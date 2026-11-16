@@ -1,9 +1,8 @@
 /**
  * Frame layout resolver. One pure function: the Frame's width, the Panel's
- * width, the Sidebar's request, the chat mode and whether a Section detail
- * layout is active go in; the Sidebar state, the Panel state, the Panel's
- * width and whether the split holds come out. Fit is measured from the
- * Frame's own width, never the window.
+ * width, the Sidebar's request and the chat mode go in; the Sidebar state, the
+ * Panel state and the Panel's width come out. Fit is measured from the Frame's
+ * own width, never the window.
  *
  * Rules, in order:
  *   1. Under 1024 the Sidebar never docks and the Panel is capped at 320 and
@@ -14,10 +13,6 @@
  *   4. Otherwise the Sidebar auto-collapses (restored when the Panel closes)
  *      if that keeps the floor with the Panel docked.
  *   5. Otherwise the Panel goes to overlay.
- *   6. For Section detail the split holds from 960, met by collapsing the
- *      Sidebar first when the Panel is docked. When even a collapsed Sidebar
- *      leaves under 960 the Panel stays docked and the detail replaces the
- *      list. While a split holds, the splitter's maximum keeps 960.
  */
 
 // Numbers from the Frame spec. sidebarWidth, pagePad and the three Panel widths
@@ -44,12 +39,10 @@ export const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
 
 /**
  * The splitter's widest docked Panel: it keeps the 720 content floor beside
- * whatever is docked now, or 960 while a Section detail split holds, so a
- * drag never breaks the split.
+ * whatever is docked now.
  */
-export function dockedPanelMax({ frameWidth, sidebarDocked, splitHolds }) {
-    const floor = splitHolds ? L.splitFloor : L.contentFloor;
-    const room = frameWidth - padTotal - floor - (sidebarDocked ? L.sidebarWidth : 0);
+export function dockedPanelMax({ frameWidth, sidebarDocked }) {
+    const room = frameWidth - padTotal - L.contentFloor - (sidebarDocked ? L.sidebarWidth : 0);
     return clamp(room, L.panelMin, L.panelMax);
 }
 
@@ -60,12 +53,10 @@ export function dockedPanelMax({ frameWidth, sidebarDocked, splitHolds }) {
  * @param {{open: boolean, setBy: 'hand' | 'default'}} [input.sidebar]
  * @param {boolean} [input.sidebarPeek] hover on the collapsed Sidebar's toggle
  * @param {'popup' | 'panel' | 'fullscreen'} [input.chatMode]
- * @param {boolean} [input.sectionDetail]
  * @returns {{
  *   sidebar: 'docked' | 'collapsed' | 'peeking' | 'overlay',
  *   panel: 'none' | 'docked' | 'overlay',
  *   panelWidth: number,
- *   splitHolds: boolean,
  * }}
  */
 export function resolveFrameLayout({
@@ -74,7 +65,6 @@ export function resolveFrameLayout({
     sidebar = { open: true, setBy: 'default' },
     sidebarPeek = false,
     chatMode = 'popup',
-    sectionDetail = false,
 }) {
     const narrow = frameWidth < L.dockMin;
     const wantsPanel = chatMode === 'panel';
@@ -124,28 +114,11 @@ export function resolveFrameLayout({
         panelState = 'overlay';
     }
 
-    // Rule 6: collapse a default Sidebar to keep the Section detail split.
-    if (
-        sectionDetail &&
-        panelState === 'docked' &&
-        sidebarState === 'docked' &&
-        !byHand &&
-        contentFor(true, true) < L.splitFloor &&
-        contentFor(false, true) >= L.splitFloor
-    ) {
-        sidebarState = 'collapsed';
-    }
-
-    const sidebarDocked = sidebarState === 'docked';
-    const panelDocked = panelState === 'docked';
-    const rawContent = contentFor(sidebarDocked, panelDocked);
-
     if (sidebarState === 'collapsed' && sidebarPeek) sidebarState = 'peeking';
 
     return {
         sidebar: sidebarState,
         panel: panelState,
         panelWidth: effectivePanelWidth,
-        splitHolds: sectionDetail && rawContent >= L.splitFloor,
     };
 }

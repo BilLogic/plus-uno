@@ -1,122 +1,123 @@
-import { render, screen, within } from '@testing-library/react';
+import React, { useState } from 'react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
-import { SplitContext } from '../Frame/SplitContext';
-import PatternSection, { SECTION_DETAIL_FLOOR, sectionDetailView } from './PatternSection';
+import { MotionPreferenceContext } from '@/lib/motionPreference';
+import PatternSection from './PatternSection';
 
 /**
- * The Section's optional `detail` region: the body is the list, the region on
- * its right shows one record. The split holds from 960 of the Section's own
- * width (or the Frame's resolver); below it the detail replaces the list behind
- * a back link. `sectionDetailView` is the rule; widths and columns are asserted
- * in the browser, in the `Templates/Section` stories.
+ * The Section's optional `detail` prop renders an inline expand built on Base
+ * UI's Collapsible: a disclosure trigger opens the detail region in place
+ * inside the Section and pushes the content below it down.
  */
-describe('sectionDetailView', () => {
-    it('splits from the floor up, with or without a selection', () => {
-        expect(SECTION_DETAIL_FLOOR).toBe(960);
-        expect(sectionDetailView({ splitHolds: true, hasSelection: true })).toBe('split');
-        expect(sectionDetailView({ splitHolds: true, hasSelection: false })).toBe('split');
-    });
-
-    it('below the floor shows the detail alone when a record is open, the list otherwise', () => {
-        expect(sectionDetailView({ splitHolds: false, hasSelection: true })).toBe('detail');
-        expect(sectionDetailView({ splitHolds: false, hasSelection: false })).toBe('list');
-    });
-});
-
-// The resolver is set so the split state never depends on jsdom's window width.
-const renderIt = (props = {}) => render(
-    <SplitContext.Provider value>
+const renderDetail = (props = {}) => render(
+    <MotionPreferenceContext.Provider value>
         <PatternSection
-            title="Queue"
-            detail={<div>Flag body</div>}
-            detailTitle="Flag 1"
-            hasSelection
+            title="Session reflections"
+            detail={<div>The reflection names two goals for next week.</div>}
+            detailTitle="Ava Thompson"
+            detailDescription="Grade 7"
+            detailFooter={<button type="button">Open full review</button>}
             {...props}
         >
-            <div>Queue rows</div>
+            <div>Section rows</div>
         </PatternSection>
-    </SplitContext.Provider>,
+    </MotionPreferenceContext.Provider>,
 );
 
-describe('PatternSection detail', () => {
-    it('puts next and previous in the detail header and runs them', async () => {
-        const onNext = vi.fn();
-        const onPrevious = vi.fn();
-        renderIt({ onNext, onPrevious });
-        const detail = screen.getByRole('heading', { name: 'Flag 1' }).closest('section');
-        await userEvent.click(within(detail).getByRole('button', { name: 'Next' }));
-        await userEvent.click(within(detail).getByRole('button', { name: 'Previous' }));
-        expect(onNext).toHaveBeenCalledOnce();
-        expect(onPrevious).toHaveBeenCalledOnce();
+describe('PatternSection detail (inline expand)', () => {
+    it('starts closed by default with a disclosure button and subtle fill', () => {
+        const { container } = renderDetail();
+        const trigger = screen.getByRole('button', { name: /Ava Thompson/ });
+        expect(trigger).toHaveAttribute('aria-expanded', 'false');
+        expect(screen.queryByRole('region', { name: 'Ava Thompson' })).toBeNull();
+        expect(screen.getByText('Section rows')).toBeInTheDocument();
+        expect(container.querySelector('.plus-pattern-section-detail').className)
+            .toContain('plus-pattern-section-fill-subtle');
     });
 
-    it('draws the detail with the subtle fill', () => {
-        renderIt();
-        expect(screen.getByRole('heading', { name: 'Flag 1' }).closest('section').className).toContain('plus-pattern-section-fill-subtle');
+    it('opens in place on click and names the detail region from detailTitle, then closes on click', async () => {
+        renderDetail();
+        const trigger = screen.getByRole('button', { name: /Ava Thompson/ });
+        await userEvent.click(trigger);
+
+        expect(trigger).toHaveAttribute('aria-expanded', 'true');
+        const region = screen.getByRole('region', { name: 'Ava Thompson' });
+        expect(within(region).getByText('The reflection names two goals for next week.')).toBeInTheDocument();
+        expect(within(region).getByRole('button', { name: 'Open full review' })).toBeInTheDocument();
+        expect(screen.getByText('Section rows')).toBeInTheDocument();
+
+        await userEvent.click(trigger);
+        expect(trigger).toHaveAttribute('aria-expanded', 'false');
+        await waitFor(() => expect(screen.queryByRole('region', { name: 'Ava Thompson' })).toBeNull());
     });
 
-    it('draws no detail when no record is open at the split, so the list spans the row', () => {
-        const { container } = renderIt({ hasSelection: false, detail: null });
-        expect(container.querySelector('.plus-pattern-section-detail')).toBeNull();
-        expect(container.querySelector('.plus-pattern-section-with-detail--split')).not.toBeNull();
-        expect(screen.getByText('Queue rows')).toBeInTheDocument();
+    it('supports defaultDetailOpen and controlled detailOpen with onDetailOpenChange', async () => {
+        const onDetailOpenChange = vi.fn();
+        const Controlled = () => {
+            const [open, setOpen] = useState(true);
+            return (
+                <MotionPreferenceContext.Provider value>
+                    <PatternSection
+                        title="Session reflections"
+                        detail={<div>Controlled body</div>}
+                        detailTitle="Ava Thompson"
+                        detailOpen={open}
+                        onDetailOpenChange={(next) => {
+                            onDetailOpenChange(next);
+                            setOpen(next);
+                        }}
+                    >
+                        <div>Section rows</div>
+                    </PatternSection>
+                </MotionPreferenceContext.Provider>
+            );
+        };
+        render(<Controlled />);
+        const trigger = screen.getByRole('button', { name: /Ava Thompson/ });
+        expect(trigger).toHaveAttribute('aria-expanded', 'true');
+        expect(screen.getByRole('region', { name: 'Ava Thompson' })).toBeInTheDocument();
+
+        await userEvent.click(trigger);
+        expect(onDetailOpenChange).toHaveBeenCalledWith(false);
+        expect(trigger).toHaveAttribute('aria-expanded', 'false');
     });
 
-    it('names the detail region from its title', () => {
-        renderIt();
-        expect(screen.getByRole('region', { name: 'Flag 1' })).toBeInTheDocument();
+    it('toggles with Enter and Space on the disclosure button', async () => {
+        renderDetail();
+        const trigger = screen.getByRole('button', { name: /Ava Thompson/ });
+        trigger.focus();
+        expect(trigger).toHaveFocus();
+
+        await userEvent.keyboard('{Enter}');
+        expect(trigger).toHaveAttribute('aria-expanded', 'true');
+        expect(screen.getByRole('region', { name: 'Ava Thompson' })).toBeInTheDocument();
+
+        await userEvent.keyboard(' ');
+        expect(trigger).toHaveAttribute('aria-expanded', 'false');
+        await waitFor(() => expect(screen.queryByRole('region', { name: 'Ava Thompson' })).toBeNull());
     });
 
-    it('disables next and previous when the caller says there is none', () => {
-        renderIt({ onNext: vi.fn(), onPrevious: vi.fn(), nextDisabled: true, previousDisabled: true });
-        expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled();
-        expect(screen.getByRole('button', { name: 'Previous' })).toBeDisabled();
+    it('closes on Escape when focus is inside the detail and returns focus to the trigger', async () => {
+        renderDetail({ defaultDetailOpen: true });
+        const trigger = screen.getByRole('button', { name: /Ava Thompson/ });
+        const innerButton = screen.getByRole('button', { name: 'Open full review' });
+
+        innerButton.focus();
+        expect(innerButton).toHaveFocus();
+
+        await userEvent.keyboard('{Escape}');
+        expect(trigger).toHaveAttribute('aria-expanded', 'false');
+        expect(trigger).toHaveFocus();
+        await waitFor(() => expect(screen.queryByRole('region', { name: 'Ava Thompson' })).toBeNull());
     });
 
-    it('draws no detail wrapper on a plain Section', () => {
-        const { container } = render(<PatternSection title="Sessions">Body</PatternSection>);
+    it('draws no detail wrapper on a plain Section or when detail is null', () => {
+        const { container, rerender } = render(<PatternSection title="Sessions">Body</PatternSection>);
         expect(container.querySelector('.plus-pattern-section-with-detail')).toBeNull();
-    });
-});
+        expect(container.querySelector('.plus-pattern-section-detail')).toBeNull();
 
-describe('PatternSection detail inside a Frame with sectionDetail', () => {
-    const inFrame = (splitHolds) => render(
-        <SplitContext.Provider value={splitHolds}>
-            <PatternSection title="Queue" detail={<div>Flag body</div>} detailTitle="Flag 1" hasSelection>
-                <div>Queue rows</div>
-            </PatternSection>
-        </SplitContext.Provider>,
-    );
-
-    it('follows the resolver: split when it holds, the detail alone when it does not', () => {
-        const held = inFrame(true);
-        expect(held.container.querySelector('.plus-pattern-section-with-detail--split')).not.toBeNull();
-        held.unmount();
-        const dropped = inFrame(false);
-        expect(dropped.container.querySelector('.plus-pattern-section-with-detail--detail')).not.toBeNull();
-        expect(screen.queryByText('Queue rows')).toBeNull();
-    });
-});
-
-describe('PatternSection detail back link', () => {
-    const narrow = (props) => render(
-        <SplitContext.Provider value={false}>
-            <PatternSection title="Queue" detail={<div>Flag body</div>} detailTitle="Flag 1" hasSelection {...props}>
-                <div>Queue rows</div>
-            </PatternSection>
-        </SplitContext.Provider>,
-    );
-
-    it('is not drawn without a handler', () => {
-        narrow();
-        expect(screen.queryByRole('button', { name: 'Back to list' })).toBeNull();
-    });
-
-    it('runs onBack when the detail replaces the list', async () => {
-        const onBack = vi.fn();
-        narrow({ onBack });
-        await userEvent.click(screen.getByRole('button', { name: 'Back to list' }));
-        expect(onBack).toHaveBeenCalledOnce();
+        rerender(<PatternSection title="Sessions" detail={null}>Body</PatternSection>);
+        expect(container.querySelector('.plus-pattern-section-detail')).toBeNull();
     });
 });

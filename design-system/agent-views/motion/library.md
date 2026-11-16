@@ -35,7 +35,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | PatternSection | template | view-bar | Swap content in place | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | PatternSection | template | side-open | Expand and collapse | `--ds-motion-spatial-default` |  |
 | PatternSection | template | side-close | Expand and collapse | `--ds-motion-spatial-default` |  |
-| PatternSection | template | detail | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` |  |
+| PatternSection | template | detail | Expand and collapse | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | PatternSection | template | body | Load content | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | PatternSection | template | footer | Step to the next or previous | `--ds-motion-spatial-default` |  |
 | PatternTable | template | selection | Update a value or state | `--ds-motion-appearance-fast` |  |

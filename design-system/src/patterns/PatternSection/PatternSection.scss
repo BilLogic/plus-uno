@@ -1,3 +1,5 @@
+@use '../../styles/state' as *;
+
 /**
  * Section pattern (Patterns/Section)
  * A span of the page grid: no fill, no pad, never elevated. Parts stack
@@ -144,50 +146,104 @@
 }
 
 /*
- * Detail: the body is the list, spanning 7 of the Page's 12 columns, and the
- * detail region spans 5, a gutter apart. Below the split floor one of them
- * fills the row.
+ * Detail: an inline expand inside the Section. The disclosure row opens the
+ * detail region in place and pushes the content below it down.
  */
 .plus-pattern-section-with-detail {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: var(--grid-gutter);
-    align-items: start;
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-stack-md);
     min-width: 0;
 }
 
-.plus-pattern-section-with-detail--split > .plus-pattern-section-list {
-    grid-column: span 7;
-}
-
-.plus-pattern-section-with-detail--split > .plus-pattern-section-detail {
-    grid-column: span 5;
-}
-
-.plus-pattern-section-with-detail--list > .plus-pattern-section-list,
-.plus-pattern-section-with-detail--detail > .plus-pattern-section-detail {
-    grid-column: 1 / -1;
-}
-
-/* No record open at the split: the list takes the row. */
-.plus-pattern-section-with-detail--split:not(:has(> .plus-pattern-section-detail)) > .plus-pattern-section-list {
-    grid-column: 1 / -1;
-}
-
-.plus-pattern-section-list,
-.plus-pattern-section-detail {
+.plus-pattern-section-list {
     min-width: 0;
 }
 
 .plus-pattern-section-detail {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    gap: var(--section-stack-sm);
+    min-width: 0;
+    padding: 0;
+    border-radius: var(--section-radius);
+    background-color: var(--ds-surface-sunken);
 }
 
-.plus-pattern-section-detail-back {
-    align-self: flex-start;
+.plus-pattern-section-detail-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--inline-md);
+    width: 100%;
+    padding: var(--section-pad-y-default) var(--section-pad-x-default);
+    border: none;
+    border-radius: var(--section-radius);
+    background-color: transparent;
+    color: var(--ds-text);
+    font: var(--body-default);
+    text-align: left;
+    cursor: pointer;
+    transition: background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+
+    @include plus-state((
+        hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
+        pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
+    ));
+}
+
+.plus-pattern-section-detail-heading {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stack-sm);
+    min-width: 0;
+}
+
+.plus-pattern-section-detail-title {
+    font: var(--heading-sm);
+    color: var(--ds-text);
+}
+
+.plus-pattern-section-detail-description {
+    font: var(--body-sm);
+    color: var(--ds-text-subtle);
+}
+
+.plus-pattern-section-detail-chevron {
+    display: inline-flex;
+    flex-shrink: 0;
+    color: var(--ds-icon-subtle);
+    transform: rotate(0deg);
+    transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
+}
+
+.plus-pattern-section-detail-trigger[data-panel-open] .plus-pattern-section-detail-chevron {
+    transform: rotate(-180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .plus-pattern-section-detail-trigger,
+    .plus-pattern-section-detail-chevron {
+        transition: none;
+    }
+}
+
+.plus-pattern-section-detail-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-stack-md);
+    padding: 0 var(--section-pad-x-default) var(--section-pad-y-default);
+}
+
+.plus-pattern-section-detail-content {
+    min-width: 0;
+}
+
+.plus-pattern-section-detail-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--inline-md);
 }
 
 /*

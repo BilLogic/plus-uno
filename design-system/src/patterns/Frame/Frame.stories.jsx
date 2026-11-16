@@ -110,10 +110,6 @@ export default {
             control: 'boolean',
             table: { category: 'Design' },
         },
-        sectionDetail: {
-            control: 'boolean',
-            table: { category: 'Design' },
-        },
         contentAs: { control: false, table: { disable: true } },
         contentClassName: { control: false, table: { disable: true } },
         width: {
@@ -309,7 +305,7 @@ export const PairTitleInHeader = {
 /** The playground: the frame at the docs height, with its layout props live. */
 export const Interactive = {
     render: DocsFrame,
-    args: { width: 'content', sectionDetail: false, surfaceDirect: false },
+    args: { width: 'content', surfaceDirect: false },
     parameters: { layout: 'padded' },
 };
 
@@ -1340,39 +1336,6 @@ export const NoPanelPeekByDefault = {
         const p = panelParts(canvasElement);
         await expect(p.frame.querySelector('.plus-frame__panel-edge'), 'no hover strip').toBeNull();
     },
-};
-
-/** 1440 with Section detail: both docked would leave 752, under the 960 split, so the default Sidebar collapses to keep it (992). */
-export const SectionDetailKeepsSplitAt1440 = {
-    parameters: { frameWidth: 1440 },
-    render: WithPanel,
-    args: { sectionDetail: true },
-    play: async ({ canvasElement }) => atViewport(1440, async () => {
-        const p = panelParts(canvasElement);
-        await waitFor(() => expect(p.sidebar()).not.toBeNull());
-        await openPanel(p);
-        await waitFor(() => expect(p.sidebar(), 'the Sidebar collapses first').toBeNull());
-        await expect(getComputedStyle(p.panel()).position).not.toBe('absolute');
-        await expect(rect(p.content).width, '1440 - 400 - 48').toBeCloseTo(992, 0);
-    }),
-};
-
-/** 1440 with Section detail: the splitter's limit keeps 960 of content, so dragging to it never breaks the split. */
-export const SectionDetailSplitterKeepsSplitAt1440 = {
-    parameters: { frameWidth: 1440 },
-    render: WithPanel,
-    args: { sectionDetail: true },
-    play: async ({ canvasElement }) => atViewport(1440, async () => {
-        const p = panelParts(canvasElement);
-        await openPanel(p);
-        const splitter = p.splitter();
-        // 1440 - 48 - 960, with the Sidebar collapsed to keep the split.
-        await expect(splitter).toHaveAttribute('aria-valuemax', '432');
-        splitter.focus();
-        await userEvent.keyboard('{End}');
-        await waitFor(() => expect(splitter).toHaveAttribute('aria-valuenow', '432'));
-        await expect(rect(p.content).width, 'content keeps 960').toBeGreaterThanOrEqual(960 - 0.5);
-    }),
 };
 
 /* ------------------------------------------------------------- states */

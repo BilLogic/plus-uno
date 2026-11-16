@@ -8,7 +8,6 @@ import { AreaStage } from '@/lib/navigationMotion';
 import { IconButton, LinkIconButton, PanelHostContext } from '@/components';
 import { SidebarControlContext } from './SidebarControl';
 import { PanelControlContext } from './PanelControl';
-import { SplitContext } from './SplitContext';
 import PanelSplitter from './PanelSplitter';
 import { useOwnWidth } from './useOwnWidth';
 import { FRAME_LAYOUT, clamp, dockedPanelMax, resolveFrameLayout } from './frameLayout';
@@ -123,7 +122,6 @@ const Frame = ({
     panelDefaultWidth = FRAME_LAYOUT.panelDefault,
     panelPeek = false,
     panelStorageKey = PANEL_STORAGE_KEY,
-    sectionDetail = false,
     width = 'content',
     contentAs: Content = 'main',
     contentClassName = '',
@@ -188,8 +186,7 @@ const Frame = ({
         sidebar: hand === null ? { open: defaultOpen, setBy: 'default' } : { open: hand, setBy: 'hand' },
         sidebarPeek: peek,
         chatMode: panelOpen ? 'panel' : 'popup',
-        sectionDetail,
-    }), [frameWidth, panelWidth, hand, defaultOpen, peek, panelOpen, sectionDetail]);
+    }), [frameWidth, panelWidth, hand, defaultOpen, peek, panelOpen]);
 
     const narrow = frameWidth < FRAME_LAYOUT.dockMin;
     const panelState = layout.panel;
@@ -475,9 +472,8 @@ const Frame = ({
     // As an overlay beside a Sidebar docked by default, the narrowest width
     // stays too wide for the Panel to dock alone, which would collapse it.
     const room = frameWidth - FRAME_LAYOUT.pagePad * 2 - FRAME_LAYOUT.contentFloor;
-    // While a Section detail split holds the floor is 960, so a drag never breaks it.
     const splitterMax = panelState === 'docked'
-        ? dockedPanelMax({ frameWidth, sidebarDocked: layout.sidebar === 'docked', splitHolds: layout.splitHolds })
+        ? dockedPanelMax({ frameWidth, sidebarDocked: layout.sidebar === 'docked' })
         : FRAME_LAYOUT.panelMax;
     const splitterMin = panelState === 'overlay' && layout.sidebar === 'docked' && hand !== true
         ? clampPanelWidth(room + 1)
@@ -636,7 +632,6 @@ const Frame = ({
 
     return (
         <div id={id} ref={frameRef} className={classes} style={style} {...props}>
-            <SplitContext.Provider value={sectionDetail ? layout.splitHolds : null}>
             <PanelControlContext.Provider value={panelControl}>
                 <SidebarControlContext.Provider value={control}>
                 {collapsed ? (
@@ -684,7 +679,6 @@ const Frame = ({
                 </Dialog.Root>
                 </SidebarControlContext.Provider>
             </PanelControlContext.Provider>
-            </SplitContext.Provider>
         </div>
     );
 };
@@ -731,8 +725,6 @@ Frame.propTypes = {
     panelPeek: PropTypes.bool,
     /** The sessionStorage key the Panel's width and open state are kept under; null keeps nothing. */
     panelStorageKey: PropTypes.string,
-    /** A Section detail layout is on the Page: the Sidebar collapses first to keep the 960 split. */
-    sectionDetail: PropTypes.bool,
     /** Content cap: content 1232, reading 864 */
     width: PropTypes.oneOf(['content', 'reading']),
     /** Element for the content box. `main` by default, the Page's landmark; pass `div` when the page supplies its own `main`. */

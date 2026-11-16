@@ -14,17 +14,17 @@ Also asked as: page section, toolbar, section header, block, region.
 
 **Source:** `design-system/src/patterns/PatternSection/PatternSection.jsx`
 
-**Stories:** `design-system/src/patterns/PatternSection/PatternSection.stories.jsx` — Overview, HeaderDefault, HeaderTabs, HeaderToolbar, HeaderCustom, HeaderTabsOnly, LayoutSingle, LayoutSplit, LayoutSubsections, FillSubtle, CardNesting, Footer, Anatomy, Levels, ToolbarSearch, LoadingDefault, LoadingToolbar, LoadingTabsOnly, Interactive, ColorModes, SplitLayout, Spacing, Detail, DetailWithPanel, DetailWithPanelNoSectionDetail, DetailSplitAt1440, DetailSplitHoldsWithPanelAt1440, DetailReplacesListBelow960, TypeList, TypeQueue, TypeCards, TypeStats, TypeDetails, TypeMainAndSide, TypeForm, TypeSubsections, HeaderTypeTitle, HeaderTypeTitleAndActions, HeaderTypeViewBarOneView, HeaderTypeViewBarSeveralViews, HeaderTypeFormatSwitch, HeaderTypeViewBarAlone, HeaderTypeUnderPageTabs, HeaderTypeSubsection, SideAtEnd, FilterSideAtStart, ResponsiveWidth, RowsSelected, EmptyInTable, AnatomyQueue
+**Stories:** `design-system/src/patterns/PatternSection/PatternSection.stories.jsx` — Overview, HeaderDefault, HeaderTabs, HeaderToolbar, HeaderCustom, HeaderTabsOnly, LayoutSingle, LayoutSplit, LayoutSubsections, FillSubtle, CardNesting, Footer, Anatomy, Levels, ToolbarSearch, LoadingDefault, LoadingToolbar, LoadingTabsOnly, Interactive, ColorModes, SplitLayout, Spacing, Detail, TypeList, TypeQueue, TypeCards, TypeStats, TypeDetails, TypeMainAndSide, TypeForm, TypeSubsections, HeaderTypeTitle, HeaderTypeTitleAndActions, HeaderTypeViewBarOneView, HeaderTypeViewBarSeveralViews, HeaderTypeFormatSwitch, HeaderTypeViewBarAlone, HeaderTypeUnderPageTabs, HeaderTypeSubsection, SideAtEnd, FilterSideAtStart, ResponsiveWidth, RowsSelected, EmptyInTable, AnatomyQueue
 
 **Storybook page:** `design-system/src/patterns/PatternSection/PatternSection.mdx`
 
-**Motion:** view-bar `spatial.fast` + `appearance.fast` · side-open `spatial.default` · side-close `spatial.default` · detail `spatial.default` + `appearance.default` · body `spatial.fast` + `appearance.fast` · footer `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Motion:** view-bar `spatial.fast` + `appearance.fast` · side-open `spatial.default` · side-close `spatial.default` · detail `spatial.fast` + `appearance.fast` · body `spatial.fast` + `appearance.fast` · footer `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
 Use `PatternSection` when content has a heading, shares actions, shows or hides as a unit, or takes its own span of the grid; otherwise the content belongs to the Section above it. The header is the Section's, not the Table's: the title row names it, and the view bar under it holds the views at the start and everything that acts on the content at the end, so switching views can swap a table for cards while the bar stays put.
 
-A Section has two looks, `none` and `subtle`, and five parts: header, body, side, detail and footer. The side and the detail take either fill. The `detail` region is a split view today; a **Section detail** in the product sense is an inline expand (see Best practices below).
+A Section has two looks, `none` and `subtle`, and five parts: header, body, side, detail and footer. The side takes either fill; the detail is an inline expand on the subtle fill that opens in place inside the Section and pushes the content below it down.
 
 ## Motion
 
@@ -35,7 +35,7 @@ PatternSection reads these motion tokens and no literal duration or curve.
 | view-bar | Swap content in place | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Title row: nothing moves. The selected pill's fill and the format switch's indicator glide while the content swaps in place. Search and the Filter count grow to the left. |
 | side-open | Expand and collapse | `--ds-motion-spatial-default` | The side opens and collapses as a section. Below 960 it hides with no animation. |
 | side-close | Expand and collapse | `--ds-motion-spatial-default` | Collapses back the same way. Below 960 the side is gone in the same frame, with no animation. |
-| detail | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | A quick look is an overlay; promoted to its record page it grows from the Panel itself. |
+| detail | Expand and collapse | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Opens in place inside the Section and pushes the content below it down. |
 | body | Load content | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Content loads on arrival; add or remove, reorder and swap content as it changes. |
 | footer | Step to the next or previous | `--ds-motion-spatial-default` | Paging is Step. |
 
@@ -136,7 +136,7 @@ The table's empty state replaces the whole table, by the Empty pattern; elevatio
 - The pill views are a tablist; the selected tab says which rows the body shows. Views swap in place.
 - Search, Filter and More carry their names: "Search students", "Filters, 2 applied", "More". The Filter count is in the name as well as on the button.
 - The table announces a selection politely, "2 selected", and the bulk bar's actions follow the select-all checkbox in the tab order.
-- The detail is a region named by its title. Below 960 its back link returns to the list.
+- The detail is a collapsible region named by its title: the disclosure button toggles it with Enter or Space, and Escape inside the open detail closes it and returns focus to the button.
 
 ## Related
 
@@ -155,7 +155,7 @@ Each Section type combines a header and body, with an optional side or detail. T
 
 - **List.** The view bar alone, one table, paging. The default for an area page.
 - **Detail.** A list with a detail that opens an item in place.
-- **Cards.** Title and actions over a grid of cards, three or four across.
+- **Cards.** Title and actions, a grid of cards three across.
 - **Stats.** A row of cards, each one number and its label, four at most.
 - **Details.** Label and value pairs in two columns, with Edit in the title row.
 - **Main and side.** A split with the side at the end and no fill: facts beside the main content.
@@ -182,7 +182,7 @@ A Section with a view bar, a detail and a footer. The title, the first pill and 
 1. **Title row.** The h2, an optional one-line description, and actions only when there is no view bar.
 2. **View bar** (optional). Pill views at the start; at the end, in order, the format switch, Search, filters, More and the labeled Primary.
 3. **Body.** A Table, a card grid, a list, a form or subsections. A Table's head row follows the bar with nothing between.
-4. **Detail** (optional). Today the `detail` region draws the picked record beside the list, 5 of 12 columns, with Previous and Next and its own footer. It is not for queue pages: a queue page docks a `Panel` beside the list.
+4. **Detail** (optional). An inline expand on the subtle fill that opens in place inside the Section and pushes the content below it down. Never use it for a queue page, which docks a `Panel` beside the list.
 5. **Footer** (optional). Paging or "View all".
 
 ## Slots
@@ -197,7 +197,8 @@ A Section with a view bar, a detail and a footer. The title, the first pill and 
 | `children` | The body: a Table, a card grid, a list, a form or subsections. |
 | `layout="split"` · `side` | A second column at the end, for a summary. |
 | `sidePlacement` | Planned. `start` puts the side first, for a filter side or a step rail. |
-| `detail` · `detailTitle` · `detailFooter` | The picked record beside the list, with Previous and Next. Not for queue pages, which dock a `Panel`. |
+| `detail` · `detailTitle` · `detailDescription` · `detailFooter` | An inline expand that opens in place inside the Section and pushes the content below it down. Never use it for a queue page, which docks a `Panel`. |
+| `detailOpen` · `defaultDetailOpen` · `onDetailOpenChange` | Open state of the inline detail expand. |
 | `footer` | Paging or "View all". |
 
 The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, and the Section holds nothing for it: Dynamic table.
@@ -210,7 +211,6 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 | `--section-stack-md` | Header to body; body to footer. |
 | `--section-stack-lg` | Between subsections. |
 | `--section-min-width-main`, `--section-min-width-side` | The main and side columns of a split. |
-| Detail split | The list spans 7 of 12 columns and the detail 5, from 960 up (`SECTION_DETAIL_FLOOR`). A grid span in the Section styles, with no token. |
 | `--section-radius` | 16: the corner of a Section with `fill="subtle"`. A Card inside it takes `--card-radius-compact` (12) instead of `--card-radius`. |
 | `--section-pad-x-default`, `--section-pad-y-default` | A Section with `fill="subtle"`, on `--ds-surface-sunken`. |
 | `--heading-md`, `--heading-sm` | A Section title and a subsection title. |
@@ -242,19 +242,13 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 | `layout` | enum | `'single'` | Body layout: the content alone, content beside `side`, or stacked subsections |
 | `side` | node | — | Side column of `layout="split"` |
 | `footer` | node | — | Footer, for "View all" or paging only; aligned to the end |
-| `detail` | node | — | The optional detail region on the right: one record of the content. Pass `null` for the region with nothing open; leave it off for a plain Section |
-| `detailTitle` | node | — | The detail's title; also the region's accessible name |
-| `detailDescription` | node | — | Optional description under the detail title |
+| `detail` | node | — | Inline expand content that opens in place inside the Section and pushes the content below it down |
+| `detailTitle` | node | — | Title on the detail disclosure button; also names the detail region |
+| `detailDescription` | node | — | Optional description on the detail disclosure button |
 | `detailFooter` | node | — | Detail footer, such as "Open full review" |
-| `hasSelection` | bool | `Boolean(detail)` | Whether a record is open. Defaults to whether `detail` is given |
-| `onBack` | func | — | Runs the back link. The link shows only when this is set and the detail replaces the list |
-| `backLabel` | string | `'Back to list'` | The back link's label |
-| `onPrevious` | func | — | Runs the previous button; the stepper shows when either handler is set |
-| `onNext` | func | — | Runs the next button |
-| `previousDisabled` | bool | `false` | Disables the previous button, at the start of the queue |
-| `nextDisabled` | bool | `false` | Disables the next button, at the end of the queue |
-| `previousLabel` | string | `'Previous'` | The previous button's label |
-| `nextLabel` | string | `'Next'` | The next button's label |
+| `detailOpen` | bool | — | Controlled open state of the inline detail expand |
+| `defaultDetailOpen` | bool | `false` | Whether an uncontrolled inline detail expand starts open |
+| `onDetailOpenChange` | func | — | Called with the next open boolean when the inline detail expand toggles |
 | `level` | enum | — | `page` makes the title the page's h1 at Heading/large 24; by default it nests one level down |
 | `gap` | enum | `'md'` | Gap between the header, the body and the footer (Section/stack tokens); `md` is the Figma value |
 | `fill` | enum | `'none'` | `subtle` sets the section on the sunken surface with a pad and a radius; `none` (default) draws nothing |
@@ -293,7 +287,7 @@ Implemented as `SectionToolbar`.
 
 ## Tokens touched
 
-`--body-default` · `--body-sm` · `--control-md` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--grid-gutter` · `--heading-lg` · `--heading-lg-tracking` · `--heading-md` · `--heading-sm` · `--heading-xs` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--section-min-width-main` · `--section-min-width-side` · `--section-pad-x-default` · `--section-pad-y-default` · `--section-radius` · `--section-stack-lg` · `--section-stack-md` · `--section-stack-sm` · `--size-300` · `--stack-sm` · `--width-3000`
+`--body-default` · `--body-sm` · `--control-md` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--grid-gutter` · `--heading-lg` · `--heading-lg-tracking` · `--heading-md` · `--heading-sm` · `--heading-xs` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--section-min-width-main` · `--section-min-width-side` · `--section-pad-x-default` · `--section-pad-y-default` · `--section-radius` · `--section-stack-lg` · `--section-stack-md` · `--section-stack-sm` · `--size-300` · `--stack-sm` · `--width-3000`
 
 From `design-system/src/patterns/PatternSection/PatternSection.scss`. Override these through the token layer, never with a literal.
 

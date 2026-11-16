@@ -18,7 +18,7 @@ export {
     SIDEBAR_RECENT_TABS,
 } from './Sidebar';
 export { default as PatternCard } from './PatternCard';
-export { default as PatternSection, SECTION_DETAIL_FLOOR, sectionDetailView } from './PatternSection';
+export { default as PatternSection, SECTION_DETAIL_FLOOR } from './PatternSection';
 export { default as AiChat, useAiChat, AI_CHAT_MODES, AI_CHAT_STORAGE_KEY, AI_CHAT_FULLSCREEN_BELOW, AI_CHAT_DISCLAIMER } from './AiChat';
 export { default as Blanket, BLANKET_WIDTHS, BLANKET_HEIGHTS, BLANKET_SPANS } from './Blanket';
 export { default as PatternModal } from './PatternModal';

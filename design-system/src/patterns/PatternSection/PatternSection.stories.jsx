@@ -3,6 +3,7 @@ import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import {
     Button,
+    DynamicTable,
     EmptyState,
     FilterButton,
     Icon,
@@ -10,7 +11,11 @@ import {
     PanelBody,
     PanelCloseAction,
     PanelContainer,
+    PanelDownAction,
+    PanelFooter,
     PanelHeader,
+    PanelSubheader,
+    PanelUpAction,
     SearchField,
     Select,
     StatusTag,
@@ -18,7 +23,7 @@ import {
     Toggle,
     Tabs as TabsComponent,
 } from '@/components';
-import { PANEL_STORAGE_KEY, PatternCard, PatternSection, SECTION_DETAIL_FLOOR, usePanelControl } from '@/patterns';
+import { PANEL_STORAGE_KEY, PatternCard, PatternSection, SECTION_DETAIL_FLOOR } from '@/patterns';
 import { FRAME_LAYOUT } from '../Frame/frameLayout';
 import { useOwnWidth } from '../Frame/useOwnWidth';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
@@ -533,185 +538,82 @@ export const Spacing = {
 
 /* ------------------------------------------------- detail region */
 /*
- * A Section with a `detail` region: a Compliance queue with the selected flag
- * beside it. Each width story sets the viewport first, then reads what a person
- * sees: the columns the list and the detail take, whether the Sidebar gave way
- * to the Panel, and what replaces what below 960.
+ * A Section with a `detail` region: an inline expand built on Base UI's
+ * Collapsible. The disclosure row opens in place inside the Section and pushes
+ * the content below it down; Escape inside the open detail closes it and
+ * returns focus to the disclosure trigger.
  */
 
 const resetPanel = () => { window.sessionStorage.removeItem(PANEL_STORAGE_KEY); };
 const DETAIL_HEIGHT = 900;
 const atViewport = (width, run) => withTestViewport(width, DETAIL_HEIGHT, run);
 
-const FLAGS = [
-    { id: 'f1', tutor: 'Maya Chen', reason: 'Session ended early', status: 'Open' },
-    { id: 'f2', tutor: 'Jordan Reyes', reason: 'Missing reflection', status: 'Open' },
-    { id: 'f3', tutor: 'Priya Nair', reason: 'Late start', status: 'In review' },
-    { id: 'f4', tutor: 'Sam Okafor', reason: 'No student check-in', status: 'Open' },
-];
-
-const ChatPanel = () => {
-    const panel = usePanelControl();
-    return (
-        <PanelContainer>
-            <PanelHeader title="AI chat" actions={<PanelCloseAction onClick={() => panel?.setOpen(false)} />} />
-            <PanelBody>Ask about this flag.</PanelBody>
-        </PanelContainer>
-    );
-};
-
-const ComplianceQueue = ({ withPanel = false, ...frameArgs }) => {
-    const [index, setIndex] = useState(0);
-    const [open, setOpen] = useState(true);
-    const flag = FLAGS[index];
-    const select = (i) => { setIndex(i); setOpen(true); };
-
-    const list = (
-            <ul style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', listStyle: 'none', paddingLeft: 0, margin: 0 }}>
-                {FLAGS.map((f, i) => (
-                    <li key={f.id}>
-                        <Button
-                            text={`${f.tutor}: ${f.reason}`}
-                            appearance={i === index && open ? 'default' : 'subtle'}
-                            isSelected={i === index && open}
-                            onClick={() => select(i)}
-                        />
-                    </li>
-                ))}
-            </ul>
-    );
-
-    return (
-        <InAppFrame
-            sectionDetail
-            panel={withPanel ? <ChatPanel /> : undefined}
-            defaultPanelOpen={withPanel}
-            panelStorageKey={null}
-            {...frameArgs}
-        >
+/** A Section with an inline detail expand that opens in place and pushes the content below it down. */
+export const Detail = {
+    render: (args) => (
+        <div style={{ inlineSize: STAGE }}>
             <PatternSection
-                title="Compliance queue"
-                description={`${FLAGS.length} flags to review`}
-                hasSelection={open}
+                title="Reflections"
+                description="Week of Oct 20"
+                tabs={<ViewBar views={['All reflections', 'Needs follow-up']} primary={null} />}
+                detailTitle="Ava Thompson"
+                detailDescription="Grade 7"
                 detail={(
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                        <StatusTag appearance={flag.status === 'Open' ? 'warning' : 'info'}>{flag.status}</StatusTag>
-                        <p style={{ margin: 0 }}>{flag.reason}. Review the session notes, then decide.</p>
+                        <StatusTag appearance="warning">Needs follow-up</StatusTag>
+                        <p style={{ margin: 0, font: 'var(--body-default)' }}>
+                            The reflection names two goals for next week and asks for extra fraction practice.
+                        </p>
                     </div>
                 )}
-                detailTitle={`Flag: ${flag.tutor}`}
-                detailDescription={flag.reason}
-                detailFooter={<Button text="Open full review" appearance="subtle" iconAfter="arrow-up-right-from-square" onClick={() => {}} />}
-                onBack={() => setOpen(false)}
-                backLabel="Back to queue"
-                onPrevious={() => select(index - 1)}
-                onNext={() => select(index + 1)}
-                previousDisabled={index === 0}
-                nextDisabled={index === FLAGS.length - 1}
+                detailFooter={<Button text="Open full review" appearance="subtle" onClick={() => {}} />}
+                footer={<Button text="View all" appearance="subtle" onClick={() => {}} />}
+                {...args}
             >
-                {list}
+                <StudentsTable count={4} />
             </PatternSection>
-        </InAppFrame>
-    );
-};
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const trigger = canvas.getByRole('button', { name: /Ava Thompson/ });
+        const footer = canvasElement.querySelector('.plus-pattern-section-footer');
 
-/* ------------------------------------------------------------- probes */
+        await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+        await expect(canvas.queryByRole('region', { name: 'Ava Thompson' })).toBeNull();
+        const closedFooterTop = footer.getBoundingClientRect().top;
 
-const rect = (el) => el.getBoundingClientRect();
-const probes = (canvasElement) => {
-    const canvas = within(canvasElement);
-    const root = canvasElement.querySelector('.plus-pattern-section-with-detail');
-    return {
-        canvas,
-        root,
-        list: () => root.querySelector('.plus-pattern-section-list'),
-        detail: () => root.querySelector('.plus-pattern-section-detail'),
-        sidebar: () => canvas.queryByRole('navigation', { name: 'Main' })?.closest('.plus-frame__sidebar') ?? null,
-    };
-};
+        await userEvent.click(trigger);
+        await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+        const region = canvas.getByRole('region', { name: 'Ava Thompson' });
+        await expect(within(region).getByText(/extra fraction practice/)).toBeInTheDocument();
+        await waitFor(() => expect(
+            footer.getBoundingClientRect().top,
+            'opening the inline detail pushes the content below it down',
+        ).toBeGreaterThan(closedFooterTop));
 
-/** `n` of the 12 columns across `total` pixels, with the 16 gutters between them. */
-const spanWidth = (total, gutter, n) => ((total - 11 * gutter) / 12) * n + (n - 1) * gutter;
+        const reviewButton = within(region).getByRole('button', { name: 'Open full review' });
+        reviewButton.focus();
+        await expect(reviewButton).toHaveFocus();
+        await userEvent.keyboard('{Escape}');
+        await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+        await expect(trigger, 'Escape inside the detail returns focus to the trigger').toHaveFocus();
+        await waitFor(() => expect(canvas.queryByRole('region', { name: 'Ava Thompson' })).toBeNull());
 
-const expectSplit = async (p, contentWidth) => {
-    const gutter = parseFloat(getComputedStyle(p.root).columnGap);
-    const total = rect(p.root).width;
-    await expect(total, 'content holds the split floor').toBeGreaterThanOrEqual(SECTION_DETAIL_FLOOR);
-    await expect(total, 'content is the Frame minus Sidebar, Panel and the 48 pad').toBeCloseTo(contentWidth, 0);
-    await expect(rect(p.list()).width, 'list spans 7 columns').toBeCloseTo(spanWidth(total, gutter, 7), 0);
-    await expect(rect(p.detail()).width, 'detail spans 5 columns').toBeCloseTo(spanWidth(total, gutter, 5), 0);
-    await expect(rect(p.detail()).left - rect(p.list()).right, 'a gutter apart').toBeCloseTo(gutter, 0);
-    const section = p.detail().querySelector('section');
-    await expect(getComputedStyle(section).backgroundColor, 'the detail has a fill').not.toBe('rgba(0, 0, 0, 0)');
-    await expect(p.canvas.queryByRole('button', { name: 'Back to queue' }), 'no back link at the split').toBeNull();
-};
+        await userEvent.keyboard('{Enter}');
+        await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+        await expect(canvas.getByRole('region', { name: 'Ava Thompson' })).toBeInTheDocument();
 
-/** A Section with a detail region: a Compliance queue with the selected flag beside it. */
-export const Detail = { render: (args) => <ComplianceQueue {...args} />, parameters: { layout: 'fullscreen' },
-    beforeEach: resetPanel };
+        await userEvent.keyboard(' ');
+        await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+        await waitFor(() => expect(canvas.queryByRole('region', { name: 'Ava Thompson' })).toBeNull());
 
-/** The same layout with the Panel open, for the docs page. */
-export const DetailWithPanel = { render: (args) => <ComplianceQueue {...args} />, parameters: { layout: 'fullscreen' },
-    beforeEach: resetPanel, args: { withPanel: true } };
-
-/** The Panel open without `sectionDetail`: the Frame keeps the Sidebar, so the detail replaces the list. For the Frame page's pair. */
-export const DetailWithPanelNoSectionDetail = {
-    render: (args) => <ComplianceQueue {...args} withPanel sectionDetail={false} />,
-    parameters: { layout: 'fullscreen' },
-    beforeEach: resetPanel,
-};
-
-/** 1440, no Panel: content is 1152, so the split holds with the Sidebar docked. */
-export const DetailSplitAt1440 = {
-    render: (args) => <ComplianceQueue {...args} />,
-    parameters: { layout: 'fullscreen' },
-    beforeEach: resetPanel,
-    play: async ({ canvasElement }) => atViewport(1440, async () => {
-        const p = probes(canvasElement);
-        await waitFor(() => expect(p.detail(), 'the detail opens beside the list').not.toBeNull());
-        await expect(p.sidebar(), 'the Sidebar stays docked').not.toBeNull();
-        await expectSplit(p, 1440 - 240 - 48);
-        const detail = within(p.detail());
-        await expect(detail.getByRole('button', { name: 'Previous' }), 'first flag: no previous').toBeDisabled();
-        await userEvent.click(detail.getByRole('button', { name: 'Next' }));
-        await waitFor(() => expect(within(p.detail()).getByRole('heading', { name: 'Flag: Jordan Reyes' })).toBeInTheDocument());
-        await expect(p.list(), 'the list stays while the detail steps').not.toBeNull();
-    }),
-};
-
-/** 1440 with the 400 Panel open: the Sidebar collapses to keep 960, and the split holds. */
-export const DetailSplitHoldsWithPanelAt1440 = {
-    render: (args) => <ComplianceQueue {...args} />,
-    parameters: { layout: 'fullscreen' },
-    beforeEach: resetPanel,
-    args: { withPanel: true },
-    play: async ({ canvasElement }) => atViewport(1440, async () => {
-        const p = probes(canvasElement);
-        await waitFor(() => expect(canvasElement.querySelector('.plus-frame__panel'), 'the Panel is open').not.toBeNull());
-        await waitFor(() => expect(p.sidebar(), 'the Sidebar collapsed to keep 960').toBeNull());
-        await waitFor(() => expect(rect(p.root).width).toBeGreaterThanOrEqual(SECTION_DETAIL_FLOOR));
-        await expectSplit(p, 1440 - 400 - 48);
-        await expect(canvasElement.querySelector('.plus-frame__blanket'), 'the Panel stays docked').toBeNull();
-    }),
-};
-
-/** 1024: content is 736, under 960, so the detail replaces the list behind a back link. */
-export const DetailReplacesListBelow960 = {
-    render: (args) => <ComplianceQueue {...args} />,
-    parameters: { layout: 'fullscreen' },
-    beforeEach: resetPanel,
-    play: async ({ canvasElement }) => atViewport(1024, async () => {
-        const p = probes(canvasElement);
-        await waitFor(() => expect(p.list(), 'the list is replaced').toBeNull());
-        await expect(rect(p.root).width, 'content under the floor').toBeLessThan(SECTION_DETAIL_FLOOR);
-        await expect(rect(p.detail()).width, 'the detail takes the row').toBeCloseTo(rect(p.root).width, 0);
-        await userEvent.click(p.canvas.getByRole('button', { name: 'Back to queue' }));
-        await waitFor(() => expect(p.list(), 'back to the list').not.toBeNull());
-        await expect(p.detail(), 'the detail closes').toBeNull();
-        await userEvent.click(p.canvas.getByRole('button', { name: /Maya Chen/ }));
-        await waitFor(() => expect(p.list()).toBeNull());
-        await expect(p.canvas.getByRole('heading', { name: 'Flag: Maya Chen' })).toBeInTheDocument();
-    }),
+        await userEvent.keyboard('{Enter}');
+        await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+        await waitFor(() => expect(
+            getComputedStyle(canvasElement.querySelector('.plus-pattern-section-detail-panel')).opacity,
+        ).toBe('1'));
+    },
 };
 
 /* ------------------------------------------------------ template page */
@@ -780,31 +682,122 @@ export const TypeList = {
     ),
 };
 
-/** Queue: a list with a detail, worked through one record at a time. */
+/** Queue: a queue page docks the Panel beside the list, and the record opens on demand. */
 export const TypeQueue = {
     name: 'Type: Queue',
+    parameters: { layout: 'fullscreen' },
+    beforeEach: resetPanel,
     render: () => {
+        const queueRows = STUDENTS.slice(0, 4);
         const [index, setIndex] = useState(0);
-        const [name, grade] = STUDENTS[index];
+        const [open, setOpen] = useState(true);
+        const [name, grade, tutor] = queueRows[index];
+        const selectRow = (i) => {
+            setIndex(i);
+            setOpen(true);
+        };
+        const panel = (
+            <PanelContainer>
+                <div>
+                    <PanelHeader
+                        title={name}
+                        actions={(
+                            <>
+                                <PanelUpAction
+                                    disabled={index === 0}
+                                    onClick={() => setIndex((i) => Math.max(0, i - 1))}
+                                />
+                                <PanelDownAction
+                                    disabled={index === queueRows.length - 1}
+                                    onClick={() => setIndex((i) => Math.min(queueRows.length - 1, i + 1))}
+                                />
+                                <PanelCloseAction onClick={() => setOpen(false)} />
+                            </>
+                        )}
+                    />
+                    <PanelSubheader>
+                        <StatusTag appearance="warning">To review</StatusTag>
+                    </PanelSubheader>
+                </div>
+                <PanelBody>
+                    <p style={{ margin: 0, font: 'var(--body-default)' }}>
+                        {grade} · {tutor}. The reflection names two goals for next week.
+                    </p>
+                </PanelBody>
+                <PanelFooter>
+                    <Button text="Open full review" appearance="subtle" onClick={() => {}} />
+                </PanelFooter>
+            </PanelContainer>
+        );
         return (
-            <ScreenStage width={STAGE}>
+            <InAppFrame
+                panel={panel}
+                panelLabel="Reflection"
+                panelOpen={open}
+                onPanelOpenChange={setOpen}
+                panelStorageKey={null}
+            >
                 <PatternSection
                     title="Reflections to review"
                     tabs={<ViewBar views={['To review']} primary={null} />}
-                    detailTitle={name}
-                    detailDescription={grade}
-                    detail={<p style={{ margin: 0, font: 'var(--body-default)' }}>The reflection names two goals for next week.</p>}
-                    detailFooter={<Button text="Open full review" appearance="subtle" onClick={() => {}} />}
-                    onPrevious={() => setIndex(index - 1)}
-                    onNext={() => setIndex(index + 1)}
-                    previousDisabled={index === 0}
-                    nextDisabled={index === 3}
                 >
-                    <StudentsTable count={4} />
+                    <DynamicTable
+                        label="Reflections to review"
+                        isFixedSize
+                        highlightedRowIndex={open ? index : undefined}
+                        head={{
+                            cells: [
+                                { key: 'name', content: 'Name' },
+                                { key: 'grade', content: 'Grade' },
+                                { key: 'last', content: 'Last session' },
+                                { key: 'action', content: 'Action' },
+                            ],
+                        }}
+                        rows={queueRows.map(([studentName, studentGrade, studentDate], i) => ({
+                            key: studentName,
+                            cells: [
+                                { key: 'name', content: studentName },
+                                { key: 'grade', content: studentGrade },
+                                { key: 'last', content: studentDate },
+                                {
+                                    key: 'action',
+                                    content: (
+                                        <Button
+                                            text="Review"
+                                            appearance="default"
+                                            spacing="compact"
+                                            isSelected={open && i === index}
+                                            onClick={() => selectRow(i)}
+                                        />
+                                    ),
+                                },
+                            ],
+                        }))}
+                    />
                 </PatternSection>
-            </ScreenStage>
+            </InAppFrame>
         );
     },
+    play: async ({ canvasElement }) => atViewport(1440, async () => {
+        const canvas = within(canvasElement);
+        await waitFor(() => expect(
+            canvasElement.querySelector('.plus-frame__panel--docked'),
+            'queue pages dock the Panel beside the list',
+        ).not.toBeNull());
+        await expect(canvasElement.querySelector('.plus-frame__blanket'), 'no Blanket on a docked Panel').toBeNull();
+
+        const panel = within(canvas.getByRole('complementary', { name: 'Reflection' }));
+        await expect(panel.getByRole('heading', { name: 'Ava Thompson' })).toBeInTheDocument();
+
+        await userEvent.click(panel.getByRole('button', { name: 'Next' }));
+        await waitFor(() => expect(panel.getByRole('heading', { name: 'Marcus Lee' })).toBeInTheDocument());
+
+        await userEvent.click(panel.getByRole('button', { name: 'Close' }));
+        await waitFor(() => expect(canvas.queryByRole('complementary', { name: 'Reflection' })).toBeNull());
+
+        await userEvent.click(canvas.getAllByRole('button', { name: 'Review' })[0]);
+        await waitFor(() => expect(canvas.getByRole('complementary', { name: 'Reflection' })).toBeInTheDocument());
+    }),
 };
 
 /** Cards: title and actions, a grid of cards three across. */
@@ -1180,23 +1173,21 @@ export const EmptyInTable = {
 
 /* ---- anatomy */
 
-/** Every part once: a queue with a view bar, a detail and a footer. */
+/** Every part once: a Section with a view bar, an inline detail and a footer. */
 export const AnatomyQueue = {
     name: 'Anatomy',
     render: () => (
         <div style={{ inlineSize: STAGE }}>
             <PatternSection
                 data-anatomy-root
-                title="Reflections to review"
+                title="Reflections"
                 description="Week of Oct 20"
-                tabs={<ViewBar views={['To review', 'Done']} primary={null} />}
+                tabs={<ViewBar views={['All reflections', 'Needs follow-up']} primary={null} />}
                 detailTitle="Ava Thompson"
                 detailDescription="Grade 7"
                 detail={<p style={{ margin: 0, font: 'var(--body-default)' }}>The reflection names two goals for next week.</p>}
                 detailFooter={<Button text="Open full review" appearance="subtle" onClick={() => {}} />}
-                onPrevious={() => {}}
-                onNext={() => {}}
-                previousDisabled
+                defaultDetailOpen
                 footer={<Button text="View all" appearance="subtle" onClick={() => {}} />}
             >
                 <StudentsTable count={4} />
