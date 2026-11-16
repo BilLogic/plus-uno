@@ -46,7 +46,7 @@ Names agents reach for that this system does not have, or has retired. Write the
 | Not here | Use instead |
 |---|---|
 | `Button variant` | `Button appearance` |
-| `Button size` | `Button spacing` (spacing is default or compact) |
+| `Button size` | `Button spacing` (spacing is default, compact or spacious) |
 | `Button disabled` | `Button isDisabled` |
 | `Button appearance="secondary"` | `Button appearance="default"` |
 | `Heading level` | `Heading as` (the level comes from the surrounding sections; set as only to override the element) |

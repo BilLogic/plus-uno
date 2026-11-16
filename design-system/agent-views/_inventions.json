@@ -197,7 +197,7 @@
       "use": [
         "Button.spacing"
       ],
-      "why": "spacing is default or compact"
+      "why": "spacing is default, compact or spacious"
     },
     {
       "not": "Button disabled",

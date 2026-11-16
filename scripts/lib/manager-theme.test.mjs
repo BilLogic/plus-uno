@@ -15,6 +15,10 @@ function fixture() {
   const dir = path.join(root, 'design-system/src/tokens/color');
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(
+    path.join(root, 'design-system/src/tokens/_type.scss'),
+    ':root {\n  --type-family-body: "Noto Sans", "Noto Sans Fallback", sans-serif;\n  --type-family-code: "Noto Sans Mono", "Noto Sans Mono Fallback", monospace;\n}\n',
+  );
+  fs.writeFileSync(
     path.join(dir, '_palette.scss'),
     ':root {\n  --p-a: #111111;\n  --p-b: #222222;\n  --p-c: #333333;\n  --p-d: #444444;\n  --p-alpha: rgb(1 2 3 / 0.5);\n}\n',
   );
@@ -66,4 +70,8 @@ test('the live theme equals the token values: light from the corpus, every mode 
   }
   assert.notEqual(themes['dark-no-preference'].theme.appContentBg, themes['light-no-preference'].theme.appContentBg);
   assert.notEqual(themes['dark-more'].theme.appBorderColor, themes['dark-no-preference'].theme.appBorderColor);
+  for (const [mode, { fonts }] of Object.entries(themes)) {
+    assert.ok(fonts?.fontBase?.includes('Noto Sans'), `${mode} fontBase includes Noto Sans`);
+    assert.ok(fonts?.fontCode?.includes('Noto Sans Mono'), `${mode} fontCode includes Noto Sans Mono`);
+  }
 });
