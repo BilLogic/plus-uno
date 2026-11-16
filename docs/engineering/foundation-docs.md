@@ -29,7 +29,7 @@ The Foundations pages in `design-system/src/styles/*.mdx` are written for design
 
 ### Token naming
 
-One name holds on both sides (`npm run check:token-naming`, reading `scripts/figma-variables-snapshot.json`). A CSS token is its Figma variable path with camelCase segments converted to kebab-case (`blackAlpha/60` maps to `--palette-black-alpha-60`, `ProgressRing/stroke` to `--progress-ring-stroke`), lowercased with `/` and spaces turned into `-`, plus the collection's code prefix:
+One name holds on both sides (`npm run check:token-naming`, reading `scripts/figma-variables-snapshot.json`). A CSS token is its Figma variable path with camelCase segments converted to kebab-case (`blackAlpha/60` maps to `--palette-black-alpha-60`, `ProgressRing/stroke` to `--progress-ring-stroke`, and a primitive alpha step to its own segment, `red/600a8` to `--palette-red-600-a8`), lowercased with `/` and spaces turned into `-`, plus the collection's code prefix:
 
 - `--palette-` for `color / primitives`;
 - `--ds-` for `color / semantics` and `color / opacity`;

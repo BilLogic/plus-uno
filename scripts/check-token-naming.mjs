@@ -115,7 +115,8 @@ function dropRedundantFolder(variable) {
  */
 export function expectedToken(collection, variable) {
   if (collection === 'color / primitives') {
-    return applyPrefix('palette', slugifyPath(variable));
+    // An alpha step is its own segment in code: `red/600a8` → `--palette-red-600-a8`.
+    return applyPrefix('palette', slugifyPath(variable).replace(/(\d)(a\d+)$/, '$1-$2'));
   }
 
   if (collection === 'color / semantics' || collection === 'color / opacity') {
@@ -140,6 +141,7 @@ export function expectedToken(collection, variable) {
   if (collection === 'motion') {
     const springMatch = MOTION_SPRING_ROW.exec(variable);
     const stem = springMatch ? springMatch[1] : variable;
+    // The raw spring primitives are their own family: `Spring/880/*` → `--motion-spring-880`.
     if (/^Spring\//.test(stem)) {
       return applyPrefix('motion', slugifyPath(stem));
     }
@@ -279,8 +281,10 @@ function summary({ repoRoot = REPO_ROOT } = {}) {
 }
 
 const REMEDY =
-  '  -> define the missing SCSS token, set the variable WEB code syntax in Figma and refresh ' +
-  '`scripts/figma-variables-snapshot.json`, or align names per `docs/engineering/foundation-docs.md` § Token naming.';
+  '  -> unknown token: define it in SCSS or point the Figma WEB code syntax at a real token. ' +
+  'Missing syntax: set the WEB code syntax in Figma (or allowlist it here with a reason). ' +
+  'Naming mismatch: align the Figma name or code syntax per `docs/engineering/foundation-docs.md` § Token naming. ' +
+  'Then refresh `scripts/figma-variables-snapshot.json`.';
 
 main(import.meta.url, 'check:token-naming', {
   run,

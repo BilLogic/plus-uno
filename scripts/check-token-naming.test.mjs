@@ -299,12 +299,8 @@ test('naming rule exceptions: /default drop (with code/default retained), chart/
 
 test('kind 3: warns when WEB code syntax disagrees with the naming rule, and blocks when BLOCK_ON_NAMING_MISMATCH is flipped', () => {
   assert.equal(BLOCK_ON_NAMING_MISMATCH, false);
-  const scss = new Set(['--palette-green-200-a40', '--radius-control-sm', '--ds-text']);
+  const scss = new Set(['--radius-control-sm', '--ds-text']);
   const snapshot = makeSnapshot({
-    'color / primitives': {
-      variables: ['green/200a40'],
-      codeSyntax: { 'green/200a40': 'var(--palette-green-200-a40)' },
-    },
     'spacing / components': {
       variables: ['Tooltip/radius'],
       codeSyntax: { 'Tooltip/radius': 'var(--radius-control-sm)' },
@@ -318,23 +314,18 @@ test('kind 3: warns when WEB code syntax disagrees with the naming rule, and blo
   });
 
   const warnings = checkTokenNaming(snapshot, scss);
-  assert.equal(warnings.length, 3);
+  assert.equal(warnings.length, 2);
   for (const finding of warnings) {
     assert.equal(finding.kind, 'naming-mismatch');
     assert.equal(finding.severity, 'warning');
   }
-  assert.match(warnings[0].message, /color \/ primitives/);
-  assert.match(warnings[0].message, /green\/200a40/);
-  assert.match(warnings[0].message, /--palette-green-200a40/);
-  assert.match(warnings[1].message, /spacing \/ components/);
-  assert.match(warnings[1].message, /Tooltip\/radius/);
-  assert.match(warnings[1].message, /--tooltip-radius/);
-  assert.match(warnings[2].message, /elevation\/shadow\/raised\/layer-1/);
-  assert.match(warnings[2].message, /--ds-shadow-raised/);
+  const messages = warnings.map((w) => w.message).join('\n');
+  assert.match(messages, /spacing \/ components · Tooltip\/radius.*--tooltip-radius/);
+  assert.match(messages, /elevation\/shadow\/raised\/layer-1.*--ds-shadow-raised/);
   assert.equal(exitCodeFor(warnings), 0);
 
   const blocking = checkTokenNaming(snapshot, scss, { blockOnNamingMismatch: true });
-  assert.equal(blocking.length, 3);
+  assert.equal(blocking.length, 2);
   assert.ok(blocking.every((f) => f.severity === 'error'));
   assert.equal(exitCodeFor(blocking), 1);
 });
@@ -362,4 +353,9 @@ test('live repository snapshot has zero unknown-token or un-allowlisted missing-
   const errors = findings.filter((f) => (f.severity ?? 'error') === 'error');
   assert.deepEqual(errors, []);
   assert.equal(exitCodeFor(findings), 0);
+});
+
+test('a primitive alpha step is its own segment, as code names it', () => {
+  assert.equal(expectedToken('color / primitives', 'red/600a8'), '--palette-red-600-a8');
+  assert.equal(expectedToken('color / primitives', 'blackAlpha/60'), '--palette-black-alpha-60');
 });
