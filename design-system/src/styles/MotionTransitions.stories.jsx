@@ -11,6 +11,7 @@ import { TRANSITION_DEMOS, TRANSITION_TREES } from '@/storybook-docs/illustratio
 import { DragReorder } from '@/storybook-docs/illustrations/motion-drag.jsx';
 import { dragAndDrop } from '@/storybook-docs/lib/test-viewport.js';
 import { reducedStory, story } from '@/storybook-docs/illustrations/motion-story-helpers.jsx';
+import { ghostOf, pointsOf } from '@/storybook-docs/illustrations/trails.js';
 
 export default {
   // A test harness and the page's figures: `!dev` keeps it out of the sidebar.
@@ -125,6 +126,53 @@ export const Rulings = {
     await expect(scene(TRANSITION_DEMOS.errModal, 'err-modal-do').landing).not.toHaveProperty('shook');
     await expect(scene(TRANSITION_DEMOS.errModal, 'err-modal-dont').landing).toMatchObject({ shook: 1 });
     await expect(scene(TRANSITION_DEMOS.errPage, 'err-page-dont').landing).toMatchObject({ shook: 1 });
+
+    // Arrows run from where each piece starts to where it lands, in the direction it moves.
+    const goHl = scene(TRANSITION_DEMOS.go, 'go-fade').arrows[0];
+    await expect(pointsOf(goHl)[1][1]).toBeGreaterThan(pointsOf(goHl)[0][1]);
+    await expect(ghostOf(goHl)).toMatchObject({ x: 12, y: 59, w: 36, h: 16 });
+    // Focused task Do is a clean fade in place, so nothing travels.
+    await expect(scene(TRANSITION_DEMOS.focused, 'focused-fade').arrows).toEqual([]);
+    // Switch views: the indicator travels right to tab 1; both content sheets travel left with ghosts.
+    const [swInd, swOut, swIn] = scene(TRANSITION_DEMOS.switch, 'switch-slide').arrows;
+    await expect(pointsOf(swInd)[1][0]).toBeGreaterThan(pointsOf(swInd)[0][0]);
+    await expect(pointsOf(swOut)[1][0]).toBeLessThan(pointsOf(swOut)[0][0]);
+    await expect(pointsOf(swIn)[1][0]).toBeLessThan(pointsOf(swIn)[0][0]);
+    // Step across moves left from box center and in from the right; Step down moves up from box center and in from below.
+    const [stepOut, stepIn] = scene(TRANSITION_DEMOS.step, 'step-across').arrows;
+    await expect(pointsOf(stepOut)[0][0]).toBe(80);
+    await expect(pointsOf(stepOut)[1][0]).toBeLessThan(8);
+    await expect(pointsOf(stepIn)[0][0]).toBeGreaterThan(152);
+    await expect(pointsOf(stepIn)[1][0]).toBe(80);
+    const [downOut, downIn] = scene(TRANSITION_DEMOS.stepDown, 'step-down').arrows;
+    await expect(pointsOf(downOut)[0][1]).toBe(48);
+    await expect(pointsOf(downOut)[1][1]).toBeLessThan(6);
+    await expect(pointsOf(downIn)[0][1]).toBeGreaterThan(94);
+    await expect(pointsOf(downIn)[1][1]).toBe(48);
+    // Reorder: row i starts at slot i and lands at PERM[i] ([1, 2, 0]).
+    const reorderArrows = scene(TRANSITION_DEMOS.reorder, 'reorder-sort').arrows;
+    await expect(reorderArrows.map((a) => [pointsOf(a)[0][1], pointsOf(a)[1][1], ghostOf(a).y])).toEqual([
+      [55, 69, 62],
+      [69, 83, 76],
+      [83, 55, 48],
+    ]);
+    // Load Don't: rows start visible above at y=26..54 and jump down +12 to y=38..66 when the header arrives.
+    const loadDont = scene(TRANSITION_DEMOS.load, 'load-dont');
+    await expect(loadDont.initial).toMatchObject({ r1: 1, r2: 1, hd: 0 });
+    const [loadArrow] = loadDont.arrows;
+    await expect(pointsOf(loadArrow)[1][1]).toBeGreaterThan(pointsOf(loadArrow)[0][1]);
+    await expect(ghostOf(loadArrow)).toMatchObject({ x: 60, y: 38, w: 83, h: 28 });
+    // Confirm carries on: the incoming Flag carries a trail and ghost.
+    await expect(scene(TRANSITION_DEMOS.confirm, 'confirm-go').arrows.length).toBe(1);
+    // Update a value: the rolling digit starts inside the CardBox (y >= 66) and rolls down into its ghost.
+    const [updArrow] = scene(TRANSITION_DEMOS.update, 'update-value').arrows;
+    await expect(pointsOf(updArrow)[0][1]).toBeGreaterThanOrEqual(66);
+    await expect(pointsOf(updArrow)[1][1]).toBeGreaterThan(pointsOf(updArrow)[0][1]);
+    await expect(ghostOf(updArrow)).toMatchObject({ x: 70, y: 74, w: 16, h: 7 });
+    // Error in a field: the second field starts at y=56..83 and moves down +8 to y=64..91.
+    const [errArrow] = scene(TRANSITION_DEMOS.errField, 'err-field-do').arrows;
+    await expect(pointsOf(errArrow)[1][1]).toBeGreaterThan(pointsOf(errArrow)[0][1]);
+    await expect(ghostOf(errArrow)).toMatchObject({ x: 60, y: 64, w: 83, h: 27 });
   },
 };
 

@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { PAINT, HAIRLINE } from './paint.js';
+import { PAINT, HAIRLINE, CORNER } from './paint.js';
 import { HeroGround, Rect, SkeletonBar } from './primitives.jsx';
 import {
   BOX, CENTER, CIRCLES, CONSTRUCTION_RADII, CORNER_CENTERS, DIAGONALS, GRID, MARK_CORNER, PLUS_ARMS, PLUS_BOX, PLUS_CENTER,
@@ -194,11 +194,25 @@ export const SpringTrail = ({ x, y, w, h, accent = false, accentAll = false, n =
  * paths in one drawing share one direction and never cross (`crossings` in
  * `trails.js` checks it).
  */
-export const Path = ({ from, to, rect, accent = false }) => {
+export const Path = ({ from, to, rect, ghost = false, accent = false }) => {
   const color = accent ? PAINT.accent : PAINT.trail;
   const g = pathGeometry(from, to, { rect });
+  const ghostRect = ghost === true ? rect : ghost;
   return (
     <g data-shape="path">
+      {ghostRect && (
+        <rect
+          data-ghost
+          x={ghostRect.x}
+          y={ghostRect.y}
+          width={ghostRect.w}
+          height={ghostRect.h}
+          fill="none"
+          stroke={color}
+          strokeDasharray="3 2"
+          style={{ ...HAIRLINE, rx: `min(${CORNER.shape}, ${Math.min(ghostRect.w, ghostRect.h) / 2}px)` }}
+        />
+      )}
       <line x1={g.start[0]} y1={g.start[1]} x2={g.lineEnd[0]} y2={g.lineEnd[1]} stroke={color} style={HAIRLINE} />
       <circle cx={g.start[0]} cy={g.start[1]} r={2.5} fill={PAINT.pageSurface} stroke={color} style={HAIRLINE} />
       <polygon points={`${g.tip.join(',')} ${g.head.map((p) => p.join(',')).join(' ')}`} fill={color} />

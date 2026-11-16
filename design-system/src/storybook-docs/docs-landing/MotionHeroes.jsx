@@ -108,7 +108,7 @@ export const TransitionsHero = () => (
     <SkeletonBar x={146} y={95} w={90} h={5} />
     <Rect x={200} y={141} w={61} h={18} fill={PAINT.accent} corner="button" />
     {Object.entries(TRANSITION_PARTS).map(([name, p]) => (
-      <Path key={name} from={p.from} to={p.to} rect={p.rect} accent />
+      <Path key={name} from={p.from} to={p.to} rect={p.rect} ghost accent />
     ))}
   </HeroDrawing>
 );

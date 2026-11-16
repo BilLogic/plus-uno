@@ -215,7 +215,7 @@ const openingScene = ({ id, title, caption, stiffness }) => {
     viewBox: VIEW,
     initial: { g: 0 },
     landing: { g: 1 },
-    arrows: [[[134, 30], [116, 54]]],
+    arrows: [{ points: [[134, 30], [116, 54]], ghost: POPUP }],
     draw: ({ g }) => (
       <>
         <Frame x={8} y={6} w={144} h={88} />

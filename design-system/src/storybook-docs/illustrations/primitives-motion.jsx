@@ -206,7 +206,7 @@ export const MOTION_SETS = [
     (a) => (
       <>
         <Rect x={22} y={44} w={12} h={12} fill={PAINT.shape} corner="shape" />
-        <Trail points={[[34, 50], [80, 34], [126, 50]]} accent={a} />
+        <Trail points={[[28, 50], [80, 34], [132, 50]]} ghost={{ x: 126, y: 44, w: 12, h: 12 }} accent={a} />
       </>
     ),
   ],

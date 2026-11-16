@@ -4,6 +4,7 @@ import { Frame, Rect, SkeletonBar } from './primitives.jsx';
 import { pair } from './motion.jsx';
 import { VIEW } from './motion-parts.jsx';
 import { drillScene } from './motion-transitions.jsx';
+import { travel } from './trails.js';
 
 /**
  * The Principles page's Do/Don't pairs (Foundations/Expression/Motion/Principles), one per principle. Each pair
@@ -34,7 +35,7 @@ const toggle = ({ id, title, caption, waits }) => ({
   viewBox: VIEW,
   initial: { c: 0, t: 0 },
   landing: { c: 1, t: 1 },
-  arrows: [[[TRACK.x + 8, 52], [TRACK.x + 8 + THUMB_TRAVEL, 52]]],
+  arrows: [travel({ x: TRACK.x + 8 + THUMB_TRAVEL - 6, y: TRACK.y + 8 - 6, w: 12, h: 12 }, -THUMB_TRAVEL, 0)],
   draw: ({ c, t }) => (
     <>
       <Frame x={8} y={6} w={144} h={88} chrome={false} />
@@ -71,7 +72,7 @@ const save = ({ id, title, caption, shakes }) => ({
   viewBox: VIEW,
   initial: { o: 0, y: 1, x: 0 },
   landing: { o: 1, y: 0, x: 0 },
-  arrows: [[[80, 50], [80, 58]]],
+  arrows: [travel(MESSAGE, 0, 4)],
   draw: ({ o, y, x }) => (
     <>
       <Frame x={8} y={6} w={144} h={88} chrome={false} />
@@ -107,6 +108,7 @@ const leadWithEmpathy = {
 // ---------- Cut the noise: a filtered list arrives as one group, or every row scatters ----------
 
 const ROWS = [0, 1, 2, 3];
+const LIST_GROUP = { x: 16, y: 16, w: 110, h: 60 };
 const list = ({ id, title, caption, scatters }) => ({
   id,
   title,
@@ -114,7 +116,7 @@ const list = ({ id, title, caption, scatters }) => ({
   viewBox: VIEW,
   initial: { g: 0 },
   landing: { g: 1 },
-  arrows: [[[140, 30], [140, 40]]],
+  arrows: [travel(LIST_GROUP, 0, 8, { lane: { x: 136 } })],
   draw: ({ g }) => (
     <>
       <Frame x={8} y={6} w={144} h={88} chrome={false} />

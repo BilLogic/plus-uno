@@ -11,6 +11,7 @@ import React from 'react';
 import { expect, waitFor } from 'storybook/test';
 
 import { MotionDemo } from '@/storybook-docs/illustrations/motion.jsx';
+import { PASS, reducedStory, story } from '@/storybook-docs/illustrations/motion-story-helpers.jsx';
 import {
   CHOREOGRAPHY_DEMOS,
   CLEAN_FADE_GAP_MS,
@@ -26,49 +27,11 @@ export default {
   parameters: { layout: 'padded' },
 };
 
-const PAINTED = ['fill', 'stroke'];
-const TOKEN_OR_NONE = /^(?:var\(--(?:ds-|chart-)[\w-]+\)|none)$/;
-const everyPaintIsAToken = (root) =>
-  [...root.querySelectorAll('svg *')].every((el) =>
-    PAINTED.every((attr) => !el.hasAttribute(attr) || TOKEN_OR_NONE.test(el.getAttribute(attr))),
-  );
-const PASS = { timeout: 15000, interval: 50 };
 const stateOf = (canvasElement, id) => JSON.parse(canvasElement.querySelector(`[data-tile="${id}"]`).dataset.state);
 const settled = async (canvasElement) => {
   const root = canvasElement.querySelector('[data-motion-demo]');
   await waitFor(() => expect(root.dataset.phase).toBe('settled'), PASS);
 };
-
-const landed = (demo, canvasElement) => {
-  for (const scene of demo.scenes) expect(stateOf(canvasElement, scene.id)).toMatchObject(scene.landing);
-};
-
-const playsToItsLanding = (demo) => async ({ canvasElement }) => {
-  const root = canvasElement.querySelector('[data-motion-demo]');
-  await expect(everyPaintIsAToken(root)).toBe(true);
-  // Choreography lessons are principles: blocked out, no words.
-  await expect(root.querySelectorAll('svg text').length).toBe(0);
-  // A part that fades in place travels nowhere, so a demo of only those has no paths to draw first.
-  if (demo.scenes.some((s) => s.arrows?.length)) {
-    await waitFor(() => expect(root.dataset.phase).toBe('arrows'), PASS);
-    for (const scene of demo.scenes) {
-      const tile = canvasElement.querySelector(`[data-tile="${scene.id}"]`);
-      await expect(tile.querySelectorAll('[data-trail]').length).toBe(scene.arrows?.length ?? 0);
-    }
-  }
-  await waitFor(() => expect(root.dataset.phase).toBe('settled'), PASS);
-  landed(demo, canvasElement);
-};
-
-const stillAtItsLanding = (demo) => async ({ canvasElement }) => {
-  const root = canvasElement.querySelector('[data-motion-demo]');
-  await waitFor(() => expect(root.dataset.phase).toBe('still'), PASS);
-  landed(demo, canvasElement);
-  await expect(everyPaintIsAToken(root)).toBe(true);
-};
-
-const story = (demo) => ({ render: () => <MotionDemo {...demo} reduced={false} />, play: playsToItsLanding(demo) });
-const reducedStory = (demo) => ({ render: () => <MotionDemo {...demo} reduced />, play: stillAtItsLanding(demo) });
 
 export const Direction = story(CHOREOGRAPHY_DEMOS.direction);
 export const DirectionReduced = reducedStory(CHOREOGRAPHY_DEMOS.direction);

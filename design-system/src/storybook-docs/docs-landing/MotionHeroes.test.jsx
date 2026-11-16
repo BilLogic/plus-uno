@@ -39,11 +39,12 @@ describe('Motion heroes', () => {
         expect(new Set(gaps).size).toBe(1);
     });
 
-    it('Transitions draws three paths from the before row to the after card, ring to arrowhead', () => {
+    it('Transitions draws three paths from the before row to the after card, ring to arrowhead, each landing on a dashed ghost', () => {
         const c = draw('foundations-expression-motion-transitions');
         expect(c.querySelectorAll('[data-shape="path"]')).toHaveLength(3);
         expect(c.querySelectorAll('[data-shape="path"] circle')).toHaveLength(3);
         expect(c.querySelectorAll('[data-shape="path"] polygon')).toHaveLength(3);
+        expect(c.querySelectorAll('[data-shape="path"] [data-ghost]')).toHaveLength(3);
     });
 
     it('Transitions paths all point downward and none cross', () => {
