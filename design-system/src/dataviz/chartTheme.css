@@ -41,8 +41,8 @@
     --highcharts-neutral-color-5: var(--ds-background-neutral-subtle-hovered);
     --highcharts-neutral-color-3: var(--ds-background-neutral-subtle-hovered);
     --highcharts-highlight-color: var(--ds-background-selected);
-    --highcharts-highlight-color-100: var(--ds-border-selected);
-    --highcharts-highlight-color-80: var(--ds-border-selected);
+    --highcharts-highlight-color-100: var(--ds-background-selected-bold);
+    --highcharts-highlight-color-80: var(--ds-background-selected-bold);
     --highcharts-highlight-color-60: var(--ds-background-selected-pressed);
     --highcharts-highlight-color-40: var(--ds-border-selected);
     --highcharts-highlight-color-20: var(--ds-background-selected-hovered);
@@ -114,16 +114,6 @@
     font-family: var(--type-family-body);
     font-weight: var(--type-weight-semibold);
     font-variant-numeric: tabular-nums;
-}
-
-.highcharts-series-inactive {
-    opacity: var(--ds-opacity-disabled);
-}
-
-.highcharts-point-select {
-    fill: var(--ds-background-selected);
-    stroke: var(--ds-border-selected);
-    stroke-width: var(--chart-grid-width);
 }
 
 /*

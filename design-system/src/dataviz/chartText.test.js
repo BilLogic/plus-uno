@@ -79,7 +79,7 @@ describe('chart sources', () => {
         expect(offenders).toEqual([]);
     });
 
-    it('reports remaining per-chart type, state and pixel-offset overrides as a soft list for #2581–#2585', () => {
+    it('reports remaining per-chart type, state and pixel-offset overrides as a soft list until each chart family is migrated', () => {
         const sharedFiles = new Set(['PlusChart.jsx']);
         const rules = [
             { id: 'b-tag', pattern: /<b\b/i },
@@ -102,7 +102,7 @@ describe('chart sources', () => {
             }
         }
         if (report.length > 0) {
-            console.info(`[dataviz soft guard — ${report.length} chart files remaining for #2581–#2585]`, report);
+            console.info(`[dataviz soft guard — ${report.length} chart files remaining]`, report);
         }
     });
 });

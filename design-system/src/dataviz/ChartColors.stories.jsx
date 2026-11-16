@@ -196,19 +196,19 @@ export const EveryChartInEveryMode = {
         // Type & numbers: every chart text node renders in Noto Sans
         // (never a system-font fallback), and number slots compute tabular-nums.
         // Charts whose sources still carry `<b>`, `font-weight: bold` or weight 300
-        // are tracked in KNOWN_WEIGHT_EXCEPTIONS (chart name -> family ticket) so
-        // the list can only shrink as #2581–#2585 land.
+        // are tracked in KNOWN_WEIGHT_EXCEPTIONS (chart name -> chart family) so
+        // the list can only shrink as each family moves onto the shared foundation.
         const KNOWN_WEIGHT_EXCEPTIONS = {
-            stacked: 2581,
-            StackedBarChart: 2581,
-            pie: 2582,
-            PieChart: 2582,
-            gauge: 2582,
-            GaugeChart: 2582,
-            PyramidChart: 2582,
-            TimelineChart: 2583,
-            PackedBubbleChart: 2584,
-            FunnelChart: 2585,
+            stacked: 'comparison',
+            StackedBarChart: 'comparison',
+            pie: 'part-to-whole',
+            PieChart: 'part-to-whole',
+            gauge: 'part-to-whole',
+            GaugeChart: 'part-to-whole',
+            PyramidChart: 'part-to-whole',
+            TimelineChart: 'temporal',
+            PackedBubbleChart: 'distribution',
+            FunnelChart: 'flow',
         };
         const typeStrays = [];
         const dirtyWeightCharts = new Set();

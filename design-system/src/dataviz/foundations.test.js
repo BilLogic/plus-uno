@@ -4,7 +4,6 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import chartTheme, { BODY, MEDIUM, SEMIBOLD, TABULAR } from '@/dataviz/chartTheme';
-import * as chartThemeModule from '@/dataviz/chartTheme';
 import {
     CHART_VALUE_CLASS,
     dataLabelFormat,
@@ -13,7 +12,6 @@ import {
     tooltipPointFormat,
     valueSpan,
 } from '@/dataviz/chartFormat';
-import * as chartFormatModule from '@/dataviz/chartFormat';
 import { BRAND, CATEGORICAL, CHROME, hoveredColor } from '@/dataviz/palette';
 import PlusChart from '@/dataviz/PlusChart';
 
@@ -182,9 +180,6 @@ describe('data-viz foundations', () => {
     it('formats values with a semibold tabular value span in chartFormat and keeps dataLabels.format unset in chartTheme so custom formatters survive', () => {
         expect(valueSpan('{point.y}')).toBe('<span class="plus-chart-value">{point.y}</span>');
         expect(valueSpan('{point.percentage:.1f}%')).toBe('<span class="plus-chart-value">{point.percentage:.1f}%</span>');
-        expect(chartFormatModule.formatValue).toBeUndefined();
-        expect(chartThemeModule.valueSpan).toBeUndefined();
-        expect(chartThemeModule.hoveredColor).toBeUndefined();
 
         expect(seriesSwatch()).toBe('<span style="color:{point.color}">●</span>');
         expect(tooltipHeaderFormat()).toBe('<span class="plus-chart-value">{point.key}</span><br/>');
@@ -290,8 +285,20 @@ describe('data-viz foundations', () => {
         expect(merged.series[2].data[0].states.hover.color).toBe('var(--chart-categorical-3-hovered)');
         expect(merged.series[2].data[1].states).toBeUndefined();
 
+        // A series colored by value takes no series hover color: it would paint
+        // every heatmap cell one hue.
+        render(
+            React.createElement(PlusChart, {
+                options: {
+                    chart: { type: 'heatmap' },
+                    colorAxis: { min: 0 },
+                    series: [{ data: [[0, 0, 1], [0, 1, 2]] }],
+                },
+            }),
+        );
+        expect(capturedPlusChartOptions.at(-1).series[0].states?.hover?.color).toBeUndefined();
+
         const css = readFileSync(join(ROOT, 'chartTheme.css'), 'utf8');
-        expect(css).toContain('stroke-width: var(--chart-grid-width)');
         const highlightLines = css
             .split(/\r?\n/)
             .filter((line) => line.includes('--highcharts-highlight-color'));

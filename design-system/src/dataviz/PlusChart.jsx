@@ -9,6 +9,9 @@ import { useMotionReduced } from '@/lib/motionPreference';
 
 const UPDATE_ARGS = [true, true, false];
 
+/** Series types Highcharts colors per point or by value, never by series. */
+const VALUE_COLORED_TYPES = new Set(['heatmap', 'tilemap', 'treemap', 'sunburst', 'solidgauge', 'gauge']);
+
 const withHoverState = (states, hoverColor) => ({
     ...states,
     hover: {
@@ -112,11 +115,15 @@ const PlusChart = forwardRef(function PlusChart(
         );
     }, [options]);
 
+    // The reduced-motion fade runs once, on the first resolved render; a later
+    // re-render never cuts it short. Its cleanup runs only on unmount.
+    const fadeRef = useRef(null);
     useLayoutEffect(() => {
-        if (!reduced || entered || optedOut || !areaResolved) return undefined;
+        if (fadeRef.current || enteredRef.current || !reduced || optedOut || !areaResolved) return;
         const containerEl = hcRef.current?.container?.current ?? hcRef.current?.chart?.container;
-        return fadeChartElement(containerEl, { defer });
-    }, [areaResolved, defer, entered, optedOut, reduced]);
+        if (containerEl) fadeRef.current = fadeChartElement(containerEl, { defer });
+    }, [areaResolved, defer, optedOut, reduced]);
+    useEffect(() => () => fadeRef.current?.(), []);
 
     useEffect(() => {
         if (areaResolved) {
@@ -189,6 +196,9 @@ const PlusChart = forwardRef(function PlusChart(
             seriesEntranceAnim = reduced ? false : resolvedEntrance;
         }
 
+        // Charts that set their own `plotOptions` replace the theme's whole
+        // object, so the theme's series and type defaults (data-label type,
+        // states) are laid under the chart's options here.
         const nextPlotOptions = {
             ...chartTheme.plotOptions,
             ...options.plotOptions,
@@ -231,16 +241,26 @@ const PlusChart = forwardRef(function PlusChart(
                 ? options.colors
                 : chartTheme.colors;
 
+        // Highcharts hands palette slots only to series without their own
+        // color, so count those to find each series' assigned hue. A series
+        // colored by value (color axis) or by point takes no series hover
+        // color: it would paint every cell or slice one hue.
+        let paletteSlot = 0;
         const nextSeries = Array.isArray(options.series)
-            ? options.series.map((s, seriesIndex) => {
+            ? options.series.map((s) => {
                   if (!s || typeof s !== 'object') return s;
                   const needsAnimReset = (entered || reduced) && s.animation !== undefined;
-                  const assignedSeriesColor =
-                      s.color ??
-                      (paletteColors.length > 0
-                          ? paletteColors[seriesIndex % paletteColors.length]
-                          : undefined);
-                  const hoverColor = hoveredColor(assignedSeriesColor);
+                  const type = s.type ?? chartType;
+                  const ownColor = s.color;
+                  const paletteColor =
+                      ownColor === undefined && paletteColors.length > 0
+                          ? paletteColors[paletteSlot++ % paletteColors.length]
+                          : undefined;
+                  const byValueOrPoint =
+                      options.colorAxis !== undefined ||
+                      VALUE_COLORED_TYPES.has(type) ||
+                      (s.colorByPoint ?? options.plotOptions?.[type]?.colorByPoint ?? seriesPlot.colorByPoint) === true;
+                  const hoverColor = byValueOrPoint ? null : hoveredColor(ownColor ?? paletteColor);
                   const nextData = Array.isArray(s.data)
                       ? s.data.map((pt) => resolvePointStates(pt, paletteColors))
                       : s.data;
@@ -269,6 +289,15 @@ const PlusChart = forwardRef(function PlusChart(
             ...(nextSeries !== undefined ? { series: nextSeries } : {}),
         };
     }, [defer, entered, isExpressive, optedOut, options, reduced]);
+
+    // HighchartsReact applies an options change in its own layout effect,
+    // which runs before this one. If that change still carried the entrance
+    // (the area resolving its final count before paint), turn the entrance
+    // off on the instance again so a later resize can't replay it.
+    useLayoutEffect(() => {
+        const chart = hcRef.current?.chart;
+        if (typeof chart?.update === 'function' && mergedOptions?.chart?.animation) freezeEntrance(chart);
+    }, [mergedOptions]);
 
     const mergedContainerProps = useMemo(() => {
         if (!reduced || entered || optedOut) return containerProps;
