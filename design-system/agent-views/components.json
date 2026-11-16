@@ -785,6 +785,7 @@
         "--image-xxs",
         "--radius-full",
         "--radius-xxl",
+        "--type-family-heading",
         "--type-size-075",
         "--type-size-0875",
         "--type-size-100",
@@ -7124,6 +7125,7 @@
         "Focused"
       ],
       "tokens": [
+        "--body-default",
         "--ds-link",
         "--ds-link-pressed",
         "--ds-link-visited",

@@ -64,9 +64,30 @@ const config = {
   // page's custom properties, so the color tokens are resolved here, per mode, and
   // inlined for manager.js (see scripts/lib/manager-theme.mjs).
   managerHead: (head) => `${head}
+<style>${fs.readFileSync(path.join(TOKEN_DIR, '_type.scss'), 'utf8')}</style>
 <script>window.__PLUS_MANAGER_THEMES__ = ${JSON.stringify(resolveManagerThemes()).replace(/</g, '\\u003c')};</script>`,
 
+  previewHead: (head) => `${head.replaceAll("'Nunito Sans',", '')}
+<script>
+  for (const s of document.querySelectorAll('head > style')) {
+    if (s.textContent && s.textContent.includes('Nunito Sans')) s.remove();
+  }
+</script>`,
+
   viteFinal: async (config) => {
+    config.plugins = config.plugins || [];
+    config.plugins.push({
+      name: 'plus-strip-storybook-nunito',
+      transformIndexHtml: {
+        order: 'post',
+        handler(html) {
+          return html
+            .replace(/<style>\s*@font-face\s*\{\s*font-family:\s*['"]?Nunito Sans['"]?[\s\S]*?<\/style>/g, '')
+            .replaceAll("'Nunito Sans',", '')
+            .replaceAll('"Nunito Sans",', '');
+        },
+      },
+    });
     // Configure path aliases for component imports
     const rootDir = path.resolve(__dirname, '..');
     const srcPath = path.resolve(rootDir, 'design-system/src');

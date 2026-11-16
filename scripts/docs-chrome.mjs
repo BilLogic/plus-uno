@@ -26,6 +26,7 @@ const EPSILON = 1;
 const PROSE_FAMILY = 'Noto Sans';
 const PROSE_SIZE = '16px';
 const PROSE_COLOR = 'rgb(44, 44, 43)';
+const ALLOWED_FAMILIES = new Set(['Noto Sans', 'Noto Sans Mono']);
 /**
  * 45–75 characters is the comfortable range; the ticket asks for at most 80.
  * The corpus sample's longest paragraph ran 134 before the cap.
@@ -131,6 +132,18 @@ export function chromeFailures(pages) {
         );
       }
     }
+
+    // #2590. Every rendered element in docs must compute to the product's
+    // families (Noto Sans or Noto Sans Mono) — never Nunito Sans or a browser
+    // fallback.
+    for (const f of p.nonProductFonts ?? []) {
+      const family = f.fontFamily.split(',')[0].replace(/["']/g, '').trim();
+      if (!ALLOWED_FAMILIES.has(family)) {
+        failures.push(
+          `${where}: element "${f.label}" renders in ${family}, not Noto Sans or Noto Sans Mono.`,
+        );
+      }
+    }
   }
 
   return failures;
@@ -191,6 +204,29 @@ export function measureScript(page) {
         wrapperOverflowX: g(w).overflowX,
       };
     });
+    const allowedFamilies = new Set(['Noto Sans', 'Noto Sans Mono']);
+    const isIconGlyph = (el) =>
+      el.matches('.fa-solid, .fa-regular, .fa-brands, .fas, .far, .fab') ||
+      el.closest('svg') !== null;
+    const nonProductFonts = [...document.querySelectorAll('.sbdocs, .sbdocs *')]
+      .filter((el) => {
+        if (el.tagName === 'SCRIPT' || el.tagName === 'STYLE' || isIconGlyph(el)) return false;
+        const c = g(el);
+        if (c.display === 'none' || c.visibility === 'hidden') return false;
+        const family = c.fontFamily.split(',')[0].replace(/["']/g, '').trim();
+        return !allowedFamilies.has(family);
+      })
+      .slice(0, 20)
+      .map((el) => {
+        const cls = typeof el.className === 'string' && el.className.trim()
+          ? '.' + el.className.trim().split(/\\s+/)[0]
+          : '';
+        const text = (el.textContent || '').trim().slice(0, 24);
+        return {
+          label: el.tagName.toLowerCase() + cls + (text ? ': ' + text : ''),
+          fontFamily: g(el).fontFamily,
+        };
+      });
     return {
       page: ${JSON.stringify(page)},
       bodyScroll: document.documentElement.scrollWidth,
@@ -198,6 +234,7 @@ export function measureScript(page) {
       canvases,
       tables,
       prose,
+      nonProductFonts,
       tokens: {
         fontFamily: getComputedStyle(document.documentElement).getPropertyValue('--type-family-body').trim(),
         color: getComputedStyle(document.body).getPropertyValue('color'),

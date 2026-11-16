@@ -31,6 +31,7 @@
     padding: 0 var(--tag-pad-x-end-compact) 0 var(--pad-x-xs);
     gap: var(--tag-gap-compact);
     border-radius: var(--radius-md);
+    font: var(--body-sm);
     vertical-align: middle;
     white-space: nowrap;
     background-color: transparent;
@@ -52,6 +53,7 @@
     padding: 0 var(--tag-pad-x-end) 0 var(--pad-x-md);
     gap: 0;
     border-radius: var(--radius-control-md);
+    font: var(--body-default);
 
     .plus-date-tag__content {
         padding-right: var(--tag-pad-x-end);

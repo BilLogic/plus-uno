@@ -161,7 +161,7 @@ $tag-colors: (
 
     /* Neutral text on every color: the hue is on the border and swatch. */
     color: var(--ds-text);
-    font: inherit;
+    font: var(--body-sm);
     text-align: left;
     text-decoration: none;
     white-space: nowrap;

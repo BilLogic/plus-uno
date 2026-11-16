@@ -124,7 +124,13 @@ textarea {
     margin: 0;
     font-family: inherit;
     font-size: inherit;
+    font-weight: inherit;
     line-height: inherit;
+}
+
+/* Every PLUS component root sets its own product type rather than inheriting from a container. */
+:where([class^="plus-"], [class*=" plus-"]):not(:where([class^="plus-"] *, [class*=" plus-"] *)) {
+    font: var(--body-default);
 }
 
 button,

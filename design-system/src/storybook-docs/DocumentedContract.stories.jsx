@@ -367,3 +367,113 @@ export const TheContractIsNotEmpty = {
     expect(variants).toBeGreaterThanOrEqual(25);
   },
 };
+
+/**
+ * #2590 — Every component sets its own family, size, weight and line height
+ * from the product tokens (`--type-*` and the label/body roles) instead of
+ * inheriting from a hostile container (`font: 700 11px "Nunito Sans"`).
+ */
+export const ComponentsSetTheirOwnType = {
+  args: { subjects },
+  play: async ({ canvasElement }) => {
+    const readProbe = (fontVar, weightVar) => {
+      const probe = document.createElement('span');
+      probe.style.font = `var(${fontVar})`;
+      if (weightVar) probe.style.fontWeight = `var(${weightVar})`;
+      canvasElement.appendChild(probe);
+      const cs = getComputedStyle(probe);
+      const out = {
+        family: cs.fontFamily.split(',')[0].replace(/["']/g, '').trim(),
+        fontSize: cs.fontSize,
+        fontWeight: cs.fontWeight,
+        lineHeight: cs.lineHeight,
+      };
+      probe.remove();
+      return out;
+    };
+
+    const bodySm = readProbe('--body-sm');
+    const bodySmMedium = readProbe('--body-sm', '--type-weight-medium');
+    const bodyDefault = readProbe('--body-default');
+    const bodyDefaultMedium = readProbe('--body-default', '--type-weight-medium');
+
+    const cases = [
+      { name: 'Tag', props: { text: 'Planned' }, selector: '.plus-tag', expected: bodySm },
+      { name: 'StatusTag', props: { text: 'In progress' }, selector: '.plus-status', expected: bodySm },
+      { name: 'CountTag', props: { value: 4 }, selector: '.plus-count', expected: bodySm },
+      { name: 'DateTag', props: { date: 'Nov 15' }, selector: '.plus-date-tag', expected: bodySm },
+      { name: 'ChangeTag', props: { value: 3 }, selector: '.plus-change-tag', expected: bodySm },
+      { name: 'SmartTag', props: { text: 'Algebra' }, selector: '.plus-tag', expected: bodySm },
+      { name: 'Suggestion', props: { label: 'Summarize notes' }, selector: '.plus-suggestion', expected: bodySm },
+      { name: 'Avatar', props: { name: 'Ada Lovelace' }, selector: '.plus-avatar', expected: { family: bodyDefault.family, fontSize: bodyDefault.fontSize, fontWeight: '600', lineHeight: bodyDefault.fontSize } },
+      { name: 'Button', props: { children: 'Save' }, selector: '.plus-btn', expected: bodyDefaultMedium },
+      { name: 'Link', props: { href: '#report', children: 'View report' }, selector: '.plus-link', expected: bodyDefault },
+      { name: 'TextField', props: { label: 'Name', defaultValue: 'Ada' }, selector: '.plus-field__control', rootSelector: '.plus-field-stack', expected: bodyDefault },
+      { name: 'TextArea', props: { label: 'Notes', defaultValue: ' Ready' }, selector: '.plus-field__control', rootSelector: '.plus-field-stack', expected: bodyDefault },
+      { name: 'SearchField', props: { label: 'Search', defaultValue: 'fractions' }, selector: '.plus-field__control', rootSelector: '.plus-search-field', expected: bodyDefault },
+      { name: 'Select', props: { label: 'Grade', options: [{ value: '5', label: 'Grade 5' }], value: '5' }, selector: '.plus-field__control', rootSelector: '.plus-select-wrapper', expected: bodyDefault },
+      { name: 'Checkbox', props: { label: 'Notify tutor' }, selector: '.plus-form-checkbox-label', rootSelector: '.plus-form-checkbox-wrapper', expected: bodyDefault },
+      { name: 'Radio', props: { label: 'Weekly', value: 'weekly' }, selector: '.plus-form-radio-label', rootSelector: '.plus-form-radio-wrapper', expected: bodyDefault },
+      { name: 'Toggle', props: { label: 'Reminders' }, selector: '.plus-toggle-label', rootSelector: '.plus-toggle-wrapper', expected: bodyDefault },
+    ];
+
+    const byName = new Map(
+      Object.keys(MODULES).map((jsxPath) => {
+        const compName = jsxPath.split('/').pop().replace(/\.jsx$/, '');
+        return [compName, load(jsxPath, compName)];
+      }),
+    );
+
+    const hostile = document.createElement('div');
+    // docs-literal: hostile-container test fixture specified by #2590
+    hostile.style.font = '700 11px "Nunito Sans"';
+    canvasElement.appendChild(hostile);
+
+    const failures = [];
+    try {
+      for (const c of cases) {
+        const Component = byName.get(c.name);
+        if (!Component) {
+          failures.push(`${c.name}: component module not found`);
+          continue;
+        }
+        const slot = document.createElement('div');
+        hostile.appendChild(slot);
+        const root = createRoot(slot);
+        try {
+          flushSync(() => root.render(React.createElement(Component, c.props)));
+          const targets = [c.selector, c.rootSelector].filter(Boolean);
+          for (const sel of targets) {
+            const el = slot.querySelector(sel);
+            if (!el) {
+              failures.push(`${c.name}: selector "${sel}" did not match`);
+              continue;
+            }
+            const cs = getComputedStyle(el);
+            const family = cs.fontFamily.split(',')[0].replace(/["']/g, '').trim();
+            if (family !== c.expected.family) {
+              failures.push(`${c.name} (${sel}): fontFamily is "${family}", expected "${c.expected.family}"`);
+            }
+            if (cs.fontSize !== c.expected.fontSize) {
+              failures.push(`${c.name} (${sel}): fontSize is "${cs.fontSize}", expected "${c.expected.fontSize}"`);
+            }
+            if (cs.fontWeight !== c.expected.fontWeight) {
+              failures.push(`${c.name} (${sel}): fontWeight is "${cs.fontWeight}", expected "${c.expected.fontWeight}"`);
+            }
+            if (cs.lineHeight !== c.expected.lineHeight) {
+              failures.push(`${c.name} (${sel}): lineHeight is "${cs.lineHeight}", expected "${c.expected.lineHeight}"`);
+            }
+          }
+        } finally {
+          flushSync(() => root.unmount());
+          slot.remove();
+        }
+      }
+    } finally {
+      hostile.remove();
+    }
+
+    expect(failures, failures.join('\n')).toEqual([]);
+  },
+};
+

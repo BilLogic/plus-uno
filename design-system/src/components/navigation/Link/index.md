@@ -137,7 +137,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-link` · `--ds-link-pressed` · `--ds-link-visited` · `--ds-text` · `--ds-text-inverse` · `--icon-sm` · `--inline-md` · `--radius-md`
+`--body-default` · `--ds-link` · `--ds-link-pressed` · `--ds-link-visited` · `--ds-text` · `--ds-text-inverse` · `--icon-sm` · `--inline-md` · `--radius-md`
 
 From `design-system/src/components/navigation/Link/Link.scss`. Override these through the token layer, never with a literal.
 

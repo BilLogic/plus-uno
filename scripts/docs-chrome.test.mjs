@@ -405,3 +405,32 @@ test('isContextDestroyedError matches navigation-destroyed context errors only',
   assert.equal(isContextDestroyedError(new Error('Timeout 30000ms exceeded')), false);
 });
 
+/* -------------------------- every docs element uses the product type families */
+
+test('chromeFailures: fails when any rendered docs element computes to a family other than Noto Sans or Noto Sans Mono', () => {
+  const f = chromeFailures([
+    page({
+      nonProductFonts: [
+        { label: 'span.plus-tag: Planned', fontFamily: '"Nunito Sans", sans-serif' },
+        { label: 'td: ResponsiveWidth', fontFamily: 'Nunito, sans-serif' },
+      ],
+    }),
+  ]);
+  assert.equal(f.length, 2);
+  assert.match(f[0], /span\.plus-tag: Planned.*Nunito Sans.*Noto Sans or Noto Sans Mono/);
+  assert.match(f[1], /td: ResponsiveWidth.*Nunito.*Noto Sans or Noto Sans Mono/);
+});
+
+test('chromeFailures: passes when every rendered docs element uses Noto Sans or Noto Sans Mono', () => {
+  const f = chromeFailures([
+    page({
+      nonProductFonts: [
+        { label: 'span.plus-tag: Planned', fontFamily: '"Noto Sans", "Noto Sans Fallback", sans-serif' },
+        { label: 'code: --body-sm', fontFamily: '"Noto Sans Mono", ui-monospace, monospace' },
+      ],
+    }),
+  ]);
+  assert.deepEqual(f, []);
+});
+
+

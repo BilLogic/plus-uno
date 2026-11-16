@@ -42,7 +42,7 @@ $avatar-colors: (
     vertical-align: middle;
     background-color: var(--ds-background-accent-blue-subtler);
     color: var(--ds-text-accent-blue);
-    font-family: inherit;
+    font-family: var(--type-family-heading);
     font-size: var(--avatar-font, var(--type-size-0875));
     font-weight: var(--type-weight-semibold);
     line-height: 1;
