@@ -207,4 +207,102 @@ describe('CheckboxGroup', () => {
         );
         expect(screen.getAllByRole('checkbox').every((cb) => cb.hasAttribute('data-disabled'))).toBe(true);
     });
+
+    it('matches a plain CheckboxGroup in role, aria-checked, Tab/Space keyboard interaction, and form submission', async () => {
+        const user = userEvent.setup();
+        const onPlainChange = vi.fn();
+        const onSoftChange = vi.fn();
+
+        const { container } = render(
+            <form>
+                <CheckboxGroup
+                    name="plainSubjects"
+                    legend="Plain subjects"
+                    appearance="plain"
+                    options={tileOptions}
+                    defaultValue={['math']}
+                    onChange={onPlainChange}
+                />
+                <CheckboxGroup
+                    name="softSubjects"
+                    legend="Soft subjects"
+                    appearance="soft"
+                    options={tileOptions}
+                    defaultValue={['math']}
+                    onChange={onSoftChange}
+                />
+            </form>
+        );
+
+        const plainGroup = screen.getByRole('group', { name: 'Plain subjects' });
+        const softGroup = screen.getByRole('group', { name: 'Soft subjects' });
+        const snapshot = (group) =>
+            within(group)
+                .getAllByRole('checkbox')
+                .map((cb) => ({ role: cb.getAttribute('role'), checked: cb.getAttribute('aria-checked') }));
+
+        expect(snapshot(softGroup)).toEqual(snapshot(plainGroup));
+        expect(screen.queryByTestId('ill-math')).toBeNull();
+
+        // Tab moves between checkboxes and Space toggles selection identically in plain and soft groups.
+        within(plainGroup).getByRole('checkbox', { name: 'Math' }).focus();
+        await user.tab();
+        await user.keyboard(' ');
+
+        within(softGroup).getByRole('checkbox', { name: 'Math' }).focus();
+        await user.tab();
+        await user.keyboard(' ');
+
+        expect(snapshot(softGroup)).toEqual(snapshot(plainGroup));
+        expect(onSoftChange).toHaveBeenLastCalledWith(['math', 'reading']);
+        expect(onSoftChange.mock.calls).toEqual(onPlainChange.mock.calls);
+
+        // Clicking the soft row's description toggles its checkbox, matching clicking the plain option.
+        await user.click(within(plainGroup).getByRole('checkbox', { name: 'Science' }));
+        await user.click(within(softGroup).getByText('Inquiry and lab review.'));
+
+        expect(snapshot(softGroup)).toEqual(snapshot(plainGroup));
+        expect(onSoftChange).toHaveBeenLastCalledWith(['math', 'reading', 'science']);
+
+        const formData = new FormData(container.querySelector('form'));
+        expect(formData.getAll('softSubjects')).toEqual(formData.getAll('plainSubjects'));
+    });
+
+    it('ignores row surface clicks when disabled or read-only', async () => {
+        const user = userEvent.setup();
+        const onChange = vi.fn();
+
+        render(
+            <>
+                <CheckboxGroup
+                    name="disabledSubjects"
+                    legend="Disabled subjects"
+                    appearance="soft"
+                    options={tileOptions}
+                    defaultValue={['math']}
+                    isDisabled
+                    onChange={onChange}
+                />
+                <CheckboxGroup
+                    name="readOnlySubjects"
+                    legend="Read-only subjects"
+                    appearance="soft"
+                    options={tileOptions}
+                    defaultValue={['math']}
+                    isReadOnly
+                    onChange={onChange}
+                />
+            </>
+        );
+
+        const disabledGroup = screen.getByRole('group', { name: 'Disabled subjects' });
+        const readOnlyGroup = screen.getByRole('group', { name: 'Read-only subjects' });
+
+        await user.click(within(disabledGroup).getByText('Fluency and comprehension.'));
+        await user.click(within(readOnlyGroup).getByText('Fluency and comprehension.'));
+
+        expect(within(disabledGroup).getByRole('checkbox', { name: 'Reading' })).toHaveAttribute('aria-checked', 'false');
+        expect(within(readOnlyGroup).getByRole('checkbox', { name: 'Reading' })).toHaveAttribute('aria-checked', 'false');
+        expect(onChange).not.toHaveBeenCalled();
+    });
 });

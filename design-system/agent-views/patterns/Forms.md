@@ -125,7 +125,7 @@ Don't: A second dialog over the first, with the field left unexplained.
 
 **Checked:** Review
 
-When most fields are required, mark the optional ones `"(optional)"` (`labelMarker="optional"`). When most fields are optional, mark the required ones `"(required)"` (`labelMarker="required"`). The marker is plain text in the label's type style, in `--ds-text-subtle`, never a symbol or legend. Required controls still set `isRequired`, so screen readers get `aria-required` and the visible `"(required)"` is hidden from them to avoid saying it twice.
+When most fields are required, mark the optional ones `"(optional)"` (`labelMarker="optional"`). When most fields are optional, mark the required ones `"(required)"` (`labelMarker="required"`). The marker is plain text in the label's type style, in `--ds-text-subtle`, never a symbol or legend. Required controls still set `isRequired`, so screen readers get `aria-required` and the visible `"(required)"` is hidden from them to avoid saying it twice. Choice flows (`RadioGroup` and `CheckboxGroup` across onboarding, quizzes, check-ins, and surveys) apply the same minority rule to selection controls: the majority selection type uses `appearance="soft"` (selected fill, border, and trailing check with no radio dot or checkbox box), while the minority selection type keeps its visible control (`card` or `plain`) so people notice when a question switches between single-select and multi-select.
 
 Do: Two required fields stay unmarked; only the optional field says so.
 Don't: Every field carries a marker, so none stands out.

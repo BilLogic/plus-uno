@@ -50,6 +50,8 @@ A radio lets a person choose one option from a set.
 
 <ComponentExample of={RadioStories.DescriptionAndCard} title="Description and card" description="A description under the label, and the card appearance for options that need more room." />
 
+<ComponentExample of={RadioStories.Soft} title="Soft" description="`appearance=&quot;soft&quot;` draws a neutral row without a visible radio dot; selection shows the selected fill, 1px selected border, and trailing check." />
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -136,9 +138,10 @@ Make one option the default: the safest and lowest-risk one. If a person may dec
 
 ## Parts
 
-1. **Radio.** A 12 circle. Selected, it fills with the selected bold fill and draws an inverse dot; unselected, it is an empty circle.
+1. **Radio.** A 12 circle in `plain` and `card` appearances; visually hidden in `soft` and `tile` while keeping native radio semantics, keyboard navigation, and form submission.
 2. **Label.** 14/20 text beside the radio in a 24 row. It names the option. An optional minority marker (`"(optional)"` or `"(required)"`) follows a standalone radio's label in plain text.
 3. **Description.** Optional 12/16 text under the label that describes the option. It does not name it.
+4. **Appearances.** `plain` draws the circle and label inline; `card` wraps them in a bordered surface row; `soft` draws a `--ds-background-neutral` row without a radio dot (selected row shows `--ds-background-selected`, a 1px `--ds-border-selected` edge, and a trailing `fa-solid fa-check` icon) for the majority selection type in a choice flow while the minority selection type keeps its visible control; `tile` draws a 224px pictured card.
 
 ### States
 
@@ -147,13 +150,13 @@ Make one option the default: the safest and lowest-risk one. If a person may dec
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Hovered</td><td>Unselected: <code>--ds-background-input-hovered</code> with a <code>--ds-border-brand</code> edge. Selected: the hovered step of the selected bold fill.</td></tr>
-<tr><td>Pressed</td><td>No step of its own. The hovered look holds while the pointer is down.</td></tr>
-<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the radio, for keyboard focus only.</td></tr>
-<tr><td>Selected</td><td><code>--ds-background-selected-bold</code> fill and <code>--ds-border-selected</code> edge; the dot is <code>--ds-icon-inverse</code>.</td></tr>
-<tr><td>Invalid</td><td>The unselected radio takes <code>--ds-border-danger</code>. A selected radio keeps its fill.</td></tr>
+<tr><td>Hovered</td><td>Unselected: <code>--ds-background-input-hovered</code> with a <code>--ds-border-brand</code> edge (or <code>--ds-background-neutral-hovered</code> in <code>soft</code>). Selected: the hovered step of the selected bold fill (or <code>--ds-background-selected-hovered</code> in <code>soft</code>).</td></tr>
+<tr><td>Pressed</td><td>No step of its own in plain/card. In <code>soft</code>, an unselected row takes <code>--ds-background-neutral-pressed</code> and a selected row takes <code>--ds-background-selected-pressed</code>.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the radio (or around the row in <code>soft</code> and <code>tile</code>), for keyboard focus only.</td></tr>
+<tr><td>Selected</td><td><code>--ds-background-selected-bold</code> fill and <code>--ds-border-selected</code> edge; the dot is <code>--ds-icon-inverse</code>. In <code>soft</code>, <code>--ds-background-selected</code> fill, 1px <code>--ds-border-selected</code> edge, and a trailing check in <code>--ds-icon-selected</code>.</td></tr>
+<tr><td>Invalid</td><td>The unselected radio or tile takes <code>--ds-border-danger</code> (in <code>soft</code>, both unselected and selected rows take <code>--ds-border-danger</code>).</td></tr>
 <tr><td>Read-only</td><td>Full contrast, in the tab order, no hover; an unchecked radio takes the <code>--ds-background-neutral</code> fill. Not changeable.</td></tr>
-<tr><td>Disabled</td><td><code>--ds-background-disabled</code> fill, <code>--ds-border-disabled</code> edge, <code>--ds-icon-disabled</code> dot. Out of the tab order.</td></tr>
+<tr><td>Disabled</td><td><code>--ds-background-disabled</code> fill, <code>--ds-border-disabled</code> edge, <code>--ds-icon-disabled</code> dot or check. Out of the tab order.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -169,6 +172,7 @@ Make one option the default: the safest and lowest-risk one. If a person may dec
 <tr><td>Row</td><td><code>--control-sm</code> (24); gap <code>--space-050</code>.</td></tr>
 <tr><td>Label</td><td><code>--ds-text</code>, body default.</td></tr>
 <tr><td>Card</td><td><code>--radius-control-md</code>, <code>--stroke-1</code> edge in <code>--ds-border</code>, <code>--ds-surface</code> fill.</td></tr>
+<tr><td>Soft row</td><td><code>--radius-control-md</code>, <code>--ds-background-neutral</code> fill at rest; selected <code>--ds-background-selected</code> fill, <code>--border-width-default</code> <code>--ds-border-selected</code> edge, and <code>--icon-sm</code> trailing check in <code>--ds-icon-selected</code>.</td></tr>
 <tr><td>Choice tile</td><td><code>--choice-tile-width</code> (224px), <code>--radius-control-md</code>, <code>--ds-surface</code> fill; selected 2px <code>--ds-border-selected</code> and <code>--ds-background-selected</code>.</td></tr>
 </tbody>
 </DocsTable>
