@@ -31,6 +31,8 @@ import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { InAppFrame, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { FilterSide, STUDENTS, StudentsTable, ViewBar, row } from '@/storybook-docs/lib/view-bar.jsx';
+import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
+import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { iconClass } from '../../lib/icon';
 import { ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
 
@@ -680,6 +682,19 @@ export const TypeList = {
             <StudentsTable count={6} rowsPerPage={4} />
         </PatternSection>
     ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const nameHeader = canvas.getByRole('columnheader', { name: /^Name/ });
+        const sortBtn = within(nameHeader).getByRole('button');
+        await userEvent.click(sortBtn);
+        await expect(nameHeader).toHaveAttribute('aria-sort', 'ascending');
+        const rows = canvas.getAllByRole('row');
+        await expect(rows[1]).toHaveTextContent('Ava Thompson');
+
+        await userEvent.click(sortBtn);
+        await expect(nameHeader).toHaveAttribute('aria-sort', 'descending');
+        await expect(canvas.getAllByRole('row')[1]).toHaveTextContent('Sofia Ramirez');
+    },
 };
 
 /** Queue: a queue page docks the Panel beside the list, and the record opens on demand. */
@@ -1146,7 +1161,7 @@ export const RowsSelected = {
         await userEvent.click(canvas.getByRole('checkbox', { name: 'Select all rows' }));
         await userEvent.click(canvas.getByRole('checkbox', { name: 'Select all rows' }));
         await waitFor(() => expect(head.queryByText(/selected/), 'clearing brings the column heads back').toBeNull());
-        await expect(head.getByRole('columnheader', { name: 'Name' })).toBeInTheDocument();
+        await expect(head.getByRole('columnheader', { name: /^Name/ })).toBeInTheDocument();
     },
 };
 
@@ -1173,11 +1188,19 @@ export const EmptyInTable = {
 
 /* ---- anatomy */
 
+const ANATOMY_PARTS = [
+    { selector: '[data-anatomy-root] > .plus-pattern-section-header .plus-pattern-section-title-row', label: 'Title row' },
+    { selector: '[data-anatomy-root] > .plus-pattern-section-header .plus-pattern-section-tabs', label: 'View bar' },
+    { selector: '[data-anatomy-root] .plus-pattern-section-list', label: 'Body' },
+    { selector: '[data-anatomy-root] .plus-pattern-section-detail', label: 'Detail', side: 'end' },
+    { selector: '[data-anatomy-root] > .plus-pattern-section-footer', label: 'Footer' },
+];
+
 /** Every part once: a Section with a view bar, an inline detail and a footer. */
 export const AnatomyQueue = {
     name: 'Anatomy',
     render: () => (
-        <div style={{ inlineSize: STAGE }}>
+        <LiveAnatomy title="A Section with its header, body, detail and footer numbered" parts={ANATOMY_PARTS}>
             <PatternSection
                 data-anatomy-root
                 title="Reflections"
@@ -1192,6 +1215,17 @@ export const AnatomyQueue = {
             >
                 <StudentsTable count={4} />
             </PatternSection>
-        </div>
+        </LiveAnatomy>
     ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await markersLevelWithParts(canvasElement, ANATOMY_PARTS);
+        leadersCrossNoOtherPart(canvasElement, ANATOMY_PARTS);
+        await expect(canvasElement.querySelector('[inert]'), 'anatomy story is not inert').toBeNull();
+        const root = canvasElement.querySelector('[data-anatomy-root]');
+        await expect(root.closest('[aria-hidden="true"]'), 'anatomy story is not aria-hidden').toBeNull();
+        const viewAll = canvas.getByRole('button', { name: 'View all' });
+        viewAll.focus();
+        await expect(viewAll, 'anatomy story controls are focusable').toHaveFocus();
+    },
 };

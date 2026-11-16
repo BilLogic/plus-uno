@@ -1,6 +1,10 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { LiveAnatomy, TypeCard } from '@/storybook-docs/lib/template-page.jsx';
 import PatternSection, { SectionToolbar } from './PatternSection';
+import * as Cases from './PatternSectionCases.jsx';
 
 /**
  * The Section pattern follows the Figma Section: no fill and no pad of its
@@ -179,3 +183,62 @@ describe('PatternSection named', () => {
         expect(screen.queryByRole('region')).toBeNull();
     });
 });
+
+describe('Template docs live examples', () => {
+    it('TypeCard links to a same-page #anchor or a cross-page docs route', () => {
+        const { rerender } = render(
+            <TypeCard thumb={<div>Thumb</div>} title="List" to="#list">The view bar alone.</TypeCard>,
+        );
+        expect(screen.getByRole('link', { name: 'List' })).toHaveAttribute('href', '#list');
+
+        rerender(
+            <TypeCard thumb={<div>Thumb</div>} title="Frame" to="templates-frame">The shell.</TypeCard>,
+        );
+        expect(screen.getByRole('link', { name: 'Frame' })).toHaveAttribute('href', '?path=/docs/templates-frame--docs');
+    });
+
+    it('every TypeCard in PatternSection.mdx links to a live ComponentExample on the page', () => {
+        const mdx = fs.readFileSync(path.join(__dirname, 'PatternSection.mdx'), 'utf8');
+        const slug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        const exampleSlugs = new Set(
+            [...mdx.matchAll(/<ComponentExample\b[^>]*?\btitle="([^"]+)"/g)].map((m) => slug(m[1])),
+        );
+        const cards = [...mdx.matchAll(/<TypeCard\b([^>]*?)>/g)].map((m) => m[1]);
+        expect(cards.length).toBeGreaterThanOrEqual(16);
+        for (const attrs of cards) {
+            const to = /\bto="([^"]+)"/.exec(attrs)?.[1];
+            expect(to, `TypeCard missing to="#...": ${attrs}`).toMatch(/^#[a-z0-9-]+$/);
+            expect(exampleSlugs.has(to.slice(1)), `no ComponentExample for ${to}`).toBe(true);
+        }
+    });
+
+    it('LiveAnatomy renders a non-inert, focusable story with non-interactive markers', () => {
+        const { container } = render(
+            <LiveAnatomy
+                title="Section anatomy"
+                parts={[{ selector: '[data-part="header"]', label: 'Header' }]}
+            >
+                <div data-part="header">
+                    <button type="button">Add students</button>
+                </div>
+            </LiveAnatomy>,
+        );
+        expect(container.querySelector('[inert]')).toBeNull();
+        const button = screen.getByRole('button', { name: 'Add students' });
+        expect(button.closest('[aria-hidden="true"]')).toBeNull();
+        button.focus();
+        expect(button).toHaveFocus();
+    });
+
+    it('PatternSectionCases render real PLUS components for every do/dont pair', () => {
+        for (const [name, Case] of Object.entries(Cases)) {
+            const { container, unmount } = render(<Case />);
+            expect(
+                container.querySelector('.plus-pattern-section, .plus-pattern-card'),
+                `${name} renders a real PatternSection or PatternCard`,
+            ).not.toBeNull();
+            unmount();
+        }
+    });
+});
+

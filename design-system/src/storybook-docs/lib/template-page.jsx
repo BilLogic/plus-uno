@@ -4,6 +4,7 @@ import { Story } from '@storybook/addon-docs/blocks';
 
 import { Tag } from '@/components';
 import { MotionPreferenceContext } from '@/lib/motionPreference.jsx';
+import { FitStage } from './fit-stage.jsx';
 import { useFitScale } from './use-fit-scale.js';
 import { ANATOMY_REGIONS, isOwnRegion } from './anatomy-regions.js';
 import { HeroCard } from '../docs-landing/HeroCard.jsx';
@@ -79,6 +80,8 @@ export const TypeGrid = ({ wide = false, children }) => (
 
 TypeGrid.propTypes = { wide: PropTypes.bool, children: PropTypes.node };
 
+const typeHref = (to) => (to.startsWith('#') ? to : `?path=/docs/${to}--docs`);
+
 /** One type: its live story (or, with `hero`, a page's registry hero) on the raised card, then its name and one line. */
 export const TypeCard = ({ of, thumb, hero, title, stage = TYPE_STAGE, to, thumbRatio, children }) => (
     <figure
@@ -105,7 +108,7 @@ export const TypeCard = ({ of, thumb, hero, title, stage = TYPE_STAGE, to, thumb
         </div>
         <figcaption style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-sm)' }}>
             <span style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>
-                {to ? <a href={`?path=/docs/${to}--docs`} style={{ color: 'var(--ds-link)', textDecoration: 'underline' }}>{title}</a> : title}
+                {to ? <a href={typeHref(to)} style={{ color: 'var(--ds-link)', textDecoration: 'underline' }}>{title}</a> : title}
             </span>
             <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{children}</span>
         </figcaption>
@@ -122,7 +125,7 @@ TypeCard.propTypes = {
     title: PropTypes.string.isRequired,
     /** The width the story lays out at, when the type needs more than the shared stage (a Frame docks its Sidebar from 1024 of its own width, inside the window's border). */
     stage: PropTypes.number,
-    /** A docs id (`templates-frame`): the title links to that page. */
+    /** A same-page anchor (`#list`) or a docs id (`templates-frame`): the title links to that live example or page. */
     to: PropTypes.string,
     /** A CSS aspect ratio (`16 / 10`) that crops every thumbnail to one height. */
     thumbRatio: PropTypes.string,
@@ -268,7 +271,6 @@ export const LiveAnatomy = ({ width, parts, title, children }) => {
     }, [parts]);
     return (
         <figure
-            role="img"
             aria-label={`${title}: ${parts.map((p, i) => `${i + 1}, ${p.label}`).join('; ')}`}
             className="not-prose"
             style={{ margin: 0, position: 'relative', paddingInline: GUTTER, paddingBlockStart: parts.some((p) => p.side === 'top') ? GUTTER : 0 }}
@@ -276,7 +278,9 @@ export const LiveAnatomy = ({ width, parts, title, children }) => {
             <div ref={box} style={{ position: 'relative' }}>
                 {/* Anatomy figures render with reduced motion. */}
                 <MotionPreferenceContext.Provider value={true}>
-                    <ScaledStory width={width}>{children}</ScaledStory>
+                    <div className="docs-story not-prose sb-unstyled" style={{ width: '100%' }}>
+                        {width ? <FitStage width={width}>{children}</FitStage> : children}
+                    </div>
                 </MotionPreferenceContext.Provider>
                 {marks.map((m, i) => m && (
                     <React.Fragment key={parts[i].selector}>
@@ -298,6 +302,7 @@ export const LiveAnatomy = ({ width, parts, title, children }) => {
                             data-anatomy-leader={i + 1}
                             style={{
                                 position: 'absolute',
+                                pointerEvents: 'none',
                                 ...(m.side === 'top'
                                     ? {
                                         left: m.elbow ? m.left + m.width : m.markerLeft + MARKER / 2,
@@ -323,6 +328,7 @@ export const LiveAnatomy = ({ width, parts, title, children }) => {
                             data-anatomy-marker={i + 1}
                             style={{
                                 position: 'absolute',
+                                pointerEvents: 'none',
                                 ...(m.side === 'top' ? { top: `calc(-1 * (${GUTTER} + ${MARKER}px) / 2)`, left: m.markerLeft } : { top: m.markerTop }),
                                 ...(m.side === 'top' ? {} : m.side === 'end' ? { left: `calc(${boxWidth}px + (${GUTTER} - ${MARKER}px) / 2)` } : { left: `calc(-1 * (${GUTTER} + ${MARKER}px) / 2)` }),
                                 width: 'var(--control-sm)',
@@ -346,7 +352,7 @@ export const LiveAnatomy = ({ width, parts, title, children }) => {
 };
 
 LiveAnatomy.propTypes = {
-    width: PropTypes.number.isRequired,
+    width: PropTypes.number,
     parts: PropTypes.arrayOf(PropTypes.shape({
         selector: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
