@@ -985,6 +985,9 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 Pick the level by what the surface does (Foundations/Visual/Elevation § Choose by behavior). Each shadow is edge + key + ambient and pairs with its level's surface (`--ds-shadow-raised` with `--ds-surface-raised`); a Tooltip takes none. Opacity dims a whole element.
 
 ```css
+--ds-opacity-chart-fill  /* A chart area under its line: range bands, radar shapes, stacked areas. */
+--ds-opacity-chart-inactive  /* Chart series faded while another series is hovered or focused. */
+--ds-opacity-chart-overlap  /* Chart marks that overlap each other, such as bubbles, so the ones beneath stay visible. */
 --ds-opacity-disabled  /* Images and whole elements in a disabled state. */
 --ds-opacity-loading  /* Content under a loading spinner. */
 --ds-shadow-blocking  /* Box shadow of the Modal on its Blanket, the one surface that blocks the page. Pair with --ds-surface-overlay. */
