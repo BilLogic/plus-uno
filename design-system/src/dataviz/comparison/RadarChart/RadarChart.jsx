@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme from '@/dataviz/chartTheme';
+import chartTheme, { CHART_RADAR_FILL_OPACITY } from '@/dataviz/chartTheme';
 import { dataLabelFormat, tooltipPointFormat } from '@/dataviz/chartFormat';
 import { seriesColor, sortCategories } from '@/dataviz/palette';
 import { iconClass } from '@/lib/icon';
@@ -188,6 +188,7 @@ const RadarChart = ({
         },
         plotOptions: {
             area: {
+                fillOpacity: CHART_RADAR_FILL_OPACITY,
                 dataLabels: {
                     ...chartTheme.plotOptions.series.dataLabels,
                     enabled: showDataLabels && filled,

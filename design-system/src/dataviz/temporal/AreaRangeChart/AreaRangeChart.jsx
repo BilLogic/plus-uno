@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme from '@/dataviz/chartTheme';
+import chartTheme, { CHART_RANGE_FILL_OPACITY } from '@/dataviz/chartTheme';
 import { BRAND } from '@/dataviz/palette';
 
 /**
@@ -48,6 +48,7 @@ const AreaRangeChart = ({
             name: 'Range',
             data: data,
             color: BRAND,
+            fillOpacity: CHART_RANGE_FILL_OPACITY,
             lineWidth: 0,
             marker: {
                 enabled: false

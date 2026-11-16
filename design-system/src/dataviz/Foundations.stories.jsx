@@ -120,7 +120,7 @@ const gridStyle = {
 const cardStyle = {
     background: 'var(--ds-surface-raised)',
     borderRadius: 'var(--card-radius)',
-    boxShadow: 'var(--ds-shadow-raised)',
+    border: 'var(--border-width-default) solid var(--ds-border)',
 };
 
 const findChart = (containerEl) =>
