@@ -24,7 +24,7 @@ Also asked as: page section, toolbar, section header, block, region.
 
 Use `PatternSection` when content has a heading, shares actions, shows or hides as a unit, or takes its own span of the grid; otherwise the content belongs to the Section above it. The header is the Section's, not the Table's: the title row names it, and the view bar under it holds the views at the start and everything that acts on the content at the end, so switching views can swap a table for cards while the bar stays put.
 
-A Section has two looks, `none` and `subtle`, and five parts: header, body, side, detail and footer. The side and the detail take either fill.
+A Section has two looks, `none` and `subtle`, and five parts: header, body, side, detail and footer. The side and the detail take either fill. A **Section detail** is an inline expand: a row or card opens in place inside its Section and pushes the content below it down. It is never the detail view on a queue page.
 
 ## Motion
 
@@ -42,7 +42,7 @@ PatternSection reads these motion tokens and no literal duration or curve.
 ## Alternatives
 
 - For one object with an agreed shape, use `PatternCard` inside a Section.
-- For a quick look at a row from a table on any page, use `Panel`.
+- For a queue page or a quick look at a row from a table, use `Panel`.
 - For the page's own title, use `PageHeader`; a Section stands under it.
 
 ## Best practices
@@ -101,11 +101,11 @@ The part-ticked select-all, the count of selected rows, then the actions, all at
 
 Each control has one home. The icon returns with its count once the side hides, below `SECTION_DETAIL_FLOOR`.
 
-### Open a queue's record in the Section detail. {#open-a-queue-s-record-in-the-section-detail}
+### Use a Section detail as an inline expand, never on a queue page. {#use-a-section-detail-as-an-inline-expand-never-on-a-queue-page}
 
 **Checked:** Review
 
-Previous and Next sit in the detail header, one detail per Section, and heavy work opens on its own page from the detail footer. The list stays in view beside the record.
+A row or card opens in place inside its Section and pushes the content below it down. A queue page docks a `Panel` beside the list instead, and the record opens on demand.
 
 ### Keep the footer for paging and "View all". {#keep-the-footer-for-paging-and-view-all}
 
@@ -154,7 +154,7 @@ Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `Patt
 Each Section type combines a header and body, with an optional side or detail. These are starting layouts of the same component.
 
 - **List.** The view bar alone, one table, paging. The default for an area page.
-- **Queue.** A list with a detail, for working through records one by one.
+- **Detail.** A list with a detail that opens an item in place.
 - **Cards.** Title and actions over a grid of cards, three or four across.
 - **Stats.** A row of cards, each one number and its label, four at most.
 - **Details.** Label and value pairs in two columns, with Edit in the title row.
@@ -177,7 +177,7 @@ A starting set, picked by what the Section holds. Every control state lives on i
 
 ## Anatomy
 
-A queue Section with a view bar, a detail and a footer. The title, the first pill and the first column share one left edge.
+A Section with a view bar, a detail and a footer. The title, the first pill and the first column share one left edge.
 
 1. **Title row.** The h2, an optional one-line description, and actions only when there is no view bar.
 2. **View bar** (optional). Pill views at the start; at the end, in order, the format switch, Search, filters, More and the labeled Primary.

@@ -61,6 +61,15 @@ _Avoid_: "student profile", "student row"
 An AI-generated student engagement summary.
 _Avoid_: "student report", "analytics"
 
+**Queue page**:
+A page worked item by item (Flags, Highlights, Feedback, Approvals, Escalations).
+
+**Section detail**:
+An inline expand inside a Section.
+
+**Commit action**:
+The footer button that commits the work (Submit, Save, Send, Approve); in multi-step forms, Back and Next may sit beside it (`design-system/src/patterns/Form/Form.mdx`).
+
 ### Organization
 
 **Affiliation**:

@@ -10,7 +10,7 @@ Also asked as: summary card, object card.
 
 **Used in:** Form (`ds guide form`); Card (`ds guide card`); Section (`ds guide section`); Table (`ds guide table`)
 
-**Governed by:** Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Forms (`ds guide forms`); Indicators (`ds guide indicators`)
+**Governed by:** Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Navigation (`ds guide navigation`)
 
 **Source:** `design-system/src/patterns/PatternCard/PatternCard.jsx`
 

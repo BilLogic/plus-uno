@@ -87,7 +87,7 @@ The AI panel is not a floating Panel. It is a region of the Frame, docked where 
 ## Alternatives
 
 - For a decision that must happen before the page continues, use `Modal`.
-- For a queue page, use a `Section` detail: the record in place beside its list.
+- For a queue page, use `Panel` docked beside the list; the record opens on demand.
 - For a short aside off a control, use `Popup`.
 - For complex or multistep work, give the record its own page with `Frame` · focused.
 
@@ -111,7 +111,7 @@ The AI panel is not a floating Panel. It is a region of the Frame, docked where 
 ## Related
 
 - Frame: use when the question is the AI panel, which is a Frame region.
-- Section: use when the record belongs beside its list on a queue page.
+- Section: use when a row or card opens in place inside its Section.
 - Modal: use when the task needs full attention.
 - Form: use when the Panel edits a record.
 - Patterns: use when you need the rules around a Panel: Navigation, Empty, Notifications.
