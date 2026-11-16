@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import DatePicker from '../DatePicker/DatePicker';
 import TimePicker from '../TimePicker/TimePicker';
 import useFieldId from '../useFieldId';
-import { FieldCaption } from '../_internal/FieldFrame';
+import { FieldCaption, LabelMarker } from '../_internal/FieldFrame';
 import { formatIso, parseDate } from '../_internal/dates';
 import { knownZone, localTimeZone, timeZoneCaption, wallTimeToUtc } from '../_internal/timeZones';
 import './DateTimePicker.scss';
@@ -208,7 +208,7 @@ const DateTimePicker = ({
                     htmlFor={showDate ? dateInputId : timeInputId}
                     className={`plus-datetime-label${isLabelHidden ? ' plus-datetime-label-hidden' : ''}`}
                 >
-                    {label}{labelMarker === 'required' || labelMarker === 'optional' ? ` (${labelMarker})` : null}
+                    {label}<LabelMarker marker={labelMarker} isRequired={isRequired} />
                 </label>
             )}
 

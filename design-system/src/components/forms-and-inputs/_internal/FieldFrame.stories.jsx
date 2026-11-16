@@ -30,7 +30,7 @@ const control = (id, extra = {}) => (
 /** The label's `htmlFor` names the control; clicking it focuses the input. */
 export const LabelAssociation = () => (
     <FieldFrame>
-        <FieldLabel htmlFor="label-assoc-input" marker="required">Tutor name</FieldLabel>
+        <FieldLabel htmlFor="label-assoc-input" labelMarker="required">Tutor name</FieldLabel>
         <FieldBox><input id="label-assoc-input" className="plus-field__control" /></FieldBox>
     </FieldFrame>
 );

@@ -133,7 +133,7 @@ const Radio = ({
                         {radioControl}
                     </BaseRadioGroup>
                 )}
-                <FieldLabel htmlFor={fieldId} marker={labelMarker} name={name} className="plus-form-radio-label">
+                <FieldLabel htmlFor={fieldId} labelMarker={labelMarker} isRequired={isRequired} name={name} className="plus-form-radio-label">
                     {label}
                 </FieldLabel>
             </div>

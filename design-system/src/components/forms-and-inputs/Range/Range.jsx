@@ -25,7 +25,6 @@ const Range = ({
     id,
     name,
     label,
-    labelMarker,
     showLabel = true,
     min = 0,
     max = 100,
@@ -60,7 +59,6 @@ const Range = ({
                     {label && (
                         <FieldLabel
                             id={labelId}
-                            marker={labelMarker}
                             hidden={!showLabel}
                             className="plus-form-range-label"
                         >
@@ -101,8 +99,6 @@ Range.propTypes = {
     name: PropTypes.string,
     /** Text that names the slider. Without it the slider has no accessible name. */
     label: PropTypes.node,
-    /** Marks the form's minority case in plain text after the label: `required` or `optional`. */
-    labelMarker: PropTypes.oneOf(['required', 'optional']),
     /** Render the label visually hidden rather than visible. It still names the slider. */
     showLabel: PropTypes.bool,
     /** The smallest value. Defaults to 0. */

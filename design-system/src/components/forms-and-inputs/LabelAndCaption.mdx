@@ -50,9 +50,9 @@ The label above a field names it, and the caption below it helps, warns or confi
 
 <ComponentExample of={LabelAndCaptionStories.LabelPlain} title="Label" description="The field's name, in the small body size." />
 
-<ComponentExample of={LabelAndCaptionStories.LabelOptional} title="Optional minority label" description="Appends &quot;(optional)&quot; in the label's own type style when most fields in the form are required." />
+<ComponentExample of={LabelAndCaptionStories.LabelOptional} title="Optional minority label" description="Appends &quot;(optional)&quot; in the label's type style, in `--ds-text-subtle`, when most fields in the form are required." />
 
-<ComponentExample of={LabelAndCaptionStories.LabelRequired} title="Required minority label" description="Appends &quot;(required)&quot; in the label's own type style when most fields in the form are optional." />
+<ComponentExample of={LabelAndCaptionStories.LabelRequired} title="Required minority label" description="Appends &quot;(required)&quot; in the label's type style, in `--ds-text-subtle`, when most fields in the form are optional." />
 
 <ComponentExample of={LabelAndCaptionStories.CaptionHelp} title="Help caption" description="Standing help under the field, in the subtle text color." />
 
@@ -127,7 +127,7 @@ Every field component in this group draws two lines around its control: the **la
 ## Parts
 
 1. **Label.** The field's name, tied to its control.
-2. **Minority marker** (optional). Plain text `"(optional)"` or `"(required)"` in the label's own type style, used only for the minority case in a form.
+2. **Minority marker** (optional). Plain text `"(optional)"` or `"(required)"` in the label's type style, in `--ds-text-subtle`, used only for the minority case in a form.
 3. **Info button** (optional). An icon beside the label that opens a tooltip, outside the label so its name never joins the field's.
 4. **Caption message** (optional). Help, or a status message with its icon.
 5. **Character count** (optional). On the right of the caption line, beside the message.
@@ -156,7 +156,7 @@ Every field component in this group draws two lines around its control: the **la
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Label and minority marker</td><td><code>--body-sm</code> in <code>--ds-text</code>.</td></tr>
+<tr><td>Label and minority marker</td><td><code>--body-sm</code> in <code>--ds-text</code>; the marker in <code>--ds-text-subtle</code>.</td></tr>
 <tr><td>Info button</td><td><code>--ds-icon-subtle</code>; focus ring <code>--focus-ring-width</code> in <code>--ds-border-focused</code>.</td></tr>
 <tr><td>Caption</td><td><code>--body-sm</code>; help <code>--ds-text-subtle</code>, success <code>--ds-text-success</code>, danger <code>--ds-text-danger</code>, warning <code>--ds-text-warning</code>.</td></tr>
 <tr><td>Caption icon</td><td><code>--icon-sm</code>, <code>--stack-sm</code> before the message.</td></tr>

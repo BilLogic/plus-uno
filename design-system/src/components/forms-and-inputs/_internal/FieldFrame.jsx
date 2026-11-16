@@ -45,11 +45,42 @@ export function fieldDescription({ fieldId, message, counted = false, describedB
 }
 
 /**
+ * The `(required)` or `(optional)` word after a label, for the form's minority
+ * case. One place, so every label draws it the same way: a span in the label's
+ * own type style, in `--ds-text-subtle`, plain text with no icon.
+ *
+ * A visible `(required)` is hidden from assistive tech when the control already
+ * says it with `aria-required` (`isRequired`), so a screen reader hears
+ * "required" once. `(optional)` is always announced, and so is a `(required)`
+ * on a control that sets no `aria-required` (a group's legend).
+ *
+ * @param {object} props
+ * @param {'required'|'optional'} [props.marker]
+ * @param {boolean} [props.isRequired] the control sets `aria-required`
+ */
+export const LabelMarker = ({ marker, isRequired = false }) => {
+    if (marker !== 'required' && marker !== 'optional') return null;
+    return (
+        <>
+            {' '}
+            <span className="plus-field-marker" aria-hidden={marker === 'required' && isRequired ? 'true' : undefined}>
+                ({marker})
+            </span>
+        </>
+    );
+};
+
+LabelMarker.propTypes = {
+    marker: PropTypes.oneOf(['required', 'optional']),
+    isRequired: PropTypes.bool,
+};
+
+/**
  * The label row above a field: the label, an optional `(required)` or
  * `(optional)` marker for the form's minority case, and an optional info
  * tooltip.
  *
- * The marker is plain text in the label's own type style; `aria-required` sits
+ * The marker is plain text in the label's type style and `--ds-text-subtle`; `aria-required` sits
  * on the control regardless of which side is the minority. The info button sits
  * outside the `<label>` so its name never becomes part of the field's name.
  */
@@ -57,17 +88,17 @@ export const FieldLabel = ({
     id,
     htmlFor,
     children,
-    marker,
+    labelMarker,
+    isRequired = false,
     info,
     hidden = false,
     name,
     className = '',
 }) => {
     if (!children) return null;
-    const markerText = marker === 'required' || marker === 'optional' ? ` (${marker})` : null;
     const label = (
         <label id={id} htmlFor={htmlFor} className={`plus-field-label${hidden ? ' plus-field-label--hidden' : ''} ${className}`.trim()}>
-            {children}{markerText}
+            {children}<LabelMarker marker={labelMarker} isRequired={isRequired} />
         </label>
     );
     if (!info || hidden) return label;
@@ -93,7 +124,9 @@ FieldLabel.propTypes = {
     htmlFor: PropTypes.string,
     children: PropTypes.node,
     /** Marks the form's minority case in plain text after the label: `required` or `optional`. */
-    marker: PropTypes.oneOf(['required', 'optional']),
+    labelMarker: PropTypes.oneOf(['required', 'optional']),
+    /** The control sets `aria-required`, so a visible `(required)` is hidden from assistive tech. */
+    isRequired: PropTypes.bool,
     /** Text for the info tooltip beside the label. */
     info: PropTypes.node,
     /** Clips the label out of sight. It is still rendered and still names the field. */

@@ -23,16 +23,16 @@ const TONE_FOR_STATE = {
  *
  * @param {object} props
  * @param {string} [props.text] Label copy.
- * @param {'required'|'optional'} [props.marker] Minority marker after the label.
+ * @param {'required'|'optional'} [props.labelMarker] Minority marker after the label.
  * @param {string} [props.htmlFor] `id` of the control this label names.
  */
-export const Label = ({ text = 'Label', marker, htmlFor }) => (
-    <FieldLabel htmlFor={htmlFor} marker={marker}>{text}</FieldLabel>
+export const Label = ({ text = 'Label', labelMarker, htmlFor }) => (
+    <FieldLabel htmlFor={htmlFor} labelMarker={labelMarker}>{text}</FieldLabel>
 );
 
 Label.propTypes = {
     text: PropTypes.string,
-    marker: PropTypes.oneOf(['required', 'optional']),
+    labelMarker: PropTypes.oneOf(['required', 'optional']),
     htmlFor: PropTypes.string,
 };
 

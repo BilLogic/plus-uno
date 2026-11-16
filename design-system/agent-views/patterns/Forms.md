@@ -125,7 +125,7 @@ Don't: A second dialog over the first, with the field left unexplained.
 
 **Checked:** Review
 
-When most fields are required, mark the optional ones `"(optional)"` (`labelMarker="optional"`). When most fields are optional, mark the required ones `"(required)"` (`labelMarker="required"`). The marker sits in the label's own type style, never a separate color, symbol or legend, and required controls still set `isRequired` so screen readers get `aria-required`.
+When most fields are required, mark the optional ones `"(optional)"` (`labelMarker="optional"`). When most fields are optional, mark the required ones `"(required)"` (`labelMarker="required"`). The marker is plain text in the label's type style, in `--ds-text-subtle`, never a symbol or legend. Required controls still set `isRequired`, so screen readers get `aria-required` and the visible `"(required)"` is hidden from them to avoid saying it twice.
 
 Do: Two required fields stay unmarked; only the optional field says so.
 Don't: Every field carries a marker, so none stands out.

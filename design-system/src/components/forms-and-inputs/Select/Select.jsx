@@ -436,7 +436,7 @@ const Select = ({
     return (
         <FieldFrame disabled={isDisabled} invalid={tone === 'invalid'} className={wrapperClasses} style={style}>
             {label && (
-                <FieldLabel id={labelId} htmlFor={typeable ? fieldId : undefined} marker={labelMarker} info={info} name={typeof label === 'string' ? label : undefined}>
+                <FieldLabel id={labelId} htmlFor={typeable ? fieldId : undefined} labelMarker={labelMarker} isRequired={isRequired} info={info} name={typeof label === 'string' ? label : undefined}>
                     {label}
                 </FieldLabel>
             )}

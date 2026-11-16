@@ -672,7 +672,7 @@ const TagInput = ({
 
     return (
         <FieldFrame disabled={disabled} invalid={tone === 'invalid'} className={`plus-tag-input ${className}`.trim()} style={style}>
-            <FieldLabel htmlFor={fieldId} marker={labelMarker} info={info}>
+            <FieldLabel htmlFor={fieldId} labelMarker={labelMarker} isRequired={required} info={info}>
                 {label}
             </FieldLabel>
             <div

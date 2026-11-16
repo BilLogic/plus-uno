@@ -462,7 +462,7 @@ const TreeSelect = ({
     return (
         <FieldFrame disabled={isDisabled} invalid={tone === 'invalid'} className={className} style={style}>
             {label && (
-                <FieldLabel id={labelId} htmlFor={fieldId} marker={labelMarker} info={info} name={typeof label === 'string' ? label : undefined}>
+                <FieldLabel id={labelId} htmlFor={fieldId} labelMarker={labelMarker} isRequired={isRequired} info={info} name={typeof label === 'string' ? label : undefined}>
                     {label}
                 </FieldLabel>
             )}

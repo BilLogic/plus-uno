@@ -173,7 +173,7 @@ export const PropsRender = () => (
 PropsRender.parameters = { docs: { disable: true } };
 PropsRender.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const numeric = canvas.getByRole('radiogroup', { name: 'Numeric (required)' });
+    const numeric = canvas.getByRole('radiogroup', { name: 'Numeric' });
     const comments = canvas.getByRole('radiogroup', { name: 'Comments' });
 
     // variant=numeric: a label 1-5 above each item, no comments label.
@@ -268,8 +268,10 @@ export const Required = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const group = within(canvasElement).getByRole('radiogroup', { name: 'How was the session? (required)' });
+        const group = within(canvasElement).getByRole('radiogroup', { name: 'How was the session?' });
         await expect(group).toHaveAttribute('aria-required', 'true');
+        const marker = canvasElement.querySelector('.plus-field-marker');
+        await expect(getComputedStyle(marker).color).toBe(tokenColor(canvasElement, '--ds-text-subtle'));
         const label = canvasElement.querySelector('.plus-rating-label');
         await expect(getComputedStyle(label).color).toBe(tokenColor(canvasElement, '--ds-text'));
     },

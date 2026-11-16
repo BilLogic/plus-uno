@@ -484,7 +484,8 @@ export const Required = {
     ),
     play: async ({ canvasElement }) => {
         await expect(fileInput(canvasElement)).toHaveAttribute('aria-required', 'true');
-        await expect(within(canvasElement).getByText('Upload files (required)')).toBeInTheDocument();
+        await expect(within(canvasElement).getByText('(required)')).toBeInTheDocument();
+        await expect(within(canvasElement).getByText('(required)')).toHaveAttribute('aria-hidden', 'true');
     },
 };
 

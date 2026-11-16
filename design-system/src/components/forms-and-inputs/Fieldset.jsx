@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Fieldset as BaseFieldset } from '@base-ui/react/fieldset';
 import useFieldId from './useFieldId';
+import { LabelMarker } from './_internal/FieldFrame';
 import './Fieldset.scss';
 
 /**
@@ -27,7 +28,6 @@ const Fieldset = ({
 }) => {
     const fieldId = useFieldId(id);
     const errorId = error ? `${fieldId}-error` : undefined;
-    const markerText = labelMarker === 'required' || labelMarker === 'optional' ? ` (${labelMarker})` : null;
 
     const classes = [
         'plus-fieldset',
@@ -46,7 +46,7 @@ const Fieldset = ({
         >
             {legend && (
                 <BaseFieldset.Legend id={`${fieldId}-legend`} className="plus-fieldset-legend">
-                    {legend}{markerText}
+                    {legend}<LabelMarker marker={labelMarker} />
                     {isRequired && labelMarker !== 'required' && (
                         <>{' '}<span className="visually-hidden">(required)</span></>
                     )}

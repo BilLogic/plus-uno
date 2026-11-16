@@ -397,9 +397,8 @@ export const DisabledWithReason = {
 export const Required = {
     render: () => <Checkbox id="cb-ex-required" label="I accept the terms" isRequired labelMarker="required" />,
     play: async ({ canvasElement }) => {
-        const cb = within(canvasElement).getByRole('checkbox', { name: 'I accept the terms (required)' });
+        const cb = within(canvasElement).getByRole('checkbox', { name: 'I accept the terms' });
         await expect(cb).toHaveAttribute('aria-required', 'true');
-        await expect(canvasElement.querySelector('.plus-form-checkbox-wrapper')).toHaveClass('plus-form-checkbox-required');
         await expect(canvasElement.textContent).not.toContain('*');
     },
 };

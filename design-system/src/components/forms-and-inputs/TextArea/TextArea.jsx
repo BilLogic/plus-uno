@@ -112,7 +112,7 @@ const TextArea = ({
 
     return (
         <FieldFrame disabled={isDisabled} invalid={tone === 'invalid'} className={`plus-text-area ${className}`.trim()} style={style}>
-            <FieldLabel htmlFor={fieldId} marker={labelMarker} info={info} hidden={isLabelHidden}>
+            <FieldLabel htmlFor={fieldId} labelMarker={labelMarker} isRequired={isRequired} info={info} hidden={isLabelHidden}>
                 {label}
             </FieldLabel>
             <FieldBox

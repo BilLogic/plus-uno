@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { RadioGroup as BaseRadioGroup } from '@base-ui/react/radio-group';
 import { Radio as BaseRadio } from '@base-ui/react/radio';
 import useFieldId from '../useFieldId';
+import { LabelMarker } from '../_internal/FieldFrame';
 import Icon from '../../images-and-icons/Icon';
 import './Rating.scss';
 
@@ -63,7 +64,7 @@ const Rating = ({
         <div className={wrapperClasses} style={style} {...props}>
             {hasLabel && (
                 <span id={labelId} className="plus-rating-label">
-                    {label}{labelMarker === 'required' || labelMarker === 'optional' ? ` (${labelMarker})` : null}
+                    {label}<LabelMarker marker={labelMarker} isRequired={isRequired} />
                 </span>
             )}
             <BaseRadioGroup

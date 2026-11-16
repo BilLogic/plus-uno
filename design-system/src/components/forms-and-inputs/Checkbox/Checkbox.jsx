@@ -65,7 +65,6 @@ const Checkbox = ({
     const wrapperClasses = [
         'plus-form-checkbox-wrapper',
         isIndeterminate ? 'plus-form-checkbox-indeterminate' : '',
-        isRequired ? 'plus-form-checkbox-required' : '',
         isInvalid ? 'plus-form-checkbox-invalid' : '',
         choiceClasses({ appearance, readOnly: isReadOnly }),
         className,
@@ -107,7 +106,7 @@ const Checkbox = ({
                 >
                     <BaseCheckbox.Indicator keepMounted className="plus-form-checkbox-indicator" />
                 </BaseCheckbox.Root>
-                <FieldLabel htmlFor={fieldId} marker={labelMarker} name={name} className="plus-form-checkbox-label">
+                <FieldLabel htmlFor={fieldId} labelMarker={labelMarker} isRequired={isRequired} name={name} className="plus-form-checkbox-label">
                     {label}
                 </FieldLabel>
             </div>

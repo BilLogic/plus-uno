@@ -11573,18 +11573,6 @@
           "deprecated": null
         },
         {
-          "name": "labelMarker",
-          "type": "enum",
-          "required": false,
-          "default": null,
-          "values": [
-            "required",
-            "optional"
-          ],
-          "description": "Marks the form's minority case in plain text after the label: `required` or `optional`.",
-          "deprecated": null
-        },
-        {
           "name": "showLabel",
           "type": "bool",
           "required": false,

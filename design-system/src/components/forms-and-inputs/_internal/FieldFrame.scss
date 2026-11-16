@@ -44,6 +44,11 @@
     font: var(--body-sm);
 }
 
+// The (required) or (optional) word: the label's type style, quieter.
+.plus-field-marker {
+    color: var(--ds-text-subtle);
+}
+
 // Hidden, not removed: the label still names the control.
 .plus-field-label--hidden {
     position: absolute;

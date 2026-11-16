@@ -1,6 +1,8 @@
 import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { FieldLabel } from './_internal/FieldFrame';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { join } from 'node:path';
+import { FieldLabel, LabelMarker } from './_internal/FieldFrame';
 import Fieldset from './Fieldset';
 import TextField from './TextField';
 import TextArea from './TextArea';
@@ -26,13 +28,13 @@ describe('Form label minority markers', () => {
         expect(container.textContent).not.toContain('*');
 
         rerender(
-            <FieldLabel htmlFor="f1" marker="optional" info="Roster name">Notes</FieldLabel>
+            <FieldLabel htmlFor="f1" labelMarker="optional" info="Roster name">Notes</FieldLabel>
         );
         expect(container.querySelector('label')).toHaveTextContent(/^Notes \(optional\)$/);
         expect(screen.getByRole('button', { name: 'About Notes' })).toBeInTheDocument();
 
         rerender(
-            <FieldLabel htmlFor="f1" marker="required" info="Roster name">Student</FieldLabel>
+            <FieldLabel htmlFor="f1" labelMarker="required" info="Roster name">Student</FieldLabel>
         );
         expect(container.querySelector('label')).toHaveTextContent(/^Student \(required\)$/);
         expect(screen.getByRole('button', { name: 'About Student' })).toBeInTheDocument();
@@ -121,19 +123,65 @@ describe('Form label minority markers', () => {
                 <DateTimePicker id="dt-opt" label="Follow-up" labelMarker="optional" />
                 <FileUpload id="fu-opt" label="Attachment" labelMarker="optional" />
                 <Rating id="rat-req" label="Confidence" value={0} isRequired labelMarker="required" />
-                <Range id="rng-opt" label="Goal minutes" labelMarker="optional" />
             </div>
         );
 
         expect(container.textContent).not.toContain('*');
         expect(screen.getByRole('textbox', { name: 'Notes (optional)' })).not.toHaveAttribute('aria-required');
-        expect(screen.getByRole('textbox', { name: 'Email (required)' })).toHaveAttribute('aria-required', 'true');
+        expect(screen.getByRole('textbox', { name: 'Email' })).toHaveAttribute('aria-required', 'true');
         expect(screen.getByRole('combobox', { name: 'Secondary site (optional)' })).not.toHaveAttribute('aria-required');
         expect(screen.getByRole('group', { name: 'Extra topics (optional)' })).toBeInTheDocument();
         expect(within(container).getByRole('group', { name: 'Attendance (required)' })).toBeInTheDocument();
         expect(container.querySelector('label[for="dt-opt-date"]')).toHaveTextContent('Follow-up (optional)');
         expect(container.querySelector('label[for="fu-opt"]')).toHaveTextContent('Attachment (optional)');
-        expect(screen.getByRole('radiogroup', { name: 'Confidence (required)' })).toHaveAttribute('aria-required', 'true');
-        expect(screen.getByRole('slider', { name: 'Goal minutes (optional)' })).toBeInTheDocument();
+        expect(screen.getByRole('radiogroup', { name: 'Confidence' })).toHaveAttribute('aria-required', 'true');
+        expect(container.querySelector('#rat-req-label, [id$="label"]')).not.toBeNull();
+    });
+
+    it('the marker is its own span so it can take the subtle text color, still plain text', () => {
+        const { container } = render(<LabelMarker marker="optional" />);
+        const span = container.querySelector('.plus-field-marker');
+        expect(span).toHaveTextContent('(optional)');
+        expect(span.querySelector('svg, i')).toBeNull();
+        const scss = readFileSync(join(__dirname, '_internal/FieldFrame.scss'), 'utf8');
+        expect(scss).toMatch(/\.plus-field-marker\s*\{[^}]*color:\s*var\(--ds-text-subtle\)/);
+        expect(render(<LabelMarker />).container).toBeEmptyDOMElement();
+    });
+
+    it('one helper builds the marker: no component rebuilds the (required)/(optional) text', () => {
+        const walk = (dir) => readdirSync(dir).flatMap((f) => {
+            const full = join(dir, f);
+            return statSync(full).isDirectory() ? walk(full) : [full];
+        });
+        const offenders = walk(__dirname)
+            .filter((f) => /\.jsx?$/.test(f) && !/(stories|test)\./.test(f) && !f.endsWith('_internal/FieldFrame.jsx'))
+            .filter((f) => /\(\$\{\w*[mM]arker\w*\}\)/.test(readFileSync(f, 'utf8')));
+        expect(offenders).toEqual([]);
+    });
+
+    it('a visible (required) is hidden from assistive tech when aria-required already says it; (optional) stays announced', () => {
+        const { container } = render(
+            <div>
+                <TextField id="a1" label="Email" isRequired labelMarker="required" />
+                <Checkbox id="a2" label="Agree" isRequired labelMarker="required" />
+                <FileUpload id="a3" label="Worksheet" isRequired labelMarker="required" />
+                <DateTimePicker id="a4" label="When" isRequired labelMarker="required" />
+                <Rating id="a5" label="Rate" value={0} isRequired labelMarker="required" />
+                <TextField id="a6" label="Notes" labelMarker="optional" />
+                <TextField id="a7" label="Name" labelMarker="required" />
+            </div>
+        );
+        for (const id of ['a1', 'a2', 'a3', 'a4', 'a5']) {
+            const marker = container.querySelector(`[for^="${id}"] .plus-field-marker, #${id}-label .plus-field-marker, label[for="${id}"] .plus-field-marker, [id^="${id}"] .plus-field-marker`);
+            expect(marker, id).not.toBeNull();
+            expect(marker).toHaveAttribute('aria-hidden', 'true');
+        }
+        for (const name of ['Email', 'Agree']) {
+            const el = screen.getByRole(name === 'Agree' ? 'checkbox' : 'textbox', { name });
+            expect(el.getAttribute('aria-required')).toBe('true');
+        }
+        expect(screen.getByRole('textbox', { name: 'Notes (optional)' })).toBeInTheDocument();
+        // aria-required is not set, so the visible word is the only signal and stays announced.
+        expect(screen.getByRole('textbox', { name: 'Name (required)' })).toBeInTheDocument();
     });
 });

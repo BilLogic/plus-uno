@@ -213,7 +213,7 @@ const TextField = ({
 
     return (
         <FieldFrame disabled={isDisabled} invalid={tone === 'invalid'} className={`plus-text-field ${className}`.trim()} style={style}>
-            <FieldLabel htmlFor={fieldId} marker={labelMarker} info={info} hidden={isLabelHidden}>
+            <FieldLabel htmlFor={fieldId} labelMarker={labelMarker} isRequired={isRequired} info={info} hidden={isLabelHidden}>
                 {label}
             </FieldLabel>
             <FieldBox

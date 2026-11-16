@@ -20,7 +20,7 @@ export default {
     },
     argTypes: {
         text: { control: 'text', table: { category: 'Content' } },
-        marker: { control: 'radio', options: [undefined, 'optional', 'required'], table: { category: 'Behavior' } },
+        labelMarker: { control: 'radio', options: [undefined, 'optional', 'required'], table: { category: 'Behavior' } },
         htmlFor: { table: { disable: true } },
     },
 };
@@ -51,14 +51,14 @@ LabelPlain.play = async ({ canvasElement }) => {
     await expect(canvasElement.querySelector('label')).toHaveTextContent(/^Email address$/);
 };
 
-export const LabelOptional = () => <Label text="Notes" marker="optional" />;
+export const LabelOptional = () => <Label text="Notes" labelMarker="optional" />;
 LabelOptional.play = async ({ canvasElement }) => {
     const label = canvasElement.querySelector('label');
     await expect(label).toHaveTextContent(/^Notes \(optional\)$/);
     await expect(getComputedStyle(label).color).toBe(tokenColor(canvasElement, '--ds-text'));
 };
 
-export const LabelRequired = () => <Label text="Email address" marker="required" />;
+export const LabelRequired = () => <Label text="Email address" labelMarker="required" />;
 LabelRequired.play = async ({ canvasElement }) => {
     const label = canvasElement.querySelector('label');
     await expect(label).toHaveTextContent(/^Email address \(required\)$/);
@@ -150,7 +150,7 @@ Layout.play = async ({ canvasElement }) => {
 };
 
 export const Interactive = {
-    args: { text: 'Notes', marker: 'optional' },
+    args: { text: 'Notes', labelMarker: 'optional' },
     render: (args) => (
         <div style={stack}>
             <Label {...args} />
