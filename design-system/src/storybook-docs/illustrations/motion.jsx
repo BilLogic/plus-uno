@@ -102,7 +102,7 @@ const roundState = (state) => Object.fromEntries(Object.entries(state).map(([k, 
  * The calls a scene's `play` makes. In `instant` mode (reduced motion's still
  * frame) every move lands at once and every pause is skipped.
  */
-function createContext({ scene, getState, setState, track, instant, isLive }) {
+function createContext({ scene, getState, setState, track, instant, isLive, mode: defaultMode = 'productive' }) {
   const set = (patch) => setState(patch);
   const run = (from, to, options) => {
     if (instant) {
@@ -117,6 +117,40 @@ function createContext({ scene, getState, setState, track, instant, isLive }) {
   };
   const springTo = (key, to, config, extra = {}) =>
     run(getState()[key], to, { ...config, ...extra, onUpdate: (v) => set({ [key]: v }) });
+  const linearTo = (key, to, beats = 1, { derive } = {}) =>
+    run(getState()[key], to, {
+      duration: beats * BEAT,
+      ease: 'linear',
+      onUpdate: (v) => set({ [key]: v, ...derive?.(v) }),
+    });
+  const exitTo = (key, edge, { velocity = 0 } = {}) => {
+    const config = springFor('spatial.exit');
+    const from = getState()[key];
+    if (instant) {
+      set({ [key]: edge });
+      return Promise.resolve();
+    }
+    return new Promise((resolve) => {
+      let controls;
+      const toward = Math.sign(edge - from) || 1;
+      controls = track(
+        animate(from, from + (edge - from) * SPRINGS['spatial.exit'].aim, {
+          ...config,
+          velocity,
+          onUpdate: (v) => {
+            if ((v - edge) * toward >= 0) {
+              set({ [key]: edge });
+              controls?.stop();
+              resolve();
+              return;
+            }
+            set({ [key]: v });
+          },
+        }),
+      );
+      controls.then(resolve, resolve);
+    });
+  };
 
   return {
     get state() {
@@ -124,28 +158,32 @@ function createContext({ scene, getState, setState, track, instant, isLive }) {
     },
     set,
     /** Move one state key to a value on a spring token (or a config). */
-    spring: (key, to, token, { mode, velocity } = {}) =>
-      springTo(key, to, typeof token === 'string' ? springFor(token, mode) : token, velocity ? { velocity } : {}),
+    spring: (key, to, token, { mode = defaultMode, velocity } = {}) => {
+      if (token === 'linear') return linearTo(key, to, 1);
+      if (token === 'spatial.exit') return exitTo(key, to, { velocity });
+      const resolved = token === 'loop' ? 'appearance.default' : token;
+      return springTo(key, to, typeof resolved === 'string' ? springFor(resolved, mode) : resolved, velocity ? { velocity } : {});
+    },
     /**
      * Follow time one to one: `linear`, over a number of beats. `derive(value)`
      * returns more state that follows the same value, such as a panel under a hand.
      */
-    linear: (key, to, beats, { derive } = {}) =>
-      run(getState()[key], to, {
-        duration: beats * BEAT,
-        ease: 'linear',
-        onUpdate: (v) => set({ [key]: v, ...derive?.(v) }),
-      }),
+    linear: linearTo,
     /**
      * Start a spring that something can interrupt. `halt()` stops it where it is
      * and returns that value and the speed it had, to hand to the next spring.
      */
-    begin: (key, to, token, { mode, velocity } = {}) => {
+    begin: (key, to, token, { mode = defaultMode, velocity } = {}) => {
       if (instant) {
         set({ [key]: to });
         return { done: Promise.resolve(), halt: () => ({ value: to, velocity: 0 }) };
       }
-      const config = typeof token === 'string' ? springFor(token, mode) : token;
+      if (token === 'linear') {
+        const done = linearTo(key, to, 1);
+        return { done, halt: () => ({ value: getState()[key], velocity: 0 }) };
+      }
+      const resolved = token === 'loop' ? 'appearance.default' : token;
+      const config = typeof resolved === 'string' ? springFor(resolved, mode) : resolved;
       let last = { v: getState()[key], t: 0 };
       let speed = 0;
       let controls;
@@ -222,34 +260,7 @@ function createContext({ scene, getState, setState, track, instant, isLive }) {
      * Leave for good on `motion.spatial.exit`: aimed `aim` times past the edge,
      * so it is still speeding up when it crosses. Resolves at the edge.
      */
-    exit: (key, edge, { velocity = 0 } = {}) => {
-      const config = springFor('spatial.exit');
-      const from = getState()[key];
-      if (instant) {
-        set({ [key]: edge });
-        return Promise.resolve();
-      }
-      return new Promise((resolve) => {
-        let controls;
-        const toward = Math.sign(edge - from) || 1;
-        controls = track(
-          animate(from, from + (edge - from) * SPRINGS['spatial.exit'].aim, {
-            ...config,
-            velocity,
-            onUpdate: (v) => {
-              if ((v - edge) * toward >= 0) {
-                set({ [key]: edge });
-                controls?.stop();
-                resolve();
-                return;
-              }
-              set({ [key]: v });
-            },
-          }),
-        );
-        controls.then(resolve, resolve);
-      });
-    },
+    exit: exitTo,
     /**
      * Swing `key` on `motion.loop`, an undamped spring: a sine wave, one cycle
      * per loop period, starting `phase` cycles in. Returns `stop()`, which turns
@@ -335,12 +346,13 @@ const Tile = ({ scene, state, arrows, dim, showArrows }) => {
   return (
     <figure
       data-tile={scene.id}
+      data-scene={scene.id}
       data-state={JSON.stringify(roundState(state))}
       // Title, drawing and caption share rows across tiles, so drawings line up
       // when a title wraps.
       style={{ margin: 0, display: 'grid', gridTemplateRows: 'subgrid', gridRow: 'span 3', gap: 'var(--stack-sm)', minInlineSize: 0 }}
     >
-      <div style={{ font: 'var(--heading-xxs)', color: 'var(--ds-text)' }}>{scene.title}</div>
+      {scene.title ? <div style={{ font: 'var(--heading-xxs)', color: 'var(--ds-text)' }}>{scene.title}</div> : <div />}
       <div
         style={{
           borderRadius: 'var(--radius-lg)',
@@ -352,7 +364,7 @@ const Tile = ({ scene, state, arrows, dim, showArrows }) => {
           '--stroke-hairline': HERO_HAIRLINE,
         }}
       >
-        <Illustration viewBox={scene.viewBox} title={scene.label ?? `${scene.title}. ${scene.caption}`}>
+        <Illustration viewBox={scene.viewBox} title={scene.label ?? (`${scene.title ?? ''}. ${scene.caption ?? ''}`.trim() || scene.id)}>
           <g opacity={round(1 - dim * VEIL)}>
             {resetting && <g>{scene.draw(startStates([scene])[scene.id])}</g>}
             <g opacity={round(state.fade ?? 1)}>{scene.draw(state)}</g>
@@ -376,7 +388,7 @@ const Tile = ({ scene, state, arrows, dim, showArrows }) => {
         >
           {scene.caption}
         </DoDontCaption>
-      ) : (
+      ) : scene.caption ? (
         <figcaption
           style={{
             display: 'flex',
@@ -390,6 +402,8 @@ const Tile = ({ scene, state, arrows, dim, showArrows }) => {
         >
           <span>{scene.caption}</span>
         </figcaption>
+      ) : (
+        <div />
       )}
     </figure>
   );
@@ -409,18 +423,51 @@ const startStates = (scenes, extra) =>
  * `fastForward` starts every animation at that multiple of 1×, so a test
  * waits for a pass in a fraction of the time; the control still reads 1×.
  */
-export const MotionDemo = ({ title, scenes, reduced: forcedReduced, fastForward = 1 }) => {
+export const MotionDemo = ({
+  title,
+  scenes,
+  reduced: forcedReduced,
+  fastForward = 1,
+  loop = true,
+  playOnInView = false,
+  mode = 'productive',
+  replayKey = 0,
+  controls = true,
+}) => {
   const prefersReduced = useReducedMotion();
   const reduced = forcedReduced ?? Boolean(prefersReduced);
   const [states, setStates] = useState(() => startStates(scenes));
   const [chrome, setChrome] = useState(NO_CHROME);
   const [phase, setPhase] = useState(reduced ? 'still' : 'idle');
+  const [passes, setPasses] = useState(0);
   const [speedIndex, setSpeedIndex] = useState(0);
   const [paused, setPausedState] = useState(false);
   const [replay, setReplay] = useState(0);
+  const [inView, setInView] = useState(!playOnInView || typeof IntersectionObserver === 'undefined');
+  const sectionRef = useRef(null);
   const statesRef = useRef(states);
   const { track, setSpeed, setPaused, stopAll } = useTracker(fastForward);
   const titleId = useId();
+
+  useEffect(() => {
+    if (!playOnInView || typeof IntersectionObserver === 'undefined') {
+      setInView(true);
+      return undefined;
+    }
+    const el = sectionRef.current;
+    if (!el) return undefined;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.15 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [playOnInView]);
 
   // Dev only: paths that move together must not cross unless the scene is the broken version.
   useEffect(() => {
@@ -449,6 +496,7 @@ export const MotionDemo = ({ title, scenes, reduced: forcedReduced, fastForward 
           instant,
           isLive,
           track,
+          mode,
           getState: () => statesRef.current[scene.id],
           setState: (patch) =>
             putStates({ ...statesRef.current, [scene.id]: { ...statesRef.current[scene.id], ...patch } }),
@@ -459,6 +507,7 @@ export const MotionDemo = ({ title, scenes, reduced: forcedReduced, fastForward 
       instant: false,
       isLive,
       track,
+      mode,
       getState: () => chromeRef.current,
       setState: (patch) => putChrome({ ...chromeRef.current, ...patch }),
     });
@@ -475,12 +524,16 @@ export const MotionDemo = ({ title, scenes, reduced: forcedReduced, fastForward 
       if (!live) return;
       setPhase('playing');
       await playAll(false);
-      if (live) setPhase('settled');
+      if (live) {
+        setPasses((n) => n + 1);
+        setPhase('settled');
+      }
     };
 
+    const totalReplays = replay + replayKey;
     putStates(startStates(scenes));
     putChrome(NO_CHROME);
-    if (reduced && !replay) {
+    if (reduced && !totalReplays) {
       // The landing, still, with its paths drawn: what changed, without the motion.
       playAll(true).then(() => {
         if (!live) return;
@@ -489,8 +542,19 @@ export const MotionDemo = ({ title, scenes, reduced: forcedReduced, fastForward 
       });
     } else if (reduced) {
       // The reader asked: one pass, then it holds.
+      setPhase('idle');
       pass();
+    } else if (!inView && !totalReplays) {
+      setPhase('idle');
+    } else if (!loop) {
+      setPhase('idle');
+      (async () => {
+        await chromeCtx.hold(1);
+        if (!live) return;
+        await pass();
+      })();
     } else {
+      setPhase('idle');
       (async () => {
         await chromeCtx.hold(1);
         while (live) {
@@ -510,9 +574,8 @@ export const MotionDemo = ({ title, scenes, reduced: forcedReduced, fastForward 
       live = false;
       stopAll();
     };
-    // `scenes` is a module constant per demo; `replay` restarts a reduced pass.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reduced, replay]);
+    // `scenes` is a module constant per demo (or memoized per card event); `replay`/`replayKey` restarts a pass.
+  }, [reduced, replay, replayKey, inView, loop, mode, scenes, stopAll, track]);
 
   const cycleSpeed = () => {
     const next = (speedIndex + 1) % SPEEDS.length;
@@ -525,11 +588,18 @@ export const MotionDemo = ({ title, scenes, reduced: forcedReduced, fastForward 
     setPausedState(!paused);
   };
 
+  const landingMap = Object.fromEntries(scenes.map((s) => [s.id, s.landing]));
+
   return (
     <section
+      ref={sectionRef}
       data-motion-demo
       data-docs-stage
       data-phase={phase}
+      data-passes={String(passes)}
+      data-reduced={String(reduced)}
+      data-mode={mode}
+      data-landing={JSON.stringify(landingMap)}
       data-speed={String(SPEEDS[speedIndex])}
       aria-labelledby={title ? titleId : undefined}
       style={{
@@ -541,27 +611,29 @@ export const MotionDemo = ({ title, scenes, reduced: forcedReduced, fastForward 
         background: 'var(--ds-surface-sunken)',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-100)' }}>
-        {title && (
-          <span id={titleId} style={{ flex: 1, font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>
-            {title}
-          </span>
-        )}
-        <Button appearance="subtle" spacing="compact" onClick={cycleSpeed} aria-label={`Playback speed: ${SPEED_LABELS[speedIndex]}`}>
-          {SPEED_LABELS[speedIndex]}
-        </Button>
-        {reduced ? (
-          <IconButton appearance="subtle" spacing="compact" icon="play" label="Play this demo once" onClick={() => setReplay((n) => n + 1)} />
-        ) : (
-          <IconButton
-            appearance="subtle"
-            spacing="compact"
-            icon={paused ? 'play' : 'pause'}
-            label={paused ? 'Play this demo' : 'Pause this demo'}
-            onClick={togglePause}
-          />
-        )}
-      </div>
+      {controls && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-100)' }}>
+          {title && (
+            <span id={titleId} style={{ flex: 1, font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>
+              {title}
+            </span>
+          )}
+          <Button appearance="subtle" spacing="compact" onClick={cycleSpeed} aria-label={`Playback speed: ${SPEED_LABELS[speedIndex]}`}>
+            {SPEED_LABELS[speedIndex]}
+          </Button>
+          {reduced ? (
+            <IconButton appearance="subtle" spacing="compact" icon="play" label="Play this demo once" onClick={() => setReplay((n) => n + 1)} />
+          ) : (
+            <IconButton
+              appearance="subtle"
+              spacing="compact"
+              icon={paused ? 'play' : 'pause'}
+              label={paused ? 'Play this demo' : 'Pause this demo'}
+              onClick={togglePause}
+            />
+          )}
+        </div>
+      )}
       <div
         style={{
           display: 'grid',
@@ -577,7 +649,7 @@ export const MotionDemo = ({ title, scenes, reduced: forcedReduced, fastForward 
           <Tile
             key={scene.id}
             scene={scene}
-            state={states[scene.id]}
+            state={states[scene.id] ?? startStates([scene])[scene.id]}
             arrows={chrome.arrows}
             dim={chrome.dim}
             showArrows={phase === 'arrows'}

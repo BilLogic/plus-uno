@@ -2,14 +2,14 @@
 
 # Library
 
-Every template's, pattern's and component's enter, exit and change motion in one table, to compare them in one pass.
+Every template's, pattern's and component's enter, exit and change motion in one gallery, to watch and replay them in one place.
 
 **Kind:** Foundation
 
 **Storybook page:** `design-system/src/styles/MotionLibrary.mdx`
 
-## Every row
+## Gallery
 
-Each row is a template's, pattern's or component's entry in the motion registry, and the same text sits in that page's Motion section. Rows are grouped by tier: templates first, then patterns, then components. A page absent from the table does not move. The Sound column names the sound an event plays, when it plays and its condition; an empty cell is silent (Sound · When to play).
+Each card plays a template's, pattern's or component's motion events from the registry on its transition drawing, grouped from templates to patterns to components, with its tokens, sound (Sound · When to play) and a link to its page's Motion section.
 
 ## Related
