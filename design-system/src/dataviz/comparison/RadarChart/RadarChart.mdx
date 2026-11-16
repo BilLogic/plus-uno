@@ -49,7 +49,7 @@ use `DumbbellChart`. For change over time, use `LineChart`.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Spokes', <>One per entry in <C>categories</C>, labeled with the category name, a Font Awesome icon from <C>categoryIcons</C>, or a name tinted by <C>categoryColors</C>. <C>categoryLabelBody3Regular</C> uses regular weight.</>],
+        ['Spokes', <>One per entry in <C>categories</C>. Axis label text always uses the text token; when <C>categoryIcons</C> is provided, each spoke renders a Font Awesome icon (<C>--icon-md</C>, <C>--ds-icon-subtle</C>), and <C>categoryColors</C> colors the category icons only (so it applies only together with <C>categoryIcons</C>). <C>categoryLabelBody3Regular</C> uses regular weight.</>],
         ['Series', <>One closed shape per entry in <C>series</C>. With <C>filled</C>, the first series is a filled area and the rest are lines; otherwise all are lines. Line series accept <C>dashStyle</C>.</>],
         ['Grid', <>Polygon rings from zero to <C>yAxisMax</C>. <C>showYAxisLabels</C> toggles ring values.</>],
         ['Data labels', <>Off by default; <C>showDataLabels</C> prints each value with a percent sign.</>],
@@ -66,8 +66,10 @@ use `DumbbellChart`. For change over time, use `LineChart`.
 
 `categories` is an array of spoke names. `series` is an array of
 `{ name, data, color, dashStyle }`, with one number per category in `categories`
-order. `height` defaults to 400 (or `'100%'` to fill its container).
-`chartSpacing` is `[top, right, bottom, left]`.
+order. Spokes keep their input order by default (`sort={false}`) so one series
+never distorts a profile shared with others; pass `sort={true}` to rank spokes
+from most to least by the first series. `height` defaults to 400 (or `'100%'`
+to fill its container). `chartSpacing` is `[top, right, bottom, left]`.
 
 ```jsx
 <RadarChart
@@ -88,7 +90,7 @@ order. `height` defaults to 400 (or `'100%'` to fill its container).
 ## Color and accessibility
 
 - **Automatic series color.** One series uses `--chart-brand`; two or more follow the [categorical order](?path=/docs/data-visualizations-color--docs) from slot 1 unless overridden by `color`.
-- **Subject-tinted spoke labels.** `categoryColors` tints spoke labels from an array in category order or an object keyed by name. Use `--chart-smart-*` (`SMART` in the palette) for the five SMART competencies.
+- **Subject-tinted spoke icons.** Axis label text always uses the text token, never a chart color. `categoryColors` colors the category icons only, so it applies only together with `categoryIcons` (from an array in category order or an object keyed by name). Use `--chart-smart-*` (`SMART` in the palette) for the five SMART competencies.
 - **Distance from center carries the value.** Add a non-color cue when comparing series: `filled` fills the first series, and `dashStyle` dashes comparison lines.
 - **Name icon-only spokes nearby.** `categoryIcons` replaces text labels with icons, so name the categories in surrounding copy.
 - **Percent-only data labels.** `showDataLabels` appends `%` to every value; enable it only for percentages.

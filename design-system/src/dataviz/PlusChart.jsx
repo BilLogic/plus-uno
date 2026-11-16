@@ -79,7 +79,7 @@ function freezeEntrance(chart) {
  *   animation off on the chart instance, so a container resize, a legend
  *   toggle or `setData` never replays the entrance.
  * - **Opt-out:** preserves an explicit `animation: false` (such as Sparkline,
- *   or Bar/Donut when `animate` is false).
+ *   or Donut when `animate` is false).
  *
  * Expressive entrances come from the surrounding `ChartMotionArea expressive`.
  */

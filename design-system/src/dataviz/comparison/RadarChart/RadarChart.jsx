@@ -1,8 +1,9 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useMemo, useRef, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
 import chartTheme from '@/dataviz/chartTheme';
-import { seriesColor } from '@/dataviz/palette';
+import { tooltipPointFormat } from '@/dataviz/chartFormat';
+import { seriesColor, sortCategories } from '@/dataviz/palette';
 import { iconClass } from '@/lib/icon';
 
 /**
@@ -10,6 +11,7 @@ import { iconClass } from '@/lib/icon';
  * A polar chart (spider web chart) using Highcharts.
  * Useful for comparing multivariate data.
  * @param {number|'100%'} height - Chart height in pixels, or '100%' to fill container (responsive).
+ * @param {Object<string, string>|string[]} [categoryColors] - Colors the category icons only, so it applies only together with `categoryIcons`. Axis label text always uses the text token.
  */
 const RadarChart = ({
     categories,
@@ -23,11 +25,43 @@ const RadarChart = ({
     showDataLabels = false,
     chartSpacing,
     showYAxisLabels = true,
-    categoryLabelBody3Regular = false
+    categoryLabelBody3Regular = false,
+    sort = false,
 }) => {
+    const {
+        categories: orderedCategories,
+        series: orderedSeries,
+        orderedIcons,
+        orderedColors,
+    } = useMemo(() => {
+        if (!sort) {
+            return {
+                categories,
+                series,
+                orderedIcons: categoryIcons,
+                orderedColors: categoryColors,
+            };
+        }
+        const { categories: nextCategories, series: nextSeries, order } = sortCategories({
+            categories,
+            series,
+            value: (d) => d,
+        });
+        return {
+            categories: nextCategories,
+            series: nextSeries,
+            orderedIcons: Array.isArray(categoryIcons)
+                ? order.map((i) => categoryIcons[i])
+                : categoryIcons,
+            orderedColors: Array.isArray(categoryColors)
+                ? order.map((i) => categoryColors[i])
+                : categoryColors,
+        };
+    }, [categories, series, categoryIcons, categoryColors, sort]);
+
     // Merge theme colors into series if not provided
     // Handle dashStyle and type for mixed area/line charts
-    const seriesWithTheme = series.map((s, i, all) => {
+    const seriesWithTheme = orderedSeries.map((s, i, all) => {
         const baseSeries = {
             ...s,
             color: s.color || seriesColor(i, all.length),
@@ -61,7 +95,7 @@ const RadarChart = ({
     // overflow: 'allow' and allowOverlap prevent polar chart labels from being truncated.
     const xAxisConfig = {
         ...chartTheme.xAxis,
-        categories: categories,
+        categories: orderedCategories,
         tickmarkPlacement: 'on',
         lineWidth: 0,
         labels: {
@@ -78,37 +112,22 @@ const RadarChart = ({
         }
     };
 
-    // Label formatter: icons when categoryIcons provided for this category; otherwise show category name (no generic circle)
-    if (categoryIcons && categories) {
+    // Label formatter: icons when categoryIcons provided for this category; axis label text always
+    // stays on the theme's text token, so categoryColors may color the icon only.
+    if (orderedIcons && orderedCategories) {
         xAxisConfig.labels = {
             ...xAxisConfig.labels,
             formatter: function() {
                 const categoryIndex = this.pos;
-                const glyph = categoryIcons[categoryIndex];
+                const glyph = orderedIcons[categoryIndex];
                 if (glyph) {
-                    return `<i class="${iconClass(glyph.replace(/^fa-/, ''))}" style="font-size: 14px; color: var(--ds-icon-subtle);" aria-hidden="true"></i>`;
+                    const category = orderedCategories[categoryIndex];
+                    const iconColor = Array.isArray(orderedColors)
+                        ? orderedColors[categoryIndex]
+                        : orderedColors?.[category] || orderedColors?.[categoryIndex];
+                    return `<i class="${iconClass(glyph.replace(/^fa-/, ''))}" style="font-size: var(--icon-md); color: ${iconColor || 'var(--ds-icon-subtle)'};" aria-hidden="true"></i>`;
                 }
                 return this.value ?? '';
-            },
-            useHTML: true
-        };
-    } else if (categoryColors && categories) {
-        xAxisConfig.labels = {
-            ...xAxisConfig.labels,
-            formatter: function() {
-                const categoryIndex = this.pos;
-                const category = categories[categoryIndex];
-                let color = 'var(--ds-text)';
-                
-                // Handle object mapping (category name -> color)
-                if (Array.isArray(categoryColors)) {
-                    color = categoryColors[categoryIndex] || color;
-                } else {
-                    // Handle object mapping
-                    color = categoryColors[category] || categoryColors[categoryIndex] || color;
-                }
-                
-                return `<span style="color: ${color}">${this.value}</span>`;
             },
             useHTML: true
         };
@@ -163,7 +182,7 @@ const RadarChart = ({
         tooltip: {
             ...chartTheme.tooltip,
             shared: true,
-            pointFormat: '<span style="color:{series.color}">{series.name}: <b>{point.y:,.0f}</b><br/>'
+            pointFormat: tooltipPointFormat('{point.y:,.0f}')
         },
         legend: {
             ...chartTheme.legend,
@@ -178,30 +197,14 @@ const RadarChart = ({
                 dataLabels: {
                     enabled: showDataLabels && filled,
                     format: '{y}%',
-                    style: {
-                        fontSize: 'var(--type-size-075)',
-                        fontWeight: 'var(--type-weight-medium)',
-                        fontFamily: 'var(--type-family-body)',
-                        color: 'var(--ds-text)',
-                        textOutline: 'none'
-                    },
-                    allowOverlap: true,
-                    y: -5 // Slight offset above the point
+                    allowOverlap: true
                 }
             },
             line: {
                 dataLabels: {
                     enabled: showDataLabels && !filled,
                     format: '{y}%',
-                    style: {
-                        fontSize: 'var(--type-size-075)',
-                        fontWeight: 'var(--type-weight-medium)',
-                        fontFamily: 'var(--type-family-body)',
-                        color: 'var(--ds-text)',
-                        textOutline: 'none'
-                    },
-                    allowOverlap: true,
-                    y: -5 // Slight offset above the point
+                    allowOverlap: true
                 }
             }
         },
@@ -232,16 +235,19 @@ RadarChart.propTypes = {
     filled: PropTypes.bool,
     yAxisMax: PropTypes.number,
     showLegend: PropTypes.bool,
+    /** Colors the category icons only, so it applies only together with `categoryIcons`. Axis label text always uses the text token. */
     categoryColors: PropTypes.oneOfType([
-        PropTypes.object, // Object mapping category names to colors
-        PropTypes.arrayOf(PropTypes.string) // Array of colors matching category order
+        PropTypes.object, // Object mapping category names to icon colors
+        PropTypes.arrayOf(PropTypes.string) // Array of icon colors matching category order
     ]),
     /** Font Awesome icon class names (e.g. ['fa-calculator', 'fa-comments']) – shown instead of category text; tooltip shows full name on hover */
     categoryIcons: PropTypes.arrayOf(PropTypes.string),
     showDataLabels: PropTypes.bool,
     chartSpacing: PropTypes.arrayOf(PropTypes.number), // [top, right, bottom, left] spacing for chart
     showYAxisLabels: PropTypes.bool,
-    categoryLabelBody3Regular: PropTypes.bool
+    categoryLabelBody3Regular: PropTypes.bool,
+    /** Sort spokes from most to least by the first series; false by default so profile axes stay in input order. */
+    sort: PropTypes.bool,
 };
 
 export default RadarChart;

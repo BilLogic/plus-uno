@@ -37,6 +37,7 @@ export default {
 export const BarRadius = () => (
     <div style={{ maxWidth: 480 }}>
         <BarChart
+            sort={false}
             categories={['Mon', 'Tue', 'Wed', 'Thu', 'Fri']}
             series={[{ name: 'Sessions', data: [12, 19, 8, 24, 16] }]}
             showLegend={false}
@@ -374,7 +375,7 @@ function MotionSpecimen() {
                     <div style={gridStyle}>
                         <div data-chart-slot="0" style={cardStyle}>
                             <BarChart
-                                animate
+                                sort={false}
                                 height={200}
                                 categories={['W1', 'W2', 'W3', 'W4']}
                                 series={[{ name: 'Sessions', data: active.bars }]}
@@ -404,7 +405,7 @@ function MotionSpecimen() {
                 <ChartMotionArea>
                     <div data-chart-slot="reduced" style={cardStyle}>
                         <BarChart
-                            animate
+                            sort={false}
                             height={180}
                             categories={['W1', 'W2', 'W3', 'W4']}
                             series={[{ name: 'Reduced motion', data: active.bars }]}

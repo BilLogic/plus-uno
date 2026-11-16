@@ -54,7 +54,7 @@ in columns.
     rows={[
         ['Low dot', <>Each item's <C>low</C>, in categorical slot 2.</>],
         ['High dot', <>Each item's <C>high</C>, in categorical slot 1.</>],
-        ['Connector', 'A 2 px line from low to high; its length is the gap.'],
+        ['Connector', <>A <C>--chart-line-width</C> line from low to high; its length is the gap.</>],
         ['Category axis', <>Names each dumbbell from <C>categories</C>; missing labels fall back to <C>Item 1</C>, <C>Item 2</C>.</>],
         ['Value axis', <>Titled by <C>yAxisLabel</C> (default <C>Value</C>).</>],
         ['Legend', <>One entry top right reading <C>lowLabel → highLabel</C> (defaults <C>Low</C> and <C>High</C>).</>],
@@ -69,8 +69,10 @@ in columns.
 ## Data shape
 
 `categories` is an array of strings. `data` is an array of `{ low, high }` (both
-required) in `categories` order. `lowLabel` and `highLabel` name the two ends.
-`height` defaults to 400; `horizontal` defaults to `true`.
+required) in `categories` order. Categories sort from most to least by gap
+(`|high - low|`) by default; pass `sort={false}` for ordinal or temporal axes.
+`lowLabel` and `highLabel` name the two ends. `height` defaults to 400;
+`horizontal` defaults to `true`.
 
 ```jsx
 <DumbbellChart
