@@ -8,9 +8,15 @@
  * Run: npx vitest run --project=storybook design-system/src/styles/MotionLibrary.stories.jsx
  */
 import React from 'react';
-import { expect, userEvent, waitFor } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { motionLibraryOf } from '../../../scripts/lib/tokens/motion-docs.mjs';
+import {
+    MOTION_FAMILIES,
+    MOTION_TIERS,
+    MOTION_TRANSITIONS,
+    filterMotionLibrary,
+    motionLibraryOf,
+} from '../../../scripts/lib/tokens/motion-docs.mjs';
 import { MotionLibrary, MotionLibraryCard } from '@/storybook-docs/motion-library.jsx';
 import { speedFor } from '@/storybook-docs/illustrations/motion-story-helpers.jsx';
 
@@ -133,6 +139,14 @@ export const EveryRegistryRowRendersACard = {
         const sections = canvasElement.querySelectorAll('[data-motion-tier-group]');
         await expect(sections.length).toBe(3);
 
+        // TOC hygiene: only the three tier headings (Templates, Patterns, Components) are h2/h3;
+        // card titles are non-heading text while keeping each card's name as its accessible label.
+        const tocHeadings = [...canvasElement.querySelectorAll('h2, h3')].map((h) => h.textContent.trim());
+        await expect(tocHeadings).toEqual(['Templates', 'Patterns', 'Components']);
+        const sampleCard = canvasElement.querySelector('[data-motion-card="component:Popup"]');
+        await expect(sampleCard).toHaveAttribute('role', 'group');
+        await expect(sampleCard).toHaveAccessibleName('Popup');
+
         // Milestone event uses Expressive mode
         const milestoneCard = canvasElement.querySelector('[data-motion-card="template:PatternCard"]');
         await expect(milestoneCard).toBeTruthy();
@@ -164,5 +178,242 @@ export const ExpressiveMilestoneCard = {
             { timeout: 15000, interval: 50 },
         );
         await expectSceneAtLanding(demo);
+    },
+};
+
+const waitSwapSettled = async (canvasElement) => {
+    const stage = canvasElement.querySelector('[data-swap-stage]');
+    await expect(stage).toBeTruthy();
+    await waitFor(
+        () => expect(stage.dataset.swapPhase).toBe('settled'),
+        { timeout: 10000, interval: 25 },
+    );
+};
+
+const resultStatus = (canvasElement) => canvasElement.querySelector('[data-motion-library-count]');
+
+const shownCards = (canvasElement) => [
+    ...canvasElement.querySelectorAll('[data-swap-incoming] [data-motion-card]'),
+];
+
+const openFilterMenu = async (canvasElement) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: /^Filters/ });
+    await userEvent.click(trigger);
+    const doc = canvasElement.ownerDocument;
+    await waitFor(() => expect(doc.querySelector('.plus-filter-menu')).not.toBeNull());
+    const menu = doc.querySelector('.plus-filter-menu');
+    await waitFor(() => expect(menu.contains(doc.activeElement)).toBe(true));
+    return menu;
+};
+
+const closeFilterMenuViaApply = async (canvasElement, menu) => {
+    await userEvent.click(within(menu).getByRole('button', { name: 'Apply' }));
+    await waitFor(() => expect(canvasElement.ownerDocument.querySelector('.plus-filter-menu')).toBeNull());
+    await waitSwapSettled(canvasElement);
+};
+
+export const SearchNarrowsByName = {
+    render: (_args, { viewMode } = {}) => (
+        <MotionLibrary reduced={false} fastForward={speedFor(viewMode)} />
+    ),
+    play: async ({ canvasElement }) => {
+        const allRows = motionLibraryOf();
+        const expected = filterMotionLibrary(allRows, { query: 'Popup' });
+        const canvas = within(canvasElement);
+
+        await expect(resultStatus(canvasElement)).toHaveAttribute('role', 'status');
+        await expect(resultStatus(canvasElement)).toHaveTextContent(`${allRows.length} of ${allRows.length}`);
+
+        const searchbox = canvas.getByRole('searchbox', { name: 'Search by name' });
+        await userEvent.type(searchbox, 'Popup');
+        await waitSwapSettled(canvasElement);
+
+        const cards = shownCards(canvasElement);
+        await expect(cards.map((c) => c.dataset.motionCard)).toEqual(
+            expected.map((r) => `${r.tier}:${r.name}`),
+        );
+        await expect(resultStatus(canvasElement)).toHaveTextContent(`${expected.length} of ${allRows.length}`);
+
+        // No tier filter is set, so tier grouping stays for matching tiers
+        const expectedTiers = MOTION_TIERS.filter((t) => expected.some((r) => r.tier === t));
+        const shownTierGroups = [
+            ...canvasElement.querySelectorAll('[data-swap-incoming] [data-motion-tier-group]'),
+        ].map((el) => el.dataset.motionTierGroup);
+        await expect(shownTierGroups).toEqual(expectedTiers);
+    },
+};
+
+export const FilterByTierFacet = {
+    render: (_args, { viewMode } = {}) => (
+        <MotionLibrary reduced={false} fastForward={speedFor(viewMode)} />
+    ),
+    play: async ({ canvasElement }) => {
+        const allRows = motionLibraryOf();
+        const expected = filterMotionLibrary(allRows, { tiers: ['pattern'] });
+        const canvas = within(canvasElement);
+
+        const menu = await openFilterMenu(canvasElement);
+        const tierGroup = within(menu).getByRole('group', { name: 'Tier' });
+        await userEvent.click(within(tierGroup).getByRole('checkbox', { name: 'Patterns' }));
+        await closeFilterMenuViaApply(canvasElement, menu);
+
+        await expect(canvas.getByRole('button', { name: 'Filters, 1 applied' })).toBeInTheDocument();
+        await expect(resultStatus(canvasElement)).toHaveTextContent(`${expected.length} of ${allRows.length}`);
+
+        const cards = shownCards(canvasElement);
+        await expect(cards.map((c) => c.dataset.motionCard)).toEqual(
+            expected.map((r) => `${r.tier}:${r.name}`),
+        );
+        // Tier filter is set: redundant tier headings do not repeat
+        await expect(
+            canvasElement.querySelectorAll('[data-swap-incoming] [data-motion-tier-group]').length,
+        ).toBe(0);
+    },
+};
+
+export const FilterByTransitionFacet = {
+    render: (_args, { viewMode } = {}) => (
+        <MotionLibrary reduced={false} fastForward={speedFor(viewMode)} />
+    ),
+    play: async ({ canvasElement }) => {
+        const allRows = motionLibraryOf();
+        const chosen = 'Dock and undock a panel';
+        const expected = filterMotionLibrary(allRows, { transitions: [chosen] });
+        const canvas = within(canvasElement);
+
+        const menu = await openFilterMenu(canvasElement);
+        const transitionGroup = within(menu).getByRole('group', { name: 'Transition' });
+        const transitionLabels = within(transitionGroup)
+            .getAllByRole('checkbox')
+            .map((cb) => cb.parentElement?.querySelector('label')?.textContent?.trim());
+        await expect(transitionLabels).toEqual([...MOTION_TRANSITIONS]);
+
+        await userEvent.click(within(transitionGroup).getByRole('checkbox', { name: chosen }));
+        await closeFilterMenuViaApply(canvasElement, menu);
+
+        await expect(canvas.getByRole('button', { name: 'Filters, 1 applied' })).toBeInTheDocument();
+        await expect(resultStatus(canvasElement)).toHaveTextContent(`${expected.length} of ${allRows.length}`);
+        await expect(shownCards(canvasElement).map((c) => c.dataset.motionCard)).toEqual(
+            expected.map((r) => `${r.tier}:${r.name}`),
+        );
+    },
+};
+
+export const FilterByFamilyFacet = {
+    render: (_args, { viewMode } = {}) => (
+        <MotionLibrary reduced={false} fastForward={speedFor(viewMode)} />
+    ),
+    play: async ({ canvasElement }) => {
+        const allRows = motionLibraryOf();
+        const expected = filterMotionLibrary(allRows, { families: ['linear'] });
+        const canvas = within(canvasElement);
+
+        const menu = await openFilterMenu(canvasElement);
+        const familyGroup = within(menu).getByRole('group', { name: 'Token family' });
+        const familyLabels = within(familyGroup)
+            .getAllByRole('checkbox')
+            .map((cb) => cb.parentElement?.querySelector('label')?.textContent?.trim());
+        await expect(familyLabels).toEqual([...MOTION_FAMILIES]);
+
+        await userEvent.click(within(familyGroup).getByRole('checkbox', { name: 'linear' }));
+        await closeFilterMenuViaApply(canvasElement, menu);
+
+        await expect(canvas.getByRole('button', { name: 'Filters, 1 applied' })).toBeInTheDocument();
+        await expect(resultStatus(canvasElement)).toHaveTextContent(`${expected.length} of ${allRows.length}`);
+        await expect(shownCards(canvasElement).map((c) => c.dataset.motionCard)).toEqual(
+            expected.map((r) => `${r.tier}:${r.name}`),
+        );
+    },
+};
+
+export const FilterBySoundFacet = {
+    render: (_args, { viewMode } = {}) => (
+        <MotionLibrary reduced={false} fastForward={speedFor(viewMode)} />
+    ),
+    play: async ({ canvasElement }) => {
+        const allRows = motionLibraryOf();
+        const allSounds = [...new Set(allRows.flatMap((r) => r.sounds))].sort();
+        const chosenSound = allSounds[0];
+        const expected = filterMotionLibrary(allRows, { sounds: [chosenSound] });
+        const canvas = within(canvasElement);
+
+        const menu = await openFilterMenu(canvasElement);
+        const soundGroup = within(menu).getByRole('group', { name: 'Sound' });
+        await userEvent.click(within(soundGroup).getByRole('checkbox', { name: `sound.${chosenSound}` }));
+        await closeFilterMenuViaApply(canvasElement, menu);
+
+        await expect(canvas.getByRole('button', { name: 'Filters, 1 applied' })).toBeInTheDocument();
+        await expect(resultStatus(canvasElement)).toHaveTextContent(`${expected.length} of ${allRows.length}`);
+        await expect(shownCards(canvasElement).map((c) => c.dataset.motionCard)).toEqual(
+            expected.map((r) => `${r.tier}:${r.name}`),
+        );
+    },
+};
+
+export const TwoFacetsAndResetRestoresAll = {
+    render: (_args, { viewMode } = {}) => (
+        <MotionLibrary reduced={false} fastForward={speedFor(viewMode)} />
+    ),
+    play: async ({ canvasElement }) => {
+        const allRows = motionLibraryOf();
+        const expected = filterMotionLibrary(allRows, {
+            tiers: ['component'],
+            transitions: ['Open and close an overlay'],
+        });
+        const canvas = within(canvasElement);
+
+        const menu = await openFilterMenu(canvasElement);
+        await userEvent.click(
+            within(within(menu).getByRole('group', { name: 'Tier' })).getByRole('checkbox', { name: 'Components' }),
+        );
+        await userEvent.click(
+            within(within(menu).getByRole('group', { name: 'Transition' })).getByRole('checkbox', {
+                name: 'Open and close an overlay',
+            }),
+        );
+        await closeFilterMenuViaApply(canvasElement, menu);
+
+        await expect(canvas.getByRole('button', { name: 'Filters, 2 applied' })).toBeInTheDocument();
+        await expect(resultStatus(canvasElement)).toHaveTextContent(`${expected.length} of ${allRows.length}`);
+        await expect(shownCards(canvasElement).map((c) => c.dataset.motionCard)).toEqual(
+            expected.map((r) => `${r.tier}:${r.name}`),
+        );
+
+        // Reset in one action restores all rows and tier grouping
+        await userEvent.click(canvas.getByRole('button', { name: 'Reset filters' }));
+        await waitSwapSettled(canvasElement);
+
+        await expect(canvas.getByRole('button', { name: 'Filters' })).toBeInTheDocument();
+        await expect(resultStatus(canvasElement)).toHaveTextContent(`${allRows.length} of ${allRows.length}`);
+        await expect(shownCards(canvasElement).length).toBe(allRows.length);
+        await expect(
+            canvasElement.querySelectorAll('[data-swap-incoming] [data-motion-tier-group]').length,
+        ).toBe(3);
+    },
+};
+
+export const NoMatchShowsEmptyState = {
+    render: (_args, { viewMode } = {}) => (
+        <MotionLibrary reduced={false} fastForward={speedFor(viewMode)} />
+    ),
+    play: async ({ canvasElement }) => {
+        const allRows = motionLibraryOf();
+        const canvas = within(canvasElement);
+
+        const searchbox = canvas.getByRole('searchbox', { name: 'Search by name' });
+        await userEvent.type(searchbox, 'zzzz-no-matching-row');
+        await waitSwapSettled(canvasElement);
+
+        await expect(shownCards(canvasElement).length).toBe(0);
+        await expect(resultStatus(canvasElement)).toHaveTextContent(`0 of ${allRows.length}`);
+        await expect(canvasElement.querySelector('[data-swap-incoming] .plus-empty-state')).not.toBeNull();
+
+        await userEvent.click(canvas.getByRole('button', { name: 'Reset filters' }));
+        await waitSwapSettled(canvasElement);
+
+        await expect(searchbox).toHaveValue('');
+        await expect(shownCards(canvasElement).length).toBe(allRows.length);
+        await expect(resultStatus(canvasElement)).toHaveTextContent(`${allRows.length} of ${allRows.length}`);
     },
 };
