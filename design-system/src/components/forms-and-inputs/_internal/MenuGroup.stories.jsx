@@ -173,7 +173,8 @@ export const Focused = {
     render: () => <StateMenu />,
     play: async ({ canvasElement }) => {
         const item = itemOf(canvasElement, 'item');
-        await expectFocusRing(canvasElement, item, 'menu row');
+        // Inset: a row spans the scrolling menu's full width, so a ring outside it would be clipped.
+        await expectFocusRing(canvasElement, item, 'menu row', -2);
         item.focus();
         await userEvent.keyboard('{ArrowDown}');
         await expect(itemOf(canvasElement, 'selected')).toHaveFocus();
