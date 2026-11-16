@@ -68,7 +68,7 @@ export const Overview = {
             <section style={sectionStyle}>
                 <Heading as="h3" size="small">Grade distribution</Heading>
                 <p style={captionStyle}>
-                    Ordinal grades (A–E) keep their axis order with sort=&#123;false&#125; while toneByRank places the darkest tone on the largest share.
+                    Ordinal grades (A–E) keep their axis order with {'sort={false}'} while toneByRank places the darkest tone on the largest share.
                 </p>
                 <SmartBarChart {...defaultData} />
             </section>

@@ -83,7 +83,7 @@ export const Overview = {
             <section style={sectionStyle}>
                 <Heading as="h3" size="small">Grouped over time (sort opted out)</Heading>
                 <p style={captionStyle}>
-                    Pass sort=&#123;false&#125; on temporal axes such as quarters to preserve chronological order.
+                    Pass {'sort={false}'} on temporal axes such as quarters to preserve chronological order.
                 </p>
                 <BarChart {...groupedData} />
             </section>
