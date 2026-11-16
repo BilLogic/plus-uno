@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import FieldBox from '../_internal/FieldBox';
+import clearLabel from '../_internal/clearLabel';
 import { FieldCaption, FieldLabel, FieldFrame, fieldDescription, toneProps } from '../_internal/FieldFrame';
 import Listbox from '../_internal/Listbox';
 import SelectTags from '../_internal/SelectTags';
@@ -9,6 +10,8 @@ import useOpenState from '../_internal/useOpenState';
 import useOptionSource from '../_internal/useOptionSource';
 import useStagedValue from '../_internal/useStagedValue';
 import useFieldId from '../useFieldId';
+import { Button } from '../Button/Button';
+import { IconButton } from '../IconButton/IconButton';
 import Icon from '../../images-and-icons/Icon';
 import './Select.scss';
 
@@ -32,8 +35,9 @@ const isEmpty = (value) => value === undefined || value === null || value === ''
  *   array with `isMulti`), controlled or not.
  * - **`isMulti`** shows Tags in a TagGroup (`displayMode="tags"`), which
  *   collapse into "+n" without focus.
- * - **Trailing** holds the clear × (not a tab stop; Delete does the same) and
- *   the caret.
+ * - **Trailing** holds the plain ✕ clear button (not a tab stop; Delete does
+ *   the same) and the caret; the list's footer also carries a subtle "Clear"
+ *   action (in the tab order) while a value is set.
  */
 const Select = ({
     id,
@@ -204,7 +208,7 @@ const Select = ({
 
     /* ---------- events ---------- */
     const hasValue = !isEmpty(current);
-    const clearName = `Clear ${typeof label === 'string' ? label : (props['aria-label'] || 'selection')}`;
+    const clearName = clearLabel(typeof label === 'string' ? label : props['aria-label'], 'selection');
 
     const handleKeyDown = (event) => {
         if (props.onKeyDown) props.onKeyDown(event);
@@ -221,10 +225,6 @@ const Select = ({
                 event.preventDefault();
                 clear();
             }
-            return;
-        }
-        if (event.key === 'Tab') {
-            closeList();
             return;
         }
         if (event.key === 'Backspace' && multi && !filter && current.length) {
@@ -369,16 +369,16 @@ const Select = ({
     const trailing = (
         <>
             {canClear && hasValue && live && (
-                <button
-                    type="button"
-                    className="plus-select-clear"
+                <IconButton
+                    icon="xmark"
+                    label={clearName}
+                    appearance="subtle"
+                    spacing={spacing}
                     tabIndex={-1}
-                    aria-label={clearName}
+                    className="plus-field-clear"
                     onMouseDown={(event) => event.preventDefault()}
                     onClick={() => { clear(); controlRef.current?.focus(); }}
-                >
-                    <Icon name="circle-xmark" />
-                </button>
+                />
             )}
             {!isReadOnly && (
                 <Icon name={shown ? 'caret-up' : 'caret-down'} className="plus-select-caret" />
@@ -402,18 +402,39 @@ const Select = ({
         header = <span className="plus-select-hint">{`Type to search ${all.length} options`}</span>;
     }
 
-    let footer = null;
+    let footerMessage = null;
     if (atLimit) {
-        footer = <Listbox.Message kind="limit">{`You can pick up to ${maxSelections}`}</Listbox.Message>;
+        footerMessage = <Listbox.Message kind="limit">{`You can pick up to ${maxSelections}`}</Listbox.Message>;
     } else if (paging.failed && !paging.firstFailed) {
-        footer = <Listbox.Message kind="error" onRetry={paging.retry}>{LOAD_FAILED}</Listbox.Message>;
+        footerMessage = <Listbox.Message kind="error" onRetry={paging.retry}>{LOAD_FAILED}</Listbox.Message>;
     } else if (paging.more) {
-        footer = (
+        footerMessage = (
             <Listbox.Message kind={paging.busy ? 'loading' : 'count'}>
                 {paging.busy ? 'Loading more…' : `Showing ${paging.count} of ${paging.total}`}
             </Listbox.Message>
         );
     }
+    const footerClear = canClear && hasValue && live ? (
+        <div className="plus-listbox-footer-actions">
+            <Button
+                appearance="subtle"
+                spacing="compact"
+                onClick={() => {
+                    clear();
+                    if (!multi) closeList();
+                    controlRef.current?.focus();
+                }}
+            >
+                Clear
+            </Button>
+        </div>
+    ) : null;
+    const footer = footerMessage || footerClear ? (
+        <>
+            {footerMessage}
+            {footerClear}
+        </>
+    ) : null;
 
     const listLoading = isLoading || paging.firstPage;
     // The first page failing leaves the list with nothing to show but the way to try again.

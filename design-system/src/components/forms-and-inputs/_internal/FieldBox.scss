@@ -108,6 +108,10 @@
         width: var(--control-md);
         padding: 0;
     }
+
+    .plus-btn.plus-field-clear .plus-btn-visual {
+        font-size: var(--icon-sm);
+    }
 }
 
 .plus-field--compact .plus-field__leading,

@@ -69,38 +69,7 @@
     min-width: 0;
 }
 
-// ── Trailing: the clear × and the caret (Figma `_Field Clear`, `_Dropdown icon`) ──
-
-.plus-select-wrapper .plus-field__trailing {
-    gap: var(--stack-md);
-}
-
-// One step smaller than the caret, `icon.subtlest` at rest and `icon.subtle` on hover.
-.plus-select-clear {
-    display: inline-flex;
-    align-items: center;
-    padding: 0;
-    border: 0;
-    background: none;
-    font-size: var(--icon-sm);
-    line-height: 1;
-    cursor: pointer;
-
-    .fa-solid,
-    .fa-regular {
-        // @contrast: non-text
-        color: var(--ds-icon-subtlest);
-        font-size: var(--icon-sm);
-    }
-
-    @include plus-state(
-        $states: (
-            hovered: (color: var(--ds-icon-subtle)),
-        ),
-        $ring: false,
-        $hovered-selector: '&:hover :is(.fa-solid, .fa-regular)'
-    );
-}
+// ── Trailing: the plain ✕ clear button and the caret ──
 
 .plus-select-caret {
     color: var(--ds-icon-subtle);

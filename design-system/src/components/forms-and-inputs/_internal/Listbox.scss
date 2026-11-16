@@ -100,6 +100,13 @@
     border-top: var(--border-width-default) solid var(--ds-border);
 }
 
+.plus-listbox-footer-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: var(--dropdown-menu-pad);
+}
+
 .plus-listbox-body {
     position: relative;
     flex: 1;
