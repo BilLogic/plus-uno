@@ -18,8 +18,8 @@ const LollipopChart = ({
     horizontal = true,
     sort = true,
 }) => {
-    const { categories: orderedCategories, data: orderedData } = useMemo(
-        () => sortCategories({ categories, data, sort }),
+    const { categories: orderedCategories, series: [{ data: orderedData }] } = useMemo(
+        () => (sort ? sortCategories({ categories, series: [{ data }] }) : { categories, series: [{ data }] }),
         [categories, data, sort],
     );
 

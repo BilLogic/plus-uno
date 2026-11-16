@@ -66,9 +66,10 @@ time, use `AreaChart`.
 `dates` is an array of category labels. `data` is an array of `{ segments }`,
 one per date. Each segment is `{ value, height, color, textColor }`: `height`
 (numeric string) sets the size, `value` sets the printed label, and `color` and
-`textColor` are optional. Columns sort from most to least by total height by
-default; pass `sort={false}` for temporal axes such as weekdays or months.
-Matching segment indexes across columns form a series.
+`textColor` are optional. Columns keep their input order by default
+(`sort={false}`) because `dates` is a temporal axis; pass `sort={true}` to rank
+categorical columns from most to least by total height. Matching segment
+indexes across columns form a series.
 
 ```jsx
 <StackedBarChart

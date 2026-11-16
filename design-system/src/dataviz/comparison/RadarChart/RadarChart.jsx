@@ -25,7 +25,7 @@ const RadarChart = ({
     chartSpacing,
     showYAxisLabels = true,
     categoryLabelBody3Regular = false,
-    sort = true,
+    sort = false,
 }) => {
     const {
         categories: orderedCategories,
@@ -33,22 +33,26 @@ const RadarChart = ({
         orderedIcons,
         orderedColors,
     } = useMemo(() => {
-        const indexMeta = (categories || []).map((_, index) => index);
-        const { categories: nextCategories, data: nextIndices, series: nextSeries } = sortCategories({
+        if (!sort) {
+            return {
+                categories,
+                series,
+                orderedIcons: categoryIcons,
+                orderedColors: categoryColors,
+            };
+        }
+        const { categories: nextCategories, series: nextSeries, order } = sortCategories({
             categories,
-            data: indexMeta,
             series,
-            sort,
-            value: (_, idx) => (Array.isArray(series?.[0]?.data) ? series[0].data[idx] ?? 0 : 0),
         });
         return {
             categories: nextCategories,
             series: nextSeries,
             orderedIcons: Array.isArray(categoryIcons)
-                ? nextIndices.map((i) => categoryIcons[i])
+                ? order.map((i) => categoryIcons[i])
                 : categoryIcons,
             orderedColors: Array.isArray(categoryColors)
-                ? nextIndices.map((i) => categoryColors[i])
+                ? order.map((i) => categoryColors[i])
                 : categoryColors,
         };
     }, [categories, series, categoryIcons, categoryColors, sort]);
@@ -106,7 +110,8 @@ const RadarChart = ({
         }
     };
 
-    // Label formatter: icons when categoryIcons provided for this category; otherwise show category name (no generic circle)
+    // Label formatter: icons when categoryIcons provided for this category; axis label text always
+    // stays on the theme's text token, so categoryColors may color the icon only.
     if (orderedIcons && orderedCategories) {
         xAxisConfig.labels = {
             ...xAxisConfig.labels,
@@ -114,29 +119,13 @@ const RadarChart = ({
                 const categoryIndex = this.pos;
                 const glyph = orderedIcons[categoryIndex];
                 if (glyph) {
-                    return `<i class="${iconClass(glyph.replace(/^fa-/, ''))}" style="font-size: var(--icon-md); color: var(--ds-icon-subtle);" aria-hidden="true"></i>`;
+                    const category = orderedCategories[categoryIndex];
+                    const iconColor = Array.isArray(orderedColors)
+                        ? orderedColors[categoryIndex]
+                        : orderedColors?.[category] || orderedColors?.[categoryIndex];
+                    return `<i class="${iconClass(glyph.replace(/^fa-/, ''))}" style="font-size: var(--icon-md); color: ${iconColor || 'var(--ds-icon-subtle)'};" aria-hidden="true"></i>`;
                 }
                 return this.value ?? '';
-            },
-            useHTML: true
-        };
-    } else if (orderedColors && orderedCategories) {
-        xAxisConfig.labels = {
-            ...xAxisConfig.labels,
-            formatter: function() {
-                const categoryIndex = this.pos;
-                const category = orderedCategories[categoryIndex];
-                let color = 'var(--ds-text)';
-                
-                // Handle object mapping (category name -> color)
-                if (Array.isArray(orderedColors)) {
-                    color = orderedColors[categoryIndex] || color;
-                } else {
-                    // Handle object mapping
-                    color = orderedColors[category] || orderedColors[categoryIndex] || color;
-                }
-                
-                return `<span style="color: ${color}">${this.value}</span>`;
             },
             useHTML: true
         };
@@ -254,7 +243,7 @@ RadarChart.propTypes = {
     chartSpacing: PropTypes.arrayOf(PropTypes.number), // [top, right, bottom, left] spacing for chart
     showYAxisLabels: PropTypes.bool,
     categoryLabelBody3Regular: PropTypes.bool,
-    /** Sort categories from most to least by default; pass false for ordinal or temporal axes. */
+    /** Sort spokes from most to least by the first series; false by default so profile axes stay in input order. */
     sort: PropTypes.bool,
 };
 

@@ -19,8 +19,12 @@ const DumbbellChart = ({
     horizontal = true,
     sort = true,
 }) => {
-    const { categories: orderedCategories, data: orderedData } = useMemo(
-        () => sortCategories({ categories, data, sort }),
+    const { categories: orderedCategories, series: [{ data: orderedData }] } = useMemo(
+        () =>
+            sort
+                // Dumbbells encode the change between two endpoints, so rank categories by gap size.
+                ? sortCategories({ categories, series: [{ data }], value: (d) => Math.abs(d.high - d.low) })
+                : { categories, series: [{ data }] },
         [categories, data, sort],
     );
 

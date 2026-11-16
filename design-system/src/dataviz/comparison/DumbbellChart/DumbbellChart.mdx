@@ -69,10 +69,10 @@ in columns.
 ## Data shape
 
 `categories` is an array of strings. `data` is an array of `{ low, high }` (both
-required) in `categories` order. Categories sort from most to least by `high`
-by default; pass `sort={false}` for ordinal or temporal axes. `lowLabel` and
-`highLabel` name the two ends. `height` defaults to 400; `horizontal` defaults
-to `true`.
+required) in `categories` order. Categories sort from most to least by gap
+(`|high - low|`) by default; pass `sort={false}` for ordinal or temporal axes.
+`lowLabel` and `highLabel` name the two ends. `height` defaults to 400;
+`horizontal` defaults to `true`.
 
 ```jsx
 <DumbbellChart

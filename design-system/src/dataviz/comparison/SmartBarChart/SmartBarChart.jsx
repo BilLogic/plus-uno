@@ -12,7 +12,7 @@ import { BRAND, CHROME, mostToLeast } from '@/dataviz/palette';
  */
 const SmartBarChart = ({ data = [], height = 200, sort = true }) => {
     const orderedData = useMemo(
-        () => mostToLeast(data, (item) => parseFloat(item.height), { sort }),
+        () => (sort ? mostToLeast(data, (item) => parseFloat(item.height)) : data),
         [data, sort],
     );
 

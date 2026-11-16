@@ -12,7 +12,6 @@ export default {
         categories: { control: 'object', description: 'Category labels' },
         yAxisLabel: { control: 'text', description: 'Y-axis label' },
         height: { control: 'number', description: 'Chart height in pixels' },
-        sort: { control: 'boolean', description: 'Sort categories from most to least by default; pass false for ordinal or temporal axes' },
     },
 };
 
@@ -70,6 +69,5 @@ export const Interactive = {
         data: [50, 30, 12, 5, 3],
         yAxisLabel: 'Count',
         height: 400,
-        sort: true,
     },
 };

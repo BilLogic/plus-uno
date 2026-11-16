@@ -12,7 +12,7 @@ export default {
         height: { control: 'number', description: 'Chart height in pixels' },
         dates: { control: 'object', description: 'Category labels' },
         data: { control: 'object', description: 'Array of { segments: [...] }' },
-        sort: { control: 'boolean', description: 'Sort categories from most to least by default; pass false for ordinal or temporal axes' },
+        sort: { control: 'boolean', description: 'Sort columns from most to least by total height; false by default because dates is a temporal axis' },
     },
 };
 
@@ -35,7 +35,6 @@ const captionStyle = {
 
 const weeklyData = {
     height: 300,
-    sort: false,
     dates: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
     data: [
         {
@@ -100,7 +99,7 @@ export const Overview = {
 export const Interactive = {
     args: {
         height: 300,
-        sort: true,
+        sort: false,
         dates: ['Jan', 'Feb', 'Mar'],
         data: [
             {

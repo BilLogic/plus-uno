@@ -9,7 +9,7 @@ export default {
     tags: ['!dev', '!autodocs'],
     argTypes: {
         filled: { control: 'boolean', description: 'Fill the area under the line' },
-        sort: { control: 'boolean', description: 'Sort spokes from most to least by default; pass false to keep input order' },
+        sort: { control: 'boolean', description: 'Sort spokes from most to least by the first series; false by default so profile axes stay in input order' },
         height: { control: 'number', description: 'Chart height in pixels' },
         yAxisMax: { control: 'number', description: 'Maximum value for y-axis' },
         categories: { control: 'object', description: 'Array of axis labels' },
@@ -94,7 +94,7 @@ export const Interactive = {
             { name: 'Dataset 2', data: [60, 80, 50, 90, 70] },
         ],
         filled: false,
-        sort: true,
+        sort: false,
         height: 400,
         yAxisMax: 100,
     },

@@ -17,8 +17,12 @@ const ColumnRangeChart = ({
     horizontal = false,
     sort = true,
 }) => {
-    const { categories: orderedCategories, data: orderedData } = useMemo(
-        () => sortCategories({ categories, data, sort }),
+    const { categories: orderedCategories, series: [{ data: orderedData }] } = useMemo(
+        () =>
+            sort
+                // Range columns encode span length, so rank categories from widest span to narrowest.
+                ? sortCategories({ categories, series: [{ data }], value: (d) => d.high - d.low })
+                : { categories, series: [{ data }] },
         [categories, data, sort],
     );
 

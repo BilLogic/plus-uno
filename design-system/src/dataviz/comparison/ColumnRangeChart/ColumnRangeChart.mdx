@@ -66,9 +66,10 @@ Vertical by default; set `horizontal` for long category labels.
 ## Data shape
 
 `categories` is an array of strings. `data` is an array of `{ low, high }` (both
-required) in `categories` order. Categories sort from most to least by `high`
-by default; pass `sort={false}` for temporal or ordinal axes (such as days of
-the week). `height` defaults to 400; `horizontal` defaults to `false`.
+required) in `categories` order. Categories sort from most to least by span
+(`high - low`) by default; pass `sort={false}` for temporal or ordinal axes
+(such as days of the week). `height` defaults to 400; `horizontal` defaults to
+`false`.
 
 ```jsx
 <ColumnRangeChart

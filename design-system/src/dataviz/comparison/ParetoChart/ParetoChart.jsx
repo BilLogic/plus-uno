@@ -14,11 +14,10 @@ const ParetoChart = ({
     categories = [],
     yAxisLabel = 'Value',
     height = 400,
-    sort = true,
 }) => {
-    const { categories: orderedCategories, data: orderedData } = useMemo(
-        () => sortCategories({ categories, data, sort }),
-        [categories, data, sort],
+    const { categories: orderedCategories, series: [{ data: orderedData }] } = useMemo(
+        () => sortCategories({ categories, series: [{ data }] }),
+        [categories, data],
     );
 
     const options = {
@@ -83,8 +82,6 @@ ParetoChart.propTypes = {
     yAxisLabel: PropTypes.string,
     /** Chart height */
     height: PropTypes.number,
-    /** Sort categories from most to least by default; pass false for ordinal or temporal axes. */
-    sort: PropTypes.bool,
 };
 
 export default ParetoChart;

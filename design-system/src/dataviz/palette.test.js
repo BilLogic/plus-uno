@@ -19,6 +19,7 @@ import {
     sequentialTone,
     seriesColor,
     sortCategories,
+    toneByRank,
 } from './palette';
 import { dsName } from '../../../scripts/lib/color/emit.mjs';
 import { contrastRatio, inkFor } from './colorMode';
@@ -77,38 +78,61 @@ describe('the data-viz palette', () => {
         expect([0, 1, 2].map((i) => seriesColor(i, 3))).toEqual(CATEGORICAL.slice(0, 3));
     });
 
-    it('sorts categories from most to least without touching the input', () => {
-        const items = [{ y: 2 }, { y: 9 }, { y: 5 }];
-        expect(mostToLeast(items).map((i) => i.y)).toEqual([9, 5, 2]);
-        expect(items.map((i) => i.y)).toEqual([2, 9, 5]);
+    it('sorts categories from most to least stably without touching the input or item colors', () => {
+        const items = [
+            { label: 'first-5', y: 5, color: 'var(--chart-blue-bold)' },
+            { label: 'nine', y: 9, color: 'var(--ds-background-accent-blue-subtler)' },
+            { label: 'second-5', y: 5, color: 'var(--chart-blue-boldest)' },
+            { label: 'two', y: 2, color: 'var(--chart-blue-bolder)' },
+        ];
+        const sorted = mostToLeast(items);
+        expect(sorted.map((i) => i.label)).toEqual(['nine', 'first-5', 'second-5', 'two']);
+        expect(sorted.map((i) => i.color)).toEqual([
+            'var(--ds-background-accent-blue-subtler)',
+            'var(--chart-blue-bold)',
+            'var(--chart-blue-boldest)',
+            'var(--chart-blue-bolder)',
+        ]);
+        expect(items.map((i) => i.y)).toEqual([5, 9, 5, 2]);
     });
 
-    it('puts the darkest sequential tone on the biggest value and keeps input order when sort is false', () => {
-        const items = [
-            { label: 'Low', y: 20 },
-            { label: 'High', y: 90 },
-            { label: 'Mid', y: 55 },
-            { label: 'MidHigh', y: 75 },
-        ];
-        const sorted = mostToLeast(items, (i) => i.y, { hue: 'blue' });
-        expect(sorted.map((i) => i.label)).toEqual(['High', 'MidHigh', 'Mid', 'Low']);
-        expect(sorted.map((i) => i.color)).toEqual([
+    it('tones ranked items explicitly with toneByRank and spreads sequentialTone across the ramp for 3, 5 and 8 items', () => {
+        const three = toneByRank([{ label: 'A' }, { label: 'B' }, { label: 'C' }], 'blue');
+        expect(three.map((i) => i.color)).toEqual([
             'var(--chart-blue-boldest)',
+            'var(--chart-blue-bolder)',
+            'var(--ds-background-accent-blue-subtler)',
+        ]);
+        expect(new Set(three.map((i) => i.color)).size).toBe(3);
+
+        const five = toneByRank(
+            [{ label: 'A' }, { label: 'B' }, { label: 'C' }, { label: 'D' }, { label: 'E' }],
+            'blue',
+        );
+        expect(five.map((i) => i.color)).toEqual([
+            'var(--chart-blue-boldest)',
+            'var(--chart-blue-bolder)',
             'var(--chart-blue-bolder)',
             'var(--chart-blue-bold)',
             'var(--ds-background-accent-blue-subtler)',
         ]);
+        expect(new Set(five.map((i) => i.color)).size).toBe(4);
 
-        const unsorted = mostToLeast(items, (i) => i.y, { sort: false, hue: 'blue' });
-        expect(unsorted.map((i) => i.label)).toEqual(['Low', 'High', 'Mid', 'MidHigh']);
-        expect(unsorted.find((i) => i.label === 'High').color).toBe('var(--chart-blue-boldest)');
-        expect(unsorted.find((i) => i.label === 'Low').color).toBe('var(--ds-background-accent-blue-subtler)');
-
-        expect(sequentialTone(0, 4, 'blue')).toBe('var(--chart-blue-boldest)');
-        expect(sequentialTone(3, 4, 'blue')).toBe('var(--ds-background-accent-blue-subtler)');
+        const eight = Array.from({ length: 8 }, (_, rank) => sequentialTone(rank, 8, 'blue'));
+        expect(eight).toEqual([
+            'var(--chart-blue-boldest)',
+            'var(--chart-blue-boldest)',
+            'var(--chart-blue-bolder)',
+            'var(--chart-blue-bolder)',
+            'var(--chart-blue-bold)',
+            'var(--chart-blue-bold)',
+            'var(--ds-background-accent-blue-subtler)',
+            'var(--ds-background-accent-blue-subtler)',
+        ]);
+        expect(new Set(eight).size).toBe(4);
     });
 
-    it('sorts parallel categories, data and series from most to least by default and respects sort=false opt-out', () => {
+    it('sorts parallel categories and series from most to least and returns the new index order', () => {
         const ranked = sortCategories({
             categories: ['Math', 'Science', 'Art'],
             series: [
@@ -119,13 +143,14 @@ describe('the data-viz palette', () => {
         expect(ranked.categories).toEqual(['Science', 'Art', 'Math']);
         expect(ranked.series[0].data).toEqual([90, 70, 50]);
         expect(ranked.series[1].data).toEqual([80, 60, 40]);
+        expect(ranked.order).toEqual([1, 2, 0]);
 
-        const optedOut = sortCategories({
-            categories: ['Mon', 'Tue', 'Wed'],
-            data: [12, 24, 18],
-            sort: false,
+        const custom = sortCategories({
+            categories: ['Narrow', 'Wide'],
+            series: [{ data: [{ low: 50, high: 60 }, { low: 10, high: 45 }] }],
+            value: (d) => d.high - d.low,
         });
-        expect(optedOut.categories).toEqual(['Mon', 'Tue', 'Wed']);
-        expect(optedOut.data).toEqual([12, 24, 18]);
+        expect(custom.categories).toEqual(['Wide', 'Narrow']);
+        expect(custom.order).toEqual([1, 0]);
     });
 });

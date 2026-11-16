@@ -10,20 +10,21 @@ import { inkFor, resolveColor, textInks, useColorModeKey } from '@/dataviz/color
  * StackedBarChart Component
  * Displays a stacked bar chart using Highcharts.
  */
-const StackedBarChart = ({ data = [], dates = [], yLabels, height = 207, yAxisMax, sort = true }) => {
+const StackedBarChart = ({ data = [], dates = [], yLabels, height = 207, yAxisMax, sort = false }) => {
     // Labels sit on their segment, so their ink is resolved per mode: re-render when it changes.
     useColorModeKey();
     const inks = textInks();
 
-    const { categories: orderedDates, data: orderedData } = useMemo(
+    const { categories: orderedDates, series: [{ data: orderedData }] } = useMemo(
         () =>
-            sortCategories({
-                categories: dates,
-                data,
-                sort,
-                value: (bar) =>
-                    (bar?.segments || []).reduce((sum, seg) => sum + parseFloat(seg.height), 0),
-            }),
+            sort
+                ? sortCategories({
+                    categories: dates,
+                    series: [{ data }],
+                    value: (bar) =>
+                        (bar?.segments || []).reduce((sum, seg) => sum + parseFloat(seg.height), 0),
+                })
+                : { categories: dates, series: [{ data }] },
         [dates, data, sort],
     );
 
@@ -102,7 +103,7 @@ const StackedBarChart = ({ data = [], dates = [], yLabels, height = 207, yAxisMa
                         return `<span class="${CHART_VALUE_CLASS}" style="color: ${ink}">${this.point.customValue}</span>`;
                     },
                 },
-                // A gap between stacked segments, as Atlassian separates adjacent chart colors.
+                // A 2px inverse-border gap separates adjacent stacked segments so touching fills stay distinct.
                 borderWidth: CHART_LINE_WIDTH_NUMBER,
                 borderColor: CHROME.separator,
                 borderRadius: CHART_BAR_RADIUS,
@@ -137,7 +138,7 @@ StackedBarChart.propTypes = {
     yLabels: PropTypes.arrayOf(PropTypes.string), // ignored in favor of axis logic mostly
     height: PropTypes.number,
     yAxisMax: PropTypes.number, // Optional override for y-axis max (auto-calculated if not provided)
-    /** Sort categories from most to least by default; pass false for ordinal or temporal axes. */
+    /** Sort columns from most to least by total height; false by default because dates is a temporal axis. */
     sort: PropTypes.bool,
 };
 

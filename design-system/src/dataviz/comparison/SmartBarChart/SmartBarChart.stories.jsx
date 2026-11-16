@@ -1,11 +1,8 @@
 import React from 'react';
 import { expect, waitFor } from 'storybook/test';
 import { Heading } from '@/components';
-import { BRAND, sequentialRamp } from '@/dataviz/palette';
+import { BRAND, toneByRank } from '@/dataviz/palette';
 import SmartBarChart from './SmartBarChart';
-
-/** A step of the blue ramp, 0 (lightest) to 3 (strongest). */
-const grade = (step) => `var(${sequentialRamp('blue')[step]})`;
 
 export default {
     title: 'Data visualizations/Comparison/Smart bar chart',
@@ -38,14 +35,17 @@ const captionStyle = {
 const defaultData = {
     height: 200,
     sort: false,
-    data: [
-        // Grades are ordinal: one hue, the strongest tone on the biggest share.
-        { letter: 'A', height: '100', color: grade(3) },
-        { letter: 'B', height: '75', color: grade(2) },
-        { letter: 'C', height: '50', color: grade(1) },
-        { letter: 'D', height: '25', color: grade(0) },
-        { letter: 'E', height: '0', color: grade(0) },
-    ],
+    // Grades are ordinal (A–E): keep axis order with sort={false} and tone by rank.
+    data: toneByRank(
+        [
+            { letter: 'A', height: '100' },
+            { letter: 'B', height: '75' },
+            { letter: 'C', height: '50' },
+            { letter: 'D', height: '25' },
+            { letter: 'E', height: '0' },
+        ],
+        'blue',
+    ),
 };
 
 const weekdayData = {
@@ -67,7 +67,7 @@ export const Overview = {
             <section style={sectionStyle}>
                 <Heading as="h3" size="small">Grade distribution</Heading>
                 <p style={captionStyle}>
-                    Shows score distribution against a 100% track with the darkest tone on the largest share.
+                    Ordinal grades (A–E) keep their axis order with sort=&#123;false&#125; while toneByRank places the darkest tone on the largest share.
                 </p>
                 <SmartBarChart {...defaultData} />
             </section>
