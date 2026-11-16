@@ -57,6 +57,7 @@ const GENERATORS = [
   'npm run generate:design-tokens',
   'npm run generate:tokens',
   'npm run generate:token-registry',
+  'node scripts/generate-ds-index.mjs',
   'npm run generate:skill-surfaces',
   'npm run generate:check-registry',
 ];

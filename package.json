@@ -63,6 +63,7 @@
     "check:doc-identifiers": "node scripts/check-doc-identifiers.mjs",
     "check:figma-links": "node scripts/generate-figma-links-spreadsheet.js --check",
     "check:component-barrel": "node scripts/generate-component-barrel.mjs --check",
+    "check:ds-index": "node scripts/generate-ds-index.mjs --check",
     "check:icon-lists": "node scripts/generate-icon-lists.mjs --check",
     "check:brand-image": "node scripts/generate-brand-image.js --check",
     "check:figma-node-types": "node scripts/check-figma-node-types.mjs",

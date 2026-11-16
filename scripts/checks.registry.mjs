@@ -164,6 +164,14 @@ export const CHECKS = [
     guards: 'design-system/src/components/index.js against the folder shape it is generated from; a hand edit or an unregenerated move shows as drift.',
   },
   {
+    name: 'check:ds-index',
+    script: 'node scripts/generate-ds-index.mjs --check',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/generate-ds-index.mjs',
+    guards: 'design-system/agent-views/ds-index.json against the design-system facts, pages, component docs and guidelines it is built from.',
+  },
+  {
     name: 'check:icon-lists',
     script: 'node scripts/generate-icon-lists.mjs --check',
     pkg: 'root',
