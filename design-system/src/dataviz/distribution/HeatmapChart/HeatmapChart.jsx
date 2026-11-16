@@ -43,6 +43,15 @@ const HeatmapChart = ({
     const options = useMemo(() => {
         const ramp = diverging ? divergingRamp(...diverging) : sequentialRamp(hue);
         const inks = textInks();
+        const defaultInset = chartTheme.chart.spacing[0];
+        const verticalInset = compactSpacing ? CHART_SPACING_COMPACT : defaultInset;
+        // Highcharts defaults a vertical colorAxis bar to a fixed length that overflows short plots;
+        // subtract container insets, the x-axis category band, and end-label clearance.
+        const xAxisMargin = xCategories.length > 0 ? defaultInset * 2 : 0;
+        const symbolHeight = Math.max(
+            defaultInset,
+            height - verticalInset * 2 - xAxisMargin - defaultInset * 2
+        );
         return {
         ...chartTheme,
         chart: {
@@ -82,7 +91,8 @@ const HeatmapChart = ({
             layout: 'vertical',
             margin: 0,
             verticalAlign: 'middle',
-            ...(hideLegendNavigation && { navigation: { enabled: false } })
+            symbolHeight,
+            navigation: { enabled: false }
         },
         tooltip: {
             ...chartTheme.tooltip,
@@ -111,7 +121,6 @@ const HeatmapChart = ({
         data,
         diverging,
         height,
-        hideLegendNavigation,
         hue,
         max,
         min,

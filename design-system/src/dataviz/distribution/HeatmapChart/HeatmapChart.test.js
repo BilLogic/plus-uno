@@ -44,8 +44,9 @@ describe('HeatmapChart options', () => {
         ]);
         expect(options.chart.spacing).toEqual([6, 6, 6, 6]);
         expect(options.legend.y).toBeUndefined();
-        expect(options.legend.symbolHeight).toBeUndefined();
+        expect(options.legend.symbolHeight).toBe(324);
         expect(options.legend.verticalAlign).toBe('middle');
+        expect(options.legend.navigation).toEqual({ enabled: false });
 
         const tooltipHtml = options.tooltip.formatter.call({
             series: {
@@ -64,5 +65,29 @@ describe('HeatmapChart options', () => {
         expect(cellLabelHtml).toContain(CHART_VALUE_CLASS);
         expect(cellLabelHtml).toContain('>34<');
         expect(options.series[0].dataLabels.style).toBeUndefined();
+    });
+
+    it('sizes symbolHeight from chart height minus vertical margins and disables legend navigation at 350 and 250', () => {
+        capturedOptions.length = 0;
+        const baseProps = {
+            xCategories: ['Q1', 'Q2'],
+            yCategories: ['Algebra', 'Geometry'],
+            data: [
+                [0, 0, -5],
+                [1, 1, 8],
+            ],
+        };
+
+        render(React.createElement(HeatmapChart, { ...baseProps, height: 350 }));
+        const tall = capturedOptions.at(-1);
+        expect(tall.legend.navigation).toEqual({ enabled: false });
+        expect(tall.legend.verticalAlign).toBe('middle');
+        expect(tall.legend.symbolHeight).toBe(254);
+
+        render(React.createElement(HeatmapChart, { ...baseProps, height: 250 }));
+        const short = capturedOptions.at(-1);
+        expect(short.legend.navigation).toEqual({ enabled: false });
+        expect(short.legend.verticalAlign).toBe('middle');
+        expect(short.legend.symbolHeight).toBe(154);
     });
 });

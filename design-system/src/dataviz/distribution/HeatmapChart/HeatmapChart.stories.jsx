@@ -110,12 +110,27 @@ export const Overview = {
             const containerRect = container.getBoundingClientRect();
             const plot = container.querySelector('.highcharts-plot-background');
             const legend = container.querySelector('.highcharts-legend');
+            const symbol = container.querySelector('.highcharts-legend-item rect, .highcharts-legend-item path');
             expect(plot).not.toBeNull();
             expect(legend).not.toBeNull();
+            expect(symbol).not.toBeNull();
+            expect(container.querySelector('.highcharts-legend-navigation')).toBeNull();
+            expect(legend.querySelector('[clip-path^="url("]')).toBeNull();
             const plotRect = plot.getBoundingClientRect();
             const legendRect = legend.getBoundingClientRect();
-            expect(legendRect.top).toBeGreaterThanOrEqual(containerRect.top - 1);
-            expect(legendRect.bottom).toBeLessThanOrEqual(containerRect.bottom + 1);
+            const symbolRect = symbol.getBoundingClientRect();
+            expect(legendRect.top).toBeGreaterThanOrEqual(containerRect.top);
+            expect(legendRect.bottom).toBeLessThanOrEqual(containerRect.bottom);
+            expect(legendRect.left).toBeGreaterThanOrEqual(containerRect.left);
+            expect(legendRect.right).toBeLessThanOrEqual(containerRect.right);
+            expect(symbolRect.height).toBeLessThanOrEqual(plotRect.height + 1);
+            expect(symbolRect.top).toBeGreaterThanOrEqual(plotRect.top - 2);
+            expect(symbolRect.bottom).toBeLessThanOrEqual(plotRect.bottom + 2);
+            for (const tickLabel of container.querySelectorAll('.highcharts-coloraxis-labels text')) {
+                const labelRect = tickLabel.getBoundingClientRect();
+                expect(labelRect.top).toBeGreaterThanOrEqual(containerRect.top);
+                expect(labelRect.bottom).toBeLessThanOrEqual(containerRect.bottom);
+            }
             const plotMidY = (plotRect.top + plotRect.bottom) / 2;
             const legendMidY = (legendRect.top + legendRect.bottom) / 2;
             expect(Math.abs(legendMidY - plotMidY)).toBeLessThan(24);
