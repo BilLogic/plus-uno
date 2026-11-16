@@ -387,6 +387,7 @@ CollapsedTagsShowPlusN.play = async ({ canvasElement }) => {
 /** Plain ✕ in the field, Clear in the list footer, and Delete from the keyboard all empty the field and keep focus in it. */
 export const ClearButton = (args) => {
     const [value, setValue] = useState('north');
+    const [multiValue, setMultiValue] = useState(['north', 'south']);
     return (
         <div style={stack}>
             <Select
@@ -396,11 +397,19 @@ export const ClearButton = (args) => {
                 value={value}
                 onChange={(next) => { setValue(next); args.onChange(next); }}
             />
+            <Select
+                id="scommit-clear-multi"
+                label="Districts"
+                isMulti
+                options={schools}
+                value={multiValue}
+                onChange={(next) => { setMultiValue(next); args.onMultiChange(next); }}
+            />
             <p data-testid="chosen">{value}</p>
         </div>
     );
 };
-ClearButton.args = { onChange: fn() };
+ClearButton.args = { onChange: fn(), onMultiChange: fn() };
 
 ClearButton.play = async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
@@ -452,6 +461,17 @@ ClearButton.play = async ({ args, canvasElement }) => {
     await expect(field).toHaveFocus();
     await userEvent.keyboard('{Delete}');
     await expect(chosen.textContent).toBe('');
+
+    // Multi-select: footer Clear empties the selection to [] and keeps focus in the field.
+    const multiField = canvas.getByRole('combobox', { name: 'Districts' });
+    await expect(canvas.getByRole('button', { name: 'Clear Districts' })).toBeInTheDocument();
+    await userEvent.click(multiField);
+    const multiListbox = (await page().findByRole('listbox')).closest('.plus-listbox');
+    args.onMultiChange.mockClear();
+    await userEvent.click(within(multiListbox.querySelector('.plus-listbox-footer')).getByRole('button', { name: 'Clear' }));
+    await expect(args.onMultiChange).toHaveBeenLastCalledWith([]);
+    await expect(multiField).toHaveFocus();
+    await expect(canvas.queryByRole('button', { name: 'Clear Districts' })).toBeNull();
 };
 
 /** Read-only shows the value and stays focusable, but never opens or clears. */

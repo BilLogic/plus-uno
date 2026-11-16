@@ -2,7 +2,7 @@
 
 # Select
 
-Select — pick one value, or several, from a list, on `_Field` with the internal `Listbox` under it. - **The field is the combobox.** Focus stays in it, and the highlighted row is its `aria-activedescendant`. The field is a text input: typing in it filters the list. With `isSearchable={false}` it is a select-only combobox. - **Values are ids; options are objects.** `value` is an option's `value` (an array with `isMulti`), controlled or not. - **`isMulti`** shows Tags in a TagGroup (`displayMode="tags"`), which collapse into "+n" without focus. - **Trailing** holds the clear × (not a tab stop; Delete does the same) and the caret.
+Select — pick one value, or several, from a list, on `_Field` with the internal `Listbox` under it. - **The field is the combobox.** Focus stays in it, and the highlighted row is its `aria-activedescendant`. The field is a text input: typing in it filters the list. With `isSearchable={false}` it is a select-only combobox. - **Values are ids; options are objects.** `value` is an option's `value` (an array with `isMulti`), controlled or not. - **`isMulti`** shows Tags in a TagGroup (`displayMode="tags"`), which collapse into "+n" without focus. - **Trailing** holds the plain ✕ clear button (not a tab stop; Delete does the same) and the caret; the list's footer also carries a subtle "Clear" action while a value is set.
 
 Also asked as: combobox, picklist, option list, async select.
 
@@ -144,6 +144,16 @@ Don't: Disabled fades a value people need to read.
   open, move through and close the list; Backspace removes the last Tag in a
   multi-select with an empty filter; Delete clears the field when
   `clearable`.
+- **Clearing by keyboard and screen reader.** When a live field is `clearable`
+  (on by default except on a required single `Select`) and holds a value, a
+  subtle `IconButton` (`xmark` at `--icon-sm`) named `"Clear <label>"` sits
+  before the caret and a compact subtle "Clear" `Button` sits at the end of
+  the list footer. Both set `tabIndex={-1}` because focus stays in the
+  combobox (`Tab` closes the list and moves to the next field): keyboard
+  users press `Delete` to clear in place, while screen-reader virtual-cursor
+  and pointer users can activate either button, which empties the value,
+  calls `onChange` with `''` (or `[]` with `isMulti`), and keeps focus in the
+  combobox.
 - **A waiting dependent field says why.** `dependsOn`'s disabled state pairs
   with a caption ("Choose a school first"), not silence.
 
@@ -159,9 +169,9 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Parts
 
-1. **Field.** The box that shows the value, or the placeholder, and a chevron.
+1. **Field.** The box that shows the value, or the placeholder, the plain ✕ clear button when a value is set and clearable, and the caret.
 2. **Label.** Names the field. A required marker follows it.
-3. **List.** The options, in a popup under the field. Groups carry a heading.
+3. **List.** The options, in a popup under the field. Groups carry a heading; when a value is set and clearable, a compact subtle "Clear" button sits at the end of the list footer.
 4. **Caption.** Helper text, or the error that replaces it.
 
 ### States
@@ -185,7 +195,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Height | 40: `--height-250`. Compact 32: `--control-md`. |
 | Radius | 10: `--radius-control-lg`. Compact 8: `--radius-control-md`. |
 | Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
-| Caret | `--ds-icon-subtle`; the clear button `--ds-icon-subtlest`, hovered `--ds-icon-subtle`. |
+| Caret and clear | Caret `--ds-icon-subtle` at `--icon-sm`; field clear icon `--icon-sm` on a subtle `IconButton`; footer Clear compact subtle `Button` in `--dropdown-menu-pad` under a `--ds-border` top edge. |
 | Label and caption | `--body-sm`; label `--ds-text`, caption `--ds-text-subtle`, error `--ds-text-danger`. |
 | List | `--ds-surface-overlay` with a `--ds-border` edge, `--popup-radius` and `--ds-shadow-overlay`. |
 | Option | `--pad-y-md` `--pad-x-md`, `--body-default`; hovered `--ds-background-neutral-subtle-hovered`, picked `--ds-background-selected`. |
@@ -262,7 +272,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-sm` · `--border-width-default` · `--ds-background-input` · `--ds-background-neutral-subtle-hovered` · `--ds-background-selected-bold` · `--ds-border-focused` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-icon-subtlest` · `--ds-text` · `--ds-text-subtle` · `--ds-text-subtlest` · `--focus-ring-width` · `--icon-sm` · `--pad-x-md` · `--pad-y-md` · `--radius-md` · `--space-025` · `--stack-md` · `--stack-sm` · `--type-size-0875`
+`--body-default` · `--body-sm` · `--border-width-default` · `--dropdown-menu-pad` · `--ds-background-input` · `--ds-background-neutral-subtle-hovered` · `--ds-background-selected-bold` · `--ds-border-focused` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-subtle` · `--ds-text-subtlest` · `--focus-ring-width` · `--icon-sm` · `--pad-x-md` · `--pad-y-md` · `--radius-md` · `--space-025` · `--stack-md` · `--stack-sm` · `--type-size-0875`
 
 From `design-system/src/components/forms-and-inputs/Select/Select.scss`. Override these through the token layer, never with a literal.
 

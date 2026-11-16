@@ -3278,7 +3278,7 @@
       "import": "import { DatePicker } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/DatePicker/DatePicker.jsx",
-      "summary": "DatePicker — a date field that opens a month calendar (Figma `DatePicker`). Built from the shared parts: the field is `FieldBox` with the calendar icon in Trailing, and the calendar is the shared `Calendar` on the `_Listbox` surface, which DateTimePicker opens too. - **Typing:** the field takes MM/DD/YYYY (and, with `range`, two dates joined by a dash). It is checked when you press Enter or leave the field: a real day inside `minDate`…`maxDate` is picked, anything else is kept as typed and marked invalid, and `onChange` is not called. - **Range:** the first click sets the first day, the second the last; a click before the first day starts again. `onChange` receives `[start, end]`. - **Popup:** opens 4px (`--stack-sm`) below the field, left-aligned (or as `calendarAlign` asks), and flips above with the same gap when there is no room below. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the input, which is the control a screen reader lands on: DatePicker has no `label` prop, so that is how a caller names it.",
+      "summary": "DatePicker — a date field that opens a month calendar (Figma `DatePicker`). Built from the shared parts: the field is `FieldBox` with the calendar icon in Trailing, and the calendar is the shared `Calendar` on the `_Listbox` surface, which DateTimePicker opens too. - **Typing:** the field takes MM/DD/YYYY (and, with `range`, two dates joined by a dash). It is checked when you press Enter or leave the field: a real day inside `minDate`…`maxDate` is picked, anything else is kept as typed and marked invalid, and `onChange` is not called. - **Range:** the first click sets the first day, the second the last; a click before the first day starts again. `onChange` receives `[start, end]`. - **Clearing:** when a value is set on a live field, a subtle `xmark` icon button (`tabIndex={-1}`) sits before the calendar icon and a subtle \"Clear\" button sits in the calendar footer. Both empty the field, call `onChange` with `''` (or `[null, null]` with `range`), and keep focus in the input. - **Popup:** opens 4px (`--stack-sm`) below the field, left-aligned (or as `calendarAlign` asks), and flips above with the same gap when there is no room below. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the input, which is the control a screen reader lands on: DatePicker has no `label` prop, so that is how a caller names it.",
       "props": [
         {
           "name": "id",
@@ -3472,10 +3472,13 @@
         "RangePicksASpan",
         "BoundedDatesBehavior",
         "TypedEntry",
-        "DaysAnnounceTheirDate"
+        "DaysAnnounceTheirDate",
+        "ClearControl"
       ],
       "tokens": [
-        "--ds-icon-subtle"
+        "--dropdown-menu-pad",
+        "--ds-icon-subtle",
+        "--icon-sm"
       ]
     },
     {
@@ -12629,7 +12632,7 @@
       "import": "import { Select } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Select/Select.jsx",
-      "summary": "Select — pick one value, or several, from a list, on `_Field` with the internal `Listbox` under it. - **The field is the combobox.** Focus stays in it, and the highlighted row is its `aria-activedescendant`. The field is a text input: typing in it filters the list. With `isSearchable={false}` it is a select-only combobox. - **Values are ids; options are objects.** `value` is an option's `value` (an array with `isMulti`), controlled or not. - **`isMulti`** shows Tags in a TagGroup (`displayMode=\"tags\"`), which collapse into \"+n\" without focus. - **Trailing** holds the clear × (not a tab stop; Delete does the same) and the caret.",
+      "summary": "Select — pick one value, or several, from a list, on `_Field` with the internal `Listbox` under it. - **The field is the combobox.** Focus stays in it, and the highlighted row is its `aria-activedescendant`. The field is a text input: typing in it filters the list. With `isSearchable={false}` it is a select-only combobox. - **Values are ids; options are objects.** `value` is an option's `value` (an array with `isMulti`), controlled or not. - **`isMulti`** shows Tags in a TagGroup (`displayMode=\"tags\"`), which collapse into \"+n\" without focus. - **Trailing** holds the plain ✕ clear button (not a tab stop; Delete does the same) and the caret; the list's footer also carries a subtle \"Clear\" action while a value is set.",
       "props": [
         {
           "name": "id",
@@ -13074,6 +13077,7 @@
         "--body-default",
         "--body-sm",
         "--border-width-default",
+        "--dropdown-menu-pad",
         "--ds-background-input",
         "--ds-background-neutral-subtle-hovered",
         "--ds-background-selected-bold",
@@ -13082,7 +13086,6 @@
         "--ds-border-selected",
         "--ds-icon-inverse",
         "--ds-icon-subtle",
-        "--ds-icon-subtlest",
         "--ds-text",
         "--ds-text-subtle",
         "--ds-text-subtlest",
