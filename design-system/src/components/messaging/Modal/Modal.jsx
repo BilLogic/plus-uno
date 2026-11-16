@@ -335,7 +335,7 @@ Modal.propTypes = {
     showCloseButton: PropTypes.bool,
     /** Icon buttons in the header, before the close button. */
     headerActions: PropTypes.node,
-    /** Custom footer actions in place of the two buttons, aligned right. */
+    /** Custom footer content in place of the built-in pair, such as a three-button or leading-text FooterActions layout. */
     footer: PropTypes.node,
     /** A rule under the header and over the footer. */
     dividers: PropTypes.bool,
@@ -351,7 +351,7 @@ Modal.propTypes = {
     renderAs: PropTypes.oneOf(['modal', 'inline']),
     /** The confirming footer button, drawn on the right. Takes `text` (default "Confirm"), `onClick`, `appearance` (default `primary`), `spacing` and `icon`. */
     primaryButton: buttonShape,
-    /** The cancelling footer button, drawn left of the primary one. Takes `text` (default "Cancel"), `onClick`, `appearance` (default `default`), `spacing` and `icon`. */
+    /** The secondary footer button, drawn in the left half when a primary button is also given. Takes `text` (default "Discard"), `onClick`, `appearance` (default `default`), `spacing` and `icon`. */
     secondaryButton: buttonShape,
     /** Called when the dialog asks to close: the close button, Escape (unless `keyboard` is false) or a press on the blanket (unless `blanket` blocks it). The parent sets `show` to false. */
     onClose: PropTypes.func,

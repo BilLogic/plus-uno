@@ -121,25 +121,46 @@ export const IconOnly = {
 export const Selected = {
     render: () => {
         const [range, setRange] = useState('week');
+        const [filter, setFilter] = useState('assigned');
         return (
-            <ButtonGroup label="Date range">
-                <Button text="Week" isSelected={range === 'week'} onClick={() => setRange('week')} />
-                <Button text="Month" isSelected={range === 'month'} onClick={() => setRange('month')} />
-            </ButtonGroup>
+            <div style={row}>
+                <ButtonGroup label="Date range">
+                    <Button text="Day" isSelected={range === 'day'} onClick={() => setRange('day')} />
+                    <Button text="Week" isSelected={range === 'week'} onClick={() => setRange('week')} />
+                    <Button text="Month" isSelected={range === 'month'} onClick={() => setRange('month')} />
+                </ButtonGroup>
+                <ButtonGroup label="Assignment filter">
+                    <Button appearance="subtle" text="All" isSelected={filter === 'all'} onClick={() => setFilter('all')} />
+                    <Button appearance="subtle" text="Assigned" isSelected={filter === 'assigned'} onClick={() => setFilter('assigned')} />
+                    <Button appearance="subtle" text="Unassigned" isSelected={filter === 'unassigned'} onClick={() => setFilter('unassigned')} />
+                </ButtonGroup>
+            </div>
         );
     },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const week = canvas.getByRole('button', { name: 'Week' });
         const month = canvas.getByRole('button', { name: 'Month' });
+        const assigned = canvas.getByRole('button', { name: 'Assigned' });
         week.style.transition = 'none';
         month.style.transition = 'none';
+        assigned.style.transition = 'none';
         await expect(week).toHaveAttribute('aria-pressed', 'true');
         await expect(month).toHaveAttribute('aria-pressed', 'false');
         const weekStyle = getComputedStyle(week);
         await expect(weekStyle.backgroundColor, 'selected fill').toBe(tokenColor(canvasElement, '--ds-background-selected'));
         await expect(weekStyle.color, 'selected text').toBe(tokenColor(canvasElement, '--ds-text-selected'));
+        await expect(weekStyle.borderTopWidth, 'selected 1px border width').toBe('1px');
+        await expect(weekStyle.borderRightWidth, 'selected right seam border width').toBe('1px');
+        await expect(weekStyle.borderLeftWidth, 'selected left seam border width').toBe('1px');
         await expect(weekStyle.borderTopColor, 'selected border').toBe(tokenColor(canvasElement, '--ds-border-selected'));
+        await expect(weekStyle.zIndex, 'selected button rises above both neighbors').toBe('1');
+        await expect(week).not.toHaveClass('plus-btn--fit-container');
+
+        const assignedStyle = getComputedStyle(assigned);
+        await expect(assignedStyle.borderTopWidth, 'subtle selected 1px border width').toBe('1px');
+        await expect(assignedStyle.borderTopColor, 'subtle selected border').toBe(tokenColor(canvasElement, '--ds-border-selected'));
+
         const monthStyle = getComputedStyle(month);
         await expect(monthStyle.backgroundColor, 'default fill').toBe(tokenColor(canvasElement, '--ds-background-neutral'));
         await expect(monthStyle.color, 'default text').toBe(tokenColor(canvasElement, '--ds-text'));

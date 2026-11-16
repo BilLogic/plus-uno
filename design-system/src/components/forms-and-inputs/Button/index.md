@@ -14,7 +14,7 @@ Also asked as: cta, submit.
 
 **Source:** `design-system/src/components/forms-and-inputs/Button/Button.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Button/Button.stories.jsx` — Overview, Appearances, Spacing, Icons, States, Default, Primary, Subtle, Warning, Danger, Discovery, Ai, Compact, Spacious, Selected, Disabled, Loading, ExplainsOnPress, FitContainer, Truncation, Interactive, StateSteps, KeyboardFocus, AnchorKeyboard, AnchorHref
+**Stories:** `design-system/src/components/forms-and-inputs/Button/Button.stories.jsx` — Overview, Appearances, Spacing, Icons, States, Default, Primary, Subtle, Warning, Danger, Discovery, Ai, Compact, Spacious, Selected, Disabled, Loading, ExplainsOnPress, FitContainer, Truncation, Interactive, StateSteps, KeyboardFocus, AnchorKeyboard, AnchorHref, Anatomy, FooterLayouts
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Button/Button.mdx`
 
@@ -28,9 +28,9 @@ Use `Button` for an action on the current page: submit a form, mark attendance, 
 
 | Appearance | When to use |
 | --- | --- |
-| Default | Most actions that are not the main call to action of a page or area. Example: "Reschedule session". |
+| Default | Most actions that are not the main call to action of a page or area, and the secondary half of a footer. Draws a soft neutral fill with no outline. Example: "Reschedule session". |
 | Primary | The main call to action or a form submission. One per page or area. Example: "Book session". |
-| Subtle | Secondary actions beside a primary button, and toolbars or button groups where items already read as interactive. Example: "Cancel" beside "Save notes". |
+| Subtle | Secondary actions in headers, toolbars, button groups and inline popups, or a leading text action in a footer. Example: "Not now", or "Cancel" in a popup. |
 | Warning | Confirms an action that may cause a significant change or a loss of data, often in a confirmation modal. Example: "Remove from this week". |
 | Danger | The final confirmation of a destructive, irreversible action. Example: "Delete session recording". |
 | Discovery | The call to action for a new experience. Example: "Try the new schedule view". |
@@ -67,7 +67,7 @@ Don't: A second AI button competes with the first, and Save notes is not an AI a
 
 ### Pick the spacing for the surrounding space. {#pick-the-spacing-for-the-surrounding-space}
 
-Use `default` spacing in most places, `compact` for tables and inline toolbars, and `spacious` in modal, panel and focused-view footers.
+Use `default` spacing in most places, `compact` for tables, headers and inline popups, and `spacious` in modal, panel and focused-view footers.
 
 ### Keep an action enabled and explain on press. {#keep-an-action-enabled-and-explain-on-press}
 
@@ -78,7 +78,7 @@ Don't: A disabled submit button gives no direction and leaves the tab order.
 
 ### Align the primary button with its group. {#align-the-primary-button-with-its-group}
 
-Right-align buttons in focused tasks and Modals, with the primary on the right. Left-align on single-page forms and full-page tasks, with the primary on the left.
+In Modal, Panel and focused-view footers, `FooterActions` places the primary action in the rightmost track. On single-page forms and full-page tasks, left-align buttons with the primary first.
 
 ## Accessibility
 
@@ -90,6 +90,7 @@ Right-align buttons in focused tasks and Modals, with the primary on the right. 
 
 ## Related
 
+- `FooterActions`: use when placing spacious buttons across the four-track footer slot of a Modal, Panel or focused view.
 - `IconButton`: use when space allows only an icon with a tooltip label.
 - `LinkButton`: use when the control navigates to another page or URL.
 - `ButtonGroup`: use when related buttons sit together in a connected row.
@@ -100,11 +101,11 @@ Same group: `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `Checkbox
 
 ## Parts
 
-1. **Container.** The pressable area: 32 high at default spacing, 24 at compact and 48 at spacious.
-2. **Icon before** (optional). A Font Awesome Free glyph at 16, before the label.
-3. **Label.** Body/default at the medium weight. It says what the action does.
-4. **Icon after** (optional). A Font Awesome Free glyph at 16, after the label.
-5. **Spinner** (loading only). A 16 `Spinner` in the label color that replaces the label and icons while the button is busy.
+1. **Container.** Soft neutral fill (`--ds-background-neutral`) with no border on `default`, transparent on `subtle`, and bold semantic fills on `primary`, `warning`, `danger`, `discovery` and `ai`. Draws `32` high (`--control-md`) at `default` spacing, `24` (`--control-sm`) at `compact`, and `48` (`--control-xl`) at `spacious` inside `FooterActions`. Stretches to its parent's width with `shouldFitContainer`, keeping the label centered.
+2. **Icon before** (optional). A Font Awesome Free glyph at `16` (`--icon-md`), before the label (`ai` always draws its sparkle).
+3. **Label.** Body/default at the medium weight, centered in the container; truncates with an ellipsis when constrained.
+4. **Icon after** (optional). A Font Awesome Free glyph at `16` (`--icon-md`), or `12` (`--icon-sm`) for a trailing chevron.
+5. **Spinner** (loading only). A `16` `Spinner` in the label color that replaces the label and icons while the button is busy.
 
 Most buttons need no icon. Add one only when the glyph has an established meaning, such as `plus` for add.
 

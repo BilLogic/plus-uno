@@ -1395,7 +1395,9 @@
         "StateSteps",
         "KeyboardFocus",
         "AnchorKeyboard",
-        "AnchorHref"
+        "AnchorHref",
+        "Anatomy",
+        "FooterLayouts"
       ],
       "tokens": [
         "--body-default",
@@ -7676,7 +7678,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Custom footer actions in place of the two buttons, aligned right.",
+          "description": "Custom footer content in place of the built-in pair, such as a three-button or leading-text FooterActions layout.",
           "deprecated": null
         },
         {
@@ -7753,7 +7755,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "The cancelling footer button, drawn left of the primary one. Takes `text` (default \"Cancel\"), `onClick`, `appearance` (default `default`), `spacing` and `icon`.",
+          "description": "The secondary footer button, drawn in the left half when a primary button is also given. Takes `text` (default \"Discard\"), `onClick`, `appearance` (default `default`), `spacing` and `icon`.",
           "deprecated": null
         },
         {
@@ -7824,7 +7826,8 @@
         "Rest",
         "Hovered",
         "Pressed",
-        "Focused"
+        "Focused",
+        "FooterLayouts"
       ],
       "tokens": [
         "--blanket-max-height-modal",
