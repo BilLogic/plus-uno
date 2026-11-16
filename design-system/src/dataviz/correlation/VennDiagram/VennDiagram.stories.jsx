@@ -1,96 +1,93 @@
 import React from 'react';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
 import VennDiagram from './VennDiagram';
 
 export default {
     title: 'Data visualizations/Correlation/Venn diagram',
     component: VennDiagram,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## Venn Diagram
+    argTypes: {
+        height: { control: 'number' },
+        data: { control: 'object' },
+        sort: { control: 'boolean', description: 'Sort single-set circles and overlaps from most to least; pass false to keep input order' },
+    },
+};
 
-Shows **overlapping sets** and their relationships.
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
+};
 
-### Overview
-Shows **overlapping sets** and their relationships.
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--card-stack-md)',
+};
 
----
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
+};
 
-### How to Read
-- **Circles** = distinct sets/groups
-- **Overlaps** = shared elements
-- **Size** = relative quantity
+const skillsData = [
+    { sets: ['Math'], value: 5, name: 'Math' },
+    { sets: ['Science'], value: 4, name: 'Science' },
+    { sets: ['English'], value: 6, name: 'English' },
+    { sets: ['Math', 'Science'], value: 3, name: 'Math & Science' },
+    { sets: ['Math', 'English'], value: 2, name: 'Math & English' },
+    { sets: ['Science', 'English'], value: 2, name: 'Science & English' },
+    { sets: ['Math', 'Science', 'English'], value: 1, name: 'All three' },
+];
 
----
+const twoGroupData = [
+    { sets: ['Tutoring'], value: 24, name: 'Tutoring' },
+    { sets: ['Study hall'], value: 18, name: 'Study hall' },
+    { sets: ['Tutoring', 'Study hall'], value: 9, name: 'Both programs' },
+];
 
-### When to Use
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Subject tutoring certifications</Heading>
+                <p style={captionStyle}>
+                    Three overlapping certification sets sorted from largest set to smallest.
+                </p>
+                <VennDiagram data={skillsData} height={380} />
+            </section>
 
-| Use Case | Recommendation |
-|----------|----------------|
-| Set relationships | ✅ Ideal |
-| Skill overlaps | ✅ Good |
-| Group comparisons | ✅ Good |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Skill Overlap** | Math + Science students |
-| **Feature Usage** | Users using multiple features |
-| **Course Enrollment** | Multi-subject students |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Align the venn diagram setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
-
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
-                `
-            }
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Program participation overlap</Heading>
+                <p style={captionStyle}>
+                    Students enrolled in tutoring, study hall or both programs.
+                </p>
+                <VennDiagram data={twoGroupData} height={320} />
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelectorAll('.highcharts-container').length).toBe(2);
+        });
+        for (const label of canvasElement.querySelectorAll('.highcharts-data-labels text, .highcharts-data-labels tspan')) {
+            if (!label.textContent?.trim()) continue;
+            const style = getComputedStyle(label);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(['500', '600']).toContain(style.fontWeight);
         }
-    }
+    },
 };
-
-const skillsData = {
-    data: [
-        { sets: ['Math'], value: 5, name: 'Math Only' },
-        { sets: ['Science'], value: 4, name: 'Science Only' },
-        { sets: ['English'], value: 6, name: 'English Only' },
-        { sets: ['Math', 'Science'], value: 3, name: 'Math & Science' },
-        { sets: ['Math', 'English'], value: 2, name: 'Math & English' },
-        { sets: ['Science', 'English'], value: 2, name: 'Science & English' },
-        { sets: ['Math', 'Science', 'English'], value: 1, name: 'All Three' }
-    ]
-};
-
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Student Subject Enrollment</h3>
-            <VennDiagram {...skillsData} />
-        </section>
-    </div>
-);
-
 
 export const Interactive = {
     args: {
         data: [
-            { sets: ['A'], value: 10 },
-            { sets: ['B'], value: 8 },
-            { sets: ['A', 'B'], value: 4 }
+            { sets: ['A'], value: 10, name: 'Set A' },
+            { sets: ['B'], value: 8, name: 'Set B' },
+            { sets: ['A', 'B'], value: 4, name: 'A & B' },
         ],
-        height: 400
-    }
+        height: 400,
+        sort: true,
+    },
 };

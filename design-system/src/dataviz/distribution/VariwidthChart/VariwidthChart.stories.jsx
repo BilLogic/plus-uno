@@ -1,95 +1,110 @@
 import React from 'react';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
+import { toneByRank } from '@/dataviz/palette';
 import VariwidthChart from './VariwidthChart';
 
 export default {
     title: 'Data visualizations/Distribution/Variwidth chart',
     component: VariwidthChart,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## Variwidth Chart (Variwide)
-
-A column chart where **column width varies** based on a second value.
-
-### Overview
-A column chart where **column width varies** based on a second value.
-
----
-
-### How to Read
-- **Height (Y)** = Primary value (e.g., Score)
-- **Width (Z)** = Secondary value/Weight (e.g., Number of students)
-- **Area** = Total impact (Score * Students)
-
----
-
-### When to Use
-
-| Use Case | Recommendation |
-|----------|----------------|
-| Weighted comparisons | ✅ Ideal |
-| Market share x Growth | ✅ Ideal |
-| Cost x Volume | ✅ Ideal |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Subject Performance** | Avg Score (Height) x Enrollment Count (Width) |
-| **Tutor Ratings** | Rating (Height) x Number of Reviews (Width) |
-| **Feature Usage** | User Count (Height) x Time Spent (Width) |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Align the variwidth chart setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
-
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
-                `
-            }
-        }
-    }
+    argTypes: {
+        height: { control: 'number' },
+        xAxisLabel: { control: 'text' },
+        yAxisLabel: { control: 'text' },
+        data: { control: 'object' },
+        sort: { control: 'boolean', description: 'Sort categories from most to least by value; pass false for ordinal or temporal axes' },
+    },
 };
 
-const performanceData = {
-    data: [
-        { name: 'Math', y: 85, z: 120 },   // High score, many students
-        { name: 'Science', y: 78, z: 90 }, // Mid score, mid students
-        { name: 'Art', y: 92, z: 30 },     // Very high score, few students
-        { name: 'History', y: 70, z: 80 }  // Lower score, mid students
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
+};
+
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--card-stack-md)',
+};
+
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
+};
+
+const subjectsData = [
+    { name: 'Math', y: 85, z: 120 },
+    { name: 'English', y: 82, z: 95 },
+    { name: 'Science', y: 78, z: 80 },
+    { name: 'History', y: 88, z: 45 },
+    { name: 'Art', y: 92, z: 30 },
+];
+
+const gradeBands = toneByRank(
+    [
+        { name: 'Grade 6', y: 76, z: 80 },
+        { name: 'Grade 7', y: 84, z: 110 },
+        { name: 'Grade 8', y: 91, z: 95 },
+        { name: 'Grade 9', y: 79, z: 65 },
     ],
-    xAxisLabel: 'Subject',
-    yAxisLabel: 'Average Score'
-};
-
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Subject Performance (Height) vs Enrollment (Width)</h3>
-            <VariwidthChart {...performanceData} />
-        </section>
-    </div>
+    'blue',
+    (d) => d.y,
 );
 
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Subject score vs. student count</Heading>
+                <p style={captionStyle}>
+                    Column height encodes average score and column width encodes enrollment, sorted from highest score to lowest in the brand color.
+                </p>
+                <VariwidthChart
+                    data={subjectsData}
+                    xAxisLabel="Subject (width = student count)"
+                    yAxisLabel="Average score (%)"
+                    height={360}
+                />
+            </section>
+
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Ordinal grade cohorts</Heading>
+                <p style={captionStyle}>
+                    Grades keep their natural order with {'sort={false}'} while toneByRank puts the darkest step on the highest average.
+                </p>
+                <VariwidthChart
+                    data={gradeBands}
+                    xAxisLabel="Grade (width = enrolled students)"
+                    yAxisLabel="Average score (%)"
+                    height={320}
+                    sort={false}
+                />
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelectorAll('.highcharts-container').length).toBe(2);
+        });
+        for (const label of canvasElement.querySelectorAll('.highcharts-data-labels text, .highcharts-data-labels tspan')) {
+            if (!label.textContent?.trim()) continue;
+            const style = getComputedStyle(label);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(style.fontVariantNumeric).toBe('tabular-nums');
+        }
+    },
+};
 
 export const Interactive = {
     args: {
         data: [
             { name: 'A', y: 50, z: 10 },
             { name: 'B', y: 30, z: 20 },
-            { name: 'C', y: 40, z: 5 }
+            { name: 'C', y: 40, z: 5 },
         ],
-        height: 400
-    }
+        height: 400,
+        sort: true,
+    },
 };

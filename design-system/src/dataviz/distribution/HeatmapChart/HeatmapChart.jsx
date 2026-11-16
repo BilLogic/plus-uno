@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
 import chartTheme, { CHART_SPACING_COMPACT } from '@/dataviz/chartTheme';
+import { CHART_VALUE_CLASS, valueSpan } from '@/dataviz/chartFormat';
 import { HUES, divergingRamp, rampStops, sequentialRamp } from '@/dataviz/palette';
 import { inkFor, resolveColor, textInks, useColorModeKey } from '@/dataviz/colorMode';
 
@@ -37,87 +38,78 @@ const HeatmapChart = ({
     showDataLabels = true,
     /** Gap between cells (0–1). Larger = more room for breath. */
     pointPadding = 0,
-    /** When false, the heatmap draws without an entrance. */
-    enableAnimation = true
 }) => {
     const mode = useColorModeKey();
     const options = useMemo(() => {
         const ramp = diverging ? divergingRamp(...diverging) : sequentialRamp(hue);
         const inks = textInks();
         return {
-        ...chartTheme,
-        chart: {
-            ...chartTheme.chart,
-            type: 'heatmap',
-            height: height,
-            ...(compactSpacing && { spacing: [CHART_SPACING_COMPACT, CHART_SPACING_COMPACT, CHART_SPACING_COMPACT, CHART_SPACING_COMPACT] })
-        },
-        title: { text: null },
-        xAxis: {
-            ...chartTheme.xAxis,
-            categories: xCategories
-        },
-        yAxis: {
-            ...chartTheme.yAxis,
-            categories: yCategories,
-            title: null,
-            reversed: true
-        },
-        colorAxis: {
-            min,
-            max,
-            // The ramp spans the data, not the rounded ticks, so the biggest value takes the strongest tone.
-            startOnTick: false,
-            endOnTick: false,
-            stops: rampStops(ramp, resolveColor)
-        },
-        plotOptions: {
-            heatmap: {
-                pointPadding: pointPadding,
-                // The entrance timing comes from PlusChart's motion model; this only opts out.
-                ...(!enableAnimation && { animation: false })
-            }
-        },
-        legend: {
-            ...chartTheme.legend,
-            enabled: showLegend,
-            align: 'right',
-            layout: 'vertical',
-            margin: 0,
-            verticalAlign: 'top',
-            y: 25,
-            symbolHeight: 280,
-            ...(hideLegendNavigation && { navigation: { enabled: false } })
-        },
-        tooltip: {
-            ...chartTheme.tooltip,
-            formatter: function () {
-                return `<b>${this.series.xAxis.categories[this.point.x]}</b><br/>
-                        <b>${this.series.yAxis.categories[this.point.y]}</b>: ${this.point.value.toFixed(2)}`;
-            }
-        },
-        series: [{
-            name: 'Heatmap',
-            borderWidth: 0,
-            data: data,
-            dataLabels: {
-                enabled: showDataLabels,
-                // A label sits on its cell, so it takes whichever text ink reads on that cell.
-                formatter: function () {
-                    const ink = inkFor(this.point.color, inks);
-                    return `<span style="color: ${ink}">${this.point.value}</span>`;
-                },
-                style: {
-                    textOutline: 'none'
+            ...chartTheme,
+            chart: {
+                ...chartTheme.chart,
+                type: 'heatmap',
+                height: height,
+                ...(compactSpacing && { spacing: [CHART_SPACING_COMPACT, CHART_SPACING_COMPACT, CHART_SPACING_COMPACT, CHART_SPACING_COMPACT] })
+            },
+            title: { text: null },
+            xAxis: {
+                ...chartTheme.xAxis,
+                categories: xCategories
+            },
+            yAxis: {
+                ...chartTheme.yAxis,
+                categories: yCategories,
+                title: null,
+                reversed: true
+            },
+            colorAxis: {
+                min,
+                max,
+                // The ramp spans the data, not the rounded ticks, so the biggest value takes the strongest tone.
+                startOnTick: false,
+                endOnTick: false,
+                stops: rampStops(ramp, resolveColor)
+            },
+            plotOptions: {
+                heatmap: {
+                    pointPadding: pointPadding,
                 }
-            }
-        }]
-    };
+            },
+            legend: {
+                ...chartTheme.legend,
+                enabled: showLegend,
+                align: 'right',
+                layout: 'vertical',
+                margin: 0,
+                verticalAlign: 'middle',
+                ...(hideLegendNavigation && { navigation: { enabled: false } })
+            },
+            tooltip: {
+                ...chartTheme.tooltip,
+                formatter: function () {
+                    const xLabel = this.series.xAxis.categories[this.point.x];
+                    const yLabel = this.series.yAxis.categories[this.point.y];
+                    return `${valueSpan(xLabel)}<br/>${yLabel}: ${valueSpan(this.point.value.toFixed(2))}`;
+                }
+            },
+            series: [{
+                name: 'Heatmap',
+                borderWidth: 0,
+                data: data,
+                dataLabels: {
+                    enabled: showDataLabels,
+                    // A label sits on its cell, so it takes whichever text ink reads on that cell.
+                    formatter: function () {
+                        const ink = inkFor(this.point.color, inks);
+                        return `<span class="${CHART_VALUE_CLASS}" style="color: ${ink}">${this.point.value}</span>`;
+                    },
+                }
+            }]
+        };
     }, [
         compactSpacing,
         data,
         diverging,
-        enableAnimation,
         height,
         hideLegendNavigation,
         hue,
@@ -165,8 +157,6 @@ HeatmapChart.propTypes = {
     showDataLabels: PropTypes.bool,
     /** Gap between cells (0–1) for visual breathing room */
     pointPadding: PropTypes.number,
-    /** When false, the heatmap draws without an entrance */
-    enableAnimation: PropTypes.bool
 };
 
 export default HeatmapChart;

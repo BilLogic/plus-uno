@@ -1,106 +1,95 @@
 import React from 'react';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
 import PackedBubbleChart from './PackedBubbleChart';
 
 export default {
     title: 'Data visualizations/Correlation/Packed bubble chart',
     component: PackedBubbleChart,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## Packed Bubble Chart
-
-Shows **grouped bubbles** where size represents quantity and color represents category.
-
-### Overview
-Shows **grouped bubbles** where size represents quantity and color represents category.
-
----
-
-### How to Read
-- **Bubble size** = value magnitude
-- **Bubble color** = category group
-- **Clustering** = related items grouped together
-
----
-
-### When to Use
-
-| Use Case | Recommendation |
-|----------|----------------|
-| Grouped comparisons | ✅ Ideal |
-| Category clusters | ✅ Ideal |
-| Market share by segment | ✅ Good |
-| Precise comparisons | ❌ Use Bar Chart |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Subject Enrollment** | Students by subject area |
-| **Tutor Expertise** | Tutors by specialty |
-| **Content Library** | Lessons by category |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Align the packed bubble chart setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
-
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
-                `
-            }
-        }
-    }
+    argTypes: {
+        height: { control: 'number' },
+        splitSeries: { control: 'boolean' },
+        data: { control: 'object' },
+        sort: { control: 'boolean', description: 'Sort groups by total value and bubbles by value; pass false to keep input order' },
+    },
 };
 
-const enrollmentData = {
-    data: [
-        {
-            name: 'CMU',
-            data: [
-                { name: 'Lincoln Middle', value: 250 },
-                { name: 'Roosevelt K-8', value: 180 },
-                { name: 'Riverside Academy', value: 120 }
-            ]
-        },
-        {
-            name: 'Pitt',
-            data: [
-                { name: 'North High', value: 200 },
-                { name: 'South High', value: 175 },
-                { name: 'Oakwood', value: 220 }
-            ]
-        },
-        {
-            name: 'Duquesne',
-            data: [
-                { name: 'Jefferson Elementary', value: 300 },
-                { name: 'Washington Middle', value: 150 },
-                { name: 'Eastside', value: 80 }
-            ]
-        }
-    ]
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
 };
 
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Tutors by University and School Site</h3>
-            <PackedBubbleChart {...enrollmentData} />
-        </section>
-    </div>
-);
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--card-stack-md)',
+};
 
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
+};
+
+const schoolsData = [
+    {
+        name: 'CMU',
+        data: [
+            { name: 'Lincoln Middle', value: 250 },
+            { name: 'Washington High', value: 180 },
+            { name: 'Jefferson Elem', value: 120 },
+        ],
+    },
+    {
+        name: 'Pitt',
+        data: [
+            { name: 'Roosevelt High', value: 200 },
+            { name: 'Adams Middle', value: 150 },
+            { name: 'Monroe Elem', value: 90 },
+        ],
+    },
+    {
+        name: 'Ohio State',
+        data: [
+            { name: 'Kennedy High', value: 300 },
+            { name: 'Madison Middle', value: 220 },
+        ],
+    },
+];
+
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Students by university and school (split clusters)</Heading>
+                <p style={captionStyle}>
+                    Groups and bubbles sort from largest total to smallest so the biggest partner cluster leads.
+                </p>
+                <PackedBubbleChart data={schoolsData} height={450} splitSeries={true} />
+            </section>
+
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Combined view</Heading>
+                <p style={captionStyle}>
+                    Packs every school into one shared cluster while keeping university colors.
+                </p>
+                <PackedBubbleChart data={schoolsData} height={400} splitSeries={false} />
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelectorAll('.highcharts-container').length).toBe(2);
+        });
+        for (const label of canvasElement.querySelectorAll('.highcharts-data-labels text, .highcharts-data-labels tspan')) {
+            if (!label.textContent?.trim()) continue;
+            const style = getComputedStyle(label);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(['500', '600']).toContain(style.fontWeight);
+        }
+    },
+};
 
 export const Interactive = {
     args: {
@@ -109,18 +98,19 @@ export const Interactive = {
                 name: 'Group A',
                 data: [
                     { name: 'Item 1', value: 100 },
-                    { name: 'Item 2', value: 80 }
-                ]
+                    { name: 'Item 2', value: 80 },
+                ],
             },
             {
                 name: 'Group B',
                 data: [
                     { name: 'Item 3', value: 120 },
-                    { name: 'Item 4', value: 60 }
-                ]
-            }
+                    { name: 'Item 4', value: 60 },
+                ],
+            },
         ],
         height: 500,
-        splitSeries: true
-    }
+        splitSeries: true,
+        sort: true,
+    },
 };

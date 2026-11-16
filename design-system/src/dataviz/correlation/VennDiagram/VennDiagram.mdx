@@ -62,8 +62,10 @@ items, use `NetworkGraph`.
 ## Data shape
 
 `data` is an array of `{ sets, value, name }` (`sets` and `value` required):
-list each single set, then each overlap. A single set's `value` is the full
-circle including overlaps, not the exclusive portion. `height` defaults to 400.
+list each single set, then each overlap. Single-set circles and overlaps sort
+from largest `value` to smallest by default; pass `sort={false}` to keep input
+order. A single set's `value` is the full circle including overlaps, not the
+exclusive portion. `height` defaults to 400.
 
 ```jsx
 <VennDiagram
@@ -81,7 +83,7 @@ circle including overlaps, not the exclusive portion. `height` defaults to 400.
 
 ## Color and accessibility
 
-- **Automatic set colors.** Each single-set circle takes the next slot in the [categorical order](?path=/docs/data-visualizations-color--docs) starting at slot 1; overlaps blend where circles cross.
+- **Automatic set colors.** A single set uses `--chart-brand`; two or more single-set circles follow the [categorical order](?path=/docs/data-visualizations-color--docs) starting at slot 1, and overlaps blend where circles cross.
 - **Label every region.** Pass `name` on every entry so labels and tooltips identify each circle and intersection without hue. Because area is judged roughly, include exact counts in `name` or surrounding copy when they matter.
 - **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type, per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
 - **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
