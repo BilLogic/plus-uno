@@ -234,7 +234,7 @@ A `subtle`, `link` or `danger` button hugs the left edge only when it is the fir
             </FooterActions>
         </div>
     }
-    doCaption="A subtle first child hugs the left edge while the filled pair sits in tracks 3 and 4."
+    doCaption="A subtle first child hugs the left edge while the filled pair sits in the rightmost two tracks."
     dontExample={
         <div style={{ inlineSize: '100%' }}>
             <FooterActions>
@@ -260,7 +260,7 @@ Put the safer alternative in the left half and the `danger` action rightmost; a 
             </FooterActions>
         </div>
     }
-    doCaption="Safer alternative on the left and danger rightmost, splitting 50/50."
+    doCaption="Safer alternative on the left and danger rightmost, splitting equally across both halves."
     dontExample={
         <div style={{ inlineSize: '100%' }}>
             <FooterActions>
@@ -285,14 +285,14 @@ Put the safer alternative in the left half and the `danger` action rightmost; a 
             </FooterActions>
         </div>
     }
-    doCaption="Real verbs split 50/50 across the footer."
+    doCaption="Real verbs split equally across both halves of the footer."
     dontExample={
         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--inline-md)', inlineSize: '100%' }}>
             <Button text="Cancel" />
             <Button appearance="primary" text="Save changes" />
         </div>
     }
-    dontCaption="Hugging 32-high buttons and a Cancel label that duplicates the corner close button."
+    dontCaption="Default-height hugging buttons and a Cancel label that duplicates the corner close button."
 />
 
 ### Split Back and Next across the footer in multi-step flows.
@@ -308,7 +308,7 @@ Keep `Back` in the `default` appearance so the step pair splits `50/50` across b
             </FooterActions>
         </div>
     }
-    doCaption="Back and Next split 50/50 across tracks 1–2 and 3–4."
+    doCaption="Back in the left half and Next in the right half, splitting the footer equally."
     dontExample={
         <div style={{ inlineSize: '100%' }}>
             <FooterActions>
@@ -317,7 +317,7 @@ Keep `Back` in the `default` appearance so the step pair splits `50/50` across b
             </FooterActions>
         </div>
     }
-    dontCaption="Making Back subtle turns it into a leading text action instead of a 50/50 step pair."
+    dontCaption="Making Back subtle turns it into a leading text action instead of an equal step pair."
 />
 
 </div>

@@ -59,29 +59,29 @@ Don't: Two primary buttons competing in the same footer.
 
 A `subtle`, `link` or `danger` button hugs the left edge only when it is the first child of two or more or passed via `leadingAction`.
 
-Do: A subtle first child hugs the left edge while the filled pair sits in tracks 3 and 4.
+Do: A subtle first child hugs the left edge while the filled pair sits in the rightmost two tracks.
 Don't: A subtle child placed second takes a filled track instead of hugging the left edge.
 
 ### Pair a destructive confirmation with a safer alternative. {#pair-a-destructive-confirmation-with-a-safer-alternative}
 
 Put the safer alternative in the left half and the `danger` action rightmost; a `danger` button placed first of two is treated as a leading text action instead.
 
-Do: Safer alternative on the left and danger rightmost, splitting 50/50.
+Do: Safer alternative on the left and danger rightmost, splitting equally across both halves.
 Don't: Danger placed first of two becomes a leading text action instead of the primary confirmation.
 
 ### Omit Cancel when the corner close button dismisses. {#omit-cancel-when-the-corner-close-button-dismisses}
 
 `Modal`, `Panel` and the focused view already provide a corner close control, so the footer names the real secondary outcome (`Discard`, `Keep editing`, `Archive instead`) rather than a generic Cancel.
 
-Do: Real verbs split 50/50 across the footer.
-Don't: Hugging 32-high buttons and a Cancel label that duplicates the corner close button.
+Do: Real verbs split equally across both halves of the footer.
+Don't: Default-height hugging buttons and a Cancel label that duplicates the corner close button.
 
 ### Split Back and Next across the footer in multi-step flows. {#split-back-and-next-across-the-footer-in-multi-step-flows}
 
 Keep `Back` in the `default` appearance so the step pair splits `50/50` across both halves rather than collapsing `Back` into a leading text button.
 
-Do: Back and Next split 50/50 across tracks 1–2 and 3–4.
-Don't: Making Back subtle turns it into a leading text action instead of a 50/50 step pair.
+Do: Back in the left half and Next in the right half, splitting the footer equally.
+Don't: Making Back subtle turns it into a leading text action instead of an equal step pair.
 
 ## Accessibility
 
