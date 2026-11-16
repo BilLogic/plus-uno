@@ -82,9 +82,9 @@ const STATIC = {
 };
 
 /** All `--token` names defined across the SCSS token files (existence truth). */
-function collectScssTokens() {
+export function collectScssTokens({ root } = {}) {
   const set = new Set();
-  for (const source of tokenSources()) {
+  for (const source of tokenSources(root ? { root } : undefined)) {
     for (const [, name] of source.text.matchAll(tokenDeclarationPattern())) {
       set.add(name);
     }

@@ -3,10 +3,10 @@
   "figmaFileKey": "zAecJNRdvJzAUOcjV32tRX",
   "figmaFileName": "Design System - BS4 Foundation (Component LIbrary)",
   "capturedAt": "2026-11-16",
-  "totalVariables": 1650,
+  "totalVariables": 1653,
   "byType": {
     "COLOR": 984,
-    "FLOAT": 651,
+    "FLOAT": 654,
     "BOOLEAN": 10,
     "STRING": 5
   },
@@ -2683,10 +2683,16 @@
         "Value"
       ],
       "variables": [
+        "opacity/chart/fill",
+        "opacity/chart/inactive",
+        "opacity/chart/overlap",
         "opacity/disabled",
         "opacity/loading"
       ],
       "codeSyntax": {
+        "opacity/chart/fill": "var(--ds-opacity-chart-fill)",
+        "opacity/chart/inactive": "var(--ds-opacity-chart-inactive)",
+        "opacity/chart/overlap": "var(--ds-opacity-chart-overlap)",
         "opacity/disabled": "var(--ds-opacity-disabled)",
         "opacity/loading": "var(--ds-opacity-loading)"
       }

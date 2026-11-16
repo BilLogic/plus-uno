@@ -103,6 +103,7 @@
     "check:bot-skills": "node scripts/check-bot-skills.mjs",
     "check:token-generation": "node scripts/check-token-generation.mjs",
     "check:token-intent": "node scripts/check-token-intent.mjs",
+    "check:token-naming": "node scripts/check-token-naming.mjs",
     "check:color-system": "node scripts/check-color-system.mjs",
     "check:color-tokens": "node scripts/generate-color-tokens.mjs --check",
     "check:design-tokens": "node scripts/generate-design-tokens.mjs --check",

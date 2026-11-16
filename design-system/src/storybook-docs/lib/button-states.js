@@ -42,8 +42,8 @@ export const expectPressed = async (host, element, appearance, name = appearance
     await expect(readGround(element, ':active'), `${name} pressed`).toBe(tokenColor(host, pressed));
 };
 
-/** Keyboard focus draws the 2px ring 2px off the edge and leaves the fill alone. */
-export const expectFocusRing = async (host, element, name = 'button') => {
+/** Keyboard focus draws the 2px ring 2px off the edge (`offset` -2 for a ring inside it) and leaves the fill alone. */
+export const expectFocusRing = async (host, element, name = 'button', offset = 2) => {
     element.style.transition = 'none';
     const rest = getComputedStyle(element).backgroundColor;
     element.focus({ focusVisible: true });
@@ -51,7 +51,7 @@ export const expectFocusRing = async (host, element, name = 'button') => {
     const style = getComputedStyle(element);
     await waitFor(() => expect(style.outlineStyle).toBe('solid'));
     await expect(px(style.outlineWidth), `${name} ring width`).toBe(2);
-    await expect(px(style.outlineOffset), `${name} ring gap`).toBe(2);
+    await expect(px(style.outlineOffset), `${name} ring gap`).toBe(offset);
     await expect(style.outlineColor, `${name} ring color`).toBe(tokenColor(host, '--ds-border-focused'));
     await expect(style.backgroundColor, `${name} no focus fill`).toBe(rest);
     element.blur();

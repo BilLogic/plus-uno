@@ -216,11 +216,12 @@ test('Button: keyboard focus is a 2px focus ring 2px off the edge, with no fill'
 // MenuGroup's `plus-menu-item`, shared with every other menu in the system.
 const MENU_GROUP = 'components/forms-and-inputs/_internal/MenuGroup.scss';
 
-test('Menu item: neutral hovered and pressed, selected neutral ink, focus ring only', () => {
+test('Menu item: neutral hovered and pressed, selected neutral ink, focus ring inside only', () => {
   expectRule(MENU_GROUP, '.plus-menu-item:hover', { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
   expectRule(MENU_GROUP, '.plus-menu-item:active', { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
   expectRule(MENU_GROUP, '.plus-menu-item[aria-current=true]', { 'background-color': layer('--ds-background-selected') });
-  expectRule(MENU_GROUP, '.plus-menu-item:focus-visible', DS_RING_OUTSIDE);
+  // Inside the row: a row spans the scrolling menu's full width, so a ring outside it is clipped.
+  expectRule(MENU_GROUP, '.plus-menu-item:focus-visible', DS_RING_INSIDE);
   expectNoFill(MENU_GROUP, '.plus-menu-item:focus-visible');
 });
 
