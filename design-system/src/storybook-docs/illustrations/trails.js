@@ -15,6 +15,13 @@ export const pointsOf = (arrow) => (Array.isArray(arrow) ? arrow : arrow.points)
 /** An arrow's landing rectangle, if it declares one. */
 export const ghostOf = (arrow) => (Array.isArray(arrow) ? undefined : arrow.ghost);
 
+/** Indices of arrows that lack a landing ghost rectangle. */
+export const ghostless = (arrows = []) =>
+  arrows.flatMap((arrow, i) => {
+    const g = ghostOf(arrow);
+    return g && typeof g.x === 'number' && typeof g.y === 'number' && g.w > 0 && g.h > 0 ? [] : [i];
+  });
+
 /**
  * The arrow for a thing that lands in `rect` after starting `(dx, dy)` away
  * from it: centre to centre. `lane` moves the line sideways (an `x`) or up and

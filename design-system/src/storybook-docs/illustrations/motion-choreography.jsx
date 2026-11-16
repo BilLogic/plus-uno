@@ -153,7 +153,12 @@ const retraceScene = ({ id, title, caption, away }) => ({
   viewBox: VIEW,
   initial: { g: 0, out: 0 },
   landing: away ? { g: 1, out: 1 } : { g: 0, out: 0 },
-  arrows: away ? [[[134, 30], [116, 54]], [[116, 54], [66, 84]]] : [[[134, 30], [116, 54]]],
+  arrows: away
+    ? [
+        { points: [[134, 30], [116, 54]], ghost: POPUP },
+        travel({ x: POPUP.x - 50, y: POPUP.y + 30, w: POPUP.w, h: POPUP.h }, 50, -30),
+      ]
+    : [{ points: [[134, 30], [116, 54]], ghost: POPUP }],
   draw: ({ g, out }) => (
     <>
       <Frame x={8} y={6} w={144} h={88} />
@@ -363,7 +368,9 @@ const causeScene = ({ id, title, caption, pushes }) => ({
   initial: { sel: 0, flag: 0, shift: 0 },
   landing: { sel: 1, flag: pushes ? 0 : 1, shift: pushes ? 1 : 0 },
   // A push moves the rows under the hand as one group: one path, one outline where the group lands.
-  arrows: pushes ? [travel({ x: 16, y: 44, w: 128, h: 42 }, 0, -14)] : [[[150, 20], [128, 20]]],
+  arrows: pushes
+    ? [travel({ x: 16, y: 44, w: 128, h: 42 }, 0, -14)]
+    : [travel({ x: 92, y: 10, w: 56, h: 20 }, 24, 0)],
   draw: ({ sel, flag, shift }) => (
     <>
       <Frame x={8} y={6} w={144} h={88} chrome={false} />
@@ -420,7 +427,7 @@ const bpScene = ({ id, title, caption, lags }) => ({
   viewBox: '0 0 176 112',
   initial: { w: 1280, shown: 1280, blend: 1, stepsSeen: [1280], waited: 0 },
   landing: { w: 768, shown: 768, blend: 1 },
-  arrows: [[[168, 56], [104, 56]]],
+  arrows: [{ points: [[168, 56], [104, 56]], ghost: { x: 8, y: 6, w: 96, h: 100 } }],
   draw: ({ w, shown, blend }) => (
     <>
       {/* The window follows the hand; the layout inside is the breakpoint's. */}

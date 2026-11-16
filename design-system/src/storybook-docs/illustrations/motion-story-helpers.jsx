@@ -2,7 +2,7 @@ import React from 'react';
 import { expect, waitFor } from 'storybook/test';
 
 import { MotionDemo } from './motion.jsx';
-import { crossings } from './trails.js';
+import { crossings, ghostless } from './trails.js';
 
 /**
  * The play tests every motion page's stories share: wait for a demo's first
@@ -12,7 +12,7 @@ import { crossings } from './trails.js';
  */
 
 const PAINTED = ['fill', 'stroke'];
-const TOKEN_OR_NONE = /^(?:var\(--ds-[\w-]+\)|none)$/;
+const TOKEN_OR_NONE = /^(?:var\(--(?:ds-|chart-)[\w-]+\)|none)$/;
 const everyPaintIsAToken = (root) =>
   [...root.querySelectorAll('svg *')].every((el) =>
     PAINTED.every((attr) => !el.hasAttribute(attr) || TOKEN_OR_NONE.test(el.getAttribute(attr))),
@@ -35,15 +35,19 @@ export const playsToItsLanding = (demo) => async ({ canvasElement }) => {
   await expect(everyPaintIsAToken(root)).toBe(true);
   // Words appear only on a real-fidelity subject; the captions sit outside the drawings.
   await expect(root.querySelectorAll('svg text:not([data-fidelity="real"] text)').length).toBe(0);
-  // Paths that move together never cross; only a scene that says so is the broken version.
+  // Paths that move together never cross unless the scene is the broken version,
+  // and every trail carries a dashed landing ghost.
   for (const scene of demo.scenes) {
     await expect(crossings(scene.arrows).length > 0).toBe(Boolean(scene.crossing));
+    await expect(ghostless(scene.arrows)).toEqual([]);
   }
   if (demo.scenes.some((s) => s.arrows?.length)) {
     await waitFor(() => expect(root.dataset.phase).toBe('arrows'), PASS);
     for (const scene of demo.scenes) {
       const tile = canvasElement.querySelector(`[data-tile="${scene.id}"]`);
-      await expect(tile.querySelectorAll('[data-trail]').length).toBe(scene.arrows?.length ?? 0);
+      const count = scene.arrows?.length ?? 0;
+      await expect(tile.querySelectorAll('[data-trail]').length).toBe(count);
+      await expect(tile.querySelectorAll('[data-trail] [data-ghost]').length).toBe(count);
     }
   }
   await waitFor(() => expect(root.dataset.phase).toBe('settled'), PASS);
@@ -55,6 +59,9 @@ export const stillAtItsLanding = (demo) => async ({ canvasElement }) => {
   const root = canvasElement.querySelector('[data-motion-demo]');
   await waitFor(() => expect(root.dataset.phase).toBe('still'), PASS);
   landed(demo, canvasElement);
+  for (const scene of demo.scenes) {
+    await expect(ghostless(scene.arrows)).toEqual([]);
+  }
   await expect(everyPaintIsAToken(root)).toBe(true);
 };
 

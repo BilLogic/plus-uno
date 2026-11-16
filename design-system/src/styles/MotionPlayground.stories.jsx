@@ -8,8 +8,8 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { MotionDemo, springFor } from '@/storybook-docs/illustrations/motion.jsx';
-import { reducedStory } from '@/storybook-docs/illustrations/motion-story-helpers.jsx';
+import { springFor } from '@/storybook-docs/illustrations/motion.jsx';
+import { reducedStory, story } from '@/storybook-docs/illustrations/motion-story-helpers.jsx';
 import { DragPastLimit, PLAYGROUND_DEMOS, SpringPlayground, limitWidth, playgroundConfig } from '@/storybook-docs/illustrations/motion-playground.jsx';
 
 export default {
@@ -85,38 +85,13 @@ export const SpeedSlowsThePlayback = {
 };
 
 /** The two ends of the dial, as a Popup opening. */
-export const StiffAndSoft = {
-  render: () => <MotionDemo {...PLAYGROUND_DEMOS.extremes} reduced={false} />,
-  play: async ({ canvasElement }) => {
-    const root = canvasElement.querySelector('[data-motion-demo]');
-    await waitFor(() => expect(root.dataset.phase).toBe('settled'), PASS);
-    for (const scene of PLAYGROUND_DEMOS.extremes.scenes) {
-      await expect(JSON.parse(canvasElement.querySelector(`[data-tile="${scene.id}"]`).dataset.state)).toMatchObject(scene.landing);
-    }
-  },
-};
+export const StiffAndSoft = story(PLAYGROUND_DEMOS.extremes);
 
 /** The blocked Save shakes once and comes to rest. */
-export const TheShake = {
-  render: () => <MotionDemo {...PLAYGROUND_DEMOS.shake} reduced={false} />,
-  play: async ({ canvasElement }) => {
-    const root = canvasElement.querySelector('[data-motion-demo]');
-    await waitFor(() => expect(root.dataset.phase).toBe('settled'), PASS);
-    await expect(JSON.parse(canvasElement.querySelector('[data-tile="shake"]').dataset.state)).toMatchObject({ x: 0, shook: 1 });
-  },
-};
+export const TheShake = story(PLAYGROUND_DEMOS.shake);
 
 /** The three Productive speeds, each on its own job. */
-export const ThreeSpeeds = {
-  render: () => <MotionDemo {...PLAYGROUND_DEMOS.speeds} reduced={false} />,
-  play: async ({ canvasElement }) => {
-    const root = canvasElement.querySelector('[data-motion-demo]');
-    await waitFor(() => expect(root.dataset.phase).toBe('settled'), PASS);
-    for (const scene of PLAYGROUND_DEMOS.speeds.scenes) {
-      await expect(JSON.parse(canvasElement.querySelector(`[data-tile="${scene.id}"]`).dataset.state)).toMatchObject(scene.landing);
-    }
-  },
-};
+export const ThreeSpeeds = story(PLAYGROUND_DEMOS.speeds);
 
 /** Under reduced motion each demo shows its landing, still: the same end frame as the animated pass. */
 export const StiffAndSoftReduced = reducedStory(PLAYGROUND_DEMOS.extremes);

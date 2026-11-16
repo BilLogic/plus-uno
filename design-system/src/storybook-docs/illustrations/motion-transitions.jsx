@@ -51,8 +51,8 @@ const ListLayer = ({ crumbs }) => (
 
 /** Where the row goes: from its corners to the record's, the same two paths before either tile moves. */
 const GROW_ARROWS = [
-  [[ROW.x + 2, ROW.y + 2], [PAGE.x + 4, PAGE.y + 4]],
-  [[ROW.x + ROW.w - 2, ROW.y + ROW.h - 2], [PAGE.x + PAGE.w - 4, PAGE.y + PAGE.h - 4]],
+  { points: [[ROW.x + 2, ROW.y + 2], [PAGE.x + 4, PAGE.y + 4]], ghost: PAGE },
+  { points: [[ROW.x + ROW.w - 2, ROW.y + ROW.h - 2], [PAGE.x + PAGE.w - 4, PAGE.y + PAGE.h - 4]], ghost: PAGE },
 ];
 
 /** The record: its Breadcrumb one level longer, a heading and two cards. */
@@ -78,7 +78,7 @@ const drill = ({ id, title, caption, crumbs = 0, mode = 'grow', spatial = 'spati
   viewBox: VIEW,
   initial: mode === 'slide' ? { x: 1, l: 1, c: 1 } : { g: 0, l: 1, c: 0 },
   landing: mode === 'slide' ? { x: 0, l: 1, c: 1 } : { g: 1, l: 0, c: 1 },
-  arrows: mode === 'slide' ? [[[148, 56], [101, 56]]] : GROW_ARROWS,
+  arrows: mode === 'slide' ? [{ points: [[151, 56], [101.5, 56]], ghost: PAGE }] : GROW_ARROWS,
   draw: ({ g = 0, l, c, x = 0 }) => (
     <>
       <Screen x={8} y={6} w={144} h={88} header={false}>
@@ -153,7 +153,7 @@ export const climbOneScene = ({
   viewBox: VIEW,
   initial: { g: 1, l: 0, c: 1 },
   landing: { g: 0, l: 1, c: 0 },
-  arrows: [[[101, 52], [101, 69]]],
+  arrows: [travel(ROW, 0, -13.5)],
   draw: ({ g, l, c }) => drill({ id: 'x', crumbs: 1 }).draw({ g, l, c }),
   play: async (ctx) => {
     await ctx.hold(1);
@@ -222,7 +222,7 @@ const focused = ({ id, title, caption, slide, spatial = 'spatial.default', appea
   viewBox: VIEW,
   initial: slide ? { fr: 1, x: 1 } : { fr: 1, f: 0 },
   landing: slide ? { fr: 0, x: 0 } : { fr: 0, f: 1 },
-  arrows: [slide ? [[148, 50], [80, 50]] : [[128, 34], [80, 50]]],
+  arrows: slide ? [{ points: [[152, 50], [80, 50]], ghost: { x: 8, y: 6, w: 144, h: 88 } }] : [],
   draw: ({ fr, f = 0, x = 0 }) => (
     <>
       {/* The window stays; only what is inside it fades, so the tile is never empty. */}
@@ -274,18 +274,18 @@ const goTo = ({ id, title, caption, slide, spatial = 'spatial.fast', appearance 
   landing: slide ? { hl: 1, p: 1 } : { hl: 1, o: 0, n: 1 },
   // The highlight tracks the place (exempt from the shared axis); when the pages slide, both travel left together.
   arrows: [
-    travel({ x: 12, y: SIDEBAR_ROWS[0], w: 36, h: 16 }, 0, SIDEBAR_ROWS[1] - SIDEBAR_ROWS[0]),
+    travel({ x: 12, y: SIDEBAR_ROWS[1], w: 36, h: 16 }, 0, SIDEBAR_ROWS[0] - SIDEBAR_ROWS[1]),
     ...(slide
       ? [
-          { points: [[101, 40], [62, 40]] },
-          { points: [[148, 72], [101, 72]], ghost: { x: 60, y: 26, w: 83, h: 60 } },
+          { points: [[101.5, 40], [3, 40]], ghost: { x: -79, y: 26, w: 83, h: 60 } },
+          { points: [[156, 72], [101.5, 72]], ghost: { x: 60, y: 26, w: 83, h: 60 } },
         ]
       : []),
   ],
   draw: ({ hl, o = 1, n = 0, p = 0 }) => (
     <>
       <Screen x={8} y={6} w={144} h={88} header={false} />
-      <Rect x={12} y={mix(SIDEBAR_ROWS[1], SIDEBAR_ROWS[0], hl)} w={36} h={16} stroke={PAINT.accent} corner="sidebarRow" />
+      <Rect x={12} y={mix(SIDEBAR_ROWS[0], SIDEBAR_ROWS[1], hl)} w={36} h={16} stroke={PAINT.accent} corner="sidebarRow" />
       <Clip {...PAGE}>
         <Moved x={-p * PAGE.w} opacity={slide ? 1 : o}>
           <ListLayer crumbs={0} />
@@ -330,8 +330,8 @@ const switchViews = ({ id, title, caption, fade, spatial, appearance = 'appearan
   // The underline tracks the tab (exempt from the shared axis); the old and new content both travel left.
   arrows: [
     travel({ x: 60 + TAB_W, y: 46, w: TAB_W, h: 4 }, -TAB_W, 0),
-    { points: [[110, 60], [66, 60]] },
-    { points: [[140, 80], [101, 80]], ghost: { x: 60, y: 54, w: 83, h: 36 } },
+    { points: [[101.5, 62], [3, 62]], ghost: { x: -79, y: 54, w: 83, h: 34 } },
+    { points: [[156, 78], [101.5, 78]], ghost: { x: 60, y: 54, w: 83, h: 34 } },
   ],
   draw: ({ i, p, o = 0 }) => (
     <>
@@ -413,6 +413,8 @@ const step = ({ id, title, caption, side, axis = 'x', spatial = 'spatial.default
   // Across the top the body is 128 × 36 under the tracker; down a side it is 80 wide beside the list.
   const box = side ? { x: 60, y: 22, w: 84, h: 52 } : { x: 16, y: 46, w: 128, h: 30 };
   const along = axis === 'x' ? box.w + 12 : box.h + 12;
+  const cx = box.x + box.w / 2;
+  const cy = box.y + box.h / 2;
   return {
     id,
     title,
@@ -420,16 +422,16 @@ const step = ({ id, title, caption, side, axis = 'x', spatial = 'spatial.default
     viewBox: VIEW,
     initial: { cur: 0, p: 0 },
     landing: { cur: 1, p: 1 },
-    // The step you leave and the step you arrive at travel the same way, in two lanes.
+    // The step you leave and the step you arrive at travel the same way, in two lanes, each with its landing ghost.
     arrows:
       axis === 'x'
         ? [
-            { points: [[box.x + box.w / 2, box.y + box.h * 0.3], [box.x + 6, box.y + box.h * 0.3]] },
-            { points: [[box.x + box.w - 6, box.y + box.h * 0.7], [box.x + box.w / 2, box.y + box.h * 0.7]], ghost: box },
+            { points: [[cx, box.y + box.h * 0.3], [3, box.y + box.h * 0.3]], ghost: { x: -box.w + 4, y: box.y, w: box.w, h: box.h } },
+            { points: [[157, box.y + box.h * 0.7], [cx, box.y + box.h * 0.7]], ghost: box },
           ]
         : [
-            { points: [[box.x + box.w * 0.3, box.y + box.h / 2], [box.x + box.w * 0.3, box.y + 6]] },
-            { points: [[box.x + box.w * 0.7, box.y + box.h - 4], [box.x + box.w * 0.7, box.y + box.h / 2]], ghost: box },
+            { points: [[box.x + box.w * 0.3, cy], [box.x + box.w * 0.3, 3]], ghost: { x: box.x, y: -box.h + 4, w: box.w, h: box.h } },
+            { points: [[box.x + box.w * 0.7, 97], [box.x + box.w * 0.7, cy]], ghost: box },
           ],
     draw: ({ cur, p }) => {
       const off = (t) => (axis === 'x' ? { x: t * along } : { y: t * along });

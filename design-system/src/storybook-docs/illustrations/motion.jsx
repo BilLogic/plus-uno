@@ -10,7 +10,7 @@ import { measureSpring, springStep } from '@/tokens/spring.js';
 import { Illustration } from './Illustration.jsx';
 import { HERO_HAIRLINE } from './paint.js';
 import { Trail, TapRing } from './primitives-motion.jsx';
-import { crossings, ghostOf, pointsOf } from './trails.js';
+import { crossings, ghostless, ghostOf, pointsOf } from './trails.js';
 
 /**
  * The illustration kit's motion layer. A demo animates kit primitives on the
@@ -469,12 +469,18 @@ export const MotionDemo = ({
     return () => observer.disconnect();
   }, [playOnInView]);
 
-  // Dev only: paths that move together must not cross unless the scene is the broken version.
+  // Dev only: paths that move together must not cross unless the scene is the broken version,
+  // and every trail must carry a dashed landing ghost.
   useEffect(() => {
     if (!import.meta.env?.DEV) return;
-    scenes
-      .filter((s) => !s.crossing && crossings(s.arrows).length)
-      .forEach((s) => console.warn(`Motion scene "${s.id}": trails cross. Unify their direction, or set crossing: true.`));
+    for (const s of scenes) {
+      if (!s.crossing && crossings(s.arrows).length) {
+        console.warn(`Motion scene "${s.id}": trails cross. Unify their direction, or set crossing: true.`);
+      }
+      if (ghostless(s.arrows).length) {
+        console.warn(`Motion scene "${s.id}": every trail must carry a dashed landing ghost.`);
+      }
+    }
   }, [scenes]);
 
   useEffect(() => {

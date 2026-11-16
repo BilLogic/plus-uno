@@ -7,6 +7,7 @@ import {
 } from './primitives.jsx';
 import { ChartAxis, ChartCurve, Pointer } from './primitives-motion.jsx';
 import { BEAT, LOOP_PERIOD, measure, pair, projectedRest, ratioOf, resisted, springFor, springWithRatio, stepOf } from './motion.jsx';
+import { travel } from './trails.js';
 
 /**
  * The Physics page's figures (Foundations/Expression/Motion/Physics). Each is a principle,
@@ -64,7 +65,7 @@ const spatialShape = {
   viewBox: VIEW,
   initial: { x: 0, s: 1 },
   landing: { x: 96, s: 1.8 },
-  arrows: [[[32, 50], [128, 50]]],
+  arrows: [travel({ x: 113.6, y: 35.6, w: 28.8, h: 28.8 }, -96, 0)],
   draw: ({ x, s }) => (
     <>
       <Rule x1={24} x2={136} y1={50} y2={50} />
@@ -80,6 +81,7 @@ const spatialShape = {
   },
 };
 
+const POPUP_FAST = { x: 68, y: 34, w: 72, h: 48 };
 /** A Popup opening from its trigger's corner: the clip grows from top right. */
 const popupOpening = ({ id, title, caption, token }) => ({
   id,
@@ -88,7 +90,7 @@ const popupOpening = ({ id, title, caption, token }) => ({
   viewBox: VIEW,
   initial: { p: 0 },
   landing: { p: 1 },
-  arrows: [[[140, 36], [72, 82]]],
+  arrows: [{ points: [[126, 26], [104, 26], [104, 58]], ghost: POPUP_FAST }],
   draw: ({ p }) => (
     <>
       <Screen rows={3} header={false} />
@@ -161,7 +163,7 @@ const linearShape = {
   viewBox: VIEW,
   initial: { p: 0 },
   landing: { p: 1 },
-  arrows: [[[32, 40], [128, 40]]],
+  arrows: [travel({ x: 120, y: 32, w: 16, h: 16 }, -96, 0)],
   draw: ({ p }) => (
     <>
       <Rule x1={24} x2={136} y1={40} y2={40} />
@@ -209,7 +211,7 @@ const plotted = ({ id, title, caption, config, seconds }) => {
     viewBox: VIEW,
     initial: { x: 0, t: 0 },
     landing: { x: 1, t: 1 },
-    arrows: [[[30, 18], [124, 18]]],
+    arrows: [travel({ x: 124, y: 12, w: 12, h: 12 }, -100, 0)],
     draw: ({ x, t }) => (
       <>
         <Rule x1={24} x2={136} y1={18} y2={18} />
@@ -251,7 +253,7 @@ const FlagLayer = ({ x = 0, opacity = 1 }) => (
     </Moved>
   </Clip>
 );
-const FLAG_IN = [[140, 40], [116, 40]];
+const FLAG_IN = travel(FLAG, 24, 0);
 const arrive = (ctx, token, mode) =>
   Promise.all([ctx.spring('x', 0, token, { mode }), ctx.spring('o', 1, 'appearance.default')]);
 
@@ -328,6 +330,7 @@ const sizeDefault = {
 };
 
 const PANEL = { x: 98, y: 18, w: 54, h: 76 };
+const PANEL_OUT = { x: PANEL.x + PANEL.w, y: PANEL.y, w: PANEL.w, h: PANEL.h };
 const DockedPanel = ({ x }) => (
   <Clip x={8} y={18} w={FRAME_RIGHT - 8 - 1} h={76}>
     <Moved x={x}>
@@ -342,7 +345,7 @@ const sizeSlow = {
   viewBox: VIEW,
   initial: { x: PANEL.w },
   landing: { x: 0 },
-  arrows: [[[150, 40], [100, 40]]],
+  arrows: [{ points: [[156, 56], [125, 56]], ghost: PANEL }],
   draw: ({ x }) => (
     <>
       <Screen rows={3} />
@@ -357,6 +360,8 @@ const sizeSlow = {
 
 // ---------- Exits ----------
 
+const PANEL_EXIT = { points: [[125, 56], [157, 56]], ghost: PANEL_OUT };
+
 const exitReverse = {
   id: 'exit-reverse',
   title: 'It can come back: reverse, one speed faster',
@@ -365,7 +370,7 @@ const exitReverse = {
   // Only the exit is drawn and played: the Panel starts open.
   initial: { x: 0 },
   landing: { x: PANEL.w },
-  arrows: [[[100, 56], [150, 56]]],
+  arrows: [PANEL_EXIT],
   draw: ({ x }) => (
     <>
       <Screen rows={3} />
@@ -381,7 +386,7 @@ const exitReverse = {
 
 // Past this offset the whole Flag has crossed the frame's right edge.
 const FLAG_GONE = FRAME_RIGHT - FLAG.x;
-const FLAG_OUT = [[116, 56], [154, 56]];
+const FLAG_OUT = { points: [[116, 46], [157, 46]], ghost: { x: FRAME_RIGHT, y: FLAG.y, w: FLAG.w, h: FLAG.h } };
 
 const flagExit = ({ id, title, caption, arrows, landing, leave }) => ({
   id,
@@ -523,7 +528,7 @@ const dampScenes = RATIOS.map(([ratio, title, caption]) => {
 // ---------- Velocity ----------
 
 const round2 = (v) => Math.round(v * 100) / 100;
-const HAND = [[110, 56], [150, 56]];
+const HAND = PANEL_EXIT;
 
 /** The Panel docked at the right, with the hand's pointer on its left edge while it holds it. */
 const PanelAndHand = ({ x, hand, dim = 1 }) => (
@@ -592,7 +597,7 @@ const decisionScene = ({ id, title, caption, pull, beats, gone }) => ({
   viewBox: VIEW,
   initial: { x: 0, hand: 0, armed: 0, pull: 0, gone: 0 },
   landing: { x: gone ? PANEL.w : 0, armed: 0, pull, gone: gone ? 1 : 0 },
-  arrows: [HAND],
+  arrows: [gone ? PANEL_EXIT : travel(PANEL, pull, 0)],
   draw: ({ x, hand, armed }) => <PanelAndHand x={x} hand={hand} dim={1 - armed * 0.35} />,
   play: async (ctx) => {
     const velocity = speedOf(pull, beats);
@@ -638,7 +643,10 @@ const interruptScene = ({ id, title, caption, turns }) => ({
   viewBox: VIEW,
   initial: { x: PANEL.w, turned: 0 },
   landing: { x: PANEL.w, turned: turns ? 1 : 0 },
-  arrows: [[[150, 36], [100, 36]], [[100, 76], [150, 76]]],
+  arrows: [
+    { points: [[156, 36], [125, 36]], ghost: PANEL },
+    { points: [[125, 76], [157, 76]], ghost: PANEL_OUT },
+  ],
   draw: ({ x }) => (
     <>
       <Screen rows={3} />
@@ -685,7 +693,14 @@ const carryScene = ({ id, title, caption, token, card }) => ({
   viewBox: VIEW,
   initial: { px: CARRY.from[0], py: CARRY.from[1], ix: CARRY.from[0], iy: CARRY.from[1], po: 0, lag: 0 },
   landing: { px: CARRY.to[0], py: CARRY.to[1], ix: CARRY.to[0], iy: CARRY.to[1], po: 0 },
-  arrows: [[CARRY.from, [80, 40], CARRY.to]],
+  arrows: [
+    {
+      points: [CARRY.from, [80, 40], CARRY.to],
+      ghost: card
+        ? { x: CARRY.to[0] - 20, y: CARRY.to[1] - 10, w: 40, h: 20 }
+        : { x: CARRY.to[0] - 10, y: CARRY.to[1] - 4, w: 20, h: 8 },
+    },
+  ],
   draw: ({ px, py, ix, iy, po }) => (
     <>
       <Frame x={8} y={6} w={144} h={88} />
@@ -754,7 +769,12 @@ const limitScene = ({ id, title, caption, stretch }) => ({
   viewBox: VIEW,
   initial: { d: 0, w: BASE_W, hand: 0, peak: BASE_W, limit: LIMIT },
   landing: { d: REACH, w: LIMIT, peak: stretch ? PEAK : LIMIT, limit: LIMIT },
-  arrows: [[[FRAME_RIGHT - BASE_W - 2, 56], [FRAME_RIGHT - BASE_W - REACH, 56]]],
+  arrows: [
+    {
+      points: [[FRAME_RIGHT - BASE_W, 56], [FRAME_RIGHT - LIMIT, 56]],
+      ghost: { x: FRAME_RIGHT - LIMIT, y: PANEL.y, w: LIMIT, h: PANEL.h },
+    },
+  ],
   draw: ({ d, w, hand }) => (
     <>
       <Screen rows={3} />
@@ -807,7 +827,12 @@ const drillScene = ({ id, title, caption, reduced }) => ({
   viewBox: VIEW,
   initial: { g: reduced ? 1 : 0, list: 1, rec: 0 },
   landing: { g: 1, list: 0, rec: 1 },
-  arrows: reduced ? [] : [[[100, 51], [100, 70]]],
+  arrows: reduced
+    ? []
+    : [
+        { points: [[LIST_ROW.x + 4, LIST_ROW.y + 3], [RECORD.x + 4, RECORD.y + 4]], ghost: RECORD },
+        { points: [[LIST_ROW.x + LIST_ROW.w - 4, LIST_ROW.y + LIST_ROW.h - 3], [RECORD.x + RECORD.w - 4, RECORD.y + RECORD.h - 4]], ghost: RECORD },
+      ],
   draw: ({ g, list, rec }) => (
     <>
       <Frame x={8} y={6} w={144} h={88} />

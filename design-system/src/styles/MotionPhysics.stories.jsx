@@ -11,6 +11,8 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { MotionDemo, SPEED_LABELS } from '@/storybook-docs/illustrations/motion.jsx';
+import { PASS, reducedStory, story } from '@/storybook-docs/illustrations/motion-story-helpers.jsx';
+import { ghostOf, pointsOf } from '@/storybook-docs/illustrations/trails.js';
 import { TapRing } from '@/storybook-docs/illustrations/primitives-motion.jsx';
 import { PAINT } from '@/storybook-docs/illustrations/paint.js';
 import { PHYSICS_DEMOS, SpringTokenTable, OneSpringFiveWays } from '@/storybook-docs/illustrations/motion-physics.jsx';
@@ -22,59 +24,6 @@ export default {
   tags: ['!dev', '!autodocs', 'manifest'],
   parameters: { layout: 'padded' },
 };
-
-const PAINTED = ['fill', 'stroke'];
-const TOKEN_OR_NONE = /^(?:var\(--(?:ds-|chart-)[\w-]+\)|none)$/;
-const everyPaintIsAToken = (root) =>
-  [...root.querySelectorAll('svg *')].every((el) =>
-    PAINTED.every((attr) => !el.hasAttribute(attr) || TOKEN_OR_NONE.test(el.getAttribute(attr))),
-  );
-
-// A first pass is a hold, the arrows and the motion; at ¼× it is four times
-// that. One pass at 1× stays well inside this.
-const PASS = { timeout: 15000, interval: 50 };
-
-const landed = (demo, canvasElement) => {
-  for (const scene of demo.scenes) {
-    const tile = canvasElement.querySelector(`[data-tile="${scene.id}"]`);
-    expect(JSON.parse(tile.dataset.state)).toMatchObject(scene.landing);
-  }
-};
-
-/** Plays one pass, checks the arrows came first, then checks every landing. */
-const playsToItsLanding = (demo) => async ({ canvasElement }) => {
-  const root = canvasElement.querySelector('[data-motion-demo]');
-  await expect(everyPaintIsAToken(root)).toBe(true);
-  // Words appear only on a real-fidelity subject; the captions sit outside the drawings.
-  await expect(root.querySelectorAll('svg text:not([data-fidelity="real"] text)').length).toBe(0);
-  if (demo.scenes.some((s) => s.arrows?.length)) {
-    await waitFor(() => expect(root.dataset.phase).toBe('arrows'), PASS);
-    for (const scene of demo.scenes) {
-      const tile = canvasElement.querySelector(`[data-tile="${scene.id}"]`);
-      await expect(tile.querySelectorAll('[data-trail]').length).toBe(scene.arrows?.length ?? 0);
-    }
-  }
-  await waitFor(() => expect(root.dataset.phase).toBe('settled'), PASS);
-  landed(demo, canvasElement);
-};
-
-/** Under reduced motion nothing plays: the demo shows its landing, still. */
-const stillAtItsLanding = (demo) => async ({ canvasElement }) => {
-  const root = canvasElement.querySelector('[data-motion-demo]');
-  await waitFor(() => expect(root.dataset.phase).toBe('still'), PASS);
-  landed(demo, canvasElement);
-  await expect(everyPaintIsAToken(root)).toBe(true);
-};
-
-const story = (demo) => ({
-  // Pinned to the animated pass whatever the device's reduced-motion setting says.
-  render: () => <MotionDemo {...demo} reduced={false} />,
-  play: playsToItsLanding(demo),
-});
-const reducedStory = (demo) => ({
-  render: () => <MotionDemo {...demo} reduced />,
-  play: stillAtItsLanding(demo),
-});
 
 export const FamilySpatial = story(PHYSICS_DEMOS.spatial);
 export const FamilySpatialReduced = reducedStory(PHYSICS_DEMOS.spatial);
@@ -135,9 +84,13 @@ export const ThrowIsDecidedByProjectedRest = {
     const drag = stateOf(canvasElement, 'decide-drag');
     await expect(flick.gone).toBe(1);
     await expect(drag.gone).toBe(0);
-    // The slow drag let go farther along than the flick did, and still came back.
+    // The slow drag let go farther along than the flick did, and still came back; its trail points left to rest.
     await expect(drag.pull).toBeGreaterThan(flick.pull);
     await expect(drag.x).toBe(0);
+    const dragArrow = PHYSICS_DEMOS.decision.scenes.find((s) => s.id === 'decide-drag').arrows[0];
+    const [dragStart, dragEnd] = pointsOf(dragArrow);
+    await expect(dragEnd[0]).toBeLessThan(dragStart[0]);
+    await expect(ghostOf(dragArrow)).toMatchObject({ x: 98, w: 54 });
   },
 };
 
@@ -180,6 +133,13 @@ export const LimitStretchesAndReturns = {
     await expect(wall.w).toBe(wall.limit);
     await expect(resists.peak).toBeGreaterThan(resists.limit);
     await expect(wall.peak).toBe(wall.limit);
+    for (const s of PHYSICS_DEMOS.limit.scenes) {
+      const arrow = s.arrows[0];
+      const [start, end] = pointsOf(arrow);
+      await expect(end[0]).toBe(152 - resists.limit);
+      await expect(end[0]).toBeLessThan(start[0]);
+      await expect(ghostOf(arrow)).toMatchObject({ x: 152 - resists.limit, w: resists.limit });
+    }
   },
 };
 

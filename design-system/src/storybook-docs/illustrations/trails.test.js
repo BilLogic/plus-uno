@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { crossings, ghostOf, pointsOf, segmentsCross, travel } from './trails.js';
+import { crossings, ghostless, ghostOf, pointsOf, segmentsCross, travel } from './trails.js';
 
 describe('segmentsCross', () => {
   it('sees an X', () => {
@@ -46,9 +46,23 @@ describe('travel', () => {
     expect(pointsOf(travel(rect, 30, 18))).toEqual([[50, 43], [20, 25]]);
     expect(ghostOf(travel(rect, 30, 18))).toBe(rect);
   });
-  it('moves the line into a lane and can leave the ghost out', () => {
+  it('shifts the line into a lane and can leave the ghost out', () => {
     const arrow = travel(rect, 0, -14, { lane: { x: 90 }, ghost: false });
     expect(pointsOf(arrow)).toEqual([[90, 11], [90, 25]]);
     expect(ghostOf(arrow)).toBeUndefined();
+  });
+});
+
+describe('ghostless', () => {
+  const rect = { x: 10, y: 20, w: 20, h: 10 };
+  it('flags bare point arrays and arrows without a positive-sized ghost rect', () => {
+    expect(
+      ghostless([
+        [[0, 0], [10, 10]],
+        travel(rect, 12, 0),
+        { points: [[0, 0], [5, 5]] },
+        { points: [[0, 0], [5, 5]], ghost: rect },
+      ]),
+    ).toEqual([0, 2]);
   });
 });

@@ -66,7 +66,7 @@ export const scrollToScene = ({
     caption,
     initial: { s: 0, h: 0, seen: 0 },
     landing: { s: 1, h: 0, seen: 1 },
-    arrows: [[[110, 86], [110, 50]]],
+    arrows: [{ points: [[96, 90], [96, 68]], ghost: { x: 60, y: 50, w: 72, h: 36 } }],
     draw: ({ s, h }) => (
       <>
         <Base />
@@ -108,7 +108,7 @@ const swap = ({ id, title, caption, crossfade, spatial = 'spatial.fast', appeara
     caption,
     initial: { f: 0, o: 1, n: 0 },
     landing: { f: 1, o: 0, n: 1 },
-    arrows: [[[72, 56], [100, 56]]],
+    arrows: [travel({ x: PILLS[1], y: 44, w: 24, h: 12 }, PILLS[0] - PILLS[1], 0)],
     draw: ({ f, o, n }) => (
       <>
         <Base />
@@ -310,9 +310,9 @@ const load = ({ id, title, caption, skeleton, spatial, appearance }) =>
     id,
     title,
     caption,
-    initial: { sk: skeleton ? 1 : 0, sh: 0, hd: 0, r1: 0, r2: 0, pri: 0, ch: 0 },
+    initial: { sk: skeleton ? 1 : 0, sh: 0, hd: 0, r1: skeleton ? 0 : 1, r2: skeleton ? 0 : 1, pri: 0, ch: 0 },
     landing: { sk: 0, hd: 1, r1: 1, r2: 1, pri: 1, ch: 1 },
-    // With no Skeleton, the three rows are pushed down as one group when the header arrives.
+    // With no Skeleton, the rows sit high until the header arrives and pushes them down as one group.
     arrows: skeleton
       ? []
       : [travel({ x: 60, y: LOAD_ROWS[0], w: LOAD_ROW_W, h: LOAD_ROWS[LOAD_ROWS.length - 1] + 14 - LOAD_ROWS[0] }, 0, -12)],
@@ -497,6 +497,8 @@ export const popupScene = ({
 const FLOATING_PANEL = { x: 100, y: 6, w: 52, h: 88 };
 const FLAG = { x: 94, y: 10, w: 54, h: 26 };
 const FLAG_EDGE = 60;
+const FLAG_IN = { points: [[156, 23], [121, 23]], ghost: FLAG };
+const FLAG_OUT = { points: [[121, 23], [157, 23]], ghost: { x: FLAG.x + FLAG_EDGE, y: FLAG.y, w: FLAG.w, h: FLAG.h } };
 export const flagScene = ({
   id,
   title,
@@ -511,7 +513,7 @@ export const flagScene = ({
     caption,
     initial: closing ? { x: 0, f: 1 } : { x: FLAG_EDGE, f: 0 },
     landing: closing ? { x: FLAG_EDGE, f: 0 } : { x: 0, f: 1 },
-    arrows: [closing ? [[100, 23], [148, 23]] : [[148, 23], [100, 23]]],
+    arrows: [closing ? FLAG_OUT : FLAG_IN],
     draw: ({ x, f }) => (
       <>
         <UnderPage />
@@ -550,7 +552,7 @@ export const confirmScene = ({
     caption,
     initial: { m: 1, s: 1, d: 1, c: 0, fx: FLAG_EDGE, fo: 0 },
     landing: confirm ? { m: 0, d: 0, c: 1, fx: 0, fo: 1 } : { m: 0, s: 0.96, d: 0, c: 0, fo: 0 },
-    arrows: [],
+    arrows: confirm ? [FLAG_IN] : [],
     draw: ({ m, s, d, c, fx, fo }) => (
       <>
         <Base />
@@ -616,11 +618,11 @@ export const dockScene = ({
     // The Panel and the page's edge move the same way: left to dock, right to undock.
     arrows: closing
       ? [
-          { points: [[130, 60], [152, 60]] },
+          { points: [[134, 60], [157, 60]], ghost: { x: DOCK_PANEL.x + SIDE, y: DOCK_PANEL.y, w: SIDE, h: DOCK_PANEL.h } },
           { points: [[109, 36], [143, 36]], ghost: { x: 60, y: 26, w: 83, h: 64 } },
         ]
       : [
-          { points: [[152, 60], [130, 60]], ghost: DOCK_PANEL },
+          { points: [[156, 60], [134, 60]], ghost: DOCK_PANEL },
           { points: [[143, 36], [109, 36]], ghost: { x: 60, y: 26, w: 83 - SIDE, h: 64 } },
         ],
     draw: ({ p, c }) => (
@@ -671,7 +673,7 @@ export const floatPanelScene = ({
     caption,
     initial: { x: 1 },
     landing: { x: 0 },
-    arrows: [[[152, 55], [110, 55]]],
+    arrows: [{ points: [[156, 51], [126, 51]], ghost: { x: 104, y: 14, w: 44, h: 74 } }],
     draw: ({ x }) => (
       <>
         <UnderPage />
@@ -706,7 +708,7 @@ export const updateScene = ({
     caption,
     initial: { c: 0, k: 0, f: 0 },
     landing: { c: 1, k: 1, f: 1 },
-    arrows: [[[76, 60], [76, 72]]],
+    arrows: [{ points: [[78, 68], [78, 77.5]], ghost: { x: 70, y: 74, w: 16, h: 7 } }],
     draw: ({ c, k, f }) => (
       <>
         <Base />
@@ -805,7 +807,7 @@ const errField = ({ id, title, caption, early, spatial = 'spatial.fast', appeara
     initial: { f1: 0, f2: 0, b: 0, h: 0, m: 0 },
     landing: { f1: 0, f2: 1, b: 1, h: 1, m: 1 },
     // The message makes room: the second field moves down to land below it.
-    arrows: [travel({ x: 60, y: 64, w: FIELD_W, h: 20 }, 0, -8)],
+    arrows: [travel({ x: 60, y: 64, w: FIELD_W, h: 27 }, 0, -8)],
     draw: ({ f1, f2, b, h, m }) => (
       <>
         <Base header={false} />
@@ -882,7 +884,7 @@ const errPage = ({ id, title, caption, shakes, spatial = 'spatial.fast', appeara
     // The summary makes room: both fields move down as one group.
     arrows: shakes
       ? []
-      : [travel({ x: 60, y: 33, w: 58, h: 51 }, 0, -9)],
+      : [travel({ x: 60, y: 33, w: 58, h: 58 }, 0, -9)],
     draw: ({ b, sx = 0, h = 0, m = 0, f1 = 0 }) => (
       <Moved x={sx}>
         <Base header={false} />
