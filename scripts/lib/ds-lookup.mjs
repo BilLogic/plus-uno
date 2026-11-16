@@ -357,17 +357,6 @@ function scanTopics(root) {
   return map;
 }
 
-/** A topic file's text, with generated HTML comments stripped. */
-function readTopicText(root, rel) {
-  const source = fs.readFileSync(path.join(root, rel), 'utf8');
-  return rel.endsWith('.mdx')
-    ? pageText(readDocsPage(source, { kind: 'foundation', root, file: rel }))
-    : source
-        .replace(/^<!--\s*DO NOT EDIT[\s\S]*?-->\n+/, '')
-        .replace(/\n*<!--\s*authored coverage:[\s\S]*?-->\s*$/, '')
-        .trim();
-}
-
 /**
  * Build the deterministic lookup index (`design-system/agent-views/ds-index.json`)
  * from the design-system facts, Storybook docs pages, Figma registry, reference
@@ -484,7 +473,18 @@ export function buildDsIndex(root) {
   const rawTopics = scanTopics(root);
   const topics = Object.fromEntries(Object.entries(rawTopics).sort(([a], [b]) => a.localeCompare(b)));
   const guidePaths = [...new Set(Object.values(topics))].sort();
-  const guides = Object.fromEntries(guidePaths.map((rel) => [rel, readTopicText(root, rel)]));
+  const guides = Object.fromEntries(
+    guidePaths.map((rel) => {
+      const source = fs.readFileSync(path.join(root, rel), 'utf8');
+      const text = rel.endsWith('.mdx')
+        ? pageText(readDocsPage(source, { kind: 'foundation', root, file: rel }))
+        : source
+            .replace(/^<!--\s*DO NOT EDIT[\s\S]*?-->\n+/, '')
+            .replace(/\n*<!--\s*authored coverage:[\s\S]*?-->\s*$/, '')
+            .trim();
+      return [rel, text];
+    }),
+  );
 
   const rulesSource = readIf(path.join(root, RULES_DOC));
   const rulesPage = rulesSource ? readDocsPage(rulesSource) : null;
@@ -510,21 +510,23 @@ export function buildDsIndex(root) {
   };
 }
 
-function loadDsIndex(root) {
+function loadDsIndex(root, { buildIndex = false } = {}) {
+  if (buildIndex) return buildDsIndex(root);
   for (const rel of [DS_INDEX, 'agent-views/ds-index.json']) {
     const file = path.join(root, rel);
     if (fs.existsSync(file)) return JSON.parse(fs.readFileSync(file, 'utf8'));
   }
-  return buildDsIndex(root);
+  throw new Error('design-system/agent-views/ds-index.json is missing. Run `node scripts/generate-ds-index.mjs`.');
 }
 
 /**
  * `readPaths: false` is the hosted server's; `aliases: false` zeroes the alias field (the retrieval bench's second arm);
  * `consumerRoot` is where `check` reads `paths` from when that is not the facts' tree (the packaged `ds check` reads the caller's project);
- * `iconMetadata` stands in for the committed Free icon lists (the `icons.json` shape), for a test that needs a small set.
+ * `iconMetadata` stands in for the committed Free icon lists (the `icons.json` shape), for a test that needs a small set;
+ * `buildIndex: true` opts fixture-root tests into building the index in memory instead of reading `ds-index.json`.
  */
-export function createLookup(root, { readPaths = true, aliases = true, iconMetadata = null, consumerRoot = root } = {}) {
-  const index = loadDsIndex(root);
+export function createLookup(root, { readPaths = true, aliases = true, iconMetadata = null, consumerRoot = root, buildIndex = false } = {}) {
+  const index = loadDsIndex(root, { buildIndex });
   const records = index.entries;
   const entriesByName = new Map(records.map((r) => [r.name, r]));
   const barrels = Object.fromEntries(BARRELS.map((spec) => [spec, new Set(index.barrels[spec] ?? [])]));
@@ -1028,11 +1030,8 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
 
   // ── guide ───────────────────────────────────────────────────────────────
 
-  const topics = () =>
-    Object.fromEntries(
-      Object.entries(index.topics ?? {}).filter(([, rel]) => fs.existsSync(path.join(root, rel))),
-    );
-  const topicText = (rel) => index.guides?.[rel] ?? readTopicText(root, rel);
+  const topics = () => index.topics;
+  const topicText = (rel) => index.guides[rel];
   const CHOOSER_HEADING = /^(?:Usage|Alternatives|Types|Header types|Slots|The nine templates|Which .*|Frame, Modal, Panel or Popup\?)$/;
   const isBriefGuide = (rel) =>
     rel.startsWith(`${AGENT_VIEWS}/patterns/`) ||
@@ -1074,8 +1073,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     if (!t) return { topic: null, path: null, text: ORIENTATION, next: 'Start with ds_find.' };
     const rule = Object.keys(RULES).find((id) => id === t || id === `ds/${t}`);
     if (rule) {
-      const text = index.rules?.[rule] ?? headed(readDocsPage(fs.readFileSync(path.join(root, RULES_DOC), 'utf8')), rule);
-      return { topic: rule, path: docLink(rule), text, next: 'Fix the code as the section says, then ds_check again.' };
+      return { topic: rule, path: docLink(rule), text: index.rules[rule], next: 'Fix the code as the section says, then ds_check again.' };
     }
     const map = topics();
     const key = map[t] ? t : TOPIC_ALIASES[t] ?? Object.keys(map).find((k) => t.split(/[\s/-]+/).includes(k)) ?? Object.entries(TOPIC_ALIASES).find(([a]) => t.includes(a))?.[1];

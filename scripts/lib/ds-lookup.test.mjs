@@ -310,10 +310,22 @@ test('guide survives a guideline folder that is empty or missing', () => {
     for (const e of fs.readdirSync(path.join(REPO_ROOT, 'design-system'))) {
       if (e !== 'guidelines') fs.symlinkSync(path.join(REPO_ROOT, 'design-system', e), path.join(tmp, 'design-system', e));
     }
-    const bare = createLookup(tmp);
+    const bare = createLookup(tmp, { buildIndex: true });
     assert.equal(bare.guide('color').path, 'design-system/agent-views/foundations/Colors.md');
     assert.ok(bare.guide('nope').topics.includes('typography'));
     assert.equal(bare.guide('data-visualization').text, null);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('a missing ds-index.json throws and names the generate command instead of rescanning', () => {
+  const tmp = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'ds-no-index-'));
+  try {
+    assert.throws(
+      () => createLookup(tmp),
+      { message: 'design-system/agent-views/ds-index.json is missing. Run `node scripts/generate-ds-index.mjs`.' },
+    );
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
@@ -391,72 +403,61 @@ test('a clean check names the template and pattern fit limit', () => {
   assert.match(lookup.check({ code: 'export const value = 1;', path: 'prototypes/a.js' }).next, /[Tt]emplate.*pattern fit is not checked/);
 });
 
-test('a cold lookup reads only ds-index.json for find, get, tokens and guide', () => {
-  const read = new Set();
-  const realRead = fs.readFileSync;
-  fs.readFileSync = (file, ...rest) => {
-    if (typeof file === 'string' && path.isAbsolute(file) && file.startsWith(REPO_ROOT)) {
-      read.add(path.relative(REPO_ROOT, file).split(path.sep).join('/'));
-    }
-    return realRead(file, ...rest);
-  };
+test('a cold lookup reads only ds-index.json for find, get, tokens and guide, even when no source or guide files exist on disk', () => {
+  const tmp = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'ds-only-index-'));
   try {
-    const cold = createLookup(REPO_ROOT, { readPaths: false });
-    cold.find('confirm before deleting');
-    cold.get(['Button', 'PatternCard', 'Button.appearance', '--ds-text']);
-    cold.tokens('stack');
-    cold.guide('filtering');
-    cold.guide('ds/no-raw-literal');
+    fs.mkdirSync(path.join(tmp, 'design-system/agent-views'), { recursive: true });
+    fs.copyFileSync(
+      path.join(REPO_ROOT, 'design-system/agent-views/ds-index.json'),
+      path.join(tmp, 'design-system/agent-views/ds-index.json'),
+    );
+    const read = new Set();
+    const realRead = fs.readFileSync;
+    fs.readFileSync = (file, ...rest) => {
+      if (typeof file === 'string' && path.isAbsolute(file) && file.startsWith(tmp)) {
+        read.add(path.relative(tmp, file).split(path.sep).join('/'));
+      }
+      return realRead(file, ...rest);
+    };
+    try {
+      const cold = createLookup(tmp, { readPaths: false });
+      assert.equal(cold.find('confirm before deleting').results[0].name, 'Common actions');
+      assert.equal(cold.get(['Button', 'PatternCard', 'Button.appearance', '--ds-text']).records[0].name, 'Button');
+      assert.ok(cold.tokens('stack').steps.length > 0);
+      assert.match(cold.guide('filtering').text, /^# Filtering\n/);
+      assert.match(cold.guide('ds/no-raw-literal').text, /^## ds\/no-raw-literal/);
+      assert.ok(cold.guide('nope').topics.includes('filtering'));
+    } finally {
+      fs.readFileSync = realRead;
+    }
+    assert.deepEqual([...read], ['design-system/agent-views/ds-index.json']);
   } finally {
-    fs.readFileSync = realRead;
+    fs.rmSync(tmp, { recursive: true, force: true });
   }
-  assert.deepEqual([...read], ['design-system/agent-views/ds-index.json']);
 });
 
-test('editing a docs page or component without regenerating makes check:ds-index fail and name the regenerate command', async () => {
+test('editing a docs page, component, guideline or rule doc without regenerating makes check:ds-index fail and name the regenerate command', async () => {
   const { run: checkDsIndex } = await import('../generate-ds-index.mjs');
-  for (const rel of [
-    'design-system/src/components/forms-and-inputs/Button/Button.mdx',
-    'design-system/src/components/forms-and-inputs/Button/Button.jsx',
+  const linkTreeWithEdit = (srcDir, dstDir, parts, edit) => {
+    const [head, ...tail] = parts;
+    fs.mkdirSync(dstDir, { recursive: true });
+    for (const e of fs.readdirSync(srcDir)) {
+      const src = path.join(srcDir, e);
+      const dst = path.join(dstDir, e);
+      if (e !== head) fs.symlinkSync(src, dst);
+      else if (tail.length) linkTreeWithEdit(src, dst, tail, edit);
+      else fs.writeFileSync(dst, edit(fs.readFileSync(src, 'utf8')), 'utf8');
+    }
+  };
+  for (const [rel, edit] of [
+    ['design-system/src/components/forms-and-inputs/Button/Button.mdx', (t) => `${t}\n\nUnregenerated docs edit for drift test.\n`],
+    ['design-system/src/components/forms-and-inputs/Button/Button.jsx', (t) => t.replace('Button: triggers an action.', 'Button: triggers an unregenerated action.')],
+    ['design-system/guidelines/foundations/data-visualization.md', (t) => `${t}\n\nUnregenerated guideline edit for drift test.\n`],
+    ['docs/engineering/ds-usage-rules.md', (t) => `${t}\n\nUnregenerated rule edit for drift test.\n`],
   ]) {
     const tmp = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'ds-index-drift-'));
     try {
-      for (const e of fs.readdirSync(REPO_ROOT)) {
-        if (e !== 'design-system') fs.symlinkSync(path.join(REPO_ROOT, e), path.join(tmp, e));
-      }
-      fs.mkdirSync(path.join(tmp, 'design-system/src/components/forms-and-inputs/Button'), { recursive: true });
-      for (const e of fs.readdirSync(path.join(REPO_ROOT, 'design-system'))) {
-        if (e !== 'src') fs.symlinkSync(path.join(REPO_ROOT, 'design-system', e), path.join(tmp, 'design-system', e));
-      }
-      for (const e of fs.readdirSync(path.join(REPO_ROOT, 'design-system/src'))) {
-        if (e !== 'components') fs.symlinkSync(path.join(REPO_ROOT, 'design-system/src', e), path.join(tmp, 'design-system/src', e));
-      }
-      for (const e of fs.readdirSync(path.join(REPO_ROOT, 'design-system/src/components'))) {
-        if (e !== 'forms-and-inputs') {
-          fs.symlinkSync(path.join(REPO_ROOT, 'design-system/src/components', e), path.join(tmp, 'design-system/src/components', e));
-        }
-      }
-      for (const e of fs.readdirSync(path.join(REPO_ROOT, 'design-system/src/components/forms-and-inputs'))) {
-        if (e !== 'Button') {
-          fs.symlinkSync(
-            path.join(REPO_ROOT, 'design-system/src/components/forms-and-inputs', e),
-            path.join(tmp, 'design-system/src/components/forms-and-inputs', e),
-          );
-        }
-      }
-      for (const e of fs.readdirSync(path.join(REPO_ROOT, 'design-system/src/components/forms-and-inputs/Button'))) {
-        const src = path.join(REPO_ROOT, 'design-system/src/components/forms-and-inputs/Button', e);
-        const dst = path.join(tmp, 'design-system/src/components/forms-and-inputs/Button', e);
-        if (`design-system/src/components/forms-and-inputs/Button/${e}` === rel) {
-          const text = fs.readFileSync(src, 'utf8');
-          const edited = e.endsWith('.mdx')
-            ? `${text}\n\nUnregenerated docs edit for drift test.\n`
-            : text.replace('Button: triggers an action.', 'Button: triggers an unregenerated action.');
-          fs.writeFileSync(dst, edited, 'utf8');
-        } else {
-          fs.symlinkSync(src, dst);
-        }
-      }
+      linkTreeWithEdit(REPO_ROOT, tmp, rel.split('/'), edit);
       const findings = checkDsIndex({ repoRoot: tmp });
       assert.equal(findings.length, 1, `expected drift finding for ${rel}`);
       assert.equal(findings[0].file, 'design-system/agent-views/ds-index.json');
