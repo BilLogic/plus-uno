@@ -12,7 +12,7 @@ Also asked as: multi-select, checklist, tick box.
 
 **Source:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.stories.jsx` — Overview, States, Content, Invalid, SelectAll, CheckboxGroup, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, Keyboard, HoverStep, Unselected, Selected, Mixed, Disabled, DisabledWithReason, Required, Description, Card, Tile, TileNarrowLargeIllustrations
+**Stories:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.stories.jsx` — Overview, States, Content, Invalid, SelectAll, CheckboxGroup, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, Keyboard, HoverStep, Unselected, Selected, Mixed, Disabled, DisabledWithReason, Required, Description, Card, Soft, Tile, TileNarrowLargeIllustrations
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.mdx`
 
@@ -122,20 +122,22 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `CheckboxGr
 
 ## Parts
 
-1. **Box.** An 18 square with a 2px edge. Selected, it fills with the selected bold fill and draws a check; mixed, it draws a dash.
+1. **Box.** An 18 square with a 2px edge in `plain`, `card` and `tile`; visually hidden in `soft` while keeping native checkbox semantics, keyboard navigation, and form submission.
 2. **Label.** 14/20 text beside the box in a 24 row. It names the checkbox. An optional minority marker (`"(optional)"` or `"(required)"`) follows it in plain text.
 3. **Description.** Optional 12/16 text under the label that describes the choice. It does not name it.
+4. **Appearances.** `plain` draws the box and label inline; `card` wraps them in a bordered surface row; `soft` draws a `--ds-background-neutral` row without a checkbox box (selected row shows `--ds-background-selected`, a 1px `--ds-border-selected` edge, and a trailing `fa-solid fa-check` icon) for the majority selection type in a choice flow while the minority selection type keeps its visible control; `tile` draws a 224px pictured card with the checkbox at the top end.
 
 ### States
 
 | State | What changes |
 | --- | --- |
-| Rest | `--ds-background-input` fill with a `--ds-border-input` edge. |
-| Hovered | Unselected: `--ds-background-input-hovered` with a `--ds-border-brand` edge. Selected: the hovered step of the selected bold fill. |
-| Focused | A 2px ring in `--ds-border-focused`, 2px off the box, for keyboard focus only. |
-| Selected | `--ds-background-selected-bold` fill and `--ds-border-selected` edge; the check is `--ds-icon-inverse`. |
-| Mixed | The same fill and edge as selected; the mark is a dash in `--ds-icon-inverse`. |
-| Invalid | The unselected box takes `--ds-border-danger`. A selected or mixed box keeps its fill. |
+| Rest | `--ds-background-input` fill with a `--ds-border-input` edge; in `soft`, `--ds-background-neutral` fill with no border. |
+| Hovered | Unselected: `--ds-background-input-hovered` with a `--ds-border-brand` edge (or `--ds-background-neutral-hovered` in `soft`). Selected: the hovered step of the selected bold fill (or `--ds-background-selected-hovered` in `soft`). |
+| Pressed | In `soft`, an unselected row takes `--ds-background-neutral-pressed` and a selected row takes `--ds-background-selected-pressed`. |
+| Focused | A 2px ring in `--ds-border-focused`, 2px off the box (or around the row in `soft` and `tile`), for keyboard focus only. |
+| Selected | `--ds-background-selected-bold` fill and `--ds-border-selected` edge; the check is `--ds-icon-inverse`. In `soft`, `--ds-background-selected` fill, 1px `--ds-border-selected` edge, and a trailing check in `--ds-icon-selected`. |
+| Mixed | The same fill and edge as selected; the mark is a dash in `--ds-icon-inverse` (or `fa-solid fa-minus` in `--ds-icon-selected` in `soft`). |
+| Invalid | The unselected box or tile takes `--ds-border-danger` (in `soft`, both unselected and selected rows take `--ds-border-danger`). |
 | Read-only | Full contrast, in the tab order, `aria-readonly`, no hover; an unchecked box takes the `--ds-background-neutral` fill. Ignores clicks and Space. |
 | Disabled | `--ds-background-disabled` fill, `--ds-border-disabled` edge, `--ds-icon-disabled` mark. Out of the tab order. |
 
@@ -149,6 +151,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `CheckboxGr
 | Row | `--control-sm` (24); gap `--space-050`. |
 | Label | `--ds-text`, body default. |
 | Focus ring | `--ds-border-focused`, 2px, 2px offset. |
+| Soft row | `--radius-control-md`, `--ds-background-neutral` fill at rest; selected `--ds-background-selected` fill, `--border-width-default` `--ds-border-selected` edge, and `--icon-sm` trailing check in `--ds-icon-selected`. |
 | Choice tile | `--choice-tile-width` (224px), `--radius-control-md`, `--ds-surface` fill; selected 2px `--ds-border-selected` and `--ds-background-selected`, with the Checkbox at the top end. |
 
 ## Content guidelines
@@ -179,7 +182,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `CheckboxGr
 | `isRequired` | bool | `false` | Set aria-required on the checkbox |
 | `description` | node | — | Secondary text under the label. It describes the box and does not name it. |
 | `illustration` | node | — | Decorative picture shown above the label when `appearance` is `tile`. |
-| `appearance` | enum | `'plain'` | `plain` (default) draws the box and label inline; `card` draws a bordered row; `tile` draws a centered pictured tile with the checkbox at its top end. |
+| `appearance` | enum | `'plain'` | `plain` (default) draws the box and label inline; `card` draws a bordered row; `soft` draws a neutral row without a checkbox; `tile` draws a centered pictured tile with the checkbox at its top end. |
 | `onChange` | func | — | Called with `{ target: { name, value, checked } }` when the box is toggled. |
 | `onFocus` | func | — | Called with the focus event when the checkbox gains focus. |
 | `onBlur` | func | — | Called with the blur event when the checkbox loses focus. |
@@ -192,7 +195,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `CheckboxGr
 
 **`labelMarker`** — `required` · `optional`
 
-**`appearance`** — `plain` · `card` · `tile`
+**`appearance`** — `plain` · `card` · `soft` · `tile`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 

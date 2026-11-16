@@ -31,7 +31,7 @@ export default {
         },
         appearance: {
             control: 'select',
-            options: ['plain', 'card', 'tile'],
+            options: ['plain', 'card', 'soft', 'tile'],
             table: { category: 'Design' },
         },
         error: { control: 'text', table: { category: 'Behavior' } },
@@ -162,6 +162,79 @@ Reveal.play = async ({ canvasElement }) => {
 };
 
 /** Pictured 224px tiles laid out inline and wrapping, with a Checkbox at each tile's top end. */
+export const Soft = () => {
+    const [picked, setPicked] = useState(['email']);
+    return (
+        <div style={stack}>
+            <CheckboxGroup
+                id="cbg-soft"
+                name="cbg-soft"
+                legend="Which reminders would you like?"
+                appearance="soft"
+                options={described}
+                value={picked}
+                onChange={setPicked}
+            />
+        </div>
+    );
+};
+Soft.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const group = canvas.getByRole('group', { name: 'Which reminders would you like?' });
+    const rows = [...group.querySelectorAll('.plus-choice-soft')];
+    await expect(rows).toHaveLength(3);
+
+    const firstBox = within(rows[0]).getByRole('checkbox', { name: 'Email summary' });
+    const secondBox = within(rows[1]).getByRole('checkbox', { name: 'Text reminder' });
+    await expect(getComputedStyle(firstBox).opacity).toBe('0');
+    await expect(getComputedStyle(secondBox).opacity).toBe('0');
+
+    // Rest state on unselected row.
+    rows[0].style.transition = 'none';
+    rows[1].style.transition = 'none';
+    await expect(withForcedPseudo(canvasElement, ':hover', () => getComputedStyle(rows[1]).backgroundColor)).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+    await expect(getComputedStyle(rows[1]).borderTopColor).toBe('rgba(0, 0, 0, 0)');
+    await expect(getComputedStyle(rows[1].querySelector('.plus-choice-soft-check')).opacity).toBe('0');
+
+    // Unselected hover and pressed states.
+    const restHover = withForcedPseudo(rows[1], ':hover', () => getComputedStyle(rows[1]).backgroundColor);
+    await expect(restHover).toBe(tokenColor(canvasElement, '--ds-background-neutral-hovered'));
+    const restPressed = withForcedPseudo(rows[1], ':active', () => getComputedStyle(rows[1]).backgroundColor);
+    await expect(restPressed).toBe(tokenColor(canvasElement, '--ds-background-neutral-pressed'));
+
+    // Selected state: fill, 1px border, trailing check.
+    await expect(withForcedPseudo(canvasElement, ':hover', () => getComputedStyle(rows[0]).backgroundColor)).toBe(tokenColor(canvasElement, '--ds-background-selected'));
+    await expect(px(getComputedStyle(rows[0]).borderTopWidth)).toBe(1);
+    await expect(getComputedStyle(rows[0]).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-selected'));
+    const check = rows[0].querySelector('.plus-choice-soft-check');
+    await expect(check).toHaveAttribute('aria-hidden', 'true');
+    await expect(getComputedStyle(check).opacity).toBe('1');
+    await expect(px(getComputedStyle(check).fontSize)).toBe(12);
+    await expect(getComputedStyle(check).color).toBe(tokenColor(canvasElement, '--ds-icon-selected'));
+
+    // Selected hover and pressed states.
+    const selectedHover = withForcedPseudo(rows[0], ':hover', () => ({
+        backgroundColor: getComputedStyle(rows[0]).backgroundColor,
+        borderTopColor: getComputedStyle(rows[0]).borderTopColor,
+    }));
+    await expect(selectedHover.backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected-hovered'));
+    await expect(selectedHover.borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-selected'));
+
+    const selectedPressed = withForcedPseudo(rows[0], ':active', () => getComputedStyle(rows[0]).backgroundColor);
+    await expect(selectedPressed).toBe(tokenColor(canvasElement, '--ds-background-selected-pressed'));
+
+    // Focus ring on the soft row and Space toggle parity.
+    secondBox.focus({ focusVisible: true });
+    await waitFor(() => expect(getComputedStyle(rows[1]).outlineStyle).toBe('solid'));
+    await expect(px(getComputedStyle(rows[1]).outlineWidth)).toBe(2);
+    await expect(px(getComputedStyle(rows[1]).outlineOffset)).toBe(2);
+    await expect(getComputedStyle(rows[1]).outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+
+    await userEvent.keyboard(' ');
+    await expect(secondBox).toHaveAttribute('aria-checked', 'true');
+    secondBox.blur();
+};
+
 export const Tiles = () => {
     const [picked, setPicked] = useState(['mastering-content']);
     return (
