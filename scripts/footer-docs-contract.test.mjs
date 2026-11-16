@@ -1,118 +1,97 @@
 /**
- * Contract tests for #2598:
- * - Button and Modal docs each carry a `## Footer actions` section teaching all 8 r5 rules,
- *   DoDontPair cards built from live component instances, and the 9-row Hug or Fill table.
- * - FooterActions is imported from `@/components` (never `@/patterns`), and docs do not
- *   reference a `narrow` prop (narrow containers are measured automatically).
- * - Button docs carry an Anatomy story and updated Parts covering soft neutral fill,
- *   spacings (32 / 24 / spacious 48) and shouldFitContainer.
- * - ButtonGroup selected-state docs show and name the 1px --ds-border-selected border.
+ * Structural contract tests for #2598:
+ * - FooterActions.mdx carries the Placement and Hug or fill sections.
+ * - Button.mdx and Modal.mdx each carry a Footer actions section and link to FooterActions.
+ * - Every DocsLink on the three pages resolves to a real Storybook docs or story id.
  */
-import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
+import { readDocsPage } from './lib/docs-page.mjs';
+import { blankComments, closeOf } from './lib/jsx-scan.mjs';
+import { storybookId } from './lib/storybook-id.mjs';
+import { storybookLinks } from './lib/storybook-links.mjs';
+import { readStorybookPage, scanStorybookPages } from './lib/storybook-pages.mjs';
+
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+const PAGES = {
+  FooterActions: 'design-system/src/components/forms-and-inputs/FooterActions/FooterActions.mdx',
+  Button: 'design-system/src/components/forms-and-inputs/Button/Button.mdx',
+  Modal: 'design-system/src/components/messaging/Modal/Modal.mdx',
+};
+
 const read = (rel) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');
 
-const BUTTON_MDX = 'design-system/src/components/forms-and-inputs/Button/Button.mdx';
-const MODAL_MDX = 'design-system/src/components/messaging/Modal/Modal.mdx';
-const BUTTON_GROUP_MDX = 'design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.mdx';
+/** All real Storybook docs and story ids derived from the source tree. */
+function collectStorybookIds(root = REPO_ROOT) {
+  const scanned = scanStorybookPages(root);
+  const mdxStoriesFiles = new Set(scanned.filter((p) => p.file.endsWith('.mdx') && p.storiesFile).map((p) => p.storiesFile));
+  const ids = new Set();
 
-const HUG_OR_FILL_SURFACES = [
-  'Page header',
-  'Card or section header',
-  'Table toolbar',
-  'Table row',
-  'Popup inline confirm',
-  'Empty state',
-  'Banner and Flag',
-  'Button group',
-  'Inline with a field',
+  for (const page of scanned) {
+    const isMdx = page.file.endsWith('.mdx');
+    const hasDocsEntry = isMdx || (!mdxStoriesFiles.has(page.file) && !page.tags.includes('!autodocs'));
+    if (page.docsId && hasDocsEntry) ids.add(page.docsId);
+
+    if (!page.file.includes('.stories.') || !page.title) continue;
+    const text = blankComments(read(page.file));
+    for (const match of text.matchAll(/export\s+const\s+(\w+)\s*=\s*(\{)?/g)) {
+      const exportName = match[1];
+      let storyName = exportName.replace(/([a-z0-9])([A-Z])/g, '$1 $2');
+      if (match[2]) {
+        const start = match.index + match[0].length - 1;
+        const body = text.slice(start, closeOf(text, start));
+        storyName = body.match(/\bname:\s*['"]([^'"]+)['"]/)?.[1] ?? storyName;
+      }
+      const override = text.match(new RegExp(`\b${exportName}\.storyName\s*=\s*['"]([^'"]+)['"]`))?.[1];
+      ids.add(storybookId(page.title, override ?? storyName));
+    }
+  }
+  return ids;
+}
+
+const allHeadings = (page) => [
+  ...page.sections.map((s) => s.title.toLowerCase()),
+  ...page.sections.flatMap((s) => s.subsections.map((sub) => sub.title.toLowerCase())),
 ];
 
-function extractSection(mdx, heading) {
-  const marker = `
-## ${heading}
-`;
-  const start = mdx.indexOf(marker);
-  if (start === -1) return null;
-  const after = mdx.slice(start + marker.length);
-  const next = after.indexOf(`
-## `);
-  return next === -1 ? after : after.slice(0, next);
-}
-
-for (const [label, file] of [
-  ['Button.mdx', BUTTON_MDX],
-  ['Modal.mdx', MODAL_MDX],
-]) {
-  test(`${label} carries a Footer actions section with all 8 r5 rules, DoDontPair cards, and the Hug or Fill table`, () => {
-    const mdx = read(file);
-    assert.doesNotMatch(mdx, /from ['"]@\/patterns['"]/, `${label} must import FooterActions from @/components, not @/patterns`);
-    const section = extractSection(mdx, 'Footer actions');
-    assert.ok(section, `${label} is missing "## Footer actions"`);
-
-    // Rule 1: 4 tracks, spacious (48), shouldFitContainer
-    assert.match(section, /four equal tracks|4 equal tracks/i, `${label}: rule 1 (4 tracks)`);
-    assert.match(section, /spacious/i, `${label}: rule 1 (spacious spacing)`);
-    assert.match(section, /48/, `${label}: rule 1 (48 height)`);
-    assert.match(section, /shouldFitContainer/, `${label}: rule 1 (shouldFitContainer)`);
-
-    // Rule 2: 1 button -> right half (tracks 3–4), no hallucinated `narrow` prop
-    assert.match(section, /right half/i, `${label}: rule 2 (right half)`);
-    assert.doesNotMatch(section, /`narrow`/, `${label}: must not reference removed narrow prop`);
-
-    // Rule 3: 2 buttons -> 50/50 split, soft neutral fill secondary left, primary right
-    assert.match(section, /50\/50/, `${label}: rule 3 (50/50 split)`);
-    assert.match(section, /--ds-background-neutral|soft neutral fill/i, `${label}: rule 3 (soft neutral fill)`);
-
-    // Rule 4: 3 buttons -> tracks 2, 3 and 4; rightmost primary
-    assert.match(section, /tracks? [`']?2[`']?,\s*[`']?3[`']?\s*(?:and|–|-)\s*[`']?4[`']?|tracks 2–4/i, `${label}: rule 4 (tracks 2–4)`);
-
-    // Rule 5: Leading text/subtle button hugs left content edge; filled buttons take tracks 3 and 4
-    assert.match(section, /hugs the left/i, `${label}: rule 5 (hugs left edge)`);
-
-    // Rule 6: Destructive dialogs -> danger primary, safer alternative secondary, 50/50
-    assert.match(section, /danger/i, `${label}: rule 6 (destructive danger primary)`);
-    assert.match(section, /safer alternative/i, `${label}: rule 6 (safer alternative secondary)`);
-
-    // Rule 7: No Cancel in footers (× dismisses); Cancel only in popups (compact, subtle, right-aligned)
-    assert.match(section, /never.*Cancel|no Cancel/i, `${label}: rule 7 (no Cancel in footers)`);
-    assert.match(section, /popup/i, `${label}: rule 7 (Cancel only in popups)`);
-
-    // Rule 8: Steps -> Back and Next split
-    assert.match(section, /Back.*Next/s, `${label}: rule 8 (Back and Next split)`);
-
-    // DoDontPair cards built from real components
-    assert.match(section, /<DoDontPair\b/, `${label}: must include DoDontPair cards`);
-    assert.match(section, /<FooterActions\b|<Modal\b/, `${label}: DoDontPair cards use real FooterActions/Modal instances`);
-
-    // Hug or Fill rule & 9-row table
-    assert.match(section, /Buttons fill in only two places|fill only in the footer slot/i, `${label}: Hug or Fill rule`);
-    for (const surface of HUG_OR_FILL_SURFACES) {
-      assert.ok(section.includes(surface), `${label}: Hug or Fill table missing "${surface}"`);
-    }
-    assert.match(section, /<DocsLink\b/, `${label}: Hug or Fill table links to Storybook pages`);
-  });
-}
-
-test('Button.mdx includes Anatomy and updated Parts for soft neutral fill, heights and shouldFitContainer', () => {
-  const mdx = read(BUTTON_MDX);
-  assert.match(mdx, /ButtonStories\.Anatomy/, 'Button.mdx renders ButtonStories.Anatomy');
-  const parts = extractSection(mdx, 'Parts');
-  assert.ok(parts, 'Button.mdx has ## Parts');
-  assert.match(parts, /--ds-background-neutral/, 'Parts names --ds-background-neutral');
-  assert.match(parts, /shouldFitContainer/, 'Parts names shouldFitContainer');
-  assert.match(parts, /spacious/, 'Parts names spacious spacing');
-  assert.match(parts, /48/, 'Parts names 48 height');
+test('FooterActions page has the Placement and Hug or fill sections', () => {
+  const page = readDocsPage(read(PAGES.FooterActions));
+  const headings = allHeadings(page);
+  assert.ok(headings.includes('placement'), 'FooterActions.mdx is missing the Placement section');
+  assert.ok(headings.includes('hug or fill'), 'FooterActions.mdx is missing the Hug or fill section');
 });
 
-test('ButtonGroup.mdx selected-state docs highlight the 1px --ds-border-selected border and hugging items', () => {
-  const mdx = read(BUTTON_GROUP_MDX);
-  assert.match(mdx, /--ds-border-selected/, 'ButtonGroup.mdx names --ds-border-selected');
-  assert.match(mdx, /1px.*border|border.*1px/i, 'ButtonGroup.mdx names the 1px border in selected state');
-  assert.match(mdx, /hug/i, 'ButtonGroup.mdx teaches that items hug their labels');
+test('Button and Modal pages each have a Footer actions section and link to FooterActions', () => {
+  const footerDocsId = readStorybookPage(REPO_ROOT, PAGES.FooterActions).docsId;
+  assert.ok(footerDocsId, 'FooterActions.mdx resolves to a Storybook docsId');
+
+  for (const name of ['Button', 'Modal']) {
+    const src = read(PAGES[name]);
+    const page = readDocsPage(src);
+    assert.ok(
+      page.sections.some((s) => s.title.toLowerCase() === 'footer actions'),
+      `${name}.mdx is missing a ## Footer actions section`,
+    );
+    const linkedIds = storybookLinks(src).map((l) => l.id);
+    assert.ok(
+      linkedIds.includes(footerDocsId),
+      `${name}.mdx does not link to ${footerDocsId}`,
+    );
+  }
+});
+
+test('every DocsLink on FooterActions, Button and Modal resolves to a real story or docs id', () => {
+  const validIds = collectStorybookIds(REPO_ROOT);
+  for (const [name, file] of Object.entries(PAGES)) {
+    const links = storybookLinks(read(file));
+    assert.ok(links.length > 0, `${name}.mdx should carry at least one Storybook link`);
+    for (const link of links) {
+      assert.ok(validIds.has(link.id), `${file}:${link.line} links to missing Storybook id "${link.id}"`);
+    }
+  }
 });

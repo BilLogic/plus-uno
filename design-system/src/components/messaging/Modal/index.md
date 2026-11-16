@@ -213,7 +213,7 @@ touched in the Harness tab.
 | `keyboard` | bool | `true` | Escape closes, by default. `false` for a dialog that has to be answered. |
 | `renderAs` | enum | `'modal'` | `modal` (default) opens as a real dialog over the page; `inline` draws the same panel in place as a plain block, for docs previews. |
 | `primaryButton` | buttonShape | — | The confirming footer button, drawn on the right. Takes `text` (default "Confirm"), `onClick`, `appearance` (default `primary`), `spacing` and `icon`. |
-| `secondaryButton` | buttonShape | — | The secondary footer button, drawn in the left half. Takes `text` (default "Discard"), `onClick`, `appearance` (default `default`), `spacing` and `icon`. |
+| `secondaryButton` | buttonShape | — | The secondary footer button, drawn in the left half when a primary button is also given. Takes `text` (default "Discard"), `onClick`, `appearance` (default `default`), `spacing` and `icon`. |
 | `onClose` | func | — | Called when the dialog asks to close: the close button, Escape (unless `keyboard` is false) or a press on the blanket (unless `blanket` blocks it). The parent sets `show` to false. |
 | `width` | enum or number or string | `'6-col'` | `4-col` · `6-col` · `8-col` · `10-col`: 4 · 6 · 8 · 10 columns of the screen grid plus the modal pad. Grows with the screen, never shrinks, ignores the sidebar. A number or a length is a fixed width, kept for the callers that still pass one. |
 | `className` | string | `''` | Extra class names added to the dialog panel beside the component's own. |

@@ -10,13 +10,15 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 
 <Meta of={FooterActionsStories} />
 
 <Title />
 The 4-track footer action bar for `Modal`, `Panel` and the focused view. Every
-filled button is sized at `spacing="spacious"` (48) with `shouldFitContainer`,
-and containers up to 400 wide automatically split actions across the full width.
+filled button is sized at `spacing="spacious"` (`48`) with `shouldFitContainer`,
+and when the footer itself is `400` px wide or less with no leading action, a
+single action spans the full width.
 
 <DocsTabs of={FooterActionsStories}>
 
@@ -35,7 +37,7 @@ and containers up to 400 wide automatically split actions across the full width.
 <ComponentExample
     of={FooterActionsStories.OneButton}
     title="One action"
-    description="A single acknowledgement action sits in the right half (tracks 3–4)."
+    description="A single acknowledgement action sits in the right half (tracks 3–4) when the footer is wider than 400 px."
 />
 
 <ComponentExample
@@ -53,19 +55,25 @@ and containers up to 400 wide automatically split actions across the full width.
 <ComponentExample
     of={FooterActionsStories.TextButtonLeft}
     title="Text action on the left"
-    description="A subtle or link action hugs the left content edge without taking a filled track, while the filled actions sit in tracks 3 and 4."
+    description="A subtle or link first child (or leadingAction) hugs the left content edge without taking a filled track, while filled actions sit in tracks 3 and 4."
 />
 
 <ComponentExample
     of={FooterActionsStories.DangerTextButtonLeft}
-    title="Danger text action on the left"
-    description="A destructive escape action such as Delete session hugs the left edge in danger text ink while the primary flow stays on the right."
+    title="Danger first child on the left"
+    description="A danger first child of two or more is treated as leading, hugging the left edge in danger text ink while the primary flow stays on the right."
+/>
+
+<ComponentExample
+    of={FooterActionsStories.TextLeftWithThreeFilled}
+    title="Leading action with three filled tracks"
+    description="When three filled buttons occupy tracks 2–4, the leading action clamps to track 1."
 />
 
 <ComponentExample
     of={FooterActionsStories.DestructiveSplit}
     title="Destructive confirmation"
-    description="In a destructive confirmation, the safer alternative is the secondary on the left and the danger action is the primary on the right, splitting 50/50."
+    description="In a destructive confirmation, the safer alternative sits on the left and the danger action sits rightmost, splitting 50/50."
 />
 
 <ComponentExample
@@ -76,8 +84,8 @@ and containers up to 400 wide automatically split actions across the full width.
 
 <ComponentExample
     of={FooterActionsStories.NarrowPanel}
-    title="Narrow container (400 and below)"
-    description="Measured with a CSS container query: when the footer container is 400 or narrower, a single action fills all 4 tracks."
+    title="Narrow footer (400 px and below)"
+    description="Measured on the footer container with @container (max-width: 400px): when there is no leading action, a single button fills all 4 tracks."
 />
 
 </div>
@@ -105,9 +113,46 @@ and containers up to 400 wide automatically split actions across the full width.
 
 ## Usage
 
-Use `FooterActions` inside `Modal`, `PanelFooter` and the focused task bar to
-place one to three filled `Button` actions on a 4-track grid with an optional
-leading text action.
+Use `FooterActions` inside <DocsLink id="components-messaging-modal">Modal</DocsLink>, <DocsLink id="templates-panel">Panel</DocsLink> (`PanelFooter`) and the <DocsLink id="templates-frame">focused view</DocsLink> to place one to three filled `Button` actions on a four-track grid with an optional leading action. Secondary buttons draw the `default` soft neutral fill (`--ds-background-neutral`) with no outline so pairs balance without heavy borders.
+
+1. **Four equal tracks.** `FooterActions` divides the width inside container padding into four equal tracks separated by `--inline-md`; every filled track button is cloned with `spacing="spacious"` (`48` high) and `shouldFitContainer`.
+2. **One action.** Sits in the right half (tracks `3` and `4`). A single action fills the full width (all four tracks) only when the footer itself is `400` px wide or less (`@container (max-width: 400px)`) and there is no leading action.
+3. **Two actions.** Split `50/50` across tracks `1`–`2` and `3`–`4`: secondary on the left in the `default` soft neutral fill (`--ds-background-neutral`), `primary` on the right.
+4. **Three actions.** Take one quarter each in tracks `2`, `3` and `4`; only the rightmost is `primary`.
+5. **Leading action.** A leading text, `link` or `subtle` action (or a link with `href`) hugs the left content edge only when it is the first child (of two or more) or is passed as `leadingAction`. A `danger` first child of two or more is also treated as leading, rendered in danger text ink on a subtle background. Filled actions then sit in tracks `3`–`4` (one filled), `3` and `4` (two filled), or `2`, `3` and `4` (three filled, clamping the leading action to track `1`).
+6. **Destructive confirmations.** Place the safer alternative (`default` secondary, such as "Archive instead") on the left and the `danger` action as the rightmost child, splitting `50/50` across tracks `1`–`2` and `3`–`4`.
+7. **No Cancel in footers.** `Modal`, `Panel` and the focused view already carry a corner close button, so footers name real outcomes ("Discard", "Save", never Cancel). Cancel appears only in inline popups (which have no close button): `compact`, `subtle`, right-aligned beside the action.
+8. **Steps.** In a multi-step flow, "Back" (`default`) and "Next" (`primary`) split `50/50` across tracks `1`–`2` and `3`–`4`.
+
+### Hug or fill
+
+Buttons fill in only two places: filled tracks inside `FooterActions`, and a single action when the footer itself is `400` px wide or less with no leading action. Everywhere else they hug their label.
+
+<DocsTable>
+<thead>
+<tr><th>Surface</th><th>Buttons</th><th>Story</th></tr>
+</thead>
+<tbody>
+<tr><td>Page header</td><td><code>default</code> 32; at most one <code>primary</code>, rightmost</td><td><DocsLink id="components-layout-and-structure-page-header">Layout/PageHeader</DocsLink></td></tr>
+<tr><td>Card or section header</td><td><code>subtle</code> <code>compact</code> text button and/or <code>subtle</code> icon button</td><td><DocsLink id="templates-card">Patterns/PatternCard</DocsLink>, <DocsLink id="templates-section">Section</DocsLink></td></tr>
+<tr><td>Table toolbar</td><td><code>compact</code>; <code>subtle</code> secondary, <code>primary</code> rightmost</td><td><DocsLink id="templates-table">Patterns/PatternTable</DocsLink></td></tr>
+<tr><td>Table row</td><td><code>subtle</code> icon buttons or one <code>subtle</code> <code>compact</code> text action; never filled</td><td><DocsLink id="templates-table">PatternTable</DocsLink>, <DocsLink id="components-text-and-data-display-dynamic-table">DynamicTable</DocsLink></td></tr>
+<tr><td>Popup inline confirm</td><td><code>compact</code>; <code>subtle</code> Cancel plus the action</td><td><DocsLink id="templates-popup">Patterns/Popup</DocsLink></td></tr>
+<tr><td>Empty state</td><td>centered; <code>default</code> 32 on a page, <code>compact</code> 24 in a card</td><td><DocsLink id="components-messaging-empty-state">Messaging/EmptyState</DocsLink>, <DocsLink id="patterns-states-empty">Docs/Empty</DocsLink></td></tr>
+<tr><td>Banner and Flag</td><td><code>subtle</code> <code>compact</code> text actions after the message</td><td><DocsLink id="components-messaging-banner">Messaging/Banner</DocsLink>, <DocsLink id="components-messaging-flag">Messaging/Flag</DocsLink></td></tr>
+<tr><td>Button group</td><td>items hug; selected item is the selected fill plus a 1px border</td><td><DocsLink id="components-forms-and-inputs-button-button-group">Navigation/ButtonGroup</DocsLink></td></tr>
+<tr><td>Inline with a field</td><td>same height as the field, <code>default</code> appearance</td><td><DocsLink id="patterns-forms">Docs/Forms</DocsLink>, <DocsLink id="templates-form">Patterns/Form</DocsLink></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For single-page or full-page forms where buttons hug their labels on the left, use `Button`.
+- For connected view or mode buttons in a toolbar, use `ButtonGroup`.
 
 </div>
 
@@ -115,9 +160,9 @@ leading text action.
 
 ## Parts
 
-1. **Grid container.** Four equal tracks separated by `--inline-md`, with `container-type: inline-size` so containers 400 or narrower adapt automatically.
-2. **Leading action** (`leadingAction`, or a leading `subtle`, `link` or `danger` button). Hugs the left content edge and never stretches across a track.
-3. **Filled actions.** One to three `Button` children cloned at `spacing="spacious"` (48) with `shouldFitContainer`.
+1. **Grid container.** Four equal tracks separated by `--inline-md`, with `container-type: inline-size` so footers `400` px wide or narrower adapt automatically.
+2. **Leading action** (`leadingAction`, or the first child of two or more when `subtle`, `link`, a link with `href`, or `danger`). Hugs the left content edge and never stretches across a filled track.
+3. **Filled actions.** One to three `Button` children cloned at `spacing="spacious"` (`48`) with `shouldFitContainer`.
 
 ### States
 
@@ -126,9 +171,9 @@ leading text action.
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Wide (over 400)</td><td>1 button takes tracks 3–4; 2 buttons split tracks 1–2 and 3–4; 3 buttons take tracks 2, 3 and 4.</td></tr>
-<tr><td>Narrow (400 and below)</td><td>Measured by <code>@container (max-width: 400px)</code>: a single action spans all 4 tracks.</td></tr>
-<tr><td>Leading text action</td><td>Hugs its label on the left edge while filled actions take the rightmost tracks.</td></tr>
+<tr><td>Wide (over 400 px)</td><td>1 filled button takes tracks 3–4; 2 split tracks 1–2 and 3–4; 3 take tracks 2, 3 and 4.</td></tr>
+<tr><td>Narrow (400 px and below)</td><td>Measured on the footer itself by <code>@container (max-width: 400px)</code>: a single action with no leading action spans all 4 tracks.</td></tr>
+<tr><td>Leading action</td><td>Hugs its label on the left edge when passed as <code>leadingAction</code> or placed as the first child of two or more, while filled actions take the rightmost tracks.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -152,7 +197,7 @@ leading text action.
 
 ### Keep the primary action on the right.
 
-Only the rightmost filled button carries the primary (or danger primary) appearance; secondary actions sit to its left in the default soft neutral fill.
+Only the rightmost filled button carries the `primary` (or `danger`) appearance; secondary actions sit to its left in the `default` soft neutral fill.
 
 <DoDontPair
     doExample={
@@ -175,9 +220,105 @@ Only the rightmost filled button carries the primary (or danger primary) appeara
     dontCaption="Two primary buttons competing in the same footer."
 />
 
+### Place a leading text or escape action first or in `leadingAction`.
+
+A `subtle`, `link` or `danger` button hugs the left edge only when it is the first child of two or more or passed via `leadingAction`.
+
+<DoDontPair
+    doExample={
+        <div style={{ inlineSize: '100%' }}>
+            <FooterActions>
+                <Button appearance="subtle" text="Not now" />
+                <Button text="Keep draft" />
+                <Button appearance="primary" text="Publish" />
+            </FooterActions>
+        </div>
+    }
+    doCaption="A subtle first child hugs the left edge while the filled pair sits in tracks 3 and 4."
+    dontExample={
+        <div style={{ inlineSize: '100%' }}>
+            <FooterActions>
+                <Button text="Keep draft" />
+                <Button appearance="subtle" text="Not now" />
+                <Button appearance="primary" text="Publish" />
+            </FooterActions>
+        </div>
+    }
+    dontCaption="A subtle child placed second takes a filled track instead of hugging the left edge."
+/>
+
+### Pair a destructive confirmation with a safer alternative.
+
+Put the safer alternative in the left half and the `danger` action rightmost; a `danger` button placed first of two is treated as a leading text action instead.
+
+<DoDontPair
+    doExample={
+        <div style={{ inlineSize: '100%' }}>
+            <FooterActions>
+                <Button text="Archive instead" />
+                <Button appearance="danger" text="Delete session" />
+            </FooterActions>
+        </div>
+    }
+    doCaption="Safer alternative on the left and danger rightmost, splitting 50/50."
+    dontExample={
+        <div style={{ inlineSize: '100%' }}>
+            <FooterActions>
+                <Button appearance="danger" text="Delete session" />
+                <Button text="Archive instead" />
+            </FooterActions>
+        </div>
+    }
+    dontCaption="Danger placed first of two becomes a leading text action instead of the primary confirmation."
+/>
+
 ### Omit Cancel when the corner close button dismisses.
 
 `Modal`, `Panel` and the focused view already provide a corner close control, so the footer names the real secondary outcome (`Discard`, `Keep editing`, `Archive instead`) rather than a generic Cancel.
+
+<DoDontPair
+    doExample={
+        <div style={{ inlineSize: '100%' }}>
+            <FooterActions>
+                <Button text="Discard" />
+                <Button appearance="primary" text="Save changes" />
+            </FooterActions>
+        </div>
+    }
+    doCaption="Real verbs split 50/50 across the footer."
+    dontExample={
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--inline-md)', inlineSize: '100%' }}>
+            <Button text="Cancel" />
+            <Button appearance="primary" text="Save changes" />
+        </div>
+    }
+    dontCaption="Hugging 32-high buttons and a Cancel label that duplicates the corner close button."
+/>
+
+### Split Back and Next across the footer in multi-step flows.
+
+Keep `Back` in the `default` appearance so the step pair splits `50/50` across both halves rather than collapsing `Back` into a leading text button.
+
+<DoDontPair
+    doExample={
+        <div style={{ inlineSize: '100%' }}>
+            <FooterActions>
+                <Button text="Back" />
+                <Button text="Next" appearance="primary" />
+            </FooterActions>
+        </div>
+    }
+    doCaption="Back and Next split 50/50 across tracks 1–2 and 3–4."
+    dontExample={
+        <div style={{ inlineSize: '100%' }}>
+            <FooterActions>
+                <Button appearance="subtle" text="Back" />
+                <Button text="Next" appearance="primary" />
+            </FooterActions>
+        </div>
+    }
+    dontCaption="Making Back subtle turns it into a leading text action instead of a 50/50 step pair."
+/>
 
 </div>
 
@@ -202,7 +343,7 @@ Only the rightmost filled button carries the primary (or danger primary) appeara
 ## Accessibility
 
 - **Focus order follows reading order.** The leading action receives focus first, followed by the secondary actions and the rightmost primary action.
-- **Full-track hit targets.** Every filled action uses `spacing="spacious"` (48) and fills its track.
+- **Full-track hit targets.** Every filled action uses `spacing="spacious"` (`48`) and fills its track.
 
 </div>
 
@@ -210,9 +351,9 @@ Only the rightmost filled button carries the primary (or danger primary) appeara
 
 ## Related
 
-- `Button`: the action control placed inside each footer track.
-- `Modal`: uses `FooterActions` for its bottom action bar.
-- `Panel`: pairs `PanelFooter` with `FooterActions` when editing or confirming in a side panel.
+- `Button`: use when placing an action control inside each footer track, or directly on a page form.
+- `Modal`: use when a blocking dialog needs `FooterActions` for its bottom action bar.
+- `Panel`: use when pairing `PanelFooter` with `FooterActions` while editing or confirming in a side panel.
 
 </div>
 

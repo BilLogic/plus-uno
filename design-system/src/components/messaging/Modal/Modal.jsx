@@ -351,7 +351,7 @@ Modal.propTypes = {
     renderAs: PropTypes.oneOf(['modal', 'inline']),
     /** The confirming footer button, drawn on the right. Takes `text` (default "Confirm"), `onClick`, `appearance` (default `primary`), `spacing` and `icon`. */
     primaryButton: buttonShape,
-    /** The secondary footer button, drawn in the left half. Takes `text` (default "Discard"), `onClick`, `appearance` (default `default`), `spacing` and `icon`. */
+    /** The secondary footer button, drawn in the left half when a primary button is also given. Takes `text` (default "Discard"), `onClick`, `appearance` (default `default`), `spacing` and `icon`. */
     secondaryButton: buttonShape,
     /** Called when the dialog asks to close: the close button, Escape (unless `keyboard` is false) or a press on the blanket (unless `blanket` blocks it). The parent sets `show` to false. */
     onClose: PropTypes.func,

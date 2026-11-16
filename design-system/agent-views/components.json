@@ -7755,7 +7755,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "The secondary footer button, drawn in the left half. Takes `text` (default \"Discard\"), `onClick`, `appearance` (default `default`), `spacing` and `icon`.",
+          "description": "The secondary footer button, drawn in the left half when a primary button is also given. Takes `text` (default \"Discard\"), `onClick`, `appearance` (default `default`), `spacing` and `icon`.",
           "deprecated": null
         },
         {

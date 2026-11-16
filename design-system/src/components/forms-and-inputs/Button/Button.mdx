@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ButtonStories from './Button.stories.jsx';
-import { Button, FooterActions } from '@/components';
+import { Button } from '@/components';
 import {
     DocsCanvasShell,
     DocsInteractivePlayground,
@@ -122,9 +122,17 @@ A button triggers an action and lets people know what happens next.
 
 <ComponentExample of={ButtonStories.FitContainer} title="Fit container" description="shouldFitContainer stretches the button to its parent's width, with the label centered." />
 
-<ComponentExample of={ButtonStories.FooterLayouts} title="Footer tracks" description="Inside FooterActions, spacious buttons draw 48 high and fill their assigned tracks across the four-track grid." />
-
 <ComponentExample of={ButtonStories.Truncation} title="Truncation" description="A label that does not fit ends in an ellipsis. Screen readers still read the full text." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Footer actions
+
+Inside <DocsLink id="components-forms-and-inputs-button-footer-actions">FooterActions</DocsLink>, filled buttons draw `48` high (`spacing="spacious"`) with `shouldFitContainer` across four equal tracks, while secondary actions use the `default` soft neutral fill (`--ds-background-neutral`) with no outline. Outside `FooterActions` (and a single action in a footer `400` px wide or less with no leading action), buttons hug their label. See <DocsLink id="components-forms-and-inputs-button-footer-actions">Footer actions</DocsLink> for the placement rules, do and don't pairs, and the hug-or-fill surface map.
+
+<ComponentExample of={ButtonStories.FooterLayouts} title="Footer tracks" description="Inside FooterActions, spacious buttons draw 48 high and fill their assigned tracks across the four-track grid." />
 
 </div>
 
@@ -251,65 +259,6 @@ Most buttons need no icon. Add one only when the glyph has an established meanin
 <tr><td>Radius</td><td>Default 6: <code>--button-radius-default</code>. Compact 4: <code>--button-radius-compact</code>. Spacious 10: <code>--button-radius-spacious</code>.</td></tr>
 <tr><td>Icon-to-label gap</td><td>4: <code>--inline-sm</code>.</td></tr>
 <tr><td>Label</td><td>Body/default at the medium weight; icons at 16 (<code>--icon-md</code>), chevrons at 12 (<code>--icon-sm</code>).</td></tr>
-</tbody>
-</DocsTable>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Footer actions
-
-<DocsLink id="components-forms-and-inputs-button-footer-actions">FooterActions</DocsLink> lays out actions in the footer slot of a <DocsLink id="components-messaging-modal">Modal</DocsLink>, <DocsLink id="templates-panel">Panel</DocsLink> or <DocsLink id="templates-frame">focused view</DocsLink>. Secondary buttons draw the `default` soft neutral fill (`--ds-background-neutral`) with no outline so the pair balances without heavy borders.
-
-1. **Four equal tracks.** `FooterActions` divides the width inside container padding into four equal tracks with an `--inline-md` gap; every track button uses `spacing="spacious"` (`48` high) and `shouldFitContainer`.
-2. **One button.** Takes the right half (tracks `3` and `4`), or all four tracks when the container is `4` columns (`400`) wide or narrower.
-3. **Two buttons.** Split `50/50` across the full width (tracks `1`–`2` and `3`–`4`): secondary on the left in the `default` soft neutral fill (`--ds-background-neutral`), `primary` on the right.
-4. **Three buttons.** Take one quarter each in tracks `2`, `3` and `4`; only the rightmost is `primary`.
-5. **Leading text button.** A text action (such as a danger "Delete session", or a `subtle` "Not now" or "Skip") hugs the left content edge and never takes a track; the filled buttons then sit in tracks `3` and `4`.
-6. **Destructive dialogs.** The `danger` action is the primary on the right and the safer alternative (such as "Archive instead") is the `default` secondary on the left, split `50/50`.
-7. **No Cancel in footers.** The header `×` dismisses, so footers carry real actions ("Discard" and "Save", never "Cancel"). "Cancel" appears only in popups (which have no `×`): `compact`, `subtle`, right-aligned with the action.
-8. **Steps.** "Back" and "Next" split `50/50` across the footer.
-
-<DoDontPair
-    doExample={<FooterActions><Button text="Discard" /><Button appearance="primary" text="Save changes" /></FooterActions>}
-    doCaption="Two footer actions split 50/50: soft neutral secondary on the left, primary on the right."
-    dontExample={<div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--inline-md)' }}><Button text="Cancel" /><Button appearance="primary" text="Save changes" /></div>}
-    dontCaption="Hugging 32-high buttons and a Cancel label that duplicates the × close button."
-/>
-
-<DoDontPair
-    doExample={<FooterActions><Button appearance="subtle" text="Not now" /><Button text="Keep draft" /><Button appearance="primary" text="Publish" /></FooterActions>}
-    doCaption="A subtle text button hugs the left edge while the filled pair sits in tracks 3 and 4."
-    dontExample={<FooterActions><Button appearance="primary" text="Publish" /><Button text="Keep draft" /><Button text="Not now" /></FooterActions>}
-    dontCaption="Primary placed first and a dismissive option given a filled track."
-/>
-
-<DoDontPair
-    doExample={<FooterActions><Button text="Archive instead" /><Button appearance="danger" text="Delete session" /></FooterActions>}
-    doCaption="Destructive footer splits 50/50 with the safer alternative on the left and danger on the right."
-    dontExample={<FooterActions><Button text="Cancel" /><Button appearance="primary" text="Delete session" /></FooterActions>}
-    dontCaption="Cancel offers no safer path, and brand primary masks an irreversible deletion."
-/>
-
-### Hug or fill
-
-Buttons fill in only two places: the footer slot, and the single action of a narrow container (`4` columns or fewer). Everywhere else they hug their label.
-
-<DocsTable>
-<thead>
-<tr><th>Surface</th><th>Buttons</th><th>Story</th></tr>
-</thead>
-<tbody>
-<tr><td>Page header</td><td><code>default</code> 32; at most one <code>primary</code>, rightmost</td><td><DocsLink id="components-layout-and-structure-page-header">Layout/PageHeader</DocsLink></td></tr>
-<tr><td>Card or section header</td><td><code>subtle</code> <code>compact</code> text button and/or <code>subtle</code> icon button</td><td><DocsLink id="templates-card">Patterns/PatternCard</DocsLink>, <DocsLink id="templates-section">Section</DocsLink></td></tr>
-<tr><td>Table toolbar</td><td><code>compact</code>; <code>subtle</code> secondary, <code>primary</code> rightmost</td><td><DocsLink id="templates-table">Patterns/PatternTable</DocsLink></td></tr>
-<tr><td>Table row</td><td><code>subtle</code> icon buttons or one <code>subtle</code> <code>compact</code> text action; never filled</td><td><DocsLink id="templates-table">PatternTable</DocsLink>, <DocsLink id="components-text-and-data-display-dynamic-table">DynamicTable</DocsLink></td></tr>
-<tr><td>Popup inline confirm</td><td><code>compact</code>; <code>subtle</code> Cancel plus the action</td><td><DocsLink id="templates-popup">Patterns/Popup</DocsLink></td></tr>
-<tr><td>Empty state</td><td>centered; <code>default</code> 32 on a page, <code>compact</code> 24 in a card</td><td><DocsLink id="components-messaging-empty-state">Messaging/EmptyState</DocsLink>, <DocsLink id="patterns-states-empty">Docs/Empty</DocsLink></td></tr>
-<tr><td>Banner and Flag</td><td><code>subtle</code> <code>compact</code> text actions after the message</td><td><DocsLink id="components-messaging-banner">Messaging/Banner</DocsLink>, <DocsLink id="components-messaging-flag">Messaging/Flag</DocsLink></td></tr>
-<tr><td>Button group</td><td>items hug; selected item is the selected fill plus a 1px border</td><td><DocsLink id="components-forms-and-inputs-button-button-group">Navigation/ButtonGroup</DocsLink></td></tr>
-<tr><td>Inline with a field</td><td>same height as the field, <code>default</code> appearance</td><td><DocsLink id="patterns-forms">Docs/Forms</DocsLink>, <DocsLink id="templates-form">Patterns/Form</DocsLink></td></tr>
 </tbody>
 </DocsTable>
 
