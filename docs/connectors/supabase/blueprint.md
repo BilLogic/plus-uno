@@ -2,7 +2,7 @@
 embodiment: all
 summary: What this blueprint is, how to retrieve from it, what absence and status mean, how paths relate to a scenario's main route, and the vocabulary — the hand-written core, always loaded; the schema is blueprint-schema.md beside it
 vendored_from: BilLogic/plus-uno-blueprint docs/agents/blueprint.md
-vendored_revision: 941d52264f6e
+vendored_revision: 339be02ef69a
 ---
 
 <!-- VENDORED from BilLogic/plus-uno-blueprint docs/agents/blueprint.md by agents/uno-bot/scripts/sync-blueprint-contract.mjs. Edit it there: this copy is overwritten by the sync, and `npm run check:contract` fails on drift. Its closing schema section is not upstream's: this repo's sync writes it (SCHEMA_POINTER) in place of the schema, which it vendors as blueprint-schema.md. -->
@@ -49,7 +49,7 @@ retriever to a scope. With filters and no `q` it returns the complete matching
 set in structural order — the honest way to say "every exception path" or
 "all of Discovery". `granularity` picks the level: phase, scenario, path,
 step, lane or cell. Every row carries `matched_by` and `total_matched`, so
-answer with the returned `total_matched` count behind the top-k, and say how many rows are shown.
+answer with the count behind the top-k: "113 cells mention Zoom; here are 15."
 Direct selects, embed hints and service-key routes are in
 [`blueprint-direct-access.md`](blueprint-direct-access.md).
 

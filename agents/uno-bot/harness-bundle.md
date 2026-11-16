@@ -15,7 +15,7 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **106,500 chars from 9 files**, against an assembled budget of 175,500 (69,000 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 86,116 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **106,481 chars from 9 files**, against an assembled budget of 175,500 (69,019 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 86,097 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
@@ -28,9 +28,9 @@ Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` lis
 | 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 69,452 | — |
 | 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 21,123 (−8,489 ide-only) | 90,626 | — |
 | 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 94,094 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,522 | 100,671 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 105,644 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 106,500 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 100,652 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 105,625 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 106,481 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -42,7 +42,7 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 162,679 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 162,118 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -52,7 +52,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `docs/connectors/figma/annotations` | [`docs/connectors/figma/annotations.md`](../../docs/connectors/figma/annotations.md) | 1,574 |
 | `docs/connectors/notion/page-writing` | [`docs/connectors/notion/page-writing.md`](../../docs/connectors/notion/page-writing.md) | 6,695 |
 | `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 23,554 |
-| `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 26,000 |
+| `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,439 |
 | `docs/conventions/design-system-glossary` | [`docs/conventions/design-system-glossary.md`](../../docs/conventions/design-system-glossary.md) | 21,361 |
 | `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,535 |
 | `draft-a-prd` | [`agents/uno-bot/skills/draft-a-prd/SKILL.md`](../../agents/uno-bot/skills/draft-a-prd/SKILL.md) | 3,724 |
@@ -1076,7 +1076,7 @@ retriever to a scope. With filters and no `q` it returns the complete matching
 set in structural order — the honest way to say "every exception path" or
 "all of Discovery". `granularity` picks the level: phase, scenario, path,
 step, lane or cell. Every row carries `matched_by` and `total_matched`, so
-answer with the returned `total_matched` count behind the top-k, and say how many rows are shown.
+answer with the count behind the top-k: "113 cells mention Zoom; here are 15."
 Direct selects, embed hints and service-key routes are in
 [`blueprint-direct-access.md`](blueprint-direct-access.md).
 
@@ -1572,38 +1572,32 @@ its description are the same migration.
 ### `agent_messages`
 Transcript events of an agent session, ordered by seq. Payload mirrors the app's TranscriptEvent.
 
-Signed-in only: a signed-in session reads it and the anon key is refused.
-
 0 of 6 columns described.
 
 | Column | Meaning |
 |---|---|
+| `created_at` | — |
 | `id` | — |
-| `session_id` | — |
-| `seq` | — |
 | `kind` | — |
 | `payload` | — |
-| `created_at` | — |
+| `seq` | — |
+| `session_id` | — |
 
 ### `agent_sessions`
 One canvas-agent conversation. Ledger entries reference it via agentSessionId (client-side).
-
-Signed-in only: a signed-in session reads it and the anon key is refused.
 
 1 of 5 columns described.
 
 | Column | Meaning |
 |---|---|
+| `created_at` | — |
+| `created_by` | Who owns this conversation. NULL means the row predates ownership (2026-08-28); those are readable by service accounts only and no new row may be NULL. |
 | `id` | — |
 | `title` | — |
-| `created_at` | — |
 | `updated_at` | — |
-| `created_by` | Who owns this conversation. NULL means the row predates ownership (2026-08-28); those are readable by service accounts only and no new row may be NULL. |
 
 ### `audit_findings`
 Audit / whatif / import-sweep outputs. Written by skills (IDE service key or canvas authenticated agent); humans triage by status. Prefixed on 2026-08-30 because the bare word `findings` gave a reader no clue which process produces the rows; the CONCEPT is still a finding everywhere else.
-
-Signed-in only: a signed-in session reads it and the anon key is refused.
 
 6 of 15 columns described.
 
@@ -1627,8 +1621,6 @@ Signed-in only: a signed-in session reads it and the anon key is refused.
 
 ### `authoring_changes`
 Append-only record of every authoring write. Audit-only: the in-memory stack in src/lib/authoringSession.ts is still the undo affordance, and nothing replays `revert` from here. A row with `deleted_kind` set is a deletion and carries the rows it destroyed; `public.trash` is the view over exactly those.
-
-Signed-in only: a signed-in session reads it and the anon key is refused.
 
 5 of 12 columns described.
 
@@ -1660,7 +1652,7 @@ Dependency from one cell to another
 | `created_at` | — |
 | `updated_at` | — |
 | `kind` | leads_to = temporal (this cell makes the other happen; drawn as an arrow); enables = functional (the other must already be in place). enables renders in the panel only. |
-| `name` | RETIRED (#550), and kept only so stage 1 is reversible. Documented as the word ON the arrow, it was never used as one: all 8 rows that carried it carried a sentence about why the edge exists, and 20260909040000 copied every one of them into note. Nothing writes it any more — not set_cell_dependency's argument, not the editor, not the agent tool. The dependency row still RENDERS it as a countTag, because that row is held byte-identical to the template's and the change to stop belongs upstream; stage 2 drops the column and that countTag together, and is a separate decision. |
+| `name` | RETIRED (#550), and kept only so stage 1 is reversible. Documented as the word ON the arrow, it was never used as one: all 8 rows that carried it carried a sentence about why the edge exists, and 20260909040000 copied every one of them into note. Nothing writes it any more — not set_cell_dependency's argument, not the editor, not the agent tool. The dependency row still RENDERS it as a badge, because that row is held byte-identical to the template's and the change to stop belongs upstream; stage 2 drops the column and that badge together, and is a separate decision. |
 | `note` | Anything worth knowing about this dependency, in the author's own words — rendered as the line under the dependency row, revealed on hover. General purpose, not "why this edge exists": the same kind of aside paths.note and scenarios.note carry, and since #550 the ONE prose field an edge has. Null means nothing was recorded, which is not the same as nothing worth recording. |
 
 ### `cell_touchpoints`
@@ -1675,7 +1667,7 @@ One touchpoint used at one cell: its own summary and role at this moment. Named 
 | `touchpoint_id` | — |
 | `position` | — |
 | `summary` | — |
-| `role` | What this touchpoint is to this moment: core (the step happens through it) or peripheral (present, but not what the step turns on), or null for the unmarked majority. Null is a state of its own and not a quiet "peripheral": it means nobody has judged this placement, so the panel renders nothing for it rather than a countTag saying so. On the placement and not the catalog because the same artifact is central at one step and incidental at another. |
+| `role` | What this touchpoint is to this moment: core (the step happens through it) or peripheral (present, but not what the step turns on), or null for the unmarked majority. Null is a state of its own and not a quiet "peripheral": it means nobody has judged this placement, so the panel renders nothing for it rather than a badge saying so. On the placement and not the catalog because the same artifact is central at one step and incidental at another. |
 | `origin` | — |
 | `created_at` | — |
 | `updated_at` | — |
@@ -1711,8 +1703,6 @@ Content at lane × step intersection, within one path.
 ### `evidence`
 Provenance rows for cells and proposition questions. A cell with zero rows is an ASSUMPTION (derived, never stored). Restricted SELECT: a note may hold interview content.
 
-Signed-in only: a signed-in session reads it and the anon key is refused.
-
 3 of 13 columns described.
 
 | Column | Meaning |
@@ -1732,9 +1722,7 @@ Signed-in only: a signed-in session reads it and the anon key is refused.
 | `updated_at` | — |
 
 ### `evidence_counts`
-cell_id -> evidence row count, without content. For signed-in readers, like evidence itself: anon holds no SELECT on either.
-
-Signed-in only: a signed-in session reads it and the anon key is refused.
+cell_id -> evidence row count. Public: powers the assumption lens without exposing evidence content.
 
 0 of 2 columns described.
 
@@ -1929,7 +1917,7 @@ Deployment-level cast list: one pool of actors a lane picks from, unique by name
 | `id` | — |
 | `name` | The identity: unique across the deployment, so the same actor recurs across services by name rather than as one row per service. |
 | `kind` | What sort of party this is. staff/recipient/partner/provider are ACTORS — they can be a lane's stakeholder. team is an accountable group — it can be a lane's owner_team and never its stakeholder. |
-| `summary` | What this party IS, in one line — a definition, not an aside. The lane panel and the owner countTag read it; a lane never copies it, because one stakeholder owns many lanes and 37 copies is 37 chances to disagree. |
+| `summary` | What this party IS, in one line — a definition, not an aside. The lane panel and the owner badge read it; a lane never copies it, because one stakeholder owns many lanes and 37 copies is 37 chances to disagree. |
 | `aliases` | — |
 | `created_at` | — |
 | `updated_at` | — |
@@ -1972,8 +1960,6 @@ Deployment-level catalog of the tools, documents, channels and artifacts the ser
 
 ### `trash`
 The deletions in public.authoring_changes, in the shape the retired deleted_structure table had. A filter over the one log, so the recovery list cannot drift from the record of what happened.
-
-Signed-in only: a signed-in session reads it and the anon key is refused.
 
 0 of 7 columns described.
 
