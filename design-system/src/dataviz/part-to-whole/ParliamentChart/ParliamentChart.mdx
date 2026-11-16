@@ -20,7 +20,7 @@ grouped and colored by category.
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Five groups of seats, sorted from most to least, with each group's count in the legend.</>}>
+<DocsCanvasShell attachSourceBelow description={<>Five groups of seats in input order, with each group's count in the legend.</>}>
     <Canvas of={ParliamentChartStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
@@ -63,8 +63,8 @@ exact count comparisons, use `BarChart`. For nested groups, use `SunburstChart`.
 ## Data shape
 
 `data` is an array of `{ name, value, color }` (`name` and whole-number `value`
-required; `color` optional). Sort `data` from most to least before passing it in
-so group and color order match size order.
+required; `color` optional). Groups keep input order by default so meaningful
+seat order stays intact; pass `sort` to order groups from most to least.
 
 ```jsx
 <ParliamentChart

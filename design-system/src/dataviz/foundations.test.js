@@ -4,7 +4,7 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import chartTheme, * as chartThemeModule from '@/dataviz/chartTheme';
-import { BODY, CHART_MARKER_RADIUS, CHART_NODE_RADIUS, MEDIUM, SEMIBOLD, TABULAR } from '@/dataviz/chartTheme';
+import { BODY, CHART_MARKER_RADIUS, CHART_NODE_HEIGHT, CHART_NODE_RADIUS, MEDIUM, SEMIBOLD, TABULAR } from '@/dataviz/chartTheme';
 import {
     CHART_VALUE_CLASS,
     dataLabelFormat,
@@ -74,9 +74,10 @@ describe('data-viz foundations', () => {
         expect(offenders).toEqual([]);
     });
 
-    it('exports shared mark radius roles from chartTheme and keeps tokenNumber internal', () => {
+    it('exports shared mark radius and size roles from chartTheme and keeps tokenNumber internal', () => {
         expect(CHART_MARKER_RADIUS).toBe(3);
-        expect(CHART_NODE_RADIUS).toBe(10);
+        expect(CHART_NODE_RADIUS).toBe(8);
+        expect(CHART_NODE_HEIGHT).toBe(32);
         expect('tokenNumber' in chartThemeModule).toBe(false);
     });
 

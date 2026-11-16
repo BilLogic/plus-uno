@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme from '@/dataviz/chartTheme';
+import chartTheme, { CHART_SPACING_COMPACT } from '@/dataviz/chartTheme';
+import { dataLabelFormat } from '@/dataviz/chartFormat';
 
 /**
  * DependencyWheel Component
@@ -15,25 +16,28 @@ const DependencyWheel = ({
         ...chartTheme,
         chart: {
             ...chartTheme.chart,
+            type: 'dependencywheel',
             height: height
         },
         title: { text: null },
         series: [{
             type: 'dependencywheel',
             keys: ['from', 'to', 'weight'],
+            colorByPoint: true,
             data: data,
             dataLabels: {
-                color: 'var(--ds-text)',
-                style: chartTheme.tooltip.style,
                 textPath: {
                     enabled: true,
                     attributes: { dy: 5 }
                 },
-                distance: 10
+                distance: CHART_SPACING_COMPACT
             }
         }],
         tooltip: {
-            ...chartTheme.tooltip
+            ...chartTheme.tooltip,
+            headerFormat: '',
+            nodeFormat: dataLabelFormat('{point.sum}', '{point.name}'),
+            pointFormat: dataLabelFormat('{point.weight}', '{point.fromNode.name} → {point.toNode.name}')
         }
     };
 

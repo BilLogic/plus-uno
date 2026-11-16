@@ -61,7 +61,8 @@ For nested levels, use `SunburstChart`. For two to five parts, use `PieChart` or
 ## Data shape
 
 `data` is an array of `{ name, value, color }` (`name` and raw `value`
-required; `color` optional when `colorByPoint` is on).
+required; `color` optional when `colorByPoint` is on). Tiles sort from most to
+least by default; pass `sort={false}` to preserve input order.
 
 ```jsx
 <TreemapChart

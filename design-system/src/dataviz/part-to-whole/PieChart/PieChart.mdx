@@ -48,7 +48,7 @@ use `StackedBarChart`. For nested parts, use `SunburstChart`.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Slices', <>One per item in <C>data</C>, sized by share of the total; clicking a slice selects it.</>],
+        ['Slices', <>One per item in <C>data</C>, sized by share of the total; a selected slice wears the selected fill and border tokens.</>],
         ['Data labels', 'Labels each slice with its name and percentage to one decimal place.'],
         ['Legend', <>Names each slice; shown by default and toggled by <C>showLegend</C>.</>],
         ['Tooltip', 'Shows the hovered slice’s percentage of the total.'],
@@ -63,8 +63,9 @@ use `StackedBarChart`. For nested parts, use `SunburstChart`.
 ## Data shape
 
 `data` is an array of `{ name, y, color }` (`name` and raw `y` required;
-`color` optional). The chart computes percentages from the sum of `y`. Sort
-`data` from most to least before passing it in.
+`color` optional). The chart computes percentages from the sum of `y` and sorts
+slices from most to least by default; pass `sort={false}` to preserve input
+order.
 
 ```jsx
 <PieChart

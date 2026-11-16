@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
 import chartTheme from '@/dataviz/chartTheme';
+import { dataLabelFormat } from '@/dataviz/chartFormat';
 
 /**
  * SankeyDiagram Component
@@ -16,17 +17,20 @@ const SankeyDiagram = ({
         ...chartTheme,
         chart: {
             ...chartTheme.chart,
+            type: 'sankey',
             height: height
         },
         title: { text: null },
         tooltip: {
             ...chartTheme.tooltip,
-            nodeFormat: '{point.name}: <b>{point.sum}</b>',
-            pointFormat: '{point.fromNode.name} → {point.toNode.name}: <b>{point.weight}</b>'
+            headerFormat: '',
+            nodeFormat: dataLabelFormat('{point.sum}', '{point.name}'),
+            pointFormat: dataLabelFormat('{point.weight}', '{point.fromNode.name} → {point.toNode.name}')
         },
         series: [{
             type: 'sankey',
             keys: ['from', 'to', 'weight'],
+            colorByPoint: true,
             data: data,
             nodes: undefined // Let Highcharts auto-generate nodes from data
         }]

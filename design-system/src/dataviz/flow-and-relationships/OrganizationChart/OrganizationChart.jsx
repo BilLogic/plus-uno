@@ -47,7 +47,9 @@ const OrganizationChart = ({
         }],
         tooltip: {
             ...chartTheme.tooltip,
-            outside: true
+            headerFormat: '',
+            nodeFormat: '{point.name}',
+            pointFormat: '{point.fromNode.name} → {point.toNode.name}'
         }
     };
 
