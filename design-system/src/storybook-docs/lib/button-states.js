@@ -2,10 +2,10 @@
  * Shared reads for the Buttons family's hover, pressed and focus stories.
  *
  * Every button in the family is drawn by `Button`, so each one takes the same
- * named tokens: a bold appearance its own bold step, default and subtle the
- * neutral subtle step. A story names the appearance it renders and these
- * helpers read the cascade against the tokens, so a rule that drifts fails in
- * the browser.
+ * named tokens: a bold appearance its own bold step, default the neutral step,
+ * and subtle the neutral subtle step. A story names the appearance it renders
+ * and these helpers read the cascade against the tokens, so a rule that drifts
+ * fails in the browser.
  */
 import { expect, waitFor } from 'storybook/test';
 import { withForcedPseudo } from './force-pseudo.js';
@@ -13,7 +13,7 @@ import { px, tokenColor } from './style-probes.js';
 
 /** Hovered and pressed ground per appearance. */
 export const STATE_GROUNDS = {
-    default: ['--ds-background-neutral-subtle-hovered', '--ds-background-neutral-subtle-pressed'],
+    default: ['--ds-background-neutral-hovered', '--ds-background-neutral-pressed'],
     subtle: ['--ds-background-neutral-subtle-hovered', '--ds-background-neutral-subtle-pressed'],
     primary: ['--ds-background-brand-bold-hovered', '--ds-background-brand-bold-pressed'],
     warning: ['--ds-background-warning-bold-hovered', '--ds-background-warning-bold-pressed'],

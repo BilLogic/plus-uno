@@ -20,7 +20,12 @@
         z-index: 1;
     }
 
-    // Primary has no edge of its own, so a primary menu trigger draws the seam.
+    // Default and primary have no outer edge of their own, so the menu trigger draws the seam.
+    > .plus-btn--default:not(.plus-btn--selected):last-child {
+        border-inline-start: var(--border-width-default) solid var(--ds-border);
+        margin-inline-start: 0;
+    }
+
     > .plus-btn--primary:last-child {
         border-inline-start: var(--border-width-default) solid var(--ds-border-inverse);
         margin-inline-start: 0;

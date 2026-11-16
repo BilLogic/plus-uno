@@ -67,8 +67,9 @@ ranking.
 ## Data shape
 
 `categories` is an array of strings. `series` is an array of `{ name, data }`,
-with one number per category in `categories` order. Omit `color` on a series to
-assign one automatically.
+with one number per category in `categories` order. Categories sort from most to
+least by default (`sort`); pass `sort={false}` for ordinal or temporal axes.
+Omit `color` on a series to assign one automatically.
 
 ```jsx
 <BarChart

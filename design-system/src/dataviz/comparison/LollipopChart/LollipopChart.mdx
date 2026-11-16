@@ -65,7 +65,9 @@ labels in columns.
 ## Data shape
 
 `categories` is an array of strings. `data` is an array of numbers in
-`categories` order. `height` defaults to 400; `horizontal` defaults to `true`.
+`categories` order. Categories sort from most to least by default; pass
+`sort={false}` for ordinal or temporal axes. `height` defaults to 400;
+`horizontal` defaults to `true`.
 
 ```jsx
 <LollipopChart
@@ -81,7 +83,7 @@ labels in columns.
 
 ## Color and accessibility
 
-- **Single series color.** Every dot uses categorical slot 1 with no per-point color override. Highlight notable items in surrounding text instead.
+- **Single series color.** Every dot uses `--chart-brand` with no per-point color override. Highlight notable items in surrounding text instead.
 - **Position carries the value.** Dots and stems trace each value to its label without hue.
 - **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Because there is no legend, `yAxisLabel` is the only name for the measure; name the chart in its surrounding Section or Card header.
 - **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).

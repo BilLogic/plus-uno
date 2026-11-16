@@ -81,7 +81,7 @@ const SURFACES = new Set(
     ].map((role) => PAINT[role]),
 );
 /** The stroke roles that count as an edge. Each one is held to the contrast check below. */
-const EDGE_ROLES = ['illustrationEdge', 'accent', 'fieldBorder', 'fieldBorderInvalid', 'buttonDefaultBorder'];
+const EDGE_ROLES = ['illustrationEdge', 'accent', 'fieldBorder', 'fieldBorderInvalid', 'buttonSelectedBorder'];
 const EDGES = new Set(EDGE_ROLES.map((role) => PAINT[role]));
 const same = (a, b) => ['x', 'y', 'width', 'height'].every((k) => a.getAttribute(k) === b.getAttribute(k));
 const fillOf = (el) => el.getAttribute('fill') || el.style.fill;

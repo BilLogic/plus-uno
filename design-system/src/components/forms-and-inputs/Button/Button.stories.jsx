@@ -3,7 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
-import Button, { BUTTON_APPEARANCES } from './Button';
+import Button, { BUTTON_APPEARANCES, BUTTON_SPACINGS } from './Button';
 import { Icon, SectionMessage } from '@/components';
 const icons = {
     'none': null,
@@ -25,9 +25,8 @@ const icons = {
  */
 const PAINT = {
     default: {
-        ground: '--ds-background-neutral-subtle', label: '--ds-text-subtle', icon: '--ds-icon-subtle',
-        hovered: '--ds-background-neutral-subtle-hovered', pressed: '--ds-background-neutral-subtle-pressed',
-        edge: '--ds-border-input',
+        ground: '--ds-background-neutral', label: '--ds-text', icon: '--ds-icon',
+        hovered: '--ds-background-neutral-hovered', pressed: '--ds-background-neutral-pressed',
     },
     primary: {
         ground: '--ds-background-brand-bold', label: '--ds-text-inverse', icon: '--ds-icon-inverse',
@@ -105,13 +104,13 @@ export default {
         },
         spacing: {
             control: 'inline-radio',
-            options: ['default', 'compact'],
-            description: 'Height and padding: `default` draws 32, `compact` draws 24. Compact is for tables and tight toolbars.',
+            options: BUTTON_SPACINGS,
+            description: 'Height and padding: `default` draws 32, `compact` draws 24, `spacious` draws 48. Compact is for tables and tight toolbars; spacious is for modal, panel and focused-view footers.',
             table: { category: 'Design' }
         },
         shouldFitContainer: {
             control: 'boolean',
-            description: 'Stretches the button to the width of its container.',
+            description: 'Stretches the button to the width of its container, with the label centered.',
             table: { category: 'Design' }
         },
 
@@ -197,25 +196,33 @@ export const Appearances = {
     },
 };
 
-/** Default draws 32; compact draws 24. Radius is 6 and 4, the icon-to-label gap 4. */
+/** Default draws 32, compact draws 24, spacious draws 48. Padding and radius come from tokens; the icon-to-label gap is 4. */
 export const Spacing = {
     render: () => (
         <div style={row}>
             <Button appearance="primary" text="Default" iconBefore="plus" />
             <Button appearance="primary" spacing="compact" text="Compact" iconBefore="plus" />
+            <Button appearance="primary" spacing="spacious" text="Spacious" iconBefore="plus" />
         </div>
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const defaults = canvas.getByRole('button', { name: 'Default' });
         const compact = canvas.getByRole('button', { name: 'Compact' });
+        const spacious = canvas.getByRole('button', { name: 'Spacious' });
         await expect(Math.round(defaults.getBoundingClientRect().height), 'default height').toBe(32);
         await expect(Math.round(compact.getBoundingClientRect().height), 'compact height').toBe(24);
-        await expect(px(getComputedStyle(defaults).borderTopLeftRadius), 'default radius').toBe(6);
-        await expect(px(getComputedStyle(compact).borderTopLeftRadius), 'compact radius').toBe(4);
+        await expect(Math.round(spacious.getBoundingClientRect().height), 'spacious height').toBe(48);
+        await expect(Math.round(defaults.getBoundingClientRect().height), 'default --control-md').toBe(tokenLength(canvasElement, '--control-md'));
+        await expect(Math.round(compact.getBoundingClientRect().height), 'compact --control-sm').toBe(tokenLength(canvasElement, '--control-sm'));
+        await expect(Math.round(spacious.getBoundingClientRect().height), 'spacious --control-xl').toBe(tokenLength(canvasElement, '--control-xl'));
+        await expect(px(getComputedStyle(defaults).borderTopLeftRadius), 'default radius').toBe(tokenLength(canvasElement, '--button-radius-default'));
+        await expect(px(getComputedStyle(compact).borderTopLeftRadius), 'compact radius').toBe(tokenLength(canvasElement, '--button-radius-compact'));
+        await expect(px(getComputedStyle(spacious).borderTopLeftRadius), 'spacious radius').toBe(tokenLength(canvasElement, '--button-radius-spacious'));
         await expect(px(getComputedStyle(defaults).paddingLeft), 'default padding').toBe(tokenLength(canvasElement, '--pad-x-md'));
         await expect(px(getComputedStyle(compact).paddingLeft), 'compact padding').toBe(tokenLength(canvasElement, '--pad-x-sm'));
-        for (const button of [defaults, compact]) {
+        await expect(px(getComputedStyle(spacious).paddingLeft), 'spacious padding').toBe(tokenLength(canvasElement, '--pad-x-lg'));
+        for (const button of [defaults, compact, spacious]) {
             await expect(px(getComputedStyle(button).columnGap), 'icon-to-label gap').toBe(4);
             await expect(px(getComputedStyle(button.querySelector('.plus-btn-visual i')).fontSize), 'icon size').toBe(16);
             const text = getComputedStyle(button.querySelector('.plus-btn-text'));
@@ -259,6 +266,9 @@ export const States = {
         await expect(selected).toHaveAttribute('aria-pressed', 'true');
         await expect(getComputedStyle(selected).backgroundColor, 'selected ground').toBe(tokenColor(canvasElement, '--ds-background-selected'));
         await expect(getComputedStyle(selected).color, 'selected label').toBe(tokenColor(canvasElement, '--ds-text-selected'));
+        await expect(getComputedStyle(selected).borderTopColor, 'selected edge').toBe(tokenColor(canvasElement, '--ds-border-selected'));
+        await expect(withForcedPseudo(selected, ':hover', () => getComputedStyle(selected).backgroundColor), 'selected hovered').toBe(tokenColor(canvasElement, '--ds-background-selected-hovered'));
+        await expect(withForcedPseudo(selected, ':active', () => getComputedStyle(selected).backgroundColor), 'selected pressed').toBe(tokenColor(canvasElement, '--ds-background-selected-pressed'));
 
         const disabled = canvas.getByRole('button', { name: 'Disabled' });
         settled(disabled);
@@ -301,7 +311,22 @@ export const Discovery = { render: () => <Button appearance="discovery" text="Tr
 export const Ai = { render: () => <Button appearance="ai" text="Generate summary" /> };
 
 /** Compact spacing, 24 high, for tables and toolbars. */
-export const Compact = { render: () => <Button appearance="primary" spacing="compact" text="Compact" /> };
+export const Compact = {
+    render: () => <Button appearance="primary" spacing="compact" text="Compact" />,
+    play: async ({ canvasElement }) => {
+        const button = within(canvasElement).getByRole('button', { name: 'Compact' });
+        await expect(Math.round(button.getBoundingClientRect().height)).toBe(24);
+    },
+};
+
+/** Spacious spacing, 48 high, for modal, panel and focused-view footers. */
+export const Spacious = {
+    render: () => <Button appearance="primary" spacing="spacious" text="Spacious" />,
+    play: async ({ canvasElement }) => {
+        const button = within(canvasElement).getByRole('button', { name: 'Spacious' });
+        await expect(Math.round(button.getBoundingClientRect().height)).toBe(48);
+    },
+};
 
 /** Selected sets `aria-pressed`. */
 export const Selected = { render: () => <Button text="Selected" isSelected /> };
@@ -309,18 +334,19 @@ export const Selected = { render: () => <Button text="Selected" isSelected /> };
 /** Disabled is a change of color, not of opacity. */
 export const Disabled = { render: () => <Button appearance="primary" text="Disabled" isDisabled /> };
 
-/** Loading swaps the label for a 16 Spinner, in both spacings, and blocks interaction. */
+/** Loading swaps the label for a 16 Spinner, across all spacings, and blocks interaction. */
 export const Loading = {
     render: () => (
         <div style={row}>
             <Button appearance="primary" text="Loading" isLoading />
             <Button appearance="primary" spacing="compact" text="Compact loading" isLoading />
+            <Button appearance="primary" spacing="spacious" text="Spacious loading" isLoading />
         </div>
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const icon = tokenLength(canvasElement, '--icon-md');
-        for (const name of ['Loading', 'Compact loading']) {
+        for (const name of ['Loading', 'Compact loading', 'Spacious loading']) {
             const button = canvas.getByRole('button', { name });
             const spinner = button.querySelector('.plus-spinner');
             await expect(spinner, `${name}: renders the Spinner`).not.toBeNull();
@@ -355,16 +381,28 @@ export const ExplainsOnPress = {
     },
 };
 
-/** Fills the width of its container. */
+/** Fills the width of its container, with the label centered. */
 export const FitContainer = {
     render: () => (
-        <div style={{ width: '320px' }}>
+        <div data-testid="fit-host" style={{ width: '320px', display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
             <Button appearance="primary" text="Full width button" shouldFitContainer />
+            <Button spacing="spacious" text="Spacious full width" shouldFitContainer />
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const button = within(canvasElement).getByRole('button', { name: 'Full width button' });
-        await expect(Math.round(button.getBoundingClientRect().width)).toBe(320);
+        const canvas = within(canvasElement);
+        const host = canvas.getByTestId('fit-host');
+        const hostRect = host.getBoundingClientRect();
+        for (const [name, expectedHeight] of [['Full width button', 32], ['Spacious full width', 48]]) {
+            const button = canvas.getByRole('button', { name });
+            const btnRect = button.getBoundingClientRect();
+            const textRect = button.querySelector('.plus-btn-text').getBoundingClientRect();
+            await expect(Math.round(btnRect.width), `${name} stretches to parent width`).toBe(Math.round(hostRect.width));
+            await expect(Math.round(btnRect.height), `${name} height`).toBe(expectedHeight);
+            const btnCenter = btnRect.left + btnRect.width / 2;
+            const textCenter = textRect.left + textRect.width / 2;
+            await expect(Math.abs(textCenter - btnCenter), `${name} label is centered`).toBeLessThanOrEqual(1);
+        }
     },
 };
 
@@ -404,8 +442,8 @@ export const Interactive = {
 
 /**
  * Hover and pressed take the named tokens, laid straight on the container: a
- * bold appearance its own bold step, default and subtle the neutral subtle
- * step.
+ * bold appearance its own bold step, default the neutral step, and subtle the
+ * neutral subtle step.
  */
 export const StateSteps = {
     parameters: { docs: { disable: true } },
@@ -430,7 +468,7 @@ export const StateSteps = {
     },
 };
 
-/** Tabbing onto a button draws the 2px focus ring 2px off its edge, and no fill. */
+/** Tabbing onto a button draws the 2px focus ring 2px off its edge, and keeps the rest fill. */
 export const KeyboardFocus = {
     parameters: { docs: { disable: true } },
     render: () => <Button text="Save" />,
@@ -444,7 +482,7 @@ export const KeyboardFocus = {
         await expect(px(style.outlineWidth), 'ring width').toBe(2);
         await expect(px(style.outlineOffset), 'ring gap').toBe(2);
         await expect(style.outlineColor, 'ring color').toBe(tokenColor(canvasElement, '--ds-border-focused'));
-        await expect(style.backgroundColor, 'no focus fill').toBe('rgba(0, 0, 0, 0)');
+        await expect(style.backgroundColor, 'focus keeps the rest fill').toBe(tokenColor(canvasElement, '--ds-background-neutral'));
     },
 };
 

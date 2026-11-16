@@ -10,7 +10,7 @@ Radio — single option within a named radio group. Supports controlled (`isChec
 
 **Source:** `design-system/src/components/forms-and-inputs/Radio/Radio.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Radio/Radio.stories.jsx` — Overview, Content, States, Invalid, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, HoverStep, Unselected, Selected, Hovered, Focused, Disabled, DisabledWithReason, Required, Tile, TileNarrowLargeIllustrations
+**Stories:** `design-system/src/components/forms-and-inputs/Radio/Radio.stories.jsx` — Overview, Content, States, Invalid, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, HoverStep, Unselected, Selected, Hovered, Focused, Disabled, DisabledWithReason, Required, Soft, Tile, TileNarrowLargeIllustrations
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Radio/Radio.mdx`
 
@@ -104,21 +104,22 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Parts
 
-1. **Radio.** A 12 circle. Selected, it fills with the selected bold fill and draws an inverse dot; unselected, it is an empty circle.
+1. **Radio.** A 12 circle in `plain` and `card` appearances; visually hidden in `soft` and `tile` while keeping native radio semantics, keyboard navigation, and form submission.
 2. **Label.** 14/20 text beside the radio in a 24 row. It names the option. An optional minority marker (`"(optional)"` or `"(required)"`) follows a standalone radio's label in plain text.
 3. **Description.** Optional 12/16 text under the label that describes the option. It does not name it.
+4. **Appearances.** `plain` draws the circle and label inline; `card` wraps them in a bordered surface row; `soft` draws a `--ds-background-neutral` row without a radio dot (selected row shows `--ds-background-selected`, a 1px `--ds-border-selected` edge, and a trailing `fa-solid fa-check` icon) for the majority selection type in a choice flow while the minority selection type keeps its visible control; `tile` draws a 224px pictured card.
 
 ### States
 
 | State | What changes |
 | --- | --- |
-| Hovered | Unselected: `--ds-background-input-hovered` with a `--ds-border-brand` edge. Selected: the hovered step of the selected bold fill. |
-| Pressed | No step of its own. The hovered look holds while the pointer is down. |
-| Focused | A 2px ring in `--ds-border-focused`, 2px off the radio, for keyboard focus only. |
-| Selected | `--ds-background-selected-bold` fill and `--ds-border-selected` edge; the dot is `--ds-icon-inverse`. |
-| Invalid | The unselected radio takes `--ds-border-danger`. A selected radio keeps its fill. |
+| Hovered | Unselected: `--ds-background-input-hovered` with a `--ds-border-brand` edge (or `--ds-background-neutral-hovered` in `soft`). Selected: the hovered step of the selected bold fill (or `--ds-background-selected-hovered` in `soft`). |
+| Pressed | No step of its own in plain/card. In `soft`, an unselected row takes `--ds-background-neutral-pressed` and a selected row takes `--ds-background-selected-pressed`. |
+| Focused | A 2px ring in `--ds-border-focused`, 2px off the radio (or around the row in `soft` and `tile`), for keyboard focus only. |
+| Selected | `--ds-background-selected-bold` fill and `--ds-border-selected` edge; the dot is `--ds-icon-inverse`. In `soft`, `--ds-background-selected` fill, 1px `--ds-border-selected` edge, and a trailing check in `--ds-icon-selected`. |
+| Invalid | The unselected radio or tile takes `--ds-border-danger` (in `soft`, both unselected and selected rows take `--ds-border-danger`). |
 | Read-only | Full contrast, in the tab order, no hover; an unchecked radio takes the `--ds-background-neutral` fill. Not changeable. |
-| Disabled | `--ds-background-disabled` fill, `--ds-border-disabled` edge, `--ds-icon-disabled` dot. Out of the tab order. |
+| Disabled | `--ds-background-disabled` fill, `--ds-border-disabled` edge, `--ds-icon-disabled` dot or check. Out of the tab order. |
 
 ### Tokens
 
@@ -129,6 +130,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Row | `--control-sm` (24); gap `--space-050`. |
 | Label | `--ds-text`, body default. |
 | Card | `--radius-control-md`, `--stroke-1` edge in `--ds-border`, `--ds-surface` fill. |
+| Soft row | `--radius-control-md`, `--ds-background-neutral` fill at rest; selected `--ds-background-selected` fill, `--border-width-default` `--ds-border-selected` edge, and `--icon-sm` trailing check in `--ds-icon-selected`. |
 | Choice tile | `--choice-tile-width` (224px), `--radius-control-md`, `--ds-surface` fill; selected 2px `--ds-border-selected` and `--ds-background-selected`. |
 
 ## Content guidelines
@@ -158,7 +160,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `isRequired` | bool | `false` | Sets the required constraint (`aria-required`) on a standalone radio. Pair with `labelMarker="required"` only when required fields are the minority in the form. |
 | `description` | node | — | Secondary text under the label. It describes the option; it does not name it. |
 | `illustration` | node | — | Decorative picture shown above the label when `appearance` is `tile`. |
-| `appearance` | enum | `'plain'` | `plain` (default) is a radio beside its label; `card` draws a bordered row; `tile` draws a centered pictured tile. |
+| `appearance` | enum | `'plain'` | `plain` (default) is a radio beside its label; `card` draws a bordered row; `soft` draws a neutral row without a radio dot; `tile` draws a centered pictured tile. |
 | `grouped` | bool | `false` | Set by `RadioGroup`. Not for direct use. |
 | `onChange` | func | — | Called with `{ target: { name, value, checked: true } }` when the option is chosen. A radio never reports being unchecked. |
 | `onFocus` | func | — | Called with the focus event when the radio gains focus. |
@@ -172,7 +174,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 **`labelMarker`** — `required` · `optional`
 
-**`appearance`** — `plain` · `card` · `tile`
+**`appearance`** — `plain` · `card` · `soft` · `tile`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 

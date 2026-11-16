@@ -117,7 +117,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Hovered | The container takes the hovered fill of its appearance. |
 | Pressed | The container takes the pressed fill of its appearance. |
 | Focused | A 2px ring in `--ds-border-focused`, 2px off the edge, for keyboard focus only. |
-| Selected | The selected role fill; the metric takes the label color. Sets `aria-pressed`. |
+| Selected | The selected role fill and a 1px `--ds-border-selected` edge; the metric takes the label color. Sets `aria-pressed`. |
 | Disabled | The disabled fill, label and icon: a change of color, not of opacity. |
 | Loading | A spinner replaces the label. Blocks interaction and sets `aria-busy`. |
 

@@ -19,6 +19,7 @@ Start here for space, size and radius (ADR-038). A component reads its component
 --control-lg  /* Height of a large control: 40px high. */
 --control-md  /* Height of a default control: 32px high. */
 --control-sm  /* Height of a small control: 24px high. */
+--control-xl  /* Height of an extra-large control: 48px high. */
 --focus-ring-offset  /* Gap between an element and its focus ring, when it must differ from the ring width. */
 --focus-ring-width  /* Width of the keyboard focus ring; also its offset unless the offset must differ. */
 --grid-columns  /* Column count of the page grid. */
@@ -116,6 +117,7 @@ Tokens one component owns, named for it.
 --avatar-size-96  /* Size of an extra-large UserAvatar, such as in a profile header. */
 --button-radius-compact  /* Corner rounding of a Button with compact spacing. */
 --button-radius-default  /* Corner rounding of a Button with default spacing. */
+--button-radius-spacious  /* Corner rounding of a Button with spacious spacing. */
 --calendar-day-lg  /* Size of a day cell in a large Calendar. */
 --calendar-day-md  /* Size of a day cell in a default Calendar. */
 --calendar-day-sm  /* Size of a day cell in a compact Calendar. */

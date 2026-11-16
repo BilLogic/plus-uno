@@ -8,6 +8,8 @@
  * in `tokens` and every component style win over it.
  */
 
+@use 'type' as *;
+
 *,
 *::before,
 *::after {
@@ -124,7 +126,42 @@ textarea {
     margin: 0;
     font-family: inherit;
     font-size: inherit;
+    font-weight: inherit;
     line-height: inherit;
+}
+
+/* Every PLUS component uses the product font family; non-inline component roots default to body-default. */
+:where([class^="plus-"], [class*=" plus-"]):not(
+    .plus-icon,
+    .fa-solid,
+    .fa-regular,
+    .fa-brands,
+    .fas,
+    .far,
+    .fab
+) {
+    font-family: var(--type-family-body);
+}
+
+:where(
+    :where([class^="plus-"], [class*=" plus-"]):not(:where([class^="plus-"] *, [class*=" plus-"] *)),
+    .plus-field-stack,
+    .plus-search-field,
+    .plus-select-wrapper,
+    .plus-form-checkbox-wrapper,
+    .plus-form-radio-wrapper,
+    .plus-toggle-wrapper
+):not(
+    .plus-link,
+    .plus-icon,
+    .fa-solid,
+    .fa-regular,
+    .fa-brands,
+    .fas,
+    .far,
+    .fab
+) {
+    @include ds-type(var(--body-default));
 }
 
 button,

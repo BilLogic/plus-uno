@@ -51,8 +51,8 @@ for.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Track', <>Full-height pill behind each column in <C>--ds-background-neutral</C>, marking 100% with no hover.</>],
-        ['Column', <>One per item in <C>data</C>, filled to <C>height</C> on a 0–100 scale in the item's <C>color</C>, rounded at both ends.</>],
+        ['Track', <>Full-height track behind each column in <C>--ds-background-neutral</C>, rounded at the value end by <C>--chart-bar-radius</C> and marking 100% with no hover.</>],
+        ['Column', <>One per item in <C>data</C>, filled to <C>height</C> on a 0–100 scale in the item's <C>color</C> (or <C>--chart-brand</C>), rounded at the value end by <C>--chart-bar-radius</C>.</>],
         ['Category labels', <>One per column from each item's <C>letter</C>.</>],
         ['Value axis', 'None. Fixed 0–100 scale, hidden, with no gridlines.'],
         ['Tooltip', 'Shows the category and value with a percent sign.'],
@@ -65,9 +65,13 @@ for.
 
 ## Data shape
 
-`data` is an array of `{ letter, height, color }` (all required): `height` is a
-numeric string from `0` to `100`, `letter` labels the column, and `color` fills
-it. The chart's `height` prop sets its pixel height (default 200).
+`data` is an array of `{ letter, height, color }`: `height` is a numeric string
+from `0` to `100`, `letter` labels the column, and `color` fills it (defaulting
+to `--chart-brand`). Items sort from most to least by default through
+`mostToLeast`; pass `sort={false}` for ordinal or temporal axes such as grades
+or weekdays, and pair with `toneByRank` (passing `(d) => parseFloat(d.height)`)
+when shading items across a sequential ramp so the darkest tone lands on the
+largest value. The chart's `height` prop sets its pixel height (default 200).
 
 ```jsx
 <SmartBarChart
@@ -88,7 +92,7 @@ it. The chart's `height` prop sets its pixel height (default 200).
 
 ## Color and accessibility
 
-- **Caller-assigned color.** `color` is required on every item. Use `BRAND` (`--chart-brand`) for one measure across categories, or one hue from `sequentialRamp` (strongest step on the largest value) for ordered groups such as grades.
+- **Caller-assigned color.** `color` is required on every item. Use `BRAND` (`--chart-brand`) for one measure across categories, or `toneByRank` on one sequential hue (strongest step on rank 0) for ordered groups such as grades.
 - **Fill height carries the value.** The chart reads without hue; never use color alone to flag a column as good or bad.
 - **Hover-only numbers.** With no axis or data labels, exact values appear only in the tooltip. State key numbers in surrounding text or use `BarChart`.
 - **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Explain single-letter category labels in nearby text, and name the chart in its surrounding Section or Card header.

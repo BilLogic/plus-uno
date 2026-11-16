@@ -32,7 +32,8 @@ export const figmaMeta = {
       "type": "enum",
       "values": [
         "default",
-        "compact"
+        "compact",
+        "spacious"
       ]
     },
     "iconBefore": {
@@ -112,9 +113,11 @@ A button triggers an action and lets people know what happens next.
 
 <ComponentExample of={ButtonStories.Compact} title="Compact" description="Spacing compact draws 24 high, for table rows and inline toolbars. Default draws 32." />
 
+<ComponentExample of={ButtonStories.Spacious} title="Spacious" description="Spacing spacious draws 48 high, for modal, panel and focused-view footers." />
+
 <ComponentExample of={ButtonStories.Icons} title="Icons" description="An icon before, after, or on both sides of the label." />
 
-<ComponentExample of={ButtonStories.FitContainer} title="Fit container" description="shouldFitContainer fills the parent, as in a narrow card footer or a mobile sheet." />
+<ComponentExample of={ButtonStories.FitContainer} title="Fit container" description="shouldFitContainer stretches the button to its parent's width, with the label centered." />
 
 <ComponentExample of={ButtonStories.Truncation} title="Truncation" description="A label that does not fit ends in an ellipsis. Screen readers still read the full text." />
 
@@ -201,7 +204,7 @@ Use `Button` for an action on the current page: submit a form, mark attendance, 
 
 ## Parts
 
-1. **Container.** The pressable area, 32 high at default spacing and 24 at compact.
+1. **Container.** The pressable area: 32 high at default spacing, 24 at compact and 48 at spacious.
 2. **Icon before** (optional). A Font Awesome Free glyph at 16, before the label.
 3. **Label.** Body/default at the medium weight. It says what the action does.
 4. **Icon after** (optional). A Font Awesome Free glyph at 16, after the label.
@@ -219,7 +222,7 @@ Most buttons need no icon. Add one only when the glyph has an established meanin
 <tr><td>Hovered</td><td>The container takes the appearance's hovered fill. The label and icon keep their colors.</td></tr>
 <tr><td>Pressed</td><td>The container takes the appearance's pressed fill.</td></tr>
 <tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the edge, for keyboard focus only.</td></tr>
-<tr><td>Selected</td><td>The selected role fill, label and icon. Applies to default and subtle, and sets <code>aria-pressed</code>.</td></tr>
+<tr><td>Selected</td><td>The selected role fill, 1px <code>--ds-border-selected</code> edge, label and icon. Applies to default and subtle, and sets <code>aria-pressed</code>.</td></tr>
 <tr><td>Disabled</td><td>The disabled fill, label and icon: a change of color, not of opacity. Subtle stays transparent.</td></tr>
 <tr><td>Loading</td><td>A 16 <code>Spinner</code> replaces the label and icons. The container keeps its fill, blocks interaction and sets <code>aria-busy</code>.</td></tr>
 </tbody>
@@ -232,15 +235,15 @@ Most buttons need no icon. Add one only when the glyph has an established meanin
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Fill: default, subtle</td><td><code>--ds-background-neutral-subtle</code>, hovered and pressed steps. Default adds a 1px <code>--ds-border-input</code> edge.</td></tr>
+<tr><td>Fill: default, subtle</td><td><code>--ds-background-neutral</code> (default) and <code>--ds-background-neutral-subtle</code> (subtle), each with hovered and pressed steps. Neither draws an edge.</td></tr>
 <tr><td>Fill: primary, warning, danger, discovery</td><td><code>--ds-background-brand-bold</code>, <code>-warning-bold</code>, <code>-danger-bold</code>, <code>-discovery-bold</code>, each with hovered and pressed steps.</td></tr>
 <tr><td>Fill: AI</td><td><code>--ds-ai-background-bold</code>, with hovered and pressed steps.</td></tr>
-<tr><td>Fill: selected, disabled</td><td><code>--ds-background-selected</code> with hovered and pressed steps; <code>--ds-background-disabled</code>.</td></tr>
-<tr><td>Label and icon</td><td><code>--ds-text-subtle</code> and <code>--ds-icon-subtle</code> (default, subtle); <code>--ds-text-inverse</code> and <code>--ds-icon-inverse</code> (primary, danger, discovery, ai); <code>--ds-text-warning-inverse</code> (warning); the selected and disabled roles.</td></tr>
+<tr><td>Fill: selected, disabled</td><td><code>--ds-background-selected</code> with hovered and pressed steps and a 1px <code>--ds-border-selected</code> edge; <code>--ds-background-disabled</code>.</td></tr>
+<tr><td>Label and icon</td><td><code>--ds-text</code> and <code>--ds-icon</code> (default); <code>--ds-text-subtle</code> and <code>--ds-icon-subtle</code> (subtle); <code>--ds-text-inverse</code> and <code>--ds-icon-inverse</code> (primary, danger, discovery, ai); <code>--ds-text-warning-inverse</code> (warning); the selected and disabled roles.</td></tr>
 <tr><td>Focus ring</td><td><code>--ds-border-focused</code>, 2px, 2px offset.</td></tr>
-<tr><td>Height</td><td>32: <code>--control-md</code>. 24: <code>--control-sm</code>.</td></tr>
-<tr><td>Padding</td><td>12: <code>--pad-x-md</code>. Compact 8: <code>--pad-x-sm</code>.</td></tr>
-<tr><td>Radius</td><td>6: <code>--button-radius-default</code>. Compact 4: <code>--button-radius-compact</code>.</td></tr>
+<tr><td>Height</td><td>Default 32: <code>--control-md</code>. Compact 24: <code>--control-sm</code>. Spacious 48: <code>--control-xl</code>.</td></tr>
+<tr><td>Padding</td><td>Default 12: <code>--pad-x-md</code>. Compact 8: <code>--pad-x-sm</code>. Spacious 16: <code>--pad-x-lg</code>.</td></tr>
+<tr><td>Radius</td><td>Default 6: <code>--button-radius-default</code>. Compact 4: <code>--button-radius-compact</code>. Spacious 10: <code>--button-radius-spacious</code>.</td></tr>
 <tr><td>Icon-to-label gap</td><td>4: <code>--inline-sm</code>.</td></tr>
 <tr><td>Label</td><td>Body/default at the medium weight; icons at 16 (<code>--icon-md</code>), chevrons at 12 (<code>--icon-sm</code>).</td></tr>
 </tbody>
@@ -274,7 +277,7 @@ The `ai` appearance marks the main AI action in a region, such as "Generate summ
 
 ### Pick the spacing for the surrounding space.
 
-Use `default` spacing in most places, and `compact` for tables and inline toolbars.
+Use `default` spacing in most places, `compact` for tables and inline toolbars, and `spacious` in modal, panel and focused-view footers.
 
 ### Keep an action enabled and explain on press.
 

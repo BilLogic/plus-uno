@@ -79,9 +79,9 @@ const ROLES = {
   // Button
   buttonPrimary: ['--ds-background-brand-bold', 'components/forms-and-inputs/Button/Button.scss'],
   buttonPrimaryText: ['--ds-text-inverse', 'components/forms-and-inputs/Button/Button.scss'],
-  buttonDefault: ['--ds-background-neutral-subtle', 'components/forms-and-inputs/Button/Button.scss'],
-  buttonDefaultBorder: ['--ds-border-input', 'components/forms-and-inputs/Button/Button.scss'],
-  buttonDefaultText: ['--ds-text-subtle', 'components/forms-and-inputs/Button/Button.scss'],
+  buttonDefault: ['--ds-background-neutral', 'components/forms-and-inputs/Button/Button.scss'],
+  buttonDefaultText: ['--ds-text', 'components/forms-and-inputs/Button/Button.scss'],
+  buttonSelectedBorder: ['--ds-border-selected', 'components/forms-and-inputs/Button/Button.scss'],
   // Tabs
   tabsDivider: ['--ds-border', 'components/navigation/Tabs/Tabs.scss'],
   tabSelected: ['--ds-border-selected', 'components/navigation/Tabs/Tabs.scss'],

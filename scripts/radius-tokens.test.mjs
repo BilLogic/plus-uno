@@ -35,9 +35,9 @@ const RADIUS = {
   '--frame-sidebar-row-radius': [6, 'var(--radius-control-sm)'],
 };
 
-test('--radius-full and the 18 semantic and component tokens exist', () => {
-  for (const name of ['--radius-full', '--button-radius-default', '--button-radius-compact']) assert.ok(corpus.has(name), name);
-  assert.equal(Object.keys(RADIUS).length + 3, 18);
+test('--radius-full and the 19 semantic and component tokens exist', () => {
+  for (const name of ['--radius-full', '--button-radius-default', '--button-radius-compact', '--button-radius-spacious']) assert.ok(corpus.has(name), name);
+  assert.equal(Object.keys(RADIUS).length + 4, 19);
 });
 
 for (const [name, [px, raw]] of Object.entries(RADIUS)) {
@@ -49,10 +49,12 @@ for (const [name, [px, raw]] of Object.entries(RADIUS)) {
   });
 }
 
-test('the slot inset is 4px and the Button radii are field radius minus it', () => {
+test('the slot inset is 4px and the Button radii follow the control ladder', () => {
   assert.equal(corpus.get('--pad-x-xs')?.value, '4px');
   assert.equal(corpus.get('--button-radius-default')?.raw, 'calc(var(--radius-control-lg) - var(--pad-x-xs))');
   assert.equal(corpus.get('--button-radius-compact')?.raw, 'calc(var(--radius-control-md) - var(--pad-x-xs))');
+  assert.equal(corpus.get('--button-radius-spacious')?.raw, 'var(--radius-control-lg)');
+  assert.equal(corpus.get('--button-radius-spacious')?.value, '10px');
 });
 
 const RETIRED = [

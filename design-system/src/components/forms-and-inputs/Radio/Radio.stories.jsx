@@ -3,6 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
+import { contrastRatio, paintedOver } from '@/storybook-docs/lib/contrast.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { expectChoiceReadOnly } from '@/storybook-docs/lib/field-states.js';
 import { Illustration } from '@/components';
@@ -40,7 +41,7 @@ export default {
         },
         appearance: {
             control: 'select',
-            options: ['plain', 'card', 'tile'],
+            options: ['plain', 'card', 'soft', 'tile'],
             table: { category: 'Design' },
         },
         isInvalid: {
@@ -364,6 +365,78 @@ export const Required = {
         await expect(canvasElement.querySelector('.plus-form-radio-wrapper')).toHaveClass('plus-form-radio-required');
         await expect(canvasElement.textContent).not.toContain('*');
     },
+};
+
+export const Soft = () => {
+    const [value, setValue] = useState('one');
+    return (
+        <div style={stack}>
+            <Radio
+                id="radio-soft-one"
+                name="radio-soft"
+                value="one"
+                label="One-on-one"
+                description="Work with one student."
+                appearance="soft"
+                isChecked={value === 'one'}
+                onChange={(e) => setValue(e.target.value)}
+            />
+            <Radio
+                id="radio-soft-group"
+                name="radio-soft"
+                value="group"
+                label="Small group"
+                description="Guide two to four students."
+                appearance="soft"
+                isChecked={value === 'group'}
+                onChange={(e) => setValue(e.target.value)}
+            />
+        </div>
+    );
+};
+Soft.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const first = canvas.getByRole('radio', { name: 'One-on-one' });
+    const second = canvas.getByRole('radio', { name: 'Small group' });
+    const selectedRow = first.closest('.plus-choice-soft');
+    const restRow = second.closest('.plus-choice-soft');
+
+    // No radio dot is visible; native role and aria-checked remain intact.
+    await expect(getComputedStyle(first).opacity).toBe('0');
+    await expect(getComputedStyle(second).opacity).toBe('0');
+    await expect(first).toHaveAttribute('aria-checked', 'true');
+    await expect(second).toHaveAttribute('aria-checked', 'false');
+
+    // Rest row: neutral fill, transparent border, hidden trailing check.
+    selectedRow.style.transition = 'none';
+    restRow.style.transition = 'none';
+    await expect(withForcedPseudo(canvasElement, ':hover', () => getComputedStyle(restRow).backgroundColor)).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+    await expect(getComputedStyle(restRow).borderTopColor).toBe('rgba(0, 0, 0, 0)');
+    await expect(getComputedStyle(restRow.querySelector('.plus-choice-soft-check')).opacity).toBe('0');
+
+    // Selected row: selected fill, 1px selected border, visible trailing check (12px, selected icon color).
+    await expect(withForcedPseudo(canvasElement, ':hover', () => getComputedStyle(selectedRow).backgroundColor)).toBe(tokenColor(canvasElement, '--ds-background-selected'));
+    await expect(px(getComputedStyle(selectedRow).borderTopWidth)).toBe(1);
+    await expect(getComputedStyle(selectedRow).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-selected'));
+    const check = selectedRow.querySelector('.plus-choice-soft-check');
+    await expect(check).toHaveAttribute('aria-hidden', 'true');
+    await expect(getComputedStyle(check).opacity).toBe('1');
+    await expect(px(getComputedStyle(check).fontSize)).toBe(12);
+    await expect(getComputedStyle(check).color).toBe(tokenColor(canvasElement, '--ds-icon-selected'));
+
+    // Unselected pressed row steps to --ds-background-neutral-pressed.
+    restRow.style.transition = 'none';
+    const restPressed = withForcedPseudo(restRow, ':active', () => getComputedStyle(restRow).backgroundColor);
+    await expect(restPressed).toBe(tokenColor(canvasElement, '--ds-background-neutral-pressed'));
+
+    // Selected check passes 3:1 non-text contrast on --ds-background-selected in every color mode.
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        const ground = paintedOver(getComputedStyle(selectedRow).backgroundColor, token('--ds-surface'));
+        await expect(
+            contrastRatio(getComputedStyle(check).color, ground),
+            `${mode}: selected soft check holds >= 3:1 contrast`
+        ).toBeGreaterThanOrEqual(3);
+    });
 };
 
 export const Tile = () => {

@@ -96,6 +96,7 @@ const CheckboxGroup = ({
         'plus-checkbox-group',
         `plus-checkbox-group-${orientation}`,
         appearance === 'card' ? 'plus-checkbox-group-card' : '',
+        appearance === 'soft' ? 'plus-checkbox-group-soft' : '',
         appearance === 'tile' ? 'plus-checkbox-group-tile' : '',
         className,
     ].filter(Boolean).join(' ');
@@ -154,8 +155,8 @@ CheckboxGroup.propTypes = {
     defaultValue: PropTypes.arrayOf(optionValueType),
     /** Receives the next array of selected option values when a box is toggled. */
     onChange: PropTypes.func,
-    /** Passed to every Checkbox. `card` draws each as a bordered row; `tile` draws centered pictured tiles with a Checkbox at the top end. */
-    appearance: PropTypes.oneOf(['plain', 'card', 'tile']),
+    /** Passed to every Checkbox. `card` draws each as a bordered row; `soft` draws each as a neutral row without a checkbox; `tile` draws centered pictured tiles with a Checkbox at the top end. */
+    appearance: PropTypes.oneOf(['plain', 'card', 'soft', 'tile']),
     /** Marks the form's minority case in plain text after the legend: `required` or `optional`. */
     labelMarker: PropTypes.oneOf(['required', 'optional']),
     /** Announces the group as required to assistive technology. Pair with `labelMarker="required"` only when required fields are the minority in the form. */

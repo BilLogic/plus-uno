@@ -4,6 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import ButtonGroup from './ButtonGroup';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { expectFocusRing, expectHovered, expectPressed } from '@/storybook-docs/lib/button-states.js';
+import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { Button, IconButton } from '@/components';
 
 const row = { display: 'flex', flexWrap: 'wrap', gap: '24px', alignItems: 'center' };
@@ -129,8 +130,20 @@ export const Selected = {
     },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(canvas.getByRole('button', { name: 'Week' })).toHaveAttribute('aria-pressed', 'true');
-        await expect(canvas.getByRole('button', { name: 'Month' })).toHaveAttribute('aria-pressed', 'false');
+        const week = canvas.getByRole('button', { name: 'Week' });
+        const month = canvas.getByRole('button', { name: 'Month' });
+        week.style.transition = 'none';
+        month.style.transition = 'none';
+        await expect(week).toHaveAttribute('aria-pressed', 'true');
+        await expect(month).toHaveAttribute('aria-pressed', 'false');
+        const weekStyle = getComputedStyle(week);
+        await expect(weekStyle.backgroundColor, 'selected fill').toBe(tokenColor(canvasElement, '--ds-background-selected'));
+        await expect(weekStyle.color, 'selected text').toBe(tokenColor(canvasElement, '--ds-text-selected'));
+        await expect(weekStyle.borderTopColor, 'selected border').toBe(tokenColor(canvasElement, '--ds-border-selected'));
+        const monthStyle = getComputedStyle(month);
+        await expect(monthStyle.backgroundColor, 'default fill').toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+        await expect(monthStyle.color, 'default text').toBe(tokenColor(canvasElement, '--ds-text'));
+        await expect(monthStyle.borderTopColor, 'default border').toBe('rgba(0, 0, 0, 0)');
     },
 };
 

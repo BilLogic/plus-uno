@@ -50,7 +50,7 @@ const Radio = ({
     description,
     /** Decorative picture shown above the label when `appearance` is `tile`. */
     illustration,
-    /** `card` draws the option as a bordered row; `tile` draws a centered pictured tile. */
+    /** `card` draws the option as a bordered row; `soft` draws a neutral row without a radio dot; `tile` draws a centered pictured tile. */
     appearance = 'plain',
     /** Set by `RadioGroup`: renders bare inside its ambient Base UI RadioGroup instead of a private one. Not for direct use. */
     grouped = false,
@@ -66,6 +66,7 @@ const Radio = ({
     const fieldId = useFieldId(id);
     const isControlled = isChecked !== undefined;
     const isTile = appearance === 'tile';
+    const isSoft = appearance === 'soft';
     const tone = isInvalid ? 'invalid' : undefined;
     const { control } = toneProps(tone);
     const { 'aria-describedby': describedBy, ...inputRest } = props;
@@ -112,7 +113,7 @@ const Radio = ({
             invalid={isInvalid}
             className={wrapperClasses}
             style={style}
-            onClick={isTile ? activateChoiceTile : undefined}
+            onClick={isTile || isSoft ? activateChoiceTile : undefined}
         >
             {isTile && illustration && (
                 <div className="plus-choice-tile-illustration" aria-hidden="true">
@@ -136,6 +137,7 @@ const Radio = ({
                 <FieldLabel htmlFor={fieldId} labelMarker={labelMarker} isRequired={isRequired} name={name} className="plus-form-radio-label">
                     {label}
                 </FieldLabel>
+                {isSoft && <i className="fa-solid fa-check plus-choice-soft-check" aria-hidden="true" />}
             </div>
             <FieldCaption messageId={messageId} message={description} tone="help" />
         </FieldFrame>
@@ -169,8 +171,8 @@ Radio.propTypes = {
     description: PropTypes.node,
     /** Decorative picture shown above the label when `appearance` is `tile`. */
     illustration: PropTypes.node,
-    /** `plain` (default) is a radio beside its label; `card` draws a bordered row; `tile` draws a centered pictured tile. */
-    appearance: PropTypes.oneOf(['plain', 'card', 'tile']),
+    /** `plain` (default) is a radio beside its label; `card` draws a bordered row; `soft` draws a neutral row without a radio dot; `tile` draws a centered pictured tile. */
+    appearance: PropTypes.oneOf(['plain', 'card', 'soft', 'tile']),
     /** Set by `RadioGroup`. Not for direct use. */
     grouped: PropTypes.bool,
     /** Called with `{ target: { name, value, checked: true } }` when the option is chosen. A radio never reports being unchecked. */

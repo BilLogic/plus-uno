@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme from '@/dataviz/chartTheme';
-import { BRAND } from '@/dataviz/palette';
+import chartTheme, { CHART_BAR_RADIUS } from '@/dataviz/chartTheme';
+import { valueSpan } from '@/dataviz/chartFormat';
+import { BRAND, sortCategories } from '@/dataviz/palette';
 
 /**
  * BulletChart Component
@@ -12,8 +13,14 @@ import { BRAND } from '@/dataviz/palette';
 const BulletChart = ({
     data = [],
     categories = [],
-    height = 200
+    height = 200,
+    sort = true,
 }) => {
+    const { categories: orderedCategories, series: [{ data: orderedData }] } = useMemo(
+        () => (sort ? sortCategories({ categories, series: [{ data }] }) : { categories, series: [{ data }] }),
+        [categories, data, sort],
+    );
+
     const options = {
         ...chartTheme,
         chart: {
@@ -25,7 +32,7 @@ const BulletChart = ({
         title: { text: null },
         xAxis: {
             ...chartTheme.xAxis,
-            categories: categories
+            categories: orderedCategories
         },
         yAxis: {
             ...chartTheme.yAxis,
@@ -47,12 +54,13 @@ const BulletChart = ({
         },
         tooltip: {
             ...chartTheme.tooltip,
-            pointFormat: '<b>{point.y}</b> (target: {point.target})'
+            pointFormat: `${valueSpan('{point.y}')} (target: ${valueSpan('{point.target}')})`
         },
         plotOptions: {
             bullet: {
                 pointPadding: 0.25,
                 borderWidth: 0,
+                borderRadius: CHART_BAR_RADIUS,
                 color: BRAND,
                 targetOptions: {
                     width: '140%',
@@ -62,7 +70,7 @@ const BulletChart = ({
             }
         },
         series: [{
-            data: data
+            data: orderedData
         }],
         legend: { enabled: false }
     };
@@ -83,7 +91,9 @@ BulletChart.propTypes = {
     /** Category labels */
     categories: PropTypes.arrayOf(PropTypes.string),
     /** Chart height */
-    height: PropTypes.number
+    height: PropTypes.number,
+    /** Sort categories from most to least by default; pass false for ordinal or temporal axes. */
+    sort: PropTypes.bool,
 };
 
 export default BulletChart;

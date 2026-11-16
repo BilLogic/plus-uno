@@ -28,8 +28,12 @@
             border-bottom-right-radius: 0;
         }
 
-        // A neighbor's edge should never cover another button's focus ring
-        // or hover fill.
+        // A neighbor's edge should never cover another button's selected
+        // border, focus ring or hover fill.
+        &.plus-btn--selected {
+            z-index: 1;
+        }
+
         @include plus-state(
             $states: (
                 hovered: (z-index: 1),

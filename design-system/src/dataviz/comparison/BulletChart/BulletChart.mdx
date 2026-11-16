@@ -68,7 +68,9 @@ fixed at 0 to 100.
 ## Data shape
 
 `categories` is an array of row labels. `data` is an array of `{ y, target }` in
-the same order. `height` defaults to 200; allow roughly 60 to 80 px per row.
+the same order. Rows sort from most to least by `y` by default; pass
+`sort={false}` for ordinal or temporal axes. `height` defaults to 200; allow
+roughly 60 to 80 px per row.
 
 ```jsx
 <BulletChart

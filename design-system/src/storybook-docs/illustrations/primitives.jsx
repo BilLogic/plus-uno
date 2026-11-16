@@ -329,7 +329,7 @@ export const Field = ({ x, y, w, accent = false, invalid = false }) => (
 /**
  * A Button in one of two fidelities, and only in appearances PLUS ships:
  * `primary` (brand fill, the drawing's accent, on the subject only) or
- * `default` (the real default: no fill, the input border).
+ * `default` (the real default: soft neutral fill, no border).
  * - Blocked out (no `label`): a flat strip with no words, for drawings about
  *   where things sit (layout, placement, which surface opens, a sequence).
  * - Real (`label`): the real button with its word, for drawings about which
@@ -339,13 +339,12 @@ export const Field = ({ x, y, w, accent = false, invalid = false }) => (
 export const ButtonShape = ({ x, y, w, appearance = 'default', label }) => {
   const primary = appearance === 'primary';
   const fill = primary ? PAINT.buttonPrimary : PAINT.buttonDefault;
-  const stroke = primary ? undefined : PAINT.buttonDefaultBorder;
   if (!label) {
-    return <Rect x={x} y={y} w={w} h={8} fill={fill} stroke={stroke} corner="button" />;
+    return <Rect x={x} y={y} w={w} h={8} fill={fill} corner="button" />;
   }
   return (
     <g data-fidelity="real">
-      <Rect x={x} y={y} w={w} h={16} fill={fill} stroke={stroke} corner="button" />
+      <Rect x={x} y={y} w={w} h={16} fill={fill} corner="button" />
       <text
         x={x + w / 2}
         y={y + 8}

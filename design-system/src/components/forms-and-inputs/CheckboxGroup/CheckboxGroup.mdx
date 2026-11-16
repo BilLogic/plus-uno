@@ -55,6 +55,14 @@ A checkbox group asks one question and offers a set of checkbox answers, any num
 
 <div className="sb-ds-doc-section">
 
+## Soft appearance
+
+<ComponentExample of={CheckboxGroupStories.Soft} title="Soft options" description="`appearance=&quot;soft&quot;` draws neutral option rows without a visible checkbox box; selection is carried by the selected fill, 1px selected border, and trailing check." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Tile appearance
 
 <ComponentExample of={CheckboxGroupStories.Tiles} title="Choice tiles" description="`appearance=&quot;tile&quot;` lays out 224px pictured tiles inline and wrapping, with a Checkbox at each tile's top end." />
@@ -143,7 +151,7 @@ Use `CheckboxGroup` for one question where a person may pick several answers —
 ## Parts
 
 1. **Legend.** The question. It names the `<fieldset>` and carries an optional minority marker (`"(optional)"` or `"(required)"`) in plain text.
-2. **Options.** Checkboxes in a stacked list, an inline row, bordered `card` rows, or 224px `tile` cards.
+2. **Options.** Checkboxes in a stacked list, an inline row, bordered `card` rows, `soft` rows without a visible checkbox box, or 224px `tile` cards.
 3. **Tile checkbox and illustration.** When `appearance` is `tile`, each tile centers its decorative `illustration`, `label`, and `description`, and anchors its `Checkbox` at the top end so multi-select is clear before clicking.
 4. **Reveal.** Optional content under an option, shown while that option is selected.
 5. **Error.** One message under the group, tied to the `<fieldset>` with `aria-describedby`.
@@ -155,11 +163,12 @@ Use `CheckboxGroup` for one question where a person may pick several answers —
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Rest</td><td>Plain/card as Checkbox; tile uses <code>--ds-surface</code> fill and 1px <code>--ds-border</code> edge.</td></tr>
-<tr><td>Hovered</td><td>Plain/card as Checkbox; unselected tile uses <code>--ds-surface-hovered</code> and <code>--ds-border-brand</code>; selected tile uses <code>--ds-background-selected-hovered</code>.</td></tr>
-<tr><td>Selected</td><td>Each selected Checkbox takes <code>--ds-background-selected-bold</code>; a selected tile also takes <code>--ds-background-selected</code> and a 2px <code>--ds-border-selected</code> edge.</td></tr>
-<tr><td>Focused</td><td>2px ring in <code>--ds-border-focused</code>: around the box in plain/card, and outside the tile in <code>tile</code> appearance.</td></tr>
-<tr><td>Invalid</td><td>Unselected options take <code>--ds-border-danger</code>, with one error message announced for the group.</td></tr>
+<tr><td>Rest</td><td>Plain/card as Checkbox; <code>soft</code> uses <code>--ds-background-neutral</code> with no border; tile uses <code>--ds-surface</code> fill and 1px <code>--ds-border</code> edge.</td></tr>
+<tr><td>Hovered</td><td>Plain/card as Checkbox; unselected <code>soft</code> uses <code>--ds-background-neutral-hovered</code>; unselected tile uses <code>--ds-surface-hovered</code> and <code>--ds-border-brand</code>; selected <code>soft</code> and tile use <code>--ds-background-selected-hovered</code>.</td></tr>
+<tr><td>Selected</td><td>Each selected Checkbox takes <code>--ds-background-selected-bold</code>; a selected <code>soft</code> row takes <code>--ds-background-selected</code>, a 1px <code>--ds-border-selected</code> edge, and a trailing <code>fa-solid fa-check</code> icon in <code>--ds-icon-selected</code>; a selected tile takes <code>--ds-background-selected</code> and a 2px <code>--ds-border-selected</code> edge.</td></tr>
+<tr><td>Pressed</td><td>In <code>soft</code>, an unselected row steps to <code>--ds-background-neutral-pressed</code> and a selected row steps to <code>--ds-background-selected-pressed</code>.</td></tr>
+<tr><td>Focused</td><td>2px ring in <code>--ds-border-focused</code>: around the box in plain/card, and outside the row or tile in <code>soft</code> and <code>tile</code> appearances.</td></tr>
+<tr><td>Invalid</td><td>Unselected options take <code>--ds-border-danger</code> (and in <code>soft</code>, selected options do too), with one error message announced for the group.</td></tr>
 <tr><td>Read-only</td><td>Full contrast, focusable, no hover, <code>aria-readonly</code> on each Checkbox; unchecked controls and tiles take <code>--ds-background-neutral</code>.</td></tr>
 <tr><td>Disabled</td><td>Every option takes the disabled fill and edge and leaves the tab order.</td></tr>
 </tbody>
@@ -173,6 +182,7 @@ Use `CheckboxGroup` for one question where a person may pick several answers —
 </thead>
 <tbody>
 <tr><td>Options gap</td><td>Stacked <code>--stack-md</code>; inline and tile gap <code>--inline-lg</code>.</td></tr>
+<tr><td>Soft row</td><td><code>--ds-background-neutral</code> fill at rest; selected <code>--ds-background-selected</code> fill, <code>--border-width-default</code> <code>--ds-border-selected</code> edge, and <code>--icon-sm</code> trailing check in <code>--ds-icon-selected</code>.</td></tr>
 <tr><td>Choice tile width</td><td><code>--choice-tile-width</code> (224px), inline and wrapping.</td></tr>
 <tr><td>Tile surface and edge</td><td><code>--ds-surface</code> and <code>--ds-border</code>; selected <code>--ds-background-selected</code> and 2px <code>--ds-border-selected</code>; radius <code>--radius-control-md</code>.</td></tr>
 <tr><td>Reveal indent</td><td><code>--checkbox-control-size</code> plus <code>--stack-md</code>.</td></tr>
@@ -184,6 +194,39 @@ Use `CheckboxGroup` for one question where a person may pick several answers —
 <div className="sb-ds-doc-section">
 
 ## Best practices
+
+### Mark the minority selection type in a flow of choice questions.
+
+In a flow of choice questions (onboarding, quizzes, check-ins, surveys), pick one default selection type for the flow: the majority type uses `appearance="soft"` without a visible radio dot or checkbox box, while the minority type keeps its visible control (`card` or `plain`) so people notice when a question works differently, following the same exception-marking rule as required and optional fields on [Forms](?path=/docs/patterns-forms--docs).
+
+<DoDontPair
+    doExample={
+        <CheckboxGroup
+            name="do-cbg-minority"
+            legend="Which subjects can you tutor? (Select all that apply)"
+            appearance="card"
+            defaultValue={['math']}
+            options={[
+                { value: 'math', label: 'Math' },
+                { value: 'reading', label: 'Reading' },
+            ]}
+        />
+    }
+    doCaption="In a mostly single-select flow, the minority multi-select question keeps its visible checkboxes so multi-select is unmistakable."
+    dontExample={
+        <CheckboxGroup
+            name="dont-cbg-minority"
+            legend="Which subjects can you tutor?"
+            appearance="soft"
+            defaultValue={['math']}
+            options={[
+                { value: 'math', label: 'Math' },
+                { value: 'reading', label: 'Reading' },
+            ]}
+        />
+    }
+    dontCaption="Both the majority single-select questions and the minority multi-select question hide their controls, so nothing signals that multiple answers work here."
+/>
 
 ### Name the question with a legend.
 

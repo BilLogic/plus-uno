@@ -776,6 +776,7 @@
         "--ds-text-accent-purple",
         "--ds-text-accent-teal",
         "--ds-text-accent-yellow",
+        "--heading-xs",
         "--icon-lg",
         "--icon-md",
         "--icon-sm",
@@ -788,8 +789,7 @@
         "--type-size-075",
         "--type-size-0875",
         "--type-size-100",
-        "--type-size-200",
-        "--type-weight-semibold"
+        "--type-size-200"
       ]
     },
     {
@@ -1219,9 +1219,10 @@
           "default": "'default'",
           "values": [
             "default",
-            "compact"
+            "compact",
+            "spacious"
           ],
-          "description": "Height and padding: `default` draws 32, `compact` draws 24. Compact is for tables and tight toolbars.",
+          "description": "Height and padding: `default` draws 32, `compact` draws 24, `spacious` draws 48. Compact is for tables and tight toolbars; spacious is for modal, panel and focused-view footers.",
           "deprecated": null
         },
         {
@@ -1230,7 +1231,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Stretches the button to the width of its container.",
+          "description": "Stretches the button to the width of its container, with the label centered.",
           "deprecated": null
         },
         {
@@ -1383,6 +1384,7 @@
         "Discovery",
         "Ai",
         "Compact",
+        "Spacious",
         "Selected",
         "Disabled",
         "Loading",
@@ -1400,10 +1402,11 @@
         "--border-width-default",
         "--button-radius-compact",
         "--button-radius-default",
+        "--button-radius-spacious",
         "--control-md",
         "--control-sm",
+        "--control-xl",
         "--ds-background-disabled",
-        "--ds-border-disabled",
         "--ds-icon-disabled",
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
@@ -1411,6 +1414,7 @@
         "--icon-md",
         "--icon-sm",
         "--inline-sm",
+        "--pad-x-lg",
         "--pad-x-md",
         "--pad-x-sm",
         "--radius-full",
@@ -2236,9 +2240,10 @@
           "values": [
             "plain",
             "card",
+            "soft",
             "tile"
           ],
-          "description": "`plain` (default) draws the box and label inline; `card` draws a bordered row; `tile` draws a centered pictured tile with the checkbox at its top end.",
+          "description": "`plain` (default) draws the box and label inline; `card` draws a bordered row; `soft` draws a neutral row without a checkbox; `tile` draws a centered pictured tile with the checkbox at its top end.",
           "deprecated": null
         },
         {
@@ -2326,6 +2331,7 @@
         "Required",
         "Description",
         "Card",
+        "Soft",
         "Tile",
         "TileNarrowLargeIllustrations"
       ],
@@ -2466,9 +2472,10 @@
           "values": [
             "plain",
             "card",
+            "soft",
             "tile"
           ],
-          "description": "Passed to every Checkbox. `card` draws each as a bordered row; `tile` draws centered pictured tiles with a Checkbox at the top end.",
+          "description": "Passed to every Checkbox. `card` draws each as a bordered row; `soft` draws each as a neutral row without a checkbox; `tile` draws centered pictured tiles with a Checkbox at the top end.",
           "deprecated": null
         },
         {
@@ -2552,6 +2559,7 @@
         "Orientation",
         "Descriptions",
         "Reveal",
+        "Soft",
         "Tiles",
         "Unselected",
         "Selected",
@@ -11156,9 +11164,10 @@
           "values": [
             "plain",
             "card",
+            "soft",
             "tile"
           ],
-          "description": "`plain` (default) is a radio beside its label; `card` draws a bordered row; `tile` draws a centered pictured tile.",
+          "description": "`plain` (default) is a radio beside its label; `card` draws a bordered row; `soft` draws a neutral row without a radio dot; `tile` draws a centered pictured tile.",
           "deprecated": null
         },
         {
@@ -11251,6 +11260,7 @@
         "Disabled",
         "DisabledWithReason",
         "Required",
+        "Soft",
         "Tile",
         "TileNarrowLargeIllustrations"
       ],
@@ -11408,9 +11418,10 @@
           "values": [
             "plain",
             "card",
+            "soft",
             "tile"
           ],
-          "description": "Passed to every Radio. `card` draws each as a bordered row; `tile` draws centered pictured tiles.",
+          "description": "Passed to every Radio. `card` draws each as a bordered row; `soft` draws each as a neutral row without a radio dot; `tile` draws centered pictured tiles.",
           "deprecated": null
         },
         {
@@ -11514,6 +11525,7 @@
         "Validation",
         "TwoGroupsWithoutIds",
         "Interactive",
+        "Soft",
         "Tiles",
         "TileRest",
         "TileHovered",
@@ -13883,6 +13895,7 @@
       ],
       "tokens": [
         "--border-width-default",
+        "--ds-border",
         "--ds-border-inverse"
       ]
     },

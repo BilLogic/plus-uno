@@ -64,6 +64,7 @@
     --control-sm: var(--size-150); /* new role; Control was missing from the Icon/Image/Item/Label/Row/Field set */
     --control-md: var(--size-200);
     --control-lg: var(--size-250);
+    --control-xl: var(--size-300);
 }
 
 @media (min-width: 1024px) {

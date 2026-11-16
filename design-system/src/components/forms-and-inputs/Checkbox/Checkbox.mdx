@@ -52,6 +52,8 @@ A checkbox lets a person select one or more options from a list, or confirm a si
 
 <ComponentExample of={CheckboxStories.Card} title="Card" description="The choice drawn as a bordered row, for choices that need more room." />
 
+<ComponentExample of={CheckboxStories.Soft} title="Soft" description="`appearance=&quot;soft&quot;` draws a neutral row without a visible checkbox box; selection shows the selected fill, 1px selected border, and trailing check." />
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -145,9 +147,10 @@ Use `Checkbox` when a person needs to select one or more options from a list of 
 
 ## Parts
 
-1. **Box.** An 18 square with a 2px edge. Selected, it fills with the selected bold fill and draws a check; mixed, it draws a dash.
+1. **Box.** An 18 square with a 2px edge in `plain`, `card` and `tile`; visually hidden in `soft` while keeping native checkbox semantics, keyboard navigation, and form submission.
 2. **Label.** 14/20 text beside the box in a 24 row. It names the checkbox. An optional minority marker (`"(optional)"` or `"(required)"`) follows it in plain text.
 3. **Description.** Optional 12/16 text under the label that describes the choice. It does not name it.
+4. **Appearances.** `plain` draws the box and label inline; `card` wraps them in a bordered surface row; `soft` draws a `--ds-background-neutral` row without a checkbox box (selected row shows `--ds-background-selected`, a 1px `--ds-border-selected` edge, and a trailing `fa-solid fa-check` icon) for the majority selection type in a choice flow while the minority selection type keeps its visible control; `tile` draws a 224px pictured card with the checkbox at the top end.
 
 ### States
 
@@ -156,12 +159,13 @@ Use `Checkbox` when a person needs to select one or more options from a list of 
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Rest</td><td><code>--ds-background-input</code> fill with a <code>--ds-border-input</code> edge.</td></tr>
-<tr><td>Hovered</td><td>Unselected: <code>--ds-background-input-hovered</code> with a <code>--ds-border-brand</code> edge. Selected: the hovered step of the selected bold fill.</td></tr>
-<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the box, for keyboard focus only.</td></tr>
-<tr><td>Selected</td><td><code>--ds-background-selected-bold</code> fill and <code>--ds-border-selected</code> edge; the check is <code>--ds-icon-inverse</code>.</td></tr>
-<tr><td>Mixed</td><td>The same fill and edge as selected; the mark is a dash in <code>--ds-icon-inverse</code>.</td></tr>
-<tr><td>Invalid</td><td>The unselected box takes <code>--ds-border-danger</code>. A selected or mixed box keeps its fill.</td></tr>
+<tr><td>Rest</td><td><code>--ds-background-input</code> fill with a <code>--ds-border-input</code> edge; in <code>soft</code>, <code>--ds-background-neutral</code> fill with no border.</td></tr>
+<tr><td>Hovered</td><td>Unselected: <code>--ds-background-input-hovered</code> with a <code>--ds-border-brand</code> edge (or <code>--ds-background-neutral-hovered</code> in <code>soft</code>). Selected: the hovered step of the selected bold fill (or <code>--ds-background-selected-hovered</code> in <code>soft</code>).</td></tr>
+<tr><td>Pressed</td><td>In <code>soft</code>, an unselected row takes <code>--ds-background-neutral-pressed</code> and a selected row takes <code>--ds-background-selected-pressed</code>.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the box (or around the row in <code>soft</code> and <code>tile</code>), for keyboard focus only.</td></tr>
+<tr><td>Selected</td><td><code>--ds-background-selected-bold</code> fill and <code>--ds-border-selected</code> edge; the check is <code>--ds-icon-inverse</code>. In <code>soft</code>, <code>--ds-background-selected</code> fill, 1px <code>--ds-border-selected</code> edge, and a trailing check in <code>--ds-icon-selected</code>.</td></tr>
+<tr><td>Mixed</td><td>The same fill and edge as selected; the mark is a dash in <code>--ds-icon-inverse</code> (or <code>fa-solid fa-minus</code> in <code>--ds-icon-selected</code> in <code>soft</code>).</td></tr>
+<tr><td>Invalid</td><td>The unselected box or tile takes <code>--ds-border-danger</code> (in <code>soft</code>, both unselected and selected rows take <code>--ds-border-danger</code>).</td></tr>
 <tr><td>Read-only</td><td>Full contrast, in the tab order, <code>aria-readonly</code>, no hover; an unchecked box takes the <code>--ds-background-neutral</code> fill. Ignores clicks and Space.</td></tr>
 <tr><td>Disabled</td><td><code>--ds-background-disabled</code> fill, <code>--ds-border-disabled</code> edge, <code>--ds-icon-disabled</code> mark. Out of the tab order.</td></tr>
 </tbody>
@@ -180,6 +184,7 @@ Use `Checkbox` when a person needs to select one or more options from a list of 
 <tr><td>Row</td><td><code>--control-sm</code> (24); gap <code>--space-050</code>.</td></tr>
 <tr><td>Label</td><td><code>--ds-text</code>, body default.</td></tr>
 <tr><td>Focus ring</td><td><code>--ds-border-focused</code>, 2px, 2px offset.</td></tr>
+<tr><td>Soft row</td><td><code>--radius-control-md</code>, <code>--ds-background-neutral</code> fill at rest; selected <code>--ds-background-selected</code> fill, <code>--border-width-default</code> <code>--ds-border-selected</code> edge, and <code>--icon-sm</code> trailing check in <code>--ds-icon-selected</code>.</td></tr>
 <tr><td>Choice tile</td><td><code>--choice-tile-width</code> (224px), <code>--radius-control-md</code>, <code>--ds-surface</code> fill; selected 2px <code>--ds-border-selected</code> and <code>--ds-background-selected</code>, with the Checkbox at the top end.</td></tr>
 </tbody>
 </DocsTable>

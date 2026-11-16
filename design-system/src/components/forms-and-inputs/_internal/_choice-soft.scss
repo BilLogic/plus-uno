@@ -1,0 +1,124 @@
+@use '../../../styles/state' as *;
+
+// The soft option row (Radio and Checkbox, `appearance="soft"`).
+// Shared so the two controls cannot drift.
+@mixin choice-soft($control-selector) {
+    padding: var(--pad-y-md) var(--pad-x-md);
+    border: var(--border-width-default) solid transparent;
+    border-radius: var(--radius-control-md);
+    background-color: var(--ds-background-neutral);
+    position: relative;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), border-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+
+    #{$control-selector}-row {
+        gap: 0;
+    }
+
+    // Visually hidden, never display:none, so keyboard focus, roving tabindex,
+    // Space toggle, and screen-reader semantics remain intact.
+    #{$control-selector} {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        min-width: 0;
+        min-height: 0;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        border: 0;
+        opacity: 0;
+        pointer-events: none;
+
+        &:focus,
+        &:focus-visible,
+        &[data-focus-visible] {
+            @include plus-ring-reset;
+        }
+    }
+
+    .plus-choice-soft-check {
+        margin-inline-start: auto;
+        padding-inline-start: var(--inline-md);
+        flex-shrink: 0;
+        font-size: var(--icon-sm);
+        color: var(--ds-icon-selected);
+        opacity: 0;
+        transition: opacity var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+    }
+
+    .plus-field-caption {
+        padding-left: 0;
+    }
+
+    &:has(#{$control-selector}:is([data-checked], [data-indeterminate])):not(.plus-field-stack--disabled) {
+        background-color: var(--ds-background-selected);
+        border-color: var(--ds-border-selected);
+    }
+
+    &:has(#{$control-selector}:is([data-checked], [data-indeterminate])) .plus-choice-soft-check {
+        opacity: 1;
+    }
+
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-background-neutral-hovered)),
+            pressed: (background-color: var(--ds-background-neutral-pressed)),
+        ),
+        $ring: false,
+        $hovered-selector: '&:hover:not(.plus-field-stack--disabled):not(.plus-choice-readonly):not(:has(#{$control-selector}:is([data-checked], [data-indeterminate])))',
+        $pressed-selector: '&:active:not(.plus-field-stack--disabled):not(.plus-choice-readonly):not(:has(#{$control-selector}:is([data-checked], [data-indeterminate])))'
+    );
+
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-background-selected-hovered)),
+            pressed: (background-color: var(--ds-background-selected-pressed)),
+        ),
+        $ring: false,
+        $hovered-selector: '&:has(#{$control-selector}:is([data-checked], [data-indeterminate])):hover:not(.plus-field-stack--disabled):not(.plus-choice-readonly)',
+        $pressed-selector: '&:has(#{$control-selector}:is([data-checked], [data-indeterminate])):active:not(.plus-field-stack--disabled):not(.plus-choice-readonly)'
+    );
+
+    &:has(#{$control-selector}:focus-visible),
+    &:has(#{$control-selector}[data-focus-visible]) {
+        @include plus-ring;
+    }
+
+    &#{$control-selector}-invalid:not(.plus-field-stack--disabled),
+    &#{$control-selector}-invalid:has(#{$control-selector}:is([data-checked], [data-indeterminate])):not(.plus-field-stack--disabled) {
+        border-color: var(--ds-border-danger);
+    }
+
+    &.plus-choice-readonly {
+        cursor: default;
+
+        &:not(:has(#{$control-selector}:is([data-checked], [data-indeterminate]))) {
+            background-color: var(--ds-background-neutral);
+        }
+    }
+
+    &.plus-field-stack--disabled {
+        cursor: not-allowed;
+        background-color: var(--ds-background-disabled);
+        border-color: var(--ds-border-disabled);
+
+        .plus-choice-soft-check {
+            color: var(--ds-icon-disabled);
+        }
+    }
+
+    @media (forced-colors: active) {
+        &:has(#{$control-selector}:is([data-checked], [data-indeterminate])) {
+            border-width: var(--border-width-selected);
+            border-color: Highlight;
+
+            .plus-choice-soft-check {
+                forced-color-adjust: none;
+                color: Highlight;
+            }
+        }
+    }
+}

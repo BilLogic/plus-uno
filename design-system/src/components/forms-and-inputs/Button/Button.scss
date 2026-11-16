@@ -5,10 +5,10 @@
 
 /*
  * Button styles. Seven appearances (default, primary, subtle, warning, danger,
- * discovery, ai), two spacings (default 32, compact 24), and the selected,
- * disabled and loading states, all on named `--ds-*` tokens. Each appearance
- * takes its hovered and pressed fills from the named tokens, laid straight on
- * the container.
+ * discovery, ai), three spacings (default 32, compact 24, spacious 48), and
+ * the selected, disabled and loading states, all on named `--ds-*` tokens.
+ * Each appearance takes its hovered and pressed fills from the named tokens,
+ * laid straight on the container.
  */
 
 // Per appearance, in order: 1 ground, 2 label, 3 icon, 4 hovered ground,
@@ -17,14 +17,14 @@
 // map and measures every label against its ground, so a row added here is
 // checked without a second list.
 $btn-appearances: (
-    'default': ('--ds-background-neutral-subtle', '--ds-text-subtle', '--ds-icon-subtle', '--ds-background-neutral-subtle-hovered', '--ds-background-neutral-subtle-pressed', '--ds-border-input'),
+    'default': ('--ds-background-neutral', '--ds-text', '--ds-icon', '--ds-background-neutral-hovered', '--ds-background-neutral-pressed', 'transparent'),
     'primary': ('--ds-background-brand-bold', '--ds-text-inverse', '--ds-icon-inverse', '--ds-background-brand-bold-hovered', '--ds-background-brand-bold-pressed', 'transparent'),
     'subtle': ('--ds-background-neutral-subtle', '--ds-text-subtle', '--ds-icon-subtle', '--ds-background-neutral-subtle-hovered', '--ds-background-neutral-subtle-pressed', 'transparent'),
     'warning': ('--ds-background-warning-bold', '--ds-text-warning-inverse', '--ds-icon-warning-inverse', '--ds-background-warning-bold-hovered', '--ds-background-warning-bold-pressed', 'transparent'),
     'danger': ('--ds-background-danger-bold', '--ds-text-inverse', '--ds-icon-inverse', '--ds-background-danger-bold-hovered', '--ds-background-danger-bold-pressed', 'transparent'),
     'discovery': ('--ds-background-discovery-bold', '--ds-text-inverse', '--ds-icon-inverse', '--ds-background-discovery-bold-hovered', '--ds-background-discovery-bold-pressed', 'transparent'),
     'ai': ('--ds-ai-background-bold', '--ds-text-inverse', '--ds-icon-inverse', '--ds-ai-background-bold-hovered', '--ds-ai-background-bold-pressed', 'transparent'),
-    'selected': ('--ds-background-selected', '--ds-text-selected', '--ds-icon-selected', '--ds-background-selected-hovered', '--ds-background-selected-pressed', 'transparent')
+    'selected': ('--ds-background-selected', '--ds-text-selected', '--ds-icon-selected', '--ds-background-selected-hovered', '--ds-background-selected-pressed', '--ds-border-selected')
 );
 
 // Wraps a map slot as a `var()` read, or passes a keyword (`transparent`) through.
@@ -66,6 +66,7 @@ $btn-appearances: (
     // Every appearance draws a 1px edge, transparent unless the appearance
     // colors it, so the height is the same in all of them.
     border: var(--border-width-default) solid transparent;
+    @include ds-type(var(--body-default), var(--type-weight-medium));
     text-align: center;
     white-space: nowrap;
     text-decoration: none;
@@ -79,8 +80,9 @@ $btn-appearances: (
     // --- SPACING ---
     // Height comes from the Size roles, padding and gap from Semantics, radius
     // from the Button's own Components-tier tokens: default 32 high with a 6
-    // radius, compact 24 high with a 4 radius. The height is set, not summed
-    // from padding, so the 1px edge never makes a 26. Content centers in it.
+    // radius, compact 24 high with a 4 radius, spacious 48 high with a 10
+    // radius. The height is set, not summed from padding, so the 1px edge
+    // never makes a 26. Content centers in it.
     box-sizing: border-box;
     height: var(--control-md);
     padding: 0 var(--pad-x-md);
@@ -91,6 +93,12 @@ $btn-appearances: (
         height: var(--control-sm);
         padding: 0 var(--pad-x-sm);
         border-radius: var(--button-radius-compact);
+    }
+
+    &.plus-btn--spacious {
+        height: var(--control-xl);
+        padding: 0 var(--pad-x-lg);
+        border-radius: var(--button-radius-spacious);
     }
 
     // An icon-only button is square.
@@ -111,8 +119,6 @@ $btn-appearances: (
     // The label is Body/default at the medium weight; icons draw at 16. A
     // label that does not fit ends in an ellipsis.
     .plus-btn-text {
-        font: var(--body-default);
-        font-weight: var(--type-weight-medium);
         color: inherit;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -143,7 +149,7 @@ $btn-appearances: (
     }
 
     // --- WIDTH ---
-    &--fit-container {
+    &.plus-btn--fit-container {
         display: flex;
         width: 100%;
     }
@@ -182,10 +188,6 @@ $btn-appearances: (
         color: var(--_button-fg);
         pointer-events: none;
         cursor: not-allowed;
-
-        &.plus-btn--default {
-            border-color: var(--ds-border-disabled);
-        }
 
         &.plus-btn--subtle {
             background-color: transparent;
