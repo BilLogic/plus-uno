@@ -628,6 +628,20 @@
           "codeSyntax": {
             "WEB": "var(--popup-radius)"
           }
+        },
+        {
+          "name": "Popup/width-3-col",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--popup-width-3-col)"
+          }
+        },
+        {
+          "name": "Popup/width-4-col",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--popup-width-4-col)"
+          }
         }
       ]
     },

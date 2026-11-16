@@ -73,6 +73,8 @@
 
     /* Popup */
     --popup-radius: var(--radius-xl);
+    --popup-width-3-col: 200px; /* 3 · 4 screen-grid columns plus 2 × 16 popup pad at 768 · 1024 · 1440 */
+    --popup-width-4-col: 261px;
 }
 
 @media (max-height: 639.98px) {
@@ -87,6 +89,8 @@
         --modal-width-sm: 512px;
         --modal-width-md: 677px;
         --modal-width-lg: 843px;
+        --popup-width-3-col: 264px;
+        --popup-width-4-col: 347px;
     }
 }
 
@@ -96,5 +100,7 @@
         --modal-width-sm: 640px;
         --modal-width-md: 848px;
         --modal-width-lg: 1056px;
+        --popup-width-3-col: 328px;
+        --popup-width-4-col: 432px;
     }
 }

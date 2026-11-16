@@ -96,6 +96,8 @@ Space owned by a pattern: page, section, card, table, modal, popup. Inside a pat
 --panel-min-width  /* Narrowest the Panel may be dragged. */
 --panel-width-default  /* Width the Panel opens at. */
 --popup-radius  /* Corner rounding of a Popup. */
+--popup-width-3-col  /* Width of a 3-column Popup, such as a short picker. */
+--popup-width-4-col  /* Width of a 4-column Popup, such as a date picker or a menu with descriptions. */
 --section-pad-x-compact  /* Horizontal padding of a PatternSection with compact spacing. */
 --section-pad-x-default  /* Horizontal padding of a PatternSection with default spacing. */
 --section-pad-x-spacious  /* Horizontal padding of a PatternSection with spacious spacing. */

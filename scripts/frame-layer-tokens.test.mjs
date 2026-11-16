@@ -336,12 +336,12 @@ const MODAL_PAD_PX = 16;
 const SCREEN_GRID_SCSS = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/styles/_screen-grid.scss'), 'utf8');
 
 /** The width the screen-grid mixin computes for a span on a screen `width` wide, with the modal pad. */
-function screenGridWidth(span, width, mode) {
+function screenGridWidth(span, width, mode, padPx = MODAL_PAD_PX) {
   const block = SCREEN_GRID_SCSS.match(/@mixin screen-grid-width\(.*\) \{([\s\S]*?)\n\}/)?.[1];
   assert.ok(block, '_screen-grid.scss has no screen-grid-width mixin');
   const local = Object.fromEntries([...block.matchAll(tokenDeclarationPattern('--plus-overlay-'))].map(([, n, v]) => [n, v.trim()]));
   local['--plus-overlay-span'] = String(span);
-  const formula = block.match(/\n\s*width:\s*([^;]+);/)?.[1]?.replace('#{$pad}', String(MODAL_PAD_PX));
+  const formula = block.match(/\n\s*width:\s*([^;]+);/)?.[1]?.replace('#{$pad}', String(padPx));
   assert.ok(formula, 'the screen-grid-width mixin declares no width');
   const resolve = (expr, depth = 0) => {
     assert.ok(depth < 10, `${expr} does not resolve`);
@@ -369,6 +369,16 @@ test('the Overlay screen grid lands on Modal/width-modal-* at 768, 1024 and 1440
       const actual = screenGridWidth(span, width, mode);
       // The column is held to two decimals, so ten columns land within half a pixel of the whole-pixel token.
       assert.ok(Math.abs(actual - expected) < 0.5, `${size} at ${mode}: _screen-grid.scss ${actual}, Figma ${expected}`);
+    }
+  }
+});
+
+test('the Overlay screen grid lands on Popup/width-3-col and -4-col at 768, 1024 and 1440', () => {
+  for (const [mode, width] of Object.entries(LAYOUT_MODES)) {
+    for (const span of [3, 4]) {
+      const expected = parseFloat(atMode(`--popup-width-${span}-col`, mode));
+      const actual = screenGridWidth(span, width, mode, 16);
+      assert.ok(Math.abs(actual - expected) < 0.5, `${span}-col at ${mode}: _screen-grid.scss ${actual}, Figma ${expected}`);
     }
   }
 });

@@ -174,6 +174,8 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Popup | `--flag-width` (declared elsewhere) |  |
 | Popup | `--flag-stack` (declared elsewhere) |  |
 | Popup | `--popup-radius` |  |
+| Popup | `--popup-width-3-col` | 3 · 4 screen-grid columns plus 2 × 16 popup pad at 768 · 1024 · 1440 |
+| Popup | `--popup-width-4-col` |  |
 | Popup | `--dropdown-menu-pad` (declared elsewhere) |  |
 | Popup | `--dropdown-menu-min-width` (declared elsewhere) |  |
 | Popup | `--dropdown-menu-max-width` (declared elsewhere) |  |

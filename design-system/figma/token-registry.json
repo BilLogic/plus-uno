@@ -349,6 +349,8 @@
       "Popup/gap-screen": "var(--popup-gap-screen)",
       "Popup/pad": "var(--popup-pad)",
       "Popup/radius": "var(--popup-radius)",
+      "Popup/width-3-col": "var(--popup-width-3-col)",
+      "Popup/width-4-col": "var(--popup-width-4-col)",
       "Popup/width-lg": "var(--popup-width-lg)",
       "Popup/width-md": "var(--popup-width-md)",
       "Popup/width-sm": "var(--popup-width-sm)",
@@ -1100,6 +1102,61 @@
       "color/text/warning/bolder": "var(--ds-text-warning-bolder)",
       "color/text/warning/default": "var(--ds-text-warning)",
       "color/text/warning/inverse": "var(--ds-text-warning-inverse)",
+      "elevation/shadow/blocking/layer-1": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-1/offsetX": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-1/offsetY": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-1/radius": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-1/spread": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-2": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-2/offsetX": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-2/offsetY": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-2/radius": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-2/spread": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-3": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-3/offsetX": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-3/offsetY": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-3/radius": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-3/spread": "var(--ds-shadow-blocking)",
+      "elevation/shadow/overflow/layer-1": "var(--ds-shadow-overflow-spread)",
+      "elevation/shadow/overflow/layer-1/offsetX": "var(--ds-shadow-overflow)",
+      "elevation/shadow/overflow/layer-1/offsetY": "var(--ds-shadow-overflow)",
+      "elevation/shadow/overflow/layer-1/radius": "var(--ds-shadow-overflow)",
+      "elevation/shadow/overflow/layer-1/spread": "var(--ds-shadow-overflow)",
+      "elevation/shadow/overflow/layer-2": "var(--ds-shadow-overflow-perimeter)",
+      "elevation/shadow/overflow/layer-2/offsetX": "var(--ds-shadow-overflow)",
+      "elevation/shadow/overflow/layer-2/offsetY": "var(--ds-shadow-overflow)",
+      "elevation/shadow/overflow/layer-2/radius": "var(--ds-shadow-overflow)",
+      "elevation/shadow/overflow/layer-2/spread": "var(--ds-shadow-overflow)",
+      "elevation/shadow/overlay/layer-1": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-1/offsetX": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-1/offsetY": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-1/radius": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-1/spread": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-2": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-2/offsetX": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-2/offsetY": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-2/radius": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-2/spread": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-3": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-3/offsetX": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-3/offsetY": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-3/radius": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-3/spread": "var(--ds-shadow-overlay)",
+      "elevation/shadow/raised/layer-1": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-1/offsetX": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-1/offsetY": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-1/radius": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-1/spread": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-2": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-2/offsetX": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-2/offsetY": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-2/radius": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-2/spread": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-3": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-3/offsetX": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-3/offsetY": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-3/radius": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-3/spread": "var(--ds-shadow-raised)",
       "elevation/surface/container/default": "var(--ds-surface-container)",
       "elevation/surface/container/hovered": "var(--ds-surface-container-hovered)",
       "elevation/surface/container/pressed": "var(--ds-surface-container-pressed)",
@@ -1835,12 +1892,12 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1162,
+    "scssTokenCount": 1164,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1785,
-      "resolved": 1699,
-      "percent": 95,
+      "total": 1782,
+      "resolved": 1756,
+      "percent": 99,
       "skippedCollections": [
         {
           "collection": "archived / colors / accent",
@@ -2065,498 +2122,18 @@
           "reason": "no code syntax"
         },
         {
-          "collection": "spacing / templates",
-          "figmaVariable": "Popup/width-3-col",
+          "collection": "color / semantics",
+          "figmaVariable": "Deprecated/color/ai/border",
           "tried": [
-            "--width-3-col"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "spacing / templates",
-          "figmaVariable": "Popup/width-4-col",
-          "tried": [
-            "--width-4-col"
+            "--border"
           ],
           "reason": "no code syntax"
         },
         {
           "collection": "color / semantics",
-          "figmaVariable": "color/ai/border",
+          "figmaVariable": "Deprecated/color/ai/icon",
           "tried": [
-            "--ds-ai-border"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "color/ai/icon",
-          "tried": [
-            "--ds-ai-icon"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-1",
-          "tried": [
-            "--layer-1"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-1/offsetX",
-          "tried": [
-            "--offsetx"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-1/offsetY",
-          "tried": [
-            "--offsety"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-1/radius",
-          "tried": [
-            "--radius"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-1/spread",
-          "tried": [
-            "--spread"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-2",
-          "tried": [
-            "--layer-2"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-2/offsetX",
-          "tried": [
-            "--offsetx"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-2/offsetY",
-          "tried": [
-            "--offsety"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-2/radius",
-          "tried": [
-            "--radius"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-2/spread",
-          "tried": [
-            "--spread"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-3",
-          "tried": [
-            "--layer-3"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-3/offsetX",
-          "tried": [
-            "--offsetx"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-3/offsetY",
-          "tried": [
-            "--offsety"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-3/radius",
-          "tried": [
-            "--radius"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-3/spread",
-          "tried": [
-            "--spread"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overflow/layer-1",
-          "tried": [
-            "--layer-1"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overflow/layer-1/offsetX",
-          "tried": [
-            "--offsetx"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overflow/layer-1/offsetY",
-          "tried": [
-            "--offsety"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overflow/layer-1/radius",
-          "tried": [
-            "--radius"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overflow/layer-1/spread",
-          "tried": [
-            "--spread"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overflow/layer-2",
-          "tried": [
-            "--layer-2"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overflow/layer-2/offsetX",
-          "tried": [
-            "--offsetx"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overflow/layer-2/offsetY",
-          "tried": [
-            "--offsety"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overflow/layer-2/radius",
-          "tried": [
-            "--radius"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overflow/layer-2/spread",
-          "tried": [
-            "--spread"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-1",
-          "tried": [
-            "--layer-1"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-1/offsetX",
-          "tried": [
-            "--offsetx"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-1/offsetY",
-          "tried": [
-            "--offsety"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-1/radius",
-          "tried": [
-            "--radius"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-1/spread",
-          "tried": [
-            "--spread"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-2",
-          "tried": [
-            "--layer-2"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-2/offsetX",
-          "tried": [
-            "--offsetx"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-2/offsetY",
-          "tried": [
-            "--offsety"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-2/radius",
-          "tried": [
-            "--radius"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-2/spread",
-          "tried": [
-            "--spread"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-3",
-          "tried": [
-            "--layer-3"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-3/offsetX",
-          "tried": [
-            "--offsetx"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-3/offsetY",
-          "tried": [
-            "--offsety"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-3/radius",
-          "tried": [
-            "--radius"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-3/spread",
-          "tried": [
-            "--spread"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-1",
-          "tried": [
-            "--layer-1"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-1/offsetX",
-          "tried": [
-            "--offsetx"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-1/offsetY",
-          "tried": [
-            "--offsety"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-1/radius",
-          "tried": [
-            "--radius"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-1/spread",
-          "tried": [
-            "--spread"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-2",
-          "tried": [
-            "--layer-2"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-2/offsetX",
-          "tried": [
-            "--offsetx"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-2/offsetY",
-          "tried": [
-            "--offsety"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-2/radius",
-          "tried": [
-            "--radius"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-2/spread",
-          "tried": [
-            "--spread"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-3",
-          "tried": [
-            "--layer-3"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-3/offsetX",
-          "tried": [
-            "--offsetx"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-3/offsetY",
-          "tried": [
-            "--offsety"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-3/radius",
-          "tried": [
-            "--radius"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-3/spread",
-          "tried": [
-            "--spread"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "spacing / components",
-          "figmaVariable": "AI message/radius",
-          "tried": [
-            "--radius"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "spacing / components",
-          "figmaVariable": "Prompt input/pad-y",
-          "tried": [
-            "--pad-y"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "spacing / components",
-          "figmaVariable": "Prompt input/radius",
-          "tried": [
-            "--radius"
+            "--icon"
           ],
           "reason": "no code syntax"
         }
