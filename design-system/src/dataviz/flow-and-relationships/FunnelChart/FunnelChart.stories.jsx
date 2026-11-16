@@ -76,19 +76,19 @@ export const Overview = {
             expect(canvasElement.querySelectorAll('.highcharts-container .highcharts-series').length).toBe(2);
             expect(canvasElement.querySelectorAll('.plus-chart-value').length).toBeGreaterThanOrEqual(5);
         });
-        const containers = canvasElement.querySelectorAll('.highcharts-container');
-        const defaultFills = new Set(
-            [...containers[0].querySelectorAll('.highcharts-series .highcharts-point')].map(
-                (pt) => getComputedStyle(pt).fill,
-            ),
-        );
-        const tonedFills = new Set(
-            [...containers[1].querySelectorAll('.highcharts-series .highcharts-point')].map(
-                (pt) => getComputedStyle(pt).fill,
-            ),
-        );
-        expect(defaultFills.size).toBe(1);
-        expect(tonedFills.size).toBeGreaterThan(1);
+        // Fills settle after the entrance and any state transition, so read
+        // them inside waitFor rather than once.
+        const fillsOf = (container) =>
+            new Set(
+                [...container.querySelectorAll('.highcharts-series .highcharts-point')].map(
+                    (pt) => getComputedStyle(pt).fill,
+                ),
+            );
+        await waitFor(() => {
+            const containers = canvasElement.querySelectorAll('.highcharts-container');
+            expect(fillsOf(containers[0]).size).toBe(1);
+            expect(fillsOf(containers[1]).size).toBeGreaterThan(1);
+        });
 
         for (const node of canvasElement.querySelectorAll('.highcharts-container text, .highcharts-container tspan, .plus-chart-value')) {
             if (!node.textContent?.trim()) continue;
