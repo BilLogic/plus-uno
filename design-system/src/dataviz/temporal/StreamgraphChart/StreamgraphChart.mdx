@@ -63,8 +63,8 @@ use `TreemapChart` or `DonutChart`.
 ## Data shape
 
 `categories` is an array of period labels. `series` is an array of
-`{ name, data }` with one number per period in `categories` order. `height`
-defaults to 400.
+`{ name, data, color }` with one number per period in `categories` order. `height`
+defaults to 400, and `sort` defaults to `false` to preserve chronological order.
 
 ```jsx
 <StreamgraphChart
@@ -83,7 +83,7 @@ defaults to 400.
 
 ## Color and accessibility
 
-- **Color by series order.** Layers take the [categorical order](?path=/docs/data-visualizations-color--docs) starting at slot 1 (even for one series; per-series `color` is ignored). Past six series, group the smallest into "Other".
+- **Color by series order.** One series uses `--chart-brand`; two or more take the [categorical order](?path=/docs/data-visualizations-color--docs) starting at slot 1 unless overridden by `color`. Past six series, group the smallest into "Other".
 - **Legend and tooltip carry exact values.** Because layers have no inline labels, patterns or value axis, keep the layer count low and provide exact figures in the tooltip or surrounding text.
 - **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
 - **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).

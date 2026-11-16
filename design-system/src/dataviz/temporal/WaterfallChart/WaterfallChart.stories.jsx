@@ -1,4 +1,6 @@
 import React from 'react';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
 import { BRAND } from '@/dataviz/palette';
 import WaterfallChart from './WaterfallChart';
 
@@ -6,110 +8,74 @@ export default {
     title: 'Data visualizations/Temporal/Waterfall chart',
     component: WaterfallChart,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## Waterfall Chart
+    argTypes: {
+        data: { control: 'object', description: 'Array of values or { y, isSum, isIntermediateSum, color } objects' },
+        categories: { control: 'object', description: 'Step labels' },
+        yAxisLabel: { control: 'text', description: 'Y-axis label' },
+        height: { control: 'number', description: 'Chart height in pixels' },
+    },
+};
 
-A waterfall chart shows how a value changes through **sequential additions and subtractions**, displaying a running total.
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
+};
 
-### Overview
-A waterfall chart shows how a value changes through **sequential additions and subtractions**, displaying a running total.
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--card-stack-md)',
+};
 
----
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
+};
 
-### How to Read
-- **First bar** = starting value
-- **Success bars** (\`--chart-success\`) = positive additions
-- **Danger bars** (\`--chart-danger\`) = deductions/losses
-- **Final bar** = ending total (sum)
-- Each bar floats from previous endpoint
+const enrollmentData = {
+    categories: ['Start of term', 'New sign-ups', 'Transfers in', 'Withdrawals', 'Graduated', 'Current'],
+    data: [
+        { y: 420, color: BRAND },
+        85,
+        24,
+        -30,
+        -18,
+        { isSum: true, color: BRAND },
+    ],
+    yAxisLabel: 'Enrolled students',
+};
 
----
-
-### When to Use
-
-| Use Case | Recommendation |
-|----------|----------------|
-| Financial statements (P&L) | ✅ Ideal |
-| Progress/cumulative changes | ✅ Ideal |
-| Variance analysis | ✅ Good |
-| Unordered comparisons | ❌ Use Bar Chart |
-| Part-to-whole | ❌ Use Stacked Bar |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Budget Tracking** | Starting budget → changes → remaining |
-| **Score Progression** | Base score + bonus - penalties = final |
-| **Enrollment Changes** | Start → additions → dropouts → current |
-| **Progress Tracking** | Initial → completed → added → total |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Keep the signed value label on every bar, so the direction never rests on color alone
-✅ Include summary bars (totals)
-✅ Label each step clearly
-✅ Show intermediate totals if needed
-
-**Avoid:**
-❌ Non-sequential data
-❌ Too many intermediate steps (>10)
-❌ Missing color legend
-                `
-            }
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Term enrollment changes</Heading>
+                <p style={captionStyle}>
+                    Shows how starting enrollment reaches the current total through sequential additions and withdrawals.
+                </p>
+                <WaterfallChart {...enrollmentData} />
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelector('.highcharts-container')).not.toBeNull();
+        });
+        for (const label of canvasElement.querySelectorAll('.highcharts-axis-labels text, .highcharts-data-label text')) {
+            if (!label.textContent?.trim()) continue;
+            const style = getComputedStyle(label);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(style.fontVariantNumeric).toBe('tabular-nums');
         }
     },
-    argTypes: {
-        data: { control: 'object', description: 'Array of values or { y, isSum } objects' },
-        categories: { control: 'object', description: 'Category labels' },
-        yAxisLabel: { control: 'text', description: 'Y-axis label' },
-        height: { control: 'number', description: 'Chart height in pixels' }
-    }
 };
 
-const profitData = {
-    categories: ['Start', 'Product', 'Services', 'Costs', 'Marketing', 'Final'],
-    data: [
-        { y: 1000, color: BRAND },
-        500,
-        200,
-        -150,
-        -100,
-        { isSum: true, color: BRAND }
-    ],
-    yAxisLabel: 'Revenue ($)'
-};
-
-/**
- * Overview: Displays all chart variants
- */
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Profit & Loss</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
-                Shows how revenue changes through different factors.
-            </p>
-            <WaterfallChart {...profitData} />
-        </section>
-    </div>
-);
-
-/**
- * Interactive: Playground with property controls
- */
 export const Interactive = {
     args: {
         categories: ['Initial', 'Add 1', 'Add 2', 'Subtract', 'Total'],
-        data: [100, 50, 30, -40, { isSum: true }],
+        data: [{ y: 100, color: BRAND }, 50, 30, -40, { isSum: true, color: BRAND }],
         yAxisLabel: 'Value',
-        height: 400
-    }
+        height: 400,
+    },
 };
