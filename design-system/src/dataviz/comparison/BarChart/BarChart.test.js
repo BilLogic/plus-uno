@@ -175,7 +175,7 @@ describe('Comparison family charts on the shared foundation', () => {
         expect(defaultOptions.xAxis.categories).toEqual(['Math', 'Reading']);
         expect(defaultOptions.series[0].data).toEqual([70, 90]);
         expect(defaultOptions.plotOptions.area.fillOpacity).toBe(CHART_RADAR_FILL_OPACITY);
-        expect(defaultOptions.plotOptions.area.fillOpacity).toBe(0.45);
+        expect(defaultOptions.plotOptions.area.fillOpacity).toBe(0.3);
         expect(defaultOptions.xAxis.labels.formatter).toBeUndefined();
 
         render(
