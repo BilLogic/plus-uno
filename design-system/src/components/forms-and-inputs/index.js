@@ -22,3 +22,4 @@ export { default as FileUpload } from './FileUpload';
 export { default as Rating } from './Rating';
 export { default as SearchField } from './SearchField';
 export { default as SettingRow } from './SettingRow';
+export { default as FooterActions } from './FooterActions';

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
-import { Button, IconButton, ProgressTracker, Skeleton } from '@/components';
-import { FooterActions, Frame } from '@/patterns';
+import { Button, FooterActions, IconButton, ProgressTracker, Skeleton } from '@/components';
+import { Frame } from '@/patterns';
 import { StepStage, resolveStepAxis } from '@/lib/navigationMotion';
 import { BrowserWindow } from './template-page.jsx';
 import { ScreenStage } from './fit-stage.jsx';
@@ -95,6 +95,7 @@ export const FocusedTask = ({ count = 5, start = 1, labels: given, title = 'Plan
                     blockSize: `var(${BAR_TOKEN})`,
                     flex: '0 0 auto',
                     boxSizing: 'border-box',
+                    overflow: 'hidden',
                     paddingInline: 'var(--page-pad)',
                     background: 'var(--ds-surface)',
                     borderBlockStart: 'var(--border-width-default) solid var(--ds-border)',

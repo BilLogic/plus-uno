@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { Button, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, ProgressTracker, SectionMessage, Skeleton, TextField } from '@/components';
-import { Blanket, FooterActions, PatternModal, PatternSection } from '@/patterns';
+import { Button, FooterActions, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, ProgressTracker, SectionMessage, Skeleton, TextField } from '@/components';
+import { Blanket, PatternModal, PatternSection } from '@/patterns';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { stepItems } from '@/storybook-docs/lib/focused-task.jsx';
 import { FormFields, FILLED } from '../Form/formDemo.jsx';
@@ -33,8 +33,8 @@ export const TwoCells = ({ secondary = 'Discard', cancel, action, appearance = '
 );
 
 /** One button: the right half (tracks 3–4), or full width when narrow. */
-export const OneCell = ({ action, onAction, narrow = false }) => (
-    <FooterActions narrow={narrow}>
+export const OneCell = ({ action, onAction }) => (
+    <FooterActions>
         <Button text={action} appearance="primary" onClick={onAction} />
     </FooterActions>
 );

@@ -2,7 +2,7 @@
 
 # Forms and inputs
 
-38 components. Each row links to the generated facts; the three columns after it are the
+39 components. Each row links to the generated facts; the three columns after it are the
 authored half, counted rather than assumed.
 
 ## Which component to reach for
@@ -74,6 +74,7 @@ authored half, counted rather than assumed.
 - **[FilterMenu](FilterMenu/index.md)** — Use `FilterMenu` when a section's content takes two or more filter categories staged and applied together from one Filter icon trigger.
   - For one category in a menu that applies as you pick, use `PopupSelect`.
   - For one to three quick filter triggers in a bar, use `FilterButton`.
+- **[FooterActions](FooterActions/index.md)** — Use `FooterActions` inside `Modal`, `PanelFooter` and the focused task bar to place one to three filled `Button` actions on a 4-track grid with an optional leading text action.
 - **[IconButton](IconButton/index.md)** — Use `IconButton` when space is limited and the glyph clearly matches the action: a toolbar, a table row, a card header.
   - For an action where space allows a text label, use `Button`.
   - For an icon that navigates to another page or site, use `LinkIconButton`.
@@ -175,6 +176,7 @@ authored half, counted rather than assumed.
 | [FileUpload](FileUpload/index.md) | 20 | ✅ | ✅ | ✅ |
 | [FilterButton](FilterButton/index.md) | 10 | ✅ | ✅ | ✅ |
 | [FilterMenu](FilterMenu/index.md) | 16 | ✅ | ✕ | ✅ |
+| [FooterActions](FooterActions/index.md) | 4 | ✅ | ✅ | ✅ |
 | [IconButton](IconButton/index.md) | 14 | ✅ | ✅ | ✅ |
 | [InlineEditableTextfield](InlineEditableTextfield/index.md) | 21 | ✕ | ✕ | ✕ |
 | [LinkButton](LinkButton/index.md) | 13 | ✅ | ✅ | ✅ |
@@ -197,7 +199,7 @@ authored half, counted rather than assumed.
 | [Toggle](Toggle/index.md) | 17 | ✅ | ✅ | ✅ |
 | [TreeSelect](TreeSelect/index.md) | 18 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 37/38 (97%) · Correct/incorrect 35/38 (92%) · Accessibility 37/38 (97%)
+**Authored coverage:** When to use 38/39 (97%) · Correct/incorrect 36/39 (92%) · Accessibility 38/39 (97%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

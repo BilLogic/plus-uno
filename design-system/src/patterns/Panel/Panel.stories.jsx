@@ -7,7 +7,7 @@ import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { BAR_TOKEN, WINDOW_HEIGHT } from '@/storybook-docs/lib/focused-task.jsx';
 import { computedShadow, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { FRAME_LAYOUT } from '@/patterns/Frame/frameLayout';
-import { footerTracks } from '@/patterns/FooterActions';
+import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { DetailsFrame, DetailsPanel, FLOAT_STAGE, GoneFrame, InboxFrame, PanelFrame, SessionsBehind } from './panelDemo.jsx';
 import { MotionPreferenceContext } from '@/lib/motionPreference';

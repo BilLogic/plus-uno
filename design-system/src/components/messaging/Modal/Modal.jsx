@@ -7,7 +7,7 @@ import Skeleton from '@/components/loading/Skeleton';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { useOverlaySlot, reportFocusLost } from '@/lib/overlay';
 import Blanket from '@/patterns/Blanket';
-import { FooterActions } from '@/patterns/FooterActions';
+import FooterActions from '@/components/forms-and-inputs/FooterActions';
 
 /** Safe CSS length / custom-property patterns for Modal width. */
 const SAFE_WIDTH_RE = /^(?:\d+(?:\.\d+)?(?:px|rem|%)|var\(--[a-zA-Z0-9-]+(?:\s*,\s*[^)]+)?\))$/;

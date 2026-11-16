@@ -6,7 +6,7 @@ import { BAR_TOKEN } from '@/storybook-docs/lib/focused-task.jsx';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
-import { footerTracks } from '@/patterns/FooterActions';
+import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { TierActive, TierDanger, TierTypeName } from '../../../patterns/PatternModal/modalDemo.jsx';
 import {
     APPEARANCES,

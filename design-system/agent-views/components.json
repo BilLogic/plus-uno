@@ -5441,6 +5441,72 @@
       ]
     },
     {
+      "name": "FooterActions",
+      "kind": "component",
+      "import": "import { FooterActions } from '@/components';",
+      "group": "forms-and-inputs",
+      "source": "design-system/src/components/forms-and-inputs/FooterActions/FooterActions.jsx",
+      "summary": "FooterActions — 4-track footer layout for Modal, Panel and Focused view. Divides the footer into 4 equal tracks separated by `--inline-md`. Every filled action button is cloned at `spacing=\"spacious\"` (48) with `shouldFitContainer`. A leading text or link action hugs the left edge without taking a filled track, and containers up to 400 wide split a single action across the full width via `@container (max-width: 400px)`.",
+      "props": [
+        {
+          "name": "leadingAction",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Optional text or link action hugging the left content edge without taking a filled track.",
+          "deprecated": null
+        },
+        {
+          "name": "children",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Filled action buttons placed across the 4 tracks.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Extra class names added to the footer grid container.",
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline style overrides on the footer grid container.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "OneButton",
+        "TwoButtons",
+        "ThreeButtons",
+        "TextButtonLeft",
+        "DangerTextButtonLeft",
+        "TextLeftWithThreeFilled",
+        "DestructiveSplit",
+        "Steps",
+        "NarrowPanel",
+        "Interactive"
+      ],
+      "tokens": [
+        "--ds-background-danger-subtler-hovered",
+        "--ds-background-danger-subtler-pressed",
+        "--ds-background-neutral-subtle",
+        "--ds-icon-danger",
+        "--ds-text-danger",
+        "--inline-md"
+      ]
+    },
+    {
       "name": "Frame",
       "kind": "pattern",
       "import": "import { Frame } from '@/patterns';",

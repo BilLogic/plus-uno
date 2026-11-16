@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Breadcrumb, Button, IconButton, Logo, Modal, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, ProgressTracker, Sidebar, Skeleton, StatusTag, TextField } from '@/components';
-import { Blanket, FooterActions, footerTracks, Frame, PANEL_STORAGE_KEY, PatternCard, PatternModal, PatternSection, usePanelControl, useSidebarControl } from '@/patterns';
+import { Breadcrumb, Button, FooterActions, IconButton, Logo, Modal, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, ProgressTracker, Sidebar, Skeleton, StatusTag, TextField } from '@/components';
+import { Blanket, Frame, PANEL_STORAGE_KEY, PatternCard, PatternModal, PatternSection, usePanelControl, useSidebarControl } from '@/patterns';
+import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { FRAME_LAYOUT } from './frameLayout';
 import { BrowserWindow, LiveAnatomy, ScaledStory } from '@/storybook-docs/lib/template-page.jsx';
 import { FitStage, ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
@@ -2766,6 +2767,7 @@ const FocusedTaskTransitionDemo = () => {
                                         alignItems: 'center',
                                         justifyContent: 'space-between',
                                         blockSize: `var(${BAR_TOKEN})`,
+                                        overflow: 'hidden',
                                         paddingInline: 'var(--page-pad)',
                                         background: 'var(--ds-surface)',
                                         borderBlockStart: 'var(--border-width-default) solid var(--ds-border)',
@@ -2914,6 +2916,7 @@ const FocusedStepMotionDemo = ({ count = 4, allowExtraBranch = false }) => {
                             blockSize: `var(${BAR_TOKEN})`,
                             flex: '0 0 auto',
                             boxSizing: 'border-box',
+                            overflow: 'hidden',
                             paddingInline: 'var(--page-pad)',
                             background: 'var(--ds-surface)',
                             borderBlockStart: 'var(--border-width-default) solid var(--ds-border)',

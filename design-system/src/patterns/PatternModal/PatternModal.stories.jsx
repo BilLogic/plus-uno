@@ -3,8 +3,8 @@ import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import PatternModal from '@/patterns/PatternModal';
 import Blanket, { BLANKET_HEIGHTS, BLANKET_SPANS, BLANKET_WIDTHS } from '@/patterns/Blanket';
-import { FooterActions, footerTracks } from '@/patterns/FooterActions';
-import { Button } from '@/components';
+import { Button, FooterActions } from '@/components';
+import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { probe, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
@@ -786,7 +786,7 @@ export const FooterDestructive = {
 
 export const FooterNarrow = {
     name: 'Footer: Single action in a narrow container',
-    render: () => sized(<Demo.ModalStage width="xs" title="Session moved" footer={<Demo.OneCell action="Got it" narrow />}><p style={{ margin: 0, font: 'var(--body-default)' }}>Thursday’s session with Ana is now at 4:30 PM.</p></Demo.ModalStage>),
+    render: () => sized(<Demo.ModalStage width="xs" title="Session moved" footer={<Demo.OneCell action="Got it" />}><p style={{ margin: 0, font: 'var(--body-default)' }}>Thursday’s session with Ana is now at 4:30 PM.</p></Demo.ModalStage>),
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');

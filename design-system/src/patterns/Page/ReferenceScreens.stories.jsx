@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import {
-    Banner, Button, EmptyState, FilterButton, Heading, PageHeader,
+    Banner, Button, EmptyState, FilterButton, FooterActions, Heading, PageHeader,
     PanelBody, PanelContainer, PanelFooter, PanelHeader, PopupSelect, SearchField, StatusTag, Tabs, TextField,
 } from '@/components';
-import { FooterActions, Frame, Page, PatternSection, PatternTable, usePanelControl } from '@/patterns';
+import { Frame, Page, PatternSection, PatternTable, usePanelControl } from '@/patterns';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 
 export default {
