@@ -312,7 +312,7 @@ function StatesSpecimen() {
 
 /**
  * Hover shifts a mark to its `-hovered` chart token while inactive series fade
- * to `--ds-opacity-disabled`; selected marks take `--ds-background-selected`
+ * to `--ds-opacity-chart-inactive`; selected marks take `--ds-background-selected`
  * and a 1px `--ds-border-selected` outline, never `--chart-brand`.
  */
 export const States = {
@@ -326,10 +326,10 @@ export const States = {
         const chart = findChart(slot);
         expect(chart).toBeDefined();
 
-        // Hover state uses the series' -hovered chart token, and inactive series uses --ds-opacity-disabled (0.4).
+        // Hover state uses the series' -hovered chart token, and inactive series uses --ds-opacity-chart-inactive (0.3).
         expect(chart.series[0].options.states.hover.color).toBe(hoveredColor(CATEGORICAL[0]));
         expect(chart.series[1].options.states.hover.color).toBe(hoveredColor(CATEGORICAL[1]));
-        expect(chart.options.plotOptions.series.states.inactive.opacity).toBe(0.4);
+        expect(chart.options.plotOptions.series.states.inactive.opacity).toBe(0.3);
 
         const hoveredFill = resolveColor('--chart-categorical-1-hovered', canvasElement);
         const selectedFill = resolveColor('--ds-background-selected', canvasElement);

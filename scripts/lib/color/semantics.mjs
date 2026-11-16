@@ -507,4 +507,7 @@ function shadows(pal) {
 const OPACITY = [
   { name: 'opacity.disabled', light: '0.4', dark: '0.4', use: 'Images and whole elements in a disabled state.', deviation: "Today 0.38 (Material); 0.4 is Atlassian's. A visible change on every disabled control." },
   { name: 'opacity.loading', light: '0.2', dark: '0.2', use: 'Content under a loading spinner.', deviation: 'New.' },
+  { name: 'opacity.chart.fill', light: '0.3', dark: '0.3', use: 'A chart area under its line: range bands, radar shapes, stacked areas.', deviation: 'New. Replaces the 0.3 and 0.45 literals in the chart theme.' },
+  { name: 'opacity.chart.overlap', light: '0.7', dark: '0.7', use: 'Chart marks that overlap each other, such as bubbles, so the ones beneath stay visible.', deviation: 'New. Replaces the 0.7 literal on BubbleChart.' },
+  { name: 'opacity.chart.inactive', light: '0.3', dark: '0.3', use: 'Chart series faded while another series is hovered or focused.', deviation: 'New. Charts borrowed --ds-opacity-disabled (0.4); a state token for controls, not for data.' },
 ];

@@ -1173,6 +1173,9 @@
       "utility/elevation/surface/current": "var(--ds-utility-elevation-surface-current)"
     },
     "color / opacity": {
+      "opacity/chart/fill": "var(--ds-opacity-chart-fill)",
+      "opacity/chart/inactive": "var(--ds-opacity-chart-inactive)",
+      "opacity/chart/overlap": "var(--ds-opacity-chart-overlap)",
       "opacity/disabled": "var(--ds-opacity-disabled)",
       "opacity/loading": "var(--ds-opacity-loading)"
     },
@@ -1892,11 +1895,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1164,
+    "scssTokenCount": 1167,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1782,
-      "resolved": 1756,
+      "total": 1785,
+      "resolved": 1759,
       "percent": 99,
       "skippedCollections": [
         {

@@ -7,7 +7,7 @@
 //
 // Six departures from the reference are deliberate, and the comparison is
 // shaped around them:
-// - PLUS adds tokens the reference never had: `color.background.smart.<subject>.subtle`,
+// - PLUS adds tokens the reference never had: `opacity.chart.*`, `color.background.smart.<subject>.subtle`,
 //   the mid-strength SMART fill for illustration bodies. They are dropped from
 //   our side before comparing, so every reference token still matches.
 // - Descriptions (`use`, `deviation`, Figma `description`) say the rule rather
@@ -47,8 +47,8 @@ const values = (rows) => rows.map((r) => Object.fromEntries(VALUE_KEYS.map((k) =
 const withoutProse = (value) =>
   JSON.parse(currentNames(JSON.stringify(value, (k, v) => (k === 'description' || k === 'use' || k === 'deviation' ? undefined : v))));
 /** Tokens PLUS added after the reference was cut. */
-const PLUS_ONLY_TOKEN = /^color[./]background[./]smart[./][a-z-]+[./]subtle$|^color[./]ai[./]background[./]bold/;
-const PLUS_ONLY_SCSS_DECL = /^ +--ds-(?:background-smart-[a-z-]+-subtle|ai-background-bold[a-z-]*): [^\n]*\n/gm;
+const PLUS_ONLY_TOKEN = /^color[./]background[./]smart[./][a-z-]+[./]subtle$|^color[./]ai[./]background[./]bold|^opacity[./]chart[./]/;
+const PLUS_ONLY_SCSS_DECL = /^ +--ds-(?:background-smart-[a-z-]+-subtle|ai-background-bold[a-z-]*|opacity-chart-[a-z]+): [^\n]*\n/gm;
 const withoutPlusOnly = (spec) => ({
   ...spec,
   collections: spec.collections.map((c) => ({ ...c, variables: c.variables.filter((v) => !PLUS_ONLY_TOKEN.test(v.name)) })),
@@ -121,7 +121,7 @@ for (const key of ['A', 'B']) {
     assert.equal(ref.rows.length, 518);
     assert.deepEqual(values(keptRows(rows)), values(keptRows(ref.rows)));
     assert.deepEqual(withoutProse(withoutElevation2(semantics.shadows)), withoutProse(withoutElevation2(ref.shadows)));
-    assert.deepEqual(withoutProse(semantics.opacity), withoutProse(ref.opacity));
+    assert.deepEqual(withoutProse(semantics.opacity.filter((o) => !PLUS_ONLY_TOKEN.test(o.name))), withoutProse(ref.opacity));
   });
 
   test(`Plan ${key}: the Figma spec matches the reference, descriptions aside`, { skip }, () => {
@@ -143,7 +143,7 @@ for (const key of ['A', 'B']) {
 
   test(`Plan ${key}: elevation SCSS keeps every reference block`, { skip }, () => {
     const files = renderPlan(key, 'scripts/generate-color-tokens.mjs');
-    const ours = blocks(withoutElevation2Lines(body(files['_elevation.scss'])));
+    const ours = blocks(withoutElevation2Lines(body(files['_elevation.scss']).replace(PLUS_ONLY_SCSS_DECL, '')));
     for (const b of blocks(withoutElevation2Lines(body(readFileSync(join(REF, `out/${key}/_elevation.scss`), 'utf8'))))) assert.ok(ours.includes(b), `_elevation.scss: ${b.split('\n')[0]}`);
   });
 }

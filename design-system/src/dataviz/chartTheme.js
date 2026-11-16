@@ -71,17 +71,20 @@ const CHART_STATE_ANIMATION = chartStateTransition();
 const CHART_GRID_WIDTH = tokenNumber('--chart-grid-width', 1);
 const CHART_LINE_WIDTH = tokenNumber('--chart-line-width', 2);
 
-/** `--ds-opacity-disabled` (0.4) — inactive series fade when another series is hovered. */
-export const CHART_INACTIVE_OPACITY = tokenNumber('--ds-opacity-disabled', 0.4);
+/** `--ds-opacity-chart-inactive` (0.3) — inactive series fade when another series is hovered or focused. */
+export const CHART_INACTIVE_OPACITY = tokenNumber('--ds-opacity-chart-inactive', 0.3);
 
 /**
- * Chart fill opacities: there is no opacity token for a chart fill
- * (`--ds-opacity-disabled` and `--ds-opacity-loading` are state tokens, so
- * charts do not borrow them). Named roles preserve each chart's rendered
- * translucency so overlapping bands and spokes do not hide lines beneath them.
+ * Chart fill opacities, from the chart opacity tokens (the state tokens
+ * `--ds-opacity-disabled` and `--ds-opacity-loading` are for controls, not data):
+ * `--ds-opacity-chart-fill` (0.3) for an area under its line — range bands and
+ * radar shapes — and `--ds-opacity-chart-overlap` (0.7) for marks that overlap
+ * each other, such as bubbles, so the ones beneath stay visible.
  */
-export const CHART_RANGE_FILL_OPACITY = 0.3;
-export const CHART_RADAR_FILL_OPACITY = 0.45;
+export const CHART_FILL_OPACITY = tokenNumber('--ds-opacity-chart-fill', 0.3);
+export const CHART_OVERLAP_OPACITY = tokenNumber('--ds-opacity-chart-overlap', 0.7);
+export const CHART_RANGE_FILL_OPACITY = CHART_FILL_OPACITY;
+export const CHART_RADAR_FILL_OPACITY = CHART_FILL_OPACITY;
 
 /** Bars and columns round only the value end (`where: 'end'`) — rounding both ends or a bigger radius distorts length reading. Pies, donuts and areas take none, so this lives on `column`/`bar` only, not the shared theme root. */
 const CHART_BAR_RADIUS_NUMBER = tokenNumber('--chart-bar-radius', 2);
