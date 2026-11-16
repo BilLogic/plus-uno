@@ -163,7 +163,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-text-subtlest` · `--inline-sm`
+`--ds-text-subtlest` · `--inline-md` · `--inline-sm`
 
 From `design-system/src/components/forms-and-inputs/FilterButton/FilterButton.scss`. Override these through the token layer, never with a literal.
 
