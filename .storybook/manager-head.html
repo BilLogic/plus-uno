@@ -2,37 +2,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400..700&family=Noto+Sans+Mono:wght@400..500&display=swap" rel="stylesheet">
-<script>
-  for (const s of document.querySelectorAll('head > style')) {
-    if (s.textContent && s.textContent.includes('Nunito Sans')) s.remove();
-  }
-</script>
 
 <style>
-  html body,
-  button,
-  input,
-  select,
-  textarea,
-  .sidebar-container,
-  .sidebar-container .sidebar-item,
-  .sidebar-container .sidebar-item > a,
-  .sidebar-container .sidebar-item > button {
-    font: var(--body-default) !important;
-  }
-
-  .sidebar-container .sidebar-subheading,
-  .sidebar-container .sidebar-subheading button {
-    font: var(--body-sm) !important;
-    font-weight: var(--type-weight-semibold) !important;
-  }
-
-  .sidebar-container .sidebar-item[data-selected='true'],
-  .sidebar-container .sidebar-item[data-selected='true'] > a,
-  .sidebar-container .sidebar-item[data-selected='true'] > button {
-    font-weight: var(--type-weight-medium) !important;
-  }
-
   /* Active story/docs row: the selected tokens (fill, text, 1px outline), written per mode by manager.js. */
   .sidebar-container [data-selected='true'] {
     /* docs-literal: the manager has no token stylesheet; 6 and 4 are --radius-md and --radius-sm. */

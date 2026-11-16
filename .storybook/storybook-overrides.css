@@ -231,21 +231,24 @@ body,
  * span IS that domain — the same borrowed-meaning mistake #269 argues against
  * for the AI palette.
  */
+/* `!important` overrides Prism/SyntaxHighlighter inline and Emotion font-family rules on code tokens. */
 .sbdocs code:not(:where(.docs-story *, .sb-ds-dodont-card *)),
 .sbdocs pre:not(:where(.docs-story *, .sb-ds-dodont-card *)) {
     font-family: var(--type-family-code) !important;
 }
 
 /* A code block scrolls inside its own box instead of widening the page. */
+.sbdocs .docblock-source,
 .sbdocs pre:not(:where(.docs-story *, .sb-ds-dodont-card *)) {
-    font: var(--code-default) !important;
+    font: var(--code-default);
     max-width: 100%;
     overflow-x: auto;
 }
 
+.sbdocs .docblock-source button,
 .sbdocs pre:not(:where(.docs-story *, .sb-ds-dodont-card *)) button {
-    font: var(--body-sm) !important;
-    font-weight: var(--type-weight-medium) !important;
+    font: var(--body-sm);
+    font-weight: var(--type-weight-medium);
 }
 
 .sbdocs code {
@@ -402,7 +405,7 @@ a.sbdocs-a {
 }
 
 .sbdocs .sb-ds-docs-interactive-panel__controls .docblock-argstable-head th {
-  font-weight: var(--type-weight-semibold) !important;
+  font-weight: var(--type-weight-semibold);
 }
 
 /*
@@ -713,8 +716,8 @@ a.sbdocs-a {
     position: relative !important;
     margin: 0 !important;
     border-radius: var(--radius-md) !important;
-    font: var(--body-sm) !important;
-    font-weight: var(--type-weight-medium) !important;
+    font: var(--body-sm);
+    font-weight: var(--type-weight-medium);
 }
 
 /* ActionBar strip under attached previews: match card sides + bottom radius when code collapsed */
@@ -1049,43 +1052,46 @@ html[data-color-mode="dark"] .docs-story {
  * tables beside them: same frame, same lines, same header weight, on tokens.
  */
 .sbdocs .docblock-argstable {
-    font: var(--body-sm) !important;
+    font: var(--body-sm);
     color: var(--ds-text);
 }
 
 .sbdocs .docblock-argstable th,
 .sbdocs .docblock-argstable-head th {
-    font: var(--body-sm) !important;
-    font-weight: var(--type-weight-semibold) !important;
+    font: var(--body-sm);
+    font-weight: var(--type-weight-semibold);
     color: var(--ds-text);
     background: transparent;
 }
 
+.sbdocs .docblock-argstable tbody td,
 .sbdocs .docblock-argstable td {
-    font: var(--body-sm) !important;
+    font: var(--body-sm);
     color: var(--ds-text);
 }
 
+.sbdocs .docblock-argstable tbody td[colspan],
 .sbdocs .docblock-argstable td[colspan] {
-    font: var(--heading-xxs) !important;
-    color: var(--ds-text-subtle) !important;
+    font: var(--heading-xxs);
+    color: var(--ds-text-subtle);
 }
 
+.sbdocs .docblock-argstable tbody td:first-of-type > span:first-of-type,
 .sbdocs .docblock-argstable td:first-of-type > span:first-of-type {
-    font: var(--body-sm) !important;
-    font-weight: var(--type-weight-semibold) !important;
+    font: var(--body-sm);
+    font-weight: var(--type-weight-semibold);
 }
 
-.sbdocs .docblock-argstable td :where(p, div, span, label) {
+.sbdocs .docblock-argstable td :is(p, div, span, label) {
     font: var(--body-sm);
 }
 
-.sbdocs .docblock-argstable :where(input, select, textarea, button) {
-    font: var(--body-sm) !important;
+.sbdocs .docblock-argstable :is(input, select, textarea, button) {
+    font: var(--body-sm);
 }
 
-.sbdocs .docblock-argstable :where(code, summary) {
-    font: var(--code-default) !important;
+.sbdocs .docblock-argstable :is(code, summary) {
+    font: var(--code-default);
     color: var(--ds-text);
 }
 

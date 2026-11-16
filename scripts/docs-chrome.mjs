@@ -133,10 +133,9 @@ export function chromeFailures(pages) {
       }
     }
 
-    // #2590. Every rendered element in docs must compute to the product's
-    // families (Noto Sans or Noto Sans Mono) — never Nunito Sans or a browser
-    // fallback.
-    for (const f of p.nonProductFonts ?? []) {
+    // Every rendered element in docs must compute to the product's families
+    // (Noto Sans or Noto Sans Mono) — never Nunito Sans or a browser fallback.
+    for (const f of (p.nonProductFonts ?? []).slice(0, 20)) {
       const family = f.fontFamily.split(',')[0].replace(/["']/g, '').trim();
       if (!ALLOWED_FAMILIES.has(family)) {
         failures.push(
@@ -322,10 +321,65 @@ export function colorNumbers(value) {
 }
 
 /**
- * The manager's sidebar follows the Color mode toolbar global. `reads` is what
- * the browser painted per step; `expected` the token-resolved literal for it.
+ * The manager's state, as a string to evaluate inside the manager document:
+ * mode, sidebar and selected-item background colors, and any visible element in
+ * the sidebar or toolbar whose computed font-family is not Noto Sans or
+ * Noto Sans Mono (capped at 20 per sample).
  *
- * @param {{step: string, mode: string, sidebar: string, selected: string}[]} reads
+ * @param {string} step the step label ('light' | 'dark')
+ * @returns {string}
+ */
+export function managerMeasureScript(step) {
+  return `(() => {
+    const g = (el) => getComputedStyle(el);
+    const paint = (el) => g(el).backgroundColor;
+    const allowedFamilies = new Set(['Noto Sans', 'Noto Sans Mono']);
+    const isIconGlyph = (el) =>
+      el.matches('.fa-solid, .fa-regular, .fa-brands, .fas, .far, .fab') ||
+      el.closest('svg') !== null;
+    const sample = [
+      ...document.querySelectorAll(
+        '.sidebar-container, .sidebar-container *, [role="toolbar"], [role="toolbar"] *, .sb-bar, .sb-bar *',
+      ),
+    ];
+    const nonProductFonts = sample
+      .filter((el) => {
+        if (el.tagName === 'SCRIPT' || el.tagName === 'STYLE' || isIconGlyph(el)) return false;
+        const c = g(el);
+        if (c.display === 'none' || c.visibility === 'hidden') return false;
+        const family = c.fontFamily.split(',')[0].replace(/["']/g, '').trim();
+        return !allowedFamilies.has(family);
+      })
+      .slice(0, 20)
+      .map((el) => {
+        const role = el.getAttribute('role');
+        const cls = typeof el.className === 'string' && el.className.trim()
+          ? '.' + el.className.trim().split(/\\s+/)[0]
+          : role
+            ? '[role="' + role + '"]'
+            : '';
+        const text = (el.textContent || '').trim().slice(0, 24);
+        return {
+          label: el.tagName.toLowerCase() + cls + (text ? ': ' + text : ''),
+          fontFamily: g(el).fontFamily,
+        };
+      });
+    return {
+      step: ${JSON.stringify(step)},
+      mode: document.documentElement.dataset.plusManagerMode,
+      sidebar: paint(document.querySelector('.sidebar-container')),
+      selected: paint(document.querySelector('.sidebar-container [data-selected="true"]')),
+      nonProductFonts,
+    };
+  })()`;
+}
+
+/**
+ * The manager's sidebar follows the Color mode toolbar global, and its sidebar
+ * and toolbar render in the product font families. `reads` is what the browser
+ * painted per step; `expected` the token-resolved literal for it.
+ *
+ * @param {{step: string, mode: string, sidebar: string, selected: string, nonProductFonts?: {label: string, fontFamily: string}[]}[]} reads
  * @param {Record<string, {mode: string, sidebar: string, selected: string}>} expected  by step
  * @returns {string[]}
  */
@@ -337,6 +391,14 @@ export function managerFailures(reads, expected) {
     for (const part of ['sidebar', 'selected']) {
       if (colorNumbers(r[part]) !== colorNumbers(want[part])) {
         failures.push(`manager ${r.step}: ${part} paints ${r[part]}, the ${want.mode} tokens say ${want[part]}`);
+      }
+    }
+    for (const f of (r.nonProductFonts ?? []).slice(0, 20)) {
+      const family = f.fontFamily.split(',')[0].replace(/["']/g, '').trim();
+      if (!ALLOWED_FAMILIES.has(family)) {
+        failures.push(
+          `manager ${r.step}: element "${f.label}" renders in ${family}, not Noto Sans or Noto Sans Mono.`,
+        );
       }
     }
   }

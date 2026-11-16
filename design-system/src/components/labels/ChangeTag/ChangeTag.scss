@@ -16,6 +16,7 @@
  * to 0ms under reduced motion.
  */
 @use '../label-heights' as label;
+@use '../../../styles/type' as *;
 
 .plus-change-tag {
     display: inline-flex;
@@ -23,7 +24,7 @@
     flex: none;
     gap: var(--inline-sm);
     margin: 0;
-    font: var(--body-sm);
+    @include ds-type(var(--body-sm));
     vertical-align: middle;
     white-space: nowrap;
 }
@@ -63,7 +64,6 @@
 }
 
 .plus-change-tag__value {
-    font: var(--body-sm);
     font-variant-numeric: tabular-nums;
 }
 
@@ -77,7 +77,6 @@
 }
 
 .plus-change-tag__comparison {
-    font: var(--body-sm);
     color: var(--ds-text-subtle);
 }
 

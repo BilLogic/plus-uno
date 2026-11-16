@@ -61,18 +61,10 @@ const config = {
   })(),
 
   // The manager's theme API takes literal colors and the manager cannot read the
-  // page's custom properties, so the color tokens are resolved here, per mode, and
-  // inlined for manager.js (see scripts/lib/manager-theme.mjs).
+  // page's custom properties, so the color and font tokens are resolved here, per
+  // mode, and inlined for manager.js (see scripts/lib/manager-theme.mjs).
   managerHead: (head) => `${head}
-<style>${fs.readFileSync(path.join(TOKEN_DIR, '_type.scss'), 'utf8')}</style>
 <script>window.__PLUS_MANAGER_THEMES__ = ${JSON.stringify(resolveManagerThemes()).replace(/</g, '\\u003c')};</script>`,
-
-  previewHead: (head) => `${head.replaceAll("'Nunito Sans',", '')}
-<script>
-  for (const s of document.querySelectorAll('head > style')) {
-    if (s.textContent && s.textContent.includes('Nunito Sans')) s.remove();
-  }
-</script>`,
 
   viteFinal: async (config) => {
     config.plugins = config.plugins || [];

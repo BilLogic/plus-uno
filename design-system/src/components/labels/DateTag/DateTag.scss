@@ -14,6 +14,7 @@
  * the appearance's subtle border for warning and danger.
  */
 @use '../label-heights' as label;
+@use '../../../styles/type' as *;
 
 .plus-date-tag {
     --plus-date-tag-height: #{label.$status-height};
@@ -31,7 +32,7 @@
     padding: 0 var(--tag-pad-x-end-compact) 0 var(--pad-x-xs);
     gap: var(--tag-gap-compact);
     border-radius: var(--radius-md);
-    font: var(--body-sm);
+    @include ds-type(var(--body-sm));
     vertical-align: middle;
     white-space: nowrap;
     background-color: transparent;
@@ -53,15 +54,11 @@
     padding: 0 var(--tag-pad-x-end) 0 var(--pad-x-md);
     gap: 0;
     border-radius: var(--radius-control-md);
-    font: var(--body-default);
+    @include ds-type(var(--body-default));
 
     .plus-date-tag__content {
         padding-right: var(--tag-pad-x-end);
         gap: var(--tag-gap);
-    }
-
-    .plus-date-tag__label {
-        font: var(--body-default);
     }
 }
 
@@ -88,7 +85,6 @@
  */
 .plus-date-tag__label {
     min-width: 0;
-    font: var(--body-sm);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

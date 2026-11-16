@@ -12,14 +12,18 @@
  * resolved in the browser from the OS before it reaches this table.
  */
 
-import { COLOR_PALETTE_FILE, COLOR_SEMANTIC_FILE, COLOR_TOKEN_DIR } from '../../design-system/src/lib/tokens-node.mjs';
+import { COLOR_PALETTE_FILE, COLOR_SEMANTIC_FILE, COLOR_TOKEN_DIR, TOKEN_DIR } from '../../design-system/src/lib/tokens-node.mjs';
 import { REPO_ROOT, text } from './corpus.mjs';
 
 /**
  * What each theme key and each manager CSS variable reads. A name here must
- * exist in every mode block of the semantic stylesheet.
+ * exist in every mode block of the semantic stylesheet (or `_type.scss` for `fonts`).
  */
 export const MANAGER_TOKENS = {
+  fonts: {
+    fontBase: '--type-family-body',
+    fontCode: '--type-family-code',
+  },
   theme: {
     colorPrimary: '--ds-background-brand-bold',
     colorSecondary: '--ds-link',
@@ -109,14 +113,16 @@ function resolve(name, table, seen = new Set()) {
 export function resolveManagerThemes({ root = REPO_ROOT } = {}) {
   const palette = text(`${COLOR_TOKEN_DIR}/${COLOR_PALETTE_FILE}`, { root });
   const semantic = text(`${COLOR_TOKEN_DIR}/${COLOR_SEMANTIC_FILE}`, { root });
+  const typeCss = text(`${TOKEN_DIR}/_type.scss`, { root });
   const primitives = new Map();
   for (const [, name, value] of palette.matchAll(/^ {2}(--[\w-]+):\s*([^;]+);/gm)) primitives.set(name, value.trim());
+  for (const [, name, value] of typeCss.matchAll(/^\s*(--[\w-]+):\s*([^;]+);/gm)) primitives.set(name, value.trim());
 
   const themes = {};
   for (const [mode, { base, over }] of Object.entries(MANAGER_MODES)) {
     const table = new Map([...primitives, ...blockDeclarations(semantic, base), ...(over ? blockDeclarations(semantic, over) : [])]);
     const pick = (map) => Object.fromEntries(Object.entries(map).map(([key, token]) => [key, toThemeColor(resolve(token, table))]));
-    themes[mode] = { theme: pick(MANAGER_TOKENS.theme), vars: pick(MANAGER_TOKENS.vars) };
+    themes[mode] = { theme: pick(MANAGER_TOKENS.theme), vars: pick(MANAGER_TOKENS.vars), fonts: pick(MANAGER_TOKENS.fonts) };
   }
   return themes;
 }

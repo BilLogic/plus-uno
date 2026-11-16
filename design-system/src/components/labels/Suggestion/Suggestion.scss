@@ -37,7 +37,7 @@
     appearance: none;
 
     color: var(--ds-text-discovery);
-    font: var(--body-sm);
+    @include ds-type(var(--body-sm));
     text-align: left;
     white-space: nowrap;
     cursor: pointer;
@@ -51,7 +51,6 @@
 }
 
 .plus-suggestion__label {
-    font: var(--body-sm);
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;

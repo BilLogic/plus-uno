@@ -66,8 +66,7 @@ $btn-appearances: (
     // Every appearance draws a 1px edge, transparent unless the appearance
     // colors it, so the height is the same in all of them.
     border: var(--border-width-default) solid transparent;
-    font: var(--body-default);
-    font-weight: var(--type-weight-medium);
+    @include ds-type(var(--body-default), var(--type-weight-medium));
     text-align: center;
     white-space: nowrap;
     text-decoration: none;
@@ -113,8 +112,6 @@ $btn-appearances: (
     // The label is Body/default at the medium weight; icons draw at 16. A
     // label that does not fit ends in an ellipsis.
     .plus-btn-text {
-        font: var(--body-default);
-        font-weight: var(--type-weight-medium);
         color: inherit;
         overflow: hidden;
         text-overflow: ellipsis;

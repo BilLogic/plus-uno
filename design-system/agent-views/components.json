@@ -776,6 +776,7 @@
         "--ds-text-accent-purple",
         "--ds-text-accent-teal",
         "--ds-text-accent-yellow",
+        "--heading-xs",
         "--icon-lg",
         "--icon-md",
         "--icon-sm",
@@ -785,12 +786,10 @@
         "--image-xxs",
         "--radius-full",
         "--radius-xxl",
-        "--type-family-heading",
         "--type-size-075",
         "--type-size-0875",
         "--type-size-100",
-        "--type-size-200",
-        "--type-weight-semibold"
+        "--type-size-200"
       ]
     },
     {
@@ -7129,7 +7128,6 @@
         "Focused"
       ],
       "tokens": [
-        "--body-default",
         "--ds-link",
         "--ds-link-pressed",
         "--ds-link-visited",

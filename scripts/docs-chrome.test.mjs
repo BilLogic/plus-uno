@@ -265,7 +265,7 @@ test('the rail measurement script is a self-contained expression', () => {
 });
 
 // ---- managerFailures: the sidebar follows the Color mode global ---------------
-import { colorNumbers, managerFailures } from './docs-chrome.mjs';
+import { colorNumbers, managerFailures, managerMeasureScript } from './docs-chrome.mjs';
 
 const MGR_EXPECTED = {
   light: { mode: 'light-no-preference', sidebar: '#f9f8f7', selected: '#15696e' },
@@ -432,5 +432,43 @@ test('chromeFailures: passes when every rendered docs element uses Noto Sans or 
   ]);
   assert.deepEqual(f, []);
 });
+
+test('chromeFailures and managerFailures cap reported font failures at 20 per sample while failing on any failure', () => {
+  const thirtyBad = Array.from({ length: 30 }, (_, i) => ({
+    label: `span.item-${i}: Row ${i}`,
+    fontFamily: '"Nunito Sans", sans-serif',
+  }));
+  const docOut = chromeFailures([page({ nonProductFonts: thirtyBad })]);
+  assert.equal(docOut.length, 20);
+
+  const mgrOut = managerFailures(
+    [
+      mgrRead('light', {
+        nonProductFonts: [
+          { label: 'button.sidebar-item: Button', fontFamily: '"Nunito Sans", sans-serif' },
+          { label: 'button[role="toolbar"]: Color mode', fontFamily: '-apple-system, sans-serif' },
+        ],
+      }),
+      mgrRead('dark'),
+    ],
+    MGR_EXPECTED,
+  );
+  assert.equal(mgrOut.length, 2);
+  assert.match(mgrOut[0], /manager light: element "button\.sidebar-item: Button" renders in Nunito Sans, not Noto Sans or Noto Sans Mono/);
+  assert.match(mgrOut[1], /manager light: element "button\[role="toolbar"\]: Color mode" renders in -apple-system, not Noto Sans or Noto Sans Mono/);
+
+  const mgrCapped = managerFailures([mgrRead('light', { nonProductFonts: thirtyBad }), mgrRead('dark')], MGR_EXPECTED);
+  assert.equal(mgrCapped.length, 20);
+});
+
+test('managerMeasureScript samples both the sidebar and the toolbar for non-product fonts', () => {
+  const src = managerMeasureScript('light');
+  assert.equal(typeof src, 'string');
+  assert.doesNotThrow(() => new Function(`return ${src}`));
+  assert.ok(src.includes('.sidebar-container'));
+  assert.ok(src.includes('toolbar'));
+  assert.ok(src.includes('nonProductFonts'));
+});
+
 
 

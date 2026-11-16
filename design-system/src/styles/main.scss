@@ -10,7 +10,7 @@
 // CSS cascade layers: declares precedence once. The element baseline is
 // lowest, the token and type rules next, component styles on top. Unlayered
 // rules (inline styles, stray `!important`) still win over every layer.
-@layer base, tokens;
+@layer base, tokens, components;
 
 // A shared exit from CSS movement, including pseudo-elements and component
 // styles loaded outside these layers. State changes still reach their target.
@@ -53,6 +53,7 @@
   @include meta.load-css("../tokens/ladder/layers");
 }
 
+@layer components {
   // Components (using load path - load-path is design-system/components, so imports should be relative to that)
   // Commented lines = no matching .scss in components/ or component lives elsewhere (e.g. forms/).
   // Prototypes and any app that imports main.scss get styles only for uncommented components.
@@ -239,4 +240,5 @@ time {
 .fab {
     --fa-width: 1em;
 }
+} // @layer components
 
