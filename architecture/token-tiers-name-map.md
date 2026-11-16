@@ -79,6 +79,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Size | `--control-sm` | new role; Control was missing from the Icon/Image/Item/Label/Row/Field set |
 | Size | `--control-md` |  |
 | Size | `--control-lg` |  |
+| Size | `--control-xl` |  |
 
 ## Patterns
 
@@ -195,6 +196,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 |---|---|---|
 | Button | `--button-radius-default` | nests in a 40-high field: its radius 10 minus the 4 slot inset = 6 |
 | Button | `--button-radius-compact` | nests in a 32-high field: its radius 8 minus the 4 slot inset = 4 |
+| Button | `--button-radius-spacious` | 48-high footer button; pairs with --control-xl |
 | Calendar | `--calendar-day-sm` |  |
 | Calendar | `--calendar-day-md` |  |
 | Calendar | `--calendar-day-lg` |  |

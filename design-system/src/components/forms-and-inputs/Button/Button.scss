@@ -5,10 +5,10 @@
 
 /*
  * Button styles. Seven appearances (default, primary, subtle, warning, danger,
- * discovery, ai), two spacings (default 32, compact 24), and the selected,
- * disabled and loading states, all on named `--ds-*` tokens. Each appearance
- * takes its hovered and pressed fills from the named tokens, laid straight on
- * the container.
+ * discovery, ai), three spacings (default 32, compact 24, spacious 48), and
+ * the selected, disabled and loading states, all on named `--ds-*` tokens.
+ * Each appearance takes its hovered and pressed fills from the named tokens,
+ * laid straight on the container.
  */
 
 // Per appearance, in order: 1 ground, 2 label, 3 icon, 4 hovered ground,
@@ -80,8 +80,9 @@ $btn-appearances: (
     // --- SPACING ---
     // Height comes from the Size roles, padding and gap from Semantics, radius
     // from the Button's own Components-tier tokens: default 32 high with a 6
-    // radius, compact 24 high with a 4 radius. The height is set, not summed
-    // from padding, so the 1px edge never makes a 26. Content centers in it.
+    // radius, compact 24 high with a 4 radius, spacious 48 high with a 10
+    // radius. The height is set, not summed from padding, so the 1px edge
+    // never makes a 26. Content centers in it.
     box-sizing: border-box;
     height: var(--control-md);
     padding: 0 var(--pad-x-md);
@@ -92,6 +93,12 @@ $btn-appearances: (
         height: var(--control-sm);
         padding: 0 var(--pad-x-sm);
         border-radius: var(--button-radius-compact);
+    }
+
+    &.plus-btn--spacious {
+        height: var(--control-xl);
+        padding: 0 var(--pad-x-lg);
+        border-radius: var(--button-radius-spacious);
     }
 
     // An icon-only button is square.
@@ -142,7 +149,7 @@ $btn-appearances: (
     }
 
     // --- WIDTH ---
-    &--fit-container {
+    &.plus-btn--fit-container {
         display: flex;
         width: 100%;
     }
