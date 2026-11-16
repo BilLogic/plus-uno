@@ -1,5 +1,6 @@
 @use 'sass:map';
 @use 'sass:string';
+@forward 'type';
 
 // The state mixin — one place that draws hover, press, selection,
 // disabled and the focus ring, for both a hand-rolled control (`:hover`,

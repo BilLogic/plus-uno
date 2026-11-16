@@ -1,0 +1,23 @@
+@use 'sass:string';
+
+// Sets a component's product type style (weight, size / line-height, family)
+// from a `--body-*`, `--heading-*`, `--code-*` or `--metric-*` token, with an
+// optional `$weight` override (`--type-weight-medium` on Button). Accepts a
+// bare token name (`--body-sm`) or a `var(--body-sm)` reference.
+@mixin ds-type($token: --body-default, $weight: null) {
+    $token-str: '#{$token}';
+    @if string.slice($token-str, 1, 2) == '--' {
+        font: var(#{$token});
+    } @else {
+        font: $token;
+    }
+
+    @if $weight {
+        $weight-str: '#{$weight}';
+        @if string.slice($weight-str, 1, 2) == '--' {
+            font-weight: var(#{$weight});
+        } @else {
+            font-weight: $weight;
+        }
+    }
+}

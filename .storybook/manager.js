@@ -75,10 +75,10 @@ const buildTheme = (key) =>
     brandImage: brandFor(key),
     brandUrl: './',
     ...THEMES[key]?.theme,
-    // The app's families: --type-family-body and --type-family-code (the manager
-    // cannot read custom properties, so the stacks are written out).
-    fontBase: '"Noto Sans", "Noto Sans Fallback", sans-serif',
-    fontCode: '"Noto Sans Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace',
+    // The app's families (--type-family-body and --type-family-code), resolved
+    // from _type.scss by scripts/lib/manager-theme.mjs.
+    fontBase: THEMES[key]?.fonts?.fontBase ?? '"Noto Sans", "Noto Sans Fallback", sans-serif',
+    fontCode: THEMES[key]?.fonts?.fontCode ?? '"Noto Sans Mono", "Noto Sans Mono Fallback", monospace',
     appBorderRadius: 8,
     inputBorderRadius: 8,
   });
@@ -86,10 +86,11 @@ const buildTheme = (key) =>
 // The selected row's colors are written as a rule, not custom properties: the
 // manager has no stylesheet that could define them (see manager-head.html for the rest).
 const paintSelected = (key) => {
-  const { vars = {} } = THEMES[key] ?? {};
+  const { vars = {}, fonts = {} } = THEMES[key] ?? {};
   const bg = vars['--plus-manager-selected-bg'];
   const fg = vars['--plus-manager-selected-fg'];
   const border = vars['--plus-manager-selected-border'];
+  const fontBase = fonts.fontBase ?? '"Noto Sans", "Noto Sans Fallback", sans-serif';
   let style = document.getElementById('plus-manager-selected');
   if (!style) {
     style = document.createElement('style');
@@ -98,6 +99,7 @@ const paintSelected = (key) => {
   }
   document.documentElement.dataset.plusManagerMode = key;
   style.textContent =
+    `body, button, input, select, textarea { font-family: ${fontBase}; }\n` +
     `.sidebar-container [data-selected='true'] { background-color: ${bg} !important; color: ${fg} !important; box-shadow: inset 0 0 0 1px ${border}; }\n` +
     `.sidebar-container [data-selected='true'] svg { color: ${fg} !important; opacity: 0.95; }\n` +
     countTagRules(vars);
