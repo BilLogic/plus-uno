@@ -7,8 +7,6 @@ import path from 'node:path';
 
 import { deriveMotionLibraryLinks, deriveMotionLibraryLinksFromPages } from './motion-library-links.mjs';
 
-const NL = String.fromCharCode(10);
-
 const REGISTRY = [
   { name: 'Panel', tier: 'template', events: { enter: { transition: 'Dock and undock a panel', spatial: 'spatial.slow' } } },
   { name: 'Panel', tier: 'component', events: { enter: { transition: 'Dock and undock a panel', spatial: 'spatial.slow' } } },
@@ -24,7 +22,7 @@ test('derives Storybook docs links and section anchors from MDX pages and Motion
     {
       file: 'design-system/src/patterns/Panel/Panel.mdx',
       docsId: 'templates-panel--docs',
-      source: ['<Meta title="Templates/Panel" />', '', '## Motion', '', '<MotionSection component="Panel" tier="template" />', ''].join(NL),
+      source: ['<Meta title="Templates/Panel" />', '', '## Motion', '', '<MotionSection component="Panel" tier="template" />', ''].join('\n'),
     },
     {
       file: 'design-system/src/components/layout-and-structure/Panel/Panel.mdx',
@@ -40,7 +38,7 @@ test('derives Storybook docs links and section anchors from MDX pages and Motion
         '',
         '<MotionSection component="Panel" />',
         '',
-      ].join(NL),
+      ].join('\n'),
     },
     {
       file: 'design-system/src/patterns/PatternModal/PatternModal.mdx',
@@ -51,12 +49,12 @@ test('derives Storybook docs links and section anchors from MDX pages and Motion
         '<MotionSection component="PatternModal" tier="template" />',
         '### Blanket motion',
         '<MotionSection component="Blanket" tier="template" />',
-      ].join(NL),
+      ].join('\n'),
     },
     {
       file: 'design-system/src/storybook-docs/patterns/Filtering/Filtering.mdx',
       docsId: 'patterns-filtering--docs',
-      source: ['<Meta title="Patterns/Filtering" />', '', '## Motion {#custom-motion}', '', '<MotionSection component="Filtering" />', ''].join(NL),
+      source: ['<Meta title="Patterns/Filtering" />', '', '## Motion {#custom-motion}', '', '<MotionSection component="Filtering" />', ''].join('\n'),
     },
   ];
 
@@ -77,7 +75,7 @@ test('deriveMotionLibraryLinks resolves <Meta of={...}> and <Meta title="..."> f
   fs.mkdirSync(btnDir, { recursive: true });
   fs.writeFileSync(
     path.join(btnDir, 'Button.stories.jsx'),
-    "export default { title: 'Components/Forms and inputs/Button/Button' };" + NL,
+    "export default { title: 'Components/Forms and inputs/Button/Button' };\n",
   );
   fs.writeFileSync(
     path.join(btnDir, 'Button.mdx'),
@@ -89,7 +87,7 @@ test('deriveMotionLibraryLinks resolves <Meta of={...}> and <Meta title="..."> f
       '',
       '<MotionSection component="Button" />',
       '',
-    ].join(NL),
+    ].join('\n'),
   );
 
   assert.deepEqual(deriveMotionLibraryLinks(root, REGISTRY), {

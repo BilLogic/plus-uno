@@ -14,9 +14,6 @@ import { MOTION_LIBRARY_LINKS } from './motion-library-links.generated.mjs';
 import { MOTION_REGISTRY } from './motion-registry.mjs';
 import { MOTION_SEMANTICS } from './plan.mjs';
 
-const NL = String.fromCharCode(10);
-const BT = String.fromCharCode(96);
-
 /**
  * The registry row named `name`, or null. A template page and a component can
  * share a name (Panel, Popup, Modal), so `tier` picks one; without it the
@@ -77,7 +74,7 @@ export function motionEventsOf(row) {
   }));
 }
 
-const code = (s) => `${BT}${s}${BT}`;
+const code = (s) => `\`${s}\``;
 
 /** A sound token's full name: `notify` → `sound.notify`. */
 export const soundNameOf = (token) => `sound.${token}`;
@@ -91,7 +88,7 @@ export function soundTextOf(sound) {
 /** The one-line summary for the agent file's header facts: `enter spatial.fast + appearance.fast · exit …`. */
 export function motionLineOf(row) {
   const parts = motionEventsOf(row).map((e) => `${e.event} ${e.tokens.map(code).join(' + ')}${e.sound ? `, sound ${code(soundNameOf(e.sound.token))}` : ''}`);
-  return `**Motion:** ${parts.join(' · ')}. Read the tokens through ${code('--ds-motion-*')}; see Foundations › Expression › Motion.${NL}${NL}`;
+  return `**Motion:** ${parts.join(' · ')}. Read the tokens through ${code('--ds-motion-*')}; see Foundations › Expression › Motion.\n\n`;
 }
 
 /**
@@ -101,23 +98,15 @@ export function motionLineOf(row) {
 export function motionSectionOf(row) {
   const events = motionEventsOf(row);
   const plays = events.some((e) => e.sound);
-  const lines = [
-    '## Motion',
-    '',
-    `${row.name} reads these motion tokens and no literal duration or curve.`,
-    '',
-    plays
-      ? '| Event | Transition | Tokens | What it does | Sound |'
-      : '| Event | Transition | Tokens | What it does |',
-    plays ? '| --- | --- | --- | --- | --- |' : '| --- | --- | --- | --- |',
-  ];
+  let d = `## Motion\n\n`;
+  d += `${row.name} reads these motion tokens and no literal duration or curve.\n\n`;
+  d += plays
+    ? `| Event | Transition | Tokens | What it does | Sound |\n| --- | --- | --- | --- | --- |\n`
+    : `| Event | Transition | Tokens | What it does |\n| --- | --- | --- | --- |\n`;
   for (const e of events) {
-    lines.push(
-      `| ${e.event} | ${e.transition} | ${e.tokens.map((t) => code(motionVarOf(t))).join(' · ')} | ${e.note} |${plays ? ` ${soundTextOf(e.sound)} |` : ''}`,
-    );
+    d += `| ${e.event} | ${e.transition} | ${e.tokens.map((t) => code(motionVarOf(t))).join(' · ')} | ${e.note} |${plays ? ` ${soundTextOf(e.sound)} |` : ''}\n`;
   }
-  lines.push('', '');
-  return lines.join(NL);
+  return `${d}\n`;
 }
 
 const unique = (items) => [...new Set(items)];
@@ -181,17 +170,11 @@ export function filterMotionLibrary(
 
 /** The Library as one Markdown table: one line per event, grouped by row, with its sound, for the agent file. */
 export function motionLibraryTableOf(registry = MOTION_REGISTRY) {
-  const lines = [
-    '| Name | Tier | Event | Transition | Tokens | Sound |',
-    '| --- | --- | --- | --- | --- | --- |',
-  ];
+  let d = `| Name | Tier | Event | Transition | Tokens | Sound |\n| --- | --- | --- | --- | --- | --- |\n`;
   for (const r of motionLibraryOf(registry)) {
     for (const e of r.events) {
-      lines.push(
-        `| ${r.name} | ${r.tier} | ${e.event} | ${e.transition} | ${e.tokens.map((t) => code(motionVarOf(t))).join(' · ')} | ${soundTextOf(e.sound)} |`,
-      );
+      d += `| ${r.name} | ${r.tier} | ${e.event} | ${e.transition} | ${e.tokens.map((t) => code(motionVarOf(t))).join(' · ')} | ${soundTextOf(e.sound)} |\n`;
     }
   }
-  lines.push('');
-  return lines.join(NL);
+  return d;
 }

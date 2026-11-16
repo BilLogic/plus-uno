@@ -22,7 +22,6 @@ import { deriveMotionLibraryLinks, renderMotionLibraryLinksModule } from './lib/
 import { motionLibraryTableOf } from './lib/tokens/motion-docs.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const NL = String.fromCharCode(10);
 
 export const OUTPUT = 'design-system/agent-views/motion/library.md';
 export const LINKS_OUTPUT = 'scripts/lib/tokens/motion-library-links.generated.mjs';
@@ -36,7 +35,7 @@ export function renderLibrary() {
     "Every template's, pattern's and component's enter, exit and change motion, one line per event, grouped by tier: templates, then patterns, then components. Tokens are read as `--ds-motion-*`; Sound names the sound an event plays (`sound.*`), when, and its condition, and is empty when silent. The same rows sit in each page's Motion section. A page absent here does not move.",
     '',
     motionLibraryTableOf(),
-  ].join(NL);
+  ].join('\n');
 }
 
 export function renderLinksModule(repoRoot = REPO_ROOT) {

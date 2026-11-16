@@ -17,7 +17,6 @@ import { motionRowOf } from './tokens/motion-docs.mjs';
 import { MOTION_REGISTRY } from './tokens/motion-registry.mjs';
 
 const DEFAULT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const NL = String.fromCharCode(10);
 
 /** Matches `.storybook/docs-toc.jsx` `stampHeadingIds` slugging for plain MDX headings. */
 function headingSlug(raw) {
@@ -44,9 +43,9 @@ function foundationSlug(title) {
 function maskCodeFences(source) {
   return source.replace(/```[\s\S]*?```/g, (block) =>
     block
-      .split(NL)
+      .split('\n')
       .map((line) => ' '.repeat(line.length))
-      .join(NL),
+      .join('\n'),
   );
 }
 
@@ -145,5 +144,5 @@ export function renderMotionLibraryLinksModule(links) {
     ...lines,
     '});',
     '',
-  ].join(NL);
+  ].join('\n');
 }
