@@ -2,7 +2,7 @@
 
 # DatePicker
 
-DatePicker — a date field that opens a month calendar (Figma `DatePicker`). Built from the shared parts: the field is `FieldBox` with the calendar icon in Trailing, and the calendar is the shared `Calendar` on the `_Listbox` surface, which DateTimePicker opens too. - **Typing:** the field takes MM/DD/YYYY (and, with `range`, two dates joined by a dash). It is checked when you press Enter or leave the field: a real day inside `minDate`…`maxDate` is picked, anything else is kept as typed and marked invalid, and `onChange` is not called. - **Range:** the first click sets the first day, the second the last; a click before the first day starts again. `onChange` receives `[start, end]`. - **Clearing:** when a value is set on a live field, a subtle `xmark` icon button (`tabIndex={-1}`) sits before the calendar icon and a subtle "Clear" button sits in the calendar footer. Both empty the field, call `onChange` with `''` (or `[null, null]` with `range`), and keep focus in the input. - **Popup:** opens 4px (`--stack-sm`) below the field, left-aligned (or as `calendarAlign` asks), and flips above with the same gap when there is no room below. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the input, which is the control a screen reader lands on: DatePicker has no `label` prop, so that is how a caller names it.
+DatePicker — a date field that opens a month calendar (Figma `DatePicker`). Built from the shared parts: the field is `FieldBox` with the calendar icon in Trailing, and the calendar is the shared `Calendar` on the `_Listbox` surface, which DateTimePicker opens too. - **Typing:** the field takes MM/DD/YYYY (and, with `range`, two dates joined by a dash). It is checked when you press Enter or leave the field: a real day inside `minDate`…`maxDate` is picked, anything else is kept as typed and marked invalid, and `onChange` is not called. - **Range:** the first click sets the first day, the second the last; a click before the first day starts again. `onChange` receives `[start, end]`. - **Clearing:** when a value or typed text is in a live field, a subtle `xmark` icon button (`tabIndex={-1}`) sits before the calendar icon and a subtle "Clear" button (in the tab order) sits in the calendar footer. Both empty the field, call `onChange` with `''` (or `[null, null]` with `range`) when a pick was set, and keep focus in the input. - **Popup:** opens 4px (`--stack-sm`) below the field, left-aligned (or as `calendarAlign` asks), and flips above with the same gap when there is no room below. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the input, which is the control a screen reader lands on: DatePicker has no `label` prop, so that is how a caller names it.
 
 Also asked as: calendar input, date field, date input, date selector.
 
@@ -95,7 +95,7 @@ Don't: Disabled fades a value people need to read.
 
 - **The input is the named control.** `aria-label`, `aria-labelledby` and `aria-describedby` are forwarded to the text input (`role="combobox"`), which tracks the popup with `aria-expanded` and `aria-haspopup`.
 - **The popup is a labeled dialog.** It opens as `role="dialog"` with `aria-label` "Choose a date" or "Choose dates".
-- **Clearing by keyboard and screen reader.** The field's plain ✕ button is named `"Clear <aria-label>"` (or `"Clear date"` / `"Clear dates"`) and sets `tabIndex={-1}` so Tab moves past the field without a second stop; keyboard users can clear the text and press Enter, or Tab through the open calendar dialog to the footer "Clear" button. Activating either control empties the date, calls `onChange` with `''` (or `[null, null]` with `range`), and returns focus to the input.
+- **Clearing by keyboard and screen reader.** When a live field holds a value or typed text, the field's plain ✕ `IconButton` (`xmark` at `--icon-sm`) is named `"Clear <noun>"` in lowercase (such as `"Clear start date"`, `"Clear date"` or `"Clear dates"`) and sets `tabIndex={-1}` so `Tab` moves past the field in one stop, while the popup footer's subtle "Clear" `Button` stays in the tab order. Keyboard users clear the text and press `Enter`, or `Tab` through the open calendar dialog to the footer "Clear" button; pointer and screen-reader users can activate either button. Both empty the field, call `onChange` with `''` (or `[null, null]` with `range`) when a pick was set, and return focus to the input.
 - **Invalid input stays editable.** An invalid typed date keeps the typed text and sets `aria-invalid` so the person can correct it.
 
 ## Related
@@ -109,10 +109,10 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 ## Parts
 
 1. **Field.** A 40 box (32 at compact) on the input fill, with the date as text.
-2. **Clear button.** A subtle `IconButton` (`xmark` at `--icon-sm`) before the calendar icon when a date or range is set on a live field (not read-only or disabled).
+2. **Clear button.** A subtle `IconButton` (`xmark` at `--icon-sm`) before the calendar icon when a date, range or typed text is in a live field (not read-only or disabled).
 3. **Calendar icon.** Opens the calendar. Decoration for assistive technology; the input is the control.
 4. **Calendar.** A month grid in a popup `--stack-sm` below the field, flipped above when there is no room. A picked day is the selected fill; days between a range's ends are the neutral selection.
-5. **Footer Clear.** A compact subtle `Button` labeled "Clear" at the end of the popup footer while a value is set.
+5. **Footer Clear.** A compact subtle `Button` labeled "Clear" at the end of the popup footer while a value or typed text is in the field.
 
 ### States
 
@@ -179,7 +179,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--dropdown-menu-pad` · `--ds-icon-subtle` · `--icon-sm`
+`--ds-icon-subtle`
 
 From `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.scss`. Override these through the token layer, never with a literal.
 

@@ -351,15 +351,15 @@ Typing is on because most lists are long enough to need it. A menu that holds a 
   multi-select with an empty filter; Delete clears the field when
   `clearable`.
 - **Clearing by keyboard and screen reader.** When a live field is `clearable`
-  (on by default except on a required single `Select`) and holds a value, a
-  subtle `IconButton` (`xmark` at `--icon-sm`) named `"Clear <label>"` sits
-  before the caret and a compact subtle "Clear" `Button` sits at the end of
-  the list footer. Both set `tabIndex={-1}` because focus stays in the
-  combobox (`Tab` closes the list and moves to the next field): keyboard
-  users press `Delete` to clear in place, while screen-reader virtual-cursor
-  and pointer users can activate either button, which empties the value,
-  calls `onChange` with `''` (or `[]` with `isMulti`), and keeps focus in the
-  combobox.
+  (on by default except on a required single `Select`) and holds a value, the
+  field's plain ✕ `IconButton` (`xmark` at `--icon-sm`) is named
+  `"Clear <noun>"` in lowercase (such as `"Clear school"` or
+  `"Clear selection"`) and sets `tabIndex={-1}` so `Tab` moves past the field
+  in one stop, while the list footer's subtle "Clear" `Button` stays in the
+  tab order. Keyboard users press `Delete` to clear in place, or `Tab` into
+  the open list to the footer "Clear" button; pointer and screen-reader users
+  can activate either button. Both empty the value, call `onChange` with `''`
+  (or `[]` with `isMulti`), and return focus to the combobox.
 - **A waiting dependent field says why.** `dependsOn`'s disabled state pairs
   with a caption ("Choose a school first"), not silence.
 

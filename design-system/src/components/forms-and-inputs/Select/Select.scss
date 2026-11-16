@@ -71,22 +71,10 @@
 
 // ── Trailing: the plain ✕ clear button and the caret ──
 
-// Same icon step as the caret (`--icon-sm`) on a subtle IconButton.
-.plus-btn.plus-select-clear .plus-btn-visual {
-    font-size: var(--icon-sm);
-}
-
 .plus-select-caret {
     color: var(--ds-icon-subtle);
     font-size: var(--icon-sm);
     cursor: pointer;
-}
-
-.plus-select-footer-actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding: var(--dropdown-menu-pad);
 }
 
 // ── The list's header: "Select all", or the search-first hint ──

@@ -416,7 +416,7 @@ ClearButton.play = async ({ args, canvasElement }) => {
     const chosen = canvas.getByTestId('chosen');
     const field = canvas.getByRole('combobox', { name: 'School' });
 
-    const clear = canvas.getByRole('button', { name: 'Clear School' });
+    const clear = canvas.getByRole('button', { name: 'Clear school' });
     await expect(clear).toHaveClass('plus-btn--subtle');
     await expect(clear).toHaveAttribute('tabindex', '-1');
     await expect(canvasElement.querySelector('.fa-circle-xmark')).toBeNull();
@@ -430,7 +430,7 @@ ClearButton.play = async ({ args, canvasElement }) => {
     await expect(chosen.textContent).toBe('');
     await expect(args.onChange).toHaveBeenLastCalledWith('');
     await expect(field).toHaveFocus();
-    await expect(canvas.queryByRole('button', { name: 'Clear School' })).toBeNull();
+    await expect(canvas.queryByRole('button', { name: 'Clear school' })).toBeNull();
     await expect(page().queryByRole('option', { name: 'North High' })).toBeNull();
 
     // Empty: opening the list shows no footer Clear.
@@ -438,7 +438,7 @@ ClearButton.play = async ({ args, canvasElement }) => {
     const emptyListbox = (await page().findByRole('listbox')).closest('.plus-listbox');
     await expect(within(emptyListbox).queryByRole('button', { name: 'Clear' })).toBeNull();
 
-    // Pick a value, reopen, and click footer Clear: empties the value and keeps focus in the field.
+    // Pick a value, reopen, and click footer Clear: a tab stop, empties the value, and keeps focus in the field.
     await userEvent.click(page().getByRole('option', { name: 'South High' }));
     await expect(chosen.textContent).toBe('south');
     await expect(field).toHaveFocus();
@@ -447,13 +447,14 @@ ClearButton.play = async ({ args, canvasElement }) => {
     await expect(filledListbox.querySelector('.fa-circle-xmark')).toBeNull();
     const footerClear = within(filledListbox.querySelector('.plus-listbox-footer')).getByRole('button', { name: 'Clear' });
     await expect(footerClear).toHaveClass('plus-btn--subtle');
+    await expect(footerClear).not.toHaveAttribute('tabindex', '-1');
 
     args.onChange.mockClear();
     await userEvent.click(footerClear);
     await expect(chosen.textContent).toBe('');
     await expect(args.onChange).toHaveBeenLastCalledWith('');
     await expect(field).toHaveFocus();
-    await expect(canvas.queryByRole('button', { name: 'Clear School' })).toBeNull();
+    await expect(canvas.queryByRole('button', { name: 'Clear school' })).toBeNull();
 
     // Delete clears from the keyboard too.
     await userEvent.click(field);
@@ -462,16 +463,22 @@ ClearButton.play = async ({ args, canvasElement }) => {
     await userEvent.keyboard('{Delete}');
     await expect(chosen.textContent).toBe('');
 
-    // Multi-select: footer Clear empties the selection to [] and keeps focus in the field.
+    // Multi-select: Tab into the open list reaches footer Clear, and activating it empties to [] and returns focus.
     const multiField = canvas.getByRole('combobox', { name: 'Districts' });
-    await expect(canvas.getByRole('button', { name: 'Clear Districts' })).toBeInTheDocument();
+    await expect(canvas.getByRole('button', { name: 'Clear districts' })).toBeInTheDocument();
     await userEvent.click(multiField);
+    await waitFor(() => expect(canvasElement.ownerDocument.querySelectorAll('.plus-listbox')).toHaveLength(1));
     const multiListbox = (await page().findByRole('listbox')).closest('.plus-listbox');
+    const multiFooterClear = within(multiListbox.querySelector('.plus-listbox-footer')).getByRole('button', { name: 'Clear' });
+    await expect(multiFooterClear).not.toHaveAttribute('tabindex', '-1');
+    await userEvent.tab(); // .plus-listbox-body
+    await userEvent.tab(); // footer Clear button
+    await expect(multiFooterClear).toHaveFocus();
     args.onMultiChange.mockClear();
-    await userEvent.click(within(multiListbox.querySelector('.plus-listbox-footer')).getByRole('button', { name: 'Clear' }));
+    await userEvent.keyboard('{Enter}');
     await expect(args.onMultiChange).toHaveBeenLastCalledWith([]);
     await expect(multiField).toHaveFocus();
-    await expect(canvas.queryByRole('button', { name: 'Clear Districts' })).toBeNull();
+    await expect(canvas.queryByRole('button', { name: 'Clear districts' })).toBeNull();
 };
 
 /** Read-only shows the value and stays focusable, but never opens or clears. */
@@ -617,10 +624,10 @@ export const ClearableDefaults = () => (
 ClearableDefaults.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    await expect(canvas.queryByRole('button', { name: 'Clear Sites' })).not.toBeNull();
-    await expect(canvas.queryByRole('button', { name: 'Clear School' })).not.toBeNull();
-    await expect(canvas.queryByRole('button', { name: 'Clear Home school' })).toBeNull();
-    await expect(canvas.queryByRole('button', { name: 'Clear Sort' })).toBeNull();
+    await expect(canvas.queryByRole('button', { name: 'Clear sites' })).not.toBeNull();
+    await expect(canvas.queryByRole('button', { name: 'Clear school' })).not.toBeNull();
+    await expect(canvas.queryByRole('button', { name: 'Clear home school' })).toBeNull();
+    await expect(canvas.queryByRole('button', { name: 'Clear sort' })).toBeNull();
 
     // Delete does not empty a field that cannot be cleared.
     const sort = canvas.getByRole('combobox', { name: 'Sort' });

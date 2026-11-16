@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import FieldBox from '../_internal/FieldBox';
+import clearLabel from '../_internal/clearLabel';
 import { FieldCaption, FieldLabel, FieldFrame, fieldDescription, toneProps } from '../_internal/FieldFrame';
 import Listbox from '../_internal/Listbox';
 import SelectTags from '../_internal/SelectTags';
@@ -36,7 +37,7 @@ const isEmpty = (value) => value === undefined || value === null || value === ''
  *   collapse into "+n" without focus.
  * - **Trailing** holds the plain ✕ clear button (not a tab stop; Delete does
  *   the same) and the caret; the list's footer also carries a subtle "Clear"
- *   action while a value is set.
+ *   action (in the tab order) while a value is set.
  */
 const Select = ({
     id,
@@ -207,7 +208,7 @@ const Select = ({
 
     /* ---------- events ---------- */
     const hasValue = !isEmpty(current);
-    const clearName = `Clear ${typeof label === 'string' ? label : (props['aria-label'] || 'selection')}`;
+    const clearName = clearLabel(typeof label === 'string' ? label : props['aria-label'], 'selection');
 
     const handleKeyDown = (event) => {
         if (props.onKeyDown) props.onKeyDown(event);
@@ -224,10 +225,6 @@ const Select = ({
                 event.preventDefault();
                 clear();
             }
-            return;
-        }
-        if (event.key === 'Tab') {
-            closeList();
             return;
         }
         if (event.key === 'Backspace' && multi && !filter && current.length) {
@@ -378,7 +375,7 @@ const Select = ({
                     appearance="subtle"
                     spacing={spacing}
                     tabIndex={-1}
-                    className="plus-select-clear"
+                    className="plus-field-clear"
                     onMouseDown={(event) => event.preventDefault()}
                     onClick={() => { clear(); controlRef.current?.focus(); }}
                 />
@@ -418,12 +415,10 @@ const Select = ({
         );
     }
     const footerClear = canClear && hasValue && live ? (
-        <div className="plus-select-footer-actions">
+        <div className="plus-listbox-footer-actions">
             <Button
                 appearance="subtle"
                 spacing="compact"
-                tabIndex={-1}
-                className="plus-select-footer-clear"
                 onClick={() => {
                     clear();
                     if (!multi) closeList();

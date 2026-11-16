@@ -559,17 +559,28 @@ ClearControl.play = async ({ args, canvasElement }) => {
     const input = canvas.getByRole('combobox', { name: 'Session date' });
 
     // Empty: neither the field ✕ nor the footer Clear is rendered.
-    await expect(canvas.queryByRole('button', { name: 'Clear Session date' })).toBeNull();
+    await expect(canvas.queryByRole('button', { name: 'Clear session date' })).toBeNull();
     await userEvent.click(input);
     await waitFor(() => expect(calendar()).toBeVisible());
     await expect(within(calendar()).queryByRole('button', { name: 'Clear' })).toBeNull();
     await expect(canvasElement.querySelector('.fa-circle-xmark')).toBeNull();
     await expect(calendar().querySelector('.fa-circle-xmark')).toBeNull();
 
+    // Typed invalid text still shows the field ✕, and clicking it clears the text and invalid state.
+    await userEvent.type(input, '13/45/2026{Enter}');
+    await expect(input).toHaveValue('13/45/2026');
+    await expect(input).toHaveAttribute('aria-invalid', 'true');
+    const invalidClear = canvas.getByRole('button', { name: 'Clear session date' });
+    await userEvent.click(invalidClear);
+    await expect(input).toHaveValue('');
+    await expect(input).not.toHaveAttribute('aria-invalid', 'true');
+    await expect(input).toHaveFocus();
+    await expect(canvas.queryByRole('button', { name: 'Clear session date' })).toBeNull();
+
     // Pick a date: the plain ✕ appears in the field (subtle icon button, icon-sm, no circular cross).
     await userEvent.type(input, '10/21/2026{Enter}');
     await expect(input).toHaveValue('10/21/2026');
-    const fieldClear = canvas.getByRole('button', { name: 'Clear Session date' });
+    const fieldClear = canvas.getByRole('button', { name: 'Clear session date' });
     await expect(fieldClear).toHaveClass('plus-btn--subtle');
     await expect(fieldClear).toHaveAttribute('tabindex', '-1');
     const xmark = fieldClear.querySelector('.fa-solid.fa-xmark');
@@ -584,9 +595,9 @@ ClearControl.play = async ({ args, canvasElement }) => {
     await expect(input).toHaveValue('');
     await expect(args.onChange).toHaveBeenLastCalledWith('');
     await expect(input).toHaveFocus();
-    await expect(canvas.queryByRole('button', { name: 'Clear Session date' })).toBeNull();
+    await expect(canvas.queryByRole('button', { name: 'Clear session date' })).toBeNull();
 
-    // Set a date again and open the calendar: footer Clear empties the value and keeps focus in the field.
+    // Set a date again and open the calendar: footer Clear is a tab stop, empties the value, and keeps focus in the field.
     await userEvent.type(input, '10/25/2026{Enter}');
     await expect(input).toHaveValue('10/25/2026');
     await userEvent.click(input);
@@ -594,6 +605,7 @@ ClearControl.play = async ({ args, canvasElement }) => {
     await expect(calendar().querySelector('.fa-circle-xmark')).toBeNull();
     const footerClear = within(calendar().querySelector('.plus-listbox-footer')).getByRole('button', { name: 'Clear' });
     await expect(footerClear).toHaveClass('plus-btn--subtle');
+    await expect(footerClear).not.toHaveAttribute('tabindex', '-1');
 
     args.onChange.mockClear();
     await userEvent.click(footerClear);
@@ -601,9 +613,19 @@ ClearControl.play = async ({ args, canvasElement }) => {
     await expect(args.onChange).toHaveBeenLastCalledWith('');
     await expect(input).toHaveFocus();
 
-    // Range DatePicker: footer Clear empties the span to [null, null] and keeps focus in the field.
+    // Range DatePicker: clicking the field ✕ empties the span to [null, null] and keeps focus in the field.
     const rangeInput = canvas.getByRole('combobox', { name: 'Report period' });
-    await expect(canvas.getByRole('button', { name: 'Clear Report period' })).toBeInTheDocument();
+    const rangeFieldClear = canvas.getByRole('button', { name: 'Clear report period' });
+    args.onRangeChange.mockClear();
+    await userEvent.click(rangeFieldClear);
+    await expect(rangeInput).toHaveValue('');
+    await expect(args.onRangeChange).toHaveBeenLastCalledWith([null, null]);
+    await expect(rangeInput).toHaveFocus();
+    await expect(canvas.queryByRole('button', { name: 'Clear report period' })).toBeNull();
+
+    // Range DatePicker: footer Clear also empties the span to [null, null] and keeps focus in the field.
+    await userEvent.type(rangeInput, '10/05/2026 – 10/06/2026{Enter}');
+    await expect(rangeInput).toHaveValue('10/05/2026 – 10/06/2026');
     await userEvent.click(rangeInput);
     const rangeDialog = await page.findByRole('dialog', { name: 'Choose dates' });
     args.onRangeChange.mockClear();
