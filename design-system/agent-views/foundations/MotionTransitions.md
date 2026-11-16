@@ -205,7 +205,7 @@ Something joins the page from above or beside it.
 
 A Modal opens only from user action, moves focus to its first input as the motion starts, and never stacks a second Modal (a confirm swaps content in place). Scale is for floating layers only.
 
-The Popup's own motion is its live story: click Details to open it, press Escape to close it.
+Product examples for Popup opening and Flag queue stacking live on [Popup](?path=/docs/components-overlays-and-layering-popup--docs) and [Flag](?path=/docs/components-messaging-flag--docs).
 
 Cancel plays the entrance backward, one speed faster, and nothing else changes. Confirm fades the Modal, recolors the row's status and brings a Flag in.
 
