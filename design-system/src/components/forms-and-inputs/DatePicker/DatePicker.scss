@@ -8,7 +8,7 @@
 @use '../../../styles/state' as *;
 
 // The input is `.plus-field__control` (FieldBox.scss): it fills the content
-// slot and draws nothing of its own. Nothing else is set here.
+// slot and draws nothing of its own.
 
 .plus-date-picker__icon {
     display: flex;
