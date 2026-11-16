@@ -102,26 +102,11 @@ function parseSource(rawText) {
 export const stripComments = (source) => parseSource(source).stripped;
 
 /**
- * Explicit allow-list of `relPath -> Set<trimmedLine>` for known chart
- * fill-opacity literals waiting on a token decision from Bill.
+ * Explicit allow-list of `relPath -> Set<trimmedLine>` for chart literals the
+ * guard would otherwise flag. Empty: chart fill opacities read the
+ * `--ds-opacity-chart-*` tokens.
  */
-export const ALLOWED_SOURCE_LINES = new Map([
-    [
-        // BubbleChart keeps `fillOpacity: 0.7` so overlapping bubbles remain
-        // legible; no chart fill-opacity token exists yet (only state tokens).
-        'correlation/BubbleChart/BubbleChart.jsx',
-        new Set(['fillOpacity: 0.7']),
-    ],
-    [
-        'chartTheme.js',
-        new Set([
-            // AreaRangeChart band fill opacity role (0.3); no chart fill-opacity token exists yet.
-            'export const CHART_RANGE_FILL_OPACITY = 0.3;',
-            // RadarChart polygon fill opacity role (0.45); no chart fill-opacity token exists yet.
-            'export const CHART_RADAR_FILL_OPACITY = 0.45;',
-        ]),
-    ],
-]);
+export const ALLOWED_SOURCE_LINES = new Map();
 
 const STATES_ALLOWED_FILES = new Set([
     'chartTheme.js',

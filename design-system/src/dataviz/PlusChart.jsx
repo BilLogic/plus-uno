@@ -57,7 +57,7 @@ function freezeEntrance(chart) {
 /**
  * Single Highcharts wrapper seam for every PLUS chart.
  *
- * - **States:** merges the shared hover, inactive (`--ds-opacity-disabled`) and
+ * - **States:** merges the shared hover, inactive (`--ds-opacity-chart-inactive`) and
  *   select (`--ds-background-selected` + `--chart-grid-width`
  *   `--ds-border-selected`) states, and resolves each series or point's
  *   `-hovered` token from its assigned color (including palette index

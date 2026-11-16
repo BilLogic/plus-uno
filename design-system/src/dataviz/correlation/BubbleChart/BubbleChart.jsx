@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme, { CHART_BUBBLE_MAX_SIZE, CHART_BUBBLE_MIN_SIZE, CHART_GRID_WIDTH_NUMBER } from '@/dataviz/chartTheme';
+import chartTheme, { CHART_BUBBLE_MAX_SIZE, CHART_BUBBLE_MIN_SIZE, CHART_GRID_WIDTH_NUMBER, CHART_OVERLAP_OPACITY } from '@/dataviz/chartTheme';
 import { tooltipHeaderFormat, valueSpan } from '@/dataviz/chartFormat';
 import { seriesColor } from '@/dataviz/palette';
 
@@ -57,8 +57,8 @@ const BubbleChart = ({
                 minSize: CHART_BUBBLE_MIN_SIZE,
                 maxSize: CHART_BUBBLE_MAX_SIZE,
                 marker: {
-                    // Token gap: only `--ds-opacity-disabled` (0.4) and `--ds-opacity-loading` (0.2) exist today; no translucent mark-fill opacity token exists yet.
-                    fillOpacity: 0.7
+                    // `--ds-opacity-chart-overlap`: overlapping bubbles stay visible through each other.
+                    fillOpacity: CHART_OVERLAP_OPACITY
                 },
                 tooltip: tooltipFormat
             }

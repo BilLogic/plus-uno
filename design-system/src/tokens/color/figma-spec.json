@@ -19938,6 +19938,30 @@
      "scopes": [
       "OPACITY"
      ]
+    },
+    {
+     "name": "opacity/chart/fill",
+     "value": 30,
+     "unit": "percent",
+     "scopes": [
+      "OPACITY"
+     ]
+    },
+    {
+     "name": "opacity/chart/overlap",
+     "value": 70,
+     "unit": "percent",
+     "scopes": [
+      "OPACITY"
+     ]
+    },
+    {
+     "name": "opacity/chart/inactive",
+     "value": 30,
+     "unit": "percent",
+     "scopes": [
+      "OPACITY"
+     ]
     }
    ]
   }

@@ -109,9 +109,9 @@ describe('data-viz foundations', () => {
         }
     });
 
-    it('restores translucent fill opacity roles on RadarChart and AreaRangeChart', () => {
+    it('fills RadarChart and AreaRangeChart at --ds-opacity-chart-fill', () => {
         expect(CHART_RANGE_FILL_OPACITY).toBe(0.3);
-        expect(CHART_RADAR_FILL_OPACITY).toBe(0.45);
+        expect(CHART_RADAR_FILL_OPACITY).toBe(0.3);
 
         capturedPlusChartOptions.length = 0;
         render(
@@ -249,9 +249,11 @@ describe('data-viz foundations', () => {
         expect(auditChartSource('sample/Chart.jsx', 'export const CUSTOM_FILL_OPACITY = 0.5;')).toEqual([
             expect.stringContaining('[pixel-offset]'),
         ]);
-        expect(auditChartSource('correlation/BubbleChart/BubbleChart.jsx', 'fillOpacity: 0.7')).toEqual([]);
-        expect(auditChartSource('chartTheme.js', 'export const CHART_RANGE_FILL_OPACITY = 0.3;')).toEqual([]);
-        expect(auditChartSource('chartTheme.js', 'export const CHART_RADAR_FILL_OPACITY = 0.45;')).toEqual([]);
+        // No allow-list: a literal fill opacity is flagged even where the old ones lived.
+        expect(auditChartSource('correlation/BubbleChart/BubbleChart.jsx', 'fillOpacity: 0.7')).toEqual([
+            expect.stringContaining('[pixel-offset]'),
+        ]);
+        expect(auditChartSource('correlation/BubbleChart/BubbleChart.jsx', 'fillOpacity: CHART_OVERLAP_OPACITY')).toEqual([]);
 
         // 6. Control radii on non-controls
         expect(auditChartSource('sample/Chart.jsx', "borderRadius: 'var(--radius-control-sm)'")).toEqual([
@@ -482,7 +484,7 @@ describe('data-viz foundations', () => {
         expect(hover?.animation?.duration).toBeGreaterThan(0);
 
         expect(inactive?.enabled).toBe(true);
-        expect(inactive?.opacity).toBe(0.4);
+        expect(inactive?.opacity).toBe(0.3);
         expect(inactive?.animation?.duration).toBeGreaterThan(0);
 
         expect(select?.enabled).toBe(true);
