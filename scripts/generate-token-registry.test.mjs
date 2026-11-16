@@ -10,6 +10,7 @@ import {
   buildFigmaVariableMappings,
   COLOR_SPEC,
   deriveCandidates,
+  parseWebCodeSyntax,
   specCodeSyntax,
 } from './generate-token-registry.mjs';
 
@@ -133,18 +134,18 @@ const SAMPLE_SNAPSHOT = {
   },
 };
 
-const DEFINED_TOKENS = () =>
-  new Set(tokenSources().flatMap((source) => [...source.text.matchAll(tokenDeclarationPattern())].map((m) => m[1])));
+/** The SCSS tokens the sample resolves against: a fixture, so a token rename cannot break these tests. */
+const DEFINED_TOKENS = () => new Set(['--ds-text', '--control-xl', '--motion-spring-880', '--type-line-height-125']);
 
 test('a variable with codeSyntax.WEB resolves to that CSS token when defined in SCSS', () => {
-  const result = buildFigmaVariableMappings(DEFINED_TOKENS(), { snapshot: SAMPLE_SNAPSHOT });
+  const result = buildFigmaVariableMappings(DEFINED_TOKENS(), { snapshot: SAMPLE_SNAPSHOT, specSyntax: new Map() });
   assert.equal(result.resolved['color / semantics']['color/text/default'], 'var(--ds-text)');
   assert.equal(result.resolved['spacing / semantics']['Size/Control/xl'], 'var(--control-xl)');
   assert.equal(result.resolved.motion['Spring/880/stiffness'], 'var(--motion-spring-880)');
 });
 
 test('a code syntax naming a missing SCSS token is reported as unresolved and does not fall back to name rules', () => {
-  const result = buildFigmaVariableMappings(DEFINED_TOKENS(), { snapshot: SAMPLE_SNAPSHOT });
+  const result = buildFigmaVariableMappings(DEFINED_TOKENS(), { snapshot: SAMPLE_SNAPSHOT, specSyntax: new Map() });
   assert.equal(result.resolved['color / semantics']['color/text/stale'], undefined);
   assert.equal(result.resolved.typography['Font size/0875'], undefined);
 
@@ -166,7 +167,7 @@ test('a code syntax naming a missing SCSS token is reported as unresolved and do
 });
 
 test('a variable with no code syntax falls back to the name rules, and reports "no code syntax" when unmapped', () => {
-  const result = buildFigmaVariableMappings(DEFINED_TOKENS(), { snapshot: SAMPLE_SNAPSHOT });
+  const result = buildFigmaVariableMappings(DEFINED_TOKENS(), { snapshot: SAMPLE_SNAPSHOT, specSyntax: new Map() });
   assert.equal(result.resolved.typography['Line height/125'], 'var(--type-line-height-125)');
   assert.equal(result.resolved['color / primitives']['teal/100'], undefined);
 
@@ -180,7 +181,7 @@ test('a variable with no code syntax falls back to the name rules, and reports "
 });
 
 test('archived collections are skipped, excluded from coverage counts, and reported as skipped rather than unresolved', () => {
-  const result = buildFigmaVariableMappings(DEFINED_TOKENS(), { snapshot: SAMPLE_SNAPSHOT });
+  const result = buildFigmaVariableMappings(DEFINED_TOKENS(), { snapshot: SAMPLE_SNAPSHOT, specSyntax: new Map() });
   assert.equal('archived / colors / accent' in result.resolved, false);
   assert.equal(
     result.unresolved.some((u) => u.collection.startsWith('archived / ')),
@@ -193,7 +194,7 @@ test('archived collections are skipped, excluded from coverage counts, and repor
 });
 
 test('build populates validation.figmaVariableCoverage from non-archived collections with skippedCollections and reasons', () => {
-  const { registry } = build({ snapshot: SAMPLE_SNAPSHOT });
+  const { registry } = build({ snapshot: SAMPLE_SNAPSHOT, specSyntax: new Map() });
   const cov = registry.validation.figmaVariableCoverage;
   assert.equal(cov.total, 7);
   assert.equal(cov.resolved, 4);
@@ -207,4 +208,12 @@ test('build populates validation.figmaVariableCoverage from non-archived collect
       ['teal/100', 'no code syntax'],
     ],
   );
+});
+
+test('parseWebCodeSyntax reads the token from var() with or without a fallback, and rejects anything else', () => {
+  assert.equal(parseWebCodeSyntax('var(--ds-text)'), '--ds-text');
+  assert.equal(parseWebCodeSyntax('  var( --control-xl )  '), '--control-xl');
+  assert.equal(parseWebCodeSyntax('var(--space-md, 4px)'), '--space-md');
+  assert.equal(parseWebCodeSyntax('4px'), null);
+  assert.equal(parseWebCodeSyntax(undefined), null);
 });

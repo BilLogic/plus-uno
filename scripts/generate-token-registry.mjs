@@ -10,8 +10,9 @@
  * Each variable in `scripts/figma-variables-snapshot.json` is resolved by its
  * `codeSyntax.WEB` (`var(--x)` -> `--x`) first and checked against SCSS, falling
  * back to collection name rules only when a variable carries no code syntax.
- * Collections prefixed `archived / ` have no code counterpart and are skipped
- * (`ARCHIVED_COLLECTION`).
+ * The color set's Figma spec (`COLOR_SPEC`) supplies code syntax for variables
+ * the snapshot does not yet carry it for. Collections prefixed `archived / `
+ * have no code counterpart and are skipped (`ARCHIVED_COLLECTION`).
  *
  * Usage:
  *   node scripts/generate-token-registry.mjs          (write)
@@ -41,8 +42,8 @@ export const COLOR_SPEC = path.join(REPO_ROOT, COLOR_SPEC_PATH);
 /** The archived Figma collections (`archived / *`), skipped rather than mapped. */
 export const ARCHIVED_COLLECTION = /^archived \/ /;
 
-/** `var(--ds-text-brand)` → `--ds-text-brand`; anything else → null. */
-const WEB_SYNTAX = new RegExp(`^var\\(\\s*(${TOKEN_NAME})\\s*\\)$`);
+/** `var(--ds-text-brand)` or `var(--ds-text-brand, fallback)` → `--ds-text-brand`; anything else → null. */
+const WEB_SYNTAX = new RegExp(`^var\\(\\s*(${TOKEN_NAME})\\s*(?:,[^)]*)?\\)$`);
 
 /** Extract `--x` from a `var(--x)` WEB code syntax string, or `null` when malformed. */
 export function parseWebCodeSyntax(web) {
@@ -249,7 +250,7 @@ export function buildFigmaVariableMappings(scssTokens, { snapshot: givenSnapshot
   const snapshot = givenSnapshot ?? JSON.parse(fs.readFileSync(VARIABLES_SNAPSHOT, 'utf8'));
   const syntax =
     givenSpecSyntax ??
-    (!givenSnapshot && fs.existsSync(COLOR_SPEC)
+    (fs.existsSync(COLOR_SPEC)
       ? specCodeSyntax(JSON.parse(fs.readFileSync(COLOR_SPEC, 'utf8')))
       : new Map());
   /** @type {Record<string, Record<string, string>>} */
