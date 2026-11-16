@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Breadcrumb, Button, IconButton, Logo, Modal, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, ProgressTracker, Sidebar, Skeleton, StatusTag, TextField } from '@/components';
+import { Breadcrumb, Button, FooterActions, IconButton, Logo, Modal, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, ProgressTracker, Sidebar, Skeleton, StatusTag, TextField } from '@/components';
 import { Blanket, Frame, PANEL_STORAGE_KEY, PatternCard, PatternModal, PatternSection, usePanelControl, useSidebarControl } from '@/patterns';
+import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { FRAME_LAYOUT } from './frameLayout';
 import { BrowserWindow, LiveAnatomy, ScaledStory } from '@/storybook-docs/lib/template-page.jsx';
 import { FitStage, ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
@@ -1682,18 +1683,22 @@ export const FocusedStepsDown = {
         await expect(rect(steps).width, 'the rail is 256 wide').toBeCloseTo(STEPS_RAIL, 0);
 
         const bar = canvasElement.querySelector('[data-probe="bar"]');
+        const barColumn = canvasElement.querySelector('[data-probe="bar-column"]');
+        const tracks = footerTracks(barColumn);
         await expect(rect(bar).height, 'the bar is 48 high').toBeCloseTo(tokenLength(bar, BAR_TOKEN), 0);
-        const cancel = canvas.getByRole('button', { name: 'Cancel' });
+        await expect(within(bar).queryByRole('button', { name: 'Cancel' }), 'no Cancel in footers').toBeNull();
         const back = canvas.getByRole('button', { name: 'Back' });
         const next = canvas.getByRole('button', { name: 'Next' });
-        await expect(rect(cancel).left, 'Cancel leads the bar').toBeLessThan(rect(back).left);
-        await expect(rect(back).right, 'Back comes before Next').toBeLessThanOrEqual(rect(next).left);
+        await expect(rect(back).left, 'Back starts on track 1').toBeCloseTo(tracks.span(1, 2).left, 0);
+        await expect(rect(back).right, 'Back ends on track 2').toBeCloseTo(tracks.span(1, 2).right, 0);
+        await expect(rect(next).left, 'Next starts on track 3').toBeCloseTo(tracks.span(3, 4).left, 0);
+        await expect(rect(next).right, 'Next ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
         await expect(back, 'Back is disabled on the first step').toHaveAttribute('aria-disabled', 'true');
         await expect(canvas.getByRole('button', { name: 'Close' }), 'Close leads the title row').toBeInTheDocument();
         // One column: the title row, the body and the bar's actions share the Page's reading edges.
         const close = canvas.getByRole('button', { name: 'Close' });
         await expect(rect(close).left, 'Close starts on the body’s left edge').toBeCloseTo(rect(steps).left, 0);
-        await expect(rect(cancel).left, 'Cancel starts on the body’s left edge').toBeCloseTo(rect(steps).left, 0);
+        await expect(rect(back).left, 'Back starts on the body’s left edge').toBeCloseTo(rect(steps).left, 0);
         await expect(rect(next).right, 'Next ends on the body’s right edge').toBeCloseTo(rect(layout).right, 0);
         await expect(canvas.queryByRole('navigation', { name: 'Main' }), 'no Sidebar').toBeNull();
         await userEvent.click(next);
@@ -2762,13 +2767,16 @@ const FocusedTaskTransitionDemo = () => {
                                         alignItems: 'center',
                                         justifyContent: 'space-between',
                                         blockSize: `var(${BAR_TOKEN})`,
+                                        overflow: 'hidden',
                                         paddingInline: 'var(--page-pad)',
                                         background: 'var(--ds-surface)',
                                         borderBlockStart: 'var(--border-width-default) solid var(--ds-border)',
                                     }}
                                 >
-                                    <Button text="Cancel" appearance="subtle" onClick={requestLeave} />
-                                    <Button text="Submit log" appearance="primary" onClick={() => { setNotes(''); setFocused(false); }} />
+                                    <FooterActions style={{ maxInlineSize: 'var(--content-max-width-reading)', marginInline: 'auto' }}>
+                                        <Button text="Discard" onClick={requestLeave} />
+                                        <Button text="Submit log" appearance="primary" onClick={() => { setNotes(''); setFocused(false); }} />
+                                    </FooterActions>
                                 </div>
                             </div>
                         )}
@@ -2778,10 +2786,10 @@ const FocusedTaskTransitionDemo = () => {
                             title="Discard unsaved session?"
                             onClose={() => setConfirmDiscard(false)}
                             footer={(
-                                <div style={{ display: 'flex', gap: 'var(--inline-sm)', justifyContent: 'flex-end' }}>
-                                    <Button text="Keep editing" appearance="subtle" onClick={() => setConfirmDiscard(false)} />
+                                <FooterActions>
+                                    <Button text="Keep editing" onClick={() => setConfirmDiscard(false)} />
                                     <Button text="Discard" appearance="danger" onClick={discardAndLeave} />
-                                </div>
+                                </FooterActions>
                             )}
                         >
                             Your notes have not been saved yet.
@@ -2810,7 +2818,7 @@ const focusedTaskPlay = (reduced) => async ({ canvasElement }) => {
 
     const field = canvas.getByLabelText('What did you cover?');
     await userEvent.type(field, 'Linear equations');
-    await userEvent.click(canvas.getByRole('button', { name: 'Cancel' }));
+    await userEvent.click(canvas.getByRole('button', { name: 'Close' }));
 
     const modal = canvasElement.querySelector('.plus-pattern-modal');
     await expect(modal, 'unsaved work asks first in a Modal').not.toBeNull();
@@ -2908,16 +2916,16 @@ const FocusedStepMotionDemo = ({ count = 4, allowExtraBranch = false }) => {
                             blockSize: `var(${BAR_TOKEN})`,
                             flex: '0 0 auto',
                             boxSizing: 'border-box',
+                            overflow: 'hidden',
                             paddingInline: 'var(--page-pad)',
                             background: 'var(--ds-surface)',
                             borderBlockStart: 'var(--border-width-default) solid var(--ds-border)',
                         }}
                     >
-                        <Button text="Cancel" appearance="subtle" onClick={() => {}} />
-                        <div style={{ display: 'flex', gap: 'var(--stack-md)' }}>
+                        <FooterActions style={{ maxInlineSize: 'var(--content-max-width-reading)', marginInline: 'auto' }}>
                             <Button text="Back" isDisabled={at === 0} onClick={() => setAt(at - 1)} />
                             <Button text={last ? 'Finish' : 'Next'} appearance="primary" onClick={() => setAt(Math.min(at + 1, labels.length - 1))} />
-                        </div>
+                        </FooterActions>
                     </div>
                 </div>
             </BrowserWindow>

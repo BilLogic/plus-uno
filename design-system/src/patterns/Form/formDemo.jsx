@@ -110,12 +110,13 @@ export const PageFooter = ({ sending, onSave }) => (
 );
 
 /**
- * Full bleed: two fixed cells, 48 high, each button filling its half. Primary
- * is furthest right. A sending button swaps its label for a spinner in place,
- * so the cells never change size, and only that button disables.
+ * FooterActions: two spacious buttons split 50/50 across the 4 tracks inside
+ * the container padding. Primary is furthest right. A sending button swaps its
+ * label for a spinner in place, so the tracks never change size, and only that
+ * button disables.
  */
-export const FullBleedFooter = ({ sending, onSave, onCancel, primary = 'Save session', cancel = 'Cancel', cancelAppearance = 'default', bleed }) => (
-    <FooterCells bleed={bleed} radius={HOST_RADIUS}>
+export const FullBleedFooter = ({ sending, onSave, onCancel, primary = 'Save session', cancel = 'Discard', cancelAppearance = 'default' }) => (
+    <FooterCells>
         <Button text={cancel} appearance={cancelAppearance} shouldFitContainer onClick={onCancel} />
         <Button text={primary} appearance="primary" shouldFitContainer isLoading={sending} onClick={onSave} />
     </FooterCells>
@@ -197,7 +198,7 @@ export const FormInPanel = () => {
                     <PanelBody data-probe="body">
                         <FormFields values={f.values} onChange={f.setValues} errors={f.errors} onBlurField={f.onBlurField} setRef={f.setRef} />
                     </PanelBody>
-                    <PanelFooter style={{ padding: 0 }}>
+                    <PanelFooter>
                         <FullBleedFooter onSave={f.submit} onCancel={() => {}} primary="Save" />
                     </PanelFooter>
                 </PanelContainer>

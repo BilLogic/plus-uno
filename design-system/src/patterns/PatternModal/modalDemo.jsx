@@ -1,24 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { Button, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, ProgressTracker, SectionMessage, Skeleton, TextField } from '@/components';
+import { Button, FooterActions, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, ProgressTracker, SectionMessage, Skeleton, TextField } from '@/components';
 import { Blanket, PatternModal, PatternSection } from '@/patterns';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
-import { FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { stepItems } from '@/storybook-docs/lib/focused-task.jsx';
 import { FormFields, FILLED } from '../Form/formDemo.jsx';
 
 /**
  * The Modal template's examples: the real PLUS parts, placed the way each type
- * lays them out. A type picks its footer, and the footer is composed from Button
- * in full-bleed cells because the Modal has no footer prop for that yet
- * (Planned).
+ * lays them out. Every footer uses the 4-track FooterActions layout inside the
+ * container padding.
  */
 
 /** The stand-in screen the docs draw the Blanket at (docs geometry, px). */
 export const SCREEN = { width: 1024, height: 480 }; // docs-literal
-
-/** The Modal's own pad, which a full-bleed footer cancels. */
-const MODAL_PAD = '--modal-pad-x-default';
 
 const text = (copy) => <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>{copy}</p>;
 
@@ -29,28 +24,37 @@ export const ModalStage = ({ children, width = 'sm', height = SCREEN.height, scr
     </Blanket>
 );
 
-/** Full-bleed cells: Cancel (Default) left, the action (Primary or Danger) right, half each. */
-export const TwoCells = ({ cancel = 'Cancel', action, appearance = 'primary', isDisabled = false, onAction, onCancel }) => (
-    <FooterCells bleed={MODAL_PAD}>
-        <Button text={cancel} shouldFitContainer onClick={onCancel} />
-        <Button text={action} appearance={appearance} isDisabled={isDisabled} shouldFitContainer onClick={onAction} />
-    </FooterCells>
+/** Two buttons: 50/50 split across the full width, secondary (Default) left, Primary or Danger right. */
+export const TwoCells = ({ secondary = 'Discard', cancel, action, appearance = 'primary', isDisabled = false, onAction, onSecondary, onCancel }) => (
+    <FooterActions>
+        <Button text={cancel ?? secondary} onClick={onSecondary ?? onCancel} />
+        <Button text={action} appearance={appearance} isDisabled={isDisabled} onClick={onAction} />
+    </FooterActions>
 );
 
-/** One button fills the whole footer. */
+/** One button: the right half (tracks 3–4), or full width when narrow. */
 export const OneCell = ({ action, onAction }) => (
-    <FooterCells bleed={MODAL_PAD} columns="1fr">
-        <Button text={action} appearance="primary" shouldFitContainer onClick={onAction} />
-    </FooterCells>
+    <FooterActions>
+        <Button text={action} appearance="primary" onClick={onAction} />
+    </FooterActions>
 );
 
-/** A third each; only the last is Primary. */
-export const ThreeCells = ({ labels = ['Cancel', 'Save draft', 'Schedule'] }) => (
-    <FooterCells bleed={MODAL_PAD} columns="1fr 1fr 1fr">
-        <Button text={labels[0]} shouldFitContainer onClick={() => {}} />
-        <Button text={labels[1]} shouldFitContainer onClick={() => {}} />
-        <Button text={labels[2]} appearance="primary" shouldFitContainer onClick={() => {}} />
-    </FooterCells>
+/** Three buttons: a quarter each in tracks 2, 3 and 4; only the rightmost is Primary. */
+export const ThreeCells = ({ labels = ['Discard', 'Save draft', 'Schedule'] }) => (
+    <FooterActions>
+        <Button text={labels[0]} onClick={() => {}} />
+        <Button text={labels[1]} onClick={() => {}} />
+        <Button text={labels[2]} appearance="primary" onClick={() => {}} />
+    </FooterActions>
+);
+
+/** Text (ghost) button hugging the left content edge; filled buttons in tracks 3 and 4. */
+export const TextLeftCells = ({ ghost = 'Skip', secondary = 'Save draft', action = 'Schedule' }) => (
+    <FooterActions>
+        <Button text={ghost} appearance="subtle" onClick={() => {}} />
+        <Button text={secondary} onClick={() => {}} />
+        <Button text={action} appearance="primary" onClick={() => {}} />
+    </FooterActions>
 );
 
 export const Passive = () => (
@@ -73,7 +77,7 @@ export const Acknowledge = () => (
 
 const STEP_LABELS = ['Student', 'When', 'Review'];
 
-/** Steps at 10-col: the tracker in the body, Cancel (Subtle) left, Back and Next on the right half. */
+/** Steps at 10-col: the tracker in the body, Back and Next split 50/50 in the footer. */
 export const Steps = ({ start = 1 }) => {
     const [at, setAt] = useState(start);
     const last = at === STEP_LABELS.length - 1;
@@ -82,11 +86,10 @@ export const Steps = ({ start = 1 }) => {
             width="lg"
             title="Schedule a session"
             footer={(
-                <FooterCells bleed={MODAL_PAD} columns="2fr 1fr 1fr">
-                    <Button text="Cancel" appearance="subtle" shouldFitContainer onClick={() => {}} />
-                    <Button text="Back" isDisabled={at === 0} shouldFitContainer onClick={() => setAt(at - 1)} />
-                    <Button text={last ? 'Schedule' : 'Next'} appearance="primary" shouldFitContainer onClick={() => setAt(Math.min(at + 1, STEP_LABELS.length - 1))} />
-                </FooterCells>
+                <FooterActions>
+                    <Button text="Back" isDisabled={at === 0} onClick={() => setAt(at - 1)} />
+                    <Button text={last ? 'Schedule' : 'Next'} appearance="primary" onClick={() => setAt(Math.min(at + 1, STEP_LABELS.length - 1))} />
+                </FooterActions>
             )}
         >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-md)' }}>
@@ -121,7 +124,7 @@ export const TierActive = () => (
 );
 
 export const TierDanger = () => (
-    <ModalStage title="Delete note?" footer={<TwoCells action="Delete note" appearance="danger" />}>
+    <ModalStage title="Delete note?" footer={<TwoCells secondary="Archive instead" action="Delete note" appearance="danger" />}>
         {text('This removes the note from Ana’s record. This cannot be undone.')}
     </ModalStage>
 );
@@ -133,7 +136,7 @@ export const TierTypeName = () => {
     return (
         <ModalStage
             title="Delete group?"
-            footer={<TwoCells action="Delete group" appearance="danger" isDisabled={typed !== GROUP_NAME} />}
+            footer={<TwoCells secondary="Archive instead" action="Delete group" appearance="danger" isDisabled={typed !== GROUP_NAME} />}
         >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-md)' }}>
                 {text('This removes the group and its sessions. This cannot be undone.')}
@@ -150,8 +153,8 @@ export const ConfirmInside = ({ start = 'details' }) => {
         <ModalStage
             title={confirming ? 'Delete session?' : 'Session details'}
             footer={confirming
-                ? <TwoCells cancel="Back" action="Delete session" appearance="danger" onCancel={() => setConfirming(false)} />
-                : <TwoCells cancel="Close" action="Delete session" appearance="danger" onAction={() => setConfirming(true)} />}
+                ? <TwoCells secondary="Back" action="Delete session" appearance="danger" onSecondary={() => setConfirming(false)} />
+                : <TwoCells secondary="Keep session" action="Delete session" appearance="danger" onAction={() => setConfirming(true)} />}
         >
             {confirming
                 ? <SectionMessage appearance="warning" dismissible={false}>This removes Thursday’s session for Ana and her tutor. This cannot be undone.</SectionMessage>
@@ -162,7 +165,7 @@ export const ConfirmInside = ({ start = 'details' }) => {
 
 /** Long content: the body scrolls between the pinned header and footer. */
 export const LongContent = () => (
-    <ModalStage title="Session history" height={360} footer={<TwoCells cancel="Close" action="Export" />}>
+    <ModalStage title="Session history" height={360} footer={<TwoCells secondary="Discard" action="Export" />}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-md)' }}>
             {Array.from({ length: 14 }, (_, i) => text(`Session ${i + 1}: Ana Ruiz, fractions, 4:00–5:00 PM.`))}
         </div>
@@ -171,7 +174,7 @@ export const LongContent = () => (
 
 /** Loading: no skeleton on the Modal itself; the body shows its content's own loading state. */
 export const LoadingBody = () => (
-    <ModalStage title="Session history" footer={<TwoCells cancel="Close" action="Export" isDisabled />}>
+    <ModalStage title="Session history" footer={<TwoCells secondary="Discard" action="Export" isDisabled />}>
         <Skeleton preset="text" lines={4} />
     </ModalStage>
 );
@@ -185,8 +188,8 @@ const PageBehind = () => (
 
 /**
  * A confirm Modal over a Panel, drawn open: the Panel open, the confirm over it,
- * and the confirm's own Blanket covering the Panel. Cancel or Escape closes the
- * confirm and hands focus back to the Panel's trigger.
+ * and the confirm's own Blanket covering the Panel. The safer alternative or Escape
+ * closes the confirm and hands focus back to the Panel's trigger.
  */
 export const ConfirmOverPanel = () => {
     const [open, setOpen] = useState(true);
@@ -217,10 +220,10 @@ export const ConfirmOverPanel = () => {
                             title="Delete student?"
                             onClose={close}
                             footer={(
-                                <FooterCells bleed={MODAL_PAD}>
-                                    <Button text="Cancel" shouldFitContainer onClick={close} />
-                                    <Button text="Delete student" appearance="danger" shouldFitContainer onClick={close} />
-                                </FooterCells>
+                                <FooterActions>
+                                    <Button text="Archive instead" onClick={close} />
+                                    <Button text="Delete student" appearance="danger" onClick={close} />
+                                </FooterActions>
                             )}
                         >
                             {text('This removes Ana and her sessions. This cannot be undone.')}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import {
-    Banner, Button, EmptyState, FilterButton, Heading, PageHeader,
+    Banner, Button, EmptyState, FilterButton, FooterActions, Heading, PageHeader,
     PanelBody, PanelContainer, PanelFooter, PanelHeader, PopupSelect, SearchField, StatusTag, Tabs, TextField,
 } from '@/components';
 import { Frame, Page, PatternSection, PatternTable, usePanelControl } from '@/patterns';
@@ -83,11 +83,11 @@ const ReviewPanel = ({ value, onSave }) => {
             <PanelBody>
                 <TextField label="Notes" value={notes} onChange={(event) => setNotes(event.target.value)} />
             </PanelBody>
-            <PanelFooter style={{ padding: 0, gap: 0 }}>
-                <>
-                    <Button text="Cancel" shouldFitContainer onClick={() => { setNotes(value); panel.setOpen(false); }} />
-                    <Button text="Save notes" appearance="primary" shouldFitContainer onClick={() => { onSave(notes); panel.setOpen(false); }} />
-                </>
+            <PanelFooter>
+                <FooterActions>
+                    <Button text="Discard" onClick={() => { setNotes(value); panel.setOpen(false); }} />
+                    <Button text="Save notes" appearance="primary" onClick={() => { onSave(notes); panel.setOpen(false); }} />
+                </FooterActions>
             </PanelFooter>
         </PanelContainer>
     );
@@ -126,11 +126,11 @@ export const DetailWithPanel = {
         const canvas = within(canvasElement);
         const panel = () => canvas.getByRole('complementary', { name: 'Session review notes' });
         await waitFor(() => expect(panel()).toHaveClass('plus-frame__panel--docked'));
-        const cancel = within(panel()).getByRole('button', { name: 'Cancel' });
+        const discard = within(panel()).getByRole('button', { name: 'Discard' });
         const save = within(panel()).getByRole('button', { name: 'Save notes' });
-        await expect(cancel.getBoundingClientRect().right).toBeLessThanOrEqual(save.getBoundingClientRect().left);
+        await expect(discard.getBoundingClientRect().right).toBeLessThanOrEqual(save.getBoundingClientRect().left);
         await userEvent.type(canvas.getByRole('textbox', { name: 'Notes' }), ' Discard this.');
-        await userEvent.click(cancel);
+        await userEvent.click(discard);
         await waitFor(() => expect(canvas.queryByRole('complementary', { name: 'Session review notes' })).toBeNull());
         await userEvent.click(canvas.getByRole('button', { name: 'Edit notes' }));
         await expect(canvas.getByRole('textbox', { name: 'Notes' })).toHaveValue('Start with unit rates.');
@@ -141,7 +141,7 @@ export const DetailWithPanel = {
         await expect(canvas.getAllByRole('status').at(-1).textContent).toBe('Practice ratios next.');
         await userEvent.click(canvas.getByRole('button', { name: 'Edit notes' }));
         await userEvent.type(canvas.getByRole('textbox', { name: 'Notes' }), ' Discard this.');
-        await userEvent.click(within(panel()).getByRole('button', { name: 'Cancel' }));
+        await userEvent.click(within(panel()).getByRole('button', { name: 'Discard' }));
         await userEvent.click(canvas.getByRole('button', { name: 'Edit notes' }));
         await expect(canvas.getByRole('textbox', { name: 'Notes' })).toHaveValue('Practice ratios next.');
     },

@@ -107,7 +107,7 @@ export const DetailsPanel = ({ editing = false, onEdit, onClose = () => {}, onSa
             )}
         </PanelBody>
         {editing ? (
-            <PanelFooter style={{ padding: 0 }}>
+            <PanelFooter>
                 <FullBleedFooter primary="Save" onSave={onSave} onCancel={onCancel} />
             </PanelFooter>
         ) : null}
@@ -177,7 +177,7 @@ export const GonePanel = ({ onClose = () => {} }) => (
                 icon="calendar-xmark"
                 header="This session no longer exists"
                 description="Someone removed it, or it moved to another week."
-                primaryAction={<Button text="Back to sessions" appearance="primary" onClick={onClose} />}
+                primaryAction={<Button text="Back to sessions" appearance="primary" spacing="compact" onClick={onClose} />}
             />
         </PanelBody>
     </PanelContainer>

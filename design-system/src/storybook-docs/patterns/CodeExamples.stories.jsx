@@ -101,7 +101,7 @@ export const Empty = {
         return (
             <PatternTable empty emptyState={
                 <EmptyState spacing="compact" header="No matching sessions" description="Try another search or reset the filters."
-                    secondaryAction={<Button text="Reset filters" />} />
+                    secondaryAction={<Button text="Reset filters" spacing="compact" />} />
             }>
                 <thead><tr><th>Student</th><th>Status</th></tr></thead>
                 <tbody />

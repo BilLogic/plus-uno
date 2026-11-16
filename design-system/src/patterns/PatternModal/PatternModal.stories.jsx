@@ -2,8 +2,9 @@ import { expectOverlayExit, withReducedMotion, settleAnimations } from '@/storyb
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import PatternModal from '@/patterns/PatternModal';
-import Blanket, { BLANKET_HEIGHTS, BLANKET_WIDTHS } from '@/patterns/Blanket';
-import { Button } from '@/components';
+import Blanket, { BLANKET_HEIGHTS, BLANKET_SPANS, BLANKET_WIDTHS } from '@/patterns/Blanket';
+import { Button, FooterActions } from '@/components';
+import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { probe, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
@@ -36,10 +37,10 @@ const longBody = (
 );
 
 const footerActions = (
-    <>
-        <Button text="Cancel" spacing="compact" onClick={() => {}} />
-        <Button text="Move session" appearance="primary" spacing="compact" onClick={() => {}} />
-    </>
+    <FooterActions>
+        <Button text="Discard" onClick={() => {}} />
+        <Button text="Move session" appearance="primary" onClick={() => {}} />
+    </FooterActions>
 );
 
 /** An inline Blanket at the stand-in screen, holding one modal. */
@@ -204,10 +205,10 @@ const sessionTabs = [
 ];
 
 const saveActions = (
-    <>
-        <Button text="Cancel" spacing="compact" onClick={() => {}} />
-        <Button text="Save" appearance="primary" spacing="compact" onClick={() => {}} />
-    </>
+    <FooterActions>
+        <Button text="Discard" onClick={() => {}} />
+        <Button text="Save" appearance="primary" onClick={() => {}} />
+    </FooterActions>
 );
 
 /**
@@ -471,23 +472,27 @@ export const Interactive = {
 const STAGE = 1024; // docs-literal: the page's stand-in screen
 const rect = (el) => el.getBoundingClientRect();
 
-/** Every footer button sits inside the Modal's box and the footer's own box: nothing overflows its container. */
+/** Every footer button sits inside the Modal's padding and the footer's own box: nothing overflows its container. */
 const buttonsInside = async (canvasElement) => {
     fitsCanvas(canvasElement);
-    const modal = rect(canvasElement.querySelector('.plus-pattern-modal'));
+    const modalEl = canvasElement.querySelector('.plus-pattern-modal');
+    const modal = rect(modalEl);
+    const scale = modalEl.offsetWidth > 0 ? modal.width / modalEl.offsetWidth : 1;
+    const padX = (parseFloat(getComputedStyle(modalEl).paddingLeft) || 0) * scale;
+    const padY = (parseFloat(getComputedStyle(modalEl).paddingBottom) || 0) * scale;
     const footer = canvasElement.querySelector('[data-probe="footer"]');
     const box = footer ? rect(footer) : modal;
     if (footer) {
-        await expect(box.bottom, 'the footer is flush with the Modal’s bottom').toBeCloseTo(modal.bottom, 0);
-        await expect(box.left, 'the footer is flush with the Modal’s left edge').toBeCloseTo(modal.left, 0);
-        await expect(box.right, 'the footer is flush with the Modal’s right edge').toBeCloseTo(modal.right, 0);
+        await expect(box.bottom, 'the footer sits inside the Modal’s bottom padding').toBeCloseTo(modal.bottom - padY, 0);
+        await expect(box.left, 'the footer sits inside the Modal’s left padding').toBeCloseTo(modal.left + padX, 0);
+        await expect(box.right, 'the footer sits inside the Modal’s right padding').toBeCloseTo(modal.right - padX, 0);
     }
     for (const button of canvasElement.querySelectorAll('.plus-pattern-modal-footer button')) {
         const b = rect(button);
         await expect(b.left, 'a footer button starts inside its container').toBeGreaterThanOrEqual(box.left - 0.5);
         await expect(b.right, 'a footer button ends inside its container').toBeLessThanOrEqual(box.right + 0.5);
         await expect(b.bottom, 'a footer button ends inside the Modal').toBeLessThanOrEqual(modal.bottom + 0.5);
-        await expect(b.height, 'a full-bleed button fills the footer’s height').toBeCloseTo(box.height, 0);
+        await expect(b.height, 'a spacious button fills the footer’s height').toBeCloseTo(box.height, 0);
         await expect(button.scrollWidth, 'a button’s label fits its box').toBeLessThanOrEqual(button.clientWidth + 1);
     }
 };
@@ -512,7 +517,15 @@ export const TypeActive = {
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
         const canvas = within(canvasElement);
-        await expect(rect(canvas.getByRole('button', { name: 'Cancel' })).left, 'Cancel (Default) left of the action').toBeLessThan(rect(canvas.getByRole('button', { name: 'Move session' })).left);
+        const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const tracks = footerTracks(footer);
+        const discard = canvas.getByRole('button', { name: 'Discard' });
+        const action = canvas.getByRole('button', { name: 'Move session' });
+        await expect(within(footer).queryByRole('button', { name: 'Cancel' }), 'no Cancel in footers').toBeNull();
+        await expect(rect(discard).left, 'secondary starts on track 1').toBeCloseTo(tracks.span(1, 2).left, 0);
+        await expect(rect(discard).right, 'secondary ends on track 2').toBeCloseTo(tracks.span(1, 2).right, 0);
+        await expect(rect(action).left, 'primary starts on track 3').toBeCloseTo(tracks.span(3, 4).left, 0);
+        await expect(rect(action).right, 'primary ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
         await buttonsInside(canvasElement);
     },
 };
@@ -522,9 +535,11 @@ export const TypeAcknowledge = {
     render: () => sized(<Demo.Acknowledge />),
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
-        const modal = rect(canvasElement.querySelector('.plus-pattern-modal'));
+        const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const tracks = footerTracks(footer);
         const button = rect(within(canvasElement).getByRole('button', { name: 'Got it' }));
-        await expect(button.width, 'one button fills the whole footer').toBeCloseTo(modal.width, 0);
+        await expect(button.left, 'one button starts on track 3').toBeCloseTo(tracks.span(3, 4).left, 0);
+        await expect(button.right, 'one button ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
         await buttonsInside(canvasElement);
     },
 };
@@ -535,12 +550,17 @@ export const TypeSteps = {
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
         const canvas = within(canvasElement);
-        const modal = rect(canvasElement.querySelector('.plus-pattern-modal'));
+        const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const tracks = footerTracks(footer);
         await expect(canvasElement.querySelector('.plus-pattern-modal').offsetWidth, '10-col at 1024').toBeCloseTo(WIDTHS_AT_1024.lg, 0);
         await expect(canvas.getByRole('navigation', { name: 'Steps' }), 'the steps run across the top').toHaveClass('plus-progress-tracker--horizontal');
+        await expect(within(footer).queryByRole('button', { name: 'Cancel' }), 'no Cancel in steps footer').toBeNull();
         const back = rect(canvas.getByRole('button', { name: 'Back' }));
-        await expect(back.left, 'Back and Next share the right half').toBeGreaterThanOrEqual(modal.left + modal.width / 2 - 1);
-        await expect(canvas.getByRole('button', { name: 'Cancel' }).className, 'Cancel is Subtle').toContain('subtle');
+        const next = rect(canvas.getByRole('button', { name: 'Next' }));
+        await expect(back.left, 'Back starts on track 1').toBeCloseTo(tracks.span(1, 2).left, 0);
+        await expect(back.right, 'Back ends on track 2').toBeCloseTo(tracks.span(1, 2).right, 0);
+        await expect(next.left, 'Next starts on track 3').toBeCloseTo(tracks.span(3, 4).left, 0);
+        await expect(next.right, 'Next ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
         await userEvent.click(canvas.getByRole('button', { name: 'Next' }));
         await expect(canvas.getByRole('button', { name: 'Schedule' }), 'on the last step Next takes the outcome’s name').toBeInTheDocument();
         await buttonsInside(canvasElement);
@@ -579,7 +599,7 @@ export const WidthStrip = {
     render: () => (
         <FitStage width={STAGE}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', inlineSize: STAGE }}>
-            {[['xs', '4-col'], ['sm', '6-col'], ['md', '8-col'], ['lg', '10-col']].map(([width, label]) => (
+            {BLANKET_WIDTHS.map((width) => [width, `${BLANKET_SPANS[width]}-col`]).map(([width, label]) => (
                 <Demo.ModalStage key={width} width={width} height={240} title={label} footer={<Demo.TwoCells action="Save" />}>
                     <p style={{ margin: 0, font: 'var(--body-default)' }}>{`${label} on the 1024 screen grid.`}</p>
                 </Demo.ModalStage>
@@ -591,7 +611,7 @@ export const WidthStrip = {
         await settleAnimations(canvasElement);
         fitsCanvas(canvasElement);
         const modals = within(canvasElement).getAllByRole('dialog');
-        for (const [i, width] of ['xs', 'sm', 'md', 'lg'].entries()) {
+        for (const [i, width] of BLANKET_WIDTHS.entries()) {
             await expect(modals[i].offsetWidth, `${width} matches the grid at 1024`).toBeCloseTo(WIDTHS_AT_1024[width], 0);
         }
         await expect(modals[0].offsetWidth, 'widths step up').toBeLessThan(modals[1].offsetWidth);
@@ -641,7 +661,16 @@ export const TierDanger = {
     render: () => sized(<Demo.TierDanger />),
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
-        await expect(within(canvasElement).getByRole('button', { name: 'Delete note' }), 'the action takes the Danger appearance').toHaveClass('plus-btn--danger');
+        const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const tracks = footerTracks(footer);
+        const safer = within(canvasElement).getByRole('button', { name: 'Archive instead' });
+        const danger = within(canvasElement).getByRole('button', { name: 'Delete note' });
+        await expect(safer, 'safer alternative is default secondary').toHaveClass('plus-btn--default');
+        await expect(danger, 'the action takes the Danger appearance').toHaveClass('plus-btn--danger');
+        await expect(rect(safer).left, 'safer alternative starts on track 1').toBeCloseTo(tracks.span(1, 2).left, 0);
+        await expect(rect(safer).right, 'safer alternative ends on track 2').toBeCloseTo(tracks.span(1, 2).right, 0);
+        await expect(rect(danger).left, 'danger primary starts on track 3').toBeCloseTo(tracks.span(3, 4).left, 0);
+        await expect(rect(danger).right, 'danger primary ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
         await buttonsInside(canvasElement);
     },
 };
@@ -666,7 +695,11 @@ export const FooterOne = {
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const tracks = footerTracks(footer);
+        const [button] = footer.querySelectorAll('button');
         await expect(footer.offsetHeight, 'the footer is 48 high').toBeCloseTo(tokenLength(footer, BAR_TOKEN), 0);
+        await expect(rect(button).left, '1 button starts on track 3').toBeCloseTo(tracks.span(3, 4).left, 0);
+        await expect(rect(button).right, '1 button ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
         await buttonsInside(canvasElement);
     },
 };
@@ -676,8 +709,16 @@ export const FooterTwo = {
     render: () => sized(<Demo.Active />),
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
-        const [cancel, action] = [...canvasElement.querySelectorAll('.plus-pattern-modal-footer button')].map(rect);
-        await expect(cancel.width, 'half each').toBeCloseTo(action.width, 0);
+        const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const tracks = footerTracks(footer);
+        const [secondary, primary] = [...footer.querySelectorAll('button')];
+        await expect(within(footer).queryByRole('button', { name: 'Cancel' }), 'no Cancel in footers').toBeNull();
+        await expect(secondary, 'secondary is default appearance').toHaveClass('plus-btn--default');
+        await expect(primary, 'primary is rightmost').toHaveClass('plus-btn--primary');
+        await expect(rect(secondary).left, 'secondary starts on track 1').toBeCloseTo(tracks.span(1, 2).left, 0);
+        await expect(rect(secondary).right, 'secondary ends on track 2').toBeCloseTo(tracks.span(1, 2).right, 0);
+        await expect(rect(primary).left, 'primary starts on track 3').toBeCloseTo(tracks.span(3, 4).left, 0);
+        await expect(rect(primary).right, 'primary ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
         await buttonsInside(canvasElement);
     },
 };
@@ -687,10 +728,72 @@ export const FooterThree = {
     render: () => sized(<Demo.ModalStage title="Schedule session" footer={<Demo.ThreeCells />}><p style={{ margin: 0, font: 'var(--body-default)' }}>Save it as a draft, or schedule it now.</p></Demo.ModalStage>),
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
-        const buttons = [...canvasElement.querySelectorAll('.plus-pattern-modal-footer button')];
+        const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const tracks = footerTracks(footer);
+        const buttons = [...footer.querySelectorAll('button')];
         await expect(buttons, 'three cells').toHaveLength(3);
         await expect(buttons[0].className, 'only the last is Primary').not.toContain('primary');
+        await expect(buttons[1].className, 'only the last is Primary').not.toContain('primary');
         await expect(buttons[2].className, 'only the last is Primary').toContain('primary');
+        await expect(rect(buttons[0]).left, 'first button in track 2').toBeCloseTo(tracks.track(2).left, 0);
+        await expect(rect(buttons[0]).right, 'first button in track 2').toBeCloseTo(tracks.track(2).right, 0);
+        await expect(rect(buttons[1]).left, 'second button in track 3').toBeCloseTo(tracks.track(3).left, 0);
+        await expect(rect(buttons[1]).right, 'second button in track 3').toBeCloseTo(tracks.track(3).right, 0);
+        await expect(rect(buttons[2]).left, 'third button in track 4').toBeCloseTo(tracks.track(4).left, 0);
+        await expect(rect(buttons[2]).right, 'third button in track 4').toBeCloseTo(tracks.track(4).right, 0);
+        await buttonsInside(canvasElement);
+    },
+};
+
+export const FooterTextLeft = {
+    name: 'Footer: Text button left',
+    render: () => sized(<Demo.ModalStage title="Schedule session" footer={<Demo.TextLeftCells />}><p style={{ margin: 0, font: 'var(--body-default)' }}>Skip for now, save a draft, or schedule it.</p></Demo.ModalStage>),
+    play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
+        const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const tracks = footerTracks(footer);
+        const [leading, secondary, primary] = [...footer.querySelectorAll('button')];
+        await expect(leading, 'text button is subtle').toHaveClass('plus-btn--subtle');
+        await expect(leading, 'text button hugs its label and takes no track').not.toHaveClass('plus-btn--fit-container');
+        await expect(rect(leading).left, 'text button hugs the left content edge').toBeCloseTo(tracks.box.left, 0);
+        await expect(rect(leading).width, 'text button hugs rather than filling tracks 1-2').toBeLessThan(tracks.span(1, 2).width);
+        await expect(rect(secondary).left, 'first filled button sits in track 3').toBeCloseTo(tracks.track(3).left, 0);
+        await expect(rect(secondary).right, 'first filled button sits in track 3').toBeCloseTo(tracks.track(3).right, 0);
+        await expect(rect(primary).left, 'second filled button sits in track 4').toBeCloseTo(tracks.track(4).left, 0);
+        await expect(rect(primary).right, 'second filled button sits in track 4').toBeCloseTo(tracks.track(4).right, 0);
+        await expect(primary, 'rightmost is primary').toHaveClass('plus-btn--primary');
+        await buttonsInside(canvasElement);
+    },
+};
+
+export const FooterDestructive = {
+    name: 'Footer: Destructive split',
+    render: () => sized(<Demo.TierDanger />),
+    play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
+        const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const tracks = footerTracks(footer);
+        const [safer, danger] = [...footer.querySelectorAll('button')];
+        await expect(safer, 'safer alternative is secondary').toHaveClass('plus-btn--default');
+        await expect(danger, 'danger is primary').toHaveClass('plus-btn--danger');
+        await expect(rect(safer).left, 'safer alternative starts on track 1').toBeCloseTo(tracks.span(1, 2).left, 0);
+        await expect(rect(safer).right, 'safer alternative ends on track 2').toBeCloseTo(tracks.span(1, 2).right, 0);
+        await expect(rect(danger).left, 'danger primary starts on track 3').toBeCloseTo(tracks.span(3, 4).left, 0);
+        await expect(rect(danger).right, 'danger primary ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
+        await buttonsInside(canvasElement);
+    },
+};
+
+export const FooterNarrow = {
+    name: 'Footer: Single action in a narrow container',
+    render: () => sized(<Demo.ModalStage width="xs" title="Session moved" footer={<Demo.OneCell action="Got it" />}><p style={{ margin: 0, font: 'var(--body-default)' }}>Thursday’s session with Ana is now at 4:30 PM.</p></Demo.ModalStage>),
+    play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
+        const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const tracks = footerTracks(footer);
+        const [button] = footer.querySelectorAll('button');
+        await expect(rect(button).left, 'single action in narrow container starts on track 1').toBeCloseTo(tracks.span(1, 4).left, 0);
+        await expect(rect(button).right, 'single action in narrow container ends on track 4').toBeCloseTo(tracks.span(1, 4).right, 0);
         await buttonsInside(canvasElement);
     },
 };
@@ -761,7 +864,7 @@ export const StackConfirmOverPanel = {
         await expect(cover.top, 'the confirm’s Blanket covers the Panel').toBeLessThanOrEqual(panel.top + 0.5);
         await expect(cover.bottom, 'the confirm’s Blanket covers the Panel').toBeGreaterThanOrEqual(panel.bottom - 0.5);
         await expect(canvas.getByText('Ana Ruiz'), 'the Panel is open under the confirm').toBeInTheDocument();
-        await userEvent.click(canvas.getByRole('button', { name: 'Cancel' }));
+        await userEvent.click(canvas.getByRole('button', { name: 'Archive instead' }));
         await waitFor(() => expect(dialogNamed(canvasElement, 'Delete student?')).toBeNull());
         await expect(canvasElement.ownerDocument.activeElement, 'focus returns to the Panel').toBe(canvas.getByRole('button', { name: 'Delete student' }));
         await expect(canvas.getByText('Ana Ruiz'), 'the Panel is still open').toBeInTheDocument();

@@ -64,10 +64,11 @@ const PatternModal = ({
     useOverlayOrigin(open, surface);
     const reactId = React.useId();
     const tabState = useTabs(tabs, { activeTab, defaultActiveTab, onTabChange });
+    const resolvedWidth = { '4-col': 'xs', '6-col': 'sm', '8-col': 'md', '10-col': 'lg' }[width] || width;
 
     const classes = [
         'plus-pattern-modal',
-        `plus-pattern-modal-width-${width}`,
+        `plus-pattern-modal-width-${resolvedWidth}`,
         `plus-pattern-modal-height-${height}`,
         className,
     ].filter(Boolean).join(' ');

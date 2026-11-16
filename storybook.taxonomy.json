@@ -22,6 +22,7 @@
       "Filter button",
       "Button group",
       "Close button",
+      "Footer actions",
       "Calendar",
       "Checkbox",
       "Checkbox group",
@@ -246,7 +247,8 @@
           "Split button",
           "Filter button",
           "Button group",
-          "Close button"
+          "Close button",
+          "Footer actions"
         ],
         "Calendar",
         "Checkbox",

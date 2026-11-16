@@ -58,7 +58,7 @@ export const LoadFailure = ({ onRetry = noop }) => (
                 icon="triangle-exclamation"
                 header="Couldn't load this week's sessions"
                 description="Check your connection and try again."
-                primaryAction={<Button text="Try again" appearance="default" onClick={onRetry} />}
+                primaryAction={<Button text="Try again" appearance="default" spacing="compact" onClick={onRetry} />}
             />
         </PatternSection>
     </div>

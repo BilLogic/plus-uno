@@ -67,7 +67,7 @@ export const CardAction = () => (
         <PatternCard
             title="Next session"
             description="Thursday, 4:00 PM with Ana Ruiz"
-            footer={<Button text="Open session" appearance="subtle" onClick={() => {}} />}
+            footer={<Button text="Open session" appearance="subtle" spacing="compact" onClick={() => {}} />}
         />
     </div>
 );
@@ -157,8 +157,8 @@ export const Sending = ({ sending: started = false }) => {
         <ModalStage
             title="Log a session"
             footer={(
-                <FooterCells bleed="--modal-pad-x-default">
-                    <Button text="Cancel" shouldFitContainer onClick={() => {}} />
+                <FooterCells>
+                    <Button text="Discard" shouldFitContainer onClick={() => {}} />
                     <Button text="Save session" appearance="primary" shouldFitContainer isLoading={sending} onClick={() => setSending(true)} />
                 </FooterCells>
             )}

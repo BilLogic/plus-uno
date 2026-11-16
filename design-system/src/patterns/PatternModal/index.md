@@ -14,7 +14,7 @@ Also asked as: dialog layout, confirm layout.
 
 **Source:** `design-system/src/patterns/PatternModal/PatternModal.jsx`
 
-**Stories:** `design-system/src/patterns/PatternModal/PatternModal.stories.jsx` — Overview, Widths, Heights, Tabs, BodyMinHeight, CustomHeader, Divider, Loading, WidthXSmall, WidthSmall, WidthMedium, WidthLarge, HugLong, HeightFill, TabsStill, Interactive, TypePassive, TypeActive, TypeAcknowledge, TypeSteps, AnatomyActive, WidthStrip, ResponsiveWidth, TierActive, TierDanger, TierTypeName, FooterOne, FooterTwo, FooterThree, KeyLongContent, KeyLoading, KeyConfirmInside, StackConfirmOverPanel, StackModalOnModalRefused, MotionOpenClose, MotionReduced
+**Stories:** `design-system/src/patterns/PatternModal/PatternModal.stories.jsx` — Overview, Widths, Heights, Tabs, BodyMinHeight, CustomHeader, Divider, Loading, WidthXSmall, WidthSmall, WidthMedium, WidthLarge, HugLong, HeightFill, TabsStill, Interactive, TypePassive, TypeActive, TypeAcknowledge, TypeSteps, AnatomyActive, WidthStrip, ResponsiveWidth, TierActive, TierDanger, TierTypeName, FooterOne, FooterTwo, FooterThree, FooterTextLeft, FooterDestructive, FooterNarrow, KeyLongContent, KeyLoading, KeyConfirmInside, StackConfirmOverPanel, StackModalOnModalRefused, MotionOpenClose, MotionReduced
 
 **Storybook page:** `design-system/src/patterns/PatternModal/PatternModal.mdx`
 

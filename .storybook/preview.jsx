@@ -253,7 +253,8 @@ const preview = {
                 "Split button",
                 "Filter button",
                 "Button group",
-                "Close button"
+                "Close button",
+                "Footer actions"
               ],
               "Calendar",
               "Checkbox",
