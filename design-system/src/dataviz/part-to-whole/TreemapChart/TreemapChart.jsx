@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
 import chartTheme from '@/dataviz/chartTheme';
-import { CATEGORICAL, HUES, rampStops, sequentialRamp } from '@/dataviz/palette';
+import { tooltipPointFormat } from '@/dataviz/chartFormat';
+import { CATEGORICAL, HUES, mostToLeast, rampStops, sequentialRamp } from '@/dataviz/palette';
 import { resolveColor, useColorModeKey } from '@/dataviz/colorMode';
 
 /**
@@ -19,47 +20,50 @@ const TreemapChart = ({
     data = [],
     height = 400,
     colorByPoint = true,
-    /** The ramp's hue when color encodes the value */
-    hue = 'blue'
+    hue = 'blue',
+    sort = true,
 }) => {
-    useColorModeKey();
-    const options = {
+    const modeKey = useColorModeKey();
+
+    const orderedData = useMemo(
+        () => (sort ? mostToLeast(data, (item) => item.value ?? 0) : data),
+        [data, sort],
+    );
+
+    const options = useMemo(() => ({
         ...chartTheme,
         chart: {
             ...chartTheme.chart,
-            height: height
+            height,
         },
         title: { text: null },
         colorAxis: colorByPoint ? undefined : {
             startOnTick: false,
             endOnTick: false,
-            stops: rampStops(sequentialRamp(hue), resolveColor)
+            stops: rampStops(sequentialRamp(hue), resolveColor),
         },
         series: [{
             type: 'treemap',
             layoutAlgorithm: 'squarified',
-            data: data.map((item, i) => ({
+            data: orderedData.map((item, index) => ({
                 ...item,
                 ...(colorByPoint
-                    ? { color: item.color || CATEGORICAL[i % CATEGORICAL.length] }
-                    : { colorValue: item.value })
+                    ? { color: item.color || CATEGORICAL[index % CATEGORICAL.length] }
+                    : { colorValue: item.value }),
             })),
             dataLabels: {
                 enabled: true,
-                style: {
-                    ...chartTheme.tooltip.style,
-                    textOutline: 'none'
-                }
-            }
+            },
         }],
         tooltip: {
             ...chartTheme.tooltip,
-            pointFormat: '<b>{point.name}</b>: {point.value}'
-        }
-    };
+            headerFormat: '',
+            pointFormat: tooltipPointFormat({ label: '{point.name}', value: '{point.value}' }),
+        },
+    }), [orderedData, height, colorByPoint, hue, modeKey]);
 
     return (
-        <div style={{ width: '100%', height: height }}>
+        <div style={{ width: '100%', height }}>
             <PlusChart options={options} />
         </div>
     );
@@ -70,14 +74,16 @@ TreemapChart.propTypes = {
     data: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string.isRequired,
         value: PropTypes.number.isRequired,
-        color: PropTypes.string
+        color: PropTypes.string,
     })),
     /** Chart height in pixels */
     height: PropTypes.number,
     /** Whether each point has a unique color; otherwise color encodes the value */
     colorByPoint: PropTypes.bool,
     /** The sequential ramp's hue when `colorByPoint` is false */
-    hue: PropTypes.oneOf(HUES)
+    hue: PropTypes.oneOf(HUES),
+    /** Sort tiles from most to least by default; pass false to keep input order. */
+    sort: PropTypes.bool,
 };
 
 export default TreemapChart;

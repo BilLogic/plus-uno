@@ -1,114 +1,82 @@
 import React from 'react';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
 import PieChart from './PieChart';
 
 export default {
     title: 'Data visualizations/Part-to-whole/Pie chart',
     component: PieChart,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## Pie Chart
+    argTypes: {
+        data: { control: 'object', description: 'Array of { name, y, color? }' },
+        height: { control: 'number', description: 'Chart height in pixels' },
+        showLegend: { control: 'boolean', description: 'Show legend' },
+        sort: { control: 'boolean', description: 'Sort slices from most to least by default' },
+    },
+};
 
-A pie chart displays **parts of a whole** as slices of a circle. Best for showing simple proportions.
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
+};
 
-### Overview
-A pie chart displays **parts of a whole** as slices of a circle.
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-md)',
+};
 
----
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
+};
 
-### How to Read
-- **Whole circle** = 100% of total
-- **Each slice** = proportion of total
-- **Slice angle** = percentage (360° = 100%)
-- Compare slice sizes to understand proportions
+const subjectShareData = {
+    data: [
+        { name: 'Reading', y: 28 },
+        { name: 'Math', y: 45 },
+        { name: 'Science', y: 15 },
+        { name: 'Writing', y: 8 },
+        { name: 'Other', y: 4 },
+    ],
+};
 
----
-
-### When to Use
-
-| Use Case | Recommendation |
-|----------|----------------|
-| Simple part-to-whole | ✅ Ideal |
-| 2-5 categories | ✅ Ideal |
-| Showing single dominant share | ✅ Good |
-| Comparing multiple charts | ❌ Use Bar Chart |
-| Many categories (>5) | ❌ Use Treemap |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Subject Distribution** | Time spent per subject |
-| **User Segments** | Student types breakdown |
-| **Content Mix** | Resource types in library |
-| **Engagement Sources** | How users found the platform |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Limit to 5 or fewer slices
-✅ Order slices by size (largest first)
-✅ Sort slices from most to least; the theme colors them in categorical order
-✅ Group past six slices into "Other"
-✅ Label slices with percentages
-
-**Avoid:**
-❌ Comparing multiple pie charts
-❌ 3D effects (distorts perception)
-❌ Many small slices
-                `
-            }
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Sessions by subject</Heading>
+                <p style={captionStyle}>
+                    Slices sort from largest to smallest and label each share with tabular figures.
+                </p>
+                <PieChart {...subjectShareData} />
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelectorAll('.highcharts-container').length).toBe(1);
+        });
+        for (const label of canvasElement.querySelectorAll('.highcharts-data-label text')) {
+            if (!label.textContent?.trim()) continue;
+            const style = getComputedStyle(label);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(style.fontVariantNumeric).toBe('tabular-nums');
         }
     },
-    argTypes: {
-        data: { control: 'object', description: 'Array of { name, y }' },
-        height: { control: 'number', description: 'Chart height in pixels' },
-        showLegend: { control: 'boolean', description: 'Show legend' }
-    }
 };
 
-const marketShareData = {
-    data: [
-        { name: 'Chrome', y: 65 },
-        { name: 'Safari', y: 15 },
-        { name: 'Firefox', y: 10 },
-        { name: 'Edge', y: 7 },
-        { name: 'Other', y: 3 }
-    ]
-};
-
-/**
- * Overview: Displays chart variants
- */
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Browser Market Share</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
-                Classic pie chart showing proportions.
-            </p>
-            <PieChart {...marketShareData} />
-        </section>
-    </div>
-);
-
-/**
- * Interactive: Playground
- */
 export const Interactive = {
     args: {
         height: 400,
         showLegend: true,
+        sort: true,
         data: [
             { name: 'Category A', y: 40 },
             { name: 'Category B', y: 30 },
             { name: 'Category C', y: 20 },
-            { name: 'Category D', y: 10 }
-        ]
-    }
+            { name: 'Category D', y: 10 },
+        ],
+    },
 };

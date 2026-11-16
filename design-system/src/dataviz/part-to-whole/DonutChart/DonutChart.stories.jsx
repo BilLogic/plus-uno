@@ -1,79 +1,38 @@
 import React from 'react';
-import { BRAND, CATEGORICAL, CHROME, mostToLeast } from '@/dataviz/palette';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
+import { BRAND, CATEGORICAL, CHROME } from '@/dataviz/palette';
 import DonutChart from './DonutChart';
 
 export default {
     title: 'Data visualizations/Part-to-whole/Donut chart',
     component: DonutChart,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## Donut Chart
-
-A donut chart shows **part-to-whole relationships** with a center cutout, ideal for displaying completion rates and KPIs.
-
-### Overview
-A donut chart shows **part-to-whole relationships** with a center cutout, ideal for displaying completion rates and KPIs.
-
----
-
-### How to Read
-- Each **segment** = a proportion of the whole
-- **Segment size** = percentage of total
-- **Center value** = key metric or total
-- All segments should sum to 100%
-
----
-
-### When to Use
-
-| Use Case | Recommendation |
-|----------|----------------|
-| Progress indicators | ✅ Ideal |
-| KPI displays | ✅ Ideal |
-| 2-5 category proportions | ✅ Good |
-| Comparing multiple items | ❌ Use Bar Chart |
-| Precise comparisons | ❌ Use Bar Chart |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Course Completion** | % of modules completed |
-| **Goal Progress** | Sessions done vs target |
-| **Skill Mastery** | Skills mastered vs total |
-| **Engagement Rate** | Active vs inactive students |
-| **Time Allocation** | Time spent per subject |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Limit to 5 or fewer segments
-✅ Use center for key values
-✅ Ensure segments sum to 100%
-✅ Sort segments from most to least, each a categorical color in order
-✅ For progress, fill with \`chartPalette.BRAND\` on a \`chartPalette.CHROME.track\` remainder
-
-**Avoid:**
-❌ Comparing multiple donuts
-❌ Many small segments
-❌ Precise value comparisons
-                `
-            }
-        }
-    },
     argTypes: {
         size: { control: { type: 'number', min: 100, max: 500, step: 10 }, description: 'Diameter in pixels' },
         value: { control: 'text', description: 'Center value text' },
         label: { control: 'text', description: 'Center label below value' },
-        centerTextSize: { control: { type: 'select', options: ['h1', 'h2', 'h3', 'h4', 'h5'] } },
-        segments: { control: 'object', description: 'Array of { value, color, label }' }
-    }
+        centerTextSize: { control: { type: 'select', options: ['lg', 'md', 'sm'] }, description: 'Metric scale step for the center figure' },
+        sort: { control: 'boolean', description: 'Sort categorical segments from most to least by default' },
+        segments: { control: 'object', description: 'Array of { value, color, label }' },
+    },
+};
+
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
+};
+
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-md)',
+};
+
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
 };
 
 const completionData = {
@@ -81,80 +40,86 @@ const completionData = {
     label: 'Completed',
     segments: [
         { value: 75, color: BRAND, label: 'Done' },
-        { value: 25, color: CHROME.track, label: 'Remaining' }
-    ]
+        { value: 25, color: CHROME.track, label: 'Remaining' },
+    ],
 };
 
 const distributionData = {
-    value: 'Total',
-    label: 'Distribution',
-    centerTextSize: 'h2',
+    value: '100',
+    label: 'Sessions by subject',
+    centerTextSize: 'md',
     segments: [
-        // Most to least, then each type a categorical series in order.
-        ...mostToLeast([
-            { value: 30, label: 'Type A' },
-            { value: 20, label: 'Type B' },
-            { value: 10, label: 'Type C' },
-            { value: 40, label: 'Type D' }
-        ], (s) => s.value).map((s, i) => ({ ...s, color: CATEGORICAL[i] }))
-    ]
+        { value: 30, label: 'Reading' },
+        { value: 20, label: 'Science' },
+        { value: 10, label: 'Writing' },
+        { value: 40, label: 'Math' },
+    ],
 };
 
 const smallData = {
     size: 150,
     value: '1/4',
     label: 'Step',
-    centerTextSize: 'h3',
+    centerTextSize: 'sm',
     segments: [
         { value: 25, color: BRAND, label: 'Current' },
-        { value: 75, color: CHROME.track, label: 'Future' }
-    ]
+        { value: 75, color: CHROME.track, label: 'Remaining' },
+    ],
 };
 
-/**
- * Overview: Displays all chart variants and examples
- */
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Completion Progress</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
-                Simple two-segment donut showing progress.
-            </p>
-            <DonutChart {...completionData} />
-        </section>
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Completion progress</Heading>
+                <p style={captionStyle}>
+                    Two-segment ring filling a single measure against the neutral track.
+                </p>
+                <DonutChart {...completionData} />
+            </section>
 
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Multi-Segment Distribution</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
-                Shows distribution across multiple categories.
-            </p>
-            <DonutChart {...distributionData} />
-        </section>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Multi-segment distribution</Heading>
+                <p style={captionStyle}>
+                    Categorical segments sort from most to least and take the categorical palette in order.
+                </p>
+                <DonutChart {...distributionData} />
+            </section>
 
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Small Size</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
-                Compact variant for dashboards or cards.
-            </p>
-            <DonutChart {...smallData} />
-        </section>
-    </div>
-);
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Compact size</Heading>
+                <p style={captionStyle}>
+                    Smaller diameter paired with the small Metric step for dense cards.
+                </p>
+                <DonutChart {...smallData} />
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelectorAll('.highcharts-container').length).toBe(3);
+        });
+        const metrics = canvasElement.querySelectorAll('.metric-lg, .metric-md, .metric-sm');
+        expect(metrics.length).toBe(3);
+        for (const metric of metrics) {
+            const style = getComputedStyle(metric);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(style.fontVariantNumeric).toBe('tabular-nums');
+        }
+    },
+};
 
-/**
- * Interactive: Playground with property controls
- */
 export const Interactive = {
     args: {
         size: 250,
         value: '50%',
         label: 'Label',
-        centerTextSize: 'h2',
+        centerTextSize: 'lg',
+        sort: true,
         segments: [
             { value: 50, color: CATEGORICAL[0], label: 'Segment A' },
             { value: 30, color: CATEGORICAL[1], label: 'Segment B' },
-            { value: 20, color: CATEGORICAL[2], label: 'Segment C' }
-        ]
-    }
+            { value: 20, color: CATEGORICAL[2], label: 'Segment C' },
+        ],
+    },
 };

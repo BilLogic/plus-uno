@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
 import chartTheme from '@/dataviz/chartTheme';
+import { dataLabelFormat, tooltipPointFormat } from '@/dataviz/chartFormat';
+import { CATEGORICAL, mostToLeast } from '@/dataviz/palette';
 
 /**
  * PieChart Component
@@ -10,60 +12,69 @@ import chartTheme from '@/dataviz/chartTheme';
 const PieChart = ({
     data = [],
     height = 400,
-    showLegend = true
+    showLegend = true,
+    sort = true,
 }) => {
-    const options = {
+    const orderedData = useMemo(
+        () => (sort ? mostToLeast(data, (item) => item.y) : data),
+        [data, sort],
+    );
+
+    const options = useMemo(() => ({
         ...chartTheme,
         chart: {
             ...chartTheme.chart,
             type: 'pie',
-            height: height
+            height,
         },
         title: { text: null },
         tooltip: {
             ...chartTheme.tooltip,
-            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            pointFormat: tooltipPointFormat({ value: '{point.percentage:.1f}%' }),
         },
         plotOptions: {
+            ...chartTheme.plotOptions,
             pie: {
                 allowPointSelect: true,
                 cursor: 'pointer',
+                borderRadius: 0,
                 dataLabels: {
                     enabled: true,
-                    format: '<b>{point.name}</b>: {point.percentage:.1f}%',
-                    style: chartTheme.tooltip.style
+                    format: dataLabelFormat('{point.percentage:.1f}%', '{point.name}'),
                 },
-                showInLegend: showLegend
-            }
+                showInLegend: showLegend,
+            },
         },
         series: [{
             name: 'Share',
             colorByPoint: true,
-            data: data.map((item, i) => ({
+            data: orderedData.map((item, index) => ({
                 ...item,
-                color: item.color || chartTheme.colors[i % chartTheme.colors.length]
-            }))
-        }]
-    };
+                color: item.color || CATEGORICAL[index % CATEGORICAL.length],
+            })),
+        }],
+    }), [orderedData, height, showLegend]);
 
     return (
-        <div style={{ width: '100%', height: height }}>
+        <div style={{ width: '100%', height }}>
             <PlusChart options={options} />
         </div>
     );
 };
 
 PieChart.propTypes = {
-    /** Array of { name, y } objects */
+    /** Array of { name, y, color? } objects */
     data: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string.isRequired,
         y: PropTypes.number.isRequired,
-        color: PropTypes.string
+        color: PropTypes.string,
     })),
     /** Chart height */
     height: PropTypes.number,
     /** Show legend */
-    showLegend: PropTypes.bool
+    showLegend: PropTypes.bool,
+    /** Sort slices from most to least by default; pass false to keep input order. */
+    sort: PropTypes.bool,
 };
 
 export default PieChart;

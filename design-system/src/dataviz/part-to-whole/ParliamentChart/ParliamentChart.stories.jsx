@@ -1,98 +1,80 @@
 import React from 'react';
-import { CATEGORICAL, mostToLeast } from '@/dataviz/palette';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
+import { CATEGORICAL } from '@/dataviz/palette';
 import ParliamentChart from './ParliamentChart';
 
 export default {
     title: 'Data visualizations/Part-to-whole/Parliament chart',
     component: ParliamentChart,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## Parliament Chart (Item Chart)
+    argTypes: {
+        data: { control: 'object', description: 'Array of { name, value, color }' },
+        height: { control: 'number', description: 'Chart height in pixels' },
+        sort: { control: 'boolean', description: 'Sort groups from most to least (keeps input seat order by default)' },
+    },
+};
 
-Shows **proportions using distinct markers** (dots) in a semi-circle.
-Commonly used for parliament seat distributions but useful for any grouped count.
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
+};
 
-### Overview
-Shows **proportions using distinct markers** (dots) in a semi-circle.
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-md)',
+};
 
----
-
-### How to Read
-- **Each dot** = one unit (e.g., one seat, one person)
-- **Color** = group/party
-- **Arrangement** = semi-circle layout
-
----
-
-### When to Use
-
-| Use Case | Recommendation |
-|----------|----------------|
-| Seat allocations | ✅ Ideal |
-| Voting results | ✅ Ideal |
-| Grouped unit counts | ✅ Good |
-| Exact value comparison | ❌ Use Bar Chart |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Class Composition** | Students by major |
-| **Survey Respondents** | Users by type |
-| **Resource Allocation** | Licenses by department |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Align the parliament chart setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
-
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
-                `
-            }
-        }
-    }
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
 };
 
 const parliamentData = {
-    // Most to least, then each group a categorical series in order.
-    data: mostToLeast([
-        { name: 'Liberals', value: 24 },
-        { name: 'Conservatives', value: 35 },
-        { name: 'Socialists', value: 18 },
-        { name: 'Greens', value: 12 },
-        { name: 'Independents', value: 6 }
-    ], (g) => g.value).map((g, i) => ({ ...g, color: CATEGORICAL[i] }))
+    data: [
+        { name: 'Grade 6', value: 18 },
+        { name: 'Grade 7', value: 24 },
+        { name: 'Grade 8', value: 35 },
+        { name: 'Grade 9', value: 12 },
+        { name: 'Grade 10', value: 6 },
+    ],
 };
 
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Student Council Seats</h3>
-            <ParliamentChart {...parliamentData} />
-        </section>
-    </div>
-);
-
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Cohort seats by grade</Heading>
+                <p style={captionStyle}>
+                    Each dot represents one student seat, grouped by grade in input order.
+                </p>
+                <ParliamentChart {...parliamentData} />
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelectorAll('.highcharts-container').length).toBe(1);
+        });
+        for (const label of canvasElement.querySelectorAll('.highcharts-legend-item text')) {
+            if (!label.textContent?.trim()) continue;
+            const style = getComputedStyle(label);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(style.fontVariantNumeric).toBe('tabular-nums');
+        }
+    },
+};
 
 export const Interactive = {
     args: {
+        sort: false,
         data: [
             { name: 'Group B', value: 15, color: CATEGORICAL[0] },
             { name: 'Group A', value: 10, color: CATEGORICAL[1] },
-            { name: 'Group C', value: 5, color: CATEGORICAL[2] }
+            { name: 'Group C', value: 5, color: CATEGORICAL[2] },
         ],
-        height: 400
-    }
+        height: 400,
+    },
 };

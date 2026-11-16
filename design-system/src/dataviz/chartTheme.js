@@ -81,6 +81,8 @@ const barRadius = { borderRadius: { radius: CHART_BAR_RADIUS_NUMBER, where: 'end
 /** A node or card-like mark that isn't a bar (e.g. a Treegraph box): the radius primitive at the same step as a 40px control, the closest existing match. */
 export const CHART_NODE_RADIUS = tokenNumber('--radius-control-lg', 10);
 
+/** A gauge or progress track's small rounded ends: `--radius-md` (4px), the Small details step Radius.mdx gives to a Table loading bar. */
+export const CHART_TRACK_RADIUS = tokenNumber('--radius-md', 4);
 /** A point marker's radius (3px, 6px diameter): a quarter of `--size-075` (12px), the smallest `--size-*` step on the scale. */
 export const CHART_MARKER_RADIUS = tokenNumber('--size-075', 12) / 4;
 
