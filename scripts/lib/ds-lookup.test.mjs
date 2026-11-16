@@ -390,3 +390,79 @@ test('situation patterns lead their components and templates have their own resu
 test('a clean check names the template and pattern fit limit', () => {
   assert.match(lookup.check({ code: 'export const value = 1;', path: 'prototypes/a.js' }).next, /[Tt]emplate.*pattern fit is not checked/);
 });
+
+test('a cold lookup reads only ds-index.json for find, get, tokens and guide', () => {
+  const read = new Set();
+  const realRead = fs.readFileSync;
+  fs.readFileSync = (file, ...rest) => {
+    if (typeof file === 'string' && path.isAbsolute(file) && file.startsWith(REPO_ROOT)) {
+      read.add(path.relative(REPO_ROOT, file).split(path.sep).join('/'));
+    }
+    return realRead(file, ...rest);
+  };
+  try {
+    const cold = createLookup(REPO_ROOT, { readPaths: false });
+    cold.find('confirm before deleting');
+    cold.get(['Button', 'PatternCard', 'Button.appearance', '--ds-text']);
+    cold.tokens('stack');
+    cold.guide('filtering');
+    cold.guide('ds/no-raw-literal');
+  } finally {
+    fs.readFileSync = realRead;
+  }
+  assert.deepEqual([...read], ['design-system/agent-views/ds-index.json']);
+});
+
+test('editing a docs page or component without regenerating makes check:ds-index fail and name the regenerate command', async () => {
+  const { run: checkDsIndex } = await import('../generate-ds-index.mjs');
+  for (const rel of [
+    'design-system/src/components/forms-and-inputs/Button/Button.mdx',
+    'design-system/src/components/forms-and-inputs/Button/Button.jsx',
+  ]) {
+    const tmp = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'ds-index-drift-'));
+    try {
+      for (const e of fs.readdirSync(REPO_ROOT)) {
+        if (e !== 'design-system') fs.symlinkSync(path.join(REPO_ROOT, e), path.join(tmp, e));
+      }
+      fs.mkdirSync(path.join(tmp, 'design-system/src/components/forms-and-inputs/Button'), { recursive: true });
+      for (const e of fs.readdirSync(path.join(REPO_ROOT, 'design-system'))) {
+        if (e !== 'src') fs.symlinkSync(path.join(REPO_ROOT, 'design-system', e), path.join(tmp, 'design-system', e));
+      }
+      for (const e of fs.readdirSync(path.join(REPO_ROOT, 'design-system/src'))) {
+        if (e !== 'components') fs.symlinkSync(path.join(REPO_ROOT, 'design-system/src', e), path.join(tmp, 'design-system/src', e));
+      }
+      for (const e of fs.readdirSync(path.join(REPO_ROOT, 'design-system/src/components'))) {
+        if (e !== 'forms-and-inputs') {
+          fs.symlinkSync(path.join(REPO_ROOT, 'design-system/src/components', e), path.join(tmp, 'design-system/src/components', e));
+        }
+      }
+      for (const e of fs.readdirSync(path.join(REPO_ROOT, 'design-system/src/components/forms-and-inputs'))) {
+        if (e !== 'Button') {
+          fs.symlinkSync(
+            path.join(REPO_ROOT, 'design-system/src/components/forms-and-inputs', e),
+            path.join(tmp, 'design-system/src/components/forms-and-inputs', e),
+          );
+        }
+      }
+      for (const e of fs.readdirSync(path.join(REPO_ROOT, 'design-system/src/components/forms-and-inputs/Button'))) {
+        const src = path.join(REPO_ROOT, 'design-system/src/components/forms-and-inputs/Button', e);
+        const dst = path.join(tmp, 'design-system/src/components/forms-and-inputs/Button', e);
+        if (`design-system/src/components/forms-and-inputs/Button/${e}` === rel) {
+          const text = fs.readFileSync(src, 'utf8');
+          const edited = e.endsWith('.mdx')
+            ? `${text}\n\nUnregenerated docs edit for drift test.\n`
+            : text.replace('Button: triggers an action.', 'Button: triggers an unregenerated action.');
+          fs.writeFileSync(dst, edited, 'utf8');
+        } else {
+          fs.symlinkSync(src, dst);
+        }
+      }
+      const findings = checkDsIndex({ repoRoot: tmp });
+      assert.equal(findings.length, 1, `expected drift finding for ${rel}`);
+      assert.equal(findings[0].file, 'design-system/agent-views/ds-index.json');
+      assert.match(findings[0].message, /generate-ds-index\.mjs|npm run regenerate/);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  }
+});

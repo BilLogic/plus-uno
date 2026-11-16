@@ -131,6 +131,11 @@ test('the repo root `ds` script is unchanged and still answers', () => {
   assert.match(sh('node', ['scripts/ds.mjs', 'find', 'Button'], REPO_ROOT), /Button/);
 });
 
+test('the CLI package ships the generated lookup index', async () => {
+  const { bakedFiles } = await import('./build-cli-package.mjs');
+  assert.ok(bakedFiles(REPO_ROOT).includes('design-system/agent-views/ds-index.json'));
+});
+
 test('the registry builds into dist/registry: foundation and component items, stamped, no alias left in a copied file', { timeout: 120_000 }, () => {
   sh('node', ['scripts/generate-registry.mjs'], REPO_ROOT);
   const dir = path.join(REPO_ROOT, 'dist/registry');
