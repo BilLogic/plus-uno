@@ -50,6 +50,7 @@ Documented exceptions:
 - `color/chart/*` maps to `--chart-*` (for example `--chart-brand`) and `Skeleton/*` / `color/skeleton/*` family rows map to `--skeleton-*` (for example `--skeleton-height` and `--skeleton-subtle`) with no `--ds-` prefix; the global fill `color/skeleton/default` stays `--ds-skeleton`.
 - A motion spring's three Figma rows (`damping`, `mass`, `stiffness`) map to the one `--ds-motion-*` spring token code defines (for example `spatial/fast/damping`, `spatial/fast/mass` and `spatial/fast/stiffness` map to `--ds-motion-spatial-fast`); raw `Spring/*` primitives in the same collection map to `--motion-spring-*` (for example `--motion-spring-880`).
 - Elevation shadow layer and geometry parts compose `--ds-shadow-*` (for example `--ds-shadow-raised`).
+- `Tooltip/radius` maps to the shared `--radius-control-sm`: Tooltip takes the small control radius, not a radius of its own.
 
 Collections prefixed `archived / ` and rows prefixed `Deprecated/` are legacy and excluded from the check.
 

@@ -32,7 +32,7 @@ export const SNAPSHOT_PATH = 'scripts/figma-variables-snapshot.json';
  * While `false`, kind 3 reports warnings so CI stays green and prints the backlog;
  * when `true`, kind 3 becomes blocking (`severity: 'error'`).
  */
-export const BLOCK_ON_NAMING_MISMATCH = false;
+export const BLOCK_ON_NAMING_MISMATCH = true;
 
 const DEPRECATED_ROW = /^Deprecated\//;
 const ELEVATION_SHADOW_PART = /^elevation\/shadow\/([^/]+)\/layer-\d+(?:\/(?:offsetX|offsetY|radius|spread))?$/;
@@ -146,6 +146,11 @@ export function expectedToken(collection, variable) {
       return applyPrefix('motion', slugifyPath(stem));
     }
     return applyPrefix('ds-motion', slugifyPath(stem));
+  }
+
+  // Tooltip shares the small control radius rather than a radius of its own (Bill, 2026-11-16).
+  if (collection === 'spacing / components' && variable === 'Tooltip/radius') {
+    return '--radius-control-sm';
   }
 
   return `--${slugifyPath(dropRedundantFolder(variable))}`;
