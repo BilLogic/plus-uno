@@ -71,7 +71,7 @@ const RecordLayer = ({ crumbs }) => (
  * subject: the pressed row and the container it grows into carry the accent. `cut` replaces the
  * grow with a jump; `slide` brings the record in from the right edge instead.
  */
-const drill = ({ id, title, caption, crumbs = 0, mode = 'grow' }) => ({
+const drill = ({ id, title, caption, crumbs = 0, mode = 'grow', spatial = 'spatial.default', appearance = 'appearance.default' }) => ({
   id,
   title,
   caption,
@@ -116,19 +116,20 @@ const drill = ({ id, title, caption, crumbs = 0, mode = 'grow' }) => ({
     await ctx.hold(1);
     await ctx.tap(101, 69);
     if (mode === 'slide') {
-      await ctx.spring('x', 0, 'spatial.default');
+      await ctx.spring('x', 0, spatial);
       return;
     }
     if (mode === 'cut') {
       ctx.set({ g: 1, l: 0, c: 1 });
       return;
     }
+    const listOut = appearance === 'appearance.default' ? 'appearance.fast' : appearance;
     // The grow, the list fading out in place, and the record's content once the container is well on its way.
     await Promise.all([
-      ctx.spring('g', 1, 'spatial.default'),
+      ctx.spring('g', 1, spatial),
       (async () => {
-        await ctx.spring('l', 0, 'appearance.fast');
-        await ctx.spring('c', 1, 'appearance.default');
+        await ctx.spring('l', 0, listOut);
+        await ctx.spring('c', 1, appearance);
       })(),
     ]);
   },
@@ -139,10 +140,16 @@ const PAGE_EDGE = PAINT.pageEdge;
 export const drillScene = drill;
 
 /** Back one level shrinks the page into its row; back two fades, because the row is not on screen. */
-const climbOne = {
-  id: 'climb-one',
-  title: 'Back one level: the page shrinks into its row',
-  caption: 'The Breadcrumb or browser back reverses the grow one speed faster. The row is on screen, so it is where the page lands.',
+export const climbOneScene = ({
+  id = 'climb-one',
+  title = 'Back one level: the page shrinks into its row',
+  caption = 'The Breadcrumb or browser back reverses the grow one speed faster. The row is on screen, so it is where the page lands.',
+  spatial = 'spatial.fast',
+  appearance = 'appearance.fast',
+} = {}) => ({
+  id,
+  title,
+  caption,
   viewBox: VIEW,
   initial: { g: 1, l: 0, c: 1 },
   landing: { g: 0, l: 1, c: 0 },
@@ -152,12 +159,14 @@ const climbOne = {
     await ctx.hold(1);
     await ctx.tap(74, 26);
     await Promise.all([
-      ctx.spring('c', 0, 'appearance.fast'),
-      ctx.spring('g', 0, 'spatial.fast'),
-      ctx.spring('l', 1, 'appearance.fast'),
+      ctx.spring('c', 0, appearance),
+      ctx.spring('g', 0, spatial),
+      ctx.spring('l', 1, appearance),
     ]);
   },
-};
+});
+
+const climbOne = climbOneScene();
 
 const climbTwo = {
   id: 'climb-two',
@@ -206,7 +215,7 @@ const TaskLayer = () => (
   </>
 );
 
-const focused = ({ id, title, caption, slide }) => ({
+const focused = ({ id, title, caption, slide, spatial = 'spatial.default', appearance = 'appearance.default' }) => ({
   id,
   title,
   caption,
@@ -240,20 +249,23 @@ const focused = ({ id, title, caption, slide }) => ({
   play: async (ctx) => {
     await ctx.hold(1);
     await ctx.tap(...HEADER_BUTTON);
+    const frameOut = appearance === 'appearance.default' ? 'appearance.fast' : appearance;
     if (slide) {
-      await Promise.all([ctx.spring('fr', 0, 'appearance.fast'), ctx.spring('x', 0, 'spatial.default')]);
+      await Promise.all([ctx.spring('fr', 0, frameOut), ctx.spring('x', 0, spatial)]);
       return;
     }
-    await ctx.spring('fr', 0, 'appearance.fast');
-    await ctx.spring('f', 1, 'appearance.default');
+    await ctx.spring('fr', 0, frameOut);
+    await ctx.spring('f', 1, appearance);
   },
 });
+
+export const focusedScene = focused;
 
 // ---------- Go to another area ----------
 
 const SIDEBAR_ROWS = [42, 59];
 
-const goTo = ({ id, title, caption, slide }) => ({
+const goTo = ({ id, title, caption, slide, spatial = 'spatial.fast', appearance = 'appearance.default' }) => ({
   id,
   title,
   caption,
@@ -288,24 +300,27 @@ const goTo = ({ id, title, caption, slide }) => ({
     await ctx.hold(1);
     await ctx.tap(30, 67);
     if (slide) {
-      await Promise.all([ctx.spring('hl', 1, 'spatial.fast'), ctx.spring('p', 1, 'spatial.slow')]);
+      await Promise.all([ctx.spring('hl', 1, spatial), ctx.spring('p', 1, 'spatial.slow')]);
       return;
     }
+    const oldOut = appearance === 'appearance.default' ? 'appearance.fast' : appearance;
     // The highlight moves while the old page fades out; the new page waits out the clean-fade gap.
     await Promise.all([
-      ctx.spring('hl', 1, 'spatial.fast'),
+      ctx.spring('hl', 1, spatial),
       (async () => {
-        await ctx.spring('o', 0, 'appearance.fast');
-        await ctx.spring('n', 1, 'appearance.default');
+        await ctx.spring('o', 0, oldOut);
+        await ctx.spring('n', 1, appearance);
       })(),
     ]);
   },
 });
 
+export const goToScene = goTo;
+
 // ---------- Switch views ----------
 
 const TAB_W = 83 / 3;
-const switchViews = ({ id, title, caption, fade }) => ({
+const switchViews = ({ id, title, caption, fade, spatial, appearance = 'appearance.default' }) => ({
   id,
   title,
   caption,
@@ -342,12 +357,14 @@ const switchViews = ({ id, title, caption, fade }) => ({
     await ctx.hold(1);
     await ctx.tap(60 + TAB_W * 1.5, 40);
     await Promise.all([
-      ctx.spring('i', 1, 'spatial.fast'),
-      ctx.spring('p', 1, 'spatial.slow'),
-      ...(fade ? [ctx.spring('o', 1, 'appearance.default')] : []),
+      ctx.spring('i', 1, spatial ?? 'spatial.fast'),
+      ctx.spring('p', 1, spatial ?? 'spatial.slow'),
+      ...(fade ? [ctx.spring('o', 1, appearance)] : []),
     ]);
   },
 });
+
+export const switchViewsScene = switchViews;
 
 // ---------- Step ----------
 
@@ -392,7 +409,7 @@ const StepBody = ({ x, y, w, h }) => (
   </>
 );
 
-const step = ({ id, title, caption, side, axis }) => {
+const step = ({ id, title, caption, side, axis = 'x', spatial = 'spatial.default', appearance = 'appearance.fast' }) => {
   // Across the top the body is 128 × 36 under the tracker; down a side it is 80 wide beside the list.
   const box = side ? { x: 60, y: 22, w: 84, h: 52 } : { x: 16, y: 46, w: 128, h: 30 };
   const along = axis === 'x' ? box.w + 12 : box.h + 12;
@@ -449,10 +466,12 @@ const step = ({ id, title, caption, side, axis }) => {
       await ctx.hold(1);
       await ctx.tap(134, 90);
       // Step states change in place at the moment the body starts; nothing travels along the tracker.
-      await Promise.all([ctx.spring('cur', 1, 'appearance.fast'), ctx.spring('p', 1, 'spatial.default')]);
+      await Promise.all([ctx.spring('cur', 1, appearance), ctx.spring('p', 1, spatial)]);
     },
   };
 };
+
+export const stepScene = step;
 
 // ---------- Trees ----------
 

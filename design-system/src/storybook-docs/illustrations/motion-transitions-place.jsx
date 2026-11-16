@@ -4,7 +4,7 @@ import { planLoadReveal } from '@/lib/loadRevealMotion';
 import { planSwapInPlace } from '@/lib/swapMotion';
 import { HAIRLINE, PAINT } from './paint.js';
 import {
-  Blanket, ButtonShape, CardBox, Field, Flag, Modal, Panel, PageHeader, Rect, Rule, Row, Screen, SkeletonBar,
+  Blanket, ButtonShape, CardBox, Field, Flag, Modal, Panel, PageHeader, Popup, Rect, Rule, Row, Screen, SkeletonBar,
 } from './primitives.jsx';
 import { BEAT, pair } from './motion.jsx';
 import { Clip, Moved, VIEW, mix } from './motion-parts.jsx';
@@ -53,46 +53,55 @@ const rowsBelow = (rows, shift) => {
 // ---------- Scroll to a spot on the page ----------
 
 const SCROLL = 44;
-const scrollTo = scene({
-  id: 'scroll-spot',
-  title: 'The page scrolls to the spot, then marks it',
-  caption: 'The body travels on spatial.slow while the header stays put. On arrival the heading takes one highlight, in and out.',
-  initial: { s: 0, h: 0, seen: 0 },
-  landing: { s: 1, h: 0, seen: 1 },
-  arrows: [[[110, 86], [110, 50]]],
-  draw: ({ s, h }) => (
-    <>
-      <Base />
-      <Clip x={60} y={46} w={72} h={46}>
-        <Moved y={-s * SCROLL}>
-          <Row x={60} y={48} w={72} />
-          <Row x={60} y={62} w={72} />
-          <Row x={60} y={76} w={72} />
-          <SkeletonBar x={60} y={94} w={30} h={5} heading />
-          <CardBox x={60} y={104} w={72} h={26} />
-        </Moved>
-      </Clip>
-      <Rect x={58} y={48} w={74} h={9} stroke={PAINT.accent} corner="shape" opacity={h} />
-      {[48, 56, 64].map((y, i) => (
-        <SkeletonBar key={y} x={137} y={y} w={9} accent={i === 2} />
-      ))}
-    </>
-  ),
-  play: async (ctx) => {
-    await ctx.hold(1);
-    await ctx.tap(141, 66);
-    await ctx.spring('s', 1, 'spatial.slow');
-    await ctx.spring('h', 1, 'appearance.fast');
-    await ctx.hold(ms(500));
-    await ctx.spring('h', 0, 'appearance.slow');
-    ctx.set({ seen: 1 });
-  },
-});
+export const scrollToScene = ({
+  id = 'scroll-spot',
+  title = 'The page scrolls to the spot, then marks it',
+  caption = 'The body travels on spatial.slow while the header stays put. On arrival the heading takes one highlight, in and out.',
+  spatial = 'spatial.slow',
+  appearance = 'appearance.fast',
+} = {}) =>
+  scene({
+    id,
+    title,
+    caption,
+    initial: { s: 0, h: 0, seen: 0 },
+    landing: { s: 1, h: 0, seen: 1 },
+    arrows: [[[110, 86], [110, 50]]],
+    draw: ({ s, h }) => (
+      <>
+        <Base />
+        <Clip x={60} y={46} w={72} h={46}>
+          <Moved y={-s * SCROLL}>
+            <Row x={60} y={48} w={72} />
+            <Row x={60} y={62} w={72} />
+            <Row x={60} y={76} w={72} />
+            <SkeletonBar x={60} y={94} w={30} h={5} heading />
+            <CardBox x={60} y={104} w={72} h={26} />
+          </Moved>
+        </Clip>
+        <Rect x={58} y={48} w={74} h={9} stroke={PAINT.accent} corner="shape" opacity={h} />
+        {[48, 56, 64].map((y, i) => (
+          <SkeletonBar key={y} x={137} y={y} w={9} accent={i === 2} />
+        ))}
+      </>
+    ),
+    play: async (ctx) => {
+      const outAppearance = appearance === 'appearance.fast' ? 'appearance.slow' : appearance;
+      await ctx.hold(1);
+      await ctx.tap(141, 66);
+      await ctx.spring('s', 1, spatial);
+      await ctx.spring('h', 1, appearance);
+      await ctx.hold(ms(500));
+      await ctx.spring('h', 0, outAppearance);
+      ctx.set({ seen: 1 });
+    },
+  });
+const scrollTo = scrollToScene();
 
 // ---------- Swap content in place ----------
 
 const PILLS = [60, 88, 116];
-const swap = ({ id, title, caption, crossfade }) =>
+const swap = ({ id, title, caption, crossfade, spatial = 'spatial.fast', appearance }) =>
   scene({
     id,
     title,
@@ -121,21 +130,24 @@ const swap = ({ id, title, caption, crossfade }) =>
       await ctx.hold(1);
       await ctx.tap(PILLS[1] + 12, 50);
       const swapPlan = planSwapInPlace();
+      const outToken = appearance ?? swapPlan.outToken;
+      const inToken = appearance ?? swapPlan.inToken;
       const content = crossfade
         ? Promise.all([ctx.spring('o', 0, 'appearance.slow'), ctx.spring('n', 1, 'appearance.slow')])
         : (async () => {
-            const out = ctx.spring('o', 0, swapPlan.outToken);
+            const out = ctx.spring('o', 0, outToken);
             await ctx.hold(ms(swapPlan.inStartsAtMs));
-            await Promise.all([out, ctx.spring('n', 1, swapPlan.inToken)]);
+            await Promise.all([out, ctx.spring('n', 1, inToken)]);
           })();
-      await Promise.all([ctx.spring('f', 1, 'spatial.fast'), content]);
+      await Promise.all([ctx.spring('f', 1, spatial), content]);
     },
   });
+export const swapScene = swap;
 
 // ---------- Add or remove an item ----------
 
 const ROW_H = 14;
-const addRemove = ({ id, title, caption, removing }) =>
+const addRemove = ({ id, title, caption, removing, spatial, appearance }) =>
   scene({
     id,
     title,
@@ -165,17 +177,18 @@ const addRemove = ({ id, title, caption, removing }) =>
         const exitPlan = planExitBeforeReflow();
         await ctx.tap(138, 69);
         // Exit before reflow: the leaving row fades out first, then the rows below close up.
-        await ctx.spring('c', 0, exitPlan.fadeToken);
-        await ctx.spring('h', 0, exitPlan.collapseToken);
+        await ctx.spring('c', 0, appearance ?? exitPlan.fadeToken);
+        await ctx.spring('h', 0, spatial ?? exitPlan.collapseToken);
         return;
       }
       const enterPlan = planEnterWithRoom();
       await ctx.tap(130, 34);
       // The rows below make room as the new row opens; its content waits for the room.
-      await ctx.spring('h', 1, enterPlan.spatialToken);
-      await ctx.spring('c', 1, enterPlan.appearanceToken);
+      await ctx.spring('h', 1, spatial ?? enterPlan.spatialToken);
+      await ctx.spring('c', 1, appearance ?? enterPlan.appearanceToken);
     },
   });
+export const addRemoveScene = addRemove;
 
 // ---------- Reorder items ----------
 
@@ -189,40 +202,47 @@ const SortRow = ({ x, y, w, i }) => (
     <SkeletonBar x={x + w * 0.8} y={y + 5} w={w * 0.12} />
   </g>
 );
-const reorder = scene({
-  id: 'reorder-sort',
-  title: 'The same rows, a new order',
-  caption: 'Each row moves straight to its new place on spatial.default, 20 ms apart. In a grid it moves x then y.',
-  initial: { r0: 0, r1: 0, r2: 0 },
-  landing: { r0: 1, r1: 1, r2: 1 },
-  // Each row moves straight to its new place, in its own lane. Rows trade places, so the one that
-  // goes to the top travels against the other two; the lanes keep their paths from crossing.
-  arrows: PERM.map((slot, i) =>
-    travel({ x: 60, y: 48 + slot * ROW_H, w: 83, h: ROW_H }, 0, (i - slot) * ROW_H, { lane: { x: 80 + i * 20 } }),
-  ),
-  draw: ({ r0, r1, r2 }) => (
-    <>
-      <Base />
-      <Clip {...BODY}>
-        {[r0, r1, r2].map((r, i) => (
-          <Moved key={i} y={(PERM[i] - i) * ROW_H * r}>
-            <SortRow x={60} y={48 + i * ROW_H} w={83} i={i} />
-          </Moved>
-        ))}
-      </Clip>
-    </>
-  ),
-  play: async (ctx) => {
-    await ctx.hold(1);
-    await ctx.tap(130, 34);
-    await Promise.all(
-      [0, 1, 2].map(async (i) => {
-        await ctx.hold(i * stagger(3));
-        await ctx.spring(`r${i}`, 1, 'spatial.default');
-      }),
-    );
-  },
-});
+export const reorderScene = ({
+  id = 'reorder-sort',
+  title = 'The same rows, a new order',
+  caption = 'Each row moves straight to its new place on spatial.default, 20 ms apart. In a grid it moves x then y.',
+  spatial = 'spatial.default',
+} = {}) =>
+  scene({
+    id,
+    title,
+    caption,
+    initial: { r0: 0, r1: 0, r2: 0 },
+    landing: { r0: 1, r1: 1, r2: 1 },
+    // Each row moves straight to its new place, in its own lane. Rows trade places, so the one that
+    // goes to the top travels against the other two; the lanes keep their paths from crossing.
+    arrows: PERM.map((slot, i) =>
+      travel({ x: 60, y: 48 + slot * ROW_H, w: 83, h: ROW_H }, 0, (i - slot) * ROW_H, { lane: { x: 80 + i * 20 } }),
+    ),
+    draw: ({ r0, r1, r2 }) => (
+      <>
+        <Base />
+        <Clip {...BODY}>
+          {[r0, r1, r2].map((r, i) => (
+            <Moved key={i} y={(PERM[i] - i) * ROW_H * r}>
+              <SortRow x={60} y={48 + i * ROW_H} w={83} i={i} />
+            </Moved>
+          ))}
+        </Clip>
+      </>
+    ),
+    play: async (ctx) => {
+      await ctx.hold(1);
+      await ctx.tap(130, 34);
+      await Promise.all(
+        [0, 1, 2].map(async (i) => {
+          await ctx.hold(i * stagger(3));
+          await ctx.spring(`r${i}`, 1, spatial);
+        }),
+      );
+    },
+  });
+const reorder = reorderScene();
 
 // ---------- Expand and collapse ----------
 
@@ -237,7 +257,7 @@ const Chevron = ({ x, y, open }) => (
     transform={`rotate(${-90 * (1 - open)} ${x} ${y})`}
   />
 );
-const expand = ({ id, title, caption, closing }) =>
+const expand = ({ id, title, caption, closing, spatial = 'spatial.fast', appearance = 'appearance.fast' }) =>
   scene({
     id,
     title,
@@ -267,15 +287,16 @@ const expand = ({ id, title, caption, closing }) =>
       await ctx.hold(1);
       await ctx.tap(100, 55);
       if (closing) {
-        await ctx.spring('c', 0, 'appearance.fast');
-        await ctx.spring('h', 0, 'spatial.fast');
+        await ctx.spring('c', 0, appearance);
+        await ctx.spring('h', 0, spatial);
         return;
       }
       // Height, the rows below and the chevron move together; the detail waits for room.
-      await ctx.spring('h', 1, 'spatial.fast');
-      await ctx.spring('c', 1, 'appearance.fast');
+      await ctx.spring('h', 1, spatial);
+      await ctx.spring('c', 1, appearance);
     },
   });
+export const expandScene = expand;
 
 // ---------- Load content ----------
 
@@ -284,7 +305,7 @@ const LOAD_ROWS = [38, 52];
 const LOAD_ROW_W = 83;
 const CHART = { x: 62, y: 70, w: 44, h: 20 };
 const LOAD_KEYS = ['r1', 'r2'];
-const load = ({ id, title, caption, skeleton }) =>
+const load = ({ id, title, caption, skeleton, spatial, appearance }) =>
   scene({
     id,
     title,
@@ -337,20 +358,22 @@ const load = ({ id, title, caption, skeleton }) =>
       await ctx.hold(1);
       if (skeleton) {
         const loadPlan = planLoadReveal(LOAD_KEYS.length);
+        const contentIn = appearance ?? spatial ?? loadPlan.contentInToken;
+        const skeletonOut = appearance ?? loadPlan.skeletonOutToken;
         // The shimmer follows time one to one while the person waits.
         await ctx.linear('sh', 1, 2);
         await Promise.all([
-          ctx.spring('hd', 1, loadPlan.contentInToken),
-          ctx.spring('sk', 0, loadPlan.skeletonOutToken),
+          ctx.spring('hd', 1, contentIn),
+          ctx.spring('sk', 0, skeletonOut),
         ]);
         await Promise.all(
           LOAD_KEYS.map(async (key, i) => {
             await ctx.hold(ms(loadPlan.slotDelaysMs[i]));
-            await ctx.spring(key, 1, loadPlan.contentInToken);
+            await ctx.spring(key, 1, contentIn);
           }),
         );
-        await ctx.spring('pri', 1, loadPlan.contentInToken);
-        await ctx.spring('ch', 1, loadPlan.contentInToken);
+        await ctx.spring('pri', 1, contentIn);
+        await ctx.spring('ch', 1, contentIn);
         return;
       }
       // The same order with nothing holding the room: each part pops in and the rest jumps.
@@ -361,6 +384,7 @@ const load = ({ id, title, caption, skeleton }) =>
       ctx.set({ pri: 1, ch: 1 });
     },
   });
+export const loadScene = load;
 
 // ---------- Overlays ----------
 
@@ -382,7 +406,14 @@ const Scaled = ({ s, opacity, children }) => (
   </g>
 );
 
-const modalScene = ({ id, title, caption, closing }) =>
+export const modalScene = ({
+  id,
+  title,
+  caption,
+  closing,
+  spatial = closing ? 'spatial.fast' : 'spatial.default',
+  appearance = closing ? 'appearance.fast' : 'appearance.default',
+} = {}) =>
   scene({
     id,
     title,
@@ -406,17 +437,59 @@ const modalScene = ({ id, title, caption, closing }) =>
       if (closing) {
         await ctx.tap(116, 76);
         await Promise.all([
-          ctx.spring('s', 0.98, 'spatial.fast'),
-          ctx.spring('m', 0, 'appearance.fast'),
-          ctx.spring('d', 0, 'appearance.fast'),
+          ctx.spring('s', 0.98, spatial),
+          ctx.spring('m', 0, appearance),
+          ctx.spring('d', 0, appearance),
         ]);
         return;
       }
       await ctx.tap(...HEADER_BUTTON);
       await Promise.all([
-        ctx.spring('s', 1, 'spatial.default'),
-        ctx.spring('m', 1, 'appearance.default'),
-        ctx.spring('d', 1, 'appearance.default'),
+        ctx.spring('s', 1, spatial),
+        ctx.spring('m', 1, appearance),
+        ctx.spring('d', 1, appearance),
+      ]);
+    },
+  });
+
+export const popupScene = ({
+  id = 'popup-open',
+  title = '',
+  caption = '',
+  closing = false,
+  spatial = closing ? null : 'spatial.fast',
+  appearance = 'appearance.fast',
+} = {}) =>
+  scene({
+    id,
+    title,
+    caption,
+    initial: closing ? { p: 1, o: 1 } : { p: spatial ? 0 : 1, o: appearance ? 0 : 1 },
+    landing: closing ? { p: spatial ? 0 : 1, o: 0 } : { p: 1, o: 1 },
+    arrows: [],
+    draw: ({ p, o }) => (
+      <>
+        <UnderPage />
+        <g opacity={o}>
+          <Clip x={140 - 74 * p} y={33} w={74 * p + 1} h={52 * p + 1}>
+            <Popup x={68} y={34} w={72} h={48} accent />
+          </Clip>
+        </g>
+      </>
+    ),
+    play: async (ctx) => {
+      await ctx.hold(1);
+      await ctx.tap(...HEADER_BUTTON);
+      if (closing) {
+        await Promise.all([
+          ...(spatial ? [ctx.spring('p', 0, spatial)] : []),
+          ctx.spring('o', 0, appearance ?? 'appearance.fast'),
+        ]);
+        return;
+      }
+      await Promise.all([
+        ...(spatial ? [ctx.spring('p', 1, spatial)] : []),
+        ...(appearance ? [ctx.spring('o', 1, appearance)] : []),
       ]);
     },
   });
@@ -424,7 +497,14 @@ const modalScene = ({ id, title, caption, closing }) =>
 const FLOATING_PANEL = { x: 100, y: 6, w: 52, h: 88 };
 const FLAG = { x: 94, y: 10, w: 54, h: 26 };
 const FLAG_EDGE = 60;
-const flagScene = ({ id, title, caption, closing }) =>
+export const flagScene = ({
+  id,
+  title,
+  caption,
+  closing,
+  spatial = closing ? 'spatial.exit' : 'spatial.default',
+  appearance = 'appearance.default',
+} = {}) =>
   scene({
     id,
     title,
@@ -446,17 +526,24 @@ const flagScene = ({ id, title, caption, closing }) =>
       await ctx.hold(1);
       if (closing) {
         // A timeout leaves the way it came, on the exit spring, still speeding up at the edge.
-        await ctx.exit('x', FLAG_EDGE);
+        await ctx.spring('x', FLAG_EDGE, spatial);
         ctx.set({ f: 0 });
         return;
       }
       await ctx.tap(...HEADER_BUTTON);
-      await Promise.all([ctx.spring('x', 0, 'spatial.default'), ctx.spring('f', 1, 'appearance.default')]);
+      await Promise.all([ctx.spring('x', 0, spatial), ctx.spring('f', 1, appearance)]);
     },
   });
 
 /** Confirm carries on; Cancel reverses the entrance. The row's status is the third row's pill. */
-const confirmScene = ({ id, title, caption, confirm }) =>
+export const confirmScene = ({
+  id,
+  title,
+  caption,
+  confirm,
+  spatial = 'spatial.fast',
+  appearance = 'appearance.fast',
+} = {}) =>
   scene({
     id,
     title,
@@ -491,17 +578,17 @@ const confirmScene = ({ id, title, caption, confirm }) =>
         await ctx.tap(94, 76);
         // Cancel shrinks the Modal back the way it came, and nothing else changes.
         await Promise.all([
-          ctx.spring('s', 0.96, 'spatial.fast'),
-          ctx.spring('m', 0, 'appearance.fast'),
-          ctx.spring('d', 0, 'appearance.fast'),
+          ctx.spring('s', 0.96, spatial),
+          ctx.spring('m', 0, appearance),
+          ctx.spring('d', 0, appearance),
         ]);
         return;
       }
       await ctx.tap(124, 76);
       await Promise.all([
-        ctx.spring('s', 0.98, 'spatial.fast'),
-        ctx.spring('m', 0, 'appearance.fast'),
-        ctx.spring('d', 0, 'appearance.fast'),
+        ctx.spring('s', 0.98, spatial),
+        ctx.spring('m', 0, appearance),
+        ctx.spring('d', 0, appearance),
       ]);
       await ctx.spring('c', 1, 'appearance.default');
       await Promise.all([ctx.spring('fx', 0, 'spatial.default'), ctx.spring('fo', 1, 'appearance.default')]);
@@ -512,7 +599,14 @@ const confirmScene = ({ id, title, caption, confirm }) =>
 
 const SIDE = 34;
 const DOCK_PANEL = { x: PAGE.x + PAGE.w - SIDE, y: PAGE.y, w: SIDE, h: PAGE.h };
-const dockScene = ({ id, title, caption, closing }) =>
+export const dockScene = ({
+  id,
+  title,
+  caption,
+  closing,
+  spatial = closing ? 'spatial.default' : 'spatial.slow',
+  appearance = 'appearance.fast',
+} = {}) =>
   scene({
     id,
     title,
@@ -549,113 +643,137 @@ const dockScene = ({ id, title, caption, closing }) =>
       await ctx.hold(1);
       if (closing) {
         await ctx.tap(138, 30);
-        await ctx.spring('c', 0, 'appearance.fast');
-        await ctx.spring('p', 0, 'spatial.default');
+        await ctx.spring('c', 0, appearance);
+        await ctx.spring('p', 0, spatial);
         return;
       }
       await ctx.tap(...HEADER_BUTTON);
       // The page makes room on the Panel's own clock; the content follows once the page is about 90% there.
       await Promise.all([
-        ctx.spring('p', 1, 'spatial.slow'),
+        ctx.spring('p', 1, spatial),
         (async () => {
           await ctx.hold(ms(250));
-          await ctx.spring('c', 1, 'appearance.fast');
+          await ctx.spring('c', 1, appearance);
         })(),
       ]);
     },
   });
 
-const floatScene = scene({
-  id: 'dock-floating',
-  title: 'A floating Panel slides over and the page stays',
-  caption: 'Opens on spatial.default over the page, which does not move. No Blanket at desktop width.',
-  initial: { x: 1 },
-  landing: { x: 0 },
-  arrows: [[[152, 55], [110, 55]]],
-  draw: ({ x }) => (
-    <>
-      <UnderPage />
-      <Clip {...FRAME}>
-        <Moved x={x * (FLOATING_PANEL.w + 6)}>
-          <Panel x={104} y={14} w={44} h={74} floating accent />
-        </Moved>
-      </Clip>
-    </>
-  ),
-  play: async (ctx) => {
-    await ctx.hold(1);
-    await ctx.tap(...HEADER_BUTTON);
-    await ctx.spring('x', 0, 'spatial.default');
-  },
-});
+export const floatPanelScene = ({
+  id = 'dock-floating',
+  title = 'A floating Panel slides over and the page stays',
+  caption = 'Opens on spatial.default over the page, which does not move. No Blanket at desktop width.',
+  spatial = 'spatial.default',
+} = {}) =>
+  scene({
+    id,
+    title,
+    caption,
+    initial: { x: 1 },
+    landing: { x: 0 },
+    arrows: [[[152, 55], [110, 55]]],
+    draw: ({ x }) => (
+      <>
+        <UnderPage />
+        <Clip {...FRAME}>
+          <Moved x={x * (FLOATING_PANEL.w + 6)}>
+            <Panel x={104} y={14} w={44} h={74} floating accent />
+          </Moved>
+        </Clip>
+      </>
+    ),
+    play: async (ctx) => {
+      await ctx.hold(1);
+      await ctx.tap(...HEADER_BUTTON);
+      await ctx.spring('x', 0, spatial);
+    },
+  });
+const floatScene = floatPanelScene();
 
 // ---------- Update a value or state ----------
 
-const update = scene({
-  id: 'update-value',
-  title: 'A status recolors; a number rolls once, then fades',
-  caption: 'Color on appearance.default. The count rolls on spatial.fast the first time only; later updates fade to the new value.',
-  initial: { c: 0, k: 0, f: 0 },
-  landing: { c: 1, k: 1, f: 1 },
-  arrows: [[[76, 60], [76, 72]]],
-  draw: ({ c, k, f }) => (
-    <>
-      <Base />
-      <Row x={60} y={48} w={83} />
-      <Rect x={124} y={52} w={14} h={6} fill={PAINT.countSurface} corner="count" />
-      <Rect x={124} y={52} w={14} h={6} fill={PAINT.accent} corner="count" opacity={c} />
-      <CardBox x={60} y={66} w={83} h={24} />
-      <Clip x={66} y={68} w={28} h={20}>
-        <Moved y={14 * k} opacity={1 - k}>
-          <SkeletonBar x={70} y={74} w={16} h={7} heading />
-        </Moved>
-        <Moved y={-14 * (1 - k)} opacity={k}>
-          <g opacity={1 - f}>
-            <SkeletonBar x={70} y={74} w={20} h={7} heading />
-          </g>
-          <g opacity={f}>
+export const updateScene = ({
+  id = 'update-value',
+  title = 'A status recolors; a number rolls once, then fades',
+  caption = 'Color on appearance.default. The count rolls on spatial.fast the first time only; later updates fade to the new value.',
+  spatial = 'spatial.fast',
+  appearance = 'appearance.default',
+  fadeAppearance = 'appearance.fast',
+} = {}) =>
+  scene({
+    id,
+    title,
+    caption,
+    initial: { c: 0, k: 0, f: 0 },
+    landing: { c: 1, k: 1, f: 1 },
+    arrows: [[[76, 60], [76, 72]]],
+    draw: ({ c, k, f }) => (
+      <>
+        <Base />
+        <Row x={60} y={48} w={83} />
+        <Rect x={124} y={52} w={14} h={6} fill={PAINT.countSurface} corner="count" />
+        <Rect x={124} y={52} w={14} h={6} fill={PAINT.accent} corner="count" opacity={c} />
+        <CardBox x={60} y={66} w={83} h={24} />
+        <Clip x={66} y={68} w={28} h={20}>
+          <Moved y={14 * k} opacity={1 - k}>
             <SkeletonBar x={70} y={74} w={16} h={7} heading />
-          </g>
-        </Moved>
-      </Clip>
-      <SkeletonBar x={100} y={76} w={30} />
-    </>
-  ),
-  play: async (ctx) => {
-    await ctx.hold(1);
-    await ctx.spring('c', 1, 'appearance.default');
-    await ctx.hold(1);
-    await ctx.spring('k', 1, 'spatial.fast');
-    await ctx.hold(1);
-    await ctx.spring('f', 1, 'appearance.fast');
-  },
-});
+          </Moved>
+          <Moved y={-14 * (1 - k)} opacity={k}>
+            <g opacity={1 - f}>
+              <SkeletonBar x={70} y={74} w={20} h={7} heading />
+            </g>
+            <g opacity={f}>
+              <SkeletonBar x={70} y={74} w={16} h={7} heading />
+            </g>
+          </Moved>
+        </Clip>
+        <SkeletonBar x={100} y={76} w={30} />
+      </>
+    ),
+    play: async (ctx) => {
+      await ctx.hold(1);
+      await ctx.spring('c', 1, appearance);
+      await ctx.hold(1);
+      await ctx.spring('k', 1, spatial);
+      await ctx.hold(1);
+      await ctx.spring('f', 1, fadeAppearance);
+    },
+  });
+const update = updateScene();
 
 // ---------- Call attention ----------
 
-const attention = scene({
-  id: 'attention-once',
-  title: 'Look here, once',
-  caption: 'A highlight in on appearance.fast, a short hold, out on appearance.slow. It never repeats.',
-  initial: { h: 0, seen: 0 },
-  landing: { h: 0, seen: 1 },
-  draw: ({ h }) => (
-    <>
-      <Base />
-      <Row x={60} y={48} w={83} />
-      <Row x={60} y={62} w={83} />
-      <Row x={60} y={76} w={83} />
-      <Rect x={60} y={62} w={83} h={14} stroke={PAINT.accent} opacity={h} />
-    </>
-  ),
-  play: async (ctx) => {
-    await ctx.hold(1);
-    await ctx.spring('h', 1, 'appearance.fast');
-    await ctx.hold(ms(500));
-    await ctx.spring('h', 0, 'appearance.slow');
-    ctx.set({ seen: 1 });
-  },
-});
+export const attentionScene = ({
+  id = 'attention-once',
+  title = 'Look here, once',
+  caption = 'A highlight in on appearance.fast, a short hold, out on appearance.slow. It never repeats.',
+  appearance = 'appearance.fast',
+  outAppearance = 'appearance.slow',
+} = {}) =>
+  scene({
+    id,
+    title,
+    caption,
+    initial: { h: 0, seen: 0 },
+    landing: { h: 0, seen: 1 },
+    draw: ({ h }) => (
+      <>
+        <Base />
+        <Row x={60} y={48} w={83} />
+        <Row x={60} y={62} w={83} />
+        <Row x={60} y={76} w={83} />
+        <Rect x={60} y={62} w={83} h={14} stroke={PAINT.accent} opacity={h} />
+      </>
+    ),
+    play: async (ctx) => {
+      await ctx.hold(1);
+      await ctx.spring('h', 1, appearance);
+      await ctx.hold(ms(500));
+      await ctx.spring('h', 0, outAppearance);
+      ctx.set({ seen: 1 });
+    },
+  });
+const attention = attentionScene();
 
 // ---------- Errors ----------
 
@@ -679,7 +797,7 @@ const Message = ({ x, y, w, opacity }) => (
 );
 
 const FIELD_W = 83;
-const errField = ({ id, title, caption, early }) =>
+const errField = ({ id, title, caption, early, spatial = 'spatial.fast', appearance = 'appearance.fast' }) =>
   scene({
     id,
     title,
@@ -700,13 +818,13 @@ const errField = ({ id, title, caption, early }) =>
     ),
     play: async (ctx) => {
       const raise = async () => {
-        await ctx.spring('b', 1, 'appearance.fast');
-        await ctx.spring('h', 1, 'spatial.fast');
-        await ctx.spring('m', 1, 'appearance.fast');
+        await ctx.spring('b', 1, appearance);
+        await ctx.spring('h', 1, spatial);
+        await ctx.spring('m', 1, appearance);
       };
       await ctx.hold(1);
       await ctx.tap(100, 41);
-      await ctx.spring('f1', 1, 'appearance.fast');
+      await ctx.spring('f1', 1, appearance);
       if (early) {
         // The Don't: red while the person is still typing.
         await ctx.hold(0.5);
@@ -714,14 +832,15 @@ const errField = ({ id, title, caption, early }) =>
       }
       await ctx.hold(1);
       await ctx.tap(100, 73);
-      await Promise.all([ctx.spring('f1', 0, 'appearance.fast'), ctx.spring('f2', 1, 'appearance.fast')]);
+      await Promise.all([ctx.spring('f1', 0, appearance), ctx.spring('f2', 1, appearance)]);
       // The Do: the field is checked once focus leaves it.
       if (!early) await raise();
     },
   });
+export const errFieldScene = errField;
 
 const MODAL_BASE = { x: 66, y: 18, w: 76, h: 60 };
-const errModal = ({ id, title, caption, shakes }) =>
+const errModal = ({ id, title, caption, shakes, spatial = 'spatial.fast', appearance = 'appearance.fast' }) =>
   scene({
     id,
     title,
@@ -747,12 +866,13 @@ const errModal = ({ id, title, caption, shakes }) =>
         return;
       }
       // The system failed, not the person: the Modal stays still and a message makes room.
-      await ctx.spring('h', 1, 'spatial.fast');
-      await ctx.spring('m', 1, 'appearance.fast');
+      await ctx.spring('h', 1, spatial);
+      await ctx.spring('m', 1, appearance);
     },
   });
+export const errModalScene = errModal;
 
-const errPage = ({ id, title, caption, shakes }) =>
+const errPage = ({ id, title, caption, shakes, spatial = 'spatial.fast', appearance = 'appearance.fast' }) =>
   scene({
     id,
     title,
@@ -776,16 +896,17 @@ const errPage = ({ id, title, caption, shakes }) =>
     play: async (ctx) => {
       await ctx.hold(1);
       await ctx.tap(133, 76);
-      await ctx.spring('b', 1, 'appearance.fast');
+      await ctx.spring('b', 1, appearance);
       if (shakes) {
         await shake(ctx);
         return;
       }
       // A one-line summary makes room at the top and focus goes to the first error.
-      await ctx.spring('h', 1, 'spatial.fast');
-      await Promise.all([ctx.spring('m', 1, 'appearance.fast'), ctx.spring('f1', 1, 'appearance.fast')]);
+      await ctx.spring('h', 1, spatial);
+      await Promise.all([ctx.spring('m', 1, appearance), ctx.spring('f1', 1, appearance)]);
     },
   });
+export const errPageScene = errPage;
 
 // ---------- The demos, in page order ----------
 
