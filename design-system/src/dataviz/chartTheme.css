@@ -67,7 +67,8 @@
 .highcharts-container text,
 .highcharts-container tspan,
 .highcharts-tooltip-container,
-:has(> .highcharts-container) ~ div {
+.highcharts-data-label,
+.highcharts-data-labels {
     font-family: var(--type-family-body);
 }
 
@@ -99,8 +100,7 @@
 .highcharts-tooltip,
 .highcharts-tooltip text,
 .highcharts-tooltip tspan,
-.highcharts-tooltip-container,
-:has(> .highcharts-container) ~ div {
+.highcharts-tooltip-container {
     font-family: var(--type-family-body);
     font-variant-numeric: tabular-nums;
 }
@@ -123,7 +123,7 @@
 .highcharts-point-select {
     fill: var(--ds-background-selected);
     stroke: var(--ds-border-selected);
-    stroke-width: var(--stroke-1);
+    stroke-width: var(--chart-grid-width);
 }
 
 /*

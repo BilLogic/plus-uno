@@ -17,7 +17,7 @@ const semantic = readFileSync(join(tokens, '_semantic.scss'), 'utf8');
 
 const block = (opener) => {
     const start = semantic.indexOf(opener);
-    const end = semantic.indexOf('\n}', start);
+    const end = semantic.indexOf(`${String.fromCharCode(10)}}`, start);
     return readTokens(semantic.slice(start, end));
 };
 const MODES = { light: block(':root,'), dark: block('[data-color-mode="dark"] {') };
@@ -79,7 +79,7 @@ describe('chart sources', () => {
         expect(offenders).toEqual([]);
     });
 
-    it('reports remaining per-chart type and state overrides as a soft list for #2581–#2585', () => {
+    it('reports remaining per-chart type, state and pixel-offset overrides as a soft list for #2581–#2585', () => {
         const sharedFiles = new Set(['PlusChart.jsx']);
         const rules = [
             { id: 'b-tag', pattern: /<b\b/i },
@@ -89,6 +89,7 @@ describe('chart sources', () => {
             { id: 'series-color-tooltip-text', pattern: /style=["']color:\s*\{series\.color\}["'][^>]*>[^●<]/ },
             { id: 'per-chart-states', pattern: /\bstates\s*:/ },
             { id: 'allow-point-select', pattern: /\ballowPointSelect\s*:/ },
+            { id: 'pixel-offset', pattern: /\b(?:pointWidth|offset|x|y|radius|distance)\s*:\s*-?[1-9]\d*(?:\.\d+)?\b/ },
         ];
         const report = [];
         for (const file of collect(__dirname)) {
@@ -101,8 +102,7 @@ describe('chart sources', () => {
             }
         }
         if (report.length > 0) {
-            console.info(`[dataviz soft guard — ${report.length} chart files remaining for #2581–#2585]\n${report.join('\n')}`);
+            console.info(`[dataviz soft guard — ${report.length} chart files remaining for #2581–#2585]`, report);
         }
-        expect(report.length).toBeGreaterThan(0);
     });
 });

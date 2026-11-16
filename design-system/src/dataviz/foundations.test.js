@@ -1,17 +1,31 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { extname, join } from 'node:path';
-import { describe, expect, it } from 'vitest';
-import chartTheme from '@/dataviz/chartTheme';
+import React from 'react';
+import { render } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import chartTheme, { BODY, MEDIUM, SEMIBOLD, TABULAR } from '@/dataviz/chartTheme';
+import * as chartThemeModule from '@/dataviz/chartTheme';
 import {
     CHART_VALUE_CLASS,
     dataLabelFormat,
-    formatValue,
     seriesSwatch,
     tooltipHeaderFormat,
     tooltipPointFormat,
     valueSpan,
 } from '@/dataviz/chartFormat';
-import { BRAND, CATEGORICAL, hoveredColor } from '@/dataviz/palette';
+import * as chartFormatModule from '@/dataviz/chartFormat';
+import { BRAND, CATEGORICAL, CHROME, hoveredColor } from '@/dataviz/palette';
+import PlusChart from '@/dataviz/PlusChart';
+
+const capturedPlusChartOptions = [];
+
+vi.mock('highcharts-react-official', () => ({
+    default: React.forwardRef((props, ref) => {
+        capturedPlusChartOptions.push(props.options);
+        React.useImperativeHandle(ref, () => ({ container: { current: null }, chart: null }));
+        return React.createElement('div', { 'data-testid': 'mock-hc' });
+    }),
+}));
 
 /**
  * Every other foundation (spacing, radius, elevation, stroke, type, motion)
@@ -87,6 +101,11 @@ describe('data-viz foundations', () => {
     });
 
     it('sets the Noto Sans body family token on chart.style and explicitly on every theme text slot', () => {
+        expect(BODY).toBe('var(--type-family-body)');
+        expect(MEDIUM).toBe('var(--type-weight-medium)');
+        expect(SEMIBOLD).toBe('var(--type-weight-semibold)');
+        expect(TABULAR).toBe('tabular-nums');
+
         const slots = {
             chart: chartTheme.chart?.style,
             title: chartTheme.title?.style,
@@ -102,7 +121,7 @@ describe('data-viz foundations', () => {
             noData: chartTheme.noData?.style,
         };
         for (const [slot, style] of Object.entries(slots)) {
-            expect(style?.fontFamily, `${slot}.fontFamily`).toBe('var(--type-family-body)');
+            expect(style?.fontFamily, `${slot}.fontFamily`).toBe(BODY);
         }
     });
 
@@ -113,7 +132,7 @@ describe('data-viz foundations', () => {
             chartTheme.yAxis?.title?.style,
         ];
         for (const style of titleSlots) {
-            expect(style?.fontWeight).toBe('var(--type-weight-semibold)');
+            expect(style?.fontWeight).toBe(SEMIBOLD);
         }
 
         const labelSlots = [
@@ -128,13 +147,13 @@ describe('data-viz foundations', () => {
             chartTheme.noData?.style,
         ];
         for (const style of labelSlots) {
-            expect(style?.fontWeight).toBe('var(--type-weight-medium)');
+            expect(style?.fontWeight).toBe(MEDIUM);
         }
 
         expect(chartTheme.plotOptions?.series?.dataLabels?.style?.textOutline).toBe('none');
     });
 
-    it('sets tabular-nums on every number slot in the theme and in chartTheme.css without a monospace font', () => {
+    it('sets tabular-nums on every number slot in the theme and in chartTheme.css without a monospace font or leaky sibling selector', () => {
         const numberSlots = {
             xAxisLabels: chartTheme.xAxis?.labels?.style,
             yAxisLabels: chartTheme.yAxis?.labels?.style,
@@ -143,7 +162,7 @@ describe('data-viz foundations', () => {
             legendItem: chartTheme.legend?.itemStyle,
         };
         for (const [slot, style] of Object.entries(numberSlots)) {
-            expect(style?.fontVariantNumeric, `${slot}.fontVariantNumeric`).toBe('tabular-nums');
+            expect(style?.fontVariantNumeric, `${slot}.fontVariantNumeric`).toBe(TABULAR);
             expect(style?.fontFamily, `${slot}.fontFamily`).not.toContain('code');
             expect(style?.fontFamily, `${slot}.fontFamily`).not.toContain('mono');
         }
@@ -151,11 +170,16 @@ describe('data-viz foundations', () => {
         const css = readFileSync(join(ROOT, 'chartTheme.css'), 'utf8');
         expect(css).toContain('font-variant-numeric: tabular-nums');
         expect(css).toContain(`.${CHART_VALUE_CLASS}`);
+        expect(css).not.toContain(':has(> .highcharts-container) ~ div');
     });
 
-    it('formats values with a semibold tabular value span and uses the format helper in theme tooltip and dataLabels defaults', () => {
+    it('formats values with a semibold tabular value span in chartFormat and keeps dataLabels.format unset in chartTheme so custom formatters survive', () => {
         expect(valueSpan('{point.y}')).toBe('<span class="plus-chart-value">{point.y}</span>');
-        expect(formatValue('{point.percentage:.1f}%')).toBe('<span class="plus-chart-value">{point.percentage:.1f}%</span>');
+        expect(valueSpan('{point.percentage:.1f}%')).toBe('<span class="plus-chart-value">{point.percentage:.1f}%</span>');
+        expect(chartFormatModule.formatValue).toBeUndefined();
+        expect(chartThemeModule.valueSpan).toBeUndefined();
+        expect(chartThemeModule.hoveredColor).toBeUndefined();
+
         expect(seriesSwatch()).toBe('<span style="color:{point.color}">●</span>');
         expect(tooltipHeaderFormat()).toBe('<span class="plus-chart-value">{point.key}</span><br/>');
         expect(tooltipPointFormat()).toBe(
@@ -168,19 +192,58 @@ describe('data-viz foundations', () => {
 
         expect(chartTheme.tooltip.pointFormat).toBe(tooltipPointFormat());
         expect(chartTheme.tooltip.headerFormat).toBe(tooltipHeaderFormat());
-        expect(chartTheme.plotOptions.series.dataLabels.format).toBe(dataLabelFormat());
+        expect(chartTheme.plotOptions.series.dataLabels.format).toBeUndefined();
         expect(chartTheme.tooltip.pointFormat).not.toContain('<b>');
         expect(chartTheme.tooltip.pointFormat).not.toMatch(/style="color:\{series\.color\}">[^●]/);
+
+        // A chart with its own dataLabels.formatter (e.g. Heatmap cell label) keeps its own text
+        // without being overridden by a theme-level `dataLabels.format`.
+        capturedPlusChartOptions.length = 0;
+        const heatmapFormatter = function heatmapCellFormatter() {
+            return `<span style="color: var(--ds-text)">${this.point.value}</span>`;
+        };
+        render(
+            React.createElement(PlusChart, {
+                options: {
+                    ...chartTheme,
+                    chart: { ...chartTheme.chart, type: 'heatmap' },
+                    series: [
+                        {
+                            name: 'Heatmap',
+                            data: [[0, 0, 42]],
+                            dataLabels: {
+                                enabled: true,
+                                formatter: heatmapFormatter,
+                            },
+                        },
+                    ],
+                },
+            }),
+        );
+        const merged = capturedPlusChartOptions.at(-1);
+        expect(merged.plotOptions.series.dataLabels.format).toBeUndefined();
+        expect(merged.series[0].dataLabels.format).toBeUndefined();
+        expect(merged.series[0].dataLabels.formatter).toBe(heatmapFormatter);
+        expect(merged.series[0].dataLabels.formatter.call({ point: { value: 42 } })).toContain('42');
     });
 
-    it('declares hover, inactive and select states once in the theme and repoints Highcharts highlight CSS variables off --chart-brand', () => {
+    it('declares hover, inactive and select states cleanly and resolves -hovered tokens per series or point (including palette index)', () => {
         expect(hoveredColor(BRAND)).toBe('var(--chart-brand-hovered)');
         expect(hoveredColor(CATEGORICAL[0])).toBe('var(--chart-categorical-1-hovered)');
-        expect(hoveredColor('#123456')).toBeUndefined();
+        expect(hoveredColor('var(--ds-background-brand-bold)')).toBe('var(--ds-background-brand-bold-hovered)');
+        expect(hoveredColor('var(--ds-background-danger-bold)')).toBe('var(--ds-background-danger-bold-hovered)');
+        expect(hoveredColor('var(--ds-background-neutral-subtle)')).toBe('var(--ds-background-neutral-subtle-hovered)');
+        expect(hoveredColor('var(--ds-background-selected)')).toBe('var(--ds-background-selected-hovered)');
+        expect(hoveredColor(CHROME.track)).toBeNull();
+        expect(hoveredColor('var(--ds-background-neutral)')).toBeNull();
+        expect(hoveredColor('var(--ds-background-accent-blue-subtler)')).toBeNull();
+        expect(hoveredColor('var(--chart-grid-width)')).toBeNull();
+        expect(hoveredColor('#123456')).toBeNull();
 
         const { hover, inactive, select } = chartTheme.plotOptions?.series?.states ?? {};
         expect(hover?.enabled).toBe(true);
-        expect(hover?.color).toBe('var(--chart-brand-hovered)');
+        expect(hover?.color).toBeUndefined();
+        expect(hover?.brightness).toBe(0);
         expect(hover?.animation?.duration).toBeGreaterThan(0);
 
         expect(inactive?.enabled).toBe(true);
@@ -193,9 +256,38 @@ describe('data-viz foundations', () => {
         expect(select?.borderWidth).toBe(1);
         expect(select?.animation?.duration).toBeGreaterThan(0);
 
+        // PlusChart resolves -hovered per series (including default palette index colors[i]) and per point.
+        capturedPlusChartOptions.length = 0;
+        render(
+            React.createElement(PlusChart, {
+                options: {
+                    ...chartTheme,
+                    series: [
+                        { name: 'Default palette 0', data: [10, 20] },
+                        { name: 'Default palette 1', data: [15, 25] },
+                        {
+                            name: 'Slices',
+                            color: CHROME.track,
+                            data: [
+                                { name: 'Slice A', y: 40, color: CATEGORICAL[2] },
+                                { name: 'Slice B', y: 60, color: CHROME.track },
+                            ],
+                        },
+                    ],
+                },
+            }),
+        );
+        const merged = capturedPlusChartOptions.at(-1);
+        expect(merged.series[0].states.hover.color).toBe('var(--chart-categorical-1-hovered)');
+        expect(merged.series[1].states.hover.color).toBe('var(--chart-categorical-2-hovered)');
+        expect(merged.series[2].states?.hover?.color).toBeUndefined();
+        expect(merged.series[2].data[0].states.hover.color).toBe('var(--chart-categorical-3-hovered)');
+        expect(merged.series[2].data[1].states).toBeUndefined();
+
         const css = readFileSync(join(ROOT, 'chartTheme.css'), 'utf8');
+        expect(css).toContain('stroke-width: var(--chart-grid-width)');
         const highlightLines = css
-            .split('\n')
+            .split(/\r?\n/)
             .filter((line) => line.includes('--highcharts-highlight-color'));
         expect(highlightLines.length).toBeGreaterThan(0);
         for (const line of highlightLines) {

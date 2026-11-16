@@ -5,15 +5,15 @@ import BarChart from '@/dataviz/comparison/BarChart/BarChart';
 import LineChart from '@/dataviz/temporal/LineChart/LineChart';
 import PieChart from '@/dataviz/part-to-whole/PieChart/PieChart';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme, {
+import chartTheme from '@/dataviz/chartTheme';
+import {
     dataLabelFormat,
-    hoveredColor,
     seriesSwatch,
     tooltipHeaderFormat,
     tooltipPointFormat,
     valueSpan,
-} from '@/dataviz/chartTheme';
-import { CATEGORICAL } from '@/dataviz/palette';
+} from '@/dataviz/chartFormat';
+import { CATEGORICAL, hoveredColor } from '@/dataviz/palette';
 import Highcharts from '@/dataviz/highchartsModules';
 import {
     ChartMotionArea,
@@ -456,9 +456,7 @@ export const Motion = {
         expect(reducedChart).toBeDefined();
         expect(reducedChart.options.chart.animation.duration).toBe(reducedExpected.duration);
         expect(reducedChart.options.chart.animation.easing(1)).toBe(1);
-        expect(reducedChart.options.plotOptions.series.animation.duration).toBe(
-            reducedExpected.duration,
-        );
+        expect(reducedChart.options.plotOptions.series.animation).toBe(false);
 
         await userEvent.click(canvas.getByRole('button', { name: /switch term data/i }));
         await waitFor(() => {

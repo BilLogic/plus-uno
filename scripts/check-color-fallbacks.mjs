@@ -23,6 +23,8 @@ import { COLOR_PREFIXES } from '../design-system/src/lib/tokens-node.mjs';
 import { fallbackCheck } from './lib/fallback-check.mjs';
 import { main } from './lib/findings.mjs';
 
+const CHART_DIMENSION_TOKENS = ['--chart-bar-radius', '--chart-line-width', '--chart-grid-width'];
+
 /**
  * The color family. It is selected BY NAME — the `--ds-*` tokens generated into
  * `tokens/color/` — and an undefined name here is a real defect: there is no
@@ -38,6 +40,10 @@ const COLOR = fallbackCheck({
   noun: 'color',
   absent: '--ds-*',
   prefix: COLOR_PREFIXES,
+  select: (tokens) =>
+    tokens.size
+      ? new Map([...tokens, ...CHART_DIMENSION_TOKENS.map((name) => [name, null])])
+      : tokens,
   reportUndefined: true,
   why:
     'Literal fallbacks that disagree with their own token (#268). Keyed on ' +

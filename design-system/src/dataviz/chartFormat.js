@@ -24,9 +24,6 @@ export const CHART_VALUE_CLASS = 'plus-chart-value';
 export const valueSpan = (expr = '{point.y}') =>
     `<span class="${CHART_VALUE_CLASS}">${expr}</span>`;
 
-/** Alias of `valueSpan` for callers that name the action rather than the node. */
-export const formatValue = valueSpan;
-
 /**
  * A colored dot swatch (`●`) for a tooltip row. Only the swatch wears the
  * series or point color; the text beside it stays in `--ds-text`.

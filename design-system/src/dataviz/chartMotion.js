@@ -8,7 +8,7 @@
  * provides `ChartMotionArea` so charts in one area share the load-reveal
  * stagger (`staggerDelays`: 20 ms apart, 500 ms cap) in mount order.
  */
-import React, { createContext, useMemo, useRef } from 'react';
+import React, { createContext, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { measureSpringToken, staggerDelays } from '@/lib/listMotion';
 
@@ -31,13 +31,69 @@ function springToAnimation(token, mode, defer) {
 }
 
 /**
- * Highcharts animation object for a chart mark's entrance (`spatial.default`).
- * Reduced motion wins over expressive (ADR-041) and collapses to the
- * `appearance.fast` fade (`SPRINGS['spatial.default'].reduced`).
+ * Highcharts animation object for a chart's entrance (`spatial.default`), or
+ * the `appearance.fast` opacity fade when reduced motion is active
+ * (`SPRINGS['spatial.default'].reduced`).
  */
 export function chartEntrance({ reduced = false, expressive = false, defer = 0 } = {}) {
     const mode = reduced ? 'reduced' : expressive ? 'expressive' : 'productive';
     return springToAnimation('spatial.default', mode, defer);
+}
+
+/**
+ * Runs an opacity 0 -> 1 fade on `element` driven by the `appearance.fast`
+ * reduced-motion spring (`chartEntrance({ reduced: true, defer })`), using the
+ * spring easing directly with no CSS eased curve or millisecond literal.
+ *
+ * @param {HTMLElement | null | undefined} element
+ * @param {{ defer?: number }} [options]
+ * @returns {() => void} cleanup function
+ */
+export function fadeChartElement(element, { defer = 0 } = {}) {
+    if (!element || !element.style) return () => {};
+    const { duration, easing, defer: delay = 0 } = chartEntrance({ reduced: true, defer });
+    element.style.opacity = '0';
+
+    if (typeof window === 'undefined' || typeof window.requestAnimationFrame !== 'function' || duration <= 0) {
+        element.style.opacity = '1';
+        return () => {};
+    }
+
+    const now = () =>
+        typeof performance !== 'undefined' && typeof performance.now === 'function'
+            ? performance.now()
+            : Date.now();
+    const startAt = now() + delay;
+    let rafId = null;
+    let cancelled = false;
+
+    const tick = (timestamp) => {
+        if (cancelled) return;
+        const t = typeof timestamp === 'number' ? timestamp : now();
+        const elapsed = t - startAt;
+        if (elapsed <= 0) {
+            element.style.opacity = '0';
+            rafId = window.requestAnimationFrame(tick);
+            return;
+        }
+        const pos = Math.min(1, elapsed / duration);
+        element.style.opacity = String(easing(pos));
+        if (pos < 1) {
+            rafId = window.requestAnimationFrame(tick);
+        } else {
+            element.style.opacity = '';
+        }
+    };
+
+    rafId = window.requestAnimationFrame(tick);
+
+    return () => {
+        cancelled = true;
+        if (rafId !== null && typeof window !== 'undefined' && typeof window.cancelAnimationFrame === 'function') {
+            window.cancelAnimationFrame(rafId);
+        }
+        element.style.opacity = '';
+    };
 }
 
 /**
@@ -57,13 +113,22 @@ export const ChartMotionContext = createContext(null);
 /**
  * Wraps an area of charts (such as a dashboard section or a docs specimen) so
  * each mounted `PlusChart` inside it receives its `defer` from `staggerDelays`
- * in mount order. Outside an area, a chart defers 0 ms.
+ * computed against the final mounted chart count. Outside an area, a chart
+ * defers 0 ms.
  */
 export function ChartMotionArea({ children, count, expressive = false }) {
     const slotsRef = useRef(null);
     if (!slotsRef.current) {
         slotsRef.current = new Map();
     }
+    const [resolvedTotal, setResolvedTotal] = useState(() => (typeof count === 'number' && count > 0 ? count : 0));
+
+    useLayoutEffect(() => {
+        const finalTotal = Math.max(count ?? 0, slotsRef.current.size);
+        if (finalTotal !== resolvedTotal) {
+            setResolvedTotal(finalTotal);
+        }
+    });
 
     const registry = useMemo(
         () => ({
@@ -73,13 +138,14 @@ export function ChartMotionArea({ children, count, expressive = false }) {
                     slots.set(slotKey, slots.size);
                 }
                 const index = slots.get(slotKey);
-                const total = Math.max(count ?? 0, slots.size, index + 1);
+                const total = Math.max(count ?? 0, resolvedTotal, slots.size, index + 1);
                 const delays = staggerDelays(total);
                 return delays[index] ?? 0;
             },
+            resolved: typeof count === 'number' && count > 0 ? true : resolvedTotal > 0 && resolvedTotal >= slotsRef.current.size,
             expressive,
         }),
-        [count, expressive],
+        [count, expressive, resolvedTotal],
     );
 
     return React.createElement(

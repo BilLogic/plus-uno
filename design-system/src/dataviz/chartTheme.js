@@ -20,15 +20,15 @@
  * shadow, not a design-system shadow token; the CSS lives beside the other
  * chart-only tokens in `chartTheme.css`.
  */
-import { CHART_VALUE_CLASS, dataLabelFormat, formatValue, seriesSwatch, tooltipHeaderFormat, tooltipPointFormat, valueSpan } from '@/dataviz/chartFormat';
+import { tooltipHeaderFormat, tooltipPointFormat } from '@/dataviz/chartFormat';
 import { chartEntrance, chartStateTransition } from '@/dataviz/chartMotion';
-import { BRAND, CATEGORICAL, CHROME, hoveredColor } from '@/dataviz/palette';
+import { CATEGORICAL, CHROME } from '@/dataviz/palette';
 import '@/dataviz/chartTheme.css';
 
-const BODY = 'var(--type-family-body)';
-const MEDIUM = 'var(--type-weight-medium)';
-const SEMIBOLD = 'var(--type-weight-semibold)';
-const TABULAR = 'tabular-nums';
+export const BODY = 'var(--type-family-body)';
+export const MEDIUM = 'var(--type-weight-medium)';
+export const SEMIBOLD = 'var(--type-weight-semibold)';
+export const TABULAR = 'tabular-nums';
 
 /**
  * Highcharts' numeric chart options (spacing, stroke width, radius) do SVG
@@ -187,7 +187,6 @@ const chartTheme = {
         series: {
             animation: CHART_ENTRANCE_ANIMATION,
             dataLabels: {
-                format: dataLabelFormat(),
                 style: {
                     color: CHROME.text,
                     fontFamily: BODY,
@@ -200,7 +199,6 @@ const chartTheme = {
             states: {
                 hover: {
                     enabled: true,
-                    color: hoveredColor(BRAND),
                     brightness: 0,
                     halo: null,
                     animation: CHART_STATE_ANIMATION,
@@ -322,16 +320,5 @@ export const CHART_ANIMATION_DURATION_MS = CHART_ENTRANCE_ANIMATION.duration;
  * stacked column only rounds the outer end of the stack, not every segment.
  */
 export const CHART_BAR_RADIUS = barRadius.borderRadius;
-
-export {
-    CHART_VALUE_CLASS,
-    dataLabelFormat,
-    formatValue,
-    hoveredColor,
-    seriesSwatch,
-    tooltipHeaderFormat,
-    tooltipPointFormat,
-    valueSpan,
-};
 
 export default chartTheme;

@@ -73,7 +73,10 @@ default Highcharts border or line entirely) needs no token — it draws nothing.
 
 Every text slot in a chart — title, subtitle, caption, axis labels and titles,
 legend items, data labels, tooltips and empty-data notices — takes the Noto Sans
-body family (`--type-family-body`), never a system-font fallback or a monospace
+body family (`--type-family-body`) and the current text tokens
+(`--type-size-075`, `--type-weight-semibold`, `--type-weight-medium`, and so on) — never a
+`'12px'` literal, never a token `var()` paired with a literal fallback
+value, and never a system-font fallback or a monospace
 font. Titles and emphasized values use semibold (`--type-weight-semibold`, 600);
 labels and supporting copy use medium (`--type-weight-medium`, 500). Nothing
 renders at 700 or 300, and data-label text outlines stay off.
@@ -82,8 +85,8 @@ Number slots (axis tick labels, data labels, tooltips, legend items and
 emphasized values) set tabular figures (`tabular-nums`) so columns of numbers
 and live readouts align digit for digit. Inside a tooltip, text stays in
 `--ds-text` while only the leading dot swatch (`●`) takes the series color. A
-chart's title normally comes from the surrounding Section or Card header rather
-than an in-chart title.
+chart's title comes from the surrounding Section or Card header, not from Highcharts'
+own `title` option (every chart sets `title: { text: null }`).
 
 ## States
 
