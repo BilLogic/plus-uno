@@ -95,7 +95,11 @@ describe('chart sources', () => {
         for (const file of collect(__dirname)) {
             const rel = file.slice(__dirname.length + 1);
             if (sharedFiles.has(rel)) continue;
-            const text = readFileSync(file, 'utf8');
+            const raw = readFileSync(file, 'utf8');
+            // Sparkline hides earlier markers at rest (`radius: 0`) and reveals them at `CHART_MARKER_RADIUS` on hover.
+            const text = rel === 'temporal/Sparkline/Sparkline.jsx'
+                ? raw.replace(/states:\s*\{\s*hover:\s*\{\s*radius:\s*CHART_MARKER_RADIUS,\s*radiusPlus:\s*0\s*\}\s*\}/g, '')
+                : raw;
             const matched = rules.filter(({ pattern }) => pattern.test(text)).map(({ id }) => id);
             if (matched.length > 0) {
                 report.push(`${rel}: ${matched.join(', ')}`);
@@ -105,6 +109,7 @@ describe('chart sources', () => {
             console.info(`[dataviz soft guard — ${report.length} chart files remaining]`, report);
         }
         expect(report.filter((entry) => entry.startsWith('comparison/'))).toEqual([]);
+        expect(report.filter((entry) => entry.startsWith('temporal/'))).toEqual([]);
         expect(report.filter((entry) => entry.startsWith('distribution/'))).toEqual([]);
         expect(report.filter((entry) => entry.startsWith('correlation/'))).toEqual([]);
     });

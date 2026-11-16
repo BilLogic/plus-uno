@@ -23,6 +23,7 @@ const ROLES = {
   '--control-sm': [24, '--size-150'],
   '--control-md': [32, '--size-200'],
   '--control-lg': [40, '--size-250'],
+  '--control-xl': [48, '--size-300'],
   '--row-height-sm': [32, '--height-200'],
   '--row-height-md': [40, '--height-250'],
   '--row-height-lg': [48, '--height-300'],

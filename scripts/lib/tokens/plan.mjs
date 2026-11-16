@@ -180,6 +180,7 @@ export const TOKEN_LADDER = [
   { tier: 'semantics', group: 'Size', new: '--control-sm', old: '--size-control-sm', ref: 'var(--size-150)', note: 'new role; Control was missing from the Icon/Image/Item/Label/Row/Field set', use: 'Height of a small control: 24px high.' },
   { tier: 'semantics', group: 'Size', new: '--control-md', old: '--size-control-md', ref: 'var(--size-200)', use: 'Height of a default control: 32px high.' },
   { tier: 'semantics', group: 'Size', new: '--control-lg', old: '--size-control-lg', ref: 'var(--size-250)', use: 'Height of a large control: 40px high.' },
+  { tier: 'semantics', group: 'Size', new: '--control-xl', old: null, ref: 'var(--size-300)', use: 'Height of an extra-large control: 48px high.' },
 
   // ─── Patterns / Frame (with Topbar and Sidebar) ──────────────────────
   { tier: 'patterns', group: 'Frame', new: '--frame-topbar-height', old: '--layout-height-topbar', ref: 'var(--height-200)', use: 'Height of the Frame\'s top bar.' },
@@ -308,6 +309,7 @@ export const TOKEN_LADDER = [
   // ─── Components / Button ──────────────────────────────────────────────
   { tier: 'components', group: 'Button', new: '--button-radius-default', old: '--element-radius-item-sm', ref: 'calc(var(--radius-control-lg) - var(--pad-x-xs))', note: 'nests in a 40-high field: its radius 10 minus the 4 slot inset = 6', use: 'Corner rounding of a Button with default spacing.' },
   { tier: 'components', group: 'Button', new: '--button-radius-compact', old: '--element-radius-md', ref: 'calc(var(--radius-control-md) - var(--pad-x-xs))', note: 'nests in a 32-high field: its radius 8 minus the 4 slot inset = 4', use: 'Corner rounding of a Button with compact spacing.' },
+  { tier: 'components', group: 'Button', new: '--button-radius-spacious', old: null, ref: 'var(--radius-control-lg)', note: '48-high footer button; pairs with --control-xl', use: 'Corner rounding of a Button with spacious spacing.' },
 
   // ─── Components / Calendar ────────────────────────────────────────────
   { tier: 'components', group: 'Calendar', new: '--calendar-day-sm', old: '--layout-calendar-day-sm', ref: '28px', use: 'Size of a day cell in a compact Calendar.' },

@@ -10,7 +10,7 @@ import './Button.scss';
 const isTrivialHref = (href) => !href || href.trim() === '#';
 
 export const BUTTON_APPEARANCES = ['default', 'primary', 'subtle', 'warning', 'danger', 'discovery', 'ai'];
-export const BUTTON_SPACINGS = ['default', 'compact'];
+export const BUTTON_SPACINGS = ['default', 'compact', 'spacious'];
 
 /** The icon slots and the label, in order. */
 const ButtonContent = ({ children, text, iconBefore, iconAfter }) => {
@@ -88,6 +88,7 @@ export const Button = ({
         `plus-btn--${appearance}`,
         {
             'plus-btn--compact': spacing === 'compact',
+            'plus-btn--spacious': spacing === 'spacious',
             'plus-btn--fit-container': shouldFitContainer,
             'plus-btn--loading': isLoading,
             'plus-btn--selected': isSelected,
@@ -174,9 +175,9 @@ Button.propTypes = {
     // Appearance
     /** The visual style. `primary` is for the main action on a page, `default` for secondary actions and `subtle` for low-emphasis ones. `warning` and `danger` mark risky or destructive actions, `discovery` points out something new, and `ai` is for AI actions and needs a text label. */
     appearance: PropTypes.oneOf(BUTTON_APPEARANCES),
-    /** `default` draws 32. `compact` draws 24, for tables and tight toolbars. */
+    /** `default` draws 32. `compact` draws 24, for tables and tight toolbars. `spacious` draws 48, for modal, panel and focused-view footers. */
     spacing: PropTypes.oneOf(BUTTON_SPACINGS),
-    /** Stretches the button to the full width of its container. */
+    /** Stretches the button to the full width of its container, with the label centered. */
     shouldFitContainer: PropTypes.bool,
     /** Extra class names added to the button element beside the component's own. */
     className: PropTypes.string,

@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
+import { valueSpan } from '@/dataviz/chartFormat';
 import chartTheme from '@/dataviz/chartTheme';
+import { seriesColor } from '@/dataviz/palette';
 
 /**
  * TimelineChart Component
@@ -26,20 +28,16 @@ const TimelineChart = ({
         yAxis: {
             visible: false
         },
-        tooltip: {
-            ...chartTheme.tooltip,
-            style: { width: 300 }
-        },
         series: [{
-            data: data.map((item, index) => ({
+            data: data.map((item, index, all) => ({
                 name: item.name,
                 label: item.label || item.name,
                 description: item.description || '',
-                color: chartTheme.colors[index % chartTheme.colors.length]
+                color: item.color || seriesColor(index, all.length)
             })),
             dataLabels: {
                 allowOverlap: false,
-                format: '<span style="font-weight: bold;">{point.label}</span><br/>{point.description}'
+                format: `${valueSpan('{point.label}')}<br/>{point.description}`
             }
         }]
     };
@@ -52,11 +50,12 @@ const TimelineChart = ({
 };
 
 TimelineChart.propTypes = {
-    /** Array of events {name, label, description} */
+    /** Array of events {name, label, description, color} */
     data: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string.isRequired,
         label: PropTypes.string,
-        description: PropTypes.string
+        description: PropTypes.string,
+        color: PropTypes.string
     })),
     /** Chart height */
     height: PropTypes.number

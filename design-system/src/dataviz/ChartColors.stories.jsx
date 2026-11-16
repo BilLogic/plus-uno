@@ -204,7 +204,6 @@ export const EveryChartInEveryMode = {
             gauge: 'part-to-whole',
             GaugeChart: 'part-to-whole',
             PyramidChart: 'part-to-whole',
-            TimelineChart: 'temporal',
             FunnelChart: 'flow',
         };
         const typeStrays = [];

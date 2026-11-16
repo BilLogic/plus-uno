@@ -41,7 +41,7 @@ export const TABULAR = 'tabular-nums';
  * @param {number} fallback
  * @returns {number}
  */
-export const tokenNumber = (varName, fallback) => {
+const tokenNumber = (varName, fallback) => {
     if (typeof document === 'undefined') return fallback;
     const value = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
     const parsed = parseFloat(value);
@@ -80,6 +80,9 @@ const barRadius = { borderRadius: { radius: CHART_BAR_RADIUS_NUMBER, where: 'end
 
 /** A node or card-like mark that isn't a bar (e.g. a Treegraph box): the radius primitive at the same step as a 40px control, the closest existing match. */
 export const CHART_NODE_RADIUS = tokenNumber('--radius-control-lg', 10);
+
+/** A point marker's radius (3px, 6px diameter): a quarter of `--size-075` (12px), the smallest `--size-*` step on the scale. */
+export const CHART_MARKER_RADIUS = tokenNumber('--size-075', 12) / 4;
 
 const axis = (gridLineWidth, gridLineDashStyle) => ({
     gridLineColor: CHROME.grid,

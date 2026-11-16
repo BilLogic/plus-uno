@@ -1,95 +1,77 @@
 import React from 'react';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
 import TimelineChart from './TimelineChart';
 
 export default {
     title: 'Data visualizations/Temporal/Timeline chart',
     component: TimelineChart,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## Timeline Chart
+    argTypes: {
+        data: { control: 'object', description: 'Array of events { name, label, description, color }' },
+        height: { control: 'number', description: 'Chart height in pixels' },
+    },
+};
 
-Shows **events or milestones** along a horizontal timeline.
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
+};
 
-### Overview
-Shows **events or milestones** along a horizontal timeline.
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--card-stack-md)',
+};
 
----
-
-### How to Read
-- **Points** = events/milestones
-- **Position** = chronological order
-- **Labels** = event names and descriptions
-
----
-
-### When to Use
-
-| Use Case | Recommendation |
-|----------|----------------|
-| Project milestones | ✅ Ideal |
-| Historical events | ✅ Ideal |
-| Progress tracking | ✅ Good |
-| Quantitative data | ❌ Use Line Chart |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Student Journey** | Enrollment → Completion |
-| **Course Milestones** | Module completion dates |
-| **Project Timeline** | Development phases |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Align the timeline chart setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
-
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
-                `
-            }
-        }
-    }
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
 };
 
 const studentJourneyData = {
     data: [
-        { name: 'Application', label: 'Application Submitted', description: 'Student applied for tutoring' },
-        { name: 'Assessment', label: 'Initial Assessment', description: 'Baseline skills evaluated' },
-        { name: 'Enrollment', label: 'Course Enrolled', description: 'Started learning path' },
-        { name: 'Midterm', label: 'Midterm Review', description: 'Progress checkpoint' },
-        { name: 'Completion', label: 'Course Completed', description: 'Certification earned' }
-    ]
+        { name: 'Application', label: 'Application submitted', description: 'Student applied for tutoring' },
+        { name: 'Assessment', label: 'Initial assessment', description: 'Baseline skills evaluated' },
+        { name: 'Enrollment', label: 'Course enrolled', description: 'Started learning path' },
+        { name: 'Midterm', label: 'Midterm review', description: 'Progress checkpoint' },
+        { name: 'Completion', label: 'Course completed', description: 'Certification earned' },
+    ],
 };
 
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Student Learning Journey</h3>
-            <TimelineChart {...studentJourneyData} />
-        </section>
-    </div>
-);
-
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Student learning journey</Heading>
+                <p style={captionStyle}>
+                    Milestones in chronological order from application through completion.
+                </p>
+                <TimelineChart {...studentJourneyData} />
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelector('.highcharts-container')).not.toBeNull();
+            expect(canvasElement.querySelectorAll('.plus-chart-value').length).toBeGreaterThan(0);
+        });
+        for (const valueNode of canvasElement.querySelectorAll('.plus-chart-value')) {
+            const style = getComputedStyle(valueNode);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(style.fontWeight).toBe('600');
+        }
+    },
+};
 
 export const Interactive = {
     args: {
         data: [
             { name: 'Step 1', label: 'Start', description: 'Beginning' },
             { name: 'Step 2', label: 'Middle', description: 'In progress' },
-            { name: 'Step 3', label: 'End', description: 'Complete' }
+            { name: 'Step 3', label: 'End', description: 'Complete' },
         ],
-        height: 400
-    }
+        height: 400,
+    },
 };
