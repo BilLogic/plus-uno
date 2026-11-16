@@ -50,7 +50,9 @@
         pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
         selected: (background-color: var(--ds-background-selected)),
         disabled: (color: var(--ds-text-disabled)),
-    ));
+    // Inset, as OptionRow draws it: a row runs the menu's full width and the
+    // menu scrolls, so a ring outside the edge was clipped at both sides.
+    ), $ring-offset: calc(-1 * var(--focus-ring-width)));
 }
 
 .plus-menu-item-icon {

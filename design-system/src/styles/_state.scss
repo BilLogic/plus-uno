@@ -55,7 +55,8 @@
 @mixin plus-state(
     $states: (),
     $ring: true,
-    $ring-offset: var(--focus-ring-width), /* one param, used for both outline and outline-offset below */
+    $ring-offset: var(--focus-ring-width), /* outline-offset; negative draws the ring inside the edge */
+    $ring-width: var(--focus-ring-width),
     $ring-token: --ds-border-focused,
     $high-contrast: false,
     $important: false,
@@ -139,7 +140,7 @@
 
         &:focus-visible,
         &[data-focus-visible] {
-            @include plus-ring($ring-offset, $ring-token, $important);
+            @include plus-ring($ring-offset, $ring-token, $important, $ring-width);
         }
 
         @if $high-contrast {
