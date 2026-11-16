@@ -95,9 +95,9 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Rest | Plain/card as Checkbox; `soft` uses `--ds-background-neutral` with no border; tile uses `--ds-surface` fill and 1px `--ds-border` edge. |
 | Hovered | Plain/card as Checkbox; unselected `soft` uses `--ds-background-neutral-hovered`; unselected tile uses `--ds-surface-hovered` and `--ds-border-brand`; selected `soft` and tile use `--ds-background-selected-hovered`. |
 | Selected | Each selected Checkbox takes `--ds-background-selected-bold`; a selected `soft` row takes `--ds-background-selected`, a 1px `--ds-border-selected` edge, and a trailing `fa-solid fa-check` icon in `--ds-icon-selected`; a selected tile takes `--ds-background-selected` and a 2px `--ds-border-selected` edge. |
-| Pressed | In `soft`, a selected row steps to `--ds-background-selected-pressed`. |
+| Pressed | In `soft`, an unselected row steps to `--ds-background-neutral-pressed` and a selected row steps to `--ds-background-selected-pressed`. |
 | Focused | 2px ring in `--ds-border-focused`: around the box in plain/card, and outside the row or tile in `soft` and `tile` appearances. |
-| Invalid | Unselected options take `--ds-border-danger`, with one error message announced for the group. |
+| Invalid | Unselected options take `--ds-border-danger` (and in `soft`, selected options do too), with one error message announced for the group. |
 | Read-only | Full contrast, focusable, no hover, `aria-readonly` on each Checkbox; unchecked controls and tiles take `--ds-background-neutral`. |
 | Disabled | Every option takes the disabled fill and edge and leaves the tab order. |
 

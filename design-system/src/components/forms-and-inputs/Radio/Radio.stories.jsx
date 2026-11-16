@@ -3,6 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
+import { contrastRatio, paintedOver } from '@/storybook-docs/lib/contrast.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { expectChoiceReadOnly } from '@/storybook-docs/lib/field-states.js';
 import { Illustration } from '@/components';
@@ -407,12 +408,14 @@ Soft.play = async ({ canvasElement }) => {
     await expect(second).toHaveAttribute('aria-checked', 'false');
 
     // Rest row: neutral fill, transparent border, hidden trailing check.
-    await expect(getComputedStyle(restRow).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+    selectedRow.style.transition = 'none';
+    restRow.style.transition = 'none';
+    await expect(withForcedPseudo(canvasElement, ':hover', () => getComputedStyle(restRow).backgroundColor)).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
     await expect(getComputedStyle(restRow).borderTopColor).toBe('rgba(0, 0, 0, 0)');
     await expect(getComputedStyle(restRow.querySelector('.plus-choice-soft-check')).opacity).toBe('0');
 
     // Selected row: selected fill, 1px selected border, visible trailing check (12px, selected icon color).
-    await expect(getComputedStyle(selectedRow).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected'));
+    await expect(withForcedPseudo(canvasElement, ':hover', () => getComputedStyle(selectedRow).backgroundColor)).toBe(tokenColor(canvasElement, '--ds-background-selected'));
     await expect(px(getComputedStyle(selectedRow).borderTopWidth)).toBe(1);
     await expect(getComputedStyle(selectedRow).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-selected'));
     const check = selectedRow.querySelector('.plus-choice-soft-check');
@@ -420,6 +423,20 @@ Soft.play = async ({ canvasElement }) => {
     await expect(getComputedStyle(check).opacity).toBe('1');
     await expect(px(getComputedStyle(check).fontSize)).toBe(12);
     await expect(getComputedStyle(check).color).toBe(tokenColor(canvasElement, '--ds-icon-selected'));
+
+    // Unselected pressed row steps to --ds-background-neutral-pressed.
+    restRow.style.transition = 'none';
+    const restPressed = withForcedPseudo(restRow, ':active', () => getComputedStyle(restRow).backgroundColor);
+    await expect(restPressed).toBe(tokenColor(canvasElement, '--ds-background-neutral-pressed'));
+
+    // Selected check passes 3:1 non-text contrast on --ds-background-selected in every color mode.
+    await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        const ground = paintedOver(getComputedStyle(selectedRow).backgroundColor, token('--ds-surface'));
+        await expect(
+            contrastRatio(getComputedStyle(check).color, ground),
+            `${mode}: selected soft check holds >= 3:1 contrast`
+        ).toBeGreaterThanOrEqual(3);
+    });
 };
 
 export const Tile = () => {

@@ -43,8 +43,8 @@ RadioGroup reads these motion tokens and no literal duration or curve.
 
 In a flow of choice questions (onboarding, quizzes, check-ins, surveys), pick one default selection type for the flow: the majority type uses `appearance="soft"` without a visible radio dot or checkbox box, while the minority type keeps its visible control (`card` or `plain`) so people notice when a question switches between single-select and multi-select, following the same exception-marking rule as required and optional fields on [Forms](?path=/docs/patterns-forms--docs).
 
-Do: In a flow where most questions are single-select, the majority single-select questions use soft rows while the occasional multi-select question keeps its visible checkboxes.
-Don't: Every question in the flow shows bordered control chrome, so a switch from single-select to multi-select stops standing out.
+Do: Two single-select questions use soft rows without radio dots; the one multi-select question keeps its visible checkboxes.
+Don't: The two majority single-select questions keep their radio dots while the minority multi-select question goes soft without checkboxes.
 
 ### Name the question with a group label. {#name-the-question-with-a-group-label}
 
@@ -128,9 +128,9 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | --- | --- |
 | Hovered | As Radio. Unselected: `--ds-background-input-hovered` with a `--ds-border-brand` edge (or `--ds-background-neutral-hovered` in `soft`). Selected: the hovered step of the selected bold fill (or `--ds-background-selected-hovered` in `soft`). |
 | Selected | As Radio: `--ds-background-selected-bold` fill and `--ds-border-selected` edge; in `soft`, `--ds-background-selected` fill, 1px `--ds-border-selected` edge, and a trailing `fa-solid fa-check` icon in `--ds-icon-selected`. |
-| Pressed | No step of its own in plain/card; in `soft`, a selected option steps to `--ds-background-selected-pressed`. |
+| Pressed | No step of its own in plain/card; in `soft`, an unselected option steps to `--ds-background-neutral-pressed` and a selected option steps to `--ds-background-selected-pressed`. |
 | Focused | A 2px ring in `--ds-border-focused` on the one tab stop (around the row in `soft` and `tile`). |
-| Invalid | Every unselected option takes `--ds-border-danger`, with one message for the group. |
+| Invalid | Unselected options take `--ds-border-danger` (and in `soft`, selected options do too), with one message for the group. |
 | Read-only | Full contrast, focusable, no hover, `aria-readonly` on the group; unchecked radios take the `--ds-background-neutral` fill and the answer does not change. |
 | Disabled | Every option takes the disabled fill and edge and leaves the tab order. |
 

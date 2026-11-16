@@ -130,59 +130,100 @@ describe('RadioGroup tiles', () => {
 });
 
 describe('RadioGroup soft appearance', () => {
-    it('keeps radio role, aria-checked, arrow-key navigation, form submission, and renders a decorative trailing check', async () => {
+    it('matches a plain RadioGroup in role, aria-checked, keyboard navigation, and form submission', async () => {
         const user = userEvent.setup();
-        const onChange = vi.fn();
+        const onPlainChange = vi.fn();
+        const onSoftChange = vi.fn();
 
         const { container } = render(
             <form>
                 <RadioGroup
-                    name="format"
-                    legend="How would you like to tutor?"
+                    name="plainFormat"
+                    legend="Plain format"
+                    appearance="plain"
+                    options={tileOptions}
+                    defaultValue="one-on-one"
+                    onChange={onPlainChange}
+                />
+                <RadioGroup
+                    name="softFormat"
+                    legend="Soft format"
                     appearance="soft"
                     options={tileOptions}
                     defaultValue="one-on-one"
-                    onChange={onChange}
+                    onChange={onSoftChange}
                 />
             </form>
         );
 
-        const group = screen.getByRole('radiogroup', { name: 'How would you like to tutor?' });
-        expect(container.querySelector('.plus-radio-group-soft')).not.toBeNull();
+        const plainGroup = screen.getByRole('radiogroup', { name: 'Plain format' });
+        const softGroup = screen.getByRole('radiogroup', { name: 'Soft format' });
+        const snapshot = (group) =>
+            within(group)
+                .getAllByRole('radio')
+                .map((r) => ({ role: r.getAttribute('role'), checked: r.getAttribute('aria-checked') }));
 
-        const softRows = container.querySelectorAll('.plus-choice-soft');
-        expect(softRows).toHaveLength(3);
-
-        const first = within(group).getByRole('radio', { name: 'One-on-one' });
-        const second = within(group).getByRole('radio', { name: 'Small group' });
-        const third = within(group).getByRole('radio', { name: 'Drop-in help' });
-
-        expect(first).toHaveAttribute('aria-checked', 'true');
-        expect(second).toHaveAttribute('aria-checked', 'false');
-
-        // Each soft row carries a decorative trailing check icon (fa-solid fa-check) and omits illustrations.
-        const checkIcon = softRows[0].querySelector('.plus-choice-soft-check');
-        expect(checkIcon).not.toBeNull();
-        expect(checkIcon).toHaveClass('fa-solid', 'fa-check');
-        expect(checkIcon).toHaveAttribute('aria-hidden', 'true');
+        expect(snapshot(softGroup)).toEqual(snapshot(plainGroup));
         expect(screen.queryByTestId('ill-one')).toBeNull();
 
-        // Arrow keys move focus and selection across soft options identically to plain radios.
-        first.focus();
+        // Arrow keys move focus and selection identically across plain and soft groups.
+        within(plainGroup).getByRole('radio', { name: 'One-on-one' }).focus();
         await user.keyboard('{ArrowDown}');
-        expect(document.activeElement).toBe(second);
-        expect(second).toHaveAttribute('aria-checked', 'true');
-        expect(first).toHaveAttribute('aria-checked', 'false');
-        expect(onChange).toHaveBeenLastCalledWith('small-group');
+        within(softGroup).getByRole('radio', { name: 'One-on-one' }).focus();
+        await user.keyboard('{ArrowDown}');
 
-        // Clicking the soft row surface activates the radio.
-        await user.click(softRows[2]);
-        expect(third).toHaveAttribute('aria-checked', 'true');
-        expect(onChange).toHaveBeenLastCalledWith('drop-in');
+        expect(snapshot(softGroup)).toEqual(snapshot(plainGroup));
+        expect(onSoftChange).toHaveBeenLastCalledWith('small-group');
+        expect(onSoftChange.mock.calls).toEqual(onPlainChange.mock.calls);
 
-        // Form submission includes the selected radio's value.
+        // Clicking a soft row's description activates its radio, matching clicking the plain option.
+        await user.click(within(plainGroup).getByRole('radio', { name: 'Drop-in help' }));
+        await user.click(within(softGroup).getByText('Answer quick homework questions.'));
+
+        expect(snapshot(softGroup)).toEqual(snapshot(plainGroup));
+        expect(onSoftChange).toHaveBeenLastCalledWith('drop-in');
+
         const formData = new FormData(container.querySelector('form'));
-        expect(formData.get('format')).toBe('drop-in');
+        expect(formData.get('softFormat')).toBe(formData.get('plainFormat'));
+    });
+
+    it('ignores row surface clicks when disabled or read-only', async () => {
+        const user = userEvent.setup();
+        const onChange = vi.fn();
+
+        render(
+            <>
+                <RadioGroup
+                    name="disabledFormat"
+                    legend="Disabled format"
+                    appearance="soft"
+                    options={tileOptions}
+                    defaultValue="one-on-one"
+                    isDisabled
+                    onChange={onChange}
+                />
+                <RadioGroup
+                    name="readOnlyFormat"
+                    legend="Read-only format"
+                    appearance="soft"
+                    options={tileOptions}
+                    defaultValue="one-on-one"
+                    isReadOnly
+                    onChange={onChange}
+                />
+            </>
+        );
+
+        const disabledGroup = screen.getByRole('radiogroup', { name: 'Disabled format' });
+        const readOnlyGroup = screen.getByRole('radiogroup', { name: 'Read-only format' });
+
+        await user.click(within(disabledGroup).getByText('Guide two to four students together.'));
+        await user.click(within(readOnlyGroup).getByText('Guide two to four students together.'));
+
+        expect(within(disabledGroup).getByRole('radio', { name: 'One-on-one' })).toHaveAttribute('aria-checked', 'true');
+        expect(within(disabledGroup).getByRole('radio', { name: 'Small group' })).toHaveAttribute('aria-checked', 'false');
+        expect(within(readOnlyGroup).getByRole('radio', { name: 'One-on-one' })).toHaveAttribute('aria-checked', 'true');
+        expect(within(readOnlyGroup).getByRole('radio', { name: 'Small group' })).toHaveAttribute('aria-checked', 'false');
+        expect(onChange).not.toHaveBeenCalled();
     });
 });
-

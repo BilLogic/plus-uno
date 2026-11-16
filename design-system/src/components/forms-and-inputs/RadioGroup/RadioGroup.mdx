@@ -1,7 +1,7 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
-import { RadioGroup, Illustration } from '@/components';
+import { CheckboxGroup, RadioGroup, Illustration } from '@/components';
 import * as RadioGroupStories from './RadioGroup.stories.jsx';
 import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -183,9 +183,9 @@ Use `RadioGroup` for one question with mutually exclusive answers visible all at
 <tbody>
 <tr><td>Hovered</td><td>As Radio. Unselected: <code>--ds-background-input-hovered</code> with a <code>--ds-border-brand</code> edge (or <code>--ds-background-neutral-hovered</code> in <code>soft</code>). Selected: the hovered step of the selected bold fill (or <code>--ds-background-selected-hovered</code> in <code>soft</code>).</td></tr>
 <tr><td>Selected</td><td>As Radio: <code>--ds-background-selected-bold</code> fill and <code>--ds-border-selected</code> edge; in <code>soft</code>, <code>--ds-background-selected</code> fill, 1px <code>--ds-border-selected</code> edge, and a trailing <code>fa-solid fa-check</code> icon in <code>--ds-icon-selected</code>.</td></tr>
-<tr><td>Pressed</td><td>No step of its own in plain/card; in <code>soft</code>, a selected option steps to <code>--ds-background-selected-pressed</code>.</td></tr>
+<tr><td>Pressed</td><td>No step of its own in plain/card; in <code>soft</code>, an unselected option steps to <code>--ds-background-neutral-pressed</code> and a selected option steps to <code>--ds-background-selected-pressed</code>.</td></tr>
 <tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code> on the one tab stop (around the row in <code>soft</code> and <code>tile</code>).</td></tr>
-<tr><td>Invalid</td><td>Every unselected option takes <code>--ds-border-danger</code>, with one message for the group.</td></tr>
+<tr><td>Invalid</td><td>Unselected options take <code>--ds-border-danger</code> (and in <code>soft</code>, selected options do too), with one message for the group.</td></tr>
 <tr><td>Read-only</td><td>Full contrast, focusable, no hover, <code>aria-readonly</code> on the group; unchecked radios take the <code>--ds-background-neutral</code> fill and the answer does not change.</td></tr>
 <tr><td>Disabled</td><td>Every option takes the disabled fill and edge and leaves the tab order.</td></tr>
 </tbody>
@@ -219,31 +219,75 @@ In a flow of choice questions (onboarding, quizzes, check-ins, surveys), pick on
 
 <DoDontPair
     doExample={
-        <RadioGroup
-            name="do-rg-minority"
-            legend="Which goal comes first for this session?"
-            appearance="soft"
-            defaultValue="fluency"
-            options={[
-                { value: 'fluency', label: 'Concept fluency' },
-                { value: 'homework', label: 'Homework completion' },
-            ]}
-        />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
+            <RadioGroup
+                name="do-rg-minority-1"
+                legend="Session format"
+                appearance="soft"
+                defaultValue="one"
+                options={[
+                    { value: 'one', label: 'One-on-one' },
+                    { value: 'group', label: 'Small group' },
+                ]}
+            />
+            <RadioGroup
+                name="do-rg-minority-2"
+                legend="First goal for this session"
+                appearance="soft"
+                defaultValue="fluency"
+                options={[
+                    { value: 'fluency', label: 'Concept fluency' },
+                    { value: 'homework', label: 'Homework completion' },
+                ]}
+            />
+            <CheckboxGroup
+                name="do-rg-minority-3"
+                legend="Subjects you can tutor"
+                appearance="card"
+                defaultValue={['math']}
+                options={[
+                    { value: 'math', label: 'Math' },
+                    { value: 'reading', label: 'Reading' },
+                ]}
+            />
+        </div>
     }
-    doCaption="In a flow where most questions are single-select, the majority single-select questions use soft rows while the occasional multi-select question keeps its visible checkboxes."
+    doCaption="Two single-select questions use soft rows without radio dots; the one multi-select question keeps its visible checkboxes."
     dontExample={
-        <RadioGroup
-            name="dont-rg-minority"
-            legend="Which goal comes first for this session?"
-            appearance="card"
-            defaultValue="fluency"
-            options={[
-                { value: 'fluency', label: 'Concept fluency' },
-                { value: 'homework', label: 'Homework completion' },
-            ]}
-        />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
+            <RadioGroup
+                name="dont-rg-minority-1"
+                legend="Session format"
+                appearance="card"
+                defaultValue="one"
+                options={[
+                    { value: 'one', label: 'One-on-one' },
+                    { value: 'group', label: 'Small group' },
+                ]}
+            />
+            <RadioGroup
+                name="dont-rg-minority-2"
+                legend="First goal for this session"
+                appearance="card"
+                defaultValue="fluency"
+                options={[
+                    { value: 'fluency', label: 'Concept fluency' },
+                    { value: 'homework', label: 'Homework completion' },
+                ]}
+            />
+            <CheckboxGroup
+                name="dont-rg-minority-3"
+                legend="Subjects you can tutor"
+                appearance="soft"
+                defaultValue={['math']}
+                options={[
+                    { value: 'math', label: 'Math' },
+                    { value: 'reading', label: 'Reading' },
+                ]}
+            />
+        </div>
     }
-    dontCaption="Every question in the flow shows bordered control chrome, so a switch from single-select to multi-select stops standing out."
+    dontCaption="The two majority single-select questions keep their radio dots while the minority multi-select question goes soft without checkboxes."
 />
 
 ### Name the question with a group label.

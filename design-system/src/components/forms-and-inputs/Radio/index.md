@@ -114,10 +114,10 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | State | What changes |
 | --- | --- |
 | Hovered | Unselected: `--ds-background-input-hovered` with a `--ds-border-brand` edge (or `--ds-background-neutral-hovered` in `soft`). Selected: the hovered step of the selected bold fill (or `--ds-background-selected-hovered` in `soft`). |
-| Pressed | No step of its own in plain/card. In `soft`, a selected row takes `--ds-background-selected-pressed`. |
+| Pressed | No step of its own in plain/card. In `soft`, an unselected row takes `--ds-background-neutral-pressed` and a selected row takes `--ds-background-selected-pressed`. |
 | Focused | A 2px ring in `--ds-border-focused`, 2px off the radio (or around the row in `soft` and `tile`), for keyboard focus only. |
 | Selected | `--ds-background-selected-bold` fill and `--ds-border-selected` edge; the dot is `--ds-icon-inverse`. In `soft`, `--ds-background-selected` fill, 1px `--ds-border-selected` edge, and a trailing check in `--ds-icon-selected`. |
-| Invalid | The unselected radio or row takes `--ds-border-danger`. A selected radio keeps its fill. |
+| Invalid | The unselected radio or tile takes `--ds-border-danger` (in `soft`, both unselected and selected rows take `--ds-border-danger`). |
 | Read-only | Full contrast, in the tab order, no hover; an unchecked radio takes the `--ds-background-neutral` fill. Not changeable. |
 | Disabled | `--ds-background-disabled` fill, `--ds-border-disabled` edge, `--ds-icon-disabled` dot or check. Out of the tab order. |
 
@@ -180,7 +180,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--border-width-default` · `--border-width-selected` · `--card-pad-default` · `--choice-tile-width` · `--control-sm` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-background-selected` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-icon-selected` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-surface` · `--ds-surface-hovered` · `--ds-text` · `--icon-sm` · `--inline-md` · `--pad-x-lg` · `--pad-x-md` · `--pad-y-md` · `--plus-choice-indent` · `--radio-control-size` · `--radius-control-md` · `--radius-full` · `--space-025` · `--space-0375` · `--space-050` · `--stack-sm` · `--stroke-1` · `--stroke-2` · `--type-weight-medium`
+`--body-default` · `--border-width-default` · `--border-width-selected` · `--card-pad-default` · `--choice-tile-width` · `--control-sm` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-neutral` · `--ds-background-selected` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-surface` · `--ds-surface-hovered` · `--ds-text` · `--pad-x-lg` · `--pad-x-md` · `--plus-choice-indent` · `--radio-control-size` · `--radius-control-md` · `--radius-full` · `--space-025` · `--space-0375` · `--space-050` · `--stack-sm` · `--stroke-1` · `--stroke-2` · `--type-weight-medium`
 
 From `design-system/src/components/forms-and-inputs/Radio/Radio.scss`. Override these through the token layer, never with a literal.
 

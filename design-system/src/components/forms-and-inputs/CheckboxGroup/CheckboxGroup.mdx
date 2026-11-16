@@ -166,9 +166,9 @@ Use `CheckboxGroup` for one question where a person may pick several answers —
 <tr><td>Rest</td><td>Plain/card as Checkbox; <code>soft</code> uses <code>--ds-background-neutral</code> with no border; tile uses <code>--ds-surface</code> fill and 1px <code>--ds-border</code> edge.</td></tr>
 <tr><td>Hovered</td><td>Plain/card as Checkbox; unselected <code>soft</code> uses <code>--ds-background-neutral-hovered</code>; unselected tile uses <code>--ds-surface-hovered</code> and <code>--ds-border-brand</code>; selected <code>soft</code> and tile use <code>--ds-background-selected-hovered</code>.</td></tr>
 <tr><td>Selected</td><td>Each selected Checkbox takes <code>--ds-background-selected-bold</code>; a selected <code>soft</code> row takes <code>--ds-background-selected</code>, a 1px <code>--ds-border-selected</code> edge, and a trailing <code>fa-solid fa-check</code> icon in <code>--ds-icon-selected</code>; a selected tile takes <code>--ds-background-selected</code> and a 2px <code>--ds-border-selected</code> edge.</td></tr>
-<tr><td>Pressed</td><td>In <code>soft</code>, a selected row steps to <code>--ds-background-selected-pressed</code>.</td></tr>
+<tr><td>Pressed</td><td>In <code>soft</code>, an unselected row steps to <code>--ds-background-neutral-pressed</code> and a selected row steps to <code>--ds-background-selected-pressed</code>.</td></tr>
 <tr><td>Focused</td><td>2px ring in <code>--ds-border-focused</code>: around the box in plain/card, and outside the row or tile in <code>soft</code> and <code>tile</code> appearances.</td></tr>
-<tr><td>Invalid</td><td>Unselected options take <code>--ds-border-danger</code>, with one error message announced for the group.</td></tr>
+<tr><td>Invalid</td><td>Unselected options take <code>--ds-border-danger</code> (and in <code>soft</code>, selected options do too), with one error message announced for the group.</td></tr>
 <tr><td>Read-only</td><td>Full contrast, focusable, no hover, <code>aria-readonly</code> on each Checkbox; unchecked controls and tiles take <code>--ds-background-neutral</code>.</td></tr>
 <tr><td>Disabled</td><td>Every option takes the disabled fill and edge and leaves the tab order.</td></tr>
 </tbody>

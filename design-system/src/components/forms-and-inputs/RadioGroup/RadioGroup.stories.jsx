@@ -309,6 +309,7 @@ TwoGroupsWithoutIds.play = async ({ canvasElement }) => {
     await expect(new Set(ids).size).toBe(4);
     await userEvent.click(first[0]);
     await userEvent.click(second[1]);
+    await userEvent.unhover(second[1]);
     await expect(first[0].nextElementSibling.checked).toBe(true);
 };
 
@@ -390,16 +391,18 @@ Soft.play = async ({ canvasElement }) => {
     // Rest state on unselected row.
     rows[0].style.transition = 'none';
     rows[1].style.transition = 'none';
-    await expect(getComputedStyle(rows[1]).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+    await expect(withForcedPseudo(canvasElement, ':hover', () => getComputedStyle(rows[1]).backgroundColor)).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
     await expect(getComputedStyle(rows[1]).borderTopColor).toBe('rgba(0, 0, 0, 0)');
     await expect(getComputedStyle(rows[1].querySelector('.plus-choice-soft-check')).opacity).toBe('0');
 
-    // Unselected hover state.
+    // Unselected hover and pressed states.
     const restHover = withForcedPseudo(rows[1], ':hover', () => getComputedStyle(rows[1]).backgroundColor);
     await expect(restHover).toBe(tokenColor(canvasElement, '--ds-background-neutral-hovered'));
+    const restPressed = withForcedPseudo(rows[1], ':active', () => getComputedStyle(rows[1]).backgroundColor);
+    await expect(restPressed).toBe(tokenColor(canvasElement, '--ds-background-neutral-pressed'));
 
     // Selected state: fill, 1px border, trailing check.
-    await expect(getComputedStyle(rows[0]).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected'));
+    await expect(withForcedPseudo(canvasElement, ':hover', () => getComputedStyle(rows[0]).backgroundColor)).toBe(tokenColor(canvasElement, '--ds-background-selected'));
     await expect(px(getComputedStyle(rows[0]).borderTopWidth)).toBe(1);
     await expect(getComputedStyle(rows[0]).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-selected'));
     const check = rows[0].querySelector('.plus-choice-soft-check');

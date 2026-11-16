@@ -110,7 +110,12 @@ const Checkbox = ({
                 <FieldLabel htmlFor={fieldId} labelMarker={labelMarker} isRequired={isRequired} name={name} className="plus-form-checkbox-label">
                     {label}
                 </FieldLabel>
-                {isSoft && <i className="fa-solid fa-check plus-choice-soft-check" aria-hidden="true" />}
+                {isSoft && (
+                    <i
+                        className={`fa-solid ${isIndeterminate ? 'fa-minus' : 'fa-check'} plus-choice-soft-check`}
+                        aria-hidden="true"
+                    />
+                )}
             </div>
             <FieldCaption messageId={messageId} message={description} tone="help" />
         </FieldFrame>
