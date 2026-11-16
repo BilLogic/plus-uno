@@ -431,7 +431,7 @@ const PatternSidebar = ({
                         className="plus-pattern-sidebar__twist"
                         appearance="subtle"
                         spacing="compact"
-                        icon="angle-down"
+                        icon={<Icon name="angle-down" size={12} />}
                         label={`${shut ? 'Show' : 'Hide'} ${item.text} tabs`}
                         tooltip={shut ? 'Show tabs' : 'Hide tabs'}
                         aria-expanded={!shut}

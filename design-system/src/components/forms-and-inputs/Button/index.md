@@ -133,7 +133,7 @@ Most buttons need no icon. Add one only when the glyph has an established meanin
 | Padding | 12: `--pad-x-md`. Compact 8: `--pad-x-sm`. |
 | Radius | 6: `--button-radius-default`. Compact 4: `--button-radius-compact`. |
 | Icon-to-label gap | 4: `--inline-sm`. |
-| Label | Body/default at the medium weight; icons at 16 (`--icon-md`). |
+| Label | Body/default at the medium weight; icons at 16 (`--icon-md`), chevrons at 12 (`--icon-sm`). |
 
 ## Content guidelines
 
@@ -180,7 +180,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--border-width-default` · `--button-radius-compact` · `--button-radius-default` · `--control-md` · `--control-sm` · `--ds-background-disabled` · `--ds-border-disabled` · `--ds-icon-disabled` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text-disabled` · `--icon-md` · `--inline-sm` · `--pad-x-md` · `--pad-x-sm` · `--radius-full` · `--type-weight-medium`
+`--body-default` · `--border-width-default` · `--button-radius-compact` · `--button-radius-default` · `--control-md` · `--control-sm` · `--ds-background-disabled` · `--ds-border-disabled` · `--ds-icon-disabled` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text-disabled` · `--icon-md` · `--icon-sm` · `--inline-sm` · `--pad-x-md` · `--pad-x-sm` · `--radius-full` · `--type-weight-medium`
 
 From `design-system/src/components/forms-and-inputs/Button/Button.scss`. Override these through the token layer, never with a literal.
 

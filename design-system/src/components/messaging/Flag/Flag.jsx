@@ -355,7 +355,7 @@ export const Flag = ({
                 <div className="plus-flag-controls">
                     {bold && (
                         <IconButton
-                            icon={expanded ? 'chevron-up' : 'chevron-down'}
+                            icon={<Icon name={expanded ? 'chevron-up' : 'chevron-down'} size={12} />}
                             label={expanded ? 'Collapse' : 'Expand'}
                             appearance="subtle"
                             spacing="compact"

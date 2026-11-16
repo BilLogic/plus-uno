@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
+import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { CountTag } from '@/components';
 import OptionRow from './OptionRow';
 import { iconClass } from '../../../lib/icon';
@@ -113,6 +114,8 @@ LeadingAndTrailing.play = async ({ canvasElement }) => {
     const step = labelLeft(child) - labelLeft(parent);
     await expect(step).toBeGreaterThan(0);
     await expect(step).toBe(parseFloat(getComputedStyle(child).getPropertyValue('--plus-option-row-indent-step')) || 20);
+    await expect(px(getComputedStyle(canvasElement.querySelector('.plus-option-row-toggle')).fontSize), 'tree toggle is --icon-sm').toBe(tokenLength(canvasElement, '--icon-sm'));
+    await expect(px(getComputedStyle(canvasElement.querySelector('.plus-option-row-chevron')).fontSize), 'cascader chevron is --icon-sm').toBe(tokenLength(canvasElement, '--icon-sm'));
 };
 
 /**

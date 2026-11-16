@@ -474,7 +474,7 @@ export const CompactChecklist = ({
                     appearance="subtle"
                     spacing="compact"
                     shouldFitContainer
-                    iconAfter="angle-right"
+                    iconAfter={<Icon name="angle-right" size={12} />}
                     onClick={(event) => {
                         event.stopPropagation();
                         onOpen?.(event);

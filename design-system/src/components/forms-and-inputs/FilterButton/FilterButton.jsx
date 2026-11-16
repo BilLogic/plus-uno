@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
+import Icon from '../../images-and-icons/Icon';
 import { Button } from '../Button/Button';
 import './FilterButton.scss';
 
@@ -22,7 +23,7 @@ export const FilterButton = ({
     return (
         <Button
             appearance={appearance}
-            iconAfter={hasChevronDown ? 'chevron-down' : undefined}
+            iconAfter={hasChevronDown ? <Icon name="chevron-down" size={12} /> : undefined}
             className={clsx('plus-filter-btn', className)}
             {...props}
         >
