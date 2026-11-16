@@ -2,6 +2,7 @@ import React, { useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '@/components/forms-and-inputs/Button';
 import useFieldId from '../useFieldId';
+import { LabelMarker } from '../_internal/FieldFrame';
 import Icon from '../../images-and-icons/Icon';
 import FileUploadContext from '../_internal/FileUploadContext';
 import './FileUpload.scss';
@@ -26,6 +27,7 @@ const FileUpload = ({
     id,
     name,
     label,
+    labelMarker,
     isRequired = false,
     description,
     acceptedFormats,
@@ -180,10 +182,7 @@ const FileUpload = ({
                     <div className="plus-file-upload-label-row">
                         {label && (
                             <label htmlFor={fieldId} className={`plus-file-upload-label ${isDisabled ? 'plus-file-upload-label-disabled' : ''}`}>
-                                {label}
-                                {isRequired && (
-                                    <span className="plus-file-upload-required" aria-label="required">*</span>
-                                )}
+                                {label}<LabelMarker marker={labelMarker} isRequired={isRequired} />
                             </label>
                         )}
                         {batchStatus && (
@@ -235,13 +234,14 @@ const FileUpload = ({
                             onClick={isReadOnly ? (event) => event.preventDefault() : undefined}
                             onKeyDown={isReadOnly ? (event) => { if (event.key === 'Enter' || event.key === ' ') event.preventDefault(); } : undefined}
                             className="plus-file-upload-input"
-                            aria-label={typeof label === 'string' && label ? label : 'File upload'}
+                            aria-label={label ? undefined : 'File upload'}
                             {...props}
                             aria-describedby={[
                                 props['aria-describedby'],
                                 descriptionText ? descriptionId : undefined,
                                 validationId,
                             ].filter(Boolean).join(' ') || undefined}
+                            aria-required={isRequired || undefined}
                             aria-invalid={state === 'invalid' || undefined}
                             aria-readonly={isReadOnly || undefined}
                         />
@@ -324,7 +324,9 @@ FileUpload.propTypes = {
     name: PropTypes.string,
     /** The visible label above the field. Without one, the file input is named "File upload". */
     label: PropTypes.node,
-    /** Shows an asterisk on the label. */
+    /** Marks the form's minority case in plain text after the label: `required` or `optional`. */
+    labelMarker: PropTypes.oneOf(['required', 'optional']),
+    /** Sets `aria-required` on the file input. Pair with `labelMarker="required"` only when required fields are the minority in the form. */
     isRequired: PropTypes.bool,
     /** Help text inside the field, such as size limits. When omitted, it is built from `acceptedFormats`. */
     description: PropTypes.string,

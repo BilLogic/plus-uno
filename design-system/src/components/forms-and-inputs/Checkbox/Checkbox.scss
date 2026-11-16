@@ -125,12 +125,6 @@
     cursor: not-allowed;
 }
 
-// Required indicator — drawn by `FieldLabel` as `.plus-field-required`.
-.plus-form-checkbox-wrapper .plus-field-required {
-    margin-left: var(--stack-sm);
-    font-weight: var(--type-weight-regular);
-}
-
 .plus-form-checkbox-wrapper .plus-field-caption {
     padding-left: var(--plus-choice-indent);
 }

@@ -358,10 +358,11 @@ export const DisabledWithReason = {
 };
 
 export const Required = {
-    render: () => <Radio id="radio-ex-required" name="radio-ex-required" label="Weekly" value="weekly" isRequired />,
+    render: () => <Radio id="radio-ex-required" name="radio-ex-required" label="Weekly" value="weekly" isRequired labelMarker="required" />,
     play: async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByRole('radio', { name: 'Weekly' })).toBeInTheDocument();
         await expect(canvasElement.querySelector('.plus-form-radio-wrapper')).toHaveClass('plus-form-radio-required');
-        await expect(canvasElement.querySelector('.plus-field-required')).toHaveAttribute('aria-hidden', 'true');
+        await expect(canvasElement.textContent).not.toContain('*');
     },
 };
 

@@ -114,9 +114,10 @@ Don't: Disabled fades a value people need to read.
   accessible name whether or not you show it. If the visible label is rendered
   by the caller instead, point it at the input with `htmlFor`; if there is no
   text anywhere, pass `aria-label`.
-- **`isRequired` shows an asterisk and sets `aria-required`.** The asterisk is
-  hidden from assistive technology. The form explains it once, in a legend above
-  the fields.
+- **`isRequired` sets `aria-required` regardless of the label marker.** Pair it
+  with `labelMarker="required"` only when required fields are the minority in
+  the form; when most fields are required, mark the optional ones with
+  `labelMarker="optional"` instead.
 - **An error is announced.** The message gets an id, the input points at it with
   `aria-describedby`, and `isInvalid` sets `aria-invalid` and renders the message
   with `role="alert"`. A warning, a success message and standing help are
@@ -139,7 +140,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Parts
 
-1. **Label.** Names the field. A required marker and an info tooltip sit beside it.
+1. **Label.** Names the field. An optional minority marker (`"(optional)"` or `"(required)"`) follows it in plain text, and an info tooltip sits beside it.
 2. **Before.** An icon, a text affix or a Button before the control.
 3. **Control.** The native input.
 4. **After.** An icon, a text affix, a Button or the number steppers.
@@ -188,7 +189,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `id` | string | — | Id of the input, which the label points at. A generated id is used when omitted. |
 | `name` | string | — | Form key of the input. Number steppers also report it in the `onChange` event. |
 | `label` | node | — | Visible label above the field. A string label also names the number steppers, as "Increase" and "Decrease" followed by the label. |
-| `isRequired` | bool | `false` | Shows an asterisk and sets `aria-required`. Explain the asterisk once, in the form's legend. |
+| `labelMarker` | enum | — | Marks the form's minority case in plain text after the label: `required` or `optional`. |
+| `isRequired` | bool | `false` | Sets `aria-required` on the input. Pair with `labelMarker="required"` only when required fields are the minority in the form. |
 | `isLabelHidden` | bool | `false` | Hides the label visually. It is still rendered and still names the input. |
 | `info` | node | — | Text for an info tooltip beside the label. |
 | `caption` | node | — | Standing help under the field. A message takes its place. |
@@ -222,6 +224,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `testId` | string | — | Maps to `data-testid`, for test queries. |
 
 ## Variants
+
+**`labelMarker`** — `required` · `optional`
 
 **`spacing`** — `default` · `compact`
 

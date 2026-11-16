@@ -44,9 +44,9 @@
     font: var(--body-sm);
 }
 
-.plus-field-required {
-    color: var(--ds-text-danger);
-    margin-left: var(--stack-sm);
+// The (required) or (optional) word: the label's type style, quieter.
+.plus-field-marker {
+    color: var(--ds-text-subtle);
 }
 
 // Hidden, not removed: the label still names the control.

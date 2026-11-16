@@ -570,9 +570,9 @@ export const Focused = {
 };
 
 export const Required = {
-    render: () => <RadioGroup name="rg-ex-required" legend="Did the session happen?" options={['Yes', 'No']} isRequired />,
+    render: () => <RadioGroup name="rg-ex-required" legend="Did the session happen?" options={['Yes', 'No']} isRequired labelMarker="required" />,
     play: async ({ canvasElement }) => {
-        const group = within(canvasElement).getByRole('radiogroup', { name: /Did the session happen\?/ });
+        const group = within(canvasElement).getByRole('radiogroup', { name: 'Did the session happen? (required)' });
         await expect(group.getAttribute('aria-required')).toBe('true');
     },
 };

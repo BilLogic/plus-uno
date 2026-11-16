@@ -28,7 +28,13 @@ export default {
         },
         isRequired: {
             control: 'boolean',
-            description: 'Whether the field is required (shows red asterisk)',
+            description: 'Sets aria-required on the date and time inputs',
+            table: { category: 'Content' },
+        },
+        labelMarker: {
+            control: 'radio',
+            options: [undefined, 'optional', 'required'],
+            description: 'Minority marker after the label',
             table: { category: 'Content' },
         },
         datePlaceholder: {

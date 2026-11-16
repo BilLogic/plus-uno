@@ -1879,12 +1879,24 @@
           "deprecated": null
         },
         {
+          "name": "labelMarker",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "required",
+            "optional"
+          ],
+          "description": "Marks the form's minority case in plain text after the label: `required` or `optional`.",
+          "deprecated": null
+        },
+        {
           "name": "isRequired",
           "type": "bool",
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Shows an asterisk on the label and sets `aria-required`.",
+          "description": "Sets `aria-required` on the combobox. Pair with `labelMarker=\"required\"` only when required fields are the minority in the form.",
           "deprecated": null
         },
         {
@@ -2177,12 +2189,24 @@
           "deprecated": null
         },
         {
+          "name": "labelMarker",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "required",
+            "optional"
+          ],
+          "description": "Minority marker after the label",
+          "deprecated": null
+        },
+        {
           "name": "isRequired",
           "type": "bool",
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Show the required marker and require it natively",
+          "description": "Set aria-required on the checkbox",
           "deprecated": null
         },
         {
@@ -2347,8 +2371,7 @@
         "--stack-sm",
         "--stroke-1",
         "--stroke-2",
-        "--type-weight-medium",
-        "--type-weight-regular"
+        "--type-weight-medium"
       ]
     },
     {
@@ -2448,12 +2471,24 @@
           "deprecated": null
         },
         {
+          "name": "labelMarker",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "required",
+            "optional"
+          ],
+          "description": "Marks the form's minority case in plain text after the legend: `required` or `optional`.",
+          "deprecated": null
+        },
+        {
           "name": "isRequired",
           "type": "bool",
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Marks the question as needing an answer on the legend.",
+          "description": "Announces the group as required to assistive technology. Pair with `labelMarker=\"required\"` only when required fields are the minority in the form.",
           "deprecated": null
         },
         {
@@ -3630,12 +3665,24 @@
           "deprecated": null
         },
         {
+          "name": "labelMarker",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "required",
+            "optional"
+          ],
+          "description": "Minority marker after the label",
+          "deprecated": null
+        },
+        {
           "name": "isRequired",
           "type": "bool",
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Whether the field is required (shows red asterisk)",
+          "description": "Sets aria-required on the date and time inputs",
           "deprecated": null
         },
         {
@@ -3901,7 +3948,6 @@
         "--body-default",
         "--body-sm",
         "--ds-text",
-        "--ds-text-danger",
         "--ds-text-subtle",
         "--space-0625",
         "--stack-md",
@@ -4267,6 +4313,18 @@
           "deprecated": null
         },
         {
+          "name": "labelMarker",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "required",
+            "optional"
+          ],
+          "description": "Marks the form's minority case in plain text after the legend: `required` or `optional`.",
+          "deprecated": null
+        },
+        {
           "name": "isDisabled",
           "type": "bool",
           "required": false,
@@ -4281,7 +4339,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Marked on the legend.",
+          "description": "Announces the group as required to assistive technology. Pair with `labelMarker=\"required\"` only when required fields are the minority in the form.",
           "deprecated": null
         },
         {
@@ -4569,12 +4627,24 @@
           "deprecated": null
         },
         {
+          "name": "labelMarker",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "required",
+            "optional"
+          ],
+          "description": "Marks the form's minority case in plain text after the label: `required` or `optional`.",
+          "deprecated": null
+        },
+        {
           "name": "isRequired",
           "type": "bool",
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Shows an asterisk on the label.",
+          "description": "Sets `aria-required` on the file input. Pair with `labelMarker=\"required\"` only when required fields are the minority in the form.",
           "deprecated": null
         },
         {
@@ -11038,12 +11108,24 @@
           "deprecated": null
         },
         {
+          "name": "labelMarker",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "required",
+            "optional"
+          ],
+          "description": "Marks the form's minority case in plain text after the label: `required` or `optional`.",
+          "deprecated": null
+        },
+        {
           "name": "isRequired",
           "type": "bool",
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Shows an asterisk on the label and sets the native `required` attribute.",
+          "description": "Sets the required constraint (`aria-required`) on a standalone radio. Pair with `labelMarker=\"required\"` only when required fields are the minority in the form.",
           "deprecated": null
         },
         {
@@ -11212,8 +11294,7 @@
         "--stack-sm",
         "--stroke-1",
         "--stroke-2",
-        "--type-weight-medium",
-        "--type-weight-regular"
+        "--type-weight-medium"
       ]
     },
     {
@@ -11344,12 +11425,24 @@
           "deprecated": null
         },
         {
+          "name": "labelMarker",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "required",
+            "optional"
+          ],
+          "description": "Marks the form's minority case in plain text after the legend: `required` or `optional`.",
+          "deprecated": null
+        },
+        {
           "name": "isRequired",
           "type": "bool",
           "required": false,
           "default": "false",
           "values": null,
-          "description": "The group needs an answer. Marked on the legend.",
+          "description": "Sets `aria-required` on the radiogroup. Pair with `labelMarker=\"required\"` only when required fields are the minority in the form.",
           "deprecated": null
         },
         {
@@ -11659,12 +11752,24 @@
           "deprecated": null
         },
         {
+          "name": "labelMarker",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "required",
+            "optional"
+          ],
+          "description": "Marks the form's minority case in plain text after the label: `required` or `optional`.",
+          "deprecated": null
+        },
+        {
           "name": "isRequired",
           "type": "bool",
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Shows an asterisk on the label and marks the group required.",
+          "description": "Marks the radiogroup required (`aria-required`). Pair with `labelMarker=\"required\"` only when required fields are the minority in the form.",
           "deprecated": null
         },
         {
@@ -11781,7 +11886,6 @@
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
         "--ds-text",
-        "--ds-text-danger",
         "--icon-lg",
         "--icon-md",
         "--radius-full",
@@ -12848,12 +12952,24 @@
           "deprecated": null
         },
         {
+          "name": "labelMarker",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "required",
+            "optional"
+          ],
+          "description": "Marks the form's minority case in plain text after the label: `required` or `optional`.",
+          "deprecated": null
+        },
+        {
           "name": "isRequired",
           "type": "bool",
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Shows an asterisk on the label and sets `aria-required`.",
+          "description": "Sets `aria-required` on the combobox. Pair with `labelMarker=\"required\"` only when required fields are the minority in the form.",
           "deprecated": null
         },
         {
@@ -15187,12 +15303,24 @@
           "deprecated": null
         },
         {
+          "name": "labelMarker",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "required",
+            "optional"
+          ],
+          "description": "Marks the form's minority case in plain text after the label: `required` or `optional`.",
+          "deprecated": null
+        },
+        {
           "name": "required",
           "type": "bool",
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Shows an asterisk and sets `aria-required`.",
+          "description": "Sets `aria-required` on the combobox. Pair with `labelMarker=\"required\"` only when required fields are the minority in the form.",
           "deprecated": null
         },
         {
@@ -15491,12 +15619,24 @@
           "deprecated": null
         },
         {
+          "name": "labelMarker",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "required",
+            "optional"
+          ],
+          "description": "Marks the form's minority case in plain text after the label: `required` or `optional`.",
+          "deprecated": null
+        },
+        {
           "name": "isRequired",
           "type": "bool",
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Shows an asterisk and sets `aria-required`.",
+          "description": "Sets `aria-required` on the textarea. Pair with `labelMarker=\"required\"` only when required fields are the minority in the form.",
           "deprecated": null
         },
         {
@@ -15773,12 +15913,24 @@
           "deprecated": null
         },
         {
+          "name": "labelMarker",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "required",
+            "optional"
+          ],
+          "description": "Marks the form's minority case in plain text after the label: `required` or `optional`.",
+          "deprecated": null
+        },
+        {
           "name": "isRequired",
           "type": "bool",
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Shows an asterisk and sets `aria-required`. Explain the asterisk once, in the form's legend.",
+          "description": "Sets `aria-required` on the input. Pair with `labelMarker=\"required\"` only when required fields are the minority in the form.",
           "deprecated": null
         },
         {
@@ -16905,12 +17057,24 @@
           "deprecated": null
         },
         {
+          "name": "labelMarker",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "required",
+            "optional"
+          ],
+          "description": "Marks the form's minority case in plain text after the label: `required` or `optional`.",
+          "deprecated": null
+        },
+        {
           "name": "isRequired",
           "type": "bool",
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Shows an asterisk on the label and sets `aria-required`.",
+          "description": "Sets `aria-required` on the combobox. Pair with `labelMarker=\"required\"` only when required fields are the minority in the form.",
           "deprecated": null
         },
         {

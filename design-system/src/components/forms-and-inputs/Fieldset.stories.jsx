@@ -18,6 +18,7 @@ export default {
     argTypes: {
         children: { table: { disable: true } },
         legend: { control: 'text', table: { category: 'Content' } },
+        labelMarker: { control: 'radio', options: [undefined, 'optional', 'required'], table: { category: 'Content' } },
         isDisabled: { control: 'boolean', table: { category: 'Behavior' } },
         isRequired: { control: 'boolean', table: { category: 'Behavior' } },
         error: { control: 'text', table: { category: 'Behavior' } },
@@ -72,7 +73,7 @@ CheckboxGroup.play = async ({ canvasElement }) => {
 
 export const WithRequiredAndError = () => (
     <div style={stack}>
-        <Fieldset legend="Required" isRequired>
+        <Fieldset legend="Required" isRequired labelMarker="required">
             <Checkbox name="fs-required" label="I agree" />
         </Fieldset>
         <Fieldset legend="Invalid" error="Choose at least one.">
@@ -87,7 +88,7 @@ export const WithRequiredAndError = () => (
 /** One story per state, for the Examples tab. */
 export const Required = {
     render: () => (
-        <Fieldset legend="Notify me by" isRequired>
+        <Fieldset legend="Notify me by" isRequired labelMarker="required">
             <Checkbox name="fs-ex-required" label="Email" />
             <Checkbox name="fs-ex-required-2" label="Text" />
         </Fieldset>
@@ -95,7 +96,7 @@ export const Required = {
     play: async ({ canvasElement }) => {
         const group = within(canvasElement).getByRole('group', { name: /Notify me by/ });
         await expect(group).toHaveAccessibleName('Notify me by (required)');
-        await expect(canvasElement.querySelector('.plus-fieldset-required')).toHaveAttribute('aria-hidden', 'true');
+        await expect(canvasElement.querySelector('.plus-fieldset-legend')).toHaveTextContent(/^Notify me by \(required\)$/);
     },
 };
 

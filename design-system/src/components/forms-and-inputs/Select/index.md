@@ -170,7 +170,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 ## Parts
 
 1. **Field.** The box that shows the value, or the placeholder, the plain ✕ clear button when a value is set and clearable, and the caret.
-2. **Label.** Names the field. A required marker follows it.
+2. **Label.** Names the field. An optional minority marker (`"(optional)"` or `"(required)"`) follows it in plain text.
 3. **List.** The options, in a popup under the field. Groups carry a heading; when a value is set and clearable, a compact subtle "Clear" button sits at the end of the list footer.
 4. **Caption.** Helper text, or the error that replaces it.
 
@@ -238,7 +238,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `spacing` | enum | `'default'` | `default` draws 40 and `compact` draws 32. |
 | `isDisabled` | bool | `false` | Dims the field and blocks opening and changing it. |
 | `isReadOnly` | bool | `false` | Shows the value, stays focusable, and cannot be changed. |
-| `isRequired` | bool | `false` | Shows an asterisk on the label and sets `aria-required`. |
+| `labelMarker` | enum | — | Marks the form's minority case in plain text after the label: `required` or `optional`. |
+| `isRequired` | bool | `false` | Sets `aria-required` on the combobox. Pair with `labelMarker="required"` only when required fields are the minority in the form. |
 | `info` | node | — | Text for the info tooltip beside the label. |
 | `isInvalid` | bool | `false` | Draws the error border, sets `aria-invalid`, and `errorMessage` becomes the announced caption. |
 | `errorMessage` | node | — | The caption shown under the field while `isInvalid` is set. It is announced. |
@@ -265,6 +266,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 **`displayMode`** — `tags` · `text`
 
 **`spacing`** — `default` · `compact`
+
+**`labelMarker`** — `required` · `optional`
 
 **`marker`** — `check` · `radio`
 

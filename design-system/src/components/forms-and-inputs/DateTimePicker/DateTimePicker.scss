@@ -15,11 +15,6 @@
     margin-bottom: 0;
     color: var(--ds-text);
     font: var(--body-default);
-
-    .plus-datetime-required {
-        color: var(--ds-text-danger);
-        margin-left: var(--stack-sm);
-    }
 }
 
 /* `showLabel={false}` hides the label, it does not delete it (#225, after #213).

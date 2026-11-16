@@ -161,18 +161,18 @@ authored half, counted rather than assumed.
 | [Button](Button/index.md) | 21 | ✅ | ✅ | ✅ |
 | [ButtonGroup](ButtonGroup/index.md) | 5 | ✅ | ✅ | ✅ |
 | [Calendar](Calendar/index.md) | 10 | ✅ | ✅ | ✅ |
-| [Cascader](Cascader/index.md) | 16 | ✅ | ✅ | ✅ |
-| [Checkbox](Checkbox/index.md) | 21 | ✅ | ✅ | ✅ |
-| [CheckboxGroup](CheckboxGroup/index.md) | 16 | ✅ | ✅ | ✅ |
+| [Cascader](Cascader/index.md) | 17 | ✅ | ✅ | ✅ |
+| [Checkbox](Checkbox/index.md) | 22 | ✅ | ✅ | ✅ |
+| [CheckboxGroup](CheckboxGroup/index.md) | 17 | ✅ | ✅ | ✅ |
 | [ChoiceGrid](ChoiceGrid/index.md) | 12 | ✅ | ✅ | ✅ |
 | [CloseButton](CloseButton/index.md) | 5 | ✅ | ✅ | ✅ |
 | [Comment](Comment/index.md) | 14 | ✅ | ✅ | ✅ |
 | [DatePicker](DatePicker/index.md) | 18 | ✅ | ✅ | ✅ |
-| [DateTimePicker](DateTimePicker/index.md) | 30 | ✅ | ✅ | ✅ |
+| [DateTimePicker](DateTimePicker/index.md) | 31 | ✅ | ✅ | ✅ |
 | [DropdownMenu](DropdownMenu/index.md) | 17 | ✅ | ✅ | ✅ |
-| [Fieldset](Fieldset.md) | 8 | ✅ | ✅ | ✅ |
+| [Fieldset](Fieldset.md) | 9 | ✅ | ✅ | ✅ |
 | [FileItem](FileItem/index.md) | 15 | ✅ | ✅ | ✅ |
-| [FileUpload](FileUpload/index.md) | 19 | ✅ | ✅ | ✅ |
+| [FileUpload](FileUpload/index.md) | 20 | ✅ | ✅ | ✅ |
 | [FilterButton](FilterButton/index.md) | 10 | ✅ | ✅ | ✅ |
 | [FilterMenu](FilterMenu/index.md) | 16 | ✅ | ✕ | ✅ |
 | [IconButton](IconButton/index.md) | 14 | ✅ | ✅ | ✅ |
@@ -181,21 +181,21 @@ authored half, counted rather than assumed.
 | [LinkIconButton](LinkIconButton/index.md) | 11 | ✅ | ✅ | ✅ |
 | [PopupSelect](PopupSelect/index.md) | 18 | ✅ | ✕ | ✅ |
 | [PromptInput](PromptInput/index.md) | 16 | ✅ | ✅ | ✅ |
-| [Radio](Radio/index.md) | 21 | ✅ | ✅ | ✅ |
-| [RadioGroup](RadioGroup/index.md) | 19 | ✅ | ✅ | ✅ |
+| [Radio](Radio/index.md) | 22 | ✅ | ✅ | ✅ |
+| [RadioGroup](RadioGroup/index.md) | 20 | ✅ | ✅ | ✅ |
 | [Range](Range/index.md) | 14 | ✅ | ✅ | ✅ |
-| [Rating](Rating/index.md) | 13 | ✅ | ✅ | ✅ |
+| [Rating](Rating/index.md) | 14 | ✅ | ✅ | ✅ |
 | [RichTextEditor](RichTextEditor/index.md) | 17 | ✅ | ✅ | ✅ |
 | [SearchField](SearchField/index.md) | 33 | ✅ | ✅ | ✅ |
-| [Select](Select/index.md) | 44 | ✅ | ✅ | ✅ |
+| [Select](Select/index.md) | 45 | ✅ | ✅ | ✅ |
 | [SettingRow](SettingRow/index.md) | 11 | ✅ | ✅ | ✅ |
 | [SplitButton](SplitButton/index.md) | 3 | ✅ | ✅ | ✅ |
-| [TagInput](TagInput/index.md) | 27 | ✅ | ✅ | ✅ |
-| [TextArea](TextArea/index.md) | 27 | ✅ | ✅ | ✅ |
-| [TextField](TextField/index.md) | 35 | ✅ | ✅ | ✅ |
+| [TagInput](TagInput/index.md) | 28 | ✅ | ✅ | ✅ |
+| [TextArea](TextArea/index.md) | 28 | ✅ | ✅ | ✅ |
+| [TextField](TextField/index.md) | 36 | ✅ | ✅ | ✅ |
 | [TimePicker](TimePicker/index.md) | 16 | ✅ | ✅ | ✅ |
 | [Toggle](Toggle/index.md) | 17 | ✅ | ✅ | ✅ |
-| [TreeSelect](TreeSelect/index.md) | 17 | ✅ | ✅ | ✅ |
+| [TreeSelect](TreeSelect/index.md) | 18 | ✅ | ✅ | ✅ |
 
 **Authored coverage:** When to use 37/38 (97%) · Correct/incorrect 35/38 (92%) · Accessibility 37/38 (97%)
 

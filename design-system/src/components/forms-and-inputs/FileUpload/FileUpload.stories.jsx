@@ -104,12 +104,12 @@ Overview.parameters = {
 export const Content = () => (
     <div style={{ maxWidth: 'var(--size-5400)' }}>
         <p className="body-default" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--section-stack-md)' }}>
-            Label, required asterisk, accepted formats, and button copy.
+            Label, minority marker, accepted formats, and button copy.
         </p>
         <FileUpload
             id="file-upload-content"
             label="Upload files"
-            isRequired
+            labelMarker="optional"
             acceptedFormats={formats}
             buttonText="Choose a file"
         />
@@ -479,11 +479,13 @@ export const ReadOnly = {
 export const Required = {
     render: () => (
         <div style={wrap}>
-            <FileUpload id="file-upload-ex-required" label="Upload files" isRequired acceptedFormats={formats} buttonText="Choose a file" />
+            <FileUpload id="file-upload-ex-required" label="Upload files" isRequired labelMarker="required" acceptedFormats={formats} buttonText="Choose a file" />
         </div>
     ),
     play: async ({ canvasElement }) => {
-        await expect(canvasElement.querySelector('[aria-label="required"]')).toBeInTheDocument();
+        await expect(fileInput(canvasElement)).toHaveAttribute('aria-required', 'true');
+        await expect(within(canvasElement).getByText('(required)')).toBeInTheDocument();
+        await expect(within(canvasElement).getByText('(required)')).toHaveAttribute('aria-hidden', 'true');
     },
 };
 

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { RadioGroup as BaseRadioGroup } from '@base-ui/react/radio-group';
 import { Radio as BaseRadio } from '@base-ui/react/radio';
 import useFieldId from '../useFieldId';
+import { LabelMarker } from '../_internal/FieldFrame';
 import Icon from '../../images-and-icons/Icon';
 import './Rating.scss';
 
@@ -22,6 +23,7 @@ const Rating = ({
     id,
     name,
     label,
+    labelMarker,
     isRequired = false,
     value = 0,
     variant = 'comments', // 'comments' or 'numeric'
@@ -62,10 +64,7 @@ const Rating = ({
         <div className={wrapperClasses} style={style} {...props}>
             {hasLabel && (
                 <span id={labelId} className="plus-rating-label">
-                    {label}
-                    {isRequired && (
-                        <span className="plus-rating-required" aria-label="required">*</span>
-                    )}
+                    {label}<LabelMarker marker={labelMarker} isRequired={isRequired} />
                 </span>
             )}
             <BaseRadioGroup
@@ -107,7 +106,9 @@ Rating.propTypes = {
     name: PropTypes.string,
     /** Visible label above the stars. It names the group; without one the group is named "Rating". */
     label: PropTypes.node,
-    /** Shows an asterisk on the label and marks the group required. */
+    /** Marks the form's minority case in plain text after the label: `required` or `optional`. */
+    labelMarker: PropTypes.oneOf(['required', 'optional']),
+    /** Marks the radiogroup required (`aria-required`). Pair with `labelMarker="required"` only when required fields are the minority in the form. */
     isRequired: PropTypes.bool,
     /** Current rating, 0 for none up to 5. Every star up to it is filled. Update it from `onChange`. */
     value: PropTypes.number,

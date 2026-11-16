@@ -126,7 +126,7 @@ Use `FileUpload` where a form needs documents, recordings, or archives from the 
 
 ## Parts
 
-1. **Label row.** Names the field, carries the required marker, and displays the batch upload status (`Uploading 2 of 6`) at its end while any `FileItem` child uploads.
+1. **Label row.** Names the field, carries an optional minority marker (`"(optional)"` or `"(required)"`) in plain text, and displays the batch upload status (`Uploading 2 of 6`) at its end while any `FileItem` child uploads.
 2. **Description.** Help text inside the drop zone, built from `acceptedFormats` when `description` is omitted.
 3. **Picker / drop line.** Either a primary `Button` (`buttonText`) or, with `allowFolders`, the `"Choose files or a folder, or drop them here"` line with inline file and folder triggers. Absent when `isReadOnly`.
 4. **Files (`children`).** `FileItem` rows rendered in one bordered list below the drop zone.
@@ -156,9 +156,9 @@ Use `FileUpload` where a form needs documents, recordings, or archives from the 
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Label and batch status</td><td><code>--ds-text</code> in <code>--body-default</code>; batch status in <code>--body-sm</code> and <code>--ds-text-subtle</code>; disabled <code>--ds-text-subtle</code>.</td></tr>
+<tr><td>Label, minority marker, and batch status</td><td><code>--ds-text</code> in <code>--body-default</code>; batch status in <code>--body-sm</code> and <code>--ds-text-subtle</code>; disabled <code>--ds-text-subtle</code>.</td></tr>
 <tr><td>Drop zone container</td><td>Padding <code>--pad-y-md</code> and <code>--pad-x-md</code>; radius <code>--card-radius-compact</code>; border <code>--ds-border</code>; drag-over <code>--ds-background-brand-subtlest</code> and <code>--ds-border-brand</code>.</td></tr>
-<tr><td>Required marker, error</td><td><code>--ds-text-danger</code>, <code>--ds-icon-danger</code>.</td></tr>
+<tr><td>Error message</td><td><code>--ds-text-danger</code>, <code>--ds-icon-danger</code>.</td></tr>
 <tr><td>Success message</td><td><code>--ds-text-success</code>, <code>--ds-icon-success</code>.</td></tr>
 <tr><td>Focus ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code>.</td></tr>
 </tbody>
