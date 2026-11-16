@@ -297,6 +297,10 @@ A corner chosen by role and nesting, following the ordered rules in `design-syst
 
 ### Design system: motion
 
+**Motion demo**:
+A kit `MotionDemo` with paths drawn before the motion, a dashed landing ghost, a speed control and a reduced still; a real-component recording is a "product example", not a demo (ADR-049).
+_Avoid_: "demo" for a real-component story, "recording" for a kit figure
+
 **Motion registry**:
 The per-template, pattern and component event-to-token table for enter, exit and change, with semantic transitions and optional sound cells; `design-system/agent-views/motion/library.md` is its generated view. Motion tokens follow primitives, semantics, patterns and components (ADR-041).
 

@@ -180,6 +180,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/046-drag-runs-on-pragmatic-drag-and-drop.md`](docs/adr/046-drag-runs-on-pragmatic-drag-and-drop.md) | Pragmatic drag and drop owns pointer drag; Base UI supplies the grab handle and Motion supplies spring travel. |
 | [`docs/adr/047-the-design-system-ships-outside-the-repo.md`](docs/adr/047-the-design-system-ships-outside-the-repo.md) | The design system ships outside the repo as one package, @plus-uno/cli, a copy-in registry plus the ds lookup and MCP over one baked snapshot. |
 | [`docs/adr/048-agents-build-in-stages-and-a-ds-fact-has-one-home.md`](docs/adr/048-agents-build-in-stages-and-a-ds-fact-has-one-home.md) | Agents build a screen in five stages (Template, Blocks, Pieces, Polish, Motion) and each design-system fact has one authored home; guidelines/composition/ is retired. |
+| [`docs/adr/049-motion-docs-teach-with-kit-demos.md`](docs/adr/049-motion-docs-teach-with-kit-demos.md) | Motion foundation pages teach with kit MotionDemo figures; real-component motion stories stay in place as play tests and component-page product examples. |
 | [`docs/adr/overview.md`](docs/adr/overview.md) | One file per architecture decision, each checked against the code rather than ported. |
 
 ## Conventions
@@ -209,6 +210,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-138 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+139 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.

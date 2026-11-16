@@ -42,7 +42,7 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 162,690 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 162,970 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -53,7 +53,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `docs/connectors/notion/page-writing` | [`docs/connectors/notion/page-writing.md`](../../docs/connectors/notion/page-writing.md) | 6,695 |
 | `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 23,554 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,988 |
-| `docs/conventions/design-system-glossary` | [`docs/conventions/design-system-glossary.md`](../../docs/conventions/design-system-glossary.md) | 21,384 |
+| `docs/conventions/design-system-glossary` | [`docs/conventions/design-system-glossary.md`](../../docs/conventions/design-system-glossary.md) | 21,664 |
 | `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,535 |
 | `draft-a-prd` | [`agents/uno-bot/skills/draft-a-prd/SKILL.md`](../../agents/uno-bot/skills/draft-a-prd/SKILL.md) | 3,724 |
 | `ds-precedence` | [`agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) | 2,262 |
@@ -2295,6 +2295,10 @@ _Avoid_: "surface" for a layout box
 A corner chosen by role and nesting, following the ordered rules in `design-system/src/styles/Radius.mdx`: template radii, control height ÷ 4, and inner radius = outer radius − padding are distinct roles. Buttons use the field radius minus the slot inset.
 
 ### Design system: motion
+
+**Motion demo**:
+A kit `MotionDemo` with paths drawn before the motion, a dashed landing ghost, a speed control and a reduced still; a real-component recording is a "product example", not a demo (ADR-049).
+_Avoid_: "demo" for a real-component story, "recording" for a kit figure
 
 **Motion registry**:
 The per-template, pattern and component event-to-token table for enter, exit and change, with semantic transitions and optional sound cells; `design-system/agent-views/motion/library.md` is its generated view. Motion tokens follow primitives, semantics, patterns and components (ADR-041).
