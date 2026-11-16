@@ -76,19 +76,26 @@ export const Overview = {
             expect(canvasElement.querySelectorAll('.highcharts-container .highcharts-series').length).toBe(2);
             expect(canvasElement.querySelectorAll('.plus-chart-value').length).toBeGreaterThanOrEqual(5);
         });
-        const containers = canvasElement.querySelectorAll('.highcharts-container');
-        const defaultFills = new Set(
-            [...containers[0].querySelectorAll('.highcharts-series .highcharts-point')].map(
-                (pt) => getComputedStyle(pt).fill,
-            ),
-        );
-        const tonedFills = new Set(
-            [...containers[1].querySelectorAll('.highcharts-series .highcharts-point')].map(
-                (pt) => getComputedStyle(pt).fill,
-            ),
-        );
-        expect(defaultFills.size).toBe(1);
-        expect(tonedFills.size).toBeGreaterThan(1);
+        // The test runner's pointer may rest on a segment, which then draws in
+        // its hovered token. Count fills over the points at rest, and require
+        // any hovered point to wear its base color's `-hovered` step.
+        const points = (container) => [...container.querySelectorAll('.highcharts-series .highcharts-point')];
+        const atRest = (container) =>
+            new Set(
+                points(container)
+                    .filter((pt) => !pt.classList.contains('highcharts-point-hover'))
+                    .map((pt) => pt.getAttribute('fill')),
+            );
+        await waitFor(() => {
+            const containers = canvasElement.querySelectorAll('.highcharts-container');
+            const restFills = atRest(containers[0]);
+            expect(restFills.size).toBe(1);
+            const [base] = restFills;
+            for (const pt of points(containers[0]).filter((p) => p.classList.contains('highcharts-point-hover'))) {
+                expect(pt.getAttribute('fill')).toBe(base.replace(/\)$/, '-hovered)'));
+            }
+            expect(atRest(containers[1]).size).toBeGreaterThan(1);
+        });
 
         for (const node of canvasElement.querySelectorAll('.highcharts-container text, .highcharts-container tspan, .plus-chart-value')) {
             if (!node.textContent?.trim()) continue;
