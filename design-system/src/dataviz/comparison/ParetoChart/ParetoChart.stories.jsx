@@ -1,88 +1,73 @@
 import React from 'react';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
 import ParetoChart from './ParetoChart';
 
 export default {
     title: 'Data visualizations/Comparison/Pareto chart',
     component: ParetoChart,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## Pareto Chart
+    argTypes: {
+        data: { control: 'object', description: 'Array of numerical values' },
+        categories: { control: 'object', description: 'Category labels' },
+        yAxisLabel: { control: 'text', description: 'Y-axis label' },
+        height: { control: 'number', description: 'Chart height in pixels' },
+    },
+};
 
-Shows columns with a **cumulative percentage line** for 80-20 analysis.
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
+};
 
-### Overview
-Shows columns with a **cumulative percentage line** for 80-20 analysis.
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--card-stack-md)',
+};
 
----
-
-### How to Read
-- **Bars** = individual category values
-- **Line** = cumulative percentage
-- Find where line crosses 80% for key factors
-
----
-
-### When to Use
-
-| Use Case | Recommendation |
-|----------|----------------|
-| 80-20 analysis | ✅ Ideal |
-| Root cause analysis | ✅ Ideal |
-| Quality control | ✅ Good |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Support Issues** | Most common problems |
-| **Student Struggles** | Top difficulty areas |
-| **Usage Patterns** | Most used features |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Align the pareto chart setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
-
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
-                `
-            }
-        }
-    }
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
 };
 
 const issuesData = {
-    categories: ['Login Issues', 'Payment', 'Video', 'Schedule', 'Content', 'Other'],
+    categories: ['Login issues', 'Payment', 'Video', 'Schedule', 'Content', 'Other'],
     data: [45, 28, 15, 8, 5, 3],
-    yAxisLabel: 'Tickets'
+    yAxisLabel: 'Tickets',
 };
 
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Support Ticket Analysis</h3>
-            <ParetoChart {...issuesData} />
-        </section>
-    </div>
-);
-
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Support ticket analysis</Heading>
+                <p style={captionStyle}>
+                    Columns sorted from largest to smallest with a cumulative share line.
+                </p>
+                <ParetoChart {...issuesData} />
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelector('.highcharts-container')).not.toBeNull();
+        });
+        for (const label of canvasElement.querySelectorAll('.highcharts-axis-labels text')) {
+            if (!label.textContent?.trim()) continue;
+            const style = getComputedStyle(label);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(style.fontVariantNumeric).toBe('tabular-nums');
+        }
+    },
+};
 
 export const Interactive = {
     args: {
         categories: ['A', 'B', 'C', 'D', 'E'],
         data: [50, 30, 12, 5, 3],
         yAxisLabel: 'Count',
-        height: 400
-    }
+        height: 400,
+    },
 };

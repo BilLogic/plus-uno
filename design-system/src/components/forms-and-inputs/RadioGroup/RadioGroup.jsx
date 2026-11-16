@@ -116,6 +116,7 @@ const RadioGroup = ({
         'plus-radio-group',
         `plus-radio-group-${orientation}`,
         appearance === 'card' ? 'plus-radio-group-card' : '',
+        appearance === 'soft' ? 'plus-radio-group-soft' : '',
         appearance === 'tile' ? 'plus-radio-group-tile' : '',
         className,
     ].filter(Boolean).join(' ');
@@ -206,8 +207,8 @@ RadioGroup.propTypes = {
     leadingText: PropTypes.node,
     /** Scale end after the options, e.g. "Very". Describes the group. */
     trailingText: PropTypes.node,
-    /** Passed to every Radio. `card` draws each as a bordered row; `tile` draws centered pictured tiles. */
-    appearance: PropTypes.oneOf(['plain', 'card', 'tile']),
+    /** Passed to every Radio. `card` draws each as a bordered row; `soft` draws each as a neutral row without a radio dot; `tile` draws centered pictured tiles. */
+    appearance: PropTypes.oneOf(['plain', 'card', 'soft', 'tile']),
     /** Radio control (dot) width, in px; unset keeps today's rendering. */
     size: PropTypes.oneOf([10, 12, 14]),
     /** Marks the form's minority case in plain text after the legend: `required` or `optional`. */

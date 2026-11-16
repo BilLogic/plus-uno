@@ -51,7 +51,7 @@ Vertical by default; set `horizontal` for long category labels.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Range column', <>One per item in <C>data</C>, from <C>low</C> to <C>high</C>, in categorical slot 1.</>],
+        ['Range column', <>One per item in <C>data</C>, from <C>low</C> to <C>high</C>, in <C>--chart-brand</C>, rounded by <C>--chart-bar-radius</C>.</>],
         ['End labels', 'Prints low and high values at the two ends of each column.'],
         ['Category axis', <>Names each column from <C>categories</C>.</>],
         ['Value axis', <>Titled by <C>yAxisLabel</C> (default <C>Value</C>).</>],
@@ -66,8 +66,10 @@ Vertical by default; set `horizontal` for long category labels.
 ## Data shape
 
 `categories` is an array of strings. `data` is an array of `{ low, high }` (both
-required) in `categories` order. `height` defaults to 400; `horizontal` defaults
-to `false`.
+required) in `categories` order. Categories sort from most to least by span
+(`high - low`) by default; pass `sort={false}` for temporal or ordinal axes
+(such as days of the week). `height` defaults to 400; `horizontal` defaults to
+`false`.
 
 ```jsx
 <ColumnRangeChart
@@ -88,7 +90,7 @@ to `false`.
 
 ## Color and accessibility
 
-- **Single series color.** Every column uses categorical slot 1 with no per-column color override.
+- **Single series color.** Every column uses `--chart-brand` with no per-column color override.
 - **Position and end labels carry the values.** Both ends sit on a shared axis and print bare numbers, so the chart reads without hue. Include the unit in `yAxisLabel`, such as `"Hour"` or `"Session length (min)"`.
 - **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Because there is no legend and the series is named `"Range"`, state what is measured in `yAxisLabel` and the surrounding Section or Card header.
 - **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).

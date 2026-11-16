@@ -482,7 +482,7 @@ export const KeyboardFocus = {
         await expect(px(style.outlineWidth), 'ring width').toBe(2);
         await expect(px(style.outlineOffset), 'ring gap').toBe(2);
         await expect(style.outlineColor, 'ring color').toBe(tokenColor(canvasElement, '--ds-border-focused'));
-        await expect(style.backgroundColor, 'no focus fill').toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+        await expect(style.backgroundColor, 'focus keeps the rest fill').toBe(tokenColor(canvasElement, '--ds-background-neutral'));
     },
 };
 

@@ -367,3 +367,179 @@ export const TheContractIsNotEmpty = {
     expect(variants).toBeGreaterThanOrEqual(25);
   },
 };
+
+/**
+ * Every component sets its own family, size, weight and line height from the
+ * product tokens (`--type-*` and the label/body/heading roles) instead of
+ * inheriting from a hostile container (`font: 700 11px "Nunito Sans"`), while
+ * inline `Link` inherits the surrounding size and keeps the product family.
+ */
+export const ComponentsSetTheirOwnType = {
+  args: { subjects },
+  play: async ({ canvasElement }) => {
+    const readProbe = (fontVar, weightVar) => {
+      const probe = document.createElement('span');
+      probe.style.font = `var(${fontVar})`;
+      if (weightVar) probe.style.fontWeight = `var(${weightVar})`;
+      canvasElement.appendChild(probe);
+      const cs = getComputedStyle(probe);
+      const out = {
+        family: cs.fontFamily.split(',')[0].replace(/["']/g, '').trim(),
+        fontSize: cs.fontSize,
+        fontWeight: cs.fontWeight,
+        lineHeight: cs.lineHeight,
+      };
+      probe.remove();
+      return out;
+    };
+
+    const bodySm = readProbe('--body-sm');
+    const bodyDefault = readProbe('--body-default');
+    const bodyDefaultMedium = readProbe('--body-default', '--type-weight-medium');
+    const headingXs = readProbe('--heading-xs');
+    const headingLg = readProbe('--heading-lg');
+
+    const cases = [
+      { name: 'Tag', props: { text: 'Planned' }, selector: '.plus-tag', expected: bodySm },
+      { name: 'StatusTag', props: { text: 'In progress' }, selector: '.plus-status', expected: bodySm },
+      { name: 'StatusTag', props: { text: 'In progress', spacing: 'spacious' }, selector: '.plus-status', expected: bodyDefault },
+      { name: 'Lozenge', props: { text: 'In progress', appearance: 'info' }, selector: '.plus-status', expected: bodySm },
+      { name: 'CountTag', props: { value: 4 }, selector: '.plus-count', expected: bodySm },
+      { name: 'Badge', props: { value: 12, appearance: 'primary' }, selector: '.plus-count', expected: bodySm },
+      { name: 'DateTag', props: { date: 'Nov 15' }, selector: '.plus-date-tag', expected: bodySm },
+      { name: 'DateTag', props: { date: 'Nov 15', spacing: 'spacious' }, selector: '.plus-date-tag', expected: bodyDefault },
+      { name: 'ChangeTag', props: { value: 3 }, selector: '.plus-change-tag', expected: bodySm },
+      { name: 'SmartTag', props: { text: 'Algebra', subject: 'mastering-content' }, selector: '.plus-tag', expected: bodySm },
+      { name: 'Suggestion', props: { label: 'Summarize notes' }, selector: '.plus-suggestion', expected: bodySm },
+      { name: 'Avatar', props: { name: 'Ada Lovelace' }, selector: '.plus-avatar', expected: headingXs },
+      { name: 'Button', props: { children: 'Save' }, selector: '.plus-btn', expected: bodyDefaultMedium },
+      { name: 'TextField', props: { label: 'Name', defaultValue: 'Ada' }, selector: '.plus-field__control', rootSelector: '.plus-field-stack', expected: bodyDefault },
+      { name: 'TextArea', props: { label: 'Notes', defaultValue: ' Ready' }, selector: '.plus-field__control', rootSelector: '.plus-field-stack', expected: bodyDefault },
+      { name: 'SearchField', props: { label: 'Search', defaultValue: 'fractions' }, selector: '.plus-field__control', rootSelector: '.plus-search-field', expected: bodyDefault },
+      { name: 'Select', props: { label: 'Grade', options: [{ value: '5', label: 'Grade 5' }], value: '5' }, selector: '.plus-field__control', rootSelector: '.plus-select-wrapper', expected: bodyDefault },
+      { name: 'Checkbox', props: { label: 'Notify tutor' }, selector: '.plus-form-checkbox-label', rootSelector: '.plus-form-checkbox-wrapper', expected: bodyDefault },
+      { name: 'Radio', props: { label: 'Weekly', value: 'weekly' }, selector: '.plus-form-radio-label', rootSelector: '.plus-form-radio-wrapper', expected: bodyDefault },
+      { name: 'Toggle', props: { label: 'Reminders' }, selector: '.plus-toggle-label', rootSelector: '.plus-toggle-wrapper', expected: bodyDefault },
+    ];
+
+    const byName = new Map(
+      Object.keys(MODULES).map((jsxPath) => {
+        const compName = jsxPath.split('/').pop().replace(/\.jsx$/, '');
+        return [compName, load(jsxPath, compName)];
+      }),
+    );
+    // CountTag and StatusTag are the PLUS numeric badge and status lozenge.
+    byName.set('Badge', byName.get('CountTag'));
+    byName.set('Lozenge', byName.get('StatusTag'));
+
+    const hostile = document.createElement('div');
+    // docs-literal: hostile-container test fixture for non-product font inheritance
+    hostile.style.font = '700 11px "Nunito Sans"';
+    canvasElement.appendChild(hostile);
+
+    const failures = [];
+    const checkComputed = (label, el, expected) => {
+      const cs = getComputedStyle(el);
+      const family = cs.fontFamily.split(',')[0].replace(/["']/g, '').trim();
+      if (family !== expected.family) {
+        failures.push(`${label}: fontFamily is "${family}", expected "${expected.family}"`);
+      }
+      if (cs.fontSize !== expected.fontSize) {
+        failures.push(`${label}: fontSize is "${cs.fontSize}", expected "${expected.fontSize}"`);
+      }
+      if (cs.fontWeight !== expected.fontWeight) {
+        failures.push(`${label}: fontWeight is "${cs.fontWeight}", expected "${expected.fontWeight}"`);
+      }
+      if (cs.lineHeight !== expected.lineHeight) {
+        failures.push(`${label}: lineHeight is "${cs.lineHeight}", expected "${expected.lineHeight}"`);
+      }
+    };
+
+    try {
+      for (const c of cases) {
+        const Component = byName.get(c.name);
+        if (!Component) {
+          failures.push(`${c.name}: component module not found`);
+          continue;
+        }
+        const slot = document.createElement('div');
+        // Mount inside a parent `.plus-*` wrapper too so nested components are proven to reset.
+        slot.className = 'plus-hostile-parent';
+        // docs-literal: hostile-container test fixture for nested component inheritance
+        slot.style.font = '700 11px "Nunito Sans"';
+        hostile.appendChild(slot);
+        const root = createRoot(slot);
+        try {
+          flushSync(() => root.render(React.createElement(Component, c.props)));
+          const targets = [c.selector, c.rootSelector].filter(Boolean);
+          for (const sel of targets) {
+            const el = slot.querySelector(sel);
+            if (!el) {
+              failures.push(`${c.name}: selector "${sel}" did not match`);
+              continue;
+            }
+            checkComputed(`${c.name} (${sel})`, el, c.expected);
+          }
+        } finally {
+          flushSync(() => root.unmount());
+          slot.remove();
+        }
+      }
+
+      // Link is inline: it inherits surrounding size and family inside small text and
+      // inside a heading, and inside the hostile Nunito container it still computes to
+      // the product family through the shared mechanism without a pinned size.
+      const Link = byName.get('Link');
+      for (const [contextName, parentFont, expected] of [
+        ['small text', 'var(--body-sm)', bodySm],
+        ['heading', 'var(--heading-lg)', headingLg],
+      ]) {
+        const parent = document.createElement('div');
+        parent.style.font = parentFont;
+        hostile.appendChild(parent);
+        const root = createRoot(parent);
+        try {
+          flushSync(() => root.render(React.createElement(Link, { href: '#report' }, 'View report')));
+          const linkEl = parent.querySelector('.plus-link');
+          const parentCs = getComputedStyle(parent);
+          const parentRead = {
+            family: parentCs.fontFamily.split(',')[0].replace(/["']/g, '').trim(),
+            fontSize: parentCs.fontSize,
+            fontWeight: parentCs.fontWeight,
+            lineHeight: parentCs.lineHeight,
+          };
+          checkComputed(`Link in ${contextName} (vs token)`, linkEl, expected);
+          checkComputed(`Link in ${contextName} (vs parent)`, linkEl, parentRead);
+        } finally {
+          flushSync(() => root.unmount());
+          parent.remove();
+        }
+      }
+
+      const hostileLinkSlot = document.createElement('div');
+      hostile.appendChild(hostileLinkSlot);
+      const hostileLinkRoot = createRoot(hostileLinkSlot);
+      try {
+        flushSync(() => hostileLinkRoot.render(React.createElement(Link, { href: '#report' }, 'View report')));
+        const linkEl = hostileLinkSlot.querySelector('.plus-link');
+        const linkCs = getComputedStyle(linkEl);
+        const hostileSize = getComputedStyle(hostile).fontSize;
+        const family = linkCs.fontFamily.split(',')[0].replace(/["']/g, '').trim();
+        if (family !== bodyDefault.family) {
+          failures.push(`Link in hostile container: fontFamily is "${family}", expected "${bodyDefault.family}"`);
+        }
+        if (linkCs.fontSize !== hostileSize) {
+          failures.push(`Link in hostile container: fontSize is "${linkCs.fontSize}", expected inherited "${hostileSize}" (not pinned "${bodyDefault.fontSize}")`);
+        }
+      } finally {
+        flushSync(() => hostileLinkRoot.unmount());
+        hostileLinkSlot.remove();
+      }
+    } finally {
+      hostile.remove();
+    }
+
+    expect(failures, failures.join('\n')).toEqual([]);
+  },
+};
+

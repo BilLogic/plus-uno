@@ -1,53 +1,52 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
 import chartTheme, { CHART_GRID_WIDTH_NUMBER, CHART_LINE_WIDTH_NUMBER, CHART_BAR_RADIUS } from '@/dataviz/chartTheme';
-import { CATEGORICAL, CHROME } from '@/dataviz/palette';
+import { CHART_VALUE_CLASS } from '@/dataviz/chartFormat';
+import { BRAND, CATEGORICAL, CHROME, sortCategories } from '@/dataviz/palette';
 import { inkFor, resolveColor, textInks, useColorModeKey } from '@/dataviz/colorMode';
 
 /**
  * StackedBarChart Component
  * Displays a stacked bar chart using Highcharts.
  */
-const StackedBarChart = ({ data, dates, yLabels, height = 207, yAxisMax }) => {
+const StackedBarChart = ({ data = [], dates = [], yLabels, height = 207, yAxisMax, sort = false }) => {
     // Labels sit on their segment, so their ink is resolved per mode: re-render when it changes.
     useColorModeKey();
     const inks = textInks();
-    // data: Array of { segments: [{ value, color, height (%), textColor }] }
-    // dates: Array of strings (x-axis categories)
 
-    // Transform data:
-    // Highcharts stacked column needs series by "Category" (segment type).
-    // The input makes it array-of-bars. We need to transpose this if the segments align (e.g. all bars have "Segment 1", "Segment 2").
-    // If segments are arbitrary, Highcharts is tricky. 
-    // Assuming segments are consistent across bars for a stacked chart.
+    const { categories: orderedDates, series: [{ data: orderedData }] } = useMemo(
+        () =>
+            sort
+                ? sortCategories({
+                    categories: dates,
+                    series: [{ data }],
+                    value: (bar) =>
+                        (bar?.segments || []).reduce((sum, seg) => sum + parseFloat(seg.height), 0),
+                })
+                : { categories: dates, series: [{ data }] },
+        [dates, data, sort],
+    );
 
-    // Let's assume the order of segments in each bar corresponds to the same series.
-    // e.g. Bottom segment is Series 1, Next is Series 2, etc.
-
-    const maxSegments = Math.max(...data.map(d => d.segments.length));
+    const maxSegments = Math.max(0, ...orderedData.map(d => d.segments.length));
     const series = [];
 
     for (let i = 0; i < maxSegments; i++) {
-        const seriesData = data.map(bar => {
+        const defaultColor = maxSegments === 1 ? BRAND : CATEGORICAL[i % CATEGORICAL.length];
+        const seriesData = orderedData.map(bar => {
             const segment = bar.segments[i];
-            // If this bar doesn't have this segment, 0
             if (!segment) return 0;
 
-            // value is the label e.g. "15", height is string "%".
-            // We need a numeric Y value. If height is implicit % of total, we can use it.
             return {
-                y: parseFloat(segment.height), // Parse "25%" -> 25
-                // A segment without a color takes its series' categorical color.
-                color: segment.color || CATEGORICAL[i % CATEGORICAL.length],
-                // Custom data label value to check later
+                y: parseFloat(segment.height),
+                color: segment.color || defaultColor,
                 customValue: segment.value,
                 textColor: segment.textColor
             };
         });
 
         series.push({
-            name: `Segment ${i + 1}`, // Placeholder names as they aren't provided
+            name: `Segment ${i + 1}`,
             data: seriesData,
             stack: 'total'
         });
@@ -56,19 +55,15 @@ const StackedBarChart = ({ data, dates, yLabels, height = 207, yAxisMax }) => {
     // Calculate max value from all segments if not provided
     let calculatedMax = yAxisMax;
     if (!calculatedMax) {
-        // Calculate total height for each bar (sum of all segments)
-        const barTotals = data.map(bar => {
+        const barTotals = orderedData.map(bar => {
             return bar.segments.reduce((sum, seg) => sum + parseFloat(seg.height), 0);
         });
         const maxValue = Math.max(...barTotals, 0);
-        // Round up to nearest 10 for clean axis
         calculatedMax = Math.ceil(maxValue / 10) * 10;
-        // Ensure minimum of 10 for visibility
         if (calculatedMax < 10) calculatedMax = 10;
     }
 
-    // Generate tick positions dynamically
-    const tickCount = 6; // 0 + 5 intermediate ticks
+    const tickCount = 6;
     const tickStep = calculatedMax / (tickCount - 1);
     const tickPositions = Array.from({ length: tickCount }, (_, i) => 
         Math.round(i * tickStep)
@@ -83,61 +78,35 @@ const StackedBarChart = ({ data, dates, yLabels, height = 207, yAxisMax }) => {
         },
         title: { text: null },
         xAxis: {
-            categories: dates,
-            labels: {
-                style: {
-                    fontSize: 'var(--type-size-075)',
-                    color: 'var(--ds-text-subtle)'
-                }
-            },
-            lineColor: 'var(--ds-border)',
-            lineWidth: CHART_GRID_WIDTH_NUMBER,
+            ...chartTheme.xAxis,
+            categories: orderedDates,
             tickWidth: 0
         },
         yAxis: {
+            ...chartTheme.yAxis,
             min: 0,
-            max: calculatedMax, // Set max dynamically based on data
-            reversedStacks: false, // Ensure first series (Green) is at the bottom
+            max: calculatedMax,
+            reversedStacks: false,
             lineWidth: CHART_GRID_WIDTH_NUMBER,
-            lineColor: 'var(--ds-border)',
-            tickPositions: tickPositions, // Dynamic ticks based on calculated max
-            title: { text: null },
-            gridLineWidth: CHART_GRID_WIDTH_NUMBER,
-            gridLineDashStyle: 'Dot', // Dotted lines as per screenshot
-            gridLineColor: 'var(--ds-border)',
-            labels: {
-                style: {
-                    fontSize: 'var(--type-size-075)',
-                    fontFamily: 'var(--type-family-body)',
-                    color: 'var(--ds-text-subtle)'
-                }
-            }
+            tickPositions: tickPositions,
+            title: { ...chartTheme.yAxis.title, text: null },
+            gridLineDashStyle: 'Dot',
         },
         plotOptions: {
             column: {
                 stacking: 'normal',
                 dataLabels: {
                     enabled: true,
-                    // Use the customValue we stored (the number inside the bar)
                     formatter: function () {
-                        // Only show if value > 0 and fits?
                         if (this.point.y < 1) return null;
-                        // The text ink that reads best on this segment, unless the data names one.
                         const ink = this.point.textColor || inkFor(resolveColor(this.point.color), inks);
-                        return `<span style="color: ${ink}">${this.point.customValue}</span>`;
+                        return `<span class="${CHART_VALUE_CLASS}" style="color: ${ink}">${this.point.customValue}</span>`;
                     },
-                    style: {
-                        textOutline: 'none',
-                        fontWeight: '300',
-                        fontSize: 'var(--type-size-075)',
-                        fontFamily: 'var(--type-family-body)'
-                    }
                 },
-                // A gap between stacked segments, as Atlassian separates adjacent chart colors.
+                // A line-width inverse-border gap separates adjacent stacked segments so touching fills stay distinct.
                 borderWidth: CHART_LINE_WIDTH_NUMBER,
                 borderColor: CHROME.separator,
                 borderRadius: CHART_BAR_RADIUS,
-                pointWidth: 48 // Match 48px from visual analysis
             }
         },
         tooltip: {
@@ -168,7 +137,9 @@ StackedBarChart.propTypes = {
     dates: PropTypes.arrayOf(PropTypes.string).isRequired,
     yLabels: PropTypes.arrayOf(PropTypes.string), // ignored in favor of axis logic mostly
     height: PropTypes.number,
-    yAxisMax: PropTypes.number // Optional override for y-axis max (auto-calculated if not provided)
+    yAxisMax: PropTypes.number, // Optional override for y-axis max (auto-calculated if not provided)
+    /** Sort columns from most to least by total height; false by default because dates is a temporal axis. */
+    sort: PropTypes.bool,
 };
 
 export default StackedBarChart;

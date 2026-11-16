@@ -4,6 +4,7 @@
  * in a 24 row with the label. `isInvalid` marks the unselected radio only.
  */
 @use '../../../styles/state' as *;
+@use '../_internal/choice-soft';
 @use '../_internal/choice-tile';
 
 .plus-form-radio-wrapper {
@@ -149,6 +150,13 @@
     .plus-form-radio:focus-visible {
         border-color: var(--ds-border-brand);
     }
+}
+
+// Soft option row (majority choice type in a flow): neutral fill at rest with
+// no visible radio dot; selection is carried by the selected fill, 1px
+// selected border, and trailing check icon.
+.plus-form-radio-wrapper.plus-choice-soft {
+    @include choice-soft.choice-soft('.plus-form-radio');
 }
 
 // Read-only, unchecked: the neutral fill. A checked radio keeps its Lagoon fill.

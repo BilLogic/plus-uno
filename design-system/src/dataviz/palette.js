@@ -128,15 +128,99 @@ export const rampStops = (tokens, resolve) =>
     tokens.map((token, i) => [tokens.length === 1 ? 0 : i / (tokens.length - 1), resolve(token)]);
 
 /**
- * Items sorted from most to least, the house order for categories. Pair it
- * with a sequential ramp and the strongest tone lands on the biggest value.
+ * Returns the CSS variable (`var(--chart-<hue>-*)`) for a 0-based rank from
+ * biggest value (`0`) to smallest value (`count - 1`), spreading across the
+ * whole ramp by `count` so the darkest tone (`boldest`) lands on rank `0` and
+ * `subtler` lands on `count - 1`.
+ *
+ * @param {number} rank
+ * @param {number} [count=4]
+ * @param {string} [hue='blue']
+ * @returns {string}
+ */
+export const sequentialTone = (rank, count = 4, hue = 'blue') => {
+    const ramp = sequentialRamp(hue);
+    const last = ramp.length - 1;
+    if (count <= 1) return `var(${ramp[last]})`;
+    const step = Math.round(((count - 1 - rank) / (count - 1)) * last);
+    const stepIndex = Math.max(0, Math.min(last, step));
+    return `var(${ramp[stepIndex]})`;
+};
+
+/**
+ * Sorts `items` from most to least (stable, returning a new array); sorts only.
  *
  * @template T
  * @param {T[]} items
- * @param {(item: T) => number} [value]
- * @returns {T[]}  a new array
+ * @param {(item: T, index: number) => number} [value]
+ * @returns {T[]}
  */
-export const mostToLeast = (items, value = (item) => item.y) => [...items].sort((a, b) => value(b) - value(a));
+export const mostToLeast = (items, value = (d) => d.y) =>
+    items
+        .map((item, index) => ({ item, index, val: value(item, index) }))
+        .sort((a, b) => b.val - a.val || a.index - b.index)
+        .map((entry) => entry.item);
+
+/**
+ * Ranks `items` by `value` (largest = rank `0`, ties keeping input order),
+ * keeps the items in their input order, and sets `color` from
+ * `sequentialTone(rank, items.length, hue)` so the darkest tone (`boldest`)
+ * lands on the largest value.
+ *
+ * @template {object} T
+ * @param {T[]} items
+ * @param {string} [hue='blue']
+ * @param {(item: T, index: number) => number} [value]
+ * @returns {Array<T & { color: string }>}
+ */
+export const toneByRank = (items, hue = 'blue', value = (d) => d.y) => {
+    const ranked = mostToLeast(
+        items.map((_, index) => index),
+        (index) => value(items[index], index),
+    );
+    const ranks = new Array(items.length);
+    ranked.forEach((itemIndex, rank) => {
+        ranks[itemIndex] = rank;
+    });
+    return items.map((item, index) => ({
+        ...item,
+        color: sequentialTone(ranks[index], items.length, hue),
+    }));
+};
+
+/**
+ * Reorders `categories` and each entry's `data` in `series` from most to least
+ * through `mostToLeast`. The category order comes from `value` (default:
+ * `(d) => d.y` on the first series' datum per category). Returns
+ * `{ categories, series, order }`, where `order` is the new index order so
+ * callers can reorder parallel arrays such as icons or colors.
+ *
+ * @param {{
+ *   categories?: string[],
+ *   series?: Array<{ data?: any[], [key: string]: any }>,
+ *   value?: (datum: any, index: number) => number,
+ * }} [options]
+ * @returns {{ categories: string[], series: Array<any>, order: number[] }}
+ */
+export const sortCategories = ({
+    categories = [],
+    series = [],
+    value = (d) => d.y,
+} = {}) => {
+    const firstData = series[0]?.data ?? [];
+    const order = mostToLeast(
+        categories.map((_, index) => index),
+        (index) => value(firstData[index], index),
+    );
+    return {
+        categories: order.map((i) => categories[i]),
+        series: series.map((s) => ({
+            ...s,
+            data: Array.isArray(s.data) ? order.map((i) => s.data[i]) : s.data,
+        })),
+        order,
+    };
+};
 
 const TOKENS_WITH_HOVERED = new Set([
     ...CATEGORICAL,

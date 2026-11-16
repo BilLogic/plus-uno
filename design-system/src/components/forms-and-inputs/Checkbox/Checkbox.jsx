@@ -37,7 +37,7 @@ const Checkbox = ({
     description,
     /** Decorative picture shown above the label when `appearance` is `tile`. */
     illustration,
-    /** `card` draws the choice as a bordered row; `tile` draws a centered pictured tile with the checkbox at its top end. */
+    /** `card` draws the choice as a bordered row; `soft` draws a neutral row without a checkbox; `tile` draws a centered pictured tile with the checkbox at its top end. */
     appearance = 'plain',
     onChange,
     onFocus,
@@ -51,6 +51,7 @@ const Checkbox = ({
     const fieldId = useFieldId(id);
     const isControlled = isChecked !== undefined;
     const isTile = appearance === 'tile';
+    const isSoft = appearance === 'soft';
     const tone = isInvalid ? 'invalid' : undefined;
     const { control } = toneProps(tone);
     const { 'aria-describedby': describedBy, ...inputRest } = props;
@@ -76,7 +77,7 @@ const Checkbox = ({
             invalid={isInvalid}
             className={wrapperClasses}
             style={style}
-            onClick={isTile ? activateChoiceTile : undefined}
+            onClick={isTile || isSoft ? activateChoiceTile : undefined}
         >
             {isTile && illustration && (
                 <div className="plus-choice-tile-illustration" aria-hidden="true">
@@ -109,6 +110,12 @@ const Checkbox = ({
                 <FieldLabel htmlFor={fieldId} labelMarker={labelMarker} isRequired={isRequired} name={name} className="plus-form-checkbox-label">
                     {label}
                 </FieldLabel>
+                {isSoft && (
+                    <i
+                        className={`fa-solid ${isIndeterminate ? 'fa-minus' : 'fa-check'} plus-choice-soft-check`}
+                        aria-hidden="true"
+                    />
+                )}
             </div>
             <FieldCaption messageId={messageId} message={description} tone="help" />
         </FieldFrame>
@@ -144,8 +151,8 @@ Checkbox.propTypes = {
     description: PropTypes.node,
     /** Decorative picture shown above the label when `appearance` is `tile`. */
     illustration: PropTypes.node,
-    /** `plain` (default) draws the box and label inline; `card` draws a bordered row; `tile` draws a centered pictured tile with the checkbox at its top end. */
-    appearance: PropTypes.oneOf(['plain', 'card', 'tile']),
+    /** `plain` (default) draws the box and label inline; `card` draws a bordered row; `soft` draws a neutral row without a checkbox; `tile` draws a centered pictured tile with the checkbox at its top end. */
+    appearance: PropTypes.oneOf(['plain', 'card', 'soft', 'tile']),
     /** Called with `{ target: { name, value, checked } }` when the box is toggled. */
     onChange: PropTypes.func,
     /** Called with the focus event when the checkbox gains focus. */

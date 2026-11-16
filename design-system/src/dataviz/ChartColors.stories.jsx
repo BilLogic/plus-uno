@@ -199,8 +199,6 @@ export const EveryChartInEveryMode = {
         // are tracked in KNOWN_WEIGHT_EXCEPTIONS (chart name -> chart family) so
         // the list can only shrink as each family moves onto the shared foundation.
         const KNOWN_WEIGHT_EXCEPTIONS = {
-            stacked: 'comparison',
-            StackedBarChart: 'comparison',
             pie: 'part-to-whole',
             PieChart: 'part-to-whole',
             gauge: 'part-to-whole',
