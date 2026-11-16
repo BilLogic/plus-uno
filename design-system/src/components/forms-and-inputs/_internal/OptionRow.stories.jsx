@@ -113,6 +113,8 @@ LeadingAndTrailing.play = async ({ canvasElement }) => {
     const step = labelLeft(child) - labelLeft(parent);
     await expect(step).toBeGreaterThan(0);
     await expect(step).toBe(parseFloat(getComputedStyle(child).getPropertyValue('--plus-option-row-indent-step')) || 20);
+    await expect(getComputedStyle(canvasElement.querySelector('.plus-option-row-toggle')).fontSize, 'tree toggle is 12px').toBe('12px');
+    await expect(getComputedStyle(canvasElement.querySelector('.plus-option-row-chevron')).fontSize, 'cascader chevron is 12px').toBe('12px');
 };
 
 /**

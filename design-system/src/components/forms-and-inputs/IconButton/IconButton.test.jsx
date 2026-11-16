@@ -107,4 +107,11 @@ describe('IconButton', () => {
         expect(after).not.toBe(before);
         expect(after).toHaveTextContent('2');
     });
+
+    it('marks chevron icons for small sizing and leaves other icons at default size', () => {
+        const { container, rerender } = render(<IconButton icon="chevron-down" label="More options" />);
+        expect(container.querySelector('.plus-btn-visual')).toHaveClass('plus-btn-visual--chevron');
+        rerender(<IconButton icon="plus" label="Add" />);
+        expect(container.querySelector('.plus-btn-visual')).not.toHaveClass('plus-btn-visual--chevron');
+    });
 });

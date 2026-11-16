@@ -142,7 +142,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Fill: default, subtle | `--ds-background-neutral-subtle`, hovered and pressed steps. Default adds a 1px `--ds-border-input` edge. |
 | Fill: primary, discovery | `--ds-background-brand-bold`, `--ds-background-discovery-bold`, each with hovered and pressed steps. |
 | Fill: selected, disabled | `--ds-background-selected` with hovered and pressed steps; `--ds-background-disabled`. |
-| Icon | `--ds-icon-subtle` (default, subtle), `--ds-icon-inverse` (primary, discovery); the selected and disabled roles. 16, `--icon-md`. |
+| Icon | `--ds-icon-subtle` (default, subtle), `--ds-icon-inverse` (primary, discovery); the selected and disabled roles. 16, `--icon-md` (12, `--icon-sm` for chevrons). |
 | Focus ring | `--ds-border-focused`, 2px, 2px offset. |
 | Size | 32: `--control-md`. 24: `--control-sm`. Square, except with a count. |
 | Count | `--ds-text-subtlest`, or the selected text color when selected. `--inline-sm` after the icon. Motion: `--ds-motion-appearance-default` to open, `--ds-motion-appearance-fast` to fade in. |

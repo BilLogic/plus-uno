@@ -137,7 +137,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Tokens touched
 
-`--border-width-default` · `--ds-border-inverse`
+`--border-width-default` · `--ds-border-inverse` · `--icon-sm`
 
 From `design-system/src/components/forms-and-inputs/SplitButton/SplitButton.scss`. Override these through the token layer, never with a literal.
 

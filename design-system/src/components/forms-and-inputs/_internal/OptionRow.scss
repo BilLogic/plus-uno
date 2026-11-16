@@ -195,10 +195,12 @@
     width: var(--plus-option-row-toggle-size);
     height: var(--plus-option-row-toggle-size);
     color: var(--ds-icon-subtle);
+    font-size: var(--icon-sm);
 }
 
 .plus-option-row-chevron {
     color: var(--ds-icon-subtle);
+    font-size: var(--icon-sm);
 }
 
 /* A drawn mark, not a form control; sized to match Checkbox and Radio. */

@@ -33,7 +33,7 @@ Icons ship at three sizes bound to `Size/Icon` tokens. `--fa-width: 1em` is set 
 
 | Size (px) | Figma token | Code | Use |
 | --- | --- | --- | --- |
-| 12 | `Size/Icon/sm` | `--icon-sm` | Chevrons, field validation, and compact controls such as tags, Count tags, statuses, secondary actions and table headers. |
+| 12 | `Size/Icon/sm` | `--icon-sm` | Chevrons, field validation, and compact controls such as tags, Count tags, statuses, secondary actions and table sort arrows. |
 | 16 | `Size/Icon/md` | `--icon-md` | Default beside 14 and 16 text in buttons, menus, fields and lists. |
 | 24 | `Size/Icon/lg` | `--icon-lg` | Empty states, section headers and standalone status marks. Above 24, use a Tile. |
 

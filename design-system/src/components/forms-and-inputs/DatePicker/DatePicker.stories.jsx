@@ -517,10 +517,12 @@ DaysAnnounceTheirDate.parameters = { docs: { disable: true } };
 DaysAnnounceTheirDate.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const trigger = canvas.getByRole('combobox', { name: 'Session date' });
+    await expect(getComputedStyle(canvasElement.querySelector('.plus-date-picker__icon i')).fontSize, 'calendar icon is 16px').toBe('16px');
 
     await userEvent.click(trigger);
 
     const seventeenth = await waitFor(() => page.getByRole('button', { name: /August 17, 2026/ }));
+    await expect(getComputedStyle(page.getByRole('button', { name: 'Previous month' }).querySelector('i')).fontSize, 'calendar chevron is 12px').toBe('12px');
     await expect(seventeenth).toBeTruthy();
     await expect(seventeenth.getAttribute('aria-pressed')).toBe('true');
 

@@ -22,6 +22,7 @@
 }
 
 .plus-tree-select-arrow {
+    font-size: var(--icon-sm);
     transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
 
     &.plus-tree-select-arrow-open {

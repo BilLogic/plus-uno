@@ -24,7 +24,7 @@ const Glyph = ({ name, family = 'fa-solid', size = '--icon-md', color = '--ds-ic
 );
 
 const SIZES = [
-    ['--icon-sm', '12', 'chevron-down', 'Use sparingly: chevrons, small text, field validation, and inside small components such as tags and table headers.'],
+    ['--icon-sm', '12', 'chevron-down', 'Use sparingly: chevrons, small text, field validation, and inside small components such as tags and table sort arrows.'],
     ['--icon-md', '16', 'calendar-days', 'The default. Beside 14 and 16 text in buttons, menus, fields and lists.'],
     ['--icon-lg', '24', 'folder', 'The largest icon. Empty states, section headers and standalone status marks.'],
 ];

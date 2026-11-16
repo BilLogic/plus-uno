@@ -210,7 +210,10 @@ const wrap = { maxWidth: 'var(--width-2500)', minHeight: 'var(--height-250)' };
 
 export const Rest = {
     render: () => <div style={wrap}><TreeSelect id="treeselect-ex-rest" label="Topic" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" /></div>,
-    play: async ({ canvasElement }) => expectRest(canvasElement, controlOf(canvasElement)),
+    play: async ({ canvasElement }) => {
+        await expectRest(canvasElement, controlOf(canvasElement));
+        await expect(getComputedStyle(canvasElement.querySelector('.plus-tree-select-arrow')).fontSize, 'tree select caret is 12px').toBe('12px');
+    },
 };
 
 export const Hovered = {

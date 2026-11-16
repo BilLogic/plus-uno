@@ -67,7 +67,7 @@ const SectionMessage = ({
     // The leading icon and the × center on the first line of text: the title
     // line when there is a title, otherwise the first body line. An invisible
     // strut in that line's text style gives each column exactly one line of
-    // height; the icon stays a 20px square (the column's width) and the button
+    // height; the icon stays a 16px square (the column's width) and the button
     // 24×24 whatever the text size.
     const firstLineClass = title ? 'plus-section-message-strut--title' : 'plus-section-message-strut--text';
     const strut = <span className={`plus-section-message-strut ${firstLineClass}`} aria-hidden="true">{'​'}</span>;

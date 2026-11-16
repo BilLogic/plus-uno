@@ -182,6 +182,10 @@ export const Styles = () => (
         <AccordionVariantsDemos />
     </div>
 );
+Styles.play = async ({ canvasElement }) => {
+    const trigger = canvasElement.querySelector('.plus-accordion-trigger');
+    await expect(getComputedStyle(trigger, '::after').fontSize).toBe('12px');
+};
 
 export const Behavior = () => (
     <div style={accordionPage}>

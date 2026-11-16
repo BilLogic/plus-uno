@@ -202,7 +202,10 @@ const wrap = { maxWidth: 'var(--width-2500)', minHeight: 'var(--height-250)' };
 
 export const Rest = {
     render: () => <div style={wrap}><Cascader id="cascader-ex-rest" label="Location" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" /></div>,
-    play: async ({ canvasElement }) => expectRest(canvasElement, controlOf(canvasElement)),
+    play: async ({ canvasElement }) => {
+        await expectRest(canvasElement, controlOf(canvasElement));
+        await expect(getComputedStyle(canvasElement.querySelector('.plus-cascader-arrow')).fontSize, 'cascader caret is 12px').toBe('12px');
+    },
 };
 
 export const Hovered = {

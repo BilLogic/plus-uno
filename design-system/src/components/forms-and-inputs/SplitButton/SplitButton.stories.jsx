@@ -42,6 +42,7 @@ export const Overview = {
         await expect(getComputedStyle(menu).borderTopLeftRadius).toBe('0px');
         await expect(getComputedStyle(action).borderTopLeftRadius).not.toBe('0px');
         await expect(getComputedStyle(menu).borderTopRightRadius).not.toBe('0px');
+        await expect(getComputedStyle(menu.querySelector('.plus-btn-visual i')).fontSize, 'chevron trigger icon is 12px').toBe('12px');
     },
 };
 

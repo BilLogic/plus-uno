@@ -343,10 +343,18 @@
 .plus-table-head-cell-type,
 .plus-table-head-cell-sort {
     flex: none;
-    width: var(--icon-sm);
-    font-size: var(--icon-sm);
     line-height: 1;
     text-align: center;
+}
+
+.plus-table-head-cell-type {
+    width: var(--icon-md);
+    font-size: var(--icon-md);
+}
+
+.plus-table-head-cell-sort {
+    width: var(--icon-sm);
+    font-size: var(--icon-sm);
 }
 
 .plus-table-head-cell-label {

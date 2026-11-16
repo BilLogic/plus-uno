@@ -126,7 +126,7 @@
         "--ds-surface",
         "--ds-text-subtle",
         "--heading-sm",
-        "--icon-md"
+        "--icon-sm"
       ],
       "subComponents": [
         {
@@ -1409,6 +1409,7 @@
         "--ds-motion-appearance-fast-duration",
         "--ds-text-disabled",
         "--icon-md",
+        "--icon-sm",
         "--inline-sm",
         "--pad-x-md",
         "--pad-x-sm",
@@ -1954,6 +1955,7 @@
         "--ds-border",
         "--ds-motion-spatial-fast",
         "--ds-motion-spatial-fast-duration",
+        "--icon-sm",
         "--plus-listbox-viewport-width"
       ]
     },
@@ -3510,7 +3512,8 @@
         "DaysAnnounceTheirDate"
       ],
       "tokens": [
-        "--ds-icon-subtle"
+        "--ds-icon-subtle",
+        "--icon-md"
       ]
     },
     {
@@ -12722,7 +12725,7 @@
         "--ds-border",
         "--ds-text",
         "--heading-sm",
-        "--icon-lg",
+        "--icon-md",
         "--stack-md",
         "--type-weight-medium"
       ]
@@ -13879,7 +13882,8 @@
       ],
       "tokens": [
         "--border-width-default",
-        "--ds-border-inverse"
+        "--ds-border-inverse",
+        "--icon-sm"
       ]
     },
     {
@@ -17130,6 +17134,7 @@
       "tokens": [
         "--ds-motion-spatial-fast",
         "--ds-motion-spatial-fast-duration",
+        "--icon-sm",
         "--plus-popup-reach"
       ]
     },

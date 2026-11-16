@@ -192,7 +192,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--border-width-default` · `--card-inline-sm` · `--card-pad-compact` · `--card-radius-compact` · `--control-md` · `--ds-border` · `--ds-text` · `--heading-sm` · `--icon-lg` · `--stack-md` · `--type-weight-medium`
+`--body-default` · `--border-width-default` · `--card-inline-sm` · `--card-pad-compact` · `--card-radius-compact` · `--control-md` · `--ds-border` · `--ds-text` · `--heading-sm` · `--icon-md` · `--stack-md` · `--type-weight-medium`
 
 From `design-system/src/components/messaging/SectionMessage/SectionMessage.scss`. Override these through the token layer, never with a literal.
 

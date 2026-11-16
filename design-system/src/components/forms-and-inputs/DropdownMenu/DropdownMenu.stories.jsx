@@ -43,6 +43,7 @@ Overview.play = async ({ canvasElement }) => {
     const toggle = canvas.getByRole('button', { name: 'Dropdown' });
 
     // The default pattern (Button + chevron) shows selected while open.
+    await expect(getComputedStyle(toggle.querySelector('.plus-btn-visual i')).fontSize, 'trigger chevron is 12px').toBe('12px');
     await expect(toggle).not.toHaveClass('plus-btn--selected');
     await userEvent.click(toggle);
     await waitFor(() => expect(toggle).toHaveClass('plus-btn--selected'));

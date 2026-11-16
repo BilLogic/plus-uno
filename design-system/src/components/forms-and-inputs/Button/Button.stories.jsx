@@ -234,6 +234,12 @@ export const Icons = {
             <Button text="Both" iconBefore="user" iconAfter="chevron-right" />
         </div>
     ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const both = canvas.getByRole('button', { name: 'Both' });
+        await expect(px(getComputedStyle(both.querySelector('.plus-btn-visual--before')).fontSize), 'leading icon is 16').toBe(16);
+        await expect(px(getComputedStyle(both.querySelector('.plus-btn-visual--after')).fontSize), 'chevron is 12').toBe(12);
+    },
 };
 
 /** Selected, disabled and loading. */

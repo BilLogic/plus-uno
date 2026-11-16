@@ -97,9 +97,11 @@ describe('Button', () => {
         expect(onClick).not.toHaveBeenCalled();
     });
 
-    it('draws Font Awesome glyphs before and after the label', () => {
+    it('renders Font Awesome glyphs from icon names', () => {
         const { container } = render(<Button text="Add" iconBefore="plus" iconAfter="chevron-right" />);
+        expect(container.querySelector('.plus-btn-visual--before')).not.toHaveClass('plus-btn-visual--chevron');
         expect(container.querySelector('.plus-btn-visual--before i')).toHaveClass('fa-solid', 'fa-plus');
+        expect(container.querySelector('.plus-btn-visual--after')).toHaveClass('plus-btn-visual--chevron');
         expect(container.querySelector('.plus-btn-visual--after i')).toHaveClass('fa-solid', 'fa-chevron-right');
     });
 });
