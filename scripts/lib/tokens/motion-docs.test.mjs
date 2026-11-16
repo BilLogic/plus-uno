@@ -1,7 +1,20 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { motionEventsOf, motionLibraryOf, motionLibraryTableOf, motionLineOf, motionRowOf, motionSectionOf, motionVarOf, soundTextOf } from './motion-docs.mjs';
+import {
+  MOTION_FAMILIES,
+  MOTION_TRANSITIONS,
+  filterMotionLibrary,
+  motionEventsOf,
+  motionFamilyOf,
+  motionLibraryOf,
+  motionLibraryTableOf,
+  motionLineOf,
+  motionRowOf,
+  motionSectionOf,
+  motionVarOf,
+  soundTextOf,
+} from './motion-docs.mjs';
 
 const row = {
   name: 'Widget',
@@ -108,7 +121,8 @@ test('every MotionSection in a docs page names a row of the real registry, in it
       if (tier === 'template') templates += 1;
     }
   }
-  assert.ok(templates >= 11, `expected the template pages to carry a MotionSection, found ${templates}`);
+  const expectedTemplates = MOTION_REGISTRY.filter((r) => r.tier === 'template').length;
+  assert.equal(templates, expectedTemplates, `expected all ${expectedTemplates} template rows to carry a MotionSection, found ${templates}`);
 });
 
 const loud = {
@@ -152,4 +166,198 @@ test('the Library has a Sound column on every line', () => {
   assert.match(table, /^\| Name \| Tier \| Event \| Transition \| Tokens \| Sound \|/);
   assert.match(table, /\| Beeper \| component \| enter \| Open \| `--ds-motion-spatial-fast` \| `sound\.notify` on land: outside a session \|/);
   assert.match(table, /\| Widget \| component \| change \|  \| `--ds-motion-appearance-default` \|  \|/);
+});
+
+test('MOTION_TRANSITIONS exports the 14 locked transition names in order', () => {
+  assert.deepEqual(MOTION_TRANSITIONS, [
+    'Go to another area',
+    'Drill into and climb back out',
+    'Switch views',
+    'Step to the next or previous',
+    'Scroll to a spot on the page',
+    'Swap content in place',
+    'Add or remove an item',
+    'Reorder items',
+    'Expand and collapse',
+    'Load content',
+    'Open and close an overlay',
+    'Dock and undock a panel',
+    'Update a value or state',
+    'Call attention',
+  ]);
+});
+
+test('motionFamilyOf maps token names to spatial, appearance or linear, including spatial.exit', () => {
+  assert.deepEqual(MOTION_FAMILIES, ['spatial', 'appearance', 'linear']);
+  assert.equal(motionFamilyOf('spatial.fast'), 'spatial');
+  assert.equal(motionFamilyOf('spatial.exit'), 'spatial');
+  assert.equal(motionFamilyOf('appearance.default'), 'appearance');
+  assert.equal(motionFamilyOf('linear'), 'linear');
+  assert.equal(motionFamilyOf('loop'), null);
+});
+
+test('each Library row exposes href (null when unlinked) and tier-aware links for shared names', () => {
+  const shared = [
+    { name: 'Popup', tier: 'template', events: { enter: { transition: 'Open and close an overlay', spatial: 'spatial.fast' } } },
+    { name: 'Popup', tier: 'component', events: { enter: { transition: 'Open and close an overlay', spatial: 'spatial.fast' } } },
+    { name: 'Orphan', tier: 'pattern', events: { change: { transition: 'Swap content in place', appearance: 'appearance.fast' } } },
+  ];
+  const links = {
+    'template:Popup': '?path=/docs/templates-popup--docs#motion',
+    'component:Popup': '?path=/docs/components-overlays-and-layering-popup--docs#motion',
+  };
+  const rows = motionLibraryOf(shared, links);
+  assert.deepEqual(
+    rows.map((r) => ({ tier: r.tier, name: r.name, href: r.href })),
+    [
+      { tier: 'template', name: 'Popup', href: '?path=/docs/templates-popup--docs#motion' },
+      { tier: 'pattern', name: 'Orphan', href: null },
+      { tier: 'component', name: 'Popup', href: '?path=/docs/components-overlays-and-layering-popup--docs#motion' },
+    ],
+  );
+});
+
+test('the live Library links shared template/component names to their own pages and sets null where absent', () => {
+  const live = motionLibraryOf();
+  const find = (tier, name) => live.find((r) => r.tier === tier && r.name === name);
+  assert.equal(find('template', 'Panel').href, '?path=/docs/templates-panel--docs#motion');
+  assert.equal(find('component', 'Panel').href, '?path=/docs/components-layout-and-structure-panel--docs#motion');
+  assert.equal(find('template', 'Popup').href, '?path=/docs/templates-popup--docs#motion');
+  assert.equal(find('component', 'Popup').href, '?path=/docs/components-overlays-and-layering-popup--docs#motion');
+  assert.equal(find('template', 'Blanket').href, '?path=/docs/templates-modal--docs#blanket-motion');
+  assert.equal(find('component', 'Sidebar').href, null);
+  assert.equal(find('pattern', 'Errors').href, null);
+});
+
+test('each Library row exposes unique transitions, families and sounds in event order', () => {
+  const custom = [
+    {
+      name: 'OverlayBox',
+      tier: 'component',
+      events: {
+        enter: {
+          transition: 'Open and close an overlay',
+          spatial: 'spatial.fast',
+          appearance: 'appearance.fast',
+          sound: { token: 'notify' },
+        },
+        exit: {
+          transition: 'Open and close an overlay',
+          spatial: 'spatial.exit',
+          sound: { token: 'notify' },
+        },
+        milestone: {
+          transition: 'Load content',
+          appearance: 'linear',
+          sound: { token: 'done.step' },
+        },
+        pulse: {
+          transition: 'Load content',
+          appearance: 'loop',
+        },
+      },
+    },
+    {
+      name: 'QuietFade',
+      tier: 'pattern',
+      events: {
+        change: { transition: 'Swap content in place', appearance: 'appearance.default' },
+      },
+    },
+  ];
+  const [quiet, overlay] = motionLibraryOf(custom, {});
+  assert.equal(overlay.tier, 'component');
+  assert.deepEqual(overlay.transitions, ['Open and close an overlay', 'Load content']);
+  assert.deepEqual(overlay.families, ['spatial', 'appearance', 'linear']);
+  assert.deepEqual(overlay.sounds, ['notify', 'done.step']);
+
+  assert.equal(quiet.tier, 'pattern');
+  assert.deepEqual(quiet.transitions, ['Swap content in place']);
+  assert.deepEqual(quiet.families, ['appearance']);
+  assert.deepEqual(quiet.sounds, []);
+});
+
+test('filterMotionLibrary combines query and facets with AND across facets and OR within each facet', () => {
+  const sample = motionLibraryOf(
+    [
+      {
+        name: 'Popup',
+        tier: 'template',
+        events: { enter: { transition: 'Open and close an overlay', spatial: 'spatial.fast' } },
+      },
+      {
+        name: 'Popup',
+        tier: 'component',
+        events: {
+          enter: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast' },
+          exit: { transition: 'Open and close an overlay', spatial: 'spatial.exit' },
+        },
+      },
+      {
+        name: 'Flag',
+        tier: 'component',
+        events: {
+          enter: { transition: 'Open and close an overlay', spatial: 'spatial.default', sound: { token: 'notify' } },
+          failed: { transition: 'Open and close an overlay', appearance: 'appearance.default', sound: { token: 'error' } },
+        },
+      },
+      {
+        name: 'Skeleton',
+        tier: 'component',
+        events: { change: { transition: 'Load content', appearance: 'linear' } },
+      },
+      {
+        name: 'Filtering',
+        tier: 'pattern',
+        events: { change: { transition: 'Swap content in place', appearance: 'appearance.fast' } },
+      },
+    ],
+    {},
+  );
+
+  // Empty constraints return all rows in order.
+  assert.equal(filterMotionLibrary(sample).length, 5);
+  assert.equal(filterMotionLibrary(sample, { query: '   ', tiers: [], transitions: [], families: [], sounds: [] }).length, 5);
+
+  // Case-insensitive name substring.
+  assert.deepEqual(
+    filterMotionLibrary(sample, { query: 'POP' }).map((r) => `${r.tier}:${r.name}`),
+    ['template:Popup', 'component:Popup'],
+  );
+
+  // OR within a facet.
+  assert.deepEqual(
+    filterMotionLibrary(sample, { tiers: ['template', 'pattern'] }).map((r) => `${r.tier}:${r.name}`),
+    ['template:Popup', 'pattern:Filtering'],
+  );
+  assert.deepEqual(
+    filterMotionLibrary(sample, { transitions: ['Load content', 'Swap content in place'] }).map((r) => r.name),
+    ['Filtering', 'Skeleton'],
+  );
+  assert.deepEqual(
+    filterMotionLibrary(sample, { families: ['linear'] }).map((r) => r.name),
+    ['Skeleton'],
+  );
+  assert.deepEqual(
+    filterMotionLibrary(sample, { sounds: ['error'] }).map((r) => r.name),
+    ['Flag'],
+  );
+
+  // AND across facets + query.
+  assert.deepEqual(
+    filterMotionLibrary(sample, {
+      query: 'pop',
+      tiers: ['component'],
+      transitions: ['Open and close an overlay'],
+      families: ['appearance'],
+    }).map((r) => `${r.tier}:${r.name}`),
+    ['component:Popup'],
+  );
+  assert.deepEqual(
+    filterMotionLibrary(sample, {
+      query: 'pop',
+      sounds: ['notify'],
+    }),
+    [],
+  );
 });

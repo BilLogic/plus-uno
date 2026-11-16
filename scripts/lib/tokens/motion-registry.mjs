@@ -68,7 +68,7 @@ export const MOTION_REGISTRY = [
     tier: 'template',
     events: {
       change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'It changes color on hover and press like a Button. Opening a clickable card is Drill.' },
-      milestone: { transition: 'Opening a page', spatial: 'spatial.default', note: 'The one card in a milestone page entrance is Expressive and leaves by the exit rules.', sound: { token: 'done.milestone', when: 'onboarding complete, first session, goal reached, term start or end, badge claimed; goal reached is shared, so the student hears it' } },
+      milestone: { transition: 'Load content', spatial: 'spatial.default', note: 'The one card in a milestone page entrance is Expressive and leaves by the exit rules.', sound: { token: 'done.milestone', when: 'onboarding complete, first session, goal reached, term start or end, badge claimed; goal reached is shared, so the student hears it' } },
     },
   },
   {
@@ -259,13 +259,13 @@ export const MOTION_REGISTRY = [
     tier: 'component',
     events: {
       enter: {
-        transition: 'Open',
+        transition: 'Open and close an overlay',
         spatial: 'spatial.fast',
         appearance: 'appearance.fast',
         note: "Clips open from the trigger's corner on the side it is aligned to. From the keyboard it opens with no animation.",
       },
       exit: {
-        transition: 'Close',
+        transition: 'Open and close an overlay',
         spatial: 'spatial.exit',
         appearance: 'appearance.fast',
         note: 'The clip folds back to the same corner while it fades. Under reduced motion it is the fade alone.',

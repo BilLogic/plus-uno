@@ -488,7 +488,7 @@ export const SOUND_MOMENTS = [
     "row": "PatternCard",
     "tier": "template",
     "event": "milestone",
-    "transition": "Opening a page",
+    "transition": "Load content",
     "token": "done.milestone",
     "at": "land",
     "when": "onboarding complete, first session, goal reached, term start or end, badge claimed; goal reached is shared, so the student hears it",

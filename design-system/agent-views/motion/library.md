@@ -27,7 +27,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Panel | template | narrow-enter | Open and close an overlay | `--ds-motion-spatial-slow` |  |
 | Panel | template | narrow-exit | Open and close an overlay | `--ds-motion-spatial-default` |  |
 | PatternCard | template | change | Update a value or state | `--ds-motion-appearance-fast` |  |
-| PatternCard | template | milestone | Opening a page | `--ds-motion-spatial-default` | `sound.done.milestone` on land: onboarding complete, first session, goal reached, term start or end, badge claimed; goal reached is shared, so the student hears it |
+| PatternCard | template | milestone | Load content | `--ds-motion-spatial-default` | `sound.done.milestone` on land: onboarding complete, first session, goal reached, term start or end, badge claimed; goal reached is shared, so the student hears it |
 | PatternModal | template | enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` |  |
 | PatternModal | template | exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` |  |
 | PatternModal | template | swap | Swap content in place | `--ds-motion-appearance-fast` |  |
@@ -156,8 +156,8 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Pagination | component | change | Step to the next or previous | `--ds-motion-spatial-default` |  |
 | Panel | component | enter | Dock and undock a panel | `--ds-motion-spatial-slow` |  |
 | Panel | component | exit | Dock and undock a panel | `--ds-motion-spatial-default` |  |
-| Popup | component | enter | Open | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
-| Popup | component | exit | Close | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` |  |
+| Popup | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
+| Popup | component | exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` |  |
 | PopupSelect | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | PopupSelect | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | ProgressBar | component | change | Load content | `--ds-motion-linear` |  |

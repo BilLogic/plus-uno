@@ -10,6 +10,7 @@
  * `design-system/src/storybook-docs/motion-section.jsx`.
  */
 
+import { MOTION_LIBRARY_LINKS } from './motion-library-links.generated.mjs';
 import { MOTION_REGISTRY } from './motion-registry.mjs';
 import { MOTION_SEMANTICS } from './plan.mjs';
 
@@ -25,6 +26,33 @@ export function motionRowOf(name, registry = MOTION_REGISTRY, tier = null) {
 
 /** The order the Library groups rows in: the page-level moves first, then what they hold. */
 export const MOTION_TIERS = ['template', 'pattern', 'component'];
+
+/** The 14 locked transition names from Foundations › Expression › Motion › Transitions, in page order. */
+export const MOTION_TRANSITIONS = Object.freeze([
+  'Go to another area',
+  'Drill into and climb back out',
+  'Switch views',
+  'Step to the next or previous',
+  'Scroll to a spot on the page',
+  'Swap content in place',
+  'Add or remove an item',
+  'Reorder items',
+  'Expand and collapse',
+  'Load content',
+  'Open and close an overlay',
+  'Dock and undock a panel',
+  'Update a value or state',
+  'Call attention',
+]);
+
+/** Token families exposed as Motion · Library facets. */
+export const MOTION_FAMILIES = Object.freeze(['spatial', 'appearance', 'linear']);
+
+/** Token family for a semantic motion token (`spatial.exit` → `'spatial'`; `'loop'` → `null`). */
+export function motionFamilyOf(token) {
+  const head = String(token).split('.')[0];
+  return MOTION_FAMILIES.includes(head) ? head : null;
+}
 
 /** The CSS custom property a semantic token name is read through: `spatial.fast` → `--ds-motion-spatial-fast`. */
 export function motionVarOf(token) {
@@ -81,14 +109,16 @@ export function motionSectionOf(row) {
   return `${d}\n`;
 }
 
+const unique = (items) => [...new Set(items)];
 
 /**
  * Every registry row as plain data for the Motion · Library index, grouped by
- * tier (`MOTION_TIERS`) and sorted by name within a tier: `{ name, tier, events }`.
+ * tier (`MOTION_TIERS`) and sorted by name within a tier:
+ * `{ name, tier, href, events, transitions, families, sounds }`.
  * A token a row names that the plan does not declare throws, so the index can
  * never show a custom property nothing sets; so does a tier outside the three.
  */
-export function motionLibraryOf(registry = MOTION_REGISTRY) {
+export function motionLibraryOf(registry = MOTION_REGISTRY, links = MOTION_LIBRARY_LINKS) {
   const valid = new Set([...MOTION_SEMANTICS.map((s) => s.name), 'linear']);
   for (const row of registry) {
     if (!MOTION_TIERS.includes(row.tier)) throw new Error(`motion registry row "${row.name}" has tier "${row.tier}", which is not one of ${MOTION_TIERS.join(', ')}`);
@@ -103,8 +133,39 @@ export function motionLibraryOf(registry = MOTION_REGISTRY) {
           if (!valid.has(t)) throw new Error(`motion registry row "${row.name}" event "${e.event}" names "${t}", which is not a motion token`);
         }
       }
-      return { name: row.name, tier: row.tier, events };
+      const transitions = unique(events.map((e) => e.transition).filter(Boolean));
+      const families = unique(events.flatMap((e) => e.tokens.map(motionFamilyOf)).filter(Boolean));
+      const sounds = unique(events.map((e) => e.sound?.token).filter(Boolean));
+      const href = links?.[`${row.tier}:${row.name}`] ?? null;
+      return { name: row.name, tier: row.tier, href, events, transitions, families, sounds };
     });
+}
+
+const asSet = (values) => (values ? new Set(values) : new Set());
+
+/**
+ * Pure lookup filter over `motionLibraryOf` rows: case-insensitive `query`
+ * substring on `row.name`, combined with AND across facets and OR within each
+ * non-empty facet (`tiers`, `transitions`, `families`, `sounds`).
+ */
+export function filterMotionLibrary(
+  rows,
+  { query = '', tiers = [], transitions = [], families = [], sounds = [] } = {},
+) {
+  const q = String(query ?? '').trim().toLowerCase();
+  const tierSet = asSet(tiers);
+  const transitionSet = asSet(transitions);
+  const familySet = asSet(families);
+  const soundSet = asSet([...sounds].map((s) => String(s).replace(/^sound\./, '')));
+
+  return rows.filter((row) => {
+    if (q && !row.name.toLowerCase().includes(q)) return false;
+    if (tierSet.size > 0 && !tierSet.has(row.tier)) return false;
+    if (transitionSet.size > 0 && !row.transitions.some((t) => transitionSet.has(t))) return false;
+    if (familySet.size > 0 && !row.families.some((f) => familySet.has(f))) return false;
+    if (soundSet.size > 0 && !row.sounds.some((s) => soundSet.has(s))) return false;
+    return true;
+  });
 }
 
 /** The Library as one Markdown table: one line per event, grouped by row, with its sound, for the agent file. */
@@ -117,4 +178,3 @@ export function motionLibraryTableOf(registry = MOTION_REGISTRY) {
   }
   return d;
 }
-

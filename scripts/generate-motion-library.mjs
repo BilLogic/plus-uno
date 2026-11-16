@@ -1,11 +1,13 @@
 /**
- * Generate the agent file for the Motion · Library index:
+ * Generate the Motion · Library artifacts:
  *
  *   design-system/agent-views/motion/library.md
+ *   scripts/lib/tokens/motion-library-links.generated.mjs
  *
  * One table of every motion registry row (`scripts/lib/tokens/motion-registry.mjs`),
- * written by `motionLibraryTableOf`, the same generator the Storybook page's
- * rows come from. Part of `npm run generate:agent`.
+ * written by `motionLibraryTableOf`, plus the derived `(tier:name) → href` map
+ * scanned from every MDX page rendering `<MotionSection />`. Part of
+ * `npm run generate:agent` (and verified by `npm run check:agent` / `check:harness`).
  *
  * Usage:
  *   node scripts/generate-motion-library.mjs
@@ -16,10 +18,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { deriveMotionLibraryLinks, renderMotionLibraryLinksModule } from './lib/motion-library-links.mjs';
 import { motionLibraryTableOf } from './lib/tokens/motion-docs.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
 export const OUTPUT = 'design-system/agent-views/motion/library.md';
+export const LINKS_OUTPUT = 'scripts/lib/tokens/motion-library-links.generated.mjs';
 
 export function renderLibrary() {
   return [
@@ -33,18 +38,36 @@ export function renderLibrary() {
   ].join('\n');
 }
 
+export function renderLinksModule(repoRoot = REPO_ROOT) {
+  return renderMotionLibraryLinksModule(deriveMotionLibraryLinks(repoRoot));
+}
+
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  const file = path.join(REPO_ROOT, OUTPUT);
-  const want = renderLibrary();
+  const targets = [
+    [OUTPUT, renderLibrary()],
+    [LINKS_OUTPUT, renderLinksModule()],
+  ];
+
   if (process.argv.includes('--check')) {
-    if (!fs.existsSync(file) || fs.readFileSync(file, 'utf8') !== want) {
-      console.error(`✗ ${OUTPUT} is stale — run \`npm run generate:agent\``);
+    const stale = targets
+      .filter(([rel, want]) => {
+        const file = path.join(REPO_ROOT, rel);
+        return !fs.existsSync(file) || fs.readFileSync(file, 'utf8') !== want;
+      })
+      .map(([rel]) => rel);
+    if (stale.length > 0) {
+      for (const rel of stale) {
+        console.error(`✗ ${rel} is stale — run npm run generate:agent`);
+      }
       process.exit(1);
     }
-    console.log('✓ motion library agent file up to date');
+    console.log('✓ motion library agent file and page links up to date');
   } else {
-    fs.mkdirSync(path.dirname(file), { recursive: true });
-    fs.writeFileSync(file, want);
-    console.log(`✓ wrote ${OUTPUT}`);
+    for (const [rel, want] of targets) {
+      const file = path.join(REPO_ROOT, rel);
+      fs.mkdirSync(path.dirname(file), { recursive: true });
+      fs.writeFileSync(file, want);
+      console.log(`✓ wrote ${rel}`);
+    }
   }
 }

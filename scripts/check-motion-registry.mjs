@@ -16,7 +16,8 @@
  *     fails, so a new component cannot arrive without a row.
  *   - Each event's `spatial` and `appearance` (each optional, at least one
  *     required) is a semantic token from `MOTION_SEMANTICS` in the plan, or
- *     `linear`. `transition`, `note` and `sound` are not read here.
+ *     `linear`, and its `transition` is one of the 14 locked names in
+ *     `MOTION_TRANSITIONS`. `note` and `sound` are not read here.
  *   - Every Patterns page (a Storybook title under `Patterns/`, the Overview
  *     excluded) has a `tier: 'pattern'` row named by its page. No allow-list:
  *     a new Patterns page arrives with its row.
@@ -39,6 +40,7 @@ import path from 'node:path';
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { main } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
+import { MOTION_TRANSITIONS } from './lib/tokens/motion-docs.mjs';
 import { MOTION_REGISTRY } from './lib/tokens/motion-registry.mjs';
 import { MOTION_SEMANTICS } from './lib/tokens/plan.mjs';
 
@@ -110,14 +112,20 @@ export function run({ repoRoot = REPO_ROOT, index, registry = MOTION_REGISTRY, p
   const components = interactiveComponents(index ?? readIndex(repoRoot));
   const findings = [];
   const valid = validTokens();
+  const transitions = new Set(MOTION_TRANSITIONS);
   for (const row of registry) {
     if (!TIERS.includes(row.tier)) {
       findings.push({ message: `motion registry row "${row.name}" has tier "${row.tier}", which is not one of ${TIERS.join(', ')}` });
     } else if (row.tier === 'component' && !components.includes(row.name)) {
       findings.push({ message: `motion registry row "${row.name}" is not an interactive component in ${INDEX}` });
     }
-    // \`sound\`, \`note\` and \`transition\` are not read here; check:sound-registry owns \`sound\`.
+    // `sound` and `note` are not read here; check:sound-registry owns `sound`.
     for (const [event, spec] of Object.entries(row.events ?? {})) {
+      if (!transitions.has(spec?.transition)) {
+        findings.push({
+          message: `motion registry row "${row.name}" (${row.tier}) event "${event}" names transition ${JSON.stringify(spec?.transition)}, which is not one of the 14 transitions (${MOTION_TRANSITIONS.join(', ')})`,
+        });
+      }
       if (!EVENT_TOKENS.some((k) => spec?.[k] !== undefined)) {
         findings.push({ message: `motion registry row "${row.name}" event "${event}" names neither spatial nor appearance` });
       }

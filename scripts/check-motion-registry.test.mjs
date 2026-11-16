@@ -21,13 +21,13 @@ const row = (name, extra = {}) => ({
   name,
   tier: 'component',
   events: {
-    enter: { transition: 'Open', spatial: 'spatial.fast', appearance: 'appearance.fast', sound: { token: 'prompt', at: 'land' } },
-    exit: { transition: 'Close', spatial: 'spatial.exit' },
-    change: { transition: 'Swap', appearance: 'appearance.fast', note: 'cross-fade' },
+    enter: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', sound: { token: 'prompt', at: 'land' } },
+    exit: { transition: 'Open and close an overlay', spatial: 'spatial.exit' },
+    change: { transition: 'Swap content in place', appearance: 'appearance.fast', note: 'cross-fade' },
   },
   ...extra,
 });
-const withEvent = (name, event, tier = 'component') => ({ name, tier, events: { enter: event } });
+const withEvent = (name, event, tier = 'component') => ({ name, tier, events: { enter: { transition: 'Open and close an overlay', ...event } } });
 
 test('interactive components are the index list minus the static ones', () => {
   assert.deepEqual(interactiveComponents(INDEX), ['Button', 'Popup']);
@@ -59,14 +59,36 @@ test('a row naming a missing token fails', () => {
 
 test('a bad token inside a named event fails', () => {
   const root = scratch(['Button']);
-  const f = run({ repoRoot: root, index: INDEX, registry: [{ name: 'Popup', tier: 'component', events: { success: { transition: 'Done', appearance: 'appearance.nope' } } }] });
+  const f = run({ repoRoot: root, index: INDEX, registry: [{ name: 'Popup', tier: 'component', events: { success: { transition: 'Update a value or state', appearance: 'appearance.nope' } } }] });
   assert.match(f[0].message, /appearance\.nope/);
   assert.match(f[0].message, /success/);
 });
 
+test('an event naming a transition outside the 14 locked transitions fails with row, tier, event and bad value', () => {
+  const root = scratch(['Button']);
+  const bad = [
+    { name: 'Popup', tier: 'component', events: { enter: { transition: 'Open', spatial: 'spatial.fast' } } },
+    { name: 'PatternCard', tier: 'template', events: { milestone: { transition: 'Opening a page', spatial: 'spatial.default' } } },
+    { name: 'Filtering', tier: 'pattern', events: { change: { appearance: 'appearance.fast' } } },
+  ];
+  const f = run({ repoRoot: root, index: INDEX, registry: bad, patterns: ['Filtering'] });
+  assert.equal(f.length, 3, JSON.stringify(f));
+  assert.match(f[0].message, /Popup/);
+  assert.match(f[0].message, /component/);
+  assert.match(f[0].message, /enter/);
+  assert.match(f[0].message, /Open/);
+  assert.match(f[1].message, /PatternCard/);
+  assert.match(f[1].message, /template/);
+  assert.match(f[1].message, /milestone/);
+  assert.match(f[1].message, /Opening a page/);
+  assert.match(f[2].message, /Filtering/);
+  assert.match(f[2].message, /pattern/);
+  assert.match(f[2].message, /change/);
+});
+
 test('a component row with a sound field passes; sound is ignored', () => {
   const root = scratch(['Button']);
-  const r = withEvent('Popup', { transition: 'Open', spatial: 'spatial.fast', sound: { token: 'not-checked-here' } });
+  const r = withEvent('Popup', { transition: 'Open and close an overlay', spatial: 'spatial.fast', sound: { token: 'not-checked-here' } });
   assert.deepEqual(run({ repoRoot: root, index: INDEX, registry: [r] }), []);
 });
 
@@ -84,7 +106,7 @@ test('an unknown tier fails', () => {
 
 test('an event with neither spatial nor appearance fails', () => {
   const root = scratch(['Button']);
-  const f = run({ repoRoot: root, index: INDEX, registry: [withEvent('Popup', { transition: 'Open', note: 'x' })] });
+  const f = run({ repoRoot: root, index: INDEX, registry: [withEvent('Popup', { note: 'x' })] });
   assert.match(f[0].message, /neither spatial nor appearance/);
 });
 
