@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import Icon from '../../images-and-icons/Icon';
-import Button from './Button';
+import Button, { BUTTON_SPACINGS } from './Button';
 
 describe('Button', () => {
     it('carries no title while disabled or loading, and keeps it otherwise', () => {
@@ -28,8 +28,10 @@ describe('Button', () => {
     it('draws the default appearance at default spacing unless told otherwise', () => {
         render(<Button text="Plain" />);
         const button = screen.getByRole('button');
+        expect(BUTTON_SPACINGS).toEqual(['default', 'compact', 'spacious']);
         expect(button).toHaveClass('plus-btn--default');
         expect(button).not.toHaveClass('plus-btn--compact');
+        expect(button).not.toHaveClass('plus-btn--spacious');
     });
 
     it.each(['default', 'primary', 'subtle', 'warning', 'danger', 'discovery', 'ai'])(
@@ -52,6 +54,11 @@ describe('Button', () => {
     it('draws compact spacing', () => {
         render(<Button spacing="compact" text="Row action" />);
         expect(screen.getByRole('button')).toHaveClass('plus-btn--compact');
+    });
+
+    it('draws spacious spacing', () => {
+        render(<Button spacing="spacious" text="Footer action" />);
+        expect(screen.getByRole('button')).toHaveClass('plus-btn--spacious');
     });
 
     it('fills its container when asked', () => {

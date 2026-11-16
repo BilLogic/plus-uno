@@ -316,7 +316,7 @@ test('propTypes enums are read off the real Button', () => {
     'utf8',
   );
   const props = new Map(parsePropTypes(source, 'Button').map((p) => [p.name, p.enumValues]));
-  assert.deepEqual(props.get('spacing'), ['default', 'compact']);
+  assert.deepEqual(props.get('spacing'), ['default', 'compact', 'spacious']);
   assert.ok(props.get('appearance').includes('discovery'));
   assert.equal(props.get('text'), null, 'a non-enum prop has no legal-value list');
 });

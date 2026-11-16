@@ -1219,9 +1219,10 @@
           "default": "'default'",
           "values": [
             "default",
-            "compact"
+            "compact",
+            "spacious"
           ],
-          "description": "Height and padding: `default` draws 32, `compact` draws 24. Compact is for tables and tight toolbars.",
+          "description": "Height and padding: `default` draws 32, `compact` draws 24, `spacious` draws 48. Compact is for tables and tight toolbars; spacious is for modal, panel and focused-view footers.",
           "deprecated": null
         },
         {
@@ -1230,7 +1231,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Stretches the button to the width of its container.",
+          "description": "Stretches the button to the width of its container, with the label centered.",
           "deprecated": null
         },
         {
@@ -1383,6 +1384,7 @@
         "Discovery",
         "Ai",
         "Compact",
+        "Spacious",
         "Selected",
         "Disabled",
         "Loading",
@@ -1400,8 +1402,10 @@
         "--border-width-default",
         "--button-radius-compact",
         "--button-radius-default",
+        "--button-radius-spacious",
         "--control-md",
         "--control-sm",
+        "--control-xl",
         "--ds-background-disabled",
         "--ds-icon-disabled",
         "--ds-motion-appearance-fast",
@@ -1410,6 +1414,7 @@
         "--icon-md",
         "--icon-sm",
         "--inline-sm",
+        "--pad-x-lg",
         "--pad-x-md",
         "--pad-x-sm",
         "--radius-full",
