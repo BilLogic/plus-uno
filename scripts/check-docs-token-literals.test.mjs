@@ -47,7 +47,7 @@ const defs = new Map([
   ['--size-breakpoint-ish', { value: '768px', file: '_layout-ish.scss' }],
   ['--type-size-100', { value: '1rem', file: '_type.scss' }],
   // A family this check does not offer, holding a value the docs might use.
-  ['--frame-sidebar-width-nav', { value: '164px', file: 'ladder/_patterns.scss' }],
+  ['--frame-sidebar-width-nav', { value: '164px', file: 'ladder/_templates.scss' }],
 ]);
 const index = buildTokenIndex(defs);
 

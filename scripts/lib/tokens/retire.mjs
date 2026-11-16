@@ -63,7 +63,7 @@ export function dropRetired(scss, retired = RETIRED_TOKENS) {
 
 /**
  * Every name the ladder's own generated files declare. A Figma export that
- * still carries one (a pattern token whose value the plan now owns) is
+ * still carries one (a template token whose value the plan now owns) is
  * dropped from the SCSS generated from it, so a name is declared once.
  */
 export function planOwnedTokens() {

@@ -2,7 +2,7 @@
 
 # Spacing
 
-The kind of box sets its pad; the pattern it sits in sets its stack and inline.
+The kind of box sets its pad; the template it sits in sets its stack and inline.
 
 **Kind:** Foundation
 
@@ -10,14 +10,14 @@ The kind of box sets its pad; the pattern it sits in sets its stack and inline.
 
 ## Overview
 
-Spacing tokens name a job, not a size. Pick the pattern you are in (Page, Section, Card, Modal, Popup, Table or a control), then the relationship (pad inside a box, stack between rows, inline between things side by side), then the size. Bind the semantic token, never a primitive or a typed number.
+Spacing tokens name a job, not a size. Pick the template you are in (Page, Section, Card, Modal, Popup, Table or a control), then the relationship (pad inside a box, stack between rows, inline between things side by side), then the size. Bind the semantic token, never a primitive or a typed number.
 
 ```css
 padding: var(--card-pad-default);
 gap: var(--card-stack-md);
 ```
 
-Figma holds them in `spacing / semantics` (Pad, Stack, Inline, Grid, Screen, Content), `spacing / patterns` (Frame, Page, Section, Card, Table, Blanket, Modal, Popup), `spacing / components` and the hidden `spacing / primitives`. [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists every token.
+Figma holds them in `spacing / semantics` (Pad, Stack, Inline, Grid, Screen, Content), `spacing / templates` (Frame, Page, Section, Card, Table, Blanket, Modal, Popup), `spacing / components` and the hidden `spacing / primitives`. [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists every token.
 
 ## Principles
 
@@ -81,7 +81,7 @@ The label stays 14/20 at every size, so pad-y is (height − 20) ÷ 2: 2 at 24 a
 
 ### Containers: one pad on every side
 
-A pattern carries its own pad ([Pattern tokens](#foundation-pattern-tokens)). A container that is not a pattern takes the Card pad of its size: a Section message and File upload take 16.
+A template carries its own pad ([Template tokens](#foundation-template-tokens)). A container that is not a template takes the Card pad of its size: a Section message and File upload take 16.
 
 ### Table cells
 
@@ -107,9 +107,9 @@ Gaps come in tiers that grow with the box. The space between sections is two to 
 - `--inline-md` (Inline/inline-md)
 - `--inline-lg` (Inline/inline-lg)
 
-## Pattern tokens
+## Template tokens
 
-Every pattern has its own tokens, so a value is read from where it sits.
+Every template has its own tokens, so a value is read from where it sits.
 
 ### Frame and Page
 
@@ -211,7 +211,7 @@ Use a Card token inside a card, a Section token inside a section, and Stack or I
 
 ### Never hand-space
 
-If a gap looks wrong with the right tokens, step to the next tier of the same group, such as `--section-stack-md` to `--section-stack-lg`. If no tier fits, raise it as a token or pattern question rather than adding space by hand. A one-off value takes the nearest semantic token of its context, or becomes a proposed token.
+If a gap looks wrong with the right tokens, step to the next tier of the same group, such as `--section-stack-md` to `--section-stack-lg`. If no tier fits, raise it as a token or template question rather than adding space by hand. A one-off value takes the nearest semantic token of its context, or becomes a proposed token.
 
 ### Build from templates and slots
 

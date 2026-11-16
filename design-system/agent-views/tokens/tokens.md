@@ -9,7 +9,7 @@ Mirrors `design-system/src/tokens/`.
 A token a plan defines carries its intent as a comment: the place or situation it is for. Pick the token whose intent names your case. A hovered or pressed color variant follows its base. A bare token has no plan yet.
 
 ## Ladder Semantics
-Start here for space, size and radius (ADR-038). A component reads its component token, else a pattern token, else one of these steps: `--pad-x-*` and `--pad-y-*` inside a control, `--stack-*` between stacked items, `--inline-*` between items in a row, `--radius-*` for corners. The primitives at the end of this file are what these resolve to.
+Start here for space, size and radius (ADR-038). A component reads its component token, else a template token, else one of these steps: `--pad-x-*` and `--pad-y-*` inside a control, `--stack-*` between stacked items, `--inline-*` between items in a row, `--radius-*` for corners. The primitives at the end of this file are what these resolve to.
 
 ```css
 --content-max-width  /* Widest a page's main content column may grow. */
@@ -39,7 +39,7 @@ Start here for space, size and radius (ADR-038). A component reads its component
 --radius-control-lg  /* Corner rounding for a control 40px high: a default field. */
 --radius-control-md  /* Corner rounding for a control 32px high: a compact field, a tab, a menu row. */
 --radius-control-sm  /* Corner rounding for a control 24px high: a compact field, a Tooltip, a Sidebar row. */
---radius-lg  /* Corner rounding for larger containers that are not a pattern, such as a tile or image. */
+--radius-lg  /* Corner rounding for larger containers that are not a template, such as a tile or image. */
 --radius-md  /* Corner rounding for controls and small containers. */
 --radius-sm  /* Corner rounding for small marks: a checkbox, a small tag. */
 --radius-xl  /* Corner rounding for a floating or compact surface, such as a Popup or a compact card. */
@@ -53,8 +53,8 @@ Start here for space, size and radius (ADR-038). A component reads its component
 --stack-sm  /* Vertical gap between tightly related items, such as a label and its control. */
 ```
 
-## Ladder Patterns
-Space owned by a pattern: page, section, card, table, modal, popup. Inside a pattern, read its token before a semantics step.
+## Ladder Templates
+Space owned by a template: page, section, card, table, modal, popup. Inside a template, read its token before a semantics step.
 
 ```css
 --blanket-fill  /* Fill of the Blanket that dims the page behind a Modal. */
@@ -325,7 +325,7 @@ The Size and Border scales (spacing / foundations): heights, widths, and the Ico
 ```
 
 ## Frame and Layer Tokens
-The patterns on the page frame, per breakpoint: page, section, card, table, overlay, modal, popup.
+The templates on the page frame, per breakpoint: page, section, card, table, overlay, modal, popup.
 
 ```css
 --card-inline-lg  /* Horizontal gap between columns inside a PatternCard. */

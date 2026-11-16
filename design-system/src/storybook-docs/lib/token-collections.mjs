@@ -62,7 +62,7 @@ export function placeToken(name, file = '') {
   }
   // Card, modal, popup, table, blanket, panel and every per-component size
   // (field, row, label, icon, image, button, tag ...) are Components.
-  if (/^--[a-z0-9-]+$/.test(name) && /(^|\/)(ladder\/_components|ladder\/_patterns|_frame_layers|_scales)\.scss$/.test(file)) {
+  if (/^--[a-z0-9-]+$/.test(name) && /(^|\/)(ladder\/_components|ladder\/_templates|_frame_layers|_scales)\.scss$/.test(file)) {
     return place('spacing', 'semantic', 'components');
   }
   return null;

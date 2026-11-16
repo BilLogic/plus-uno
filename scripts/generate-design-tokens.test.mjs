@@ -46,8 +46,24 @@ test('no ladder token is declared twice', () => {
 test('the payload has exactly the collections the ladder names, and no motion', () => {
   assert.deepEqual(
     variablesPayload().collections.map((c) => c.name),
-    ['spacing / semantics', 'spacing / patterns', 'spacing / components', 'layers'],
+    ['spacing / semantics', 'spacing / templates', 'spacing / components', 'layers'],
   );
+  const ladderFiles = artifacts()
+    .map((a) => a.path)
+    .filter((p) => p.includes('/ladder/'))
+    .map((p) => p.split('/').pop())
+    .sort();
+  assert.deepEqual(ladderFiles, [
+    '_components.scss',
+    '_layers.scss',
+    '_semantics.scss',
+    '_springs.scss',
+    '_templates.scss',
+    'springs.generated.js',
+  ]);
+  const templatesScss = artifacts().find((a) => a.path.endsWith('ladder/_templates.scss'));
+  assert.match(templatesScss.content, /Templates \(ADR-038 ladder\)/);
+  assert.deepEqual([...new Set(TOKEN_LADDER.map((r) => r.tier))], ['semantics', 'templates', 'components', 'layers']);
 });
 
 test('no collection, Figma variable or code name carries the spec name, "roles" or "element"', () => {

@@ -18,7 +18,7 @@ grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));
 gap: var(--grid-gutter);
 ```
 
-Figma holds the breakpoint modes (768, 1024 and 1440) on `spacing / semantics` and `spacing / patterns`. The content grid sits on the Page's content frame; the screen grid sits on the Blanket only.
+Figma holds the breakpoint modes (768, 1024 and 1440) on `spacing / semantics` and `spacing / templates`. The content grid sits on the Page's content frame; the screen grid sits on the Blanket only.
 
 ## Breakpoints
 
@@ -132,7 +132,7 @@ One Size scale, used through five roles. Pick the role, then its size; the pixel
 
 ### Size tokens
 
-Card, Section, Popup and Menu sizes sit with their patterns on [Spacing](?path=/docs/foundations-layout-spacing--docs#foundation-pattern-tokens), and [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists the full scale.
+Card, Section, Popup and Menu sizes sit with their templates on [Spacing](?path=/docs/foundations-layout-spacing--docs#foundation-template-tokens), and [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists the full scale.
 
 - `--control-sm` (Size/Item/height-sm)
 - `--control-md` (Size/Item/height-md)

@@ -56,9 +56,9 @@ foundations say which to reach for and why.
 
 - Color, spacing, typography, radius and elevation come from compile-ready tokens, such as `var(--ds-text)`: never raw values, and never Figma literal names.
 - Never hardcode a color, spacing, typography, radius or elevation value when a token exists.
-- Choose the tier first (component, then pattern, then semantics, then primitives), then pick the token.
+- Choose the tier first (component, then template, then semantics, then primitives), then pick the token.
 - Use primitives only for token-definition work, never in feature implementation.
-- Fallback rule: reach for a component token first; if none fits, the pattern token; failing that, the semantic step. A pattern token is one whose value would change if the pattern changed.
+- Fallback rule: reach for a component token first; if none fits, the template token; failing that, the semantic step. A template token is one whose value would change if the template changed.
 
 ## Known drift
 

@@ -58,13 +58,13 @@ function tokenSections() {
     // another file also declares keeps its ladder tier.
     return [
         { group: 'Ladder Semantics', tier: 'semantic', tokens: l('_semantics.scss') },
-        { group: 'Ladder Patterns', tier: 'pattern', tokens: l('_patterns.scss') },
+        { group: 'Ladder Templates', tier: 'template', tokens: l('_templates.scss') },
         { group: 'Ladder Components', tier: 'component', tokens: l('_components.scss') },
         { group: 'Layers', tier: 'semantic', tokens: l('_layers.scss') },
         { group: 'Motion Springs (--ds-motion-)', tier: 'semantic', tokens: springs.filter((d) => d.name.startsWith('--ds-motion-')) },
         { group: 'Motion Spring Primitives', tier: 'primitive', tokens: springs.filter((d) => d.name.startsWith('--motion-spring-')) },
         { group: 'Scale Tokens', tier: 'semantic', tokens: scales.filter((d) => !isScalePrimitive(d.name)) },
-        { group: 'Frame and Layer Tokens', tier: 'pattern', tokens: t('_frame_layers.scss') },
+        { group: 'Frame and Layer Tokens', tier: 'template', tokens: t('_frame_layers.scss') },
         { group: 'Type Scale', tier: 'semantic', tokens: t('_type.scss') },
         { group: 'Color Tokens (--ds-)', tier: 'semantic', tokens: c(COLOR_SEMANTIC_FILE) },
         { group: 'Elevation and Opacity Tokens (--ds-)', tier: 'semantic', tokens: c(COLOR_ELEVATION_FILE) },
@@ -108,7 +108,7 @@ function renderTokensDoc() {
     const names = Object.fromEntries(sections.map((s) => [s.group, s.tokens.map((d) => d.name)]));
     const lines = Object.fromEntries(sections.map((s) => [s.group, tokenLines(s.tier, names[s.group])]));
     const ladderSemantics = lines['Ladder Semantics'];
-    const ladderPatterns = lines['Ladder Patterns'];
+    const ladderTemplates = lines['Ladder Templates'];
     const ladderComponents = lines['Ladder Components'];
     const layerTokens = lines['Layers'];
     const springTokens = lines['Motion Springs (--ds-motion-)'];
@@ -129,12 +129,12 @@ function renderTokensDoc() {
     tokensDoc += `A token a plan defines carries its intent as a comment: the place or situation it is for. Pick the token whose intent names your case. A hovered or pressed color variant follows its base. A bare token has no plan yet.\n\n`;
 
     tokensDoc += `## Ladder Semantics\n`;
-    tokensDoc += `Start here for space, size and radius (ADR-038). A component reads its component token, else a pattern token, else one of these steps: \`--pad-x-*\` and \`--pad-y-*\` inside a control, \`--stack-*\` between stacked items, \`--inline-*\` between items in a row, \`--radius-*\` for corners. The primitives at the end of this file are what these resolve to.\n\n`;
+    tokensDoc += `Start here for space, size and radius (ADR-038). A component reads its component token, else a template token, else one of these steps: \`--pad-x-*\` and \`--pad-y-*\` inside a control, \`--stack-*\` between stacked items, \`--inline-*\` between items in a row, \`--radius-*\` for corners. The primitives at the end of this file are what these resolve to.\n\n`;
     tokensDoc += "```css\n" + ladderSemantics + "\n```\n\n";
 
-    tokensDoc += `## Ladder Patterns\n`;
-    tokensDoc += `Space owned by a pattern: page, section, card, table, modal, popup. Inside a pattern, read its token before a semantics step.\n\n`;
-    tokensDoc += "```css\n" + ladderPatterns + "\n```\n\n";
+    tokensDoc += `## Ladder Templates\n`;
+    tokensDoc += `Space owned by a template: page, section, card, table, modal, popup. Inside a template, read its token before a semantics step.\n\n`;
+    tokensDoc += "```css\n" + ladderTemplates + "\n```\n\n";
 
     tokensDoc += `## Ladder Components\n`;
     tokensDoc += `Tokens one component owns, named for it.\n\n`;
@@ -156,7 +156,7 @@ function renderTokensDoc() {
     tokensDoc += `The Size and Border scales (spacing / foundations): heights, widths, and the Icon, Image, Item, Row, Label and Field sizes.\n\n`;
     tokensDoc += "```css\n" + scaleFoundations + "\n```\n\n";
     tokensDoc += `## Frame and Layer Tokens\n`;
-    tokensDoc += `The patterns on the page frame, per breakpoint: page, section, card, table, overlay, modal, popup.\n\n`;
+    tokensDoc += `The templates on the page frame, per breakpoint: page, section, card, table, overlay, modal, popup.\n\n`;
     tokensDoc += "```css\n" + frameLayerTokens + "\n```\n\n";
     tokensDoc += `## Type Scale\n`;
     tokensDoc += `The text styles, generated from Figma: \`font: var(--heading-lg)\`. A button or tab label is \`--body-default\` with \`font-weight: var(--type-weight-medium)\`; there is no button style.\n\n`;

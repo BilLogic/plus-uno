@@ -33,7 +33,7 @@ describe('every role names a token its source component uses', () => {
 });
 
 /** A token's px value, followed through the scale files (`--a: var(--b)` or `Npx`). */
-const scaleSrc = ['tokens/_scales.scss', 'tokens/ladder/_semantics.scss', 'tokens/ladder/_patterns.scss', 'tokens/ladder/_components.scss']
+const scaleSrc = ['tokens/_scales.scss', 'tokens/ladder/_semantics.scss', 'tokens/ladder/_templates.scss', 'tokens/ladder/_components.scss']
   .map((f) => readFileSync(resolve(SRC, f), 'utf8'))
   .join('\n');
 const px = (token) => {
