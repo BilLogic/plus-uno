@@ -129,7 +129,7 @@ export function ResourcesCard({ href, icon, title }) {
  * @param {string} [props.className]
  */
 export function DocsTable({ children, className = '' }) {
-    const wrapClass = ['sb-ds-doc-table-wrap', className].filter(Boolean).join(' ');
+    const wrapClass = ['sb-ds-doc-table-wrap', 'sb-unstyled', className].filter(Boolean).join(' ');
     return (
         <div className={wrapClass}>
             <table className="sb-ds-doc-table">{children}</table>
@@ -375,7 +375,7 @@ export function DoDontCard({ tone, children, caption }) {
                     font: 'var(--body-default)',
                 }}
             >
-                <div className="sb-ds-dodont-card__example">{children}</div>
+                <div className="sb-ds-dodont-card__example sb-unstyled">{children}</div>
             </div>
             <DoDontCaption tone={tone}>{caption}</DoDontCaption>
         </figure>

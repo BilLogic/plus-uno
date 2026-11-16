@@ -776,6 +776,7 @@
         "--ds-text-accent-purple",
         "--ds-text-accent-teal",
         "--ds-text-accent-yellow",
+        "--heading-xs",
         "--icon-lg",
         "--icon-md",
         "--icon-sm",
@@ -788,8 +789,7 @@
         "--type-size-075",
         "--type-size-0875",
         "--type-size-100",
-        "--type-size-200",
-        "--type-weight-semibold"
+        "--type-size-200"
       ]
     },
     {
