@@ -11,6 +11,7 @@ import { iconClass } from '@/lib/icon';
  * A polar chart (spider web chart) using Highcharts.
  * Useful for comparing multivariate data.
  * @param {number|'100%'} height - Chart height in pixels, or '100%' to fill container (responsive).
+ * @param {Object<string, string>|string[]} [categoryColors] - Colors the category icons only, so it applies only together with `categoryIcons`. Axis label text always uses the text token.
  */
 const RadarChart = ({
     categories,
@@ -44,6 +45,7 @@ const RadarChart = ({
         const { categories: nextCategories, series: nextSeries, order } = sortCategories({
             categories,
             series,
+            value: (d) => d,
         });
         return {
             categories: nextCategories,
@@ -233,9 +235,10 @@ RadarChart.propTypes = {
     filled: PropTypes.bool,
     yAxisMax: PropTypes.number,
     showLegend: PropTypes.bool,
+    /** Colors the category icons only, so it applies only together with `categoryIcons`. Axis label text always uses the text token. */
     categoryColors: PropTypes.oneOfType([
-        PropTypes.object, // Object mapping category names to colors
-        PropTypes.arrayOf(PropTypes.string) // Array of colors matching category order
+        PropTypes.object, // Object mapping category names to icon colors
+        PropTypes.arrayOf(PropTypes.string) // Array of icon colors matching category order
     ]),
     /** Font Awesome icon class names (e.g. ['fa-calculator', 'fa-comments']) – shown instead of category text; tooltip shows full name on hover */
     categoryIcons: PropTypes.arrayOf(PropTypes.string),

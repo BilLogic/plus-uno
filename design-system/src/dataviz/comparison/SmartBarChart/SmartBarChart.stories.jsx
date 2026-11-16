@@ -45,6 +45,7 @@ const defaultData = {
             { letter: 'E', height: '0' },
         ],
         'blue',
+        (d) => parseFloat(d.height),
     ),
 };
 

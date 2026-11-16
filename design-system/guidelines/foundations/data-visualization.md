@@ -45,8 +45,8 @@ that doesn't.
 
 Category charts with no inherent axis order sort categories from most to least by default (`sort = true`), with `sort={false}` as the opt-out for ordinal, temporal or profile axes (such as grades A–E, weekdays or radar spokes). Sorting and sequential toning are two separate, explicit steps in `design-system/src/dataviz/palette.js`:
 
-- **Step 1 — sort:** `mostToLeast(items, value = (d) => d.y)` returns a new, stable array ordered from biggest to smallest and never touches `color`. When categories and series live in separate arrays, `sortCategories({ categories, series, value })` reorders both and returns `{ categories, series, order }` so callers can reorder parallel arrays (such as icons or colors) with `order`.
-- **Step 2 — optionally tone by rank:** `toneByRank(items, hue)` sets `color` on each item from `sequentialTone(rank, items.length, hue)`, placing the darkest ramp step (`--chart-<hue>-boldest`) on rank `0` and spreading `items.length` items across the ramp down to `subtler`.
+- **Step 1 — sort:** `mostToLeast(items, value = (d) => d.y)` returns a new, stable array ordered from biggest to smallest. When categories and series live in separate arrays, `sortCategories({ categories, series, value = (d) => d.y })` reorders both (pass `value: (d) => d` for plain numeric data) and returns `{ categories, series, order }` so callers can reorder parallel arrays (such as icons or colors) with `order`.
+- **Step 2 — optionally tone by rank:** `toneByRank(items, hue, value = (d) => d.y)` ranks items by `value` while keeping their input order and sets `color` on each item from `sequentialTone(rank, items.length, hue)`, placing the darkest ramp step (`--chart-<hue>-boldest`) on the largest value (rank `0`) and spreading `items.length` items across the ramp down to `subtler`.
 
 A single series uses one color, `--chart-brand` (`BRAND`), so the chart never implies multiple categories where there is only one measure.
 

@@ -69,9 +69,9 @@ for.
 from `0` to `100`, `letter` labels the column, and `color` fills it (defaulting
 to `--chart-brand`). Items sort from most to least by default through
 `mostToLeast`; pass `sort={false}` for ordinal or temporal axes such as grades
-or weekdays, and pair with `toneByRank` when shading items across a sequential
-ramp so the darkest tone lands on rank 0. The chart's `height` prop sets its
-pixel height (default 200).
+or weekdays, and pair with `toneByRank` (passing `(d) => parseFloat(d.height)`)
+when shading items across a sequential ramp so the darkest tone lands on the
+largest value. The chart's `height` prop sets its pixel height (default 200).
 
 ```jsx
 <SmartBarChart

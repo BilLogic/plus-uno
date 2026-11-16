@@ -219,19 +219,20 @@ describe('Comparison family charts on the shared foundation', () => {
                 sort: false,
                 data: toneByRank(
                     [
-                        { letter: 'A', height: '100' },
-                        { letter: 'B', height: '75' },
-                        { letter: 'C', height: '50' },
+                        { letter: 'A', height: '50' },
+                        { letter: 'B', height: '100' },
+                        { letter: 'C', height: '75' },
                         { letter: 'D', height: '25' },
                         { letter: 'E', height: '0' },
                     ],
                     'blue',
+                    (d) => parseFloat(d.height),
                 ),
             }),
         );
         const ordinalOptions = capturedOptions.at(-1);
         expect(ordinalOptions.xAxis.categories).toEqual(['A', 'B', 'C', 'D', 'E']);
-        expect(ordinalOptions.series[1].data[0].color).toBe('var(--chart-blue-boldest)');
+        expect(ordinalOptions.series[1].data[1].color).toBe('var(--chart-blue-boldest)');
         expect(ordinalOptions.series[1].data[4].color).toBe('var(--ds-background-accent-blue-subtler)');
     });
 

@@ -103,7 +103,7 @@ const StackedBarChart = ({ data = [], dates = [], yLabels, height = 207, yAxisMa
                         return `<span class="${CHART_VALUE_CLASS}" style="color: ${ink}">${this.point.customValue}</span>`;
                     },
                 },
-                // A 2px inverse-border gap separates adjacent stacked segments so touching fills stay distinct.
+                // A line-width inverse-border gap separates adjacent stacked segments so touching fills stay distinct.
                 borderWidth: CHART_LINE_WIDTH_NUMBER,
                 borderColor: CHROME.separator,
                 borderRadius: CHART_BAR_RADIUS,

@@ -16,7 +16,7 @@ const ParetoChart = ({
     height = 400,
 }) => {
     const { categories: orderedCategories, series: [{ data: orderedData }] } = useMemo(
-        () => sortCategories({ categories, series: [{ data }] }),
+        () => sortCategories({ categories, series: [{ data }], value: (d) => d }),
         [categories, data],
     );
 

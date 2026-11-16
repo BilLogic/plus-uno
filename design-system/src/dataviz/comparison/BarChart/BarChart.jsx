@@ -54,7 +54,7 @@ const BarChart = ({
     fillOpacity,
 }) => {
     const { categories: orderedCategories, series: orderedSeries } = useMemo(
-        () => (sort ? sortCategories({ categories, series }) : { categories, series }),
+        () => (sort ? sortCategories({ categories, series, value: (d) => d }) : { categories, series }),
         [categories, series, sort],
     );
 
