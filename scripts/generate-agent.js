@@ -28,6 +28,7 @@ const steps = [
   ['Figma component registry', `node scripts/generate-component-registry-from-storybook.js${flag}`],
   ['Figma token registry', `node scripts/generate-token-registry.mjs${flag}`],
   ['Knowledge audit spreadsheet', `node scripts/generate-knowledge-audit.js${flag}`],
+  ...(!check ? [['DS lookup index', 'node scripts/generate-ds-index.mjs']] : []),
 ];
 
 console.log(

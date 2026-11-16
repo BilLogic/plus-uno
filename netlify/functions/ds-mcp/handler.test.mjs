@@ -150,6 +150,8 @@ test('included_files in netlify.toml covers every file the five tools open', () 
     Object.assign(fs, real);
   }
 
+  assert.ok(bundled.has('design-system/agent-views/ds-index.json'), 'netlify.toml bundles ds-index.json');
+  assert.ok(read.has('design-system/agent-views/ds-index.json'), 'the lookup opens ds-index.json');
   assert.ok(read.size > 100, 'the trace caught almost no reads');
   const missing = [...read].filter((f) => !bundled.has(f) && !/^scripts\/|^netlify\//.test(f));
   assert.deepEqual(missing, [], `files the lookup opens that included_files in netlify.toml does not bundle:\n${missing.join('\n')}`);

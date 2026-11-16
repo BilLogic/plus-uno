@@ -32,6 +32,7 @@
 # roots, hence their style and script globs.
 [functions."ds-mcp"]
   included_files = [
+    "design-system/agent-views/ds-index.json",
     "design-system/agent-views/**",
     "design-system/guidelines/**",
     "design-system/figma/component-registry.json",

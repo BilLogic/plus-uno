@@ -310,10 +310,22 @@ test('guide survives a guideline folder that is empty or missing', () => {
     for (const e of fs.readdirSync(path.join(REPO_ROOT, 'design-system'))) {
       if (e !== 'guidelines') fs.symlinkSync(path.join(REPO_ROOT, 'design-system', e), path.join(tmp, 'design-system', e));
     }
-    const bare = createLookup(tmp);
+    const bare = createLookup(tmp, { buildIndex: true });
     assert.equal(bare.guide('color').path, 'design-system/agent-views/foundations/Colors.md');
     assert.ok(bare.guide('nope').topics.includes('typography'));
     assert.equal(bare.guide('data-visualization').text, null);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('a missing ds-index.json throws and names the generate command instead of rescanning', () => {
+  const tmp = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'ds-no-index-'));
+  try {
+    assert.throws(
+      () => createLookup(tmp),
+      { message: 'design-system/agent-views/ds-index.json is missing. Run `node scripts/generate-ds-index.mjs`.' },
+    );
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
@@ -389,4 +401,69 @@ test('situation patterns lead their components and templates have their own resu
 
 test('a clean check names the template and pattern fit limit', () => {
   assert.match(lookup.check({ code: 'export const value = 1;', path: 'prototypes/a.js' }).next, /[Tt]emplate.*pattern fit is not checked/);
+});
+
+test('a cold lookup reads only ds-index.json for find, get, tokens and guide, even when no source or guide files exist on disk', () => {
+  const tmp = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'ds-only-index-'));
+  try {
+    fs.mkdirSync(path.join(tmp, 'design-system/agent-views'), { recursive: true });
+    fs.copyFileSync(
+      path.join(REPO_ROOT, 'design-system/agent-views/ds-index.json'),
+      path.join(tmp, 'design-system/agent-views/ds-index.json'),
+    );
+    const read = new Set();
+    const realRead = fs.readFileSync;
+    fs.readFileSync = (file, ...rest) => {
+      if (typeof file === 'string' && path.isAbsolute(file) && file.startsWith(tmp)) {
+        read.add(path.relative(tmp, file).split(path.sep).join('/'));
+      }
+      return realRead(file, ...rest);
+    };
+    try {
+      const cold = createLookup(tmp, { readPaths: false });
+      assert.equal(cold.find('confirm before deleting').results[0].name, 'Common actions');
+      assert.equal(cold.get(['Button', 'PatternCard', 'Button.appearance', '--ds-text']).records[0].name, 'Button');
+      assert.ok(cold.tokens('stack').steps.length > 0);
+      assert.match(cold.guide('filtering').text, /^# Filtering\n/);
+      assert.match(cold.guide('ds/no-raw-literal').text, /^## ds\/no-raw-literal/);
+      assert.ok(cold.guide('nope').topics.includes('filtering'));
+    } finally {
+      fs.readFileSync = realRead;
+    }
+    assert.deepEqual([...read], ['design-system/agent-views/ds-index.json']);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('editing a docs page, component, guideline or rule doc without regenerating makes check:ds-index fail and name the regenerate command', async () => {
+  const { run: checkDsIndex } = await import('../generate-ds-index.mjs');
+  const linkTreeWithEdit = (srcDir, dstDir, parts, edit) => {
+    const [head, ...tail] = parts;
+    fs.mkdirSync(dstDir, { recursive: true });
+    for (const e of fs.readdirSync(srcDir)) {
+      const src = path.join(srcDir, e);
+      const dst = path.join(dstDir, e);
+      if (e !== head) fs.symlinkSync(src, dst);
+      else if (tail.length) linkTreeWithEdit(src, dst, tail, edit);
+      else fs.writeFileSync(dst, edit(fs.readFileSync(src, 'utf8')), 'utf8');
+    }
+  };
+  for (const [rel, edit] of [
+    ['design-system/src/components/forms-and-inputs/Button/Button.mdx', (t) => `${t}\n\nUnregenerated docs edit for drift test.\n`],
+    ['design-system/src/components/forms-and-inputs/Button/Button.jsx', (t) => t.replace('Button: triggers an action.', 'Button: triggers an unregenerated action.')],
+    ['design-system/guidelines/foundations/data-visualization.md', (t) => `${t}\n\nUnregenerated guideline edit for drift test.\n`],
+    ['docs/engineering/ds-usage-rules.md', (t) => `${t}\n\nUnregenerated rule edit for drift test.\n`],
+  ]) {
+    const tmp = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'ds-index-drift-'));
+    try {
+      linkTreeWithEdit(REPO_ROOT, tmp, rel.split('/'), edit);
+      const findings = checkDsIndex({ repoRoot: tmp });
+      assert.equal(findings.length, 1, `expected drift finding for ${rel}`);
+      assert.equal(findings[0].file, 'design-system/agent-views/ds-index.json');
+      assert.match(findings[0].message, /generate-ds-index\.mjs|npm run regenerate/);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  }
 });

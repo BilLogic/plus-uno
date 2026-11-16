@@ -118,9 +118,9 @@
       "Family/brand-heading": "var(--type-family-brand-heading)",
       "Family/code": "var(--type-family-code)",
       "Family/heading": "var(--type-family-heading)",
-      "Letter spacing/none": "var(--type-tracking-none)",
-      "Letter spacing/tight": "var(--type-tracking-tight)",
-      "Letter spacing/tighter": "var(--type-tracking-tighter)",
+      "Tracking/none": "var(--type-tracking-none)",
+      "Tracking/tight": "var(--type-tracking-tight)",
+      "Tracking/tighter": "var(--type-tracking-tighter)",
       "Type line height/100": "var(--type-line-height-100)",
       "Type line height/125": "var(--type-line-height-125)",
       "Type line height/150": "var(--type-line-height-150)",
@@ -140,12 +140,6 @@
     },
     "spacing / primitives": {
       "ProgressRing/stroke": "var(--progress-ring-stroke)",
-      "Radius/radius-0125": "var(--space-0125)",
-      "Radius/radius-025": "var(--space-025)",
-      "Radius/radius-03125": "var(--space-03125)",
-      "Radius/radius-050": "var(--space-050)",
-      "Radius/radius-075": "var(--space-075)",
-      "Radius/radius-100": "var(--space-100)",
       "Radius/radius-full": "var(--radius-full)",
       "Size/size-075": "var(--size-075)",
       "Size/size-100": "var(--size-100)",
@@ -205,8 +199,16 @@
       "Grid/gutter": "var(--grid-gutter)",
       "Grid/width-column": "var(--grid-width-column)",
       "Grid/width-column-screen": "var(--grid-width-column-screen)",
+      "Inline/lg": "var(--inline-lg)",
+      "Inline/md": "var(--inline-md)",
+      "Inline/sm": "var(--inline-sm)",
       "Pad/x-lg": "var(--pad-x-lg)",
+      "Pad/x-md": "var(--pad-x-md)",
+      "Pad/x-sm": "var(--pad-x-sm)",
+      "Pad/x-xs": "var(--pad-x-xs)",
       "Pad/y-lg": "var(--pad-y-lg)",
+      "Pad/y-md": "var(--pad-y-md)",
+      "Pad/y-sm": "var(--pad-y-sm)",
       "Radius/Control/lg": "var(--radius-control-lg)",
       "Radius/Control/md": "var(--radius-control-md)",
       "Radius/Control/sm": "var(--radius-control-sm)",
@@ -261,9 +263,12 @@
       "Size/Width/2000": "var(--width-2000)",
       "Size/Width/2500": "var(--width-2500)",
       "Size/Width/3000": "var(--width-3000)",
-      "Size/Width/500": "var(--width-500)"
+      "Size/Width/500": "var(--width-500)",
+      "Stack/lg": "var(--stack-lg)",
+      "Stack/md": "var(--stack-md)",
+      "Stack/sm": "var(--stack-sm)"
     },
-    "spacing / patterns": {
+    "spacing / templates": {
       "Blanket/fill": "var(--blanket-fill)",
       "Blanket/pad-x": "var(--blanket-pad-x)",
       "Blanket/pad-y": "var(--blanket-pad-y)",
@@ -284,12 +289,17 @@
       "Card/stack-lg": "var(--card-stack-lg)",
       "Card/stack-md": "var(--card-stack-md)",
       "Card/stack-sm": "var(--card-stack-sm)",
-      "Dropdown menu/max-height": "var(--dropdown-menu-max-height)",
-      "Dropdown menu/max-width": "var(--dropdown-menu-max-width)",
-      "Dropdown menu/min-width": "var(--dropdown-menu-min-width)",
-      "Dropdown menu/pad": "var(--dropdown-menu-pad)",
-      "Flag/stack": "var(--flag-stack)",
-      "Flag/width": "var(--flag-width)",
+      "Deprecated/Drawer/inline-lg": "var(--inline-lg)",
+      "Deprecated/Drawer/inline-md": "var(--inline-md)",
+      "Deprecated/Drawer/inline-sm": "var(--inline-sm)",
+      "Deprecated/Drawer/stack-lg": "var(--stack-lg)",
+      "Deprecated/Drawer/stack-md": "var(--stack-md)",
+      "Deprecated/Drawer/stack-sm": "var(--stack-sm)",
+      "Deprecated/Menu/radius-lg": "var(--radius-lg)",
+      "Deprecated/Menu/radius-md": "var(--radius-md)",
+      "Deprecated/Menu/radius-sm": "var(--radius-sm)",
+      "Deprecated/Tile/radius-lg": "var(--radius-lg)",
+      "Deprecated/Tile/radius-sm": "var(--radius-sm)",
       "Focused page/inline-md": "var(--focused-page-inline-md)",
       "Focused page/inline-sm": "var(--focused-page-inline-sm)",
       "Focused page/pad-x": "var(--focused-page-pad-x)",
@@ -339,6 +349,8 @@
       "Popup/gap-screen": "var(--popup-gap-screen)",
       "Popup/pad": "var(--popup-pad)",
       "Popup/radius": "var(--popup-radius)",
+      "Popup/width-3-col": "var(--popup-width-3-col)",
+      "Popup/width-4-col": "var(--popup-width-4-col)",
       "Popup/width-lg": "var(--popup-width-lg)",
       "Popup/width-md": "var(--popup-width-md)",
       "Popup/width-sm": "var(--popup-width-sm)",
@@ -361,12 +373,212 @@
       "Table/pad-x-footer": "var(--table-pad-x-footer)",
       "Table/pad-y-cell": "var(--table-pad-y-cell)",
       "Table/radius": "var(--table-radius)",
-      "Table/stack": "var(--table-stack)",
-      "Tooltip/max-width": "var(--tooltip-max-width)",
-      "Tooltip/pad-y": "var(--tooltip-pad-y)",
-      "Tooltip/radius": "var(--radius-control-sm)"
+      "Table/stack": "var(--table-stack)"
     },
-    "color / primitives": {},
+    "color / primitives": {
+      "blackAlpha/60": "var(--palette-black-alpha-60)",
+      "blue/100": "var(--palette-blue-100)",
+      "blue/1000": "var(--palette-blue-1000)",
+      "blue/1100": "var(--palette-blue-1100)",
+      "blue/200": "var(--palette-blue-200)",
+      "blue/250": "var(--palette-blue-250)",
+      "blue/300": "var(--palette-blue-300)",
+      "blue/400": "var(--palette-blue-400)",
+      "blue/500": "var(--palette-blue-500)",
+      "blue/600": "var(--palette-blue-600)",
+      "blue/700": "var(--palette-blue-700)",
+      "blue/800": "var(--palette-blue-800)",
+      "blue/850": "var(--palette-blue-850)",
+      "blue/900": "var(--palette-blue-900)",
+      "brown/100": "var(--palette-brown-100)",
+      "brown/1000": "var(--palette-brown-1000)",
+      "brown/1100": "var(--palette-brown-1100)",
+      "brown/200": "var(--palette-brown-200)",
+      "brown/250": "var(--palette-brown-250)",
+      "brown/300": "var(--palette-brown-300)",
+      "brown/400": "var(--palette-brown-400)",
+      "brown/500": "var(--palette-brown-500)",
+      "brown/600": "var(--palette-brown-600)",
+      "brown/700": "var(--palette-brown-700)",
+      "brown/800": "var(--palette-brown-800)",
+      "brown/850": "var(--palette-brown-850)",
+      "brown/900": "var(--palette-brown-900)",
+      "darkNeutral/0": "var(--palette-dark-neutral-0)",
+      "darkNeutral/100": "var(--palette-dark-neutral-100)",
+      "darkNeutral/1000": "var(--palette-dark-neutral-1000)",
+      "darkNeutral/1100": "var(--palette-dark-neutral-1100)",
+      "darkNeutral/200": "var(--palette-dark-neutral-200)",
+      "darkNeutral/250": "var(--palette-dark-neutral-250)",
+      "darkNeutral/300": "var(--palette-dark-neutral-300)",
+      "darkNeutral/350": "var(--palette-dark-neutral-350)",
+      "darkNeutral/400": "var(--palette-dark-neutral-400)",
+      "darkNeutral/500": "var(--palette-dark-neutral-500)",
+      "darkNeutral/600": "var(--palette-dark-neutral-600)",
+      "darkNeutral/700": "var(--palette-dark-neutral-700)",
+      "darkNeutral/750": "var(--palette-dark-neutral-750)",
+      "darkNeutral/800": "var(--palette-dark-neutral-800)",
+      "darkNeutral/900": "var(--palette-dark-neutral-900)",
+      "darkNeutralAlpha/100": "var(--palette-dark-neutral-alpha-100)",
+      "darkNeutralAlpha/200": "var(--palette-dark-neutral-alpha-200)",
+      "darkNeutralAlpha/300": "var(--palette-dark-neutral-alpha-300)",
+      "darkNeutralAlpha/400": "var(--palette-dark-neutral-alpha-400)",
+      "darkNeutralAlpha/500": "var(--palette-dark-neutral-alpha-500)",
+      "darkNeutralAlpha/600": "var(--palette-dark-neutral-alpha-600)",
+      "darkNeutralAlpha/700": "var(--palette-dark-neutral-alpha-700)",
+      "darkNeutralAlpha/750": "var(--palette-dark-neutral-alpha-750)",
+      "darkNeutralAlpha/800": "var(--palette-dark-neutral-alpha-800)",
+      "darkNeutralAlpha/850": "var(--palette-dark-neutral-alpha-850)",
+      "darkNeutralAlpha/900": "var(--palette-dark-neutral-alpha-900)",
+      "green/100": "var(--palette-green-100)",
+      "green/1000": "var(--palette-green-1000)",
+      "green/1100": "var(--palette-green-1100)",
+      "green/200": "var(--palette-green-200)",
+      "green/200a40": "var(--palette-green-200-a40)",
+      "green/250": "var(--palette-green-250)",
+      "green/300": "var(--palette-green-300)",
+      "green/400": "var(--palette-green-400)",
+      "green/500": "var(--palette-green-500)",
+      "green/600": "var(--palette-green-600)",
+      "green/700": "var(--palette-green-700)",
+      "green/800": "var(--palette-green-800)",
+      "green/850": "var(--palette-green-850)",
+      "green/900": "var(--palette-green-900)",
+      "green/900a70": "var(--palette-green-900-a70)",
+      "lagoon/100": "var(--palette-lagoon-100)",
+      "lagoon/1000": "var(--palette-lagoon-1000)",
+      "lagoon/1100": "var(--palette-lagoon-1100)",
+      "lagoon/200": "var(--palette-lagoon-200)",
+      "lagoon/250": "var(--palette-lagoon-250)",
+      "lagoon/300": "var(--palette-lagoon-300)",
+      "lagoon/400": "var(--palette-lagoon-400)",
+      "lagoon/500": "var(--palette-lagoon-500)",
+      "lagoon/600": "var(--palette-lagoon-600)",
+      "lagoon/700": "var(--palette-lagoon-700)",
+      "lagoon/800": "var(--palette-lagoon-800)",
+      "lagoon/850": "var(--palette-lagoon-850)",
+      "lagoon/900": "var(--palette-lagoon-900)",
+      "lime/100": "var(--palette-lime-100)",
+      "lime/1000": "var(--palette-lime-1000)",
+      "lime/1100": "var(--palette-lime-1100)",
+      "lime/200": "var(--palette-lime-200)",
+      "lime/250": "var(--palette-lime-250)",
+      "lime/300": "var(--palette-lime-300)",
+      "lime/400": "var(--palette-lime-400)",
+      "lime/500": "var(--palette-lime-500)",
+      "lime/600": "var(--palette-lime-600)",
+      "lime/700": "var(--palette-lime-700)",
+      "lime/800": "var(--palette-lime-800)",
+      "lime/850": "var(--palette-lime-850)",
+      "lime/900": "var(--palette-lime-900)",
+      "magenta/100": "var(--palette-magenta-100)",
+      "magenta/1000": "var(--palette-magenta-1000)",
+      "magenta/1100": "var(--palette-magenta-1100)",
+      "magenta/200": "var(--palette-magenta-200)",
+      "magenta/250": "var(--palette-magenta-250)",
+      "magenta/300": "var(--palette-magenta-300)",
+      "magenta/400": "var(--palette-magenta-400)",
+      "magenta/500": "var(--palette-magenta-500)",
+      "magenta/600": "var(--palette-magenta-600)",
+      "magenta/700": "var(--palette-magenta-700)",
+      "magenta/800": "var(--palette-magenta-800)",
+      "magenta/850": "var(--palette-magenta-850)",
+      "magenta/900": "var(--palette-magenta-900)",
+      "neutral/0": "var(--palette-neutral-0)",
+      "neutral/100": "var(--palette-neutral-100)",
+      "neutral/1000": "var(--palette-neutral-1000)",
+      "neutral/1100": "var(--palette-neutral-1100)",
+      "neutral/200": "var(--palette-neutral-200)",
+      "neutral/300": "var(--palette-neutral-300)",
+      "neutral/350": "var(--palette-neutral-350)",
+      "neutral/400": "var(--palette-neutral-400)",
+      "neutral/500": "var(--palette-neutral-500)",
+      "neutral/600": "var(--palette-neutral-600)",
+      "neutral/700": "var(--palette-neutral-700)",
+      "neutral/750": "var(--palette-neutral-750)",
+      "neutral/800": "var(--palette-neutral-800)",
+      "neutral/900": "var(--palette-neutral-900)",
+      "neutralAlpha/100": "var(--palette-neutral-alpha-100)",
+      "neutralAlpha/200": "var(--palette-neutral-alpha-200)",
+      "neutralAlpha/250": "var(--palette-neutral-alpha-250)",
+      "neutralAlpha/300": "var(--palette-neutral-alpha-300)",
+      "neutralAlpha/400": "var(--palette-neutral-alpha-400)",
+      "neutralAlpha/500": "var(--palette-neutral-alpha-500)",
+      "neutralAlpha/600": "var(--palette-neutral-alpha-600)",
+      "neutralAlpha/700": "var(--palette-neutral-alpha-700)",
+      "neutralAlpha/750": "var(--palette-neutral-alpha-750)",
+      "neutralAlpha/800": "var(--palette-neutral-alpha-800)",
+      "neutralAlpha/850": "var(--palette-neutral-alpha-850)",
+      "neutralAlpha/900": "var(--palette-neutral-alpha-900)",
+      "orange/100": "var(--palette-orange-100)",
+      "orange/1000": "var(--palette-orange-1000)",
+      "orange/1100": "var(--palette-orange-1100)",
+      "orange/200": "var(--palette-orange-200)",
+      "orange/250": "var(--palette-orange-250)",
+      "orange/300": "var(--palette-orange-300)",
+      "orange/400": "var(--palette-orange-400)",
+      "orange/500": "var(--palette-orange-500)",
+      "orange/600": "var(--palette-orange-600)",
+      "orange/700": "var(--palette-orange-700)",
+      "orange/800": "var(--palette-orange-800)",
+      "orange/850": "var(--palette-orange-850)",
+      "orange/900": "var(--palette-orange-900)",
+      "purple/100": "var(--palette-purple-100)",
+      "purple/1000": "var(--palette-purple-1000)",
+      "purple/1100": "var(--palette-purple-1100)",
+      "purple/200": "var(--palette-purple-200)",
+      "purple/250": "var(--palette-purple-250)",
+      "purple/300": "var(--palette-purple-300)",
+      "purple/400": "var(--palette-purple-400)",
+      "purple/500": "var(--palette-purple-500)",
+      "purple/600": "var(--palette-purple-600)",
+      "purple/700": "var(--palette-purple-700)",
+      "purple/800": "var(--palette-purple-800)",
+      "purple/850": "var(--palette-purple-850)",
+      "purple/900": "var(--palette-purple-900)",
+      "red/100": "var(--palette-red-100)",
+      "red/1000": "var(--palette-red-1000)",
+      "red/1100": "var(--palette-red-1100)",
+      "red/200": "var(--palette-red-200)",
+      "red/200a40": "var(--palette-red-200-a40)",
+      "red/250": "var(--palette-red-250)",
+      "red/300": "var(--palette-red-300)",
+      "red/400": "var(--palette-red-400)",
+      "red/500": "var(--palette-red-500)",
+      "red/500a8": "var(--palette-red-500-a8)",
+      "red/600": "var(--palette-red-600)",
+      "red/600a8": "var(--palette-red-600-a8)",
+      "red/700": "var(--palette-red-700)",
+      "red/800": "var(--palette-red-800)",
+      "red/850": "var(--palette-red-850)",
+      "red/900": "var(--palette-red-900)",
+      "red/900a70": "var(--palette-red-900-a70)",
+      "teal/100": "var(--palette-teal-100)",
+      "teal/1000": "var(--palette-teal-1000)",
+      "teal/1100": "var(--palette-teal-1100)",
+      "teal/200": "var(--palette-teal-200)",
+      "teal/250": "var(--palette-teal-250)",
+      "teal/300": "var(--palette-teal-300)",
+      "teal/400": "var(--palette-teal-400)",
+      "teal/500": "var(--palette-teal-500)",
+      "teal/600": "var(--palette-teal-600)",
+      "teal/700": "var(--palette-teal-700)",
+      "teal/800": "var(--palette-teal-800)",
+      "teal/850": "var(--palette-teal-850)",
+      "teal/900": "var(--palette-teal-900)",
+      "yellow/100": "var(--palette-yellow-100)",
+      "yellow/1000": "var(--palette-yellow-1000)",
+      "yellow/1100": "var(--palette-yellow-1100)",
+      "yellow/200": "var(--palette-yellow-200)",
+      "yellow/250": "var(--palette-yellow-250)",
+      "yellow/300": "var(--palette-yellow-300)",
+      "yellow/400": "var(--palette-yellow-400)",
+      "yellow/500": "var(--palette-yellow-500)",
+      "yellow/600": "var(--palette-yellow-600)",
+      "yellow/700": "var(--palette-yellow-700)",
+      "yellow/800": "var(--palette-yellow-800)",
+      "yellow/850": "var(--palette-yellow-850)",
+      "yellow/900": "var(--palette-yellow-900)"
+    },
     "color / semantics": {
       "color/ai/background/bold/default": "var(--ds-ai-background-bold)",
       "color/ai/background/bold/hovered": "var(--ds-ai-background-bold-hovered)",
@@ -890,6 +1102,61 @@
       "color/text/warning/bolder": "var(--ds-text-warning-bolder)",
       "color/text/warning/default": "var(--ds-text-warning)",
       "color/text/warning/inverse": "var(--ds-text-warning-inverse)",
+      "elevation/shadow/blocking/layer-1": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-1/offsetX": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-1/offsetY": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-1/radius": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-1/spread": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-2": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-2/offsetX": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-2/offsetY": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-2/radius": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-2/spread": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-3": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-3/offsetX": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-3/offsetY": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-3/radius": "var(--ds-shadow-blocking)",
+      "elevation/shadow/blocking/layer-3/spread": "var(--ds-shadow-blocking)",
+      "elevation/shadow/overflow/layer-1": "var(--ds-shadow-overflow-spread)",
+      "elevation/shadow/overflow/layer-1/offsetX": "var(--ds-shadow-overflow)",
+      "elevation/shadow/overflow/layer-1/offsetY": "var(--ds-shadow-overflow)",
+      "elevation/shadow/overflow/layer-1/radius": "var(--ds-shadow-overflow)",
+      "elevation/shadow/overflow/layer-1/spread": "var(--ds-shadow-overflow)",
+      "elevation/shadow/overflow/layer-2": "var(--ds-shadow-overflow-perimeter)",
+      "elevation/shadow/overflow/layer-2/offsetX": "var(--ds-shadow-overflow)",
+      "elevation/shadow/overflow/layer-2/offsetY": "var(--ds-shadow-overflow)",
+      "elevation/shadow/overflow/layer-2/radius": "var(--ds-shadow-overflow)",
+      "elevation/shadow/overflow/layer-2/spread": "var(--ds-shadow-overflow)",
+      "elevation/shadow/overlay/layer-1": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-1/offsetX": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-1/offsetY": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-1/radius": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-1/spread": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-2": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-2/offsetX": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-2/offsetY": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-2/radius": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-2/spread": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-3": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-3/offsetX": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-3/offsetY": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-3/radius": "var(--ds-shadow-overlay)",
+      "elevation/shadow/overlay/layer-3/spread": "var(--ds-shadow-overlay)",
+      "elevation/shadow/raised/layer-1": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-1/offsetX": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-1/offsetY": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-1/radius": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-1/spread": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-2": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-2/offsetX": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-2/offsetY": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-2/radius": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-2/spread": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-3": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-3/offsetX": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-3/offsetY": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-3/radius": "var(--ds-shadow-raised)",
+      "elevation/shadow/raised/layer-3/spread": "var(--ds-shadow-raised)",
       "elevation/surface/container/default": "var(--ds-surface-container)",
       "elevation/surface/container/hovered": "var(--ds-surface-container-hovered)",
       "elevation/surface/container/pressed": "var(--ds-surface-container-pressed)",
@@ -905,7 +1172,10 @@
       "elevation/surface/sunken": "var(--ds-surface-sunken)",
       "utility/elevation/surface/current": "var(--ds-utility-elevation-surface-current)"
     },
-    "color / opacity": {},
+    "color / opacity": {
+      "opacity/disabled": "var(--ds-opacity-disabled)",
+      "opacity/loading": "var(--ds-opacity-loading)"
+    },
     "spacing / components": {
       "Ai/chat-width": "var(--ai-chat-width)",
       "Avatar/size-128": "var(--avatar-size-128)",
@@ -935,12 +1205,18 @@
       "Choice/grid-control-size-12": "var(--choice-grid-control-size-12)",
       "Choice/tile-width": "var(--choice-tile-width)",
       "Count/tag-dot-size": "var(--count-tag-dot-size)",
+      "Dropdown menu/max-height": "var(--dropdown-menu-max-height)",
+      "Dropdown menu/max-width": "var(--dropdown-menu-max-width)",
+      "Dropdown menu/min-width": "var(--dropdown-menu-min-width)",
+      "Dropdown menu/pad": "var(--dropdown-menu-pad)",
       "File/item-height": "var(--file-item-height)",
       "Flag/min-height": "var(--flag-min-height)",
       "Flag/offset": "var(--flag-offset)",
       "Flag/pad": "var(--flag-pad)",
       "Flag/radius-timer": "var(--flag-radius-timer)",
+      "Flag/stack": "var(--flag-stack)",
       "Flag/timer-height": "var(--flag-timer-height)",
+      "Flag/width": "var(--flag-width)",
       "Inbox/width": "var(--inbox-width)",
       "Join/row-width": "var(--join-row-width)",
       "Listbox/max-height": "var(--listbox-max-height)",
@@ -1001,7 +1277,10 @@
       "Toggle/track-height-16": "var(--toggle-track-height-16)",
       "Toggle/track-height-20": "var(--toggle-track-height-20)",
       "Toggle/track-width-16": "var(--toggle-track-width-16)",
-      "Toggle/track-width-20": "var(--toggle-track-width-20)"
+      "Toggle/track-width-20": "var(--toggle-track-width-20)",
+      "Tooltip/max-width": "var(--tooltip-max-width)",
+      "Tooltip/pad-y": "var(--tooltip-pad-y)",
+      "Tooltip/radius": "var(--radius-control-sm)"
     },
     "layers": {
       "Layer/blanket": "var(--layer-blanket)",
@@ -1014,7 +1293,6 @@
       "Layer/spotlight": "var(--layer-spotlight)",
       "Layer/tooltip": "var(--layer-tooltip)"
     },
-    "panel / width": {},
     "motion": {
       "Spring/1600/damping": "var(--motion-spring-1600)",
       "Spring/1600/mass": "var(--motion-spring-1600)",
@@ -1614,12 +1892,12 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1162,
+    "scssTokenCount": 1164,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1789,
-      "resolved": 1479,
-      "percent": 83,
+      "total": 1782,
+      "resolved": 1756,
+      "percent": 99,
       "skippedCollections": [
         {
           "collection": "archived / colors / accent",
@@ -1652,2482 +1930,210 @@
       ],
       "unresolved": [
         {
-          "collection": "typography",
-          "figmaVariable": "Family/icon",
+          "collection": "spacing / primitives",
+          "figmaVariable": "Deprecated/Radius/radius-0125",
           "tried": [
-            "--type-family-icon"
+            "--radius-0125"
           ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "typography",
-          "figmaVariable": "Family/icon-brands",
-          "tried": [
-            "--type-family-icon-brands"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "typography",
-          "figmaVariable": "Weight/bold",
-          "tried": [
-            "--type-weight-bold"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / semantics",
-          "figmaVariable": "Element/radius-item-lg",
-          "tried": [
-            "--element-radius-item-lg"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / semantics",
-          "figmaVariable": "Focus/radius-item-lg",
-          "tried": [
-            "--focus-radius-item-lg"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / semantics",
-          "figmaVariable": "Focus/radius-item-md",
-          "tried": [
-            "--focus-radius-item-md"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / semantics",
-          "figmaVariable": "Focus/radius-item-sm",
-          "tried": [
-            "--focus-radius-item-sm"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / semantics",
-          "figmaVariable": "Focus/radius-lg",
-          "tried": [
-            "--focus-radius-lg"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / semantics",
-          "figmaVariable": "Focus/radius-md",
-          "tried": [
-            "--focus-radius-md"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / semantics",
-          "figmaVariable": "Focus/radius-sm",
-          "tried": [
-            "--focus-radius-sm"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / semantics",
-          "figmaVariable": "Focus/ring-radius",
-          "tried": [
-            "--focus-ring-radius"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / semantics",
-          "figmaVariable": "Inline/lg",
-          "tried": [
-            "--element-inline-lg"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / semantics",
-          "figmaVariable": "Inline/md",
-          "tried": [
-            "--element-inline-md"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / semantics",
-          "figmaVariable": "Inline/sm",
-          "tried": [
-            "--element-inline-sm"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / semantics",
-          "figmaVariable": "Pad/x-md",
-          "tried": [
-            "--element-pad-x-md"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / semantics",
-          "figmaVariable": "Pad/x-sm",
-          "tried": [
-            "--element-pad-x-sm"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / semantics",
-          "figmaVariable": "Pad/x-xs",
-          "tried": [
-            "--element-pad-x-xs"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / semantics",
-          "figmaVariable": "Pad/y-md",
-          "tried": [
-            "--element-pad-y-md"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / semantics",
-          "figmaVariable": "Pad/y-sm",
-          "tried": [
-            "--element-pad-y-sm"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / semantics",
-          "figmaVariable": "Stack/lg",
-          "tried": [
-            "--element-stack-lg"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / semantics",
-          "figmaVariable": "Stack/md",
-          "tried": [
-            "--element-stack-md"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / semantics",
-          "figmaVariable": "Stack/sm",
-          "tried": [
-            "--element-stack-sm"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / patterns",
-          "figmaVariable": "Card/pad-lg",
-          "tried": [
-            "--card-pad-lg"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / patterns",
-          "figmaVariable": "Card/pad-md",
-          "tried": [
-            "--card-pad-md"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / patterns",
-          "figmaVariable": "Card/pad-sm",
-          "tried": [
-            "--card-pad-sm"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / patterns",
-          "figmaVariable": "Drawer/inline-lg",
-          "tried": [
-            "--drawer-inline-lg"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / patterns",
-          "figmaVariable": "Drawer/inline-md",
-          "tried": [
-            "--drawer-inline-md"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / patterns",
-          "figmaVariable": "Drawer/inline-sm",
-          "tried": [
-            "--drawer-inline-sm"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / patterns",
-          "figmaVariable": "Drawer/pad",
-          "tried": [
-            "--drawer-pad"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / patterns",
-          "figmaVariable": "Drawer/stack-lg",
-          "tried": [
-            "--drawer-stack-lg"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / patterns",
-          "figmaVariable": "Drawer/stack-md",
-          "tried": [
-            "--drawer-stack-md"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / patterns",
-          "figmaVariable": "Drawer/stack-sm",
-          "tried": [
-            "--drawer-stack-sm"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / patterns",
-          "figmaVariable": "Drawer/width-lg",
-          "tried": [
-            "--drawer-width-lg"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / patterns",
-          "figmaVariable": "Drawer/width-md",
-          "tried": [
-            "--drawer-width-md"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / patterns",
-          "figmaVariable": "Drawer/width-sm",
-          "tried": [
-            "--drawer-width-sm"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / patterns",
-          "figmaVariable": "Frame/sidebar-docked",
-          "tried": [
-            "--frame-sidebar-docked"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "spacing / patterns",
-          "figmaVariable": "Menu/radius-lg",
-          "tried": [
-            "--popover-radius-menu-lg"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / patterns",
-          "figmaVariable": "Menu/radius-md",
-          "tried": [
-            "--popover-radius-menu-md"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / patterns",
-          "figmaVariable": "Menu/radius-sm",
-          "tried": [
-            "--popover-radius-menu-sm"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / patterns",
-          "figmaVariable": "Page/radius",
-          "tried": [
-            "--page-radius"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / patterns",
-          "figmaVariable": "Popup/width-3-col",
-          "tried": [
-            "--popup-width-3-col"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "spacing / patterns",
-          "figmaVariable": "Popup/width-4-col",
-          "tried": [
-            "--popup-width-4-col"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "spacing / patterns",
-          "figmaVariable": "Tile/radius-lg",
-          "tried": [
-            "--tile-radius-lg"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / patterns",
-          "figmaVariable": "Tile/radius-sm",
-          "tried": [
-            "--tile-radius-sm"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "blackAlpha/60",
-          "tried": [
-            "--60"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "blue/100",
-          "tried": [
-            "--100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "blue/1000",
-          "tried": [
-            "--1000"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "blue/1100",
-          "tried": [
-            "--1100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "blue/200",
-          "tried": [
-            "--200"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "blue/250",
-          "tried": [
-            "--250"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "blue/300",
-          "tried": [
-            "--300"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "blue/400",
-          "tried": [
-            "--400"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "blue/500",
-          "tried": [
-            "--500"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "blue/600",
-          "tried": [
-            "--600"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "blue/700",
-          "tried": [
-            "--700"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "blue/800",
-          "tried": [
-            "--800"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "blue/850",
-          "tried": [
-            "--850"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "blue/900",
-          "tried": [
-            "--900"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "brown/100",
-          "tried": [
-            "--100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "brown/1000",
-          "tried": [
-            "--1000"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "brown/1100",
-          "tried": [
-            "--1100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "brown/200",
-          "tried": [
-            "--200"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "brown/250",
-          "tried": [
-            "--250"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "brown/300",
-          "tried": [
-            "--300"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "brown/400",
-          "tried": [
-            "--400"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "brown/500",
-          "tried": [
-            "--500"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "brown/600",
-          "tried": [
-            "--600"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "brown/700",
-          "tried": [
-            "--700"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "brown/800",
-          "tried": [
-            "--800"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "brown/850",
-          "tried": [
-            "--850"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "brown/900",
-          "tried": [
-            "--900"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutral/0",
-          "tried": [
-            "--0"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutral/100",
-          "tried": [
-            "--100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutral/1000",
-          "tried": [
-            "--1000"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutral/1100",
-          "tried": [
-            "--1100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutral/200",
-          "tried": [
-            "--200"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutral/250",
-          "tried": [
-            "--250"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutral/300",
-          "tried": [
-            "--300"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutral/350",
-          "tried": [
-            "--350"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutral/400",
-          "tried": [
-            "--400"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutral/500",
-          "tried": [
-            "--500"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutral/600",
-          "tried": [
-            "--600"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutral/700",
-          "tried": [
-            "--700"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutral/750",
-          "tried": [
-            "--750"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutral/800",
-          "tried": [
-            "--800"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutral/900",
-          "tried": [
-            "--900"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutralAlpha/100",
-          "tried": [
-            "--100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutralAlpha/200",
-          "tried": [
-            "--200"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutralAlpha/300",
-          "tried": [
-            "--300"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutralAlpha/400",
-          "tried": [
-            "--400"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutralAlpha/500",
-          "tried": [
-            "--500"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutralAlpha/600",
-          "tried": [
-            "--600"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutralAlpha/700",
-          "tried": [
-            "--700"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutralAlpha/750",
-          "tried": [
-            "--750"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutralAlpha/800",
-          "tried": [
-            "--800"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutralAlpha/850",
-          "tried": [
-            "--850"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "darkNeutralAlpha/900",
-          "tried": [
-            "--900"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "green/100",
-          "tried": [
-            "--100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "green/1000",
-          "tried": [
-            "--1000"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "green/1100",
-          "tried": [
-            "--1100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "green/200",
-          "tried": [
-            "--200"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "green/200a40",
-          "tried": [
-            "--200a40"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "green/250",
-          "tried": [
-            "--250"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "green/300",
-          "tried": [
-            "--300"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "green/400",
-          "tried": [
-            "--400"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "green/500",
-          "tried": [
-            "--500"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "green/600",
-          "tried": [
-            "--600"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "green/700",
-          "tried": [
-            "--700"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "green/800",
-          "tried": [
-            "--800"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "green/850",
-          "tried": [
-            "--850"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "green/900",
-          "tried": [
-            "--900"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "green/900a70",
-          "tried": [
-            "--900a70"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lagoon/100",
-          "tried": [
-            "--100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lagoon/1000",
-          "tried": [
-            "--1000"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lagoon/1100",
-          "tried": [
-            "--1100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lagoon/200",
-          "tried": [
-            "--200"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lagoon/250",
-          "tried": [
-            "--250"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lagoon/300",
-          "tried": [
-            "--300"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lagoon/400",
-          "tried": [
-            "--400"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lagoon/500",
-          "tried": [
-            "--500"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lagoon/600",
-          "tried": [
-            "--600"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lagoon/700",
-          "tried": [
-            "--700"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lagoon/800",
-          "tried": [
-            "--800"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lagoon/850",
-          "tried": [
-            "--850"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lagoon/900",
-          "tried": [
-            "--900"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lime/100",
-          "tried": [
-            "--100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lime/1000",
-          "tried": [
-            "--1000"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lime/1100",
-          "tried": [
-            "--1100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lime/200",
-          "tried": [
-            "--200"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lime/250",
-          "tried": [
-            "--250"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lime/300",
-          "tried": [
-            "--300"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lime/400",
-          "tried": [
-            "--400"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lime/500",
-          "tried": [
-            "--500"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lime/600",
-          "tried": [
-            "--600"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lime/700",
-          "tried": [
-            "--700"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lime/800",
-          "tried": [
-            "--800"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lime/850",
-          "tried": [
-            "--850"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "lime/900",
-          "tried": [
-            "--900"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "magenta/100",
-          "tried": [
-            "--100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "magenta/1000",
-          "tried": [
-            "--1000"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "magenta/1100",
-          "tried": [
-            "--1100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "magenta/200",
-          "tried": [
-            "--200"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "magenta/250",
-          "tried": [
-            "--250"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "magenta/300",
-          "tried": [
-            "--300"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "magenta/400",
-          "tried": [
-            "--400"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "magenta/500",
-          "tried": [
-            "--500"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "magenta/600",
-          "tried": [
-            "--600"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "magenta/700",
-          "tried": [
-            "--700"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "magenta/800",
-          "tried": [
-            "--800"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "magenta/850",
-          "tried": [
-            "--850"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "magenta/900",
-          "tried": [
-            "--900"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutral/0",
-          "tried": [
-            "--0"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutral/100",
-          "tried": [
-            "--100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutral/1000",
-          "tried": [
-            "--1000"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutral/1100",
-          "tried": [
-            "--1100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutral/200",
-          "tried": [
-            "--200"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutral/300",
-          "tried": [
-            "--300"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutral/350",
-          "tried": [
-            "--350"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutral/400",
-          "tried": [
-            "--400"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutral/500",
-          "tried": [
-            "--500"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutral/600",
-          "tried": [
-            "--600"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutral/700",
-          "tried": [
-            "--700"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutral/750",
-          "tried": [
-            "--750"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutral/800",
-          "tried": [
-            "--800"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutral/900",
-          "tried": [
-            "--900"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutralAlpha/100",
-          "tried": [
-            "--100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutralAlpha/200",
-          "tried": [
-            "--200"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutralAlpha/250",
-          "tried": [
-            "--250"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutralAlpha/300",
-          "tried": [
-            "--300"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutralAlpha/400",
-          "tried": [
-            "--400"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutralAlpha/500",
-          "tried": [
-            "--500"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutralAlpha/600",
-          "tried": [
-            "--600"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutralAlpha/700",
-          "tried": [
-            "--700"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutralAlpha/750",
-          "tried": [
-            "--750"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutralAlpha/800",
-          "tried": [
-            "--800"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutralAlpha/850",
-          "tried": [
-            "--850"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "neutralAlpha/900",
-          "tried": [
-            "--900"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "orange/100",
-          "tried": [
-            "--100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "orange/1000",
-          "tried": [
-            "--1000"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "orange/1100",
-          "tried": [
-            "--1100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "orange/200",
-          "tried": [
-            "--200"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "orange/250",
-          "tried": [
-            "--250"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "orange/300",
-          "tried": [
-            "--300"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "orange/400",
-          "tried": [
-            "--400"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "orange/500",
-          "tried": [
-            "--500"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "orange/600",
-          "tried": [
-            "--600"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "orange/700",
-          "tried": [
-            "--700"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "orange/800",
-          "tried": [
-            "--800"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "orange/850",
-          "tried": [
-            "--850"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "orange/900",
-          "tried": [
-            "--900"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "purple/100",
-          "tried": [
-            "--100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "purple/1000",
-          "tried": [
-            "--1000"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "purple/1100",
-          "tried": [
-            "--1100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "purple/200",
-          "tried": [
-            "--200"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "purple/250",
-          "tried": [
-            "--250"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "purple/300",
-          "tried": [
-            "--300"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "purple/400",
-          "tried": [
-            "--400"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "purple/500",
-          "tried": [
-            "--500"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "purple/600",
-          "tried": [
-            "--600"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "purple/700",
-          "tried": [
-            "--700"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "purple/800",
-          "tried": [
-            "--800"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "purple/850",
-          "tried": [
-            "--850"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "purple/900",
-          "tried": [
-            "--900"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "red/100",
-          "tried": [
-            "--100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "red/1000",
-          "tried": [
-            "--1000"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "red/1100",
-          "tried": [
-            "--1100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "red/200",
-          "tried": [
-            "--200"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "red/200a40",
-          "tried": [
-            "--200a40"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "red/250",
-          "tried": [
-            "--250"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "red/300",
-          "tried": [
-            "--300"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "red/400",
-          "tried": [
-            "--400"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "red/500",
-          "tried": [
-            "--500"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "red/500a8",
-          "tried": [
-            "--500a8"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "red/600",
-          "tried": [
-            "--600"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "red/600a8",
-          "tried": [
-            "--600a8"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "red/700",
-          "tried": [
-            "--700"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "red/800",
-          "tried": [
-            "--800"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "red/850",
-          "tried": [
-            "--850"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "red/900",
-          "tried": [
-            "--900"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "red/900a70",
-          "tried": [
-            "--900a70"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "teal/100",
-          "tried": [
-            "--100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "teal/1000",
-          "tried": [
-            "--1000"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "teal/1100",
-          "tried": [
-            "--1100"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "teal/200",
-          "tried": [
-            "--200"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "teal/250",
-          "tried": [
-            "--250"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "teal/300",
-          "tried": [
-            "--300"
-          ],
           "reason": "no code syntax"
         },
         {
-          "collection": "color / primitives",
-          "figmaVariable": "teal/400",
+          "collection": "spacing / primitives",
+          "figmaVariable": "Deprecated/Radius/radius-025",
           "tried": [
-            "--400"
+            "--radius-025"
           ],
           "reason": "no code syntax"
         },
         {
-          "collection": "color / primitives",
-          "figmaVariable": "teal/500",
+          "collection": "spacing / primitives",
+          "figmaVariable": "Deprecated/Radius/radius-03125",
           "tried": [
-            "--500"
+            "--radius-03125"
           ],
           "reason": "no code syntax"
         },
         {
-          "collection": "color / primitives",
-          "figmaVariable": "teal/600",
+          "collection": "spacing / primitives",
+          "figmaVariable": "Deprecated/Radius/radius-050",
           "tried": [
-            "--600"
+            "--radius-050"
           ],
           "reason": "no code syntax"
         },
         {
-          "collection": "color / primitives",
-          "figmaVariable": "teal/700",
+          "collection": "spacing / primitives",
+          "figmaVariable": "Deprecated/Radius/radius-075",
           "tried": [
-            "--700"
+            "--radius-075"
           ],
           "reason": "no code syntax"
         },
         {
-          "collection": "color / primitives",
-          "figmaVariable": "teal/800",
+          "collection": "spacing / primitives",
+          "figmaVariable": "Deprecated/Radius/radius-100",
           "tried": [
-            "--800"
+            "--radius-100"
           ],
           "reason": "no code syntax"
         },
         {
-          "collection": "color / primitives",
-          "figmaVariable": "teal/850",
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Card/pad-lg",
           "tried": [
-            "--850"
+            "--pad-lg"
           ],
           "reason": "no code syntax"
         },
         {
-          "collection": "color / primitives",
-          "figmaVariable": "teal/900",
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Card/pad-md",
           "tried": [
-            "--900"
+            "--pad-md"
           ],
           "reason": "no code syntax"
         },
         {
-          "collection": "color / primitives",
-          "figmaVariable": "yellow/100",
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Card/pad-sm",
           "tried": [
-            "--100"
+            "--pad-sm"
           ],
           "reason": "no code syntax"
         },
         {
-          "collection": "color / primitives",
-          "figmaVariable": "yellow/1000",
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Drawer/pad",
           "tried": [
-            "--1000"
+            "--pad"
           ],
           "reason": "no code syntax"
         },
         {
-          "collection": "color / primitives",
-          "figmaVariable": "yellow/1100",
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Drawer/width-lg",
           "tried": [
-            "--1100"
+            "--width-lg"
           ],
           "reason": "no code syntax"
         },
         {
-          "collection": "color / primitives",
-          "figmaVariable": "yellow/200",
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Drawer/width-md",
           "tried": [
-            "--200"
+            "--width-md"
           ],
           "reason": "no code syntax"
         },
         {
-          "collection": "color / primitives",
-          "figmaVariable": "yellow/250",
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Drawer/width-sm",
           "tried": [
-            "--250"
+            "--width-sm"
           ],
           "reason": "no code syntax"
         },
         {
-          "collection": "color / primitives",
-          "figmaVariable": "yellow/300",
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Dropdown menu/max-height",
           "tried": [
-            "--300"
+            "--max-height"
           ],
           "reason": "no code syntax"
         },
         {
-          "collection": "color / primitives",
-          "figmaVariable": "yellow/400",
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Dropdown menu/max-width",
           "tried": [
-            "--400"
+            "--max-width"
           ],
           "reason": "no code syntax"
         },
         {
-          "collection": "color / primitives",
-          "figmaVariable": "yellow/500",
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Dropdown menu/min-width",
           "tried": [
-            "--500"
+            "--min-width"
           ],
           "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "yellow/600",
-          "tried": [
-            "--600"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "yellow/700",
-          "tried": [
-            "--700"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "yellow/800",
-          "tried": [
-            "--800"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "yellow/850",
-          "tried": [
-            "--850"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / primitives",
-          "figmaVariable": "yellow/900",
-          "tried": [
-            "--900"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "color/ai/border",
-          "tried": [
-            "--ds-ai-border"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "color/ai/icon",
-          "tried": [
-            "--ds-ai-icon"
-          ],
-          "reason": "code syntax names a token the code does not have"
         },
         {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-1",
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Dropdown menu/pad",
           "tried": [
-            "--layer-1"
+            "--pad"
           ],
           "reason": "no code syntax"
         },
         {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-1/offsetX",
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Flag/stack",
           "tried": [
-            "--offsetx"
+            "--stack"
           ],
           "reason": "no code syntax"
         },
         {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-1/offsetY",
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Flag/width",
           "tried": [
-            "--offsety"
+            "--width"
           ],
           "reason": "no code syntax"
         },
         {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-1/radius",
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Page/radius",
           "tried": [
             "--radius"
           ],
           "reason": "no code syntax"
         },
         {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-1/spread",
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Tooltip/max-width",
           "tried": [
-            "--spread"
+            "--max-width"
           ],
           "reason": "no code syntax"
         },
         {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-2",
-          "tried": [
-            "--layer-2"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-2/offsetX",
-          "tried": [
-            "--offsetx"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-2/offsetY",
-          "tried": [
-            "--offsety"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-2/radius",
-          "tried": [
-            "--radius"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-2/spread",
-          "tried": [
-            "--spread"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-3",
-          "tried": [
-            "--layer-3"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-3/offsetX",
-          "tried": [
-            "--offsetx"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-3/offsetY",
-          "tried": [
-            "--offsety"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-3/radius",
-          "tried": [
-            "--radius"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/blocking/layer-3/spread",
-          "tried": [
-            "--spread"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overflow/layer-1",
-          "tried": [
-            "--layer-1"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overflow/layer-1/offsetX",
-          "tried": [
-            "--offsetx"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overflow/layer-1/offsetY",
-          "tried": [
-            "--offsety"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overflow/layer-1/radius",
-          "tried": [
-            "--radius"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overflow/layer-1/spread",
-          "tried": [
-            "--spread"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overflow/layer-2",
-          "tried": [
-            "--layer-2"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overflow/layer-2/offsetX",
-          "tried": [
-            "--offsetx"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overflow/layer-2/offsetY",
-          "tried": [
-            "--offsety"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overflow/layer-2/radius",
-          "tried": [
-            "--radius"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overflow/layer-2/spread",
-          "tried": [
-            "--spread"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-1",
-          "tried": [
-            "--layer-1"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-1/offsetX",
-          "tried": [
-            "--offsetx"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-1/offsetY",
-          "tried": [
-            "--offsety"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-1/radius",
-          "tried": [
-            "--radius"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-1/spread",
-          "tried": [
-            "--spread"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-2",
-          "tried": [
-            "--layer-2"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-2/offsetX",
-          "tried": [
-            "--offsetx"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-2/offsetY",
-          "tried": [
-            "--offsety"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-2/radius",
-          "tried": [
-            "--radius"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-2/spread",
-          "tried": [
-            "--spread"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-3",
-          "tried": [
-            "--layer-3"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-3/offsetX",
-          "tried": [
-            "--offsetx"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-3/offsetY",
-          "tried": [
-            "--offsety"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-3/radius",
-          "tried": [
-            "--radius"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/overlay/layer-3/spread",
-          "tried": [
-            "--spread"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-1",
-          "tried": [
-            "--layer-1"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-1/offsetX",
-          "tried": [
-            "--offsetx"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-1/offsetY",
-          "tried": [
-            "--offsety"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-1/radius",
-          "tried": [
-            "--radius"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-1/spread",
-          "tried": [
-            "--spread"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-2",
-          "tried": [
-            "--layer-2"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-2/offsetX",
-          "tried": [
-            "--offsetx"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-2/offsetY",
-          "tried": [
-            "--offsety"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-2/radius",
-          "tried": [
-            "--radius"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-2/spread",
-          "tried": [
-            "--spread"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-3",
-          "tried": [
-            "--layer-3"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-3/offsetX",
-          "tried": [
-            "--offsetx"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-3/offsetY",
-          "tried": [
-            "--offsety"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-3/radius",
-          "tried": [
-            "--radius"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/shadow/raised/layer-3/spread",
-          "tried": [
-            "--spread"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / opacity",
-          "figmaVariable": "opacity/disabled",
-          "tried": [
-            "--disabled"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "color / opacity",
-          "figmaVariable": "opacity/loading",
-          "tried": [
-            "--loading"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "spacing / components",
-          "figmaVariable": "AI message/radius",
-          "tried": [
-            "--radius"
-          ],
-          "reason": "no code syntax"
-        },
-        {
-          "collection": "spacing / components",
-          "figmaVariable": "Button/size-vertical",
-          "tried": [
-            "--button-size-vertical"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / components",
-          "figmaVariable": "Prompt input/pad-y",
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Tooltip/pad-y",
           "tried": [
             "--pad-y"
           ],
           "reason": "no code syntax"
         },
         {
-          "collection": "spacing / components",
-          "figmaVariable": "Prompt input/radius",
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Tooltip/radius",
           "tried": [
             "--radius"
           ],
           "reason": "no code syntax"
         },
         {
-          "collection": "panel / width",
-          "figmaVariable": "Panel/width",
+          "collection": "spacing / templates",
+          "figmaVariable": "Frame/sidebar-docked",
           "tried": [
-            "--width"
+            "--sidebar-docked"
+          ],
+          "reason": "no code syntax"
+        },
+        {
+          "collection": "color / semantics",
+          "figmaVariable": "Deprecated/color/ai/border",
+          "tried": [
+            "--border"
+          ],
+          "reason": "no code syntax"
+        },
+        {
+          "collection": "color / semantics",
+          "figmaVariable": "Deprecated/color/ai/icon",
+          "tried": [
+            "--icon"
           ],
           "reason": "no code syntax"
         }
