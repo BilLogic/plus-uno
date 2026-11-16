@@ -25,12 +25,10 @@ const ENTRIES = ['scripts/ds.mjs', 'scripts/lib/ds-mcp-server.mjs'];
 export const SNAPSHOT_DIRS = [
   ['design-system/agent-views', null],
   ['design-system/guidelines', null],
-  // Docs pages, generated component pages and the barrels `loadFacts` reads; stories, styles and component source are not needed.
-  ['design-system/src', ['.md', '.mdx', '.json'], ['index.js']],
+  // Generated component pages, Free icon lists and the barrels `ds check` reads; stories, MDX, styles and component source are not needed.
+  ['design-system/src', ['.md', '.json'], ['index.js']],
 ];
 export const SNAPSHOT_FILES = [
-  'design-system/figma/component-registry.json',
-  'docs/engineering/ds-usage-rules.md',
   'docs/conventions/design-system-glossary.md',
 ];
 
