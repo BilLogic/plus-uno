@@ -265,7 +265,6 @@ The Frame decides what docks from its own width, not the window's, through one l
 - **Sidebar.** Below its docking width, opened by hand, it floats over the Page and closes on an outside press or Escape. Hovering the toggle or the left edge peeks a collapsed Sidebar over the Page with no Blanket. Clicking the toggle, or pressing Ctrl+[, closes a docked Sidebar and opens a collapsed one.
 - **AI panel.** It opens from anything inside the Frame through `usePanelControl()`. Both dock when the Sidebar, the panel and the content minimum fit. Otherwise a Sidebar left open by default collapses and comes back when the panel closes. Below that, the panel floats over the Page and the Sidebar on the overlay fill and shadow, with no Blanket.
 - **Narrow Frames** hold one layer open at a time: opening the Sidebar closes the panel, and opening the panel closes the Sidebar.
-- **`sectionDetail`** collapses the Sidebar first, so a list and its detail keep 960 side by side. If a collapsed Sidebar still leaves under 960, the panel stays docked and the detail replaces the list.
 - **Modals.** Opening a Modal closes a peeking or floating Sidebar, and a docked Sidebar stays. While a Modal is open the Sidebar does not peek, and Escape closes the Modal only. A Modal leaves the panel open under its Blanket.
 
 Docked, the panel meets the Page at a hairline. Its splitter resizes it from 320 to 640, but never past what keeps 720 beside a docked Sidebar. The width and whether the panel is open are kept for the tab.
@@ -343,12 +342,6 @@ Sign-in, errors and welcome have one job and no account yet, so the Frame carrie
 <RuleTag kind="review" />
 
 The count sets the side or the top once, when the task opens. The thresholds are under Focused steps.
-
-### Pass sectionDetail for a list and its detail.
-
-<RuleTag kind="review" />
-
-With `sectionDetail` and the panel open on a wide Frame, the Sidebar collapses and the list keeps its detail beside it. Without it, both dock and the detail replaces the list.
 
 ### Put the place in the header as a breadcrumb.
 

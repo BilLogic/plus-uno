@@ -168,75 +168,21 @@ describe('chat mode', () => {
     });
 });
 
-describe('Section detail', () => {
-    it('holds the split from 960 content', () => {
-        expect(resolve({ frameWidth: 1440, sectionDetail: true }).splitHolds).toBe(true); // 1152
-        expect(resolve({ frameWidth: 1248, sectionDetail: true }).splitHolds).toBe(true); // 960
-        expect(resolve({ frameWidth: 1247, sectionDetail: true }).splitHolds).toBe(false); // 959
-    });
-    it('is off when Section detail is off', () => {
-        expect(resolve({ frameWidth: 1440, sectionDetail: false }).splitHolds).toBe(false);
-    });
-    it('collapses the Sidebar first to keep the split when the Panel opens', () => {
-        // 1440 - 400 - 48 = 992 (Sidebar docked would be 752)
-        const r = resolve({ frameWidth: 1440, chatMode: 'panel', sectionDetail: true });
-        expect(r.sidebar).toBe('collapsed');
-        expect(r.panel).toBe('docked');
-        expect(r.contentWidth).toBe(992);
-        expect(r.splitHolds).toBe(true);
-    });
-    it('without Section detail the same frame keeps both docked', () => {
-        const r = resolve({ frameWidth: 1440, chatMode: 'panel', sectionDetail: false });
-        expect(r.sidebar).toBe('docked');
-        expect(r.panel).toBe('docked');
-        expect(r.contentWidth).toBe(752);
-    });
-    it('does not collapse a Sidebar opened by hand: the split gives way', () => {
-        const r = resolve({ frameWidth: 1440, chatMode: 'panel', sectionDetail: true, sidebar: byHand });
-        expect(r.sidebar).toBe('docked');
-        expect(r.panel).toBe('docked');
-        expect(r.splitHolds).toBe(false);
-    });
-    it('gives way when even a collapsed Sidebar leaves under 960', () => {
-        // 1300 - 400 - 48 = 852
-        const r = resolve({ frameWidth: 1300, chatMode: 'panel', sectionDetail: true });
-        expect(r.panel).toBe('docked');
-        expect(r.contentWidth).toBe(852);
-        expect(r.splitHolds).toBe(false);
-    });
-    it('does not auto-collapse for the split when no Panel is docked', () => {
-        const r = resolve({ frameWidth: 1100, sectionDetail: true });
-        expect(r.sidebar).toBe('docked');
-        expect(r.splitHolds).toBe(false);
-    });
-});
-
 describe('docked Panel maximum (the splitter)', () => {
-    it('keeps the 720 floor when no split holds', () => {
+    it('keeps the 720 floor', () => {
         // 1440 - 240 - 48 - 720 = 432
-        expect(dockedPanelMax({ frameWidth: 1440, sidebarDocked: true, splitHolds: false })).toBe(432);
-    });
-    it('keeps 960 while a split holds, so a drag never breaks it', () => {
-        // 1440 - 0 - 48 - 960 = 432
-        expect(dockedPanelMax({ frameWidth: 1440, sidebarDocked: false, splitHolds: true })).toBe(432);
-        // 1600 - 48 - 960 = 592 (floor-only would allow 640)
-        expect(dockedPanelMax({ frameWidth: 1600, sidebarDocked: false, splitHolds: true })).toBe(592);
+        expect(dockedPanelMax({ frameWidth: 1440, sidebarDocked: true })).toBe(432);
     });
     it('stays inside the Panel range', () => {
-        expect(dockedPanelMax({ frameWidth: 3000, sidebarDocked: false, splitHolds: true })).toBe(640);
-        expect(dockedPanelMax({ frameWidth: 1100, sidebarDocked: true, splitHolds: true })).toBe(320);
-    });
-    it('resolves a split that holds at the maximum', () => {
-        const max = dockedPanelMax({ frameWidth: 1600, sidebarDocked: false, splitHolds: true });
-        const r = resolve({ frameWidth: 1600, chatMode: 'panel', sectionDetail: true, panelWidth: max });
-        expect(r.splitHolds).toBe(true);
+        expect(dockedPanelMax({ frameWidth: 3000, sidebarDocked: false })).toBe(640);
+        expect(dockedPanelMax({ frameWidth: 1100, sidebarDocked: true })).toBe(320);
     });
 });
 
 describe('outputs', () => {
     it('are exactly the ones the Frame reads', () => {
         expect(Object.keys(resolveFrameLayout({ frameWidth: 1440 })).sort())
-            .toEqual(['panel', 'panelWidth', 'sidebar', 'splitHolds']);
+            .toEqual(['panel', 'panelWidth', 'sidebar']);
     });
 });
 

@@ -55,8 +55,8 @@ Each Section type combines a header and body, with an optional side or detail. T
 
 <TypeGrid>
 <TypeCard of={PatternSectionStories.TypeList} title="List">The view bar alone, one table, paging. The default for an area page.</TypeCard>
-<TypeCard of={PatternSectionStories.TypeQueue} title="Detail">A list with a detail that opens an item in place.</TypeCard>
-<TypeCard of={PatternSectionStories.TypeCards} title="Cards">Title and actions over a grid of cards, three or four across.</TypeCard>
+<TypeCard of={PatternSectionStories.Detail} title="Detail">A list with a detail that opens an item in place.</TypeCard>
+<TypeCard of={PatternSectionStories.TypeCards} title="Cards">Title and actions, a grid of cards three across.</TypeCard>
 <TypeCard of={PatternSectionStories.TypeStats} title="Stats">A row of cards, each one number and its label, four at most.</TypeCard>
 <TypeCard of={PatternSectionStories.TypeDetails} title="Details">Label and value pairs in two columns, with Edit in the title row.</TypeCard>
 <TypeCard of={PatternSectionStories.TypeMainAndSide} title="Main and side">A split with the side at the end and no fill: facts beside the main content.</TypeCard>
@@ -89,7 +89,7 @@ A Section with a view bar, a detail and a footer. The title, the first pill and 
 1. **Title row.** The h2, an optional one-line description, and actions only when there is no view bar.
 2. **View bar** (optional). Pill views at the start; at the end, in order, the format switch, Search, filters, More and the labeled Primary.
 3. **Body.** A Table, a card grid, a list, a form or subsections. A Table's head row follows the bar with nothing between.
-4. **Detail** (optional). Today the `detail` region draws the picked record beside the list, 5 of 12 columns, with Previous and Next and its own footer. It is not for queue pages: a queue page docks a `Panel` beside the list.
+4. **Detail** (optional). An inline expand on the subtle fill that opens in place inside the Section and pushes the content below it down. Never use it for a queue page, which docks a `Panel` beside the list.
 5. **Footer** (optional). Paging or "View all".
 
 </div>
@@ -123,7 +123,7 @@ A starting set, picked by what the Section holds. Every control state lives on i
 
 <ComponentExample of={PatternSectionStories.FilterSideAtStart} title="Filter side at the start" description={'When filtering is the main job: "Reset filters" at the top and a count beside each category. The tiers are the Filtering pattern.'} />
 
-<ComponentExample of={PatternSectionStories.TypeQueue} title="Detail" description="Today the detail region draws the picked record beside the list, with Previous and Next in its header. Not for queue pages, which dock a Panel." />
+<ComponentExample of={PatternSectionStories.Detail} title="Detail" description="An inline expand: the disclosure row opens in place inside the Section and pushes the content below it down. Queue pages dock a Panel instead." />
 
 </div>
 
@@ -162,7 +162,6 @@ Loading, errors and the search field follow their patterns and components: Loadi
 <tr><td><code>--section-stack-md</code></td><td>Header to body; body to footer.</td></tr>
 <tr><td><code>--section-stack-lg</code></td><td>Between subsections.</td></tr>
 <tr><td><code>--section-min-width-main</code>, <code>--section-min-width-side</code></td><td>The main and side columns of a split.</td></tr>
-<tr><td>Detail split</td><td>The list spans 7 of 12 columns and the detail 5, from 960 up (<code>SECTION_DETAIL_FLOOR</code>). A grid span in the Section styles, with no token.</td></tr>
 <tr><td><code>--section-radius</code></td><td>16: the corner of a Section with <code>fill="subtle"</code>. A Card inside it takes <code>--card-radius-compact</code> (12) instead of <code>--card-radius</code>.</td></tr>
 <tr><td><code>--section-pad-x-default</code>, <code>--section-pad-y-default</code></td><td>A Section with <code>fill="subtle"</code>, on <code>--ds-surface-sunken</code>.</td></tr>
 <tr><td><code>--heading-md</code>, <code>--heading-sm</code></td><td>A Section title and a subsection title.</td></tr>
@@ -204,7 +203,8 @@ Loading, errors and the search field follow their patterns and components: Loadi
 <tr><td><code>children</code></td><td>The body: a Table, a card grid, a list, a form or subsections.</td></tr>
 <tr><td><code>layout="split"</code> · <code>side</code></td><td>A second column at the end, for a summary.</td></tr>
 <tr><td><code>sidePlacement</code> <PlannedTag /></td><td>Planned. <code>start</code> puts the side first, for a filter side or a step rail.</td></tr>
-<tr><td><code>detail</code> · <code>detailTitle</code> · <code>detailFooter</code></td><td>The picked record beside the list, with Previous and Next. Not for queue pages, which dock a <code>Panel</code>.</td></tr>
+<tr><td><code>detail</code> · <code>detailTitle</code> · <code>detailDescription</code> · <code>detailFooter</code></td><td>An inline expand that opens in place inside the Section and pushes the content below it down. Never use it for a queue page, which docks a <code>Panel</code>.</td></tr>
+<tr><td><code>detailOpen</code> · <code>defaultDetailOpen</code> · <code>onDetailOpenChange</code></td><td>Open state of the inline detail expand.</td></tr>
 <tr><td><code>footer</code></td><td>Paging or "View all".</td></tr>
 </tbody>
 </DocsTable>
@@ -227,7 +227,7 @@ The bulk bar lives in the Dynamic table's head row, through its <code>bulkAction
 
 Use `PatternSection` when content has a heading, shares actions, shows or hides as a unit, or takes its own span of the grid; otherwise the content belongs to the Section above it. The header is the Section's, not the Table's: the title row names it, and the view bar under it holds the views at the start and everything that acts on the content at the end, so switching views can swap a table for cards while the bar stays put.
 
-A Section has two looks, `none` and `subtle`, and five parts: header, body, side, detail and footer. The side and the detail take either fill. The `detail` region is a split view today; a **Section detail** in the product sense is an inline expand (see Best practices below).
+A Section has two looks, `none` and `subtle`, and five parts: header, body, side, detail and footer. The side takes either fill; the detail is an inline expand on the subtle fill that opens in place inside the Section and pushes the content below it down.
 
 </div>
 
@@ -376,7 +376,7 @@ The table's empty state replaces the whole table, by the Empty pattern; elevatio
 - The pill views are a tablist; the selected tab says which rows the body shows. Views swap in place.
 - Search, Filter and More carry their names: "Search students", "Filters, 2 applied", "More". The Filter count is in the name as well as on the button.
 - The table announces a selection politely, "2 selected", and the bulk bar's actions follow the select-all checkbox in the tab order.
-- The detail is a region named by its title. Below 960 its back link returns to the list.
+- The detail is a collapsible region named by its title: the disclosure button toggles it with Enter or Space, and Escape inside the open detail closes it and returns focus to the button.
 
 </div>
 

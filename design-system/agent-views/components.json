@@ -5679,15 +5679,6 @@
           "deprecated": null
         },
         {
-          "name": "sectionDetail",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "A Section detail layout is on the Page: the Sidebar collapses first to keep the 960 split.",
-          "deprecated": null
-        },
-        {
           "name": "width",
           "type": "enum",
           "required": false,
@@ -5799,8 +5790,6 @@
         "PanelRememberedForTheTab",
         "PanelPeek",
         "NoPanelPeekByDefault",
-        "SectionDetailKeepsSplitAt1440",
-        "SectionDetailSplitterKeepsSplitAt1440",
         "StateSidebarDocked",
         "StateSidebarClosed",
         "StateSidebarPeek",
@@ -9266,7 +9255,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "The optional detail region on the right: one record of the content. Pass `null` for the region with nothing open; leave it off for a plain Section",
+          "description": "Inline expand content that opens in place inside the Section and pushes the content below it down",
           "deprecated": null
         },
         {
@@ -9275,7 +9264,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "The detail's title; also the region's accessible name",
+          "description": "Title on the detail disclosure button; also names the detail region",
           "deprecated": null
         },
         {
@@ -9284,7 +9273,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Optional description under the detail title",
+          "description": "Optional description on the detail disclosure button",
           "deprecated": null
         },
         {
@@ -9297,84 +9286,30 @@
           "deprecated": null
         },
         {
-          "name": "hasSelection",
+          "name": "detailOpen",
           "type": "bool",
           "required": false,
-          "default": "Boolean(detail)",
-          "values": null,
-          "description": "Whether a record is open. Defaults to whether `detail` is given",
-          "deprecated": null
-        },
-        {
-          "name": "onBack",
-          "type": "func",
-          "required": false,
           "default": null,
           "values": null,
-          "description": "Runs the back link. The link shows only when this is set and the detail replaces the list",
+          "description": "Controlled open state of the inline detail expand",
           "deprecated": null
         },
         {
-          "name": "backLabel",
-          "type": "string",
-          "required": false,
-          "default": "'Back to list'",
-          "values": null,
-          "description": "The back link's label",
-          "deprecated": null
-        },
-        {
-          "name": "onPrevious",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Runs the previous button; the stepper shows when either handler is set",
-          "deprecated": null
-        },
-        {
-          "name": "onNext",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Runs the next button",
-          "deprecated": null
-        },
-        {
-          "name": "previousDisabled",
+          "name": "defaultDetailOpen",
           "type": "bool",
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Disables the previous button, at the start of the queue",
+          "description": "Whether an uncontrolled inline detail expand starts open",
           "deprecated": null
         },
         {
-          "name": "nextDisabled",
-          "type": "bool",
+          "name": "onDetailOpenChange",
+          "type": "func",
           "required": false,
-          "default": "false",
+          "default": null,
           "values": null,
-          "description": "Disables the next button, at the end of the queue",
-          "deprecated": null
-        },
-        {
-          "name": "previousLabel",
-          "type": "string",
-          "required": false,
-          "default": "'Previous'",
-          "values": null,
-          "description": "The previous button's label",
-          "deprecated": null
-        },
-        {
-          "name": "nextLabel",
-          "type": "string",
-          "required": false,
-          "default": "'Next'",
-          "values": null,
-          "description": "The next button's label",
+          "description": "Called with the next open boolean when the inline detail expand toggles",
           "deprecated": null
         },
         {
@@ -9474,11 +9409,6 @@
         "SplitLayout",
         "Spacing",
         "Detail",
-        "DetailWithPanel",
-        "DetailWithPanelNoSectionDetail",
-        "DetailSplitAt1440",
-        "DetailSplitHoldsWithPanelAt1440",
-        "DetailReplacesListBelow960",
         "TypeList",
         "TypeQueue",
         "TypeCards",
@@ -9506,6 +9436,13 @@
         "--body-default",
         "--body-sm",
         "--control-md",
+        "--ds-background-neutral-subtle-hovered",
+        "--ds-background-neutral-subtle-pressed",
+        "--ds-icon-subtle",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
+        "--ds-motion-spatial-fast",
+        "--ds-motion-spatial-fast-duration",
         "--ds-surface-sunken",
         "--ds-text",
         "--ds-text-subtle",

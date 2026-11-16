@@ -58,7 +58,7 @@ export const MOTION_REGISTRY = [
       'view-bar': { transition: 'Swap content in place', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Title row: nothing moves. The selected pill\'s fill and the format switch\'s indicator glide while the content swaps in place. Search and the Filter count grow to the left.' },
       'side-open': { transition: 'Expand and collapse', spatial: 'spatial.default', note: 'The side opens and collapses as a section. Below 960 it hides with no animation.' },
       'side-close': { transition: 'Expand and collapse', spatial: 'spatial.default', note: 'Collapses back the same way. Below 960 the side is gone in the same frame, with no animation.' },
-      detail: { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.default', note: 'A quick look is an overlay; promoted to its record page it grows from the Panel itself.' },
+      detail: { transition: 'Expand and collapse', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Opens in place inside the Section and pushes the content below it down.' },
       body: { transition: 'Load content', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Content loads on arrival; add or remove, reorder and swap content as it changes.' },
       footer: { transition: 'Step to the next or previous', spatial: 'spatial.default', note: 'Paging is Step.' },
     },
