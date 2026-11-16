@@ -47,7 +47,7 @@ groups, use `BoxPlotChart`. For a distribution across two dimensions, use
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Bins', <>One column per range; height encodes count. Set range width with <C>binWidth</C> or let the chart choose it. Outlined in <C>--ds-border-inverse</C> to separate adjacent bins.</>],
+        ['Bins', <>One column per range in ascending numeric order (ordinal opt-out from category sorting); height encodes count. Set range width with <C>binWidth</C> or let the chart choose it. Rounded at the value end by <C>--chart-bar-radius</C> and outlined in <C>--ds-border-inverse</C> to separate adjacent bins.</>],
         ['Bin axis', <>Top axis showing value ranges, titled by <C>yAxisLabel</C>.</>],
         ['Raw-data axis', <>Bottom axis for the hidden raw-data series, titled by <C>xAxisLabel</C>.</>],
         ['Count axis', 'Left axis titled "Count"; an unused right axis is titled "Probability".'],

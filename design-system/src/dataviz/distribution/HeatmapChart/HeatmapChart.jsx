@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
 import chartTheme, { CHART_SPACING_COMPACT } from '@/dataviz/chartTheme';
+import { CHART_VALUE_CLASS, valueSpan } from '@/dataviz/chartFormat';
 import { HUES, divergingRamp, rampStops, sequentialRamp } from '@/dataviz/palette';
 import { inkFor, resolveColor, textInks, useColorModeKey } from '@/dataviz/colorMode';
 
@@ -36,14 +37,21 @@ const HeatmapChart = ({
     /** When false, hides values in cells; value is represented by color/opacity only. */
     showDataLabels = true,
     /** Gap between cells (0–1). Larger = more room for breath. */
-    pointPadding = 0,
-    /** When false, the heatmap draws without an entrance. */
-    enableAnimation = true
+    pointPadding = 0
 }) => {
     const mode = useColorModeKey();
     const options = useMemo(() => {
         const ramp = diverging ? divergingRamp(...diverging) : sequentialRamp(hue);
         const inks = textInks();
+        const defaultInset = chartTheme.chart.spacing[0];
+        const verticalInset = compactSpacing ? CHART_SPACING_COMPACT : defaultInset;
+        // Highcharts defaults a vertical colorAxis bar to a fixed length that overflows short plots;
+        // subtract container insets, the x-axis category band, and end-label clearance.
+        const xAxisMargin = xCategories.length > 0 ? defaultInset * 2 : 0;
+        const symbolHeight = Math.max(
+            defaultInset,
+            height - verticalInset * 2 - xAxisMargin - defaultInset * 2
+        );
         return {
         ...chartTheme,
         chart: {
@@ -73,9 +81,7 @@ const HeatmapChart = ({
         },
         plotOptions: {
             heatmap: {
-                pointPadding: pointPadding,
-                // The entrance timing comes from PlusChart's motion model; this only opts out.
-                ...(!enableAnimation && { animation: false })
+                pointPadding: pointPadding
             }
         },
         legend: {
@@ -84,16 +90,16 @@ const HeatmapChart = ({
             align: 'right',
             layout: 'vertical',
             margin: 0,
-            verticalAlign: 'top',
-            y: 25,
-            symbolHeight: 280,
-            ...(hideLegendNavigation && { navigation: { enabled: false } })
+            verticalAlign: 'middle',
+            symbolHeight,
+            navigation: { enabled: false }
         },
         tooltip: {
             ...chartTheme.tooltip,
             formatter: function () {
-                return `<b>${this.series.xAxis.categories[this.point.x]}</b><br/>
-                        <b>${this.series.yAxis.categories[this.point.y]}</b>: ${this.point.value.toFixed(2)}`;
+                const xLabel = this.series.xAxis.categories[this.point.x];
+                const yLabel = this.series.yAxis.categories[this.point.y];
+                return `${valueSpan(xLabel)}<br/>${yLabel}: ${valueSpan(this.point.value.toFixed(2))}`;
             }
         },
         series: [{
@@ -105,10 +111,7 @@ const HeatmapChart = ({
                 // A label sits on its cell, so it takes whichever text ink reads on that cell.
                 formatter: function () {
                     const ink = inkFor(this.point.color, inks);
-                    return `<span style="color: ${ink}">${this.point.value}</span>`;
-                },
-                style: {
-                    textOutline: 'none'
+                    return `<span class="${CHART_VALUE_CLASS}" style="color: ${ink}">${this.point.value}</span>`;
                 }
             }
         }]
@@ -117,9 +120,7 @@ const HeatmapChart = ({
         compactSpacing,
         data,
         diverging,
-        enableAnimation,
         height,
-        hideLegendNavigation,
         hue,
         max,
         min,
@@ -164,9 +165,7 @@ HeatmapChart.propTypes = {
     /** When false, hides values in cells (color/opacity only) */
     showDataLabels: PropTypes.bool,
     /** Gap between cells (0–1) for visual breathing room */
-    pointPadding: PropTypes.number,
-    /** When false, the heatmap draws without an entrance */
-    enableAnimation: PropTypes.bool
+    pointPadding: PropTypes.number
 };
 
 export default HeatmapChart;

@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme from '@/dataviz/chartTheme';
+import chartTheme, { CHART_BAR_RADIUS, CHART_GRID_WIDTH_NUMBER } from '@/dataviz/chartTheme';
+import { dataLabelFormat, valueSpan } from '@/dataviz/chartFormat';
+import { BRAND, CHROME, mostToLeast } from '@/dataviz/palette';
 
 /**
  * VariwidthChart Component
@@ -12,8 +14,19 @@ const VariwidthChart = ({
     data = [],
     xAxisLabel = 'Category',
     yAxisLabel = 'Value',
-    height = 400
+    height = 400,
+    sort = true
 }) => {
+    const orderedData = useMemo(
+        () => (sort ? mostToLeast(data, (d) => d.y) : data),
+        [data, sort],
+    );
+
+    const tooltipFormat = {
+        ...chartTheme.tooltip,
+        pointFormat: `Value: ${valueSpan('{point.y}')}<br/>Weight: ${valueSpan('{point.z}')}`
+    };
+
     const options = {
         ...chartTheme,
         chart: {
@@ -25,31 +38,31 @@ const VariwidthChart = ({
         xAxis: {
             ...chartTheme.xAxis,
             type: 'category',
-            title: { text: xAxisLabel }
+            title: { ...chartTheme.xAxis.title, text: xAxisLabel }
         },
         yAxis: {
             ...chartTheme.yAxis,
-            title: { text: yAxisLabel, style: chartTheme.yAxis.labels.style }
+            title: { ...chartTheme.yAxis.title, text: yAxisLabel }
         },
-        tooltip: {
-            ...chartTheme.tooltip,
-            pointFormat: 'Value: <b>{point.y}</b><br>Weight: <b>{point.z}</b>'
-        },
+        tooltip: tooltipFormat,
         legend: { enabled: false },
+        plotOptions: {
+            variwide: {
+                borderColor: CHROME.separator,
+                borderWidth: CHART_GRID_WIDTH_NUMBER,
+                borderRadius: CHART_BAR_RADIUS,
+                tooltip: tooltipFormat
+            }
+        },
         series: [{
             name: 'Data',
-            data: data.map(item => ({
-                name: item.name,
-                y: item.y,
-                z: item.z,
-                color: item.color
-            })),
+            color: BRAND,
+            data: orderedData,
             dataLabels: {
+                ...chartTheme.plotOptions.series.dataLabels,
                 enabled: true,
-                format: '{point.y:.0f}'
-            },
-            colorByPoint: true,
-            colors: chartTheme.colors
+                format: dataLabelFormat('{point.y:.0f}')
+            }
         }]
     };
 
@@ -73,7 +86,9 @@ VariwidthChart.propTypes = {
     /** Y-axis label */
     yAxisLabel: PropTypes.string,
     /** Chart height */
-    height: PropTypes.number
+    height: PropTypes.number,
+    /** Sort categories from most to least by value; pass false for ordinal or temporal axes. */
+    sort: PropTypes.bool
 };
 
 export default VariwidthChart;

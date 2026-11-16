@@ -48,7 +48,7 @@ spread within each category, use `BoxPlotChart`.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Columns', <>One per item; height is <C>y</C>, width is <C>z</C>, colored in categorical order unless the item sets <C>color</C>.</>],
+        ['Columns', <>One per item; height is <C>y</C>, width is <C>z</C>, filled in <C>--chart-brand</C> unless the item sets <C>color</C>, rounded at the value end by <C>--chart-bar-radius</C> and separated by <C>--ds-border-inverse</C>.</>],
         ['Value labels', <>Prints <C>y</C> rounded to a whole number on every column.</>],
         ['Category axis', <>Names each column from <C>name</C>; titled by <C>xAxisLabel</C> (default <C>"Category"</C>); no separate legend.</>],
         ['Value axis', <>Titled by <C>yAxisLabel</C> (default <C>"Value"</C>).</>],
@@ -63,7 +63,10 @@ spread within each category, use `BoxPlotChart`.
 ## Data shape
 
 `data` is an array of `{ name, y, z, color }` (`name`, `y` and `z` required;
-`color` optional). `height` defaults to 400.
+`color` optional). Columns sort from most to least by `y` by default through
+`mostToLeast`; pass `sort={false}` for ordinal or temporal categories, and pair
+with `toneByRank` when shading across a sequential ramp so the darkest step
+lands on the largest value. `height` defaults to 400.
 
 ```jsx
 <VariwidthChart
@@ -84,7 +87,7 @@ spread within each category, use `BoxPlotChart`.
 
 ## Color and accessibility
 
-- **Per-column color.** Columns cycle through the [categorical order](?path=/docs/data-visualizations-color--docs) from slot 1 (overflowing past six and repeating past eight). Because the axis already names each column, pass `color: 'var(--chart-brand)'` on every item if you prefer one hue.
+- **Single series color.** Columns use `--chart-brand` by default so one series reads as one measure; pass `toneByRank(data, hue, (d) => d.y)` when shading ordered cohorts across one sequential hue.
 - **Height and width carry the values.** There is no width axis, so state what column width represents in the header or description.
 - **Ensure height × width is meaningful.** Readers naturally compare column areas, so use this chart only when the product of height and width makes sense.
 - **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.

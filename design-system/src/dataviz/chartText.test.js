@@ -111,5 +111,7 @@ describe('chart sources', () => {
         expect(report.filter((entry) => entry.startsWith('flow-and-relationships/'))).toEqual([]);
         expect(report.filter((entry) => entry.startsWith('temporal/'))).toEqual([]);
         expect(report.filter((entry) => entry.startsWith('part-to-whole/'))).toEqual([]);
+        expect(report.filter((entry) => entry.startsWith('distribution/'))).toEqual([]);
+        expect(report.filter((entry) => entry.startsWith('correlation/'))).toEqual([]);
     });
 });

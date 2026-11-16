@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme, { CHART_GRID_WIDTH_NUMBER } from '@/dataviz/chartTheme';
+import chartTheme, { CHART_BUBBLE_MAX_SIZE, CHART_BUBBLE_MIN_SIZE, CHART_GRID_WIDTH_NUMBER } from '@/dataviz/chartTheme';
+import { tooltipHeaderFormat, valueSpan } from '@/dataviz/chartFormat';
 import { seriesColor } from '@/dataviz/palette';
 
 /**
@@ -22,6 +23,16 @@ const BubbleChart = ({
         color: s.color || seriesColor(i, all.length)
     }));
 
+    const tooltipFormat = {
+        ...chartTheme.tooltip,
+        headerFormat: tooltipHeaderFormat('{series.name}'),
+        pointFormat: [
+            `${xAxisLabel}: ${valueSpan('{point.x}')}`,
+            `${yAxisLabel}: ${valueSpan('{point.y}')}`,
+            `${zAxisLabel}: ${valueSpan('{point.z}')}`,
+        ].join('<br/>')
+    };
+
     const options = {
         ...chartTheme,
         chart: {
@@ -33,29 +44,28 @@ const BubbleChart = ({
         title: { text: null },
         xAxis: {
             ...chartTheme.xAxis,
-            title: { text: xAxisLabel, style: chartTheme.xAxis.labels.style },
+            title: { ...chartTheme.xAxis.title, text: xAxisLabel },
             gridLineWidth: CHART_GRID_WIDTH_NUMBER
         },
         yAxis: {
             ...chartTheme.yAxis,
-            title: { text: yAxisLabel, style: chartTheme.yAxis.labels.style }
+            title: { ...chartTheme.yAxis.title, text: yAxisLabel }
         },
-        tooltip: {
-            ...chartTheme.tooltip,
-            useHTML: true,
-            pointFormat: `<b>{series.name}</b><br/>
-                ${xAxisLabel}: {point.x}<br/>
-                ${yAxisLabel}: {point.y}<br/>
-                ${zAxisLabel}: {point.z}`
-        },
+        tooltip: tooltipFormat,
         plotOptions: {
             bubble: {
-                minSize: 10,
-                maxSize: 60,
+                minSize: CHART_BUBBLE_MIN_SIZE,
+                maxSize: CHART_BUBBLE_MAX_SIZE,
                 marker: {
+                    // Token gap: only `--ds-opacity-disabled` (0.4) and `--ds-opacity-loading` (0.2) exist today; no translucent mark-fill opacity token exists yet.
                     fillOpacity: 0.7
-                }
+                },
+                tooltip: tooltipFormat
             }
+        },
+        legend: {
+            ...chartTheme.legend,
+            enabled: true
         },
         series: seriesWithTheme
     };

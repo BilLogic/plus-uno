@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
 import chartTheme from '@/dataviz/chartTheme';
+import { tooltipPointFormat } from '@/dataviz/chartFormat';
+import { BRAND } from '@/dataviz/palette';
 
 /**
  * VennDiagram Component
@@ -12,6 +14,14 @@ const VennDiagram = ({
     data = [],
     height = 400
 }) => {
+    const isSingleSet = data.filter((d) => d.sets?.length === 1).length === 1;
+
+    const tooltipFormat = {
+        ...chartTheme.tooltip,
+        headerFormat: '',
+        pointFormat: tooltipPointFormat({ label: '{point.name}', value: '{point.value}' })
+    };
+
     const options = {
         ...chartTheme,
         chart: {
@@ -20,12 +30,19 @@ const VennDiagram = ({
             height: height
         },
         title: { text: null },
-        tooltip: {
-            ...chartTheme.tooltip,
-            headerFormat: ''
+        tooltip: tooltipFormat,
+        plotOptions: {
+            venn: {
+                colorByPoint: !isSingleSet,
+                dataLabels: {
+                    ...chartTheme.plotOptions.series.dataLabels
+                },
+                tooltip: tooltipFormat
+            }
         },
         series: [{
             name: 'Groups',
+            ...(isSingleSet && { color: BRAND }),
             data: data
         }]
     };
