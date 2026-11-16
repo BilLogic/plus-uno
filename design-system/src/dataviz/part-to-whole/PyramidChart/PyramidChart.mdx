@@ -62,8 +62,9 @@ exact comparisons, use `BarChart`. For parts of a total without levels, use
 
 ## Data shape
 
-`data` is an array of `{ name, value }`, ordered from the base up (largest
-first).
+`data` is an array of `{ name, value }`, sorted from most to least by default
+from the base up; pass `sort={false}` when bands represent an explicit stage
+order.
 
 ```jsx
 <PyramidChart

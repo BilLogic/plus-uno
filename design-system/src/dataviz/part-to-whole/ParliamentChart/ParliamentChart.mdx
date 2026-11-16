@@ -63,8 +63,8 @@ exact count comparisons, use `BarChart`. For nested groups, use `SunburstChart`.
 ## Data shape
 
 `data` is an array of `{ name, value, color }` (`name` and whole-number `value`
-required; `color` optional). Sort `data` from most to least before passing it in
-so group and color order match size order.
+required; `color` optional). Groups sort from most to least by default so seat
+and color order match size order; pass `sort={false}` to preserve input order.
 
 ```jsx
 <ParliamentChart

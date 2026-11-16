@@ -104,6 +104,6 @@ describe('chart sources', () => {
         if (report.length > 0) {
             console.info(`[dataviz soft guard — ${report.length} chart files remaining]`, report);
         }
-        expect(report.filter((entry) => entry.startsWith('comparison/'))).toEqual([]);
+        expect(report.filter((entry) => entry.startsWith('comparison/') || entry.startsWith('part-to-whole/'))).toEqual([]);
     });
 });

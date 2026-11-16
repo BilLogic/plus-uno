@@ -1,4 +1,6 @@
 import React from 'react';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
 import { STATUS } from '@/dataviz/palette';
 import GaugeChart from './GaugeChart';
 
@@ -6,104 +8,74 @@ export default {
     title: 'Data visualizations/Part-to-whole/Gauge chart',
     component: GaugeChart,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## Gauge Chart
-
-A gauge chart displays a **single value on a dial**, perfect for KPIs and progress indicators.
-
-### Overview
-A gauge chart displays a **single value on a dial**, perfect for KPIs and progress indicators.
-
----
-
-### How to Read
-- **Needle/fill position** indicates current value
-- **Scale** shows the range (min to max)
-- **Center text** displays the exact value
-- Color zones can indicate performance thresholds
-
----
-
-### When to Use
-
-| Use Case | Recommendation |
-|----------|----------------|
-| Single KPI display | ✅ Ideal |
-| Progress toward goal | ✅ Ideal |
-| Performance dashboards | ✅ Good |
-| Multiple values | ❌ Use Bar/Donut |
-| Trend over time | ❌ Use Line Chart |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Completion Rate** | Course/module completion % |
-| **Session Goals** | Sessions completed vs target |
-| **Student Progress** | Learning objectives achieved |
-| **Platform Health** | System uptime, response time |
-| **Tutor Metrics** | Student satisfaction score |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Use sparingly for key metrics only
-✅ Include clear min/max labels
-✅ When the value is a status, color it with the status chart tokens (\`chartPalette.STATUS\`) and say the status in the label
-✅ Show exact value in center
-
-**Avoid:**
-❌ Too many gauges on one dashboard
-❌ Comparing multiple gauges (use bar charts)
-❌ Complex scales or many tick marks
-                `
-            }
-        }
-    },
     argTypes: {
         value: { control: { type: 'number', min: 0, max: 100 }, description: 'Current value' },
         min: { control: 'number', description: 'Minimum scale value' },
         max: { control: 'number', description: 'Maximum scale value' },
         label: { control: 'text', description: 'Label below value' },
         height: { control: 'number', description: 'Chart height in pixels' },
-        color: { control: 'color', description: 'Gauge fill color' }
-    }
+        color: { control: 'text', description: 'Gauge fill token; defaults to --chart-brand' },
+    },
 };
 
-/**
- * Overview: Displays all chart variants and examples
- */
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Performance Gauges</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
-                Shows KPIs at a glance.
-            </p>
-            <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
-                <GaugeChart value={75} label="Completion" />
-                <GaugeChart value={92} label="Accuracy" color={STATUS.success} />
-                <GaugeChart value={45} label="Engagement" color={STATUS.warning} />
-            </div>
-        </section>
-    </div>
-);
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
+};
 
-/**
- * Interactive: Playground with property controls
- */
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-md)',
+};
+
+const rowStyle = {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(var(--width-1500), 1fr))',
+    gap: 'var(--section-stack-lg)',
+};
+
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
+};
+
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Single measure and status gauges</Heading>
+                <p style={captionStyle}>
+                    A single measure uses the brand chart token by default; status tokens pair with a status label.
+                </p>
+                <div style={rowStyle}>
+                    <GaugeChart value={75} label="Completion" />
+                    <GaugeChart value={92} label="Accuracy (on track)" color={STATUS.success} />
+                    <GaugeChart value={45} label="Engagement (needs attention)" color={STATUS.warning} />
+                </div>
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelectorAll('.highcharts-container').length).toBe(3);
+        });
+        for (const valueNode of canvasElement.querySelectorAll('.metric-md')) {
+            const style = getComputedStyle(valueNode);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(style.fontWeight).toBe('600');
+            expect(style.fontVariantNumeric).toBe('tabular-nums');
+        }
+    },
+};
+
 export const Interactive = {
     args: {
         value: 65,
         min: 0,
         max: 100,
         label: 'Progress',
-        height: 300
-    }
+        height: 300,
+    },
 };

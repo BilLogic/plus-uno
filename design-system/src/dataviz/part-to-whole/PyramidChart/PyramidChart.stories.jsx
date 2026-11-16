@@ -1,96 +1,79 @@
 import React from 'react';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
 import PyramidChart from './PyramidChart';
 
 export default {
     title: 'Data visualizations/Part-to-whole/Pyramid chart',
     component: PyramidChart,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## Pyramid Chart
-
-Shows **hierarchical quantities** from largest at bottom to smallest at top.
-
-### Overview
-Shows **hierarchical quantities** from largest at bottom to smallest at top.
-
----
-
-### How to Read
-- **Width** = relative size/quantity
-- **Position** = hierarchical level
-- Bottom = largest, Top = smallest
-
----
-
-### When to Use
-
-| Use Case | Recommendation |
-|----------|----------------|
-| Sales funnel stages | ✅ Ideal |
-| Population pyramids | ✅ Ideal |
-| Maslow's hierarchy | ✅ Good |
-| Equal portions | ❌ Use Pie Chart |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Student Funnel** | Prospects → Enrolled |
-| **Learning Stages** | Awareness → Mastery |
-| **Support Escalation** | Self-help → Expert |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Align the pyramid chart setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
-
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
-                `
-            }
-        }
-    }
+    argTypes: {
+        data: { control: 'object', description: 'Array of { name, value, color? }' },
+        height: { control: 'number', description: 'Chart height in pixels' },
+        sort: { control: 'boolean', description: 'Sort bands from most to least by default' },
+    },
 };
 
-const funnelData = {
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
+};
+
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-md)',
+};
+
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
+};
+
+const enrollmentData = {
     data: [
-        { name: 'Website Visits', value: 15654 },
-        { name: 'Trial Signups', value: 4064 },
-        { name: 'Active Users', value: 1987 },
-        { name: 'Paid Subscribers', value: 976 },
-        { name: 'Premium Plans', value: 346 }
-    ]
+        { name: 'Referred', value: 1200 },
+        { name: 'Enrolled', value: 840 },
+        { name: 'Attending weekly', value: 510 },
+        { name: 'Met their goal', value: 230 },
+    ],
 };
 
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Student Acquisition Funnel</h3>
-            <PyramidChart {...funnelData} />
-        </section>
-    </div>
-);
-
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Student enrollment tiers</Heading>
+                <p style={captionStyle}>
+                    Bands stack from the largest base to the narrowest tier at the top.
+                </p>
+                <PyramidChart {...enrollmentData} />
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelectorAll('.highcharts-container').length).toBe(1);
+        });
+        for (const label of canvasElement.querySelectorAll('.highcharts-data-label text')) {
+            if (!label.textContent?.trim()) continue;
+            const style = getComputedStyle(label);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(style.fontVariantNumeric).toBe('tabular-nums');
+        }
+    },
+};
 
 export const Interactive = {
     args: {
+        sort: true,
         data: [
             { name: 'Stage 1', value: 1000 },
             { name: 'Stage 2', value: 600 },
             { name: 'Stage 3', value: 300 },
-            { name: 'Stage 4', value: 100 }
+            { name: 'Stage 4', value: 100 },
         ],
-        height: 400
-    }
+        height: 400,
+    },
 };

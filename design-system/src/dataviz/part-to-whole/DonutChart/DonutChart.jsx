@@ -1,110 +1,92 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
+import chartTheme from '@/dataviz/chartTheme';
+import { tooltipPointFormat } from '@/dataviz/chartFormat';
+import { CATEGORICAL, CHROME, mostToLeast } from '@/dataviz/palette';
+
+const METRIC_CLASSES = {
+    lg: 'metric-lg',
+    md: 'metric-md',
+    sm: 'metric-sm',
+    h1: 'metric-lg',
+    h2: 'metric-lg',
+    h3: 'metric-lg',
+    h4: 'metric-md',
+    h5: 'metric-sm',
+    body3: 'metric-sm',
+};
 
 /**
  * DonutChart Component
- * Displays a donut chart using Highcharts with centered text overlay.
+ * Displays a donut chart using Highcharts with a centered Metric figure.
  */
-import chartTheme, { CHART_ANIMATION_DURATION_MS } from '@/dataviz/chartTheme';
-
 const DonutChart = ({
     size = 228,
     segments = [],
     value,
     label,
-    centerTextSize = 'h1',
-    animate = false,
-    animationDelay = 0,
-    animationDuration = CHART_ANIMATION_DURATION_MS
+    centerTextSize = 'lg',
+    sort = true,
 }) => {
-    // Transform segments into Highcharts series data
-    const chartData = useMemo(() => segments.map(segment => ({
-        y: segment.value,
-        color: segment.color,
-        name: segment.label || 'Segment'
-    })), [segments]);
+    const orderedSegments = useMemo(() => {
+        const hasTrack = segments.some((segment) => segment.color === CHROME.track);
+        if (!sort || hasTrack) return segments;
+        return mostToLeast(segments, (segment) => segment.value);
+    }, [segments, sort]);
 
-    // Get font size value for the center text using the type ladder
-    const getFontSize = () => {
-        const sizeMap = {
-            'h1': 'var(--type-size-200)',
-            'h2': 'var(--type-size-200)',
-            'h3': 'var(--type-size-175)',
-            'h4': 'var(--type-size-150)',
-            'h5': 'var(--type-size-125)',
-            'body3': 'var(--type-size-075)'
-        };
-        return sizeMap[centerTextSize] || sizeMap['h4'];
-    };
+    const chartData = useMemo(
+        () => orderedSegments.map((segment, index) => ({
+            y: segment.value,
+            color: segment.color || CATEGORICAL[index % CATEGORICAL.length],
+            name: segment.label || 'Segment',
+        })),
+        [orderedSegments],
+    );
 
-    const getFontWeight = () => {
-        // Title steps take the semibold weight, body3 the regular one
-        return centerTextSize === 'body3' ? 'var(--type-weight-regular)' : 'var(--type-weight-semibold)';
-    };
-
-    const getLineHeight = () => {
-        const lineHeightMap = {
-            'h1': 'var(--type-line-height-225)',
-            'h2': 'var(--type-line-height-225)',
-            'h3': 'var(--type-line-height-200)',
-            'h4': 'var(--type-line-height-175)',
-            'h5': 'var(--type-line-height-150)',
-            'body3': 'var(--type-line-height-100)'
-        };
-        return lineHeightMap[centerTextSize] || lineHeightMap['h4'];
-    };
+    const metricClass = METRIC_CLASSES[centerTextSize] || METRIC_CLASSES.lg;
 
     const options = useMemo(() => ({
-        ...chartTheme, // Apply theme defaults
+        ...chartTheme,
         chart: {
+            ...chartTheme.chart,
             type: 'pie',
             width: size,
             height: size,
-            backgroundColor: 'transparent',
             spacing: [0, 0, 0, 0],
-            margin: [0, 0, 0, 0]
+            margin: [0, 0, 0, 0],
         },
         title: {
-            text: null
+            text: null,
         },
         plotOptions: {
+            ...chartTheme.plotOptions,
             pie: {
-                animation: animate ? { duration: animationDuration, defer: animationDelay } : false,
-                innerSize: '85%', // Donut thickness
+                borderRadius: 0,
+                innerSize: '85%',
                 borderWidth: 0,
-                allowPointSelect: false,
                 cursor: 'default',
                 dataLabels: {
-                    enabled: false
+                    enabled: false,
                 },
-                states: {
-                    hover: {
-                        enabled: false,
-                        halo: null
-                    },
-                    inactive: {
-                        opacity: 1
-                    }
-                }
-            }
+            },
         },
         tooltip: {
             ...chartTheme.tooltip,
             enabled: true,
-            pointFormat: '<b>{point.name}</b>: {point.y}'
+            headerFormat: '',
+            pointFormat: tooltipPointFormat({ label: '{point.name}', value: '{point.y}' }),
         },
         credits: {
-            enabled: false
+            enabled: false,
         },
         series: [{
             name: 'Data',
             data: chartData,
             size: '100%',
             innerSize: '85%',
-            animation: animate ? { duration: animationDuration, defer: animationDelay } : false,
-        }]
-    }), [size, chartData, animate, animationDelay, animationDuration]);
+        }],
+    }), [size, chartData]);
 
     return (
         <div style={{ width: size, height: size, position: 'relative' }}>
@@ -115,32 +97,35 @@ const DonutChart = ({
               * keyboard-navigation proxies the module renders inside it.
               */}
             <PlusChart options={options} />
-            <div style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                textAlign: 'center',
-                pointerEvents: 'none',
-                width: '100%'
-            }}>
-                <div style={{
-                    fontFamily: centerTextSize === 'body3' ? 'var(--type-family-body)' : 'var(--type-family-heading)',
-                    fontWeight: getFontWeight(),
-                    fontSize: getFontSize(),
-                    lineHeight: getLineHeight(),
-                    color: centerTextSize === 'body3' ? 'var(--ds-text-subtle)' : 'var(--ds-text)'
-                }}>
+            <div
+                style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    textAlign: 'center',
+                    pointerEvents: 'none',
+                    width: '100%',
+                }}
+            >
+                <div
+                    className={metricClass}
+                    style={{
+                        color: 'var(--ds-text)',
+                    }}
+                >
                     {value || ''}
                 </div>
                 {label && (
-                    <div style={{
-                        fontFamily: 'var(--type-family-body)',
-                        fontSize: 'var(--type-size-075)',
-                        lineHeight: '1.667',
-                        color: 'var(--ds-text-subtle)',
-                        marginTop: 'var(--pad-x-xs)'
-                    }}>
+                    <div
+                        style={{
+                            fontFamily: 'var(--type-family-body)',
+                            fontSize: 'var(--type-size-075)',
+                            fontWeight: 'var(--type-weight-medium)',
+                            color: 'var(--ds-text-subtle)',
+                            marginTop: 'var(--pad-x-xs)',
+                        }}
+                    >
                         {label}
                     </div>
                 )}
@@ -155,21 +140,17 @@ DonutChart.propTypes = {
     /** Array of segment objects { value, color, label } */
     segments: PropTypes.arrayOf(PropTypes.shape({
         value: PropTypes.number.isRequired,
-        color: PropTypes.string.isRequired,
-        label: PropTypes.string
+        color: PropTypes.string,
+        label: PropTypes.string,
     })),
     /** Text to display in the center */
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     /** Label text below the value */
     label: PropTypes.string,
-    /** CSS class for the center value text size */
-    centerTextSize: PropTypes.oneOf(['h1', 'h2', 'h3', 'h4', 'h5', 'body3']),
-    /** Whether to animate the donut fill on first render */
-    animate: PropTypes.bool,
-    /** Delay before donut animation starts in milliseconds */
-    animationDelay: PropTypes.number,
-    /** Duration of donut animation in milliseconds */
-    animationDuration: PropTypes.number
+    /** Metric scale step for the center figure */
+    centerTextSize: PropTypes.oneOf(['lg', 'md', 'sm', 'h1', 'h2', 'h3', 'h4', 'h5', 'body3']),
+    /** Sort categorical segments from most to least by default; pass false to keep input order. */
+    sort: PropTypes.bool,
 };
 
 export default DonutChart;

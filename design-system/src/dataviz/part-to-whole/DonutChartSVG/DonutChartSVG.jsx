@@ -1,71 +1,67 @@
 import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 
+const METRIC_CLASSES = {
+    lg: 'metric-lg',
+    md: 'metric-md',
+    sm: 'metric-sm',
+    h1: 'metric-lg',
+    h2: 'metric-lg',
+    h3: 'metric-lg',
+    h4: 'metric-md',
+    h5: 'metric-sm',
+    body3: 'metric-sm',
+};
+
 /**
  * DonutChartSVG Component
  * Renders a donut chart using exact SVG paths from Figma for pixel-perfect matching.
- * Used for Session Admin charts that require exact visual replication.
  * Includes interactive tooltips on hover showing segment data.
  */
-const DonutChartSVG = ({ 
+const DonutChartSVG = ({
     size = 228,
-    paths = [], // Array of { d: string, fill: string, label?: string, value?: number, percentage?: number } objects
-    value, 
-    label = '', 
-    centerTextSize = 'h1'
+    paths = [],
+    value,
+    label = '',
+    centerTextSize = 'lg',
 }) => {
     const [hoveredIndex, setHoveredIndex] = useState(null);
     const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0, visible: false });
     const svgRef = useRef(null);
-    // Text styling based on centerTextSize
-    const getTextStyle = () => {
-        if (centerTextSize === 'body3') {
-            return {
-                fontFamily: 'var(--type-family-body)',
-                fontWeight: 'var(--type-weight-regular)',
-                fontSize: 'var(--type-size-075)',
-                lineHeight: '1.4',
-                color: 'var(--ds-text-subtle)',
-                letterSpacing: '0'
-            };
-        }
-        // Default to header styles for other sizes
-        return {
-            fontFamily: 'var(--type-family-heading)',
-            fontWeight: 'var(--type-weight-semibold)',
-            fontSize: 'var(--type-size-200)',
-            lineHeight: '1',
-            color: 'var(--ds-text)'
-        };
+    const metricClass = METRIC_CLASSES[centerTextSize] || METRIC_CLASSES.lg;
+
+    const updateTooltipPosition = (event) => {
+        if (!svgRef.current) return;
+        const rect = svgRef.current.getBoundingClientRect();
+        setTooltipPosition({
+            x: event.clientX - rect.left,
+            y: event.clientY - rect.top,
+            visible: true,
+        });
     };
-    
-    const textStyle = getTextStyle();
-    
+
     return (
-        <div style={{ 
-            width: `${size}px`, 
-            height: `${size}px`, 
-            position: 'relative',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-        }}>
-            <svg 
+        <div
+            style={{
+                width: `${size}px`,
+                height: `${size}px`,
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}
+        >
+            <svg
                 ref={svgRef}
-                xmlns="http://www.w3.org/2000/svg" 
-                width={size} 
-                height={size} 
-                viewBox={`0 0 ${size} ${size}`} 
+                xmlns="http://www.w3.org/2000/svg"
+                width={size}
+                height={size}
+                viewBox={`0 0 ${size} ${size}`}
                 fill="none"
                 style={{ position: 'absolute', top: 0, left: 0 }}
-                onMouseMove={(e) => {
-                    if (hoveredIndex !== null && svgRef.current) {
-                        const rect = svgRef.current.getBoundingClientRect();
-                        setTooltipPosition({
-                            x: e.clientX - rect.left,
-                            y: e.clientY - rect.top,
-                            visible: true
-                        });
+                onMouseMove={(event) => {
+                    if (hoveredIndex !== null) {
+                        updateTooltipPosition(event);
                     }
                 }}
                 onMouseLeave={() => {
@@ -73,47 +69,48 @@ const DonutChartSVG = ({
                     setTooltipPosition({ x: 0, y: 0, visible: false });
                 }}
             >
-                {/* Render each path segment with hover support */}
                 {paths.map((path, index) => {
                     const hasTooltip = path.label || path.value !== undefined || path.percentage !== undefined;
-                    
+
                     return (
-                        <path 
+                        <path
                             key={index}
-                            d={path.d} 
+                            d={path.d}
                             fill={path.fill}
                             style={{
                                 cursor: hasTooltip ? 'pointer' : 'default',
                                 opacity: hoveredIndex !== null && hoveredIndex !== index ? 'var(--ds-opacity-disabled)' : 1,
-                                transition: 'opacity var(--ds-motion-appearance-default-duration) var(--ds-motion-appearance-default)'
+                                transition: 'opacity var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast)',
                             }}
-                            onMouseEnter={() => {
+                            onMouseEnter={(event) => {
                                 setHoveredIndex(index);
+                                updateTooltipPosition(event);
                             }}
                         />
                     );
                 })}
             </svg>
-            
-            {/* Custom tooltip */}
+
             {hoveredIndex !== null && paths[hoveredIndex] && tooltipPosition.visible && (
                 <div
                     style={{
                         position: 'absolute',
                         left: `${tooltipPosition.x}px`,
-                        top: `${tooltipPosition.y - 40}px`,
+                        top: `calc(${tooltipPosition.y}px - var(--popup-offset))`,
                         transform: 'translate(-50%, -100%)',
                         backgroundColor: 'var(--ds-surface-overlay)',
                         color: 'var(--ds-text)',
-                        padding: 'var(--tooltip-pad-y) var(--pad-x-sm)',
-                        borderRadius: 'var(--radius-control-sm)',
-                        fontSize: 'var(--type-size-075)',
+                        padding: 'var(--popup-pad)',
+                        borderRadius: 'var(--popup-radius)',
+                        fontSize: 'var(--type-size-0875)',
                         fontFamily: 'var(--type-family-body)',
+                        fontWeight: 'var(--type-weight-medium)',
+                        fontVariantNumeric: 'tabular-nums',
                         pointerEvents: 'none',
-                        zIndex: 'var(--layer-tooltip)',
+                        zIndex: 'var(--layer-popup)',
                         whiteSpace: 'nowrap',
                         boxShadow: 'var(--ds-shadow-overlay)',
-                        textAlign: 'center'
+                        textAlign: 'center',
                     }}
                 >
                     {paths[hoveredIndex].label && (
@@ -129,35 +126,41 @@ const DonutChartSVG = ({
                     )}
                 </div>
             )}
-            
-            {/* Center text */}
-            <div style={{
-                position: 'absolute',
-                top: 'calc(50% + 2.5px)',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: `${size}px`,
-                textAlign: 'center',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                pointerEvents: 'none'
-            }}>
-                <p style={{ 
-                    margin: 0, 
-                    lineHeight: '1',
-                    ...textStyle
-                }}>
+
+            <div
+                style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: `${size}px`,
+                    textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    pointerEvents: 'none',
+                }}
+            >
+                <p
+                    className={metricClass}
+                    style={{
+                        margin: 0,
+                        color: 'var(--ds-text)',
+                    }}
+                >
                     {value}
                 </p>
                 {label && (
-                    <span style={{
-                        fontFamily: 'var(--type-family-body)',
-                        fontSize: 'var(--type-size-075)',
-                        color: 'var(--ds-text-subtle)',
-                        marginTop: 'var(--pad-x-xs)'
-                    }}>
+                    <span
+                        style={{
+                            fontFamily: 'var(--type-family-body)',
+                            fontSize: 'var(--type-size-075)',
+                            fontWeight: 'var(--type-weight-medium)',
+                            color: 'var(--ds-text-subtle)',
+                            marginTop: 'var(--pad-x-xs)',
+                        }}
+                    >
                         {label}
                     </span>
                 )}
@@ -175,14 +178,14 @@ DonutChartSVG.propTypes = {
         fill: PropTypes.string.isRequired,
         label: PropTypes.string,
         value: PropTypes.number,
-        percentage: PropTypes.number
+        percentage: PropTypes.number,
     })).isRequired,
     /** Text to display in the center */
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     /** Label text below the value */
     label: PropTypes.string,
-    /** CSS class for the center value text size */
-    centerTextSize: PropTypes.oneOf(['h1', 'h2', 'h3', 'h4', 'h5', 'body3'])
+    /** Metric scale step for the center figure */
+    centerTextSize: PropTypes.oneOf(['lg', 'md', 'sm', 'h1', 'h2', 'h3', 'h4', 'h5', 'body3']),
 };
 
 export default DonutChartSVG;

@@ -48,10 +48,10 @@ precisely, use `BulletChart`. For a completion share with a centered label, use
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Track', <>Half-circle arc behind the fill in <C>--ds-background-neutral</C>, spanning <C>min</C> to <C>max</C> (default 0 to 100).</>],
+        ['Track', <>Half-circle arc behind the fill in <C>--ds-background-neutral</C>, rounded at <C>--chart-bar-radius</C> and spanning <C>min</C> to <C>max</C> (default 0 to 100).</>],
         ['Fill', <>Grows from the left end to <C>value</C> in <C>color</C> (default <C>--chart-brand</C>).</>],
         ['Scale labels', <>Labels only <C>min</C> and <C>max</C> at the two ends, with no intermediate ticks.</>],
-        ['Value and label', <>Prints <C>value</C> in bold beneath the arc with <C>label</C> under it in subtle text.</>],
+        ['Value and label', <>Prints <C>value</C> on the medium Metric style beneath the arc with <C>label</C> under it in subtle text.</>],
         ['Height', <>Pixel height from <C>height</C> (default 300).</>],
     ]}
 />

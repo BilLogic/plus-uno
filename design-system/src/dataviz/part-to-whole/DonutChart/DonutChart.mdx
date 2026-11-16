@@ -49,11 +49,11 @@ donuts, use `BarChart`.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Ring', <>One segment per item in <C>segments</C>, with no legend, data labels or hover highlight. <C>size</C> sets pixel diameter (default 228).</>],
-        ['Center value', <>Headline from <C>value</C>; <C>centerTextSize</C> selects <C>h1</C> (default), <C>h2</C>, <C>h3</C>, <C>h4</C>, <C>h5</C> or <C>body3</C>.</>],
+        ['Ring', <>One segment per item in <C>segments</C>, with no legend or slice labels. <C>size</C> sets pixel diameter (default 228).</>],
+        ['Center value', <>Headline from <C>value</C> on the Metric scale; <C>centerTextSize</C> selects <C>lg</C> (default), <C>md</C> or <C>sm</C>.</>],
         ['Center label', <>Short line under the value from <C>label</C>, in subtle body text.</>],
         ['Tooltip', 'Shows the hovered segment label and raw value.'],
-        ['Animation', <>Off by default. <C>animate</C> fills the ring on first render; <C>animationDelay</C> and <C>animationDuration</C> time it in ms.</>],
+        ['Entrance', <>Enters on the shared spatial spring on first render and respects reduced motion.</>],
     ]}
 />
 
@@ -63,8 +63,11 @@ donuts, use `BarChart`.
 
 ## Data shape
 
-`segments` is an array of `{ value, color, label }` (`value` and `color`
-required; `label` names the segment in the tooltip), drawn in array order.
+`segments` is an array of `{ value, color, label }` (`value` required; `color`
+defaults to the categorical palette, and `label` names the segment in the
+tooltip). Multi-segment distributions sort from most to least by default (pass
+`sort={false}` to preserve input order), while a completion ring with a
+`--ds-background-neutral` track keeps the filled measure first.
 
 ```jsx
 <DonutChart
