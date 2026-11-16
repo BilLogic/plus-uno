@@ -311,14 +311,32 @@ const playSwapResults = (reduced = false) => async ({ canvasElement }) => {
     await userEvent.click(p.filterIcon());
     await waitFor(() => expect(p.popup()).not.toBeNull());
     await userEvent.click(within(p.popup()).getByRole('checkbox', { name: 'Grade 7' }));
-    await userEvent.click(within(p.popup()).getByRole('button', { name: 'Apply' }));
 
-    await expect(swapStage.getAttribute('data-swap-phase'), 'clean-fade swap enters out phase first').toBe('out');
-    const incoming = swapStage.querySelector('[data-swap-incoming]');
-    await expect(getComputedStyle(incoming).opacity, 'incoming results hold hidden during clean-fade gap').toBe('0');
+    const phases = [];
+    let incomingOpacityDuringOut = null;
+    const observer = new MutationObserver(() => {
+        const phase = swapStage.getAttribute('data-swap-phase');
+        if (phase != null) phases.push(phase);
+        if (phase === 'out' && incomingOpacityDuringOut == null) {
+            const incomingEl = swapStage.querySelector('[data-swap-incoming]');
+            if (incomingEl) incomingOpacityDuringOut = getComputedStyle(incomingEl).opacity;
+        }
+    });
+    observer.observe(swapStage, { attributes: true, attributeFilter: ['data-swap-phase'] });
 
-    await waitFor(() => expect(swapStage).toHaveAttribute('data-swap-phase', 'settled'), { timeout: 4000 });
+    try {
+        await userEvent.click(within(p.popup()).getByRole('button', { name: 'Apply' }));
+        await waitFor(() => expect(swapStage).toHaveAttribute('data-swap-phase', 'settled'), { timeout: 4000 });
+    } finally {
+        observer.disconnect();
+    }
+
+    await expect(phases[0], 'clean-fade swap enters out phase first').toBe('out');
+    await expect(phases.indexOf('in'), 'clean-fade swap enters in phase after out').toBeGreaterThan(phases.indexOf('out'));
+    await expect(incomingOpacityDuringOut, 'incoming results hold hidden during clean-fade gap').toBe('0');
+
     await settleAnimations(canvasElement);
+    const incoming = swapStage.querySelector('[data-swap-incoming]');
     await expect(p.status()).toHaveTextContent('3 of 8 students');
     await expect(getComputedStyle(incoming).opacity).toBe('1');
 };
