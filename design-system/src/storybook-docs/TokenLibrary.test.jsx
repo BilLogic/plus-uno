@@ -9,7 +9,7 @@ import { corpus } from './token-collection-blocks.jsx';
 vi.mock('./token-collection-blocks.jsx', async () => {
     const fs = await import('node:fs');
     const { collectTokens } = await import('@/storybook-docs/lib/token-collections.mjs');
-    const files = ['_scales', '_type', '_frame_layers', 'color/_palette', 'color/_semantic', 'color/_elevation', 'ladder/_components', 'ladder/_layers', 'ladder/_patterns', 'ladder/_semantics', 'ladder/_springs'];
+    const files = ['_scales', '_type', '_frame_layers', 'color/_palette', 'color/_semantic', 'color/_elevation', 'ladder/_components', 'ladder/_layers', 'ladder/_templates', 'ladder/_semantics', 'ladder/_springs'];
     const SOURCES = files.map((f) => ({ file: `${f}.scss`, text: fs.readFileSync(`${process.cwd()}/src/tokens/${f}.scss`, 'utf8') }));
     return { SOURCES, corpus: collectTokens(SOURCES) };
 });

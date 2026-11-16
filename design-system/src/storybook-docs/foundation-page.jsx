@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
  * The Foundation docs scaffold: the chrome every Foundations page shares, so a
  * page file holds only its content. A page is, in order, a hero, a contents
  * list, its sections (Overview first, Related last) and Accessibility.
- * Every block styles itself with `--ds-*` and pattern tokens, so a page follows the toolbar's Color mode and Contrast switches.
+ * Every block styles itself with `--ds-*` and template tokens, so a page follows the toolbar's Color mode and Contrast switches.
  */
 
 const SECTION_ATTR = 'data-foundation-section';

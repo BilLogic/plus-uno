@@ -298,7 +298,7 @@
       ]
     },
     {
-      "name": "spacing / patterns",
+      "name": "spacing / templates",
       "variables": [
         {
           "name": "Frame/topbar-height",

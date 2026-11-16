@@ -7,9 +7,9 @@ summary: Token ladder (ADR-038) — every token across all four tiers, by group
 
 Generated from `scripts/lib/tokens/plan.mjs`'s `TOKEN_LADDER` by `npm run generate:design-tokens` — never hand-edit.
 
-One plan, four tiers, most general to most specific: **primitives** (`--space-*` / `--radius-*` / `--stroke-*` / `--size-*`, Figma-sourced, `generate-all-tokens.js`) -> **semantics** -> **patterns** -> **components**, plus **layers** as its own z-index family. Figma collection names: `spacing / primitives`, `spacing / semantics`, `spacing / patterns`, `spacing / components`, `layers`.
+One plan, four tiers, most general to most specific: **primitives** (`--space-*` / `--radius-*` / `--stroke-*` / `--size-*`, Figma-sourced, `generate-all-tokens.js`) -> **semantics** -> **templates** -> **components**, plus **layers** as its own z-index family. Figma collection names: `spacing / primitives`, `spacing / semantics`, `spacing / templates`, `spacing / components`, `layers`.
 
-Every token below is declared by the generator in `design-system/src/tokens/ladder/_semantics.scss`, `_patterns.scss`, `_components.scss` or `_layers.scss`, with its own value, except a row marked *declared elsewhere*, whose name its own source file already declares.
+Every token below is declared by the generator in `design-system/src/tokens/ladder/_semantics.scss`, `_templates.scss`, `_components.scss` or `_layers.scss`, with its own value, except a row marked *declared elsewhere*, whose name its own source file already declares.
 
 ## Semantics
 
@@ -81,7 +81,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Size | `--control-lg` |  |
 | Size | `--control-xl` |  |
 
-## Patterns
+## Templates
 
 | Group | Token | Note |
 |---|---|---|
@@ -161,7 +161,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Modal | `--modal-inline-lg` (declared elsewhere) |  |
 | Modal | `--modal-radius` |  |
 | Modal | `--modal-width-xs` | 4 screen-grid columns plus 2 × 16 modal pad at 768 · 1024 · 1440 |
-| Modal | `--modal-width-sm` | lifted out of spacing / layout, beside the pattern’s pad/stack tokens |
+| Modal | `--modal-width-sm` | lifted out of spacing / layout, beside the template’s pad/stack tokens |
 | Modal | `--modal-width-md` |  |
 | Modal | `--modal-width-lg` |  |
 | Page | `--page-border-width` |  |

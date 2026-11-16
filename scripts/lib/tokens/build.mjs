@@ -107,7 +107,7 @@ export const SPRINGS = ${JSON.stringify(table, null, 2)};
 /** The four tiers, in the order they are written, and the SCSS heading each gets. */
 const LADDER_TIERS = [
   { tier: 'semantics', file: '_semantics.scss', collection: 'spacing / semantics', heading: 'Semantics (ADR-038 ladder)' },
-  { tier: 'patterns', file: '_patterns.scss', collection: 'spacing / patterns', heading: 'Patterns (ADR-038 ladder)' },
+  { tier: 'templates', file: '_templates.scss', collection: 'spacing / templates', heading: 'Templates (ADR-038 ladder)' },
   { tier: 'components', file: '_components.scss', collection: 'spacing / components', heading: 'Components (ADR-038 ladder)' },
   { tier: 'layers', file: '_layers.scss', collection: 'layers', heading: 'Layers (ADR-038 ladder; not a spacing family)' },
 ];
@@ -262,7 +262,7 @@ export function motionPayload() {
 
 /** @returns {string} `architecture/token-tiers-name-map.md`: every ladder token, by tier. */
 export function nameMapMarkdown() {
-  const tiers = ['semantics', 'patterns', 'components', 'layers'];
+  const tiers = ['semantics', 'templates', 'components', 'layers'];
   const title = (t) => t[0].toUpperCase() + t.slice(1);
   let body = `---
 summary: Token ladder (ADR-038) — every token across all four tiers, by group
@@ -273,9 +273,9 @@ summary: Token ladder (ADR-038) — every token across all four tiers, by group
 
 Generated from \`scripts/lib/tokens/plan.mjs\`'s \`TOKEN_LADDER\` by \`npm run generate:design-tokens\` — never hand-edit.
 
-One plan, four tiers, most general to most specific: **primitives** (\`--space-*\` / \`--radius-*\` / \`--stroke-*\` / \`--size-*\`, Figma-sourced, \`generate-all-tokens.js\`) -> **semantics** -> **patterns** -> **components**, plus **layers** as its own z-index family. Figma collection names: \`spacing / primitives\`, \`spacing / semantics\`, \`spacing / patterns\`, \`spacing / components\`, \`layers\`.
+One plan, four tiers, most general to most specific: **primitives** (\`--space-*\` / \`--radius-*\` / \`--stroke-*\` / \`--size-*\`, Figma-sourced, \`generate-all-tokens.js\`) -> **semantics** -> **templates** -> **components**, plus **layers** as its own z-index family. Figma collection names: \`spacing / primitives\`, \`spacing / semantics\`, \`spacing / templates\`, \`spacing / components\`, \`layers\`.
 
-Every token below is declared by the generator in \`design-system/src/tokens/ladder/_semantics.scss\`, \`_patterns.scss\`, \`_components.scss\` or \`_layers.scss\`, with its own value, except a row marked *declared elsewhere*, whose name its own source file already declares.
+Every token below is declared by the generator in \`design-system/src/tokens/ladder/_semantics.scss\`, \`_templates.scss\`, \`_components.scss\` or \`_layers.scss\`, with its own value, except a row marked *declared elsewhere*, whose name its own source file already declares.
 
 `;
   for (const tier of tiers) {

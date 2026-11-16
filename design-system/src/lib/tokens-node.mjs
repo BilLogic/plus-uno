@@ -193,7 +193,7 @@ export function tokenSources({ root = REPO_ROOT } = {}) {
     COLOR_TOKEN_FILES.includes(rel.slice(COLOR_TOKEN_DIR.length + 1)),
   );
   // The token ladder (`tokens/ladder/`, generated from scripts/lib/tokens/plan.mjs) holds the semantics,
-  // pattern, component and layer tokens beside the Figma-exported ones.
+  // template, component and layer tokens beside the Figma-exported ones.
   const ladder = documents(`${TOKEN_DIR}/ladder/*`, { root, ext: ['.scss', '.css'] });
   return [...documents(`${TOKEN_DIR}/*`, { root, ext: ['.scss', '.css'] }), ...color, ...ladder].map((rel) => ({
     path: rel,

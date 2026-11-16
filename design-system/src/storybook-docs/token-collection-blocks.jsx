@@ -12,7 +12,7 @@ import semantic from '@/tokens/color/_semantic.scss?raw';
 import elevation from '@/tokens/color/_elevation.scss?raw';
 import components from '@/tokens/ladder/_components.scss?raw';
 import layers from '@/tokens/ladder/_layers.scss?raw';
-import patterns from '@/tokens/ladder/_patterns.scss?raw';
+import templates from '@/tokens/ladder/_templates.scss?raw';
 import semantics from '@/tokens/ladder/_semantics.scss?raw';
 import springs from '@/tokens/ladder/_springs.scss?raw';
 
@@ -34,7 +34,7 @@ export const SOURCES = [
     ['color/_elevation.scss', elevation],
     ['ladder/_components.scss', components],
     ['ladder/_layers.scss', layers],
-    ['ladder/_patterns.scss', patterns],
+    ['ladder/_templates.scss', templates],
     ['ladder/_semantics.scss', semantics],
     ['ladder/_springs.scss', springs],
 ].map(([file, text]) => ({ file, text }));

@@ -78,7 +78,7 @@
  *     knows whether this is a card or a section. It filters by property family
  *     (a `font-size` is never offered a spacing token) and it prefers semantic
  *     names over the primitives — but it does not choose.
- *  5. TOKEN FAMILIES OUTSIDE `BUCKET_OF`. The pattern tokens (`--page-*`,
+ *  5. TOKEN FAMILIES OUTSIDE `BUCKET_OF`. The template tokens (`--page-*`,
  *     `--grid-*`, `--screen-*`, `--content-*`) describe the app-shell layout; a
  *     docs-chrome pixel that happened to equal a column width would be a
  *     coincidence, not a token being ignored, and reporting it would train

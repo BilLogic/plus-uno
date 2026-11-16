@@ -7,7 +7,7 @@ import { usePageContrast } from '@/storybook-docs/lib/use-page-contrast.js';
  * Building blocks for the Foundations docs pages: token tables whose values are
  * read from the page, Do and Don't pairs, and a light and dark comparison.
  *
- * Every block styles itself with `--ds-*` and pattern tokens, so a page built
+ * Every block styles itself with `--ds-*` and template tokens, so a page built
  * from them follows the toolbar's Color mode and Contrast switches.
  */
 

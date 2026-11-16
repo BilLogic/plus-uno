@@ -53,13 +53,13 @@ test('the sections partition the corpus: no token twice, none missing', () => {
 });
 
 test('frame tokens sit on Spacing and size and layer tokens on Elevation and layers', () => {
-  assert.equal(placeToken('--page-pad', 'ladder/_patterns.scss').collection, 'spacing');
-  assert.equal(placeToken('--page-pad', 'ladder/_patterns.scss').scope, 'templates');
-  assert.equal(placeToken('--frame-sidebar-width', 'ladder/_patterns.scss').collection, 'spacing');
+  assert.equal(placeToken('--page-pad', 'ladder/_templates.scss').collection, 'spacing');
+  assert.equal(placeToken('--page-pad', 'ladder/_templates.scss').scope, 'templates');
+  assert.equal(placeToken('--frame-sidebar-width', 'ladder/_templates.scss').collection, 'spacing');
   assert.equal(placeToken('--layer-modal', 'ladder/_layers.scss').collection, 'elevation');
   assert.equal(placeToken('--layer-frame-sidebar', '_frame_layers.scss').collection, 'elevation');
   assert.equal(placeToken('--layer-frame-sidebar', '_frame_layers.scss').scope, 'templates');
-  assert.equal(placeToken('--card-pad-default', 'ladder/_patterns.scss').scope, 'components');
+  assert.equal(placeToken('--card-pad-default', 'ladder/_templates.scss').scope, 'components');
 });
 
 test('scope follows the family: page-level tokens are Templates, card, modal, popup and table are Components', () => {

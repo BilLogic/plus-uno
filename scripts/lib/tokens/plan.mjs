@@ -1,5 +1,5 @@
 /**
- * The token plan (ADR-038): the four-tier ladder (semantics, patterns,
+ * The token plan (ADR-038): the four-tier ladder (semantics, templates,
  * components, layers) and motion, as one file this repo owns, the way
  * `scripts/lib/color/plans/` owns color (ADR-035). `scripts/generate-design-tokens.mjs`
  * renders it into SCSS and one Figma variables payload; nothing here reads
@@ -62,7 +62,7 @@ export const REDUCED_FADE = 'appearance.fast';
 /**
  * THE FOUR-TIER LADDER (#1756, Bill 2026-11-04: "clean up both token on figma
  * and in code and fully align the two"). One plan, one row per token, most
- * general tier to most specific: primitives -> semantics -> patterns ->
+ * general tier to most specific: primitives -> semantics -> templates ->
  * components. Figma collection on the left of each tier's row group, code
  * name on the right.
  *
@@ -79,7 +79,7 @@ export const REDUCED_FADE = 'appearance.fast';
  * (`tokens.json`, `tokens.md`) and `check:token-intent` fails a row without one.
  *
  * A row with `old === new` is not a rename — it is a tier the token was
- * already correctly named for (the Size dimension roles, most of Patterns'
+ * already correctly named for (the Size dimension roles, most of Templates'
  * bare `Collection/property` names). It is still listed, so the name-map doc
  * is every token, not just the ones that moved, and excluded from SCSS/payload
  * generation below (declaring a name twice is a no-op).
@@ -117,7 +117,7 @@ export const TOKEN_LADDER = [
   // ─── Semantics / Radius (non-control, + control-by-height) ───────────
   { tier: 'semantics', group: 'Radius', new: '--radius-sm', old: '--element-radius-sm', ref: 'var(--space-0125)', use: 'Corner rounding for small marks: a checkbox, a small tag.' },
   { tier: 'semantics', group: 'Radius', new: '--radius-md', old: '--element-radius-md', ref: 'var(--space-025)', use: 'Corner rounding for controls and small containers.' },
-  { tier: 'semantics', group: 'Radius', new: '--radius-lg', old: '--element-radius-lg', ref: 'var(--space-050)', use: 'Corner rounding for larger containers that are not a pattern, such as a tile or image.' },
+  { tier: 'semantics', group: 'Radius', new: '--radius-lg', old: '--element-radius-lg', ref: 'var(--space-050)', use: 'Corner rounding for larger containers that are not a template, such as a tile or image.' },
   { tier: 'semantics', group: 'Radius', new: '--radius-xl', old: null, ref: 'var(--space-075)', use: 'Corner rounding for a floating or compact surface, such as a Popup or a compact card.' },
   { tier: 'semantics', group: 'Radius', new: '--radius-xxl', old: null, ref: 'var(--space-100)', use: 'Corner rounding for a top-level surface, such as a Section or a card.' },
   { tier: 'semantics', group: 'Radius', new: '--radius-full', old: '--element-radius-full', ref: 'var(--radius-full)', primitive: true, note: 'Figma Radius/full; the code name is the --radius-full primitive, so no second declaration', use: 'Fully rounded ends: an avatar, a pill-shaped tag, a toggle track.' },
@@ -182,131 +182,131 @@ export const TOKEN_LADDER = [
   { tier: 'semantics', group: 'Size', new: '--control-lg', old: '--size-control-lg', ref: 'var(--size-250)', use: 'Height of a large control: 40px high.' },
   { tier: 'semantics', group: 'Size', new: '--control-xl', old: null, ref: 'var(--size-300)', use: 'Height of an extra-large control: 48px high.' },
 
-  // ─── Patterns / Frame (with Topbar and Sidebar) ──────────────────────
-  { tier: 'patterns', group: 'Frame', new: '--frame-topbar-height', old: '--layout-height-topbar', ref: 'var(--height-200)', use: 'Height of the Frame\'s top bar.' },
-  { tier: 'patterns', group: 'Frame', new: '--frame-sidebar-width', old: '--layout-width-sidebar', ref: 'var(--width-1500)', use: 'Width of the Frame\'s Sidebar at the current breakpoint.' },
-  { tier: 'patterns', group: 'Frame', new: '--frame-sidebar-width-nav', old: '--layout-sidebar-width', ref: '164px', note: 'fixed SideNav width (164), distinct from the responsive sidebar above', use: 'Fixed width of the side navigation inside the Frame.' },
-  { tier: 'patterns', group: 'Frame', new: '--frame-sidebar-pad', old: null, value: '--space-075', note: 'the Sidebar pads 12 on every side', use: 'Padding on every side inside the Sidebar.' },
-  { tier: 'patterns', group: 'Frame', new: '--frame-sidebar-row-gap', old: null, value: '--space-0125', note: 'two Sidebar rows sit 2 apart', use: 'Vertical gap between two rows in the Sidebar.' },
-  { tier: 'patterns', group: 'Frame', new: '--frame-sidebar-group-gap', old: null, value: '--space-100', note: 'two Sidebar groups sit 16 apart', use: 'Vertical gap between two groups of rows in the Sidebar.' },
-  { tier: 'patterns', group: 'Frame', new: '--frame-sidebar-row-radius', old: null, ref: 'var(--radius-control-sm)', note: 'the rounding of a Sidebar row (6)', use: 'Corner rounding of a Sidebar row.' },
+  // ─── Templates / Frame (with Topbar and Sidebar) ──────────────────────
+  { tier: 'templates', group: 'Frame', new: '--frame-topbar-height', old: '--layout-height-topbar', ref: 'var(--height-200)', use: 'Height of the Frame\'s top bar.' },
+  { tier: 'templates', group: 'Frame', new: '--frame-sidebar-width', old: '--layout-width-sidebar', ref: 'var(--width-1500)', use: 'Width of the Frame\'s Sidebar at the current breakpoint.' },
+  { tier: 'templates', group: 'Frame', new: '--frame-sidebar-width-nav', old: '--layout-sidebar-width', ref: '164px', note: 'fixed SideNav width (164), distinct from the responsive sidebar above', use: 'Fixed width of the side navigation inside the Frame.' },
+  { tier: 'templates', group: 'Frame', new: '--frame-sidebar-pad', old: null, value: '--space-075', note: 'the Sidebar pads 12 on every side', use: 'Padding on every side inside the Sidebar.' },
+  { tier: 'templates', group: 'Frame', new: '--frame-sidebar-row-gap', old: null, value: '--space-0125', note: 'two Sidebar rows sit 2 apart', use: 'Vertical gap between two rows in the Sidebar.' },
+  { tier: 'templates', group: 'Frame', new: '--frame-sidebar-group-gap', old: null, value: '--space-100', note: 'two Sidebar groups sit 16 apart', use: 'Vertical gap between two groups of rows in the Sidebar.' },
+  { tier: 'templates', group: 'Frame', new: '--frame-sidebar-row-radius', old: null, ref: 'var(--radius-control-sm)', note: 'the rounding of a Sidebar row (6)', use: 'Corner rounding of a Sidebar row.' },
 
-  // ─── Patterns / Page ──────────────────────────────────────────────────
-  { tier: 'patterns', group: 'Page', new: '--page-pad', old: '--page-pad', use: 'Padding around a Page\'s content at the current breakpoint.' },
-  { tier: 'patterns', group: 'Page', new: '--page-pad-x-compact', old: null, value: '--space-150', use: 'Horizontal padding of a Page with compact spacing.' },
-  { tier: 'patterns', group: 'Page', new: '--page-pad-x-default', old: null, value: '--space-200', use: 'Horizontal padding of a Page with default spacing.' },
-  { tier: 'patterns', group: 'Page', new: '--page-pad-x-spacious', old: null, value: '--space-250', use: 'Horizontal padding of a Page with spacious spacing.' },
-  { tier: 'patterns', group: 'Page', new: '--page-pad-y-compact', old: null, value: '--space-100', use: 'Vertical padding of a Page with compact spacing.' },
-  { tier: 'patterns', group: 'Page', new: '--page-pad-y-default', old: null, value: '--space-150', use: 'Vertical padding of a Page with default spacing.' },
-  { tier: 'patterns', group: 'Page', new: '--page-pad-y-spacious', old: null, value: '--space-200', use: 'Vertical padding of a Page with spacious spacing.' },
-  { tier: 'patterns', group: 'Page', new: '--page-stack-sm', old: '--page-stack-sm', use: 'Vertical gap between closely related blocks on a Page, such as a header and its subtitle.' },
-  { tier: 'patterns', group: 'Page', new: '--page-stack-md', old: '--page-stack-md', use: 'Vertical gap between sections on a Page.' },
-  { tier: 'patterns', group: 'Page', new: '--page-stack-lg', old: '--page-stack-lg', use: 'Vertical gap between major regions of a Page.' },
+  // ─── Templates / Page ──────────────────────────────────────────────────
+  { tier: 'templates', group: 'Page', new: '--page-pad', old: '--page-pad', use: 'Padding around a Page\'s content at the current breakpoint.' },
+  { tier: 'templates', group: 'Page', new: '--page-pad-x-compact', old: null, value: '--space-150', use: 'Horizontal padding of a Page with compact spacing.' },
+  { tier: 'templates', group: 'Page', new: '--page-pad-x-default', old: null, value: '--space-200', use: 'Horizontal padding of a Page with default spacing.' },
+  { tier: 'templates', group: 'Page', new: '--page-pad-x-spacious', old: null, value: '--space-250', use: 'Horizontal padding of a Page with spacious spacing.' },
+  { tier: 'templates', group: 'Page', new: '--page-pad-y-compact', old: null, value: '--space-100', use: 'Vertical padding of a Page with compact spacing.' },
+  { tier: 'templates', group: 'Page', new: '--page-pad-y-default', old: null, value: '--space-150', use: 'Vertical padding of a Page with default spacing.' },
+  { tier: 'templates', group: 'Page', new: '--page-pad-y-spacious', old: null, value: '--space-200', use: 'Vertical padding of a Page with spacious spacing.' },
+  { tier: 'templates', group: 'Page', new: '--page-stack-sm', old: '--page-stack-sm', use: 'Vertical gap between closely related blocks on a Page, such as a header and its subtitle.' },
+  { tier: 'templates', group: 'Page', new: '--page-stack-md', old: '--page-stack-md', use: 'Vertical gap between sections on a Page.' },
+  { tier: 'templates', group: 'Page', new: '--page-stack-lg', old: '--page-stack-lg', use: 'Vertical gap between major regions of a Page.' },
 
-  // ─── Patterns / Panel (the Frame's right-hand area) ──────────────────
-  { tier: 'patterns', group: 'Panel', new: '--panel-min-width', old: null, ref: 'var(--width-2000)', note: 'the narrowest the splitter allows (320)', use: 'Narrowest the Panel may be dragged.' },
-  { tier: 'patterns', group: 'Panel', new: '--panel-width-default', old: null, ref: 'var(--width-2500)', note: 'the width a Panel opens at (400)', use: 'Width the Panel opens at.' },
-  { tier: 'patterns', group: 'Panel', new: '--panel-max-width', old: null, ref: 'var(--size-4000)', note: 'the widest the splitter allows (640)', use: 'Widest the Panel may be dragged.' },
+  // ─── Templates / Panel (the Frame's right-hand area) ──────────────────
+  { tier: 'templates', group: 'Panel', new: '--panel-min-width', old: null, ref: 'var(--width-2000)', note: 'the narrowest the splitter allows (320)', use: 'Narrowest the Panel may be dragged.' },
+  { tier: 'templates', group: 'Panel', new: '--panel-width-default', old: null, ref: 'var(--width-2500)', note: 'the width a Panel opens at (400)', use: 'Width the Panel opens at.' },
+  { tier: 'templates', group: 'Panel', new: '--panel-max-width', old: null, ref: 'var(--size-4000)', note: 'the widest the splitter allows (640)', use: 'Widest the Panel may be dragged.' },
 
-  // ─── Patterns / Section ───────────────────────────────────────────────
-  { tier: 'patterns', group: 'Section', new: '--section-pad-x-compact', old: null, value: '--space-100', use: 'Horizontal padding of a PatternSection with compact spacing.' },
-  { tier: 'patterns', group: 'Section', new: '--section-pad-x-default', old: null, value: '--space-150', use: 'Horizontal padding of a PatternSection with default spacing.' },
-  { tier: 'patterns', group: 'Section', new: '--section-pad-x-spacious', old: null, value: '--space-200', use: 'Horizontal padding of a PatternSection with spacious spacing.' },
-  { tier: 'patterns', group: 'Section', new: '--section-pad-y-compact', old: null, value: '--space-100', use: 'Vertical padding of a PatternSection with compact spacing.' },
-  { tier: 'patterns', group: 'Section', new: '--section-pad-y-default', old: null, value: '--space-150', use: 'Vertical padding of a PatternSection with default spacing.' },
-  { tier: 'patterns', group: 'Section', new: '--section-pad-y-spacious', old: null, value: '--space-200', use: 'Vertical padding of a PatternSection with spacious spacing.' },
-  { tier: 'patterns', group: 'Section', new: '--section-radius', old: null, ref: 'var(--radius-xxl)', note: 'the rounding of a Section with a fill', use: 'Corner rounding of a PatternSection that has a fill.' },
-  { tier: 'patterns', group: 'Section', new: '--section-stack-sm', old: '--section-stack-sm', use: 'Vertical gap between a section header and its content.' },
-  { tier: 'patterns', group: 'Section', new: '--section-stack-md', old: '--section-stack-md', use: 'Vertical gap between blocks inside a PatternSection.' },
-  { tier: 'patterns', group: 'Section', new: '--section-stack-lg', old: '--section-stack-lg', use: 'Vertical gap between groups of blocks inside a PatternSection.' },
-  { tier: 'patterns', group: 'Section', new: '--section-min-width-main', old: '--section-min-width-main', use: 'Narrowest the main column of a two-column PatternSection may shrink.' },
-  { tier: 'patterns', group: 'Section', new: '--section-min-width-side', old: '--section-min-width-side', use: 'Narrowest the side column of a two-column PatternSection may shrink.' },
+  // ─── Templates / Section ───────────────────────────────────────────────
+  { tier: 'templates', group: 'Section', new: '--section-pad-x-compact', old: null, value: '--space-100', use: 'Horizontal padding of a PatternSection with compact spacing.' },
+  { tier: 'templates', group: 'Section', new: '--section-pad-x-default', old: null, value: '--space-150', use: 'Horizontal padding of a PatternSection with default spacing.' },
+  { tier: 'templates', group: 'Section', new: '--section-pad-x-spacious', old: null, value: '--space-200', use: 'Horizontal padding of a PatternSection with spacious spacing.' },
+  { tier: 'templates', group: 'Section', new: '--section-pad-y-compact', old: null, value: '--space-100', use: 'Vertical padding of a PatternSection with compact spacing.' },
+  { tier: 'templates', group: 'Section', new: '--section-pad-y-default', old: null, value: '--space-150', use: 'Vertical padding of a PatternSection with default spacing.' },
+  { tier: 'templates', group: 'Section', new: '--section-pad-y-spacious', old: null, value: '--space-200', use: 'Vertical padding of a PatternSection with spacious spacing.' },
+  { tier: 'templates', group: 'Section', new: '--section-radius', old: null, ref: 'var(--radius-xxl)', note: 'the rounding of a Section with a fill', use: 'Corner rounding of a PatternSection that has a fill.' },
+  { tier: 'templates', group: 'Section', new: '--section-stack-sm', old: '--section-stack-sm', use: 'Vertical gap between a section header and its content.' },
+  { tier: 'templates', group: 'Section', new: '--section-stack-md', old: '--section-stack-md', use: 'Vertical gap between blocks inside a PatternSection.' },
+  { tier: 'templates', group: 'Section', new: '--section-stack-lg', old: '--section-stack-lg', use: 'Vertical gap between groups of blocks inside a PatternSection.' },
+  { tier: 'templates', group: 'Section', new: '--section-min-width-main', old: '--section-min-width-main', use: 'Narrowest the main column of a two-column PatternSection may shrink.' },
+  { tier: 'templates', group: 'Section', new: '--section-min-width-side', old: '--section-min-width-side', use: 'Narrowest the side column of a two-column PatternSection may shrink.' },
 
-  // ─── Patterns / Card ──────────────────────────────────────────────────
-  { tier: 'patterns', group: 'Card', new: '--card-pad-compact', old: null, value: '--space-100', use: 'Padding inside a PatternCard with compact spacing.' },
-  { tier: 'patterns', group: 'Card', new: '--card-pad-default', old: null, value: '--space-125', use: 'Padding inside a PatternCard with default spacing.' },
-  { tier: 'patterns', group: 'Card', new: '--card-pad-spacious', old: null, value: '--space-150', use: 'Padding inside a PatternCard with spacious spacing.' },
-  { tier: 'patterns', group: 'Card', new: '--card-stack-sm', old: '--card-stack-sm', use: 'Vertical gap between tightly related lines in a PatternCard, such as a title and its meta.' },
-  { tier: 'patterns', group: 'Card', new: '--card-stack-md', old: '--card-stack-md', use: 'Vertical gap between blocks in a PatternCard.' },
-  { tier: 'patterns', group: 'Card', new: '--card-stack-lg', old: '--card-stack-lg', use: 'Vertical gap between a PatternCard\'s header, body and footer.' },
-  { tier: 'patterns', group: 'Card', new: '--card-inline-sm', old: '--card-inline-sm', use: 'Horizontal gap between small items in a PatternCard row, such as tags.' },
-  { tier: 'patterns', group: 'Card', new: '--card-inline-md', old: '--card-inline-md', use: 'Horizontal gap between items in a PatternCard row, such as actions.' },
-  { tier: 'patterns', group: 'Card', new: '--card-inline-lg', old: '--card-inline-lg', use: 'Horizontal gap between columns inside a PatternCard.' },
-  { tier: 'patterns', group: 'Card', new: '--card-min-width-sm', old: '--card-min-width-sm', use: 'Narrowest a small PatternCard may shrink in a grid.' },
-  { tier: 'patterns', group: 'Card', new: '--card-min-width-md', old: '--card-min-width-md', use: 'Narrowest a default PatternCard may shrink in a grid.' },
-  { tier: 'patterns', group: 'Card', new: '--card-min-width-lg', old: '--card-min-width-lg', use: 'Narrowest a large PatternCard may shrink in a grid.' },
-  { tier: 'patterns', group: 'Card', new: '--card-radius', old: null, ref: 'var(--radius-xxl)', use: 'Corner rounding of a PatternCard.' },
-  { tier: 'patterns', group: 'Card', new: '--card-radius-compact', old: '--card-radius-sm', ref: 'var(--radius-xl)', use: 'Corner rounding of a compact PatternCard or a card nested in another surface.' },
-  { tier: 'patterns', group: 'Card', new: '--card-max-height-sm', old: '--card-max-height-sm', use: 'Tallest a short scrolling PatternCard may grow.' },
-  { tier: 'patterns', group: 'Card', new: '--card-max-height-md', old: '--card-max-height-md', use: 'Tallest a default scrolling PatternCard may grow.' },
-  { tier: 'patterns', group: 'Card', new: '--card-max-height-lg', old: '--card-max-height-lg', use: 'Tallest a tall scrolling PatternCard may grow.' },
+  // ─── Templates / Card ──────────────────────────────────────────────────
+  { tier: 'templates', group: 'Card', new: '--card-pad-compact', old: null, value: '--space-100', use: 'Padding inside a PatternCard with compact spacing.' },
+  { tier: 'templates', group: 'Card', new: '--card-pad-default', old: null, value: '--space-125', use: 'Padding inside a PatternCard with default spacing.' },
+  { tier: 'templates', group: 'Card', new: '--card-pad-spacious', old: null, value: '--space-150', use: 'Padding inside a PatternCard with spacious spacing.' },
+  { tier: 'templates', group: 'Card', new: '--card-stack-sm', old: '--card-stack-sm', use: 'Vertical gap between tightly related lines in a PatternCard, such as a title and its meta.' },
+  { tier: 'templates', group: 'Card', new: '--card-stack-md', old: '--card-stack-md', use: 'Vertical gap between blocks in a PatternCard.' },
+  { tier: 'templates', group: 'Card', new: '--card-stack-lg', old: '--card-stack-lg', use: 'Vertical gap between a PatternCard\'s header, body and footer.' },
+  { tier: 'templates', group: 'Card', new: '--card-inline-sm', old: '--card-inline-sm', use: 'Horizontal gap between small items in a PatternCard row, such as tags.' },
+  { tier: 'templates', group: 'Card', new: '--card-inline-md', old: '--card-inline-md', use: 'Horizontal gap between items in a PatternCard row, such as actions.' },
+  { tier: 'templates', group: 'Card', new: '--card-inline-lg', old: '--card-inline-lg', use: 'Horizontal gap between columns inside a PatternCard.' },
+  { tier: 'templates', group: 'Card', new: '--card-min-width-sm', old: '--card-min-width-sm', use: 'Narrowest a small PatternCard may shrink in a grid.' },
+  { tier: 'templates', group: 'Card', new: '--card-min-width-md', old: '--card-min-width-md', use: 'Narrowest a default PatternCard may shrink in a grid.' },
+  { tier: 'templates', group: 'Card', new: '--card-min-width-lg', old: '--card-min-width-lg', use: 'Narrowest a large PatternCard may shrink in a grid.' },
+  { tier: 'templates', group: 'Card', new: '--card-radius', old: null, ref: 'var(--radius-xxl)', use: 'Corner rounding of a PatternCard.' },
+  { tier: 'templates', group: 'Card', new: '--card-radius-compact', old: '--card-radius-sm', ref: 'var(--radius-xl)', use: 'Corner rounding of a compact PatternCard or a card nested in another surface.' },
+  { tier: 'templates', group: 'Card', new: '--card-max-height-sm', old: '--card-max-height-sm', use: 'Tallest a short scrolling PatternCard may grow.' },
+  { tier: 'templates', group: 'Card', new: '--card-max-height-md', old: '--card-max-height-md', use: 'Tallest a default scrolling PatternCard may grow.' },
+  { tier: 'templates', group: 'Card', new: '--card-max-height-lg', old: '--card-max-height-lg', use: 'Tallest a tall scrolling PatternCard may grow.' },
 
-  // ─── Patterns / Table ─────────────────────────────────────────────────
-  { tier: 'patterns', group: 'Table', new: '--table-pad-x-cell', old: '--table-pad-x-cell', use: 'Horizontal padding inside a PatternTable cell.' },
-  { tier: 'patterns', group: 'Table', new: '--table-pad-y-cell', old: '--table-pad-y-cell', use: 'Vertical padding inside a PatternTable cell.' },
-  { tier: 'patterns', group: 'Table', new: '--table-indent', old: '--table-indent', use: 'Indent of each nested level in a tree table.' },
-  { tier: 'patterns', group: 'Table', new: '--table-radius', old: null, ref: 'var(--radius-xl)', use: 'Corner rounding of a PatternTable.' },
-  { tier: 'patterns', group: 'Table', new: '--table-stack', old: '--table-stack', use: 'Vertical gap between a PatternTable and its toolbar or footer.' },
-  { tier: 'patterns', group: 'Table', new: '--table-pad-x-footer', old: '--table-pad-x-footer', use: 'Horizontal padding of a PatternTable footer, such as its Pagination row.' },
-  { tier: 'patterns', group: 'Table', new: '--table-footer-height', old: null, ref: 'var(--space-300)', use: 'Height of a PatternTable footer row: the range, the page-size Select and Pagination on one line.' },
-  { tier: 'patterns', group: 'Table', new: '--table-min-width-title', old: '--table-min-width-title', use: 'Narrowest a PatternTable\'s title column may shrink.' },
+  // ─── Templates / Table ─────────────────────────────────────────────────
+  { tier: 'templates', group: 'Table', new: '--table-pad-x-cell', old: '--table-pad-x-cell', use: 'Horizontal padding inside a PatternTable cell.' },
+  { tier: 'templates', group: 'Table', new: '--table-pad-y-cell', old: '--table-pad-y-cell', use: 'Vertical padding inside a PatternTable cell.' },
+  { tier: 'templates', group: 'Table', new: '--table-indent', old: '--table-indent', use: 'Indent of each nested level in a tree table.' },
+  { tier: 'templates', group: 'Table', new: '--table-radius', old: null, ref: 'var(--radius-xl)', use: 'Corner rounding of a PatternTable.' },
+  { tier: 'templates', group: 'Table', new: '--table-stack', old: '--table-stack', use: 'Vertical gap between a PatternTable and its toolbar or footer.' },
+  { tier: 'templates', group: 'Table', new: '--table-pad-x-footer', old: '--table-pad-x-footer', use: 'Horizontal padding of a PatternTable footer, such as its Pagination row.' },
+  { tier: 'templates', group: 'Table', new: '--table-footer-height', old: null, ref: 'var(--space-300)', use: 'Height of a PatternTable footer row: the range, the page-size Select and Pagination on one line.' },
+  { tier: 'templates', group: 'Table', new: '--table-min-width-title', old: '--table-min-width-title', use: 'Narrowest a PatternTable\'s title column may shrink.' },
 
-  // ─── Patterns / Blanket (renamed from Overlay) ───────────────────────
-  { tier: 'patterns', group: 'Blanket', new: '--blanket-pad-x', old: '--overlay-pad-x', ref: 'var(--space-100)', use: 'Horizontal space between the screen edge and a Modal on its Blanket.' },
-  { tier: 'patterns', group: 'Blanket', new: '--blanket-pad-y', old: '--overlay-pad-y', ref: 'var(--space-400)', at: { '(max-height: 639.98px)': 'var(--space-150)' }, use: 'Vertical space between the screen edge and a Modal on its Blanket; shrinks on short screens.' },
-  { tier: 'patterns', group: 'Blanket', new: '--blanket-fill', old: '--overlay-scrim', type: 'COLOR', ref: 'rgba(0, 0, 0, 0.38)', note: "the Blanket's own fill color; the old declaration's value, written directly so this file carries no old-language word", use: 'Fill of the Blanket that dims the page behind a Modal.' },
-  { tier: 'patterns', group: 'Blanket', new: '--blanket-max-height-modal', old: '--layout-max-height-modal', ref: 'calc(100dvh - 2 * var(--blanket-pad-y))', codeOnly: true, note: 'a calc() of the pad above: code only, no Figma variable', use: 'Tallest a Modal may grow inside its Blanket.' },
+  // ─── Templates / Blanket (renamed from Overlay) ───────────────────────
+  { tier: 'templates', group: 'Blanket', new: '--blanket-pad-x', old: '--overlay-pad-x', ref: 'var(--space-100)', use: 'Horizontal space between the screen edge and a Modal on its Blanket.' },
+  { tier: 'templates', group: 'Blanket', new: '--blanket-pad-y', old: '--overlay-pad-y', ref: 'var(--space-400)', at: { '(max-height: 639.98px)': 'var(--space-150)' }, use: 'Vertical space between the screen edge and a Modal on its Blanket; shrinks on short screens.' },
+  { tier: 'templates', group: 'Blanket', new: '--blanket-fill', old: '--overlay-scrim', type: 'COLOR', ref: 'rgba(0, 0, 0, 0.38)', note: "the Blanket's own fill color; the old declaration's value, written directly so this file carries no old-language word", use: 'Fill of the Blanket that dims the page behind a Modal.' },
+  { tier: 'templates', group: 'Blanket', new: '--blanket-max-height-modal', old: '--layout-max-height-modal', ref: 'calc(100dvh - 2 * var(--blanket-pad-y))', codeOnly: true, note: 'a calc() of the pad above: code only, no Figma variable', use: 'Tallest a Modal may grow inside its Blanket.' },
 
-  // ─── Patterns / Modal ─────────────────────────────────────────────────
-  { tier: 'patterns', group: 'Modal', new: '--modal-pad', old: '--modal-pad', use: 'Padding inside a Modal at the current breakpoint.' },
-  { tier: 'patterns', group: 'Modal', new: '--modal-pad-x-compact', old: null, value: '--space-0625', use: 'Horizontal padding of a Modal with compact spacing.' },
-  { tier: 'patterns', group: 'Modal', new: '--modal-pad-x-default', old: null, value: '--space-100', use: 'Horizontal padding of a Modal with default spacing.' },
-  { tier: 'patterns', group: 'Modal', new: '--modal-pad-x-spacious', old: null, value: '--space-125', use: 'Horizontal padding of a Modal with spacious spacing.' },
-  { tier: 'patterns', group: 'Modal', new: '--modal-pad-y-compact', old: null, value: '--space-050', use: 'Vertical padding of a Modal with compact spacing.' },
-  { tier: 'patterns', group: 'Modal', new: '--modal-pad-y-default', old: null, value: '--space-075', use: 'Vertical padding of a Modal with default spacing.' },
-  { tier: 'patterns', group: 'Modal', new: '--modal-pad-y-spacious', old: null, value: '--space-100', use: 'Vertical padding of a Modal with spacious spacing.' },
-  { tier: 'patterns', group: 'Modal', new: '--modal-stack-sm', old: '--modal-stack-sm', use: 'Vertical gap between a Modal\'s title and its description.' },
-  { tier: 'patterns', group: 'Modal', new: '--modal-stack-md', old: '--modal-stack-md', use: 'Vertical gap between blocks in a Modal\'s body.' },
-  { tier: 'patterns', group: 'Modal', new: '--modal-stack-lg', old: '--modal-stack-lg', use: 'Vertical gap between a Modal\'s header, body and footer.' },
-  { tier: 'patterns', group: 'Modal', new: '--modal-inline-sm', old: '--modal-inline-sm', use: 'Horizontal gap between small items in a Modal row.' },
-  { tier: 'patterns', group: 'Modal', new: '--modal-inline-md', old: '--modal-inline-md', use: 'Horizontal gap between the actions in a Modal footer.' },
-  { tier: 'patterns', group: 'Modal', new: '--modal-inline-lg', old: '--modal-inline-lg', use: 'Horizontal gap between columns in a Modal.' },
-  { tier: 'patterns', group: 'Modal', new: '--modal-radius', old: null, ref: 'var(--radius-xxl)', use: 'Corner rounding of a Modal.' },
-  { tier: 'patterns', group: 'Modal', new: '--modal-width-xs', old: null, ref: '261px', at: { '(min-width: 1024px)': '347px', '(min-width: 1440px)': '432px' }, codeOnly: true, note: '4 screen-grid columns plus 2 × 16 modal pad at 768 · 1024 · 1440', use: 'Width of a compact Modal, such as a confirmation.' },
-  { tier: 'patterns', group: 'Modal', new: '--modal-width-sm', old: '--layout-width-modal-sm', ref: '384px', at: { '(min-width: 1024px)': '512px', '(min-width: 1440px)': '640px' }, note: 'lifted out of spacing / layout, beside the pattern’s pad/stack tokens', use: 'Width of a small Modal, such as a single question or a one-field form.' },
-  { tier: 'patterns', group: 'Modal', new: '--modal-width-md', old: '--layout-width-modal-md', ref: '507px', at: { '(min-width: 1024px)': '677px', '(min-width: 1440px)': '848px' }, use: 'Width of a default Modal, such as a short form.' },
-  { tier: 'patterns', group: 'Modal', new: '--modal-width-lg', old: '--layout-width-modal-lg', ref: '629px', at: { '(min-width: 1024px)': '843px', '(min-width: 1440px)': '1056px' }, use: 'Width of a large Modal, such as a table or a long form.' },
-  { tier: 'patterns', group: 'Page', new: '--page-border-width', old: null, ref: 'var(--stroke-2)', use: 'Width of the edge drawn around a Page frame.' },
-  { tier: 'patterns', group: 'Table', new: '--table-overflow-reach', old: null, ref: 'var(--space-150)', use: 'How far a PatternTable lets a row\'s overflow, such as a focus ring, reach past its clip.' },
-  { tier: 'patterns', group: 'Modal', new: '--modal-body-min-height', old: null, ref: 'var(--space-500)', use: 'Minimum height of a Modal\'s body, so a short body does not collapse the dialog.' },
+  // ─── Templates / Modal ─────────────────────────────────────────────────
+  { tier: 'templates', group: 'Modal', new: '--modal-pad', old: '--modal-pad', use: 'Padding inside a Modal at the current breakpoint.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-pad-x-compact', old: null, value: '--space-0625', use: 'Horizontal padding of a Modal with compact spacing.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-pad-x-default', old: null, value: '--space-100', use: 'Horizontal padding of a Modal with default spacing.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-pad-x-spacious', old: null, value: '--space-125', use: 'Horizontal padding of a Modal with spacious spacing.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-pad-y-compact', old: null, value: '--space-050', use: 'Vertical padding of a Modal with compact spacing.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-pad-y-default', old: null, value: '--space-075', use: 'Vertical padding of a Modal with default spacing.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-pad-y-spacious', old: null, value: '--space-100', use: 'Vertical padding of a Modal with spacious spacing.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-stack-sm', old: '--modal-stack-sm', use: 'Vertical gap between a Modal\'s title and its description.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-stack-md', old: '--modal-stack-md', use: 'Vertical gap between blocks in a Modal\'s body.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-stack-lg', old: '--modal-stack-lg', use: 'Vertical gap between a Modal\'s header, body and footer.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-inline-sm', old: '--modal-inline-sm', use: 'Horizontal gap between small items in a Modal row.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-inline-md', old: '--modal-inline-md', use: 'Horizontal gap between the actions in a Modal footer.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-inline-lg', old: '--modal-inline-lg', use: 'Horizontal gap between columns in a Modal.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-radius', old: null, ref: 'var(--radius-xxl)', use: 'Corner rounding of a Modal.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-width-xs', old: null, ref: '261px', at: { '(min-width: 1024px)': '347px', '(min-width: 1440px)': '432px' }, codeOnly: true, note: '4 screen-grid columns plus 2 × 16 modal pad at 768 · 1024 · 1440', use: 'Width of a compact Modal, such as a confirmation.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-width-sm', old: '--layout-width-modal-sm', ref: '384px', at: { '(min-width: 1024px)': '512px', '(min-width: 1440px)': '640px' }, note: 'lifted out of spacing / layout, beside the template’s pad/stack tokens', use: 'Width of a small Modal, such as a single question or a one-field form.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-width-md', old: '--layout-width-modal-md', ref: '507px', at: { '(min-width: 1024px)': '677px', '(min-width: 1440px)': '848px' }, use: 'Width of a default Modal, such as a short form.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-width-lg', old: '--layout-width-modal-lg', ref: '629px', at: { '(min-width: 1024px)': '843px', '(min-width: 1440px)': '1056px' }, use: 'Width of a large Modal, such as a table or a long form.' },
+  { tier: 'templates', group: 'Page', new: '--page-border-width', old: null, ref: 'var(--stroke-2)', use: 'Width of the edge drawn around a Page frame.' },
+  { tier: 'templates', group: 'Table', new: '--table-overflow-reach', old: null, ref: 'var(--space-150)', use: 'How far a PatternTable lets a row\'s overflow, such as a focus ring, reach past its clip.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-body-min-height', old: null, ref: 'var(--space-500)', use: 'Minimum height of a Modal\'s body, so a short body does not collapse the dialog.' },
 
-  // ─── Patterns / Popup ───────────────────────────────────────────────
-  { tier: 'patterns', group: 'Popup', new: '--popup-pad', old: '--popup-pad', use: 'Padding inside a Popup.' },
-  { tier: 'patterns', group: 'Popup', new: '--popup-width-sm', old: '--popup-width-sm', use: 'Width of a small Popup.' },
-  { tier: 'patterns', group: 'Popup', new: '--popup-width-md', old: '--popup-width-md', use: 'Width of a default Popup.' },
-  { tier: 'patterns', group: 'Popup', new: '--popup-width-lg', old: '--popup-width-lg', use: 'Width of a large Popup.' },
-  { tier: 'patterns', group: 'Popup', new: '--flag-width', old: '--flag-width', use: 'Width of a Flag.' },
-  { tier: 'patterns', group: 'Popup', new: '--flag-stack', old: '--flag-stack', use: 'Vertical gap between stacked Flags.' },
-  { tier: 'patterns', group: 'Popup', new: '--popup-radius', old: null, ref: 'var(--radius-xl)', use: 'Corner rounding of a Popup.' },
-  { tier: 'patterns', group: 'Popup', new: '--popup-width-3-col', old: null, ref: '200px', at: { '(min-width: 1024px)': '264px', '(min-width: 1440px)': '328px' }, note: '3 · 4 screen-grid columns plus 2 × 16 popup pad at 768 · 1024 · 1440', use: 'Width of a 3-column Popup, such as a short picker.' },
-  { tier: 'patterns', group: 'Popup', new: '--popup-width-4-col', old: null, ref: '261px', at: { '(min-width: 1024px)': '347px', '(min-width: 1440px)': '432px' }, use: 'Width of a 4-column Popup, such as a date picker or a menu with descriptions.' },
-  { tier: 'patterns', group: 'Popup', new: '--dropdown-menu-pad', old: '--dropdown-menu-pad', use: 'Padding inside a DropdownMenu or listbox.' },
-  { tier: 'patterns', group: 'Popup', new: '--dropdown-menu-min-width', old: '--dropdown-menu-min-width', use: 'Narrowest a DropdownMenu or listbox may shrink.' },
-  { tier: 'patterns', group: 'Popup', new: '--dropdown-menu-max-width', old: '--dropdown-menu-max-width', use: 'Widest a DropdownMenu or listbox may grow.' },
-  { tier: 'patterns', group: 'Popup', new: '--dropdown-menu-max-height', old: '--dropdown-menu-max-height', use: 'Tallest a DropdownMenu or listbox may grow before it scrolls.' },
-  { tier: 'patterns', group: 'Popup', new: '--tooltip-pad-y', old: '--tooltip-pad-y', use: 'Vertical padding inside a Tooltip.' },
-  { tier: 'patterns', group: 'Popup', new: '--tooltip-max-width', old: '--tooltip-max-width', use: 'Widest a Tooltip may grow before its text wraps.' },
-  { tier: 'patterns', group: 'Popup', new: '--popup-gap-screen', old: '--popup-gap-screen', use: 'Space a floating layer keeps from the screen edge, such as a Flag or a listbox.' },
-  { tier: 'patterns', group: 'Popup', new: '--popup-offset', old: '--popup-offset', use: 'Gap between a Popup, menu or Tooltip and the element that opened it.' },
+  // ─── Templates / Popup ───────────────────────────────────────────────
+  { tier: 'templates', group: 'Popup', new: '--popup-pad', old: '--popup-pad', use: 'Padding inside a Popup.' },
+  { tier: 'templates', group: 'Popup', new: '--popup-width-sm', old: '--popup-width-sm', use: 'Width of a small Popup.' },
+  { tier: 'templates', group: 'Popup', new: '--popup-width-md', old: '--popup-width-md', use: 'Width of a default Popup.' },
+  { tier: 'templates', group: 'Popup', new: '--popup-width-lg', old: '--popup-width-lg', use: 'Width of a large Popup.' },
+  { tier: 'templates', group: 'Popup', new: '--flag-width', old: '--flag-width', use: 'Width of a Flag.' },
+  { tier: 'templates', group: 'Popup', new: '--flag-stack', old: '--flag-stack', use: 'Vertical gap between stacked Flags.' },
+  { tier: 'templates', group: 'Popup', new: '--popup-radius', old: null, ref: 'var(--radius-xl)', use: 'Corner rounding of a Popup.' },
+  { tier: 'templates', group: 'Popup', new: '--popup-width-3-col', old: null, ref: '200px', at: { '(min-width: 1024px)': '264px', '(min-width: 1440px)': '328px' }, note: '3 · 4 screen-grid columns plus 2 × 16 popup pad at 768 · 1024 · 1440', use: 'Width of a 3-column Popup, such as a short picker.' },
+  { tier: 'templates', group: 'Popup', new: '--popup-width-4-col', old: null, ref: '261px', at: { '(min-width: 1024px)': '347px', '(min-width: 1440px)': '432px' }, use: 'Width of a 4-column Popup, such as a date picker or a menu with descriptions.' },
+  { tier: 'templates', group: 'Popup', new: '--dropdown-menu-pad', old: '--dropdown-menu-pad', use: 'Padding inside a DropdownMenu or listbox.' },
+  { tier: 'templates', group: 'Popup', new: '--dropdown-menu-min-width', old: '--dropdown-menu-min-width', use: 'Narrowest a DropdownMenu or listbox may shrink.' },
+  { tier: 'templates', group: 'Popup', new: '--dropdown-menu-max-width', old: '--dropdown-menu-max-width', use: 'Widest a DropdownMenu or listbox may grow.' },
+  { tier: 'templates', group: 'Popup', new: '--dropdown-menu-max-height', old: '--dropdown-menu-max-height', use: 'Tallest a DropdownMenu or listbox may grow before it scrolls.' },
+  { tier: 'templates', group: 'Popup', new: '--tooltip-pad-y', old: '--tooltip-pad-y', use: 'Vertical padding inside a Tooltip.' },
+  { tier: 'templates', group: 'Popup', new: '--tooltip-max-width', old: '--tooltip-max-width', use: 'Widest a Tooltip may grow before its text wraps.' },
+  { tier: 'templates', group: 'Popup', new: '--popup-gap-screen', old: '--popup-gap-screen', use: 'Space a floating layer keeps from the screen edge, such as a Flag or a listbox.' },
+  { tier: 'templates', group: 'Popup', new: '--popup-offset', old: '--popup-offset', use: 'Gap between a Popup, menu or Tooltip and the element that opened it.' },
 
-  // ─── Patterns / Focused page ──────────────────────────────────────────
-  { tier: 'patterns', group: 'Focused page', new: '--focused-page-pad-x', old: '--focused-page-pad-x', use: 'Horizontal padding of a focused page: a single task with no Sidebar, such as a wizard step.' },
-  { tier: 'patterns', group: 'Focused page', new: '--focused-page-pad-y', old: '--focused-page-pad-y', use: 'Vertical padding of a focused page.' },
-  { tier: 'patterns', group: 'Focused page', new: '--focused-page-stack-sm', old: '--focused-page-stack-sm', use: 'Vertical gap between a focused page\'s title and its description.' },
-  { tier: 'patterns', group: 'Focused page', new: '--focused-page-stack-md', old: '--focused-page-stack-md', use: 'Vertical gap between blocks on a focused page.' },
-  { tier: 'patterns', group: 'Focused page', new: '--focused-page-stack-lg', old: '--focused-page-stack-lg', use: 'Vertical gap between a focused page\'s header, body and actions.' },
-  { tier: 'patterns', group: 'Focused page', new: '--focused-page-inline-sm', old: '--focused-page-inline-sm', use: 'Horizontal gap between small items in a focused page row.' },
-  { tier: 'patterns', group: 'Focused page', new: '--focused-page-inline-md', old: '--focused-page-inline-md', use: 'Horizontal gap between the actions on a focused page.' },
+  // ─── Templates / Focused page ──────────────────────────────────────────
+  { tier: 'templates', group: 'Focused page', new: '--focused-page-pad-x', old: '--focused-page-pad-x', use: 'Horizontal padding of a focused page: a single task with no Sidebar, such as a wizard step.' },
+  { tier: 'templates', group: 'Focused page', new: '--focused-page-pad-y', old: '--focused-page-pad-y', use: 'Vertical padding of a focused page.' },
+  { tier: 'templates', group: 'Focused page', new: '--focused-page-stack-sm', old: '--focused-page-stack-sm', use: 'Vertical gap between a focused page\'s title and its description.' },
+  { tier: 'templates', group: 'Focused page', new: '--focused-page-stack-md', old: '--focused-page-stack-md', use: 'Vertical gap between blocks on a focused page.' },
+  { tier: 'templates', group: 'Focused page', new: '--focused-page-stack-lg', old: '--focused-page-stack-lg', use: 'Vertical gap between a focused page\'s header, body and actions.' },
+  { tier: 'templates', group: 'Focused page', new: '--focused-page-inline-sm', old: '--focused-page-inline-sm', use: 'Horizontal gap between small items in a focused page row.' },
+  { tier: 'templates', group: 'Focused page', new: '--focused-page-inline-md', old: '--focused-page-inline-md', use: 'Horizontal gap between the actions on a focused page.' },
 
   // ─── Components / Button ──────────────────────────────────────────────
   { tier: 'components', group: 'Button', new: '--button-radius-default', old: '--element-radius-item-sm', ref: 'calc(var(--radius-control-lg) - var(--pad-x-xs))', note: 'nests in a 40-high field: its radius 10 minus the 4 slot inset = 6', use: 'Corner rounding of a Button with default spacing.' },

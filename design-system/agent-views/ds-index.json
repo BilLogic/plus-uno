@@ -17968,29 +17968,29 @@
     },
     {
       "name": "--blanket-fill",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "rgba(0, 0, 0, 0.38)",
       "intent": "Fill of the Blanket that dims the page behind a Modal."
     },
     {
       "name": "--blanket-max-height-modal",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "calc(100dvh - 2 * var(--blanket-pad-y))",
       "intent": "Tallest a Modal may grow inside its Blanket."
     },
     {
       "name": "--blanket-pad-x",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-100)",
       "intent": "Horizontal space between the screen edge and a Modal on its Blanket."
     },
     {
       "name": "--blanket-pad-y",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-400)",
       "intent": "Vertical space between the screen edge and a Modal on its Blanket; shrinks on short screens."
     },
@@ -18084,119 +18084,119 @@
     },
     {
       "name": "--card-inline-lg",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-075)",
       "intent": "Horizontal gap between columns inside a PatternCard."
     },
     {
       "name": "--card-inline-md",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-050)",
       "intent": "Horizontal gap between items in a PatternCard row, such as actions."
     },
     {
       "name": "--card-inline-sm",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-025)",
       "intent": "Horizontal gap between small items in a PatternCard row, such as tags."
     },
     {
       "name": "--card-max-height-lg",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--size-4000)",
       "intent": "Tallest a tall scrolling PatternCard may grow."
     },
     {
       "name": "--card-max-height-md",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--size-2500)",
       "intent": "Tallest a default scrolling PatternCard may grow."
     },
     {
       "name": "--card-max-height-sm",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--size-1900)",
       "intent": "Tallest a short scrolling PatternCard may grow."
     },
     {
       "name": "--card-min-width-lg",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--width-3000)",
       "intent": "Narrowest a large PatternCard may shrink in a grid."
     },
     {
       "name": "--card-min-width-md",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--width-1900)",
       "intent": "Narrowest a default PatternCard may shrink in a grid."
     },
     {
       "name": "--card-min-width-sm",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--width-1400)",
       "intent": "Narrowest a small PatternCard may shrink in a grid."
     },
     {
       "name": "--card-pad-compact",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-100)",
       "intent": "Padding inside a PatternCard with compact spacing."
     },
     {
       "name": "--card-pad-default",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-125)",
       "intent": "Padding inside a PatternCard with default spacing."
     },
     {
       "name": "--card-pad-spacious",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-150)",
       "intent": "Padding inside a PatternCard with spacious spacing."
     },
     {
       "name": "--card-radius",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--radius-xxl)",
       "intent": "Corner rounding of a PatternCard."
     },
     {
       "name": "--card-radius-compact",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--radius-xl)",
       "intent": "Corner rounding of a compact PatternCard or a card nested in another surface."
     },
     {
       "name": "--card-stack-lg",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-075)",
       "intent": "Vertical gap between a PatternCard's header, body and footer."
     },
     {
       "name": "--card-stack-md",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-050)",
       "intent": "Vertical gap between blocks in a PatternCard."
     },
     {
       "name": "--card-stack-sm",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-025)",
       "intent": "Vertical gap between tightly related lines in a PatternCard, such as a title and its meta."
@@ -19203,28 +19203,28 @@
     },
     {
       "name": "--dropdown-menu-max-height",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--height-2000)",
       "intent": "Tallest a DropdownMenu or listbox may grow before it scrolls."
     },
     {
       "name": "--dropdown-menu-max-width",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--width-2000)",
       "intent": "Widest a DropdownMenu or listbox may grow."
     },
     {
       "name": "--dropdown-menu-min-width",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--width-1000)",
       "intent": "Narrowest a DropdownMenu or listbox may shrink."
     },
     {
       "name": "--dropdown-menu-pad",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-025)",
       "intent": "Padding inside a DropdownMenu or listbox."
@@ -22423,7 +22423,7 @@
     },
     {
       "name": "--flag-stack",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-100)",
       "intent": "Vertical gap between stacked Flags."
@@ -22437,7 +22437,7 @@
     },
     {
       "name": "--flag-width",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--width-2500)",
       "intent": "Width of a Flag."
@@ -22458,99 +22458,99 @@
     },
     {
       "name": "--focused-page-inline-md",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-075)",
       "intent": "Horizontal gap between the actions on a focused page."
     },
     {
       "name": "--focused-page-inline-sm",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-050)",
       "intent": "Horizontal gap between small items in a focused page row."
     },
     {
       "name": "--focused-page-pad-x",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-050)",
       "intent": "Horizontal padding of a focused page: a single task with no Sidebar, such as a wizard step."
     },
     {
       "name": "--focused-page-pad-y",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-050)",
       "intent": "Vertical padding of a focused page."
     },
     {
       "name": "--focused-page-stack-lg",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-150)",
       "intent": "Vertical gap between a focused page's header, body and actions."
     },
     {
       "name": "--focused-page-stack-md",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-100)",
       "intent": "Vertical gap between blocks on a focused page."
     },
     {
       "name": "--focused-page-stack-sm",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-050)",
       "intent": "Vertical gap between a focused page's title and its description."
     },
     {
       "name": "--frame-sidebar-group-gap",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-100)",
       "intent": "Vertical gap between two groups of rows in the Sidebar."
     },
     {
       "name": "--frame-sidebar-pad",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-075)",
       "intent": "Padding on every side inside the Sidebar."
     },
     {
       "name": "--frame-sidebar-row-gap",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-0125)",
       "intent": "Vertical gap between two rows in the Sidebar."
     },
     {
       "name": "--frame-sidebar-row-radius",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--radius-control-sm)",
       "intent": "Corner rounding of a Sidebar row."
     },
     {
       "name": "--frame-sidebar-width",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--width-1500)",
       "intent": "Width of the Frame's Sidebar at the current breakpoint."
     },
     {
       "name": "--frame-sidebar-width-nav",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "164px",
       "intent": "Fixed width of the side navigation inside the Frame."
     },
     {
       "name": "--frame-topbar-height",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--height-200)",
       "intent": "Height of the Frame's top bar."
     },
@@ -22845,43 +22845,43 @@
     },
     {
       "name": "--layer-frame-blanket",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "calc(var(--layer-navigation) + 2)"
     },
     {
       "name": "--layer-frame-docked-edge",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "1"
     },
     {
       "name": "--layer-frame-edge",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "calc(var(--layer-navigation) - 1)"
     },
     {
       "name": "--layer-frame-panel-peek",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "calc(var(--layer-navigation) + 3)"
     },
     {
       "name": "--layer-frame-sidebar",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--layer-navigation)"
     },
     {
       "name": "--layer-frame-splitter",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "1"
     },
     {
       "name": "--layer-frame-topbar-start",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "calc(var(--layer-navigation) + 1)"
     },
@@ -22989,134 +22989,134 @@
     },
     {
       "name": "--modal-body-min-height",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-500)",
       "intent": "Minimum height of a Modal's body, so a short body does not collapse the dialog."
     },
     {
       "name": "--modal-inline-lg",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-150)",
       "intent": "Horizontal gap between columns in a Modal."
     },
     {
       "name": "--modal-inline-md",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-100)",
       "intent": "Horizontal gap between the actions in a Modal footer."
     },
     {
       "name": "--modal-inline-sm",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-050)",
       "intent": "Horizontal gap between small items in a Modal row."
     },
     {
       "name": "--modal-pad",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-100)",
       "intent": "Padding inside a Modal at the current breakpoint."
     },
     {
       "name": "--modal-pad-x-compact",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-0625)",
       "intent": "Horizontal padding of a Modal with compact spacing."
     },
     {
       "name": "--modal-pad-x-default",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-100)",
       "intent": "Horizontal padding of a Modal with default spacing."
     },
     {
       "name": "--modal-pad-x-spacious",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-125)",
       "intent": "Horizontal padding of a Modal with spacious spacing."
     },
     {
       "name": "--modal-pad-y-compact",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-050)",
       "intent": "Vertical padding of a Modal with compact spacing."
     },
     {
       "name": "--modal-pad-y-default",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-075)",
       "intent": "Vertical padding of a Modal with default spacing."
     },
     {
       "name": "--modal-pad-y-spacious",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-100)",
       "intent": "Vertical padding of a Modal with spacious spacing."
     },
     {
       "name": "--modal-radius",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--radius-xxl)",
       "intent": "Corner rounding of a Modal."
     },
     {
       "name": "--modal-stack-lg",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-150)",
       "intent": "Vertical gap between a Modal's header, body and footer."
     },
     {
       "name": "--modal-stack-md",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-100)",
       "intent": "Vertical gap between blocks in a Modal's body."
     },
     {
       "name": "--modal-stack-sm",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-050)",
       "intent": "Vertical gap between a Modal's title and its description."
     },
     {
       "name": "--modal-width-lg",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "629px",
       "intent": "Width of a large Modal, such as a table or a long form."
     },
     {
       "name": "--modal-width-md",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "507px",
       "intent": "Width of a default Modal, such as a short form."
     },
     {
       "name": "--modal-width-sm",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "384px",
       "intent": "Width of a small Modal, such as a single question or a one-field form."
     },
     {
       "name": "--modal-width-xs",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "261px",
       "intent": "Width of a compact Modal, such as a confirmation."
     },
@@ -23331,77 +23331,77 @@
     },
     {
       "name": "--page-border-width",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--stroke-2)",
       "intent": "Width of the edge drawn around a Page frame."
     },
     {
       "name": "--page-pad",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-150)",
       "intent": "Padding around a Page's content at the current breakpoint."
     },
     {
       "name": "--page-pad-x-compact",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-150)",
       "intent": "Horizontal padding of a Page with compact spacing."
     },
     {
       "name": "--page-pad-x-default",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-200)",
       "intent": "Horizontal padding of a Page with default spacing."
     },
     {
       "name": "--page-pad-x-spacious",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-250)",
       "intent": "Horizontal padding of a Page with spacious spacing."
     },
     {
       "name": "--page-pad-y-compact",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-100)",
       "intent": "Vertical padding of a Page with compact spacing."
     },
     {
       "name": "--page-pad-y-default",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-150)",
       "intent": "Vertical padding of a Page with default spacing."
     },
     {
       "name": "--page-pad-y-spacious",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-200)",
       "intent": "Vertical padding of a Page with spacious spacing."
     },
     {
       "name": "--page-stack-lg",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-250)",
       "intent": "Vertical gap between major regions of a Page."
     },
     {
       "name": "--page-stack-md",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-150)",
       "intent": "Vertical gap between sections on a Page."
     },
     {
       "name": "--page-stack-sm",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-100)",
       "intent": "Vertical gap between closely related blocks on a Page, such as a header and its subtitle."
@@ -24620,22 +24620,22 @@
     },
     {
       "name": "--panel-max-width",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--size-4000)",
       "intent": "Widest the Panel may be dragged."
     },
     {
       "name": "--panel-min-width",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--width-2000)",
       "intent": "Narrowest the Panel may be dragged."
     },
     {
       "name": "--panel-width-default",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--width-2500)",
       "intent": "Width the Panel opens at."
     },
@@ -24648,7 +24648,7 @@
     },
     {
       "name": "--popup-gap-screen",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-050)",
       "intent": "Space a floating layer keeps from the screen edge, such as a Flag or a listbox."
@@ -24669,56 +24669,56 @@
     },
     {
       "name": "--popup-offset",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-025)",
       "intent": "Gap between a Popup, menu or Tooltip and the element that opened it."
     },
     {
       "name": "--popup-pad",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-100)",
       "intent": "Padding inside a Popup."
     },
     {
       "name": "--popup-radius",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--radius-xl)",
       "intent": "Corner rounding of a Popup."
     },
     {
       "name": "--popup-width-3-col",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "200px",
       "intent": "Width of a 3-column Popup, such as a short picker."
     },
     {
       "name": "--popup-width-4-col",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "261px",
       "intent": "Width of a 4-column Popup, such as a date picker or a menu with descriptions."
     },
     {
       "name": "--popup-width-lg",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--width-3000)",
       "intent": "Width of a large Popup."
     },
     {
       "name": "--popup-width-md",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--width-2500)",
       "intent": "Width of a default Popup."
     },
     {
       "name": "--popup-width-sm",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--width-2000)",
       "intent": "Width of a small Popup."
@@ -24804,7 +24804,7 @@
       "tier": "semantic",
       "group": "Ladder Semantics",
       "value": "var(--space-050)",
-      "intent": "Corner rounding for larger containers that are not a pattern, such as a tile or image."
+      "intent": "Corner rounding for larger containers that are not a template, such as a tile or image."
     },
     {
       "name": "--radius-md",
@@ -24948,84 +24948,84 @@
     },
     {
       "name": "--section-min-width-main",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--width-3000)",
       "intent": "Narrowest the main column of a two-column PatternSection may shrink."
     },
     {
       "name": "--section-min-width-side",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--width-1400)",
       "intent": "Narrowest the side column of a two-column PatternSection may shrink."
     },
     {
       "name": "--section-pad-x-compact",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-100)",
       "intent": "Horizontal padding of a PatternSection with compact spacing."
     },
     {
       "name": "--section-pad-x-default",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-150)",
       "intent": "Horizontal padding of a PatternSection with default spacing."
     },
     {
       "name": "--section-pad-x-spacious",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-200)",
       "intent": "Horizontal padding of a PatternSection with spacious spacing."
     },
     {
       "name": "--section-pad-y-compact",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-100)",
       "intent": "Vertical padding of a PatternSection with compact spacing."
     },
     {
       "name": "--section-pad-y-default",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-150)",
       "intent": "Vertical padding of a PatternSection with default spacing."
     },
     {
       "name": "--section-pad-y-spacious",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-200)",
       "intent": "Vertical padding of a PatternSection with spacious spacing."
     },
     {
       "name": "--section-radius",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--radius-xxl)",
       "intent": "Corner rounding of a PatternSection that has a fill."
     },
     {
       "name": "--section-stack-lg",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-150)",
       "intent": "Vertical gap between groups of blocks inside a PatternSection."
     },
     {
       "name": "--section-stack-md",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-100)",
       "intent": "Vertical gap between blocks inside a PatternSection."
     },
     {
       "name": "--section-stack-sm",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-050)",
       "intent": "Vertical gap between a section header and its content."
@@ -25426,63 +25426,63 @@
     },
     {
       "name": "--table-footer-height",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-300)",
       "intent": "Height of a PatternTable footer row: the range, the page-size Select and Pagination on one line."
     },
     {
       "name": "--table-indent",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-150)",
       "intent": "Indent of each nested level in a tree table."
     },
     {
       "name": "--table-min-width-title",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--width-1400)",
       "intent": "Narrowest a PatternTable's title column may shrink."
     },
     {
       "name": "--table-overflow-reach",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--space-150)",
       "intent": "How far a PatternTable lets a row's overflow, such as a focus ring, reach past its clip."
     },
     {
       "name": "--table-pad-x-cell",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-050)",
       "intent": "Horizontal padding inside a PatternTable cell."
     },
     {
       "name": "--table-pad-x-footer",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-100)",
       "intent": "Horizontal padding of a PatternTable footer, such as its Pagination row."
     },
     {
       "name": "--table-pad-y-cell",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-025)",
       "intent": "Vertical padding inside a PatternTable cell."
     },
     {
       "name": "--table-radius",
-      "tier": "pattern",
-      "group": "Ladder Patterns",
+      "tier": "template",
+      "group": "Ladder Templates",
       "value": "var(--radius-xl)",
       "intent": "Corner rounding of a PatternTable."
     },
     {
       "name": "--table-stack",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-050)",
       "intent": "Vertical gap between a PatternTable and its toolbar or footer."
@@ -25559,14 +25559,14 @@
     },
     {
       "name": "--tooltip-max-width",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--width-1500)",
       "intent": "Widest a Tooltip may grow before its text wraps."
     },
     {
       "name": "--tooltip-pad-y",
-      "tier": "pattern",
+      "tier": "template",
       "group": "Frame and Layer Tokens",
       "value": "var(--space-025)",
       "intent": "Vertical padding inside a Tooltip."
@@ -25971,7 +25971,7 @@
       "Token tier",
       "Primitive",
       "Semantic",
-      "Pattern token",
+      "Template token",
       "Component token",
       "Private variable",
       "Named state token",
@@ -26119,7 +26119,7 @@
     "design-system/agent-views/foundations/ContentVoiceAndTone.md": "# Voice and tone\n\nHow PLUS sounds to everyone it serves.\n\n**Kind:** Foundation\n\n**Storybook page:** `design-system/src/styles/ContentVoiceAndTone.mdx`\n\n## Voice\n\nOur voice is helpful, honest, warm and clear. Who we are stays the same; how we say it fits who is reading.\n\n| Word | The idea | What it asks of the writer |\n| --- | --- | --- |\n|  | The purpose · Productivity | Point to the next step. Tell people what is coming, then show them how to get there. |\n|  | The truth · Learning | Say what happened. Give feedback straight, with the reason. Own our mistakes. |\n|  | The feeling · Uplift | Write the way a colleague talks. Notice the effort. Skip the jargon. |\n|  | The words · Simplicity | Keep it short. Use everyday words. Lead with the verb. One idea per sentence. |\n\n## When to dial\n\nThe four words never change. How hard we lean on each one does.\n\n| Word | Lean in | Pull back |\n| --- | --- | --- |\n|  | A tutor is about to start a session. | The reader is browsing, not doing. |\n|  | Something failed, or a student is stuck. | Never. Soften how you say it, not what you say. |\n|  | A student did well. A tutor showed up. | Money, policy, or an error. |\n|  | A live session, a phone, a hurry. | Never. Clear is always on. |\n\n### Warm, pulled back\n\nWhen money is late, warm means calm and specific. The date is the kindest part.\n\nDo: Kind, because it answers “when?”.\nDon't: Polite, but the tutor still has to ask when.\n\n## Tone\n\nOne moment, told five ways: Maya, a sixth-grade student, can now solve fractions on her own. However the tone shifts, it always sounds like PLUS.\n\n| Reader | Where | Tone | The line |\n| --- | --- | --- | --- |\n| Tutor | Product | Quick, warm, like a teammate | “Maya solved her first fraction on her own. Nice work this week.” |\n| Supervisor | Product | Brief, factual, ranked | “Maya mastered fractions in four sessions with her tutor, Priya.” |\n| Researcher | Product | Precise, neutral, numbers first | “Fractions: mastered at session 4. School B, grade 6.” |\n| Teacher | Service | Respectful, free of product terms | “Maya can now solve fractions on her own. Next, her tutor moves on to decimals.” |\n| Student | Service | Short, kind, about effort | “You did it, Maya. Fractions are yours.” |\n\n## In the product\n\nOne card for each person who uses PLUS. The voice holds; the tone shifts with the job. In each card the headline is the action, what to do next, and the body says why it matters in that reader’s terms.\n\n| Reader | Context | Headline (the action) | Body (why it matters) | Actions |\n| --- | --- | --- | --- | --- |\n| Tutor | Today · 3:30 PM · Breakout room 3 · Starts in 10 min | Prep for Maya’s session | Last week you tagged her Stuck on fractions. Start with a warm-up problem to build her confidence. | Open session · View notes |\n| Lead tutor | Room 3 · Attendance · 2 of 6 joined | Mark attendance for Room 3 | Four students haven’t joined yet. Marking them absent frees their tutors for students who are here. | Mark attendance · Wait 5 min |\n| Supervisor | Reviews · This week · 2 urgent | Start with 2 urgent reflections | Priya flagged a session where a student seemed upset. Reading it first lets you check in before her next session. | Open review · See all 5 |\n| Researcher | Exports · Fall term · Ready | Your export is ready | 1,240 sessions from three schools, with student names removed. It matches the filters you saved on Monday. | Download CSV · Edit filters |\n\n## Related",
     "design-system/agent-views/foundations/Elevation.md": "# Elevation\n\nWhat sits above what, and whether it blocks. Shadow and surface color show it.\n\n**Kind:** Foundation\n\n**Storybook page:** `design-system/src/styles/Elevation.mdx`\n\n## Overview\n\n**Elevation** is the order of layers: which surface sits above which, and whether it blocks the one below. **Shadow** is one way to show that order; surface color does the rest.\n\n## The levels\n\nSix levels, lowest first. A surface and its shadow always travel together.\n\n| Level | Surface | Shadow |\n| --- | --- | --- |\n\nRaised and overlay have `-hovered` and `-pressed` surfaces for a surface that can be clicked. `--ds-surface-container` is a translucent well inside a surface, and it is not a level.\n\n## Choose by behavior\n\nPick the level by what the surface does, never by how strong a shadow looks. Answer the questions to land on a row.\n\n## Shadow anatomy\n\nEvery shadow is three slots: **edge**, **key** and **ambient**. A new shadow fills all three, or says why one is empty. Switch each slot off to see what it carries.\n\n### Cross-section\n\nHow dark the ground is at each px below a surface's edge, computed from the tokens on this page. The tick on the axis is each shadow's reach.\n\n### Every slot\n\nEach value reads offset x and y, blur, spread, then ink opacity. In dark the ambient is a tight dark halo: a wide soft shadow does not show on a dark ground.\n\n## Surface color and dark mode\n\nHigher is lighter. In light the lifted surfaces share the page color and the shadow lifts them; in dark the surface itself steps up.\n\nDark blocking is the same as dark overlay. On the dark Blanket a shadow barely shows, so the lighter overlay surface is what lifts the Modal.\n\n## Layering\n\nEach layer is a `--layer-*` z-index token, set in code only. Components name the token, never a number.\n\n- **A confirm Modal may open over a Panel, a Popup or a focused task,** with its own Blanket.\n- **Never a Modal on a Modal.** A Modal confirms inside itself, with a warning SectionMessage and the danger button.\n- **A Panel never has a Blanket.** It floats beside a usable page.\n- **Popups and Tooltips open over a Modal.** A Popup opened inside a Modal portals into it.\n- **A Flag sits above all of it**, so a message is never hidden.\n- **`--layer-dialog`** holds a view that replaces the page: Frame · focused and AiChat full screen.\n\n## Elevation in the system\n\n### Card\n\nRaised at rest; a clickable Card lifts to overlay on hover and while dragged.\n\n### Popup and an open Select\n\n### Floating Sidebar and floating Panel\n\nBoth take the overlay pair, with no Blanket: the page beside them stays usable.\n\n### Modal over its Blanket\n\n### Sticky header, scrolled\n\nA border marks the cut first; the overflow shadow is for where a border would be missed.\n\n### Tooltip\n\nA label, so it has no shadow: the dark fill sets it apart.\n\n## Motion\n\nA shadow moves on `--ds-motion-appearance-*`, documented in [Motion](?path=/docs/foundations-expression-motion-physics--docs).\n\n### A shadow changes with its fill\n\nIt moves on `--ds-motion-appearance-default`, together with the surface. Click the Card.\n\n### A clip never cuts a shadow\n\nA clip-path open runs on `--ds-motion-appearance-default` and rests past the shadow's reach, drawn dashed.\n\n### A scroll shadow tracks the scroll\n\nIt grows one to one with the scroll position, with no spring token of its own.\n\n## Accessibility\n\n- **A shadow is never the boundary.** The edge slot is: under increased contrast it becomes a 3:1 line. Turn it on below.\n- **Forced colors keep an edge.** Shadows disappear there, so a lifted surface carries a transparent border that the system paints.\n- **Text clears 4.5:1 on every level**, in light and dark. Check a new pairing on the overlay surface in dark, where it is lightest. See [Color](?path=/docs/foundations-visual-color--docs).\n\n## Do and don't\n\n### Lift with shadow, not a darker fill\n\nA lifted surface gets its height from its shadow; a darker fill reads as a different surface.\n\n### No border on a lifted surface\n\nThe shadow's edge slot is the border, so a drawn border doubles it.\n\n### Pair the surface with its shadow\n\nA level's surface and shadow travel together.\n\n### Blocking only on the Blanket\n\nThe blocking shadow belongs to the Modal over its Blanket, and nothing else.\n\n### Sunken never floats\n\nA sunken surface is a ground, so it sits behind the work and never lifts.\n\n### Keep the Tooltip flat\n\nA Tooltip is a label, so it has no shadow.\n\n### Raise one focal point\n\nRaise the one object a person acts on; a page of raised cards has no focus.\n\n## Related",
     "design-system/agent-views/foundations/FoundationsOverview.md": "# Overview\n\nFoundations create consistent experiences across the tutor and student apps.\n\n**Kind:** Foundation\n\n**Storybook page:** `design-system/src/styles/FoundationsOverview.mdx`\n\n## Framework\n\n## Overview\n\nFoundations are the tokens, guidelines and visual styles that every pattern and component builds on: color, spacing, typography and more.\n\n- Repo: `design-system/guidelines/foundations/` holds the written guidance for each foundation.\n- Figma: one page per foundation under Foundations.\n- Storybook: one page per foundation under Foundations.\n\n## The foundations\n\nGrouped as tokens, brand, visual, layout, expression and accessibility.\n\n### Design tokens\n\n- **Tokens.** Named values that store a design decision once, for every theme.\n\n### Brand\n\n- **Voice and tone.** How PLUS sounds to everyone it serves.\n- **Language.** How we write every word, for everyone PLUS reaches.\n- **Messages.** What to say when something happens.\n- **Logos.** The PLUS mark, with or without the wordmark.\n- **Illustrations.** Hand-drawn characters for moments with room to breathe.\n\n### Visual\n\n- **Color.** Every color as a token named for its job.\n- **Typography.** Heading, Body, Metric and Code text styles.\n- **Iconography.** Font Awesome Free icons at three sizes.\n- **Elevation.** Surface and shadow pairs that lift a layer.\n- **Radius.** Corner roundness: height ÷ 4, with buttons at 6 and 4.\n- **Border.** A width token paired with a color token.\n\n### Layout\n\n- **Spacing.** The space inside and between boxes, named by the job it does.\n- **Grid.** Two 12-column grids, the breakpoints and the content widths.\n\n### Expression\n\n- **Motion.** Springs, transitions and what moves.\n- **Sound.** Synthesized sounds for the few moments worth hearing.\n\n### Accessibility\n\n- **Accessibility.** The rules every PLUS screen meets, built into the tokens and patterns.\n\n## Page anatomy\n\nEvery foundation page follows the same shape:\n\n- A landing opens the page: the foundation's name, one-line purpose, quick links, and hero.\n- The right rail lists every section, Overview and Related included.\n- The foundation's sections come next, then Accessibility, then Related last.\n- Examples read live tokens and follow the toolbar's Color mode and Contrast switches.\n\n## Accessibility\n\nEach foundation page ends with the accessibility rules it owns. [Accessibility](?path=/docs/foundations-accessibility--docs) holds the cross-cutting rules.\n\n## Related",
-    "design-system/agent-views/foundations/Grid.md": "# Grid\n\nTwo 12-column grids with a 16 gutter at every width; page content caps at 1232.\n\n**Kind:** Foundation\n\n**Storybook page:** `design-system/src/styles/Grid.mdx`\n\n## Overview\n\nPLUS is desktop only, from 768 up. The screen grid spans the screen on the Blanket layer: modals and floating Panels size from it. The content grid sits inside the Page: cards, tables, forms and text blocks align to it, and it is the only grid a page frame carries. A frame changes breakpoint by switching its breakpoint mode, never by hand-editing its grid. The grid decides where containers sit; spacing tokens decide everything inside them.\n\n```css\ndisplay: grid;\ngrid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));\ngap: var(--grid-gutter);\n```\n\nFigma holds the breakpoint modes (768, 1024 and 1440) on `spacing / semantics` and `spacing / patterns`. The content grid sits on the Page's content frame; the screen grid sits on the Blanket only.\n\n## Breakpoints\n\nEach breakpoint is one minimum width and one mode. The column count stays 12 and the gutter 16 at every width. The sidebar docks from 1024.\n\n| Mode | From | Code | Sidebar | Page pad | Content width | Column |\n| --- | --- | --- | --- | --- | --- | --- |\n| Medium | 768 | `:root` | closed | 24 | 720 | 45.33 |\n| Large | 1024 | `@media (min-width: 1024px)` | docked, 240 | 24 | 736 | 46.67 |\n| X-Large | 1440 | `@media (min-width: 1440px)` | docked, 240 | 24 | 1152 | 81.33 |\n\nNothing switches above 1440 or below 768: below 768 the content holds its 720 minimum and the page scrolls sideways. Design at Medium and X-Large at least, by switching the frame's variable mode rather than resizing by hand.\n\n## Two grids\n\nBoth grids are 12 columns with a 16 gutter.\n\n- **The screen grid** spans the screen inside the screen pad, centered and capped at 1232: `clamp(720, screen − 2 × 24, 1232)`, which is 720 · 976 · 1232 at the three modes. Past a 1280 screen it stops growing and centers. It ignores the sidebar, so a modal sits in the same place whether the sidebar is docked or closed. The screen pad is its own rule, not the Page pad: it stays 24 · 24 · 32 so a Modal or floating Panel keeps its width when the Page pad changes.\n- **The content grid** sits inside the Page, after the sidebar and the Page pad take their share (`Frame width − Sidebar (240 if docked) − Panel (if docked) − 48`, never under 720). A Section with a detail region keeps its 7 + 5 split from 960 of content. At X-Large, content is 1440 − 240 sidebar − 2 × 24 = 1152; a 400 Panel beside a docked Sidebar needs a 1408 Frame (1168 with the Sidebar collapsed). At Medium the sidebar is closed, so content is 768 − 2 × 24 = 720, exactly its minimum.\n\n- `--grid-columns` (Grid/columns)\n- `--grid-gutter` (Grid/gutter)\n- `--screen-width` (Screen/width-screen)\n- `--screen-pad-x` (Screen/pad-x-screen)\n- `--grid-width-column-screen` (Grid/width-column-screen)\n- `--content-width` (Content/width-content)\n- `--grid-width-column` (Grid/width-column)\n- `--page-pad` (Page/pad)\n\nThese per-mode widths step at each breakpoint rather than follow the screen. Code lays out on the CSS grid itself (as in the Overview) rather than reading `--grid-width-column`.\n\n## Grid in Figma\n\nTake the grid from the template and set its variable mode rather than drawing columns by hand.\n\n| Grid | Carried by | How to apply |\n| --- | --- | --- |\n| Screen grid | The Blanket: 12 columns, centered, each column Grid/width-column-screen wide, gutter Grid/gutter. | Put the Modal in the Blanket. Change the breakpoint with the frame’s variable mode in the appearance panel, never by resizing. |\n| Content grid | The Content frame of the Page inside the Frame: 12 columns, stretched, gutter Grid/gutter; the margin is Page/pad. | Build the page inside the Frame and set the mode on the frame. Place containers on the columns with auto layout. |\n| Grid styles | Grid and Grid/Adaptive (12-col) are the content grid; Grid/Viewport (adaptive) is the screen grid. | Apply Grid or Grid/Adaptive (12-col) to a Page content frame and Grid/Viewport (adaptive) to a Blanket. All three follow the frame mode. |\n\nShift + G (Mac) or Control + G (Windows) shows and hides the grid. Each layer owns one part of the layout:\n\n- The **template** owns the width (`Screen/width-screen`) and the breakpoint mode.\n- **Frame** fills it: the Sidebar beside the Page. The Page carries the content grid and the Content slot.\n- The **Sidebar** docks by `Sidebar/sidebar-docked` (false · true · true across Medium · Large · X-Large).\n- The **Blanket** sits above the Frame and carries the screen grid, which shows and hides with it.\n\n## Content widths\n\nPick one width mode per page and keep it.\n\n| Mode | Width | Token | Use |\n| --- | --- | --- | --- |\n| Fixed-wide (default) | 1232 | `--content-max-width` | Dashboards, directories, tables. Past the cap the content centers; with the sidebar docked, the cap binds from a 1520 screen. |\n| Fixed-narrow | 864 | `--content-max-width-reading` | Long-form reading, so lines stay a comfortable length. |\n| Fluid | no cap | — | Canvases, boards and timelines that grow sideways. |\n| Minimum | 720 | `--content-min-width` | Narrower than this, the content stays 720 and the page scrolls sideways; the topbar stays put. |\n\n## The frame\n\nThe [Frame](?path=/docs/templates-frame--docs) draws the layout the content grid is measured in: the topbar above a row with the sidebar and the Page.\n\n- `--frame-topbar-height` (Topbar/height-topbar)\n- `--frame-sidebar-width` (Sidebar/width-sidebar)\n- `--page-pad` (Page/pad)\n- `--panel-min-width`: The narrowest the splitter allows a Panel\n- `--panel-width-default`: The width a Panel opens at\n- `--panel-max-width`: The widest the splitter allows a Panel\n\nThe Frame has no seams, no pad and no stack: the Page runs to the window edges and meets the sidebar at a hairline. A Panel opens at 400, and its splitter holds it between 320 and 640. The topbar is 32 with no vertical pad. Below 1024 the sidebar opens over the page (240 wide, full height, overlay shadow, no Blanket) and an outside click closes it, so the page never reflows when it opens. At 1024 the sidebar docks and content steps from 975 to 736, so cards reflow there while modals keep their width.\n\n## Column spans\n\nA region takes whole columns: `span n = n × column + (n − 1) × 16`.\n\n| Span | Medium | Large | X-Large |\n| --- | --- | --- | --- |\n| span 1 | 45.33 | 46.67 | 81.33 |\n| span 2 | 106.67 | 109.33 | 178.67 |\n| span 3 | 168 | 172 | 276 |\n| span 4 | 229.33 | 234.67 | 373.33 |\n| span 6 | 352 | 360 | 568 |\n| span 8 | 474.67 | 485.33 | 762.67 |\n| span 12 | 720 | 736 | 1152 |\n\nCards per row is the most of 4, 3, 2 or 1 that keeps each card at its minimum width (`--card-min-width-sm` 224, `-md` 304, `-lg` 480). In a section narrower than 12 columns, only counts that divide its span apply. A split section keeps its main column at least 480 (`--section-min-width-main`) and its side column at least 224 (`--section-min-width-side`); below those, they stack.\n\n## Modal widths\n\nA modal spans 4, 6, 8 or 10 screen-grid columns, the gutters between them, and its own 16 pad on each side (`width = n × --grid-width-column-screen + (n − 1) × --grid-gutter + 2 × --modal-pad-x-default`). It grows with the screen between breakpoints, stops past a 1280 screen, never shrinks below its Medium width, ignores the sidebar and never comes closer than 16 to the side of the screen. Pass `width=\"4-col\"`, `\"6-col\"`, `\"8-col\"` or `\"10-col\"` to Modal; a fixed pixel width ignores the screen grid. The tokens below are each mode's width rounded to a whole pixel: `4-col` 261 · 347 · 432, `6-col` 384 · 512 · 640, `8-col` 507 · 677 · 848 and `10-col` 629 · 843 · 1056 at Medium · Large · X-Large.\n\n- `--modal-width-xs`\n- `--modal-width-sm` (Modal/width-modal-sm)\n- `--modal-width-md` (Modal/width-modal-md)\n- `--modal-width-lg` (Modal/width-modal-lg)\n- `--blanket-pad-x` (Blanket/pad-x)\n- `--blanket-pad-y` (Blanket/pad-y)\n\n## Size roles\n\nOne Size scale, used through five roles. Pick the role, then its size; the pixel leads and the token is the binding. Icon sizes (12, 16, 24) live on [Iconography](?path=/docs/foundations-visual-iconography--docs), frame sizes (topbar 32, sidebar 240) under The frame, and the 720 minimum and the 864 and 1232 caps under Content widths. Minimum and maximum widths come from the common width scale (`--width-1000` is 160); there is no separate list.\n\n| Role | Values | Tokens | Use |\n| --- | --- | --- | --- |\n| Control | 24 · 32 | `--control-sm` · `-md` | Anything you click or type into. Buttons, tabs and menu rows are 32 (24 compact); fields are 40 (32 compact). Compact only inside table rows and inline toolbars. |\n| Row | 32 · 40 · 48 | `--row-height-sm` · `-md` · `-lg` | One record in a table or list. A minimum: rows grow with their content. |\n| Label | 16 · 20 · max 160 | `--label-height-sm` · `-md` · `--label-max-width` | Tag, Status and Count. |\n| Media | 16 · 20 · 24 · 32 · 40 · 48 | `--image-xxs` … `--image-xl` | Avatar, Tile and logos. Images keep their ratio (1:1, 4:3, 16:9, 3:2) and take their width from the grid or the card. |\n| Field | 80 · 160 · 240 · 320 · 480 · min 80 · 120 | `--field-width-xs` … `-xl` · `--field-min-height-sm` · `-lg` | Fields fill their column by default; a fixed width takes a field width. Text area and Rich text editor take the minimum heights. |\n\n### Size tokens\n\nCard, Section, Popup and Menu sizes sit with their patterns on [Spacing](?path=/docs/foundations-layout-spacing--docs#foundation-pattern-tokens), and [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists the full scale.\n\n- `--control-sm` (Size/Item/height-sm)\n- `--control-md` (Size/Item/height-md)\n- `--row-height-sm` (Size/Row/height-sm)\n- `--row-height-md` (Size/Row/height-md)\n- `--row-height-lg` (Size/Row/height-lg)\n- `--label-height-sm` (Size/Label/height-sm)\n- `--label-height-md` (Size/Label/height-md)\n- `--label-max-width` (Size/Label/max-width)\n- `--image-xxs` (Size/Image/xxs)\n- `--image-xs` (Size/Image/xs)\n- `--image-sm` (Size/Image/sm)\n- `--image-md` (Size/Image/md)\n- `--image-lg` (Size/Image/lg)\n- `--image-xl` (Size/Image/xl)\n- `--field-width-xs` (Size/Field/width-xs)\n- `--field-width-sm` (Size/Field/width-sm)\n- `--field-width-md` (Size/Field/width-md)\n- `--field-width-lg` (Size/Field/width-lg)\n- `--field-width-xl` (Size/Field/width-xl)\n- `--field-min-height-sm` (Size/Field/min-height-sm)\n- `--field-min-height-lg` (Size/Field/min-height-lg)\n\nDo: A form at 40 and 32: the field is 40 (compact 32), the button 32 (compact 24).\nDon't: A compact 24 button beside a 40 field. Compact is for table rows and inline toolbars only.\n\n## Hug and fill\n\nEvery box either hugs its content or fills the space it is given. The container decides; content never stretches just to look aligned. A Button, an icon and a tag hug their label and never stretch to a column. Choose Hug or Fill on the child after it sits inside the auto-layout parent; a wrapping text block takes a fixed width, then wraps.\n\n| Part | Hugs | Fills |\n| --- | --- | --- |\n| Roster row | Status tag, Button and the rowu2019s own height | The name column, which takes what the others leave |\n| Card | Its height, so cards in a row stretch to the tallest | Its column on the content grid |\n| Modal | Height by default, up to the screen minus 128 | The screen minus 128 when set to Fill, as a notes editor is |\n| Form | Labels and helper text | Each field, across its column |\n\n**Let the name column fill and the controls hug.** A roster row with a name, a Status tag and one action.\n\nDo: The name fills; the tag and the button keep their own width.\nDon't: The button fills the leftover space, so an action becomes a wide bar and the name crowds the edge.\n\n## Do and don't\n\n### Keep the gutter 16 at every width\n\nColumns flex with the screen; the gutter never changes.\n\n### Span whole columns\n\nA content container spans whole columns (3, 4, 6 or 12) and can be centered by leaving the same number of columns empty on each side. Content never bleeds into a gutter or into the Page pad.\n\n### Size modals from the screen grid\n\nThe width comes from screen-grid columns, so a modal lines up with the page whenever the sidebar is closed.\n\n### Cap reading text at 864\n\nLong-form text uses the reading cap, so lines stay readable. Structured content, such as dashboards and tables, uses the 1232 cap.\n\n### Align containers, not their parts\n\nOnly top-level containers align to columns: cards, tables, forms, images, charts and text blocks. Inside a container the grid stops and spacing tokens take over, so buttons, icons, tags and avatars never stretch to columns, and cards have no inner grid.\n\n### Keep the grid on the page\n\nThe content grid starts where the Page starts, after the sidebar, and never runs under the sidebar or the topbar.\n\n### Build with auto layout\n\nAn auto layout row with a 16 px gap keeps cards on the columns when the mode changes; cards dragged into place by hand drift off the columns.\n\n### Design from 768 up\n\nPLUS has no small-screen tier. Never design below 768, and never drop to 6 or 2 columns: a four-card row at X-Large is still a four-card row at Medium, just narrower.\n\n## Accessibility\n\n- Content never sits under the sidebar or the topbar. Below 1024 the sidebar opens over the page and closes on an outside click or Escape, and focus returns to its toggle.\n- Cap long-form text at the reading width (`--content-max-width-reading`, 864) so lines stay a readable length on wide screens.\n- Content holds a 720 minimum (`--content-min-width`); below it the page scrolls sideways instead of squeezing columns, so text never overlaps or clips when zoomed.\n- Keep DOM order the same as visual order on the grid so keyboard focus and screen readers follow what a reader sees.\n- Every control is at least 24 tall, and 32 or more outside a table row or inline toolbar. An icon-only control still needs a name.\n\n## Related",
+    "design-system/agent-views/foundations/Grid.md": "# Grid\n\nTwo 12-column grids with a 16 gutter at every width; page content caps at 1232.\n\n**Kind:** Foundation\n\n**Storybook page:** `design-system/src/styles/Grid.mdx`\n\n## Overview\n\nPLUS is desktop only, from 768 up. The screen grid spans the screen on the Blanket layer: modals and floating Panels size from it. The content grid sits inside the Page: cards, tables, forms and text blocks align to it, and it is the only grid a page frame carries. A frame changes breakpoint by switching its breakpoint mode, never by hand-editing its grid. The grid decides where containers sit; spacing tokens decide everything inside them.\n\n```css\ndisplay: grid;\ngrid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr));\ngap: var(--grid-gutter);\n```\n\nFigma holds the breakpoint modes (768, 1024 and 1440) on `spacing / semantics` and `spacing / templates`. The content grid sits on the Page's content frame; the screen grid sits on the Blanket only.\n\n## Breakpoints\n\nEach breakpoint is one minimum width and one mode. The column count stays 12 and the gutter 16 at every width. The sidebar docks from 1024.\n\n| Mode | From | Code | Sidebar | Page pad | Content width | Column |\n| --- | --- | --- | --- | --- | --- | --- |\n| Medium | 768 | `:root` | closed | 24 | 720 | 45.33 |\n| Large | 1024 | `@media (min-width: 1024px)` | docked, 240 | 24 | 736 | 46.67 |\n| X-Large | 1440 | `@media (min-width: 1440px)` | docked, 240 | 24 | 1152 | 81.33 |\n\nNothing switches above 1440 or below 768: below 768 the content holds its 720 minimum and the page scrolls sideways. Design at Medium and X-Large at least, by switching the frame's variable mode rather than resizing by hand.\n\n## Two grids\n\nBoth grids are 12 columns with a 16 gutter.\n\n- **The screen grid** spans the screen inside the screen pad, centered and capped at 1232: `clamp(720, screen − 2 × 24, 1232)`, which is 720 · 976 · 1232 at the three modes. Past a 1280 screen it stops growing and centers. It ignores the sidebar, so a modal sits in the same place whether the sidebar is docked or closed. The screen pad is its own rule, not the Page pad: it stays 24 · 24 · 32 so a Modal or floating Panel keeps its width when the Page pad changes.\n- **The content grid** sits inside the Page, after the sidebar and the Page pad take their share (`Frame width − Sidebar (240 if docked) − Panel (if docked) − 48`, never under 720). A Section with a detail region keeps its 7 + 5 split from 960 of content. At X-Large, content is 1440 − 240 sidebar − 2 × 24 = 1152; a 400 Panel beside a docked Sidebar needs a 1408 Frame (1168 with the Sidebar collapsed). At Medium the sidebar is closed, so content is 768 − 2 × 24 = 720, exactly its minimum.\n\n- `--grid-columns` (Grid/columns)\n- `--grid-gutter` (Grid/gutter)\n- `--screen-width` (Screen/width-screen)\n- `--screen-pad-x` (Screen/pad-x-screen)\n- `--grid-width-column-screen` (Grid/width-column-screen)\n- `--content-width` (Content/width-content)\n- `--grid-width-column` (Grid/width-column)\n- `--page-pad` (Page/pad)\n\nThese per-mode widths step at each breakpoint rather than follow the screen. Code lays out on the CSS grid itself (as in the Overview) rather than reading `--grid-width-column`.\n\n## Grid in Figma\n\nTake the grid from the template and set its variable mode rather than drawing columns by hand.\n\n| Grid | Carried by | How to apply |\n| --- | --- | --- |\n| Screen grid | The Blanket: 12 columns, centered, each column Grid/width-column-screen wide, gutter Grid/gutter. | Put the Modal in the Blanket. Change the breakpoint with the frame’s variable mode in the appearance panel, never by resizing. |\n| Content grid | The Content frame of the Page inside the Frame: 12 columns, stretched, gutter Grid/gutter; the margin is Page/pad. | Build the page inside the Frame and set the mode on the frame. Place containers on the columns with auto layout. |\n| Grid styles | Grid and Grid/Adaptive (12-col) are the content grid; Grid/Viewport (adaptive) is the screen grid. | Apply Grid or Grid/Adaptive (12-col) to a Page content frame and Grid/Viewport (adaptive) to a Blanket. All three follow the frame mode. |\n\nShift + G (Mac) or Control + G (Windows) shows and hides the grid. Each layer owns one part of the layout:\n\n- The **template** owns the width (`Screen/width-screen`) and the breakpoint mode.\n- **Frame** fills it: the Sidebar beside the Page. The Page carries the content grid and the Content slot.\n- The **Sidebar** docks by `Sidebar/sidebar-docked` (false · true · true across Medium · Large · X-Large).\n- The **Blanket** sits above the Frame and carries the screen grid, which shows and hides with it.\n\n## Content widths\n\nPick one width mode per page and keep it.\n\n| Mode | Width | Token | Use |\n| --- | --- | --- | --- |\n| Fixed-wide (default) | 1232 | `--content-max-width` | Dashboards, directories, tables. Past the cap the content centers; with the sidebar docked, the cap binds from a 1520 screen. |\n| Fixed-narrow | 864 | `--content-max-width-reading` | Long-form reading, so lines stay a comfortable length. |\n| Fluid | no cap | — | Canvases, boards and timelines that grow sideways. |\n| Minimum | 720 | `--content-min-width` | Narrower than this, the content stays 720 and the page scrolls sideways; the topbar stays put. |\n\n## The frame\n\nThe [Frame](?path=/docs/templates-frame--docs) draws the layout the content grid is measured in: the topbar above a row with the sidebar and the Page.\n\n- `--frame-topbar-height` (Topbar/height-topbar)\n- `--frame-sidebar-width` (Sidebar/width-sidebar)\n- `--page-pad` (Page/pad)\n- `--panel-min-width`: The narrowest the splitter allows a Panel\n- `--panel-width-default`: The width a Panel opens at\n- `--panel-max-width`: The widest the splitter allows a Panel\n\nThe Frame has no seams, no pad and no stack: the Page runs to the window edges and meets the sidebar at a hairline. A Panel opens at 400, and its splitter holds it between 320 and 640. The topbar is 32 with no vertical pad. Below 1024 the sidebar opens over the page (240 wide, full height, overlay shadow, no Blanket) and an outside click closes it, so the page never reflows when it opens. At 1024 the sidebar docks and content steps from 975 to 736, so cards reflow there while modals keep their width.\n\n## Column spans\n\nA region takes whole columns: `span n = n × column + (n − 1) × 16`.\n\n| Span | Medium | Large | X-Large |\n| --- | --- | --- | --- |\n| span 1 | 45.33 | 46.67 | 81.33 |\n| span 2 | 106.67 | 109.33 | 178.67 |\n| span 3 | 168 | 172 | 276 |\n| span 4 | 229.33 | 234.67 | 373.33 |\n| span 6 | 352 | 360 | 568 |\n| span 8 | 474.67 | 485.33 | 762.67 |\n| span 12 | 720 | 736 | 1152 |\n\nCards per row is the most of 4, 3, 2 or 1 that keeps each card at its minimum width (`--card-min-width-sm` 224, `-md` 304, `-lg` 480). In a section narrower than 12 columns, only counts that divide its span apply. A split section keeps its main column at least 480 (`--section-min-width-main`) and its side column at least 224 (`--section-min-width-side`); below those, they stack.\n\n## Modal widths\n\nA modal spans 4, 6, 8 or 10 screen-grid columns, the gutters between them, and its own 16 pad on each side (`width = n × --grid-width-column-screen + (n − 1) × --grid-gutter + 2 × --modal-pad-x-default`). It grows with the screen between breakpoints, stops past a 1280 screen, never shrinks below its Medium width, ignores the sidebar and never comes closer than 16 to the side of the screen. Pass `width=\"4-col\"`, `\"6-col\"`, `\"8-col\"` or `\"10-col\"` to Modal; a fixed pixel width ignores the screen grid. The tokens below are each mode's width rounded to a whole pixel: `4-col` 261 · 347 · 432, `6-col` 384 · 512 · 640, `8-col` 507 · 677 · 848 and `10-col` 629 · 843 · 1056 at Medium · Large · X-Large.\n\n- `--modal-width-xs`\n- `--modal-width-sm` (Modal/width-modal-sm)\n- `--modal-width-md` (Modal/width-modal-md)\n- `--modal-width-lg` (Modal/width-modal-lg)\n- `--blanket-pad-x` (Blanket/pad-x)\n- `--blanket-pad-y` (Blanket/pad-y)\n\n## Size roles\n\nOne Size scale, used through five roles. Pick the role, then its size; the pixel leads and the token is the binding. Icon sizes (12, 16, 24) live on [Iconography](?path=/docs/foundations-visual-iconography--docs), frame sizes (topbar 32, sidebar 240) under The frame, and the 720 minimum and the 864 and 1232 caps under Content widths. Minimum and maximum widths come from the common width scale (`--width-1000` is 160); there is no separate list.\n\n| Role | Values | Tokens | Use |\n| --- | --- | --- | --- |\n| Control | 24 · 32 | `--control-sm` · `-md` | Anything you click or type into. Buttons, tabs and menu rows are 32 (24 compact); fields are 40 (32 compact). Compact only inside table rows and inline toolbars. |\n| Row | 32 · 40 · 48 | `--row-height-sm` · `-md` · `-lg` | One record in a table or list. A minimum: rows grow with their content. |\n| Label | 16 · 20 · max 160 | `--label-height-sm` · `-md` · `--label-max-width` | Tag, Status and Count. |\n| Media | 16 · 20 · 24 · 32 · 40 · 48 | `--image-xxs` … `--image-xl` | Avatar, Tile and logos. Images keep their ratio (1:1, 4:3, 16:9, 3:2) and take their width from the grid or the card. |\n| Field | 80 · 160 · 240 · 320 · 480 · min 80 · 120 | `--field-width-xs` … `-xl` · `--field-min-height-sm` · `-lg` | Fields fill their column by default; a fixed width takes a field width. Text area and Rich text editor take the minimum heights. |\n\n### Size tokens\n\nCard, Section, Popup and Menu sizes sit with their templates on [Spacing](?path=/docs/foundations-layout-spacing--docs#foundation-template-tokens), and [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists the full scale.\n\n- `--control-sm` (Size/Item/height-sm)\n- `--control-md` (Size/Item/height-md)\n- `--row-height-sm` (Size/Row/height-sm)\n- `--row-height-md` (Size/Row/height-md)\n- `--row-height-lg` (Size/Row/height-lg)\n- `--label-height-sm` (Size/Label/height-sm)\n- `--label-height-md` (Size/Label/height-md)\n- `--label-max-width` (Size/Label/max-width)\n- `--image-xxs` (Size/Image/xxs)\n- `--image-xs` (Size/Image/xs)\n- `--image-sm` (Size/Image/sm)\n- `--image-md` (Size/Image/md)\n- `--image-lg` (Size/Image/lg)\n- `--image-xl` (Size/Image/xl)\n- `--field-width-xs` (Size/Field/width-xs)\n- `--field-width-sm` (Size/Field/width-sm)\n- `--field-width-md` (Size/Field/width-md)\n- `--field-width-lg` (Size/Field/width-lg)\n- `--field-width-xl` (Size/Field/width-xl)\n- `--field-min-height-sm` (Size/Field/min-height-sm)\n- `--field-min-height-lg` (Size/Field/min-height-lg)\n\nDo: A form at 40 and 32: the field is 40 (compact 32), the button 32 (compact 24).\nDon't: A compact 24 button beside a 40 field. Compact is for table rows and inline toolbars only.\n\n## Hug and fill\n\nEvery box either hugs its content or fills the space it is given. The container decides; content never stretches just to look aligned. A Button, an icon and a tag hug their label and never stretch to a column. Choose Hug or Fill on the child after it sits inside the auto-layout parent; a wrapping text block takes a fixed width, then wraps.\n\n| Part | Hugs | Fills |\n| --- | --- | --- |\n| Roster row | Status tag, Button and the rowu2019s own height | The name column, which takes what the others leave |\n| Card | Its height, so cards in a row stretch to the tallest | Its column on the content grid |\n| Modal | Height by default, up to the screen minus 128 | The screen minus 128 when set to Fill, as a notes editor is |\n| Form | Labels and helper text | Each field, across its column |\n\n**Let the name column fill and the controls hug.** A roster row with a name, a Status tag and one action.\n\nDo: The name fills; the tag and the button keep their own width.\nDon't: The button fills the leftover space, so an action becomes a wide bar and the name crowds the edge.\n\n## Do and don't\n\n### Keep the gutter 16 at every width\n\nColumns flex with the screen; the gutter never changes.\n\n### Span whole columns\n\nA content container spans whole columns (3, 4, 6 or 12) and can be centered by leaving the same number of columns empty on each side. Content never bleeds into a gutter or into the Page pad.\n\n### Size modals from the screen grid\n\nThe width comes from screen-grid columns, so a modal lines up with the page whenever the sidebar is closed.\n\n### Cap reading text at 864\n\nLong-form text uses the reading cap, so lines stay readable. Structured content, such as dashboards and tables, uses the 1232 cap.\n\n### Align containers, not their parts\n\nOnly top-level containers align to columns: cards, tables, forms, images, charts and text blocks. Inside a container the grid stops and spacing tokens take over, so buttons, icons, tags and avatars never stretch to columns, and cards have no inner grid.\n\n### Keep the grid on the page\n\nThe content grid starts where the Page starts, after the sidebar, and never runs under the sidebar or the topbar.\n\n### Build with auto layout\n\nAn auto layout row with a 16 px gap keeps cards on the columns when the mode changes; cards dragged into place by hand drift off the columns.\n\n### Design from 768 up\n\nPLUS has no small-screen tier. Never design below 768, and never drop to 6 or 2 columns: a four-card row at X-Large is still a four-card row at Medium, just narrower.\n\n## Accessibility\n\n- Content never sits under the sidebar or the topbar. Below 1024 the sidebar opens over the page and closes on an outside click or Escape, and focus returns to its toggle.\n- Cap long-form text at the reading width (`--content-max-width-reading`, 864) so lines stay a readable length on wide screens.\n- Content holds a 720 minimum (`--content-min-width`); below it the page scrolls sideways instead of squeezing columns, so text never overlaps or clips when zoomed.\n- Keep DOM order the same as visual order on the grid so keyboard focus and screen readers follow what a reader sees.\n- Every control is at least 24 tall, and 32 or more outside a table row or inline toolbar. An icon-only control still needs a name.\n\n## Related",
     "design-system/agent-views/foundations/Icons.md": "# Iconography\n\nIcons are small symbols that help people find their way and act faster.\n\n**Kind:** Foundation\n\n**Storybook page:** `design-system/src/styles/Icons.mdx`\n\n## Overview\n\nThe Icon component renders a single glyph; components with icon slots (`Button`'s `iconBefore` and `iconAfter`) pass the glyph name through `Icon` (`fa-regular fa-<name>`, falling back to `fa-solid` where Font Awesome Free has no regular weight). A React node in place of the name renders as given.\n\n```jsx\n<Icon name=\"calendar-days\" size={16} color=\"subtle\" />\n<Button appearance=\"primary\" text=\"Add tutor\" iconBefore=\"plus\" />\n```\n\n## Principles\n\n### Use one recognized symbol per meaning\n\nPick the plainest glyph most people read the same way (calendar for dates, bell for notifications, gear for settings) and keep one glyph per meaning across the product.\n\n### Pair icons with text labels\n\nA label states what the icon does and names it for screen readers. Leave an icon unlabeled only for a familiar action in a tight space, and give the control an accessible `label` in code.\n\n## Sizes: 12, 16 and 24\n\nIcons ship at three sizes bound to `Size/Icon` tokens. `--fa-width: 1em` is set globally so every glyph fills its square box without adding line height. Chevrons are always 12. Add breathing room with spacing tokens, never a larger icon size.\n\n| Size (px) | Figma token | Code | Use |\n| --- | --- | --- | --- |\n| 12 | `Size/Icon/sm` | `--icon-sm` | Chevrons, field validation, and compact controls such as tags, Count tags, statuses, secondary actions and table headers. |\n| 16 | `Size/Icon/md` | `--icon-md` | Default beside 14 and 16 text in buttons, menus, fields and lists. |\n| 24 | `Size/Icon/lg` | `--icon-lg` | Empty states, section headers and standalone status marks. Above 24, use a Tile. |\n\n## Above 24, use a Tile\n\n24 is the top of the icon scale. A larger mark, tool logo or empty-state symbol belongs in a Tile, which sets its size, radius and fill together.\n\n## Font Awesome Free and color tokens\n\nUse Font Awesome Free 7.2 only: `fa-solid`, `fa-regular` and `fa-brands` (such as `fa-brands fa-figma` and `fa-brands fa-github`). Pro families (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`) and Pro-only names are unlicensed and render blank, so check a glyph name against the Free set first. Regular is the default weight; solid is used where Free has no regular glyph. Where one set of icons needs a glyph Free draws only in solid, that one glyph is solid and the rest stay regular. Always use current glyph names rather than legacy aliases (`calendar-days`, not `calendar-alt`).\n\nColor icons with `--ds-icon-*` tokens (`--ds-icon-success`, `--ds-icon-danger`, or the text color beside the icon), never a raw hex value.\n\n## Usage\n\n| Component | Job |\n| --- | --- |\n| Icon | Backs up a text label at 12, 16 or 24. |\n| Tile | Frames an icon, partner/tool logo or picture at 16 to 48. |\n| Logo | Marks PLUS itself. |\n| Image | Places a photo or graphic in content. |\n\nBefore proposing a new glyph through Intake, verify that no existing glyph fits, that it will not conflict with another icon in the same view, and that a text label alone would not be clearer. A design lead approves new glyphs. Zoom has no Font Awesome Free glyph: a Zoom link is not an icon, and partner and tool marks go in a `Tile`, never in `Logo`.\n\n## Common icons\n\n| Glyph | Name | Job |\n| --- | --- | --- |\n|  | `plus` | Add |\n|  | `minus` | Remove |\n|  | `check` | Confirm |\n|  | `xmark` | Close, cancel or dismiss |\n|  | `trash` | Delete |\n|  | `pen` | Edit |\n|  | `magnifying-glass` | Search |\n|  | `gear` | Settings |\n|  | `calendar-days` | Session or schedule |\n|  | `user` | Person or profile |\n|  | `clipboard` | Session note |\n|  | `bell` | Notification |\n|  | `circle-info` | Information |\n|  | `arrow-right` | Next or forward |\n|  | `arrow-left` | Back or previous |\n|  | `chevron-down` | Expand or open a menu |\n|  | `chevron-up` | Collapse |\n|  | `star` | Favorite or rating |\n\n## Do and don't\n\n### Use Free families and Free names only\n\nSolid, regular and brands are licensed here, including brand glyphs.\n\nDo: Free families (fa-regular, fa-solid, fa-brands) render everywhere.\nDon't: Pro families (fa-light, fa-thin, fa-sharp, fa-duotone) render blank.\n\n### Use 16 by default, 12 sparingly\n\nIcons are 16 beside body text. Keep 12 for chevrons, validation and compact parts.\n\nDo: A 16 icon leads the label; the trailing chevron is 12.\nDon't: A 12 leading icon is too small beside 14 body text.\n\n### Use a symbol people recognize\n\nPick the glyph most people read the same way.\n\nDo: A bell for notifications.\nDon't: A gear reads as settings, so it misleads here.\n\n## Accessibility\n\n- Decorative icons and icons beside a visible text label carry `aria-hidden=\"true\"`.\n- Icon-only controls (`IconButton`) require a concise `label` prop so screen readers announce the action.\n- `--ds-icon-*` tokens clear the 3:1 non-text contrast bar against their paired surfaces (Color).\n\n## Related",
     "design-system/agent-views/foundations/Illustrations.md": "# Illustrations\n\nHand-drawn characters for moments with room to breathe.\n\n**Kind:** Foundation\n\n**Storybook page:** `design-system/src/styles/Illustrations.mdx`\n\n## Overview\n\nPLUS illustrations are 12 hand-drawn spot characters: five for the SMART areas and seven math symbols. Each character's body takes its area or accent token, so it adapts to Light and Dark. See Illustration for props, sizes and code. A low-fidelity illustration of the UI uses basic shapes in mostly gray, never a real screenshot; see the Illustration kit. Decide first that an illustration is needed.\n\n## Characters\n\nThe five SMART characters each stand for an area; the seven math characters stand for general moments and take an accent hue.\n\n| Moment | Character |\n| --- | --- |\n| A lesson, card or page about one SMART area | That area's character: `mastering-content`, `advocacy`, `technology`, `relationships` or `social-emotional`. |\n| General moments: empty state, welcome, completion | A math character: `dot`, `approximately-equal`, `root`, `all`, `pi`, `equal` or `divider`. |\n\n### SMART characters\n\n### Math characters\n\n## Color and SMART mapping\n\nAll 12 bodies sit at one mid strength so the set reads equally light in Light and Dark. SMART characters take `color/background/smart/<area>/subtle`. Math characters take `color/background/accent/<hue>/subtle` (red, blue, green or purple) and never a SMART hue. Line work takes `color/icon/subtle`.\n\n| Character | Body token |\n| --- | --- |\n| mastering content | `--ds-background-smart-mastering-content-subtle` |\n| advocacy | `--ds-background-smart-advocacy-subtle` |\n| technology | `--ds-background-smart-technology-tools-subtle` |\n| relationships | `--ds-background-smart-relationship-subtle` |\n| social emotional | `--ds-background-smart-social-emotional-subtle` |\n| dot · pi | `--ds-background-accent-red-subtle` |\n| approximately equal · equal | `--ds-background-accent-blue-subtle` |\n| root · divider | `--ds-background-accent-green-subtle` |\n| all | `--ds-background-accent-purple-subtle` |\n| Face, arms and legs (all) | `--ds-icon-subtle` |\n\n## Usage\n\n| Where | Illustration | Guidance |\n| --- | --- | --- |\n| Empty state | Yes | One character above the message: 96 on a card, 160 on a page. |\n| Onboarding and tours | Yes | One character per step: 160 or 240. |\n| Completion and encouragement | Yes | A finished session or met goal: 160 or 240. |\n| SMART area header | Yes | The area’s own character, at 48 or 96. |\n| Tables, forms and toolbars | No | Working surfaces. Use icons or copy instead. |\n| Inline errors and buttons | No | These need words, not mood. Use a Banner. |\n\n- Use the `Illustration` component; never detach or recolor its parts.\n- Pick a size from the scale and scale uniformly.\n- Reuse existing characters first. Adding a new character requires design lead approval.\n- An illustration works with the copy and never replaces it.\n- Other visuals have their own components: `Avatar` for people, `Icon` for actions, `Logo` for brand, `Image` for photos.\n\n## Do and don't\n\n### Match the character to its SMART area\n\nThe body color stands for the area, so a character only appears with its own area.\n\nDo: The technology character with the Technology & tools lesson.\nDon't: The mastering content character on a Relationships lesson.\n\n### Keep the proportions\n\nScale with the size; the limbs and texture distort when stretched.\n\nDo: Scaled uniformly to a size on the scale.\nDon't: Stretched to fill a banner.\n\n### One character per moment\n\nA single character carries the mood; a crowd competes with the message.\n\nDo: One character above the empty-state message.\nDon't: Four characters crowding one empty state. A collage like this belongs on a marketing page, not in the product.\n\n## Accessibility\n\n- Keep an illustration decorative, hidden from assistive technology, wherever the copy beside it says the same thing.\n- Name an illustration that carries meaning on its own, using the component's `title`, and say what it shows in a few words.\n- Never put the only copy of information in an illustration. The words carry it.\n\n## Related",
     "design-system/agent-views/foundations/Logos.md": "# Logos\n\nThe visual mark of PLUS, shown with or without the wordmark.\n\n**Kind:** Foundation\n\n**Storybook page:** `design-system/src/styles/Logos.mdx`\n\n## Overview\n\nUse the logo to mark PLUS in the tutor and student apps: the sidebar and navbar header, sign-in, email headers and the loading screen. Never use it as decoration. Its colors are brand artwork rather than theme tokens, so it looks the same on every surface.\n\n```jsx\nimport { Logo } from '@/components';\n```\n\nSee Logo for props and code.\n\n## One logo, two parts\n\nThe logo has two parts: the logomark and the wordmark. Together they form the lockup. In product, always render the `Logo` component rather than redrawing or exporting the mark by hand.\n\n## Logomark shape and size\n\nThe logomark ships in fixed heights: 16, 20, 24, 32, 48, 64 and 96. At 24 and below it uses a heavier small-size drawing so the plus stays open. Pick a step; never scale an instance by hand.\n\n## Construction\n\nThe logomark is drawn on a 12 by 12 unit square (1 unit = 8 of the 96 drawing coordinates). Two circles of 6 and 4.5 units share its center, two 2-unit corner circles sit at the top right and bottom left, and the 3-unit plus is centered 8.5 units from the left and 3.5 from the top. Use the `Logo` component; the drawing explains the shape and is not a template to redraw from.\n\n## Color options\n\nChoose the color option for the ground the logo sits on.\n\n| Color option | Ground | When to use |\n| --- | --- | --- |\n| Colored | Light and dark surfaces | Default. Brand artwork on a light ground; in dark mode each glow steps one lighter. |\n| Colored dark | Dark surfaces | Stronger glows, fixed across color modes. |\n| Filled | Light grounds | Solid teal tile with a white plus and dark wordmark, where the glow cannot sit. |\n| Dark | Dark grounds | Solid deep teal tile with a white plus and light wordmark. |\n| Outlined | Light grounds | Dark outline mark, where a solid block competes with content. |\n| Outlined reversed | Photos or dark grounds | Light outline mark, where a solid block hides or competes with an image. |\n\n## Logo clearance\n\nKeep clear space around the logo, measured from the logomark's edge. Align the logo to neighbors by the logomark's edge and center it with adjacent text.\n\n| Rule | Value | Note |\n| --- | --- | --- |\n| Clear space | Half the logomark’s height | On every side, measured from the edge of the logomark, not the edge of the Logo frame. |\n| Minimum size | 24 (lockup) · 16 (logomark) | Below 24, use the logomark alone. |\n\n## Do and don't\n\n### Use approved colors\n\nUse the color options as drawn, on the ground each belongs on.\n\nDo: The colored logomark on a light ground.\nDon't: An unapproved color combination.\n\n### Keep the logomark's shape and proportions\n\nPick a size step. Do not stretch, crop or rotate the logomark.\n\nDo: A size step, wordmark included.\nDon't: A stretched logomark.\n\n### Give the logomark breathing room\n\nDo not add unnecessary containers around the logomark. Never rebuild it from shapes or type; use the Logo component.\n\nDo: The logomark on its own, with space around it.\nDon't: The logomark nested in an extra container.\n\n### Keep the artwork clean\n\nDo not add effects to the logo or edit the artwork. Use the outlined option on photos and busy grounds, and keep to one Logo per view: partner and tool logos go in a Tile, never in the Logo set.\n\nDo: The logomark as drawn.\nDon't: A drop shadow added to the logomark.\n\n## Accessibility\n\nWrite the name in the alt text for the logo in digital experiences.\n\n| Case | Alt text |\n| --- | --- |\n| Logo is the only thing naming PLUS (sign-in screen) | PLUS |\n| Logo sits beside a visible PLUS title | Empty. It is decorative; hide it from assistive technology. |\n| Logo links home | PLUS home (names where it goes). Give it keyboard focus and the focus ring. |\n\n- Choose the color option by ground so the logomark keeps its contrast.\n\n## Related",
@@ -26129,13 +26129,13 @@
     "design-system/agent-views/foundations/MotionPlayground.md": "# Playground\n\nTry the springs on a real move, and check how they feel at real speed.\n\n**Kind:** Foundation\n\n**Storybook page:** `design-system/src/styles/MotionPlayground.mdx`\n\n## Try a spring\n\n### Stiff and soft\n\nThe same menu at the two extremes of the dial. A very stiff spring snaps; a very soft one drifts and makes you wait.\n\n### Your own spring\n\nPick a token and a mode to load its generated spring, then move stiffness and damping ratio (`damping = 2 × ratio × √(stiffness × mass)`). The curve and the 90% time update with the controls, and playback speed slows the move so you can study it. Anything tuned here is for feel only: to change a token, ask the design team; the numbers in Physics are the only source.\n\n## Feel checks\n\n### The shake\n\nA blocked Save shakes once, at real speed.\n\n### Dragged past a limit\n\nDrag the Panel's edge to the left, past the dashed line (or focus the edge and hold ArrowLeft). Past the limit the Panel follows less and less; on release it springs back with the hand's speed.\n\n### The three Productive speeds\n\nEach on its real job, at real speed.\n\n## Related",
     "design-system/agent-views/foundations/MotionPrinciples.md": "# Principles\n\nMotion in PLUS explains a change. If it explains nothing, it is not there.\n\n**Kind:** Foundation\n\n**Storybook page:** `design-system/src/styles/MotionPrinciples.mdx`\n\n## How motion carries the framework\n\nOur motion is responsive, clear about how things work, kind in the moments that matter, and quiet everywhere else.\n\n## Four principles\n\nNearly everything a tutor does in a day is Productive; one moment in a term is Expressive. Every Do and Don't below plays the same scene with one rule broken, drawing its path from start to landing before it moves.\n\n### Always responsive\n\n**Keep up, never hold up.**\n\nEvery press answers in the same frame through its color or press state (90% done by about ). A moving part, such as a Toggle thumb, follows on `spatial.fast`. Any motion can be interrupted mid-way, switched to Reduced mode by the system setting, and paused if it runs longer than 5 s.\n\n### Build understanding\n\n**Show how, not just what.**\n\nMotion shows where something came from, where it went, and where you are now. It keeps the speed of the hand that started it, carries the weight of the thing that moves, and settles where it belongs.\n\n### Lead with empathy\n\n**Cheer the wins, cushion the misses.**\n\nExpressive marks the end of something worth finishing, a few times a week at most. A blocked submit shakes once; a failed save eases in and stays until it is fixed.\n\n### Cut the noise\n\n**One story at a time.**\n\nOnly what explains the change moves. How often something happens sets how loud its motion is, never to zero at page level. From the keyboard, controls and Popups open with no animation; layers and pages keep their motion. Never use Expressive on a control, a field, or anything done dozens of times a day.\n\n## Sound\n\nSound is rare and never the only signal: see Sound · When to play and Settings and accessibility.\n\n## Before you add motion\n\n1. **What does it explain?** Where something came from, where it went, or what is new. If the answer is \"nothing\", leave it out.\n2. **How often will someone see it?** Dozens a day means quiet.\n3. **Does it answer at once, and can it be interrupted?** Nothing waits for an animation to finish.\n4. **Does the weight fit the object and the input?**\n5. **Does it fit the moment?** Cheer a win once; keep a failed save calm.\n6. **Does every moving part explain the change?** Cut the rest, or move it as one group.\n\nA new kind of motion is a question for the design team.\n\n## Related",
     "design-system/agent-views/foundations/MotionTransitions.md": "# Transitions\n\nFourteen transitions in four groups, named for what the person sees. Pick one by the relationship between the two screens.\n\n**Kind:** Foundation\n\n**Storybook page:** `design-system/src/styles/MotionTransitions.mdx`\n\n## Reading this page\n\nTo tell the Between places transitions apart, look at the Breadcrumb:\n\n- It gets longer or shorter: **Drill into and climb back out**.\n- It stays the same length while your place in an ordered set changes: **Step to the next or previous**.\n- Tabs change: **Switch views**.\n- It is replaced by an unrelated one: **Go to another area**.\n\nIn running text, Drill, Step and Go to stand for the full names. Tokens drop the `motion.` prefix (`spatial.fast`); their values live on [Physics](?path=/docs/foundations-expression-motion-physics--docs). Per-component motion lives in each component's Motion section.\n\n## Between places\n\nThe person ends up somewhere else. Each transition in this group starts from a small tree of screens: where you were, and where you land.\n\n### Go to another area\n\n| Tells the person | When | Not | Breadcrumb | PLUS case |\n| --- | --- | --- | --- | --- |\n| This is a different area; nothing here relates to where you were. | Moving between Sidebar areas (Sessions to Tutors). | If the new view sits inside the current one, it is Drill. | Replaced. | Sidebar click, browser back. |\n\n| What | Property | Token | Starts |\n| --- | --- | --- | --- |\n| Sidebar highlight | position | `spatial.fast` | 0 |\n| Old page | opacity out | `appearance.fast` | 0 |\n| New page | opacity in, in place, all at once | `appearance.default` | After the clean-fade gap |\n\nNever a slide (which suggests the areas sit side by side) and never a cut. The Sidebar itself does not move.\n\n### Drill into and climb back out\n\n| Tells the person | When | Not | Breadcrumb | PLUS case |\n| --- | --- | --- | --- | --- |\n| You went one level deeper, and the way back is the way you came. | Opening one record or item from a list, card or overview, or opening a focused task. | A quick look that leaves the page in place is Open an overlay. | Gains a level going in, loses one coming back. A focused task has no Breadcrumb; it still counts as a Drill. | Session row in a tutor’s record; Log a session. Triggered by a row or button, the Breadcrumb, browser back. |\n\n| What | Property | Token | Starts |\n| --- | --- | --- | --- |\n| Tapped row | grows into the record (position, size, corner radius together) | `spatial.default` | 0 |\n| The row's own content | opacity out | `appearance.fast` | 0 |\n| List | fades out in place; it doesn't move, and nothing dims | `appearance.fast` | 0 |\n| Record header, tabs and content | opacity in, together, in place | `appearance.default` | Once the container is well on its way |\n\nThe row becomes the page: its own bars fade as it grows, and the record's content fades in once the container shows where it is going. Nothing inside travels; the container is the only mover. Because people drill many times a day, the grow runs on `spatial.default`, and Back reverses it one speed faster on `spatial.fast`, returning the list at the same scroll position with that row briefly lit.\n\nPLUS is at most three levels deep (area, record, one record inside it), so the same container transform holds at every level. A flow that needs a fourth level is a hierarchy to flatten, not a fourth grow. On a desktop with a fixed Sidebar a page never slides in: a slide reads as a floating Panel opening.\n\nClimbing back one level shrinks the page into the row it came from. Jumping back two or more levels, past a page no longer on screen, fades in place with the Breadcrumb already shorter.\n\n**Focused task.** Opening a focused task (Log a session) replaces the frame itself: the page and Sidebar fade out together on `appearance.fast`, then Frame · focused fades in on `appearance.default`. A button, a row's menu item or a link all open the task the same way, because the frame changes, not the thing pressed. Moving between steps is Step; leaving with unsaved work confirms in a Modal, then reverses one speed faster. Finishing carries on forward to the new record and a Flag confirms.\n\n**Used in:** Record page, Table rows, PatternCard, Breadcrumb, focused tasks.\n\n### Switch views\n\n| Tells the person | When | Not | Breadcrumb | PLUS case |\n| --- | --- | --- | --- | --- |\n| The same thing, seen another way. | Page tabs, such as a session’s Overview, Notes and Reflection. | An ordered set is Step; pill filters and format switches are Swap content in place. | Unchanged. | Tab bar click or arrow keys. |\n\n| What | Property | Token | Starts |\n| --- | --- | --- | --- |\n| Tab indicator | position, width | `spatial.fast` | 0 |\n| Both tab bodies | slide together toward the chosen tab, as one flat sheet, no fade | `spatial.slow` for a page-size body, `spatial.default` for a panel | 0 |\n| Tab labels | color | `appearance.fast` | 0 |\n\nBecause the views are peers in a row, the bodies move sideways as a group without fading; in Reduced mode the slide becomes an `appearance.fast` fade.\n\n### Step to the next or previous\n\n| Tells the person | When | Not | Breadcrumb | PLUS case |\n| --- | --- | --- | --- | --- |\n| The next one in line, and where you are in the set. | An ordered set: form steps, paging, one week to the next, reflection questions. | Going deeper is Drill; another area is Go to. | Unchanged; position label changes (\"2 of 4\"). | Reflection 1 of 4; Schedule week to week. Triggered by Next and Back, arrow keys, swipe on touch. |\n\n| Steps sit | Body | Token |\n| --- | --- | --- |\n| Across the top (horizontal ProgressTracker, ≤4 steps, paging, Schedule weeks, Carousel) | Old and new slide together sideways, no fade | By size; step states change in place on appearance.fast |\n| Down a side (vertical ProgressTracker, ≥5 steps, reflection questions in a side list) | Old and new slide together vertically, no fade: Next brings the new step up from below | By size; step states change in place on appearance.fast |\n\nThe body moves on the same axis as the step list. Step states change in place on `appearance.fast`, the moment the body starts: the step just left becomes visited and the next becomes current, and nothing travels along the ProgressTracker. Placement (top for four steps or fewer, side for five or more) is set once, when the task opens, by the longest path the flow can take, so a branch never changes the slide axis mid-task. Fit can push top to side, never the reverse: four steps whose labels would truncate go down the side. The position label swaps on `appearance.fast`; the header, Sidebar and step list never move.\n\n**Used in:** Form steps, Table paging, Schedule weeks, Carousel, focused tasks.\n\n## Within a place\n\nThe person stays where they are; something on the page changes.\n\n### Scroll to a spot on the page\n\n| Tells the person | When | Not | PLUS case |\n| --- | --- | --- | --- |\n| You’re still on this page; here is the spot. | A heading outline link or a link to one comment on the current page. | Another page is Go to or Drill. | Heading outline \"Escalation\" link scrolls and marks the heading. |\n\n| What | Property | Token | Starts |\n| --- | --- | --- | --- |\n| Page | scroll position | `spatial.slow` | 0 |\n| Destination | Call attention (below) | as Call attention | On arrival |\n\nIn Reduced mode the page does not travel: the content at the new position fades in on `appearance.fast` and the destination is marked.\n\n### Swap content in place\n\n| Tells the person | When | Not | PLUS case |\n| --- | --- | --- | --- |\n| The frame is the same; what’s inside it changed. | A view pill, a filter that replaces most of a list, a confirm replacing a form in a Modal, Previous/Next in a Panel. | If one item changes, it is Add or remove, or Update a value. | Sessions filter from This week to Last month. |\n\n| What | Property | Token | Starts |\n| --- | --- | --- | --- |\n| Frame, headers, stable labels | stay still | — | — |\n| Selected view pill fill | glides to the new pill | `spatial.fast` | 0 |\n| Old content | opacity out | `appearance.fast` | 0 |\n| New content | opacity in | `appearance.fast` | After the clean-fade gap |\n\nThe old content is gone before the new arrives, so one clean frame sits between them. A cross-fade shows both at half strength and reads as mud.\n\n### Add or remove an item\n\n| Tells the person | When | Not | PLUS case |\n| --- | --- | --- | --- |\n| One thing joined or left, and the others made room. | One item joins or leaves a list or grid in the page (rows, SectionMessage, Banner). | Above the page is Open an overlay; replacing most of a list is Swap content. | Adding a session; opening a record adds it to Sidebar open items. |\n\n| What | Property | Token | Starts |\n| --- | --- | --- | --- |\n| Rows below | make room | `spatial.fast` | 0 |\n| New row | opens from the seam (height) | `spatial.fast` | 0 |\n| New row content | opacity in, in place, no scale | `appearance.fast` | Once there is room |\n| Removed row | opacity out | `appearance.fast` | 0 |\n| Rows below a removed row | close the gap | `spatial.fast` | As it fades |\n\nIn a grid, the others slide along their row and wrap.\n\n### Reorder items\n\n| Tells the person | When | Not | PLUS case |\n| --- | --- | --- | --- |\n| The same items, in a new order. | Sorting, or dragging an item to a new place in the same set. | If items join or leave, it is Add or remove. | Sorting Students by last session; dragging a session to another slot. |\n\n| What | Property | Token | Starts |\n| --- | --- | --- | --- |\n| Each item | moves to its new place: straight along the column in a list, x then y in a grid | `spatial.default` | Staggered: 20 ms apart, or 500 ms ÷ items if shorter |\n\nA dragged item follows the pointer by weight (`spatial.fast` for a Tag, `spatial.default` for a card) and settles on `spatial.fast` from the release velocity while neighbors close up on `spatial.default`. With the keyboard, Space picks up the grab handle, arrow keys move it (including across lists), Space drops it and Escape cancels, and a live region says where it is. Between two lists the dropped item takes the place it lands on and both lists close up. Under Reduced motion nothing travels: what moved fades in place on `appearance.fast`, in the same order.\n\n### Expand and collapse\n\n| Tells the person | When | Not | PLUS case |\n| --- | --- | --- | --- |\n| More of the same thing, revealed from where it was hidden. | A disclosure row, Search icon opening into a field, Filter button widening for its count. | If new content arrives from elsewhere, it is Load content. | \"Escalate this session\" reveals the reason field. |\n\n| What | Property | Token | Starts |\n| --- | --- | --- | --- |\n| Container | height, from the seam | `spatial.fast` for a row, `spatial.default` for a section | 0 |\n| Rows below | move down | Same as the container | 0 |\n| Revealed content | opacity in | `appearance.fast` | Once there is room |\n| Chevron | rotates with the height | Same as the container | 0 |\n\nClosing reverses the reveal on the same token, with the detail fading first.\n\n### Load content\n\n| Tells the person | When | Not | PLUS case |\n| --- | --- | --- | --- |\n| Something is coming, and the page won’t jump when it arrives. | Content is fetched, then arrives. | Saving is Update a value or state. | The Admin dashboard loading. |\n\n| Wait | Signal |\n| --- | --- |\n| Under 200 ms | Nothing |\n| 200 ms to 5 s | A Skeleton or Spinner, inside the thing that is loading |\n| In a menu or Popup | Never a Skeleton: one \"Loading options\" row, then \"Couldn't load options\" with Retry. New options fade in 20 ms apart; the list grows on spatial.fast |\n| Over 5 s | Progress with a number |\n\n| What | Property | Token | Starts |\n| --- | --- | --- | --- |\n| Skeleton | shimmer, top-left to bottom-right | `linear` | While waiting |\n| Content | opacity in, in place, in load order | `appearance.default` | Staggered: 20 ms apart, or 500 ms ÷ items if shorter |\n| Skeleton | opacity out under it | `appearance.fast` | As content arrives |\n\nA button that starts a load keeps its width: its label fades out, a Spinner fades in, and the same button confirms when done.\n\n## Above a place\n\nSomething joins the page from above or beside it.\n\n### Open and close an overlay\n\n| Tells the person | When | Not | PLUS case |\n| --- | --- | --- | --- |\n| This sits on top for now; the page underneath is untouched. | A Modal, Popup, floating Panel, Flag or Tooltip appears. | Taking space beside the page is Dock and undock; a deeper Breadcrumb level is Drill. | Call-off confirm Modal: Cancel reverses, Confirm carries on. |\n\n| Component | Enter | Exit |\n| --- | --- | --- |\n| Modal | scales up from 96% and fades in; the Blanket dims | scales to 98% and fades |\n| Popup, FilterMenu | clips open from the trigger's top-right corner along one axis | fades |\n| Floating Panel | slides in from its edge over the page, with no Blanket | slides back to the same edge and stays there |\n| Flag | slides in from the top-right corner | leaves the way it came, by the exit rules in Physics |\n| Tooltip | fades in after a short wait | fades out shortly after the pointer leaves |\n\nA Modal opens only from user action, moves focus to its first input as the motion starts, and never stacks a second Modal (a confirm swaps content in place). Scale is for floating layers only.\n\nThe Popup's own motion is its live story: click Details to open it, press Escape to close it.\n\nCancel plays the entrance backward, one speed faster, and nothing else changes. Confirm fades the Modal, recolors the row's status and brings a Flag in.\n\n### Dock and undock a panel\n\n| Tells the person | When | Not | PLUS case |\n| --- | --- | --- | --- |\n| This sits beside your work, and your work made room for it. | A panel takes space beside the page. | Floating above the page is Open an overlay. | The AI Panel docks on the right of Sessions and the table narrows. |\n\n| What | Property | Token | Starts |\n| --- | --- | --- | --- |\n| Page | width, making room | `spatial.slow` | 0 |\n| Panel | slides in from its edge | `spatial.slow` | 0 |\n| Panel content | opacity in | `appearance.fast` | When the page is about 90% done making room |\n\nBelow the docking width the Panel slides over with a Blanket.\n\n## Feedback\n\nNothing moves place. One element answers, or asks to be looked at.\n\n### Update a value or state\n\n| Tells the person | When | Not | PLUS case |\n| --- | --- | --- | --- |\n| This value changed. | A status, Saving to Saved, or a count. | If the element joins or leaves, it is Add or remove. | Shift swap accepted: session goes from Called off to Covered. |\n\n| What | Property | Token | Starts |\n| --- | --- | --- | --- |\n| Status | color | `appearance.default` | 0 |\n| Number, first view | rolls once | `spatial.fast` | 0 |\n| Number, later updates | fades to the new value | `appearance.fast` | 0 |\n\nA number never overshoots.\n\n### Call attention\n\n| Tells the person | When | PLUS case |\n| --- | --- | --- |\n| Look here. | The row you jumped to, a warning that appeared, a field that needs fixing. | Scroll to \"Escalation\" marks the heading. |\n\n| What | Property | Token | Starts |\n| --- | --- | --- | --- |\n| Spot | highlight in | `appearance.fast` | 0 |\n| Spot | highlight out | `appearance.slow` | After a 500 ms hold |\n\nIt plays once: repeating motion belongs to loading, never to attention. Color, icon and message always carry the meaning, so Reduced mode loses nothing.\n\n| Error case | When it shows | What moves | Shake |\n| --- | --- | --- | --- |\n| Leaving a field | When focus leaves it; once red, it rechecks while typing | The message makes room, then fades in; it clears the moment the field is fixed | No |\n| Typing | Never before the field is left; a code only when complete | Nothing | No |\n| Submitting a Modal | On submit, for a required field never touched | The Modal stays open; the bad fields are marked; focus goes to the first | The Modal, once |\n| A field with its own button | On submit, for a server-only check such as a join code | The field is marked, its message below | The field and button, once |\n| Submitting a page | On submit | A one-line summary makes room at the top; focus goes to the first error | No |\n| The system failed | After sending fails | A message makes room at the top of the form | No: the person did nothing wrong |\n| Wrong again | Each submit | The same as the first time; after a few tries, the message offers help | The same shake, never bigger |\n\nPrevent errors first: use pickers, dropdowns, radios and number inputs with limits wherever the value has a fixed set or range, and keep submit enabled until the form is sent so people act, then see exactly what to fix. One shake at most, however many fields are wrong, and errors make no sound. In Reduced mode there is no shake: color, icon, message, the focus move and a screen-reader announcement carry it.\n\nIn a field, check when focus leaves and never flag the person while they type.\n\nA failure that is the system's gets a message that makes room, never a shake.\n\nA page gets a summary at the top and focus on the first error, never a shake.\n\n## Related",
-    "design-system/agent-views/foundations/Radius.md": "# Radius\n\nHow round a corner is, and which rule decides it. Every corner reads a token.\n\n**Kind:** Foundation\n\n**Storybook page:** `design-system/src/styles/Radius.mdx`\n\n## Overview\n\nNine rules decide a corner. Take the first one that matches. A radius comes only from a token.\n\n1. **Window edge:** 0. A Page in the Frame, and a Modal footer that runs to the Modal's sides.\n2. **Pill:** `--radius-full`. A pill keeps its shape wherever it sits.\n3. **Joined group:** the outer corners round; the seams inside stay square.\n4. **Tight grid:** `--radius-md` (4).\n5. **Nested:** inner radius = outer radius − padding. Fix an uneven corner with padding, not a new radius.\n6. **Button in a field:** the field's radius − 4, so 6 default and 4 compact.\n7. **Other controls:** the control's height ÷ 4 (`Radius / Control`).\n8. **Templates:** Section, Modal and Card 16; Popup, compact Card, Table and boxes inside a page 12; the smallest nested visual 8.\n9. **Focus ring:** the element's radius + the ring's offset.\n\n## Scale\n\nSemantic radius and control-radius tokens point directly at their matching Space step (`--radius-control-lg` is 0.625rem, 10). The scale below shows the resulting values; `--radius-full` is the only literal. Components bind the semantic tokens below.\n\n## Controls\n\nA control rounds at a quarter of its height, so the corner reads the same at every size.\n\n| Control height (px) | Radius (px) | Token | Examples |\n| --- | --- | --- | --- |\n| 24 | 6 | `--radius-control-sm` | Tooltip, Sidebar row, compact tab |\n| 32 | 8 | `--radius-control-md` | Compact field, tab, option row |\n| 40 | 10 | `--radius-control-lg` | Default field |\n\nA Tile follows the same quarter: 20 rounds at 5 and 40 at 10. A square Avatar rounds at a quarter of its size, up to 16.\n\n## Buttons\n\nA button sits 4 inside a field, so it rounds at the field's radius minus 4: 6 at 32 (in a 40 field) and 4 at 24 (in a 32 compact field).\n\n`--button-radius-default` and `--button-radius-compact` apply whether the button sits in a field or not. This covers Button, Icon button, Split button and every button built on them.\n\nA button group rounds its outer corners and keeps the inner seams square.\n\n## Templates\n\nEach template owns a token. A Page sits square in the Frame; a Section with a fill and a Card round at 16; a Card inside a filled Section takes the compact 12.\n\n| Template | Radius (px) | Token |\n| --- | --- | --- |\n| Page in the Frame | 0 | — |\n| Section with a fill | 16 | `--section-radius` |\n| Modal | 16 | `--modal-radius` |\n| Card | 16 | `--card-radius` |\n| Card, compact, or inside a filled Section | 12 | `--card-radius-compact` |\n| Popup, menu, Flag | 12 | `--popup-radius` |\n| Table | 12 | `--table-radius` |\n\nA box inside a page (Comment, Code block, Section message, File upload) rounds at 12 (`--radius-xl`). The smallest nested visual (a choice card, a spacious Status tag) rounds at 8 (`--radius-lg`).\n\n### Window edge\n\nWhere a box meets the window or its parent's side, it takes 0. The Page runs to the Frame's edge, and a filled Modal footer runs to the Modal's sides, so its seam is square and the Modal's corner clips it.\n\n## Nesting\n\nA shape inset in a rounded box rounds at the box's radius minus the inset, so the gap between the curves stays even. Rows inset 4 in a 12 Popup take 8.\n\nIf the corners look uneven, change the padding, not the radius, so the inner radius lands on a step. A part flush with its parent's edge (a Table head row, a Card image) takes no radius of its own; the parent clips it.\n\n### Pills\n\nA pill is exempt from nesting and keeps `--radius-full` inside a Card, field or row.\n\n## Small details\n\nSmall parts keep the two smallest steps wherever they sit. A tight grid, such as the days of a Calendar, rounds at 4 so a larger curve does not pinch the gap between neighbors.\n\n| Radius (px) | Token | Examples |\n| --- | --- | --- |\n| 2 | `--radius-sm` | Logo in a Tile, team avatar in a Tag |\n| 4 | `--radius-md` | Count tag, Status tag, Checkbox, Link, Calendar day, Table loading bar |\n\n## Focus ring\n\nThe focus ring sits 2 px outside the element (`--focus-ring-width`), so its radius is the element's radius + 2. [Border](?path=/docs/foundations-visual-border--docs#foundation-focus-ring) owns the ring's color and width. Radius is decoration: never let a corner alone signal state or meaning.\n\n| Element | Radius (px) | Focus ring radius (px) |\n| --- | --- | --- |\n| Default button (32) | 6 | 8 |\n| Compact button (24) | 4 | 6 |\n| 24 control | 6 | 8 |\n| 32 control | 8 | 10 |\n| 40 field | 10 | 12 |\n| Checkbox | 4 | 6 |\n\n## Tokens\n\nThe `Radius` group names a step by size; `Radius / Control` names it by control height. `--frame-sidebar-row-radius` (6) rounds a Sidebar row. Pattern and component radius tokens sit in the tables above, and [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists the full ladder.\n\n- `--radius-sm` (Radius/sm): Small details.\n- `--radius-md` (Radius/md): Tight grids and small tags.\n- `--radius-lg` (Radius/lg): The smallest nested visual.\n- `--radius-xl` (Radius/xl): Boxes inside a page.\n- `--radius-xxl` (Radius/xxl): The largest templates.\n- `--radius-full` (Radius/full): Pills.\n- `--radius-control-sm` (Radius/Control/sm): 24 high controls.\n- `--radius-control-md` (Radius/Control/md): 32 high controls.\n- `--radius-control-lg` (Radius/Control/lg): 40 high controls.\n\n## Do and don't\n\n### Round an inner corner smaller than its parent\n\nDo: Rows inset 4 in a 12 Popup take 8, so the gap between the curves stays even.\nDon't: Rows at the Popup's own 12. Their corners bulge toward its edge, and the inset looks uneven.\n\n### Keep a component's own radius\n\nDo: Both buttons keep the button radius, 6.\nDon't: One button overridden to a pill. One component now has two shapes.\n\n### Stay on the scale\n\nDo: The Card at 16 and the tag at 4, both steps on the scale.\nDon't: A Card at 14 and a tag at 5. Off-scale values drift from every neighbor.\n\n### Round a tight group at 4\n\nDo: Tiles 2 apart at 4. The gaps stay straight.\nDon't: The same tiles at 12. Every gap pinches where the curves meet.\n\n### Close with an Icon button\n\nDo: The subtle Icon button: the button radius, the ring and the states come with it.\nDon't: A hand-built circle. Its corner, its states and its focus ring are all guesses.\n\n### Read a token, never a px value\n\nDo: The token follows the rules when a value moves.\nDon't: A literal is right today and wrong after the next change. The radius lint fails it.\n\n## Related",
+    "design-system/agent-views/foundations/Radius.md": "# Radius\n\nHow round a corner is, and which rule decides it. Every corner reads a token.\n\n**Kind:** Foundation\n\n**Storybook page:** `design-system/src/styles/Radius.mdx`\n\n## Overview\n\nNine rules decide a corner. Take the first one that matches. A radius comes only from a token.\n\n1. **Window edge:** 0. A Page in the Frame, and a Modal footer that runs to the Modal's sides.\n2. **Pill:** `--radius-full`. A pill keeps its shape wherever it sits.\n3. **Joined group:** the outer corners round; the seams inside stay square.\n4. **Tight grid:** `--radius-md` (4).\n5. **Nested:** inner radius = outer radius − padding. Fix an uneven corner with padding, not a new radius.\n6. **Button in a field:** the field's radius − 4, so 6 default and 4 compact.\n7. **Other controls:** the control's height ÷ 4 (`Radius / Control`).\n8. **Templates:** Section, Modal and Card 16; Popup, compact Card, Table and boxes inside a page 12; the smallest nested visual 8.\n9. **Focus ring:** the element's radius + the ring's offset.\n\n## Scale\n\nSemantic radius and control-radius tokens point directly at their matching Space step (`--radius-control-lg` is 0.625rem, 10). The scale below shows the resulting values; `--radius-full` is the only literal. Components bind the semantic tokens below.\n\n## Controls\n\nA control rounds at a quarter of its height, so the corner reads the same at every size.\n\n| Control height (px) | Radius (px) | Token | Examples |\n| --- | --- | --- | --- |\n| 24 | 6 | `--radius-control-sm` | Tooltip, Sidebar row, compact tab |\n| 32 | 8 | `--radius-control-md` | Compact field, tab, option row |\n| 40 | 10 | `--radius-control-lg` | Default field |\n\nA Tile follows the same quarter: 20 rounds at 5 and 40 at 10. A square Avatar rounds at a quarter of its size, up to 16.\n\n## Buttons\n\nA button sits 4 inside a field, so it rounds at the field's radius minus 4: 6 at 32 (in a 40 field) and 4 at 24 (in a 32 compact field).\n\n`--button-radius-default` and `--button-radius-compact` apply whether the button sits in a field or not. This covers Button, Icon button, Split button and every button built on them.\n\nA button group rounds its outer corners and keeps the inner seams square.\n\n## Templates\n\nEach template owns a token. A Page sits square in the Frame; a Section with a fill and a Card round at 16; a Card inside a filled Section takes the compact 12.\n\n| Template | Radius (px) | Token |\n| --- | --- | --- |\n| Page in the Frame | 0 | — |\n| Section with a fill | 16 | `--section-radius` |\n| Modal | 16 | `--modal-radius` |\n| Card | 16 | `--card-radius` |\n| Card, compact, or inside a filled Section | 12 | `--card-radius-compact` |\n| Popup, menu, Flag | 12 | `--popup-radius` |\n| Table | 12 | `--table-radius` |\n\nA box inside a page (Comment, Code block, Section message, File upload) rounds at 12 (`--radius-xl`). The smallest nested visual (a choice card, a spacious Status tag) rounds at 8 (`--radius-lg`).\n\n### Window edge\n\nWhere a box meets the window or its parent's side, it takes 0. The Page runs to the Frame's edge, and a filled Modal footer runs to the Modal's sides, so its seam is square and the Modal's corner clips it.\n\n## Nesting\n\nA shape inset in a rounded box rounds at the box's radius minus the inset, so the gap between the curves stays even. Rows inset 4 in a 12 Popup take 8.\n\nIf the corners look uneven, change the padding, not the radius, so the inner radius lands on a step. A part flush with its parent's edge (a Table head row, a Card image) takes no radius of its own; the parent clips it.\n\n### Pills\n\nA pill is exempt from nesting and keeps `--radius-full` inside a Card, field or row.\n\n## Small details\n\nSmall parts keep the two smallest steps wherever they sit. A tight grid, such as the days of a Calendar, rounds at 4 so a larger curve does not pinch the gap between neighbors.\n\n| Radius (px) | Token | Examples |\n| --- | --- | --- |\n| 2 | `--radius-sm` | Logo in a Tile, team avatar in a Tag |\n| 4 | `--radius-md` | Count tag, Status tag, Checkbox, Link, Calendar day, Table loading bar |\n\n## Focus ring\n\nThe focus ring sits 2 px outside the element (`--focus-ring-width`), so its radius is the element's radius + 2. [Border](?path=/docs/foundations-visual-border--docs#foundation-focus-ring) owns the ring's color and width. Radius is decoration: never let a corner alone signal state or meaning.\n\n| Element | Radius (px) | Focus ring radius (px) |\n| --- | --- | --- |\n| Default button (32) | 6 | 8 |\n| Compact button (24) | 4 | 6 |\n| 24 control | 6 | 8 |\n| 32 control | 8 | 10 |\n| 40 field | 10 | 12 |\n| Checkbox | 4 | 6 |\n\n## Tokens\n\nThe `Radius` group names a step by size; `Radius / Control` names it by control height. `--frame-sidebar-row-radius` (6) rounds a Sidebar row. Template and component radius tokens sit in the tables above, and [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists the full ladder.\n\n- `--radius-sm` (Radius/sm): Small details.\n- `--radius-md` (Radius/md): Tight grids and small tags.\n- `--radius-lg` (Radius/lg): The smallest nested visual.\n- `--radius-xl` (Radius/xl): Boxes inside a page.\n- `--radius-xxl` (Radius/xxl): The largest templates.\n- `--radius-full` (Radius/full): Pills.\n- `--radius-control-sm` (Radius/Control/sm): 24 high controls.\n- `--radius-control-md` (Radius/Control/md): 32 high controls.\n- `--radius-control-lg` (Radius/Control/lg): 40 high controls.\n\n## Do and don't\n\n### Round an inner corner smaller than its parent\n\nDo: Rows inset 4 in a 12 Popup take 8, so the gap between the curves stays even.\nDon't: Rows at the Popup's own 12. Their corners bulge toward its edge, and the inset looks uneven.\n\n### Keep a component's own radius\n\nDo: Both buttons keep the button radius, 6.\nDon't: One button overridden to a pill. One component now has two shapes.\n\n### Stay on the scale\n\nDo: The Card at 16 and the tag at 4, both steps on the scale.\nDon't: A Card at 14 and a tag at 5. Off-scale values drift from every neighbor.\n\n### Round a tight group at 4\n\nDo: Tiles 2 apart at 4. The gaps stay straight.\nDon't: The same tiles at 12. Every gap pinches where the curves meet.\n\n### Close with an Icon button\n\nDo: The subtle Icon button: the button radius, the ring and the states come with it.\nDon't: A hand-built circle. Its corner, its states and its focus ring are all guesses.\n\n### Read a token, never a px value\n\nDo: The token follows the rules when a value moves.\nDon't: A literal is right today and wrong after the next change. The radius lint fails it.\n\n## Related",
     "design-system/agent-views/foundations/SoundOverview.md": "# Sound\n\nSound marks the few moments worth hearing, and lands with the motion that shows them.\n\n**Kind:** Foundation\n\n**Storybook page:** `design-system/src/styles/SoundOverview.mdx`\n\n## Overview\n\nA sound plays where a moment matters and a tutor may be looking elsewhere: a Flag arriving, a step done, a sign-up confirmed. Every sound is synthesized in the browser from one material, a dry abacus bead, so there are no audio files.\n\n## Principles\n\n### Rare\n\nMost moments are silent. A sound plays only where its registry row names one: When to play.\n\n### Paired\n\nEvery sound has an on-screen change that says the same thing, so turning sound off loses nothing: Settings and accessibility.\n\n### Landed\n\nA sound lands when its motion lands: With motion.\n\n### In key\n\nEvery sound is in one key, so any two can play back to back: Sounds.\n\n## The nine sounds\n\nPress one to hear it. The switch is the same setting the app reads; Sounds adds the three AI feedback sounds.\n\n## Related",
     "design-system/agent-views/foundations/SoundSettings.md": "# Settings and accessibility\n\nOne switch turns all sound off, and no one misses anything when it is off.\n\n**Kind:** Foundation\n\n**Storybook page:** `design-system/src/styles/SoundSettings.mdx`\n\n## The switch\n\nOne setting turns every sound off. It is on by default and kept across visits. Nothing is opt-in, and reduced motion does not mute sound. Sound follows the device's volume.\n\n## Pairing\n\nEvery sound pairs with an on-screen change that says the same thing: a Flag, a step checked, a message. Sound is never the only signal, so turning it off loses nothing.\n\n## The student rule\n\nA sound a student can hear is good news only. A concern never plays while a student can hear, and a shared moment, such as a goal reached, plays for both.\n\n## Related",
     "design-system/agent-views/foundations/SoundSounds.md": "# Sounds\n\nTwelve tokens on one material: nine sounds and three for AI feedback.\n\n**Kind:** Foundation\n\n**Storybook page:** `design-system/src/styles/SoundSounds.mdx`\n\n## Material\n\nEvery sound is struck on one material, Detent: a dry abacus bead, a short tick, then a soft knock. Before it lands it clicks three notches, the pickup, which takes . A token sets its notes and its level, nothing else.\n\n## Key\n\nEvery sound is in C major, tuned to whole-number ratios on . Milestone is tuned a fourth lower, on . Any two sounds can play back to back without clashing.\n\n## The sound sheet\n\nLength runs from the first notch to the last note falling silent. Tokens drop their `sound.` prefix elsewhere in the docs.\n\n## Levels\n\nEach token sits on one of three levels, measured offline as its loudest 50 ms.\n\n## AI feedback\n\nAn AI sound counts in first: six rising ticks over , then the result.\n\n## In code\n\n```js\nimport { playSound } from '@/components';\n\nplaySound('done.step');\n```\n\n`playSound` plays nothing until the first tap or key press on the page, and nothing while the switch is off. Mount `SoundProvider` once at the app root to unlock audio on that first gesture.\n\n## Related\n\n## References\n\n- ADR-043 records why sound is synthesized in the browser and how it is tokened.\n- The sheet is read from `design-system/src/sound/spec.generated.js`, generated from `scripts/lib/tokens/sound-plan.mjs`; `check:sound-spec` fails when it is stale.",
     "design-system/agent-views/foundations/SoundWhenToPlay.md": "# When to play\n\nThe registry names every moment that plays. Everything else is silent.\n\n**Kind:** Foundation\n\n**Storybook page:** `design-system/src/styles/SoundWhenToPlay.mdx`\n\n## Rules\n\n- **Rare:** frequent actions, field errors and anything once per keystroke, row or field stay silent. Repeats inside a burst play once.\n- **Severity:** Error follows only a person's own submit or a job they started. Most confirmations stay silent; the registry names the ones that play.\n- **Session:** while a session runs, the moments that play are Roster, Goal, Prompt, Sent and Milestone. Commit, Error and Step belong to screens outside a session and play on their own conditions in the registry. Other notices wait until the session ends.\n\n## Rows that play\n\nEach row is a motion registry row with a `sound` cell: the token, when it plays and any condition. The same cell shows in the row's Motion section, and the app decides the conditions (such as whether a session is running). To add a sound, add the cell to the row; `check:sound-registry` fails on a token that does not exist or a row the list below covers.\n\n## Always silent\n\nThese moments are silent too, and have no registry row of their own:\n\n- \"Revise your response\", Goal updated and Copied\n- Strikes, Tutor Coach flags, TIP and PIP, and escalations\n- Any concern while a student can hear\n\n## Related",
     "design-system/agent-views/foundations/SoundWithMotion.md": "# With motion\n\nA sound lands when its motion lands.\n\n**Kind:** Foundation\n\n**Storybook page:** `design-system/src/styles/SoundWithMotion.mdx`\n\n## The land rule\n\nA sound starts at its motion token's 90% time minus its pickup, so its first note lands as the motion reads as arrived. Under reduced motion it lands with the reduced motion instead.\n\n## On a Flag\n\nA Flag slides in from the top right and Notify lands with it.\n\n## Expressive moments\n\nSound follows motion's Expressive moments and adds none. Step plays on every Finish and on a module or lesson done in a ProgressBar or ProgressTracker, and Milestone plays on every Milestone. The list of those moments lives in Motion · Physics.\n\n## In code\n\n```js\nimport { playSound, soundStartFor } from '@/components';\n\nplaySound('notify', { at: soundStartFor('spatial.default', 'notify') });\n```\n\nCall it when the motion starts. Pass `{ mode: 'reduced' }` or `{ mode: 'expressive' }` to time it to that mode's spring.\n\n## Related",
-    "design-system/agent-views/foundations/Spacing.md": "# Spacing\n\nThe kind of box sets its pad; the pattern it sits in sets its stack and inline.\n\n**Kind:** Foundation\n\n**Storybook page:** `design-system/src/styles/Spacing.mdx`\n\n## Overview\n\nSpacing tokens name a job, not a size. Pick the pattern you are in (Page, Section, Card, Modal, Popup, Table or a control), then the relationship (pad inside a box, stack between rows, inline between things side by side), then the size. Bind the semantic token, never a primitive or a typed number.\n\n```css\npadding: var(--card-pad-default);\ngap: var(--card-stack-md);\n```\n\nFigma holds them in `spacing / semantics` (Pad, Stack, Inline, Grid, Screen, Content), `spacing / patterns` (Frame, Page, Section, Card, Table, Blanket, Modal, Popup), `spacing / components` and the hidden `spacing / primitives`. [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists every token.\n\n## Principles\n\n### Similarity\n\nItems of equal weight, such as the fields of one form group, sit close together with one stack.\n\n### Differentiation\n\nWhen the content changes kind, from a suggestion to the form controls, step up a tier so the change reads at a glance.\n\n### Rhythm\n\nGaps grow with the box: 4 · 8 · 12 px inside a control or Card, 8 · 16 · 24 px inside a Section or Modal, and 16 · 24 · 40 px between Page sections.\n\n### Hierarchy\n\nGive headings and primary actions the larger stack of their tier, and never add space by hand.\n\n### White space\n\nPad the modal on every side, and leave the largest gap of its tier between the content and the footer buttons.\n\n## Tokens\n\nPrimitives are the raw scale, named rem × 100 (`--space-100` is 16 px), and are hidden in Figma, so nothing binds them. Every other tier points at a primitive and names a job as `Collection/property-variant` in Figma, and the same words joined by dashes in code: `Section/pad-x-default` is `--section-pad-x-default`. A collection with a single property skips the variant (`--table-stack`).\n\nName the relationship first, then pick the token from the four-tier ladder on [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs). If you cannot name the context a value belongs to, step back to the box that holds it.\n\n| Word | Means | Example |\n| --- | --- | --- |\n| `pad` | The space between a box’s edge and its content, the same on all four sides | `--card-pad-default` 20 |\n| `pad-x` · `pad-y` | Used only when the two axes differ, as on an Item | `--pad-x-md` 12 · `--pad-y-md` 6 |\n| `stack` | The vertical gap between rows, chosen by use, never by the size of the box | `--section-stack-md` 16 |\n| `inline` | The horizontal gap between things side by side | `--modal-inline-sm` 8 |\n| `gutter` | The gap between grid columns, and between cards side by side on the grid | `--grid-gutter` 16 |\n| `radius` | Corner radius, set per component (Radius) | `--card-radius` 16 |\n| `height` · `width` · `min` · `max` | Size roles (Grid) | `--control-md` 32 |\n\nMargin, slot and viewport are never token words. What other systems call a page margin is the Page pad, `--page-pad`.\n\n## Three kinds of box\n\nEvery box on a page is one of three kinds, and the kind decides its padding.\n\n- An **Item** has a minimum height, and its pad-x is larger than its pad-y.\n- A **Container** has a background and one pad on every side, and its height hugs its content.\n- A **Wrapper** has no fill and no pad. It only arranges its children with a gap or a grid.\n\n## Padding\n\n### Items: height first\n\nThe label stays 14/20 at every size, so pad-y is (height − 20) ÷ 2: 2 at 24 and 6 at 32. Pad-x is always the larger: 8 at 24 and 12 at 32. Buttons, tabs and menu rows come in 32, or 24 compact inside table rows and inline toolbars. Fields come in 40, or 32 compact, with pad-y 10 at 40. Labels (Tag, Status, Count) pad 4 across. Corner rounding is in [Radius](?path=/docs/foundations-visual-radius--docs).\n\n- `--pad-x-xs` (Pad/pad-x-xs): Labels: Tag, Status, Count\n- `--pad-x-sm` (Pad/pad-x-sm): Compact 24 Items\n- `--pad-x-md` (Pad/pad-x-md): Default 32 Items\n- `--pad-y-sm` (Pad/pad-y-sm): Compact 24 Items\n- `--pad-y-md` (Pad/pad-y-md): Default 32 Items\n\n### Containers: one pad on every side\n\nA pattern carries its own pad ([Pattern tokens](#foundation-pattern-tokens)). A container that is not a pattern takes the Card pad of its size: a Section message and File upload take 16.\n\n### Table cells\n\nCells pad 4 top and bottom and 8 across (`--table-pad-y-cell`, `--table-pad-x-cell`). The row height is a minimum, and the row grows with its content. On a plain table, the first and last cells sit flush with the table's edge.\n\n## Stack and inline\n\nGaps come in tiers that grow with the box. The space between sections is two to three times the space inside them. Stack follows use, not the size of the box: a Card stacks its parts 8 apart at every size.\n\n| Group | sm (px) | md (px) | lg (px) | Used between |\n| --- | --- | --- | --- | --- |\n| Control | 4 | 8 | 12 | Parts inside a component: icon and label, label and field, field and help text |\n| Card | 4 | 8 | 12 | The parts of a card: title, body, footer |\n| Modal | 8 | 16 | 24 | Header, body and footer content |\n| Section | 8 | 16 | 24 | A section’s heading, its body and its footer |\n| Page | 16 | 24 | 40 | Sections on a page; 40 before a new topic |\n| Grid | — | 16 | — | Anything side by side on the grid: the gutter |\n\n- `--stack-sm` (Stack/stack-sm)\n- `--stack-md` (Stack/stack-md)\n- `--stack-lg` (Stack/stack-lg)\n- `--inline-sm` (Inline/inline-sm)\n- `--inline-md` (Inline/inline-md)\n- `--inline-lg` (Inline/inline-lg)\n\n## Pattern tokens\n\nEvery pattern has its own tokens, so a value is read from where it sits.\n\n### Frame and Page\n\nThe Frame is the whole screen: the topbar above a row holding the sidebar and the Page. The Page holds the content, and its pad is the content grid's margin.\n\n- `--page-pad` (Page/pad): Every width\n- `--page-stack-sm` (Page/stack-sm)\n- `--page-stack-md` (Page/stack-md): Between sections\n- `--page-stack-lg` (Page/stack-lg): Before a new topic\n\n### Section\n\nA span of the page grid under one heading. A plain section has no fill, no pad and no size options.\n\n- `--section-stack-sm` (Section/stack-sm)\n- `--section-stack-md` (Section/stack-md): Heading to body\n- `--section-stack-lg` (Section/stack-lg): Body to the primary action\n- `--section-min-width-main` (Section/min-width-main): The main column of a split section\n- `--section-min-width-side` (Section/min-width-side): The side column of a split section\n\n### Card\n\nPad and radius follow the card's size; stack and inline follow use.\n\n- `--card-pad-compact` (Card/pad-sm)\n- `--card-pad-default` (Card/pad-md)\n- `--card-pad-spacious` (Card/pad-lg)\n- `--card-stack-sm` (Card/stack-sm): Title to description\n- `--card-stack-md` (Card/stack-md): Header to body\n- `--card-stack-lg` (Card/stack-lg): Body to footer\n- `--card-inline-sm` (Card/inline-sm)\n- `--card-inline-md` (Card/inline-md)\n- `--card-inline-lg` (Card/inline-lg)\n- `--card-min-width-sm` (Card/min-width-sm)\n- `--card-min-width-md` (Card/min-width-md)\n- `--card-min-width-lg` (Card/min-width-lg)\n- `--card-max-height-sm` (Card/max-height-sm)\n- `--card-max-height-md` (Card/max-height-md)\n- `--card-max-height-lg` (Card/max-height-lg)\n\n### Table\n\nPlain and full-span by default.\n\n- `--table-pad-x-cell` (Table/pad-x-cell)\n- `--table-pad-y-cell` (Table/pad-y-cell)\n- `--table-indent` (Table/indent)\n- `--table-stack` (Table/stack)\n- `--table-pad-x-footer` (Table/pad-x-footer)\n- `--table-min-width-title` (Table/min-width-title)\n\n### Blanket and Modal\n\nThe Blanket pads the screen. A modal pads 16 on every side at every width.\n\n- `--blanket-pad-x` (Blanket/pad-x)\n- `--blanket-pad-y` (Blanket/pad-y)\n- `--modal-pad` (Modal/pad)\n- `--modal-stack-sm` (Modal/stack-sm)\n- `--modal-stack-md` (Modal/stack-md): Between related fields\n- `--modal-stack-lg` (Modal/stack-lg): Between groups, and before the footer\n- `--modal-inline-sm` (Modal/inline-sm): Between footer actions\n- `--modal-inline-md` (Modal/inline-md)\n- `--modal-inline-lg` (Modal/inline-lg)\n\n### Popup, menu and tooltip\n\nMenu, popup, flag and tooltip float without a Blanket. The outer box of a menu pads 4, and a popup or flag pads 16.\n\n- `--popup-pad` (Popup and flag/pad)\n- `--popup-width-sm` (Popup and flag/width-sm)\n- `--popup-width-md` (Popup and flag/width-md)\n- `--popup-width-lg` (Popup and flag/width-lg)\n- `--flag-width` (Popup and flag/width-flag)\n- `--flag-stack` (Popup and flag/stack-flag)\n- `--dropdown-menu-pad` (Menu/pad-menu)\n- `--dropdown-menu-min-width` (Menu/min-width-menu)\n- `--dropdown-menu-max-width` (Menu/max-width-menu)\n- `--dropdown-menu-max-height` (Menu/max-height-menu)\n- `--tooltip-pad-y` (Tooltip/pad-y-tooltip)\n- `--tooltip-max-width` (Tooltip/max-width-tooltip)\n- `--popup-gap-screen` (Placement/gap-screen): The closest a floating layer comes to the screen edge\n\n## Usage\n\n### Group first, then assign tokens\n\nBefore picking a token, group the content from the inside out; each step out is one tier up. In a modal form:\n\n1. Pair a control with what it changes, such as a field and its \"Repeats weekly\" toggle: `--stack-md` (8).\n2. Gather related fields: `--modal-stack-md` (16) between them.\n3. Separate unrelated groups: `--modal-stack-lg` (24).\n4. Separate the header from the body, and the body from the footer: `--modal-stack-lg` (24).\n5. Set the actions side by side: `--modal-inline-sm` (8).\n\n### Pick by context, not by number\n\nUse a Card token inside a card, a Section token inside a section, and Stack or Inline tokens inside a component. Never borrow a token because its number happens to match.\n\n### Never hand-space\n\nIf a gap looks wrong with the right tokens, step to the next tier of the same group, such as `--section-stack-md` to `--section-stack-lg`. If no tier fits, raise it as a token or pattern question rather than adding space by hand. A one-off value takes the nearest semantic token of its context, or becomes a proposed token.\n\n### Build from templates and slots\n\nStart from the template (Section, Card, Modal, Popup) and keep it attached. The template owns the pad, the stacks and the size; add content only inside its slots. Never detach it; if you copy a layout to get a variation, it needs a slot, not a new variant.\n\n### No card inside a card\n\nA card groups one thing. Tiers inside it are stacks and dividers in the card body, not more cards.\n\n### Let the content pick the size\n\nVisible empty space means a smaller size; overflow or clipping means a larger one. Cards hug their content, with an optional maximum height that scrolls the body. Modals hug or fill. Tables, sections and tab groups grow to fit.\n\n## Space never speaks alone\n\nA gap tells the eye there is a boundary, but it cannot say what the boundary is. Pair a group gap with a heading, label, fieldset legend or divider.\n\n- Group first, then space: related fields sit close and each group takes a bigger gap than the one inside it.\n- Pick one stack tier for the context and keep it across the container. All three metric cards on Home take the same stack.\n- An optical nudge is allowed where the eye needs it, such as an icon beside an all-caps label. Note it on the layer, keep it on a scale unit, and never leave a silent hard-code.\n\n**Name the groups the space separates.** The create-session form has student fields, then schedule fields.\n\nDo: A 24 gap and a subsection heading say the same thing twice.\nDon't: Four fields and one unexplained gap. People who cannot see the spacing, or whose screen reader skips it, miss the break.\n\n## Do and don't\n\n### Group by proximity\n\nKeep a label near its own field and put the larger gap between groups.\n\nDo: Label to field 8 (Stack/stack-md), group to group 24 (Modal/stack-lg), so each label attaches to its field.\nDon't: Label to field 24 and group to group 8: each label sits nearer the previous field than its own.\n\n### Match the token to the context\n\nPad tokens for controls, card tokens for cards.\n\nDo: A card pads with a card token, so the content breathes at the card scale.\nDon't: A control pad on a card squeezes the content to a button-sized pad.\n\n### Never hardcode spacing\n\nAlways use the variable; the code token is the same name with `var()`.\n\nDo: Bound to the variable, so the pad follows the system.\nDon't: A literal 13 matches no step on the scale and will not follow a token change.\n\n## Accessibility\n\n- Keep one stack tier per context across a container so readers can see what belongs together without reading every label.\n- Spacing never carries meaning alone. Pair a group break with a heading, label or fieldset legend.\n- Leave room for the focus ring: the ring sits outside a control, so a control never sits flush against a clipping edge ([Border](?path=/docs/foundations-visual-border--docs)).\n\n## Related",
+    "design-system/agent-views/foundations/Spacing.md": "# Spacing\n\nThe kind of box sets its pad; the template it sits in sets its stack and inline.\n\n**Kind:** Foundation\n\n**Storybook page:** `design-system/src/styles/Spacing.mdx`\n\n## Overview\n\nSpacing tokens name a job, not a size. Pick the template you are in (Page, Section, Card, Modal, Popup, Table or a control), then the relationship (pad inside a box, stack between rows, inline between things side by side), then the size. Bind the semantic token, never a primitive or a typed number.\n\n```css\npadding: var(--card-pad-default);\ngap: var(--card-stack-md);\n```\n\nFigma holds them in `spacing / semantics` (Pad, Stack, Inline, Grid, Screen, Content), `spacing / templates` (Frame, Page, Section, Card, Table, Blanket, Modal, Popup), `spacing / components` and the hidden `spacing / primitives`. [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists every token.\n\n## Principles\n\n### Similarity\n\nItems of equal weight, such as the fields of one form group, sit close together with one stack.\n\n### Differentiation\n\nWhen the content changes kind, from a suggestion to the form controls, step up a tier so the change reads at a glance.\n\n### Rhythm\n\nGaps grow with the box: 4 · 8 · 12 px inside a control or Card, 8 · 16 · 24 px inside a Section or Modal, and 16 · 24 · 40 px between Page sections.\n\n### Hierarchy\n\nGive headings and primary actions the larger stack of their tier, and never add space by hand.\n\n### White space\n\nPad the modal on every side, and leave the largest gap of its tier between the content and the footer buttons.\n\n## Tokens\n\nPrimitives are the raw scale, named rem × 100 (`--space-100` is 16 px), and are hidden in Figma, so nothing binds them. Every other tier points at a primitive and names a job as `Collection/property-variant` in Figma, and the same words joined by dashes in code: `Section/pad-x-default` is `--section-pad-x-default`. A collection with a single property skips the variant (`--table-stack`).\n\nName the relationship first, then pick the token from the four-tier ladder on [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs). If you cannot name the context a value belongs to, step back to the box that holds it.\n\n| Word | Means | Example |\n| --- | --- | --- |\n| `pad` | The space between a box’s edge and its content, the same on all four sides | `--card-pad-default` 20 |\n| `pad-x` · `pad-y` | Used only when the two axes differ, as on an Item | `--pad-x-md` 12 · `--pad-y-md` 6 |\n| `stack` | The vertical gap between rows, chosen by use, never by the size of the box | `--section-stack-md` 16 |\n| `inline` | The horizontal gap between things side by side | `--modal-inline-sm` 8 |\n| `gutter` | The gap between grid columns, and between cards side by side on the grid | `--grid-gutter` 16 |\n| `radius` | Corner radius, set per component (Radius) | `--card-radius` 16 |\n| `height` · `width` · `min` · `max` | Size roles (Grid) | `--control-md` 32 |\n\nMargin, slot and viewport are never token words. What other systems call a page margin is the Page pad, `--page-pad`.\n\n## Three kinds of box\n\nEvery box on a page is one of three kinds, and the kind decides its padding.\n\n- An **Item** has a minimum height, and its pad-x is larger than its pad-y.\n- A **Container** has a background and one pad on every side, and its height hugs its content.\n- A **Wrapper** has no fill and no pad. It only arranges its children with a gap or a grid.\n\n## Padding\n\n### Items: height first\n\nThe label stays 14/20 at every size, so pad-y is (height − 20) ÷ 2: 2 at 24 and 6 at 32. Pad-x is always the larger: 8 at 24 and 12 at 32. Buttons, tabs and menu rows come in 32, or 24 compact inside table rows and inline toolbars. Fields come in 40, or 32 compact, with pad-y 10 at 40. Labels (Tag, Status, Count) pad 4 across. Corner rounding is in [Radius](?path=/docs/foundations-visual-radius--docs).\n\n- `--pad-x-xs` (Pad/pad-x-xs): Labels: Tag, Status, Count\n- `--pad-x-sm` (Pad/pad-x-sm): Compact 24 Items\n- `--pad-x-md` (Pad/pad-x-md): Default 32 Items\n- `--pad-y-sm` (Pad/pad-y-sm): Compact 24 Items\n- `--pad-y-md` (Pad/pad-y-md): Default 32 Items\n\n### Containers: one pad on every side\n\nA template carries its own pad ([Template tokens](#foundation-template-tokens)). A container that is not a template takes the Card pad of its size: a Section message and File upload take 16.\n\n### Table cells\n\nCells pad 4 top and bottom and 8 across (`--table-pad-y-cell`, `--table-pad-x-cell`). The row height is a minimum, and the row grows with its content. On a plain table, the first and last cells sit flush with the table's edge.\n\n## Stack and inline\n\nGaps come in tiers that grow with the box. The space between sections is two to three times the space inside them. Stack follows use, not the size of the box: a Card stacks its parts 8 apart at every size.\n\n| Group | sm (px) | md (px) | lg (px) | Used between |\n| --- | --- | --- | --- | --- |\n| Control | 4 | 8 | 12 | Parts inside a component: icon and label, label and field, field and help text |\n| Card | 4 | 8 | 12 | The parts of a card: title, body, footer |\n| Modal | 8 | 16 | 24 | Header, body and footer content |\n| Section | 8 | 16 | 24 | A section’s heading, its body and its footer |\n| Page | 16 | 24 | 40 | Sections on a page; 40 before a new topic |\n| Grid | — | 16 | — | Anything side by side on the grid: the gutter |\n\n- `--stack-sm` (Stack/stack-sm)\n- `--stack-md` (Stack/stack-md)\n- `--stack-lg` (Stack/stack-lg)\n- `--inline-sm` (Inline/inline-sm)\n- `--inline-md` (Inline/inline-md)\n- `--inline-lg` (Inline/inline-lg)\n\n## Template tokens\n\nEvery template has its own tokens, so a value is read from where it sits.\n\n### Frame and Page\n\nThe Frame is the whole screen: the topbar above a row holding the sidebar and the Page. The Page holds the content, and its pad is the content grid's margin.\n\n- `--page-pad` (Page/pad): Every width\n- `--page-stack-sm` (Page/stack-sm)\n- `--page-stack-md` (Page/stack-md): Between sections\n- `--page-stack-lg` (Page/stack-lg): Before a new topic\n\n### Section\n\nA span of the page grid under one heading. A plain section has no fill, no pad and no size options.\n\n- `--section-stack-sm` (Section/stack-sm)\n- `--section-stack-md` (Section/stack-md): Heading to body\n- `--section-stack-lg` (Section/stack-lg): Body to the primary action\n- `--section-min-width-main` (Section/min-width-main): The main column of a split section\n- `--section-min-width-side` (Section/min-width-side): The side column of a split section\n\n### Card\n\nPad and radius follow the card's size; stack and inline follow use.\n\n- `--card-pad-compact` (Card/pad-sm)\n- `--card-pad-default` (Card/pad-md)\n- `--card-pad-spacious` (Card/pad-lg)\n- `--card-stack-sm` (Card/stack-sm): Title to description\n- `--card-stack-md` (Card/stack-md): Header to body\n- `--card-stack-lg` (Card/stack-lg): Body to footer\n- `--card-inline-sm` (Card/inline-sm)\n- `--card-inline-md` (Card/inline-md)\n- `--card-inline-lg` (Card/inline-lg)\n- `--card-min-width-sm` (Card/min-width-sm)\n- `--card-min-width-md` (Card/min-width-md)\n- `--card-min-width-lg` (Card/min-width-lg)\n- `--card-max-height-sm` (Card/max-height-sm)\n- `--card-max-height-md` (Card/max-height-md)\n- `--card-max-height-lg` (Card/max-height-lg)\n\n### Table\n\nPlain and full-span by default.\n\n- `--table-pad-x-cell` (Table/pad-x-cell)\n- `--table-pad-y-cell` (Table/pad-y-cell)\n- `--table-indent` (Table/indent)\n- `--table-stack` (Table/stack)\n- `--table-pad-x-footer` (Table/pad-x-footer)\n- `--table-min-width-title` (Table/min-width-title)\n\n### Blanket and Modal\n\nThe Blanket pads the screen. A modal pads 16 on every side at every width.\n\n- `--blanket-pad-x` (Blanket/pad-x)\n- `--blanket-pad-y` (Blanket/pad-y)\n- `--modal-pad` (Modal/pad)\n- `--modal-stack-sm` (Modal/stack-sm)\n- `--modal-stack-md` (Modal/stack-md): Between related fields\n- `--modal-stack-lg` (Modal/stack-lg): Between groups, and before the footer\n- `--modal-inline-sm` (Modal/inline-sm): Between footer actions\n- `--modal-inline-md` (Modal/inline-md)\n- `--modal-inline-lg` (Modal/inline-lg)\n\n### Popup, menu and tooltip\n\nMenu, popup, flag and tooltip float without a Blanket. The outer box of a menu pads 4, and a popup or flag pads 16.\n\n- `--popup-pad` (Popup and flag/pad)\n- `--popup-width-sm` (Popup and flag/width-sm)\n- `--popup-width-md` (Popup and flag/width-md)\n- `--popup-width-lg` (Popup and flag/width-lg)\n- `--flag-width` (Popup and flag/width-flag)\n- `--flag-stack` (Popup and flag/stack-flag)\n- `--dropdown-menu-pad` (Menu/pad-menu)\n- `--dropdown-menu-min-width` (Menu/min-width-menu)\n- `--dropdown-menu-max-width` (Menu/max-width-menu)\n- `--dropdown-menu-max-height` (Menu/max-height-menu)\n- `--tooltip-pad-y` (Tooltip/pad-y-tooltip)\n- `--tooltip-max-width` (Tooltip/max-width-tooltip)\n- `--popup-gap-screen` (Placement/gap-screen): The closest a floating layer comes to the screen edge\n\n## Usage\n\n### Group first, then assign tokens\n\nBefore picking a token, group the content from the inside out; each step out is one tier up. In a modal form:\n\n1. Pair a control with what it changes, such as a field and its \"Repeats weekly\" toggle: `--stack-md` (8).\n2. Gather related fields: `--modal-stack-md` (16) between them.\n3. Separate unrelated groups: `--modal-stack-lg` (24).\n4. Separate the header from the body, and the body from the footer: `--modal-stack-lg` (24).\n5. Set the actions side by side: `--modal-inline-sm` (8).\n\n### Pick by context, not by number\n\nUse a Card token inside a card, a Section token inside a section, and Stack or Inline tokens inside a component. Never borrow a token because its number happens to match.\n\n### Never hand-space\n\nIf a gap looks wrong with the right tokens, step to the next tier of the same group, such as `--section-stack-md` to `--section-stack-lg`. If no tier fits, raise it as a token or template question rather than adding space by hand. A one-off value takes the nearest semantic token of its context, or becomes a proposed token.\n\n### Build from templates and slots\n\nStart from the template (Section, Card, Modal, Popup) and keep it attached. The template owns the pad, the stacks and the size; add content only inside its slots. Never detach it; if you copy a layout to get a variation, it needs a slot, not a new variant.\n\n### No card inside a card\n\nA card groups one thing. Tiers inside it are stacks and dividers in the card body, not more cards.\n\n### Let the content pick the size\n\nVisible empty space means a smaller size; overflow or clipping means a larger one. Cards hug their content, with an optional maximum height that scrolls the body. Modals hug or fill. Tables, sections and tab groups grow to fit.\n\n## Space never speaks alone\n\nA gap tells the eye there is a boundary, but it cannot say what the boundary is. Pair a group gap with a heading, label, fieldset legend or divider.\n\n- Group first, then space: related fields sit close and each group takes a bigger gap than the one inside it.\n- Pick one stack tier for the context and keep it across the container. All three metric cards on Home take the same stack.\n- An optical nudge is allowed where the eye needs it, such as an icon beside an all-caps label. Note it on the layer, keep it on a scale unit, and never leave a silent hard-code.\n\n**Name the groups the space separates.** The create-session form has student fields, then schedule fields.\n\nDo: A 24 gap and a subsection heading say the same thing twice.\nDon't: Four fields and one unexplained gap. People who cannot see the spacing, or whose screen reader skips it, miss the break.\n\n## Do and don't\n\n### Group by proximity\n\nKeep a label near its own field and put the larger gap between groups.\n\nDo: Label to field 8 (Stack/stack-md), group to group 24 (Modal/stack-lg), so each label attaches to its field.\nDon't: Label to field 24 and group to group 8: each label sits nearer the previous field than its own.\n\n### Match the token to the context\n\nPad tokens for controls, card tokens for cards.\n\nDo: A card pads with a card token, so the content breathes at the card scale.\nDon't: A control pad on a card squeezes the content to a button-sized pad.\n\n### Never hardcode spacing\n\nAlways use the variable; the code token is the same name with `var()`.\n\nDo: Bound to the variable, so the pad follows the system.\nDon't: A literal 13 matches no step on the scale and will not follow a token change.\n\n## Accessibility\n\n- Keep one stack tier per context across a container so readers can see what belongs together without reading every label.\n- Spacing never carries meaning alone. Pair a group break with a heading, label or fieldset legend.\n- Leave room for the focus ring: the ring sits outside a control, so a control never sits flush against a clipping edge ([Border](?path=/docs/foundations-visual-border--docs)).\n\n## Related",
     "design-system/agent-views/foundations/TokensColor.md": "# Color\n\nEvery color a PLUS screen uses, as the palette it comes from and the named roles that follow the Color mode.\n\n**Kind:** Foundation\n\n**Storybook page:** `design-system/src/styles/TokensColor.mdx`\n\n## Overview\n\nRoles such as text, surface and border give a palette step a job and switch with the Light, Dark and high-contrast modes ([Color](?path=/docs/foundations-visual-color--docs)). A screen binds a role, never a palette step.\n\n## Related",
     "design-system/agent-views/foundations/TokensElevationAndLayers.md": "# Elevation and layers\n\nShadow and opacity for how high a surface sits, and the layer order for what stacks over what.\n\n**Kind:** Foundation\n\n**Storybook page:** `design-system/src/styles/TokensElevationAndLayers.mdx`\n\n## Overview\n\nElevation is shown by shadow and surface color ([Elevation](?path=/docs/foundations-visual-elevation--docs)); layers decide stacking. Opacity steps live here too.\n\n## Related",
     "design-system/agent-views/foundations/TokensLibrary.md": "# Library\n\nEvery token in one place: search by name, narrow by collection, tier and scope, and copy a name.\n\n**Kind:** Foundation\n\n**Storybook page:** `design-system/src/styles/TokensLibrary.mdx`\n\n## Overview\n\nTokens form a ladder. A screen binds the semantic token whose job matches, never a primitive, so one decision is made once and every mode follows.\n\n| Tier / scope | Holds | Bound by |\n| --- | --- | --- |\n| Primitive | Raw palette hues, rem scales and spring curves | Semantic tokens only; hidden from features |\n| Semantic · Global | Roles that apply anywhere: text, surface, border, space, radius, shadow, motion | Any feature or component |\n| Semantic · Templates | Frame, Page, Section, Card, Table, Blanket, Modal and Popup tokens | The template and the layout inside it |\n| Semantic · Components | Tokens owned by one component (Button radius, chart colors, Skeleton) | That component only |\n\n## Find a token\n\n## Related",

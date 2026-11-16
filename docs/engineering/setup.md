@@ -122,7 +122,7 @@ Figma export → design-system/src/tokens/source/*.json → npm run generate:tok
   variable's `codeSyntax.WEB` (`var(--pad-x-sm)`, say) is its CSS name, so the
   generator refuses a variable without one instead of deriving a name. It
   writes `_scales.scss`, `_frame_layers.scss` and `_type.scss`.
-- The four-tier token ladder (semantics, patterns, components, layers) and
+- The four-tier token ladder (semantics, templates, components, layers) and
   motion generate the other direction, code → Figma, via
   `npm run generate:design-tokens` (ADR-038). `generate:tokens` drops the
   retired names (`RETIRED_TOKENS` in `scripts/lib/tokens/plan.mjs`) that the

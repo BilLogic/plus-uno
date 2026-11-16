@@ -12,7 +12,7 @@
  * touches the disk.
  */
 
-export const TIERS = ['primitive', 'semantic', 'pattern', 'component'];
+export const TIERS = ['primitive', 'semantic', 'template', 'component'];
 
 const byName = (a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
 

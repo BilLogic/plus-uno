@@ -1,5 +1,5 @@
 /**
- * Patterns (ADR-038 ladder)
+ * Templates (ADR-038 ladder)
  * Generated from scripts/lib/tokens/plan.mjs's TOKEN_LADDER — never hand-edit.
  * Each row declares its own value; a responsive row repeats under the media
  * query the plan names for it, below the :root block.
@@ -66,7 +66,7 @@
     --modal-pad-y-spacious: var(--space-100);
     --modal-radius: var(--radius-xxl);
     --modal-width-xs: 261px; /* 4 screen-grid columns plus 2 × 16 modal pad at 768 · 1024 · 1440 */
-    --modal-width-sm: 384px; /* lifted out of spacing / layout, beside the pattern’s pad/stack tokens */
+    --modal-width-sm: 384px; /* lifted out of spacing / layout, beside the template’s pad/stack tokens */
     --modal-width-md: 507px;
     --modal-width-lg: 629px;
     --modal-body-min-height: var(--space-500);

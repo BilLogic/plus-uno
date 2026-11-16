@@ -4,7 +4,7 @@
  * (ADR-038, #1756), generated from `scripts/lib/tokens/plan.mjs`.
  *
  * WHAT IT WRITES. `design-system/src/tokens/ladder/`: `_semantics.scss`,
- * `_patterns.scss`, `_components.scss`, `_layers.scss` from `TOKEN_LADDER`,
+ * `_templates.scss`, `_components.scss`, `_layers.scss` from `TOKEN_LADDER`,
  * and `_springs.scss` plus `springs.generated.js` (the motion springs, ADR-041). `design-system/figma/variables-payload.json` is the combined Figma
  * variables payload for all of the above — written, never pushed; pushing it
  * is a separate, one-writer-queue step, out of scope here.

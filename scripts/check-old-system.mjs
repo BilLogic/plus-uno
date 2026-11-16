@@ -71,7 +71,7 @@ export const FAMILIES = [
   {
     name: 'size',
     pattern: OLD_SIZE,
-    remedy: 'the old size names are gone; use the current token for the role: `--space-*` / `--size-*` / `--radius-*` / `--stroke-*` primitives, the `--pad-*` / `--stack-*` / `--inline-*` semantics, or the pattern tokens (`--card-*`, `--section-*`, `--modal-*`, `--page-*`, `--table-*`, `--icon-*`, `--image-*`, `--row-height-*`)',
+    remedy: 'the old size names are gone; use the current token for the role: `--space-*` / `--size-*` / `--radius-*` / `--stroke-*` primitives, the `--pad-*` / `--stack-*` / `--inline-*` semantics, or the template tokens (`--card-*`, `--section-*`, `--modal-*`, `--page-*`, `--table-*`, `--icon-*`, `--image-*`, `--row-height-*`)',
   },
   {
     name: 'type',

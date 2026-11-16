@@ -21,7 +21,7 @@ import { exportedValue } from './lib/docs-page.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SOURCE_DIR = path.join(REPO_ROOT, TOKEN_DIR, 'source');
-const STYLESHEETS = ['_frame_layers.scss', ...['semantics', 'patterns', 'components', 'layers'].map((t) => `ladder/_${t}.scss`)].map((f) => path.join(REPO_ROOT, TOKEN_DIR, f));
+const STYLESHEETS = ['_frame_layers.scss', ...['semantics', 'templates', 'components', 'layers'].map((t) => `ladder/_${t}.scss`)].map((f) => path.join(REPO_ROOT, TOKEN_DIR, f));
 const corpus = tokenCorpus({ root: REPO_ROOT });
 const stylesheet = STYLESHEETS.map((f) => fs.readFileSync(f, 'utf8')).join('\n');
 
@@ -161,7 +161,7 @@ test('every Layout token resolves to its value at Medium, Large and X-Large', ()
 test('the derived Layout rows are the frame rules worked at each mode width', () => {
   for (const [mode, width] of Object.entries(LAYOUT_MODES)) {
     for (const [leaf, value] of Object.entries(deriveLayout(width))) {
-      // The modal widths live with the Modal pattern tokens; 4-col was born there, with no Layout name to retire.
+      // The modal widths live with the Modal template tokens; 4-col was born there, with no Layout name to retire.
       const name = leaf.startsWith('width-modal-') ? `--modal-width-${leaf.slice('width-modal-'.length)}` : renamed(`--layout-${leaf}`);
       assert.equal(atMode(name, mode), px(value), `${leaf} at ${mode}`);
     }
