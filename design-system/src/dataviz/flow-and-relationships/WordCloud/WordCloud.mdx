@@ -49,7 +49,7 @@ category and sized, use `PackedBubbleChart`. For co-occurring terms, use
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Words', <>One per item in <C>data</C>; font size scales with <C>weight</C>, while placement carries no meaning.</>],
+        ['Words', <>One per item in <C>data</C>, rendered in <C>--chart-brand</C>; font size scales with <C>weight</C>, while placement carries no meaning.</>],
         ['Tooltip', <>Shows the word and its <C>weight</C>.</>],
         ['Height', <>Pixel height from <C>height</C> (default 400).</>],
     ]}
@@ -83,7 +83,7 @@ default (`sort`); pass `sort={false}` to preserve input order.
 
 ## Color and accessibility
 
-- **Decorative color.** Words cycle through the [categorical order](?path=/docs/data-visualizations-color--docs) from `--chart-categorical-1` and repeat past eight; hue encodes neither category nor count.
+- **Single-series color.** As a single-series chart, words render in `--chart-brand` ([Color](?path=/docs/data-visualizations-color--docs)); font size carries the weight rather than hue.
 - **Word length distorts perceived weight.** Longer words occupy more area than shorter words of equal weight; provide exact counts in the tooltip, a table or surrounding copy when precision matters.
 - **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
 - **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).

@@ -62,6 +62,13 @@ export const Overview = {
         await waitFor(() => {
             expect(canvasElement.querySelectorAll('.highcharts-container .highcharts-point').length).toBeGreaterThanOrEqual(5);
         });
+        const fills = new Set(
+            [...canvasElement.querySelectorAll('.highcharts-container .highcharts-point')].map(
+                (pt) => getComputedStyle(pt).fill,
+            ),
+        );
+        expect(fills.size).toBe(1);
+
         for (const node of canvasElement.querySelectorAll('.highcharts-container text, .highcharts-container tspan')) {
             if (!node.textContent?.trim()) continue;
             const style = getComputedStyle(node);

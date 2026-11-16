@@ -1,8 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { CHART_NODE_RADIUS, CHART_SPACING_COMPACT } from '@/dataviz/chartTheme';
-import { BRAND, CATEGORICAL, CHROME, toneByRank } from '@/dataviz/palette';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { toneByRank } from '@/dataviz/palette';
 
 const capturedOptions = [];
 
@@ -14,20 +13,27 @@ vi.mock('@/dataviz/PlusChart', () => ({
     }),
 }));
 
-import ArcDiagram from './ArcDiagram';
-import DependencyWheel from '../DependencyWheel/DependencyWheel';
-import FunnelChart from '../FunnelChart/FunnelChart';
-import NetworkGraph from '../NetworkGraph/NetworkGraph';
-import OrganizationChart from '../OrganizationChart/OrganizationChart';
-import SankeyDiagram from '../SankeyDiagram/SankeyDiagram';
-import TreegraphChart from '../TreegraphChart/TreegraphChart';
-import WordCloud from '../WordCloud/WordCloud';
+import ArcDiagram from './ArcDiagram/ArcDiagram';
+import DependencyWheel from './DependencyWheel/DependencyWheel';
+import FunnelChart from './FunnelChart/FunnelChart';
+import NetworkGraph from './NetworkGraph/NetworkGraph';
+import OrganizationChart from './OrganizationChart/OrganizationChart';
+import SankeyDiagram from './SankeyDiagram/SankeyDiagram';
+import TreegraphChart from './TreegraphChart/TreegraphChart';
+import WordCloud from './WordCloud/WordCloud';
 
 const REMOVED_ANIMATION_PROPS = ['animate', 'animationDelay', 'animationDuration', 'enableAnimation'];
+const STUBBED_TOKENS = ['--radius-lg', '--radius-control-lg', '--pad-y-md', '--size-200'];
 
-describe('Flow and relationship charts on the shared foundation (#2585)', () => {
+describe('Flow and relationship charts on the shared foundation', () => {
     beforeEach(() => {
         capturedOptions.length = 0;
+    });
+
+    afterEach(() => {
+        for (const token of STUBBED_TOKENS) {
+            document.documentElement.style.removeProperty(token);
+        }
     });
 
     it('exposes no legacy animation props on any chart in the family', () => {
@@ -46,6 +52,56 @@ describe('Flow and relationship charts on the shared foundation (#2585)', () => 
                 expect(Chart.propTypes?.[prop], `${Chart.name}.${prop}`).toBeUndefined();
             }
         }
+    });
+
+    it('reads Treegraph node radius/height and DependencyWheel label distance from CSS tokens rather than fallbacks or control tokens', async () => {
+        document.documentElement.style.setProperty('--radius-lg', '11px');
+        document.documentElement.style.setProperty('--radius-control-lg', '19px');
+        document.documentElement.style.setProperty('--pad-y-md', '9px');
+        document.documentElement.style.setProperty('--size-200', '34px');
+
+        vi.resetModules();
+
+        const themeMod = await import('@/dataviz/chartTheme');
+        expect(themeMod.CHART_NODE_RADIUS).toBe(11);
+        expect(themeMod.CHART_NODE_RADIUS).not.toBe(19);
+        expect(themeMod.CHART_NODE_HEIGHT).toBe(34);
+        expect(themeMod.CHART_SPACING_COMPACT).toBe(9);
+
+        const { default: FreshTreegraphChart } = await import('./TreegraphChart/TreegraphChart');
+        render(
+            React.createElement(FreshTreegraphChart, {
+                data: [
+                    { id: 'math', name: 'Math' },
+                    { id: 'fractions', parent: 'math', name: 'Fractions' },
+                ],
+            }),
+        );
+        const treegraphOptions = capturedOptions.at(-1);
+        expect(treegraphOptions.chart.type).toBe('treegraph');
+        expect(treegraphOptions.series[0].borderRadius).toBe(11);
+        expect(treegraphOptions.series[0].marker.height).toBe(34);
+        expect(treegraphOptions.series[0].dataLabels.style).toBeUndefined();
+        expect(treegraphOptions.tooltip.pointFormat).toBe('{point.name}');
+
+        const { default: FreshDependencyWheel } = await import('./DependencyWheel/DependencyWheel');
+        render(
+            React.createElement(FreshDependencyWheel, {
+                data: [
+                    ['Reading', 'Comprehension', 5],
+                    ['Reading', 'Vocabulary', 4],
+                ],
+            }),
+        );
+        const wheelOptions = capturedOptions.at(-1);
+        expect(wheelOptions.chart.type).toBe('dependencywheel');
+        expect(wheelOptions.series[0].dataLabels.distance).toBe(9);
+        expect(wheelOptions.series[0].dataLabels.style).toBeUndefined();
+        expect(wheelOptions.series[0].dataLabels.color).toBeUndefined();
+        expect(wheelOptions.tooltip.nodeFormat).toContain('class="plus-chart-value"');
+        expect(wheelOptions.tooltip.pointFormat).toContain('class="plus-chart-value"');
+        expect(wheelOptions.tooltip.nodeFormat).not.toContain('<b>');
+        expect(wheelOptions.tooltip.pointFormat).not.toContain('<b>');
     });
 
     it('ArcDiagram drops redundant data-label style overrides and formats tooltips without <b>', () => {
@@ -67,28 +123,7 @@ describe('Flow and relationship charts on the shared foundation (#2585)', () => 
         expect(options.tooltip.pointFormat).not.toContain('<b>');
     });
 
-    it('DependencyWheel takes label distance from CHART_SPACING_COMPACT, drops tooltip-style override on dataLabels, and formats tooltips without <b>', () => {
-        render(
-            React.createElement(DependencyWheel, {
-                data: [
-                    ['Reading', 'Comprehension', 5],
-                    ['Reading', 'Vocabulary', 4],
-                ],
-            }),
-        );
-
-        const options = capturedOptions.at(-1);
-        expect(options.chart.type).toBe('dependencywheel');
-        expect(options.series[0].dataLabels.distance).toBe(CHART_SPACING_COMPACT);
-        expect(options.series[0].dataLabels.style).toBeUndefined();
-        expect(options.series[0].dataLabels.color).toBeUndefined();
-        expect(options.tooltip.nodeFormat).toContain('class="plus-chart-value"');
-        expect(options.tooltip.pointFormat).toContain('class="plus-chart-value"');
-        expect(options.tooltip.nodeFormat).not.toContain('<b>');
-        expect(options.tooltip.pointFormat).not.toContain('<b>');
-    });
-
-    it('FunnelChart keeps stage order by default (sort={false}), sorts most to least when sort={true}, supports toneByRank, and formats labels and tooltips without <b>', () => {
+    it('FunnelChart defaults to single-series --chart-brand (colorByPoint: false), keeps stage order unless sort={true}, supports toneByRank, and formats without <b>', () => {
         const stages = [
             { name: 'Started', y: 400 },
             { name: 'Re-engaged', y: 650 },
@@ -97,16 +132,14 @@ describe('Flow and relationship charts on the shared foundation (#2585)', () => 
         render(React.createElement(FunnelChart, { data: stages }));
 
         const defaultOptions = capturedOptions.at(-1);
+        expect(defaultOptions.series[0].color).toBe('var(--chart-brand)');
+        expect(defaultOptions.series[0].colorByPoint).toBe(false);
         expect(defaultOptions.series[0].data.map((d) => d.name)).toEqual([
             'Started',
             'Re-engaged',
             'Completed',
         ]);
-        expect(defaultOptions.series[0].data.map((d) => d.color)).toEqual([
-            CATEGORICAL[0],
-            CATEGORICAL[1],
-            CATEGORICAL[2],
-        ]);
+        expect(defaultOptions.series[0].data.every((d) => d.color === undefined)).toBe(true);
         expect(defaultOptions.plotOptions.funnel.dataLabels.style.fontWeight).toBe('var(--type-weight-medium)');
         expect(defaultOptions.plotOptions.funnel.dataLabels.format).toContain('class="plus-chart-value"');
         expect(defaultOptions.plotOptions.funnel.dataLabels.format).not.toContain('<b>');
@@ -134,7 +167,7 @@ describe('Flow and relationship charts on the shared foundation (#2585)', () => 
         expect(tonedOptions.series[0].data[2].color).toBe('var(--ds-background-accent-blue-subtler)');
     });
 
-    it('NetworkGraph uses BRAND for its single series and drops tooltip-style override on dataLabels', () => {
+    it('NetworkGraph uses --chart-brand for its single series and drops tooltip-style override on dataLabels', () => {
         render(
             React.createElement(NetworkGraph, {
                 data: [
@@ -146,13 +179,13 @@ describe('Flow and relationship charts on the shared foundation (#2585)', () => 
 
         const options = capturedOptions.at(-1);
         expect(options.chart.type).toBe('networkgraph');
-        expect(options.plotOptions.networkgraph.link.color).toBe(CHROME.link);
-        expect(options.series[0].color).toBe(BRAND);
+        expect(options.plotOptions.networkgraph.link.color).toBe('var(--ds-border-bold)');
+        expect(options.series[0].color).toBe('var(--chart-brand)');
         expect(options.series[0].dataLabels.style).toBeUndefined();
         expect(options.tooltip.pointFormat).toBe('{point.name}');
     });
 
-    it('OrganizationChart uses CHROME.textInverse on level 0, CHROME.link on links, and formats tooltips without <b>', () => {
+    it('OrganizationChart uses --ds-text-inverse on level 0, --ds-border-bold on links, and inherits outside: true from chartTheme.tooltip', () => {
         render(
             React.createElement(OrganizationChart, {
                 data: [
@@ -164,8 +197,9 @@ describe('Flow and relationship charts on the shared foundation (#2585)', () => 
 
         const options = capturedOptions.at(-1);
         expect(options.chart.type).toBe('organization');
-        expect(options.series[0].levels[0].dataLabels.color).toBe(CHROME.textInverse);
-        expect(options.series[0].link.color).toBe(CHROME.link);
+        expect(options.series[0].levels[0].dataLabels.color).toBe('var(--ds-text-inverse)');
+        expect(options.series[0].link.color).toBe('var(--ds-border-bold)');
+        expect(options.tooltip.outside).toBe(true);
         expect(options.tooltip.nodeFormat).toBe('{point.name}');
         expect(options.tooltip.pointFormat).toBe('{point.fromNode.name} → {point.toNode.name}');
     });
@@ -188,26 +222,7 @@ describe('Flow and relationship charts on the shared foundation (#2585)', () => 
         expect(options.tooltip.pointFormat).not.toContain('<b>');
     });
 
-    it('TreegraphChart uses the role radius CHART_NODE_RADIUS (--radius-lg, 8) rather than a control radius and drops redundant data-label style', () => {
-        expect(CHART_NODE_RADIUS).toBe(8);
-
-        render(
-            React.createElement(TreegraphChart, {
-                data: [
-                    { id: 'math', name: 'Math' },
-                    { id: 'fractions', parent: 'math', name: 'Fractions' },
-                ],
-            }),
-        );
-
-        const options = capturedOptions.at(-1);
-        expect(options.chart.type).toBe('treegraph');
-        expect(options.series[0].borderRadius).toBe(CHART_NODE_RADIUS);
-        expect(options.series[0].dataLabels.style).toBeUndefined();
-        expect(options.tooltip.pointFormat).toBe('{point.name}');
-    });
-
-    it('WordCloud sorts words from most to least by weight by default, preserves order when sort={false}, and formats tooltips without <b>', () => {
+    it('WordCloud defaults to single-series --chart-brand (colorByPoint: false), sorts words most to least by weight, and formats tooltips without <b>', () => {
         const words = [
             { name: 'Clear', weight: 12 },
             { name: 'Helpful', weight: 30 },
@@ -217,6 +232,8 @@ describe('Flow and relationship charts on the shared foundation (#2585)', () => 
 
         const sortedOptions = capturedOptions.at(-1);
         expect(sortedOptions.chart.type).toBe('wordcloud');
+        expect(sortedOptions.series[0].color).toBe('var(--chart-brand)');
+        expect(sortedOptions.series[0].colorByPoint).toBe(false);
         expect(sortedOptions.series[0].data.map((d) => d.name)).toEqual(['Helpful', 'Clear', 'Fun']);
         expect(sortedOptions.tooltip.pointFormat).toContain('class="plus-chart-value"');
         expect(sortedOptions.tooltip.pointFormat).not.toContain('<b>');

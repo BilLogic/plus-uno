@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
 import chartTheme from '@/dataviz/chartTheme';
 import { dataLabelFormat } from '@/dataviz/chartFormat';
-import { CATEGORICAL, mostToLeast } from '@/dataviz/palette';
+import { BRAND, mostToLeast } from '@/dataviz/palette';
 
 /**
  * FunnelChart Component
@@ -48,11 +48,9 @@ const FunnelChart = ({
         },
         series: [{
             name: 'Funnel',
-            colorByPoint: true,
-            data: orderedData.map((item, i) => ({
-                ...item,
-                color: item.color || CATEGORICAL[i % CATEGORICAL.length]
-            }))
+            color: BRAND,
+            colorByPoint: false,
+            data: orderedData.map((item) => ({ ...item }))
         }]
     };
 

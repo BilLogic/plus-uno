@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme, { CHART_NODE_RADIUS } from '@/dataviz/chartTheme';
+import chartTheme, { CHART_NODE_HEIGHT, CHART_NODE_RADIUS } from '@/dataviz/chartTheme';
 import { CHROME } from '@/dataviz/palette';
 
 /**
@@ -37,7 +37,8 @@ const TreegraphChart = ({
             marker: {
                 symbol: 'rect',
                 width: '25%',
-                height: 30
+                // Node height from `--size-200` (32px); corner radius from `--radius-lg` (8px).
+                height: CHART_NODE_HEIGHT
             },
             borderRadius: CHART_NODE_RADIUS,
             dataLabels: {

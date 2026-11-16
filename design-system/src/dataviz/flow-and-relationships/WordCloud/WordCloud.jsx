@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
 import chartTheme from '@/dataviz/chartTheme';
 import { dataLabelFormat } from '@/dataviz/chartFormat';
-import { mostToLeast } from '@/dataviz/palette';
+import { BRAND, mostToLeast } from '@/dataviz/palette';
 
 /**
  * WordCloud Component
@@ -29,7 +29,8 @@ const WordCloud = ({
         title: { text: null },
         series: [{
             type: 'wordcloud',
-            colorByPoint: true,
+            color: BRAND,
+            colorByPoint: false,
             data: orderedData,
             name: 'Occurrences'
         }],

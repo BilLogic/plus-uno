@@ -78,8 +78,11 @@ export const CHART_INACTIVE_OPACITY = tokenNumber('--ds-opacity-disabled', 0.4);
 const CHART_BAR_RADIUS_NUMBER = tokenNumber('--chart-bar-radius', 2);
 const barRadius = { borderRadius: { radius: CHART_BAR_RADIUS_NUMBER, where: 'end' } };
 
-/** A node or card-like mark inside a chart (e.g. a Treegraph box): the smallest nested visual role radius (`--radius-lg`, 8px), never a control radius. */
+/** A node or card-like mark inside a chart (e.g. a Treegraph box): the card-nesting role radius (`--radius-lg`, 8px), never a control radius. */
 export const CHART_NODE_RADIUS = tokenNumber('--radius-lg', 8);
+
+/** Height of a labeled node box inside a chart (e.g. a Treegraph box), read off the size ladder (`--size-200`, 32px). */
+export const CHART_NODE_HEIGHT = tokenNumber('--size-200', 32);
 
 const axis = (gridLineWidth, gridLineDashStyle) => ({
     gridLineColor: CHROME.grid,
