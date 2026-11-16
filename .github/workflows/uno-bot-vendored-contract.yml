@@ -1,0 +1,56 @@
+name: uno-bot vendored blueprint contract
+
+# The three docs under docs/connectors/supabase/blueprint*.md are VENDORED from
+# BilLogic/plus-uno-blueprint by agents/uno-bot/scripts/sync-blueprint-contract.mjs,
+# and uno-bot-deploy.yml refuses to ship when their bytes differ from upstream.
+# That check used to run only on main, after the merge: on 15 Nov a repo-wide
+# rename (#2573) edited three words inside blueprint-schema.md and every deploy
+# after it failed. This runs the same check on a pull request that touches the
+# vendored docs or the sync script, so an edit there fails before it lands.
+#
+# Scoped by `paths` on purpose: upstream moves on its own schedule, and a PR
+# that does not touch these files should not go red because the blueprint did.
+# The deploy on main still catches upstream drift.
+on:
+  pull_request:
+    paths:
+      - "docs/connectors/supabase/blueprint.md"
+      - "docs/connectors/supabase/blueprint-schema.md"
+      - "docs/connectors/supabase/blueprint-direct-access.md"
+      - "agents/uno-bot/scripts/sync-blueprint-contract.mjs"
+      - ".github/workflows/uno-bot-vendored-contract.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  vendored-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      HAS_BLUEPRINT_TOKEN: ${{ secrets.BLUEPRINT_REPO_TOKEN != '' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
+        with:
+          persist-credentials: false
+      - name: Check out uno-blueprint (contract source)
+        if: env.HAS_BLUEPRINT_TOKEN == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v4
+        with:
+          repository: BilLogic/plus-uno-blueprint
+          token: ${{ secrets.BLUEPRINT_REPO_TOKEN }}
+          path: uno-blueprint-src
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: ".nvmrc"
+      # The script uses node built-ins only, so no install. Without the token
+      # (a fork PR) the source is absent and the check reports SKIPPED rather
+      # than passing.
+      - name: Vendored docs match upstream
+        working-directory: agents/uno-bot
+        env:
+          BLUEPRINT_REPO: ${{ github.workspace }}/uno-blueprint-src
+          BLUEPRINT_CONTRACT_OPTIONAL: ${{ secrets.BLUEPRINT_REPO_TOKEN != '' && '0' || '1' }}
+        run: node scripts/sync-blueprint-contract.mjs --check
