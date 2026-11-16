@@ -241,7 +241,6 @@ const PatternSection = ({
 
     const detailTitleId = useId();
     const detailTriggerRef = useRef(null);
-    const detailPanelRef = useRef(null);
     const [uncontrolledDetailOpen, setUncontrolledDetailOpen] = useState(defaultDetailOpen);
     const isDetailControlled = detailOpenProp !== undefined;
     const isDetailOpen = isDetailControlled ? Boolean(detailOpenProp) : uncontrolledDetailOpen;
@@ -309,7 +308,7 @@ const PatternSection = ({
                             <AnimatePresence initial={false}>
                                 {state.open && (
                                     <HeightSurface key="detail" className="plus-pattern-section-detail-panel">
-                                        <div ref={detailPanelRef} className="plus-pattern-section-detail-body">
+                                        <div className="plus-pattern-section-detail-body">
                                             <div className="plus-pattern-section-detail-content">{detail}</div>
                                             {detailFooter && (
                                                 <div className="plus-pattern-section-detail-footer">{detailFooter}</div>
