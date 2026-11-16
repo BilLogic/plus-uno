@@ -4159,7 +4159,8 @@
         "DisabledRowWithReason",
         "HoveredState",
         "KeyboardFocus",
-        "OpenMenuEdge"
+        "OpenMenuEdge",
+        "BestPracticesLive"
       ],
       "tokens": [
         "--body-default",
@@ -7056,6 +7057,15 @@
           "deprecated": null
         },
         {
+          "name": "defaultOpen",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Whether the message popup starts open.",
+          "deprecated": null
+        },
+        {
           "name": "children",
           "type": "node",
           "required": false,
@@ -7095,7 +7105,8 @@
         "Rest",
         "Hovered",
         "Pressed",
-        "Focused"
+        "Focused",
+        "BestPracticesLive"
       ],
       "tokens": [
         "--body-default",
@@ -14043,7 +14054,8 @@
         "Rest",
         "Hovered",
         "Pressed",
-        "Focused"
+        "Focused",
+        "BestPracticesLive"
       ],
       "tokens": [
         "--body-default",

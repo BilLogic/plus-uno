@@ -12,7 +12,7 @@ Also asked as: field error, helper error, inline error, form validation.
 
 **Source:** `design-system/src/components/messaging/InlineMessage/InlineMessage.jsx`
 
-**Stories:** `design-system/src/components/messaging/InlineMessage/InlineMessage.stories.jsx` — Overview, Appearances, Info, Warning, Danger, Success, WithSecondaryText, Interactive, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/messaging/InlineMessage/InlineMessage.stories.jsx` — Overview, Appearances, Info, Warning, Danger, Success, WithSecondaryText, Interactive, Rest, Hovered, Pressed, Focused, BestPracticesLive
 
 **Storybook page:** `design-system/src/components/messaging/InlineMessage/InlineMessage.mdx`
 
@@ -139,6 +139,7 @@ The popup surface is Popup's; see `Popup`.
 | `title` | node | — | Bolded first line of the popup. |
 | `secondaryText` | node | — | A second line, when the title alone does not say enough. |
 | `placement` | enum | `'bottom-start'` | Where the popup opens relative to the trigger. |
+| `defaultOpen` | bool | `false` | Whether the message popup starts open. |
 | `children` | node | — | The popup's body content. |
 | `className` | string | `''` | — |
 | `id` | string | — | — |

@@ -123,7 +123,12 @@ export const Spotlight = ({
     );
 
     return (
-        <Popover.Root open={isOpen} onOpenChange={(open) => { if (!open) onDismiss?.(); }}>
+        <Popover.Root
+            open={isOpen}
+            onOpenChange={(open, details) => {
+                if (!open && (!bounded || details?.reason !== 'outside-press')) onDismiss?.();
+            }}
+        >
             <Popover.Portal container={bounded ? bounded.container : undefined}>
                 <Popover.Positioner
                     anchor={anchor}
@@ -133,7 +138,10 @@ export const Spotlight = ({
                     collisionBoundary={bounded?.collisionBoundary}
                     collisionAvoidance={bounded?.collisionAvoidance}
                 >
-                    <Popover.Popup className={clsx('plus-spotlight', className)}>
+                    <Popover.Popup
+                        initialFocus={bounded ? false : undefined}
+                        className={clsx('plus-spotlight', className)}
+                    >
                         <SpotlightHeader headline={headline} dismissControl={dismissControl} />
                         {media && <div className="plus-spotlight-media">{media}</div>}
                         <Popover.Description className="plus-spotlight-body">{children}</Popover.Description>

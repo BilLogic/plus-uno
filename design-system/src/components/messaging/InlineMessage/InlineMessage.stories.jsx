@@ -1,5 +1,7 @@
 import React from 'react';
 import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
+import { DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import InlineMessage, { INLINE_MESSAGE_APPEARANCES } from './InlineMessage';
 
@@ -23,6 +25,7 @@ export default {
         title: { control: 'text', table: { category: 'Content' } },
         secondaryText: { control: 'text', table: { category: 'Content' } },
         placement: { control: 'select', options: ['top', 'bottom', 'left', 'right', 'top-start', 'top-end', 'bottom-start', 'bottom-end'], table: { category: 'Layout' } },
+        defaultOpen: { control: 'boolean', table: { category: 'Behavior' } },
         children: { control: 'text', table: { category: 'Content' } },
     },
     args: {
@@ -137,5 +140,88 @@ export const Focused = {
         trigger.focus();
         await userEvent.keyboard('{Enter}');
         await waitFor(() => expect(documentOf(canvasElement).getByText('Why this matters')).toBeTruthy());
+    },
+};
+
+const fieldRow = { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--inline-sm)' };
+
+/** Live DoDontPair inline messages stay bounded in their wells, have no inert wrappers, and open/dismiss interactively. */
+export const BestPracticesLive = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' }}>
+            <DoDontPair
+                doExample={(
+                    <DocsOverlayBoundary containHeight>
+                        <div style={fieldRow}>
+                            <span>Session length</span>
+                            <InlineMessage appearance="info" defaultOpen label="About info note" title="Heads up">
+                                This setting applies to new sessions only.
+                            </InlineMessage>
+                        </div>
+                    </DocsOverlayBoundary>
+                )}
+                doCaption="Info for a neutral note."
+                dontExample={(
+                    <DocsOverlayBoundary containHeight>
+                        <div style={fieldRow}>
+                            <span>Session length</span>
+                            <InlineMessage appearance="danger" defaultOpen label="About danger note" title="Heads up">
+                                This setting applies to new sessions only.
+                            </InlineMessage>
+                        </div>
+                    </DocsOverlayBoundary>
+                )}
+                dontCaption="Danger for a neutral note."
+            />
+            <DoDontPair
+                doExample={(
+                    <DocsOverlayBoundary containHeight>
+                        <div style={fieldRow}>
+                            <span>Session length</span>
+                            <InlineMessage appearance="info" label="About session length" title="Session length note">
+                                This setting applies to new sessions only.
+                            </InlineMessage>
+                        </div>
+                    </DocsOverlayBoundary>
+                )}
+                doCaption="A single message."
+                dontExample={(
+                    <DocsOverlayBoundary containHeight>
+                        <div style={fieldRow}>
+                            <span>Session length</span>
+                            <InlineMessage appearance="info" label="First field note" title="Heads up">
+                                This setting applies to new sessions only.
+                            </InlineMessage>
+                            <InlineMessage appearance="warning" label="About availability" title="Limited availability">
+                                Only 2 slots left this week.
+                            </InlineMessage>
+                        </div>
+                    </DocsOverlayBoundary>
+                )}
+                dontCaption="An info note and a warning together."
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expect(canvasElement.querySelector('[inert]')).toBeNull();
+        const cards = canvasElement.querySelectorAll('figure.sb-ds-dodont-card');
+        await expect(cards).toHaveLength(4);
+
+        // Pair 1 starts open inside its card well without overflowing onto the caption.
+        const firstWell = cards[0].querySelector('.sb-ds-dodont-card__well');
+        await waitFor(() => expect(within(cards[0]).getByText('Heads up')).toBeVisible());
+        const openPopup = cards[0].querySelector('.plus-popup');
+        await expect(openPopup.getBoundingClientRect().bottom).toBeLessThanOrEqual(firstWell.getBoundingClientRect().bottom + 1);
+
+        // Pair 2 starts closed and opens inside its own well when clicked.
+        const singleTrigger = within(cards[2]).getByRole('button', { name: 'About session length' });
+        singleTrigger.focus();
+        await expect(singleTrigger).toHaveFocus();
+        await userEvent.click(singleTrigger);
+        await waitFor(() => expect(within(cards[2]).getByText('Session length note')).toBeVisible());
+        const thirdWell = cards[2].querySelector('.sb-ds-dodont-card__well');
+        const thirdPopup = cards[2].querySelector('.plus-popup');
+        await expect(thirdPopup.getBoundingClientRect().bottom).toBeLessThanOrEqual(thirdWell.getBoundingClientRect().bottom + 1);
     },
 };

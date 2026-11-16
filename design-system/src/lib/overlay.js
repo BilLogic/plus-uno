@@ -332,6 +332,7 @@ export function useFloatingOverlay({
     };
 
     return {
+        bounded: Boolean(bounded),
         triggerProps: { render: mergedTrigger, nativeButton: trigger ? isButtonLike(trigger) : undefined },
         container: bounded ? bounded.container : containerRef,
         positionerProps: {

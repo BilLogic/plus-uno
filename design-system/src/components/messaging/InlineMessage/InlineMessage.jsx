@@ -32,6 +32,7 @@ export const InlineMessage = ({
     title,
     secondaryText,
     placement = 'bottom-start',
+    defaultOpen = false,
     children,
     className = '',
     id,
@@ -50,6 +51,7 @@ export const InlineMessage = ({
                 />
             )}
             placement={placement}
+            defaultShow={defaultOpen}
             id={id}
             className={`plus-inline-message ${className}`}
         >
@@ -77,6 +79,8 @@ InlineMessage.propTypes = {
     secondaryText: PropTypes.node,
     /** Where the popup opens relative to the trigger. */
     placement: PropTypes.oneOf(['auto', 'top', 'bottom', 'left', 'right', 'top-start', 'top-end', 'bottom-start', 'bottom-end', 'right-start', 'right-end', 'left-start', 'left-end']),
+    /** Whether the message popup starts open. */
+    defaultOpen: PropTypes.bool,
     /** The popup's body content. */
     children: PropTypes.node,
     className: PropTypes.string,

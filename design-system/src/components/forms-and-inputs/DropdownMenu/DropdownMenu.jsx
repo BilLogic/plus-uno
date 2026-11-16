@@ -1,5 +1,5 @@
 import { useMotionReduced } from '@/lib/motionPreference';
-import React, { useId } from 'react';
+import React, { useId, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
 import { Menu as BaseMenu } from '@base-ui/react/menu';
@@ -37,11 +37,13 @@ const DropdownMenu = ({
     className = '',
 }) => {
     const reduced = useMotionReduced();
-    const { isOpen: open, setOpen: handleOpenChange, closeList } = useOpenState({
+    const { isOpen: open, closeList, setOpen: handleOpenChange } = useOpenState({
         open: isOpen,
         defaultOpen,
         onOpenChange,
     });
+    const mountedOpenRef = useRef(open);
+    if (!open) mountedOpenRef.current = false;
 
     const floating = useFloatingOverlay({
         trigger,
@@ -79,6 +81,7 @@ const DropdownMenu = ({
             <BaseMenu.Portal container={floating.container}>
                 <BaseMenu.Positioner {...floating.positionerProps}>
                     <BaseMenu.Popup
+                        initialFocus={floating.bounded && mountedOpenRef.current ? false : undefined}
                         data-reduced={reduced ? 'true' : undefined}
                         id={id}
                         data-testid={testId}

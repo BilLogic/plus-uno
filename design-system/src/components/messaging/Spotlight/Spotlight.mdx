@@ -1,7 +1,8 @@
+import React, { useState } from 'react';
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as SpotlightStories from './Spotlight.stories.jsx';
-import { CloseButton, SpotlightAction } from '@/components';
+import { Button, Spotlight, SpotlightAction, SpotlightProvider, SpotlightTarget } from '@/components';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -9,6 +10,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const figmaMeta = {
@@ -26,30 +28,64 @@ export const figmaMeta = {
   ]
 };
 
-{/* The callout's content drawn statically with its own classes and real SpotlightActions, so a pair never opens a real popup over the docs page. The preview is inert: a picture, not a control. */}
-export const StaticSpotlight = ({ headline, children, stepCount, primaryAction, secondaryAction }) => (
-    <div className="plus-spotlight" inert aria-hidden="true">
-        <div className="plus-spotlight-header">
-            <div className="plus-spotlight-dismiss">
-                <CloseButton label="Dismiss" tone="inverse" isTooltipDisabled className="plus-spotlight-dismiss-button" />
-            </div>
-            <div className="plus-spotlight-headline">{headline}</div>
-        </div>
-        <div className="plus-spotlight-body">{children}</div>
-        <div className="plus-spotlight-footer">
-            {stepCount && <span className="plus-spotlight-step-count">{stepCount}</span>}
-            <div className="plus-spotlight-actions">
-                {secondaryAction}
-                {primaryAction}
-            </div>
-        </div>
-    </div>
-);
+export const LiveSpotlight = ({
+    targetText = 'Calendar',
+    headline,
+    children,
+    stepCount,
+    secondaryKind = 'skip',
+    secondaryLabel = 'Skip',
+    primaryLabel = 'Got it',
+}) => {
+    const [isOpen, setIsOpen] = useState(true);
+    const secondaryAction = secondaryKind === 'link'
+        ? (
+            <SpotlightAction
+                appearance="secondary"
+                href="#spotlight-tour-details"
+                onClick={(event) => event.preventDefault()}
+            >
+                {secondaryLabel}
+            </SpotlightAction>
+        )
+        : secondaryKind === 'competing-primary'
+            ? (
+                <SpotlightAction appearance="primary" onClick={() => setIsOpen(false)}>
+                    {secondaryLabel}
+                </SpotlightAction>
+            )
+            : (
+                <SpotlightAction appearance="secondary" onClick={() => setIsOpen(false)}>
+                    {secondaryLabel}
+                </SpotlightAction>
+            );
 
-export const skip = <SpotlightAction appearance="secondary">Skip</SpotlightAction>;
-export const linkAction = <SpotlightAction appearance="secondary" href="#">Learn more</SpotlightAction>;
-
-export const gotIt = <SpotlightAction appearance="primary">Got it</SpotlightAction>;
+    return (
+        <DocsOverlayBoundary containHeight>
+            <SpotlightProvider>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <SpotlightTarget>
+                        <Button text={targetText} onClick={() => setIsOpen((open) => !open)} />
+                    </SpotlightTarget>
+                    <Spotlight
+                        headline={headline}
+                        stepCount={stepCount}
+                        isOpen={isOpen}
+                        onDismiss={() => setIsOpen(false)}
+                        secondaryAction={secondaryAction}
+                        primaryAction={(
+                            <SpotlightAction appearance="primary" onClick={() => setIsOpen(false)}>
+                                {primaryLabel}
+                            </SpotlightAction>
+                        )}
+                    >
+                        {children}
+                    </Spotlight>
+                </div>
+            </SpotlightProvider>
+        </DocsOverlayBoundary>
+    );
+};
 
 <Meta of={SpotlightStories} />
 
@@ -205,9 +241,9 @@ short, explicit sequence with a `stepCount`, not an ongoing help system.
 A headline names the thing; the body is one sentence.
 
 <DoDontPair
-    doExample={<StaticSpotlight headline="Find sessions here" stepCount="1 of 3" secondaryAction={skip} primaryAction={gotIt}>Open the calendar to see this week.</StaticSpotlight>}
+    doExample={<LiveSpotlight headline="Find sessions here" stepCount="1 of 3">Open the calendar to see this week.</LiveSpotlight>}
     doCaption="Short headline, one-sentence body."
-    dontExample={<StaticSpotlight headline="Welcome!" stepCount="1 of 3" secondaryAction={skip} primaryAction={gotIt}>Click here to learn about the new calendar view and everything else we changed this term.</StaticSpotlight>}
+    dontExample={<LiveSpotlight headline="Welcome!" stepCount="1 of 3">Click here to learn about the new calendar view and everything else we changed this term.</LiveSpotlight>}
     dontCaption="A greeting and a paragraph."
 />
 
@@ -216,9 +252,9 @@ A headline names the thing; the body is one sentence.
 One step alone has nothing to count.
 
 <DoDontPair
-    doExample={<StaticSpotlight headline="Find sessions here" stepCount="1 of 3" secondaryAction={skip} primaryAction={gotIt}>Open the calendar to see this week.</StaticSpotlight>}
+    doExample={<LiveSpotlight headline="Find sessions here" stepCount="1 of 3">Open the calendar to see this week.</LiveSpotlight>}
     doCaption="Step count in a multi-step tour."
-    dontExample={<StaticSpotlight headline="Find sessions here" stepCount="1 of 1" secondaryAction={skip} primaryAction={gotIt}>Open the calendar to see this week.</StaticSpotlight>}
+    dontExample={<LiveSpotlight headline="Find sessions here" stepCount="1 of 1">Open the calendar to see this week.</LiveSpotlight>}
     dontCaption="Step count on a single tip."
 />
 
@@ -228,9 +264,9 @@ The primary action leads; the second one stays quiet. A `SpotlightAction` with
 `href` renders as a link.
 
 <DoDontPair
-    doExample={<StaticSpotlight headline="Find sessions here" stepCount="1 of 3" secondaryAction={linkAction} primaryAction={gotIt}>Open the calendar to see this week.</StaticSpotlight>}
+    doExample={<LiveSpotlight headline="Find sessions here" stepCount="1 of 3" secondaryKind="link" secondaryLabel="Learn more">Open the calendar to see this week.</LiveSpotlight>}
     doCaption="Secondary action as a link."
-    dontExample={<StaticSpotlight headline="Find sessions here" stepCount="1 of 3" secondaryAction={<SpotlightAction appearance="primary">Learn more</SpotlightAction>} primaryAction={gotIt}>Open the calendar to see this week.</StaticSpotlight>}
+    dontExample={<LiveSpotlight headline="Find sessions here" stepCount="1 of 3" secondaryKind="competing-primary" secondaryLabel="Learn more">Open the calendar to see this week.</LiveSpotlight>}
     dontCaption="Two competing buttons."
 />
 

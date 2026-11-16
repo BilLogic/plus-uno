@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { OverlayContainer } from '@/lib/overlay';
 import Spotlight, { SpotlightAction, SpotlightProvider, SpotlightTarget } from './Spotlight';
@@ -58,6 +59,32 @@ describe('Spotlight', () => {
         expect(popup).not.toBeNull();
         expect(popup.closest('[data-side]')).toHaveAttribute('data-side', 'bottom');
         canvas.remove();
+    });
+
+    it('keeps bounded docs spotlights open on outside clicks while Dismiss still fires onDismiss', async () => {
+        const user = userEvent.setup();
+        const onDismiss = vi.fn();
+        const canvas = document.createElement('div');
+        const outside = document.createElement('button');
+        outside.textContent = 'Elsewhere on page';
+        document.body.append(canvas, outside);
+        try {
+            render(
+                <OverlayContainer container={canvas}>
+                    <SpotlightProvider>
+                        <SpotlightTarget><button type="button">Calendar</button></SpotlightTarget>
+                        <Spotlight headline="Find sessions here" onDismiss={onDismiss}>Open the calendar to see this week.</Spotlight>
+                    </SpotlightProvider>
+                </OverlayContainer>,
+            );
+            await user.click(outside);
+            expect(onDismiss).not.toHaveBeenCalled();
+            await user.click(screen.getByRole('button', { name: 'Dismiss' }));
+            expect(onDismiss).toHaveBeenCalledTimes(1);
+        } finally {
+            canvas.remove();
+            outside.remove();
+        }
     });
 });
 

@@ -14,7 +14,7 @@ Also asked as: actions menu, overflow menu, kebab, more actions, context menu, m
 
 **Source:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.stories.jsx` — Overview, Placements, Spacing, WithSections, Loading, LoadFailed, EscapeCloses, MenuKeyboardNavigation, Interactive, Default, Open, CompactRows, DisabledRow, DisabledRowWithReason, HoveredState, KeyboardFocus, OpenMenuEdge
+**Stories:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.stories.jsx` — Overview, Placements, Spacing, WithSections, Loading, LoadFailed, EscapeCloses, MenuKeyboardNavigation, Interactive, Default, Open, CompactRows, DisabledRow, DisabledRowWithReason, HoveredState, KeyboardFocus, OpenMenuEdge, BestPracticesLive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.mdx`
 

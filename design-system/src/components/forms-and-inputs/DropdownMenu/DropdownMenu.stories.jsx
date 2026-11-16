@@ -2,6 +2,8 @@ import React from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { Button, Icon } from '@/components';
 import { ButtonItem, LinkItem, Section } from '@/components/forms-and-inputs/_internal/MenuGroup';
+import { DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
@@ -350,5 +352,75 @@ export const OpenMenuEdge = {
         const style = getComputedStyle(menu);
         await expect(style.borderTopColor, 'no painted border').toBe('rgba(0, 0, 0, 0)');
         await expect(style.boxShadow, 'the overlay shadow is the edge').toBe(computedShadow(canvasElement, 'var(--ds-shadow-overlay)'));
+    },
+};
+
+const LiveDocsMenu = ({ label = 'Session actions', children }) => (
+    <DocsOverlayBoundary containHeight>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <DropdownMenu
+                defaultOpen
+                placement="bottom-start"
+                minWidth="var(--width-1500)"
+                trigger={<Button text={label} iconAfter={<Icon name="chevron-down" size={12} />} />}
+            >
+                {children}
+            </DropdownMenu>
+        </div>
+    </DocsOverlayBoundary>
+);
+
+/** Live DoDontPair menus stay bounded in their wells, carry no inert wrappers, and open and navigate by keyboard and pointer. */
+export const BestPracticesLive = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <DoDontPair
+            doExample={(
+                <LiveDocsMenu label="Order actions">
+                    <ButtonItem onClick={() => {}}>Rename</ButtonItem>
+                    <ButtonItem onClick={() => {}}>Duplicate</ButtonItem>
+                    <ButtonItem onClick={() => {}}>Archive</ButtonItem>
+                    <ButtonItem onClick={() => {}}>Delete</ButtonItem>
+                </LiveDocsMenu>
+            )}
+            doCaption="Delete sits last, after the common actions."
+            dontExample={(
+                <LiveDocsMenu label="Risky order">
+                    <ButtonItem onClick={() => {}}>Delete</ButtonItem>
+                    <ButtonItem onClick={() => {}}>Rename</ButtonItem>
+                    <ButtonItem onClick={() => {}}>Duplicate</ButtonItem>
+                    <ButtonItem onClick={() => {}}>Archive</ButtonItem>
+                </LiveDocsMenu>
+            )}
+            dontCaption="Delete first puts a risky action at the top."
+        />
+    ),
+    play: async ({ canvasElement }) => {
+        await expect(canvasElement.querySelector('[inert]')).toBeNull();
+        const cards = canvasElement.querySelectorAll('figure.sb-ds-dodont-card');
+        await expect(cards).toHaveLength(2);
+
+        const doCard = cards[0];
+        const doWell = doCard.querySelector('.sb-ds-dodont-card__well');
+        await waitFor(() => expect(within(doCard).getByRole('menuitem', { name: 'Rename' })).toBeVisible());
+
+        const menuPopup = doCard.querySelector('.plus-dropdown-menu');
+        const wellRect = doWell.getBoundingClientRect();
+        const menuRect = menuPopup.getBoundingClientRect();
+        await expect(menuRect.bottom).toBeLessThanOrEqual(wellRect.bottom + 1);
+
+        const rename = within(doCard).getByRole('menuitem', { name: 'Rename' });
+        rename.focus();
+        await expect(rename).toHaveFocus();
+        await userEvent.keyboard('{ArrowDown}');
+        await expect(within(doCard).getByRole('menuitem', { name: 'Duplicate' })).toHaveFocus();
+
+        await userEvent.keyboard('{Escape}');
+        const trigger = within(doCard).getByRole('button', { name: 'Order actions' });
+        await waitFor(() => expect(within(doCard).queryByRole('menuitem', { name: 'Rename' })).toBeNull());
+        await expect(trigger).toHaveFocus();
+
+        await userEvent.click(trigger);
+        await expect(await within(doCard).findByRole('menuitem', { name: 'Delete' })).toBeVisible();
     },
 };

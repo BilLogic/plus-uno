@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
+import { DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
-import { expect, waitFor } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { Button, Spotlight, SPOTLIGHT_PLACEMENTS, SpotlightAction, SpotlightProvider, SpotlightTarget } from '@/components';
 
@@ -241,5 +243,94 @@ export const Focused = {
         await expect(parseFloat(style.outlineWidth)).toBe(2);
         await expect(style.outlineColor).toBe(tokenColor(dismiss, '--ds-border-focused-inverse'));
         dismiss.blur();
+    },
+};
+
+const LiveDocsSpotlight = ({ headline, stepCount, secondaryAsLink = false, children }) => {
+    const [isOpen, setIsOpen] = useState(true);
+    return (
+        <DocsOverlayBoundary containHeight>
+            <SpotlightProvider>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <SpotlightTarget>
+                        <Button text="Calendar" onClick={() => setIsOpen((open) => !open)} />
+                    </SpotlightTarget>
+                    <Spotlight
+                        headline={headline}
+                        stepCount={stepCount}
+                        isOpen={isOpen}
+                        onDismiss={() => setIsOpen(false)}
+                        secondaryAction={secondaryAsLink ? (
+                            <SpotlightAction
+                                appearance="secondary"
+                                href="#spotlight-tour-details"
+                                onClick={(event) => event.preventDefault()}
+                            >
+                                Learn more
+                            </SpotlightAction>
+                        ) : (
+                            <SpotlightAction appearance="secondary" onClick={() => setIsOpen(false)}>
+                                Skip
+                            </SpotlightAction>
+                        )}
+                        primaryAction={(
+                            <SpotlightAction appearance="primary" onClick={() => setIsOpen(false)}>
+                                Got it
+                            </SpotlightAction>
+                        )}
+                    >
+                        {children}
+                    </Spotlight>
+                </div>
+            </SpotlightProvider>
+        </DocsOverlayBoundary>
+    );
+};
+
+/** Live DoDontPair spotlights stay bounded inside their wells, carry no inert wrappers, and dismiss and reopen independently. */
+export const BestPracticesLive = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <DoDontPair
+            doExample={(
+                <LiveDocsSpotlight headline="Find sessions here" stepCount="1 of 3" secondaryAsLink>
+                    Open the calendar to see this week.
+                </LiveDocsSpotlight>
+            )}
+            doCaption="Secondary action as a link."
+            dontExample={(
+                <LiveDocsSpotlight headline="Welcome!" stepCount="1 of 3">
+                    Click here to learn about the new calendar view and everything else we changed this term.
+                </LiveDocsSpotlight>
+            )}
+            dontCaption="A greeting and a paragraph."
+        />
+    ),
+    play: async ({ canvasElement }) => {
+        await expect(canvasElement.querySelector('[inert]')).toBeNull();
+        const cards = canvasElement.querySelectorAll('figure.sb-ds-dodont-card');
+        await expect(cards).toHaveLength(2);
+
+        const [doCard, dontCard] = cards;
+        await waitFor(() => expect(within(doCard).getByText('Find sessions here')).toBeVisible());
+        await waitFor(() => expect(within(dontCard).getByText('Welcome!')).toBeVisible());
+
+        for (const card of cards) {
+            const wellRect = card.querySelector('.sb-ds-dodont-card__well').getBoundingClientRect();
+            const spotlightRect = card.querySelector('.plus-spotlight').getBoundingClientRect();
+            await expect(spotlightRect.bottom).toBeLessThanOrEqual(wellRect.bottom + 1);
+        }
+
+        const learnMore = within(doCard).getByRole('link', { name: 'Learn more' });
+        learnMore.focus();
+        await expect(learnMore).toHaveFocus();
+
+        // Dismissing the Do card's spotlight leaves the Don't card's spotlight open, and clicking Calendar reopens it.
+        await userEvent.click(within(doCard).getByRole('button', { name: 'Got it' }));
+        await waitFor(() => expect(within(doCard).queryByText('Find sessions here')).toBeNull());
+        await expect(within(dontCard).getByText('Welcome!')).toBeVisible();
+
+        await userEvent.click(within(doCard).getByRole('button', { name: 'Calendar' }));
+        await waitFor(() => expect(within(doCard).getByText('Find sessions here')).toBeVisible());
     },
 };

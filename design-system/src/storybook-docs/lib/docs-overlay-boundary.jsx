@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useCallback, useLayoutEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { OverlayContainer } from '@/lib/overlay';
 
@@ -26,10 +26,13 @@ export const fitZoom = (natural, available) => {
  * width, so the reader sees all of it. CSS `zoom` scales layout as well as
  * paint, so hit-testing and overlay positioning stay correct.
  */
-export function DocsOverlayBoundary({ disablePointerEvents = false, fit = true, children }) {
+export function DocsOverlayBoundary({ disablePointerEvents = false, fit = true, containHeight = false, children }) {
     const [node, setNode] = useState(null);
     const [scaled, setScaled] = useState(null);
-    const boundary = node ? (node.closest('.docs-story > *:first-child') ?? node) : null;
+    const [containedMinHeight, setContainedMinHeight] = useState(null);
+    const boundary = node
+        ? (node.closest('.docs-story > *:first-child, .sb-ds-dodont-card__well') ?? node)
+        : null;
 
     useLayoutEffect(() => {
         const host = node?.parentElement;
@@ -56,6 +59,65 @@ export function DocsOverlayBoundary({ disablePointerEvents = false, fit = true, 
         return () => observer.disconnect();
     }, [node, fit]);
 
+    const measureHeight = useCallback(() => {
+        if (!containHeight || !node) {
+            setContainedMinHeight((prev) => (prev === null ? prev : null));
+            return;
+        }
+        const applied = node.style.minHeight;
+        node.style.minHeight = '';
+        let needed = null;
+        try {
+            const base = node.getBoundingClientRect();
+            let maxBottom = base.bottom;
+            for (const overlay of node.querySelectorAll('[data-side]')) {
+                const rect = overlay.getBoundingClientRect();
+                if (rect.height > 0 && rect.bottom > maxBottom) maxBottom = rect.bottom;
+            }
+            if (maxBottom > base.bottom) {
+                const z = scaled?.zoom ?? 1;
+                needed = `${Math.ceil(node.clientHeight + (maxBottom - base.bottom) / z)}px`;
+            }
+        } finally {
+            node.style.minHeight = applied;
+        }
+        setContainedMinHeight((prev) => (prev === needed ? prev : needed));
+    }, [containHeight, node, scaled]);
+
+    useLayoutEffect(() => {
+        measureHeight();
+    });
+
+    useLayoutEffect(() => {
+        if (!containHeight || !node) return undefined;
+        let raf = 0;
+        const schedule = () => {
+            if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(raf);
+            if (typeof requestAnimationFrame === 'function') {
+                raf = requestAnimationFrame(measureHeight);
+            } else {
+                measureHeight();
+            }
+        };
+        const mutationObserver = typeof MutationObserver !== 'undefined'
+            ? new MutationObserver((records) => {
+                const ours = (r) => r.type === 'attributes' && r.target === node && r.attributeName === 'style';
+                if (records.every(ours)) return;
+                schedule();
+            })
+            : null;
+        mutationObserver?.observe(node, { subtree: true, childList: true, attributes: true });
+        const resizeObserver = typeof ResizeObserver !== 'undefined' && node.parentElement
+            ? new ResizeObserver(schedule)
+            : null;
+        if (node.parentElement) resizeObserver?.observe(node.parentElement);
+        return () => {
+            mutationObserver?.disconnect();
+            resizeObserver?.disconnect();
+            if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(raf);
+        };
+    }, [containHeight, node, measureHeight]);
+
     return (
         <div
             ref={setNode}
@@ -63,6 +125,8 @@ export function DocsOverlayBoundary({ disablePointerEvents = false, fit = true, 
             data-docs-fit={scaled ? String(Math.round(scaled.zoom * 100) / 100) : undefined}
             style={{
                 position: 'relative',
+                ...(containHeight ? { width: '100%' } : undefined),
+                ...(containedMinHeight ? { minHeight: containedMinHeight } : undefined),
                 ...(scaled ? { width: scaled.width, zoom: scaled.zoom } : undefined),
                 ...(disablePointerEvents ? { pointerEvents: 'none' } : undefined),
             }}
@@ -78,5 +142,7 @@ DocsOverlayBoundary.propTypes = {
     disablePointerEvents: PropTypes.bool,
     /** Zoom an example wider than its preview down to the preview's width. Off with `parameters.docs.fit: false`. */
     fit: PropTypes.bool,
+    /** Grow `minHeight` while a positioned overlay inside the boundary extends past its bottom edge. */
+    containHeight: PropTypes.bool,
     children: PropTypes.node,
 };

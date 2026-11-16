@@ -78,6 +78,49 @@ describe('DocsOverlayBoundary', () => {
             expect(boundary.querySelector('[data-side]')).toHaveAttribute('data-side', 'bottom');
         }
     });
+
+    it('expands minHeight for an open overlay when containHeight is set and releases it on close', () => {
+        const originalClientHeight = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'clientHeight');
+        Object.defineProperty(HTMLElement.prototype, 'clientHeight', { configurable: true, get: () => 32 });
+        const rectSpy = (el) => {
+            if (el.hasAttribute?.('data-docs-overlay-container')) {
+                return { top: 10, bottom: 42, left: 0, right: 300, width: 300, height: 32 };
+            }
+            if (el.hasAttribute?.('data-side')) {
+                return { top: 46, bottom: 186, left: 0, right: 240, width: 240, height: 140 };
+            }
+            return { top: 10, bottom: 42, left: 0, right: 100, width: 100, height: 32 };
+        };
+        const originalGBCR = Element.prototype.getBoundingClientRect;
+        Element.prototype.getBoundingClientRect = function mockRect() {
+            return rectSpy(this);
+        };
+
+        try {
+            const { container, rerender } = render(
+                <DocsOverlayBoundary containHeight>
+                    <button type="button">Trigger</button>
+                    <div data-side="bottom">Open overlay</div>
+                </DocsOverlayBoundary>,
+            );
+            const host = container.querySelector('[data-docs-overlay-container]');
+            expect(host.style.minHeight).toBe('176px');
+
+            rerender(
+                <DocsOverlayBoundary containHeight>
+                    <button type="button">Trigger</button>
+                </DocsOverlayBoundary>,
+            );
+            expect(host.style.minHeight).toBe('');
+        } finally {
+            Element.prototype.getBoundingClientRect = originalGBCR;
+            if (originalClientHeight) {
+                Object.defineProperty(HTMLElement.prototype, 'clientHeight', originalClientHeight);
+            } else {
+                delete HTMLElement.prototype.clientHeight;
+            }
+        }
+    });
 });
 
 describe('fitZoom', () => {

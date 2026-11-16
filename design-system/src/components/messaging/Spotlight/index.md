@@ -10,7 +10,7 @@ Also asked as: onboarding, feature tour, coach mark, new feature highlight, walk
 
 **Source:** `design-system/src/components/messaging/Spotlight/Spotlight.jsx`
 
-**Stories:** `design-system/src/components/messaging/Spotlight/Spotlight.stories.jsx` — Basic, WithMedia, LinkAction, PrimaryAction, SecondaryAction, Interactive, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/messaging/Spotlight/Spotlight.stories.jsx` — Basic, WithMedia, LinkAction, PrimaryAction, SecondaryAction, Interactive, Rest, Hovered, Pressed, Focused, BestPracticesLive
 
 **Storybook page:** `design-system/src/components/messaging/Spotlight/Spotlight.mdx`
 

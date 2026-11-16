@@ -47,7 +47,7 @@ authored half, counted rather than assumed.
 | [Banner](Banner/index.md) | 5 | ✅ | ✅ | ✅ |
 | [EmptyState](EmptyState/index.md) | 8 | ✅ | ✅ | ✅ |
 | [Flag](Flag/index.md) | 21 | ✅ | ✅ | ✅ |
-| [InlineMessage](InlineMessage/index.md) | 8 | ✅ | ✅ | ✅ |
+| [InlineMessage](InlineMessage/index.md) | 9 | ✅ | ✅ | ✅ |
 | [Modal](Modal/index.md) | 23 | ✅ | ✅ | ✅ |
 | [NotificationItem](NotificationItem/index.md) | 13 | ✅ | ✅ | ✅ |
 | [SectionMessage](SectionMessage/index.md) | 10 | ✅ | ✅ | ✅ |
