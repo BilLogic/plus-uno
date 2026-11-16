@@ -2,9 +2,11 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
+import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
+import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import Button, { BUTTON_APPEARANCES, BUTTON_SPACINGS } from './Button';
-import { Icon, SectionMessage } from '@/components';
+import { FooterActions, Icon, SectionMessage } from '@/components';
 const icons = {
     'none': null,
     'plus': 'plus',
@@ -539,4 +541,146 @@ AnchorHref.play = async ({ canvasElement }) => {
     const link = within(canvasElement).getByTestId('anchor-href');
     await expect(link.tagName).toBe('A');
     await expect(link).toHaveAttribute('href', 'https://example.com/schedule');
+};
+
+const ANATOMY_PARTS = [
+    { selector: '[data-testid="button-anatomy"]', label: 'Container', side: 'top', at: 'start', holds: true },
+    { selector: '[data-testid="button-anatomy"] .plus-btn-visual--before', label: 'Icon before', side: 'start', at: 'middle' },
+    { selector: '[data-testid="button-anatomy"] .plus-btn-text', label: 'Label', side: 'top', at: 'middle' },
+    { selector: '[data-testid="button-anatomy"] .plus-btn-visual--after', label: 'Icon after', side: 'end', at: 'middle' },
+];
+
+/** Anatomy: soft neutral container with no border, optional leading icon, medium-weight label and optional trailing chevron. */
+export const Anatomy = {
+    render: () => (
+        <LiveAnatomy width={280} title="A button with its container, leading icon, label and trailing chevron numbered" parts={ANATOMY_PARTS}>
+            <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--pad-y-lg) var(--pad-x-lg)' }}>
+                <Button
+                    testId="button-anatomy"
+                    text="Session options"
+                    iconBefore="calendar"
+                    iconAfter={<Icon name="chevron-down" size={12} />}
+                />
+            </div>
+        </LiveAnatomy>
+    ),
+    play: async ({ canvasElement }) => {
+        const btn = within(canvasElement).getByTestId('button-anatomy');
+        settled(btn);
+        const cs = getComputedStyle(btn);
+        await expect(cs.backgroundColor, 'soft neutral fill').toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+        await expect(cs.borderTopColor, 'default draws no visible border').toBe('rgba(0, 0, 0, 0)');
+        await expect(px(cs.height), 'default spacing draws 32').toBe(tokenLength(canvasElement, '--control-md'));
+        await expect(canvasElement.querySelectorAll('[data-anatomy-marker]')).toHaveLength(4);
+    },
+};
+
+const footerStageStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--stack-lg)',
+    width: '100%',
+    maxWidth: '560px',
+};
+
+const footerCardStyle = {
+    padding: 'var(--pad-y-md) var(--pad-x-lg)',
+    borderRadius: 'var(--card-radius)',
+    border: 'var(--border-width-default) solid var(--ds-border)',
+    background: 'var(--ds-surface-overlay)',
+};
+
+const footerCaptionStyle = {
+    margin: '0 0 var(--stack-sm)',
+    color: 'var(--ds-text-subtle)',
+    font: 'var(--body-sm)',
+};
+
+/** Footer tracks (r5): 4 equal tracks inside container padding, spacious (48) buttons with shouldFitContainer. */
+export const FooterLayouts = {
+    render: () => (
+        <div style={footerStageStyle}>
+            <div style={footerCardStyle}>
+                <p style={footerCaptionStyle}>One button — right half (tracks 3–4)</p>
+                <FooterActions data-testid="footer-one">
+                    <Button appearance="primary" text="Done" />
+                </FooterActions>
+            </div>
+            <div style={footerCardStyle}>
+                <p style={footerCaptionStyle}>Two buttons — 50/50 split, soft neutral secondary left, primary right</p>
+                <FooterActions data-testid="footer-two">
+                    <Button text="Discard" />
+                    <Button appearance="primary" text="Save changes" />
+                </FooterActions>
+            </div>
+            <div style={footerCardStyle}>
+                <p style={footerCaptionStyle}>Three buttons — tracks 2, 3 and 4, rightmost primary</p>
+                <FooterActions data-testid="footer-three">
+                    <Button text="Save draft" />
+                    <Button text="Preview" />
+                    <Button appearance="primary" text="Publish" />
+                </FooterActions>
+            </div>
+            <div style={footerCardStyle}>
+                <p style={footerCaptionStyle}>Leading text action — hugs left edge; filled buttons take tracks 3 and 4</p>
+                <FooterActions data-testid="footer-leading">
+                    <Button appearance="subtle" text="Not now" />
+                    <Button text="Keep draft" />
+                    <Button appearance="primary" text="Publish" />
+                </FooterActions>
+            </div>
+            <div style={footerCardStyle}>
+                <p style={footerCaptionStyle}>Destructive — safer alternative left, danger primary right, 50/50</p>
+                <FooterActions data-testid="footer-destructive">
+                    <Button text="Archive instead" />
+                    <Button appearance="danger" text="Delete session" />
+                </FooterActions>
+            </div>
+            <div style={footerCardStyle}>
+                <p style={footerCaptionStyle}>Steps — Back and Next split 50/50</p>
+                <FooterActions data-testid="footer-steps">
+                    <Button text="Back" />
+                    <Button appearance="primary" text="Next" />
+                </FooterActions>
+            </div>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const close = (a, b) => Math.abs(a - b) <= 1.5;
+
+        const one = canvas.getByTestId('footer-one');
+        const oneTracks = footerTracks(one);
+        const done = within(one).getByRole('button', { name: 'Done' });
+        await expect(close(done.getBoundingClientRect().left, oneTracks.span(3, 4).left), '1 button starts at track 3').toBe(true);
+        await expect(close(done.getBoundingClientRect().right, oneTracks.span(3, 4).right), '1 button ends at track 4').toBe(true);
+        await expect(close(done.getBoundingClientRect().height, 48), 'footer buttons draw 48 high').toBe(true);
+        await expect(done).toHaveClass('plus-btn--spacious');
+        await expect(done).toHaveClass('plus-btn--fit-container');
+
+        const two = canvas.getByTestId('footer-two');
+        const twoTracks = footerTracks(two);
+        const discard = within(two).getByRole('button', { name: 'Discard' });
+        const save = within(two).getByRole('button', { name: 'Save changes' });
+        settled(discard);
+        await expect(getComputedStyle(discard).backgroundColor, 'secondary uses soft neutral fill').toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+        await expect(close(discard.getBoundingClientRect().left, twoTracks.span(1, 2).left), 'secondary starts at track 1').toBe(true);
+        await expect(close(discard.getBoundingClientRect().width, save.getBoundingClientRect().width), '50/50 equal widths').toBe(true);
+        await expect(close(save.getBoundingClientRect().right, twoTracks.span(3, 4).right), 'primary ends at track 4').toBe(true);
+
+        const three = canvas.getByTestId('footer-three');
+        const threeTracks = footerTracks(three);
+        const draft = within(three).getByRole('button', { name: 'Save draft' });
+        const publish = within(three).getByRole('button', { name: 'Publish' });
+        await expect(close(draft.getBoundingClientRect().left, threeTracks.track(2).left), 'first of 3 starts at track 2').toBe(true);
+        await expect(close(publish.getBoundingClientRect().left, threeTracks.track(4).left), 'third of 3 starts at track 4').toBe(true);
+
+        const leading = canvas.getByTestId('footer-leading');
+        const leadingTracks = footerTracks(leading);
+        const notNow = within(leading).getByRole('button', { name: 'Not now' });
+        const keepDraft = within(leading).getByRole('button', { name: 'Keep draft' });
+        await expect(notNow).not.toHaveClass('plus-btn--fit-container');
+        await expect(close(notNow.getBoundingClientRect().left, leadingTracks.box.left), 'subtle action hugs left edge').toBe(true);
+        await expect(close(keepDraft.getBoundingClientRect().left, leadingTracks.track(3).left), 'filled pair starts at track 3').toBe(true);
+    },
 };

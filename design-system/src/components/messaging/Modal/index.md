@@ -14,7 +14,7 @@ Also asked as: confirm, confirmation dialog, destructive confirm, popup window, 
 
 **Source:** `design-system/src/components/messaging/Modal/Modal.jsx`
 
-**Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Width4Col, Width6Col, Width8Col, Width10Col, HeightHug, HeightFill, HeaderOptions, WithoutCloseButton, Loading, Content, Layout, Interactive, Overview, ConfirmView, ConfirmViewEscape, ModalOverModalRefused, BlockingShadow, SelectKeepsOverlayShadow, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Width4Col, Width6Col, Width8Col, Width10Col, HeightHug, HeightFill, HeaderOptions, WithoutCloseButton, Loading, Content, Layout, Interactive, Overview, ConfirmView, ConfirmViewEscape, ModalOverModalRefused, BlockingShadow, SelectKeepsOverlayShadow, Rest, Hovered, Pressed, Focused, FooterLayouts
 
 **Storybook page:** `design-system/src/components/messaging/Modal/Modal.mdx`
 
@@ -27,10 +27,10 @@ destructive confirmation, a short form that would derail the page, a detail view
 the person closes and returns from. It is the one messaging component that takes
 focus from the page, so it fits when interrupting is the point.
 
-The footer is built in: pass `primaryButton` and `secondaryButton` as objects and
-the component renders the `Button` pair, aligned right. Pass `footer` for other
-actions, such as a Delete on the left or a single primary. Opening a Modal
-closes a floating Sidebar; a docked one stays.
+The footer runs on `FooterActions`: pass `primaryButton` and `secondaryButton`
+as objects for a `50/50` pair (or `primaryButton` alone for the right half), or
+pass `footer` with `<FooterActions>` for three actions or a leading text
+button. Opening a Modal closes a floating Sidebar; a docked one stays.
 
 ### Width guidance
 
@@ -101,7 +101,7 @@ Don't: Dividers around a short body.
 
 `showBottomButtons` defaults to true, and the footer renders only when
 `primaryButton`, `secondaryButton` or `footer` is given; describe the actions as
-objects and the component renders the Button pair.
+objects and the component renders the `FooterActions` pair.
 
 ### Show a follow-up decision in the same Modal; a Modal never opens on another Modal. {#show-a-follow-up-decision-in-the-same-modal-a-modal-never-opens-on-another-modal}
 
@@ -115,7 +115,7 @@ focused task, each with its own Blanket.
   title={confirming ? 'Discard changes?' : 'Session settings'}
   show={open}
   onClose={close}
-  secondaryButton={confirming ? { text: 'Back', onClick: () => setConfirming(false) } : { text: 'Cancel', onClick: close }}
+  secondaryButton={confirming ? { text: 'Back', onClick: () => setConfirming(false) } : { text: 'Discard', onClick: close }}
   primaryButton={confirming ? { text: 'Discard changes', appearance: 'danger', onClick: discard } : { text: 'Save', onClick: save }}
 >
   {confirming ? 'Your edits to this session are not saved.' : settingsForm}
@@ -155,6 +155,7 @@ focused task, each with its own Blanket.
 
 ## Related
 
+- `FooterActions`: use when placing three actions or a leading text button across the Modal's four-track footer slot.
 - `PatternModal`: use when a docs page or a mockup draws the Modal shell inline, with no focus trap.
 - `Blanket`: use when a new blocking layer needs the dimmed screen under it; `Modal` brings its own.
 - Templates: use when choosing between a Modal and a focused page; its Usage section weighs the two.
@@ -166,7 +167,7 @@ Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Notificati
 1. **Blanket.** Dims the page and holds focus inside.
 2. **Header.** Title, optional description, header actions and the close button.
 3. **Body.** Text or any content; scrolls when it overflows.
-4. **Footer.** Appears only when a button or `footer` is given: a secondary and a primary.
+4. **Footer.** Appears only when a button or `footer` is given: `FooterActions` divides the width inside container padding into four equal tracks.
 5. **Dividers.** Optional rules under the header and over the footer.
 
 The tokens each part draws are read from `Modal.scss` and listed under Tokens
@@ -189,7 +190,7 @@ touched in the Harness tab.
 | --- | --- |
 | Title the Modal with the action or decision: "Delete account?". | Use a vague title such as "Warning". |
 | Say what happens and whether it can be undone. | Hide the consequence in the body. |
-| Label buttons with verbs that match the title: "Delete", "Cancel". | Use "Yes" and "No". |
+| Label buttons with verbs that match the title: "Delete recording", "Archive instead". | Use "Cancel", "Yes" or "No" in a Modal footer. |
 
 ## Props
 
@@ -204,7 +205,7 @@ touched in the Harness tab.
 | `showBottomButtons` | bool | `true` | Show the footer: `footer`, or the secondary and primary buttons. |
 | `showCloseButton` | bool | `true` | The header's close button. Off for a dialog that has to be answered. |
 | `headerActions` | node | — | Icon buttons in the header, before the close button. |
-| `footer` | node | — | Custom footer actions in place of the two buttons, aligned right. |
+| `footer` | node | — | Custom footer content in place of the built-in pair, such as a three-button or leading-text FooterActions layout. |
 | `dividers` | bool | `false` | A rule under the header and over the footer. |
 | `loading` | bool | `false` | Skeleton bars in place of the body while its content loads. |
 | `show` | bool | `false` | Whether the dialog is open. Controlled by the parent: set it to false in `onClose` to close. |
@@ -212,7 +213,7 @@ touched in the Harness tab.
 | `keyboard` | bool | `true` | Escape closes, by default. `false` for a dialog that has to be answered. |
 | `renderAs` | enum | `'modal'` | `modal` (default) opens as a real dialog over the page; `inline` draws the same panel in place as a plain block, for docs previews. |
 | `primaryButton` | buttonShape | — | The confirming footer button, drawn on the right. Takes `text` (default "Confirm"), `onClick`, `appearance` (default `primary`), `spacing` and `icon`. |
-| `secondaryButton` | buttonShape | — | The cancelling footer button, drawn left of the primary one. Takes `text` (default "Cancel"), `onClick`, `appearance` (default `default`), `spacing` and `icon`. |
+| `secondaryButton` | buttonShape | — | The secondary footer button, drawn in the left half when a primary button is also given. Takes `text` (default "Discard"), `onClick`, `appearance` (default `default`), `spacing` and `icon`. |
 | `onClose` | func | — | Called when the dialog asks to close: the close button, Escape (unless `keyboard` is false) or a press on the blanket (unless `blanket` blocks it). The parent sets `show` to false. |
 | `width` | enum or number or string | `'6-col'` | `4-col` · `6-col` · `8-col` · `10-col`: 4 · 6 · 8 · 10 columns of the screen grid plus the modal pad. Grows with the screen, never shrinks, ignores the sidebar. A number or a length is a fixed width, kept for the callers that still pass one. |
 | `className` | string | `''` | Extra class names added to the dialog panel beside the component's own. |
