@@ -5,6 +5,7 @@ import {
     Button,
     EmptyState,
     FilterButton,
+    Icon,
     IconButton,
     PanelBody,
     PanelCloseAction,
@@ -53,8 +54,8 @@ const DefaultToolbar = () => (
         search={<TextField label="Search students" isLabelHidden placeholder="Search students" elemBeforeInput={<i className={iconClass('magnifying-glass')} aria-hidden="true" />} type="search" />}
         filters={(
             <>
-                <Button text="Status" appearance="subtle" iconAfter="chevron-down" onClick={() => {}} />
-                <Button text="Tutor" appearance="subtle" iconAfter="chevron-down" onClick={() => {}} />
+                <Button text="Status" appearance="subtle" iconAfter={<Icon name="chevron-down" size={12} />} onClick={() => {}} />
+                <Button text="Tutor" appearance="subtle" iconAfter={<Icon name="chevron-down" size={12} />} onClick={() => {}} />
             </>
         )}
         count="48 students"

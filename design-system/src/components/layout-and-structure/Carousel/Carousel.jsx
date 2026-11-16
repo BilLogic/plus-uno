@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 // Component folders, not the barrel: the barrel exports Carousel itself, so
 // importing it from here would read Carousel before it is defined.
 import IconButton from '@/components/forms-and-inputs/IconButton';
+import Icon from '@/components/images-and-icons/Icon';
 import Heading from '@/components/text-and-data-display/Heading';
 import ProgressIndicator from '@/components/status-indicators/ProgressIndicator';
 import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
@@ -380,7 +381,7 @@ const Carousel = ({
                     )}
                     {isStatic && (
                         <IconButton
-                            icon="chevron-left"
+                            icon={<Icon name="chevron-left" size={12} />}
                             label="Previous slide"
                             shape="circle"
                             isDisabled={!wraps && index === 0}
@@ -395,7 +396,7 @@ const Carousel = ({
                     <CarouselProgressIndicator slides={slides} index={index} timed={autoplays} clockRef={progressClockRef} onSelect={goTo} />
                     {isStatic && (
                         <IconButton
-                            icon="chevron-right"
+                            icon={<Icon name="chevron-right" size={12} />}
                             label="Next slide"
                             shape="circle"
                             isDisabled={!wraps && index === count - 1}

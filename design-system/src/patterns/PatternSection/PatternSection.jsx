@@ -1,6 +1,6 @@
 import React, { useId, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Button, IconButton, Skeleton } from '@/components';
+import { Button, Icon, IconButton, Skeleton } from '@/components';
 import { HeadingLevelContext, headingTag, useHeadingLevel } from '@/lib/headingLevel';
 import { FRAME_LAYOUT } from '../Frame/frameLayout';
 import { useSplitHolds } from '../Frame/SplitContext';
@@ -276,8 +276,8 @@ const PatternSection = ({
     const view = sectionDetailView({ splitHolds, hasSelection: detailOpen });
     const stepper = (onPrevious || onNext) && (
         <>
-            <IconButton icon="chevron-up" label={previousLabel} appearance="subtle" spacing="compact" isDisabled={previousDisabled} onClick={onPrevious} />
-            <IconButton icon="chevron-down" label={nextLabel} appearance="subtle" spacing="compact" isDisabled={nextDisabled} onClick={onNext} />
+            <IconButton icon={<Icon name="chevron-up" size={12} />} label={previousLabel} appearance="subtle" spacing="compact" isDisabled={previousDisabled} onClick={onPrevious} />
+            <IconButton icon={<Icon name="chevron-down" size={12} />} label={nextLabel} appearance="subtle" spacing="compact" isDisabled={nextDisabled} onClick={onNext} />
         </>
     );
     const withDetail = hasDetailRegion ? (

@@ -128,6 +128,10 @@ $btn-appearances: (
         line-height: 1;
         flex-shrink: 0;
 
+        &:has(> .plus-icon--size-12) {
+            font-size: var(--icon-sm);
+        }
+
         i,
         .fa-solid,
         .fa-regular,
