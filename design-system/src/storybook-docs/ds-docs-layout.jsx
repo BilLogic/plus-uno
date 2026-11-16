@@ -244,13 +244,14 @@ export function DocsCanvasShell({ description, children, attachSourceBelow = tru
  * component page is Examples (these), Code (generated) and Usage.
  *
  * @param {unknown} props.of - the story export, as `<ComponentExample of={ButtonStories.Primary} />`
- * @param {string} props.title - the appearance, state or size the story shows
+ * @param {string} [props.title] - the appearance, state or size the story shows; leave it out when
+ *   the example is the section's only one and its heading already names it, so the page does not repeat itself
  * @param {React.ReactNode} [props.description] - when it applies, in one sentence
  */
 export function ComponentExample({ of: ofStory, title, description }) {
     return (
         <>
-            <h3>{title}</h3>
+            {title ? <h3>{title}</h3> : null}
             <DocsCanvasShell description={description}>
                 <Canvas of={ofStory} story={{ inline: true }} layout="padded" sourceState="hidden" />
             </DocsCanvasShell>
