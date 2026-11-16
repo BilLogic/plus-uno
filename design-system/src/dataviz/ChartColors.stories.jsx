@@ -206,7 +206,6 @@ export const EveryChartInEveryMode = {
             PyramidChart: 'part-to-whole',
             TimelineChart: 'temporal',
             PackedBubbleChart: 'distribution',
-            FunnelChart: 'flow',
         };
         const typeStrays = [];
         const dirtyWeightCharts = new Set();

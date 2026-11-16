@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
 import chartTheme from '@/dataviz/chartTheme';
+import { dataLabelFormat } from '@/dataviz/chartFormat';
+import { CATEGORICAL, mostToLeast } from '@/dataviz/palette';
 
 /**
  * FunnelChart Component
@@ -9,8 +11,14 @@ import chartTheme from '@/dataviz/chartTheme';
  */
 const FunnelChart = ({
     data = [],
-    height = 400
+    height = 400,
+    sort = false
 }) => {
+    const orderedData = useMemo(
+        () => (sort ? mostToLeast(data) : data),
+        [data, sort],
+    );
+
     const options = {
         ...chartTheme,
         chart: {
@@ -20,12 +28,12 @@ const FunnelChart = ({
         },
         title: { text: null },
         plotOptions: {
-            series: {
+            funnel: {
                 dataLabels: {
+                    ...chartTheme.plotOptions.series.dataLabels,
                     enabled: true,
-                    format: '<b>{point.name}</b> ({point.y:,.0f})',
-                    softConnector: true,
-                    style: chartTheme.tooltip.style
+                    format: dataLabelFormat('{point.y:,.0f}', '{point.name}'),
+                    softConnector: true
                 },
                 center: ['40%', '50%'],
                 neckWidth: '30%',
@@ -35,13 +43,15 @@ const FunnelChart = ({
         },
         tooltip: {
             ...chartTheme.tooltip,
-            pointFormat: '{point.name}: <b>{point.y:,.0f}</b>'
+            headerFormat: '',
+            pointFormat: dataLabelFormat('{point.y:,.0f}', '{point.name}')
         },
         series: [{
             name: 'Funnel',
-            data: data.map((item, i) => ({
+            colorByPoint: true,
+            data: orderedData.map((item, i) => ({
                 ...item,
-                color: item.color || chartTheme.colors[i % chartTheme.colors.length]
+                color: item.color || CATEGORICAL[i % CATEGORICAL.length]
             }))
         }]
     };
@@ -61,7 +71,9 @@ FunnelChart.propTypes = {
         color: PropTypes.string
     })),
     /** Chart height in pixels */
-    height: PropTypes.number
+    height: PropTypes.number,
+    /** Keep sequential stage order by default (`false`); pass `true` to sort stages from most to least. */
+    sort: PropTypes.bool
 };
 
 export default FunnelChart;

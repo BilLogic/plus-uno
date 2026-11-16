@@ -62,7 +62,8 @@ category and sized, use `PackedBubbleChart`. For co-occurring terms, use
 ## Data shape
 
 `data` is an array of `{ name, weight }` (both required), where `name` is the
-word and `weight` is its count.
+word and `weight` is its count. Words sort from most to least by `weight` by
+default (`sort`); pass `sort={false}` to preserve input order.
 
 ```jsx
 <WordCloud

@@ -1,96 +1,78 @@
 import React from 'react';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
 import ArcDiagram from './ArcDiagram';
 
 export default {
     title: 'Data visualizations/Flow & relationships/Arc diagram',
     component: ArcDiagram,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## Arc Diagram
+    argTypes: {
+        data: { control: 'object', description: 'Array of [from, to, weight] connection rows' },
+        height: { control: 'number', description: 'Chart height in pixels' },
+    },
+};
 
-Shows **nodes and links along a single axis** to visualize connections.
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
+};
 
-### Overview
-Shows **nodes and links along a single axis** to visualize connections.
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--card-stack-md)',
+};
 
----
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
+};
 
-### How to Read
-- **Nodes** = placed on a line
-- **Arcs** = connections between nodes
-- **Arc thickness** = strength/weight of connection
+const subjectLinks = [
+    ['Algebra', 'Geometry', 14],
+    ['Algebra', 'Physics', 18],
+    ['Geometry', 'Physics', 9],
+    ['Physics', 'Chemistry', 12],
+    ['Chemistry', 'Biology', 15],
+    ['Algebra', 'Statistics', 11],
+    ['Statistics', 'Biology', 7],
+];
 
----
-
-### When to Use
-
-| Use Case | Recommendation |
-|----------|----------------|
-| Linear connections | ✅ Ideal |
-| Story character interactions | ✅ Ideal |
-| Step-based flows | ✅ Good |
-| Complex networks | ❌ Use Network Graph |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Lesson Flow** | Valid transitions between lessons |
-| **Student Interactions** | Connections between classmates |
-| **Topic Relations** | Linked concepts |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Align the arc diagram setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
-
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
-                `
-            }
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Subject connections</Heading>
+                <p style={captionStyle}>
+                    Weighted co-enrollment links across ordered subjects, with arc thickness encoding shared student count.
+                </p>
+                <ArcDiagram data={subjectLinks} height={400} />
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelectorAll('.highcharts-container .highcharts-series').length).toBeGreaterThanOrEqual(1);
+        });
+        for (const node of canvasElement.querySelectorAll('.highcharts-container text, .highcharts-container tspan')) {
+            if (!node.textContent?.trim()) continue;
+            const style = getComputedStyle(node);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(['500', '600']).toContain(style.fontWeight);
         }
-    }
+    },
 };
-
-const connectionData = {
-    data: [
-        ['CMU', 'Lincoln Middle', 10],
-        ['CMU', 'Roosevelt K-8', 15],
-        ['Pitt', 'North High', 8],
-        ['Pitt', 'Lincoln Middle', 5],
-        ['Duquesne', 'South High', 12]
-    ]
-};
-
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Subject Connections</h3>
-            <ArcDiagram {...connectionData} />
-        </section>
-    </div>
-);
-
 
 export const Interactive = {
     args: {
         data: [
-            ['A', 'B', 1],
-            ['A', 'C', 2],
-            ['B', 'C', 1],
-            ['C', 'D', 3]
+            ['Fractions', 'Ratios', 8],
+            ['Fractions', 'Decimals', 12],
+            ['Ratios', 'Decimals', 6],
+            ['Decimals', 'Percentages', 15],
         ],
-        height: 400
-    }
+        height: 400,
+    },
 };

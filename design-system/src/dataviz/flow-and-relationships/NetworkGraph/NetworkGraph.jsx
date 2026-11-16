@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
 import chartTheme from '@/dataviz/chartTheme';
-import { CHROME } from '@/dataviz/palette';
+import { BRAND, CHROME } from '@/dataviz/palette';
 
 /**
  * NetworkGraph Component
@@ -34,16 +34,18 @@ const NetworkGraph = ({
             }
         },
         series: [{
+            color: BRAND,
             dataLabels: {
                 enabled: true,
-                linkFormat: '',
-                style: chartTheme.tooltip.style
+                linkFormat: ''
             },
             data: data,
             nodes: nodes.length > 0 ? nodes : undefined
         }],
         tooltip: {
-            ...chartTheme.tooltip
+            ...chartTheme.tooltip,
+            headerFormat: '',
+            pointFormat: '{point.name}'
         }
     };
 

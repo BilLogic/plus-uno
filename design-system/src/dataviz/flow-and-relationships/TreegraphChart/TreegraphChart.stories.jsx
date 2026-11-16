@@ -1,98 +1,78 @@
 import React from 'react';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
 import TreegraphChart from './TreegraphChart';
 
 export default {
     title: 'Data visualizations/Flow & relationships/Treegraph chart',
     component: TreegraphChart,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## Treegraph Chart
+    argTypes: {
+        data: { control: 'object', description: 'Flat array of { id, parent?, name } nodes' },
+        height: { control: 'number', description: 'Chart height in pixels' },
+    },
+};
 
-Shows **hierarchical structures** like family trees or decision trees.
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
+};
 
-### Overview
-Shows **hierarchical structures** like family trees or decision trees.
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--card-stack-md)',
+};
 
----
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
+};
 
-### How to Read
-- **Nodes** = individual items
-- **Connections** = parent-child relationships
-- **Layout** = hierarchical tree structure
+const curriculumTree = [
+    { id: 'math', name: 'Middle school math' },
+    { id: 'ratios', parent: 'math', name: 'Ratios & proportions' },
+    { id: 'expressions', parent: 'math', name: 'Expressions & equations' },
+    { id: 'unit-rates', parent: 'ratios', name: 'Unit rates' },
+    { id: 'percent', parent: 'ratios', name: 'Percent problems' },
+    { id: 'linear', parent: 'expressions', name: 'Linear equations' },
+    { id: 'inequalities', parent: 'expressions', name: 'Inequalities' },
+];
 
----
-
-### When to Use
-
-| Use Case | Recommendation |
-|----------|----------------|
-| Decision trees | ✅ Ideal |
-| Family trees | ✅ Ideal |
-| Process flows | ✅ Good |
-| Org charts | ✅ Good (or use OrgChart) |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Prerequisite Chains** | Course dependencies |
-| **Logic Flows** | Learning path decisions |
-| **Categorization** | Topic hierarchy |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Align the treegraph chart setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
-
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
-                `
-            }
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Curriculum topic hierarchy</Heading>
+                <p style={captionStyle}>
+                    Subject, unit and lesson breakdown with node boxes rounded on the nested visual role radius.
+                </p>
+                <TreegraphChart data={curriculumTree} height={500} />
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelectorAll('.highcharts-container .highcharts-series').length).toBeGreaterThanOrEqual(1);
+        });
+        for (const node of canvasElement.querySelectorAll('.highcharts-container text, .highcharts-container tspan')) {
+            if (!node.textContent?.trim()) continue;
+            const style = getComputedStyle(node);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(['500', '600']).toContain(style.fontWeight);
         }
-    }
+    },
 };
-
-const familyTreeData = {
-    data: [
-        { id: 'GP1', name: 'Grandparent 1' },
-        { id: 'GP2', name: 'Grandparent 2' },
-        { id: 'P1', parent: 'GP1', name: 'Parent 1' },
-        { id: 'P2', parent: 'GP1', name: 'Parent 2' },
-        { id: 'C1', parent: 'P1', name: 'Child 1' },
-        { id: 'C2', parent: 'P1', name: 'Child 2' },
-        { id: 'C3', parent: 'P2', name: 'Cousin 1' }
-    ]
-};
-
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Course Prerequisites</h3>
-            <TreegraphChart {...familyTreeData} />
-        </section>
-    </div>
-);
-
 
 export const Interactive = {
     args: {
         data: [
-            { id: 'A', name: 'Root' },
-            { id: 'B', parent: 'A', name: 'Branch 1' },
-            { id: 'C', parent: 'A', name: 'Branch 2' },
-            { id: 'D', parent: 'B', name: 'Leaf 1' }
+            { id: 'math', name: 'Math' },
+            { id: 'fractions', parent: 'math', name: 'Fractions' },
+            { id: 'ratios', parent: 'math', name: 'Ratios' },
+            { id: 'equivalent', parent: 'fractions', name: 'Equivalent fractions' },
         ],
-        height: 500
-    }
+        height: 500,
+    },
 };

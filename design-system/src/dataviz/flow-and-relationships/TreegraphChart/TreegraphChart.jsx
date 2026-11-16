@@ -21,6 +21,11 @@ const TreegraphChart = ({
             height: height
         },
         title: { text: null },
+        tooltip: {
+            ...chartTheme.tooltip,
+            headerFormat: '',
+            pointFormat: '{point.name}'
+        },
         series: [{
             type: 'treegraph',
             link: { color: CHROME.link },
@@ -29,10 +34,6 @@ const TreegraphChart = ({
                 parent: item.parent,
                 name: item.name
             })),
-            tooltip: {
-                ...chartTheme.tooltip,
-                pointFormat: '{point.name}'
-            },
             marker: {
                 symbol: 'rect',
                 width: '25%',
@@ -40,11 +41,7 @@ const TreegraphChart = ({
             },
             borderRadius: CHART_NODE_RADIUS,
             dataLabels: {
-                enabled: true,
-                style: {
-                    color: 'var(--ds-text)',
-                    textOutline: 'none'
-                }
+                enabled: true
             },
             levels: [{
                 level: 0,
