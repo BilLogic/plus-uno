@@ -529,7 +529,7 @@ const ReorderTableDemo = () => {
             actions={(
                 <Button
                     text={descending ? 'Sort by name' : 'Sort by sessions'}
-                    appearance="default"
+                    appearance="subtle"
                     spacing="compact"
                     onClick={() => setDescending((prev) => !prev)}
                 />

@@ -46,7 +46,7 @@ children, each keeping its own appearance and spacing.
 
 ## State
 
-<ComponentExample of={ButtonGroupStories.Selected} title="Selected" description="Selection lives on each Button, not on the group." />
+<ComponentExample of={ButtonGroupStories.Selected} title="Selected" description="Items hug their label; a selected Button draws the selected fill plus a 1px --ds-border-selected border raised above its neighbors." />
 
 </div>
 
@@ -93,8 +93,8 @@ Use `ButtonGroup` for a short row of related actions or view toggles that read a
 ## Parts
 
 1. **Container.** Groups its children with `role="group"` and the `label` as its name. It paints nothing of its own.
-2. **Buttons.** Button or Icon button children. Each keeps its own appearance, spacing and state.
-3. **Seam.** Inner corners are square and neighbors overlap by one edge, so the row reads as one control.
+2. **Buttons.** Button or Icon button children that hug their labels. Each keeps its own appearance, spacing and state.
+3. **Seam.** Inner corners are square and neighbors overlap by one edge, so the row reads as one control and a selected item's 1px border stays unbroken.
 
 ### States
 
@@ -105,7 +105,7 @@ Use `ButtonGroup` for a short row of related actions or view toggles that read a
 <tbody>
 <tr><td>Hovered</td><td>The hovered button rises above its neighbors so its fill is not covered.</td></tr>
 <tr><td>Focused</td><td>The focused button rises above its neighbors so its ring is not covered.</td></tr>
-<tr><td>Selected</td><td>Set on each button with <code>isSelected</code>, which sets <code>aria-pressed</code>, draws the selected fill and a 1px <code>--ds-border-selected</code> edge, and rises above its neighbors. The group has no selection logic.</td></tr>
+<tr><td>Selected</td><td>Set on each button with <code>isSelected</code>, which sets <code>aria-pressed</code>, draws <code>--ds-background-selected</code>, <code>--ds-text-selected</code> and a 1px <code>--ds-border-selected</code> border, and rises above its neighbors. The group has no selection logic.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -116,8 +116,9 @@ Use `ButtonGroup` for a short row of related actions or view toggles that read a
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Outer corners</td><td>6: <code>--button-radius-default</code>.</td></tr>
+<tr><td>Outer corners</td><td>6: <code>--button-radius-default</code>. Compact 4: <code>--button-radius-compact</code>.</td></tr>
 <tr><td>Seam overlap</td><td>1: <code>--border-width-default</code>.</td></tr>
+<tr><td>Selected border</td><td>1px <code>--ds-border-selected</code> over <code>--ds-background-selected</code>.</td></tr>
 </tbody>
 </DocsTable>
 

@@ -88,6 +88,16 @@ test('3. a Usage section stranded in the Examples tab is caught', () => {
     found.some((f) => /"Accessibility" is in the "examples" tab but belongs in "usage"/.test(f)),
     found.join('\n'),
   );
+
+  const brokenFooter = page({ examples: ['Overview', 'Footer actions'] });
+  const foundFooter = checkFile(COMPONENT, brokenFooter, true);
+  assert.ok(
+    foundFooter.some((f) => /"Footer actions" is in the "examples" tab but belongs in "usage"/.test(f)),
+    foundFooter.join('\n'),
+  );
+
+  const okFooter = page({ examples: ['Overview'], usage: ['Usage', 'Footer actions', 'Related'] });
+  assert.deepEqual(checkFile(COMPONENT, okFooter, true), []);
 });
 
 test('3b. an Examples section pulled into Usage is caught — the rule runs both ways', () => {

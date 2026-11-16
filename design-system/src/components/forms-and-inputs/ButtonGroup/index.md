@@ -79,8 +79,8 @@ Same group: `Button` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup
 ## Parts
 
 1. **Container.** Groups its children with `role="group"` and the `label` as its name. It paints nothing of its own.
-2. **Buttons.** Button or Icon button children. Each keeps its own appearance, spacing and state.
-3. **Seam.** Inner corners are square and neighbors overlap by one edge, so the row reads as one control.
+2. **Buttons.** Button or Icon button children that hug their labels. Each keeps its own appearance, spacing and state.
+3. **Seam.** Inner corners are square and neighbors overlap by one edge, so the row reads as one control and a selected item's 1px border stays unbroken.
 
 ### States
 
@@ -88,14 +88,15 @@ Same group: `Button` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup
 | --- | --- |
 | Hovered | The hovered button rises above its neighbors so its fill is not covered. |
 | Focused | The focused button rises above its neighbors so its ring is not covered. |
-| Selected | Set on each button with `isSelected`, which sets `aria-pressed`, draws the selected fill and a 1px `--ds-border-selected` edge, and rises above its neighbors. The group has no selection logic. |
+| Selected | Set on each button with `isSelected`, which sets `aria-pressed`, draws `--ds-background-selected`, `--ds-text-selected` and a 1px `--ds-border-selected` border, and rises above its neighbors. The group has no selection logic. |
 
 ### Tokens
 
 | Part | Token |
 | --- | --- |
-| Outer corners | 6: `--button-radius-default`. |
+| Outer corners | 6: `--button-radius-default`. Compact 4: `--button-radius-compact`. |
 | Seam overlap | 1: `--border-width-default`. |
+| Selected border | 1px `--ds-border-selected` over `--ds-background-selected`. |
 
 ## Content guidelines
 

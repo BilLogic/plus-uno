@@ -3,7 +3,8 @@ import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { Modal, MODAL_WIDTHS } from '@/components';
-import { IconButton, Button, Select } from '@/components';
+import { FooterActions, IconButton, Button, Select } from '@/components';
+import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 export default {
@@ -575,4 +576,91 @@ export const Focused = {
 HeaderOptions.play = async ({ canvasElement }) => {
     await expect(getComputedStyle(canvasElement.querySelector('.plus-modal')).borderTopLeftRadius, 'Modal radius is 16').toBe('16px');
     await expect(getComputedStyle(canvasElement.querySelector('.plus-modal-footer')).borderBottomLeftRadius, 'footer inner corners are square').toBe('0px');
+};
+
+/** Footer actions (r5): 4-track placement inside Modal padding, spacious (48) fit buttons, no Cancel. */
+export const FooterLayouts = {
+    render: () => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', '--plus-overlay-screen': '1024px', width: '100%' }}>
+            <Modal
+                show
+                renderAs="inline"
+                width="6-col"
+                data-testid="modal-footer-one"
+                title="Session summary ready"
+                body="Parents can view the published summary on the session card."
+                primaryButton={{ text: 'Done' }}
+                onClose={() => {}}
+            />
+            <Modal
+                show
+                renderAs="inline"
+                width="6-col"
+                data-testid="modal-footer-two"
+                title="Unsaved session notes"
+                body="Closing now drops your edits to Jordan's session."
+                secondaryButton={{ text: 'Discard' }}
+                primaryButton={{ text: 'Save notes' }}
+                onClose={() => {}}
+            />
+            <Modal
+                show
+                renderAs="inline"
+                width="8-col"
+                data-testid="modal-footer-leading"
+                title="Edit session plan"
+                body="Update the lesson goals before sharing with the family."
+                footer={(
+                    <FooterActions>
+                        <Button appearance="subtle" text="Skip for now" />
+                        <Button text="Save draft" />
+                        <Button appearance="primary" text="Publish plan" />
+                    </FooterActions>
+                )}
+                onClose={() => {}}
+            />
+            <Modal
+                show
+                renderAs="inline"
+                width="6-col"
+                data-testid="modal-footer-destructive"
+                title="Delete session recording?"
+                body="The recording is removed permanently. Archiving hides it from students while keeping supervisor access."
+                secondaryButton={{ text: 'Archive instead' }}
+                primaryButton={{ text: 'Delete recording', appearance: 'danger' }}
+                onClose={() => {}}
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const close = (a, b) => Math.abs(a - b) <= 1.5;
+
+        const oneModal = canvas.getByTestId('modal-footer-one');
+        const oneFooter = oneModal.querySelector('.plus-footer-actions');
+        const oneTracks = footerTracks(oneFooter);
+        const done = within(oneModal).getByRole('button', { name: 'Done' });
+        await expect(close(done.getBoundingClientRect().left, oneTracks.span(3, 4).left), 'single Modal button starts at track 3').toBe(true);
+        await expect(close(done.getBoundingClientRect().height, 48), 'Modal footer button draws 48 high').toBe(true);
+
+        const twoModal = canvas.getByTestId('modal-footer-two');
+        const twoFooter = twoModal.querySelector('.plus-footer-actions');
+        const twoTracks = footerTracks(twoFooter);
+        const discard = within(twoModal).getByRole('button', { name: 'Discard' });
+        const save = within(twoModal).getByRole('button', { name: 'Save notes' });
+        await expect(close(discard.getBoundingClientRect().left, twoTracks.span(1, 2).left), 'secondary starts at track 1').toBe(true);
+        await expect(close(save.getBoundingClientRect().left, twoTracks.span(3, 4).left), 'primary starts at track 3').toBe(true);
+
+        const leadingModal = canvas.getByTestId('modal-footer-leading');
+        const leadingFooter = leadingModal.querySelector('.plus-footer-actions');
+        const leadingTracks = footerTracks(leadingFooter);
+        const skip = within(leadingModal).getByRole('button', { name: 'Skip for now' });
+        const draft = within(leadingModal).getByRole('button', { name: 'Save draft' });
+        await expect(close(skip.getBoundingClientRect().left, leadingTracks.box.left), 'leading subtle button hugs left edge').toBe(true);
+        await expect(close(draft.getBoundingClientRect().left, leadingTracks.track(3).left), 'filled buttons sit in tracks 3 and 4').toBe(true);
+
+        const destructiveModal = canvas.getByTestId('modal-footer-destructive');
+        const del = within(destructiveModal).getByRole('button', { name: 'Delete recording' });
+        await expect(del).toHaveClass('plus-btn--danger');
+    },
 };

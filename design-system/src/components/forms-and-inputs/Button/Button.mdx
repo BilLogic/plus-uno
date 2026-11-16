@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ButtonStories from './Button.stories.jsx';
-import { Button } from '@/components';
+import { Button, FooterActions } from '@/components';
 import {
     DocsCanvasShell,
     DocsInteractivePlayground,
@@ -11,6 +11,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const figmaMeta = {
@@ -111,6 +112,8 @@ A button triggers an action and lets people know what happens next.
 
 ## Size and layout
 
+<ComponentExample of={ButtonStories.Anatomy} title="Anatomy" description="Soft neutral container with no border, optional leading icon, medium-weight label and optional trailing chevron." />
+
 <ComponentExample of={ButtonStories.Compact} title="Compact" description="Spacing compact draws 24 high, for table rows and inline toolbars. Default draws 32." />
 
 <ComponentExample of={ButtonStories.Spacious} title="Spacious" description="Spacing spacious draws 48 high, for modal, panel and focused-view footers." />
@@ -118,6 +121,8 @@ A button triggers an action and lets people know what happens next.
 <ComponentExample of={ButtonStories.Icons} title="Icons" description="An icon before, after, or on both sides of the label." />
 
 <ComponentExample of={ButtonStories.FitContainer} title="Fit container" description="shouldFitContainer stretches the button to its parent's width, with the label centered." />
+
+<ComponentExample of={ButtonStories.FooterLayouts} title="Footer tracks" description="Inside FooterActions, spacious buttons draw 48 high and fill their assigned tracks across the four-track grid." />
 
 <ComponentExample of={ButtonStories.Truncation} title="Truncation" description="A label that does not fit ends in an ellipsis. Screen readers still read the full text." />
 
@@ -177,9 +182,9 @@ Use `Button` for an action on the current page: submit a form, mark attendance, 
 <tr><th>Appearance</th><th>When to use</th></tr>
 </thead>
 <tbody>
-<tr><td>Default</td><td>Most actions that are not the main call to action of a page or area. Example: "Reschedule session".</td></tr>
+<tr><td>Default</td><td>Most actions that are not the main call to action of a page or area, and the secondary half of a footer. Draws a soft neutral fill with no outline. Example: "Reschedule session".</td></tr>
 <tr><td>Primary</td><td>The main call to action or a form submission. One per page or area. Example: "Book session".</td></tr>
-<tr><td>Subtle</td><td>Secondary actions beside a primary button, and toolbars or button groups where items already read as interactive. Example: "Cancel" beside "Save notes".</td></tr>
+<tr><td>Subtle</td><td>Secondary actions in headers, toolbars, button groups and inline popups, or a leading text action in a footer. Example: "Not now", or "Cancel" in a popup.</td></tr>
 <tr><td>Warning</td><td>Confirms an action that may cause a significant change or a loss of data, often in a confirmation modal. Example: "Remove from this week".</td></tr>
 <tr><td>Danger</td><td>The final confirmation of a destructive, irreversible action. Example: "Delete session recording".</td></tr>
 <tr><td>Discovery</td><td>The call to action for a new experience. Example: "Try the new schedule view".</td></tr>
@@ -204,11 +209,11 @@ Use `Button` for an action on the current page: submit a form, mark attendance, 
 
 ## Parts
 
-1. **Container.** The pressable area: 32 high at default spacing, 24 at compact and 48 at spacious.
-2. **Icon before** (optional). A Font Awesome Free glyph at 16, before the label.
-3. **Label.** Body/default at the medium weight. It says what the action does.
-4. **Icon after** (optional). A Font Awesome Free glyph at 16, after the label.
-5. **Spinner** (loading only). A 16 `Spinner` in the label color that replaces the label and icons while the button is busy.
+1. **Container.** Soft neutral fill (`--ds-background-neutral`) with no border on `default`, transparent on `subtle`, and bold semantic fills on `primary`, `warning`, `danger`, `discovery` and `ai`. Draws `32` high (`--control-md`) at `default` spacing, `24` (`--control-sm`) at `compact`, and `48` (`--control-xl`) at `spacious` inside `FooterActions`. Stretches to its parent's width with `shouldFitContainer`, keeping the label centered.
+2. **Icon before** (optional). A Font Awesome Free glyph at `16` (`--icon-md`), before the label (`ai` always draws its sparkle).
+3. **Label.** Body/default at the medium weight, centered in the container; truncates with an ellipsis when constrained.
+4. **Icon after** (optional). A Font Awesome Free glyph at `16` (`--icon-md`), or `12` (`--icon-sm`) for a trailing chevron.
+5. **Spinner** (loading only). A `16` `Spinner` in the label color that replaces the label and icons while the button is busy.
 
 Most buttons need no icon. Add one only when the glyph has an established meaning, such as `plus` for add.
 
@@ -253,14 +258,73 @@ Most buttons need no icon. Add one only when the glyph has an established meanin
 
 <div className="sb-ds-doc-section">
 
+## Footer actions
+
+<DocsLink id="components-forms-and-inputs-button-footer-actions">FooterActions</DocsLink> lays out actions in the footer slot of a <DocsLink id="components-messaging-modal">Modal</DocsLink>, <DocsLink id="templates-panel">Panel</DocsLink> or <DocsLink id="templates-frame">focused view</DocsLink>. Secondary buttons draw the `default` soft neutral fill (`--ds-background-neutral`) with no outline so the pair balances without heavy borders.
+
+1. **Four equal tracks.** `FooterActions` divides the width inside container padding into four equal tracks with an `--inline-md` gap; every track button uses `spacing="spacious"` (`48` high) and `shouldFitContainer`.
+2. **One button.** Takes the right half (tracks `3` and `4`), or all four tracks when the container is `4` columns (`400`) wide or narrower.
+3. **Two buttons.** Split `50/50` across the full width (tracks `1`–`2` and `3`–`4`): secondary on the left in the `default` soft neutral fill (`--ds-background-neutral`), `primary` on the right.
+4. **Three buttons.** Take one quarter each in tracks `2`, `3` and `4`; only the rightmost is `primary`.
+5. **Leading text button.** A text action (such as a danger "Delete session", or a `subtle` "Not now" or "Skip") hugs the left content edge and never takes a track; the filled buttons then sit in tracks `3` and `4`.
+6. **Destructive dialogs.** The `danger` action is the primary on the right and the safer alternative (such as "Archive instead") is the `default` secondary on the left, split `50/50`.
+7. **No Cancel in footers.** The header `×` dismisses, so footers carry real actions ("Discard" and "Save", never "Cancel"). "Cancel" appears only in popups (which have no `×`): `compact`, `subtle`, right-aligned with the action.
+8. **Steps.** "Back" and "Next" split `50/50` across the footer.
+
+<DoDontPair
+    doExample={<FooterActions><Button text="Discard" /><Button appearance="primary" text="Save changes" /></FooterActions>}
+    doCaption="Two footer actions split 50/50: soft neutral secondary on the left, primary on the right."
+    dontExample={<div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--inline-md)' }}><Button text="Cancel" /><Button appearance="primary" text="Save changes" /></div>}
+    dontCaption="Hugging 32-high buttons and a Cancel label that duplicates the × close button."
+/>
+
+<DoDontPair
+    doExample={<FooterActions><Button appearance="subtle" text="Not now" /><Button text="Keep draft" /><Button appearance="primary" text="Publish" /></FooterActions>}
+    doCaption="A subtle text button hugs the left edge while the filled pair sits in tracks 3 and 4."
+    dontExample={<FooterActions><Button appearance="primary" text="Publish" /><Button text="Keep draft" /><Button text="Not now" /></FooterActions>}
+    dontCaption="Primary placed first and a dismissive option given a filled track."
+/>
+
+<DoDontPair
+    doExample={<FooterActions><Button text="Archive instead" /><Button appearance="danger" text="Delete session" /></FooterActions>}
+    doCaption="Destructive footer splits 50/50 with the safer alternative on the left and danger on the right."
+    dontExample={<FooterActions><Button text="Cancel" /><Button appearance="primary" text="Delete session" /></FooterActions>}
+    dontCaption="Cancel offers no safer path, and brand primary masks an irreversible deletion."
+/>
+
+### Hug or fill
+
+Buttons fill in only two places: the footer slot, and the single action of a narrow container (`4` columns or fewer). Everywhere else they hug their label.
+
+<DocsTable>
+<thead>
+<tr><th>Surface</th><th>Buttons</th><th>Story</th></tr>
+</thead>
+<tbody>
+<tr><td>Page header</td><td><code>default</code> 32; at most one <code>primary</code>, rightmost</td><td><DocsLink id="components-layout-and-structure-page-header">Layout/PageHeader</DocsLink></td></tr>
+<tr><td>Card or section header</td><td><code>subtle</code> <code>compact</code> text button and/or <code>subtle</code> icon button</td><td><DocsLink id="templates-card">Patterns/PatternCard</DocsLink>, <DocsLink id="templates-section">Section</DocsLink></td></tr>
+<tr><td>Table toolbar</td><td><code>compact</code>; <code>subtle</code> secondary, <code>primary</code> rightmost</td><td><DocsLink id="templates-table">Patterns/PatternTable</DocsLink></td></tr>
+<tr><td>Table row</td><td><code>subtle</code> icon buttons or one <code>subtle</code> <code>compact</code> text action; never filled</td><td><DocsLink id="templates-table">PatternTable</DocsLink>, <DocsLink id="components-text-and-data-display-dynamic-table">DynamicTable</DocsLink></td></tr>
+<tr><td>Popup inline confirm</td><td><code>compact</code>; <code>subtle</code> Cancel plus the action</td><td><DocsLink id="templates-popup">Patterns/Popup</DocsLink></td></tr>
+<tr><td>Empty state</td><td>centered; <code>default</code> 32 on a page, <code>compact</code> 24 in a card</td><td><DocsLink id="components-messaging-empty-state">Messaging/EmptyState</DocsLink>, <DocsLink id="patterns-states-empty">Docs/Empty</DocsLink></td></tr>
+<tr><td>Banner and Flag</td><td><code>subtle</code> <code>compact</code> text actions after the message</td><td><DocsLink id="components-messaging-banner">Messaging/Banner</DocsLink>, <DocsLink id="components-messaging-flag">Messaging/Flag</DocsLink></td></tr>
+<tr><td>Button group</td><td>items hug; selected item is the selected fill plus a 1px border</td><td><DocsLink id="components-forms-and-inputs-button-button-group">Navigation/ButtonGroup</DocsLink></td></tr>
+<tr><td>Inline with a field</td><td>same height as the field, <code>default</code> appearance</td><td><DocsLink id="patterns-forms">Docs/Forms</DocsLink>, <DocsLink id="templates-form">Patterns/Form</DocsLink></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Best practices
 
 ### Use one primary action per area.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><Button appearance="primary" text="Book session" /><Button appearance="subtle" text="Cancel" /></div>}
+    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><Button appearance="subtle" text="View schedule" /><Button appearance="primary" text="Book session" /></div>}
     doCaption="One primary button, with the secondary action subtle beside it."
-    dontExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><Button appearance="primary" text="Book session" /><Button appearance="primary" text="Cancel" /></div>}
+    dontExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><Button appearance="primary" text="View schedule" /><Button appearance="primary" text="Book session" /></div>}
     dontCaption="Two primary buttons in one area compete for attention."
 />
 
@@ -277,7 +341,7 @@ The `ai` appearance marks the main AI action in a region, such as "Generate summ
 
 ### Pick the spacing for the surrounding space.
 
-Use `default` spacing in most places, `compact` for tables and inline toolbars, and `spacious` in modal, panel and focused-view footers.
+Use `default` spacing in most places, `compact` for tables, headers and inline popups, and `spacious` in modal, panel and focused-view footers.
 
 ### Keep an action enabled and explain on press.
 
@@ -292,7 +356,7 @@ An action that is not ready stays enabled. When pressed, move focus to the first
 
 ### Align the primary button with its group.
 
-Right-align buttons in focused tasks and Modals, with the primary on the right. Left-align on single-page forms and full-page tasks, with the primary on the left.
+In Modal, Panel and focused-view footers, `FooterActions` places the primary action in the rightmost track. On single-page forms and full-page tasks, left-align buttons with the primary first.
 
 </div>
 
@@ -330,6 +394,7 @@ Right-align buttons in focused tasks and Modals, with the primary on the right. 
 
 ## Related
 
+- `FooterActions`: use when placing spacious buttons across the four-track footer slot of a Modal, Panel or focused view.
 - `IconButton`: use when space allows only an icon with a tooltip label.
 - `LinkButton`: use when the control navigates to another page or URL.
 - `ButtonGroup`: use when related buttons sit together in a connected row.

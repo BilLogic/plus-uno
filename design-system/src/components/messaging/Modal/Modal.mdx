@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as ModalStories from './Modal.stories.jsx';
-import { Modal, MODAL_WIDTHS, MODAL_WIDTH_PX, MODAL_WIDTH_SCREENS } from '@/components';
+import { Button, FooterActions, Modal, MODAL_WIDTHS, MODAL_WIDTH_PX, MODAL_WIDTH_SCREENS } from '@/components';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -10,6 +10,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const figmaMeta = {
@@ -69,7 +70,9 @@ The width examples are drawn at the 1024 screen.
 
 <ComponentExample of={ModalStories.HeightFill} title="Height fill" description="Sits at the cap, for settings, editors and record peeks that should not jump." />
 
-<ComponentExample of={ModalStories.Layout} title="Footer" description="Header only, and header with a secondary and a primary action." />
+<ComponentExample of={ModalStories.Layout} title="Footer" description="Header only, and header with a 50/50 secondary and primary pair." />
+
+<ComponentExample of={ModalStories.FooterLayouts} title="Footer tracks" description="One action in the right half, two split 50/50, a leading subtle action beside tracks 3–4, and a 50/50 destructive pair." />
 
 <ComponentExample of={ModalStories.Content} title="Content" description="Short and long bodies, with and without footer actions." />
 
@@ -137,10 +140,10 @@ destructive confirmation, a short form that would derail the page, a detail view
 the person closes and returns from. It is the one messaging component that takes
 focus from the page, so it fits when interrupting is the point.
 
-The footer is built in: pass `primaryButton` and `secondaryButton` as objects and
-the component renders the `Button` pair, aligned right. Pass `footer` for other
-actions, such as a Delete on the left or a single primary. Opening a Modal
-closes a floating Sidebar; a docked one stays.
+The footer runs on `FooterActions`: pass `primaryButton` and `secondaryButton`
+as objects for a `50/50` pair (or `primaryButton` alone for the right half), or
+pass `footer` with `<FooterActions>` for three actions or a leading text
+button. Opening a Modal closes a floating Sidebar; a docked one stays.
 
 ### Width guidance
 
@@ -188,7 +191,7 @@ height hugs its content up to the cap the Blanket sets
 1. **Blanket.** Dims the page and holds focus inside.
 2. **Header.** Title, optional description, header actions and the close button.
 3. **Body.** Text or any content; scrolls when it overflows.
-4. **Footer.** Appears only when a button or `footer` is given: a secondary and a primary.
+4. **Footer.** Appears only when a button or `footer` is given: `FooterActions` divides the width inside container padding into four equal tracks.
 5. **Dividers.** Optional rules under the header and over the footer.
 
 The tokens each part draws are read from `Modal.scss` and listed under Tokens
@@ -214,6 +217,65 @@ touched in the Harness tab.
 
 <div className="sb-ds-doc-section">
 
+## Footer actions
+
+`Modal` places its footer actions inside <DocsLink id="components-forms-and-inputs-button-footer-actions">FooterActions</DocsLink>, sharing one four-track contract with <DocsLink id="templates-panel">Panel</DocsLink> and <DocsLink id="templates-frame">focused views</DocsLink>. Secondary buttons draw the `default` soft neutral fill (`--ds-background-neutral`) with no outline.
+
+1. **Four equal tracks.** `FooterActions` divides the width inside the modal padding into four equal tracks with an `--inline-md` gap; every track button uses `spacing="spacious"` (`48` high) and `shouldFitContainer`.
+2. **One button.** Takes the right half (tracks `3` and `4`), or all four tracks when the container is `4` columns (`400`) wide or narrower.
+3. **Two buttons.** Split `50/50` across the full width (tracks `1`–`2` and `3`–`4`): secondary on the left in the `default` soft neutral fill (`--ds-background-neutral`), `primary` on the right.
+4. **Three buttons.** Take one quarter each in tracks `2`, `3` and `4`; only the rightmost is `primary`.
+5. **Leading text button.** A text action (such as a danger "Delete session", or a `subtle` "Not now" or "Skip") hugs the left content edge and never takes a track; the filled buttons then sit in tracks `3` and `4`.
+6. **Destructive dialogs.** The `danger` action is the primary on the right and the safer alternative (such as "Archive instead") is the `default` secondary on the left, split `50/50`.
+7. **No Cancel in footers.** The header `×` dismisses, so footers carry real actions ("Discard" and "Save", never "Cancel"). "Cancel" appears only in popups (which have no `×`): `compact`, `subtle`, right-aligned with the action.
+8. **Steps.** "Back" and "Next" split `50/50` across the footer.
+
+<DoDontPair
+    doExample={<div style={narrowScreen}><Modal show renderAs="inline" title="Unsaved session notes" body="Closing now drops your edits." secondaryButton={{ text: 'Discard' }} primaryButton={{ text: 'Save notes' }} onClose={() => {}} /></div>}
+    doCaption="Real verbs split 50/50: soft neutral Discard on the left, primary Save notes on the right."
+    dontExample={<div style={narrowScreen}><Modal show renderAs="inline" title="Unsaved session notes" body="Closing now drops your edits." secondaryButton={{ text: 'Cancel' }} primaryButton={{ text: 'Save notes' }} onClose={() => {}} /></div>}
+    dontCaption="Cancel duplicates the header × instead of naming what happens to the edits."
+/>
+
+<DoDontPair
+    doExample={<div style={narrowScreen}><Modal show renderAs="inline" title="Share lesson plan" body="Publish now or save a draft for later." footer={<FooterActions><Button appearance="subtle" text="Not now" /><Button text="Save draft" /><Button appearance="primary" text="Publish" /></FooterActions>} onClose={() => {}} /></div>}
+    doCaption="A subtle text button hugs the left edge while the filled actions take tracks 3 and 4."
+    dontExample={<div style={narrowScreen}><Modal show renderAs="inline" title="Share lesson plan" body="Publish now or save a draft for later." footer={<FooterActions><Button appearance="primary" text="Publish" /><Button text="Save draft" /><Button text="Not now" /></FooterActions>} onClose={() => {}} /></div>}
+    dontCaption="Primary placed first and a dismissive option given a filled track."
+/>
+
+<DoDontPair
+    doExample={<div style={narrowScreen}><Modal show renderAs="inline" title="Delete recording?" body="Archiving hides it from students while keeping supervisor access." secondaryButton={{ text: 'Archive instead' }} primaryButton={{ text: 'Delete recording', appearance: 'danger' }} onClose={() => {}} /></div>}
+    doCaption="Destructive confirmation splits 50/50 with the safer alternative on the left and danger on the right."
+    dontExample={<div style={narrowScreen}><Modal show renderAs="inline" title="Delete recording?" body="Archiving hides it from students while keeping supervisor access." secondaryButton={{ text: 'Cancel' }} primaryButton={{ text: 'Delete recording', appearance: 'primary' }} onClose={() => {}} /></div>}
+    dontCaption="Cancel offers no safer option, and brand primary masks a destructive action."
+/>
+
+### Hug or fill
+
+Buttons fill in only two places: the footer slot, and the single action of a narrow container (`4` columns or fewer). Everywhere else they hug their label.
+
+<DocsTable>
+<thead>
+<tr><th>Surface</th><th>Buttons</th><th>Story</th></tr>
+</thead>
+<tbody>
+<tr><td>Page header</td><td><code>default</code> 32; at most one <code>primary</code>, rightmost</td><td><DocsLink id="components-layout-and-structure-page-header">Layout/PageHeader</DocsLink></td></tr>
+<tr><td>Card or section header</td><td><code>subtle</code> <code>compact</code> text button and/or <code>subtle</code> icon button</td><td><DocsLink id="templates-card">Patterns/PatternCard</DocsLink>, <DocsLink id="templates-section">Section</DocsLink></td></tr>
+<tr><td>Table toolbar</td><td><code>compact</code>; <code>subtle</code> secondary, <code>primary</code> rightmost</td><td><DocsLink id="templates-table">Patterns/PatternTable</DocsLink></td></tr>
+<tr><td>Table row</td><td><code>subtle</code> icon buttons or one <code>subtle</code> <code>compact</code> text action; never filled</td><td><DocsLink id="templates-table">PatternTable</DocsLink>, <DocsLink id="components-text-and-data-display-dynamic-table">DynamicTable</DocsLink></td></tr>
+<tr><td>Popup inline confirm</td><td><code>compact</code>; <code>subtle</code> Cancel plus the action</td><td><DocsLink id="templates-popup">Patterns/Popup</DocsLink></td></tr>
+<tr><td>Empty state</td><td>centered; <code>default</code> 32 on a page, <code>compact</code> 24 in a card</td><td><DocsLink id="components-messaging-empty-state">Messaging/EmptyState</DocsLink>, <DocsLink id="patterns-states-empty">Docs/Empty</DocsLink></td></tr>
+<tr><td>Banner and Flag</td><td><code>subtle</code> <code>compact</code> text actions after the message</td><td><DocsLink id="components-messaging-banner">Messaging/Banner</DocsLink>, <DocsLink id="components-messaging-flag">Messaging/Flag</DocsLink></td></tr>
+<tr><td>Button group</td><td>items hug; selected item is the selected fill plus a 1px border</td><td><DocsLink id="components-forms-and-inputs-button-button-group">Navigation/ButtonGroup</DocsLink></td></tr>
+<tr><td>Inline with a field</td><td>same height as the field, <code>default</code> appearance</td><td><DocsLink id="patterns-forms">Docs/Forms</DocsLink>, <DocsLink id="templates-form">Patterns/Form</DocsLink></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Best practices
 
 ### Size the Modal to its content with a step of `MODAL_WIDTHS`.
@@ -223,9 +285,9 @@ A short confirmation takes `6-col`, a short form `8-col`, a table or an editor
 screen.
 
 <DoDontPair
-    doExample={<div style={scaledScreen}><Modal show renderAs="inline" width="6-col" title="Remove this session?" body="The student is told it was canceled." secondaryButton={{ text: 'Cancel' }} primaryButton={{ text: 'Remove' }} onClose={() => {}} /></div>}
+    doExample={<div style={scaledScreen}><Modal show renderAs="inline" width="6-col" title="Remove this session?" body="The student is told it was canceled." secondaryButton={{ text: 'Keep session' }} primaryButton={{ text: 'Remove', appearance: 'danger' }} onClose={() => {}} /></div>}
     doCaption="The narrowest step for a short question."
-    dontExample={<div style={scaledScreen}><Modal show renderAs="inline" width="10-col" title="Remove this session?" body="The student is told it was canceled." secondaryButton={{ text: 'Cancel' }} primaryButton={{ text: 'Remove' }} onClose={() => {}} /></div>}
+    dontExample={<div style={scaledScreen}><Modal show renderAs="inline" width="10-col" title="Remove this session?" body="The student is told it was canceled." secondaryButton={{ text: 'Keep session' }} primaryButton={{ text: 'Remove', appearance: 'danger' }} onClose={() => {}} /></div>}
     dontCaption="The widest step around one sentence."
 />
 
@@ -257,7 +319,7 @@ short body reads cleaner without them.
 
 `showBottomButtons` defaults to true, and the footer renders only when
 `primaryButton`, `secondaryButton` or `footer` is given; describe the actions as
-objects and the component renders the Button pair.
+objects and the component renders the `FooterActions` pair.
 
 ### Show a follow-up decision in the same Modal; a Modal never opens on another Modal.
 
@@ -271,7 +333,7 @@ focused task, each with its own Blanket.
   title={confirming ? 'Discard changes?' : 'Session settings'}
   show={open}
   onClose={close}
-  secondaryButton={confirming ? { text: 'Back', onClick: () => setConfirming(false) } : { text: 'Cancel', onClick: close }}
+  secondaryButton={confirming ? { text: 'Back', onClick: () => setConfirming(false) } : { text: 'Discard', onClick: close }}
   primaryButton={confirming ? { text: 'Discard changes', appearance: 'danger', onClick: discard } : { text: 'Save', onClick: save }}
 >
   {confirming ? 'Your edits to this session are not saved.' : settingsForm}
@@ -291,7 +353,7 @@ focused task, each with its own Blanket.
 <tbody>
 <tr><td>Title the Modal with the action or decision: "Delete account?".</td><td>Use a vague title such as "Warning".</td></tr>
 <tr><td>Say what happens and whether it can be undone.</td><td>Hide the consequence in the body.</td></tr>
-<tr><td>Label buttons with verbs that match the title: "Delete", "Cancel".</td><td>Use "Yes" and "No".</td></tr>
+<tr><td>Label buttons with verbs that match the title: "Delete recording", "Archive instead".</td><td>Use "Cancel", "Yes" or "No" in a Modal footer.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -336,6 +398,7 @@ focused task, each with its own Blanket.
 
 ## Related
 
+- `FooterActions`: use when placing three actions or a leading text button across the Modal's four-track footer slot.
 - `PatternModal`: use when a docs page or a mockup draws the Modal shell inline, with no focus trap.
 - `Blanket`: use when a new blocking layer needs the dimmed screen under it; `Modal` brings its own.
 - Templates: use when choosing between a Modal and a focused page; its Usage section weighs the two.
