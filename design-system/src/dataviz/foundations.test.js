@@ -484,7 +484,7 @@ describe('data-viz foundations', () => {
         expect(hover?.animation?.duration).toBeGreaterThan(0);
 
         expect(inactive?.enabled).toBe(true);
-        expect(inactive?.opacity).toBe(0.4);
+        expect(inactive?.opacity).toBe(0.3);
         expect(inactive?.animation?.duration).toBeGreaterThan(0);
 
         expect(select?.enabled).toBe(true);
