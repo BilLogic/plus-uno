@@ -24,7 +24,7 @@ Also asked as: page section, toolbar, section header, block, region.
 
 Use `PatternSection` when content has a heading, shares actions, shows or hides as a unit, or takes its own span of the grid; otherwise the content belongs to the Section above it. The header is the Section's, not the Table's: the title row names it, and the view bar under it holds the views at the start and everything that acts on the content at the end, so switching views can swap a table for cards while the bar stays put.
 
-A Section has two looks, `none` and `subtle`, and five parts: header, body, side, detail and footer. The side and the detail take either fill; a detail expands an item in place (see Best practices below).
+A Section has two looks, `none` and `subtle`, and five parts: header, body, side, detail and footer. The side and the detail take either fill. The `detail` region is a split view today; a **Section detail** in the product sense is an inline expand (see Best practices below).
 
 ## Motion
 
@@ -182,7 +182,7 @@ A Section with a view bar, a detail and a footer. The title, the first pill and 
 1. **Title row.** The h2, an optional one-line description, and actions only when there is no view bar.
 2. **View bar** (optional). Pill views at the start; at the end, in order, the format switch, Search, filters, More and the labeled Primary.
 3. **Body.** A Table, a card grid, a list, a form or subsections. A Table's head row follows the bar with nothing between.
-4. **Detail** (optional). An item expanded in place inside the Section, with its own header and footer.
+4. **Detail** (optional). Today the `detail` region draws the picked record beside the list, 5 of 12 columns, with Previous and Next and its own footer. It is not for queue pages: a queue page docks a `Panel` beside the list.
 5. **Footer** (optional). Paging or "View all".
 
 ## Slots
@@ -197,7 +197,7 @@ A Section with a view bar, a detail and a footer. The title, the first pill and 
 | `children` | The body: a Table, a card grid, a list, a form or subsections. |
 | `layout="split"` · `side` | A second column at the end, for a summary. |
 | `sidePlacement` | Planned. `start` puts the side first, for a filter side or a step rail. |
-| `detail` · `detailTitle` · `detailFooter` | An item expanded in place inside the Section, with its own title and footer. |
+| `detail` · `detailTitle` · `detailFooter` | The picked record beside the list, with Previous and Next. Not for queue pages, which dock a `Panel`. |
 | `footer` | Paging or "View all". |
 
 The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, and the Section holds nothing for it: Dynamic table.
