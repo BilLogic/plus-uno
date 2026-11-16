@@ -64,10 +64,11 @@ group, use `BarChart`; for change over time, use `LineChart`.
 ## Data shape
 
 `categories` is an array of strings. `data` holds one precomputed
-`[low, q1, median, q3, high]` array per category in `categories` order. There is
-one series and no outlier points; if low and high are trimmed (such as to the
-5th and 95th percentiles), state that in the description. `height` defaults to
-400.
+`[low, q1, median, q3, high]` array per category in `categories` order. Categories
+sort from highest median to lowest by default; pass `sort={false}` for ordinal
+or temporal categories. There is one series and no outlier points; if low and
+high are trimmed (such as to the 5th and 95th percentiles), state that in the
+description. `height` defaults to 400.
 
 ```jsx
 <BoxPlotChart
@@ -87,7 +88,7 @@ one series and no outlier points; if low and high are trimmed (such as to the
 
 ## Color and accessibility
 
-- **Single series color.** Box, stem and whiskers use `--chart-categorical-1`; position and the contrasting `--ds-border-inverse` median line carry the reading without hue.
+- **Single series color.** Box, stem and whiskers use `--chart-brand` with no legend; position and the contrasting `--ds-border-inverse` median line carry the reading without hue.
 - **Limit group count.** Keep to roughly ten or fewer groups so category labels do not crowd.
 - **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
 - **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).

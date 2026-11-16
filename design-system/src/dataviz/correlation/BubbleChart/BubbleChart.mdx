@@ -48,7 +48,7 @@ give it its own `BarChart`.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Bubbles', <>One per <C>[x, y, z]</C> point. Area scales with <C>z</C> (10 to 60 px across), filled at 70% opacity so overlaps show through.</>],
+        ['Bubbles', <>One per <C>[x, y, z]</C> point. Area scales with <C>z</C> between <C>CHART_BUBBLE_MIN_SIZE</C> (<C>--size-075</C>) and <C>CHART_BUBBLE_MAX_SIZE</C> (<C>--size-300</C>), filled at 70% opacity so overlaps show through.</>],
         ['X axis', <>First measure, with vertical grid lines; titled by <C>xAxisLabel</C>.</>],
         ['Y axis', <>Second measure; titled by <C>yAxisLabel</C>.</>],
         ['Legend', 'Names each series.'],

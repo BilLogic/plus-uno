@@ -4,7 +4,17 @@ import React from 'react';
 import { render } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import chartTheme, * as chartThemeModule from '@/dataviz/chartTheme';
-import { BODY, CHART_MARKER_RADIUS, CHART_NODE_HEIGHT, CHART_NODE_RADIUS, MEDIUM, SEMIBOLD, TABULAR } from '@/dataviz/chartTheme';
+import {
+    BODY,
+    CHART_BUBBLE_MAX_SIZE,
+    CHART_BUBBLE_MIN_SIZE,
+    CHART_MARKER_RADIUS,
+    CHART_NODE_HEIGHT,
+    CHART_NODE_RADIUS,
+    MEDIUM,
+    SEMIBOLD,
+    TABULAR,
+} from '@/dataviz/chartTheme';
 import {
     CHART_VALUE_CLASS,
     dataLabelFormat,
@@ -74,11 +84,53 @@ describe('data-viz foundations', () => {
         expect(offenders).toEqual([]);
     });
 
-    it('exports shared mark radius and size roles from chartTheme and keeps tokenNumber internal', () => {
+    it('exports shared mark radius and size roles from chartTheme and keeps tokenNumber internal', async () => {
         expect(CHART_MARKER_RADIUS).toBe(3);
+        expect(CHART_BUBBLE_MIN_SIZE).toBe(12);
+        expect(CHART_BUBBLE_MAX_SIZE).toBe(48);
         expect(CHART_NODE_RADIUS).toBe(8);
         expect(CHART_NODE_HEIGHT).toBe(32);
         expect('tokenNumber' in chartThemeModule).toBe(false);
+
+        document.documentElement.style.setProperty('--size-075', '16px');
+        document.documentElement.style.setProperty('--size-300', '52px');
+        document.documentElement.style.setProperty('--pad-x-md', '99px');
+        document.documentElement.style.setProperty('--control-lg', '99px');
+        try {
+            vi.resetModules();
+            const fresh = await import('@/dataviz/chartTheme');
+            expect(fresh.CHART_MARKER_RADIUS).toBe(4);
+            expect(fresh.CHART_BUBBLE_MIN_SIZE).toBe(16);
+            expect(fresh.CHART_BUBBLE_MAX_SIZE).toBe(52);
+        } finally {
+            document.documentElement.style.removeProperty('--size-075');
+            document.documentElement.style.removeProperty('--size-300');
+            document.documentElement.style.removeProperty('--pad-x-md');
+            document.documentElement.style.removeProperty('--control-lg');
+        }
+    });
+
+    it('clears Highcharts hardcoded 2000ms CSS data-label transition on packedbubble through PlusChart', () => {
+        capturedPlusChartOptions.length = 0;
+        render(
+            React.createElement(PlusChart, {
+                options: {
+                    ...chartTheme,
+                    chart: { ...chartTheme.chart, type: 'packedbubble' },
+                    plotOptions: {
+                        packedbubble: {
+                            dataLabels: {
+                                ...chartTheme.plotOptions.series.dataLabels,
+                                enabled: true,
+                            },
+                        },
+                    },
+                    series: [{ name: 'Group', data: [{ name: 'Item', value: 100 }] }],
+                },
+            }),
+        );
+        const merged = capturedPlusChartOptions.at(-1);
+        expect(merged.plotOptions.packedbubble.dataLabels.style.transition).toBe('none');
     });
 
     it('every chart that sets a Highcharts tooltip spreads the shared theme tooltip', () => {

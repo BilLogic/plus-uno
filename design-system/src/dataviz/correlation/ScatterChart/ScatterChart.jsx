@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme from '@/dataviz/chartTheme';
+import chartTheme, { CHART_MARKER_RADIUS } from '@/dataviz/chartTheme';
+import { seriesSwatch, tooltipHeaderFormat, valueSpan } from '@/dataviz/chartFormat';
 import { seriesColor } from '@/dataviz/palette';
 
 /**
@@ -21,6 +22,12 @@ const ScatterChart = ({
         type: 'scatter',
         color: s.color || seriesColor(i, all.length)
     }));
+
+    const tooltipFormat = {
+        ...chartTheme.tooltip,
+        headerFormat: tooltipHeaderFormat('{series.name}'),
+        pointFormat: `${seriesSwatch()} ${valueSpan('{point.x}')}, ${valueSpan('{point.y}')}`
+    };
 
     const options = {
         ...chartTheme,
@@ -47,32 +54,19 @@ const ScatterChart = ({
                 text: yAxisLabel
             }
         },
+        tooltip: tooltipFormat,
         plotOptions: {
             scatter: {
                 marker: {
-                    radius: 5,
-                    states: {
-                        hover: {
-                            enabled: true,
-                            lineColor: 'var(--ds-border-bold)'
-                        }
-                    }
+                    radius: CHART_MARKER_RADIUS
                 },
-                states: {
-                    hover: {
-                        marker: {
-                            enabled: false
-                        }
-                    }
-                },
-                tooltip: {
-                    ...chartTheme.tooltip,
-                    headerFormat: '<b>{series.name}</b><br>',
-                    pointFormat: '{point.x}, {point.y}'
-                }
+                tooltip: tooltipFormat
             }
         },
-        legend: { enabled: true },
+        legend: {
+            ...chartTheme.legend,
+            enabled: true
+        },
         series: seriesWithTheme
     };
 

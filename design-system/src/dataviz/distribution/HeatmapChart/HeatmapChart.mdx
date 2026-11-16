@@ -48,17 +48,16 @@ individual points, use `ScatterChart`. For one dimension, use `HistogramChart`.
     head={['Part', 'What it does']}
     rows={[
         ['Cells', <>One per <C>[x, y, value]</C> point, shaded from the ramp. <C>pointPadding</C> (0 to 1) opens a gap between cells.</>],
-        ['Cell labels', <>Raw value on each cell; on by default and toggled by <C>showDataLabels</C>.</>],
+        ['Cell labels', <>Raw value on each cell in tabular figures; on by default and toggled by <C>showDataLabels</C>.</>],
         ['X axis', <>Names columns from <C>xCategories</C>.</>],
         ['Y axis', <>Names rows from <C>yCategories</C> (first at top), with no axis title.</>],
-        ['Color bar', <>Vertical legend on the right from lowest to highest value. <C>showLegend</C> hides it; <C>hideLegendNavigation</C> hides its scroll arrows.</>],
+        ['Color bar', <>Vertical legend centered vertically on the right (<C>verticalAlign: &apos;middle&apos;</C>) from lowest to highest value. <C>showLegend</C> hides it; <C>hideLegendNavigation</C> hides its scroll arrows.</>],
         ['Tooltip', 'Column name, row name and value to two decimals.'],
     ]}
 />
 
 `compactSpacing` trims the chart inset to the tighter chart spacing step.
-The heatmap enters on the shared chart entrance; `enableAnimation={false}`
-draws it without one.
+The heatmap enters on the shared chart entrance.
 
 </div>
 

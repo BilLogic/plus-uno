@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
 import chartTheme, { CHART_LINE_WIDTH_NUMBER, CHART_GRID_WIDTH_NUMBER } from '@/dataviz/chartTheme';
+import { valueSpan } from '@/dataviz/chartFormat';
+import { BRAND, CHROME, sortCategories } from '@/dataviz/palette';
 
 /**
  * BoxPlotChart Component
@@ -12,8 +14,35 @@ const BoxPlotChart = ({
     data = [],
     categories = [],
     yAxisLabel = 'Value',
-    height = 400
+    height = 400,
+    sort = true
 }) => {
+    const {
+        categories: orderedCategories,
+        series: [{ data: orderedData }],
+    } = useMemo(
+        () =>
+            sort
+                ? sortCategories({
+                      categories,
+                      series: [{ data }],
+                      value: (d) => (Array.isArray(d) ? d[2] : d?.median ?? 0),
+                  })
+                : { categories, series: [{ data }] },
+        [categories, data, sort],
+    );
+
+    const tooltipFormat = {
+        ...chartTheme.tooltip,
+        pointFormat: [
+            `Maximum: ${valueSpan('{point.high}')}`,
+            `Upper quartile: ${valueSpan('{point.q3}')}`,
+            `Median: ${valueSpan('{point.median}')}`,
+            `Lower quartile: ${valueSpan('{point.q1}')}`,
+            `Minimum: ${valueSpan('{point.low}')}`,
+        ].join('<br/>')
+    };
+
     const options = {
         ...chartTheme,
         chart: {
@@ -22,35 +51,35 @@ const BoxPlotChart = ({
             height: height
         },
         title: { text: null },
+        legend: { enabled: false },
         xAxis: {
             ...chartTheme.xAxis,
-            categories: categories
+            categories: orderedCategories
         },
         yAxis: {
             ...chartTheme.yAxis,
-            title: { text: yAxisLabel, style: chartTheme.yAxis.labels.style }
+            title: { ...chartTheme.yAxis.title, text: yAxisLabel }
         },
-        tooltip: {
-            ...chartTheme.tooltip
-        },
+        tooltip: tooltipFormat,
         plotOptions: {
             boxplot: {
-                fillColor: chartTheme.colors[0],
+                fillColor: BRAND,
                 lineWidth: CHART_LINE_WIDTH_NUMBER,
-                medianColor: 'var(--ds-border-inverse)',
+                medianColor: CHROME.separator,
                 // The median line reads as the one line in the box this chart asks a reader to find first — a step bolder than the box outline, off the same stroke token rather than a bare `3`.
                 medianWidth: CHART_LINE_WIDTH_NUMBER * 1.5,
-                stemColor: chartTheme.colors[0],
+                stemColor: BRAND,
                 stemWidth: CHART_GRID_WIDTH_NUMBER,
-                whiskerColor: chartTheme.colors[0],
+                whiskerColor: BRAND,
                 whiskerLength: '50%',
-                whiskerWidth: CHART_LINE_WIDTH_NUMBER
+                whiskerWidth: CHART_LINE_WIDTH_NUMBER,
+                tooltip: tooltipFormat
             }
         },
         series: [{
             name: 'Distribution',
-            data: data,
-            color: chartTheme.colors[0]
+            data: orderedData,
+            color: BRAND
         }]
     };
 
@@ -69,7 +98,9 @@ BoxPlotChart.propTypes = {
     /** Y-axis label */
     yAxisLabel: PropTypes.string,
     /** Chart height */
-    height: PropTypes.number
+    height: PropTypes.number,
+    /** Sort categories from most to least by median; pass false for ordinal or temporal axes. */
+    sort: PropTypes.bool
 };
 
 export default BoxPlotChart;

@@ -63,9 +63,11 @@ between groups, use `VennDiagram`.
 ## Data shape
 
 `data` is an array of `{ name, data }` groups, where `data` holds
-`{ name, value }` items. Keep values within the fixed 0 to 1,000 size range so
-bubbles above 1,000 do not all clamp to the maximum size. `height` defaults to
-500; `splitSeries` defaults to `true`.
+`{ name, value }` items. Groups sort from largest total to smallest and bubbles
+within each group sort from largest `value` to smallest by default; pass
+`sort={false}` to keep input order. Keep values within the fixed 0 to 1,000 size
+range so bubbles above 1,000 do not all clamp to the maximum size. `height`
+defaults to 500; `splitSeries` defaults to `true`.
 
 ```jsx
 <PackedBubbleChart
@@ -83,10 +85,10 @@ bubbles above 1,000 do not all clamp to the maximum size. `height` defaults to
 
 ## Color and accessibility
 
-- **One color per group.** Groups follow the [categorical order](?path=/docs/data-visualizations-color--docs) from slot 1. Past six groups, fold the smallest into "Other".
+- **Automatic group color.** One group uses `--chart-brand`; two or more follow the [categorical order](?path=/docs/data-visualizations-color--docs) from slot 1. Past six groups, fold the smallest into "Other".
 - **Area is a rough encoding.** Readers can spot the largest bubble but cannot judge exact ratios; pair with a table or `BarChart` when exact numbers matter.
 - **Thresholded labels.** Bubbles at 50 or under carry no label, so their names appear only in the tooltip.
-- **Fixed black label ink.** Bubble labels draw in black rather than a text token and do not adapt to dark mode; verify legibility before shipping in dark mode.
+- **Adaptive label ink.** Each bubble label picks `--ds-text` or `--ds-text-inverse` for contrast against its fill and updates when color mode or contrast changes.
 - **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
 - **Contrast.** Series colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 
