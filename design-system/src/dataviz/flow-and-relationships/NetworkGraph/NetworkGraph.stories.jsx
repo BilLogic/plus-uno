@@ -1,139 +1,103 @@
 import React from 'react';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
 import NetworkGraph from './NetworkGraph';
 
 export default {
     title: 'Data visualizations/Flow & relationships/Network graph',
     component: NetworkGraph,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## Network Graph
+    argTypes: {
+        data: { control: 'object', description: 'Array of [from, to] node-name pairs' },
+        nodes: { control: 'object', description: 'Optional array of { id, color } node overrides' },
+        height: { control: 'number', description: 'Chart height in pixels' },
+    },
+};
 
-A network graph shows **relationships and connections** between entities as nodes and links.
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
+};
 
-### Overview
-A network graph shows **relationships and connections** between entities as nodes and links.
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--card-stack-md)',
+};
 
----
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
+};
 
-### How to Read
-- **Nodes** = entities (people, concepts, items)
-- **Links/edges** = relationships between entities
-- **Clusters** = groups of closely connected nodes
-- **Central nodes** = highly connected entities
+const conceptMapData = [
+    ['Mathematics', 'Algebra'],
+    ['Mathematics', 'Geometry'],
+    ['Mathematics', 'Calculus'],
+    ['Algebra', 'Equations'],
+    ['Algebra', 'Functions'],
+    ['Geometry', 'Shapes'],
+    ['Geometry', 'Trigonometry'],
+    ['Calculus', 'Derivatives'],
+    ['Calculus', 'Integrals'],
+    ['Functions', 'Calculus'],
+    ['Trigonometry', 'Calculus'],
+];
 
----
+const peerNetworkData = [
+    ['Priya S.', 'Marcus T.'],
+    ['Priya S.', 'Dana K.'],
+    ['Marcus T.', 'Dana K.'],
+    ['Dana K.', 'Jordan R.'],
+    ['Jordan R.', 'Elena M.'],
+    ['Jordan R.', 'Sam L.'],
+    ['Elena M.', 'Sam L.'],
+];
 
-### When to Use
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Math concept map</Heading>
+                <p style={captionStyle}>
+                    Unweighted prerequisite and topic links rendered in the single-series brand color.
+                </p>
+                <NetworkGraph data={conceptMapData} height={500} />
+            </section>
 
-| Use Case | Recommendation |
-|----------|----------------|
-| Showing relationships | ✅ Ideal |
-| Social networks | ✅ Ideal |
-| Concept maps | ✅ Good |
-| Hierarchical data | ❌ Use Sunburst/Treemap |
-| Sequential flows | ❌ Use Sankey |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Concept Maps** | How learning topics connect |
-| **Student Networks** | Peer tutoring relationships |
-| **Skill Dependencies** | Prerequisites between skills |
-| **Tutor-Student Matching** | Assignment relationships |
-| **Content Relationships** | How lessons relate to each other |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Use meaningful node labels
-✅ Color-code node types
-✅ Allow interactive exploration
-✅ Show edge weights when relevant
-
-**Avoid:**
-❌ Too many nodes (>50 becomes cluttered)
-❌ Missing labels
-❌ Overlapping node positions
-                `
-            }
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Peer study network</Heading>
+                <p style={captionStyle}>
+                    Co-tutoring pairs across a smaller cohort at a compact height.
+                </p>
+                <NetworkGraph data={peerNetworkData} height={400} />
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelectorAll('.highcharts-container .highcharts-series').length).toBe(2);
+        });
+        for (const node of canvasElement.querySelectorAll('.highcharts-container text, .highcharts-container tspan')) {
+            if (!node.textContent?.trim()) continue;
+            const style = getComputedStyle(node);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(['500', '600']).toContain(style.fontWeight);
         }
     },
-    argTypes: {
-        data: { control: 'object', description: 'Array of [from, to] connections' },
-        nodes: { control: 'object', description: 'Optional node definitions' },
-        height: { control: 'number', description: 'Chart height in pixels' }
-    }
 };
 
-const conceptMapData = {
-    data: [
-        ['CMU', 'Lincoln Middle'],
-        ['CMU', 'Roosevelt K-8'],
-        ['CMU', 'North High'],
-        ['Lincoln Middle', 'Tuesday Zoom'],
-        ['Lincoln Middle', 'Thursday Zoom'],
-        ['Roosevelt K-8', 'Monday Pencil'],
-        ['Roosevelt K-8', 'Wednesday Pencil'],
-        ['North High', 'Friday Zoom'],
-        ['North High', 'Friday Pencil']
-    ]
-};
-
-const socialNetworkData = {
-    data: [
-        ['Alice', 'Bob'],
-        ['Alice', 'Carol'],
-        ['Bob', 'David'],
-        ['Carol', 'David'],
-        ['Carol', 'Eve'],
-        ['David', 'Eve'],
-        ['Eve', 'Frank']
-    ]
-};
-
-/**
- * Overview: Displays chart variants
- */
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Concept Map</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
-                Shows relationships between math concepts.
-            </p>
-            <NetworkGraph {...conceptMapData} />
-        </section>
-
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Social Network</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
-                Shows connections between people.
-            </p>
-            <NetworkGraph {...socialNetworkData} height={400} />
-        </section>
-    </div>
-);
-
-/**
- * Interactive: Playground
- */
 export const Interactive = {
     args: {
         height: 500,
         data: [
-            ['A', 'B'],
-            ['A', 'C'],
-            ['B', 'D'],
-            ['C', 'D'],
-            ['D', 'E']
+            ['Fractions', 'Ratios'],
+            ['Fractions', 'Decimals'],
+            ['Ratios', 'Percentages'],
+            ['Decimals', 'Percentages'],
+            ['Percentages', 'Proportions'],
         ],
-        nodes: []
-    }
+        nodes: [],
+    },
 };

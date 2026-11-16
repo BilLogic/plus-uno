@@ -108,6 +108,7 @@ describe('chart sources', () => {
             console.info(`[dataviz soft guard — ${report.length} chart files remaining]`, report);
         }
         expect(report.filter((entry) => entry.startsWith('comparison/'))).toEqual([]);
+        expect(report.filter((entry) => entry.startsWith('flow-and-relationships/'))).toEqual([]);
         expect(report.filter((entry) => entry.startsWith('temporal/'))).toEqual([]);
         expect(report.filter((entry) => entry.startsWith('part-to-whole/'))).toEqual([]);
     });

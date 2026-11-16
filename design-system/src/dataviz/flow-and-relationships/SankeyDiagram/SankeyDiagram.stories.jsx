@@ -1,137 +1,98 @@
 import React from 'react';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
 import SankeyDiagram from './SankeyDiagram';
 
 export default {
     title: 'Data visualizations/Flow & relationships/Sankey diagram',
     component: SankeyDiagram,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## Sankey Diagram
+    argTypes: {
+        data: { control: 'object', description: 'Array of [from, to, weight] flow rows' },
+        height: { control: 'number', description: 'Chart height in pixels' },
+    },
+};
 
-A Sankey diagram visualizes **flow and transfer** between entities, with link width representing volume.
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
+};
 
-### Overview
-A Sankey diagram visualizes **flow and transfer** between entities, with link width representing volume.
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--card-stack-md)',
+};
 
----
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
+};
 
-### How to Read
-- **Nodes** = stages or entities
-- **Links** = flow between nodes
-- **Link width** = proportional to flow volume
-- Follow the flow from left to right (or source to destination)
+const referralFlowData = [
+    ['School referral', 'First session', 140],
+    ['Teacher nomination', 'First session', 85],
+    ['Family request', 'First session', 55],
+    ['First session', 'Algebra support', 130],
+    ['First session', 'Reading fluency', 95],
+    ['First session', 'Homework lab', 55],
+];
 
----
+const sessionProgressionData = [
+    ['Check-in', 'Warm-up problem', 240],
+    ['Check-in', 'Concept review', 160],
+    ['Warm-up problem', 'Guided practice', 210],
+    ['Warm-up problem', 'Independent exit ticket', 30],
+    ['Concept review', 'Guided practice', 160],
+    ['Guided practice', 'Independent exit ticket', 340],
+    ['Guided practice', 'Follow-up assigned', 30],
+];
 
-### When to Use
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Referral to subject placement</Heading>
+                <p style={captionStyle}>
+                    How incoming student referrals consolidate at first session and split into subject tracks.
+                </p>
+                <SankeyDiagram data={referralFlowData} height={400} />
+            </section>
 
-| Use Case | Recommendation |
-|----------|----------------|
-| Showing flows/transfers | ✅ Ideal |
-| Energy/material flows | ✅ Ideal |
-| User journey paths | ✅ Good |
-| Simple comparisons | ❌ Use Bar Chart |
-| Hierarchical data | ❌ Use Treemap |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Learning Pathways** | How students progress through modules |
-| **Student Flow** | Enrollment → Engagement → Completion |
-| **Resource Distribution** | Budget allocation across programs |
-| **Referral Sources** | How students find the platform |
-| **User Journeys** | Navigation paths through the app |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Order nodes logically (source → destination)
-✅ Use distinct colors for major flows
-✅ Include flow values in tooltips
-✅ Limit to 5-7 stages for clarity
-
-**Avoid:**
-❌ Circular flows (sankey is directional)
-❌ Too many nodes (becomes spaghetti)
-❌ Unrelated categories in same diagram
-                `
-            }
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Tutoring session progression</Heading>
+                <p style={captionStyle}>
+                    Branching activity flow across a tutoring block, with link width proportional to session count.
+                </p>
+                <SankeyDiagram data={sessionProgressionData} height={400} />
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelectorAll('.highcharts-container .highcharts-series').length).toBe(2);
+        });
+        for (const node of canvasElement.querySelectorAll('.highcharts-container text, .highcharts-container tspan')) {
+            if (!node.textContent?.trim()) continue;
+            const style = getComputedStyle(node);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(['500', '600']).toContain(style.fontWeight);
         }
     },
-    argTypes: {
-        data: { control: 'object', description: 'Array of [from, to, weight]' },
-        height: { control: 'number', description: 'Chart height in pixels' }
-    }
 };
 
-const energyData = {
-    data: [
-        ['Solar', 'Electricity', 50],
-        ['Wind', 'Electricity', 30],
-        ['Coal', 'Electricity', 20],
-        ['Electricity', 'Industry', 40],
-        ['Electricity', 'Residential', 35],
-        ['Electricity', 'Commercial', 25]
-    ]
-};
-
-const userFlowData = {
-    data: [
-        ['Homepage', 'Products', 300],
-        ['Homepage', 'About', 100],
-        ['Homepage', 'Contact', 50],
-        ['Products', 'Cart', 150],
-        ['Products', 'Homepage', 50],
-        ['Cart', 'Checkout', 100],
-        ['Cart', 'Products', 30],
-        ['Checkout', 'Purchase', 80]
-    ]
-};
-
-/**
- * Overview: Displays all chart variants and examples
- */
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Energy Flow</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
-                Shows flow from energy sources to sectors.
-            </p>
-            <SankeyDiagram {...energyData} />
-        </section>
-
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>User Journey Flow</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
-                Tracks user navigation patterns on a website.
-            </p>
-            <SankeyDiagram {...userFlowData} />
-        </section>
-    </div>
-);
-
-/**
- * Interactive: Playground with property controls
- */
 export const Interactive = {
     args: {
         height: 400,
         data: [
-            ['A', 'X', 50],
-            ['A', 'Y', 30],
-            ['B', 'X', 40],
-            ['B', 'Z', 20],
-            ['X', 'Output', 60],
-            ['Y', 'Output', 30],
-            ['Z', 'Output', 20]
-        ]
-    }
+            ['CMU tutors', 'Lincoln Middle', 50],
+            ['CMU tutors', 'Roosevelt K-8', 30],
+            ['Pitt tutors', 'Lincoln Middle', 40],
+            ['Pitt tutors', 'North High', 25],
+            ['Lincoln Middle', 'Math sessions', 90],
+            ['Roosevelt K-8', 'Reading sessions', 30],
+            ['North High', 'Math sessions', 25],
+        ],
+    },
 };

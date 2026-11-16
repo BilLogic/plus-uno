@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
 import chartTheme from '@/dataviz/chartTheme';
+import { dataLabelFormat } from '@/dataviz/chartFormat';
+import { BRAND, mostToLeast } from '@/dataviz/palette';
 
 /**
  * WordCloud Component
@@ -9,23 +11,33 @@ import chartTheme from '@/dataviz/chartTheme';
  */
 const WordCloud = ({
     data = [],
-    height = 400
+    height = 400,
+    sort = true
 }) => {
+    const orderedData = useMemo(
+        () => (sort ? mostToLeast(data, (item) => item.weight) : data),
+        [data, sort],
+    );
+
     const options = {
         ...chartTheme,
         chart: {
             ...chartTheme.chart,
+            type: 'wordcloud',
             height: height
         },
         title: { text: null },
         series: [{
             type: 'wordcloud',
-            data: data,
+            color: BRAND,
+            colorByPoint: false,
+            data: orderedData,
             name: 'Occurrences'
         }],
         tooltip: {
             ...chartTheme.tooltip,
-            pointFormat: '<b>{point.name}</b>: {point.weight}'
+            headerFormat: '',
+            pointFormat: dataLabelFormat('{point.weight}', '{point.name}')
         }
     };
 
@@ -43,7 +55,9 @@ WordCloud.propTypes = {
         weight: PropTypes.number.isRequired
     })),
     /** Chart height */
-    height: PropTypes.number
+    height: PropTypes.number,
+    /** Sort words from most to least by weight by default; pass false to preserve input order. */
+    sort: PropTypes.bool
 };
 
 export default WordCloud;

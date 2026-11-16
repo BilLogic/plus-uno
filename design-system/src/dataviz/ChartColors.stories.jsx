@@ -200,7 +200,6 @@ export const EveryChartInEveryMode = {
         // the list can only shrink as each family moves onto the shared foundation.
         const KNOWN_WEIGHT_EXCEPTIONS = {
             PackedBubbleChart: 'distribution',
-            FunnelChart: 'flow',
         };
         const typeStrays = [];
         const dirtyWeightCharts = new Set();
