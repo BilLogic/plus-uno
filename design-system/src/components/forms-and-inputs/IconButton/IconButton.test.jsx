@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
+import Icon from '../../images-and-icons/Icon';
 import IconButton from './IconButton';
 
 describe('IconButton', () => {
@@ -106,5 +107,12 @@ describe('IconButton', () => {
         const after = container.querySelector('.plus-icon-btn__metric-value');
         expect(after).not.toBe(before);
         expect(after).toHaveTextContent('2');
+    });
+
+    it('renders an explicit small chevron Icon node with plus-icon--size-12 and leaves string icons at default size', () => {
+        const { container, rerender } = render(<IconButton icon={<Icon name="chevron-down" size={12} />} label="More options" />);
+        expect(container.querySelector('.plus-btn-visual i')).toHaveClass('plus-icon--size-12');
+        rerender(<IconButton icon="plus" label="Add" />);
+        expect(container.querySelector('.plus-btn-visual i')).not.toHaveClass('plus-icon--size-12');
     });
 });

@@ -13,14 +13,14 @@ import * as FoundationsStories from './Foundations.stories.jsx';
 <FoundationHero
     kind="Data visualizations"
     title="Chart foundations"
-    summary="Spacing, radius, elevation, stroke, type and motion tokens for charts. For palette and ramp rules, see Chart color."
+    summary="Spacing, radius, elevation, stroke, type, states and motion tokens for charts. For palette and ramp rules, see Chart color."
 />
 
 <FoundationContents />
 
 <FoundationSection title="Chart container and tooltip">
 
-A chart sits in a Card: <C>--card-pad-compact</C> sets Highcharts' `chart.spacing`, and the chart adds no outer padding of its own. The tooltip uses the Popup pattern's surface, shadow, radius, padding and layer tokens rather than Highcharts' built-in `shadow` or `borderRadius` options.
+A chart sits in a Card: <C>--card-pad-compact</C> sets the chart inset, and the chart adds no outer padding of its own. The tooltip uses the Popup pattern's surface, shadow, radius, padding and layer tokens rather than built-in SVG shadow or corner options.
 
 <Canvas of={FoundationsStories.TooltipSurface} sourceState="none" />
 
@@ -55,7 +55,7 @@ Bars and columns round only the value end so the baseline stays flat and length 
 
 <FoundationSection title="Stroke">
 
-Gridlines, axes, series lines and chart separators (such as gaps between stacked bar segments) use two component-tier tokens declared in `chartTheme.css`:
+Gridlines, axes, series lines and chart separators (such as gaps between stacked bar segments) use two component-tier stroke tokens:
 
 <RefTable
     head={['Role', 'Token']}
@@ -69,13 +69,37 @@ Removing a border or line with `0` needs no token.
 
 </FoundationSection>
 
-<FoundationSection title="Type">
+<FoundationSection title="Type and numbers">
+
+Every text slot in a chart — title, subtitle, caption, axis labels and titles, legend items, data labels, tooltips and empty-data notices — sets the Noto Sans body family (<C>--type-family-body</C>) and current text tokens — never a <C>'12px'</C> literal or a <C>var()</C> with a literal fallback. Titles and emphasized values use semibold (<C>--type-weight-semibold</C>, 600); labels and supporting text use medium (<C>--type-weight-medium</C>, 500). Nothing renders at 700 or 300, data-label text outlines stay off, and number slots set tabular figures (<C>tabular-nums</C>) so values align digit for digit without switching to a monospace font. Inside a tooltip, text stays in <C>--ds-text</C> while only the leading dot swatch takes the series color.
+
+<Canvas of={FoundationsStories.TypeAndNumbers} sourceState="none" />
 
 <RefTable
-    head={['Role', 'Rule']}
+    head={['Slot', 'Tokens and rules']}
     rows={[
-        ['Tick labels, legends, tooltips, data labels', <>Use current text tokens — never a <C>'12px'</C> literal or a <C>var()</C> with a literal fallback.</>],
-        ['Chart title', <>Name the chart in its surrounding Section or Card header, never Highcharts' <C>title</C> option.</>],
+        ['Title and axis titles', <><C>--type-family-body</C> · <C>--type-weight-semibold</C> (600) · <C>--ds-text</C>; name the chart in its surrounding Section or Card header rather than an in-chart title</>],
+        ['Subtitle, caption and no-data notice', <><C>--type-family-body</C> · <C>--type-weight-medium</C> (500) · <C>--ds-text-subtle</C></>],
+        ['Axis tick labels', <><C>--type-family-body</C> · <C>--type-size-075</C> · <C>--type-weight-medium</C> (500) · <C>tabular-nums</C> · <C>--ds-text-subtle</C> — never a <C>'12px'</C> literal or a <C>var()</C> with a literal fallback</>],
+        ['Data labels and legend items', <><C>--type-family-body</C> · <C>--type-size-075</C> · <C>--type-weight-medium</C> (500) · <C>tabular-nums</C> · no text outline · <C>--ds-text</C></>],
+        ['Tooltip text and emphasized values', <><C>--type-family-body</C> · <C>--type-size-0875</C> · <C>--type-weight-semibold</C> (600) on values with <C>tabular-nums</C> · <C>--ds-text</C> (series color on the swatch only)</>],
+    ]}
+/>
+
+</FoundationSection>
+
+<FoundationSection title="States">
+
+Interactive states are declared once in the shared theme so every chart responds the same way. Hovering a mark shifts its fill to that mark's <C>-hovered</C> chart token while the other series fade to <C>--ds-opacity-disabled</C>. Selecting a mark paints <C>--ds-background-selected</C> with a 1px <C>--ds-border-selected</C> outline, never a brand fill.
+
+<Canvas of={FoundationsStories.States} sourceState="none" />
+
+<RefTable
+    head={['State', 'Token / rule']}
+    rows={[
+        ['Hover', <>The mark's <C>--chart-*-hovered</C> token (for example <C>--chart-categorical-1-hovered</C> or <C>--chart-brand-hovered</C>) on <C>appearance.fast</C></>],
+        ['Inactive series', <><C>--ds-opacity-disabled</C> on non-hovered series while another series is hovered, on <C>appearance.fast</C></>],
+        ['Selected', <><C>--ds-background-selected</C> fill with a <C>--chart-grid-width</C> (1px) <C>--ds-border-selected</C> outline, never <C>--chart-brand</C></>],
     ]}
 />
 
@@ -105,6 +129,7 @@ Charts grow to their value on the default spatial spring (<C>spatial.default</C>
 <FoundationRelated
     items={[
         { title: 'Chart color', description: 'Every chart color, grouped by the job it does.', href: '?path=/docs/data-visualizations-color--docs' },
+        { title: 'Typography', description: 'The type families, weights and tabular-figure rules chart text draws from.', href: '?path=/docs/foundations-visual-typography--docs' },
         { title: 'Physics', description: 'The spring table and modes that chart motion samples from.', href: '?path=/docs/foundations-expression-motion-physics--docs' },
         { title: 'Choreography', description: 'One orchestrated moment per area and the load-reveal stagger.', href: '?path=/docs/foundations-expression-motion-choreography--docs' },
         { title: 'Elevation', description: 'The shadow steps the tooltip draws from.', href: '?path=/docs/foundations-visual-elevation--docs' },

@@ -17,12 +17,29 @@ import {
 } from './chartMotion';
 
 const capturedProps = [];
+const capturedContainers = [];
 
 vi.mock('highcharts-react-official', () => ({
-    default: (props) => {
+    default: React.forwardRef((props, ref) => {
+        const divRef = React.useRef(null);
         capturedProps.push(props);
-        return React.createElement('div', { 'data-testid': 'mock-highcharts-react' });
-    },
+        React.useImperativeHandle(ref, () => ({
+            get chart() {
+                return { container: divRef.current };
+            },
+            container: divRef,
+        }));
+        return React.createElement('div', {
+            'data-testid': 'mock-highcharts-react',
+            ...props.containerProps,
+            ref: (el) => {
+                divRef.current = el;
+                if (el && !capturedContainers.includes(el)) {
+                    capturedContainers.push(el);
+                }
+            },
+        });
+    }),
 }));
 
 const h = React.createElement;
@@ -39,6 +56,7 @@ const configFor = (entry) => {
 describe('chartMotion and PlusChart', () => {
     beforeEach(() => {
         capturedProps.length = 0;
+        capturedContainers.length = 0;
     });
 
     it('maps spatial.default productive to a Highcharts spring animation whose easing matches springStep and ends at 1', () => {
@@ -201,16 +219,26 @@ describe('chartMotion and PlusChart', () => {
         expect(second.updateArgs).toEqual([true, true, false]);
     });
 
-    it('PlusChart reads reduced motion through MotionPreferenceContext and gives the reduced fade', () => {
+    it('pins reduced motion both ways: reduced disables series grow and fades container opacity 0->1 on appearance.fast; not reduced uses spatial.default grow', () => {
         const reducedExpected = chartEntrance({ reduced: true });
+        const productiveExpected = chartEntrance({ reduced: false });
 
-        render(
-            h(
-                MotionPreferenceContext.Provider,
-                { value: true },
+        const rafCallbacks = [];
+        let nowMs = 1000;
+        const nowSpy = vi.spyOn(performance, 'now').mockImplementation(() => nowMs);
+        const rafSpy = vi
+            .spyOn(window, 'requestAnimationFrame')
+            .mockImplementation((cb) => {
+                rafCallbacks.push(cb);
+                return rafCallbacks.length;
+            });
+        const cafSpy = vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
+
+        try {
+            render(
                 h(
-                    ChartMotionArea,
-                    { expressive: true },
+                    MotionPreferenceContext.Provider,
+                    { value: true },
                     h(PlusChart, {
                         options: {
                             chart: { type: 'line' },
@@ -218,17 +246,60 @@ describe('chartMotion and PlusChart', () => {
                         },
                     }),
                 ),
-            ),
-        );
-
-        const { options } = capturedProps[0];
-        expect(options.chart.animation.duration).toBe(reducedExpected.duration);
-        expect(options.plotOptions.series.animation.duration).toBe(reducedExpected.duration);
-        for (const pos of [0.2, 0.5, 0.8]) {
-            expect(options.chart.animation.easing(pos)).toBeCloseTo(
-                reducedExpected.easing(pos),
-                6,
             );
+
+            const { options, containerProps } = capturedProps[0];
+            // Under reduced motion, marks draw at final geometry (series.animation: false)
+            expect(options.plotOptions.series.animation).toBe(false);
+            expect(options.chart.animation.duration).toBe(reducedExpected.duration);
+            expect(containerProps?.style?.opacity).toBe(0);
+
+            const containerEl = capturedContainers[0];
+            expect(containerEl).toBeDefined();
+            expect(containerEl.style.opacity).toBe('0');
+
+            // Step halfway through the appearance.fast spring
+            nowMs = 1000 + reducedExpected.duration * 0.5;
+            const firstTick = rafCallbacks.shift();
+            expect(typeof firstTick).toBe('function');
+            firstTick(nowMs);
+            expect(Number(containerEl.style.opacity)).toBeCloseTo(reducedExpected.easing(0.5), 5);
+
+            // Step to completion (pos = 1)
+            nowMs = 1000 + reducedExpected.duration;
+            const secondTick = rafCallbacks.shift();
+            expect(typeof secondTick).toBe('function');
+            secondTick(nowMs);
+            expect(containerEl.style.opacity).toBe('');
+
+            // Not reduced -> spatial.default series grow, no opacity fade
+            capturedProps.length = 0;
+            capturedContainers.length = 0;
+            rafCallbacks.length = 0;
+
+            render(
+                h(
+                    MotionPreferenceContext.Provider,
+                    { value: false },
+                    h(PlusChart, {
+                        options: {
+                            chart: { type: 'line' },
+                            series: [{ name: 'Score', data: [1, 2, 3] }],
+                        },
+                    }),
+                ),
+            );
+
+            const notReduced = capturedProps[0];
+            expect(notReduced.options.plotOptions.series.animation.duration).toBe(
+                productiveExpected.duration,
+            );
+            expect(notReduced.containerProps).toBeUndefined();
+            expect(rafCallbacks).toHaveLength(0);
+        } finally {
+            nowSpy.mockRestore();
+            rafSpy.mockRestore();
+            cafSpy.mockRestore();
         }
     });
 
@@ -253,13 +324,14 @@ describe('chartMotion and PlusChart', () => {
             ),
         );
 
-        expect(capturedProps[0].options.chart.animation).toBe(false);
-        expect(capturedProps[0].options.plotOptions.series.animation).toBe(false);
-        expect(capturedProps[1].options.chart.animation).toBe(false);
-        expect(capturedProps[1].options.plotOptions.series.animation).toBe(false);
+        const lastTwo = capturedProps.slice(-2);
+        expect(lastTwo[0].options.chart.animation).toBe(false);
+        expect(lastTwo[0].options.plotOptions.series.animation).toBe(false);
+        expect(lastTwo[1].options.chart.animation).toBe(false);
+        expect(lastTwo[1].options.plotOptions.series.animation).toBe(false);
     });
 
-    it('hands two PlusCharts in one ChartMotionArea defers 0 and 20, and caps larger areas at 500 ms', () => {
+    it('gives three charts in a ChartMotionArea evenly spaced defers matching staggerDelays(3), and six under the 500 ms cap matching staggerDelays(6)', () => {
         render(
             h(
                 MotionPreferenceContext.Provider,
@@ -267,31 +339,61 @@ describe('chartMotion and PlusChart', () => {
                 h(
                     ChartMotionArea,
                     null,
-                    h(PlusChart, { options: { series: [{ data: [1, 2] }] } }),
-                    h(PlusChart, { options: { series: [{ data: [3, 4] }] } }),
+                    h(PlusChart, { options: { series: [{ data: [1] }] } }),
+                    h(PlusChart, { options: { series: [{ data: [2] }] } }),
+                    h(PlusChart, { options: { series: [{ data: [3] }] } }),
                 ),
             ),
         );
 
-        expect(capturedProps[0].options.chart.animation.defer).toBe(0);
-        expect(capturedProps[0].options.plotOptions.series.animation.defer).toBe(0);
-        expect(capturedProps[1].options.chart.animation.defer).toBe(20);
-        expect(capturedProps[1].options.plotOptions.series.animation.defer).toBe(20);
+        const threeCharts = capturedProps.slice(-3);
+        expect(threeCharts.map((p) => p.options.chart.animation.defer)).toEqual(
+            staggerDelays(3),
+        );
+        expect(threeCharts.map((p) => p.options.plotOptions.series.animation.defer)).toEqual(
+            staggerDelays(3),
+        );
 
         capturedProps.length = 0;
         render(
             h(
-                ChartMotionArea,
-                { count: 40 },
-                ...Array.from({ length: 40 }, (_, i) =>
-                    h(PlusChart, { key: i, options: { series: [{ data: [i] }] } }),
+                MotionPreferenceContext.Provider,
+                { value: false },
+                h(
+                    ChartMotionArea,
+                    null,
+                    ...Array.from({ length: 30 }, (_, i) =>
+                        h(PlusChart, { key: i, options: { series: [{ data: [i] }] } }),
+                    ),
                 ),
             ),
         );
-        expect(capturedProps.map((p) => p.options.chart.animation.defer)).toEqual(
-            staggerDelays(40),
+
+        const thirtyCharts = capturedProps.slice(-30);
+        expect(thirtyCharts.map((p) => p.options.chart.animation.defer)).toEqual(
+            staggerDelays(30),
         );
-        expect(capturedProps.at(-1).options.chart.animation.defer).toBeLessThanOrEqual(500);
+        expect(thirtyCharts.at(-1).options.chart.animation.defer).toBeLessThanOrEqual(500);
+
+        capturedProps.length = 0;
+        render(
+            h(
+                MotionPreferenceContext.Provider,
+                { value: false },
+                h(
+                    ChartMotionArea,
+                    null,
+                    ...Array.from({ length: 6 }, (_, i) =>
+                        h(PlusChart, { key: i, options: { series: [{ data: [i] }] } }),
+                    ),
+                ),
+            ),
+        );
+
+        const sixCharts = capturedProps.slice(-6);
+        expect(sixCharts.map((p) => p.options.chart.animation.defer)).toEqual(
+            staggerDelays(6),
+        );
 
         capturedProps.length = 0;
         const expressiveExpected = chartEntrance({ expressive: true });
@@ -306,9 +408,8 @@ describe('chartMotion and PlusChart', () => {
                 ),
             ),
         );
-        expect(capturedProps[0].options.chart.animation.duration).toBe(
+        expect(capturedProps.at(-1).options.chart.animation.duration).toBe(
             expressiveExpected.duration,
         );
     });
 });
-

@@ -1,9 +1,9 @@
 import React from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
-import { Button } from '@/components';
+import { Button, Icon } from '@/components';
 import { ButtonItem, LinkItem, Section } from '@/components/forms-and-inputs/_internal/MenuGroup';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
-import { computedShadow, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import DropdownMenu from './DropdownMenu';
 
@@ -32,7 +32,7 @@ const basicMenu = (
 
 export const Overview = () => (
     <div style={{ padding: 'var(--space-500) var(--space-150) var(--size-1000)' }}>
-        <DropdownMenu trigger={<Button text="Dropdown" iconAfter={<i className="fa-solid fa-chevron-down" aria-hidden="true" />} />}>
+        <DropdownMenu trigger={<Button text="Dropdown" iconAfter={<Icon name="chevron-down" size={12} />} />}>
             {basicMenu}
         </DropdownMenu>
     </div>
@@ -43,6 +43,7 @@ Overview.play = async ({ canvasElement }) => {
     const toggle = canvas.getByRole('button', { name: 'Dropdown' });
 
     // The default pattern (Button + chevron) shows selected while open.
+    await expect(px(getComputedStyle(toggle.querySelector('.plus-btn-visual i')).fontSize), 'trigger chevron is --icon-sm').toBe(tokenLength(canvasElement, '--icon-sm'));
     await expect(toggle).not.toHaveClass('plus-btn--selected');
     await userEvent.click(toggle);
     await waitFor(() => expect(toggle).toHaveClass('plus-btn--selected'));
@@ -220,7 +221,7 @@ const noop = () => {};
 export const Default = {
     render: () => (
         <div style={{ padding: 'var(--space-150) var(--space-150) var(--space-150)' }}>
-            <DropdownMenu trigger={<Button text="Actions" iconAfter={<i className="fa-solid fa-chevron-down" aria-hidden="true" />} />}>
+            <DropdownMenu trigger={<Button text="Actions" iconAfter={<Icon name="chevron-down" size={12} />} />}>
                 {basicMenu}
             </DropdownMenu>
         </div>

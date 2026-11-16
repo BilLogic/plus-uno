@@ -68,7 +68,7 @@ Don't: The two halves disagree on appearance, so they read as two controls.
 ```jsx
 <SplitButton>
     <Button text="Send" onClick={send} appearance="primary" />
-    <IconButton icon="chevron-down" label="More send options" appearance="primary" onClick={openMenu} />
+    <IconButton icon={<Icon name="chevron-down" size={12} />} label="More send options" appearance="primary" onClick={openMenu} />
 </SplitButton>
 ```
 

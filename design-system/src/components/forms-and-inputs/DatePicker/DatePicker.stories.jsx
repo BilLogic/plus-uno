@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { expectFieldDisabled, expectFieldFocused, expectFieldHovered, expectFieldInvalid, expectFieldReadOnly, fieldBox } from '@/storybook-docs/lib/field-states.js';
+import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import Calendar from '../_internal/Calendar';
@@ -521,6 +522,7 @@ DaysAnnounceTheirDate.play = async ({ canvasElement }) => {
     await userEvent.click(trigger);
 
     const seventeenth = await waitFor(() => page.getByRole('button', { name: /August 17, 2026/ }));
+    await expect(px(getComputedStyle(page.getByRole('button', { name: 'Previous month' }).querySelector('i')).fontSize), 'calendar chevron is --icon-sm').toBe(tokenLength(canvasElement, '--icon-sm'));
     await expect(seventeenth).toBeTruthy();
     await expect(seventeenth.getAttribute('aria-pressed')).toBe('true');
 

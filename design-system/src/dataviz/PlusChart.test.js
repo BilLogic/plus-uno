@@ -85,11 +85,12 @@ describe('chart-specific animation goes through the motion model', () => {
             expect(seen.map(durationOf)).toEqual([chartEntrance().duration]);
         });
 
-        it(`${name} enters on the reduced timing under reduced motion`, () => {
+        it(`${name} draws at its final value under reduced motion (the container fades instead)`, () => {
             const { seen, remove } = recordSeriesAnimations();
             render(withMotion(true, make()));
             remove();
-            expect(seen.map(durationOf)).toEqual([chartEntrance({ reduced: true }).duration]);
+            expect(seen.map(durationOf)).toEqual([0]);
+            expect(lastChart().renderTo.style.opacity).toBe('0');
         });
     }
 });

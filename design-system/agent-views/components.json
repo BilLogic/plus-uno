@@ -126,7 +126,7 @@
         "--ds-surface",
         "--ds-text-subtle",
         "--heading-sm",
-        "--icon-md"
+        "--icon-sm"
       ],
       "subComponents": [
         {
@@ -1409,6 +1409,7 @@
         "--ds-motion-appearance-fast-duration",
         "--ds-text-disabled",
         "--icon-md",
+        "--icon-sm",
         "--inline-sm",
         "--pad-x-md",
         "--pad-x-sm",

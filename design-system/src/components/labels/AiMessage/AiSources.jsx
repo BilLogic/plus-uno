@@ -1,5 +1,6 @@
 import React, { useId, useState } from 'react';
 import PropTypes from 'prop-types';
+import Icon from '@/components/images-and-icons/Icon';
 import Link from '@/components/navigation/Link';
 import Button from '@/components/forms-and-inputs/Button';
 import './AiMessage.scss';
@@ -34,7 +35,7 @@ export const AiSources = ({ sources = [], target, defaultOpen = false, className
                 className="plus-ai-sources__toggle"
                 aria-expanded={open}
                 aria-controls={listId}
-                iconAfter={open ? 'chevron-up' : 'chevron-down'}
+                iconAfter={<Icon name={open ? 'chevron-up' : 'chevron-down'} size={12} />}
                 onClick={() => setOpen((value) => !value)}
                 text={`Sources (${list.length})`}
             />
