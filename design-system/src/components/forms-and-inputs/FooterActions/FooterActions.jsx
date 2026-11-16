@@ -39,6 +39,7 @@ export const FooterActions = ({
     className,
     style,
     children,
+    'data-probe': probe = 'footer',
     ...props
 }) => {
     const items = React.Children.toArray(children).filter(React.isValidElement);
@@ -66,6 +67,7 @@ export const FooterActions = ({
     return (
         <div
             className={clsx('plus-footer-actions', className)}
+            data-probe={probe}
             style={style}
             {...props}
         >
