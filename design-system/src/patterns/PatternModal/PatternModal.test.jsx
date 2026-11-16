@@ -24,6 +24,11 @@ describe('PatternModal sizing', () => {
         expect(dialog()).toHaveClass(`plus-pattern-modal-width-${width}`);
     });
 
+    it('aliases 4-col to xs', () => {
+        render(<PatternModal title="Move session" width="4-col">Body</PatternModal>);
+        expect(dialog()).toHaveClass('plus-pattern-modal-width-xs');
+    });
+
     it.each(['hug', 'fill'])('takes height %s', (height) => {
         render(<PatternModal title="Move session" height={height}>Body</PatternModal>);
         expect(dialog()).toHaveClass(`plus-pattern-modal-height-${height}`);

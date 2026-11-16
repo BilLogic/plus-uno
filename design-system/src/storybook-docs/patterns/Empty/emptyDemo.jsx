@@ -78,13 +78,14 @@ const COPY = {
 /** One empty state in the words its type takes. `kind` also takes `noAccess`, the Can't show type with nobody to retry. */
 export const EmptyType = ({ kind, spacing = 'default', action = true }) => {
     const copy = COPY[kind];
+    const primaryAction = action && copy.action ? React.cloneElement(copy.action, { spacing }) : undefined;
     return (
         <EmptyState
             spacing={spacing}
             icon={copy.icon}
             header={copy.header}
             description={copy.description}
-            primaryAction={action ? copy.action ?? undefined : undefined}
+            primaryAction={primaryAction}
         />
     );
 };

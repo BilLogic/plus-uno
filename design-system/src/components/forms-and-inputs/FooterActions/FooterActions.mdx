@@ -1,0 +1,223 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import { Button, FooterActions } from '@/components';
+import * as FooterActionsStories from './FooterActions.stories.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={FooterActionsStories} />
+
+<Title />
+The 4-track footer action bar for `Modal`, `Panel` and the focused view. Every
+filled button is sized at `spacing="spacious"` (48) with `shouldFitContainer`,
+and containers up to 400 wide automatically split actions across the full width.
+
+<DocsTabs of={FooterActionsStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/FooterActions"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Placement
+
+<ComponentExample
+    of={FooterActionsStories.OneButton}
+    title="One action"
+    description="A single acknowledgement action sits in the right half (tracks 3–4)."
+/>
+
+<ComponentExample
+    of={FooterActionsStories.TwoButtons}
+    title="Two actions"
+    description="Two actions split 50/50 across tracks 1–2 and 3–4: soft-fill secondary on the left, primary on the right."
+/>
+
+<ComponentExample
+    of={FooterActionsStories.ThreeButtons}
+    title="Three actions"
+    description="Three actions take one track each in tracks 2, 3 and 4; only the rightmost is primary."
+/>
+
+<ComponentExample
+    of={FooterActionsStories.TextButtonLeft}
+    title="Text action on the left"
+    description="A subtle or link action hugs the left content edge without taking a filled track, while the filled actions sit in tracks 3 and 4."
+/>
+
+<ComponentExample
+    of={FooterActionsStories.DangerTextButtonLeft}
+    title="Danger text action on the left"
+    description="A destructive escape action such as Delete session hugs the left edge in danger text ink while the primary flow stays on the right."
+/>
+
+<ComponentExample
+    of={FooterActionsStories.DestructiveSplit}
+    title="Destructive confirmation"
+    description="In a destructive confirmation, the safer alternative is the secondary on the left and the danger action is the primary on the right, splitting 50/50."
+/>
+
+<ComponentExample
+    of={FooterActionsStories.Steps}
+    title="Steps"
+    description="In a multi-step flow, Back and Next split 50/50 across the footer."
+/>
+
+<ComponentExample
+    of={FooterActionsStories.NarrowPanel}
+    title="Narrow container (400 and below)"
+    description="Measured with a CSS container query: when the footer container is 400 or narrower, a single action fills all 4 tracks."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={FooterActionsStories.Interactive}
+    description="Inspect the 4-track footer layout."
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use `FooterActions` inside `Modal`, `PanelFooter` and the focused task bar to
+place one to three filled `Button` actions on a 4-track grid with an optional
+leading text action.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Grid container.** Four equal tracks separated by `--inline-md`, with `container-type: inline-size` so containers 400 or narrower adapt automatically.
+2. **Leading action** (`leadingAction`, or a leading `subtle`, `link` or `danger` button). Hugs the left content edge and never stretches across a track.
+3. **Filled actions.** One to three `Button` children cloned at `spacing="spacious"` (48) with `shouldFitContainer`.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Wide (over 400)</td><td>1 button takes tracks 3–4; 2 buttons split tracks 1–2 and 3–4; 3 buttons take tracks 2, 3 and 4.</td></tr>
+<tr><td>Narrow (400 and below)</td><td>Measured by <code>@container (max-width: 400px)</code>: a single action spans all 4 tracks.</td></tr>
+<tr><td>Leading text action</td><td>Hugs its label on the left edge while filled actions take the rightmost tracks.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Track gap</td><td><code>--inline-md</code> between the 4 equal tracks.</td></tr>
+<tr><td>Danger leading action</td><td><code>--ds-text-danger</code> label and <code>--ds-icon-danger</code> icon on <code>--ds-background-neutral-subtle</code>, with <code>--ds-background-danger-subtler-hovered</code> and <code>--ds-background-danger-subtler-pressed</code> states.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Keep the primary action on the right.
+
+Only the rightmost filled button carries the primary (or danger primary) appearance; secondary actions sit to its left in the default soft neutral fill.
+
+<DoDontPair
+    doExample={
+        <div style={{ inlineSize: '100%' }}>
+            <FooterActions>
+                <Button text="Discard" />
+                <Button text="Save" appearance="primary" />
+            </FooterActions>
+        </div>
+    }
+    doCaption="Secondary on the left, primary on the right."
+    dontExample={
+        <div style={{ inlineSize: '100%' }}>
+            <FooterActions>
+                <Button text="Save" appearance="primary" />
+                <Button text="Discard" appearance="primary" />
+            </FooterActions>
+        </div>
+    }
+    dontCaption="Two primary buttons competing in the same footer."
+/>
+
+### Omit Cancel when the corner close button dismisses.
+
+`Modal`, `Panel` and the focused view already provide a corner close control, so the footer names the real secondary outcome (`Discard`, `Keep editing`, `Archive instead`) rather than a generic `Cancel`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name the secondary action for what it does: "Discard", "Save draft", "Archive instead".</td><td>Add a generic "Cancel" button beside the corner close button.</td></tr>
+<tr><td>Keep labels to two or three words so they fit a single track without truncating.</td><td>Write sentence-length button labels in a 4-track footer.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Focus order follows reading order.** The leading action receives focus first, followed by the secondary actions and the rightmost primary action.
+- **Full-track hit targets.** Every filled action uses `spacing="spacious"` (48) and fills its track.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- `Button`: the action control placed inside each footer track.
+- `Modal`: uses `FooterActions` for its bottom action bar.
+- `Panel`: pairs `PanelFooter` with `FooterActions` when editing or confirming in a side panel.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

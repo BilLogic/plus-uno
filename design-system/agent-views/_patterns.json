@@ -9,7 +9,7 @@
     {
       "group": "Frame",
       "name": "PatternSidebar",
-      "use": "The Frame's Sidebar with its open tabs. The PLUS `Sidebar` (@/components) fills it from the role's config; reach for this only for a sidebar that is not the app's."
+      "use": "The Frame's Sidebar with its open tabs. The PLUS `Sidebar` (@/components) fills it from the role's config; reach for this only for a sidebar that isn't the app's."
     },
     {
       "group": "Page",

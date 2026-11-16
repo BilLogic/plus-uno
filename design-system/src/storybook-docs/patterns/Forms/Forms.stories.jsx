@@ -266,7 +266,7 @@ export const ShownBlockedSubmit = {
     },
 };
 
-/** Sending: the Primary shows its spinner at its own width; Cancel is live. */
+/** Sending: the Primary shows its spinner at its own width; Discard is live. */
 export const ShownSending = {
     name: 'Validation: Sending (shown)',
     render: () => staged(<FormInModal initial={FILLED} sending />),
@@ -274,7 +274,7 @@ export const ShownSending = {
         await settleAnimations(canvasElement);
         const canvas = within(canvasElement);
         await expect(canvas.getByRole('button', { name: 'Save session' }), 'the spinner button is the one that disables').toBeDisabled();
-        await expect(canvas.getByRole('button', { name: 'Cancel' }), 'Cancel stays live').not.toBeDisabled();
+        await expect(canvas.getByRole('button', { name: 'Discard' }), 'Discard stays live').not.toBeDisabled();
         await fitsCanvas(canvasElement);
     },
 };
@@ -353,7 +353,7 @@ export const ServerRefuses = {
     },
 };
 
-/** Sending: the one time a button disables; it keeps its width and Cancel stays live. */
+/** Sending: the one time a button disables; it keeps its width and Discard stays live. */
 export const Sending = {
     name: 'Test: Sending',
     render: () => staged(<FormInModal initial={FILLED} sendingForever />),
@@ -365,7 +365,7 @@ export const Sending = {
         await userEvent.click(save);
         await waitFor(() => expect(save).toBeDisabled());
         await expect(rect(save).width, 'the button keeps its width').toBeCloseTo(width, 0);
-        await expect(canvas.getByRole('button', { name: 'Cancel' }), 'Cancel stays live').not.toBeDisabled();
+        await expect(canvas.getByRole('button', { name: 'Discard' }), 'Discard stays live').not.toBeDisabled();
         await fitsCanvas(canvasElement);
     },
 };
@@ -379,10 +379,10 @@ export const LeavingWithEdits = {
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
         const canvas = within(canvasElement);
-        await userEvent.click(canvas.getByRole('button', { name: 'Cancel' }));
+        await userEvent.click(canvas.getByRole('button', { name: 'Discard' }));
         await expect(canvas.queryByRole('heading', { name: 'Discard changes?' }), 'a form with no edits leaves at once').toBeNull();
         await userEvent.type(canvas.getByLabelText(/Student/), 'Ana');
-        await userEvent.click(canvas.getByRole('button', { name: 'Cancel' }));
+        await userEvent.click(canvas.getByRole('button', { name: 'Discard' }));
         await expect(await canvas.findByRole('heading', { level: 1, name: 'Discard changes?' })).toBeInTheDocument();
         await expect(canvas.queryAllByRole('dialog'), 'the same Modal, never a third layer').toHaveLength(1);
         await expect(canvas.getByRole('button', { name: 'Discard' }).className, 'Discard is the one that loses work, so it is the Primary cell').toContain('primary');

@@ -193,7 +193,7 @@ export const FilteredStudents = ({ tier, categories, initial = {}, openMenu, vie
             icon="user-group"
             header="No students match these filters"
             description={`Nothing matches ${flat(value).join(' and ')}. Reset the filters to see every student.`}
-            primaryAction={<Button text="Reset filters" appearance="primary" onClick={reset} />}
+            primaryAction={<Button text="Reset filters" appearance="primary" spacing="compact" onClick={reset} />}
         />
     );
     const resultsSkeleton = ({ reduced }) => (
