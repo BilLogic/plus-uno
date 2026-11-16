@@ -70,9 +70,9 @@ const save = ({ id, title, caption, shakes }) => ({
   title,
   caption,
   viewBox: VIEW,
-  initial: { o: 0, y: 1, x: 0 },
+  initial: { o: 0, y: -1, x: 0 },
   landing: { o: 1, y: 0, x: 0 },
-  arrows: [travel(MESSAGE, 0, 4)],
+  arrows: [travel(MESSAGE, 0, -4)],
   draw: ({ o, y, x }) => (
     <>
       <Frame x={8} y={6} w={144} h={88} chrome={false} />
@@ -116,7 +116,7 @@ const list = ({ id, title, caption, scatters }) => ({
   viewBox: VIEW,
   initial: { g: 0 },
   landing: { g: 1 },
-  arrows: [travel(LIST_GROUP, 0, 8, { lane: { x: 136 } })],
+  arrows: [travel(LIST_GROUP, 0, -4, { lane: { x: 136 } })],
   draw: ({ g }) => (
     <>
       <Frame x={8} y={6} w={144} h={88} chrome={false} />
@@ -124,7 +124,7 @@ const list = ({ id, title, caption, scatters }) => ({
         const left = 1 - g;
         // One group moves together; the scatter sends each row its own way.
         const dx = scatters ? (r % 2 ? 1 : -1) * left * (24 + r * 6) : 0;
-        const dy = scatters ? 0 : left * 8;
+        const dy = scatters ? 0 : -left * 4;
         return (
           <g key={r} opacity={g} transform={`translate(${dx} ${dy})`}>
             <SkeletonBar x={16} y={16 + r * 18} w={110 - r * 12} h={6} />

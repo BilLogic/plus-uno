@@ -41,13 +41,12 @@ export const PrinciplesHero = () => {
       {cards.map((x) => (
         <CardBox key={x} x={x} y={5} w={100} h={150} />
       ))}
-      {/* Build understanding: a new row lands in its slot, the path from where it came */}
-      {[25, 45, 85].map((y) => (
+      {/* Build understanding: a new row settles into its slot, the path from where it came */}
+      <Rect x={-50} y={22} w={60} h={15} fill={PAINT.accent} corner="shape" opacity={0.25} />
+      <Path from={[-20, 30]} to={[-30, 72.5]} rect={{ x: -70, y: 65, w: 80, h: 15 }} ghost accent />
+      {[85, 105, 125].map((y) => (
         <Rect key={y} x={-70} y={y} w={80} h={15} fill={PAINT.placeholderText} corner="shape" />
       ))}
-      <Rect x={-70} y={65} w={80} h={15} stroke={PAINT.target} corner="shape" />
-      <Rect x={-50} y={123} w={60} h={15} fill={PAINT.accent} corner="shape" opacity={0.25} />
-      <Path from={[10, 132]} to={[0, 80]} rect={{ x: -70, y: 65, w: 80, h: 15 }} accent />
       {/* Always responsive: a press answered at once */}
       <Rect x={60} y={65} w={60} h={24} fill={PAINT.accent} corner="full" />
       <circle cx={96} cy={77} r={17} fill="none" stroke={PAINT.accent} opacity={0.35} style={HAIRLINE} />
