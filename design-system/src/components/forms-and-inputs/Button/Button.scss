@@ -110,10 +110,6 @@ $btn-appearances: (
         width: var(--control-sm);
     }
 
-    &.plus-btn--icon-only.plus-btn--spacious {
-        width: var(--control-xl);
-    }
-
     // Icon button `shape="circle"`: a round icon button for top navigation.
     &.plus-btn--circle {
         border-radius: var(--radius-full);
