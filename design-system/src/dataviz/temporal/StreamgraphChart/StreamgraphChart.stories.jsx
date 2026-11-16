@@ -1,65 +1,35 @@
 import React from 'react';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
 import StreamgraphChart from './StreamgraphChart';
 
 export default {
     title: 'Data visualizations/Temporal/Streamgraph chart',
     component: StreamgraphChart,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## Streamgraph Chart
+    argTypes: {
+        categories: { control: 'object', description: 'X-axis period labels' },
+        series: { control: 'object', description: 'Array of series { name, data, color }' },
+        height: { control: 'number', description: 'Chart height in pixels' },
+        sort: { control: 'boolean', description: 'Sort categories from most to least; false by default on temporal axes' },
+    },
+};
 
-Shows **composition changes over time** with flowing organic shapes.
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
+};
 
-### Overview
-Shows **composition changes over time** with flowing organic shapes.
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--card-stack-md)',
+};
 
----
-
-### How to Read
-- **Width** = relative value at that time
-- **Flow** = trend direction
-- **Colors** = different categories
-
----
-
-### When to Use
-
-| Use Case | Recommendation |
-|----------|----------------|
-| Trend evolution | ✅ Ideal |
-| Topic popularity | ✅ Good |
-| Proportions over time | ✅ Good |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Subject Popularity** | Enrollment trends |
-| **Feature Usage** | Daily usage by feature |
-| **Content Engagement** | Lesson views over time |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Align the streamgraph chart setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
-
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
-                `
-            }
-        }
-    }
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
 };
 
 const usageData = {
@@ -68,27 +38,43 @@ const usageData = {
         { name: 'Math', data: [100, 120, 150, 180, 200, 220] },
         { name: 'Science', data: [80, 95, 110, 130, 145, 160] },
         { name: 'English', data: [60, 70, 85, 100, 115, 125] },
-        { name: 'History', data: [40, 50, 60, 75, 85, 95] }
-    ]
+        { name: 'History', data: [40, 50, 60, 75, 85, 95] },
+    ],
 };
 
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Subject Enrollment Trends</h3>
-            <StreamgraphChart {...usageData} />
-        </section>
-    </div>
-);
-
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Subject enrollment trends</Heading>
+                <p style={captionStyle}>
+                    Shows how enrollment across subjects shifts from month to month.
+                </p>
+                <StreamgraphChart {...usageData} />
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelector('.highcharts-container')).not.toBeNull();
+        });
+        for (const label of canvasElement.querySelectorAll('.highcharts-axis-labels text')) {
+            if (!label.textContent?.trim()) continue;
+            const style = getComputedStyle(label);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(style.fontVariantNumeric).toBe('tabular-nums');
+        }
+    },
+};
 
 export const Interactive = {
     args: {
         categories: ['Q1', 'Q2', 'Q3', 'Q4'],
         series: [
             { name: 'Series A', data: [10, 20, 30, 25] },
-            { name: 'Series B', data: [15, 25, 20, 30] }
+            { name: 'Series B', data: [15, 25, 20, 30] },
         ],
-        height: 400
-    }
+        height: 400,
+        sort: false,
+    },
 };

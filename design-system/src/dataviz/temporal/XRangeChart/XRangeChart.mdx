@@ -65,7 +65,8 @@ as a quantity, use `AreaChart`.
 `categories` names the rows top to bottom. `data` is an array of
 `{ start, end, y, name, color }`, where `start` and `end` are millisecond
 timestamps, `y` indexes into `categories`, and `name` and `color` are optional.
-`height` defaults to 400.
+`height` defaults to 400, and `sort` defaults to `false` (pass `sort` to rank
+rows from most to least total duration).
 
 ```jsx
 const day = 24 * 60 * 60 * 1000;
@@ -88,7 +89,7 @@ const monday = Date.UTC(2026, 8, 7);
 
 ## Color and accessibility
 
-- **Per-row color.** Bars take the [categorical color](?path=/docs/data-visualizations-color--docs) for their row index `y` (repeating past eight) unless overridden by `color`. When using a status `color` (for example, a canceled session), include the status in `name` as well.
+- **Per-row color.** A single row uses `--chart-brand`; two or more rows take the [categorical color](?path=/docs/data-visualizations-color--docs) for their row index `y` (repeating past eight) unless overridden by `color`. When using a status `color` (for example, a canceled session), include the status in `name` as well.
 - **Position and labels carry the reading.** Row labels, bar endpoints and bar `name`s convey who, when and what without hue.
 - **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
 - **Contrast.** Colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).

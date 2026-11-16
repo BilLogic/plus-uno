@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
 import chartTheme from '@/dataviz/chartTheme';
+import { seriesColor, sortCategories } from '@/dataviz/palette';
 
 /**
  * StreamgraphChart Component
@@ -11,44 +12,57 @@ import chartTheme from '@/dataviz/chartTheme';
 const StreamgraphChart = ({
     series = [],
     categories = [],
-    height = 400
+    height = 400,
+    sort = false,
 }) => {
+    const { categories: orderedCategories, series: orderedSeries } = useMemo(
+        () =>
+            sort
+                ? sortCategories({
+                      categories,
+                      series,
+                      value: (d) => (typeof d === 'number' ? d : d?.y),
+                  })
+                : { categories, series },
+        [categories, series, sort],
+    );
+
     const options = {
         ...chartTheme,
         chart: {
             ...chartTheme.chart,
             type: 'streamgraph',
-            height: height
+            height: height,
         },
         title: { text: null },
         xAxis: {
             ...chartTheme.xAxis,
-            categories: categories,
+            categories: orderedCategories,
             maxPadding: 0,
-            type: 'category'
+            type: 'category',
         },
         yAxis: {
             visible: false,
             startOnTick: false,
-            endOnTick: false
+            endOnTick: false,
         },
         tooltip: {
             ...chartTheme.tooltip,
-            shared: true
+            shared: true,
         },
         plotOptions: {
             series: {
-                label: { enabled: false }
-            }
+                label: { enabled: false },
+            },
         },
         legend: {
-            enabled: true
+            enabled: true,
         },
-        series: series.map((s, i) => ({
+        series: orderedSeries.map((s, i, all) => ({
             name: s.name,
             data: s.data,
-            color: chartTheme.colors[i % chartTheme.colors.length]
-        }))
+            color: s.color || seriesColor(i, all.length),
+        })),
     };
 
     return (
@@ -60,14 +74,19 @@ const StreamgraphChart = ({
 
 StreamgraphChart.propTypes = {
     /** Array of series {name, data: []} */
-    series: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        data: PropTypes.arrayOf(PropTypes.number).isRequired
-    })),
+    series: PropTypes.arrayOf(
+        PropTypes.shape({
+            name: PropTypes.string.isRequired,
+            data: PropTypes.arrayOf(PropTypes.number).isRequired,
+            color: PropTypes.string,
+        }),
+    ),
     /** X-axis categories */
     categories: PropTypes.arrayOf(PropTypes.string),
     /** Chart height */
-    height: PropTypes.number
+    height: PropTypes.number,
+    /** Sort categories from most to least by the first series; false by default on temporal axes. */
+    sort: PropTypes.bool,
 };
 
 export default StreamgraphChart;

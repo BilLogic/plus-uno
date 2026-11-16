@@ -105,5 +105,6 @@ describe('chart sources', () => {
             console.info(`[dataviz soft guard — ${report.length} chart files remaining]`, report);
         }
         expect(report.filter((entry) => entry.startsWith('comparison/'))).toEqual([]);
+        expect(report.filter((entry) => entry.startsWith('temporal/'))).toEqual([]);
     });
 });

@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme, { CHART_LINE_WIDTH_NUMBER, CHART_SPACING_MICRO } from '@/dataviz/chartTheme';
+import { tooltipHeaderFormat, valueSpan } from '@/dataviz/chartFormat';
+import chartTheme, { CHART_LINE_WIDTH_NUMBER, CHART_SPACING_MICRO, tokenNumber } from '@/dataviz/chartTheme';
 import { BRAND, STATUS } from '@/dataviz/palette';
 
 /** What a sparkline's line may mean: the brand by default, or a status. */
@@ -29,21 +30,23 @@ const Sparkline = ({
     width = 120,
     height = 32,
     showLastPoint = true,
-    valueSuffix = ''
+    valueSuffix = '',
 }) => {
     const color = SPARKLINE_TONES[tone];
+    const markerRadius = tokenNumber('--pad-y-md', 6) / 2;
+
     // Every point keeps a marker so keyboard focus and hover can land on it, but only the
     // latest value draws one at rest: the rest are radius 0 until hovered.
     const points = data.map((y, i) => ({
         y,
-        ...(showLastPoint && i === data.length - 1 && { marker: { radius: 3 } })
+        ...(showLastPoint && i === data.length - 1 && { marker: { radius: markerRadius } }),
     }));
 
     const options = {
         ...chartTheme,
         accessibility: {
             ...chartTheme.accessibility,
-            description: label
+            description: label,
         },
         chart: {
             ...chartTheme.chart,
@@ -51,45 +54,47 @@ const Sparkline = ({
             width,
             height,
             spacing: [CHART_SPACING_MICRO, CHART_SPACING_MICRO, CHART_SPACING_MICRO, CHART_SPACING_MICRO],
-            margin: [CHART_SPACING_MICRO, CHART_SPACING_MICRO, CHART_SPACING_MICRO, CHART_SPACING_MICRO]
+            margin: [CHART_SPACING_MICRO, CHART_SPACING_MICRO, CHART_SPACING_MICRO, CHART_SPACING_MICRO],
         },
         title: { text: null },
         xAxis: {
             visible: false,
-            categories
+            categories,
         },
         yAxis: {
             visible: false,
             startOnTick: false,
-            endOnTick: false
+            endOnTick: false,
         },
         legend: { enabled: false },
         tooltip: {
             ...chartTheme.tooltip,
             outside: true,
-            headerFormat: categories ? '<span>{point.key}</span><br/>' : '',
-            pointFormat: `<b>{point.y}${valueSuffix}</b>`
+            headerFormat: categories ? tooltipHeaderFormat() : '',
+            pointFormat: valueSpan(`{point.y}${valueSuffix}`),
         },
         plotOptions: {
             series: {
                 animation: false,
+            },
+            line: {
                 lineWidth: CHART_LINE_WIDTH_NUMBER,
-                states: { hover: { lineWidthPlus: 0 } },
                 marker: {
                     enabled: true,
                     radius: 0,
-                    states: { hover: { radius: 3, radiusPlus: 0 } },
                     symbol: 'circle',
                     lineWidth: CHART_LINE_WIDTH_NUMBER,
-                    lineColor: 'var(--ds-border-inverse)'
-                }
-            }
+                    lineColor: 'var(--ds-border-inverse)',
+                },
+            },
         },
-        series: [{
-            name: label,
-            color,
-            data: points
-        }]
+        series: [
+            {
+                name: label,
+                color,
+                data: points,
+            },
+        ],
     };
 
     return (
@@ -115,7 +120,7 @@ Sparkline.propTypes = {
     /** When true, marks the latest value */
     showLastPoint: PropTypes.bool,
     /** Text after each value in the tooltip, e.g. "%" */
-    valueSuffix: PropTypes.string
+    valueSuffix: PropTypes.string,
 };
 
 export default Sparkline;

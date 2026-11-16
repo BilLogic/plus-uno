@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme from '@/dataviz/chartTheme';
-import { seriesColor } from '@/dataviz/palette';
+import chartTheme, { tokenNumber } from '@/dataviz/chartTheme';
+import { seriesColor, sortCategories } from '@/dataviz/palette';
 
 /**
  * AreaChart Component
@@ -11,14 +11,30 @@ import { seriesColor } from '@/dataviz/palette';
 const AreaChart = ({
     data,
     categories,
-    stacking = null, // 'normal', 'percent', or null
+    stacking = null,
     xAxisLabel,
     yAxisLabel,
-    height = 300
+    height = 300,
+    sort = false,
 }) => {
-    const seriesWithTheme = data.map((s, i, all) => ({
+    const rawCategories = categories ?? data[0]?.categories;
+    const { categories: orderedCategories, series: orderedData } = useMemo(
+        () =>
+            sort && Array.isArray(rawCategories)
+                ? sortCategories({
+                      categories: rawCategories,
+                      series: data,
+                      value: (d) => (typeof d === 'number' ? d : d?.y),
+                  })
+                : { categories: rawCategories, series: data },
+        [rawCategories, data, sort],
+    );
+
+    const markerRadius = tokenNumber('--pad-x-xs', 4) / 2;
+
+    const seriesWithTheme = orderedData.map((s, i, all) => ({
         ...s,
-        color: s.color || seriesColor(i, all.length)
+        color: s.color || seriesColor(i, all.length),
     }));
 
     const options = {
@@ -26,17 +42,23 @@ const AreaChart = ({
         chart: {
             ...chartTheme.chart,
             type: 'area',
-            height: height
+            height: height,
         },
         title: { text: null },
         xAxis: {
             ...chartTheme.xAxis,
-            categories: categories ?? data[0]?.categories,
-            title: { text: xAxisLabel }
+            categories: orderedCategories,
+            title: {
+                ...chartTheme.xAxis.title,
+                text: xAxisLabel,
+            },
         },
         yAxis: {
             ...chartTheme.yAxis,
-            title: { text: yAxisLabel }
+            title: {
+                ...chartTheme.yAxis.title,
+                text: yAxisLabel,
+            },
         },
         plotOptions: {
             area: {
@@ -44,19 +66,16 @@ const AreaChart = ({
                 marker: {
                     enabled: false,
                     symbol: 'circle',
-                    radius: 2,
-                    states: {
-                        hover: { enabled: true }
-                    }
-                }
-            }
+                    radius: markerRadius,
+                },
+            },
         },
         legend: { enabled: true },
         tooltip: {
             ...chartTheme.tooltip,
-            shared: true
+            shared: true,
         },
-        series: seriesWithTheme
+        series: seriesWithTheme,
     };
 
     return (
@@ -67,17 +86,22 @@ const AreaChart = ({
 };
 
 AreaChart.propTypes = {
-    data: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        data: PropTypes.array.isRequired,
-        categories: PropTypes.array
-    })).isRequired,
+    data: PropTypes.arrayOf(
+        PropTypes.shape({
+            name: PropTypes.string.isRequired,
+            data: PropTypes.array.isRequired,
+            color: PropTypes.string,
+            categories: PropTypes.array,
+        }),
+    ).isRequired,
     /** X-axis period labels, one per point. Without them the axis counts 0, 1, 2. */
     categories: PropTypes.arrayOf(PropTypes.string),
     stacking: PropTypes.oneOf(['normal', 'percent', null]),
     xAxisLabel: PropTypes.string,
     yAxisLabel: PropTypes.string,
-    height: PropTypes.number
+    height: PropTypes.number,
+    /** Sort categories from most to least by the first series; false by default on temporal axes. */
+    sort: PropTypes.bool,
 };
 
 export default AreaChart;

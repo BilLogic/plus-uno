@@ -41,7 +41,7 @@ export const TABULAR = 'tabular-nums';
  * @param {number} fallback
  * @returns {number}
  */
-const tokenNumber = (varName, fallback) => {
+export const tokenNumber = (varName, fallback) => {
     if (typeof document === 'undefined') return fallback;
     const value = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
     const parsed = parseFloat(value);

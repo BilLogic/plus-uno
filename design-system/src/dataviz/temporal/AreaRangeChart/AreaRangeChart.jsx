@@ -13,41 +13,49 @@ const AreaRangeChart = ({
     data = [],
     xAxisLabel = '',
     yAxisLabel = 'Value',
-    height = 400
+    height = 400,
 }) => {
     const options = {
         ...chartTheme,
         chart: {
             ...chartTheme.chart,
             type: 'arearange',
-            height: height
+            height: height,
         },
         title: { text: null },
         xAxis: {
             ...chartTheme.xAxis,
-            title: { text: xAxisLabel }
+            title: {
+                ...chartTheme.xAxis.title,
+                text: xAxisLabel,
+            },
         },
         yAxis: {
             ...chartTheme.yAxis,
-            title: { text: yAxisLabel, style: chartTheme.yAxis.labels.style }
+            title: {
+                ...chartTheme.yAxis.title,
+                text: yAxisLabel,
+            },
         },
         tooltip: {
             ...chartTheme.tooltip,
             crosshairs: true,
             shared: true,
-            valueSuffix: ''
+            valueSuffix: '',
         },
         legend: { enabled: false },
-        series: [{
-            name: 'Range',
-            data: data,
-            color: BRAND,
-            fillOpacity: 0.3,
-            lineWidth: 0,
-            marker: {
-                enabled: false
-            }
-        }]
+        series: [
+            {
+                name: 'Range',
+                data: data,
+                color: BRAND,
+                fillOpacity: 0.3,
+                lineWidth: 0,
+                marker: {
+                    enabled: false,
+                },
+            },
+        ],
     };
 
     return (
@@ -65,7 +73,7 @@ AreaRangeChart.propTypes = {
     /** Y-axis label */
     yAxisLabel: PropTypes.string,
     /** Chart height */
-    height: PropTypes.number
+    height: PropTypes.number,
 };
 
 export default AreaRangeChart;

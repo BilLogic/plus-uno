@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
+import { valueSpan } from '@/dataviz/chartFormat';
 import chartTheme from '@/dataviz/chartTheme';
+import { seriesColor } from '@/dataviz/palette';
 
 /**
  * TimelineChart Component
@@ -10,38 +12,36 @@ import chartTheme from '@/dataviz/chartTheme';
  */
 const TimelineChart = ({
     data = [],
-    height = 400
+    height = 400,
 }) => {
     const options = {
         ...chartTheme,
         chart: {
             ...chartTheme.chart,
             type: 'timeline',
-            height: height
+            height: height,
         },
         title: { text: null },
         xAxis: {
-            visible: false
+            visible: false,
         },
         yAxis: {
-            visible: false
+            visible: false,
         },
-        tooltip: {
-            ...chartTheme.tooltip,
-            style: { width: 300 }
-        },
-        series: [{
-            data: data.map((item, index) => ({
-                name: item.name,
-                label: item.label || item.name,
-                description: item.description || '',
-                color: chartTheme.colors[index % chartTheme.colors.length]
-            })),
-            dataLabels: {
-                allowOverlap: false,
-                format: '<span style="font-weight: bold;">{point.label}</span><br/>{point.description}'
-            }
-        }]
+        series: [
+            {
+                data: data.map((item, index, all) => ({
+                    name: item.name,
+                    label: item.label || item.name,
+                    description: item.description || '',
+                    color: item.color || seriesColor(index, all.length),
+                })),
+                dataLabels: {
+                    allowOverlap: false,
+                    format: `${valueSpan('{point.label}')}<br/>{point.description}`,
+                },
+            },
+        ],
     };
 
     return (
@@ -52,14 +52,17 @@ const TimelineChart = ({
 };
 
 TimelineChart.propTypes = {
-    /** Array of events {name, label, description} */
-    data: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        label: PropTypes.string,
-        description: PropTypes.string
-    })),
+    /** Array of events {name, label, description, color} */
+    data: PropTypes.arrayOf(
+        PropTypes.shape({
+            name: PropTypes.string.isRequired,
+            label: PropTypes.string,
+            description: PropTypes.string,
+            color: PropTypes.string,
+        }),
+    ),
     /** Chart height */
-    height: PropTypes.number
+    height: PropTypes.number,
 };
 
 export default TimelineChart;

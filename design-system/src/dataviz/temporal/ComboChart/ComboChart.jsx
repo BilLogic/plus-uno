@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
-import Highcharts from '@/dataviz/highchartsModules';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme, { CHART_LINE_WIDTH_NUMBER } from '@/dataviz/chartTheme';
-import { CHROME } from '@/dataviz/palette';
+import chartTheme, { CHART_BAR_RADIUS } from '@/dataviz/chartTheme';
+import { seriesColor, sortCategories } from '@/dataviz/palette';
 
 /**
  * ComboChart Component
@@ -15,61 +14,90 @@ const ComboChart = ({
     categories,
     primaryAxisLabel,
     secondaryAxisLabel,
-    height = 300
+    height = 300,
+    sort = false,
 }) => {
-    // Determine colors: Bars usually primary/secondary, Lines can be tertiary/warning
-    const barSeries = barData.map((s, i) => ({
+    const {
+        categories: orderedCategories,
+        barSeriesData,
+        lineSeriesData,
+    } = useMemo(() => {
+        if (!sort) {
+            return {
+                categories,
+                barSeriesData: barData,
+                lineSeriesData: lineData,
+            };
+        }
+        const combined = [...barData, ...lineData];
+        const { categories: nextCategories, series: nextCombined } = sortCategories({
+            categories,
+            series: combined,
+            value: (d) => (typeof d === 'number' ? d : d?.y),
+        });
+        return {
+            categories: nextCategories,
+            barSeriesData: nextCombined.slice(0, barData.length),
+            lineSeriesData: nextCombined.slice(barData.length),
+        };
+    }, [categories, barData, lineData, sort]);
+
+    const totalSeries = barSeriesData.length + lineSeriesData.length;
+
+    const barSeries = barSeriesData.map((s, i) => ({
         ...s,
         type: 'column',
-        color: s.color || chartTheme.colors[i % chartTheme.colors.length]
+        color: s.color || seriesColor(i, totalSeries),
     }));
 
-    const lineSeries = lineData.map((s, i) => ({
+    const lineSeries = lineSeriesData.map((s, i) => ({
         ...s,
         type: 'line',
-        color: s.color || chartTheme.colors[(i + barData.length) % chartTheme.colors.length],
+        color: s.color || seriesColor(i + barSeriesData.length, totalSeries),
         marker: {
-            lineWidth: CHART_LINE_WIDTH_NUMBER,
-            lineColor: Highcharts.getOptions().colors[3], // default
-            fillColor: CHROME.surface
-        }
+            symbol: 'circle',
+        },
     }));
 
     const options = {
         ...chartTheme,
         chart: {
             ...chartTheme.chart,
-            height: height
+            height: height,
         },
         title: { text: null },
         xAxis: {
             ...chartTheme.xAxis,
-            categories: categories
+            categories: orderedCategories,
         },
         yAxis: [
-            { // Primary yAxis
+            {
                 ...chartTheme.yAxis,
                 title: {
                     ...chartTheme.yAxis.title,
-                    text: primaryAxisLabel
-                }
+                    text: primaryAxisLabel,
+                },
             },
-            { // Secondary yAxis
+            {
                 ...chartTheme.yAxis,
                 title: {
                     ...chartTheme.yAxis.title,
                     text: secondaryAxisLabel,
-                    style: { color: Highcharts.getOptions().colors[0] } // optional: match line color
                 },
-                opposite: true
-            }
+                opposite: true,
+            },
         ],
+        plotOptions: {
+            column: {
+                borderRadius: CHART_BAR_RADIUS,
+            },
+        },
         tooltip: {
             ...chartTheme.tooltip,
-            shared: true
+            shared: true,
         },
         legend: { enabled: true },
-        series: [...barSeries, ...lineSeries]
+        series: [...barSeries, ...lineSeries],
     };
 
     return (
@@ -85,7 +113,9 @@ ComboChart.propTypes = {
     categories: PropTypes.array.isRequired,
     primaryAxisLabel: PropTypes.string,
     secondaryAxisLabel: PropTypes.string,
-    height: PropTypes.number
+    height: PropTypes.number,
+    /** Sort categories from most to least by the first series; false by default on temporal axes. */
+    sort: PropTypes.bool,
 };
 
 export default ComboChart;

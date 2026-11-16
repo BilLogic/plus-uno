@@ -48,7 +48,7 @@ use `TreemapChart`.
 <RefTable
     head={['Part', 'What it does']}
     rows={[
-        ['Step bars', <>One per change, starting where the previous bar ended (gains in <C>--chart-success</C>, losses in <C>--chart-danger</C>, outlined in <C>--ds-border-inverse</C>).</>],
+        ['Step bars', <>One per change, starting where the previous bar ended and rounded on the value end with <C>--chart-bar-radius</C> (gains in <C>--chart-success</C>, losses in <C>--chart-danger</C>, outlined in <C>--ds-border-inverse</C>).</>],
         ['Total bars', <><C>isSum: true</C> draws the full total from zero; <C>isIntermediateSum: true</C> draws a subtotal since the last one.</>],
         ['Connectors', 'Thin lines in the grid border token joining the end of each bar to the start of the next.'],
         ['Value labels', 'Whole-number value on every bar (losses carry a minus sign; gains carry no plus sign).'],

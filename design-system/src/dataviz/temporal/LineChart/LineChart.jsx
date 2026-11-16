@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
 import chartTheme from '@/dataviz/chartTheme';
-import { seriesColor } from '@/dataviz/palette';
+import { seriesColor, sortCategories } from '@/dataviz/palette';
 
 /**
  * LineChart Component
@@ -10,18 +10,30 @@ import { seriesColor } from '@/dataviz/palette';
  */
 const LineChart = ({
     data,
+    categories,
     xAxisLabel,
     yAxisLabel,
     height = 300,
     yDomain,
-    yTicks
+    yTicks,
+    sort = false,
 }) => {
-    // data: Array of series objects: [{ name: 'Series 1', data: [1, 2, 3] }, ...]
+    const rawCategories = categories ?? data[0]?.categories;
+    const { categories: orderedCategories, series: orderedData } = useMemo(
+        () =>
+            sort && Array.isArray(rawCategories)
+                ? sortCategories({
+                      categories: rawCategories,
+                      series: data,
+                      value: (d) => (typeof d === 'number' ? d : d?.y),
+                  })
+                : { categories: rawCategories, series: data },
+        [rawCategories, data, sort],
+    );
 
-    // Automatically apply theme colors if series don't have them
-    const seriesWithTheme = data.map((s, i, all) => ({
+    const seriesWithTheme = orderedData.map((s, i, all) => ({
         ...s,
-        color: s.color || seriesColor(i, all.length)
+        color: s.color || seriesColor(i, all.length),
     }));
 
     const options = {
@@ -29,37 +41,36 @@ const LineChart = ({
         chart: {
             ...chartTheme.chart,
             type: 'line',
-            height: height
+            height: height,
         },
         title: { text: null },
         xAxis: {
             ...chartTheme.xAxis,
             title: {
                 ...chartTheme.xAxis.title,
-                text: xAxisLabel
+                text: xAxisLabel,
             },
-            categories: data[0]?.categories // Optional: if categories are passed in first series or separate prop
+            categories: orderedCategories,
         },
         yAxis: {
             ...chartTheme.yAxis,
             title: {
                 ...chartTheme.yAxis.title,
-                text: yAxisLabel
+                text: yAxisLabel,
             },
-            // Optional: a fixed domain and ticks; without them Highcharts picks its own.
             ...(yDomain ? { min: yDomain[0], max: yDomain[1] } : {}),
-            ...(yTicks ? { tickPositions: yTicks } : {})
+            ...(yTicks ? { tickPositions: yTicks } : {}),
         },
         plotOptions: {
             line: {
                 marker: {
                     enabled: true,
-                    symbol: 'circle'
-                }
-            }
+                    symbol: 'circle',
+                },
+            },
         },
         legend: { enabled: true },
-        series: seriesWithTheme
+        series: seriesWithTheme,
     };
 
     return (
@@ -70,19 +81,25 @@ const LineChart = ({
 };
 
 LineChart.propTypes = {
-    data: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string.isRequired,
-        data: PropTypes.array.isRequired,
-        color: PropTypes.string,
-        categories: PropTypes.array // Optional categories for X axis
-    })).isRequired,
+    data: PropTypes.arrayOf(
+        PropTypes.shape({
+            name: PropTypes.string.isRequired,
+            data: PropTypes.array.isRequired,
+            color: PropTypes.string,
+            categories: PropTypes.array,
+        }),
+    ).isRequired,
+    /** X-axis period labels, one per point. May also be passed on the first series. */
+    categories: PropTypes.arrayOf(PropTypes.string),
     xAxisLabel: PropTypes.string,
     yAxisLabel: PropTypes.string,
     height: PropTypes.number,
     /** The y-axis domain as [min, max]; omitted, Highcharts fits it to the data */
     yDomain: PropTypes.arrayOf(PropTypes.number),
     /** The y-axis tick values, e.g. [0, 25, 50, 75, 100]; omitted, Highcharts picks them */
-    yTicks: PropTypes.arrayOf(PropTypes.number)
+    yTicks: PropTypes.arrayOf(PropTypes.number),
+    /** Sort categories from most to least by the first series; false by default on temporal axes. */
+    sort: PropTypes.bool,
 };
 
 export default LineChart;

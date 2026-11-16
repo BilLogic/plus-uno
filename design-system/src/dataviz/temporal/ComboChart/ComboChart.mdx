@@ -67,7 +67,8 @@ does not create false crossings. For ranked causes with a cumulative line, use
 `categories` is an array of period labels. `barData` and `lineData` (all three
 required; pass `[]` for an unused side) are arrays of `{ name, data, color, yAxis }`.
 Set `yAxis: 1` on a line series to plot it against the secondary axis; `height`
-defaults to 300.
+defaults to 300, and `sort` defaults to `false` on temporal axes (pass `sort` to
+order categories from most to least by the first series).
 
 ```jsx
 <ComboChart
@@ -85,9 +86,8 @@ defaults to 300.
 
 ## Color and accessibility
 
-- **Sequential categorical assignment.** `barData` series take [categorical slots](?path=/docs/data-visualizations-color--docs) starting at slot 1 (even for a single column series), and `lineData` continues from the next free slot.
+- **Automatic series color.** One series alone uses `--chart-brand`; two or more take [categorical slots](?path=/docs/data-visualizations-color--docs) in order across `barData` and then `lineData`.
 - **Shape and explicit axis labels.** Columns and lines stay distinct without hue, while multiple series of the same kind rely on color. Include units in `primaryAxisLabel`, `secondaryAxisLabel` and series names so each series maps clearly to its axis.
-- **Known gap.** Line marker rings and the secondary axis title use Highcharts defaults and marker fills are white rather than chart tokens, so they do not adapt to color mode.
 - **Screen readers and keyboard.** Renders a labeled group with a screen-reader summary of its type and axes, per-series and per-point labels, and arrow-key navigation. Name the chart in its surrounding Section or Card header.
 - **Contrast.** Series colors follow the page's color mode and increased-contrast setting; the tooltip uses the Popup pattern's background and text tokens ([Foundations](?path=/docs/data-visualizations-foundations--docs)).
 

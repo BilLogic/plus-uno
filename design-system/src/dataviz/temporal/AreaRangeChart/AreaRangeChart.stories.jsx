@@ -1,96 +1,79 @@
 import React from 'react';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
 import AreaRangeChart from './AreaRangeChart';
 
 export default {
     title: 'Data visualizations/Temporal/Area range chart',
     component: AreaRangeChart,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## Area Range Chart
-
-Shows a **range of values over time** with a filled area between min and max.
-
-### Overview
-Shows a **range of values over time** with a filled area between min and max.
-
----
-
-### How to Read
-- **Filled area** = range between low and high
-- **Width of band** = variability at that point
-- Wider band = more variation
-
----
-
-### When to Use
-
-| Use Case | Recommendation |
-|----------|----------------|
-| Confidence intervals | ✅ Ideal |
-| Min/max over time | ✅ Ideal |
-| Temperature ranges | ✅ Good |
-| Single values | ❌ Use Line Chart |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Score Bands** | Expected score range |
-| **Activity Windows** | Peak usage times |
-| **Performance Range** | Min/max ratings |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Align the area range chart setup with the primary question you need to answer
-✅ Keep labels, units, and legends explicit so interpretation is immediate
-✅ Limit visual complexity to emphasize the most important pattern
-✅ Use consistent color meaning across categories or series
-
-**Avoid:**
-❌ Mixing unrelated metrics without clarifying scale or context
-❌ Overcrowding the chart with too many categories or series
-❌ Using decorative styling that competes with the data
-                `
-            }
-        }
-    }
+    argTypes: {
+        data: { control: 'object', description: 'Array of [x, low, high] triples' },
+        xAxisLabel: { control: 'text', description: 'Label for the X axis' },
+        yAxisLabel: { control: 'text', description: 'Label for the Y axis' },
+        height: { control: 'number', description: 'Chart height in pixels' },
+    },
 };
 
-// Sample data: [x, low, high]
-const temperatureData = {
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
+};
+
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--card-stack-md)',
+};
+
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
+};
+
+const scoreRangeData = {
     data: [
-        [0, 14, 22], [1, 13, 23], [2, 15, 25], [3, 16, 24],
-        [4, 18, 28], [5, 20, 30], [6, 22, 32], [7, 21, 31],
-        [8, 19, 29], [9, 17, 27], [10, 15, 24], [11, 14, 22]
+        [1, 54, 78], [2, 56, 80], [3, 58, 83], [4, 60, 84],
+        [5, 62, 86], [6, 63, 88], [7, 65, 89], [8, 66, 90],
+        [9, 68, 91], [10, 69, 92], [11, 70, 93], [12, 72, 94],
     ],
-    xAxisLabel: 'Month',
-    yAxisLabel: 'Temperature (°C)'
+    xAxisLabel: 'Week of term',
+    yAxisLabel: 'Session score (%)',
 };
 
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Monthly Temperature Range</h3>
-            <AreaRangeChart {...temperatureData} />
-        </section>
-    </div>
-);
-
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Weekly score range</Heading>
+                <p style={captionStyle}>
+                    Filled band from the lowest to highest session score each week.
+                </p>
+                <AreaRangeChart {...scoreRangeData} />
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelector('.highcharts-container')).not.toBeNull();
+        });
+        for (const label of canvasElement.querySelectorAll('.highcharts-axis-labels text')) {
+            if (!label.textContent?.trim()) continue;
+            const style = getComputedStyle(label);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(style.fontVariantNumeric).toBe('tabular-nums');
+        }
+    },
+};
 
 export const Interactive = {
     args: {
         data: [
-            [0, 10, 20], [1, 12, 22], [2, 15, 25], [3, 18, 28], [4, 16, 24]
+            [0, 10, 20], [1, 12, 22], [2, 15, 25], [3, 18, 28], [4, 16, 24],
         ],
-        xAxisLabel: 'Time',
+        xAxisLabel: 'Week',
         yAxisLabel: 'Value',
-        height: 400
-    }
+        height: 400,
+    },
 };
