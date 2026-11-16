@@ -2,7 +2,7 @@
 
 # Library
 
-Every template's, pattern's and component's enter, exit and change motion in one gallery, to watch and replay them in one place.
+Look up every template's, pattern's and component's enter, exit and change motion from the registry in one place.
 
 **Kind:** Foundation
 
@@ -10,6 +10,6 @@ Every template's, pattern's and component's enter, exit and change motion in one
 
 ## Gallery
 
-Each card plays a template's, pattern's or component's motion events from the registry on its transition drawing, grouped from templates to patterns to components, with its tokens, sound (Sound · When to play) and a link to its page's Motion section.
+Search by name, filter by tier, transition, token family or sound (Sound · When to play), and switch event tabs or press replay on any card to watch its motion again.
 
 ## Related

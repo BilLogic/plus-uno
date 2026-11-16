@@ -1,8 +1,26 @@
-import React, { useMemo, useState } from 'react';
+import React, { useId, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Code, IconButton, Link, Tabs, Tag } from '@/components';
+import {
+    Button,
+    Code,
+    EmptyState,
+    FilterMenu,
+    IconButton,
+    Link,
+    SearchField,
+    Tabs,
+    Tag,
+} from '@/components';
+import { HeadingContextProvider } from '@/lib/headingLevel';
+import { SwapInPlace } from '@/lib/swapMotion';
 import { PatternCard } from '@/patterns';
-import { MOTION_TIERS, motionLibraryOf } from '../../../scripts/lib/tokens/motion-docs.mjs';
+import {
+    MOTION_FAMILIES,
+    MOTION_TIERS,
+    MOTION_TRANSITIONS,
+    filterMotionLibrary,
+    motionLibraryOf,
+} from '../../../scripts/lib/tokens/motion-docs.mjs';
 import { MotionDemo } from './illustrations/motion.jsx';
 import {
     climbOneScene,
@@ -242,6 +260,7 @@ export const MotionLibraryCard = ({
     fastForward = 1,
     playOnInView = true,
 }) => {
+    const titleId = useId();
     const events = row.events ?? [];
     const initialKey =
         defaultEvent && events.some((e) => e.event === defaultEvent)
@@ -275,28 +294,38 @@ export const MotionLibraryCard = ({
 
     return (
         <PatternCard
-            title={row.name}
+            role="group"
+            aria-labelledby={titleId}
             minWidth="var(--card-min-width-md)"
             data-motion-card={`${row.tier}:${row.name}`}
             data-tier={row.tier}
             data-active-event={activeEvent.event}
             data-active-mode={mode}
             data-active-transition={activeEvent.transition}
-            actions={
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-sm)' }}>
-                    <Tag color="gray">{row.tier}</Tag>
-                    <IconButton
-                        icon={reduced ? 'play' : 'rotate-right'}
-                        appearance="subtle"
-                        spacing="compact"
-                        label={
-                            reduced
-                                ? `Play ${row.name} ${activeEvent.event} motion once`
-                                : `Replay ${row.name} ${activeEvent.event} motion`
-                        }
-                        data-motion-replay
-                        onClick={handleReplay}
-                    />
+            header={
+                <div className="plus-pattern-card-header--default">
+                    <div className="plus-pattern-card-heading">
+                        <span id={titleId} className="plus-pattern-card-title">
+                            {row.name}
+                        </span>
+                    </div>
+                    <div className="plus-pattern-card-actions">
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-sm)' }}>
+                            <Tag color="gray">{row.tier}</Tag>
+                            <IconButton
+                                icon={reduced ? 'play' : 'rotate-right'}
+                                appearance="subtle"
+                                spacing="compact"
+                                label={
+                                    reduced
+                                        ? `Play ${row.name} ${activeEvent.event} motion once`
+                                        : `Replay ${row.name} ${activeEvent.event} motion`
+                                }
+                                data-motion-replay
+                                onClick={handleReplay}
+                            />
+                        </div>
+                    </div>
                 </div>
             }
             footer={
@@ -394,6 +423,9 @@ MotionLibraryCard.propTypes = {
         name: PropTypes.string.isRequired,
         tier: PropTypes.oneOf(MOTION_TIERS).isRequired,
         href: PropTypes.string,
+        transitions: PropTypes.arrayOf(PropTypes.string),
+        families: PropTypes.arrayOf(PropTypes.string),
+        sounds: PropTypes.arrayOf(PropTypes.string),
         events: PropTypes.arrayOf(
             PropTypes.shape({
                 event: PropTypes.string.isRequired,
@@ -413,12 +445,25 @@ MotionLibraryCard.propTypes = {
     playOnInView: PropTypes.bool,
 };
 
+const BLANK_FILTERS = Object.freeze({
+    tiers: [],
+    transitions: [],
+    families: [],
+    sounds: [],
+});
+
+const CARD_GRID_STYLE = {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, var(--card-min-width-md)), 1fr))',
+    gap: 'var(--grid-gutter)',
+    alignItems: 'stretch',
+};
+
 /**
  * The Motion · Library gallery: one animated card per row in the motion
- * registry, grouped templates → patterns → components.
- *
- * Accepts `rows` (for #2652's search and facet filtering) and `renderSubject`
- * (for #2653's live component subjects).
+ * registry, grouped templates → patterns → components when no tier filter is
+ * active, with search by name and facet filters for tier, transition, token
+ * family and sound.
  */
 export const MotionLibrary = ({
     rows: rowsProp,
@@ -427,16 +472,155 @@ export const MotionLibrary = ({
     fastForward = 1,
     playOnInView = true,
 }) => {
-    const rows = useMemo(() => rowsProp ?? motionLibraryOf(), [rowsProp]);
+    const baseRows = useMemo(() => rowsProp ?? motionLibraryOf(), [rowsProp]);
+    const [query, setQuery] = useState('');
+    const [appliedFilters, setAppliedFilters] = useState(BLANK_FILTERS);
+
+    const soundTokens = useMemo(
+        () => [...new Set(baseRows.flatMap((r) => r.sounds ?? []))].sort(),
+        [baseRows],
+    );
+
+    const categories = useMemo(() => {
+        const list = [
+            {
+                id: 'tiers',
+                label: 'Tier',
+                options: MOTION_TIERS.map((tier) => ({
+                    value: tier,
+                    label: TIER_TITLES[tier] ?? tier,
+                })),
+            },
+            {
+                id: 'transitions',
+                label: 'Transition',
+                options: [...MOTION_TRANSITIONS],
+            },
+            {
+                id: 'families',
+                label: 'Token family',
+                options: [...MOTION_FAMILIES],
+            },
+        ];
+        if (soundTokens.length > 0) {
+            list.push({
+                id: 'sounds',
+                label: 'Sound',
+                options: soundTokens.map((token) => ({
+                    value: token,
+                    label: `sound.${token}`,
+                })),
+            });
+        }
+        return list;
+    }, [soundTokens]);
+
+    const filteredRows = useMemo(
+        () =>
+            filterMotionLibrary(baseRows, {
+                query,
+                tiers: appliedFilters.tiers,
+                transitions: appliedFilters.transitions,
+                families: appliedFilters.families,
+                sounds: appliedFilters.sounds,
+            }),
+        [baseRows, query, appliedFilters],
+    );
+
+    const appliedFilterCount = useMemo(
+        () =>
+            Object.values(appliedFilters).reduce(
+                (sum, picked) => sum + (picked?.length ?? 0),
+                0,
+            ),
+        [appliedFilters],
+    );
+    const hasQuery = query.trim().length > 0;
+    const isFiltered = hasQuery || appliedFilterCount > 0;
+    const hasTierFilter = (appliedFilters.tiers?.length ?? 0) > 0;
+
     const groups = useMemo(
         () =>
             MOTION_TIERS.map((tier) => ({
                 tier,
                 title: TIER_TITLES[tier] ?? tier,
-                rows: rows.filter((r) => r.tier === tier),
+                rows: filteredRows.filter((r) => r.tier === tier),
             })).filter((g) => g.rows.length > 0),
-        [rows],
+        [filteredRows],
     );
+
+    const handleResetAll = () => {
+        setQuery('');
+        setAppliedFilters(BLANK_FILTERS);
+    };
+
+    const renderCards = (cardRows) => (
+        <div style={CARD_GRID_STYLE}>
+            {cardRows.map((row) => (
+                <MotionLibraryCard
+                    key={`${row.tier}:${row.name}`}
+                    row={row}
+                    subject={renderSubject}
+                    reduced={reduced}
+                    fastForward={fastForward}
+                    playOnInView={playOnInView}
+                />
+            ))}
+        </div>
+    );
+
+    const swapKey = `${query.trim().toLowerCase()}|${JSON.stringify(appliedFilters)}`;
+
+    let resultsContent;
+    if (filteredRows.length === 0) {
+        resultsContent = (
+            <HeadingContextProvider value={2}>
+                <EmptyState
+                    spacing="compact"
+                    icon="magnifying-glass"
+                    header="No motion matches these filters"
+                    description="Reset the filters to see every template, pattern and component."
+                    primaryAction={
+                        <Button
+                            text="Reset filters"
+                            appearance="default"
+                            spacing="default"
+                            onClick={handleResetAll}
+                        />
+                    }
+                />
+            </HeadingContextProvider>
+        );
+    } else if (hasTierFilter) {
+        resultsContent = renderCards(filteredRows);
+    } else {
+        resultsContent = (
+            <div
+                style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--section-stack-lg)',
+                }}
+            >
+                {groups.map((group) => (
+                    <section
+                        key={group.tier}
+                        data-motion-tier-group={group.tier}
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 'var(--section-stack-md)',
+                        }}
+                    >
+                        <h3 style={{ margin: 0, font: 'var(--heading-md)', color: 'var(--ds-text)' }}>
+                            {group.title}
+                        </h3>
+                        {renderCards(group.rows)}
+                    </section>
+                ))}
+            </div>
+        );
+    }
 
     return (
         <div
@@ -445,44 +629,63 @@ export const MotionLibrary = ({
             style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'var(--section-stack-lg)',
+                gap: 'var(--section-stack-md)',
             }}
         >
-            {groups.map((group) => (
-                <section
-                    key={group.tier}
-                    data-motion-tier-group={group.tier}
+            <div
+                data-motion-library-bar
+                style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 'var(--inline-md)',
+                }}
+            >
+                <span
+                    role="status"
+                    aria-live="polite"
+                    data-motion-library-count
+                    style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}
+                >
+                    {`${filteredRows.length} of ${baseRows.length}`}
+                </span>
+                <div
                     style={{
                         display: 'flex',
-                        flexDirection: 'column',
-                        gap: 'var(--section-stack-md)',
+                        flexWrap: 'wrap',
+                        alignItems: 'center',
+                        gap: 'var(--inline-sm)',
+                        marginInlineStart: 'auto',
                     }}
                 >
-                    <h3 style={{ margin: 0, font: 'var(--heading-md)', color: 'var(--ds-text)' }}>
-                        {group.title}
-                    </h3>
-                    <div
-                        style={{
-                            display: 'grid',
-                            gridTemplateColumns:
-                                'repeat(auto-fill, minmax(min(100%, var(--card-min-width-md)), 1fr))',
-                            gap: 'var(--grid-gutter)',
-                            alignItems: 'stretch',
-                        }}
-                    >
-                        {group.rows.map((row) => (
-                            <MotionLibraryCard
-                                key={`${row.tier}:${row.name}`}
-                                row={row}
-                                subject={renderSubject}
-                                reduced={reduced}
-                                fastForward={fastForward}
-                                playOnInView={playOnInView}
-                            />
-                        ))}
-                    </div>
-                </section>
-            ))}
+                    {isFiltered && filteredRows.length > 0 && (
+                        <Button
+                            text="Reset filters"
+                            appearance="subtle"
+                            spacing="default"
+                            onClick={handleResetAll}
+                        />
+                    )}
+                    <SearchField
+                        placeholder="Search by name"
+                        spacing="compact"
+                        value={query}
+                        onValueChange={setQuery}
+                    />
+                    <FilterMenu
+                        label="Filters"
+                        categories={categories}
+                        value={appliedFilters}
+                        onApply={(next) => setAppliedFilters({ ...BLANK_FILTERS, ...next })}
+                        width="4-col"
+                    />
+                </div>
+            </div>
+
+            <SwapInPlace swapKey={swapKey} reducedMotion={reduced}>
+                {resultsContent}
+            </SwapInPlace>
         </div>
     );
 };
