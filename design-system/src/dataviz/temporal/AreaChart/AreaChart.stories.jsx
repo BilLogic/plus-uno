@@ -1,90 +1,51 @@
 import React from 'react';
+import { expect, waitFor } from 'storybook/test';
+import { Heading } from '@/components';
 import AreaChart from './AreaChart';
 
 export default {
     title: 'Data visualizations/Temporal/Area chart',
     component: AreaChart,
     tags: ['!dev', '!autodocs'],
-    parameters: {
-        docs: {
-            description: {
-                component: `## Area Chart
-
-An area chart fills the space below a line, emphasizing **volume and magnitude over time**.
-
-### Overview
-An area chart fills the space below a line, emphasizing **volume and magnitude over time**.
-
----
-
-### How to Read
-- **Line** shows the trend over time
-- **Filled area** emphasizes cumulative magnitude
-- **Stacked areas** show how parts contribute to total
-- Height at any point = total value at that time
-
----
-
-### When to Use
-
-| Use Case | Recommendation |
-|----------|----------------|
-| Emphasizing volume/magnitude | ✅ Ideal |
-| Stacked part-to-whole over time | ✅ Ideal |
-| Simple trend lines | ❌ Use Line Chart |
-| Precise value reading | ❌ Use Bar Chart |
-| Many overlapping series | ❌ Use Line Chart |
-
----
-
-### PLUS Context
-
-| Scenario | Example |
-|----------|---------|
-| **Cumulative Learning** | Total hours studied over semester |
-| **Enrollment Growth** | Student count over time (stacked by grade) |
-| **Session Volume** | Daily sessions by type (stacked) |
-| **Progress Tracking** | Cumulative assignments completed |
-
----
-
-### How to Use
-
-**Best Practices:**
-✅ Use transparency for overlapping areas
-✅ Order stacked areas logically (largest at bottom)
-✅ Include X-axis time labels
-✅ Use consistent time intervals
-
-**Avoid:**
-❌ Too many overlapping unstacked areas
-❌ Vastly different scales in same chart
-❌ Missing axis labels
-                `
-            }
-        }
-    },
     argTypes: {
-        xAxisLabel: { control: 'text', description: 'Label for X axis' },
-        yAxisLabel: { control: 'text', description: 'Label for Y axis' },
-        categories: { control: 'object', description: 'X-axis category labels' },
-        series: { control: 'object', description: 'Array of series { name, data }' },
+        xAxisLabel: { control: 'text', description: 'Label for the X axis' },
+        yAxisLabel: { control: 'text', description: 'Label for the Y axis' },
+        categories: { control: 'object', description: 'X-axis period labels' },
+        data: { control: 'object', description: 'Array of series { name, data, color, categories }' },
+        stacking: { control: 'select', options: [null, 'normal', 'percent'], description: 'Stack areas into a total or percentage' },
         height: { control: 'number', description: 'Chart height in pixels' },
-        stacked: { control: 'boolean', description: 'Stack areas on top of each other' }
-    }
+        sort: { control: 'boolean', description: 'Sort categories from most to least; false by default on temporal axes' },
+    },
+};
+
+const stackStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--section-stack-lg)',
+};
+
+const sectionStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--card-stack-md)',
+};
+
+const captionStyle = {
+    margin: 0,
+    color: 'var(--ds-text-subtle)',
 };
 
 const quarters = ['Fall 2024', 'Spring 2025', 'Fall 2025', 'Spring 2026'];
 const months = ['Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-const revenueData = {
+const standardData = {
     categories: quarters,
     xAxisLabel: 'Term',
     yAxisLabel: 'Sessions',
     data: [
         { name: 'Math', data: [500, 700, 800, 1000] },
-        { name: 'Reading', data: [300, 400, 500, 600] }
-    ]
+        { name: 'Reading', data: [300, 400, 500, 600] },
+    ],
 };
 
 const stackedData = {
@@ -94,36 +55,43 @@ const stackedData = {
     stacking: 'normal',
     data: [
         { name: 'Math', data: [500, 700, 800, 1000] },
-        { name: 'Reading', data: [300, 400, 500, 600] }
-    ]
+        { name: 'Reading', data: [300, 400, 500, 600] },
+    ],
 };
 
-/**
- * Overview: Displays all chart variants and examples
- */
-export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Standard Area</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
-                Shows magnitude of values over time.
-            </p>
-            <AreaChart {...revenueData} />
-        </section>
+export const Overview = {
+    render: () => (
+        <div style={stackStyle}>
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Standard area</Heading>
+                <p style={captionStyle}>
+                    Shows magnitude of values over time.
+                </p>
+                <AreaChart {...standardData} />
+            </section>
 
-        <section>
-            <h3 style={{ marginBottom: '16px' }}>Stacked Area</h3>
-            <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
-                Shows how parts contribute to a total over time.
-            </p>
-            <AreaChart {...stackedData} />
-        </section>
-    </div>
-);
+            <section style={sectionStyle}>
+                <Heading as="h3" size="small">Stacked area</Heading>
+                <p style={captionStyle}>
+                    Shows how parts contribute to a total over time.
+                </p>
+                <AreaChart {...stackedData} />
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await waitFor(() => {
+            expect(canvasElement.querySelectorAll('.highcharts-container').length).toBe(2);
+        });
+        for (const label of canvasElement.querySelectorAll('.highcharts-axis-labels text')) {
+            if (!label.textContent?.trim()) continue;
+            const style = getComputedStyle(label);
+            expect(style.fontFamily).toContain('Noto Sans');
+            expect(style.fontVariantNumeric).toBe('tabular-nums');
+        }
+    },
+};
 
-/**
- * Interactive: Playground with property controls
- */
 export const Interactive = {
     args: {
         xAxisLabel: 'Month',
@@ -131,9 +99,10 @@ export const Interactive = {
         categories: months,
         stacking: null,
         height: 300,
+        sort: false,
         data: [
             { name: 'Series 1', data: [100, 150, 120, 180, 200] },
-            { name: 'Series 2', data: [80, 100, 90, 120, 140] }
-        ]
-    }
+            { name: 'Series 2', data: [80, 100, 90, 120, 140] },
+        ],
+    },
 };

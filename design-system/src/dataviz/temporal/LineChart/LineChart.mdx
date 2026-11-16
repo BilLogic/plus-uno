@@ -65,9 +65,9 @@ chart, use `ComboChart`. For a compact trend beside a number with no axes, use
 ## Data shape
 
 `data` is an array of `{ name, data, categories, color }` series, with period
-labels passed on the first series' `categories` (there is no separate
-`categories` prop). `height` defaults to 300. Omit `color` to assign one
-automatically.
+labels passed in `categories` (or on the first series' `categories`). `height`
+defaults to 300, and `sort` defaults to `false` to preserve chronological order.
+Omit `color` to assign one automatically.
 
 ```jsx
 <LineChart
