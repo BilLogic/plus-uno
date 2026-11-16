@@ -26,7 +26,7 @@ test('derives Storybook docs links and section anchors from MDX pages and Motion
     },
     {
       file: 'design-system/src/components/layout-and-structure/Panel/Panel.mdx',
-      docsId: 'components-layout-and-structure-panel-panel--docs',
+      docsId: 'components-layout-and-structure-panel--docs',
       source: [
         '<Meta of={PanelStories} />',
         '',
@@ -60,7 +60,7 @@ test('derives Storybook docs links and section anchors from MDX pages and Motion
 
   const links = deriveMotionLibraryLinksFromPages(pages, REGISTRY);
   assert.deepEqual(links, {
-    'component:Panel': '?path=/docs/components-layout-and-structure-panel-panel--docs#motion',
+    'component:Panel': '?path=/docs/components-layout-and-structure-panel--docs#motion',
     'pattern:Filtering': '?path=/docs/patterns-filtering--docs#custom-motion',
     'template:Blanket': '?path=/docs/templates-modal--docs#blanket-motion',
     'template:Panel': '?path=/docs/templates-panel--docs#motion',

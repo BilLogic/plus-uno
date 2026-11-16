@@ -204,7 +204,7 @@ test('each Library row exposes href (null when unlinked) and tier-aware links fo
   ];
   const links = {
     'template:Popup': '?path=/docs/templates-popup--docs#motion',
-    'component:Popup': '?path=/docs/components-overlays-and-layering-popup-popup--docs#motion',
+    'component:Popup': '?path=/docs/components-overlays-and-layering-popup--docs#motion',
   };
   const rows = motionLibraryOf(shared, links);
   assert.deepEqual(
@@ -212,7 +212,7 @@ test('each Library row exposes href (null when unlinked) and tier-aware links fo
     [
       { tier: 'template', name: 'Popup', href: '?path=/docs/templates-popup--docs#motion' },
       { tier: 'pattern', name: 'Orphan', href: null },
-      { tier: 'component', name: 'Popup', href: '?path=/docs/components-overlays-and-layering-popup-popup--docs#motion' },
+      { tier: 'component', name: 'Popup', href: '?path=/docs/components-overlays-and-layering-popup--docs#motion' },
     ],
   );
 });
