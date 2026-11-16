@@ -54,7 +54,8 @@ const SNAPSHOT = 'scripts/figma-variables-snapshot.json';
  * Names are SORTED, which the pre-2026-08-29 snapshot was not. Figma's
  * `variableIds` order is neither stable nor meaningful, so an unsorted capture
  * makes every refresh a reordering diff and hides the two or three lines that
- * actually changed.
+ * actually changed. Each variable's `codeSyntax.WEB` is captured beside its
+ * name in a sorted `codeSyntax` map holding only the variables that have one.
  */
 export const PROBE = `const collections = await figma.variables.getLocalVariableCollectionsAsync();
 const all = await figma.variables.getLocalVariablesAsync();
@@ -63,9 +64,17 @@ const byType = {};
 for (const v of all) byType[v.resolvedType] = (byType[v.resolvedType] ?? 0) + 1;
 const collectionsOut = {};
 for (const c of collections) {
+  const vars = c.variableIds.map((id) => byId.get(id)).filter((v) => v?.name);
+  const variables = vars.map((v) => v.name).sort();
+  const webByName = new Map(vars.filter((v) => v.codeSyntax?.WEB).map((v) => [v.name, v.codeSyntax.WEB]));
+  const codeSyntax = {};
+  for (const name of variables) {
+    if (webByName.has(name)) codeSyntax[name] = webByName.get(name);
+  }
   collectionsOut[c.name] = {
     modes: c.modes.map((m) => m.name),
-    variables: c.variableIds.map((id) => byId.get(id)?.name).filter(Boolean).sort(),
+    variables,
+    codeSyntax,
   };
 }
 return { totalVariables: all.length, byType, collections: collectionsOut };`;
@@ -80,7 +89,7 @@ export function count(doc) {
  *
  * Three kinds of field, and only one of them comes from Figma:
  *
- *   from the probe   totalVariables, byType, collections[*].modes/variables
+ *   from the probe   totalVariables, byType, collections[*].modes/variables/codeSyntax
  *   hand-authored    note, collections[*].note — carried across, because they
  *                    say WHY a collection is shaped as it is and the probe has
  *                    no opinion about that
@@ -98,10 +107,20 @@ export function refreshed(previous, probe, capturedAt) {
   const collections = {};
   for (const [name, live] of Object.entries(probe.collections)) {
     const carried = previous?.collections?.[name] ?? {};
+    const variables = [...(live.variables ?? [])].sort();
+    const rawSyntax = live.codeSyntax && typeof live.codeSyntax === 'object' ? live.codeSyntax : {};
+    const codeSyntax = {};
+    for (const variable of variables) {
+      const web = rawSyntax[variable];
+      if (typeof web === 'string' && web.length > 0) {
+        codeSyntax[variable] = web;
+      }
+    }
     collections[name] = {
       ...(carried.note ? { note: carried.note } : {}),
       modes: live.modes ?? [],
-      variables: [...(live.variables ?? [])].sort(),
+      variables,
+      codeSyntax,
     };
   }
 
