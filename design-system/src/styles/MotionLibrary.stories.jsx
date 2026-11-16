@@ -17,7 +17,12 @@ import {
     filterMotionLibrary,
     motionLibraryOf,
 } from '../../../scripts/lib/tokens/motion-docs.mjs';
-import { MotionLibrary, MotionLibraryCard } from '@/storybook-docs/motion-library.jsx';
+import {
+    COMPONENT_SUBJECTS,
+    COMPONENT_SUBJECT_FALLBACKS,
+    MotionLibrary,
+    MotionLibraryCard,
+} from '@/storybook-docs/motion-library.jsx';
 import { speedFor } from '@/storybook-docs/illustrations/motion-story-helpers.jsx';
 
 export default {
@@ -28,6 +33,9 @@ export default {
 
 const ROWS = motionLibraryOf();
 const MULTI_EVENT_ROW = ROWS.find((r) => r.tier === 'component' && r.name === 'Modal') ?? ROWS.find((r) => r.events.length > 1);
+const CHECKBOX_ROW = ROWS.find((r) => r.tier === 'component' && r.name === 'Checkbox') ?? MULTI_EVENT_ROW;
+const FALLBACK_ROW = ROWS.find((r) => r.tier === 'component' && r.name === 'Sidebar');
+const PATTERN_ROW = ROWS.find((r) => r.tier === 'pattern') ?? ROWS[0];
 const MILESTONE_ROW = ROWS.find((r) => r.tier === 'template' && r.name === 'PatternCard') ?? ROWS[0];
 
 const expectSceneAtLanding = async (demoEl) => {
@@ -178,6 +186,145 @@ export const ExpressiveMilestoneCard = {
             { timeout: 15000, interval: 50 },
         );
         await expectSceneAtLanding(demo);
+    },
+};
+
+export const RealComponentCardAnimatesAndSettles = {
+    render: (_args, { viewMode } = {}) => (
+        <MotionLibraryCard
+            row={CHECKBOX_ROW}
+            reduced={false}
+            fastForward={speedFor(viewMode)}
+        />
+    ),
+    play: async ({ canvasElement }) => {
+        const card = canvasElement.querySelector('[data-motion-card="component:Checkbox"]');
+        await expect(card).toBeTruthy();
+        const demo = card.querySelector('[data-motion-demo]');
+        await expect(demo).toBeTruthy();
+        await expect(demo.dataset.subject).toBe('component');
+
+        await waitFor(
+            () => expect(demo.dataset.phase).toBe('settled'),
+            { timeout: 15000, interval: 50 },
+        );
+        await expect(Number(demo.dataset.passes)).toBeGreaterThanOrEqual(1);
+        await expectSceneAtLanding(demo);
+
+        const subjectEl = card.querySelector('[data-motion-component-subject="Checkbox"]');
+        await expect(subjectEl).toBeTruthy();
+        const checkbox = within(subjectEl).getByRole('checkbox', { name: 'Complete warm-up check' });
+        await expect(checkbox).toBeChecked();
+    },
+};
+
+export const RealComponentCardReducedTwin = {
+    render: (_args, { viewMode } = {}) => (
+        <MotionLibraryCard
+            row={CHECKBOX_ROW}
+            reduced
+            fastForward={speedFor(viewMode)}
+        />
+    ),
+    play: async ({ canvasElement }) => {
+        const card = canvasElement.querySelector('[data-motion-card="component:Checkbox"]');
+        await expect(card).toBeTruthy();
+        const demo = card.querySelector('[data-motion-demo]');
+        await expect(demo.dataset.subject).toBe('component');
+        await expect(demo.dataset.reduced).toBe('true');
+        await expect(demo.dataset.phase).toBe('still');
+        await expectSceneAtLanding(demo);
+
+        await waitFor(() =>
+            expect(card.querySelector('[data-motion-component-subject="Checkbox"]')).toBeTruthy(),
+        );
+        const subjectEl = card.querySelector('[data-motion-component-subject="Checkbox"]');
+        const checkbox = within(subjectEl).getByRole('checkbox', { name: 'Complete warm-up check' });
+        await expect(checkbox).toBeChecked();
+
+        // Reduced motion still plays once when explicitly requested via the Play button
+        const playOnceBtn = card.querySelector('[data-motion-replay]');
+        await userEvent.click(playOnceBtn);
+        await waitFor(
+            () => expect(demo.dataset.phase).toBe('settled'),
+            { timeout: 15000, interval: 50 },
+        );
+        await expect(Number(demo.dataset.passes)).toBeGreaterThanOrEqual(1);
+    },
+};
+
+export const ComponentSubjectCoverage = {
+    render: () => (
+        <div style={{ display: 'grid', gap: 'var(--space-200)' }}>
+            <MotionLibraryCard row={MULTI_EVENT_ROW} reduced playOnInView={false} />
+            {FALLBACK_ROW ? <MotionLibraryCard row={FALLBACK_ROW} reduced playOnInView={false} /> : null}
+            <MotionLibraryCard row={PATTERN_ROW} reduced playOnInView={false} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const componentRows = motionLibraryOf().filter((r) => r.tier === 'component');
+        const subjectKeys = new Set(Object.keys(COMPONENT_SUBJECTS));
+        const fallbackKeys = new Set(Object.keys(COMPONENT_SUBJECT_FALLBACKS));
+
+        const uncovered = [];
+        const overlapped = [];
+        for (const row of componentRows) {
+            const hasSubject = subjectKeys.has(row.name);
+            const hasFallback = fallbackKeys.has(row.name);
+            if (!hasSubject && !hasFallback) uncovered.push(row.name);
+            if (hasSubject && hasFallback) overlapped.push(row.name);
+            if (hasSubject) {
+                const renderFn = COMPONENT_SUBJECTS[row.name];
+                const startEl = renderFn({
+                    row,
+                    event: row.events[0],
+                    step: 'start',
+                    progress: 0,
+                    isExit: false,
+                    reduced: false,
+                    mode: 'productive',
+                });
+                const landingEl = renderFn({
+                    row,
+                    event: row.events[0],
+                    step: 'landing',
+                    progress: 1,
+                    isExit: false,
+                    reduced: false,
+                    mode: 'productive',
+                });
+                await expect(React.isValidElement(startEl)).toBe(true);
+                await expect(React.isValidElement(landingEl)).toBe(true);
+            }
+        }
+        await expect(uncovered).toEqual([]);
+        await expect(overlapped).toEqual([]);
+
+        // Verify no stale keys exist in COMPONENT_SUBJECTS or COMPONENT_SUBJECT_FALLBACKS
+        const validNames = new Set(componentRows.map((r) => r.name));
+        const staleSubjects = [...subjectKeys].filter((k) => !validNames.has(k));
+        const staleFallbacks = [...fallbackKeys].filter((k) => !validNames.has(k));
+        await expect(staleSubjects).toEqual([]);
+        await expect(staleFallbacks).toEqual([]);
+
+        // Modal renders its real PLUS Modal inline inside the card
+        const modalCard = canvasElement.querySelector('[data-motion-card="component:Modal"]');
+        await expect(modalCard.querySelector('[data-subject="component"]')).toBeTruthy();
+        await expect(modalCard.querySelector('.plus-modal')).toBeTruthy();
+
+        // Fallback component row and pattern row keep their kit drawing
+        if (FALLBACK_ROW) {
+            const fallbackCard = canvasElement.querySelector(
+                `[data-motion-card="component:${FALLBACK_ROW.name}"]`,
+            );
+            await expect(fallbackCard.querySelector('[data-subject="component"]')).toBeNull();
+            await expect(fallbackCard.querySelector('svg')).toBeTruthy();
+        }
+        const patternCard = canvasElement.querySelector(
+            `[data-motion-card="${PATTERN_ROW.tier}:${PATTERN_ROW.name}"]`,
+        );
+        await expect(patternCard.querySelector('[data-subject="component"]')).toBeNull();
+        await expect(patternCard.querySelector('svg')).toBeTruthy();
     },
 };
 

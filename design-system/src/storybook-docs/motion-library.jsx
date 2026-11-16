@@ -23,6 +23,11 @@ import {
 } from '../../../scripts/lib/tokens/motion-docs.mjs';
 import { MotionDemo } from './illustrations/motion.jsx';
 import {
+    COMPONENT_SUBJECTS,
+    COMPONENT_SUBJECT_FALLBACKS,
+    renderComponentSubject,
+} from './motion-library-subjects.jsx';
+import {
     climbOneScene,
     drillScene,
     focusedScene,
@@ -244,18 +249,21 @@ export function sceneForEvent(row, event) {
     };
 }
 
+export { COMPONENT_SUBJECTS, COMPONENT_SUBJECT_FALLBACKS, renderComponentSubject };
+
 /**
  * One animated card in the Motion · Library gallery.
  *
  * Plays the selected event's transition drawing once when scrolled into view,
  * holds at the landing, and replays on demand. `subject` (a node or render
- * function `(row, event, { replayKey, reduced, mode }) => node`) is the seam
- * for #2653's live component subjects.
+ * function `(row, event, { replayKey, reduced, mode }) => node`) defaults to
+ * `renderComponentSubject` so component-tier rows render their real PLUS
+ * component while template, pattern, and fallback rows render their kit drawing.
  */
 export const MotionLibraryCard = ({
     row,
     defaultEvent,
-    subject,
+    subject = renderComponentSubject,
     reduced,
     fastForward = 1,
     playOnInView = true,
@@ -289,7 +297,7 @@ export const MotionLibraryCard = ({
 
     const customSubject =
         typeof subject === 'function'
-            ? subject(row, activeEvent, { replayKey, reduced, mode, fastForward })
+            ? subject(row, activeEvent, { replayKey, reduced, mode, fastForward, playOnInView })
             : subject;
 
     return (
