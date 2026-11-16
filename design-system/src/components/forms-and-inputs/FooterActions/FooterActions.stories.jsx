@@ -49,7 +49,7 @@ export const OneButton = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const footer = canvasElement.querySelector('.plus-footer-actions');
         const tracks = footerTracks(footer);
         const button = within(footer).getByRole('button', { name: 'Got it' });
         await expect(rect(button).height, 'spacious 48 button height').toBeCloseTo(tokenLength(footer, '--control-xl'), 0);
@@ -69,7 +69,7 @@ export const TwoButtons = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const footer = canvasElement.querySelector('.plus-footer-actions');
         const tracks = footerTracks(footer);
         const discard = within(footer).getByRole('button', { name: 'Discard' });
         const save = within(footer).getByRole('button', { name: 'Save' });
@@ -96,7 +96,7 @@ export const ThreeButtons = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const footer = canvasElement.querySelector('.plus-footer-actions');
         const tracks = footerTracks(footer);
         const discard = within(footer).getByRole('button', { name: 'Discard' });
         const draft = within(footer).getByRole('button', { name: 'Save draft' });
@@ -122,7 +122,7 @@ export const TextButtonLeft = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const footer = canvasElement.querySelector('.plus-footer-actions');
         const tracks = footerTracks(footer);
         const skip = within(footer).getByRole('button', { name: 'Skip' });
         const draft = within(footer).getByRole('button', { name: 'Save draft' });
@@ -147,7 +147,7 @@ export const DangerTextButtonLeft = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const footer = canvasElement.querySelector('.plus-footer-actions');
         const tracks = footerTracks(footer);
         const del = within(footer).getByRole('button', { name: 'Delete session' });
         const discard = within(footer).getByRole('button', { name: 'Discard' });
@@ -176,7 +176,7 @@ export const TextLeftWithThreeFilled = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const footer = canvasElement.querySelector('.plus-footer-actions');
         const tracks = footerTracks(footer);
         const skip = within(footer).getByRole('button', { name: 'Skip' });
         const discard = within(footer).getByRole('button', { name: 'Discard' });
@@ -204,7 +204,7 @@ export const DestructiveSplit = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const footer = canvasElement.querySelector('.plus-footer-actions');
         const tracks = footerTracks(footer);
         const safer = within(footer).getByRole('button', { name: 'Archive instead' });
         const danger = within(footer).getByRole('button', { name: 'Delete note' });
@@ -226,7 +226,7 @@ export const Steps = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const footer = canvasElement.querySelector('.plus-footer-actions');
         const tracks = footerTracks(footer);
         const back = within(footer).getByRole('button', { name: 'Back' });
         const next = within(footer).getByRole('button', { name: 'Next' });

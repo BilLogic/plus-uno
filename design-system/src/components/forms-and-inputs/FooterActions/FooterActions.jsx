@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
 import './FooterActions.scss';
@@ -36,15 +36,13 @@ const trackListFor = (count, { hasLeading }) => {
  */
 export const FooterActions = ({
     leadingAction,
-    elemBefore,
     className,
     style,
     children,
-    'data-probe': probe = 'footer',
     ...props
 }) => {
     const items = React.Children.toArray(children).filter(React.isValidElement);
-    const explicitLeading = leadingAction ?? elemBefore;
+    const explicitLeading = leadingAction;
     const implicitLeading =
         !explicitLeading && items.length >= 2 && isLeadingNode(items[0], items.length)
             ? items[0]
@@ -52,11 +50,14 @@ export const FooterActions = ({
     const leadingNode = explicitLeading ?? implicitLeading;
     const filledNodes = implicitLeading ? items.slice(1) : items;
 
-    if (process.env.NODE_ENV !== 'production' && filledNodes.length > 3) {
-        console.warn(
-            `FooterActions: received ${filledNodes.length} filled action buttons; the 4-track footer layout supports at most 3 filled buttons.`
-        );
-    }
+    const filledCount = filledNodes.length;
+    useEffect(() => {
+        if (process.env.NODE_ENV !== 'production' && filledCount > 3) {
+            console.warn(
+                `FooterActions: received ${filledCount} filled action buttons; the 4-track footer layout supports at most 3 filled buttons.`
+            );
+        }
+    }, [filledCount]);
 
     const hasLeading = Boolean(leadingNode);
     const tracks = trackListFor(filledNodes.length, { hasLeading });
@@ -65,7 +66,6 @@ export const FooterActions = ({
     return (
         <div
             className={clsx('plus-footer-actions', className)}
-            data-probe={probe}
             style={style}
             {...props}
         >
