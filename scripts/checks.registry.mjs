@@ -520,6 +520,14 @@ export const CHECKS = [
     guards: 'every token a plan defines carrying its intent in `tokens.json`, and no primitive carrying the field; unplanned groups are counted.',
   },
   {
+    name: 'check:token-naming',
+    script: 'node scripts/check-token-naming.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-token-naming.mjs',
+    guards: 'every live Figma variable in figma-variables-snapshot.json carrying a WEB code syntax that resolves in SCSS and follows the token naming rule.',
+  },
+  {
     name: 'check:color-system',
     script: 'node scripts/check-color-system.mjs',
     pkg: 'root',

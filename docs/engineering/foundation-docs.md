@@ -27,6 +27,24 @@ The Foundations pages in `design-system/src/styles/*.mdx` are written for design
 - Per-breakpoint layout values are generated from the plan into `design-system/src/tokens/_frame_layers.scss`. `Modal.scss` works the width formula out continuously, and the frame and layer token test pins it to `--grid-width-column-screen` at 768, 1024 and 1440.
 - Icon names are checked against the Free set generated into `design-system/src/lib/icon-free.generated.js` and `icon-regular.generated.js` (`npm run generate:icon-lists`).
 
+### Token naming
+
+One name holds on both sides (`npm run check:token-naming`, reading `scripts/figma-variables-snapshot.json`). A CSS token is its Figma variable path lowercased, with `/` and spaces turned into `-`, plus the collection's code prefix:
+
+- `--palette-` for `color / primitives`;
+- `--ds-` for `color / semantics` (after the leading `color/` or `elevation/` folder) and `color / opacity`;
+- `--type-` for `typography`;
+- `--motion-` for `motion`;
+- bare `--` (no collection prefix) for spacing, size and `layers`.
+
+Documented exceptions:
+
+- A `color / semantics` leaf `/default` drops in code (`color/background/neutral/default` maps to `--ds-background-neutral`).
+- A motion spring's three Figma rows (`damping`, `mass`, `stiffness`) map to one `--motion-spring-*` token (for example `--motion-spring-880`).
+- Elevation shadow layer and geometry parts compose `--ds-shadow-*` (for example `--ds-shadow-raised`).
+
+Collections prefixed `archived / ` and rows prefixed `Deprecated/` are legacy and excluded from the check.
+
 ## Type
 
 - `npm run check:font-size-literals` holds components and patterns to text-style tokens.
