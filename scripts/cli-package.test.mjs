@@ -131,6 +131,41 @@ test('the repo root `ds` script is unchanged and still answers', () => {
   assert.match(sh('node', ['scripts/ds.mjs', 'find', 'Button'], REPO_ROOT), /Button/);
 });
 
+test('the CLI package ships ds-index.json, drops .mdx, component-registry.json and ds-usage-rules.md, and runs find, get, guide and check without them', async () => {
+  const { bakedFiles, build } = await import('./build-cli-package.mjs');
+  const files = bakedFiles(REPO_ROOT);
+  assert.ok(files.includes('design-system/agent-views/ds-index.json'));
+  assert.equal(files.some((f) => f.endsWith('.mdx')), false, 'package drops .mdx docs');
+  assert.equal(files.includes('design-system/figma/component-registry.json'), false, 'package drops component-registry.json');
+  assert.equal(files.includes('docs/engineering/ds-usage-rules.md'), false, 'package drops ds-usage-rules.md');
+
+  const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'plus-uno-cli-built-'));
+  try {
+    const dist = path.join(scratch, 'dist');
+    const binDir = path.join(scratch, 'bin');
+    const consumer = path.join(scratch, 'consumer');
+    build(REPO_ROOT, dist);
+    fs.mkdirSync(binDir, { recursive: true });
+    fs.copyFileSync(path.join(PKG, 'bin/ds.mjs'), path.join(binDir, 'ds.mjs'));
+    const bin = path.join(binDir, 'ds.mjs');
+
+    assert.equal(fs.existsSync(path.join(dist, 'design-system/figma/component-registry.json')), false);
+    assert.equal(fs.existsSync(path.join(dist, 'docs/engineering/ds-usage-rules.md')), false);
+
+    fs.mkdirSync(path.join(consumer, 'src'), { recursive: true });
+    const fixture = path.join(consumer, 'src/Clean.jsx');
+    fs.writeFileSync(fixture, "import { Button } from '@/components';\nexport const Clean = () => <Button text=\"Save\" />;\n");
+
+    assert.match(sh('node', [bin, 'find', 'Button'], consumer), /Button/);
+    assert.match(sh('node', [bin, 'get', 'Button'], consumer), /# Button\n/);
+    assert.match(sh('node', [bin, 'guide', 'filtering'], consumer), /^# Filtering\n/m);
+    assert.match(sh('node', [bin, 'guide', 'ds/no-raw-literal'], consumer), /^## ds\/no-raw-literal/m);
+    assert.match(sh('node', [bin, 'check', 'src/Clean.jsx'], consumer), /Clean: no escapes/);
+  } finally {
+    fs.rmSync(scratch, { recursive: true, force: true });
+  }
+});
+
 test('the registry builds into dist/registry: foundation and component items, stamped, no alias left in a copied file', { timeout: 120_000 }, () => {
   sh('node', ['scripts/generate-registry.mjs'], REPO_ROOT);
   const dir = path.join(REPO_ROOT, 'dist/registry');

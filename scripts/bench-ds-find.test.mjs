@@ -121,7 +121,7 @@ test('the hosted lookup (readPaths off) ranks the same names as the local one fo
 // DS_BENCH_TIMING=1: `npm run bench:ds-find:timing` runs it alone and serially,
 // and CI runs that as its own step after the harness. A regression slows every
 // sample, the fastest included, so the 300 ms budget still goes red on one.
-test('the first find on a fresh lookup, index build included, takes under 300 ms', { skip: process.env.DS_BENCH_TIMING !== '1' && 'timing runs alone: npm run bench:ds-find:timing' }, () => {
+test('the first find on a fresh lookup, index build included, takes under 300 ms', { skip: process.env.DS_BENCH_TIMING !== '1' && 'timing runs alone: npm run bench:ds-find:timing' }, (t) => {
   const samples = [];
   for (let i = 0; i < 5; i++) {
     const lookup = createLookup(REPO_ROOT, { readPaths: false });
@@ -133,5 +133,6 @@ test('the first find on a fresh lookup, index build included, takes under 300 ms
     assert.ok(results.some((r) => r.name === 'Modal'), 'Modal still in the answer');
   }
   const ms = Math.min(...samples);
+  t.diagnostic(`fastest of five first finds: ${ms.toFixed(1)} ms (${samples.map((s) => s.toFixed(1)).join(', ')})`);
   assert.ok(ms < 300, `the fastest of five first finds took ${ms.toFixed(0)} ms (${samples.map((t) => t.toFixed(0)).join(', ')})`);
 });
