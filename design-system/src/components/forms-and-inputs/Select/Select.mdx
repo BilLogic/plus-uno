@@ -173,9 +173,9 @@ Use `Select` for a form field with six or more options, where typing to filter h
 
 ## Parts
 
-1. **Field.** The box that shows the value, or the placeholder, and a chevron.
+1. **Field.** The box that shows the value, or the placeholder, the plain ✕ clear button when a value is set and clearable, and the caret.
 2. **Label.** Names the field. A required marker follows it.
-3. **List.** The options, in a popup under the field. Groups carry a heading.
+3. **List.** The options, in a popup under the field. Groups carry a heading; when a value is set and clearable, a compact subtle "Clear" button sits at the end of the list footer.
 4. **Caption.** Helper text, or the error that replaces it.
 
 ### States
@@ -207,7 +207,7 @@ Use `Select` for a form field with six or more options, where typing to filter h
 <tr><td>Height</td><td>40: <code>--height-250</code>. Compact 32: <code>--control-md</code>.</td></tr>
 <tr><td>Radius</td><td>10: <code>--radius-control-lg</code>. Compact 8: <code>--radius-control-md</code>.</td></tr>
 <tr><td>Text</td><td><code>--body-default</code> in <code>--ds-text</code>; placeholder <code>--ds-text-subtlest</code>.</td></tr>
-<tr><td>Caret</td><td><code>--ds-icon-subtle</code>; the clear button <code>--ds-icon-subtlest</code>, hovered <code>--ds-icon-subtle</code>.</td></tr>
+<tr><td>Caret and clear</td><td>Caret <code>--ds-icon-subtle</code> at <code>--icon-sm</code>; field clear icon <code>--icon-sm</code> on a subtle <code>IconButton</code>; footer Clear compact subtle <code>Button</code> in <code>--dropdown-menu-pad</code> under a <code>--ds-border</code> top edge.</td></tr>
 <tr><td>Label and caption</td><td><code>--body-sm</code>; label <code>--ds-text</code>, caption <code>--ds-text-subtle</code>, error <code>--ds-text-danger</code>.</td></tr>
 <tr><td>List</td><td><code>--ds-surface-overlay</code> with a <code>--ds-border</code> edge, <code>--popup-radius</code> and <code>--ds-shadow-overlay</code>.</td></tr>
 <tr><td>Option</td><td><code>--pad-y-md</code> <code>--pad-x-md</code>, <code>--body-default</code>; hovered <code>--ds-background-neutral-subtle-hovered</code>, picked <code>--ds-background-selected</code>.</td></tr>
@@ -350,6 +350,16 @@ Typing is on because most lists are long enough to need it. A menu that holds a 
   open, move through and close the list; Backspace removes the last Tag in a
   multi-select with an empty filter; Delete clears the field when
   `clearable`.
+- **Clearing by keyboard and screen reader.** When a live field is `clearable`
+  (on by default except on a required single `Select`) and holds a value, a
+  subtle `IconButton` (`xmark` at `--icon-sm`) named `"Clear <label>"` sits
+  before the caret and a compact subtle "Clear" `Button` sits at the end of
+  the list footer. Both set `tabIndex={-1}` because focus stays in the
+  combobox (`Tab` closes the list and moves to the next field): keyboard
+  users press `Delete` to clear in place, while screen-reader virtual-cursor
+  and pointer users can activate either button, which empties the value,
+  calls `onChange` with `''` (or `[]` with `isMulti`), and keeps focus in the
+  combobox.
 - **A waiting dependent field says why.** `dependsOn`'s disabled state pairs
   with a caption ("Choose a school first"), not silence.
 

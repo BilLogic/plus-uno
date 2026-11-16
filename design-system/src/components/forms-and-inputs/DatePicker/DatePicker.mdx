@@ -131,8 +131,10 @@ Use `DatePicker` for a single date or a date range typed or chosen from a popup 
 ## Parts
 
 1. **Field.** A 40 box (32 at compact) on the input fill, with the date as text.
-2. **Calendar icon.** Opens the calendar. Decoration for assistive technology; the input is the control.
-3. **Calendar.** A month grid in a popup 4px below the field, flipped above when there is no room. A picked day is the selected fill; days between a range's ends are the neutral selection.
+2. **Clear button.** A subtle `IconButton` (`xmark` at `--icon-sm`) before the calendar icon when a date or range is set on a live field (not read-only or disabled).
+3. **Calendar icon.** Opens the calendar. Decoration for assistive technology; the input is the control.
+4. **Calendar.** A month grid in a popup `--stack-sm` below the field, flipped above when there is no room. A picked day is the selected fill; days between a range's ends are the neutral selection.
+5. **Footer Clear.** A compact subtle `Button` labeled "Clear" at the end of the popup footer while a value is set.
 
 ### States
 
@@ -145,8 +147,8 @@ Use `DatePicker` for a single date or a date range typed or chosen from a popup 
 <tr><td>Hovered</td><td>The border takes <code>--ds-border-focused</code>.</td></tr>
 <tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the box.</td></tr>
 <tr><td>Invalid</td><td>The border takes <code>--ds-border-danger</code> and the input sets <code>aria-invalid</code>.</td></tr>
-<tr><td>Read-only</td><td>The box takes <code>--ds-background-neutral</code>, at full contrast with no hover. The calendar icon is not drawn and a press opens no calendar. The date can be read, selected and copied.</td></tr>
-<tr><td>Disabled</td><td>The box fades to <code>--ds-opacity-disabled</code> and leaves the tab order.</td></tr>
+<tr><td>Read-only</td><td>The box takes <code>--ds-background-neutral</code>, at full contrast with no hover. The clear button and calendar icon are not drawn and a press opens no calendar. The date can be read, selected and copied.</td></tr>
+<tr><td>Disabled</td><td>The box fades to <code>--ds-opacity-disabled</code>, hides the clear button, and leaves the tab order.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -160,7 +162,8 @@ Use `DatePicker` for a single date or a date range typed or chosen from a popup 
 <tr><td>Fill</td><td><code>--ds-background-input</code>; read-only <code>--ds-background-neutral</code>.</td></tr>
 <tr><td>Border</td><td><code>--ds-border-input</code>; hovered <code>--ds-border-focused</code>; invalid <code>--ds-border-danger</code>.</td></tr>
 <tr><td>Text</td><td><code>--ds-text</code>; placeholder <code>--ds-text-subtlest</code>.</td></tr>
-<tr><td>Icon</td><td><code>--ds-icon-subtle</code>.</td></tr>
+<tr><td>Icon and clear</td><td>Calendar icon <code>--ds-icon-subtle</code>; field clear icon <code>--icon-sm</code> on a subtle <code>IconButton</code>.</td></tr>
+<tr><td>Footer Clear</td><td>Compact subtle <code>Button</code> at the end of the footer in <code>--dropdown-menu-pad</code> under a <code>--ds-border</code> top edge.</td></tr>
 <tr><td>Focus ring</td><td><code>--ds-border-focused</code>, 2px, 2px offset.</td></tr>
 <tr><td>Popup gap</td><td><code>--stack-sm</code>.</td></tr>
 </tbody>
@@ -263,6 +266,7 @@ A range picks start and end in one field and one calendar. Two separate fields s
 
 - **The input is the named control.** `aria-label`, `aria-labelledby` and `aria-describedby` are forwarded to the text input (`role="combobox"`), which tracks the popup with `aria-expanded` and `aria-haspopup`.
 - **The popup is a labeled dialog.** It opens as `role="dialog"` with `aria-label` "Choose a date" or "Choose dates".
+- **Clearing by keyboard and screen reader.** The field's plain ✕ button is named `"Clear <aria-label>"` (or `"Clear date"` / `"Clear dates"`) and sets `tabIndex={-1}` so Tab moves past the field without a second stop; keyboard users can clear the text and press Enter, or Tab through the open calendar dialog to the footer "Clear" button. Activating either control empties the date, calls `onChange` with `''` (or `[null, null]` with `range`), and returns focus to the input.
 - **Invalid input stays editable.** An invalid typed date keeps the typed text and sets `aria-invalid` so the person can correct it.
 
 </div>

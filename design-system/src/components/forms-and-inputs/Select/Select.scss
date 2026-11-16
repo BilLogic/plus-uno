@@ -69,43 +69,24 @@
     min-width: 0;
 }
 
-// ── Trailing: the clear × and the caret (Figma `_Field Clear`, `_Dropdown icon`) ──
+// ── Trailing: the plain ✕ clear button and the caret ──
 
-.plus-select-wrapper .plus-field__trailing {
-    gap: var(--stack-md);
-}
-
-// One step smaller than the caret, `icon.subtlest` at rest and `icon.subtle` on hover.
-.plus-select-clear {
-    display: inline-flex;
-    align-items: center;
-    padding: 0;
-    border: 0;
-    background: none;
+// Same icon step as the caret (`--icon-sm`) on a subtle IconButton.
+.plus-btn.plus-select-clear .plus-btn-visual {
     font-size: var(--icon-sm);
-    line-height: 1;
-    cursor: pointer;
-
-    .fa-solid,
-    .fa-regular {
-        // @contrast: non-text
-        color: var(--ds-icon-subtlest);
-        font-size: var(--icon-sm);
-    }
-
-    @include plus-state(
-        $states: (
-            hovered: (color: var(--ds-icon-subtle)),
-        ),
-        $ring: false,
-        $hovered-selector: '&:hover :is(.fa-solid, .fa-regular)'
-    );
 }
 
 .plus-select-caret {
     color: var(--ds-icon-subtle);
     font-size: var(--icon-sm);
     cursor: pointer;
+}
+
+.plus-select-footer-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: var(--dropdown-menu-pad);
 }
 
 // ── The list's header: "Select all", or the search-first hint ──

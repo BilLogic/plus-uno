@@ -384,33 +384,69 @@ CollapsedTagsShowPlusN.play = async ({ canvasElement }) => {
 
 /* ---------------------------------------------------------------- states */
 
-/** The clear × is not a tab stop; Delete clears from the keyboard. */
-export const ClearButton = () => {
+/** Plain ✕ in the field, Clear in the list footer, and Delete from the keyboard all empty the field and keep focus in it. */
+export const ClearButton = (args) => {
     const [value, setValue] = useState('north');
     return (
         <div style={stack}>
-            <Select id="scommit-clear" label="School" options={schools} value={value} onChange={setValue} />
+            <Select
+                id="scommit-clear"
+                label="School"
+                options={schools}
+                value={value}
+                onChange={(next) => { setValue(next); args.onChange(next); }}
+            />
             <p data-testid="chosen">{value}</p>
         </div>
     );
 };
+ClearButton.args = { onChange: fn() };
 
-ClearButton.play = async ({ canvasElement }) => {
+ClearButton.play = async ({ args, canvasElement }) => {
     const canvas = within(canvasElement);
     const chosen = canvas.getByTestId('chosen');
     const field = canvas.getByRole('combobox', { name: 'School' });
 
     const clear = canvas.getByRole('button', { name: 'Clear School' });
+    await expect(clear).toHaveClass('plus-btn--subtle');
     await expect(clear).toHaveAttribute('tabindex', '-1');
+    await expect(canvasElement.querySelector('.fa-circle-xmark')).toBeNull();
+    const xmark = clear.querySelector('.fa-solid.fa-xmark');
+    await expect(xmark).not.toBeNull();
     // No larger than the caret: both take the smallest icon step.
     const size = (el) => parseFloat(getComputedStyle(el).fontSize);
-    await expect(size(clear.querySelector('.fa-circle-xmark')))
+    await expect(size(xmark))
         .toBeLessThanOrEqual(size(canvasElement.querySelector('.plus-select-caret')));
     await userEvent.click(clear);
     await expect(chosen.textContent).toBe('');
+    await expect(args.onChange).toHaveBeenLastCalledWith('');
+    await expect(field).toHaveFocus();
     await expect(canvas.queryByRole('button', { name: 'Clear School' })).toBeNull();
     await expect(page().queryByRole('option', { name: 'North High' })).toBeNull();
 
+    // Empty: opening the list shows no footer Clear.
+    await userEvent.click(field);
+    const emptyListbox = (await page().findByRole('listbox')).closest('.plus-listbox');
+    await expect(within(emptyListbox).queryByRole('button', { name: 'Clear' })).toBeNull();
+
+    // Pick a value, reopen, and click footer Clear: empties the value and keeps focus in the field.
+    await userEvent.click(page().getByRole('option', { name: 'South High' }));
+    await expect(chosen.textContent).toBe('south');
+    await expect(field).toHaveFocus();
+    await userEvent.click(field);
+    const filledListbox = (await page().findByRole('listbox')).closest('.plus-listbox');
+    await expect(filledListbox.querySelector('.fa-circle-xmark')).toBeNull();
+    const footerClear = within(filledListbox.querySelector('.plus-listbox-footer')).getByRole('button', { name: 'Clear' });
+    await expect(footerClear).toHaveClass('plus-btn--subtle');
+
+    args.onChange.mockClear();
+    await userEvent.click(footerClear);
+    await expect(chosen.textContent).toBe('');
+    await expect(args.onChange).toHaveBeenLastCalledWith('');
+    await expect(field).toHaveFocus();
+    await expect(canvas.queryByRole('button', { name: 'Clear School' })).toBeNull();
+
+    // Delete clears from the keyboard too.
     await userEvent.click(field);
     await userEvent.click(await page().findByRole('option', { name: 'South High' }));
     await expect(field).toHaveFocus();

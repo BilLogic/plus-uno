@@ -4,6 +4,8 @@ import FieldBox from '../_internal/FieldBox';
 import Calendar from '../_internal/Calendar';
 import AnchoredListboxSurface from '../_internal/AnchoredListboxSurface';
 import { formatDisplay, formatIso, outOfBounds, parseDate, parseTyped } from '../_internal/dates';
+import { Button } from '../Button/Button';
+import { IconButton } from '../IconButton/IconButton';
 import Icon from '../../images-and-icons/Icon';
 import '../_internal/Listbox.scss';
 import './DatePicker.scss';
@@ -50,6 +52,11 @@ const fromValue = (value, range) => {
  *   typed and marked invalid, and `onChange` is not called.
  * - **Range:** the first click sets the first day, the second the last; a click
  *   before the first day starts again. `onChange` receives `[start, end]`.
+ * - **Clearing:** when a value is set on a live field, a subtle `xmark` icon
+ *   button (`tabIndex={-1}`) sits before the calendar icon and a subtle
+ *   "Clear" button sits in the calendar footer. Both empty the field, call
+ *   `onChange` with `''` (or `[null, null]` with `range`), and keep focus in
+ *   the input.
  * - **Popup:** opens 4px (`--stack-sm`) below the field, left-aligned
  *   (or as `calendarAlign` asks), and flips above with the same gap when there
  *   is no room below.
@@ -189,6 +196,12 @@ const DatePicker = ({
 
     const invalid = isInvalid || typedInvalid;
     const [rangeStart, rangeEnd] = Array.isArray(picked) ? picked : [null, null];
+    const hasValue = Array.isArray(picked) ? Boolean(rangeStart || rangeEnd) : Boolean(picked);
+    const clearLabel = `Clear ${props['aria-label'] || (range ? 'dates' : 'date')}`;
+
+    const clear = () => {
+        commit(range ? [null, null] : null);
+    };
 
     return (
         <>
@@ -201,20 +214,37 @@ const DatePicker = ({
                 valid={isValid}
                 className={['plus-date-picker', open && 'plus-date-picker--open', className].filter(Boolean).join(' ')}
                 style={style}
-                // A read-only value cannot be changed, so the calendar icon is not drawn.
+                // A read-only value cannot be changed, so the trailing controls are not drawn.
                 elemAfter={isReadOnly ? null : (
-                    <span
-                        className="plus-date-picker__icon"
-                        aria-hidden="true"
-                        onMouseDown={(event) => {
-                            if (!interactive) return;
-                            event.preventDefault();
-                            inputRef.current?.focus();
-                            if (open) setOpen(false); else openCalendar();
-                        }}
-                    >
-                        <Icon name="calendar-day" />
-                    </span>
+                    <>
+                        {hasValue && !isDisabled && (
+                            <IconButton
+                                icon="xmark"
+                                label={clearLabel}
+                                appearance="subtle"
+                                spacing={spacing}
+                                tabIndex={-1}
+                                className="plus-date-picker__clear"
+                                onMouseDown={(event) => event.preventDefault()}
+                                onClick={() => {
+                                    clear();
+                                    inputRef.current?.focus();
+                                }}
+                            />
+                        )}
+                        <span
+                            className="plus-date-picker__icon"
+                            aria-hidden="true"
+                            onMouseDown={(event) => {
+                                if (!interactive) return;
+                                event.preventDefault();
+                                inputRef.current?.focus();
+                                if (open) setOpen(false); else openCalendar();
+                            }}
+                        >
+                            <Icon name="calendar-day" />
+                        </span>
+                    </>
                 )}
             >
                 <input
@@ -266,6 +296,22 @@ const DatePicker = ({
                     maxDate={maxDate}
                     onPick={pick}
                 />
+                {hasValue && interactive && (
+                    <div className="plus-listbox-footer plus-date-picker__footer">
+                        <Button
+                            appearance="subtle"
+                            spacing="compact"
+                            className="plus-date-picker__footer-clear"
+                            onClick={() => {
+                                clear();
+                                setOpen(false);
+                                inputRef.current?.focus();
+                            }}
+                        >
+                            Clear
+                        </Button>
+                    </div>
+                )}
             </AnchoredListboxSurface>
         </>
     );
