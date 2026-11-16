@@ -37,6 +37,7 @@ export const BLOCK_ON_NAMING_MISMATCH = false;
 const DEPRECATED_ROW = /^Deprecated\//;
 const ELEVATION_SHADOW_PART = /^elevation\/shadow\/([^/]+)\/layer-\d+(?:\/(?:offsetX|offsetY|radius|spread))?$/;
 const MOTION_SPRING_ROW = /^(.+)\/(?:damping|mass|stiffness)$/;
+const CODE_DEFAULT_COLOR = /^color\/(?:background|text)\/code\/default$/;
 
 /**
  * Live Figma variables permitted to carry no WEB code syntax (#2641).
@@ -71,7 +72,38 @@ export const MISSING_SYNTAX_ALLOWLIST = [
   },
 ];
 
-const slugifyPath = (value) => value.toLowerCase().replace(/[/\s]+/g, '-');
+const kebabSegment = (segment) =>
+  segment
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1-$2')
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+    .toLowerCase()
+    .replace(/\s+/g, '-');
+
+const slugifyPath = (value) =>
+  value
+    .split('/')
+    .filter(Boolean)
+    .map(kebabSegment)
+    .join('-');
+
+function applyPrefix(prefix, slug) {
+  if (!prefix) return `--${slug}`;
+  if (slug === prefix || slug.startsWith(`${prefix}-`)) {
+    return `--${slug}`;
+  }
+  return `--${prefix}-${slug}`;
+}
+
+function dropRedundantFolder(variable) {
+  const parts = variable.split('/');
+  if (parts.length < 2) return variable;
+  const first = kebabSegment(parts[0]);
+  const second = kebabSegment(parts[1]);
+  if (first === 'size' || second === first || second.startsWith(`${first}-`)) {
+    return parts.slice(1).join('/');
+  }
+  return variable;
+}
 
 /**
  * Expected CSS token name for a live Figma variable under the naming rule and
@@ -83,7 +115,7 @@ const slugifyPath = (value) => value.toLowerCase().replace(/[/\s]+/g, '-');
  */
 export function expectedToken(collection, variable) {
   if (collection === 'color / primitives') {
-    return `--palette-${slugifyPath(variable)}`;
+    return applyPrefix('palette', slugifyPath(variable));
   }
 
   if (collection === 'color / semantics' || collection === 'color / opacity') {
@@ -91,21 +123,30 @@ export function expectedToken(collection, variable) {
     if (shadowMatch) {
       return `--ds-shadow-${slugifyPath(shadowMatch[1])}`;
     }
-    const stripped = variable.replace(/^(?:color|elevation)\//, '').replace(/\/default$/, '');
-    return `--ds-${slugifyPath(stripped)}`;
+    const withoutTop = variable.replace(/^(?:color|elevation)\//, '');
+    const stripped = CODE_DEFAULT_COLOR.test(variable)
+      ? withoutTop
+      : withoutTop.replace(/\/default$/, '');
+    if (stripped.startsWith('chart/') || stripped.startsWith('skeleton/')) {
+      return `--${slugifyPath(stripped)}`;
+    }
+    return applyPrefix('ds', slugifyPath(stripped));
   }
 
   if (collection === 'typography') {
-    return `--type-${slugifyPath(variable)}`;
+    return applyPrefix('type', slugifyPath(variable));
   }
 
   if (collection === 'motion') {
     const springMatch = MOTION_SPRING_ROW.exec(variable);
     const stem = springMatch ? springMatch[1] : variable;
-    return `--motion-${slugifyPath(stem)}`;
+    if (/^Spring\//.test(stem)) {
+      return applyPrefix('motion', slugifyPath(stem));
+    }
+    return applyPrefix('ds-motion', slugifyPath(stem));
   }
 
-  return `--${slugifyPath(variable)}`;
+  return `--${slugifyPath(dropRedundantFolder(variable))}`;
 }
 
 function matchesNamingRule(collection, variable, actualToken, expected) {

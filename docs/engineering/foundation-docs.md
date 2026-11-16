@@ -29,18 +29,26 @@ The Foundations pages in `design-system/src/styles/*.mdx` are written for design
 
 ### Token naming
 
-One name holds on both sides (`npm run check:token-naming`, reading `scripts/figma-variables-snapshot.json`). A CSS token is its Figma variable path lowercased, with `/` and spaces turned into `-`, plus the collection's code prefix:
+One name holds on both sides (`npm run check:token-naming`, reading `scripts/figma-variables-snapshot.json`). A CSS token is its Figma variable path with camelCase segments converted to kebab-case (`blackAlpha/60` maps to `--palette-black-alpha-60`, `ProgressRing/stroke` to `--progress-ring-stroke`), lowercased with `/` and spaces turned into `-`, plus the collection's code prefix:
 
 - `--palette-` for `color / primitives`;
-- `--ds-` for `color / semantics` (after the leading `color/` or `elevation/` folder) and `color / opacity`;
+- `--ds-` for `color / semantics` and `color / opacity`;
 - `--type-` for `typography`;
-- `--motion-` for `motion`;
+- `--ds-motion-` for `motion`;
 - bare `--` (no collection prefix) for spacing, size and `layers`.
+
+A collection prefix already carried by the leading path segment applies once (`typography` `Type size/100` maps to `--type-size-100` and `Type line height/100` to `--type-line-height-100`).
+
+Leading folder drops:
+
+- In `color / semantics`, the leading `color/` or `elevation/` folder drops before `--ds-`.
+- In spacing and size collections, the leading `Size/` folder drops (`Size/Control/md` maps to `--control-md`), and a leading `Radius/`, `Size/`, `Space/` or `Stroke/` folder whose name already prefixes the next segment drops so the segment appears once (`Radius/radius-full` maps to `--radius-full`, `Size/size-100` to `--size-100`, `Space/space-100` to `--space-100`, `Stroke/stroke-1` to `--stroke-1`).
 
 Documented exceptions:
 
-- A `color / semantics` leaf `/default` drops in code (`color/background/neutral/default` maps to `--ds-background-neutral`).
-- A motion spring's three Figma rows (`damping`, `mass`, `stiffness`) map to one `--motion-spring-*` token (for example `--motion-spring-880`).
+- A `color / semantics` leaf `/default` drops in code (`color/background/neutral/default` maps to `--ds-background-neutral`), except `color/background/code/default` (`--ds-background-code-default`) and `color/text/code/default` (`--ds-text-code-default`), where `-default` names the base code role beside `gutter`, `highlight` and syntax roles.
+- `color/chart/*` maps to `--chart-*` (for example `--chart-brand`) and `Skeleton/*` / `color/skeleton/*` family rows map to `--skeleton-*` (for example `--skeleton-height` and `--skeleton-subtle`) with no `--ds-` prefix; the global fill `color/skeleton/default` stays `--ds-skeleton`.
+- A motion spring's three Figma rows (`damping`, `mass`, `stiffness`) map to the one `--ds-motion-*` spring token code defines (for example `spatial/fast/damping`, `spatial/fast/mass` and `spatial/fast/stiffness` map to `--ds-motion-spatial-fast`); raw `Spring/*` primitives in the same collection map to `--motion-spring-*` (for example `--motion-spring-880`).
 - Elevation shadow layer and geometry parts compose `--ds-shadow-*` (for example `--ds-shadow-raised`).
 
 Collections prefixed `archived / ` and rows prefixed `Deprecated/` are legacy and excluded from the check.

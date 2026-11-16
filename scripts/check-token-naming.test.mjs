@@ -160,23 +160,73 @@ test('kind 2 allowlist: permits color/ai/*, Prompt input/*, elevation shadow par
   assert.deepEqual(findings, []);
 });
 
-test('naming rule: collection prefixes and path normalization hold across every collection', () => {
+test('naming rule: collection prefixes, no doubled prefixes, camelCase kebab-case, and folder drops hold across collections', () => {
+  // Base collection prefixes
   assert.equal(expectedToken('color / primitives', 'blue/100'), '--palette-blue-100');
   assert.equal(expectedToken('color / semantics', 'color/text/brand'), '--ds-text-brand');
   assert.equal(expectedToken('color / opacity', 'opacity/disabled'), '--ds-opacity-disabled');
   assert.equal(expectedToken('typography', 'Family/brand-heading'), '--type-family-brand-heading');
   assert.equal(expectedToken('typography', 'Tracking/tight'), '--type-tracking-tight');
-  assert.equal(expectedToken('motion', 'Spring/880/stiffness'), '--motion-spring-880');
   assert.equal(expectedToken('spacing / semantics', 'Pad/x-md'), '--pad-x-md');
   assert.equal(expectedToken('spacing / templates', 'Focused page/pad-x'), '--focused-page-pad-x');
   assert.equal(expectedToken('spacing / components', 'Dropdown menu/max-width'), '--dropdown-menu-max-width');
   assert.equal(expectedToken('layers', 'Layer/modal'), '--layer-modal');
+
+  // 1. Don't double a prefix the path already carries
+  assert.equal(expectedToken('typography', 'Type size/100'), '--type-size-100');
+  assert.equal(expectedToken('typography', 'Type line height/125'), '--type-line-height-125');
+  assert.equal(expectedToken('color / primitives', 'palette/blue-100'), '--palette-blue-100');
+  assert.equal(expectedToken('color / opacity', 'ds/opacity-disabled'), '--ds-opacity-disabled');
+
+  // 2. Kebab-case camelCase segments
+  assert.equal(expectedToken('color / primitives', 'blackAlpha/60'), '--palette-black-alpha-60');
+  assert.equal(expectedToken('color / primitives', 'darkNeutral/250'), '--palette-dark-neutral-250');
+  assert.equal(expectedToken('color / primitives', 'darkNeutralAlpha/100'), '--palette-dark-neutral-alpha-100');
+  assert.equal(expectedToken('spacing / primitives', 'ProgressRing/stroke'), '--progress-ring-stroke');
+
+  // 3. Drop redundant leading folder where code does (Size/* and repeated <Folder>/<folder>-* segment)
+  assert.equal(expectedToken('spacing / semantics', 'Size/Control/md'), '--control-md');
+  assert.equal(expectedToken('spacing / semantics', 'Size/Icon/sm'), '--icon-sm');
+  assert.equal(expectedToken('spacing / primitives', 'Size/size-100'), '--size-100');
+  assert.equal(expectedToken('spacing / primitives', 'Radius/radius-full'), '--radius-full');
+  assert.equal(expectedToken('spacing / primitives', 'Space/space-100'), '--space-100');
+  assert.equal(expectedToken('spacing / primitives', 'Stroke/stroke-1'), '--stroke-1');
+  assert.equal(expectedToken('spacing / semantics', 'Radius/full'), '--radius-full');
+  assert.equal(expectedToken('spacing / semantics', 'Radius/Control/sm'), '--radius-control-sm');
+
+  // 4. /default drop in color / semantics, except color/{background,text}/code/default where SCSS keeps -default
+  assert.equal(expectedToken('color / semantics', 'color/background/neutral/default'), '--ds-background-neutral');
+  assert.equal(expectedToken('color / semantics', 'color/background/code/default'), '--ds-background-code-default');
+  assert.equal(expectedToken('color / semantics', 'color/text/code/default'), '--ds-text-code-default');
+
+  // 5. Chart and skeleton families carry no --ds- prefix; global color/skeleton/default is --ds-skeleton
+  assert.equal(expectedToken('color / semantics', 'color/chart/brand/default'), '--chart-brand');
+  assert.equal(expectedToken('color / semantics', 'color/chart/blue/bold/hovered'), '--chart-blue-bold-hovered');
+  assert.equal(expectedToken('color / semantics', 'color/skeleton/subtle'), '--skeleton-subtle');
+  assert.equal(expectedToken('color / semantics', 'color/skeleton/default'), '--ds-skeleton');
+  assert.equal(expectedToken('spacing / components', 'Skeleton/height'), '--skeleton-height');
+
+  // 6. Motion maps to --ds-motion-*; raw Spring/* primitives map to --motion-spring-*
+  assert.equal(expectedToken('motion', 'spatial/fast/stiffness'), '--ds-motion-spatial-fast');
+  assert.equal(expectedToken('motion', 'appearance/default/damping'), '--ds-motion-appearance-default');
+  assert.equal(expectedToken('motion', 'loop/mass'), '--ds-motion-loop');
+  assert.equal(expectedToken('motion', 'linear'), '--ds-motion-linear');
+  assert.equal(expectedToken('motion', 'Spring/880/stiffness'), '--motion-spring-880');
 });
 
-test('naming rule exceptions: /default drop, motion spring triples, and elevation shadow parts pass without warnings', () => {
+test('naming rule exceptions: /default drop (with code/default retained), chart/skeleton families, motion spring triples, and elevation shadow parts pass without warnings', () => {
   const scss = new Set([
     '--ds-background-neutral',
+    '--ds-background-code-default',
+    '--ds-text-code-default',
     '--ds-surface-raised',
+    '--chart-brand',
+    '--chart-blue-bold-hovered',
+    '--skeleton-subtle',
+    '--ds-skeleton',
+    '--ds-motion-spatial-fast',
+    '--ds-motion-appearance-default',
+    '--ds-motion-loop',
     '--motion-spring-880',
     '--motion-spring-800-r60',
     '--ds-shadow-raised',
@@ -188,7 +238,13 @@ test('naming rule exceptions: /default drop, motion spring triples, and elevatio
       'color / semantics': {
         variables: [
           'color/background/neutral/default',
+          'color/background/code/default',
+          'color/text/code/default',
           'elevation/surface/raised/default',
+          'color/chart/brand/default',
+          'color/chart/blue/bold/hovered',
+          'color/skeleton/subtle',
+          'color/skeleton/default',
           'elevation/shadow/raised/layer-1',
           'elevation/shadow/raised/layer-1/offsetX',
           'elevation/shadow/raised/layer-1/radius',
@@ -197,7 +253,13 @@ test('naming rule exceptions: /default drop, motion spring triples, and elevatio
         ],
         codeSyntax: {
           'color/background/neutral/default': 'var(--ds-background-neutral)',
+          'color/background/code/default': 'var(--ds-background-code-default)',
+          'color/text/code/default': 'var(--ds-text-code-default)',
           'elevation/surface/raised/default': 'var(--ds-surface-raised)',
+          'color/chart/brand/default': 'var(--chart-brand)',
+          'color/chart/blue/bold/hovered': 'var(--chart-blue-bold-hovered)',
+          'color/skeleton/subtle': 'var(--skeleton-subtle)',
+          'color/skeleton/default': 'var(--ds-skeleton)',
           'elevation/shadow/raised/layer-1': 'var(--ds-shadow-raised)',
           'elevation/shadow/raised/layer-1/offsetX': 'var(--ds-shadow-raised)',
           'elevation/shadow/raised/layer-1/radius': 'var(--ds-shadow-raised)',
@@ -207,12 +269,22 @@ test('naming rule exceptions: /default drop, motion spring triples, and elevatio
       },
       motion: {
         variables: [
+          'spatial/fast/damping',
+          'spatial/fast/mass',
+          'spatial/fast/stiffness',
+          'appearance/default/damping',
+          'loop/stiffness',
           'Spring/880/damping',
           'Spring/880/mass',
           'Spring/880/stiffness',
           'Spring/800-r60/damping',
         ],
         codeSyntax: {
+          'spatial/fast/damping': 'var(--ds-motion-spatial-fast)',
+          'spatial/fast/mass': 'var(--ds-motion-spatial-fast)',
+          'spatial/fast/stiffness': 'var(--ds-motion-spatial-fast)',
+          'appearance/default/damping': 'var(--ds-motion-appearance-default)',
+          'loop/stiffness': 'var(--ds-motion-loop)',
           'Spring/880/damping': 'var(--motion-spring-880)',
           'Spring/880/mass': 'var(--motion-spring-880)',
           'Spring/880/stiffness': 'var(--motion-spring-880)',
@@ -227,16 +299,19 @@ test('naming rule exceptions: /default drop, motion spring triples, and elevatio
 
 test('kind 3: warns when WEB code syntax disagrees with the naming rule, and blocks when BLOCK_ON_NAMING_MISMATCH is flipped', () => {
   assert.equal(BLOCK_ON_NAMING_MISMATCH, false);
-  const scss = new Set(['--icon-sm', '--chart-brand', '--ds-text']);
+  const scss = new Set(['--palette-green-200-a40', '--radius-control-sm', '--ds-text']);
   const snapshot = makeSnapshot({
-    'spacing / semantics': {
-      variables: ['Size/Icon/sm'],
-      codeSyntax: { 'Size/Icon/sm': 'var(--icon-sm)' },
+    'color / primitives': {
+      variables: ['green/200a40'],
+      codeSyntax: { 'green/200a40': 'var(--palette-green-200-a40)' },
+    },
+    'spacing / components': {
+      variables: ['Tooltip/radius'],
+      codeSyntax: { 'Tooltip/radius': 'var(--radius-control-sm)' },
     },
     'color / semantics': {
-      variables: ['color/chart/brand/default', 'elevation/shadow/raised/layer-1'],
+      variables: ['elevation/shadow/raised/layer-1'],
       codeSyntax: {
-        'color/chart/brand/default': 'var(--chart-brand)',
         'elevation/shadow/raised/layer-1': 'var(--ds-text)',
       },
     },
@@ -248,12 +323,12 @@ test('kind 3: warns when WEB code syntax disagrees with the naming rule, and blo
     assert.equal(finding.kind, 'naming-mismatch');
     assert.equal(finding.severity, 'warning');
   }
-  assert.match(warnings[0].message, /spacing \/ semantics/);
-  assert.match(warnings[0].message, /Size\/Icon\/sm/);
-  assert.match(warnings[0].message, /--size-icon-sm/);
-  assert.match(warnings[1].message, /color \/ semantics/);
-  assert.match(warnings[1].message, /color\/chart\/brand\/default/);
-  assert.match(warnings[1].message, /--ds-chart-brand/);
+  assert.match(warnings[0].message, /color \/ primitives/);
+  assert.match(warnings[0].message, /green\/200a40/);
+  assert.match(warnings[0].message, /--palette-green-200a40/);
+  assert.match(warnings[1].message, /spacing \/ components/);
+  assert.match(warnings[1].message, /Tooltip\/radius/);
+  assert.match(warnings[1].message, /--tooltip-radius/);
   assert.match(warnings[2].message, /elevation\/shadow\/raised\/layer-1/);
   assert.match(warnings[2].message, /--ds-shadow-raised/);
   assert.equal(exitCodeFor(warnings), 0);
