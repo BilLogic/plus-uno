@@ -12,7 +12,7 @@ import { CATEGORICAL, mostToLeast } from '@/dataviz/palette';
 const ParliamentChart = ({
     data = [],
     height = 400,
-    sort = true,
+    sort = false,
 }) => {
     const orderedData = useMemo(
         () => (sort ? mostToLeast(data, (item) => item.value) : data),
@@ -73,7 +73,7 @@ ParliamentChart.propTypes = {
     })),
     /** Chart height */
     height: PropTypes.number,
-    /** Sort groups from most to least by default; pass false to keep input order. */
+    /** Keep input seat order by default; pass true to sort groups from most to least. */
     sort: PropTypes.bool,
 };
 

@@ -1,10 +1,11 @@
 import React from 'react';
 import { fireEvent, render } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import chartTheme, { CHART_BAR_RADIUS } from '@/dataviz/chartTheme';
+import chartTheme, { CHART_TRACK_RADIUS } from '@/dataviz/chartTheme';
 import { CHART_VALUE_CLASS } from '@/dataviz/chartFormat';
 import { BRAND, CATEGORICAL, CHROME, STATUS, sequentialRamp } from '@/dataviz/palette';
 import DonutChart from './DonutChart/DonutChart.jsx';
+import DonutChartSVGCell from './DonutChart/DonutChartSVG.jsx';
 import DonutChartSVG from './DonutChartSVG/DonutChartSVG.jsx';
 import GaugeChart from './GaugeChart/GaugeChart.jsx';
 import ParliamentChart from './ParliamentChart/ParliamentChart.jsx';
@@ -22,16 +23,17 @@ vi.mock('@/dataviz/PlusChart', () => ({
 }));
 
 describe('DonutChart', () => {
-    it('enters on the shared spring by default with no animation props and styles its center figure with a Metric token', () => {
+    it('enters on the shared spring by default with no animation props and styles its center figure with lg, md or sm Metric tokens only', () => {
         capturedOptions.length = 0;
-        const { getByText } = render(
+        const trackSegments = [
+            { value: 25, color: BRAND, label: 'Done' },
+            { value: 75, color: CHROME.track, label: 'Remaining' },
+        ];
+        const { getByText, rerender } = render(
             React.createElement(DonutChart, {
                 value: '75%',
                 label: 'Completed',
-                segments: [
-                    { value: 25, color: BRAND, label: 'Done' },
-                    { value: 75, color: CHROME.track, label: 'Remaining' },
-                ],
+                segments: trackSegments,
             }),
         );
         const options = capturedOptions.at(-1);
@@ -39,7 +41,7 @@ describe('DonutChart', () => {
         expect(options.plotOptions.pie?.animation).toBeUndefined();
         expect(options.series[0].animation).toBeUndefined();
         expect(options.plotOptions.pie?.states).toBeUndefined();
-        expect(options.plotOptions.pie?.allowPointSelect).toBeUndefined();
+        expect(options.plotOptions.pie?.allowPointSelect).toBe(false);
         expect(options.tooltip.pointFormat).toContain(CHART_VALUE_CLASS);
         expect(options.tooltip.pointFormat).not.toMatch(/<b\b/i);
 
@@ -50,11 +52,23 @@ describe('DonutChart', () => {
         expect(DonutChart.propTypes.animationDelay).toBeUndefined();
         expect(DonutChart.propTypes.animationDuration).toBeUndefined();
 
-        const centerFigure = getByText('75%');
-        expect(centerFigure.classList.contains('metric-lg')).toBe(true);
+        expect(getByText('75%').classList.contains('metric-lg')).toBe(true);
+
+        rerender(React.createElement(DonutChart, { value: '75%', segments: trackSegments, centerTextSize: 'md' }));
+        expect(getByText('75%').classList.contains('metric-md')).toBe(true);
+
+        rerender(React.createElement(DonutChart, { value: '75%', segments: trackSegments, centerTextSize: 'sm' }));
+        expect(getByText('75%').classList.contains('metric-sm')).toBe(true);
+
+        // Retired type-scale aliases are not mapped onto metric-md / metric-sm.
+        const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        rerender(React.createElement(DonutChart, { value: '75%', segments: trackSegments, centerTextSize: 'h4' }));
+        expect(getByText('75%').classList.contains('metric-md')).toBe(false);
+        expect(getByText('75%').classList.contains('metric-lg')).toBe(true);
+        errSpy.mockRestore();
     });
 
-    it('sorts multi-segment distributions from most to least by default and respects sort={false}', () => {
+    it('enables point selection in categorical mode using the theme selected tokens, sorts most to least by default and respects sort={false}', () => {
         capturedOptions.length = 0;
         const segments = [
             { value: 20, color: CATEGORICAL[1], label: 'Reading' },
@@ -62,7 +76,15 @@ describe('DonutChart', () => {
             { value: 30, color: CATEGORICAL[2], label: 'Science' },
         ];
         render(React.createElement(DonutChart, { value: '100', segments }));
-        expect(capturedOptions.at(-1).series[0].data.map((d) => d.name)).toEqual(['Math', 'Science', 'Reading']);
+        const options = capturedOptions.at(-1);
+        expect(options.plotOptions.pie.allowPointSelect).toBe(true);
+        expect(options.plotOptions.pie.states).toBeUndefined();
+        expect(options.series[0].states).toBeUndefined();
+        const selectState = options.plotOptions.series?.states?.select;
+        expect(selectState?.color).toBe('var(--ds-background-selected)');
+        expect(selectState?.borderColor).toBe('var(--ds-border-selected)');
+        expect(selectState?.color).not.toBe(BRAND);
+        expect(options.series[0].data.map((d) => d.name)).toEqual(['Math', 'Science', 'Reading']);
 
         render(React.createElement(DonutChart, { value: '100', segments, sort: false }));
         expect(capturedOptions.at(-1).series[0].data.map((d) => d.name)).toEqual(['Reading', 'Math', 'Science']);
@@ -70,15 +92,16 @@ describe('DonutChart', () => {
 });
 
 describe('DonutChartSVG', () => {
-    it('uses a Metric token for its center value, keeps hover on appearance.fast and rounds its tooltip with --popup-radius', () => {
-        const { container, getByText } = render(
+    it('maps only lg, md and sm to .metric-* classes, keeps hover on appearance.fast and rounds its tooltip with --popup-radius', () => {
+        const paths = [
+            { d: 'M 0 0 L 10 0 L 10 10 Z', fill: CATEGORICAL[0], label: 'Segment 1', percentage: 73 },
+            { d: 'M 10 0 L 20 0 L 20 10 Z', fill: CHROME.track, label: 'Remaining', percentage: 27 },
+        ];
+        const { container, getByText, rerender } = render(
             React.createElement(DonutChartSVG, {
                 value: '73%',
                 label: 'Attended',
-                paths: [
-                    { d: 'M 0 0 L 10 0 L 10 10 Z', fill: CATEGORICAL[0], label: 'Segment 1', percentage: 73 },
-                    { d: 'M 10 0 L 20 0 L 20 10 Z', fill: CHROME.track, label: 'Remaining', percentage: 27 },
-                ],
+                paths,
             }),
         );
 
@@ -95,13 +118,31 @@ describe('DonutChartSVG', () => {
         const tooltip = getByText('Segment 1').parentElement;
         expect(tooltip.style.borderRadius).toBe('var(--popup-radius)');
         expect(tooltip.style.top).toContain('var(--popup-offset)');
+        fireEvent.mouseLeave(container.querySelector('svg'));
+
+        rerender(React.createElement(DonutChartSVG, { value: '73%', paths, centerTextSize: 'md' }));
+        expect(getByText('73%').classList.contains('metric-md')).toBe(true);
+        rerender(React.createElement(DonutChartSVG, { value: '73%', paths, centerTextSize: 'sm' }));
+        expect(getByText('73%').classList.contains('metric-sm')).toBe(true);
+
+        const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        rerender(React.createElement(DonutChartSVG, { value: '73%', paths, centerTextSize: 'h4' }));
+        expect(getByText('73%').classList.contains('metric-md')).toBe(false);
+
+        const cell = render(React.createElement(DonutChartSVGCell, { value: '80%', centerTextSize: 'h1' }));
+        expect(cell.getByText('80%').classList.contains('metric-lg')).toBe(false);
+        expect(cell.getByText('80%').classList.contains('metric-sm')).toBe(true);
+        errSpy.mockRestore();
     });
 });
 
 describe('GaugeChart', () => {
-    it('has no 1200 ms sweep or inline 24px bold, defaults its single measure to --chart-brand and rounds its track with a role radius', () => {
+    it('rounds its track with numeric CHART_TRACK_RADIUS (no pane.borderRadius), shows only min and max end ticks without radial gridlines, and escapes label HTML', () => {
         capturedOptions.length = 0;
-        render(React.createElement(GaugeChart, { value: 82, label: 'Attendance' }));
+        expect(typeof CHART_TRACK_RADIUS).toBe('number');
+        expect(CHART_TRACK_RADIUS).toBeGreaterThan(0);
+
+        render(React.createElement(GaugeChart, { value: 82, min: 0, max: 100, label: 'Attendance' }));
         const options = capturedOptions.at(-1);
 
         expect(JSON.stringify(options)).not.toContain('1200');
@@ -110,11 +151,23 @@ describe('GaugeChart', () => {
             [0, BRAND],
             [1, BRAND],
         ]);
-        expect(options.pane.borderRadius).toEqual(CHART_BAR_RADIUS);
+        expect(options.pane.borderRadius).toBeUndefined();
+        expect(typeof options.pane.background.borderRadius).toBe('number');
+        expect(options.pane.background.borderRadius).toBe(CHART_TRACK_RADIUS);
+        expect(typeof options.plotOptions.solidgauge.borderRadius).toBe('number');
+        expect(options.plotOptions.solidgauge.borderRadius).toBe(CHART_TRACK_RADIUS);
+
+        expect(options.yAxis.tickPositions).toEqual([0, 100]);
+        expect(options.yAxis.gridLineWidth).toBe(0);
 
         const format = options.plotOptions.solidgauge.dataLabels.format;
         expect(format).not.toMatch(/24px|12px|bold|<b\b/i);
         expect(format).toContain('metric-md');
+
+        render(React.createElement(GaugeChart, { value: 50, label: '<img src=x onerror=alert(1)> & "quote"' }));
+        const escapedFormat = capturedOptions.at(-1).plotOptions.solidgauge.dataLabels.format;
+        expect(escapedFormat).not.toContain('<img');
+        expect(escapedFormat).toContain('&lt;img src=x onerror=alert(1)&gt; &amp; &quot;quote&quot;');
 
         render(React.createElement(GaugeChart, { value: 92, label: 'On track', color: STATUS.success }));
         expect(capturedOptions.at(-1).yAxis.stops).toEqual([
@@ -125,7 +178,7 @@ describe('GaugeChart', () => {
 });
 
 describe('PieChart', () => {
-    it('uses the selected tokens rather than --chart-brand, formats values without <b> and sorts most to least with sort={false} opt-out', () => {
+    it('restores allowPointSelect with theme selected tokens (never --chart-brand), formats values without <b> and sorts most to least with sort={false} opt-out', () => {
         capturedOptions.length = 0;
         const data = [
             { name: 'Roosevelt', y: 25 },
@@ -135,12 +188,14 @@ describe('PieChart', () => {
         render(React.createElement(PieChart, { data }));
         const options = capturedOptions.at(-1);
 
+        expect(options.plotOptions.pie.allowPointSelect).toBe(true);
+        expect(options.plotOptions.pie.states).toBeUndefined();
+        expect(options.series[0].states).toBeUndefined();
         const selectState = options.plotOptions.series?.states?.select;
         expect(selectState?.color).toBe('var(--ds-background-selected)');
         expect(selectState?.borderColor).toBe('var(--ds-border-selected)');
         expect(selectState?.borderWidth).toBe(chartTheme.plotOptions.series.states.select.borderWidth);
         expect(selectState?.color).not.toBe(BRAND);
-        expect(options.plotOptions.pie?.allowPointSelect).toBeUndefined();
 
         expect(options.tooltip.pointFormat).toContain(CHART_VALUE_CLASS);
         expect(options.tooltip.pointFormat).not.toMatch(/<b\b/i);
@@ -156,7 +211,7 @@ describe('PieChart', () => {
 });
 
 describe('ParliamentChart', () => {
-    it('sorts groups most to least by default, respects sort={false} and formats numbers with plus-chart-value', () => {
+    it('keeps input seat order by default (sort = false), sorts most to least when sort={true} and formats numbers with plus-chart-value', () => {
         capturedOptions.length = 0;
         const data = [
             { name: 'Panel B', value: 8 },
@@ -165,17 +220,17 @@ describe('ParliamentChart', () => {
         ];
         render(React.createElement(ParliamentChart, { data }));
         const options = capturedOptions.at(-1);
-        expect(options.series[0].data.map((row) => row[0])).toEqual(['Panel A', 'Panel B', 'Panel C']);
+        expect(options.series[0].data.map((row) => row[0])).toEqual(['Panel B', 'Panel A', 'Panel C']);
         expect(options.legend.labelFormat).toContain(CHART_VALUE_CLASS);
         expect(options.tooltip.pointFormat).toContain(CHART_VALUE_CLASS);
 
-        render(React.createElement(ParliamentChart, { data, sort: false }));
-        expect(capturedOptions.at(-1).series[0].data.map((row) => row[0])).toEqual(['Panel B', 'Panel A', 'Panel C']);
+        render(React.createElement(ParliamentChart, { data, sort: true }));
+        expect(capturedOptions.at(-1).series[0].data.map((row) => row[0])).toEqual(['Panel A', 'Panel B', 'Panel C']);
     });
 });
 
 describe('PyramidChart', () => {
-    it('sorts bands most to least by default, respects sort={false} and formats labels without <b> or weight 400', () => {
+    it('keeps input stage order by default (sort = false), sorts most to least when sort={true} and formats labels without <b> or weight 400', () => {
         capturedOptions.length = 0;
         const data = [
             { name: 'Enrolled', value: 600 },
@@ -184,15 +239,15 @@ describe('PyramidChart', () => {
         ];
         render(React.createElement(PyramidChart, { data }));
         const options = capturedOptions.at(-1);
-        expect(options.series[0].data.map((d) => d.name)).toEqual(['Referred', 'Enrolled', 'Completed']);
+        expect(options.series[0].data.map((d) => d.name)).toEqual(['Enrolled', 'Referred', 'Completed']);
 
         const dl = options.plotOptions.pyramid?.dataLabels ?? options.plotOptions.series?.dataLabels;
         expect(dl.format).toContain(CHART_VALUE_CLASS);
         expect(dl.format).not.toMatch(/<b\b/i);
         expect(dl.style?.fontWeight).not.toBe('var(--type-weight-regular)');
 
-        render(React.createElement(PyramidChart, { data, sort: false }));
-        expect(capturedOptions.at(-1).series[0].data.map((d) => d.name)).toEqual(['Enrolled', 'Referred', 'Completed']);
+        render(React.createElement(PyramidChart, { data, sort: true }));
+        expect(capturedOptions.at(-1).series[0].data.map((d) => d.name)).toEqual(['Referred', 'Enrolled', 'Completed']);
     });
 });
 

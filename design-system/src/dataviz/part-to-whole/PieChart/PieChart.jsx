@@ -35,6 +35,8 @@ const PieChart = ({
         plotOptions: {
             ...chartTheme.plotOptions,
             pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
                 borderRadius: 0,
                 dataLabels: {
                     enabled: true,

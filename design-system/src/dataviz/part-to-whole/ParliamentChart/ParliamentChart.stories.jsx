@@ -11,7 +11,7 @@ export default {
     argTypes: {
         data: { control: 'object', description: 'Array of { name, value, color }' },
         height: { control: 'number', description: 'Chart height in pixels' },
-        sort: { control: 'boolean', description: 'Sort groups from most to least by default' },
+        sort: { control: 'boolean', description: 'Sort groups from most to least (keeps input seat order by default)' },
     },
 };
 
@@ -34,9 +34,9 @@ const captionStyle = {
 
 const parliamentData = {
     data: [
+        { name: 'Grade 6', value: 18 },
         { name: 'Grade 7', value: 24 },
         { name: 'Grade 8', value: 35 },
-        { name: 'Grade 6', value: 18 },
         { name: 'Grade 9', value: 12 },
         { name: 'Grade 10', value: 6 },
     ],
@@ -48,7 +48,7 @@ export const Overview = {
             <section style={sectionStyle}>
                 <Heading as="h3" size="small">Cohort seats by grade</Heading>
                 <p style={captionStyle}>
-                    Each dot represents one student seat, sorted from largest group to smallest.
+                    Each dot represents one student seat, grouped by grade in input order.
                 </p>
                 <ParliamentChart {...parliamentData} />
             </section>
@@ -69,7 +69,7 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        sort: true,
+        sort: false,
         data: [
             { name: 'Group B', value: 15, color: CATEGORICAL[0] },
             { name: 'Group A', value: 10, color: CATEGORICAL[1] },

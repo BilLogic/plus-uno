@@ -12,7 +12,7 @@ import { CATEGORICAL, mostToLeast } from '@/dataviz/palette';
 const PyramidChart = ({
     data = [],
     height = 400,
-    sort = true,
+    sort = false,
 }) => {
     const orderedData = useMemo(
         () => (sort ? mostToLeast(data, (item) => item.value) : data),
@@ -71,7 +71,7 @@ PyramidChart.propTypes = {
     })),
     /** Chart height */
     height: PropTypes.number,
-    /** Sort bands from most to least by default; pass false for ordinal levels. */
+    /** Keep input stage order by default; pass true to sort bands from most to least. */
     sort: PropTypes.bool,
 };
 

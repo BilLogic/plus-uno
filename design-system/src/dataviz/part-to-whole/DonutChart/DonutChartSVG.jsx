@@ -5,12 +5,6 @@ const METRIC_CLASSES = {
     lg: 'metric-lg',
     md: 'metric-md',
     sm: 'metric-sm',
-    h1: 'metric-lg',
-    h2: 'metric-lg',
-    h3: 'metric-lg',
-    h4: 'metric-md',
-    h5: 'metric-sm',
-    body3: 'metric-sm',
 };
 
 /**
@@ -136,7 +130,7 @@ DonutChartSVG.propTypes = {
     /** Label text below the value */
     label: PropTypes.string,
     /** Metric scale step for the center figure */
-    centerTextSize: PropTypes.oneOf(['lg', 'md', 'sm', 'h1', 'h2', 'h3', 'h4', 'h5', 'body3']),
+    centerTextSize: PropTypes.oneOf(['lg', 'md', 'sm']),
     /** Size of the chart (currently fixed at 48x40px for table cells) */
     size: PropTypes.number,
 };

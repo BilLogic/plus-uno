@@ -1,9 +1,19 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme, { CHART_BAR_RADIUS } from '@/dataviz/chartTheme';
+import chartTheme, { CHART_TRACK_RADIUS } from '@/dataviz/chartTheme';
 import { CHART_VALUE_CLASS, tooltipPointFormat, valueSpan } from '@/dataviz/chartFormat';
 import { BRAND, CHROME } from '@/dataviz/palette';
+
+const HTML_ENTITIES = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&apos;',
+};
+
+const escapeHtml = (text) => String(text).replace(/[&<>"']/g, (ch) => HTML_ENTITIES[ch]);
 
 /**
  * GaugeChart Component
@@ -18,6 +28,7 @@ const GaugeChart = ({
     color,
 }) => {
     const gaugeColor = color || BRAND;
+    const escapedLabel = label ? escapeHtml(label) : '';
 
     const options = useMemo(() => ({
         ...chartTheme,
@@ -28,14 +39,14 @@ const GaugeChart = ({
         },
         title: { text: null },
         pane: {
-            center: ['50%', '78%'],
-            size: '120%',
+            center: ['50%', '72%'],
+            size: '90%',
             startAngle: -90,
             endAngle: 90,
-            borderRadius: CHART_BAR_RADIUS,
             background: {
                 backgroundColor: CHROME.track,
-                borderRadius: CHART_BAR_RADIUS,
+                borderWidth: 0,
+                borderRadius: CHART_TRACK_RADIUS,
                 innerRadius: '60%',
                 outerRadius: '100%',
                 shape: 'arc',
@@ -49,26 +60,31 @@ const GaugeChart = ({
                 [0, gaugeColor],
                 [1, gaugeColor],
             ],
+            gridLineWidth: 0,
             lineWidth: 0,
             tickWidth: 0,
             minorTickInterval: null,
-            tickAmount: 2,
+            tickPositions: [min, max],
+            title: {
+                ...chartTheme.yAxis.title,
+                text: null,
+            },
         },
         tooltip: {
             ...chartTheme.tooltip,
             headerFormat: '',
-            pointFormat: label
-                ? tooltipPointFormat({ label: '{series.name}', value: '{point.y}' })
+            pointFormat: escapedLabel
+                ? tooltipPointFormat({ label: escapedLabel, value: '{point.y}' })
                 : valueSpan('{point.y}'),
         },
         plotOptions: {
             ...chartTheme.plotOptions,
             solidgauge: {
-                borderRadius: CHART_BAR_RADIUS,
+                borderRadius: CHART_TRACK_RADIUS,
                 dataLabels: {
                     borderWidth: 0,
                     useHTML: true,
-                    format: `<div style="text-align:center"><span class="metric-md ${CHART_VALUE_CLASS}" style="display:block;color:var(--ds-text)">{y}</span>${label ? `<span style="display:block;color:var(--ds-text-subtle)">${label}</span>` : ''}</div>`,
+                    format: `<div style="text-align:center"><span class="metric-md ${CHART_VALUE_CLASS}" style="display:block;color:var(--ds-text)">{y}</span>${escapedLabel ? `<span style="display:block;color:var(--ds-text-subtle)">${escapedLabel}</span>` : ''}</div>`,
                 },
             },
         },
@@ -79,7 +95,7 @@ const GaugeChart = ({
             innerRadius: '60%',
             radius: '100%',
         }],
-    }), [value, min, max, label, height, gaugeColor]);
+    }), [value, min, max, label, escapedLabel, height, gaugeColor]);
 
     return (
         <div style={{ width: '100%', height }}>

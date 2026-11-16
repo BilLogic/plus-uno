@@ -10,7 +10,7 @@ export default {
     argTypes: {
         data: { control: 'object', description: 'Array of { name, value, color? }' },
         height: { control: 'number', description: 'Chart height in pixels' },
-        sort: { control: 'boolean', description: 'Sort bands from most to least by default' },
+        sort: { control: 'boolean', description: 'Sort bands from most to least (keeps input stage order by default)' },
     },
 };
 
@@ -67,7 +67,7 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        sort: true,
+        sort: false,
         data: [
             { name: 'Stage 1', value: 1000 },
             { name: 'Stage 2', value: 600 },

@@ -9,12 +9,6 @@ const METRIC_CLASSES = {
     lg: 'metric-lg',
     md: 'metric-md',
     sm: 'metric-sm',
-    h1: 'metric-lg',
-    h2: 'metric-lg',
-    h3: 'metric-lg',
-    h4: 'metric-md',
-    h5: 'metric-sm',
-    body3: 'metric-sm',
 };
 
 /**
@@ -29,11 +23,15 @@ const DonutChart = ({
     centerTextSize = 'lg',
     sort = true,
 }) => {
+    const hasTrack = useMemo(
+        () => segments.some((segment) => segment.color === CHROME.track),
+        [segments],
+    );
+
     const orderedSegments = useMemo(() => {
-        const hasTrack = segments.some((segment) => segment.color === CHROME.track);
         if (!sort || hasTrack) return segments;
         return mostToLeast(segments, (segment) => segment.value);
-    }, [segments, sort]);
+    }, [segments, sort, hasTrack]);
 
     const chartData = useMemo(
         () => orderedSegments.map((segment, index) => ({
@@ -62,10 +60,11 @@ const DonutChart = ({
         plotOptions: {
             ...chartTheme.plotOptions,
             pie: {
+                allowPointSelect: !hasTrack,
                 borderRadius: 0,
                 innerSize: '85%',
                 borderWidth: 0,
-                cursor: 'default',
+                cursor: hasTrack ? 'default' : 'pointer',
                 dataLabels: {
                     enabled: false,
                 },
@@ -86,7 +85,7 @@ const DonutChart = ({
             size: '100%',
             innerSize: '85%',
         }],
-    }), [size, chartData]);
+    }), [size, chartData, hasTrack]);
 
     return (
         <div style={{ width: size, height: size, position: 'relative' }}>
@@ -148,7 +147,7 @@ DonutChart.propTypes = {
     /** Label text below the value */
     label: PropTypes.string,
     /** Metric scale step for the center figure */
-    centerTextSize: PropTypes.oneOf(['lg', 'md', 'sm', 'h1', 'h2', 'h3', 'h4', 'h5', 'body3']),
+    centerTextSize: PropTypes.oneOf(['lg', 'md', 'sm']),
     /** Sort categorical segments from most to least by default; pass false to keep input order. */
     sort: PropTypes.bool,
 };

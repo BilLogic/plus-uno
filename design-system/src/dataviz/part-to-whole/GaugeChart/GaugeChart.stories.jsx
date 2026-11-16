@@ -61,6 +61,28 @@ export const Overview = {
         await waitFor(() => {
             expect(canvasElement.querySelectorAll('.highcharts-container').length).toBe(3);
         });
+        for (const container of canvasElement.querySelectorAll('.highcharts-container')) {
+            const containerRect = container.getBoundingClientRect();
+            const ticks = [...container.querySelectorAll('.highcharts-yaxis-labels text')];
+            expect(ticks.map((t) => t.textContent?.trim())).toEqual(['0', '100']);
+            for (const gridLine of container.querySelectorAll('.highcharts-grid-line')) {
+                expect(gridLine.getAttribute('stroke-width')).toBe('0');
+            }
+
+            const readout = container.querySelector('.highcharts-data-label div');
+            const readoutRect = readout.getBoundingClientRect();
+            for (const tick of ticks) {
+                const tickRect = tick.getBoundingClientRect();
+                expect(tickRect.left).toBeGreaterThanOrEqual(containerRect.left);
+                expect(tickRect.right).toBeLessThanOrEqual(containerRect.right);
+                const overlapsReadout =
+                    tickRect.left < readoutRect.right &&
+                    tickRect.right > readoutRect.left &&
+                    tickRect.top < readoutRect.bottom &&
+                    tickRect.bottom > readoutRect.top;
+                expect(overlapsReadout).toBe(false);
+            }
+        }
         for (const valueNode of canvasElement.querySelectorAll('.metric-md')) {
             const style = getComputedStyle(valueNode);
             expect(style.fontFamily).toContain('Noto Sans');
