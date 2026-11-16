@@ -38,18 +38,17 @@ export const STUDENTS = [
     ['Emily Chen', 'Grade 8', 'Oct 20'],
     ['Noah Williams', 'Grade 6', 'Oct 18'],
 ];
-export const STUDENT_HEAD = {
-    cells: [
-        { key: 'name', content: 'Name', isSortable: true },
-        { key: 'grade', content: 'Grade', isSortable: true },
-        { key: 'last', content: 'Last session', isSortable: true },
-    ],
+export const STUDENT_HEAD = { cells: [{ key: 'name', content: 'Name' }, { key: 'grade', content: 'Grade' }, { key: 'last', content: 'Last session' }] };
+const SORTABLE_STUDENT_HEAD = {
+    cells: STUDENT_HEAD.cells.map((cell) => ({ ...cell, isSortable: true })),
 };
 export const studentRows = (count) => STUDENTS.slice(0, count).map(([name, grade, last]) => ({
     key: name,
     cells: [{ key: name, content: name }, { key: grade, content: grade }, { key: last, content: last }],
 }));
-export const StudentsTable = ({ count = 4, ...props }) => <DynamicTable head={STUDENT_HEAD} rows={studentRows(count)} label="Students" isFixedSize {...props} />;
+export const StudentsTable = ({ count = 4, sortable = false, ...props }) => (
+    <DynamicTable head={sortable ? SORTABLE_STUDENT_HEAD : STUDENT_HEAD} rows={studentRows(count)} label="Students" isFixedSize {...props} />
+);
 
 export const row = { display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', minWidth: 0 };
 

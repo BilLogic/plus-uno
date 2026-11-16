@@ -248,17 +248,15 @@ const exampleSlug = (text) => (typeof text === 'string'
  * component page is Examples (these), Code (generated) and Usage.
  *
  * @param {unknown} props.of - the story export, as `<ComponentExample of={ButtonStories.Primary} />`
- * @param {string} [props.id] - stable anchor id for same-page links; defaults to the slug of `title`
  * @param {string} [props.title] - the appearance, state or size the story shows; leave it out when
  *   the example is the section's only one and its heading already names it, so the page does not repeat itself
  * @param {React.ReactNode} [props.description] - when it applies, in one sentence
  */
-export function ComponentExample({ of: ofStory, id, title, description }) {
-    const headingId = id ?? exampleSlug(title);
+export function ComponentExample({ of: ofStory, title, description }) {
     return (
         <>
-            {title ? <h3 id={headingId}>{title}</h3> : null}
-            <DocsCanvasShell id={!title ? id : undefined} description={description}>
+            {title ? <h3 id={exampleSlug(title)}>{title}</h3> : null}
+            <DocsCanvasShell description={description}>
                 <Canvas of={ofStory} story={{ inline: true }} layout="padded" sourceState="hidden" />
             </DocsCanvasShell>
         </>

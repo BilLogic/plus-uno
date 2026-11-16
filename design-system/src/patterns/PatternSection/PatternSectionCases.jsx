@@ -38,36 +38,6 @@ const SectionRepeatsCardCase = () => (
     </PatternSection>
 );
 
-/** The title row first, the view bar under it, sharing one left edge. */
-const TitleRowAboveViewBarCase = () => (
-    <PatternSection
-        title="Students"
-        description="Lincoln Middle · 24 students"
-        tabs={<ViewBar views={['All students', 'Needs follow-up']} search={false} more={false} />}
-    >
-        <StudentsTable count={2} />
-    </PatternSection>
-);
-
-/** The title pushed into the view bar: the heading and the pills fight for the start, and the description has nowhere to go. */
-const TitleInViewBarCase = () => (
-    <PatternSection
-        title="Students"
-        type="tabs-only"
-        tabs={(
-            <div className="plus-section-view-bar" style={{ ...row, inlineSize: '100%' }}>
-                <span style={{ font: 'var(--heading-md)', color: 'var(--ds-text)' }}>Students</span>
-                <ViewPills views={['All students', 'Needs follow-up']} />
-                <div style={{ ...row, marginInlineStart: 'auto' }}>
-                    <Button text="Add students" iconBefore="user-plus" appearance="primary" onClick={() => {}} />
-                </div>
-            </div>
-        )}
-    >
-        <StudentsTable count={2} />
-    </PatternSection>
-);
-
 /** No view bar, so the actions sit at the end of the title row. */
 const ActionsInTitleRowCase = () => (
     <PatternSection
@@ -182,8 +152,6 @@ const FooterCommitsCase = () => (
 
 export const CardStandsAlone = unstyled(CardStandsAloneCase);
 export const SectionRepeatsCard = unstyled(SectionRepeatsCardCase);
-export const TitleRowAboveViewBar = unstyled(TitleRowAboveViewBarCase);
-export const TitleInViewBar = unstyled(TitleInViewBarCase);
 export const ActionsInTitleRow = unstyled(ActionsInTitleRowCase);
 export const ActionsInTwoHomes = unstyled(ActionsInTwoHomesCase);
 export const RightSideInOrder = unstyled(RightSideInOrderCase);

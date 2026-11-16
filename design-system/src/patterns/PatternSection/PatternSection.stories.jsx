@@ -679,7 +679,7 @@ export const TypeList = {
     name: 'Type: List',
     render: () => (
         <PatternSection title="Students" type="tabs-only" tabs={<ViewBar views={['All students', 'Needs follow-up']} />}>
-            <StudentsTable count={6} rowsPerPage={4} />
+            <StudentsTable count={6} rowsPerPage={4} sortable />
         </PatternSection>
     ),
     play: async ({ canvasElement }) => {
@@ -1161,7 +1161,7 @@ export const RowsSelected = {
         await userEvent.click(canvas.getByRole('checkbox', { name: 'Select all rows' }));
         await userEvent.click(canvas.getByRole('checkbox', { name: 'Select all rows' }));
         await waitFor(() => expect(head.queryByText(/selected/), 'clearing brings the column heads back').toBeNull());
-        await expect(head.getByRole('columnheader', { name: /^Name/ })).toBeInTheDocument();
+        await expect(head.getByRole('columnheader', { name: 'Name' })).toBeInTheDocument();
     },
 };
 
@@ -1200,7 +1200,7 @@ const ANATOMY_PARTS = [
 export const AnatomyQueue = {
     name: 'Anatomy',
     render: () => (
-        <LiveAnatomy title="A Section with its header, body, detail and footer numbered" parts={ANATOMY_PARTS}>
+        <LiveAnatomy live title="A Section with its header, body, detail and footer numbered" parts={ANATOMY_PARTS}>
             <PatternSection
                 data-anatomy-root
                 title="Reflections"
