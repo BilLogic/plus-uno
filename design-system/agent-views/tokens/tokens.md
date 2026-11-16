@@ -82,7 +82,8 @@ Space owned by a pattern: page, section, card, table, modal, popup. Inside a pat
 --modal-radius  /* Corner rounding of a Modal. */
 --modal-width-lg  /* Width of a large Modal, such as a table or a long form. */
 --modal-width-md  /* Width of a default Modal, such as a short form. */
---modal-width-sm  /* Width of a small Modal, such as a confirmation. */
+--modal-width-sm  /* Width of a small Modal, such as a single question or a one-field form. */
+--modal-width-xs  /* Width of a compact Modal, such as a confirmation. */
 --page-border-width  /* Width of the edge drawn around a Page frame. */
 --page-pad-x-compact  /* Horizontal padding of a Page with compact spacing. */
 --page-pad-x-default  /* Horizontal padding of a Page with default spacing. */
@@ -115,7 +116,6 @@ Tokens one component owns, named for it.
 --avatar-size-96  /* Size of an extra-large UserAvatar, such as in a profile header. */
 --button-radius-compact  /* Corner rounding of a Button with compact spacing. */
 --button-radius-default  /* Corner rounding of a Button with default spacing. */
---button-size-vertical  /* Height of a Button laid out vertically, with its icon above its label. */
 --calendar-day-lg  /* Size of a day cell in a large Calendar. */
 --calendar-day-md  /* Size of a day cell in a default Calendar. */
 --calendar-day-sm  /* Size of a day cell in a compact Calendar. */

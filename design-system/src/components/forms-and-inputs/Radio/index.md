@@ -10,7 +10,7 @@ Radio — single option within a named radio group. Supports controlled (`isChec
 
 **Source:** `design-system/src/components/forms-and-inputs/Radio/Radio.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Radio/Radio.stories.jsx` — Overview, Content, States, Invalid, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, HoverStep, Unselected, Selected, Hovered, Focused, Disabled, DisabledWithReason, Required, Tile
+**Stories:** `design-system/src/components/forms-and-inputs/Radio/Radio.stories.jsx` — Overview, Content, States, Invalid, Interactive, ReadOnly, DescriptionAndCard, KeyboardFocus, HoverStep, Unselected, Selected, Hovered, Focused, Disabled, DisabledWithReason, Required, Tile, TileNarrowLargeIllustrations
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Radio/Radio.mdx`
 
@@ -100,7 +100,7 @@ For six or more options, use `Select`. Do not write numeric options that overlap
 - `Select`: use when choosing one option from a list of six or more.
 - `Toggle`: use when flipping a single setting on or off immediately.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
 
 ## Parts
 

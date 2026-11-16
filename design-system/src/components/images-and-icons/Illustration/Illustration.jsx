@@ -83,10 +83,12 @@ export const Illustration = ({
         .filter(Boolean)
         .join(' ');
 
+    // Height follows width through aspect-ratio rather than a fixed blockSize, so a
+    // caller that caps the width (a choice tile's slot) keeps the frame square.
     return (
         <span
             className={classes}
-            style={{ inlineSize: `${size}px`, blockSize: `${size}px`, ...style }}
+            style={{ inlineSize: `${size}px`, aspectRatio: '1 / 1', ...style }}
             data-character={character}
             {...rest}
             {...a11y}

@@ -19,7 +19,7 @@ describe('PatternModal sizing', () => {
         expect(el).toHaveClass('plus-pattern-modal-width-sm', 'plus-pattern-modal-height-hug');
     });
 
-    it.each(['sm', 'md', 'lg'])('takes width %s', (width) => {
+    it.each(['xs', 'sm', 'md', 'lg'])('takes width %s', (width) => {
         render(<PatternModal title="Move session" width={width}>Body</PatternModal>);
         expect(dialog()).toHaveClass(`plus-pattern-modal-width-${width}`);
     });

@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import PlusChart from '@/dataviz/PlusChart';
-import chartTheme, { CHART_ANIMATION_DURATION_MS, CHART_SPACING_COMPACT } from '@/dataviz/chartTheme';
+import chartTheme, { CHART_SPACING_COMPACT } from '@/dataviz/chartTheme';
 import { HUES, divergingRamp, rampStops, sequentialRamp } from '@/dataviz/palette';
 import { inkFor, resolveColor, textInks, useColorModeKey } from '@/dataviz/colorMode';
 
@@ -37,10 +37,8 @@ const HeatmapChart = ({
     showDataLabels = true,
     /** Gap between cells (0–1). Larger = more room for breath. */
     pointPadding = 0,
-    /** When false, disables Highcharts series animation (useful to avoid replay on redraw). */
-    enableAnimation = true,
-    /** Animation duration in ms when animation is enabled. */
-    animationDuration = CHART_ANIMATION_DURATION_MS
+    /** When false, the heatmap draws without an entrance. */
+    enableAnimation = true
 }) => {
     const mode = useColorModeKey();
     const options = useMemo(() => {
@@ -76,7 +74,8 @@ const HeatmapChart = ({
         plotOptions: {
             heatmap: {
                 pointPadding: pointPadding,
-                animation: enableAnimation ? { duration: animationDuration } : false
+                // The entrance timing comes from PlusChart's motion model; this only opts out.
+                ...(!enableAnimation && { animation: false })
             }
         },
         legend: {
@@ -115,7 +114,6 @@ const HeatmapChart = ({
         }]
     };
     }, [
-        animationDuration,
         compactSpacing,
         data,
         diverging,
@@ -167,10 +165,8 @@ HeatmapChart.propTypes = {
     showDataLabels: PropTypes.bool,
     /** Gap between cells (0–1) for visual breathing room */
     pointPadding: PropTypes.number,
-    /** When false, disables Highcharts series animation */
-    enableAnimation: PropTypes.bool,
-    /** Animation duration in ms */
-    animationDuration: PropTypes.number
+    /** When false, the heatmap draws without an entrance */
+    enableAnimation: PropTypes.bool
 };
 
 export default HeatmapChart;

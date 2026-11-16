@@ -1,4 +1,4 @@
-import React, { forwardRef, useContext, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef } from 'react';
+import React, { forwardRef, useCallback, useContext, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef } from 'react';
 import PropTypes from 'prop-types';
 import HighchartsReact from 'highcharts-react-official';
 import Highcharts from '@/dataviz/highchartsModules';
@@ -34,6 +34,24 @@ const resolvePointStates = (pt, paletteColors) => {
 };
 
 /**
+ * Turns the entrance off on a drawn chart. Highcharts reads
+ * `chart.animation` for every later redraw (a resize, a legend toggle,
+ * `setData`), so leaving the entrance there replays it. The series options
+ * are set in place rather than through `chart.update({ plotOptions })`, which
+ * rebuilds every series and would cut the running entrance short.
+ */
+function freezeEntrance(chart) {
+    chart.update({ chart: { animation: false } }, false);
+    chart.options.plotOptions.series = {
+        ...chart.options.plotOptions.series,
+        animation: false,
+    };
+    chart.series.forEach((series) => {
+        series.options.animation = false;
+    });
+}
+
+/**
  * Single Highcharts wrapper seam for every PLUS chart.
  *
  * - **States:** merges the shared hover, inactive (`--ds-opacity-disabled`) and
@@ -51,11 +69,19 @@ const resolvePointStates = (pt, paletteColors) => {
  * - **Every later render:** sets entrance animations to `false` and passes
  *   `updateArgs={[true, true, false]}` so data updates and resizes never
  *   replay.
+ * - **Chart-type overrides:** a `plotOptions.<type>.animation` object (such
+ *   as the gauge's) is replaced by the same entrance, so every chart type
+ *   enters on the motion model.
+ * - **After the first draw:** turns `chart.animation` and the series
+ *   animation off on the chart instance, so a container resize, a legend
+ *   toggle or `setData` never replays the entrance.
  * - **Opt-out:** preserves an explicit `animation: false` (such as Sparkline,
  *   or Bar/Donut when `animate` is false).
+ *
+ * Expressive entrances come from the surrounding `ChartMotionArea expressive`.
  */
 const PlusChart = forwardRef(function PlusChart(
-    { options, expressive = false, containerProps, ...rest },
+    { options, containerProps, callback, ...rest },
     ref,
 ) {
     const reduced = useMotionReduced();
@@ -66,7 +92,7 @@ const PlusChart = forwardRef(function PlusChart(
 
     useImperativeHandle(ref, () => hcRef.current);
 
-    const isExpressive = Boolean(expressive || area?.expressive);
+    const isExpressive = Boolean(area?.expressive);
     const defer = area ? area.claim(slotKeyRef.current) : 0;
     const areaResolved = area ? area.resolved : true;
     const entered = enteredRef.current;
@@ -97,6 +123,23 @@ const PlusChart = forwardRef(function PlusChart(
             enteredRef.current = true;
         }
     }, [areaResolved]);
+
+    // Frees the slot on unmount only; the area's registry object changes
+    // when its count or expressive prop does, and that is not an unmount.
+    const areaRef = useRef(area);
+    areaRef.current = area;
+    useEffect(() => {
+        const slotKey = slotKeyRef.current;
+        return () => areaRef.current?.release(slotKey);
+    }, []);
+
+    const handleChart = useCallback(
+        (chart) => {
+            freezeEntrance(chart);
+            callback?.(chart);
+        },
+        [callback],
+    );
 
     const mergedOptions = useMemo(() => {
         if (!options) return options;
@@ -149,11 +192,11 @@ const PlusChart = forwardRef(function PlusChart(
         const nextPlotOptions = {
             ...chartTheme.plotOptions,
             ...options.plotOptions,
-            ...( (entered || reduced) && chartType && typePlot?.animation !== undefined
+            ...(chartType && typePlot?.animation !== undefined
                 ? {
                       [chartType]: {
                           ...typePlot,
-                          animation: false,
+                          animation: seriesEntranceAnim,
                       },
                   }
                 : {}),
@@ -245,6 +288,7 @@ const PlusChart = forwardRef(function PlusChart(
             options={mergedOptions}
             updateArgs={UPDATE_ARGS}
             containerProps={mergedContainerProps}
+            callback={handleChart}
             {...rest}
         />
     );
@@ -252,8 +296,9 @@ const PlusChart = forwardRef(function PlusChart(
 
 PlusChart.propTypes = {
     options: PropTypes.object.isRequired,
-    expressive: PropTypes.bool,
     containerProps: PropTypes.object,
+    /** Called with the Highcharts chart once its first draw completes. */
+    callback: PropTypes.func,
 };
 
 export default PlusChart;

@@ -271,7 +271,8 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Modal', new: '--modal-inline-md', old: '--modal-inline-md', use: 'Horizontal gap between the actions in a Modal footer.' },
   { tier: 'patterns', group: 'Modal', new: '--modal-inline-lg', old: '--modal-inline-lg', use: 'Horizontal gap between columns in a Modal.' },
   { tier: 'patterns', group: 'Modal', new: '--modal-radius', old: null, ref: 'var(--radius-xxl)', use: 'Corner rounding of a Modal.' },
-  { tier: 'patterns', group: 'Modal', new: '--modal-width-sm', old: '--layout-width-modal-sm', ref: '384px', at: { '(min-width: 1024px)': '512px', '(min-width: 1440px)': '640px' }, note: 'lifted out of spacing / layout, beside the pattern’s pad/stack tokens', use: 'Width of a small Modal, such as a confirmation.' },
+  { tier: 'patterns', group: 'Modal', new: '--modal-width-xs', old: null, ref: '261px', at: { '(min-width: 1024px)': '347px', '(min-width: 1440px)': '432px' }, codeOnly: true, note: '4 screen-grid columns plus 2 × 16 modal pad at 768 · 1024 · 1440', use: 'Width of a compact Modal, such as a confirmation.' },
+  { tier: 'patterns', group: 'Modal', new: '--modal-width-sm', old: '--layout-width-modal-sm', ref: '384px', at: { '(min-width: 1024px)': '512px', '(min-width: 1440px)': '640px' }, note: 'lifted out of spacing / layout, beside the pattern’s pad/stack tokens', use: 'Width of a small Modal, such as a single question or a one-field form.' },
   { tier: 'patterns', group: 'Modal', new: '--modal-width-md', old: '--layout-width-modal-md', ref: '507px', at: { '(min-width: 1024px)': '677px', '(min-width: 1440px)': '848px' }, use: 'Width of a default Modal, such as a short form.' },
   { tier: 'patterns', group: 'Modal', new: '--modal-width-lg', old: '--layout-width-modal-lg', ref: '629px', at: { '(min-width: 1024px)': '843px', '(min-width: 1440px)': '1056px' }, use: 'Width of a large Modal, such as a table or a long form.' },
   { tier: 'patterns', group: 'Page', new: '--page-border-width', old: null, ref: 'var(--stroke-2)', use: 'Width of the edge drawn around a Page frame.' },
@@ -357,7 +358,6 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Checklist', new: '--checklist-action-min-width', old: null, ref: 'var(--size-750)', note: '120px floor', use: 'Narrowest a checklist card\'s trailing action column may shrink.' },
 
   // ─── Components / sizes once written with primitives ─────────────────
-  { tier: 'components', group: 'Button', new: '--button-size-vertical', old: null, ref: 'var(--space-400)', use: 'Height of a Button laid out vertically, with its icon above its label.' },
   { tier: 'components', group: 'Option row', new: '--option-row-indent-step', old: null, ref: 'var(--space-125)', use: 'Indent added for each level of a nested option row.' },
   { tier: 'components', group: 'Option row', new: '--option-row-control-gap', old: null, ref: 'var(--space-0625)', use: 'Horizontal gap between an option row\'s control and its label.' },
   { tier: 'components', group: 'Option row', new: '--option-row-dot-size', old: null, ref: 'var(--space-050)', use: 'Size of the dot in an option row, such as a radio\'s selected mark.' },

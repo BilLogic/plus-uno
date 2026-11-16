@@ -431,32 +431,38 @@ export const Motion = {
         });
 
         const productiveExpected = chartEntrance({ reduced: false });
-        const reducedExpected = chartEntrance({ reduced: true });
         const stateExpected = chartStateTransition();
 
         const productiveSlots = [0, 1, 2].map((i) =>
             findChart(canvasElement.querySelector(`[data-chart-slot="${i}"]`)),
         );
+        // The entrance is what PlusChart handed Highcharts; after the first draw
+        // the chart instance itself carries animation: false, so nothing replays.
         for (const [index, chart] of productiveSlots.entries()) {
             expect(chart, `productive chart ${index}`).toBeDefined();
-            const entrance = chart.options.chart.animation;
-            const seriesEntrance = chart.options.plotOptions.series.animation;
+            const seriesEntrance = chart.userOptions.plotOptions.series.animation;
             const hoverState = chart.options.plotOptions.series.states.hover.animation;
 
-            expect(entrance.duration).toBe(productiveExpected.duration);
-            expect(typeof entrance.easing).toBe('function');
-            expect(entrance.easing(1)).toBe(1);
-            expect(entrance.defer).toBe(index * 20);
             expect(seriesEntrance.duration).toBe(productiveExpected.duration);
+            expect(typeof seriesEntrance.easing).toBe('function');
+            expect(seriesEntrance.easing(1)).toBe(1);
             expect(seriesEntrance.defer).toBe(index * 20);
             expect(hoverState.duration).toBe(stateExpected.duration);
+            expect(chart.options.chart.animation).toBe(false);
         }
 
         const reducedChart = findChart(canvasElement.querySelector('[data-chart-slot="reduced"]'));
         expect(reducedChart).toBeDefined();
-        expect(reducedChart.options.chart.animation.duration).toBe(reducedExpected.duration);
-        expect(reducedChart.options.chart.animation.easing(1)).toBe(1);
-        expect(reducedChart.options.plotOptions.series.animation).toBe(false);
+        // Reduced motion: marks draw at their final value and the container
+        // fades in on the appearance.fast spring (timing is unit-tested).
+        expect(reducedChart.userOptions.plotOptions.series.animation).toBe(false);
+        await waitFor(() => {
+            expect(reducedChart.container.style.opacity).not.toBe('0');
+        });
+
+        // A container resize redraws with the chart's own animation, now off.
+        productiveSlots[0].setSize(undefined, undefined);
+        expect(productiveSlots[0].renderer.globalAnimation).toBe(false);
 
         await userEvent.click(canvas.getByRole('button', { name: /switch term data/i }));
         await waitFor(() => {

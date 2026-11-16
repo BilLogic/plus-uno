@@ -161,7 +161,9 @@ test('every Layout token resolves to its value at Medium, Large and X-Large', ()
 test('the derived Layout rows are the frame rules worked at each mode width', () => {
   for (const [mode, width] of Object.entries(LAYOUT_MODES)) {
     for (const [leaf, value] of Object.entries(deriveLayout(width))) {
-      assert.equal(atMode(renamed(`--layout-${leaf}`), mode), px(value), `${leaf} at ${mode}`);
+      // The modal widths live with the Modal pattern tokens; 4-col was born there, with no Layout name to retire.
+      const name = leaf.startsWith('width-modal-') ? `--modal-width-${leaf.slice('width-modal-'.length)}` : renamed(`--layout-${leaf}`);
+      assert.equal(atMode(name, mode), px(value), `${leaf} at ${mode}`);
     }
   }
 });
@@ -356,10 +358,11 @@ function screenGridWidth(span, width, mode) {
 }
 
 test('the Overlay screen grid lands on Modal/width-modal-* at 768, 1024 and 1440', () => {
+  assert.match(SCREEN_GRID_SCSS, /&-width-xs \{ --plus-overlay-span: 4; \}/);
   assert.match(SCREEN_GRID_SCSS, /&-width-sm \{ --plus-overlay-span: 6; \}/);
   assert.match(SCREEN_GRID_SCSS, /&-width-md \{ --plus-overlay-span: 8; \}/);
   assert.match(SCREEN_GRID_SCSS, /&-width-lg \{ --plus-overlay-span: 10; \}/);
-  const spans = { sm: 6, md: 8, lg: 10 };
+  const spans = { xs: 4, sm: 6, md: 8, lg: 10 };
   for (const [mode, width] of Object.entries(LAYOUT_MODES)) {
     for (const [size, span] of Object.entries(spans)) {
       const expected = parseFloat(atMode(`--modal-width-${size}`, mode));
@@ -373,12 +376,13 @@ test('the Overlay screen grid lands on Modal/width-modal-* at 768, 1024 and 1440
 const MODAL_SCSS = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/components/messaging/Modal/Modal.scss'), 'utf8');
 const POPUP_SCSS = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/components/overlays-and-layering/Popup/Popup.scss'), 'utf8');
 
-test('Modal takes its 6 · 8 · 10 column widths from the shared screen grid', () => {
+test('Modal takes its 4 · 6 · 8 · 10 column widths from the shared screen grid', () => {
   assert.match(MODAL_SCSS, /@use '[./]*styles\/screen-grid' as \*;/);
   const block = MODAL_SCSS.match(/\n\.plus-modal \{([\s\S]*?)\n\}/)?.[1];
   assert.ok(block, 'Modal.scss has no .plus-modal block');
   assert.match(block, /@include screen-grid-width\(var\(--modal-pad-x-default\)\);/);
   assert.match(block, /--plus-overlay-span: 6;/);
+  assert.match(MODAL_SCSS, /\.plus-modal-width-4-col \{\s*--plus-overlay-span: 4;/);
   assert.match(MODAL_SCSS, /\.plus-modal-width-8-col \{\s*--plus-overlay-span: 8;/);
   assert.match(MODAL_SCSS, /\.plus-modal-width-10-col \{\s*--plus-overlay-span: 10;/);
   assert.doesNotMatch(MODAL_SCSS, /--plus-modal-(grid|column|span|screen)/, 'Modal keeps no column math of its own');

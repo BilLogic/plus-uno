@@ -41,7 +41,6 @@ export { default as TextField } from '@/components/forms-and-inputs/TextField';
 export { default as TimePicker, DEFAULT_TIMES, parseTime } from '@/components/forms-and-inputs/TimePicker';
 export { default as Toggle } from '@/components/forms-and-inputs/Toggle';
 export { default as TreeSelect, TREE_SELECT_SPACINGS } from '@/components/forms-and-inputs/TreeSelect';
-export { default as VerticalButton, VERTICAL_BUTTON_APPEARANCES } from '@/components/forms-and-inputs/VerticalButton';
 
 export { default as AiIcon, AI_ICON_ALL_SIZES, AI_ICON_NAMES, AI_ICON_SIZES } from '@/components/images-and-icons/AiIcon';
 export { default as Avatar, AVATAR_COLORS, AVATAR_SHAPES, AVATAR_SIZES, AVATAR_STATUSES, initialsOf } from '@/components/images-and-icons/Avatar';

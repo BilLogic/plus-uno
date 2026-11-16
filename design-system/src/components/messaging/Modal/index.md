@@ -14,7 +14,7 @@ Also asked as: confirm, confirmation dialog, destructive confirm, popup window, 
 
 **Source:** `design-system/src/components/messaging/Modal/Modal.jsx`
 
-**Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Width6Col, Width8Col, Width10Col, HeightHug, HeightFill, HeaderOptions, WithoutCloseButton, Loading, Content, Layout, Interactive, Overview, ConfirmView, ConfirmViewEscape, ModalOverModalRefused, BlockingShadow, SelectKeepsOverlayShadow, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Width4Col, Width6Col, Width8Col, Width10Col, HeightHug, HeightFill, HeaderOptions, WithoutCloseButton, Loading, Content, Layout, Interactive, Overview, ConfirmView, ConfirmViewEscape, ModalOverModalRefused, BlockingShadow, SelectKeepsOverlayShadow, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/messaging/Modal/Modal.mdx`
 
@@ -34,11 +34,12 @@ closes a floating Sidebar; a docked one stays.
 
 ### Width guidance
 
-`width` takes a step of `MODAL_WIDTHS` (6-col · 8-col · 10-col): that
+`width` takes a step of `MODAL_WIDTHS` (4-col · 6-col · 8-col · 10-col): that
 many columns of the screen grid plus the modal pad.
 
 | Width | When to use | `MODAL_WIDTH_PX` at 768 · 1024 · 1280 |
 | --- | --- | --- |
+| 4-col | A compact confirmation. | 261 · 347 · 432 |
 | 6-col | A confirmation or a short question. | 384 · 512 · 640 |
 | 8-col | A short form. | 507 · 677 · 848 |
 | 10-col | A table or an editor. | 629 · 843 · 1056 |
@@ -213,7 +214,7 @@ touched in the Harness tab.
 | `primaryButton` | buttonShape | — | The confirming footer button, drawn on the right. Takes `text` (default "Confirm"), `onClick`, `appearance` (default `primary`), `spacing` and `icon`. |
 | `secondaryButton` | buttonShape | — | The cancelling footer button, drawn left of the primary one. Takes `text` (default "Cancel"), `onClick`, `appearance` (default `default`), `spacing` and `icon`. |
 | `onClose` | func | — | Called when the dialog asks to close: the close button, Escape (unless `keyboard` is false) or a press on the blanket (unless `blanket` blocks it). The parent sets `show` to false. |
-| `width` | enum or number or string | `'6-col'` | `6-col` · `8-col` · `10-col`: 6 · 8 · 10 columns of the screen grid plus the modal pad. Grows with the screen, never shrinks, ignores the sidebar. A number or a length is a fixed width, kept for the callers that still pass one. |
+| `width` | enum or number or string | `'6-col'` | `4-col` · `6-col` · `8-col` · `10-col`: 4 · 6 · 8 · 10 columns of the screen grid plus the modal pad. Grows with the screen, never shrinks, ignores the sidebar. A number or a length is a fixed width, kept for the callers that still pass one. |
 | `className` | string | `''` | Extra class names added to the dialog panel beside the component's own. |
 | `style` | object | — | Inline styles for the dialog panel. A fixed `width` is applied after them. |
 | `children` | node | — | More content rendered in the body after `body`, for composing the dialog contents directly. |

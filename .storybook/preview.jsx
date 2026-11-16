@@ -253,8 +253,7 @@ const preview = {
                 "Split button",
                 "Filter button",
                 "Button group",
-                "Close button",
-                "Vertical button"
+                "Close button"
               ],
               "Calendar",
               "Checkbox",
@@ -267,9 +266,6 @@ const preview = {
               [
                 "Date time picker",
                 "Date picker",
-                [
-                  "Date picker"
-                ],
                 "Time picker"
               ],
               "Dropdown menu",
@@ -348,7 +344,7 @@ const preview = {
               "Empty state",
               "Flag",
               "Inline message",
-              "Modal",
+              "Modal dialog",
               "Notification item",
               "Section message",
               "Spotlight"
@@ -622,7 +618,10 @@ const preview = {
           context.name !== 'Overview' &&
           context.title.startsWith('Components/');
         return (
-          <DocsOverlayBoundary disablePointerEvents={staticComponentExample}>
+          <DocsOverlayBoundary
+            disablePointerEvents={staticComponentExample}
+            fit={context.parameters?.docs?.fit !== false}
+          >
             <Story />
           </DocsOverlayBoundary>
         );

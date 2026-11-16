@@ -113,7 +113,10 @@ export const ChartMotionContext = createContext(null);
 /**
  * Wraps an area of charts (such as a dashboard section or a docs specimen) so
  * each mounted `PlusChart` inside it receives its `defer` from `staggerDelays`
- * computed against the final mounted chart count. Outside an area, a chart
+ * computed against the final mounted chart count. A chart that unmounts frees
+ * its slot, so a chart mounting later takes the lowest free slot and its delay.
+ * `expressive` gives the area's charts the expressive entrance spring. Outside
+ * an area, a chart
  * defers 0 ms.
  */
 export function ChartMotionArea({ children, count, expressive = false }) {
@@ -135,7 +138,10 @@ export function ChartMotionArea({ children, count, expressive = false }) {
             claim(slotKey) {
                 const slots = slotsRef.current;
                 if (!slots.has(slotKey)) {
-                    slots.set(slotKey, slots.size);
+                    const taken = new Set(slots.values());
+                    let free = 0;
+                    while (taken.has(free)) free += 1;
+                    slots.set(slotKey, free);
                 }
                 const index = slots.get(slotKey);
                 const total = Math.max(count ?? 0, resolvedTotal, slots.size, index + 1);
@@ -143,6 +149,9 @@ export function ChartMotionArea({ children, count, expressive = false }) {
                 return delays[index] ?? 0;
             },
             resolved: typeof count === 'number' && count > 0 ? true : resolvedTotal > 0 && resolvedTotal >= slotsRef.current.size,
+            release(slotKey) {
+                slotsRef.current.delete(slotKey);
+            },
             expressive,
         }),
         [count, expressive, resolvedTotal],

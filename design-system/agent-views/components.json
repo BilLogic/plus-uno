@@ -1397,11 +1397,9 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-sm",
         "--border-width-default",
         "--button-radius-compact",
         "--button-radius-default",
-        "--button-size-vertical",
         "--control-md",
         "--control-sm",
         "--ds-background-disabled",
@@ -1414,8 +1412,6 @@
         "--inline-sm",
         "--pad-x-md",
         "--pad-x-sm",
-        "--pad-x-xs",
-        "--pad-y-sm",
         "--radius-full",
         "--type-weight-medium"
       ]
@@ -2305,7 +2301,8 @@
         "Required",
         "Description",
         "Card",
-        "Tile"
+        "Tile",
+        "TileNarrowLargeIllustrations"
       ],
       "tokens": [
         "--body-default",
@@ -3469,7 +3466,13 @@
         "ReadOnly",
         "Disabled",
         "HoveredState",
-        "KeyboardFocus"
+        "KeyboardFocus",
+        "CalendarOpensFourPixelsBelow",
+        "CalendarFlipsAboveNearTheBottom",
+        "RangePicksASpan",
+        "BoundedDatesBehavior",
+        "TypedEntry",
+        "DaysAnnounceTheirDate"
       ],
       "tokens": [
         "--ds-icon-subtle"
@@ -6340,7 +6343,8 @@
         "Pi",
         "Equal",
         "Divider",
-        "Interactive"
+        "Interactive",
+        "WidthCappedStaysSquare"
       ],
       "tokens": [
         "--ds-background-accent-blue-subtle",
@@ -7621,7 +7625,7 @@
           "required": false,
           "default": "'6-col'",
           "values": null,
-          "description": "`6-col` · `8-col` · `10-col`: 6 · 8 · 10 columns of the screen grid plus the modal pad. Grows with the screen, never shrinks, ignores the sidebar. A number or a length is a fixed width, kept for the callers that still pass one.",
+          "description": "`4-col` · `6-col` · `8-col` · `10-col`: 4 · 6 · 8 · 10 columns of the screen grid plus the modal pad. Grows with the screen, never shrinks, ignores the sidebar. A number or a length is a fixed width, kept for the callers that still pass one.",
           "deprecated": null
         },
         {
@@ -7653,6 +7657,7 @@
         }
       ],
       "stories": [
+        "Width4Col",
         "Width6Col",
         "Width8Col",
         "Width10Col",
@@ -8739,7 +8744,7 @@
       "import": "import { PatternModal } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/PatternModal/PatternModal.jsx",
-      "summary": "Modal pattern for PLUS design system. Modal shell rendered inline (no portal, focus trap or Escape): header with title and close button, body slot, footer slot. Width is a step of the screen grid (sm · md · lg: 6 · 8 · 10 columns plus the modal pad), and height hugs the content up to the screen less 128 or fills to it, the body scrolling past it. Place it in `Blanket`. Baked-in tokens: the overlay pair (`--ds-surface-overlay` with `--ds-shadow-overlay`), as the Modal component draws it, and Modal/pad, Modal/stack-md and Modal/radius. Mirrors \"Pattern/Modal\" in the Figma design system file. For a real overlay dialog (blanket, focus trap), use the core Modal component. A dialog is its own page: the title is its h1, at Heading/medium 20, and a section inside it opens at h2. `tabs` puts a tab group under the title, as Figma's `_Modal header` type=tabs: `Tabs` in the header, so it stays put while only the body scrolls. The body becomes the tab panel, named by the selected tab, and shows that tab's content in place of `children`. `header` is Figma's `_Modal header` type=custom: a slot that takes the place of the title row (the title and the close button), so the caller owns both and names the dialog with `aria-label` or `aria-labelledby`. `divider` draws a rule under the header and above the footer, as Figma's `divider?`. `loading` swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. The body never draws shorter than Modal/body-min-height 96.",
+      "summary": "Modal pattern for PLUS design system. Modal shell rendered inline (no portal, focus trap or Escape): header with title and close button, body slot, footer slot. Width is a step of the screen grid (xs · sm · md · lg: 4 · 6 · 8 · 10 columns plus the modal pad), and height hugs the content up to the screen less 128 or fills to it, the body scrolling past it. Place it in `Blanket`. Baked-in tokens: the overlay pair (`--ds-surface-overlay` with `--ds-shadow-overlay`), as the Modal component draws it, and Modal/pad, Modal/stack-md and Modal/radius. Mirrors \"Pattern/Modal\" in the Figma design system file. For a real overlay dialog (blanket, focus trap), use the core Modal component. A dialog is its own page: the title is its h1, at Heading/medium 20, and a section inside it opens at h2. `tabs` puts a tab group under the title, as Figma's `_Modal header` type=tabs: `Tabs` in the header, so it stays put while only the body scrolls. The body becomes the tab panel, named by the selected tab, and shows that tab's content in place of `children`. `header` is Figma's `_Modal header` type=custom: a slot that takes the place of the title row (the title and the close button), so the caller owns both and names the dialog with `aria-label` or `aria-labelledby`. `divider` draws a rule under the header and above the footer, as Figma's `divider?`. `loading` swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. The body never draws shorter than Modal/body-min-height 96.",
       "props": [
         {
           "name": "show",
@@ -8819,11 +8824,12 @@
           "required": false,
           "default": "'sm'",
           "values": [
+            "xs",
             "sm",
             "md",
             "lg"
           ],
-          "description": "`sm` · `md` · `lg`: 6 · 8 · 10 columns of the screen grid plus the modal pad (384 · 507 · 629 at 768, 512 · 677 · 843 at 1024, 640 · 848 · 1056 at 1440). Grows with the screen, never shrinks, ignores the sidebar.",
+          "description": "`xs` · `sm` · `md` · `lg`: 4 · 6 · 8 · 10 columns of the screen grid plus the modal pad (261 · 384 · 507 · 629 at 768, 347 · 512 · 677 · 843 at 1024, 432 · 640 · 848 · 1056 at 1440). Grows with the screen, never shrinks, ignores the sidebar.",
           "deprecated": null
         },
         {
@@ -8911,6 +8917,7 @@
         "CustomHeader",
         "Divider",
         "Loading",
+        "WidthXSmall",
         "WidthSmall",
         "WidthMedium",
         "WidthLarge",
@@ -9355,6 +9362,7 @@
         "--heading-lg-tracking",
         "--heading-md",
         "--heading-sm",
+        "--heading-xs",
         "--inline-lg",
         "--inline-md",
         "--inline-sm",
@@ -11156,7 +11164,8 @@
         "Disabled",
         "DisabledWithReason",
         "Required",
-        "Tile"
+        "Tile",
+        "TileNarrowLargeIllustrations"
       ],
       "tokens": [
         "--body-default",
@@ -16958,104 +16967,6 @@
         "--ds-motion-spatial-fast",
         "--ds-motion-spatial-fast-duration",
         "--plus-popup-reach"
-      ]
-    },
-    {
-      "name": "VerticalButton",
-      "kind": "component",
-      "import": "import { VerticalButton } from '@/components';",
-      "group": "forms-and-inputs",
-      "source": "design-system/src/components/forms-and-inputs/VerticalButton/VerticalButton.jsx",
-      "summary": "Vertical button: an icon stacked over a short label, one size (60 by 60). For choosing between a few large options, such as a role.",
-      "props": [
-        {
-          "name": "icon",
-          "type": "string or node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "A Font Awesome Free glyph name (`user-gear`) or a node.",
-          "deprecated": null
-        },
-        {
-          "name": "label",
-          "type": "string",
-          "required": true,
-          "default": null,
-          "values": null,
-          "description": "One or two words, sentence case.",
-          "deprecated": null
-        },
-        {
-          "name": "appearance",
-          "type": "enum",
-          "required": false,
-          "default": "'default'",
-          "values": [
-            "default",
-            "subtle",
-            "primary"
-          ],
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "isSelected",
-          "type": "bool",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "isDisabled",
-          "type": "bool",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "isLoading",
-          "type": "bool",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "onClick",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "className",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        }
-      ],
-      "stories": [
-        "Overview",
-        "Appearances",
-        "States",
-        "Selected",
-        "Disabled",
-        "Loading",
-        "HoveredState",
-        "PressedState",
-        "KeyboardFocus",
-        "Interactive"
       ]
     },
     {

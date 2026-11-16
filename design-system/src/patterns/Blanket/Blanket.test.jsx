@@ -11,9 +11,9 @@ import PatternModal from '../PatternModal';
  */
 describe('Blanket', () => {
     it('names the widths and heights a layer inside it can take', () => {
-        expect(BLANKET_WIDTHS).toEqual(['sm', 'md', 'lg']);
+        expect(BLANKET_WIDTHS).toEqual(['xs', 'sm', 'md', 'lg']);
         expect(BLANKET_HEIGHTS).toEqual(['hug', 'fill']);
-        expect(BLANKET_SPANS).toEqual({ sm: 6, md: 8, lg: 10 });
+        expect(BLANKET_SPANS).toEqual({ xs: 4, sm: 6, md: 8, lg: 10 });
     });
 
     it('draws one class, with no placement', () => {

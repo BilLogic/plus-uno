@@ -76,12 +76,6 @@ export const webAppSourceSnippets = {
         '  onApply={setApplied}',
         '/>'
     ]),
-    verticalButton: snippet([
-        '<VerticalButton',
-        '  icon="user-gear"',
-        '  label="Admin"',
-        '/>'
-    ]),
     iconButton: snippet([
         '<IconButton',
         '  icon="pen"',

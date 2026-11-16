@@ -294,3 +294,14 @@ Interactive.argTypes = {
     size: { control: { type: 'number', min: 24, step: 8 } },
     title: { control: 'text' },
 };
+
+export const WidthCappedStaysSquare = () => (
+    <div style={{ width: 60 }}>
+        <Illustration character="relationships" size={240} style={{ maxInlineSize: '100%' }} />
+    </div>
+);
+WidthCappedStaysSquare.play = async ({ canvasElement }) => {
+    const frame = canvasElement.querySelector('.plus-illustration').getBoundingClientRect();
+    await expect(frame.width).toBeLessThan(240);
+    await expect(Math.abs(frame.height - frame.width)).toBeLessThan(1);
+};

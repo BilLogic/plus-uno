@@ -404,3 +404,44 @@ Tile.play = async ({ canvasElement }) => {
     await expect(getComputedStyle(first).opacity).toBe('0');
     await expect(tile.querySelector('.plus-choice-tile-illustration')).toHaveAttribute('aria-hidden', 'true');
 };
+
+const SQUARE_IMAGE = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Crect width='10' height='10'/%3E%3C/svg%3E";
+const BigSvg = () => (
+    <svg viewBox="0 0 240 240" width="240" height="240" aria-hidden="true"><circle cx="120" cy="120" r="110" fill="var(--ds-icon-subtle)" /></svg>
+);
+
+export const TileNarrowLargeIllustrations = () => (
+    <div style={{ width: 320, /* 320px: the narrow-phone container width the ticket names */ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
+        <Radio id="radio-narrow-character" name="radio-narrow" value="a" label="Character" illustration={<Illustration character="relationships" size={240} />} appearance="tile" />
+        <Radio id="radio-narrow-svg" name="radio-narrow" value="b" label="Svg" illustration={<BigSvg />} appearance="tile" />
+        <Radio
+            id="radio-narrow-img"
+            name="radio-narrow"
+            value="c"
+            label="Image"
+            illustration={<img alt="" width="300" height="300" src={SQUARE_IMAGE} />}
+            appearance="tile"
+        />
+        {/* 160px: the smallest container a tile is asked to fit */}
+        <div style={{ width: 160 }}>
+            <Radio id="radio-narrow-small" name="radio-narrow-small" value="d" label="Smallest" illustration={<Illustration character="relationships" size={240} />} appearance="tile" />
+        </div>
+    </div>
+);
+TileNarrowLargeIllustrations.play = async ({ canvasElement }) => {
+    const tiles = canvasElement.querySelectorAll('.plus-choice-tile');
+    await expect(tiles.length).toBe(4);
+    for (const tile of tiles) {
+        const card = tile.getBoundingClientRect();
+        const slotChild = tile.querySelector('.plus-choice-tile-illustration > *');
+        // The line art (limbs included) when the child is a character, else the child itself.
+        const art = (slotChild.querySelector('.plus-illustration__lines') || slotChild).getBoundingClientRect();
+        const label = tile.querySelector('.plus-form-radio-label, .plus-form-checkbox-label, label').getBoundingClientRect();
+        await expect(art.width).toBeGreaterThan(0);
+        await expect(art.bottom).toBeLessThanOrEqual(label.top);
+        await expect(art.left).toBeGreaterThanOrEqual(card.left);
+        await expect(art.right).toBeLessThanOrEqual(card.right);
+        await expect(art.top).toBeGreaterThanOrEqual(card.top);
+        await expect(art.bottom).toBeLessThanOrEqual(card.bottom);
+    }
+};
