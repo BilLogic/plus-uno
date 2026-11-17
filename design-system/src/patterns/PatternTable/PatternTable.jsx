@@ -1,9 +1,9 @@
-import React, { Children, Fragment, isValidElement, useCallback, useLayoutEffect, useRef, useState } from 'react';
+import React, { Children, Fragment, isValidElement, useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import { TableBodyMotion } from '@/lib/listMotion';
 import './PatternTable.scss';
 
-/** Children with fragments opened, so a `thead` passed inside one is found. */
+/** Children with fragments opened, so a `caption` or `tbody` passed inside one is found. */
 const flatten = (children) => Children.toArray(children).flatMap((child) => (
     isValidElement(child) && child.type === Fragment ? flatten(child.props.children) : [child]
 ));
@@ -17,26 +17,17 @@ const withBodyMotion = (children) => flatten(children).map((child, index) => (
         : child
 ));
 
-/** The rows an empty table drops; the head row, a caption and column groups stay. */
-const isBody = (child) => isElementOf('tbody')(child) || isElementOf('tfoot')(child);
-
-/** How many columns the head row spans, counting each cell's `colSpan`; 1 with no head row. */
-const columnCount = (kept) => {
-    const firstRow = kept.filter(isElementOf('thead'))
-        .flatMap((head) => flatten(head.props.children))
-        .find(isElementOf('tr'));
-    if (!firstRow) return 1;
-    const count = flatten(firstRow.props.children)
-        .filter((cell) => isElementOf('th')(cell) || isElementOf('td')(cell))
-        .reduce((sum, cell) => sum + (Number(cell.props.colSpan) || 1), 0);
-    return Math.max(count, 1);
+const textOf = (node) => {
+    if (typeof node === 'string' || typeof node === 'number') return String(node);
+    if (Array.isArray(node)) return node.map(textOf).join('');
+    if (isValidElement(node)) return textOf(node.props.children);
+    return '';
 };
 
-/** The rendered head row's span, which also counts cells a wrapper component draws. */
-const renderedColumnCount = (table) => {
-    const row = table?.tHead?.rows[0];
-    if (!row) return null;
-    return Array.from(row.cells).reduce((sum, cell) => sum + (cell.colSpan || 1), 0) || null;
+const captionLabel = (children) => {
+    const caption = flatten(children).find(isElementOf('caption'));
+    const text = caption ? textOf(caption).trim() : '';
+    return text || undefined;
 };
 
 /**
@@ -44,9 +35,8 @@ const renderedColumnCount = (table) => {
  * Table shell: table children (consumers pass their own thead/tbody), a
  * footer slot under the rows, and an empty-state slot. The table has no
  * toolbar of its own: the Section header above it carries the title, search,
- * filters and actions. With `empty`, the header stays and the empty state
- * takes the body as one message row spanning every column, so the columns
- * still say what will appear. The table itself is
+ * filters and actions. With `empty`, the empty state replaces the whole table
+ * (no column headers, no caption, no footer). The table itself is
  * no-fill (transparent): the surrounding card or surface provides the
  * background, and row states are layered over each cell's fill rather than
  * replacing it.
@@ -99,18 +89,10 @@ const PatternTable = ({
     ].filter(Boolean).join(' ');
 
     const showEmptyState = Boolean(empty && emptyState);
-    // An empty table keeps its head row and swaps its body for the message row.
-    const kept = showEmptyState ? flatten(children).filter((child) => !isBody(child)) : null;
-    // The span is read from the children first, then from the rendered head
-    // row, so a head row drawn by a wrapper component is still spanned.
-    const tableRef = useRef(null);
-    const [measuredSpan, setMeasuredSpan] = useState(null);
-    useLayoutEffect(() => {
-        if (!showEmptyState) return;
-        const span = renderedColumnCount(tableRef.current);
-        setMeasuredSpan((prev) => (prev === span ? prev : span));
-    });
-    const messageSpan = showEmptyState ? (measuredSpan ?? columnCount(kept)) : null;
+    const emptyLabel = showEmptyState
+        ? (tableProps?.['aria-label'] ?? (tableProps?.['aria-labelledby'] ? undefined : captionLabel(children)))
+        : undefined;
+    const emptyLabelledBy = showEmptyState ? tableProps?.['aria-labelledby'] : undefined;
     const tracksScroll = pinsHeader || stickyColumn;
     // A region that scrolls must be reachable by keyboard: a bounded region
     // scrolls vertically, and a sticky column exists for a table that scrolls
@@ -119,33 +101,32 @@ const PatternTable = ({
 
     return (
         <div id={id} className={classes} style={style} {...props}>
-            <div
-                className="plus-pattern-table-scroll"
-                style={bounded ? { maxHeight } : undefined}
-                tabIndex={scrollable ? 0 : undefined}
-                onScroll={tracksScroll ? onScroll : undefined}
-                data-scrolled-x={tracksScroll && scrolled.x ? '' : undefined}
-                data-scrolled-y={tracksScroll && scrolled.y ? '' : undefined}
-            >
-                <table
-                    {...tableProps}
-                    ref={tableRef}
-                    className={['plus-pattern-table-table', tableProps?.className].filter(Boolean).join(' ')}
+            {showEmptyState ? (
+                <div
+                    className="plus-pattern-table-empty"
+                    role={emptyLabel || emptyLabelledBy ? 'region' : undefined}
+                    aria-label={emptyLabel}
+                    aria-labelledby={emptyLabelledBy}
                 >
-                    {showEmptyState ? (
-                        <>
-                            {kept}
-                            <tbody>
-                                <tr className="plus-pattern-table-message-row">
-                                    <td className="plus-pattern-table-message" colSpan={messageSpan}>
-                                        <div className="plus-pattern-table-message-body">{emptyState}</div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </>
-                    ) : withBodyMotion(children)}
-                </table>
-            </div>
+                    {emptyState}
+                </div>
+            ) : (
+                <div
+                    className="plus-pattern-table-scroll"
+                    style={bounded ? { maxHeight } : undefined}
+                    tabIndex={scrollable ? 0 : undefined}
+                    onScroll={tracksScroll ? onScroll : undefined}
+                    data-scrolled-x={tracksScroll && scrolled.x ? '' : undefined}
+                    data-scrolled-y={tracksScroll && scrolled.y ? '' : undefined}
+                >
+                    <table
+                        {...tableProps}
+                        className={['plus-pattern-table-table', tableProps?.className].filter(Boolean).join(' ')}
+                    >
+                        {withBodyMotion(children)}
+                    </table>
+                </div>
+            )}
             {footer && !showEmptyState && (
                 <div className="plus-pattern-table-footer">{footer}</div>
             )}
@@ -160,12 +141,12 @@ PatternTable.propTypes = {
      * @ds-context Governed by: Empty (ds guide empty)
      */
     footer: PropTypes.node,
-    /** Empty-state slot: a message row under the head row, spanning every column, when `empty` is true
+    /** Empty-state slot: replaces the entire table (no head row, caption, or footer) when `empty` is true
      * @ds-context Used in: Table.emptyState (ds guide table)
      * @ds-context Governed by: Empty (ds guide empty)
      */
     emptyState: PropTypes.node,
-    /** Swap the body rows for the empty-state message row; the head row stays */
+    /** Replace the table with the `emptyState` slot; with `empty` and no `emptyState`, the table renders normally */
     empty: PropTypes.bool,
     /** Pin the head row while the rows scroll under it; needs `maxHeight`, since only a bounded region scrolls vertically */
     stickyHeader: PropTypes.bool,

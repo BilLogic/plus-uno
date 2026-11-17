@@ -2,7 +2,7 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
-import { Table, DynamicTable, HeadCell } from '@/components';
+import { Button, DynamicTable, EmptyState, HeadCell, Table } from '@/components';
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import PatternSection, { SectionToolbar } from '@/patterns/PatternSection';
 import { HeadingLevelContext } from '@/lib/headingLevel';
@@ -21,7 +21,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'A table people sort, page or act on. `head.cells` names the columns and `rows` holds one `{ key, cells }` per row; a column sorts by its cells\' `key`. Left alone the table holds its own sort and page; pass `sortKey`/`sortOrder` or `page` and the page owns them. Every state but `default` and `refreshing` keeps the head row and swaps the body for one message row.'
+                    'A table people sort, page or act on. `head.cells` names the columns and `rows` holds one `{ key, cells }` per row; a column sorts by its cells\' `key`. Left alone the table holds its own sort and page; pass `sortKey`/`sortOrder` or `page` and the page owns them. `empty` and `no results` replace the whole table (no head row, footer or pagination) with `EmptyState`; `loading` and `error` keep the head row and swap the body for one message row.'
             }
         }
     },
@@ -153,11 +153,22 @@ export const States = {
             <DynamicTable {...args} isLoading label="Students, refreshing" testId="state-refreshing" />
         </div>
     ),
-    args: { head, rows: rows.slice(0, 3) },
-    parameters: { docs: { description: { story: 'Each state keeps the head row so the columns still say what will appear. Empty, no results, loading and error swap the body for one message row; refreshing keeps the rows at the loading opacity under a spinner.' } } },
+    args: { head, rows: rows.slice(0, 3), rowsPerPage: 2 },
+    parameters: { docs: { description: { story: 'Empty and no results replace the whole table (no head row, footer or pagination) with EmptyState; loading and error keep the head row and swap the body for one message row; refreshing keeps the rows at the loading opacity under a spinner.' } } },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        for (const state of STATES) {
+        const emptyStates = STATES.filter((state) => state === 'empty' || state === 'no results');
+        const keptHeaderStates = STATES.filter((state) => !emptyStates.includes(state));
+        for (const state of emptyStates) {
+            const root = canvas.getByTestId(`state-${state}`);
+            await expect(root).toHaveAttribute('data-state', state);
+            await expect(within(root).queryByRole('table'), `${state}: no table`).toBeNull();
+            await expect(within(root).queryAllByRole('columnheader'), `${state}: no column headers`).toHaveLength(0);
+            await expect(within(root).queryByRole('navigation'), `${state}: no pagination`).toBeNull();
+            const region = within(root).getByRole('region', { name: `Students, ${state}` });
+            await expect(within(region).getByRole('heading'), `${state}: EmptyState heading visible`).toBeVisible();
+        }
+        for (const state of keptHeaderStates) {
             const root = canvas.getByTestId(`state-${state}`);
             await expect(root).toHaveAttribute('data-state', state);
             const message = root.querySelector('.plus-pattern-table-message');
@@ -173,14 +184,48 @@ export const States = {
 };
 
 export const Empty = {
-    args: { head, rows: [], label: 'Students', emptyView: 'No students yet' },
+    args: { head, rows: [], label: 'Students', rowsPerPage: 5, emptyView: 'No students yet' },
     parameters: {
-        docs: { description: { story: 'With no rows the header stays and `emptyView` takes the body as one message row spanning every column.' } }
+        docs: { description: { story: 'With no rows, the whole table (header row, footer and pagination) is replaced by `EmptyState`.' } }
     },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(canvas.getByText('No students yet').closest('td').colSpan).toBe(4);
-        await expect(canvas.getByRole('columnheader', { name: /Student/ })).toBeVisible();
+        await expect(canvas.queryByRole('table')).toBeNull();
+        await expect(canvas.queryAllByRole('columnheader')).toHaveLength(0);
+        await expect(canvas.queryByRole('navigation')).toBeNull();
+        const region = canvas.getByRole('region', { name: 'Students' });
+        await expect(within(region).getByRole('heading', { name: 'No students yet' })).toBeVisible();
+    }
+};
+
+export const NoResults = {
+    args: {
+        head,
+        rows,
+        state: 'no results',
+        label: 'Students',
+        rowsPerPage: 5,
+        noResultsView: (
+            <EmptyState
+                spacing="compact"
+                icon="magnifying-glass"
+                header="No matching students"
+                description="Try another search or reset the filters."
+                primaryAction={<Button text="Reset filters" appearance="default" spacing="compact" onClick={() => {}} />}
+            />
+        ),
+    },
+    parameters: {
+        docs: { description: { story: 'With `state="no results"`, the whole table (header row, footer and pagination) is replaced by `EmptyState`.' } }
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.queryByRole('table')).toBeNull();
+        await expect(canvas.queryAllByRole('columnheader')).toHaveLength(0);
+        await expect(canvas.queryByRole('navigation')).toBeNull();
+        const region = canvas.getByRole('region', { name: 'Students' });
+        await expect(within(region).getByRole('heading', { name: 'No matching students' })).toBeVisible();
+        await expect(within(region).getByRole('button', { name: 'Reset filters' })).toBeVisible();
     }
 };
 

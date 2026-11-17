@@ -22,7 +22,7 @@ Choose among four situations to set the wording and available action. See Empty 
 The place sets the spacing and the alignment. The words stay the same.
 
 - **A full page.** The block lines up with the page title, left-aligned with no wide margin, the picture above the text. The block is centered today.
-- **In a table.** The empty state replaces the whole table: no column headers, no footer. The block is centered and its text stays left-aligned. The Table keeps its header row and centers the text today.
+- **In a table.** The empty state replaces the whole table: no column headers, no footer. The block is centered and its text stays left-aligned. `EmptyState` centers the text today.
 - **In a card.** Compact: a smaller picture and heading, the block centered in the card, the text left-aligned. Several cards at once drop their pictures and use Subtle actions. The text is centered today.
 - **In a Panel.** The Details Panel when its record was removed: the block at the top of the body, with a way back.
 
@@ -69,7 +69,7 @@ Use Empty when a list, table, card, Panel or page has no records to show, a sear
 | --- | --- | --- |
 | The block | Empty state | Picture or icon, header, one line and the action; `spacing` is `default` for a view and `compact` for a table body or card. |
 | The action | Button | `primaryAction` takes one Button; a No matches action is Default. |
-| Table slot | Table | `emptyState` takes the block. It replaces the whole table, header and footer included. |
+| Table slot | Table | `emptyState` (`PatternTable`) and `emptyView` / `noResultsView` (`DynamicTable`) take the block and replace the whole table, header and footer included. |
 | In a Panel | Panel | The record-gone state at the top of the body. |
 
 ## Related
@@ -101,7 +101,7 @@ The picture above, then the heading, one line and the action, all on one left ed
 
 **Checked:** Review
 
-No column headers and no footer while the table is empty; the view bar above stays, so the person can change the view, search or reset. A "No matches" state offers "Reset filters".  The Table keeps its header row in its `emptyState` slot today.
+No column headers and no footer while the table is empty; the view bar above stays, so the person can change the view, search or reset. A "No matches" state offers "Reset filters".
 
 Do: The whole table replaced; the view bar stays.
 Don't: Column headers and a footer over nothing, with a centered paragraph.

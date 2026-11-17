@@ -7,7 +7,7 @@ import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
 import PatternTable from '@/patterns/PatternTable';
 import PatternSection from '@/patterns/PatternSection';
-import { Checkbox, Button } from '@/components';
+import { Checkbox, Button, EmptyState as PlusEmptyState } from '@/components';
 
 const sampleRows = [
     { name: 'Jordan Blake', role: 'Tutor', status: 'Active' },
@@ -47,14 +47,15 @@ const paginationSlot = (
     </span>
 );
 
-/** The empty type of the message row: icon, title, description and the first action. */
+/** The empty state replacing the table: icon, heading, description and action. */
 const emptyStateSlot = (
-    <>
-        <i className="fa-regular fa-folder" aria-hidden="true" style={{ fontSize: 'var(--icon-lg)', color: 'var(--ds-icon-subtle)' }} />
-        <span style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>No members yet</span>
-        <span style={{ font: 'var(--body-sm)' }}>Members you invite show up here.</span>
-        <Button text="Invite a member" appearance="subtle" spacing="compact" onClick={() => {}} />
-    </>
+    <PlusEmptyState
+        spacing="compact"
+        icon="folder"
+        header="No members yet"
+        description="Members you invite show up here."
+        primaryAction={<Button text="Invite a member" appearance="subtle" spacing="compact" onClick={() => {}} />}
+    />
 );
 
 const wideColumns = ['Name', 'Role', 'Status', 'School', 'Platform', 'Sessions', 'Last session', 'Mentor'];
@@ -127,10 +128,8 @@ export const Overview = () => (
 );
 
 /**
- * The empty state sits inside the table, under its head row, as a message row
- * spanning every column; the Section header above stays usable. It is not a
- * data row, so it takes no hover state, and the pager hides with the rows.
- * Held in all four modes.
+ * The empty state replaces the whole table (no head row, no footer); the
+ * Section header above stays usable. Held in all four modes.
  */
 export const EmptyState = {
     render: () => (
@@ -142,29 +141,22 @@ export const EmptyState = {
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        const color = (token) => tokenColor(canvasElement, token);
-        const table = canvas.getByRole('table');
 
         await inEveryColorMode(async (mode) => {
-            const message = within(table).getByText('No members yet').closest('td');
-            const row = message.closest('tr');
-            await expect(within(table).getByRole('columnheader', { name: 'Role' }), `${mode}: the head row stays`).toBeVisible();
-            await expect(within(table).queryByText('Jordan Blake'), `${mode}: the body rows are replaced`).toBeNull();
-            await expect(message.colSpan, `${mode}: the message spans every column`).toBe(3);
-            await expect(row.closest('tbody'), `${mode}: the message is a row of the table body`).not.toBeNull();
-            await expect(getComputedStyle(message).color, `${mode}: message text`).toBe(color('--ds-text-subtle'));
-            await expect(getComputedStyle(message).borderBottomColor, `${mode}: the message row's rule`).toBe(color('--ds-border'));
-            await expect(withForcedPseudo(row, ':hover', () => getComputedStyle(message).backgroundImage), `${mode}: no hover on a message row`)
-                .not.toContain(color('--ds-background-neutral-subtle-hovered'));
-            await expect(canvas.getByRole('button', { name: 'Add member' }), `${mode}: the Section header stays usable`).toBeEnabled();
+            await expect(canvas.queryByRole('table'), `${mode}: the table is replaced`).toBeNull();
+            await expect(canvas.queryAllByRole('columnheader'), `${mode}: no column headers`).toHaveLength(0);
+            await expect(canvas.queryByText('Jordan Blake'), `${mode}: no body rows`).toBeNull();
             await expect(canvas.queryByText(/Pagination slot/), `${mode}: no pager without rows`).toBeNull();
+            await expect(canvas.getByRole('heading', { name: 'No members yet' }), `${mode}: EmptyState heading visible`).toBeVisible();
+            await expect(canvas.getByRole('button', { name: 'Invite a member' }), `${mode}: EmptyState action visible`).toBeVisible();
+            await expect(canvas.getByRole('button', { name: 'Add member' }), `${mode}: the Section header stays usable`).toBeEnabled();
         });
     },
 };
 
 /**
- * With a sticky column, the message row spans it rather than pinning to it:
- * the head cell stays sticky, the message cell does not.
+ * Even with stickyColumn, stickyHeader and maxHeight set, an empty table
+ * replaces the whole grid: no scroll region and no sticky head row.
  */
 export const EmptyWithStickyColumn = {
     parameters: { docs: { disable: true } },
@@ -175,10 +167,10 @@ export const EmptyWithStickyColumn = {
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        const message = canvas.getByText('No members yet').closest('td');
-        await expect(getComputedStyle(canvas.getByText('Name')).position, 'the head cell is sticky').toBe('sticky');
-        await expect(getComputedStyle(message).position, 'the message cell is not pinned').not.toBe('sticky');
-        await expect(getComputedStyle(message).boxShadow, 'the message cell draws no overflow shadow').toBe('none');
+        await expect(canvas.queryByRole('table'), 'no table when empty').toBeNull();
+        await expect(canvas.queryAllByRole('columnheader'), 'no sticky column headers when empty').toHaveLength(0);
+        await expect(canvasElement.querySelector('.plus-pattern-table-scroll'), 'no scroll region when empty').toBeNull();
+        await expect(canvas.getByRole('heading', { name: 'No members yet' })).toBeVisible();
     },
 };
 

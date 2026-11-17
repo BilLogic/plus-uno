@@ -68,7 +68,8 @@ export const ListWithFilters = {
         const search = canvas.getByRole('searchbox', { name: 'Search students' });
         await userEvent.type(search, 'Ana');
         await expect(canvas.getByText('No matching sessions')).toBeVisible();
-        await expect(canvas.getByRole('columnheader', { name: 'Student' })).toBeVisible();
+        await expect(canvas.queryByRole('table')).toBeNull();
+        await expect(canvas.queryAllByRole('columnheader')).toHaveLength(0);
         await userEvent.click(canvas.getByRole('button', { name: 'Reset filters' }));
         await expect(canvas.getAllByRole('row')).toHaveLength(4);
     },

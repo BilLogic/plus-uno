@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import PatternTable from '@/patterns/PatternTable';
+import EmptyState from '@/components/messaging/EmptyState';
 import Pagination from '@/components/navigation/Pagination';
 import Select from '@/components/forms-and-inputs/Select';
 import Spinner from '@/components/loading/Spinner';
@@ -69,11 +70,12 @@ const deriveState = (state, isLoading, rowCount) => {
  *   it is given. With `totalRows`, `rows` is already the current page (paged
  *   on a server) and the footer counts against `totalRows`.
  * - **States.** `default`, `empty`, `no results`, `loading`, `refreshing` and
- *   `error`. Every state but `default` and `refreshing` keeps the head row and
- *   swaps the body for one message row; `refreshing` keeps the rows at the
- *   loading opacity under a spinner. `isLoading` and an empty `rows` choose
- *   the state on their own; `state` names one outright (`no results` and
- *   `error` are only ever named).
+ *   `error`. `empty` and `no results` replace the whole table (no head row,
+ *   footer or pagination) with `EmptyState`; `loading` and `error` keep the
+ *   head row and swap the body for one message row; `refreshing` keeps the rows
+ *   at the loading opacity under a spinner. `isLoading` and an empty `rows`
+ *   choose the state on their own; `state` names one outright (`no results`
+ *   and `error` are only ever named).
  * - **Selection.** `isSelectable` adds a checkbox column as wide as the row
  *   is tall: "Select row N" on each row, "Select all rows" in the head, which
  *   is checked when every row on the page is selected and mixed when only
@@ -207,7 +209,9 @@ const DynamicTable = ({
     const highlighted = [].concat(highlightedRowIndex ?? []);
 
     const bodyState = deriveState(state, isLoading, rows.length);
-    const showsMessage = !['default', 'refreshing'].includes(bodyState);
+    const isEmptyState = bodyState === 'empty' || bodyState === 'no results';
+    const showsBodyMessage = bodyState === 'loading' || bodyState === 'error';
+    const showsMessage = isEmptyState || showsBodyMessage;
 
     const handleSort = (key) => (order) => {
         if (!keyControlled || !orderControlled) setOwnSort({ key, order });
@@ -219,13 +223,24 @@ const DynamicTable = ({
         if (onSetPage) onSetPage(next);
     };
 
-    const message = {
-        empty: emptyView ?? DEFAULT_MESSAGES.empty,
-        'no results': noResultsView ?? DEFAULT_MESSAGES['no results'],
+    const toEmptyState = (view, fallback) => {
+        const content = view ?? fallback;
+        return React.isValidElement(content)
+            ? content
+            : <EmptyState spacing="compact" header={content} />;
+    };
+
+    const emptyStateNode = isEmptyState
+        ? (bodyState === 'empty'
+            ? toEmptyState(emptyView, DEFAULT_MESSAGES.empty)
+            : toEmptyState(noResultsView, DEFAULT_MESSAGES['no results']))
+        : null;
+
+    const bodyMessage = showsBodyMessage ? {
         error: errorView ?? DEFAULT_MESSAGES.error,
         // The words carry the state; the spinner beside them is not read twice.
         loading: <><span aria-hidden="true"><Spinner size={24} /></span><span>Loading rows</span></>,
-    }[bodyState];
+    }[bodyState] : null;
 
     const narrow = useNarrow();
     const rangeText = `${total === 0 ? 0 : start + 1}–${Math.min(start + rowsPerPage, total)} of ${total}${noun ? ` ${noun}` : ''}`;
@@ -257,6 +272,7 @@ const DynamicTable = ({
     ) : null;
 
     const anyWidth = head.cells.some((cell) => cell.width);
+    const columnCount = head.cells.length + (isSelectable ? 1 : 0);
 
     return (
         <div
@@ -273,17 +289,15 @@ const DynamicTable = ({
         >
             <PatternTable
                 footer={footer}
-                empty={showsMessage}
+                empty={isEmptyState}
                 stickyHeader={stickyHeader}
                 stickyColumn={isFrozen}
                 maxHeight={maxHeight}
-                emptyState={showsMessage ? (
-                    <span className={classes('plus-dynamic-table-message', `plus-dynamic-table-message--${bodyState.replace(/\s+/g, '-')}`)}>
-                        {message}
-                    </span>
-                ) : null}
+                emptyState={emptyStateNode}
                 tableProps={{
-                    'aria-label': caption ? undefined : label,
+                    'aria-label': isEmptyState
+                        ? (label || (typeof caption === 'string' ? caption : undefined))
+                        : (caption ? undefined : label),
                     className: classes(
                         'plus-table',
                         `plus-table-${size}`,
@@ -348,7 +362,17 @@ const DynamicTable = ({
                     </tr>
                 </thead>
                 <tbody>
-                    {visible.map((row, rowIndex) => {
+                    {showsBodyMessage ? (
+                        <tr className="plus-pattern-table-message-row">
+                            <td className="plus-pattern-table-message" colSpan={columnCount}>
+                                <div className="plus-pattern-table-message-body">
+                                    <span className={classes('plus-dynamic-table-message', `plus-dynamic-table-message--${bodyState.replace(/\s+/g, '-')}`)}>
+                                        {bodyMessage}
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                    ) : visible.map((row, rowIndex) => {
                         const key = rowKey(row, start + rowIndex);
                         const rowSelected = isSelectable && isSelected(key);
                         return (
@@ -459,9 +483,9 @@ DynamicTable.propTypes = {
     isLoading: PropTypes.bool,
     /** Names the body's state outright. */
     state: PropTypes.oneOf(STATES),
-    /** The message for the `empty` state. */
+    /** The `EmptyState` (or heading text) rendered in place of the table for the `empty` state. */
     emptyView: PropTypes.node,
-    /** The message for the `no results` state. */
+    /** The `EmptyState` (or heading text) rendered in place of the table for the `no results` state. */
     noResultsView: PropTypes.node,
     /** The message for the `error` state. */
     errorView: PropTypes.node,

@@ -69,7 +69,7 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 
 ## Body states
 
-<ComponentExample of={DynamicTableStories.States} description={<>Every state keeps the head row, so the columns still say what will appear. Empty, no results, loading and error swap the body for one message row; refreshing keeps the rows at the loading opacity under a spinner.</>} />
+<ComponentExample of={DynamicTableStories.States} description={<><code>empty</code> and <code>no results</code> replace the whole table (no head row, footer or pagination) with <code>EmptyState</code>; <code>loading</code> and <code>error</code> keep the head row and swap the body for one message row; <code>refreshing</code> keeps the rows at the loading opacity under a spinner.</>} />
 
 </div>
 
@@ -77,7 +77,9 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 
 ## Empty state
 
-<ComponentExample of={DynamicTableStories.Empty} title="Empty" description={<>With no rows, a cleared filter or a new account, <code>emptyView</code> takes the body as one message row.</>} />
+<ComponentExample of={DynamicTableStories.Empty} title="Empty" description={<>With no rows, a cleared filter or a new account, <code>emptyView</code> replaces the whole table with <code>EmptyState</code>.</>} />
+
+<ComponentExample of={DynamicTableStories.NoResults} title="No results" description={<>With <code>state="no results"</code>, <code>noResultsView</code> replaces the whole table with <code>EmptyState</code>.</>} />
 
 </div>
 
@@ -179,7 +181,7 @@ or page through a long result with pagination. It holds its own sort and page un
 2. **Sort arrow.** `12` tall; hidden until hover or focus, kept once sorted.
 3. **Row.** Cells in a band, with hover and selected grounds.
 4. **Footer.** States the range on a table that pages.
-5. **Message row.** The empty, no results, loading and error states, spanning every column.
+5. **Message row.** The `loading` and `error` states, spanning every column under the head row. `empty` and `no results` replace the whole table with `EmptyState`.
 6. **Checkbox column.** With `isSelectable`: as wide as the row is tall, select-all in the head.
 7. **Bulk bar.** While rows are selected, the head row itself: select-all in its cell, then the count and `bulkActions` in one cell across the columns. The labels cross-fade in place and the row keeps its height.
 8. **Frozen column.** With `isFrozen`: an opaque first column with a stronger divider while scrolled sideways.
@@ -236,7 +238,7 @@ A date needs a key that sorts, such as `20261024`, and its readable text as `con
 
 ### Say what an empty table is for.
 
-Every state keeps the head row, so the columns still say what will appear. Word the message with `emptyView`.
+`empty` and `no results` replace the whole table (header row, footer and pagination included) with `EmptyState`. Word the message with `emptyView`.
 
 <DoDontPair
     doExample={<DynamicTable head={sortHead} rows={[]} label="Sessions" emptyView="No sessions yet. They appear here once one is booked." />}

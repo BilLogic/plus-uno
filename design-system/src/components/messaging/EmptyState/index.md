@@ -82,11 +82,11 @@ person to a message above it.
 Do: What failed, with Try again.
 Don't: An empty-view invitation when the load failed.
 
-### Fill a Table with it, not around it. {#fill-a-table-with-it-not-around-it}
+### Replace a Table with it, never stack it under one. {#replace-a-table-with-it-never-stack-it-under-one}
 
-The Table's `emptyState` takes the body; an EmptyState never sits under a Table.  The Empty pattern replaces the whole table, header row and footer included; today the Table keeps its header row.
+Pass `EmptyState` to `DynamicTable`'s `emptyView` (or `PatternTable`'s `emptyState` with `empty`) so it replaces the whole table, header row and footer included. Never stack an `EmptyState` under an empty `Table`.
 
-Do: An EmptyState in the Table's emptyState.
+Do: An EmptyState in DynamicTable's emptyView replaces the whole table.
 Don't: An EmptyState under a Table with an empty body.
 
 ## Accessibility
@@ -102,7 +102,7 @@ Don't: An EmptyState under a Table with an empty body.
 
 ## Related
 
-- `StaticTable`: use when passing `EmptyState` into a table's `emptyState` slot.
+- `DynamicTable`: use when passing `EmptyState` into a table's `emptyView` or `noResultsView` slot.
 - `Illustration`: use when placing a PLUS character in the `image` slot.
 - Empty: use when choosing empty and error states across pages, sections and tables.
 

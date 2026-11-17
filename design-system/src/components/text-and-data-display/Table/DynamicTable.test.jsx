@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, within, fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { DynamicTable } from '.';
+import { DynamicTable, EmptyState } from '@/components';
 
 const head = {
     cells: [
@@ -146,7 +146,69 @@ describe('DynamicTable', () => {
     it.each([
         ['empty', { rows: [] }, 'Nothing here yet'],
         ['empty', { rows: [], emptyView: 'No sessions yet' }, 'No sessions yet'],
-        ['no results', { state: 'no results' }, 'No results'],
+        ['no results', { state: 'no results' }, 'No results. Try other filters.'],
+        ['no results', { state: 'no results', noResultsView: 'No matching students' }, 'No matching students'],
+    ])('the %s state replaces the table, header row, and pagination with EmptyState', (state, props, text) => {
+        const { container } = render(
+            <DynamicTable head={head} rows={rows} rowsPerPage={2} label="Students" {...props} />
+        );
+        expect(container.querySelector('.plus-dynamic-table')).toHaveAttribute('data-state', state);
+        expect(screen.queryByRole('table')).toBeNull();
+        expect(screen.queryAllByRole('columnheader')).toHaveLength(0);
+        expect(container.querySelector('.plus-table-footer')).toBeNull();
+        expect(screen.queryByRole('navigation')).toBeNull();
+        expect(screen.queryByText('Marcus Lee')).toBeNull();
+        const region = screen.getByRole('region', { name: 'Students' });
+        expect(within(region).getByRole('heading', { name: text })).toBeVisible();
+    });
+
+    it('renders a passed EmptyState element and preserves caption as accessible name without table semantics', () => {
+        const { container } = render(
+            <DynamicTable
+                head={head}
+                rows={[]}
+                caption="Session roster"
+                rowsPerPage={2}
+                emptyView={<EmptyState spacing="compact" header="No sessions yet" description="Book a session to begin." />}
+            />
+        );
+        expect(screen.queryByRole('table')).toBeNull();
+        expect(screen.queryAllByRole('columnheader')).toHaveLength(0);
+        expect(screen.queryByRole('navigation')).toBeNull();
+        const region = screen.getByRole('region', { name: 'Session roster' });
+        expect(within(region).getByRole('heading', { name: 'No sessions yet' })).toBeVisible();
+        expect(within(region).getByText('Book a session to begin.')).toBeVisible();
+        expect(container.querySelector('.plus-pattern-table-empty > .plus-empty-state')).not.toBeNull();
+    });
+
+    it('replaces the table with a plain-element emptyView on the wrapper padding path', () => {
+        const { container } = render(
+            <DynamicTable
+                head={head}
+                rows={[]}
+                label="Students"
+                emptyView={<span>No rows right now</span>}
+            />
+        );
+        expect(screen.queryByRole('table')).toBeNull();
+        expect(screen.queryAllByRole('columnheader')).toHaveLength(0);
+        const region = screen.getByRole('region', { name: 'Students' });
+        expect(region).toHaveClass('plus-pattern-table-empty');
+        expect(container.querySelector('.plus-pattern-table-empty > .plus-empty-state')).toBeNull();
+        expect(within(region).getByText('No rows right now')).toBeVisible();
+    });
+
+    it('has no region role when empty without label or caption', () => {
+        const { container } = render(
+            <DynamicTable head={head} rows={[]} emptyView="No students yet" />
+        );
+        expect(screen.queryByRole('table')).toBeNull();
+        expect(screen.queryByRole('region')).toBeNull();
+        expect(container.querySelector('.plus-pattern-table-empty')).not.toBeNull();
+        expect(screen.getByRole('heading', { name: 'No students yet' })).toBeVisible();
+    });
+
+    it.each([
         ['loading', { rows: [], isLoading: true }, 'Loading rows'],
         ['error', { state: 'error' }, 'Couldn’t load'],
     ])('the %s state keeps the head row and swaps the body for its message row', (state, props, text) => {

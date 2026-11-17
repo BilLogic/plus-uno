@@ -61,7 +61,7 @@ The place sets the spacing and the alignment. The words stay the same.
 
 <TypeGrid>
 <TypeCard of={EmptyStories.PlaceFullPage} title="A full page" stage={STAGE}>The block lines up with the page title, left-aligned with no wide margin, the picture above the text. <PlannedTag /> The block is centered today.</TypeCard>
-<TypeCard of={EmptyStories.PlaceTable} title="In a table" stage={STAGE}>The empty state replaces the whole table: no column headers, no footer. The block is centered and its text stays left-aligned. <PlannedTag /> The Table keeps its header row and centers the text today.</TypeCard>
+<TypeCard of={EmptyStories.PlaceTable} title="In a table" stage={STAGE}>The empty state replaces the whole table: no column headers, no footer. The block is centered and its text stays left-aligned. <PlannedTag /> `EmptyState` centers the text today.</TypeCard>
 <TypeCard of={EmptyStories.PlaceCard} title="In a card" stage={SMALL_STAGE}>Compact: a smaller picture and heading, the block centered in the card, the text left-aligned. Several cards at once drop their pictures and use Subtle actions. <PlannedTag /> The text is centered today.</TypeCard>
 <TypeCard of={EmptyStories.PlacePanel} title="In a Panel" stage={SMALL_STAGE}>The Details Panel when its record was removed: the block at the top of the body, with a way back.</TypeCard>
 </TypeGrid>
@@ -145,7 +145,7 @@ The picture above, then the heading, one line and the action, all on one left ed
 
 <RuleTag kind="review" />
 
-No column headers and no footer while the table is empty; the view bar above stays, so the person can change the view, search or reset. A "No matches" state offers "Reset filters". <PlannedTag /> The Table keeps its header row in its `emptyState` slot today.
+No column headers and no footer while the table is empty; the view bar above stays, so the person can change the view, search or reset. A "No matches" state offers "Reset filters".
 
 <DoDontPair
     doExample={<ReplacedTable />}
@@ -234,7 +234,7 @@ An illustration for a full view a person meets once, such as a new tutor's first
 <tbody>
 <tr><td>The block</td><td><a target="_top" href="./?path=/docs/components-messaging-empty-state--docs">Empty state</a></td><td>Picture or icon, header, one line and the action; `spacing` is `default` for a view and `compact` for a table body or card.</td></tr>
 <tr><td>The action</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-button-button--docs">Button</a></td><td>`primaryAction` takes one Button; a No matches action is Default.</td></tr>
-<tr><td>Table slot</td><td>Table</td><td>`emptyState` takes the block. <PlannedTag /> It replaces the whole table, header and footer included.</td></tr>
+<tr><td>Table slot</td><td>Table</td><td>`emptyState` (`PatternTable`) and `emptyView` / `noResultsView` (`DynamicTable`) take the block and replace the whole table, header and footer included.</td></tr>
 <tr><td>In a Panel</td><td><a target="_top" href="./?path=/docs/templates-panel--docs">Panel</a></td><td>The record-gone state at the top of the body.</td></tr>
 </tbody>
 </DocsTable>

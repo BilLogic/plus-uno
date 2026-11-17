@@ -29,35 +29,39 @@ describe('PatternTable', () => {
         vi.restoreAllMocks();
     });
 
-    it('renders the empty state as a message row under the header, inside the table', () => {
+    it('renders the empty state instead of the table, with no column headers or footer', () => {
         render(
             <PatternTable empty emptyState={<span>No members yet</span>} footer={<span>1 of 4</span>}>
                 {head}
                 {body}
             </PatternTable>
         );
-        const table = screen.getByRole('table');
-        // The header stays, so the columns still say what will appear.
-        expect(within(table).getByRole('columnheader', { name: 'Name' })).toBeInTheDocument();
-        // The rows are replaced by one message row spanning every column.
-        expect(within(table).queryByText('Jordan Blake')).toBeNull();
-        const message = within(table).getByText('No members yet').closest('td');
-        expect(message).not.toBeNull();
-        expect(message.colSpan).toBe(4);
-        expect(message.closest('tr')).toHaveClass('plus-pattern-table-message-row');
-        expect(message.closest('tbody')).not.toBeNull();
-        // Paging belongs to rows; with none there is nothing to page.
+        expect(screen.queryByRole('table')).toBeNull();
+        expect(screen.queryAllByRole('columnheader')).toHaveLength(0);
+        expect(screen.queryAllByRole('row')).toHaveLength(0);
+        expect(screen.queryByText('Jordan Blake')).toBeNull();
         expect(screen.queryByText('1 of 4')).toBeNull();
+        expect(screen.getByText('No members yet')).toBeVisible();
     });
 
-    it('spans one column when there is no header to count', () => {
-        render(<PatternTable empty emptyState={<span>Nothing here</span>} />);
-        const cell = screen.getByText('Nothing here').closest('td');
-        expect(cell.colSpan).toBe(1);
-        expect(cell.closest('table')).not.toBeNull();
+    it('keeps the accessible name from tableProps without leaving table roles', () => {
+        render(
+            <PatternTable
+                empty
+                emptyState={<span>Nothing here</span>}
+                tableProps={{ 'aria-label': 'Team members' }}
+            >
+                {head}
+                {body}
+            </PatternTable>
+        );
+        expect(screen.queryByRole('table')).toBeNull();
+        expect(screen.queryAllByRole('columnheader')).toHaveLength(0);
+        const region = screen.getByRole('region', { name: 'Team members' });
+        expect(within(region).getByText('Nothing here')).toBeVisible();
     });
 
-    it('keeps a caption and a head row drawn by a wrapper component, and spans its columns', () => {
+    it('drops caption and head rows when empty while preserving the accessible name', () => {
         const Head = () => (
             <thead>
                 <tr>
@@ -73,10 +77,36 @@ describe('PatternTable', () => {
                 {body}
             </PatternTable>
         );
-        expect(screen.getByRole('table', { name: 'Team members' })).toBeInTheDocument();
-        expect(screen.getByRole('columnheader', { name: 'Role' })).toBeInTheDocument();
+        expect(screen.queryByRole('table')).toBeNull();
+        expect(screen.queryByRole('columnheader')).toBeNull();
         expect(screen.queryByText('Jordan Blake')).toBeNull();
-        expect(screen.getByText('No members yet').closest('td').colSpan).toBe(2);
+        const region = screen.getByRole('region', { name: 'Team members' });
+        expect(within(region).getByText('No members yet')).toBeVisible();
+    });
+
+    it('omits the region role when empty without an accessible name or caption', () => {
+        render(
+            <PatternTable empty emptyState={<span>No members yet</span>}>
+                {head}
+                {body}
+            </PatternTable>
+        );
+        expect(screen.queryByRole('table')).toBeNull();
+        expect(screen.queryByRole('region')).toBeNull();
+        expect(screen.getByText('No members yet')).toBeVisible();
+    });
+
+    it('renders the table normally when empty is true without emptyState', () => {
+        render(
+            <PatternTable empty footer={<span>1 of 4</span>}>
+                {head}
+                {body}
+            </PatternTable>
+        );
+        expect(screen.getByRole('table')).toBeInTheDocument();
+        expect(screen.getAllByRole('columnheader')).toHaveLength(3);
+        expect(screen.getByText('Jordan Blake')).toBeInTheDocument();
+        expect(screen.getByText('1 of 4')).toBeInTheDocument();
     });
 
     it('renders the rows and pagination when not empty', () => {

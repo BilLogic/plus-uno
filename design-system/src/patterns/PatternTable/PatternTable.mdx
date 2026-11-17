@@ -79,7 +79,7 @@ The examples on this page follow the toolbar's Color mode switch.
 
 <ComponentExample of={PatternTableStories.RowStates} title="Row states" description="Hover a row to see its layer; the second row is selected, its checkbox checked and the whole row filled." />
 
-<ComponentExample of={PatternTableStories.EmptyState} title="Empty" description={<>With <code>empty</code>, the head row stays and <code>emptyState</code> takes the body as one message row; the pager hides.</>} />
+<ComponentExample of={PatternTableStories.EmptyState} title="Empty" description={<>With <code>empty</code>, <code>emptyState</code> replaces the whole table, with no head row, no caption and no footer.</>} />
 
 </div>
 
@@ -119,7 +119,7 @@ The examples on this page follow the toolbar's Color mode switch.
 
 ## Usage
 
-A table sits in a Section and spans it. Its first and last cells sit flush with the section edge. The Section header carries the toolbar and the tabs: search, filters and the record count use the toolbar type, and saved views use the tabs type. The bulk bar is never in the Section header: while rows are selected, a Dynamic table's head row becomes it, so the toolbar stays put. Empty, no results, loading and error states happen inside the table, under its header, so the Section header stays usable. Paging stays under the rows, inside the same Section.
+A table sits in a Section and spans it. Its first and last cells sit flush with the section edge. The Section header carries the toolbar and the tabs: search, filters and the record count use the toolbar type, and saved views use the tabs type. The bulk bar is never in the Section header: while rows are selected, a Dynamic table's head row becomes it, so the toolbar stays put. Empty and no results replace the whole table so the Section header stays usable; loading and error states happen inside the table, under its header. Paging stays under the rows, inside the same Section.
 
 ### Type guidance
 
@@ -147,7 +147,7 @@ Search, filters and actions sit in the Section header: `<PatternSection toolbar=
 1. **Head row.** Names the columns. Its rule is the bold border.
 2. **Rows.** The data you pass as `tbody`. Each draws a thin rule, and there is no zebra striping.
 3. **Pagination** (optional). A slot under the rows, aligned to the end. It hides while the empty state shows.
-4. **Message row.** The `emptyState` slot, which replaces the rows when `empty` is true. It sits under the head row and spans every column.
+4. **Empty state.** The `emptyState` slot, which replaces the whole table (head row, caption and footer included) when `empty` is true; with `empty` and no `emptyState`, the table renders normally.
 
 ### States
 
@@ -164,7 +164,7 @@ Row states are layered over each cell's fill, never swapped for it.
 <tr><td>Focused</td><td>A scroll region takes keyboard focus and draws the <code>--ds-border-focused</code> ring.</td></tr>
 <tr><td>Disabled</td><td>A table has no disabled state. Disable the controls in a row.</td></tr>
 <tr><td>Selected</td><td>A row with <code>aria-selected="true"</code> takes <code>--ds-background-selected</code> across the whole row, with <code>-hovered</code> and <code>-pressed</code> steps and no stripe on its leading edge.</td></tr>
-<tr><td>Empty</td><td>The message row replaces the rows and takes no hover state.</td></tr>
+<tr><td>Empty</td><td>The empty state replaces the whole table; no head row or footer stays.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -178,15 +178,15 @@ Row states are layered over each cell's fill, never swapped for it.
 <tr><td><code>--ds-border</code>, <code>--border-width-default</code></td><td>color, 1</td><td>The rule under each row.</td></tr>
 <tr><td><code>--ds-border-bold</code></td><td>color</td><td>The rule under the head row.</td></tr>
 <tr><td><code>--ds-text</code>, <code>--body-default</code></td><td>14/20</td><td>Body cells.</td></tr>
-<tr><td><code>--ds-text-subtle</code>, <code>--heading-xxs</code></td><td>color, type</td><td>Head cells and the message row.</td></tr>
-<tr><td><code>--table-pad-x-cell</code>, <code>--table-pad-y-cell</code>, <code>--stack-md</code></td><td>length</td><td>Cell padding, the gap inside a cell, and the side pad (8) of the message row.</td></tr>
+<tr><td><code>--ds-text-subtle</code>, <code>--heading-xxs</code></td><td>color, type</td><td>Head cells, message rows, and empty-state wrapper text.</td></tr>
+<tr><td><code>--table-pad-x-cell</code>, <code>--table-pad-y-cell</code>, <code>--stack-md</code></td><td>length</td><td>Cell padding, the gap between table and footer, and the side pad (8) of message rows and plain empty-state wrappers.</td></tr>
 <tr><td><code>--ds-background-neutral-subtle-hovered</code>, <code>-pressed</code></td><td>color</td><td>A hovered and a pressed row.</td></tr>
 <tr><td><code>--ds-background-selected</code>, <code>-hovered</code>, <code>-pressed</code></td><td>color</td><td>A selected row.</td></tr>
 <tr><td><code>--ds-shadow-overflow</code></td><td>shadow</td><td>A sticky edge, only while content is scrolled under it.</td></tr>
 <tr><td><code>--ds-utility-elevation-surface-current</code></td><td>color</td><td>The fill of sticky cells, so they match what the table sits on.</td></tr>
 <tr><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code></td><td>focus ring</td><td>The ring of a scroll region.</td></tr>
 <tr><td><code>--row-height-md</code></td><td>40</td><td>The least height of the message row.</td></tr>
-<tr><td><code>--section-stack-md</code>, <code>--stack-sm</code></td><td>16, 4</td><td>Space around the message, and between its lines.</td></tr>
+<tr><td><code>--section-stack-md</code>, <code>--stack-sm</code></td><td>16, 4</td><td>Space around message rows and plain empty-state wrappers, and the gap inside them.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -271,7 +271,7 @@ Never mix a Static, Dynamic or Tree table in one Section either.
 - Mark a selected row with `aria-selected="true"`. That attribute belongs to a row of a table with `role="grid"`.
 - Selection is never color alone. The row's checkbox is checked, and the head row says "2 selected".
 - A region that scrolls takes keyboard focus, so people can scroll it without a pointer. That covers a region with `maxHeight` and one with a sticky column.
-- The empty message is a row of the table, so assistive technology reads it with the columns it replaces.
+- When empty, the empty state replaces the table with no table roles left behind, and keeps the table's accessible name when one was provided.
 - Name the table through `tableProps`, such as `aria-label`, when no caption names it.
 
 </div>

@@ -9795,7 +9795,7 @@
       "import": "import { PatternTable } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/PatternTable/PatternTable.jsx",
-      "summary": "Table pattern for PLUS design system. Table shell: table children (consumers pass their own thead/tbody), a footer slot under the rows, and an empty-state slot. The table has no toolbar of its own: the Section header above it carries the title, search, filters and actions. With `empty`, the header stays and the empty state takes the body as one message row spanning every column, so the columns still say what will appear. The table itself is no-fill (transparent): the surrounding card or surface provides the background, and row states are layered over each cell's fill rather than replacing it. - **Row states**: hovered and pressed rows take the neutral subtle steps; a row with `aria-selected=\"true\"` (in a `role=\"grid\"` table) takes the selected ladder across the whole row, with no stripe on its leading edge; the row's checkbox is the cue that does not rest on color. - **Sticky cells**: `stickyHeader` pins the head row and `stickyColumn` the first column. They paint the current surface, so they match the page or the card they sit in, and take the overflow shadow only while content is scrolled under them. `stickyHeader` pairs with `maxHeight`: only a bounded region scrolls vertically, so without `maxHeight` the header is not pinned. A bounded region, or one with a sticky column, takes keyboard focus so it can be scrolled without a pointer. Mirrors the \"Table\" slot component in the Figma design system file.",
+      "summary": "Table pattern for PLUS design system. Table shell: table children (consumers pass their own thead/tbody), a footer slot under the rows, and an empty-state slot. The table has no toolbar of its own: the Section header above it carries the title, search, filters and actions. With `empty`, the empty state replaces the whole table (no column headers, no caption, no footer). The table itself is no-fill (transparent): the surrounding card or surface provides the background, and row states are layered over each cell's fill rather than replacing it. - **Row states**: hovered and pressed rows take the neutral subtle steps; a row with `aria-selected=\"true\"` (in a `role=\"grid\"` table) takes the selected ladder across the whole row, with no stripe on its leading edge; the row's checkbox is the cue that does not rest on color. - **Sticky cells**: `stickyHeader` pins the head row and `stickyColumn` the first column. They paint the current surface, so they match the page or the card they sit in, and take the overflow shadow only while content is scrolled under them. `stickyHeader` pairs with `maxHeight`: only a bounded region scrolls vertically, so without `maxHeight` the header is not pinned. A bounded region, or one with a sticky column, takes keyboard focus so it can be scrolled without a pointer. Mirrors the \"Table\" slot component in the Figma design system file.",
       "props": [
         {
           "name": "id",
@@ -9821,7 +9821,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Empty-state slot: a message row under the head row, spanning every column, when `empty` is true",
+          "description": "Empty-state slot: replaces the entire table (no head row, caption, or footer) when `empty` is true",
           "deprecated": null
         },
         {
@@ -9830,7 +9830,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Swap the body rows for the empty-state message row; the head row stays",
+          "description": "Replace the table with the `emptyState` slot; with `empty` and no `emptyState`, the table renders normally",
           "deprecated": null
         },
         {
