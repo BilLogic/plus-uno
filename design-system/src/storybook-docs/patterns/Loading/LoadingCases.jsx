@@ -13,7 +13,7 @@ const MENU_ROOM = 200; // docs-literal: room for the open menu below the trigger
 
 const MenuStage = ({ children }) => (
     <DocsOverlayBoundary fit={false} containHeight>
-        <div style={{ display: 'flex', justifyContent: 'center', minBlockSize: MENU_ROOM, paddingBlockStart: 'var(--pad-y-xs)' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', minBlockSize: MENU_ROOM, paddingBlockStart: 'var(--pad-y-sm)' }}>
             {children}
         </div>
     </DocsOverlayBoundary>
