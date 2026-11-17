@@ -21,8 +21,9 @@ reconnect the `storybook` MCP. Stop it when the task is done.
 A worktree's Storybook on another port serves the same endpoint at
 `http://localhost:<port>/mcp`; a CLI run or a second session calls it there with
 JSON-RPC (`tools/list`, `tools/call`). Work that adds or changes stories calls
-`get-storybook-story-instructions` before writing and `stories-changed` then
-`test-run` before its PR.
+`get-storybook-story-instructions` before writing and `test-run` before its PR,
+on the stories `stories-find-by-component` returns for the files the branch
+changed. `stories-changed` only sees edits made while that server runs.
 
 | Tool | Use it for |
 |---|---|
