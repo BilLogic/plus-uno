@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
-import { Button, ButtonItem, DropdownMenu, IconButton, InlineEdit, TextField, Tooltip } from '@/components';
-import { PatternCard, PatternSection } from '@/patterns';
+import { Button, ButtonItem, DropdownMenu, Fieldset, FooterActions, IconButton, InlineEdit, TextField, Tooltip } from '@/components';
+import { PatternCard, PatternModal, PatternSection } from '@/patterns';
 import { FilterSide, StudentsTable, ViewBar, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
+import { CaseBlanket, CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { FocusedType } from '@/storybook-docs/lib/focused-task.jsx';
 import { FILLED, FormInPage, PAGE_WIDTH as FORM_PAGE_WIDTH } from '../../../patterns/Form/formDemo.jsx';
@@ -139,16 +140,25 @@ export const EditRecord = ({ held = false }) => {
 };
 
 /** Rows selected: the head row becomes the bulk bar, so the actions sit with the rows they act on. */
-export const ManyRows = () => (
-    <PatternSection title="Students" description="Lincoln Middle · 24 students" tabs={<ViewBar views={['All students', 'Needs follow-up']} />}>
-        <StudentsTable
-            count={4}
-            isSelectable
-            defaultSelectedRowKeys={['Ava Thompson', 'Sofia Ramirez']}
-            bulkActions={[{ label: 'Move to group' }, { label: 'Remove from group' }]}
-        />
-    </PatternSection>
-);
+export const ManyRows = () => {
+    const [view, setView] = useState('All students');
+    return (
+        <PatternSection
+            title="Students"
+            description="Lincoln Middle · 24 students"
+            tabs={<ViewBar views={['All students', 'Needs follow-up']} activeView={view} onViewChange={setView} />}
+        >
+            <StudentsTable
+                count={6}
+                view={view}
+                sortable
+                isSelectable
+                defaultSelectedRowKeys={['Ava Thompson', 'Sofia Ramirez']}
+                bulkActions={[{ label: 'Move to group' }, { label: 'Remove from group' }]}
+            />
+        </PatternSection>
+    );
+};
 
 /** Sending: only the pressed button disables, swapping its label for a spinner in place at the same width. */
 export const Sending = ({ sending: started = false }) => {
@@ -167,3 +177,113 @@ export const Sending = ({ sending: started = false }) => {
         </ModalStage>
     );
 };
+
+/* ----------------------------------------------------- live do/don't pairs */
+
+const buttonRow = {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: 'var(--stack-md)',
+    marginBlockStart: 'var(--stack-lg)',
+};
+
+/** Do: one Primary, with the second action Default beside it. */
+export const OnePrimaryCase = () => (
+    <CaseSurface>
+        <Fieldset legend="Session">
+            <TextField label="Student" defaultValue="Ana Ruiz" />
+        </Fieldset>
+        <div style={buttonRow}>
+            <Button appearance="primary" text="Save session" onClick={() => {}} />
+            <Button appearance="default" text="Save draft" onClick={() => {}} />
+        </div>
+    </CaseSurface>
+);
+
+/** Don't: two Primary buttons in one row; neither reads as the next step. */
+export const TwoPrimariesCase = () => (
+    <CaseSurface>
+        <Fieldset legend="Session">
+            <TextField label="Student" defaultValue="Ana Ruiz" />
+        </Fieldset>
+        <div style={buttonRow}>
+            <Button appearance="primary" text="Save session" onClick={() => {}} />
+            <Button appearance="primary" text="Save draft" onClick={() => {}} />
+        </div>
+    </CaseSurface>
+);
+
+/** Do: Primary first, then Cancel, left-aligned under the fields. */
+export const PageButtonsLeftCase = () => (
+    <CaseSurface>
+        <Fieldset legend="Session">
+            <TextField label="Student" defaultValue="Ana Ruiz" />
+            <TextField label="Site" defaultValue="Lincoln Middle" />
+        </Fieldset>
+        <div style={{ ...buttonRow, justifyContent: 'flex-start' }}>
+            <Button appearance="primary" text="Save session" onClick={() => {}} />
+            <Button appearance="subtle" text="Cancel" onClick={() => {}} />
+        </div>
+    </CaseSurface>
+);
+
+/** Don't: buttons pushed to the far end of the page, away from the fields, with Primary last. */
+export const PageButtonsFarRightCase = () => (
+    <CaseSurface>
+        <Fieldset legend="Session">
+            <TextField label="Student" defaultValue="Ana Ruiz" />
+            <TextField label="Site" defaultValue="Lincoln Middle" />
+        </Fieldset>
+        <div style={{ ...buttonRow, justifyContent: 'flex-end' }}>
+            <Button appearance="subtle" text="Cancel" onClick={() => {}} />
+            <Button appearance="primary" text="Save session" onClick={() => {}} />
+        </div>
+    </CaseSurface>
+);
+
+/** Do: two buttons filling the Modal footer edge to edge. */
+export const ModalFooterFullBleedCase = () => (
+    <CaseBlanket height={280}>
+        <PatternModal
+            width="xs"
+            title="Log a session"
+            onClose={() => {}}
+            footer={(
+                <FooterActions>
+                    <Button text="Discard" onClick={() => {}} />
+                    <Button text="Save session" appearance="primary" onClick={() => {}} />
+                </FooterActions>
+            )}
+        >
+            <TextField label="Student" defaultValue="Ana Ruiz" />
+        </PatternModal>
+    </CaseBlanket>
+);
+
+/** Don't: small buttons inset at the end, with spare footer around them. */
+export const ModalFooterInsetCase = () => (
+    <CaseBlanket height={280}>
+        <PatternModal
+            width="xs"
+            title="Log a session"
+            onClose={() => {}}
+            footer={(
+                <div
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                        gap: 'var(--inline-md)',
+                        paddingInline: 'var(--modal-pad-x-default)',
+                        paddingBlock: 'var(--stack-md)',
+                        borderTop: 'var(--border-width-default) solid var(--ds-border)',
+                    }}
+                >
+                    <Button text="Discard" onClick={() => {}} />
+                    <Button text="Save session" appearance="primary" onClick={() => {}} />
+                </div>
+            )}
+        >
+            <TextField label="Student" defaultValue="Ana Ruiz" />
+        </PatternModal>
+    </CaseBlanket>
+);

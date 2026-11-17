@@ -4,7 +4,8 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { BAR_TOKEN } from '@/storybook-docs/lib/focused-task.jsx';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
-import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
+import { FitStage, ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { TierActive, TierDanger, TierTypeName } from '../../../patterns/PatternModal/modalDemo.jsx';
@@ -42,23 +43,26 @@ export default {
 };
 
 const rect = (el) => el.getBoundingClientRect();
-const staged = (story, width = STAGE) => <FitStage width={width}>{story}</FitStage>;
+const staged = (story, width = STAGE) => <FitStage width={width} scrollable>{story}</FitStage>;
 
 /* -------------------------------------------------------------- appearances */
 
 /** Every appearance with the word it takes: one Primary, one AI. */
 export const AppearancesRow = {
     name: 'Appearances',
-    render: () => staged(<Appearances />),
-    play: async ({ canvasElement }) => {
+    render: () => <Appearances />,
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         for (const [appearance, label] of APPEARANCES) {
             const button = canvas.getByRole('button', { name: label });
             await expect(button.className, `${label} takes the ${appearance} appearance`).toContain(appearance);
+            await expect(button).toBeEnabled();
         }
         const primaries = canvasElement.querySelectorAll('.plus-btn--primary, .plus-btn-primary');
         await expect(primaries.length, 'one Primary in the area').toBe(1);
+        await userEvent.click(canvas.getByRole('button', { name: 'Add students' }));
         await fitsCanvas(canvasElement);
     },
 };
@@ -69,15 +73,20 @@ export const AppearancesRow = {
 export const PlacementPage = {
     name: 'Placement: In a page',
     render: () => staged(<Page />, PAGE_WIDTH),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const save = canvas.getByRole('button', { name: 'Save session' });
         const cancel = canvas.getByRole('button', { name: 'Cancel' });
         const fieldset = canvasElement.querySelector('.plus-fieldset');
         await expect(rect(save).left, 'the buttons start at the fields\' edge').toBeCloseTo(rect(fieldset).left, 0);
         await expect(rect(save).left, 'Primary first').toBeLessThan(rect(cancel).left);
         await expect(cancel.className, 'Cancel is Subtle beside a Primary').toContain('subtle');
+        const student = canvas.getByRole('textbox', { name: /Student/ });
+        await userEvent.clear(student);
+        await userEvent.click(save);
+        await expect(await canvas.findByText('Enter the student’s name.'), 'pressing Save validates inline').toBeInTheDocument();
         await fitsCanvas(canvasElement);
     },
 };
@@ -86,15 +95,16 @@ export const PlacementPage = {
 export const PlacementModal = {
     name: 'Placement: In a Modal',
     render: () => staged(<ModalFooter />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const tracks = footerTracks(footer);
         const dialog = canvas.getByRole('dialog');
         const close = within(dialog).getByRole('button', { name: 'Close' });
-        const discard = canvas.getByRole('button', { name: 'Discard' });
-        const save = canvas.getByRole('button', { name: 'Save session' });
+        const discard = within(footer).getByRole('button', { name: 'Discard' });
+        const save = within(footer).getByRole('button', { name: 'Save session' });
         await expect(within(footer).queryByRole('button', { name: 'Cancel' }), 'no Cancel in footers').toBeNull();
         await expect(close, 'Close is an icon button in the header').toHaveTextContent('');
         await expect(rect(close).bottom, 'and sits above the footer').toBeLessThan(rect(footer).top);
@@ -104,6 +114,8 @@ export const PlacementModal = {
         await expect(rect(save).left, 'Save starts on track 3').toBeCloseTo(tracks.span(3, 4).left, 0);
         await expect(rect(save).right, 'Save ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
         await expect(rect(footer).height, 'the footer is 48 high').toBeCloseTo(tokenLength(footer, BAR_TOKEN), 0);
+        await expect(save).toBeEnabled();
+        await expect(discard).toBeEnabled();
         await fitsCanvas(canvasElement);
     },
 };
@@ -112,9 +124,10 @@ export const PlacementModal = {
 export const PlacementFocused = {
     name: 'Placement: In a focused task',
     render: () => staged(<FocusedBar />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const bar = canvasElement.querySelector('[data-probe="bar"]');
         const column = canvasElement.querySelector('[data-probe="bar-column"]');
         const tracks = footerTracks(column);
@@ -126,6 +139,10 @@ export const PlacementFocused = {
         await expect(rect(next).left, 'Next starts on track 3').toBeCloseTo(tracks.span(3, 4).left, 0);
         await expect(rect(next).right, 'Next ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
         await expect(rect(bar).height, 'the bar is 48 high').toBeCloseTo(tokenLength(bar, BAR_TOKEN), 0);
+        await userEvent.click(back);
+        await waitFor(() => expect(back, 'Back disables on the first step').toBeDisabled());
+        await userEvent.click(next);
+        await waitFor(() => expect(back, 'Next re-enables Back on step 2').toBeEnabled());
         await fitsCanvas(canvasElement);
     },
 };
@@ -133,12 +150,16 @@ export const PlacementFocused = {
 /** A card: its main action is Subtle in the footer. */
 export const PlacementCard = {
     name: 'Placement: In a card',
-    render: () => staged(<CardAction />),
-    play: async ({ canvasElement }) => {
+    render: () => <CardAction />,
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
-        const open = within(canvasElement).getByRole('button', { name: 'Open session' });
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        const open = canvas.getByRole('button', { name: 'Open session' });
         await expect(open.className, 'the main action is Subtle').toContain('subtle');
         await expect(open.closest('.plus-pattern-card-footer'), 'in the card\'s footer').not.toBeNull();
+        await expect(open).toBeEnabled();
+        await userEvent.click(open);
         await fitsCanvas(canvasElement);
     },
 };
@@ -149,9 +170,10 @@ export const PlacementCard = {
 export const ResetChoices = {
     name: 'Reset',
     render: () => staged(<Reset />, 480),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await expect(canvas.getByRole('checkbox', { name: 'Grade 7' })).toBeChecked();
         await userEvent.click(canvas.getByRole('button', { name: 'Reset filters' }));
         await expect(canvas.getByRole('checkbox', { name: 'Grade 7' }), 'Reset clears the choices').not.toBeChecked();
@@ -163,10 +185,14 @@ export const ResetChoices = {
 export const CopyValue = {
     name: 'Copy',
     render: () => staged(<Copy held />, 480),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
-        const copy = within(canvasElement).getByRole('button', { name: 'Copy' });
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        const copy = canvas.getByRole('button', { name: 'Copy' });
         await expect(copy.textContent, 'an icon button').toBe('');
+        await expect(copy).toBeEnabled();
+        await userEvent.click(copy);
         await expect(await within(document.body).findByText('Copied'), 'the tooltip says Copied').toBeInTheDocument();
         await expect(document.body.querySelector('[role="alert"], .plus-flag'), 'no Flag').toBeNull();
     },
@@ -176,9 +202,10 @@ export const CopyValue = {
 export const EditValue = {
     name: 'Edit: one value',
     render: () => staged(<EditOne />, 480),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await userEvent.click(canvas.getByRole('button', { name: /Lincoln Middle/ }));
         const field = await canvas.findByRole('textbox');
         await userEvent.clear(field);
@@ -192,11 +219,15 @@ export const EditValue = {
 export const EditWholeRecord = {
     name: 'Edit: the whole record',
     render: () => staged(<EditRecord held />, 480),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         // The menu is held open inside the picture, once the picture's element is in state.
-        await waitFor(() => expect(within(canvasElement).getByRole('menuitem', { name: 'Edit' }), 'Edit sits in the More menu').toBeInTheDocument());
-        await expect(within(canvasElement).getByRole('menuitem', { name: 'Remove from group' }), 'beside Remove, which is Default').toBeInTheDocument();
+        const editItem = await waitFor(() => canvas.getByRole('menuitem', { name: 'Edit' }));
+        await expect(editItem, 'Edit sits in the More menu').toBeInTheDocument();
+        await expect(canvas.getByRole('menuitem', { name: 'Remove from group' }), 'beside Remove, which is Default').toBeInTheDocument();
+        await userEvent.click(editItem);
         await fitsCanvas(canvasElement);
     },
 };
@@ -207,10 +238,14 @@ export const EditWholeRecord = {
 export const TierActiveModal = {
     name: 'Destructive tier: Active',
     render: () => staged(<TierActive />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
-        const action = within(canvasElement).getByRole('button', { name: 'Remove from this week' });
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        const action = canvas.getByRole('button', { name: 'Remove from this week' });
         await expect(action.className, 'Primary').toContain('primary');
+        await expect(action).toBeEnabled();
+        await expect(canvas.getByRole('button', { name: 'Discard' })).toBeEnabled();
         await fitsCanvas(canvasElement);
     },
 };
@@ -219,10 +254,14 @@ export const TierActiveModal = {
 export const TierDangerModal = {
     name: 'Destructive tier: Active with Danger',
     render: () => staged(<TierDanger />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
-        const action = within(canvasElement).getByRole('button', { name: 'Delete note' });
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        const action = canvas.getByRole('button', { name: 'Delete note' });
         await expect(action.className, 'Danger').toContain('danger');
+        await expect(action).toBeEnabled();
+        await expect(canvas.getByRole('button', { name: 'Archive instead' })).toBeEnabled();
         await fitsCanvas(canvasElement);
     },
 };
@@ -231,9 +270,10 @@ export const TierDangerModal = {
 export const TierTypeNameModal = {
     name: 'Destructive tier: Danger, type the name',
     render: () => staged(<TierTypeName />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const action = canvas.getByRole('button', { name: 'Delete group' });
         await expect(action, 'disabled until the name matches').toBeDisabled();
         await expect(canvas.getByText(/Type Fractions group to enable/), 'the caption says why').toBeInTheDocument();
@@ -250,15 +290,27 @@ export const TierTypeNameModal = {
 export const BulkBar = {
     name: 'Many rows: the bulk bar',
     render: () => staged(<ManyRows />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const head = within(canvasElement.querySelector('thead'));
         await expect(head.getByText('2 selected')).toBeInTheDocument();
         await expect(head.getByRole('checkbox', { name: 'Select all rows' }), 'the select-all reports its mixed state').toBePartiallyChecked();
         await expect(head.getByRole('button', { name: 'Remove from group' })).toBeInTheDocument();
         await expect(canvas.queryByRole('button', { name: /Cancel|Clear/ }), 'no Cancel: the checkboxes clear it').toBeNull();
         await expect(canvas.queryByRole('button', { name: /Delete/ }), 'Delete never sits in the bar').toBeNull();
+
+        await userEvent.click(canvas.getByRole('tab', { name: 'Needs follow-up' }));
+        await expect(canvas.queryByText('Sofia Ramirez')).toBeNull();
+        await expect(canvas.getByText('Noah Williams')).toBeInTheDocument();
+
+        await userEvent.click(canvas.getByRole('tab', { name: 'All students' }));
+        await userEvent.click(head.getByRole('checkbox', { name: 'Select all rows' }));
+        await userEvent.click(head.getByRole('checkbox', { name: 'Select all rows' }));
+        const nameHeader = await waitFor(() => canvas.getByRole('columnheader', { name: /^Name/ }));
+        await userEvent.click(within(nameHeader).getByRole('button'));
+        await expect(nameHeader).toHaveAttribute('aria-sort', 'ascending');
         await fitsCanvas(canvasElement);
     },
 };
@@ -269,9 +321,10 @@ export const BulkBar = {
 export const SendingShown = {
     name: 'Key state: Sending (shown)',
     render: () => staged(<Sending sending />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await expect(canvas.getByRole('button', { name: 'Save session' }), 'the spinner button disables').toBeDisabled();
         await expect(canvas.getByRole('button', { name: 'Discard' }), 'Discard stays live').not.toBeDisabled();
         await fitsCanvas(canvasElement);
@@ -282,9 +335,10 @@ export const SendingShown = {
 export const SendingKeepsWidth = {
     name: 'Test: Sending',
     render: () => staged(<Sending />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const save = canvas.getByRole('button', { name: 'Save session' });
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const before = { width: rect(save).width, height: rect(footer).height };
