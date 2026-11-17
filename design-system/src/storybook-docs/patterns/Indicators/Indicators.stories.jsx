@@ -3,6 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import {
     BesideTitle,
     CHECKLIST_FRAME_STAGE,
@@ -70,10 +71,21 @@ export const StatusInARow = {
     name: 'Status in a row',
     render: () => staged(<InARow />),
     play: async ({ canvasElement }) => {
-        for (const row of within(canvasElement).getAllByRole('row').slice(1)) {
+        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        for (const row of canvas.getAllByRole('row').slice(1)) {
             await expect(row.querySelectorAll('.plus-status').length, 'one status per row').toBe(1);
             await expect(row.querySelector('.plus-status').textContent.trim().split(/\s+/).length, 'one or two words').toBeLessThanOrEqual(2);
         }
+        const studentHeader = canvas.getByRole('columnheader', { name: /Student/ });
+        await userEvent.click(within(studentHeader).getByRole('button'));
+        await expect(studentHeader).toHaveAttribute('aria-sort', 'ascending');
+        const firstBodyRow = canvas.getAllByRole('row')[1];
+        await expect(within(firstBodyRow).getByText('Ana Ruiz')).toBeInTheDocument();
+        await userEvent.click(within(studentHeader).getByRole('button'));
+        await expect(studentHeader).toHaveAttribute('aria-sort', 'descending');
+        await expect(within(canvas.getAllByRole('row')[1]).getByText('Sofia Ramirez')).toBeInTheDocument();
         await fitsCanvas(canvasElement);
     },
 };
@@ -84,10 +96,16 @@ export const StatusBesideHeading = {
     render: () => staged(<BesideTitle />),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const title = canvas.getByRole('heading', { name: 'Session with Ana Ruiz' });
         const status = tagOf(canvas.getByText('Needs review'));
         await expect(rect(status).left, 'the tag follows the text').toBeGreaterThan(rect(title).right - 1);
         await expect(rect(status).height, 'spacious is taller than the 20 default').toBeGreaterThan(24);
+        await userEvent.click(canvas.getByRole('button', { name: 'Mark reviewed' }));
+        await expect(tagOf(canvas.getByText('Completed')).className).toContain('success');
+        await userEvent.click(canvas.getByRole('button', { name: 'Reopen review' }));
+        await expect(tagOf(canvas.getByText('Needs review')).className).toContain('warning');
         await fitsCanvas(canvasElement);
     },
 };
@@ -97,12 +115,18 @@ export const CountsOnNavigation = {
     name: 'Counts on navigation',
     render: () => staged(<OnNavigation />, NARROW),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const item = (name) => canvasElement.querySelector(`[data-nav-item="${name}"]`);
         await expect(within(item('Inbox')).getByText('3'), 'a quiet count').toBeInTheDocument();
         await expect(tagOf(within(item('Reflections')).getByText('5')).className, 'bold asks for action now').toContain('bold');
-        await expect(item('Archive').children.length, 'nothing renders at zero').toBe(1);
+        await expect(item('Archive').querySelector('.plus-count'), 'nothing renders at zero').toBeNull();
         await expect(within(item('Messages')).getByText('99+'), 'capped past max').toBeInTheDocument();
         await expect(canvasElement.querySelectorAll('.plus-count--bold').length, 'at most one bold count in the area').toBe(1);
+        const reflectionsBtn = within(item('Reflections')).getByRole('button');
+        await userEvent.click(reflectionsBtn);
+        await expect(reflectionsBtn).toHaveAttribute('aria-current', 'page');
+        await expect(within(item('Inbox')).getByRole('button')).not.toHaveAttribute('aria-current');
         await fitsCanvas(canvasElement);
     },
 };
@@ -113,9 +137,18 @@ export const WhereColorIsNotEnough = {
     render: () => staged(<NotColorOnly />, NARROW),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const missed = tagOf(canvas.getByText('Missed'));
         await expect(missed.querySelector('svg, .fa-solid, [class*="icon"]'), 'the icon joins the color').not.toBeNull();
         await expect(missed.querySelector('svg, i, [class*="icon"]').getAttribute('aria-hidden'), 'the icon is decorative').toBe('true');
+        await userEvent.click(canvas.getByRole('button', { name: /Status:/ }));
+        await userEvent.click(await within(canvasElement.ownerDocument.body).findByRole('option', { name: 'Completed' }));
+        await waitFor(() => expect(canvas.queryByText('Missed')).toBeNull());
+        await expect(canvas.getByText('Completed')).toBeInTheDocument();
+        await userEvent.click(canvas.getByRole('button', { name: /Status:/ }));
+        await userEvent.click(await within(canvasElement.ownerDocument.body).findByRole('option', { name: 'All' }));
+        await expect(canvas.getByText('Missed')).toBeInTheDocument();
         await fitsCanvas(canvasElement);
     },
 };
@@ -125,10 +158,17 @@ export const ChangeWhereUpIsBad = {
     name: 'Change where up is bad',
     render: () => staged(<UpIsBad />, NARROW),
     play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const tag = canvasElement.querySelector('.plus-change-tag');
         await expect(tag.textContent, 'the value is signed').toContain('+3');
         await expect(tag.className, 'up is danger when the good direction is down').toContain('danger');
         await expect(tag.textContent.includes('Up 3'), 'the words read the direction').toBe(true);
+        await userEvent.click(canvas.getByRole('button', { name: /Period:/ }));
+        await userEvent.click(await within(canvasElement.ownerDocument.body).findByRole('option', { name: 'vs last month' }));
+        await waitFor(() => expect(canvasElement.querySelector('.plus-change-tag').textContent).toContain('−2'));
+        await expect(canvasElement.querySelector('.plus-change-tag').className).toContain('success');
         await fitsCanvas(canvasElement);
     },
 };
@@ -139,8 +179,16 @@ export const RollUpShowsWorst = {
     render: () => staged(<RollUp />, ROLL_UP_STAGE),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        const group = tagOf(canvas.getAllByText('Missed')[0]);
-        await expect(group.className, 'the group shows danger, the worst of its children').toContain('danger');
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        const group = () => canvas.getByTestId('rollup-group-status');
+        await expect(group().className, 'the group shows danger, the worst of its children').toContain('danger');
+        await expect(group()).toHaveTextContent('Missed');
+        await userEvent.click(canvas.getByRole('button', { name: 'Resolve' }));
+        await expect(group().className, 'resolving the missed child lowers the roll-up to warning').toContain('warning');
+        await expect(group()).toHaveTextContent('Needs review');
+        await userEvent.click(canvas.getByRole('button', { name: 'Undo' }));
+        await expect(group().className).toContain('danger');
         await fitsCanvas(canvasElement);
     },
 };
@@ -261,8 +309,15 @@ export const ChecklistCompactInSidebar = {
     render: () => staged(<ChecklistInSidebar />, CHECKLIST_FRAME_STAGE),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        const sidebar = canvasElement.querySelector('.plus-pattern-sidebar');
         const foot = canvasElement.querySelector('[data-checklist-sidebar-foot]');
+        const account = canvasElement.querySelector('.plus-sidebar-account');
         await expect(foot, 'compact checklist sits at the foot of the sidebar').not.toBeNull();
+        await expect(sidebar.contains(foot), 'compact checklist sits inside Sidebar').toBe(true);
+        await expect(account, 'Sidebar account block is present below the checklist').not.toBeNull();
+        await expect(rect(foot).bottom, 'checklist sits above the account block').toBeLessThanOrEqual(rect(account).top + 1);
         await expect(within(foot).getByText('2 of 5 done')).toBeInTheDocument();
         await expect(within(foot).getByRole('progressbar')).toHaveAttribute('aria-valuenow', '40');
 

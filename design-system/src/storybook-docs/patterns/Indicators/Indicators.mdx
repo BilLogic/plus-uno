@@ -54,13 +54,25 @@ Three jobs, three components. A category with a color is a Tag, not an indicator
 ## Key cases
 
 <TypeGrid>
-<TypeCard of={IndicatorsStories.StatusInARow} title="Status in a row" stage={STAGE}>Default spacing in a table cell. One status per object; the label is one or two words.</TypeCard>
-<TypeCard of={IndicatorsStories.StatusBesideHeading} title="Status beside a heading" stage={STAGE}>Spacious beside the page title, after the text.</TypeCard>
-<TypeCard of={IndicatorsStories.CountsOnNavigation} title="Counts on navigation" stage={NARROW}>A count beside an item's name. At zero the component renders nothing; bold asks for action now, at most one per area.</TypeCard>
-<TypeCard of={IndicatorsStories.WhereColorIsNotEnough} title="Where color is not enough" stage={NARROW}>A leading icon joins the color on a status that must be told apart at a glance, such as Missed.</TypeCard>
-<TypeCard of={IndicatorsStories.ChangeWhereUpIsBad} title="Change where up is bad" stage={NARROW}>Absences rose by 3: the value is up and the tone is danger, because the good direction is down.</TypeCard>
-<TypeCard of={IndicatorsStories.RollUpShowsWorst} title="A roll-up" stage={ROLL_UP_STAGE}>A group's status shows the worst state among its children: danger over warning over information.</TypeCard>
+<TypeCard of={IndicatorsStories.StatusInARow} to="#status-in-a-row" title="Status in a row" stage={STAGE}>Default spacing in a table cell. One status per object; the label is one or two words.</TypeCard>
+<TypeCard of={IndicatorsStories.StatusBesideHeading} to="#status-beside-a-heading" title="Status beside a heading" stage={STAGE}>Spacious beside the page title, after the text.</TypeCard>
+<TypeCard of={IndicatorsStories.CountsOnNavigation} to="#counts-on-navigation" title="Counts on navigation" stage={NARROW}>A count beside an item's name. At zero the component renders nothing; bold asks for action now, at most one per area.</TypeCard>
+<TypeCard of={IndicatorsStories.WhereColorIsNotEnough} to="#where-color-is-not-enough" title="Where color is not enough" stage={NARROW}>A leading icon joins the color on a status that must be told apart at a glance, such as Missed.</TypeCard>
+<TypeCard of={IndicatorsStories.ChangeWhereUpIsBad} to="#change-where-up-is-bad" title="Change where up is bad" stage={NARROW}>Absences rose by 3: the value is up and the tone is danger, because the good direction is down.</TypeCard>
+<TypeCard of={IndicatorsStories.RollUpShowsWorst} to="#a-roll-up" title="A roll-up" stage={ROLL_UP_STAGE}>A group's status shows the worst state among its children: danger over warning over information.</TypeCard>
 </TypeGrid>
+
+<ComponentExample of={IndicatorsStories.StatusInARow} title="Status in a row" description="Default spacing in a table cell. One status per object; the label is one or two words." />
+
+<ComponentExample of={IndicatorsStories.StatusBesideHeading} title="Status beside a heading" description="Spacious beside the page title, after the text. The button marks the session reviewed without turning the Status tag into a menu." />
+
+<ComponentExample of={IndicatorsStories.CountsOnNavigation} title="Counts on navigation" description="A count beside an item's name. At zero the component renders nothing; bold asks for action now, at most one per area." />
+
+<ComponentExample of={IndicatorsStories.WhereColorIsNotEnough} title="Where color is not enough" description="A leading icon joins the color on a status that must be told apart at a glance, such as Missed." />
+
+<ComponentExample of={IndicatorsStories.ChangeWhereUpIsBad} title="Change where up is bad" description="Absences rose by 3: the value is up and the tone is danger, because the good direction is down. Switch the period to compare an upward rise with a drop." />
+
+<ComponentExample of={IndicatorsStories.RollUpShowsWorst} title="A roll-up" description="A group's status shows the worst state among its children: danger over warning over information. Resolve the missed child to see the group drop to warning." />
 
 A checklist tracks setup or compliance steps in three layouts: a dismissible card on Home, a persistent card in a page, and a compact summary at the foot of the Sidebar.
 
