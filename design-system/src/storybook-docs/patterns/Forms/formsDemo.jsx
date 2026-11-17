@@ -89,6 +89,28 @@ export const MajorityMarked = () => (
     </div>
 );
 
+/** Do: standing help stays in the caption under the field, still visible after typing. */
+export const HelpInCaptionCase = () => (
+    <div style={pairStack}>
+        <TextField
+            label="School email"
+            defaultValue="ana.ruiz@lincoln.edu"
+            caption="Shared with your site supervisor."
+        />
+    </div>
+);
+
+/** Don't: help placed only in an info tooltip beside the label disappears on touch and while typing. */
+export const HelpInTooltipCase = () => (
+    <div style={pairStack}>
+        <TextField
+            label="School email"
+            defaultValue="ana.ruiz@lincoln.edu"
+            info="Shared with your site supervisor."
+        />
+    </div>
+);
+
 export const QUESTION_STEPS = [
     {
         id: 'format',
