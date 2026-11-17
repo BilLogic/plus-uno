@@ -283,7 +283,7 @@ const contentBox = (root) => root.querySelector('.plus-frame__content');
 
 /** A tutor's area page: the title alone over Sections. */
 const AreaPage = ({ full = false }) => (
-    <PageStage full={full} width={TYPE_STAGE} height={300}>
+    <PageStage scrollable full={full} width={TYPE_STAGE} height={300}>
         <DemoPageHeader title="Sessions" />
         <CardsSection title="Upcoming sessions" description="Next 7 days" actions={<Button text="View calendar" onClick={() => {}} />} />
     </PageStage>
@@ -294,8 +294,14 @@ export const TypeDefault = {
     name: 'Type: Default',
     render: () => <AreaPage />,
     play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvasElement.closest('[inert]')).toBeNull();
+        await expect(canvasElement.querySelector('[inert]')).toBeNull();
         const cap = parseFloat(getComputedStyle(canvasElement).getPropertyValue('--content-max-width')) || FRAME_LAYOUT.contentCap;
         await expect(contentBox(canvasElement).getBoundingClientRect().width, 'the content box stops at the cap').toBe(cap);
+        const btn = canvas.getByRole('button', { name: 'View calendar' });
+        btn.focus();
+        await expect(btn).toHaveFocus();
     },
 };
 
@@ -304,8 +310,14 @@ export const TypeFullWidth = {
     name: 'Type: Full width',
     render: () => <AreaPage full />,
     play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvasElement.closest('[inert]')).toBeNull();
+        await expect(canvasElement.querySelector('[inert]')).toBeNull();
         await expect(contentBox(canvasElement).getBoundingClientRect().width, 'the content runs past the cap').toBeGreaterThan(FRAME_LAYOUT.contentCap);
         await expect(canvasElement.querySelector('[data-page-stage]').offsetWidth, 'at the stage width').toBe(TYPE_STAGE);
+        const btn = canvas.getByRole('button', { name: 'View calendar' });
+        btn.focus();
+        await expect(btn).toHaveFocus();
     },
 };
 
