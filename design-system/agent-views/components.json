@@ -9632,15 +9632,6 @@
           "deprecated": null
         },
         {
-          "name": "footer",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Content pinned inside the sidebar between the navigation list and the account row",
-          "deprecated": null
-        },
-        {
           "name": "account",
           "type": "shape",
           "required": true,
@@ -13479,15 +13470,6 @@
           "default": null,
           "values": null,
           "description": "The trailing slot by row id: `{ compliance-monitor: { count: 3, countLabel: '3 open flags' }, lessons: { dot: true } }`",
-          "deprecated": null
-        },
-        {
-          "name": "footer",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Content pinned inside the sidebar between the navigation list and the account row",
           "deprecated": null
         },
         {

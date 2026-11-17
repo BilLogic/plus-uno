@@ -39,7 +39,6 @@ Same group: `Breadcrumb` · `Link` · `Pagination` · `Tabs`
 | `modulesLeft` | number | `0` | A tutor's onboarding modules left. Above 0 the Toolkit is locked; supervisors are never locked. |
 | `lessonsLeft` | number | `0` | A tutor's assigned lessons left; counted on the Lessons row |
 | `countTags` | objectOf | — | The trailing slot by row id: `{ compliance-monitor: { count: 3, countLabel: '3 open flags' }, lessons: { dot: true } }` |
-| `footer` | node | — | Content pinned inside the sidebar between the navigation list and the account row |
 | `onHomeClick` | func | — | Home's press (the row and the logo); without it Home calls `onTabClick('home')` |
 | `onTabClick` | func | — | Called with the row id for every other row (external links excepted) |
 | `onOpenTabSelect` | func | — | Called with the open tab (`{ id, parentId, recordId, title, href, status }`) when one is pressed |

@@ -28,7 +28,6 @@ const Sidebar = ({
     modulesLeft = 0,
     lessonsLeft = 0,
     countTags,
-    footer,
     onHomeClick,
     onTabClick,
     onOpenTabSelect,
@@ -79,7 +78,6 @@ const Sidebar = ({
             onCloseAllTabs={(item) => openTabs.closeAll(item.id)}
             modulesLeft={user === 'tutor' ? modulesLeft : 0}
             lessonsLeft={user === 'tutor' ? lessonsLeft : 0}
-            footer={footer}
             account={account}
             onProfile={onProfile}
             onSignOut={() => {
@@ -136,8 +134,6 @@ Sidebar.propTypes = {
         dot: PropTypes.bool,
         dotLabel: PropTypes.string,
     })),
-    /** Content pinned inside the sidebar between the navigation list and the account row */
-    footer: PropTypes.node,
     /** Home's press (the row and the logo); without it Home calls `onTabClick('home')` */
     onHomeClick: PropTypes.func,
     /** Called with the row id for every other row (external links excepted) */

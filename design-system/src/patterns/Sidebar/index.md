@@ -147,7 +147,6 @@ Docked, collapsed, peeking and overlay are the Frame's states, on the Frame page
 | `onCloseAllTabs` | func | — | Called with `(item)` by a row's Close all |
 | `modulesLeft` | number | `0` | Onboarding modules a tutor has left. Above 0, groups marked `lockedDuringOnboarding` lock, and the `modules` row counts it. |
 | `lessonsLeft` | number | `0` | Assigned lessons a tutor has left; the `lessons` row counts it |
-| `footer` | node | — | Content pinned inside the sidebar between the navigation list and the account row |
 | `account` | shape (required) | — | The signed-in person, for the account row. Their `id` keys the remembered sections. |
 | `onProfile` | func | — | The account menu's Profile |
 | `onSignOut` | func | — | The account menu's Sign out |

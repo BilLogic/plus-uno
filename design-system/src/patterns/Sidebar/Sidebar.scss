@@ -451,11 +451,6 @@ button.plus-pattern-sidebar__title {
     $hovered-selector: '.plus-pattern-sidebar__tab--more .plus-pattern-sidebar__row:hover .plus-pattern-sidebar__label'
 );
 
-.plus-pattern-sidebar__footer {
-    flex-shrink: 0;
-    padding-top: var(--stack-md);
-}
-
 /* ------------------------------------------------------------- account row */
 
 // Under the one divider, full bleed. The trigger is a nav row (avatar in the

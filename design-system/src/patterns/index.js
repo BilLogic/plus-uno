@@ -9,7 +9,6 @@ export { usePanelControl } from './Frame/PanelControl';
 export { PANEL_STORAGE_KEY } from './Frame';
 export {
     default as PatternSidebar,
-    SidebarTab,
     useOpenTabs,
     clearOpenTabs,
     createOpenTabsStore,
