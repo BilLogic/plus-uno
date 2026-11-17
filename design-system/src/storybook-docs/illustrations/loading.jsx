@@ -1,14 +1,10 @@
 import React from 'react';
 import { PAINT } from './paint.js';
 import { Illustration } from './Illustration.jsx';
-import { Popup, Rect, Row, SkeletonBar } from './primitives.jsx';
+import { Rect, SkeletonBar } from './primitives.jsx';
 
 /**
- * The Loading pattern's do and don't drawings. Each lesson is about what fills
- * the space while a view waits, so every drawing is blocked out: no words. A
- * spinner is a ring of the skeleton's own tone; the one accent is a ring
- * around the subject. Every pair shares one canvas, so a do and its don't
- * compare at one scale.
+ * The Loading pattern's abstract layout-stability diagram.
  */
 
 const W = 168;
@@ -54,26 +50,5 @@ export const SpinnerInBlank = ({ title = 'A blank area with one spinner in the m
     <SkeletonBar x={X} y={8} w={48} h={6} heading />
     <Spinner x={W / 2 - SPIN / 2} y={56} />
     <Subject x={X} y={28} w={INNER} h={62} />
-  </Canvas>
-);
-
-/** Do: a menu that waits shows one loading row. */
-export const MenuOneRow = ({ title = 'A menu holding one row with a spinner beside a text bar' }) => (
-  <Canvas title={title}>
-    <Row x={X} y={12} w={INNER} />
-    <Popup x={X + 16} y={32} w={96} h={24} />
-    <Spinner x={X + 24} y={40} />
-    <SkeletonBar x={X + 38} y={42} w={48} />
-    <Subject x={X + 16} y={32} w={96} h={24} corner="popup" />
-  </Canvas>
-);
-
-/** Don't: a menu full of skeleton rows, promising items it may not have. */
-export const MenuSkeletonRows = ({ title = 'A menu holding three skeleton rows' }) => (
-  <Canvas title={title}>
-    <Row x={X} y={12} w={INNER} />
-    <Popup x={X + 16} y={32} w={96} h={56} />
-    {[0, 1, 2].map((i) => <SkeletonBar key={i} x={X + 24} y={42 + i * 14} w={72 - i * 12} />)}
-    <Subject x={X + 16} y={32} w={96} h={56} corner="popup" />
   </Canvas>
 );
