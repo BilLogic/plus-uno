@@ -1,6 +1,6 @@
 import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Story } from '@storybook/addon-docs/blocks';
+import { Meta } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as FormStories from './Form.stories.jsx';
@@ -12,9 +12,8 @@ import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 import {
     EditInModal,
     EditInPanel,
-    OneColumn,
-    TwoColumns,
 } from '@/storybook-docs/illustrations/form.jsx';
+import { OneColumnFields, TwoColumnFields } from './FormCases.jsx';
 
 <Meta title="Templates/Form" tags={['manifest']} />
 
@@ -47,11 +46,19 @@ import {
 The place sets the footer. The fields are the same everywhere.
 
 <TypeGrid>
-<TypeCard of={FormStories.TypePage} title="In a page" stage={PAGE_WIDTH}>Settings and anything saved as a group. Buttons left-aligned under the fields, Primary first.</TypeCard>
-<TypeCard of={FormStories.TypePanel} title="In a Panel">Editing a record beside the page. A full-bleed footer, only while editing.</TypeCard>
-<TypeCard of={FormStories.TypeModal} title="In a Modal">Fewer than five fields. A full-bleed footer, Primary furthest right.</TypeCard>
-<TypeCard of={FormStories.TypeSteps} title="In steps">Frame · focused with the form in the body. The bar carries Back and Next.</TypeCard>
+<TypeCard of={FormStories.TypePage} to="#form-in-a-page" title="In a page" stage={PAGE_WIDTH}>Settings and anything saved as a group. Buttons left-aligned under the fields, Primary first.</TypeCard>
+<TypeCard of={FormStories.TypePanel} to="#form-in-a-panel" title="In a Panel">Editing a record beside the page. A full-bleed footer, only while editing.</TypeCard>
+<TypeCard of={FormStories.TypeModal} to="#form-in-a-modal" title="In a Modal">Fewer than five fields. A full-bleed footer, Primary furthest right.</TypeCard>
+<TypeCard of={FormStories.TypeSteps} to="#form-in-steps" title="In steps">Frame · focused with the form in the body. The bar carries Back and Next.</TypeCard>
 </TypeGrid>
+
+<ComponentExample of={FormStories.TypePage} title="Form in a page" description="Settings and anything saved as a group. Buttons left-aligned under the fields, Primary first." />
+
+<ComponentExample of={FormStories.TypePanel} title="Form in a Panel" description="Editing a record beside the page. A full-bleed footer, only while editing." />
+
+<ComponentExample of={FormStories.TypeModal} title="Form in a Modal" description="Fewer than five fields. A full-bleed footer, Primary furthest right." />
+
+<ComponentExample of={FormStories.TypeSteps} title="Form in steps" description="Frame · focused with the form in the body. The bar carries Back and Next." />
 
 </div>
 
@@ -63,7 +70,7 @@ The place sets the footer. The fields are the same everywhere.
 
 Settings saved as a group, drawn in the Frame with the Sidebar docked. The form sits straight on the Page: its title is the page-level Section header, the page's `h1`, and the fields and footer follow it with no Section around them. A settings page with several groups can use subsections under that header.
 
-<Story of={FormStories.AnatomyPage} inline />
+<ComponentExample of={FormStories.AnatomyPage} />
 
 1. **Message slot.** At the top, for a server failure.
 2. **Group.** One Fieldset per group of fields that describe one thing, with its legend.
@@ -74,7 +81,7 @@ Settings saved as a group, drawn in the Frame with the Sidebar docked. The form 
 
 The Details Panel with the form open. The footer shows only while editing.
 
-<Story of={FormStories.AnatomyPanel} inline />
+<ComponentExample of={FormStories.AnatomyPanel} />
 
 1. **Header.** The record's name and its fixed actions.
 2. **Body.** The fields, with `--space-200` of pad from every edge.
@@ -84,7 +91,7 @@ The Details Panel with the form open. The footer shows only while editing.
 
 A short form at 8-col: the Modal's header, the fields in its body, its full-bleed footer.
 
-<Story of={FormStories.AnatomyModal} inline />
+<ComponentExample of={FormStories.AnatomyModal} />
 
 1. **Header.** The title and Close.
 2. **Body.** The fields, scrolling past the cap.
@@ -94,7 +101,7 @@ A short form at 8-col: the Modal's header, the fields in its body, its full-blee
 
 A stepped form on its own page is Frame · focused with the form in the body. Back keeps what was typed.
 
-<Story of={FormStories.AnatomySteps} inline />
+<ComponentExample of={FormStories.AnatomySteps} />
 
 1. **Steps.** The rail at the start, with done, current and later steps; four or fewer run across the top.
 2. **Body.** One group per step, at reading width.
@@ -253,9 +260,9 @@ Editing a row opens a Panel so the person keeps the page in view. A Modal is for
 Pair two fields side by side only when they belong together, such as first and last name, or date and time. Anything else reads down one column.
 
 <DoDontPair
-    doExample={<OneColumn />}
+    doExample={<OneColumnFields />}
     doCaption="One column, so the eye moves straight down."
-    dontExample={<TwoColumns />}
+    dontExample={<TwoColumnFields />}
     dontCaption="Unrelated fields scattered across two columns."
 />
 

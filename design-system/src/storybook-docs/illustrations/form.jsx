@@ -114,19 +114,3 @@ export const EditInModal = ({ title = 'A short edit in a Modal over a Blanket, w
     <Field x={52} y={52} w={64} />
   </Canvas>
 );
-
-/** Do: one column, with a pair side by side only where the two belong together. */
-export const OneColumn = ({ title = 'A page form in one column of fields, one pair side by side' }) => (
-  <Canvas title={title}>
-    <PageForm fields={2} />
-    <Rect x={20} y={32} w={W - 40} h={52} fill="none" stroke={PAINT.accent} corner="field" />
-  </Canvas>
-);
-
-/** Don't: fields scattered across two columns, so the eye zigzags. */
-export const TwoColumns = ({ title = 'A page form with its fields scattered across two columns' }) => (
-  <Canvas title={title}>
-    <PageForm fields={4} columns={2} />
-    <Rect x={20} y={32} w={W - 40} h={56} fill="none" stroke={PAINT.accent} corner="field" />
-  </Canvas>
-);
