@@ -238,7 +238,7 @@ export function DocsCanvasShell({ description, children, attachSourceBelow = tru
     );
 }
 
-const exampleSlug = (text) => (typeof text === 'string'
+export const exampleSlug = (text) => (typeof text === 'string'
     ? text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || undefined
     : undefined);
 

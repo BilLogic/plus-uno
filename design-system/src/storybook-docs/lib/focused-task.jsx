@@ -10,7 +10,7 @@ import { ScreenStage } from './fit-stage.jsx';
  * The focused Frame type, shared by the Frame and Form template pages: one
  * task in the whole window, Close and the task's name above, a step tracker
  * (five or more down the left, four or fewer across the top), the body, and the
- * bottom bar with Cancel at the start and Back and Next at the end.
+ * bottom bar with Back and Next.
  */
 
 /** The browser body's height on the docs page: docs geometry, in px. */
@@ -117,9 +117,9 @@ export const FocusedTask = ({ count = 5, start = 1, labels: given, title = 'Plan
     );
 };
 
-/** The focused type in its window: on a docs page it reflows with the canvas and scales below the Page's floor. */
-export const FocusedType = ({ address = 'app.plus.org/terms/new', ...props }) => (
-    <ScreenStage width={FOCUSED_SCREEN} fluid>
+/** The focused type in its window: on a docs page it reflows with the canvas and scales below the Page's floor (or scrolls horizontally when `scrollable`). */
+export const FocusedType = ({ address = 'app.plus.org/terms/new', scrollable = false, ...props }) => (
+    <ScreenStage width={FOCUSED_SCREEN} fluid scrollable={scrollable}>
         <BrowserWindow address={address} height={WINDOW_HEIGHT}>
             <FocusedTask {...props} />
         </BrowserWindow>

@@ -221,7 +221,7 @@ const placeMarkers = (items, boxWidth) => {
     });
 };
 
-export const LiveAnatomy = ({ width, live = false, parts, title, children }) => {
+export const LiveAnatomy = ({ width, live = false, scrollable = false, parts, title, children }) => {
     const box = React.useRef(null);
     const [marks, setMarks] = React.useState([]);
     const [boxWidth, setBoxWidth] = React.useState(0);
@@ -285,18 +285,24 @@ export const LiveAnatomy = ({ width, live = false, parts, title, children }) => 
             mutations?.disconnect();
         };
     }, [parts]);
-    return (
+    const figure = (
         <figure
             role={live ? undefined : 'img'}
             aria-label={`${title}: ${parts.map((p, i) => `${i + 1}, ${p.label}`).join('; ')}`}
             className="not-prose"
-            style={{ margin: 0, position: 'relative', paddingInline: GUTTER, paddingBlockStart: parts.some((p) => p.side === 'top') ? GUTTER : 0 }}
+            style={{
+                margin: 0,
+                position: 'relative',
+                ...(scrollable && width ? { inlineSize: `calc(${width}px + 2 * ${GUTTER})`, boxSizing: 'border-box' } : undefined),
+                paddingInline: GUTTER,
+                paddingBlockStart: parts.some((p) => p.side === 'top') ? GUTTER : 0,
+            }}
         >
             <div ref={box} style={{ position: 'relative' }}>
                 {/* Anatomy figures render with reduced motion. */}
                 <MotionPreferenceContext.Provider value={true}>
-                    {live && !width ? (
-                        <div className="docs-story not-prose sb-unstyled" style={{ width: '100%' }}>
+                    {live && (!width || scrollable) ? (
+                        <div className="docs-story not-prose sb-unstyled" style={{ width: width ?? '100%' }}>
                             {children}
                         </div>
                     ) : (
@@ -370,11 +376,13 @@ export const LiveAnatomy = ({ width, live = false, parts, title, children }) => 
             </div>
         </figure>
     );
+    return scrollable ? <div style={{ overflowX: 'auto' }}>{figure}</div> : figure;
 };
 
 LiveAnatomy.propTypes = {
     width: PropTypes.number,
     live: PropTypes.bool,
+    scrollable: PropTypes.bool,
     parts: PropTypes.arrayOf(PropTypes.shape({
         selector: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
