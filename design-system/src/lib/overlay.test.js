@@ -10,6 +10,7 @@ import {
     overlayMountOf,
     OverlayContainer,
     useBoundedOverlay,
+    useFloatingOverlay,
     useOverlaySlot,
     isPressInRaisedOverlay,
     isOverlayRaisedOver,
@@ -243,6 +244,87 @@ describe('useBoundedOverlay', () => {
         const wrapper = ({ children }) => React.createElement(OverlayContainer, { container: canvas }, children);
         expect(renderHook(() => useBoundedOverlay({ container: explicit }), { wrapper }).result.current).toBeNull();
         expect(renderHook(() => useBoundedOverlay({ fromNode: trigger }), { wrapper }).result.current).toBeNull();
+    });
+});
+
+describe('useFloatingOverlay', () => {
+    afterEach(() => { document.body.innerHTML = ''; });
+
+    it('cancels and skips onOpenChange when not dismissible for dismiss reasons', () => {
+        const onOpenChange = vi.fn();
+        const { result } = renderHook(() => useFloatingOverlay({
+            dismissible: false,
+            onOpenChange,
+        }));
+
+        for (const reason of ['outside-press', 'escape-key', 'focus-out']) {
+            const cancel = vi.fn();
+            result.current.onOpenChange(false, { reason, cancel });
+            expect(cancel).toHaveBeenCalledTimes(1);
+        }
+        expect(onOpenChange).not.toHaveBeenCalled();
+
+        const triggerCancel = vi.fn();
+        const details = { reason: 'trigger-press', cancel: triggerCancel };
+        result.current.onOpenChange(false, details);
+        expect(triggerCancel).not.toHaveBeenCalled();
+        expect(onOpenChange).toHaveBeenCalledWith(false, details);
+    });
+
+    it('cancels and skips onOpenChange for an outside press inside a raised overlay', () => {
+        document.body.innerHTML = `
+            <button id="owner"></button>
+            <div class="plus-pattern-blanket"><button id="in-modal"></button></div>
+            <main id="page"></main>`;
+        const owner = document.getElementById('owner');
+        const inModal = document.getElementById('in-modal');
+        const page = document.getElementById('page');
+        const onOpenChange = vi.fn();
+
+        const { result } = renderHook(() => useFloatingOverlay({
+            anchor: { current: owner },
+            onOpenChange,
+        }));
+
+        const cancel = vi.fn();
+        result.current.onOpenChange(false, {
+            reason: 'outside-press',
+            event: { target: inModal },
+            cancel,
+        });
+        expect(cancel).toHaveBeenCalledTimes(1);
+        expect(onOpenChange).not.toHaveBeenCalled();
+
+        const pageCancel = vi.fn();
+        const acceptedDetails = { reason: 'outside-press', event: { target: page }, cancel: pageCancel };
+        result.current.onOpenChange(false, acceptedDetails);
+        expect(pageCancel).not.toHaveBeenCalled();
+        expect(onOpenChange).toHaveBeenCalledWith(false, acceptedDetails);
+    });
+
+    it('cancels escape-key and focus-out while an overlay is raised over the owner, and allows accepted closes', () => {
+        document.body.innerHTML = '<button id="owner"></button>';
+        const owner = document.getElementById('owner');
+        const onOpenChange = vi.fn();
+        const { result } = renderHook(() => useFloatingOverlay({
+            anchor: { current: owner },
+            onOpenChange,
+        }));
+
+        const handle = open();
+        for (const reason of ['escape-key', 'focus-out']) {
+            const cancel = vi.fn();
+            result.current.onOpenChange(false, { reason, cancel });
+            expect(cancel).toHaveBeenCalledTimes(1);
+        }
+        expect(onOpenChange).not.toHaveBeenCalled();
+
+        handle.release();
+        const acceptedCancel = vi.fn();
+        const details = { reason: 'escape-key', cancel: acceptedCancel };
+        result.current.onOpenChange(false, details);
+        expect(acceptedCancel).not.toHaveBeenCalled();
+        expect(onOpenChange).toHaveBeenCalledWith(false, details);
     });
 });
 
