@@ -4,7 +4,7 @@ import { planLoadReveal } from '@/lib/loadRevealMotion';
 import { planSwapInPlace } from '@/lib/swapMotion';
 import { HAIRLINE, PAINT } from './paint.js';
 import {
-  Blanket, ButtonShape, CardBox, Field, Flag, Modal, Panel, PageHeader, Popup, Rect, Rule, Row, Screen, SkeletonBar,
+  Blanket, ButtonShape, CardBox, Field, Flag, Layer, Modal, Panel, PageHeader, Popup, Rect, Rule, Row, Screen, SkeletonBar,
 } from './primitives.jsx';
 import { BEAT, pair } from './motion.jsx';
 import { Clip, Moved, VIEW, mix } from './motion-parts.jsx';
@@ -841,7 +841,16 @@ const errField = ({ id, title, caption, early, spatial = 'spatial.fast', appeara
   });
 export const errFieldScene = errField;
 
-const MODAL_BASE = { x: 66, y: 18, w: 76, h: 60 };
+const MODAL_BASE = { x: 64, y: 9, w: 76, h: 73 };
+const MODAL_ERR_SHIFT = 9;
+const MODAL_FIELDS_LANDING = { x: 74, y: 35, w: 56, h: 38 };
+const ModalField = ({ x, y, w }) => (
+  <g>
+    <SkeletonBar x={x} y={y} w={w * 0.3} h={3} heading />
+    <Rect x={x} y={y + 5} w={w} h={12} fill={PAINT.fieldSurface} stroke={PAINT.fieldBorder} corner="field" />
+    <SkeletonBar x={x + 5} y={y + 9.5} w={w * 0.4} />
+  </g>
+);
 const errModal = ({ id, title, caption, shakes, spatial = 'spatial.fast', appearance = 'appearance.fast' }) =>
   scene({
     id,
@@ -849,25 +858,39 @@ const errModal = ({ id, title, caption, shakes, spatial = 'spatial.fast', appear
     caption,
     initial: shakes ? { sx: 0, shook: 0 } : { h: 0, m: 0 },
     landing: shakes ? { sx: 0, shook: 1 } : { h: 1, m: 1 },
-    draw: ({ sx = 0, h = 0, m = 0 }) => (
-      <>
-        <UnderPage />
-        <Blanket {...FRAME} />
-        <Moved x={sx}>
-          <Modal {...MODAL_BASE} h={MODAL_BASE.h + 12 * h} />
-          <Message x={MODAL_BASE.x + 10} y={MODAL_BASE.y + 41} w={46} opacity={m} />
-        </Moved>
-      </>
-    ),
+    // The message opens at the top of the Modal body; both fields move down as one group.
+    arrows: shakes
+      ? []
+      : [travel(MODAL_FIELDS_LANDING, 0, -MODAL_ERR_SHIFT)],
+    draw: ({ sx = 0, h = 0, m = 0 }) => {
+      const modalH = MODAL_BASE.h + MODAL_ERR_SHIFT * h;
+      const bottom = MODAL_BASE.y + modalH;
+      return (
+        <>
+          <UnderPage />
+          <Blanket {...FRAME} />
+          <Moved x={sx}>
+            <Layer {...MODAL_BASE} h={modalH} fill={PAINT.modalSurface} shadow={PAINT.modalShadow} corner="modal" />
+            <SkeletonBar x={74} y={16} w={34} h={5} heading />
+            <Message x={74} y={26} w={46} opacity={m} />
+            <ModalField x={74} y={26 + MODAL_ERR_SHIFT * h} w={56} />
+            <ModalField x={74} y={47 + MODAL_ERR_SHIFT * h} w={56} />
+            <Rule x1={MODAL_BASE.x} x2={MODAL_BASE.x + MODAL_BASE.w} y1={bottom - 14} y2={bottom - 14} stroke={PAINT.modalDivider} />
+            <ButtonShape x={78} y={bottom - 11} w={24} />
+            <ButtonShape x={106} y={bottom - 11} w={24} appearance="primary" />
+          </Moved>
+        </>
+      );
+    },
     play: async (ctx) => {
       await ctx.hold(1);
-      await ctx.tap(119, 68);
+      await ctx.tap(118, 75);
       await ctx.hold(0.5);
       if (shakes) {
         await shake(ctx);
         return;
       }
-      // The system failed, not the person: the Modal stays still and a message makes room.
+      // The system failed, not the person: the Modal stays still and a message makes room at the top.
       await ctx.spring('h', 1, spatial);
       await ctx.spring('m', 1, appearance);
     },
