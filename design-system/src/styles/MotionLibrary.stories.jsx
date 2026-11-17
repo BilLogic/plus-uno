@@ -8,7 +8,12 @@
  * Run: npx vitest run --project=storybook design-system/src/styles/MotionLibrary.stories.jsx
  */
 import React from 'react';
+import { flushSync } from 'react-dom';
+import { createRoot } from 'react-dom/client';
+import PropTypes from 'prop-types';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { HeadingContextProvider } from '@/components';
+import { OverlayContainer } from '@/lib/overlay';
 
 import {
     MOTION_FAMILIES,
@@ -325,6 +330,146 @@ export const ComponentSubjectCoverage = {
         );
         await expect(patternCard.querySelector('[data-subject="component"]')).toBeNull();
         await expect(patternCard.querySelector('svg')).toBeTruthy();
+    },
+};
+
+const LEGACY_REACT_ELEMENT_TYPE = Symbol.for('react.element');
+
+const toLegacyReactElementForPropTypes = (val) => {
+    if (!val) return val;
+    if (Array.isArray(val)) return val.map(toLegacyReactElementForPropTypes);
+    if (React.isValidElement(val)) {
+        return { ...val, $$typeof: LEGACY_REACT_ELEMENT_TYPE };
+    }
+    return val;
+};
+
+const checkElementTreePropTypes = (node, subjectName) => {
+    if (!node) return;
+    if (Array.isArray(node)) {
+        for (const item of node) checkElementTreePropTypes(item, subjectName);
+        return;
+    }
+    if (!React.isValidElement(node)) return;
+
+    const { type, props } = node;
+    const propTypes = type?.propTypes ?? type?.render?.propTypes;
+    const compName =
+        type?.displayName ||
+        type?.name ||
+        type?.render?.displayName ||
+        type?.render?.name ||
+        subjectName;
+
+    if (propTypes && props) {
+        const normalizedProps = Object.fromEntries(
+            Object.entries(props).map(([k, v]) => [k, toLegacyReactElementForPropTypes(v)]),
+        );
+        PropTypes.resetWarningCache();
+        PropTypes.checkPropTypes(propTypes, normalizedProps, 'prop', `${subjectName} -> ${compName}`);
+        for (const key of Object.keys(props)) {
+            if (
+                key === 'children' ||
+                key === 'key' ||
+                key === 'ref' ||
+                key.startsWith('aria-') ||
+                key.startsWith('data-')
+            ) {
+                continue;
+            }
+            if (!Object.prototype.hasOwnProperty.call(propTypes, key)) {
+                console.error(
+                    `Warning: Failed prop type: Invalid prop \`${key}\` supplied to \`${subjectName} -> ${compName}\`, not declared in propTypes.`,
+                );
+            }
+        }
+    }
+
+    if (props) {
+        for (const [key, val] of Object.entries(props)) {
+            if (key === 'children' || React.isValidElement(val) || Array.isArray(val)) {
+                checkElementTreePropTypes(val, subjectName);
+            } else if (typeof val === 'function' && (key === 'readView' || key === 'editView')) {
+                try {
+                    checkElementTreePropTypes(
+                        val({ value: 'Sample', onChange: () => {}, id: 'sample-id' }),
+                        subjectName,
+                    );
+                } catch {
+                    // ignore render-prop probe errors
+                }
+            }
+        }
+    }
+};
+
+export const ComponentSubjectsMatchPropTypes = {
+    render: () => <div data-subject-prop-check-host />,
+    play: async ({ canvasElement }) => {
+        const componentRows = motionLibraryOf().filter(
+            (r) => r.tier === 'component' && Object.prototype.hasOwnProperty.call(COMPONENT_SUBJECTS, r.name),
+        );
+        const propTypeErrors = [];
+        const originalConsoleError = console.error;
+        console.error = (...args) => {
+            const msg = args.map((a) => (typeof a === 'string' ? a : String(a))).join(' ');
+            if (msg.includes('Failed prop type')) {
+                propTypeErrors.push(msg);
+            }
+            originalConsoleError.apply(console, args);
+        };
+
+        const host = canvasElement.querySelector('[data-subject-prop-check-host]') ?? canvasElement;
+        try {
+            for (const row of componentRows) {
+                const renderFn = COMPONENT_SUBJECTS[row.name];
+                const events = row.events?.length ? row.events : [{ event: 'default' }];
+                for (const event of events) {
+                    const isExit =
+                        event?.event === 'exit' ||
+                        event?.event === 'dismiss' ||
+                        event?.event === 'floating-exit';
+                    for (const [step, progress] of [
+                        ['start', 0],
+                        ['landing', 1],
+                    ]) {
+                        const element = renderFn({
+                            row,
+                            event,
+                            step,
+                            progress,
+                            isExit,
+                            reduced: true,
+                            mode: 'productive',
+                            container: host,
+                        });
+                        checkElementTreePropTypes(element, row.name);
+
+                        const slot = document.createElement('div');
+                        host.appendChild(slot);
+                        const root = createRoot(slot);
+                        try {
+                            flushSync(() => {
+                                root.render(
+                                    <HeadingContextProvider value={4}>
+                                        <OverlayContainer container={slot} boundary={slot}>
+                                            {element}
+                                        </OverlayContainer>
+                                    </HeadingContextProvider>,
+                                );
+                            });
+                        } finally {
+                            flushSync(() => root.unmount());
+                            slot.remove();
+                        }
+                    }
+                }
+            }
+        } finally {
+            console.error = originalConsoleError;
+        }
+
+        await expect(propTypeErrors, propTypeErrors.join('\n')).toEqual([]);
     },
 };
 

@@ -205,6 +205,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
         <div style={{ width: '100%' }}>
             <Carousel
                 key={step}
+                aria-label="Lesson steps"
                 autoplay={false}
                 peek={false}
                 aspectRatio={16 / 7}
@@ -239,7 +240,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
 
     CheckboxGroup: ({ step }) => (
         <CheckboxGroup
-            label="Session topics"
+            legend="Session topics"
             options={[
                 { label: 'Fractions', value: 'fractions' },
                 { label: 'Decimals', value: 'decimals' },
@@ -267,7 +268,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
     ),
 
     CloseButton: () => (
-        <CloseButton label="Dismiss item" isTooltipDisabled onClick={NOOP} />
+        <CloseButton label="Dismiss item" onClick={NOOP} />
     ),
 
     DatePicker: ({ step }) => (
@@ -285,7 +286,8 @@ export const COMPONENT_SUBJECTS = Object.freeze({
             <DateTimePicker
                 label="Session time"
                 spacing="compact"
-                value={step === 'landing' ? '2026-11-18T15:00' : '2026-11-16T14:30'}
+                dateValue={step === 'landing' ? '2026-11-18' : '2026-11-16'}
+                timeValue={step === 'landing' ? '03:00 PM' : '02:30 PM'}
                 onChange={NOOP}
             />
         </div>
@@ -332,8 +334,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
 
     FilterButton: ({ step }) => (
         <FilterButton
-            label="Subject"
-            value={step === 'landing' ? 'Algebra' : undefined}
+            text={step === 'landing' ? 'Subject: Algebra' : 'Subject'}
             isSelected={step === 'landing'}
             trailingMetric={step === 'landing' ? 2 : undefined}
             spacing="compact"
@@ -355,19 +356,20 @@ export const COMPONENT_SUBJECTS = Object.freeze({
         <div style={{ width: '100%' }}>
             <Flag
                 title={event?.event === 'failed' ? 'Could not save notes' : 'Session saved'}
-                description="Updated for Maya Lin."
                 appearance={
                     event?.event === 'failed'
                         ? 'error'
                         : event?.event === 'milestone'
                             ? 'success'
-                            : 'info'
+                            : 'information'
                 }
                 show
                 autohide={false}
                 sound={false}
-                onClose={NOOP}
-            />
+                onDismiss={NOOP}
+            >
+                Updated for Maya Lin.
+            </Flag>
         </div>
     ),
 
@@ -438,7 +440,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
     ),
 
     Link: () => (
-        <Link href="#session-notes" onClick={(e) => e.preventDefault()}>
+        <Link href="#session-notes">
             View session summary
         </Link>
     ),
@@ -454,7 +456,6 @@ export const COMPONENT_SUBJECTS = Object.freeze({
             href="#open-new"
             icon="arrow-up-right-from-square"
             label="Open in new tab"
-            isTooltipDisabled
             onClick={(e) => e.preventDefault()}
         />
     ),
@@ -507,7 +508,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
     Panel: () => (
         <div style={{ width: '100%' }}>
             <Panel width="100%">
-                <PanelHeader title="Student notes" onClose={NOOP} />
+                <PanelHeader title="Student notes" />
                 <PanelBody>Focus on common denominators next week.</PanelBody>
             </Panel>
         </div>
@@ -575,8 +576,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
 
     ProgressRing: ({ progress }) => (
         <ProgressRing
-            ariaLabel="Upload progress"
-            size="lg"
+            label="Upload progress"
             value={Math.round(15 + progress * 75)}
         />
     ),
@@ -645,7 +645,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
     RadioGroup: ({ step }) => (
         <RadioGroup
             name="cadence-demo"
-            label="Session cadence"
+            legend="Session cadence"
             options={[
                 { label: 'Weekly', value: 'weekly' },
                 { label: 'Twice weekly', value: 'twice' },
