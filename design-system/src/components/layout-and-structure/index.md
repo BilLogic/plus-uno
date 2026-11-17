@@ -25,7 +25,7 @@ authored half, counted rather than assumed.
 |-----------|------:|:---:|:---:|:---:|
 | [Accordion](Accordion/index.md) | 9 | ✅ | ✅ | ✅ |
 | [Carousel](Carousel/index.md) | 10 | ✅ | ✅ | ✅ |
-| [PageHeader](PageHeader/index.md) | 7 | ✅ | ✅ | ✅ |
+| [PageHeader](PageHeader/index.md) | 8 | ✅ | ✅ | ✅ |
 | [Panel](Panel/index.md) | 3 | ✅ | ✅ | ✅ |
 | [ScrollBar](ScrollBar/index.md) | 6 | ✅ | ✅ | ✅ |
 

@@ -59,6 +59,8 @@ its side, and a bottom bar below.
 
 <ComponentExample of={PageHeaderStories.WithBreadcrumbsActionsAndBottomBar} title="All parts" description="Breadcrumbs above the title, actions beside it, and a bottom bar below for anything that belongs to the whole page." />
 
+<ComponentExample of={PageHeaderStories.SecondaryLevel} title="Explicit level (h2)" description={<>Pass <code>titleAs="h2"</code> when the header sits below another page title, such as inside a dialog body or nested view.</>} />
+
 <ComponentExample of={PageHeaderStories.DisableTitleStyles} title="Unstyled title" description={<><code>disableTitleStyles</code> renders the title as a plain node, for a caller that styles it itself.</>} />
 
 </div>
@@ -130,7 +132,7 @@ heading wrapper.
 ## Parts
 
 1. **Breadcrumbs.** Optional, above the title.
-2. **Title.** A level 2 heading, or any node with `disableTitleStyles`.
+2. **Title.** The page's `h1` at `Heading` `large` (24/28) by default (or the ambient heading level), `titleAs="h2"` when below another page title, or any node with `disableTitleStyles`.
 3. **Actions.** Optional, at the end of the title row.
 4. **Bottom bar.** Optional, under the row: tabs, a filter bar or a status line.
 
@@ -156,7 +158,7 @@ heading wrapper.
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Title</td><td><code>Heading</code> at the <code>xlarge</code> size, as an <code>h2</code>.</td></tr>
+<tr><td>Title</td><td><code>Heading</code> at the <code>large</code> size (24/28), as an <code>h1</code> by default (follows the ambient heading level; override with <code>titleAs</code>).</td></tr>
 <tr><td>Rows</td><td><code>--space-100</code> between breadcrumbs, title row and bottom bar.</td></tr>
 <tr><td>Title row</td><td><code>--space-150</code> between the title and its actions; <code>--space-075</code> between actions.</td></tr>
 <tr><td>Breadcrumbs</td><td><code>--body-sm</code>.</td></tr>
@@ -223,6 +225,12 @@ not given.
 />
 ```
 
+### Pass `titleAs="h2"` when the header sits below another page title.
+
+A page has one `h1`. When a `PageHeader` sits under an existing page heading or
+inside a dialog below its `h1` title, pass `titleAs="h2"` so the heading
+outline keeps one `h1`.
+
 ### Reach for `disableTitleStyles` only when the title is not plain text.
 
 The default renders the title in a `Heading`. Turn styling off only when the
@@ -251,9 +259,10 @@ title is a custom element already carrying its own heading semantics.
 
 ## Accessibility
 
-- **A real heading.** The title renders as an `h2` by default, giving the
-  page one clear entry point for assistive technology navigating by
-  heading.
+- **A real heading.** The title renders as an `h1` by default (matching the
+  ambient heading level), giving the page one clear entry point for assistive
+  technology navigating by heading. Pass `titleAs="h2"` whenever the header
+  sits below another page title or inside a dialog body.
 - **Breadcrumbs keep their own semantics.** `PageHeader` does not wrap
   `breadcrumbs` in extra markup — pass a `Breadcrumb` component, which
   carries its own navigation landmark.
