@@ -3,7 +3,8 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { fitsCanvas, leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
-import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
+import { FitStage, ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { BAR_TOKEN, WINDOW_HEIGHT } from '@/storybook-docs/lib/focused-task.jsx';
 import { computedShadow, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { FRAME_LAYOUT } from '@/patterns/Frame/frameLayout';
@@ -34,7 +35,7 @@ export default {
 const rect = (el) => el.getBoundingClientRect();
 
 /** The stage under which the Panel cannot dock beside 720 of content, so it floats. */
-const sized = (story, width = FLOAT_STAGE) => <FitStage width={width}>{story}</FitStage>;
+const sized = (story, width = FLOAT_STAGE) => <FitStage width={width} scrollable>{story}</FitStage>;
 
 const frameParts = (canvasElement) => {
     const frame = canvasElement.querySelector('.plus-frame');
@@ -48,6 +49,8 @@ const frameParts = (canvasElement) => {
 
 /** A floating Panel: the overlay fill and shadow over the page, full height at the right edge, and no Blanket layer anywhere. */
 const expectFloating = async (canvasElement) => {
+    await expectNotInert(canvasElement);
+    await expectFullScale(canvasElement);
     const { frame, panel, surface } = frameParts(canvasElement);
     await waitFor(() => expect(panel(), 'the Panel is open').not.toBeNull());
     const el = panel();
@@ -70,8 +73,6 @@ export const TypeDetails = {
     name: 'Type: Details',
     render: () => sized(<DetailsFrame />),
     play: async ({ canvasElement }) => {
-        await expect(canvasElement.closest('[inert]')).toBeNull();
-        await expect(canvasElement.querySelector('[inert]:not([data-base-ui-inert])')).toBeNull();
         await expectFloating(canvasElement);
         const { frame, panel } = frameParts(canvasElement);
         await expect(panel(), 'named for the record').toHaveAccessibleName('Session details');
@@ -128,13 +129,13 @@ const ANATOMY_DETAILS_PARTS = [
 export const AnatomyDetails = {
     name: 'Anatomy: Details',
     render: () => (
-        <LiveAnatomy live width={FLOAT_STAGE} title="Details with its parts numbered" parts={ANATOMY_DETAILS_PARTS}>
+        <LiveAnatomy live scrollable width={FLOAT_STAGE} title="Details with its parts numbered" parts={ANATOMY_DETAILS_PARTS}>
             <DetailsFrame />
         </LiveAnatomy>
     ),
     play: async ({ canvasElement }) => {
-        await expect(canvasElement.closest('[inert]')).toBeNull();
-        await expect(canvasElement.querySelector('[inert]:not([data-base-ui-inert])')).toBeNull();
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await markersLevelWithParts(canvasElement, ANATOMY_DETAILS_PARTS);
         leadersCrossNoOtherPart(canvasElement, ANATOMY_DETAILS_PARTS);
         const { panel } = frameParts(canvasElement);
@@ -153,13 +154,13 @@ const ANATOMY_INBOX_PARTS = [
 export const AnatomyNotifications = {
     name: 'Anatomy: Notifications',
     render: () => (
-        <LiveAnatomy live width={FLOAT_STAGE} title="Notifications with its parts numbered" parts={ANATOMY_INBOX_PARTS}>
+        <LiveAnatomy live scrollable width={FLOAT_STAGE} title="Notifications with its parts numbered" parts={ANATOMY_INBOX_PARTS}>
             <InboxFrame />
         </LiveAnatomy>
     ),
     play: async ({ canvasElement }) => {
-        await expect(canvasElement.closest('[inert]')).toBeNull();
-        await expect(canvasElement.querySelector('[inert]:not([data-base-ui-inert])')).toBeNull();
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await markersLevelWithParts(canvasElement, ANATOMY_INBOX_PARTS);
         leadersCrossNoOtherPart(canvasElement, ANATOMY_INBOX_PARTS);
         const { panel } = frameParts(canvasElement);
@@ -176,20 +177,18 @@ export const AnatomyNotifications = {
 
 /* ------------------------------------------------------------ width story */
 
-/** The docs canvas is narrower than a desktop Frame, so the stage is laid out at `width` and drawn to fit: the Panel is always in view. Details is open on Ben Okafor's row. */
+/** The stage renders full size at `width` and scrolls horizontally if wider than the docs column: the Panel is always in view. Details is open on Ben Okafor's row. */
 const WidthStage = ({ width }) => (
-    <FitStage width={width}>
-        <div data-probe="stage" style={{ inlineSize: '100%', blockSize: WINDOW_HEIGHT }}>
-            <InAppFrame height="100%" panel={<DetailsPanel />} panelLabel="Session details" panelStorageKey={null} panelOpen>
-                <SessionsBehind />
-            </InAppFrame>
-        </div>
-    </FitStage>
+    <ScrollStage width={width} height={WINDOW_HEIGHT} data-probe="stage">
+        <InAppFrame height="100%" panel={<DetailsPanel />} panelLabel="Session details" panelStorageKey={null} panelOpen>
+            <SessionsBehind />
+        </InAppFrame>
+    </ScrollStage>
 );
 
 /** Lay the stage out at `px`: the Frame measures its own box, so resizing the holder is what a width drag does. */
 const setStageWidth = (canvasElement, px) => {
-    canvasElement.querySelector('[data-fit-stage] > div').style.inlineSize = `${px}px`;
+    canvasElement.querySelector('[data-probe="stage"]').style.inlineSize = `${px}px`;
 };
 
 const panelMode = (canvasElement, mode) => waitFor(() => expect(
@@ -204,6 +203,8 @@ const expectNoBlanket = (canvasElement) => expect(
 
 /** Docked: an edge line, the Page's own fill and no shadow. */
 const expectDocked = async (canvasElement) => {
+    await expectNotInert(canvasElement);
+    await expectFullScale(canvasElement);
     const { frame, panel } = frameParts(canvasElement);
     await panelMode(canvasElement, 'docked');
     await expect(getComputedStyle(panel()).boxShadow, 'docked: no shadow').toBe('none');
@@ -215,6 +216,8 @@ const expectDocked = async (canvasElement) => {
 
 /** Floating: over the Page on the overlay fill and shadow. */
 const expectOverlay = async (canvasElement) => {
+    await expectNotInert(canvasElement);
+    await expectFullScale(canvasElement);
     const { frame, panel } = frameParts(canvasElement);
     await panelMode(canvasElement, 'overlay');
     await expect(getComputedStyle(panel()).boxShadow, 'floating: the overlay shadow').toBe(computedShadow(frame, 'var(--ds-shadow-overlay)'));
@@ -311,6 +314,8 @@ export const KeyUnder1024 = {
     name: 'Key state: Under 1024',
     render: () => sized(<PanelFrame label="Session details" panel={<DetailsPanel />} />, FRAME_LAYOUT.dockMin - 124),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const { frame, panel } = frameParts(canvasElement);
         await waitFor(() => expect(panel()).not.toBeNull());
         const narrowest = tokenLength(frame, '--panel-min-width');

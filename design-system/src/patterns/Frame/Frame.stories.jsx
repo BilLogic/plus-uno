@@ -6,11 +6,12 @@ import { Blanket, Frame, PANEL_STORAGE_KEY, PatternCard, PatternModal, PatternSe
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { FRAME_LAYOUT } from './frameLayout';
 import { BrowserWindow, LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
-import { FitStage, ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { FitStage, ScreenStage, ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { DemoPageHeader } from '../Page/pageDemo.jsx';
 import { expectOverlayExit } from '@/storybook-docs/lib/overlay-motion-plays.js';
 import { AreaStage, DrillStack, FocusedFrameSwitch, StepStage, resolveStepAxis, useDrillStack } from '@/lib/navigationMotion';
 import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
+import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { BAR_TOKEN, FocusedType, STEPS_RAIL, TASK_STEPS, WINDOW_HEIGHT, stepItems } from '@/storybook-docs/lib/focused-task.jsx';
 import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
@@ -1544,16 +1545,14 @@ export const TypeDefault = {
     name: 'Type: Default',
     parameters: { layout: 'padded' },
     render: () => (
-        <div style={{ overflowX: 'auto' }}>
-            <div style={{ inlineSize: 1440 /* docs-literal: the X-Large stage, wide enough to dock the Sidebar and the AI panel */ }}>
-                <DefaultType withPanel />
-            </div>
-        </div>
+        <ScrollStage width={1440 /* docs-literal: the X-Large stage, wide enough to dock the Sidebar and the AI panel */}>
+            <DefaultType withPanel />
+        </ScrollStage>
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(canvasElement.closest('[inert]')).toBeNull();
-        await expect(canvasElement.querySelector('[inert]')).toBeNull();
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const p = parts(canvasElement);
         await waitFor(() => expect(p.sidebar(), 'the Sidebar docks').not.toBeNull());
         await expect(p.frame.querySelector('.plus-frame__panel'), 'the AI panel docks beside the Page').not.toBeNull();
@@ -1597,8 +1596,8 @@ export const TypeBare = {
     render: () => <BareSignIn />,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(canvasElement.closest('[inert]')).toBeNull();
-        await expect(canvasElement.querySelector('[inert]')).toBeNull();
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const p = parts(canvasElement);
         await expect(p.sidebar(), 'no Sidebar').toBeNull();
         await expect(p.toggle, 'so no toggle').toBeNull();
@@ -1635,14 +1634,14 @@ export const AnatomyDefault = {
     name: 'Anatomy: Default',
     parameters: { layout: 'padded' },
     render: () => (
-        <LiveAnatomy live width={1440 /* docs-literal: the X-Large stage */} title="The default Frame with its parts numbered" parts={ANATOMY_DEFAULT_PARTS}>
+        <LiveAnatomy live scrollable width={1440 /* docs-literal: the X-Large stage */} title="The default Frame with its parts numbered" parts={ANATOMY_DEFAULT_PARTS}>
             <DefaultType withPanel address="app.plus.org/students/maya-rodriguez" breadcrumbs={RECORD_CRUMBS} />
         </LiveAnatomy>
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(canvasElement.closest('[inert]')).toBeNull();
-        await expect(canvasElement.querySelector('[inert]')).toBeNull();
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await markersLevelWithParts(canvasElement, ANATOMY_DEFAULT_PARTS);
         leadersCrossNoOtherPart(canvasElement, ANATOMY_DEFAULT_PARTS);
         const ask = canvas.getByRole('textbox', { name: 'Ask' });
@@ -1656,14 +1655,14 @@ export const AnatomyFocused = {
     name: 'Anatomy: Focused',
     parameters: { layout: 'padded' },
     render: () => (
-        <LiveAnatomy live width={1024 /* docs-literal: the Large stage */} title="The focused Frame with its parts numbered" parts={ANATOMY_FOCUSED_PARTS}>
-            <FocusedType count={5} />
+        <LiveAnatomy live scrollable width={1024 /* docs-literal: the Large stage */} title="The focused Frame with its parts numbered" parts={ANATOMY_FOCUSED_PARTS}>
+            <FocusedType count={5} scrollable />
         </LiveAnatomy>
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(canvasElement.closest('[inert]')).toBeNull();
-        await expect(canvasElement.querySelector('[inert]')).toBeNull();
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await markersLevelWithParts(canvasElement, ANATOMY_FOCUSED_PARTS);
         leadersCrossNoOtherPart(canvasElement, ANATOMY_FOCUSED_PARTS);
         const back = canvas.getByRole('button', { name: 'Back' });
@@ -1673,13 +1672,15 @@ export const AnatomyFocused = {
     },
 };
 
-/** Steps down the left: five or more, a rail 256 wide, the bar at 48 with Cancel, Back and Next. */
+/** Steps down the left: five or more, a rail 256 wide, the bar at 48 with Back and Next. */
 export const FocusedStepsDown = {
     name: 'Focused: five steps, down the left',
     parameters: { layout: 'padded' },
-    render: () => <FocusedType count={5} start={0} />,
+    render: () => <FocusedType count={5} start={0} scrollable />,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const layout = canvasElement.querySelector('[data-probe="steps-layout"]');
         const steps = canvasElement.querySelector('[data-probe="steps"]');
         const body = steps.nextElementSibling;
@@ -1716,9 +1717,11 @@ export const FocusedStepsDown = {
 export const FocusedStepsAcross = {
     name: 'Focused: four steps, across the top',
     parameters: { layout: 'padded' },
-    render: () => <FocusedType count={4} start={0} />,
+    render: () => <FocusedType count={4} start={0} scrollable />,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const layout = canvasElement.querySelector('[data-probe="steps-layout"]');
         const steps = canvasElement.querySelector('[data-probe="steps"]');
         const body = steps.nextElementSibling;
@@ -1731,13 +1734,11 @@ export const FocusedStepsAcross = {
 
 /** A stage whose own width the control sets, with the AI panel open. */
 const WidthStage = ({ width, ...args }) => (
-    <div style={{ overflowX: 'auto' }}>
-        <div data-probe="stage" style={{ inlineSize: width, blockSize: WINDOW_HEIGHT }}>
-            <InAppFrame height="100%" panel={<ChatPanel />} panelLabel="AI chat" panelStorageKey={null} defaultPanelOpen {...args}>
-                <SkeletonSection title="Upcoming sessions" />
-            </InAppFrame>
-        </div>
-    </div>
+    <ScrollStage width={width} height={WINDOW_HEIGHT} data-probe="stage">
+        <InAppFrame height="100%" panel={<ChatPanel />} panelLabel="AI chat" panelStorageKey={null} defaultPanelOpen {...args}>
+            <SkeletonSection title="Upcoming sessions" />
+        </InAppFrame>
+    </ScrollStage>
 );
 
 /** Width behavior: drag through 1408, 1168, 1024 and 768 and the Sidebar and the AI panel dock, collapse or float. */
@@ -1750,6 +1751,8 @@ export const ResponsiveWidth = {
     },
     render: WidthStage,
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const p = panelParts(canvasElement);
         const stage = canvasElement.querySelector('[data-probe="stage"]');
         const setWidth = (px) => { stage.style.inlineSize = `${px}px`; };
@@ -1784,8 +1787,8 @@ export const KeyPanelCollapsesSidebar = {
     parameters: { layout: 'padded' },
     render: () => <AtWidth width={1200 /* docs-literal: between the docked-alone and docked-both widths */} />,
     play: async ({ canvasElement }) => {
-        await expect(canvasElement.closest('[inert]')).toBeNull();
-        await expect(canvasElement.querySelector('[inert]')).toBeNull();
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const p = panelParts(canvasElement);
         await sidebarIs(p, 'closed');
         await panelIs(p, 'docked');
@@ -1804,8 +1807,8 @@ export const KeyUnder1024 = {
     render: () => <AtWidth width={FRAME_LAYOUT.dockMin - 124} />,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(canvasElement.closest('[inert]')).toBeNull();
-        await expect(canvasElement.querySelector('[inert]:not([data-base-ui-inert])')).toBeNull();
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const p = panelParts(canvasElement);
         await panelIs(p, 'overlay');
         await expect(p.sidebar(), 'the Sidebar is not docked').toBeNull();
@@ -1815,7 +1818,7 @@ export const KeyUnder1024 = {
         await expect(ask).toHaveValue('Help');
         await userEvent.click(within(p.panel()).getByRole('button', { name: 'Close' }));
         await waitFor(() => expect(p.panel(), 'closing the AI panel unmounts it').toBeNull());
-        await expect(canvasElement.querySelector('[inert]')).toBeNull();
+        await expectNotInert(canvasElement);
         await userEvent.click(p.frame.querySelector('.plus-frame__toggle'));
         await waitFor(() => expect(p.sidebar(), 'the Sidebar opens as an overlay').not.toBeNull());
         await expect(getComputedStyle(p.sidebar()).position).toBe('absolute');

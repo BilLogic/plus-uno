@@ -5,7 +5,7 @@ import { Frame, PatternCard, PatternSection } from '@/patterns';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { SlideViews } from '@/lib/navigationMotion';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
-import { ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { ScreenStage, ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { WINDOW_HEIGHT } from '@/storybook-docs/lib/focused-task.jsx';
 import { FRAME_LAYOUT } from '../Frame/frameLayout';
 import {
@@ -30,6 +30,7 @@ import { DemoLabel, RECORD_CRUMBS, slotContent } from '@/storybook-docs/lib/patt
 import { StudentsTable } from '@/storybook-docs/lib/view-bar.jsx';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
+import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 
 const col = { display: 'flex', flexDirection: 'column', gap: '24px' };
 
@@ -182,6 +183,8 @@ export const HeaderAndBanner = {
     },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const header = canvas.getByRole('heading', { level: 1, name: 'Sessions' }).closest('header');
         const content = canvas.getByRole('heading', { level: 2, name: 'Upcoming sessions' }).closest('.plus-pattern-section');
         const gap = px(probe(canvasElement, 'marginTop', 'var(--page-stack-md)'));
@@ -295,8 +298,8 @@ export const TypeDefault = {
     render: () => <AreaPage />,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(canvasElement.closest('[inert]')).toBeNull();
-        await expect(canvasElement.querySelector('[inert]')).toBeNull();
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const cap = parseFloat(getComputedStyle(canvasElement).getPropertyValue('--content-max-width')) || FRAME_LAYOUT.contentCap;
         await expect(contentBox(canvasElement).getBoundingClientRect().width, 'the content box stops at the cap').toBe(cap);
         const btn = canvas.getByRole('button', { name: 'View calendar' });
@@ -311,8 +314,8 @@ export const TypeFullWidth = {
     render: () => <AreaPage full />,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(canvasElement.closest('[inert]')).toBeNull();
-        await expect(canvasElement.querySelector('[inert]')).toBeNull();
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await expect(contentBox(canvasElement).getBoundingClientRect().width, 'the content runs past the cap').toBeGreaterThan(FRAME_LAYOUT.contentCap);
         await expect(canvasElement.querySelector('[data-page-stage]').offsetWidth, 'at the stage width').toBe(TYPE_STAGE);
         const btn = canvas.getByRole('button', { name: 'View calendar' });
@@ -322,11 +325,11 @@ export const TypeFullWidth = {
 };
 
 /** The record page with everything the header can carry. */
-const RecordPage = ({ banner = false }) => {
+const RecordPage = ({ banner = false, scrollable = false }) => {
     const [tab, setTab] = useState('overview');
     const [status, setStatus] = useState('upcoming');
     return (
-        <PageStage width={PAGE_STAGE} height={480}>
+        <PageStage scrollable={scrollable} width={PAGE_STAGE} height={480}>
             <DemoPageHeader
                 breadcrumb={RECORD_CRUMBS}
                 title="Maya Rodriguez"
@@ -341,29 +344,35 @@ const RecordPage = ({ banner = false }) => {
     );
 };
 
+const playRecordAnatomy = async (canvasElement) => {
+    const canvas = within(canvasElement);
+    await expectNotInert(canvasElement);
+    await expect(canvas.getByRole('heading', { name: 'Upcoming sessions' })).toBeInTheDocument();
+
+    await userEvent.click(canvas.getByRole('tab', { name: 'Sessions' }));
+    await expect(canvas.getByRole('table', { name: 'Sessions' })).toBeInTheDocument();
+
+    await userEvent.click(canvas.getByRole('tab', { name: 'Notes' }));
+    await expect(canvas.getByRole('heading', { name: 'Tutor notes' })).toBeInTheDocument();
+
+    await userEvent.click(canvas.getByRole('tab', { name: 'Overview' }));
+    await expect(canvas.getByRole('heading', { name: 'Upcoming sessions' })).toBeInTheDocument();
+
+    await markersLevelWithParts(canvasElement, ANATOMY_PARTS);
+    leadersCrossNoOtherPart(canvasElement, ANATOMY_PARTS);
+};
+
 /** Every part once: breadcrumb, title with its StatusTag, description, actions, page tabs, banner, content. Markers sit in the nearest gutter. */
 export const AnatomyRecord = {
     name: 'Anatomy',
     render: () => (
-        <LiveAnatomy live width={PAGE_STAGE} parts={ANATOMY_PARTS} title="A record page with its parts numbered">
-            <RecordPage banner />
+        <LiveAnatomy live scrollable width={PAGE_STAGE} parts={ANATOMY_PARTS} title="A record page with its parts numbered">
+            <RecordPage banner scrollable />
         </LiveAnatomy>
     ),
     play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        await expect(canvas.getByRole('heading', { name: 'Upcoming sessions' })).toBeInTheDocument();
-
-        await userEvent.click(canvas.getByRole('tab', { name: 'Sessions' }));
-        await expect(canvas.getByRole('table', { name: 'Sessions' })).toBeInTheDocument();
-
-        await userEvent.click(canvas.getByRole('tab', { name: 'Notes' }));
-        await expect(canvas.getByRole('heading', { name: 'Tutor notes' })).toBeInTheDocument();
-
-        await userEvent.click(canvas.getByRole('tab', { name: 'Overview' }));
-        await expect(canvas.getByRole('heading', { name: 'Upcoming sessions' })).toBeInTheDocument();
-
-        await markersLevelWithParts(canvasElement, ANATOMY_PARTS);
-        leadersCrossNoOtherPart(canvasElement, ANATOMY_PARTS);
+        await expectFullScale(canvasElement);
+        await playRecordAnatomy(canvasElement);
     },
 };
 
@@ -377,14 +386,16 @@ export const AnatomyRecordScaledDown = {
             </LiveAnatomy>
         </div>
     ),
-    play: AnatomyRecord.play,
+    play: async ({ canvasElement }) => {
+        await playRecordAnatomy(canvasElement);
+    },
 };
 
 /** Area page, one collection: the title alone; the collection's Primary ends its view bar. */
 export const ScenarioArea = {
     name: 'Area page, one collection',
     render: () => (
-        <PageStage>
+        <PageStage scrollable>
             <DemoPageHeader title="Students" />
             <PatternSection title="Students" type="tabs-only" tabs={<ViewBarWithAdd />}>
                 <StudentsTable count={4} />
@@ -393,6 +404,8 @@ export const ScenarioArea = {
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await expect(canvas.getAllByRole('heading', { level: 1 }), 'one h1').toHaveLength(1);
         await expect(canvasElement.querySelector('.plus-page-header-actions'), 'no page actions on an area page').toBeNull();
         const add = canvas.getByRole('button', { name: 'Add student' });
@@ -410,7 +423,7 @@ const REFLECTION_ROWS = [
 export const ScenarioSeveralSections = {
     name: 'Area page, several Sections',
     render: () => (
-        <PageStage height={420}>
+        <PageStage scrollable height={420}>
             <DemoPageHeader title="Home" />
             <CardsSection title="Upcoming sessions" description="Next 7 days" actions={<Button text="View calendar" onClick={() => {}} />} />
             <PatternSection title="Needs follow-up" actions={<Button text="Review all" onClick={() => {}} />}>
@@ -420,6 +433,8 @@ export const ScenarioSeveralSections = {
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await expect(canvas.getAllByRole('heading', { level: 1 })).toHaveLength(1);
         await expect(canvas.getAllByRole('heading', { level: 2 }).map((h) => h.textContent), 'Sections open at h2').toEqual(['Upcoming sessions', 'Needs follow-up']);
     },
@@ -430,7 +445,7 @@ const ScenarioRecordTabsDemo = () => {
     const [tab, setTab] = useState('sessions');
     const [status, setStatus] = useState('upcoming');
     return (
-        <PageStage height={420}>
+        <PageStage scrollable height={420}>
             <DemoPageHeader breadcrumb={RECORD_CRUMBS} title="Maya Rodriguez" description="Grade 8 · Math" actions={<PageActions />} tabs={<PageTabs active={tab} onSelect={setTab} />} />
             <RecordTabSection tab={tab} status={status} onStatusChange={setStatus} />
         </PageStage>
@@ -442,6 +457,8 @@ export const ScenarioRecordTabs = {
     render: () => <ScenarioRecordTabsDemo />,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await expect(canvas.getAllByRole('tablist'), 'one tab system: the page tabs').toHaveLength(1);
         await expect(canvas.getByRole('tab', { name: 'Sessions' })).toHaveAttribute('aria-selected', 'true');
         const trigger = canvas.getByRole('button', { name: 'Status: Upcoming' });
@@ -465,7 +482,7 @@ export const ScenarioRecordTabs = {
 export const ScenarioTwoLevels = {
     name: 'Two levels down',
     render: () => (
-        <PageStage>
+        <PageStage scrollable>
             <DemoPageHeader breadcrumb={DEEP_CRUMBS} title="Session on Oct 14" actions={<PageActions />} />
             <PatternSection title="Notes">
                 <PatternCard title="Oct 14 reflection" description="Worked through distributive property and two-step equations together." />
@@ -473,7 +490,10 @@ export const ScenarioTwoLevels = {
         </PageStage>
     ),
     play: async ({ canvasElement }) => {
-        const nav = within(canvasElement).getByRole('navigation', { name: 'Breadcrumb' });
+        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        const nav = canvas.getByRole('navigation', { name: 'Breadcrumb' });
         await expect(within(nav).getAllByRole('link').map((a) => a.textContent), 'every parent, each a link').toEqual(['Students', 'Maya Rodriguez']);
     },
 };
@@ -482,13 +502,15 @@ export const ScenarioTwoLevels = {
 export const KeyBanner = {
     name: 'Page banner',
     render: () => (
-        <PageStage>
+        <PageStage scrollable>
             <DemoPageHeader title="Sessions" />
             <PageBanner />
             <CardsSection title="Upcoming sessions" />
         </PageStage>
     ),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const banner = canvasElement.querySelector('.plus-banner');
         const header = canvasElement.querySelector('.plus-page-header');
         await expect(canvasElement.querySelectorAll('.plus-banner'), 'one banner at a time').toHaveLength(1);
@@ -505,25 +527,26 @@ export const ResponsiveWidth = {
         width: { control: { type: 'range', min: 720, max: 1600, step: 8 }, description: "The page's own width, in px.", table: { category: 'Docs' } },
     },
     render: ({ width }) => (
-        <div style={{ overflowX: 'auto' }}>
-            <div data-probe="stage" style={{ inlineSize: width }}>
-                <div style={{ height: 480 }}>
-                    <Frame>
-                        <DemoPageHeader title="Sessions" />
-                        <CardsSection title="Upcoming sessions" />
-                    </Frame>
-                </div>
+        <ScrollStage width={width} data-probe="stage">
+            <div style={{ height: 480 }}>
+                <Frame>
+                    <DemoPageHeader title="Sessions" />
+                    <CardsSection title="Upcoming sessions" />
+                </Frame>
             </div>
-        </div>
+        </ScrollStage>
     ),
     play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const stage = canvasElement.querySelector('[data-probe="stage"]');
         const box = () => contentBox(canvasElement).getBoundingClientRect().width;
         stage.style.inlineSize = `${FRAME_LAYOUT.contentCap + 160}px`;
         await waitFor(() => expect(box(), 'past the cap the content stops at it').toBe(FRAME_LAYOUT.contentCap));
         stage.style.inlineSize = `${FRAME_LAYOUT.contentCap - 160}px`;
         await waitFor(() => expect(box(), 'under the cap the content takes the width').toBeLessThan(FRAME_LAYOUT.contentCap));
-        await expect(within(canvasElement).getAllByRole('heading', { level: 1 }), 'one h1 at every width').toHaveLength(1);
+        await expect(canvas.getAllByRole('heading', { level: 1 }), 'one h1 at every width').toHaveLength(1);
     },
 };
 

@@ -1,6 +1,8 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { ComponentExample } from '@/storybook-docs/ds-docs-layout.jsx';
+import { ComponentExample, exampleSlug } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard } from '@/storybook-docs/lib/template-page.jsx';
 import { ReadingNoFooter, ReadingWithFooter } from './PanelCases.jsx';
 
@@ -18,6 +20,8 @@ vi.mock('@storybook/addon-docs/blocks', async () => {
     };
 });
 
+const panelMdx = readFileSync(join(__dirname, 'Panel.mdx'), 'utf8');
+
 describe('Panel live cases', () => {
     it('ReadingNoFooter renders header and body with no footer button', () => {
         render(<ReadingNoFooter />);
@@ -31,19 +35,37 @@ describe('Panel live cases', () => {
         expect(screen.getByRole('button', { name: 'Done' })).toBeInTheDocument();
     });
 
-    it('links Panel TypeCard anchors to the matching ComponentExample ids', () => {
+    it('links Panel TypeCard anchors to unique ComponentExample and heading ids in Panel.mdx', () => {
+        const typeCards = [...panelMdx.matchAll(/<TypeCard\s+[^>]*to="#([^"]+)"[^>]*title="([^"]+)"/g)]
+            .map(([, to, title]) => ({ to, title }));
+        const exampleTitles = [...panelMdx.matchAll(/<ComponentExample\s+[^>]*title="([^"]+)"/g)]
+            .map(([, title]) => title);
+        const examplesTab = panelMdx.split('<DocsTab tab="examples">')[1].split('</DocsTab>')[0];
+        const headingSlugs = [
+            ...exampleTitles.map(exampleSlug),
+            ...[...examplesTab.matchAll(new RegExp('^#{2,3}\\s+([^\\n<]+)', 'gm'))].map(([, h]) => exampleSlug(h)),
+        ];
+
+        expect(new Set(headingSlugs).size).toBe(headingSlugs.length);
+        typeCards.forEach(({ to }) => expect(headingSlugs).toContain(to));
+
         const Stub = { render: () => <div /> };
         render(
             <div>
-                <TypeCard of={Stub} to="#details" title="Details">Details</TypeCard>
-                <TypeCard of={Stub} to="#notifications" title="Notifications">Notifications</TypeCard>
-                <ComponentExample of={Stub} title="Details" description="Details" />
-                <ComponentExample of={Stub} title="Notifications" description="Notifications" />
+                {typeCards.map(({ to, title }) => (
+                    <TypeCard key={title} of={Stub} to={`#${to}`} title={title}>{title}</TypeCard>
+                ))}
+                {exampleTitles.map((title) => (
+                    <ComponentExample key={title} of={Stub} title={title} description={title} />
+                ))}
             </div>,
         );
-        expect(screen.getByRole('link', { name: /Details/ })).toHaveAttribute('href', '#details');
-        expect(screen.getByRole('link', { name: /Notifications/ })).toHaveAttribute('href', '#notifications');
-        expect(within(document.body).getByRole('heading', { level: 3, name: 'Details' })).toHaveAttribute('id', 'details');
-        expect(within(document.body).getByRole('heading', { level: 3, name: 'Notifications' })).toHaveAttribute('id', 'notifications');
+
+        for (const { to, title } of typeCards) {
+            expect(screen.getByRole('link', { name: new RegExp(title) })).toHaveAttribute('href', `#${to}`);
+        }
+        for (const title of exampleTitles) {
+            expect(within(document.body).getByRole('heading', { level: 3, name: title })).toHaveAttribute('id', exampleSlug(title));
+        }
     });
 });

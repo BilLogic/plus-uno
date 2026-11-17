@@ -11,7 +11,7 @@ const BarSurface = ({ children }) => (
         className="sb-unstyled"
         style={{
             inlineSize: '100%',
-            padding: 'var(--space-100) var(--space-150)',
+            padding: 'var(--pad-y-sm) var(--pad-x-md)',
             borderTop: 'var(--border-width-default) solid var(--ds-border)',
             background: 'var(--ds-surface)',
         }}

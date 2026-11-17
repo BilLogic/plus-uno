@@ -13,7 +13,7 @@ import {
     Heading,
 } from '@/components';
 import { Frame, PatternCard, PatternSection } from '@/patterns';
-import { ReflowStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { ReflowStage, ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
 
 /**
  * Page-template docs helpers: the page header assembled from its parts, a
@@ -190,24 +190,18 @@ export const RecordTabSection = ({ tab = 'sessions', status = 'upcoming', onStat
  * token to none on the content box).
  */
 export const PageStage = ({ full = false, scrollable = false, width = SCENARIO_STAGE, height = STAGE_HEIGHT, children }) => {
-    if (scrollable) {
-        return (
-            <div style={{ overflowX: 'auto' }}>
-                <div data-page-stage style={{ inlineSize: width, height }}>
-                    <Frame style={full ? { '--content-max-width': 'none' } : undefined}>
-                        {children}
-                    </Frame>
-                </div>
-            </div>
-        );
-    }
-    return (
+    const frame = (
+        <Frame style={full ? { '--content-max-width': 'none' } : undefined}>
+            {children}
+        </Frame>
+    );
+    return scrollable ? (
+        <ScrollStage width={width} height={height} data-page-stage>{frame}</ScrollStage>
+    ) : (
         <ReflowStage width={width}>
             {(layout) => (
                 <div data-page-stage style={{ inlineSize: layout, height }}>
-                    <Frame style={full ? { '--content-max-width': 'none' } : undefined}>
-                        {children}
-                    </Frame>
+                    {frame}
                 </div>
             )}
         </ReflowStage>
