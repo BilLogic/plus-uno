@@ -88,6 +88,47 @@ describe('DropdownMenu floating behavior', () => {
         expect(screen.getByTestId('controlled-actions-menu')).toBeInTheDocument();
     });
 
+    it('keeps a controlled menu open on ignored outside clicks and still closes on Escape', async () => {
+        const user = userEvent.setup();
+        function ControlledCard() {
+            const [isOpen, setIsOpen] = useState(true);
+            const insideRef = React.useRef(false);
+            return (
+                <div>
+                    <div
+                        onClickCapture={() => { insideRef.current = true; }}
+                        onKeyDownCapture={() => { insideRef.current = true; }}
+                    >
+                        <DropdownMenu
+                            trigger={<Button>Actions</Button>}
+                            isOpen={isOpen}
+                            onOpenChange={(next) => {
+                                if (next || insideRef.current) {
+                                    insideRef.current = false;
+                                    setIsOpen(next);
+                                }
+                            }}
+                            testId="controlled-outside-menu"
+                        >
+                            <button role="menuitem" type="button">Rename</button>
+                        </DropdownMenu>
+                    </div>
+                    <button type="button">Outside target</button>
+                </div>
+            );
+        }
+        render(<ControlledCard />);
+        expect(screen.getByTestId('controlled-outside-menu')).toBeInTheDocument();
+
+        await user.click(screen.getByRole('button', { name: 'Outside target' }));
+        expect(screen.getByTestId('controlled-outside-menu')).toBeInTheDocument();
+
+        const item = screen.getByRole('menuitem', { name: 'Rename' });
+        item.focus();
+        await user.keyboard('{Escape}');
+        await waitFor(() => expect(screen.queryByTestId('controlled-outside-menu')).toBeNull());
+    });
+
     it('honors an explicit container over the preview container and preserves the trigger ref', async () => {
         const user = userEvent.setup();
         const preview = document.createElement('div');

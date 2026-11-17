@@ -438,11 +438,11 @@ export const BestPracticesLive = {
             await userEvent.keyboard('{Escape}');
             const doTrigger = within(doCard).getByRole('button', { name: 'Session actions' });
             await waitFor(() => expect(within(doCard).queryByRole('menuitem', { name: doItems[0] })).toBeNull());
-            await expect(doTrigger).toHaveFocus();
+            await waitFor(() => expect(doTrigger).toHaveFocus());
             await expect(within(dontCard).getByRole('menuitem', { name: dontFirst })).toBeVisible();
 
             await userEvent.click(doTrigger);
-            await waitFor(() => expect(within(doCard).getByRole('menuitem', { name: doItems[0] })).toBeVisible());
+            await waitFor(() => expect(within(doCard).getByRole('menuitem', { name: doItems[0] })).toHaveFocus());
             await userEvent.keyboard('{ArrowDown}');
             await waitFor(() => expect(within(doCard).getByRole('menuitem', { name: doItems[1] })).toHaveFocus());
 
@@ -451,7 +451,7 @@ export const BestPracticesLive = {
             await waitFor(() => expect(within(dontCard).queryByRole('menuitem', { name: dontFirst })).toBeNull());
             await expect(within(doCard).getByRole('menuitem', { name: doItems[0] })).toBeVisible();
             await userEvent.click(within(dontCard).getByRole('button', { name: 'Session actions' }));
-            await waitFor(() => expect(within(dontCard).getByRole('menuitem', { name: dontFirst })).toBeVisible());
+            await waitFor(() => expect(within(dontCard).getByRole('menuitem', { name: dontFirst })).toHaveFocus());
         }
     },
 };

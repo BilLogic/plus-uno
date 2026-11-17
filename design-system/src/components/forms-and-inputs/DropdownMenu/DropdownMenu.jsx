@@ -43,6 +43,13 @@ const DropdownMenu = ({
         onOpenChange,
     });
 
+    const handleControlledOpenChange = (next, details) => {
+        handleOpenChange(next);
+        if (!next && isOpen !== undefined) {
+            details?.cancel?.();
+        }
+    };
+
     const floating = useFloatingOverlay({
         trigger,
         triggerProps: {
@@ -53,7 +60,7 @@ const DropdownMenu = ({
         placement,
         container,
         collisionAvoidance: { side: shouldFlip ? 'flip' : 'none' },
-        onOpenChange: handleOpenChange,
+        onOpenChange: handleControlledOpenChange,
     });
 
     const labelId = useId();

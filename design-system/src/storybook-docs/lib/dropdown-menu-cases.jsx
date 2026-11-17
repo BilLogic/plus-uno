@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button, ButtonItem, DropdownMenu, Icon } from '@/components';
 import { DocsOverlayBoundary } from './docs-overlay-boundary.jsx';
 
@@ -16,12 +16,15 @@ const noop = () => {};
 export const LiveMenu = ({ label = 'Session actions', defaultOpen = true, children }) => {
     const [isOpen, setIsOpen] = useState(defaultOpen);
     const insideGestureRef = useRef(false);
+    const gestureTimerRef = useRef(0);
     const markInsideGesture = () => {
         insideGestureRef.current = true;
-        queueMicrotask(() => {
+        window.clearTimeout(gestureTimerRef.current);
+        gestureTimerRef.current = window.setTimeout(() => {
             insideGestureRef.current = false;
-        });
+        }, 0);
     };
+    useEffect(() => () => window.clearTimeout(gestureTimerRef.current), []);
 
     return (
         <DocsOverlayBoundary fit={false} containHeight>

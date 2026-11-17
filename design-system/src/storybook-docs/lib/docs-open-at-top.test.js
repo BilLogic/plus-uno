@@ -95,5 +95,29 @@ describe('guardBoundaryMountFocus', () => {
             outside.remove();
         }
     });
+
+    it('keeps guarding a boundary when an input event targets outside it', () => {
+        const boundary = document.createElement('div');
+        const inside = document.createElement('button');
+        const outside = document.createElement('button');
+        boundary.appendChild(inside);
+        document.body.append(boundary, outside);
+
+        let release = () => {};
+        try {
+            release = guardBoundaryMountFocus(boundary);
+            outside.dispatchEvent(new Event('keydown', { bubbles: true }));
+            inside.focus({ preventScroll: false });
+            expect(document.activeElement).not.toBe(inside);
+
+            inside.dispatchEvent(new Event('keydown', { bubbles: true }));
+            inside.focus({ preventScroll: false });
+            expect(document.activeElement).toBe(inside);
+        } finally {
+            release();
+            boundary.remove();
+            outside.remove();
+        }
+    });
 });
 

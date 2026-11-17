@@ -79,16 +79,19 @@ export const guardBoundaryMountFocus = (node) => {
 
     let active = true;
     let raf = 0;
+    const onInput = (event) => {
+        if (event?.target instanceof win.Node && node.contains(event.target)) release();
+    };
     const release = () => {
         if (!active) return;
         active = false;
         mountingBoundaries.delete(node);
         if (mountingBoundaries.size === 0) restoreBoundaryFocus?.();
-        for (const type of INPUT_EVENTS) win.removeEventListener(type, release, true);
+        for (const type of INPUT_EVENTS) win.removeEventListener(type, onInput, true);
         if (typeof win.cancelAnimationFrame === 'function') win.cancelAnimationFrame(raf);
     };
 
-    for (const type of INPUT_EVENTS) win.addEventListener(type, release, true);
+    for (const type of INPUT_EVENTS) win.addEventListener(type, onInput, true);
     queueMicrotask(() => {
         queueMicrotask(() => {
             queueMicrotask(() => {
