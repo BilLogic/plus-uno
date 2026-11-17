@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
-import { Button, DynamicTable, Tooltip } from '@/components';
+import { Button } from '@/components';
 import { PatternSection } from '@/patterns';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
-import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
-import { STUDENTS, StudentsTable } from '@/storybook-docs/lib/view-bar.jsx';
-import { LONG_NOTE, LONG_TITLE } from './overflowDemo.jsx';
+import { StudentsTable } from '@/storybook-docs/lib/view-bar.jsx';
+import { ClippedCell, clipStyle, LONG_TITLE } from './overflowDemo.jsx';
 
 /**
  * The live do and don't examples on the Overflow pattern page, composed from
- * `PatternSection`, `DynamicTable`, `StudentsTable`, `ClippedCell`, `Button`
- * and `CaseSurface`.
+ * `PatternSection`, `StudentsTable`, `ClippedCell`, `Button` and `CaseSurface`.
  */
 
 const narrowSectionStyle = { maxInlineSize: 'var(--card-min-width-md)' };
@@ -29,92 +27,24 @@ export const WrappedSectionTitleCase = () => (
 export const ClippedSectionTitleCase = () => (
     <CaseSurface>
         <div style={narrowSectionStyle}>
-            <PatternSection
-                title={(
-                    <span
-                        style={{
-                            display: 'block',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
-                        }}
-                    >
-                        {LONG_TITLE}
-                    </span>
-                )}
-            >
+            <PatternSection title={<span style={clipStyle}>{LONG_TITLE}</span>}>
                 <StudentsTable count={2} />
             </PatternSection>
         </div>
     </CaseSurface>
 );
 
-/** Do: a clipped cell opens its full text in a Tooltip on hover and focus. */
+/** Do: a clipped cell opens its full text in a Tooltip on hover and focus only while clipped. */
 export const ClippedCellOpensTextCase = () => (
-    <DocsOverlayBoundary fit={false} containHeight>
-        <CaseSurface style={{ paddingBlockStart: 'calc(var(--page-pad) * 3)' }}>
-            <DynamicTable
-                label="Session notes"
-                head={{ cells: [{ key: 'name', content: 'Student', width: '30%' }, { key: 'note', content: 'Note', width: '70%' }] }}
-                rows={STUDENTS.slice(0, 3).map(([name], i) => ({
-                    key: name,
-                    cells: [
-                        { key: `${name}-n`, content: name },
-                        {
-                            key: `${name}-t`,
-                            content: i === 0 ? (
-                                <Tooltip text={LONG_NOTE} placement="top" show>
-                                    <span
-                                        className="plus-table-cell-text"
-                                        tabIndex={0}
-                                        style={{
-                                            display: 'block',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            whiteSpace: 'nowrap',
-                                        }}
-                                    >
-                                        {LONG_NOTE}
-                                    </span>
-                                </Tooltip>
-                            ) : 'On track',
-                        },
-                    ],
-                }))}
-            />
-        </CaseSurface>
-    </DocsOverlayBoundary>
+    <CaseSurface>
+        <ClippedCell padded={false} />
+    </CaseSurface>
 );
 
 /** Don't: a clipped cell without a Tooltip leaves the rest of the value unreadable. */
 export const ClippedCellNoTextCase = () => (
     <CaseSurface>
-        <DynamicTable
-            label="Session notes"
-            head={{ cells: [{ key: 'name', content: 'Student', width: '30%' }, { key: 'note', content: 'Note', width: '70%' }] }}
-            rows={STUDENTS.slice(0, 3).map(([name], i) => ({
-                key: name,
-                cells: [
-                    { key: `${name}-n`, content: name },
-                    {
-                        key: `${name}-t`,
-                        content: i === 0 ? (
-                            <span
-                                className="plus-table-cell-text"
-                                style={{
-                                    display: 'block',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap',
-                                }}
-                            >
-                                {LONG_NOTE}
-                            </span>
-                        ) : 'On track',
-                    },
-                ],
-            }))}
-        />
+        <ClippedCell padded={false} withTooltip={false} />
     </CaseSurface>
 );
 

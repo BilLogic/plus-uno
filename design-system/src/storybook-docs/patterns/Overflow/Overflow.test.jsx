@@ -28,15 +28,34 @@ describe('Overflow live cases and TypeCard links', () => {
         expect(clipped.style.whiteSpace).toBe('nowrap');
     });
 
-    it('ClippedCellOpensTextCase keeps the full note in a tooltip while ClippedCellNoTextCase omits the tooltip', () => {
-        const { unmount } = render(<ClippedCellOpensTextCase />);
-        expect(screen.getByRole('tooltip')).toHaveTextContent(LONG_NOTE);
-        unmount();
+    it('ClippedCellOpensTextCase opens its tooltip on focus only while clipped, while ClippedCellNoTextCase omits the tooltip', async () => {
+        const originalScrollWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'scrollWidth');
+        Object.defineProperty(HTMLElement.prototype, 'scrollWidth', {
+            configurable: true,
+            get() {
+                return this.textContent === LONG_NOTE ? 400 : 0;
+            },
+        });
+        try {
+            const { unmount } = render(<ClippedCellOpensTextCase />);
+            expect(screen.queryByRole('tooltip')).toBeNull();
+            const doNote = screen.getByText(LONG_NOTE);
+            expect(doNote).toHaveAttribute('tabindex', '0');
+            doNote.focus();
+            expect(await screen.findByRole('tooltip')).toHaveTextContent(LONG_NOTE);
+            unmount();
 
-        render(<ClippedCellNoTextCase />);
-        expect(screen.queryByRole('tooltip')).toBeNull();
-        const note = screen.getByText(LONG_NOTE);
-        expect(note.getAttribute('tabindex')).toBeNull();
+            render(<ClippedCellNoTextCase />);
+            expect(screen.queryByRole('tooltip')).toBeNull();
+            const dontNote = screen.getByText(LONG_NOTE);
+            expect(dontNote.getAttribute('tabindex')).toBeNull();
+        } finally {
+            if (originalScrollWidth) {
+                Object.defineProperty(HTMLElement.prototype, 'scrollWidth', originalScrollWidth);
+            } else {
+                delete HTMLElement.prototype.scrollWidth;
+            }
+        }
     });
 
     it('ShowMoreWithCountCase expands from 2 to 6 rows on click while FadedListCase offers no expand control', async () => {

@@ -39,6 +39,7 @@ export default {
 };
 
 const rect = (el) => el.getBoundingClientRect();
+const bodyOf = (canvasElement) => within(canvasElement.ownerDocument.body);
 const staged = (story, width) => <FitStage width={width} scrollable>{story}</FitStage>;
 
 /** True while an element's text is cut: its content is wider than its box. */
@@ -81,7 +82,7 @@ export const TruncatedCell = {
     play: async ({ canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
-        await waitFor(() => expect(within(document.body).getAllByRole('tooltip').some((tip) => tip.textContent === LONG_NOTE), 'the picture shows the full note in its Tooltip').toBe(true));
+        await waitFor(() => expect(bodyOf(canvasElement).getAllByRole('tooltip').some((tip) => tip.textContent === LONG_NOTE), 'the picture shows the full note in its Tooltip').toBe(true));
         const clipped = textOf(canvasElement, LONG_NOTE);
         await expect(getComputedStyle(clipped).textOverflow, 'the cell ends in an ellipsis').toBe('ellipsis');
         await expect(getComputedStyle(clipped).whiteSpace, 'on one line').toBe('nowrap');
@@ -92,6 +93,7 @@ export const TruncatedCell = {
         await expect(isClipped(fits), 'a short note is not cut').toBe(false);
         await expect(fits.getAttribute('tabindex'), 'an unclipped cell is not a tab stop').toBeNull();
         await fitsCanvas(canvasElement);
+        await settleAnimations(canvasElement);
     },
 };
 
@@ -106,7 +108,7 @@ export const TruncatedCellTooltip = {
         await expect(clipped.textContent, 'the full text is always in the DOM').toBe(LONG_NOTE);
         const stop = clipped.getAttribute('tabindex') !== null ? clipped : clipped.closest('[tabindex="0"]');
         stop.focus();
-        await waitFor(() => expect(within(document.body).getAllByRole('tooltip').some((tip) => tip.textContent === LONG_NOTE), 'the Tooltip opens on focus').toBe(true));
+        await waitFor(() => expect(bodyOf(canvasElement).getAllByRole('tooltip').some((tip) => tip.textContent === LONG_NOTE), 'the Tooltip opens on focus').toBe(true));
         await settleAnimations(canvasElement);
     },
 };
@@ -124,7 +126,7 @@ export const UnclippedCellNoTooltip = {
         await expect(short.closest('[title]'), 'no title attribute either').toBeNull();
         await userEvent.hover(short);
         await new Promise((resolve) => setTimeout(resolve, 400));
-        await expect(within(document.body).queryAllByRole('tooltip').some((tip) => tip.textContent === 'Starts with number lines'), 'no Tooltip for a value that fits').toBe(false);
+        await expect(bodyOf(canvasElement).queryAllByRole('tooltip').some((tip) => tip.textContent === 'Starts with number lines'), 'no Tooltip for a value that fits').toBe(false);
     },
 };
 

@@ -33,6 +33,13 @@ export const LONG_NOTE = 'Ava found equivalent fractions easy but stalled on mix
 export const LONG_TAG = 'Fractions, decimals and percentages review';
 export const LONG_STATUS = 'Waiting on the supervisor to review';
 
+export const clipStyle = {
+    display: 'block',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+};
+
 const frame = { padding: 'var(--page-pad)' };
 
 /** A Section title and a SectionMessage: both take more lines, never an ellipsis. */
@@ -58,31 +65,35 @@ export const HeldNote = ({ note, held, open }) => (
  * `held` opens the clipped cell's Tooltip for a docs picture, and only once the
  * picture's own element exists, so the Tooltip measures the laid-out cell.
  */
-export const ClippedCell = ({ note = LONG_NOTE, held = false, padded = true }) => {
+export const ClippedCell = ({ note = LONG_NOTE, held = false, padded = true, withTooltip = true }) => {
     const [mountRef, mount] = useLayerMount();
-    return (
-        <DocsOverlayBoundary fit={false} containHeight>
-            <div
-                ref={mountRef}
-                style={{
-                    ...(padded ? frame : undefined),
-                    paddingBlockStart: held ? 'calc(var(--page-pad) * 3)' : padded ? frame.padding : undefined,
-                }}
-            >
-                <DynamicTable
-                    label="Session notes"
-                    head={{ cells: [{ key: 'name', content: 'Student', width: '30%' }, { key: 'note', content: 'Note', width: '70%' }] }}
-                    rows={STUDENTS.slice(0, 3).map(([name], i) => ({
-                        key: name,
-                        cells: [
-                            { key: `${name}-n`, content: name },
-                            { key: `${name}-t`, content: i === 0 ? <HeldNote note={note} held={held} open={Boolean(mount)} /> : 'On track' },
-                        ],
-                    }))}
-                />
-            </div>
-        </DocsOverlayBoundary>
+    const noteCell = withTooltip
+        ? <HeldNote note={note} held={held} open={Boolean(mount)} />
+        : <span className="plus-table-cell-text" style={clipStyle}>{note}</span>;
+    const table = (
+        <div
+            ref={mountRef}
+            style={{
+                ...(padded ? frame : undefined),
+                paddingBlockStart: held ? 'calc(var(--page-pad) * 3)' : padded ? frame.padding : undefined,
+            }}
+        >
+            <DynamicTable
+                label="Session notes"
+                head={{ cells: [{ key: 'name', content: 'Student', width: '30%' }, { key: 'note', content: 'Note', width: '70%' }] }}
+                rows={STUDENTS.slice(0, 3).map(([name], i) => ({
+                    key: name,
+                    cells: [
+                        { key: `${name}-n`, content: name },
+                        { key: `${name}-t`, content: i === 0 ? noteCell : 'On track' },
+                    ],
+                }))}
+            />
+        </div>
     );
+    return withTooltip
+        ? <DocsOverlayBoundary fit={false} containHeight>{table}</DocsOverlayBoundary>
+        : table;
 };
 
 /** A Tag and a StatusTag past their widths: each ends in an ellipsis. */

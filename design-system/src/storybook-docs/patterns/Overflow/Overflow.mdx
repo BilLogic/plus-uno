@@ -63,15 +63,15 @@ Pick by what the text is. Wrap when it must be read whole; truncate when the roo
 
 ## Key cases
 
-<ComponentExample of={OverflowStories.WrapTitlesAndErrors} title="Wrap: titles and messages" />
+<ComponentExample of={OverflowStories.WrapTitlesAndErrors} title="Wrap: titles and messages" description="A narrow Section title and its error message both run onto multiple lines so every word stays visible." />
 
 <ComponentExample of={OverflowStories.TruncatedTags} title="A tag" description="A Tag stops at its maxWidth, 180 by default, and a Status tag at 200. A clipped tag becomes a tab stop so its Tooltip opens on focus." />
 
-<ComponentExample of={OverflowStories.TruncatedCell} title="A cell" description="Tab to the clipped note to open its Tooltip; a short cell in the same column is not a tab stop." />
+<ComponentExample of={OverflowStories.TruncatedCellTooltip} title="A cell" description="A table cell stays one line and ends in an ellipsis. A short cell in the same column is not a tab stop and has no Tooltip. Hover or tab to the clipped note to open its Tooltip." />
 
 <ComponentExample of={OverflowStories.FoldedTagGroup} title="Fold: a Tag group" description="Click +n to open the menu of folded tags." />
 
-<ComponentExample of={OverflowStories.PagedInFooter} title="Page a table" description="Use the pager in the Section footer to switch pages." />
+<ComponentExample of={OverflowStories.PagedInFooter} title="Page a table" description="A table pages instead of growing, keeping the range and pager at the end of the Section footer. Use the pager to switch pages." />
 
 The three cases below are Planned <PlannedTag />: no component carries them yet.
 
