@@ -31,7 +31,7 @@ authored half, counted rather than assumed.
 | [Breadcrumb](Breadcrumb/index.md) | 6 | ✅ | ✅ | ✅ |
 | [Link](Link/index.md) | 7 | ✅ | ✅ | ✅ |
 | [Pagination](Pagination/index.md) | 11 | ✅ | ✅ | ✅ |
-| [Sidebar](Sidebar/index.md) | 18 | ✕ | ✕ | ✕ |
+| [Sidebar](Sidebar/index.md) | 19 | ✕ | ✕ | ✕ |
 | [Tabs](Tabs/index.md) | 9 | ✅ | ✅ | ✅ |
 
 **Authored coverage:** When to use 4/5 (80%) · Correct/incorrect 4/5 (80%) · Accessibility 4/5 (80%)

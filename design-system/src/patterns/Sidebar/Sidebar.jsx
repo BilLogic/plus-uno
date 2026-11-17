@@ -97,6 +97,7 @@ const PatternSidebar = ({
     onCloseAllTabs,
     modulesLeft = 0,
     lessonsLeft = 0,
+    footer,
     account,
     onProfile,
     onSignOut,
@@ -554,6 +555,7 @@ const PatternSidebar = ({
                 <span ref={glideRef} className="plus-pattern-sidebar__glide" aria-hidden="true" />
                 {groups.map(renderGroup)}
             </nav>
+            {footer ? <div className="plus-pattern-sidebar__footer">{footer}</div> : null}
             {account ? (
                 <SidebarAccount
                     name={account.name}
@@ -629,6 +631,8 @@ PatternSidebar.propTypes = {
     modulesLeft: PropTypes.number,
     /** Assigned lessons a tutor has left; the `lessons` row counts it */
     lessonsLeft: PropTypes.number,
+    /** Content pinned inside the sidebar between the navigation list and the account row */
+    footer: PropTypes.node,
     /** The signed-in person, for the account row. Their `id` keys the remembered sections. */
     account: PropTypes.shape({
         id: PropTypes.string,
