@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+import { Breadcrumb, PageHeader } from '@/components';
+import { HeadingLevelContext } from '@/lib/headingLevel';
 import { Page, PatternSection } from '@/patterns';
 import {
     CardsSection,
@@ -10,6 +12,7 @@ import {
     SessionsTable,
     STUDENT_SESSION_CARDS,
 } from '../../../patterns/Page/pageDemo.jsx';
+import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { RECORD_CRUMBS } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { StudentsTable, ViewBar } from '@/storybook-docs/lib/view-bar.jsx';
@@ -17,20 +20,21 @@ import { NamesDo, TabLabelDo, TabLabelDont } from '../../../patterns/Sidebar/Sid
 
 /**
  * The Navigation pattern's examples, drawn with the real Sidebar, Tabs,
- * Breadcrumb and PageHeader. Every picture renders the state its heading
- * names through props: the selected area, the drilled-in record page, the
- * page tabs on their Sessions tab. The Sidebar pictures are the Sidebar
- * docs' own examples (inert, hidden from assistive technology), reused so
- * the pages show one thing. Nothing here runs a play.
+ * Breadcrumb and PageHeader. Every example renders the state its heading
+ * names through props and stays interactive: the selected area, the drilled-in
+ * record page, the page tabs on their Sessions tab. The Sidebar examples are
+ * the Sidebar docs' own live examples, reused so the pages show one thing.
  *
- *   AreaPicture        the Sidebar with an area selected
- *   OpenItemsPicture   open items under Sessions, named by time and who
- *   OpenItemsDont      the same item carrying everything, cut off
- *   ViewsPicture       pill views in a Section's view bar
- *   PageTabsPicture    page tabs under a record's title
- *   DrillPicture       the record page after a drill-in, breadcrumb above the title
- *   AreaPagePicture    an area page: no breadcrumb
- *   TabsUnderPicture   page tabs with the Section's views as one PopupSelect
+ *   AreaPicture              the Sidebar with an area selected
+ *   OpenItemsPicture         open items under Sessions, named by time and who
+ *   OpenItemsDont            the same item carrying everything, cut off
+ *   ViewsPicture             pill views in a Section's view bar
+ *   PageTabsPicture          page tabs under a record's title
+ *   DrillPicture             the record page after a drill-in, breadcrumb above the title
+ *   AreaPagePicture          an area page: no breadcrumb
+ *   TabsUnderPicture         page tabs with the Section's views as one PopupSelect
+ *   BreadcrumbOnRecordCase   live Do example: breadcrumb above a record's title
+ *   BreadcrumbOnAreaCase     live Don't example: breadcrumb on an area page
  */
 
 /** The width a picture lays out at, in px: docs geometry. */
@@ -45,23 +49,23 @@ export const SIDEBAR_STAGE = 320; // docs-literal
 const pad = { padding: 'var(--page-pad)', boxSizing: 'border-box' };
 
 /** Tier 1: the Sidebar with an area selected. */
-export const AreaPicture = () => (
+export const AreaPicture = ({ label = 'Navigation areas example' } = {}) => (
     <div style={{ ...pad, inlineSize: 'var(--card-min-width-md)' }}>
-        <NamesDo />
+        <NamesDo label={label} />
     </div>
 );
 
 /** Tier 1b: sessions opened earlier, as temporary items under Sessions. */
-export const OpenItemsPicture = () => (
+export const OpenItemsPicture = ({ label = 'Open items — do' } = {}) => (
     <div style={{ ...pad, inlineSize: 'var(--card-min-width-md)' }}>
-        <TabLabelDo />
+        <TabLabelDo label={label} />
     </div>
 );
 
 /** Don't: an open item that carries everything, so the time it is found by is cut off. */
-export const OpenItemsDont = () => (
+export const OpenItemsDont = ({ label = "Open items — don't" } = {}) => (
     <div style={{ ...pad, inlineSize: 'var(--card-min-width-md)' }}>
-        <TabLabelDont />
+        <TabLabelDont label={label} />
     </div>
 );
 
@@ -144,3 +148,63 @@ export const TabsUnderPicture = () => {
         </BrowserWindow>
     );
 };
+
+/** Live Do: a breadcrumb above the record page's title, parents only. */
+export const BreadcrumbOnRecordCase = () => (
+    <CaseSurface border="none" padding="none" surface={false}>
+        <HeadingLevelContext.Provider value={5}>
+            <Page
+                padding="md"
+                header={(
+                    <PageHeader
+                        title="Maya Rodriguez"
+                        titleAs="h4"
+                        breadcrumbs={(
+                            <Breadcrumb
+                                label="Record page breadcrumb"
+                                items={[
+                                    { text: 'Students', href: '#students', onClick: () => {} },
+                                    { text: 'Maya Rodriguez' },
+                                ]}
+                            />
+                        )}
+                    />
+                )}
+            >
+                <PatternSection title="Sessions">
+                    <SessionsTable />
+                </PatternSection>
+            </Page>
+        </HeadingLevelContext.Provider>
+    </CaseSurface>
+);
+
+/** Live Don't: a breadcrumb on an area page, where there is nothing to climb out of. */
+export const BreadcrumbOnAreaCase = () => (
+    <CaseSurface border="none" padding="none" surface={false}>
+        <HeadingLevelContext.Provider value={5}>
+            <Page
+                padding="md"
+                header={(
+                    <PageHeader
+                        title="Students"
+                        titleAs="h4"
+                        breadcrumbs={(
+                            <Breadcrumb
+                                label="Area page breadcrumb"
+                                items={[
+                                    { text: 'Home', href: '#home', onClick: () => {} },
+                                    { text: 'Students' },
+                                ]}
+                            />
+                        )}
+                    />
+                )}
+            >
+                <PatternSection title="Students" type="tabs-only">
+                    <StudentsTable count={3} />
+                </PatternSection>
+            </Page>
+        </HeadingLevelContext.Provider>
+    </CaseSurface>
+);

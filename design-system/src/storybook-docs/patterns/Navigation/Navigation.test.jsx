@@ -1,0 +1,52 @@
+import { join } from 'node:path';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
+import { expectTypeCardAnchors } from '@/storybook-docs/lib/type-card-anchors.jsx';
+import {
+    BreadcrumbOnAreaCase,
+    BreadcrumbOnRecordCase,
+    OpenItemsDont,
+    OpenItemsPicture,
+} from './navigationDemo.jsx';
+
+vi.mock('@storybook/addon-docs/blocks', () => import('@/storybook-docs/lib/addon-docs-blocks-mock.jsx'));
+
+describe('Navigation live cases and links', () => {
+    it('BreadcrumbOnRecordCase and BreadcrumbOnAreaCase render non-inert live PageHeader breadcrumbs', () => {
+        const { container, unmount } = render(<BreadcrumbOnRecordCase />);
+        expect(container.querySelector('[inert], [aria-hidden="true"] [role="navigation"]')).toBeNull();
+        const recordNav = screen.getByRole('navigation', { name: 'Record page breadcrumb' });
+        expect(recordNav).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: 'Students' })).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Maya Rodriguez' })).toBeInTheDocument();
+        unmount();
+
+        render(<BreadcrumbOnAreaCase />);
+        const areaNav = screen.getByRole('navigation', { name: 'Area page breadcrumb' });
+        expect(areaNav).toBeInTheDocument();
+        expect(screen.getByRole('link', { name: 'Home' })).toBeInTheDocument();
+        expect(screen.getByRole('heading', { level: 4, name: 'Students' })).toBeInTheDocument();
+    });
+
+    it('OpenItemsPicture and OpenItemsDont render interactive, non-inert Sidebar open items', async () => {
+        const user = userEvent.setup();
+        const { container } = render(
+            <div>
+                <OpenItemsPicture />
+                <OpenItemsDont />
+            </div>,
+        );
+        expect(container.querySelector('[inert]')).toBeNull();
+        const navs = screen.getAllByRole('navigation');
+        expect(navs.map((nav) => nav.getAttribute('aria-label'))).toEqual(['Open items — do', "Open items — don't"]);
+
+        const item = screen.getByRole('button', { name: '4:00 PM · Ms. Ortiz' });
+        await user.click(item);
+        expect(item).toHaveAttribute('aria-current', 'page');
+    });
+
+    it('links every TypeCard anchor to a unique ComponentExample heading id in Navigation.mdx', () => {
+        expectTypeCardAnchors(join(__dirname, 'Navigation.mdx'), 4);
+    });
+});
