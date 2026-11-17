@@ -87,6 +87,7 @@ export const PlacementPage = {
         await userEvent.clear(student);
         await userEvent.click(save);
         await expect(await canvas.findByText('Enter the student’s name.'), 'pressing Save validates inline').toBeInTheDocument();
+        await settleAnimations(canvasElement);
         await fitsCanvas(canvasElement);
     },
 };
