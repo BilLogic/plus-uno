@@ -87,8 +87,7 @@ export const KindList = {
 export const KindAction = {
     name: 'Kind: A button action',
     render: () => kindCard(<LoadingAction band="shape" />),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         const save = canvas.getByRole('button', { name: 'Save session' });
@@ -140,8 +139,7 @@ export const KindMenu = {
 export const KeyUnderOneSecond = {
     name: 'Key: Under 1 s',
     render: () => staged(<LoadingList band="under" />),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(canvas.getByRole('table'), 'the old rows stay').toBeInTheDocument();
@@ -156,8 +154,7 @@ export const KeyUnderOneSecond = {
 export const KeyOverTenSeconds = {
     name: 'Key: Past 10 s, a Flag',
     render: () => staged(<LoadingList band="over" reduced={false} />),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(bars(canvasElement).length, 'the skeleton stays').toBeGreaterThan(0);
@@ -187,8 +184,7 @@ export const KeyLongJob = {
 export const KeyMenuFailed = {
     name: 'Key: A menu that could not load',
     render: () => staged(<LoadingMenu band="over" />),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await waitFor(() => expect(canvas.getByText("Couldn't load options")).toBeInTheDocument());

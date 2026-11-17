@@ -244,34 +244,41 @@ export const LoadingTimeline = ({ kind = 'list', seconds = 2.5, reduced }) => {
     );
 };
 
-/** Demo of LoadThenReveal for Foundations/Motion: cross-fades the table skeleton to real rows and staggers the header, table and actions on arrival. */
+/**
+ * Interactive Load content demo: holds layout with Skeletons, then cross-fades
+ * real content in load order (headings & summary -> data table -> primary action).
+ */
 export const LoadingRevealDemo = () => {
     const [loading, setLoading] = useState(true);
     const skeleton = ({ reduced }) => (
         <div aria-hidden="true" style={stack}>
             <Skeleton shape="text" width="40%" isShimmering={!reduced} />
             <SkeletonRows rows={4} reduced={reduced} />
+            <Skeleton width={140} height="var(--height-250)" radius="element-radius-sm" isShimmering={!reduced} />
         </div>
     );
     return (
-        <div style={stack}>
-            <div style={{ display: 'flex', gap: 'var(--inline-md)' }}>
+        <div style={{ padding: 'var(--page-pad)', ...stack }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <Button
                     text={loading ? 'Finish loading' : 'Reload'}
-                    appearance="primary"
-                    onClick={() => setLoading((v) => !v)}
+                    appearance="default"
+                    spacing="compact"
+                    onClick={() => setLoading((prev) => !prev)}
                 />
             </div>
             <PatternSection title="Students" description="Lincoln Middle">
                 <LoadThenReveal loading={loading} skeleton={skeleton}>
-                    <LoadRevealSlot index={0}>
-                        <ViewBar views={['All students']} filters={null} primary={null} />
+                    <LoadRevealSlot>
+                        <p style={{ margin: 0, font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
+                            4 active students scheduled this week
+                        </p>
                     </LoadRevealSlot>
-                    <LoadRevealSlot index={1}>
+                    <LoadRevealSlot>
                         <StudentsTable count={4} />
                     </LoadRevealSlot>
-                    <LoadRevealSlot index={2}>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <LoadRevealSlot>
+                        <div>
                             <Button text="Export roster" appearance="primary" onClick={noop} />
                         </div>
                     </LoadRevealSlot>

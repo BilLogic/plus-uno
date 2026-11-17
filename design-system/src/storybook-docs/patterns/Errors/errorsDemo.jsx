@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 
 import { Banner, Button, ButtonItem, DropdownMenu, EmptyState, Flag, FlagGroup, IconButton, TextField } from '@/components';
 import { Page, PatternSection } from '@/patterns';
-import { DemoPageHeader } from '../../../patterns/Page/pageDemo.jsx';
+import { DemoPageHeader, SessionsTable } from '../../../patterns/Page/pageDemo.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
-import { StudentsTable, ViewBar, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
+import { ViewBar, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
 
 /**
  * The Errors pattern's examples: where a failure shows, drawn with the real
@@ -35,22 +35,23 @@ const WINDOW = 420; // docs-literal
 const noop = () => {};
 const pad = { padding: 'var(--page-pad)', boxSizing: 'border-box' };
 
+export const isValidEmail = (value) => value.includes('@') && value.includes('.');
+
 /** One field after blur: invalid, the message under it saying what to fix. */
-export const FieldError = () => {
+export const FieldError = ({ padded = true }) => {
     const [email, setEmail] = useState('ana@school');
-    const invalid = !email.includes('.') || !email.includes('@');
-    return (
-        <div style={{ ...pad, maxInlineSize: 'var(--card-min-width-lg)' }}>
-            <TextField
-                label="School email"
-                isRequired
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                isInvalid={invalid}
-                errorMessage={invalid ? 'Enter a full email, like name@school.org' : undefined}
-            />
-        </div>
+    const invalid = !isValidEmail(email);
+    const field = (
+        <TextField
+            label="School email"
+            isRequired
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            isInvalid={invalid}
+            errorMessage={invalid ? 'Enter a full email, like name@school.org' : undefined}
+        />
     );
+    return padded ? <div style={{ ...pad, maxInlineSize: 'var(--card-min-width-lg)' }}>{field}</div> : field;
 };
 
 /** A Section whose content could not load: the view bar stays, the body holds the error with Try again. */
@@ -72,13 +73,14 @@ export const LoadFailure = ({ onRetry, padded = true }) => {
                         setView(next);
                         if (next === 'This week') setRecovered(false);
                     }}
+                    searchLabel="Search sessions"
                     filters={null}
                     primary={null}
                 />
             )}
         >
             {showingTable ? (
-                <StudentsTable count={4} sortable />
+                <SessionsTable status={view === 'Next week' ? 'past' : 'upcoming'} />
             ) : (
                 <EmptyState
                     spacing="compact"

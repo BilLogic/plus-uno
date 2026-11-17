@@ -1,5 +1,5 @@
 import React from 'react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
@@ -38,8 +38,7 @@ const noTooltipCopy = async (canvasElement) => {
 export const PlaceField = {
     name: 'Place: A field',
     render: () => staged(<FieldError />, PLACE_STAGE),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         const field = canvas.getByLabelText(/School email/);
@@ -47,6 +46,10 @@ export const PlaceField = {
         await expect(canvas.getByText('Enter a full email, like name@school.org'), 'the message says what to fix').toBeInTheDocument();
         await noTooltipCopy(canvasElement);
         await fitsCanvas(canvasElement);
+        await userEvent.clear(field);
+        await userEvent.type(field, 'ana@school.org');
+        await expect(field).not.toHaveAttribute('aria-invalid', 'true');
+        await waitFor(() => expect(canvas.queryByText('Enter a full email, like name@school.org')).toBeNull());
         await settleAnimations(canvasElement);
     },
 };
@@ -115,8 +118,7 @@ export const PlacePageCondition = {
 export const PlaceMenu = {
     name: 'Place: A menu’s options',
     render: () => staged(<MenuError />, PLACE_STAGE),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(await canvas.findByText("Couldn't load options"), 'the row says what failed').toBeInTheDocument();
@@ -125,6 +127,7 @@ export const PlaceMenu = {
         await fitsCanvas(canvasElement);
         await userEvent.click(retry);
         await expect(await canvas.findByRole('menuitem', { name: 'Edit' })).toBeInTheDocument();
+        await settleAnimations(canvasElement);
     },
 };
 
@@ -134,14 +137,17 @@ export const PlaceMenu = {
 export const KeyBlockedSubmit = {
     name: 'Key case: Blocked submit',
     render: () => staged(<FormInModal initial={EMPTY} marked height="fill" stageHeight={680} />),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(canvas.queryAllByRole('dialog'), 'one dialog, never a second').toHaveLength(1);
-        await expect(canvas.getByLabelText(/Student/), 'the field is marked').toHaveAttribute('aria-invalid', 'true');
+        const student = canvas.getByLabelText(/Student/);
+        await expect(student, 'the field is marked').toHaveAttribute('aria-invalid', 'true');
         await expect(canvas.getByText('Choose a site.'), 'the message is on the field').toBeInTheDocument();
         await fitsCanvas(canvasElement);
+        await userEvent.type(student, 'Ana Ruiz');
+        await expect(student).not.toHaveAttribute('aria-invalid', 'true');
+        await waitFor(() => expect(canvas.queryByText('Enter the student’s name.')).toBeNull());
         await settleAnimations(canvasElement);
     },
 };
@@ -167,8 +173,7 @@ export const KeyRejectedSubmit = {
 export const KeySectionFailed = {
     name: 'Key case: A Section that could not load',
     render: () => staged(<InPage />),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(canvas.getByRole('heading', { name: 'Lincoln Middle', level: 1 }), 'the page around it is up').toBeInTheDocument();
@@ -179,6 +184,7 @@ export const KeySectionFailed = {
         await expect(canvas.getByRole('table')).toBeVisible();
         await userEvent.click(canvas.getByRole('tab', { name: 'Next week' }));
         await expect(canvas.getByRole('tab', { name: 'Next week' })).toHaveAttribute('aria-selected', 'true');
+        await settleAnimations(canvasElement);
     },
 };
 
@@ -186,8 +192,7 @@ export const KeySectionFailed = {
 export const KeyFlagOnPage = {
     name: 'Key case: A failed save in the background',
     render: () => staged(<FlagOnPage />),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(canvas.getByRole('alert')).toBeInTheDocument();

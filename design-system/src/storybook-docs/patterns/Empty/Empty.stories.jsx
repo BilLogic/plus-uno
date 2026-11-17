@@ -4,6 +4,7 @@ import { expect, userEvent, within } from 'storybook/test';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
+import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import { EmptyType, FullPage, InCard, InPanel, InTable, SMALL_STAGE, STAGE, TYPE_STAGE } from './emptyDemo.jsx';
 
 /**
@@ -41,9 +42,8 @@ const keepsTheBasics = async (canvasElement, { action }) => {
 export const TypeFirstUse = {
     name: 'Type: First use',
     render: () => staged(box('first'), TYPE_STAGE),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await keepsTheBasics(canvasElement, { action: true });
-        const canvas = within(canvasElement);
         const add = canvas.getByRole('button', { name: 'Add students' });
         await expect(add.className, 'the one action is Primary').toContain('primary');
         await userEvent.click(add);
@@ -98,8 +98,7 @@ export const TypeNoAccess = {
 export const PlaceFullPage = {
     name: 'Place: A full page',
     render: () => staged(<FullPage />),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         const [title, empty] = canvas.getAllByRole('heading');
@@ -144,8 +143,7 @@ export const PlaceCard = {
 export const PlacePanel = {
     name: 'Place: In a Panel',
     render: () => staged(<InPanel />, SMALL_STAGE),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(canvas.getByRole('heading', { name: 'This session no longer exists' })).toBeInTheDocument();
@@ -163,8 +161,7 @@ export const PlacePanel = {
 export const KeyNoMatchesInTable = {
     name: 'Key: No matches in a table',
     render: () => staged(<InTable kind="matches" />),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(canvas.queryByRole('table'), 'the table is replaced whole').toBeNull();
@@ -182,6 +179,7 @@ export const KeyNoMatchesInTable = {
         await expect(canvas.getByRole('tab', { name: 'Needs follow-up' })).toHaveAttribute('aria-selected', 'true');
         await userEvent.click(canvas.getByRole('tab', { name: 'All students' }));
         await expect(canvas.getByRole('heading', { name: 'No students match these filters' })).toBeVisible();
+        await settleAnimations(canvasElement);
     },
 };
 
@@ -189,11 +187,10 @@ export const KeyNoMatchesInTable = {
 export const KeyLoadFailure = {
     name: 'Key: A load failure',
     render: () => staged(<InTable kind="cant" />),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
-        await expect(canvas.getByRole('heading', { name: "Couldn't load sessions" }), 'the error sits in the empty-state slot').toBeInTheDocument();
+        await expect(canvas.getByRole('heading', { name: "Couldn't load students" }), 'the error sits in the empty-state slot').toBeInTheDocument();
         const retry = canvas.getByRole('button', { name: 'Try again' });
         await expect(retry).toBeInTheDocument();
         await expect(canvas.queryByRole('table')).toBeNull();

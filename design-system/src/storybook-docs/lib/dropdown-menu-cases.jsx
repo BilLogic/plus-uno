@@ -13,7 +13,14 @@ const noop = () => {};
  * only closes when interacted with inside its own card (trigger click, row pick,
  * or Escape), never when another card is clicked.
  */
-export const LiveMenu = ({ label = 'Session actions', defaultOpen = true, children }) => {
+export const LiveMenu = ({
+    label = 'Session actions',
+    defaultOpen = true,
+    minWidth = 'var(--width-1500)',
+    trigger,
+    children,
+    ...menuProps
+}) => {
     const [isOpen, setIsOpen] = useState(defaultOpen);
     const insideGestureRef = useRef(false);
     const gestureTimerRef = useRef(0);
@@ -44,8 +51,9 @@ export const LiveMenu = ({ label = 'Session actions', defaultOpen = true, childr
                         }
                     }}
                     placement="bottom-start"
-                    minWidth="var(--width-1500)"
-                    trigger={<Button text={label} iconAfter={<Icon name="chevron-down" size={12} />} />}
+                    minWidth={minWidth}
+                    trigger={trigger ?? <Button text={label} iconAfter={<Icon name="chevron-down" size={12} />} />}
+                    {...menuProps}
                 >
                     {children}
                 </DropdownMenu>

@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { Button, DynamicTable, EmptyState, Pagination, Table } from '@/components';
 import { PatternSection } from '@/patterns';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
-import { STUDENT_HEAD, StudentsTable, ViewBar, studentRows } from '@/storybook-docs/lib/view-bar.jsx';
+import { ResetExampleButton } from '@/storybook-docs/lib/reset-example.jsx';
+import { StudentsTable, ViewBar } from '@/storybook-docs/lib/view-bar.jsx';
+import { CATEGORIES, QuickFilter, narrow } from '../Filtering/filteringDemo.jsx';
 
 /**
  * The live do and don't examples on the Empty pattern page, composed from
  * `PatternSection`, `EmptyState`, `DynamicTable`, `Table`, `Pagination`,
- * `ViewBar` and `Button`.
+ * `ViewBar`, `QuickFilter` and `Button`.
  */
 
 /** Do: say what belongs here, why it is empty, and give the one action that fills it. */
@@ -18,7 +20,7 @@ export const WhatBelongsHereCase = () => {
             <PatternSection
                 title="Students"
                 description="Lincoln Middle"
-                actions={added ? <Button text="Reset" appearance="subtle" onClick={() => setAdded(false)} /> : undefined}
+                actions={added ? <ResetExampleButton onReset={() => setAdded(false)} /> : undefined}
             >
                 {added ? (
                     <StudentsTable count={3} sortable />
@@ -47,11 +49,24 @@ export const BareStringCase = () => (
     </CaseSurface>
 );
 
+const FILTERED_HEAD = {
+    cells: ['Name', 'Grade', 'Subject'].map((content) => ({ key: content.toLowerCase(), content, isSortable: true })),
+};
+
+const NO_MATCHES_FILTERS = { grade: ['Grade 6'], subject: ['Math'] };
+const CLEARED_FILTERS = { grade: [], subject: [] };
+
 /** Do: replace the whole table with the empty state while the view bar stays above. */
 export const ReplacedTableCase = () => {
     const [view, setView] = useState('All students');
-    const [filtered, setFiltered] = useState(true);
-    const rows = filtered ? [] : studentRows(4, { view });
+    const [filters, setFilters] = useState(NO_MATCHES_FILTERS);
+    const pickFilter = (id, next) => setFilters((current) => ({ ...current, [id]: next }));
+    const matching = narrow(filters).slice(0, 4);
+    const visible = view === 'Needs follow-up' ? matching.filter((_, index) => index % 2 === 1) : matching;
+    const rows = visible.map(([name, grade, , subject]) => ({
+        key: name,
+        cells: [{ key: name, content: name }, { key: grade, content: grade }, { key: subject, content: subject }],
+    }));
 
     return (
         <CaseSurface>
@@ -64,9 +79,14 @@ export const ReplacedTableCase = () => {
                         activeView={view}
                         onViewChange={(next) => {
                             setView(next);
-                            setFiltered(next === 'All students');
+                            setFilters(next === 'All students' ? NO_MATCHES_FILTERS : CLEARED_FILTERS);
                         }}
-                        filters={null}
+                        filters={(
+                            <>
+                                <QuickFilter category={CATEGORIES.grade} value={filters} onPick={pickFilter} />
+                                <QuickFilter category={CATEGORIES.subject} value={filters} onPick={pickFilter} />
+                            </>
+                        )}
                         search={false}
                         more={false}
                         primary={null}
@@ -74,7 +94,7 @@ export const ReplacedTableCase = () => {
                 )}
             >
                 <DynamicTable
-                    head={STUDENT_HEAD}
+                    head={FILTERED_HEAD}
                     rows={rows}
                     label="Students"
                     state={rows.length === 0 ? 'no results' : undefined}
@@ -84,7 +104,7 @@ export const ReplacedTableCase = () => {
                             icon="magnifying-glass"
                             header="No students match these filters"
                             description="Nothing matches Grade 6 and Math. Reset the filters to see every student."
-                            primaryAction={<Button text="Reset filters" appearance="default" spacing="compact" onClick={() => setFiltered(false)} />}
+                            primaryAction={<Button text="Reset filters" appearance="default" spacing="compact" onClick={() => setFilters(CLEARED_FILTERS)} />}
                         />
                     )}
                     isFixedSize

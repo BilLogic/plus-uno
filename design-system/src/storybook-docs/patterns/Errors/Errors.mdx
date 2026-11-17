@@ -58,19 +58,19 @@ Give each failure one home near its cause. Key cases shows the two submit failur
 
 ## Key cases
 
-<ComponentExample of={ErrorsStories.KeyBlockedSubmit} title="Blocked submit" description={<>A missing field: the error on the field and focus on the first one. The Modal stays open; never a second dialog. A single shake is Planned <PlannedTag />.</>} />
+<ComponentExample of={ErrorsStories.KeyBlockedSubmit} title="Blocked submit" description={<>Missing fields keep the Modal open and focus the first error. Fill Student and Site, then click Save session to clear them. A single shake is Planned <PlannedTag />.</>} />
 
-<ComponentExample of={ErrorsStories.KeyRejectedSubmit} title="Rejected submit" description={<>The server said no: a danger SectionMessage at the top of the form, announced when it appears, plus the field errors it names. Scrolling it into view is Planned <PlannedTag />.</>} />
+<ComponentExample of={ErrorsStories.KeyRejectedSubmit} title="Rejected submit" description={<>A server refusal sits in a danger SectionMessage above the fields. Edit and click Save session to retry. Scrolling it into view is Planned <PlannedTag />.</>} />
 
-<ComponentExample of={ErrorsStories.KeySectionFailed} title="A Section that could not load" description="The rest of the page works. The Section's body shows the error in its empty-state slot with Try again; the view bar stays." />
+<ComponentExample of={ErrorsStories.KeySectionFailed} title="A Section that could not load" description="Click Try again or switch view tabs; the rest of the page stays live." />
 
-<ComponentExample of={ErrorsStories.PlaceNoAccess} title="No access" description="When a view cannot open for this person, the empty-state slot explains who can grant access and leaves out unavailable buttons." />
+<ComponentExample of={ErrorsStories.PlaceNoAccess} title="No access" />
 
-<ComponentExample of={ErrorsStories.KeyFlagOnPage} title="A failed save in the background" description="The person moved on; the Flag finds them at the top right, stays until Try again resolves it." />
+<ComponentExample of={ErrorsStories.KeyFlagOnPage} title="A failed save in the background" description="Click Try again on the Flag to finish the save." />
 
-<ComponentExample of={ErrorsStories.PlacePageCondition} title="The whole page" description="A condition across the entire page mounts a persistent danger Banner with no dismiss button." />
+<ComponentExample of={ErrorsStories.PlacePageCondition} title="The whole page" />
 
-<ComponentExample of={ErrorsStories.PlaceMenu} title="A menu's options" description="An open DropdownMenu shows the failure and Retry inside the menu list." />
+<ComponentExample of={ErrorsStories.PlaceMenu} title="A menu's options" description="Click Retry in the menu to load the options." />
 
 </div>
 

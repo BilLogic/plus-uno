@@ -20,6 +20,7 @@ describe('Errors live cases and TypeCard links', () => {
         await user.clear(field);
         await user.type(field, 'ana@school.org');
         expect(field).not.toHaveAttribute('aria-invalid', 'true');
+        expect(screen.queryByText('Enter a full email, like name@school.org')).toBeNull();
         unmount();
 
         render(<BorderAndTooltipCase />);
