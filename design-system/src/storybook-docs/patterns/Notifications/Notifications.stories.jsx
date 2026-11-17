@@ -8,20 +8,22 @@ import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { Flag, FlagGroup } from '@/components';
 import { Acknowledge } from '../../../patterns/PatternModal/modalDemo.jsx';
 import {
-    FlagOnPage,
-    FlagStack,
-    FlagTopRight,
-    FlagUndo,
-    FlagWithActions,
+    FlagOnPageCase,
+    FlagStackCase,
+    FlagTopRightCase,
+    FlagUndoCase,
+    FlagWithActionsCase,
+    TierFrameCase,
+    TierPageCase,
+    TierSectionCase,
+} from './NotificationsCases.jsx';
+import {
     INBOX_STAGE,
     InboxInSidebar,
     MustStay,
     PLACE_STAGE,
     SeverityRow,
     STAGE,
-    TierFrame,
-    TierPage,
-    TierSection,
 } from './notificationsDemo.jsx';
 
 /**
@@ -41,39 +43,36 @@ export default {
     parameters: { layout: 'padded' },
 };
 
-const staged = (story, width = STAGE) => <FitStage width={width}>{story}</FitStage>;
+const staged = (story, width = STAGE) => <FitStage width={width} scrollable>{story}</FitStage>;
 
 /* ---------------------------------------------------------------- carriers */
 
 /** A Flag: a passing notice at the top right, its title naming the event and one line for the next step. */
 export const CarrierFlag = {
     name: 'Carrier: Flag',
-    render: () => staged(<FlagTopRight />, PLACE_STAGE),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    render: () => staged(<FlagTopRightCase />, PLACE_STAGE),
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(canvas.getByText('Session logged'), 'the title names the event').toBeInTheDocument();
         await expect(canvas.getByText(/supervisor will see it Friday/), 'one line gives the next step').toBeInTheDocument();
         await expect(canvas.getByRole('status'), 'a success Flag is a polite status').toBeInTheDocument();
+        await userEvent.click(canvas.getByRole('button', { name: 'Dismiss flag' }));
+        await waitFor(() => expect(canvas.queryByText('Session logged')).toBeNull());
         await fitsCanvas(canvasElement);
     },
 };
 
-/** A Banner: one line for a condition, no dismiss. */
+/** A Banner: one line for a condition, no dismiss (TypeCard thumbnail matching Tier: Page). */
 export const CarrierBanner = {
     name: 'Carrier: Banner',
-    render: () => staged(<TierPage />, STAGE),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    render: () => staged(<TierPageCase />, STAGE),
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         const banner = canvasElement.querySelector('.plus-banner');
         await expect(banner, 'a Banner').toBeInTheDocument();
         await expect(within(banner).queryByRole('button'), 'a Banner has no dismiss').toBeNull();
-        const studentHeader = canvas.getByRole('columnheader', { name: /Student/ });
-        await userEvent.click(within(studentHeader).getByRole('button'));
-        await expect(studentHeader).toHaveAttribute('aria-sort', 'ascending');
         await fitsCanvas(canvasElement);
     },
 };
@@ -82,10 +81,10 @@ export const CarrierBanner = {
 export const CarrierSectionMessage = {
     name: 'Carrier: SectionMessage',
     render: () => staged(<MustStay />, PLACE_STAGE),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
-        await expect(within(canvasElement).getByRole('alert'), 'announced when it appears').toBeInTheDocument();
+        await expect(canvas.getByRole('alert'), 'announced when it appears').toBeInTheDocument();
         await fitsCanvas(canvasElement);
     },
 };
@@ -94,8 +93,7 @@ export const CarrierSectionMessage = {
 export const CarrierInbox = {
     name: 'Carrier: The Inbox',
     render: () => staged(<InboxInSidebar />, INBOX_STAGE),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         const inbox = canvas.getByRole('region', { name: 'Inbox' });
@@ -113,10 +111,16 @@ export const CarrierInbox = {
         for (const row of rows) {
             await expect(within(row).getAllByRole('link'), 'one link per row').toHaveLength(1);
         }
+
+        await userEvent.hover(rows[0]);
+        await userEvent.click(within(rows[0]).getByRole('button', { name: 'Mark as read' }));
+        await expect(within(inbox).getByRole('tab', { name: /Unread/i })).toHaveTextContent('2');
+        await expect(inbox.querySelectorAll('.plus-notification-item')).toHaveLength(2);
+
         await userEvent.click(within(inbox).getByRole('tab', { name: 'All' }));
         await expect(inbox.querySelectorAll('.plus-notification-item')).toHaveLength(4);
         await userEvent.click(within(inbox).getByRole('tab', { name: /Unread/i }));
-        await expect(inbox.querySelectorAll('.plus-notification-item')).toHaveLength(3);
+        await expect(inbox.querySelectorAll('.plus-notification-item')).toHaveLength(2);
         await fitsCanvas(canvasElement);
     },
 };
@@ -126,15 +130,14 @@ export const CarrierInbox = {
 /** The Frame tier: system news across the whole width. */
 export const TierFrameStory = {
     name: 'Tier: Frame',
-    render: () => staged(<TierFrame />),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    render: () => staged(<TierFrameCase />),
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(canvasElement.querySelectorAll('.plus-banner'), 'one Banner at a time').toHaveLength(1);
-        const timeHeader = canvas.getByRole('columnheader', { name: /Time/ });
-        await userEvent.click(within(timeHeader).getByRole('button'));
-        await expect(timeHeader).toHaveAttribute('aria-sort', 'ascending');
+        const nameHeader = canvas.getByRole('columnheader', { name: /Name/ });
+        await userEvent.click(within(nameHeader).getByRole('button'));
+        await expect(nameHeader).toHaveAttribute('aria-sort', 'ascending');
         await fitsCanvas(canvasElement);
     },
 };
@@ -142,15 +145,14 @@ export const TierFrameStory = {
 /** The Page tier: under the page header. */
 export const TierPageStory = {
     name: 'Tier: Page',
-    render: () => staged(<TierPage />),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    render: () => staged(<TierPageCase />),
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(canvasElement.querySelectorAll('.plus-banner'), 'one Banner at a time').toHaveLength(1);
-        const studentHeader = canvas.getByRole('columnheader', { name: /Student/ });
-        await userEvent.click(within(studentHeader).getByRole('button'));
-        await expect(studentHeader).toHaveAttribute('aria-sort', 'ascending');
+        const nameHeader = canvas.getByRole('columnheader', { name: /Name/ });
+        await userEvent.click(within(nameHeader).getByRole('button'));
+        await expect(nameHeader).toHaveAttribute('aria-sort', 'ascending');
         await fitsCanvas(canvasElement);
     },
 };
@@ -158,18 +160,17 @@ export const TierPageStory = {
 /** The Section tier: at the top of one collection. */
 export const TierSectionStory = {
     name: 'Tier: Section',
-    render: () => staged(<TierSection />),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    render: () => staged(<TierSectionCase />),
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(canvasElement.querySelectorAll('.plus-banner'), 'one Banner at a time').toHaveLength(1);
-        await expect(canvas.getAllByRole('row').slice(1)).toHaveLength(3);
+        await expect(canvas.getAllByRole('row').slice(1)).toHaveLength(6);
         await userEvent.click(canvas.getByRole('tab', { name: 'Paused' }));
         await expect(canvas.getAllByRole('row').slice(1)).toHaveLength(2);
         await expect(canvas.getByText('Jordan Patel')).toBeInTheDocument();
         await userEvent.click(canvas.getByRole('tab', { name: 'All students' }));
-        await expect(canvas.getAllByRole('row').slice(1)).toHaveLength(3);
+        await expect(canvas.getAllByRole('row').slice(1)).toHaveLength(6);
         await fitsCanvas(canvasElement);
     },
 };
@@ -180,8 +181,7 @@ export const TierSectionStory = {
 export const Severity = {
     name: 'Severity: four statuses',
     render: () => staged(<SeverityRow />, PLACE_STAGE),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         for (const title of ['Schedule updated', 'Session logged', 'Notes are due Friday', "Couldn't save your note"]) {
@@ -197,9 +197,8 @@ export const Severity = {
 /** A stack of Flags: newest on top, each its own message. */
 export const KeyFlagStack = {
     name: 'Key case: A stack of Flags',
-    render: () => staged(<FlagStack />, PLACE_STAGE),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    render: () => staged(<FlagStackCase />, PLACE_STAGE),
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(canvas.getByText('Note saved')).toBeInTheDocument();
@@ -216,9 +215,8 @@ export const KeyFlagStack = {
 /** A Flag with an action: up to two verbs. */
 export const KeyFlagWithAction = {
     name: 'Key case: A Flag with an action',
-    render: () => staged(<FlagWithActions />, PLACE_STAGE),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    render: () => staged(<FlagWithActionsCase />, PLACE_STAGE),
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(canvas.getByRole('button', { name: 'Undo' })).toBeInTheDocument();
@@ -232,9 +230,8 @@ export const KeyFlagWithAction = {
 /** Undo: a timed Flag, then the plain Flag that replaces it. */
 export const KeyFlagUndo = {
     name: 'Key case: Undo with a timer',
-    render: () => staged(<FlagUndo />, PLACE_STAGE),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    render: () => staged(<FlagUndoCase />, PLACE_STAGE),
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(canvas.getByRole('button', { name: 'Undo' })).toBeInTheDocument();
@@ -251,8 +248,7 @@ export const KeyFlagUndo = {
 export const KeyMustStay = {
     name: 'Key case: A message that must stay',
     render: () => staged(<MustStay />, PLACE_STAGE),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(canvas.queryByRole('button', { name: /dismiss|close/i }), 'dismiss is off').toBeNull();
@@ -264,8 +260,7 @@ export const KeyMustStay = {
 export const KeyAcknowledge = {
     name: 'Key case: Something to answer first',
     render: () => staged(<Acknowledge />),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(canvas.getByRole('dialog', { name: 'Your session was moved' }), 'one Modal').toBeInTheDocument();
@@ -277,9 +272,8 @@ export const KeyAcknowledge = {
 /** The Flag finds the person at the top right of the page they moved to. */
 export const KeyFlagOnPage = {
     name: 'Key case: A Flag on the page',
-    render: () => staged(<FlagOnPage />),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    render: () => staged(<FlagOnPageCase />),
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(canvas.getByText('Session logged')).toBeInTheDocument();
@@ -293,10 +287,10 @@ export const KeyFlagOnPage = {
 export const KeyInboxCaughtUp = {
     name: 'Key case: All caught up in the Inbox',
     render: () => staged(<InboxInSidebar initialAllRead />, INBOX_STAGE),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
-        const inbox = within(canvasElement).getByRole('region', { name: 'Inbox' });
+        const inbox = canvas.getByRole('region', { name: 'Inbox' });
         await expect(within(inbox).getByRole('heading', { name: 'You are all caught up.' })).toBeInTheDocument();
         await userEvent.click(within(inbox).getByRole('tab', { name: 'All' }));
         await expect(inbox.querySelectorAll('.plus-notification-item').length).toBeGreaterThan(0);
@@ -324,8 +318,7 @@ const Timers = () => {
 export const TestFlagsLeave = {
     name: 'Test: routine Flags leave, danger stays',
     render: () => <Timers />,
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas }) => {
         await waitFor(() => expect(canvas.queryByText('Saved'), 'the routine Flag left on its own').toBeNull(), { timeout: 3000 });
         await expect(canvas.getByText("Couldn't save"), 'the danger Flag stays').toBeInTheDocument();
         await expect(canvas.queryByRole('button', { name: /dismiss/i }), 'a bold Flag has no ×').toBeNull();
@@ -336,8 +329,7 @@ export const TestFlagsLeave = {
 export const TestInboxInteractions = {
     name: 'Test: Inbox marks read and closes on Escape or outside click',
     render: () => <div style={{ width: INBOX_STAGE }}><InboxInSidebar /></div>,
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas }) => {
         const inbox = canvas.getByRole('region', { name: 'Inbox' });
 
         // Hover and mark one item read
