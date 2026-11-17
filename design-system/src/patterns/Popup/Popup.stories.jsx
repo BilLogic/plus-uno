@@ -2,9 +2,10 @@ import React from 'react';
 import { expect, waitFor, within } from 'storybook/test';
 
 import { Button, ButtonItem, Popup, POPUP_WIDTH_PX } from '@/components';
-import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { fitsCanvas, leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
+import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import * as Demo from './popupDemo.jsx';
 
@@ -55,8 +56,13 @@ export const TypeMenu = {
     name: 'Type: Menu',
     render: () => <Demo.PopupStage height={HEIGHT.menu} side="end">{(mount) => <Demo.Menu mount={mount} />}</Demo.PopupStage>,
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const layer = await holdsInStage(canvasElement, '.plus-dropdown-menu');
-        await expect(within(layer).getAllByRole('menuitem'), 'a short list of rows').toHaveLength(4);
+        const items = within(layer).getAllByRole('menuitem');
+        await expect(items, 'a short list of rows').toHaveLength(4);
+        items[0].focus();
+        await expect(items[0]).toHaveFocus();
     },
 };
 
@@ -64,8 +70,14 @@ export const TypeSelectList = {
     name: 'Type: Select list',
     render: () => <Demo.PopupStage height={HEIGHT.select}>{(mount) => <Demo.SelectList mount={mount} />}</Demo.PopupStage>,
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const layer = await holdsInStage(canvasElement, '.plus-popup-select');
-        await expect(within(layer).getAllByRole('option'), 'one list').toHaveLength(3);
+        const listbox = within(layer).getByRole('listbox');
+        const options = within(layer).getAllByRole('option');
+        await expect(options, 'one list').toHaveLength(3);
+        listbox.focus();
+        await expect(listbox).toHaveFocus();
     },
 };
 
@@ -73,11 +85,16 @@ export const TypeFilterMenu = {
     name: 'Type: Filter menu',
     render: () => <Demo.PopupStage height={HEIGHT.filter} side="end">{(mount) => <Demo.FilterMenuLayer mount={mount} />}</Demo.PopupStage>,
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const layer = await holdsInStage(canvasElement, '.plus-filter-menu');
         await expect(layer, 'two or three categories sit side by side').toHaveClass('plus-filter-menu--side-by-side');
         const footer = layer.querySelector('.plus-filter-menu__footer');
-        await expect(within(footer).getByRole('button', { name: 'Reset' }), 'Reset (Default) then Apply').toBeInTheDocument();
+        const reset = within(footer).getByRole('button', { name: 'Reset' });
+        await expect(reset, 'Reset (Default) then Apply').toBeInTheDocument();
         await expect(within(footer).getByRole('button', { name: 'Apply' }), 'Apply (Primary)').toBeInTheDocument();
+        reset.focus();
+        await expect(reset).toHaveFocus();
     },
 };
 
@@ -89,10 +106,15 @@ export const TypeFilterMenuStacked = {
         </Demo.PopupStage>
     ),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const layer = await holdsInStage(canvasElement, '.plus-filter-menu');
         await expect(layer, 'four or more categories stack').toHaveClass('plus-filter-menu--stacked');
         await expect(layer, 'up to 4-col').toHaveClass('plus-popup--4-col');
-        await expect(within(layer).getByRole('button', { name: 'Apply' }), 'the footer stays pinned under the scrolling categories').toBeInTheDocument();
+        const apply = within(layer).getByRole('button', { name: 'Apply' });
+        await expect(apply, 'the footer stays pinned under the scrolling categories').toBeInTheDocument();
+        apply.focus();
+        await expect(apply).toHaveFocus();
     },
 };
 
@@ -100,8 +122,13 @@ export const TypeProfileMenu = {
     name: 'Type: Profile menu',
     render: () => <Demo.PopupStage height={HEIGHT.profile}>{(mount) => <Demo.ProfileMenu mount={mount} />}</Demo.PopupStage>,
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const layer = await holdsInStage(canvasElement, '.plus-dropdown-menu');
-        await expect(within(layer).getByRole('menuitem', { name: 'Sign out' }), 'Sign out closes the menu').toBeInTheDocument();
+        const signOut = within(layer).getByRole('menuitem', { name: 'Sign out' });
+        await expect(signOut, 'Sign out closes the menu').toBeInTheDocument();
+        signOut.focus();
+        await expect(signOut).toHaveFocus();
     },
 };
 
@@ -109,9 +136,14 @@ export const TypeContent = {
     name: 'Type: Content',
     render: () => <Demo.PopupStage height={HEIGHT.content}>{(mount) => <Demo.Content mount={mount} />}</Demo.PopupStage>,
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const layer = await holdsInStage(canvasElement, '.plus-popup');
         await expect(layer, 'content takes 4-col, the cap').toHaveClass('plus-popup--4-col');
         await expect(layer.getAttribute('role'), 'content is a popup, not a dialog that traps focus').not.toBeNull();
+        const trigger = within(canvasElement).getByRole('button', { name: 'Notes' });
+        trigger.focus();
+        await expect(trigger).toHaveFocus();
     },
 };
 
@@ -127,11 +159,13 @@ const ANATOMY_PARTS = [
 export const AnatomyFilterMenu = {
     name: 'Anatomy: Filter menu',
     render: () => (
-        <LiveAnatomy width={TYPE_STAGE} title="A filter menu off the Filter icon with its parts numbered" parts={ANATOMY_PARTS}>
+        <LiveAnatomy live scrollable width={TYPE_STAGE} title="A filter menu off the Filter icon with its parts numbered" parts={ANATOMY_PARTS}>
             <Demo.PopupStage height={HEIGHT.filter} side="end">{(mount) => <Demo.FilterMenuLayer mount={mount} />}</Demo.PopupStage>
         </LiveAnatomy>
     ),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         fitsCanvas(canvasElement);
         await found(canvasElement, '.plus-filter-menu');
         await markersLevelWithParts(canvasElement, ANATOMY_PARTS);
@@ -145,6 +179,9 @@ export const AnatomyFilterMenu = {
         const scale = rect(stage).width / stage.offsetWidth;
         await expect(Math.round(gap / scale), 'the layer hangs 4 below its trigger').toBe(tokenLength(canvasElement, '--popup-offset'));
         await expect(Math.round((rect(layer).right - trigger.right) / scale), 'aligned to the trigger’s end edge').toBe(0);
+        const apply = within(layer).getByRole('button', { name: 'Apply' });
+        apply.focus();
+        await expect(apply).toHaveFocus();
     },
 };
 
@@ -166,7 +203,7 @@ const WIDTH_NOTES = {
 export const WidthSteps = {
     name: 'Widths',
     render: () => (
-        <FitStage width={WIDTHS_STAGE}>
+        <ScrollStage width={WIDTHS_STAGE}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.3fr', gap: 'var(--section-stack-md)' }}>
                 {['auto', '3-col', '4-col'].map((width) => (
                     <Demo.PopupStage key={width} height={200}>
@@ -188,7 +225,7 @@ export const WidthSteps = {
                     </Demo.PopupStage>
                 ))}
             </div>
-        </FitStage>
+        </ScrollStage>
     ),
     play: async ({ canvasElement }) => {
         fitsCanvas(canvasElement);
