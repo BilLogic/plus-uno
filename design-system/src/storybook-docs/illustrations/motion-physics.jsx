@@ -147,12 +147,11 @@ const appearanceApp = {
       <g opacity={c}>
         <Row x={16} y={58} w={128} accent />
       </g>
-      <Pointer x={104} y={63} />
     </>
   ),
   play: async (ctx) => {
     await ctx.tap(104, 63);
-    await ctx.spring('c', 1, 'appearance.default');
+    await ctx.spring('c', 1, 'appearance.fast');
   },
 };
 
@@ -268,6 +267,7 @@ const flagMode = ({ id, title, caption, token, mode }) => ({
   draw: ({ x, o }) => (
     <>
       <Screen rows={3} />
+      {o < 1 && <FlagLayer x={24} opacity={Math.round(0.35 * (1 - o) * 100) / 100} />}
       <FlagLayer x={x} opacity={o} />
     </>
   ),
@@ -299,6 +299,10 @@ const sizeFast = popupOpening({
 });
 
 const MODAL = { x: 34, y: 32, w: 92, h: 52 };
+const MODAL_GROW = [
+  { points: [[64, 58], [38, 58]], ghost: MODAL },
+  { points: [[96, 58], [122, 58]], ghost: MODAL },
+];
 const sizeDefault = {
   id: 'size-default',
   title: 'spatial.default: a Modal',
@@ -306,12 +310,20 @@ const sizeDefault = {
   viewBox: VIEW,
   initial: { s: 0.96, o: 0, b: 0 },
   landing: { s: 1, o: 1, b: 1 },
+  arrows: MODAL_GROW,
   draw: ({ s, o, b }) => (
     <>
       <Screen rows={3} />
       <g opacity={b}>
         <Blanket x={8} y={18} w={144} h={76} />
       </g>
+      {o < 1 && (
+        <g opacity={Math.round(0.35 * (1 - o) * 100) / 100}>
+          <Scaled cx={MODAL.x + MODAL.w / 2} cy={MODAL.y + MODAL.h / 2} s={0.96}>
+            <Modal {...MODAL} accent />
+          </Scaled>
+        </g>
+      )}
       <g opacity={o}>
         <Scaled cx={MODAL.x + MODAL.w / 2} cy={MODAL.y + MODAL.h / 2} s={s}>
           <Modal {...MODAL} accent />
@@ -427,7 +439,7 @@ const exitClick = flagExit({
   id: 'exit-click',
   title: 'Gone, the person clicked: a fade',
   caption: 'Closing by hand is a quick appearance.fast fade, with no travel.',
-  arrows: [],
+  arrows: [{ points: [], ghost: FLAG }],
   landing: { x: 0, o: 0 },
   leave: async (ctx) => {
     await ctx.tap(132, 30);

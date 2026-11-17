@@ -61,7 +61,8 @@ export const SpringPlayground = ({ reduced: forcedReduced }) => {
   const [stiffness, setStiffness] = useState(null);
   const [ratio, setRatio] = useState(null);
   const [speed, setSpeed] = useState(1);
-  const [p, setP] = useState(0);
+  const [p, setP] = useState(() => (prefersReduced ? 1 : 0));
+  const [opacity, setOpacity] = useState(1);
   const [phase, setPhase] = useState('idle');
   const [played, setPlayed] = useState(null);
   const controlsRef = useRef(null);
@@ -76,6 +77,12 @@ export const SpringPlayground = ({ reduced: forcedReduced }) => {
   useEffect(() => {
     if (controlsRef.current) controlsRef.current.speed = speed;
   }, [speed]);
+  useEffect(() => {
+    if (phase === 'idle') {
+      setP(prefersReduced ? 1 : 0);
+      setOpacity(1);
+    }
+  }, [prefersReduced, phase]);
 
   const reset = (patch) => {
     setStiffness(null);
@@ -86,12 +93,21 @@ export const SpringPlayground = ({ reduced: forcedReduced }) => {
   const play = () => {
     controlsRef.current?.stop();
     setPlayed(config);
-    setP(0);
     if (prefersReduced) {
       setP(1);
-      setPhase('settled');
+      setOpacity(0);
+      setPhase('playing');
+      const controls = animate(0, 1, { ...springFor('appearance.fast'), onUpdate: setOpacity });
+      controls.speed = speedRef.current;
+      controlsRef.current = controls;
+      controls.then(
+        () => setPhase('settled'),
+        () => {},
+      );
       return;
     }
+    setOpacity(1);
+    setP(0);
     setPhase('playing');
     const controls = animate(0, 1, { ...config, onUpdate: setP });
     controls.speed = speedRef.current;
@@ -186,13 +202,15 @@ export const SpringPlayground = ({ reduced: forcedReduced }) => {
             <Row key={i} x={16} y={44 + i * 14} w={128} />
           ))}
           {p > 0.02 && (
-            <Popup
-              x={lerp(TRIGGER.x, POPUP.x, p)}
-              y={lerp(TRIGGER.y, POPUP.y, p)}
-              w={Math.max(1, lerp(TRIGGER.w, POPUP.w, p))}
-              h={Math.max(1, lerp(TRIGGER.h, POPUP.h, p))}
-              accent
-            />
+            <g data-popup opacity={round2(opacity)}>
+              <Popup
+                x={lerp(TRIGGER.x, POPUP.x, p)}
+                y={lerp(TRIGGER.y, POPUP.y, p)}
+                w={Math.max(1, lerp(TRIGGER.w, POPUP.w, p))}
+                h={Math.max(1, lerp(TRIGGER.h, POPUP.h, p))}
+                accent
+              />
+            </g>
           )}
         </Illustration>
         <Illustration viewBox={VIEW} title="Position over time on the spring in the controls, against the dashed target">
@@ -297,6 +315,8 @@ export const DragPastLimit = ({ reduced: forcedReduced }) => {
   const deviceReduced = useReducedMotion();
   const reduced = forcedReduced ?? deviceReduced;
   const [w, setW] = useState(LIMIT_PANEL.rest);
+  const [fromW, setFromW] = useState(null);
+  const [fade, setFade] = useState(1);
   const [phase, setPhase] = useState('rest');
   const [hand, setHand] = useState(null);
   const svgRef = useRef(null);
@@ -309,6 +329,8 @@ export const DragPastLimit = ({ reduced: forcedReduced }) => {
   const unitsPerPx = () => VIEW_W / drawing().getBoundingClientRect().width;
   const grab = (startW) => {
     controls.current?.stop();
+    setFromW(null);
+    setFade(1);
     // The pull that gives the current width, so a second grab picks up where the Panel is.
     const d = startW > LIMIT_W ? LIMIT_PANEL.extra + unresisted(startW - LIMIT_W) : startW - LIMIT_PANEL.rest;
     drag.current = { d, last: { w: startW, t: performance.now() }, v: 0 };
@@ -332,10 +354,22 @@ export const DragPastLimit = ({ reduced: forcedReduced }) => {
     const to = limitRest(from);
     if (from === to) return setPhase('rest');
     // Under reduced motion the hand still drives the drag (it is the person's own motion, resistance
-    // included), but the return is not played: the Panel is simply at the limit.
+    // included), and release fades in place to the limit on appearance.fast instead of cutting.
     if (reduced) {
+      setFromW(from);
       setW(to);
-      return setPhase('rest');
+      setFade(0);
+      setPhase('returning');
+      controls.current = animate(0, 1, { ...springFor('appearance.fast'), onUpdate: setFade });
+      controls.current.then(
+        () => {
+          setFromW(null);
+          setFade(1);
+          setPhase('rest');
+        },
+        () => {},
+      );
+      return;
     }
     setPhase('returning');
     controls.current = animate(from, to, { ...springFor('spatial.fast'), velocity: g.v, onUpdate: setW });
@@ -422,9 +456,17 @@ export const DragPastLimit = ({ reduced: forcedReduced }) => {
             {[0, 1, 2].map((i) => (
               <Row key={i} x={16} y={44 + i * 14} w={Math.max(20, edge - 24)} />
             ))}
-            <Panel x={edge} y={LIMIT_PANEL.y} w={w} h={LIMIT_PANEL.h} accent />
+            {fromW !== null && fade < 1 && (
+              <g opacity={round2(1 - fade)}>
+                <Panel x={LIMIT_FRAME_RIGHT - fromW} y={LIMIT_PANEL.y} w={fromW} h={LIMIT_PANEL.h} accent />
+                <Rect x={LIMIT_FRAME_RIGHT - fromW - 1} y={50} w={2} h={12} fill={PAINT.accent} corner="shape" />
+              </g>
+            )}
+            <g opacity={fromW !== null ? round2(fade) : 1}>
+              <Panel x={edge} y={LIMIT_PANEL.y} w={w} h={LIMIT_PANEL.h} accent />
+              <Rect x={edge - 1} y={50} w={2} h={12} fill={PAINT.accent} corner="shape" />
+            </g>
             <Rule x1={LIMIT_FRAME_RIGHT - LIMIT_W} x2={LIMIT_FRAME_RIGHT - LIMIT_W} y1={18} y2={94} stroke={PAINT.target} dash="3 3" />
-            <Rect x={edge - 1} y={50} w={2} h={12} fill={PAINT.accent} corner="shape" />
             {hand && <Pointer x={hand.x} y={hand.y} />}
           </Illustration>
         </div>
