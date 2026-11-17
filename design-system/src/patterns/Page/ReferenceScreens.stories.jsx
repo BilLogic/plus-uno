@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import {
-    Banner, Button, EmptyState, FilterButton, FooterActions, Heading, PageHeader,
+    Banner, Button, EmptyState, FilterButton, FooterActions, PageHeader,
     PanelBody, PanelContainer, PanelFooter, PanelHeader, PopupSelect, SearchField, StatusTag, Tabs, TextField,
 } from '@/components';
 import { Frame, Page, PatternSection, PatternTable, usePanelControl } from '@/patterns';
@@ -30,7 +30,7 @@ export const ListWithFilters = {
         return (
             <Frame>
                 <Page
-                    header={<PageHeader disableTitleStyles title={<Heading as="h1" size="large">Session review queue</Heading>} />}
+                    header={<PageHeader title="Session review queue" />}
                     banner={<Banner appearance="announcement">Review notes are visible to the session tutor.</Banner>}
                 >
                     <PatternSection title="Sessions" toolbar={
@@ -110,7 +110,7 @@ export const DetailWithPanel = {
                 <Frame style={{ blockSize: '100vh' }} defaultPanelOpen panelStorageKey={null}
                     panelLabel="Session review notes" panel={<ReviewPanel value={saved} onSave={setSaved} />}>
                     <Page
-                        header={<PageHeader disableTitleStyles title={<Heading as="h1" size="large">Ana Ruiz · Session review</Heading>} actions={<EditNotes />} />}
+                        header={<PageHeader title="Ana Ruiz · Session review" actions={<EditNotes />} />}
                         banner={<Banner appearance="announcement">Saved notes are shared with the tutor.</Banner>}
                     >
                         <PatternSection title="Session summary">

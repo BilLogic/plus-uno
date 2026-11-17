@@ -8272,7 +8272,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "The page title. Drawn as an `xlarge` `Heading` unless `disableTitleStyles` is set. `children` is used when it is omitted.",
+          "description": "The page title. Drawn as a `large` `Heading` (at the ambient heading level, `h1` by default) unless `disableTitleStyles` is set. `children` is used when it is omitted.",
           "deprecated": null
         },
         {
@@ -8312,6 +8312,24 @@
           "deprecated": null
         },
         {
+          "name": "titleAs",
+          "type": "oneOf",
+          "required": false,
+          "default": null,
+          "values": [
+            "div",
+            "h1",
+            "h2",
+            "h3",
+            "h4",
+            "h5",
+            "h6",
+            "span"
+          ],
+          "description": "Overrides the HTML element the title's `Heading` renders as, e.g. `\"h2\"` when placed below another page title. A `Modal` or dialog body resets the heading level to 1, so a `PageHeader` inside one passes `titleAs=\"h2\"`.",
+          "deprecated": null
+        },
+        {
           "name": "disableTitleStyles",
           "type": "bool",
           "required": false,
@@ -8332,6 +8350,7 @@
       ],
       "stories": [
         "Basic",
+        "SecondaryLevel",
         "WithBreadcrumbsActionsAndBottomBar",
         "DisableTitleStyles",
         "Interactive",

@@ -5,7 +5,7 @@ import './Heading.scss';
 
 export const HEADING_SIZES = ['xxlarge', 'xlarge', 'large', 'medium', 'small', 'xsmall', 'xxsmall'];
 export const HEADING_COLORS = ['color.text', 'color.text.inverse', 'color.text.warning.inverse'];
-const HEADING_TAGS = ['div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span'];
+export const HEADING_TAGS = ['div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span'];
 
 /**
  * A heading's text style, independent of the HTML tag it renders. The tag

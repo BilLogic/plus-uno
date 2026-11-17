@@ -1,11 +1,29 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { HeadingContextProvider } from '@/components/text-and-data-display/Heading';
 import PageHeader from './PageHeader';
 
 describe('PageHeader', () => {
-    it('renders the title as a Heading', () => {
+    it('renders the title as an h1 Heading at size large by default', () => {
         render(<PageHeader title="Dashboard" />);
-        expect(screen.getByRole('heading', { name: 'Dashboard' })).toBeInTheDocument();
+        const heading = screen.getByRole('heading', { level: 1, name: 'Dashboard' });
+        expect(heading).toBeInTheDocument();
+        expect(heading).toHaveAttribute('data-size', 'large');
+    });
+
+    it('renders an explicit titleAs heading level at size large', () => {
+        render(<PageHeader title="Details" titleAs="h2" />);
+        const heading = screen.getByRole('heading', { level: 2, name: 'Details' });
+        expect(heading).toHaveAttribute('data-size', 'large');
+    });
+
+    it('follows the ambient HeadingContextProvider when titleAs is omitted', () => {
+        render(
+            <HeadingContextProvider value={2}>
+                <PageHeader title="Nested" />
+            </HeadingContextProvider>,
+        );
+        expect(screen.getByRole('heading', { level: 2, name: 'Nested' })).toHaveAttribute('data-size', 'large');
     });
 
     it('renders breadcrumbs, actions and a bottom bar only when given', () => {

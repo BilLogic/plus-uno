@@ -14,7 +14,7 @@ Also asked as: heading with buttons, header actions, page heading.
 
 **Source:** `design-system/src/components/layout-and-structure/PageHeader/PageHeader.jsx`
 
-**Stories:** `design-system/src/components/layout-and-structure/PageHeader/PageHeader.stories.jsx` — Basic, WithBreadcrumbsActionsAndBottomBar, DisableTitleStyles, Interactive, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/layout-and-structure/PageHeader/PageHeader.stories.jsx` — Basic, SecondaryLevel, WithBreadcrumbsActionsAndBottomBar, DisableTitleStyles, Interactive, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/layout-and-structure/PageHeader/PageHeader.mdx`
 
@@ -78,6 +78,12 @@ not given.
 />
 ```
 
+### Pass `titleAs="h2"` when the header sits below another page title. {#pass-titleas-h2-when-the-header-sits-below-another-page-title}
+
+A page has one `h1`. When a `PageHeader` sits under an existing page heading or
+inside a dialog below its `h1` title, pass `titleAs="h2"` so the heading
+outline keeps one `h1`.
+
 ### Reach for `disableTitleStyles` only when the title is not plain text. {#reach-for-disabletitlestyles-only-when-the-title-is-not-plain-text}
 
 The default renders the title in a `Heading`. Turn styling off only when the
@@ -85,9 +91,9 @@ title is a custom element already carrying its own heading semantics.
 
 ## Accessibility
 
-- **A real heading.** The title renders as an `h2` by default, giving the
-  page one clear entry point for assistive technology navigating by
-  heading.
+- **A real heading.** The title renders as a `Heading` (`h1` by default),
+  giving the page one clear entry point for assistive technology navigating by
+  heading; see Best practices when a second header needs `titleAs="h2"`.
 - **Breadcrumbs keep their own semantics.** `PageHeader` does not wrap
   `breadcrumbs` in extra markup — pass a `Breadcrumb` component, which
   carries its own navigation landmark.
@@ -102,7 +108,7 @@ Same group: `Accordion` · `Carousel` · `Panel` · `ScrollBar`
 ## Parts
 
 1. **Breadcrumbs.** Optional, above the title.
-2. **Title.** A level 2 heading, or any node with `disableTitleStyles`.
+2. **Title.** The page's `h1` by default, or any node with `disableTitleStyles`.
 3. **Actions.** Optional, at the end of the title row.
 4. **Bottom bar.** Optional, under the row: tabs, a filter bar or a status line.
 
@@ -120,7 +126,7 @@ Same group: `Accordion` · `Carousel` · `Panel` · `ScrollBar`
 
 | Part | Token |
 | --- | --- |
-| Title | `Heading` at the `xlarge` size, as an `h2`. |
+| Title | `Heading` at `large` (24/28); see Best practices for heading level. |
 | Rows | `--space-100` between breadcrumbs, title row and bottom bar. |
 | Title row | `--space-150` between the title and its actions; `--space-075` between actions. |
 | Breadcrumbs | `--body-sm`. |
@@ -137,13 +143,20 @@ Same group: `Accordion` · `Carousel` · `Panel` · `ScrollBar`
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `title` | node | — | The page title. Drawn as an `xlarge` `Heading` unless `disableTitleStyles` is set. `children` is used when it is omitted. |
+| `title` | node | — | The page title. Drawn as a `large` `Heading` (at the ambient heading level, `h1` by default) unless `disableTitleStyles` is set. `children` is used when it is omitted. |
 | `children` | node | — | `children` is the title when `title` is not given. |
 | `breadcrumbs` | node | — | A breadcrumb trail shown above the title row. Pass a `Breadcrumb`. |
 | `actions` | node | — | Controls shown at the end of the title row, such as a primary button or a menu. |
 | `bottomBar` | node | — | Content in a bar below the title row, such as tabs or filters. |
+| `titleAs` | oneOf | — | Overrides the HTML element the title's `Heading` renders as, e.g. `"h2"` when placed below another page title. A `Modal` or dialog body resets the heading level to 1, so a `PageHeader` inside one passes `titleAs="h2"`. |
 | `disableTitleStyles` | bool | `false` | Renders the title as a plain node instead of a `Heading`, for a caller that styles it itself. |
 | `className` | string | — | Extra class names added to the header element beside the component's own. |
+
+## Variants
+
+**`titleAs`** — `div` · `h1` · `h2` · `h3` · `h4` · `h5` · `h6` · `span`
+
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 

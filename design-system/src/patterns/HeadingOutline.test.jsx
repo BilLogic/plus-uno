@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import PatternCard from './PatternCard';
 import DropdownMenu from '@/components/forms-and-inputs/DropdownMenu';
 import { ButtonItem, Section } from '@/components/forms-and-inputs/_internal/MenuGroup';
+import PageHeader from '@/components/layout-and-structure/PageHeader';
 import Modal from '@/components/messaging/Modal';
 import Sidebar from '@/components/navigation/Sidebar';
 import Table from '@/components/text-and-data-display/Table';
@@ -68,6 +69,17 @@ describe('the page outline', () => {
             ['h4', 'In a subsection'],
         ]);
     });
+
+    it('places a Page with PageHeader at h1 and sections inside it at h2', () => {
+        render(
+            <Page header={<PageHeader title="Sessions" />}>
+                <PatternSection title="This week">
+                    <PatternCard title="Monday" />
+                </PatternSection>
+            </Page>,
+        );
+        expect(outline()).toEqual([['h1', 'Sessions'], ['h2', 'This week'], ['h3', 'Monday']]);
+    });
 });
 
 describe('a dialog', () => {
@@ -88,6 +100,17 @@ describe('a dialog', () => {
         render(<PatternModal title="Delete file" onClose={() => {}}>Gone for good.</PatternModal>);
         const dialog = screen.getByRole('dialog', { name: 'Delete file' });
         expect(within(dialog).getByRole('heading', { name: 'Delete file' }).tagName).toBe('H1');
+    });
+
+    it('steps a PageHeader with titleAs="h2" below the dialog title', () => {
+        render(
+            <Modal show title="Edit session" onClose={() => {}}>
+                <PageHeader title="Details" titleAs="h2" />
+            </Modal>,
+        );
+        const dialog = screen.getByRole('dialog', { name: 'Edit session' });
+        const headings = within(dialog).getAllByRole('heading').map((h) => [h.tagName.toLowerCase(), h.textContent]);
+        expect(headings).toEqual([['h1', 'Edit session'], ['h2', 'Details']]);
     });
 });
 

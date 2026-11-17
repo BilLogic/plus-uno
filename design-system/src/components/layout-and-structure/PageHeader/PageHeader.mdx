@@ -1,7 +1,7 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as PageHeaderStories from './PageHeader.stories.jsx';
-import { Breadcrumb, Button, PageHeader, Tabs } from '@/components';
+import { Breadcrumb, Button, HeadingContextProvider, PageHeader, Tabs } from '@/components';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -58,6 +58,8 @@ its side, and a bottom bar below.
 ## Size and layout
 
 <ComponentExample of={PageHeaderStories.WithBreadcrumbsActionsAndBottomBar} title="All parts" description="Breadcrumbs above the title, actions beside it, and a bottom bar below for anything that belongs to the whole page." />
+
+<ComponentExample of={PageHeaderStories.SecondaryLevel} title="Explicit level (h2)" description={<>Pass <code>titleAs="h2"</code> when the header sits below another page title, such as inside a dialog body or nested view.</>} />
 
 <ComponentExample of={PageHeaderStories.DisableTitleStyles} title="Unstyled title" description={<><code>disableTitleStyles</code> renders the title as a plain node, for a caller that styles it itself.</>} />
 
@@ -130,7 +132,7 @@ heading wrapper.
 ## Parts
 
 1. **Breadcrumbs.** Optional, above the title.
-2. **Title.** A level 2 heading, or any node with `disableTitleStyles`.
+2. **Title.** The page's `h1` by default, or any node with `disableTitleStyles`.
 3. **Actions.** Optional, at the end of the title row.
 4. **Bottom bar.** Optional, under the row: tabs, a filter bar or a status line.
 
@@ -156,7 +158,7 @@ heading wrapper.
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Title</td><td><code>Heading</code> at the <code>xlarge</code> size, as an <code>h2</code>.</td></tr>
+<tr><td>Title</td><td><code>Heading</code> at <code>large</code> (24/28); see Best practices for heading level.</td></tr>
 <tr><td>Rows</td><td><code>--space-100</code> between breadcrumbs, title row and bottom bar.</td></tr>
 <tr><td>Title row</td><td><code>--space-150</code> between the title and its actions; <code>--space-075</code> between actions.</td></tr>
 <tr><td>Breadcrumbs</td><td><code>--body-sm</code>.</td></tr>
@@ -174,9 +176,17 @@ heading wrapper.
 Breadcrumbs tell the person where they are; on a page two levels down they are the way back.
 
 <DoDontPair
-    doExample={<PageHeader breadcrumbs={<Breadcrumb items={trail} label="Breadcrumbs, nested page" />} title="Session notes" />}
+    doExample={
+        <HeadingContextProvider value={2}>
+            <PageHeader breadcrumbs={<Breadcrumb items={trail} label="Breadcrumbs, nested page" />} title="Session notes" />
+        </HeadingContextProvider>
+    }
     doCaption="Breadcrumbs on a nested page."
-    dontExample={<PageHeader title="Session notes" />}
+    dontExample={
+        <HeadingContextProvider value={2}>
+            <PageHeader title="Session notes" />
+        </HeadingContextProvider>
+    }
     dontCaption="Nested page with no way back."
 />
 
@@ -185,9 +195,17 @@ Breadcrumbs tell the person where they are; on a page two levels down they are t
 The title shares a row with actions, so it has to stay on one line.
 
 <DoDontPair
-    doExample={<PageHeader title="Sessions" actions={<Button appearance="primary" text="Schedule" />} />}
+    doExample={
+        <HeadingContextProvider value={2}>
+            <PageHeader title="Sessions" actions={<Button appearance="primary" text="Schedule" />} />
+        </HeadingContextProvider>
+    }
     doCaption="A short noun."
-    dontExample={<PageHeader title="All of the sessions you have scheduled this semester" actions={<Button appearance="primary" text="Schedule" />} />}
+    dontExample={
+        <HeadingContextProvider value={2}>
+            <PageHeader title="All of the sessions you have scheduled this semester" actions={<Button appearance="primary" text="Schedule" />} />
+        </HeadingContextProvider>
+    }
     dontCaption="A title that wraps and pushes actions down."
 />
 
@@ -196,15 +214,21 @@ The title shares a row with actions, so it has to stay on one line.
 Every extra row pushes content down; add a part only when the page uses it.
 
 <DoDontPair
-    doExample={<PageHeader title="Session plans" actions={<Button appearance="primary" text="New plan" />} />}
+    doExample={
+        <HeadingContextProvider value={2}>
+            <PageHeader title="Session plans" actions={<Button appearance="primary" text="New plan" />} />
+        </HeadingContextProvider>
+    }
     doCaption="Title and one action."
     dontExample={
-        <PageHeader
-            breadcrumbs={<Breadcrumb items={[{ text: 'Home', href: '#' }, { text: 'Session plans' }]} label="Breadcrumbs, every part" />}
-            title="Session plans"
-            actions={<Button appearance="primary" text="New plan" />}
-            bottomBar={<Tabs defaultActiveKey="all" spacing="compact"><Tabs.Tab eventKey="all">All</Tabs.Tab><Tabs.Tab eventKey="mine">Mine</Tabs.Tab><Tabs.Tab eventKey="shared">Shared</Tabs.Tab></Tabs>}
-        />
+        <HeadingContextProvider value={2}>
+            <PageHeader
+                breadcrumbs={<Breadcrumb items={[{ text: 'Home', href: '#' }, { text: 'Session plans' }]} label="Breadcrumbs, every part" />}
+                title="Session plans"
+                actions={<Button appearance="primary" text="New plan" />}
+                bottomBar={<Tabs defaultActiveKey="all" spacing="compact"><Tabs.Tab eventKey="all">All</Tabs.Tab><Tabs.Tab eventKey="mine">Mine</Tabs.Tab><Tabs.Tab eventKey="shared">Shared</Tabs.Tab></Tabs>}
+            />
+        </HeadingContextProvider>
     }
     dontCaption="Breadcrumbs, actions and bottom bar all on."
 />
@@ -222,6 +246,12 @@ not given.
     actions={<Button text="New plan" />}
 />
 ```
+
+### Pass `titleAs="h2"` when the header sits below another page title.
+
+A page has one `h1`. When a `PageHeader` sits under an existing page heading or
+inside a dialog below its `h1` title, pass `titleAs="h2"` so the heading
+outline keeps one `h1`.
 
 ### Reach for `disableTitleStyles` only when the title is not plain text.
 
@@ -251,9 +281,9 @@ title is a custom element already carrying its own heading semantics.
 
 ## Accessibility
 
-- **A real heading.** The title renders as an `h2` by default, giving the
-  page one clear entry point for assistive technology navigating by
-  heading.
+- **A real heading.** The title renders as a `Heading` (`h1` by default),
+  giving the page one clear entry point for assistive technology navigating by
+  heading; see Best practices when a second header needs `titleAs="h2"`.
 - **Breadcrumbs keep their own semantics.** `PageHeader` does not wrap
   `breadcrumbs` in extra markup — pass a `Breadcrumb` component, which
   carries its own navigation landmark.

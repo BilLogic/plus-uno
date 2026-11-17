@@ -182,6 +182,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/048-agents-build-in-stages-and-a-ds-fact-has-one-home.md`](docs/adr/048-agents-build-in-stages-and-a-ds-fact-has-one-home.md) | Agents build a screen in five stages (Template, Blocks, Pieces, Polish, Motion) and each design-system fact has one authored home; guidelines/composition/ is retired. |
 | [`docs/adr/049-motion-docs-teach-with-kit-demos.md`](docs/adr/049-motion-docs-teach-with-kit-demos.md) | Motion foundation pages teach with kit MotionDemo figures; real-component motion stories stay in place as play tests and component-page product examples. |
 | [`docs/adr/050-an-empty-table-is-replaced-by-its-empty-state.md`](docs/adr/050-an-empty-table-is-replaced-by-its-empty-state.md) | Empty and no-results tables in PatternTable and DynamicTable replace the whole table (headers, caption, footer and pagination included) with EmptyState, matching the Empty pattern. |
+| [`docs/adr/051-a-page-header-title-is-the-page-h1.md`](docs/adr/051-a-page-header-title-is-the-page-h1.md) | PageHeader renders its title as the page's single h1 at Heading large (24/28) by default, following the ambient heading level unless overridden with titleAs. |
 | [`docs/adr/overview.md`](docs/adr/overview.md) | One file per architecture decision, each checked against the code rather than ported. |
 
 ## Conventions
@@ -211,6 +212,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-140 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+141 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
-import Heading from '@/components/text-and-data-display/Heading';
+import Heading, { HEADING_TAGS } from '@/components/text-and-data-display/Heading/Heading';
 import './PageHeader.scss';
 
 /**
@@ -14,6 +14,7 @@ export const PageHeader = ({
     breadcrumbs,
     actions,
     bottomBar,
+    titleAs,
     disableTitleStyles = false,
     className,
     ...props
@@ -26,7 +27,7 @@ export const PageHeader = ({
             <div className="plus-page-header-row">
                 <div className="plus-page-header-title">
                     {disableTitleStyles ? titleContent : (
-                        <Heading size="xlarge" as="h2">{titleContent}</Heading>
+                        <Heading size="large" as={titleAs}>{titleContent}</Heading>
                     )}
                 </div>
                 {actions && <div className="plus-page-header-actions">{actions}</div>}
@@ -37,7 +38,7 @@ export const PageHeader = ({
 };
 
 PageHeader.propTypes = {
-    /** The page title. Drawn as an `xlarge` `Heading` unless `disableTitleStyles` is set. `children` is used when it is omitted. */
+    /** The page title. Drawn as a `large` `Heading` (at the ambient heading level, `h1` by default) unless `disableTitleStyles` is set. `children` is used when it is omitted. */
     title: PropTypes.node,
     /** `children` is the title when `title` is not given. */
     children: PropTypes.node,
@@ -47,6 +48,8 @@ PageHeader.propTypes = {
     actions: PropTypes.node,
     /** Content in a bar below the title row, such as tabs or filters. */
     bottomBar: PropTypes.node,
+    /** Overrides the HTML element the title's `Heading` renders as, e.g. `"h2"` when placed below another page title. A `Modal` or dialog body resets the heading level to 1, so a `PageHeader` inside one passes `titleAs="h2"`. */
+    titleAs: PropTypes.oneOf(HEADING_TAGS),
     /** Renders the title as a plain node instead of a `Heading`, for a caller that styles it itself. */
     disableTitleStyles: PropTypes.bool,
     /** Extra class names added to the header element beside the component's own. */
