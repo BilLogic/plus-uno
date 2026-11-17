@@ -5,12 +5,15 @@
  *
  * Run: npx vitest run --project=storybook design-system/src/styles/MotionTransitions.stories.jsx
  */
+import React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { expect, userEvent, waitFor } from 'storybook/test';
 
 import { TRANSITION_DEMOS, TRANSITION_TREES } from '@/storybook-docs/illustrations/motion-transitions.jsx';
 import { DragReorder } from '@/storybook-docs/illustrations/motion-drag.jsx';
 import { dragAndDrop } from '@/storybook-docs/lib/test-viewport.js';
 import { reducedStory, story } from '@/storybook-docs/illustrations/motion-story-helpers.jsx';
+import { PAINT } from '@/storybook-docs/illustrations/paint.js';
 import { ghostOf, pointsOf } from '@/storybook-docs/illustrations/trails.js';
 
 export default {
@@ -177,6 +180,27 @@ export const Rulings = {
     const [errArrow] = scene(TRANSITION_DEMOS.errField, 'err-field-do').arrows;
     await expect(pointsOf(errArrow)[1][1]).toBeGreaterThan(pointsOf(errArrow)[0][1]);
     await expect(ghostOf(errArrow)).toMatchObject({ x: 60, y: 64, w: 83, h: 27 });
+    // Error in a modal: the message opens at the top of the Modal body and the fields reflow down on a ghosted arrow; Don't shakes.
+    const errModalDo = scene(TRANSITION_DEMOS.errModal, 'err-modal-do');
+    const errModalDont = scene(TRANSITION_DEMOS.errModal, 'err-modal-dont');
+    await expect(errModalDo.arrows).toHaveLength(1);
+    const [modalErrArrow] = errModalDo.arrows;
+    await expect(pointsOf(modalErrArrow)[1][1]).toBeGreaterThan(pointsOf(modalErrArrow)[0][1]);
+    await expect(ghostOf(modalErrArrow)).toMatchObject({ x: 74, y: 35, w: 56, h: 38 });
+    await expect(errModalDont.arrows ?? []).toEqual([]);
+    const parseDoc = (state) => new DOMParser().parseFromString(`<svg>${renderToStaticMarkup(errModalDo.draw(state))}</svg>`, 'image/svg+xml');
+    const initialSvg = parseDoc(errModalDo.initial);
+    const landingSvg = parseDoc({ ...errModalDo.initial, ...errModalDo.landing });
+    const fieldYs = (doc) => [...doc.querySelectorAll('rect')].filter((r) => r.getAttribute('stroke') === PAINT.fieldBorder).map((r) => Number(r.getAttribute('y')));
+    const msgRect = [...landingSvg.querySelectorAll('rect')].find((r) => r.getAttribute('fill') === PAINT.fieldMessageDanger);
+    await expect(msgRect, 'danger message renders in landing frame').toBeTruthy();
+    const startFieldYs = fieldYs(initialSvg);
+    const endFieldYs = fieldYs(landingSvg);
+    await expect(startFieldYs.length, 'modal body renders two fields').toBe(2);
+    await expect(Number(msgRect.getAttribute('y')), 'message sits below the modal title bar').toBeGreaterThan(21);
+    await expect(Number(msgRect.getAttribute('y')) + Number(msgRect.getAttribute('height')), 'message sits above the first reflowed modal field label').toBeLessThanOrEqual(35);
+    await expect(endFieldYs[0] - startFieldYs[0], 'first modal field reflows down').toBe(9);
+    await expect(endFieldYs[1] - startFieldYs[1], 'second modal field reflows down').toBe(9);
   },
 };
 
