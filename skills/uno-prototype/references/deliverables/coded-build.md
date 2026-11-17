@@ -84,7 +84,7 @@ the shape script and records the rest as unavailable, not as failures:
 
 - `bash skills/uno-prototype/scripts/validate-prototype.sh prototypes/{project}`
   — the project's shape (App, export, config, name).
-- Stories touched → Storybook MCP `run-story-tests` (a11y included).
+- Stories touched → Storybook MCP `test-run` (a11y included).
 - Open the running preview: pages render, key interactions work, console
   clean — scripts can pass while the page is visibly broken; the browser is
   the check of record for UI.
