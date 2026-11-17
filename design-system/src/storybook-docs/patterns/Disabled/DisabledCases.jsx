@@ -30,6 +30,7 @@ export const ReasonInCaptionCase = () => (
 export const ReasonInTooltipCase = () => (
     <DocsOverlayBoundary fit={false} containHeight>
         <CaseSurface style={{ minBlockSize: 'calc(var(--control-lg) * 3)' }}>
+            {/* Pinned open with `show` because the disabled Select inside receives no hover or focus events, so an uncontrolled tooltip could never open to show the anti-pattern. */}
             <Tooltip text="Choose a school first." placement="bottom" show>
                 <div style={{ inlineSize: '100%' }}>
                     <Select

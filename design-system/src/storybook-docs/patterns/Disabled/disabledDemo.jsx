@@ -145,35 +145,51 @@ export const BlocksAction = () => {
     const [hasSchool, setHasSchool] = useState(false);
     const [group, setGroup] = useState(null);
     const [time, setTime] = useState(null);
+    const resetSchool = () => {
+        setHasSchool(false);
+        setGroup(null);
+        setTime(null);
+    };
     return (
-        <div style={column}>
-            {!hasSchool && (
-                <SectionMessage
-                    appearance="warning"
-                    title="No school yet"
-                    dismissible={false}
-                    actions={[{ text: 'Add school', onClick: () => setHasSchool(true) }]}
-                >
-                    Add a school to this group to schedule sessions.
-                </SectionMessage>
-            )}
-            <Select
-                label="Group"
-                options={GROUPS}
-                value={group}
-                onChange={setGroup}
-                isDisabled={!hasSchool}
-                caption={hasSchool ? undefined : 'Needs a school first.'}
-            />
-            <Select
-                label="Time"
-                options={TIMES}
-                value={time}
-                onChange={setTime}
-                isDisabled={!hasSchool}
-                caption={hasSchool ? undefined : 'Needs a school first.'}
-            />
-        </div>
+        <DocsOverlayBoundary fit={false} containHeight>
+            <div style={column}>
+                {hasSchool ? (
+                    <SectionMessage
+                        appearance="success"
+                        title="School added"
+                        dismissible={false}
+                        actions={[{ text: 'Remove school', onClick: resetSchool }]}
+                    >
+                        Group and Time are ready to schedule.
+                    </SectionMessage>
+                ) : (
+                    <SectionMessage
+                        appearance="warning"
+                        title="No school yet"
+                        dismissible={false}
+                        actions={[{ text: 'Add school', onClick: () => setHasSchool(true) }]}
+                    >
+                        Add a school to this group to schedule sessions.
+                    </SectionMessage>
+                )}
+                <Select
+                    label="Group"
+                    options={GROUPS}
+                    value={group}
+                    onChange={setGroup}
+                    isDisabled={!hasSchool}
+                    caption={hasSchool ? undefined : 'Needs a school first.'}
+                />
+                <Select
+                    label="Time"
+                    options={TIMES}
+                    value={time}
+                    onChange={setTime}
+                    isDisabled={!hasSchool}
+                    caption={hasSchool ? undefined : 'Needs a school first.'}
+                />
+            </div>
+        </DocsOverlayBoundary>
     );
 };
 
@@ -185,7 +201,7 @@ export const SelfEvident = () => {
         <div style={column}>
             <div style={buttons}>
                 <Button text="Back" appearance="subtle" isDisabled={step === 0} onClick={() => setStep(0)} />
-                <Button text="Next" appearance="primary" isDisabled={step === 1} onClick={() => setStep(1)} />
+                <Button text="Next" appearance="primary" onClick={() => setStep(1)} />
             </div>
             <TextField
                 label="Type the school name to confirm"
@@ -263,6 +279,7 @@ export const LockedToolkitDemo = () => {
     return (
         <DocsOverlayBoundary fit={false} containHeight>
             <div style={pad}>
+                {/* Sidebar.examples.jsx defines `Box` unexported, so mirror its docked Frame sidebar wrapper here without altering locked Sidebar files. */}
                 <div className="plus-frame__sidebar plus-frame__sidebar--docked not-prose sb-unstyled">
                     <PatternSidebar
                         label="Toolkit during onboarding"

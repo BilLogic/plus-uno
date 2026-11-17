@@ -43,8 +43,8 @@ const noTooltipCopy = async (canvasElement) => {
 };
 
 /** The reason is visible text: present, and at full contrast beside a faded control. */
-const reasonIsVisible = async (canvasElement, reason) => {
-    const text = within(canvasElement).getByText(reason);
+const reasonIsVisible = async (canvas, reason) => {
+    const text = canvas.getByText(reason);
     await expect(text, 'the reason is on the page').toBeVisible();
     await expect(getComputedStyle(text).opacity, 'at full contrast').toBe('1');
 };
@@ -67,6 +67,8 @@ export const AnswerExplains = {
         await waitFor(() => expect(canvas.queryByText("Enter the student's name.")).toBeNull());
         await userEvent.click(save);
         await waitFor(() => expect(canvas.getByText('Session saved.')).toBeVisible());
+        await userEvent.click(canvas.getByRole('button', { name: 'Cancel' }));
+        await waitFor(() => expect(canvas.getByText("Enter the student's name.")).toBeVisible());
         await settleAnimations(canvasElement);
     },
 };
@@ -82,7 +84,7 @@ export const AnswerDisabledWithReason = {
         await expect(field, 'disabled').toBeDisabled();
         await userEvent.tab();
         await expect(document.activeElement, 'it leaves the tab order').not.toBe(field);
-        await reasonIsVisible(canvasElement, 'Choose a date first.');
+        await reasonIsVisible(canvas, 'Choose a date first.');
         await noTooltipCopy(canvasElement);
         await fitsCanvas(canvasElement);
     },
@@ -127,7 +129,7 @@ export const KeyWaitsOnField = {
         await expectFullScale(canvasElement);
         const group = canvas.getByLabelText('Group');
         await expect(group, 'the Group waits').toBeDisabled();
-        await reasonIsVisible(canvasElement, 'Choose a school first');
+        await reasonIsVisible(canvas, 'Choose a school first');
         await noTooltipCopy(canvasElement);
         await fitsCanvas(canvasElement);
 
@@ -152,7 +154,7 @@ export const KeyOptionCannotApply = {
         await expect(taken.getAttribute('tabindex'), 'and out of the tab order').toBe('-1');
         const live = canvas.getByRole('radio', { name: /3:00 PM/ });
         await expect(live, 'the rest are live').not.toHaveAttribute('aria-disabled', 'true');
-        await reasonIsVisible(canvasElement, 'Ms. Ortiz has a session then.');
+        await reasonIsVisible(canvas, 'Ms. Ortiz has a session then.');
         await noTooltipCopy(canvasElement);
         await fitsCanvas(canvasElement);
         await userEvent.click(live);
@@ -177,6 +179,9 @@ export const KeyBlocksAction = {
         await userEvent.click(addSchool);
         await expect(canvas.getByLabelText('Group')).toBeEnabled();
         await expect(canvas.getByLabelText('Time')).toBeEnabled();
+        await userEvent.click(canvas.getByRole('button', { name: 'Remove school' }));
+        await expect(canvas.getByLabelText('Group')).toBeDisabled();
+        await expect(canvas.getByLabelText('Time')).toBeDisabled();
         await settleAnimations(canvasElement);
     },
 };
@@ -198,6 +203,7 @@ export const KeySelfEvident = {
 
         await userEvent.click(next);
         await expect(back).toBeEnabled();
+        await expect(next, 'Next does not disable on the last step').toBeEnabled();
         const confirm = canvas.getByLabelText('Type the school name to confirm');
         await userEvent.clear(confirm);
         await userEvent.type(confirm, 'Lincoln Middle School');

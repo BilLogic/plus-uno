@@ -57,19 +57,19 @@ Try these options in order; disable only when the earlier options do not fit.
 
 ## Key cases
 
-<ComponentExample of={DisabledStories.AnswerExplains} title="Enabled, and it explains" description="Enter a student's name and click Save session to clear the error." />
+<ComponentExample of={DisabledStories.AnswerExplains} title="Enabled, and it explains" description="Pressing Save session marks what is missing rather than disabling the button. Enter a student's name and click Save session to save, or Cancel to reset." />
 
-<ComponentExample of={DisabledStories.KeyWaitsOnField} title="A field that waits on another" description="Group waits on School. Pick a school to enable Group." />
+<ComponentExample of={DisabledStories.KeyWaitsOnField} title="A field that waits on another" description="Group waits on School. The caption says &quot;Choose a school first&quot;; the field fades and leaves the tab order, and the caption stays at full contrast. Pick a school to enable Group." />
 
 <ComponentExample of={DisabledStories.KeyOptionCannotApply} title="An option that cannot apply" description="The option's description line carries the reason. The rest of the list is live." />
 
-<ComponentExample of={DisabledStories.KeyBlocksAction} title="It blocks the main action" description="Click Add school in the warning SectionMessage to unlock Group and Time." />
+<ComponentExample of={DisabledStories.KeyBlocksAction} title="It blocks the main action" description="When the prerequisite blocks the main action or several items, a warning SectionMessage above says how to turn it on. Click Add school to turn them on, or Remove school to reset." />
 
 <ComponentExample of={DisabledStories.KeySelfEvident} title="Self-evident" description="Back on the first step, and the Danger button until the name matches: no reason needed beyond what is on screen." />
 
-<ComponentExample of={DisabledStories.KeySending} title="Sending" description="Click Cancel to stop sending and re-enable Save session." />
+<ComponentExample of={DisabledStories.KeySending} title="Sending" description="The only time a button disables: it swaps its label for a spinner and Cancel stays live. Click Cancel to stop sending and Save session to try again." />
 
-<ComponentExample of={DisabledStories.AnswerReadOnly} title="Read-only" />
+<ComponentExample of={DisabledStories.AnswerReadOnly} title="Read-only" description="Neutral fill at full contrast, in the tab order so the time can be selected and copied." />
 
 <ComponentExample of={DisabledStories.AnswerHidden} title="Hidden" description="Open More to see only the actions a tutor can take." />
 
