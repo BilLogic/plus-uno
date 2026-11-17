@@ -23,7 +23,7 @@ export const CARD_STAGE = 600; // docs-literal
 
 const noop = () => {};
 const pad = { padding: 'var(--page-pad)', boxSizing: 'border-box' };
-const column = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxInlineSize: 'var(--card-min-width-lg)' };
+export const column = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxInlineSize: 'var(--card-min-width-lg)' };
 const paddedColumn = { ...pad, ...column };
 
 const NOTE = 'Ana is working on fractions. She asked to review ratios before the quiz on Friday, and she wants a second pass at word problems, especially the ones with two steps. Ms. Ortiz agreed to add a short warm-up each week.';
