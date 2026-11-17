@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { CHOREOGRAPHY_DEMOS } from './motion-choreography.jsx';
 import { PRINCIPLE_DEMOS } from './motion-principles.jsx';
-import { pointsOf } from './trails.js';
+import { crossings, ghostOf, pointsOf } from './trails.js';
 
 /**
  * T5 ruling: nothing arrives by rising (closing gaps after an exit is fine, and
@@ -58,5 +58,24 @@ describe('Nothing arrives by rising (T5)', () => {
       return Math.atan2(e[1] - s[1], e[0] - s[0]).toFixed(2);
     });
     expect(new Set(angles).size).toBe(3);
+  });
+
+  it("Principles Cut the noise draws one group arrow in Do and one scatter trail per row in Don't", () => {
+    const [doScene, dontScene] = PRINCIPLE_DEMOS.cutTheNoise.scenes;
+    const { container } = render(<svg viewBox={dontScene.viewBox}>{dontScene.draw(dontScene.initial)}</svg>);
+    const rowGroups = [...container.querySelectorAll('g[transform]')];
+    expect(doScene.arrows).toHaveLength(1);
+    expect(dontScene.arrows).toHaveLength(rowGroups.length);
+    expect(crossings(dontScene.arrows).length > 0).toBe(Boolean(dontScene.crossing));
+    rowGroups.forEach((g, i) => {
+      const m = g.getAttribute('transform').match(/translate\(\s*([-\d.]+)(?:[\s,]+([-\d.]+))?\s*\)/);
+      const [dx, dy] = [Number(m[1]), Number(m[2] ?? 0)];
+      const rect = g.querySelector('rect');
+      const [x, y, w, h] = ['x', 'y', 'width', 'height'].map((k) => Number(rect.getAttribute(k)));
+      expect(ghostOf(dontScene.arrows[i])).toEqual({ x, y, w, h });
+      const [start, end] = pointsOf(dontScene.arrows[i]);
+      expect(start).toEqual([x + w / 2 + dx, y + h / 2 + dy]);
+      expect(end).toEqual([x + w / 2, y + h / 2]);
+    });
   });
 });

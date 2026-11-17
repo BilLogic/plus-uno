@@ -38,8 +38,14 @@ export const PairsAreSameScene = {
       const [a, b] = demo.scenes;
       await expect(a.viewBox).toBe(b.viewBox);
       await expect(Object.keys(a.landing)).toEqual(Object.keys(b.landing));
-      // Arrows come before the move in both tiles, on the same path.
-      await expect(a.arrows).toEqual(b.arrows);
+      if (demo === PRINCIPLE_DEMOS.cutTheNoise) {
+        // Do moves the four rows as one group; Don't scatters every row along its own path.
+        await expect(a.arrows.length).toBe(1);
+        await expect(b.arrows.length).toBe(4);
+      } else {
+        // Arrows come before the move in both tiles, on the same path.
+        await expect(a.arrows).toEqual(b.arrows);
+      }
     }
   },
 };
