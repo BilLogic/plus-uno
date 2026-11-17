@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import Blanket from '@/patterns/Blanket';
 import PatternModal from '@/patterns/PatternModal';
-import { FloatingPanel } from './Blanket.examples.jsx';
+import { DetailsPanel } from '../Panel/panelDemo.jsx';
 import { Button } from '@/components';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { probe, tokenLength } from '@/storybook-docs/lib/style-probes.js';
@@ -73,6 +73,39 @@ export const Inline = {
         await expect(args.onBlanketClick).toHaveBeenCalledTimes(1);
     },
 };
+
+/**
+ * A Details Panel floating over the right of the stand-in screen: on the
+ * overlay fill and shadow, with no Blanket under it. Docs geometry, px.
+ */
+const FloatingPanel = ({ screenHeight = 520 }) => (
+    <div
+        style={{
+            position: 'relative',
+            width: 1024, // docs-literal
+            height: screenHeight,
+            background: 'var(--ds-surface)',
+            overflow: 'hidden',
+        }}
+    >
+        <div
+            data-floating-panel
+            style={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                bottom: 0,
+                width: 400, // docs-literal
+                display: 'flex',
+                flexDirection: 'column',
+                background: 'var(--ds-surface-overlay)',
+                boxShadow: 'var(--ds-shadow-overlay)',
+            }}
+        >
+            <DetailsPanel />
+        </div>
+    </div>
+);
 
 /**
  * A confirm Modal may open over a Panel, a Popup or a focused task, and brings

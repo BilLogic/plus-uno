@@ -9,7 +9,8 @@ import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { probe, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { fitsCanvas, leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
-import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
+import { FitStage, ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { openOverlay } from '@/lib/overlay.js';
 import { BAR_TOKEN } from '@/storybook-docs/lib/focused-task.jsx';
 import * as Demo from './modalDemo.jsx';
@@ -497,17 +498,22 @@ const buttonsInside = async (canvasElement) => {
     }
 };
 
-/** The 1024 stand-in screen, drawn to fit the canvas: never wider than it. */
-const sized = (story, width = STAGE) => <FitStage width={width}>{story}</FitStage>;
+/** The 1024 stand-in screen at 1:1 scale inside a horizontally scrollable box when the docs column is narrower. */
+const sized = (story, width = STAGE) => <ScrollStage width={width}>{story}</ScrollStage>;
 
 export const TypePassive = {
     name: 'Type: Passive',
     render: () => sized(<Demo.Passive />),
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         fitsCanvas(canvasElement);
         await expect(canvasElement.querySelector('.plus-pattern-modal-footer'), 'Passive has no footer').toBeNull();
-        await expect(within(canvasElement).getByRole('button', { name: 'Close' }), 'Close is the way out').toBeInTheDocument();
+        const close = within(canvasElement).getByRole('button', { name: 'Close' });
+        await expect(close, 'Close is the way out').toBeInTheDocument();
+        close.focus();
+        await expect(close).toHaveFocus();
     },
 };
 
@@ -516,6 +522,8 @@ export const TypeActive = {
     render: () => sized(<Demo.Active />),
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const canvas = within(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const tracks = footerTracks(footer);
@@ -527,6 +535,8 @@ export const TypeActive = {
         await expect(rect(action).left, 'primary starts on track 3').toBeCloseTo(tracks.span(3, 4).left, 0);
         await expect(rect(action).right, 'primary ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
         await buttonsInside(canvasElement);
+        action.focus();
+        await expect(action).toHaveFocus();
     },
 };
 
@@ -535,12 +545,17 @@ export const TypeAcknowledge = {
     render: () => sized(<Demo.Acknowledge />),
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const tracks = footerTracks(footer);
-        const button = rect(within(canvasElement).getByRole('button', { name: 'Got it' }));
+        const gotIt = within(canvasElement).getByRole('button', { name: 'Got it' });
+        const button = rect(gotIt);
         await expect(button.left, 'one button starts on track 3').toBeCloseTo(tracks.span(3, 4).left, 0);
         await expect(button.right, 'one button ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
         await buttonsInside(canvasElement);
+        gotIt.focus();
+        await expect(gotIt).toHaveFocus();
     },
 };
 
@@ -549,6 +564,8 @@ export const TypeSteps = {
     render: () => sized(<Demo.Steps />),
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const canvas = within(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const tracks = footerTracks(footer);
@@ -577,12 +594,14 @@ const ANATOMY_PARTS = [
 export const AnatomyActive = {
     name: 'Anatomy: Active, 8-col',
     render: () => (
-        <LiveAnatomy width={STAGE} title="An 8-col Active Modal with its parts numbered" parts={ANATOMY_PARTS}>
+        <LiveAnatomy live scrollable width={STAGE} title="An 8-col Active Modal with its parts numbered" parts={ANATOMY_PARTS}>
             <Demo.ActiveForm />
         </LiveAnatomy>
     ),
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         fitsCanvas(canvasElement);
         await markersLevelWithParts(canvasElement, ANATOMY_PARTS);
         const body = canvasElement.querySelector('.plus-pattern-modal-body');
@@ -591,24 +610,30 @@ export const AnatomyActive = {
         const modal = canvasElement.querySelector('.plus-pattern-modal');
         await expect(getComputedStyle(modal).paddingTop, 'pad 16 on every side').toBe(`${tokenLength(canvasElement, '--modal-pad-x-default')}px`);
         await expect(getComputedStyle(modal).borderTopLeftRadius, 'radius 16').toBe(`${tokenLength(canvasElement, '--modal-radius')}px`);
+        const student = within(canvasElement).getByLabelText(/Student/);
+        await userEvent.clear(student);
+        await userEvent.type(student, 'Ben Okafor');
+        await expect(student).toHaveValue('Ben Okafor');
     },
 };
 
 /** The width steps against the screen grid: 4 · 6 · 8 · 10 columns plus 16 a side at 1024. */
 export const WidthStrip = {
     render: () => (
-        <FitStage width={STAGE}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', inlineSize: STAGE }}>
-            {BLANKET_WIDTHS.map((width) => [width, `${BLANKET_SPANS[width]}-col`]).map(([width, label]) => (
-                <Demo.ModalStage key={width} width={width} height={240} title={label} footer={<Demo.TwoCells action="Save" />}>
-                    <p style={{ margin: 0, font: 'var(--body-default)' }}>{`${label} on the 1024 screen grid.`}</p>
-                </Demo.ModalStage>
-            ))}
-        </div>
-        </FitStage>
+        <ScrollStage width={STAGE}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+                {BLANKET_WIDTHS.map((width) => [width, `${BLANKET_SPANS[width]}-col`]).map(([width, label]) => (
+                    <Demo.ModalStage key={width} width={width} height={240} title={label} footer={<Demo.TwoCells action="Save" />}>
+                        <p style={{ margin: 0, font: 'var(--body-default)' }}>{`${label} on the 1024 screen grid.`}</p>
+                    </Demo.ModalStage>
+                ))}
+            </div>
+        </ScrollStage>
     ),
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         fitsCanvas(canvasElement);
         const modals = within(canvasElement).getAllByRole('dialog');
         for (const [i, width] of BLANKET_WIDTHS.entries()) {
@@ -617,6 +642,9 @@ export const WidthStrip = {
         await expect(modals[0].offsetWidth, 'widths step up').toBeLessThan(modals[1].offsetWidth);
         await expect(modals[1].offsetWidth, 'widths step up').toBeLessThan(modals[2].offsetWidth);
         await expect(modals[2].offsetWidth, 'widths step up').toBeLessThan(modals[3].offsetWidth);
+        const save = within(modals[0]).getByRole('button', { name: 'Save' });
+        save.focus();
+        await expect(save).toHaveFocus();
     },
 };
 

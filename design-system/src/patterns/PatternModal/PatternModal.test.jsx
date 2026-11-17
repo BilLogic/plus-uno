@@ -1,7 +1,32 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-
+import { ComponentExample, exampleSlug } from '@/storybook-docs/ds-docs-layout.jsx';
+import { TypeCard } from '@/storybook-docs/lib/template-page.jsx';
 import PatternModal from './PatternModal';
+import {
+    ButtonInBodyModal,
+    FooterPinnedModal,
+    StepsFooterModal,
+    TabsForStepsModal,
+} from './PatternModalCases.jsx';
+
+vi.mock('@storybook/addon-docs/blocks', async () => {
+    const React = await import('react');
+    return {
+        Canvas: ({ children, of }) => (
+            <div data-testid="mock-canvas">
+                {of?.render ? <of.render /> : children}
+            </div>
+        ),
+        Story: ({ of }) => (of?.render ? <of.render /> : null),
+        Meta: () => null,
+        Title: () => null,
+    };
+});
+
+const modalMdx = readFileSync(join(__dirname, 'PatternModal.mdx'), 'utf8');
 
 /**
  * PatternModal takes Figma's sizing: `width` sm · md · lg from the screen grid
@@ -198,5 +223,67 @@ describe('PatternModal tabs', () => {
         expect(dialog().querySelector('.plus-pattern-modal-header-group')).toBeNull();
         expect(dialog().querySelector('[role="tablist"]')).toBeNull();
         expect(dialog().querySelector('.plus-pattern-modal-body')).not.toHaveAttribute('role');
+    });
+});
+
+describe('PatternModal live cases and docs links', () => {
+    it('renders FooterPinnedModal with a pinned footer and ButtonInBodyModal without one', () => {
+        const pinned = render(<FooterPinnedModal />);
+        expect(pinned.container.querySelector('.plus-pattern-modal-footer')).not.toBeNull();
+        pinned.unmount();
+
+        const inBody = render(<ButtonInBodyModal />);
+        expect(inBody.container.querySelector('.plus-pattern-modal-footer')).toBeNull();
+        expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
+    });
+
+    it('steps forward and back in StepsFooterModal and switches tabs in TabsForStepsModal', () => {
+        const steps = render(<StepsFooterModal />);
+        expect(screen.getByRole('textbox', { name: 'Student' })).toHaveValue('Ana Ruiz');
+        fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+        expect(screen.getByRole('textbox', { name: 'Time' })).toHaveValue('Thursday · 4:30 PM');
+        fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+        expect(screen.getByRole('button', { name: 'Schedule' })).toBeInTheDocument();
+        steps.unmount();
+
+        render(<TabsForStepsModal />);
+        expect(screen.getByRole('tab', { name: '1. Student' })).toHaveAttribute('aria-selected', 'true');
+        fireEvent.click(screen.getByRole('tab', { name: '2. When' }));
+        expect(screen.getByRole('textbox', { name: 'Time' })).toHaveValue('Thursday · 4:30 PM');
+    });
+
+    it('links TypeCard anchors to unique ComponentExample and heading ids in PatternModal.mdx', () => {
+        const typeCards = [...modalMdx.matchAll(/<TypeCard\s+[^>]*to="#([^"]+)"[^>]*title="([^"]+)"/g)]
+            .map(([, to, title]) => ({ to, title }));
+        const exampleTitles = [...modalMdx.matchAll(/<ComponentExample\s+[^>]*title="([^"]+)"/g)]
+            .map(([, title]) => title);
+        const examplesTab = modalMdx.split('<DocsTab tab="examples">')[1].split('</DocsTab>')[0];
+        const headingSlugs = [
+            ...exampleTitles.map(exampleSlug),
+            ...[...examplesTab.matchAll(new RegExp('^#{2,3}\\s+([^\\n<]+)', 'gm'))].map(([, h]) => exampleSlug(h)),
+        ];
+
+        expect(typeCards).toHaveLength(4);
+        expect(new Set(headingSlugs).size).toBe(headingSlugs.length);
+        typeCards.forEach(({ to }) => expect(headingSlugs).toContain(to));
+
+        const Stub = { render: () => <div /> };
+        render(
+            <div>
+                {typeCards.map(({ to, title }) => (
+                    <TypeCard key={title} of={Stub} to={`#${to}`} title={title}>{title}</TypeCard>
+                ))}
+                {exampleTitles.map((title) => (
+                    <ComponentExample key={title} of={Stub} title={title} description={title} />
+                ))}
+            </div>,
+        );
+
+        for (const { to, title } of typeCards) {
+            expect(screen.getByRole('link', { name: new RegExp(title) })).toHaveAttribute('href', `#${to}`);
+        }
+        for (const title of exampleTitles) {
+            expect(within(document.body).getByRole('heading', { level: 3, name: title })).toHaveAttribute('id', exampleSlug(title));
+        }
     });
 });
