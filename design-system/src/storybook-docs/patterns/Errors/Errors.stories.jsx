@@ -3,7 +3,9 @@ import { expect, userEvent, within } from 'storybook/test';
 
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
-import { EMPTY, FILLED, FormInModal, FormInPage } from '../../../patterns/Form/formDemo.jsx';
+import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
+import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
+import { EMPTY, FILLED, FormInModal, FormInPage, PAGE_WIDTH } from '../../../patterns/Form/formDemo.jsx';
 import { BackgroundJob, FieldError, FlagOnPage, InPage, LoadFailure, MenuError, NoAccess, PLACE_STAGE, PageCondition, STAGE } from './errorsDemo.jsx';
 
 /**
@@ -23,7 +25,7 @@ export default {
     parameters: { layout: 'padded' },
 };
 
-const staged = (story, width = STAGE) => <FitStage width={width}>{story}</FitStage>;
+const staged = (story, width = STAGE) => <FitStage width={width} scrollable>{story}</FitStage>;
 
 /** No message in this picture lives in a tooltip or a title attribute. */
 const noTooltipCopy = async (canvasElement) => {
@@ -38,11 +40,14 @@ export const PlaceField = {
     render: () => staged(<FieldError />, PLACE_STAGE),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const field = canvas.getByLabelText(/School email/);
         await expect(field, 'the field is invalid').toHaveAttribute('aria-invalid', 'true');
         await expect(canvas.getByText('Enter a full email, like name@school.org'), 'the message says what to fix').toBeInTheDocument();
         await noTooltipCopy(canvasElement);
         await fitsCanvas(canvasElement);
+        await settleAnimations(canvasElement);
     },
 };
 
@@ -52,6 +57,8 @@ export const PlaceLoadFailure = {
     render: () => staged(<LoadFailure />, PLACE_STAGE),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await expect(canvas.getByRole('heading', { name: "Couldn't load this week's sessions" }), 'the heading says what failed').toBeInTheDocument();
         await expect(canvas.getByRole('button', { name: 'Try again' }), 'the way forward').toBeInTheDocument();
         await expect(canvas.queryByRole('table'), 'the table is replaced whole').toBeNull();
@@ -66,6 +73,8 @@ export const PlaceNoAccess = {
     render: () => staged(<NoAccess />, PLACE_STAGE),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await expect(canvas.getByText(/Ask the supervisor/), 'it says who can help').toBeInTheDocument();
         await expect(canvas.queryByRole('button', { name: /Try again|Request/ }), 'no action the person cannot take').toBeNull();
         await fitsCanvas(canvasElement);
@@ -78,10 +87,13 @@ export const PlaceBackgroundJob = {
     render: () => staged(<BackgroundJob />, PLACE_STAGE),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await expect(canvas.getByText("Couldn't save your session note"), 'the title names the event').toBeInTheDocument();
         await expect(canvas.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
         await expect(canvas.getByRole('alert'), 'a danger Flag is an alert').toBeInTheDocument();
         await fitsCanvas(canvasElement);
+        await settleAnimations(canvasElement);
     },
 };
 
@@ -90,6 +102,8 @@ export const PlacePageCondition = {
     name: 'Place: The whole page',
     render: () => staged(<PageCondition />, PLACE_STAGE),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const banner = canvasElement.querySelector('.plus-banner--danger');
         await expect(banner, 'a danger Banner').toBeInTheDocument();
         await expect(within(banner).queryByRole('button'), 'a Banner has no dismiss').toBeNull();
@@ -103,9 +117,14 @@ export const PlaceMenu = {
     render: () => staged(<MenuError />, PLACE_STAGE),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await expect(await canvas.findByText("Couldn't load options"), 'the row says what failed').toBeInTheDocument();
-        await expect(canvas.getByRole('menuitem', { name: 'Retry' }), 'and offers Retry').toBeInTheDocument();
+        const retry = canvas.getByRole('menuitem', { name: 'Retry' });
+        await expect(retry, 'and offers Retry').toBeInTheDocument();
         await fitsCanvas(canvasElement);
+        await userEvent.click(retry);
+        await expect(await canvas.findByRole('menuitem', { name: 'Edit' })).toBeInTheDocument();
     },
 };
 
@@ -117,23 +136,30 @@ export const KeyBlockedSubmit = {
     render: () => staged(<FormInModal initial={EMPTY} marked height="fill" stageHeight={680} />),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await expect(canvas.queryAllByRole('dialog'), 'one dialog, never a second').toHaveLength(1);
         await expect(canvas.getByLabelText(/Student/), 'the field is marked').toHaveAttribute('aria-invalid', 'true');
         await expect(canvas.getByText('Choose a site.'), 'the message is on the field').toBeInTheDocument();
         await fitsCanvas(canvasElement);
+        await settleAnimations(canvasElement);
     },
 };
 
 /** The server said no: a danger SectionMessage at the top of the form, announced. */
 export const KeyRejectedSubmit = {
     name: 'Key case: Rejected submit',
-    render: () => staged(<FormInPage server initial={FILLED} />),
+    render: () => staged(<FormInPage server initial={FILLED} />, PAGE_WIDTH),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        await settleAnimations(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const message = canvasElement.querySelector('[data-probe="message"]');
         await expect(within(message).getByRole('alert'), 'announced when it appears').toBeInTheDocument();
         await expect(message.getBoundingClientRect().top, 'at the top of the form').toBeLessThanOrEqual(canvas.getByLabelText(/Student/).getBoundingClientRect().top);
         await fitsCanvas(canvasElement);
+        await settleAnimations(canvasElement);
     },
 };
 
@@ -143,9 +169,16 @@ export const KeySectionFailed = {
     render: () => staged(<InPage />),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await expect(canvas.getByRole('heading', { name: 'Lincoln Middle', level: 1 }), 'the page around it is up').toBeInTheDocument();
-        await expect(canvas.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
+        const retry = canvas.getByRole('button', { name: 'Try again' });
+        await expect(retry).toBeInTheDocument();
         await fitsCanvas(canvasElement);
+        await userEvent.click(retry);
+        await expect(canvas.getByRole('table')).toBeVisible();
+        await userEvent.click(canvas.getByRole('tab', { name: 'Next week' }));
+        await expect(canvas.getByRole('tab', { name: 'Next week' })).toHaveAttribute('aria-selected', 'true');
     },
 };
 
@@ -154,8 +187,14 @@ export const KeyFlagOnPage = {
     name: 'Key case: A failed save in the background',
     render: () => staged(<FlagOnPage />),
     play: async ({ canvasElement }) => {
-        await expect(within(canvasElement).getByRole('alert')).toBeInTheDocument();
+        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        await expect(canvas.getByRole('alert')).toBeInTheDocument();
         await fitsCanvas(canvasElement);
+        await userEvent.click(canvas.getByRole('button', { name: 'Try again' }));
+        await expect(canvas.getByText('Session note saved')).toBeInTheDocument();
+        await settleAnimations(canvasElement);
     },
 };
 
