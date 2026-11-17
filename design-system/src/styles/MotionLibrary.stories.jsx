@@ -8,7 +8,12 @@
  * Run: npx vitest run --project=storybook design-system/src/styles/MotionLibrary.stories.jsx
  */
 import React from 'react';
+import { flushSync } from 'react-dom';
+import { createRoot } from 'react-dom/client';
+import PropTypes from 'prop-types';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { HeadingContextProvider } from '@/components';
+import { OverlayContainer } from '@/lib/overlay';
 
 import {
     MOTION_FAMILIES,
@@ -17,7 +22,12 @@ import {
     filterMotionLibrary,
     motionLibraryOf,
 } from '../../../scripts/lib/tokens/motion-docs.mjs';
-import { MotionLibrary, MotionLibraryCard } from '@/storybook-docs/motion-library.jsx';
+import {
+    COMPONENT_SUBJECTS,
+    COMPONENT_SUBJECT_FALLBACKS,
+    MotionLibrary,
+    MotionLibraryCard,
+} from '@/storybook-docs/motion-library.jsx';
 import { speedFor } from '@/storybook-docs/illustrations/motion-story-helpers.jsx';
 
 export default {
@@ -28,6 +38,9 @@ export default {
 
 const ROWS = motionLibraryOf();
 const MULTI_EVENT_ROW = ROWS.find((r) => r.tier === 'component' && r.name === 'Modal') ?? ROWS.find((r) => r.events.length > 1);
+const CHECKBOX_ROW = ROWS.find((r) => r.tier === 'component' && r.name === 'Checkbox') ?? MULTI_EVENT_ROW;
+const FALLBACK_ROW = ROWS.find((r) => r.tier === 'component' && r.name === 'Sidebar');
+const PATTERN_ROW = ROWS.find((r) => r.tier === 'pattern') ?? ROWS[0];
 const MILESTONE_ROW = ROWS.find((r) => r.tier === 'template' && r.name === 'PatternCard') ?? ROWS[0];
 
 const expectSceneAtLanding = async (demoEl) => {
@@ -178,6 +191,285 @@ export const ExpressiveMilestoneCard = {
             { timeout: 15000, interval: 50 },
         );
         await expectSceneAtLanding(demo);
+    },
+};
+
+export const RealComponentCardAnimatesAndSettles = {
+    render: (_args, { viewMode } = {}) => (
+        <MotionLibraryCard
+            row={CHECKBOX_ROW}
+            reduced={false}
+            fastForward={speedFor(viewMode)}
+        />
+    ),
+    play: async ({ canvasElement }) => {
+        const card = canvasElement.querySelector('[data-motion-card="component:Checkbox"]');
+        await expect(card).toBeTruthy();
+        const demo = card.querySelector('[data-motion-demo]');
+        await expect(demo).toBeTruthy();
+        await expect(demo.dataset.subject).toBe('component');
+
+        await waitFor(
+            () => expect(demo.dataset.phase).toBe('settled'),
+            { timeout: 15000, interval: 50 },
+        );
+        await expect(Number(demo.dataset.passes)).toBeGreaterThanOrEqual(1);
+        await expectSceneAtLanding(demo);
+
+        const subjectEl = card.querySelector('[data-motion-component-subject="Checkbox"]');
+        await expect(subjectEl).toBeTruthy();
+        const checkbox = within(subjectEl).getByRole('checkbox', { name: 'Complete warm-up check' });
+        await expect(checkbox).toBeChecked();
+    },
+};
+
+export const RealComponentCardReducedTwin = {
+    render: (_args, { viewMode } = {}) => (
+        <MotionLibraryCard
+            row={CHECKBOX_ROW}
+            reduced
+            fastForward={speedFor(viewMode)}
+        />
+    ),
+    play: async ({ canvasElement }) => {
+        const card = canvasElement.querySelector('[data-motion-card="component:Checkbox"]');
+        await expect(card).toBeTruthy();
+        const demo = card.querySelector('[data-motion-demo]');
+        await expect(demo.dataset.subject).toBe('component');
+        await expect(demo.dataset.reduced).toBe('true');
+        await expect(demo.dataset.phase).toBe('still');
+        await expectSceneAtLanding(demo);
+
+        await waitFor(() =>
+            expect(card.querySelector('[data-motion-component-subject="Checkbox"]')).toBeTruthy(),
+        );
+        const subjectEl = card.querySelector('[data-motion-component-subject="Checkbox"]');
+        const checkbox = within(subjectEl).getByRole('checkbox', { name: 'Complete warm-up check' });
+        await expect(checkbox).toBeChecked();
+
+        // Reduced motion still plays once when explicitly requested via the Play button
+        const playOnceBtn = card.querySelector('[data-motion-replay]');
+        await userEvent.click(playOnceBtn);
+        await waitFor(
+            () => expect(demo.dataset.phase).toBe('settled'),
+            { timeout: 15000, interval: 50 },
+        );
+        await expect(Number(demo.dataset.passes)).toBeGreaterThanOrEqual(1);
+    },
+};
+
+export const ComponentSubjectCoverage = {
+    render: () => (
+        <div style={{ display: 'grid', gap: 'var(--space-200)' }}>
+            <MotionLibraryCard row={MULTI_EVENT_ROW} reduced playOnInView={false} />
+            {FALLBACK_ROW ? <MotionLibraryCard row={FALLBACK_ROW} reduced playOnInView={false} /> : null}
+            <MotionLibraryCard row={PATTERN_ROW} reduced playOnInView={false} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const componentRows = motionLibraryOf().filter((r) => r.tier === 'component');
+        const subjectKeys = new Set(Object.keys(COMPONENT_SUBJECTS));
+        const fallbackKeys = new Set(Object.keys(COMPONENT_SUBJECT_FALLBACKS));
+
+        const uncovered = [];
+        const overlapped = [];
+        for (const row of componentRows) {
+            const hasSubject = subjectKeys.has(row.name);
+            const hasFallback = fallbackKeys.has(row.name);
+            if (!hasSubject && !hasFallback) uncovered.push(row.name);
+            if (hasSubject && hasFallback) overlapped.push(row.name);
+            if (hasSubject) {
+                const renderFn = COMPONENT_SUBJECTS[row.name];
+                const startEl = renderFn({
+                    row,
+                    event: row.events[0],
+                    step: 'start',
+                    progress: 0,
+                    isExit: false,
+                    reduced: false,
+                    mode: 'productive',
+                });
+                const landingEl = renderFn({
+                    row,
+                    event: row.events[0],
+                    step: 'landing',
+                    progress: 1,
+                    isExit: false,
+                    reduced: false,
+                    mode: 'productive',
+                });
+                await expect(React.isValidElement(startEl)).toBe(true);
+                await expect(React.isValidElement(landingEl)).toBe(true);
+            }
+        }
+        await expect(uncovered).toEqual([]);
+        await expect(overlapped).toEqual([]);
+
+        // Verify no stale keys exist in COMPONENT_SUBJECTS or COMPONENT_SUBJECT_FALLBACKS
+        const validNames = new Set(componentRows.map((r) => r.name));
+        const staleSubjects = [...subjectKeys].filter((k) => !validNames.has(k));
+        const staleFallbacks = [...fallbackKeys].filter((k) => !validNames.has(k));
+        await expect(staleSubjects).toEqual([]);
+        await expect(staleFallbacks).toEqual([]);
+
+        // Modal renders its real PLUS Modal inline inside the card
+        const modalCard = canvasElement.querySelector('[data-motion-card="component:Modal"]');
+        await expect(modalCard.querySelector('[data-subject="component"]')).toBeTruthy();
+        await expect(modalCard.querySelector('.plus-modal')).toBeTruthy();
+
+        // Fallback component row and pattern row keep their kit drawing
+        if (FALLBACK_ROW) {
+            const fallbackCard = canvasElement.querySelector(
+                `[data-motion-card="component:${FALLBACK_ROW.name}"]`,
+            );
+            await expect(fallbackCard.querySelector('[data-subject="component"]')).toBeNull();
+            await expect(fallbackCard.querySelector('svg')).toBeTruthy();
+        }
+        const patternCard = canvasElement.querySelector(
+            `[data-motion-card="${PATTERN_ROW.tier}:${PATTERN_ROW.name}"]`,
+        );
+        await expect(patternCard.querySelector('[data-subject="component"]')).toBeNull();
+        await expect(patternCard.querySelector('svg')).toBeTruthy();
+    },
+};
+
+const LEGACY_REACT_ELEMENT_TYPE = Symbol.for('react.element');
+
+const toLegacyReactElementForPropTypes = (val) => {
+    if (!val) return val;
+    if (Array.isArray(val)) return val.map(toLegacyReactElementForPropTypes);
+    if (React.isValidElement(val)) {
+        return { ...val, $$typeof: LEGACY_REACT_ELEMENT_TYPE };
+    }
+    return val;
+};
+
+const checkElementTreePropTypes = (node, subjectName) => {
+    if (!node) return;
+    if (Array.isArray(node)) {
+        for (const item of node) checkElementTreePropTypes(item, subjectName);
+        return;
+    }
+    if (!React.isValidElement(node)) return;
+
+    const { type, props } = node;
+    const propTypes = type?.propTypes ?? type?.render?.propTypes;
+    const compName =
+        type?.displayName ||
+        type?.name ||
+        type?.render?.displayName ||
+        type?.render?.name ||
+        subjectName;
+
+    if (propTypes && props) {
+        const normalizedProps = Object.fromEntries(
+            Object.entries(props).map(([k, v]) => [k, toLegacyReactElementForPropTypes(v)]),
+        );
+        PropTypes.resetWarningCache();
+        PropTypes.checkPropTypes(propTypes, normalizedProps, 'prop', `${subjectName} -> ${compName}`);
+        for (const key of Object.keys(props)) {
+            if (
+                key === 'children' ||
+                key === 'key' ||
+                key === 'ref' ||
+                key.startsWith('aria-') ||
+                key.startsWith('data-')
+            ) {
+                continue;
+            }
+            if (!Object.prototype.hasOwnProperty.call(propTypes, key)) {
+                console.error(
+                    `Warning: Failed prop type: Invalid prop \`${key}\` supplied to \`${subjectName} -> ${compName}\`, not declared in propTypes.`,
+                );
+            }
+        }
+    }
+
+    if (props) {
+        for (const [key, val] of Object.entries(props)) {
+            if (key === 'children' || React.isValidElement(val) || Array.isArray(val)) {
+                checkElementTreePropTypes(val, subjectName);
+            } else if (typeof val === 'function' && (key === 'readView' || key === 'editView')) {
+                try {
+                    checkElementTreePropTypes(
+                        val({ value: 'Sample', onChange: () => {}, id: 'sample-id' }),
+                        subjectName,
+                    );
+                } catch {
+                    // ignore render-prop probe errors
+                }
+            }
+        }
+    }
+};
+
+export const ComponentSubjectsMatchPropTypes = {
+    render: () => <div data-subject-prop-check-host />,
+    play: async ({ canvasElement }) => {
+        const componentRows = motionLibraryOf().filter(
+            (r) => r.tier === 'component' && Object.prototype.hasOwnProperty.call(COMPONENT_SUBJECTS, r.name),
+        );
+        const propTypeErrors = [];
+        const originalConsoleError = console.error;
+        console.error = (...args) => {
+            const msg = args.map((a) => (typeof a === 'string' ? a : String(a))).join(' ');
+            if (msg.includes('Failed prop type')) {
+                propTypeErrors.push(msg);
+            }
+            originalConsoleError.apply(console, args);
+        };
+
+        const host = canvasElement.querySelector('[data-subject-prop-check-host]') ?? canvasElement;
+        try {
+            for (const row of componentRows) {
+                const renderFn = COMPONENT_SUBJECTS[row.name];
+                const events = row.events?.length ? row.events : [{ event: 'default' }];
+                for (const event of events) {
+                    const isExit =
+                        event?.event === 'exit' ||
+                        event?.event === 'dismiss' ||
+                        event?.event === 'floating-exit';
+                    for (const [step, progress] of [
+                        ['start', 0],
+                        ['landing', 1],
+                    ]) {
+                        const element = renderFn({
+                            row,
+                            event,
+                            step,
+                            progress,
+                            isExit,
+                            reduced: true,
+                            mode: 'productive',
+                            container: host,
+                        });
+                        checkElementTreePropTypes(element, row.name);
+
+                        const slot = document.createElement('div');
+                        host.appendChild(slot);
+                        const root = createRoot(slot);
+                        try {
+                            flushSync(() => {
+                                root.render(
+                                    <HeadingContextProvider value={4}>
+                                        <OverlayContainer container={slot} boundary={slot}>
+                                            {element}
+                                        </OverlayContainer>
+                                    </HeadingContextProvider>,
+                                );
+                            });
+                        } finally {
+                            flushSync(() => root.unmount());
+                            slot.remove();
+                        }
+                    }
+                }
+            }
+        } finally {
+            console.error = originalConsoleError;
+        }
+
+        await expect(propTypeErrors, propTypeErrors.join('\n')).toEqual([]);
     },
 };
 
