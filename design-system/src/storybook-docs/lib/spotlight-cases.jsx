@@ -36,7 +36,7 @@ export const LiveSpotlight = ({
     };
     useEffect(() => () => window.clearTimeout(gestureTimerRef.current), []);
 
-    const secondaryAction = secondaryKind === 'link'
+    const secondaryAction = secondaryKind === 'outlined'
         ? (
             <SpotlightAction
                 appearance="secondary"
@@ -121,7 +121,7 @@ export const StepCountTourDont = () => (
 );
 
 export const SecondaryQuieterDo = () => (
-    <LiveSpotlight headline="Find sessions here" stepCount="1 of 3" secondaryKind="link" secondaryLabel="Learn more">
+    <LiveSpotlight headline="Find sessions here" stepCount="1 of 3" secondaryKind="outlined" secondaryLabel="Learn more">
         Open the calendar to see this week.
     </LiveSpotlight>
 );
