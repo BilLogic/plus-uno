@@ -23,20 +23,21 @@ export const CARD_STAGE = 600; // docs-literal
 
 const noop = () => {};
 const pad = { padding: 'var(--page-pad)', boxSizing: 'border-box' };
-const column = { ...pad, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxInlineSize: 'var(--card-min-width-lg)' };
+const column = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxInlineSize: 'var(--card-min-width-lg)' };
+const paddedColumn = { ...pad, ...column };
 
 const NOTE = 'Ana is working on fractions. She asked to review ratios before the quiz on Friday, and she wants a second pass at word problems, especially the ones with two steps. Ms. Ortiz agreed to add a short warm-up each week.';
 
 /** A time someone else set: neutral fill, full contrast, the reason in the caption. */
-export const ReadOnlyField = () => (
-    <div style={column}>
+export const ReadOnlyField = ({ padded = true }) => (
+    <div style={padded ? paddedColumn : column}>
         <TextField label="Session time" value="Thursday at 4:00 PM" onChange={noop} isReadOnly caption="Set by your supervisor." />
     </div>
 );
 
 /** A Select and a DatePicker: no chevron, no calendar button, the value reads as text. */
 export const ReadOnlyPickers = () => (
-    <div style={column}>
+    <div style={paddedColumn}>
         <Select label="Site" options={[{ value: 'lincoln', label: 'Lincoln Middle' }]} value="lincoln" onChange={noop} isReadOnly caption="Set by your supervisor." />
         <DatePicker aria-label="Date" value="2026-03-05" onChange={noop} isReadOnly />
     </div>
@@ -44,7 +45,7 @@ export const ReadOnlyPickers = () => (
 
 /** A Checkbox, a RadioGroup and a Toggle keep their state at full contrast and ignore clicks. */
 export const ReadOnlyChoices = () => (
-    <div style={column}>
+    <div style={paddedColumn}>
         <Checkbox label="Parent notified" isChecked onChange={noop} isReadOnly />
         <RadioGroup legend="Format" value="video" onChange={noop} isReadOnly options={[{ value: 'person', label: 'In person' }, { value: 'video', label: 'Video' }]} />
         <Toggle label="Send a reminder" isChecked onChange={noop} isReadOnly />
@@ -63,7 +64,7 @@ export const OwnedForm = () => (
     <BrowserWindow address="app.plus.org/sessions/ana-ruiz" height={PAGE_HEIGHT}>
         <InAppFrame height="100%" activeTabId="sessions" breadcrumbs={RECORD_CRUMBS} panelStorageKey={null}>
             <PatternSection level="page" title="Session details" description="Set by Lincoln's supervisor.">
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxInlineSize: 'var(--card-min-width-lg)' }}>
+                <div style={column}>
                     <TextField label="Student" value="Ana Ruiz" onChange={noop} isReadOnly />
                     <TextField label="Time" value="Thursday at 4:00 PM" onChange={noop} isReadOnly />
                     <Select label="Site" options={[{ value: 'lincoln', label: 'Lincoln Middle' }]} value="lincoln" onChange={noop} isReadOnly />
@@ -78,14 +79,14 @@ const LONG_ROWS = 6; // docs-literal
 
 /** A long value is never truncated: the rows are set so all of it shows. */
 export const LongValue = () => (
-    <div style={column}>
+    <div style={paddedColumn}>
         <TextArea label="Session notes" value={NOTE} onChange={noop} isReadOnly rows={LONG_ROWS} caption="Locked while the import runs." />
     </div>
 );
 
 /** A value nobody changes here is plain text: a label and a value in a details Section. */
-export const PlainText = () => (
-    <div style={pad}>
+export const PlainText = ({ padded = true }) => (
+    <div style={padded ? pad : undefined}>
         <PatternSection title="Details" description="Lincoln Middle">
             <dl style={{ margin: 0, display: 'grid', gridTemplateColumns: 'max-content 1fr', gap: 'var(--stack-sm) var(--inline-lg)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
                 <dt style={{ color: 'var(--ds-text-subtle)' }}>School</dt>
