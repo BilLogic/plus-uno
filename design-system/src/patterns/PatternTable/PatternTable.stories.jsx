@@ -203,7 +203,7 @@ export const Interactive = {
     ),
     play: async ({ canvasElement }) => {
         const scroll = canvasElement.querySelector('.plus-pattern-table-scroll');
-        await expect(getComputedStyle(scroll).borderTopLeftRadius, 'Table radius is 12').toBe('12px');
+        await expect(getComputedStyle(scroll).borderTopLeftRadius, 'Table scroll region is flush so row rules are not clipped').toBe('0px');
     },
 };
 

@@ -107,14 +107,28 @@ export const KeyAreaPage = {
     },
 };
 
-/** One tab system: page tabs, and the Section's views as one Select. */
+/** One tab system: page tabs, and the Section's views as one labeled PopupSelect. */
 export const KeyOneTabSystem = {
     name: 'Key case: One tab system per page',
     render: () => staged(<TabsUnderPicture />),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expect(canvas.getAllByRole('tablist'), 'one tab system: the page tabs').toHaveLength(1);
-        await expect(canvas.getByRole('combobox', { name: 'Status' }), 'the Section picks its view from a Select').toBeInTheDocument();
+        const trigger = canvas.getByRole('button', { name: 'Status: Upcoming' });
+        await expect(trigger, 'the Section picks its view from a labeled PopupSelect').toBeInTheDocument();
+        await expect(canvas.getByRole('cell', { name: 'Algebra' }), 'Subject column holds subjects').toBeInTheDocument();
+        await userEvent.click(trigger);
+        const body = within(canvasElement.ownerDocument.body);
+        await userEvent.click(await body.findByRole('option', { name: 'Past' }));
+        await expect(canvas.getByRole('button', { name: 'Status: Past' })).toBeInTheDocument();
+        await expect(canvas.getByRole('cell', { name: 'Two-step equations' }), 'picking Past filters rows').toBeInTheDocument();
+        await userEvent.click(canvas.getByRole('tab', { name: 'Overview' }));
+        await expect(canvas.getByRole('heading', { name: 'Upcoming sessions' }), 'Overview tab shows upcoming sessions').toBeInTheDocument();
+        await userEvent.click(canvas.getByRole('tab', { name: 'Notes' }));
+        await expect(canvas.getByRole('heading', { name: 'Tutor notes' }), 'page tabs swap Section content').toBeInTheDocument();
+        await userEvent.click(canvas.getByRole('tab', { name: 'Sessions' }));
+        await userEvent.click(canvas.getByRole('button', { name: 'Status: Past' }));
+        await userEvent.click(await body.findByRole('option', { name: 'Upcoming' }));
         await fitsCanvas(canvasElement);
     },
 };

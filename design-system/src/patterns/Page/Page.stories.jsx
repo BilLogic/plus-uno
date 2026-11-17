@@ -18,6 +18,8 @@ import {
     PageBanner,
     PageStage,
     PageTabs,
+    RecordTabSection,
+    SessionsTable,
     ViewBarWithAdd,
     ViewSelect,
 } from './pageDemo.jsx';
@@ -25,6 +27,7 @@ import Page, { PAGE_EDGE, PAGE_LEVELS } from '@/patterns/Page';
 import { computedShadow, probe, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { DemoLabel, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { StudentsTable } from '@/storybook-docs/lib/view-bar.jsx';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
 
@@ -283,7 +286,7 @@ const contentBox = (root) => root.querySelector('.plus-frame__content');
 const AreaPage = ({ full = false }) => (
     <PageStage full={full} width={TYPE_STAGE} height={300}>
         <DemoPageHeader title="Sessions" />
-        <CardsSection title="Upcoming sessions" description="Next 7 days" actions={<PageActions />} />
+        <CardsSection title="Upcoming sessions" description="Next 7 days" actions={<Button text="View calendar" onClick={() => {}} />} />
     </PageStage>
 );
 
@@ -308,20 +311,24 @@ export const TypeFullWidth = {
 };
 
 /** The record page with everything the header can carry. */
-const RecordPage = ({ banner = false }) => (
-    <PageStage width={PAGE_STAGE} height={480}>
-        <DemoPageHeader
-            breadcrumb={RECORD_CRUMBS}
-            title="Maya Rodriguez"
-            status={{ appearance: 'success', text: 'Active' }}
-            description="Grade 8 · Math · Lincoln Middle School"
-            actions={<PageActions />}
-            tabs={<PageTabs />}
-        />
-        {banner && <PageBanner />}
-        <CardsSection title="Upcoming sessions" />
-    </PageStage>
-);
+const RecordPage = ({ banner = false }) => {
+    const [tab, setTab] = useState('overview');
+    const [status, setStatus] = useState('upcoming');
+    return (
+        <PageStage width={PAGE_STAGE} height={480}>
+            <DemoPageHeader
+                breadcrumb={RECORD_CRUMBS}
+                title="Maya Rodriguez"
+                status={{ appearance: 'success', text: 'Active' }}
+                description="Grade 8 · Math · Lincoln Middle School"
+                actions={<PageActions />}
+                tabs={<PageTabs active={tab} onSelect={setTab} />}
+            />
+            {banner && <PageBanner />}
+            <RecordTabSection tab={tab} status={status} onStatusChange={setStatus} />
+        </PageStage>
+    );
+};
 
 /** Every part once: breadcrumb, title with its StatusTag, description, actions, page tabs, banner, content. Markers sit in the nearest gutter. */
 export const AnatomyRecord = {
@@ -357,7 +364,7 @@ export const ScenarioArea = {
         <PageStage>
             <DemoPageHeader title="Students" />
             <PatternSection title="Students" type="tabs-only" tabs={<ViewBarWithAdd />}>
-                {slotContent('Students table')}
+                <StudentsTable count={4} />
             </PatternSection>
         </PageStage>
     ),
@@ -378,7 +385,7 @@ export const ScenarioSeveralSections = {
             <DemoPageHeader title="Home" />
             <CardsSection title="Upcoming sessions" description="Next 7 days" actions={<Button text="View calendar" onClick={() => {}} />} />
             <PatternSection title="Needs follow-up" actions={<Button text="Review all" onClick={() => {}} />}>
-                {slotContent('Reflections table')}
+                <StudentsTable count={3} view="Needs follow-up" />
             </PatternSection>
         </PageStage>
     ),
@@ -389,21 +396,39 @@ export const ScenarioSeveralSections = {
     },
 };
 
-/** Record page under page tabs: the Section's views become one labeled Select. */
+/** Record page under page tabs: the Section's views become one labeled PopupSelect. */
+const ScenarioRecordTabsDemo = () => {
+    const [tab, setTab] = useState('sessions');
+    const [status, setStatus] = useState('upcoming');
+    return (
+        <PageStage height={420}>
+            <DemoPageHeader breadcrumb={RECORD_CRUMBS} title="Maya Rodriguez" description="Grade 8 · Math" actions={<PageActions />} tabs={<PageTabs active={tab} onSelect={setTab} />} />
+            <RecordTabSection tab={tab} status={status} onStatusChange={setStatus} />
+        </PageStage>
+    );
+};
+
 export const ScenarioRecordTabs = {
     name: 'Record page under page tabs',
-    render: () => (
-        <PageStage height={420}>
-            <DemoPageHeader breadcrumb={RECORD_CRUMBS} title="Maya Rodriguez" description="Grade 8 · Math" actions={<PageActions />} tabs={<PageTabs active="sessions" />} />
-            <PatternSection title="Sessions" type="tabs-only" tabs={<ViewSelect />}>
-                {slotContent('Sessions table')}
-            </PatternSection>
-        </PageStage>
-    ),
+    render: () => <ScenarioRecordTabsDemo />,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expect(canvas.getAllByRole('tablist'), 'one tab system: the page tabs').toHaveLength(1);
         await expect(canvas.getByRole('tab', { name: 'Sessions' })).toHaveAttribute('aria-selected', 'true');
+        const trigger = canvas.getByRole('button', { name: 'Status: Upcoming' });
+        await expect(trigger).toBeInTheDocument();
+        await userEvent.click(trigger);
+        const body = within(canvasElement.ownerDocument.body);
+        await userEvent.click(await body.findByRole('option', { name: 'Past' }));
+        await expect(canvas.getByRole('button', { name: 'Status: Past' })).toBeInTheDocument();
+        await expect(canvas.getByRole('cell', { name: 'Two-step equations' })).toBeInTheDocument();
+        await userEvent.click(canvas.getByRole('tab', { name: 'Overview' }));
+        await expect(canvas.getByRole('heading', { name: 'Upcoming sessions' })).toBeInTheDocument();
+        await userEvent.click(canvas.getByRole('tab', { name: 'Notes' }));
+        await expect(canvas.getByRole('heading', { name: 'Tutor notes' })).toBeInTheDocument();
+        await userEvent.click(canvas.getByRole('tab', { name: 'Sessions' }));
+        await userEvent.click(canvas.getByRole('button', { name: 'Status: Past' }));
+        await userEvent.click(await body.findByRole('option', { name: 'Upcoming' }));
     },
 };
 
@@ -413,7 +438,9 @@ export const ScenarioTwoLevels = {
     render: () => (
         <PageStage>
             <DemoPageHeader breadcrumb={DEEP_CRUMBS} title="Session on Oct 14" actions={<PageActions />} />
-            <CardsSection title="Notes" />
+            <PatternSection title="Notes">
+                <PatternCard title="Oct 14 reflection" description="Worked through distributive property and two-step equations together." />
+            </PatternSection>
         </PageStage>
     ),
     play: async ({ canvasElement }) => {
@@ -453,7 +480,7 @@ export const ResponsiveWidth = {
             <div data-probe="stage" style={{ inlineSize: width }}>
                 <div style={{ height: 480 }}>
                     <Frame>
-                        <DemoPageHeader title="Sessions" actions={<PageActions />} />
+                        <DemoPageHeader title="Sessions" />
                         <CardsSection title="Upcoming sessions" />
                     </Frame>
                 </div>
@@ -480,6 +507,7 @@ const RECORD_TABS = ['overview', 'sessions', 'notes'];
 
 const SwitchViewsDemo = () => {
     const [tab, setTab] = useState('overview');
+    const [status, setStatus] = useState('upcoming');
     const views = {
         overview: (
             <PatternSection title="Current goals">
@@ -487,8 +515,8 @@ const SwitchViewsDemo = () => {
             </PatternSection>
         ),
         sessions: (
-            <PatternSection title="Sessions" type="tabs-only" tabs={<ViewSelect />}>
-                <CardsSection title="This month" />
+            <PatternSection title="Sessions" type="tabs-only" tabs={<ViewSelect value={status} onChange={setStatus} />}>
+                <SessionsTable status={status} />
             </PatternSection>
         ),
         notes: (
@@ -501,20 +529,24 @@ const SwitchViewsDemo = () => {
         <ScreenStage width={FRAME_LAYOUT.dockMin} fluid>
             <BrowserWindow address="app.plus.org/students/maya-rodriguez" height={WINDOW_HEIGHT}>
                 <Frame>
-                    <Page padding="none">
-                        <DemoPageHeader
-                            breadcrumb={[{ text: 'Students', href: '#students' }, { text: 'Maya Rodriguez' }]}
-                            title="Maya Rodriguez"
-                            description="Grade 8 · Math"
-                            actions={<PageActions />}
-                            tabs={(
-                                <Tabs activeKey={tab} onSelect={setTab} aria-label="Student views">
-                                    <Tabs.Tab eventKey="overview">Overview</Tabs.Tab>
-                                    <Tabs.Tab eventKey="sessions">Sessions</Tabs.Tab>
-                                    <Tabs.Tab eventKey="notes">Notes</Tabs.Tab>
-                                </Tabs>
-                            )}
-                        />
+                    <Page
+                        padding="none"
+                        header={(
+                            <DemoPageHeader
+                                breadcrumb={[{ text: 'Students', href: '#students' }, { text: 'Maya Rodriguez' }]}
+                                title="Maya Rodriguez"
+                                description="Grade 8 · Math"
+                                actions={<PageActions />}
+                                tabs={(
+                                    <Tabs activeKey={tab} onSelect={setTab} aria-label="Student views">
+                                        <Tabs.Tab eventKey="overview">Overview</Tabs.Tab>
+                                        <Tabs.Tab eventKey="sessions">Sessions</Tabs.Tab>
+                                        <Tabs.Tab eventKey="notes">Notes</Tabs.Tab>
+                                    </Tabs>
+                                )}
+                            />
+                        )}
+                    >
                         <SlideViews activeKey={tab} keys={RECORD_TABS} size="page">
                             {views[tab]}
                         </SlideViews>
@@ -551,7 +583,8 @@ const switchViewsPlay = (reduced) => async ({ canvasElement }) => {
 
     await waitFor(() => expect(stage).toHaveAttribute('data-view-phase', 'settled'));
     await expect(sessionsTab).toHaveAttribute('aria-selected', 'true');
-    await expect(canvas.getByRole('heading', { name: 'This month' })).toBeInTheDocument();
+    await expect(canvas.getByRole('table', { name: 'Sessions' })).toBeInTheDocument();
+    await expect(canvas.getByRole('button', { name: 'Status: Upcoming' })).toBeInTheDocument();
     await expect(within(breadcrumb).getAllByRole('link').map((a) => a.textContent), 'breadcrumb stays unchanged').toEqual(['Students']);
 
     sessionsTab.focus();

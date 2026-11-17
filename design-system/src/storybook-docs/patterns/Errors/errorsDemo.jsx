@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Banner, Button, ButtonItem, DropdownMenu, EmptyState, Flag, FlagGroup, IconButton, TextField } from '@/components';
-import { PatternSection } from '@/patterns';
+import { Page, PatternSection } from '@/patterns';
 import { DemoPageHeader } from '../../../patterns/Page/pageDemo.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { ViewBar, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
@@ -50,8 +50,8 @@ export const FieldError = () => (
 );
 
 /** A Section whose content could not load: the view bar stays, the body holds the error with Try again. */
-export const LoadFailure = ({ onRetry = noop }) => (
-    <div style={pad}>
+export const LoadFailure = ({ onRetry = noop, padded = true }) => {
+    const section = (
         <PatternSection title="Sessions" description="This week" tabs={<ViewBar views={['This week']} filters={null} primary={null} />}>
             <EmptyState
                 spacing="compact"
@@ -61,8 +61,9 @@ export const LoadFailure = ({ onRetry = noop }) => (
                 primaryAction={<Button text="Try again" appearance="default" spacing="compact" onClick={onRetry} />}
             />
         </PatternSection>
-    </div>
-);
+    );
+    return padded ? <div style={pad}>{section}</div> : section;
+};
 
 /** No access: the same slot names who can help and offers no action the person cannot take. */
 export const NoAccess = () => (
@@ -79,8 +80,8 @@ export const NoAccess = () => (
 );
 
 /** A save that failed after the person moved on: a danger Flag at the top right, held in the picture, no autohide. */
-export const BackgroundJob = () => (
-    <div style={{ ...pad, display: 'flex', justifyContent: 'flex-end', minBlockSize: 'var(--card-min-width-lg)' }}>
+export const BackgroundJob = ({ padded = true }) => (
+    <div style={{ ...(padded ? pad : {}), display: 'flex', justifyContent: 'flex-end', minBlockSize: 'var(--card-min-width-lg)' }}>
         <FlagGroup position="top-end" containerPosition="static">
             <Flag
                 appearance="error"
@@ -126,19 +127,17 @@ export const MenuError = () => {
 /** A page whose Section failed to load: the rest of the page works. */
 export const InPage = () => (
     <BrowserWindow address="app.plus.org/groups/algebra-b" height={WINDOW}>
-        <div style={pad}>
-            <DemoPageHeader title="Lincoln Middle" description="Tuesdays and Thursdays, 4:00 PM" />
-            <LoadFailure />
-        </div>
+        <Page header={<DemoPageHeader title="Lincoln Middle" description="Tuesdays and Thursdays, 4:00 PM" />}>
+            <LoadFailure padded={false} />
+        </Page>
     </BrowserWindow>
 );
 
 /** A failed save after the person moved on: the page behind them, the Flag finding them at the top right. */
 export const FlagOnPage = () => (
     <BrowserWindow address="app.plus.org/students" height={WINDOW}>
-        <div style={pad}>
-            <DemoPageHeader title="Students" description="Lincoln Middle" />
-            <BackgroundJob />
-        </div>
+        <Page header={<DemoPageHeader title="Students" description="Lincoln Middle" />}>
+            <BackgroundJob padded={false} />
+        </Page>
     </BrowserWindow>
 );

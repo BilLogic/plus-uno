@@ -43,7 +43,7 @@ export const slotContent = (label) => (
     </div>
 );
 
-const BREADCRUMBS = [{ text: 'Home', href: '#' }, { text: 'Dashboard' }];
+const BREADCRUMBS = [{ text: 'Students', href: '#' }, { text: 'Maya Rodriguez' }];
 const ACCOUNT = { id: 'john-doe', name: 'John Doe', role: 'Lead' };
 
 /**
@@ -55,7 +55,7 @@ const ACCOUNT = { id: 'john-doe', name: 'John Doe', role: 'Lead' };
 export const InAppFrame = ({ breadcrumbs = BREADCRUMBS, account = ACCOUNT, activeTabId = 'home', height = '100vh', children, ...frameProps }) => (
     <div style={{ height }}>
         <Frame
-            header={<Breadcrumb items={breadcrumbs} />}
+            header={breadcrumbs ? <Breadcrumb items={breadcrumbs} /> : undefined}
             sidebar={<Sidebar user="tutor" activeTabId={activeTabId} account={account} />}
             {...frameProps}
         >

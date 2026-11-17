@@ -94,7 +94,7 @@ A record page one level down shows every header slot, with markers in the gutter
 
 <ComponentExample of={PageStories.ScenarioSeveralSections} title="Area page, several Sections" description="Each Section takes a title and its own actions, since the page holds one Primary at most." />
 
-<ComponentExample of={PageStories.ScenarioRecordTabs} title="Record page under page tabs" description="One tab system per page: under page tabs a Section's views become one labeled Select at the start of its bar." />
+<ComponentExample of={PageStories.ScenarioRecordTabs} title="Record page under page tabs" description="One tab system per page: under page tabs a Section's views become one labeled PopupSelect at the start of its bar." />
 
 <ComponentExample of={PageStories.ScenarioTwoLevels} title="Two levels down" description="Every parent in order, each a link. With no page tabs the Sections take titles." />
 
@@ -304,11 +304,11 @@ Anything longer moves into the first Section.
 
 <RuleTag kind="review" />
 
-The rule and its reasons: the <DocsLink id="patterns-navigation">Navigation</DocsLink> pattern. Page tabs name views of one subject; the Section's views become one labeled Select.
+The rule and its reasons: the <DocsLink id="patterns-navigation">Navigation</DocsLink> pattern. Page tabs name views of one subject; the Section's views become one labeled PopupSelect.
 
 <DoDontPair
     doExample={<OneTabSystem />}
-    doCaption="Under page tabs the Section's views are one labeled Select at the start of its bar."
+    doCaption="Under page tabs the Section's views are one labeled PopupSelect at the start of its bar."
     dontExample={<TwoTabSystems />}
     dontCaption="Pill views under page tabs: two tab systems on one page."
 />

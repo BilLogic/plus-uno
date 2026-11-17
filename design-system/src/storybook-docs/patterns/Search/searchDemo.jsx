@@ -32,18 +32,27 @@ export const matching = (rows, query) => {
 };
 
 /** The count in words, in the results header, zero included. */
-export const countWords = (shown, total, query) => (query.trim() ? `${shown} of ${total} students` : `${total} students`);
+export const countWords = (shown, total, query, noun = 'students') => (query.trim() ? `${shown} of ${total} ${noun}` : `${total} ${noun}`);
 
 export const VIEWS = ['All students', 'Needs follow-up'];
 /** The rows the second view keeps. */
 const FOLLOW_UP = ['Marcus Lee', 'Noah Williams'];
 
 const HEAD = { cells: ['Name', 'Grade', 'Last session'].map((content) => ({ key: content, content })) };
-const tableRows = (rows) => rows.map(([name, grade, last]) => ({ key: name, cells: [name, grade, last].map((content) => ({ key: content, content })) }));
+const SESSION_HEAD = { cells: ['Time', 'Tutor', 'Subject'].map((content) => ({ key: content, content })) };
+const SESSION_ROWS = [
+    ['Thu 4:00 PM', 'Ms. Ortiz', 'Algebra'],
+    ['Thu 5:30 PM', 'Mr. Patel', 'Geometry'],
+    ['Fri 3:30 PM', 'Ms. Ortiz', 'Fractions'],
+    ['Sat 10:00 AM', 'Ms. Kim', 'Linear equations'],
+    ['Tue 4:00 PM', 'Ms. Ortiz', 'Two-step equations'],
+    ['Mon 3:30 PM', 'Mr. Patel', 'Angles and proofs'],
+];
+const tableRows = (rows) => rows.map(([a, b, c]) => ({ key: `${a}-${b}`, cells: [a, b, c].map((content) => ({ key: content, content })) }));
 
 const SCOPES = [
     { value: 'students', label: 'Students', count: 6 },
-    { value: 'sessions', label: 'Sessions', count: 12 },
+    { value: 'sessions', label: 'Sessions', count: 6 },
 ];
 
 /** The results header: the count, always, in words. */
@@ -59,17 +68,17 @@ const LoadingBody = () => (
 );
 
 /** The results: header with the count, then rows, loading or the empty state. */
-const Results = ({ shown, total, query, loading, onReset }) => (
+const Results = ({ shown, total, query, loading, onReset, noun = 'students', head = HEAD }) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-        <ResultsHeader>{loading ? 'Searching students' : countWords(shown.length, total, query)}</ResultsHeader>
+        <ResultsHeader>{loading ? `Searching ${noun}` : countWords(shown.length, total, query, noun)}</ResultsHeader>
         {loading && <LoadingBody />}
-        {!loading && shown.length > 0 && <DynamicTable head={HEAD} rows={tableRows(shown)} label="Students" isFixedSize />}
+        {!loading && shown.length > 0 && <DynamicTable head={head} rows={tableRows(shown)} label={noun === 'sessions' ? 'Sessions' : 'Students'} isFixedSize />}
         {!loading && shown.length === 0 && (
             <EmptyState
                 spacing="compact"
                 icon="user-group"
                 header="No matches"
-                description={`No students match "${query.trim()}".`}
+                description={`No ${noun} match "${query.trim()}".`}
                 primaryAction={<Button text="Reset filters" spacing="compact" onClick={onReset} />}
             />
         )}
@@ -122,20 +131,37 @@ export const SearchStudents = ({ initialQuery = '', initialOpen = false, isLoadi
 };
 
 /** The page-body field: default spacing, open, with a scope filter when `scoped`. */
-const BodyField = ({ scoped, ...props }) => (
+const BodyField = ({ scoped, placeholder = SCOPE, ...props }) => (
     <div style={{ maxInlineSize: 'var(--field-width-md)' }}>
-        <SearchField placeholder={SCOPE} {...(scoped ? { scopes: SCOPES } : {})} {...props} />
+        <SearchField placeholder={placeholder} {...(scoped ? { scopes: SCOPES } : {})} {...props} />
     </div>
 );
 
 /** A page body with its own search, at default spacing. */
 export const BodySearch = ({ initialQuery = '', scoped = false }) => {
     const [query, setQuery] = useState(initialQuery);
-    const shown = matching(STUDENTS, query);
+    const [scope, setScope] = useState('all');
+    const isSessions = scoped && scope === 'sessions';
+    const pool = isSessions ? SESSION_ROWS : STUDENTS;
+    const shown = matching(pool, query);
     return (
         <div style={{ padding: 'var(--page-pad)', display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
-            <BodyField scoped={scoped} value={query} onValueChange={setQuery} />
-            <Results shown={shown} total={STUDENTS.length} query={query} onReset={() => setQuery('')} />
+            <BodyField
+                scoped={scoped}
+                scope={scoped ? scope : undefined}
+                onScopeChange={scoped ? setScope : undefined}
+                placeholder={isSessions ? 'Search sessions' : SCOPE}
+                value={query}
+                onValueChange={setQuery}
+            />
+            <Results
+                shown={shown}
+                total={pool.length}
+                query={query}
+                noun={isSessions ? 'sessions' : 'students'}
+                head={isSessions ? SESSION_HEAD : HEAD}
+                onReset={() => setQuery('')}
+            />
         </div>
     );
 };
@@ -201,7 +227,7 @@ const THUMB_HEIGHT = STAGE / 2; // docs-literal
 const PageFrame = ({ mountRef, field, children }) => (
     <div ref={mountRef} style={{ position: 'relative', blockSize: THUMB_HEIGHT, overflow: 'hidden', padding: 'var(--page-pad)', boxSizing: 'border-box' }}>
         <PageHeader title="Students" actions={field} />
-        <div style={{ marginBlockStart: 'var(--stack-lg)' }}>{children}</div>
+        <div style={{ marginBlockStart: 'var(--page-stack-md)' }}>{children}</div>
     </div>
 );
 

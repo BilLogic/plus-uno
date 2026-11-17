@@ -121,7 +121,7 @@ export const IconOnly = {
 export const Selected = {
     render: () => {
         const [range, setRange] = useState('week');
-        const [filter, setFilter] = useState('assigned');
+        const [format, setFormat] = useState('table');
         return (
             <div style={row}>
                 <ButtonGroup label="Date range">
@@ -129,10 +129,9 @@ export const Selected = {
                     <Button text="Week" isSelected={range === 'week'} onClick={() => setRange('week')} />
                     <Button text="Month" isSelected={range === 'month'} onClick={() => setRange('month')} />
                 </ButtonGroup>
-                <ButtonGroup label="Assignment filter">
-                    <Button appearance="subtle" text="All" isSelected={filter === 'all'} onClick={() => setFilter('all')} />
-                    <Button appearance="subtle" text="Assigned" isSelected={filter === 'assigned'} onClick={() => setFilter('assigned')} />
-                    <Button appearance="subtle" text="Unassigned" isSelected={filter === 'unassigned'} onClick={() => setFilter('unassigned')} />
+                <ButtonGroup label="Schedule format">
+                    <Button appearance="subtle" text="Table" isSelected={format === 'table'} onClick={() => setFormat('table')} />
+                    <Button appearance="subtle" text="Calendar" isSelected={format === 'calendar'} onClick={() => setFormat('calendar')} />
                 </ButtonGroup>
             </div>
         );
@@ -141,7 +140,7 @@ export const Selected = {
         const canvas = within(canvasElement);
         const week = canvas.getByRole('button', { name: 'Week' });
         const month = canvas.getByRole('button', { name: 'Month' });
-        const assigned = canvas.getByRole('button', { name: 'Assigned' });
+        const assigned = canvas.getByRole('button', { name: 'Table' });
         week.style.transition = 'none';
         month.style.transition = 'none';
         assigned.style.transition = 'none';

@@ -259,9 +259,53 @@ export const FormInModal = ({ initial, server, sendingForever, marked, sending, 
 /** A form in steps: Frame · focused, the form's groups one per step in the body. */
 export const FormInSteps = ({ start = 0 }) => {
     const f = useFormState();
+    const [schedule, setSchedule] = useState({ date: 'Thu, Oct 24', time: '4:00 PM' });
     return (
         <FocusedType address="app.plus.org/sessions/new" labels={['Student', 'Schedule', 'Notes', 'Review']} start={start} title="Log a session">
-            <FormFields values={f.values} onChange={f.setValues} errors={f.errors} onBlurField={f.onBlurField} setRef={f.setRef} />
+            {(stepIndex) => {
+                if (stepIndex === 0) {
+                    return <FormFields values={f.values} onChange={f.setValues} errors={f.errors} onBlurField={f.onBlurField} setRef={f.setRef} />;
+                }
+                if (stepIndex === 1) {
+                    return (
+                        <Fieldset legend="Schedule">
+                            <TextField
+                                label="Session date"
+                                isRequired
+                                value={schedule.date}
+                                onChange={(e) => setSchedule((s) => ({ ...s, date: e.target.value }))}
+                            />
+                            <TextField
+                                label="Start time"
+                                isRequired
+                                value={schedule.time}
+                                onChange={(e) => setSchedule((s) => ({ ...s, time: e.target.value }))}
+                            />
+                        </Fieldset>
+                    );
+                }
+                if (stepIndex === 2) {
+                    return (
+                        <Fieldset legend="Notes">
+                            <TextField
+                                label="Session notes"
+                                labelMarker="optional"
+                                value={f.values.notes}
+                                onChange={(e) => f.setValues({ ...f.values, notes: e.target.value })}
+                                caption="Shared with the site supervisor after the session."
+                            />
+                        </Fieldset>
+                    );
+                }
+                const siteLabel = SUBJECTS.find((s) => s.value === f.values.subject)?.label ?? (f.values.subject || 'Lincoln Middle');
+                return (
+                    <Fieldset legend="Review">
+                        <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+                            {`${f.values.student || 'Ana Ruiz'} · ${siteLabel} · ${schedule.date} at ${schedule.time}`}
+                        </p>
+                    </Fieldset>
+                );
+            }}
         </FocusedType>
     );
 };

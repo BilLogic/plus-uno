@@ -64,14 +64,14 @@ A focused Frame has no Sidebar and no breadcrumb. Close leads the title row, so 
 Do: The task fills the window: no Sidebar, nothing to invite the person away.
 Don't: The Sidebar left docked beside a focused task, one click from leaving it.
 
-### Put Cancel at the start of the bar and Back and Next at the end. {#put-cancel-at-the-start-of-the-bar-and-back-and-next-at-the-end}
+### Put Back and Next in the bar, with no Cancel. {#put-back-and-next-in-the-bar-with-no-cancel}
 
 **Checked:** Review
 
-The bottom bar is fixed along the bottom, one row high (`--space-300`). Cancel (Subtle) is at the start; Back and Next sit together at the end, Next last and Primary. Back on the first step is disabled and needs no reason.
+The bottom bar is fixed along the bottom, one row high (`--space-300`). Close in the title row leaves the task, so the bar holds only Back and the primary Next, full bleed. Back on the first step is disabled and needs no reason.
 
-Do: Cancel alone at the start, then Back and the primary Next together at the end.
-Don't: Cancel between Back and Next: one run of three buttons, with the way out beside the way on.
+Do: Back and the primary Next split the bar; Close in the title row leaves the task.
+Don't: Cancel repeated in the bar beside Back and Next: two ways out of one task.
 
 ### Keep the AI panel docked as its own region. {#keep-the-ai-panel-docked-as-its-own-region}
 
@@ -151,7 +151,7 @@ A task with five steps. No Sidebar and no breadcrumb: nothing invites the person
 1. **Title row.** Close at the start, then the task's name as the page's one h1.
 2. **Steps.** A Section side at the start, 256 wide (320 for long labels), or a bar across the top; Focused steps says which.
 3. **Body.** The task's Sections at reading width, 864, centered.
-4. **Bar**, fixed along the bottom and 48 high. Cancel (Subtle) at the start; Back and Next at the end, full bleed. Back on the first step is disabled and needs no reason.
+4. **Bar**, fixed along the bottom and 48 high. Back and Next split the bar, full bleed; Close in the title row leaves the task. Back on the first step is disabled and needs no reason.
 
 ## Slots
 
@@ -163,7 +163,7 @@ A task with five steps. No Sidebar and no breadcrumb: nothing invites the person
 | `panel` · `panelLabel` · `panelOpen` | The AI panel region at the right, named for its content, filled with the Panel parts. |
 | `onBack` · `onClose` | A Back and a Close icon button in the header row. A focused page leads its title row with its own Close instead. |
 | `surfaceDirect` | Children go straight into the Page with no content box, for a bare column or a full-bleed view. |
-| `bar` | Planned. The focused bottom bar, 48 high, with Cancel, Back and Next. Today the page places the bar, so the Anatomy bar is the target shape. |
+| `bar` | Planned. The focused bottom bar, 48 high, with Back and Next, full bleed. Today the page places the bar, so the Anatomy bar is the target shape. |
 | `banner` | Planned. System news across the whole width above the Sidebar and the Page. |
 
 ## Sizes
@@ -183,7 +183,7 @@ Lengths are in pixels. Where the layout mode changes a value, the columns read M
 | Name the focused task for what it does: "Plan a tutoring term". | A generic title such as "Wizard". |
 | Name the panel for its content with `panelLabel`: "AI chat". | A generic name such as "Panel". |
 | Name steps with one noun each: "Student", "Schedule", "Review". | A sentence for a step. |
-| Keep Cancel, Back and Next named for what they do. | Icon buttons with no name. |
+| Keep Back and Next named for what they do. | Icon buttons with no name. |
 
 ## Props
 

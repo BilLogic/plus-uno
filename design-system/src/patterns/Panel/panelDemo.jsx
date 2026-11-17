@@ -14,9 +14,9 @@ import {
     PanelMoreAction,
     PanelSubheader,
     PanelUpAction,
-    Select,
     StaticTable,
     StatusTag,
+    Tabs,
     TextArea,
     TextField,
     VisuallyHidden,
@@ -121,51 +121,54 @@ const INBOX = [
 ];
 
 /** Notifications: the Inbox. Items carry an avatar, who did what and where, an excerpt, the time and an unread dot paired with the word. */
-export const InboxPanel = ({ onClose = () => {}, items = INBOX }) => (
-    <PanelContainer>
-        <PanelHeader
-            title="Inbox"
-            actions={(
-                <>
-                    <Button text="Archive all" appearance="subtle" spacing="compact" onClick={() => {}} />
-                    <PanelCloseAction onClick={onClose} />
-                </>
-            )}
-        />
-        <PanelSubheader>
-            <Select
-                aria-label="Show"
-                value="unread"
-                onChange={() => {}}
-                options={[
-                    { value: 'unread', label: 'Unread' },
-                    { value: 'all', label: 'All' },
-                    { value: 'mentions', label: 'Mentions' },
-                ]}
+export const InboxPanel = ({ onClose = () => {}, items = INBOX }) => {
+    const [tab, setTab] = useState('unread');
+    const visibleItems = tab === 'unread'
+        ? items.filter((n) => n.unread)
+        : tab === 'mentions'
+            ? items.filter((n) => n.what.includes('mentioned'))
+            : items;
+    return (
+        <PanelContainer>
+            <PanelHeader
+                title="Inbox"
+                actions={(
+                    <>
+                        <Button text="Archive all" appearance="subtle" spacing="compact" onClick={() => {}} />
+                        <PanelCloseAction onClick={onClose} />
+                    </>
+                )}
             />
-        </PanelSubheader>
-        <PanelBody data-probe="body">
-            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-                {items.map((n) => (
-                    <li key={n.id} data-probe="item" style={{ display: 'flex', gap: 'var(--inline-md)', alignItems: 'flex-start' }}>
-                        <Avatar name={n.name} size={32} />
-                        <div style={{ flex: '1 1 auto', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                            <span style={{ font: 'var(--body-default)', color: 'var(--ds-text)' }}>{`${n.name} ${n.what} in ${n.where}`}</span>
-                            <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{n.excerpt}</span>
-                            <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{n.time}</span>
-                        </div>
-                        {n.unread ? (
-                            <>
-                                <span aria-hidden="true" data-probe="unread" style={{ inlineSize: 'var(--inline-md)', blockSize: 'var(--inline-md)', marginBlockStart: 'var(--stack-md)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-brand-bold)' }} />
-                                <VisuallyHidden>unread</VisuallyHidden>
-                            </>
-                        ) : null}
-                    </li>
-                ))}
-            </ul>
-        </PanelBody>
-    </PanelContainer>
-);
+            <PanelSubheader>
+                <Tabs spacing="compact" activeKey={tab} onSelect={setTab} aria-label="Show">
+                    <Tabs.Tab eventKey="unread">Unread</Tabs.Tab>
+                    <Tabs.Tab eventKey="all">All</Tabs.Tab>
+                    <Tabs.Tab eventKey="mentions">Mentions</Tabs.Tab>
+                </Tabs>
+            </PanelSubheader>
+            <PanelBody data-probe="body">
+                <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
+                    {visibleItems.map((n) => (
+                        <li key={n.id} data-probe="item" style={{ display: 'flex', gap: 'var(--inline-md)', alignItems: 'flex-start' }}>
+                            <Avatar name={n.name} size={32} />
+                            <div style={{ flex: '1 1 auto', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
+                                <span style={{ font: 'var(--body-default)', color: 'var(--ds-text)' }}>{`${n.name} ${n.what} in ${n.where}`}</span>
+                                <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{n.excerpt}</span>
+                                <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{n.time}</span>
+                            </div>
+                            {n.unread ? (
+                                <>
+                                    <span aria-hidden="true" data-probe="unread" style={{ inlineSize: 'var(--inline-md)', blockSize: 'var(--inline-md)', marginBlockStart: 'var(--stack-md)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-brand-bold)' }} />
+                                    <VisuallyHidden>unread</VisuallyHidden>
+                                </>
+                            ) : null}
+                        </li>
+                    ))}
+                </ul>
+            </PanelBody>
+        </PanelContainer>
+    );
+};
 
 /** The record behind the Panel was removed: the body shows its empty state with a way back. */
 export const GonePanel = ({ onClose = () => {} }) => (

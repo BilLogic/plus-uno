@@ -56,7 +56,7 @@ Four tiers, from the whole app down to one record. A quick look is a layer, not 
 
 <ComponentExample of={NavigationStories.TierPageTabs} title="Page tabs" description="Views of one record, at the bottom of the page header. Only the selected indicator glides; content swaps in place." />
 
-<ComponentExample of={NavigationStories.KeyOneTabSystem} title="One tab system per page" description={<>Under page tabs a Section has no pill views: its views become one Select at the start of the bar, picking a view and not a filter. A visible label on it, "Status: Upcoming", is Planned <PlannedTag />.</>} />
+<ComponentExample of={NavigationStories.KeyOneTabSystem} title="One tab system per page" description={'Under page tabs a Section has no pill views: its views become one labeled PopupSelect at the start of the bar ("Status: Upcoming"), picking a view and not a filter.'} />
 
 <ComponentExample of={NavigationStories.KeyAreaPage} title="An area page" description="Nothing to climb out of, so no breadcrumb. The collection's add action is the Primary at the end of its view bar." />
 
@@ -148,15 +148,15 @@ Never on an area page or a focused task. It sits above the title in the page hea
 
 ### Keep one tab system per page.
 
-<RuleTag kind="review" />
+<RuleTag kind="automatic" />
 
-Page tabs under the title, or pill views in a Section's bar, never both. Under page tabs a Section's views become one Select at the start of its bar. It picks a view, not a filter.
+Either page tabs under the title, or pill views in a Section's bar, never both. Under page tabs a Section's views become one labeled PopupSelect at the start of its bar. It picks a view, not a filter.
 
 <DoDontPair
     doExample={<OneTabSystem />}
-    doCaption="Under page tabs the Section's views are one Select at the start of its bar."
+    doCaption="Under page tabs the Section's views are one labeled PopupSelect at the start of its bar."
     dontExample={<TwoTabSystems />}
-    dontCaption="Page tabs and pill views on one page: two tab systems."
+    dontCaption="Page tabs and pill views on the same page: two tab systems."
 />
 
 ### Make views a fixed set the product defines.

@@ -32,22 +32,21 @@ const Body = ({ x, y = 28, w }) => (
   </g>
 );
 
-/** The focused bottom bar: Cancel at the start, Back and Next at the end. */
+/** The focused bottom bar: Back and Next split the bar, with Close in the title row leaving the task. */
 const Bar = ({ order = 'right' }) => (
   <g>
     <Rect x={0} y={H - BAR_H} w={W} h={BAR_H} fill={PAINT.pageSurface} />
     <Rule x1={0} x2={W} y1={H - BAR_H} y2={H - BAR_H} />
     {order === 'right' ? (
       <g>
-        <ButtonShape x={6} y={H - BAR_H + 2} w={24} />
-        <ButtonShape x={W - 58} y={H - BAR_H + 2} w={24} />
-        <ButtonShape x={W - 30} y={H - BAR_H + 2} w={24} appearance="primary" />
+        <ButtonShape x={6} y={H - BAR_H + 2} w={(W - 16) / 2} />
+        <ButtonShape x={10 + (W - 16) / 2} y={H - BAR_H + 2} w={(W - 16) / 2} appearance="primary" />
       </g>
     ) : (
       <g>
-        <ButtonShape x={W - 86} y={H - BAR_H + 2} w={24} />
-        <ButtonShape x={W - 58} y={H - BAR_H + 2} w={24} appearance="primary" />
-        <ButtonShape x={W - 30} y={H - BAR_H + 2} w={24} />
+        <ButtonShape x={6} y={H - BAR_H + 2} w={24} />
+        <ButtonShape x={W - 58} y={H - BAR_H + 2} w={24} />
+        <ButtonShape x={W - 30} y={H - BAR_H + 2} w={24} appearance="primary" />
       </g>
     )}
   </g>
@@ -74,23 +73,23 @@ export const FocusedWithSidebar = ({ title = 'A focused task with the Sidebar st
   </Canvas>
 );
 
-/** Cancel at the start; Back and Next together at the end, the Primary last. */
-export const BarInOrder = ({ title = 'A bottom bar with Cancel at the start, and Back then the primary Next together at the end' }) => (
+/** Back and the primary Next split the bar, with no Cancel in the footer. */
+export const BarInOrder = ({ title = 'A bottom bar with Back and the primary Next splitting the bar, while Close in the title row leaves the task' }) => (
   <Canvas title={title}>
     <PageBox x={0} w={W} h={H - BAR_H} />
     <Body x={8} y={12} w={W - 16} />
     <Bar />
-    <Rect x={W - 62} y={H - BAR_H} w={60} h={BAR_H} fill="none" stroke={PAINT.accent} corner="button" />
+    <Rect x={2} y={H - BAR_H} w={W - 4} h={BAR_H} fill="none" stroke={PAINT.accent} corner="button" />
   </Canvas>
 );
 
-/** The three buttons gathered in one run, Cancel between Back and Next. */
-export const BarScrambled = ({ title = 'A bottom bar whose three buttons sit together at the end, with Cancel between Back and the primary Next' }) => (
+/** Cancel repeated in the bar beside Back and Next. */
+export const BarScrambled = ({ title = 'A bottom bar that repeats Cancel at the start beside Back and the primary Next' }) => (
   <Canvas title={title}>
     <PageBox x={0} w={W} h={H - BAR_H} />
     <Body x={8} y={12} w={W - 16} />
     <Bar order="end" />
-    <Rect x={W - 90} y={H - BAR_H} w={86} h={BAR_H} fill="none" stroke={PAINT.accent} corner="button" />
+    <Rect x={4} y={H - BAR_H} w={28} h={BAR_H} fill="none" stroke={PAINT.accent} corner="button" />
   </Canvas>
 );
 

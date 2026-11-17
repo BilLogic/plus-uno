@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Button, EmptyState } from '@/components';
-import { PatternCard, PatternSection } from '@/patterns';
+import { Page, PatternCard, PatternSection } from '@/patterns';
 import { DemoPageHeader } from '../../../patterns/Page/pageDemo.jsx';
 import { GonePanel } from '../../../patterns/Panel/panelDemo.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
@@ -93,10 +93,9 @@ export const EmptyType = ({ kind, spacing = 'default', action = true }) => {
 /** A page whose content has nothing to show: the block under the page header. */
 export const FullPage = () => (
     <BrowserWindow address="app.plus.org/groups/algebra-b" height={WINDOW}>
-        <div style={{ padding: 'var(--page-pad)', boxSizing: 'border-box' }}>
-            <DemoPageHeader title="Lincoln Middle" description="Tuesdays and Thursdays, 4:00 PM" />
+        <Page header={<DemoPageHeader title="Lincoln Middle" description="Tuesdays and Thursdays, 4:00 PM" />}>
             <EmptyType kind="first" />
-        </div>
+        </Page>
     </BrowserWindow>
 );
 

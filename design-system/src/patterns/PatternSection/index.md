@@ -78,7 +78,7 @@ Don't: Actions in the title row and again in the view bar: one action, two homes
 
 **Checked:** Review
 
-Views are a fixed set the product defines, and one pill stays even with one view. The strip stays on one line; extra pills fold into More. Under page tabs, the views become one labeled Select, so the page keeps one tab system.
+Views are a fixed set the product defines, and one pill stays even with one view. The strip stays on one line; extra pills fold into More. Under page tabs, the views become one labeled PopupSelect, so the page keeps one tab system.
 
 ### Order the end of the bar: format switch, Search, filters, More, Primary. {#order-the-end-of-the-bar-format-switch-search-filters-more-primary}
 
@@ -172,7 +172,7 @@ A starting set, picked by what the Section holds. Every control state lives on i
 - **View bar, several views.** Two to five views of the same rows, a fixed set the product defines. Extra pills fold into More.
 - **Format switch.** When the rows show as a table or a calendar, equal-width segments sit first at the end.
 - **View bar alone.** The page title already names the collection, so the title row is hidden from sight and stays in the page for screen readers.
-- **Under page tabs.** One tab system per page: the views become one labeled Select at the start of the bar. It picks a view, not a filter.
+- **Under page tabs.** One tab system per page: the views become one labeled PopupSelect at the start of the bar. It picks a view, not a filter.
 - **Subsection.** Any type nests once. The title drops to an h3; the view bar keeps its size.
 
 ## Anatomy

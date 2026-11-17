@@ -16,8 +16,8 @@ import {
     PanelHeader,
     PanelSubheader,
     PanelUpAction,
+    PopupSelect,
     SearchField,
-    Select,
     StatusTag,
     TextField,
     Toggle,
@@ -26,11 +26,12 @@ import {
 import { PANEL_STORAGE_KEY, PatternCard, PatternSection, SECTION_DETAIL_FLOOR } from '@/patterns';
 import { FRAME_LAYOUT } from '../Frame/frameLayout';
 import { useOwnWidth } from '../Frame/useOwnWidth';
+import { PAST_SESSIONS, SessionsTable, STUDENT_SESSION_CARDS, UPCOMING_SESSIONS } from '../Page/pageDemo.jsx';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { InAppFrame, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
-import { FilterSide, STUDENTS, StudentsTable, ViewBar, row } from '@/storybook-docs/lib/view-bar.jsx';
+import { FilterSide, STUDENTS, StudentsTable, ViewBar, filterStudentList, row } from '@/storybook-docs/lib/view-bar.jsx';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { iconClass } from '../../lib/icon';
@@ -652,9 +653,9 @@ const SESSIONS = [
     ['Roosevelt K-8', 'Wed 3:00 PM · 4 students'],
     ['North High', 'Thu 5:00 PM · 5 students'],
 ];
-const SessionCards = () => (
+const SessionCards = ({ items = SESSIONS }) => (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 'var(--grid-gutter)' }}>
-        {SESSIONS.map(([title, when]) => <PatternCard key={title} title={title} description={when} />)}
+        {items.map(([title, when]) => <PatternCard key={title} title={title} description={when} />)}
     </div>
 );
 
@@ -675,13 +676,18 @@ const STUDENT_FACTS = [['School', 'Lincoln Middle School'], ['Grade', 'Grade 7']
 /* ---- types */
 
 /** List: the view bar alone, one table, paging. */
+const TypeListDemo = () => {
+    const [view, setView] = useState('All students');
+    return (
+        <PatternSection title="Students" type="tabs-only" tabs={<ViewBar views={['All students', 'Needs follow-up']} activeView={view} onViewChange={setView} />}>
+            <StudentsTable count={6} rowsPerPage={4} sortable view={view} />
+        </PatternSection>
+    );
+};
+
 export const TypeList = {
     name: 'Type: List',
-    render: () => (
-        <PatternSection title="Students" type="tabs-only" tabs={<ViewBar views={['All students', 'Needs follow-up']} />}>
-            <StudentsTable count={6} rowsPerPage={4} sortable />
-        </PatternSection>
-    ),
+    render: () => <TypeListDemo />,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const nameHeader = canvas.getByRole('columnheader', { name: /^Name/ });
@@ -706,7 +712,7 @@ export const TypeQueue = {
         const queueRows = STUDENTS.slice(0, 4);
         const [index, setIndex] = useState(0);
         const [open, setOpen] = useState(true);
-        const [name, grade, tutor] = queueRows[index];
+        const [name, grade, lastSession, , , tutor] = queueRows[index];
         const selectRow = (i) => {
             setIndex(i);
             setOpen(true);
@@ -736,7 +742,7 @@ export const TypeQueue = {
                 </div>
                 <PanelBody>
                     <p style={{ margin: 0, font: 'var(--body-default)' }}>
-                        {grade} · {tutor}. The reflection names two goals for next week.
+                        {grade} · Tutor: {tutor} · {lastSession}. The reflection names two goals for next week.
                     </p>
                 </PanelBody>
                 <PanelFooter>
@@ -746,6 +752,7 @@ export const TypeQueue = {
         );
         return (
             <InAppFrame
+                breadcrumbs={null}
                 panel={panel}
                 panelLabel="Reflection"
                 panelOpen={open}
@@ -849,11 +856,13 @@ export const TypeDetails = {
     ),
 };
 
+const GROUP_FACTS = [['Tutor', 'Priya Nair'], ['Meets', 'Tuesdays, 4:30 PM'], ['Room', 'Library 2']];
+
 /** Main and side: the side at the end, no fill, facts beside the main content. */
 export const TypeMainAndSide = {
     name: 'Type: Main and side',
     render: () => (
-        <PatternSection title="Lincoln Middle" description="Tuesdays at 4:30 PM" layout="split" side={<Facts pairs={STUDENT_FACTS.slice(0, 3)} columns={1} />}>
+        <PatternSection title="Lincoln Middle" description="Tuesdays at 4:30 PM" layout="split" side={<Facts pairs={GROUP_FACTS} columns={1} />}>
             <StudentsTable count={4} />
         </PatternSection>
     ),
@@ -938,69 +947,119 @@ export const HeaderTypeViewBarOneView = {
 };
 
 /** View bar, several views of the same rows. */
+const HeaderTypeViewBarSeveralViewsDemo = () => {
+    const [view, setView] = useState('All students');
+    return (
+        <PatternSection
+            title="Students"
+            description="Lincoln Middle · 6 students"
+            tabs={<ViewBar views={['All students', 'Needs follow-up', 'Paused']} activeView={view} onViewChange={setView} />}
+        >
+            <StudentsTable count={6} view={view} />
+        </PatternSection>
+    );
+};
+
 export const HeaderTypeViewBarSeveralViews = {
     name: 'Header: View bar, several views',
-    render: () => (
-        <PatternSection title="Students" description="Lincoln Middle · 24 students" tabs={<ViewBar views={['All students', 'Needs follow-up', 'Paused']} />}>
-            <StudentsTable count={3} />
-        </PatternSection>
-    ),
+    render: () => <HeaderTypeViewBarSeveralViewsDemo />,
 };
 
 /** Format switch: equal-width segments, first on the right. */
+const HeaderTypeFormatSwitchDemo = () => {
+    const [view, setView] = useState('Upcoming');
+    const [format, setFormat] = useState('table');
+    const status = view === 'Past' ? 'past' : 'upcoming';
+    const cards = (status === 'past' ? PAST_SESSIONS : UPCOMING_SESSIONS).slice(0, 3);
+    return (
+        <PatternSection
+            title="Sessions"
+            description="This term"
+            tabs={<ViewBar views={['Upcoming', 'Past']} activeView={view} onViewChange={setView} format={format} onFormatChange={setFormat} primary="New session" />}
+        >
+            {format === 'calendar' ? (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 'var(--grid-gutter)' }}>
+                    {cards.map(([time, tutor, subject]) => (
+                        <PatternCard key={`${time}-${subject}`} title={`${time} · ${subject}`} description={tutor} />
+                    ))}
+                </div>
+            ) : (
+                <SessionsTable status={status} />
+            )}
+        </PatternSection>
+    );
+};
+
 export const HeaderTypeFormatSwitch = {
     name: 'Header: Format switch',
-    render: () => (
-        <PatternSection title="Sessions" description="This term" tabs={<ViewBar views={['Upcoming', 'Past']} format primary="New session" />}>
-            <StudentsTable count={3} />
-        </PatternSection>
-    ),
+    render: () => <HeaderTypeFormatSwitchDemo />,
 };
 
 /** View bar alone: the page title names the collection, so the title row is hidden from sight. */
-export const HeaderTypeViewBarAlone = {
-    name: 'Header: View bar alone',
-    render: () => (
-        <PatternSection title="Students" type="tabs-only" tabs={<ViewBar views={['All students', 'Needs follow-up']} />}>
-            <StudentsTable count={3} />
+const HeaderTypeViewBarAloneDemo = () => {
+    const [view, setView] = useState('All students');
+    return (
+        <PatternSection title="Students" type="tabs-only" tabs={<ViewBar views={['All students', 'Needs follow-up']} activeView={view} onViewChange={setView} />}>
+            <StudentsTable count={6} view={view} />
         </PatternSection>
-    ),
+    );
 };
 
-/** Under page tabs: the views become one labeled Select at the start of the bar. */
-export const HeaderTypeUnderPageTabs = {
-    name: 'Header: Under page tabs',
-    render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
-            <TabsComponent defaultActiveKey="sessions" aria-label="Student pages">
+export const HeaderTypeViewBarAlone = {
+    name: 'Header: View bar alone',
+    render: () => <HeaderTypeViewBarAloneDemo />,
+};
+
+/** Under page tabs: the views become one labeled PopupSelect at the start of the bar. */
+const HeaderTypeUnderPageTabsDemo = () => {
+    const [tab, setTab] = useState('sessions');
+    const [status, setStatus] = useState('upcoming');
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--page-stack-md)' }}>
+            <TabsComponent activeKey={tab} onSelect={setTab} aria-label="Student pages">
                 <TabsComponent.Tab eventKey="overview">Overview</TabsComponent.Tab>
                 <TabsComponent.Tab eventKey="sessions">Sessions</TabsComponent.Tab>
                 <TabsComponent.Tab eventKey="notes">Notes</TabsComponent.Tab>
             </TabsComponent>
-            <PatternSection
-                title="Sessions"
-                type="tabs-only"
-                tabs={(
-                    <ViewBar
-                        start={(
-                            <div style={{ inlineSize: 'var(--card-min-width-sm)' }}>
-                                <Select
-                                    aria-label="Status"
-                                    spacing="compact"
-                                    clearable={false}
-                                    defaultValue="upcoming"
-                                    options={[{ value: 'upcoming', label: 'Upcoming' }, { value: 'past', label: 'Past' }, { value: 'canceled', label: 'Canceled' }]}
+            {tab === 'overview' && (
+                <PatternSection title="Upcoming sessions">
+                    <SessionCards items={STUDENT_SESSION_CARDS} />
+                </PatternSection>
+            )}
+            {tab === 'sessions' && (
+                <PatternSection
+                    title="Sessions"
+                    type="tabs-only"
+                    tabs={(
+                        <ViewBar
+                            start={(
+                                <PopupSelect
+                                    label="Status"
+                                    options={[{ value: 'upcoming', label: 'Upcoming' }, { value: 'past', label: 'Past' }]}
+                                    value={status}
+                                    onChange={setStatus}
+                                    isSearchable={false}
                                 />
-                            </div>
-                        )}
-                        primary="New session"
-                    />
-                )}
-            >
-                <StudentsTable count={3} />
-            </PatternSection>
+                            )}
+                            primary="New session"
+                        />
+                    )}
+                >
+                    <SessionsTable status={status} />
+                </PatternSection>
+            )}
+            {tab === 'notes' && (
+                <PatternSection title="Tutor notes">
+                    <PatternCard title="Oct 14 reflection" description="Worked through distributive property and two-step equations together." />
+                </PatternSection>
+            )}
         </div>
-    ),
+    );
+};
+
+export const HeaderTypeUnderPageTabs = {
+    name: 'Header: Under page tabs',
+    render: () => <HeaderTypeUnderPageTabsDemo />,
 };
 
 /** Subsection: any type nests once; the title drops to an h3 and the view bar keeps its size. */
@@ -1025,7 +1084,7 @@ export const SideAtEnd = {
             title="Lincoln Middle"
             tabs={<ViewBar views={['All students']} />}
             layout="split"
-            side={<Facts pairs={[['Tutor', 'Priya Nair'], ['Meets', 'Tuesdays, 4:30 PM'], ['Room', 'Library 2']]} columns={1} />}
+            side={<Facts pairs={GROUP_FACTS} columns={1} />}
         >
             <StudentsTable count={4} />
         </PatternSection>
@@ -1048,7 +1107,18 @@ const FilterSideSection = () => {
     const narrow = width < FRAME_LAYOUT.fullWidthBelow;
     const toggle = (v) => setChecked(checked.includes(v) ? checked.filter((c) => c !== v) : [...checked, v]);
     const side = <FilterSide checked={checked} onToggle={toggle} onReset={() => setChecked([])} />;
-    const table = <StudentsTable count={5} />;
+    const matching = filterStudentList({ count: STUDENTS.length, checked });
+    const table = matching.length > 0 ? (
+        <StudentsTable count={STUDENTS.length} checked={checked} />
+    ) : (
+        <EmptyState
+            spacing="compact"
+            icon="user-group"
+            header="No students match"
+            description="Try other filters, or reset them to see every student."
+            primaryAction={<Button text="Reset filters" appearance="primary" onClick={() => setChecked([])} />}
+        />
+    );
     let body = table;
     if (sideFits) {
         body = (
@@ -1069,7 +1139,7 @@ const FilterSideSection = () => {
         <div ref={ref}>
             <PatternSection
                 title="Students"
-                description="Lincoln Middle · 24 students"
+                description={`Lincoln Middle · ${matching.length} ${matching.length === 1 ? 'student' : 'students'}`}
                 tabs={(
                     <ViewBar
                         views={['All students']}

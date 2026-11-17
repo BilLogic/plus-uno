@@ -102,12 +102,12 @@ Don't: A breadcrumb on an area page: there is nothing to climb out of.
 
 ### Keep one tab system per page. {#keep-one-tab-system-per-page}
 
-**Checked:** Review
+**Checked:** Automatic
 
-Page tabs under the title, or pill views in a Section's bar, never both. Under page tabs a Section's views become one Select at the start of its bar. It picks a view, not a filter.
+Either page tabs under the title, or pill views in a Section's bar, never both. Under page tabs a Section's views become one labeled PopupSelect at the start of its bar. It picks a view, not a filter.
 
-Do: Under page tabs the Section's views are one Select at the start of its bar.
-Don't: Page tabs and pill views on one page: two tab systems.
+Do: Under page tabs the Section's views are one labeled PopupSelect at the start of its bar.
+Don't: Page tabs and pill views on the same page: two tab systems.
 
 ### Make views a fixed set the product defines. {#make-views-a-fixed-set-the-product-defines}
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Button, ButtonItem, Select, SectionMessage, TextField, RadioGroup, DropdownMenu, IconButton } from '@/components';
 import { useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
@@ -48,19 +48,28 @@ export const DisabledWithReason = () => (
     </div>
 );
 
+const GROUPS = [
+    { value: 'algebra-b', label: 'Algebra B · Tue 4:00 PM' },
+    { value: 'geometry-a', label: 'Geometry A · Thu 4:30 PM' },
+];
+
 /** A field that waits on another on this screen: faded, out of the tab order, the caption says what to do. */
-export const WaitsOnField = ({ school = null }) => (
-    <div style={column}>
-        <Select label="School" options={SCHOOLS} value={school} onChange={noop} />
-        <Select
-            label="Group"
-            options={[{ value: 'algebra', label: 'Lincoln Middle' }]}
-            value={null}
-            onChange={noop}
-            dependsOn={{ value: school, label: 'a school' }}
-        />
-    </div>
-);
+export const WaitsOnField = ({ school: initialSchool = null }) => {
+    const [school, setSchool] = useState(initialSchool);
+    const [group, setGroup] = useState(null);
+    return (
+        <div style={column}>
+            <Select label="School" options={SCHOOLS} value={school} onChange={setSchool} />
+            <Select
+                label="Group"
+                options={GROUPS}
+                value={group}
+                onChange={setGroup}
+                dependsOn={{ value: school, label: 'a school' }}
+            />
+        </div>
+    );
+};
 
 /** An option that cannot apply: its description line carries the reason and the rest of the list is live. */
 export const OptionCannotApply = () => (

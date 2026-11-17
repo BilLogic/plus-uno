@@ -9933,8 +9933,7 @@
         "--table-footer-height",
         "--table-overflow-reach",
         "--table-pad-x-cell",
-        "--table-pad-y-cell",
-        "--table-radius"
+        "--table-pad-y-cell"
       ]
     },
     {
