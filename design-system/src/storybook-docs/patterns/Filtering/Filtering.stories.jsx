@@ -285,6 +285,15 @@ export const UnderPageTabs = {
         await expect(rect(picker).left, 'the view picker sits at the bar\'s start').toBeCloseTo(rect(p.bar).left, 0);
         await expect(rect(p.filterIcon()).left, 'the filters stay at the end').toBeGreaterThan(rect(picker).right);
         await expectHungFrom(canvasElement, picker, 'start');
+
+        await userEvent.click(p.canvas.getByRole('tab', { name: 'Overview' }));
+        await expect(p.canvas.getByRole('heading', { name: 'Lincoln Middle' })).toBeInTheDocument();
+
+        await userEvent.click(p.canvas.getByRole('tab', { name: 'Sessions' }));
+        await expect(p.canvas.getByRole('table', { name: 'Sessions' })).toBeInTheDocument();
+
+        await userEvent.click(p.canvas.getByRole('tab', { name: 'Students' }));
+        await expect(p.canvas.getByRole('heading', { name: 'Students' })).toBeInTheDocument();
         await fitsCanvas(canvasElement);
     },
 };

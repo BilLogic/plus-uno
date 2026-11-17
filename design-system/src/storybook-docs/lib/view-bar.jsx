@@ -63,9 +63,20 @@ export const studentRows = (count, options) => filterStudentList({ count, ...opt
     key: name,
     cells: [{ key: name, content: name }, { key: grade, content: grade }, { key: last, content: last }],
 }));
-export const StudentsTable = ({ count = 4, sortable = false, view, checked, ...props }) => (
-    <DynamicTable head={sortable ? SORTABLE_STUDENT_HEAD : STUDENT_HEAD} rows={studentRows(count, { view, checked })} label="Students" isFixedSize {...props} />
-);
+export const StudentsTable = ({ count = 4, sortable = false, view, checked, rows, columns, label = 'Students', ...props }) => {
+    const head = columns
+        ? { cells: columns.map((content) => ({ key: content.toLowerCase(), content, ...(sortable ? { isSortable: true } : {}) })) }
+        : (sortable ? SORTABLE_STUDENT_HEAD : STUDENT_HEAD);
+    const tableRows = rows
+        ? rows.map((rowValues) => ({
+            key: rowValues[0],
+            cells: rowValues.slice(0, head.cells.length).map((content) => ({ key: content, content })),
+        }))
+        : studentRows(count, { view, checked });
+    return (
+        <DynamicTable head={head} rows={tableRows} label={label} isFixedSize {...props} />
+    );
+};
 
 export const row = { display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', minWidth: 0 };
 
@@ -94,7 +105,7 @@ export const FormatSwitch = ({ iconsOnly = true, format: controlledFormat, onFor
     };
     return (
         <ButtonGroup label="Format">
-            {[['table', 'table-list', 'Table'], ['calendar', 'calendar', 'Calendar']].map(([key, icon, label]) => (
+            {[['table', 'table-list', 'Table'], ['cards', 'grip', 'Cards']].map(([key, icon, label]) => (
                 iconsOnly
                     ? <IconButton key={key} icon={icon} label={label} isSelected={format === key} onClick={() => handleSelect(key)} />
                     : <Button key={key} text={label} iconBefore={icon} isSelected={format === key} onClick={() => handleSelect(key)} />
@@ -107,9 +118,7 @@ export const FormatSwitch = ({ iconsOnly = true, format: controlledFormat, onFor
  * The view bar's end, in order: format switch, Search, filters, More, the
  * labeled Primary. `narrow` keeps only the Primary's icon, below 768.
  */
-export const BarEnd = ({ format = false, onFormatChange, search = true, filters = null, more = true, primary = 'Add students', primaryIcon, narrow = false }) => {
-    const icon = primaryIcon ?? (primary === 'New session' ? 'plus' : 'user-plus');
-    const searchLabel = primary === 'New session' ? 'Search sessions' : 'Search students';
+export const BarEnd = ({ format = false, onFormatChange, search = true, searchLabel = 'Search students', filters = null, more = true, primary = 'Add students', primaryIcon = 'user-plus', narrow = false }) => {
     const formatValue = typeof format === 'string' ? format : undefined;
     return (
         <div style={{ ...row, marginInlineStart: 'auto' }}>
@@ -118,8 +127,8 @@ export const BarEnd = ({ format = false, onFormatChange, search = true, filters 
             {filters}
             {more && <IconButton icon="ellipsis" label="More" appearance="subtle" onClick={() => {}} />}
             {primary && (narrow
-                ? <IconButton icon={icon} label={primary} appearance="primary" onClick={() => {}} />
-                : <Button text={primary} iconBefore={icon} appearance="primary" onClick={() => {}} />)}
+                ? <IconButton icon={primaryIcon} label={primary} appearance="primary" onClick={() => {}} />
+                : <Button text={primary} iconBefore={primaryIcon} appearance="primary" onClick={() => {}} />)}
         </div>
     );
 };

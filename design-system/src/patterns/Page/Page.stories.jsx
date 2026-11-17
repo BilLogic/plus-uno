@@ -26,7 +26,7 @@ import {
 import Page, { PAGE_EDGE, PAGE_LEVELS } from '@/patterns/Page';
 import { computedShadow, probe, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
-import { DemoLabel, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { DemoLabel, RECORD_CRUMBS, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { StudentsTable } from '@/storybook-docs/lib/view-bar.jsx';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
@@ -276,7 +276,6 @@ export const Interactive = {
 
 /* The template's types, anatomy, key scenarios and states: live stories of the real header, Sections and Frame. */
 
-const RECORD_CRUMBS = [{ text: 'Students', href: '#' }, { text: 'Maya Rodriguez' }];
 const DEEP_CRUMBS = [{ text: 'Students', href: '#' }, { text: 'Maya Rodriguez', href: '#' }, { text: 'Session on Oct 14' }];
 
 /** The page's content box: the Frame's content element, which carries the cap. */
@@ -334,11 +333,23 @@ const RecordPage = ({ banner = false }) => {
 export const AnatomyRecord = {
     name: 'Anatomy',
     render: () => (
-        <LiveAnatomy width={PAGE_STAGE} parts={ANATOMY_PARTS} title="A record page with its parts numbered">
+        <LiveAnatomy live width={PAGE_STAGE} parts={ANATOMY_PARTS} title="A record page with its parts numbered">
             <RecordPage banner />
         </LiveAnatomy>
     ),
     play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByRole('heading', { name: 'Upcoming sessions' })).toBeInTheDocument();
+
+        await userEvent.click(canvas.getByRole('tab', { name: 'Sessions' }));
+        await expect(canvas.getByRole('table', { name: 'Sessions' })).toBeInTheDocument();
+
+        await userEvent.click(canvas.getByRole('tab', { name: 'Notes' }));
+        await expect(canvas.getByRole('heading', { name: 'Tutor notes' })).toBeInTheDocument();
+
+        await userEvent.click(canvas.getByRole('tab', { name: 'Overview' }));
+        await expect(canvas.getByRole('heading', { name: 'Upcoming sessions' })).toBeInTheDocument();
+
         await markersLevelWithParts(canvasElement, ANATOMY_PARTS);
         leadersCrossNoOtherPart(canvasElement, ANATOMY_PARTS);
     },
@@ -349,7 +360,7 @@ export const AnatomyRecordScaledDown = {
     name: 'Anatomy, scaled down',
     render: () => (
         <div style={{ width: 880 }}>
-            <LiveAnatomy width={PAGE_STAGE} parts={ANATOMY_PARTS} title="A record page with its parts numbered">
+            <LiveAnatomy live width={PAGE_STAGE} parts={ANATOMY_PARTS} title="A record page with its parts numbered">
                 <RecordPage banner />
             </LiveAnatomy>
         </div>
@@ -377,6 +388,12 @@ export const ScenarioArea = {
     },
 };
 
+const REFLECTION_ROWS = [
+    ['Ava Thompson', 'Oct 24 · Fractions', 'Paused on mixed-number word problems.'],
+    ['Marcus Lee', 'Oct 23 · Ratios', 'Asked for extra unit-rate practice before Friday.'],
+    ['Noah Williams', 'Oct 18 · Equations', 'Missed warm-up; needs a quick check-in.'],
+];
+
 /** Area page, several Sections: each takes a title and its own actions. */
 export const ScenarioSeveralSections = {
     name: 'Area page, several Sections',
@@ -385,7 +402,7 @@ export const ScenarioSeveralSections = {
             <DemoPageHeader title="Home" />
             <CardsSection title="Upcoming sessions" description="Next 7 days" actions={<Button text="View calendar" onClick={() => {}} />} />
             <PatternSection title="Needs follow-up" actions={<Button text="Review all" onClick={() => {}} />}>
-                <StudentsTable count={3} view="Needs follow-up" />
+                <StudentsTable columns={['Student', 'Session', 'Reflection']} rows={REFLECTION_ROWS} label="Reflections" />
             </PatternSection>
         </PageStage>
     ),

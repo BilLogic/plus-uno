@@ -15,7 +15,7 @@ import { BAR_TOKEN, FocusedType, STEPS_RAIL, TASK_STEPS, WINDOW_HEIGHT, stepItem
 import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
-import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { InAppFrame, RECORD_CRUMBS } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { PAGE_EDGE } from '@/patterns/Page';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 
@@ -292,7 +292,7 @@ export const DocsContentGrid = {
  */
 
 /** Do: an app page supplies its Sidebar, its breadcrumb and its content. */
-export const PairWithSidebar = {};
+export const PairWithSidebar = { args: { breadcrumbs: RECORD_CRUMBS } };
 
 /** Don't: the same page with no Sidebar, so there is no navigation and no toggle. */
 export const PairWithoutSidebar = { args: { sidebar: undefined } };
@@ -575,7 +575,7 @@ const WithModal = (args) => {
     return (
         <div style={{ height: '100vh' }}>
             <Frame
-                header={<Breadcrumb items={[{ text: 'Home', href: '#' }, { text: 'Dashboard' }]} />}
+                header={<Breadcrumb items={RECORD_CRUMBS} />}
                 sidebar={(
                     <>
                         <Sidebar user="tutor" activeTabId="home" account={{ id: 'story', name: 'John Doe', role: 'Tutor' }} />
@@ -779,7 +779,7 @@ const WithPanel = ({ withModal = false, withHeaderTrigger = false, ...args }) =>
     const [modal, setModal] = useState(false);
     const header = withHeaderTrigger ? (
         <div style={{ display: 'flex', flex: '1 1 auto', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Breadcrumb items={[{ text: 'Home', href: '#' }, { text: 'Dashboard' }]} />
+            <Breadcrumb items={RECORD_CRUMBS} />
             <HeaderChatTrigger />
         </div>
     ) : undefined;
@@ -1524,8 +1524,8 @@ const SkeletonSection = ({ title }) => (
 );
 
 /** The default type: the Sidebar, the Page, and the AI panel as its own region. */
-const DefaultType = ({ withPanel = false, ...args }) => (
-    <BrowserWindow address="app.plus.org/dashboard" height={WINDOW_HEIGHT}>
+const DefaultType = ({ withPanel = false, address = 'app.plus.org/dashboard', ...args }) => (
+    <BrowserWindow address={address} height={WINDOW_HEIGHT}>
         <InAppFrame
             height="100%"
             panelLabel="AI chat"
@@ -1606,7 +1606,7 @@ export const AnatomyDefault = {
     parameters: { layout: 'padded' },
     render: () => (
         <LiveAnatomy width={1440 /* docs-literal: the X-Large stage */} title="The default Frame with its parts numbered" parts={ANATOMY_DEFAULT_PARTS}>
-            <DefaultType withPanel />
+            <DefaultType withPanel address="app.plus.org/students/maya-rodriguez" breadcrumbs={RECORD_CRUMBS} />
         </LiveAnatomy>
     ),
     play: async ({ canvasElement }) => {

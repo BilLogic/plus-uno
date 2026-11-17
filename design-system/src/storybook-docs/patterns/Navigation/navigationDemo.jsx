@@ -11,6 +11,7 @@ import {
     STUDENT_SESSION_CARDS,
 } from '../../../patterns/Page/pageDemo.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
+import { RECORD_CRUMBS } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { StudentsTable, ViewBar } from '@/storybook-docs/lib/view-bar.jsx';
 import { NamesDo, TabLabelDo, TabLabelDont } from '../../../patterns/Sidebar/Sidebar.examples.jsx';
 
@@ -42,8 +43,6 @@ export const SMALL_STAGE = 640; // docs-literal
 export const SIDEBAR_STAGE = 320; // docs-literal
 
 const pad = { padding: 'var(--page-pad)', boxSizing: 'border-box' };
-
-const RECORD_CRUMBS = [{ text: 'Students', href: '#' }, { text: 'Maya Rodriguez' }];
 
 /** Tier 1: the Sidebar with an area selected. */
 export const AreaPicture = () => (

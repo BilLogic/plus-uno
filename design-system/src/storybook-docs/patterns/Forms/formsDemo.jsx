@@ -453,7 +453,7 @@ export const SettingsPage = () => {
 
     return (
         <div style={{ position: 'relative', blockSize: '100%' }}>
-            <InAppFrame height="100%" activeTabId="home" breadcrumbs={null} panelStorageKey={null}>
+            <InAppFrame height="100%" activeTabId="home" panelStorageKey={null}>
                 <PatternSection level="page" title="Settings" layout="subsections">
                     <PatternSection title="Notifications">
                         <div>

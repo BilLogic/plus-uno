@@ -690,6 +690,13 @@ export const TypeList = {
     render: () => <TypeListDemo />,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        await userEvent.click(canvas.getByRole('tab', { name: 'Needs follow-up' }));
+        await expect(canvas.queryByRole('cell', { name: 'Sofia Ramirez' })).toBeNull();
+        await expect(canvas.getByRole('cell', { name: 'Marcus Lee' })).toBeInTheDocument();
+
+        await userEvent.click(canvas.getByRole('tab', { name: 'All students' }));
+        await expect(canvas.getByRole('cell', { name: 'Sofia Ramirez' })).toBeInTheDocument();
+
         const nameHeader = canvas.getByRole('columnheader', { name: /^Name/ });
         const sortBtn = within(nameHeader).getByRole('button');
         await userEvent.click(sortBtn);
@@ -752,7 +759,6 @@ export const TypeQueue = {
         );
         return (
             <InAppFrame
-                breadcrumbs={null}
                 panel={panel}
                 panelLabel="Reflection"
                 panelOpen={open}
@@ -963,6 +969,21 @@ const HeaderTypeViewBarSeveralViewsDemo = () => {
 export const HeaderTypeViewBarSeveralViews = {
     name: 'Header: View bar, several views',
     render: () => <HeaderTypeViewBarSeveralViewsDemo />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByRole('cell', { name: 'Sofia Ramirez' })).toBeInTheDocument();
+
+        await userEvent.click(canvas.getByRole('tab', { name: 'Needs follow-up' }));
+        await expect(canvas.queryByRole('cell', { name: 'Sofia Ramirez' })).toBeNull();
+        await expect(canvas.getByRole('cell', { name: 'Marcus Lee' })).toBeInTheDocument();
+
+        await userEvent.click(canvas.getByRole('tab', { name: 'Paused' }));
+        await expect(canvas.queryByRole('cell', { name: 'Marcus Lee' })).toBeNull();
+        await expect(canvas.getByRole('cell', { name: 'Noah Williams' })).toBeInTheDocument();
+
+        await userEvent.click(canvas.getByRole('tab', { name: 'All students' }));
+        await expect(canvas.getByRole('cell', { name: 'Sofia Ramirez' })).toBeInTheDocument();
+    },
 };
 
 /** Format switch: equal-width segments, first on the right. */
@@ -975,9 +996,9 @@ const HeaderTypeFormatSwitchDemo = () => {
         <PatternSection
             title="Sessions"
             description="This term"
-            tabs={<ViewBar views={['Upcoming', 'Past']} activeView={view} onViewChange={setView} format={format} onFormatChange={setFormat} primary="New session" />}
+            tabs={<ViewBar views={['Upcoming', 'Past']} activeView={view} onViewChange={setView} format={format} onFormatChange={setFormat} primary="New session" primaryIcon="plus" searchLabel="Search sessions" />}
         >
-            {format === 'calendar' ? (
+            {format === 'cards' ? (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 'var(--grid-gutter)' }}>
                     {cards.map(([time, tutor, subject]) => (
                         <PatternCard key={`${time}-${subject}`} title={`${time} · ${subject}`} description={tutor} />
@@ -993,6 +1014,25 @@ const HeaderTypeFormatSwitchDemo = () => {
 export const HeaderTypeFormatSwitch = {
     name: 'Header: Format switch',
     render: () => <HeaderTypeFormatSwitchDemo />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByRole('table', { name: 'Sessions' })).toBeInTheDocument();
+        await expect(canvas.getByRole('cell', { name: 'Algebra' })).toBeInTheDocument();
+
+        await userEvent.click(canvas.getByRole('button', { name: 'Cards' }));
+        await expect(canvas.queryByRole('table', { name: 'Sessions' })).toBeNull();
+        await expect(canvas.getByText('Thu 4:00 PM · Algebra')).toBeInTheDocument();
+
+        await userEvent.click(canvas.getByRole('tab', { name: 'Past' }));
+        await expect(canvas.getByText('Tue 4:00 PM · Two-step equations')).toBeInTheDocument();
+
+        await userEvent.click(canvas.getByRole('button', { name: 'Table' }));
+        await expect(canvas.getByRole('table', { name: 'Sessions' })).toBeInTheDocument();
+        await expect(canvas.getByRole('cell', { name: 'Two-step equations' })).toBeInTheDocument();
+
+        await userEvent.click(canvas.getByRole('tab', { name: 'Upcoming' }));
+        await expect(canvas.getByRole('cell', { name: 'Algebra' })).toBeInTheDocument();
+    },
 };
 
 /** View bar alone: the page title names the collection, so the title row is hidden from sight. */
@@ -1008,6 +1048,17 @@ const HeaderTypeViewBarAloneDemo = () => {
 export const HeaderTypeViewBarAlone = {
     name: 'Header: View bar alone',
     render: () => <HeaderTypeViewBarAloneDemo />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByRole('cell', { name: 'Sofia Ramirez' })).toBeInTheDocument();
+
+        await userEvent.click(canvas.getByRole('tab', { name: 'Needs follow-up' }));
+        await expect(canvas.queryByRole('cell', { name: 'Sofia Ramirez' })).toBeNull();
+        await expect(canvas.getByRole('cell', { name: 'Marcus Lee' })).toBeInTheDocument();
+
+        await userEvent.click(canvas.getByRole('tab', { name: 'All students' }));
+        await expect(canvas.getByRole('cell', { name: 'Sofia Ramirez' })).toBeInTheDocument();
+    },
 };
 
 /** Under page tabs: the views become one labeled PopupSelect at the start of the bar. */
@@ -1042,6 +1093,8 @@ const HeaderTypeUnderPageTabsDemo = () => {
                                 />
                             )}
                             primary="New session"
+                            primaryIcon="plus"
+                            searchLabel="Search sessions"
                         />
                     )}
                 >
@@ -1060,6 +1113,28 @@ const HeaderTypeUnderPageTabsDemo = () => {
 export const HeaderTypeUnderPageTabs = {
     name: 'Header: Under page tabs',
     render: () => <HeaderTypeUnderPageTabsDemo />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const body = within(canvasElement.ownerDocument.body);
+        await expect(canvas.getByRole('cell', { name: 'Algebra' })).toBeInTheDocument();
+
+        await userEvent.click(canvas.getByRole('button', { name: 'Status: Upcoming' }));
+        await userEvent.click(await body.findByRole('option', { name: 'Past' }));
+        await expect(canvas.getByRole('cell', { name: 'Two-step equations' })).toBeInTheDocument();
+
+        await userEvent.click(canvas.getByRole('button', { name: 'Status: Past' }));
+        await userEvent.click(await body.findByRole('option', { name: 'Upcoming' }));
+        await expect(canvas.getByRole('cell', { name: 'Algebra' })).toBeInTheDocument();
+
+        await userEvent.click(canvas.getByRole('tab', { name: 'Overview' }));
+        await expect(canvas.getByRole('heading', { name: 'Upcoming sessions' })).toBeInTheDocument();
+
+        await userEvent.click(canvas.getByRole('tab', { name: 'Notes' }));
+        await expect(canvas.getByRole('heading', { name: 'Tutor notes' })).toBeInTheDocument();
+
+        await userEvent.click(canvas.getByRole('tab', { name: 'Sessions' }));
+        await expect(canvas.getByRole('table', { name: 'Sessions' })).toBeInTheDocument();
+    },
 };
 
 /** Subsection: any type nests once; the title drops to an h3 and the view bar keeps its size. */
@@ -1158,6 +1233,26 @@ const FilterSideSection = () => {
 export const FilterSideAtStart = {
     name: 'Filter side at the start',
     render: () => <ScreenStage width={STAGE}><FilterSideSection /></ScreenStage>,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByText('Lincoln Middle · 2 students')).toBeInTheDocument();
+        await expect(canvas.getByRole('cell', { name: 'Ava Thompson' })).toBeInTheDocument();
+
+        await userEvent.click(canvas.getByRole('checkbox', { name: 'Grade 8' }));
+        await expect(canvas.getByText('Lincoln Middle · 4 students')).toBeInTheDocument();
+        await expect(canvas.getByRole('cell', { name: 'Marcus Lee' })).toBeInTheDocument();
+
+        await userEvent.click(canvas.getByRole('checkbox', { name: 'Paused' }));
+        await userEvent.click(canvas.getByRole('checkbox', { name: 'Active' }));
+        await expect(canvas.getByText('Lincoln Middle · 0 students')).toBeInTheDocument();
+
+        await userEvent.click(canvas.getAllByRole('button', { name: 'Reset filters' })[0]);
+        await expect(canvas.getByText('Lincoln Middle · 6 students')).toBeInTheDocument();
+
+        await userEvent.click(canvas.getByRole('checkbox', { name: 'Grade 7' }));
+        await userEvent.click(canvas.getByRole('checkbox', { name: 'Active' }));
+        await expect(canvas.getByText('Lincoln Middle · 2 students')).toBeInTheDocument();
+    },
 };
 
 /** The Section's width, as a control: drag through 960 and 768. */

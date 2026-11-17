@@ -3,7 +3,7 @@ import React from 'react';
 import { Checkbox, DatePicker, RadioGroup, Select, TextArea, TextField, Toggle } from '@/components';
 import { PatternSection } from '@/patterns';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
-import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { InAppFrame, RECORD_CRUMBS } from '@/storybook-docs/lib/pattern-demo.jsx';
 
 /**
  * The Read-only pattern's examples, drawn with the real fields in their
@@ -54,8 +54,6 @@ export const ReadOnlyChoices = () => (
 /** The window's height: the title, three fields and the caption, with room under them. Docs geometry, in px. */
 const PAGE_HEIGHT = 420; // docs-literal
 
-const PAGE_BREADCRUMBS = [{ text: 'Home', href: '#' }, { text: 'Sessions', href: '#' }, { text: 'Session details' }];
-
 /**
  * A whole form someone else owns, in a page: drawn in the Frame with the Sidebar
  * docked, straight on the Page like the Form template. The title is the page's
@@ -63,7 +61,7 @@ const PAGE_BREADCRUMBS = [{ text: 'Home', href: '#' }, { text: 'Sessions', href:
  */
 export const OwnedForm = () => (
     <BrowserWindow address="app.plus.org/sessions/ana-ruiz" height={PAGE_HEIGHT}>
-        <InAppFrame height="100%" activeTabId="sessions" breadcrumbs={PAGE_BREADCRUMBS} panelStorageKey={null}>
+        <InAppFrame height="100%" activeTabId="sessions" breadcrumbs={RECORD_CRUMBS} panelStorageKey={null}>
             <PatternSection level="page" title="Session details" description="Set by Lincoln's supervisor.">
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxInlineSize: 'var(--card-min-width-lg)' }}>
                     <TextField label="Student" value="Ana Ruiz" onChange={noop} isReadOnly />

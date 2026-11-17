@@ -30,7 +30,7 @@ import { HeroCard } from '../docs-landing/HeroCard.jsx';
  * technology, so the docs page gains no tab stops, headings or landmarks.
  * The story itself runs at full size in Storybook and its test run.
  */
-export const ScaledStory = ({ width, children }) => {
+export const ScaledStory = ({ width, live = false, children }) => {
     const [ref, scale] = useFitScale(width);
     const inner = React.useRef(null);
     const [height, setHeight] = React.useState(0);
@@ -46,7 +46,7 @@ export const ScaledStory = ({ width, children }) => {
     }, []);
     return (
         // `docs-story` puts the picture's headings on Tocbot's ignore list, so "On this page" lists the page's own.
-        <div ref={ref} className="docs-story not-prose sb-unstyled" inert aria-hidden="true" style={{ width: '100%', height: height * scale, flexShrink: 0, overflow: 'hidden' }}>
+        <div ref={ref} className="docs-story not-prose sb-unstyled" inert={!live} aria-hidden={live ? undefined : 'true'} style={{ width: '100%', height: height * scale, flexShrink: 0, overflow: 'hidden' }}>
             <div ref={inner} style={{ width, transform: `scale(${scale})`, transformOrigin: 'top left' }}>
                 {children}
             </div>
@@ -57,6 +57,7 @@ export const ScaledStory = ({ width, children }) => {
 ScaledStory.propTypes = {
     /** The stage width the story lays out at: docs geometry, not a design value. */
     width: PropTypes.number.isRequired,
+    live: PropTypes.bool,
     children: PropTypes.node,
 };
 
@@ -294,12 +295,12 @@ export const LiveAnatomy = ({ width, live = false, parts, title, children }) => 
             <div ref={box} style={{ position: 'relative' }}>
                 {/* Anatomy figures render with reduced motion. */}
                 <MotionPreferenceContext.Provider value={true}>
-                    {live ? (
+                    {live && !width ? (
                         <div className="docs-story not-prose sb-unstyled" style={{ width: '100%' }}>
                             {children}
                         </div>
                     ) : (
-                        <ScaledStory width={width}>{children}</ScaledStory>
+                        <ScaledStory width={width} live={live}>{children}</ScaledStory>
                     )}
                 </MotionPreferenceContext.Provider>
                 {marks.map((m, i) => m && (

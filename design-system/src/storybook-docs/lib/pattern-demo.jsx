@@ -43,16 +43,16 @@ export const slotContent = (label) => (
     </div>
 );
 
-const BREADCRUMBS = [{ text: 'Students', href: '#' }, { text: 'Maya Rodriguez' }];
+export const RECORD_CRUMBS = [{ text: 'Students', href: '#' }, { text: 'Maya Rodriguez' }];
 const ACCOUNT = { id: 'john-doe', name: 'John Doe', role: 'Lead' };
 
 /**
  * The app frame at full height: the tutor Sidebar with `account` in its
- * account row and `activeTabId` selected, `breadcrumbs` in the Page's header row, and `children` in the
+ * account row and `activeTabId` selected, optional `breadcrumbs` in the Page's header row, and `children` in the
  * surface. `height` sizes the box the
  * frame fills (the viewport by default). Any other prop goes to Frame.
  */
-export const InAppFrame = ({ breadcrumbs = BREADCRUMBS, account = ACCOUNT, activeTabId = 'home', height = '100vh', children, ...frameProps }) => (
+export const InAppFrame = ({ breadcrumbs = null, account = ACCOUNT, activeTabId = 'home', height = '100vh', children, ...frameProps }) => (
     <div style={{ height }}>
         <Frame
             header={breadcrumbs ? <Breadcrumb items={breadcrumbs} /> : undefined}

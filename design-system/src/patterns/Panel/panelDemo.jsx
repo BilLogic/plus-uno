@@ -14,9 +14,9 @@ import {
     PanelMoreAction,
     PanelSubheader,
     PanelUpAction,
+    PopupSelect,
     StaticTable,
     StatusTag,
-    Tabs,
     TextArea,
     TextField,
     VisuallyHidden,
@@ -114,19 +114,25 @@ export const DetailsPanel = ({ editing = false, onEdit, onClose = () => {}, onSa
     </PanelContainer>
 );
 
+const INBOX_VIEWS = [
+    { value: 'unread', label: 'Unread' },
+    { value: 'all', label: 'All' },
+    { value: 'mentions', label: 'Mentions' },
+];
+
 const INBOX = [
-    { id: 1, name: 'Ana Ruiz', what: 'moved Thursday’s session', where: 'Sessions', excerpt: 'New time is 4:30 PM, if that works.', time: '2m', unread: true },
-    { id: 2, name: 'Ben Okafor', what: 'mentioned you', where: 'Notes', excerpt: 'Can you check the unit rates plan?', time: '1h', unread: true },
-    { id: 3, name: 'Chloe Tran', what: 'confirmed Friday', where: 'Sessions', excerpt: 'See you at 3:30 PM.', time: 'Yesterday', unread: false },
+    { id: 1, name: 'Ana Ruiz', what: 'moved Thursday’s session', where: 'Sessions', excerpt: 'New time is 4:30 PM, if that works.', time: '2m', unread: true, kind: 'session' },
+    { id: 2, name: 'Ben Okafor', what: 'mentioned you', where: 'Notes', excerpt: 'Can you check the unit rates plan?', time: '1h', unread: true, kind: 'mention' },
+    { id: 3, name: 'Chloe Tran', what: 'confirmed Friday', where: 'Sessions', excerpt: 'See you at 3:30 PM.', time: 'Yesterday', unread: false, kind: 'session' },
 ];
 
 /** Notifications: the Inbox. Items carry an avatar, who did what and where, an excerpt, the time and an unread dot paired with the word. */
 export const InboxPanel = ({ onClose = () => {}, items = INBOX }) => {
-    const [tab, setTab] = useState('unread');
-    const visibleItems = tab === 'unread'
+    const [view, setView] = useState('unread');
+    const visibleItems = view === 'unread'
         ? items.filter((n) => n.unread)
-        : tab === 'mentions'
-            ? items.filter((n) => n.what.includes('mentioned'))
+        : view === 'mentions'
+            ? items.filter((n) => n.kind === 'mention')
             : items;
     return (
         <PanelContainer>
@@ -140,11 +146,13 @@ export const InboxPanel = ({ onClose = () => {}, items = INBOX }) => {
                 )}
             />
             <PanelSubheader>
-                <Tabs spacing="compact" activeKey={tab} onSelect={setTab} aria-label="Show">
-                    <Tabs.Tab eventKey="unread">Unread</Tabs.Tab>
-                    <Tabs.Tab eventKey="all">All</Tabs.Tab>
-                    <Tabs.Tab eventKey="mentions">Mentions</Tabs.Tab>
-                </Tabs>
+                <PopupSelect
+                    label="Show"
+                    value={view}
+                    onChange={setView}
+                    options={INBOX_VIEWS}
+                    isSearchable={false}
+                />
             </PanelSubheader>
             <PanelBody data-probe="body">
                 <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>

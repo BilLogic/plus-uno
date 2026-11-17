@@ -64,8 +64,19 @@ export const TierViews = {
     render: () => staged(<ViewsPicture />, SMALL_STAGE),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(canvas.getAllByRole('tab'), 'two views').toHaveLength(2);
-        await expect(canvas.getAllByRole('tab').filter((t) => t.getAttribute('aria-selected') === 'true'), 'one selected').toHaveLength(1);
+        const [upcomingTab, pastTab] = canvas.getAllByRole('tab');
+        await expect([upcomingTab, pastTab], 'two views').toHaveLength(2);
+        await expect(upcomingTab, 'Upcoming starts selected').toHaveAttribute('aria-selected', 'true');
+        await expect(canvas.getByRole('cell', { name: 'Algebra' })).toBeInTheDocument();
+
+        await userEvent.click(pastTab);
+        await expect(pastTab, 'Past selected').toHaveAttribute('aria-selected', 'true');
+        await expect(canvas.queryByRole('cell', { name: 'Algebra' })).toBeNull();
+        await expect(canvas.getByRole('cell', { name: 'Two-step equations' })).toBeInTheDocument();
+
+        await userEvent.click(upcomingTab);
+        await expect(upcomingTab).toHaveAttribute('aria-selected', 'true');
+        await expect(canvas.getByRole('cell', { name: 'Algebra' })).toBeInTheDocument();
         await fitsCanvas(canvasElement);
     },
 };
@@ -76,7 +87,23 @@ export const TierPageTabs = {
     render: () => staged(<PageTabsPicture />),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(canvas.getByRole('tab', { name: 'Sessions' }), 'the selected tab').toHaveAttribute('aria-selected', 'true');
+        const overviewTab = canvas.getByRole('tab', { name: 'Overview' });
+        const sessionsTab = canvas.getByRole('tab', { name: 'Sessions' });
+        const notesTab = canvas.getByRole('tab', { name: 'Notes' });
+        await expect(sessionsTab, 'the selected tab').toHaveAttribute('aria-selected', 'true');
+        await expect(canvas.getByRole('table', { name: 'Sessions' })).toBeInTheDocument();
+
+        await userEvent.click(overviewTab);
+        await expect(overviewTab).toHaveAttribute('aria-selected', 'true');
+        await expect(canvas.getByRole('heading', { name: 'Upcoming sessions' })).toBeInTheDocument();
+
+        await userEvent.click(notesTab);
+        await expect(notesTab).toHaveAttribute('aria-selected', 'true');
+        await expect(canvas.getByRole('heading', { name: 'Tutor notes' })).toBeInTheDocument();
+
+        await userEvent.click(sessionsTab);
+        await expect(sessionsTab).toHaveAttribute('aria-selected', 'true');
+        await expect(canvas.getByRole('table', { name: 'Sessions' })).toBeInTheDocument();
         await fitsCanvas(canvasElement);
     },
 };

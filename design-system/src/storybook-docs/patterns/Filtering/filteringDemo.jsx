@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { Button, DynamicTable, EmptyState, FilterButton, FilterMenu, IconButton, PopupSelect, Skeleton, Tabs } from '@/components';
+import { Button, EmptyState, FilterButton, FilterMenu, IconButton, PopupSelect, Skeleton } from '@/components';
 import { LoadThenReveal } from '@/lib/loadRevealMotion';
 import { SwapInPlace } from '@/lib/swapMotion';
-import { PatternCard, PatternSection, SECTION_DETAIL_FLOOR } from '@/patterns';
+import { Page, PatternCard, PatternSection, SECTION_DETAIL_FLOOR } from '@/patterns';
 import { FRAME_LAYOUT } from '@/patterns/Frame/frameLayout';
 import { useOwnWidth } from '@/patterns/Frame/useOwnWidth';
-import { SessionsTable } from '@/patterns/Page/pageDemo.jsx';
-import { FilterSide, ViewBar, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
+import { PageTabs, SessionsTable } from '@/patterns/Page/pageDemo.jsx';
+import { FilterSide, StudentsTable, ViewBar, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
 
 /**
  * The Filtering pattern's examples: a real Section with its view bar, the
@@ -59,19 +59,7 @@ export const narrow = (value) => ROSTER.filter((rowValues) => Object.entries(val
 /** The result count in words, read politely as the rows narrow. */
 export const countWords = (rows, value) => (appliedCount(value) > 0 ? `${rows.length} of ${ROSTER.length} students` : `${ROSTER.length} students`);
 
-const HEAD = { cells: ['Name', 'Grade', 'School', 'Subject'].map((content) => ({ key: content, content })) };
-
-const StudentsTable = ({ rows }) => (
-    <DynamicTable
-        head={HEAD}
-        rows={rows.map(([name, grade, school, subject]) => ({
-            key: name,
-            cells: [name, grade, school, subject].map((content) => ({ key: content, content })),
-        }))}
-        label="Students"
-        isFixedSize
-    />
-);
+const ROSTER_COLUMNS = ['Name', 'Grade', 'School', 'Subject'];
 
 const noop = () => {};
 
@@ -201,7 +189,7 @@ export const FilteredStudents = ({
 
     const status = <span role="status" style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{countWords(rows, value)}</span>;
     const swapKey = `${activeView}:${JSON.stringify(value)}`;
-    const rawResults = rows.length > 0 ? <StudentsTable rows={rows} /> : (
+    const rawResults = rows.length > 0 ? <StudentsTable rows={rows} columns={ROSTER_COLUMNS} /> : (
         <EmptyState
             spacing="compact"
             icon="user-group"
@@ -268,37 +256,34 @@ export const FilteredStudents = ({
                 data-filter-stage
                 style={{
                     position: 'relative',
-                    boxSizing: 'border-box',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'var(--page-stack-md)',
-                    // The page's own pad, so a menu at the bar's start is not pushed off its trigger by the picture's edge.
-                    padding: 'var(--page-pad)',
-                    minBlockSize: openMenu ? OPEN_ROOM[tier === '2c' ? 'stacked' : 'short'] : undefined,
                     '--plus-overlay-screen': `${READ_SCREEN}px`,
                 }}
             >
-                {pageTabs ? <PageTabs active={pageTab} onSelect={setPageTab} /> : null}
-                {pageTabs && pageTab === 'overview' && (
-                    <PatternSection title="Lincoln Middle">
-                        <PatternCard title="Tuesdays & Thursdays · 4:30 PM" description="Priya Nair · 8 students enrolled this term." />
-                    </PatternSection>
-                )}
-                {pageTabs && pageTab === 'sessions' && (
-                    <PatternSection title="Sessions">
-                        <SessionsTable />
-                    </PatternSection>
-                )}
-                {(!pageTabs || pageTab === 'students') && (
-                    <PatternSection
-                        title="Students"
-                        description="Lincoln Middle"
-                        type={pageTabs ? 'tabs-only' : sectionType}
-                        tabs={<ViewBar views={views} activeView={activeView} onViewChange={setActiveView} start={start ? start(mount, { activeView, onViewChange: setActiveView }) : undefined} filters={filters} primary="Add students" narrow={width < FRAME_LAYOUT.fullWidthBelow} />}
-                    >
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>{body}</div>
-                    </PatternSection>
-                )}
+                <Page
+                    header={pageTabs ? <PageTabs active={pageTab} onSelect={setPageTab} labels={['Overview', 'Students', 'Sessions']} aria-label="Group pages" /> : undefined}
+                    style={{ minBlockSize: openMenu ? OPEN_ROOM[tier === '2c' ? 'stacked' : 'short'] : undefined }}
+                >
+                    {pageTabs && pageTab === 'overview' && (
+                        <PatternSection title="Lincoln Middle">
+                            <PatternCard title="Tuesdays & Thursdays · 4:30 PM" description="Priya Nair · 8 students enrolled this term." />
+                        </PatternSection>
+                    )}
+                    {pageTabs && pageTab === 'sessions' && (
+                        <PatternSection title="Sessions">
+                            <SessionsTable />
+                        </PatternSection>
+                    )}
+                    {(!pageTabs || pageTab === 'students') && (
+                        <PatternSection
+                            title="Students"
+                            description="Lincoln Middle"
+                            type={pageTabs ? 'tabs-only' : sectionType}
+                            tabs={<ViewBar views={views} activeView={activeView} onViewChange={setActiveView} start={start ? start(mount, { activeView, onViewChange: setActiveView }) : undefined} filters={filters} primary="Add students" narrow={width < FRAME_LAYOUT.fullWidthBelow} />}
+                        >
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>{body}</div>
+                        </PatternSection>
+                    )}
+                </Page>
             </div>
         </div>
     );
@@ -309,24 +294,10 @@ export const ViewPicker = ({ open = false, mount, value, onChange }) => (
     <PopupSelect
         label="View"
         options={['All students', 'Needs follow-up', 'New this term']}
-        value={value}
-        defaultValue="All students"
-        onChange={onChange}
+        {...(value !== undefined ? { value, onChange } : { defaultValue: 'All students' })}
         isSearchable={false}
         placement="bottom-start"
         {...(open && mount ? { open: true, onOpenChange: noop } : {})}
         container={mount ?? undefined}
     />
-);
-
-/** Page tabs above the Section: the group's pages. */
-export const PageTabs = ({ active = 'students', onSelect }) => (
-    <Tabs
-        {...(onSelect ? { activeKey: active, onSelect } : { defaultActiveKey: active })}
-        aria-label="Group pages"
-    >
-        <Tabs.Tab eventKey="overview">Overview</Tabs.Tab>
-        <Tabs.Tab eventKey="students">Students</Tabs.Tab>
-        <Tabs.Tab eventKey="sessions">Sessions</Tabs.Tab>
-    </Tabs>
 );

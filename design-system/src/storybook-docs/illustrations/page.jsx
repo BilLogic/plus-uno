@@ -1,6 +1,7 @@
 import React from 'react';
 import { Illustration } from './Illustration.jsx';
-import { Breadcrumb, ButtonShape, Row, Section, SkeletonBar, Tabs } from './primitives.jsx';
+import { HAIRLINE, PAINT } from './paint.js';
+import { Breadcrumb, ButtonShape, Rect, Row, Section, SkeletonBar, Tabs } from './primitives.jsx';
 
 /**
  * The Page template's do and don't drawings. Each lesson is about where a part
@@ -120,7 +121,13 @@ export const OneTabSystem = ({ title = 'Page tabs under the title, and a Section
   <Canvas title={title}>
     <Title y={6} description={false} />
     <Tabs x={X} y={20} w={72} count={3} />
-    <ButtonShape x={X} y={44} w={30} appearance="primary" />
+    <Rect x={X} y={44} w={30} h={8} fill={PAINT.buttonDefault} stroke={PAINT.accent} corner="full" />
+    <path
+      d={`M${X + 23} 47 L${X + 25} 49 L${X + 27} 47`}
+      fill="none"
+      stroke={PAINT.buttonDefaultText}
+      style={HAIRLINE}
+    />
     <Rows y={62} count={2} />
   </Canvas>
 );

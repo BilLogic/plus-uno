@@ -58,15 +58,18 @@ export const DemoPageHeader = ({ breadcrumb, title, status, description, actions
     />
 );
 
+const DEFAULT_TAB_LABELS = ['Overview', 'Sessions', 'Notes'];
+
 /** Page tabs: they switch the whole page. */
-export const PageTabs = ({ active = 'overview', onSelect }) => (
+export const PageTabs = ({ active = 'overview', onSelect, labels = DEFAULT_TAB_LABELS, 'aria-label': ariaLabel = 'Student pages' }) => (
     <Tabs
         {...(onSelect ? { activeKey: active, onSelect } : { defaultActiveKey: active })}
-        aria-label="Student pages"
+        aria-label={ariaLabel}
     >
-        <Tabs.Tab eventKey="overview">Overview</Tabs.Tab>
-        <Tabs.Tab eventKey="sessions">Sessions</Tabs.Tab>
-        <Tabs.Tab eventKey="notes">Notes</Tabs.Tab>
+        {labels.map((entry) => {
+            const [key, label] = Array.isArray(entry) ? entry : [entry.toLowerCase(), entry];
+            return <Tabs.Tab key={key} eventKey={key}>{label}</Tabs.Tab>;
+        })}
     </Tabs>
 );
 
@@ -155,9 +158,7 @@ export const ViewSelect = ({ value, defaultValue = 'upcoming', onChange, actions
         <PopupSelect
             label="Status"
             options={STATUS_OPTIONS}
-            value={value}
-            defaultValue={defaultValue}
-            onChange={onChange}
+            {...(value !== undefined ? { value, onChange } : { defaultValue })}
             isSearchable={false}
         />
         {actions ? <div style={{ marginInlineStart: 'auto' }}>{actions}</div> : null}

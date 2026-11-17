@@ -283,7 +283,6 @@ const SessionsFrame = ({ edge, columns = 1, ...frameProps }) => {
         <div ref={ref}>
             <InAppFrame
                 height="calc(var(--image-xl) * 5)"
-                breadcrumbs={[{ text: 'Home', href: '#' }, { text: 'Sessions' }]}
                 account={ACCOUNT}
                 panelStorageKey={null}
                 {...frameProps}

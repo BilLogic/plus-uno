@@ -33,9 +33,7 @@ export const PAGE_WIDTH = 1060; // docs-literal
 
 export const SCREEN = { width: 1024, height: 580 }; // docs-literal
 
-const PAGE_BREADCRUMBS = [{ text: 'Home', href: '#' }, { text: 'Sessions', href: '#' }, { text: 'Log a session' }];
-
-const SUBJECTS = [
+const SITES = [
     { value: 'lincoln', label: 'Lincoln Middle' },
     { value: 'roosevelt', label: 'Roosevelt K-8' },
     { value: 'north', label: 'North High' },
@@ -58,12 +56,12 @@ export const FormFields = ({ values, onChange, errors = {}, onBlurField, subject
         <Select
             label="Site"
             isRequired
-            options={SUBJECTS}
-            value={values.subject}
-            onChange={(v) => onChange({ ...values, subject: v })}
+            options={SITES}
+            value={values.site}
+            onChange={(v) => onChange({ ...values, site: v })}
             isDisabled={subjectWaits}
-            isInvalid={Boolean(errors.subject)}
-            errorMessage={errors.subject}
+            isInvalid={Boolean(errors.site)}
+            errorMessage={errors.site}
             caption={subjectWaits ? 'Choose a student first.' : undefined}
         />
         <TextField
@@ -75,13 +73,13 @@ export const FormFields = ({ values, onChange, errors = {}, onBlurField, subject
     </Fieldset>
 );
 
-export const EMPTY = { student: '', subject: '', notes: '' };
-export const FILLED = { student: 'Ana Ruiz', subject: 'lincoln', notes: '' };
+export const EMPTY = { student: '', site: '', notes: '' };
+export const FILLED = { student: 'Ana Ruiz', site: 'lincoln', notes: '' };
 
 /** Every required field the form is missing, as `{ field: message }`. */
 export const missing = (values) => ({
     ...(values.student.trim() ? {} : { student: 'Enter the student’s name.' }),
-    ...(values.subject ? {} : { subject: 'Choose a site.' }),
+    ...(values.site ? {} : { site: 'Choose a site.' }),
 });
 
 /** A docs picture's after-state: the missing fields, all of them or only those named. */
@@ -173,7 +171,7 @@ export const FormInPage = ({ initial, server, subjectWaits, sendingForever, mark
     const f = useFormState({ initial, server, sendingForever, marked, sending });
     return (
         <BrowserWindow address="app.plus.org/sessions/new" height={PAGE_HEIGHT}>
-            <InAppFrame height="100%" activeTabId="sessions" breadcrumbs={PAGE_BREADCRUMBS} panelStorageKey={null}>
+            <InAppFrame height="100%" activeTabId="sessions" panelStorageKey={null}>
                 <PatternSection level="page" title="Log a session">
                     <PresenceSlot show={Boolean(f.serverError)}>
                         <FormMessage>{SERVER_MESSAGE}</FormMessage>
@@ -297,7 +295,7 @@ export const FormInSteps = ({ start = 0 }) => {
                         </Fieldset>
                     );
                 }
-                const siteLabel = SUBJECTS.find((s) => s.value === f.values.subject)?.label ?? (f.values.subject || 'Lincoln Middle');
+                const siteLabel = SITES.find((s) => s.value === f.values.site)?.label ?? (f.values.site || 'Lincoln Middle');
                 return (
                     <Fieldset legend="Review">
                         <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>
