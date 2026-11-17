@@ -1,8 +1,12 @@
 import React from 'react';
+import { join } from 'node:path';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { expectTypeCardAnchors } from '@/storybook-docs/lib/type-card-anchors.jsx';
 import { InboxInSidebar } from './notificationsDemo.jsx';
+
+vi.mock('@storybook/addon-docs/blocks', () => import('@/storybook-docs/lib/addon-docs-blocks-mock.jsx'));
 
 describe('InboxInSidebar (Patterns › Notifications)', () => {
     it('opens a 360px (--inbox-width) Inbox Panel beside the Sidebar with header actions, Unread/All tabs and day groups', async () => {
@@ -88,5 +92,9 @@ describe('InboxInSidebar (Patterns › Notifications)', () => {
         // Closes on outside click (the page behind has no blanket)
         await user.click(screen.getByRole('heading', { name: 'Sessions' }));
         expect(screen.queryByRole('region', { name: 'Inbox' })).toBeNull();
+    });
+
+    it('links every TypeCard anchor to a unique ComponentExample heading id in Notifications.mdx', () => {
+        expectTypeCardAnchors(join(__dirname, 'Notifications.mdx'), 7);
     });
 });

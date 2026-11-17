@@ -43,11 +43,15 @@ import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 Four components carry every message. Each component page holds its appearances; this pattern picks the carrier and the place. A Modal is the fifth, for the one message that must be answered first.
 
 <TypeGrid>
-<TypeCard of={NotificationsStories.CarrierFlag} title="Flag" stage={PLACE_STAGE}>A passing notice at the top right, two lines at most. Routine ones leave on their own; warning and error stay until acted on.</TypeCard>
-<TypeCard of={NotificationsStories.CarrierBanner} title="Banner" stage={STAGE}>A condition that holds for the whole Frame, page or Section: one line, no dismiss, one at a time.</TypeCard>
-<TypeCard of={NotificationsStories.CarrierSectionMessage} title="SectionMessage" stage={PLACE_STAGE}>Something to read or act on that belongs to this part of the page and stays until resolved or dismissed.</TypeCard>
-<TypeCard of={NotificationsStories.CarrierInbox} title="The Inbox" stage={INBOX_STAGE}>Updates that arrived over time, in a 360-wide (`--inbox-width`) <a target="_top" href="./?path=/docs/templates-panel--docs">Panel</a> beside the Sidebar with `Unread` and `All` tabs and `NotificationItem` rows grouped by day.</TypeCard>
+<TypeCard of={NotificationsStories.CarrierFlag} to="#a-flag-on-the-page" title="Flag" stage={PLACE_STAGE}>A passing notice at the top right, two lines at most. Routine ones leave on their own; warning and error stay until acted on.</TypeCard>
+<TypeCard of={NotificationsStories.CarrierBanner} to="#banner" title="Banner" stage={STAGE}>A condition that holds for the whole Frame, page or Section: one line, no dismiss, one at a time.</TypeCard>
+<TypeCard of={NotificationsStories.CarrierSectionMessage} to="#a-message-that-must-stay" title="SectionMessage" stage={PLACE_STAGE}>Something to read or act on that belongs to this part of the page and stays until resolved or dismissed.</TypeCard>
+<TypeCard of={NotificationsStories.CarrierInbox} to="#the-inbox" title="The Inbox" stage={INBOX_STAGE}>Updates that arrived over time, in a 360-wide (`--inbox-width`) <a target="_top" href="./?path=/docs/templates-panel--docs">Panel</a> beside the Sidebar with `Unread` and `All` tabs and `NotificationItem` rows grouped by day.</TypeCard>
 </TypeGrid>
+
+<ComponentExample of={NotificationsStories.CarrierBanner} title="Banner" description="A condition that holds for the whole Frame, page or Section: one line, no dismiss, one at a time." />
+
+<ComponentExample of={NotificationsStories.CarrierInbox} title="The Inbox" description="Updates that arrived over time, in a 360-wide (--inbox-width) Panel beside the Sidebar with Unread and All tabs and NotificationItem rows grouped by day." />
 
 </div>
 
@@ -58,10 +62,16 @@ Four components carry every message. Each component page holds its appearances; 
 One banner at a time, scrolling with its content. The Frame tier is system news and pins only during an active outage. The Page tier is about this page. The Section tier is about this collection. The Frame and Page `banner` slots are Planned <PlannedTag />: today a Banner goes in the content, set where its tier says.
 
 <TypeGrid>
-<TypeCard of={NotificationsStories.TierFrameStory} title="Frame" stage={STAGE}>System news across the whole width, above the Sidebar and the page.</TypeCard>
-<TypeCard of={NotificationsStories.TierPageStory} title="Page" stage={STAGE}>Under the page header, about this page.</TypeCard>
-<TypeCard of={NotificationsStories.TierSectionStory} title="Section" stage={STAGE}>At the top of one collection, about that collection.</TypeCard>
+<TypeCard of={NotificationsStories.TierFrameStory} to="#frame" title="Frame" stage={STAGE}>System news across the whole width, above the Sidebar and the page.</TypeCard>
+<TypeCard of={NotificationsStories.TierPageStory} to="#page" title="Page" stage={STAGE}>Under the page header, about this page.</TypeCard>
+<TypeCard of={NotificationsStories.TierSectionStory} to="#section" title="Section" stage={STAGE}>At the top of one collection, about that collection.</TypeCard>
 </TypeGrid>
+
+<ComponentExample of={NotificationsStories.TierFrameStory} title="Frame" description="System news across the whole width, above the Sidebar and the page." />
+
+<ComponentExample of={NotificationsStories.TierPageStory} title="Page" description="Under the page header, about this page." />
+
+<ComponentExample of={NotificationsStories.TierSectionStory} title="Section" description="At the top of one collection, about that collection." />
 
 </div>
 

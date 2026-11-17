@@ -5,6 +5,7 @@ import {
     Banner,
     Button,
     CountTag,
+    DynamicTable,
     EmptyState,
     Flag,
     FlagGroup,
@@ -389,48 +390,84 @@ const TopRight = ({ padded = true, children }) => (
 );
 
 /** One passing notice: the title names the event, one line gives the next step. */
-export const FlagTopRight = () => (
-    <TopRight>
-        <Flag icon="circle-check" title="Session logged" autohide={false} show>
-            Maya's supervisor will see it Friday.
-        </Flag>
-    </TopRight>
-);
+export const FlagTopRight = () => {
+    const [show, setShow] = useState(true);
+    return (
+        <TopRight>
+            <Flag icon="circle-check" title="Session logged" autohide={false} show={show} onDismiss={() => setShow(false)}>
+                Maya's supervisor will see it Friday.
+            </Flag>
+        </TopRight>
+    );
+};
 
 /** Several Flags, newest on top, each its own message. A stack is all default flags, each with its ×. */
-export const FlagStack = () => (
-    <TopRight>
-        <Flag icon="circle-check" title="Note saved" autohide={false} show>
-            Maya can read it now.
-        </Flag>
-        <Flag title="Schedule updated" autohide={false} show>
-            Thursday moved to 4:30 PM.
-        </Flag>
-    </TopRight>
-);
+export const FlagStack = () => {
+    const [gone, setGone] = useState([]);
+    const dismiss = (id) => () => setGone((prev) => [...prev, id]);
+    return (
+        <TopRight>
+            <Flag icon="circle-check" title="Note saved" autohide={false} show={!gone.includes('note')} onDismiss={dismiss('note')}>
+                Maya can read it now.
+            </Flag>
+            <Flag title="Schedule updated" autohide={false} show={!gone.includes('schedule')} onDismiss={dismiss('schedule')}>
+                Thursday moved to 4:30 PM.
+            </Flag>
+        </TopRight>
+    );
+};
 
 /** A Flag with two verbs. */
-export const FlagWithActions = () => (
-    <TopRight>
-        <Flag
-            icon="circle-check"
-            title="Session deleted"
-            autohide={false}
-            show
-            actions={[{ text: 'Undo', onClick: noop }, { text: 'View sessions', onClick: noop }]}
-        >
-            Lincoln Middle on Tuesday.
-        </Flag>
-    </TopRight>
-);
+export const FlagWithActions = () => {
+    const [restored, setRestored] = useState(false);
+    const [show, setShow] = useState(true);
+    return (
+        <TopRight>
+            {restored ? (
+                <Flag icon="circle-check" title="Session restored" autohide={false} show={show} onDismiss={() => setShow(false)} />
+            ) : (
+                <Flag
+                    icon="circle-check"
+                    title="Session deleted"
+                    autohide={false}
+                    show={show}
+                    onDismiss={() => setShow(false)}
+                    actions={[
+                        { text: 'Undo', onClick: () => setRestored(true) },
+                        { text: 'View sessions', onClick: noop },
+                    ]}
+                >
+                    Lincoln Middle on Tuesday.
+                </Flag>
+            )}
+        </TopRight>
+    );
+};
 
 /** Undo: a timed Flag with Undo first, then the plain Flag that replaces it once Undo is pressed. */
-export const FlagUndo = () => (
-    <TopRight>
-        <Flag title="Session deleted" timer delay={60000} show actions={[{ text: 'Undo', onClick: noop }]} />
-        <Flag icon="circle-check" title="Session restored" autohide={false} show />
-    </TopRight>
-);
+export const FlagUndo = () => {
+    const [undone, setUndone] = useState(false);
+    const [showRestored, setShowRestored] = useState(true);
+    return (
+        <TopRight>
+            <Flag
+                title="Session deleted"
+                timer
+                delay={60000}
+                show={!undone}
+                onDismiss={() => setUndone(true)}
+                actions={[{ text: 'Undo', onClick: () => setUndone(true) }]}
+            />
+            <Flag
+                icon="circle-check"
+                title="Session restored"
+                autohide={false}
+                show={showRestored}
+                onDismiss={() => setShowRestored(false)}
+            />
+        </TopRight>
+    );
+};
 
 /** A SectionMessage that stays: dismiss off, placed by the action it informs. */
 export const MustStay = () => (
@@ -451,11 +488,43 @@ export const SeverityRow = () => (
     </div>
 );
 
+const TIER_SESSIONS = [
+    ['Ana Ruiz', 'Thu 4:30 PM', 'Confirmed', 'success'],
+    ['Ben Okafor', 'Thu 5:00 PM', 'Needs a tutor', 'warning'],
+    ['Chloe Tran', 'Fri 3:30 PM', 'Confirmed', 'success'],
+];
+
+const TierSessionsTable = () => (
+    <DynamicTable
+        label="Sessions"
+        isFixedSize
+        head={{
+            cells: [
+                { key: 'student', content: 'Student', isSortable: true },
+                { key: 'time', content: 'Time', isSortable: true },
+                { key: 'status', content: 'Status', isSortable: true },
+            ],
+        }}
+        rows={TIER_SESSIONS.map(([student, time, status, appearance]) => ({
+            key: student,
+            cells: [
+                { key: student, content: student },
+                { key: time, content: time },
+                { key: status, content: <StatusTag appearance={appearance}>{status}</StatusTag> },
+            ],
+        }))}
+    />
+);
+
 /** The Frame tier: system news across the whole width, above the page. The Frame's own banner slot is Planned, so the picture sets the Banner above the Frame's content. */
 export const TierFrame = () => (
     <BrowserWindow address="app.plus.org/sessions">
         <Banner appearance="announcement">Scheduled maintenance Saturday 2–4 AM ET.</Banner>
-        <Page header={<DemoPageHeader title="Sessions" description="This week" />} />
+        <Page header={<DemoPageHeader title="Sessions" description="This week" />}>
+            <PatternSection title="Upcoming sessions">
+                <TierSessionsTable />
+            </PatternSection>
+        </Page>
     </BrowserWindow>
 );
 
@@ -465,23 +534,46 @@ export const TierPage = () => (
         <Page
             header={<DemoPageHeader title="Sessions" description="This week" />}
             banner={<Banner appearance="warning">Tutoring sessions move to the new calendar on Friday.</Banner>}
-        />
-    </BrowserWindow>
-);
-
-/** The Section tier: at the top of one collection, about that collection. */
-export const TierSection = () => (
-    <BrowserWindow address="app.plus.org/students">
-        <Page header={<DemoPageHeader title="Students" description="Lincoln Middle" />}>
-            <PatternSection title="Students" type="tabs-only" tabs={<ViewBar views={['All students']} filters={null} primary={null} />}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
-                    <Banner appearance="warning">Two students have no guardian contact on file.</Banner>
-                    <StudentsTable count={2} />
-                </div>
+        >
+            <PatternSection title="Upcoming sessions">
+                <TierSessionsTable />
             </PatternSection>
         </Page>
     </BrowserWindow>
 );
+
+/** The Section tier: at the top of one collection, about that collection. */
+export const TierSection = () => {
+    const [view, setView] = useState('All students');
+    return (
+        <BrowserWindow address="app.plus.org/students">
+            <Page header={<DemoPageHeader title="Students" description="Lincoln Middle" />}>
+                <PatternSection
+                    title="Students"
+                    type="tabs-only"
+                    tabs={(
+                        <ViewBar
+                            views={['All students', 'Paused']}
+                            activeView={view}
+                            onViewChange={setView}
+                            filters={null}
+                            primary={null}
+                        />
+                    )}
+                >
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+                        <Banner appearance="warning">Two students have no guardian contact on file.</Banner>
+                        <StudentsTable
+                            sortable
+                            view={view === 'Paused' ? 'Paused' : undefined}
+                            count={view === 'Paused' ? 6 : 3}
+                        />
+                    </div>
+                </PatternSection>
+            </Page>
+        </BrowserWindow>
+    );
+};
 
 /** Do: a finished action on the default Flag, the event in the title and the next step below. */
 export const FlagDo = () => (
@@ -513,14 +605,17 @@ export const BannerDont = () => (
 );
 
 /** A page whose Flag has found the person at the top right: the page behind them. */
-export const FlagOnPage = () => (
-    <BrowserWindow address="app.plus.org/sessions" height={WINDOW}>
-        <Page header={<DemoPageHeader title="Sessions" description="This week" />}>
-            <TopRight padded={false}>
-                <Flag icon="circle-check" title="Session logged" autohide={false} show>
-                    Maya's supervisor will see it Friday.
-                </Flag>
-            </TopRight>
-        </Page>
-    </BrowserWindow>
-);
+export const FlagOnPage = () => {
+    const [show, setShow] = useState(true);
+    return (
+        <BrowserWindow address="app.plus.org/sessions" height={WINDOW}>
+            <Page header={<DemoPageHeader title="Sessions" description="This week" />}>
+                <TopRight padded={false}>
+                    <Flag icon="circle-check" title="Session logged" autohide={false} show={show} onDismiss={() => setShow(false)}>
+                        Maya's supervisor will see it Friday.
+                    </Flag>
+                </TopRight>
+            </Page>
+        </BrowserWindow>
+    );
+};
