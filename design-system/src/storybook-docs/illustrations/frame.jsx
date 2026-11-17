@@ -33,22 +33,12 @@ const Body = ({ x, y = 28, w }) => (
 );
 
 /** The focused bottom bar: Back and Next split the bar, with Close in the title row leaving the task. */
-const Bar = ({ order = 'right' }) => (
+const Bar = () => (
   <g>
     <Rect x={0} y={H - BAR_H} w={W} h={BAR_H} fill={PAINT.pageSurface} />
     <Rule x1={0} x2={W} y1={H - BAR_H} y2={H - BAR_H} />
-    {order === 'right' ? (
-      <g>
-        <ButtonShape x={6} y={H - BAR_H + 2} w={(W - 16) / 2} />
-        <ButtonShape x={10 + (W - 16) / 2} y={H - BAR_H + 2} w={(W - 16) / 2} appearance="primary" />
-      </g>
-    ) : (
-      <g>
-        <ButtonShape x={6} y={H - BAR_H + 2} w={24} />
-        <ButtonShape x={W - 58} y={H - BAR_H + 2} w={24} />
-        <ButtonShape x={W - 30} y={H - BAR_H + 2} w={24} appearance="primary" />
-      </g>
-    )}
+    <ButtonShape x={6} y={H - BAR_H + 2} w={(W - 16) / 2} />
+    <ButtonShape x={10 + (W - 16) / 2} y={H - BAR_H + 2} w={(W - 16) / 2} appearance="primary" />
   </g>
 );
 
@@ -70,26 +60,6 @@ export const FocusedWithSidebar = ({ title = 'A focused task with the Sidebar st
     <SkeletonBar x={SIDE + 8} y={8} w={40} h={6} heading />
     <Body x={SIDE + 8} w={W - SIDE - 16} />
     <Bar />
-  </Canvas>
-);
-
-/** Back and the primary Next split the bar, with no Cancel in the footer. */
-export const BarInOrder = ({ title = 'A bottom bar with Back and the primary Next splitting the bar, while Close in the title row leaves the task' }) => (
-  <Canvas title={title}>
-    <PageBox x={0} w={W} h={H - BAR_H} />
-    <Body x={8} y={12} w={W - 16} />
-    <Bar />
-    <Rect x={2} y={H - BAR_H} w={W - 4} h={BAR_H} fill="none" stroke={PAINT.accent} corner="button" />
-  </Canvas>
-);
-
-/** Cancel repeated in the bar beside Back and Next. */
-export const BarScrambled = ({ title = 'A bottom bar that repeats Cancel at the start beside Back and the primary Next' }) => (
-  <Canvas title={title}>
-    <PageBox x={0} w={W} h={H - BAR_H} />
-    <Body x={8} y={12} w={W - 16} />
-    <Bar order="end" />
-    <Rect x={4} y={H - BAR_H} w={28} h={BAR_H} fill="none" stroke={PAINT.accent} corner="button" />
   </Canvas>
 );
 

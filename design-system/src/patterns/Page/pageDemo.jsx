@@ -13,7 +13,7 @@ import {
     Heading,
 } from '@/components';
 import { Frame, PatternCard, PatternSection } from '@/patterns';
-import { ReflowStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { ReflowStage, ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
 
 /**
  * Page-template docs helpers: the page header assembled from its parts, a
@@ -189,19 +189,26 @@ export const RecordTabSection = ({ tab = 'sessions', status = 'upcoming', onStat
  * 1232 cap (`width="full"` is planned on the Frame; the story sets the cap
  * token to none on the content box).
  */
-export const PageStage = ({ full = false, width = SCENARIO_STAGE, height = STAGE_HEIGHT, children }) => (
-    <ReflowStage width={width}>
-        {(layout) => (
-            <div data-page-stage style={{ inlineSize: layout, height }}>
-                <Frame style={full ? { '--content-max-width': 'none' } : undefined}>
-                    {children}
-                </Frame>
-            </div>
-        )}
-    </ReflowStage>
-);
+export const PageStage = ({ full = false, scrollable = false, width = SCENARIO_STAGE, height = STAGE_HEIGHT, children }) => {
+    const frame = (
+        <Frame style={full ? { '--content-max-width': 'none' } : undefined}>
+            {children}
+        </Frame>
+    );
+    return scrollable ? (
+        <ScrollStage width={width} height={height} data-page-stage>{frame}</ScrollStage>
+    ) : (
+        <ReflowStage width={width}>
+            {(layout) => (
+                <div data-page-stage style={{ inlineSize: layout, height }}>
+                    {frame}
+                </div>
+            )}
+        </ReflowStage>
+    );
+};
 
-PageStage.propTypes = { full: PropTypes.bool, width: PropTypes.number, height: PropTypes.number, children: PropTypes.node };
+PageStage.propTypes = { full: PropTypes.bool, scrollable: PropTypes.bool, width: PropTypes.number, height: PropTypes.number, children: PropTypes.node };
 
 /** The banner slot, under the header. */
 export const PageBanner = () => <Banner appearance="warning">Tutoring sessions move to the new calendar on Friday.</Banner>;

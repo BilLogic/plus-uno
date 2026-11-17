@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useStageLayout } from './use-fit-scale.js';
+import { STAGE_FLOOR, useStageLayout } from './use-fit-scale.js';
 
 /** The height of the box `ref` points at, kept current as it changes. */
 const useMeasuredHeight = () => {
@@ -38,6 +38,24 @@ const Stage = ({ width, allowReflow, scaleOutside, children }) => {
 };
 
 /**
+ * A live story at its own `width` inside a horizontally scrollable box: it
+ * takes its container's width and scrolls sideways when wider, never scaling.
+ */
+export const ScrollStage = ({ width, height, children, ...props }) => (
+    <div style={{ overflowX: 'auto' }}>
+        <div style={{ inlineSize: width, blockSize: height }} {...props}>
+            {children}
+        </div>
+    </div>
+);
+
+ScrollStage.propTypes = {
+    width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+    height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    children: PropTypes.node,
+};
+
+/**
  * A live story laid out at a stage `width` and drawn to fit its canvas: the
  * stage is never wider than the box it sits in, so the picture has equal
  * insets on both sides. Unlike `ScaledStory` it stays interactive (no `inert`),
@@ -49,18 +67,26 @@ const Stage = ({ width, allowReflow, scaleOutside, children }) => {
  * a whole screen responds to the page and never shrinks to an unreadable
  * picture. A story's own canvas and the test runner keep the fixed stage.
  *
+ * With `scrollable` set, the stage never scales and instead scrolls
+ * horizontally inside its own box when wider than the docs column.
+ *
  * @param {object} props
  * @param {number} props.width  the stage width the story lays out at
  * @param {boolean} [props.reflow]  false keeps the stage at its own width on a docs page too, only scaling it
+ * @param {boolean} [props.scrollable]  render at scale 1 and scroll horizontally when wider than the container
  */
-export const FitStage = ({ width, reflow = true, children }) => (
-    <Stage width={width} allowReflow={reflow} scaleOutside>{() => children}</Stage>
+export const FitStage = ({ width, reflow = true, scrollable = false, children }) => (
+    scrollable
+        ? <ScrollStage width={width} data-fit-stage>{children}</ScrollStage>
+        : <Stage width={width} allowReflow={reflow} scaleOutside>{() => children}</Stage>
 );
 
 FitStage.propTypes = {
     width: PropTypes.number.isRequired,
     /** False keeps the stage at its own width on a docs page too, only scaling it: for a picture of one fixed width. */
     reflow: PropTypes.bool,
+    /** Render at scale 1 inside a horizontally scrollable box instead of scaling down. */
+    scrollable: PropTypes.bool,
     children: PropTypes.node,
 };
 
@@ -87,14 +113,26 @@ ReflowStage.propTypes = {
 /**
  * A screen box `width` wide, reflowed on a docs page: `ReflowStage` around one
  * plain box. A `fluid` screen fills its canvas outside the docs, as it did
- * before, and only takes the reflowed width on a docs page.
+ * before, and only takes the reflowed width on a docs page. With `scrollable`,
+ * the stage never applies a scale transform and scrolls sideways below `STAGE_FLOOR`.
  */
-export const ScreenStage = ({ width, fluid = false, children }) => (
-    <ReflowStage width={width}>
-        {(layout, reflow) => <div style={{ inlineSize: fluid && !reflow ? undefined : layout }}>{children}</div>}
-    </ReflowStage>
-);
+export const ScreenStage = ({ width, fluid = false, scrollable = false, children }) => {
+    if (scrollable) {
+        return (
+            <div style={{ overflowX: 'auto' }}>
+                <div style={{ inlineSize: fluid ? '100%' : width, minInlineSize: fluid ? Math.min(width, STAGE_FLOOR) : undefined }}>
+                    {children}
+                </div>
+            </div>
+        );
+    }
+    return (
+        <ReflowStage width={width}>
+            {(layout, reflow) => <div style={{ inlineSize: fluid && !reflow ? undefined : layout }}>{children}</div>}
+        </ReflowStage>
+    );
+};
 
-ScreenStage.propTypes = { width: PropTypes.number.isRequired, fluid: PropTypes.bool, children: PropTypes.node };
+ScreenStage.propTypes = { width: PropTypes.number.isRequired, fluid: PropTypes.bool, scrollable: PropTypes.bool, children: PropTypes.node };
 
 export default FitStage;

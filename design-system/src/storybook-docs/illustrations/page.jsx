@@ -1,7 +1,7 @@
 import React from 'react';
 import { Illustration } from './Illustration.jsx';
-import { HAIRLINE, PAINT } from './paint.js';
-import { Breadcrumb, ButtonShape, Rect, Row, Section, SkeletonBar, Tabs } from './primitives.jsx';
+import { PAINT } from './paint.js';
+import { Breadcrumb, Row, Section, SkeletonBar } from './primitives.jsx';
 
 /**
  * The Page template's do and don't drawings. Each lesson is about where a part
@@ -29,14 +29,6 @@ const Title = ({ y, accent = false, description = true, w = 52 }) => (
   </g>
 );
 
-/** The collection's view bar: one pill at the start; `primary` adds the labeled Primary at the end. */
-const ViewBar = ({ y, primary = false }) => (
-  <g>
-    <Tabs x={X} y={y - 4} w={24} count={1} />
-    {primary && <ButtonShape x={W - X - 26} y={y} w={26} appearance="primary" />}
-  </g>
-);
-
 const Rows = ({ y, count = 3 }) => (
   <g>
     {Array.from({ length: count }, (_, i) => <Row key={i} x={X} y={y + i * 15} w={INNER} />)}
@@ -58,25 +50,6 @@ export const SectionsAsTitles = ({ title = 'Two Sections whose headings are as l
     <Rows y={24} count={2} />
     <SkeletonBar x={X} y={62} w={52} h={8} heading />
     <Rows y={76} count={1} />
-  </Canvas>
-);
-
-/** The Primary that adds rows ends the collection's view bar; the header carries only the title. */
-export const AddInViewBar = ({ title = 'A page header with only its title, and the one primary button at the end of the collection view bar' }) => (
-  <Canvas title={title}>
-    <Title y={8} description={false} />
-    <ViewBar y={34} primary />
-    <Rows y={52} />
-  </Canvas>
-);
-
-/** The same Primary twice: in the page header and again in the view bar. */
-export const AddTwice = ({ title = 'The same primary button in the page header and again at the end of the view bar' }) => (
-  <Canvas title={title}>
-    <Title y={8} description={false} />
-    <ButtonShape x={W - X - 26} y={8} w={26} appearance="primary" />
-    <ViewBar y={34} primary />
-    <Rows y={52} />
   </Canvas>
 );
 
@@ -113,31 +86,5 @@ export const ParagraphUnderTitle = ({ title = 'A page title with a three-line pa
     <SkeletonBar x={X} y={29} w={INNER * 0.85} accent />
     <SkeletonBar x={X} y={37} w={INNER * 0.5} accent />
     <Section x={X} y={54} w={INNER} h={44} rows={2} />
-  </Canvas>
-);
-
-/** Page tabs, and under them a Section whose views are one labeled PopupSelect at the start of its bar. */
-export const OneTabSystem = ({ title = 'Page tabs under the title, and a Section whose views are one labeled PopupSelect at the start of its bar' }) => (
-  <Canvas title={title}>
-    <Title y={6} description={false} />
-    <Tabs x={X} y={20} w={72} count={3} />
-    <Rect x={X} y={44} w={30} h={8} fill={PAINT.buttonDefault} stroke={PAINT.accent} corner="full" />
-    <path
-      d={`M${X + 23} 47 L${X + 25} 49 L${X + 27} 47`}
-      fill="none"
-      stroke={PAINT.buttonDefaultText}
-      style={HAIRLINE}
-    />
-    <Rows y={62} count={2} />
-  </Canvas>
-);
-
-/** Page tabs and pill views under them: two tab systems on one page. */
-export const TwoTabSystems = ({ title = 'Page tabs under the title, and pill views in the Section bar under them: two tab systems on one page' }) => (
-  <Canvas title={title}>
-    <Title y={6} description={false} />
-    <Tabs x={X} y={20} w={72} count={3} />
-    <Tabs x={X} y={42} w={48} count={2} accent />
-    <Rows y={62} count={2} />
   </Canvas>
 );

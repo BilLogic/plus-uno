@@ -1,9 +1,10 @@
 import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Story } from '@storybook/addon-docs/blocks';
+import { Meta } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PageStories from './Page.stories.jsx';
+import { AddInViewBar, AddTwice, OneTabSystem, TwoTabSystems } from './PageCases.jsx';
 import * as HeadingOutlineStories from '../HeadingOutline.stories.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 import {
@@ -18,16 +19,12 @@ import {
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 import {
-    AddInViewBar,
-    AddTwice,
     AreaPageTitleAlone,
     BreadcrumbOnAreaPage,
     HeaderIsTheH1,
     OneLineDescription,
-    OneTabSystem,
     ParagraphUnderTitle,
     SectionsAsTitles,
-    TwoTabSystems,
 } from '@/storybook-docs/illustrations/page.jsx';
 
 <Meta of={PageStories} />
@@ -62,9 +59,13 @@ import {
 ## Types
 
 <TypeGrid wide>
-<TypeCard of={PageStories.TypeDefault} title="Default" stage={1920}>The content grid, centered and capped at its content width. Nearly every page.</TypeCard>
-<TypeCard of={PageStories.TypeFullWidth} title="Full width" stage={1920}>The content runs to the pad with no cap, for a page that fills it, such as chat or a board.</TypeCard>
+<TypeCard of={PageStories.TypeDefault} to="#default" title="Default" stage={1920}>The content grid, centered and capped at its content width. Nearly every page.</TypeCard>
+<TypeCard of={PageStories.TypeFullWidth} to="#full-width" title="Full width" stage={1920}>The content runs to the pad with no cap, for a page that fills it, such as chat or a board.</TypeCard>
 </TypeGrid>
+
+<ComponentExample of={PageStories.TypeDefault} title="Default" description="The content grid, centered and capped at its content width. Nearly every page." />
+
+<ComponentExample of={PageStories.TypeFullWidth} title="Full width" description="The content runs to the pad with no cap, for a page that fills it, such as chat or a board." />
 
 </div>
 
@@ -74,7 +75,7 @@ import {
 
 A record page one level down shows every header slot, with markers in the gutter beside each part.
 
-<Story of={PageStories.AnatomyRecord} inline />
+<ComponentExample of={PageStories.AnatomyRecord} />
 
 1. **Breadcrumb** (optional). The record's parents on their own row, above the title.
 2. **Title.** The page's one h1, with its StatusTag after the text when the page is one record.

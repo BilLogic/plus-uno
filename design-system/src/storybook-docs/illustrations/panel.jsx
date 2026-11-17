@@ -1,7 +1,7 @@
 import React from 'react';
 import { PAINT } from './paint.js';
 import { Illustration } from './Illustration.jsx';
-import { Blanket, ButtonShape, Panel, Rect, Row, Rule, Section } from './primitives.jsx';
+import { Blanket, Panel, Rect, Row, Section } from './primitives.jsx';
 
 /**
  * The Panel template's do and don't drawings. Each lesson is about how a Panel
@@ -61,26 +61,6 @@ export const TwoFloatingPanels = ({ title = 'Two floating Panels open at once, t
     <PageBehind />
     <Panel x={70} y={0} w={72} h={H} floating />
     <Panel x={96} y={0} w={72} h={H} accent floating />
-  </Canvas>
-);
-
-/** Do: a Panel read in place has no footer. */
-export const ReadingNoFooter = ({ title = 'A Panel that is only read, header and body with no footer' }) => (
-  <Canvas title={title}>
-    <PageBehind />
-    <Panel x={96} y={0} w={72} h={H} floating accent />
-  </Canvas>
-);
-
-/** Don't: a footer on a Panel that is only read. */
-export const ReadingWithFooter = ({ title = 'A Panel that is only read, with a footer of buttons it has no use for' }) => (
-  <Canvas title={title}>
-    <PageBehind />
-    <Panel x={96} y={0} w={72} h={H} floating />
-    <Rule x1={96} x2={168} y1={H - 22} y2={H - 22} stroke={PAINT.modalDivider} />
-    <ButtonShape x={96} y={H - 16} w={36} />
-    <ButtonShape x={132} y={H - 16} w={36} appearance="primary" />
-    <Rect x={96} y={H - 22} w={72} h={22} fill="none" stroke={PAINT.accent} />
   </Canvas>
 );
 
