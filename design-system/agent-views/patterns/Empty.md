@@ -77,6 +77,8 @@ Use Empty when a list, table, card, Panel or page has no records to show, a sear
 - Loading: use before you know the view is empty.
 - Errors: use for the words in a Can't show state.
 - Filtering: use for where No matches comes from, and the "Reset filters" wording.
+- Search: use for a search that matches nothing.
+- Section: use for the view bar that stays above a replaced table.
 
 ## Best practices
 
