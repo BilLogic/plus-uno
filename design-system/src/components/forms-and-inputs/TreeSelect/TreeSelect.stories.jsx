@@ -65,40 +65,40 @@ export default {
 
 const sampleOptions = [
     {
-        label: 'Middle schools',
-        value: 'middle-schools',
+        label: 'Algebra',
+        value: 'algebra',
         children: [
             {
-                label: 'Lincoln Middle',
-                value: 'lincoln-middle',
+                label: 'Linear equations',
+                value: 'linear-equations',
                 children: [
-                    { label: 'Tuesday 4:00 PM', value: 'lincoln-tue' },
-                    { label: 'Thursday 4:00 PM', value: 'lincoln-thu' },
+                    { label: 'Two-step equations', value: 'two-step' },
+                    { label: 'Slope and intercept', value: 'slope-intercept' },
                 ],
             },
             {
-                label: 'Roosevelt K-8',
-                value: 'roosevelt-k8',
+                label: 'Quadratics',
+                value: 'quadratics',
                 children: [
-                    { label: 'Monday 3:30 PM', value: 'roosevelt-mon' },
-                    { label: 'Wednesday 3:30 PM', value: 'roosevelt-wed' },
+                    { label: 'Factoring', value: 'factoring' },
+                    { label: 'Quadratic formula', value: 'quadratic-formula' },
                 ],
             },
         ],
     },
     {
-        label: 'High schools',
-        value: 'high-schools',
+        label: 'Geometry',
+        value: 'geometry',
         children: [
             {
-                label: 'North High',
-                value: 'north-high',
+                label: 'Triangles',
+                value: 'triangles',
                 children: [
-                    { label: 'Friday 3:30 PM', value: 'north-fri-early' },
-                    { label: 'Friday 4:15 PM', value: 'north-fri-late' },
+                    { label: 'Pythagorean theorem', value: 'pythagorean' },
+                    { label: 'Congruence and similarity', value: 'congruence' },
                 ],
             },
-            { label: 'South High', value: 'south-high' },
+            { label: 'Circles and arcs', value: 'circles' },
         ],
     },
 ];
@@ -135,7 +135,7 @@ export const SingleSelect = () => {
 
 /** Multi select: a parent's check cascades to its children; a partly checked branch is indeterminate. */
 export const MultiSelect = () => {
-    const [value, setValue] = useState(['roosevelt-mon', 'roosevelt-wed', 'roosevelt-k8']);
+    const [value, setValue] = useState(['factoring', 'quadratic-formula', 'quadratics']);
     return (
         <div style={fieldWrap}>
             <TreeSelect id="tree-select-multi" label="Topics" value={value} options={sampleOptions} onChange={setValue} isMulti />
@@ -157,13 +157,13 @@ export const SpacingCompact = () => (
 
 export const Interactive = (args) => {
     const presetValue = args.contentPreset === 'preselected'
-        ? (args.isMulti ? ['roosevelt-mon', 'roosevelt-wed', 'roosevelt-k8'] : 'roosevelt-mon')
+        ? (args.isMulti ? ['factoring', 'quadratic-formula', 'quadratics'] : 'factoring')
         : (args.isMulti ? [] : '');
     const [value, setValue] = useState(presetValue);
 
     useEffect(() => {
         setValue(args.contentPreset === 'preselected'
-            ? (args.isMulti ? ['roosevelt-mon', 'roosevelt-wed', 'roosevelt-k8'] : 'roosevelt-mon')
+            ? (args.isMulti ? ['factoring', 'quadratic-formula', 'quadratics'] : 'factoring')
             : (args.isMulti ? [] : ''));
     }, [args.contentPreset, args.isMulti]);
 

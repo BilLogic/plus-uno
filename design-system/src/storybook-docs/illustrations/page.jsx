@@ -1,6 +1,7 @@
 import React from 'react';
 import { Illustration } from './Illustration.jsx';
-import { Breadcrumb, ButtonShape, Field, Row, Section, SkeletonBar, Tabs } from './primitives.jsx';
+import { HAIRLINE, PAINT } from './paint.js';
+import { Breadcrumb, ButtonShape, Rect, Row, Section, SkeletonBar, Tabs } from './primitives.jsx';
 
 /**
  * The Page template's do and don't drawings. Each lesson is about where a part
@@ -115,13 +116,19 @@ export const ParagraphUnderTitle = ({ title = 'A page title with a three-line pa
   </Canvas>
 );
 
-/** Page tabs, and under them a Section whose views are one field at the start of its bar. */
-export const OneTabSystem = ({ title = 'Page tabs under the title, and a Section whose views are one field at the start of its bar' }) => (
+/** Page tabs, and under them a Section whose views are one labeled PopupSelect at the start of its bar. */
+export const OneTabSystem = ({ title = 'Page tabs under the title, and a Section whose views are one labeled PopupSelect at the start of its bar' }) => (
   <Canvas title={title}>
     <Title y={6} description={false} />
     <Tabs x={X} y={20} w={72} count={3} />
-    <Field x={X} y={46} w={44} accent />
-    <Rows y={72} count={2} />
+    <Rect x={X} y={44} w={30} h={8} fill={PAINT.buttonDefault} stroke={PAINT.accent} corner="full" />
+    <path
+      d={`M${X + 23} 47 L${X + 25} 49 L${X + 27} 47`}
+      fill="none"
+      stroke={PAINT.buttonDefaultText}
+      style={HAIRLINE}
+    />
+    <Rows y={62} count={2} />
   </Canvas>
 );
 

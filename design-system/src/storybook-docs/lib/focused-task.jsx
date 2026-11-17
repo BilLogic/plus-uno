@@ -48,7 +48,7 @@ export const stepItems = (labels, at, go) => labels.map((label, i) => ({
  * The focused type: one task in the whole window. Close leads the title row
  * beside the task's name, there is no Sidebar and no breadcrumb. Five steps or
  * more go down a left side 256 wide; four or fewer run across the top. The bar
- * along the bottom is Cancel at the start, then Back and Next at the end.
+ * along the bottom is Back and Next: the × in the title row dismisses.
  */
 export const FocusedTask = ({ count = 5, start = 1, labels: given, title = 'Plan a tutoring term', children }) => {
     const labels = given ?? TASK_STEPS.slice(0, count);
@@ -79,7 +79,7 @@ export const FocusedTask = ({ count = 5, start = 1, labels: given, title = 'Plan
                     <div data-probe="steps" style={down ? { flex: `0 0 ${STEPS_RAIL}px`, inlineSize: STEPS_RAIL } : undefined}>{tracker}</div>
                     <div style={{ flex: '1 1 auto', minInlineSize: 0 }}>
                         <StepStage step={at} axis={placement} maxSteps={labels.length} labels={labels}>
-                            {children ?? <Skeleton preset="text" lines={4} />}
+                            {(typeof children === 'function' ? children(at) : children) ?? <Skeleton preset="text" lines={4} />}
                         </StepStage>
                     </div>
                 </div>

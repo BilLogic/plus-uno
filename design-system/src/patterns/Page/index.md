@@ -82,9 +82,9 @@ Don't: A paragraph under the title pushes the first Section down.
 
 **Checked:** Review
 
-The rule and its reasons: the Navigation pattern. Page tabs name views of one subject; the Section's views become one labeled Select.
+The rule and its reasons: the Navigation pattern. Page tabs name views of one subject; the Section's views become one labeled PopupSelect.
 
-Do: Under page tabs the Section's views are one labeled Select at the start of its bar.
+Do: Under page tabs the Section's views are one labeled PopupSelect at the start of its bar.
 Don't: Pill views under page tabs: two tab systems on one page.
 
 ### Shrink the scrolled header to one sticky row. {#shrink-the-scrolled-header-to-one-sticky-row}

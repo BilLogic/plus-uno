@@ -78,7 +78,7 @@ Don't: Actions in the title row and again in the view bar: one action, two homes
 
 **Checked:** Review
 
-Views are a fixed set the product defines, and one pill stays even with one view. The strip stays on one line; extra pills fold into More. Under page tabs, the views become one labeled Select, so the page keeps one tab system.
+Views are a fixed set the product defines, and one pill stays even with one view. The strip stays on one line; extra pills fold into More. Under page tabs, the views become one labeled PopupSelect, so the page keeps one tab system.
 
 ### Order the end of the bar: format switch, Search, filters, More, Primary. {#order-the-end-of-the-bar-format-switch-search-filters-more-primary}
 
@@ -142,7 +142,7 @@ The table's empty state replaces the whole table, by the Empty pattern; elevatio
 
 - Page: use when the heading is the page's own.
 - Panel: use when a queue page docks the Panel beside the list, or for a quick look from a table.
-- Popup: use when choosing the menu the view Select or the Filter icon opens.
+- Popup: use when choosing the menu the labeled view trigger (`PopupSelect`) or the Filter icon opens.
 - Table: use when the body is rows and columns.
 - Filtering: use when picking a filter tier for the view bar.
 - Patterns: use when the question is the search field's behavior (Search) or an empty body (Empty).
@@ -170,9 +170,9 @@ A starting set, picked by what the Section holds. Every control state lives on i
 - **Title and actions.** Section actions in the title row. One Primary and two others at most.
 - **View bar, one view.** One pill names the rows and stays, so nothing moves when a second view arrives.
 - **View bar, several views.** Two to five views of the same rows, a fixed set the product defines. Extra pills fold into More.
-- **Format switch.** When the rows show as a table or a calendar, equal-width segments sit first at the end.
+- **Format switch.** When the rows show as a table or cards, equal-width segments sit first at the end.
 - **View bar alone.** The page title already names the collection, so the title row is hidden from sight and stays in the page for screen readers.
-- **Under page tabs.** One tab system per page: the views become one labeled Select at the start of the bar. It picks a view, not a filter.
+- **Under page tabs.** One tab system per page: the views become one labeled PopupSelect at the start of the bar. It picks a view, not a filter.
 - **Subsection.** Any type nests once. The title drops to an h3; the view bar keeps its size.
 
 ## Anatomy

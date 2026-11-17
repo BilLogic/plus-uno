@@ -59,6 +59,7 @@ export const TypePanel = {
         const tracks = footerTracks(footer);
         const [discard, save] = [...footer.querySelectorAll('button')];
         await expect(rect(footer).height, 'the footer is 48 high').toBeCloseTo(tokenLength(footer, BAR_TOKEN), 0);
+        await expect(within(footer).queryByRole('button', { name: 'Cancel' }), 'no Cancel in footers').toBeNull();
         await expect(rect(discard).left, 'Discard starts on track 1').toBeCloseTo(tracks.span(1, 2).left, 0);
         await expect(rect(discard).right, 'Discard ends on track 2').toBeCloseTo(tracks.span(1, 2).right, 0);
         await expect(rect(save).left, 'Save starts on track 3').toBeCloseTo(tracks.span(3, 4).left, 0);
@@ -95,6 +96,8 @@ export const TypeSteps = {
         const canvas = within(canvasElement);
         await expect(canvas.getByRole('navigation', { name: 'Steps' }), 'four steps run across the top').toHaveClass('plus-progress-tracker--horizontal');
         await expect(canvas.getByRole('button', { name: 'Back' }), 'Back on the first step is disabled').toHaveAttribute('aria-disabled', 'true');
+        await expect(canvas.getByRole('button', { name: 'Next' }), 'Next in the bar').toBeInTheDocument();
+        await expect(canvas.queryByRole('button', { name: 'Cancel' }), 'no Cancel in steps bar').toBeNull();
         await expect(canvas.queryByRole('navigation', { name: 'Main' }), 'no Sidebar').toBeNull();
     },
 };
@@ -250,7 +253,7 @@ export const KeyServerSaysNo = {
     },
 };
 
-/** Sending: the button swaps its label for a spinner in place at the same width; Cancel stays live. */
+/** Sending: the button swaps its label for a spinner in place at the same width; Discard stays live. */
 export const KeySending = {
     name: 'Key state: Sending',
     render: () => <ScreenStage width={STAGE}><FormInModal initial={FILLED} sendingForever /></ScreenStage>,

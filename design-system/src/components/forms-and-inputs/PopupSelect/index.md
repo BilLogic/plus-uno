@@ -6,9 +6,9 @@ Popup select: one list in a Popup, applied the moment a row is picked. - **One l
 
 **Import:** `import { PopupSelect } from '@/components';`
 
-**Used in:** Popup (`ds guide popup`)
+**Used in:** Page (`ds guide page`); Panel (`ds guide panel`); Section (`ds guide section`); Popup (`ds guide popup`)
 
-**Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.
+**Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.; Navigation (`ds guide navigation`)
 
 **Source:** `design-system/src/components/forms-and-inputs/PopupSelect/PopupSelect.jsx`
 
@@ -113,7 +113,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Do | Don't |
 | --- | --- |
-| Name what is picked: "Status", "Subject". | A verb phrase such as "Filter by status". |
+| Name what is picked: "Status", "Subject", "View". | A verb phrase such as "Filter by status". |
 | Use short option labels in sentence case: "Upcoming". | Labels long enough to wrap or truncate. |
 
 ## Props

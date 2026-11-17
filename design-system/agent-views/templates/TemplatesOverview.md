@@ -82,7 +82,7 @@ One chooser for the four layers that take over from the page or sit above it. A 
 | has its own URL | Yes | No | No | No |
 | closes on Escape and returns focus | No | Yes | Yes | Yes |
 
-A Panel that needs full attention becomes a Modal. Anything wider than 4-col, or that outlives a click, leaves the Popup for a Panel. Leaving a focused task goes through Close or Cancel, and unsaved work asks first, in a Modal.
+A Panel that needs full attention becomes a Modal. Anything wider than 4-col, or that outlives a click, leaves the Popup for a Panel. Leaving a focused task goes through Close, and unsaved work asks first, in a Modal.
 
 ## Opening a record
 

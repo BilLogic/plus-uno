@@ -121,7 +121,6 @@ Row states are layered over each cell's fill, never swapped for it.
 | `--ds-border-bold` | color | The rule under the head row. |
 | `--ds-text`, `--body-default` | 14/20 | Body cells. |
 | `--ds-text-subtle`, `--heading-xxs` | color, type | Head cells and the message row. |
-| `--table-radius` | 12 | The corner of the table and of its scroll region. |
 | `--table-pad-x-cell`, `--table-pad-y-cell`, `--stack-md` | length | Cell padding, the gap inside a cell, and the side pad (8) of the message row. |
 | `--ds-background-neutral-subtle-hovered`, `-pressed` | color | A hovered and a pressed row. |
 | `--ds-background-selected`, `-hovered`, `-pressed` | color | A selected row. |
@@ -157,7 +156,7 @@ Row states are layered over each cell's fill, never swapped for it.
 
 ## Tokens touched
 
-`--body-default` · `--border-width-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-border` · `--ds-border-bold` · `--ds-border-focused` · `--ds-shadow-overflow` · `--ds-text` · `--ds-text-subtle` · `--ds-utility-elevation-surface-current` · `--focus-ring-width` · `--heading-xxs` · `--layer-card` · `--pattern-table-overflow-reach` · `--pattern-table-z-corner` · `--pattern-table-z-sticky` · `--plus-pattern-table-row-state` · `--row-height-md` · `--section-stack-md` · `--space-0625` · `--stack-md` · `--stack-sm` · `--table-footer-height` · `--table-overflow-reach` · `--table-pad-x-cell` · `--table-pad-y-cell` · `--table-radius`
+`--body-default` · `--border-width-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-border` · `--ds-border-bold` · `--ds-border-focused` · `--ds-shadow-overflow` · `--ds-text` · `--ds-text-subtle` · `--ds-utility-elevation-surface-current` · `--focus-ring-width` · `--heading-xxs` · `--layer-card` · `--pattern-table-overflow-reach` · `--pattern-table-z-corner` · `--pattern-table-z-sticky` · `--plus-pattern-table-row-state` · `--row-height-md` · `--section-stack-md` · `--space-0625` · `--stack-md` · `--stack-sm` · `--table-footer-height` · `--table-overflow-reach` · `--table-pad-x-cell` · `--table-pad-y-cell`
 
 From `design-system/src/patterns/PatternTable/PatternTable.scss`. Override these through the token layer, never with a literal.
 

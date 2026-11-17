@@ -77,6 +77,8 @@ const RightSideInOrderCase = () => (
                 format
                 filters={<FilterButton text="Filters" iconBefore="filter" hasChevronDown={false} appearance="subtle" onClick={() => {}} />}
                 primary="New session"
+                primaryIcon="plus"
+                searchLabel="Search sessions"
             />
         )}
     >

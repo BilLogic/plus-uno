@@ -33,9 +33,7 @@ export const PAGE_WIDTH = 1060; // docs-literal
 
 export const SCREEN = { width: 1024, height: 580 }; // docs-literal
 
-const PAGE_BREADCRUMBS = [{ text: 'Home', href: '#' }, { text: 'Sessions', href: '#' }, { text: 'Log a session' }];
-
-const SUBJECTS = [
+const SITES = [
     { value: 'lincoln', label: 'Lincoln Middle' },
     { value: 'roosevelt', label: 'Roosevelt K-8' },
     { value: 'north', label: 'North High' },
@@ -58,12 +56,12 @@ export const FormFields = ({ values, onChange, errors = {}, onBlurField, subject
         <Select
             label="Site"
             isRequired
-            options={SUBJECTS}
-            value={values.subject}
-            onChange={(v) => onChange({ ...values, subject: v })}
+            options={SITES}
+            value={values.site}
+            onChange={(v) => onChange({ ...values, site: v })}
             isDisabled={subjectWaits}
-            isInvalid={Boolean(errors.subject)}
-            errorMessage={errors.subject}
+            isInvalid={Boolean(errors.site)}
+            errorMessage={errors.site}
             caption={subjectWaits ? 'Choose a student first.' : undefined}
         />
         <TextField
@@ -75,13 +73,13 @@ export const FormFields = ({ values, onChange, errors = {}, onBlurField, subject
     </Fieldset>
 );
 
-export const EMPTY = { student: '', subject: '', notes: '' };
-export const FILLED = { student: 'Ana Ruiz', subject: 'lincoln', notes: '' };
+export const EMPTY = { student: '', site: '', notes: '' };
+export const FILLED = { student: 'Ana Ruiz', site: 'lincoln', notes: '' };
 
 /** Every required field the form is missing, as `{ field: message }`. */
 export const missing = (values) => ({
     ...(values.student.trim() ? {} : { student: 'Enter the student’s name.' }),
-    ...(values.subject ? {} : { subject: 'Choose a site.' }),
+    ...(values.site ? {} : { site: 'Choose a site.' }),
 });
 
 /** A docs picture's after-state: the missing fields, all of them or only those named. */
@@ -173,7 +171,7 @@ export const FormInPage = ({ initial, server, subjectWaits, sendingForever, mark
     const f = useFormState({ initial, server, sendingForever, marked, sending });
     return (
         <BrowserWindow address="app.plus.org/sessions/new" height={PAGE_HEIGHT}>
-            <InAppFrame height="100%" activeTabId="sessions" breadcrumbs={PAGE_BREADCRUMBS} panelStorageKey={null}>
+            <InAppFrame height="100%" activeTabId="sessions" panelStorageKey={null}>
                 <PatternSection level="page" title="Log a session">
                     <PresenceSlot show={Boolean(f.serverError)}>
                         <FormMessage>{SERVER_MESSAGE}</FormMessage>
@@ -259,9 +257,53 @@ export const FormInModal = ({ initial, server, sendingForever, marked, sending, 
 /** A form in steps: Frame · focused, the form's groups one per step in the body. */
 export const FormInSteps = ({ start = 0 }) => {
     const f = useFormState();
+    const [schedule, setSchedule] = useState({ date: 'Thu, Oct 24', time: '4:00 PM' });
     return (
         <FocusedType address="app.plus.org/sessions/new" labels={['Student', 'Schedule', 'Notes', 'Review']} start={start} title="Log a session">
-            <FormFields values={f.values} onChange={f.setValues} errors={f.errors} onBlurField={f.onBlurField} setRef={f.setRef} />
+            {(stepIndex) => {
+                if (stepIndex === 0) {
+                    return <FormFields values={f.values} onChange={f.setValues} errors={f.errors} onBlurField={f.onBlurField} setRef={f.setRef} />;
+                }
+                if (stepIndex === 1) {
+                    return (
+                        <Fieldset legend="Schedule">
+                            <TextField
+                                label="Session date"
+                                isRequired
+                                value={schedule.date}
+                                onChange={(e) => setSchedule((s) => ({ ...s, date: e.target.value }))}
+                            />
+                            <TextField
+                                label="Start time"
+                                isRequired
+                                value={schedule.time}
+                                onChange={(e) => setSchedule((s) => ({ ...s, time: e.target.value }))}
+                            />
+                        </Fieldset>
+                    );
+                }
+                if (stepIndex === 2) {
+                    return (
+                        <Fieldset legend="Notes">
+                            <TextField
+                                label="Session notes"
+                                labelMarker="optional"
+                                value={f.values.notes}
+                                onChange={(e) => f.setValues({ ...f.values, notes: e.target.value })}
+                                caption="Shared with the site supervisor after the session."
+                            />
+                        </Fieldset>
+                    );
+                }
+                const siteLabel = SITES.find((s) => s.value === f.values.site)?.label ?? (f.values.site || 'Lincoln Middle');
+                return (
+                    <Fieldset legend="Review">
+                        <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+                            {`${f.values.student || 'Ana Ruiz'} · ${siteLabel} · ${schedule.date} at ${schedule.time}`}
+                        </p>
+                    </Fieldset>
+                );
+            }}
         </FocusedType>
     );
 };

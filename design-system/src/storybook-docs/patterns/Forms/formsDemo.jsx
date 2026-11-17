@@ -416,8 +416,6 @@ export const QuestionStepInWindow = ({ address = 'app.plus.org/signup', height =
 /** Window height for the settings page example: docs geometry, in px. */
 export const SETTINGS_PAGE_HEIGHT = 560; // docs-literal
 
-const SETTINGS_BREADCRUMBS = [{ text: 'Home', href: '#' }, { text: 'Settings' }];
-
 const REMINDER_LEAD_OPTIONS = [
     { value: '15m', label: '15 minutes before' },
     { value: '1h', label: '1 hour before' },
@@ -455,7 +453,7 @@ export const SettingsPage = () => {
 
     return (
         <div style={{ position: 'relative', blockSize: '100%' }}>
-            <InAppFrame height="100%" activeTabId="home" breadcrumbs={SETTINGS_BREADCRUMBS} panelStorageKey={null}>
+            <InAppFrame height="100%" activeTabId="home" panelStorageKey={null}>
                 <PatternSection level="page" title="Settings" layout="subsections">
                     <PatternSection title="Notifications">
                         <div>

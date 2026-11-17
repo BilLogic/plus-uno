@@ -107,9 +107,9 @@ A starting set, picked by what the Section holds. Every control state lives on i
 <TypeCard of={PatternSectionStories.HeaderTypeTitleAndActions} to="#title-and-actions" title="Title and actions">Section actions in the title row. One Primary and two others at most.</TypeCard>
 <TypeCard of={PatternSectionStories.HeaderTypeViewBarOneView} to="#view-bar-one-view" title="View bar, one view">One pill names the rows and stays, so nothing moves when a second view arrives.</TypeCard>
 <TypeCard of={PatternSectionStories.HeaderTypeViewBarSeveralViews} to="#view-bar-several-views" title="View bar, several views">Two to five views of the same rows, a fixed set the product defines. Extra pills fold into More.</TypeCard>
-<TypeCard of={PatternSectionStories.HeaderTypeFormatSwitch} to="#format-switch" title="Format switch">When the rows show as a table or a calendar, equal-width segments sit first at the end.</TypeCard>
+<TypeCard of={PatternSectionStories.HeaderTypeFormatSwitch} to="#format-switch" title="Format switch">When the rows show as a table or cards, equal-width segments sit first at the end.</TypeCard>
 <TypeCard of={PatternSectionStories.HeaderTypeViewBarAlone} to="#view-bar-alone" title="View bar alone">The page title already names the collection, so the title row is hidden from sight and stays in the page for screen readers.</TypeCard>
-<TypeCard of={PatternSectionStories.HeaderTypeUnderPageTabs} to="#under-page-tabs" title="Under page tabs">One tab system per page: the views become one labeled Select at the start of the bar. It picks a view, not a filter.</TypeCard>
+<TypeCard of={PatternSectionStories.HeaderTypeUnderPageTabs} to="#under-page-tabs" title="Under page tabs">One tab system per page: the views become one labeled PopupSelect at the start of the bar. It picks a view, not a filter.</TypeCard>
 <TypeCard of={PatternSectionStories.HeaderTypeSubsection} to="#subsection" title="Subsection">Any type nests once. The title drops to an h3; the view bar keeps its size.</TypeCard>
 </TypeGrid>
 
@@ -121,11 +121,11 @@ A starting set, picked by what the Section holds. Every control state lives on i
 
 <ComponentExample of={PatternSectionStories.HeaderTypeViewBarSeveralViews} title="View bar, several views" description="Two to five views of the same rows, a fixed set the product defines. Extra pills fold into More." />
 
-<ComponentExample of={PatternSectionStories.HeaderTypeFormatSwitch} title="Format switch" description="When the rows show as a table or a calendar, equal-width segments sit first at the end." />
+<ComponentExample of={PatternSectionStories.HeaderTypeFormatSwitch} title="Format switch" description="When the rows show as a table or cards, equal-width segments sit first at the end." />
 
 <ComponentExample of={PatternSectionStories.HeaderTypeViewBarAlone} title="View bar alone" description="The page title already names the collection, so the title row is hidden from sight and stays in the page for screen readers." />
 
-<ComponentExample of={PatternSectionStories.HeaderTypeUnderPageTabs} title="Under page tabs" description="One tab system per page: the views become one labeled Select at the start of the bar. It picks a view, not a filter." />
+<ComponentExample of={PatternSectionStories.HeaderTypeUnderPageTabs} title="Under page tabs" description="One tab system per page: the views become one labeled PopupSelect at the start of the bar. It picks a view, not a filter." />
 
 <ComponentExample of={PatternSectionStories.HeaderTypeSubsection} title="Subsection" description="Any type nests once. The title drops to an h3; the view bar keeps its size." />
 
@@ -306,7 +306,7 @@ Each action has one home. With a view bar, every action sits at its end.
 
 <RuleTag kind="review" />
 
-Views are a fixed set the product defines, and one pill stays even with one view. The strip stays on one line; extra pills fold into More. Under page tabs, the views become one labeled Select, so the page keeps one tab system.
+Views are a fixed set the product defines, and one pill stays even with one view. The strip stays on one line; extra pills fold into More. Under page tabs, the views become one labeled PopupSelect, so the page keeps one tab system.
 
 ### Order the end of the bar: format switch, Search, filters, More, Primary.
 
@@ -404,7 +404,7 @@ The table's empty state replaces the whole table, by the Empty pattern; elevatio
 
 - <DocsLink id="templates-page">Page</DocsLink>: use when the heading is the page's own.
 - <DocsLink id="templates-panel">Panel</DocsLink>: use when a queue page docks the Panel beside the list, or for a quick look from a table.
-- <DocsLink id="templates-popup">Popup</DocsLink>: use when choosing the menu the view Select or the Filter icon opens.
+- <DocsLink id="templates-popup">Popup</DocsLink>: use when choosing the menu the labeled view trigger (`PopupSelect`) or the Filter icon opens.
 - <DocsLink id="templates-table">Table</DocsLink>: use when the body is rows and columns.
 - <DocsLink id="patterns-filtering">Filtering</DocsLink>: use when picking a filter tier for the view bar.
 - <DocsLink id="patterns-overview">Patterns</DocsLink>: use when the question is the search field's behavior (Search) or an empty body (Empty).

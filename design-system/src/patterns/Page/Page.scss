@@ -21,6 +21,12 @@
     margin-block-start: var(--page-stack-md);
 }
 
+.plus-pattern-page-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--page-stack-md);
+}
+
 // The title's optical negative margin must not reduce the new banner gap.
 .plus-pattern-page > .plus-pattern-page-title:has(+ .plus-pattern-page-banner) {
     margin-block: 0;

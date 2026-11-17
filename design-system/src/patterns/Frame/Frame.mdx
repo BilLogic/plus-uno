@@ -122,7 +122,7 @@ A task with five steps. No Sidebar and no breadcrumb: nothing invites the person
 1. **Title row.** Close at the start, then the task's name as the page's one h1.
 2. **Steps.** A Section side at the start, 256 wide (320 for long labels), or a bar across the top; <i>Focused steps</i> says which.
 3. **Body.** The task's Sections at reading width, 864, centered.
-4. **Bar**, fixed along the bottom and 48 high. Cancel (Subtle) at the start; Back and Next at the end, full bleed. Back on the first step is disabled and needs no reason.
+4. **Bar**, fixed along the bottom and 48 high. Back and Next split the bar, full bleed; Close in the title row leaves the task. Back on the first step is disabled and needs no reason.
 
 </div>
 
@@ -130,7 +130,7 @@ A task with five steps. No Sidebar and no breadcrumb: nothing invites the person
 
 ## Focused steps
 
-Five or more steps go down the left. Four or fewer run across the top. Placement is chosen when the task opens and does not change mid-task, however the count moves. The bar is the same in both, and the focused Frame moves like a Drill: it slides in over the dimmed opener, and Close or Cancel play it backwards. When a long task gets its own Frame is the <DocsLink id="patterns-navigation">Navigation</DocsLink> pattern.
+Five or more steps go down the left. Four or fewer run across the top. Placement is chosen when the task opens and does not change mid-task, however the count moves. The bar is the same in both, and the focused Frame moves like a Drill: it slides in over the dimmed opener, and Close plays it backwards. When a long task gets its own Frame is the <DocsLink id="patterns-navigation">Navigation</DocsLink> pattern.
 
 <ComponentExample of={FrameStories.FocusedStepsDown} title="Five steps, down the left" description="The rail is 256 wide; use 320 when a label is long. The current step is marked, and visited steps go back." />
 
@@ -239,7 +239,7 @@ Lengths are in pixels. Where the layout mode changes a value, the columns read M
 <tr><td><code>panel</code> · <code>panelLabel</code> · <code>panelOpen</code></td><td>The AI panel region at the right, named for its content, filled with the Panel parts.</td></tr>
 <tr><td><code>onBack</code> · <code>onClose</code></td><td>A Back and a Close icon button in the header row. A focused page leads its title row with its own Close instead.</td></tr>
 <tr><td><code>surfaceDirect</code></td><td>Children go straight into the Page with no content box, for a bare column or a full-bleed view.</td></tr>
-<tr><td><code>bar</code> <PlannedTag /></td><td>Planned. The focused bottom bar, 48 high, with Cancel, Back and Next. Today the page places the bar, so the Anatomy bar is the target shape.</td></tr>
+<tr><td><code>bar</code> <PlannedTag /></td><td>Planned. The focused bottom bar, 48 high, with Back and Next, full bleed. Today the page places the bar, so the Anatomy bar is the target shape.</td></tr>
 <tr><td><code>banner</code> <PlannedTag /></td><td>Planned. System news across the whole width above the Sidebar and the Page.</td></tr>
 </tbody>
 </DocsTable>
@@ -298,17 +298,17 @@ A focused Frame has no Sidebar and no breadcrumb. Close leads the title row, so 
     dontCaption="The Sidebar left docked beside a focused task, one click from leaving it."
 />
 
-### Put Cancel at the start of the bar and Back and Next at the end.
+### Put Back and Next in the bar, with no Cancel.
 
 <RuleTag kind="review" />
 
-The bottom bar is fixed along the bottom, one row high (`--space-300`). Cancel (Subtle) is at the start; Back and Next sit together at the end, Next last and Primary. Back on the first step is disabled and needs no reason.
+The bottom bar is fixed along the bottom, one row high (`--space-300`). Close in the title row leaves the task, so the bar holds only Back and the primary Next, full bleed. Back on the first step is disabled and needs no reason.
 
 <DoDontPair
     doExample={<BarInOrder />}
-    doCaption="Cancel alone at the start, then Back and the primary Next together at the end."
+    doCaption="Back and the primary Next split the bar; Close in the title row leaves the task."
     dontExample={<BarScrambled />}
-    dontCaption="Cancel between Back and Next: one run of three buttons, with the way out beside the way on."
+    dontCaption="Cancel repeated in the bar beside Back and Next: two ways out of one task."
 />
 
 ### Keep the AI panel docked as its own region.
@@ -365,7 +365,7 @@ Elevation and fills follow <DocsLink id="foundations-visual-elevation">Elevation
 <tr><td>Name the focused task for what it does: "Plan a tutoring term".</td><td>A generic title such as "Wizard".</td></tr>
 <tr><td>Name the panel for its content with <code>panelLabel</code>: "AI chat".</td><td>A generic name such as "Panel".</td></tr>
 <tr><td>Name steps with one noun each: "Student", "Schedule", "Review".</td><td>A sentence for a step.</td></tr>
-<tr><td>Keep Cancel, Back and Next named for what they do.</td><td>Icon buttons with no name.</td></tr>
+<tr><td>Keep Back and Next named for what they do.</td><td>Icon buttons with no name.</td></tr>
 </tbody>
 </DocsTable>
 

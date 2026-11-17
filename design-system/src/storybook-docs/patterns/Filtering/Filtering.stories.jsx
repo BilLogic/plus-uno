@@ -7,7 +7,7 @@ import { FRAME_LAYOUT } from '@/patterns/Frame/frameLayout';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
-import { FilteredStudents, PageTabs, STAGE, ViewPicker } from './filteringDemo.jsx';
+import { FilteredStudents, STAGE, ViewPicker } from './filteringDemo.jsx';
 
 /**
  * Filtering: the pattern page's examples, run in the Storybook tests. Each
@@ -268,16 +268,16 @@ export const NoMatches = {
 export const UnderPageTabs = {
     name: 'Under page tabs',
     render: () => staged(
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
-            <PageTabs />
-            <FilteredStudents
-                tier="2b"
-                categories={['grade', 'school']}
-                initial={{ grade: ['Grade 7'] }}
-                openMenu="view"
-                start={(mount) => <ViewPicker open mount={mount} />}
-            />
-        </div>,
+        <FilteredStudents
+            tier="2b"
+            categories={['grade', 'school']}
+            initial={{ grade: ['Grade 7'] }}
+            openMenu="view"
+            pageTabs
+            start={(mount, { activeView, onViewChange }) => (
+                <ViewPicker open mount={mount} value={activeView} onChange={onViewChange} />
+            )}
+        />,
     ),
     play: async ({ canvasElement }) => {
         const p = parts(canvasElement);
@@ -285,6 +285,15 @@ export const UnderPageTabs = {
         await expect(rect(picker).left, 'the view picker sits at the bar\'s start').toBeCloseTo(rect(p.bar).left, 0);
         await expect(rect(p.filterIcon()).left, 'the filters stay at the end').toBeGreaterThan(rect(picker).right);
         await expectHungFrom(canvasElement, picker, 'start');
+
+        await userEvent.click(p.canvas.getByRole('tab', { name: 'Overview' }));
+        await expect(p.canvas.getByRole('heading', { name: 'Lincoln Middle' })).toBeInTheDocument();
+
+        await userEvent.click(p.canvas.getByRole('tab', { name: 'Sessions' }));
+        await expect(p.canvas.getByRole('table', { name: 'Sessions' })).toBeInTheDocument();
+
+        await userEvent.click(p.canvas.getByRole('tab', { name: 'Students' }));
+        await expect(p.canvas.getByRole('heading', { name: 'Students' })).toBeInTheDocument();
         await fitsCanvas(canvasElement);
     },
 };

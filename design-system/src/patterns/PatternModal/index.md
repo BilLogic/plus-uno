@@ -27,9 +27,9 @@ Use a Modal when the next step has to happen before anything else can: a confirm
 | Type | Use when | Footer |
 | --- | --- | --- |
 | Passive | Something to read, with nothing to decide | None; Close only |
-| Active | A choice, a confirm or a short form | Cancel and the action |
+| Active | A choice, a confirm or a short form | Secondary (such as Discard or Keep) and the action; no Cancel |
 | Acknowledge | One thing to read and accept | One button |
-| Steps | A short ordered sequence | Cancel · Back · Next |
+| Steps | A short ordered sequence | Back and Next |
 
 ## Motion
 
@@ -90,10 +90,10 @@ Don't: The button inside the scrolling body: it scrolls out of reach.
 
 Two to five views of one thing opened in any order; one footer saves them all. Views in order are Steps, with Back and Next in the footer.
 
-Do: Views in order are Steps: Cancel at the start, Back and Next on the right half.
+Do: Views in order are Steps: Back and Next split across the footer.
 Don't: Numbered tabs as steps: any order, one Save, nothing to go back to.
 
-Footer buttons, Cancel and Close, and which destructive tier, including type the name: Common actions. A blocked submit: Forms. The sending button: Loading.
+Footer buttons, real actions and Close, and which destructive tier, including type the name: Common actions. A blocked submit: Forms. The sending button: Loading.
 
 ## Accessibility
 
@@ -117,9 +117,9 @@ Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `Patt
 Picked by what the person has to do. The component page holds every prop and state; these are the filled layouts.
 
 - **Passive.** Information only, with Close. No footer.
-- **Active.** A choice, a confirm or a short form. Cancel and the action.
+- **Active.** A choice, a confirm or a short form. Discard (or a real alternative) and the action; no Cancel.
 - **Acknowledge.** One thing to read and one button that fills the footer.
-- **Steps.** A short sequence at 10-col: Cancel (Subtle) left, Back and Next on the right half.
+- **Steps.** A short sequence at 10-col: Back and Next, split 50/50.
 
 ## Anatomy
 
@@ -128,7 +128,7 @@ An Active Modal at 8-col with a short form. Every part once; the pad is 16 on ev
 1. **Blanket.** Dims the page and holds the Modal centered.
 2. **Header.** The title at 20/24, whatever the level around it, and the Close icon button. With tabs, the tab group sits 8 under the title.
 3. **Body.** Text, a list, fields or a table. It scrolls past the cap and never draws under 80 tall.
-4. **Footer** (optional). Full-bleed buttons; Cancel (Default) left, Primary right.
+4. **Footer** (optional). Full-bleed buttons; secondary (Default) left, Primary right; Close in the header dismisses, so no Cancel.
 
 ## Slots
 

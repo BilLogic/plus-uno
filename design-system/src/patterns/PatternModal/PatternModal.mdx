@@ -62,9 +62,9 @@ Picked by what the person has to do. The component page holds every prop and sta
 
 <TypeGrid>
 <TypeCard of={PatternModalStories.TypePassive} title="Passive">Information only, with Close. No footer.</TypeCard>
-<TypeCard of={PatternModalStories.TypeActive} title="Active">A choice, a confirm or a short form. Cancel and the action.</TypeCard>
+<TypeCard of={PatternModalStories.TypeActive} title="Active">A choice, a confirm or a short form. Discard (or a real alternative) and the action; no Cancel.</TypeCard>
 <TypeCard of={PatternModalStories.TypeAcknowledge} title="Acknowledge">One thing to read and one button that fills the footer.</TypeCard>
-<TypeCard of={PatternModalStories.TypeSteps} title="Steps">A short sequence at 10-col: Cancel (Subtle) left, Back and Next on the right half.</TypeCard>
+<TypeCard of={PatternModalStories.TypeSteps} title="Steps">A short sequence at 10-col: Back and Next, split 50/50.</TypeCard>
 </TypeGrid>
 
 </div>
@@ -80,7 +80,7 @@ An Active Modal at 8-col with a short form. Every part once; the pad is 16 on ev
 1. **Blanket.** Dims the page and holds the Modal centered.
 2. **Header.** The title at 20/24, whatever the level around it, and the Close icon button. With tabs, the tab group sits 8 under the title.
 3. **Body.** Text, a list, fields or a table. It scrolls past the cap and never draws under 80 tall.
-4. **Footer** (optional). Full-bleed buttons; Cancel (Default) left, Primary right.
+4. **Footer** (optional). Full-bleed buttons; secondary (Default) left, Primary right; Close in the header dismisses, so no Cancel.
 
 <DocsCanvasShell description="A modal with its title, description and a section.">
     <DsCanvasQuiet of={HeadingOutlineStories.ModalTitle} />
@@ -126,7 +126,7 @@ Drag the screen's width. The Modal grows with it and never shrinks.
 
 Which tier, and its words: <DocsLink id="patterns-common-actions">Common actions</DocsLink>.
 
-<ComponentExample of={PatternModalStories.TierActive} title="Active" description="A change that can be undone: Cancel and the action in Primary." />
+<ComponentExample of={PatternModalStories.TierActive} title="Active" description="A change that can be undone: Discard and the action in Primary." />
 
 <ComponentExample of={PatternModalStories.TierDanger} title="Active with Danger" description="A delete: the action takes the Danger appearance." />
 
@@ -170,7 +170,7 @@ A blocked submit is on <DocsLink id="templates-form">Form</DocsLink>, and a Moda
 
 A confirm Modal may open over a Panel, a Popup or a focused task, and brings its own Blanket. A Modal never opens on another Modal.
 
-<ComponentExample of={PatternModalStories.StackConfirmOverPanel} title="A confirm over a Panel" description="The Panel stays open under the confirm's own Blanket. Cancel closes the confirm and focus returns to the Panel." />
+<ComponentExample of={PatternModalStories.StackConfirmOverPanel} title="A confirm over a Panel" description="The Panel stays open under the confirm's own Blanket. Archive instead or Close returns focus to the Panel." />
 
 <ComponentExample of={PatternModalStories.StackModalOnModalRefused} title="Confirm inside the Modal" description="A Modal that needs a confirm holds it inside itself: a warning SectionMessage in the body and the action in Danger. A second Modal never opens on it." />
 
@@ -376,9 +376,9 @@ Use a Modal when the next step has to happen before anything else can: a confirm
 </thead>
 <tbody>
 <tr><td>Passive</td><td>Something to read, with nothing to decide</td><td>None; Close only</td></tr>
-<tr><td>Active</td><td>A choice, a confirm or a short form</td><td>Cancel and the action</td></tr>
+<tr><td>Active</td><td>A choice, a confirm or a short form</td><td>Secondary (such as Discard or Keep) and the action; no Cancel</td></tr>
 <tr><td>Acknowledge</td><td>One thing to read and accept</td><td>One button</td></tr>
-<tr><td>Steps</td><td>A short ordered sequence</td><td>Cancel · Back · Next</td></tr>
+<tr><td>Steps</td><td>A short ordered sequence</td><td>Back and Next</td></tr>
 </tbody>
 </DocsTable>
 
@@ -452,12 +452,12 @@ Two to five views of one thing opened in any order; one footer saves them all. V
 
 <DoDontPair
     doExample={<StepsForSequence />}
-    doCaption="Views in order are Steps: Cancel at the start, Back and Next on the right half."
+    doCaption="Views in order are Steps: Back and Next split across the footer."
     dontExample={<TabsForSteps />}
     dontCaption="Numbered tabs as steps: any order, one Save, nothing to go back to."
 />
 
-Footer buttons, Cancel and Close, and which destructive tier, including type the name: <DocsLink id="patterns-common-actions">Common actions</DocsLink>. A blocked submit: <DocsLink id="patterns-forms">Forms</DocsLink>. The sending button: <DocsLink id="patterns-states-loading">Loading</DocsLink>.
+Footer buttons, real actions and Close, and which destructive tier, including type the name: <DocsLink id="patterns-common-actions">Common actions</DocsLink>. A blocked submit: <DocsLink id="patterns-forms">Forms</DocsLink>. The sending button: <DocsLink id="patterns-states-loading">Loading</DocsLink>.
 
 </div>
 

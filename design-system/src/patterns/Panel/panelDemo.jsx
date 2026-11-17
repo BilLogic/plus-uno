@@ -14,7 +14,7 @@ import {
     PanelMoreAction,
     PanelSubheader,
     PanelUpAction,
-    Select,
+    PopupSelect,
     StaticTable,
     StatusTag,
     TextArea,
@@ -114,58 +114,69 @@ export const DetailsPanel = ({ editing = false, onEdit, onClose = () => {}, onSa
     </PanelContainer>
 );
 
+const INBOX_VIEWS = [
+    { value: 'unread', label: 'Unread' },
+    { value: 'all', label: 'All' },
+    { value: 'mentions', label: 'Mentions' },
+];
+
 const INBOX = [
-    { id: 1, name: 'Ana Ruiz', what: 'moved Thursday’s session', where: 'Sessions', excerpt: 'New time is 4:30 PM, if that works.', time: '2m', unread: true },
-    { id: 2, name: 'Ben Okafor', what: 'mentioned you', where: 'Notes', excerpt: 'Can you check the unit rates plan?', time: '1h', unread: true },
-    { id: 3, name: 'Chloe Tran', what: 'confirmed Friday', where: 'Sessions', excerpt: 'See you at 3:30 PM.', time: 'Yesterday', unread: false },
+    { id: 1, name: 'Ana Ruiz', what: 'moved Thursday’s session', where: 'Sessions', excerpt: 'New time is 4:30 PM, if that works.', time: '2m', unread: true, kind: 'session' },
+    { id: 2, name: 'Ben Okafor', what: 'mentioned you', where: 'Notes', excerpt: 'Can you check the unit rates plan?', time: '1h', unread: true, kind: 'mention' },
+    { id: 3, name: 'Chloe Tran', what: 'confirmed Friday', where: 'Sessions', excerpt: 'See you at 3:30 PM.', time: 'Yesterday', unread: false, kind: 'session' },
 ];
 
 /** Notifications: the Inbox. Items carry an avatar, who did what and where, an excerpt, the time and an unread dot paired with the word. */
-export const InboxPanel = ({ onClose = () => {}, items = INBOX }) => (
-    <PanelContainer>
-        <PanelHeader
-            title="Inbox"
-            actions={(
-                <>
-                    <Button text="Archive all" appearance="subtle" spacing="compact" onClick={() => {}} />
-                    <PanelCloseAction onClick={onClose} />
-                </>
-            )}
-        />
-        <PanelSubheader>
-            <Select
-                aria-label="Show"
-                value="unread"
-                onChange={() => {}}
-                options={[
-                    { value: 'unread', label: 'Unread' },
-                    { value: 'all', label: 'All' },
-                    { value: 'mentions', label: 'Mentions' },
-                ]}
+export const InboxPanel = ({ onClose = () => {}, items = INBOX }) => {
+    const [view, setView] = useState('unread');
+    const visibleItems = view === 'unread'
+        ? items.filter((n) => n.unread)
+        : view === 'mentions'
+            ? items.filter((n) => n.kind === 'mention')
+            : items;
+    return (
+        <PanelContainer>
+            <PanelHeader
+                title="Inbox"
+                actions={(
+                    <>
+                        <Button text="Archive all" appearance="subtle" spacing="compact" onClick={() => {}} />
+                        <PanelCloseAction onClick={onClose} />
+                    </>
+                )}
             />
-        </PanelSubheader>
-        <PanelBody data-probe="body">
-            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-                {items.map((n) => (
-                    <li key={n.id} data-probe="item" style={{ display: 'flex', gap: 'var(--inline-md)', alignItems: 'flex-start' }}>
-                        <Avatar name={n.name} size={32} />
-                        <div style={{ flex: '1 1 auto', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                            <span style={{ font: 'var(--body-default)', color: 'var(--ds-text)' }}>{`${n.name} ${n.what} in ${n.where}`}</span>
-                            <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{n.excerpt}</span>
-                            <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{n.time}</span>
-                        </div>
-                        {n.unread ? (
-                            <>
-                                <span aria-hidden="true" data-probe="unread" style={{ inlineSize: 'var(--inline-md)', blockSize: 'var(--inline-md)', marginBlockStart: 'var(--stack-md)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-brand-bold)' }} />
-                                <VisuallyHidden>unread</VisuallyHidden>
-                            </>
-                        ) : null}
-                    </li>
-                ))}
-            </ul>
-        </PanelBody>
-    </PanelContainer>
-);
+            <PanelSubheader>
+                <PopupSelect
+                    label="Show"
+                    value={view}
+                    onChange={setView}
+                    options={INBOX_VIEWS}
+                    isSearchable={false}
+                />
+            </PanelSubheader>
+            <PanelBody data-probe="body">
+                <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
+                    {visibleItems.map((n) => (
+                        <li key={n.id} data-probe="item" style={{ display: 'flex', gap: 'var(--inline-md)', alignItems: 'flex-start' }}>
+                            <Avatar name={n.name} size={32} />
+                            <div style={{ flex: '1 1 auto', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
+                                <span style={{ font: 'var(--body-default)', color: 'var(--ds-text)' }}>{`${n.name} ${n.what} in ${n.where}`}</span>
+                                <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{n.excerpt}</span>
+                                <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{n.time}</span>
+                            </div>
+                            {n.unread ? (
+                                <>
+                                    <span aria-hidden="true" data-probe="unread" style={{ inlineSize: 'var(--inline-md)', blockSize: 'var(--inline-md)', marginBlockStart: 'var(--stack-md)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-brand-bold)' }} />
+                                    <VisuallyHidden>unread</VisuallyHidden>
+                                </>
+                            ) : null}
+                        </li>
+                    ))}
+                </ul>
+            </PanelBody>
+        </PanelContainer>
+    );
+};
 
 /** The record behind the Panel was removed: the body shows its empty state with a way back. */
 export const GonePanel = ({ onClose = () => {} }) => (

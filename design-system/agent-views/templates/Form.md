@@ -15,7 +15,7 @@ The place sets the footer. The fields are the same everywhere.
 - **In a page.** Settings and anything saved as a group. Buttons left-aligned under the fields, Primary first.
 - **In a Panel.** Editing a record beside the page. A full-bleed footer, only while editing.
 - **In a Modal.** Fewer than five fields. A full-bleed footer, Primary furthest right.
-- **In steps.** Frame · focused with the form in the body. The bar carries Cancel, Back and Next.
+- **In steps.** Frame · focused with the form in the body. The bar carries Back and Next.
 
 ## Anatomy
 
@@ -34,7 +34,7 @@ The Details Panel with the form open. The footer shows only while editing.
 
 1. **Header.** The record's name and its fixed actions.
 2. **Body.** The fields, with `--space-200` of pad from every edge.
-3. **Footer.** Cancel (Default) and Save (Primary), full bleed, half each.
+3. **Footer.** Discard (Default) and Save (Primary), full bleed, half each; Close in the header dismisses, so no Cancel.
 
 ### In a Modal
 
@@ -42,7 +42,7 @@ A short form at 8-col: the Modal's header, the fields in its body, its full-blee
 
 1. **Header.** The title and Close.
 2. **Body.** The fields, scrolling past the cap.
-3. **Footer.** Cancel (Default) and the action (Primary), full bleed.
+3. **Footer.** Discard (Default) and the action (Primary), full bleed; Close in the header dismisses, so no Cancel.
 
 ### In steps
 
@@ -50,7 +50,7 @@ A stepped form on its own page is Frame · focused with the form in the body. Ba
 
 1. **Steps.** The rail at the start, with done, current and later steps; four or fewer run across the top.
 2. **Body.** One group per step, at reading width.
-3. **Bar.** Cancel (Subtle) at the start; Back and Next at the end. On the last step Next takes the outcome's name.
+3. **Bar.** Back and Next, full bleed; Close in the title row leaves the task. On the last step Next takes the outcome's name.
 
 ## Key states
 
@@ -76,22 +76,22 @@ A Form is a composition: the fields in a Fieldset, inside a Page, a Panel, a Mod
 | --- | --- |
 | `message` | A `SectionMessage` at the top for a server failure, scrolled into view and announced; a warning one when a disabled prerequisite blocks the main action. |
 | `groups` | One `Fieldset` per group of fields that describe one thing. |
-| `footer` | The container's: left-aligned on a page; full bleed in a Modal, a Panel or a card; Cancel, Back and Next in a step flow. |
+| `footer` | The container's: left-aligned on a page; full bleed in a Modal, a Panel or a card; Back and Next in a step flow. |
 | Modal and Panel `footer`, full bleed | Planned. A footer that fills its cells edge to edge at `--space-300`, with the inner corners squared. Today the page composes it from two Buttons. |
 | Blocked-submit shake | Planned. The Modal's single shake when a submit is blocked. Today the Modal stays open and marks the field. |
 
 ## Usage
 
-Use a Form wherever a person enters or changes values that are saved together. The place sets the footer: in a page the buttons sit left under the fields; in a Panel, a Modal or a card they go full bleed; in steps the bar carries Cancel, Back and Next. A stepped form on its own page is Frame · focused with the form in the body.
+Use a Form wherever a person enters or changes values that are saved together. The place sets the footer: in a Modal, a Panel and the focused view the corner × dismisses, so their footers carry real actions and no Cancel; the steps footer is Back and Next; page forms and popups have no ×, so they keep a subtle Cancel. A stepped form on its own page is Frame · focused with the form in the body.
 
 Pick the host from the task:
 
 | The form… | Host | Buttons |
 | --- | --- | --- |
 | is saved as a group on its own page: settings, a profile | In a page | Left-aligned under the fields, Primary first, Cancel Subtle |
-| is a short edit of a row, with the page still in view | In a Panel · Details | Cancel and Save full bleed at the bottom |
-| is rare and critical, with fewer than five fields | In a Modal, 8-col | Cancel (Default) and the action, full bleed |
-| is long, or has sections someone works through | In steps on Frame · focused | Cancel, Back and Next in the bar |
+| is a short edit of a row, with the page still in view | In a Panel · Details | Discard (Default) and Save (Primary) full bleed at the bottom, no Cancel |
+| is rare and critical, with fewer than five fields | In a Modal, 8-col | Discard (Default) and the action (Primary), full bleed, no Cancel |
+| is long, or has sections someone works through | In steps on Frame · focused | Back and Next in the bar, no Cancel |
 
 When to validate, what a blocked submit does, required and optional marks, and leaving with edits are the Forms pattern; where the buttons sit is the Common actions pattern. This page shows how a form sits in each container.
 
@@ -115,7 +115,7 @@ When to validate, what a blocked submit does, required and optional marks, and l
 - Group related fields in a `Fieldset`, so a screen reader announces the legend with each field.
 - A Modal form's title is the dialog's one h1. Focus goes to the first field when it opens.
 - A server message is announced when it appears. A field's error is tied to its field, and focus moves to the first field that needs fixing.
-- A sending button keeps its name while its label is replaced by a spinner, and Cancel stays reachable.
+- A sending button keeps its name while its label is replaced by a spinner, and the secondary action stays reachable.
 
 ## Related
 

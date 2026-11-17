@@ -56,7 +56,7 @@ Least room to most. Pick the lowest step that fits. The picture is on Templates.
 | --- | --- |
 | Views as short parallel nouns: "Upcoming", "Past". | "Show upcoming sessions", "History". |
 | Page tabs name views of one subject: "Overview", "Sessions", "Notes". | Counts or status in the tab label. |
-| The view Select is labeled: "Status: Upcoming" . | A bare "Upcoming". |
+| The labeled filter trigger names the view: "Status: Upcoming". | A bare "Upcoming". |
 | Breadcrumb levels by the page's own title. | "Back", "Home" as a level. |
 | Open item: "4:00 PM · Ms. Ortiz". | "Session #1028". |
 
@@ -74,7 +74,7 @@ Least room to most. Pick the lowest step that fits. The picture is on Templates.
 - Filtering: use for narrowing a view by attributes.
 - Indicators: use for counts on Sidebar items.
 - Frame, Page, Section: use for the drawn shells.
-- `Sidebar`, `Breadcrumb`, `Tabs`, `PageHeader`, `Select`: the components.
+- `Sidebar`, `Breadcrumb`, `Tabs`, `PageHeader`, `PopupSelect`: the components.
 
 ## Motion
 
@@ -102,12 +102,12 @@ Don't: A breadcrumb on an area page: there is nothing to climb out of.
 
 ### Keep one tab system per page. {#keep-one-tab-system-per-page}
 
-**Checked:** Review
+**Checked:** Automatic
 
-Page tabs under the title, or pill views in a Section's bar, never both. Under page tabs a Section's views become one Select at the start of its bar. It picks a view, not a filter.
+Either page tabs under the title, or pill views in a Section's bar, never both. Under page tabs a Section's views become one labeled PopupSelect at the start of its bar. It picks a view, not a filter.
 
-Do: Under page tabs the Section's views are one Select at the start of its bar.
-Don't: Page tabs and pill views on one page: two tab systems.
+Do: Under page tabs the Section's views are one labeled PopupSelect at the start of its bar.
+Don't: Page tabs and pill views on the same page: two tab systems.
 
 ### Make views a fixed set the product defines. {#make-views-a-fixed-set-the-product-defines}
 

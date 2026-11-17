@@ -29,7 +29,6 @@
 
 .plus-pattern-table-scroll {
     overflow: auto;
-    border-radius: var(--table-radius);
     // Sticky cells stack inside the table, never over the page around it.
     isolation: isolate;
 

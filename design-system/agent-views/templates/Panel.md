@@ -33,7 +33,7 @@ The picked row stays highlighted on the page while the Panel is open.
 
 Picking an item opens its page behind the Panel and marks it read. The Inbox stays open.
 
-1. **Header.** The title, a filter (Unread, All, Mentions), Archive all and Close.
+1. **Header.** The title, Archive all and Close, with the Show filter (`PopupSelect`: Unread, All, Mentions) in the subheader.
 2. **Items.** Avatar, who did what and where, a one-line excerpt and the time. An unread item ends in a dot, paired with the word "unread" for a screen reader.
 
 The Bell in the Sidebar, with its unread count, opens the Inbox. It sits with the Sidebar and is Planned with the Inbox's placement.
@@ -72,9 +72,9 @@ The Panel components are the parts: header with its fixed actions, body, footer,
 | Slot | Details | Notifications |
 | --- | --- | --- |
 | `title` | The record's name, with its StatusTag under it | "Inbox" |
-| `actions` | Up, Down, More and Close | A filter (Select), Archive all and Close |
+| `actions` | Up, Down, More and Close | Archive all and Close (the Show `PopupSelect` sits in the subheader) |
 | `body` | Sections of the record; the form while editing | Items grouped by time |
-| `footer` | Only while editing: Cancel and Save, full bleed. The page composes it from Button. Planned as a prop. | None |
+| `footer` | Only while editing: Discard and Save, full bleed; Close in the header dismisses, so no Cancel. The page composes it from Button. Planned as a prop. | None |
 | Placement | Floating, right. Floats under 1168; at 1168 and up the Frame docks it. Floating at every width is Planned. | Floating, left, out of the Sidebar. Planned. Today it uses the right-hand area. |
 | Beside the AI panel | Planned. The Frame has one Panel area. | Planned. |
 
@@ -98,7 +98,7 @@ The AI panel is not a floating Panel. It is a region of the Frame, docked where 
 | Title Details with the record: "Ana Ruiz · Thu 4:00 PM". | "Details". |
 | Name the filter by what it keeps: "Unread". | "Filter". |
 | Give the empty state a way back: "Back to sessions". | "Nothing here". |
-| Name the footer's actions: "Cancel" and "Save". | "OK" and "Done". |
+| Name the footer's actions: "Discard" and "Save". | "OK" and "Done". |
 
 ## Accessibility
 
@@ -159,7 +159,7 @@ Picking the same row again closes it; Up and Down step through the rows.
 
 **Checked:** Review
 
-Cancel (Default) and Save (Primary), full bleed. Reading needs no footer.
+Discard (Default) and Save (Primary), full bleed; Close in the header dismisses, so no Cancel. Reading needs no footer.
 
 Do: Reading: a header and a body, nothing to save.
 Don't: A footer of buttons on a Panel that is only read.

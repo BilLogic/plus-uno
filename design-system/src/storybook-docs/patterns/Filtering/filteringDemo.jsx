@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { Button, DynamicTable, EmptyState, FilterButton, FilterMenu, IconButton, PopupSelect, Skeleton, Tabs } from '@/components';
+import { Button, EmptyState, FilterButton, FilterMenu, IconButton, PopupSelect, Skeleton } from '@/components';
 import { LoadThenReveal } from '@/lib/loadRevealMotion';
 import { SwapInPlace } from '@/lib/swapMotion';
-import { PatternSection, SECTION_DETAIL_FLOOR } from '@/patterns';
+import { Page, PatternCard, PatternSection, SECTION_DETAIL_FLOOR } from '@/patterns';
 import { FRAME_LAYOUT } from '@/patterns/Frame/frameLayout';
 import { useOwnWidth } from '@/patterns/Frame/useOwnWidth';
-import { FilterSide, ViewBar, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
+import { PageTabs, SessionsTable } from '@/patterns/Page/pageDemo.jsx';
+import { FilterSide, StudentsTable, ViewBar, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
 
 /**
  * The Filtering pattern's examples: a real Section with its view bar, the
@@ -58,19 +59,7 @@ export const narrow = (value) => ROSTER.filter((rowValues) => Object.entries(val
 /** The result count in words, read politely as the rows narrow. */
 export const countWords = (rows, value) => (appliedCount(value) > 0 ? `${rows.length} of ${ROSTER.length} students` : `${ROSTER.length} students`);
 
-const HEAD = { cells: ['Name', 'Grade', 'School', 'Subject'].map((content) => ({ key: content, content })) };
-
-const StudentsTable = ({ rows }) => (
-    <DynamicTable
-        head={HEAD}
-        rows={rows.map(([name, grade, school, subject]) => ({
-            key: name,
-            cells: [name, grade, school, subject].map((content) => ({ key: content, content })),
-        }))}
-        label="Students"
-        isFixedSize
-    />
-);
+const ROSTER_COLUMNS = ['Name', 'Grade', 'School', 'Subject'];
 
 const noop = () => {};
 
@@ -128,13 +117,24 @@ const OneListMenu = ({ category, value, onPick, open, mount }) => {
  * @param {string[]} [props.views]  the pill views at the bar's start
  * @param {(mount: Element | null) => React.ReactNode} [props.start]  the bar's start in place of the pills (a view picker), given the picture's mount
  */
-export const FilteredStudents = ({ tier, categories, initial = {}, openMenu, views = ['All students', 'Needs follow-up'], start, loading = false }) => {
+export const FilteredStudents = ({
+    tier,
+    categories,
+    initial = {},
+    openMenu,
+    views = ['All students', 'Needs follow-up'],
+    start,
+    loading = false,
+    sectionType,
+    pageTabs = false,
+}) => {
     const ref = useRef(null);
     const width = useOwnWidth(ref, STAGE);
     const [setMount, mount] = useLayerMount();
     const blank = Object.fromEntries(categories.map((id) => [id, []]));
     const [value, setValue] = useState({ ...blank, ...initial });
     const [activeView, setActiveView] = useState(views[0]);
+    const [pageTab, setPageTab] = useState('students');
     const [showSide, setShowSide] = useState(false);
     const cats = categories.map((id) => CATEGORIES[id]);
     const pick = (id, next) => setValue((current) => ({ ...current, [id]: next }));
@@ -142,7 +142,9 @@ export const FilteredStudents = ({ tier, categories, initial = {}, openMenu, vie
     const baseRows = narrow(value);
     const rows = activeView === 'Needs follow-up'
         ? baseRows.filter((_, index) => index % 2 === 1)
-        : baseRows;
+        : activeView === 'New this term'
+            ? baseRows.slice(0, 3)
+            : baseRows;
     const count = appliedCount(value);
 
     // A held-open picture shows the open layer, not the focus ring a real open moves into it.
@@ -187,7 +189,7 @@ export const FilteredStudents = ({ tier, categories, initial = {}, openMenu, vie
 
     const status = <span role="status" style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{countWords(rows, value)}</span>;
     const swapKey = `${activeView}:${JSON.stringify(value)}`;
-    const rawResults = rows.length > 0 ? <StudentsTable rows={rows} /> : (
+    const rawResults = rows.length > 0 ? <StudentsTable rows={rows} columns={ROSTER_COLUMNS} /> : (
         <EmptyState
             spacing="compact"
             icon="user-group"
@@ -254,43 +256,48 @@ export const FilteredStudents = ({ tier, categories, initial = {}, openMenu, vie
                 data-filter-stage
                 style={{
                     position: 'relative',
-                    boxSizing: 'border-box',
-                    // The page's own pad, so a menu at the bar's start is not pushed off its trigger by the picture's edge.
-                    padding: 'var(--page-pad)',
-                    minBlockSize: openMenu ? OPEN_ROOM[tier === '2c' ? 'stacked' : 'short'] : undefined,
                     '--plus-overlay-screen': `${READ_SCREEN}px`,
                 }}
             >
-                <PatternSection
-                    title="Students"
-                    description="Lincoln Middle"
-                    tabs={<ViewBar views={views} activeView={activeView} onViewChange={setActiveView} start={start ? start(mount) : undefined} filters={filters} primary="Add students" narrow={width < FRAME_LAYOUT.fullWidthBelow} />}
+                <Page
+                    header={pageTabs ? <PageTabs active={pageTab} onSelect={setPageTab} labels={['Overview', 'Students', 'Sessions']} aria-label="Group pages" /> : undefined}
+                    style={{ minBlockSize: openMenu ? OPEN_ROOM[tier === '2c' ? 'stacked' : 'short'] : undefined }}
                 >
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>{body}</div>
-                </PatternSection>
+                    {pageTabs && pageTab === 'overview' && (
+                        <PatternSection title="Lincoln Middle">
+                            <PatternCard title="Tuesdays & Thursdays · 4:30 PM" description="Priya Nair · 8 students enrolled this term." />
+                        </PatternSection>
+                    )}
+                    {pageTabs && pageTab === 'sessions' && (
+                        <PatternSection title="Sessions">
+                            <SessionsTable />
+                        </PatternSection>
+                    )}
+                    {(!pageTabs || pageTab === 'students') && (
+                        <PatternSection
+                            title="Students"
+                            description="Lincoln Middle"
+                            type={pageTabs ? 'tabs-only' : sectionType}
+                            tabs={<ViewBar views={views} activeView={activeView} onViewChange={setActiveView} start={start ? start(mount, { activeView, onViewChange: setActiveView }) : undefined} filters={filters} primary="Add students" narrow={width < FRAME_LAYOUT.fullWidthBelow} />}
+                        >
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>{body}</div>
+                        </PatternSection>
+                    )}
+                </Page>
             </div>
         </div>
     );
 };
 
 /** The view picker under page tabs: a Popup select at the bar's start, picking a view, not a filter. */
-export const ViewPicker = ({ open = false, mount }) => (
+export const ViewPicker = ({ open = false, mount, value, onChange }) => (
     <PopupSelect
         label="View"
         options={['All students', 'Needs follow-up', 'New this term']}
-        defaultValue="All students"
+        {...(value !== undefined ? { value, onChange } : { defaultValue: 'All students' })}
         isSearchable={false}
         placement="bottom-start"
         {...(open && mount ? { open: true, onOpenChange: noop } : {})}
         container={mount ?? undefined}
     />
-);
-
-/** Page tabs above the Section: the student's pages. */
-export const PageTabs = () => (
-    <Tabs defaultActiveKey="students" aria-label="Group pages">
-        <Tabs.Tab eventKey="overview">Overview</Tabs.Tab>
-        <Tabs.Tab eventKey="students">Students</Tabs.Tab>
-        <Tabs.Tab eventKey="sessions">Sessions</Tabs.Tab>
-    </Tabs>
 );

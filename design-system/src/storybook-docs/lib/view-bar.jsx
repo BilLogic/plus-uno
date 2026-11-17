@@ -31,24 +31,52 @@ export const useLayerMount = () => {
 };
 
 export const STUDENTS = [
-    ['Ava Thompson', 'Grade 7', 'Oct 24'],
-    ['Marcus Lee', 'Grade 8', 'Oct 23'],
-    ['Sofia Ramirez', 'Grade 7', 'Oct 23'],
-    ['Jordan Patel', 'Grade 6', 'Oct 21'],
-    ['Emily Chen', 'Grade 8', 'Oct 20'],
-    ['Noah Williams', 'Grade 6', 'Oct 18'],
+    ['Ava Thompson', 'Grade 7', 'Oct 24', 'Active', true, 'Priya Nair'],
+    ['Marcus Lee', 'Grade 8', 'Oct 23', 'Active', true, 'Devon Brooks'],
+    ['Sofia Ramirez', 'Grade 7', 'Oct 23', 'Active', false, 'Priya Nair'],
+    ['Jordan Patel', 'Grade 6', 'Oct 21', 'Paused', false, 'Samir Shah'],
+    ['Emily Chen', 'Grade 8', 'Oct 20', 'Active', false, 'Devon Brooks'],
+    ['Noah Williams', 'Grade 6', 'Oct 18', 'Paused', true, 'Samir Shah'],
 ];
 export const STUDENT_HEAD = { cells: [{ key: 'name', content: 'Name' }, { key: 'grade', content: 'Grade' }, { key: 'last', content: 'Last session' }] };
 const SORTABLE_STUDENT_HEAD = {
     cells: STUDENT_HEAD.cells.map((cell) => ({ ...cell, isSortable: true })),
 };
-export const studentRows = (count) => STUDENTS.slice(0, count).map(([name, grade, last]) => ({
+export const filterStudentList = ({ count = STUDENTS.length, view, checked } = {}) => {
+    let list = STUDENTS.slice(0, count);
+    if (view === 'Needs follow-up') {
+        list = list.filter(([, , , , followUp]) => followUp);
+    } else if (view === 'Paused') {
+        list = list.filter(([, , , status]) => status === 'Paused');
+    }
+    if ( Array.isArray(checked) ) {
+        const grades = checked.filter((v) => v.startsWith('Grade '));
+        const statuses = checked.filter((v) => v === 'Active' || v === 'Paused');
+        list = list.filter(([, grade, , status]) => (
+            (grades.length === 0 || grades.includes(grade))
+            && (statuses.length === 0 || statuses.includes(status))
+        ));
+    }
+    return list;
+};
+export const studentRows = (count, options) => filterStudentList({ count, ...options }).map(([name, grade, last]) => ({
     key: name,
     cells: [{ key: name, content: name }, { key: grade, content: grade }, { key: last, content: last }],
 }));
-export const StudentsTable = ({ count = 4, sortable = false, ...props }) => (
-    <DynamicTable head={sortable ? SORTABLE_STUDENT_HEAD : STUDENT_HEAD} rows={studentRows(count)} label="Students" isFixedSize {...props} />
-);
+export const StudentsTable = ({ count = 4, sortable = false, view, checked, rows, columns, label = 'Students', ...props }) => {
+    const head = columns
+        ? { cells: columns.map((content) => ({ key: content.toLowerCase(), content, ...(sortable ? { isSortable: true } : {}) })) }
+        : (sortable ? SORTABLE_STUDENT_HEAD : STUDENT_HEAD);
+    const tableRows = rows
+        ? rows.map((rowValues) => ({
+            key: rowValues[0],
+            cells: rowValues.slice(0, head.cells.length).map((content) => ({ key: content, content })),
+        }))
+        : studentRows(count, { view, checked });
+    return (
+        <DynamicTable head={head} rows={tableRows} label={label} isFixedSize {...props} />
+    );
+};
 
 export const row = { display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', minWidth: 0 };
 
@@ -68,14 +96,19 @@ export const ViewPills = ({ views, activeView, onViewChange }) => {
 };
 
 /** The format switch: equal-width segments, first on the right. */
-export const FormatSwitch = ({ iconsOnly = true }) => {
-    const [format, setFormat] = useState('table');
+export const FormatSwitch = ({ iconsOnly = true, format: controlledFormat, onFormatChange }) => {
+    const [uncontrolled, setUncontrolled] = useState('table');
+    const format = controlledFormat ?? uncontrolled;
+    const handleSelect = (next) => {
+        if (controlledFormat === undefined) setUncontrolled(next);
+        onFormatChange?.(next);
+    };
     return (
         <ButtonGroup label="Format">
-            {[['table', 'table-list', 'Table'], ['calendar', 'calendar', 'Calendar']].map(([key, icon, label]) => (
+            {[['table', 'table-list', 'Table'], ['cards', 'grip', 'Cards']].map(([key, icon, label]) => (
                 iconsOnly
-                    ? <IconButton key={key} icon={icon} label={label} isSelected={format === key} onClick={() => setFormat(key)} />
-                    : <Button key={key} text={label} iconBefore={icon} isSelected={format === key} onClick={() => setFormat(key)} />
+                    ? <IconButton key={key} icon={icon} label={label} isSelected={format === key} onClick={() => handleSelect(key)} />
+                    : <Button key={key} text={label} iconBefore={icon} isSelected={format === key} onClick={() => handleSelect(key)} />
             ))}
         </ButtonGroup>
     );
@@ -85,17 +118,20 @@ export const FormatSwitch = ({ iconsOnly = true }) => {
  * The view bar's end, in order: format switch, Search, filters, More, the
  * labeled Primary. `narrow` keeps only the Primary's icon, below 768.
  */
-export const BarEnd = ({ format = false, search = true, filters = null, more = true, primary = 'Add students', narrow = false }) => (
-    <div style={{ ...row, marginInlineStart: 'auto' }}>
-        {format && <FormatSwitch />}
-        {search && <IconButton icon="magnifying-glass" label="Search students" appearance="subtle" onClick={() => {}} />}
-        {filters}
-        {more && <IconButton icon="ellipsis" label="More" appearance="subtle" onClick={() => {}} />}
-        {primary && (narrow
-            ? <IconButton icon="user-plus" label={primary} appearance="primary" onClick={() => {}} />
-            : <Button text={primary} iconBefore="user-plus" appearance="primary" onClick={() => {}} />)}
-    </div>
-);
+export const BarEnd = ({ format = false, onFormatChange, search = true, searchLabel = 'Search students', filters = null, more = true, primary = 'Add students', primaryIcon = 'user-plus', narrow = false }) => {
+    const formatValue = typeof format === 'string' ? format : undefined;
+    return (
+        <div style={{ ...row, marginInlineStart: 'auto' }}>
+            {format && <FormatSwitch format={formatValue} onFormatChange={onFormatChange} />}
+            {search && <IconButton icon="magnifying-glass" label={searchLabel} appearance="subtle" onClick={() => {}} />}
+            {filters}
+            {more && <IconButton icon="ellipsis" label="More" appearance="subtle" onClick={() => {}} />}
+            {primary && (narrow
+                ? <IconButton icon={primaryIcon} label={primary} appearance="primary" onClick={() => {}} />
+                : <Button text={primary} iconBefore={primaryIcon} appearance="primary" onClick={() => {}} />)}
+        </div>
+    );
+};
 
 /** The view bar: views at the start, everything that acts on the rows at the end. */
 export const ViewBar = ({ views = ['All students'], start, activeView, onViewChange, ...end }) => (

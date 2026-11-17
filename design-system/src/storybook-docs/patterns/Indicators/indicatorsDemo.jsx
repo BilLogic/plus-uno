@@ -525,9 +525,6 @@ export const ChecklistInSidebar = ({ defaultSteps = HOME_CHECKLIST_STEPS }) => {
     const [dismissed, setDismissed] = useState(false);
 
     const isHome = activePage === 'home';
-    const breadcrumbs = isHome
-        ? [{ text: 'Home' }]
-        : [{ text: 'Home', href: '#home' }, { text: 'Sessions' }];
 
     const sidebarSlot = (
         <div style={{ display: 'flex', flexDirection: 'column', blockSize: '100%', minBlockSize: 0 }}>
@@ -558,7 +555,7 @@ export const ChecklistInSidebar = ({ defaultSteps = HOME_CHECKLIST_STEPS }) => {
 
     return (
         <BrowserWindow address={isHome ? 'app.plus.org/home' : 'app.plus.org/sessions'} height={CHECKLIST_WINDOW_HEIGHT}>
-            <Frame header={<Breadcrumb items={breadcrumbs} />} sidebar={sidebarSlot}>
+            <Frame sidebar={sidebarSlot}>
                 {isHome ? (
                     <PatternSection title="Home" level="page" gap="md">
                         {!dismissed && (

@@ -4,9 +4,10 @@ import {
     Banner,
     Breadcrumb,
     Button,
+    DynamicTable,
     IconButton,
     PageHeader,
-    Select,
+    PopupSelect,
     StatusTag,
     Tabs,
     Heading,
@@ -57,12 +58,18 @@ export const DemoPageHeader = ({ breadcrumb, title, status, description, actions
     />
 );
 
+const DEFAULT_TAB_LABELS = ['Overview', 'Sessions', 'Notes'];
+
 /** Page tabs: they switch the whole page. */
-export const PageTabs = ({ active = 'overview' }) => (
-    <Tabs defaultActiveKey={active} aria-label="Student pages">
-        <Tabs.Tab eventKey="overview">Overview</Tabs.Tab>
-        <Tabs.Tab eventKey="sessions">Sessions</Tabs.Tab>
-        <Tabs.Tab eventKey="notes">Notes</Tabs.Tab>
+export const PageTabs = ({ active = 'overview', onSelect, labels = DEFAULT_TAB_LABELS, 'aria-label': ariaLabel = 'Student pages' }) => (
+    <Tabs
+        {...(onSelect ? { activeKey: active, onSelect } : { defaultActiveKey: active })}
+        aria-label={ariaLabel}
+    >
+        {labels.map((entry) => {
+            const [key, label] = Array.isArray(entry) ? entry : [entry.toLowerCase(), entry];
+            return <Tabs.Tab key={key} eventKey={key}>{label}</Tabs.Tab>;
+        })}
     </Tabs>
 );
 
@@ -74,21 +81,59 @@ export const PageActions = () => (
     </>
 );
 
+export const GROUP_SESSION_CARDS = [
+    ['Lincoln Middle', 'Tue 4:30 PM · 6 students'],
+    ['Roosevelt K-8', 'Wed 3:00 PM · 4 students'],
+    ['North High', 'Thu 5:00 PM · 5 students'],
+];
+
+export const STUDENT_SESSION_CARDS = [
+    ['Thu 4:00 PM · Algebra', 'Ms. Ortiz · Linear equations'],
+    ['Fri 3:30 PM · Fractions', 'Ms. Ortiz · Equivalent fractions'],
+    ['Sat 10:00 AM · Algebra', 'Ms. Kim · Systems of equations'],
+];
+
 /** A Section's body: three session cards. */
-export const SessionCards = () => (
+export const SessionCards = ({ items = GROUP_SESSION_CARDS }) => (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 'var(--grid-gutter)' }}>
-        {[['Lincoln Middle', 'Tue 4:30 PM · 6 students'], ['Roosevelt K-8', 'Wed 3:00 PM · 4 students'], ['North High', 'Thu 5:00 PM · 5 students']].map(([t, d]) => (
+        {items.map(([t, d]) => (
             <PatternCard key={t} title={t} description={d} />
         ))}
     </div>
 );
 
 /** A Section holding the cards under its own title. */
-export const CardsSection = ({ title, actions, description }) => (
+export const CardsSection = ({ title, actions, description, items }) => (
     <PatternSection title={title} description={description} actions={actions}>
-        <SessionCards />
+        <SessionCards items={items} />
     </PatternSection>
 );
+
+const SESSION_HEAD = { cells: ['Time', 'Tutor', 'Subject'].map((content) => ({ key: content, content, isSortable: true })) };
+export const UPCOMING_SESSIONS = [
+    ['Thu 4:00 PM', 'Ms. Ortiz', 'Algebra'],
+    ['Thu 5:30 PM', 'Mr. Patel', 'Geometry'],
+    ['Fri 3:30 PM', 'Ms. Ortiz', 'Fractions'],
+    ['Sat 10:00 AM', 'Ms. Kim', 'Linear equations'],
+];
+export const PAST_SESSIONS = [
+    ['Tue 4:00 PM', 'Ms. Ortiz', 'Two-step equations'],
+    ['Mon 3:30 PM', 'Mr. Patel', 'Angles and proofs'],
+    ['Fri 4:00 PM', 'Ms. Kim', 'Ratios and rates'],
+];
+
+/** A Dynamic table of sessions, filtered by status (`upcoming` or `past`). */
+export const SessionsTable = ({ status = 'upcoming' }) => {
+    const rows = status === 'past' ? PAST_SESSIONS : UPCOMING_SESSIONS;
+    return (
+        <DynamicTable
+            head={SESSION_HEAD}
+            rows={rows.map((cells) => ({ key: cells.join(), cells: cells.map((content) => ({ key: content, content })) }))}
+            label="Sessions"
+            isFixedSize
+        />
+    );
+};
 
 /** The collection's view bar: one pill at the start, the labeled Primary that adds a row at the end. */
 export const ViewBarWithAdd = () => (
@@ -102,20 +147,42 @@ export const ViewBarWithAdd = () => (
     </div>
 );
 
-/** The view bar's views as one labeled Select at the start, the form under page tabs. */
-export const ViewSelect = () => (
+const STATUS_OPTIONS = [
+    { value: 'upcoming', label: 'Upcoming' },
+    { value: 'past', label: 'Past' },
+];
+
+/** The view bar's views as one labeled PopupSelect at the start, the form under page tabs. */
+export const ViewSelect = ({ value, defaultValue = 'upcoming', onChange, actions }) => (
     <div className="plus-section-view-bar" style={{ ...row, inlineSize: '100%' }}>
-        <div style={{ inlineSize: 'var(--card-min-width-sm)' }}>
-            <Select
-                aria-label="Status"
-                spacing="compact"
-                clearable={false}
-                defaultValue="upcoming"
-                options={[{ value: 'upcoming', label: 'Upcoming' }, { value: 'past', label: 'Past' }]}
-            />
-        </div>
+        <PopupSelect
+            label="Status"
+            options={STATUS_OPTIONS}
+            {...(value !== undefined ? { value, onChange } : { defaultValue })}
+            isSearchable={false}
+        />
+        {actions ? <div style={{ marginInlineStart: 'auto' }}>{actions}</div> : null}
     </div>
 );
+
+/** The Section content under `PageTabs` (`overview`, `sessions`, `notes`). */
+export const RecordTabSection = ({ tab = 'sessions', status = 'upcoming', onStatusChange, overviewItems = STUDENT_SESSION_CARDS }) => {
+    if (tab === 'overview') {
+        return <CardsSection title="Upcoming sessions" items={overviewItems} />;
+    }
+    if (tab === 'notes') {
+        return (
+            <PatternSection title="Tutor notes">
+                <PatternCard title="Oct 14 reflection" description="Worked through distributive property and two-step equations together." />
+            </PatternSection>
+        );
+    }
+    return (
+        <PatternSection title="Sessions" type="tabs-only" tabs={<ViewSelect value={status} onChange={onStatusChange} />}>
+            <SessionsTable status={status} />
+        </PatternSection>
+    );
+};
 
 /**
  * The Frame with no sidebar at the stage width, holding a page. `full` lifts the

@@ -126,11 +126,17 @@ export default {
 };
 
 const sampleOptions = [
-    { value: 'option-1', label: 'Option #1' },
-    { value: 'option-2', label: 'Option #2' },
-    { value: 'option-3', label: 'Option #3' },
-    { value: 'option-4', label: 'Option #4' },
-    { value: 'option-5', label: 'Option #5' },
+    { value: 'lincoln', label: 'Lincoln Middle' },
+    { value: 'roosevelt', label: 'Roosevelt K-8' },
+    { value: 'north', label: 'North High' },
+    { value: 'oak-creek', label: 'Oak Creek Elementary' },
+    { value: 'westview', label: 'Westview Academy' },
+];
+
+const statusOptions = [
+    { value: 'upcoming', label: 'Upcoming' },
+    { value: 'completed', label: 'Completed' },
+    { value: 'canceled', label: 'Canceled' },
 ];
 
 const grid = { pointerEvents: 'auto', display: 'grid', gap: 'var(--space-125)', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' };
@@ -143,11 +149,11 @@ export const Empty = {
 };
 
 export const Filled = {
-    render: () => <div style={field}><Select label="Site" defaultValue="option-1" options={sampleOptions} placeholder="Select a site" /></div>,
+    render: () => <div style={field}><Select label="Site" defaultValue="lincoln" options={sampleOptions} placeholder="Select a site" /></div>,
 };
 
 export const Multi = {
-    render: () => <div style={field}><Select label="Sites" isMulti options={sampleOptions} defaultValue={['option-1', 'option-2']} placeholder="Select sites" /></div>,
+    render: () => <div style={field}><Select label="Sites" isMulti options={sampleOptions} defaultValue={['lincoln', 'roosevelt']} placeholder="Select sites" /></div>,
 };
 
 export const Searchable = {
@@ -158,8 +164,8 @@ export const Searchable = {
 export const Marker = {
     render: () => (
         <div style={{ ...grid, pointerEvents: 'auto' }}>
-            <Select label="Check" options={sampleOptions} defaultValue="option-1" />
-            <Select label="Radio" marker="radio" options={sampleOptions} defaultValue="option-1" />
+            <Select label="Check" options={sampleOptions} defaultValue="lincoln" />
+            <Select label="Radio" marker="radio" options={sampleOptions} defaultValue="lincoln" />
         </div>
     ),
     play: async ({ canvasElement }) => {
@@ -189,9 +195,9 @@ export const Marker = {
     },
 };
 
-/** A short list in a filter menu opts out: the field is a plain trigger that opens the list. */
+/** A short list in a form opts out: the field is a plain trigger that opens the list. */
 export const NotSearchable = {
-    render: () => <div style={field}><Select label="Status" isSearchable={false} options={sampleOptions.slice(0, 3)} placeholder="Any status" /></div>,
+    render: () => <div style={field}><Select label="Status" isSearchable={false} options={statusOptions} placeholder="Any status" /></div>,
 };
 
 export const Creatable = {

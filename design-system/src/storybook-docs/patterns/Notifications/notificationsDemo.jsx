@@ -21,7 +21,7 @@ import {
     Tabs,
     Tile,
 } from '@/components';
-import { Frame, PatternSection, PatternSidebar } from '@/patterns';
+import { Frame, Page, PatternSection, PatternSidebar } from '@/patterns';
 import { DemoPageHeader } from '../../../patterns/Page/pageDemo.jsx';
 import { WINDOW_HEIGHT } from '@/storybook-docs/lib/focused-task.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
@@ -380,8 +380,8 @@ export const InboxInSidebar = ({ defaultOpen = true, initialAllRead = false }) =
 };
 
 /** A Flag stack at the top right, held in the picture. */
-const TopRight = ({ children }) => (
-    <div style={{ ...pad, display: 'flex', justifyContent: 'flex-end' }}>
+const TopRight = ({ padded = true, children }) => (
+    <div style={{ ...(padded ? pad : {}), display: 'flex', justifyContent: 'flex-end' }}>
         <FlagGroup position="top-end" containerPosition="static">
             {children}
         </FlagGroup>
@@ -455,32 +455,31 @@ export const SeverityRow = () => (
 export const TierFrame = () => (
     <BrowserWindow address="app.plus.org/sessions">
         <Banner appearance="announcement">Scheduled maintenance Saturday 2–4 AM ET.</Banner>
-        <div style={pad}>
-            <DemoPageHeader title="Sessions" description="This week" />
-        </div>
+        <Page header={<DemoPageHeader title="Sessions" description="This week" />} />
     </BrowserWindow>
 );
 
 /** The Page tier: under the page header, about this page. */
 export const TierPage = () => (
     <BrowserWindow address="app.plus.org/sessions">
-        <div style={pad}>
-            <DemoPageHeader title="Sessions" description="This week" />
-            <Banner appearance="warning">Tutoring sessions move to the new calendar on Friday.</Banner>
-        </div>
+        <Page
+            header={<DemoPageHeader title="Sessions" description="This week" />}
+            banner={<Banner appearance="warning">Tutoring sessions move to the new calendar on Friday.</Banner>}
+        />
     </BrowserWindow>
 );
 
 /** The Section tier: at the top of one collection, about that collection. */
 export const TierSection = () => (
     <BrowserWindow address="app.plus.org/students">
-        <div style={pad}>
-            <DemoPageHeader title="Students" description="Lincoln Middle" />
-            <PatternSection title="Students" tabs={<ViewBar views={['All students']} filters={null} primary={null} />}>
-                <Banner appearance="warning">Two students have no guardian contact on file.</Banner>
-                <StudentsTable count={2} />
+        <Page header={<DemoPageHeader title="Students" description="Lincoln Middle" />}>
+            <PatternSection title="Students" type="tabs-only" tabs={<ViewBar views={['All students']} filters={null} primary={null} />}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+                    <Banner appearance="warning">Two students have no guardian contact on file.</Banner>
+                    <StudentsTable count={2} />
+                </div>
             </PatternSection>
-        </div>
+        </Page>
     </BrowserWindow>
 );
 
@@ -516,13 +515,12 @@ export const BannerDont = () => (
 /** A page whose Flag has found the person at the top right: the page behind them. */
 export const FlagOnPage = () => (
     <BrowserWindow address="app.plus.org/sessions" height={WINDOW}>
-        <div style={pad}>
-            <DemoPageHeader title="Sessions" description="This week" />
-            <TopRight>
+        <Page header={<DemoPageHeader title="Sessions" description="This week" />}>
+            <TopRight padded={false}>
                 <Flag icon="circle-check" title="Session logged" autohide={false} show>
                     Maya's supervisor will see it Friday.
                 </Flag>
             </TopRight>
-        </div>
+        </Page>
     </BrowserWindow>
 );

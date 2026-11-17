@@ -91,6 +91,23 @@ export const TypeNotifications = {
         await expect(panel(), 'named Inbox').toHaveAccessibleName('Inbox');
         const unread = within(panel()).getAllByText('unread');
         await expect(unread.length, 'each unread dot is paired with the word').toBe(canvasElement.querySelectorAll('[data-probe="unread"]').length);
+
+        const body = within(canvasElement.ownerDocument.body);
+        const p = within(panel());
+        await expect(p.queryByText(/Chloe Tran/)).toBeNull();
+
+        await userEvent.click(p.getByRole('button', { name: 'Show: Unread' }));
+        await userEvent.click(await body.findByRole('option', { name: 'All' }));
+        await expect(p.getByText(/Chloe Tran/)).toBeInTheDocument();
+
+        await userEvent.click(p.getByRole('button', { name: 'Show: All' }));
+        await userEvent.click(await body.findByRole('option', { name: 'Mentions' }));
+        await expect(p.getByText(/Ben Okafor/)).toBeInTheDocument();
+        await expect(p.queryByText(/Ana Ruiz/)).toBeNull();
+
+        await userEvent.click(p.getByRole('button', { name: 'Show: Mentions' }));
+        await userEvent.click(await body.findByRole('option', { name: 'Unread' }));
+        await expect(p.getByText(/Ana Ruiz/)).toBeInTheDocument();
     },
 };
 
