@@ -84,6 +84,31 @@ describe('PatternTable', () => {
         expect(within(region).getByText('No members yet')).toBeVisible();
     });
 
+    it('omits the region role when empty without an accessible name or caption', () => {
+        render(
+            <PatternTable empty emptyState={<span>No members yet</span>}>
+                {head}
+                {body}
+            </PatternTable>
+        );
+        expect(screen.queryByRole('table')).toBeNull();
+        expect(screen.queryByRole('region')).toBeNull();
+        expect(screen.getByText('No members yet')).toBeVisible();
+    });
+
+    it('renders the table normally when empty is true without emptyState', () => {
+        render(
+            <PatternTable empty footer={<span>1 of 4</span>}>
+                {head}
+                {body}
+            </PatternTable>
+        );
+        expect(screen.getByRole('table')).toBeInTheDocument();
+        expect(screen.getAllByRole('columnheader')).toHaveLength(3);
+        expect(screen.getByText('Jordan Blake')).toBeInTheDocument();
+        expect(screen.getByText('1 of 4')).toBeInTheDocument();
+    });
+
     it('renders the rows and pagination when not empty', () => {
         render(
             <PatternTable emptyState={<span>No members yet</span>} footer={<span>1 of 4</span>}>

@@ -154,7 +154,6 @@
     gap: var(--stack-sm);
     width: 100%;
     color: var(--ds-text-subtle);
-    text-align: center;
 
     &:not(:has(> .plus-empty-state)) {
         padding: var(--section-stack-md) var(--table-pad-x-cell);

@@ -157,7 +157,9 @@ export const States = {
     parameters: { docs: { description: { story: 'Empty and no results replace the whole table (no head row, footer or pagination) with EmptyState; loading and error keep the head row and swap the body for one message row; refreshing keeps the rows at the loading opacity under a spinner.' } } },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        for (const state of ['empty', 'no results']) {
+        const emptyStates = STATES.filter((state) => state === 'empty' || state === 'no results');
+        const keptHeaderStates = STATES.filter((state) => !emptyStates.includes(state));
+        for (const state of emptyStates) {
             const root = canvas.getByTestId(`state-${state}`);
             await expect(root).toHaveAttribute('data-state', state);
             await expect(within(root).queryByRole('table'), `${state}: no table`).toBeNull();
@@ -166,7 +168,7 @@ export const States = {
             const region = within(root).getByRole('region', { name: `Students, ${state}` });
             await expect(within(region).getByRole('heading'), `${state}: EmptyState heading visible`).toBeVisible();
         }
-        for (const state of ['loading', 'error']) {
+        for (const state of keptHeaderStates) {
             const root = canvas.getByTestId(`state-${state}`);
             await expect(root).toHaveAttribute('data-state', state);
             const message = root.querySelector('.plus-pattern-table-message');

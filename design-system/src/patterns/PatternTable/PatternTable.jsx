@@ -146,7 +146,7 @@ PatternTable.propTypes = {
      * @ds-context Governed by: Empty (ds guide empty)
      */
     emptyState: PropTypes.node,
-    /** Replace the table with the `emptyState` slot */
+    /** Replace the table with the `emptyState` slot; with `empty` and no `emptyState`, the table renders normally */
     empty: PropTypes.bool,
     /** Pin the head row while the rows scroll under it; needs `maxHeight`, since only a bounded region scrolls vertically */
     stickyHeader: PropTypes.bool,

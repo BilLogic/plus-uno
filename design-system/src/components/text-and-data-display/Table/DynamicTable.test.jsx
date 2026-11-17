@@ -163,7 +163,7 @@ describe('DynamicTable', () => {
     });
 
     it('renders a passed EmptyState element and preserves caption as accessible name without table semantics', () => {
-        render(
+        const { container } = render(
             <DynamicTable
                 head={head}
                 rows={[]}
@@ -178,6 +178,34 @@ describe('DynamicTable', () => {
         const region = screen.getByRole('region', { name: 'Session roster' });
         expect(within(region).getByRole('heading', { name: 'No sessions yet' })).toBeVisible();
         expect(within(region).getByText('Book a session to begin.')).toBeVisible();
+        expect(container.querySelector('.plus-pattern-table-empty > .plus-empty-state')).not.toBeNull();
+    });
+
+    it('replaces the table with a plain-element emptyView on the wrapper padding path', () => {
+        const { container } = render(
+            <DynamicTable
+                head={head}
+                rows={[]}
+                label="Students"
+                emptyView={<span>No rows right now</span>}
+            />
+        );
+        expect(screen.queryByRole('table')).toBeNull();
+        expect(screen.queryAllByRole('columnheader')).toHaveLength(0);
+        const region = screen.getByRole('region', { name: 'Students' });
+        expect(region).toHaveClass('plus-pattern-table-empty');
+        expect(container.querySelector('.plus-pattern-table-empty > .plus-empty-state')).toBeNull();
+        expect(within(region).getByText('No rows right now')).toBeVisible();
+    });
+
+    it('has no region role when empty without label or caption', () => {
+        const { container } = render(
+            <DynamicTable head={head} rows={[]} emptyView="No students yet" />
+        );
+        expect(screen.queryByRole('table')).toBeNull();
+        expect(screen.queryByRole('region')).toBeNull();
+        expect(container.querySelector('.plus-pattern-table-empty')).not.toBeNull();
+        expect(screen.getByRole('heading', { name: 'No students yet' })).toBeVisible();
     });
 
     it.each([

@@ -97,7 +97,7 @@ Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `Patt
 1. **Head row.** Names the columns. Its rule is the bold border.
 2. **Rows.** The data you pass as `tbody`. Each draws a thin rule, and there is no zebra striping.
 3. **Pagination** (optional). A slot under the rows, aligned to the end. It hides while the empty state shows.
-4. **Empty state.** The `emptyState` slot, which replaces the whole table (head row, caption and footer included) when `empty` is true.
+4. **Empty state.** The `emptyState` slot, which replaces the whole table (head row, caption and footer included) when `empty` is true; with `empty` and no `emptyState`, the table renders normally.
 
 ### States
 
@@ -120,15 +120,15 @@ Row states are layered over each cell's fill, never swapped for it.
 | `--ds-border`, `--border-width-default` | color, 1 | The rule under each row. |
 | `--ds-border-bold` | color | The rule under the head row. |
 | `--ds-text`, `--body-default` | 14/20 | Body cells. |
-| `--ds-text-subtle`, `--heading-xxs` | color, type | Head cells and message rows. |
-| `--table-pad-x-cell`, `--table-pad-y-cell`, `--stack-md` | length | Cell padding, the gap inside a cell, and the side pad (8) of a message row. |
+| `--ds-text-subtle`, `--heading-xxs` | color, type | Head cells, message rows, and empty-state wrapper text. |
+| `--table-pad-x-cell`, `--table-pad-y-cell`, `--stack-md` | length | Cell padding, the gap between table and footer, and the side pad (8) of message rows and plain empty-state wrappers. |
 | `--ds-background-neutral-subtle-hovered`, `-pressed` | color | A hovered and a pressed row. |
 | `--ds-background-selected`, `-hovered`, `-pressed` | color | A selected row. |
 | `--ds-shadow-overflow` | shadow | A sticky edge, only while content is scrolled under it. |
 | `--ds-utility-elevation-surface-current` | color | The fill of sticky cells, so they match what the table sits on. |
 | `--ds-border-focused`, `--focus-ring-width` | focus ring | The ring of a scroll region. |
 | `--row-height-md` | 40 | The least height of the message row. |
-| `--section-stack-md`, `--stack-sm` | 16, 4 | Space around the message, and between its lines. |
+| `--section-stack-md`, `--stack-sm` | 16, 4 | Space around message rows and plain empty-state wrappers, and the gap inside them. |
 
 ## Content guidelines
 
@@ -145,7 +145,7 @@ Row states are layered over each cell's fill, never swapped for it.
 | `id` | string | — | — |
 | `footer` | node | — | Footer slot under the rows (range, page-size Select, Pagination); hidden while the empty state shows |
 | `emptyState` | node | — | Empty-state slot: replaces the entire table (no head row, caption, or footer) when `empty` is true |
-| `empty` | bool | `false` | Replace the table with the `emptyState` slot |
+| `empty` | bool | `false` | Replace the table with the `emptyState` slot; with `empty` and no `emptyState`, the table renders normally |
 | `stickyHeader` | bool | `false` | Pin the head row while the rows scroll under it; needs `maxHeight`, since only a bounded region scrolls vertically |
 | `stickyColumn` | bool | `false` | Pin the first column while the other columns scroll under it |
 | `maxHeight` | number or string | — | Bound the scroll region's height (number of px or any CSS length); a sticky header pins only within it |

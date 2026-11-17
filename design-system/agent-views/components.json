@@ -9830,7 +9830,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Replace the table with the `emptyState` slot",
+          "description": "Replace the table with the `emptyState` slot; with `empty` and no `emptyState`, the table renders normally",
           "deprecated": null
         },
         {
