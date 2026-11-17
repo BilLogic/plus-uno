@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import {
+    Breadcrumb,
     Button,
     ChangeTag,
     CountTag,
@@ -8,12 +9,11 @@ import {
     Heading,
     Icon,
     IconButton,
-    PopupSelect,
     ProgressBar,
     Sidebar,
     StatusTag,
 } from '@/components';
-import { Frame, PatternCard, PatternSection, SidebarTab } from '@/patterns';
+import { Frame, PatternCard, PatternSection } from '@/patterns';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 
 /**
@@ -103,19 +103,13 @@ export const InARow = () => (
         <DynamicTable
             label="Sessions"
             isFixedSize
-            head={{
-                cells: [
-                    { key: 'when', content: 'Session', isSortable: true },
-                    { key: 'who', content: 'Student', isSortable: true },
-                    { key: 'status', content: 'Status', isSortable: true },
-                ],
-            }}
+            head={{ cells: [{ key: 'when', content: 'Session' }, { key: 'who', content: 'Student' }, { key: 'status', content: 'Status' }] }}
             rows={SESSIONS.map(([when, who, appearance, status]) => ({
                 key: when,
                 cells: [
-                    { key: when, content: when },
-                    { key: who, content: who },
-                    { key: status, content: <StatusTag appearance={appearance}>{status}</StatusTag> },
+                    { key: `${when}-w`, content: when },
+                    { key: `${when}-s`, content: who },
+                    { key: `${when}-t`, content: <StatusTag appearance={appearance}>{status}</StatusTag> },
                 ],
             }))}
         />
@@ -123,166 +117,61 @@ export const InARow = () => (
 );
 
 /** A spacious Status tag after the page title. */
-export const BesideTitle = () => {
-    const [reviewed, setReviewed] = useState(false);
-    return (
-        <div style={{ ...frame, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--inline-md)', flexWrap: 'wrap' }}>
-            <div style={line}>
-                <Heading size="large">Session with Ana Ruiz</Heading>
-                <StatusTag appearance={reviewed ? 'success' : 'warning'} spacing="spacious">
-                    {reviewed ? 'Completed' : 'Needs review'}
-                </StatusTag>
-            </div>
-            <Button
-                appearance="subtle"
-                spacing="compact"
-                onClick={() => setReviewed((prev) => !prev)}
-            >
-                {reviewed ? 'Reopen review' : 'Mark reviewed'}
-            </Button>
-        </div>
-    );
-};
+export const BesideTitle = () => (
+    <div style={{ ...frame, ...line }}>
+        <Heading size="large">Session with Ana Ruiz</Heading>
+        <StatusTag appearance="warning" spacing="spacious">Needs review</StatusTag>
+    </div>
+);
 
 /** An item's count: quiet by default, bold when it asks for action now, nothing at zero, a cap past max. */
-export const OnNavigation = () => {
-    const [selected, setSelected] = useState('Inbox');
-    const items = [
-        ['Inbox', <CountTag key="a" value={3} label="3 unread" />],
-        ['Reflections', <CountTag key="b" value={5} isBold label="5 reflections to write" />],
-        ['Archive', <CountTag key="c" value={0} label="No items" />],
-        ['Messages', <CountTag key="d" value={120} label="99 or more messages" />],
-    ];
-    return (
-        <nav aria-label="Workspace" style={{ ...frame, display: 'flex', flexDirection: 'column', gap: 'var(--frame-sidebar-row-gap)', maxInlineSize: 'var(--card-min-width-md)' }}>
-            {items.map(([name, count]) => (
-                <div key={name} data-nav-item={name}>
-                    <SidebarTab
-                        text={name}
-                        state={selected === name ? 'selected' : 'enabled'}
-                        onClick={() => setSelected(name)}
-                        elemAfter={count}
-                    />
-                </div>
-            ))}
-        </nav>
-    );
-};
-
-const COLOR_NOT_ENOUGH_ROWS = [
-    { id: 'tue', label: 'Tuesday · Sofia R.', appearance: 'danger', icon: 'circle-exclamation', status: 'Missed' },
-    { id: 'mon', label: 'Monday · Jordan P.', appearance: 'success', icon: 'circle-check', status: 'Completed' },
-];
+export const OnNavigation = () => (
+    <div style={{ ...frame, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxInlineSize: 'var(--card-min-width-md)' }}>
+        {[
+            ['Inbox', <CountTag key="a" value={3} label="3 unread" />],
+            ['Reflections', <CountTag key="b" value={5} isBold label="5 reflections to write" />],
+            ['Archive', <CountTag key="c" value={0} label="No items" />],
+            ['Messages', <CountTag key="d" value={120} label="99 or more messages" />],
+        ].map(([name, count]) => (
+            <div key={name} data-nav-item={name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={text}>{name}</span>
+                {count}
+            </div>
+        ))}
+    </div>
+);
 
 /** A status told apart at a glance: the color is joined by a leading icon. */
-export const NotColorOnly = ({ icon = true }) => {
-    const [filter, setFilter] = useState('all');
-    const visible = filter === 'all'
-        ? COLOR_NOT_ENOUGH_ROWS
-        : COLOR_NOT_ENOUGH_ROWS.filter((row) => row.status.toLowerCase() === filter);
-
-    return (
-        <div style={{ ...frame, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-            <div>
-                <PopupSelect
-                    label="Status"
-                    value={filter}
-                    onChange={setFilter}
-                    isSearchable={false}
-                    options={[
-                        { label: 'All', value: 'all' },
-                        { label: 'Missed', value: 'missed' },
-                        { label: 'Completed', value: 'completed' },
-                    ]}
-                />
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                {visible.map((row) => (
-                    <div key={row.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--inline-md)' }}>
-                        <span style={text}>{row.label}</span>
-                        <StatusTag appearance={row.appearance} iconBefore={icon ? row.icon : undefined}>
-                            {row.status}
-                        </StatusTag>
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
-};
-
-const ABSENCE_PERIODS = {
-    week: { value: 3, comparison: 'vs last week' },
-    month: { value: -2, comparison: 'vs last month' },
-};
+export const NotColorOnly = ({ icon = true }) => (
+    <div style={{ ...frame, ...line }}>
+        <StatusTag appearance="danger" iconBefore={icon ? 'circle-exclamation' : undefined}>Missed</StatusTag>
+        <StatusTag appearance="success" iconBefore={icon ? 'circle-check' : undefined}>Completed</StatusTag>
+    </div>
+);
 
 /** Absences rose by 3: up, and in danger, because the good direction is down. */
-export const UpIsBad = ({ goodDirection = 'down' }) => {
-    const [period, setPeriod] = useState('week');
-    const current = ABSENCE_PERIODS[period];
-    return (
-        <div style={{ ...frame, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-            <div>
-                <PopupSelect
-                    label="Period"
-                    value={period}
-                    onChange={setPeriod}
-                    isSearchable={false}
-                    options={[
-                        { label: 'vs last week', value: 'week' },
-                        { label: 'vs last month', value: 'month' },
-                    ]}
-                />
-            </div>
-            <div style={line}>
-                <span style={text}>Absences</span>
-                <ChangeTag value={current.value} goodDirection={goodDirection} comparison={current.comparison} />
-            </div>
-        </div>
-    );
-};
-
-const SEVERITY_RANK = { danger: 3, warning: 2, info: 1, success: 0 };
+export const UpIsBad = ({ goodDirection = 'down' }) => (
+    <div style={{ ...frame, ...line }}>
+        <span style={text}>Absences</span>
+        <ChangeTag value={3} goodDirection={goodDirection} comparison="vs last week" />
+    </div>
+);
 
 /** A group shows the worst state among its children: danger over warning over information. */
-export const RollUp = () => {
-    const [tuesdayResolved, setTuesdayResolved] = useState(false);
-    const children = [
-        { when: 'Thursday, 4:00 PM', appearance: 'info', status: 'Scheduled' },
-        { when: 'Wednesday, 3:30 PM', appearance: 'warning', status: 'Needs review' },
-        tuesdayResolved
-            ? { when: 'Tuesday, 4:00 PM', appearance: 'success', status: 'Completed', canToggle: true }
-            : { when: 'Tuesday, 4:00 PM', appearance: 'danger', status: 'Missed', canToggle: true },
-    ];
-    const worst = children.reduce((acc, item) => (
-        SEVERITY_RANK[item.appearance] > SEVERITY_RANK[acc.appearance] ? item : acc
-    ), children[0]);
-
-    return (
-        <div style={{ ...frame, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxInlineSize: 'var(--card-min-width-lg)' }}>
-            <div style={{ ...line, justifyContent: 'space-between' }}>
-                <span style={{ ...text, font: 'var(--heading-xs)' }}>Group: Fractions</span>
-                <StatusTag appearance={worst.appearance} data-testid="rollup-group-status">{worst.status}</StatusTag>
-            </div>
-            {children.map((row) => (
-                <div key={row.when} style={{ ...line, justifyContent: 'space-between', paddingInlineStart: 'var(--inline-lg)' }}>
-                    <span style={subtle}>{row.when}</span>
-                    <div style={line}>
-                        <StatusTag appearance={row.appearance}>{row.status}</StatusTag>
-                        {row.canToggle ? (
-                            <Button
-                                appearance="subtle"
-                                spacing="compact"
-                                onClick={() => setTuesdayResolved((prev) => !prev)}
-                            >
-                                {tuesdayResolved ? 'Undo' : 'Resolve'}
-                            </Button>
-                        ) : null}
-                    </div>
-                </div>
-            ))}
+export const RollUp = () => (
+    <div style={{ ...frame, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxInlineSize: 'var(--card-min-width-lg)' }}>
+        <div style={{ ...line, justifyContent: 'space-between' }}>
+            <span style={{ ...text, font: 'var(--heading-xs)' }}>Group: Fractions</span>
+            <StatusTag appearance="danger">Missed</StatusTag>
         </div>
-    );
-};
+        {SESSIONS.slice(0, 3).map(([when, , appearance, status]) => (
+            <div key={when} style={{ ...line, justifyContent: 'space-between', paddingInlineStart: 'var(--inline-lg)' }}>
+                <span style={subtle}>{when}</span>
+                <StatusTag appearance={appearance}>{status}</StatusTag>
+            </div>
+        ))}
+    </div>
+);
 
 /* --------------------------------------------------------------- checklist */
 
@@ -638,23 +527,30 @@ export const ChecklistInSidebar = ({ defaultSteps = HOME_CHECKLIST_STEPS }) => {
     const isHome = activePage === 'home';
 
     const sidebarSlot = (
-        <Sidebar
-            user="tutor"
-            account={{ id: 'tutor-ana', name: 'Ana Ruiz', role: 'Tutor' }}
-            helpHref="#help"
-            activeTabId={activePage}
-            onHomeClick={() => setActivePage('home')}
-            onTabClick={(id) => setActivePage(id)}
-            footer={!dismissed ? (
-                <div data-checklist-sidebar-foot="">
+        <div style={{ display: 'flex', flexDirection: 'column', blockSize: '100%', minBlockSize: 0 }}>
+            <Sidebar
+                user="tutor"
+                activeTabId={activePage}
+                onHomeClick={() => setActivePage('home')}
+                onTabClick={(id) => setActivePage(id)}
+                style={{ flex: '1 1 auto', blockSize: 'auto' }}
+            />
+            {!dismissed && (
+                <div
+                    data-checklist-sidebar-foot=""
+                    style={{
+                        paddingInline: 'var(--frame-sidebar-pad)',
+                        paddingBlockEnd: 'var(--frame-sidebar-pad)',
+                    }}
+                >
                     <CompactChecklist
                         title="First session"
                         steps={steps}
                         onOpen={() => setActivePage('home')}
                     />
                 </div>
-            ) : null}
-        />
+            )}
+        </div>
     );
 
     return (

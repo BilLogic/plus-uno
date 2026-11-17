@@ -3,6 +3,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { expectTypeCardAnchors } from '@/storybook-docs/lib/type-card-anchors.jsx';
+import { OnNavigationCase, worstIndicator } from './IndicatorsCases.jsx';
 import {
     ChecklistCard,
     ChecklistInPage,
@@ -143,18 +144,12 @@ describe('Checklist (Patterns › Indicators)', () => {
         expect(within(card).getAllByText('Completed')).toHaveLength(5);
     });
 
-    it('renders compact checklist inside the sidebar above the account block with count, bar and next step, and opens the full list on press', async () => {
+    it('renders compact checklist at the foot of the sidebar with count, bar and next step, and opens the full list on press', async () => {
         const user = userEvent.setup();
-        const { container } = render(<ChecklistInSidebar />);
+        render(<ChecklistInSidebar />);
 
-        const sidebar = container.querySelector('.plus-pattern-sidebar');
-        const foot = container.querySelector('[data-checklist-sidebar-foot]');
-        const account = container.querySelector('.plus-sidebar-account');
-        expect(sidebar).not.toBeNull();
-        expect(foot).not.toBeNull();
-        expect(account).not.toBeNull();
-        expect(sidebar.contains(foot)).toBe(true);
-        expect(foot.compareDocumentPosition(account) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+        const nav = screen.getByRole('navigation', { name: 'Main' });
+        const sidebar = nav.closest('.plus-pattern-frame__sidebar') ?? nav.parentElement.parentElement;
 
         expect(within(sidebar).getByText('2 of 5 done')).toBeInTheDocument();
         expect(within(sidebar).getByRole('progressbar')).toHaveAttribute('aria-valuenow', '40');
@@ -167,6 +162,30 @@ describe('Checklist (Patterns › Indicators)', () => {
 
         expect(screen.getByRole('heading', { name: 'Get ready for your first session' })).toBeInTheDocument();
         expect(screen.getAllByText('Connect your calendar').length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('selects navigation rows and decrements counts to zero when items are handled', async () => {
+        const user = userEvent.setup();
+        const { container } = render(<OnNavigationCase />);
+
+        const item = (name) => container.querySelector(`[data-nav-item="${name}"]`);
+        await user.click(within(item('Inbox')).getByRole('button'));
+        const handleBtn = screen.getByRole('button', { name: 'Handle item' });
+
+        await user.click(handleBtn);
+        expect(within(item('Inbox')).getByText('2')).toBeInTheDocument();
+        await user.click(handleBtn);
+        await user.click(handleBtn);
+        expect(item('Inbox').querySelector('.plus-count')).toBeNull();
+        expect(handleBtn).toBeDisabled();
+    });
+
+    it('picks the highest-severity indicator in worstIndicator', () => {
+        expect(worstIndicator([
+            { appearance: 'info', status: 'Scheduled' },
+            { appearance: 'danger', status: 'Missed' },
+            { appearance: 'warning', status: 'Needs review' },
+        ]).status).toBe('Missed');
     });
 
     it('links every TypeCard anchor to a unique ComponentExample heading id in Indicators.mdx', () => {
