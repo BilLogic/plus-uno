@@ -286,10 +286,10 @@ export const DocsContentGrid = {
     parameters: { layout: 'padded' },
 };
 
-/*
- * The do and don't pairs on the docs page draw these in an iframe at a real
- * screen width (`ModeFrame`), since the Frame sizes itself from its own box.
- * No play: they are pictures.
+/**
+ * Do and don't pair variants for the Frame story args. The docs page uses
+ * `FrameCases` and `illustrations/frame` directly for its inline examples;
+ * these stories carry no play because they are static arg configurations.
  */
 
 /** Do: an app page supplies its Sidebar, its breadcrumb and its content. */
@@ -1342,11 +1342,10 @@ export const NoPanelPeekByDefault = {
 /* ------------------------------------------------------------- states */
 
 /**
- * Every Frame state, one story each, for the docs page's state gallery. The
- * docs page draws each one in an iframe at its stated width (`ModeFrame`), so
- * the Frame measures a real width and the layout tokens read a real viewport.
- * `frameWidth` holds the same width in the test runner, where each play reads
- * the resolved state a person sees.
+ * Every Frame state, one story each, for the state gallery. `frameWidth`
+ * sizes the Frame's box at the stated screen width so the layout tokens read
+ * a matching viewport in the test runner, where each play reads the resolved
+ * state a person sees.
  *
  * `act` does once, after mount, what a person does: hover the left edge
  * (`peek-sidebar`), press the toggle (`open-sidebar`) or hover the right edge

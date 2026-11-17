@@ -185,8 +185,7 @@ export const Appearances = {
             ))}
         </div>
     ),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
         for (const [appearance, paint] of Object.entries(PAINT)) {
             const button = canvas.getByRole('button', { name: label(appearance) });
             settled(button);
@@ -208,8 +207,7 @@ export const Spacing = {
             <Button appearance="primary" spacing="spacious" text="Spacious" iconBefore="plus" />
         </div>
     ),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
         const defaults = canvas.getByRole('button', { name: 'Default' });
         const compact = canvas.getByRole('button', { name: 'Compact' });
         const spacious = canvas.getByRole('button', { name: 'Spacious' });
@@ -244,8 +242,7 @@ export const Icons = {
             <Button text="Both" iconBefore="user" iconAfter={<Icon name="chevron-right" size={12} />} />
         </div>
     ),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
         const both = canvas.getByRole('button', { name: 'Both' });
         await expect(px(getComputedStyle(both.querySelector('.plus-btn-visual--before')).fontSize), 'leading icon is --icon-md').toBe(tokenLength(canvasElement, '--icon-md'));
         await expect(px(getComputedStyle(both.querySelector('.plus-btn-visual--after')).fontSize), 'chevron is --icon-sm').toBe(tokenLength(canvasElement, '--icon-sm'));
@@ -261,9 +258,7 @@ export const States = {
             <Button text="Loading" appearance="primary" isLoading />
         </div>
     ),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-
+    play: async ({ canvas, canvasElement }) => {
         const selected = canvas.getByRole('button', { name: 'Selected' });
         settled(selected);
         await expect(selected).toHaveAttribute('aria-pressed', 'true');
@@ -316,8 +311,8 @@ export const Ai = { render: () => <Button appearance="ai" text="Generate summary
 /** Compact spacing, 24 high, for tables and toolbars. */
 export const Compact = {
     render: () => <Button appearance="primary" spacing="compact" text="Compact" />,
-    play: async ({ canvasElement }) => {
-        const button = within(canvasElement).getByRole('button', { name: 'Compact' });
+    play: async ({ canvas }) => {
+        const button = canvas.getByRole('button', { name: 'Compact' });
         await expect(Math.round(button.getBoundingClientRect().height)).toBe(24);
     },
 };
@@ -325,8 +320,8 @@ export const Compact = {
 /** Spacious spacing, 48 high, for modal, panel and focused-view footers. */
 export const Spacious = {
     render: () => <Button appearance="primary" spacing="spacious" text="Spacious" />,
-    play: async ({ canvasElement }) => {
-        const button = within(canvasElement).getByRole('button', { name: 'Spacious' });
+    play: async ({ canvas }) => {
+        const button = canvas.getByRole('button', { name: 'Spacious' });
         await expect(Math.round(button.getBoundingClientRect().height)).toBe(48);
     },
 };
@@ -346,8 +341,7 @@ export const Loading = {
             <Button appearance="primary" spacing="spacious" text="Spacious loading" isLoading />
         </div>
     ),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
         const icon = tokenLength(canvasElement, '--icon-md');
         for (const name of ['Loading', 'Compact loading', 'Spacious loading']) {
             const button = canvas.getByRole('button', { name });
@@ -373,8 +367,7 @@ export const ExplainsOnPress = {
         };
         return <Demo />;
     },
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas }) => {
         const save = canvas.getByRole('button', { name: 'Save notes' });
         await expect(save).toBeEnabled();
         await expect(canvas.queryByText('Add the session notes before saving.')).toBeNull();
@@ -392,8 +385,7 @@ export const FitContainer = {
             <Button spacing="spacious" text="Spacious full width" shouldFitContainer />
         </div>
     ),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas }) => {
         const host = canvas.getByTestId('fit-host');
         const hostRect = host.getBoundingClientRect();
         for (const [name, expectedHeight] of [['Full width button', 32], ['Spacious full width', 48]]) {
@@ -416,8 +408,8 @@ export const Truncation = {
             <Button text="This text is truncated to fit within the container" />
         </div>
     ),
-    play: async ({ canvasElement }) => {
-        const button = within(canvasElement).getByRole('button');
+    play: async ({ canvas }) => {
+        const button = canvas.getByRole('button');
         const text = button.querySelector('.plus-btn-text');
         await expect(getComputedStyle(text).textOverflow).toBe('ellipsis');
         await expect(button.getBoundingClientRect().width).toBeLessThanOrEqual(160);
@@ -457,8 +449,7 @@ export const StateSteps = {
             ))}
         </div>
     ),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
         const read = (button, pseudo) => {
             settled(button);
             return withForcedPseudo(button, pseudo, () => getComputedStyle(button).backgroundColor);
@@ -475,8 +466,8 @@ export const StateSteps = {
 export const KeyboardFocus = {
     parameters: { docs: { disable: true } },
     render: () => <Button text="Save" />,
-    play: async ({ canvasElement }) => {
-        const button = within(canvasElement).getByRole('button', { name: 'Save' });
+    play: async ({ canvas, canvasElement }) => {
+        const button = canvas.getByRole('button', { name: 'Save' });
         settled(button);
         await userEvent.tab();
         await expect(document.activeElement).toBe(button);
@@ -514,8 +505,7 @@ export const AnchorKeyboard = {
             </div>
         );
     },
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas }) => {
         const link = canvas.getByTestId('anchor-enabled');
         await expect(link.tagName).toBe('A');
         await expect(link).toHaveAttribute('role', 'button');
@@ -538,8 +528,8 @@ export const AnchorHref = () => (
     <Button text="Open schedule" href="https://example.com/schedule" testId="anchor-href" />
 );
 AnchorHref.parameters = { docs: { disable: true } };
-AnchorHref.play = async ({ canvasElement }) => {
-    const link = within(canvasElement).getByTestId('anchor-href');
+AnchorHref.play = async ({ canvas }) => {
+    const link = canvas.getByTestId('anchor-href');
     await expect(link.tagName).toBe('A');
     await expect(link).toHaveAttribute('href', 'https://example.com/schedule');
 };
@@ -565,10 +555,10 @@ export const Anatomy = {
             </div>
         </LiveAnatomy>
     ),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
-        const btn = within(canvasElement).getByTestId('button-anatomy');
+        const btn = canvas.getByTestId('button-anatomy');
         settled(btn);
         const cs = getComputedStyle(btn);
         await expect(cs.backgroundColor, 'soft neutral fill').toBe(tokenColor(canvasElement, '--ds-background-neutral'));
@@ -650,8 +640,7 @@ export const FooterLayouts = {
             </div>
         </div>
     ),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
         const close = (a, b) => Math.abs(a - b) <= 1.5;
 
         const one = canvas.getByTestId('footer-one');

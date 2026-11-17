@@ -135,13 +135,13 @@ export const TypeProfileMenu = {
 export const TypeContent = {
     name: 'Type: Content',
     render: () => <Demo.PopupStage height={HEIGHT.content}>{(mount) => <Demo.Content mount={mount} />}</Demo.PopupStage>,
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         const layer = await holdsInStage(canvasElement, '.plus-popup');
         await expect(layer, 'content takes 4-col, the cap').toHaveClass('plus-popup--4-col');
         await expect(layer.getAttribute('role'), 'content is a popup, not a dialog that traps focus').not.toBeNull();
-        const trigger = within(canvasElement).getByRole('button', { name: 'Notes' });
+        const trigger = canvas.getByRole('button', { name: 'Notes' });
         trigger.focus();
         await expect(trigger).toHaveFocus();
     },
@@ -326,9 +326,9 @@ export const KeyLoadFailed = {
 export const KeyFlipped = {
     name: 'Key: Flipped',
     render: () => <Demo.PopupStage height={320} side="end" align="end">{(mount) => <Demo.Menu mount={mount} />}</Demo.PopupStage>,
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         const layer = await holdsInStage(canvasElement, '.plus-dropdown-menu');
-        const trigger = rect(within(canvasElement).getByRole('button', { name: 'More' }));
+        const trigger = rect(canvas.getByRole('button', { name: 'More' }));
         await expect(rect(layer).bottom, 'the layer opens above the trigger').toBeLessThanOrEqual(trigger.top);
         const stage = canvasElement.querySelector('[data-popup-stage]');
         const scale = rect(stage).width / stage.offsetWidth;
@@ -344,9 +344,9 @@ export const KeyFilterApplied = {
             {(mount) => <Demo.FilterMenuLayer mount={mount} open={false} defaultValue={{ status: ['Upcoming'], subject: ['Math'] }} />}
         </Demo.PopupStage>
     ),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         fitsCanvas(canvasElement);
-        await expect(within(canvasElement).getByRole('button', { name: 'Filters, 2 applied' }), 'the count rides on the icon').toBeInTheDocument();
+        await expect(canvas.getByRole('button', { name: 'Filters, 2 applied' }), 'the count rides on the icon').toBeInTheDocument();
         await expect(canvasElement.querySelector('.plus-filter-menu'), 'the menu is closed').toBeNull();
     },
 };

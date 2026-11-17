@@ -29,7 +29,7 @@ export const inDocsPage = (el) => Boolean(el?.closest?.('.sbdocs'));
  * The scale that fits a stage of `width` into the box `ref` points at: the
  * box's width over the stage's, never above 1. Read before the first paint and
  * kept current by a ResizeObserver, so a scaled stage never shows unscaled.
- * Shared by `ScaledPreview` and `ModeFrame`.
+ * Used by `ScaledStory` in `template-page.jsx`.
  *
  * @param {number} width  the stage width
  * @returns {[React.RefObject<HTMLElement>, number]} the ref to put on the box, and the scale

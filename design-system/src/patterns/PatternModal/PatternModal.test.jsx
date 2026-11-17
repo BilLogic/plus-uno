@@ -264,6 +264,7 @@ describe('PatternModal live cases and docs links', () => {
         ];
 
         expect(typeCards).toHaveLength(4);
+        expect(exampleTitles).toHaveLength(19);
         expect(new Set(headingSlugs).size).toBe(headingSlugs.length);
         typeCards.forEach(({ to }) => expect(headingSlugs).toContain(to));
 

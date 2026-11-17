@@ -10,7 +10,7 @@ import { probe, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { fitsCanvas, leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
-import { FitStage, ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { openOverlay } from '@/lib/overlay.js';
 import { BAR_TOKEN } from '@/storybook-docs/lib/focused-task.jsx';
 import * as Demo from './modalDemo.jsx';
@@ -51,7 +51,7 @@ const InBlanket = ({ children, height = SCREEN.height }) => (
     </Blanket>
 );
 
-const dialogs = (canvasElement) => within(canvasElement).getAllByRole('dialog');
+const dialogs = (canvas) => canvas.getAllByRole('dialog');
 
 export default {
     title: 'Templates/Modal',
@@ -96,10 +96,10 @@ export const Overview = {
             </PatternModal>
         </InBlanket>
     ),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
         const overlay = canvasElement.querySelector('.plus-pattern-blanket');
-        const [modal] = dialogs(canvasElement);
+        const [modal] = dialogs(canvas);
         const style = getComputedStyle(modal);
         await expect(style.paddingTop, 'Modal/pad').toBe(`${tokenLength(canvasElement, '--modal-pad-x-default')}px`);
         await expect(style.rowGap, 'Modal/stack-md').toBe(`${tokenLength(canvasElement, '--modal-stack-md')}px`);
@@ -130,9 +130,9 @@ export const Widths = {
             ))}
         </div>
     ),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const modals = dialogs(canvasElement);
+        const modals = dialogs(canvas);
         for (const [i, width] of BLANKET_WIDTHS.entries()) {
             await expect(modals[i].getBoundingClientRect().width, `width ${width} at 1024`).toBeCloseTo(WIDTHS_AT_1024[width], 0);
         }
@@ -163,9 +163,9 @@ export const Heights = {
             </InBlanket>
         </div>
     ),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const [short, long, fill] = dialogs(canvasElement);
+        const [short, long, fill] = dialogs(canvas);
         const cap = SCREEN.height - 2 * tokenLength(canvasElement, '--blanket-pad-y');
         await expect(short.getBoundingClientRect().height, 'a short hug modal hugs').toBeLessThan(cap);
         await expect(long.getBoundingClientRect().height, 'a long hug modal stops at the cap').toBeCloseTo(cap, 0);
@@ -237,9 +237,9 @@ export const Tabs = {
             </InBlanket>
         </div>
     ),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const [hug, fill] = dialogs(canvasElement);
+        const [hug, fill] = dialogs(canvas);
         const cap = SCREEN.height - 2 * tokenLength(canvasElement, '--blanket-pad-y');
         const tabsOf = (modal) => within(modal).getAllByRole('tab');
         const panelOf = (modal) => within(modal).getByRole('tabpanel');
@@ -311,9 +311,9 @@ export const BodyMinHeight = {
             </PatternModal>
         </InBlanket>
     ),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const [modal] = dialogs(canvasElement);
+        const [modal] = dialogs(canvas);
         const body = modal.querySelector('.plus-pattern-modal-body');
         await expect(getComputedStyle(body).minHeight, 'Modal/body-min-height').toBe('80px');
         await expect(body.getBoundingClientRect().height).toBeGreaterThanOrEqual(80);
@@ -338,9 +338,9 @@ export const CustomHeader = {
             </PatternModal>
         </InBlanket>
     ),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const [modal] = dialogs(canvasElement);
+        const [modal] = dialogs(canvas);
         const view = within(modal);
         await expect(view.getByText('Reschedule')).toBeInTheDocument();
         await expect(view.queryByRole('button', { name: 'Close' }), 'no default close button').toBeNull();
@@ -358,9 +358,9 @@ export const Divider = {
             </PatternModal>
         </InBlanket>
     ),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const [modal] = dialogs(canvasElement);
+        const [modal] = dialogs(canvas);
         const rules = modal.querySelectorAll('.plus-pattern-modal-divider');
         await expect(rules).toHaveLength(2);
         await inEveryColorModeOf(canvasElement, async (mode, token) => {
@@ -381,9 +381,9 @@ export const Loading = {
             </PatternModal>
         </InBlanket>
     ),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const [modal] = dialogs(canvasElement);
+        const [modal] = dialogs(canvas);
         const body = modal.querySelector('.plus-pattern-modal-body');
         await expect(body).toHaveAttribute('aria-busy', 'true');
         await expect(within(modal).queryByText(/Move Thursday/), 'the real body is not drawn').toBeNull();
@@ -504,13 +504,13 @@ const sized = (story, width = STAGE) => <ScrollStage width={width}>{story}</Scro
 export const TypePassive = {
     name: 'Type: Passive',
     render: () => sized(<Demo.Passive />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         fitsCanvas(canvasElement);
         await expect(canvasElement.querySelector('.plus-pattern-modal-footer'), 'Passive has no footer').toBeNull();
-        const close = within(canvasElement).getByRole('button', { name: 'Close' });
+        const close = canvas.getByRole('button', { name: 'Close' });
         await expect(close, 'Close is the way out').toBeInTheDocument();
         close.focus();
         await expect(close).toHaveFocus();
@@ -520,11 +520,10 @@ export const TypePassive = {
 export const TypeActive = {
     name: 'Type: Active',
     render: () => sized(<Demo.Active />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
-        const canvas = within(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const tracks = footerTracks(footer);
         const discard = canvas.getByRole('button', { name: 'Discard' });
@@ -543,13 +542,13 @@ export const TypeActive = {
 export const TypeAcknowledge = {
     name: 'Type: Acknowledge',
     render: () => sized(<Demo.Acknowledge />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const tracks = footerTracks(footer);
-        const gotIt = within(canvasElement).getByRole('button', { name: 'Got it' });
+        const gotIt = canvas.getByRole('button', { name: 'Got it' });
         const button = rect(gotIt);
         await expect(button.left, 'one button starts on track 3').toBeCloseTo(tracks.span(3, 4).left, 0);
         await expect(button.right, 'one button ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
@@ -562,11 +561,10 @@ export const TypeAcknowledge = {
 export const TypeSteps = {
     name: 'Type: Steps',
     render: () => sized(<Demo.Steps />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
-        const canvas = within(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const tracks = footerTracks(footer);
         await expect(canvasElement.querySelector('.plus-pattern-modal').offsetWidth, '10-col at 1024').toBeCloseTo(WIDTHS_AT_1024.lg, 0);
@@ -598,7 +596,7 @@ export const AnatomyActive = {
             <Demo.ActiveForm />
         </LiveAnatomy>
     ),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
@@ -610,7 +608,7 @@ export const AnatomyActive = {
         const modal = canvasElement.querySelector('.plus-pattern-modal');
         await expect(getComputedStyle(modal).paddingTop, 'pad 16 on every side').toBe(`${tokenLength(canvasElement, '--modal-pad-x-default')}px`);
         await expect(getComputedStyle(modal).borderTopLeftRadius, 'radius 16').toBe(`${tokenLength(canvasElement, '--modal-radius')}px`);
-        const student = within(canvasElement).getByLabelText(/Student/);
+        const student = canvas.getByLabelText(/Student/);
         await userEvent.clear(student);
         await userEvent.type(student, 'Ben Okafor');
         await expect(student).toHaveValue('Ben Okafor');
@@ -630,12 +628,12 @@ export const WidthStrip = {
             </div>
         </ScrollStage>
     ),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         fitsCanvas(canvasElement);
-        const modals = within(canvasElement).getAllByRole('dialog');
+        const modals = canvas.getAllByRole('dialog');
         for (const [i, width] of BLANKET_WIDTHS.entries()) {
             await expect(modals[i].offsetWidth, `${width} matches the grid at 1024`).toBeCloseTo(WIDTHS_AT_1024[width], 0);
         }
@@ -657,17 +655,19 @@ export const ResponsiveWidth = {
         width: { control: { type: 'range', min: 768, max: 1440, step: 8 }, description: 'The screen’s width, in px.', table: { category: 'Docs' } },
     },
     render: ({ width }) => (
-        <FitStage width={width}>
+        <ScrollStage width={width}>
             <Demo.ModalStage width="md" screenWidth={width} height={260} title="Session settings" footer={<Demo.TwoCells action="Save" />}>
                 <p style={{ margin: 0, font: 'var(--body-default)' }}>The Modal takes its width from the screen grid.</p>
             </Demo.ModalStage>
-        </FitStage>
+        </ScrollStage>
     ),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         fitsCanvas(canvasElement);
         const blanket = canvasElement.querySelector('.plus-pattern-blanket');
-        const modal = within(canvasElement).getByRole('dialog');
+        const modal = canvas.getByRole('dialog');
         const at = (screen) => {
             blanket.style.setProperty('--plus-overlay-screen', `${screen}px`);
             return modal.offsetWidth;
@@ -687,12 +687,12 @@ export const TierActive = { name: 'Tier: Active', render: () => sized(<Demo.Tier
 export const TierDanger = {
     name: 'Tier: Active with Danger',
     render: () => sized(<Demo.TierDanger />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const tracks = footerTracks(footer);
-        const safer = within(canvasElement).getByRole('button', { name: 'Archive instead' });
-        const danger = within(canvasElement).getByRole('button', { name: 'Delete note' });
+        const safer = canvas.getByRole('button', { name: 'Archive instead' });
+        const danger = canvas.getByRole('button', { name: 'Delete note' });
         await expect(safer, 'safer alternative is default secondary').toHaveClass('plus-btn--default');
         await expect(danger, 'the action takes the Danger appearance').toHaveClass('plus-btn--danger');
         await expect(rect(safer).left, 'safer alternative starts on track 1').toBeCloseTo(tracks.span(1, 2).left, 0);
@@ -706,9 +706,8 @@ export const TierDanger = {
 export const TierTypeName = {
     name: 'Tier: Danger, type the name',
     render: () => sized(<Demo.TierTypeName />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const canvas = within(canvasElement);
         await expect(canvas.getByRole('button', { name: 'Delete group' }), 'Danger waits for the name').toHaveAttribute('aria-disabled', 'true');
         await expect(canvas.getByText('Type Fractions group to enable Delete group.'), 'the caption carries the reason').toBeVisible();
         await userEvent.type(canvas.getByRole('textbox', { name: /Group name/ }), 'Fractions group');
@@ -844,19 +843,18 @@ export const KeyLongContent = {
 export const KeyLoading = {
     name: 'Key state: Loading',
     render: () => sized(<Demo.LoadingBody />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
         await expect(canvasElement.querySelector('.plus-pattern-modal-body .plus-skeleton'), 'the body shows its content’s own loading state').not.toBeNull();
-        await expect(within(canvasElement).getByRole('heading', { level: 1, name: 'Session history' }), 'the title stays real').toBeInTheDocument();
+        await expect(canvas.getByRole('heading', { level: 1, name: 'Session history' }), 'the title stays real').toBeInTheDocument();
     },
 };
 
 export const KeyConfirmInside = {
     name: 'Key state: Its confirm',
     render: () => sized(<Demo.ConfirmInside />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const canvas = within(canvasElement);
         await userEvent.click(canvas.getByRole('button', { name: 'Delete session' }));
         await expect(canvas.getAllByRole('dialog'), 'still one Modal').toHaveLength(1);
         await expect(canvas.getByRole('heading', { level: 1, name: 'Delete session?' }), 'the title swaps in place').toBeInTheDocument();
@@ -869,7 +867,7 @@ export const KeyConfirmInside = {
     },
 };
 
-const dialogNamed = (canvasElement, name) => within(canvasElement).queryByRole('dialog', { name });
+const dialogNamed = (canvas, name) => canvas.queryByRole('dialog', { name });
 
 /**
  * A confirm Modal over a Panel, drawn open: the Panel open, the confirm over it,
@@ -879,11 +877,10 @@ const dialogNamed = (canvasElement, name) => within(canvasElement).queryByRole('
 export const StackConfirmOverPanel = {
     name: 'Stacking: Confirm over a Panel',
     render: () => sized(<Demo.ConfirmOverPanel />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
         fitsCanvas(canvasElement);
-        const canvas = within(canvasElement);
-        await waitFor(() => expect(dialogNamed(canvasElement, 'Delete student?'), 'the confirm is open').not.toBeNull());
+        await waitFor(() => expect(dialogNamed(canvas, 'Delete student?'), 'the confirm is open').not.toBeNull());
         const blanket = canvasElement.querySelector('.plus-pattern-blanket');
         const panel = rect(canvasElement.querySelector('.plus-panel'));
         const cover = rect(blanket);
@@ -893,7 +890,7 @@ export const StackConfirmOverPanel = {
         await expect(cover.bottom, 'the confirm’s Blanket covers the Panel').toBeGreaterThanOrEqual(panel.bottom - 0.5);
         await expect(canvas.getByText('Ana Ruiz'), 'the Panel is open under the confirm').toBeInTheDocument();
         await userEvent.click(canvas.getByRole('button', { name: 'Archive instead' }));
-        await waitFor(() => expect(dialogNamed(canvasElement, 'Delete student?')).toBeNull());
+        await waitFor(() => expect(dialogNamed(canvas, 'Delete student?')).toBeNull());
         await expect(canvasElement.ownerDocument.activeElement, 'focus returns to the Panel').toBe(canvas.getByRole('button', { name: 'Delete student' }));
         await expect(canvas.getByText('Ana Ruiz'), 'the Panel is still open').toBeInTheDocument();
     },
@@ -906,10 +903,9 @@ export const StackConfirmOverPanel = {
 export const StackModalOnModalRefused = {
     name: 'Stacking: Confirm inside the Modal',
     render: () => sized(<Demo.ConfirmInside start="confirm" />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
         fitsCanvas(canvasElement);
-        const canvas = within(canvasElement);
         await expect(canvas.getAllByRole('dialog'), 'one Modal, one Blanket').toHaveLength(1);
         await expect(canvasElement.querySelector('.plus-section-message--warning, [class*="section-message"][class*="warning"]'), 'a warning SectionMessage in the body').not.toBeNull();
         await expect(canvas.getByRole('button', { name: 'Delete session' }), 'the action takes the Danger appearance').toHaveClass('plus-btn--danger');
@@ -931,8 +927,8 @@ const MotionOverlay = () => {
     const [open, setOpen] = useState(false);
     return <><Button text="Session details" onClick={() => setOpen(!open)} /><Blanket inline show={open}><PatternModal title="Session details" onClose={() => setOpen(false)}>Notes from the session</PatternModal></Blanket></>;
 };
-const overlayMotionPlay = (reduced = false) => async ({ canvasElement }) => {
-    const trigger = within(canvasElement).getByRole('button', { name: 'Session details' });
+const overlayMotionPlay = (reduced = false) => async ({ canvas, canvasElement }) => {
+    const trigger = canvas.getByRole('button', { name: 'Session details' });
     await userEvent.click(trigger);
     const surface = canvasElement.querySelector('.plus-pattern-modal');
     await expect(surface).not.toBeNull();
