@@ -18,6 +18,27 @@ const everyPaintIsAToken = (root) =>
     PAINTED.every((attr) => !el.hasAttribute(attr) || TOKEN_OR_NONE.test(el.getAttribute(attr))),
   );
 
+const effectiveOpacity = (el, svg) => {
+  let o = 1;
+  for (let n = el; n && n !== svg; n = n.parentElement) {
+    const v = n.getAttribute('opacity') ?? n.style.opacity;
+    if (v !== null && v !== '') o *= Number(v);
+  }
+  return o;
+};
+
+const paintedSubjects = (tile) => {
+  const svg = tile.querySelector('svg');
+  return [...svg.querySelectorAll('rect, path, circle, ellipse, line, polygon, polyline')].filter((el) => {
+    const fill = el.getAttribute('fill');
+    const stroke = el.getAttribute('stroke');
+    if ((!fill || fill === 'none') && (!stroke || stroke === 'none')) return false;
+    const box = el.getBBox();
+    if (!box.width && !box.height) return false;
+    return effectiveOpacity(el, svg) >= 0.5;
+  });
+};
+
 // A first pass is a hold, the arrows and the motion; at ¼× it is four times
 // that. One pass at 1× stays well inside this.
 export const PASS = { timeout: 15000, interval: 50 };
@@ -60,6 +81,8 @@ export const stillAtItsLanding = (demo) => async ({ canvasElement }) => {
   await waitFor(() => expect(root.dataset.phase).toBe('still'), PASS);
   landed(demo, canvasElement);
   for (const scene of demo.scenes) {
+    const tile = canvasElement.querySelector(`[data-tile="${scene.id}"]`);
+    await expect(paintedSubjects(tile).length).toBeGreaterThan(0);
     await expect(ghostless(scene.arrows)).toEqual([]);
   }
   await expect(everyPaintIsAToken(root)).toBe(true);

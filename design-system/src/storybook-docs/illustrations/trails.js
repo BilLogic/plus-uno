@@ -10,7 +10,7 @@
  */
 
 /** An arrow's points, whichever form it was written in. */
-export const pointsOf = (arrow) => (Array.isArray(arrow) ? arrow : arrow.points);
+export const pointsOf = (arrow) => (Array.isArray(arrow) ? arrow : arrow.points ?? []);
 
 /** An arrow's landing rectangle, if it declares one. */
 export const ghostOf = (arrow) => (Array.isArray(arrow) ? undefined : arrow.ghost);

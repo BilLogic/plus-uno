@@ -98,6 +98,10 @@ export const Rulings = {
   render: () => null,
   play: async () => {
     const scene = (demo, id) => demo.scenes.find((s) => s.id === id);
+    // Tree drill preserves the lit parent-to-child drill path at its landing so the reduced still differs from initial.
+    const treeDrill = scene(TRANSITION_TREES.drill, 'tree-drill');
+    await expect(treeDrill.landing).toMatchObject({ s: 0.35, r: 1, e: 1 });
+    await expect(treeDrill.landing).not.toEqual(expect.objectContaining({ s: treeDrill.initial.s, r: treeDrill.initial.r, e: treeDrill.initial.e }));
     // Drill grows and the list fades out with nothing dimmed; the record's content follows.
     await expect(scene(TRANSITION_DEMOS.drill, 'drill-grow').landing).toMatchObject({ g: 1, l: 0, c: 1 });
     // Back two levels fades; a focused task fades; page tabs slide with no fade.
