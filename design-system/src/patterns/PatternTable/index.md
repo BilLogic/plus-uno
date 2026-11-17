@@ -2,7 +2,7 @@
 
 # PatternTable
 
-Table pattern for PLUS design system. Table shell: table children (consumers pass their own thead/tbody), a footer slot under the rows, and an empty-state slot. The table has no toolbar of its own: the Section header above it carries the title, search, filters and actions. With `empty`, the header stays and the empty state takes the body as one message row spanning every column, so the columns still say what will appear. The table itself is no-fill (transparent): the surrounding card or surface provides the background, and row states are layered over each cell's fill rather than replacing it. - **Row states**: hovered and pressed rows take the neutral subtle steps; a row with `aria-selected="true"` (in a `role="grid"` table) takes the selected ladder across the whole row, with no stripe on its leading edge; the row's checkbox is the cue that does not rest on color. - **Sticky cells**: `stickyHeader` pins the head row and `stickyColumn` the first column. They paint the current surface, so they match the page or the card they sit in, and take the overflow shadow only while content is scrolled under them. `stickyHeader` pairs with `maxHeight`: only a bounded region scrolls vertically, so without `maxHeight` the header is not pinned. A bounded region, or one with a sticky column, takes keyboard focus so it can be scrolled without a pointer. Mirrors the "Table" slot component in the Figma design system file.
+Table pattern for PLUS design system. Table shell: table children (consumers pass their own thead/tbody), a footer slot under the rows, and an empty-state slot. The table has no toolbar of its own: the Section header above it carries the title, search, filters and actions. With `empty`, the empty state replaces the whole table (no column headers, no caption, no footer). The table itself is no-fill (transparent): the surrounding card or surface provides the background, and row states are layered over each cell's fill rather than replacing it. - **Row states**: hovered and pressed rows take the neutral subtle steps; a row with `aria-selected="true"` (in a `role="grid"` table) takes the selected ladder across the whole row, with no stripe on its leading edge; the row's checkbox is the cue that does not rest on color. - **Sticky cells**: `stickyHeader` pins the head row and `stickyColumn` the first column. They paint the current surface, so they match the page or the card they sit in, and take the overflow shadow only while content is scrolled under them. `stickyHeader` pairs with `maxHeight`: only a bounded region scrolls vertically, so without `maxHeight` the header is not pinned. A bounded region, or one with a sticky column, takes keyboard focus so it can be scrolled without a pointer. Mirrors the "Table" slot component in the Figma design system file.
 
 Also asked as: list of records, data table on a page, sortable list, records with filters.
 
@@ -22,7 +22,7 @@ Also asked as: list of records, data table on a page, sortable list, records wit
 
 ## Usage
 
-A table sits in a Section and spans it. Its first and last cells sit flush with the section edge. The Section header carries the toolbar and the tabs: search, filters and the record count use the toolbar type, and saved views use the tabs type. The bulk bar is never in the Section header: while rows are selected, a Dynamic table's head row becomes it, so the toolbar stays put. Empty, no results, loading and error states happen inside the table, under its header, so the Section header stays usable. Paging stays under the rows, inside the same Section.
+A table sits in a Section and spans it. Its first and last cells sit flush with the section edge. The Section header carries the toolbar and the tabs: search, filters and the record count use the toolbar type, and saved views use the tabs type. The bulk bar is never in the Section header: while rows are selected, a Dynamic table's head row becomes it, so the toolbar stays put. Empty and no results replace the whole table so the Section header stays usable; loading and error states happen inside the table, under its header. Paging stays under the rows, inside the same Section.
 
 ### Type guidance
 
@@ -80,7 +80,7 @@ Don't: A hierarchy faked with expandable rows: the classes and students lose the
 - Mark a selected row with `aria-selected="true"`. That attribute belongs to a row of a table with `role="grid"`.
 - Selection is never color alone. The row's checkbox is checked, and the head row says "2 selected".
 - A region that scrolls takes keyboard focus, so people can scroll it without a pointer. That covers a region with `maxHeight` and one with a sticky column.
-- The empty message is a row of the table, so assistive technology reads it with the columns it replaces.
+- When empty, the empty state replaces the table with no table roles left behind, and keeps the table's accessible name when one was provided.
 - Name the table through `tableProps`, such as `aria-label`, when no caption names it.
 
 ## Related
@@ -97,7 +97,7 @@ Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `Patt
 1. **Head row.** Names the columns. Its rule is the bold border.
 2. **Rows.** The data you pass as `tbody`. Each draws a thin rule, and there is no zebra striping.
 3. **Pagination** (optional). A slot under the rows, aligned to the end. It hides while the empty state shows.
-4. **Message row.** The `emptyState` slot, which replaces the rows when `empty` is true. It sits under the head row and spans every column.
+4. **Empty state.** The `emptyState` slot, which replaces the whole table (head row, caption and footer included) when `empty` is true.
 
 ### States
 
@@ -111,7 +111,7 @@ Row states are layered over each cell's fill, never swapped for it.
 | Focused | A scroll region takes keyboard focus and draws the `--ds-border-focused` ring. |
 | Disabled | A table has no disabled state. Disable the controls in a row. |
 | Selected | A row with `aria-selected="true"` takes `--ds-background-selected` across the whole row, with `-hovered` and `-pressed` steps and no stripe on its leading edge. |
-| Empty | The message row replaces the rows and takes no hover state. |
+| Empty | The empty state replaces the whole table; no head row or footer stays. |
 
 ### Tokens
 
@@ -120,8 +120,8 @@ Row states are layered over each cell's fill, never swapped for it.
 | `--ds-border`, `--border-width-default` | color, 1 | The rule under each row. |
 | `--ds-border-bold` | color | The rule under the head row. |
 | `--ds-text`, `--body-default` | 14/20 | Body cells. |
-| `--ds-text-subtle`, `--heading-xxs` | color, type | Head cells and the message row. |
-| `--table-pad-x-cell`, `--table-pad-y-cell`, `--stack-md` | length | Cell padding, the gap inside a cell, and the side pad (8) of the message row. |
+| `--ds-text-subtle`, `--heading-xxs` | color, type | Head cells and message rows. |
+| `--table-pad-x-cell`, `--table-pad-y-cell`, `--stack-md` | length | Cell padding, the gap inside a cell, and the side pad (8) of a message row. |
 | `--ds-background-neutral-subtle-hovered`, `-pressed` | color | A hovered and a pressed row. |
 | `--ds-background-selected`, `-hovered`, `-pressed` | color | A selected row. |
 | `--ds-shadow-overflow` | shadow | A sticky edge, only while content is scrolled under it. |
@@ -144,8 +144,8 @@ Row states are layered over each cell's fill, never swapped for it.
 |------|------|---------|-------------|
 | `id` | string | — | — |
 | `footer` | node | — | Footer slot under the rows (range, page-size Select, Pagination); hidden while the empty state shows |
-| `emptyState` | node | — | Empty-state slot: a message row under the head row, spanning every column, when `empty` is true |
-| `empty` | bool | `false` | Swap the body rows for the empty-state message row; the head row stays |
+| `emptyState` | node | — | Empty-state slot: replaces the entire table (no head row, caption, or footer) when `empty` is true |
+| `empty` | bool | `false` | Replace the table with the `emptyState` slot |
 | `stickyHeader` | bool | `false` | Pin the head row while the rows scroll under it; needs `maxHeight`, since only a bounded region scrolls vertically |
 | `stickyColumn` | bool | `false` | Pin the first column while the other columns scroll under it |
 | `maxHeight` | number or string | — | Bound the scroll region's height (number of px or any CSS length); a sticky header pins only within it |
