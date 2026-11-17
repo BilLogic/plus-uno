@@ -4,13 +4,13 @@ import { Frame, Rect, SkeletonBar } from './primitives.jsx';
 import { pair } from './motion.jsx';
 import { VIEW } from './motion-parts.jsx';
 import { drillScene } from './motion-transitions.jsx';
-import { travel } from './trails.js';
+import { crossings, travel } from './trails.js';
 
 /**
  * The Principles page's Do/Don't pairs (Foundations/Expression/Motion/Principles), one per principle. Each pair
- * is one scene with one rule broken, so the difference is the lesson, and the
- * arrows before the move are the same in both tiles. Blocked out in kit shapes,
- * no words.
+ * is one scene with one rule broken, so the difference is the lesson, and each
+ * tile draws the paths it is about to play before it moves. Blocked out in kit
+ * shapes, no words.
  */
 
 // ---------- Build understanding: a row grows into its record, or the record just replaces the list ----------
@@ -70,9 +70,9 @@ const save = ({ id, title, caption, shakes }) => ({
   title,
   caption,
   viewBox: VIEW,
-  initial: { o: 0, y: 1, x: 0 },
+  initial: { o: 0, y: -1, x: 0 },
   landing: { o: 1, y: 0, x: 0 },
-  arrows: [travel(MESSAGE, 0, 4)],
+  arrows: [travel(MESSAGE, 0, -4)],
   draw: ({ o, y, x }) => (
     <>
       <Frame x={8} y={6} w={144} h={88} chrome={false} />
@@ -109,35 +109,43 @@ const leadWithEmpathy = {
 
 const ROWS = [0, 1, 2, 3];
 const LIST_GROUP = { x: 16, y: 16, w: 110, h: 60 };
-const list = ({ id, title, caption, scatters }) => ({
-  id,
-  title,
-  caption,
-  viewBox: VIEW,
-  initial: { g: 0 },
-  landing: { g: 1 },
-  arrows: [travel(LIST_GROUP, 0, 8, { lane: { x: 136 } })],
-  draw: ({ g }) => (
-    <>
-      <Frame x={8} y={6} w={144} h={88} chrome={false} />
-      {ROWS.map((r) => {
-        const left = 1 - g;
-        // One group moves together; the scatter sends each row its own way.
-        const dx = scatters ? (r % 2 ? 1 : -1) * left * (24 + r * 6) : 0;
-        const dy = scatters ? 0 : left * 8;
-        return (
-          <g key={r} opacity={g} transform={`translate(${dx} ${dy})`}>
-            <SkeletonBar x={16} y={16 + r * 18} w={110 - r * 12} h={6} />
-          </g>
-        );
-      })}
-    </>
-  ),
-  play: async (ctx) => {
-    await ctx.hold(1);
-    await ctx.spring('g', 1, 'spatial.default');
-  },
-});
+const rowRect = (r) => ({ x: 16, y: 16 + r * 18, w: 110 - r * 12, h: 6 });
+const scatterDx = (r) => (r % 2 ? 1 : -1) * (24 + r * 6);
+const list = ({ id, title, caption, scatters }) => {
+  const arrows = scatters
+    ? ROWS.map((r) => travel(rowRect(r), scatterDx(r), 0))
+    : [travel(LIST_GROUP, 0, -4, { lane: { x: 136 } })];
+  return {
+    id,
+    title,
+    caption,
+    viewBox: VIEW,
+    ...(scatters && crossings(arrows).length > 0 ? { crossing: true } : {}),
+    initial: { g: 0 },
+    landing: { g: 1 },
+    arrows,
+    draw: ({ g }) => (
+      <>
+        <Frame x={8} y={6} w={144} h={88} chrome={false} />
+        {ROWS.map((r) => {
+          const left = 1 - g;
+          // One group moves together; the scatter sends each row its own way.
+          const dx = scatters ? scatterDx(r) * left : 0;
+          const dy = scatters ? 0 : -left * 4;
+          return (
+            <g key={r} opacity={g} transform={`translate(${dx} ${dy})`}>
+              <SkeletonBar {...rowRect(r)} />
+            </g>
+          );
+        })}
+      </>
+    ),
+    play: async (ctx) => {
+      await ctx.hold(1);
+      await ctx.spring('g', 1, 'spatial.default');
+    },
+  };
+};
 
 const cutTheNoise = {
   title: 'Cut the noise',

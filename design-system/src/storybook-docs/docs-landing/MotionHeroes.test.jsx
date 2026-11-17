@@ -77,6 +77,15 @@ describe('Motion heroes', () => {
         expect(c.querySelectorAll('foreignObject')).toHaveLength(4);
     });
 
+    it('Principles first card settles downward into a dashed landing slot, never rising', () => {
+        const c = draw('foundations-expression-motion-principles');
+        const path = c.querySelector('[data-shape="path"]');
+        const ghost = path?.querySelector('[data-ghost]');
+        const start = path?.querySelector('circle');
+        expect(ghost).not.toBeNull();
+        expect(+start.getAttribute('cy')).toBeLessThan(+ghost.getAttribute('y'));
+    });
+
     it('Playground draws one target line, the spring trail\'s own', () => {
         expect(draw('foundations-expression-motion-playground').querySelectorAll('line[stroke-dasharray]')).toHaveLength(1);
     });

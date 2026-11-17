@@ -38,14 +38,14 @@ const FADE_MS = EXIT_FADE_MS;
 
 // Three parts of one screen, each landing in its place. Every part's start is
 // offset from its landing; `UNIFIED` offsets are one and the same (so all three
-// rise up and to the left together, side by side), `SCATTERED` ones each point
+// travel from the right together, side by side), `SCATTERED` ones each point
 // their own way. Three parts and short moves keep the pair calm enough to read.
 const PARTS = [
   { rect: { x: 16, y: 18, w: 52, h: 36 }, card: true },
   { rect: { x: 76, y: 22, w: 44, h: 6 }, heading: true },
   { rect: { x: 16, y: 64, w: 128, h: 14 }, row: true },
 ];
-const UNIFIED = [[16, 10], [16, 10], [16, 10]];
+const UNIFIED = [[16, 0], [16, 0], [16, 0]];
 const SCATTERED = [[44, 0], [-40, 30], [30, -40]];
 
 const unifyScene = ({ id, title, caption, offsets, crossing }) => ({
@@ -78,7 +78,7 @@ const unifyScene = ({ id, title, caption, offsets, crossing }) => ({
 const unify = unifyScene({
   id: 'direction-unify',
   title: 'Every part heads the same way',
-  caption: 'Three parts, each from where it is to where it lands, all up and to the left: none crosses another.',
+  caption: 'Three parts, each from where it is to where it lands, all from the right: none crosses another.',
   offsets: UNIFIED,
 });
 const scatter = unifyScene({

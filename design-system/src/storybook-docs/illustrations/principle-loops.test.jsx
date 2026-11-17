@@ -65,4 +65,12 @@ describe('Motion principles', () => {
         expect(css).toMatch(/animation-timing-function:\s*var\(--ds-motion-/);
         expect(css).not.toMatch(/\d(ms|s)\b/);
     });
+
+    it('gives the Simplicity loop bars one shared, non-rising entry', () => {
+        const nthBlocks = [...css.matchAll(/\[data-loop='simplicity'\]\s*\.loop-group\s*>\s*i:nth-child\(\d+\)\s*\{([^}]*)\}/g)];
+        expect(nthBlocks).toHaveLength(4);
+        for (const [, body] of nthBlocks) expect(body).not.toContain('--from');
+        const itemRule = css.match(/\[data-loop='simplicity'\]\s*\.loop-group\s*>\s*i\s*\{([^}]*)\}/)?.[1] ?? '';
+        expect(itemRule).toMatch(/--from:\s*0\s+calc\(var\(--space-050\)\s*\*\s*-1\)/);
+    });
 });
