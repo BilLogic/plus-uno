@@ -3,9 +3,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { expectTypeCardAnchors } from '@/storybook-docs/lib/type-card-anchors.jsx';
+import { BreadcrumbCase } from './NavigationCases.jsx';
 import {
-    BreadcrumbOnAreaCase,
-    BreadcrumbOnRecordCase,
     OpenItemsDont,
     OpenItemsPicture,
 } from './navigationDemo.jsx';
@@ -13,16 +12,21 @@ import {
 vi.mock('@storybook/addon-docs/blocks', () => import('@/storybook-docs/lib/addon-docs-blocks-mock.jsx'));
 
 describe('Navigation live cases and links', () => {
-    it('BreadcrumbOnRecordCase and BreadcrumbOnAreaCase render non-inert live PageHeader breadcrumbs', () => {
-        const { container, unmount } = render(<BreadcrumbOnRecordCase />);
+    it('BreadcrumbCase renders Maya Rodriguez sessions only on record pages and area breadcrumbs without inert', () => {
+        const { container, unmount } = render(<BreadcrumbCase record />);
         expect(container.querySelector('[inert], [aria-hidden="true"] [role="navigation"]')).toBeNull();
         const recordNav = screen.getByRole('navigation', { name: 'Record page breadcrumb' });
         expect(recordNav).toBeInTheDocument();
         expect(screen.getByRole('link', { name: 'Students' })).toBeInTheDocument();
         expect(screen.getByRole('heading', { name: 'Maya Rodriguez' })).toBeInTheDocument();
+        expect(screen.getByRole('cell', { name: 'Algebra' })).toBeInTheDocument();
+        expect(screen.getByRole('cell', { name: 'Fractions' })).toBeInTheDocument();
+        expect(screen.getByRole('cell', { name: 'Linear equations' })).toBeInTheDocument();
+        expect(screen.queryByRole('cell', { name: 'Geometry' })).toBeNull();
+        expect(screen.queryByRole('cell', { name: 'Mr. Patel' })).toBeNull();
         unmount();
 
-        render(<BreadcrumbOnAreaCase />);
+        render(<BreadcrumbCase record={false} />);
         const areaNav = screen.getByRole('navigation', { name: 'Area page breadcrumb' });
         expect(areaNav).toBeInTheDocument();
         expect(screen.getByRole('link', { name: 'Home' })).toBeInTheDocument();

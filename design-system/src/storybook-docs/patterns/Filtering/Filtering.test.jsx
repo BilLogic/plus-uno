@@ -10,7 +10,7 @@ import {
     OneTierCase,
     TagRowCase,
     TwoTiersCase,
-} from './filteringDemo.jsx';
+} from './FilteringCases.jsx';
 
 vi.mock('@storybook/addon-docs/blocks', () => import('@/storybook-docs/lib/addon-docs-blocks-mock.jsx'));
 
@@ -31,10 +31,11 @@ describe('Filtering live cases and links', () => {
 
         render(<TwoTiersCase />);
         expect(screen.getByRole('button', { name: /Grade/ })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Filters' })).toBeInTheDocument();
+        await user.click(screen.getByRole('button', { name: 'Filters' }));
+        expect(await screen.findByRole('checkbox', { name: 'Math' })).toBeInTheDocument();
     });
 
-    it('FiltersAtEndCase and FiltersAmongViewsCase render live view tabs and filters', async () => {
+    it('FiltersAtEndCase and FiltersAmongViewsCase render live view tabs, ViewBar slots, and SearchField', async () => {
         const user = userEvent.setup();
         const { unmount } = render(<FiltersAtEndCase />);
         const followUp = screen.getByRole('tab', { name: 'Needs follow-up' });
@@ -42,12 +43,19 @@ describe('Filtering live cases and links', () => {
         expect(followUp).toHaveAttribute('aria-selected', 'true');
         unmount();
 
-        render(<FiltersAmongViewsCase />);
+        const { container } = render(<FiltersAmongViewsCase />);
+        expect(container.querySelector('.plus-section-view-bar')).not.toBeNull();
         expect(screen.getByRole('tab', { name: 'All students' })).toHaveAttribute('aria-selected', 'true');
         expect(screen.getByRole('button', { name: 'Grade' })).toBeInTheDocument();
+
+        await user.click(screen.getByRole('button', { name: 'Search students' }));
+        const searchbox = await screen.findByRole('searchbox', { name: 'Search students' });
+        await user.type(searchbox, 'Sofia');
+        expect(screen.getByText('Sofia Ramirez')).toBeInTheDocument();
+        expect(screen.queryByText('Ava Thompson')).toBeNull();
     });
 
-    it('CountOnIconCase and TagRowCase render live count vs removable tag row', async () => {
+    it('CountOnIconCase and TagRowCase render live count vs removable tag row with live FilterMenu', async () => {
         const user = userEvent.setup();
         const { unmount } = render(<CountOnIconCase />);
         expect(screen.getByRole('button', { name: 'Filters, 2 applied' })).toBeInTheDocument();
@@ -59,6 +67,9 @@ describe('Filtering live cases and links', () => {
         expect(within(list).getByText('Grade 7')).toBeInTheDocument();
         await user.click(screen.getByRole('button', { name: /Remove.*Grade 7/i }));
         expect(within(list).queryByText('Grade 7')).toBeNull();
+
+        await user.click(screen.getByRole('button', { name: 'Filters' }));
+        expect(await screen.findByRole('checkbox', { name: 'Grade 7' })).toBeInTheDocument();
     });
 
     it('links every TypeCard anchor to a unique ComponentExample heading id in Filtering.mdx', () => {

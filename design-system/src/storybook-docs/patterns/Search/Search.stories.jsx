@@ -37,7 +37,30 @@ export const TypeActive = {
     play: async ({ canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
+        const canvas = within(canvasElement);
         await expect(bodyRows(canvasElement).length, 'the rows narrowed in place').toBe(2);
+        await expect(status(canvas).textContent).toBe('2 of 6 students');
+
+        await userEvent.click(canvas.getByRole('button', { name: 'Clear search' }));
+        await waitFor(() => expect(bodyRows(canvasElement).length).toBe(6));
+        await userEvent.click(field(canvas));
+        await userEvent.keyboard('ia');
+        await waitFor(() => expect(field(canvas)).toHaveValue('ia'));
+        await waitFor(() => expect(bodyRows(canvasElement).length).toBe(2));
+        await expect(status(canvas).textContent).toBe('2 of 6 students');
+
+        await userEvent.clear(field(canvas));
+        await userEvent.keyboard('Zoe');
+        await waitFor(() => expect(field(canvas)).toHaveValue('Zoe'));
+        await waitFor(() => expect(bodyRows(canvasElement).length).toBe(0));
+        await expect(status(canvas).textContent).toBe('0 of 6 students');
+
+        await userEvent.click(canvas.getByRole('button', { name: 'Reset filters' }));
+        await waitFor(() => expect(bodyRows(canvasElement).length).toBe(6));
+        await userEvent.click(field(canvas));
+        await userEvent.keyboard('ia');
+        await waitFor(() => expect(field(canvas)).toHaveValue('ia'));
+        await waitFor(() => expect(bodyRows(canvasElement).length).toBe(2));
         await fitsCanvas(canvasElement);
     },
 };
@@ -69,9 +92,19 @@ export const TypeBasic = {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         const canvas = within(canvasElement);
-        await expect(field(canvas).value).toBe('Ava');
+        const input = field(canvas);
+        await expect(input.value).toBe('Ava');
+        await expect(canvas.getByText('For \u201CAva\u201D')).toBeInTheDocument();
         await expect(canvasElement.querySelector('[aria-busy="true"]'), 'the results page waits under the bar').toBeTruthy();
         await expect(canvasElement.querySelector('[role="listbox"]'), 'no panel in basic').toBeNull();
+
+        await userEvent.clear(input);
+        await userEvent.type(input, 'Maya{Enter}');
+        await expect(canvas.getByText('For \u201CMaya\u201D')).toBeInTheDocument();
+
+        await userEvent.clear(input);
+        await userEvent.type(input, 'Ava{Enter}');
+        await expect(canvas.getByText('For \u201CAva\u201D')).toBeInTheDocument();
         await fitsCanvas(canvasElement);
     },
 };
@@ -120,6 +153,29 @@ export const Narrowing = {
         await expect(field(canvas).value).toBe('ia');
         await expect(status(canvas).textContent, 'the count in words, in the results header').toBe('2 of 6 students');
         await expect(bodyRows(canvasElement).length).toBe(2);
+
+        await userEvent.click(canvas.getByRole('button', { name: 'Clear search' }));
+        await waitFor(() => expect(bodyRows(canvasElement).length).toBe(6));
+        await expect(status(canvas).textContent).toBe('6 students');
+
+        await userEvent.click(field(canvas));
+        await userEvent.keyboard('ia');
+        await waitFor(() => expect(field(canvas)).toHaveValue('ia'));
+        await waitFor(() => expect(bodyRows(canvasElement).length).toBe(2));
+        await expect(status(canvas).textContent).toBe('2 of 6 students');
+
+        await userEvent.clear(field(canvas));
+        await userEvent.keyboard('Zoe');
+        await waitFor(() => expect(field(canvas)).toHaveValue('Zoe'));
+        await waitFor(() => expect(bodyRows(canvasElement).length).toBe(0));
+        await expect(status(canvas).textContent).toBe('0 of 6 students');
+
+        await userEvent.click(canvas.getByRole('button', { name: 'Reset filters' }));
+        await waitFor(() => expect(bodyRows(canvasElement).length).toBe(6));
+        await userEvent.click(field(canvas));
+        await userEvent.keyboard('ia');
+        await waitFor(() => expect(field(canvas)).toHaveValue('ia'));
+        await waitFor(() => expect(bodyRows(canvasElement).length).toBe(2));
         await expect(canvas.getByRole('button', { name: 'Clear search' })).toBeTruthy();
         await fitsCanvas(canvasElement);
     },

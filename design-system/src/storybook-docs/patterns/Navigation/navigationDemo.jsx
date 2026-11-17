@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 
-import { Breadcrumb, PageHeader } from '@/components';
-import { HeadingLevelContext } from '@/lib/headingLevel';
 import { Page, PatternSection } from '@/patterns';
 import {
     CardsSection,
@@ -12,7 +10,6 @@ import {
     SessionsTable,
     STUDENT_SESSION_CARDS,
 } from '../../../patterns/Page/pageDemo.jsx';
-import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { RECORD_CRUMBS } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { StudentsTable, ViewBar } from '@/storybook-docs/lib/view-bar.jsx';
@@ -33,8 +30,6 @@ import { NamesDo, TabLabelDo, TabLabelDont } from '../../../patterns/Sidebar/Sid
  *   DrillPicture             the record page after a drill-in, breadcrumb above the title
  *   AreaPagePicture          an area page: no breadcrumb
  *   TabsUnderPicture         page tabs with the Section's views as one PopupSelect
- *   BreadcrumbOnRecordCase   live Do example: breadcrumb above a record's title
- *   BreadcrumbOnAreaCase     live Don't example: breadcrumb on an area page
  */
 
 /** The width a picture lays out at, in px: docs geometry. */
@@ -148,63 +143,3 @@ export const TabsUnderPicture = () => {
         </BrowserWindow>
     );
 };
-
-/** Live Do: a breadcrumb above the record page's title, parents only. */
-export const BreadcrumbOnRecordCase = () => (
-    <CaseSurface border="none" padding="none" surface={false}>
-        <HeadingLevelContext.Provider value={5}>
-            <Page
-                padding="md"
-                header={(
-                    <PageHeader
-                        title="Maya Rodriguez"
-                        titleAs="h4"
-                        breadcrumbs={(
-                            <Breadcrumb
-                                label="Record page breadcrumb"
-                                items={[
-                                    { text: 'Students', href: '#students', onClick: () => {} },
-                                    { text: 'Maya Rodriguez' },
-                                ]}
-                            />
-                        )}
-                    />
-                )}
-            >
-                <PatternSection title="Sessions">
-                    <SessionsTable />
-                </PatternSection>
-            </Page>
-        </HeadingLevelContext.Provider>
-    </CaseSurface>
-);
-
-/** Live Don't: a breadcrumb on an area page, where there is nothing to climb out of. */
-export const BreadcrumbOnAreaCase = () => (
-    <CaseSurface border="none" padding="none" surface={false}>
-        <HeadingLevelContext.Provider value={5}>
-            <Page
-                padding="md"
-                header={(
-                    <PageHeader
-                        title="Students"
-                        titleAs="h4"
-                        breadcrumbs={(
-                            <Breadcrumb
-                                label="Area page breadcrumb"
-                                items={[
-                                    { text: 'Home', href: '#home', onClick: () => {} },
-                                    { text: 'Students' },
-                                ]}
-                            />
-                        )}
-                    />
-                )}
-            >
-                <PatternSection title="Students" type="tabs-only">
-                    <StudentsTable count={3} />
-                </PatternSection>
-            </Page>
-        </HeadingLevelContext.Provider>
-    </CaseSurface>
-);

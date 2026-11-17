@@ -43,8 +43,8 @@ Three modes share one field. Choose by the amount of data and the cost of search
 
 <TypeGrid>
 <TypeCard of={SearchStories.TypeActive} to="#narrowing" title="Active" stage={STAGE} thumbRatio="2 / 1">Small or on-screen data. The rows narrow in place as the person types.</TypeCard>
-<TypeCard of={SearchStories.TypeFocused} to="#focused" title="Focused" stage={STAGE} thumbRatio="2 / 1">A person's own work, found from the page they are on. A panel under the field lists recent searches, then matches grouped by type, and widens with "See all results".</TypeCard>
-<TypeCard of={SearchStories.TypeBasic} to="#basic" title="Basic" stage={STAGE} thumbRatio="2 / 1">Large or costly data. Nothing runs while typing; Enter takes the person to a results page.</TypeCard>
+<TypeCard of={SearchStories.TypeFocused} to="#focused-search" title="Focused" stage={STAGE} thumbRatio="2 / 1">A person's own work, found from the page they are on. A panel under the field lists recent searches, then matches grouped by type, and widens with "See all results".</TypeCard>
+<TypeCard of={SearchStories.TypeBasic} to="#basic-search" title="Basic" stage={STAGE} thumbRatio="2 / 1">Large or costly data. Nothing runs while typing; Enter takes the person to a results page.</TypeCard>
 </TypeGrid>
 
 </div>
@@ -71,8 +71,6 @@ The field sits in the Section's view bar, compact, and collapses to an icon unti
 
 Focus in the field opens the panel. With no text it lists recent searches; while typing it lists matches grouped by type, then a last "See all results" row that runs a basic search. An optional action row, such as "Add student", closes the panel.
 
-<ComponentExample of={SearchStories.TypeFocused} title="Focused" description="The field in a page header with its panel open under it, grouped matches and &quot;See all results&quot;." />
-
 <DocsInteractivePlayground of={SearchStories.FocusedPanel} description="Switch the text: empty lists recent searches, &quot;a&quot; lists grouped results, &quot;zzz&quot; leaves only See all." />
 
 </div>
@@ -83,7 +81,7 @@ Focus in the field opens the panel. With no text it lists recent searches; while
 
 The field alone. Typing runs nothing; Enter runs the search and a results page takes over. That page is its own template, outside this pattern.
 
-<ComponentExample of={SearchStories.BasicField} title="Basic" description="No panel and no per-keystroke work." />
+<ComponentExample of={SearchStories.BasicField} description="No panel and no per-keystroke work." />
 
 </div>
 

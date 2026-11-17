@@ -140,11 +140,13 @@ export const TierDrill = {
         await expectFullScale(canvasElement);
         const canvas = within(canvasElement);
         const nav = canvas.getByRole('navigation', { name: 'Breadcrumb' });
+        const parentLink = within(nav).getByRole('link', { name: 'Students' });
         await expect(within(nav).getAllByRole('link').map((a) => a.textContent), 'parents only, each a link').toEqual(['Students']);
         await expect(nav.querySelector('[aria-current="page"]'), 'the record is plain text, the current page').toHaveTextContent('Maya Rodriguez');
-        const share = canvas.getByRole('button', { name: 'Share' });
-        share.focus();
-        await expect(share).toHaveFocus();
+        await userEvent.tab();
+        await expect(parentLink).toHaveFocus();
+        await userEvent.tab();
+        await expect(canvas.getByRole('button', { name: 'Share' })).toHaveFocus();
         await fitsCanvas(canvasElement);
     },
 };

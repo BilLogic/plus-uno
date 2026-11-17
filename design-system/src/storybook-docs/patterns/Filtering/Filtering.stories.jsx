@@ -317,6 +317,19 @@ export const UnderPageTabs = {
         await expect(rect(p.filterIcon()).left, 'the filters stay at the end').toBeGreaterThan(rect(picker).right);
         await expectHungFrom(canvasElement, picker, 'start');
 
+        await expect(p.status()).toHaveTextContent('3 of 8 students');
+        await expect(p.canvas.getByRole('cell', { name: 'Ava Thompson' })).toBeInTheDocument();
+        await userEvent.click(within(p.popup()).getByRole('option', { name: 'Needs follow-up' }));
+        await expect(p.canvas.getByRole('button', { name: 'View: Needs follow-up' })).toBeInTheDocument();
+        await expect(p.status()).toHaveTextContent('1 of 8 students');
+        await expect(p.canvas.queryByRole('cell', { name: 'Ava Thompson' })).toBeNull();
+        await expect(p.canvas.getByRole('cell', { name: 'Sofia Ramirez' })).toBeInTheDocument();
+
+        await userEvent.click(p.canvas.getByRole('button', { name: 'View: Needs follow-up' }));
+        await waitFor(() => expect(p.popup()).not.toBeNull());
+        await userEvent.click(within(p.popup()).getByRole('option', { name: 'All students' }));
+        await expect(p.status()).toHaveTextContent('3 of 8 students');
+
         await userEvent.click(p.canvas.getByRole('tab', { name: 'Overview' }));
         await expect(p.canvas.getByRole('heading', { name: 'Lincoln Middle' })).toBeInTheDocument();
 

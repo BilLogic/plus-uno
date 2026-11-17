@@ -4,9 +4,8 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as NavigationStories from './Navigation.stories.jsx';
+import { BreadcrumbCase } from './NavigationCases.jsx';
 import {
-    BreadcrumbOnAreaCase,
-    BreadcrumbOnRecordCase,
     OpenItemsDont,
     OpenItemsPicture,
     SIDEBAR_STAGE,
@@ -55,13 +54,13 @@ Four tiers, from the whole app down to one record. A quick look is a layer, not 
 <TypeCard of={NavigationStories.TierDrill} to="#3-drill-in-and-climb-out" title="3 · Drill in and climb out" stage={STAGE}>A record page with a breadcrumb: the record's place, parents only. Climb out through the breadcrumb.</TypeCard>
 </TypeGrid>
 
-<ComponentExample of={NavigationStories.TierAreas} title="1 · Areas" description="Go to: the Sidebar's fixed items. The selected row takes the selected fill and marks aria-current=&quot;page&quot;." />
+<ComponentExample of={NavigationStories.TierAreas} title="1 · Areas" description="Clicking an area item moves the selected fill and marks the current page." />
 
-<ComponentExample of={NavigationStories.TierOpenItems} title="1b · Open items" description="Records opened earlier appear as temporary items under their area, named by time and teacher. Click to go to or close." />
+<ComponentExample of={NavigationStories.TierOpenItems} title="1b · Open items" description="Temporary session items under Sessions, named by time and teacher; click to open or dismiss with the close button." />
 
 <ComponentExample of={NavigationStories.TierViews} title="2 · Views" description="Pill views in a Section's view bar swap content in place as you switch tabs." />
 
-<ComponentExample of={NavigationStories.TierDrill} title="3 · Drill in and climb out" description="A record page with a breadcrumb above the title, parents only. Climb out through the parent links." />
+<ComponentExample of={NavigationStories.TierDrill} title="3 · Drill in and climb out" description="Maya Rodriguez's record page with a Students link in the breadcrumb above the title." />
 
 </div>
 
@@ -155,9 +154,9 @@ Least room to most. Pick the lowest step that fits. The picture is on <a target=
 Never on an area page or a focused task. It sits above the title in the page header and shows the record's place: parents only, never history. It never wraps. Folding five or more items into "…" is Planned <PlannedTag />.
 
 <DoDontPair
-    doExample={<BreadcrumbOnRecordCase />}
+    doExample={<BreadcrumbCase record />}
     doCaption="A breadcrumb on the record page, parents only."
-    dontExample={<BreadcrumbOnAreaCase />}
+    dontExample={<BreadcrumbCase record={false} />}
     dontCaption="A breadcrumb on an area page: there is nothing to climb out of."
 />
 

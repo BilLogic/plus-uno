@@ -8,10 +8,10 @@ import {
     FiltersAmongViewsCase,
     FiltersAtEndCase,
     OneTierCase,
-    STAGE,
     TagRowCase,
     TwoTiersCase,
-} from './filteringDemo.jsx';
+} from './FilteringCases.jsx';
+import { STAGE } from './filteringDemo.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
@@ -56,15 +56,15 @@ Choose a tier by the number of categories and the length of their lists. See Bes
 <TypeCard of={FilteringStories.TierFilterSide} to="#3-filter-side" title="3 · Filter side" stage={STAGE}>Filtering is the main job: a side at the Section's start, "Reset filters" at its top and a count beside each category.</TypeCard>
 </TypeGrid>
 
-<ComponentExample of={FilteringStories.TierQuickFilters} title="1 · Quick filters" description="One to three categories, each a short list: a FilterButton per category at the bar's end, applied as you pick." />
+<ComponentExample of={FilteringStories.TierQuickFilters} title="1 · Quick filters" description="Each category sits at the bar's end as a FilterButton; picking a value narrows the rows at once and marks the button." />
 
-<ComponentExample of={FilteringStories.TierOneList} title="2a · Menu, one category" description="One category behind the Filter icon, applied as you pick with no footer." />
+<ComponentExample of={FilteringStories.TierOneList} title="2a · Menu, one category" description="Clicking the Filter icon opens a single radio list that updates the table as soon as a choice is picked." />
 
-<ComponentExample of={FilteringStories.TierSideBySide} title="2b · Menu, side by side" description="Two or three short categories in columns behind the Filter icon, with Reset and Apply full bleed." />
+<ComponentExample of={FilteringStories.TierSideBySide} title="2b · Menu, side by side" description="Tick boxes across two or three columns; nothing changes until Apply is pressed, and Reset clears draft ticks." />
 
-<ComponentExample of={FilteringStories.TierStacked} title="2c · Menu, stacked" description="Four or more categories, or long lists, stacked behind the Filter icon with Reset and Apply full bleed." />
+<ComponentExample of={FilteringStories.TierStacked} title="2c · Menu, stacked" description="Four categories stack one above another in a scrolling menu with Reset and Apply pinned at the bottom." />
 
-<ComponentExample of={FilteringStories.TierFilterSide} title="3 · Filter side" description="Filtering is the main job: a side at the Section's start with Reset filters at the top and a count beside each category." />
+<ComponentExample of={FilteringStories.TierFilterSide} title="3 · Filter side" description="A persistent filter rail beside the table with live counts per legend and Reset filters at the top." />
 
 </div>
 
