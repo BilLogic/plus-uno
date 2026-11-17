@@ -3,6 +3,8 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
+import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import {
     ClippedCell,
     FOLD_STAGE,
@@ -37,7 +39,8 @@ export default {
 };
 
 const rect = (el) => el.getBoundingClientRect();
-const staged = (story, width) => <FitStage width={width}>{story}</FitStage>;
+const bodyOf = (canvasElement) => within(canvasElement.ownerDocument.body);
+const staged = (story, width) => <FitStage width={width} scrollable>{story}</FitStage>;
 
 /** True while an element's text is cut: its content is wider than its box. */
 const isClipped = (el) => el.scrollWidth > el.clientWidth;
@@ -54,8 +57,9 @@ const textOf = (root, label) => {
 export const WrapTitlesAndErrors = {
     name: 'Wrap: titles and messages',
     render: () => staged(<Wrap />, NARROW),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const title = canvas.getByRole('heading', { name: LONG_TITLE });
         const error = canvas.getByText(LONG_ERROR);
         for (const [name, el] of [['title', title], ['error', error]]) {
@@ -76,7 +80,9 @@ export const TruncatedCell = {
     name: 'Truncate: a cell',
     render: () => staged(<ClippedCell held />, TABLE_STAGE),
     play: async ({ canvasElement }) => {
-        await waitFor(() => expect(within(document.body).getAllByRole('tooltip').some((tip) => tip.textContent === LONG_NOTE), 'the picture shows the full note in its Tooltip').toBe(true));
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        await waitFor(() => expect(bodyOf(canvasElement).getAllByRole('tooltip').some((tip) => tip.textContent === LONG_NOTE), 'the picture shows the full note in its Tooltip').toBe(true));
         const clipped = textOf(canvasElement, LONG_NOTE);
         await expect(getComputedStyle(clipped).textOverflow, 'the cell ends in an ellipsis').toBe('ellipsis');
         await expect(getComputedStyle(clipped).whiteSpace, 'on one line').toBe('nowrap');
@@ -87,6 +93,7 @@ export const TruncatedCell = {
         await expect(isClipped(fits), 'a short note is not cut').toBe(false);
         await expect(fits.getAttribute('tabindex'), 'an unclipped cell is not a tab stop').toBeNull();
         await fitsCanvas(canvasElement);
+        await settleAnimations(canvasElement);
     },
 };
 
@@ -95,11 +102,14 @@ export const TruncatedCellTooltip = {
     name: 'Test: a clipped cell opens its text',
     render: () => staged(<ClippedCell />, TABLE_STAGE),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const clipped = textOf(canvasElement, LONG_NOTE);
         await expect(clipped.textContent, 'the full text is always in the DOM').toBe(LONG_NOTE);
         const stop = clipped.getAttribute('tabindex') !== null ? clipped : clipped.closest('[tabindex="0"]');
         stop.focus();
-        await waitFor(() => expect(within(document.body).getAllByRole('tooltip').some((tip) => tip.textContent === LONG_NOTE), 'the Tooltip opens on focus').toBe(true));
+        await waitFor(() => expect(bodyOf(canvasElement).getAllByRole('tooltip').some((tip) => tip.textContent === LONG_NOTE), 'the Tooltip opens on focus').toBe(true));
+        await settleAnimations(canvasElement);
     },
 };
 
@@ -108,13 +118,15 @@ export const UnclippedCellNoTooltip = {
     name: 'Test: an unclipped cell has no Tooltip',
     render: () => staged(<ClippedCell note="Starts with number lines" />, TABLE_STAGE),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const short = textOf(canvasElement, 'Starts with number lines');
         await expect(isClipped(short)).toBe(false);
         await expect(short.getAttribute('tabindex'), 'not a tab stop').toBeNull();
         await expect(short.closest('[title]'), 'no title attribute either').toBeNull();
         await userEvent.hover(short);
         await new Promise((resolve) => setTimeout(resolve, 400));
-        await expect(within(document.body).queryAllByRole('tooltip').some((tip) => tip.textContent === 'Starts with number lines'), 'no Tooltip for a value that fits').toBe(false);
+        await expect(bodyOf(canvasElement).queryAllByRole('tooltip').some((tip) => tip.textContent === 'Starts with number lines'), 'no Tooltip for a value that fits').toBe(false);
     },
 };
 
@@ -123,6 +135,8 @@ export const TruncatedTags = {
     name: 'Truncate: a Tag and a StatusTag',
     render: () => staged(<LongTags />, NARROW),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const tag = textOf(canvasElement, LONG_TAG);
         const status = textOf(canvasElement, LONG_STATUS);
         await expect(isClipped(tag), 'the Tag is clipped').toBe(true);
@@ -141,8 +155,10 @@ export const TruncatedTags = {
 export const FoldedTagGroup = {
     name: 'Fold: a TagGroup',
     render: () => staged(<FoldedTags />, FOLD_STAGE),
-    play: async ({ canvasElement }) => {
-        const list = within(canvasElement).getByRole('list', { name: 'Subjects' });
+    play: async ({ canvas, canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        const list = canvas.getByRole('list', { name: 'Subjects' });
         const fold = () => within(list).queryByRole('button', { name: /more tags?$/ });
         // A tag on the row, not a measuring copy and not one hidden past the edge.
         const shown = () => SUBJECTS.flatMap((subject) => within(list).queryAllByText(subject)
@@ -152,6 +168,11 @@ export const FoldedTagGroup = {
         await expect(shown().length + Number(fold().textContent.slice(1)), 'shown plus folded is every tag').toBe(SUBJECTS.length);
         await expect(new Set(shown().map((el) => Math.round(rect(el).top))).size, 'one line').toBe(1);
         await fitsCanvas(canvasElement);
+
+        await userEvent.click(fold());
+        await expect(await canvas.findByRole('menuitem', { name: 'History' })).toBeVisible();
+        await userEvent.keyboard('{Escape}');
+        await settleAnimations(canvasElement);
     },
 };
 
@@ -161,12 +182,19 @@ export const FoldedTagGroup = {
 export const PagedInFooter = {
     name: 'Page: a table',
     render: () => staged(<PagedTable />, TABLE_STAGE),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const footer = canvasElement.querySelector('.plus-pattern-section-footer');
         const pager = within(footer).getByRole('navigation', { name: 'Page navigation' });
         await expect(rect(pager).right, 'the pager sits at the end of the footer').toBeCloseTo(rect(footer).right, -1);
         await expect(canvas.getAllByRole('row').length, 'the rows stay at one page').toBe(5);
+        await expect(canvas.getByText('Ava Thompson')).toBeVisible();
         await fitsCanvas(canvasElement);
+
+        await userEvent.click(within(pager).getByRole('button', { name: 'Page 2' }));
+        await expect(within(pager).getByRole('button', { name: 'Page 2' })).toHaveAttribute('aria-current', 'page');
+        await expect(canvas.getByText('Emily Chen')).toBeVisible();
+        await expect(canvas.queryByText('Ava Thompson')).toBeNull();
     },
 };

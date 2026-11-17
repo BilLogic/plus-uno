@@ -4,15 +4,15 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as ReadOnlyStories from './ReadOnly.stories.jsx';
 import { CARD_STAGE } from './readOnlyDemo.jsx';
+import {
+    FadedNoReasonCase,
+    FieldForFixedValueCase,
+    PlainValueCase,
+    ReadableWithReasonCase,
+} from './ReadOnlyCases.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
-import {
-    FadedNoReason,
-    FieldForFixedValue,
-    PlainValue,
-    ReadableWithReason,
-} from '@/storybook-docs/illustrations/read-only.jsx';
 
 <Meta title="Patterns/States/Read-only" tags={['manifest']} />
 
@@ -43,8 +43,8 @@ import {
 Choose how to show a value by who can change it and what prevents editing.
 
 <TypeGrid>
-<TypeCard of={ReadOnlyStories.KeyField} title="Read-only" stage={CARD_STAGE}>Someone can change it; this person cannot right now. Neutral fill, full contrast, the reason in the caption.</TypeCard>
-<TypeCard of={ReadOnlyStories.CasePlainText} title="Plain text" stage={CARD_STAGE}>Nobody ever changes it here. It is a label and a value, not a field.</TypeCard>
+<TypeCard of={ReadOnlyStories.KeyField} to="#a-read-only-field" title="Read-only" stage={CARD_STAGE}>Someone can change it; this person cannot right now. Neutral fill, full contrast, the reason in the caption.</TypeCard>
+<TypeCard of={ReadOnlyStories.CasePlainText} to="#plain-text" title="Plain text" stage={CARD_STAGE}>Nobody ever changes it here. It is a label and a value, not a field.</TypeCard>
 </TypeGrid>
 
 The third case is <a target="_top" href="./?path=/docs/patterns-states-disabled--docs">Disabled</a>: the value waits on something fixable on this screen. It is faded and out of the tab order, and it is never swapped with read-only.
@@ -55,7 +55,7 @@ The third case is <a target="_top" href="./?path=/docs/patterns-states-disabled-
 
 ## Key cases
 
-<ComponentExample of={ReadOnlyStories.KeyField} title="A read-only field" description="Neutral fill, full contrast, no hover change. It is in the tab order, the value can be selected and copied, and the caption says why." />
+<ComponentExample of={ReadOnlyStories.KeyField} title="A read-only field" description="Neutral fill, full contrast, no hover change. It is in the tab order, the value can be selected and copied, and the caption says why. Tab into the field to select and copy the value." />
 
 <ComponentExample of={ReadOnlyStories.KeyPickers} title="A Select and a date" description="Select hides its chevron and DatePicker its calendar button; the value reads as text on the neutral fill." />
 
@@ -64,6 +64,8 @@ The third case is <a target="_top" href="./?path=/docs/patterns-states-disabled-
 <ComponentExample of={ReadOnlyStories.KeyOwnedForm} title="A whole form someone else owns" description="A tutor reads a session the supervisor set: the title is the page's h1 and the fields sit straight on the Page, every one read-only, one caption on the group, no Save." />
 
 <ComponentExample of={ReadOnlyStories.KeyLongValue} title="A long value" description={<>A read-only value is shown whole. A TextArea does not size itself to its value yet, so set its rows to show all of it. Growing to fit is Planned <PlannedTag />.</>} />
+
+<ComponentExample of={ReadOnlyStories.CasePlainText} title="Plain text" description="Static details sit in a definition list inside a details Section, with no input border or tab stop." />
 
 </div>
 
@@ -127,9 +129,9 @@ It can be reached, read, selected and copied. `isReadOnly` sets `aria-readonly` 
 "Set by your supervisor." "Locked while the import runs." One caption on a group is enough when every field in it is read-only for the same reason.
 
 <DoDontPair
-    doExample={<ReadableWithReason />}
+    doExample={<ReadableWithReasonCase />}
     doCaption='Read-only at full contrast, with "Set by your supervisor" in the caption.'
-    dontExample={<FadedNoReason />}
+    dontExample={<FadedNoReasonCase />}
     dontCaption="A faded value with no reason: out of the tab order and hard to read."
 />
 
@@ -146,9 +148,9 @@ A `Select` wraps to show its full value; for a `TextArea`, set `rows` to show it
 A field promises an input. A value nobody changes here is a label and a value in a details Section.
 
 <DoDontPair
-    doExample={<PlainValue />}
+    doExample={<PlainValueCase />}
     doCaption="A value nobody changes here is plain text."
-    dontExample={<FieldForFixedValue />}
+    dontExample={<FieldForFixedValueCase />}
     dontCaption="A field for a value that was never editable: it promises an input."
 />
 

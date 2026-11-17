@@ -4,15 +4,15 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as DisabledStories from './Disabled.stories.jsx';
 import { CARD_STAGE } from './disabledDemo.jsx';
+import {
+    DimmedInMenuCase,
+    LeftOutOfMenuCase,
+    ReasonInCaptionCase,
+    ReasonInTooltipCase,
+} from './DisabledCases.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
-import {
-    DimmedInMenu,
-    LeftOutOfMenu,
-    ReasonInCaption,
-    ReasonInTooltip,
-} from '@/storybook-docs/illustrations/disabled.jsx';
 
 <Meta title="Patterns/States/Disabled" tags={['manifest']} />
 
@@ -45,10 +45,10 @@ import {
 Try these options in order; disable only when the earlier options do not fit.
 
 <TypeGrid>
-<TypeCard of={DisabledStories.AnswerExplains} title="Enabled, and it explains" stage={CARD_STAGE}>An action stays pressable and says what is missing when pressed. It disables only while sending.</TypeCard>
-<TypeCard of={DisabledStories.AnswerDisabledWithReason} title="Disabled with a visible reason" stage={CARD_STAGE}>A field or option that waits on a prerequisite the person can fix here. The reason is the caption or the option's description line.</TypeCard>
-<TypeCard of={DisabledStories.AnswerReadOnly} title="Read-only" stage={CARD_STAGE}>Content people must read but cannot change. It has its own pattern.</TypeCard>
-<TypeCard of={DisabledStories.AnswerHidden} title="Hidden" stage={CARD_STAGE}>What this role can never use is left out, not dimmed. The one exception is the Toolkit, locked during onboarding and never hidden.</TypeCard>
+<TypeCard of={DisabledStories.AnswerExplains} to="#enabled-and-it-explains" title="Enabled, and it explains" stage={CARD_STAGE}>An action stays pressable and says what is missing when pressed. It disables only while sending.</TypeCard>
+<TypeCard of={DisabledStories.AnswerDisabledWithReason} to="#a-field-that-waits-on-another" title="Disabled with a visible reason" stage={CARD_STAGE}>A field or option that waits on a prerequisite the person can fix here. The reason is the caption or the option's description line.</TypeCard>
+<TypeCard of={DisabledStories.AnswerReadOnly} to="#read-only" title="Read-only" stage={CARD_STAGE}>Content people must read but cannot change. It has its own pattern.</TypeCard>
+<TypeCard of={DisabledStories.AnswerHidden} to="#hidden" title="Hidden" stage={CARD_STAGE}>What this role can never use is left out, not dimmed. The one exception is the Toolkit, locked during onboarding and never hidden.</TypeCard>
 </TypeGrid>
 
 </div>
@@ -57,15 +57,21 @@ Try these options in order; disable only when the earlier options do not fit.
 
 ## Key cases
 
-<ComponentExample of={DisabledStories.KeyWaitsOnField} title="A field that waits on another" description="Group waits on School. The caption says &quot;Choose a school first&quot;; the field fades and leaves the tab order, and the caption stays at full contrast." />
+<ComponentExample of={DisabledStories.AnswerExplains} title="Enabled, and it explains" description="Pressing Save session marks what is missing rather than disabling the button. Enter a student's name and click Save session to save, or Cancel to reset." />
+
+<ComponentExample of={DisabledStories.KeyWaitsOnField} title="A field that waits on another" description="Group waits on School. The caption says &quot;Choose a school first&quot;; the field fades and leaves the tab order, and the caption stays at full contrast. Pick a school to enable Group." />
 
 <ComponentExample of={DisabledStories.KeyOptionCannotApply} title="An option that cannot apply" description="The option's description line carries the reason. The rest of the list is live." />
 
-<ComponentExample of={DisabledStories.KeyBlocksAction} title="It blocks the main action" description="When the prerequisite blocks the main action or several items, a warning SectionMessage above says how to turn it on." />
+<ComponentExample of={DisabledStories.KeyBlocksAction} title="It blocks the main action" description="When the prerequisite blocks the main action or several items, a warning SectionMessage above says how to turn it on. Click Add school to turn them on, or Remove school to reset." />
 
 <ComponentExample of={DisabledStories.KeySelfEvident} title="Self-evident" description="Back on the first step, and the Danger button until the name matches: no reason needed beyond what is on screen." />
 
-<ComponentExample of={DisabledStories.KeySending} title="Sending" description="The only time a button disables: it swaps its label for a spinner and Cancel stays live." />
+<ComponentExample of={DisabledStories.KeySending} title="Sending" description="The only time a button disables: it swaps its label for a spinner and Cancel stays live. Click Cancel to stop sending and Save session to try again." />
+
+<ComponentExample of={DisabledStories.AnswerReadOnly} title="Read-only" description="Neutral fill at full contrast, in the tab order so the time can be selected and copied." />
+
+<ComponentExample of={DisabledStories.AnswerHidden} title="Hidden" description="Open More to see only the actions a tutor can take." />
 
 <ComponentExample of={DisabledStories.KeyLocked} title="Locked, not hidden" description={<>The Toolkit in the Sidebar during onboarding: the rows show, faded. The visible line that says what unlocks them is Planned <PlannedTag />.</>} />
 
@@ -143,9 +149,9 @@ The field caption or the option's description line. When the prerequisite blocks
 A disabled control gets no events and is absent on touch, so a tooltip would never open for the people who need it most. A disabled control keeps its default behavior and leaves the tab order.
 
 <DoDontPair
-    doExample={<ReasonInCaption />}
+    doExample={<ReasonInCaptionCase />}
     doCaption='The reason as the caption: "Choose a school first".'
-    dontExample={<ReasonInTooltip />}
+    dontExample={<ReasonInTooltipCase />}
     dontCaption="The reason in a tooltip on a faded field: it never opens on touch."
 />
 
@@ -156,9 +162,9 @@ A disabled control gets no events and is absent on touch, so a tooltip would nev
 An action a tutor can never take, such as deleting a school, is left out, not dimmed. A breadcrumb level the person cannot open is left out. Only a change of role brings it back.
 
 <DoDontPair
-    doExample={<LeftOutOfMenu />}
+    doExample={<LeftOutOfMenuCase />}
     doCaption="An action a tutor can never take is left out of the menu."
-    dontExample={<DimmedInMenu />}
+    dontExample={<DimmedInMenuCase />}
     dontCaption='A faded "Delete school" that a tutor will never be able to press.'
 />
 
