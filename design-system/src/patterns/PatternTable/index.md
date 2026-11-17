@@ -10,7 +10,7 @@ Also asked as: list of records, data table on a page, sortable list, records wit
 
 **Used in:** Modal (`ds guide modal`); Section (`ds guide section`); Table (`ds guide table`)
 
-**Governed by:** Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Filtering (`ds guide filtering`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); Search (`ds guide search`)
+**Governed by:** Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Filtering (`ds guide filtering`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); Search (`ds guide search`)
 
 **Source:** `design-system/src/patterns/PatternTable/PatternTable.jsx`
 

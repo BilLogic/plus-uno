@@ -1,7 +1,7 @@
-import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import { BAR_TOKEN } from '@/storybook-docs/lib/focused-task.jsx';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
@@ -269,6 +269,7 @@ export const ShownOnBlur = {
         await userEvent.type(student, 'Ana Ruiz');
         await userEvent.tab();
         await waitFor(() => expect(student, 'typing clears the error once valid').not.toHaveAttribute('aria-invalid', 'true'));
+        await settleAnimations(canvasElement);
         await fitsCanvas(canvasElement);
     },
 };
@@ -287,6 +288,7 @@ export const ShownSubmitStaysEnabled = {
         await expect(canvas.getByRole('button', { name: 'Save session' }), 'still enabled').not.toBeDisabled();
         await userEvent.type(student, 'Ana Ruiz');
         await expect(student).toHaveValue('Ana Ruiz');
+        await settleAnimations(canvasElement);
         await fitsCanvas(canvasElement);
     },
 };
@@ -305,6 +307,7 @@ export const ShownBlockedSubmit = {
         await expect(canvas.getByText('Choose a site.')).toBeInTheDocument();
         await userEvent.type(student, 'Ana Ruiz');
         await expect(student).toHaveValue('Ana Ruiz');
+        await settleAnimations(canvasElement);
         await fitsCanvas(canvasElement);
     },
 };

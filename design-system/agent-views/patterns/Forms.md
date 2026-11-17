@@ -12,10 +12,10 @@ How a form takes and checks what someone types: its host, when it validates, wha
 
 Choose among four hosts. The Form template shows their layouts; this pattern guides host selection and form behavior.
 
-- **In a page.** Settings and anything saved as a group. Buttons left-aligned under the fields.
-- **In a Panel.** A short edit from a table, with the page in view. Discard and Save full bleed at the bottom, no Cancel.
-- **In a Modal.** A rare, critical task with fewer than five fields. 8-col; a confirm is 4-col or 6-col.
-- **In steps.** A stepped task on Frame · focused: dots above one question under five steps, or the left step list at five or more.
+- **In a page.** Settings and anything saved as a group.
+- **In a Panel.** A short edit beside the page, with a full-bleed footer.
+- **In a Modal.** A rare, critical task with fewer than five fields.
+- **In steps.** A stepped task on Frame · focused.
 
 ## Marks and help
 

@@ -1,9 +1,8 @@
-import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { ComponentExample, exampleSlug } from '@/storybook-docs/ds-docs-layout.jsx';
-import { TypeCard } from '@/storybook-docs/lib/template-page.jsx';
+import { expectTypeCardAnchors } from '@/storybook-docs/lib/type-card-anchors.jsx';
 import {
     ModalFooterFullBleedCase,
     ModalFooterInsetCase,
@@ -13,90 +12,87 @@ import {
     TwoPrimariesCase,
 } from './commonActionsDemo.jsx';
 
-vi.mock('@storybook/addon-docs/blocks', async () => {
-    const React = await import('react');
-    return {
-        Canvas: ({ children, of }) => (
-            <div data-testid="mock-canvas">
-                {of?.render ? <of.render /> : children}
-            </div>
-        ),
-        Story: ({ of }) => (of?.render ? <of.render /> : null),
-        Meta: () => null,
-        Title: () => null,
-    };
-});
-
-const commonActionsMdx = readFileSync(join(__dirname, 'CommonActions.mdx'), 'utf8');
+vi.mock('@storybook/addon-docs/blocks', () => import('@/storybook-docs/lib/addon-docs-blocks-mock.jsx'));
 
 describe('CommonActions live cases and links', () => {
-    it('OnePrimaryCase renders one primary button and one default button', () => {
+    it('OnePrimaryCase renders one primary button and one default button with interactive controls', async () => {
+        const user = userEvent.setup();
         render(<OnePrimaryCase />);
-        expect(screen.getByRole('button', { name: 'Save session' }).className).toContain('primary');
+        const primary = screen.getByRole('button', { name: 'Save session' });
+        expect(primary.className).toContain('primary');
         expect(screen.getByRole('button', { name: 'Save draft' }).className).toContain('default');
+        const student = screen.getByRole('textbox', { name: 'Student' });
+        await user.clear(student);
+        await user.type(student, 'Marcus Lee');
+        expect(student).toHaveValue('Marcus Lee');
+        primary.focus();
+        expect(primary).toHaveFocus();
     });
 
-    it('TwoPrimariesCase renders two competing primary buttons', () => {
+    it('TwoPrimariesCase renders two competing primary buttons with interactive controls', async () => {
+        const user = userEvent.setup();
         render(<TwoPrimariesCase />);
-        expect(screen.getByRole('button', { name: 'Save session' }).className).toContain('primary');
+        const primary = screen.getByRole('button', { name: 'Save session' });
+        expect(primary.className).toContain('primary');
         expect(screen.getByRole('button', { name: 'Save draft' }).className).toContain('primary');
+        const student = screen.getByRole('textbox', { name: 'Student' });
+        await user.clear(student);
+        await user.type(student, 'Sofia Ramirez');
+        expect(student).toHaveValue('Sofia Ramirez');
+        primary.focus();
+        expect(primary).toHaveFocus();
     });
 
-    it('PageButtonsLeftCase and PageButtonsFarRightCase render live page form controls', () => {
+    it('PageButtonsLeftCase and PageButtonsFarRightCase render live interactive page form controls', async () => {
+        const user = userEvent.setup();
         const { unmount } = render(<PageButtonsLeftCase />);
-        expect(screen.getByRole('textbox', { name: 'Student' })).toHaveValue('Ana Ruiz');
-        expect(screen.getByRole('button', { name: 'Save session' })).toBeInTheDocument();
+        const student = screen.getByRole('textbox', { name: 'Student' });
+        expect(student).toHaveValue('Ana Ruiz');
+        await user.clear(student);
+        await user.type(student, 'Jordan Kim');
+        expect(student).toHaveValue('Jordan Kim');
+        const saveLeft = screen.getByRole('button', { name: 'Save session' });
+        saveLeft.focus();
+        expect(saveLeft).toHaveFocus();
         expect(screen.getByRole('button', { name: 'Cancel' }).className).toContain('subtle');
         unmount();
 
         render(<PageButtonsFarRightCase />);
-        expect(screen.getByRole('textbox', { name: 'Site' })).toHaveValue('Lincoln Middle');
+        const site = screen.getByRole('textbox', { name: 'Site' });
+        expect(site).toHaveValue('Lincoln Middle');
+        await user.clear(site);
+        await user.type(site, 'North High');
+        expect(site).toHaveValue('North High');
+        const saveRight = screen.getByRole('button', { name: 'Save session' });
+        saveRight.focus();
+        expect(saveRight).toHaveFocus();
     });
 
-    it('ModalFooterFullBleedCase and ModalFooterInsetCase render live PatternModal footers', () => {
+    it('ModalFooterFullBleedCase and ModalFooterInsetCase render live interactive PatternModal footers', async () => {
+        const user = userEvent.setup();
         const { unmount } = render(<ModalFooterFullBleedCase />);
         expect(screen.getByRole('dialog')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Save session' })).toBeInTheDocument();
+        const fullBleedStudent = screen.getByRole('textbox', { name: 'Student' });
+        await user.clear(fullBleedStudent);
+        await user.type(fullBleedStudent, 'Ava Thompson');
+        expect(fullBleedStudent).toHaveValue('Ava Thompson');
+        const save = screen.getByRole('button', { name: 'Save session' });
+        save.focus();
+        expect(save).toHaveFocus();
         unmount();
 
         render(<ModalFooterInsetCase />);
         expect(screen.getByRole('dialog')).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Discard' })).toBeInTheDocument();
+        const insetStudent = screen.getByRole('textbox', { name: 'Student' });
+        await user.clear(insetStudent);
+        await user.type(insetStudent, 'Noah Patel');
+        expect(insetStudent).toHaveValue('Noah Patel');
+        const discard = screen.getByRole('button', { name: 'Discard' });
+        discard.focus();
+        expect(discard).toHaveFocus();
     });
 
     it('links every TypeCard anchor to a unique ComponentExample heading id in CommonActions.mdx', () => {
-        const typeCards = [...commonActionsMdx.matchAll(/<TypeCard\s+[^>]*to="#([^"]+)"[^>]*title="([^"]+)"/g)]
-            .map(([, to, title]) => ({ to, title }));
-        const exampleTitles = [...commonActionsMdx.matchAll(/<ComponentExample\s+[^>]*title="([^"]+)"/g)]
-            .map(([, title]) => title);
-        const examplesTab = commonActionsMdx.split('<DocsTab tab="examples">')[1].split('</DocsTab>')[0];
-        const headingSlugs = [
-            ...exampleTitles.map(exampleSlug),
-            ...[...examplesTab.matchAll(/^#{2,3}\s+([^\r\n<]+)/gm)].map(([, h]) => exampleSlug(h)),
-        ];
-
-        expect(typeCards).toHaveLength(7);
-        expect(new Set(headingSlugs).size).toBe(headingSlugs.length);
-        typeCards.forEach(({ to }) => expect(headingSlugs).toContain(to));
-
-        const Stub = { render: () => <div /> };
-        render(
-            <div>
-                {typeCards.map(({ to, title }) => (
-                    <TypeCard key={title} of={Stub} to={`#${to}`} title={title}>{title}</TypeCard>
-                ))}
-                {exampleTitles.map((title) => (
-                    <ComponentExample key={title} of={Stub} title={title} description={title} />
-                ))}
-            </div>,
-        );
-
-        for (const { to, title } of typeCards) {
-            const exact = new RegExp(`^${title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`);
-            expect(screen.getByRole('link', { name: exact })).toHaveAttribute('href', `#${to}`);
-        }
-        for (const title of exampleTitles) {
-            expect(within(document.body).getByRole('heading', { level: 3, name: title })).toHaveAttribute('id', exampleSlug(title));
-        }
+        expectTypeCardAnchors(join(__dirname, 'CommonActions.mdx'), 7);
     });
 });

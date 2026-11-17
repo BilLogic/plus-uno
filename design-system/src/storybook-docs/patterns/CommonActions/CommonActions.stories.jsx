@@ -1,11 +1,11 @@
-import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import { BAR_TOKEN } from '@/storybook-docs/lib/focused-task.jsx';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
-import { FitStage, ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { TierActive, TierDanger, TierTypeName } from '../../../patterns/PatternModal/modalDemo.jsx';
@@ -43,14 +43,14 @@ export default {
 };
 
 const rect = (el) => el.getBoundingClientRect();
-const staged = (story, width = STAGE) => <FitStage width={width} scrollable>{story}</FitStage>;
+const staged = (story, width = STAGE, { fluid = false } = {}) => <FitStage width={width} scrollable fluid={fluid}>{story}</FitStage>;
 
 /* -------------------------------------------------------------- appearances */
 
 /** Every appearance with the word it takes: one Primary, one AI. */
 export const AppearancesRow = {
     name: 'Appearances',
-    render: () => <Appearances />,
+    render: () => staged(<Appearances />, STAGE, { fluid: true }),
     play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
         await expectNotInert(canvasElement);
@@ -150,7 +150,7 @@ export const PlacementFocused = {
 /** A card: its main action is Subtle in the footer. */
 export const PlacementCard = {
     name: 'Placement: In a card',
-    render: () => <CardAction />,
+    render: () => staged(<CardAction />, STAGE, { fluid: true }),
     play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
         await expectNotInert(canvasElement);

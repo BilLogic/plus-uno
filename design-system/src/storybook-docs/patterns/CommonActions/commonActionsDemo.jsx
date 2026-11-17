@@ -16,7 +16,7 @@ import { ModalStage, TwoCells } from '../../../patterns/PatternModal/modalDemo.j
  *
  *   Appearances   every appearance, with the word it takes
  *   Page          buttons under a page form
- *   ModalFooter   full bleed, Close in the header and Cancel in the footer
+ *   ModalFooter   full bleed, Close in the header, Discard left and the action right (no Cancel)
  *   Reset         a filter side, "Reset filters" at its top
  *   Copy          an icon button and its "Copied" tooltip
  *   EditOne       one value, edited in place
@@ -52,14 +52,14 @@ export const Appearances = () => (
 /** Buttons under a page form: left-aligned, Primary first, Cancel Subtle. The form sits on the Page, in the Frame. */
 export const Page = () => <FormInPage initial={FILLED} />;
 
-/** A Modal's footer: full bleed, Cancel (Default) left and the action right; Close sits in the header. */
+/** A Modal's footer: full bleed, Discard (Default) left and the action right; Close sits in the header, no Cancel. */
 export const ModalFooter = () => (
     <ModalStage title="Log a session" footer={<TwoCells action="Save session" />}>
         {text('Ana Ruiz, Thursday at 4:00 PM, Lincoln Middle.')}
     </ModalStage>
 );
 
-/** A focused task's bottom bar: Cancel (Subtle) at the start, Back and Next at the end. */
+/** A focused task's bottom bar: Back and Next split 50/50, Close in the title row, no Cancel. */
 export const FocusedBar = () => <FocusedType start={1} />;
 
 /** A card's main action: Subtle in the footer. */
@@ -119,12 +119,15 @@ export const EditOne = () => {
     );
 };
 
+/** Room for the held-open DropdownMenu in EditRecord: docs geometry, in px. */
+const EDIT_RECORD_HEIGHT = 180; // docs-literal
+
 /** The whole record: Edit sits in the More menu beside the record's other actions. */
 export const EditRecord = ({ held = false }) => {
     const [setMount, mount] = useLayerMount();
     return (
         // A held-open menu waits for the picture's element, so it mounts inside it and not on the page.
-        <div ref={setMount} style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: 'var(--page-pad)', minBlockSize: held ? 'calc(var(--card-min-width-md) * 0.6)' : undefined }}>
+        <div ref={setMount} style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: 'var(--page-pad)', minBlockSize: held ? EDIT_RECORD_HEIGHT : undefined }}>
             <span style={{ font: 'var(--heading-sm)', color: 'var(--ds-text)' }}>Ana Ruiz</span>
             <DropdownMenu
                 trigger={<IconButton icon="ellipsis" label="More" appearance="subtle" />}
@@ -261,6 +264,7 @@ export const ModalFooterFullBleedCase = () => (
 );
 
 /** Don't: small buttons inset at the end, with spare footer around them. */
+// Deliberately mirrors the inset footer (non-full-bleed) as the Don't example.
 export const ModalFooterInsetCase = () => (
     <CaseBlanket height={280}>
         <PatternModal
