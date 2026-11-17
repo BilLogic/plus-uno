@@ -24,7 +24,7 @@ export const LiveMenu = ({ label = 'Session actions', defaultOpen = true, childr
     };
 
     return (
-        <DocsOverlayBoundary containHeight>
+        <DocsOverlayBoundary fit={false} containHeight>
             <div
                 style={{ display: 'flex', justifyContent: 'center' }}
                 onPointerDownCapture={markInsideGesture}

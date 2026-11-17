@@ -10,9 +10,8 @@ import { DocsOverlayBoundary } from './docs-overlay-boundary.jsx';
  * open at rest inside `DocsOverlayBoundary` (`containHeight`) and only closes
  * when dismissed from inside its own card (Got it, Skip, Dismiss, target toggle,
  * or Escape), never when another card is clicked. For "Make the secondary
- * action a link", the Do half renders `SpotlightAction` with `href` as an
- * inline link (`textDecoration: 'underline'`, no button border) so the visual
- * contrast against the Don't half's two competing buttons is clear at rest.
+ * action a link", the Do half renders `SpotlightAction` with `appearance="secondary"`
+ * and `href` while the Don't half renders two competing primary buttons.
  */
 export const LiveSpotlight = ({
     targetText = 'Calendar',
@@ -38,7 +37,6 @@ export const LiveSpotlight = ({
             <SpotlightAction
                 appearance="secondary"
                 href="#spotlight-tour-details"
-                style={{ border: 'none', textDecoration: 'underline' }}
                 onClick={(event) => event.preventDefault()}
             >
                 {secondaryLabel}
@@ -57,7 +55,7 @@ export const LiveSpotlight = ({
             );
 
     return (
-        <DocsOverlayBoundary containHeight>
+        <DocsOverlayBoundary fit={false} containHeight>
             <SpotlightProvider>
                 <div
                     style={{ display: 'flex', justifyContent: 'center' }}

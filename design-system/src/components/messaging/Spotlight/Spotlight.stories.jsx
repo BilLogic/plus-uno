@@ -293,8 +293,11 @@ export const BestPracticesLive = {
         await waitFor(() => expect(within(cards[3]).getByText('1 of 1')).toBeVisible());
         const learnMoreLink = await within(cards[4]).findByRole('link', { name: 'Learn more' });
         await expect(learnMoreLink).toHaveAttribute('href', '#spotlight-tour-details');
-        await expect(getComputedStyle(learnMoreLink).textDecorationLine).toContain('underline');
-        await expect(await within(cards[5]).findByRole('button', { name: 'Learn more' })).toBeVisible();
+        await expect(learnMoreLink).toHaveClass('plus-spotlight-action--secondary');
+        await expect(learnMoreLink.getAttribute('style')).toBeNull();
+        const competingButton = await within(cards[5]).findByRole('button', { name: 'Learn more' });
+        await expect(competingButton).toBeVisible();
+        await expect(competingButton).toHaveClass('plus-spotlight-action--primary');
 
         await expect(canvasElement.contains(doc.activeElement)).toBe(false);
         await expect(win.scrollY).toBe(0);
@@ -303,6 +306,17 @@ export const BestPracticesLive = {
             const well = card.querySelector('.sb-ds-dodont-card__well');
             const spotlight = card.querySelector('.plus-spotlight');
             await waitFor(() => expect(spotlight.getBoundingClientRect().bottom).toBeLessThanOrEqual(well.getBoundingClientRect().bottom + 1));
+            await expect(well.scrollWidth).toBeLessThanOrEqual(well.clientWidth + 1);
+            const cardRect = card.getBoundingClientRect();
+            for (const el of [well, ...well.querySelectorAll('*')]) {
+                await expect(['1', 'normal']).toContain(win.getComputedStyle(el).zoom);
+                if (el.hasAttribute('data-base-ui-focus-guard')) continue;
+                const rect = el.getBoundingClientRect();
+                if (rect.width > 0) {
+                    await expect(rect.left).toBeGreaterThanOrEqual(cardRect.left - 1);
+                    await expect(rect.right).toBeLessThanOrEqual(cardRect.right + 1);
+                }
+            }
         }
 
         // Pair 1 (cards 0 and 1): dismiss card 0 via Got it while card 1 stays open, then reopen card 0 via Calendar.

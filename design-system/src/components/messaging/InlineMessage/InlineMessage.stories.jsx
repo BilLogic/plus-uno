@@ -230,6 +230,25 @@ export const BestPracticesLive = {
             await waitFor(() => expect(popup.getBoundingClientRect().bottom).toBeLessThanOrEqual(well.getBoundingClientRect().bottom + 1));
         }
 
+        const assertWellFullSizeAndBounded = async (card) => {
+            const cardRect = card.getBoundingClientRect();
+            const well = card.querySelector('.sb-ds-dodont-card__well');
+            await expect(well.scrollWidth).toBeLessThanOrEqual(well.clientWidth + 1);
+            for (const el of [well, ...well.querySelectorAll('*')]) {
+                await expect(['1', 'normal']).toContain(win.getComputedStyle(el).zoom);
+                if (el.hasAttribute('data-base-ui-focus-guard')) continue;
+                const rect = el.getBoundingClientRect();
+                if (rect.width > 0) {
+                    await expect(rect.left).toBeGreaterThanOrEqual(cardRect.left - 1);
+                    await expect(rect.right).toBeLessThanOrEqual(cardRect.right + 1);
+                }
+            }
+        };
+
+        for (const card of cards) {
+            await assertWellFullSizeAndBounded(card);
+        }
+
         // Pair 1 (cards 0 and 1): focus trigger, dismiss with Escape, reopen with Enter, while card 1 stays open.
         const pair1DoTrigger = within(cards[0]).getByRole('button', { name: 'About this setting' });
         pair1DoTrigger.focus();
@@ -257,6 +276,7 @@ export const BestPracticesLive = {
         await waitFor(() => expect(
             cards[4].querySelector('.plus-popup').getBoundingClientRect().bottom,
         ).toBeLessThanOrEqual(cards[4].querySelector('.sb-ds-dodont-card__well').getBoundingClientRect().bottom + 1));
+        await assertWellFullSizeAndBounded(cards[4]);
         await userEvent.keyboard('{Escape}');
         await waitFor(() => expect(within(cards[4]).queryByText('Heads up')).toBeNull());
     },

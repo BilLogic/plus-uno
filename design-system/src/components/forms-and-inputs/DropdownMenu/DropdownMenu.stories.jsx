@@ -409,20 +409,32 @@ export const BestPracticesLive = {
         await expect(canvasElement.contains(doc.activeElement)).toBe(false);
         await expect(win.scrollY).toBe(0);
 
+        for (const card of cards) {
+            const cardRect = card.getBoundingClientRect();
+            const well = card.querySelector('.sb-ds-dodont-card__well');
+            const menu = card.querySelector('.plus-dropdown-menu');
+            await waitFor(() => expect(menu.getBoundingClientRect().bottom).toBeLessThanOrEqual(well.getBoundingClientRect().bottom + 1));
+            await expect(well.scrollWidth).toBeLessThanOrEqual(well.clientWidth + 1);
+            for (const el of [well, ...well.querySelectorAll('*')]) {
+                await expect(['1', 'normal']).toContain(win.getComputedStyle(el).zoom);
+                if (el.hasAttribute('data-base-ui-focus-guard')) continue;
+                const rect = el.getBoundingClientRect();
+                if (rect.width > 0) {
+                    await expect(rect.left).toBeGreaterThanOrEqual(cardRect.left - 1);
+                    await expect(rect.right).toBeLessThanOrEqual(cardRect.right + 1);
+                }
+            }
+        }
+
         for (const { doIdx, dontIdx, doItems, dontFirst } of pairs) {
             const doCard = cards[doIdx];
             const dontCard = cards[dontIdx];
-            const doWell = doCard.querySelector('.sb-ds-dodont-card__well');
-            const doMenu = doCard.querySelector('.plus-dropdown-menu');
-            await waitFor(() => expect(doMenu.getBoundingClientRect().bottom).toBeLessThanOrEqual(doWell.getBoundingClientRect().bottom + 1));
 
             const firstItem = within(doCard).getByRole('menuitem', { name: doItems[0] });
             firstItem.focus();
             await expect(firstItem).toHaveFocus();
-            await userEvent.keyboard('{ArrowDown}');
-            await expect(within(doCard).getByRole('menuitem', { name: doItems[1] })).toHaveFocus();
 
-            // Dismiss with Escape, verify Don't card stayed open, then reopen Do card by clicking trigger.
+            // Dismiss with Escape, verify Don't card stayed open, then reopen Do card and navigate by keyboard.
             await userEvent.keyboard('{Escape}');
             const doTrigger = within(doCard).getByRole('button', { name: 'Session actions' });
             await waitFor(() => expect(within(doCard).queryByRole('menuitem', { name: doItems[0] })).toBeNull());
@@ -431,6 +443,8 @@ export const BestPracticesLive = {
 
             await userEvent.click(doTrigger);
             await waitFor(() => expect(within(doCard).getByRole('menuitem', { name: doItems[0] })).toBeVisible());
+            await userEvent.keyboard('{ArrowDown}');
+            await waitFor(() => expect(within(doCard).getByRole('menuitem', { name: doItems[1] })).toHaveFocus());
 
             // Dismiss Don't card by clicking its first item, then reopen by clicking its trigger.
             await userEvent.click(within(dontCard).getByRole('menuitem', { name: dontFirst }));

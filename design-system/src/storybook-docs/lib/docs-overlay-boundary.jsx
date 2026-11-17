@@ -27,7 +27,7 @@ export const fitZoom = (natural, available) => {
  * width, so the reader sees all of it. CSS `zoom` scales layout as well as
  * paint, so hit-testing and overlay positioning stay correct.
  */
-export function DocsOverlayBoundary({ disablePointerEvents = false, fit = true, containHeight = false, children }) {
+export function DocsOverlayBoundary({ disablePointerEvents = false, containHeight = false, fit = !containHeight, children }) {
     const [node, setNode] = useState(null);
     const [scaled, setScaled] = useState(null);
     const [containedMinHeight, setContainedMinHeight] = useState(null);

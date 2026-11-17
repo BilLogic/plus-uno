@@ -57,7 +57,7 @@ export const LiveInlineMessage = ({
     }, [defaultOpen, host]);
 
     return (
-        <DocsOverlayBoundary containHeight>
+        <DocsOverlayBoundary fit={false} containHeight>
             <div
                 ref={setHost}
                 style={fieldRow}
@@ -71,6 +71,7 @@ export const LiveInlineMessage = ({
                     key={resetKey}
                     appearance={appearance}
                     defaultOpen={defaultOpen}
+                    placement="bottom"
                     label={label}
                     title={title}
                 >
@@ -111,10 +112,10 @@ export const ShortLineDont = () => (
 );
 
 export const OnePerFieldDo = () => (
-    <DocsOverlayBoundary containHeight>
+    <DocsOverlayBoundary fit={false} containHeight>
         <div style={fieldRow}>
             <span>Session length</span>
-            <InlineMessage appearance="info" label="About session length" title="Heads up">
+            <InlineMessage appearance="info" placement="bottom" label="About session length" title="Heads up">
                 This setting applies to new sessions only.
             </InlineMessage>
         </div>
@@ -122,13 +123,13 @@ export const OnePerFieldDo = () => (
 );
 
 export const OnePerFieldDont = () => (
-    <DocsOverlayBoundary containHeight>
+    <DocsOverlayBoundary fit={false} containHeight>
         <div style={fieldRow}>
             <span>Session length</span>
-            <InlineMessage appearance="info" label="About session length" title="Heads up">
+            <InlineMessage appearance="info" placement="bottom" label="About session length" title="Heads up">
                 This setting applies to new sessions only.
             </InlineMessage>
-            <InlineMessage appearance="warning" label="About availability" title="Limited availability">
+            <InlineMessage appearance="warning" placement="bottom" label="About availability" title="Limited availability">
                 Only 2 slots left this week.
             </InlineMessage>
         </div>

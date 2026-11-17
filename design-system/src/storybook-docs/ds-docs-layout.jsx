@@ -380,21 +380,23 @@ export function DoDontCard({ tone, children, caption }) {
                     font: 'var(--body-default)',
                 }}
             >
-                <div className="sb-ds-dodont-card__example sb-unstyled">{children}</div>
+                <div className="sb-ds-dodont-card__example sb-unstyled" style={{ inlineSize: '100%' }}>{children}</div>
             </div>
             <DoDontCaption tone={tone}>{caption}</DoDontCaption>
         </figure>
     );
 }
 
-/** A matched do and don't, side by side. */
-export function DoDontPair({ doExample, doCaption, dontExample, dontCaption }) {
+/** A matched do and don't, side by side (or `stacked` one above the other when an example is too wide to halve). */
+export function DoDontPair({ doExample, doCaption, dontExample, dontCaption, stacked = false }) {
     return (
         <div
             className="sb-ds-dodont-pair"
             style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(max(min(100%, var(--card-min-width-md)), calc((100% - var(--section-stack-lg)) / 2)), 1fr))',
+                gridTemplateColumns: stacked
+                    ? 'minmax(0, 1fr)'
+                    : 'repeat(auto-fit, minmax(max(min(100%, var(--card-min-width-md)), calc((100% - var(--section-stack-lg)) / 2)), 1fr))',
                 gap: 'var(--section-stack-lg)',
                 alignItems: 'stretch',
             }}

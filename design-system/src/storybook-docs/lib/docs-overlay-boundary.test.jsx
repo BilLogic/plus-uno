@@ -79,9 +79,13 @@ describe('DocsOverlayBoundary', () => {
         }
     });
 
-    it('expands minHeight for an open overlay when containHeight is set and releases it on close', async () => {
+    it('expands minHeight for an open overlay when containHeight is set, never zooms, and releases minHeight on close', async () => {
         const originalClientHeight = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'clientHeight');
+        const originalClientWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'clientWidth');
+        const originalScrollWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'scrollWidth');
         Object.defineProperty(HTMLElement.prototype, 'clientHeight', { configurable: true, get: () => 32 });
+        Object.defineProperty(HTMLElement.prototype, 'clientWidth', { configurable: true, get: () => 300 });
+        Object.defineProperty(HTMLElement.prototype, 'scrollWidth', { configurable: true, get: () => 680 });
         const rectSpy = (el) => {
             if (el.hasAttribute?.('data-docs-overlay-container')) {
                 return { top: 10, bottom: 42, left: 0, right: 300, width: 300, height: 32 };
@@ -98,16 +102,19 @@ describe('DocsOverlayBoundary', () => {
 
         try {
             const { container, rerender } = render(
-                <DocsOverlayBoundary containHeight>
+                <DocsOverlayBoundary fit={false} containHeight>
                     <button type="button">Trigger</button>
                     <div data-side="bottom">Open overlay</div>
                 </DocsOverlayBoundary>,
             );
             const host = container.querySelector('[data-docs-overlay-container]');
             expect(host.style.minHeight).toBe('176px');
+            expect(host.style.zoom).toBe('');
+            expect(host.style.width).toBe('100%');
+            expect(host.getAttribute('data-docs-fit')).toBeNull();
 
             rerender(
-                <DocsOverlayBoundary containHeight>
+                <DocsOverlayBoundary fit={false} containHeight>
                     <button type="button">Trigger</button>
                 </DocsOverlayBoundary>,
             );
@@ -118,6 +125,16 @@ describe('DocsOverlayBoundary', () => {
                 Object.defineProperty(HTMLElement.prototype, 'clientHeight', originalClientHeight);
             } else {
                 delete HTMLElement.prototype.clientHeight;
+            }
+            if (originalClientWidth) {
+                Object.defineProperty(HTMLElement.prototype, 'clientWidth', originalClientWidth);
+            } else {
+                delete HTMLElement.prototype.clientWidth;
+            }
+            if (originalScrollWidth) {
+                Object.defineProperty(HTMLElement.prototype, 'scrollWidth', originalScrollWidth);
+            } else {
+                delete HTMLElement.prototype.scrollWidth;
             }
         }
     });
