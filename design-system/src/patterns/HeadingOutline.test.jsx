@@ -5,13 +5,13 @@ import { describe, expect, it } from 'vitest';
 import PatternCard from './PatternCard';
 import DropdownMenu from '@/components/forms-and-inputs/DropdownMenu';
 import { ButtonItem, Section } from '@/components/forms-and-inputs/_internal/MenuGroup';
+import PageHeader from '@/components/layout-and-structure/PageHeader';
 import Modal from '@/components/messaging/Modal';
 import Sidebar from '@/components/navigation/Sidebar';
 import Table from '@/components/text-and-data-display/Table';
 import PatternModal from './PatternModal';
 import PatternSection from './PatternSection';
 import Page from './Page';
-import PageHeader from '@/components/layout-and-structure/PageHeader';
 
 /**
  * Heading tags follow nesting: one h1 per page, sections h2, subsections h3,

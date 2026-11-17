@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
-import Heading, { HEADING_TAGS } from '@/components/text-and-data-display/Heading';
+import Heading, { HEADING_TAGS } from '@/components/text-and-data-display/Heading/Heading';
 import './PageHeader.scss';
 
 /**
@@ -48,7 +48,7 @@ PageHeader.propTypes = {
     actions: PropTypes.node,
     /** Content in a bar below the title row, such as tabs or filters. */
     bottomBar: PropTypes.node,
-    /** Overrides the HTML element the title's `Heading` renders as, e.g. `"h2"` when placed below another page title. */
+    /** Overrides the HTML element the title's `Heading` renders as, e.g. `"h2"` when placed below another page title. A `Modal` or dialog body resets the heading level to 1, so a `PageHeader` inside one passes `titleAs="h2"`. */
     titleAs: PropTypes.oneOf(HEADING_TAGS),
     /** Renders the title as a plain node instead of a `Heading`, for a caller that styles it itself. */
     disableTitleStyles: PropTypes.bool,

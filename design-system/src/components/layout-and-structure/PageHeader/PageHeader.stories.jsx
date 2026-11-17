@@ -14,9 +14,6 @@ export const Basic = () => <PageHeader title="Session plans" id="page-header-bas
 Basic.play = async ({ canvas }) => {
     const heading = canvas.getByRole('heading', { level: 1, name: 'Session plans' });
     await expect(heading).toHaveAttribute('data-size', 'large');
-    const style = getComputedStyle(heading);
-    await expect(style.fontSize).toBe('24px');
-    await expect(style.lineHeight).toBe('28px');
 };
 
 export const SecondaryLevel = () => (

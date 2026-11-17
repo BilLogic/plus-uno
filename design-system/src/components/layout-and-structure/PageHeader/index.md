@@ -91,10 +91,9 @@ title is a custom element already carrying its own heading semantics.
 
 ## Accessibility
 
-- **A real heading.** The title renders as an `h1` by default (matching the
-  ambient heading level), giving the page one clear entry point for assistive
-  technology navigating by heading. Pass `titleAs="h2"` whenever the header
-  sits below another page title or inside a dialog body.
+- **A real heading.** The title renders as a `Heading` (`h1` by default),
+  giving the page one clear entry point for assistive technology navigating by
+  heading; see Best practices when a second header needs `titleAs="h2"`.
 - **Breadcrumbs keep their own semantics.** `PageHeader` does not wrap
   `breadcrumbs` in extra markup — pass a `Breadcrumb` component, which
   carries its own navigation landmark.
@@ -109,7 +108,7 @@ Same group: `Accordion` · `Carousel` · `Panel` · `ScrollBar`
 ## Parts
 
 1. **Breadcrumbs.** Optional, above the title.
-2. **Title.** The page's `h1` at `Heading` `large` (24/28) by default (or the ambient heading level), `titleAs="h2"` when below another page title, or any node with `disableTitleStyles`.
+2. **Title.** The page's `h1` by default, or any node with `disableTitleStyles`.
 3. **Actions.** Optional, at the end of the title row.
 4. **Bottom bar.** Optional, under the row: tabs, a filter bar or a status line.
 
@@ -127,7 +126,7 @@ Same group: `Accordion` · `Carousel` · `Panel` · `ScrollBar`
 
 | Part | Token |
 | --- | --- |
-| Title | `Heading` at the `large` size (24/28), as an `h1` by default (follows the ambient heading level; override with `titleAs`). |
+| Title | `Heading` at `large` (24/28); see Best practices for heading level. |
 | Rows | `--space-100` between breadcrumbs, title row and bottom bar. |
 | Title row | `--space-150` between the title and its actions; `--space-075` between actions. |
 | Breadcrumbs | `--body-sm`. |
@@ -149,7 +148,7 @@ Same group: `Accordion` · `Carousel` · `Panel` · `ScrollBar`
 | `breadcrumbs` | node | — | A breadcrumb trail shown above the title row. Pass a `Breadcrumb`. |
 | `actions` | node | — | Controls shown at the end of the title row, such as a primary button or a menu. |
 | `bottomBar` | node | — | Content in a bar below the title row, such as tabs or filters. |
-| `titleAs` | oneOf | — | Overrides the HTML element the title's `Heading` renders as, e.g. `"h2"` when placed below another page title. |
+| `titleAs` | oneOf | — | Overrides the HTML element the title's `Heading` renders as, e.g. `"h2"` when placed below another page title. A `Modal` or dialog body resets the heading level to 1, so a `PageHeader` inside one passes `titleAs="h2"`. |
 | `disableTitleStyles` | bool | `false` | Renders the title as a plain node instead of a `Heading`, for a caller that styles it itself. |
 | `className` | string | — | Extra class names added to the header element beside the component's own. |
 

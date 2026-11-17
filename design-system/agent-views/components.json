@@ -8326,7 +8326,7 @@
             "h6",
             "span"
           ],
-          "description": "Overrides the HTML element the title's `Heading` renders as, e.g. `\"h2\"` when placed below another page title.",
+          "description": "Overrides the HTML element the title's `Heading` renders as, e.g. `\"h2\"` when placed below another page title. A `Modal` or dialog body resets the heading level to 1, so a `PageHeader` inside one passes `titleAs=\"h2\"`.",
           "deprecated": null
         },
         {
