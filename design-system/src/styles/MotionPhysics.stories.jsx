@@ -201,3 +201,46 @@ export const TokenTable = {
     await expect(text).toContain('317 ms');
   },
 };
+
+/** Audit T6 + T7 checks: exits keep a ghost, Modal size has arrows+ghost, Modes Flag has a dimmed start ghost, and appearance uses appearance.fast with no hard-coded Pointer. */
+export const NoEmptyTilesAndAppearanceFast = {
+  render: () => null,
+  play: async () => {
+    const find = (demo, id) => demo.scenes.find((s) => s.id === id);
+    const exitClick = find(PHYSICS_DEMOS.exits, 'exit-click');
+    await expect(exitClick.arrows?.length).toBe(1);
+    await expect(ghostOf(exitClick.arrows[0])).toMatchObject({ x: 88, y: 22, w: 56, h: 48 });
+
+    const sizeModal = find(PHYSICS_DEMOS.size, 'size-default');
+    await expect(sizeModal.arrows?.length).toBeGreaterThan(0);
+    for (const arrow of sizeModal.arrows) {
+      await expect(ghostOf(arrow)).toMatchObject({ x: 34, y: 32, w: 92, h: 52 });
+    }
+
+    for (const id of ['flag-productive', 'flag-expressive']) {
+      const flag = find(PHYSICS_DEMOS.modes, id);
+      const wrap = document.createElement('div');
+      const { createRoot } = await import('react-dom/client');
+      const root = createRoot(wrap);
+      root.render(<svg>{flag.draw(flag.initial)}</svg>);
+      await waitFor(() => expect(wrap.querySelectorAll('[opacity="0.35"]').length).toBeGreaterThan(0));
+      root.unmount();
+    }
+
+    const app = find(PHYSICS_DEMOS.appearance, 'appearance-app');
+    const tokens = [];
+    await app.play({
+      tap: async () => {},
+      spring: async (_k, _to, token) => { tokens.push(token); },
+      hold: async () => {},
+    });
+    await expect(tokens).toEqual(['appearance.fast']);
+    const wrap = document.createElement('div');
+    const { createRoot } = await import('react-dom/client');
+    const root = createRoot(wrap);
+    root.render(<svg>{app.draw(app.landing)}</svg>);
+    await waitFor(() => expect(wrap.querySelectorAll('rect').length).toBeGreaterThan(0));
+    await expect(wrap.querySelector(`path[fill="${PAINT.pointer}"]`)).toBeNull();
+    root.unmount();
+  },
+};

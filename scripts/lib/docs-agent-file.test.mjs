@@ -174,7 +174,7 @@ test('a MotionSection naming a row the registry lacks fails the render', () => {
   assert.throws(() => renderDocsAgentFile(source, { file: 'x.mdx', kind: 'Template', registry: [] }), /Ghost/);
 });
 
-// ── Foundations › Expression › Motion through get-documentation ──
+// ── Foundations › Expression › Motion through docs-show ──
 
 const MOTION_MDX = (name) => `import { Meta } from '@storybook/addon-docs/blocks';\n\n<Meta title="Foundations/Expression/Motion/${name}" tags={['!dev', 'manifest']} />\n\n# ${name}\n`;
 const MOTION_STORIES = (name, tags) => `export default {\n    title: 'Foundations/Expression/Motion/${name}',\n    tags: [${tags}],\n};\n`;

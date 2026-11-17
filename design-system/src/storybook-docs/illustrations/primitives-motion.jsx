@@ -63,11 +63,12 @@ export const ChartCurve = ({ x, y, w, h, values, scale = 0.8, upTo = 1, accent =
  * `ghost` is the rectangle it lands in, outlined dashed so the landing is seen
  * before anything moves.
  */
-export const Trail = ({ points, ghost, accent = false }) => {
+export const Trail = ({ points = [], ghost, accent = false }) => {
   const color = accent ? PAINT.accent : PAINT.trail;
-  const [sx, sy] = points[0];
-  const [ex, ey] = points[points.length - 1];
-  const [px, py] = points[points.length - 2] ?? points[0];
+  const hasLine = points.length >= 2;
+  const [sx, sy] = hasLine ? points[0] : [0, 0];
+  const [ex, ey] = hasLine ? points[points.length - 1] : [0, 0];
+  const [px, py] = hasLine ? (points[points.length - 2] ?? points[0]) : [0, 0];
   const angle = Math.atan2(ey - py, ex - px);
   const head = (a, r) => `${(ex - r * Math.cos(angle + a)).toFixed(1)},${(ey - r * Math.sin(angle + a)).toFixed(1)}`;
   return (
@@ -85,14 +86,18 @@ export const Trail = ({ points, ghost, accent = false }) => {
           style={{ ...HAIRLINE, rx: `min(${CORNER.shape}, ${Math.min(ghost.w, ghost.h) / 2}px)` }}
         />
       )}
-      <polyline
-        points={points.map(([x, y]) => `${x},${y}`).join(' ')}
-        fill="none"
-        stroke={color}
-        style={{ ...SERIES, strokeWidth: 'var(--stroke-hairline)' }}
-      />
-      <circle cx={sx} cy={sy} r={1.75} fill={color} />
-      <polygon points={`${ex},${ey} ${head(0.5, 5)} ${head(-0.5, 5)}`} fill={color} />
+      {hasLine && (
+        <>
+          <polyline
+            points={points.map(([x, y]) => `${x},${y}`).join(' ')}
+            fill="none"
+            stroke={color}
+            style={{ ...SERIES, strokeWidth: 'var(--stroke-hairline)' }}
+          />
+          <circle cx={sx} cy={sy} r={1.75} fill={color} />
+          <polygon points={`${ex},${ey} ${head(0.5, 5)} ${head(-0.5, 5)}`} fill={color} />
+        </>
+      )}
     </g>
   );
 };

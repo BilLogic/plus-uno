@@ -9,7 +9,7 @@ import { BrowserWindow, LiveAnatomy, ScaledStory } from '@/storybook-docs/lib/te
 import { FitStage, ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { DemoPageHeader } from '../Page/pageDemo.jsx';
 import { expectOverlayExit } from '@/storybook-docs/lib/overlay-motion-plays.js';
-import { AreaStage, DrillStack, FocusedFrameSwitch, StepStage, useDrillStack } from '@/lib/navigationMotion';
+import { AreaStage, DrillStack, FocusedFrameSwitch, StepStage, resolveStepAxis, useDrillStack } from '@/lib/navigationMotion';
 import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { BAR_TOKEN, FocusedType, STEPS_RAIL, TASK_STEPS, WINDOW_HEIGHT, stepItems } from '@/storybook-docs/lib/focused-task.jsx';
 import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
@@ -2808,24 +2808,26 @@ export const MotionFocusedTaskReduced = {
     play: focusedTaskPlay(true),
 };
 
-const STEP_BODIES = [
-    ['Choose the student', 'Pick who this tutoring plan is for and confirm their grade level.'],
-    ['Set the weekly schedule', 'Confirm the recurring day, time and school room.'],
-    ['Pick learning goals', 'Choose up to three math standards to track together.'],
-    ['Attach materials', 'Link worksheets or warm-up decks for the first session.'],
-    ['Review and confirm', 'Check every detail before sending the plan to the school lead.'],
-];
+const STEP_BODY_BY_LABEL = {
+    Student: ['Choose the student', 'Pick who this tutoring plan is for and confirm their grade level.'],
+    Schedule: ['Set the weekly schedule', 'Confirm the recurring day, time and school room.'],
+    Goals: ['Pick learning goals', 'Choose up to three math standards to track together.'],
+    Materials: ['Attach materials', 'Link worksheets or warm-up decks for the first session.'],
+    Review: ['Review and confirm', 'Check every detail before sending the plan to the school lead.'],
+};
 
 const FocusedStepMotionDemo = ({ count = 4, allowExtraBranch = false }) => {
     const [extra, setExtra] = useState(false);
-    const activeCount = extra ? count + 1 : count;
-    const labels = TASK_STEPS.slice(0, activeCount);
+    const baseLabels = TASK_STEPS.slice(0, count);
+    const branchLabel = baseLabels.includes('Review') ? TASK_STEPS[count] : 'Review';
+    const longestLabels = allowExtraBranch && branchLabel ? [...baseLabels, branchLabel] : baseLabels;
+    const labels = extra ? longestLabels : baseLabels;
     const [at, setAt] = useState(0);
-    // Placement is decided once when the task opens, by the initial maxSteps.
-    const [placement] = useState(() => (count > 4 ? 'down' : 'across'));
+    // Placement is decided once when the task opens, by the longest path the flow can take.
+    const [placement] = useState(() => resolveStepAxis({ maxSteps: longestLabels.length, labels: longestLabels }));
     const down = placement === 'down';
     const last = at === labels.length - 1;
-    const [title, description] = STEP_BODIES[at] ?? STEP_BODIES[0];
+    const [title, description] = STEP_BODY_BY_LABEL[labels[at]] ?? STEP_BODY_BY_LABEL.Student;
 
     return (
         <ScreenStage width={FRAME_LAYOUT.dockMin} fluid>
@@ -2855,7 +2857,7 @@ const FocusedStepMotionDemo = ({ count = 4, allowExtraBranch = false }) => {
                                 />
                             </div>
                             <div style={{ flex: '1 1 auto', minInlineSize: 0 }}>
-                                <StepStage step={at} axis={placement} maxSteps={count} labels={labels}>
+                                <StepStage step={at} axis={placement} maxSteps={longestLabels.length} labels={labels}>
                                     <PatternSection title={title} description={description}>
                                         <PatternCard title={`Step ${at + 1}: ${labels[at]}`} description={description} />
                                         {allowExtraBranch && !extra ? (
@@ -2896,19 +2898,23 @@ const FocusedStepMotionDemo = ({ count = 4, allowExtraBranch = false }) => {
     );
 };
 
-const stepMotionPlay = ({ expectedPlacement, reduced, checkBranchLock = false }) => async ({ canvasElement }) => {
+const stepMotionPlay = ({ expectedPlacement, reduced, initialCount, checkBranchLock = false }) => async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const stage = canvasElement.querySelector('[data-step-stage]');
     const head = canvasElement.querySelector('[data-probe="step-head"]');
     const bar = canvasElement.querySelector('[data-probe="bar"]');
+    const trackerItems = () => canvasElement.querySelectorAll('[data-probe="steps"] .plus-progress-tracker__item');
     const headTop = rect(head).top;
     const barTop = rect(bar).top;
 
     await expect(stage).toHaveAttribute('data-step-placement', expectedPlacement);
-    await expect(canvasElement.querySelector('[data-probe="step-position"]')).toHaveTextContent(`1 of ${expectedPlacement === 'across' ? 4 : 5}`);
+    await expect(canvasElement.querySelector('[data-probe="step-position"]')).toHaveTextContent(`1 of ${initialCount}`);
+    if (expectedPlacement === 'across') {
+        await expect(trackerItems().length, 'across tracker never exceeds 4 steps').toBeLessThanOrEqual(4);
+    }
 
     await userEvent.click(canvas.getByRole('button', { name: 'Next' }));
-    await expect(canvasElement.querySelector('[data-probe="step-position"]')).toHaveTextContent(`2 of ${expectedPlacement === 'across' ? 4 : 5}`);
+    await expect(canvasElement.querySelector('[data-probe="step-position"]')).toHaveTextContent(`2 of ${initialCount}`);
 
     if (reduced) {
         await expect(stage, 'reduced motion swaps via fade, never sliding').not.toHaveAttribute('data-step-phase', 'sliding');
@@ -2936,7 +2942,11 @@ const stepMotionPlay = ({ expectedPlacement, reduced, checkBranchLock = false })
 
     if (checkBranchLock) {
         await userEvent.click(canvas.getByRole('button', { name: 'Add review step' }));
-        await expect(stage, 'a branch adding a step mid-task never flips top to side').toHaveAttribute('data-step-placement', 'across');
+        await expect(stage, 'a branch adding a step mid-task never flips placement').toHaveAttribute('data-step-placement', expectedPlacement);
+        await expect(canvasElement.querySelector('[data-probe="step-position"]')).toHaveTextContent(`1 of ${initialCount + 1}`);
+        if (expectedPlacement === 'across') {
+            await expect(trackerItems().length, 'across story never shows 5 steps across').toBeLessThanOrEqual(4);
+        }
     }
 };
 
@@ -2944,31 +2954,31 @@ export const MotionStepAcross = {
     name: 'Navigation motion: Step across',
     parameters: { layout: 'padded' },
     decorators: [motionOn],
-    render: () => <FocusedStepMotionDemo count={4} allowExtraBranch />,
-    play: stepMotionPlay({ expectedPlacement: 'across', reduced: false, checkBranchLock: true }),
+    render: () => <FocusedStepMotionDemo count={3} allowExtraBranch />,
+    play: stepMotionPlay({ expectedPlacement: 'across', reduced: false, initialCount: 3, checkBranchLock: true }),
 };
 
 export const MotionStepAcrossReduced = {
     name: 'Navigation motion: Step across, reduced',
     parameters: { layout: 'padded' },
     decorators: [motionOff],
-    render: () => <FocusedStepMotionDemo count={4} allowExtraBranch />,
-    play: stepMotionPlay({ expectedPlacement: 'across', reduced: true, checkBranchLock: true }),
+    render: () => <FocusedStepMotionDemo count={3} allowExtraBranch />,
+    play: stepMotionPlay({ expectedPlacement: 'across', reduced: true, initialCount: 3, checkBranchLock: true }),
 };
 
 export const MotionStepDown = {
     name: 'Navigation motion: Step down',
     parameters: { layout: 'padded' },
     decorators: [motionOn],
-    render: () => <FocusedStepMotionDemo count={5} />,
-    play: stepMotionPlay({ expectedPlacement: 'down', reduced: false }),
+    render: () => <FocusedStepMotionDemo count={4} allowExtraBranch />,
+    play: stepMotionPlay({ expectedPlacement: 'down', reduced: false, initialCount: 4, checkBranchLock: true }),
 };
 
 export const MotionStepDownReduced = {
     name: 'Navigation motion: Step down, reduced',
     parameters: { layout: 'padded' },
     decorators: [motionOff],
-    render: () => <FocusedStepMotionDemo count={5} />,
-    play: stepMotionPlay({ expectedPlacement: 'down', reduced: true }),
+    render: () => <FocusedStepMotionDemo count={4} allowExtraBranch />,
+    play: stepMotionPlay({ expectedPlacement: 'down', reduced: true, initialCount: 4, checkBranchLock: true }),
 };
 

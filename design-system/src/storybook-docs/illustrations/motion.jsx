@@ -366,7 +366,11 @@ const Tile = ({ scene, state, arrows, dim, showArrows }) => {
       >
         <Illustration viewBox={scene.viewBox} title={scene.label ?? (`${scene.title ?? ''}. ${scene.caption ?? ''}`.trim() || scene.id)}>
           <g opacity={round(1 - dim * VEIL)}>
-            {resetting && <g>{scene.draw(startStates([scene])[scene.id])}</g>}
+            {resetting && (
+              <g opacity={state.crossfade ? round(1 - (state.fade ?? 1)) : undefined}>
+                {scene.draw(startStates([scene])[scene.id])}
+              </g>
+            )}
             <g opacity={round(state.fade ?? 1)}>{scene.draw(state)}</g>
           </g>
           {state.tapOpacity > 0 && (
@@ -410,11 +414,15 @@ const Tile = ({ scene, state, arrows, dim, showArrows }) => {
 };
 
 const NO_CHROME = { arrows: 0, dim: 0 };
+const REDUCED_CHROME = { arrows: 1, dim: 0 };
 /** How far the arrows phase veils the drawing: light, so the window stays readable under the paths. */
 const VEIL = 0.15;
 /** Every scene at its start, with the layer's own keys at rest. */
 const startStates = (scenes, extra) =>
   Object.fromEntries(scenes.map((s) => [s.id, { fade: 1, tap: 0, tapOpacity: 0, tapX: 0, tapY: 0, ...s.initial, ...extra }]));
+/** Every scene at its declared landing, so reduced stills never flash their start frame on mount. */
+const landingStates = (scenes, extra) =>
+  Object.fromEntries(scenes.map((s) => [s.id, { fade: 1, tap: 0, tapOpacity: 0, tapX: 0, tapY: 0, ...s.initial, ...s.landing, ...extra }]));
 
 /**
  * A group of scenes that play together and share one speed control. Phases,
@@ -436,9 +444,9 @@ export const MotionDemo = ({
 }) => {
   const prefersReduced = useReducedMotion();
   const reduced = forcedReduced ?? Boolean(prefersReduced);
-  const [states, setStates] = useState(() => startStates(scenes));
-  const [chrome, setChrome] = useState(NO_CHROME);
-  const [phase, setPhase] = useState(reduced ? 'still' : 'idle');
+  const [states, setStates] = useState(() => (reduced ? landingStates(scenes) : startStates(scenes)));
+  const [chrome, setChrome] = useState(() => (reduced ? REDUCED_CHROME : NO_CHROME));
+  const [phase, setPhase] = useState('idle');
   const [passes, setPasses] = useState(0);
   const [speedIndex, setSpeedIndex] = useState(0);
   const [paused, setPausedState] = useState(false);
@@ -486,7 +494,7 @@ export const MotionDemo = ({
   useEffect(() => {
     let live = true;
     const isLive = () => live;
-    const chromeRef = { current: NO_CHROME };
+    const chromeRef = { current: reduced ? REDUCED_CHROME : NO_CHROME };
     const putStates = (next) => {
       statesRef.current = next;
       if (live) setStates(next);
@@ -495,7 +503,7 @@ export const MotionDemo = ({
       chromeRef.current = next;
       if (live) setChrome(next);
     };
-    const contexts = (instant) =>
+    const contexts = (instant, storeRef = statesRef, write = putStates) =>
       scenes.map((scene) =>
         createContext({
           scene,
@@ -503,9 +511,9 @@ export const MotionDemo = ({
           isLive,
           track,
           mode,
-          getState: () => statesRef.current[scene.id],
+          getState: () => storeRef.current[scene.id],
           setState: (patch) =>
-            putStates({ ...statesRef.current, [scene.id]: { ...statesRef.current[scene.id], ...patch } }),
+            write({ ...storeRef.current, [scene.id]: { ...storeRef.current[scene.id], ...patch } }),
         }),
       );
     const chromeCtx = createContext({
@@ -518,6 +526,16 @@ export const MotionDemo = ({
       setState: (patch) => putChrome({ ...chromeRef.current, ...patch }),
     });
     const playAll = (instant) => Promise.all(contexts(instant).map((ctx) => ctx.scene.play(ctx)));
+    const resolveLandingStates = async (extra) => {
+      const scratch = { current: startStates(scenes) };
+      await Promise.all(
+        contexts(true, scratch, (next) => {
+          scratch.current = next;
+        }).map((ctx) => ctx.scene.play(ctx)),
+      );
+      if (!extra) return scratch.current;
+      return Object.fromEntries(Object.entries(scratch.current).map(([id, st]) => [id, { ...st, ...extra }]));
+    };
 
     const pass = async () => {
       if (scenes.some((s) => s.arrows?.length)) {
@@ -536,45 +554,73 @@ export const MotionDemo = ({
       }
     };
 
+    const reducedPass = async () => {
+      const finished = await resolveLandingStates();
+      const landed = Object.fromEntries(Object.entries(finished).map(([id, st]) => [id, { ...st, fade: 0, crossfade: 1 }]));
+      if (!live) return;
+      putStates(landed);
+      putChrome({ arrows: 1, dim: 1 });
+      if (scenes.some((s) => s.arrows?.length)) {
+        setPhase('arrows');
+        await chromeCtx.hold(0.5);
+        if (!live) return;
+      }
+      setPhase('playing');
+      await Promise.all([
+        ...contexts(false).map((ctx) => ctx.spring('fade', 1, 'appearance.fast')),
+        chromeCtx.spring('dim', 0, 'appearance.fast'),
+      ]);
+      if (live) {
+        putStates(finished);
+        setPasses((n) => n + 1);
+        setPhase('still');
+      }
+    };
+
     const totalReplays = replay + replayKey;
-    putStates(startStates(scenes));
-    putChrome(NO_CHROME);
     if (reduced && !totalReplays) {
       // The landing, still, with its paths drawn: what changed, without the motion.
-      playAll(true).then(() => {
+      putStates(landingStates(scenes));
+      putChrome(REDUCED_CHROME);
+      resolveLandingStates().then((landed) => {
         if (!live) return;
-        putChrome({ arrows: 1, dim: 0 });
+        putStates(landed);
+        putChrome(REDUCED_CHROME);
         setPhase('still');
       });
     } else if (reduced) {
-      // The reader asked: one pass, then it holds.
+      // The reader asked: fade in place from start to landing on appearance.fast, never a cut or travel.
       setPhase('idle');
-      pass();
-    } else if (!inView && !totalReplays) {
-      setPhase('idle');
-    } else if (!loop) {
-      setPhase('idle');
-      (async () => {
-        await chromeCtx.hold(1);
-        if (!live) return;
-        await pass();
-      })();
+      reducedPass();
     } else {
-      setPhase('idle');
-      (async () => {
-        await chromeCtx.hold(1);
-        while (live) {
+      putStates(startStates(scenes));
+      putChrome(NO_CHROME);
+      if (!inView && !totalReplays) {
+        setPhase('idle');
+      } else if (!loop) {
+        setPhase('idle');
+        (async () => {
+          await chromeCtx.hold(1);
+          if (!live) return;
           await pass();
-          if (!live) return;
-          await chromeCtx.hold(4);
-          if (!live) return;
-          // Crossfade the landing out over the start state, then put every scene
-          // back at its start: a loop never jumps and a tile never goes empty.
-          await Promise.all(contexts(false).map((ctx) => ctx.spring('fade', 0, 'appearance.default')));
-          if (!live) return;
-          putStates(startStates(scenes));
-        }
-      })();
+        })();
+      } else {
+        setPhase('idle');
+        (async () => {
+          await chromeCtx.hold(1);
+          while (live) {
+            await pass();
+            if (!live) return;
+            await chromeCtx.hold(4);
+            if (!live) return;
+            // Crossfade the landing out over the start state, then put every scene
+            // back at its start: a loop never jumps and a tile never goes empty.
+            await Promise.all(contexts(false).map((ctx) => ctx.spring('fade', 0, 'appearance.default')));
+            if (!live) return;
+            putStates(startStates(scenes));
+          }
+        })();
+      }
     }
     return () => {
       live = false;

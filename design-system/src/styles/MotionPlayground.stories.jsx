@@ -98,13 +98,16 @@ export const StiffAndSoftReduced = reducedStory(PLAYGROUND_DEMOS.extremes);
 export const TheShakeReduced = reducedStory(PLAYGROUND_DEMOS.shake);
 export const ThreeSpeedsReduced = reducedStory(PLAYGROUND_DEMOS.speeds);
 
-/** The spring controls under reduced motion: Play lands on the end frame with no travel. */
+/** The spring controls under reduced motion: still shows landing, and Play fades on appearance.fast with no travel or cut. */
 export const PlayLandsStillWhenReduced = {
   render: () => <SpringPlayground reduced />,
   play: async ({ canvasElement }) => {
     const root = canvasElement.querySelector('[data-playground]');
+    await expect(canvasElement.querySelector('[data-popup]')).not.toBeNull();
     await userEvent.click(within(canvasElement).getByRole('button', { name: /play/i }));
+    await waitFor(() => expect(root.dataset.phase).toBe('playing'));
     await waitFor(() => expect(root.dataset.phase).toBe('settled'), PASS);
+    await expect(canvasElement.querySelector('[data-popup]')).not.toBeNull();
   },
 };
 
@@ -130,17 +133,20 @@ export const DragPastTheLimitResistsAndReturns = {
   },
 };
 
-/** Under reduced motion the drag still follows the hand; let go, the Panel is at the limit without travelling. */
+/** Under reduced motion the drag still follows the hand; let go, the Panel fades to the limit on appearance.fast with the dashed limit line drawn. */
 export const DragPastTheLimitReduced = {
   render: () => <DragPastLimit reduced />,
   play: async ({ canvasElement }) => {
     const root = canvasElement.querySelector('[data-drag-limit]');
     const grab = canvasElement.querySelector('[data-grab]');
+    await expect(root.querySelector('line[stroke-dasharray="3 3"]')).not.toBeNull();
     grab.focus();
     for (let i = 0; i < 6; i++) grab.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
     await waitFor(() => expect(Number(root.dataset.width)).toBeCloseTo(limitWidth(36), 1));
     grab.dispatchEvent(new KeyboardEvent('keyup', { key: 'ArrowLeft', bubbles: true }));
-    await waitFor(() => expect(root.dataset.phase).toBe('rest'));
+    await waitFor(() => expect(root.dataset.phase).toBe('returning'));
+    await waitFor(() => expect(root.dataset.phase).toBe('rest'), PASS);
     await waitFor(() => expect(Number(root.dataset.width)).toBeCloseTo(limitWidth(25), 1));
+    await expect(root.querySelector('line[stroke-dasharray="3 3"]')).not.toBeNull();
   },
 };

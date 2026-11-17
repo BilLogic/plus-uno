@@ -388,7 +388,7 @@ const SideSteps = ({ x, y, current }) => (
               cx={x + 7}
               cy={cy}
               r={2.5}
-              fill="none"
+              fill={i === current ? PAINT.trackerCurrentDot : 'none'}
               stroke={i === current ? PAINT.trackerCurrentRing : PAINT.trackerDot}
               style={{ strokeWidth: 'var(--stroke-hairline)' }}
             />
@@ -400,14 +400,24 @@ const SideSteps = ({ x, y, current }) => (
   </>
 );
 
-/** One step's body: a card and a few lines, drawn at (`x`, `y`) in a w × h box. */
-const StepBody = ({ x, y, w, h }) => (
-  <>
-    <CardBox x={x} y={y} w={w} h={h} />
-    <SkeletonBar x={x + 8} y={y + 8} w={w * 0.3} h={5} heading />
-    <Field x={x + 8} y={y + 18} w={w - 16} />
-  </>
-);
+/** One step's body: a card and its fields, distinct per step so the landed step reads in still frames too. */
+const StepBody = ({ x, y, w, h, step = 0 }) => {
+  const half = (w - 20) / 2;
+  return (
+    <>
+      <CardBox x={x} y={y} w={w} h={h} />
+      <SkeletonBar x={x + 8} y={y + 8} w={w * (step === 0 ? 0.3 : 0.44)} h={5} heading />
+      {step === 0 ? (
+        <Field x={x + 8} y={y + 18} w={w - 16} />
+      ) : (
+        <>
+          <Field x={x + 8} y={y + 18} w={half} />
+          <Field x={x + 12 + half} y={y + 18} w={half} />
+        </>
+      )}
+    </>
+  );
+};
 
 const step = ({ id, title, caption, side, axis = 'x', spatial = 'spatial.default', appearance = 'appearance.fast' }) => {
   // Across the top the body is 128 × 36 under the tracker; down a side it is 80 wide beside the list.
@@ -446,16 +456,16 @@ const step = ({ id, title, caption, side, axis = 'x', spatial = 'spatial.default
             </>
           ) : (
             <>
-              <g opacity={1 - cur}><ProgressTracker x={16} y={28} w={128} count={4} current={0} /></g>
-              <g opacity={cur}><ProgressTracker x={16} y={28} w={128} count={4} current={1} /></g>
+              <g opacity={1 - cur}><ProgressTracker x={16} y={28} w={128} count={4} current={0} accent /></g>
+              <g opacity={cur}><ProgressTracker x={16} y={28} w={128} count={4} current={1} accent /></g>
             </>
           )}
           <Clip {...box}>
             <Moved {...off(-p)}>
-              <StepBody {...box} />
+              <StepBody {...box} step={0} />
             </Moved>
             <Moved {...off(1 - p)}>
-              <StepBody {...box} />
+              <StepBody {...box} step={1} />
             </Moved>
           </Clip>
           <Rule x1={9} x2={151} y1={82} y2={82} stroke={PAINT.frameDivider} />
@@ -545,18 +555,21 @@ const go = treeScene({
 const drillTree = treeScene({
   id: 'tree-drill',
   title: 'Drill into and climb back out',
-  caption: 'The path lights one level down into the chosen record, then back up to its parent.',
-  initial: { s: 1, r: 0, e: 0, seen: 0 },
-  landing: { s: 1, r: 0, e: 0, seen: 1 },
-  draw: ({ s, r, e }) => <IATree lit={{ a: s, r2: r }} progress={{ 'a-r2': e }} />,
+  caption: 'The path lights one level down into a record, climbs back to its parent, and drills into the chosen record.',
+  initial: { s: 1, r1: 0, e1: 0, r: 0, e: 0, seen: 0 },
+  landing: { s: 0.35, r1: 0, e1: 0, r: 1, e: 1, seen: 1 },
+  draw: ({ s, r1 = 0, e1 = 0, r, e }) => <IATree lit={{ a: s, r1, r2: r }} progress={{ 'a-r1': e1, 'a-r2': e }} />,
   play: async (ctx) => {
     await ctx.hold(1);
+    await ctx.spring('e1', 1, 'spatial.default');
+    await Promise.all([ctx.spring('r1', 1, 'appearance.default'), ctx.spring('s', 0.35, 'appearance.default')]);
+    await ctx.hold(1);
+    await Promise.all([ctx.spring('r1', 0, 'appearance.fast'), ctx.spring('e1', 0, 'spatial.fast')]);
+    await ctx.spring('s', 1, 'appearance.default');
+    await ctx.hold(0.5);
     await ctx.spring('e', 1, 'spatial.default');
     ctx.set({ seen: 1 });
     await Promise.all([ctx.spring('r', 1, 'appearance.default'), ctx.spring('s', 0.35, 'appearance.default')]);
-    await ctx.hold(1);
-    await Promise.all([ctx.spring('r', 0, 'appearance.fast'), ctx.spring('e', 0, 'spatial.fast')]);
-    await ctx.spring('s', 1, 'appearance.default');
   },
 });
 
