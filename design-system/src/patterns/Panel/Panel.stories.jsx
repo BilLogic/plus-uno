@@ -70,6 +70,8 @@ export const TypeDetails = {
     name: 'Type: Details',
     render: () => sized(<DetailsFrame />),
     play: async ({ canvasElement }) => {
+        await expect(canvasElement.closest('[inert]')).toBeNull();
+        await expect(canvasElement.querySelector('[inert]:not([data-base-ui-inert])')).toBeNull();
         await expectFloating(canvasElement);
         const { frame, panel } = frameParts(canvasElement);
         await expect(panel(), 'named for the record').toHaveAccessibleName('Session details');
@@ -78,6 +80,10 @@ export const TypeDetails = {
         await expect(Number(splitter.getAttribute('aria-valuemax')), 'to no wider than 640').toBeLessThanOrEqual(FRAME_LAYOUT.panelMax);
         const row = frame.querySelector('tbody tr:nth-child(2)');
         await expect(row.className, 'the picked row stays highlighted').toMatch(/highlighted/);
+        await userEvent.click(within(panel()).getByRole('button', { name: 'Edit' }));
+        await expect(within(panel()).getByRole('button', { name: 'Save' })).toBeInTheDocument();
+        await userEvent.click(within(panel()).getByRole('button', { name: 'Save' }));
+        await waitFor(() => expect(within(panel()).queryByRole('button', { name: 'Save' })).toBeNull());
     },
 };
 
@@ -122,13 +128,20 @@ const ANATOMY_DETAILS_PARTS = [
 export const AnatomyDetails = {
     name: 'Anatomy: Details',
     render: () => (
-        <LiveAnatomy width={FLOAT_STAGE} title="Details with its parts numbered" parts={ANATOMY_DETAILS_PARTS}>
+        <LiveAnatomy live width={FLOAT_STAGE} title="Details with its parts numbered" parts={ANATOMY_DETAILS_PARTS}>
             <DetailsFrame />
         </LiveAnatomy>
     ),
     play: async ({ canvasElement }) => {
+        await expect(canvasElement.closest('[inert]')).toBeNull();
+        await expect(canvasElement.querySelector('[inert]:not([data-base-ui-inert])')).toBeNull();
         await markersLevelWithParts(canvasElement, ANATOMY_DETAILS_PARTS);
         leadersCrossNoOtherPart(canvasElement, ANATOMY_DETAILS_PARTS);
+        const { panel } = frameParts(canvasElement);
+        await userEvent.click(within(panel()).getByRole('button', { name: 'Edit' }));
+        await expect(within(panel()).getByRole('button', { name: 'Save' })).toBeInTheDocument();
+        await userEvent.click(within(panel()).getByRole('button', { name: 'Discard' }));
+        await waitFor(() => expect(within(panel()).queryByRole('button', { name: 'Save' })).toBeNull());
     },
 };
 
@@ -140,13 +153,24 @@ const ANATOMY_INBOX_PARTS = [
 export const AnatomyNotifications = {
     name: 'Anatomy: Notifications',
     render: () => (
-        <LiveAnatomy width={FLOAT_STAGE} title="Notifications with its parts numbered" parts={ANATOMY_INBOX_PARTS}>
+        <LiveAnatomy live width={FLOAT_STAGE} title="Notifications with its parts numbered" parts={ANATOMY_INBOX_PARTS}>
             <InboxFrame />
         </LiveAnatomy>
     ),
     play: async ({ canvasElement }) => {
+        await expect(canvasElement.closest('[inert]')).toBeNull();
+        await expect(canvasElement.querySelector('[inert]:not([data-base-ui-inert])')).toBeNull();
         await markersLevelWithParts(canvasElement, ANATOMY_INBOX_PARTS);
         leadersCrossNoOtherPart(canvasElement, ANATOMY_INBOX_PARTS);
+        const { panel } = frameParts(canvasElement);
+        const p = within(panel());
+        const body = within(canvasElement.ownerDocument.body);
+        await userEvent.click(p.getByRole('button', { name: 'Show: Unread' }));
+        await userEvent.click(await body.findByRole('option', { name: 'All' }));
+        await expect(p.getByText(/Chloe Tran/)).toBeInTheDocument();
+        await userEvent.click(p.getByRole('button', { name: 'Show: All' }));
+        await userEvent.click(await body.findByRole('option', { name: 'Unread' }));
+        await expect(p.queryByText(/Chloe Tran/)).toBeNull();
     },
 };
 
