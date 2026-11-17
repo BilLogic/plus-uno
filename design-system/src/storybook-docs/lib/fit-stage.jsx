@@ -1,6 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { STAGE_FLOOR, useStageLayout } from './use-fit-scale.js';
+import { STAGE_FLOOR, inTypeThumb, useStageLayout } from './use-fit-scale.js';
+
+/** True when rendered inside a TypeCard thumbnail, keeping the thumbnail stage unscrollable as on main. */
+export const TypeThumbContext = React.createContext(false);
+
+const useInTypeThumb = (active) => {
+    const thumbCtx = React.useContext(TypeThumbContext);
+    const probeRef = React.useRef(null);
+    const [inThumb, setInThumb] = React.useState(false);
+    React.useLayoutEffect(() => {
+        if (!active || thumbCtx) return;
+        setInThumb(inTypeThumb(probeRef.current));
+    }, [active, thumbCtx]);
+    return [probeRef, thumbCtx || inThumb];
+};
 
 /** The height of the box `ref` points at, kept current as it changes. */
 const useMeasuredHeight = () => {
@@ -41,13 +55,15 @@ const Stage = ({ width, allowReflow, scaleOutside, children }) => {
  * A live story at its own `width` inside a horizontally scrollable box: it
  * takes its container's width and scrolls sideways when wider, never scaling.
  */
-export const ScrollStage = ({ width, height, children, ...props }) => (
-    <div style={{ overflowX: 'auto' }}>
+export const ScrollStage = React.forwardRef(({ width, height, children, ...props }, ref) => (
+    <div ref={ref} style={{ overflowX: 'auto' }}>
         <div style={{ inlineSize: width, blockSize: height }} {...props}>
             {children}
         </div>
     </div>
-);
+));
+
+ScrollStage.displayName = 'ScrollStage';
 
 ScrollStage.propTypes = {
     width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
@@ -68,18 +84,23 @@ ScrollStage.propTypes = {
  * picture. A story's own canvas and the test runner keep the fixed stage.
  *
  * With `scrollable` set, the stage never scales and instead scrolls
- * horizontally inside its own box when wider than the docs column.
+ * horizontally inside its own box when wider than the docs column (unless
+ * inside a `TypeCard` thumbnail, which keeps the unscrollable main stage).
  *
  * @param {object} props
  * @param {number} props.width  the stage width the story lays out at
  * @param {boolean} [props.reflow]  false keeps the stage at its own width on a docs page too, only scaling it
  * @param {boolean} [props.scrollable]  render at scale 1 and scroll horizontally when wider than the container
+ * @param {boolean} [props.fluid]  fill the container at scale 1 without forcing `width` outside a thumbnail
  */
-export const FitStage = ({ width, reflow = true, scrollable = false, children }) => (
-    scrollable
-        ? <ScrollStage width={width} data-fit-stage>{children}</ScrollStage>
-        : <Stage width={width} allowReflow={reflow} scaleOutside>{() => children}</Stage>
-);
+export const FitStage = ({ width, reflow = true, scrollable = false, fluid = false, children }) => {
+    const [probeRef, inThumb] = useInTypeThumb(scrollable);
+    if (scrollable && !inThumb) {
+        if (fluid) return <div ref={probeRef} style={{ inlineSize: '100%' }} data-fit-stage>{children}</div>;
+        return <ScrollStage ref={probeRef} width={width} data-fit-stage>{children}</ScrollStage>;
+    }
+    return <Stage width={width} allowReflow={reflow} scaleOutside>{() => children}</Stage>;
+};
 
 FitStage.propTypes = {
     width: PropTypes.number.isRequired,
@@ -87,6 +108,8 @@ FitStage.propTypes = {
     reflow: PropTypes.bool,
     /** Render at scale 1 inside a horizontally scrollable box instead of scaling down. */
     scrollable: PropTypes.bool,
+    /** Fill the container at scale 1 without forcing `width` outside a TypeCard thumbnail. */
+    fluid: PropTypes.bool,
     children: PropTypes.node,
 };
 
@@ -114,12 +137,14 @@ ReflowStage.propTypes = {
  * A screen box `width` wide, reflowed on a docs page: `ReflowStage` around one
  * plain box. A `fluid` screen fills its canvas outside the docs, as it did
  * before, and only takes the reflowed width on a docs page. With `scrollable`,
- * the stage never applies a scale transform and scrolls sideways below `STAGE_FLOOR`.
+ * the stage never applies a scale transform and scrolls sideways below `STAGE_FLOOR`
+ * (except inside a `TypeCard` thumbnail, which keeps the unscrollable main stage).
  */
 export const ScreenStage = ({ width, fluid = false, scrollable = false, children }) => {
-    if (scrollable) {
+    const [probeRef, inThumb] = useInTypeThumb(scrollable);
+    if (scrollable && !inThumb) {
         return (
-            <div style={{ overflowX: 'auto' }}>
+            <div ref={probeRef} style={{ overflowX: 'auto' }}>
                 <div style={{ inlineSize: fluid ? '100%' : width, minInlineSize: fluid ? Math.min(width, STAGE_FLOOR) : undefined }}>
                     {children}
                 </div>

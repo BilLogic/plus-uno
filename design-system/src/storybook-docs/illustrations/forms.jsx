@@ -1,7 +1,7 @@
 import React from 'react';
 import { PAINT } from './paint.js';
 import { Illustration } from './Illustration.jsx';
-import { Blanket, Field, Modal, Popup, Rect, SkeletonBar } from './primitives.jsx';
+import { Blanket, Field, Modal, Rect, SkeletonBar } from './primitives.jsx';
 
 /**
  * The Forms pattern's do and don't drawings. Each lesson is about where a
@@ -50,24 +50,5 @@ export const ErrorInSecondDialog = ({ title = 'A Modal whose invalid field has n
     <FormModal invalid />
     <Blanket x={0} y={0} w={W} h={H} />
     <Modal x={52} y={30} w={64} h={40} accent />
-  </Canvas>
-);
-
-/** Do: help in a caption under the field, where it stays. */
-export const HelpInCaption = ({ title = 'A field with its help in a caption under it, still there after typing' }) => (
-  <Canvas title={title}>
-    <FormModal>
-      <SkeletonBar x={FIELD_X} y={MODAL.y + 53} w={72} />
-      <Rect x={FIELD_X - 2} y={MODAL.y + 50} w={76} h={9} fill="none" stroke={PAINT.accent} corner="button" />
-    </FormModal>
-  </Canvas>
-);
-
-/** Don't: help only in a tooltip, a layer that is gone on touch and after typing. */
-export const HelpInTooltip = ({ title = 'A field with no caption whose only help is a tooltip layer floating over it' }) => (
-  <Canvas title={title}>
-    <FormModal>
-      <Popup x={FIELD_X + 36} y={MODAL.y + 40} w={52} h={24} accent />
-    </FormModal>
   </Canvas>
 );

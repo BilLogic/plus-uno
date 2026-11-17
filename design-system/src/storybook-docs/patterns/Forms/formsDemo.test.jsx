@@ -1,7 +1,11 @@
+import { join } from 'node:path';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
-import { FIVE_QUESTION_STEPS, QuestionStep, SettingsPage } from './formsDemo.jsx';
+import { describe, expect, it, vi } from 'vitest';
+import { expectTypeCardAnchors } from '@/storybook-docs/lib/type-card-anchors.jsx';
+import { FIVE_QUESTION_STEPS, HelpInCaptionCase, HelpInTooltipCase, QuestionStep, SettingsPage } from './formsDemo.jsx';
+
+vi.mock('@storybook/addon-docs/blocks', () => import('@/storybook-docs/lib/addon-docs-blocks-mock.jsx'));
 
 describe('SettingsPage (Forms › Settings page)', () => {
     it('groups SettingRows under section headings with Toggle, compact Select, and Button + StatusTag controls', () => {
@@ -135,5 +139,34 @@ describe('QuestionStep (Forms › In steps)', () => {
 
         await user.click(within(tracker).getByRole('button', { name: /Format/ }));
         expect(screen.getByRole('heading', { level: 1, name: 'How would you like to tutor?' })).toBeInTheDocument();
+    });
+});
+
+describe('Forms live cases and TypeCard links', () => {
+    it('HelpInCaptionCase renders visible standing help in the caption while HelpInTooltipCase puts it in an info button', async () => {
+        const user = userEvent.setup();
+        const { unmount } = render(<HelpInCaptionCase />);
+        const captionInput = screen.getByRole('textbox', { name: 'School email' });
+        const caption = screen.getByText('Shared with your site supervisor.');
+        expect(captionInput.getAttribute('aria-describedby')).toContain(caption.id);
+        await user.clear(captionInput);
+        await user.type(captionInput, 'marcus.lee@lincoln.edu');
+        expect(captionInput).toHaveValue('marcus.lee@lincoln.edu');
+        unmount();
+
+        render(<HelpInTooltipCase />);
+        const tooltipInput = screen.getByRole('textbox', { name: 'School email' });
+        expect(tooltipInput).toHaveValue('ana.ruiz@lincoln.edu');
+        await user.clear(tooltipInput);
+        await user.type(tooltipInput, 'sofia.ramirez@lincoln.edu');
+        expect(tooltipInput).toHaveValue('sofia.ramirez@lincoln.edu');
+        const infoBtn = screen.getByRole('button', { name: 'About School email' });
+        infoBtn.focus();
+        expect(infoBtn).toHaveFocus();
+        expect(screen.queryByText('Shared with your site supervisor.')).toBeNull();
+    });
+
+    it('links every TypeCard anchor to a unique ComponentExample heading id in Forms.mdx', () => {
+        expectTypeCardAnchors(join(__dirname, 'Forms.mdx'), 4);
     });
 });

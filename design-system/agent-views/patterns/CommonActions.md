@@ -16,10 +16,10 @@ Primary, Default, Subtle, Warning, Danger, Discovery and AI. One Primary per are
 
 The place sets the alignment. A page form's buttons start under the fields; a layer's end where the eye does.
 
-- **In a page form.** Left-aligned under the fields, Primary first, Cancel Subtle beside it.
-- **In a Modal.** Full bleed across the footer: Discard (Default) left, Primary right, Close in the header, no Cancel. The footer is 48 high and never moves.
-- **In a focused task.** The bottom bar: Back and Next split 50/50, Close in the title row, no Cancel. Back is disabled on the first step.
-- **In a card.** The main action is Subtle in the footer. A clickable card has no inner buttons; when in doubt, full-span inside tiles.
+- **In a page form.** Left-aligned under the fields, Primary first.
+- **In a Modal.** Full bleed across the footer: Discard left, Primary right, no Cancel.
+- **In a focused task.** Back and Next split 50/50 across the bar; Close in the title row.
+- **In a card.** Subtle in the footer; clickable cards keep no inner buttons.
 
 ## Small actions
 
@@ -27,9 +27,9 @@ The place sets the alignment. A page form's buttons start under the fields; a la
 
 Three tiers, picked by whether the change can be undone. No danger-outline combinations.
 
-- **Active.** A change that can be undone: Discard and the action in Primary.
-- **Active with Danger.** A delete: the action takes the Danger appearance.
-- **Danger, type the name.** A delete that cannot be undone: the caption asks for the name, and Danger enables once it matches.
+- **Active.** Reversible change: Discard and a Primary action.
+- **Active with Danger.** A delete: Danger in place of Primary.
+- **Danger, type the name.** Irreversible delete: Danger enables once the typed name matches.
 
 ## Acting on many rows
 

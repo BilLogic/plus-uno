@@ -5,6 +5,7 @@ import { Story } from '@storybook/addon-docs/blocks';
 import { Tag } from '@/components';
 import { MotionPreferenceContext } from '@/lib/motionPreference.jsx';
 import { useFitScale } from './use-fit-scale.js';
+import { TypeThumbContext } from './fit-stage.jsx';
 import { ANATOMY_REGIONS, isOwnRegion } from './anatomy-regions.js';
 import { HeroCard } from '../docs-landing/HeroCard.jsx';
 
@@ -114,9 +115,11 @@ export const TypeCard = ({ of, thumb, hero, title, stage = TYPE_STAGE, to, thumb
                 {hero ? (
                     <HeroCard page={hero} />
                 ) : (
-                    <ScaledStory width={stage}>
-                        {thumb ?? <Story of={of} inline />}
-                    </ScaledStory>
+                    <TypeThumbContext.Provider value={true}>
+                        <ScaledStory width={stage}>
+                            {thumb ?? <Story of={of} inline />}
+                        </ScaledStory>
+                    </TypeThumbContext.Provider>
                 )}
             </ThumbTag>
             <figcaption style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-sm)' }}>

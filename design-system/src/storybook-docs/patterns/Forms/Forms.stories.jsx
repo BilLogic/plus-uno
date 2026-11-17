@@ -1,9 +1,10 @@
-import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import { BAR_TOKEN } from '@/storybook-docs/lib/focused-task.jsx';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
+import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { alpha, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { EMPTY, FILLED, FormInModal, FormInPage, FormInPanel, FormInSteps, PAGE_WIDTH } from '../../../patterns/Form/formDemo.jsx';
@@ -30,18 +31,22 @@ const rect = (el) => el.getBoundingClientRect();
 /** Stage heights that hold the whole form: the server message and the field errors each add a block above the pinned footer. */
 const SERVER_HEIGHT = 720; // docs-literal
 const MARKED_HEIGHT = 680; // docs-literal
-const staged = (story, width = STAGE) => <FitStage width={width}>{story}</FitStage>;
+const staged = (story, width = STAGE) => <FitStage width={width} scrollable>{story}</FitStage>;
 
 /* ------------------------------------------------------------------- hosts */
 
 export const HostPage = {
     name: 'Host: In a page',
     render: () => staged(<FormInPage />, PAGE_WIDTH),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const save = canvas.getByRole('button', { name: 'Save session' });
         await expect(rect(save).left, 'buttons left-aligned under the fields').toBeCloseTo(rect(canvasElement.querySelector('.plus-fieldset')).left, 0);
+        const student = canvas.getByRole('textbox', { name: /Student/ });
+        await userEvent.type(student, 'Ana Ruiz');
+        await expect(student).toHaveValue('Ana Ruiz');
         await fitsCanvas(canvasElement);
     },
 };
@@ -50,9 +55,10 @@ export const HostPage = {
 export const SettingsInPage = {
     name: 'Host: Settings on a page',
     render: () => staged(<SettingsPageInWindow />, PAGE_WIDTH),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
 
         await expect(canvas.getByRole('heading', { level: 1, name: 'Settings' })).toBeInTheDocument();
         await expect(canvas.getByRole('heading', { level: 2, name: 'Notifications' })).toBeInTheDocument();
@@ -88,10 +94,16 @@ export const SettingsInPage = {
 export const HostPanel = {
     name: 'Host: In a Panel',
     render: () => staged(<FormInPanel />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         await expect(rect(footer).height, 'the full-bleed footer is 48 high').toBeCloseTo(tokenLength(footer, BAR_TOKEN), 0);
+        const student = canvas.getByRole('textbox', { name: /Student/ });
+        await userEvent.clear(student);
+        await userEvent.type(student, 'Marcus Lee');
+        await expect(student).toHaveValue('Marcus Lee');
         await fitsCanvas(canvasElement);
     },
 };
@@ -99,10 +111,15 @@ export const HostPanel = {
 export const HostModal = {
     name: 'Host: In a Modal',
     render: () => staged(<FormInModal />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const dialog = within(canvasElement).getByRole('dialog');
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        const dialog = canvas.getByRole('dialog');
         await expect(within(dialog).getAllByRole('textbox').length, 'fewer than five fields').toBeLessThan(5);
+        const student = within(dialog).getByRole('textbox', { name: /Student/ });
+        await userEvent.type(student, 'Ana Ruiz');
+        await expect(student).toHaveValue('Ana Ruiz');
         await fitsCanvas(canvasElement);
     },
 };
@@ -110,9 +127,16 @@ export const HostModal = {
 export const HostSteps = {
     name: 'Host: In steps',
     render: () => staged(<FormInSteps />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        await expect(within(canvasElement).getByRole('button', { name: 'Next' }), 'the bar carries Back and Next').toBeInTheDocument();
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        const next = canvas.getByRole('button', { name: 'Next' });
+        await expect(next, 'the bar carries Back and Next').toBeInTheDocument();
+        await userEvent.click(next);
+        await expect(await canvas.findByRole('textbox', { name: /Session date/ })).toBeInTheDocument();
+        await userEvent.click(canvas.getByRole('button', { name: 'Back' }));
+        await expect(await canvas.findByRole('textbox', { name: /Student/ })).toBeInTheDocument();
         await fitsCanvas(canvasElement);
     },
 };
@@ -121,9 +145,10 @@ export const HostSteps = {
 export const OneQuestionPerStep = {
     name: 'Host: In steps (one question per step)',
     render: () => staged(<QuestionStepInWindow />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const centerX = (el) => {
             const box = rect(el);
             return (box.left + box.right) / 2;
@@ -183,9 +208,10 @@ export const OneQuestionPerStep = {
 export const QuestionStepFiveOrMore = {
     name: 'Test: In steps at five or more steps',
     render: () => staged(<QuestionStepInWindow steps={FIVE_QUESTION_STEPS} />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
 
         await expect(canvas.queryByRole('group', { name: 'Setup progress' }), 'dots give way to the step list at five steps').toBeNull();
         const tracker = canvas.getByRole('navigation', { name: 'Steps' });
@@ -205,16 +231,20 @@ export const QuestionStepFiveOrMore = {
 export const RequiredMarks = {
     name: 'Minority marker and help',
     render: () => staged(<Marks />, 480),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const student = canvas.getByRole('textbox', { name: 'Student' });
         await expect(student, 'a required field reports aria-required').toHaveAttribute('aria-required', 'true');
         await expect(canvasElement.querySelector('label[for="' + student.id + '"]'), 'majority required label stays unmarked').toHaveTextContent(/^Student$/);
         await expect(canvasElement.textContent, 'no star symbol in the form').not.toContain('*');
-        await expect(canvas.getByRole('textbox', { name: 'Notes (optional)' }), 'the minority optional field says so').not.toHaveAttribute('aria-required', 'true');
+        const notes = canvas.getByRole('textbox', { name: 'Notes (optional)' });
+        await expect(notes, 'the minority optional field says so').not.toHaveAttribute('aria-required', 'true');
         const caption = canvas.getByText('First and last name, as on the roster.');
         await expect(student.getAttribute('aria-describedby'), 'help sits in a caption the field points at').toContain(caption.id);
+        await userEvent.type(notes, 'Bring calculator');
+        await expect(notes).toHaveValue('Bring calculator');
         await fitsCanvas(canvasElement);
     },
 };
@@ -228,12 +258,18 @@ export const RequiredMarks = {
 export const ShownOnBlur = {
     name: 'Validation: On blur (shown)',
     render: () => staged(<FormInPage initial={EMPTY} marked="student" />, PAGE_WIDTH),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const canvas = within(canvasElement);
-        await expect(canvas.getByLabelText(/Student/), 'touched and empty').toHaveAttribute('aria-invalid', 'true');
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        const student = canvas.getByLabelText(/Student/);
+        await expect(student, 'touched and empty').toHaveAttribute('aria-invalid', 'true');
         await expect(canvas.getByText('Enter the student’s name.'), 'the error says what to fix').toBeInTheDocument();
         await expect(canvas.queryByText('Choose a site.'), 'an untouched field is not marked').toBeNull();
+        await userEvent.type(student, 'Ana Ruiz');
+        await userEvent.tab();
+        await waitFor(() => expect(student, 'typing clears the error once valid').not.toHaveAttribute('aria-invalid', 'true'));
+        await settleAnimations(canvasElement);
         await fitsCanvas(canvasElement);
     },
 };
@@ -242,12 +278,17 @@ export const ShownOnBlur = {
 export const ShownSubmitStaysEnabled = {
     name: 'Validation: Submit stays enabled (shown)',
     render: () => staged(<FormInPage initial={EMPTY} marked />, PAGE_WIDTH),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const canvas = within(canvasElement);
-        await expect(canvas.getByLabelText(/Student/)).toHaveAttribute('aria-invalid', 'true');
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        const student = canvas.getByLabelText(/Student/);
+        await expect(student).toHaveAttribute('aria-invalid', 'true');
         await expect(canvas.getByText('Choose a site.'), 'every missing field is marked').toBeInTheDocument();
         await expect(canvas.getByRole('button', { name: 'Save session' }), 'still enabled').not.toBeDisabled();
+        await userEvent.type(student, 'Ana Ruiz');
+        await expect(student).toHaveValue('Ana Ruiz');
+        await settleAnimations(canvasElement);
         await fitsCanvas(canvasElement);
     },
 };
@@ -256,12 +297,17 @@ export const ShownSubmitStaysEnabled = {
 export const ShownBlockedSubmit = {
     name: 'Validation: Blocked submit in a Modal (shown)',
     render: () => staged(<FormInModal initial={EMPTY} marked height="fill" stageHeight={MARKED_HEIGHT} />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await expect(canvas.queryAllByRole('dialog'), 'one dialog').toHaveLength(1);
-        await expect(canvas.getByLabelText(/Student/)).toHaveAttribute('aria-invalid', 'true');
+        const student = canvas.getByLabelText(/Student/);
+        await expect(student).toHaveAttribute('aria-invalid', 'true');
         await expect(canvas.getByText('Choose a site.')).toBeInTheDocument();
+        await userEvent.type(student, 'Ana Ruiz');
+        await expect(student).toHaveValue('Ana Ruiz');
+        await settleAnimations(canvasElement);
         await fitsCanvas(canvasElement);
     },
 };
@@ -270,9 +316,10 @@ export const ShownBlockedSubmit = {
 export const ShownSending = {
     name: 'Validation: Sending (shown)',
     render: () => staged(<FormInModal initial={FILLED} sending />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await expect(canvas.getByRole('button', { name: 'Save session' }), 'the spinner button is the one that disables').toBeDisabled();
         await expect(canvas.getByRole('button', { name: 'Discard' }), 'Discard stays live').not.toBeDisabled();
         await fitsCanvas(canvasElement);
@@ -283,9 +330,10 @@ export const ShownSending = {
 export const OnBlur = {
     name: 'Test: On blur',
     render: () => staged(<FormInPage />, PAGE_WIDTH),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const student = canvas.getByLabelText(/Student/);
         await userEvent.click(student);
         await expect(student, 'nothing is checked before the field is left').not.toHaveAttribute('aria-invalid', 'true');
@@ -303,9 +351,10 @@ export const OnBlur = {
 export const SubmitStaysEnabled = {
     name: 'Test: Submit stays enabled',
     render: () => staged(<FormInPage />, PAGE_WIDTH),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const save = canvas.getByRole('button', { name: 'Save session' });
         await expect(save, 'enabled with a field missing').not.toBeDisabled();
         await userEvent.click(save);
@@ -322,9 +371,10 @@ export const BlockedSubmit = {
     name: 'Test: Blocked submit in a Modal',
     // A filled Modal keeps its size when the errors appear, so the footer holds still; a hugging one grows from the middle.
     render: () => staged(<FormInModal height="fill" stageHeight={MARKED_HEIGHT} />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const before = rect(footer);
         await userEvent.click(canvas.getByRole('button', { name: 'Save session' }));
@@ -341,14 +391,16 @@ export const BlockedSubmit = {
 export const ServerRefuses = {
     name: 'Validation: Rejected by the server',
     render: () => staged(<FormInModal server initial={FILLED} height="fill" stageHeight={SERVER_HEIGHT} />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const message = canvasElement.querySelector('[data-probe="message"]');
         const body = canvasElement.querySelector('[data-probe="body"], .plus-pattern-modal-body');
         if (body) await expect(body.scrollHeight, 'the whole form shows: the body does not scroll').toBeLessThanOrEqual(body.clientHeight + 1);
         await expect(within(message).getByRole('alert'), 'announced when it appears').toBeInTheDocument();
         await expect(rect(message).top, 'at the top of the body').toBeLessThanOrEqual(rect(canvas.getByLabelText(/Student/)).top);
+        await expect(canvas.getByRole('button', { name: 'Save session' })).toBeEnabled();
         await fitsCanvas(canvasElement);
     },
 };
@@ -357,9 +409,10 @@ export const ServerRefuses = {
 export const Sending = {
     name: 'Test: Sending',
     render: () => staged(<FormInModal initial={FILLED} sendingForever />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const save = canvas.getByRole('button', { name: 'Save session' });
         const width = rect(save).width;
         await userEvent.click(save);
@@ -376,9 +429,10 @@ export const Sending = {
 export const LeavingWithEdits = {
     name: 'Leaving with edits',
     render: () => staged(<FormInModal />),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await userEvent.click(canvas.getByRole('button', { name: 'Discard' }));
         await expect(canvas.queryByRole('heading', { name: 'Discard changes?' }), 'a form with no edits leaves at once').toBeNull();
         await userEvent.type(canvas.getByLabelText(/Student/), 'Ana');
@@ -396,12 +450,20 @@ export const LeavingWithEdits = {
 export const BoundInput = {
     name: 'Bound inputs',
     render: () => staged(<BoundInputs />, 480),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await expect(canvas.getAllByRole('radio'), 'three choices are visible at once').toHaveLength(3);
         for (const radio of canvas.getAllByRole('radio')) await expect(radio, 'a radio group starts unanswered').not.toBeChecked();
-        await expect(canvas.getByRole('combobox', { name: /Grade/ }), 'six choices open from a select').toBeInTheDocument();
+        const inPerson = canvas.getByRole('radio', { name: 'In person' });
+        await userEvent.click(inPerson);
+        await expect(inPerson).toBeChecked();
+        const grade = canvas.getByRole('combobox', { name: /Grade/ });
+        await expect(grade, 'six choices open from a select').toBeInTheDocument();
+        await userEvent.click(grade);
+        await userEvent.click(await within(canvasElement.ownerDocument.body).findByRole('option', { name: 'Grade 7' }));
+        await expect(grade).toHaveValue('Grade 7');
         await fitsCanvas(canvasElement);
     },
 };

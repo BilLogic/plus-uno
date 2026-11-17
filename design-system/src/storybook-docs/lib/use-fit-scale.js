@@ -25,6 +25,9 @@ export const stageLayout = ({ width, available, reflow = false, floor = STAGE_FL
 /** True inside a docs page, where whole-screen examples reflow to the canvas. */
 export const inDocsPage = (el) => Boolean(el?.closest?.('.sbdocs'));
 
+/** True inside a TypeCard thumbnail, where stages stay unscrollable like main. */
+export const inTypeThumb = (el) => Boolean(el?.closest?.('[data-type-thumb]'));
+
 /**
  * The scale that fits a stage of `width` into the box `ref` points at: the
  * box's width over the stage's, never above 1. Read before the first paint and

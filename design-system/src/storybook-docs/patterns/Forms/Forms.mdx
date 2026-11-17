@@ -4,7 +4,7 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as FormsStories from './Forms.stories.jsx';
-import { STAGE, MinorityMarked, MajorityMarked } from './formsDemo.jsx';
+import { HelpInCaptionCase, HelpInTooltipCase, MajorityMarked, MinorityMarked, STAGE } from './formsDemo.jsx';
 import { PAGE_WIDTH } from '../../../patterns/Form/formDemo.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
@@ -12,8 +12,6 @@ import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 import {
     ErrorInSecondDialog,
     ErrorOnField,
-    HelpInCaption,
-    HelpInTooltip,
 } from '@/storybook-docs/illustrations/forms.jsx';
 
 <Meta title="Patterns/Forms" tags={['manifest']} />
@@ -48,11 +46,19 @@ import {
 Choose among four hosts. The <a target="_top" href="./?path=/docs/templates-form--docs">Form</a> template shows their layouts; this pattern guides host selection and form behavior.
 
 <TypeGrid>
-<TypeCard of={FormsStories.HostPage} title="In a page" stage={PAGE_WIDTH}>Settings and anything saved as a group. Buttons left-aligned under the fields.</TypeCard>
-<TypeCard of={FormsStories.HostPanel} title="In a Panel" stage={STAGE}>A short edit from a table, with the page in view. Discard and Save full bleed at the bottom, no Cancel.</TypeCard>
-<TypeCard of={FormsStories.HostModal} title="In a Modal" stage={STAGE}>A rare, critical task with fewer than five fields. 8-col; a confirm is 4-col or 6-col.</TypeCard>
-<TypeCard of={FormsStories.HostSteps} title="In steps" stage={STAGE}>A stepped task on Frame · focused: dots above one question under five steps, or the left step list at five or more.</TypeCard>
+<TypeCard of={FormsStories.HostPage} to="#in-a-page" title="In a page" stage={PAGE_WIDTH}>Settings and anything saved as a group.</TypeCard>
+<TypeCard of={FormsStories.HostPanel} to="#in-a-panel" title="In a Panel" stage={STAGE}>A short edit beside the page, with a full-bleed footer.</TypeCard>
+<TypeCard of={FormsStories.HostModal} to="#in-a-modal" title="In a Modal" stage={STAGE}>A rare, critical task with fewer than five fields.</TypeCard>
+<TypeCard of={FormsStories.HostSteps} to="#in-steps" title="In steps" stage={STAGE}>A stepped task on Frame · focused.</TypeCard>
 </TypeGrid>
+
+<ComponentExample of={FormsStories.HostPage} title="In a page" description="Settings and anything saved as a group. Buttons left-aligned under the fields." />
+
+<ComponentExample of={FormsStories.HostPanel} title="In a Panel" description="A short edit from a table, with the page in view. Discard and Save full bleed at the bottom, no Cancel." />
+
+<ComponentExample of={FormsStories.HostModal} title="In a Modal" description="A rare, critical task with fewer than five fields. 8-col; a confirm is 4-col or 6-col." />
+
+<ComponentExample of={FormsStories.HostSteps} title="In steps" description="A stepped task on Frame · focused: dots above one question under five steps, or the left step list at five or more." />
 
 <ComponentExample of={FormsStories.SettingsInPage} title="Settings on a page" description="Settings that apply at once sit in grouped SettingRows under section headings on the page, dividing rows with `--border-width-default` and no card per row: Toggle (with no own label), compact Select, and connection rows with StatusTag beside the label and Button at the end. Flipping a Toggle saves immediately and confirms with a Flag." />
 
@@ -198,9 +204,9 @@ When most fields are required, mark the optional ones `"(optional)"` (`labelMark
 A caption stays after the person types and is read by a screen reader with the field. A tooltip never carries the only copy of anything. An explanation most people will never need opens from an `InlineMessage` beside the field.
 
 <DoDontPair
-    doExample={<HelpInCaption />}
+    doExample={<HelpInCaptionCase />}
     doCaption="Help in the caption, where it stays after typing."
-    dontExample={<HelpInTooltip />}
+    dontExample={<HelpInTooltipCase />}
     dontCaption="Help only in a tooltip: gone on touch, gone after typing."
 />
 

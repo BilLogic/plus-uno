@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
-import { Button, ButtonItem, DropdownMenu, IconButton, InlineEdit, TextField, Tooltip } from '@/components';
-import { PatternCard, PatternSection } from '@/patterns';
+import { Button, ButtonItem, DropdownMenu, Fieldset, FooterActions, IconButton, InlineEdit, TextField, Tooltip } from '@/components';
+import { PatternCard, PatternModal, PatternSection } from '@/patterns';
 import { FilterSide, StudentsTable, ViewBar, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
+import { CaseBlanket, CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { FocusedType } from '@/storybook-docs/lib/focused-task.jsx';
 import { FILLED, FormInPage, PAGE_WIDTH as FORM_PAGE_WIDTH } from '../../../patterns/Form/formDemo.jsx';
@@ -15,7 +16,7 @@ import { ModalStage, TwoCells } from '../../../patterns/PatternModal/modalDemo.j
  *
  *   Appearances   every appearance, with the word it takes
  *   Page          buttons under a page form
- *   ModalFooter   full bleed, Close in the header and Cancel in the footer
+ *   ModalFooter   full bleed, Close in the header, Discard left and the action right (no Cancel)
  *   Reset         a filter side, "Reset filters" at its top
  *   Copy          an icon button and its "Copied" tooltip
  *   EditOne       one value, edited in place
@@ -51,14 +52,14 @@ export const Appearances = () => (
 /** Buttons under a page form: left-aligned, Primary first, Cancel Subtle. The form sits on the Page, in the Frame. */
 export const Page = () => <FormInPage initial={FILLED} />;
 
-/** A Modal's footer: full bleed, Cancel (Default) left and the action right; Close sits in the header. */
+/** A Modal's footer: full bleed, Discard (Default) left and the action right; Close sits in the header, no Cancel. */
 export const ModalFooter = () => (
     <ModalStage title="Log a session" footer={<TwoCells action="Save session" />}>
         {text('Ana Ruiz, Thursday at 4:00 PM, Lincoln Middle.')}
     </ModalStage>
 );
 
-/** A focused task's bottom bar: Cancel (Subtle) at the start, Back and Next at the end. */
+/** A focused task's bottom bar: Back and Next split 50/50, Close in the title row, no Cancel. */
 export const FocusedBar = () => <FocusedType start={1} />;
 
 /** A card's main action: Subtle in the footer. */
@@ -118,12 +119,15 @@ export const EditOne = () => {
     );
 };
 
+/** Room for the held-open DropdownMenu in EditRecord: docs geometry, in px. */
+const EDIT_RECORD_HEIGHT = 180; // docs-literal
+
 /** The whole record: Edit sits in the More menu beside the record's other actions. */
 export const EditRecord = ({ held = false }) => {
     const [setMount, mount] = useLayerMount();
     return (
         // A held-open menu waits for the picture's element, so it mounts inside it and not on the page.
-        <div ref={setMount} style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: 'var(--page-pad)', minBlockSize: held ? 'calc(var(--card-min-width-md) * 0.6)' : undefined }}>
+        <div ref={setMount} style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: 'var(--page-pad)', minBlockSize: held ? EDIT_RECORD_HEIGHT : undefined }}>
             <span style={{ font: 'var(--heading-sm)', color: 'var(--ds-text)' }}>Ana Ruiz</span>
             <DropdownMenu
                 trigger={<IconButton icon="ellipsis" label="More" appearance="subtle" />}
@@ -139,16 +143,25 @@ export const EditRecord = ({ held = false }) => {
 };
 
 /** Rows selected: the head row becomes the bulk bar, so the actions sit with the rows they act on. */
-export const ManyRows = () => (
-    <PatternSection title="Students" description="Lincoln Middle · 24 students" tabs={<ViewBar views={['All students', 'Needs follow-up']} />}>
-        <StudentsTable
-            count={4}
-            isSelectable
-            defaultSelectedRowKeys={['Ava Thompson', 'Sofia Ramirez']}
-            bulkActions={[{ label: 'Move to group' }, { label: 'Remove from group' }]}
-        />
-    </PatternSection>
-);
+export const ManyRows = () => {
+    const [view, setView] = useState('All students');
+    return (
+        <PatternSection
+            title="Students"
+            description="Lincoln Middle · 24 students"
+            tabs={<ViewBar views={['All students', 'Needs follow-up']} activeView={view} onViewChange={setView} />}
+        >
+            <StudentsTable
+                count={6}
+                view={view}
+                sortable
+                isSelectable
+                defaultSelectedRowKeys={['Ava Thompson', 'Sofia Ramirez']}
+                bulkActions={[{ label: 'Move to group' }, { label: 'Remove from group' }]}
+            />
+        </PatternSection>
+    );
+};
 
 /** Sending: only the pressed button disables, swapping its label for a spinner in place at the same width. */
 export const Sending = ({ sending: started = false }) => {
@@ -167,3 +180,114 @@ export const Sending = ({ sending: started = false }) => {
         </ModalStage>
     );
 };
+
+/* ----------------------------------------------------- live do/don't pairs */
+
+const buttonRow = {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: 'var(--stack-md)',
+    marginBlockStart: 'var(--stack-lg)',
+};
+
+/** Do: one Primary, with the second action Default beside it. */
+export const OnePrimaryCase = () => (
+    <CaseSurface>
+        <Fieldset legend="Session">
+            <TextField label="Student" defaultValue="Ana Ruiz" />
+        </Fieldset>
+        <div style={buttonRow}>
+            <Button appearance="primary" text="Save session" onClick={() => {}} />
+            <Button appearance="default" text="Save draft" onClick={() => {}} />
+        </div>
+    </CaseSurface>
+);
+
+/** Don't: two Primary buttons in one row; neither reads as the next step. */
+export const TwoPrimariesCase = () => (
+    <CaseSurface>
+        <Fieldset legend="Session">
+            <TextField label="Student" defaultValue="Ana Ruiz" />
+        </Fieldset>
+        <div style={buttonRow}>
+            <Button appearance="primary" text="Save session" onClick={() => {}} />
+            <Button appearance="primary" text="Save draft" onClick={() => {}} />
+        </div>
+    </CaseSurface>
+);
+
+/** Do: Primary first, then Cancel, left-aligned under the fields. */
+export const PageButtonsLeftCase = () => (
+    <CaseSurface>
+        <Fieldset legend="Session">
+            <TextField label="Student" defaultValue="Ana Ruiz" />
+            <TextField label="Site" defaultValue="Lincoln Middle" />
+        </Fieldset>
+        <div style={{ ...buttonRow, justifyContent: 'flex-start' }}>
+            <Button appearance="primary" text="Save session" onClick={() => {}} />
+            <Button appearance="subtle" text="Cancel" onClick={() => {}} />
+        </div>
+    </CaseSurface>
+);
+
+/** Don't: buttons pushed to the far end of the page, away from the fields, with Primary last. */
+export const PageButtonsFarRightCase = () => (
+    <CaseSurface>
+        <Fieldset legend="Session">
+            <TextField label="Student" defaultValue="Ana Ruiz" />
+            <TextField label="Site" defaultValue="Lincoln Middle" />
+        </Fieldset>
+        <div style={{ ...buttonRow, justifyContent: 'flex-end' }}>
+            <Button appearance="subtle" text="Cancel" onClick={() => {}} />
+            <Button appearance="primary" text="Save session" onClick={() => {}} />
+        </div>
+    </CaseSurface>
+);
+
+/** Do: two buttons filling the Modal footer edge to edge. */
+export const ModalFooterFullBleedCase = () => (
+    <CaseBlanket height={280}>
+        <PatternModal
+            width="xs"
+            title="Log a session"
+            onClose={() => {}}
+            footer={(
+                <FooterActions>
+                    <Button text="Discard" onClick={() => {}} />
+                    <Button text="Save session" appearance="primary" onClick={() => {}} />
+                </FooterActions>
+            )}
+        >
+            <TextField label="Student" defaultValue="Ana Ruiz" />
+        </PatternModal>
+    </CaseBlanket>
+);
+
+/** Don't: small buttons inset at the end, with spare footer around them. */
+// Deliberately mirrors the inset footer (non-full-bleed) as the Don't example.
+export const ModalFooterInsetCase = () => (
+    <CaseBlanket height={280}>
+        <PatternModal
+            width="xs"
+            title="Log a session"
+            onClose={() => {}}
+            footer={(
+                <div
+                    style={{
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                        gap: 'var(--inline-md)',
+                        paddingInline: 'var(--modal-pad-x-default)',
+                        paddingBlock: 'var(--stack-md)',
+                        borderTop: 'var(--border-width-default) solid var(--ds-border)',
+                    }}
+                >
+                    <Button text="Discard" onClick={() => {}} />
+                    <Button text="Save session" appearance="primary" onClick={() => {}} />
+                </div>
+            )}
+        >
+            <TextField label="Student" defaultValue="Ana Ruiz" />
+        </PatternModal>
+    </CaseBlanket>
+);
