@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { ClippedTooltip } from '@/lib/ClippedTooltip';
-import { useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
+import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
+import { useLayerMount, STUDENTS, StudentsTable } from '@/storybook-docs/lib/view-bar.jsx';
 import { DynamicTable, Pagination, SectionMessage, StatusTag, Tag, TagGroup } from '@/components';
 import { PatternSection } from '@/patterns';
-import { STUDENTS, StudentsTable } from '@/storybook-docs/lib/view-bar.jsx';
 
 /**
  * The Overflow pattern's examples: real parts holding text longer than their
@@ -45,8 +45,8 @@ export const Wrap = () => (
 );
 
 /** The note cell's text: the same clipped Tooltip a table cell carries, held open when `held`. */
-const HeldNote = ({ note, held }) => (
-    <ClippedTooltip text={note} placement="top" show={held || undefined}>
+export const HeldNote = ({ note, held, open }) => (
+    <ClippedTooltip text={note} placement="top" show={held ? open : undefined}>
         {({ measureRef, truncated }) => (
             <span ref={measureRef} className="plus-table-cell-text" tabIndex={truncated ? 0 : undefined}>{note}</span>
         )}
@@ -58,49 +58,77 @@ const HeldNote = ({ note, held }) => (
  * `held` opens the clipped cell's Tooltip for a docs picture, and only once the
  * picture's own element exists, so the Tooltip measures the laid-out cell.
  */
-export const ClippedCell = ({ note = LONG_NOTE, held = false }) => {
+export const ClippedCell = ({ note = LONG_NOTE, held = false, padded = true }) => {
     const [mountRef, mount] = useLayerMount();
     return (
-        <div ref={mountRef} style={{ ...frame, paddingBlockStart: held ? 'calc(var(--page-pad) * 3)' : frame.padding }}>
-            <DynamicTable
-                label="Session notes"
-                head={{ cells: [{ key: 'name', content: 'Student', width: '30%' }, { key: 'note', content: 'Note', width: '70%' }] }}
-                rows={STUDENTS.slice(0, 3).map(([name], i) => ({
-                    key: name,
-                    cells: [
-                        { key: `${name}-n`, content: name },
-                        { key: `${name}-t`, content: i === 0 ? <HeldNote note={note} held={held && Boolean(mount)} /> : 'On track' },
-                    ],
-                }))}
-            />
-        </div>
+        <DocsOverlayBoundary fit={false} containHeight>
+            <div
+                ref={mountRef}
+                style={{
+                    ...(padded ? frame : undefined),
+                    paddingBlockStart: held ? 'calc(var(--page-pad) * 3)' : padded ? frame.padding : undefined,
+                }}
+            >
+                <DynamicTable
+                    label="Session notes"
+                    head={{ cells: [{ key: 'name', content: 'Student', width: '30%' }, { key: 'note', content: 'Note', width: '70%' }] }}
+                    rows={STUDENTS.slice(0, 3).map(([name], i) => ({
+                        key: name,
+                        cells: [
+                            { key: `${name}-n`, content: name },
+                            { key: `${name}-t`, content: i === 0 ? <HeldNote note={note} held={held} open={Boolean(mount)} /> : 'On track' },
+                        ],
+                    }))}
+                />
+            </div>
+        </DocsOverlayBoundary>
     );
 };
 
 /** A Tag and a StatusTag past their widths: each ends in an ellipsis. */
 export const LongTags = ({ tag = LONG_TAG, status = LONG_STATUS }) => (
-    <div style={{ ...frame, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--stack-md)' }}>
-        <Tag text={tag} color="blue" />
-        <StatusTag appearance="warning">{status}</StatusTag>
-    </div>
+    <DocsOverlayBoundary fit={false} containHeight>
+        <div style={{ ...frame, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--stack-md)' }}>
+            <Tag text={tag} color="blue" />
+            <StatusTag appearance="warning">{status}</StatusTag>
+        </div>
+    </DocsOverlayBoundary>
 );
 
 export const SUBJECTS = ['Science', 'Mathematics', 'History', 'Geography', 'Music', 'Art', 'Drama'];
 
 /** A TagGroup that keeps one line and folds the rest into +n. */
 export const FoldedTags = () => (
-    <div style={frame}>
-        <TagGroup label="Subjects" overflow="collapse">
-            {SUBJECTS.map((subject) => <Tag key={subject} text={subject} color="gray" />)}
-        </TagGroup>
-    </div>
+    <DocsOverlayBoundary fit={false} containHeight>
+        <div style={frame}>
+            <TagGroup label="Subjects" overflow="collapse">
+                {SUBJECTS.map((subject) => <Tag key={subject} text={subject} color="gray" />)}
+            </TagGroup>
+        </div>
+    </DocsOverlayBoundary>
 );
 
+const PAGED_STUDENTS = [
+    ...STUDENTS,
+    ['Maya Rodriguez', 'Grade 7', 'Oct 17', 'Active', false, 'Priya Nair'],
+    ['Leo Torres', 'Grade 8', 'Oct 15', 'Active', true, 'Devon Brooks'],
+];
+
+const PAGE_SIZE = 4;
+
 /** A table that pages in its Section's footer instead of growing. */
-export const PagedTable = ({ page = 1 }) => (
-    <div style={frame}>
-        <PatternSection title="Students" footer={<Pagination currentPage={page} totalPages={8} onPageChange={() => {}} />}>
-            <StudentsTable count={4} />
-        </PatternSection>
-    </div>
-);
+export const PagedTable = ({ page: initialPage = 1 }) => {
+    const [page, setPage] = useState(initialPage);
+    const totalPages = Math.ceil(PAGED_STUDENTS.length / PAGE_SIZE);
+    const slice = PAGED_STUDENTS.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+    return (
+        <div style={frame}>
+            <PatternSection
+                title="Students"
+                footer={<Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />}
+            >
+                <StudentsTable rows={slice} />
+            </PatternSection>
+        </div>
+    );
+};
