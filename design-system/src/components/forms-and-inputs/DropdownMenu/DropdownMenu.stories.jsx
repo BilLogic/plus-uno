@@ -438,7 +438,7 @@ export const BestPracticesLive = {
             await userEvent.keyboard('{Escape}');
             const doTrigger = within(doCard).getByRole('button', { name: 'Session actions' });
             await waitFor(() => expect(within(doCard).queryByRole('menuitem', { name: doItems[0] })).toBeNull());
-            await waitFor(() => expect(doTrigger).toHaveFocus());
+            await expect(doTrigger).toHaveFocus();
             await expect(within(dontCard).getByRole('menuitem', { name: dontFirst })).toBeVisible();
 
             await userEvent.click(doTrigger);

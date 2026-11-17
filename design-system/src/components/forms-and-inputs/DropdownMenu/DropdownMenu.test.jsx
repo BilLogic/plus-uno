@@ -129,6 +129,47 @@ describe('DropdownMenu floating behavior', () => {
         await waitFor(() => expect(screen.queryByTestId('controlled-outside-menu')).toBeNull());
     });
 
+    it('closes an uncontrolled menu on Escape and returns focus to its trigger', async () => {
+        const user = userEvent.setup();
+        render(
+            <DropdownMenu trigger={<Button>Actions</Button>} testId="uncontrolled-menu">
+                <button role="menuitem" type="button">Rename</button>
+            </DropdownMenu>,
+        );
+        const trigger = screen.getByRole('button', { name: 'Actions' });
+        await user.click(trigger);
+        const item = await screen.findByRole('menuitem', { name: 'Rename' });
+        item.focus();
+        await user.keyboard('{Escape}');
+        await waitFor(() => expect(screen.queryByTestId('uncontrolled-menu')).not.toBeInTheDocument());
+        expect(trigger).toHaveFocus();
+    });
+
+    it('closes a controlled menu whose parent accepts the close and returns focus to its trigger', async () => {
+        const user = userEvent.setup();
+        function ControlledExample() {
+            const [isOpen, setIsOpen] = useState(false);
+            return (
+                <DropdownMenu
+                    trigger={<Button>Actions</Button>}
+                    isOpen={isOpen}
+                    onOpenChange={setIsOpen}
+                    testId="controlled-close-menu"
+                >
+                    <button role="menuitem" type="button">Rename</button>
+                </DropdownMenu>
+            );
+        }
+        render(<ControlledExample />);
+        const trigger = screen.getByRole('button', { name: 'Actions' });
+        await user.click(trigger);
+        const item = await screen.findByRole('menuitem', { name: 'Rename' });
+        item.focus();
+        await user.keyboard('{Escape}');
+        await waitFor(() => expect(screen.queryByTestId('controlled-close-menu')).not.toBeInTheDocument());
+        expect(trigger).toHaveFocus();
+    });
+
     it('honors an explicit container over the preview container and preserves the trigger ref', async () => {
         const user = userEvent.setup();
         const preview = document.createElement('div');
