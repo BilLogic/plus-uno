@@ -238,13 +238,14 @@ const PageFrame = ({ mountRef, field, children }) => (
  */
 export const FocusedPage = ({ text = 'a' }) => {
     const [setMount, mount] = useLayerMount();
+    const [query, setQuery] = useState(text);
     // The picture is scaled after the panel first places itself, so it is placed again once settled.
     useEffect(() => {
         if (!mount) return undefined;
         const replace = setTimeout(() => window.dispatchEvent(new Event('resize')), 250); // docs-literal: after the picture is scaled
         return () => clearTimeout(replace);
     }, [mount]);
-    const groups = groupsFor(text).map((group) => ({ ...group, items: group.items.slice(0, 3) }));
+    const groups = groupsFor(query).map((group) => ({ ...group, items: group.items.slice(0, 3) }));
     return (
         <PageFrame
             mountRef={setMount}
@@ -254,7 +255,8 @@ export const FocusedPage = ({ text = 'a' }) => {
                         mode="focused"
                         spacing="compact"
                         placeholder={SCOPE}
-                        value={text}
+                        value={query}
+                        onValueChange={setQuery}
                         results={groups}
                         recent={['Ava', 'Lincoln Middle']}
                         panelLabel={PANEL}
@@ -263,7 +265,7 @@ export const FocusedPage = ({ text = 'a' }) => {
                         onSelect={() => {}}
                         onSearch={() => {}}
                     >
-                        <SearchFieldAction onSelect={() => {}}>{`Add student \u201C${text.trim()}\u201D`}</SearchFieldAction>
+                        <SearchFieldAction onSelect={() => {}}>{`Add student \u201C${query.trim()}\u201D`}</SearchFieldAction>
                     </SearchField>
                 </div>
             )}
@@ -279,19 +281,22 @@ export const FocusedPage = ({ text = 'a' }) => {
  * Basic, as a picture: the field with its text in the page header, and
  * under it the results page that Enter leads to, as Skeleton bars.
  */
-export const BasicPage = ({ text = 'Ava' }) => (
-    <PageFrame
-        field={(
-            <div style={{ ...row, inlineSize: '100%' }}>
-                <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)', whiteSpace: 'nowrap' }}>Press Enter to search</span>
-                <div style={{ inlineSize: 'var(--field-width-md)' }}>
-                    <SearchField mode="basic" spacing="compact" placeholder={SCOPE} defaultValue={text} onSearch={() => {}} />
+export const BasicPage = ({ text = 'Ava' }) => {
+    const [submitted, setSubmitted] = useState(text);
+    return (
+        <PageFrame
+            field={(
+                <div style={{ ...row, inlineSize: '100%' }}>
+                    <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)', whiteSpace: 'nowrap' }}>Press Enter to search</span>
+                    <div style={{ inlineSize: 'var(--field-width-md)' }}>
+                        <SearchField mode="basic" spacing="compact" placeholder={SCOPE} defaultValue={text} onSearch={(next) => setSubmitted(next || text)} />
+                    </div>
                 </div>
-            </div>
-        )}
-    >
-        <PatternSection title="Results" description={`For \u201C${text}\u201D`}>
-            <div aria-busy="true"><Skeleton shape="text" lines={8} /></div>
-        </PatternSection>
-    </PageFrame>
-);
+            )}
+        >
+            <PatternSection title="Results" description={`For \u201C${submitted}\u201D`}>
+                <div aria-busy="true"><Skeleton shape="text" lines={8} /></div>
+            </PatternSection>
+        </PageFrame>
+    );
+};
