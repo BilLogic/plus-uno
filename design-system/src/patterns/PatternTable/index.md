@@ -121,7 +121,6 @@ Row states are layered over each cell's fill, never swapped for it.
 | `--ds-border-bold` | color | The rule under the head row. |
 | `--ds-text`, `--body-default` | 14/20 | Body cells. |
 | `--ds-text-subtle`, `--heading-xxs` | color, type | Head cells and the message row. |
-| `--table-radius` | 12 | The corner of the table and of its scroll region. |
 | `--table-pad-x-cell`, `--table-pad-y-cell`, `--stack-md` | length | Cell padding, the gap inside a cell, and the side pad (8) of the message row. |
 | `--ds-background-neutral-subtle-hovered`, `-pressed` | color | A hovered and a pressed row. |
 | `--ds-background-selected`, `-hovered`, `-pressed` | color | A selected row. |

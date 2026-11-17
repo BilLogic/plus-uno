@@ -13,7 +13,7 @@ How a form takes and checks what someone types: its host, when it validates, wha
 Choose among four hosts. The Form template shows their layouts; this pattern guides host selection and form behavior.
 
 - **In a page.** Settings and anything saved as a group. Buttons left-aligned under the fields.
-- **In a Panel.** A short edit from a table, with the page in view. Cancel and Save full bleed at the bottom.
+- **In a Panel.** A short edit from a table, with the page in view. Discard and Save full bleed at the bottom, no Cancel.
 - **In a Modal.** A rare, critical task with fewer than five fields. 8-col; a confirm is 4-col or 6-col.
 - **In steps.** A stepped task on Frame · focused: dots above one question under five steps, or the left step list at five or more.
 
@@ -32,9 +32,9 @@ Use Forms when a page asks for input that is saved together: adding a student, l
 | The form… | Host | Buttons |
 | --- | --- | --- |
 | is saved as a group on its own page: settings, a profile | In a page | Left-aligned under the fields, Primary first, Cancel Subtle |
-| is a short edit of a row, with the page still in view | In a Panel · Details | Cancel and Save full bleed at the bottom |
-| is rare and critical, with fewer than five fields | In a Modal, 8-col | Cancel (Default) and the action, full bleed |
-| is long, or has sections someone works through | In steps on Frame · focused | Cancel (Subtle) left; Back and Next full bleed right |
+| is a short edit of a row, with the page still in view | In a Panel · Details | Discard (Default) and Save (Primary) full bleed at the bottom, no Cancel |
+| is rare and critical, with fewer than five fields | In a Modal, 8-col | Discard (Default) and the action (Primary), full bleed, no Cancel |
+| is long, or has sections someone works through | In steps on Frame · focused | Back and Next in the bar, no Cancel |
 | asks one big question per step (sign-up, check-in, site setup) | In steps on Frame · focused | Back (Subtle) and Continue (Primary) centered under the tiles |
 | asks for one value read far more than changed | Inline edit on the record | None; it saves on its own |
 
@@ -61,7 +61,7 @@ Use Forms when a page asks for input that is saved together: adding a student, l
 - Every input has a visible label. A group is a `fieldset` with a `legend`; its one error is announced once.
 - A field error is announced and sets `aria-invalid`; the submit moves focus to the first invalid field. A server message is announced when it appears.
 - A required field sets `aria-required` whether or not it carries a visible `"(required)"` marker; only the form's minority case is marked in the label text.
-- A sending button keeps its name and sets `aria-busy`; Cancel stays reachable.
+- A sending button keeps its name and sets `aria-busy`; the secondary action stays reachable.
 - A dialog opens only from a person's action. Focus goes to the first input and stays trapped until it closes.
 
 ## Parts
@@ -143,7 +143,7 @@ Don't: Help only in a tooltip: gone on touch, gone after typing.
 
 **Checked:** Automatic
 
-Close, Cancel and navigating away raise a 4-col Modal: Back returns without losing anything typed; Discard is Danger. A form already in a Modal asks in that Modal's confirm view, so two layers never become three. A form with no edits leaves at once. In a focused task, Close and Cancel play the opening backwards once the person confirms.
+Close, Discard, Cancel (on a page form) and navigating away raise a 4-col Modal: Back returns without losing anything typed; Discard is Danger. A form already in a Modal asks in that Modal's confirm view, so two layers never become three. A form with no edits leaves at once. In a focused task, Close plays the opening backwards once the person confirms.
 
 ### Prefer a bound input to a free one. {#prefer-a-bound-input-to-a-free-one}
 

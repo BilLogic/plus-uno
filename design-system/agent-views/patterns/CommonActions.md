@@ -17,8 +17,8 @@ Primary, Default, Subtle, Warning, Danger, Discovery and AI. One Primary per are
 The place sets the alignment. A page form's buttons start under the fields; a layer's end where the eye does.
 
 - **In a page form.** Left-aligned under the fields, Primary first, Cancel Subtle beside it.
-- **In a Modal.** Full bleed across the footer: Cancel (Default) left, Primary right, Close in the header. The footer is 48 high and never moves.
-- **In a focused task.** The bottom bar: Cancel (Subtle) at the start, Back and Next at the end. Back is disabled on the first step.
+- **In a Modal.** Full bleed across the footer: Discard (Default) left, Primary right, Close in the header, no Cancel. The footer is 48 high and never moves.
+- **In a focused task.** The bottom bar: Back and Next split 50/50, Close in the title row, no Cancel. Back is disabled on the first step.
 - **In a card.** The main action is Subtle in the footer. A clickable card has no inner buttons; when in doubt, full-span inside tiles.
 
 ## Small actions
@@ -27,7 +27,7 @@ The place sets the alignment. A page form's buttons start under the fields; a la
 
 Three tiers, picked by whether the change can be undone. No danger-outline combinations.
 
-- **Active.** A change that can be undone: Cancel and the action in Primary.
+- **Active.** A change that can be undone: Discard and the action in Primary.
 - **Active with Danger.** A delete: the action takes the Danger appearance.
 - **Danger, type the name.** A delete that cannot be undone: the caption asks for the name, and Danger enables once it matches.
 
@@ -43,8 +43,8 @@ Choose a button's appearance by importance, placement by what it acts on, and la
 | --- | --- | --- | --- |
 | The main action of an area | Primary, one per area | Last in its group (on a page form: first, before Cancel) | Verb and object: "Add students" |
 | Another action in the area | Default | Before the Primary | Verb and object: "Reschedule session" |
-| Leave without doing anything | Subtle; Default in a full-bleed footer | Left of the Primary (on a page form: after it) | "Cancel"; a link is allowed |
-| Close a layer | Icon button | Start of a focused title row; end of a Modal, Panel or Flag header | Named "Close" |
+| Leave a page form or popup without saving | Subtle | After Primary on a page form; left of Primary in a popup | "Cancel"; a link is allowed |
+| Dismiss a Modal, Panel or focused task | Icon button | Start of a focused title row; end of a Modal, Panel or Flag header | Named "Close" |
 | Empty a menu's choices | Default, full bleed with Apply | The menu's footer, or the top of a filter side | "Reset" in a menu; "Reset filters" everywhere else |
 | Empty one field | Icon button inside the field | End of the field | Named "Clear", "Clear search" |
 | Copy a value | Icon button | Beside the value | Named "Copy"; "Copied" in a tooltip after |
@@ -69,7 +69,7 @@ Choose a button's appearance by importance, placement by what it acts on, and la
 | Do | Don't |
 | --- | --- |
 | Verb and object: "Log session", "Add students", "Remove from group". | "Submit", "OK", "Yes", "Continue" with nothing after it. |
-| "Cancel" to leave a form; "Close" to end a layer. | "Dismiss" on a form; "Cancel" on a Close icon. |
+| "Cancel" on a page form or popup; "Close" to dismiss a layer; real actions like "Discard" in Modal or Panel footers. | "Dismiss" on a form; "Cancel" on a Close icon or inside a Modal or Panel footer. |
 | "Reset" in a menu; "Reset filters" everywhere else. | "Clear all", "Clear filters", "Reset all". |
 | "Delete" for something destroyed; "Remove" for something taken out of a group. | "Delete" for leaving a group; "Remove" for erasing a record. |
 | Sentence case: "Mark attendance". | Title Case: "Mark Attendance". |
@@ -77,7 +77,7 @@ Choose a button's appearance by importance, placement by what it acts on, and la
 ## Accessibility
 
 - A button performs an action and a link navigates; the element gives the role. An icon-only button is an `IconButton` with a `label`: "Close", "Copy", "Edit", "More".
-- A sending button sets `aria-busy` and keeps its label in the tree; only that button disables, and Cancel stays live.
+- A sending button sets `aria-busy` and keeps its label in the tree; only that button disables, and the secondary action stays live.
 - The Danger button in a type-the-name confirm is disabled until the name matches; the field caption carries the reason, never a tooltip.
 - The bulk bar's count is a polite live region; the select-all checkbox reports its mixed state. Focus stays on the checkbox that was ticked.
 - The focus ring takes `--ds-border-focused` on every appearance.
@@ -142,19 +142,19 @@ Don't: Small buttons inset at the end, with spare footer around them.
 
 **Checked:** Automatic
 
-Header and footer stay pinned while the body scrolls. A blocked submit, a server message and a sending button change the body or a button, never the footer's size or place. A sending button swaps its label for a spinner in place and keeps its width; only that button disables, and Cancel stays live.
+Header and footer stay pinned while the body scrolls. A blocked submit, a server message and a sending button change the body or a button, never the footer's size or place. A sending button swaps its label for a spinner in place and keeps its width; only that button disables, and the secondary action stays live.
 
-### Keep Close an icon button, separate from Cancel. {#keep-close-an-icon-button-separate-from-cancel}
-
-**Checked:** Automatic
-
-Close ends a layer and lives in its header, or at the start of a focused title row. Cancel leaves a form without saving and lives with the form's buttons. Neither stands in for the other; a Modal has both.
-
-### Make Cancel Subtle beside a Primary and Default in a full-bleed footer. {#make-cancel-subtle-beside-a-primary-and-default-in-a-full-bleed-footer}
+### Keep Close an icon button, and use Cancel only where there is no Close. {#keep-close-an-icon-button-and-use-cancel-only-where-there-is-no-close}
 
 **Checked:** Automatic
 
-Beside a Primary it is already clear the row is interactive, so Cancel steps back. In a full-bleed footer every cell is a button, so Cancel takes the Default fill to read as one. Cancel may be a link where a button would compete.
+Close ends a layer and lives in its header, or at the start of a focused title row. In a Modal, Panel and focused task the corner Close dismisses, so their footers carry real actions (such as Discard or Keep) and no Cancel. Page forms and popups have no Close, so they keep a subtle Cancel.
+
+### Make Cancel Subtle on page forms and popups. {#make-cancel-subtle-on-page-forms-and-popups}
+
+**Checked:** Automatic
+
+Beside a Primary it is already clear the row is interactive, so Cancel steps back as Subtle. Cancel may be a link where a button would compete. In a full-bleed Modal or Panel footer every cell is a button, so the secondary action takes the Default fill to read as one.
 
 ### Say Reset in a menu and Reset filters everywhere else. {#say-reset-in-a-menu-and-reset-filters-everywhere-else}
 
@@ -178,7 +178,7 @@ A value read far more than changed takes `InlineEdit`: a pencil on hover and foc
 
 **Checked:** Review
 
-Active: it can be undone, Cancel and a Primary. Active with Danger: a delete, the action in Danger. Danger with the name typed: a delete that cannot be undone, the field caption asks for the name and the Danger button enables once it matches, with no tooltip. Remove, which takes something out of a group it can return to, is Default, not Danger. The Modal that raises the confirm: Modal.
+Active: it can be undone, Discard (or a real alternative) and a Primary. Active with Danger: a delete, the action in Danger. Danger with the name typed: a delete that cannot be undone, the field caption asks for the name and the Danger button enables once it matches, with no tooltip. Remove, which takes something out of a group it can return to, is Default, not Danger. The Modal that raises the confirm: Modal.
 
 ### Turn the head row into the bulk bar when rows are selected. {#turn-the-head-row-into-the-bulk-bar-when-rows-are-selected}
 

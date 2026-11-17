@@ -56,7 +56,7 @@ Least room to most. Pick the lowest step that fits. The picture is on Templates.
 | --- | --- |
 | Views as short parallel nouns: "Upcoming", "Past". | "Show upcoming sessions", "History". |
 | Page tabs name views of one subject: "Overview", "Sessions", "Notes". | Counts or status in the tab label. |
-| The view Select is labeled: "Status: Upcoming" . | A bare "Upcoming". |
+| The labeled filter trigger names the view: "Status: Upcoming". | A bare "Upcoming". |
 | Breadcrumb levels by the page's own title. | "Back", "Home" as a level. |
 | Open item: "4:00 PM · Ms. Ortiz". | "Session #1028". |
 
@@ -74,7 +74,7 @@ Least room to most. Pick the lowest step that fits. The picture is on Templates.
 - Filtering: use for narrowing a view by attributes.
 - Indicators: use for counts on Sidebar items.
 - Frame, Page, Section: use for the drawn shells.
-- `Sidebar`, `Breadcrumb`, `Tabs`, `PageHeader`, `Select`: the components.
+- `Sidebar`, `Breadcrumb`, `Tabs`, `PageHeader`, `PopupSelect`: the components.
 
 ## Motion
 

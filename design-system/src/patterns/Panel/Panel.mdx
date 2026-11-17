@@ -85,7 +85,7 @@ Picking an item opens its page behind the Panel and marks it read. The Inbox sta
 
 <Story of={PanelStories.AnatomyNotifications} inline />
 
-1. **Header.** The title, a filter (Unread, All, Mentions), Archive all and Close.
+1. **Header.** The title, Archive all and Close, with the Show filter (`PopupSelect`: Unread, All, Mentions) in the subheader.
 2. **Items.** Avatar, who did what and where, a one-line excerpt and the time. An unread item ends in a dot, paired with the word "unread" for a screen reader.
 
 The Bell in the Sidebar, with its unread count, opens the Inbox. It sits with the Sidebar and is Planned with the Inbox's placement.
@@ -106,7 +106,7 @@ Drag the Frame's width. From 1168 a 400 Panel docks beside the Page at an edge l
 
 ## Key states
 
-<ComponentExample of={PanelStories.KeyEditing} title="Editing" description="The same Panel with the form open and its full-bleed footer: Cancel (Default) left and Save (Primary) right. Save returns to reading, which has no footer." />
+<ComponentExample of={PanelStories.KeyEditing} title="Editing" description="The same Panel with the form open and its full-bleed footer: Discard (Default) left and Save (Primary) right; Close in the header dismisses, so no Cancel. Save returns to reading, which has no footer." />
 
 <ComponentExample of={PanelStories.KeyRecordGone} title="Record gone" description={<>When the row no longer exists the body shows its empty state with a way back: <DocsLink id="patterns-states-empty">Empty</DocsLink>.</>} />
 
@@ -172,9 +172,9 @@ The Panel components are the parts: header with its fixed actions, body, footer,
 </thead>
 <tbody>
 <tr><td><code>title</code></td><td>The record's name, with its StatusTag under it</td><td>"Inbox"</td></tr>
-<tr><td><code>actions</code></td><td>Up, Down, More and Close</td><td>A filter (Select), Archive all and Close</td></tr>
+<tr><td><code>actions</code></td><td>Up, Down, More and Close</td><td>Archive all and Close (the Show <code>PopupSelect</code> sits in the subheader)</td></tr>
 <tr><td><code>body</code></td><td>Sections of the record; the form while editing</td><td>Items grouped by time</td></tr>
-<tr><td><code>footer</code></td><td>Only while editing: Cancel and Save, full bleed. The page composes it from Button. <PlannedTag /> Planned as a prop.</td><td>None</td></tr>
+<tr><td><code>footer</code></td><td>Only while editing: Discard and Save, full bleed; Close in the header dismisses, so no Cancel. The page composes it from Button. <PlannedTag /> Planned as a prop.</td><td>None</td></tr>
 <tr><td>Placement</td><td>Floating, right. Floats under 1168; at 1168 and up the Frame docks it. <PlannedTag /> Floating at every width is Planned.</td><td>Floating, left, out of the Sidebar. <PlannedTag /> Planned. Today it uses the right-hand area.</td></tr>
 <tr><td>Beside the AI panel <PlannedTag /></td><td>Planned. The Frame has one Panel area.</td><td>Planned.</td></tr>
 </tbody>
@@ -251,7 +251,7 @@ Picking the same row again closes it; Up and Down step through the rows.
 
 <RuleTag kind="review" />
 
-Cancel (Default) and Save (Primary), full bleed. Reading needs no footer.
+Discard (Default) and Save (Primary), full bleed; Close in the header dismisses, so no Cancel. Reading needs no footer.
 
 <DoDontPair
     doExample={<ReadingNoFooter />}
@@ -311,7 +311,7 @@ For the step up when the quick look is not enough.
 <tr><td>Title Details with the record: "Ana Ruiz · Thu 4:00 PM".</td><td>"Details".</td></tr>
 <tr><td>Name the filter by what it keeps: "Unread".</td><td>"Filter".</td></tr>
 <tr><td>Give the empty state a way back: "Back to sessions".</td><td>"Nothing here".</td></tr>
-<tr><td>Name the footer's actions: "Cancel" and "Save".</td><td>"OK" and "Done".</td></tr>
+<tr><td>Name the footer's actions: "Discard" and "Save".</td><td>"OK" and "Done".</td></tr>
 </tbody>
 </DocsTable>
 

@@ -44,7 +44,7 @@ Frame reads these motion tokens and no literal duration or curve.
 | panel-dock | Dock and undock a panel | `--ds-motion-spatial-slow` · `--ds-motion-appearance-fast` | The AI Panel docks on the right and the Page makes room; its content fades in once the page is about 90% done. |
 | panel-undock | Dock and undock a panel | `--ds-motion-spatial-default` | It reverses and stays at the edge. |
 | focused-open | Drill into and climb back out | `--ds-motion-appearance-default` | Focused opens as a change of frame: the page and the Sidebar fade out together on appearance.fast, then the task fades in, in place. A focused task fades; it does not grow or slide. Bare frames, such as sign-in, do not move. |
-| focused-close | Drill into and climb back out | `--ds-motion-appearance-fast` | Close and Cancel reverse the entrance one speed faster: the task fades out, then the page and Sidebar fade back in, asking first in a Modal if anything is unsaved. |
+| focused-close | Drill into and climb back out | `--ds-motion-appearance-fast` | Close reverses the entrance one speed faster: the task fades out, then the page and Sidebar fade back in, asking first in a Modal if anything is unsaved. |
 | step | Step to the next or previous | `--ds-motion-spatial-default` · `--ds-motion-appearance-fast` | The body slides on the same axis as the step list: up with the steps down the left, across with four or fewer across the top. Step states change in place. Placement is set once, when the task opens, by the longest path the flow can take. |
 
 ## Alternatives
