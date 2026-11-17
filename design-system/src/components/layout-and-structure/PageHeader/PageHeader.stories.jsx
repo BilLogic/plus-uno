@@ -1,6 +1,6 @@
 import React from 'react';
 import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
-import { expect, within } from 'storybook/test';
+import { expect } from 'storybook/test';
 import { Button, PageHeader } from '@/components';
 
 export default {
@@ -11,9 +11,21 @@ export default {
 
 export const Basic = () => <PageHeader title="Session plans" id="page-header-basic" />;
 
-Basic.play = async ({ canvasElement }) => {
-    const node = canvasElement.querySelector('#page-header-basic');
-    await expect(node.querySelector('h2')).toHaveTextContent('Session plans');
+Basic.play = async ({ canvas }) => {
+    const heading = canvas.getByRole('heading', { level: 1, name: 'Session plans' });
+    await expect(heading).toHaveAttribute('data-size', 'large');
+    const style = getComputedStyle(heading);
+    await expect(style.fontSize).toBe('24px');
+    await expect(style.lineHeight).toBe('28px');
+};
+
+export const SecondaryLevel = () => (
+    <PageHeader id="page-header-h2" title="Section overview" titleAs="h2" />
+);
+
+SecondaryLevel.play = async ({ canvas }) => {
+    const heading = canvas.getByRole('heading', { level: 2, name: 'Section overview' });
+    await expect(heading).toHaveAttribute('data-size', 'large');
 };
 
 export const WithBreadcrumbsActionsAndBottomBar = () => (
@@ -26,7 +38,8 @@ export const WithBreadcrumbsActionsAndBottomBar = () => (
     />
 );
 
-WithBreadcrumbsActionsAndBottomBar.play = async ({ canvasElement }) => {
+WithBreadcrumbsActionsAndBottomBar.play = async ({ canvas, canvasElement }) => {
+    await expect(canvas.getByRole('heading', { level: 1, name: 'Ari Patel' })).toBeInTheDocument();
     const node = canvasElement.querySelector('#page-header-full');
     await expect(node.querySelector('.plus-page-header-breadcrumbs')).toHaveTextContent('Students / Ari');
     await expect(node.querySelector('.plus-page-header-actions')).toHaveTextContent('Schedule');
@@ -37,9 +50,9 @@ export const DisableTitleStyles = () => (
     <PageHeader id="page-header-disabled" title="Custom-styled title" disableTitleStyles />
 );
 
-DisableTitleStyles.play = async ({ canvasElement }) => {
-    const node = canvasElement.querySelector('#page-header-disabled');
-    await expect(node.querySelector('h2')).toBeNull();
+DisableTitleStyles.play = async ({ canvas }) => {
+    await expect(canvas.queryByRole('heading')).toBeNull();
+    await expect(canvas.getByText('Custom-styled title')).toBeInTheDocument();
 };
 
 export const Interactive = {
@@ -56,8 +69,8 @@ const root = (canvasElement) => canvasElement.firstElementChild;
 /** Rest: page header. */
 export const Rest = {
     render: () => <Subject />,
-    play: async ({ canvasElement }) => {
-        await expect(within(canvasElement).getByRole('heading', { level: 2 })).toHaveTextContent('Session plans');
+    play: async ({ canvas, canvasElement }) => {
+        await expect(canvas.getByRole('heading', { level: 1 })).toHaveTextContent('Session plans');
         await expect(root(canvasElement).tagName).toBe('HEADER');
     },
 };
