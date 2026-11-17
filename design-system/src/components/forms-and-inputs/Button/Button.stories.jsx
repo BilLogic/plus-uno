@@ -3,6 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
+import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import Button, { BUTTON_APPEARANCES, BUTTON_SPACINGS } from './Button';
@@ -553,7 +554,7 @@ const ANATOMY_PARTS = [
 /** Anatomy: soft neutral container with no border, optional leading icon, medium-weight label and optional trailing chevron. */
 export const Anatomy = {
     render: () => (
-        <LiveAnatomy width={280} title="A button with its container, leading icon, label and trailing chevron numbered" parts={ANATOMY_PARTS}>
+        <LiveAnatomy live scrollable width={280} title="A button with its container, leading icon, label and trailing chevron numbered" parts={ANATOMY_PARTS}>
             <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--pad-y-lg) var(--pad-x-lg)' }}>
                 <Button
                     testId="button-anatomy"
@@ -565,6 +566,8 @@ export const Anatomy = {
         </LiveAnatomy>
     ),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const btn = within(canvasElement).getByTestId('button-anatomy');
         settled(btn);
         const cs = getComputedStyle(btn);
@@ -572,6 +575,8 @@ export const Anatomy = {
         await expect(cs.borderTopColor, 'default draws no visible border').toBe('rgba(0, 0, 0, 0)');
         await expect(px(cs.height), 'default spacing draws 32').toBe(tokenLength(canvasElement, '--control-md'));
         await expect(canvasElement.querySelectorAll('[data-anatomy-marker]')).toHaveLength(4);
+        btn.focus();
+        await expect(btn).toHaveFocus();
     },
 };
 

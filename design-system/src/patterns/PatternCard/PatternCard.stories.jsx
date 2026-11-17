@@ -6,7 +6,8 @@ import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { PatternCard } from '@/patterns';
 import { Skeleton, Button, IconButton } from '@/components';
 import { CardJobs } from './PatternCardCases.jsx';
-import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 
 const bodyCopy = (
     <p className="body-lg" style={{ margin: 0 }}>
@@ -66,8 +67,8 @@ function PatternCardRowsDemo() {
             {[['Medium', 720], ['Large', 736], ['X-Large', 1152]].map(([mode, width]) => (
                 <div key={mode}>
                     <DemoCaption>{`${mode} · content ${width}`}</DemoCaption>
-                    {/* Each row is a picture of one content width: scaled to fit, never reflowed. */}
-                    <FitStage width={width} reflow={false}>
+                    {/* Each row renders at 1:1 scale inside a horizontally scrollable box when wider than the column. */}
+                    <ScrollStage width={width}>
                         <div
                             data-row={mode}
                             style={{
@@ -83,7 +84,7 @@ function PatternCardRowsDemo() {
                                 </PatternCard>
                             ))}
                         </div>
-                    </FitStage>
+                    </ScrollStage>
                 </div>
             ))}
         </div>
@@ -425,6 +426,8 @@ export const LoadingCard = {
 export const Rows = {
     render: () => <PatternCardRowsDemo />,
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const count = (mode) => {
             const cards = Array.from(canvasElement.querySelector(`[data-row="${mode}"]`).children);
             const top = Math.min(...cards.map((card) => Math.round(card.getBoundingClientRect().top)));
