@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button, Spotlight, SpotlightAction, SpotlightProvider, SpotlightTarget } from '@/components';
 import { DocsOverlayBoundary } from './docs-overlay-boundary.jsx';
 
@@ -9,9 +9,10 @@ import { DocsOverlayBoundary } from './docs-overlay-boundary.jsx';
  * Uses Spotlight's public `isOpen` and `onDismiss` API so each spotlight starts
  * open at rest inside `DocsOverlayBoundary` (`containHeight`) and only closes
  * when dismissed from inside its own card (Got it, Skip, Dismiss, target toggle,
- * or Escape), never when another card is clicked. For "Make the secondary
- * action a link", the Do half renders `SpotlightAction` with `appearance="secondary"`
- * and `href` while the Don't half renders two competing primary buttons.
+ * or Escape), never when another card is clicked. For "Keep the secondary
+ * action quieter than the primary", the Do half renders an outlined secondary
+ * `SpotlightAction` beside the filled primary while the Don't half renders two
+ * filled primary buttons.
  */
 export const LiveSpotlight = ({
     targetText = 'Calendar',
@@ -25,12 +26,15 @@ export const LiveSpotlight = ({
 }) => {
     const [isOpen, setIsOpen] = useState(defaultOpen);
     const insideGestureRef = useRef(false);
+    const gestureTimerRef = useRef(0);
     const markInsideGesture = () => {
         insideGestureRef.current = true;
-        queueMicrotask(() => {
+        window.clearTimeout(gestureTimerRef.current);
+        gestureTimerRef.current = window.setTimeout(() => {
             insideGestureRef.current = false;
-        });
+        }, 0);
     };
+    useEffect(() => () => window.clearTimeout(gestureTimerRef.current), []);
 
     const secondaryAction = secondaryKind === 'link'
         ? (
@@ -116,13 +120,13 @@ export const StepCountTourDont = () => (
     </LiveSpotlight>
 );
 
-export const SecondaryLinkDo = () => (
+export const SecondaryQuieterDo = () => (
     <LiveSpotlight headline="Find sessions here" stepCount="1 of 3" secondaryKind="link" secondaryLabel="Learn more">
         Open the calendar to see this week.
     </LiveSpotlight>
 );
 
-export const SecondaryLinkDont = () => (
+export const SecondaryQuieterDont = () => (
     <LiveSpotlight headline="Find sessions here" stepCount="1 of 3" secondaryKind="competing-primary" secondaryLabel="Learn more">
         Open the calendar to see this week.
     </LiveSpotlight>

@@ -8,8 +8,8 @@ import { Button, Spotlight, SPOTLIGHT_PLACEMENTS, SpotlightAction, SpotlightProv
 import {
     FeatureHeadlineDo,
     FeatureHeadlineDont,
-    SecondaryLinkDo,
-    SecondaryLinkDont,
+    SecondaryQuieterDo,
+    SecondaryQuieterDont,
     StepCountTourDo,
     StepCountTourDont,
 } from '@/storybook-docs/lib/spotlight-cases';
@@ -271,10 +271,10 @@ export const BestPracticesLive = {
                 dontCaption="Step count on a single tip."
             />
             <DoDontPair
-                doExample={<SecondaryLinkDo />}
-                doCaption="Secondary action as a link."
-                dontExample={<SecondaryLinkDont />}
-                dontCaption="Two competing buttons."
+                doExample={<SecondaryQuieterDo />}
+                doCaption="The outlined secondary next to the filled primary."
+                dontExample={<SecondaryQuieterDont />}
+                dontCaption="Two filled, competing buttons."
             />
         </div>
     ),
