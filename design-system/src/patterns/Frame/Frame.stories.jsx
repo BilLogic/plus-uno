@@ -5,7 +5,7 @@ import { Breadcrumb, Button, FooterActions, IconButton, Logo, Modal, PanelBody, 
 import { Blanket, Frame, PANEL_STORAGE_KEY, PatternCard, PatternModal, PatternSection, usePanelControl, useSidebarControl } from '@/patterns';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { FRAME_LAYOUT } from './frameLayout';
-import { BrowserWindow, LiveAnatomy, ScaledStory } from '@/storybook-docs/lib/template-page.jsx';
+import { BrowserWindow, LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { FitStage, ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { DemoPageHeader } from '../Page/pageDemo.jsx';
 import { expectOverlayExit } from '@/storybook-docs/lib/overlay-motion-plays.js';
@@ -1543,11 +1543,27 @@ const DefaultType = ({ withPanel = false, address = 'app.plus.org/dashboard', ..
 export const TypeDefault = {
     name: 'Type: Default',
     parameters: { layout: 'padded' },
-    render: () => <div style={{ inlineSize: 1440 /* docs-literal: the X-Large stage, wide enough to dock the Sidebar and the AI panel */ }}><DefaultType withPanel /></div>,
+    render: () => (
+        <div style={{ overflowX: 'auto' }}>
+            <div style={{ inlineSize: 1440 /* docs-literal: the X-Large stage, wide enough to dock the Sidebar and the AI panel */ }}>
+                <DefaultType withPanel />
+            </div>
+        </div>
+    ),
     play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvasElement.closest('[inert]')).toBeNull();
+        await expect(canvasElement.querySelector('[inert]')).toBeNull();
         const p = parts(canvasElement);
         await waitFor(() => expect(p.sidebar(), 'the Sidebar docks').not.toBeNull());
         await expect(p.frame.querySelector('.plus-frame__panel'), 'the AI panel docks beside the Page').not.toBeNull();
+        const ask = canvas.getByRole('textbox', { name: 'Ask' });
+        await userEvent.type(ask, 'Summarize');
+        await expect(ask).toHaveValue('Summarize');
+        await userEvent.click(p.toggle);
+        await waitFor(() => expect(p.sidebar(), 'toggling collapses the Sidebar').toBeNull());
+        await userEvent.click(parts(canvasElement).toggle);
+        await waitFor(() => expect(parts(canvasElement).sidebar(), 'toggling again docks the Sidebar').not.toBeNull());
     },
 };
 
@@ -1559,28 +1575,42 @@ export const TypeFocused = {
     render: () => <FocusedType count={5} />,
 };
 
-/** Bare: sign-in, errors and welcome: one centered column, no Sidebar and no header row. */
-export const TypeBare = {
-    name: 'Type: Bare',
-    parameters: { layout: 'padded' },
-    render: () => (
+const BareSignIn = () => {
+    const [email, setEmail] = useState('');
+    return (
         <BrowserWindow address="app.plus.org/sign-in" height={WINDOW_HEIGHT}>
             <Frame surfaceDirect>
                 <div data-probe="bare-column" style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 'var(--space-150)', maxInlineSize: 'var(--panel-min-width)', marginInline: 'auto', paddingBlock: 'var(--space-300)' }}>
                     <Logo />
-                    <TextField label="Email" type="email" value="" onChange={() => {}} />
+                    <TextField label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
                     <Button text="Sign in" appearance="primary" onClick={() => {}} />
                 </div>
             </Frame>
         </BrowserWindow>
-    ),
+    );
+};
+
+/** Bare: sign-in, errors and welcome: one centered column, no Sidebar and no header row. */
+export const TypeBare = {
+    name: 'Type: Bare',
+    parameters: { layout: 'padded' },
+    render: () => <BareSignIn />,
     play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvasElement.closest('[inert]')).toBeNull();
+        await expect(canvasElement.querySelector('[inert]')).toBeNull();
         const p = parts(canvasElement);
         await expect(p.sidebar(), 'no Sidebar').toBeNull();
         await expect(p.toggle, 'so no toggle').toBeNull();
         const column = canvasElement.querySelector('[data-probe="bare-column"]');
         const page = rect(p.surface);
         await expect(rect(column).left - page.left, 'one column, centered in the Page').toBeCloseTo(page.right - rect(column).right, 0);
+        const email = canvas.getByRole('textbox', { name: 'Email' });
+        await userEvent.type(email, 'maya@plus.org');
+        await expect(email).toHaveValue('maya@plus.org');
+        const signIn = canvas.getByRole('button', { name: 'Sign in' });
+        signIn.focus();
+        await expect(signIn).toHaveFocus();
     },
 };
 
@@ -1605,13 +1635,19 @@ export const AnatomyDefault = {
     name: 'Anatomy: Default',
     parameters: { layout: 'padded' },
     render: () => (
-        <LiveAnatomy width={1440 /* docs-literal: the X-Large stage */} title="The default Frame with its parts numbered" parts={ANATOMY_DEFAULT_PARTS}>
+        <LiveAnatomy live width={1440 /* docs-literal: the X-Large stage */} title="The default Frame with its parts numbered" parts={ANATOMY_DEFAULT_PARTS}>
             <DefaultType withPanel address="app.plus.org/students/maya-rodriguez" breadcrumbs={RECORD_CRUMBS} />
         </LiveAnatomy>
     ),
     play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvasElement.closest('[inert]')).toBeNull();
+        await expect(canvasElement.querySelector('[inert]')).toBeNull();
         await markersLevelWithParts(canvasElement, ANATOMY_DEFAULT_PARTS);
         leadersCrossNoOtherPart(canvasElement, ANATOMY_DEFAULT_PARTS);
+        const ask = canvas.getByRole('textbox', { name: 'Ask' });
+        await userEvent.type(ask, 'Next session?');
+        await expect(ask).toHaveValue('Next session?');
     },
 };
 
@@ -1620,13 +1656,20 @@ export const AnatomyFocused = {
     name: 'Anatomy: Focused',
     parameters: { layout: 'padded' },
     render: () => (
-        <LiveAnatomy width={1024 /* docs-literal: the Large stage */} title="The focused Frame with its parts numbered" parts={ANATOMY_FOCUSED_PARTS}>
+        <LiveAnatomy live width={1024 /* docs-literal: the Large stage */} title="The focused Frame with its parts numbered" parts={ANATOMY_FOCUSED_PARTS}>
             <FocusedType count={5} />
         </LiveAnatomy>
     ),
     play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvasElement.closest('[inert]')).toBeNull();
+        await expect(canvasElement.querySelector('[inert]')).toBeNull();
         await markersLevelWithParts(canvasElement, ANATOMY_FOCUSED_PARTS);
         leadersCrossNoOtherPart(canvasElement, ANATOMY_FOCUSED_PARTS);
+        const back = canvas.getByRole('button', { name: 'Back' });
+        await expect(back).not.toHaveAttribute('aria-disabled');
+        await userEvent.click(back);
+        await expect(back).toHaveAttribute('aria-disabled', 'true');
     },
 };
 
@@ -1732,12 +1775,8 @@ export const ResponsiveWidth = {
     },
 };
 
-/** A key state drawn at its own width, scaled to the docs column. */
-const AtWidth = ({ width }) => (
-    <ScaledStory width={width}>
-        <WidthStage width={width} />
-    </ScaledStory>
-);
+/** A key state rendered full size at its own width inside a scrollable stage. */
+const AtWidth = ({ width }) => <WidthStage width={width} />;
 
 /** The AI panel opens on a Frame too narrow for the Sidebar, the panel and 720 of content: the Sidebar collapses. */
 export const KeyPanelCollapsesSidebar = {
@@ -1745,10 +1784,16 @@ export const KeyPanelCollapsesSidebar = {
     parameters: { layout: 'padded' },
     render: () => <AtWidth width={1200 /* docs-literal: between the docked-alone and docked-both widths */} />,
     play: async ({ canvasElement }) => {
+        await expect(canvasElement.closest('[inert]')).toBeNull();
+        await expect(canvasElement.querySelector('[inert]')).toBeNull();
         const p = panelParts(canvasElement);
         await sidebarIs(p, 'closed');
         await panelIs(p, 'docked');
         await expect(p.frame.querySelector('.plus-frame__toggle'), 'the toggle moves to the Page\'s top left').not.toBeNull();
+        const closePanel = within(p.panel()).getByRole('button', { name: 'Close' });
+        await userEvent.click(closePanel);
+        await waitFor(() => expect(p.panel(), 'closing the AI panel unmounts it').toBeNull());
+        await sidebarIs(p, 'docked');
     },
 };
 
@@ -1758,10 +1803,22 @@ export const KeyUnder1024 = {
     parameters: { layout: 'padded' },
     render: () => <AtWidth width={FRAME_LAYOUT.dockMin - 124} />,
     play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvasElement.closest('[inert]')).toBeNull();
+        await expect(canvasElement.querySelector('[inert]:not([data-base-ui-inert])')).toBeNull();
         const p = panelParts(canvasElement);
         await panelIs(p, 'overlay');
         await expect(p.sidebar(), 'the Sidebar is not docked').toBeNull();
         await expect(blanketShows(p), 'the panel floats with no Blanket').toBeNull();
+        const ask = canvas.getByRole('textbox', { name: 'Ask' });
+        await userEvent.type(ask, 'Help');
+        await expect(ask).toHaveValue('Help');
+        await userEvent.click(within(p.panel()).getByRole('button', { name: 'Close' }));
+        await waitFor(() => expect(p.panel(), 'closing the AI panel unmounts it').toBeNull());
+        await expect(canvasElement.querySelector('[inert]')).toBeNull();
+        await userEvent.click(p.frame.querySelector('.plus-frame__toggle'));
+        await waitFor(() => expect(p.sidebar(), 'the Sidebar opens as an overlay').not.toBeNull());
+        await expect(getComputedStyle(p.sidebar()).position).toBe('absolute');
     },
 };
 
