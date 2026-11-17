@@ -120,10 +120,13 @@ export const FormatSwitch = ({ iconsOnly = true, format: controlledFormat, onFor
  */
 export const BarEnd = ({ format = false, onFormatChange, search = true, searchLabel = 'Search students', filters = null, more = true, primary = 'Add students', primaryIcon = 'user-plus', narrow = false }) => {
     const formatValue = typeof format === 'string' ? format : undefined;
+    const searchControl = React.isValidElement(search)
+        ? search
+        : (search ? <IconButton icon="magnifying-glass" label={searchLabel} appearance="subtle" onClick={() => {}} /> : null);
     return (
         <div style={{ ...row, marginInlineStart: 'auto' }}>
             {format && <FormatSwitch format={formatValue} onFormatChange={onFormatChange} />}
-            {search && <IconButton icon="magnifying-glass" label={searchLabel} appearance="subtle" onClick={() => {}} />}
+            {searchControl}
             {filters}
             {more && <IconButton icon="ellipsis" label="More" appearance="subtle" onClick={() => {}} />}
             {primary && (narrow

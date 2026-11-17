@@ -4,6 +4,7 @@ import { expect, userEvent, within } from 'storybook/test';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { FocusedType } from '@/storybook-docs/lib/focused-task.jsx';
+import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { ViewBar } from '@/storybook-docs/lib/view-bar.jsx';
 import {
     AreaPagePicture,
@@ -34,16 +35,26 @@ export default {
     parameters: { layout: 'padded' },
 };
 
-const staged = (story, width = STAGE) => <FitStage width={width}>{story}</FitStage>;
+const staged = (story, width = STAGE) => <FitStage width={width} scrollable>{story}</FitStage>;
 
 /* ------------------------------------------------------------------- tiers */
 
 /** Tier 1, Areas: the Sidebar's fixed items; the selected row is marked as the current page. */
 export const TierAreas = {
     name: 'Tier: Areas',
-    render: () => staged(<AreaPicture />, SIDEBAR_STAGE),
+    render: () => staged(<AreaPicture label="Tier 1 — areas" />, SIDEBAR_STAGE),
     play: async ({ canvasElement }) => {
-        await expect(canvasElement.querySelector('[aria-current="page"]'), 'the selected area').not.toBeNull();
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        const canvas = within(canvasElement);
+        const sessions = canvas.getByRole('button', { name: 'Sessions' });
+        const students = canvas.getByRole('button', { name: 'Students' });
+        await expect(sessions, 'Sessions starts as the selected area').toHaveAttribute('aria-current', 'page');
+        await userEvent.click(students);
+        await expect(students, 'clicking another area moves aria-current="page"').toHaveAttribute('aria-current', 'page');
+        await expect(sessions).not.toHaveAttribute('aria-current', 'page');
+        await userEvent.click(sessions);
+        await expect(sessions).toHaveAttribute('aria-current', 'page');
         await fitsCanvas(canvasElement);
     },
 };
@@ -51,9 +62,17 @@ export const TierAreas = {
 /** Tier 1b, Open items: records opened earlier, named by time and who. */
 export const TierOpenItems = {
     name: 'Tier: Open items',
-    render: () => staged(<OpenItemsPicture />, SIDEBAR_STAGE),
+    render: () => staged(<OpenItemsPicture label="Tier 1b — open items" />, SIDEBAR_STAGE),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        const canvas = within(canvasElement);
         await expect(canvasElement.textContent, 'named by time and who').toContain('4:00 PM · Ms. Ortiz');
+        const firstTab = canvas.getByRole('button', { name: '4:00 PM · Ms. Ortiz' });
+        await userEvent.click(firstTab);
+        await expect(firstTab, 'clicking an open item marks it current').toHaveAttribute('aria-current', 'page');
+        await userEvent.click(canvas.getByRole('button', { name: 'Home' }));
+        await expect(canvas.getByRole('button', { name: 'Home' })).toHaveAttribute('aria-current', 'page');
         await fitsCanvas(canvasElement);
     },
 };
@@ -63,6 +82,8 @@ export const TierViews = {
     name: 'Tier: Views',
     render: () => staged(<ViewsPicture />, SMALL_STAGE),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const canvas = within(canvasElement);
         const [upcomingTab, pastTab] = canvas.getAllByRole('tab');
         await expect([upcomingTab, pastTab], 'two views').toHaveLength(2);
@@ -86,6 +107,8 @@ export const TierPageTabs = {
     name: 'Tier: Page tabs',
     render: () => staged(<PageTabsPicture />),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const canvas = within(canvasElement);
         const overviewTab = canvas.getByRole('tab', { name: 'Overview' });
         const sessionsTab = canvas.getByRole('tab', { name: 'Sessions' });
@@ -113,9 +136,17 @@ export const TierDrill = {
     name: 'Tier: Drill in and climb out',
     render: () => staged(<DrillPicture />),
     play: async ({ canvasElement }) => {
-        const nav = within(canvasElement).getByRole('navigation', { name: 'Breadcrumb' });
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        const canvas = within(canvasElement);
+        const nav = canvas.getByRole('navigation', { name: 'Breadcrumb' });
+        const parentLink = within(nav).getByRole('link', { name: 'Students' });
         await expect(within(nav).getAllByRole('link').map((a) => a.textContent), 'parents only, each a link').toEqual(['Students']);
         await expect(nav.querySelector('[aria-current="page"]'), 'the record is plain text, the current page').toHaveTextContent('Maya Rodriguez');
+        await userEvent.tab();
+        await expect(parentLink).toHaveFocus();
+        await userEvent.tab();
+        await expect(canvas.getByRole('button', { name: 'Share' })).toHaveFocus();
         await fitsCanvas(canvasElement);
     },
 };
@@ -127,6 +158,8 @@ export const KeyAreaPage = {
     name: 'Key case: An area page',
     render: () => staged(<AreaPagePicture />),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const canvas = within(canvasElement);
         await expect(canvas.queryByRole('navigation', { name: 'Breadcrumb' }), 'nothing to climb out of').toBeNull();
         await expect(canvas.getByRole('button', { name: 'Add student' }).closest('.plus-section-view-bar'), 'the add action is in the view bar').not.toBeNull();
@@ -139,6 +172,8 @@ export const KeyOneTabSystem = {
     name: 'Key case: One tab system per page',
     render: () => staged(<TabsUnderPicture />),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const canvas = within(canvasElement);
         await expect(canvas.getAllByRole('tablist'), 'one tab system: the page tabs').toHaveLength(1);
         const trigger = canvas.getByRole('button', { name: 'Status: Upcoming' });
@@ -165,6 +200,8 @@ export const KeyFocusedTask = {
     name: 'Key case: A focused task',
     render: () => staged(<FocusedType />),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const canvas = within(canvasElement);
         await expect(canvas.getByRole('button', { name: 'Close' })).toBeInTheDocument();
         await expect(canvas.queryByRole('navigation', { name: 'Breadcrumb' }), 'no breadcrumb').toBeNull();

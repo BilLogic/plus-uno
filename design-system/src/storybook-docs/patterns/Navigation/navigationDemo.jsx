@@ -17,20 +17,19 @@ import { NamesDo, TabLabelDo, TabLabelDont } from '../../../patterns/Sidebar/Sid
 
 /**
  * The Navigation pattern's examples, drawn with the real Sidebar, Tabs,
- * Breadcrumb and PageHeader. Every picture renders the state its heading
- * names through props: the selected area, the drilled-in record page, the
- * page tabs on their Sessions tab. The Sidebar pictures are the Sidebar
- * docs' own examples (inert, hidden from assistive technology), reused so
- * the pages show one thing. Nothing here runs a play.
+ * Breadcrumb and PageHeader. Every example renders the state its heading
+ * names through props and stays interactive: the selected area, the drilled-in
+ * record page, the page tabs on their Sessions tab. The Sidebar examples are
+ * the Sidebar docs' own live examples, reused so the pages show one thing.
  *
- *   AreaPicture        the Sidebar with an area selected
- *   OpenItemsPicture   open items under Sessions, named by time and who
- *   OpenItemsDont      the same item carrying everything, cut off
- *   ViewsPicture       pill views in a Section's view bar
- *   PageTabsPicture    page tabs under a record's title
- *   DrillPicture       the record page after a drill-in, breadcrumb above the title
- *   AreaPagePicture    an area page: no breadcrumb
- *   TabsUnderPicture   page tabs with the Section's views as one PopupSelect
+ *   AreaPicture              the Sidebar with an area selected
+ *   OpenItemsPicture         open items under Sessions, named by time and who
+ *   OpenItemsDont            the same item carrying everything, cut off
+ *   ViewsPicture             pill views in a Section's view bar
+ *   PageTabsPicture          page tabs under a record's title
+ *   DrillPicture             the record page after a drill-in, breadcrumb above the title
+ *   AreaPagePicture          an area page: no breadcrumb
+ *   TabsUnderPicture         page tabs with the Section's views as one PopupSelect
  */
 
 /** The width a picture lays out at, in px: docs geometry. */
@@ -45,23 +44,23 @@ export const SIDEBAR_STAGE = 320; // docs-literal
 const pad = { padding: 'var(--page-pad)', boxSizing: 'border-box' };
 
 /** Tier 1: the Sidebar with an area selected. */
-export const AreaPicture = () => (
+export const AreaPicture = ({ label = 'Navigation areas example' } = {}) => (
     <div style={{ ...pad, inlineSize: 'var(--card-min-width-md)' }}>
-        <NamesDo />
+        <NamesDo label={label} />
     </div>
 );
 
 /** Tier 1b: sessions opened earlier, as temporary items under Sessions. */
-export const OpenItemsPicture = () => (
+export const OpenItemsPicture = ({ label = 'Open items — do' } = {}) => (
     <div style={{ ...pad, inlineSize: 'var(--card-min-width-md)' }}>
-        <TabLabelDo />
+        <TabLabelDo label={label} />
     </div>
 );
 
 /** Don't: an open item that carries everything, so the time it is found by is cut off. */
-export const OpenItemsDont = () => (
+export const OpenItemsDont = ({ label = "Open items — don't" } = {}) => (
     <div style={{ ...pad, inlineSize: 'var(--card-min-width-md)' }}>
-        <TabLabelDont />
+        <TabLabelDont label={label} />
     </div>
 );
 

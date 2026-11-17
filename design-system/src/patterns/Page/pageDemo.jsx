@@ -122,9 +122,9 @@ export const PAST_SESSIONS = [
     ['Fri 4:00 PM', 'Ms. Kim', 'Ratios and rates'],
 ];
 
-/** A Dynamic table of sessions, filtered by status (`upcoming` or `past`). */
-export const SessionsTable = ({ status = 'upcoming' }) => {
-    const rows = status === 'past' ? PAST_SESSIONS : UPCOMING_SESSIONS;
+/** A Dynamic table of sessions, filtered by status (`upcoming` or `past`) or explicit `rows`. */
+export const SessionsTable = ({ status = 'upcoming', rows: rowsProp }) => {
+    const rows = rowsProp ?? (status === 'past' ? PAST_SESSIONS : UPCOMING_SESSIONS);
     return (
         <DynamicTable
             head={SESSION_HEAD}

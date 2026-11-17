@@ -61,8 +61,6 @@ export const countWords = (rows, value) => (appliedCount(value) > 0 ? `${rows.le
 
 const ROSTER_COLUMNS = ['Name', 'Grade', 'School', 'Subject'];
 
-const noop = () => {};
-
 /** A filter side's values, one flat list; the side counts each category. */
 const flat = (value) => Object.values(value).flat();
 
@@ -71,8 +69,8 @@ const flat = (value) => Object.values(value).flat();
  * bar's end, applied as you pick. The list is a Popup select, one value at a
  * time; several at once is Planned on it.
  */
-const QuickFilter = ({ category, value, onPick, open, mount }) => {
-    const picked = value[category.id][0];
+export const QuickFilter = ({ category, value, onPick, open, onOpenChange, mount, placement = 'bottom-end' }) => {
+    const picked = (value[category.id] ?? [])[0];
     return (
         <PopupSelect
             label={category.label}
@@ -80,8 +78,8 @@ const QuickFilter = ({ category, value, onPick, open, mount }) => {
             value={picked ?? null}
             onChange={(next) => onPick(category.id, next === picked ? [] : [next])}
             isSearchable={false}
-            placement="bottom-end"
-            {...(open ? { open: true, onOpenChange: noop } : {})}
+            placement={placement}
+            {...(open !== undefined ? { open, onOpenChange } : {})}
             container={mount ?? undefined}
             trigger={<FilterButton text={category.label} appearance="subtle" trailingMetric={picked ? 1 : undefined} isSelected={Boolean(picked)} />}
         />
@@ -89,7 +87,7 @@ const QuickFilter = ({ category, value, onPick, open, mount }) => {
 };
 
 /** Tier 2a: the Filter icon opens one list, applied as you pick, with no footer. */
-const OneListMenu = ({ category, value, onPick, open, mount }) => {
+const OneListMenu = ({ category, value, onPick, open, onOpenChange, mount }) => {
     const picked = value[category.id][0];
     return (
         <PopupSelect
@@ -99,7 +97,7 @@ const OneListMenu = ({ category, value, onPick, open, mount }) => {
             onChange={(next) => onPick(category.id, next === picked ? [] : [next])}
             isSearchable={false}
             placement="bottom-end"
-            {...(open ? { open: true, onOpenChange: noop } : {})}
+            {...(open !== undefined ? { open, onOpenChange } : {})}
             container={mount ?? undefined}
             trigger={<IconButton icon="filter" label="Filters" appearance="subtle" trailingMetric={picked ? 1 : undefined} />}
         />
@@ -136,6 +134,7 @@ export const FilteredStudents = ({
     const [activeView, setActiveView] = useState(views[0]);
     const [pageTab, setPageTab] = useState('students');
     const [showSide, setShowSide] = useState(false);
+    const [activeMenu, setActiveMenu] = useState(openMenu ?? null);
     const cats = categories.map((id) => CATEGORIES[id]);
     const pick = (id, next) => setValue((current) => ({ ...current, [id]: next }));
     const reset = () => setValue(blank);
@@ -159,16 +158,20 @@ export const FilteredStudents = ({
     // Below 768 quick filters fold into a stacked menu behind the Filter icon; below 960 a filter side hides and the Filter icon returns.
     const folded = tier === '1' && width < FRAME_LAYOUT.fullWidthBelow;
     const sideFits = width >= SECTION_DETAIL_FLOOR;
-    // A held-open menu waits for the picture's element: opened on the first render it would mount on the page, and stay there.
-    const held = (id) => mount !== null && openMenu === id;
+    const menuProps = (id) => (openMenu
+        ? {
+            open: mount !== null && activeMenu === id,
+            onOpenChange: (next) => setActiveMenu(next ? id : null),
+        }
+        : {});
 
     let filters = null;
     if (tier === '1' && !folded) {
         filters = cats.map((category) => (
-            <QuickFilter key={category.id} category={category} value={value} onPick={pick} open={held(category.id)} mount={mount} />
+            <QuickFilter key={category.id} category={category} value={value} onPick={pick} {...menuProps(category.id)} mount={mount} />
         ));
     } else if (tier === '2a') {
-        filters = <OneListMenu category={cats[0]} value={value} onPick={pick} open={held('filters')} mount={mount} />;
+        filters = <OneListMenu category={cats[0]} value={value} onPick={pick} {...menuProps('filters')} mount={mount} />;
     } else if (tier === '2b' || tier === '2c' || folded) {
         filters = (
             <FilterMenu
@@ -176,7 +179,7 @@ export const FilteredStudents = ({
                 value={value}
                 onApply={setValue}
                 layout={tier === '2b' ? 'side-by-side' : 'stacked'}
-                {...(held('filters') ? { open: true, onOpenChange: noop } : {})}
+                {...menuProps('filters')}
                 container={mount ?? undefined}
             />
         );
@@ -278,7 +281,24 @@ export const FilteredStudents = ({
                             title="Students"
                             description="Lincoln Middle"
                             type={pageTabs ? 'tabs-only' : sectionType}
-                            tabs={<ViewBar views={views} activeView={activeView} onViewChange={setActiveView} start={start ? start(mount, { activeView, onViewChange: setActiveView }) : undefined} filters={filters} primary="Add students" narrow={width < FRAME_LAYOUT.fullWidthBelow} />}
+                            tabs={(
+                                <ViewBar
+                                    views={views}
+                                    activeView={activeView}
+                                    onViewChange={setActiveView}
+                                    start={start
+                                        ? start(mount, {
+                                            activeView,
+                                            onViewChange: setActiveView,
+                                            open: openMenu === 'view' ? mount !== null && activeMenu === 'view' : undefined,
+                                            onOpenChange: openMenu === 'view' ? (next) => setActiveMenu(next ? 'view' : null) : undefined,
+                                        })
+                                        : undefined}
+                                    filters={filters}
+                                    primary="Add students"
+                                    narrow={width < FRAME_LAYOUT.fullWidthBelow}
+                                />
+                            )}
                         >
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>{body}</div>
                         </PatternSection>
@@ -290,14 +310,14 @@ export const FilteredStudents = ({
 };
 
 /** The view picker under page tabs: a Popup select at the bar's start, picking a view, not a filter. */
-export const ViewPicker = ({ open = false, mount, value, onChange }) => (
+export const ViewPicker = ({ open = false, onOpenChange, mount, value, onChange }) => (
     <PopupSelect
         label="View"
         options={['All students', 'Needs follow-up', 'New this term']}
         {...(value !== undefined ? { value, onChange } : { defaultValue: 'All students' })}
         isSearchable={false}
         placement="bottom-start"
-        {...(open && mount ? { open: true, onOpenChange: noop } : {})}
+        {...(open && mount && onOpenChange ? { open, onOpenChange } : {})}
         container={mount ?? undefined}
     />
 );

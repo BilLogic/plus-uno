@@ -3,6 +3,7 @@ import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { BasicPage, BasicStudents, BodySearch, FocusedPage, FocusedStudents, PANEL, SCOPE, STAGE, SearchStudents } from './searchDemo.jsx';
 
 /**
@@ -21,10 +22,10 @@ export default {
     parameters: { layout: 'padded' },
 };
 
-const staged = (story) => <FitStage width={STAGE}>{story}</FitStage>;
+const staged = (story) => <FitStage width={STAGE} scrollable>{story}</FitStage>;
 const page = (canvasElement) => within(canvasElement.ownerDocument.body);
 const field = (canvas) => canvas.getByRole('searchbox', { name: SCOPE });
-const status = (canvas) => canvas.getByRole('status');
+const status = (canvas) => canvas.getByText(/students|sessions/i, { selector: 'span[role="status"]' });
 const bodyRows = (canvasElement) => canvasElement.querySelectorAll('tbody tr');
 
 /* ---------- the three types, as the page's opening grid ---------- */
@@ -34,7 +35,32 @@ export const TypeActive = {
     name: 'Type: active',
     render: () => staged(<SearchStudents initialQuery="ia" />),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        const canvas = within(canvasElement);
         await expect(bodyRows(canvasElement).length, 'the rows narrowed in place').toBe(2);
+        await expect(status(canvas).textContent).toBe('2 of 6 students');
+
+        await userEvent.click(canvas.getByRole('button', { name: 'Clear search' }));
+        await waitFor(() => expect(bodyRows(canvasElement).length).toBe(6));
+        await userEvent.click(field(canvas));
+        await userEvent.keyboard('ia');
+        await waitFor(() => expect(field(canvas)).toHaveValue('ia'));
+        await waitFor(() => expect(bodyRows(canvasElement).length).toBe(2));
+        await expect(status(canvas).textContent).toBe('2 of 6 students');
+
+        await userEvent.clear(field(canvas));
+        await userEvent.keyboard('Zoe');
+        await waitFor(() => expect(field(canvas)).toHaveValue('Zoe'));
+        await waitFor(() => expect(bodyRows(canvasElement).length).toBe(0));
+        await expect(status(canvas).textContent).toBe('0 of 6 students');
+
+        await userEvent.click(canvas.getByRole('button', { name: 'Reset filters' }));
+        await waitFor(() => expect(bodyRows(canvasElement).length).toBe(6));
+        await userEvent.click(field(canvas));
+        await userEvent.keyboard('ia');
+        await waitFor(() => expect(field(canvas)).toHaveValue('ia'));
+        await waitFor(() => expect(bodyRows(canvasElement).length).toBe(2));
         await fitsCanvas(canvasElement);
     },
 };
@@ -44,10 +70,16 @@ export const TypeFocused = {
     name: 'Type: focused',
     render: () => staged(<FocusedPage />),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const canvas = within(canvasElement);
-        await expect(canvas.getByRole('combobox', { name: SCOPE })).toBeTruthy();
+        const input = canvas.getByRole('combobox', { name: SCOPE });
+        await expect(input).toBeTruthy();
         await waitFor(() => expect(canvasElement.querySelector('[role="listbox"]'), 'the panel is open inside the picture').toBeTruthy());
         await expect(canvas.getByText(/See all results for/), 'the last row runs a basic search').toBeTruthy();
+        await userEvent.click(input);
+        await userEvent.keyboard('v');
+        await expect(input).toHaveValue('av');
         await fitsCanvas(canvasElement);
     },
 };
@@ -57,10 +89,22 @@ export const TypeBasic = {
     name: 'Type: basic',
     render: () => staged(<BasicPage />),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const canvas = within(canvasElement);
-        await expect(field(canvas).value).toBe('Ava');
+        const input = field(canvas);
+        await expect(input.value).toBe('Ava');
+        await expect(canvas.getByText('For \u201CAva\u201D')).toBeInTheDocument();
         await expect(canvasElement.querySelector('[aria-busy="true"]'), 'the results page waits under the bar').toBeTruthy();
         await expect(canvasElement.querySelector('[role="listbox"]'), 'no panel in basic').toBeNull();
+
+        await userEvent.clear(input);
+        await userEvent.type(input, 'Maya{Enter}');
+        await expect(canvas.getByText('For \u201CMaya\u201D')).toBeInTheDocument();
+
+        await userEvent.clear(input);
+        await userEvent.type(input, 'Ava{Enter}');
+        await expect(canvas.getByText('For \u201CAva\u201D')).toBeInTheDocument();
         await fitsCanvas(canvasElement);
     },
 };
@@ -70,7 +114,12 @@ export const BasicField = {
     name: 'Type: basic, the field',
     render: () => staged(<BasicStudents />),
     play: async ({ canvasElement }) => {
-        await expect(field(within(canvasElement))).toBeTruthy();
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        const input = field(within(canvasElement));
+        await expect(input).toBeTruthy();
+        await userEvent.click(input);
+        await expect(input).toHaveFocus();
     },
 };
 
@@ -81,6 +130,8 @@ export const Closed = {
     name: 'State: closed',
     render: () => staged(<SearchStudents />),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const canvas = within(canvasElement);
         const bar = canvasElement.querySelector('.plus-section-view-bar');
         const search = canvas.getByRole('button', { name: SCOPE });
@@ -96,10 +147,35 @@ export const Narrowing = {
     name: 'State: narrowing',
     render: () => staged(<SearchStudents initialQuery="ia" />),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const canvas = within(canvasElement);
         await expect(field(canvas).value).toBe('ia');
         await expect(status(canvas).textContent, 'the count in words, in the results header').toBe('2 of 6 students');
         await expect(bodyRows(canvasElement).length).toBe(2);
+
+        await userEvent.click(canvas.getByRole('button', { name: 'Clear search' }));
+        await waitFor(() => expect(bodyRows(canvasElement).length).toBe(6));
+        await expect(status(canvas).textContent).toBe('6 students');
+
+        await userEvent.click(field(canvas));
+        await userEvent.keyboard('ia');
+        await waitFor(() => expect(field(canvas)).toHaveValue('ia'));
+        await waitFor(() => expect(bodyRows(canvasElement).length).toBe(2));
+        await expect(status(canvas).textContent).toBe('2 of 6 students');
+
+        await userEvent.clear(field(canvas));
+        await userEvent.keyboard('Zoe');
+        await waitFor(() => expect(field(canvas)).toHaveValue('Zoe'));
+        await waitFor(() => expect(bodyRows(canvasElement).length).toBe(0));
+        await expect(status(canvas).textContent).toBe('0 of 6 students');
+
+        await userEvent.click(canvas.getByRole('button', { name: 'Reset filters' }));
+        await waitFor(() => expect(bodyRows(canvasElement).length).toBe(6));
+        await userEvent.click(field(canvas));
+        await userEvent.keyboard('ia');
+        await waitFor(() => expect(field(canvas)).toHaveValue('ia'));
+        await waitFor(() => expect(bodyRows(canvasElement).length).toBe(2));
         await expect(canvas.getByRole('button', { name: 'Clear search' })).toBeTruthy();
         await fitsCanvas(canvasElement);
     },
@@ -110,6 +186,8 @@ export const NoMatches = {
     name: 'State: no matches',
     render: () => staged(<SearchStudents initialQuery="Zoe" />),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const canvas = within(canvasElement);
         await expect(status(canvas).textContent, 'zero is a count too').toBe('0 of 6 students');
         await expect(canvas.getByText('No students match "Zoe".')).toBeTruthy();
@@ -125,6 +203,8 @@ export const Loading = {
     name: 'State: loading',
     render: () => staged(<SearchStudents initialQuery="ia" isLoading />),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const canvas = within(canvasElement);
         await expect(canvas.getByText('Searching students'), 'the count slot says what is happening').toBeTruthy();
         await expect(canvasElement.querySelector('.plus-search-field__spinner'), 'a spinner takes the search icon').toBeTruthy();
@@ -141,6 +221,8 @@ export const BodyDefault = {
     name: 'Placement: page body',
     render: () => staged(<BodySearch initialQuery="ia" />),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const canvas = within(canvasElement);
         await expect(canvasElement.querySelector('.plus-search-field--compact'), 'default spacing').toBeNull();
         await expect(field(canvas).value).toBe('ia');
@@ -153,8 +235,20 @@ export const WithScope = {
     name: 'Scope filter',
     render: () => staged(<BodySearch scoped />),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const canvas = within(canvasElement);
-        await expect(canvas.getByText('All'), 'All is first and selected').toBeTruthy();
+        const trigger = canvas.getByRole('combobox', { name: 'Search scope' });
+        await expect(trigger, 'All is first and selected').toHaveTextContent('All');
+        await expect(status(canvas)).toHaveTextContent('6 students');
+        await userEvent.click(trigger);
+        const body = page(canvasElement);
+        await userEvent.click(await body.findByRole('option', { name: /Sessions/ }));
+        await expect(status(canvas)).toHaveTextContent('6 sessions');
+        await expect(canvas.getByRole('cell', { name: 'Algebra' })).toBeInTheDocument();
+        await userEvent.click(trigger);
+        await userEvent.click(await body.findByRole('option', { name: /^All/ }));
+        await expect(status(canvas)).toHaveTextContent('6 students');
         await fitsCanvas(canvasElement);
     },
 };
@@ -168,6 +262,10 @@ export const FocusedPanel = {
     argTypes: { text: { control: 'inline-radio', options: ['', 'a', 'zzz'] } },
     parameters: { controls: { include: ['text'] } },
     render: ({ text }) => <FocusedStudents text={text} holdFocus />,
+    play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+    },
 };
 
 /* ---------- test-only: interaction from a clean start ---------- */

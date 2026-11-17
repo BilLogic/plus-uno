@@ -4,13 +4,18 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as NavigationStories from './Navigation.stories.jsx';
-import { SIDEBAR_STAGE, SMALL_STAGE, STAGE, OpenItemsDont, OpenItemsPicture } from './navigationDemo.jsx';
+import { BreadcrumbCase } from './NavigationCases.jsx';
+import {
+    OpenItemsDont,
+    OpenItemsPicture,
+    SIDEBAR_STAGE,
+    SMALL_STAGE,
+    STAGE,
+} from './navigationDemo.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
-import { AreaPageTitleAlone, BreadcrumbOnAreaPage } from '@/storybook-docs/illustrations/page.jsx';
 import { OneTabSystem, TwoTabSystems } from '@/patterns/Page/PageCases.jsx';
-import { BreadcrumbOnRecordPage } from '@/storybook-docs/illustrations/navigation.jsx';
 
 <Meta title="Patterns/Navigation" tags={['manifest']} />
 
@@ -43,11 +48,19 @@ import { BreadcrumbOnRecordPage } from '@/storybook-docs/illustrations/navigatio
 Four tiers, from the whole app down to one record. A quick look is a layer, not a tier; steps move within a level.
 
 <TypeGrid>
-<TypeCard of={NavigationStories.TierAreas} title="1 · Areas" stage={SIDEBAR_STAGE}>Go to: the Sidebar's fixed items. The selected row takes the selected fill.</TypeCard>
-<TypeCard of={NavigationStories.TierOpenItems} title="1b · Open items" stage={SIDEBAR_STAGE}>Records the person opened, a session or a student, as temporary items in the Sidebar: add and remove, then go to.</TypeCard>
-<TypeCard of={NavigationStories.TierViews} title="2 · Views" stage={SMALL_STAGE}>Pill views in a Section's view bar, or page tabs under the page title. Content swaps in place.</TypeCard>
-<TypeCard of={NavigationStories.TierDrill} title="3 · Drill in and climb out" stage={STAGE}>A record page with a breadcrumb: the record's place, parents only. Climb out through the breadcrumb.</TypeCard>
+<TypeCard of={NavigationStories.TierAreas} to="#1-areas" title="1 · Areas" stage={SIDEBAR_STAGE}>Go to: the Sidebar's fixed items. The selected row takes the selected fill.</TypeCard>
+<TypeCard of={NavigationStories.TierOpenItems} to="#1b-open-items" title="1b · Open items" stage={SIDEBAR_STAGE}>Records the person opened, a session or a student, as temporary items in the Sidebar: add and remove, then go to.</TypeCard>
+<TypeCard of={NavigationStories.TierViews} to="#2-views" title="2 · Views" stage={SMALL_STAGE}>Pill views in a Section's view bar, or page tabs under the page title. Content swaps in place.</TypeCard>
+<TypeCard of={NavigationStories.TierDrill} to="#3-drill-in-and-climb-out" title="3 · Drill in and climb out" stage={STAGE}>A record page with a breadcrumb: the record's place, parents only. Climb out through the breadcrumb.</TypeCard>
 </TypeGrid>
+
+<ComponentExample of={NavigationStories.TierAreas} title="1 · Areas" description="Clicking an area item moves the selected fill and marks the current page." />
+
+<ComponentExample of={NavigationStories.TierOpenItems} title="1b · Open items" description="Temporary session items under Sessions, named by time and teacher; click to open or dismiss with the close button." />
+
+<ComponentExample of={NavigationStories.TierViews} title="2 · Views" description="Pill views in a Section's view bar swap content in place as you switch tabs." />
+
+<ComponentExample of={NavigationStories.TierDrill} title="3 · Drill in and climb out" description="Maya Rodriguez's record page with a Students link in the breadcrumb above the title." />
 
 </div>
 
@@ -141,9 +154,9 @@ Least room to most. Pick the lowest step that fits. The picture is on <a target=
 Never on an area page or a focused task. It sits above the title in the page header and shows the record's place: parents only, never history. It never wraps. Folding five or more items into "…" is Planned <PlannedTag />.
 
 <DoDontPair
-    doExample={<BreadcrumbOnRecordPage />}
+    doExample={<BreadcrumbCase record />}
     doCaption="A breadcrumb on the record page, parents only."
-    dontExample={<BreadcrumbOnAreaPage />}
+    dontExample={<BreadcrumbCase record={false} />}
     dontCaption="A breadcrumb on an area page: there is nothing to climb out of."
 />
 
