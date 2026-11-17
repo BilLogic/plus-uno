@@ -108,8 +108,10 @@ export const PlaceTable = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expect(canvas.queryByRole('table'), 'no table, so no column headers and no footer').toBeNull();
+        await expect(canvas.queryAllByRole('columnheader'), 'no column headers').toHaveLength(0);
+        await expect(canvas.queryByRole('navigation'), 'no pagination').toBeNull();
         await expect(canvasElement.querySelector('.plus-section-view-bar'), 'the view bar stays').not.toBeNull();
-        await expect(canvas.getByRole('heading', { name: 'No students in this group yet' })).toBeInTheDocument();
+        await expect(canvas.getByRole('heading', { name: 'No students in this group yet' })).toBeVisible();
         await fitsCanvas(canvasElement);
     },
 };
@@ -145,7 +147,10 @@ export const KeyNoMatchesInTable = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expect(canvas.queryByRole('table'), 'the table is replaced whole').toBeNull();
-        await expect(canvas.getByRole('button', { name: 'Reset filters' })).toBeInTheDocument();
+        await expect(canvas.queryAllByRole('columnheader'), 'no column headers').toHaveLength(0);
+        await expect(canvas.queryByRole('navigation'), 'no pagination').toBeNull();
+        await expect(canvas.getByRole('heading', { name: 'No students match these filters' })).toBeVisible();
+        await expect(canvas.getByRole('button', { name: 'Reset filters' })).toBeVisible();
         await fitsCanvas(canvasElement);
     },
 };

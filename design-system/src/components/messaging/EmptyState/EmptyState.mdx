@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as EmptyStateStories from './EmptyState.stories.jsx';
-import { Button, EmptyState, Table } from '@/components';
+import { Button, DynamicTable, EmptyState, Table } from '@/components';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -10,7 +10,6 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
-import { PlannedTag } from '@/storybook-docs/lib/template-page.jsx';
 
 <Meta of={EmptyStateStories} />
 
@@ -47,7 +46,7 @@ line on what goes here, and the one action that fills it.
 
 <ComponentExample of={EmptyStateStories.Compact} title="Compact" description="For a table body or a card, with a smaller picture." />
 
-<ComponentExample of={EmptyStateStories.InATable} title="In a table" description="Passed to a Table's emptyState, it takes the body while the header row stays today; the Empty pattern replaces the whole table." />
+<ComponentExample of={EmptyStateStories.InATable} title="In a table" description="Passed to DynamicTable's emptyView (or PatternTable's emptyState), it replaces the whole table with no header row or footer." />
 
 </div>
 
@@ -237,13 +236,13 @@ person to a message above it.
     dontCaption="An empty-view invitation when the load failed."
 />
 
-### Fill a Table with it, not around it.
+### Replace a Table with it, never stack it under one.
 
-The Table's `emptyState` takes the body; an EmptyState never sits under a Table. <PlannedTag /> The <a target="_top" href="./?path=/docs/patterns-states-empty--docs">Empty pattern</a> replaces the whole table, header row and footer included; today the Table keeps its header row.
+Pass `EmptyState` to `DynamicTable`'s `emptyView` (or `PatternTable`'s `emptyState` with `empty`) so it replaces the whole table, header row and footer included. Never stack an `EmptyState` under an empty `Table`.
 
 <DoDontPair
-    doExample={<Table headers={['Student', 'Grade']} rows={[]} emptyState={<EmptyState spacing="compact" icon="user-group" header="No students yet" description="Add a student to see them here." />} />}
-    doCaption="An EmptyState in the Table's emptyState."
+    doExample={<DynamicTable head={{ cells: [{ key: 'student', content: 'Student' }, { key: 'grade', content: 'Grade' }] }} rows={[]} label="Students" emptyView={<EmptyState spacing="compact" icon="user-group" header="No students yet" description="Add a student to see them here." />} />}
+    doCaption="An EmptyState in DynamicTable's emptyView replaces the whole table."
     dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><Table headers={['Student', 'Grade']} rows={[]} /><EmptyState spacing="compact" icon="user-group" header="No students yet" description="Add a student to see them here." /></div>}
     dontCaption="An EmptyState under a Table with an empty body."
 />
@@ -289,7 +288,7 @@ The Table's `emptyState` takes the body; an EmptyState never sits under a Table.
 
 ## Related
 
-- `StaticTable`: use when passing `EmptyState` into a table's `emptyState` slot.
+- `DynamicTable`: use when passing `EmptyState` into a table's `emptyView` or `noResultsView` slot.
 - `Illustration`: use when placing a PLUS character in the `image` slot.
 - <a href="?path=/docs/patterns-states-empty--docs">Empty</a>: use when choosing empty and error states across pages, sections and tables.
 

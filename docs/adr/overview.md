@@ -45,6 +45,7 @@ Worker source, the guard script, the OAuth handler — and carry the same
 - [ADR-047](047-the-design-system-ships-outside-the-repo.md): the design system ships through the `@plus-uno/cli` package; supersedes ADR-006.
 - [ADR-048](048-agents-build-in-stages-and-a-ds-fact-has-one-home.md): agents build in five stages (`templates-first`), and each DS fact has one authored home; `guidelines/composition/` retires.
 - [ADR-049](049-motion-docs-teach-with-kit-demos.md): motion docs teach with kit demos; real components are tests and examples.
+- [ADR-050](050-an-empty-table-is-replaced-by-its-empty-state.md): empty and no-results tables in `PatternTable` and `DynamicTable` replace the whole table with `EmptyState`.
 
 ## Writing a new one
 

@@ -5,7 +5,7 @@ import { expect, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { px } from '@/storybook-docs/lib/style-probes.js';
-import { Button, Illustration, Table } from '@/components';
+import { Button, DynamicTable, Illustration, Table } from '@/components';
 import EmptyState from './EmptyState';
 
 /**
@@ -137,10 +137,17 @@ Compact.play = async ({ canvasElement }) => {
 /* ------------------------------------------------------------------ in a table */
 
 export const InATable = () => (
-    <Table
-        headers={['Student', 'Grade', 'Sessions']}
+    <DynamicTable
+        head={{
+            cells: [
+                { key: 'student', content: 'Student' },
+                { key: 'grade', content: 'Grade' },
+                { key: 'sessions', content: 'Sessions' },
+            ],
+        }}
         rows={[]}
-        emptyState={(
+        label="Students"
+        emptyView={(
             <EmptyState
                 spacing="compact"
                 icon="user-group"
@@ -152,11 +159,12 @@ export const InATable = () => (
     />
 );
 
-/** The Table keeps its header row and the EmptyState takes the body, so the message is one row spanning every column. */
+/** Passed to a DynamicTable's emptyView, the EmptyState replaces the whole table with no header row or footer. */
 InATable.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByRole('columnheader', { name: 'Student' }), 'header stays').toBeVisible();
-    await expect(canvas.getByRole('heading', { name: 'No students yet' }), 'message in the body').toBeVisible();
+    await expect(canvas.queryByRole('table'), 'table is replaced').toBeNull();
+    await expect(canvas.queryAllByRole('columnheader'), 'no header row').toHaveLength(0);
+    await expect(canvas.getByRole('heading', { name: 'No students yet' }), 'empty state heading').toBeVisible();
     await expect(canvas.getByRole('button', { name: 'Add student' })).toBeVisible();
 };
 
@@ -195,7 +203,7 @@ NoAccess.play = async ({ canvasElement }) => {
     await expect(canvas.queryByRole('button'), 'nothing to retry').toBeNull();
 };
 
-/** A table body that fails to load keeps its header row, like an empty one. */
+/** A table body that fails to load keeps its header row. */
 export const LoadFailureInATable = () => (
     <Table
         headers={['Student', 'Grade', 'Sessions']}
