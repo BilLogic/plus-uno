@@ -1,27 +1,13 @@
 import React, { useState } from 'react';
 import { Button, FooterActions, ProgressTracker, TextField } from '@/components';
-import { Blanket, PatternModal } from '@/patterns';
+import { PatternModal } from '@/patterns';
+import { CaseBlanket } from '@/storybook-docs/lib/case-surface.jsx';
 import { stepItems } from '@/storybook-docs/lib/focused-task.jsx';
 
 /**
  * The live do and don't examples on the Modal template page, composed from
  * `Blanket`, `PatternModal`, `FooterActions`, `ProgressTracker` and `Button`.
  */
-
-const CaseBlanket = ({ children, height = 300 }) => (
-    <div className="sb-unstyled" style={{ inlineSize: '100%' }}>
-        <Blanket
-            inline
-            screenHeight={height}
-            style={{
-                padding: 'var(--pad-y-md) var(--pad-x-md)',
-                borderRadius: 'var(--radius-md)',
-            }}
-        >
-            {children}
-        </Blanket>
-    </div>
-);
 
 const SESSION_NOTES = [
     'Ana solved two-step linear equations with fractions.',

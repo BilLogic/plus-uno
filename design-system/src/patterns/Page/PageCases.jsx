@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button, PageHeader } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { Page, PatternCard, PatternSection } from '@/patterns';
+import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { ViewBar } from '@/storybook-docs/lib/view-bar.jsx';
 import { PageTabs, SessionsTable, ViewBarWithAdd, ViewSelect } from './pageDemo.jsx';
 
@@ -11,11 +12,11 @@ import { PageTabs, SessionsTable, ViewBarWithAdd, ViewSelect } from './pageDemo.
  */
 
 const InDocs = ({ children }) => (
-    <div className="sb-unstyled" style={{ inlineSize: '100%' }}>
+    <CaseSurface border="none" padding="none" surface={false}>
         <HeadingLevelContext.Provider value={5}>
             {children}
         </HeadingLevelContext.Provider>
-    </div>
+    </CaseSurface>
 );
 
 /** "Add" ends the collection's view bar; the header carries only page actions. */

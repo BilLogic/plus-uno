@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button, FooterActions, Popup, TextField } from '@/components';
-import { Blanket, PatternModal } from '@/patterns';
+import { PatternModal } from '@/patterns';
+import { CaseBlanket, CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 
 /**
  * The live do and don't examples on the Popup template page, composed from
@@ -12,33 +13,24 @@ export const FieldsInModalCase = () => {
     const [student, setStudent] = useState('Ana Ruiz');
     const [topic, setTopic] = useState('Two-step equations');
     return (
-        <div className="sb-unstyled" style={{ inlineSize: '100%' }}>
-            <Blanket
-                inline
-                screenHeight={280}
-                style={{
-                    padding: 'var(--pad-y-md) var(--pad-x-md)',
-                    borderRadius: 'var(--radius-md)',
-                }}
+        <CaseBlanket height={280}>
+            <PatternModal
+                title="Add session"
+                onClose={() => {}}
+                style={{ inlineSize: '100%' }}
+                footer={(
+                    <FooterActions>
+                        <Button text="Discard" onClick={() => {}} />
+                        <Button text="Save" appearance="primary" onClick={() => {}} />
+                    </FooterActions>
+                )}
             >
-                <PatternModal
-                    title="Add session"
-                    onClose={() => {}}
-                    style={{ inlineSize: '100%' }}
-                    footer={(
-                        <FooterActions>
-                            <Button text="Discard" onClick={() => {}} />
-                            <Button text="Save" appearance="primary" onClick={() => {}} />
-                        </FooterActions>
-                    )}
-                >
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-                        <TextField label="Student" value={student} onChange={(e) => setStudent(e.target.value)} />
-                        <TextField label="Topic" value={topic} onChange={(e) => setTopic(e.target.value)} />
-                    </div>
-                </PatternModal>
-            </Blanket>
-        </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
+                    <TextField label="Student" value={student} onChange={(e) => setStudent(e.target.value)} />
+                    <TextField label="Topic" value={topic} onChange={(e) => setTopic(e.target.value)} />
+                </div>
+            </PatternModal>
+        </CaseBlanket>
     );
 };
 
@@ -47,19 +39,12 @@ export const FormInPopupCase = () => {
     const [mount, setMount] = useState(null);
     const [student, setStudent] = useState('Ana Ruiz');
     return (
-        <div
+        <CaseSurface
             ref={setMount}
-            className="sb-unstyled"
             style={{
                 position: 'relative',
-                overflow: 'hidden',
                 boxSizing: 'border-box',
-                inlineSize: '100%',
-                blockSize: 280,
-                padding: 'var(--pad-y-md) var(--pad-x-md)',
-                background: 'var(--ds-surface)',
-                border: 'var(--border-width-default) solid var(--ds-border)',
-                borderRadius: 'var(--radius-md)',
+                minBlockSize: 280,
             }}
         >
             {mount ? (
@@ -73,12 +58,13 @@ export const FormInPopupCase = () => {
                 >
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                         <TextField label="Student" value={student} onChange={(e) => setStudent(e.target.value)} />
-                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--inline-md)' }}>
+                            <Button text="Cancel" appearance="subtle" spacing="compact" onClick={() => {}} />
                             <Button text="Save" appearance="primary" spacing="compact" onClick={() => {}} />
                         </div>
                     </div>
                 </Popup>
             ) : null}
-        </div>
+        </CaseSurface>
     );
 };

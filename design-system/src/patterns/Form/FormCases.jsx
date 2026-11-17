@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Fieldset, Select, TextField } from '@/components';
+import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 
 /**
  * The live do and don't field-layout examples on the Form template page,
@@ -11,21 +12,6 @@ const SITES = [
     { value: 'roosevelt', label: 'Roosevelt K-8' },
     { value: 'north', label: 'North High' },
 ];
-
-const CaseSurface = ({ children }) => (
-    <div
-        className="sb-unstyled"
-        style={{
-            inlineSize: '100%',
-            padding: 'var(--pad-y-md) var(--pad-x-md)',
-            border: 'var(--border-width-default) solid var(--ds-border)',
-            borderRadius: 'var(--radius-md)',
-            background: 'var(--ds-surface)',
-        }}
-    >
-        {children}
-    </div>
-);
 
 /** One column down, pairing only date and time that belong together. */
 export const OneColumnFields = () => {

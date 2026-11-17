@@ -31,9 +31,10 @@ describe('Popup live cases and docs links', () => {
         expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
     });
 
-    it('renders FormInPopupCase with an open Popup containing a field and Save button', () => {
+    it('renders FormInPopupCase with an open Popup containing a field and Cancel/Save buttons', () => {
         render(<FormInPopupCase />);
         expect(screen.getByRole('textbox', { name: 'Student' })).toHaveValue('Ana Ruiz');
+        expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
     });
 
