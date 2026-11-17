@@ -3,19 +3,19 @@ import { Meta } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as FilteringStories from './Filtering.stories.jsx';
-import { STAGE } from './filteringDemo.jsx';
+import {
+    CountOnIconCase,
+    FiltersAmongViewsCase,
+    FiltersAtEndCase,
+    OneTierCase,
+    STAGE,
+    TagRowCase,
+    TwoTiersCase,
+} from './filteringDemo.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
-import {
-    TagRow,
-    CountOnIcon,
-    FiltersAmongViews,
-    FiltersAtEnd,
-    OneTier,
-    TwoTiers,
-} from '@/storybook-docs/illustrations/filtering.jsx';
 
 <Meta title="Patterns/Filtering" tags={['manifest']} />
 
@@ -49,12 +49,22 @@ import {
 Choose a tier by the number of categories and the length of their lists. See Best practices for when to move filters into a menu.
 
 <TypeGrid>
-<TypeCard of={FilteringStories.TierQuickFilters} title="1 · Quick filters" stage={STAGE}>One to three categories, each a short list: a FilterButton per category, applied as you pick.</TypeCard>
-<TypeCard of={FilteringStories.TierOneList} title="2a · Menu, one category" stage={STAGE}>The Filter icon opens one list, applied as you pick. No footer.</TypeCard>
-<TypeCard of={FilteringStories.TierSideBySide} title="2b · Menu, side by side" stage={STAGE}>Two or three categories with short lists in columns, with Reset and Apply full bleed.</TypeCard>
-<TypeCard of={FilteringStories.TierStacked} title="2c · Menu, stacked" stage={STAGE}>Four or more categories, or long lists, stacked, with Reset and Apply full bleed.</TypeCard>
-<TypeCard of={FilteringStories.TierFilterSide} title="3 · Filter side" stage={STAGE}>Filtering is the main job: a side at the Section's start, "Reset filters" at its top and a count beside each category.</TypeCard>
+<TypeCard of={FilteringStories.TierQuickFilters} to="#1-quick-filters" title="1 · Quick filters" stage={STAGE}>One to three categories, each a short list: a FilterButton per category, applied as you pick.</TypeCard>
+<TypeCard of={FilteringStories.TierOneList} to="#2a-menu-one-category" title="2a · Menu, one category" stage={STAGE}>The Filter icon opens one list, applied as you pick. No footer.</TypeCard>
+<TypeCard of={FilteringStories.TierSideBySide} to="#2b-menu-side-by-side" title="2b · Menu, side by side" stage={STAGE}>Two or three categories with short lists in columns, with Reset and Apply full bleed.</TypeCard>
+<TypeCard of={FilteringStories.TierStacked} to="#2c-menu-stacked" title="2c · Menu, stacked" stage={STAGE}>Four or more categories, or long lists, stacked, with Reset and Apply full bleed.</TypeCard>
+<TypeCard of={FilteringStories.TierFilterSide} to="#3-filter-side" title="3 · Filter side" stage={STAGE}>Filtering is the main job: a side at the Section's start, "Reset filters" at its top and a count beside each category.</TypeCard>
 </TypeGrid>
+
+<ComponentExample of={FilteringStories.TierQuickFilters} title="1 · Quick filters" description="One to three categories, each a short list: a FilterButton per category at the bar's end, applied as you pick." />
+
+<ComponentExample of={FilteringStories.TierOneList} title="2a · Menu, one category" description="One category behind the Filter icon, applied as you pick with no footer." />
+
+<ComponentExample of={FilteringStories.TierSideBySide} title="2b · Menu, side by side" description="Two or three short categories in columns behind the Filter icon, with Reset and Apply full bleed." />
+
+<ComponentExample of={FilteringStories.TierStacked} title="2c · Menu, stacked" description="Four or more categories, or long lists, stacked behind the Filter icon with Reset and Apply full bleed." />
+
+<ComponentExample of={FilteringStories.TierFilterSide} title="3 · Filter side" description="Filtering is the main job: a side at the Section's start with Reset filters at the top and a count beside each category." />
 
 </div>
 
@@ -146,9 +156,9 @@ Use Filtering when a person narrows a collection by its attributes. Filters live
 Quick filters and a filter menu never share a bar: some filters outside and some inside read as two systems. When a Section outgrows tier 1, all of its filters move into the menu. Where the filters sit in the bar, and the bar's order: <a target="_top" href="./?path=/docs/templates-section--docs#order-the-end-of-the-bar-format-switch-search-filters-more-primary">Section › Order the end of the bar</a>.
 
 <DoDontPair
-    doExample={<OneTier />}
+    doExample={<OneTierCase />}
     doCaption="One tier: three quick filters, all in the bar."
-    dontExample={<TwoTiers />}
+    dontExample={<TwoTiersCase />}
     dontCaption="Two quick filters plus a Filter icon: two systems in one bar."
 />
 
@@ -159,9 +169,9 @@ Quick filters and a filter menu never share a bar: some filters outside and some
 The start of the bar is for views. The filters come after Search and before More and the Primary, so a person finds them in one place on every Section.
 
 <DoDontPair
-    doExample={<FiltersAtEnd />}
+    doExample={<FiltersAtEndCase />}
     doCaption="Views at the start; Search, then the filters, at the end."
-    dontExample={<FiltersAmongViews />}
+    dontExample={<FiltersAmongViewsCase />}
     dontCaption="The filters squeezed in beside the views."
 />
 
@@ -172,9 +182,9 @@ The start of the bar is for views. The filters come after Search and before More
 A FilterButton's count, the Filter icon's count on the selected fill, or a count beside each category in a side. No separate count tag, and no row of tags under the bar.
 
 <DoDontPair
-    doExample={<CountOnIcon />}
+    doExample={<CountOnIconCase />}
     doCaption="The count on the Filter icon, on the selected fill."
-    dontExample={<TagRow />}
+    dontExample={<TagRowCase />}
     dontCaption="A row of tags under the bar, repeating what is on."
 />
 

@@ -6,6 +6,7 @@ import { SECTION_DETAIL_FLOOR } from '@/patterns';
 import { FRAME_LAYOUT } from '@/patterns/Frame/frameLayout';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
 import { FilteredStudents, STAGE, ViewPicker } from './filteringDemo.jsx';
 
@@ -26,11 +27,11 @@ export default {
 };
 
 const rect = (el) => el.getBoundingClientRect();
-const staged = (story, width = STAGE) => <FitStage width={width}>{story}</FitStage>;
+const staged = (story, width = STAGE) => <FitStage width={width} scrollable>{story}</FitStage>;
 
 /** The picture's scale: drawn width over laid-out width. */
 const scaleOf = (canvasElement) => {
-    const inner = canvasElement.querySelector('[data-fit-stage] > div');
+    const inner = canvasElement.querySelector('[data-fit-stage]');
     return rect(inner).width / inner.offsetWidth;
 };
 
@@ -43,7 +44,7 @@ const parts = (canvasElement) => {
         views: () => bar.querySelector('[role="tablist"]'),
         filterIcon: () => canvas.queryByRole('button', { name: /^Filters/ }),
         popup: () => canvasElement.querySelector('[data-filter-stage] [role="dialog"], [data-filter-stage] .plus-popup'),
-        status: () => canvas.getByRole('status'),
+        status: () => canvasElement.querySelector('.plus-pattern-section-content span[role="status"]'),
     };
 };
 
@@ -77,6 +78,8 @@ export const TierQuickFilters = {
     name: 'Tier 1: Quick filters',
     render: () => staged(<FilteredStudents tier="1" categories={['grade', 'school', 'subject']} initial={{ grade: ['Grade 7'] }} openMenu="grade" />),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const p = parts(canvasElement);
         const buttons = ['Grade', 'School', 'Subject'].map((name) => p.canvas.getByRole('button', { name: new RegExp(`^${name}`) }));
         await expect(p.filterIcon(), 'one tier per bar: no Filter icon beside quick filters').toBeNull();
@@ -84,6 +87,8 @@ export const TierQuickFilters = {
         await expect(buttons[0], 'what is on shows on the button: its count').toHaveTextContent('1');
         await expectHungFrom(canvasElement, buttons[0], 'end');
         await expect(within(p.popup()).queryByRole('button', { name: /Apply|Reset/ }), 'one list applies as you pick: no footer').toBeNull();
+        await userEvent.click(within(p.popup()).getByRole('option', { name: 'Grade 8' }));
+        await expect(p.status()).toHaveTextContent('3 of 8 students');
         await fitsCanvas(canvasElement);
     },
 };
@@ -93,6 +98,8 @@ export const TierOneList = {
     name: 'Tier 2a: Menu, one category',
     render: () => staged(<FilteredStudents tier="2a" categories={['grade']} initial={{ grade: ['Grade 7'] }} openMenu="filters" />),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const p = parts(canvasElement);
         await expect(p.filterIcon(), 'the Filter icon reads its count').toHaveAccessibleName('Filters, 1 applied');
         await expect(p.canvas.queryByRole('button', { name: /^Grade/ }), 'one tier per bar: no quick filter beside the menu').toBeNull();
@@ -100,6 +107,8 @@ export const TierOneList = {
         await expectHungFrom(canvasElement, p.filterIcon(), 'end');
         await expect(within(p.popup()).getByRole('listbox'), 'one list').toBeInTheDocument();
         await expect(within(p.popup()).queryByRole('button', { name: /Apply|Reset/ }), 'no footer').toBeNull();
+        await userEvent.click(within(p.popup()).getByRole('option', { name: 'Grade 6' }));
+        await expect(p.status()).toHaveTextContent('2 of 8 students');
         await fitsCanvas(canvasElement);
     },
 };
@@ -109,6 +118,8 @@ export const TierSideBySide = {
     name: 'Tier 2b: Menu, side by side',
     render: () => staged(<FilteredStudents tier="2b" categories={['grade', 'school']} initial={{ grade: ['Grade 7'], school: ['Lincoln Middle'] }} openMenu="filters" />),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const p = parts(canvasElement);
         await expect(p.filterIcon()).toHaveAccessibleName('Filters, 2 applied');
         await expectHungFrom(canvasElement, p.filterIcon(), 'end');
@@ -117,6 +128,9 @@ export const TierSideBySide = {
         await expect(menu.getByRole('button', { name: 'Reset' }), 'a menu says Reset').toBeInTheDocument();
         await expect(menu.getByRole('button', { name: 'Apply' })).toBeInTheDocument();
         await expect(menu.queryByRole('button', { name: 'Reset filters' }), 'never "Reset filters" in a menu').toBeNull();
+        await userEvent.click(menu.getByRole('checkbox', { name: 'Grade 8' }));
+        await userEvent.click(menu.getByRole('button', { name: 'Apply' }));
+        await expect(p.filterIcon()).toHaveAccessibleName('Filters, 3 applied');
         await fitsCanvas(canvasElement);
     },
 };
@@ -126,11 +140,16 @@ export const TierStacked = {
     name: 'Tier 2c: Menu, stacked',
     render: () => staged(<FilteredStudents tier="2c" categories={['grade', 'school', 'subject', 'tutor']} initial={{ subject: ['Math'] }} openMenu="filters" />),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const p = parts(canvasElement);
         await expect(p.filterIcon()).toHaveAccessibleName('Filters, 1 applied');
         await expectHungFrom(canvasElement, p.filterIcon(), 'end');
         await expect(p.popup().closest('.plus-filter-menu') ?? p.popup().querySelector('.plus-filter-menu') ?? p.popup(), 'stacked').toHaveClass('plus-filter-menu--stacked');
         await expect(within(p.popup()).getAllByRole('group'), 'one group per category').toHaveLength(4);
+        await userEvent.click(within(p.popup()).getByRole('checkbox', { name: 'Grade 7' }));
+        await userEvent.click(within(p.popup()).getByRole('button', { name: 'Apply' }));
+        await expect(p.filterIcon()).toHaveAccessibleName('Filters, 2 applied');
         await fitsCanvas(canvasElement);
     },
 };
@@ -140,6 +159,8 @@ export const TierFilterSide = {
     name: 'Tier 3: Filter side',
     render: () => staged(<FilteredStudents tier="3" categories={['grade', 'subject']} initial={{ grade: ['Grade 7'] }} />),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const p = parts(canvasElement);
         const side = p.canvas.getByRole('region', { name: 'Filters' });
         await expect(p.filterIcon(), 'no Filter icon in the bar while the side shows').toBeNull();
@@ -148,6 +169,8 @@ export const TierFilterSide = {
         await expect(rect(reset).bottom, '"Reset filters" at the side\'s top').toBeLessThanOrEqual(rect(first).top);
         await expect(rect(side).right, 'the side sits at the Section\'s start').toBeLessThan(rect(p.canvas.getByRole('table')).left);
         await expect(first, 'a count beside each category').toHaveTextContent('1');
+        await userEvent.click(within(side).getByRole('checkbox', { name: 'Math' }));
+        await expect(p.status()).toHaveTextContent('2 of 8 students');
         await fitsCanvas(canvasElement);
     },
 };
@@ -162,6 +185,8 @@ export const FilterCount = {
     name: 'The Filter icon\'s count',
     render: () => staged(<FilteredStudents tier="2b" categories={['grade', 'school']} />),
     play: async ({ canvasElement, step }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const p = parts(canvasElement);
         const menu = () => within(p.popup());
         // The filters wait for the picture's element, so a menu the press opens mounts inside it.
@@ -224,8 +249,10 @@ export const NarrowWidth = {
     },
     render: ({ width }) => staged(<FilteredStudents tier="1" categories={['grade', 'school', 'subject']} initial={{ grade: ['Grade 7'], subject: ['Math'] }} />, width),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const p = parts(canvasElement);
-        const stage = canvasElement.querySelector('[data-fit-stage] > div');
+        const stage = canvasElement.querySelector('[data-fit-stage]');
         const setWidth = (px) => { stage.style.inlineSize = `${px}px`; };
         const quick = () => p.canvas.queryByRole('button', { name: /^Grade/ });
 
@@ -251,6 +278,8 @@ export const NoMatches = {
     name: 'No matches',
     render: () => staged(<FilteredStudents tier="2b" categories={['grade', 'subject']} initial={{ grade: ['Grade 6'], subject: ['Math'] }} />),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const p = parts(canvasElement);
         await waitFor(() => expect(p.filterIcon()).not.toBeNull());
         await expect(p.canvas.queryByRole('table'), 'the empty state replaces the whole table').toBeNull();
@@ -274,12 +303,14 @@ export const UnderPageTabs = {
             initial={{ grade: ['Grade 7'] }}
             openMenu="view"
             pageTabs
-            start={(mount, { activeView, onViewChange }) => (
-                <ViewPicker open mount={mount} value={activeView} onChange={onViewChange} />
+            start={(mount, { activeView, onViewChange, open, onOpenChange }) => (
+                <ViewPicker open={open} onOpenChange={onOpenChange} mount={mount} value={activeView} onChange={onViewChange} />
             )}
         />,
     ),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const p = parts(canvasElement);
         const picker = p.canvas.getByRole('button', { name: /^View/ });
         await expect(rect(picker).left, 'the view picker sits at the bar\'s start').toBeCloseTo(rect(p.bar).left, 0);
