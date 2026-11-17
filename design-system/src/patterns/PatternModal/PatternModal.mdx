@@ -1,6 +1,6 @@
 import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Story } from '@storybook/addon-docs/blocks';
+import { Meta } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PatternModalStories from './PatternModal.stories.jsx';
@@ -18,15 +18,17 @@ import {
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 import {
-    ButtonInBody,
     ConfirmNarrow,
     ConfirmsInside,
     ConfirmWide,
-    FooterPinned,
     ModalOnModal,
-    StepsForSequence,
-    TabsForSteps,
 } from '@/storybook-docs/illustrations/modal.jsx';
+import {
+    ButtonInBodyModal,
+    FooterPinnedModal,
+    StepsFooterModal,
+    TabsForStepsModal,
+} from './PatternModalCases.jsx';
 
 <Meta of={PatternModalStories} />
 
@@ -61,11 +63,17 @@ import {
 Picked by what the person has to do. The component page holds every prop and state; these are the filled layouts.
 
 <TypeGrid>
-<TypeCard of={PatternModalStories.TypePassive} title="Passive">Information only, with Close. No footer.</TypeCard>
-<TypeCard of={PatternModalStories.TypeActive} title="Active">A choice, a confirm or a short form. Discard (or a real alternative) and the action; no Cancel.</TypeCard>
-<TypeCard of={PatternModalStories.TypeAcknowledge} title="Acknowledge">One thing to read and one button that fills the footer.</TypeCard>
-<TypeCard of={PatternModalStories.TypeSteps} title="Steps">A short sequence at 10-col: Back and Next, split 50/50.</TypeCard>
+<TypeCard of={PatternModalStories.TypePassive} to="#passive" title="Passive">Information only, with Close. No footer.</TypeCard>
+<TypeCard of={PatternModalStories.TypeActive} to="#active" title="Active">A choice, a confirm or a short form. Discard (or a real alternative) and the action; no Cancel.</TypeCard>
+<TypeCard of={PatternModalStories.TypeAcknowledge} to="#acknowledge" title="Acknowledge">One thing to read and one button that fills the footer.</TypeCard>
+<TypeCard of={PatternModalStories.TypeSteps} to="#steps" title="Steps">A short sequence at 10-col: Back and Next, split 50/50.</TypeCard>
 </TypeGrid>
+
+<ComponentExample of={PatternModalStories.TypePassive} title="Passive" description="Information only, with Close. No footer." />
+
+<ComponentExample of={PatternModalStories.TypeAcknowledge} title="Acknowledge" description="One thing to read and one button that fills the footer." />
+
+<ComponentExample of={PatternModalStories.TypeSteps} title="Steps" description="A short sequence at 10-col: Back and Next, split 50/50." />
 
 </div>
 
@@ -75,7 +83,7 @@ Picked by what the person has to do. The component page holds every prop and sta
 
 An Active Modal at 8-col with a short form. Every part once; the pad is 16 on every side, the radius 16, and the parts sit 16 apart.
 
-<Story of={PatternModalStories.AnatomyActive} inline />
+<ComponentExample of={PatternModalStories.AnatomyActive} />
 
 1. **Blanket.** Dims the page and holds the Modal centered.
 2. **Header.** The title at 20/24, whatever the level around it, and the Close icon button. With tabs, the tab group sits 8 under the title.
@@ -438,9 +446,9 @@ Stacking holds the rule. The overlay module keeps a second Modal closed and call
 Each width has a maximum height, the screen less `--space-400` above and below. Header and footer are pinned and the footer never moves. Actions never sit in the body, which scrolls away; a missing-field error shows on the field and the body scrolls to it, and a rejected submit shows its message at the top of the body.
 
 <DoDontPair
-    doExample={<FooterPinned />}
+    doExample={<FooterPinnedModal />}
     doCaption="Past the cap the body scrolls; the footer stays pinned with its buttons."
-    dontExample={<ButtonInBody />}
+    dontExample={<ButtonInBodyModal />}
     dontCaption="The button inside the scrolling body: it scrolls out of reach."
 />
 
@@ -451,9 +459,9 @@ Each width has a maximum height, the screen less `--space-400` above and below. 
 Two to five views of one thing opened in any order; one footer saves them all. Views in order are Steps, with Back and Next in the footer.
 
 <DoDontPair
-    doExample={<StepsForSequence />}
+    doExample={<StepsFooterModal />}
     doCaption="Views in order are Steps: Back and Next split across the footer."
-    dontExample={<TabsForSteps />}
+    dontExample={<TabsForStepsModal />}
     dontCaption="Numbered tabs as steps: any order, one Save, nothing to go back to."
 />
 

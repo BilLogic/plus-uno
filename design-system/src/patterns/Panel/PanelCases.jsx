@@ -11,6 +11,7 @@ import {
     StatusTag,
 } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
+import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 
 /**
  * The live do and don't examples of the Panel template page, built from
@@ -18,15 +19,12 @@ import { HeadingLevelContext } from '@/lib/headingLevel';
  */
 
 const ReadingPanel = ({ footer }) => (
-    <div
-        className="sb-unstyled"
+    <CaseSurface
+        padding="none"
         style={{
-            inlineSize: '100%',
             maxInlineSize: 'var(--panel-width-default)',
-            border: 'var(--border-width-default) solid var(--ds-border)',
             borderRadius: 'var(--radius-sm)',
             overflow: 'hidden',
-            background: 'var(--ds-surface)',
         }}
     >
         <HeadingLevelContext.Provider value={4}>
@@ -41,7 +39,7 @@ const ReadingPanel = ({ footer }) => (
                 {footer ? <PanelFooter>{footer}</PanelFooter> : null}
             </PanelContainer>
         </HeadingLevelContext.Provider>
-    </div>
+    </CaseSurface>
 );
 
 /** Reading: a header and a body, nothing to save. */

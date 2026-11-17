@@ -1,6 +1,6 @@
 import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Story } from '@storybook/addon-docs/blocks';
+import { Meta } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PopupStories from './Popup.stories.jsx';
@@ -18,14 +18,13 @@ import {
     AsWideAsTrigger,
     AtCap,
     EndAligned,
-    FieldsInModal,
-    FormInPopup,
     NarrowerThanTrigger,
     OneFlatMenu,
     PopupBesidePopup,
     StartAlignedAtEnd,
     WiderThanCap,
 } from '@/storybook-docs/illustrations/popup.jsx';
+import { FieldsInModalCase, FormInPopupCase } from './PopupCases.jsx';
 
 <Meta title="Templates/Popup" tags={['manifest']} />
 
@@ -58,13 +57,25 @@ import {
 Each type composes the Popup component, which handles placement, outside clicks and Escape.
 
 <TypeGrid>
-<TypeCard of={PopupStories.TypeMenu} title="Menu" stage={480}>Actions from a More button, at auto width. Applies on pick.</TypeCard>
-<TypeCard of={PopupStories.TypeProfileMenu} title="Profile menu" stage={480}>From the account row: who is signed in, then links and Sign out. The 3-col width is Planned: today the menu hugs its rows.</TypeCard>
-<TypeCard of={PopupStories.TypeSelectList} title="Select list" stage={480}>One list that applies as you pick: radios for one choice, checkboxes for several.</TypeCard>
-<TypeCard of={PopupStories.TypeContent} title="Content" stage={480}>A preview or a short explanation. Anything wider is a Panel or a Modal.</TypeCard>
-<TypeCard of={PopupStories.TypeFilterMenu} title="Filter menu" stage={480}>Two or three categories, held until Apply. Reset and Apply sit full bleed, half each.</TypeCard>
-<TypeCard of={PopupStories.TypeFilterMenuStacked} title="Filter menu, stacked" stage={480}>Four or more categories, or long lists, stacked at 3-col up to 4-col. The categories scroll between the pinned header and footer.</TypeCard>
+<TypeCard of={PopupStories.TypeMenu} to="#menu" title="Menu" stage={480}>Actions from a More button, at auto width. Applies on pick.</TypeCard>
+<TypeCard of={PopupStories.TypeProfileMenu} to="#profile-menu" title="Profile menu" stage={480}>From the account row: who is signed in, then links and Sign out. The 3-col width is Planned: today the menu hugs its rows.</TypeCard>
+<TypeCard of={PopupStories.TypeSelectList} to="#select-list" title="Select list" stage={480}>One list that applies as you pick: radios for one choice, checkboxes for several.</TypeCard>
+<TypeCard of={PopupStories.TypeContent} to="#content" title="Content" stage={480}>A preview or a short explanation. Anything wider is a Panel or a Modal.</TypeCard>
+<TypeCard of={PopupStories.TypeFilterMenu} to="#filter-menu" title="Filter menu" stage={480}>Two or three categories, held until Apply. Reset and Apply sit full bleed, half each.</TypeCard>
+<TypeCard of={PopupStories.TypeFilterMenuStacked} to="#filter-menu-stacked" title="Filter menu, stacked" stage={480}>Four or more categories, or long lists, stacked at 3-col up to 4-col. The categories scroll between the pinned header and footer.</TypeCard>
 </TypeGrid>
+
+<ComponentExample of={PopupStories.TypeMenu} title="Menu" description="Actions from a More button, at auto width. Applies on pick." />
+
+<ComponentExample of={PopupStories.TypeProfileMenu} title="Profile menu" description="From the account row: who is signed in, then links and Sign out. The 3-col width is Planned: today the menu hugs its rows." />
+
+<ComponentExample of={PopupStories.TypeSelectList} title="Select list" description="One list that applies as you pick: radios for one choice, checkboxes for several." />
+
+<ComponentExample of={PopupStories.TypeContent} title="Content" description="A preview or a short explanation. Anything wider is a Panel or a Modal." />
+
+<ComponentExample of={PopupStories.TypeFilterMenu} title="Filter menu" description="Two or three categories, held until Apply. Reset and Apply sit full bleed, half each." />
+
+<ComponentExample of={PopupStories.TypeFilterMenuStacked} title="Filter menu, stacked" description="Four or more categories, or long lists, stacked at 3-col up to 4-col. The categories scroll between the pinned header and footer." />
 
 </div>
 
@@ -74,7 +85,7 @@ Each type composes the Popup component, which handles placement, outside clicks 
 
 A filter menu off the Filter icon. Every part once; the layer is padded 16 and rounded 12 on the overlay pair.
 
-<Story of={PopupStories.AnatomyFilterMenu} inline />
+<ComponentExample of={PopupStories.AnatomyFilterMenu} />
 
 1. **Trigger.** The control it hangs off. It shows the open state and, for the Filter icon, the count.
 2. **Layer.** Hangs 4 below the trigger, aligned to the trigger's end edge because the trigger sits at the end of the bar. A titled layer's title is 14, whatever level the page around it is at.
@@ -289,9 +300,9 @@ Anything wider is a Panel or a Modal. Anything with inputs the person must finis
 An outside click closes a Popup and loses what was typed.
 
 <DoDontPair
-    doExample={<FieldsInModal />}
+    doExample={<FieldsInModalCase />}
     doCaption="Fields to finish go in a Modal, over its Blanket."
-    dontExample={<FormInPopup />}
+    dontExample={<FormInPopupCase />}
     dontCaption="A form in a Popup: an outside click loses what was typed."
 />
 

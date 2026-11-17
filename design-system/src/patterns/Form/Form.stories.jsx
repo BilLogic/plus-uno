@@ -6,6 +6,7 @@ import { TextField } from '@/components';
 
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
+import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { BAR_TOKEN } from '@/storybook-docs/lib/focused-task.jsx';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
@@ -35,10 +36,11 @@ const STAGE = 1024; // docs-literal
 
 export const TypePage = {
     name: 'Type: In a page',
-    render: () => <ScreenStage width={PAGE_WIDTH}><FormInPage /></ScreenStage>,
-    play: async ({ canvasElement }) => {
+    render: () => <ScreenStage width={PAGE_WIDTH} scrollable><FormInPage /></ScreenStage>,
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const save = canvas.getByRole('button', { name: 'Save session' });
         const cancel = canvas.getByRole('button', { name: 'Cancel' });
@@ -47,14 +49,19 @@ export const TypePage = {
         await expect(cancel.className, 'Cancel is Subtle').toContain('subtle');
         await expect(canvas.getByRole('heading', { level: 1, name: 'Log a session' }), 'the form’s title is the page’s h1').toBeInTheDocument();
         await expect(canvasElement.querySelector('.plus-pattern-section-fill-subtle'), 'the form sits on the Page, not in a subtle Section').toBeNull();
+        const student = canvas.getByLabelText(/Student/);
+        await userEvent.type(student, 'Ana Ruiz');
+        await expect(student).toHaveValue('Ana Ruiz');
     },
 };
 
 export const TypePanel = {
     name: 'Type: In a Panel',
-    render: () => <ScreenStage width={STAGE}><FormInPanel /></ScreenStage>,
-    play: async ({ canvasElement }) => {
+    render: () => <ScreenStage width={STAGE} scrollable><FormInPanel /></ScreenStage>,
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const tracks = footerTracks(footer);
         const [discard, save] = [...footer.querySelectorAll('button')];
@@ -64,15 +71,19 @@ export const TypePanel = {
         await expect(rect(discard).right, 'Discard ends on track 2').toBeCloseTo(tracks.span(1, 2).right, 0);
         await expect(rect(save).left, 'Save starts on track 3').toBeCloseTo(tracks.span(3, 4).left, 0);
         await expect(rect(save).right, 'Save ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
+        const student = canvas.getByLabelText(/Student/);
+        await userEvent.type(student, 'Ana Ruiz');
+        await expect(student).toHaveValue('Ana Ruiz');
     },
 };
 
 export const TypeModal = {
     name: 'Type: In a Modal',
-    render: () => <ScreenStage width={STAGE}><FormInModal height="fill" stageHeight={680} /></ScreenStage>, // docs-literal
-    play: async ({ canvasElement }) => {
+    render: () => <ScreenStage width={STAGE} scrollable><FormInModal height="fill" stageHeight={680} /></ScreenStage>, // docs-literal
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const tracks = footerTracks(footer);
         const discard = canvas.getByRole('button', { name: 'Discard' });
@@ -85,20 +96,29 @@ export const TypeModal = {
         await expect(rect(save).left, 'Save starts on track 3').toBeCloseTo(tracks.span(3, 4).left, 0);
         await expect(rect(save).right, 'Save ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
         await expect(rect(discard).width, 'the two halves are equal').toBeCloseTo(rect(save).width, 0);
+        const student = canvas.getByLabelText(/Student/);
+        await userEvent.type(student, 'Ana Ruiz');
+        await expect(student).toHaveValue('Ana Ruiz');
     },
 };
 
 export const TypeSteps = {
     name: 'Type: In steps',
-    render: () => <ScreenStage width={STAGE}><FormInSteps /></ScreenStage>,
-    play: async ({ canvasElement }) => {
+    render: () => <ScreenStage width={STAGE} scrollable><FormInSteps /></ScreenStage>,
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
-        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await expect(canvas.getByRole('navigation', { name: 'Steps' }), 'four steps run across the top').toHaveClass('plus-progress-tracker--horizontal');
         await expect(canvas.getByRole('button', { name: 'Back' }), 'Back on the first step is disabled').toHaveAttribute('aria-disabled', 'true');
         await expect(canvas.getByRole('button', { name: 'Next' }), 'Next in the bar').toBeInTheDocument();
         await expect(canvas.queryByRole('button', { name: 'Cancel' }), 'no Cancel in steps bar').toBeNull();
         await expect(canvas.queryByRole('navigation', { name: 'Main' }), 'no Sidebar').toBeNull();
+        await userEvent.click(canvas.getByRole('button', { name: 'Next' }));
+        await expect(canvas.getByLabelText(/Session date/)).toBeInTheDocument();
+        await userEvent.click(canvas.getByRole('button', { name: 'Back' }));
+        await expect(canvas.getByLabelText(/Student/)).toBeInTheDocument();
+        await settleAnimations(canvasElement.ownerDocument.body);
     },
 };
 
@@ -114,14 +134,19 @@ const ANATOMY_PAGE_PARTS = [
 export const AnatomyPage = {
     name: 'Anatomy: In a page',
     render: () => (
-        <LiveAnatomy width={PAGE_WIDTH} title="A form in a page with its parts numbered" parts={ANATOMY_PAGE_PARTS}>
+        <LiveAnatomy live scrollable width={PAGE_WIDTH} title="A form in a page with its parts numbered" parts={ANATOMY_PAGE_PARTS}>
             <FormInPage server />
         </LiveAnatomy>
     ),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await markersLevelWithParts(canvasElement, ANATOMY_PAGE_PARTS);
         leadersCrossNoOtherPart(canvasElement, ANATOMY_PAGE_PARTS);
+        const student = canvas.getByLabelText(/Student/);
+        await userEvent.type(student, 'Ana Ruiz');
+        await expect(student).toHaveValue('Ana Ruiz');
     },
 };
 
@@ -134,14 +159,19 @@ const ANATOMY_PANEL_PARTS = [
 export const AnatomyPanel = {
     name: 'Anatomy: In a Panel',
     render: () => (
-        <LiveAnatomy width={STAGE} title="A form in a Panel with its parts numbered" parts={ANATOMY_PANEL_PARTS}>
+        <LiveAnatomy live scrollable width={STAGE} title="A form in a Panel with its parts numbered" parts={ANATOMY_PANEL_PARTS}>
             <FormInPanel />
         </LiveAnatomy>
     ),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await markersLevelWithParts(canvasElement, ANATOMY_PANEL_PARTS);
         leadersCrossNoOtherPart(canvasElement, ANATOMY_PANEL_PARTS);
+        const student = canvas.getByLabelText(/Student/);
+        await userEvent.type(student, 'Ana Ruiz');
+        await expect(student).toHaveValue('Ana Ruiz');
     },
 };
 
@@ -154,14 +184,19 @@ const ANATOMY_MODAL_PARTS = [
 export const AnatomyModal = {
     name: 'Anatomy: In a Modal',
     render: () => (
-        <LiveAnatomy width={STAGE} title="A form in a Modal with its parts numbered" parts={ANATOMY_MODAL_PARTS}>
+        <LiveAnatomy live scrollable width={STAGE} title="A form in a Modal with its parts numbered" parts={ANATOMY_MODAL_PARTS}>
             <FormInModal />
         </LiveAnatomy>
     ),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await markersLevelWithParts(canvasElement, ANATOMY_MODAL_PARTS);
         leadersCrossNoOtherPart(canvasElement, ANATOMY_MODAL_PARTS);
+        const student = canvas.getByLabelText(/Student/);
+        await userEvent.type(student, 'Ana Ruiz');
+        await expect(student).toHaveValue('Ana Ruiz');
     },
 };
 
@@ -174,14 +209,21 @@ const ANATOMY_STEPS_PARTS = [
 export const AnatomySteps = {
     name: 'Anatomy: In steps',
     render: () => (
-        <LiveAnatomy width={STAGE} title="A stepped form with its parts numbered" parts={ANATOMY_STEPS_PARTS}>
+        <LiveAnatomy live scrollable width={STAGE} title="A stepped form with its parts numbered" parts={ANATOMY_STEPS_PARTS}>
             <FormInSteps />
         </LiveAnatomy>
     ),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await markersLevelWithParts(canvasElement, ANATOMY_STEPS_PARTS);
         leadersCrossNoOtherPart(canvasElement, ANATOMY_STEPS_PARTS);
+        await userEvent.click(canvas.getByRole('button', { name: 'Next' }));
+        await expect(canvas.getByLabelText(/Session date/)).toBeInTheDocument();
+        await userEvent.click(canvas.getByRole('button', { name: 'Back' }));
+        await expect(canvas.getByLabelText(/Student/)).toBeInTheDocument();
+        await settleAnimations(canvasElement.ownerDocument.body);
     },
 };
 
@@ -190,10 +232,9 @@ export const AnatomySteps = {
 /** A field takes its error look on blur, and the message says what to fix. */
 export const KeyFieldError = {
     name: 'Key state: Field error on blur',
-    render: () => <ScreenStage width={PAGE_WIDTH}><FormInPage /></ScreenStage>,
-    play: async ({ canvasElement }) => {
+    render: () => <ScreenStage width={PAGE_WIDTH} scrollable><FormInPage /></ScreenStage>,
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
-        const canvas = within(canvasElement);
         const student = canvas.getByLabelText(/Student/);
         await userEvent.click(student);
         await userEvent.tab();
@@ -208,10 +249,9 @@ export const KeyFieldError = {
 /** A field waiting on another says so in its caption; Save stays enabled. */
 export const KeyDisabledReason = {
     name: 'Key state: Disabled with its reason',
-    render: () => <ScreenStage width={PAGE_WIDTH}><FormInPage subjectWaits /></ScreenStage>,
-    play: async ({ canvasElement }) => {
+    render: () => <ScreenStage width={PAGE_WIDTH} scrollable><FormInPage subjectWaits /></ScreenStage>,
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
-        const canvas = within(canvasElement);
         await expect(canvas.getByText('Choose a student first.'), 'the reason is visible text on the field').toBeInTheDocument();
         await expect(canvas.getByRole('button', { name: 'Save session' }), 'Save stays enabled').not.toBeDisabled();
     },
@@ -220,10 +260,9 @@ export const KeyDisabledReason = {
 /** A blocked submit keeps the Modal open, marks the field, and the footer never moves. */
 export const KeyBlockedSubmit = {
     name: 'Key state: Blocked submit',
-    render: () => <ScreenStage width={STAGE}><FormInModal height="fill" stageHeight={680} /></ScreenStage>, // docs-literal
-    play: async ({ canvasElement }) => {
+    render: () => <ScreenStage width={STAGE} scrollable><FormInModal height="fill" stageHeight={680} /></ScreenStage>, // docs-literal
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
-        const canvas = within(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const before = rect(footer);
         await userEvent.click(canvas.getByRole('button', { name: 'Save session' }));
@@ -241,10 +280,9 @@ export const KeyBlockedSubmit = {
 /** The server says no: a danger message at the top of the body, plus field errors. */
 export const KeyServerSaysNo = {
     name: 'Key state: The server says no',
-    render: () => <ScreenStage width={STAGE}><FormInModal server initial={FILLED} /></ScreenStage>,
-    play: async ({ canvasElement }) => {
+    render: () => <ScreenStage width={STAGE} scrollable><FormInModal server initial={FILLED} /></ScreenStage>,
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
-        const canvas = within(canvasElement);
         const message = canvasElement.querySelector('[data-probe="message"]');
         const body = canvasElement.querySelector('.plus-pattern-modal-body');
         await expect(within(message).getByRole('alert'), 'announced').toBeInTheDocument();
@@ -256,10 +294,9 @@ export const KeyServerSaysNo = {
 /** Sending: the button swaps its label for a spinner in place at the same width; Discard stays live. */
 export const KeySending = {
     name: 'Key state: Sending',
-    render: () => <ScreenStage width={STAGE}><FormInModal initial={FILLED} sendingForever /></ScreenStage>,
-    play: async ({ canvasElement }) => {
+    render: () => <ScreenStage width={STAGE} scrollable><FormInModal initial={FILLED} sendingForever /></ScreenStage>,
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
-        const canvas = within(canvasElement);
         const save = canvas.getByRole('button', { name: 'Save session' });
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const before = { save: rect(save).width, footer: rect(footer).height };
@@ -275,10 +312,9 @@ export const KeySending = {
 /** Leaving with edits asks first, in the same Modal; Back keeps what was typed. */
 export const KeyLeaving = {
     name: 'Key state: Leaving with edits',
-    render: () => <ScreenStage width={STAGE}><FormInModal /></ScreenStage>,
-    play: async ({ canvasElement }) => {
+    render: () => <ScreenStage width={STAGE} scrollable><FormInModal /></ScreenStage>,
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
-        const canvas = within(canvasElement);
         await userEvent.type(canvas.getByLabelText(/Student/), 'Ana');
         await userEvent.click(canvas.getByRole('button', { name: 'Discard' }));
         await expect(await canvas.findByRole('heading', { level: 1, name: 'Discard changes?' })).toBeInTheDocument();
@@ -341,9 +377,8 @@ const FormFieldNotes = ({ value, onChange }) => (
     />
 );
 
-const playInlineValidation = (reduced = false) => async ({ canvasElement }) => {
+const playInlineValidation = (reduced = false) => async ({ canvas, canvasElement }) => {
     await settleAnimations(canvasElement);
-    const canvas = within(canvasElement);
     const school = canvas.getByLabelText(/School/);
     const notesWrap = canvas.getByTestId('notes-field-wrap');
     const notesTopInitial = notesWrap.getBoundingClientRect().top;

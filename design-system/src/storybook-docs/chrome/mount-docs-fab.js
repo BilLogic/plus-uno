@@ -5,7 +5,7 @@
  * It is not a manager addon: the manager bundle is built by esbuild with no
  * `.scss` loader or `@/` alias, so the PLUS components cannot load there.
  *
- * Skipped in a nested frame (a ModeFrame story inside the docs) and under
+ * Skipped in a nested frame (such as an embedded story iframe) and under
  * tests. The stack loads on demand, so a test run never pulls its styles or
  * the component barrel in through the preview.
  */

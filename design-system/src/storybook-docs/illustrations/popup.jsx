@@ -1,7 +1,7 @@
 import React from 'react';
 import { PAINT } from './paint.js';
 import { Illustration } from './Illustration.jsx';
-import { Blanket, ButtonShape, Field, Modal, Popup, Rect, SkeletonBar } from './primitives.jsx';
+import { ButtonShape, Popup, Rect, SkeletonBar } from './primitives.jsx';
 
 /**
  * The Popup template's do and don't drawings. Each lesson is about where a
@@ -32,28 +32,6 @@ const Behind = () => (
   <g>
     {[0, 1, 2].map((i) => <SkeletonBar key={i} x={X} y={64 + i * 10} w={W - 2 * X - i * 24} />)}
   </g>
-);
-
-/** Do: fields the person must finish go in a Modal, over its Blanket. */
-export const FieldsInModal = ({ title = 'A Modal over its Blanket holding two fields and a Primary button' }) => (
-  <Illustration width={W} height={H} title={title}>
-    <Rect x={0} y={0} w={W} h={H} fill={PAINT.pageSurface} />
-    <Blanket x={0} y={0} w={W} h={H} />
-    <Modal x={36} y={10} w={96} h={84} accent />
-    <Field x={46} y={28} w={76} />
-    <Field x={46} y={50} w={76} />
-    <ButtonShape x={46} y={78} w={76} appearance="primary" />
-  </Illustration>
-);
-
-/** Don't: a form in a Popup, which an outside click closes and loses. */
-export const FormInPopup = ({ title = 'A Popup under a trigger holding a field and a Primary button' }) => (
-  <Canvas title={title}>
-    <ButtonShape x={X} y={BAR_Y} w={40} />
-    <Popup x={X} y={POPUP_Y} w={84} h={68} accent />
-    <Field x={X + 8} y={POPUP_Y + 6} w={68} />
-    <ButtonShape x={X + 8} y={POPUP_Y + 50} w={68} appearance="primary" />
-  </Canvas>
 );
 
 /** Do: a trigger at the end of the bar gets a layer aligned to its end edge, growing into the page. */

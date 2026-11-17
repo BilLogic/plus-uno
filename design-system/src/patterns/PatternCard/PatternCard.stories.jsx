@@ -6,7 +6,8 @@ import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { PatternCard } from '@/patterns';
 import { Skeleton, Button, IconButton } from '@/components';
 import { CardJobs } from './PatternCardCases.jsx';
-import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 
 const bodyCopy = (
     <p className="body-lg" style={{ margin: 0 }}>
@@ -66,8 +67,8 @@ function PatternCardRowsDemo() {
             {[['Medium', 720], ['Large', 736], ['X-Large', 1152]].map(([mode, width]) => (
                 <div key={mode}>
                     <DemoCaption>{`${mode} · content ${width}`}</DemoCaption>
-                    {/* Each row is a picture of one content width: scaled to fit, never reflowed. */}
-                    <FitStage width={width} reflow={false}>
+                    {/* Each row renders at 1:1 scale inside a horizontally scrollable box when wider than the column. */}
+                    <ScrollStage width={width}>
                         <div
                             data-row={mode}
                             style={{
@@ -78,12 +79,12 @@ function PatternCardRowsDemo() {
                             }}
                         >
                             {people.map(([name, detail], i) => (
-                                <PatternCard key={`${name}-${i}`} title={name} description={detail}>
+                                <PatternCard key={`${name}-${i}`} title={name} description={detail} footer={viewSession}>
                                     {sessionBody}
                                 </PatternCard>
                             ))}
                         </div>
-                    </FitStage>
+                    </ScrollStage>
                 </div>
             ))}
         </div>
@@ -212,9 +213,9 @@ export const Elevation = {
             <PatternCard title="Dragging" minWidth={200} dragging>{bodyCopy}</PatternCard>
         </div>
     ),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         const card = (name) => {
-            const el = within(canvasElement).getByText(name).closest('.plus-pattern-card');
+            const el = canvas.getByText(name).closest('.plus-pattern-card');
             el.style.transition = 'none';
             return el;
         };
@@ -311,8 +312,8 @@ const placementStory = (imagePlacement, state = 'rest', imageSplit = '1/3') => (
             {sessionBody}
         </PatternCard>
     ),
-    play: async ({ canvasElement }) => {
-        const card = within(canvasElement).getByRole('article', { name: 'Session summary' });
+    play: async ({ canvas, canvasElement }) => {
+        const card = canvas.getByRole('article', { name: 'Session summary' });
         const image = within(card).getByRole('img', { name: 'Session illustration' });
         const heading = within(card).getByRole('heading', { name: 'Ana Ruiz' });
         const root = card.getBoundingClientRect();
@@ -424,7 +425,9 @@ export const LoadingCard = {
 /** At the content widths of the three modes, a md card row holds 2, 2 and 3 cards. */
 export const Rows = {
     render: () => <PatternCardRowsDemo />,
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const count = (mode) => {
             const cards = Array.from(canvasElement.querySelector(`[data-row="${mode}"]`).children);
             const top = Math.min(...cards.map((card) => Math.round(card.getBoundingClientRect().top)));
@@ -433,6 +436,9 @@ export const Rows = {
         await expect(count('Medium'), 'Medium holds 2 md cards').toBe(2);
         await expect(count('Large'), 'Large holds 2 md cards').toBe(2);
         await expect(count('X-Large'), 'X-Large holds 3 md cards').toBe(3);
+        const firstAction = canvas.getAllByRole('button', { name: 'View session' })[0];
+        firstAction.focus();
+        await expect(firstAction).toHaveFocus();
     },
 };
 
@@ -449,10 +455,10 @@ export const PlacementBoundary = {
             )))}
         </div>
     ),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas }) => {
         for (const placement of ['start', 'end']) {
             for (const split of ['1/3', '1/2']) {
-                const card = within(canvasElement).getByRole('article', { name: `${placement} ${split}` });
+                const card = canvas.getByRole('article', { name: `${placement} ${split}` });
                 const image = card.firstElementChild;
                 const heading = within(card).getByRole('heading', { name: 'Ana Ruiz' });
                 for (const width of [479, 480, 600, 479]) {

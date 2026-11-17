@@ -1,9 +1,9 @@
 import { expectOverlayExit, withReducedMotion, settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import React, { useState } from 'react';
-import { expect, fn, userEvent, within } from 'storybook/test';
+import { expect, fn, userEvent } from 'storybook/test';
 import Blanket from '@/patterns/Blanket';
 import PatternModal from '@/patterns/PatternModal';
-import { FloatingPanel } from './Blanket.examples.jsx';
+import { DetailsPanel } from '../Panel/panelDemo.jsx';
 import { Button } from '@/components';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { probe, tokenLength } from '@/storybook-docs/lib/style-probes.js';
@@ -54,10 +54,10 @@ export const Inline = {
             </PatternModal>
         </Blanket>
     ),
-    play: async ({ args, canvasElement }) => {
+    play: async ({ args, canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
         const overlay = canvasElement.querySelector('.plus-pattern-blanket');
-        const modal = within(canvasElement).getByRole('dialog', { name: 'Move session' });
+        const modal = canvas.getByRole('dialog', { name: 'Move session' });
         const box = overlay.getBoundingClientRect();
         const inner = modal.getBoundingClientRect();
         await expect(box.width, 'the stand-in screen').toBeCloseTo(Math.min(768, canvasElement.clientWidth), 0);
@@ -75,6 +75,39 @@ export const Inline = {
 };
 
 /**
+ * A Details Panel floating over the right of the stand-in screen: on the
+ * overlay fill and shadow, with no Blanket under it. Docs geometry, px.
+ */
+const FloatingPanel = ({ screenHeight = 520 }) => (
+    <div
+        style={{
+            position: 'relative',
+            width: 1024, // docs-literal
+            height: screenHeight,
+            background: 'var(--ds-surface)',
+            overflow: 'hidden',
+        }}
+    >
+        <div
+            data-floating-panel
+            style={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                bottom: 0,
+                width: 400, // docs-literal
+                display: 'flex',
+                flexDirection: 'column',
+                background: 'var(--ds-surface-overlay)',
+                boxShadow: 'var(--ds-shadow-overlay)',
+            }}
+        >
+            <DetailsPanel />
+        </div>
+    </div>
+);
+
+/**
  * A confirm Modal may open over a Panel, a Popup or a focused task, and brings
  * its own Blanket: the Panel floats with none, so the confirm's is the only one.
  * A confirm is sm. A Modal never opens on another Modal.
@@ -90,9 +123,9 @@ export const ConfirmOverPanel = {
             </Blanket>
         </div>
     ),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const confirm = within(canvasElement).getByRole('dialog', { name: 'Discard changes?' });
+        const confirm = canvas.getByRole('dialog', { name: 'Discard changes?' });
         await expect(confirm.getBoundingClientRect().width, 'width-modal-sm at 1024').toBeCloseTo(512, 0);
         const { left, top, width, height } = confirm.getBoundingClientRect();
         const hit = document.elementFromPoint(left + width / 2, top + height / 2);
@@ -110,10 +143,10 @@ export const Layers = {
             </PatternModal>
         </Blanket>
     ),
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
         const overlay = canvasElement.querySelector('.plus-pattern-blanket');
-        const modal = within(canvasElement).getByRole('dialog');
+        const modal = canvas.getByRole('dialog');
         const z = (token) => probe(canvasElement, 'zIndex', `var(${token})`, { position: 'relative' });
         await expect(getComputedStyle(overlay).position).toBe('fixed');
         await expect(getComputedStyle(overlay).zIndex, 'blanket layer').toBe(z('--layer-blanket'));
@@ -208,11 +241,11 @@ export const ScreenGrid = {
             </Blanket>
         );
     },
-    play: async ({ canvasElement }) => {
+    play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
         const grid = canvasElement.querySelector('[data-guide="screen-grid"]');
         await expect(grid.children, '12 columns').toHaveLength(12);
-        const modal = within(canvasElement).getByRole('dialog');
+        const modal = canvas.getByRole('dialog');
         await expect(modal.getBoundingClientRect().width, 'six columns plus 2 × 16 at 1024').toBeCloseTo(512, 0);
     },
 };
@@ -232,8 +265,8 @@ const MotionOverlay = () => {
     const [open, setOpen] = useState(false);
     return <><Button text="Session details" onClick={() => setOpen(!open)} /><Blanket inline show={open}><div>Session details</div></Blanket></>;
 };
-const overlayMotionPlay = (reduced = false) => async ({ canvasElement }) => {
-    const trigger = within(canvasElement).getByRole('button', { name: 'Session details' });
+const overlayMotionPlay = (reduced = false) => async ({ canvas, canvasElement }) => {
+    const trigger = canvas.getByRole('button', { name: 'Session details' });
     await userEvent.click(trigger);
     const surface = canvasElement.querySelector('.plus-pattern-blanket');
     await expect(surface).not.toBeNull();
