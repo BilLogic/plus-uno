@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { isDocsView, keepDocsAtTop } from './docs-open-at-top.js';
+import { guardBoundaryMountFocus, isDocsView, keepDocsAtTop } from './docs-open-at-top.js';
 
 const docsWindow = (viewMode) => ({
     HTMLElement: window.HTMLElement,
@@ -70,3 +70,30 @@ describe('isDocsView', () => {
         expect(isDocsView({ location: { search: '?viewMode=story' } })).toBe(false);
     });
 });
+
+describe('guardBoundaryMountFocus', () => {
+    it('suppresses initial mount focus inside the boundary and restores focus after release', () => {
+        const boundary = document.createElement('div');
+        const inside = document.createElement('button');
+        const outside = document.createElement('button');
+        boundary.appendChild(inside);
+        document.body.append(boundary, outside);
+
+        try {
+            const release = guardBoundaryMountFocus(boundary);
+            inside.focus({ preventScroll: false });
+            expect(document.activeElement).not.toBe(inside);
+
+            outside.focus({ preventScroll: false });
+            expect(document.activeElement).toBe(outside);
+
+            release();
+            inside.focus({ preventScroll: false });
+            expect(document.activeElement).toBe(inside);
+        } finally {
+            boundary.remove();
+            outside.remove();
+        }
+    });
+});
+

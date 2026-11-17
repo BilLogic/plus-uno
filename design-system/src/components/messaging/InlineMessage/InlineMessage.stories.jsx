@@ -1,10 +1,17 @@
 import React from 'react';
 import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
-import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import InlineMessage, { INLINE_MESSAGE_APPEARANCES } from './InlineMessage';
-
+import {
+    OnePerFieldDo,
+    OnePerFieldDont,
+    ShortLineDo,
+    ShortLineDont,
+    TintMeaningDo,
+    TintMeaningDont,
+    fieldRow,
+} from '@/storybook-docs/lib/inline-message-cases';
 /** The popup is a portal; `within(canvasElement)` cannot see it. */
 const documentOf = (canvasElement) => within(canvasElement.ownerDocument.body);
 
@@ -20,18 +27,49 @@ export default {
         docs: { toc: { title: 'On this page' } },
     },
     argTypes: {
-        appearance: { control: 'select', options: INLINE_MESSAGE_APPEARANCES, table: { category: 'Design' } },
-        label: { control: 'text', table: { category: 'Content' } },
-        title: { control: 'text', table: { category: 'Content' } },
-        secondaryText: { control: 'text', table: { category: 'Content' } },
-        placement: { control: 'select', options: ['top', 'bottom', 'left', 'right', 'top-start', 'top-end', 'bottom-start', 'bottom-end'], table: { category: 'Layout' } },
-        defaultOpen: { control: 'boolean', table: { category: 'Behavior' } },
-        children: { control: 'text', table: { category: 'Content' } },
+        appearance: {
+            control: 'select',
+            options: INLINE_MESSAGE_APPEARANCES,
+            description: "The trigger's icon and tint.",
+            table: { category: 'Design', defaultValue: { summary: "'info'" } },
+        },
+        label: {
+            control: 'text',
+            description: "The trigger icon's accessible name and tooltip. Required: it is the only visible part before the popup opens.",
+            table: { category: 'Content' },
+        },
+        title: {
+            control: 'text',
+            description: 'Bolded first line of the popup.',
+            table: { category: 'Content' },
+        },
+        secondaryText: {
+            control: 'text',
+            description: 'A second line, when the title alone does not say enough.',
+            table: { category: 'Content' },
+        },
+        placement: {
+            control: 'select',
+            options: ['auto', 'top', 'bottom', 'left', 'right', 'top-start', 'top-end', 'bottom-start', 'bottom-end', 'right-start', 'right-end', 'left-start', 'left-end'],
+            description: 'Where the popup opens relative to the trigger.',
+            table: { category: 'Layout', defaultValue: { summary: "'bottom-start'" } },
+        },
+        defaultOpen: {
+            control: 'boolean',
+            description: 'Whether the message popup starts open.',
+            table: { category: 'Behavior', defaultValue: { summary: 'false' } },
+        },
+        children: {
+            control: 'text',
+            description: "The popup's body content.",
+            table: { category: 'Content' },
+        },
     },
     args: {
         appearance: 'info',
         label: 'More information',
         title: 'Why this matters',
+        defaultOpen: false,
         children: 'Sessions are scored on the rubric agreed at intake.',
     },
 };
@@ -143,85 +181,83 @@ export const Focused = {
     },
 };
 
-const fieldRow = { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--inline-sm)' };
-
-/** Live DoDontPair inline messages stay bounded in their wells, have no inert wrappers, and open/dismiss interactively. */
+/** Live DoDontPair inline messages stay bounded in their wells, have no inert wrappers, do not steal focus or scroll on load, and open, navigate by keyboard, and dismiss across every pair. */
 export const BestPracticesLive = {
     parameters: { docs: { disable: true } },
     render: () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' }}>
             <DoDontPair
-                doExample={(
-                    <DocsOverlayBoundary containHeight>
-                        <div style={fieldRow}>
-                            <span>Session length</span>
-                            <InlineMessage appearance="info" defaultOpen label="About info note" title="Heads up">
-                                This setting applies to new sessions only.
-                            </InlineMessage>
-                        </div>
-                    </DocsOverlayBoundary>
-                )}
+                doExample={<TintMeaningDo />}
                 doCaption="Info for a neutral note."
-                dontExample={(
-                    <DocsOverlayBoundary containHeight>
-                        <div style={fieldRow}>
-                            <span>Session length</span>
-                            <InlineMessage appearance="danger" defaultOpen label="About danger note" title="Heads up">
-                                This setting applies to new sessions only.
-                            </InlineMessage>
-                        </div>
-                    </DocsOverlayBoundary>
-                )}
+                dontExample={<TintMeaningDont />}
                 dontCaption="Danger for a neutral note."
             />
             <DoDontPair
-                doExample={(
-                    <DocsOverlayBoundary containHeight>
-                        <div style={fieldRow}>
-                            <span>Session length</span>
-                            <InlineMessage appearance="info" label="About session length" title="Session length note">
-                                This setting applies to new sessions only.
-                            </InlineMessage>
-                        </div>
-                    </DocsOverlayBoundary>
-                )}
+                doExample={<ShortLineDo />}
+                doCaption="One short sentence."
+                dontExample={<ShortLineDont />}
+                dontCaption="A paragraph beside a field."
+            />
+            <DoDontPair
+                doExample={<OnePerFieldDo />}
                 doCaption="A single message."
-                dontExample={(
-                    <DocsOverlayBoundary containHeight>
-                        <div style={fieldRow}>
-                            <span>Session length</span>
-                            <InlineMessage appearance="info" label="First field note" title="Heads up">
-                                This setting applies to new sessions only.
-                            </InlineMessage>
-                            <InlineMessage appearance="warning" label="About availability" title="Limited availability">
-                                Only 2 slots left this week.
-                            </InlineMessage>
-                        </div>
-                    </DocsOverlayBoundary>
-                )}
+                dontExample={<OnePerFieldDont />}
                 dontCaption="An info note and a warning together."
             />
         </div>
     ),
     play: async ({ canvasElement }) => {
+        const doc = canvasElement.ownerDocument;
+        const win = doc.defaultView;
         await expect(canvasElement.querySelector('[inert]')).toBeNull();
+
         const cards = canvasElement.querySelectorAll('figure.sb-ds-dodont-card');
-        await expect(cards).toHaveLength(4);
+        await expect(cards).toHaveLength(6);
 
-        // Pair 1 starts open inside its card well without overflowing onto the caption.
-        const firstWell = cards[0].querySelector('.sb-ds-dodont-card__well');
+        // Pairs 1 and 2 start open at rest, bounded in their wells, without stealing focus or scrolling.
+        for (const idx of [0, 1]) {
+            await waitFor(() => expect(within(cards[idx]).getByText('Heads up')).toBeVisible());
+        }
+        for (const idx of [2, 3]) {
+            await waitFor(() => expect(within(cards[idx]).getByText('Limited availability')).toBeVisible());
+        }
+        await expect(canvasElement.contains(doc.activeElement)).toBe(false);
+        await expect(win.scrollY).toBe(0);
+
+        for (const idx of [0, 1, 2, 3]) {
+            const well = cards[idx].querySelector('.sb-ds-dodont-card__well');
+            const popup = cards[idx].querySelector('.plus-popup');
+            await waitFor(() => expect(popup.getBoundingClientRect().bottom).toBeLessThanOrEqual(well.getBoundingClientRect().bottom + 1));
+        }
+
+        // Pair 1 (cards 0 and 1): focus trigger, dismiss with Escape, reopen with Enter, while card 1 stays open.
+        const pair1DoTrigger = within(cards[0]).getByRole('button', { name: 'About this setting' });
+        pair1DoTrigger.focus();
+        await expect(pair1DoTrigger).toHaveFocus();
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(within(cards[0]).queryByText('Heads up')).toBeNull());
+        await expect(within(cards[1]).getByText('Heads up')).toBeVisible();
+        await userEvent.keyboard('{Enter}');
         await waitFor(() => expect(within(cards[0]).getByText('Heads up')).toBeVisible());
-        const openPopup = cards[0].querySelector('.plus-popup');
-        await expect(openPopup.getBoundingClientRect().bottom).toBeLessThanOrEqual(firstWell.getBoundingClientRect().bottom + 1);
 
-        // Pair 2 starts closed and opens inside its own well when clicked.
-        const singleTrigger = within(cards[2]).getByRole('button', { name: 'About session length' });
-        singleTrigger.focus();
-        await expect(singleTrigger).toHaveFocus();
-        await userEvent.click(singleTrigger);
-        await waitFor(() => expect(within(cards[2]).getByText('Session length note')).toBeVisible());
-        const thirdWell = cards[2].querySelector('.sb-ds-dodont-card__well');
-        const thirdPopup = cards[2].querySelector('.plus-popup');
-        await expect(thirdPopup.getBoundingClientRect().bottom).toBeLessThanOrEqual(thirdWell.getBoundingClientRect().bottom + 1);
+        // Pair 2 (cards 2 and 3): dismiss card 2 by clicking trigger and reopen, while card 3 stays open.
+        const pair2DoTrigger = within(cards[2]).getByRole('button', { name: 'About availability' });
+        await userEvent.click(pair2DoTrigger);
+        await waitFor(() => expect(within(cards[2]).queryByText('Limited availability')).toBeNull());
+        await waitFor(() => expect(within(cards[3]).getByText('Limited availability')).toBeVisible());
+        await userEvent.click(pair2DoTrigger);
+        await waitFor(() => expect(within(cards[2]).getByText('Limited availability')).toBeVisible());
+
+        // Pair 3 (cards 4 and 5): single message vs two messages on one field; open by click, bounded in well, dismiss with Escape.
+        await expect(within(cards[4]).getAllByRole('button')).toHaveLength(1);
+        await expect(within(cards[5]).getAllByRole('button')).toHaveLength(2);
+        const pair3Trigger = within(cards[4]).getByRole('button', { name: 'About session length' });
+        await userEvent.click(pair3Trigger);
+        await waitFor(() => expect(within(cards[4]).getByText('Heads up')).toBeVisible());
+        await waitFor(() => expect(
+            cards[4].querySelector('.plus-popup').getBoundingClientRect().bottom,
+        ).toBeLessThanOrEqual(cards[4].querySelector('.sb-ds-dodont-card__well').getBoundingClientRect().bottom + 1));
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(within(cards[4]).queryByText('Heads up')).toBeNull());
     },
 };

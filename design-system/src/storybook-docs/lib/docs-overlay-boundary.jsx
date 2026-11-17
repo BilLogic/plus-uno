@@ -1,6 +1,7 @@
 import React, { useCallback, useLayoutEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { OverlayContainer } from '@/lib/overlay';
+import { guardBoundaryMountFocus } from './docs-open-at-top.js';
 
 /** Below this zoom an example would turn illegible; it scrolls sideways at this zoom instead. */
 export const MIN_FIT_ZOOM = 0.5;
@@ -85,19 +86,17 @@ export function DocsOverlayBoundary({ disablePointerEvents = false, fit = true, 
     }, [containHeight, node, scaled]);
 
     useLayoutEffect(() => {
+        if (!containHeight || !node) {
+            setContainedMinHeight(null);
+            return undefined;
+        }
+        const releaseMountFocus = guardBoundaryMountFocus(node);
         measureHeight();
-    });
-
-    useLayoutEffect(() => {
-        if (!containHeight || !node) return undefined;
         let raf = 0;
         const schedule = () => {
             if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(raf);
-            if (typeof requestAnimationFrame === 'function') {
-                raf = requestAnimationFrame(measureHeight);
-            } else {
-                measureHeight();
-            }
+            raf = typeof requestAnimationFrame === 'function' ? requestAnimationFrame(measureHeight) : 0;
+            if (!raf) measureHeight();
         };
         const mutationObserver = typeof MutationObserver !== 'undefined'
             ? new MutationObserver((records) => {
@@ -110,8 +109,9 @@ export function DocsOverlayBoundary({ disablePointerEvents = false, fit = true, 
         const resizeObserver = typeof ResizeObserver !== 'undefined' && node.parentElement
             ? new ResizeObserver(schedule)
             : null;
-        if (node.parentElement) resizeObserver?.observe(node.parentElement);
+        resizeObserver?.observe(node.parentElement);
         return () => {
+            releaseMountFocus();
             mutationObserver?.disconnect();
             resizeObserver?.disconnect();
             if (typeof cancelAnimationFrame === 'function') cancelAnimationFrame(raf);

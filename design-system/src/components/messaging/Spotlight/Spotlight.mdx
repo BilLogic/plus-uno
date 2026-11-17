@@ -1,8 +1,6 @@
-import React, { useState } from 'react';
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as SpotlightStories from './Spotlight.stories.jsx';
-import { Button, Spotlight, SpotlightAction, SpotlightProvider, SpotlightTarget } from '@/components';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -10,8 +8,15 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
-import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
+import {
+    FeatureHeadlineDo,
+    FeatureHeadlineDont,
+    SecondaryLinkDo,
+    SecondaryLinkDont,
+    StepCountTourDo,
+    StepCountTourDont,
+} from '@/storybook-docs/lib/spotlight-cases.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -26,65 +31,6 @@ export const figmaMeta = {
       "isComponentSet": false
     }
   ]
-};
-
-export const LiveSpotlight = ({
-    targetText = 'Calendar',
-    headline,
-    children,
-    stepCount,
-    secondaryKind = 'skip',
-    secondaryLabel = 'Skip',
-    primaryLabel = 'Got it',
-}) => {
-    const [isOpen, setIsOpen] = useState(true);
-    const secondaryAction = secondaryKind === 'link'
-        ? (
-            <SpotlightAction
-                appearance="secondary"
-                href="#spotlight-tour-details"
-                onClick={(event) => event.preventDefault()}
-            >
-                {secondaryLabel}
-            </SpotlightAction>
-        )
-        : secondaryKind === 'competing-primary'
-            ? (
-                <SpotlightAction appearance="primary" onClick={() => setIsOpen(false)}>
-                    {secondaryLabel}
-                </SpotlightAction>
-            )
-            : (
-                <SpotlightAction appearance="secondary" onClick={() => setIsOpen(false)}>
-                    {secondaryLabel}
-                </SpotlightAction>
-            );
-
-    return (
-        <DocsOverlayBoundary containHeight>
-            <SpotlightProvider>
-                <div style={{ display: 'flex', justifyContent: 'center' }}>
-                    <SpotlightTarget>
-                        <Button text={targetText} onClick={() => setIsOpen((open) => !open)} />
-                    </SpotlightTarget>
-                    <Spotlight
-                        headline={headline}
-                        stepCount={stepCount}
-                        isOpen={isOpen}
-                        onDismiss={() => setIsOpen(false)}
-                        secondaryAction={secondaryAction}
-                        primaryAction={(
-                            <SpotlightAction appearance="primary" onClick={() => setIsOpen(false)}>
-                                {primaryLabel}
-                            </SpotlightAction>
-                        )}
-                    >
-                        {children}
-                    </Spotlight>
-                </div>
-            </SpotlightProvider>
-        </DocsOverlayBoundary>
-    );
 };
 
 <Meta of={SpotlightStories} />
@@ -241,9 +187,9 @@ short, explicit sequence with a `stepCount`, not an ongoing help system.
 A headline names the thing; the body is one sentence.
 
 <DoDontPair
-    doExample={<LiveSpotlight headline="Find sessions here" stepCount="1 of 3">Open the calendar to see this week.</LiveSpotlight>}
+    doExample={<FeatureHeadlineDo />}
     doCaption="Short headline, one-sentence body."
-    dontExample={<LiveSpotlight headline="Welcome!" stepCount="1 of 3">Click here to learn about the new calendar view and everything else we changed this term.</LiveSpotlight>}
+    dontExample={<FeatureHeadlineDont />}
     dontCaption="A greeting and a paragraph."
 />
 
@@ -252,9 +198,9 @@ A headline names the thing; the body is one sentence.
 One step alone has nothing to count.
 
 <DoDontPair
-    doExample={<LiveSpotlight headline="Find sessions here" stepCount="1 of 3">Open the calendar to see this week.</LiveSpotlight>}
+    doExample={<StepCountTourDo />}
     doCaption="Step count in a multi-step tour."
-    dontExample={<LiveSpotlight headline="Find sessions here" stepCount="1 of 1">Open the calendar to see this week.</LiveSpotlight>}
+    dontExample={<StepCountTourDont />}
     dontCaption="Step count on a single tip."
 />
 
@@ -264,9 +210,9 @@ The primary action leads; the second one stays quiet. A `SpotlightAction` with
 `href` renders as a link.
 
 <DoDontPair
-    doExample={<LiveSpotlight headline="Find sessions here" stepCount="1 of 3" secondaryKind="link" secondaryLabel="Learn more">Open the calendar to see this week.</LiveSpotlight>}
+    doExample={<SecondaryLinkDo />}
     doCaption="Secondary action as a link."
-    dontExample={<LiveSpotlight headline="Find sessions here" stepCount="1 of 3" secondaryKind="competing-primary" secondaryLabel="Learn more">Open the calendar to see this week.</LiveSpotlight>}
+    dontExample={<SecondaryLinkDont />}
     dontCaption="Two competing buttons."
 />
 

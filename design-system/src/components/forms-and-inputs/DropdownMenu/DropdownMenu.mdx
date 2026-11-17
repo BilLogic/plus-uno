@@ -1,7 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
-import { Button, ButtonItem, DropdownMenu, Icon } from '@/components';
 import * as DropdownMenuStories from './DropdownMenu.stories.jsx';
 import * as MenuItemStories from '../_internal/MenuGroup.stories.jsx';
 import {
@@ -11,23 +10,15 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
-import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
-
-export const LiveMenu = ({ label = 'Session actions', children }) => (
-    <DocsOverlayBoundary containHeight>
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <DropdownMenu
-                defaultOpen
-                placement="bottom-start"
-                minWidth="var(--width-1500)"
-                trigger={<Button text={label} iconAfter={<Icon name="chevron-down" size={12} />} />}
-            >
-                {children}
-            </DropdownMenu>
-        </div>
-    </DocsOverlayBoundary>
-);
+import {
+    OrderDo,
+    OrderDont,
+    ShortLabelsDo,
+    ShortLabelsDont,
+    VerbCaseDo,
+    VerbCaseDont,
+} from '@/storybook-docs/lib/dropdown-menu-cases.jsx';
 
 <Meta of={DropdownMenuStories} />
 
@@ -211,9 +202,9 @@ Rows that set a value belong in a Select, which shows the chosen value on its tr
 Order items by task and put Delete at the bottom, away from the common actions.
 
 <DoDontPair
-    doExample={<LiveMenu><ButtonItem onClick={() => {}}>Rename</ButtonItem><ButtonItem onClick={() => {}}>Duplicate</ButtonItem><ButtonItem onClick={() => {}}>Archive</ButtonItem><ButtonItem onClick={() => {}}>Delete</ButtonItem></LiveMenu>}
+    doExample={<OrderDo />}
     doCaption="Delete sits last, after the common actions."
-    dontExample={<LiveMenu><ButtonItem onClick={() => {}}>Delete</ButtonItem><ButtonItem onClick={() => {}}>Rename</ButtonItem><ButtonItem onClick={() => {}}>Duplicate</ButtonItem><ButtonItem onClick={() => {}}>Archive</ButtonItem></LiveMenu>}
+    dontExample={<OrderDont />}
     dontCaption="Delete first puts a risky action at the top."
 />
 
@@ -222,9 +213,9 @@ Order items by task and put Delete at the bottom, away from the common actions.
 Verb-first labels read as actions. All caps and noun-only labels slow scanning.
 
 <DoDontPair
-    doExample={<LiveMenu><ButtonItem onClick={() => {}}>Rename</ButtonItem><ButtonItem onClick={() => {}}>Duplicate</ButtonItem><ButtonItem onClick={() => {}}>Archive</ButtonItem></LiveMenu>}
+    doExample={<VerbCaseDo />}
     doCaption="Verb first, sentence case."
-    dontExample={<LiveMenu><ButtonItem onClick={() => {}}>NAME</ButtonItem><ButtonItem onClick={() => {}}>COPY</ButtonItem><ButtonItem onClick={() => {}}>FILE</ButtonItem></LiveMenu>}
+    dontExample={<VerbCaseDont />}
     dontCaption="All caps and noun-only labels."
 />
 
@@ -233,9 +224,9 @@ Verb-first labels read as actions. All caps and noun-only labels slow scanning.
 One or two words each. Long, near-identical labels make the choice harder and wrap.
 
 <DoDontPair
-    doExample={<LiveMenu><ButtonItem onClick={() => {}}>Rename</ButtonItem><ButtonItem onClick={() => {}}>Duplicate</ButtonItem><ButtonItem onClick={() => {}}>Archive</ButtonItem></LiveMenu>}
+    doExample={<ShortLabelsDo />}
     doCaption="Short, distinct labels."
-    dontExample={<LiveMenu><ButtonItem onClick={() => {}}>Archive this session now</ButtonItem><ButtonItem onClick={() => {}}>Archive this session later</ButtonItem><ButtonItem onClick={() => {}}>Archive this session today</ButtonItem></LiveMenu>}
+    dontExample={<ShortLabelsDont />}
     dontCaption="Long, near-identical labels."
 />
 

@@ -22,7 +22,8 @@ Also asked as: field error, helper error, inline error, form validation.
 
 Use `InlineMessage` for a note that explains or qualifies something right
 beside it, such as why a field is required or what a score means, without
-taking up space until someone asks. It is built on `Popup`, so placement,
+taking up space until someone asks. Pass `defaultOpen` when the message popup
+should start open on first render. It is built on `Popup`, so placement,
 dismissal and focus return are shared with every other popup in the system.
 
 ### Appearance guidance
@@ -97,7 +98,7 @@ Same group: `Banner` · `EmptyState` · `Flag` · `Modal` · `NotificationItem` 
 ## Parts
 
 1. **Trigger.** A subtle, compact icon button in the appearance color, named by `label`.
-2. **Popup.** Opens on press with a title, optional secondary line and body.
+2. **Popup.** Opens on press — or on first render with `defaultOpen` — with a `title`, optional `secondaryText` and body `children`, positioned by `placement`.
 
 ### States
 

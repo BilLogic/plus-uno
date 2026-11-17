@@ -2,7 +2,6 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as InlineMessageStories from './InlineMessage.stories.jsx';
-import { InlineMessage } from '@/components';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -10,21 +9,15 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
-import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
-
-export const fieldRow = { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 'var(--inline-sm)' };
-
-export const LiveInlineMessage = ({ field = 'Session length', appearance, label, title, children }) => (
-    <DocsOverlayBoundary containHeight>
-        <div style={fieldRow}>
-            <span>{field}</span>
-            <InlineMessage appearance={appearance} defaultOpen label={label} title={title}>
-                {children}
-            </InlineMessage>
-        </div>
-    </DocsOverlayBoundary>
-);
+import {
+    OnePerFieldDo,
+    OnePerFieldDont,
+    ShortLineDo,
+    ShortLineDont,
+    TintMeaningDo,
+    TintMeaningDont,
+} from '@/storybook-docs/lib/inline-message-cases.jsx';
 
 <Meta of={InlineMessageStories} />
 
@@ -112,7 +105,8 @@ secondary note out of the page's reading order until someone asks for it.
 
 Use `InlineMessage` for a note that explains or qualifies something right
 beside it, such as why a field is required or what a score means, without
-taking up space until someone asks. It is built on `Popup`, so placement,
+taking up space until someone asks. Pass `defaultOpen` when the message popup
+should start open on first render. It is built on `Popup`, so placement,
 dismissal and focus return are shared with every other popup in the system.
 
 ### Appearance guidance
@@ -145,7 +139,7 @@ dismissal and focus return are shared with every other popup in the system.
 ## Parts
 
 1. **Trigger.** A subtle, compact icon button in the appearance color, named by `label`.
-2. **Popup.** Opens on press with a title, optional secondary line and body.
+2. **Popup.** Opens on press — or on first render with `defaultOpen` — with a `title`, optional `secondaryText` and body `children`, positioned by `placement`.
 
 ### States
 
@@ -191,9 +185,9 @@ Info for a neutral note; danger only when something failed. The icon is a
 second cue, not a style choice.
 
 <DoDontPair
-    doExample={<LiveInlineMessage field="Session length" appearance="info" label="About this setting" title="Heads up">This setting applies to new sessions only.</LiveInlineMessage>}
+    doExample={<TintMeaningDo />}
     doCaption="Info for a neutral note."
-    dontExample={<LiveInlineMessage field="Session length" appearance="danger" label="About this setting" title="Heads up">This setting applies to new sessions only.</LiveInlineMessage>}
+    dontExample={<TintMeaningDont />}
     dontCaption="Danger for a neutral note."
 />
 
@@ -202,9 +196,9 @@ second cue, not a style choice.
 It sits beside a field; long copy pushes the form around.
 
 <DoDontPair
-    doExample={<LiveInlineMessage field="Availability" appearance="warning" label="About availability" title="Limited availability">Only 2 slots left this week.</LiveInlineMessage>}
+    doExample={<ShortLineDo />}
     doCaption="One short sentence."
-    dontExample={<LiveInlineMessage field="Availability" appearance="warning" label="About availability" title="Limited availability">Only 2 slots left this week. Slots open each Monday for the following week, and a slot is held for ten minutes while you book, so the count can change while this page is open.</LiveInlineMessage>}
+    dontExample={<ShortLineDont />}
     dontCaption="A paragraph beside a field."
 />
 
@@ -213,9 +207,9 @@ It sits beside a field; long copy pushes the form around.
 Two messages on one field leave no clear next step.
 
 <DoDontPair
-    doExample={<DocsOverlayBoundary containHeight><div style={fieldRow}><span>Session length</span><InlineMessage appearance="info" label="About session length" title="Heads up">This setting applies to new sessions only.</InlineMessage></div></DocsOverlayBoundary>}
+    doExample={<OnePerFieldDo />}
     doCaption="A single message."
-    dontExample={<DocsOverlayBoundary containHeight><div style={fieldRow}><span>Session length</span><InlineMessage appearance="info" label="About session length" title="Heads up">This setting applies to new sessions only.</InlineMessage><InlineMessage appearance="warning" label="About availability" title="Limited availability">Only 2 slots left this week.</InlineMessage></div></DocsOverlayBoundary>}
+    dontExample={<OnePerFieldDont />}
     dontCaption="An info note and a warning together."
 />
 

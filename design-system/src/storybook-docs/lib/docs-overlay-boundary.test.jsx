@@ -1,5 +1,5 @@
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import {
     Button,
@@ -79,7 +79,7 @@ describe('DocsOverlayBoundary', () => {
         }
     });
 
-    it('expands minHeight for an open overlay when containHeight is set and releases it on close', () => {
+    it('expands minHeight for an open overlay when containHeight is set and releases it on close', async () => {
         const originalClientHeight = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'clientHeight');
         Object.defineProperty(HTMLElement.prototype, 'clientHeight', { configurable: true, get: () => 32 });
         const rectSpy = (el) => {
@@ -111,7 +111,7 @@ describe('DocsOverlayBoundary', () => {
                     <button type="button">Trigger</button>
                 </DocsOverlayBoundary>,
             );
-            expect(host.style.minHeight).toBe('');
+            await waitFor(() => expect(host.style.minHeight).toBe(''));
         } finally {
             Element.prototype.getBoundingClientRect = originalGBCR;
             if (originalClientHeight) {
