@@ -18,6 +18,11 @@ runs from the checkout with no server. Start Storybook on demand for the tools
 only it has (story instructions, story ids, previews, tests): in the desktop
 app `preview_start {name: "storybook"}`, in a shell `npm run storybook`, then
 reconnect the `storybook` MCP. Stop it when the task is done.
+A worktree's Storybook on another port serves the same endpoint at
+`http://localhost:<port>/mcp`; a CLI run or a second session calls it there with
+JSON-RPC (`tools/list`, `tools/call`). Work that adds or changes stories calls
+`get-storybook-story-instructions` before writing and `stories-changed` then
+`test-run` before its PR.
 
 | Tool | Use it for |
 |---|---|
