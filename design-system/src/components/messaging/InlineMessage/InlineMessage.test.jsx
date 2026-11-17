@@ -28,4 +28,17 @@ describe('InlineMessage', () => {
         rerender(<InlineMessage appearance="danger" label="Danger info">Message</InlineMessage>);
         expect(container.querySelector('i')).toHaveClass('fa-circle-exclamation');
     });
+
+    it('starts open when defaultOpen is true and closes on Escape', async () => {
+        const user = userEvent.setup();
+        render(
+            <InlineMessage defaultOpen label="About availability" title="Limited availability">
+                Only 2 slots left this week.
+            </InlineMessage>,
+        );
+        expect(await screen.findByText('Limited availability')).toBeInTheDocument();
+        expect(screen.getByText('Only 2 slots left this week.')).toBeInTheDocument();
+        await user.keyboard('{Escape}');
+        await waitFor(() => expect(screen.queryByText('Limited availability')).not.toBeInTheDocument());
+    });
 });

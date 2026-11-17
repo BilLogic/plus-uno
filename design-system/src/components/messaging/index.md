@@ -19,7 +19,7 @@ authored half, counted rather than assumed.
   - For something the user must read or act on in the page flow, use `SectionMessage`.
   - For a decision that blocks the task until answered, use `Modal`.
   - For help attached to a specific control, use `Tooltip` or `Popup`.
-- **[InlineMessage](InlineMessage/index.md)** — Use `InlineMessage` for a note that explains or qualifies something right beside it, such as why a field is required or what a score means, without taking up space until someone asks. It is built on `Popup`, so placement, dismissal and focus return are shared with every other popup in the system.
+- **[InlineMessage](InlineMessage/index.md)** — Use `InlineMessage` for a note that explains or qualifies something right beside it, such as why a field is required or what a score means, without taking up space until someone asks. Pass `defaultOpen` when the message popup should start open on first render. It is built on `Popup`, so placement, dismissal and focus return are shared with every other popup in the system.
   - For a message that belongs to a page or section and should always be visible, use `SectionMessage`.
   - For a short plain-text label on hover or focus over a control, use `Tooltip`.
 - **[Modal](Modal/index.md)** — Use `Modal` when the next step has to happen before anything else can: a destructive confirmation, a short form that would derail the page, a detail view the person closes and returns from. It is the one messaging component that takes focus from the page, so it fits when interrupting is the point.
@@ -47,7 +47,7 @@ authored half, counted rather than assumed.
 | [Banner](Banner/index.md) | 5 | ✅ | ✅ | ✅ |
 | [EmptyState](EmptyState/index.md) | 8 | ✅ | ✅ | ✅ |
 | [Flag](Flag/index.md) | 21 | ✅ | ✅ | ✅ |
-| [InlineMessage](InlineMessage/index.md) | 8 | ✅ | ✅ | ✅ |
+| [InlineMessage](InlineMessage/index.md) | 9 | ✅ | ✅ | ✅ |
 | [Modal](Modal/index.md) | 23 | ✅ | ✅ | ✅ |
 | [NotificationItem](NotificationItem/index.md) | 13 | ✅ | ✅ | ✅ |
 | [SectionMessage](SectionMessage/index.md) | 10 | ✅ | ✅ | ✅ |

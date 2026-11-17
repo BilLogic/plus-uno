@@ -10,7 +10,7 @@ Also asked as: onboarding, feature tour, coach mark, new feature highlight, walk
 
 **Source:** `design-system/src/components/messaging/Spotlight/Spotlight.jsx`
 
-**Stories:** `design-system/src/components/messaging/Spotlight/Spotlight.stories.jsx` — Basic, WithMedia, LinkAction, PrimaryAction, SecondaryAction, Interactive, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/messaging/Spotlight/Spotlight.stories.jsx` — Basic, WithMedia, LinkAction, PrimaryAction, SecondaryAction, Interactive, Rest, Hovered, Pressed, Focused, BestPracticesLive
 
 **Storybook page:** `design-system/src/components/messaging/Spotlight/Spotlight.mdx`
 
@@ -53,13 +53,13 @@ One step alone has nothing to count.
 Do: Step count in a multi-step tour.
 Don't: Step count on a single tip.
 
-### Make the secondary action a link. {#make-the-secondary-action-a-link}
+### Keep the secondary action quieter than the primary. {#keep-the-secondary-action-quieter-than-the-primary}
 
-The primary action leads; the second one stays quiet. A `SpotlightAction` with
-`href` renders as a link.
+The primary action leads as the filled action; the secondary is the outlined one.
+Either `SpotlightAction` can take `href` to navigate.
 
-Do: Secondary action as a link.
-Don't: Two competing buttons.
+Do: The outlined secondary next to the filled primary.
+Don't: Two filled, competing buttons.
 
 ### Wrap the target and the spotlight in one `SpotlightProvider`. {#wrap-the-target-and-the-spotlight-in-one-spotlightprovider}
 

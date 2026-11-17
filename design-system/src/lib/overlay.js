@@ -323,11 +323,20 @@ export function useFloatingOverlay({
 
     const handleOpenChange = (next, details) => {
         const owner = triggerNodeRef.current ?? fromNode;
-        if (!next && !dismissible && DISMISS_REASONS.has(details?.reason)) return;
+        if (!next && !dismissible && DISMISS_REASONS.has(details?.reason)) {
+            details?.cancel?.();
+            return;
+        }
         if (!next && details?.reason === 'outside-press'
-            && isPressInRaisedOverlay(details.event?.target, owner)) return;
+            && isPressInRaisedOverlay(details.event?.target, owner)) {
+            details?.cancel?.();
+            return;
+        }
         if (!next && (details?.reason === 'escape-key' || details?.reason === 'focus-out')
-            && isOverlayRaisedOver(owner)) return;
+            && isOverlayRaisedOver(owner)) {
+            details?.cancel?.();
+            return;
+        }
         onOpenChange?.(next, details);
     };
 

@@ -1,9 +1,18 @@
 import React, { useState } from 'react';
 import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
+import { DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
-import { expect, waitFor } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { Button, Spotlight, SPOTLIGHT_PLACEMENTS, SpotlightAction, SpotlightProvider, SpotlightTarget } from '@/components';
+import {
+    FeatureHeadlineDo,
+    FeatureHeadlineDont,
+    SecondaryQuieterDo,
+    SecondaryQuieterDont,
+    StepCountTourDo,
+    StepCountTourDont,
+} from '@/storybook-docs/lib/spotlight-cases';
 
 export default {
     title: 'Components/Messaging/Spotlight',
@@ -241,5 +250,99 @@ export const Focused = {
         await expect(parseFloat(style.outlineWidth)).toBe(2);
         await expect(style.outlineColor).toBe(tokenColor(dismiss, '--ds-border-focused-inverse'));
         dismiss.blur();
+    },
+};
+
+/** Live DoDontPair spotlights stay bounded inside their wells, carry no inert wrappers, do not steal focus or scroll on load, and dismiss and reopen across every pair. */
+export const BestPracticesLive = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' }}>
+            <DoDontPair
+                doExample={<FeatureHeadlineDo />}
+                doCaption="Short headline, one-sentence body."
+                dontExample={<FeatureHeadlineDont />}
+                dontCaption="A greeting and a paragraph."
+            />
+            <DoDontPair
+                doExample={<StepCountTourDo />}
+                doCaption="Step count in a multi-step tour."
+                dontExample={<StepCountTourDont />}
+                dontCaption="Step count on a single tip."
+            />
+            <DoDontPair
+                doExample={<SecondaryQuieterDo />}
+                doCaption="The outlined secondary next to the filled primary."
+                dontExample={<SecondaryQuieterDont />}
+                dontCaption="Two filled, competing buttons."
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const doc = canvasElement.ownerDocument;
+        const win = doc.defaultView;
+        await expect(canvasElement.querySelector('[inert]')).toBeNull();
+
+        const cards = canvasElement.querySelectorAll('figure.sb-ds-dodont-card');
+        await expect(cards).toHaveLength(6);
+
+        // All 6 spotlights start open at rest, bounded in their wells, without stealing focus or scrolling.
+        await waitFor(() => expect(within(cards[0]).getByText('Find sessions here')).toBeVisible());
+        await waitFor(() => expect(within(cards[1]).getByText('Welcome!')).toBeVisible());
+        await waitFor(() => expect(within(cards[2]).getByText('1 of 3')).toBeVisible());
+        await waitFor(() => expect(within(cards[3]).getByText('1 of 1')).toBeVisible());
+        const learnMoreLink = await within(cards[4]).findByRole('link', { name: 'Learn more' });
+        await expect(learnMoreLink).toHaveAttribute('href', '#spotlight-tour-details');
+        await expect(learnMoreLink).toHaveClass('plus-spotlight-action--secondary');
+        await expect(learnMoreLink.getAttribute('style')).toBeNull();
+        const competingButton = await within(cards[5]).findByRole('button', { name: 'Learn more' });
+        await expect(competingButton).toBeVisible();
+        await expect(competingButton).toHaveClass('plus-spotlight-action--primary');
+
+        await expect(canvasElement.contains(doc.activeElement)).toBe(false);
+        await expect(win.scrollY).toBe(0);
+
+        for (const card of cards) {
+            const well = card.querySelector('.sb-ds-dodont-card__well');
+            const spotlight = card.querySelector('.plus-spotlight');
+            await waitFor(() => expect(spotlight.getBoundingClientRect().bottom).toBeLessThanOrEqual(well.getBoundingClientRect().bottom + 1));
+            await expect(well.scrollWidth).toBeLessThanOrEqual(well.clientWidth + 1);
+            const cardRect = card.getBoundingClientRect();
+            for (const el of [well, ...well.querySelectorAll('*')]) {
+                await expect(['1', 'normal']).toContain(win.getComputedStyle(el).zoom);
+                if (el.hasAttribute('data-base-ui-focus-guard')) continue;
+                const rect = el.getBoundingClientRect();
+                if (rect.width > 0) {
+                    await expect(rect.left).toBeGreaterThanOrEqual(cardRect.left - 1);
+                    await expect(rect.right).toBeLessThanOrEqual(cardRect.right + 1);
+                }
+            }
+        }
+
+        // Pair 1 (cards 0 and 1): dismiss card 0 via Got it while card 1 stays open, then reopen card 0 via Calendar.
+        const gotIt0 = within(cards[0]).getByRole('button', { name: 'Got it' });
+        gotIt0.focus();
+        await expect(gotIt0).toHaveFocus();
+        await userEvent.click(gotIt0);
+        await waitFor(() => expect(within(cards[0]).queryByText('Find sessions here')).toBeNull());
+        await expect(within(cards[1]).getByText('Welcome!')).toBeVisible();
+        await userEvent.click(within(cards[0]).getByRole('button', { name: 'Calendar' }));
+        await waitFor(() => expect(within(cards[0]).getByText('Find sessions here')).toBeVisible());
+
+        // Pair 2 (cards 2 and 3): dismiss card 2 via Dismiss button while card 3 stays open, then reopen card 2.
+        await userEvent.click(within(cards[2]).getByRole('button', { name: 'Dismiss' }));
+        await waitFor(() => expect(within(cards[2]).queryByText('1 of 3')).toBeNull());
+        await expect(within(cards[3]).getByText('1 of 1')).toBeVisible();
+        await userEvent.click(within(cards[2]).getByRole('button', { name: 'Calendar' }));
+        await waitFor(() => expect(within(cards[2]).getByText('1 of 3')).toBeVisible());
+
+        // Pair 3 (cards 4 and 5): keyboard focus on link, dismiss with Escape while card 5 stays open, then reopen.
+        learnMoreLink.focus();
+        await expect(learnMoreLink).toHaveFocus();
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(within(cards[4]).queryByRole('link', { name: 'Learn more' })).toBeNull());
+        await expect(within(cards[5]).getByRole('button', { name: 'Learn more' })).toBeVisible();
+        await userEvent.click(within(cards[4]).getByRole('button', { name: 'Calendar' }));
+        await waitFor(() => expect(within(cards[4]).getByRole('link', { name: 'Learn more' })).toBeVisible());
     },
 };

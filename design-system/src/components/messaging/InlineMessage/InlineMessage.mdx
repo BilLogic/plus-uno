@@ -2,7 +2,6 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as InlineMessageStories from './InlineMessage.stories.jsx';
-import { InlineMessage } from '@/components';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -11,31 +10,14 @@ import {
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
-
-export const popupSurface = {
-    width: 'var(--popup-max-width)',
-    padding: 'var(--popup-pad)',
-    backgroundColor: 'var(--ds-surface-overlay)',
-    borderRadius: 'var(--popup-radius)',
-    boxShadow: 'var(--ds-shadow-overlay)',
-};
-
-{/* The trigger, closed, with its popup's content drawn statically below it. The preview is inert, so a pair never opens a real popup over the docs page and leaves nothing to tab to. */}
-export const OpenPreview = ({ appearance, label, title, children }) => (
-    <div inert aria-hidden="true" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--stack-sm)' }}>
-        <InlineMessage appearance={appearance} label={label} title={title}>{children}</InlineMessage>
-        <div style={popupSurface}>
-            <div className="plus-inline-message-content">
-                <div className="plus-inline-message-heading">
-                    <strong className="plus-inline-message-title">{title}</strong>
-                </div>
-                {children}
-            </div>
-        </div>
-    </div>
-);
-
-export const fieldRow = { display: 'flex', alignItems: 'center', gap: 'var(--inline-sm)' };
+import {
+    OnePerFieldDo,
+    OnePerFieldDont,
+    ShortLineDo,
+    ShortLineDont,
+    TintMeaningDo,
+    TintMeaningDont,
+} from '@/storybook-docs/lib/inline-message-cases.jsx';
 
 <Meta of={InlineMessageStories} />
 
@@ -123,7 +105,8 @@ secondary note out of the page's reading order until someone asks for it.
 
 Use `InlineMessage` for a note that explains or qualifies something right
 beside it, such as why a field is required or what a score means, without
-taking up space until someone asks. It is built on `Popup`, so placement,
+taking up space until someone asks. Pass `defaultOpen` when the message popup
+should start open on first render. It is built on `Popup`, so placement,
 dismissal and focus return are shared with every other popup in the system.
 
 ### Appearance guidance
@@ -156,7 +139,7 @@ dismissal and focus return are shared with every other popup in the system.
 ## Parts
 
 1. **Trigger.** A subtle, compact icon button in the appearance color, named by `label`.
-2. **Popup.** Opens on press with a title, optional secondary line and body.
+2. **Popup.** Opens on press — or on first render with `defaultOpen` — with a `title`, optional `secondaryText` and body `children`, positioned by `placement`.
 
 ### States
 
@@ -202,9 +185,9 @@ Info for a neutral note; danger only when something failed. The icon is a
 second cue, not a style choice.
 
 <DoDontPair
-    doExample={<OpenPreview appearance="info" label="About this setting" title="Heads up">This setting applies to new sessions only.</OpenPreview>}
+    doExample={<TintMeaningDo />}
     doCaption="Info for a neutral note."
-    dontExample={<OpenPreview appearance="danger" label="About this setting" title="Heads up">This setting applies to new sessions only.</OpenPreview>}
+    dontExample={<TintMeaningDont />}
     dontCaption="Danger for a neutral note."
 />
 
@@ -213,9 +196,9 @@ second cue, not a style choice.
 It sits beside a field; long copy pushes the form around.
 
 <DoDontPair
-    doExample={<OpenPreview appearance="warning" label="About availability" title="Limited availability">Only 2 slots left this week.</OpenPreview>}
+    doExample={<ShortLineDo />}
     doCaption="One short sentence."
-    dontExample={<OpenPreview appearance="warning" label="About availability" title="Limited availability">Only 2 slots left this week. Slots open each Monday for the following week, and a slot is held for ten minutes while you book, so the count can change while this page is open.</OpenPreview>}
+    dontExample={<ShortLineDont />}
     dontCaption="A paragraph beside a field."
 />
 
@@ -224,9 +207,9 @@ It sits beside a field; long copy pushes the form around.
 Two messages on one field leave no clear next step.
 
 <DoDontPair
-    doExample={<div inert aria-hidden="true" style={fieldRow}><span>Session length</span><InlineMessage appearance="info" label="About session length" title="Heads up">This setting applies to new sessions only.</InlineMessage></div>}
+    doExample={<OnePerFieldDo />}
     doCaption="A single message."
-    dontExample={<div inert aria-hidden="true" style={fieldRow}><span>Session length</span><InlineMessage appearance="info" label="About session length" title="Heads up">This setting applies to new sessions only.</InlineMessage><InlineMessage appearance="warning" label="About availability" title="Limited availability">Only 2 slots left this week.</InlineMessage></div>}
+    dontExample={<OnePerFieldDont />}
     dontCaption="An info note and a warning together."
 />
 
