@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Button, EmptyState } from '@/components';
 import { Page, PatternCard, PatternSection } from '@/patterns';
-import { DemoPageHeader } from '../../../patterns/Page/pageDemo.jsx';
+import { DemoPageHeader, SessionsTable } from '../../../patterns/Page/pageDemo.jsx';
 import { GonePanel } from '../../../patterns/Panel/panelDemo.jsx';
+import { ResetExampleButton } from '@/storybook-docs/lib/reset-example.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
-import { ViewBar } from '@/storybook-docs/lib/view-bar.jsx';
+import { StudentsTable, ViewBar } from '@/storybook-docs/lib/view-bar.jsx';
+import { CATEGORIES, QuickFilter } from '../Filtering/filteringDemo.jsx';
 
 /**
  * The Empty pattern's examples: the real EmptyState in the four types and the
@@ -31,8 +33,6 @@ export const SMALL_STAGE = 520; // docs-literal
 /** Docs geometry, in px: the page window's height. */
 const WINDOW = 400; // docs-literal
 
-const noop = () => {};
-
 /** The four types, by id, with the name each shows on the page. */
 export const EMPTY_TYPES = [
     ['first', 'First use'],
@@ -47,38 +47,59 @@ const COPY = {
         icon: 'user-group',
         header: 'No students in this group yet',
         description: 'Add students to schedule sessions and track their progress.',
-        action: <Button text="Add students" appearance="primary" onClick={noop} />,
+        actionLabel: 'Add students',
+        appearance: 'primary',
     },
     matches: {
         icon: 'magnifying-glass',
         header: 'No students match these filters',
         description: 'Nothing matches Grade 6 and Math. Reset the filters to see every student.',
-        action: <Button text="Reset filters" appearance="default" onClick={noop} />,
+        actionLabel: 'Reset filters',
+        appearance: 'default',
     },
     done: {
         icon: 'circle-check',
         header: 'Every reflection is reviewed',
         description: "New ones arrive after Friday's sessions.",
-        action: null,
+        actionLabel: null,
     },
     cant: {
         icon: 'triangle-exclamation',
-        header: "Couldn't load sessions",
+        header: "Couldn't load students",
         description: 'Something went wrong on our side. Try again in a moment.',
-        action: <Button text="Try again" appearance="primary" onClick={noop} />,
+        actionLabel: 'Try again',
+        appearance: 'primary',
     },
     noAccess: {
         icon: 'lock',
         header: 'Only supervisors can see session notes',
         description: 'Ask your supervisor to add you.',
-        action: null,
+        actionLabel: null,
     },
 };
 
 /** One empty state in the words its type takes. `kind` also takes `noAccess`, the Can't show type with nobody to retry. */
-export const EmptyType = ({ kind, spacing = 'default', action = true }) => {
+export const EmptyType = ({ kind, spacing = 'default', action = true, onAction }) => {
+    const [acted, setActed] = useState(false);
     const copy = COPY[kind];
-    const primaryAction = action && copy.action ? React.cloneElement(copy.action, { spacing }) : undefined;
+
+    if (acted && !onAction) {
+        return (
+            <PatternSection
+                title="Students"
+                description="Lincoln Middle"
+                actions={<ResetExampleButton onReset={() => setActed(false)} />}
+            >
+                <StudentsTable count={3} sortable />
+            </PatternSection>
+        );
+    }
+
+    const handleAction = onAction ?? (() => setActed(true));
+    const primaryAction = action && copy.actionLabel
+        ? <Button text={copy.actionLabel} appearance={copy.appearance} spacing={spacing} onClick={handleAction} />
+        : undefined;
+
     return (
         <EmptyState
             spacing={spacing}
@@ -99,14 +120,60 @@ export const FullPage = () => (
     </BrowserWindow>
 );
 
+const NO_MATCHES_FILTERS = { grade: ['Grade 6'], subject: ['Math'] };
+const CLEARED_FILTERS = { grade: [], subject: [] };
+
 /** A Section whose table is empty: the empty state replaces the whole table; the view bar above stays. */
-export const InTable = ({ kind = 'first' }) => (
-    <div style={{ padding: 'var(--page-pad)', boxSizing: 'border-box' }}>
-        <PatternSection title="Students" description="Lincoln Middle" tabs={<ViewBar views={['All students']} filters={null} />}>
-            <EmptyType kind={kind} spacing="compact" />
-        </PatternSection>
-    </div>
-);
+export const InTable = ({ kind = 'first' }) => {
+    const [view, setView] = useState('All students');
+    const [resolved, setResolved] = useState(false);
+    const [filters, setFilters] = useState(NO_MATCHES_FILTERS);
+    const showingRows = resolved || view !== 'All students';
+    const pickFilter = (id, next) => {
+        const updated = { ...filters, [id]: next };
+        setFilters(updated);
+        if (updated.grade.length === 0 || updated.subject.length === 0) setResolved(true);
+    };
+
+    return (
+        <div style={{ padding: 'var(--page-pad)', boxSizing: 'border-box' }}>
+            <PatternSection
+                title="Students"
+                description="Lincoln Middle"
+                tabs={(
+                    <ViewBar
+                        views={['All students', 'Needs follow-up']}
+                        activeView={view}
+                        onViewChange={(next) => {
+                            setView(next);
+                            setResolved(false);
+                            if (kind === 'matches' && next === 'All students') setFilters(NO_MATCHES_FILTERS);
+                        }}
+                        filters={kind === 'matches' ? (
+                            <>
+                                <QuickFilter category={CATEGORIES.grade} value={resolved ? CLEARED_FILTERS : filters} onPick={pickFilter} />
+                                <QuickFilter category={CATEGORIES.subject} value={resolved ? CLEARED_FILTERS : filters} onPick={pickFilter} />
+                            </>
+                        ) : null}
+                    />
+                )}
+            >
+                {showingRows ? (
+                    <StudentsTable count={4} view={view} sortable />
+                ) : (
+                    <EmptyType
+                        kind={kind}
+                        spacing="compact"
+                        onAction={() => {
+                            setResolved(true);
+                            if (kind === 'matches') setFilters(CLEARED_FILTERS);
+                        }}
+                    />
+                )}
+            </PatternSection>
+        </div>
+    );
+};
 
 /** A card with nothing to show: compact, the block centered in the card. */
 export const InCard = () => (
@@ -118,8 +185,22 @@ export const InCard = () => (
 );
 
 /** The Details Panel when its record was removed: the block at the top of the body with a way back. */
-export const InPanel = () => (
-    <div style={{ padding: 'var(--page-pad)', boxSizing: 'border-box' }}>
-        <GonePanel />
-    </div>
-);
+export const InPanel = () => {
+    const [returned, setReturned] = useState(false);
+
+    return (
+        <div style={{ padding: 'var(--page-pad)', boxSizing: 'border-box' }}>
+            {returned ? (
+                <PatternSection
+                    title="Sessions"
+                    description="This week"
+                    actions={<ResetExampleButton onReset={() => setReturned(false)} />}
+                >
+                    <SessionsTable />
+                </PatternSection>
+            ) : (
+                <GonePanel onClose={() => setReturned(true)} />
+            )}
+        </div>
+    );
+};

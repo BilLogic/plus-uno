@@ -4,12 +4,11 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as LoadingStories from './Loading.stories.jsx';
 import { KIND_STAGE } from './loadingDemo.jsx';
+import { MenuOneRowCase, MenuSkeletonRowsCase } from './LoadingCases.jsx';
 import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 import {
-    MenuOneRow,
-    MenuSkeletonRows,
     SkeletonInShape,
     SpinnerInBlank,
 } from '@/storybook-docs/illustrations/loading.jsx';
@@ -46,10 +45,10 @@ import {
 Four kinds of wait. Each has its own shape in the 1 to 10 s band; the time bands are the same for all.
 
 <TypeGrid>
-<TypeCard of={LoadingStories.KindList} title="A list or cards" stage={KIND_STAGE}>A skeleton in the real shape, so the layout stays still.</TypeCard>
-<TypeCard of={LoadingStories.KindAction} title="A button action" stage={KIND_STAGE}>A spinner inside the button that started it. The fields stay as they are.</TypeCard>
-<TypeCard of={LoadingStories.KindPage} title="A whole page" stage={KIND_STAGE}>The Frame and page header draw first; each Section fills as its data arrives.</TypeCard>
-<TypeCard of={LoadingStories.KindMenu} title="A menu" stage={KIND_STAGE}>One "Loading options" row, never a skeleton. Fetch items before the click where you can.</TypeCard>
+<TypeCard of={LoadingStories.KindList} to="#a-list-or-cards" title="A list or cards" stage={KIND_STAGE}>A skeleton in the real shape, so the layout stays still.</TypeCard>
+<TypeCard of={LoadingStories.KindAction} to="#a-button-action" title="A button action" stage={KIND_STAGE}>A spinner inside the button that started it. The fields stay as they are.</TypeCard>
+<TypeCard of={LoadingStories.KindPage} to="#a-whole-page" title="A whole page" stage={KIND_STAGE}>The Frame and page header draw first; each Section fills as its data arrives.</TypeCard>
+<TypeCard of={LoadingStories.KindMenu} to="#a-menu" title="A menu" stage={KIND_STAGE}>One "Loading options" row, never a skeleton. Fetch items before the click where you can.</TypeCard>
 </TypeGrid>
 
 </div>
@@ -66,13 +65,21 @@ Four kinds of wait. Each has its own shape in the 1 to 10 s band; the time bands
 
 ## Key cases
 
-<ComponentExample of={LoadingStories.KeyUnderOneSecond} title="Under 1 s" description="Keep what was there. A skeleton that only flashes reads as a glitch; the old rows stay until the new ones land." />
+<ComponentExample of={LoadingStories.KindList} title="A list or cards" />
 
-<ComponentExample of={LoadingStories.KeyOverTenSeconds} title="Past 10 s, a Flag" description="The skeleton stays and an information Flag explains the wait and that the person can keep working." />
+<ComponentExample of={LoadingStories.KindAction} title="A button action" description="Click Cancel to stop the in-flight save." />
 
-<ComponentExample of={LoadingStories.KeyLongJob} title="A long job" description="Importing a roster gets a labeled progress bar that says what is happening and how far along it is." />
+<ComponentExample of={LoadingStories.KindPage} title="A whole page" />
 
-<ComponentExample of={LoadingStories.KeyMenuFailed} title="A menu that could not load" description="The spinner row becomes &quot;Couldn't load options&quot; with Retry. Still one row." />
+<ComponentExample of={LoadingStories.KindMenu} title="A menu" />
+
+<ComponentExample of={LoadingStories.KeyUnderOneSecond} title="Under 1 s" description="Click a column header to sort the existing rows." />
+
+<ComponentExample of={LoadingStories.KeyOverTenSeconds} title="Past 10 s, a Flag" />
+
+<ComponentExample of={LoadingStories.KeyLongJob} title="A long job" />
+
+<ComponentExample of={LoadingStories.KeyMenuFailed} title="A menu that could not load" description="Click Retry in the menu to load the options." />
 
 </div>
 
@@ -162,9 +169,9 @@ A Flag, kept up with `autohide={false}` until the work ends, explains the wait a
 They open in answer to a click and open complete. A menu whose items must load shows one "Loading options" row, then "Couldn't load options" with Retry. A Modal's body may hold its content's own loading state.
 
 <DoDontPair
-    doExample={<MenuOneRow />}
+    doExample={<MenuOneRowCase />}
     doCaption="A menu shows one &quot;Loading options&quot; row."
-    dontExample={<MenuSkeletonRows />}
+    dontExample={<MenuSkeletonRowsCase />}
     dontCaption="A menu full of skeleton rows, promising items it may not have."
 />
 

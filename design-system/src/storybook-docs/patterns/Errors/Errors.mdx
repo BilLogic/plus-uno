@@ -4,14 +4,13 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as ErrorsStories from './Errors.stories.jsx';
 import { PLACE_STAGE } from './errorsDemo.jsx';
+import { BorderAndTooltipCase, MessageOnFieldCase } from './ErrorsCases.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 import {
-    BorderAndTooltip,
     FailureInModal,
     FailureInSlot,
-    MessageOnField,
 } from '@/storybook-docs/illustrations/errors.jsx';
 
 <Meta title="Patterns/States/Errors" tags={['manifest']} />
@@ -45,12 +44,12 @@ import {
 Give each failure one home near its cause. Key cases shows the two submit failures: blocked and rejected.
 
 <TypeGrid>
-<TypeCard of={ErrorsStories.PlaceField} title="A field" stage={PLACE_STAGE}>The error on the field, after blur. It clears once the rule is met: <a target="_top" href="./?path=/docs/patterns-forms--docs">Forms</a>.</TypeCard>
-<TypeCard of={ErrorsStories.PlaceLoadFailure} title="A view that could not load" stage={PLACE_STAGE}>The error in the empty-state slot, with Try again. The view bar stays.</TypeCard>
-<TypeCard of={ErrorsStories.PlaceNoAccess} title="No access" stage={PLACE_STAGE}>The same slot, saying who can help. No action the person cannot take.</TypeCard>
-<TypeCard of={ErrorsStories.PlaceBackgroundJob} title="A background job" stage={PLACE_STAGE}>A danger Flag that stays, with Try again.</TypeCard>
-<TypeCard of={ErrorsStories.PlacePageCondition} title="The whole page" stage={PLACE_STAGE}>A danger Banner for a condition that applies to everything on the page, for as long as it holds.</TypeCard>
-<TypeCard of={ErrorsStories.PlaceMenu} title="A menu's options" stage={PLACE_STAGE}>A "Couldn't load options" row with Retry, in the menu itself.</TypeCard>
+<TypeCard of={ErrorsStories.PlaceField} to="#blocked-submit" title="A field" stage={PLACE_STAGE}>The error on the field, after blur. It clears once the rule is met: <a target="_top" href="./?path=/docs/patterns-forms--docs">Forms</a>.</TypeCard>
+<TypeCard of={ErrorsStories.PlaceLoadFailure} to="#a-section-that-could-not-load" title="A view that could not load" stage={PLACE_STAGE}>The error in the empty-state slot, with Try again. The view bar stays.</TypeCard>
+<TypeCard of={ErrorsStories.PlaceNoAccess} to="#no-access" title="No access" stage={PLACE_STAGE}>The same slot, saying who can help. No action the person cannot take.</TypeCard>
+<TypeCard of={ErrorsStories.PlaceBackgroundJob} to="#a-failed-save-in-the-background" title="A background job" stage={PLACE_STAGE}>A danger Flag that stays, with Try again.</TypeCard>
+<TypeCard of={ErrorsStories.PlacePageCondition} to="#the-whole-page" title="The whole page" stage={PLACE_STAGE}>A danger Banner for a condition that applies to everything on the page, for as long as it holds.</TypeCard>
+<TypeCard of={ErrorsStories.PlaceMenu} to="#a-menu-s-options" title="A menu's options" stage={PLACE_STAGE}>A "Couldn't load options" row with Retry, in the menu itself.</TypeCard>
 </TypeGrid>
 
 </div>
@@ -59,13 +58,19 @@ Give each failure one home near its cause. Key cases shows the two submit failur
 
 ## Key cases
 
-<ComponentExample of={ErrorsStories.KeyBlockedSubmit} title="Blocked submit" description={<>A missing field: the error on the field and focus on the first one. The Modal stays open; never a second dialog. A single shake is Planned <PlannedTag />.</>} />
+<ComponentExample of={ErrorsStories.KeyBlockedSubmit} title="Blocked submit" description={<>Missing fields keep the Modal open and focus the first error. Fill Student and Site, then click Save session to clear them. A single shake is Planned <PlannedTag />.</>} />
 
-<ComponentExample of={ErrorsStories.KeyRejectedSubmit} title="Rejected submit" description={<>The server said no: a danger SectionMessage at the top of the form, announced when it appears, plus the field errors it names. Scrolling it into view is Planned <PlannedTag />.</>} />
+<ComponentExample of={ErrorsStories.KeyRejectedSubmit} title="Rejected submit" description={<>A server refusal sits in a danger SectionMessage above the fields. Edit and click Save session to retry. Scrolling it into view is Planned <PlannedTag />.</>} />
 
-<ComponentExample of={ErrorsStories.KeySectionFailed} title="A Section that could not load" description="The rest of the page works. The Section's body shows the error in its empty-state slot with Try again; the view bar stays." />
+<ComponentExample of={ErrorsStories.KeySectionFailed} title="A Section that could not load" description="Click Try again or switch view tabs; the rest of the page stays live." />
 
-<ComponentExample of={ErrorsStories.KeyFlagOnPage} title="A failed save in the background" description="The person moved on; the Flag finds them at the top right, stays until Try again resolves it." />
+<ComponentExample of={ErrorsStories.PlaceNoAccess} title="No access" />
+
+<ComponentExample of={ErrorsStories.KeyFlagOnPage} title="A failed save in the background" description="Click Try again on the Flag to finish the save." />
+
+<ComponentExample of={ErrorsStories.PlacePageCondition} title="The whole page" />
+
+<ComponentExample of={ErrorsStories.PlaceMenu} title="A menu's options" description="Click Retry in the menu to load the options." />
 
 </div>
 
@@ -128,9 +133,9 @@ The error sits on the field and says what to fix. <a target="_top" href="./?path
 The message sits right under the invalid field and names the fix. The red border supports the words and never replaces them.
 
 <DoDontPair
-    doExample={<MessageOnField />}
+    doExample={<MessageOnFieldCase />}
     doCaption="Say what to fix, on the field, in words."
-    dontExample={<BorderAndTooltip />}
+    dontExample={<BorderAndTooltipCase />}
     dontCaption="A red border alone, with its words in a tooltip."
 />
 

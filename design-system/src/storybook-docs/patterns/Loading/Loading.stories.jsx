@@ -4,6 +4,7 @@ import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
 import {
     BANDS,
@@ -38,7 +39,7 @@ export default {
 };
 
 /** The picture's shimmer is held explicitly: CI's Chromium reports reduced motion, and a docs picture must read the same everywhere. */
-const staged = (story, width = STAGE) => <FitStage width={width}>{story}</FitStage>;
+const staged = (story, width = STAGE) => <FitStage width={width} scrollable>{story}</FitStage>;
 /** A kind card's story on the Page's pad, as the other patterns' type cards draw theirs. */
 const kindCard = (story) => staged(<div style={{ padding: 'var(--page-pad)' }}>{story}</div>, KIND_STAGE);
 const rect = (el) => el.getBoundingClientRect();
@@ -70,9 +71,11 @@ export const KindList = {
     name: 'Kind: A list',
     render: () => kindCard(<LoadingList band="shape" reduced={false} />),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const region = busy(canvasElement);
         await expect(region, 'the loading region is busy').not.toBeNull();
-        await expect(bars(region).length, 'text bars in the table\'s shape: three columns, four rows').toBe(12);
+        await expect(bars(region).length, "text bars in the table's shape: three columns, four rows").toBe(12);
         await expect(within(canvasElement).queryByRole('table'), 'no table yet').toBeNull();
         await waitFor(() => expect(status(canvasElement)).toHaveTextContent('Loading students…'));
         await expect(region.contains(status(canvasElement)), 'the label sits beside the busy region, not inside it').toBe(false);
@@ -84,13 +87,18 @@ export const KindList = {
 export const KindAction = {
     name: 'Kind: A button action',
     render: () => kindCard(<LoadingAction band="shape" />),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const save = canvas.getByRole('button', { name: 'Save session' });
         await expect(save, 'the button that started it is busy').toHaveAttribute('aria-busy', 'true');
         await expect(save.querySelector('.plus-spinner, [class*="spinner"]'), 'with the spinner inside it').not.toBeNull();
-        await expect(canvas.getByRole('button', { name: 'Cancel' }), 'Cancel stays live').toBeEnabled();
+        const cancel = canvas.getByRole('button', { name: 'Cancel' });
+        await expect(cancel, 'Cancel stays live').toBeEnabled();
         await fitsCanvas(canvasElement);
+        await userEvent.click(cancel);
+        await expect(canvas.getByRole('button', { name: 'Save session' })).not.toHaveAttribute('aria-busy');
+        await settleAnimations(canvasElement);
     },
 };
 
@@ -100,7 +108,9 @@ export const KindPage = {
     render: () => kindCard(<LoadingPage band="shape" reduced={false} />),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(canvas.getByRole('heading', { name: 'Roster' }), 'each Section\'s header is drawn').toBeInTheDocument();
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        await expect(canvas.getByRole('heading', { name: 'Roster' }), "each Section's header is drawn").toBeInTheDocument();
         await expect(canvas.getByRole('heading', { name: 'Sessions' })).toBeInTheDocument();
         await expect(canvas.queryByRole('table'), 'the rows are skeleton, not data').toBeNull();
         await expect(bars(canvasElement).length).toBeGreaterThan(0);
@@ -114,6 +124,8 @@ export const KindMenu = {
     render: () => staged(<LoadingMenu band="shape" />, KIND_STAGE),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await waitFor(() => expect(canvas.getByText('Loading options')).toBeInTheDocument());
         await expect(bars(canvasElement), 'no skeleton on a menu').toHaveLength(0);
         await expect(canvas.queryByRole('menuitem', { name: 'Edit' }), 'the real rows wait').toBeNull();
@@ -127,11 +139,14 @@ export const KindMenu = {
 export const KeyUnderOneSecond = {
     name: 'Key: Under 1 s',
     render: () => staged(<LoadingList band="under" />),
-    play: async ({ canvasElement }) => {
-        await expect(within(canvasElement).getByRole('table'), 'the old rows stay').toBeInTheDocument();
+    play: async ({ canvas, canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        await expect(canvas.getByRole('table'), 'the old rows stay').toBeInTheDocument();
         await expect(busy(canvasElement), 'nothing is marked busy yet').toBeNull();
         await expect(bars(canvasElement), 'no skeleton flashes').toHaveLength(0);
         await fitsCanvas(canvasElement);
+        await userEvent.click(canvas.getByRole('columnheader', { name: /Name/ }));
     },
 };
 
@@ -139,12 +154,14 @@ export const KeyUnderOneSecond = {
 export const KeyOverTenSeconds = {
     name: 'Key: Past 10 s, a Flag',
     render: () => staged(<LoadingList band="over" reduced={false} />),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await expect(bars(canvasElement).length, 'the skeleton stays').toBeGreaterThan(0);
         await waitFor(() => expect(canvas.getByText('Still loading students')).toBeInTheDocument());
         await expect(canvas.getByText(/you can keep working/), 'it says the person can keep working').toBeInTheDocument();
         await fitsCanvas(canvasElement);
+        await settleAnimations(canvasElement);
     },
 };
 
@@ -154,6 +171,8 @@ export const KeyLongJob = {
     render: () => staged(<LoadingPage band="over" reduced={false} />),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         const bar = canvas.getByRole('progressbar', { name: 'Importing roster' });
         await expect(bar).toHaveAttribute('aria-valuenow', '33');
         await expect(canvas.getByText('Importing roster · 40 of 120 students'), 'the words say what and how far').toBeInTheDocument();
@@ -165,12 +184,16 @@ export const KeyLongJob = {
 export const KeyMenuFailed = {
     name: 'Key: A menu that could not load',
     render: () => staged(<LoadingMenu band="over" />),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
+    play: async ({ canvas, canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await waitFor(() => expect(canvas.getByText("Couldn't load options")).toBeInTheDocument());
-        await expect(canvas.getByRole('menuitem', { name: /Retry/ }), 'Retry is on offer').toBeInTheDocument();
+        const retry = canvas.getByRole('menuitem', { name: /Retry/ });
+        await expect(retry, 'Retry is on offer').toBeInTheDocument();
         await expect(canvas.queryByText('Loading options')).toBeNull();
         await fitsCanvas(canvasElement);
+        await userEvent.click(retry);
+        await expect(await canvas.findByRole('menuitem', { name: 'Edit' })).toBeInTheDocument();
     },
 };
 
@@ -187,6 +210,8 @@ export const Timeline = {
     },
     render: ({ kind, seconds }) => staged(<LoadingTimeline kind={kind} seconds={seconds} reduced={false} />),
     play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
         await expect(within(canvasElement).getByText('1 to 10 s'), 'it opens in the 1 to 10 s band').toBeInTheDocument();
         await fitsCanvas(canvasElement);
     },
@@ -314,4 +339,3 @@ export const MotionLoadRevealReduced = {
     render: () => staged(<LoadingRevealDemo />),
     play: playLoadReveal(true),
 };
-

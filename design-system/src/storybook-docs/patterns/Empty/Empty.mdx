@@ -4,15 +4,15 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as EmptyStories from './Empty.stories.jsx';
 import { STAGE, SMALL_STAGE, TYPE_STAGE } from './emptyDemo.jsx';
+import {
+    BareStringCase,
+    HeaderOverNothingCase,
+    ReplacedTableCase,
+    WhatBelongsHereCase,
+} from './EmptyCases.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
-import {
-    BareString,
-    HeaderOverNothing,
-    ReplacedTable,
-    WhatBelongsHere,
-} from '@/storybook-docs/illustrations/empty.jsx';
 
 <Meta title="Patterns/States/Empty" tags={['manifest']} />
 
@@ -45,10 +45,10 @@ import {
 Choose among four situations to set the wording and available action. See <a target="_top" href="./?path=/docs/components-messaging-empty-state--docs">Empty state</a> for props.
 
 <TypeGrid>
-<TypeCard of={EmptyStories.TypeFirstUse} title="First use" stage={TYPE_STAGE}>Nothing has been added yet. Say what will appear and give the one action that adds it, if this person can.</TypeCard>
-<TypeCard of={EmptyStories.TypeNoMatches} title="No matches" stage={TYPE_STAGE}>A search or filter matched nothing. Name what is active and offer "Reset filters".</TypeCard>
-<TypeCard of={EmptyStories.TypeAllDone} title="All done" stage={TYPE_STAGE}>The person finished everything. Say so, and when more arrives. No action.</TypeCard>
-<TypeCard of={EmptyStories.TypeCantShow} title="Can't show" stage={TYPE_STAGE}>The data could not load, or this person has no access. Say why and give a way forward: Try again, or who can help.</TypeCard>
+<TypeCard of={EmptyStories.TypeFirstUse} to="#first-use" title="First use" stage={TYPE_STAGE}>Nothing has been added yet. Say what will appear and give the one action that adds it, if this person can.</TypeCard>
+<TypeCard of={EmptyStories.TypeNoMatches} to="#no-matches-in-a-table" title="No matches" stage={TYPE_STAGE}>A search or filter matched nothing. Name what is active and offer "Reset filters".</TypeCard>
+<TypeCard of={EmptyStories.TypeAllDone} to="#all-done" title="All done" stage={TYPE_STAGE}>The person finished everything. Say so, and when more arrives. No action.</TypeCard>
+<TypeCard of={EmptyStories.TypeCantShow} to="#a-load-failure" title="Can't show" stage={TYPE_STAGE}>The data could not load, or this person has no access. Say why and give a way forward: Try again, or who can help.</TypeCard>
 </TypeGrid>
 
 </div>
@@ -60,10 +60,10 @@ Choose among four situations to set the wording and available action. See <a tar
 The place sets the spacing and the alignment. The words stay the same.
 
 <TypeGrid>
-<TypeCard of={EmptyStories.PlaceFullPage} title="A full page" stage={STAGE}>The block lines up with the page title, left-aligned with no wide margin, the picture above the text. <PlannedTag /> The block is centered today.</TypeCard>
-<TypeCard of={EmptyStories.PlaceTable} title="In a table" stage={STAGE}>The empty state replaces the whole table: no column headers, no footer. The block is centered and its text stays left-aligned. <PlannedTag /> `EmptyState` centers the text today.</TypeCard>
-<TypeCard of={EmptyStories.PlaceCard} title="In a card" stage={SMALL_STAGE}>Compact: a smaller picture and heading, the block centered in the card, the text left-aligned. Several cards at once drop their pictures and use Subtle actions. <PlannedTag /> The text is centered today.</TypeCard>
-<TypeCard of={EmptyStories.PlacePanel} title="In a Panel" stage={SMALL_STAGE}>The Details Panel when its record was removed: the block at the top of the body, with a way back.</TypeCard>
+<TypeCard of={EmptyStories.PlaceFullPage} to="#a-full-page" title="A full page" stage={STAGE}>The block lines up with the page title, left-aligned with no wide margin, the picture above the text. <PlannedTag /> The block is centered today.</TypeCard>
+<TypeCard of={EmptyStories.PlaceTable} to="#no-matches-in-a-table" title="In a table" stage={STAGE}>The empty state replaces the whole table: no column headers, no footer. The block is centered and its text stays left-aligned. <PlannedTag /> `EmptyState` centers the text today.</TypeCard>
+<TypeCard of={EmptyStories.PlaceCard} to="#in-a-card" title="In a card" stage={SMALL_STAGE}>Compact: a smaller picture and heading, the block centered in the card, the text left-aligned. Several cards at once drop their pictures and use Subtle actions. <PlannedTag /> The text is centered today.</TypeCard>
+<TypeCard of={EmptyStories.PlacePanel} to="#in-a-panel" title="In a Panel" stage={SMALL_STAGE}>The Details Panel when its record was removed: the block at the top of the body, with a way back.</TypeCard>
 </TypeGrid>
 
 </div>
@@ -72,11 +72,21 @@ The place sets the spacing and the alignment. The words stay the same.
 
 ## Key cases
 
-<ComponentExample of={EmptyStories.KeyNoMatchesInTable} title="No matches in a table" description="The view bar stays so the person can change the view, search or reset; the table is gone. &quot;Reset filters&quot; is a Default button, and it also clears the search." />
+<ComponentExample of={EmptyStories.TypeFirstUse} title="First use" description="Click Add students to fill the group." />
 
-<ComponentExample of={EmptyStories.KeyLoadFailure} title="A load failure" description="Content that fails to load shows its error in the empty-state slot, with Try again. The words belong to the Errors pattern." />
+<ComponentExample of={EmptyStories.TypeAllDone} title="All done" />
 
-<ComponentExample of={EmptyStories.TypeNoAccess} title="No access" description="The same slot says why and who can help. There is no button for an action this person cannot take." />
+<ComponentExample of={EmptyStories.PlaceFullPage} title="A full page" description="Click Add students to populate the page." />
+
+<ComponentExample of={EmptyStories.PlaceCard} title="In a card" />
+
+<ComponentExample of={EmptyStories.PlacePanel} title="In a Panel" description="Click Back to sessions to return to the table." />
+
+<ComponentExample of={EmptyStories.KeyNoMatchesInTable} title="No matches in a table" description="Click Reset filters or switch view tabs to bring back the rows." />
+
+<ComponentExample of={EmptyStories.KeyLoadFailure} title="A load failure" description="Click Try again or switch view tabs to retry loading." />
+
+<ComponentExample of={EmptyStories.TypeNoAccess} title="No access" />
 
 </div>
 
@@ -129,9 +139,9 @@ Use Empty when a list, table, card, Panel or page has no records to show, a sear
 Never a blank area or a bare "No results": a blank reads as broken or still loading.
 
 <DoDontPair
-    doExample={<WhatBelongsHere />}
+    doExample={<WhatBelongsHereCase />}
     doCaption="Say what belongs here and give the one action that fills it."
-    dontExample={<BareString />}
+    dontExample={<BareStringCase />}
     dontCaption="A bare string in an empty box: broken, loading or empty, nobody can tell."
 />
 
@@ -148,9 +158,9 @@ The picture above, then the heading, one line and the action, all on one left ed
 No column headers and no footer while the table is empty; the view bar above stays, so the person can change the view, search or reset. A "No matches" state offers "Reset filters".
 
 <DoDontPair
-    doExample={<ReplacedTable />}
+    doExample={<ReplacedTableCase />}
     doCaption="The whole table replaced; the view bar stays."
-    dontExample={<HeaderOverNothing />}
+    dontExample={<HeaderOverNothingCase />}
     dontCaption="Column headers and a footer over nothing, with a centered paragraph."
 />
 

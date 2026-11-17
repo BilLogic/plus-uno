@@ -97,7 +97,7 @@ export const LoadingList = ({ band = 'shape', first = false, reduced }) => (
                 reducedMotion={reduced}
                 skeleton={({ reduced: isReduced }) => <SkeletonRows reduced={isReduced} />}
             >
-                {first ? <div style={{ minBlockSize: BLANK }} /> : <StudentsTable count={4} />}
+                {first ? <div style={{ minBlockSize: BLANK }} /> : <StudentsTable count={4} sortable />}
             </LoadThenReveal>
         </PatternSection>
         <LiveLabel>{band === 'under' ? '' : 'Loading students…'}</LiveLabel>
@@ -110,18 +110,22 @@ export const LoadingList = ({ band = 'shape', first = false, reduced }) => (
  * from 1 s a spinner inside the button, the fields as they were; past 10 s a
  * Flag says it is still working.
  */
-export const LoadingAction = ({ band = 'shape' }) => (
-    <div style={stack}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', maxInlineSize: ACTION_WIDTH }}>
-            <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>Ana Ruiz · Thursday at 4:00 PM · Lincoln Middle</p>
-            <div style={{ display: 'flex', gap: 'var(--inline-md)' }}>
-                <Button text="Save session" appearance="primary" isLoading={band !== 'under'} onClick={noop} />
-                <Button text="Cancel" appearance="subtle" onClick={noop} />
+export const LoadingAction = ({ band = 'shape' }) => {
+    const [cancelled, setCancelled] = useState(false);
+    useEffect(() => { setCancelled(false); }, [band]);
+    return (
+        <div style={stack}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', maxInlineSize: ACTION_WIDTH }}>
+                <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>Ana Ruiz · Thursday at 4:00 PM · Lincoln Middle</p>
+                <div style={{ display: 'flex', gap: 'var(--inline-md)' }}>
+                    <Button text="Save session" appearance="primary" isLoading={band !== 'under' && !cancelled} onClick={noop} />
+                    <Button text="Cancel" appearance="subtle" onClick={() => setCancelled(true)} />
+                </div>
             </div>
+            {band === 'over' && !cancelled && <WaitFlag title="Still saving the session">You can leave this page; we will tell you when it is saved.</WaitFlag>}
         </div>
-        {band === 'over' && <WaitFlag title="Still saving the session">You can leave this page; we will tell you when it is saved.</WaitFlag>}
-    </div>
-);
+    );
+};
 
 /** A whole page: under 1 s the previous page stays; from 1 s the Frame and header draw and each Section holds a skeleton; past 10 s a labeled progress bar. */
 export const LoadingPage = ({ band = 'shape', reduced }) => (
@@ -151,6 +155,8 @@ export const LoadingPage = ({ band = 'shape', reduced }) => (
  */
 export const LoadingMenu = ({ band = 'shape' }) => {
     const [setMount, mount] = useLayerMount();
+    const [retried, setRetried] = useState(false);
+    useEffect(() => { setRetried(false); }, [band]);
     return (
         <div ref={setMount} style={{ position: 'relative', boxSizing: 'border-box', padding: 'var(--page-pad)', minBlockSize: MENU_ROOM }}>
             {mount && (
@@ -159,8 +165,8 @@ export const LoadingMenu = ({ band = 'shape' }) => {
                     onOpenChange={noop}
                     container={mount}
                     loading={band === 'shape'}
-                    hasError={band === 'over'}
-                    onRetry={noop}
+                    hasError={band === 'over' && !retried}
+                    onRetry={() => setRetried(true)}
                     trigger={<IconButton icon="ellipsis" label="More" appearance="subtle" onClick={noop} />}
                 >
                     <ButtonItem onClick={noop}>Edit</ButtonItem>
@@ -281,4 +287,3 @@ export const LoadingRevealDemo = () => {
         </div>
     );
 };
-
