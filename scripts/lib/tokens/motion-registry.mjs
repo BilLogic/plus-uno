@@ -468,7 +468,7 @@ export const MOTION_REGISTRY = [
     tier: 'component',
     events: {
       enter: { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.default', note: 'Scales from 96% while it fades in; the Blanket dims on the same fade.' },
-      exit: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Scales to 98% while it fades.' },
+      exit: { transition: 'Open and close an overlay', spatial: 'spatial.exit', appearance: 'appearance.fast', note: 'Scales to 98% while it fades.' },
       rejected: { transition: 'Call attention', spatial: 'spatial.fast', note: 'A blocked submit shakes it once; never in reduced motion.' },
     },
   },
