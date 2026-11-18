@@ -135,11 +135,21 @@ jobs:
         # order and key order. An unchanged library whose snapshot on main is
         # past half check:figma-snapshots' age ceiling reads as `date-only`, so
         # the refresh can clear that check. A file that is not JSON fails here
-        # rather than reading as a change.
+        # rather than reading as a change. When anything changed, it writes the
+        # PR body naming every changed component.
+        env:
+          BASE: ${{ github.event.repository.default_branch }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
           git show "HEAD:$SNAPSHOT" > "$RUNNER_TEMP/main-snapshot.json"
           node scripts/figma-snapshot-verdict.mjs "$RUNNER_TEMP/main-snapshot.json" "$SNAPSHOT" \
+            --pr-body "$RUNNER_TEMP/pr-body.md" \
+            --delta-file "$RUNNER_TEMP/delta.md" \
+            --base "$BASE" \
+            --branch "$BRANCH" \
+            --snapshot "$SNAPSHOT" \
+            --run-url "$RUN_URL" \
             | tee -a "$GITHUB_OUTPUT"
 
       - name: No change
@@ -198,32 +208,9 @@ jobs:
           BASE: ${{ github.event.repository.default_branch }}
           OWNER: ${{ github.repository_owner }}
           VERDICT: ${{ steps.compare.outputs.verdict }}
-          AGE_DAYS: ${{ steps.compare.outputs.age_days }}
-          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
           BODY="$RUNNER_TEMP/pr-body.md"
-          {
-            echo "Refreshes \`$SNAPSHOT\` from the published Figma library."
-            echo
-            if [ "$VERDICT" = "date-only" ]; then
-              echo "**Date refresh only.** The published library matches $BASE. This PR moves \`lastChecked\` forward because the snapshot on $BASE was ${AGE_DAYS:-an unreadable number of} days old, past half of the \`check:figma-snapshots\` age ceiling."
-              echo
-            fi
-            echo "## Delta"
-            echo
-            cat "$RUNNER_TEMP/delta.md"
-            echo
-            echo "Counts are published variants, and \"sets changed\" names the component sets they belong to. The delta covers adds, removals and renames only. A change with no set named is somewhere else: a variant's \`description\` or \`nodeId\`, a node hash (a visual edit), or the publish history."
-            echo
-            echo "## Before merging"
-            echo
-            echo "This PR was opened by the workflow's \`GITHUB_TOKEN\`, and GitHub starts no other workflow from that token's events, so **the pull_request checks have not run**. To run them, close this PR and reopen it. Mark it ready for review once they pass."
-            echo
-            echo "Each later run force-pushes \`$BRANCH\` and rewrites this description, and its checks need another close and reopen. A later run that finds no change closes this PR."
-            echo
-            echo "Opened by [Refresh Figma Component Snapshot]($RUN_URL)."
-          } > "$BODY"
 
           PR=$(gh pr list --head "$BRANCH" --base "$BASE" --state open \
             --json number,headRepositoryOwner,isCrossRepository \

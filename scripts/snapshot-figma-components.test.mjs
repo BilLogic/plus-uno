@@ -23,9 +23,13 @@ import { fileURLToPath } from 'node:url';
 import {
   DEFAULT_FILE_KEY,
   MISSING_TOKEN,
+  buildRefreshPrBody,
+  changedComponents,
   changedSets,
   diff,
+  hashNodeDocument,
   isIgnored,
+  projectNode,
   refreshVerdict,
   rowsFrom,
   setsIn,
@@ -508,3 +512,256 @@ for (const endpoint of ['/components', '/versions']) {
     assert.equal(fs.readFileSync(live, 'utf8'), before);
   });
 }
+
+// ── canonical node hashing & PR body (#2799) ────────────────────────────────
+
+function recordedNodeFixtures() {
+  return {
+    '10:1': {
+      document: {
+        id: '10:1',
+        name: 'appearance=primary, state=default',
+        type: 'COMPONENT',
+        layoutMode: 'HORIZONTAL',
+        paddingLeft: 16,
+        paddingRight: 16,
+        itemSpacing: 8,
+        cornerRadius: 8,
+        size: { x: 120, y: 40 },
+        absoluteBoundingBox: { x: 100, y: 200, width: 120, height: 40 },
+        absoluteRenderBounds: { x: 100, y: 200, width: 120, height: 40 },
+        fills: [
+          {
+            type: 'SOLID',
+            color: { r: 0.1, g: 0.2, b: 0.8, a: 1 },
+            boundVariables: { color: { type: 'VARIABLE_ALIAS', id: 'VariableID:1:10' } },
+          },
+        ],
+        strokes: [],
+        effects: [{ type: 'DROP_SHADOW', visible: true, radius: 4, offset: { x: 0, y: 2 } }],
+        styles: { fill: 'S:fill-primary' },
+        componentPropertyDefinitions: {
+          'Label#10:0': { type: 'TEXT', defaultValue: 'Save' },
+        },
+        pluginData: { figmaTokens: { syncedAt: '2026-11-16T00:00:00Z' } },
+        sharedPluginData: { codeConnect: { stamp: 'run-1' } },
+        devStatus: { type: 'READY_FOR_DEV' },
+        fillGeometry: [{ path: 'M0 0L120 0L120 40L0 40Z', windingRule: 'NONZERO' }],
+        children: [
+          {
+            id: 'I10:1;10:2',
+            name: 'Label',
+            type: 'TEXT',
+            characters: 'Save',
+            visible: true,
+            style: { fontFamily: 'Inter', fontSize: 14, fontWeight: 600 },
+            componentPropertyReferences: { characters: 'Label#10:0' },
+            pluginData: { noise: 'a' },
+          },
+        ],
+      },
+    },
+    '10:2': {
+      document: {
+        id: '10:2',
+        name: 'tone=neutral, size=sm',
+        type: 'COMPONENT',
+        layoutMode: 'HORIZONTAL',
+        size: { x: 64, y: 24 },
+        fills: [{ type: 'SOLID', color: { r: 0.9, g: 0.9, b: 0.9, a: 1 } }],
+        strokes: [{ type: 'SOLID', color: { r: 0.7, g: 0.7, b: 0.7, a: 1 } }],
+        strokeWeight: 1,
+        boundVariables: { topLeftRadius: { type: 'VARIABLE_ALIAS', id: 'VariableID:2:5' } },
+        children: [
+          {
+            id: '10:3',
+            name: 'Icon',
+            type: 'INSTANCE',
+            componentId: '99:1',
+            componentProperties: {
+              'Show#99:0': { type: 'BOOLEAN', value: true },
+            },
+            overrides: [{ id: 'I10:3;99:2', overriddenFields: ['fills'] }],
+          },
+        ],
+      },
+    },
+  };
+}
+
+function shuffleKeys(value) {
+  if (Array.isArray(value)) return value.map(shuffleKeys);
+  if (value && typeof value === 'object') {
+    const entries = Object.entries(value).reverse().map(([k, v]) => [k, shuffleKeys(v)]);
+    return Object.fromEntries(entries);
+  }
+  return value;
+}
+
+test('two fetches of an unchanged file give identical hashes despite volatile fields and key order', async () => {
+  const rows = [
+    { key: 'k1', name: 'appearance=primary, state=default', description: '', nodeId: '10:1', containingFrame: 'Button' },
+    { key: 'k2', name: 'tone=neutral, size=sm', description: '', nodeId: '10:2', containingFrame: 'Tag' },
+  ];
+
+  const fetch1Nodes = recordedNodeFixtures();
+  const fetch2Nodes = shuffleKeys(recordedNodeFixtures());
+  // Mutate volatile / version-dependent / reissued fields on fetch 2.
+  fetch2Nodes['10:1'].document.id = '999:1';
+  fetch2Nodes['10:1'].document.pluginData = { figmaTokens: { syncedAt: '2026-11-18T00:00:00Z' } };
+  fetch2Nodes['10:1'].document.sharedPluginData = { codeConnect: { stamp: 'run-2' }, extra: true };
+  fetch2Nodes['10:1'].document.devStatus = { type: 'NONE' };
+  fetch2Nodes['10:1'].document.absoluteBoundingBox = { x: 800, y: 1200, width: 120, height: 40 };
+  fetch2Nodes['10:1'].document.absoluteRenderBounds = { x: 800, y: 1200, width: 120, height: 40 };
+  fetch2Nodes['10:1'].document.fillGeometry = [{ path: 'M0 0L120 0L120 40L0 40Z', windingRule: 'EVENODD' }];
+  fetch2Nodes['10:1'].document.children[0].id = 'I999:1;888:2';
+  fetch2Nodes['10:1'].document.children[0].pluginData = { noise: 'b' };
+  fetch2Nodes['10:2'].document.children[0].id = '777:3';
+  fetch2Nodes['10:2'].document.children[0].componentId = '99:999';
+  fetch2Nodes['10:2'].document.children[0].overrides = [{ id: 'I777:3;99:99', overriddenFields: ['fills'] }];
+
+  const first = await fetchNodeHashes(rows, 'KEY', 'tok', async () => ({ nodes: fetch1Nodes }), 0);
+  const second = await fetchNodeHashes(rows, 'KEY', 'tok', async () => ({ nodes: fetch2Nodes }), 0);
+
+  assert.deepEqual(first.failed, []);
+  assert.deepEqual(second.failed, []);
+  assert.deepEqual(second.hashes, first.hashes);
+  assert.equal(projectNode(fetch1Nodes['10:1'].document).pluginData, undefined);
+});
+
+test('a real edit (a fill or a property change) changes only that component hash', async () => {
+  const rows = [
+    { key: 'k1', name: 'appearance=primary, state=default', description: '', nodeId: '10:1', containingFrame: 'Button' },
+    { key: 'k2', name: 'tone=neutral, size=sm', description: '', nodeId: '10:2', containingFrame: 'Tag' },
+  ];
+
+  const base = await fetchNodeHashes(rows, 'KEY', 'tok', async () => ({ nodes: recordedNodeFixtures() }), 0);
+
+  // Fill edit on 10:1 only
+  const fillEditNodes = recordedNodeFixtures();
+  fillEditNodes['10:1'].document.fills[0].color.r = 0.5;
+  const afterFill = await fetchNodeHashes(rows, 'KEY', 'tok', async () => ({ nodes: fillEditNodes }), 0);
+  assert.notEqual(afterFill.hashes['10:1'], base.hashes['10:1'], 'fill change updates Button hash');
+  assert.equal(afterFill.hashes['10:2'], base.hashes['10:2'], 'unchanged Tag hash stays identical');
+
+  // Component property edit on 10:2 only
+  const propEditNodes = recordedNodeFixtures();
+  propEditNodes['10:2'].document.children[0].componentProperties['Show#99:0'].value = false;
+  const afterProp = await fetchNodeHashes(rows, 'KEY', 'tok', async () => ({ nodes: propEditNodes }), 0);
+  assert.equal(afterProp.hashes['10:1'], base.hashes['10:1'], 'unchanged Button hash stays identical');
+  assert.notEqual(afterProp.hashes['10:2'], base.hashes['10:2'], 'property change updates Tag hash');
+});
+
+test('hashNodeDocument detects changes across all design fields', () => {
+  const doc = recordedNodeFixtures()['10:1'].document;
+  const baseHash = hashNodeDocument(doc);
+  const mutate = (fn) => {
+    const copy = structuredClone(doc);
+    fn(copy);
+    return hashNodeDocument(copy);
+  };
+  assert.notEqual(mutate((d) => { d.name = 'appearance=secondary'; }), baseHash);
+  assert.notEqual(mutate((d) => { d.paddingLeft = 20; }), baseHash);
+  assert.notEqual(mutate((d) => { d.strokes = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0, a: 1 } }]; }), baseHash);
+  assert.notEqual(mutate((d) => { d.effects = []; }), baseHash);
+  assert.notEqual(mutate((d) => { d.styles.fill = 'S:other'; }), baseHash);
+  assert.notEqual(mutate((d) => { d.children[0].characters = 'Cancel'; }), baseHash);
+  assert.notEqual(mutate((d) => { d.children[0].visible = false; }), baseHash);
+  assert.notEqual(mutate((d) => { d.componentPropertyDefinitions['Label#10:0'].defaultValue = 'Go'; }), baseHash);
+});
+
+test('no PR is opened when nothing changed, and the PR body names the changed components', () => {
+  const rows = [
+    { key: 'k1', name: 'appearance=primary, state=default', description: '', nodeId: '10:1', containingFrame: 'Button' },
+    { key: 'k2', name: 'tone=neutral, size=sm', description: '', nodeId: '10:2', containingFrame: 'Tag' },
+  ];
+  const baseHashes = {
+    '10:1': hashNodeDocument(recordedNodeFixtures()['10:1'].document),
+    '10:2': hashNodeDocument(recordedNodeFixtures()['10:2'].document),
+  };
+  const before = snapshotFrom({ rows, versions: [], nodeHashes: baseHashes, fileKey: DEFAULT_FILE_KEY, now: new Date('2026-11-16T00:00:00Z') });
+
+  // Second fetch with volatile churn only -> identical hashes -> verdict is unchanged (workflow opens no PR)
+  const unchangedNodes = shuffleKeys(recordedNodeFixtures());
+  unchangedNodes['10:1'].document.pluginData = { changed: true };
+  const afterUnchanged = snapshotFrom({
+    rows,
+    versions: [],
+    nodeHashes: {
+      '10:1': hashNodeDocument(unchangedNodes['10:1'].document),
+      '10:2': hashNodeDocument(unchangedNodes['10:2'].document),
+    },
+    fileKey: DEFAULT_FILE_KEY,
+    now: new Date('2026-11-18T00:00:00Z'),
+  });
+  assert.equal(
+    refreshVerdict(before, afterUnchanged, { now: new Date('2026-11-18T00:00:00Z'), maxAgeDays: 180 }).verdict,
+    'unchanged',
+  );
+
+  // Real edit on 10:1 only -> PR body lists Button / appearance=primary, state=default by name
+  const editedNodes = recordedNodeFixtures();
+  editedNodes['10:1'].document.fills[0].color.r = 0.4;
+  const afterEdited = snapshotFrom({
+    rows,
+    versions: [],
+    nodeHashes: {
+      '10:1': hashNodeDocument(editedNodes['10:1'].document),
+      '10:2': hashNodeDocument(editedNodes['10:2'].document),
+    },
+    fileKey: DEFAULT_FILE_KEY,
+    now: new Date('2026-11-18T00:00:00Z'),
+  });
+  assert.equal(
+    refreshVerdict(before, afterEdited, { now: new Date('2026-11-18T00:00:00Z'), maxAgeDays: 180 }).verdict,
+    'changed',
+  );
+
+  const changes = changedComponents(before, afterEdited);
+  assert.deepEqual(changes.names, ['Button / appearance=primary, state=default']);
+
+  const body = buildRefreshPrBody({
+    before,
+    after: afterEdited,
+    verdict: 'changed',
+    ageDays: 2,
+    deltaLog: '[snapshot:figma-components] 2 published components in 2 sets.',
+    base: 'main',
+    branch: 'chore/figma-snapshot-refresh',
+    snapshotPath: 'scripts/figma-component-snapshot.json',
+    runUrl: 'https://github.com/BilLogic/plus-uno/actions/runs/1',
+  });
+  assert.match(body, /Button \/ appearance=primary, state=default/);
+  assert.doesNotMatch(body, /Tag \/ tone=neutral, size=sm/);
+  assert.doesNotMatch(body, /\b1 hash(es)? changed\b/i);
+
+  // Workflow check: unchanged verdict gates out PR creation, and Compare passes --pr-body
+  const workflow = fs.readFileSync(path.join(REPO_ROOT, '.github/workflows/figma-snapshot-refresh.yml'), 'utf8');
+  assert.match(workflow, /--pr-body/);
+  assert.match(workflow, /if:\s*steps\.compare\.outputs\.verdict\s*!=\s*'unchanged'/);
+});
+
+test('the verdict CLI writes a PR body naming changed components and skips writing when unchanged', () => {
+  const cli = path.join(REPO_ROOT, 'scripts/figma-snapshot-verdict.mjs');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'verdict-pr-'));
+  const beforePath = path.join(dir, 'before.json');
+  const unchangedPath = path.join(dir, 'unchanged.json');
+  const editedPath = path.join(dir, 'edited.json');
+  const prBodyPath = path.join(dir, 'pr-body.md');
+
+  const today = new Date().toISOString();
+  const baseSnap = snap(today);
+  fs.writeFileSync(beforePath, JSON.stringify(baseSnap));
+  fs.writeFileSync(unchangedPath, JSON.stringify({ ...baseSnap, lastChecked: new Date().toISOString() }));
+  fs.writeFileSync(editedPath, JSON.stringify({ ...baseSnap, nodeHashes: { '1:1': 'edited', '1:2': 'h2' } }));
+
+  const outUnchanged = execFileSync('node', [cli, beforePath, unchangedPath, '--pr-body', prBodyPath], { encoding: 'utf8' });
+  assert.match(outUnchanged, /^verdict=unchanged\n/);
+  assert.equal(fs.existsSync(prBodyPath), false, 'no PR body written when unchanged');
+
+  const outChanged = execFileSync('node', [cli, beforePath, editedPath, '--pr-body', prBodyPath], { encoding: 'utf8' });
+  assert.match(outChanged, /^verdict=changed\n/);
+  const body = fs.readFileSync(prBodyPath, 'utf8');
+  assert.match(body, /A \/ a/);
+  assert.doesNotMatch(body, /B \/ b/);
+});
