@@ -12,6 +12,7 @@ import {
     Modal,
     Page,
     Popup,
+    Rect,
     Row,
     Rule,
     Section,
@@ -716,20 +717,31 @@ export const LayerDiagramPanel = ({ variant }) => {
     );
 };
 
-/** Side-by-side row pairing a LayerDiagramPanel with its usage prose. */
+/** Side-by-side row pairing a LayerDiagramPanel with its usage prose in a 2:1 desktop split that stacks when narrow. */
 export const LayerDetailRow = ({ variant, children }) => (
     <div
+        data-layer-detail={variant}
         style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-md)), 1fr))',
+            display: 'flex',
+            flexWrap: 'wrap',
             gap: 'var(--grid-gutter)',
-            alignItems: 'start',
+            alignItems: 'flex-start',
         }}
     >
-        <div style={{ gridColumn: 'span 1' }}>
+        <div style={{ flex: '2 1 var(--grid-gutter)', minWidth: 'min(100%, var(--section-min-width-main))' }}>
             <LayerDiagramPanel variant={variant} />
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+        <div
+            style={{
+                flex: '1 1 0',
+                minWidth: 'min(100%, var(--section-min-width-side))',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 'var(--stack-sm)',
+                font: 'var(--body-default)',
+                color: 'var(--ds-text)',
+            }}
+        >
             {children}
         </div>
     </div>
@@ -817,12 +829,46 @@ export const ByTemplateGrid = () => (
                     >
                         <StickyHeader x={10} y={12} w={140} h={60} />
                     </TemplateTile>
+                    <TemplateTile
+                        title="Empty box"
+                        description="Sunken: the table’s empty state"
+                        tokens="--ds-surface-sunken"
+                        ariaTitle="Empty state box on the sunken surface replacing a table"
+                    >
+                        <Rect x={14} y={8} w={132} h={68} fill={PAINT.frameSunken} corner="card" />
+                        <Rect x={72} y={16} w={16} h={16} stroke={PAINT.placeholderHeading} corner="icon" />
+                        <SkeletonBar x={46} y={39} w={68} />
+                        <SkeletonBar x={56} y={47} w={48} />
+                        <ButtonShape x={58} y={58} w={44} />
+                    </TemplateTile>
                 </div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
                 <h4 style={{ margin: 0, font: 'var(--heading-sm)', color: 'var(--ds-text)' }}>Card</h4>
                 <div style={TEMPLATE_GRID_STYLE}>
+                    <TemplateTile
+                        title="Sunken card"
+                        description="Sunken, flat (static), the default card"
+                        tokens="--ds-surface-sunken"
+                        ariaTitle="Sunken card on the sunken surface with no shadow or border"
+                    >
+                        <Rect x={18} y={14} w={124} h={56} fill={PAINT.frameSunken} corner="card" />
+                        <SkeletonBar x={28} y={25} w={52} heading />
+                        <SkeletonBar x={28} y={36} w={84} />
+                        <SkeletonBar x={28} y={45} w={68} />
+                    </TemplateTile>
+                    <TemplateTile
+                        title="Default card"
+                        description="Default: bordered, flat; on the Frame, Sunken or colored areas, or dense"
+                        tokens="--ds-surface · --ds-border"
+                        ariaTitle="Default card on the default surface with a hairline border"
+                    >
+                        <Rect x={18} y={14} w={124} h={56} fill={PAINT.pageSurface} stroke={PAINT.frameDivider} corner="card" />
+                        <SkeletonBar x={28} y={25} w={52} heading />
+                        <SkeletonBar x={28} y={36} w={84} />
+                        <SkeletonBar x={28} y={45} w={68} />
+                    </TemplateTile>
                     <TemplateTile
                         title="Primary card"
                         description="Raised at rest, one per view"
@@ -835,8 +881,32 @@ export const ByTemplateGrid = () => (
                         <ButtonShape x={26} y={48} w={40} appearance="primary" />
                     </TemplateTile>
                     <TemplateTile
+                        title="Clickable card, rest"
+                        description="Sunken, flat in a grid"
+                        tokens="--ds-surface-sunken"
+                        ariaTitle="Clickable cards at rest on the sunken surface in a grid"
+                    >
+                        <Rect x={12} y={14} w={64} h={56} fill={PAINT.frameSunken} corner="card" />
+                        <SkeletonBar x={20} y={24} w={36} heading />
+                        <SkeletonBar x={20} y={34} w={26} />
+                        <Rect x={84} y={14} w={64} h={56} fill={PAINT.frameSunken} corner="card" />
+                        <SkeletonBar x={92} y={24} w={32} heading />
+                    </TemplateTile>
+                    <TemplateTile
+                        title="Clickable card, hover"
+                        description="Raised on hover: raised pair, no movement"
+                        tokens="--ds-surface-raised · --ds-shadow-raised"
+                        ariaTitle="Clickable card on hover lifted onto the raised surface and shadow"
+                    >
+                        <CardBox x={12} y={14} w={64} h={56} />
+                        <SkeletonBar x={20} y={24} w={36} heading />
+                        <SkeletonBar x={20} y={34} w={26} />
+                        <Rect x={84} y={14} w={64} h={56} fill={PAINT.frameSunken} corner="card" />
+                        <SkeletonBar x={92} y={24} w={32} heading />
+                    </TemplateTile>
+                    <TemplateTile
                         title="Dragged card"
-                        description="leaves the page for Layer 3 · Non-blocking overlay"
+                        description="leaves the page for L3"
                         tokens="--ds-surface-overlay · --ds-shadow-overlay"
                         ariaTitle="Dragged card lifted onto the overlay surface and shadow"
                     >
@@ -855,10 +925,10 @@ export const ByTemplateGrid = () => (
 /* ----------------------------------------------------- shadow ramp figures */
 
 const RAMP_STEPS = [
-    { id: 'raised', label: 'raised', surface: '--ds-surface-raised', shadow: '--ds-shadow-raised' },
-    { id: 'overflow', label: 'overflow', surface: '--ds-surface', shadow: '--ds-shadow-overflow' },
-    { id: 'overlay', label: 'overlay', surface: '--ds-surface-overlay', shadow: '--ds-shadow-overlay' },
-    { id: 'blocking', label: 'blocking', surface: '--ds-surface-overlay', shadow: '--ds-shadow-blocking' },
+    { id: 'raised', label: 'raised', fill: PAINT.cardSurface, shadow: PAINT.cardShadow },
+    { id: 'overflow', label: 'overflow', fill: PAINT.pageSurface, shadow: PAINT.overflowShadow },
+    { id: 'overlay', label: 'overlay', fill: PAINT.popupSurface, shadow: PAINT.popupShadow },
+    { id: 'blocking', label: 'blocking', fill: PAINT.modalSurface, shadow: PAINT.modalShadow },
 ];
 
 /** Shadow ramp key figure: four shadows in layer order, shown side by side in light and dark. */
@@ -906,16 +976,11 @@ export const ShadowRampFigure = () => (
                                     gap: 'var(--stack-md)',
                                 }}
                             >
-                                <div
-                                    data-shadow-step={step.id}
-                                    style={{
-                                        width: 'var(--image-xl)',
-                                        height: 'var(--image-xl)',
-                                        borderRadius: 'var(--radius-full)',
-                                        background: `var(${step.surface})`,
-                                        boxShadow: `var(${step.shadow})`,
-                                    }}
-                                />
+                                <div data-shadow-step={step.id} style={{ width: '100%' }}>
+                                    <Illustration width={84} height={84} capped={false} title={`${step.label} shadow in ${mode} mode`}>
+                                        <Layer x={18} y={14} w={48} h={48} fill={step.fill} shadow={step.shadow} corner="full" />
+                                    </Illustration>
+                                </div>
                                 <span
                                     style={{
                                         textAlign: 'center',
@@ -946,6 +1011,12 @@ const formatLayerSummary = (layer) => {
     }
     return `${layer.x} ${layer.y}px ${layer.blur}px · ${pct}`;
 };
+
+const EquationDisc = ({ shadow, title }) => (
+    <Illustration width={72} height={72} title={title}>
+        <Layer x={16} y={14} w={40} h={40} fill={PAINT.modalSurface} shadow={shadow} corner="full" />
+    </Illustration>
+);
 
 /** Edge + Key + Ambient = --ds-shadow-blocking, reading live resolved values from the page. */
 export const ShadowTokensEquation = () => {
@@ -980,14 +1051,6 @@ export const ShadowTokensEquation = () => {
         },
     ];
 
-    const discStyle = (shadow) => ({
-        width: 'var(--image-lg)',
-        height: 'var(--image-lg)',
-        borderRadius: 'var(--radius-full)',
-        background: 'var(--ds-surface-overlay)',
-        boxShadow: shadow,
-    });
-
     return (
         <ElevationPanel ref={probeRef} data-testid="shadow-equation">
             <div
@@ -1012,7 +1075,7 @@ export const ShadowTokensEquation = () => {
                                 textAlign: 'center',
                             }}
                         >
-                            <div style={discStyle(part.boxShadow)} />
+                            <EquationDisc shadow={part.boxShadow} title={`${part.title} shadow layer`} />
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                                 <strong style={{ font: 'var(--body-default)', fontWeight: 'inherit', color: 'var(--ds-text)' }}>
                                     {part.title}
@@ -1044,7 +1107,7 @@ export const ShadowTokensEquation = () => {
                         textAlign: 'center',
                     }}
                 >
-                    <div style={discStyle('var(--ds-shadow-blocking)')} />
+                    <EquationDisc shadow={PAINT.modalShadow} title="Composite --ds-shadow-blocking shadow" />
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                         <strong style={{ font: 'var(--code-default)', fontWeight: 'inherit', color: 'var(--ds-text)' }}>
                             --ds-shadow-blocking

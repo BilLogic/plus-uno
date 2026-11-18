@@ -75,15 +75,16 @@ Layer 1 has three surfaces: Default, Sunken and Raised.
 
 ### Default
 
-Most of the page: a Section and its side, tables, lists, forms; rows are hairlines.
+Most of the page: a Section and its side, tables, lists, forms; rows are hairlines. A Default card is this surface with a border.
 
 #### Usage & styling
 
 - **A Section takes no surface:** no fill, no padding, no border.
+- **A Default card** takes `--ds-border`: on the Frame, on Sunken or colored areas, or when dense with its own rows.
 
 ### Sunken
 
-A backdrop that groups static content, such as a subtle Section.
+A backdrop that groups static content: a Card (the default surface), the empty box, a clickable card at rest.
 
 #### Usage & styling
 

@@ -5,7 +5,9 @@ import { Blanket, PatternCard, PatternSection, PatternTable } from '@/patterns';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
 import { Illustration } from '@/storybook-docs/illustrations/Illustration.jsx';
-import { Flag as FlagIllustration, Layer, SkeletonBar } from '@/storybook-docs/illustrations/primitives.jsx';
+import { Flag as FlagIllustration, Layer, Rect, SkeletonBar } from '@/storybook-docs/illustrations/primitives.jsx';
+import { PAINT } from '@/storybook-docs/illustrations/paint.js';
+import { usePageContrast } from '@/storybook-docs/lib/use-page-contrast.js';
 import {
     BehaviorGuide,
     ByTemplateGrid,
@@ -712,12 +714,14 @@ export const Ramp = {
 
         const steps = ['raised', 'overflow', 'overlay', 'blocking'];
         for (const mode of modes) {
-            const discs = [...mode.querySelectorAll('[data-shadow-step]')];
-            await expect(discs.map((d) => d.dataset.shadowStep)).toEqual(steps);
-            const discRects = discs.map((d) => d.getBoundingClientRect());
+            const stepWraps = [...mode.querySelectorAll('[data-shadow-step]')];
+            await expect(stepWraps.map((d) => d.dataset.shadowStep)).toEqual(steps);
+            const discs = stepWraps.map((w) => w.querySelector('foreignObject div'));
             for (const disc of discs) {
+                await expect(disc).not.toBeNull();
                 await expect(getComputedStyle(disc).boxShadow).not.toBe('none');
             }
+            const discRects = discs.map((d) => d.getBoundingClientRect());
             for (let i = 0; i < discRects.length; i += 1) {
                 await expect(discRects[i].width, `${steps[i]} disc width`).toBeGreaterThanOrEqual(40);
                 await expect(discRects[i].height, `${steps[i]} disc height`).toBeGreaterThanOrEqual(40);
@@ -761,7 +765,7 @@ export const ByTemplate = {
         await assertPanelContainer(panel);
         await expect(panel.getAttribute('data-testid')).toBe('by-template-grid');
         const svgs = [...panel.querySelectorAll('svg')];
-        await expect(svgs.length).toBeGreaterThanOrEqual(6);
+        await expect(svgs.length).toBe(11);
         for (const svg of svgs) {
             await expect(svg.querySelector('text'), 'template tiles draw no words').toBeNull();
         }
@@ -783,40 +787,55 @@ export const ShadowEquation = {
 export const UsingShadowTokens = () => (
     <DoDont>
         <Do caption="Use the layer’s token.">
-            <div style={ground}>{menu()}</div>
+            {menu()}
         </Do>
         <Dont caption="Don’t write a raw shadow.">
-            <div style={ground}>{menu({ boxShadow: '0 6px 18px rgba(0, 0, 0, 0.22)' })}</div>
+            {menu({ boxShadow: '0 6px 18px rgba(0, 0, 0, 0.22)' })}
         </Dont>
     </DoDont>
 );
+
+const FlagAdaptIllustration = ({ raw = false }) => {
+    const contrast = usePageContrast();
+    const modeProps = (mode) => ({
+        'data-color-mode': mode,
+        ...(contrast ? { 'data-contrast-mode': contrast } : {}),
+    });
+    return (
+        <Illustration
+            width={160}
+            height={96}
+            title={raw ? 'Flag in light and dark mode with a hand-made shadow' : 'Flag in light and dark mode using elevation tokens'}
+        >
+            {(['light', 'dark']).map((mode, idx) => {
+                const y = idx === 0 ? 4 : 50;
+                return (
+                    <g key={mode} {...modeProps(mode)}>
+                        <Rect x={4} y={y} w={152} h={42} fill={PAINT.pageSurface} stroke={PAINT.frameDivider} corner="card" />
+                        {raw ? (
+                            <>
+                                <Layer x={20} y={y + 6} w={120} h={30} fill={PAINT.pageSurface} shadow="0 6px 18px rgba(0, 0, 0, 0.22)" corner="flag" />
+                                <SkeletonBar x={40} y={y + 13} w={48} h={4} heading />
+                                <SkeletonBar x={40} y={y + 22} w={78} />
+                            </>
+                        ) : (
+                            <FlagIllustration x={20} y={y + 6} w={120} h={30} />
+                        )}
+                    </g>
+                );
+            })}
+        </Illustration>
+    );
+};
 
 /** Shadow ramp Do/Don't 2: tokens adapt in dark; a raw shadow vanishes. */
 export const TokensAdaptInDark = () => (
     <DoDont>
         <Do caption="Tokens adapt: in dark the Flag steps lighter and keeps its ring.">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', width: '100%' }}>
-                {(['light', 'dark']).map((mode) => (
-                    <div key={mode} data-color-mode={mode} style={ground}>
-                        <Illustration width={160} height={60} capped={false} title={`Flag in ${mode} mode using elevation tokens`}>
-                            <FlagIllustration x={16} y={6} w={128} h={48} />
-                        </Illustration>
-                    </div>
-                ))}
-            </div>
+            <FlagAdaptIllustration />
         </Do>
         <Dont caption="A hand-made shadow vanishes in dark.">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', width: '100%' }}>
-                {(['light', 'dark']).map((mode) => (
-                    <div key={mode} data-color-mode={mode} style={ground}>
-                        <Illustration width={160} height={60} capped={false} title={`Flag in ${mode} mode with a hand-made shadow`}>
-                            <Layer x={16} y={6} w={128} h={48} fill="var(--ds-surface)" shadow="0 6px 18px rgba(0, 0, 0, 0.22)" corner="flag" />
-                            <SkeletonBar x={36} y={14} w={52} h={4} heading />
-                            <SkeletonBar x={36} y={23} w={84} />
-                        </Illustration>
-                    </div>
-                ))}
-            </div>
+            <FlagAdaptIllustration raw />
         </Dont>
     </DoDont>
 );
@@ -825,10 +844,10 @@ export const TokensAdaptInDark = () => (
 export const KeepComponentShadow = () => (
     <DoDont>
         <Do caption="A Popup keeps the overlay pair it ships with.">
-            <div style={ground}>{menu()}</div>
+            {menu()}
         </Do>
         <Dont caption="Reassigning a component’s shadow puts it on the wrong layer.">
-            <div style={ground}>{menu({ boxShadow: 'var(--ds-shadow-raised)' })}</div>
+            {menu({ boxShadow: 'var(--ds-shadow-raised)' })}
         </Dont>
     </DoDont>
 );
