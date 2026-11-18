@@ -6,9 +6,6 @@
         "design-system/src/components/forms-and-inputs/Checkbox/Checkbox.scss": {
           "count": 6
         },
-        "design-system/src/components/forms-and-inputs/Comment/Comment.scss": {
-          "count": 10
-        },
         "design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicker.scss": {
           "count": 1
         },
@@ -42,28 +39,7 @@
         "design-system/src/components/labels/Tag/Tag.scss": {
           "count": 2
         },
-        "design-system/src/components/layout-and-structure/PageHeader/PageHeader.scss": {
-          "count": 3
-        },
-        "design-system/src/components/layout-and-structure/Panel/Panel.scss": {
-          "count": 10
-        },
         "design-system/src/components/messaging/Modal/Modal.scss": {
-          "count": 1
-        },
-        "design-system/src/components/messaging/Spotlight/Spotlight.scss": {
-          "count": 8
-        },
-        "design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.scss": {
-          "count": 4
-        },
-        "design-system/src/components/text-and-data-display/Table/Table.scss": {
-          "count": 2
-        },
-        "design-system/src/patterns/PatternSection/PatternSection.scss": {
-          "count": 1
-        },
-        "design-system/src/patterns/PatternTable/PatternTable.scss": {
           "count": 1
         }
       }
