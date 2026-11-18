@@ -1,6 +1,10 @@
+@use '../../../styles/overlay-motion' as *;
 @use '../../../styles/state' as *;
 
 .plus-spotlight {
+    --plus-overlay-origin: center;
+    @include overlay-motion(plus-overlay-scale-in, none, default, fast);
+    transform-origin: var(--transform-origin, var(--plus-overlay-origin, center));
     width: var(--spotlight-width);
     max-width: calc(100vw - var(--space-100) * 2);
     background: var(--ds-background-brand-bold);

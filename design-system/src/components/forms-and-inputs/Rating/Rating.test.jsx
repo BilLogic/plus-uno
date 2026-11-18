@@ -66,4 +66,18 @@ describe('Rating', () => {
         expect(score()).toBe('4');
         radios.forEach((radio) => expect(radio).toHaveAttribute('aria-disabled', 'true'));
     });
+
+    it('bases stagger delay on distance from the previous value', async () => {
+        const user = userEvent.setup();
+        render(<Controlled value={0} />);
+
+        await user.click(screen.getByRole('radio', { name: 'Rate 4' }));
+        expect(screen.getByRole('radio', { name: 'Rate 1' }).style.getPropertyValue('--plus-rating-stagger')).toBe('0ms');
+        expect(screen.getByRole('radio', { name: 'Rate 2' }).style.getPropertyValue('--plus-rating-stagger')).toBe('20ms');
+        expect(screen.getByRole('radio', { name: 'Rate 3' }).style.getPropertyValue('--plus-rating-stagger')).toBe('40ms');
+        expect(screen.getByRole('radio', { name: 'Rate 4' }).style.getPropertyValue('--plus-rating-stagger')).toBe('60ms');
+
+        await user.click(screen.getByRole('radio', { name: 'Rate 5' }));
+        expect(screen.getByRole('radio', { name: 'Rate 5' }).style.getPropertyValue('--plus-rating-stagger')).toBe('0ms');
+    });
 });

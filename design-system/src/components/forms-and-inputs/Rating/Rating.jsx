@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { RadioGroup as BaseRadioGroup } from '@base-ui/react/radio-group';
 import { Radio as BaseRadio } from '@base-ui/react/radio';
+import { STAGGER } from '@/lib/listMotion';
+import { useMotionReduced } from '@/lib/motionPreference';
 import useFieldId from '../useFieldId';
 import { LabelMarker } from '../_internal/FieldFrame';
 import Icon from '../../images-and-icons/Icon';
@@ -47,10 +49,19 @@ const Rating = ({
     const fieldId = useFieldId(id);
     const hasLabel = Boolean(label);
     const labelId = hasLabel ? `${fieldId}-label` : undefined;
-    const checkedValue = RATING_VALUES.includes(value) ? value : null;
+    const numericValue = Number.isFinite(value) ? value : 0;
+    const checkedValue = RATING_VALUES.includes(numericValue) ? numericValue : null;
+    const reduced = useMotionReduced();
+
+    const prevValueRef = useRef(numericValue);
+    const [staggerFrom, setStaggerFrom] = useState(numericValue);
+    if (prevValueRef.current !== numericValue) {
+        setStaggerFrom(prevValueRef.current);
+        prevValueRef.current = numericValue;
+    }
 
     const handleValueChange = (next) => {
-        if (next === value) return;
+        if (next === numericValue) return;
         onChange?.(next);
     };
 
@@ -78,17 +89,25 @@ const Rating = ({
                 aria-labelledby={labelId}
                 aria-label={hasLabel ? undefined : 'Rating'}
             >
-                {RATING_VALUES.map((starValue) => (
-                    <div key={starValue} className="plus-rating-star-group">
-                        <RatingItem
-                            value={starValue}
-                            selected={value >= starValue}
-                            variant={variant}
-                            icon={icon}
-                            disabled={isDisabled}
-                        />
-                    </div>
-                ))}
+                {RATING_VALUES.map((starValue) => {
+                    const selected = numericValue >= starValue;
+                    const staggerStep = Math.max(0, starValue - staggerFrom - 1);
+                    const itemStyle = selected && !reduced
+                        ? { '--plus-rating-stagger': `${staggerStep * STAGGER.gap}ms` }
+                        : undefined;
+                    return (
+                        <div key={starValue} className="plus-rating-star-group">
+                            <RatingItem
+                                value={starValue}
+                                selected={selected}
+                                variant={variant}
+                                icon={icon}
+                                disabled={isDisabled}
+                                style={itemStyle}
+                            />
+                        </div>
+                    );
+                })}
             </BaseRadioGroup>
             {variant === 'comments' && showCommentsLabel && (
                 <div className="plus-rating-comments-label">
@@ -141,14 +160,20 @@ const RatingItem = ({
     icon = 'star',
     disabled = false,
     className = '',
+    style,
     ...props
 }) => {
+    const reduced = useMotionReduced();
     const itemClasses = [
         'plus-rating-item',
         selected ? 'plus-rating-item-selected' : 'plus-rating-item-unselected',
         disabled ? 'plus-rating-item-disabled' : '',
         className
     ].filter(Boolean).join(' ');
+
+    const itemStyle = selected && !reduced
+        ? { '--plus-rating-stagger': `${(value - 1) * STAGGER.gap}ms`, ...style }
+        : style;
 
     return (
         <div className="plus-rating-item-wrapper">
@@ -168,6 +193,7 @@ const RatingItem = ({
                 value={value}
                 disabled={disabled}
                 className={itemClasses}
+                style={itemStyle}
                 aria-label={`Rate ${value}`}
                 {...props}
             >

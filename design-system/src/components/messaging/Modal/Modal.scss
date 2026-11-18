@@ -7,6 +7,7 @@
  * Modal/stack-md 16, radius Modal/radius 16, centered in an overlay that pads
  * Overlay/pad-x 16 at the sides and Overlay/pad-y 64 above and below.
  */
+@use '../../../styles/overlay-motion' as *;
 @use '../../../styles/screen-grid' as *;
 @use '../../../styles/state' as *;
 
@@ -34,6 +35,12 @@
     overflow: hidden;
     /* Hug: as tall as the content, up to the screen less the overlay pad above and below. */
     max-height: var(--blanket-max-height-modal);
+}
+
+.plus-modal:not(.plus-modal--inline) {
+    --plus-overlay-origin: center;
+    @include overlay-motion(plus-overlay-scale-in, plus-overlay-scale-out, default, default);
+    transform-origin: var(--transform-origin, var(--plus-overlay-origin, center));
 }
 
 .plus-modal-width-4-col {

@@ -1603,6 +1603,7 @@
         "Size44",
         "PickADay",
         "TurnMonths",
+        "TurnMonthsReduced",
         "Default",
         "Selected",
         "Range",
@@ -3519,7 +3520,8 @@
         "BoundedDatesBehavior",
         "TypedEntry",
         "DaysAnnounceTheirDate",
-        "ClearControl"
+        "ClearControl",
+        "MonthTurnKeepsPopupHeight"
       ],
       "tokens": [
         "--ds-icon-subtle"
@@ -7829,7 +7831,9 @@
         "Pressed",
         "Focused",
         "FooterLayouts",
-        "SizeToContent"
+        "SizeToContent",
+        "MotionOpenAndClose",
+        "MotionReduced"
       ],
       "tokens": [
         "--blanket-max-height-modal",
@@ -7845,9 +7849,11 @@
         "--modal-pad-x-default",
         "--modal-radius",
         "--modal-stack-md",
+        "--plus-overlay-origin",
         "--stack-md",
         "--stack-sm",
-        "--stroke-1"
+        "--stroke-1",
+        "--transform-origin"
       ]
     },
     {
@@ -11938,6 +11944,7 @@
         "--ds-text",
         "--icon-lg",
         "--icon-md",
+        "--plus-rating-stagger",
         "--radius-full",
         "--space-0625",
         "--stack-md",
@@ -12763,7 +12770,9 @@
         "Rest",
         "Hovered",
         "Pressed",
-        "Focused"
+        "Focused",
+        "MotionEnterAndExit",
+        "MotionReduced"
       ],
       "tokens": [
         "--body-default",
@@ -14073,7 +14082,9 @@
         "Hovered",
         "Pressed",
         "Focused",
-        "BestPracticesLive"
+        "BestPracticesLive",
+        "MotionOpenAndClose",
+        "MotionReduced"
       ],
       "tokens": [
         "--body-default",
@@ -14086,13 +14097,15 @@
         "--ds-text",
         "--ds-text-inverse",
         "--heading-sm",
+        "--plus-overlay-origin",
         "--popup-radius",
         "--radius-lg",
         "--space-075",
         "--space-100",
         "--space-150",
         "--spotlight-media-height",
-        "--spotlight-width"
+        "--spotlight-width",
+        "--transform-origin"
       ]
     },
     {

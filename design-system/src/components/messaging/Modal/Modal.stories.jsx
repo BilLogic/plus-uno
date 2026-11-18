@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expectOverlayExit, settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
+import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { Modal, MODAL_WIDTHS } from '@/components';
 import { FooterActions, IconButton, Button, Select } from '@/components';
@@ -707,5 +708,54 @@ export const SizeToContent = {
     play: async ({ canvas }) => {
         await expect(canvas.getAllByRole('heading', { name: 'Remove this session?' })).toHaveLength(2);
         await expect(canvas.getAllByRole('button', { name: 'Remove' })).toHaveLength(2);
+    },
+};
+
+function ModalMotionDemo() {
+    const [open, setOpen] = useState(false);
+    return (
+        <>
+            <Button text="Open session modal" onClick={() => setOpen(true)} />
+            <Modal
+                show={open}
+                width="6-col"
+                title="Publish session notes?"
+                body="Families can view published notes on the student profile."
+                secondaryButton={{ text: 'Keep draft', onClick: () => setOpen(false) }}
+                primaryButton={{ text: 'Publish notes', onClick: () => setOpen(false) }}
+                onClose={() => setOpen(false)}
+            />
+        </>
+    );
+}
+
+export const MotionOpenAndClose = {
+    render: () => <ModalMotionDemo />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const docBody = canvasElement.ownerDocument.body;
+        await userEvent.click(canvas.getByRole('button', { name: 'Open session modal' }));
+        const dialog = await within(docBody).findByRole('dialog', { name: 'Publish session notes?' });
+        await expect(getComputedStyle(dialog).animationName, 'Modal scales in on open').toContain('plus-overlay-scale-in');
+        await settleAnimations(docBody);
+
+        await expectOverlayExit(dialog, () => fireEvent.keyDown(dialog, { key: 'Escape' }), false);
+        await settleAnimations(docBody);
+    },
+};
+
+export const MotionReduced = {
+    decorators: [withReducedMotion],
+    render: () => <ModalMotionDemo />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const docBody = canvasElement.ownerDocument.body;
+        await userEvent.click(canvas.getByRole('button', { name: 'Open session modal' }));
+        const dialog = await within(docBody).findByRole('dialog', { name: 'Publish session notes?' });
+        await expect(dialog).toHaveAttribute('data-reduced', 'true');
+        await expect(getComputedStyle(dialog).animationName).toBe('none');
+        await settleAnimations(docBody);
+
+        await expectOverlayExit(dialog, () => fireEvent.keyDown(dialog, { key: 'Escape' }), true);
     },
 };

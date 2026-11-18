@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
+import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import { expectInk, expectInsetRing } from '@/storybook-docs/lib/navigation-states.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
@@ -235,6 +236,13 @@ Overview.parameters = {
  */
 export const Interactive = Template.bind({});
 Interactive.args = { ...paginationPlaygroundArgs };
+Interactive.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page6 = canvas.getByRole('button', { name: 'Page 6' });
+    await userEvent.click(page6);
+    await settleAnimations(canvasElement);
+    await expect(page6).toHaveAttribute('aria-current', 'page');
+};
 
 /**
  * The accessibility contract: every part is a named button, the current page

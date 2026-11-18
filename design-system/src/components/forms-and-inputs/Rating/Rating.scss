@@ -64,11 +64,11 @@
     justify-content: center;
     background-color: var(--ds-background-neutral);
     cursor: pointer;
-    transition: all var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+    transition: background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
     
     i {
         font-size: var(--icon-md);
-        transition: all var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+        transition: color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
     }
     
     // Hover state (only when not disabled)
@@ -91,6 +91,7 @@
 .plus-rating-item-selected {
     i {
         color: var(--ds-icon-selected);
+        transition-delay: var(--plus-rating-stagger);
     }
 }
 

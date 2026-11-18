@@ -1,5 +1,6 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
@@ -367,12 +368,13 @@ export const ExplainsOnPress = {
         };
         return <Demo />;
     },
-    play: async ({ canvas }) => {
+    play: async ({ canvas, canvasElement }) => {
         const save = canvas.getByRole('button', { name: 'Save notes' });
         await expect(save).toBeEnabled();
         await expect(canvas.queryByText('Add the session notes before saving.')).toBeNull();
         await userEvent.click(save);
-        await expect(await canvas.findByText('Add the session notes before saving.')).toBeVisible();
+        await waitFor(() => expect(canvas.getByText('Add the session notes before saving.')).toBeVisible());
+        await settleAnimations(canvasElement);
         await expect(save).toBeEnabled();
     },
 };
