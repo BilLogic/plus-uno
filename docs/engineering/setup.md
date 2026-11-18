@@ -124,9 +124,11 @@ Figma export → design-system/src/tokens/source/*.json → npm run generate:tok
   writes `_scales.scss`, `_frame_layers.scss` and `_type.scss`.
 - The four-tier token ladder (semantics, templates, components, layers) and
   motion generate the other direction, code → Figma, via
-  `npm run generate:design-tokens` (ADR-038). `generate:tokens` drops the
-  retired names (`RETIRED_TOKENS` in `scripts/lib/tokens/plan.mjs`) that the
-  Figma exports still carry.
+  `npm run generate:design-tokens` (ADR-038). `generate:tokens` filters out the
+  ladder-owned names (`planOwnedTokens()` in `scripts/lib/tokens/retire.mjs`)
+  when writing `_scales.scss` and `_frame_layers.scss`, so tokens the plan now
+  owns are declared once in the ladder's generated files rather than
+  re-declared from the Figma exports.
 - Edit the source, then regenerate: every token file is generated output except
   `_fonts.scss`, the hand-authored fallback faces and base heading and body type.
 - Where a token deliberately differs from Figma, or is not in Figma, the
