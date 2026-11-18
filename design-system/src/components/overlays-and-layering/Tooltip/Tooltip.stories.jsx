@@ -5,8 +5,10 @@ import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
-import { Tooltip, Button } from '@/components';
+import { Tooltip, Button, Popup } from '@/components';
+import { Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
+import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
 
 export default {
     title: 'Components/Overlays and layering/Tooltip',
@@ -247,4 +249,108 @@ export const MotionReduced = {
     render: MotionTooltip,
     decorators: [withReducedMotion],
     play: (context) => tooltipMotionPlay(context, true),
+};
+
+/** Say what the control does rather than repeating its visible label. */
+export const SayWhatControlDoes = {
+    render: () => (
+        <DoDont>
+            <Do caption="A few words on what the control does.">
+                <DocsOverlayBoundary fit={false} containHeight>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <Tooltip text="Opens the session notes" placement="bottom" show>
+                            <Button appearance="default" text="Notes" />
+                        </Tooltip>
+                    </div>
+                </DocsOverlayBoundary>
+            </Do>
+            <Dont caption="Repeats the label the control already shows.">
+                <DocsOverlayBoundary fit={false} containHeight>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <Tooltip text="Notes" placement="bottom" show>
+                            <Button appearance="default" text="Notes" />
+                        </Tooltip>
+                    </div>
+                </DocsOverlayBoundary>
+            </Dont>
+        </DoDont>
+    ),
+    play: async ({ canvas, canvasElement }) => {
+        const doc = canvasElement.ownerDocument;
+        await waitFor(() => expect(doc.querySelectorAll('[role="tooltip"]')).toHaveLength(2));
+        await expect(canvas.getAllByRole('button', { name: 'Notes' })).toHaveLength(2);
+    },
+};
+
+/** Keep tooltip copy to one short line in sentence case with no closing period. */
+export const KeepToOneLine = {
+    render: () => (
+        <DoDont>
+            <Do caption="One line, sentence case, no closing period.">
+                <DocsOverlayBoundary fit={false} containHeight>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <Tooltip text="Moves this session out of the active list" placement="bottom" show>
+                            <Button appearance="default" text="Archive" />
+                        </Tooltip>
+                    </div>
+                </DocsOverlayBoundary>
+            </Do>
+            <Dont caption="Two sentences that wrap, with a closing period.">
+                <DocsOverlayBoundary fit={false} containHeight>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <Tooltip
+                            text="Moves this session out of the active list. You can bring it back later from the archive, and its notes stay with it."
+                            placement="bottom"
+                            show
+                        >
+                            <Button appearance="default" text="Archive" />
+                        </Tooltip>
+                    </div>
+                </DocsOverlayBoundary>
+            </Dont>
+        </DoDont>
+    ),
+    play: async ({ canvas, canvasElement }) => {
+        const doc = canvasElement.ownerDocument;
+        await waitFor(() => expect(doc.querySelectorAll('[role="tooltip"]')).toHaveLength(2));
+        await expect(canvas.getAllByRole('button', { name: 'Archive' })).toHaveLength(2);
+    },
+};
+
+/** Put anything the user can click inside a Popup rather than a Tooltip. */
+export const InteractiveContentInPopup = {
+    render: () => (
+        <DoDont>
+            <Do caption="A popup holds content the user can reach.">
+                <DocsOverlayBoundary fit={false} containHeight>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <Popup
+                            trigger={<Button appearance="default" text="Scheduling" />}
+                            title="Scheduling"
+                            placement="bottom"
+                            defaultShow
+                            rootClose={false}
+                        >
+                            <a href="#help">Read the guide</a>
+                        </Popup>
+                    </div>
+                </DocsOverlayBoundary>
+            </Do>
+            <Dont caption="A link in a tooltip: moving toward it leaves the trigger, and the tooltip hides.">
+                <DocsOverlayBoundary fit={false} containHeight>
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <Tooltip text={<a href="#help" style={{ color: 'inherit' }}>Read the guide</a>} placement="bottom" show>
+                            <Button appearance="default" text="Scheduling" />
+                        </Tooltip>
+                    </div>
+                </DocsOverlayBoundary>
+            </Dont>
+        </DoDont>
+    ),
+    play: async ({ canvas, canvasElement }) => {
+        const doc = canvasElement.ownerDocument;
+        await waitFor(() => expect(doc.querySelectorAll('[role="tooltip"]')).toHaveLength(1));
+        await waitFor(() => expect(doc.querySelector('.plus-popup')).not.toBeNull());
+        await expect(canvas.getAllByRole('button', { name: 'Scheduling' })).toHaveLength(2);
+    },
 };

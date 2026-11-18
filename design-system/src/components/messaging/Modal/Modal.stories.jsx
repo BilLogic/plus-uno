@@ -4,6 +4,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { Modal, MODAL_WIDTHS } from '@/components';
 import { FooterActions, IconButton, Button, Select } from '@/components';
+import { Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
@@ -664,5 +665,47 @@ export const FooterLayouts = {
         const destructiveModal = canvas.getByTestId('modal-footer-destructive');
         const del = within(destructiveModal).getByRole('button', { name: 'Delete recording' });
         await expect(del).toHaveClass('plus-btn--danger');
+    },
+};
+
+const narrowPairScreen = { '--plus-overlay-screen': 'var(--width-3000)', width: '100%' };
+
+/** Size the Modal to its content with a step of MODAL_WIDTHS. */
+export const SizeToContent = {
+    render: () => (
+        <DoDont>
+            <Do caption="The narrowest step for a short question.">
+                <div style={narrowPairScreen}>
+                    <Modal
+                        show
+                        renderAs="inline"
+                        width="6-col"
+                        title="Remove this session?"
+                        body="The student is told it was canceled."
+                        secondaryButton={{ text: 'Keep session' }}
+                        primaryButton={{ text: 'Remove', appearance: 'danger' }}
+                        onClose={() => {}}
+                    />
+                </div>
+            </Do>
+            <Dont caption="The widest step around one sentence.">
+                <div style={narrowPairScreen}>
+                    <Modal
+                        show
+                        renderAs="inline"
+                        width="10-col"
+                        title="Remove this session?"
+                        body="The student is told it was canceled."
+                        secondaryButton={{ text: 'Keep session' }}
+                        primaryButton={{ text: 'Remove', appearance: 'danger' }}
+                        onClose={() => {}}
+                    />
+                </div>
+            </Dont>
+        </DoDont>
+    ),
+    play: async ({ canvas }) => {
+        await expect(canvas.getAllByRole('heading', { name: 'Remove this session?' })).toHaveLength(2);
+        await expect(canvas.getAllByRole('button', { name: 'Remove' })).toHaveLength(2);
     },
 };

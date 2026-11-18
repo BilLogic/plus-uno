@@ -1,5 +1,5 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Canvas, Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as ModalStories from './Modal.stories.jsx';
 import { Modal, MODAL_WIDTHS, MODAL_WIDTH_PX, MODAL_WIDTH_SCREENS } from '@/components';
@@ -30,8 +30,6 @@ export const figmaMeta = {
 
 {/* Pairs draw the inline panel, never a live dialog. A narrow stand-in screen keeps every width inside a pair card. */}
 export const narrowScreen = { '--plus-overlay-screen': 'var(--width-3000)', width: '100%' };
-// Pair one draws both widths at three quarters, so ten columns fit beside six at the same scale.
-export const scaledScreen = { ...narrowScreen, zoom: 0.75 };
 export const shortCap = { ...narrowScreen, '--blanket-max-height-modal': 'var(--height-2000)' };
 export const longBody =
     'Review the session summary before publishing it to the student profile. Note which two-step equation problems Maya K. solved independently, which steps still needed a prompt, and which practice set is assigned for Thursday at 4:00 PM ET at Lincoln Middle. Families and lead tutors read this note together before the next check-in. ' +
@@ -236,12 +234,11 @@ A short confirmation takes `6-col`, a short form `8-col`, a table or an editor
 `10-col`. A step grows with the screen; a fixed number keeps one size on every
 screen.
 
-<DoDontPair
-    doExample={<div style={scaledScreen}><Modal show renderAs="inline" width="6-col" title="Remove this session?" body="The student is told it was canceled." secondaryButton={{ text: 'Keep session' }} primaryButton={{ text: 'Remove', appearance: 'danger' }} onClose={() => {}} /></div>}
-    doCaption="The narrowest step for a short question."
-    dontExample={<div style={scaledScreen}><Modal show renderAs="inline" width="10-col" title="Remove this session?" body="The student is told it was canceled." secondaryButton={{ text: 'Keep session' }} primaryButton={{ text: 'Remove', appearance: 'danger' }} onClose={() => {}} /></div>}
-    dontCaption="The widest step around one sentence."
-/>
+Do: The narrowest step for a short question.
+
+Don't: The widest step around one sentence.
+
+<Canvas of={ModalStories.SizeToContent} />
 
 ### Keep Close on a Modal unless the person has to answer it.
 

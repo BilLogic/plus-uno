@@ -14,7 +14,7 @@ Also asked as: confirm, confirmation dialog, destructive confirm, popup window, 
 
 **Source:** `design-system/src/components/messaging/Modal/Modal.jsx`
 
-**Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Width4Col, Width6Col, Width8Col, Width10Col, HeightHug, HeightFill, HeaderOptions, WithoutCloseButton, Loading, Content, Layout, Interactive, Overview, ConfirmView, ConfirmViewEscape, ModalOverModalRefused, BlockingShadow, SelectKeepsOverlayShadow, Rest, Hovered, Pressed, Focused, FooterLayouts
+**Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Width4Col, Width6Col, Width8Col, Width10Col, HeightHug, HeightFill, HeaderOptions, WithoutCloseButton, Loading, Content, Layout, Interactive, Overview, ConfirmView, ConfirmViewEscape, ModalOverModalRefused, BlockingShadow, SelectKeepsOverlayShadow, Rest, Hovered, Pressed, Focused, FooterLayouts, SizeToContent
 
 **Storybook page:** `design-system/src/components/messaging/Modal/Modal.mdx`
 
@@ -79,6 +79,7 @@ A short confirmation takes `6-col`, a short form `8-col`, a table or an editor
 screen.
 
 Do: The narrowest step for a short question.
+
 Don't: The widest step around one sentence.
 
 ### Keep Close on a Modal unless the person has to answer it. {#keep-close-on-a-modal-unless-the-person-has-to-answer-it}

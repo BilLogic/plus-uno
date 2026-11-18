@@ -95,25 +95,33 @@ AllIcons.play = async ({ canvasElement }) => {
     await expect(getComputedStyle(light).color, 'light icon color').not.toBe(getComputedStyle(dark).color);
 };
 
-/* ------------------------------------------------------- 1x and 2x, close up */
+/* ------------------------------------------------------- native token sizes */
 
 export const CloseUp = () => (
-    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--grid-gutter)', color: 'var(--ds-icon)' }}>
+    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', gap: 'var(--grid-gutter)', color: 'var(--ds-icon)' }}>
         {AI_ICON_NAMES.map((name) => (
             <div key={name} style={cell}>
-                <span style={{ display: 'inline-flex', transform: 'scale(2)', transformOrigin: 'center', margin: 'var(--pad-y-md)' }}>
-                    <AiIcon name={name} size={24} />
-                </span>
-                <AiIcon name={name} size={24} />
-                <span style={caption}>{name}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
+                    {AI_ICON_SIZES[name].map((size) => (
+                        <AiIcon key={size} name={name} size={size} data-name={name} data-size={size} />
+                    ))}
+                </div>
+                <span style={caption}>{name} ({AI_ICON_SIZES[name].join(' · ')})</span>
             </div>
         ))}
     </div>
 );
 
-/** The 24px icons drawn at 2x above and 1x below, for checking edges and the gap around each sparkle. */
+/** Every AI icon at its supported native token sizes (16 and 24, plus 12 for generate and stop-generating). */
 CloseUp.play = async ({ canvasElement }) => {
-    await expect(canvasElement.querySelectorAll('svg')).toHaveLength(AI_ICON_NAMES.length * 2);
+    const expected = AI_ICON_NAMES.reduce((count, name) => count + AI_ICON_SIZES[name].length, 0);
+    const icons = [...canvasElement.querySelectorAll('svg')];
+    await expect(icons).toHaveLength(expected);
+    for (const svg of icons) {
+        const size = Number(svg.dataset.size);
+        await expect(px(getComputedStyle(svg).width), `${svg.dataset.name} width`).toBe(size);
+        await expect(px(getComputedStyle(svg).height), `${svg.dataset.name} height`).toBe(size);
+    }
 };
 
 /* ------------------------------------------------------------ accessibility */

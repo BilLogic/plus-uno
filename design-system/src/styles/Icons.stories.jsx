@@ -1,6 +1,7 @@
 import React from 'react';
-import { Tile, Button, IconButton } from '@/components';
-import { Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { expect } from 'storybook/test';
+import { Tile, Button, Icon, IconButton } from '@/components';
+import { C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
 
 /**
  * Specimens for Foundations/Iconography: Font Awesome Free glyphs at the three
@@ -143,3 +144,67 @@ export const LargerMeansTile = () => (
         </span>
     </div>
 );
+
+/** Use Font Awesome Free families (solid, regular, brands) only. */
+export const FreeFamiliesOnly = {
+    render: () => (
+        <DoDont>
+            <Do caption="Free families (fa-regular, fa-solid, fa-brands) render everywhere.">
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
+                    <Icon name="fa-brands fa-figma" size={16} />
+                    <Icon name="fa-regular fa-calendar-days" size={16} />
+                    <C>fa-brands fa-figma · fa-regular fa-calendar-days</C>
+                </span>
+            </Do>
+            <Dont caption="Pro families (fa-light, fa-thin, fa-sharp, fa-duotone) render blank.">
+                <C>fa-light fa-calendar-days</C>
+            </Dont>
+        </DoDont>
+    ),
+    play: async ({ canvasElement }) => {
+        await expect(canvasElement.querySelectorAll('i.fa-brands, i.fa-regular')).toHaveLength(2);
+    },
+};
+
+/** Use 16 by default beside body text, and 12 sparingly for chevrons and compact parts. */
+export const IconSizingInControls = {
+    render: () => (
+        <DoDont>
+            <Do caption="A 16 icon leads the label; the trailing chevron is 12.">
+                <Button
+                    appearance="default"
+                    text="Add tutor"
+                    iconBefore="plus"
+                    iconAfter={<Icon name="chevron-down" size={12} />}
+                />
+            </Do>
+            <Dont caption="A 12 leading icon is too small beside 14 body text.">
+                <Button
+                    appearance="default"
+                    text="Add tutor"
+                    iconBefore={<Icon name="plus" size={12} />}
+                />
+            </Dont>
+        </DoDont>
+    ),
+    play: async ({ canvas }) => {
+        await expect(canvas.getAllByRole('button', { name: 'Add tutor' })).toHaveLength(2);
+    },
+};
+
+/** Pick the glyph most people read the same way. */
+export const RecognizableSymbols = {
+    render: () => (
+        <DoDont>
+            <Do caption="A bell for notifications.">
+                <Button appearance="subtle" text="Notifications" iconBefore="bell" />
+            </Do>
+            <Dont caption="A gear reads as settings, so it misleads here.">
+                <Button appearance="subtle" text="Notifications" iconBefore="gear" />
+            </Dont>
+        </DoDont>
+    ),
+    play: async ({ canvas }) => {
+        await expect(canvas.getAllByRole('button', { name: 'Notifications' })).toHaveLength(2);
+    },
+};

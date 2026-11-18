@@ -7828,7 +7828,8 @@
         "Hovered",
         "Pressed",
         "Focused",
-        "FooterLayouts"
+        "FooterLayouts",
+        "SizeToContent"
       ],
       "tokens": [
         "--blanket-max-height-modal",
@@ -8223,7 +8224,6 @@
         "TypeDefault",
         "TypeFullWidth",
         "AnatomyRecord",
-        "AnatomyRecordScaledDown",
         "ScenarioArea",
         "ScenarioSeveralSections",
         "ScenarioRecordTabs",
@@ -16973,7 +16973,10 @@
         "PlacementRight",
         "Wrapping",
         "MotionOpenClose",
-        "MotionReduced"
+        "MotionReduced",
+        "SayWhatControlDoes",
+        "KeepToOneLine",
+        "InteractiveContentInPopup"
       ],
       "tokens": [
         "--body-sm",

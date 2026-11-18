@@ -376,21 +376,6 @@ export const AnatomyRecord = {
     },
 };
 
-/** The same figure at the docs column's width, where the story scales down and the title and description rows sit closer than a marker is tall. */
-export const AnatomyRecordScaledDown = {
-    name: 'Anatomy, scaled down',
-    render: () => (
-        <div style={{ width: 880 /* token gap: 880px */ }}>
-            <LiveAnatomy live width={PAGE_STAGE} parts={ANATOMY_PARTS} title="A record page with its parts numbered">
-                <RecordPage banner />
-            </LiveAnatomy>
-        </div>
-    ),
-    play: async ({ canvasElement }) => {
-        await playRecordAnatomy(canvasElement);
-    },
-};
-
 /** Area page, one collection: the title alone; the collection's Primary ends its view bar. */
 export const ScenarioArea = {
     name: 'Area page, one collection',

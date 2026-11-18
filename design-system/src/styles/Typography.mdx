@@ -130,18 +130,13 @@ Every page has one `h1` (visually hidden when the topbar or tab strip replaces a
 
 <FoundationSection title="Labels">
 
-Button, tab and menu labels use `Body/default/medium` (`font: var(--body-default); font-weight: var(--type-weight-medium)`), which pairs with icon stroke weight. A Sidebar tab is a navigation row: its label is regular weight at rest and medium when selected.
+Button, tab and menu labels use `Body/default/medium` (`font: var(--body-default); font-weight: var(--type-weight-medium)`), which pairs with icon stroke weight. Never set regular or bold weight, or a heading style, on a button or tab label. A Sidebar tab is a navigation row: its label is regular weight at rest and medium when selected.
 
-<DoDont>
-<Do caption="Body/default/medium on a button or tab label.">
-<span style={{ display: 'inline-block', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Save changes</span>
-</Do>
-<Dont caption="Regular or bold weight, or a heading style, on a button or tab label.">
-<span style={{ display: 'inline-block', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-semibold)' }}>Save changes</span>
-</Dont>
-</DoDont>
+Do: Body/default/medium on a button or tab label.
 
-<Canvas of={TypographyStories.LabelStyle} sourceState="none" />
+Don't: Regular or bold weight, or a heading style, on a button or tab label.
+
+<Canvas of={TypographyStories.LabelStyle} />
 
 </FoundationSection>
 
@@ -165,20 +160,11 @@ Names and titles truncate; primary content wraps. Never shrink font size to fit 
 
 A student name in a roster row.
 
-<DoDont>
-<Do caption="One line with an ellipsis. The Status keeps its place.">
-<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', maxWidth: 'var(--card-min-width-md)' }}>
-<span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Alexandria Montgomery-Hernandez, Lincoln Middle</span>
-<span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-success)' }}>Active</span>
-</div>
-</Do>
-<Dont caption="The name wraps onto extra lines and makes the row taller than its neighbors.">
-<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', maxWidth: 'var(--card-min-width-md)' }}>
-<span style={{ flex: 1, minWidth: 0, font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Alexandria Montgomery-Hernandez, Lincoln Middle</span>
-<span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-success)' }}>Active</span>
-</div>
-</Dont>
-</DoDont>
+Do: One line with an ellipsis. The Status keeps its place.
+
+Don't: The name wraps onto extra lines and makes the row taller than its neighbors.
+
+<Canvas of={TypographyStories.TruncateName} />
 
 </FoundationSubsection>
 
@@ -190,14 +176,11 @@ A student name in a roster row.
 
 Introduce a section with a heading style, not with bold body text.
 
-<DoDont>
-<Do caption="Heading/small, tagged as the section's heading.">
-<h3 style={{ margin: 0, font: 'var(--heading-sm)' }}>Next session</h3>
-</Do>
-<Dont caption="Bold body text looks like a heading but carries no structure.">
-<span style={{ font: 'var(--body-default)', fontWeight: 'var(--type-weight-semibold)' }}>Next session</span>
-</Dont>
-</DoDont>
+Do: Heading/small, tagged as the section's heading.
+
+Don't: Bold body text looks like a heading but carries no structure.
+
+<Canvas of={TypographyStories.HeadingStyleOverBold} />
 
 </FoundationSubsection>
 
@@ -205,21 +188,11 @@ Introduce a section with a heading style, not with bold body text.
 
 Headings step down one level at a time.
 
-<DoDont>
-<Do caption="h1, then h2, then h3.">
-<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-<span><C>h1</C> <Sample font="--heading-lg">Tutor dashboard</Sample></span>
-<span><C>h2</C> <Sample font="--heading-md">Upcoming sessions</Sample></span>
-<span><C>h3</C> <Sample font="--heading-sm">Grade 6 math</Sample></span>
-</div>
-</Do>
-<Dont caption="An h3 straight after the h1 skips the h2.">
-<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-<span><C>h1</C> <Sample font="--heading-lg">Tutor dashboard</Sample></span>
-<span><C>h3</C> <Sample font="--heading-sm">Grade 6 math</Sample></span>
-</div>
-</Dont>
-</DoDont>
+Do: h1, then h2, then h3.
+
+Don't: An h3 straight after the h1 skips the h2.
+
+<Canvas of={TypographyStories.StepHeadingLevels} />
 
 </FoundationSubsection>
 
@@ -239,14 +212,11 @@ Semibold at 28 and 32 sits close to bold body text. Keep 600 and do not add a 70
 
 Metric styles are Noto Sans 600 with tabular figures. Use the `.num` class, or `font-variant-numeric: tabular-nums`, for numbers that line up vertically: table columns, times in schedules and timelines, and counts in lists. Running text keeps proportional figures. A time or duration ("3:30 to 4:30", "12 min") takes the body or heading style of its context, never mono.
 
-<DoDont>
-<Do caption="Metric/large for the figure.">
-<Sample font="--metric-lg">1,284</Sample><div style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
-</Do>
-<Dont caption="Heading/medium for a number.">
-<Sample font="--heading-md">1,284</Sample><div style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
-</Dont>
-</DoDont>
+Do: Metric/large for the figure.
+
+Don't: Heading/medium for a number.
+
+<Canvas of={TypographyStories.MetricNumbers} />
 
 </FoundationSubsection>
 

@@ -16,7 +16,14 @@ const PAGES = [
 
 describe('Content pages', () => {
     it.each(PAGES)('$file is titled under Brand > Content', ({ file, title }) => {
-        expect(readFileSync(join(STYLES, file), 'utf8')).toContain(`<Meta title="${title}" />`);
+        const text = readFileSync(join(STYLES, file), 'utf8');
+        // A page either titles itself, or attaches to its stories file and takes that file's title.
+        const attached = text.match(/^import \* as (\w+) from '\.\/([\w.]+\.stories\.jsx)';$/m);
+        if (attached && text.includes(`<Meta of={${attached[1]}} />`)) {
+            expect(readFileSync(join(STYLES, attached[2]), 'utf8')).toContain(`title: '${title}'`);
+        } else {
+            expect(text).toContain(`<Meta title="${title}" />`);
+        }
     });
 
     it.each(PAGES)('$file renders its sections in order', ({ file, sections }) => {

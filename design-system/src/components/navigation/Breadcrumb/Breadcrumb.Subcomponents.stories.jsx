@@ -1,4 +1,6 @@
 import React from 'react';
+import { expect } from 'storybook/test';
+import Breadcrumb from './Breadcrumb';
 import './Breadcrumb.scss';
 
 /**
@@ -65,11 +67,22 @@ PageItem.args = {
 
 /**
  * Divider
- * Visual separator between items.
+ * Visual separator between items (default slash).
  * Figma State: state=divider
  */
-export const Divider = () => (
-    <div className="plus-breadcrumb">
-        <span style={{ color: 'var(--ds-text-subtlest)' }}>/</span>
-    </div>
-);
+export const Divider = {
+    render: () => (
+        <Breadcrumb
+            items={[
+                { text: 'Home', href: '#home' },
+                { text: 'Tutoring', href: '#tutoring' },
+                { text: 'Algebra B' },
+            ]}
+        />
+    ),
+    play: async ({ canvas }) => {
+        await expect(canvas.getByRole('navigation', { name: 'breadcrumb' })).toBeInTheDocument();
+        await expect(canvas.getByRole('link', { name: 'Home' })).toBeInTheDocument();
+        await expect(canvas.getByText('Algebra B')).toHaveAttribute('aria-current', 'page');
+    },
+};

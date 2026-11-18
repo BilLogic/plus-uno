@@ -1,31 +1,14 @@
-import { Meta } from '@storybook/addon-docs/blocks';
-import { Icon } from '@/components';
-import { RefTable, TokenTable, C, Do, Dont, DoDont, Callout } from '@/storybook-docs/foundation-blocks.jsx';
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { RefTable, TokenTable, C, Callout } from '@/storybook-docs/foundation-blocks.jsx';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
     FoundationSection,
     FoundationSubsection,
     FoundationRelated,
-    FoundationExample,
 } from '@/storybook-docs/foundation-page.jsx';
+import * as BorderStories from './Border.stories.jsx';
 
-export const field = (extra = {}) => ({
-    display: 'flex',
-    alignItems: 'center',
-    gap: 'var(--inline-md)',
-    minHeight: 'var(--row-height-md)',
-    padding: '0 var(--pad-x-md)',
-    borderRadius: 'var(--radius-lg)',
-    background: 'var(--ds-background-input)',
-    boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border-input)',
-    color: 'var(--ds-text)',
-    font: 'var(--body-default)',
-    ...extra,
-});
-
-export const caption = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
-
-<Meta title="Foundations/Visual/Border" />
+<Meta of={BorderStories} />
 
 <DocsLanding
     page="foundations-visual-border"
@@ -90,27 +73,7 @@ Take both width and color from this table.
     ]}
 />
 
-<FoundationExample>
-<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)' }}>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-        <span style={field()}>Value</span>
-        <span style={caption}>Default: Border/default + color/border/input</span>
-    </div>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-        <span style={field({ boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border-danger)' })}>Value</span>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-sm)', font: 'var(--body-sm)', color: 'var(--ds-text-danger)' }}><Icon name="triangle-exclamation" size={12} color="danger" /> Validation message</span>
-        <span style={caption}>Invalid: Border/default + color/border/danger</span>
-    </div>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-        <span style={field({ outline: 'var(--border-width-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--focus-ring-offset)' })}>Value</span>
-        <span style={caption}>Focused: Border/focused + color/border/focused</span>
-    </div>
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-        <span style={field({ boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border-disabled)', background: 'var(--ds-background-disabled)', color: 'var(--ds-text-disabled)' })}>Value</span>
-        <span style={caption}>Disabled: Border/default + color/border/disabled</span>
-    </div>
-</div>
-</FoundationExample>
+<Canvas of={BorderStories.PairWidthWithColor} />
 
 </FoundationSection>
 
@@ -129,21 +92,13 @@ The focus ring shows keyboard users where they are. It is a ring, never a fill: 
     ]}
 />
 
-<FoundationExample caption="A ring, drawn 2 px away from the control in the focused border color, with the field's own fill unchanged.">
-<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--section-stack-md)', padding: 'var(--pad-x-md)' }}>
-    <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--control-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', outline: 'var(--border-width-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--focus-ring-offset)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Button</span>
-    <span style={field({ minWidth: 'var(--field-width-md)', outline: 'var(--border-width-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--focus-ring-offset)', color: 'var(--ds-text-subtlest)' })}>Placeholder</span>
-</div>
-</FoundationExample>
+<Canvas of={BorderStories.FocusRingShowcase} />
 
-<DoDont>
-<Do caption="The field keeps its fill and gains the ring.">
-<span style={field({ outline: 'var(--border-width-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--focus-ring-offset)' })}>Lincoln Middle Thursday</span>
-</Do>
-<Dont caption="A filled field reads as selected and hides what is typed.">
-<span style={field({ background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', boxShadow: 'none' })}>Lincoln Middle Thursday</span>
-</Dont>
-</DoDont>
+Do: The field keeps its fill and gains the ring.
+
+Don't: A filled field reads as selected and hides what is typed.
+
+<Canvas of={BorderStories.FocusRingDoDont} />
 
 </FoundationSection>
 
@@ -159,20 +114,7 @@ A selected option, active tab or chosen tile takes `Border/selected` (2 px) in `
 - A horizontal rule spans the content width of its container. A vertical rule sits between controls and takes their height.
 - A heavier or colored line is a state, not a divider.
 
-<FoundationExample>
-<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
-    <div style={{ font: 'var(--body-default)' }}>
-        Upcoming sessions
-        <hr style={{ border: 0, borderBlockStart: 'var(--border-width-default) solid var(--ds-border)', margin: 'var(--section-stack-sm) 0' }} />
-        Past sessions
-    </div>
-    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-lg)', height: 'var(--control-md)', font: 'var(--body-default)' }}>
-        Day
-        <span aria-hidden="true" style={{ alignSelf: 'stretch', borderInlineStart: 'var(--border-width-default) solid var(--ds-border)' }} />
-        Week
-    </div>
-</div>
-</FoundationExample>
+<Canvas of={BorderStories.Dividers} />
 
 </FoundationSection>
 
@@ -194,22 +136,11 @@ Take pattern borders from this table rather than adding one of your own.
 
 The sidebar ends in a 1 px divider in `color/border/default`. The topbar has no border.
 
-<DoDont>
-<Do caption="One hairline on the sidebar edge.">
-<div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gridTemplateRows: 'auto 1fr', font: 'var(--body-default)', background: 'var(--ds-surface-sunken)' }}>
-    <div style={{ gridColumn: '1 / -1', padding: 'var(--pad-x-md)' }}>Topbar</div>
-    <div style={{ padding: 'var(--pad-x-md)', borderInlineEnd: 'var(--border-width-default) solid var(--ds-border)' }}>Home<br />Sessions<br />Training</div>
-    <div style={{ padding: 'var(--pad-x-md)', background: 'var(--ds-surface)' }}><strong style={{ font: 'var(--heading-xs)' }}>Upcoming sessions</strong></div>
-</div>
-</Do>
-<Dont caption="A line under the topbar adds a second edge the Frame does not use.">
-<div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gridTemplateRows: 'auto 1fr', font: 'var(--body-default)', background: 'var(--ds-surface-sunken)' }}>
-    <div style={{ gridColumn: '1 / -1', padding: 'var(--pad-x-md)', borderBlockEnd: 'var(--border-width-default) solid var(--ds-border)' }}>Topbar</div>
-    <div style={{ padding: 'var(--pad-x-md)', borderInlineEnd: 'var(--border-width-default) solid var(--ds-border)' }}>Home<br />Sessions<br />Training</div>
-    <div style={{ padding: 'var(--pad-x-md)', background: 'var(--ds-surface)' }}><strong style={{ font: 'var(--heading-xs)' }}>Upcoming sessions</strong></div>
-</div>
-</Dont>
-</DoDont>
+Do: One hairline on the sidebar edge.
+
+Don't: A line under the topbar adds a second edge the Frame does not use.
+
+<Canvas of={BorderStories.SidebarEdges} />
 
 </FoundationSubsection>
 
@@ -221,14 +152,11 @@ The sidebar ends in a 1 px divider in `color/border/default`. The topbar has no 
 
 A selected row takes the 2 px selected border on every side, in `color/border/selected`.
 
-<DoDont>
-<Do caption="The 2 px outline wraps the whole row.">
-<div style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', boxShadow: 'inset 0 0 0 var(--border-width-selected) var(--ds-border-selected)', font: 'var(--body-default)' }}>Selected: Lincoln Middle</div>
-</Do>
-<Dont caption="A colored stripe on one edge marks nothing the system recognizes. Use the full outline, a fill or an icon.">
-<div style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border)', borderInlineStart: 'var(--border-width-selected) solid var(--ds-border-selected)', font: 'var(--body-default)' }}>Selected: Lincoln Middle</div>
-</Dont>
-</DoDont>
+Do: The 2 px outline wraps the whole row.
+
+Don't: A colored stripe on one edge marks nothing the system recognizes. Use the full outline, a fill or an icon.
+
+<Canvas of={BorderStories.WholeSelectionOutline} />
 
 </FoundationSubsection>
 
@@ -236,14 +164,11 @@ A selected row takes the 2 px selected border on every side, in `color/border/se
 
 `Border/default` is the width for everything that is not a state.
 
-<DoDont>
-<Do caption="Resting rows and cards keep Border/default.">
-<div style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border)', font: 'var(--body-default)' }}>Lincoln Middle</div>
-</Do>
-<Dont caption="The 2 px width on a resting row reads as selected, so users cannot tell what is chosen.">
-<div style={{ padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-lg)', boxShadow: 'inset 0 0 0 var(--border-width-selected) var(--ds-border-selected)', font: 'var(--body-default)' }}>Lincoln Middle</div>
-</Dont>
-</DoDont>
+Do: Resting rows and cards keep Border/default.
+
+Don't: The 2 px width on a resting row reads as selected, so users cannot tell what is chosen.
+
+<Canvas of={BorderStories.SelectedWidthOnlyForSelection} />
 
 </FoundationSubsection>
 

@@ -1,5 +1,7 @@
 import React from 'react';
 import { expect, waitFor } from 'storybook/test';
+import { Icon, IconButton, PanelContainer, PanelHeader } from '@/components';
+import { Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
 import {
     ButtonInField,
     JoinedGroup,
@@ -166,5 +168,47 @@ export const Pill = {
         for (const pill of root.querySelectorAll('[data-part="pill"]')) {
             await expect(rxOf(pill)).toBeCloseTo(Number(pill.getAttribute('height')) / 2, 1);
         }
+    },
+};
+
+/** Close actions on panel headers use the subtle IconButton at the default button radius. */
+export const CloseControl = {
+    render: () => (
+        <DoDont>
+            <Do caption="The subtle Icon button: the button radius, the ring and the states come with it.">
+                <PanelContainer width="100%">
+                    <PanelHeader
+                        title="Session details"
+                        actions={<IconButton icon="xmark" label="Close session details" appearance="subtle" />}
+                    />
+                </PanelContainer>
+            </Do>
+            <Dont caption="A hand-built circle. Its corner, its states and its focus ring are all guesses.">
+                <PanelContainer width="100%">
+                    <PanelHeader
+                        title="Session details"
+                        actions={(
+                            <span
+                                aria-hidden="true"
+                                style={{
+                                    display: 'grid',
+                                    placeItems: 'center',
+                                    width: 'var(--control-md)',
+                                    height: 'var(--control-md)',
+                                    borderRadius: 'var(--radius-full)',
+                                    background: 'var(--ds-background-neutral)',
+                                    color: 'var(--ds-icon-subtle)',
+                                }}
+                            >
+                                <Icon name="xmark" size={16} />
+                            </span>
+                        )}
+                    />
+                </PanelContainer>
+            </Dont>
+        </DoDont>
+    ),
+    play: async ({ canvas }) => {
+        await expect(canvas.getAllByRole('button', { name: 'Close session details' })).toHaveLength(1);
     },
 };
