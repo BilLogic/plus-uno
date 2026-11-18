@@ -102,12 +102,12 @@ Spacing.play = async ({ canvasElement }) => {
 
 
 /** One story per value, for the Examples tab. */
-export const Rows1 = () => <div style={fieldWrap}><TextArea label="Notes" placeholder="Add session notes..." rows={1} /></div>;
-export const Rows3 = () => <div style={fieldWrap}><TextArea label="Notes" placeholder="Add session notes..." rows={3} /></div>;
-export const Rows6 = () => <div style={fieldWrap}><TextArea label="Notes" placeholder="Add session notes..." rows={6} /></div>;
+export const Rows1 = () => <div style={fieldWrap}><TextArea label="Notes" placeholder="What did you cover?" rows={1} /></div>;
+export const Rows3 = () => <div style={fieldWrap}><TextArea label="Notes" placeholder="What did you cover?" rows={3} /></div>;
+export const Rows6 = () => <div style={fieldWrap}><TextArea label="Notes" placeholder="What did you cover?" rows={6} /></div>;
 
-export const SpacingDefault = () => <div style={fieldWrap}><TextArea label="Notes" placeholder="Add session notes..." spacing="default" rows={2} /></div>;
-export const SpacingCompact = () => <div style={fieldWrap}><TextArea label="Notes" placeholder="Add session notes..." spacing="compact" rows={2} /></div>;
+export const SpacingDefault = () => <div style={fieldWrap}><TextArea label="Notes" placeholder="What did you cover?" spacing="default" rows={2} /></div>;
+export const SpacingCompact = () => <div style={fieldWrap}><TextArea label="Notes" placeholder="What did you cover?" spacing="compact" rows={2} /></div>;
 
 export const Filled = () => <div style={fieldWrap}><TextArea label="Notes" defaultValue="Worked through slope and intercepts." /></div>;
 export const Success = () => <div style={fieldWrap}><TextArea label="Notes" defaultValue="Worked through slope and intercepts." successMessage="Looks good." /></div>;
@@ -116,7 +116,7 @@ export const Warning = () => <div style={fieldWrap}><TextArea label="Notes" defa
 /** Focus is a ring only: no fill, border or text color changes. */
 export const FocusRing = () => (
     <div style={{ maxWidth: '600px' /* token gap: 600px */ }}>
-        <TextArea id="text-area-focus" label="Notes" placeholder="Add session notes..." />
+        <TextArea id="text-area-focus" label="Notes" placeholder="What did you cover?" />
     </div>
 );
 
@@ -251,31 +251,31 @@ const controlOf = (canvasElement) => within(canvasElement).getByRole('textbox', 
 const wrap = { maxWidth: 'var(--width-2500)', minHeight: 'var(--height-250)' };
 
 export const Rest = {
-    render: () => <div style={wrap}><TextArea id="textarea-ex-rest" label="Notes" placeholder="Notes" /></div>,
+    render: () => <div style={wrap}><TextArea id="textarea-ex-rest" label="Notes" placeholder="What did you cover?" /></div>,
     play: async ({ canvasElement }) => expectRest(canvasElement, controlOf(canvasElement)),
 };
 
 export const Hovered = {
-    render: () => <div style={wrap}><TextArea id="textarea-ex-hover" label="Notes" placeholder="Notes" /></div>,
+    render: () => <div style={wrap}><TextArea id="textarea-ex-hover" label="Notes" placeholder="What did you cover?" /></div>,
     play: async ({ canvasElement }) => expectHovered(canvasElement, controlOf(canvasElement)),
 };
 
 export const Focused = {
-    render: () => <div style={wrap}><TextArea id="textarea-ex-focus" label="Notes" placeholder="Notes" /></div>,
+    render: () => <div style={wrap}><TextArea id="textarea-ex-focus" label="Notes" placeholder="What did you cover?" /></div>,
     play: async ({ canvasElement }) => expectFocused(canvasElement, controlOf(canvasElement)),
 };
 
 export const FieldDisabled = {
-    render: () => <div style={wrap}><TextArea id="textarea-ex-disabled" label="Notes" placeholder="Notes" isDisabled /></div>,
+    render: () => <div style={wrap}><TextArea id="textarea-ex-disabled" label="Notes" placeholder="What did you cover?" isDisabled /></div>,
     play: async ({ canvasElement }) => expectDisabled(canvasElement, controlOf(canvasElement)),
 };
 
 export const FieldInvalid = {
-    render: () => <div style={wrap}><TextArea id="textarea-ex-invalid" label="Notes" placeholder="Notes" isInvalid errorMessage="Add a note." /></div>,
+    render: () => <div style={wrap}><TextArea id="textarea-ex-invalid" label="Notes" placeholder="What did you cover?" isInvalid errorMessage="Add a note." /></div>,
     play: async ({ canvasElement }) => expectInvalid(canvasElement, controlOf(canvasElement)),
 };
 
 export const FieldReadOnly = {
-    render: () => <div style={wrap}><TextArea id="textarea-ex-readonly" label="Notes" placeholder="Notes" isReadOnly /></div>,
+    render: () => <div style={wrap}><TextArea id="textarea-ex-readonly" label="Notes" placeholder="What did you cover?" isReadOnly /></div>,
     play: async ({ canvasElement }) => expectReadOnly(canvasElement, controlOf(canvasElement)),
 };

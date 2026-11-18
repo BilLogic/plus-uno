@@ -90,7 +90,7 @@ export const WithNestedReplies = () => (
         author="Ari Patel"
         content="Should we review fractions again before Friday's quiz?"
         nestedReplies={(
-            <Comment author="Maya Chen" content="Yes, let's start with a five-minute warm-up." />
+            <Comment author="Maya K." content="Yes, let's start with a five-minute warm-up." />
         )}
     />
 );

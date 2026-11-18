@@ -97,7 +97,7 @@ export const LinkAction = () => (
                 primaryAction={<SpotlightAction appearance="primary" href="#session-guide">Learn more</SpotlightAction>}
                 id="spotlight-link-action"
             >
-                Open the step-by-step guide in a new page.
+                Follow the step-by-step guide on this page.
             </Spotlight>
         </div>
     </SpotlightProvider>
@@ -116,7 +116,7 @@ export function Dismissible() {
                 <SpotlightTarget><Button text="Session tips" /></SpotlightTarget>
                 {isOpen && (
                     <Spotlight headline="Warm-up notes added" onDismiss={() => setIsOpen(false)}>
-                        Select the close button to dismiss this tip.
+                        See what your student practiced before the session. Select the close button to dismiss it.
                     </Spotlight>
                 )}
             </div>

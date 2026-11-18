@@ -65,28 +65,28 @@ function PopupLayoutDemos() {
     return (
         <section style={{ display: 'flex', gap: '32px' /* token gap: 32px */, flexWrap: 'wrap', justifyContent: 'center' }}>
             <Popup
-                trigger={<Button text="Popup on Top" />}
+                trigger={<Button text="Session note on top" />}
                 placement="top"
                 title="Session note"
             >
                 Maya K. completed three practice sets before Thursday's session.
             </Popup>
             <Popup
-                trigger={<Button text="Popup on Bottom" />}
+                trigger={<Button text="Session note on bottom" />}
                 placement="bottom"
                 title="Session note"
             >
                 Maya K. completed three practice sets before Thursday's session.
             </Popup>
             <Popup
-                trigger={<Button text="Popup on Left" />}
+                trigger={<Button text="Session note on left" />}
                 placement="left"
                 title="Session note"
             >
                 Maya K. completed three practice sets before Thursday's session.
             </Popup>
             <Popup
-                trigger={<Button text="Popup on Right" />}
+                trigger={<Button text="Session note on right" />}
                 placement="right"
                 title="Session note"
             >
@@ -116,19 +116,19 @@ function PopupInteractionStatesDemos() {
             <DemoLabel>TRIGGER TYPES</DemoLabel>
             <div style={{ display: 'flex', gap: 'var(--grid-gutter)', flexWrap: 'wrap' }}>
                 <Popup
-                    trigger={<Button text="Click (Default)" appearance="primary" />}
+                    trigger={<Button text="Click for session details (default)" appearance="primary" />}
                     triggerType="click"
                 >
                     Session details opened on click.
                 </Popup>
                 <Popup
-                    trigger={<Button text="Hover" appearance="primary" />}
+                    trigger={<Button text="Hover for session summary" appearance="primary" />}
                     triggerType="hover"
                 >
                     Session summary shown on hover.
                 </Popup>
                 <Popup
-                    trigger={<Button text="Focus" appearance="primary" />}
+                    trigger={<Button text="Focus for lesson goals" appearance="primary" />}
                     triggerType="focus"
                 >
                     Lesson goals shown on keyboard focus.

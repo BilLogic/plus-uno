@@ -257,22 +257,22 @@ export const DependentFields = {
 };
 
 const tutorNames = [
-    'Ari Patel', 'Maya Chen', 'Jordan Taylor', 'Elena Ruiz', 'Marcus Brooks',
-    'Priya Shah', 'Noah Wright', 'Sofia Lopez', 'Liam Davis', 'Chloe Miller',
-    'Ethan Hayes', 'Zoe Park', 'Ava Carter', 'Leo Garcia', 'Nora Foster',
-    'Owen Kim', 'Hannah Vance', 'Lucas Morales', 'Grace Turner', 'Caleb Reed',
-    'Ruby Santos', 'Isaac Bennett', 'Clara Nguyen', 'Julian Price', 'Hazel Cole',
-    'Miles Rivera', 'Stella Ward', 'Theo James', 'Iris Diaz', 'Eli Flores',
-    'Lydia Ross', 'Gavin Powell', 'Mila Jenkins', 'Asher Long', 'Naomi Perry',
-    'Wesley Hughes', 'Audrey Myers', 'Roman Ford', 'Carmen Gomez', 'Darius Bell',
-    'Camila Ortiz', 'Jonas Kelly', 'Beatrice Cruz', 'Simon Howard', 'Tessa Ward',
-    'Mateo Silva', 'Claire Price', 'Nathan Cole', 'Eva Simmons', 'Adrian Stone',
-    'Leah Griffin', 'Victor Walsh', 'Sonia Morales', 'Callum Burke', 'Alice Bryant',
-    'Jasper Cox', 'Phoebe Dunn', 'Rowan Webb', 'Dahlia Shaw', 'Declan Hart',
-    'Sienna Fox', 'Felix Stone', 'Corinne Lane', 'Tobias Nash', 'Molly West',
-    'Cyrus Dean', 'Freya Mills', 'Oscar Boyd', 'Gianna Hunt', 'Arthur Shaw',
-    'Lucy Fleming', 'Hugo Watts', 'Fiona Marsh', 'Devon Blake', 'Talia Greene',
-    'Jonah Lowe', 'Vera Sutton', 'Malcolm Cross', 'Kira Wolfe', 'Elias Boone',
+    'Ari P.', 'Maya K.', 'Jordan T.', 'Elena R.', 'Marcus B.',
+    'Priya S.', 'Noah W.', 'Sofia L.', 'Liam D.', 'Chloe M.',
+    'Ethan H.', 'Zoe P.', 'Ava C.', 'Leo G.', 'Nora F.',
+    'Owen K.', 'Hannah V.', 'Lucas M.', 'Grace T.', 'Caleb R.',
+    'Ruby S.', 'Isaac B.', 'Clara N.', 'Julian P.', 'Hazel C.',
+    'Miles R.', 'Stella W.', 'Theo J.', 'Iris D.', 'Eli F.',
+    'Lydia R.', 'Gavin P.', 'Mila J.', 'Asher L.', 'Naomi P.',
+    'Wesley H.', 'Audrey M.', 'Roman F.', 'Carmen G.', 'Darius B.',
+    'Camila O.', 'Jonas K.', 'Beatrice C.', 'Simon H.', 'Tessa W.',
+    'Mateo S.', 'Claire P.', 'Nathan C.', 'Eva S.', 'Adrian S.',
+    'Leah G.', 'Victor W.', 'Sonia M.', 'Callum B.', 'Alice B.',
+    'Jasper C.', 'Phoebe D.', 'Rowan W.', 'Dahlia S.', 'Declan H.',
+    'Sienna F.', 'Felix S.', 'Corinne L.', 'Tobias N.', 'Molly W.',
+    'Cyrus D.', 'Freya M.', 'Oscar B.', 'Gianna H.', 'Arthur S.',
+    'Lucy F.', 'Hugo W.', 'Fiona M.', 'Devon B.', 'Talia G.',
+    'Jonah L.', 'Vera S.', 'Malcolm C.', 'Kira W.', 'Elias B.',
 ];
 const people = tutorNames.map((name, i) => ({ value: `p${i + 1}`, label: name }));
 
@@ -288,7 +288,33 @@ export const LongList = {
 /** Rows live in a portal on `document.body`, so they are looked up on the whole page. */
 const page = () => within(document.body);
 
-const students = Array.from({ length: 120 }, (_, i) => ({ value: `s${i + 1}`, label: `Student ${i + 1}` }));
+const studentNames = [
+    'Ari P.', 'Maya K.', 'Jordan T.', 'Elena R.', 'Marcus B.',
+    'Priya S.', 'Noah W.', 'Sofia L.', 'Liam D.', 'Chloe M.',
+    'Ethan H.', 'Zane P.', 'Ava C.', 'Leo G.', 'Nora F.',
+    'Owen K.', 'Hannah V.', 'Lucas M.', 'Grace T.', 'Caleb R.',
+    'Ruby S.', 'Isaac B.', 'Clara N.', 'Julian P.', 'Hazel C.',
+    'Miles R.', 'Stella W.', 'Theo J.', 'Iris D.', 'Eli F.',
+    'Lydia R.', 'Gavin P.', 'Mila J.', 'Asher L.', 'Naomi P.',
+    'Wesley H.', 'Audrey M.', 'Roman F.', 'Carmen G.', 'Darius B.',
+    'Camila O.', 'Jonas K.', 'Beatrice C.', 'Simon H.', 'Tessa W.',
+    'Mateo S.', 'Claire P.', 'Nathan C.', 'Eva S.', 'Adrian S.',
+    'Leah G.', 'Victor W.', 'Sonia M.', 'Callum B.', 'Alice B.',
+    'Jasper C.', 'Phoebe D.', 'Rowan W.', 'Dahlia S.', 'Declan H.',
+    'Sienna F.', 'Felix S.', 'Corinne L.', 'Tobias N.', 'Molly W.',
+    'Cyrus D.', 'Freya M.', 'Oscar B.', 'Gianna H.', 'Arthur S.',
+    'Lucy F.', 'Hugo W.', 'Fiona M.', 'Devon B.', 'Talia G.',
+    'Jonah L.', 'Vera S.', 'Malcolm C.', 'Kira W.', 'Elias B.',
+    'Amara T.', 'Bennett R.', 'Camille D.', 'Desmond K.', 'Eliza N.',
+    'Fabian L.', 'Gemma W.', 'Henrik P.', 'Imogen B.', 'Jude M.',
+    'Keira H.', 'Landon F.', 'Margot S.', 'Nico V.', 'Ophelia G.',
+    'Parker C.', 'Quinn R.', 'Rafael T.', 'Sabrina J.', 'Tristan D.',
+    'Uma K.', 'Valerie N.', 'Wyatt B.', 'Xander L.', 'Yara M.',
+    'Zuri H.', 'Aiden W.', 'Brielle P.', 'Carter S.', 'Delilah F.',
+    'Emmett G.', 'Flora C.', 'Gideon R.', 'Harper T.', 'Isaiah N.',
+    'Josie B.', 'Kieran D.', 'Lilah M.', 'Micah V.', 'Nadia W.',
+];
+const students = studentNames.map((name, i) => ({ value: `s${i + 1}`, label: name }));
 
 /** A server stand-in: filters by the typed text and answers a page after a short wait. */
 const loadStudents = (query, { offset, limit }) => new Promise((resolve) => {
@@ -316,8 +342,9 @@ export const Async = {
         fireEvent.scroll(body);
         await expect(await page().findByText('Showing 100 of 120')).toBeInTheDocument();
 
-        await userEvent.type(field, 'Student 11');
-        await waitFor(() => expect(page().getAllByRole('option')).toHaveLength(11));
+        await userEvent.type(field, 'Maya K.');
+        await waitFor(() => expect(page().getAllByRole('option')).toHaveLength(1));
+        await expect(page().getByRole('option', { name: 'Maya K.' })).toBeInTheDocument();
         await expect(page().queryByText(/^Showing/)).toBeNull();
     },
 };

@@ -199,7 +199,7 @@ Without `onSelect` the markers are decorative and only `aria-current` marks the 
 A short row reads at a glance. With many steps, position stops being readable.
 
 <DoDontPair
-    doExample={<ProgressIndicator values={['Session setup', 'Warm-up', 'Guided work', 'Practice', 'Reflection']} selectedIndex={2} />}
+    doExample={<ProgressIndicator values={['Session setup', 'Warm-up', 'Practice', 'Reflection']} selectedIndex={1} />}
     doCaption="A handful of steps, so the current one is easy to find."
     dontExample={<ProgressIndicator values={Array.from({ length: 24 }, (_, i) => `Step ${i + 1}`)} selectedIndex={11} size={8} spacing="compact" />}
     dontCaption="Two dozen steps, where the current one is lost in the row."
