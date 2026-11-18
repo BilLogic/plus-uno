@@ -63,6 +63,7 @@
   @include meta.load-css("../components/forms-and-inputs/ButtonGroup/ButtonGroup");
   // @import "../components/Checkbox/Checkbox"; // no Checkbox component in components/
 
+@include meta.load-css("../components/messaging/Dialog/Dialog");
 @include meta.load-css("../components/messaging/Modal/Modal");
 @include meta.load-css("../components/forms-and-inputs/FooterActions/FooterActions");
 // @import "../components/Navigation/Navigation"; // no Navigation component in components/
