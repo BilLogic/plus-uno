@@ -6,6 +6,7 @@ import {
   ElevationHero,
   ElevationLayersHero,
   ElevationRampHero,
+  DimensionsHero,
   GridHero,
   IconographyHero,
   IllustrationsHero,
@@ -153,6 +154,11 @@ export const HEROES = {
     Hero: RadiusHero,
     description:
       'One corner cropped big, drawn as the circle it comes from.',
+  },
+  'foundations-layout-dimensions': {
+    Hero: DimensionsHero,
+    description:
+      'The ladder as bars as wide as their value, the five core sizes outlined.',
   },
   'foundations-layout-spacing': {
     Hero: SpacingHero,

@@ -262,6 +262,18 @@ _Avoid_: "dots", "slide marker", `CarouselDots`
 
 ### Design system: tokens
 
+**Dimension**:
+The foundation of every length on a page: the dimension primitives (one rem ladder named in basis points, where `100` is 1 rem) and the rules every gap, size, radius and stroke shares. Dimensions is the Foundations page that owns the ladder (ADR-052).
+_Avoid_: "size scale" and "spacing scale" for it, as if they were two ladders
+
+**Core size**:
+One of the five box sizes, 16 · 24 · 32 · 40 · 48, that Control, Row and Media take. A Label's 16 and 20 are the one-line exception.
+_Avoid_: 28 as a size
+
+**Spacing** (the foundation):
+Empty space read from the dimension primitives: pad, stack, inline and gutter. It names a job, where a size names how big a thing is. The `spacing` prop is a different word: it sets a component's density.
+_Avoid_: "margin", "padding" as token words
+
 **Token**:
 A design value: color, spacing, typography, elevation, radius.
 

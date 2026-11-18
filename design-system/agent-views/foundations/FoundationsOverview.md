@@ -45,7 +45,8 @@ Grouped as tokens, brand, visual, layout, expression and accessibility.
 
 ### Layout
 
-- **Spacing.** The space inside and between boxes, named by the job it does.
+- **Dimensions.** The one ladder every size, gap, radius and stroke reads from.
+- **Spacing.** Empty space named by the job it does: pad, stack, inline and gutter.
 - **Grid.** Two 12-column grids, the breakpoints and the content widths.
 
 ### Expression
