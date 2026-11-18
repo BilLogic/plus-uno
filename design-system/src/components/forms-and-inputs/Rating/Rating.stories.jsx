@@ -170,6 +170,12 @@ Interactive.play = async ({ canvasElement }) => {
     await settleAnimations(canvasElement);
     await expect(star4).toHaveAttribute('aria-checked', 'true');
     await expect(getComputedStyle(star4.querySelector('i')).color).toBe(tokenColor(canvasElement, '--ds-icon-selected'));
+
+    const star5 = canvas.getByRole('radio', { name: 'Rate 5' });
+    await userEvent.click(star5);
+    await expect(star5.style.getPropertyValue('--plus-rating-stagger')).toBe('0ms');
+    await settleAnimations(canvasElement);
+    await expect(star5).toHaveAttribute('aria-checked', 'true');
 };
 
 /** Each prop shows up in the DOM: numeric labels, comments label, icon family, minority marker. */
