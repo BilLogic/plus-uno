@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import { Breadcrumb, Sidebar as RoleSidebar, Button } from '@/components';
+import { Breadcrumb, Button } from '@/components';
 import { Frame } from '@/patterns';
-import PatternSidebar, {
+import Sidebar, {
     createOpenTabsStore,
     OpenTabsProvider,
     SIDEBAR_SECTIONS_STORAGE_KEY,
-} from '@/patterns/Sidebar';
+} from './index';
 import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 
 /**
- * `PatternSidebar` — the app's side navigation.
+ * `Sidebar` — the app's side navigation.
  *
  * THE TEST SEAM IS THIS FILE. Each story is one state of the signed-off
  * prototype's dial (view, onboarding, sections, tabs, tab state, sidebar
@@ -110,7 +110,7 @@ const Live = ({ view = 'supervisor', tabSet = 'few', boxHeight, account, ...args
     const [tabs, setTabs] = useState(TAB_SETS[tabSet]);
     return (
         <Box height={boxHeight}>
-            <PatternSidebar
+            <Sidebar
                 groups={groups(view)}
                 account={account ?? (view === 'tutor' ? TUTOR : ACCOUNT)}
                 helpHref="https://www.notion.so/"
@@ -141,24 +141,32 @@ const settledLayout = (Story) => <MotionPreferenceContext.Provider value><Story 
 export default {
     decorators: [settledLayout],
     title: 'Components/Navigation/Navigation system/Navigation system',
-    component: PatternSidebar,
+    component: Sidebar,
     tags: ['!dev', '!autodocs'],
     render: (args) => <Live {...args} />,
     args: { view: 'supervisor', tabSet: 'few', activeId: 'sessions', modulesLeft: 0, lessonsLeft: 0, label: 'Main', storageKey: SIDEBAR_SECTIONS_STORAGE_KEY },
     argTypes: {
         view: { control: 'inline-radio', options: ['tutor', 'supervisor'], table: { category: 'Story' } },
         tabSet: { control: 'inline-radio', options: ['none', 'few', 'many'], table: { category: 'Story' } },
+        user: { control: 'inline-radio', options: ['tutor', 'supervisor'], table: { category: 'Content' } },
         groups: { control: false, table: { category: 'Content' } },
         tabs: { control: false, table: { category: 'Content' } },
+        countTags: { control: false, table: { category: 'Content' } },
         account: { control: 'object', table: { category: 'Content' } },
         modulesLeft: { control: { type: 'number', min: 0 }, table: { category: 'Content' } },
         lessonsLeft: { control: { type: 'number', min: 0 }, table: { category: 'Content' } },
         activeId: { control: 'text', table: { category: 'Behavior' } },
+        activeTabId: { control: 'text', table: { category: 'Behavior' } },
         helpHref: { control: 'text', table: { category: 'Content' } },
         homeHref: { control: 'text', table: { category: 'Content' } },
+        slackUrl: { control: 'text', table: { category: 'Content' } },
         storageKey: { control: 'text', table: { category: 'Behavior' } },
         label: { control: 'text', table: { category: 'Accessibility' } },
+        visible: { control: 'boolean', table: { category: 'Behavior' } },
         onSelect: { table: { disable: true } },
+        onHomeClick: { table: { disable: true } },
+        onTabClick: { table: { disable: true } },
+        onOpenTabSelect: { table: { disable: true } },
         onSelectTab: { table: { disable: true } },
         onCloseTab: { table: { disable: true } },
         onCloseAllTabs: { table: { disable: true } },
@@ -276,11 +284,26 @@ export const Tutor = {
     },
 };
 
+/** Default content: with no `groups` or `user` prop, Sidebar renders the tutor role's groups with Home selected. */
+export const DefaultRole = {
+    render: () => (
+        <Box>
+            <Sidebar account={TUTOR} storageKey={null} onToggle={() => {}} />
+        </Box>
+    ),
+    play: async ({ canvasElement }) => {
+        const titles = [...nav(canvasElement).querySelectorAll('.plus-pattern-sidebar__title-text')].map((t) => t.textContent);
+        await expect(titles).toEqual(['Training', 'Toolkit']);
+        await expect(rowNamed(canvasElement, 'Home')).toHaveAttribute('aria-current', 'page');
+        await expect(rowNamed(canvasElement, 'Sessions')).toBeVisible();
+    },
+};
+
 /** A prototype: keeps the role's navigation with its own area added to the Toolkit and selected. */
 export const PrototypeAreas = {
     render: () => (
         <Box>
-            <RoleSidebar
+            <Sidebar
                 user="tutor"
                 groups={[
                     {
@@ -642,7 +665,7 @@ const InFrame = ({ width, sidebarDocked }) => {
                 <Frame
                     sidebarDocked={sidebarDocked}
                     header={<Breadcrumb items={[{ text: 'Toolkit' }, { text: 'Sessions' }]} />}
-                    sidebar={<RoleSidebar user="supervisor" activeTabId="sessions" account={ACCOUNT} countTags={{ 'compliance-monitor': { count: 3, countLabel: '3 open flags' } }} lessonsLeft={2} />}
+                    sidebar={<Sidebar user="supervisor" activeTabId="sessions" account={ACCOUNT} countTags={{ 'compliance-monitor': { count: 3, countLabel: '3 open flags' } }} lessonsLeft={2} />}
                     panelStorageKey={null}
                 >
                     <p style={{ margin: 0 }}>Upcoming and past sessions.</p>

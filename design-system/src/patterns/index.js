@@ -7,16 +7,6 @@ export { default as Frame } from './Frame';
 export { useSidebarControl } from './Frame/SidebarControl';
 export { usePanelControl } from './Frame/PanelControl';
 export { PANEL_STORAGE_KEY } from './Frame';
-export {
-    default as PatternSidebar,
-    useOpenTabs,
-    clearOpenTabs,
-    createOpenTabsStore,
-    getOpenTabsStore,
-    OpenTabsProvider,
-    OPEN_TABS_STORAGE_KEY,
-    SIDEBAR_RECENT_TABS,
-} from './Sidebar';
 export { default as PatternCard } from './PatternCard';
 export { default as PatternSection, SECTION_DETAIL_FLOOR } from './PatternSection';
 export { default as AiChat, useAiChat, AI_CHAT_MODES, AI_CHAT_STORAGE_KEY, AI_CHAT_FULLSCREEN_BELOW, AI_CHAT_DISCLAIMER } from './AiChat';

@@ -185,7 +185,6 @@ export const TOKEN_LADDER = [
   // ─── Templates / Frame (with Topbar and Sidebar) ──────────────────────
   { tier: 'templates', group: 'Frame', new: '--frame-topbar-height', old: '--layout-height-topbar', ref: 'var(--height-200)', use: 'Height of the Frame\'s top bar.' },
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-width', old: '--layout-width-sidebar', ref: 'var(--width-1500)', use: 'Width of the Frame\'s Sidebar at the current breakpoint.' },
-  { tier: 'templates', group: 'Frame', new: '--frame-sidebar-width-nav', old: '--layout-sidebar-width', ref: '164px', note: 'fixed SideNav width (164), distinct from the responsive sidebar above', use: 'Fixed width of the side navigation inside the Frame.' },
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-pad', old: null, value: '--space-075', note: 'the Sidebar pads 12 on every side', use: 'Padding on every side inside the Sidebar.' },
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-row-gap', old: null, value: '--space-0125', note: 'two Sidebar rows sit 2 apart', use: 'Vertical gap between two rows in the Sidebar.' },
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-group-gap', old: null, value: '--space-100', note: 'two Sidebar groups sit 16 apart', use: 'Vertical gap between two groups of rows in the Sidebar.' },
@@ -483,6 +482,7 @@ export const RETIRED_RENAMES = {
   '--card-pad-sm': '--card-pad-compact',
   '--card-pad-md': '--card-pad-default',
   '--card-pad-lg': '--card-pad-spacious',
+  '--layout-sidebar-width': '--frame-sidebar-width',
 };
 
 /** Retired name -> its replacement: the explicit table above, then each ladder row's `old` (first row wins). */

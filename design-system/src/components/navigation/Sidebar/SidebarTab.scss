@@ -6,7 +6,7 @@
  * a 16 icon (Icon/md) and a Body/default label. Every length is a token.
  */
 
-@use '../../styles/state' as *;
+@use '../../../styles/state' as *;
 
 .plus-sidebar-tab {
     display: flex;

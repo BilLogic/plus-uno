@@ -88,7 +88,7 @@ export { default as Spotlight, SPOTLIGHT_PLACEMENTS, SpotlightAction, SpotlightP
 export { default as Breadcrumb } from '@/components/navigation/Breadcrumb';
 export { default as Link, LINK_APPEARANCES } from '@/components/navigation/Link';
 export { default as Pagination, PAGINATION_NAVIGATORS, PAGINATION_SPACINGS } from '@/components/navigation/Pagination';
-export { default as Sidebar } from '@/components/navigation/Sidebar';
+export { default as Sidebar, ACCOUNT_ROLES, clearOpenTabs, createOpenTabsStore, getOpenTabsStore, lockMessage, OPEN_TABS_STORAGE_KEY, OpenTabsProvider, SIDEBAR_RECENT_TABS, SIDEBAR_SECTIONS_STORAGE_KEY, SidebarAccount, SidebarTab, trainingCount, useOpenTabs } from '@/components/navigation/Sidebar';
 export { default as Tabs } from '@/components/navigation/Tabs';
 
 export { default as Popup, acceptsExpandedState, POPUP_WIDTH_PX, POPUP_WIDTHS } from '@/components/overlays-and-layering/Popup';

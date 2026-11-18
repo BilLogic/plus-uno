@@ -1,5 +1,5 @@
 /**
- * Sidebar pattern (Patterns/Sidebar). One grid holds every part: the Sidebar
+ * Sidebar (Components/Navigation/Navigation system). One grid holds every part: the Sidebar
  * pads 12, so rows run from x 12 to 228; a row pads 4, its 24 icon slot sits
  * 4 in (x 20 to 44, center 32), the label follows 4 later (x 48), and the
  * trailing slot ends 4 before the row's end (center 208). Section titles start
@@ -7,7 +7,7 @@
  * a Frame, semantic or size token; every color is a `--ds-*` role.
  */
 
-@use '../../styles/state' as *;
+@use '../../../styles/state' as *;
 
 // The ring sits inside the row's edge, so the scrolling nav never clips it.
 @mixin sidebar-ring-inside {

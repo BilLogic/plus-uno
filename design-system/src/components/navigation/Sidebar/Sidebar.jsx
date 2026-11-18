@@ -1,159 +1,797 @@
-import React from 'react';
+import React, { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
+import { animate } from 'motion/react';
+import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
+import { ClippedTooltip } from '@/lib/ClippedTooltip';
+import { useMotionReduced } from '@/lib/motionPreference';
+import { measureRelativeBox } from '@/lib/navigationMotion';
+import CountTag from '../../labels/CountTag';
+import Icon from '../../images-and-icons/Icon';
+import IconButton from '../../forms-and-inputs/IconButton';
+import Logo from '../../images-and-icons/Logo';
+import Tooltip from '../../overlays-and-layering/Tooltip';
 // The pattern's own folder, not the patterns barrel: the components barrel loads
 // this file, and pulling every pattern (and its stylesheet) in here would
 // reorder the cascade for every component that loads after it.
-import PatternSidebar, { clearOpenTabs, useOpenTabs } from '@/patterns/Sidebar';
+import { useSidebarControl } from '../../../patterns/Frame/SidebarControl';
+import SidebarAccount, { ACCOUNT_ROLES } from './SidebarAccount';
+import { clearOpenTabs, SIDEBAR_RECENT_TABS, useOpenTabs } from './openTabs';
 import { sidebarGroups } from './sidebarConfig';
+import './Sidebar.scss';
+
+/** Where collapsed section titles are remembered, per person: `<key>:<account id>`. */
+export const SIDEBAR_SECTIONS_STORAGE_KEY = 'plus-sidebar-sections';
+
+/** The tooltip and message of a section locked until assigned training is done. */
+export const lockMessage = (title) => `Complete your assigned training to unlock the ${title}`;
+
+/** What a Training row counts: assigned lessons, or onboarding modules while onboarding is in progress. */
+export const trainingCount = (kind, { lessonsLeft = 0, modulesLeft = 0 }) => {
+    if (kind === 'lessons' && lessonsLeft > 0) {
+        return { count: lessonsLeft, label: `${lessonsLeft} assigned ${lessonsLeft === 1 ? 'lesson' : 'lessons'} left` };
+    }
+    if (kind === 'modules' && modulesLeft > 0) {
+        return { count: modulesLeft, label: `${modulesLeft} onboarding ${modulesLeft === 1 ? 'module' : 'modules'} left` };
+    }
+    return null;
+};
+
+const readCollapsed = (key) => {
+    if (!key || typeof window === 'undefined') return {};
+    try {
+        const value = JSON.parse(window.localStorage.getItem(key));
+        return value && typeof value === 'object' ? value : {};
+    } catch {
+        return {};
+    }
+};
+
+const writeCollapsed = (key, value) => {
+    if (!key || typeof window === 'undefined') return;
+    try {
+        window.localStorage.setItem(key, JSON.stringify(value));
+    } catch {
+        // Storage full or blocked: the sections still collapse, they just forget.
+    }
+};
 
 /**
- * The PLUS sidebar: the Sidebar pattern (`@/patterns`) filled with the groups
- * for the role (`sidebarConfig.js`), the signed-in person's account row, and
- * the open tabs. Home is selected when nothing else is. Pass `groups` to add
- * or override a prototype's own area(s) by `id` while keeping the role's
- * navigation.
+ * The PLUS sidebar: the app's side navigation, 240 wide, padded 12, on the
+ * sunken fill. Every row sits on one grid: rows 32 high from x 12 to 228 with
+ * radius 6, a 24 icon slot centered on x 32, the label on x 48, and a trailing
+ * slot centered on x 208.
  *
- * Open tabs come from `useOpenTabs()`: a page that opens a record (a session, a
- * student) calls `open(parentId, record)`, and the record shows here as a tab
- * under its row. A tab is selected while its row is the current page
- * (`activeTabId`); elsewhere the page's own row is. Pressing a tab selects it
- * and calls `onOpenTabSelect(tab)`, which is where an app goes to the record's
- * route if it is not already there. Signing out clears the tabs. Nothing here
- * changes the URL.
+ * By default it fills with the groups for `user` (`sidebarConfig.js`, defaulting
+ * to `'tutor'`), the signed-in person's account row, and open tabs from
+ * `useOpenTabs()`. Pass `user` and `groups` together to add or override a
+ * prototype's own area(s) by `id` while keeping the role's navigation; pass
+ * `groups` without `user` (and/or `tabs`) to render custom groups directly.
+ *
+ * - **Logo row**: the PLUS Logo lockup at height 24, a link to Home, and the
+ *   sidebar toggle (`angles-left`) on the trailing column. Inside a Frame the
+ *   toggle comes from the Frame; standalone, pass `onToggle`.
+ * - **Groups**: the first has no title (Home, Slack). Every other group has a
+ *   title row, a full 32 row that collapses its group; an `angle-down` shows
+ *   after the title on hover and focus and turns right while collapsed. Each
+ *   person's collapsed sections are remembered in localStorage.
+ * - **Locked group**: while `modulesLeft` is above 0, a group marked
+ *   `lockedDuringOnboarding` shows a lock in the title's caret slot, its rows
+ *   in the subtlest text with no hover, and the tooltip "Complete your assigned
+ *   training to unlock the Toolkit" (no number). It neither collapses nor opens.
+ * - **Training counts**: a row with `training: 'lessons'` shows the Count tag of
+ *   `lessonsLeft` ("2 assigned lessons left"); `training: 'modules'` shows
+ *   `modulesLeft` ("3 onboarding modules left"), only while onboarding is in
+ *   progress. Zero shows nothing.
+ * - **Trailing slot**: a count, a dot, the external icon for a link that
+ *   leaves the app, or a close button.
+ * - **Open tabs** (`useOpenTabs()` or `tabs[item.id]`): records a person
+ *   opened (a session, a student) list under their row on a thread, one line
+ *   on the icon column whose last row turns into the label column. Each tab
+ *   shows a live dot at rest and Close on hover, focus and while selected;
+ *   Delete or Backspace closes the focused tab. Three show, then "Show n more".
+ *   On hover the row's icon slot turns into a collapse angle and its trailing
+ *   slot into Close all. Exactly one row is selected: a selected tab takes the
+ *   fill and its row goes to ink; collapsed, the row takes the fill and shows
+ *   the tab count.
+ * - **Icons**: every row icon is outlined (Font Awesome Free regular) in the
+ *   one subtle icon color. A selected row shows the fill and the selected icon
+ *   color, never a solid icon; a brand mark (`fa-brands fa-slack`) is the only
+ *   exception.
+ * - **Account row**: `SidebarAccount`, under a divider.
+ *
+ * Content is data. Nothing here changes the URL.
  */
 const Sidebar = ({
-    user = 'tutor',
+    user,
     groups,
-    account,
-    modulesLeft = 0,
-    lessonsLeft = 0,
-    countTags,
+    activeId,
+    activeTabId,
+    onSelect,
     onHomeClick,
     onTabClick,
     onOpenTabSelect,
+    tabs,
+    onSelectTab,
+    onCloseTab,
+    onCloseAllTabs,
+    modulesLeft = 0,
+    lessonsLeft = 0,
+    countTags,
+    account,
     onProfile,
     onSignOut,
     helpHref,
-    activeTabId,
+    homeHref = '/',
     slackUrl,
+    onHome,
+    onToggle,
+    storageKey = SIDEBAR_SECTIONS_STORAGE_KEY,
     label = 'Main',
     visible = true,
+    id,
     className = '',
     style,
 }) => {
+    const baseId = useId();
+    const control = useSidebarControl();
     const openTabs = useOpenTabs();
+    const reduced = useMotionReduced();
+    const navRef = useRef(null);
+    const glideRef = useRef(null);
+    const mountedRef = useRef(false);
+    const lastRowRef = useRef(null);
+    const glideAnimRef = useRef(null);
+    const sectionsKey = storageKey && account?.id ? `${storageKey}:${account.id}` : null;
+    const [shutGroups, setShutGroups] = useState(() => readCollapsed(sectionsKey));
+    const [shutRows, setShutRows] = useState({});
+    const [showingAll, setShowingAll] = useState({});
+
+    const resolvedGroups = useMemo(() => {
+        if (groups === undefined) {
+            return sidebarGroups(user ?? 'tutor', { slackUrl, countTags });
+        }
+        if (user !== undefined) {
+            return sidebarGroups(user, { slackUrl, countTags, groups });
+        }
+        return groups;
+    }, [groups, user, slackUrl, countTags]);
+
+    const resolvedTabs = useMemo(() => {
+        if (tabs !== undefined) return tabs;
+        return Object.fromEntries(Object.entries(openTabs.byParent).map(([parentId, list]) => [
+            parentId,
+            list.map((tab) => ({ ...tab, label: tab.title, live: tab.status === 'live' })),
+        ]));
+    }, [tabs, openTabs.byParent]);
+
+    const isRoleConfigured = groups === undefined || user !== undefined;
+    const resolvedActiveId = useMemo(() => {
+        if (activeId !== undefined) return activeId;
+        if (activeTabId !== undefined || isRoleConfigured) {
+            const page = activeTabId || 'home';
+            const selectedTab = openTabs.tabs.find((tab) => tab.id === openTabs.selectedId);
+            return selectedTab && selectedTab.parentId === page ? selectedTab.id : page;
+        }
+        return undefined;
+    }, [activeId, activeTabId, isRoleConfigured, openTabs.tabs, openTabs.selectedId]);
+
+    const effectiveModulesLeft = user === 'supervisor' ? 0 : modulesLeft;
+    const effectiveLessonsLeft = user === 'supervisor' ? 0 : lessonsLeft;
+
+    useLayoutEffect(() => {
+        const navEl = navRef.current;
+        const glideEl = glideRef.current;
+        if (!navEl || !glideEl || !visible) return undefined;
+        const activeEl = navEl.querySelector('[aria-current="page"]');
+        const readRow = (el) => {
+            const box = measureRelativeBox(el, navEl);
+            return box
+                ? { id: resolvedActiveId, x: box.x, y: box.y + navEl.scrollTop, width: box.width, height: box.height }
+                : null;
+        };
+        if (!activeEl) {
+            lastRowRef.current = null;
+            return undefined;
+        }
+        if (!mountedRef.current) {
+            mountedRef.current = true;
+            lastRowRef.current = readRow(activeEl);
+            return undefined;
+        }
+        const prev = lastRowRef.current;
+        const next = readRow(activeEl);
+        if (!prev || !next || prev.id === resolvedActiveId) {
+            if (!navEl.dataset.gliding) lastRowRef.current = next;
+            return undefined;
+        }
+        if (reduced) {
+            glideAnimRef.current?.stop?.();
+            delete navEl.dataset.gliding;
+            lastRowRef.current = next;
+            return undefined;
+        }
+        glideAnimRef.current?.stop?.();
+        navEl.dataset.gliding = 'true';
+        const from = { ...prev };
+        const apply = (p) => {
+            const lerp = (a, b) => a + (b - a) * p;
+            const x = lerp(from.x, next.x);
+            const y = lerp(from.y, next.y);
+            const w = Math.max(0, lerp(from.width, next.width));
+            const h = Math.max(0, lerp(from.height, next.height));
+            glideEl.style.transform = `translate(${x}px, ${y}px)`;
+            glideEl.style.width = `${w}px`;
+            glideEl.style.height = `${h}px`;
+            lastRowRef.current = { id: resolvedActiveId, x, y, width: w, height: h };
+        };
+        apply(0);
+        const anim = animate(0, 1, {
+            ...SPRINGS['spatial.fast'].productive,
+            onUpdate: apply,
+        });
+        glideAnimRef.current = anim;
+        Promise.resolve(anim.finished).then(() => {
+            if (glideAnimRef.current !== anim) return;
+            glideAnimRef.current = null;
+            delete navEl.dataset.gliding;
+            lastRowRef.current = readRow(activeEl);
+        });
+        return undefined;
+    }, [resolvedActiveId, reduced, visible]);
+
+    useLayoutEffect(() => () => { glideAnimRef.current?.stop?.(); }, []);
+
+    // A different person has their own sections.
+    useEffect(() => { setShutGroups(readCollapsed(sectionsKey)); }, [sectionsKey]);
+
+    const toggleGroup = useCallback((groupId) => {
+        setShutGroups((prev) => {
+            const next = { ...prev, [groupId]: !prev[groupId] };
+            if (!next[groupId]) delete next[groupId];
+            writeCollapsed(sectionsKey, next);
+            return next;
+        });
+    }, [sectionsKey]);
+
+    const flip = (setter, key) => setter((prev) => ({ ...prev, [key]: !prev[key] }));
+
+    // A row with tabs opens on its own when one of its tabs is selected.
+    useEffect(() => {
+        if (!resolvedActiveId) return;
+        const parent = Object.keys(resolvedTabs || {}).find((key) => resolvedTabs[key]?.some((tab) => tab.id === resolvedActiveId));
+        if (parent && shutRows[parent]) setShutRows((prev) => ({ ...prev, [parent]: false }));
+        // Only a change of selection opens it; collapsing by hand must stick.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [resolvedActiveId]);
+
     if (!visible) return null;
 
-    const page = activeTabId || 'home';
-    const selectedTab = openTabs.tabs.find((tab) => tab.id === openTabs.selectedId);
-    const activeId = selectedTab && selectedTab.parentId === page ? selectedTab.id : page;
-
-    const tabs = Object.fromEntries(Object.entries(openTabs.byParent).map(([parentId, list]) => [
-        parentId,
-        list.map((tab) => ({ ...tab, label: tab.title, live: tab.status === 'live' })),
-    ]));
-
-    const handleSelect = (id) => {
-        openTabs.select(id);
-        if (id === 'home' && onHomeClick) {
+    const handleSelect = (rowId, item) => {
+        if (tabs === undefined) openTabs.select(rowId);
+        onSelect?.(rowId, item);
+        if (rowId === 'home' && onHomeClick) {
             onHomeClick();
             return;
         }
-        onTabClick?.(id);
+        onTabClick?.(rowId);
     };
 
-    return (
-        <PatternSidebar
-            className={['plus-sidebar', className].filter(Boolean).join(' ')}
-            style={style}
-            groups={sidebarGroups(user, { slackUrl, countTags, groups })}
-            activeId={activeId}
-            onSelect={handleSelect}
-            tabs={tabs}
-            onSelectTab={(tab) => {
-                openTabs.select(tab.id);
-                onOpenTabSelect?.(tab);
-            }}
-            onCloseTab={(tab) => openTabs.close(tab.id)}
-            onCloseAllTabs={(item) => openTabs.closeAll(item.id)}
-            modulesLeft={user === 'tutor' ? modulesLeft : 0}
-            lessonsLeft={user === 'tutor' ? lessonsLeft : 0}
-            account={account}
-            onProfile={onProfile}
-            onSignOut={() => {
-                clearOpenTabs();
-                onSignOut?.();
-            }}
-            helpHref={helpHref}
-            onHome={() => handleSelect('home')}
-            label={label}
+    const handleHome = onHome ?? (onHomeClick || onTabClick || onSelect
+        ? () => {
+            if (tabs === undefined) openTabs.select('home');
+            if (onHomeClick) {
+                onHomeClick();
+                return;
+            }
+            if (onTabClick) {
+                onTabClick('home');
+                return;
+            }
+            onSelect?.('home', { id: 'home', text: 'Home' });
+        }
+        : undefined);
+
+    const handleSelectTab = (tab, item) => {
+        if (tabs === undefined) openTabs.select(tab.id);
+        onSelectTab?.(tab, item);
+        onOpenTabSelect?.(tab);
+    };
+
+    const handleCloseTab = (tab, item) => {
+        if (onCloseTab) {
+            onCloseTab(tab, item);
+            return;
+        }
+        openTabs.close(tab.id);
+    };
+
+    const handleCloseAllTabs = (item) => {
+        if (onCloseAllTabs) {
+            onCloseAllTabs(item);
+            return;
+        }
+        openTabs.closeAll(item.id);
+    };
+
+    const handleSignOut = () => {
+        if (tabs === undefined) clearOpenTabs();
+        onSignOut?.();
+    };
+
+    const toggleButton = control ? (
+        <IconButton
+            className="plus-pattern-sidebar__toggle"
+            appearance="subtle"
+            icon="angles-left"
+            label="Close sidebar"
+            tooltip="Close sidebar · Ctrl ["
+            aria-expanded
+            {...control.closeProps}
         />
+    ) : onToggle ? (
+        <IconButton
+            className="plus-pattern-sidebar__toggle"
+            appearance="subtle"
+            icon="angles-left"
+            label="Close sidebar"
+            tooltip="Close sidebar · Ctrl ["
+            aria-expanded
+            aria-keyshortcuts="Control+[ Meta+["
+            onClick={onToggle}
+        />
+    ) : null;
+
+    const trailing = (item, extra) => {
+        const training = trainingCount(item.training, {
+            lessonsLeft: effectiveLessonsLeft,
+            modulesLeft: effectiveModulesLeft,
+        });
+        if (extra) return <span className="plus-pattern-sidebar__end">{extra}</span>;
+        if (training) {
+            return (
+                <span className="plus-pattern-sidebar__end">
+                    <CountTag value={training.count} label={training.label} />
+                </span>
+            );
+        }
+        if (item.count) {
+            return (
+                <span className="plus-pattern-sidebar__end">
+                    <CountTag value={item.count} label={item.countLabel} />
+                </span>
+            );
+        }
+        if (item.dot) {
+            return (
+                <span className="plus-pattern-sidebar__end">
+                    <CountTag isDot appearance="info" label={item.dotLabel ?? 'New'} />
+                </span>
+            );
+        }
+        if (item.external) {
+            return (
+                <span className="plus-pattern-sidebar__end plus-pattern-sidebar__end--icon" aria-hidden="true">
+                    <Icon name="arrow-up-right-from-square" />
+                </span>
+            );
+        }
+        return null;
+    };
+
+    const rowContent = (item, extra, labelRef) => (
+        <>
+            <span className="plus-pattern-sidebar__slot" aria-hidden="true">
+                {item.icon ? <Icon name={item.icon} /> : null}
+            </span>
+            <span ref={labelRef} className="plus-pattern-sidebar__label">{item.text}</span>
+            {item.external ? <span className="visually-hidden">(opens in a new tab)</span> : null}
+            {trailing(item, extra)}
+        </>
+    );
+
+    /** A row: a link with `href`, else a button. A plain function, so a Tooltip's ref lands on the element. */
+    const renderRow = ({ item, rowClass, current, onPress, extra, labelRef, ...rest }) => {
+        const shared = {
+            className: rowClass,
+            'aria-current': current ? 'page' : undefined,
+            ...rest,
+        };
+        if (item.href && !rest['aria-disabled']) {
+            return (
+                <a
+                    {...shared}
+                    href={item.href}
+                    target={item.external ? '_blank' : undefined}
+                    rel={item.external ? 'noopener noreferrer' : undefined}
+                    onClick={(event) => {
+                        // A plain click stays in the app; a modified click is the browser's.
+                        if (item.external || !onPress) return;
+                        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+                        event.preventDefault();
+                        onPress();
+                    }}
+                >
+                    {rowContent(item, extra, labelRef)}
+                </a>
+            );
+        }
+        return (
+            <button type="button" {...shared} onClick={rest['aria-disabled'] ? undefined : onPress}>
+                {rowContent(item, extra, labelRef)}
+            </button>
+        );
+    };
+
+    const tabRow = (item, tab, last) => {
+        const selected = resolvedActiveId === tab.id;
+        const close = () => handleCloseTab(tab, item);
+        // Delete and Backspace close the focused tab; focus moves to the next
+        // tab, else the one before it, else the tab's row.
+        const onKeyDown = (event) => {
+            if (event.key !== 'Delete' && event.key !== 'Backspace') return;
+            if (event.target.closest('.plus-pattern-sidebar__tab-close')) return;
+            event.preventDefault();
+            const li = event.currentTarget;
+            const rowIn = (el) => (el?.matches('.plus-pattern-sidebar__tab') ? el.querySelector('.plus-pattern-sidebar__row') : null);
+            const sibling = rowIn(li.nextElementSibling) ?? rowIn(li.previousElementSibling);
+            const parent = li.closest('.plus-pattern-sidebar__item');
+            close();
+            requestAnimationFrame(() => {
+                const target = sibling?.isConnected ? sibling : parent?.querySelector('.plus-pattern-sidebar__row');
+                target?.focus();
+            });
+        };
+        // The row is already a link or a button, so it carries the tooltip and
+        // adds no tab stop. A clipped label shows its full text, with the longer
+        // name after it when the tab has one; a tab that fits shows only that name.
+        const row = (
+            <ClippedTooltip
+                text={tab.tooltip ? `${tab.label}. ${tab.tooltip}` : tab.label}
+                textWhenFits={tab.tooltip}
+                placement="right"
+            >
+                {({ measureRef }) => renderRow({
+                    item: { id: tab.id, text: tab.label, href: tab.href },
+                    rowClass: ['plus-pattern-sidebar__row', selected && 'plus-pattern-sidebar__row--selected'].filter(Boolean).join(' '),
+                    current: selected,
+                    onPress: () => handleSelectTab(tab, item),
+                    extra: tab.live ? <CountTag isDot appearance="success" label="Live" /> : undefined,
+                    labelRef: measureRef,
+                })}
+            </ClippedTooltip>
+        );
+        return (
+            <li
+                key={tab.id}
+                className={['plus-pattern-sidebar__tab', last && 'plus-pattern-sidebar__tab--last', selected && 'plus-pattern-sidebar__tab--selected'].filter(Boolean).join(' ')}
+                onKeyDown={onKeyDown}
+            >
+                {row}
+                <IconButton
+                    className="plus-pattern-sidebar__tab-close"
+                    appearance="subtle"
+                    spacing="compact"
+                    icon="xmark"
+                    label={`Close ${tab.label}`}
+                    tooltip="Close tab"
+                    onClick={close}
+                />
+            </li>
+        );
+    };
+
+    const renderItem = (item, locked, message) => {
+        const own = locked || item.external ? [] : (resolvedTabs?.[item.id] ?? []);
+        const rowSelected = resolvedActiveId === item.id;
+        const select = item.external ? undefined : () => handleSelect(item.id, item);
+
+        if (locked) {
+            return (
+                <li key={item.id} className="plus-pattern-sidebar__item">
+                    <Tooltip text={message} placement="right">
+                        {renderRow({
+                            item,
+                            rowClass: 'plus-pattern-sidebar__row plus-pattern-sidebar__row--locked',
+                            'aria-disabled': 'true',
+                        })}
+                    </Tooltip>
+                </li>
+            );
+        }
+
+        if (!own.length) {
+            return (
+                <li key={item.id} className="plus-pattern-sidebar__item">
+                    {renderRow({
+                        item,
+                        rowClass: ['plus-pattern-sidebar__row', rowSelected && 'plus-pattern-sidebar__row--selected'].filter(Boolean).join(' '),
+                        current: rowSelected,
+                        onPress: select,
+                    })}
+                </li>
+            );
+        }
+
+        const listId = `${baseId}-${item.id}-tabs`;
+        const shut = Boolean(shutRows[item.id]);
+        const tabSelected = own.some((tab) => tab.id === resolvedActiveId);
+        // Exactly one selected row: collapsed with its tab selected, the row stands in for the tab.
+        const standsIn = shut && tabSelected;
+        const all = Boolean(showingAll[item.id]);
+        const more = own.length - SIDEBAR_RECENT_TABS;
+        const recent = all || more <= 0 ? own : own.slice(0, SIDEBAR_RECENT_TABS);
+        // The selected tab always shows, even when it is past the first three.
+        const selectedTab = own.find((tab) => tab.id === resolvedActiveId);
+        const shown = selectedTab && !recent.includes(selectedTab) ? [...recent, selectedTab] : recent;
+        const rowClass = [
+            'plus-pattern-sidebar__row',
+            (rowSelected || standsIn) && 'plus-pattern-sidebar__row--selected',
+            !shut && tabSelected && 'plus-pattern-sidebar__row--ancestor',
+        ].filter(Boolean).join(' ');
+
+        return (
+            <li key={item.id} className="plus-pattern-sidebar__item plus-pattern-sidebar__item--parent">
+                <div className={['plus-pattern-sidebar__parent', shut && 'plus-pattern-sidebar__parent--shut'].filter(Boolean).join(' ')}>
+                    {renderRow({
+                        item,
+                        rowClass,
+                        current: rowSelected || standsIn,
+                        onPress: select,
+                        extra: shut ? <CountTag value={own.length} label={`${own.length} open tabs`} /> : undefined,
+                    })}
+                    <IconButton
+                        className="plus-pattern-sidebar__twist"
+                        appearance="subtle"
+                        spacing="compact"
+                        icon={<Icon name="angle-down" size={12} />}
+                        label={`${shut ? 'Show' : 'Hide'} ${item.text} tabs`}
+                        tooltip={shut ? 'Show tabs' : 'Hide tabs'}
+                        aria-expanded={!shut}
+                        aria-controls={shut ? undefined : listId}
+                        onClick={() => flip(setShutRows, item.id)}
+                    />
+                    <IconButton
+                        className="plus-pattern-sidebar__close-all"
+                        appearance="subtle"
+                        spacing="compact"
+                        icon="xmark"
+                        label={`Close all ${own.length} ${item.text.toLowerCase()} tabs`}
+                        tooltip={`Close all ${own.length} tabs`}
+                        onClick={() => handleCloseAllTabs(item)}
+                    />
+                </div>
+                {shut ? null : (
+                    <ul id={listId} className="plus-pattern-sidebar__tabs" aria-label={`Open ${item.text}`}>
+                        {shown.map((tab, index) => tabRow(item, tab, more <= 0 && index === shown.length - 1))}
+                        {more > 0 ? (
+                            <li className="plus-pattern-sidebar__tab plus-pattern-sidebar__tab--last plus-pattern-sidebar__tab--more">
+                                <button
+                                    type="button"
+                                    className="plus-pattern-sidebar__row"
+                                    aria-expanded={all}
+                                    onClick={() => flip(setShowingAll, item.id)}
+                                >
+                                    <span className="plus-pattern-sidebar__slot" aria-hidden="true" />
+                                    <span className="plus-pattern-sidebar__label">{all ? 'Show less' : `Show ${more} more`}</span>
+                                </button>
+                            </li>
+                        ) : null}
+                    </ul>
+                )}
+            </li>
+        );
+    };
+
+    const renderGroup = (group) => {
+        const titleId = `${baseId}-${group.id}-title`;
+        const listId = `${baseId}-${group.id}-list`;
+        const locked = Boolean(group.lockedDuringOnboarding) && effectiveModulesLeft > 0;
+        const message = locked ? lockMessage(group.title) : null;
+        const shut = Boolean(group.title) && !locked && Boolean(shutGroups[group.id]);
+
+        let title = null;
+        if (group.title && locked) {
+            title = (
+                <div className="plus-pattern-sidebar__title plus-pattern-sidebar__title--locked">
+                    <span id={titleId} className="plus-pattern-sidebar__title-text">{group.title}</span>
+                    <Tooltip text={message} placement="right">
+                        {/* The lock is focusable so a keyboard reaches its message. */}
+                        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
+                        <span className="plus-pattern-sidebar__caret plus-pattern-sidebar__caret--lock" tabIndex={0} role="img" aria-label={`Locked. ${message}`}>
+                            <Icon name="lock" />
+                        </span>
+                    </Tooltip>
+                </div>
+            );
+        } else if (group.title) {
+            title = (
+                <button
+                    type="button"
+                    className={['plus-pattern-sidebar__title', shut && 'plus-pattern-sidebar__title--shut'].filter(Boolean).join(' ')}
+                    aria-expanded={!shut}
+                    aria-controls={shut ? undefined : listId}
+                    onClick={() => toggleGroup(group.id)}
+                >
+                    <span id={titleId} className="plus-pattern-sidebar__title-text">{group.title}</span>
+                    <span className="plus-pattern-sidebar__caret" aria-hidden="true">
+                        <Icon name="angle-down" />
+                    </span>
+                </button>
+            );
+        }
+
+        return (
+            <div
+                key={group.id}
+                className="plus-pattern-sidebar__group"
+                role={group.title ? 'group' : undefined}
+                aria-labelledby={group.title ? titleId : undefined}
+            >
+                {title}
+                {shut ? null : (
+                    <ul id={listId} className="plus-pattern-sidebar__list">
+                        {group.items.map((item) => renderItem(item, locked, message))}
+                    </ul>
+                )}
+            </div>
+        );
+    };
+
+    const brand = handleHome ? (
+        <a
+            className="plus-pattern-sidebar__brand"
+            href={homeHref}
+            aria-label="PLUS, go to Home"
+            onClick={(event) => {
+                if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+                event.preventDefault();
+                handleHome();
+            }}
+        >
+            <Logo appearance="colored" size={24} wordmark />
+        </a>
+    ) : (
+        <a className="plus-pattern-sidebar__brand" href={homeHref} aria-label="PLUS, go to Home">
+            <Logo appearance="colored" size={24} wordmark />
+        </a>
+    );
+
+    return (
+        <div id={id} className={['plus-pattern-sidebar', 'plus-sidebar', className].filter(Boolean).join(' ')} style={style}>
+            <div className="plus-pattern-sidebar__logo-row">
+                {brand}
+                {toggleButton}
+            </div>
+            <nav ref={navRef} aria-label={label} className="plus-pattern-sidebar__nav">
+                <span ref={glideRef} className="plus-pattern-sidebar__glide" aria-hidden="true" />
+                {resolvedGroups.map(renderGroup)}
+            </nav>
+            {account ? (
+                <SidebarAccount
+                    name={account.name}
+                    preferredName={account.preferredName}
+                    role={account.role}
+                    onProfile={onProfile}
+                    onSignOut={handleSignOut}
+                    helpHref={helpHref}
+                />
+            ) : null}
+        </div>
     );
 };
 
-const groupItemShape = PropTypes.shape({
+const itemShape = PropTypes.shape({
+    /** Unique id; `activeId`, `onSelect` and `tabs` use it */
     id: PropTypes.string.isRequired,
     text: PropTypes.string,
+    /** Font Awesome Free name for the 16 icon (`house`), drawn by Icon; a brand logo carries its family (`fa-brands fa-slack`); every other icon is outlined, selected or not */
     icon: PropTypes.string,
+    /** Makes the row a link */
     href: PropTypes.string,
+    /** With `href`: leaves the app in a new tab, never selected; the trailing slot shows the external icon */
     external: PropTypes.bool,
+    /** A count in the trailing slot */
     count: PropTypes.number,
+    /** The count's accessible name, e.g. "3 open flags" */
     countLabel: PropTypes.string,
+    /** A dot in the trailing slot: something new */
     dot: PropTypes.bool,
+    /** The dot's accessible name; "New" by default */
     dotLabel: PropTypes.string,
+    /** A Training row: `lessons` counts `lessonsLeft`, `modules` counts `modulesLeft` */
     training: PropTypes.oneOf(['lessons', 'modules']),
+});
+
+const tabShape = PropTypes.shape({
+    /** Unique across the sidebar; `activeId` selects it */
+    id: PropTypes.string.isRequired,
+    /** Short: time · teacher for a session (the day only when it is not today), the name for a student. It truncates. */
+    label: PropTypes.string.isRequired,
+    /** The longer name, in the tooltip (the school) */
+    tooltip: PropTypes.string,
+    /** The record's own route; the row links to it */
+    href: PropTypes.string,
+    /** A session happening now: the live dot at rest */
+    live: PropTypes.bool,
 });
 
 const groupShape = PropTypes.shape({
     id: PropTypes.string.isRequired,
+    /** The section title; a group without one has no title row and never collapses */
     title: PropTypes.string,
+    items: PropTypes.arrayOf(itemShape).isRequired,
+    /** Locked while `modulesLeft` is above 0 */
     lockedDuringOnboarding: PropTypes.bool,
-    items: PropTypes.arrayOf(groupItemShape).isRequired,
 });
 
 Sidebar.propTypes = {
+    /** Role whose navigation fills the Sidebar when `groups` is omitted (defaults to `'tutor'`), or merged into `groups` when both are passed */
     user: PropTypes.oneOf(['tutor', 'supervisor']),
-    /** Extra or overridden groups merged by `id` into the role's config (`sidebarConfig.js`): e.g. `[{ id: 'toolkit', items: [{ id: 'reviews', text: 'Reviews', icon: 'clipboard-check' }] }]` */
+    /** Groups to render directly, or merged by `id` into the role's config (`sidebarConfig.js`) when `user` is also passed */
     groups: PropTypes.arrayOf(groupShape),
-    /** The signed-in person: name, preferred name, one-word role, and an id that keys their remembered sections */
-    account: PropTypes.shape({
-        id: PropTypes.string,
-        name: PropTypes.string.isRequired,
-        preferredName: PropTypes.string,
-        /** Tutor, Lead or Admin; the pattern holds the list (`ACCOUNT_ROLES`), read at render, since this file loads inside the pattern's own import cycle */
-        role: PropTypes.string.isRequired,
-    }),
-    /** A tutor's onboarding modules left. Above 0 the Toolkit is locked; supervisors are never locked. */
-    modulesLeft: PropTypes.number,
-    /** A tutor's assigned lessons left; counted on the Lessons row */
-    lessonsLeft: PropTypes.number,
-    /** The trailing slot by row id: `{ compliance-monitor: { count: 3, countLabel: '3 open flags' }, lessons: { dot: true } }` */
-    countTags: PropTypes.objectOf(PropTypes.shape({
-        count: PropTypes.number,
-        countLabel: PropTypes.string,
-        dot: PropTypes.bool,
-        dotLabel: PropTypes.string,
-    })),
+    /** Id of the selected row or tab; it carries `aria-current="page"` */
+    activeId: PropTypes.string,
+    /** Id of the row to show as selected when `activeId` is not set (e.g. `'sessions'`, `'home'`) */
+    activeTabId: PropTypes.string,
+    /** Called with `(id, item)` when a row other than an external link is pressed */
+    onSelect: PropTypes.func,
     /** Home's press (the row and the logo); without it Home calls `onTabClick('home')` */
     onHomeClick: PropTypes.func,
     /** Called with the row id for every other row (external links excepted) */
     onTabClick: PropTypes.func,
     /** Called with the open tab (`{ id, parentId, recordId, title, href, status }`) when one is pressed */
     onOpenTabSelect: PropTypes.func,
+    /** Open tabs by row id, in the order they show; defaults to `useOpenTabs()` */
+    tabs: PropTypes.objectOf(PropTypes.arrayOf(tabShape)),
+    /** Called with `(tab, item)` on a plain click of a tab */
+    onSelectTab: PropTypes.func,
+    /** Called with `(tab, item)` by a tab's Close and by Delete or Backspace */
+    onCloseTab: PropTypes.func,
+    /** Called with `(item)` by a row's Close all */
+    onCloseAllTabs: PropTypes.func,
+    /** Onboarding modules a tutor has left. Above 0, groups marked `lockedDuringOnboarding` lock, and the `modules` row counts it. Supervisors are never locked. */
+    modulesLeft: PropTypes.number,
+    /** Assigned lessons a tutor has left; the `lessons` row counts it */
+    lessonsLeft: PropTypes.number,
+    /** The trailing slot by row id when using the role config: `{ compliance-monitor: { count: 3, countLabel: '3 open flags' }, lessons: { dot: true } }` */
+    countTags: PropTypes.objectOf(PropTypes.shape({
+        count: PropTypes.number,
+        countLabel: PropTypes.string,
+        dot: PropTypes.bool,
+        dotLabel: PropTypes.string,
+    })),
+    /** The signed-in person, for the account row. Their `id` keys the remembered sections. */
+    account: PropTypes.shape({
+        id: PropTypes.string,
+        name: PropTypes.string.isRequired,
+        preferredName: PropTypes.string,
+        role: PropTypes.oneOf(ACCOUNT_ROLES).isRequired,
+    }),
     /** The account menu's Profile */
     onProfile: PropTypes.func,
-    /** The account menu's Sign out, after the open tabs are cleared */
+    /** The account menu's Sign out, after open tabs are cleared when using `useOpenTabs()` */
     onSignOut: PropTypes.func,
     /** Help Center, opened in a new tab */
     helpHref: PropTypes.string,
-    /** Id of the row to show as selected (e.g. 'sessions', 'home') */
-    activeTabId: PropTypes.string,
-    /** Where Slack links; defaults to `SLACK_URL` */
+    /** Where the logo goes */
+    homeHref: PropTypes.string,
+    /** Where Slack links in the role config; defaults to `SLACK_URL` */
     slackUrl: PropTypes.string,
-    /** Accessible name of the navigation landmark */
+    /** Called on a plain click of the logo; the caller goes Home */
+    onHome: PropTypes.func,
+    /** Standalone: the toggle's press. Inside a Frame the Frame draws the toggle's state. */
+    onToggle: PropTypes.func,
+    /** The localStorage key collapsed sections are kept under, per account id; null keeps nothing */
+    storageKey: PropTypes.string,
+    /** Accessible name of the `nav` landmark */
     label: PropTypes.string,
+    /** Whether the Sidebar renders */
     visible: PropTypes.bool,
+    /** HTML id attribute on the Sidebar root element */
+    id: PropTypes.string,
+    /** Additional CSS class names applied to the Sidebar root */
     className: PropTypes.string,
+    /** Inline styles applied to the Sidebar root */
     style: PropTypes.object,
 };
 

@@ -9614,272 +9614,6 @@
       ]
     },
     {
-      "name": "PatternSidebar",
-      "kind": "pattern",
-      "import": "import { PatternSidebar } from '@/patterns';",
-      "group": "patterns",
-      "source": "design-system/src/patterns/Sidebar/Sidebar.jsx",
-      "summary": "Sidebar pattern: the app's side navigation, 240 wide, padded 12, on the sunken fill. Every row sits on one grid: rows 32 high from x 12 to 228 with radius 6, a 24 icon slot centered on x 32, the label on x 48, and a trailing slot centered on x 208. - **Logo row**: the PLUS Logo lockup at height 24, a link to Home, and the sidebar toggle (`angles-left`) on the trailing column. Inside a Frame the toggle comes from the Frame; standalone, pass `onToggle`. - **Groups**: the first has no title (Home, Slack). Every other group has a title row, a full 32 row that collapses its group; an `angle-down` shows after the title on hover and focus and turns right while collapsed. Each person's collapsed sections are remembered in localStorage. - **Locked group**: while `modulesLeft` is above 0, a group marked `lockedDuringOnboarding` shows a lock in the title's caret slot, its rows in the subtlest text with no hover, and the tooltip \"Complete your assigned training to unlock the Toolkit\" (no number). It neither collapses nor opens. - **Training counts**: a row with `training: 'lessons'` shows the Count tag of `lessonsLeft` (\"2 assigned lessons left\"); `training: 'modules'` shows `modulesLeft` (\"3 onboarding modules left\"), only while onboarding is in progress. Zero shows nothing. - **Trailing slot**: a count, a dot, the external icon for a link that leaves the app, or a close button. - **Open tabs** (`tabs[item.id]`): records a person opened (a session, a student) list under their row on a thread, one line on the icon column whose last row turns into the label column. Each tab shows a live dot at rest and Close on hover, focus and while selected; Delete or Backspace closes the focused tab. Three show, then \"Show n more\". On hover the row's icon slot turns into a collapse angle and its trailing slot into Close all. Exactly one row is selected: a selected tab takes the fill and its row goes to ink; collapsed, the row takes the fill and shows the tab count. - **Icons**: every row icon is outlined (Font Awesome Free regular) in the one subtle icon color. A selected row shows the fill and the selected icon color, never a solid icon; a brand mark (`fa-brands fa-slack`) is the only exception. - **Account row**: `SidebarAccount`, under a divider. Content is data. The pattern draws what it is given and never changes the URL; which groups a role sees is the caller's config.",
-      "props": [
-        {
-          "name": "groups",
-          "type": "arrayOf",
-          "required": true,
-          "default": "[]",
-          "values": null,
-          "description": "The groups, in order. The first usually has no title (Home, Slack).",
-          "deprecated": null
-        },
-        {
-          "name": "activeId",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Id of the selected row or tab; it carries `aria-current=\"page\"`",
-          "deprecated": null
-        },
-        {
-          "name": "onSelect",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Called with `(id, item)` when a row other than an external link is pressed",
-          "deprecated": null
-        },
-        {
-          "name": "tabs",
-          "type": "objectOf",
-          "required": false,
-          "default": "{}",
-          "values": null,
-          "description": "Open tabs by row id, in the order they show",
-          "deprecated": null
-        },
-        {
-          "name": "onSelectTab",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Called with `(tab, item)` on a plain click of a tab",
-          "deprecated": null
-        },
-        {
-          "name": "onCloseTab",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Called with `(tab, item)` by a tab's Close and by Delete or Backspace",
-          "deprecated": null
-        },
-        {
-          "name": "onCloseAllTabs",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Called with `(item)` by a row's Close all",
-          "deprecated": null
-        },
-        {
-          "name": "modulesLeft",
-          "type": "number",
-          "required": false,
-          "default": "0",
-          "values": null,
-          "description": "Onboarding modules a tutor has left. Above 0, groups marked `lockedDuringOnboarding` lock, and the `modules` row counts it.",
-          "deprecated": null
-        },
-        {
-          "name": "lessonsLeft",
-          "type": "number",
-          "required": false,
-          "default": "0",
-          "values": null,
-          "description": "Assigned lessons a tutor has left; the `lessons` row counts it",
-          "deprecated": null
-        },
-        {
-          "name": "account",
-          "type": "shape",
-          "required": true,
-          "default": null,
-          "values": null,
-          "description": "The signed-in person, for the account row. Their `id` keys the remembered sections.",
-          "deprecated": null
-        },
-        {
-          "name": "onProfile",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "The account menu's Profile",
-          "deprecated": null
-        },
-        {
-          "name": "onSignOut",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "The account menu's Sign out",
-          "deprecated": null
-        },
-        {
-          "name": "helpHref",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Help Center, opened in a new tab",
-          "deprecated": null
-        },
-        {
-          "name": "homeHref",
-          "type": "string",
-          "required": false,
-          "default": "'/'",
-          "values": null,
-          "description": "Where the logo goes",
-          "deprecated": null
-        },
-        {
-          "name": "onHome",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Called on a plain click of the logo; the caller goes Home",
-          "deprecated": null
-        },
-        {
-          "name": "onToggle",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Standalone: the toggle's press. Inside a Frame the Frame draws the toggle's state.",
-          "deprecated": null
-        },
-        {
-          "name": "storageKey",
-          "type": "string",
-          "required": false,
-          "default": "SIDEBAR_SECTIONS_STORAGE_KEY",
-          "values": null,
-          "description": "The localStorage key collapsed sections are kept under, per account id; null keeps nothing",
-          "deprecated": null
-        },
-        {
-          "name": "label",
-          "type": "string",
-          "required": false,
-          "default": "'Main'",
-          "values": null,
-          "description": "Accessible name of the `nav` landmark",
-          "deprecated": null
-        },
-        {
-          "name": "id",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "className",
-          "type": "string",
-          "required": false,
-          "default": "''",
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "style",
-          "type": "object",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        }
-      ],
-      "stories": [
-        "Overview",
-        "Geometry",
-        "Tutor",
-        "PrototypeAreas",
-        "OnboardingInProgress",
-        "OnboardingDone",
-        "SectionsOpen",
-        "SectionsCollapsed",
-        "TabsNone",
-        "TabsFew",
-        "TabsMany",
-        "TabsClipped",
-        "TabRest",
-        "TabHover",
-        "TabFocus",
-        "TabSelected",
-        "TabsCollapsedWithSelection",
-        "ClosingTabs",
-        "AccountHug",
-        "AccountRow",
-        "SidebarOpen",
-        "SidebarClosed",
-        "SidebarFloating",
-        "Interactive",
-        "Light",
-        "Dark"
-      ],
-      "tokens": [
-        "--body-default",
-        "--body-sm",
-        "--border-width-default",
-        "--control-md",
-        "--ds-background-neutral-subtle-hovered",
-        "--ds-background-neutral-subtle-pressed",
-        "--ds-background-selected",
-        "--ds-background-selected-hovered",
-        "--ds-background-selected-pressed",
-        "--ds-border",
-        "--ds-icon",
-        "--ds-icon-selected",
-        "--ds-icon-subtle",
-        "--ds-icon-subtlest",
-        "--ds-motion-spatial-fast",
-        "--ds-motion-spatial-fast-duration",
-        "--ds-text",
-        "--ds-text-selected",
-        "--ds-text-subtle",
-        "--ds-text-subtlest",
-        "--focus-ring-width",
-        "--frame-sidebar-group-gap",
-        "--frame-sidebar-pad",
-        "--frame-sidebar-row-gap",
-        "--frame-sidebar-row-radius",
-        "--icon-lg",
-        "--icon-md",
-        "--icon-sm",
-        "--inline-sm",
-        "--pad-x-lg",
-        "--pad-x-md",
-        "--pad-x-sm",
-        "--pad-x-xs",
-        "--radius-sm",
-        "--stack-lg",
-        "--stack-md",
-        "--type-weight-medium"
-      ]
-    },
-    {
       "name": "PatternTable",
       "kind": "pattern",
       "import": "import { PatternTable } from '@/patterns';",
@@ -13487,18 +13221,18 @@
       "import": "import { Sidebar } from '@/components';",
       "group": "navigation",
       "source": "design-system/src/components/navigation/Sidebar/Sidebar.jsx",
-      "summary": "The PLUS sidebar: the Sidebar pattern (`@/patterns`) filled with the groups for the role (`sidebarConfig.js`), the signed-in person's account row, and the open tabs. Home is selected when nothing else is. Pass `groups` to add or override a prototype's own area(s) by `id` while keeping the role's navigation. Open tabs come from `useOpenTabs()`: a page that opens a record (a session, a student) calls `open(parentId, record)`, and the record shows here as a tab under its row. A tab is selected while its row is the current page (`activeTabId`); elsewhere the page's own row is. Pressing a tab selects it and calls `onOpenTabSelect(tab)`, which is where an app goes to the record's route if it is not already there. Signing out clears the tabs. Nothing here changes the URL.",
+      "summary": "The PLUS sidebar: the app's side navigation, 240 wide, padded 12, on the sunken fill. Every row sits on one grid: rows 32 high from x 12 to 228 with radius 6, a 24 icon slot centered on x 32, the label on x 48, and a trailing slot centered on x 208. By default it fills with the groups for `user` (`sidebarConfig.js`, defaulting to `'tutor'`), the signed-in person's account row, and open tabs from `useOpenTabs()`. Pass `user` and `groups` together to add or override a prototype's own area(s) by `id` while keeping the role's navigation; pass `groups` without `user` (and/or `tabs`) to render custom groups directly. - **Logo row**: the PLUS Logo lockup at height 24, a link to Home, and the sidebar toggle (`angles-left`) on the trailing column. Inside a Frame the toggle comes from the Frame; standalone, pass `onToggle`. - **Groups**: the first has no title (Home, Slack). Every other group has a title row, a full 32 row that collapses its group; an `angle-down` shows after the title on hover and focus and turns right while collapsed. Each person's collapsed sections are remembered in localStorage. - **Locked group**: while `modulesLeft` is above 0, a group marked `lockedDuringOnboarding` shows a lock in the title's caret slot, its rows in the subtlest text with no hover, and the tooltip \"Complete your assigned training to unlock the Toolkit\" (no number). It neither collapses nor opens. - **Training counts**: a row with `training: 'lessons'` shows the Count tag of `lessonsLeft` (\"2 assigned lessons left\"); `training: 'modules'` shows `modulesLeft` (\"3 onboarding modules left\"), only while onboarding is in progress. Zero shows nothing. - **Trailing slot**: a count, a dot, the external icon for a link that leaves the app, or a close button. - **Open tabs** (`useOpenTabs()` or `tabs[item.id]`): records a person opened (a session, a student) list under their row on a thread, one line on the icon column whose last row turns into the label column. Each tab shows a live dot at rest and Close on hover, focus and while selected; Delete or Backspace closes the focused tab. Three show, then \"Show n more\". On hover the row's icon slot turns into a collapse angle and its trailing slot into Close all. Exactly one row is selected: a selected tab takes the fill and its row goes to ink; collapsed, the row takes the fill and shows the tab count. - **Icons**: every row icon is outlined (Font Awesome Free regular) in the one subtle icon color. A selected row shows the fill and the selected icon color, never a solid icon; a brand mark (`fa-brands fa-slack`) is the only exception. - **Account row**: `SidebarAccount`, under a divider. Content is data. Nothing here changes the URL.",
       "props": [
         {
           "name": "user",
           "type": "enum",
           "required": false,
-          "default": "'tutor'",
+          "default": null,
           "values": [
             "tutor",
             "supervisor"
           ],
-          "description": null,
+          "description": "Role whose navigation fills the Sidebar when `groups` is omitted (defaults to `'tutor'`), or merged into `groups` when both are passed",
           "deprecated": null
         },
         {
@@ -13507,43 +13241,34 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Extra or overridden groups merged by `id` into the role's config (`sidebarConfig.js`): e.g. `[{ id: 'toolkit', items: [{ id: 'reviews', text: 'Reviews', icon: 'clipboard-check' }] }]`",
+          "description": "Groups to render directly, or merged by `id` into the role's config (`sidebarConfig.js`) when `user` is also passed",
           "deprecated": null
         },
         {
-          "name": "account",
-          "type": "shape",
-          "required": true,
-          "default": null,
-          "values": null,
-          "description": "The signed-in person: name, preferred name, one-word role, and an id that keys their remembered sections",
-          "deprecated": null
-        },
-        {
-          "name": "modulesLeft",
-          "type": "number",
-          "required": false,
-          "default": "0",
-          "values": null,
-          "description": "A tutor's onboarding modules left. Above 0 the Toolkit is locked; supervisors are never locked.",
-          "deprecated": null
-        },
-        {
-          "name": "lessonsLeft",
-          "type": "number",
-          "required": false,
-          "default": "0",
-          "values": null,
-          "description": "A tutor's assigned lessons left; counted on the Lessons row",
-          "deprecated": null
-        },
-        {
-          "name": "countTags",
-          "type": "objectOf",
+          "name": "activeId",
+          "type": "string",
           "required": false,
           "default": null,
           "values": null,
-          "description": "The trailing slot by row id: `{ compliance-monitor: { count: 3, countLabel: '3 open flags' }, lessons: { dot: true } }`",
+          "description": "Id of the selected row or tab; it carries `aria-current=\"page\"`",
+          "deprecated": null
+        },
+        {
+          "name": "activeTabId",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Id of the row to show as selected when `activeId` is not set (e.g. `'sessions'`, `'home'`)",
+          "deprecated": null
+        },
+        {
+          "name": "onSelect",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with `(id, item)` when a row other than an external link is pressed",
           "deprecated": null
         },
         {
@@ -13574,6 +13299,78 @@
           "deprecated": null
         },
         {
+          "name": "tabs",
+          "type": "objectOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Open tabs by row id, in the order they show; defaults to `useOpenTabs()`",
+          "deprecated": null
+        },
+        {
+          "name": "onSelectTab",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with `(tab, item)` on a plain click of a tab",
+          "deprecated": null
+        },
+        {
+          "name": "onCloseTab",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with `(tab, item)` by a tab's Close and by Delete or Backspace",
+          "deprecated": null
+        },
+        {
+          "name": "onCloseAllTabs",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with `(item)` by a row's Close all",
+          "deprecated": null
+        },
+        {
+          "name": "modulesLeft",
+          "type": "number",
+          "required": false,
+          "default": "0",
+          "values": null,
+          "description": "Onboarding modules a tutor has left. Above 0, groups marked `lockedDuringOnboarding` lock, and the `modules` row counts it. Supervisors are never locked.",
+          "deprecated": null
+        },
+        {
+          "name": "lessonsLeft",
+          "type": "number",
+          "required": false,
+          "default": "0",
+          "values": null,
+          "description": "Assigned lessons a tutor has left; the `lessons` row counts it",
+          "deprecated": null
+        },
+        {
+          "name": "countTags",
+          "type": "objectOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The trailing slot by row id when using the role config: `{ compliance-monitor: { count: 3, countLabel: '3 open flags' }, lessons: { dot: true } }`",
+          "deprecated": null
+        },
+        {
+          "name": "account",
+          "type": "shape",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "The signed-in person, for the account row. Their `id` keys the remembered sections.",
+          "deprecated": null
+        },
+        {
           "name": "onProfile",
           "type": "func",
           "required": false,
@@ -13588,7 +13385,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "The account menu's Sign out, after the open tabs are cleared",
+          "description": "The account menu's Sign out, after open tabs are cleared when using `useOpenTabs()`",
           "deprecated": null
         },
         {
@@ -13601,12 +13398,12 @@
           "deprecated": null
         },
         {
-          "name": "activeTabId",
+          "name": "homeHref",
           "type": "string",
           "required": false,
-          "default": null,
+          "default": "'/'",
           "values": null,
-          "description": "Id of the row to show as selected (e.g. 'sessions', 'home')",
+          "description": "Where the logo goes",
           "deprecated": null
         },
         {
@@ -13615,7 +13412,34 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Where Slack links; defaults to `SLACK_URL`",
+          "description": "Where Slack links in the role config; defaults to `SLACK_URL`",
+          "deprecated": null
+        },
+        {
+          "name": "onHome",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called on a plain click of the logo; the caller goes Home",
+          "deprecated": null
+        },
+        {
+          "name": "onToggle",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Standalone: the toggle's press. Inside a Frame the Frame draws the toggle's state.",
+          "deprecated": null
+        },
+        {
+          "name": "storageKey",
+          "type": "string",
+          "required": false,
+          "default": "SIDEBAR_SECTIONS_STORAGE_KEY",
+          "values": null,
+          "description": "The localStorage key collapsed sections are kept under, per account id; null keeps nothing",
           "deprecated": null
         },
         {
@@ -13624,7 +13448,7 @@
           "required": false,
           "default": "'Main'",
           "values": null,
-          "description": "Accessible name of the navigation landmark",
+          "description": "Accessible name of the `nav` landmark",
           "deprecated": null
         },
         {
@@ -13633,7 +13457,16 @@
           "required": false,
           "default": "true",
           "values": null,
-          "description": null,
+          "description": "Whether the Sidebar renders",
+          "deprecated": null
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "HTML id attribute on the Sidebar root element",
           "deprecated": null
         },
         {
@@ -13642,7 +13475,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Additional CSS class names applied to the Sidebar root",
           "deprecated": null
         },
         {
@@ -13651,9 +13484,77 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Inline styles applied to the Sidebar root",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Geometry",
+        "Tutor",
+        "DefaultRole",
+        "PrototypeAreas",
+        "OnboardingInProgress",
+        "OnboardingDone",
+        "SectionsOpen",
+        "SectionsCollapsed",
+        "TabsNone",
+        "TabsFew",
+        "TabsMany",
+        "TabsClipped",
+        "TabRest",
+        "TabHover",
+        "TabFocus",
+        "TabSelected",
+        "TabsCollapsedWithSelection",
+        "ClosingTabs",
+        "AccountHug",
+        "AccountRow",
+        "SidebarOpen",
+        "SidebarClosed",
+        "SidebarFloating",
+        "Interactive",
+        "Light",
+        "Dark"
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-sm",
+        "--border-width-default",
+        "--control-md",
+        "--ds-background-neutral-subtle-hovered",
+        "--ds-background-neutral-subtle-pressed",
+        "--ds-background-selected",
+        "--ds-background-selected-hovered",
+        "--ds-background-selected-pressed",
+        "--ds-border",
+        "--ds-icon",
+        "--ds-icon-selected",
+        "--ds-icon-subtle",
+        "--ds-icon-subtlest",
+        "--ds-motion-spatial-fast",
+        "--ds-motion-spatial-fast-duration",
+        "--ds-text",
+        "--ds-text-selected",
+        "--ds-text-subtle",
+        "--ds-text-subtlest",
+        "--focus-ring-width",
+        "--frame-sidebar-group-gap",
+        "--frame-sidebar-pad",
+        "--frame-sidebar-row-gap",
+        "--frame-sidebar-row-radius",
+        "--icon-lg",
+        "--icon-md",
+        "--icon-sm",
+        "--inline-sm",
+        "--pad-x-lg",
+        "--pad-x-md",
+        "--pad-x-sm",
+        "--pad-x-xs",
+        "--radius-sm",
+        "--stack-lg",
+        "--stack-md",
+        "--type-weight-medium"
       ]
     },
     {

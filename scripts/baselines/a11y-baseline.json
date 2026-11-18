@@ -1,9 +1,9 @@
 {
   "why": "Accessibility rules each story violated when the record was measured. A story may stop violating a rule and never start: a new violation is fixed, or argued in that story's own parameters.a11y.",
-  "measured": "2026-11-17",
+  "measured": "2026-11-18",
   "suite": {
-    "storyFiles": 219,
-    "tests": 2378
+    "storyFiles": 221,
+    "tests": 2425
   },
   "violatingStories": 0,
   "sets": {

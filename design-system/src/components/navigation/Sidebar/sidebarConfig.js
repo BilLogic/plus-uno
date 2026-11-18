@@ -55,7 +55,7 @@ export const SIDEBAR_GROUPS = [
 ];
 
 /**
- * The groups one role sees, ready for `PatternSidebar`.
+ * The groups one role sees, ready for `Sidebar`.
  *
  * Pass `groups` to add or override groups and rows by `id` while keeping the
  * role's navigation: matching group and item ids merge in place; new items and

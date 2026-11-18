@@ -314,7 +314,6 @@ test('every alias lands on the scales, never on an old --size-* primitive', () =
 
 test('the code-only frame tokens resolve, unchanged', () => {
   const OLD = {
-    '--frame-sidebar-width-nav': '164px',
     '--listbox-max-width': '320px',
   };
   for (const [name, value] of Object.entries(OLD)) {

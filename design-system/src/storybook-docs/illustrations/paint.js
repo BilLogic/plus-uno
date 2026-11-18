@@ -40,8 +40,8 @@ const ROLES = {
   // Sidebar
   sidebarOverlaySurface: ['--ds-surface-overlay', 'patterns/Frame/Frame.scss'],
   sidebarOverlayShadow: ['--ds-shadow-overlay', 'patterns/Frame/Frame.scss'],
-  sidebarSelected: ['--ds-background-selected', 'patterns/Sidebar/Sidebar.scss'],
-  sidebarIcon: ['--ds-icon-subtle', 'patterns/Sidebar/Sidebar.scss'],
+  sidebarSelected: ['--ds-background-selected', 'components/navigation/Sidebar/Sidebar.scss'],
+  sidebarIcon: ['--ds-icon-subtle', 'components/navigation/Sidebar/Sidebar.scss'],
   // Section and Card
   // Only the subtle variant has a surface; the default Section draws none.
   sectionSubtleSurface: ['--ds-surface-sunken', 'patterns/PatternSection/PatternSection.scss'],
@@ -156,7 +156,7 @@ export const HEIGHTS = {
   tab: ['--control-md', 'components/navigation/Tabs/Tabs.scss', 16],
   count: ['--label-height-sm', 'components/labels/_label-heights.scss', 8],
   tracker: ['--control-md', 'components/status-indicators/ProgressTracker/ProgressTracker.scss', 16],
-  sidebarRow: ['--control-md', 'patterns/Sidebar/Sidebar.scss', 16],
+  sidebarRow: ['--control-md', 'components/navigation/Sidebar/Sidebar.scss', 16],
 };
 
 /** corner role: [radius token, source SCSS]. Drawn at the kit's half scale. */
@@ -170,7 +170,7 @@ const CORNERS = {
   tooltip: ['--radius-control-sm', 'components/overlays-and-layering/Tooltip/Tooltip.scss'],
   modal: ['--modal-radius', 'components/messaging/Modal/Modal.scss'],
   field: ['--radius-control-lg', 'components/forms-and-inputs/_internal/FieldBox.scss'],
-  sidebarRow: ['--frame-sidebar-row-radius', 'patterns/Sidebar/Sidebar.scss'],
+  sidebarRow: ['--frame-sidebar-row-radius', 'components/navigation/Sidebar/Sidebar.scss'],
   tab: ['--radius-control-md', 'components/navigation/Tabs/Tabs.scss'],
   count: ['--radius-md', 'components/labels/CountTag/CountTag.scss'],
   icon: ['--radius-sm', null],

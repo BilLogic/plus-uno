@@ -108,7 +108,7 @@ const layer = (token) => `var(${token})`;
 
 /* ─── SidebarTab and the Sidebar's open tabs ─────────────────────────────── */
 
-const TAB = 'patterns/Sidebar/SidebarTab.scss';
+const TAB = 'components/navigation/Sidebar/SidebarTab.scss';
 
 /**
  * The frame chain's navigation is on the new color tokens: hover and press move
@@ -148,7 +148,7 @@ test('SidebarTab: neutral hover and press, neutral selection with its own steps,
 
 test('Sidebar: rows, titles and the account row hover on the neutral subtle hovered step; a selected row climbs the selected steps', () => {
   const decls = [];
-  sheet('patterns/Sidebar/Sidebar.scss').walkRules((rule) => {
+  sheet('components/navigation/Sidebar/Sidebar.scss').walkRules((rule) => {
     if (/:hover/.test(rule.selector)) {
       const selected = /--selected/.test(rule.selector) && !/:not\(\.plus-pattern-sidebar__row--selected\)/.test(rule.selector);
       for (const node of rule.nodes) if (node.prop === 'background-color') decls.push([selected, node.value]);

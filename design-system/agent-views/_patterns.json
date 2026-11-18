@@ -7,11 +7,6 @@
       "use": "Every full page: the app frame (Sidebar, Page with its 12-column content grid, and Panel, with no top bar). The default template puts the PLUS `Sidebar` (@/components) in `sidebar` and a `Breadcrumb` in `header`; the focused template, for one task the person finishes or leaves, has no `sidebar`, `width=\"reading\"`, the task's name as the `h1` in `header`, and `onBack` and `onClose`."
     },
     {
-      "group": "Frame",
-      "name": "PatternSidebar",
-      "use": "The Frame's Sidebar with its open tabs. The PLUS `Sidebar` (@/components) fills it from the role's config; reach for this only for a sidebar that isn't the app's."
-    },
-    {
       "group": "Page",
       "name": "Page",
       "use": "A tokenized box with a level (fill and shadow together), a pad and a radius. The Frame draws the page's own; use it for any other block that needs a level."
