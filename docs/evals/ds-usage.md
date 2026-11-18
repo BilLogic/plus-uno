@@ -180,6 +180,7 @@ Read: every build came out clean, and the post-edit hook never had to hand one b
 | Layout formula used | 2/12 | 11/12 |
 | Mean turns / minutes | 21.5 / 1.6 | 19.5 / 1.3 |
 
+<!-- retired-names-ok: historical 2026-11-06 Phase 1 eval run -->
 Read: every full page now sits in `PageLayout`, and both frame-to-code builds are a `PatternCard`, where the runs before wrote that the system had no card. The one miss is an overlay flow whose outer view was hand-made. An overlay-flow agent also chose the `Modal` component over `PatternModal` because the pattern draws inline with no focus trap, which is right; the row now says so. After this run the review also dropped a wrong "Not here" row for `Section` (a real menu part), renamed the table's first column and named all three barrels in the index header; none of those touch what a page agent reads first.
 
 ## Phase 2 baseline (2026-11-07)

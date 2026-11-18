@@ -57,7 +57,7 @@ A suggested starting point for each scenario, with the patterns to consult and t
 | A record page, one level down | Page with a breadcrumb and page tabs | Navigation · Indicators | `Breadcrumb`, `PageHeader`, `StatusTag`, `Tabs`, `PopupSelect` |
 | Working through a queue | Panel · Details, docked beside the list | Navigation · Common actions | `Table`, `Panel`, `Button` |
 | A quick look at one row | Panel · Details | Navigation | `Panel`, `Button` |
-| A short decision before going on | Modal · Active, confirm width | Common actions · Errors | `Modal`, `Button` |
+| A short decision before going on | Modal · Active, confirm width | Common actions · Errors | `Dialog`, `Button` |
 | A long task with steps | Frame · focused, with a Form in steps | Forms · Navigation | `ProgressTracker`, `Fieldset`, `Button` |
 | Settings saved as a group | Form in a page, on the Page under its page-level header; subsections for several groups | Forms · Read-only · Disabled | `Fieldset`, `TextField`, `PopupSelect`, `Toggle`, `Button` |
 | Narrowing a long catalog | Section with a filter side | Filtering | `Checkbox`, `PopupSelect`, `Button` |

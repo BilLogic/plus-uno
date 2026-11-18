@@ -99,7 +99,7 @@ every visit.
 - `Popup`: use when anchoring an overlay dialog or panel to a trigger element.
 - `CloseButton`: use when rendering the inverse dismiss control in the spotlight header.
 
-Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `NotificationItem` · `SectionMessage`
+Same group: `Banner` · `Dialog` · `EmptyState` · `Flag` · `InlineMessage` · `NotificationItem` · `SectionMessage`
 
 ## Parts
 

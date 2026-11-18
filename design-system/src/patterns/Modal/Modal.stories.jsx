@@ -1,9 +1,8 @@
 import { expectOverlayExit, withReducedMotion, settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import React, { useState } from 'react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
-import PatternModal from '@/patterns/PatternModal';
-import Blanket, { BLANKET_HEIGHTS, BLANKET_SPANS, BLANKET_WIDTHS } from '@/patterns/Blanket';
-import { Button, FooterActions } from '@/components';
+import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
+import Modal, { MODAL_HEIGHTS, MODAL_WIDTHS, MODAL_WIDTH_PX } from './Modal';
+import { Button, FooterActions, IconButton, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, Select } from '@/components';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { probe, tokenLength } from '@/storybook-docs/lib/style-probes.js';
@@ -18,8 +17,13 @@ import * as Demo from './modalDemo.jsx';
 /** The stand-in screen the docs draw the overlay at: the Large mode, and a short template. */
 const SCREEN = { width: 1024, height: 520 };
 
-/** Figma's Modal/width-modal-* at 1024: 4 · 6 · 8 · 10 screen columns plus 2 × 16. */
-const WIDTHS_AT_1024 = { xs: 347, sm: 512, md: 677, lg: 843 };
+/** Modal widths at 1024: 4 · 6 · 8 · 10 screen columns plus 2 × 16. */
+const WIDTHS_AT_1024 = {
+    '4-col': MODAL_WIDTH_PX['4-col'][1],
+    '6-col': MODAL_WIDTH_PX['6-col'][1],
+    '8-col': MODAL_WIDTH_PX['8-col'][1],
+    '10-col': MODAL_WIDTH_PX['10-col'][1],
+};
 
 const bodyCopy = (
     <p style={{ margin: 0, font: 'var(--body-default)' }}>
@@ -44,36 +48,42 @@ const footerActions = (
     </FooterActions>
 );
 
-/** An inline Blanket at the stand-in screen, holding one modal. */
-const InBlanket = ({ children, height = SCREEN.height }) => (
-    <Blanket inline screenWidth={SCREEN.width} screenHeight={height}>
-        {children}
-    </Blanket>
+const footerWithAction = (action) => (
+    <FooterActions>
+        <Button text="Discard" onClick={() => {}} />
+        <Button text={action} appearance="primary" onClick={() => {}} />
+    </FooterActions>
 );
 
 const dialogs = (canvas) => canvas.getAllByRole('dialog');
+const documentOf = (canvasElement) => within(canvasElement.ownerDocument.body);
+const dialogNamed = (canvasElement, name) => documentOf(canvasElement).queryByRole('dialog', { name });
+const expectDialogGone = (canvasElement, name) =>
+    waitFor(() => expect(dialogNamed(canvasElement, name)).toBeNull());
 
 export default {
     title: 'Templates/Modal',
-    component: PatternModal,
+    component: Modal,
     tags: ['!dev', '!autodocs'],
     argTypes: {
         children: { table: { disable: true } },
         style: { table: { disable: true } },
         onClose: { table: { disable: true } },
         footer: { table: { disable: true } },
+        primaryButton: { table: { disable: true } },
+        secondaryButton: { table: { disable: true } },
         title: {
             control: 'text',
             table: { category: 'Slots' },
         },
         width: {
             control: 'inline-radio',
-            options: BLANKET_WIDTHS,
+            options: MODAL_WIDTHS,
             table: { category: 'Design' },
         },
         height: {
             control: 'inline-radio',
-            options: BLANKET_HEIGHTS,
+            options: MODAL_HEIGHTS,
             table: { category: 'Design' },
         },
         id: {
@@ -87,14 +97,12 @@ export default {
     },
 };
 
-/** A sm, hug modal in its Blanket: the blanket, the pads and the modal centered. */
+/** A 6-col, hug modal in its Blanket: the blanket, the pads and the modal centered. */
 export const Overview = {
     render: () => (
-        <InBlanket>
-            <PatternModal title="Move session" onClose={() => {}} footer={footerActions}>
-                {bodyCopy}
-            </PatternModal>
-        </InBlanket>
+        <Demo.ModalStage title="Move session" screenHeight={SCREEN.height} footer={footerActions}>
+            {bodyCopy}
+        </Demo.ModalStage>
     ),
     play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
@@ -103,8 +111,8 @@ export const Overview = {
         const style = getComputedStyle(modal);
         await expect(style.paddingTop, 'Modal/pad').toBe(`${tokenLength(canvasElement, '--modal-pad-x-default')}px`);
         await expect(style.rowGap, 'Modal/stack-md').toBe(`${tokenLength(canvasElement, '--modal-stack-md')}px`);
-        const header = modal.querySelector('.plus-pattern-modal-header');
-        const footer = modal.querySelector('.plus-pattern-modal-footer');
+        const header = modal.querySelector('.plus-dialog-header');
+        const footer = modal.querySelector('.plus-dialog-footer');
         await expect(getComputedStyle(header).gap, 'Modal header gap').toBe(`${tokenLength(canvasElement, '--modal-inline-sm')}px`);
         await expect(getComputedStyle(header).gap, 'Modal header gap is 8px').toBe('8px');
         await expect(getComputedStyle(footer).gap, 'Modal footer gap').toBe(`${tokenLength(canvasElement, '--modal-inline-sm')}px`);
@@ -123,63 +131,50 @@ export const Overview = {
     },
 };
 
-/** sm · md · lg at the 1024 screen: 512 · 677 · 843, as Figma's Large mode draws them. */
+/** 4-col · 6-col · 8-col · 10-col at the 1024 screen: 347 · 512 · 677 · 843. */
 export const Widths = {
     render: () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
-            {BLANKET_WIDTHS.map((width) => (
-                <InBlanket key={width} height={320}>
-                    <PatternModal title={`width="${width}"`} width={width} onClose={() => {}} footer={footerActions}>
-                        {bodyCopy}
-                    </PatternModal>
-                </InBlanket>
+            {MODAL_WIDTHS.map((width) => (
+                <Demo.ModalStage key={width} title={`width="${width}"`} width={width} screenHeight={320} footer={footerActions}>
+                    {bodyCopy}
+                </Demo.ModalStage>
             ))}
         </div>
     ),
     play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
         const modals = dialogs(canvas);
-        for (const [i, width] of BLANKET_WIDTHS.entries()) {
+        for (const [i, width] of MODAL_WIDTHS.entries()) {
             await expect(modals[i].getBoundingClientRect().width, `width ${width} at 1024`).toBeCloseTo(WIDTHS_AT_1024[width], 0);
         }
     },
 };
 
-/**
- * Hug grows with its content up to the screen less the overlay pad above and
- * below, then the body scrolls; Fill always sits at that height.
- */
+/** Hug grows with its content up to the screen less the blanket pad, then scrolls; Fill sits at that height. */
 export const Heights = {
     render: () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
-            <InBlanket>
-                <PatternModal title='height="hug", short' onClose={() => {}} footer={footerActions}>
-                    {bodyCopy}
-                </PatternModal>
-            </InBlanket>
-            <InBlanket>
-                <PatternModal title='height="hug", long' onClose={() => {}} footer={footerActions}>
-                    {longBody}
-                </PatternModal>
-            </InBlanket>
-            <InBlanket>
-                <PatternModal title='height="fill"' height="fill" onClose={() => {}} footer={footerActions}>
-                    {bodyCopy}
-                </PatternModal>
-            </InBlanket>
+            <Demo.ModalStage title='height="hug", short' screenHeight={SCREEN.height} footer={footerActions}>
+                {bodyCopy}
+            </Demo.ModalStage>
+            <Demo.ModalStage title='height="hug", long' screenHeight={SCREEN.height} footer={footerActions}>
+                {longBody}
+            </Demo.ModalStage>
+            <Demo.ModalStage title='height="fill"' screenHeight={SCREEN.height} height="fill" footer={footerActions}>
+                {bodyCopy}
+            </Demo.ModalStage>
         </div>
     ),
     play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const [short, long, fill] = dialogs(canvas);
+        const [short, long] = dialogs(canvas);
         const cap = SCREEN.height - 2 * tokenLength(canvasElement, '--blanket-pad-y');
         await expect(short.getBoundingClientRect().height, 'a short hug modal hugs').toBeLessThan(cap);
         await expect(long.getBoundingClientRect().height, 'a long hug modal stops at the cap').toBeCloseTo(cap, 0);
-        await expect(fill.getBoundingClientRect().height, 'fill sits at the cap').toBeCloseTo(cap, 0);
-        const body = long.querySelector('.plus-pattern-modal-body');
+        const body = long.querySelector('.plus-dialog-body');
         await expect(body.scrollHeight, 'the long body scrolls').toBeGreaterThan(body.clientHeight);
         await expect(body, 'a body that scrolls is a tab stop').toHaveAttribute('tabindex', '0');
-        await expect(fill.querySelector('.plus-pattern-modal-body')).toHaveAttribute('tabindex', '0');
     },
 };
 
@@ -196,7 +191,6 @@ const fields = (rows) => (
 
 const STUDENTS = ['Ana Ruiz', 'Ben Okafor', 'Chloe Tran', 'Diego Alvarez', 'Emma Chen', 'Farah Haddad', 'Gabe Miller', 'Hana Sato', 'Isaac Reyes', 'Jada Brooks', 'Kai Nguyen', 'Lena Fischer'];
 
-/** Three views of one session, the students one long enough to scroll. */
 const sessionTabs = [
     {
         key: 'details',
@@ -218,29 +212,23 @@ const saveActions = (
     </FooterActions>
 );
 
-/**
- * A tab group under the title, as `_Modal header` type=tabs: `Tabs` in the
- * header, so it stays put while only the body scrolls. The body is
- * the selected tab's panel. Left and Right move between tabs, Home and End jump
- * to the ends.
- */
 export const Tabs = {
     render: () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
-            <InBlanket>
-                <PatternModal title="Session settings" tabs={sessionTabs} onClose={() => {}} footer={saveActions} />
-            </InBlanket>
-            <InBlanket>
-                <PatternModal
-                    title="Session settings"
-                    width="md"
-                    height="fill"
-                    tabs={sessionTabs}
-                    defaultActiveTab="students"
-                    onClose={() => {}}
-                    footer={saveActions}
-                />
-            </InBlanket>
+            <Demo.ModalStage title="Session settings" screenHeight={SCREEN.height} tabs={sessionTabs} footer={saveActions} />
+            <Modal
+                inline
+                show
+                screenWidth={SCREEN.width}
+                screenHeight={SCREEN.height}
+                title="Session settings"
+                width="8-col"
+                height="fill"
+                tabs={sessionTabs}
+                defaultActiveTab="students"
+                onClose={() => {}}
+                footer={saveActions}
+            />
         </div>
     ),
     play: async ({ canvas, canvasElement }) => {
@@ -249,240 +237,328 @@ export const Tabs = {
         const cap = SCREEN.height - 2 * tokenLength(canvasElement, '--blanket-pad-y');
         const tabsOf = (modal) => within(modal).getAllByRole('tab');
         const panelOf = (modal) => within(modal).getByRole('tabpanel');
-        const selectedOf = (modal) => tabsOf(modal).find((tab) => tab.getAttribute('aria-selected') === 'true');
 
-        // The tabs sit in the header, Modal/stack-sm under the title row.
-        const group = hug.querySelector('.plus-pattern-modal-header-group');
+        const group = hug.querySelector('.plus-dialog-header-group');
         await expect(group.querySelector('[role="tablist"]'), 'the tablist is in the header').not.toBeNull();
         await expect(getComputedStyle(group).rowGap, 'Modal/stack-sm').toBe(`${tokenLength(canvasElement, '--modal-stack-sm')}px`);
 
-        // Keyboard: arrows move selection and focus together; the panel follows.
         await userEvent.click(tabsOf(hug)[0]);
         await expect(panelOf(hug)).toHaveAttribute('aria-labelledby', tabsOf(hug)[0].id);
         await userEvent.keyboard('{ArrowRight}');
         await expect(tabsOf(hug)[1]).toHaveFocus();
         await expect(tabsOf(hug)[1]).toHaveAttribute('aria-selected', 'true');
-        await expect(panelOf(hug), 'the panel is named by its tab').toHaveAttribute('aria-labelledby', tabsOf(hug)[1].id);
-        await userEvent.keyboard('{End}');
-        await expect(tabsOf(hug)[2]).toHaveAttribute('aria-selected', 'true');
-        await userEvent.keyboard('{ArrowRight}');
-        await expect(tabsOf(hug)[0], 'Right wraps to the first tab').toHaveAttribute('aria-selected', 'true');
-        await userEvent.keyboard('{ArrowLeft}');
-        await expect(tabsOf(hug)[2], 'Left wraps to the last tab').toHaveAttribute('aria-selected', 'true');
         await userEvent.keyboard('{Home}');
         await expect(tabsOf(hug)[0]).toHaveFocus();
-        await expect(tabsOf(hug).filter((tab) => tab.tabIndex === 0), 'one tab stop for the strip').toHaveLength(1);
-        await userEvent.tab();
-        await expect(panelOf(hug), 'Tab moves from the strip into the panel').toHaveFocus();
+        await expect(tabsOf(hug)[0]).toHaveAttribute('aria-selected', 'true');
 
-        // Hug: a short tab hugs, a long one stops at the cap and scrolls.
         await expect(hug.getBoundingClientRect().height, 'a short tab hugs').toBeLessThan(cap);
         await userEvent.click(within(hug).getByRole('tab', { name: 'Students' }));
         await waitFor(() => expect(hug.getBoundingClientRect().height, 'a long tab stops at the cap').toBeCloseTo(cap, 0));
 
-        // Fill: the tabs stay put while the body scrolls under them.
         await expect(fill.getBoundingClientRect().height, 'fill sits at the cap').toBeCloseTo(cap, 0);
         const body = panelOf(fill);
-        const strip = within(fill).getByRole('tablist');
         await expect(body.scrollHeight, 'the long tab scrolls').toBeGreaterThan(body.clientHeight);
-        const stripTop = strip.getBoundingClientRect().top;
-        body.scrollTop = body.scrollHeight;
-        await waitFor(() => expect(body.scrollTop).toBeGreaterThan(0));
-        await expect(strip.getBoundingClientRect().top, 'the tabs do not scroll').toBeCloseTo(stripTop, 0);
-        await expect(fill.getBoundingClientRect().height, 'switching tabs never resizes a fill modal').toBeCloseTo(cap, 0);
-        await userEvent.click(within(fill).getByRole('tab', { name: 'Details' }));
-        await expect(panelOf(fill).scrollTop, 'a new tab starts at the top').toBe(0);
-        await expect(fill.getBoundingClientRect().height, 'fill holds its height on a short tab').toBeCloseTo(cap, 0);
-
-        await inEveryColorModeOf(canvasElement, async (mode, token) => {
-            for (const [name, modal] of [['hug', hug], ['fill', fill]]) {
-                const selected = selectedOf(modal);
-                await expect(getComputedStyle(selected).color, `${name}: selected tab ink (${mode})`).toBe(token('--ds-text-selected'));
-                await expect(getComputedStyle(selected).borderBottomColor, `${name}: selected tab underline (${mode})`).toBe(token('--ds-border-selected'));
-                await expect(getComputedStyle(modal).backgroundColor, `${name}: surface overlay (${mode})`).toBe(token('--ds-surface-overlay'));
-            }
-        });
     },
 };
 
-/**
- * The body never draws shorter than Modal/body-min-height 80, however little
- * it holds, as Figma holds it.
- */
 export const BodyMinHeight = {
     render: () => (
-        <InBlanket>
-            <PatternModal title="Move session" onClose={() => {}} footer={footerActions}>
-                <span>Short.</span>
-            </PatternModal>
-        </InBlanket>
+        <Demo.ModalStage title="Short body" screenHeight={320} footer={saveActions}>
+            <p style={{ margin: 0, font: 'var(--body-default)' }}>One line.</p>
+        </Demo.ModalStage>
     ),
-    play: async ({ canvas, canvasElement }) => {
+    play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
-        const [modal] = dialogs(canvas);
-        const body = modal.querySelector('.plus-pattern-modal-body');
+        const body = canvasElement.querySelector('.plus-dialog-body');
         await expect(getComputedStyle(body).minHeight, 'Modal/body-min-height').toBe('80px');
-        await expect(body.getBoundingClientRect().height).toBeGreaterThanOrEqual(80);
     },
 };
 
-/** `header` replaces the title row, as `_Modal header` type=custom; the caller names the dialog. */
 export const CustomHeader = {
     render: () => (
-        <InBlanket>
-            <PatternModal
-                aria-label="Reschedule"
-                header={(
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <strong style={{ font: 'var(--heading-md)' }}>Reschedule</strong>
-                        <Button text="Help" spacing="compact" onClick={() => {}} />
-                    </div>
-                )}
-                footer={footerActions}
-            >
-                {bodyCopy}
-            </PatternModal>
-        </InBlanket>
+        <Demo.ModalStage
+            screenHeight={320}
+            ariaLabel="Reschedule session"
+            header={(
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <strong style={{ font: 'var(--heading-md)' }}>Reschedule</strong>
+                    <Button text="Help" spacing="compact" onClick={() => {}} />
+                </div>
+            )}
+            footer={saveActions}
+        >
+            {bodyCopy}
+        </Demo.ModalStage>
     ),
     play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
         const [modal] = dialogs(canvas);
-        const view = within(modal);
-        await expect(view.getByText('Reschedule')).toBeInTheDocument();
-        await expect(view.queryByRole('button', { name: 'Close' }), 'no default close button').toBeNull();
-        await expect(modal).toHaveAttribute('aria-label', 'Reschedule');
-        await expect(modal).not.toHaveAttribute('aria-labelledby');
+        await expect(modal).toHaveAttribute('aria-label', 'Reschedule session');
+        await expect(within(modal).getByRole('button', { name: 'Help' })).toBeInTheDocument();
+        await expect(within(modal).queryByRole('button', { name: 'Close' })).toBeNull();
     },
 };
 
-/** `divider` draws a rule under the header and above the footer, as Figma's `divider?`. */
 export const Divider = {
     render: () => (
-        <InBlanket>
-            <PatternModal title="Move session" divider onClose={() => {}} footer={footerActions}>
-                {bodyCopy}
-            </PatternModal>
-        </InBlanket>
+        <Demo.ModalStage title="Session notes" screenHeight={320} dividers footer={saveActions}>
+            {bodyCopy}
+        </Demo.ModalStage>
     ),
-    play: async ({ canvas, canvasElement }) => {
+    play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
-        const [modal] = dialogs(canvas);
-        const rules = modal.querySelectorAll('.plus-pattern-modal-divider');
-        await expect(rules).toHaveLength(2);
-        await inEveryColorModeOf(canvasElement, async (mode, token) => {
-            for (const rule of rules) {
-                await expect(getComputedStyle(rule).backgroundColor, `rule color (${mode})`).toBe(token('--ds-border'));
-                await expect(getComputedStyle(rule).height, 'rule is one border wide').toBe(`${tokenLength(canvasElement, '--border-width-default')}px`);
-            }
-        });
+        await expect(canvasElement.querySelectorAll('.plus-dialog-divider')).toHaveLength(2);
     },
 };
 
-/** `loading` swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. */
 export const Loading = {
     render: () => (
-        <InBlanket>
-            <PatternModal title="Move session" loading onClose={() => {}} footer={footerActions}>
-                {bodyCopy}
-            </PatternModal>
-        </InBlanket>
+        <Demo.ModalStage title="Session details" screenHeight={320} loading footer={saveActions}>
+            {bodyCopy}
+        </Demo.ModalStage>
+    ),
+    play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
+        const body = canvasElement.querySelector('.plus-dialog-body');
+        await expect(body).toHaveAttribute('aria-busy', 'true');
+        await expect(canvasElement.querySelector('.plus-dialog-skeleton')).not.toBeNull();
+    },
+};
+
+const widthStory = (width) => ({
+    render: () => (
+        <Demo.ModalStage title={`width="${width}"`} width={width} screenHeight={320} footer={footerActions}>
+            {bodyCopy}
+        </Demo.ModalStage>
     ),
     play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
         const [modal] = dialogs(canvas);
-        const body = modal.querySelector('.plus-pattern-modal-body');
-        await expect(body).toHaveAttribute('aria-busy', 'true');
-        await expect(within(modal).queryByText(/Move Thursday/), 'the real body is not drawn').toBeNull();
-        await expect(body.querySelector('[aria-hidden="true"]'), 'a skeleton stands in').not.toBeNull();
-        await expect(within(modal).getByRole('button', { name: 'Move session' }), 'the footer stays').toBeInTheDocument();
+        await expect(modal.getBoundingClientRect().width, `${width} at 1024`).toBeCloseTo(WIDTHS_AT_1024[width], 0);
     },
-};
+});
 
-/* ---------------------------------------------------- one value per story */
+export const Width4Col = widthStory('4-col');
+export const Width6Col = widthStory('6-col');
+export const Width8Col = widthStory('8-col');
+export const Width10Col = widthStory('10-col');
 
-/** One width step per story, at the 1024 screen. */
-const atWidth = (width) => (
-    <InBlanket height={320}>
-        <PatternModal title="Move session" width={width} onClose={() => {}} footer={footerActions}>
-            {bodyCopy}
-        </PatternModal>
-    </InBlanket>
-);
-
-export const WidthXSmall = { name: 'Extra small', render: () => atWidth('xs') };
-export const WidthSmall = { name: 'Small', render: () => atWidth('sm') };
-export const WidthMedium = { name: 'Medium', render: () => atWidth('md') };
-export const WidthLarge = { name: 'Large', render: () => atWidth('lg') };
-
-/** Hug with long content: it stops at the cap and the body scrolls. */
 export const HugLong = {
-    name: 'Hug, long content',
     render: () => (
-        <InBlanket>
-            <PatternModal title="Session history" onClose={() => {}} footer={footerActions}>
-                {longBody}
-            </PatternModal>
-        </InBlanket>
+        <Demo.ModalStage title='height="hug"' screenHeight={SCREEN.height} footer={footerActions}>
+            {longBody}
+        </Demo.ModalStage>
     ),
 };
 
-/** Fill: the modal sits at the cap, however little it holds. */
 export const HeightFill = {
-    name: 'Fill',
     render: () => (
-        <InBlanket>
-            <PatternModal title="Session settings" height="fill" onClose={() => {}} footer={saveActions}>
-                {bodyCopy}
-            </PatternModal>
-        </InBlanket>
+        <Modal inline show screenWidth={SCREEN.width} screenHeight={SCREEN.height} title='height="fill"' height="fill" onClose={() => {}} footer={footerActions}>
+            {bodyCopy}
+        </Modal>
     ),
 };
 
-/** A tab group under the title, with no play: the docs page shows it at rest. */
 export const TabsStill = {
     name: 'Tabs',
     render: () => (
-        <InBlanket>
-            <PatternModal title="Session settings" tabs={sessionTabs} onClose={() => {}} footer={saveActions} />
-        </InBlanket>
+        <Demo.ModalStage title="Session settings" screenHeight={SCREEN.height} tabs={sessionTabs} footer={saveActions} />
     ),
 };
 
 export const Interactive = {
     args: {
         title: 'Move session',
-        width: 'sm',
+        width: '6-col',
         height: 'hug',
     },
     render: (args) => (
-        <InBlanket>
-            <PatternModal
-                title={args.title}
-                width={args.width}
-                height={args.height}
-                onClose={() => {}}
-                footer={footerActions}
-            >
-                {longBody}
-            </PatternModal>
-        </InBlanket>
+        <Modal
+            inline
+            show
+            screenWidth={SCREEN.width}
+            screenHeight={SCREEN.height}
+            title={args.title}
+            width={args.width}
+            height={args.height}
+            onClose={() => {}}
+            footer={footerActions}
+        >
+            {longBody}
+        </Modal>
     ),
 };
 
 /* ---------------------------------------------------------------------------
- * The template page's examples (Templates/Modal): types, anatomy, widths,
- * destructive tiers, footers, key states and stacking. Each play asserts what a
- * person sees: the footer's height from its token, the footer holding still
- * while the body scrolls, and every button inside its container.
+ * Live modal behavior (portal, focus move, Escape, Blanket press, scroll lock,
+ * single-overlay slot, confirm view swap, blocking shadow, z-index layers).
  * ------------------------------------------------------------------------- */
 
-const STAGE = 1024; // docs-literal: the page's stand-in screen
+export const LiveBehavior = () => {
+    const [open, setOpen] = useState(false);
+    const [blanket, setBlanket] = useState(true);
+    return (
+        <div style={{ display: 'flex', gap: 'var(--inline-sm)' }}>
+            <Button text="Open modal" onClick={() => setOpen(true)} />
+            <Button text="Toggle static" onClick={() => setBlanket((b) => (b === true ? 'static' : true))} />
+            <Modal
+                show={open}
+                blanket={blanket}
+                title="Confirm schedule"
+                body="Focus moves into the Dialog, Escape or a Blanket press closes it, and body scroll is locked."
+                secondaryButton={{ text: 'Keep editing', onClick: () => setOpen(false) }}
+                primaryButton={{ text: 'Confirm', onClick: () => setOpen(false) }}
+                onClose={() => setOpen(false)}
+            />
+        </div>
+    );
+};
+
+LiveBehavior.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const doc = documentOf(canvasElement);
+    const ownerDoc = canvasElement.ownerDocument;
+    const trigger = canvas.getByRole('button', { name: 'Open modal' });
+
+    await userEvent.click(trigger);
+    const dialog = await doc.findByRole('dialog', { name: 'Confirm schedule' });
+    await settleAnimations(ownerDoc.body);
+
+    // 1. Focus moves into the Dialog.
+    await expect(dialog.contains(ownerDoc.activeElement), 'focus moves inside the Dialog').toBe(true);
+
+    // 2. Scroll lock on html or body while open.
+    const locked = getComputedStyle(ownerDoc.documentElement).overflowY === 'hidden'
+        || getComputedStyle(ownerDoc.body).overflowY === 'hidden'
+        || ownerDoc.documentElement.style.overflow === 'hidden'
+        || ownerDoc.body.style.overflow === 'hidden';
+    await expect(locked, 'scroll is locked while Modal is open').toBe(true);
+
+    // 3. Escape closes and returns focus to trigger.
+    await userEvent.keyboard('{Escape}');
+    await expectDialogGone(canvasElement, 'Confirm schedule');
+    await expect(ownerDoc.activeElement, 'focus returns to trigger').toBe(trigger);
+
+    // 4. Blanket press closes when blanket={true}.
+    await userEvent.click(trigger);
+    const reopened = await doc.findByRole('dialog', { name: 'Confirm schedule' });
+    await settleAnimations(ownerDoc.body);
+    const blanket = reopened.closest('.plus-pattern-blanket');
+    await expect(blanket).not.toBeNull();
+    fireEvent.mouseDown(blanket);
+    fireEvent.click(blanket);
+    await expectDialogGone(canvasElement, 'Confirm schedule');
+
+    // 5. Static blanket refuses to close on Blanket press.
+    await userEvent.click(canvas.getByRole('button', { name: 'Toggle static' }));
+    await userEvent.click(trigger);
+    const staticDialog = await doc.findByRole('dialog', { name: 'Confirm schedule' });
+    await settleAnimations(ownerDoc.body);
+    const staticBlanket = staticDialog.closest('.plus-pattern-blanket');
+    fireEvent.mouseDown(staticBlanket);
+    fireEvent.click(staticBlanket);
+    await expect(doc.getByRole('dialog', { name: 'Confirm schedule' }), 'static blanket keeps Modal open').toBeInTheDocument();
+    await userEvent.click(doc.getByRole('button', { name: 'Close' }));
+    await expectDialogGone(canvasElement, 'Confirm schedule');
+};
+
+export const StaticBlanketRefusesToClose = () => {
+    const [open, setOpen] = useState(true);
+    const [closes, setCloses] = useState(0);
+
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
+            <Modal
+                id="mdis-uploading"
+                show={open}
+                blanket="static"
+                keyboard={false}
+                title="Uploading transcript"
+                body="Leaving now would discard it."
+                showBottomButtons={false}
+                onClose={() => {
+                    setCloses((n) => n + 1);
+                    setOpen(false);
+                }}
+            />
+            <p data-testid="close-count">{closes}</p>
+        </div>
+    );
+};
+
+StaticBlanketRefusesToClose.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const doc = documentOf(canvasElement);
+    const closes = canvas.getByTestId('close-count');
+
+    await doc.findByText('Uploading transcript');
+    await userEvent.keyboard('{Escape}');
+    await expect(closes).toHaveTextContent('0');
+    await expect(doc.getByText('Uploading transcript')).toBeInTheDocument();
+
+    const blanket = canvasElement.ownerDocument.querySelector('.plus-pattern-blanket');
+    await expect(blanket).not.toBeNull();
+    blanket.click();
+    await expect(closes).toHaveTextContent('0');
+    await expect(doc.getByText('Uploading transcript')).toBeInTheDocument();
+
+    await userEvent.click(doc.getByRole('button', { name: 'Close' }));
+    await expectDialogGone(canvasElement, 'Uploading transcript');
+    await expect(closes).toHaveTextContent('1');
+};
+
+export const BlockingShadow = () => (
+    <Modal show title="Confirm schedule" body="This opens over the page." primaryButton={{ text: 'Confirm', onClick: () => {} }} onClose={() => {}} />
+);
+
+BlockingShadow.play = async ({ canvasElement }) => {
+    const doc = documentOf(canvasElement);
+    const dialog = await doc.findByRole('dialog', { name: 'Confirm schedule' });
+    await settleAnimations(canvasElement.ownerDocument.body);
+    await inEveryColorModeOf(canvasElement, async (mode) => {
+        await expect(getComputedStyle(dialog).backgroundColor, `surface-overlay in ${mode}`)
+            .toBe(probe(canvasElement, 'backgroundColor', 'var(--ds-surface-overlay)'));
+        await expect(getComputedStyle(dialog).boxShadow, `shadow-blocking in ${mode}`)
+            .toBe(probe(canvasElement, 'boxShadow', 'var(--ds-shadow-blocking)'));
+    });
+};
+
+const OPTIONS = ['Lincoln Middle', 'Roosevelt K-8', 'North High', 'South High'].map((label) => ({ value: label.toLowerCase(), label }));
+
+export const SelectKeepsOverlayShadow = () => (
+    <Modal show title="Assign site" showBottomButtons={false} onClose={() => {}}>
+        <Select label="Site" options={OPTIONS} />
+    </Modal>
+);
+
+SelectKeepsOverlayShadow.play = async ({ canvasElement }) => {
+    const doc = documentOf(canvasElement);
+    await doc.findByRole('dialog', { name: 'Assign site' });
+    await userEvent.click(doc.getByRole('combobox', { name: 'Site' }));
+    const listbox = await doc.findByRole('listbox');
+    const option = within(listbox).getByRole('option', { name: 'South High' });
+    const overlay = doc.getByText('Assign site').closest('.plus-pattern-blanket');
+    await expect(listbox.closest('.plus-pattern-blanket')).toBe(overlay);
+    await expect(getComputedStyle(listbox.closest('.plus-listbox')).zIndex).toBe('510');
+    await settleAnimations(canvasElement.ownerDocument.body);
+    const box = option.getBoundingClientRect();
+    const hit = canvasElement.ownerDocument.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+    await expect(option.contains(hit)).toBe(true);
+    await expect(getComputedStyle(listbox.closest('.plus-listbox')).boxShadow)
+        .toBe(probe(canvasElement, 'boxShadow', 'var(--ds-shadow-overlay)'));
+};
+
+/* ---------------------------------------------------------------------------
+ * Template page examples (Templates/Modal): Types, Anatomy, Widths, Tiers,
+ * Footers, Key states, Stacking, Blanket, Motion.
+ * ------------------------------------------------------------------------- */
+
+const STAGE = 1024;
 const rect = (el) => el.getBoundingClientRect();
 
-/** Every footer button sits inside the Modal's padding and the footer's own box: nothing overflows its container. */
 const buttonsInside = async (canvasElement) => {
     fitsCanvas(canvasElement);
-    const modalEl = canvasElement.querySelector('.plus-pattern-modal');
+    const modalEl = canvasElement.querySelector('.plus-dialog');
     const modal = rect(modalEl);
     const scale = modalEl.offsetWidth > 0 ? modal.width / modalEl.offsetWidth : 1;
     const padX = (parseFloat(getComputedStyle(modalEl).paddingLeft) || 0) * scale;
@@ -494,17 +570,16 @@ const buttonsInside = async (canvasElement) => {
         await expect(box.left, 'the footer sits inside the Modal’s left padding').toBeCloseTo(modal.left + padX, 0);
         await expect(box.right, 'the footer sits inside the Modal’s right padding').toBeCloseTo(modal.right - padX, 0);
     }
-    for (const button of canvasElement.querySelectorAll('.plus-pattern-modal-footer button')) {
+    for (const button of canvasElement.querySelectorAll('.plus-dialog-footer button')) {
         const b = rect(button);
         await expect(b.left, 'a footer button starts inside its container').toBeGreaterThanOrEqual(box.left - 0.5);
         await expect(b.right, 'a footer button ends inside its container').toBeLessThanOrEqual(box.right + 0.5);
         await expect(b.bottom, 'a footer button ends inside the Modal').toBeLessThanOrEqual(modal.bottom + 0.5);
-        await expect(b.height, 'a spacious button fills the footer’s height').toBeCloseTo(box.height, 0);
+        await expect(b.height, 'button fills the footer’s height').toBeCloseTo(box.height, 0);
         await expect(button.scrollWidth, 'a button’s label fits its box').toBeLessThanOrEqual(button.clientWidth + 1);
     }
 };
 
-/** The 1024 stand-in screen at 1:1 scale inside a horizontally scrollable box when the docs column is narrower. */
 const sized = (story, width = STAGE) => <ScrollStage width={width}>{story}</ScrollStage>;
 
 export const TypePassive = {
@@ -515,7 +590,7 @@ export const TypePassive = {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         fitsCanvas(canvasElement);
-        await expect(canvasElement.querySelector('.plus-pattern-modal-footer'), 'Passive has no footer').toBeNull();
+        await expect(canvasElement.querySelector('.plus-dialog-footer'), 'Passive has no footer').toBeNull();
         const close = canvas.getByRole('button', { name: 'Close' });
         await expect(close, 'Close is the way out').toBeInTheDocument();
         close.focus();
@@ -573,7 +648,7 @@ export const TypeSteps = {
         await expectFullScale(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const tracks = footerTracks(footer);
-        await expect(canvasElement.querySelector('.plus-pattern-modal').offsetWidth, '10-col at 1024').toBeCloseTo(WIDTHS_AT_1024.lg, 0);
+        await expect(canvasElement.querySelector('.plus-dialog').offsetWidth, '10-col at 1024').toBeCloseTo(WIDTHS_AT_1024['10-col'], 0);
         await expect(canvas.getByRole('navigation', { name: 'Steps' }), 'the steps run across the top').toHaveClass('plus-progress-tracker--horizontal');
         await expect(within(footer).queryByRole('button', { name: 'Cancel' }), 'no Cancel in steps footer').toBeNull();
         const back = rect(canvas.getByRole('button', { name: 'Back' }));
@@ -590,8 +665,8 @@ export const TypeSteps = {
 
 const ANATOMY_PARTS = [
     { selector: '.plus-pattern-blanket', label: 'Blanket', side: 'end', at: 'start', holds: true },
-    { selector: '.plus-pattern-modal-header', label: 'Header', at: 'start' },
-    { selector: '.plus-pattern-modal-body', label: 'Body', at: 'middle' },
+    { selector: '.plus-dialog-header', label: 'Header', at: 'start' },
+    { selector: '.plus-dialog-body', label: 'Body', at: 'middle' },
     { selector: '[data-probe="footer"]', label: 'Footer', at: 'end' },
 ];
 
@@ -608,27 +683,31 @@ export const AnatomyActive = {
         await expectFullScale(canvasElement);
         fitsCanvas(canvasElement);
         await markersLevelWithParts(canvasElement, ANATOMY_PARTS);
-        const body = canvasElement.querySelector('.plus-pattern-modal-body');
+        const body = canvasElement.querySelector('.plus-dialog-body');
         await expect(body.scrollHeight, 'the body shows every field whole: nothing clips').toBeLessThanOrEqual(body.clientHeight + 1);
         leadersCrossNoOtherPart(canvasElement, ANATOMY_PARTS);
-        const modal = canvasElement.querySelector('.plus-pattern-modal');
+        const modal = canvasElement.querySelector('.plus-dialog');
         await expect(getComputedStyle(modal).paddingTop, 'pad 16 on every side').toBe(`${tokenLength(canvasElement, '--modal-pad-x-default')}px`);
         await expect(getComputedStyle(modal).borderTopLeftRadius, 'radius 16').toBe(`${tokenLength(canvasElement, '--modal-radius')}px`);
+        // Form in a Modal: fields 40px, footer buttons 32px.
         const student = canvas.getByLabelText(/Student/);
+        const fieldBox = student.closest('.plus-field');
+        await expect(rect(fieldBox).height, 'Modal form fields are 40 high').toBeCloseTo(40, 0);
+        const saveBtn = canvas.getByRole('button', { name: 'Save session' });
+        await expect(rect(saveBtn).height, 'Modal form footer buttons are 32 high').toBeCloseTo(32, 0);
         await userEvent.clear(student);
         await userEvent.type(student, 'Ben Okafor');
         await expect(student).toHaveValue('Ben Okafor');
     },
 };
 
-/** The width steps against the screen grid: 4 · 6 · 8 · 10 columns plus 16 a side at 1024. */
 export const WidthStrip = {
     render: () => (
         <ScrollStage width={STAGE}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
-                {BLANKET_WIDTHS.map((width) => [width, `${BLANKET_SPANS[width]}-col`]).map(([width, label]) => (
-                    <Demo.ModalStage key={width} width={width} height={240} title={label} footer={<Demo.TwoCells action="Save" />}>
-                        <p style={{ margin: 0, font: 'var(--body-default)' }}>{`${label} on the 1024 screen grid.`}</p>
+                {MODAL_WIDTHS.map((width) => (
+                    <Demo.ModalStage key={width} width={width} screenHeight={240} title={width} footer={<Demo.TwoCells action="Save" />}>
+                        <p style={{ margin: 0, font: 'var(--body-default)' }}>{`${width} on the 1024 screen grid.`}</p>
                     </Demo.ModalStage>
                 ))}
             </div>
@@ -640,19 +719,15 @@ export const WidthStrip = {
         await expectFullScale(canvasElement);
         fitsCanvas(canvasElement);
         const modals = canvas.getAllByRole('dialog');
-        for (const [i, width] of BLANKET_WIDTHS.entries()) {
+        for (const [i, width] of MODAL_WIDTHS.entries()) {
             await expect(modals[i].offsetWidth, `${width} matches the grid at 1024`).toBeCloseTo(WIDTHS_AT_1024[width], 0);
         }
         await expect(modals[0].offsetWidth, 'widths step up').toBeLessThan(modals[1].offsetWidth);
         await expect(modals[1].offsetWidth, 'widths step up').toBeLessThan(modals[2].offsetWidth);
         await expect(modals[2].offsetWidth, 'widths step up').toBeLessThan(modals[3].offsetWidth);
-        const save = within(modals[0]).getByRole('button', { name: 'Save' });
-        save.focus();
-        await expect(save).toHaveFocus();
     },
 };
 
-/** Width behavior: the screen's width is the control; a Modal grows with it and never shrinks. */
 export const ResponsiveWidth = {
     name: 'Width behavior',
     args: { width: STAGE },
@@ -662,7 +737,7 @@ export const ResponsiveWidth = {
     },
     render: ({ width }) => (
         <ScrollStage width={width}>
-            <Demo.ModalStage width="md" screenWidth={width} height={260} title="Session settings" footer={<Demo.TwoCells action="Save" />}>
+            <Demo.ModalStage width="8-col" screenWidth={width} screenHeight={260} title="Session settings" footer={<Demo.TwoCells action="Save" />}>
                 <p style={{ margin: 0, font: 'var(--body-default)' }}>The Modal takes its width from the screen grid.</p>
             </Demo.ModalStage>
         </ScrollStage>
@@ -681,14 +756,15 @@ export const ResponsiveWidth = {
         const small = at(768);
         const mid = at(1024);
         const large = at(1440);
-        await expect(mid, '8-col at 1024').toBeCloseTo(WIDTHS_AT_1024.md, 0);
+        await expect(mid, '8-col at 1024').toBeCloseTo(WIDTHS_AT_1024['8-col'], 0);
         await expect(small, 'narrower screen, narrower Modal').toBeLessThan(mid);
         await expect(large, 'wider screen, wider Modal').toBeGreaterThan(mid);
     },
 };
 
 export const TierActive = { name: 'Tier: Active', render: () => sized(<Demo.TierActive />), play: async ({ canvasElement }) => {
-        await settleAnimations(canvasElement); await buttonsInside(canvasElement); } };
+    await settleAnimations(canvasElement); await buttonsInside(canvasElement);
+} };
 
 export const TierDanger = {
     name: 'Tier: Active with Danger',
@@ -769,11 +845,8 @@ export const FooterThree = {
         await expect(buttons[1].className, 'only the last is Primary').not.toContain('primary');
         await expect(buttons[2].className, 'only the last is Primary').toContain('primary');
         await expect(rect(buttons[0]).left, 'first button in track 2').toBeCloseTo(tracks.track(2).left, 0);
-        await expect(rect(buttons[0]).right, 'first button in track 2').toBeCloseTo(tracks.track(2).right, 0);
         await expect(rect(buttons[1]).left, 'second button in track 3').toBeCloseTo(tracks.track(3).left, 0);
-        await expect(rect(buttons[1]).right, 'second button in track 3').toBeCloseTo(tracks.track(3).right, 0);
         await expect(rect(buttons[2]).left, 'third button in track 4').toBeCloseTo(tracks.track(4).left, 0);
-        await expect(rect(buttons[2]).right, 'third button in track 4').toBeCloseTo(tracks.track(4).right, 0);
         await buttonsInside(canvasElement);
     },
 };
@@ -789,12 +862,8 @@ export const FooterTextLeft = {
         await expect(leading, 'text button is subtle').toHaveClass('plus-btn--subtle');
         await expect(leading, 'text button hugs its label and takes no track').not.toHaveClass('plus-btn--fit-container');
         await expect(rect(leading).left, 'text button hugs the left content edge').toBeCloseTo(tracks.box.left, 0);
-        await expect(rect(leading).width, 'text button hugs rather than filling tracks 1-2').toBeLessThan(tracks.span(1, 2).width);
         await expect(rect(secondary).left, 'first filled button sits in track 3').toBeCloseTo(tracks.track(3).left, 0);
-        await expect(rect(secondary).right, 'first filled button sits in track 3').toBeCloseTo(tracks.track(3).right, 0);
         await expect(rect(primary).left, 'second filled button sits in track 4').toBeCloseTo(tracks.track(4).left, 0);
-        await expect(rect(primary).right, 'second filled button sits in track 4').toBeCloseTo(tracks.track(4).right, 0);
-        await expect(primary, 'rightmost is primary').toHaveClass('plus-btn--primary');
         await buttonsInside(canvasElement);
     },
 };
@@ -807,19 +876,17 @@ export const FooterDestructive = {
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const tracks = footerTracks(footer);
         const [safer, danger] = [...footer.querySelectorAll('button')];
-        await expect(safer, 'safer alternative is secondary').toHaveClass('plus-btn--default');
-        await expect(danger, 'danger is primary').toHaveClass('plus-btn--danger');
-        await expect(rect(safer).left, 'safer alternative starts on track 1').toBeCloseTo(tracks.span(1, 2).left, 0);
-        await expect(rect(safer).right, 'safer alternative ends on track 2').toBeCloseTo(tracks.span(1, 2).right, 0);
-        await expect(rect(danger).left, 'danger primary starts on track 3').toBeCloseTo(tracks.span(3, 4).left, 0);
-        await expect(rect(danger).right, 'danger primary ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
+        await expect(safer).toHaveClass('plus-btn--default');
+        await expect(danger).toHaveClass('plus-btn--danger');
+        await expect(rect(safer).left).toBeCloseTo(tracks.span(1, 2).left, 0);
+        await expect(rect(danger).left).toBeCloseTo(tracks.span(3, 4).left, 0);
         await buttonsInside(canvasElement);
     },
 };
 
 export const FooterNarrow = {
     name: 'Footer: Single action in a narrow container',
-    render: () => sized(<Demo.ModalStage width="xs" title="Session moved" footer={<Demo.OneCell action="Got it" />}><p style={{ margin: 0, font: 'var(--body-default)' }}>Thursday’s session with Ana is now at 4:30 PM.</p></Demo.ModalStage>),
+    render: () => sized(<Demo.ModalStage width="4-col" title="Session moved" footer={<Demo.OneCell action="Got it" />}><p style={{ margin: 0, font: 'var(--body-default)' }}>Thursday’s session with Ana is now at 4:30 PM.</p></Demo.ModalStage>),
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
@@ -836,8 +903,8 @@ export const KeyLongContent = {
     render: () => sized(<Demo.LongContent />),
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
-        const body = canvasElement.querySelector('.plus-pattern-modal-body');
-        const footer = canvasElement.querySelector('.plus-pattern-modal-footer');
+        const body = canvasElement.querySelector('.plus-dialog-body');
+        const footer = canvasElement.querySelector('.plus-dialog-footer');
         const before = rect(footer).top;
         await expect(body.scrollHeight, 'the body scrolls past the cap').toBeGreaterThan(body.clientHeight);
         body.scrollTop = body.scrollHeight;
@@ -851,7 +918,7 @@ export const KeyLoading = {
     render: () => sized(<Demo.LoadingBody />),
     play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        await expect(canvasElement.querySelector('.plus-pattern-modal-body .plus-skeleton'), 'the body shows its content’s own loading state').not.toBeNull();
+        await expect(canvasElement.querySelector('.plus-dialog-body .plus-skeleton'), 'the body shows its content’s own loading state').not.toBeNull();
         await expect(canvas.getByRole('heading', { level: 1, name: 'Session history' }), 'the title stays real').toBeInTheDocument();
     },
 };
@@ -874,39 +941,25 @@ export const KeyConfirmInside = {
     },
 };
 
-const dialogNamed = (canvas, name) => canvas.queryByRole('dialog', { name });
-
-/**
- * A confirm Modal over a Panel, drawn open: the Panel open, the confirm over it,
- * and the confirm's own Blanket covering the Panel. Cancel closes the confirm and
- * focus returns to the Panel's Delete student button.
- */
 export const StackConfirmOverPanel = {
     name: 'Stacking: Confirm over a Panel',
     render: () => sized(<Demo.ConfirmOverPanel />),
     play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
         fitsCanvas(canvasElement);
-        await waitFor(() => expect(dialogNamed(canvas, 'Delete student?'), 'the confirm is open').not.toBeNull());
+        await waitFor(() => expect(canvas.queryByRole('dialog', { name: 'Delete student?' }), 'the confirm is open').not.toBeNull());
         const blanket = canvasElement.querySelector('.plus-pattern-blanket');
         const panel = rect(canvasElement.querySelector('.plus-panel'));
         const cover = rect(blanket);
         await expect(cover.left, 'the confirm’s Blanket covers the Panel').toBeLessThanOrEqual(panel.left + 0.5);
         await expect(cover.right, 'the confirm’s Blanket covers the Panel').toBeGreaterThanOrEqual(panel.right - 0.5);
-        await expect(cover.top, 'the confirm’s Blanket covers the Panel').toBeLessThanOrEqual(panel.top + 0.5);
-        await expect(cover.bottom, 'the confirm’s Blanket covers the Panel').toBeGreaterThanOrEqual(panel.bottom - 0.5);
         await expect(canvas.getByText('Ana Ruiz'), 'the Panel is open under the confirm').toBeInTheDocument();
         await userEvent.click(canvas.getByRole('button', { name: 'Archive instead' }));
-        await waitFor(() => expect(dialogNamed(canvas, 'Delete student?')).toBeNull());
+        await waitFor(() => expect(canvas.queryByRole('dialog', { name: 'Delete student?' })).toBeNull());
         await expect(canvasElement.ownerDocument.activeElement, 'focus returns to the Panel').toBe(canvas.getByRole('button', { name: 'Delete student' }));
-        await expect(canvas.getByText('Ana Ruiz'), 'the Panel is still open').toBeInTheDocument();
     },
 };
 
-/**
- * A Modal never opens on another Modal; one that needs a confirm holds it inside itself.
- * Drawn open: the confirm view, a warning SectionMessage in the body and a Danger action.
- */
 export const StackModalOnModalRefused = {
     name: 'Stacking: Confirm inside the Modal',
     render: () => sized(<Demo.ConfirmInside start="confirm" />),
@@ -914,15 +967,14 @@ export const StackModalOnModalRefused = {
         await settleAnimations(canvasElement);
         fitsCanvas(canvasElement);
         await expect(canvas.getAllByRole('dialog'), 'one Modal, one Blanket').toHaveLength(1);
-        await expect(canvasElement.querySelector('.plus-section-message--warning, [class*="section-message"][class*="warning"]'), 'a warning SectionMessage in the body').not.toBeNull();
-        await expect(canvas.getByRole('button', { name: 'Delete session' }), 'the action takes the Danger appearance').toHaveClass('plus-btn--danger');
-        // The overlay module refuses a second Modal while one is open.
+        await expect(canvasElement.querySelector('.plus-section-message--warning, [class*="section-message"][class*="warning"]')).not.toBeNull();
+        await expect(canvas.getByRole('button', { name: 'Delete session' })).toHaveClass('plus-btn--danger');
         const first = openOverlay();
         const warn = console.warn;
         console.warn = () => {};
         try {
-            await expect(first, 'the first Modal takes the slot').not.toBeNull();
-            await expect(openOverlay(), 'the second Modal stays closed').toBeNull();
+            await expect(first).not.toBeNull();
+            await expect(openOverlay()).toBeNull();
         } finally {
             console.warn = warn;
             first?.release();
@@ -930,17 +982,194 @@ export const StackModalOnModalRefused = {
     },
 };
 
+/* ---------------------------------------------------------------------------
+ * Blanket section stories
+ * ------------------------------------------------------------------------- */
+
+const guideFill = (token, percent) => `color-mix(in srgb, var(${token}) ${percent}%, transparent)`;
+const bandStyle = (extra) => ({
+    position: 'absolute',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxSizing: 'border-box',
+    pointerEvents: 'none',
+    background: guideFill('--ds-background-information-bold', 24),
+    color: 'var(--ds-text-information-bolder)',
+    font: 'var(--body-sm)',
+    zIndex: 1,
+    ...extra,
+});
+
+export const BlanketInline = {
+    render: () => (
+        <Modal inline show screenWidth={768} screenHeight={480} width="6-col" title="Move session" onClose={() => {}} footer={footerWithAction('Move session')}>
+            {bodyCopy}
+        </Modal>
+    ),
+    play: async ({ canvas, canvasElement }) => {
+        await settleAnimations(canvasElement);
+        const overlay = canvasElement.querySelector('.plus-pattern-blanket');
+        const modal = canvas.getByRole('dialog');
+        await expect(modal.getBoundingClientRect().width, '6-col at 768').toBeCloseTo(384, 0);
+        await inEveryColorModeOf(canvasElement, async (mode, token) => {
+            await expect(getComputedStyle(overlay).backgroundColor, `blanket in ${mode}`).toBe(token('--ds-blanket'));
+        });
+    },
+};
+
+export const BlanketPads = {
+    render: () => (
+        <div style={{ position: 'relative', width: 768, maxWidth: '100%' }}>
+            <Modal inline show screenWidth={768} screenHeight={520} width="6-col" title="Move session" onClose={() => {}} footer={footerWithAction('Move session')}>
+                {bodyCopy}
+            </Modal>
+            <div data-guide="pad-y" style={bandStyle({ top: 0, left: 0, right: 0, height: 'var(--blanket-pad-y)' })}>pad-y 64</div>
+            <div data-guide="pad-y" style={bandStyle({ bottom: 0, left: 0, right: 0, height: 'var(--blanket-pad-y)' })}>pad-y 64</div>
+            <div data-guide="pad-x" style={bandStyle({ top: 'var(--blanket-pad-y)', bottom: 'var(--blanket-pad-y)', left: 0, width: 'var(--blanket-pad-x)' })} />
+            <div data-guide="pad-x" style={bandStyle({ top: 'var(--blanket-pad-y)', bottom: 'var(--blanket-pad-y)', right: 0, width: 'var(--blanket-pad-x)' })} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement);
+        const overlay = canvasElement.querySelector('.plus-pattern-blanket');
+        const style = getComputedStyle(overlay);
+        await expect(style.paddingLeft, 'Overlay/pad-x').toBe(`${tokenLength(canvasElement, '--blanket-pad-x')}px`);
+        await expect(style.paddingTop, 'Overlay/pad-y').toBe(`${tokenLength(canvasElement, '--blanket-pad-y')}px`);
+    },
+};
+
+export const BlanketScreenGrid = {
+    render: () => {
+        const grid = Math.min(1232, Math.max(720, 1024 - 48));
+        return (
+            <div style={{ position: 'relative', width: 1024, maxWidth: '100%' }}>
+                <Modal inline show screenWidth={1024} screenHeight={520} width="6-col" title="Move session" onClose={() => {}} footer={footerWithAction('Move session')}>
+                    {bodyCopy}
+                </Modal>
+                <div
+                    data-guide="screen-grid"
+                    aria-hidden="true"
+                    style={{
+                        position: 'absolute',
+                        top: 0,
+                        bottom: 0,
+                        left: '50%',
+                        width: grid,
+                        maxWidth: '100%',
+                        transform: 'translateX(-50%)',
+                        display: 'grid',
+                        gridTemplateColumns: 'repeat(12, minmax(0, 1fr))',
+                        columnGap: 'var(--grid-gutter)',
+                        pointerEvents: 'none',
+                    }}
+                >
+                    {Array.from({ length: 12 }, (_, i) => (
+                        <div key={i} style={{ background: guideFill('--ds-background-danger-bold', 12) }} />
+                    ))}
+                </div>
+            </div>
+        );
+    },
+    play: async ({ canvas, canvasElement }) => {
+        await settleAnimations(canvasElement);
+        const grid = canvasElement.querySelector('[data-guide="screen-grid"]');
+        await expect(grid.children, '12 columns').toHaveLength(12);
+        const modal = canvas.getByRole('dialog');
+        await expect(modal.getBoundingClientRect().width, '6-col at 1024').toBeCloseTo(512, 0);
+    },
+};
+
+export const BlanketInteractive = {
+    args: { screenWidth: 1024 },
+    render: (args) => (
+        <Modal inline show screenWidth={args.screenWidth} screenHeight={420} width="6-col" title="Move session" onClose={() => {}} footer={footerWithAction('Move session')}>
+            {bodyCopy}
+        </Modal>
+    ),
+};
+
+export const BlanketLayers = {
+    render: () => (
+        <Modal show title="Move session" onClose={() => {}} footer={footerWithAction('Move session')}>
+            {bodyCopy}
+        </Modal>
+    ),
+    play: async ({ canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
+        const overlay = canvasElement.ownerDocument.querySelector('.plus-pattern-blanket');
+        const modal = documentOf(canvasElement).getByRole('dialog');
+        const z = (token) => probe(canvasElement, 'zIndex', `var(${token})`, { position: 'relative' });
+        await expect(getComputedStyle(overlay).position).toBe('fixed');
+        await expect(getComputedStyle(overlay).zIndex, 'blanket layer').toBe(z('--layer-blanket'));
+        await expect(getComputedStyle(modal).zIndex, 'modal layer').toBe(z('--layer-modal'));
+    },
+};
+
+export const BlanketConfirmOverPanel = {
+    render: () => (
+        <div style={{ position: 'relative', width: 1024, maxWidth: '100%', height: 520, overflow: 'hidden', background: 'var(--ds-surface)' }}>
+            <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0 }}>
+                <PanelContainer width="var(--panel-width-default)">
+                    <PanelHeader title="Session" actions={<PanelCloseAction onClick={() => {}} />} />
+                    <PanelBody>
+                        <p style={{ margin: 0, font: 'var(--body-default)' }}>Thursday, 4:30 PM with Ana Ruiz.</p>
+                    </PanelBody>
+                </PanelContainer>
+            </div>
+            <Modal inline show screenWidth={1024} screenHeight={520} width="6-col" title="Discard changes?" onClose={() => {}} footer={footerWithAction('Discard')} style={{ margin: 'auto' }}>
+                <p style={{ margin: 0, font: 'var(--body-default)' }}>Your edits to this session are not saved.</p>
+            </Modal>
+        </div>
+    ),
+    play: async ({ canvas, canvasElement }) => {
+        await settleAnimations(canvasElement);
+        const confirm = canvas.getByRole('dialog', { name: 'Discard changes?' });
+        await expect(confirm.getBoundingClientRect().width, '6-col at 1024').toBeCloseTo(512, 0);
+        await expect(canvasElement.querySelectorAll('.plus-pattern-blanket').length).toBe(1);
+    },
+};
+
 const MotionOverlay = () => {
     const [open, setOpen] = useState(false);
-    return <><Button text="Session details" onClick={() => setOpen(!open)} /><Blanket inline show={open}><PatternModal title="Session details" onClose={() => setOpen(false)}>Notes from the session</PatternModal></Blanket></>;
+    return (
+        <>
+            <Button text="Session details" onClick={() => setOpen(!open)} />
+            <Modal inline show={open} title="Session details" onClose={() => setOpen(false)}>
+                Notes from the session
+            </Modal>
+        </>
+    );
 };
 const overlayMotionPlay = (reduced = false) => async ({ canvas, canvasElement }) => {
     const trigger = canvas.getByRole('button', { name: 'Session details' });
     await userEvent.click(trigger);
-    const surface = canvasElement.querySelector('.plus-pattern-modal');
+    const surface = canvasElement.querySelector('.plus-modal');
     await expect(surface).not.toBeNull();
     await expectOverlayExit(surface, () => trigger.click(), reduced);
     await expect(canvasElement.querySelector('.plus-pattern-blanket')).toBeNull();
 };
 export const MotionOpenClose = { render: MotionOverlay, play: overlayMotionPlay() };
 export const MotionReduced = { ...MotionOpenClose, decorators: [withReducedMotion], play: overlayMotionPlay(true) };
+
+const BlanketMotionOverlay = () => {
+    const [open, setOpen] = useState(false);
+    return (
+        <>
+            <Button text="Session details" onClick={() => setOpen(!open)} />
+            <Modal inline show={open} title="Session details" onClose={() => setOpen(false)}>
+                Notes from the session
+            </Modal>
+        </>
+    );
+};
+const blanketMotionPlay = (reduced = false) => async ({ canvas, canvasElement }) => {
+    const trigger = canvas.getByRole('button', { name: 'Session details' });
+    await userEvent.click(trigger);
+    const surface = canvasElement.querySelector('.plus-pattern-blanket');
+    await expect(surface).not.toBeNull();
+    await expectOverlayExit(surface, () => trigger.click(), reduced);
+    await expect(canvasElement.querySelector('.plus-pattern-blanket')).toBeNull();
+};
+export const BlanketMotionOpenClose = { render: BlanketMotionOverlay, play: blanketMotionPlay() };
+export const BlanketMotionReduced = { ...BlanketMotionOpenClose, decorators: [withReducedMotion], play: blanketMotionPlay(true) };

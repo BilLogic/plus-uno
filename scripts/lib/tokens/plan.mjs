@@ -253,7 +253,6 @@ export const TOKEN_LADDER = [
   // ─── Templates / Blanket (renamed from Overlay) ───────────────────────
   { tier: 'templates', group: 'Blanket', new: '--blanket-pad-x', old: '--overlay-pad-x', ref: 'var(--space-100)', use: 'Horizontal space between the screen edge and a Modal on its Blanket.' },
   { tier: 'templates', group: 'Blanket', new: '--blanket-pad-y', old: '--overlay-pad-y', ref: 'var(--space-400)', at: { '(max-height: 639.98px)': 'var(--space-150)' }, use: 'Vertical space between the screen edge and a Modal on its Blanket; shrinks on short screens.' },
-  { tier: 'templates', group: 'Blanket', new: '--blanket-fill', old: '--overlay-scrim', type: 'COLOR', ref: 'rgba(0, 0, 0, 0.38)', note: "the Blanket's own fill color; the old declaration's value, written directly so this file carries no old-language word", use: 'Fill of the Blanket that dims the page behind a Modal.' },
   { tier: 'templates', group: 'Blanket', new: '--blanket-max-height-modal', old: '--layout-max-height-modal', ref: 'calc(100dvh - 2 * var(--blanket-pad-y))', codeOnly: true, note: 'a calc() of the pad above: code only, no Figma variable', use: 'Tallest a Modal may grow inside its Blanket.' },
 
   // ─── Templates / Modal ─────────────────────────────────────────────────
@@ -307,6 +306,19 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Button', new: '--button-radius-default', old: '--element-radius-item-sm', ref: 'calc(var(--radius-control-lg) - var(--pad-x-xs))', note: 'nests in a 40-high field: its radius 10 minus the 4 slot inset = 6', use: 'Corner rounding of a Button with default spacing.' },
   { tier: 'components', group: 'Button', new: '--button-radius-compact', old: '--element-radius-md', ref: 'calc(var(--radius-control-md) - var(--pad-x-xs))', note: 'nests in a 32-high field: its radius 8 minus the 4 slot inset = 4', use: 'Corner rounding of a Button with compact spacing.' },
   { tier: 'components', group: 'Button', new: '--button-radius-spacious', old: null, ref: 'var(--radius-control-lg)', note: '48-high footer button; pairs with --control-xl', use: 'Corner rounding of a Button with spacious spacing.' },
+
+  // ─── Components / Dialog ──────────────────────────────────────────────
+  { tier: 'components', group: 'Dialog', new: '--dialog-pad-x-default', old: null, ref: 'var(--space-100)', use: 'Horizontal padding of a Dialog with default spacing.' },
+  { tier: 'components', group: 'Dialog', new: '--dialog-pad-x-spacious', old: null, ref: 'var(--space-150)', use: 'Horizontal padding of a Dialog with spacious spacing.' },
+  { tier: 'components', group: 'Dialog', new: '--dialog-stack-sm', old: null, ref: 'var(--space-050)', use: 'Vertical gap between a Dialog\'s title and its description or tabs.' },
+  { tier: 'components', group: 'Dialog', new: '--dialog-stack-md', old: null, ref: 'var(--space-100)', use: 'Vertical gap between a Dialog\'s header, body and footer.' },
+  { tier: 'components', group: 'Dialog', new: '--dialog-stack-lg', old: null, ref: 'var(--space-150)', use: 'Vertical gap between blocks in a Dialog\'s body.' },
+  { tier: 'components', group: 'Dialog', new: '--dialog-inline-sm', old: null, ref: 'var(--space-050)', use: 'Horizontal gap between small items in a Dialog header or footer.' },
+  { tier: 'components', group: 'Dialog', new: '--dialog-inline-md', old: null, ref: 'var(--space-100)', use: 'Horizontal gap between the actions in a Dialog footer.' },
+  { tier: 'components', group: 'Dialog', new: '--dialog-inline-lg', old: null, ref: 'var(--space-150)', use: 'Horizontal gap between columns in a Dialog.' },
+  { tier: 'components', group: 'Dialog', new: '--dialog-radius', old: null, ref: 'var(--radius-xxl)', use: 'Corner rounding of a Dialog.' },
+  { tier: 'components', group: 'Dialog', new: '--dialog-body-min-height', old: null, ref: 'var(--height-500)', use: 'Minimum height of a Dialog\'s body, so a short body does not collapse the dialog.' },
+  { tier: 'components', group: 'Dialog', new: '--dialog-shadow', old: null, ref: 'var(--ds-shadow-blocking)', use: 'Shadow of a Dialog.' },
 
   // ─── Components / Calendar ────────────────────────────────────────────
   { tier: 'components', group: 'Calendar', new: '--calendar-day-sm', old: '--layout-calendar-day-sm', ref: '28px', use: 'Size of a day cell in a compact Calendar.' },

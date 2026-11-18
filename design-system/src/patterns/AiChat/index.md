@@ -83,7 +83,7 @@ Don't: An answer from records with nothing to check it against.
 - For one reply on its own, use `AiMessage`.
 - For the field alone, use `PromptInput`; for suggested prompts, `PromptStarters`.
 
-Same group: `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
+Same group: `Frame` · `Modal` · `Page` · `PatternCard` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 ## Parts
 

@@ -27,18 +27,18 @@
     {
       "id": "cancel-modal",
       "screen": "Cancel session confirmation modal",
-      "template": "PatternModal",
+      "template": "Modal",
       "variant": "Modal · Destructive / Active",
-      "page": "design-system/src/patterns/PatternModal/index.md",
+      "page": "design-system/src/patterns/Modal/index.md",
       "section": "Types",
       "pages": [
-        "design-system/src/patterns/PatternModal/index.md"
+        "design-system/src/patterns/Modal/index.md"
       ],
       "guides": ["modal"],
       "scoring": "checker",
       "check": {
         "kind": "component-present",
-        "components": ["Modal", "PatternModal"]
+        "components": ["Modal", "Dialog"]
       },
       "expectation": "Choosing Cancel session opens a Modal naming the session and asking for a cancellation reason."
     }

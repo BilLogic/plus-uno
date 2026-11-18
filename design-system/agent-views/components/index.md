@@ -33,7 +33,8 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `InputGroup` | `TextField` |
 | `NumberInput` | `TextField` |
 | `CustomThemeButton` | `Button` |
-| `Dialog` | `Modal` |
+| `ModalDialog` | `Dialog`, `Modal` (Dialog is inline; Modal is blocking) |
+| `PatternModal` | `Modal`, `Dialog` (renamed to Modal) |
 | `Input` | `TextField`, `TextArea` |
 | `Dropdown` | `Select`, `DropdownMenu` (Select picks a value; DropdownMenu runs an action) |
 | `Chip` | `Tag` |
@@ -79,8 +80,7 @@ A template is a shell that owns the frame (fill, pad, radius, elevation) and lea
 | Section | [`PatternSection`](../../src/patterns/PatternSection/PatternSection.mdx) | `import { PatternSection } from '@/patterns';` | A span of the page grid under one heading, with its header, toolbar and tabs. No box of its own: the Page supplies the pad. `detail` for a list with a detail region. |
 | Card | [`PatternCard`](../../src/patterns/PatternCard/PatternCard.mdx) | `import { PatternCard } from '@/patterns';` | A raised container for one object: a student, a session, a metric. Optional image, a header over the body, optional footer. |
 | Table | [`PatternTable`](../../src/patterns/PatternTable/PatternTable.mdx) | `import { PatternTable } from '@/patterns';` | How a table sits on a page: inside a Section whose header carries the title and toolbar, with slots for pagination and the empty state. |
-| Overlays | [`PatternModal`](../../src/patterns/PatternModal/PatternModal.mdx) | `import { PatternModal } from '@/patterns';` | The modal's layout, drawn inline: title, body and footer, width a step of the screen grid. For a working dialog (Blanket, focus trap, Escape) use the `Modal` component, which draws the same layers. |
-| Overlays | [`Blanket`](../../src/patterns/PatternModal/PatternModal.mdx) | `import { Blanket } from '@/patterns';` | The full-screen layer under a modal. PatternModal brings its own; use it alone only for a new blocking layer. A Panel floats with no Blanket. |
+| Overlays | [`Modal`](../../src/patterns/Modal/Modal.mdx) | `import { Modal } from '@/patterns';` | The template for content that takes over the screen until it is closed: a `Dialog` (@/components) on a Blanket with modal behavior on Base UI (portal, focus trap, Escape, scroll lock). For the dialog panel inline with no Blanket or modal behavior, use `Dialog`. |
 | Popups | [`Popup`](../../src/components/overlays-and-layering/Popup/Popup.mdx) | `import { Popup } from '@/components';` | The Popups pattern is four floating layers that never block the page, each a component: `DropdownMenu` lists actions, `Popup` holds a small aside anchored to a control, `Flag` reports what just happened, `Tooltip` names a control. |
 | AI | [`AiChat`](../../src/patterns/AiChat/AiChat.mdx) | `import { AiChat } from '@/patterns';` | AI chat as a popup, in the Frame's Panel or full screen, opened from one floating button. |
 
@@ -111,6 +111,7 @@ A template is a shell that owns the frame (fill, pad, radius, elevation) and lea
 - [DatePicker](../../src/components/forms-and-inputs/DatePicker/index.md)
 - [DateTag](../../src/components/labels/DateTag/index.md)
 - [DateTimePicker](../../src/components/forms-and-inputs/DateTimePicker/index.md)
+- [Dialog](../../src/components/messaging/Dialog/index.md)
 - [DropdownMenu](../../src/components/forms-and-inputs/DropdownMenu/index.md)
 - [EmptyState](../../src/components/messaging/EmptyState/index.md)
 - [Fieldset](../../src/components/forms-and-inputs/Fieldset.md)
@@ -133,7 +134,6 @@ A template is a shell that owns the frame (fill, pad, radius, elevation) and lea
 - [LinkButton](../../src/components/forms-and-inputs/LinkButton/index.md)
 - [LinkIconButton](../../src/components/forms-and-inputs/LinkIconButton/index.md)
 - Logo — exported here, implemented outside `src/components/`; read the source
-- [Modal](../../src/components/messaging/Modal/index.md)
 - [NotificationItem](../../src/components/messaging/NotificationItem/index.md)
 - [Object](../../src/components/images-and-icons/Object/index.md)
 - [PageHeader](../../src/components/layout-and-structure/PageHeader/index.md)

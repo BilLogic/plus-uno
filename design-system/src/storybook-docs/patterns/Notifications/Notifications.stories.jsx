@@ -6,7 +6,7 @@ import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { Flag, FlagGroup } from '@/components';
-import { Acknowledge } from '../../../patterns/PatternModal/modalDemo.jsx';
+import { Acknowledge } from '../../../patterns/Modal/modalDemo.jsx';
 import {
     FlagOnPageCase,
     FlagStackCase,

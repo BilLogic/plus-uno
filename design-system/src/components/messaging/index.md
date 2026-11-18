@@ -11,6 +11,12 @@ authored half, counted rather than assumed.
   - For a message scoped to one region of the page that stays until resolved or dismissed, use `SectionMessage`.
   - For a timed confirmation that something already happened, use `Flag`.
   - For a short note tied to one control or field, use `Popup` or `Tooltip`.
+- **[Dialog](Dialog/index.md)** — Use `Dialog` as the panel inside the Modal template, or when a docs illustration or mockup draws the dialog panel inline with no Blanket and no modal behavior. For a working overlay over the page (Blanket, portal, focus trap, Escape and scroll lock), use the `Modal` template from `@/patterns`.
+  - For a blocking overlay over the page with Blanket, focus trap, Escape and scroll lock, use `Modal` (`@/patterns`).
+  - For a message the person only reads, use `SectionMessage` in the page or `Flag` at the screen corner.
+  - For a task that keeps the page in view, use `Panel`, floating: a row's details, filters, a short edit.
+  - For a small aside anchored to a control, use `Popup`.
+  - For a list of actions or a value to pick, use `DropdownMenu` or `Select`.
 - **[EmptyState](EmptyState/index.md)** — Use `EmptyState` when a view, panel, card or table has no content yet, in place of a blank area or a bare "No results". It carries a picture, a header, one line and one primary action.
   - For a rejected form submit at the top of a form, use `SectionMessage`.
   - For a background failure such as a sync or autosave that failed out of sight, use `Flag`.
@@ -22,12 +28,6 @@ authored half, counted rather than assumed.
 - **[InlineMessage](InlineMessage/index.md)** — Use `InlineMessage` for a note that explains or qualifies something right beside it, such as why a field is required or what a score means, without taking up space until someone asks. Pass `defaultOpen` when the message popup should start open on first render. It is built on `Popup`, so placement, dismissal and focus return are shared with every other popup in the system.
   - For a message that belongs to a page or section and should always be visible, use `SectionMessage`.
   - For a short plain-text label on hover or focus over a control, use `Tooltip`.
-- **[Modal](Modal/index.md)** — Use `Modal` when the next step has to happen before anything else can: a destructive confirmation, a short form that would derail the page, a detail view the person closes and returns from. It is the one messaging component that takes focus from the page, so it fits when interrupting is the point.
-  - For a message the person only reads, use `SectionMessage` in the page or `Flag` at the screen corner.
-  - For a task that takes more than a screen or has sections, use `Frame`: the focused template, with no sidebar.
-  - For a task that keeps the page in view, use `Panel`, floating: a row's details, filters, a short edit.
-  - For a small aside anchored to a control, use `Popup`.
-  - For a list of actions or a value to pick, use `DropdownMenu` or `Select`.
 - **[NotificationItem](NotificationItem/index.md)** — Use `NotificationItem` for updates that arrived over time: in the Inbox Notifications panel, in a recent-updates card on Home, or on a full notifications page. Every row says who, what, where and when in two compact lines and opens its destination as one link.
   - For a passing confirmation of an action that just finished, use `Flag`.
   - For something to read or act on inside part of a page, use `SectionMessage`.
@@ -45,10 +45,10 @@ authored half, counted rather than assumed.
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [Banner](Banner/index.md) | 5 | ✅ | ✅ | ✅ |
+| [Dialog](Dialog/index.md) | 24 | ✅ | ✅ | ✅ |
 | [EmptyState](EmptyState/index.md) | 8 | ✅ | ✅ | ✅ |
 | [Flag](Flag/index.md) | 21 | ✅ | ✅ | ✅ |
 | [InlineMessage](InlineMessage/index.md) | 9 | ✅ | ✅ | ✅ |
-| [Modal](Modal/index.md) | 23 | ✅ | ✅ | ✅ |
 | [NotificationItem](NotificationItem/index.md) | 13 | ✅ | ✅ | ✅ |
 | [SectionMessage](SectionMessage/index.md) | 10 | ✅ | ✅ | ✅ |
 | [Spotlight](Spotlight/index.md) | 12 | ✅ | ✅ | ✅ |

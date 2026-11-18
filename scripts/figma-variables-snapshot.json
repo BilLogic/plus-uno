@@ -3,9 +3,9 @@
   "figmaFileKey": "zAecJNRdvJzAUOcjV32tRX",
   "figmaFileName": "Design System - BS4 Foundation (Component LIbrary)",
   "capturedAt": "2026-11-16",
-  "totalVariables": 1644,
+  "totalVariables": 1643,
   "byType": {
-    "COLOR": 984,
+    "COLOR": 983,
     "FLOAT": 645,
     "BOOLEAN": 10,
     "STRING": 5
@@ -833,7 +833,6 @@
         "X-Large (1440px)"
       ],
       "variables": [
-        "Blanket/fill",
         "Blanket/pad-x",
         "Blanket/pad-y",
         "Card/inline-lg",
@@ -952,7 +951,6 @@
         "Table/radius"
       ],
       "codeSyntax": {
-        "Blanket/fill": "var(--blanket-fill)",
         "Blanket/pad-x": "var(--blanket-pad-x)",
         "Blanket/pad-y": "var(--blanket-pad-y)",
         "Card/inline-lg": "var(--card-inline-lg)",

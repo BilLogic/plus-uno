@@ -396,7 +396,7 @@ export const ServerRefuses = {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         const message = canvasElement.querySelector('[data-probe="message"]');
-        const body = canvasElement.querySelector('[data-probe="body"], .plus-pattern-modal-body');
+        const body = canvasElement.querySelector('[data-probe="body"], .plus-dialog-body');
         if (body) await expect(body.scrollHeight, 'the whole form shows: the body does not scroll').toBeLessThanOrEqual(body.clientHeight + 1);
         await expect(within(message).getByRole('alert'), 'announced when it appears').toBeInTheDocument();
         await expect(rect(message).top, 'at the top of the body').toBeLessThanOrEqual(rect(canvas.getByLabelText(/Student/)).top);

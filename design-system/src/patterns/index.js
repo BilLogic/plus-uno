@@ -20,8 +20,7 @@ export {
 export { default as PatternCard } from './PatternCard';
 export { default as PatternSection, SECTION_DETAIL_FLOOR } from './PatternSection';
 export { default as AiChat, useAiChat, AI_CHAT_MODES, AI_CHAT_STORAGE_KEY, AI_CHAT_FULLSCREEN_BELOW, AI_CHAT_DISCLAIMER } from './AiChat';
-export { default as Blanket, BLANKET_WIDTHS, BLANKET_HEIGHTS, BLANKET_SPANS } from './Blanket';
-export { default as PatternModal } from './PatternModal';
+export { default as Modal, MODAL_WIDTHS, MODAL_WIDTH_PX, MODAL_WIDTH_SCREENS, MODAL_HEIGHTS } from './Modal';
 export { default as PatternTable } from './PatternTable';
 
 // Template and pattern motion helpers (Transitions & Choreography)

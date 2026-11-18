@@ -365,6 +365,7 @@ export const FAMILIES = [
   { family: 'avatar', prefix: '--avatar-', what: 'the two largest Avatar sizes, 96 and 128' },
   { family: 'layer', prefix: '--layer-', what: 'the z-index scale, card to tooltip' },
   { family: 'motion', prefix: '--motion-', what: 'motion durations and easings' },
+  { family: 'dialog', prefix: '--dialog-', what: 'Dialog pad, stack, inline, radius and body floor' },
   { family: 'modal', prefix: '--modal-', what: 'Modal pad, stack, inline, radius and body floor' },
   { family: 'focused-page', prefix: '--focused-page-', what: 'the focused page frame: its pad, stacks and inline gaps' },
   { family: 'tooltip', prefix: '--tooltip-', what: 'Tooltip maximum width and vertical padding' },

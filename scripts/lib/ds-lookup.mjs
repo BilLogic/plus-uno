@@ -222,7 +222,7 @@ const PRO_FAMILY = /\bfa-(?:sharp-duotone|sharp|duotone|light|thin)\b/;
 const GUIDELINES = 'design-system/guidelines';
 const AGENT_VIEWS = 'design-system/agent-views';
 const PATTERNS_SRC = 'design-system/src/patterns';
-const TEMPLATE_COMPONENTS = ['Frame', 'Page', 'PatternSection', 'PatternCard', 'PatternTable', 'PatternModal'];
+const TEMPLATE_COMPONENTS = ['Frame', 'Page', 'PatternSection', 'PatternCard', 'PatternTable', 'Modal'];
 const readIf = (file) => (fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null);
 const firstSentence = (text, max = 160) => {
   if (!text) return null;

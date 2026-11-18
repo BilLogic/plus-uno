@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import { Button, FooterActions, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, ProgressTracker, SectionMessage, Skeleton, TextField } from '@/components';
-import { Blanket, PatternModal, PatternSection } from '@/patterns';
+import Modal from './Modal.jsx';
+import PatternSection from '../PatternSection';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { stepItems } from '@/storybook-docs/lib/focused-task.jsx';
 import { FormFields, FILLED } from '../Form/formDemo.jsx';
@@ -18,24 +19,24 @@ export const SCREEN = { width: 1024, height: 480 }; // docs-literal
 const text = (copy) => <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>{copy}</p>;
 
 /** A Modal at a width step, centered in its Blanket at the stand-in screen. */
-export const ModalStage = ({ children, width = 'sm', height = SCREEN.height, screenWidth = SCREEN.width, ...modal }) => (
-    <Blanket inline screenWidth={screenWidth} screenHeight={height}>
-        <PatternModal width={width} onClose={() => {}} {...modal}>{children}</PatternModal>
-    </Blanket>
+export const ModalStage = ({ children, width = '6-col', height = 'hug', screenWidth = SCREEN.width, screenHeight = SCREEN.height, ...modal }) => (
+    <Modal inline show width={width} height={height} screenWidth={screenWidth} screenHeight={screenHeight} onClose={() => {}} {...modal}>
+        {children}
+    </Modal>
 );
 
 /** Two buttons: 50/50 split across the full width, secondary (Default) left, Primary or Danger right. */
-export const TwoCells = ({ secondary = 'Discard', cancel, action, appearance = 'primary', isDisabled = false, onAction, onSecondary, onCancel }) => (
+export const TwoCells = ({ secondary = 'Discard', cancel, action, appearance = 'primary', buttonSpacing, isDisabled = false, onAction, onSecondary, onCancel }) => (
     <FooterActions>
-        <Button text={cancel ?? secondary} onClick={onSecondary ?? onCancel} />
-        <Button text={action} appearance={appearance} isDisabled={isDisabled} onClick={onAction} />
+        <Button text={cancel ?? secondary} spacing={buttonSpacing} onClick={onSecondary ?? onCancel} />
+        <Button text={action} appearance={appearance} spacing={buttonSpacing} isDisabled={isDisabled} onClick={onAction} />
     </FooterActions>
 );
 
 /** One button: the right half (tracks 3–4), or full width when narrow. */
-export const OneCell = ({ action, onAction }) => (
+export const OneCell = ({ action, buttonSpacing, onAction }) => (
     <FooterActions>
-        <Button text={action} appearance="primary" onClick={onAction} />
+        <Button text={action} appearance="primary" spacing={buttonSpacing} onClick={onAction} />
     </FooterActions>
 );
 
@@ -83,7 +84,7 @@ export const Steps = ({ start = 1 }) => {
     const last = at === STEP_LABELS.length - 1;
     return (
         <ModalStage
-            width="lg"
+            width="10-col"
             title="Schedule a session"
             footer={(
                 <FooterActions>
@@ -104,9 +105,9 @@ export const Steps = ({ start = 1 }) => {
     );
 };
 
-/** Active, 8-col, with its fields: every part once. */
+/** Active, 8-col, with its fields (40px) and 32px footer buttons: every part once. */
 export const ActiveForm = () => (
-    <ModalStage width="md" height={640} title="Log a session" footer={<TwoCells action="Save session" />}>
+    <ModalStage width="8-col" screenHeight={640} title="Log a session" footer={<TwoCells action="Save session" buttonSpacing="default" />}>
         <FormFieldsStatic />
     </ModalStage>
 );
@@ -165,7 +166,7 @@ export const ConfirmInside = ({ start = 'details' }) => {
 
 /** Long content: the body scrolls between the pinned header and footer. */
 export const LongContent = () => (
-    <ModalStage title="Session history" height={360} footer={<TwoCells secondary="Discard" action="Export" />}>
+    <ModalStage title="Session history" screenHeight={360} footer={<TwoCells secondary="Discard" action="Export" />}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--modal-stack-md)' }}>
             {Array.from({ length: 14 }, (_, i) => text(`Session ${i + 1}: Ana Ruiz, fractions, 4:00–5:00 PM.`))}
         </div>
@@ -199,7 +200,7 @@ export const ConfirmOverPanel = () => {
         root.current?.querySelector('.plus-panel .plus-btn--danger')?.focus();
     };
     useEffect(() => {
-        if (open) root.current?.querySelector('.plus-pattern-modal-footer button')?.focus();
+        if (open) root.current?.querySelector('.plus-dialog-footer button')?.focus();
     }, [open]);
     return (
         <BrowserWindow address="app.plus.org/students" height={420}>
@@ -214,21 +215,24 @@ export const ConfirmOverPanel = () => {
                     </PanelContainer>
                 </div>
                 {open && (
-                    <Blanket inline screenWidth={SCREEN.width} screenHeight={420} style={{ position: 'absolute', inset: 0, inlineSize: '100%' }}>
-                        <PatternModal
-                            width="sm"
-                            title="Delete student?"
-                            onClose={close}
-                            footer={(
-                                <FooterActions>
-                                    <Button text="Archive instead" onClick={close} />
-                                    <Button text="Delete student" appearance="danger" onClick={close} />
-                                </FooterActions>
-                            )}
-                        >
-                            {text('This removes Ana and her sessions. This cannot be undone.')}
-                        </PatternModal>
-                    </Blanket>
+                    <Modal
+                        inline
+                        show
+                        screenWidth={SCREEN.width}
+                        screenHeight={420}
+                        width="6-col"
+                        title="Delete student?"
+                        onClose={close}
+                        style={{ margin: 'auto' }}
+                        footer={(
+                            <FooterActions>
+                                <Button text="Archive instead" onClick={close} />
+                                <Button text="Delete student" appearance="danger" onClick={close} />
+                            </FooterActions>
+                        )}
+                    >
+                        {text('This removes Ana and her sessions. This cannot be undone.')}
+                    </Modal>
                 )}
             </div>
         </BrowserWindow>

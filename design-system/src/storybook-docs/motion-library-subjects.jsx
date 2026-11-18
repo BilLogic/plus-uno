@@ -33,7 +33,6 @@ import {
     Link,
     LinkButton,
     LinkIconButton,
-    Modal,
     NotificationItem,
     PageHeader,
     Pagination,
@@ -458,21 +457,6 @@ export const COMPONENT_SUBJECTS = Object.freeze({
             label="Open in new tab"
             onClick={(e) => e.preventDefault()}
         />
-    ),
-
-    Modal: () => (
-        <div style={{ width: '100%' }}>
-            <Modal
-                renderAs="inline"
-                show
-                title="End session early?"
-                body="Progress so far will be saved to the session log."
-                width="100%"
-                primaryButton={{ text: 'Save & end', appearance: 'primary', spacing: 'compact', onClick: NOOP }}
-                secondaryButton={{ text: 'Keep going', appearance: 'default', spacing: 'compact', onClick: NOOP }}
-                onClose={NOOP}
-            />
-        </div>
     ),
 
     NotificationItem: ({ step }) => (

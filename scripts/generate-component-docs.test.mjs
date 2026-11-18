@@ -211,7 +211,7 @@ test('group indexes carry a generated chooser from each page\'s Usage and Altern
   assert.equal(fs.existsSync('design-system/guidelines/components'), false);
   const messaging = fs.readFileSync('design-system/src/components/messaging/index.md', 'utf8');
   assert.match(messaging, /## Which component to reach for/);
-  for (const name of ['Banner', 'EmptyState', 'Flag', 'InlineMessage', 'Modal', 'NotificationItem', 'SectionMessage', 'Spotlight']) {
+  for (const name of ['Banner', 'Dialog', 'EmptyState', 'Flag', 'InlineMessage', 'NotificationItem', 'SectionMessage', 'Spotlight']) {
     assert.match(messaging, new RegExp(`- \\*\\*\\[${name}\\]\\(${name}/index\\.md\\)\\*\\* — `), name);
   }
   assert.match(messaging, /For a transient confirmation that needs no reply, use `Flag`\./);

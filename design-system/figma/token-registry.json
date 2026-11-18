@@ -267,7 +267,6 @@
       "Stack/sm": "var(--stack-sm)"
     },
     "spacing / templates": {
-      "Blanket/fill": "var(--blanket-fill)",
       "Blanket/pad-x": "var(--blanket-pad-x)",
       "Blanket/pad-y": "var(--blanket-pad-y)",
       "Card/inline-lg": "var(--card-inline-lg)",
@@ -1875,11 +1874,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1159,
+    "scssTokenCount": 1169,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1776,
-      "resolved": 1739,
+      "total": 1775,
+      "resolved": 1738,
       "percent": 98,
       "skippedCollections": [
         {

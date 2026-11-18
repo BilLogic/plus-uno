@@ -143,7 +143,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Table | `--table-min-width-title` (declared elsewhere) |  |
 | Blanket | `--blanket-pad-x` |  |
 | Blanket | `--blanket-pad-y` |  |
-| Blanket | `--blanket-fill` | the Blanket's own fill color; the old declaration's value, written directly so this file carries no old-language word |
 | Blanket | `--blanket-max-height-modal` | a calc() of the pad above: code only, no Figma variable |
 | Modal | `--modal-pad-x-default` |  |
 | Modal | `--modal-pad-x-spacious` |  |
@@ -194,6 +193,17 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Button | `--button-radius-default` | nests in a 40-high field: its radius 10 minus the 4 slot inset = 6 |
 | Button | `--button-radius-compact` | nests in a 32-high field: its radius 8 minus the 4 slot inset = 4 |
 | Button | `--button-radius-spacious` | 48-high footer button; pairs with --control-xl |
+| Dialog | `--dialog-pad-x-default` |  |
+| Dialog | `--dialog-pad-x-spacious` |  |
+| Dialog | `--dialog-stack-sm` |  |
+| Dialog | `--dialog-stack-md` |  |
+| Dialog | `--dialog-stack-lg` |  |
+| Dialog | `--dialog-inline-sm` |  |
+| Dialog | `--dialog-inline-md` |  |
+| Dialog | `--dialog-inline-lg` |  |
+| Dialog | `--dialog-radius` |  |
+| Dialog | `--dialog-body-min-height` |  |
+| Dialog | `--dialog-shadow` |  |
 | Calendar | `--calendar-day-sm` |  |
 | Calendar | `--calendar-day-md` |  |
 | Calendar | `--calendar-day-lg` |  |

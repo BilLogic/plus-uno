@@ -176,8 +176,8 @@ export const AnatomyPanel = {
 };
 
 const ANATOMY_MODAL_PARTS = [
-    { selector: '.plus-pattern-modal-header', label: 'Header', at: 'start' },
-    { selector: '.plus-pattern-modal-body', label: 'Body', at: 'middle' },
+    { selector: '.plus-dialog-header', label: 'Header', at: 'start' },
+    { selector: '.plus-dialog-body', label: 'Body', at: 'middle' },
     { selector: '[data-probe="footer"]', label: 'Footer', at: 'end' },
 ];
 
@@ -284,7 +284,7 @@ export const KeyServerSaysNo = {
     play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
         const message = canvasElement.querySelector('[data-probe="message"]');
-        const body = canvasElement.querySelector('.plus-pattern-modal-body');
+        const body = canvasElement.querySelector('.plus-dialog-body');
         await expect(within(message).getByRole('alert'), 'announced').toBeInTheDocument();
         await expect(rect(message).top, 'at the top of the body').toBeLessThanOrEqual(rect(canvas.getByLabelText(/Student/)).top);
         await expect(body.contains(message)).toBe(true);

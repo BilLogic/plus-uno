@@ -101,7 +101,7 @@ A card that holds actions that commit a change gets a footer, and its actions st
 - Page for the content area's own fill, header and elevation.
 - Modal for something that must be decided before the page can continue.
 
-Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
+Same group: `AiChat` · `Frame` · `Modal` · `Page` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 ## Parts
 

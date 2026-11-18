@@ -42,7 +42,7 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 162,986 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 163,339 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -53,7 +53,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `docs/connectors/notion/page-writing` | [`docs/connectors/notion/page-writing.md`](../../docs/connectors/notion/page-writing.md) | 6,695 |
 | `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 23,554 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,988 |
-| `docs/conventions/design-system-glossary` | [`docs/conventions/design-system-glossary.md`](../../docs/conventions/design-system-glossary.md) | 21,680 |
+| `docs/conventions/design-system-glossary` | [`docs/conventions/design-system-glossary.md`](../../docs/conventions/design-system-glossary.md) | 22,033 |
 | `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,535 |
 | `draft-a-prd` | [`agents/uno-bot/skills/draft-a-prd/SKILL.md`](../../agents/uno-bot/skills/draft-a-prd/SKILL.md) | 3,724 |
 | `ds-precedence` | [`agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) | 2,262 |
@@ -2082,12 +2082,16 @@ The pattern for the container of one object, raised at rest with no border. Rela
 _Avoid_: "tile" (Tile is its own component), "panel" (Panel is the Frame's right area)
 
 **Blanket**:
-The pattern for the layer that dims what sits behind it: full screen for a **Modal**, which it also holds and sizes. A **Panel** floats with none.
-_Avoid_: "backdrop", "overlay" for the pattern (the word is a **Panel** and **Sidebar** state), "scrim"
+The layer within the **Modal** template that dims what sits behind it and holds and sizes the **Dialog**. It is part of the Modal template, not exported on its own; a **Panel** floats with none.
+_Avoid_: "backdrop", "overlay" for the Blanket (the word is a **Panel** and **Sidebar** state), "scrim"
+
+**Dialog**:
+The component (`@/components`) for the dialog panel itself: header (title, close), body and footer slots, widths on the screen grid, rendered inline with no **Blanket** and no modal behavior.
+_Avoid_: "PatternModal"
 
 **Modal**:
-The component and pattern for content that takes over the screen until it is closed: a follow-up decision swaps the same Modal's content for its confirm view, and one Modal is open at a time. `Modal` is the component; `PatternModal` draws its shell inline.
-_Avoid_: "Modal dialog", "ModalDialog", "popup" for a blocking dialog
+The template (`@/patterns`) for content that takes over the screen until it is closed: a **Dialog** on the **Blanket** with modal behavior on Base UI (portal, focus trap, Escape, scroll lock). A follow-up decision swaps the same Modal's content for its confirm view, and one Modal is open at a time.
+_Avoid_: "Modal dialog" for the template, "ModalDialog", "PatternModal", "popup" for a blocking dialog
 
 **Part**:
 A `_`-prefixed piece only its parent uses, such as `_Section header` or `_Modal header`: it lives inside its parent and stays out of the public exports.
