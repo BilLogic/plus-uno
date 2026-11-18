@@ -4,7 +4,7 @@ import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { computedShadow, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { PatternCard } from '@/patterns';
-import { Skeleton, Button, IconButton } from '@/components';
+import { Skeleton, Button, IconButton, Image } from '@/components';
 import { CardJobs } from './PatternCardCases.jsx';
 import { ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
@@ -36,12 +36,10 @@ const sessionBody = (
 const viewSession = <Button text="View session" appearance="subtle" spacing="compact" onClick={() => {}} />;
 
 const imagePlaceholder = (ratio) => (
-    <img
+    <Image
         src={sessionSummaryLight}
         alt={`Weekly tutoring session summary (${ratio})`}
         style={{
-            display: 'block',
-            width: '100%',
             aspectRatio: ratio.replace(':', ' / '),
             objectFit: 'cover',
         }}
@@ -298,8 +296,8 @@ export const ImageSquare = { name: 'Image 1:1', render: () => imageCard('1:1') }
 const placementStory = (imagePlacement, state = 'rest', imageSplit = '1/3') => ({
     render: () => (
         <PatternCard imagePlacement={imagePlacement} imageSplit={imageSplit}
-            image={<img alt="Session illustration" src={sessionSummaryLight}
-                style={{ display: 'block', width: '100%', aspectRatio: '16 / 9', objectFit: 'cover' }} />}
+            image={<Image alt="Session illustration" src={sessionSummaryLight}
+                style={{ aspectRatio: '16 / 9', objectFit: 'cover' }} />}
             title="Ana Ruiz" description="Lincoln Middle · Thu 4:00 PM" footer={viewSession}
             role="article" aria-label="Session summary" dragging={state === 'dragging'}
             onClick={state === 'hovered' || state === 'pressed' ? () => {} : undefined}
