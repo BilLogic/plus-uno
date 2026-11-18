@@ -364,6 +364,37 @@ export const RadiusHero = () => (
   </HeroDrawing>
 );
 
+/** The dimension ladder: each step a bar as wide as its value, the five core sizes outlined, the default 32 in the brand color. */
+const LADDER = [4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80];
+const CORE = new Set([16, 24, 32, 40, 48]);
+
+export const DimensionsHero = () => {
+  let x = -30;
+  return (
+    <HeroDrawing>
+      {LADDER.map((step) => {
+        const width = step * 0.8;
+        const at = x;
+        x += width + 4;
+        return (
+          <React.Fragment key={step}>
+            <Rect x={at} y={20} w={width} h={110} fill={PAINT.zone} />
+            {CORE.has(step) && (
+              <Rect
+                x={at}
+                y={20}
+                w={width}
+                h={110}
+                stroke={step === 32 ? PAINT.accent : PAINT.measureLine}
+              />
+            )}
+          </React.Fragment>
+        );
+      })}
+    </HeroDrawing>
+  );
+};
+
 /** The spacing scale, in kit units: each step a square its own size. */
 const STEPS = [4, 8, 12, 16, 24, 32, 48, 64, 96, 128];
 
