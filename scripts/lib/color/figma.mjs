@@ -23,7 +23,7 @@ function scopes(name) {
   if (name.startsWith('color.text') || name.startsWith('color.link')) return ['TEXT_FILL'];
   if (name.startsWith('color.icon')) return ['TEXT_FILL', 'SHAPE_FILL', 'STROKE_COLOR']; // Font Awesome glyphs are text
   if (name.startsWith('color.border')) return ['STROKE_COLOR'];
-  if (name.startsWith('color.chart')) return [...FILL, 'STROKE_COLOR'];
+  if (name.startsWith('color.chart') || name.startsWith('color.logo')) return [...FILL, 'STROKE_COLOR'];
   if (name.startsWith('elevation.shadow')) return ['EFFECT_COLOR'];
   return FILL; // backgrounds, surfaces, blanket, interaction, skeleton, utility
 }
