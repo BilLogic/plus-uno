@@ -1,12 +1,13 @@
 import React from 'react';
-import { Button, FilterButton, IconButton, TextField } from '@/components';
+import { Button, IconButton, TextField } from '@/components';
 import { PatternCard, PatternSection } from '@/patterns';
 import { HeadingLevelContext } from '@/lib/headingLevel';
-import { FormatSwitch, StudentsTable, ViewBar, ViewPills, row } from '@/storybook-docs/lib/view-bar.jsx';
+import { HeaderSearch, SectionActions } from '@/storybook-docs/lib/section-header.jsx';
+import { FormatSwitch, StudentsTable, ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
 
 /**
  * The do and don't examples of the Section template page, built from
- * `PatternSection`, `PatternCard`, the view bar and real PLUS controls.
+ * `PatternSection` and its header props, `PatternCard` and real PLUS controls.
  */
 
 const unstyled = (Case) => {
@@ -38,7 +39,7 @@ const SectionRepeatsCardCase = () => (
     </PatternSection>
 );
 
-/** No view bar, so the actions sit at the end of the title row. */
+/** The actions sit at the end of the title row, with the views under it. */
 const ActionsInTitleRowCase = () => (
     <PatternSection
         title="Students"
@@ -49,38 +50,35 @@ const ActionsInTitleRowCase = () => (
                 <Button text="Add students" iconBefore="user-plus" appearance="primary" onClick={() => {}} />
             </>
         )}
+        views={<ViewPills views={['All students', 'Needs follow-up']} />}
     >
         <StudentsTable count={2} />
     </PatternSection>
 );
 
-/** Actions in the title row and again in the view bar: one action, two homes. */
+/** Actions in the title row and again in the views row: one action, two homes. */
 const ActionsInTwoHomesCase = () => (
     <PatternSection
         title="Students"
         description="Lincoln Middle · 24 students"
-        actions={<Button text="Add students" iconBefore="user-plus" appearance="primary" onClick={() => {}} />}
-        tabs={<ViewBar views={['All students', 'Needs follow-up']} search={false} more={false} />}
+        actions={<SectionActions more={false} />}
+        views={<ViewPills views={['All students', 'Needs follow-up']} />}
+        format={<Button text="Add students" iconBefore="user-plus" appearance="primary" onClick={() => {}} />}
     >
         <StudentsTable count={2} />
     </PatternSection>
 );
 
-/** Format switch, Search, Filter, More, then the labeled Primary last. */
+/** More and the labeled Primary in the title row; the format switch ends the views row; Search, then the filter, lead row 3. */
 const RightSideInOrderCase = () => (
     <PatternSection
         title="Sessions"
         description="This term"
-        tabs={(
-            <ViewBar
-                views={['Upcoming', 'Past']}
-                format
-                filters={<FilterButton text="Filters" iconBefore="filter" hasChevronDown={false} appearance="subtle" onClick={() => {}} />}
-                primary="New session"
-                primaryIcon="plus"
-                searchLabel="Search sessions"
-            />
-        )}
+        actions={<SectionActions primary="New session" icon="plus" />}
+        views={<ViewPills views={['Upcoming', 'Past']} />}
+        format={<FormatSwitch />}
+        search={<HeaderSearch label="Search sessions" />}
+        filters={[{ key: 'status', label: 'Status', text: 'All', onClick: () => {} }]}
     >
         <StudentsTable count={2} />
     </PatternSection>
@@ -91,19 +89,17 @@ const RightSideCrowdedCase = () => (
     <PatternSection
         title="Sessions"
         description="This term"
-        tabs={(
-            <div className="plus-section-view-bar" style={{ ...row, inlineSize: '100%' }}>
-                <ViewPills views={['Upcoming']} />
-                <div style={{ ...row, marginInlineStart: 'auto' }}>
-                    <Button text="New session" iconBefore="plus" appearance="primary" onClick={() => {}} />
-                    <IconButton icon="download" label="Export" appearance="subtle" onClick={() => {}} />
-                    <Button text="Share" onClick={() => {}} />
-                    <IconButton icon="filter" label="Filters" appearance="subtle" onClick={() => {}} />
-                    <FormatSwitch />
-                    <IconButton icon="ellipsis" label="More" appearance="subtle" onClick={() => {}} />
-                </div>
-            </div>
+        actions={(
+            <>
+                <Button text="New session" iconBefore="plus" appearance="primary" onClick={() => {}} />
+                <IconButton icon="download" label="Export" appearance="subtle" onClick={() => {}} />
+                <Button text="Share" onClick={() => {}} />
+                <IconButton icon="filter" label="Filters" appearance="subtle" onClick={() => {}} />
+                <IconButton icon="ellipsis" label="More" appearance="subtle" onClick={() => {}} />
+            </>
         )}
+        views={<ViewPills views={['Upcoming']} />}
+        format={<FormatSwitch />}
     >
         <StudentsTable count={2} />
     </PatternSection>

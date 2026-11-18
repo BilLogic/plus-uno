@@ -285,7 +285,7 @@ describe('Template docs live examples', () => {
 
         const r5 = render(<Cases.RightSideInOrder />);
         expect(screen.getByRole('heading', { name: 'Sessions' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Filters' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Status: All' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'New session' })).toBeInTheDocument();
         r5.unmount();
 
@@ -372,6 +372,28 @@ describe('PatternSection header rows', () => {
         expect(screen.getByRole('button', { name: 'Date: All time' })).toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'Grade: All' })).toBeNull();
         expect(screen.getByRole('button', { name: /More filters/ })).toHaveTextContent('2');
+    });
+
+    it('hands a filter entry\'s trigger to its menu, so the same button opens it', () => {
+        const menu = vi.fn((trigger) => <div data-testid="menu-wrap">{trigger}</div>);
+        render(<PatternSection title="Sessions" search={<div />} filters={[{ key: 'status', label: 'Status', text: 'Upcoming', isSelected: true, menu }]}>Body</PatternSection>);
+        const trigger = screen.getByRole('button', { name: 'Status: Upcoming' });
+        expect(menu).toHaveBeenCalled();
+        expect(screen.getByTestId('menu-wrap')).toContainElement(trigger);
+        expect(trigger).toHaveAttribute('aria-pressed', 'true');
+    });
+
+    it('keeps the count and Clear all under 768', () => {
+        const before = window.innerWidth;
+        window.innerWidth = 600;
+        try {
+            const applied = filters.map((f, i) => ({ ...f, isSelected: i === 0 }));
+            render(<PatternSection title="Sessions" search={<div />} filters={applied} count="3 of 12" onClearAll={() => {}}>Body</PatternSection>);
+            expect(screen.getByText('3 of 12')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Clear all' })).toBeInTheDocument();
+        } finally {
+            window.innerWidth = before;
+        }
     });
 
     it('folds the triggers into one Filter button with the applied count under 768', () => {

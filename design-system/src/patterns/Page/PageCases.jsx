@@ -20,7 +20,7 @@ const InDocs = ({ children }) => (
 );
 
 /** "Add" is the Section's one action, in its title row; the page header carries only page actions. */
-export const AddInViewBar = () => (
+export const AddInTitleRow = () => (
     <InDocs>
         <Page header={<PageHeader title="Students" titleAs="h4" />}>
             <PatternSection title="Students" views={<StudentViews />} actions={<AddStudentAction />} />

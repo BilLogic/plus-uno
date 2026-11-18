@@ -3,7 +3,7 @@ import { Illustration } from './Illustration.jsx';
 import { ButtonShape, Row, SkeletonBar, Tabs } from './primitives.jsx';
 
 /**
- * The Section template's placement drawings for the title row and the view bar.
+ * The Section template's placement drawings for the title row and the header rows.
  * The lesson is where a part sits with every word removed, so both figures are
  * blocked out on one shared canvas.
  */
@@ -27,7 +27,7 @@ const TitleRow = ({ y, accent = false, w = 48 }) => (
   </g>
 );
 
-/** The view bar: Tabs hugging the start, the first selected. `y` is the bar's top edge. */
+/** The views row: Tabs hugging the start, the first selected. `y` is the bar's top edge. */
 const Pills = ({ x = X, y, count = 2 }) => <Tabs x={x} y={y - 4} w={count * 24} count={count} />;
 
 /** Table rows under the bar. */
@@ -37,8 +37,8 @@ const Rows = ({ y, count = 3 }) => (
   </g>
 );
 
-/** Title row first, the view bar under it, one left edge. */
-export const TitleRowAboveViewBar = ({ title = 'A Section with its title row on top and the view bar under it, both starting at one left edge' }) => (
+/** Title row first, the header rows under it, one left edge. */
+export const TitleRowAboveHeaderRows = ({ title = 'A Section with its title row on top and the header rows under it, both starting at one left edge' }) => (
   <Canvas title={title}>
     <TitleRow y={8} accent />
     <Pills y={30} />
@@ -47,8 +47,8 @@ export const TitleRowAboveViewBar = ({ title = 'A Section with its title row on 
   </Canvas>
 );
 
-/** The title pushed into the view bar, fighting the pills for the start. */
-export const TitleInViewBar = ({ title = 'A Section whose title sits inside the view bar, crowding the pills, with no room for a description' }) => (
+/** The title pushed into the views row, fighting the pills for the start. */
+export const TitleInViewsRow = ({ title = 'A Section whose title sits inside the views row, crowding the pills, with no room for a description' }) => (
   <Canvas title={title}>
     <SkeletonBar x={X} y={10} w={36} h={6} accent heading />
     <Pills x={X + 42} y={9} />

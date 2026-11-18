@@ -13,11 +13,13 @@ import { Button, IconButton, SearchField } from '@/components';
  *   categoryFilters    "Field: value" trigger props from filter categories
  */
 
-/** The title row's actions: More, then the labeled Primary. Pass `primary={null}` for More alone. */
-export const SectionActions = ({ primary = 'Add students', icon = 'user-plus', more = true, moreLabel = 'More section actions' }) => (
+/** The title row's actions: More, then the labeled Primary. Pass `primary={null}` for More alone; `narrow` keeps only the Primary's icon, below 768. */
+export const SectionActions = ({ primary = 'Add students', icon = 'user-plus', more = true, moreLabel = 'More section actions', narrow = false }) => (
     <>
         {more && <IconButton icon="ellipsis" label={moreLabel} onClick={() => {}} />}
-        {primary && <Button text={primary} iconBefore={icon} appearance="primary" onClick={() => {}} />}
+        {primary && (narrow
+            ? <IconButton icon={icon} label={primary} appearance="primary" onClick={() => {}} />
+            : <Button text={primary} iconBefore={icon} appearance="primary" onClick={() => {}} />)}
     </>
 );
 

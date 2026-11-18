@@ -15,8 +15,8 @@ import {
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 import {
-    TitleInViewBar,
-    TitleRowAboveViewBar,
+    TitleInViewsRow,
+    TitleRowAboveHeaderRows,
 } from '@/storybook-docs/illustrations/section.jsx';
 import {
     ActionsInTitleRow,
@@ -35,7 +35,7 @@ import {
     page="templates-section"
     eyebrow="Template"
     title="Section"
-    purpose="A span of the page grid under one heading: a header, a body, and an optional side, detail and footer. The header owns the title row and the view bar."
+    purpose="A span of the page grid under one heading: a header, a body, and an optional side, detail and footer. The header owns the title row, the views and the filters."
 />
 
 <DocsTabs of={PatternSectionStories}>
@@ -56,7 +56,7 @@ import {
 Each Section type combines a header and body, with an optional side or detail. These are starting layouts of the same component.
 
 <TypeGrid>
-<TypeCard of={PatternSectionStories.TypeList} to="#list" title="List">The view bar alone, one table, paging. The default for an area page.</TypeCard>
+<TypeCard of={PatternSectionStories.TypeList} to="#list" title="List">The views alone, one table, paging. The default for an area page.</TypeCard>
 <TypeCard of={PatternSectionStories.Detail} to="#detail" title="Detail">A list with a detail that opens an item in place.</TypeCard>
 <TypeCard of={PatternSectionStories.TypeCards} to="#cards" title="Cards">Title and actions, a grid of cards three across.</TypeCard>
 <TypeCard of={PatternSectionStories.TypeStats} to="#stats" title="Stats">A row of cards, each one number and its label, four at most.</TypeCard>
@@ -66,7 +66,7 @@ Each Section type combines a header and body, with an optional side or detail. T
 <TypeCard of={PatternSectionStories.TypeSubsections} to="#subsections" title="Subsections">Sections nested one level, each an h3, for a long settings page.</TypeCard>
 </TypeGrid>
 
-<ComponentExample of={PatternSectionStories.TypeList} title="List" description="The view bar alone, one table, paging. The default for an area page." />
+<ComponentExample of={PatternSectionStories.TypeList} title="List" description="The views alone, one table, paging. The default for an area page." />
 
 <ComponentExample of={PatternSectionStories.TypeCards} title="Cards" description="Title and actions, a grid of cards three across." />
 
@@ -84,13 +84,13 @@ Each Section type combines a header and body, with an optional side or detail. T
 
 ## Anatomy
 
-A Section with a view bar, a detail and a footer. The title, the first pill and the first column share one left edge.
+A Section with its header rows, a detail and a footer. The title, the first pill and the first column share one left edge.
 
 <ComponentExample of={PatternSectionStories.AnatomyQueue} />
 
-1. **Title row.** The h2, an optional one-line description, and actions only when there is no view bar.
-2. **View bar** (optional). Pill views at the start; at the end, in order, the format switch, Search, filters, More and the labeled Primary.
-3. **Body.** A Table, a card grid, a list, a form or subsections. A Table's head row follows the bar with nothing between.
+1. **Title row.** The h2, an optional one-line description, and the actions at the end: More and the labeled Primary.
+2. **Header rows** (optional). Row 2 holds the pill views at the start and the format switch at the end. Row 3 holds Search, then the filter triggers.
+3. **Body.** A Table, a card grid, a list, a form or subsections. A Table's head row follows the header rows with nothing between.
 4. **Detail** (optional). An inline expand, drawn as a sunken Card, that opens in place inside the Section and pushes the content below it down. Never use it for a queue page, which docks a `Panel` beside the list.
 5. **Footer** (optional). Paging or "View all".
 
@@ -100,11 +100,11 @@ A Section with a view bar, a detail and a footer. The title, the first pill and 
 
 ## Header rows
 
-A starting set, picked by what the Section holds. Every control state lives on its component: <DocsLink id="components-forms-and-inputs-button-icon-button">Icon button</DocsLink>, <DocsLink id="components-forms-and-inputs-button-filter-button">Filter button</DocsLink> and <DocsLink id="components-navigation-tabs">Tabs</DocsLink>. Which filters the bar takes is <DocsLink id="patterns-filtering">Filtering</DocsLink>; how the search field behaves is the Search pattern, listed in <DocsLink id="patterns-overview">Patterns</DocsLink>.
+A starting set, picked by what the Section holds. Every control state lives on its component: <DocsLink id="components-forms-and-inputs-button-icon-button">Icon button</DocsLink>, <DocsLink id="components-forms-and-inputs-button-filter-button">Filter button</DocsLink> and <DocsLink id="components-navigation-tabs">Tabs</DocsLink>. Which filters the header takes is <DocsLink id="patterns-filtering">Filtering</DocsLink>; how the search field behaves is the Search pattern, listed in <DocsLink id="patterns-overview">Patterns</DocsLink>.
 
 A header has up to three rows, all on one 32 line. Row 1 is the title with its actions: usually one Primary standing alone, with a `…` Icon button or a secondary button beside it. Row 2 is the views at the start and the format switch at the end. Row 3 is Search, then the filter triggers, each reading "Field: value". A Section with no views drops row 2 and the format switch moves to the end of row 3; one with nothing to search or filter drops row 3.
 
-Every control in a header row is 32: Buttons, Icon buttons and Filter buttons at default spacing, Search and text fields at compact spacing. A Tag beside them is 20. Applied filters take the selected state, and the row ends with the count and Clear all. Three triggers show and the rest go in More filters with a count. Under 768 Search takes the row and the triggers fold into one Filter button with a count.
+Every control in a header row is 32: Buttons, Icon buttons and Filter buttons at default spacing, Search and text fields at compact spacing. A Tag beside them is 20. Applied filters take the selected state, and the row ends with the count and Clear all. Three triggers show and the rest go in More filters with a count. Under 768 Search takes the row and the triggers fold into one Filter button with a count; the count and Clear all stay at the end of the Search row. When the triggers no longer fit beside Search they wrap to their own row, end-aligned. A trigger can open a list: give its `filters` entry a `menu` that hands the trigger to a Popup select or a Filter menu.
 
 <TypeGrid>
 <TypeCard of={PatternSectionStories.Full} to="#full" title="Full">Title and actions, views and the format switch, then Search and three triggers.</TypeCard>
@@ -112,6 +112,7 @@ Every control in a header row is 32: Buttons, Icon buttons and Filter buttons at
 <TypeCard of={PatternSectionStories.NoViews} to="#no-views" title="No views">Row 2 goes; the format switch joins the end of row 3.</TypeCard>
 <TypeCard of={PatternSectionStories.ViewsOnly} to="#views-only" title="Views only">Nothing to search or filter, so row 3 goes.</TypeCard>
 <TypeCard of={PatternSectionStories.ManyFilters} to="#many-filters" title="Many filters">Three triggers show; the rest sit in More filters with a count.</TypeCard>
+<TypeCard of={PatternSectionStories.WrappedFilters} to="#wrapped-filters" title="Wrapped filters">When the triggers do not fit beside Search they take their own row, end-aligned.</TypeCard>
 <TypeCard of={PatternSectionStories.RowsSelected} to="#rows-selected" title="Rows selected">The header stays; the table's head row becomes the bulk bar.</TypeCard>
 <TypeCard of={PatternSectionStories.Narrow} to="#narrow" title="Narrow">Search takes the row; the triggers fold into one Filter button with a count.</TypeCard>
 <TypeCard of={PatternSectionStories.Subsection} to="#subsection" title="Subsection">A smaller title; its primary acts on it alone.</TypeCard>
@@ -126,6 +127,8 @@ Every control in a header row is 32: Buttons, Icon buttons and Filter buttons at
 <ComponentExample of={PatternSectionStories.ViewsOnly} title="Views only" description="Nothing to search or filter, so row 3 goes." />
 
 <ComponentExample of={PatternSectionStories.ManyFilters} title="Many filters" description="Three triggers show; the rest sit in More filters with a count." />
+
+<ComponentExample of={PatternSectionStories.WrappedFilters} title="Wrapped filters" description="When the triggers do not fit beside Search they wrap to their own row, end-aligned; with room again they return beside Search." />
 
 <ComponentExample of={PatternSectionStories.RowsSelected} title="Rows selected" description={'The header stays. The Dynamic table\'s head row becomes the bulk bar at its 40 height: the part-ticked select-all, "3 selected", up to three subtle compact actions and a …, all at the start. The checkboxes clear it, so it has no Clear. Which actions go in the bar, and their words, are the Common actions pattern.'} />
 
@@ -153,7 +156,7 @@ Every control in a header row is 32: Buttons, Icon buttons and Filter buttons at
 
 ## Width behavior
 
-Drag the width through 960 and 768. From 960 the filter side sits at the start. Below it the side hides and the Filter icon returns with its count, read "Filters, 2 applied"; pressing it gives the filters the Section's whole width, and "Show results" goes back. Below 768 the Primary keeps only its icon. The title row and the view bar stay two rows at every width.
+Drag the width through 960 and 768. From 960 the filter side sits at the start. Below it the side hides and the Filter button returns with its count; pressing it gives the filters the Section's whole width, and "Show results" goes back. Below 768 the Primary keeps only its icon. The title row and the header rows stay separate rows at every width.
 
 <DocsInteractivePlayground of={PatternSectionStories.ResponsiveWidth} description="The width control sets the Section's own width." />
 
@@ -178,7 +181,7 @@ Loading, errors and the search field follow their patterns and components: Loadi
 <tr><th>Token</th><th>Used for</th></tr>
 </thead>
 <tbody>
-<tr><td><code>--section-stack-sm</code></td><td>Title row to view bar.</td></tr>
+<tr><td><code>--section-stack-sm</code></td><td>Title row to header rows.</td></tr>
 <tr><td><code>--section-stack-md</code></td><td>Header to body; body to footer.</td></tr>
 <tr><td><code>--section-stack-lg</code></td><td>Between subsections.</td></tr>
 <tr><td><code>--section-min-width-main</code>, <code>--section-min-width-side</code></td><td>The main and side columns of a split.</td></tr>
@@ -215,7 +218,7 @@ Loading, errors and the search field follow their patterns and components: Loadi
 </thead>
 <tbody>
 <tr><td><code>title</code> · <code>description</code> · <code>actions</code></td><td>The title row.</td></tr>
-<tr><td><code>viewBar</code> <PlannedTag /></td><td>Planned. Pill Tabs at the start; at the end the format switch, Search, the filters, More and the labeled Primary. Today the view bar goes in <code>tabs</code>.</td></tr>
+<tr><td><code>views</code> · <code>format</code> · <code>search</code> · <code>filters</code> · <code>count</code></td><td>Rows 2 and 3 of the header: pill Tabs and the format switch, then a compact Search and the "Field: value" triggers. A <code>filters</code> entry takes an optional <code>menu</code>, <code>(trigger) =&gt; node</code>, that wraps its trigger in a Popup select or a Filter menu.</td></tr>
 <tr><td><code>toolbar</code></td><td>A <code>SectionToolbar</code>, the row under the title row for the search, filters and actions of a table. Pass a <code>PatternSection.Toolbar</code> as the <code>toolbar</code> prop. It takes the place of <code>tabs</code> when both are passed.</td></tr>
 <tr><td><code>tabs</code> · <code>type="tabs-only"</code></td><td>The row under the title row; <code>tabs-only</code> hides the title row from sight when the page title names the collection.</td></tr>
 <tr><td><code>spacing</code></td><td><code>compact</code>, <code>default</code> or <code>spacious</code>: the space between the header, the body and the footer.</td></tr>
@@ -244,7 +247,7 @@ The bulk bar lives in the Dynamic table's head row, through its <code>bulkAction
 
 ## Usage
 
-Use `PatternSection` when content has a heading, shares actions, shows or hides as a unit, or takes its own span of the grid; otherwise the content belongs to the Section above it. The header is the Section's, not the Table's: the title row names it, and the view bar under it holds the views at the start and everything that acts on the content at the end, so switching views can swap a table for cards while the bar stays put.
+Use `PatternSection` when content has a heading, shares actions, shows or hides as a unit, or takes its own span of the grid; otherwise the content belongs to the Section above it. The header is the Section's, not the Table's: the title row names it and carries its actions, and the header rows under it hold the views, then Search and the filters, so switching views can swap a table for cards while the rows stay put.
 
 A Section takes no fill and no pad, and has five parts: header, body, side, detail and footer. The detail is an inline expand, drawn as a sunken Card, that opens in place inside the Section and pushes the content below it down.
 
@@ -277,30 +280,30 @@ A Section earns its own heading, its own actions or its own place in the grid. W
     dontCaption="A Section whose heading repeats its only card's title: two headings for one thing."
 />
 
-### Put the title row first and the view bar under it.
+### Put the title row first and the header rows under it.
 
 <RuleTag kind="automatic" />
 
-The title row sits `--section-stack-sm` above the view bar, and the header sits `--section-stack-md` above the body. The title, the first pill's label and the first column's text share one left edge. At every width the two stay separate rows: below the narrow width the description truncates first, then Search collapses, the format switch shows icons, extra pills fold and the Primary keeps only its icon.
+The title row sits `--section-stack-sm` above the header rows, and the header sits `--section-stack-md` above the body. The title, the first pill's label and the first column's text share one left edge. At every width the two stay separate rows: below the narrow width the description truncates first, then Search collapses, the format switch shows icons, extra pills fold and the Primary keeps only its icon.
 
 <DoDontPair
-    doExample={<TitleRowAboveViewBar />}
-    doCaption="The title row first, the view bar under it, sharing one left edge."
-    dontExample={<TitleInViewBar />}
-    dontCaption="The title pushed into the view bar: the heading and the pills fight for the start, and the description has nowhere to go."
+    doExample={<TitleRowAboveHeaderRows />}
+    doCaption="The title row first, the header rows under it, sharing one left edge."
+    dontExample={<TitleInViewsRow />}
+    dontCaption="The title pushed into the views row: the heading and the pills fight for the start, and the description has nowhere to go."
 />
 
-### Put actions in the title row only when there is no view bar.
+### Give each action one home: the title row.
 
 <RuleTag kind="review" />
 
-Each action has one home. With a view bar, every action sits at its end.
+Actions sit at the end of the title row, More then the labeled Primary, whether or not the Section has views. Row 2 is for views and the format switch, row 3 for Search and filters, so an action there is a second home.
 
 <DoDontPair
     doExample={<ActionsInTitleRow />}
-    doCaption="No view bar, so the actions sit at the end of the title row."
+    doCaption="The actions at the end of the title row, with the views under it."
     dontExample={<ActionsInTwoHomes />}
-    dontCaption="Actions in the title row and again in the view bar: one action, two homes."
+    dontCaption="Add students in the title row and again in the views row: one action, two homes."
 />
 
 ### Keep views at the start as pills that hug their labels.
@@ -309,30 +312,30 @@ Each action has one home. With a view bar, every action sits at its end.
 
 Views are a fixed set the product defines, and one pill stays even with one view. The strip stays on one line; extra pills fold into More. Under page tabs, the views become one labeled PopupSelect, so the page keeps one tab system.
 
-### Order the end of the bar: format switch, Search, filters, More, Primary.
+### Order the header: actions, then views and format, then Search and filters.
 
 <RuleTag kind="review" />
 
-Filter and More are icon buttons with Tooltips; Search is a compact `SearchField` (`spacing="compact"`, and `isCollapsible` where the bar is tight); the Primary is labeled and last. Keep five controls at most and fold extras into More. Search, Filter and the Primary stay in the bar. Every control is a default button, or compact in a compact bar.
+Row 1 ends with More, then the labeled Primary, which is last. Row 2 holds the views at the start and the format switch at the end. Row 3 holds a compact `SearchField` (`spacing="compact"`, and `isCollapsible` where the row is tight), then the filter triggers; a trigger that opens a list takes a `menu`. More is an Icon button with a Tooltip. Fold extras into More.
 
 <DoDontPair
     doExample={<RightSideInOrder />}
-    doCaption="Format switch, Search, Filter, More, then the labeled Primary last."
+    doCaption="More and the labeled Primary in the title row; the format switch ends the views row; Search, then the filter, lead row 3."
     dontExample={<RightSideCrowded />}
-    dontCaption="Six controls in no order, the Primary first and a second labeled button: fold extras into More."
+    dontCaption="Five controls in no order, the Primary first, a second labeled button and a Filter icon in the title row: fold extras into More and give the filter its own row."
 />
 
 ### Turn the head row into the bulk bar when rows are selected.
 
 <RuleTag kind="automatic" />
 
-The part-ticked select-all, the count of selected rows, then the actions, all at the start. The checkboxes clear the selection, so the bar carries no Cancel. Selected rows take the selected fill and the view bar stays put. Only the Dynamic table selects rows.
+The part-ticked select-all, the count of selected rows, then the actions, all at the start. The checkboxes clear the selection, so the bar carries no Cancel. Selected rows take the selected fill and the header rows stay put. Only the Dynamic table selects rows.
 
 ### Drop the Filter icon while a filter side shows.
 
 <RuleTag kind="review" />
 
-Each control has one home. The icon returns with its count once the side hides, below `SECTION_DETAIL_FLOOR`.
+Each control has one home. The Filter button returns with its count once the side hides, below `SECTION_DETAIL_FLOOR`.
 
 ### Use a Section detail as an inline expand, never on a queue page.
 
@@ -363,7 +366,7 @@ A padded box with a fill is a Card. A Section takes no fill and no pad, so a par
 
 <RuleTag kind="review" />
 
-A subsection is an h3. A Section that already has a view bar holds subsections without one.
+A subsection is an h3. A Section that already has views holds subsections without them.
 
 The table's empty state replaces the whole table, by the Empty pattern; elevation and fills follow <DocsLink id="foundations-visual-elevation">Elevation</DocsLink>.
 
@@ -391,9 +394,9 @@ The table's empty state replaces the whole table, by the Empty pattern; elevatio
 
 ## Accessibility
 
-- The title is a heading whose level follows nesting: h2 for a Section, h3 for a subsection. With the view bar alone the title stays in the page, hidden from sight.
+- The title is a heading whose level follows nesting: h2 for a Section, h3 for a subsection. With the views alone (`type="tabs-only"`) the title stays in the page, hidden from sight.
 - The pill views are a tablist; the selected tab says which rows the body shows. Views swap in place.
-- Search, Filter and More carry their names: "Search students", "Filters, 2 applied", "More". The Filter count is in the name as well as on the button.
+- Search, the filter triggers and More carry their names: "Search students", "Status: Upcoming", "More section actions". A trigger's selected state is announced as pressed.
 - The table announces a selection politely, "2 selected", and the bulk bar's actions follow the select-all checkbox in the tab order.
 - The detail is a collapsible region named by its title: the disclosure button toggles it with Enter or Space, and Escape inside the open detail closes it and returns focus to the button.
 
@@ -405,9 +408,9 @@ The table's empty state replaces the whole table, by the Empty pattern; elevatio
 
 - <DocsLink id="templates-page">Page</DocsLink>: use when the heading is the page's own.
 - <DocsLink id="templates-panel">Panel</DocsLink>: use when a queue page docks the Panel beside the list, or for a quick look from a table.
-- <DocsLink id="templates-popup">Popup</DocsLink>: use when choosing the menu the labeled view trigger (`PopupSelect`) or the Filter icon opens.
+- <DocsLink id="templates-popup">Popup</DocsLink>: use when choosing the menu the labeled view trigger (`PopupSelect`) or a filter trigger opens.
 - <DocsLink id="templates-table">Table</DocsLink>: use when the body is rows and columns.
-- <DocsLink id="patterns-filtering">Filtering</DocsLink>: use when picking a filter tier for the view bar.
+- <DocsLink id="patterns-filtering">Filtering</DocsLink>: use when picking a filter tier for the header.
 - <DocsLink id="patterns-overview">Patterns</DocsLink>: use when the question is the search field's behavior (Search) or an empty body (Empty).
 
 </div>

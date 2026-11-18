@@ -4,7 +4,7 @@ import { Meta } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PageStories from './Page.stories.jsx';
-import { AddInViewBar, AddTwice, OneTabSystem, TwoTabSystems } from './PageCases.jsx';
+import { AddInTitleRow, AddTwice, OneTabSystem, TwoTabSystems } from './PageCases.jsx';
 import * as HeadingOutlineStories from '../HeadingOutline.stories.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 import {
@@ -282,7 +282,7 @@ When it shows and what it holds: the <DocsLink id="patterns-navigation">Navigati
 Page actions sit at the end of the title row and are about the page only. Where an add action goes: the <DocsLink id="patterns-navigation">Navigation</DocsLink> pattern.
 
 <DoDontPair
-    doExample={<AddInViewBar />}
+    doExample={<AddInTitleRow />}
     doCaption={'"Add" is the Section\'s one action, in its title row; the page header carries only page actions.'}
     dontExample={<AddTwice />}
     dontCaption="The same Primary twice: in the page header and in the Section's title row."

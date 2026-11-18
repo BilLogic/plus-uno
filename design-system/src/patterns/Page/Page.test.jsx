@@ -6,7 +6,7 @@ import { ComponentExample, exampleSlug } from '@/storybook-docs/ds-docs-layout.j
 import { TypeCard } from '@/storybook-docs/lib/template-page.jsx';
 import * as PageModule from './Page.jsx';
 import Page from './Page.jsx';
-import { AddInViewBar, AddTwice, OneTabSystem, TwoTabSystems } from './PageCases.jsx';
+import { AddInTitleRow, AddTwice, OneTabSystem, TwoTabSystems } from './PageCases.jsx';
 
 vi.mock('@storybook/addon-docs/blocks', async () => {
     const React = await import('react');
@@ -25,8 +25,8 @@ vi.mock('@storybook/addon-docs/blocks', async () => {
 const pageMdx = readFileSync(join(__dirname, 'Page.mdx'), 'utf8');
 
 describe('Page live cases', () => {
-    it('AddInViewBar puts Add student once in the view bar, while AddTwice duplicates it in PageHeader', () => {
-        const r1 = render(<AddInViewBar />);
+    it('AddInTitleRow puts Add student once in the title row, while AddTwice duplicates it in PageHeader', () => {
+        const r1 = render(<AddInTitleRow />);
         expect(screen.getAllByRole('button', { name: 'Add student' })).toHaveLength(1);
         r1.unmount();
 

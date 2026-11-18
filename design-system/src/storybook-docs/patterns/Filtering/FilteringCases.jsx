@@ -103,7 +103,7 @@ export const TwoTiersCase = () => {
     );
 };
 
-/** Live Do: views at the start of the bar; Search and filters at the end. */
+/** Live Do: views in the second row; Search and the filters in the third. */
 export const FiltersAtEndCase = () => {
     const [view, setView] = useState('All students');
     const [value, pick] = useQuickFilters();
