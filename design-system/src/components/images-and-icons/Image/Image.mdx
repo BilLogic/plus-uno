@@ -150,9 +150,9 @@ The dark variant is a second `<source>` inside a `<picture>`, matched by
 flash of the light image on a dark system.
 
 <DoDontPair
-    doExample={<div style={{ width: '160px' }}><Image src={sessionSummaryLight} srcDark={sessionSummaryDark} alt="" /></div>}
+    doExample={<Image src={sessionSummaryLight} srcDark={sessionSummaryDark} alt="" />}
     doCaption="One image with a dark variant, picked before paint."
-    dontExample={<div style={{ width: '160px' }}><Image src={sessionSummaryLight} alt="" /></div>}
+    dontExample={<Image src={sessionSummaryLight} alt="" />}
     dontCaption="A light image alone on a dark surface."
 />
 
@@ -163,9 +163,9 @@ real text only when the image carries information nothing else on the page
 already states.
 
 <DoDontPair
-    doExample={<div><div style={{ width: '160px' }}><Image src={sessionSummaryLight} alt="" /></div><p>Week 3 attendance, by session.</p></div>}
+    doExample={<div><Image src={sessionSummaryLight} alt="" /><p>Week 3 attendance, by session.</p></div>}
     doCaption="Empty alt where a caption already says it."
-    dontExample={<div><div style={{ width: '160px' }}><Image src={sessionSummaryLight} alt="Image" /></div><p>Week 3 attendance, by session.</p></div>}
+    dontExample={<div><Image src={sessionSummaryLight} alt="Image" /><p>Week 3 attendance, by session.</p></div>}
     dontCaption="Alt text that says nothing, or repeats the caption beside it."
 />
 
