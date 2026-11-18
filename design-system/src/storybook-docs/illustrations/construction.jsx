@@ -1,5 +1,6 @@
-import React, { useId } from 'react';
-import { Illustration } from './Illustration.jsx';
+import React, { useContext, useEffect, useId } from 'react';
+import { devWarn } from '../../lib/devWarn.js';
+import { Illustration, MAX_LABELED_ZONES, ZoneBudgetContext } from './Illustration.jsx';
 import { CORNER, HAIRLINE, MONO_LABEL_FONT, PAINT, scaledCorner } from './paint.js';
 import { Rect, SkeletonBar } from './primitives.jsx';
 
@@ -10,7 +11,9 @@ import { Rect, SkeletonBar } from './primitives.jsx';
  * increased-contrast modes automatically.
  */
 
-export const MAX_LABELED_ZONES = 3;
+export { MAX_LABELED_ZONES };
+
+const warnZone = devWarn('Zone');
 
 const CORE_OUTLINE = { strokeWidth: 'var(--border-width-selected)' };
 const cornerStyle = (value) => ({ rx: value, ry: value });
@@ -31,7 +34,7 @@ const COLUMNS_OPACITY = 0.45;
 /**
  * A dimension bracket for a box's own height (`axis="vertical"`) or width
  * (`axis="horizontal"`), labeled with its primitive name (`size-200`,
- * `space-100`) in `--ds-text-accent-magenta` mono 11 and drawn with
+ * `space-100`) in `--ds-text-accent-magenta` mono and drawn with
  * `--ds-border-accent-magenta`.
  */
 export const Measure = ({ x = 0, y = 0, w, h, axis, side, label, tick = 4, accent = false }) => {
@@ -134,6 +137,8 @@ export const Zone = ({
   accent = false,
 }) => {
   const clipId = useId().replace(/:/g, '');
+  const zoneId = useId();
+  const zoneRegistry = useContext(ZoneBudgetContext);
   const isPad = kind === 'pad' || Boolean(inner) || inset !== undefined;
   const resolvedInner = isPad ? resolveInner(x, y, w, h, inner, inset) : null;
   const fillOpacity = opacity ?? (isPad || translucent ? PAD_OPACITY : 1);
@@ -141,9 +146,27 @@ export const Zone = ({
   const linePaint = accent ? PAINT.accent : PAINT.measureLine;
   const textPaint = accent ? PAINT.accent : PAINT.measureText;
   const useTokenClip = isPad && typeof radius === 'string';
-  const callouts = (
-    labels ?? (label ? [{ text: label, x: labelPos?.x ?? x + w + 8, y: labelPos?.y ?? y + h / 2, anchor: labelPos?.anchor ?? 'start', leader }] : [])
-  ).slice(0, MAX_LABELED_ZONES);
+  const allCallouts =
+    labels ??
+    (label ? [{ text: label, x: labelPos?.x ?? x + w + 8, y: labelPos?.y ?? y + h / 2, anchor: labelPos?.anchor ?? 'start', leader }] : []);
+
+  let allowed = MAX_LABELED_ZONES;
+  if (zoneRegistry) {
+    zoneRegistry.set(zoneId, allCallouts.length);
+    let usedBefore = 0;
+    for (const [id, count] of zoneRegistry) {
+      if (id === zoneId) break;
+      usedBefore += Math.min(count, Math.max(0, MAX_LABELED_ZONES - usedBefore));
+    }
+    allowed = Math.max(0, MAX_LABELED_ZONES - usedBefore);
+  }
+  const callouts = allCallouts.slice(0, allowed);
+
+  useEffect(() => {
+    if (allCallouts.length > allowed) {
+      warnZone(`figure exceeded ${MAX_LABELED_ZONES} labeled zones; truncating extra labels.`);
+    }
+  }, [allCallouts.length, allowed]);
 
   return (
     <g data-part="zone" data-zone-kind={isPad ? 'pad' : 'gap'}>

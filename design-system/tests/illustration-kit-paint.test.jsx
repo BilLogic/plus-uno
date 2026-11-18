@@ -12,6 +12,7 @@ import { resolve } from 'node:path';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { CORNER_TOKEN, HEIGHTS, PAINT, ROLE_SOURCES } from '../src/storybook-docs/illustrations/paint.js';
+import { Illustration } from '../src/storybook-docs/illustrations/Illustration.jsx';
 import * as primitives from '../src/storybook-docs/illustrations/primitives.jsx';
 import * as compositions from '../src/storybook-docs/illustrations/compositions.jsx';
 import * as construction from '../src/storybook-docs/illustrations/construction.jsx';
@@ -140,5 +141,36 @@ describe('every drawn paint resolves to a role', () => {
     for (const [, value] of html.matchAll(/\b(?:fill|stroke)="([^"]*)"/g)) {
       expect(value === 'none' || paints.has(value), `${value} in CoreSizeMatrix`).toBe(true);
     }
+  });
+});
+
+describe('Zone label cap is per figure', () => {
+  it('caps total labeled zones at MAX_LABELED_ZONES across multiple Zone instances in one Illustration', () => {
+    const html = renderToStaticMarkup(
+      <Illustration viewBox="0 0 360 156" scale={1} title="Two Zone instances">
+        <construction.Zone
+          x={24}
+          y={20}
+          w={100}
+          h={20}
+          labels={[
+            { text: 'space-075', x: 140, y: 30 },
+            { text: 'space-100', x: 140, y: 50 },
+          ]}
+        />
+        <construction.Zone
+          x={24}
+          y={60}
+          w={100}
+          h={20}
+          labels={[
+            { text: 'space-150', x: 140, y: 70 },
+            { text: 'space-200', x: 140, y: 90 },
+          ]}
+        />
+      </Illustration>,
+    );
+    const renderedLabels = html.match(/data-zone-label="/g) ?? [];
+    expect(renderedLabels.length).toBe(construction.MAX_LABELED_ZONES);
   });
 });

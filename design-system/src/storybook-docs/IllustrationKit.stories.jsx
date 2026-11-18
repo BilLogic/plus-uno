@@ -126,41 +126,47 @@ export const ResponsiveReflowDrawings = {
 
 export const Measure = {
   render: () => (
-    <IllustrationFigure caption="Measure: magenta brackets for height (size-200) and width (space-500) in mono 11">
+    <IllustrationFigure caption="Measure: magenta brackets for height (size-200) and width (space-500)">
       <Illustration viewBox="0 0 280 120" scale={1} title="Measure brackets on a box for height and width">
         <rect
           x={96}
-          y={24}
-          width={120}
-          height={48}
+          y={28}
+          width={80}
+          height={32}
           fill={PAINT.buttonDefault}
           style={{ rx: 'var(--radius-control-md)', ry: 'var(--radius-control-md)' }}
         />
         <rect
-          x={116}
-          y={40}
-          width={80}
-          height={16}
+          x={112}
+          y={38}
+          width={48}
+          height={12}
           fill={PAINT.placeholderText}
           style={{ rx: 'var(--radius-md)', ry: 'var(--radius-md)' }}
         />
-        <MeasurePart x={84} y={24} h={48} label="size-200" side="left" />
-        <MeasurePart x={96} y={84} w={120} axis="horizontal" label="space-500" side="bottom" />
+        <MeasurePart x={84} y={28} h={32} label="size-200" side="left" />
+        <MeasurePart x={96} y={72} w={80} axis="horizontal" label="space-500" side="bottom" />
       </Illustration>
     </IllustrationFigure>
   ),
   play: async ({ canvasElement }) => {
     const svg = canvasElement.querySelector('svg[role="img"]');
     await expect(everyPaintIsAToken(svg)).toBe(true);
+    const box = svg.querySelector('rect');
+    await expect(Number(box.getAttribute('width'))).toBe(80);
+    await expect(Number(box.getAttribute('height'))).toBe(32);
     const measures = [...svg.querySelectorAll('[data-part="measure"]')];
     await expect(measures.length).toBe(2);
     await expect(measures[0].getAttribute('data-axis')).toBe('vertical');
     await expect(measures[1].getAttribute('data-axis')).toBe('horizontal');
     const line = measures[0].querySelector('line');
     await expect(line.getAttribute('stroke')).toBe('var(--ds-border-accent-magenta)');
+    await expect(Math.abs(Number(line.getAttribute('y2')) - Number(line.getAttribute('y1')))).toBe(32);
+    const hLine = measures[1].querySelector('line');
+    await expect(Math.abs(Number(hLine.getAttribute('x2')) - Number(hLine.getAttribute('x1')))).toBe(80);
     const label = measures[0].querySelector('text');
     await expect(label.getAttribute('fill')).toBe('var(--ds-text-accent-magenta)');
-    await expect(parseFloat(getComputedStyle(label).fontSize)).toBe(11);
+    await expect(parseFloat(getComputedStyle(label).fontSize)).toBe(12);
   },
 };
 
@@ -229,6 +235,56 @@ export const Zone = {
     await expect(Number(pad.getAttribute('opacity'))).toBeLessThan(1);
     const labels = svg.querySelectorAll('[data-zone-label]');
     await expect(labels.length).toBeLessThanOrEqual(MAX_LABELED_ZONES);
+  },
+};
+
+export const ZoneLabelCap = {
+  render: () => (
+    <IllustrationFigure caption="Zone label cap: two Zone instances inside one figure stay capped at three labels total">
+      <Illustration viewBox="0 0 360 156" scale={1} title="Two Zone instances in one figure capped at three labels total">
+        <rect
+          x={24}
+          y={16}
+          width={200}
+          height={120}
+          fill={PAINT.cardSurface}
+          stroke={PAINT.pageEdge}
+          style={{ rx: 'var(--card-radius)', ry: 'var(--card-radius)' }}
+        />
+        <ZonePart
+          x={40}
+          y={44}
+          w={168}
+          h={12}
+          labels={[
+            { text: 'space-075', x: 244, y: 50, anchor: 'start', leader: { x1: 208, y1: 50, x2: 238, y2: 50 } },
+            { text: 'space-100', x: 244, y: 74, anchor: 'start', leader: { x1: 208, y1: 74, x2: 238, y2: 74 } },
+          ]}
+        />
+        <ZonePart
+          kind="pad"
+          x={24}
+          y={16}
+          w={200}
+          h={120}
+          radius="var(--card-radius)"
+          inner={{ x: 40, y: 32, w: 168, h: 88 }}
+          labels={[
+            { text: 'space-150', x: 244, y: 24, anchor: 'start', leader: { x1: 216, y1: 24, x2: 238, y2: 24 } },
+            { text: 'space-200', x: 244, y: 100, anchor: 'start', leader: { x1: 216, y1: 100, x2: 238, y2: 100 } },
+          ]}
+        />
+      </Illustration>
+    </IllustrationFigure>
+  ),
+  play: async ({ canvasElement }) => {
+    const svg = canvasElement.querySelector('svg[role="img"]');
+    await expect(everyPaintIsAToken(svg)).toBe(true);
+    const zones = [...svg.querySelectorAll('[data-part="zone"]')];
+    await expect(zones.length).toBeGreaterThanOrEqual(2);
+    const labels = [...svg.querySelectorAll('[data-zone-label]')];
+    await expect(labels.length).toBeLessThanOrEqual(MAX_LABELED_ZONES);
+    await expect(labels.length).toBe(MAX_LABELED_ZONES);
   },
 };
 

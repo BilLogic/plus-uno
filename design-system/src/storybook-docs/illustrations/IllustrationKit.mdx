@@ -87,7 +87,7 @@ Each primitive takes a position (`x`, `y`), size (`w`, `h`) and `accent` flag. T
 
 Layout foundations diagrams layer four annotation parts from `construction.jsx` (shown in the shared gallery above) over the kit's shapes:
 
-- `Measure` draws a magenta bracket (`--ds-border-accent-magenta`) for a box's own height or width, labeled in `--ds-text-accent-magenta` mono 11 with its primitive name.
+- `Measure` draws a magenta bracket (`--ds-border-accent-magenta`) for a box's own height or width, labeled in `--ds-text-accent-magenta` mono with its primitive name.
 - `Zone` paints a tinted gap or pad (`--ds-background-accent-magenta-subtler`). A `pad` zone is translucent (`evenodd` outline minus content area) and overlays the box; keep to at most three labeled zones per figure, with labels outside the object joined by dashed leaders where needed.
 - `Baseline` draws a 4-unit grid of hairlines behind a figure. Text inside figures is drawn as `--ds-skeleton` bars (`16` tall for body, `12` for small).
 - `Columns` draws the 12 grid columns only, in translucent `--ds-background-accent-blue-subtler`.

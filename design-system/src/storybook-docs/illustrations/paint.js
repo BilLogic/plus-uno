@@ -237,11 +237,11 @@ export const LABEL_FONT = {
 };
 
 /**
- * Mono 11 label for construction-kit brackets and zone callouts, built from
- * tokens (12px `--type-size-075` minus 1px `--border-width-default`).
+ * Mono label for construction-kit brackets and zone callouts, at 1:1 scale
+ * (`--type-size-075`).
  */
 export const MONO_LABEL_FONT = {
   fontFamily: 'var(--type-family-code)',
   fontWeight: 'var(--type-weight-medium)',
-  fontSize: 'calc(var(--type-size-075) - var(--border-width-default))',
+  fontSize: 'var(--type-size-075)',
 };
