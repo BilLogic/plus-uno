@@ -28,9 +28,9 @@ It is never decoration: each cue answers what floats, what groups and what you c
 
 <Callout title="Why two cues">
 
-Surface color and shadow do one job: they build the sense of layers, so you can tell what sits above what and what you can act on. Each cue covers what the other cannot.
+Surface color and shadow do one job: they build the sense of layers, so you can tell what sits above what and what you can act on. Each cue covers what the others cannot.
 
-- **Surface color** separates before any shadow: Sunken groups, while Raised and overlay surfaces read as a different plane.
+- **Surface color** separates before any shadow: Sunken groups, Raised and overlay surfaces read as a different plane.
 - **Shadow** says how high: contact, then height, stronger for each layer up.
 
 Used together, they make one layer read the same way everywhere.
@@ -44,7 +44,7 @@ Used together, they make one layer read the same way everywhere.
     rows={[
         [
             'Layer',
-            'Where a surface sits in the stack: Frame, Page, Navigation, Non-blocking overlay, Blocking overlay. A higher layer is always above a lower one.',
+            'Where a surface sits in the stack: Layer 0 · Frame, Layer 1 · Page, Layer 2 · Navigation, Layer 3 · Non-blocking overlay, Layer 4 · Blocking overlay. A higher layer is always above a lower one.',
         ],
         [
             'Surface',
@@ -61,9 +61,10 @@ Used together, they make one layer read the same way everywhere.
         [
             'Blanket',
             <>
-                The dim layer (<C>--ds-blanket</C>) behind a blocking overlay. It tells you the page behind cannot be used.
+                The dimmed layer under a blocking overlay: <C>--ds-blanket</C>.
             </>,
         ],
+        ['Flat', 'No shadow, whatever the surface.'],
     ]}
 />
 
@@ -71,14 +72,17 @@ Used together, they make one layer read the same way everywhere.
 
 <FoundationSection title="Golden rules">
 
-1. **Flat by default.** The Frame, the Page, Sections and Tables carry no shadow.
-2. **Lift means you can act on it,** or it sits over the page. Never lift to decorate.
-3. **Raise one thing per view** at rest. If every card is Raised, none is.
-4. **Group with a surface color or a border,** never a shadow.
-5. **A blocking overlay sits on the Blanket.** Without the Blanket it is non-blocking.
-6. **One blocking overlay at a time.** Never stack a Modal on a Modal.
-7. **No stroke on an elevated surface.** Its shadow already draws the 1px edge.
-8. **Pair the surface with its shadow.** Never mix layers.
-9. **Never invent a shadow.** The four tokens are the whole ramp.
+1. Flat by default.
+2. Lift means you can act on it.
+3. Raise one thing per view.
+4. Group with a surface color or a border, never a shadow.
+5. A blocking overlay sits on the Blanket.
+6. One blocking overlay at a time.
+7. No stroke on an elevated surface.
+8. Pair the surface with its shadow.
+9. Dark mode lightens only what floats.
+10. A control’s boundary meets 3:1.
+
+Each rule is drawn as a Do and a Don’t under Usage.
 
 </FoundationSection>

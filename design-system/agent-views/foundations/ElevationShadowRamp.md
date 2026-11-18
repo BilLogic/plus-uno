@@ -6,10 +6,10 @@ Four shadows, in layer order. The higher ones are stronger on purpose, so a floa
 
 | Token | Layer | Used by |
 | --- | --- | --- |
-| `--ds-shadow-raised` | Page · Raised | A Card at rest, a grabbed control |
-| `--ds-shadow-overflow` | Navigation | A sticky header or column once content scrolls under it |
-| `--ds-shadow-overlay` | Non-blocking overlay | Popups, Flag, floating Sidebar and Panel, a hovered clickable Card, a dragged Card |
-| `--ds-shadow-blocking` | Blocking overlay | The Modal, on the Blanket |
+| `--ds-shadow-raised` | Page · Raised | The primary card, a grabbed control |
+| `--ds-shadow-overflow` | Layer 2 · Navigation | A sticky header or column once content scrolls under it |
+| `--ds-shadow-overlay` | Layer 3 · Non-blocking overlay | Popups, Flag, floating Sidebar and Panel, a hovered clickable Card, a dragged Card |
+| `--ds-shadow-blocking` | Layer 4 · Blocking overlay | The Modal, on the Blanket |
 
 **Kind:** Foundation
 
@@ -18,18 +18,6 @@ Four shadows, in layer order. The higher ones are stronger on purpose, so a floa
 ## Shadow tokens
 
 Each token adds three layers: an edge, a key and an ambient shadow. Overflow is a scroll-edge shadow only.
-
-### Interactive composer
-
-Switch each slot off to see what it carries on a live surface.
-
-### Cross-section
-
-How dark the ground is at each px below a surface's edge, computed from the tokens on this page. The tick on the axis is each shadow's reach.
-
-### Every slot
-
-Each value reads offset x and y, blur, spread, then ink opacity. In dark the ambient is a tight dark halo: a wide soft shadow does not show on a dark ground.
 
 ## Using the tokens
 

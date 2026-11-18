@@ -14,19 +14,23 @@ It is never decoration: each cue answers what floats, what groups and what you c
 
 | Term | Means |
 | --- | --- |
-| Layer | Where a surface sits in the stack: Frame, Page, Navigation, Non-blocking overlay, Blocking overlay. A higher layer is always above a lower one. |
+| Layer | Where a surface sits in the stack: Layer 0 · Frame, Layer 1 · Page, Layer 2 · Navigation, Layer 3 · Non-blocking overlay, Layer 4 · Blocking overlay. A higher layer is always above a lower one. |
 | Surface | The color a layer or element sits on: `--ds-surface` (Default), `--ds-surface-sunken`, `--ds-surface-raised`, `--ds-surface-overlay`. |
 | Shadow | How high a surface floats: `--ds-shadow-raised`, `--ds-shadow-overflow`, `--ds-shadow-overlay`, `--ds-shadow-blocking`. |
-| Blanket | The dim layer (`--ds-blanket`) behind a blocking overlay. It tells you the page behind cannot be used. |
+| Blanket | The dimmed layer under a blocking overlay: `--ds-blanket`. |
+| Flat | No shadow, whatever the surface. |
 
 ## Golden rules
 
-1. **Flat by default.** The Frame, the Page, Sections and Tables carry no shadow.
-2. **Lift means you can act on it,** or it sits over the page. Never lift to decorate.
-3. **Raise one thing per view** at rest. If every card is Raised, none is.
-4. **Group with a surface color or a border,** never a shadow.
-5. **A blocking overlay sits on the Blanket.** Without the Blanket it is non-blocking.
-6. **One blocking overlay at a time.** Never stack a Modal on a Modal.
-7. **No stroke on an elevated surface.** Its shadow already draws the 1px edge.
-8. **Pair the surface with its shadow.** Never mix layers.
-9. **Never invent a shadow.** The four tokens are the whole ramp.
+1. Flat by default.
+2. Lift means you can act on it.
+3. Raise one thing per view.
+4. Group with a surface color or a border, never a shadow.
+5. A blocking overlay sits on the Blanket.
+6. One blocking overlay at a time.
+7. No stroke on an elevated surface.
+8. Pair the surface with its shadow.
+9. Dark mode lightens only what floats.
+10. A control’s boundary meets 3:1.
+
+Each rule is drawn as a Do and a Don’t under Usage.

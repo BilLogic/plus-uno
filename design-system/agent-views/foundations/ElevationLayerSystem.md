@@ -2,7 +2,7 @@
 
 # Layer system
 
-Every surface sits in one of five layers. Frame and Page are flat; Navigation, Non-blocking overlay and Blocking overlay are elevated. Then, within the page, three surfaces set what groups and what stands out.
+Every surface sits in one of five layers. Layers 0 and 1 are flat; 2 to 4 are elevated. Then, within the page, three surfaces set what groups and what stands out.
 
 **Kind:** Foundation
 
@@ -10,15 +10,15 @@ Every surface sits in one of five layers. Frame and Page are flat; Navigation, N
 
 ## The five layers
 
-### Frame
+### Layer 0 · Frame
 
-### Page
+### Layer 1 · Page
 
-### Navigation
+### Layer 2 · Navigation
 
-### Non-blocking overlay
+### Layer 3 · Non-blocking overlay
 
-### Blocking overlay
+### Layer 4 · Blocking overlay
 
 ### Not a layer
 
@@ -26,7 +26,7 @@ A **Tooltip** labels a control: no shadow, `--layer-tooltip`.
 
 ## Within the page
 
-The Page has three surfaces: Default, Sunken and Raised.
+Layer 1 has three surfaces: Default, Sunken and Raised.
 
 ### Default
 
@@ -36,4 +36,4 @@ The Page has three surfaces: Default, Sunken and Raised.
 
 ### By template
 
-How a Section, its side and its detail sit on the page is in Templates › Section. Elevation sets only their surface: by default a Section takes none.
+How a Section, its side and its detail sit on the page is in Templates › Section. Elevation sets only their surface: a Section takes none.
