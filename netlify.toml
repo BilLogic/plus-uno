@@ -461,7 +461,7 @@
   status = 301
   force = true
 
-# SmartTag renamed to CompetencyTag (#2720).
+# Retired tag story ids redirect to CompetencyTag.
 [[redirects]]
   from = "/storybook/"
   query = { path = "/docs/components-labels-tag-smart-tag--docs" }

@@ -98,7 +98,7 @@ test('a component family parent redirects to its Name/Name page, whose story is 
   }
 });
 
-test('every retired SmartTag story id redirects to the matching CompetencyTag story id', async () => {
+test('every retired tag story id redirects to the matching CompetencyTag story id', async () => {
   const { storybookId } = await import('./lib/storybook-id.mjs');
   const storyFile = new URL('../design-system/src/components/labels/CompetencyTag/CompetencyTag.stories.jsx', import.meta.url);
   const src = fs.readFileSync(storyFile, 'utf8');
