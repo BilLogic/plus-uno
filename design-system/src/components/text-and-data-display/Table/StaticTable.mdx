@@ -243,9 +243,9 @@ card.
 ### Keep a cell to one line.
 
 <DoDontPair
-    doExample={<div style={{ width: 'var(--size-2000)' }}><StaticTable headers={[{ text: 'Student' }, { text: 'Note' }]} rows={[['Priya Nair', 'Needs a longer session on fractions and ratios this week']]} /></div>}
+    doExample={<div style={{ width: 'var(--field-width-lg)' }}><StaticTable headers={[{ text: 'Student' }, { text: 'Note' }]} rows={[['Priya Nair', 'Needs a longer session on fractions and ratios this week']]} /></div>}
     doCaption="Long text truncates with an ellipsis and shows in full in a tooltip."
-    dontExample={<div style={{ width: 'var(--size-2000)' }}><StaticTable headers={[{ text: 'Student' }, { text: 'Note' }]} rows={[['Priya Nair', { content: 'Needs a longer session on fractions and ratios this week', overflow: 'wrap' }]]} /></div>}
+    dontExample={<div style={{ width: 'var(--field-width-lg)' }}><StaticTable headers={[{ text: 'Student' }, { text: 'Note' }]} rows={[['Priya Nair', { content: 'Needs a longer session on fractions and ratios this week', overflow: 'wrap' }]]} /></div>}
     dontCaption="Every cell wrapped, so rows grow uneven."
 />
 

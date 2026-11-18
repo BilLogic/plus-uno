@@ -103,6 +103,7 @@
     --carousel-indicator-height-compact: var(--space-025);
     --carousel-indicator-height: var(--space-0375);
     --carousel-indicator-height-spacious: var(--space-050);
+    --carousel-slide-max-width: 1000px;
 
     /* Scroll bar */
     --scroll-bar-size: var(--space-0375);
@@ -129,6 +130,10 @@
     /* Spotlight */
     --spotlight-width: var(--width-2500);
     --spotlight-media-height: calc(var(--size-750) + var(--space-150));
+    --spotlight-screen-pad: var(--space-100);
+    --spotlight-pad: var(--space-150);
+    --spotlight-gap: var(--space-100);
+    --spotlight-footer-stack: var(--space-150);
 
     /* Menu group */
     --menu-group-min-width: var(--size-1400);
@@ -148,6 +153,21 @@
 
     /* Table */
     --table-cell-max-width: var(--size-300);
+    --table-message-gap: var(--space-0625);
+
+    /* Page header */
+    --page-header-stack: var(--space-100);
+    --page-header-gap: var(--space-150);
+
+    /* Comment */
+    --comment-pad: var(--space-100);
+    --comment-gap: var(--space-100);
+    --comment-replies-stack: var(--space-100);
+    --comment-replies-indent: var(--space-150);
+
+    /* Progress tracker */
+    --progress-tracker-connector-width: var(--space-150);
+    --progress-tracker-dot-size: var(--space-050);
 
     /* Avatar */
     --avatar-size-96: calc(var(--space-300) * 2);

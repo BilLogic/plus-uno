@@ -156,7 +156,7 @@ Row states are layered over each cell's fill, never swapped for it.
 
 ## Tokens touched
 
-`--body-default` · `--border-width-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-border` · `--ds-border-bold` · `--ds-border-focused` · `--ds-shadow-overflow` · `--ds-text` · `--ds-text-subtle` · `--ds-utility-elevation-surface-current` · `--focus-ring-width` · `--heading-xxs` · `--layer-card` · `--pattern-table-overflow-reach` · `--pattern-table-z-corner` · `--pattern-table-z-sticky` · `--plus-pattern-table-row-state` · `--row-height-md` · `--section-stack-md` · `--space-0625` · `--stack-md` · `--stack-sm` · `--table-footer-height` · `--table-overflow-reach` · `--table-pad-x-cell` · `--table-pad-y-cell`
+`--body-default` · `--border-width-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-border` · `--ds-border-bold` · `--ds-border-focused` · `--ds-shadow-overflow` · `--ds-text` · `--ds-text-subtle` · `--ds-utility-elevation-surface-current` · `--focus-ring-width` · `--heading-xxs` · `--layer-card` · `--pattern-table-overflow-reach` · `--pattern-table-z-corner` · `--pattern-table-z-sticky` · `--plus-pattern-table-row-state` · `--row-height-md` · `--section-stack-md` · `--stack-md` · `--stack-sm` · `--table-footer-gap` · `--table-footer-height` · `--table-overflow-reach` · `--table-pad-x-cell` · `--table-pad-y-cell`
 
 From `design-system/src/patterns/PatternTable/PatternTable.scss`. Override these through the token layer, never with a literal.
 

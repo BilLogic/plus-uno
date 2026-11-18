@@ -195,11 +195,11 @@ time {
 }
 
 .border-outline {
-    border: 1px solid var(--ds-border-bold);
+    border: var(--border-width-default) solid var(--ds-border-bold);
 }
 
 .border-outline-variant {
-    border: 1px solid var(--ds-border);
+    border: var(--border-width-default) solid var(--ds-border);
 }
 
 // Visually hidden: read by assistive technology, never seen. A one-pixel,
@@ -221,7 +221,7 @@ time {
 // Image Placeholder Utility
 .image-placeholder {
     background-color: var(--ds-surface-container);
-    border: 1px dashed var(--ds-border);
+    border: var(--border-width-default) dashed var(--ds-border);
     display: flex;
     align-items: center;
     justify-content: center;

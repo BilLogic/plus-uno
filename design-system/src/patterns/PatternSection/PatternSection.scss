@@ -295,7 +295,7 @@
     flex: 1 1 auto;
     align-items: center;
     gap: var(--inline-md);
-    min-width: min(100%, var(--width-3000));
+    min-width: min(100%, var(--section-toolbar-min-width));
 }
 
 .plus-section-toolbar__search {
@@ -313,7 +313,7 @@
 /* The count truncates first. */
 .plus-section-toolbar__count {
     flex: 1 1 0;
-    min-width: var(--size-300);
+    min-width: var(--section-toolbar-count-min-width);
     overflow: hidden;
     font: var(--body-sm);
     color: var(--ds-text-subtle);

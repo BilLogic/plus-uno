@@ -279,7 +279,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: var(--space-0625);
+    gap: var(--table-message-gap);
 }
 
 // ------------------------------------------------------------- summary row
@@ -317,7 +317,7 @@
 .plus-table-footer-actions {
     display: flex;
     align-items: center;
-    gap: var(--space-0625);
+    gap: var(--table-footer-gap);
 }
 
 // ---------------------------------------------------------------- head cell

@@ -1746,6 +1746,7 @@
         "--carousel-ring-size",
         "--carousel-ring-stroke",
         "--carousel-slide-max",
+        "--carousel-slide-max-width",
         "--carousel-slide-share",
         "--carousel-slide-share-md",
         "--carousel-slide-share-sm",
@@ -3114,14 +3115,16 @@
         "--body-sm",
         "--border-width-default",
         "--card-radius-compact",
+        "--comment-gap",
+        "--comment-pad",
+        "--comment-replies-indent",
+        "--comment-replies-stack",
         "--ds-background-selected",
         "--ds-border",
         "--ds-text-subtle",
-        "--space-025",
-        "--space-050",
-        "--space-075",
-        "--space-100",
-        "--space-150",
+        "--inline-lg",
+        "--stack-md",
+        "--stack-sm",
         "--type-weight-semibold"
       ]
     },
@@ -8437,9 +8440,9 @@
       ],
       "tokens": [
         "--body-sm",
-        "--space-075",
-        "--space-100",
-        "--space-150"
+        "--inline-lg",
+        "--page-header-gap",
+        "--page-header-stack"
       ]
     },
     {
@@ -8729,10 +8732,12 @@
         "--ds-border",
         "--ds-surface-overlay",
         "--ds-text-subtle",
-        "--space-025",
-        "--space-075",
-        "--space-100",
-        "--space-150"
+        "--panel-inline-lg",
+        "--panel-inline-md",
+        "--panel-inline-sm",
+        "--panel-pad",
+        "--panel-pad-y",
+        "--panel-subheader-pad-y"
       ]
     },
     {
@@ -9570,9 +9575,9 @@
         "--section-stack-lg",
         "--section-stack-md",
         "--section-stack-sm",
-        "--size-300",
-        "--stack-sm",
-        "--width-3000"
+        "--section-toolbar-count-min-width",
+        "--section-toolbar-min-width",
+        "--stack-sm"
       ],
       "subComponents": [
         {
@@ -10033,9 +10038,9 @@
         "--plus-pattern-table-row-state",
         "--row-height-md",
         "--section-stack-md",
-        "--space-0625",
         "--stack-md",
         "--stack-sm",
+        "--table-footer-gap",
         "--table-footer-height",
         "--table-overflow-reach",
         "--table-pad-x-cell",
@@ -10889,14 +10894,13 @@
         "--icon-sm",
         "--inline-sm",
         "--pad-x-md",
+        "--progress-tracker-connector-width",
+        "--progress-tracker-dot-size",
         "--radius-control-md",
         "--radius-full",
-        "--space-050",
-        "--space-150",
         "--stack-lg",
         "--stack-md",
         "--stack-sm",
-        "--stroke-1",
         "--type-weight-medium"
       ]
     },
@@ -14107,13 +14111,15 @@
         "--ds-text",
         "--ds-text-inverse",
         "--heading-sm",
+        "--inline-lg",
         "--plus-overlay-origin",
         "--popup-radius",
         "--radius-lg",
-        "--space-075",
-        "--space-100",
-        "--space-150",
+        "--spotlight-footer-stack",
+        "--spotlight-gap",
         "--spotlight-media-height",
+        "--spotlight-pad",
+        "--spotlight-screen-pad",
         "--spotlight-width",
         "--transform-origin"
       ]
@@ -14608,9 +14614,10 @@
         "--row-height-lg",
         "--row-height-md",
         "--row-height-sm",
-        "--space-0625",
         "--table-cell-max-width",
+        "--table-footer-gap",
         "--table-footer-height",
+        "--table-message-gap",
         "--table-pad-x-cell",
         "--table-pad-y-cell",
         "--table-radius",
