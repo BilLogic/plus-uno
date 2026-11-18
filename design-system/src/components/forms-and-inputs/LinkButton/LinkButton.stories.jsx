@@ -5,7 +5,7 @@ import LinkButton from './LinkButton';
 import { BUTTON_APPEARANCES } from '@/components';
 import { expectFocusRing, expectHovered, expectPressed } from '@/storybook-docs/lib/button-states.js';
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-lg)', alignItems: 'center' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--grid-gutter)', alignItems: 'center' };
 const title = (name) => name.charAt(0).toUpperCase() + name.slice(1);
 
 export default {

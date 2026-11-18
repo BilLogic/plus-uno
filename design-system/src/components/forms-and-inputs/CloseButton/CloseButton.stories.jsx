@@ -6,10 +6,10 @@ import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import CloseButton from './CloseButton';
 import { INVERSE_GROUNDS } from './inverseGrounds.js';
 
-const row = { display: 'flex', gap: 'var(--inline-lg)', alignItems: 'center', flexWrap: 'wrap' };
+const row = { display: 'flex', gap: 'var(--section-stack-lg)', alignItems: 'center', flexWrap: 'wrap' };
 const inverseGround = {
     ...row,
-    padding: 'var(--card-pad-compact)',
+    padding: 'var(--pad-x-lg)',
     borderRadius: 'var(--radius-md)',
     background: 'var(--ds-background-neutral-bold)',
 };
@@ -80,7 +80,7 @@ export const Spacing = {
 
 export const Tones = {
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', alignItems: 'flex-start' }}>
             <div style={row}>
                 <CloseButton label="Dismiss default example" />
             </div>
@@ -113,7 +113,7 @@ export const Tones = {
 
 export const Focus = {
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', alignItems: 'flex-start' }}>
             <div style={row}>
                 <CloseButton label="Close default focus example" />
             </div>
@@ -143,7 +143,7 @@ export const InverseGrounds = {
     render: () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', alignItems: 'flex-start' }}>
             {INVERSE_GROUNDS.map((ground) => (
-                <div key={ground} data-ground={ground} style={{ ...row, padding: 'var(--card-pad-compact)', borderRadius: 'var(--radius-md)', background: `var(${ground})` }}>
+                <div key={ground} data-ground={ground} style={{ ...row, padding: 'var(--pad-x-lg)', borderRadius: 'var(--radius-md)', background: `var(${ground})` }}>
                     <CloseButton tone="inverse" label={`Dismiss example on ${ground.replace('--ds-background-', '')}`} />
                 </div>
             ))}

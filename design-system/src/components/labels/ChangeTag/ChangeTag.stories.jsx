@@ -40,7 +40,7 @@ export default {
     },
 };
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-lg)', alignItems: 'center' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--grid-gutter)', alignItems: 'center' };
 const grid = { display: 'grid', gap: 'var(--stack-lg)' };
 
 const SIZE = { default: 20, compact: 16 };

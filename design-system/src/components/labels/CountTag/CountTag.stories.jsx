@@ -3,10 +3,9 @@ import { expect, spyOn, userEvent, within } from 'storybook/test';
 
 import { contrastRatio as contrast } from '@/storybook-docs/lib/contrast.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
-import { Button } from '@/components';
+import { Button, Icon } from '@/components';
 import CountTag, { COUNT_TAG_APPEARANCES, COUNT_TAG_SPACINGS } from './CountTag';
 import { expectGroundUnder, expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
-import { iconClass } from '../../../lib/icon';
 
 /**
  * `CountTag` — a number on its own, as a near-square countTag.
@@ -36,7 +35,7 @@ export default {
     },
 };
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-lg)', alignItems: 'center' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--grid-gutter)', alignItems: 'center' };
 
 /* ------------------------------------------------------------------ helpers */
 
@@ -183,14 +182,14 @@ Zero.play = async ({ canvasElement }) => {
 export const Ring = () => (
     <div style={row}>
         <span style={{ position: 'relative', display: 'inline-flex' }}>
-            <i className={iconClass('bell')} aria-hidden="true" style={{ fontSize: 'var(--icon-lg)' }} />
+            <Icon name="bell" size={24} />
             <span style={{ position: 'absolute', top: 'calc(-1 * var(--pad-y-md))', right: 'calc(-1 * var(--pad-x-sm))' }}>
                 <CountTag value={3} isBold appearance="danger" hasRing label="3 notifications" />
             </span>
         </span>
         <span style={{ position: 'relative', display: 'inline-flex' }}>
-            <i className={iconClass('bell')} aria-hidden="true" style={{ fontSize: 'var(--icon-lg)' }} />
-            <span style={{ position: 'absolute', top: 'calc(-1 * var(--pad-y-sm))', right: 'calc(-1 * var(--pad-y-sm))', display: 'flex' }}>
+            <Icon name="bell" size={24} />
+            <span style={{ position: 'absolute', top: 'calc(-1 * var(--pad-y-sm))', right: 'calc(-1 * var(--pad-x-xs))', display: 'flex' }}>
                 <CountTag isDot appearance="danger" hasRing label="New notifications" />
             </span>
         </span>
