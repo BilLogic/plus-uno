@@ -127,7 +127,6 @@ Tokens one component owns, named for it.
 --calendar-day-lg  /* Size of a day cell in a large Calendar. */
 --calendar-day-md  /* Size of a day cell in a default Calendar. */
 --calendar-day-sm  /* Size of a day cell in a compact Calendar. */
---calendar-nav-size  /* Size of the Calendar's previous and next month buttons. */
 --carousel-control-offset  /* Distance between a Carousel's previous and next controls and its edge. */
 --carousel-control-pad  /* Padding inside a Carousel's previous and next controls. */
 --carousel-control-size  /* Size of a Carousel's previous and next controls. */
@@ -157,9 +156,7 @@ Tokens one component owns, named for it.
 --listbox-max-height  /* Tallest a Select or Cascader listbox may grow before it scrolls. */
 --listbox-max-width  /* Widest a Select or Cascader listbox may grow. */
 --listbox-min-height  /* Shortest a Select or Cascader listbox may be. */
---menu-group-gap  /* Vertical gap between groups in a menu. */
 --menu-group-min-width  /* Minimum width of a menu group. */
---menu-group-pad-x  /* Horizontal padding of a menu group. */
 --option-menu-width  /* Width of a fixed-width option menu. */
 --option-row-control-gap  /* Horizontal gap between an option row's control and its label. */
 --option-row-dot-size  /* Size of the dot in an option row, such as a radio's selected mark. */
@@ -908,11 +905,27 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-link-pressed  /* Links in a pressed state */
 --ds-link-visited  /* Visited links */
 --ds-link-visited-pressed  /* Visited links in a pressed state */
+--ds-logo-glow-dark-0  /* First glow layer of the colored-dark Logo mark and dark-mode colored Logo mark. */
+--ds-logo-glow-dark-1  /* Second glow layer of the colored-dark Logo mark and dark-mode colored Logo mark. */
+--ds-logo-glow-dark-2  /* Third glow layer of the colored-dark Logo mark and dark-mode colored Logo mark. */
+--ds-logo-glow-dark-3  /* Fourth glow layer of the colored-dark Logo mark and dark-mode colored Logo mark. */
+--ds-logo-glow-dark-4  /* Fifth glow layer of the colored-dark Logo mark and dark-mode colored Logo mark. */
+--ds-logo-glow-light-0  /* First glow layer of the colored Logo mark on light grounds. */
+--ds-logo-glow-light-1  /* Second glow layer of the colored Logo mark on light grounds. */
+--ds-logo-glow-light-2  /* Third glow layer of the colored Logo mark on light grounds. */
+--ds-logo-glow-light-3  /* Fourth glow layer of the colored Logo mark on light grounds. */
+--ds-logo-glow-light-4  /* Fifth glow layer of the colored Logo mark on light grounds. */
+--ds-logo-ground  /* Ground fill behind the glows inside the colored and colored-dark Logo marks. */
+--ds-logo-mark  /* Ring stroke and plus fill of the outlined Logo mark. */
+--ds-logo-mark-reversed  /* Ring stroke and plus fill of the outlined-reversed Logo mark. */
+--ds-logo-plus  /* Plus glyph fill inside the filled, dark, colored, and colored-dark Logo marks. */
+--ds-logo-tile  /* Tile fill of the filled Logo mark. */
+--ds-logo-tile-dark  /* Tile fill of the dark Logo mark. */
+--ds-logo-wordmark  /* Default wordmark fill on light surfaces. */
+--ds-logo-wordmark-reversed  /* Reversed wordmark fill on dark surfaces. */
+--ds-logo-wordmark-stroke  /* Hairline stroke in the dark ground color around light wordmark letters on dark grounds. */
 --ds-skeleton  /* Skeleton loading states */
 --ds-surface  /* The primary background for the UI */
---ds-surface-container  /* A neutral container surface background */
---ds-surface-container-hovered
---ds-surface-container-pressed
 --ds-surface-hovered
 --ds-surface-overlay  /* The background of elements that sit on top of the UI, such as modals, dropdown menus, floating toolbars, and floating single-action buttons. Also use for the background of raised cards in a dragged state. Combine with --ds-shadow-overlay */
 --ds-surface-overlay-hovered

@@ -115,7 +115,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ### Menu items
 
-Dropdown menu exports the four row parts: `Section`, `ButtonItem`, `LinkItem` and `CustomItem`. `ButtonItem` runs an action and `LinkItem` navigates with `href`. `CustomItem` renders through a `component` of the caller's choosing, such as a `label` around a checkbox. All three take `elemBefore`, `elemAfter`, `description`, `isSelected` and `isDisabled`. `Section` takes a `title` and `hasSeparator` and groups rows. Arrow keys move between enabled rows and wrap at the ends.
+Dropdown menu exports the four row parts: `Section`, `ButtonItem`, `LinkItem` and `CustomItem`. `ButtonItem` runs an action and `LinkItem` navigates with `href`. `CustomItem` renders through a `component` of the caller's choosing, such as a `label` around a checkbox. All three take `elemBefore`, `elemAfter`, `description`, `isSelected` and `isDisabled`. `Section` takes a `title` and `hasSeparator` and groups rows. Arrow keys move between enabled rows and wrap at the ends. Standalone menus wrap rows in `MenuGroup`, which takes `spacing` (`default` 32, `compact` 24, `spacious` 40).
 
 ### States
 
@@ -133,9 +133,11 @@ Dropdown menu exports the four row parts: `Section`, `ButtonItem`, `LinkItem` an
 
 | Part | Token |
 | --- | --- |
-| Row text | `--ds-text`, body default; disabled `--ds-text-disabled`. |
+| Surface padding | `--dropdown-menu-pad` (4). |
+| Row height | `--control-md` (32) default; `--control-sm` (24) compact; `--control-lg` (40) spacious on `MenuGroup`. |
+| Row text | `--ds-text`, `--body-default` (14); disabled `--ds-text-disabled`. |
 | Row icon | `--ds-icon-subtle`. |
-| Row padding, radius | `--space-0625` and `--space-150`; `--radius-lg`. |
+| Row padding, gap, radius | `--pad-x-md` and `--pad-y-md` (12 × 6); gap `--inline-md` (8); `--radius-control-md` (8). |
 | Focus ring | `--ds-border-focused`, 2px, 2px offset. |
 
 ## Content guidelines

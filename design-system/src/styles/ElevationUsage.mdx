@@ -9,30 +9,14 @@ import {
 import { LevelTiles, LEVELS } from '@/storybook-docs/elevation-demos.jsx';
 import * as ElevationStories from './Elevation.stories.jsx';
 
-
-<Meta of={ElevationStories} />
+<Meta title="Foundations/Visual/Elevation/Usage" />
 
 <DocsLanding
-    page="foundations-visual-elevation"
-    eyebrow="Foundation"
-    title="Elevation"
-    purpose="What sits above what, and whether it blocks. Shadow and surface color show it."
-    links={{
-        items: [
-            { title: 'Levels', href: '#foundation-the-levels' },
-            { title: 'Shadow', href: '#foundation-shadow-anatomy' },
-            { title: 'Surface color', href: '#foundation-surface-color-and-dark-mode' },
-        ],
-    }}
+    page="foundations-visual-elevation-usage"
+    eyebrow="Foundation · Elevation"
+    title="Usage"
+    purpose="Which surface and shadow each behavior takes, how surfaces step in dark mode, how lifts move, and how edges hold under contrast."
 />
-
-<FoundationSection title="Overview">
-
-**Elevation** is the order of layers: which surface sits above which, and whether it blocks the one below. **Shadow** is one way to show that order; surface color does the rest.
-
-<Canvas of={ElevationStories.Stack} sourceState="none" />
-
-</FoundationSection>
 
 <FoundationSection title="The levels">
 
@@ -45,7 +29,7 @@ Six levels, lowest first. A surface and its shadow always travel together.
     rows={LEVELS.map((l) => [l.name, l.surface ? <C>{l.surface}</C> : '—', l.shadow ? <C>{l.shadow}</C> : '—'])}
 />
 
-Raised and overlay have `-hovered` and `-pressed` surfaces for a surface that can be clicked. `--ds-surface-container` is a translucent well inside a surface, and it is not a level.
+Raised and overlay have `-hovered` and `-pressed` surfaces for a surface that can be clicked.
 
 </FoundationSection>
 
@@ -57,33 +41,9 @@ Pick the level by what the surface does, never by how strong a shadow looks. Ans
 
 </FoundationSection>
 
-<FoundationSection title="Shadow anatomy">
-
-Every shadow is three slots: **edge**, **key** and **ambient**. A new shadow fills all three, or says why one is empty. Switch each slot off to see what it carries.
-
-<Canvas of={ElevationStories.Composer} sourceState="none" />
-
-<FoundationSubsection title="Cross-section">
-
-How dark the ground is at each px below a surface's edge, computed from the tokens on this page. The tick on the axis is each shadow's reach.
-
-<Canvas of={ElevationStories.CrossSectionChart} sourceState="none" />
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Every slot">
-
-Each value reads offset x and y, blur, spread, then ink opacity. In dark the ambient is a tight dark halo: a wide soft shadow does not show on a dark ground.
-
-<Canvas of={ElevationStories.SlotTable} sourceState="none" />
-
-</FoundationSubsection>
-
-</FoundationSection>
-
 <FoundationSection title="Surface color and dark mode">
 
-Higher is lighter. In light the lifted surfaces share the page color and the shadow lifts them; in dark the surface itself steps up.
+In light the lifted surfaces share the page color and the shadow lifts them; in dark, Raised keeps the page tone and is told apart by its shadow, while overlay surfaces still step up.
 
 <Canvas of={ElevationStories.Ladder} sourceState="none" />
 
@@ -97,12 +57,12 @@ Each layer is a `--layer-*` z-index token, set in code only. Components name the
 
 <Canvas of={ElevationStories.Layers} sourceState="none" />
 
-- **A confirm Modal may open over a Panel, a Popup or a focused task,** with its own Blanket.
+- **A confirm Modal may open over a Panel or a Popup,** with its own Blanket.
 - **Never a Modal on a Modal.** A Modal confirms inside itself, with a warning SectionMessage and the danger button.
 - **A Panel never has a Blanket.** It floats beside a usable page.
 - **Popups and Tooltips open over a Modal.** A Popup opened inside a Modal portals into it.
 - **A Flag sits above all of it**, so a message is never hidden.
-- **`--layer-dialog`** holds a view that replaces the page: Frame · focused and AiChat full screen.
+- **`--layer-dialog`** holds a view that replaces the page: AiChat full screen.
 
 </FoundationSection>
 

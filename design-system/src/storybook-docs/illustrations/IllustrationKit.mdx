@@ -4,6 +4,7 @@ import { RefTable } from '@/storybook-docs/foundation-blocks.jsx';
 import { IllustrationKitGallery } from '@/storybook-docs/illustrations/IllustrationKitGallery.jsx';
 import { IllustrationFigure } from '@/storybook-docs/illustrations/Illustration.jsx';
 import { ThreeLayers, OpeningARecord, ResponsiveReflow, SessionSummary, PartnerMark } from '@/storybook-docs/illustrations/compositions.jsx';
+import { ScaleStrip, CoreSizeMatrix, ControlConstruction } from '@/storybook-docs/illustrations/construction.jsx';
 
 <Meta title="Get started/Illustration kit" />
 
@@ -44,7 +45,7 @@ Motion follows the same split: a component's own motion is a live story, a princ
 
 <FoundationSection title="Primitives">
 
-Each primitive takes a position (`x`, `y`), size (`w`, `h`) and `accent` flag. The top drawing is neutral and the bottom is accented (Button shows blocked-out above and real below). A card paints the raised surface and shadow, a Tooltip is flat with no shadow, and a Sticky header casts the overflow shadow over rows that scroll under it. Screen combines a Frame, Sidebar and Page, with the Sidebar docked, an overlay or none. Field also takes `invalid`, which paints its border with the error token. Flag takes `tone` (neutral, success, warning, danger or info). Tabs, Breadcrumb and Progress tracker take `count`; Tabs also takes `selected` and Progress tracker `current`. The gallery ends with the four motion primitives from `primitives-motion.jsx` and the six cover shapes from `shapes.jsx`.
+Each primitive takes a position (`x`, `y`), size (`w`, `h`) and `accent` flag. The top drawing is neutral and the bottom is accented (Button shows blocked-out above and real below). A card paints the raised surface and shadow, a Tooltip is flat with no shadow, and a Sticky header casts the overflow shadow over rows that scroll under it. Screen combines a Frame, Sidebar and Page, with the Sidebar docked, an overlay or none. Field also takes `invalid`, which paints its border with the error token. Flag takes `tone` (neutral, success, warning, danger or info). Tabs, Breadcrumb and Progress tracker take `count`; Tabs also takes `selected` and Progress tracker `current`. The gallery ends with the motion primitives from `primitives-motion.jsx`, the cover shapes from `shapes.jsx` and the four construction primitives (`Measure`, `Zone`, `Baseline`, `Columns`) from `construction.jsx`.
 
 <IllustrationKitGallery />
 
@@ -78,6 +79,29 @@ Each primitive takes a position (`x`, `y`), size (`w`, `h`) and `accent` flag. T
 
 <IllustrationFigure caption="Partner mark: a square generic partner emblem built from kit shapes.">
     <PartnerMark />
+</IllustrationFigure>
+
+</FoundationSection>
+
+<FoundationSection title="Construction">
+
+Layout foundations diagrams layer four annotation parts from `construction.jsx` (shown in the shared gallery above) over the kit's shapes:
+
+- `Measure` draws a magenta bracket (`--ds-border-accent-magenta`) for a box's own height or width, labeled in `--ds-text-accent-magenta` mono with its primitive name.
+- `Zone` paints a tinted gap or pad (`--ds-background-accent-magenta-subtler`). A `pad` zone is translucent (`evenodd` outline minus content area) and overlays the box; keep to at most three labeled zones per figure, with labels outside the object joined by dashed leaders where needed.
+- `Baseline` draws a 4-unit grid of hairlines behind a figure. Text inside figures is drawn as `--ds-skeleton` bars (`16` tall for body, `12` for small).
+- `Columns` draws the 12 grid columns only, in translucent `--ds-background-accent-blue-subtler`.
+
+<IllustrationFigure caption="Scale strip: the quarter-rem space ladder as bars; the five core sizes outlined.">
+    <ScaleStrip />
+</IllustrationFigure>
+
+<IllustrationFigure caption="Core-size matrix: 16, 24, 32, 40 and 48 across Step, Button, Field, Row, Media and Icon.">
+    <CoreSizeMatrix />
+</IllustrationFigure>
+
+<IllustrationFigure caption="Building a control: a 32 Button built from 6 + 20 + 6 with 12 pad-x, and a 20 Tag built from 2 + 16 + 2 with 4 pad-x.">
+    <ControlConstruction />
 </IllustrationFigure>
 
 </FoundationSection>

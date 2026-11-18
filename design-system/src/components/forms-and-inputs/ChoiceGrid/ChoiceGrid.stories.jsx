@@ -427,10 +427,17 @@ export const Disabled = {
 const radiusOf = (root, selector) => getComputedStyle(root.querySelector(selector)).borderTopLeftRadius;
 Overview.play = async ({ canvasElement }) => {
     await expect(radiusOf(canvasElement, '.plus-choice-grid-table'), 'Choice grid radius is 12').toBe('12px');
+    const table = canvasElement.querySelector('.plus-choice-grid-table');
     const corner = canvasElement.querySelector('.plus-choice-grid-row-header');
     const column = canvasElement.querySelector('.plus-choice-grid-column-header');
+    const rowLabel = canvasElement.querySelector('.plus-choice-grid-row-label');
+    const bodyCell = canvasElement.querySelector('.plus-choice-grid-cell');
     await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        const sunken = token('--ds-surface-sunken');
+        await expect(getComputedStyle(column).backgroundColor, `${mode}: column header takes the sunken fill`).toBe(sunken);
         await expect(getComputedStyle(corner).backgroundColor, `${mode}: corner cell matches a column header`).toBe(getComputedStyle(column).backgroundColor);
-        await expect(getComputedStyle(corner).backgroundColor, `${mode}: corner cell takes the container fill`).toBe(token('--ds-surface-container'));
+        await expect(getComputedStyle(table).backgroundColor, `${mode}: table takes the sunken fill`).toBe(sunken);
+        await expect(getComputedStyle(rowLabel).backgroundColor, `${mode}: row label takes the sunken fill`).toBe(sunken);
+        await expect(getComputedStyle(bodyCell).backgroundColor, `${mode}: body cell takes the sunken fill`).toBe(sunken);
     });
 };

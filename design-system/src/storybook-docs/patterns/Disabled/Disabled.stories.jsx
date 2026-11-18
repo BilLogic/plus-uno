@@ -4,7 +4,6 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
-import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import { ReadOnlyField } from '../ReadOnly/readOnlyDemo.jsx';
 import {
     BlocksAction,
@@ -69,7 +68,6 @@ export const AnswerExplains = {
         await waitFor(() => expect(canvas.getByText('Session saved.')).toBeVisible());
         await userEvent.click(canvas.getByRole('button', { name: 'Cancel' }));
         await waitFor(() => expect(canvas.getByText("Enter the student's name.")).toBeVisible());
-        await settleAnimations(canvasElement);
     },
 };
 
@@ -114,7 +112,6 @@ export const AnswerHidden = {
         await expect(await canvas.findByRole('menuitem', { name: 'Edit' })).toBeInTheDocument();
         await expect(canvas.queryByText(/Delete/), 'left out, not dimmed').toBeNull();
         await fitsCanvas(canvasElement);
-        await settleAnimations(canvasElement);
     },
 };
 
@@ -138,7 +135,6 @@ export const KeyWaitsOnField = {
         await expect(group, 'picking a school enables Group').toBeEnabled();
         await userEvent.click(group);
         await userEvent.click(await canvas.findByRole('option', { name: /Algebra B/ }));
-        await settleAnimations(canvasElement);
     },
 };
 
@@ -182,7 +178,6 @@ export const KeyBlocksAction = {
         await userEvent.click(canvas.getByRole('button', { name: 'Remove school' }));
         await expect(canvas.getByLabelText('Group')).toBeDisabled();
         await expect(canvas.getByLabelText('Time')).toBeDisabled();
-        await settleAnimations(canvasElement);
     },
 };
 

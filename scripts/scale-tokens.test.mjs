@@ -214,6 +214,8 @@ test('the unused spacing tokens removed in #2719 are gone', () => {
     '--modal-pad-y-default',
     '--modal-pad-y-spacious',
     '--table-stack',
+    '--menu-group-pad-x',
+    '--menu-group-gap',
   ]) {
     assert.equal(corpus.get(name), undefined, `${name} was removed`);
   }

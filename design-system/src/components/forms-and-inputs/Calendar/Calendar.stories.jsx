@@ -20,8 +20,8 @@ export default {
         className: { table: { disable: true } },
         size: {
             control: 'select',
-            options: [28, 36, 44],
-            table: { category: 'Design', defaultValue: { summary: '36' } },
+            options: [24, 32, 40],
+            table: { category: 'Design', defaultValue: { summary: '32' } },
         },
         minDate: {
             control: 'text',
@@ -46,9 +46,9 @@ const sizeStory = (size) => ({
     ),
 });
 
-export const Size28 = sizeStory(28);
-export const Size36 = sizeStory(36);
-export const Size44 = sizeStory(44);
+export const Size24 = sizeStory(24);
+export const Size32 = sizeStory(32);
+export const Size40 = sizeStory(40);
 
 export const PickADay = () => {
     const [viewDate, setViewDate] = useState(new Date(2026, 9, 1));
@@ -208,7 +208,7 @@ function PlaygroundCalendar(args) {
 }
 
 export const Interactive = {
-    args: { size: 36, minDate: '', maxDate: '' },
+    args: { size: 32, minDate: '', maxDate: '' },
     render: ({ minDate, maxDate, ...args }) => (
         <PlaygroundCalendar {...args} minDate={minDate || undefined} maxDate={maxDate || undefined} />
     ),

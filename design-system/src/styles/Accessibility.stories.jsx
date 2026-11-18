@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import { animate } from 'motion/react';
 import { expect, userEvent } from 'storybook/test';
 import { Button, StatusTag } from '@/components';
 import { PatternCard } from '@/patterns';
+import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { RefTable, C, Do, Dont, DoDont, ModeCompare, RingDemo } from '@/storybook-docs/foundation-blocks.jsx';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 
@@ -90,5 +92,36 @@ export const StatusNotColorAlone = {
     ),
     play: async ({ canvas }) => {
         await expect(canvas.getByText('Payment failed')).toBeInTheDocument();
+    },
+};
+
+const FadeInFromZero = () => {
+    const ref = useRef(null);
+    useEffect(() => {
+        const el = ref.current;
+        if (!el) return undefined;
+        const controls = animate(el, { opacity: [0, 1] }, SPRINGS['appearance.slow'].productive);
+        return () => controls.stop();
+    }, []);
+    return (
+        <div
+            ref={ref}
+            style={{
+                opacity: 0,
+                background: 'var(--ds-surface)',
+                color: 'var(--ds-text)',
+                padding: 'var(--section-pad-y-default)',
+            }}
+        >
+            Session notes saved.
+        </div>
+    );
+};
+
+/** An element that fades in from 0 opacity settles before the a11y scan checks contrast. */
+export const SettledFadeInPassesScan = {
+    render: () => <FadeInFromZero />,
+    play: async ({ canvas }) => {
+        await expect(canvas.getByText('Session notes saved.')).toBeInTheDocument();
     },
 };

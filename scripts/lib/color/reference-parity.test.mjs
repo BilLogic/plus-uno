@@ -28,6 +28,9 @@
 // - Lagoon was retuned toward Notion's teal after the reference was cut (plan-a.json
 //   `accents`). The reference's Lagoon hexes are swapped for ours, step for step,
 //   before any comparison, so every other value is still held to the reference.
+// - Surface elevation moved after the reference was cut: `elevation.surface.container*`
+//   was retired, and dark `elevation.surface.raised` moved to the page tone
+//   (`darkNeutral.100`), held by `semantics.test.mjs` and `check:color-system`.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
@@ -51,15 +54,16 @@ const values = (rows) => rows.map((r) => Object.fromEntries(VALUE_KEYS.map((k) =
 const withoutProse = (value) =>
   JSON.parse(currentNames(JSON.stringify(value, (k, v) => (k === 'description' || k === 'use' || k === 'deviation' ? undefined : v))));
 /** Tokens PLUS added after the reference was cut. */
-const PLUS_ONLY_TOKEN = /^color[./]background[./]competency[./][a-z-]+[./]subtle$|^color[./]ai[./]background[./]bold|^opacity[./]chart[./]/;
-const PLUS_ONLY_SCSS_DECL = /^ +--ds-(?:background-competency-[a-z-]+-subtle|ai-background-bold[a-z-]*|opacity-chart-[a-z]+): [^\n]*\n/gm;
+const PLUS_ONLY_TOKEN = /^color[./]background[./]competency[./][a-z-]+[./]subtle$|^color[./]ai[./]background[./]bold|^color[./]logo[./]|^opacity[./]chart[./]/;
+const PLUS_ONLY_SCSS_DECL = /^ +--ds-(?:background-competency-[a-z-]+-subtle|ai-background-bold[a-z-]*|logo-[a-z0-9-]+|opacity-chart-[a-z]+): [^\n]*\n/gm;
 const withoutPlusOnly = (spec) => ({
   ...spec,
   collections: spec.collections.map((c) => ({ ...c, variables: c.variables.filter((v) => !PLUS_ONLY_TOKEN.test(v.name)) })),
 });
 /** Top-level blocks of a stylesheet body (each ends with a `}` in column 0). */
 const CHART_DEPARTURE = /^color\.chart\.(categorical|smart)\.|^color\.chart\.(neutral|gray\.bold)$/;
-const isDeparture = (name) => CHART_DEPARTURE.test(name);
+const SURFACE_DEPARTURE = /^elevation\.surface\.(container(\.|$)|raised$)/;
+const isDeparture = (name) => CHART_DEPARTURE.test(name) || SURFACE_DEPARTURE.test(name);
 const keptRows = (rows) => rows.filter((r) => !isDeparture(r.name));
 /** A Figma spec without the departed variables (`color/chart/neutral/default` is `color.chart.neutral`). */
 const keptSpec = (spec) => ({
@@ -80,7 +84,11 @@ const refShape = (palette) => ({
 const withoutElevation2 = (rows) => rows.filter((r) => !ELEVATION_2.test(r.name));
 const withoutElevation2Lines = (css) => css.split('\n').filter((l) => !ELEVATION_2.test(l)).join('\n');
 /** A stylesheet without the departed declarations. */
-const keptCss = (css) => css.split('\n').filter((l) => !/--chart-(categorical|smart)-|--chart-(neutral|gray-bold):/.test(l)).join('\n');
+const keptCss = (css) =>
+  css
+    .split('\n')
+    .filter((l) => !/--chart-(categorical|smart)-|--chart-(neutral|gray-bold):|--ds-surface-(container(-hovered|-pressed)?|raised):/.test(l))
+    .join('\n');
 /** Rewrites the reference's Lagoon values (hex, bare hex and rgb triplets) to ours, for the plan's retuned steps. */
 function lagoonSwap(key) {
   const ours = buildPlan(key).semantics.palette.lagoon;

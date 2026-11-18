@@ -21,3 +21,42 @@
 .plus-field--disabled .plus-date-picker__icon {
     cursor: default;
 }
+
+.plus-popup.plus-date-range-popup,
+.plus-listbox.plus-date-range-popup {
+    width: var(--popup-width-md);
+    min-width: 0;
+    max-width: none;
+    padding: calc(var(--popup-pad) - var(--border-width-default));
+}
+
+.plus-date-range-popup__layout {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--popup-pad);
+}
+
+.plus-date-range-popup__presets {
+    width: var(--width-1000);
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.plus-date-range-popup__calendar {
+    width: calc(var(--calendar-day-sm) * 7 + var(--pad-x-md) * 2);
+    flex-shrink: 0;
+
+    .plus-calendar {
+        padding: 0 var(--pad-x-md);
+    }
+}
+
+.plus-date-range-popup__footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--inline-md);
+    margin-top: var(--popup-pad);
+    padding-inline: var(--pad-x-md);
+}

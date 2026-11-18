@@ -2,6 +2,8 @@
  * `Logo` — the seven mark sizes, six appearances, the small-size drawing at 24
  * and below, and the lockup with its 24 minimum.
  */
+import { readFileSync, readdirSync } from 'node:fs';
+import { join } from 'node:path';
 import { render } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import Logo, { LOGO_SIZES, LOGO_APPEARANCES, LOCKUP_MIN_SIZE } from './Logo';
@@ -73,5 +75,14 @@ describe('Logo', () => {
     it('does not pass a stray style string through to the DOM', () => {
         const { container } = render(<Logo appearance="filled" />);
         expect(container.firstChild.getAttribute('style')).toBeNull();
+    });
+
+    it('reads no --palette- primitives in any Logo stylesheet', () => {
+        const stylesheets = readdirSync(__dirname).filter((file) => file.endsWith('.scss'));
+        expect(stylesheets.length).toBeGreaterThan(0);
+        for (const file of stylesheets) {
+            const css = readFileSync(join(__dirname, file), 'utf8');
+            expect(css, `${file} must read --ds-logo-* tokens rather than --palette-* primitives`).not.toMatch(/--palette-/);
+        }
     });
 });
