@@ -533,7 +533,7 @@ export const Flag = ({ x, y, w, h, tone = 'neutral', accent = false }) => (
 );
 
 /** A small count pill. The accent is an outline, since CountTag has no brand tone. */
-export const CountTag = ({ x, y, w = 14, h = 10, accent = false }) => {
+export const CountTag = ({ x, y, w = 14, h = 8, accent = false }) => {
   const onHeroGround = useContext(HeroGround);
   return (
     <g>

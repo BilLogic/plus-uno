@@ -28,7 +28,6 @@ import './ChangeTag.scss';
 
 export const CHANGE_TAG_FORMATS = ['number', 'percent', 'points'];
 export const CHANGE_TAG_GOOD_DIRECTIONS = ['up', 'down', 'none'];
-export const CHANGE_TAG_SPACINGS = ['default', 'compact'];
 
 /** The arrow each direction draws. */
 export const CHANGE_TAG_ICONS = {
@@ -81,7 +80,6 @@ export const ChangeTag = ({
     format = 'number',
     goodDirection = 'none',
     comparison,
-    spacing = 'default',
     iconBefore,
     className = '',
     id,
@@ -108,12 +106,6 @@ export const ChangeTag = ({
         effectiveGood = 'none';
     }
 
-    let effectiveSpacing = spacing;
-    if (!CHANGE_TAG_SPACINGS.includes(spacing)) {
-        warn(`spacing="${spacing}" is not one of ${CHANGE_TAG_SPACINGS.join(', ')}; it falls back to default.`);
-        effectiveSpacing = 'default';
-    }
-
     const { direction, text, spoken } = describeChange(value, effectiveFormat);
     const tone = changeTone(direction, effectiveGood);
     const icon = iconBefore ?? (direction ? CHANGE_TAG_ICONS[direction] : null);
@@ -134,7 +126,6 @@ export const ChangeTag = ({
     const classes = [
         'plus-change-tag',
         `plus-change-tag--${tone}`,
-        `plus-change-tag--${effectiveSpacing}`,
         className,
     ].filter(Boolean).join(' ');
 
@@ -173,8 +164,6 @@ ChangeTag.propTypes = {
     goodDirection: PropTypes.oneOf(CHANGE_TAG_GOOD_DIRECTIONS),
     /** What the change is measured against, such as "vs last week", in subtle text after the tag. */
     comparison: PropTypes.node,
-    /** `default` (20) in cards and headers; `compact` (16) in table cells. */
-    spacing: PropTypes.oneOf(CHANGE_TAG_SPACINGS),
     /** Replaces the direction arrow: a Font Awesome Free name (`arrow-trend-up`). Decorative; the words carry the direction. */
     iconBefore: PropTypes.string,
     /** Extra class names added to the tag element beside the component's own. */

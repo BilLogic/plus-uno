@@ -46,7 +46,7 @@ const SIZE = { default: 20, spacious: 32 };
 /** Left and right padding when there is no count: Element xs (4) and md (12). */
 const PAD = { default: 4, spacious: 12 };
 /** The nested count's height, and its inset from the top and right edges. */
-const COUNT = { default: { height: 16, inset: 2 }, spacious: { height: 20, inset: 6 } };
+const COUNT = { default: { height: 16, top: 2, right: 2 }, spacious: { height: 16, top: 8, right: 6 } };
 
 /** [fill, text, inner border] per appearance, from the Figma set. Info is Tertiary. */
 const STATE_COLORS = {
@@ -141,8 +141,8 @@ Styles.play = async ({ canvasElement }) => {
 };
 
 /**
- * `trailingMetric` nests a Count tag of the same appearance: compact (16) in default,
- * default (20) in spacious, inset equally from the top and the right.
+ * `trailingMetric` nests a 16 Count tag of the same appearance, centered
+ * vertically and inset from the trailing edge.
  */
 export const WithCount = () => (
     <div style={grid}>
@@ -174,8 +174,8 @@ WithCount.play = async ({ canvasElement }) => {
             const box = el.getBoundingClientRect();
             const p = pill.getBoundingClientRect();
             await expect(p.height, `${name} count height`).toBe(COUNT[size].height);
-            await expect(p.top - box.top, `${name} count top inset`).toBe(COUNT[size].inset);
-            await expect(box.right - p.right, `${name} count right inset`).toBe(COUNT[size].inset);
+            await expect(p.top - box.top, `${name} count top inset`).toBe(COUNT[size].top);
+            await expect(box.right - p.right, `${name} count right inset`).toBe(COUNT[size].right);
 
             // The count takes the Status tag appearance: its subtle tinted background and (Text).
             const ground = style === 'neutral' ? '--ds-background-neutral' : STATE_COLORS[style][0];
@@ -215,11 +215,11 @@ TrailingMetricAppearance.play = async ({ canvasElement }) => {
         await expect(own.color).toBe(token('--ds-text-danger'));
     });
 
-    // It is a compact Count tag nested at the end of the tag.
+    // It is a 16 Count tag nested at the end of the tag.
     const box = canvas.getByTestId('follows').getBoundingClientRect();
     const pill = pillIn('follows').getBoundingClientRect();
     await expect(pill.height).toBe(COUNT.default.height);
-    await expect(box.right - pill.right).toBe(COUNT.default.inset);
+    await expect(box.right - pill.right).toBe(COUNT.default.right);
 };
 
 /** `iconBefore` adds one icon before the label, in the text color. */

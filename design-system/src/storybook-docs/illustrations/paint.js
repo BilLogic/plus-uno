@@ -154,7 +154,7 @@ export const HEIGHTS = {
   field: ['--height-250', 'components/forms-and-inputs/_internal/FieldBox.scss', 20],
   button: ['--control-md', 'components/forms-and-inputs/Button/Button.scss', 16],
   tab: ['--control-md', 'components/navigation/Tabs/Tabs.scss', 16],
-  count: ['--label-height-md', 'components/labels/_label-heights.scss', 10],
+  count: ['--label-height-sm', 'components/labels/_label-heights.scss', 8],
   tracker: ['--control-md', 'components/status-indicators/ProgressTracker/ProgressTracker.scss', 16],
   sidebarRow: ['--control-md', 'patterns/Sidebar/Sidebar.scss', 16],
 };

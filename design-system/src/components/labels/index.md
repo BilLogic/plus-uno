@@ -11,7 +11,7 @@ authored half, counted rather than assumed.
 - **[ChangeTag](ChangeTag/index.md)** — Use `ChangeTag` beside a number to say how it moved since the last period: in a card header, a table cell or a chart tooltip. For the number itself, use plain text.
   - For a count on its own, use `CountTag`.
   - For the condition something is in, use `StatusTag`.
-- **[CountTag](CountTag/index.md)** — Use `CountTag` for a number on its own: unread messages on a nav item, results on a tab, errors in a section header, a notification on a bell.
+- **[CountTag](CountTag/index.md)** — Use `CountTag` for a number on its own: unread messages on a nav item, results on a tab, errors in a section header, a notification on a bell. It is always `16` tall, including inside `Button`, `Tabs`, `Sidebar` rows, `StatusTag` (`trailingMetric`) and selectable `Tag` (`trailingMetric`).
   - For the condition something is in, use `StatusTag`.
   - For a change over time such as "+3 vs last week", use `ChangeTag`.
   - For a due or event date, use `DateTag`.
@@ -45,8 +45,8 @@ authored half, counted rather than assumed.
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [AiMessage](AiMessage/index.md) | 11 | ✅ | ✅ | ✅ |
-| [ChangeTag](ChangeTag/index.md) | 8 | ✅ | ✅ | ✅ |
-| [CountTag](CountTag/index.md) | 12 | ✅ | ✅ | ✅ |
+| [ChangeTag](ChangeTag/index.md) | 7 | ✅ | ✅ | ✅ |
+| [CountTag](CountTag/index.md) | 11 | ✅ | ✅ | ✅ |
 | [DateTag](DateTag/index.md) | 6 | ✅ | ✅ | ✅ |
 | [PromptStarters](PromptStarters/index.md) | 4 | ✅ | ✅ | ✅ |
 | [SmartTag](SmartTag/index.md) | 3 | ✅ | ✅ | ✅ |
