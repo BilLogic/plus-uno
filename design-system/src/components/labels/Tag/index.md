@@ -179,7 +179,7 @@ Same group: `AiMessage` · `ChangeTag` · `CountTag` · `DateTag` · `PromptStar
 
 1. **Lead, optional.** Nothing by default. A `10` swatch (`swatchBefore`), an icon (`elemBefore`), or for a person, an agent or a team a `16` avatar.
 2. **Label.** Neutral text; the hue never colors the words.
-3. **Trailing metric.** Optional on a selectable tag: a compact `CountTag`, such as a filter's result count.
+3. **Trailing metric.** Optional on a selectable tag: a `CountTag`, such as a filter's result count.
 4. **Remove button.** Optional, with its own focus ring and a name that says what it removes.
 
 ### States
@@ -221,7 +221,7 @@ Same group: `AiMessage` · `ChangeTag` · `CountTag` · `DateTag` · `PromptStar
 | `color` | enum | `'gray'` | A category color: an accent family, on the border (and on the swatch when `swatchBefore` is on). Never a status. On an avatar type the border is neutral and the color fills the avatar; gray agents fill discovery (the AI purple) and gray teams the lightest blue. |
 | `type` | oneOf | `'plain'` | What the tag names. `plain` leads with nothing unless `swatchBefore` or `elemBefore` is set; `person` (round), `agent` (hexagon) and `team` (square) lead with a 16 avatar. |
 | `avatar` | string or node | — | The avatar of a person, agent or team tag: an image source, or a node. Missing or broken, it falls back to initials. Decorative. |
-| `trailingMetric` | number or string | — | Selectable tags only: a compact neutral Count tag after the label, such as a filter's result count. Ignored with a warning elsewhere. |
+| `trailingMetric` | number or string | — | Selectable tags only: a neutral Count tag after the label, such as a filter's result count. Ignored with a warning elsewhere. |
 | `elemBefore` | node | — | The leading icon slot, empty by default: an icon in front of the text, for when the icon carries meaning. Plain tags only: an avatar type leads with its avatar. Sits after `swatchBefore` when both are set. |
 | `swatchBefore` | bool or string | — | A 10 color square in front of the text, off by default, for a tag that uses color for wayfinding such as a chart legend entry. `true` draws it in the tag's own color; a background color token (`background-accent-blue-bolder`, or `--ds-background-accent-blue-bolder`) draws a custom one. Never a raw CSS color. Plain tags only. |
 | `maxWidth` | number or string | `180` | Caps the whole tag (default 180). A clipped label ellipsizes and shows its full text as a tooltip. |

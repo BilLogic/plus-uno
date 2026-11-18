@@ -1375,6 +1375,7 @@
         "Appearances",
         "Spacing",
         "Icons",
+        "WithCount",
         "States",
         "Default",
         "Primary",
@@ -2015,18 +2016,6 @@
           "default": null,
           "values": null,
           "description": "What the change is measured against, such as \"vs last week\", in subtle text after the tag.",
-          "deprecated": null
-        },
-        {
-          "name": "spacing",
-          "type": "enum",
-          "required": false,
-          "default": "'default'",
-          "values": [
-            "default",
-            "compact"
-          ],
-          "description": "`default` (20) in cards and headers; `compact` (16) in table cells.",
           "deprecated": null
         },
         {
@@ -3188,18 +3177,6 @@
           "deprecated": null
         },
         {
-          "name": "spacing",
-          "type": "enum",
-          "required": false,
-          "default": "'default'",
-          "values": [
-            "default",
-            "compact"
-          ],
-          "description": "`default` (20) on its own; `compact` (16) is for use inside a label. A dot is always 8.",
-          "deprecated": null
-        },
-        {
           "name": "isBold",
           "type": "bool",
           "required": false,
@@ -3265,7 +3242,7 @@
       ],
       "stories": [
         "Appearances",
-        "Spacings",
+        "Size",
         "Max",
         "Zero",
         "Ring",
@@ -14168,7 +14145,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "A small count at the end of the tag, a Count tag nested inside it: compact (16) in default, default (20) in spacious. Hidden at 0.",
+          "description": "A small count at the end of the tag, a 16 Count tag nested inside it. Hidden at 0.",
           "deprecated": null
         },
         {
@@ -14714,6 +14691,7 @@
         "Alignment",
         "Appearance",
         "UnderlineRadius",
+        "WithCount",
         "WithPanels",
         "InteractionStates",
         "Interactive",
@@ -14895,7 +14873,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Selectable tags only: a compact neutral Count tag after the label, such as a filter's result count. Ignored with a warning elsewhere.",
+          "description": "Selectable tags only: a neutral Count tag after the label, such as a filter's result count. Ignored with a warning elsewhere.",
           "deprecated": null
         },
         {
