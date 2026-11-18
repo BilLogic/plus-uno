@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Button } from '@/components';
 import BarChart from '@/dataviz/comparison/BarChart/BarChart';
@@ -44,11 +44,22 @@ export const BarRadius = () => (
 );
 
 /** The tooltip's surface, shadow, radius and padding — the Popup pattern's tokens on a live chart tooltip. */
-export const TooltipSurface = {
-    render: () => (
+function TooltipSurfaceSpecimen() {
+    const slotRef = useRef(null);
+    useEffect(() => {
+        const slot = slotRef.current;
+        if (!slot) return undefined;
+        const chart = findChart(slot);
+        if (chart?.series?.[0]?.points?.[3]) {
+            chart.tooltip.refresh(chart.series[0].points[3]);
+        }
+        return undefined;
+    }, []);
+
+    return (
         <div style={stackStyle}>
-            <span style={labelStyle}>Hover a bar to open the tooltip styled with Popup surface, shadow, radius and padding tokens.</span>
-            <div data-specimen="tooltip-chart" style={{ ...cardStyle, maxWidth: 'var(--card-min-width-lg)' }}>
+            <span style={labelStyle}>Tooltip styled with Popup surface, shadow, radius and padding tokens (open at rest; hover any bar to move it).</span>
+            <div ref={slotRef} data-specimen="tooltip-chart" style={{ ...cardStyle, maxWidth: 'var(--card-min-width-lg)' }}>
                 <BarChart
                     sort={false}
                     height={220}
@@ -58,13 +69,14 @@ export const TooltipSurface = {
                 />
             </div>
         </div>
-    ),
+    );
+}
+
+export const TooltipSurface = {
+    render: () => <TooltipSurfaceSpecimen />,
     play: async ({ canvasElement }) => {
         const slot = canvasElement.querySelector('[data-specimen="tooltip-chart"]');
         await waitFor(() => expect(slot.querySelector('.highcharts-container')).not.toBeNull());
-        const chart = findChart(slot);
-        expect(chart).toBeDefined();
-        chart.tooltip.refresh(chart.series[0].points[3]);
         const doc = canvasElement.ownerDocument;
         await waitFor(() => expect(doc.querySelector('.highcharts-tooltip-container .plus-chart-value')).not.toBeNull());
         const tooltip = doc.querySelector('.highcharts-tooltip-container');
@@ -202,7 +214,14 @@ const TYPE_OPTIONS = {
 export const TypeAndNumbers = {
     render: () => (
         <div data-specimen="type-chart" style={cardStyle}>
-            <PlusChart options={TYPE_OPTIONS} />
+            <PlusChart
+                options={TYPE_OPTIONS}
+                callback={(chart) => {
+                    if (chart?.series?.[0]?.points?.[3]) {
+                        chart.tooltip.refresh(chart.series[0].points[3]);
+                    }
+                }}
+            />
         </div>
     ),
     play: async ({ canvasElement }) => {
@@ -210,10 +229,6 @@ export const TypeAndNumbers = {
         await waitFor(() => {
             expect(slot.querySelector('.highcharts-container')).not.toBeNull();
         });
-
-        const chart = findChart(slot);
-        expect(chart).toBeDefined();
-        chart.tooltip.refresh(chart.series[0].points[3]);
 
         const doc = canvasElement.ownerDocument;
         await waitFor(() => {
@@ -227,12 +242,14 @@ export const TypeAndNumbers = {
         const axisLabel = container.querySelector('.highcharts-axis-labels text');
         const dataLabelValue = container.querySelector('.highcharts-data-label .plus-chart-value');
         const legendItem = container.querySelector('.highcharts-legend-item text');
+        const tooltipEl = doc.querySelector('.highcharts-tooltip-container .highcharts-tooltip');
         const tooltipValue = doc.querySelector('.highcharts-tooltip-container .plus-chart-value');
 
         expect(getComputedStyle(title).fontFamily).toContain('Noto Sans');
         expect(getComputedStyle(title).fontWeight).toBe('600');
         expect(getComputedStyle(subtitle).fontWeight).toBe('500');
         expect(getComputedStyle(caption).fontWeight).toBe('500');
+        expect(getComputedStyle(tooltipEl).color).toBe(resolveColor('--ds-text', canvasElement));
 
         for (const numEl of [axisLabel, dataLabelValue, legendItem, tooltipValue]) {
             expect(numEl).not.toBeNull();
