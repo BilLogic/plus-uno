@@ -3,6 +3,7 @@ import { expect, userEvent } from 'storybook/test';
 import { Button, StatusTag } from '@/components';
 import { PatternCard } from '@/patterns';
 import { RefTable, C, Do, Dont, DoDont, ModeCompare, RingDemo } from '@/storybook-docs/foundation-blocks.jsx';
+import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 
 export default {
     title: 'Foundations/Accessibility',
@@ -64,11 +65,14 @@ export const FocusRing = {
             </Dont>
         </DoDont>
     ),
-    play: async ({ canvas }) => {
+    play: async ({ canvas, canvasElement }) => {
         const buttons = canvas.getAllByRole('button', { name: 'Save changes' });
         await expect(buttons).toHaveLength(2);
         buttons[0].focus();
         await expect(buttons[0]).toHaveFocus();
+        await expect(getComputedStyle(buttons[0].parentElement).outlineColor).toBe(
+            tokenColor(canvasElement, '--ds-border-focused'),
+        );
     },
 };
 
