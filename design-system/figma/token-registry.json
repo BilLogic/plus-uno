@@ -1170,7 +1170,6 @@
       "Calendar/day-lg": "var(--calendar-day-lg)",
       "Calendar/day-md": "var(--calendar-day-md)",
       "Calendar/day-sm": "var(--calendar-day-sm)",
-      "Calendar/nav-size": "var(--calendar-nav-size)",
       "Carousel/control-offset": "var(--carousel-control-offset)",
       "Carousel/control-pad": "var(--carousel-control-pad)",
       "Carousel/control-size": "var(--carousel-control-size)",
@@ -1892,11 +1891,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1181,
+    "scssTokenCount": 1180,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1793,
-      "resolved": 1756,
+      "total": 1792,
+      "resolved": 1755,
       "percent": 98,
       "skippedCollections": [
         {

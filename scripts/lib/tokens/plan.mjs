@@ -314,10 +314,9 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Button', new: '--button-radius-spacious', old: null, ref: 'var(--radius-control-lg)', note: '48-high footer button; pairs with --control-xl', use: 'Corner rounding of a Button with spacious spacing.' },
 
   // ─── Components / Calendar ────────────────────────────────────────────
-  { tier: 'components', group: 'Calendar', new: '--calendar-day-sm', old: '--layout-calendar-day-sm', ref: '28px', use: 'Size of a day cell in a compact Calendar.' },
-  { tier: 'components', group: 'Calendar', new: '--calendar-day-md', old: '--layout-calendar-day-md', ref: '36px', use: 'Size of a day cell in a default Calendar.' },
-  { tier: 'components', group: 'Calendar', new: '--calendar-day-lg', old: '--layout-calendar-day-lg', ref: '44px', use: 'Size of a day cell in a large Calendar.' },
-  { tier: 'components', group: 'Calendar', new: '--calendar-nav-size', old: '--layout-calendar-nav', ref: '32px', use: 'Size of the Calendar\'s previous and next month buttons.' },
+  { tier: 'components', group: 'Calendar', new: '--calendar-day-sm', old: '--layout-calendar-day-sm', ref: 'var(--control-sm)', use: 'Size of a day cell in a compact Calendar.' },
+  { tier: 'components', group: 'Calendar', new: '--calendar-day-md', old: '--layout-calendar-day-md', ref: 'var(--control-md)', use: 'Size of a day cell in a default Calendar.' },
+  { tier: 'components', group: 'Calendar', new: '--calendar-day-lg', old: '--layout-calendar-day-lg', ref: 'var(--control-lg)', use: 'Size of a day cell in a large Calendar.' },
 
   // ─── Components / Progress indicator ──────────────────────────────────
   { tier: 'components', group: 'Progress indicator', new: '--progress-indicator-dot-size-8', old: null, ref: 'var(--space-050)', note: 'ProgressIndicator size 8', use: 'Dot size of a ProgressIndicator with size 8.' },
@@ -487,6 +486,7 @@ export const RETIRED_RENAMES = {
   '--card-pad-sm': '--card-pad-compact',
   '--card-pad-md': '--card-pad-default',
   '--card-pad-lg': '--card-pad-spacious',
+  '--layout-calendar-nav': '--control-sm',
 };
 
 /** Retired name -> its replacement: the explicit table above, then each ladder row's `old` (first row wins). */

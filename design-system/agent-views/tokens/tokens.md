@@ -125,7 +125,6 @@ Tokens one component owns, named for it.
 --calendar-day-lg  /* Size of a day cell in a large Calendar. */
 --calendar-day-md  /* Size of a day cell in a default Calendar. */
 --calendar-day-sm  /* Size of a day cell in a compact Calendar. */
---calendar-nav-size  /* Size of the Calendar's previous and next month buttons. */
 --carousel-control-offset  /* Distance between a Carousel's previous and next controls and its edge. */
 --carousel-control-pad  /* Padding inside a Carousel's previous and next controls. */
 --carousel-control-size  /* Size of a Carousel's previous and next controls. */

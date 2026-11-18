@@ -14,7 +14,7 @@ Also asked as: calendar input, date field, date input, date selector.
 
 **Source:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.stories.jsx` — Overview, Spacing, InteractionStates, PickDate, PickRange, Bounds, Interactive, CalendarColors, Default, WithValue, Compact, Invalid, ReadOnly, Disabled, HoveredState, KeyboardFocus, CalendarOpensFourPixelsBelow, CalendarFlipsAboveNearTheBottom, RangePicksASpan, BoundedDatesBehavior, TypedEntry, DaysAnnounceTheirDate, ClearControl, MonthTurnKeepsPopupHeight
+**Stories:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.stories.jsx` — Overview, Spacing, InteractionStates, PickDate, PickRange, Bounds, Interactive, CalendarColors, Default, WithValue, Compact, Invalid, ReadOnly, Disabled, HoveredState, KeyboardFocus, CalendarOpensFourPixelsBelow, CalendarFlipsAboveNearTheBottom, RangePicksASpan, BoundedDatesBehavior, TypedEntry, DaysAnnounceTheirDate, ClearControl, MonthTurnKeepsPopupHeight, RangePopup, RangePopupPresetKeyboard, RangePopupClearCommits, RangePopupPresetBounds, RangePopupReadOnly
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.mdx`
 
@@ -111,8 +111,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 1. **Field.** A 40 box (32 at compact) on the input fill, with the date as text.
 2. **Clear button.** A subtle `IconButton` (`xmark` at `--icon-sm`) before the calendar icon when a date, range or typed text is in a live field (not read-only or disabled).
 3. **Calendar icon.** Opens the calendar. Decoration for assistive technology; the input is the control.
-4. **Calendar.** A month grid in a popup `--stack-sm` below the field, flipped above when there is no room. A picked day is the selected fill; days between a range's ends are the neutral selection.
-5. **Footer Clear.** A compact subtle `Button` labeled "Clear" at the end of the popup footer while a value or typed text is in the field.
+4. **Calendar.** A month grid of 24px day cells (`--calendar-day-sm`) in a popup `--stack-sm` below the field, flipped above when there is no room. A picked day or range end is a filled square; days between form a continuous band that rounds where a week starts or ends.
+5. **Presets and footer.** With `presets`, a 160px (`--width-1000`) column of 32px radio rows (`All time`, `Today`, `Last 7 days`, `Last 30 days`) sits beside the calendar with arrow-key navigation and `Enter`/`Space` selection, and presets outside `minDate`–`maxDate` are disabled. Compact `Clear` and `Apply` buttons sit below: `Clear` commits `[null, null]` immediately while `Apply` stays disabled until an in-bounds complete range (or `All time` over a non-empty filter) is ready. Otherwise, a compact subtle "Clear" `Button` sits at the end of the popup footer while a value or typed text is in the field.
 
 ### States
 
@@ -122,7 +122,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Hovered | The border takes `--ds-border-focused`. |
 | Focused | A 2px ring in `--ds-border-focused`, 2px off the box. |
 | Invalid | The border takes `--ds-border-danger` and the input sets `aria-invalid`. |
-| Read-only | The box takes `--ds-background-neutral`, at full contrast with no hover. The clear button and calendar icon are not drawn and a press opens no calendar. The date can be read, selected and copied. |
+| Read-only | The box takes `--ds-background-neutral`, at full contrast with no hover. The clear button and calendar icon are not drawn and a press opens no calendar (nor does a read-only filter trigger). The date can be read, selected and copied. |
 | Disabled | The box fades to `--ds-opacity-disabled`, hides the clear button, and leaves the tab order. |
 
 ### Tokens
@@ -154,7 +154,14 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `name` | string | — | Form key of the input. |
 | `placeholder` | string | — | Placeholder text |
 | `value` | string or arrayOf | — | ISO `YYYY-MM-DD`; with `range`, `[start, end]`, either end may be `null`. |
+| `defaultValue` | string or arrayOf | — | Initial value when uncontrolled. |
 | `range` | bool | `false` | Pick a first and a last day |
+| `presets` | bool or arrayOf or shape or string or func | `false` | Show preset ranges beside the calendar with Clear and Apply actions |
+| `label` | string | — | Filter trigger label for the preset range popup |
+| `trigger` | node or func | — | Custom trigger element or `({ isOpen, value, summary }) => node` for the filter popup. |
+| `placement` | enum | `'bottom-start'` | Popup placement relative to a filter trigger. |
+| `today` | string or instanceOf | — | Reference date used for relative presets and `lookBack`; defaults to today. |
+| `lookBack` | bool | — | Disable days after `today`. Defaults to true when `presets` or a filter `label` is set. |
 | `spacing` | enum | `'default'` | Field height: 40 default, 32 compact |
 | `isDisabled` | bool | `false` | Disable the picker |
 | `isReadOnly` | bool | `false` | Make read-only |
@@ -163,6 +170,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `minDate` | string or instanceOf | — | Optional minimum allowed date |
 | `maxDate` | string or instanceOf | — | Optional maximum allowed date |
 | `calendarAlign` | enum | `'left'` | Calendar dropdown alignment |
+| `container` | object | — | Where a filter popup portals to; defaults to the page overlay layer. |
 | `onChange` | func | — | `(iso)`, or `([start, end])` with `range`; `\'\'` or nulls when cleared. |
 | `onFocus` | func | — | Called with the focus event when the input gains focus. |
 | `onBlur` | func | — | Called with the blur event when the input loses focus, after any typed text has been checked. |
@@ -170,6 +178,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `style` | object | — | Inline style on the field frame. |
 
 ## Variants
+
+**`placement`** — `bottom-start` · `bottom-end`
 
 **`spacing`** — `default` · `compact`
 
@@ -179,7 +189,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-icon-subtle`
+`--border-width-default` · `--calendar-day-sm` · `--ds-icon-subtle` · `--inline-md` · `--pad-x-md` · `--popup-pad` · `--popup-width-md` · `--width-1000`
 
 From `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.scss`. Override these through the token layer, never with a literal.
 
