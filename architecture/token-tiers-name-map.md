@@ -87,7 +87,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 |---|---|---|
 | Frame | `--frame-topbar-height` |  |
 | Frame | `--frame-sidebar-width` |  |
-| Frame | `--frame-sidebar-width-nav` | fixed SideNav width (164), distinct from the responsive sidebar above |
 | Frame | `--frame-sidebar-pad` | the Sidebar pads 12 on every side |
 | Frame | `--frame-sidebar-row-gap` | two Sidebar rows sit 2 apart |
 | Frame | `--frame-sidebar-group-gap` | two Sidebar groups sit 16 apart |

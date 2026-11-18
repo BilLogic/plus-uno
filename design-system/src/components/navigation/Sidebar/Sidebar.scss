@@ -7,7 +7,7 @@
  * a Frame, semantic or size token; every color is a `--ds-*` role.
  */
 
-@use '../../styles/state' as *;
+@use '../../../styles/state' as *;
 
 // The ring sits inside the row's edge, so the scrolling nav never clips it.
 @mixin sidebar-ring-inside {

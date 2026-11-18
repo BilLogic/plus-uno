@@ -315,13 +315,6 @@
           }
         },
         {
-          "name": "Frame/sidebar-width-nav",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--frame-sidebar-width-nav)"
-          }
-        },
-        {
           "name": "Frame/sidebar-pad",
           "resolvedType": "FLOAT",
           "codeSyntax": {

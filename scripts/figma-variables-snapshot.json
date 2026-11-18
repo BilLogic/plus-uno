@@ -3,10 +3,10 @@
   "figmaFileKey": "zAecJNRdvJzAUOcjV32tRX",
   "figmaFileName": "Design System - BS4 Foundation (Component LIbrary)",
   "capturedAt": "2026-11-16",
-  "totalVariables": 1644,
+  "totalVariables": 1643,
   "byType": {
     "COLOR": 984,
-    "FLOAT": 645,
+    "FLOAT": 644,
     "BOOLEAN": 10,
     "STRING": 5
   },
@@ -894,7 +894,6 @@
         "Frame/sidebar-row-gap",
         "Frame/sidebar-row-radius",
         "Frame/sidebar-width",
-        "Frame/sidebar-width-nav",
         "Frame/topbar-height",
         "Modal/body-min-height",
         "Modal/inline-lg",
@@ -984,7 +983,6 @@
         "Frame/sidebar-row-gap": "var(--frame-sidebar-row-gap)",
         "Frame/sidebar-row-radius": "var(--frame-sidebar-row-radius)",
         "Frame/sidebar-width": "var(--frame-sidebar-width)",
-        "Frame/sidebar-width-nav": "var(--frame-sidebar-width-nav)",
         "Frame/topbar-height": "var(--frame-topbar-height)",
         "Modal/body-min-height": "var(--modal-body-min-height)",
         "Modal/inline-lg": "var(--modal-inline-lg)",

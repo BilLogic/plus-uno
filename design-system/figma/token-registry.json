@@ -299,7 +299,6 @@
       "Frame/sidebar-row-gap": "var(--frame-sidebar-row-gap)",
       "Frame/sidebar-row-radius": "var(--frame-sidebar-row-radius)",
       "Frame/sidebar-width": "var(--frame-sidebar-width)",
-      "Frame/sidebar-width-nav": "var(--frame-sidebar-width-nav)",
       "Frame/topbar-height": "var(--frame-topbar-height)",
       "Modal/body-min-height": "var(--modal-body-min-height)",
       "Modal/inline-lg": "var(--modal-inline-lg)",
@@ -1875,11 +1874,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1158,
+    "scssTokenCount": 1157,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1776,
-      "resolved": 1739,
+      "total": 1775,
+      "resolved": 1738,
       "percent": 98,
       "skippedCollections": [
         {

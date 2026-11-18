@@ -18,7 +18,7 @@ test('a row marked retired joins the language ban; an invented name does not', (
   const table = {
     components: [
       { not: 'Toast', use: ['Flag'], retired: true, inProse: true },
-      { not: 'Navbar', use: ['PatternSidebar'], retired: true },
+      { not: 'Navbar', use: ['Sidebar'], retired: true },
       { not: 'Dialog', use: ['Modal'] },
     ],
     props: [],
