@@ -409,7 +409,7 @@ export const LoadingTable = () => {
                 <h3 id="skeleton-students" className="heading-sm">Students</h3>
                 <div style={{ display: 'grid', gap: 'var(--stack-lg)' }}>
                     {[['Rosa Chen', 140], ['Kai Brooks', 110], ['Amara Okafor', 160]].map(([name, width]) => (
-                        <div key={name} style={{ display: 'flex', gap: 'var(--page-stack-lg)', alignItems: 'center' }}>
+                        <div key={name} style={{ display: 'flex', gap: '48px' /* token gap: 48px */, alignItems: 'center' }}>
                             {loaded ? (
                                 <>
                                     <span className="body-default" style={{ width }}>{name}</span>
@@ -473,8 +473,8 @@ export const LoadingCard = () => {
                 role="group"
                 style={{
                     display: 'grid',
-                    gap: 'var(--stack-md)',
-                    width: 'var(--card-min-width-md)',
+                    gap: '10px' /* token gap: 10px */,
+                    width: '294px' /* token gap: 294px */,
                     padding: 'var(--card-pad-compact)',
                     border: 'var(--border-width-default) solid var(--ds-border)',
                     borderRadius: 'var(--card-radius-compact)',

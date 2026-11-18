@@ -206,7 +206,7 @@ Interactive.args = {
  * carries a message on the left and a count on the right.
  */
 export const Anatomy = () => (
-    <div style={{ maxWidth: 'var(--width-2500)' }}>
+    <div style={{ maxWidth: '360px' /* token gap: 360px */ }}>
         <TextField
             id="text-field-anatomy"
             label="Full name"
@@ -249,7 +249,7 @@ Anatomy.play = async ({ canvasElement }) => {
 export const ErrorAndCount = () => {
     const [value, setValue] = useState('A summary that runs long');
     return (
-        <div style={{ maxWidth: 'var(--width-2500)' }}>
+        <div style={{ maxWidth: '360px' /* token gap: 360px */ }}>
             <TextField
                 id="text-field-count"
                 label="Headline"
@@ -281,7 +281,7 @@ ErrorAndCount.play = async ({ canvasElement }) => {
 
 /** A warning accepts the value: the field is not invalid, and it is described, not announced. */
 export const Warning = () => (
-    <div style={{ maxWidth: 'var(--width-2500)' }}>
+    <div style={{ maxWidth: '360px' /* token gap: 360px */ }}>
         <TextField
             id="text-field-warning"
             label="Meeting link"
@@ -306,7 +306,7 @@ Warning.play = async ({ canvasElement }) => {
 
 /** `autoComplete` reaches the input, for the browser and password managers. */
 export const Autofill = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: 'var(--width-2500)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: '360px' /* token gap: 360px */ }}>
         <TextField id="text-field-autofill-email" label="Email address" type="email" autoComplete="email" />
         <TextField id="text-field-autofill-password" label="Password" type="password" autoComplete="current-password" />
         <TextField id="text-field-autofill-code" label="Access code" autoComplete="one-time-code" />
@@ -322,7 +322,7 @@ Autofill.play = async ({ canvasElement }) => {
 
 /** Search: the magnifier before the control and a visually hidden label. */
 export const Search = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: 'var(--width-2500)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: '360px' /* token gap: 360px */ }}>
         <TextField id="text-field-search-compact" label="Search tutors" isLabelHidden type="search" spacing="compact" placeholder="Search tutors" elemBeforeInput={icon('magnifying-glass')} />
         <TextField id="text-field-search" label="Search tutors" isLabelHidden type="search" placeholder="Search tutors" elemBeforeInput={icon('magnifying-glass')} />
     </div>
@@ -336,7 +336,7 @@ Search.play = async ({ canvasElement }) => {
 
 /** Buttons in the slots: 32 in the 40 field, 24 in the 32 field, centered, 4 from the edge. */
 export const ButtonsInside = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: 'var(--width-2500)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: '360px' /* token gap: 360px */ }}>
         <div data-field="default">
             <TextField
                 label="Invite by email"
@@ -380,7 +380,7 @@ const slowSave = (value) => new Promise((resolve, reject) => {
 export const Subtle = (args) => {
     const [saved, setSaved] = useState('8th grade');
     return (
-        <div style={{ maxWidth: 'var(--width-2500)' }}>
+        <div style={{ maxWidth: '360px' /* token gap: 360px */ }}>
             <TextField
                 id="text-field-subtle"
                 label="Grade level"

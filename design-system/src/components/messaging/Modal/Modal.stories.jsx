@@ -70,7 +70,7 @@ export default {
 const col = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', alignItems: 'flex-start' };
 const contentVariantGrid = {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(var(--width-2000), 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))' /* token gap: 360px */,
     gap: 'var(--section-stack-lg)',
     width: '100%',
 };
@@ -80,15 +80,15 @@ const longBody = `${'Long body copy. '.repeat(24)}A Hug modal scrolls its own bo
 const modalDocsHostStyle = {
     position: 'relative',
     width: '100%',
-    maxWidth: 'var(--content-max-width-reading)',
+    maxWidth: '800px' /* token gap: 800px */,
     borderRadius: 'var(--radius-xl)',
     border: 'var(--border-width-default) solid var(--ds-border)',
     background: 'var(--ds-surface-sunken)',
     overflow: 'hidden',
-    padding: 'var(--modal-pad)',
+    padding: 'var(--section-pad-y-compact) var(--section-pad-x-compact)',
 };
 
-function InlineModalCanvas({ minHeight = 'var(--height-2000)', modal }) {
+function InlineModalCanvas({ minHeight = 'var(--width-2500)', modal }) {
     return (
         <div style={{ ...modalDocsHostStyle, minHeight }}>
             {modal}
@@ -141,7 +141,7 @@ function ModalContentDemos() {
             <ContentVariantCanvas
                 title="Long + Buttons"
                 description="Use for longer content that still needs explicit footer actions."
-                minHeight="var(--height-2000)"
+                minHeight={'340px' /* token gap: 340px */}
                 modal={
                     <Modal
                         show
@@ -181,7 +181,7 @@ function ModalContentDemos() {
             <ContentVariantCanvas
                 title="Long + No Buttons"
                 description="Use for long read-only content without footer actions."
-                minHeight="var(--height-2000)"
+                minHeight={'360px' /* token gap: 360px */}
                 modal={
                     <Modal
                         show
@@ -201,7 +201,7 @@ function ModalLayoutDemos() {
     return (
         <>
             <InlineModalCanvas
-                minHeight="var(--height-2000)"
+                minHeight={'360px' /* token gap: 360px */}
                 modal={
                     <Modal
                         show
@@ -215,7 +215,7 @@ function ModalLayoutDemos() {
             />
 
             <InlineModalCanvas
-                minHeight="var(--height-2000)"
+                minHeight="var(--width-2500)"
                 modal={
                     <Modal
                         show
@@ -243,7 +243,7 @@ function ModalLayoutDemos() {
 
 /** One grid width, drawn at the 1024 screen. */
 const widthStory = (size) => () => (
-    <div style={{ '--plus-overlay-screen': 'var(--screen-width)', width: '100%' }}>
+    <div style={{ '--plus-overlay-screen': '1024px' /* token gap: 1024px */, width: '100%' }}>
         <Modal
             show
             renderAs="inline"
@@ -272,7 +272,7 @@ const heightStory = (height, title, body) => () => (
         style={{
             ...modalDocsHostStyle,
             '--blanket-max-height-modal': 'var(--height-2000)',
-            minHeight: 'calc(var(--height-2000) + 2 * var(--modal-pad))',
+            minHeight: 'calc(var(--height-2000) + 2 * var(--section-pad-y-compact))',
         }}
     >
         <Modal show renderAs="inline" height={height} title={title} body={body} primaryButton={{ text: 'Done' }} onClose={() => {}} />
@@ -315,7 +315,7 @@ export const Content = () => (
 export const Layout = () => <div style={col}><ModalLayoutDemos /></div>;
 
 const modalDocsShellStyle = {
-    minHeight: 'var(--height-2000)',
+    minHeight: 'var(--width-2500)',
     width: '100%',
 };
 
@@ -581,7 +581,7 @@ HeaderOptions.play = async ({ canvasElement }) => {
 /** Footer actions (r5): 4-track placement inside Modal padding, spacious (48) fit buttons, no Cancel. */
 export const FooterLayouts = {
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', '--plus-overlay-screen': 'var(--screen-width)', width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', '--plus-overlay-screen': '1024px' /* token gap: 1024px */, width: '100%' }}>
             <Modal
                 show
                 renderAs="inline"

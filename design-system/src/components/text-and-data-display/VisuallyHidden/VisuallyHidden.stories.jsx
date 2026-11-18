@@ -107,7 +107,7 @@ NamesAControl.play = async ({ canvasElement }) => {
 /* ----------------------------------------------------------------- header cell */
 
 export const HiddenColumnHeaders = () => (
-    <table className="table" style={{ maxWidth: 'var(--width-2500)' }}>
+    <table className="table" style={{ maxWidth: '420px' /* token gap: 420px */ }}>
         <thead>
             <tr>
                 <th scope="col"><VisuallyHidden>Select</VisuallyHidden></th>

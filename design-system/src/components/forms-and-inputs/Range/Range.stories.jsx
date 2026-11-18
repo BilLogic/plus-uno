@@ -58,7 +58,7 @@ export const Overview = () => {
     const [value, setValue] = useState(50);
 
     return (
-        <div style={{ maxWidth: 'var(--field-width-xl)' }}>
+        <div style={{ maxWidth: 'var(--panel-max-width)' }}>
             <Range
                 id="range-overview"
                 label="Volume"
@@ -77,7 +77,7 @@ Overview.parameters = {
 
 /** The label sits directly above the slider, aligned left. A hidden label still names it. */
 export const Labels = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', maxWidth: 'var(--field-width-xl)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', maxWidth: 'var(--panel-max-width)' }}>
         <Range id="range-visible" label="Zoom" defaultValue={30}/>
         <Range id="range-hidden" label="Brightness" showLabel={false} defaultValue={70}/>
     </div>
@@ -85,7 +85,7 @@ export const Labels = () => (
 
 /** The thumb at the start, the middle and the end of the span. */
 export const Positions = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', maxWidth: 'var(--field-width-xl)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', maxWidth: 'var(--panel-max-width)' }}>
         <Range id="range-start" label="At the start" defaultValue={0}/>
         <Range id="range-middle" label="In the middle" defaultValue={50}/>
         <Range id="range-end" label="At the end" defaultValue={100}/>
@@ -94,7 +94,7 @@ export const Positions = () => (
 
 /** Disabled takes the disabled fill on the track and the thumb. */
 export const Disabled = () => (
-    <div style={{ maxWidth: 'var(--field-width-xl)' }}>
+    <div style={{ maxWidth: 'var(--panel-max-width)' }}>
         <Range id="range-disabled" label="Zoom" defaultValue={40} isDisabled/>
     </div>
 );
@@ -111,7 +111,7 @@ export const Interactive = (args) => {
     }, [args.value]);
 
     return (
-        <div style={{ maxWidth: 'var(--field-width-xl)' }}>
+        <div style={{ maxWidth: 'var(--panel-max-width)' }}>
             <Range
                 id="range-interactive"
                 label="Range value"
@@ -135,7 +135,7 @@ Interactive.args = {
 
 /** `size` scales the dot and the bar in px; the track between them follows a step behind. */
 export const Size = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', maxWidth: 'var(--field-width-xl)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', maxWidth: 'var(--panel-max-width)' }}>
         <Range id="range-size-8" label="8" defaultValue={50} size={8}/>
         <Range id="range-size-12" label="12" defaultValue={50} size={12}/>
         <Range id="range-size-16" label="16" defaultValue={50} size={16}/>
@@ -155,7 +155,7 @@ export const ReportsNumber = () => {
     const [seen, setSeen] = useState('none');
 
     return (
-        <div style={{ maxWidth: 'var(--field-width-xl)' }}>
+        <div style={{ maxWidth: 'var(--panel-max-width)' }}>
             <Range
                 id="range-number"
                 label="Reported"
@@ -177,7 +177,7 @@ ReportsNumber.play = async ({ canvasElement }) => {
 
 /** The thumb reports its span and its value through ARIA, independent of what is on screen. */
 export const Aria = () => (
-    <div style={{ maxWidth: 'var(--field-width-xl)' }}>
+    <div style={{ maxWidth: 'var(--panel-max-width)' }}>
         <Range id="range-aria" label="Volume" min={10} max={90} defaultValue={40} />
     </div>
 );
@@ -196,7 +196,7 @@ Aria.play = async ({ canvasElement }) => {
 export const Keyboard = () => {
     const [value, setValue] = useState(50);
     return (
-        <div style={{ maxWidth: 'var(--field-width-xl)' }}>
+        <div style={{ maxWidth: 'var(--panel-max-width)' }}>
             <Range id="range-keyboard" label="Keyboard" value={value} onChange={setValue} />
         </div>
     );
@@ -221,7 +221,7 @@ Keyboard.play = async ({ canvasElement }) => {
 };
 
 /** One story per state, for the Examples tab. */
-const frame = { maxWidth: 'var(--field-width-xl)' };
+const frame = { maxWidth: 'var(--panel-max-width)' };
 const thumbOf = (canvasElement) => canvasElement.querySelector('.plus-form-range-thumb');
 
 export const Rest = {

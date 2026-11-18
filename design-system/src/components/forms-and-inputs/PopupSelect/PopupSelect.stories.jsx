@@ -19,7 +19,7 @@ const SITES = [
     'North High', 'South High', 'Oakwood', 'Eastside',
 ];
 
-const pad = { padding: 'var(--popup-clip-reach)', minHeight: 'var(--width-3000)' };
+const pad = { padding: 'var(--popup-clip-reach)', minHeight: '448px' /* token gap: 448px */ };
 const bar = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--inline-md)' };
 
 /** The open menu, found in the document it portals to. */
@@ -198,7 +198,7 @@ export const Searchable = {
         const Demo = () => {
             const [site, setSite] = useState(null);
             return (
-                <div style={{ ...pad, minHeight: 'var(--content-min-width)' }}>
+                <div style={{ ...pad, minHeight: '768px' /* token gap: 768px */ }}>
                     <PopupSelect
                         label="Site"
                         options={SITES}

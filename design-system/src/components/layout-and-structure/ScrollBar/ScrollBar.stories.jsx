@@ -46,7 +46,7 @@ export default {
 const demoBox = {
     border: 'var(--border-width-default) solid var(--ds-border)',
     borderRadius: 'var(--radius-lg)',
-    padding: 'var(--pad-x-lg)'
+    padding: 'var(--section-pad-y-compact) var(--section-pad-x-compact)'
 };
 
 function TallContent({ count = 12 }) {
@@ -81,9 +81,9 @@ function WideContent({ count = 12 }) {
 }
 
 export const Overview = () => (
-    <div style={{ width: '100%', maxWidth: 'var(--panel-max-width)' }}>
+    <div style={{ width: '100%', maxWidth: '600px' /* token gap: 600px */ }}>
         <div style={demoBox}>
-            <ScrollBar maxHeight="var(--width-1400)">
+            <ScrollBar maxHeight={'200px' /* token gap: 200px */}>
                 <TallContent />
             </ScrollBar>
         </div>
@@ -91,7 +91,7 @@ export const Overview = () => (
 );
 
 export const Layout = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--page-stack-lg)', width: '100%', maxWidth: 'var(--panel-max-width)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' /* token gap: 48px */, width: '100%', maxWidth: '600px' /* token gap: 600px */ }}>
         <section>
             <DemoLabel>VERTICAL (DEFAULT)</DemoLabel>
             <p className="body-sm" style={{ marginBottom: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
@@ -118,14 +118,14 @@ export const Layout = () => (
 );
 
 export const Content = () => (
-    <div style={{ width: '100%', maxWidth: 'var(--panel-max-width)' }}>
+    <div style={{ width: '100%', maxWidth: '600px' /* token gap: 600px */ }}>
         <DemoLabel>USE CASE EXAMPLE</DemoLabel>
         <p className="body-sm" style={{ marginBottom: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
             A list panel with the Design System scrollbar instead of the browser default.
         </p>
         <div style={{ ...demoBox, padding: 0 }}>
-            <ScrollBar maxHeight="var(--width-1400)">
-                <div style={{ padding: 'var(--pad-x-lg)' }}>
+            <ScrollBar maxHeight={'220px' /* token gap: 220px */}>
+                <div style={{ padding: 'var(--section-pad-y-compact) var(--section-pad-x-compact)' }}>
                     <TallContent count={16} />
                 </div>
             </ScrollBar>
@@ -139,11 +139,11 @@ export const Content = () => (
  */
 export const Interactive = {
     args: {
-        maxHeight: 'var(--width-1400)',
+        maxHeight: '200px' /* token gap: 200px */,
         horizontal: false
     },
     render: (args) => (
-        <div style={{ width: '100%', maxWidth: 'var(--panel-max-width)' }}>
+        <div style={{ width: '100%', maxWidth: '600px' /* token gap: 600px */ }}>
             <div style={demoBox}>
                 <ScrollBar {...args}>
                     {args.horizontal ? <WideContent /> : <TallContent />}

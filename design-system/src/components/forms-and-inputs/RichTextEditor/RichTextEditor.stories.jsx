@@ -117,7 +117,7 @@ Interactive.args = {
 
 /** The compact toolbar's block-style menu: open, select, keyboard. */
 export const BlockStyleMenu = () => (
-    <div style={{ width: '100%', paddingBottom: 'var(--dropdown-menu-max-height)' }}>
+    <div style={{ width: '100%', paddingBottom: '200px' /* token gap: 200px */ }}>
         <RichTextEditor label="Session notes" defaultValue="<p>Hello</p>" minHeight={150} />
     </div>
 );

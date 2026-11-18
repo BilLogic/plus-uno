@@ -236,9 +236,9 @@ export const Widths = {
         <div style={{ display: 'grid', gap: 'var(--section-stack-lg)' }}>
             {[
                 [480, 'var(--width-3000)'],
-                [768, 'var(--content-min-width)'],
-                [1024, 'var(--content-max-width-reading)'],
-                [1920, 'var(--content-max-width)'],
+                [768, '768px' /* token gap: 768px */],
+                [1024, '1024px' /* token gap: 1024px */],
+                [1920, '1920px' /* token gap: 1920px */],
             ].map(([labelWidth, width]) => (
                 <div key={labelWidth} data-testid={`width-${labelWidth}`} style={{ width }}>
                     <DynamicTable {...args} label={`Students at ${labelWidth}`} />
@@ -385,8 +385,8 @@ const SortableHeads = () => {
     );
     return (
         <HeadRow>
-            {head('student', 'Student', { width: 'var(--width-1400)' })}
-            {head('sessions', 'Sessions', { width: 'var(--width-1000)', align: 'number' })}
+            {head('student', 'Student', { width: '200px' /* token gap: 200px */ })}
+            {head('sessions', 'Sessions', { width: '140px' /* token gap: 140px */, align: 'number' })}
         </HeadRow>
     );
 };

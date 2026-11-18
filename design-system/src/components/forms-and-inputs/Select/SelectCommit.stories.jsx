@@ -354,7 +354,7 @@ PickLimitDisablesRows.play = async ({ canvasElement }) => {
 
 /** Without focus, the tags that do not fit collapse into "+n". */
 export const CollapsedTagsShowPlusN = () => (
-    <div style={{ ...stack, width: 'var(--width-1400)' }}>
+    <div style={{ ...stack, width: '220px' /* token gap: 220px */ }}>
         <Button>Before</Button>
         <Select
             id="scommit-collapse"
@@ -676,7 +676,7 @@ export const ControlledOpenAsksTheParent = {
  * the field's size.
  */
 export const ListFollowsWrappingTags = () => (
-    <div style={{ ...stack, maxWidth: 'var(--width-1400)' }}>
+    <div style={{ ...stack, maxWidth: '220px' /* token gap: 220px */ }}>
         <Select id="sopen-wrap" label="Schools" isMulti options={schools} />
     </div>
 );

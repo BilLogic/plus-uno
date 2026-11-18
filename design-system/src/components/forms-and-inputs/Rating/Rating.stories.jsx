@@ -50,7 +50,7 @@ export default {
     }
 };
 
-const ratingCol = { display: 'flex', flexDirection: 'column', gap: 'var(--section-pad-x-spacious)', maxWidth: 'var(--content-max-width-reading)' };
+const ratingCol = { display: 'flex', flexDirection: 'column', gap: '32px' /* token gap: 32px */, maxWidth: 'var(--content-max-width-reading)' };
 
 export const Overview = () => {
     const [value, setValue] = useState(3);

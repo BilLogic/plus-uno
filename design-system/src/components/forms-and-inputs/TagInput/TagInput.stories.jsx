@@ -300,7 +300,7 @@ const MANY = ['Session prep', 'Tutor coaching', 'Reflections', 'Attendance', 'Tr
 
 /** Without focus, tags past one line collapse into "+n". With focus, every tag shows. */
 export const CollapsesWithoutFocus = () => (
-    <div style={{ ...stack, maxWidth: 'var(--width-1900)' }}>
+    <div style={{ ...stack, maxWidth: '280px' /* token gap: 280px */ }}>
         <TagInput label="Topics" options={TOPICS} defaultTags={MANY} />
     </div>
 );

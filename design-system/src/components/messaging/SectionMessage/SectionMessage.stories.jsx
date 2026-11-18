@@ -79,7 +79,7 @@ const GROUND_TOKEN = {
     info: '--ds-background-information',
 };
 
-const sectionMessageCol = { display: 'flex', flexDirection: 'column', gap: 'var(--page-stack-lg)' };
+const sectionMessageCol = { display: 'flex', flexDirection: 'column', gap: '48px' /* token gap: 48px */ };
 const contentVariantCol = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' };
 
 function SectionMessageContentDemos() {

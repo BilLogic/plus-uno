@@ -303,7 +303,7 @@ Truncation.play = async ({ canvasElement }) => {
  */
 export const NarrowContainer = () => (
     <div style={grid}>
-        <div data-testid="column" style={{ width: 'var(--height-750)', border: 'var(--border-width-default) dashed var(--ds-border)' }}>
+        <div data-testid="column" style={{ width: '120px' /* token gap: 120px */, border: 'var(--border-width-default) dashed var(--ds-border)' }}>
             <StatusTag appearance="info" data-testid="clamped">Waiting on the district data export</StatusTag>
         </div>
         <div style={{ width: 'var(--width-2500)' }}>

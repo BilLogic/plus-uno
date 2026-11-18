@@ -1187,7 +1187,7 @@ const stateLayer = (host, token) => {
 /** The 2px surface gap as a computed shadow: under a ×, or stacked on the overlay shadow under a tag. */
 const surfaceGap = (host, { onElevation = true } = {}) => computedShadow(
     host,
-    `0 0 0 var(--stroke-2) var(--ds-surface-overlay)${onElevation ? ', var(--ds-shadow-overlay)' : ''}`,
+    `0 0 0 var(--border-width-focused) var(--ds-surface-overlay)${onElevation ? ', var(--ds-shadow-overlay)' : ''}`,
 );
 
 /**
@@ -1378,7 +1378,7 @@ ElevatedAvatarTypes.play = async ({ canvasElement }) => {
  * and the three avatar types.
  */
 export const ElevatedDisabled = () => (
-    <div style={{ ...thumbnail, height: 'var(--width-1400)' }}>
+    <div style={{ ...thumbnail, height: '200px' /* token gap: 200px */ }}>
         <div style={picture} aria-hidden="true" />
         <div style={onPicture}>
             <TagContext.Provider value={{ isDisabled: true }}>
@@ -1459,7 +1459,7 @@ ElevatedDisabled.play = async ({ canvasElement }) => {
  * off the image keeps the plain ring.
  */
 export const ElevatedRemoveFocus = () => (
-    <div style={{ ...thumbnail, height: 'var(--width-1400)' }}>
+    <div style={{ ...thumbnail, height: '200px' /* token gap: 200px */ }}>
         <div style={picture} aria-hidden="true" />
         <div style={onPicture}>
             <Tag color="teal" href="#unit" isElevated isRemovable onAfterRemoveAction={() => {}}>Unit 3</Tag>
@@ -1476,7 +1476,7 @@ export const ElevatedRemoveFocus = () => (
 ElevatedRemoveFocus.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const gap = surfaceGap(canvasElement, { onElevation: false });
-    const spread = px(probe(canvasElement, 'width', 'var(--stroke-2)'));
+    const spread = px(probe(canvasElement, 'width', 'var(--border-width-focused)'));
 
     // Tab past the link to its ×, and check the ring and what sits under it.
     const focusRemove = async (name, what, shadow) => {

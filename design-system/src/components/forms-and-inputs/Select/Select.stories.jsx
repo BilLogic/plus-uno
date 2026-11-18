@@ -139,7 +139,7 @@ const statusOptions = [
     { value: 'canceled', label: 'Canceled' },
 ];
 
-const grid = { pointerEvents: 'auto', display: 'grid', gap: 'var(--section-stack-md)', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' };
+const grid = { pointerEvents: 'auto', display: 'grid', gap: '20px' /* token gap: 20px */, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' };
 
 const field = { maxWidth: 'var(--width-2500)' };
 
@@ -215,7 +215,7 @@ export const SpacingCompact = {
 /** Spacing — default (40) and compact (32). */
 export const Spacing = {
     render: () => (
-        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', display: 'flex', flexDirection: 'column', gap: '20px' /* token gap: 20px */ }}>
             <Select label="Default" spacing="default" options={sampleOptions} placeholder="Select..." />
             <Select label="Compact" spacing="compact" options={sampleOptions} placeholder="Select..." />
         </div>
@@ -532,7 +532,7 @@ export const FieldReadOnlyShowsLabel = {
 /** A read-only value is shown whole: it wraps, and is never clipped to one line. */
 export const FieldReadOnlyLongValue = {
     render: () => (
-        <div style={{ ...wrap, maxWidth: 'var(--width-1400)' }}>
+        <div style={{ ...wrap, maxWidth: '200px' /* token gap: 200px */ }}>
             <Select
                 id="select-ex-readonly-long"
                 label="Option"

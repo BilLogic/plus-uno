@@ -41,7 +41,7 @@ export default {
 const calloutCanvas = {
     display: 'flex',
     justifyContent: 'center',
-    padding: 'var(--blanket-pad-y)',
+    padding: 'calc(var(--section-pad-x-spacious) * 2)',
     minHeight: 'var(--width-2500)',
 };
 const calloutCanvasTall = { ...calloutCanvas, minHeight: 'var(--width-3000)' };
@@ -129,7 +129,7 @@ export function Dismissible() {
 /** A SpotlightAction on the callout's brand bold ground, without opening a popup. */
 const actionStory = (appearance, label) => ({
     render: () => (
-        <div style={{ display: 'inline-flex', padding: 'var(--section-pad-x-default)', borderRadius: 'var(--radius-xxl)', background: 'var(--ds-background-brand-bold)' }}>
+        <div style={{ display: 'inline-flex', padding: 'var(--section-pad-y-default) var(--section-pad-x-default)', borderRadius: 'var(--radius-xxl)', background: 'var(--ds-background-brand-bold)' }}>
             <SpotlightAction appearance={appearance}>{label}</SpotlightAction>
         </div>
     ),

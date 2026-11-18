@@ -70,7 +70,7 @@ export default {
     },
 };
 
-const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxWidth: 'var(--width-2500)' };
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxWidth: '360px' /* token gap: 360px */ };
 
 /** A controlled group of radios sharing one name. */
 const Group = ({ name, options, initial, ...radioProps }) => {
@@ -196,7 +196,7 @@ ReadOnly.play = async ({ canvasElement }) => {
 
 /** A description under the label, and the card appearance. */
 export const DescriptionAndCard = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxWidth: 'var(--width-2500)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxWidth: '360px' /* token gap: 360px */ }}>
         <Radio id="radio-desc" name="radio-desc" label="Weekly" value="weekly" description="Every week at the same time."/>
         <Radio id="radio-card" name="radio-card" label="Just once" value="once" description="A single session." appearance="card" defaultChecked/>
     </div>

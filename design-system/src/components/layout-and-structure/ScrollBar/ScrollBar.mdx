@@ -177,7 +177,7 @@ Two bars side by side suggest two scrolling areas where there is one. Do not nes
 <DoDontPair
     doExample={<div style={box}><ScrollBar maxHeight={smallCap} aria-label="Notes, one region"><Notes count={12} /></ScrollBar></div>}
     doCaption="A single scrollbar."
-    dontExample={<div style={box}><ScrollBar maxHeight={smallCap} aria-label="Notes, outer region"><div style={{ ...box, margin: 'var(--pad-y-lg) var(--pad-x-md)' }}><ScrollBar maxHeight="var(--width-1000)" aria-label="Notes, inner region"><Notes count={20} /></ScrollBar></div></ScrollBar></div>}
+    dontExample={<div style={box}><ScrollBar maxHeight={smallCap} aria-label="Notes, outer region"><div style={{ ...box, margin: 'var(--pad-y-lg) var(--pad-x-md)' }}><ScrollBar maxHeight="calc(var(--height-500) * 2.5)" aria-label="Notes, inner region"><Notes count={20} /></ScrollBar></div></ScrollBar></div>}
     dontCaption="A region nested in another: two scrollbars on one region."
 />
 

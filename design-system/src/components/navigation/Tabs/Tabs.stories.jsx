@@ -58,7 +58,7 @@ export default {
     }
 };
 
-const col = { display: 'flex', flexDirection: 'column', gap: 'var(--page-stack-lg)' };
+const col = { display: 'flex', flexDirection: 'column', gap: '48px' /* token gap: 48px */ };
 
 export const Overview = () => {
     const [activeKey, setActiveKey] = useState('1');
@@ -239,7 +239,7 @@ function InteractionStatesDemos() {
             <p className="body-default" style={{ marginBottom: 'var(--section-stack-lg)', color: 'var(--ds-text-subtle)' }}>
                 States below are artificially forced for demonstration.
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-pad-x-spacious)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' /* token gap: 32px */ }}>
                 <div>
                     <p className="body-sm" style={{ marginBottom: 'var(--section-stack-md)', fontWeight: 'bold' }}>Unselected tab states</p>
                     <Tabs defaultActiveKey="none">
