@@ -1,5 +1,6 @@
 import React from 'react';
-import SectionMessage from './SectionMessage'; // We import the main component to extract/mock subcomponents styling for demo
+import { expect } from 'storybook/test';
+import SectionMessage from './SectionMessage';
 
 /**
  * Subcomponent documentation for SectionMessage.
@@ -19,16 +20,28 @@ export default {
 
 /**
  * Content Structure
- * The internal layout of title and message text.
+ * The internal layout of title, message text, and link actions inside a live SectionMessage.
  */
-export const ContentStructure = () => (
-    <div className="plus-section-message" style={{ border: 'var(--border-width-default) dashed var(--ds-border)' }}>
-        <div className="plus-section-message-content">
-            <div className="plus-section-message-title heading-lg">Section message title</div>
-            <div className="plus-section-message-text body-lg">This is the message body text within the content area.</div>
-        </div>
-    </div>
-);
+export const ContentStructure = {
+    render: () => (
+        <SectionMessage
+            appearance="primary"
+            title="Session schedule updated"
+            dismissible={false}
+            actions={[
+                { text: 'View schedule', href: '#schedule' },
+                { text: 'Notify student', onClick: () => {} },
+            ]}
+        >
+            Your Tuesday Algebra B session with Maya moved to 4:30 PM.
+        </SectionMessage>
+    ),
+    play: async ({ canvas }) => {
+        await expect(canvas.getByRole('heading', { name: 'Session schedule updated' })).toBeInTheDocument();
+        await expect(canvas.getByRole('link', { name: 'View schedule' })).toBeInTheDocument();
+        await expect(canvas.getByRole('button', { name: 'Notify student' })).toBeInTheDocument();
+    },
+};
 
 /**
  * Dismiss Button

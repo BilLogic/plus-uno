@@ -4,6 +4,14 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as TooltipStories from './Tooltip.stories.jsx';
 import { Button } from '@/components';
 import {
+    InteractivePopupDo,
+    InteractiveTooltipDont,
+    LabelDo,
+    LabelDont,
+    ShortLineDo,
+    ShortLineDont,
+} from '@/storybook-docs/lib/tooltip-cases.jsx';
+import {
     ComponentExample,
     DocsInteractivePlayground,
     DocsTable,
@@ -189,18 +197,18 @@ after `250` ms, hiding `400` ms after you leave.
 ### Say what the control does.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--stack-sm)' }}><Button appearance="default" text="Notes" /><div className="plus-tooltip" style={{ display: 'inline-block' }}>Opens the session notes</div></div>}
+    doExample={<LabelDo />}
     doCaption="A few words on what the control does."
-    dontExample={<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--stack-sm)' }}><Button appearance="default" text="Notes" /><div className="plus-tooltip" style={{ display: 'inline-block' }}>Notes</div></div>}
+    dontExample={<LabelDont />}
     dontCaption="Repeats the label the control already shows."
 />
 
 ### Keep it to one short line.
 
 <DoDontPair
-    doExample={<div className="plus-tooltip" style={{ display: 'inline-block' }}>Moves this session out of the active list</div>}
+    doExample={<ShortLineDo />}
     doCaption="One line, sentence case, no closing period."
-    dontExample={<div style={{ display: 'inline-block', maxWidth: '100%' }}><div className="plus-tooltip" style={{ display: 'inline-block' }}>Moves this session out of the active list. You can bring it back later from the archive, and its notes stay with it.</div></div>}
+    dontExample={<ShortLineDont />}
     dontCaption="Two sentences that wrap, with a closing period."
 />
 
@@ -221,9 +229,9 @@ A disabled control takes no hover and no focus, so a tooltip on it never opens, 
 ### Put anything the user can click in a `Popup`.
 
 <DoDontPair
-    doExample={<div className="plus-popup" style={{ position: 'static', width: '100%' }}><div className="plus-popup-title">Scheduling</div><div className="plus-popup-body"><a href="#help">Read the guide</a></div></div>}
+    doExample={<InteractivePopupDo />}
     doCaption="A popup holds content the user can reach."
-    dontExample={<div className="plus-tooltip" style={{ display: 'inline-block' }}><a href="#help" style={{ color: 'inherit' }}>Read the guide</a></div>}
+    dontExample={<InteractiveTooltipDont />}
     dontCaption="A link in a tooltip: moving toward it leaves the trigger, and the tooltip hides."
 />
 

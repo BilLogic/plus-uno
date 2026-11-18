@@ -7,6 +7,14 @@ import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { Tooltip, Button } from '@/components';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
+import {
+    InteractivePopupDo,
+    InteractiveTooltipDont,
+    LabelDo,
+    LabelDont,
+    ShortLineDo,
+    ShortLineDont,
+} from '@/storybook-docs/lib/tooltip-cases.jsx';
 
 export default {
     title: 'Components/Overlays and layering/Tooltip',
@@ -247,4 +255,25 @@ export const MotionReduced = {
     render: MotionTooltip,
     decorators: [withReducedMotion],
     play: (context) => tooltipMotionPlay(context, true),
+};
+
+export const BestPractices = {
+    render: () => (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-md), 1fr))', gap: 'var(--grid-gutter)' }}>
+            <LabelDo />
+            <LabelDont />
+            <ShortLineDo />
+            <ShortLineDont />
+            <InteractivePopupDo />
+            <InteractiveTooltipDont />
+        </div>
+    ),
+    play: async ({ canvas, canvasElement }) => {
+        const doc = canvasElement.ownerDocument;
+        await waitFor(() => expect(doc.querySelectorAll('[role="tooltip"]')).toHaveLength(5));
+        await waitFor(() => expect(doc.querySelector('.plus-popup')).not.toBeNull());
+        await expect(canvas.getAllByRole('button', { name: 'Notes' })).toHaveLength(2);
+        await expect(canvas.getAllByRole('button', { name: 'Archive' })).toHaveLength(2);
+        await expect(canvas.getAllByRole('button', { name: 'Scheduling' })).toHaveLength(2);
+    },
 };

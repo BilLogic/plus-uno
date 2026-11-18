@@ -106,7 +106,7 @@ export const DetailWithPanel = {
     render: function DetailReferenceScreen() {
         const [saved, setSaved] = useState('Start with unit rates.');
         return (
-            <FitStage width={1600}>
+            <FitStage width={1600} scrollable>
                 <Frame style={{ blockSize: '100vh' }} defaultPanelOpen panelStorageKey={null}
                     panelLabel="Session review notes" panel={<ReviewPanel value={saved} onSave={setSaved} />}>
                     <Page

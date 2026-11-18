@@ -376,17 +376,16 @@ export const AnatomyRecord = {
     },
 };
 
-/** The same figure at the docs column's width, where the story scales down and the title and description rows sit closer than a marker is tall. */
+/** Full-scale anatomy inside a horizontally scrollable container when narrower than the page stage. */
 export const AnatomyRecordScaledDown = {
     name: 'Anatomy, scaled down',
     render: () => (
-        <div style={{ width: 880 /* token gap: 880px */ }}>
-            <LiveAnatomy live width={PAGE_STAGE} parts={ANATOMY_PARTS} title="A record page with its parts numbered">
-                <RecordPage banner />
-            </LiveAnatomy>
-        </div>
+        <LiveAnatomy live scrollable width={PAGE_STAGE} parts={ANATOMY_PARTS} title="A record page with its parts numbered">
+            <RecordPage banner scrollable />
+        </LiveAnatomy>
     ),
     play: async ({ canvasElement }) => {
+        await expectFullScale(canvasElement);
         await playRecordAnatomy(canvasElement);
     },
 };

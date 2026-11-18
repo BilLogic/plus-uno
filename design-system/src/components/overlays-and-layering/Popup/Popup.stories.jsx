@@ -3,9 +3,9 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
-import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Popup from './Popup';
 import { Button } from '@/components';
+import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 export default {
@@ -156,22 +156,33 @@ export const InteractionStates = () => (
     </div>
 );
 
-export const Overview = () => (
-    <div className="plus-popup-overview-static">
-        <Button type="button" text="Toggle popup" appearance="primary" />
-        <div className="plus-popup">
-            <div className="plus-popup-title">Popup title</div>
-            <div className="plus-popup-body">
-                Body content appears below the title. This overview is non-interactive; use Interactive for
-                click/hover behavior.
+export const Overview = {
+    render: () => (
+        <DocsOverlayBoundary fit={false} containHeight>
+            <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--section-pad-y-default) var(--section-pad-x-default)' }}>
+                <Popup
+                    trigger={<Button type="button" text="Session details" appearance="primary" />}
+                    title="Session 12"
+                    placement="bottom"
+                    defaultShow
+                >
+                    Math · Fractions and unit rates with Jordan (45 min).
+                </Popup>
             </div>
-        </div>
-    </div>
-);
-Overview.parameters = {
-    docs: {
-        source: { language: 'jsx', code: webAppSourceSnippets.popup }
-    }
+        </DocsOverlayBoundary>
+    ),
+    play: async ({ canvas, canvasElement }) => {
+        const doc = canvasElement.ownerDocument;
+        const trigger = canvas.getByRole('button', { name: 'Session details' });
+        await waitFor(() => expect(doc.querySelector('.plus-popup')).not.toBeNull());
+        await expect(doc.querySelector('.plus-popup')).toHaveTextContent('Math · Fractions and unit rates with Jordan (45 min).');
+        await userEvent.click(trigger);
+        await waitFor(() => expect(doc.querySelector('.plus-popup')).toBeNull());
+        await userEvent.click(trigger);
+        await waitFor(() => expect(doc.querySelector('.plus-popup')).not.toBeNull());
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(doc.querySelector('.plus-popup')).toBeNull());
+    },
 };
 
 export const Interactive = {
