@@ -37,8 +37,8 @@ export default {
     },
 };
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' };
-const grid = { display: 'grid', gap: '12px' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--grid-gutter)', alignItems: 'center' };
+const grid = { display: 'grid', gap: 'var(--stack-lg)' };
 
 /* ------------------------------------------------------------------ helpers */
 
@@ -303,10 +303,10 @@ Truncation.play = async ({ canvasElement }) => {
  */
 export const NarrowContainer = () => (
     <div style={grid}>
-        <div data-testid="column" style={{ width: '120px', border: '1px dashed var(--ds-border)' }}>
+        <div data-testid="column" style={{ width: 'var(--height-750)', border: 'var(--border-width-default) dashed var(--ds-border)' }}>
             <StatusTag appearance="info" data-testid="clamped">Waiting on the district data export</StatusTag>
         </div>
-        <div style={{ width: '400px' }}>
+        <div style={{ width: 'var(--width-2500)' }}>
             <StatusTag appearance="info" maxWidth={100} data-testid="capped">Waiting on the district data export</StatusTag>
         </div>
     </div>

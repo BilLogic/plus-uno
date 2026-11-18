@@ -45,7 +45,7 @@ export default {
     },
 };
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-md)', alignItems: 'center' };
 
 /* ------------------------------------------------------------------ helpers */
 
@@ -335,7 +335,7 @@ Types.play = async ({ canvasElement }) => {
  * tag is the same width whether its photo loaded, failed, or was never given.
  */
 export const AvatarFallback = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--stack-md)' }}>
         {AVATAR_TAG_TYPES.map((type) => (
             <div key={type} style={row}>
                 <Tag type={type} avatar={PHOTO} data-testid={`${type}-loaded`}>Rosa Chen</Tag>
@@ -402,7 +402,7 @@ export const TypeBehaviors = {
             );
         };
         return (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
                 <Row type="person" label="Rosa Chen" />
                 <Row type="agent" label="Tutor bot" />
                 <Row type="team" label="Math team" />
@@ -1157,10 +1157,10 @@ Truncation.play = async ({ canvasElement }) => {
  */
 const thumbnail = {
     position: 'relative',
-    width: '480px',
+    width: 'var(--width-3000)',
     maxWidth: '100%',
-    height: '160px',
-    borderRadius: 'var(--radius-lg, 8px)',
+    height: 'var(--width-1000)',
+    borderRadius: 'var(--radius-lg)',
     overflow: 'hidden',
 };
 const picture = {
@@ -1173,9 +1173,9 @@ const picture = {
 const onPicture = {
     ...row,
     position: 'absolute',
-    top: 'var(--space-050)',
-    left: 'var(--space-050)',
-    right: 'var(--space-050)',
+    top: 'var(--stack-md)',
+    left: 'var(--inline-md)',
+    right: 'var(--inline-md)',
 };
 
 /** A state layer over the elevated fill, as it computes: a one-color gradient. */
@@ -1378,7 +1378,7 @@ ElevatedAvatarTypes.play = async ({ canvasElement }) => {
  * and the three avatar types.
  */
 export const ElevatedDisabled = () => (
-    <div style={{ ...thumbnail, height: '200px' }}>
+    <div style={{ ...thumbnail, height: 'var(--width-1400)' }}>
         <div style={picture} aria-hidden="true" />
         <div style={onPicture}>
             <TagContext.Provider value={{ isDisabled: true }}>
@@ -1459,7 +1459,7 @@ ElevatedDisabled.play = async ({ canvasElement }) => {
  * off the image keeps the plain ring.
  */
 export const ElevatedRemoveFocus = () => (
-    <div style={{ ...thumbnail, height: '200px' }}>
+    <div style={{ ...thumbnail, height: 'var(--width-1400)' }}>
         <div style={picture} aria-hidden="true" />
         <div style={onPicture}>
             <Tag color="teal" href="#unit" isElevated isRemovable onAfterRemoveAction={() => {}}>Unit 3</Tag>

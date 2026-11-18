@@ -41,10 +41,10 @@ export default {
 const calloutCanvas = {
     display: 'flex',
     justifyContent: 'center',
-    padding: 'var(--space-400)',
-    minHeight: 'var(--size-2500)',
+    padding: 'var(--blanket-pad-y)',
+    minHeight: 'var(--width-2500)',
 };
-const calloutCanvasTall = { ...calloutCanvas, minHeight: 'var(--size-3000)' };
+const calloutCanvasTall = { ...calloutCanvas, minHeight: 'var(--width-3000)' };
 
 export const Basic = () => (
     <SpotlightProvider>
@@ -129,7 +129,7 @@ export function Dismissible() {
 /** A SpotlightAction on the callout's brand bold ground, without opening a popup. */
 const actionStory = (appearance, label) => ({
     render: () => (
-        <div style={{ display: 'inline-flex', padding: 'var(--space-150)', borderRadius: 'var(--radius-xxl)', background: 'var(--ds-background-brand-bold)' }}>
+        <div style={{ display: 'inline-flex', padding: 'var(--section-pad-x-default)', borderRadius: 'var(--radius-xxl)', background: 'var(--ds-background-brand-bold)' }}>
             <SpotlightAction appearance={appearance}>{label}</SpotlightAction>
         </div>
     ),

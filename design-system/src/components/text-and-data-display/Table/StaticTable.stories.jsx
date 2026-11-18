@@ -128,7 +128,7 @@ export const Bordered = {
 export const Sizes = {
     parameters: { docs: { description: { story: 'Rows are 32, 40 or 48 tall at minimum, from `--row-height-sm`, `--row-height-md` and `--row-height-lg`.' } } },
     render: () => (
-        <div style={{ display: 'grid', gap: 'var(--space-100)' }}>
+        <div style={{ display: 'grid', gap: 'var(--section-stack-md)' }}>
             {[32, 40, 48].map((size) => (
                 <Table
                     key={size}
@@ -268,7 +268,7 @@ export const Static = {
 };
 
 const HeadRow = ({ children }) => (
-    <table className="plus-table plus-table-40" style={{ tableLayout: 'fixed' }}>
+    <table className="plus-table plus-table-40" style={{ tableLayout: 'fixed', width: 'var(--width-3000)' }}>
         <thead><tr>{children}</tr></thead>
     </table>
 );
@@ -277,10 +277,10 @@ export const HeadCells = {
     parameters: { docs: { description: { story: 'The head cell holds a label and an optional type icon (Font Awesome Free, 12 tall). It aligns as text, number or icon, and with `isIconOnlyHeader` draws the icon alone while the label stays for screen readers. A label too long for its width ends in an ellipsis and shows in full in a tooltip. Header links and buttons are not allowed; the sort button is the only control.' } } },
     render: () => (
         <HeadRow>
-            <HeadCell label="Student" icon="user" width="160px" />
-            <HeadCell label="A column name far too long for the width it was given" width="120px" />
-            <HeadCell label="Sessions" align="number" icon={iconClass('hashtag')} width="120px" />
-            <HeadCell label="Flagged" align="icon" icon={iconClass('flag')} isIconOnlyHeader width="64px" />
+            <HeadCell label="Student" icon="user" width="34%" />
+            <HeadCell label="A column name far too long for the width it was given" width="26%" />
+            <HeadCell label="Sessions" align="number" icon={iconClass('hashtag')} width="26%" />
+            <HeadCell label="Flagged" align="icon" icon={iconClass('flag')} isIconOnlyHeader width="14%" />
         </HeadRow>
     ),
     play: async ({ canvasElement }) => {

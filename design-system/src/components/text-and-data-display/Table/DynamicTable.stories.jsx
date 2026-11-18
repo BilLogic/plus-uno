@@ -234,9 +234,14 @@ const LONG = 'Alexandria Montgomery-Vasquez, transferred from Roosevelt K-8 in t
 export const Widths = {
     render: (args) => (
         <div style={{ display: 'grid', gap: 'var(--section-stack-lg)' }}>
-            {[480, 768, 1024, 1920].map((width) => (
-                <div key={width} data-testid={`width-${width}`} style={{ width: `${width}px` }}>
-                    <DynamicTable {...args} label={`Students at ${width}`} />
+            {[
+                [480, 'var(--width-3000)'],
+                [768, 'var(--content-min-width)'],
+                [1024, 'var(--content-max-width-reading)'],
+                [1920, 'var(--content-max-width)'],
+            ].map(([labelWidth, width]) => (
+                <div key={labelWidth} data-testid={`width-${labelWidth}`} style={{ width }}>
+                    <DynamicTable {...args} label={`Students at ${labelWidth}`} />
                 </div>
             ))}
         </div>
@@ -339,7 +344,7 @@ export const StickyHeaderAndFrozenColumn = {
         stickyHeader: true,
         maxHeight: 200
     },
-    render: (args) => <div style={{ width: '480px' }}><DynamicTable {...args} /></div>,
+    render: (args) => <div style={{ width: 'var(--width-3000)' }}><DynamicTable {...args} /></div>,
     parameters: { docs: { description: { story: 'The head row stays pinned while the rows scroll under it inside the table\'s own region. The checkboxes and the title column stay frozen on an opaque surface; while the table scrolls sideways their edge draws a stronger divider and the overflow shadow.' } } },
     play: async ({ canvasElement }) => {
         const scroll = canvasElement.querySelector('.plus-pattern-table-scroll');
@@ -380,8 +385,8 @@ const SortableHeads = () => {
     );
     return (
         <HeadRow>
-            {head('student', 'Student', { width: '200px' })}
-            {head('sessions', 'Sessions', { width: '140px', align: 'number' })}
+            {head('student', 'Student', { width: 'var(--width-1400)' })}
+            {head('sessions', 'Sessions', { width: 'var(--width-1000)', align: 'number' })}
         </HeadRow>
     );
 };

@@ -43,7 +43,7 @@ export default {
     },
 };
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-md)', alignItems: 'center' };
 
 const CLEAR = 'rgba(0, 0, 0, 0)';
 
