@@ -2,9 +2,8 @@
  * Change tag — change over time: a filled tag (arrow + signed value) and an
  * optional comparison in subtle text after it.
  *
- * THE BOX. Default is 20 tall, compact 16 for table cells, from
- * `_label-heights.scss`. The value is body.small 12/16 and the arrow 12 in
- * both, so compact only drops the ground's breathing room.
+ * THE BOX. 16 tall from `_label-heights.scss`. The value is body.small 12/16
+ * and the arrow 12.
  *
  * THE CHIP IS FILLED, LIKE A STATUS TAG. The tone (neutral, success, danger)
  * is a meaning, so it takes Status tag's fill, text and 1px inside border (an
@@ -45,10 +44,6 @@
     transition-property: background-color, color, box-shadow;
     transition-duration: var(--ds-motion-appearance-default-duration);
     transition-timing-function: var(--ds-motion-appearance-default);
-}
-
-.plus-change-tag--compact .plus-change-tag__tag {
-    --plus-change-tag-height: #{label.$change-height-compact};
 }
 
 .plus-change-tag__visual {

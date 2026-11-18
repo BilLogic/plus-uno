@@ -15,7 +15,6 @@ export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
   "props": {
     "appearance": { "type": "enum", "values": ["neutral", "success", "warning", "danger", "info", "discovery"] },
-    "spacing": { "type": "enum", "values": ["default", "compact"] },
     "isBold": { "type": "boolean" },
     "isInverse": { "type": "boolean" },
     "isDot": { "type": "boolean" },
@@ -30,7 +29,7 @@ export const figmaMeta = {
       "source": "manual",
       "status": "verified",
       "isComponentSet": true,
-      "notes": "On the Labels page, Status, count & tag. Figma values carry a (default) suffix on subtle, neutral and default; hasRing is the ring in Figma. Inverse exists in neutral only, and dot at default spacing only. Docs page: node 17883:1895."
+      "notes": "On the Labels page, Status, count & tag. Figma values carry a (default) suffix on subtle and neutral; hasRing is the ring in Figma. Inverse exists in neutral only. Docs page: node 17883:1895."
     }
   ]
 };
@@ -66,7 +65,7 @@ section header, or a presence dot on a bell.
 
 ## Size and layout
 
-<ComponentExample of={CountTagStories.Spacings} title="Spacing" description="Default draws 20 high on its own; compact draws 16, for use inside a label. More digits grow the tag from the trailing edge." />
+<ComponentExample of={CountTagStories.Size} title="Size" description="Always 16 high and at least 24 wide, so one digit is a small rectangle and more digits grow the tag from the trailing edge." />
 
 <ComponentExample of={CountTagStories.Ring} title="Ring" description={<><code>hasRing</code> adds a ring in the surface color, for a count pinned to an icon or an avatar.</>} />
 
@@ -127,10 +126,9 @@ section header, or a presence dot on a bell.
 ## Usage
 
 Use `CountTag` for a number on its own: unread messages on a nav item, results on a
-tab, errors in a section header, a notification on a bell.
-
-`spacing="compact"` (`16`) is for use inside a label: `StatusTag` nests it through its
-`trailingMetric` prop, and `Tag` nests it on a selectable tag.
+tab, errors in a section header, a notification on a bell. It is always `16` tall,
+including inside `Button`, `Tabs`, `Sidebar` rows, `StatusTag` (`trailingMetric`)
+and selectable `Tag` (`trailingMetric`).
 
 </div>
 
@@ -151,7 +149,7 @@ tab, errors in a section header, a notification on a bell.
 ## Parts
 
 1. **Number.** The count in the body-sm size with tabular digits, hidden at 0 unless `showZero`, capped at `max` with a `+`.
-2. **Pill.** `20` tall on its own and `16` inside a label, `24` wide at minimum, so one digit is a small rectangle and more digits grow it from the trailing edge.
+2. **Pill.** `16` tall, `24` wide at minimum, so one digit is a small rectangle and more digits grow it from the trailing edge.
 3. **Dot.** Presence without a number: an `8` circle that needs a `label` for its name.
 4. **Ring.** Optional, in the surface color, for a count pinned to the corner of an icon or an avatar.
 
@@ -176,7 +174,7 @@ tab, errors in a section header, a notification on a bell.
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Height</td><td><code>--label-height-md</code> (20) on its own, <code>--label-height-sm</code> (16) when compact.</td></tr>
+<tr><td>Height</td><td><code>--label-height-sm</code> (16).</td></tr>
 <tr><td>Width and padding</td><td><code>--control-sm</code> for the minimum, <code>--pad-x-xs</code> either side.</td></tr>
 <tr><td>Corner</td><td><code>--radius-md</code>; the dot is <code>--radius-full</code>.</td></tr>
 <tr><td>Subtle</td><td><code>--ds-background-neutral</code> with <code>--ds-text</code>, and the same pair for each other appearance.</td></tr>
