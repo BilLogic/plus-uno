@@ -161,6 +161,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Page | `--page-border-width` |  |
 | Table | `--table-overflow-reach` |  |
 | Modal | `--modal-body-min-height` |  |
+| Modal | `--modal-shadow` |  |
 | Popup | `--popup-pad` (declared elsewhere) |  |
 | Popup | `--popup-width-sm` (declared elsewhere) |  |
 | Popup | `--popup-width-md` (declared elsewhere) |  |

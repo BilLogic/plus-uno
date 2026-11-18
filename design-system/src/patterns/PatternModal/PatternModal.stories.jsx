@@ -103,16 +103,22 @@ export const Overview = {
         const style = getComputedStyle(modal);
         await expect(style.paddingTop, 'Modal/pad').toBe(`${tokenLength(canvasElement, '--modal-pad-x-default')}px`);
         await expect(style.rowGap, 'Modal/stack-md').toBe(`${tokenLength(canvasElement, '--modal-stack-md')}px`);
+        const header = modal.querySelector('.plus-pattern-modal-header');
+        const footer = modal.querySelector('.plus-pattern-modal-footer');
+        await expect(getComputedStyle(header).gap, 'Modal header gap').toBe(`${tokenLength(canvasElement, '--modal-inline-sm')}px`);
+        await expect(getComputedStyle(header).gap, 'Modal header gap is 8px').toBe('8px');
+        await expect(getComputedStyle(footer).gap, 'Modal footer gap').toBe(`${tokenLength(canvasElement, '--modal-inline-sm')}px`);
+        await expect(getComputedStyle(footer).gap, 'Modal footer gap is 8px').toBe('8px');
         await expect(style.borderTopLeftRadius, 'Modal/radius').toBe(`${tokenLength(canvasElement, '--modal-radius')}px`);
         await expect(style.borderTopLeftRadius, 'Modal radius is 16').toBe('16px');
-        await expect(getComputedStyle(modal.querySelector('.plus-pattern-modal-footer')).borderBottomLeftRadius, 'footer inner corners are square').toBe('0px');
+        await expect(getComputedStyle(footer).borderBottomLeftRadius, 'footer inner corners are square').toBe('0px');
         const overlayStyle = getComputedStyle(overlay);
         await expect(overlayStyle.paddingLeft, 'Overlay/pad-x').toBe(`${tokenLength(canvasElement, '--blanket-pad-x')}px`);
         await expect(overlayStyle.paddingTop, 'Overlay/pad-y').toBe(`${tokenLength(canvasElement, '--blanket-pad-y')}px`);
         await inEveryColorModeOf(canvasElement, async (mode, token) => {
             await expect(getComputedStyle(overlay).backgroundColor, `blanket fill (${mode})`).toBe(token('--ds-blanket'));
             await expect(getComputedStyle(modal).backgroundColor, `surface overlay (${mode})`).toBe(token('--ds-surface-overlay'));
-            await expect(getComputedStyle(modal).boxShadow, `shadow overlay (${mode})`).toBe(probe(canvasElement, 'boxShadow', 'var(--ds-shadow-overlay)'));
+            await expect(getComputedStyle(modal).boxShadow, `shadow blocking (${mode})`).toBe(probe(canvasElement, 'boxShadow', 'var(--ds-shadow-blocking)'));
         });
     },
 };

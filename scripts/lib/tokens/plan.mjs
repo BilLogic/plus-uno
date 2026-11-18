@@ -272,7 +272,8 @@ export const TOKEN_LADDER = [
   { tier: 'templates', group: 'Modal', new: '--modal-width-lg', old: '--layout-width-modal-lg', ref: '629px', at: { '(min-width: 1024px)': '843px', '(min-width: 1440px)': '1056px' }, use: 'Width of a large Modal, such as a table or a long form.' },
   { tier: 'templates', group: 'Page', new: '--page-border-width', old: null, ref: 'var(--stroke-2)', use: 'Width of the edge drawn around a Page frame.' },
   { tier: 'templates', group: 'Table', new: '--table-overflow-reach', old: null, ref: 'var(--space-150)', use: 'How far a PatternTable lets a row\'s overflow, such as a focus ring, reach past its clip.' },
-  { tier: 'templates', group: 'Modal', new: '--modal-body-min-height', old: null, ref: 'var(--space-500)', use: 'Minimum height of a Modal\'s body, so a short body does not collapse the dialog.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-body-min-height', old: null, ref: 'var(--height-500)', use: 'Minimum height of a Modal\'s body, so a short body does not collapse the dialog.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-shadow', old: null, ref: 'var(--ds-shadow-blocking)', codeOnly: true, use: 'Shadow of a Modal on its Blanket.' },
 
   // ─── Templates / Popup ───────────────────────────────────────────────
   { tier: 'templates', group: 'Popup', new: '--popup-pad', old: '--popup-pad', use: 'Padding inside a Popup.' },

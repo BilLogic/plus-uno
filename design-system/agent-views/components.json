@@ -8984,7 +8984,7 @@
       "import": "import { PatternModal } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/PatternModal/PatternModal.jsx",
-      "summary": "Modal pattern for PLUS design system. Modal shell rendered inline (no portal, focus trap or Escape): header with title and close button, body slot, footer slot. Width is a step of the screen grid (xs · sm · md · lg: 4 · 6 · 8 · 10 columns plus the modal pad), and height hugs the content up to the screen less 128 or fills to it, the body scrolling past it. Place it in `Blanket`. Baked-in tokens: the overlay pair (`--ds-surface-overlay` with `--ds-shadow-overlay`), as the Modal component draws it, and Modal/pad, Modal/stack-md and Modal/radius. Mirrors \"Pattern/Modal\" in the Figma design system file. For a real overlay dialog (blanket, focus trap), use the core Modal component. A dialog is its own page: the title is its h1, at Heading/medium 20, and a section inside it opens at h2. `tabs` puts a tab group under the title, as Figma's `_Modal header` type=tabs: `Tabs` in the header, so it stays put while only the body scrolls. The body becomes the tab panel, named by the selected tab, and shows that tab's content in place of `children`. `header` is Figma's `_Modal header` type=custom: a slot that takes the place of the title row (the title and the close button), so the caller owns both and names the dialog with `aria-label` or `aria-labelledby`. `divider` draws a rule under the header and above the footer, as Figma's `divider?`. `loading` swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. The body never draws shorter than Modal/body-min-height 96.",
+      "summary": "Modal pattern for PLUS design system. Modal shell rendered inline (no portal, focus trap or Escape): header with title and close button, body slot, footer slot. Width is a step of the screen grid (xs · sm · md · lg: 4 · 6 · 8 · 10 columns plus the modal pad), and height hugs the content up to the screen less 128 or fills to it, the body scrolling past it. Place it in `Blanket`. Baked-in tokens: `--ds-surface-overlay` with `--modal-shadow` (`--ds-shadow-blocking`), as the Modal component draws it, and Modal/pad, Modal/stack-md and Modal/radius. Mirrors \"Pattern/Modal\" in the Figma design system file. For a real overlay dialog (blanket, focus trap), use the core Modal component. A dialog is its own page: the title is its h1, at Heading/medium 20, and a section inside it opens at h2. `tabs` puts a tab group under the title, as Figma's `_Modal header` type=tabs: `Tabs` in the header, so it stays put while only the body scrolls. The body becomes the tab panel, named by the selected tab, and shows that tab's content in place of `children`. `header` is Figma's `_Modal header` type=custom: a slot that takes the place of the title row (the title and the close button), so the caller owns both and names the dialog with `aria-label` or `aria-labelledby`. `divider` draws a rule under the header and above the footer, as Figma's `divider?`. `loading` swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. The body never draws shorter than Modal/body-min-height 96.",
       "props": [
         {
           "name": "show",
@@ -9192,18 +9192,17 @@
       "tokens": [
         "--border-width-default",
         "--ds-border",
-        "--ds-shadow-overlay",
         "--ds-surface-overlay",
         "--ds-text",
         "--heading-md",
         "--modal-body-min-height",
+        "--modal-inline-sm",
         "--modal-pad-x-default",
         "--modal-radius",
+        "--modal-shadow",
         "--modal-stack-md",
         "--modal-stack-sm",
         "--plus-overlay-origin",
-        "--stack-lg",
-        "--stack-md",
         "--transform-origin"
       ]
     },

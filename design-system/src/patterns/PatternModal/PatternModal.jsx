@@ -15,8 +15,8 @@ import './PatternModal.scss';
  * screen grid (xs · sm · md · lg: 4 · 6 · 8 · 10 columns plus the modal pad), and
  * height hugs the content up to the screen less 128 or fills to it, the body
  * scrolling past it. Place it in `Blanket`.
- * Baked-in tokens: the overlay pair (`--ds-surface-overlay` with
- * `--ds-shadow-overlay`), as the Modal component draws it, and Modal/pad,
+ * Baked-in tokens: `--ds-surface-overlay` with `--modal-shadow`
+ * (`--ds-shadow-blocking`), as the Modal component draws it, and Modal/pad,
  * Modal/stack-md and Modal/radius.
  * Mirrors "Pattern/Modal" in the Figma design system file.
  * For a real overlay dialog (blanket, focus trap), use the core Modal component.

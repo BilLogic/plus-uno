@@ -2,8 +2,8 @@
 /**
  * Modal pattern (Patterns/Modal)
  * Inline modal shell, drawn as the Modal component draws one: the overlay
- * pair (elevation.surface.overlay with elevation.shadow.overlay, the level
- * every floating layer takes; the blanket under a real modal sets it apart),
+ * surface with the blocking shadow (`--modal-shadow` -> `--ds-shadow-blocking`,
+ * the level that sits above a Blanket),
  * Modal/pad 16, Modal/stack-md 16 and Modal/radius 16. Width is a step of the
  * screen grid and height hugs or fills to the screen less 128, both from the
  * Overlay pattern it is placed in.
@@ -22,7 +22,7 @@
     background-color: var(--ds-surface-overlay);
     color: var(--ds-text);
     border-radius: var(--modal-radius);
-    box-shadow: var(--ds-shadow-overlay);
+    box-shadow: var(--modal-shadow);
     overflow: hidden; // keep scrolling body clipped to the radius
     /* Hug: as tall as the content, up to the screen less the overlay pad above and below. */
     max-height: $overlay-max-height;
@@ -38,7 +38,7 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: var(--stack-lg);
+    gap: var(--modal-inline-sm);
     flex-shrink: 0;
 }
 
@@ -91,7 +91,7 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: var(--stack-md);
+    gap: var(--modal-inline-sm);
     flex-shrink: 0;
     border-radius: 0; // full bleed: the Modal's own radius clips the outer corners
 }
