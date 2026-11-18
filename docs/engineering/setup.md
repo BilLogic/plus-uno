@@ -115,7 +115,7 @@ Figma export → design-system/src/tokens/source/*.json → npm run generate:tok
 
 - The source JSON is exported through the Figma MCP, read-only: one file per
   collection (`spacing _ primitives.json`, `spacing _ foundations.json`,
-  `spacing _ layout.json`, `spacing _ patterns.json`, `color _ patterns.json`,
+  `spacing _ layout.json`, `spacing _ templates.json`, `color _ templates.json`,
   `typography.json`). Each is `{ modes, variables }`, and every variable
   carries `id`, `name`, `resolvedType`, `valuesByMode` (aliases kept as
   `VARIABLE_ALIAS`), `resolvedValuesByMode`, `scopes` and `codeSyntax`. A
