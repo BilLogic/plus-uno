@@ -148,8 +148,8 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        xCategories: ['A', 'B', 'C', 'D'],
-        yCategories: ['Row 1', 'Row 2', 'Row 3'],
+        xCategories: ['Mon', 'Tue', 'Wed', 'Thu'],
+        yCategories: ['Grade 6', 'Grade 7', 'Grade 8'],
         height: 300,
         hue: 'blue',
         data: [

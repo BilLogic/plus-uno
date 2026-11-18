@@ -99,11 +99,11 @@ export const Interactive = {
         hue: 'blue',
         sort: true,
         data: [
-            { name: 'Category A', value: 100 },
-            { name: 'Category B', value: 80 },
-            { name: 'Category C', value: 60 },
-            { name: 'Category D', value: 40 },
-            { name: 'Category E', value: 20 },
+            { name: 'Lincoln Middle', value: 100 },
+            { name: 'Roosevelt K-8', value: 80 },
+            { name: 'North High', value: 60 },
+            { name: 'Oakwood Elementary', value: 40 },
+            { name: 'South High', value: 20 },
         ],
     },
 };

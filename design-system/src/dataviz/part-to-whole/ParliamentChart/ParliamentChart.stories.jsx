@@ -71,9 +71,9 @@ export const Interactive = {
     args: {
         sort: false,
         data: [
-            { name: 'Group B', value: 15, color: CATEGORICAL[0] },
-            { name: 'Group A', value: 10, color: CATEGORICAL[1] },
-            { name: 'Group C', value: 5, color: CATEGORICAL[2] },
+            { name: 'Grade 7', value: 15, color: CATEGORICAL[0] },
+            { name: 'Grade 6', value: 10, color: CATEGORICAL[1] },
+            { name: 'Grade 8', value: 5, color: CATEGORICAL[2] },
         ],
         height: 400,
     },

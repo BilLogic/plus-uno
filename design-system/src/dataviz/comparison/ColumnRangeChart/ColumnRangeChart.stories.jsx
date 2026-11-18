@@ -74,14 +74,14 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        categories: ['A', 'B', 'C', 'D'],
+        categories: ['Lincoln Middle', 'Roosevelt K-8', 'North High', 'South High'],
         data: [
-            { low: 10, high: 40 },
-            { low: 20, high: 50 },
-            { low: 5, high: 35 },
-            { low: 15, high: 55 },
+            { low: 20, high: 45 },
+            { low: 25, high: 50 },
+            { low: 15, high: 35 },
+            { low: 30, high: 55 },
         ],
-        yAxisLabel: 'Value',
+        yAxisLabel: 'Minutes tutored',
         height: 400,
         horizontal: false,
         sort: true,

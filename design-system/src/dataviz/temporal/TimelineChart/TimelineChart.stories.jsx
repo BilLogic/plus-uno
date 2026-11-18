@@ -68,9 +68,9 @@ export const Overview = {
 export const Interactive = {
     args: {
         data: [
-            { name: 'Step 1', label: 'Start', description: 'Beginning' },
-            { name: 'Step 2', label: 'Middle', description: 'In progress' },
-            { name: 'Step 3', label: 'End', description: 'Complete' },
+            { name: 'Intake', label: 'Student enrolled', description: 'Placed at Lincoln Middle' },
+            { name: 'Matched', label: 'Tutor matched', description: 'Paired for weekly math' },
+            { name: 'Goal met', label: 'Mastery reached', description: 'Passed unit assessment' },
         ],
         height: 400,
     },

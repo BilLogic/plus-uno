@@ -82,9 +82,9 @@ export const Overview = {
 export const Interactive = {
     args: {
         data: [
-            { sets: ['A'], value: 10, name: 'Set A' },
-            { sets: ['B'], value: 8, name: 'Set B' },
-            { sets: ['A', 'B'], value: 4, name: 'A & B' },
+            { sets: ['Math'], value: 120, name: 'Math tutoring' },
+            { sets: ['Reading'], value: 96, name: 'Reading tutoring' },
+            { sets: ['Math', 'Reading'], value: 42, name: 'Math and reading' },
         ],
         height: 400,
     },

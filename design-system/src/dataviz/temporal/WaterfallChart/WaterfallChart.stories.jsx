@@ -73,9 +73,9 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        categories: ['Initial', 'Add 1', 'Add 2', 'Subtract', 'Total'],
+        categories: ['Start of term', 'New enrollments', 'Transfers in', 'Completed', 'Current active'],
         data: [{ y: 100, color: BRAND }, 50, 30, -40, { isSum: true, color: BRAND }],
-        yAxisLabel: 'Value',
+        yAxisLabel: 'Enrolled students',
         height: 400,
     },
 };

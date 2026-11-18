@@ -116,13 +116,13 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        xAxisLabel: 'X value',
-        yAxisLabel: 'Y value',
-        zAxisLabel: 'Size',
+        xAxisLabel: 'Minutes tutored',
+        yAxisLabel: 'Competency score',
+        zAxisLabel: 'Sessions per week',
         height: 400,
         data: [
-            { name: 'Series A', data: [[10, 20, 30], [20, 40, 50], [30, 30, 40]] },
-            { name: 'Series B', data: [[15, 35, 25], [25, 25, 35], [35, 45, 45]] },
+            { name: 'Lincoln Middle', data: [[25, 72, 10], [35, 81, 16], [45, 89, 22]] },
+            { name: 'Roosevelt K-8', data: [[20, 68, 8], [32, 77, 14], [42, 86, 18]] },
         ],
     },
 };

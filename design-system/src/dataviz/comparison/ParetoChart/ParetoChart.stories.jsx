@@ -65,9 +65,9 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        categories: ['A', 'B', 'C', 'D', 'E'],
+        categories: ['Fractions', 'Linear equations', 'Reading fluency', 'Geometry', 'Essay structure'],
         data: [50, 30, 12, 5, 3],
-        yAxisLabel: 'Count',
+        yAxisLabel: 'Tutoring sessions',
         height: 400,
     },
 };

@@ -70,11 +70,11 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        primaryAxisLabel: 'Primary metric',
-        secondaryAxisLabel: 'Secondary metric',
-        categories: ['Period 1', 'Period 2', 'Period 3', 'Period 4'],
-        barData: [{ name: 'Volume', data: [50, 80, 60, 100] }],
-        lineData: [{ name: 'Rate', data: [5, 8, 6, 10], yAxis: 1 }],
+        primaryAxisLabel: 'Sessions held',
+        secondaryAxisLabel: 'Attendance rate (%)',
+        categories: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+        barData: [{ name: 'Sessions', data: [50, 80, 60, 100] }],
+        lineData: [{ name: 'Attendance rate', data: [82, 88, 85, 92], yAxis: 1 }],
         height: 400,
         sort: false,
     },

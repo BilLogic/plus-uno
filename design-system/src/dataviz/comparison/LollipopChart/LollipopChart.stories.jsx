@@ -67,9 +67,9 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        categories: ['A', 'B', 'C', 'D', 'E'],
-        data: [50, 40, 70, 30, 60],
-        yAxisLabel: 'Value',
+        categories: ['Lincoln Middle', 'Roosevelt K-8', 'North High', 'Oakwood Elementary', 'South High'],
+        data: [54, 42, 76, 34, 63],
+        yAxisLabel: 'Sessions per week',
         height: 400,
         horizontal: true,
         sort: true,

@@ -72,10 +72,10 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        categories: ['Resource 1', 'Resource 2'],
+        categories: ['Maya Lin', 'Devon Brooks'],
         data: [
-            { start: monday, end: monday + day, y: 0, name: 'Task 1' },
-            { start: monday + day, end: monday + day * 2, y: 1, name: 'Task 2' },
+            { start: monday, end: monday + day, y: 0, name: 'Algebra I at Lincoln Middle' },
+            { start: monday + day, end: monday + day * 2, y: 1, name: 'Fractions at Roosevelt K-8' },
         ],
         height: 400,
         sort: false,
