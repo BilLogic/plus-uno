@@ -1,5 +1,5 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Canvas, Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as ModalStories from './Modal.stories.jsx';
 import { Modal, MODAL_WIDTHS, MODAL_WIDTH_PX, MODAL_WIDTH_SCREENS } from '@/components';
@@ -231,12 +231,11 @@ A short confirmation takes `6-col`, a short form `8-col`, a table or an editor
 `10-col`. A step grows with the screen; a fixed number keeps one size on every
 screen.
 
-<DoDontPair
-    doExample={<div style={narrowScreen}><Modal show renderAs="inline" width="6-col" title="Remove this session?" body="The student is told it was canceled." secondaryButton={{ text: 'Keep session' }} primaryButton={{ text: 'Remove', appearance: 'danger' }} onClose={() => {}} /></div>}
-    doCaption="The narrowest step for a short question."
-    dontExample={<div style={narrowScreen}><Modal show renderAs="inline" width="10-col" title="Remove this session?" body="The student is told it was canceled." secondaryButton={{ text: 'Keep session' }} primaryButton={{ text: 'Remove', appearance: 'danger' }} onClose={() => {}} /></div>}
-    dontCaption="The widest step around one sentence."
-/>
+Do: The narrowest step for a short question.
+
+Don't: The widest step around one sentence.
+
+<Canvas of={ModalStories.SizeToContent} />
 
 ### Keep Close on a Modal unless the person has to answer it.
 
