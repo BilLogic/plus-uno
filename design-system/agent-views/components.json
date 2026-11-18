@@ -9416,6 +9416,7 @@
         "LayoutSplit",
         "LayoutSubsections",
         "SunkenCard",
+        "DetailIsSunkenCard",
         "CardNesting",
         "NoSurfaceNoPad",
         "Footer",

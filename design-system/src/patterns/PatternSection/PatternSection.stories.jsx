@@ -245,6 +245,23 @@ export const SunkenCard = {
     },
 };
 
+/** The inline detail is a sunken Card, so it takes the Card's surface, pad and radius. */
+export const DetailIsSunkenCard = {
+    name: 'Detail is a sunken Card',
+    render: () => (
+        <PatternSection title="Session reflections" detail={<p style={{ margin: 0 }}>Two goals for next week.</p>} detailTitle="Ava Thompson">
+            {slotContent('Rows')}
+        </PatternSection>
+    ),
+    play: async ({ canvasElement }) => {
+        const detail = canvasElement.querySelector('.plus-pattern-section-detail');
+        const style = getComputedStyle(detail);
+        await expect(style.backgroundColor, 'the detail is on the sunken surface').toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+        await expect(style.borderTopLeftRadius, 'detail radius is 16').toBe('16px');
+        await expect(getComputedStyle(detail.querySelector('.plus-pattern-card-inner')).paddingTop, 'detail pad is 16').toBe('16px');
+    },
+};
+
 /** A Card in a Section keeps the Card radius. */
 export const CardNesting = {
     name: 'Card in a Section',
