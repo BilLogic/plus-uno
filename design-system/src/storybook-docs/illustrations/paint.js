@@ -216,10 +216,11 @@ export const TAB_UNDERLINE = { strokeWidth: 'var(--border-width-selected)' };
 
 /**
  * A real-fidelity label. Drawings show at up to twice their viewBox, so the
- * size is the real label size halved: at full width it reads at true size.
+ * size is the real label size halved (`--kit-label-drawing-size`, docs-rhythm.css):
+ * at full width it reads at true size.
  */
 export const LABEL_FONT = {
   fontFamily: 'var(--type-family-body)',
   fontWeight: 'var(--type-weight-semibold)',
-  fontSize: 'calc(var(--type-size-0875) / 2)',
+  fontSize: 'var(--kit-label-drawing-size)',
 };
