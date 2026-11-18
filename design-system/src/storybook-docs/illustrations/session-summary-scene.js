@@ -33,8 +33,8 @@ export const sessionSummaryNodes = ({ x = 0, y = 0, w = SESSION_SUMMARY_BOX.widt
   const bars = BAR_HEIGHTS.map((bh, index) => {
     const bx = innerX + index * (barW + barGap);
     const by = chartBottom - bh;
-    const fill = accent && index > 0 ? PAINT.accent : PAINT.shape;
-    const opacity = accent && (index === 1 || index === 3) ? 0.45 : undefined;
+    const isLast = index === barCount - 1;
+    const fill = accent && isLast ? PAINT.accent : PAINT.shape;
     return {
       kind: 'rect',
       x: bx,
@@ -43,7 +43,6 @@ export const sessionSummaryNodes = ({ x = 0, y = 0, w = SESSION_SUMMARY_BOX.widt
       h: bh,
       fill,
       corner: 'shape',
-      opacity,
     };
   });
 

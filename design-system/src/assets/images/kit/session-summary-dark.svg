@@ -10,8 +10,8 @@
   <rect x="122" y="23" width="14" height="2" rx="1" fill="rgba(247, 246, 245, 0.078)"/>
   <line x1="20" x2="140" y1="40" y2="40" stroke="rgba(247, 246, 245, 0.102)" stroke-width="1"/>
   <rect x="20" y="48" width="16" height="22" rx="3" fill="rgba(247, 246, 245, 0.078)"/>
-  <rect x="46" y="54" width="16" height="16" rx="3" fill="#7dced5" opacity="0.45"/>
-  <rect x="72" y="46" width="16" height="24" rx="3" fill="#7dced5"/>
-  <rect x="98" y="51" width="16" height="19" rx="3" fill="#7dced5" opacity="0.45"/>
+  <rect x="46" y="54" width="16" height="16" rx="3" fill="rgba(247, 246, 245, 0.078)"/>
+  <rect x="72" y="46" width="16" height="24" rx="3" fill="rgba(247, 246, 245, 0.078)"/>
+  <rect x="98" y="51" width="16" height="19" rx="3" fill="rgba(247, 246, 245, 0.078)"/>
   <rect x="124" y="44" width="16" height="26" rx="3" fill="#7dced5"/>
 </svg>
