@@ -12,6 +12,8 @@ const FOUNDATION_IDS = [
     'foundations-visual-elevation-layer-system',
     'foundations-visual-elevation-shadow-ramp',
     'foundations-visual-elevation-usage',
+    'foundations-visual-elevation-color',
+    'foundations-visual-elevation-accessibility',
     'foundations-layout-grid',
     'foundations-visual-iconography',
     'foundations-brand-illustrations',
