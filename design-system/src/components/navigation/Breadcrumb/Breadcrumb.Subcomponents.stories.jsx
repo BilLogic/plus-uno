@@ -67,13 +67,12 @@ PageItem.args = {
 
 /**
  * Divider
- * Visual separator between items; `separator` swaps the default slash.
+ * Visual separator between items (default slash).
  * Figma State: state=divider
  */
 export const Divider = {
     render: () => (
         <Breadcrumb
-            separator="›"
             items={[
                 { text: 'Home', href: '#home' },
                 { text: 'Tutoring', href: '#tutoring' },
