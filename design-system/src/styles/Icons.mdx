@@ -1,5 +1,5 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
-import { RefTable, C, Do, Dont, DoDont, Glyph } from '@/storybook-docs/foundation-blocks.jsx';
+import { RefTable, C, Glyph } from '@/storybook-docs/foundation-blocks.jsx';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
     FoundationSection,
@@ -7,7 +7,6 @@ import {
     FoundationRelated,
     DocsLink,
 } from '@/storybook-docs/foundation-page.jsx';
-import { Icon } from '@/components';
 import * as IconsStories from './Icons.stories.jsx';
 
 <Meta of={IconsStories} />
@@ -139,17 +138,7 @@ Before proposing a new glyph through Intake, verify that no existing glyph fits,
 
 Solid, regular and brands are licensed here, including brand glyphs.
 
-<DoDont>
-<Do caption="Free families (fa-regular, fa-solid, fa-brands) render everywhere.">
-<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
-    <Glyph name="figma" family="fa-brands" /><Glyph name="calendar-days" family="fa-regular" />
-    <C>fa-brands fa-figma · fa-regular fa-calendar-days</C>
-</span>
-</Do>
-<Dont caption="Pro families (fa-light, fa-thin, fa-sharp, fa-duotone) render blank.">
-<C>fa-light fa-calendar-days</C>
-</Dont>
-</DoDont>
+<Canvas of={IconsStories.FreeFamiliesOnly} />
 
 </FoundationSubsection>
 
@@ -157,14 +146,7 @@ Solid, regular and brands are licensed here, including brand glyphs.
 
 Icons are 16 beside body text. Keep 12 for chevrons, validation and compact parts.
 
-<DoDont>
-<Do caption="A 16 icon leads the label; the trailing chevron is 12.">
-<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}><Glyph name="plus" />Add tutor<Glyph name="chevron-down" size={12} /></span>
-</Do>
-<Dont caption="A 12 leading icon is too small beside 14 body text.">
-<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}><Icon name="plus" size={12} color="default" />Add tutor</span>
-</Dont>
-</DoDont>
+<Canvas of={IconsStories.IconSizingInControls} />
 
 </FoundationSubsection>
 
@@ -172,14 +154,7 @@ Icons are 16 beside body text. Keep 12 for chevrons, validation and compact part
 
 Pick the glyph most people read the same way.
 
-<DoDont>
-<Do caption="A bell for notifications.">
-<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}><Glyph name="bell" />Notifications</span>
-</Do>
-<Dont caption="A gear reads as settings, so it misleads here.">
-<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}><Glyph name="gear" />Notifications</span>
-</Dont>
-</DoDont>
+<Canvas of={IconsStories.RecognizableSymbols} />
 
 </FoundationSubsection>
 

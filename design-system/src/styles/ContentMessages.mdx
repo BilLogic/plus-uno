@@ -1,13 +1,14 @@
-import { Meta } from '@storybook/addon-docs/blocks';
-import { RefTable, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { RefTable } from '@/storybook-docs/foundation-blocks.jsx';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import { FoundationSection, FoundationSubsection, FoundationRelated, DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { VoiceTag } from '@/storybook-docs/rule-tag.jsx';
-import { Sample, RuleHead } from '@/storybook-docs/content-blocks.jsx';
+import { RuleHead } from '@/storybook-docs/content-blocks.jsx';
+import * as ContentMessagesStories from './ContentMessages.stories.jsx';
 
 {/* Agent twin: design-system/guidelines/foundations/content/messages.md. Change the two together. */}
 
-<Meta title="Foundations/Brand/Content/Messages" />
+<Meta of={ContentMessagesStories} />
 
 <DocsLanding
     page="foundations-brand-content-messages"
@@ -27,7 +28,7 @@ import { Sample, RuleHead } from '@/storybook-docs/content-blocks.jsx';
 
 Every message has the same three parts.
 
-<Sample title="Sessions start late Monday" action="See schedule">School B has a late start. Sessions begin at 10:30 AM ET.</Sample>
+<Canvas of={ContentMessagesStories.Anatomy} />
 
 <RefTable
     head={['Part', 'What it says', 'Length']}
@@ -66,10 +67,7 @@ Pick by what the reader needs. Each type has a home component.
 
 Say what broke, what’s safe, and the next step.
 
-<DoDont>
-<Do caption="Answers the first worry: did I lose my work?"><Sample icon="circle-exclamation" title="Notes didn’t save" action="Try again">Your connection dropped. Your draft is safe on this device.</Sample></Do>
-<Dont caption="Polite and short, but the tutor still wonders if the notes are gone."><Sample icon="circle-exclamation" title="Notes didn’t save" action="Try again">Something went wrong. Try again.</Sample></Dont>
-</DoDont>
+<Canvas of={ContentMessagesStories.Errors} />
 
 </FoundationSubsection>
 
@@ -79,10 +77,7 @@ Say what broke, what’s safe, and the next step.
 
 Say what happens to other people, then name both buttons.
 
-<DoDont>
-<Do caption="The tutor sees the ripple before deciding."><Sample icon="triangle-exclamation" title="Call off Thursday’s session?" action="Keep session" secondary="Call off">Jordan’s teacher gets a note, and we look for a fill-in.</Sample></Do>
-<Dont caption="Clear action, but it hides the people it touches."><Sample icon="triangle-exclamation" title="Call off this session?" action="Cancel" secondary="Call off">You can’t undo this.</Sample></Dont>
-</DoDont>
+<Canvas of={ContentMessagesStories.Warnings} />
 
 </FoundationSubsection>
 
@@ -92,10 +87,7 @@ Say what happens to other people, then name both buttons.
 
 Name what finished, then what happens with it.
 
-<DoDont>
-<Do caption="The tutor knows their work lands somewhere."><Sample icon="circle-check" title="Reflection submitted">Your lead tutor reads it before Friday’s check-in.</Sample></Do>
-<Dont caption="Warm, but the tutor doesn’t know who reads it."><Sample icon="circle-check" title="Reflection submitted">Thanks for sharing.</Sample></Dont>
-</DoDont>
+<Canvas of={ContentMessagesStories.Success} />
 
 </FoundationSubsection>
 
@@ -105,10 +97,7 @@ Name what finished, then what happens with it.
 
 Say why it’s empty and what will fill it.
 
-<DoDont>
-<Do caption="Sets the expectation and names who acts."><Sample icon="calendar" title="No sessions this week">Sessions show up here once your lead tutor schedules them.</Sample></Do>
-<Dont caption="Calm, but later when, and why?"><Sample icon="calendar" title="No sessions this week">Check back later.</Sample></Dont>
-</DoDont>
+<Canvas of={ContentMessagesStories.EmptyStates} />
 
 </FoundationSubsection>
 
@@ -118,10 +107,7 @@ Say why it’s empty and what will fill it.
 
 One line, under the field, phrased as what to do.
 
-<DoDont>
-<Do caption="An instruction, with the unit."><Sample icon="circle-exclamation" title="Session length: 95">Enter 30 to 90 minutes.</Sample></Do>
-<Dont caption="Correct, but reads like a rule, and drops the unit."><Sample icon="circle-exclamation" title="Session length: 95">Must be between 30 and 90.</Sample></Dont>
-</DoDont>
+<Canvas of={ContentMessagesStories.FieldErrors} />
 
 </FoundationSubsection>
 

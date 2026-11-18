@@ -7,8 +7,6 @@ import {
     FoundationRelated,
 } from '@/storybook-docs/foundation-page.jsx';
 import {
-    CloseDo,
-    CloseDont,
     NestedDo,
     NestedDont,
     OffScaleDo,
@@ -232,10 +230,7 @@ The `Radius` group names a step by size; `Radius / Control` names it by control 
 
 <FoundationSubsection title="Close with an Icon button">
 
-<DoDont>
-<Do caption="The subtle Icon button: the button radius, the ring and the states come with it.">{<CloseDo />}</Do>
-<Dont caption="A hand-built circle. Its corner, its states and its focus ring are all guesses.">{<CloseDont />}</Dont>
-</DoDont>
+<Canvas of={RadiusStories.CloseControl} />
 
 </FoundationSubsection>
 

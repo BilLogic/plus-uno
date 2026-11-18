@@ -1,5 +1,7 @@
 import React from 'react';
 import { expect, waitFor } from 'storybook/test';
+import { IconButton, PanelContainer, PanelHeader } from '@/components';
+import { Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
 import {
     ButtonInField,
     JoinedGroup,
@@ -166,5 +168,33 @@ export const Pill = {
         for (const pill of root.querySelectorAll('[data-part="pill"]')) {
             await expect(rxOf(pill)).toBeCloseTo(Number(pill.getAttribute('height')) / 2, 1);
         }
+    },
+};
+
+/** Close actions on panel headers use the subtle IconButton at the default button radius. */
+export const CloseControl = {
+    render: () => (
+        <DoDont>
+            <Do caption="The subtle IconButton: the button radius, the ring and the states come with it.">
+                <PanelContainer width="100%">
+                    <PanelHeader
+                        title="Session details"
+                        actions={<IconButton icon="xmark" label="Close session details" appearance="subtle" />}
+                    />
+                </PanelContainer>
+            </Do>
+            <Dont caption="A round button on a panel header instead of the default button radius.">
+                <PanelContainer width="100%">
+                    <PanelHeader
+                        title="Session details"
+                        actions={<IconButton icon="xmark" label="Close session details" appearance="subtle" shape="circle" />}
+                    />
+                </PanelContainer>
+            </Dont>
+        </DoDont>
+    ),
+    play: async ({ canvas }) => {
+        const buttons = canvas.getAllByRole('button', { name: 'Close session details' });
+        await expect(buttons).toHaveLength(2);
     },
 };
