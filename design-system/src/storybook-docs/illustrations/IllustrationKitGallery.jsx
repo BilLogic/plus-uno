@@ -6,7 +6,7 @@ import {
 } from './primitives.jsx';
 import { MOTION_SETS } from './primitives-motion.jsx';
 import { SHAPE_SETS } from './shapes.jsx';
-import { SessionSummaryArtwork } from './compositions.jsx';
+import { PartnerMarkArtwork, SessionSummaryArtwork } from './compositions.jsx';
 
 /**
  * Every primitive, neutral then accented, at the one scale the compositions use.
@@ -41,6 +41,7 @@ const SETS = [
   // The cover shapes: timeline, waveform, isometric stack, Logo construction, spring trail, path.
   ...SHAPE_SETS,
   ['Session summary', (a) => <SessionSummaryArtwork x={0} y={5} w={160} h={90} accent={a} />],
+  ['Partner mark', (a) => <PartnerMarkArtwork x={48} y={18} w={64} h={64} accent={a} />],
 ];
 
 export const IllustrationKitGallery = () => (

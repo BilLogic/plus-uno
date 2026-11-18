@@ -5,6 +5,7 @@ import {
   Blanket, ButtonShape, Frame, Modal, Panel, Rect, Rule, Row, Screen, Section, SkeletonBar, pageBody, screenLayout,
 } from './primitives.jsx';
 import { SESSION_SUMMARY_BOX, sessionSummaryNodes } from './session-summary-scene.js';
+import { PARTNER_MARK_BOX, partnerMarkNodes } from './partner-mark-scene.js';
 
 /** One dotted joint between two layers. */
 const Link = ({ x1, x2, y }) => <Rule x1={x1} x2={x2} y1={y} y2={y} stroke={PAINT.annotation} dash="2 3" />;
@@ -153,20 +154,23 @@ export const ResponsiveReflow = ({ width = 1280, title }) => (
   </Illustration>
 );
 
+const SceneNodes = ({ nodes }) =>
+  nodes.map((node, index) => {
+    if (node.kind === 'rect') {
+      return <Rect key={index} x={node.x} y={node.y} w={node.w} h={node.h} fill={node.fill} stroke={node.stroke} corner={node.corner} opacity={node.opacity} />;
+    }
+    if (node.kind === 'circle') {
+      return <circle key={index} cx={node.cx} cy={node.cy} r={node.r} fill={node.fill} opacity={node.opacity} />;
+    }
+    if (node.kind === 'skeleton') {
+      return <SkeletonBar key={index} x={node.x} y={node.y} w={node.w} h={node.h} tone={node.tone} />;
+    }
+    return <Rule key={index} x1={node.x1} x2={node.x2} y1={node.y1} y2={node.y2} stroke={node.stroke} />;
+  });
+
 export const SessionSummaryArtwork = ({ x = 0, y = 0, w = SESSION_SUMMARY_BOX.width, h = SESSION_SUMMARY_BOX.height, accent = false }) => (
   <g data-part="session-summary">
-    {sessionSummaryNodes({ x, y, w, h, accent }).map((node, index) => {
-      if (node.kind === 'rect') {
-        return <Rect key={index} x={node.x} y={node.y} w={node.w} h={node.h} fill={node.fill} stroke={node.stroke} corner={node.corner} opacity={node.opacity} />;
-      }
-      if (node.kind === 'circle') {
-        return <circle key={index} cx={node.cx} cy={node.cy} r={node.r} fill={node.fill} opacity={node.opacity} />;
-      }
-      if (node.kind === 'skeleton') {
-        return <SkeletonBar key={index} x={node.x} y={node.y} w={node.w} h={node.h} tone={node.tone} />;
-      }
-      return <Rule key={index} x1={node.x1} x2={node.x2} y1={node.y1} y2={node.y2} stroke={node.stroke} />;
-    })}
+    <SceneNodes nodes={sessionSummaryNodes({ x, y, w, h, accent })} />
   </g>
 );
 
@@ -176,5 +180,20 @@ export const SessionSummary = ({
 }) => (
   <Illustration width={SESSION_SUMMARY_BOX.width} height={SESSION_SUMMARY_BOX.height} title={title}>
     <SessionSummaryArtwork accent={accent} />
+  </Illustration>
+);
+
+export const PartnerMarkArtwork = ({ x = 0, y = 0, w = PARTNER_MARK_BOX.width, h = PARTNER_MARK_BOX.height, accent = false }) => (
+  <g data-part="partner-mark">
+    <SceneNodes nodes={partnerMarkNodes({ x, y, w, h, accent })} />
+  </g>
+);
+
+export const PartnerMark = ({
+  accent = true,
+  title = 'Square partner mark emblem built from a rounded tile, circle and bars',
+}) => (
+  <Illustration width={PARTNER_MARK_BOX.width} height={PARTNER_MARK_BOX.height} title={title}>
+    <PartnerMarkArtwork accent={accent} />
   </Illustration>
 );
