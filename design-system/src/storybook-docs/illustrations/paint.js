@@ -182,6 +182,7 @@ const CORNERS = {
   sidebarRow: ['--frame-sidebar-row-radius', 'patterns/Sidebar/Sidebar.scss'],
   tab: ['--radius-control-md', 'components/navigation/Tabs/Tabs.scss'],
   count: ['--radius-md', 'components/labels/CountTag/CountTag.scss'],
+  tag: ['--radius-md', 'components/labels/Tag/Tag.scss'],
   icon: ['--radius-sm', null],
   tracker: ['--radius-control-md', 'components/status-indicators/ProgressTracker/ProgressTracker.scss'],
   cardImage: ['--card-radius-compact', 'patterns/PatternCard/PatternCard.scss'],

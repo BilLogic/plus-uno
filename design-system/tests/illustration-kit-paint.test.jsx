@@ -173,4 +173,12 @@ describe('Zone label cap is per figure', () => {
     const renderedLabels = html.match(/data-zone-label="/g) ?? [];
     expect(renderedLabels.length).toBe(construction.MAX_LABELED_ZONES);
   });
+
+  it('ControlConstruction keeps both Button and Tag halves within MAX_LABELED_ZONES', () => {
+    const html = renderToStaticMarkup(<construction.ControlConstruction />);
+    expect(html).toContain('data-control="button"');
+    expect(html).toContain('data-control="tag"');
+    const renderedLabels = html.match(/data-zone-label="/g) ?? [];
+    expect(renderedLabels.length).toBe(construction.MAX_LABELED_ZONES);
+  });
 });

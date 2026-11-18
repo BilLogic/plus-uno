@@ -21,6 +21,7 @@ const RADIUS_BUTTON_COMPACT_2X = cornerStyle(scaledCorner('buttonCompact', 2));
 const RADIUS_BUTTON_DEFAULT_2X = cornerStyle(scaledCorner('button', 2));
 const RADIUS_BUTTON_SPACIOUS_2X = cornerStyle(scaledCorner('buttonSpacious', 2));
 const RADIUS_BUTTON_DEFAULT_4X = cornerStyle(scaledCorner('button', 4));
+const RADIUS_TAG_4X = cornerStyle(scaledCorner('tag', 4));
 const RADIUS_CONTROL_MD_2X = cornerStyle(scaledCorner('tab', 2));
 const RADIUS_CONTROL_LG_2X = cornerStyle(scaledCorner('field', 2));
 const RADIUS_4 = cornerStyle('var(--radius-md)');
@@ -391,14 +392,14 @@ const MatrixCellSvg = ({ width, height, label, children }) => (
 );
 
 const BUTTON_SPEC = {
-  24: { w: 86, h: 48, radius: RADIUS_BUTTON_COMPACT_2X, primary: false, barW: 44 },
-  32: { w: 116, h: 64, radius: RADIUS_BUTTON_DEFAULT_2X, primary: true, barW: 58 },
+  24: { w: 86.4, h: 48, radius: RADIUS_BUTTON_COMPACT_2X, primary: false, barW: 43.2 },
+  32: { w: 115.2, h: 64, radius: RADIUS_BUTTON_DEFAULT_2X, primary: true, barW: 57.6 },
   48: { w: 136, h: 96, radius: RADIUS_BUTTON_SPACIOUS_2X, primary: false, barW: 68 },
 };
 
 const FIELD_SPEC = {
-  32: { w: 116, h: 64, radius: RADIUS_CONTROL_MD_2X, barW: 52 },
-  40: { w: 136, h: 80, radius: RADIUS_CONTROL_LG_2X, barW: 62 },
+  32: { w: 115.2, h: 64, radius: RADIUS_CONTROL_MD_2X, barW: 51.84 },
+  40: { w: 136, h: 80, radius: RADIUS_CONTROL_LG_2X, barW: 61.2 },
 };
 
 const ICON_INNER = { 16: 24, 24: 32, 32: 32, 40: 48, 48: 48 };
@@ -497,7 +498,7 @@ export const CoreSizeMatrix = () => (
                 style={{ ...HAIRLINE, ...spec.radius }}
               />
               <rect
-                x={20}
+                x={12}
                 y={(spec.h - 32) / 2}
                 width={spec.barW}
                 height={32}
@@ -598,18 +599,27 @@ export const CoreSizeMatrix = () => (
 );
 
 /**
- * The control-construction figure: a 32 Button at 4x scale built from
- * 6 + 20 + 6 with 12 pad-x, showing `size-200`, `size-125`, `space-0375`
- * (pad-y) and `space-075` (pad-x).
+ * The control-construction figure: at 4x scale, a 32 Button built from
+ * 6 + 20 + 6 with 12 pad-x (`size-200`, `size-125`, `space-0375`, `space-075`),
+ * beside a 20 Tag (`--label-height-md`) built from 2 + 16 + 2 with 4 pad-x
+ * (`--pad-x-xs` from `Tag.scss`: `size-125`, `size-100`, `space-0125 · space-025`).
  */
 export const ControlConstruction = () => (
   <Illustration
-    viewBox="0 0 424 200"
+    viewBox="-12 0 972 200"
     scale={1}
-    title="A 32 Button built from 6 + 20 + 6 with 12 pad-x around its 20 label line"
+    title="A 32 Button built from 6 + 20 + 6 with 12 pad-x, and a 20 Tag built from 2 + 16 + 2 with 4 pad-x"
   >
     <g data-figure="control-construction">
-      <rect x={80} y={26} width={232} height={128} fill={PAINT.buttonDefault} style={RADIUS_BUTTON_DEFAULT_4X} />
+      <rect
+        data-control="button"
+        x={80}
+        y={26}
+        width={232}
+        height={128}
+        fill={PAINT.buttonDefault}
+        style={RADIUS_BUTTON_DEFAULT_4X}
+      />
       <rect x={128} y={58} width={136} height={64} fill={PAINT.placeholderText} style={RADIUS_4} />
       <Zone
         kind="pad"
@@ -626,6 +636,37 @@ export const ControlConstruction = () => (
       />
       <Measure x={64} y={26} h={128} label="size-200" side="left" />
       <Measure x={328} y={50} h={80} label="size-125" side="right" />
+
+      <rect
+        data-control="tag"
+        x={612}
+        y={26}
+        width={152}
+        height={80}
+        fill={PAINT.countSurface}
+        style={RADIUS_TAG_4X}
+      />
+      <rect x={628} y={42} width={120} height={48} fill={PAINT.placeholderText} style={RADIUS_4} />
+      <Zone
+        kind="pad"
+        x={612}
+        y={26}
+        w={152}
+        h={80}
+        radius={scaledCorner('tag', 4)}
+        inner={{ x: 628, y: 34, w: 120, h: 64 }}
+        labels={[
+          {
+            text: 'space-0125 · space-025',
+            x: 788,
+            y: 30,
+            anchor: 'start',
+            leader: { x1: 756, y1: 30, x2: 782, y2: 30 },
+          },
+        ]}
+      />
+      <Measure x={596} y={26} h={80} label="size-125" side="left" />
+      <Measure x={780} y={34} h={64} label="size-100" side="right" />
     </g>
   </Illustration>
 );

@@ -418,6 +418,12 @@ export const CoreSizeMatrix = {
     await expect(buttonRects[3].getAttribute('fill')).toBe('var(--ds-skeleton)');
     await expect(buttonRects[3].getAttribute('opacity')).toBeNull();
     await expect(buttonRects[4].style.rx).toContain('--button-radius-spacious');
+    const fieldRow = matrix.querySelector('[data-matrix-row="field"]');
+    const fieldBars = [...fieldRow.querySelectorAll('svg rect:nth-child(2)')];
+    await expect(fieldBars.length).toBe(2);
+    for (const bar of fieldBars) {
+      await expect(bar.getAttribute('x')).toBe('12');
+    }
     const rowGroup = matrix.querySelector('[data-matrix-row="row"]');
     await expect(rowGroup.querySelectorAll('[data-row-edge="top"]').length).toBe(3);
     await expect(rowGroup.querySelectorAll('[data-row-edge="bottom"]').length).toBe(3);
@@ -429,24 +435,32 @@ export const CoreSizeMatrix = {
 
 export const ControlConstruction = {
   render: () => (
-    <IllustrationFigure caption="Building a control: a 32 Button built from 6 + 20 + 6 with 12 pad-x">
+    <IllustrationFigure caption="Building a control: a 32 Button built from 6 + 20 + 6 with 12 pad-x, and a 20 Tag built from 2 + 16 + 2 with 4 pad-x">
       <ControlConstructionFigure />
     </IllustrationFigure>
   ),
   play: async ({ canvasElement }) => {
     const svg = canvasElement.querySelector('svg[role="img"]');
     await expect(everyPaintIsAToken(svg)).toBe(true);
-    const buttonRect = svg.querySelector('[data-figure="control-construction"] > rect');
+    const buttonRect = svg.querySelector('[data-control="button"]');
+    await expect(buttonRect).not.toBeNull();
     await expect(buttonRect.style.rx).toContain('--button-radius-default');
-    const clipRect = svg.querySelector('[data-zone-kind="pad"] clipPath rect');
-    await expect(clipRect).not.toBeNull();
-    await expect(clipRect.style.rx).toContain('--button-radius-default');
-    await expect(svg.querySelectorAll('[data-part="measure"]').length).toBe(2);
-    await expect(svg.querySelectorAll('[data-part="zone"]').length).toBe(1);
-    await expect(svg.querySelectorAll('[data-zone-label]').length).toBe(2);
+    const tagRect = svg.querySelector('[data-control="tag"]');
+    await expect(tagRect).not.toBeNull();
+    await expect(tagRect.getAttribute('height')).toBe('80');
+    await expect(tagRect.style.rx).toContain('--radius-md');
+    const clipRects = [...svg.querySelectorAll('[data-zone-kind="pad"] clipPath rect')];
+    await expect(clipRects.length).toBe(2);
+    await expect(clipRects[0].style.rx).toContain('--button-radius-default');
+    await expect(clipRects[1].style.rx).toContain('--radius-md');
+    await expect(svg.querySelectorAll('[data-part="measure"]').length).toBe(4);
+    await expect(svg.querySelectorAll('[data-part="zone"]').length).toBe(2);
+    await expect(svg.querySelectorAll('[data-zone-label]').length).toBe(3);
     await expect(svg.textContent).toContain('size-200');
     await expect(svg.textContent).toContain('size-125');
+    await expect(svg.textContent).toContain('size-100');
     await expect(svg.textContent).toContain('space-0375');
     await expect(svg.textContent).toContain('space-075');
+    await expect(svg.textContent).toContain('space-0125 · space-025');
   },
 };
