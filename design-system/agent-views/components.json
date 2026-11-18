@@ -8662,7 +8662,7 @@
       "import": "import { PatternCard } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/PatternCard/PatternCard.jsx",
-      "summary": "PLUS card: an optional image, content and footer on the raised surface and shadow. - **Image placement**: `top` (default), `start` or `end`. Side images apply at the large card minimum width and fill the height. `imageSplit` chooses one third (default) or one half; half uses Heading medium on a side card. Below the large minimum width, the image returns to the top with its own ratio. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: `padding` sets Card/pad-compact · default · spacious (via prop values `'sm'`, `'md'`, `'lg'`), the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: the raised pair at rest. A card with an `onClick` lifts on hover to the raised surface's hovered step under the overlay shadow, and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.",
+      "summary": "PLUS card: an optional image, content and footer on a `sunken`, `default`, or `raised` surface. - **Surface**: `sunken` (default, flat), `default` (page surface with a 1px border, flat), or `raised` (raised surface and shadow). Every card carries a 1px border (transparent on sunken and raised) so forced colors draw its edge. - **Image placement**: `top` (default), `start` or `end`. Side images apply at the large card minimum width and fill the height. `imageSplit` chooses one third (default) or one half; half uses Heading medium on a side card. Below the large minimum width, the image returns to the top with its own ratio. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: `padding` sets Card/pad-compact · default · spacious (via prop values `'sm'`, `'md'`, `'lg'`), the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: a clickable `sunken` or `default` card lifts to Raised on hover in place and settles to the raised shadow while pressed; a clickable `raised` card lifts to the raised hovered step under the overlay shadow and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.",
       "props": [
         {
           "name": "id",
@@ -8750,6 +8750,19 @@
           "default": null,
           "values": null,
           "description": "Footer slot: commit actions, left-aligned, Card/stack-lg below the body",
+          "deprecated": null
+        },
+        {
+          "name": "surface",
+          "type": "enum",
+          "required": false,
+          "default": "'sunken'",
+          "values": [
+            "sunken",
+            "default",
+            "raised"
+          ],
+          "description": "Surface level: sunken (default, flat), default (page fill with a 1px border, flat), or raised (raised fill and shadow)",
           "deprecated": null
         },
         {
@@ -8872,36 +8885,44 @@
         "BodyOnly",
         "WithFooter",
         "CustomHeader",
+        "SurfaceSunken",
+        "SurfaceDefault",
+        "SurfaceRaised",
         "Static",
         "Clickable",
         "Dragging",
+        "ForcedColors",
         "LoadingCard",
         "Rows",
         "PlacementBoundary"
       ],
       "tokens": [
-        "--body-default",
+        "--card-border-default",
+        "--card-border-width",
+        "--card-description-font",
         "--card-inline-md",
         "--card-pad-compact",
         "--card-pad-default",
         "--card-pad-spacious",
         "--card-radius",
         "--card-radius-compact",
+        "--card-shadow-overlay",
+        "--card-shadow-raised",
         "--card-stack-lg",
         "--card-stack-md",
         "--card-stack-sm",
+        "--card-surface-default",
+        "--card-surface-overlay",
+        "--card-surface-raised",
+        "--card-surface-raised-hovered",
+        "--card-surface-raised-pressed",
+        "--card-surface-sunken",
+        "--card-text",
+        "--card-text-subtle",
+        "--card-title-font-lg",
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
-        "--ds-shadow-overlay",
-        "--ds-shadow-raised",
-        "--ds-surface-overlay",
-        "--ds-surface-raised",
-        "--ds-surface-raised-hovered",
-        "--ds-surface-raised-pressed",
-        "--ds-text",
-        "--ds-text-subtle",
-        "--ds-utility-elevation-surface-current",
-        "--heading-md"
+        "--ds-utility-elevation-surface-current"
       ]
     },
     {
