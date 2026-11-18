@@ -318,7 +318,7 @@ CollapsesWithoutFocus.play = async ({ canvasElement }) => {
 };
 
 /**
- * The field fits its tags: every tag, "+n" included, is Tag's one height, 22,
+ * The field fits its tags: every tag, "+n" included, is Tag's one height, 20,
  * and sits inside the field's border at any width, and the field stays as tall
  * as an Input.
  */
@@ -352,7 +352,7 @@ SmallFitsItsTags.play = async ({ canvasElement }) => {
         await expect(shown.some((tag) => tag.matches('.plus-tag-group__overflow'))).toBe(true);
         for (const tag of shown) {
             const box = tag.getBoundingClientRect();
-            await expect(Math.round(box.height)).toBe(22);
+            await expect(Math.round(box.height)).toBe(20);
             await expect(box.top).toBeGreaterThanOrEqual(inner.top + border);
             await expect(box.bottom).toBeLessThanOrEqual(inner.bottom - border);
             await expect(box.right).toBeLessThanOrEqual(inner.right - border);

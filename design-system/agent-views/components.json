@@ -3151,6 +3151,18 @@
           "deprecated": null
         },
         {
+          "name": "spacing",
+          "type": "enum",
+          "required": false,
+          "default": "'default'",
+          "values": [
+            "default",
+            "spacious"
+          ],
+          "description": "`default` (20) in rows, lists and sentences; `spacious` (32) beside a heading.",
+          "deprecated": null
+        },
+        {
           "name": "children",
           "type": "node",
           "required": false,
@@ -3167,6 +3179,15 @@
           "values": null,
           "description": "The label (alternative to `children`). Defaults to the subject's own name.",
           "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra class on the tag element.",
+          "deprecated": null
         }
       ],
       "stories": [
@@ -3174,6 +3195,7 @@
         "CustomLabel",
         "PassesThroughTagProps",
         "UnknownSubjectFallsBack",
+        "BesideHeading",
         "Interactive",
         "Rest",
         "Hovered",
@@ -3182,7 +3204,12 @@
         "Disabled"
       ],
       "tokens": [
-        "--icon-sm"
+        "--body-default",
+        "--icon-md",
+        "--icon-sm",
+        "--pad-x-md",
+        "--radius-control-md",
+        "--tag-gap"
       ]
     },
     {

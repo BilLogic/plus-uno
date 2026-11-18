@@ -80,7 +80,7 @@ Colors.play = async ({ canvasElement }) => {
             const tag = canvas.getByTestId(color);
             const s = getComputedStyle(tag);
 
-            await expect(px(s.height), `${color} is 22 tall`).toBe(22);
+            await expect(px(s.height), `${color} is 20 tall`).toBe(20);
             await expect(px(s.borderTopWidth), `${color} has a 1px border`).toBe(1);
             await expect(s.color, `${color} text is neutral`).toBe(ink);
 
@@ -227,11 +227,11 @@ export const Behaviors = () => (
     </div>
 );
 
-/** One size: every behavior and state is 22 tall, the count and the × included. */
+/** One size: every behavior and state is 20 tall, the count and the × included. */
 Behaviors.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     for (const id of ['read-only', 'removable', 'selectable', 'selected', 'link', 'split', 'saving']) {
-        await expect(px(getComputedStyle(canvas.getByTestId(id)).height), `${id} is 22 tall`).toBe(22);
+        await expect(px(getComputedStyle(canvas.getByTestId(id)).height), `${id} is 20 tall`).toBe(20);
     }
 };
 
@@ -268,7 +268,7 @@ export const Types = () => (
 );
 
 /**
- * Every type is 22 tall with a 16 avatar. A person is fully round, and so is
+ * Every type is 20 tall with a 16 avatar. A person is fully round, and so is
  * its ×; an agent's avatar is a hexagon; a team's is a square with radius-2 corners.
  * The border is neutral on every avatar type, and the color goes to the
  * avatar's fill.
@@ -279,7 +279,7 @@ Types.play = async ({ canvasElement }) => {
 
     for (const id of ['plain', 'person', 'agent', 'team', 'person-photo', 'agent-photo', 'team-photo']) {
         const tag = canvas.getByTestId(id);
-        await expect(px(getComputedStyle(tag).height), `${id} is 22 tall`).toBe(22);
+        await expect(px(getComputedStyle(tag).height), `${id} is 20 tall`).toBe(20);
         if (id === 'plain') continue;
         const avatar = avatarOf(tag);
         await expect(px(getComputedStyle(avatar).width), `${id} avatar is 16 wide`).toBe(16);
@@ -290,7 +290,7 @@ Types.play = async ({ canvasElement }) => {
     // A person is fully round: the corner is at least half the height.
     const person = canvas.getByTestId('person');
     await expect(px(getComputedStyle(person).borderTopLeftRadius), 'a person tag is round')
-        .toBeGreaterThanOrEqual(11);
+        .toBeGreaterThanOrEqual(10);
     await expect(px(getComputedStyle(avatarOf(person)).borderTopLeftRadius), 'with a round avatar')
         .toBeGreaterThanOrEqual(8);
     const personX = canvas.getByRole('button', { name: 'Remove Rosa Chen' });
@@ -363,7 +363,7 @@ AvatarFallback.play = async ({ canvasElement }) => {
         const width = loaded.getBoundingClientRect().width;
         await expect(broken.getBoundingClientRect().width, `${type}: no layout shift`).toBe(width);
         await expect(none.getBoundingClientRect().width, `${type}: no layout shift`).toBe(width);
-        await expect(px(getComputedStyle(none).height)).toBe(22);
+        await expect(px(getComputedStyle(none).height)).toBe(20);
     }
 };
 
@@ -415,8 +415,8 @@ export const TypeBehaviors = {
 
         for (const [type, label] of Object.entries(labels)) {
             for (const kind of ['removable', 'selectable', 'link', 'disabled']) {
-                await expect(px(getComputedStyle(canvas.getByTestId(`${type}-${kind}`)).height), `${type} ${kind} is 22 tall`)
-                    .toBe(22);
+                await expect(px(getComputedStyle(canvas.getByTestId(`${type}-${kind}`)).height), `${type} ${kind} is 20 tall`)
+                    .toBe(20);
             }
 
             // Removable: the × is named after the words, never the initials.
@@ -968,7 +968,7 @@ DisabledInField.play = async ({ canvasElement }) => {
         const tag = canvas.getByTestId(id);
         await expect(getComputedStyle(tag).backgroundColor, `${id} fill`).toBe(fill);
         await expect(getComputedStyle(tag).color, `${id} text`).toBe(text);
-        await expect(px(getComputedStyle(tag).height)).toBe(22);
+        await expect(px(getComputedStyle(tag).height)).toBe(20);
     }
 
     // A span tag says it is inactive; a selectable one is a disabled button.
@@ -1251,7 +1251,7 @@ OnImages.play = async ({ canvasElement }) => {
     for (const tag of tags) {
         const s = getComputedStyle(tag);
         const name = tag.textContent;
-        await expect(px(s.height), `${name} is 22 tall`).toBe(22);
+        await expect(px(s.height), `${name} is 20 tall`).toBe(20);
         await expect(s.backgroundColor, `${name} has a solid fill`).toBe(ground);
         await expect(s.borderTopColor, `${name} has no border`).toBe(CLEAR);
         await expect(s.boxShadow, `${name} has the overlay shadow`).toBe(shadow);
@@ -1344,7 +1344,7 @@ ElevatedAvatarTypes.play = async ({ canvasElement }) => {
         ]) {
             const s = getComputedStyle(tag);
             const name = tag.textContent;
-            await expect(px(s.height), `${name} is 22 tall`).toBe(22);
+            await expect(px(s.height), `${name} is 20 tall`).toBe(20);
             await expect(s.backgroundColor, `${name} has the solid fill`).toBe(ground);
             await expect(s.borderTopColor, `${name} has no border`).toBe(CLEAR);
             await expect(s.boxShadow, `${name} has the overlay shadow`).toBe(shadow);
@@ -1414,7 +1414,7 @@ ElevatedDisabled.play = async ({ canvasElement }) => {
 
     const expectGround = async (tag, what) => {
         const s = getComputedStyle(tag);
-        await expect(px(s.height), `${what} is 22 tall`).toBe(22);
+        await expect(px(s.height), `${what} is 20 tall`).toBe(20);
         await expect(s.backgroundColor, `${what} keeps the solid fill`).toBe(ground);
         await expect(s.borderTopColor, `${what} has no border`).toBe(CLEAR);
         await expect(s.boxShadow, `${what} keeps the overlay shadow`).toBe(shadow);
@@ -1649,7 +1649,7 @@ export const Rest = {
         const tag = within(canvasElement).getByRole('button', { name: 'Science', pressed: false });
         await expect(getComputedStyle(tag).backgroundColor, 'outlined only').toBe(CLEAR);
         await expect(getComputedStyle(tag).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-accent-blue-subtle'));
-        await expect(px(getComputedStyle(tag).height)).toBe(22);
+        await expect(px(getComputedStyle(tag).height)).toBe(20);
     },
 };
 

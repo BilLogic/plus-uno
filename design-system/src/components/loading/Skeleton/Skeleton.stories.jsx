@@ -128,9 +128,9 @@ LabelPresets.play = async ({ canvasElement }) => {
     await expect(radius(canvas.getByTestId('status-spacious'))).toBe(8);
     const count = canvas.getByTestId('count');
     await expect(box(count).width, 'count is 24 wide').toBe(24);
-    await expect(box(canvas.getByTestId('tag')).height).toBe(22);
+    await expect(box(canvas.getByTestId('tag')).height).toBe(20);
     const person = canvas.getByTestId('tag-person');
-    await expect(box(person).height).toBe(22);
+    await expect(box(person).height).toBe(20);
     await expect(radius(person), 'tag-person is fully round').toBeGreaterThanOrEqual(box(person).height / 2);
 };
 

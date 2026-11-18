@@ -46,7 +46,7 @@ authored half, counted rather than assumed.
 |-----------|------:|:---:|:---:|:---:|
 | [AiMessage](AiMessage/index.md) | 11 | ✅ | ✅ | ✅ |
 | [ChangeTag](ChangeTag/index.md) | 7 | ✅ | ✅ | ✅ |
-| [CompetencyTag](CompetencyTag/index.md) | 3 | ✅ | ✅ | ✅ |
+| [CompetencyTag](CompetencyTag/index.md) | 5 | ✅ | ✅ | ✅ |
 | [CountTag](CountTag/index.md) | 11 | ✅ | ✅ | ✅ |
 | [DateTag](DateTag/index.md) | 6 | ✅ | ✅ | ✅ |
 | [PromptStarters](PromptStarters/index.md) | 4 | ✅ | ✅ | ✅ |
