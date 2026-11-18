@@ -79,7 +79,7 @@ export const Stack = {
         const turns = plates.map((p) => p.querySelector('[data-turn]').getAttribute('transform').replace(/translate\([^)]*\)\s*/, ''));
         await expect(new Set(turns).size, 'one skew for every plate').toBe(1);
         await expect(turns[0]).toBe('skewY(-12) scale(0.8 1)');
-        // Evenly spaced up the figure, once the rise has landed.
+        // Evenly spaced up the figure, once the fade in place has settled.
         await waitFor(() => {
             const origins = plates.map((p) => p.querySelector('[data-turn]').getAttribute('transform').match(/translate\(([-\d.]+) ([-\d.]+)\)/).slice(1).map(Number));
             const steps = origins.slice(1).map(([x, y], i) => [x - origins[i][0], y - origins[i][1]]);

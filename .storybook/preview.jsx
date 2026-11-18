@@ -199,8 +199,8 @@ const preview = {
               "Color",
               "Typography",
               "Iconography",
+              "Elevation",
               [
-                "Elevation",
                 "Overview",
                 "Layer system",
                 "Shadow ramp",
