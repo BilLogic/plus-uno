@@ -546,15 +546,15 @@ const preview = {
 
   globalTypes: {
     plusBrowser: {
-      description: 'Browser window chrome around the Template stories (docs only)',
+      description: 'Browser window chrome around the Template stories (Chrome by default)',
       toolbar: {
         title: 'Browser',
         icon: 'browser',
         items: [
-          { value: 'none', title: 'No browser' },
           { value: 'chrome', title: 'Chrome' },
           { value: 'safari', title: 'Safari' },
           { value: 'edge', title: 'Edge' },
+          { value: 'none', title: 'No browser' },
         ],
         dynamicTitle: true,
       },
@@ -636,7 +636,7 @@ const preview = {
     backgrounds: {
       value: DEFAULT_BACKGROUND
     },
-    plusBrowser: 'none',
+    plusBrowser: 'chrome',
     plusColorMode: 'light',
     plusContrastMode: 'no-preference',
   },

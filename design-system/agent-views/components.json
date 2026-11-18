@@ -5728,6 +5728,7 @@
       ],
       "stories": [
         "Overview",
+        "WithoutBrowserFrame",
         "ColorModes",
         "Reading",
         "DocsOverview",

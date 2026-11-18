@@ -221,6 +221,19 @@ export const Overview = {
         await expect(canvas.queryByRole('button', { name: 'Back' }), 'no Back on an ordinary page').toBeNull();
         await expect(canvas.queryByRole('button', { name: 'Close' }), 'no Close on an ordinary page').toBeNull();
         await expect(canvasElement.querySelector('.plus-frame__back, .plus-frame__close'), 'no Back or Close in the header row').toBeNull();
+        const browserFrame = canvasElement.querySelector('.plus-browser-frame');
+        await expect(browserFrame, 'Templates/ stories render with a browser frame by default').not.toBeNull();
+        await expect(browserFrame).toHaveAttribute('data-browser', 'chrome');
+        await expect(browserFrame.querySelector('.plus-browser-frame__toolbar')).not.toBeNull();
+    },
+};
+
+/** Opting out of the default template browser frame via `parameters.browserFrame: 'none'`. */
+export const WithoutBrowserFrame = {
+    parameters: { browserFrame: 'none', docs: { disable: true } },
+    play: async ({ canvasElement }) => {
+        await expect(canvasElement.querySelector('.plus-browser-frame'), 'browserFrame: none opts out of the browser frame').toBeNull();
+        await expect(canvasElement.querySelector('.plus-frame')).not.toBeNull();
     },
 };
 
