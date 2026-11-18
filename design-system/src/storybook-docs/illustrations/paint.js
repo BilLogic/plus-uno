@@ -44,9 +44,9 @@ const ROLES = {
   sidebarIcon: ['--ds-icon-subtle', 'patterns/Sidebar/Sidebar.scss'],
   // Section and Card
   // A Section draws no surface; a sunken box inside one is a sunken Card.
-  sectionSubtleSurface: ['--ds-surface-sunken', 'patterns/PatternCard/PatternCard.scss'],
+  sectionSubtleSurface: ['--ds-surface-sunken', 'tokens/ladder/_templates.scss'],
   cardSurface: ['--ds-surface-raised', 'tokens/ladder/_templates.scss'],
-  cardSunken: ['--ds-surface-sunken', 'patterns/PatternCard/PatternCard.scss'],
+  cardSunken: ['--ds-surface-sunken', 'tokens/ladder/_templates.scss'],
   cardShadow: ['--ds-shadow-raised', 'tokens/ladder/_templates.scss'],
   // Overlays
   popupSurface: ['--ds-surface-overlay', 'components/overlays-and-layering/Popup/Popup.scss'],
