@@ -26,7 +26,7 @@ export default {
 };
 
 const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', maxWidth: 'var(--size-3000)' };
-const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-xl)', alignItems: 'flex-start' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-xl) var(--inline-xl)', alignItems: 'flex-start' };
 const cell = { minWidth: 'var(--size-1000)' };
 
 export const Overview = () => (

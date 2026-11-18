@@ -129,7 +129,7 @@ export const InteractionStates = () => (
         <p className="body-default" style={{ color: 'var(--ds-text-subtle)' }}>
             Empty, with value, disabled, and read-only.
         </p>
-        <div style={{ display: 'flex', gap: 'var(--stack-2xl)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 'var(--stack-2xl) var(--inline-2xl)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
             <div>
                 <DemoLabel>DEFAULT</DemoLabel>
                 <DatePicker placeholder="MM/DD/YYYY" />

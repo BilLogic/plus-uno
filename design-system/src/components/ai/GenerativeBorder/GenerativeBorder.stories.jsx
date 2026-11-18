@@ -154,7 +154,7 @@ ReducedMotion.play = async ({ canvasElement }) => {
 /* ------------------------------------------------------------------- radius */
 
 export const Radii = () => (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-xl)' }}>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-xl) var(--inline-xl)' }}>
         {GENERATIVE_BORDER_RADII.map((radius) => (
             <GenerativeBorder key={radius} isActive radius={radius}>
                 <div style={{ ...box, minWidth: 'var(--card-min-width-sm)' }}>

@@ -6,7 +6,7 @@ import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import CloseButton from './CloseButton';
 import { INVERSE_GROUNDS } from './inverseGrounds.js';
 
-const row = { display: 'flex', gap: 'var(--inline-2xl)', alignItems: 'center', flexWrap: 'wrap' };
+const row = { display: 'flex', gap: 'var(--stack-2xl) var(--inline-2xl)', alignItems: 'center', flexWrap: 'wrap' };
 const inverseGround = {
     ...row,
     padding: 'var(--pad-x-lg)',

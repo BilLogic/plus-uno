@@ -58,7 +58,7 @@ const PAINT = {
 };
 
 const label = (appearance) => appearance === 'ai' ? 'Generate summary' : appearance.charAt(0).toUpperCase() + appearance.slice(1);
-const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-xl)', alignItems: 'center' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-xl) var(--inline-xl)', alignItems: 'center' };
 /** A hover or pressed read with the transition out of the way. */
 const settled = (button) => { button.style.transition = 'none'; };
 

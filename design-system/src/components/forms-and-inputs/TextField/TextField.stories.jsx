@@ -57,7 +57,7 @@ export default {
     }
 };
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-2xl)', alignItems: 'flex-start' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-2xl) var(--inline-2xl)', alignItems: 'flex-start' };
 const px = (value) => Math.round(parseFloat(value));
 const icon = (name) => <i className={iconClass(name)} aria-hidden="true" />;
 const fieldWrap = { maxWidth: 'var(--width-2500)' };

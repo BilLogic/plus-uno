@@ -32,7 +32,7 @@ const SIZES = [
 
 /** The three icon sizes. */
 export const Sizes = () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--stack-xl) var(--inline-xl)' }}>
         {SIZES.map(([token, value, name, use]) => (
             <div key={token} style={col('var(--stack-md)')}>
                 <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 'var(--image-xl)', height: 'var(--image-xl)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-surface-sunken)' }}>
@@ -47,7 +47,7 @@ export const Sizes = () => (
 
 /** Solid, regular and brands: the three Font Awesome Free families. */
 export const Families = () => (
-    <div style={{ display: 'flex', gap: 'var(--inline-2xl)', flexWrap: 'wrap' }}>
+    <div style={{ display: 'flex', gap: 'var(--stack-2xl) var(--inline-2xl)', flexWrap: 'wrap' }}>
         {[
             ['fa-solid', ['calendar-days', 'bell', 'gear', 'user', 'circle-check']],
             ['fa-regular', ['calendar-days', 'bell', 'user', 'circle-check', 'file']],

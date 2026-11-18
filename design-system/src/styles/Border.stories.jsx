@@ -71,7 +71,7 @@ export const PairWidthWithColor = {
 /** Focus ring outside a button and a field, leaving the control fill unchanged. */
 export const FocusRingShowcase = {
     render: () => (
-        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--stack-xl)', padding: 'var(--pad-x-md)' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--stack-xl) var(--inline-xl)', padding: 'var(--pad-x-md)' }}>
             <RingDemo style={{ borderRadius: 'var(--radius-control-md)' }}>
                 <Button text="Button" appearance="primary" />
             </RingDemo>

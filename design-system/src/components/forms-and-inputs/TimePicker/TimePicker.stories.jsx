@@ -75,7 +75,7 @@ Spacing.play = async ({ canvasElement }) => {
 };
 
 export const InteractionStates = () => (
-    <div style={{ display: 'flex', gap: 'var(--inline-2xl)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+    <div style={{ display: 'flex', gap: 'var(--stack-2xl) var(--inline-2xl)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div>
             <DemoLabel>DEFAULT</DemoLabel>
             <TimePicker aria-label="Time" placeholder="Default" />

@@ -210,7 +210,7 @@ export const Interactive = (args) => {
             {value && (
                 <div
                     style={{
-                        marginTop: 'var(--section-stack-md)',
+                        marginTop: 'var(--stack-xl)',
                         padding: 'var(--pad-x-md)',
                         backgroundColor: 'var(--ds-surface-sunken)',
                         borderRadius: 'var(--radius-md)',

@@ -49,7 +49,7 @@ const containerStyle = {
 };
 
 const blockStyle = {
-    margin: 'var(--page-stack-lg) calc(var(--section-pad-x-spacious) * 2)',
+    margin: 'var(--page-stack-lg) calc(var(--section-pad-x-spacious) * 2)', /* 40px: no general gap step */
 };
 
 function TooltipVariantsDemos() {

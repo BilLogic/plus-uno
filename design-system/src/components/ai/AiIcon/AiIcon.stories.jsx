@@ -70,7 +70,7 @@ const ModeSet = ({ mode }) => (
 /* ---------------------------------------------------------------- the set */
 
 export const AllIcons = () => (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-xl)' }}>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-xl) var(--inline-xl)' }}>
         <ModeSet mode="light" />
         <ModeSet mode="dark" />
     </div>
@@ -98,7 +98,7 @@ AllIcons.play = async ({ canvasElement }) => {
 /* ------------------------------------------------------- native token sizes */
 
 export const CloseUp = () => (
-    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', gap: 'var(--inline-xl)', color: 'var(--ds-icon)' }}>
+    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', gap: 'var(--stack-xl) var(--inline-xl)', color: 'var(--ds-icon)' }}>
         {AI_ICON_NAMES.map((name) => (
             <div key={name} style={cell}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
