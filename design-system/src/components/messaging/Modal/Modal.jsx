@@ -1,7 +1,6 @@
-import React, { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import React, { useId, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Dialog } from '@base-ui/react/dialog';
-import { animate } from 'motion/react';
 import Button from '@/components/forms-and-inputs/Button';
 import CloseButton from '@/components/forms-and-inputs/CloseButton';
 import Skeleton from '@/components/loading/Skeleton';
@@ -137,10 +136,7 @@ const Modal = ({
     const descriptionId = useId();
     const [bodyEl, setBodyEl] = useState(null);
     const panelRef = useRef(null);
-    const shakeRef = useRef(null);
     const reduced = useMotionReduced();
-
-    useEffect(() => () => shakeRef.current?.stop(), []);
 
     const [placed, trigger] = useOverlaySlot(show && renderAs === 'modal', onClose);
     const visible = renderAs === 'inline' ? show : show && placed;
@@ -160,23 +156,7 @@ const Modal = ({
     const handleOpenChange = (nextOpen, details) => {
         if (nextOpen) return;
         if (details?.reason === 'escape-key' && !keyboard) return;
-        if (details?.reason === 'outside-press' && !blanketCloses) {
-            if (blanket === 'static' && !reduced && panelRef.current) {
-                const target = panelRef.current;
-                shakeRef.current?.stop();
-                shakeRef.current = animate(0.001, 0, {
-                    type: 'spring',
-                    stiffness: 1187.5,
-                    damping: 15,
-                    mass: 1,
-                    velocity: 420,
-                    onUpdate: (v) => { target.style.translate = `${v}px 0`; },
-                    onComplete: () => { target.style.translate = ''; },
-                });
-            }
-            return;
-        }
-        shakeRef.current?.stop();
+        if (details?.reason === 'outside-press' && !blanketCloses) return;
         onClose?.(details?.event);
     };
 
