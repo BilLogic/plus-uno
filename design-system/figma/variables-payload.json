@@ -609,24 +609,24 @@
           }
         },
         {
-          "name": "Modal/width-sm",
+          "name": "Modal/width-6-col",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--modal-width-sm)"
+            "WEB": "var(--modal-width-6-col)"
           }
         },
         {
-          "name": "Modal/width-md",
+          "name": "Modal/width-8-col",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--modal-width-md)"
+            "WEB": "var(--modal-width-8-col)"
           }
         },
         {
-          "name": "Modal/width-lg",
+          "name": "Modal/width-10-col",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--modal-width-lg)"
+            "WEB": "var(--modal-width-10-col)"
           }
         },
         {

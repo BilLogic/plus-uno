@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import PatternSection from '@/patterns/PatternSection';
-import { DynamicTable, StaticTable, TreeTable } from '@/components';
-import { TableEmptyBox, TableFooterRow } from '@/components/text-and-data-display/Table/TableParts';
+import { DynamicTable, StaticTable, TableEmptyBox, TableFooterRow, TreeTable } from '@/components';
 import './Table.scss';
 
 /** The three kinds of table the template arranges, by the name `kind` takes. */

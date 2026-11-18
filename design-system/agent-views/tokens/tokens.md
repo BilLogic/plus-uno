@@ -83,10 +83,10 @@ Space owned by a template: page, section, card, table, modal, popup. Inside a te
 --modal-pad-x-spacious  /* Horizontal padding of a Modal with spacious spacing. */
 --modal-radius  /* Corner rounding of a Modal. */
 --modal-shadow  /* Shadow of a Modal on its Blanket. */
---modal-width-lg  /* Width of a large Modal, such as a table or a long form. */
---modal-width-md  /* Width of a default Modal, such as a short form. */
---modal-width-sm  /* Width of a small Modal, such as a single question or a one-field form. */
---modal-width-xs  /* Width of a compact Modal, such as a confirmation. */
+--modal-width-10-col  /* Width of a large Modal, such as a table or a long form. */
+--modal-width-4-col  /* Width of a compact Modal, such as a confirmation. */
+--modal-width-6-col  /* Width of a small Modal, such as a single question or a one-field form. */
+--modal-width-8-col  /* Width of a default Modal, such as a short form. */
 --page-border-width  /* Width of the edge drawn around a Page frame. */
 --page-pad-x-compact  /* Horizontal padding of a Page with compact spacing. */
 --page-pad-x-default  /* Horizontal padding of a Page with default spacing. */

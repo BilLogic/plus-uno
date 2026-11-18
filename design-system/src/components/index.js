@@ -103,7 +103,7 @@ export { default as DynamicTable } from '@/components/text-and-data-display/Dyna
 export { default as Heading, HEADING_COLORS, HEADING_SIZES, HeadingContextProvider, useHeadingLevel } from '@/components/text-and-data-display/Heading';
 export { default as InlineEdit } from '@/components/text-and-data-display/InlineEdit';
 export { default as StaticTable } from '@/components/text-and-data-display/StaticTable';
-export { HeadCell, TableBulkActions, TableCell, TableFooter, TableMessageRow, TableRow, TableSummaryRow } from '@/components/text-and-data-display/Table';
+export { HeadCell, TableBulkActions, TableCell, TableEmptyBox, TableFooter, TableFooterRow, TableMessageRow, TableRow, TableSummaryRow } from '@/components/text-and-data-display/Table';
 export { default as TreeTable } from '@/components/text-and-data-display/TreeTable';
 export { default as VisuallyHidden } from '@/components/text-and-data-display/VisuallyHidden';
 
