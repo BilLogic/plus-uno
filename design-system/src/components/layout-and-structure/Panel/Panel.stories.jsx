@@ -10,7 +10,7 @@ export default {
 };
 
 export const FullComposition = () => (
-    <PanelContainer width="360px" id="panel-full">
+    <PanelContainer width="var(--panel-width-default)" id="panel-full">
         <PanelHeader
             backAction={<PanelBackAction />}
             title="Session details"
@@ -27,7 +27,7 @@ export const FullComposition = () => (
 
 FullComposition.play = async ({ canvasElement }) => {
     const panel = canvasElement.querySelector('#panel-full');
-    await expect(panel.style.width).toBe('360px');
+    await expect(panel.style.width).toBe('var(--panel-width-default)');
     await expect(panel.querySelector('.plus-panel-header-title')).toHaveTextContent('Session details');
     await expect(panel.querySelector('.plus-panel-footer')).toHaveTextContent('Done');
 };
@@ -40,7 +40,7 @@ export const MinimalHeaderAndBody = () => (
 );
 
 export const WidthFromProvider = () => (
-    <PanelProvider defaultWidth="480px">
+    <PanelProvider defaultWidth="var(--width-3000)">
         <PanelContainer id="panel-provider-width">
             <PanelHeader title="Wide panel" />
             <PanelBody>Takes its width from PanelProvider.</PanelBody>
@@ -50,7 +50,7 @@ export const WidthFromProvider = () => (
 
 WidthFromProvider.play = async ({ canvasElement }) => {
     const panel = canvasElement.querySelector('#panel-provider-width');
-    await expect(panel.style.width).toBe('480px');
+    await expect(panel.style.width).toBe('var(--width-3000)');
 };
 
 /** Interactive playground: change the width, title and body from the table. */
@@ -79,7 +79,7 @@ export const Interactive = {
 
 
 const Subject = (props) => (
-    <PanelContainer width="360px" {...props}>
+    <PanelContainer width="var(--panel-width-default)" {...props}>
         <PanelHeader title="Session details" actions={<PanelActionGroup><PanelCloseAction /></PanelActionGroup>} />
         <PanelBody>Panel body content goes here.</PanelBody>
     </PanelContainer>
@@ -90,7 +90,7 @@ const root = (canvasElement) => canvasElement.firstElementChild;
 export const Rest = {
     render: () => <Subject />,
     play: async ({ canvasElement }) => {
-        await expect(root(canvasElement).style.width).toBe('360px');
+        await expect(root(canvasElement).style.width).toBe('var(--panel-width-default)');
         await expect(within(canvasElement).getByText('Session details')).toBeVisible();
     },
 };
