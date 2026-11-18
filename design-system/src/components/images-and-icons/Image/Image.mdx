@@ -2,6 +2,8 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as ImageStories from './Image.stories.jsx';
 import { Image } from '@/components';
+import sessionSummaryLight from '@/assets/images/lessons/session-summary-light.svg';
+import sessionSummaryDark from '@/assets/images/lessons/session-summary-dark.svg';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -148,9 +150,9 @@ The dark variant is a second `<source>` inside a `<picture>`, matched by
 flash of the light image on a dark system.
 
 <DoDontPair
-    doExample={<Image src="https://placehold.co/160x90" srcDark="https://placehold.co/160x90/111/eee" alt="" />}
+    doExample={<div style={{ width: '160px' }}><Image src={sessionSummaryLight} srcDark={sessionSummaryDark} alt="" /></div>}
     doCaption="One image with a dark variant, picked before paint."
-    dontExample={<Image src="https://placehold.co/160x90" alt="" />}
+    dontExample={<div style={{ width: '160px' }}><Image src={sessionSummaryLight} alt="" /></div>}
     dontCaption="A light image alone on a dark surface."
 />
 
@@ -161,9 +163,9 @@ real text only when the image carries information nothing else on the page
 already states.
 
 <DoDontPair
-    doExample={<div><Image src="https://placehold.co/160x90" alt="" /><p>Week 3 attendance, by session.</p></div>}
+    doExample={<div><div style={{ width: '160px' }}><Image src={sessionSummaryLight} alt="" /></div><p>Week 3 attendance, by session.</p></div>}
     doCaption="Empty alt where a caption already says it."
-    dontExample={<div><Image src="https://placehold.co/160x90" alt="Image" /><p>Week 3 attendance, by session.</p></div>}
+    dontExample={<div><div style={{ width: '160px' }}><Image src={sessionSummaryLight} alt="Image" /></div><p>Week 3 attendance, by session.</p></div>}
     dontCaption="Alt text that says nothing, or repeats the caption beside it."
 />
 
@@ -172,9 +174,9 @@ already states.
 Use `fluid` and let the container set the width, so one image works from phone to desktop. Reach for `fixed` only for a picture that must stay at its natural size.
 
 <DoDontPair
-    doExample={<div style={{ width: '50%' }}><Image src="https://placehold.co/320x180" alt="" /></div>}
+    doExample={<div style={{ width: '50%' }}><Image src={sessionSummaryLight} alt="" /></div>}
     doCaption="Fluid, so the container sets the width."
-    dontExample={<div style={{ width: '50%' }}><Image src="https://placehold.co/320x180" alt="" size="fixed" /></div>}
+    dontExample={<div style={{ width: '50%' }}><Image src={sessionSummaryLight} alt="" size="fixed" /></div>}
     dontCaption="Fixed in a narrow container: the picture overflows it."
 />
 
