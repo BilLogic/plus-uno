@@ -115,7 +115,7 @@ $count-dot: (
  * box-shadow outside the box, as in Figma, so the countTag keeps its exact height.
  */
 .plus-count--ring {
-    box-shadow: 0 0 0 var(--stroke-2) var(--ds-surface);
+    box-shadow: 0 0 0 var(--count-tag-ring-width) var(--ds-surface);
 }
 
 /*

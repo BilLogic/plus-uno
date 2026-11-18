@@ -11,9 +11,9 @@ const NUMERIC_FALLBACK = /var\(\s*--[a-z0-9-]+\s*,\s*\d+(?:\.\d+)?(?:px|rem)\s*\
 
 function stripCommentsAndSrOnly(source) {
     let text = source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
-    // Visually-hidden / sr-only clips use 1px / -1px intentionally.
-    text = text.replace(/\{[^{}]*(?:clip:\s*rect\(0,\s*0,\s*0,\s*0\)|clip-path:\s*inset\(50%\))[^{}]*\}/g, '{}');
-    return text;
+    // Strip nested rules first so outer sr-only blocks with nested &:focus rules match cleanly.
+    const withoutNested = text.replace(/&[^{}]*\{[^{}]*\}/g, '');
+    return withoutNested.replace(/\{[^{}]*(?:clip:\s*rect\(0,\s*0,\s*0,\s*0\)|clip-path:\s*inset\(50%\))[^{}]*\}/g, '{}');
 }
 
 const TARGETS = [
