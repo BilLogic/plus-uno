@@ -71,7 +71,7 @@ Two kinds of text node carry no text style, and each binds its type variables di
 | Element padding | `var(--pad-x-{xs\|sm\|md\|lg})`, `var(--pad-y-{sm\|md\|lg})` (ADR-038) |
 | Element gap | `var(--stack-{sm\|md\|lg})`, `var(--inline-{sm\|md\|lg})`; the 10px step reads `var(--space-0625)` |
 | Element radius | `var(--radius-{sm\|md\|lg\|full})` |
-| Modal padding | `var(--modal-pad-{x\|y}-{compact\|default\|spacious})` |
+| Modal padding | `var(--modal-pad-x-{default\|spacious})` |
 | Section padding | `var(--section-pad-{x\|y}-{compact\|default\|spacious})` |
 | Page padding | `var(--page-pad-{x\|y}-{compact\|default\|spacious})` |
 | Table cell | `var(--table-pad-x-cell)` 8 · `var(--table-pad-y-cell)` 4 |

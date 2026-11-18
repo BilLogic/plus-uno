@@ -258,7 +258,7 @@
       "use": [
         "--pad-x-lg",
         "--section-stack-md",
-        "--modal-pad"
+        "--modal-pad-x-default"
       ]
     },
     {

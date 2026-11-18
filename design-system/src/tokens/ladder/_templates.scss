@@ -58,12 +58,8 @@
     --blanket-max-height-modal: calc(100dvh - 2 * var(--blanket-pad-y)); /* a calc() of the pad above: code only, no Figma variable */
 
     /* Modal */
-    --modal-pad-x-compact: var(--space-0625);
     --modal-pad-x-default: var(--space-100);
     --modal-pad-x-spacious: var(--space-125);
-    --modal-pad-y-compact: var(--space-050);
-    --modal-pad-y-default: var(--space-075);
-    --modal-pad-y-spacious: var(--space-100);
     --modal-radius: var(--radius-xxl);
     --modal-width-xs: 261px; /* 4 screen-grid columns plus 2 × 16 modal pad at 768 · 1024 · 1440 */
     --modal-width-sm: 384px; /* lifted out of spacing / layout, beside the template’s pad/stack tokens */

@@ -59,7 +59,7 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `--space-025 (4px)` | `--stack-sm`, `--inline-sm`, `--pad-x-xs` (a primitive; read the step for the role) |
 | `--space-050 (8px)` | `--stack-md`, `--inline-md`, `--pad-x-sm` |
 | `--space-075 (12px)` | `--stack-lg`, `--inline-lg`, `--pad-x-md` |
-| `--space-100 (16px)` | `--pad-x-lg`, `--section-stack-md`, `--modal-pad` |
+| `--space-100 (16px)` | `--pad-x-lg`, `--section-stack-md`, `--modal-pad-x-default` |
 | `--space-150 (24px)` | `--page-stack-md`, `--page-pad`, `--section-stack-lg` |
 | `--space-200 (32px) and up` | `--page-stack-lg` (space this large belongs to a page; it is rarely right inside a component) |
 | `--radius-<n>` | `--radius-md`, `--radius-xl` (read the semantic step for the role: --radius-sm to --radius-xxl, or --radius-control-sm, -md, -lg for a control by height) |

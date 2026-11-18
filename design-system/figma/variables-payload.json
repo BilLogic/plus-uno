@@ -532,13 +532,6 @@
           }
         },
         {
-          "name": "Modal/pad-x-compact",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--modal-pad-x-compact)"
-          }
-        },
-        {
           "name": "Modal/pad-x-default",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -550,27 +543,6 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--modal-pad-x-spacious)"
-          }
-        },
-        {
-          "name": "Modal/pad-y-compact",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--modal-pad-y-compact)"
-          }
-        },
-        {
-          "name": "Modal/pad-y-default",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--modal-pad-y-default)"
-          }
-        },
-        {
-          "name": "Modal/pad-y-spacious",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--modal-pad-y-spacious)"
           }
         },
         {
@@ -1206,13 +1178,6 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--menu-group-gap)"
-          }
-        },
-        {
-          "name": "Menu/group-item-pad-y",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--menu-group-item-pad-y)"
           }
         },
         {
