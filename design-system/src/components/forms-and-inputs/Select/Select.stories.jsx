@@ -216,8 +216,8 @@ export const SpacingCompact = {
 export const Spacing = {
     render: () => (
         <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', display: 'flex', flexDirection: 'column', gap: '20px' /* token gap: 20px */ }}>
-            <Select label="Default" spacing="default" options={sampleOptions} placeholder="Select..." />
-            <Select label="Compact" spacing="compact" options={sampleOptions} placeholder="Select..." />
+            <Select label="Default" spacing="default" options={sampleOptions} placeholder="Select a site" />
+            <Select label="Compact" spacing="compact" options={sampleOptions} placeholder="Select a site" />
         </div>
     ),
     play: async ({ canvasElement }) => {
@@ -256,7 +256,25 @@ export const DependentFields = {
     }
 };
 
-const people = Array.from({ length: 80 }, (_, i) => ({ value: `p${i + 1}`, label: `Tutor ${i + 1}` }));
+const tutorNames = [
+    'Ari Patel', 'Maya Chen', 'Jordan Taylor', 'Elena Ruiz', 'Marcus Brooks',
+    'Priya Shah', 'Noah Wright', 'Sofia Lopez', 'Liam Davis', 'Chloe Miller',
+    'Ethan Hayes', 'Zoe Park', 'Ava Carter', 'Leo Garcia', 'Nora Foster',
+    'Owen Kim', 'Hannah Vance', 'Lucas Morales', 'Grace Turner', 'Caleb Reed',
+    'Ruby Santos', 'Isaac Bennett', 'Clara Nguyen', 'Julian Price', 'Hazel Cole',
+    'Miles Rivera', 'Stella Ward', 'Theo James', 'Iris Diaz', 'Eli Flores',
+    'Lydia Ross', 'Gavin Powell', 'Mila Jenkins', 'Asher Long', 'Naomi Perry',
+    'Wesley Hughes', 'Audrey Myers', 'Roman Ford', 'Carmen Gomez', 'Darius Bell',
+    'Camila Ortiz', 'Jonas Kelly', 'Beatrice Cruz', 'Simon Howard', 'Tessa Ward',
+    'Mateo Silva', 'Claire Price', 'Nathan Cole', 'Eva Simmons', 'Adrian Stone',
+    'Leah Griffin', 'Victor Walsh', 'Sonia Morales', 'Callum Burke', 'Alice Bryant',
+    'Jasper Cox', 'Phoebe Dunn', 'Rowan Webb', 'Dahlia Shaw', 'Declan Hart',
+    'Sienna Fox', 'Felix Stone', 'Corinne Lane', 'Tobias Nash', 'Molly West',
+    'Cyrus Dean', 'Freya Mills', 'Oscar Boyd', 'Gianna Hunt', 'Arthur Shaw',
+    'Lucy Fleming', 'Hugo Watts', 'Fiona Marsh', 'Devon Blake', 'Talia Greene',
+    'Jonah Lowe', 'Vera Sutton', 'Malcolm Cross', 'Kira Wolfe', 'Elias Boone',
+];
+const people = tutorNames.map((name, i) => ({ value: `p${i + 1}`, label: name }));
 
 /** LongList — past 50 options, Recent and Suggested come first and typing searches the rest. */
 export const LongList = {
@@ -364,7 +382,7 @@ export const Overview = {
             className="sb-select-interactive-override"
             style={{ pointerEvents: 'auto', maxWidth: 'var(--width-2500)', width: '100%' }}
         >
-            <Select aria-label="Option" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
+            <Select aria-label="Site" options={sampleOptions} placeholder="Select a site" />
         </div>
     ),
     parameters: {
@@ -405,8 +423,8 @@ export const Interactive = {
     },
     args: {
         isMulti: false,
-        label: 'Option',
-        placeholder: 'Select...',
+        label: 'Site',
+        placeholder: 'Select a site',
         caption: '',
         isSearchable: true,
         isCreatable: false,
@@ -472,36 +490,36 @@ export const Colors = {
 };
 
 /** One story per state, for the Examples tab. */
-const controlOf = (canvasElement) => within(canvasElement).getByRole('combobox', { name: 'Option' });
+const controlOf = (canvasElement) => within(canvasElement).getByRole('combobox', { name: 'Site' });
 const wrap = { maxWidth: 'var(--width-2500)', minHeight: 'var(--height-250)' };
 
 export const Rest = {
-    render: () => <div style={wrap}><Select id="select-ex-rest" label="Option" options={sampleOptions} placeholder="Please select" /></div>,
+    render: () => <div style={wrap}><Select id="select-ex-rest" label="Site" options={sampleOptions} placeholder="Select a site" /></div>,
     play: async ({ canvasElement }) => expectRest(canvasElement, controlOf(canvasElement)),
 };
 
 export const Hovered = {
-    render: () => <div style={wrap}><Select id="select-ex-hover" label="Option" options={sampleOptions} placeholder="Please select" /></div>,
+    render: () => <div style={wrap}><Select id="select-ex-hover" label="Site" options={sampleOptions} placeholder="Select a site" /></div>,
     play: async ({ canvasElement }) => expectHovered(canvasElement, controlOf(canvasElement)),
 };
 
 export const Focused = {
-    render: () => <div style={wrap}><Select id="select-ex-focus" label="Option" options={sampleOptions} placeholder="Please select" /></div>,
+    render: () => <div style={wrap}><Select id="select-ex-focus" label="Site" options={sampleOptions} placeholder="Select a site" /></div>,
     play: async ({ canvasElement }) => expectFocused(canvasElement, controlOf(canvasElement)),
 };
 
 export const FieldDisabled = {
-    render: () => <div style={wrap}><Select id="select-ex-disabled" label="Option" options={sampleOptions} placeholder="Please select" isDisabled /></div>,
+    render: () => <div style={wrap}><Select id="select-ex-disabled" label="Site" options={sampleOptions} placeholder="Select a site" isDisabled /></div>,
     play: async ({ canvasElement }) => expectDisabled(canvasElement, controlOf(canvasElement)),
 };
 
 export const FieldInvalid = {
-    render: () => <div style={wrap}><Select id="select-ex-invalid" label="Option" options={sampleOptions} placeholder="Please select" isInvalid errorMessage="Pick an option." /></div>,
+    render: () => <div style={wrap}><Select id="select-ex-invalid" label="Site" options={sampleOptions} placeholder="Select a site" isInvalid errorMessage="Choose a site." /></div>,
     play: async ({ canvasElement }) => expectInvalid(canvasElement, controlOf(canvasElement)),
 };
 
 export const FieldReadOnly = {
-    render: () => <div style={wrap}><Select id="select-ex-readonly" label="Option" options={sampleOptions} placeholder="Please select" isReadOnly /></div>,
+    render: () => <div style={wrap}><Select id="select-ex-readonly" label="Site" options={sampleOptions} placeholder="Select a site" isReadOnly /></div>,
     play: async ({ canvasElement }) => {
         await expectReadOnly(canvasElement, controlOf(canvasElement));
         // Nothing to open: the chevron is not drawn, and a press or Enter leaves the list shut.
@@ -535,10 +553,10 @@ export const FieldReadOnlyLongValue = {
         <div style={{ ...wrap, maxWidth: '200px' /* token gap: 200px */ }}>
             <Select
                 id="select-ex-readonly-long"
-                label="Option"
+                label="Lesson topic"
                 isReadOnly
                 value="long"
-                options={[{ value: 'long', label: 'Introduction to organic chemistry for first-year students' }]}
+                options={[{ value: 'long', label: 'Two-step linear equations with variables on both sides and word problems' }]}
             />
         </div>
     ),
