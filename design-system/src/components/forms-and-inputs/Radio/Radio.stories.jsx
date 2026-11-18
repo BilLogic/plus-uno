@@ -486,19 +486,19 @@ const BigSvg = () => (
 
 export const TileNarrowLargeIllustrations = () => (
     <div style={{ width: 'var(--width-2000)', /* 320px: the narrow-phone container width the ticket names */ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-        <Radio id="radio-narrow-character" name="radio-narrow" value="a" label="Character" illustration={<Illustration character="relationships" size={240} />} appearance="tile" />
-        <Radio id="radio-narrow-svg" name="radio-narrow" value="b" label="Svg" illustration={<BigSvg />} appearance="tile" />
+        <Radio id="radio-narrow-character" name="radio-narrow" value="a" label="One-on-one" illustration={<Illustration character="relationships" size={240} />} appearance="tile" />
+        <Radio id="radio-narrow-svg" name="radio-narrow" value="b" label="Small group" illustration={<BigSvg />} appearance="tile" />
         <Radio
             id="radio-narrow-img"
             name="radio-narrow"
             value="c"
-            label="Image"
+            label="Drop-in lab"
             illustration={<img alt="" width="300" height="300" src={SQUARE_IMAGE} />}
             appearance="tile"
         />
         {/* 160px: the smallest container a tile is asked to fit */}
         <div style={{ width: 'var(--width-1000)' }}>
-            <Radio id="radio-narrow-small" name="radio-narrow-small" value="d" label="Smallest" illustration={<Illustration character="relationships" size={240} />} appearance="tile" />
+            <Radio id="radio-narrow-small" name="radio-narrow-small" value="d" label="Study hall" illustration={<Illustration character="relationships" size={240} />} appearance="tile" />
         </div>
     </div>
 );
