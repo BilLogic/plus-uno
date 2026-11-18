@@ -3,6 +3,7 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as TileStories from './Tile.stories.jsx';
 import { Tile } from '@/components';
+import sessionSummaryLight from '@/assets/images/kit/session-summary-light.svg';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -209,7 +210,7 @@ logo keeps its own. Images cover the whole tile, so color does not apply.
 <DoDontPair
     doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile icon="book-open" appearance="bold" color="blue" /><Tile icon="book-open" /></div>}
     doCaption="Icons take appearance and color; logos keep their own."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile content="logo" src={"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'48'%20height%3D'48'%20viewBox%3D'0%200%2048%2048'%3E%3Crect%20width%3D'48'%20height%3D'48'%20rx%3D'12'%20fill%3D'%23147c82'%2F%3E%3Ccircle%20cx%3D'24'%20cy%3D'24'%20r%3D'10'%20fill%3D'%23ffffff'%2F%3E%3C%2Fsvg%3E"} appearance="bold" /></div>}
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile content="logo" src={sessionSummaryLight} label="Weekly tutoring session summary" appearance="bold" /></div>}
     dontCaption="A bold appearance on a logo, which does nothing."
 />
 
@@ -230,9 +231,9 @@ item across the app, or leave tiles gray.
 Logos default to white. Set a ground color only to match a surface; never recolor the logo.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile content="logo" src={"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'48'%20height%3D'48'%20viewBox%3D'0%200%2048%2048'%3E%3Crect%20width%3D'48'%20height%3D'48'%20rx%3D'12'%20fill%3D'%23147c82'%2F%3E%3Ccircle%20cx%3D'24'%20cy%3D'24'%20r%3D'10'%20fill%3D'%23ffffff'%2F%3E%3C%2Fsvg%3E"} /></div>}
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile content="logo" src={sessionSummaryLight} label="Weekly tutoring session summary" /></div>}
     doCaption="A logo on the default white ground."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile content="logo" src={"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'48'%20height%3D'48'%20viewBox%3D'0%200%2048%2048'%3E%3Crect%20width%3D'48'%20height%3D'48'%20rx%3D'12'%20fill%3D'%23147c82'%2F%3E%3Ccircle%20cx%3D'24'%20cy%3D'24'%20r%3D'10'%20fill%3D'%23ffffff'%2F%3E%3C%2Fsvg%3E"} color="blue" appearance="bold" /></div>}
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile content="logo" src={sessionSummaryLight} label="Weekly tutoring session summary" color="blue" appearance="bold" /></div>}
     dontCaption="A bold ground on the logo, which keeps its own."
 />
 

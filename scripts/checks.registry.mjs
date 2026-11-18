@@ -188,6 +188,14 @@ export const CHECKS = [
     guards: 'the generated `.storybook/brand-image.js` data-URI module against `design-system/src/assets/storybook-brand.svg`.',
   },
   {
+    name: 'check:kit-art',
+    script: 'node scripts/export-kit-art.mjs --check',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/export-kit-art.mjs',
+    guards: 'the exported static kit SVGs in design-system/src/assets/images/kit/ against the shared illustration kit scene and tokens.',
+  },
+  {
     name: 'check:figma-node-types',
     script: 'node scripts/check-figma-node-types.mjs',
     pkg: 'root',

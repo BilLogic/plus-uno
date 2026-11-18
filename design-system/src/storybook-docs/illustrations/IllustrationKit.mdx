@@ -3,7 +3,7 @@ import { FoundationHero, FoundationContents, FoundationSection } from '@/storybo
 import { RefTable } from '@/storybook-docs/foundation-blocks.jsx';
 import { IllustrationKitGallery } from '@/storybook-docs/illustrations/IllustrationKitGallery.jsx';
 import { IllustrationFigure } from '@/storybook-docs/illustrations/Illustration.jsx';
-import { ThreeLayers, OpeningARecord, ResponsiveReflow } from '@/storybook-docs/illustrations/compositions.jsx';
+import { ThreeLayers, OpeningARecord, ResponsiveReflow, SessionSummary } from '@/storybook-docs/illustrations/compositions.jsx';
 
 <Meta title="Get started/Illustration kit" />
 
@@ -70,6 +70,10 @@ Each primitive takes a position (`x`, `y`), size (`w`, `h`) and `accent` flag. T
 
 <IllustrationFigure caption="Frame 768 wide: a Sidebar opened by hand floats on a Blanket over the same single column.">
     <ResponsiveReflow width={768} />
+</IllustrationFigure>
+
+<IllustrationFigure caption="Session summary: a card with an avatar dot, skeleton bars, a tag, a divider and a five-bar chart.">
+    <SessionSummary />
 </IllustrationFigure>
 
 </FoundationSection>

@@ -1,8 +1,8 @@
 import React from 'react';
 import { expect } from 'storybook/test';
 import { Image, IMAGE_SIZES } from '@/components';
-import sessionSummaryLight from '@/assets/images/lessons/session-summary-light.svg';
-import sessionSummaryDark from '@/assets/images/lessons/session-summary-dark.svg';
+import sessionSummaryLight from '@/assets/images/kit/session-summary-light.svg';
+import sessionSummaryDark from '@/assets/images/kit/session-summary-dark.svg';
 
 export default {
     title: 'Components/Images and icons/Image',
