@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, DynamicTable, EmptyState, Pagination, Table } from '@/components';
+import { Button, DynamicTable, EmptyState, Pagination, StaticTable } from '@/components';
 import { PatternSection } from '@/patterns';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { ResetExampleButton } from '@/storybook-docs/lib/reset-example.jsx';
@@ -8,7 +8,7 @@ import { CATEGORIES, QuickFilter, narrow } from '../Filtering/filteringDemo.jsx'
 
 /**
  * The live do and don't examples on the Empty pattern page, composed from
- * `PatternSection`, `EmptyState`, `DynamicTable`, `Table`, `Pagination`,
+ * `PatternSection`, `EmptyState`, `DynamicTable`, `StaticTable`, `Pagination`,
  * `ViewBar`, `QuickFilter` and `Button`.
  */
 
@@ -122,7 +122,7 @@ export const HeaderOverNothingCase = () => (
             description="Lincoln Middle"
             tabs={<ViewBar views={['All students', 'Needs follow-up']} filters={null} search={false} more={false} primary={null} />}
         >
-            <Table
+            <StaticTable
                 headers={['Name', 'Grade', 'Last session']}
                 rows={[]}
                 emptyState="No results"

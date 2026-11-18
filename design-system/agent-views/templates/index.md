@@ -9,6 +9,6 @@
 - [Panel](Panel.md)
 - [Card](../../src/patterns/PatternCard/index.md)
 - [Section](../../src/patterns/PatternSection/index.md)
-- [Table](../../src/patterns/PatternTable/index.md)
 - [Popup](Popup.md)
+- [Table](../../src/patterns/Table/index.md)
 - [Overview](TemplatesOverview.md)

@@ -2,11 +2,11 @@ import { AnimatePresence, HeightRow } from '@/lib/heightMotion';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import Spinner from '@/components/loading/Spinner';
-import HeadCell from './HeadCell';
-import { TableCell, TableRow, TableMessageRow, TableShell } from './TableParts';
+import HeadCell from '../Table/HeadCell';
+import { TableCell, TableRow, TableMessageRow, TableShell } from '../Table/TableParts';
 import Icon from '../../images-and-icons/Icon';
-import './Table.scss';
-import './DynamicTable.scss';
+import '../Table/Table.scss';
+import '../Table/DynamicTable.scss';
 import './TreeTable.scss';
 
 const classes = (...names) => names.filter(Boolean).join(' ');
@@ -344,6 +344,7 @@ TreeTable.propTypes = {
     emptyMessage: PropTypes.node,
     /** Row height: 32, 40 or 48. */
     size: PropTypes.oneOf([32, 40, 48]),
+    /** Extra class names added to the table's wrapper beside the component's own. */
     className: PropTypes.string,
     /** Maps to `data-testid`, for test queries. */
     testId: PropTypes.string,

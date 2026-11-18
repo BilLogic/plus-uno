@@ -249,7 +249,7 @@ export const TOKEN_LADDER = [
   { tier: 'templates', group: 'Table', new: '--table-pad-x-footer', old: '--table-pad-x-footer', use: 'Horizontal padding of a table footer, such as its Pagination row.' },
   { tier: 'templates', group: 'Table', new: '--table-inline', old: null, ref: 'var(--inline-md)', use: 'Horizontal gap between controls in a table footer.' },
   { tier: 'templates', group: 'Table', new: '--table-footer-height', old: null, ref: 'var(--height-300)', use: 'Height of a table footer row: the range, the page-size Select and Pagination on one line.' },
-  { tier: 'templates', group: 'Table', new: '--table-min-width-title', old: '--table-min-width-title', use: 'Narrowest a PatternTable\'s title column may shrink.' },
+  { tier: 'templates', group: 'Table', new: '--table-min-width-title', old: '--table-min-width-title', use: 'Narrowest a table\'s title column may shrink.' },
   { tier: 'templates', group: 'Table', new: '--table-empty-surface', old: null, type: 'COLOR', ref: 'var(--ds-surface-sunken)', use: 'Surface of the empty state box that replaces an empty table.' },
   { tier: 'templates', group: 'Table', new: '--table-empty-radius', old: null, ref: 'var(--radius-xxl)', use: 'Corner rounding of the empty state box that replaces an empty table.' },
 
@@ -273,7 +273,7 @@ export const TOKEN_LADDER = [
   { tier: 'templates', group: 'Modal', new: '--modal-width-md', old: '--layout-width-modal-md', ref: '507px', at: { '(min-width: 1024px)': '677px', '(min-width: 1440px)': '848px' }, use: 'Width of a default Modal, such as a short form.' },
   { tier: 'templates', group: 'Modal', new: '--modal-width-lg', old: '--layout-width-modal-lg', ref: '629px', at: { '(min-width: 1024px)': '843px', '(min-width: 1440px)': '1056px' }, use: 'Width of a large Modal, such as a table or a long form.' },
   { tier: 'templates', group: 'Page', new: '--page-border-width', old: null, ref: 'var(--stroke-2)', use: 'Width of the edge drawn around a Page frame.' },
-  { tier: 'templates', group: 'Table', new: '--table-overflow-reach', old: null, ref: 'var(--space-150)', use: 'How far a PatternTable lets a row\'s overflow, such as a focus ring, reach past its clip.' },
+  { tier: 'templates', group: 'Table', new: '--table-overflow-reach', old: null, ref: 'var(--space-150)', use: 'How far a table lets a row\'s overflow, such as a focus ring, reach past its clip.' },
   { tier: 'templates', group: 'Modal', new: '--modal-body-min-height', old: null, ref: 'var(--height-500)', use: 'Minimum height of a Modal\'s body, so a short body does not collapse the dialog.' },
   { tier: 'templates', group: 'Modal', new: '--modal-shadow', old: null, ref: 'var(--ds-shadow-blocking)', codeOnly: true, use: 'Shadow of a Modal on its Blanket.' },
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { act, render, screen, within, fireEvent, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { TreeTable } from '.';
+import TreeTable from '.';
 
 const head = {
     cells: [

@@ -161,12 +161,12 @@ $edge-shadow: inset calc(-1 * var(--border-width-default)) 0 0 var(--ds-border-b
     .plus-table-shell--sticky-column :is(th, td):nth-child(2):not(.plus-table-shell-message) {
         position: sticky;
         left: var(--plus-table-row-height);
-        z-index: var(--pattern-table-z-sticky);
+        z-index: var(--table-shell-z-sticky);
         background-color: var(--ds-utility-elevation-surface-current);
     }
 
     .plus-table-shell--sticky-header.plus-table-shell--sticky-column thead th:nth-child(2) {
-        z-index: var(--pattern-table-z-corner);
+        z-index: var(--table-shell-z-corner);
     }
 
     #{$frozen} :is(th, td):first-child:not(.plus-table-shell-message) {
@@ -176,6 +176,6 @@ $edge-shadow: inset calc(-1 * var(--border-width-default)) 0 0 var(--ds-border-b
 
     #{$frozen} :is(th, td):nth-child(2):not(.plus-table-shell-message) {
         box-shadow: $edge-shadow;
-        clip-path: inset(0 calc(-1 * var(--pattern-table-overflow-reach)) 0 0);
+        clip-path: inset(0 calc(-1 * var(--table-shell-overflow-reach)) 0 0);
     }
 }

@@ -54,7 +54,7 @@ export const STATIC = new Set([
   'Logo', 'Object', 'VisuallyHidden',
   // The motion docs' "No motion" list (05-components.md): they never move.
   'Avatar', 'AvatarGroup', 'ButtonGroup', 'ChangeTag', 'Comment', 'CompetencyTag', 'CountTag', 'Dialog', 'EmptyState', 'FooterActions',
-  'RichTextEditor', 'ScrollBar', 'StatusTag', 'Tag', 'TagGroup', 'Tile',
+  'RichTextEditor', 'ScrollBar', 'StaticTable', 'StatusTag', 'Tag', 'TagGroup', 'Tile',
 ]);
 
 const TIERS = ['component', 'pattern', 'template'];

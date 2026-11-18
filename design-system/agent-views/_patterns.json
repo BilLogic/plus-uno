@@ -28,8 +28,8 @@
     },
     {
       "group": "Table",
-      "name": "PatternTable",
-      "use": "How a table sits on a page: inside a Section whose header carries the title and toolbar, with slots for pagination and the empty state."
+      "name": "Table",
+      "use": "How a table sits on a page: a Section header over a Static, Dynamic or Tree table, with its footer and empty state."
     },
     {
       "group": "Overlays",

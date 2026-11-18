@@ -50,7 +50,7 @@
       "name": "table",
       "token_scope": "--table-*",
       "typical_locations": [
-        "design-system/src/patterns/PatternTable/"
+        "design-system/src/patterns/Table/"
       ]
     },
     {

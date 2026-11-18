@@ -84,10 +84,10 @@ Don't: An empty-view invitation when the load failed.
 
 ### Replace a Table with it, never stack it under one. {#replace-a-table-with-it-never-stack-it-under-one}
 
-Pass `EmptyState` to `DynamicTable`'s `emptyView` (or `PatternTable`'s `emptyState` with `empty`) so it replaces the whole table, header row and footer included. Never stack an `EmptyState` under an empty `Table`.
+Pass `EmptyState` to `DynamicTable`'s `emptyView` (or the Table template's `emptyState` with `empty`) so it replaces the whole table, header row and footer included. Never stack an `EmptyState` under an empty Static table.
 
 Do: An EmptyState in DynamicTable's emptyView replaces the whole table.
-Don't: An EmptyState under a Table with an empty body.
+Don't: An EmptyState under a Static table with an empty body.
 
 ## Accessibility
 

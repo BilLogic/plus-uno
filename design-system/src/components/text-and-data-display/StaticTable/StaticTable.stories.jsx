@@ -3,12 +3,12 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
-import { Table, StaticTable, HeadCell } from '@/components';
+import { StaticTable, HeadCell } from '@/components';
 import { iconClass } from '../../../lib/icon';
 
 export default {
     title: 'Components/Text and data display/Static table',
-    component: Table,
+    component: StaticTable,
     tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
@@ -81,11 +81,6 @@ export default {
             description: 'Alternate row background',
             table: { category: 'Design' }
         },
-        hover: {
-            control: 'boolean',
-            description: 'Highlight the row under the cursor',
-            table: { category: 'Design' }
-        },
         bordered: {
             control: 'boolean',
             description: 'Frame the table and draw vertical lines',
@@ -114,7 +109,7 @@ const rows = [
 const rowOf = (canvasElement, name) => within(canvasElement).getByText(name).closest('tr');
 
 export const Overview = {
-    args: { headers, rows, hover: true, size: 40, titleColumn: 1 }
+    args: { headers, rows, size: 40, titleColumn: 1 }
 };
 
 export const Striped = {
@@ -130,7 +125,7 @@ export const Sizes = {
     render: () => (
         <div style={{ display: 'grid', gap: 'var(--section-stack-md)' }}>
             {[32, 40, 48].map((size) => (
-                <Table
+                <StaticTable
                     key={size}
                     size={size}
                     headers={[{ text: `size=${size}` }, { text: 'Sessions', align: 'number' }]}
@@ -164,7 +159,7 @@ export const FramedAndLines = {
 export const Cells = {
     parameters: { docs: { description: { story: 'A cell is text or a slot. Text cells add a muted second line, wrap, take the title emphasis, align as text, number or icon, and take an `elemBefore` slot. A name that does not fit ends in an ellipsis and shows its full text in a tooltip.' } } },
     render: () => (
-        <Table
+        <StaticTable
             headers={[
                 { text: 'Student', width: '28%' },
                 { text: 'Note', width: '30%' },
@@ -224,8 +219,7 @@ export const RowStates = {
     args: {
         headers: ['Row', 'Grade'],
         rows: [['Rest', 'Grade 7'], ['Highlighted', 'Grade 7'], ['Selected', 'Grade 7'], ['Disabled', 'Grade 7']],
-        rowStates: ['rest', 'highlighted', 'selected', 'disabled'],
-        hover: true
+        rowStates: ['rest', 'highlighted', 'selected', 'disabled']
     },
     parameters: { docs: { description: { story: 'A row rests, is highlighted (a warning wash), is selected, or is disabled. The fills are transparencies of ink and state tokens, so each flips with the color mode.' } } },
     play: async ({ canvasElement }) => {

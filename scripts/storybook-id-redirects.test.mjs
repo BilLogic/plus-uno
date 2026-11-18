@@ -137,7 +137,7 @@ test('every retired Modal component story id redirects to a live Dialog or Modal
 });
 
 
-test('every retired PatternTable story id redirects to a live Table template or Table shell story id', async () => {
+test('every retired table-pattern story id redirects to a live Table template or Table shell story id', async () => {
   const { storybookId } = await import('./lib/storybook-id.mjs');
   const exportIds = (relPath, title) => {
     const src = fs.readFileSync(new URL(relPath, import.meta.url), 'utf8');

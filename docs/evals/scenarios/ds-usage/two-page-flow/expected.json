@@ -8,23 +8,23 @@
     {
       "id": "escalation-list-page",
       "screen": "Escalation list page",
-      "template": "Frame + Page + PatternSection + PatternTable",
-      "variant": "Frame · Default / Page · Default / PatternSection · Default / PatternTable · Dynamic table",
+      "template": "Frame + Page + PatternSection + Table",
+      "variant": "Frame · Default / Page · Default / PatternSection · Default / Table · Dynamic table",
       "page": "design-system/src/patterns/Page/index.md",
       "section": "Anatomy",
       "pages": [
         "design-system/src/patterns/Frame/index.md",
         "design-system/src/patterns/Page/index.md",
         "design-system/src/patterns/PatternSection/index.md",
-        "design-system/src/patterns/PatternTable/index.md"
+        "design-system/src/patterns/Table/index.md"
       ],
       "guides": ["frame", "page", "section", "table", "templates"],
       "scoring": "checker",
       "check": {
         "kind": "template",
-        "components": ["Frame", "Page", "PatternSection", "PatternTable"]
+        "components": ["Frame", "Page", "PatternSection", "Table"]
       },
-      "expectation": "Escalation list page built on Frame, Page, PatternSection, and PatternTable with open escalations listed first."
+      "expectation": "Escalation list page built on Frame, Page, PatternSection, and Table with open escalations listed first."
     },
     {
       "id": "escalation-detail-page",

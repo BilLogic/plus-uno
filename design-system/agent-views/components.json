@@ -4410,6 +4410,387 @@
       ]
     },
     {
+      "name": "DynamicTable",
+      "kind": "component",
+      "import": "import { DynamicTable } from '@/components';",
+      "group": "text-and-data-display",
+      "source": "design-system/src/components/text-and-data-display/DynamicTable/DynamicTable.jsx",
+      "summary": "Dynamic table. A table people sort, page or act on, built on the table shell: its `footer` and `emptyState` slots, sortable `HeadCell`s in the head row and the shared `TableRow` and `TableCell` parts in the body. - **Data.** `head.cells` is one `{ key, content, isSortable, width, align }` per column; `rows` is `{ key, cells, onClick }` with one `{ key, content }` per column. A column sorts by its cells' `key`. - **Stateful or stateless.** Left alone it holds its own sort and page, seeded by `defaultSortKey`, `defaultSortOrder` and `defaultPage`. Pass `sortKey` and `sortOrder`, or `page`, and the page owns that state: the table reports a press through `onSort` or `onSetPage` and draws only what it is given. With `totalRows`, `rows` is already the current page (paged on a server) and the footer counts against `totalRows`. - **States.** `default`, `empty`, `no results`, `loading`, `refreshing` and `error`. `empty` and `no results` replace the whole table (no head row, footer or pagination) with `EmptyState`; `loading` and `error` keep the head row and swap the body for one message row; `refreshing` keeps the rows at the loading opacity under a spinner. `isLoading` and an empty `rows` choose the state on their own; `state` names one outright (`no results` and `error` are only ever named). - **Selection.** `isSelectable` adds a checkbox column as wide as the row is tall: \"Select row N\" on each row, \"Select all rows\" in the head, which is checked when every row on the page is selected and mixed when only some are. A selected row carries `aria-selected` and the selected fill. The keys come back through `onSelectionChange`; pass `selectedRowKeys` to own them. - **Bulk bar.** While rows are selected, the head row becomes the bulk bar: select-all stays in its cell, and one cell across the columns says \"N selected\" and holds `bulkActions` at the start. The labels cross-fade in place and the row keeps its height. There is no Clear: the checkboxes clear the selection, and the head row comes back when none are left. - **Sticky header and frozen column.** `stickyHeader` pins the head row inside the table's own scroll region, bounded by `maxHeight`. `isFrozen` pins the first column (with the checkboxes, the title column beside them) on an opaque surface, with a stronger divider and the overflow shadow only while the table is scrolled sideways. - **Width.** Under the content minimum the table scrolls sideways instead of squeezing. The first column fills the room and the rest size to their content, unless a head cell sets `width`; `isFixedSize` holds every column to its set width.",
+      "props": [
+        {
+          "name": "head",
+          "type": "shape",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "One `{ key, content, isSortable, width, align }` per column",
+          "deprecated": null
+        },
+        {
+          "name": "rows",
+          "type": "arrayOf",
+          "required": true,
+          "default": "[]",
+          "values": null,
+          "description": "One `{ key, cells, onClick }` per row; each cell `{ key, content }`",
+          "deprecated": null
+        },
+        {
+          "name": "caption",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "A visible caption that names the table.",
+          "deprecated": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The table's accessible name when there is no caption.",
+          "deprecated": null
+        },
+        {
+          "name": "rowsPerPage",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Rows per page; leave it out and the table does not page.",
+          "deprecated": null
+        },
+        {
+          "name": "rowsPerPageOptions",
+          "type": "arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Page sizes offered in the footer's \"25 / page\" Select; with `onRowsPerPageChange`.",
+          "deprecated": null
+        },
+        {
+          "name": "onRowsPerPageChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with the chosen page size.",
+          "deprecated": null
+        },
+        {
+          "name": "noun",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The table's noun in the footer range, \"1–25 of 140 sessions\".",
+          "deprecated": null
+        },
+        {
+          "name": "page",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The current page, owned by the page (stateless).",
+          "deprecated": null
+        },
+        {
+          "name": "defaultPage",
+          "type": "number",
+          "required": false,
+          "default": "1",
+          "values": null,
+          "description": "The first page when the table holds its own page.",
+          "deprecated": null
+        },
+        {
+          "name": "onSetPage",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with the page the pager asks for.",
+          "deprecated": null
+        },
+        {
+          "name": "totalRows",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The full count when `rows` is already one page, paged on a server.",
+          "deprecated": null
+        },
+        {
+          "name": "sortKey",
+          "type": "string or number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The sorted column's key, owned by the page (stateless).",
+          "deprecated": null
+        },
+        {
+          "name": "sortOrder",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "ascending",
+            "descending",
+            "none"
+          ],
+          "description": "The sort direction, owned by the page.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultSortKey",
+          "type": "string or number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The column the table starts sorted by when it holds its own sort.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultSortOrder",
+          "type": "enum",
+          "required": false,
+          "default": "'ascending'",
+          "values": [
+            "ascending",
+            "descending"
+          ],
+          "description": "The direction the table starts sorted in when it holds its own sort.",
+          "deprecated": null
+        },
+        {
+          "name": "onSort",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with `{ key, sortOrder }` when a head cell asks for a sort.",
+          "deprecated": null
+        },
+        {
+          "name": "isLoading",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Rows are on their way: `loading` with no rows, `refreshing` over them.",
+          "deprecated": null
+        },
+        {
+          "name": "state",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "default",
+            "empty",
+            "no results",
+            "loading",
+            "refreshing",
+            "error"
+          ],
+          "description": "Names the body's state outright.",
+          "deprecated": null
+        },
+        {
+          "name": "emptyView",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The `EmptyState` (or heading text) rendered in place of the table for the `empty` state.",
+          "deprecated": null
+        },
+        {
+          "name": "noResultsView",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The `EmptyState` (or heading text) rendered in place of the table for the `no results` state.",
+          "deprecated": null
+        },
+        {
+          "name": "errorView",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The message for the `error` state.",
+          "deprecated": null
+        },
+        {
+          "name": "highlightedRowIndex",
+          "type": "number or arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The index (across every page) of the row to highlight, or a list of them.",
+          "deprecated": null
+        },
+        {
+          "name": "isFixedSize",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Hold every column to its head cell's `width`.",
+          "deprecated": null
+        },
+        {
+          "name": "verticalLines",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Rules between the columns.",
+          "deprecated": null
+        },
+        {
+          "name": "wrap",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Every cell wraps instead of truncating.",
+          "deprecated": null
+        },
+        {
+          "name": "size",
+          "type": "enum",
+          "required": false,
+          "default": "40",
+          "values": [
+            "32",
+            "40",
+            "48"
+          ],
+          "description": "Row height: 32, 40 or 48.",
+          "deprecated": null
+        },
+        {
+          "name": "isSelectable",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "A checkbox column with select-all in the head.",
+          "deprecated": null
+        },
+        {
+          "name": "selectedRowKeys",
+          "type": "arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The selected rows' keys, owned by the page.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultSelectedRowKeys",
+          "type": "arrayOf",
+          "required": false,
+          "default": "[]",
+          "values": null,
+          "description": "The rows selected at first when the table holds its own selection.",
+          "deprecated": null
+        },
+        {
+          "name": "onSelectionChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with every selected key when the selection changes.",
+          "deprecated": null
+        },
+        {
+          "name": "bulkActions",
+          "type": "arrayOf",
+          "required": true,
+          "default": "[]",
+          "values": null,
+          "description": "The bulk bar's actions, one `{ label, onClick }` each: the first three show as buttons, the rest in an overflow menu.",
+          "deprecated": null
+        },
+        {
+          "name": "stickyHeader",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Pin the head row inside the table's own scroll region; needs `maxHeight`.",
+          "deprecated": null
+        },
+        {
+          "name": "maxHeight",
+          "type": "number or string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Bound the scroll region's height (px or any CSS length).",
+          "deprecated": null
+        },
+        {
+          "name": "isFrozen",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Pin the first column (the title column too, beside the checkboxes).",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra class names added to the table's wrapper beside the component's own.",
+          "deprecated": null
+        },
+        {
+          "name": "testId",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Maps to `data-testid`, for test queries.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Default",
+        "Stateless",
+        "States",
+        "Empty",
+        "NoResults",
+        "EmptyNothingYet",
+        "EmptyHiddenByFilter",
+        "EmptyNothingToCreate",
+        "Widths",
+        "Selection",
+        "StickyHeaderAndFrozenColumn",
+        "SortableHeadCells",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "DisabledRow",
+        "Interactive"
+      ]
+    },
+    {
       "name": "EmptyState",
       "kind": "component",
       "import": "import { EmptyState } from '@/components';",
@@ -9900,167 +10281,6 @@
       ]
     },
     {
-      "name": "PatternTable",
-      "kind": "pattern",
-      "import": "import { PatternTable } from '@/patterns';",
-      "group": "patterns",
-      "source": "design-system/src/patterns/PatternTable/PatternTable.jsx",
-      "summary": "Table pattern for PLUS design system. Table shell: table children (consumers pass their own thead/tbody), a footer slot under the rows, and an empty-state slot. The table has no toolbar of its own: the Section header above it carries the title, search, filters and actions. With `empty`, the empty state replaces the whole table (no column headers, no caption, no footer). The table itself is no-fill (transparent): the surrounding card or surface provides the background, and row states are layered over each cell's fill rather than replacing it. - **Row states**: hovered and pressed rows take the neutral subtle steps; a row with `aria-selected=\"true\"` (in a `role=\"grid\"` table) takes the selected ladder across the whole row, with no stripe on its leading edge; the row's checkbox is the cue that does not rest on color. - **Sticky cells**: `stickyHeader` pins the head row and `stickyColumn` the first column. They paint the current surface, so they match the page or the card they sit in, and take the overflow shadow only while content is scrolled under them. `stickyHeader` pairs with `maxHeight`: only a bounded region scrolls vertically, so without `maxHeight` the header is not pinned. A bounded region, or one with a sticky column, takes keyboard focus so it can be scrolled without a pointer. Mirrors the \"Table\" slot component in the Figma design system file.",
-      "props": [
-        {
-          "name": "id",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "footer",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Footer slot under the rows (range, page-size Select, Pagination); hidden while the empty state shows",
-          "deprecated": null
-        },
-        {
-          "name": "emptyState",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Empty-state slot: replaces the entire table (no head row, caption, or footer) when `empty` is true",
-          "deprecated": null
-        },
-        {
-          "name": "empty",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Replace the table with the `emptyState` slot; with `empty` and no `emptyState`, the table renders normally",
-          "deprecated": null
-        },
-        {
-          "name": "stickyHeader",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Pin the head row while the rows scroll under it; needs `maxHeight`, since only a bounded region scrolls vertically",
-          "deprecated": null
-        },
-        {
-          "name": "stickyColumn",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Pin the first column while the other columns scroll under it",
-          "deprecated": null
-        },
-        {
-          "name": "maxHeight",
-          "type": "number or string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Bound the scroll region's height (number of px or any CSS length); a sticky header pins only within it",
-          "deprecated": null
-        },
-        {
-          "name": "tableProps",
-          "type": "object",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Props for the `table` element itself: an accessible name, a class a wrapper styles it by",
-          "deprecated": null
-        },
-        {
-          "name": "className",
-          "type": "string",
-          "required": false,
-          "default": "''",
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "style",
-          "type": "object",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "children",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Table content slot — pass thead/tbody elements",
-          "deprecated": null
-        }
-      ],
-      "stories": [
-        "Overview",
-        "EmptyState",
-        "EmptyHiddenByFilter",
-        "EmptyNothingToCreate",
-        "EmptyWithStickyColumn",
-        "Interactive",
-        "RowStates",
-        "Sticky",
-        "StickyHeaderNeedsMaxHeight",
-        "StickyHeader",
-        "StickyColumn",
-        "MotionAddRow",
-        "MotionAddRowReduced",
-        "MotionRemoveRow",
-        "MotionRemoveRowReduced",
-        "MotionReorderRows",
-        "MotionReorderRowsReduced"
-      ],
-      "tokens": [
-        "--body-default",
-        "--border-width-default",
-        "--ds-background-neutral-subtle-hovered",
-        "--ds-background-neutral-subtle-pressed",
-        "--ds-background-selected",
-        "--ds-background-selected-hovered",
-        "--ds-background-selected-pressed",
-        "--ds-border",
-        "--ds-border-bold",
-        "--ds-border-focused",
-        "--ds-shadow-overflow",
-        "--ds-text",
-        "--ds-text-subtle",
-        "--ds-utility-elevation-surface-current",
-        "--focus-ring-width",
-        "--heading-xxs",
-        "--layer-card",
-        "--pattern-table-overflow-reach",
-        "--pattern-table-z-corner",
-        "--pattern-table-z-sticky",
-        "--plus-table-shell-row-state",
-        "--row-height-md",
-        "--stack-md",
-        "--stack-sm",
-        "--table-empty-radius",
-        "--table-empty-surface",
-        "--table-footer-height",
-        "--table-inline",
-        "--table-overflow-reach",
-        "--table-pad-x-cell",
-        "--table-pad-y-cell"
-      ]
-    },
-    {
       "name": "Popup",
       "kind": "component",
       "import": "import { Popup } from '@/components';",
@@ -14137,6 +14357,177 @@
       ]
     },
     {
+      "name": "StaticTable",
+      "kind": "component",
+      "import": "import { StaticTable } from '@/components';",
+      "group": "text-and-data-display",
+      "source": "design-system/src/components/text-and-data-display/StaticTable/StaticTable.jsx",
+      "summary": "The Static table: a fixed grid people read. Rows rest or are highlighted (`rowStates`); there is nothing to sort, select, page or expand, so it takes no hover and no row click. Reach for the Dynamic table when rows act or people work the data. Takes `headers` and `rows`, plus `size`, `frame`, `titleColumn`, `summary`, `verticalLines` and `striped`.",
+      "props": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The `id` of the `table` element. The wrapper takes `{id}-wrapper`.",
+          "deprecated": null
+        },
+        {
+          "name": "headers",
+          "type": "arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Column headers — a string, or { text, width, align } for control over layout; align is text, number or icon",
+          "deprecated": null
+        },
+        {
+          "name": "rows",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Row data — each row is an array of cells; a cell is a node or { content, align, emphasis, overflow, secondary, elemBefore, state, loading, colSpan, className }",
+          "deprecated": null
+        },
+        {
+          "name": "striped",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Alternate row background",
+          "deprecated": null
+        },
+        {
+          "name": "bordered",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Frame the table and draw vertical lines",
+          "deprecated": null
+        },
+        {
+          "name": "verticalLines",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Vertical hairlines between columns",
+          "deprecated": null
+        },
+        {
+          "name": "frame",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "plain",
+            "framed"
+          ],
+          "description": "Plain spans its section with no outer frame; framed draws its own edge",
+          "deprecated": null
+        },
+        {
+          "name": "size",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "32",
+            "40",
+            "48"
+          ],
+          "description": "Row height in pixels, from the Row size tokens",
+          "deprecated": null
+        },
+        {
+          "name": "titleColumn",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Index of the one column that names the record, set in semibold",
+          "deprecated": null
+        },
+        {
+          "name": "rowStates",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "One state per row: rest, highlighted, selected or disabled",
+          "deprecated": null
+        },
+        {
+          "name": "summary",
+          "type": "arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "One calculation per column, in a muted row that closes the table",
+          "deprecated": null
+        },
+        {
+          "name": "emptyState",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Shown as a message row spanning every column when there are no rows",
+          "deprecated": null
+        },
+        {
+          "name": "footer",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "A TableFooter under the rows",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra class names added to the `table` element beside the component's own.",
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline styles for the table's wrapper element.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "Striped",
+        "Bordered",
+        "Sizes",
+        "FramedAndLines",
+        "Cells",
+        "RowStates",
+        "Summary",
+        "Static",
+        "HeadCells",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "Disabled",
+        "Invalid",
+        "Interactive"
+      ]
+    },
+    {
       "name": "StatusTag",
       "kind": "component",
       "import": "import { StatusTag } from '@/components';",
@@ -14431,134 +14822,41 @@
     },
     {
       "name": "Table",
-      "kind": "component",
-      "import": "import { Table } from '@/components';",
-      "group": "text-and-data-display",
-      "source": "design-system/src/components/text-and-data-display/Table/Table.jsx",
-      "summary": "Standard table component for displaying tabular data, built from the shared `_Table` parts (`TableRow`, `TableCell`, `TableMessageRow`, `TableSummaryRow`, `TableFooter`). The feel: hairline horizontal dividers, no outer frame, a quiet header over a stronger rule, single-line cells that end in an ellipsis with a tooltip, no zebra. Rows are 32, 40 or 48 tall (`size`). `StaticTable` is this table for a fixed grid people read.",
+      "kind": "pattern",
+      "import": "import { Table } from '@/patterns';",
+      "group": "patterns",
+      "source": "design-system/src/patterns/Table/Table.jsx",
+      "summary": "Section header carries the title and the toolbar. Under the header come the table, then the footer (range, page size, Pagination), and the empty state box in place of both when there are no rows. Pass the table as `children` (a `StaticTable`, `DynamicTable` or `TreeTable`), or name a `kind` and pass its props as `tableProps`. Choose the kind by what people do with the rows: nesting is a Tree table; sort, filter, select, page, expand or row actions is a Dynamic table; otherwise it is a Static table. Every other prop goes to the Section (`title`, `description`, `actions`, `toolbar`, `tabs`).",
       "props": [
         {
-          "name": "id",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "The `id` of the `table` element. The wrapper takes `{id}-wrapper`.",
-          "deprecated": null
-        },
-        {
-          "name": "headers",
-          "type": "arrayOf",
-          "required": false,
-          "default": "[]",
-          "values": null,
-          "description": "The column headers. A string is the header text; an object adds `width`, `align`, `className` and `style` to `text`.",
-          "deprecated": null
-        },
-        {
-          "name": "rows",
-          "type": "enum",
-          "required": false,
-          "default": "[]",
-          "values": null,
-          "description": "The body rows, each an array of cells. A cell is a node, or an object with `content` plus `align`, `emphasis`, `overflow`, `secondary`, `elemBefore`, `state`, `loading`, `className`, `colSpan` or `style`.",
-          "deprecated": null
-        },
-        {
-          "name": "striped",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Shades alternate rows.",
-          "deprecated": null
-        },
-        {
-          "name": "hover",
-          "type": "bool",
-          "required": false,
-          "default": "true",
-          "values": null,
-          "description": "Highlights a row on hover. On by default.",
-          "deprecated": null
-        },
-        {
-          "name": "bordered",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Draws a frame around the table and lines between columns. Shorthand for `frame=\"framed\"` plus `verticalLines`.",
-          "deprecated": null
-        },
-        {
-          "name": "verticalLines",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Draws lines between columns.",
-          "deprecated": null
-        },
-        {
-          "name": "frame",
-          "type": "enum",
-          "required": false,
-          "default": "'plain'",
-          "values": [
-            "plain",
-            "framed"
-          ],
-          "description": "`plain` (default) draws no outer frame; `framed` draws a border around the table.",
-          "deprecated": null
-        },
-        {
-          "name": "size",
+          "name": "kind",
           "type": "enum",
           "required": false,
           "default": null,
           "values": [
-            "32",
-            "40",
-            "48"
+            "static",
+            "dynamic",
+            "tree"
           ],
-          "description": "Row height in px: 32 for dense tables, 40 (default) or 48 for roomy ones.",
+          "description": "The kind of table to draw when no table is passed as `children`",
           "deprecated": null
         },
         {
-          "name": "titleColumn",
-          "type": "number",
+          "name": "tableProps",
+          "type": "object",
           "required": false,
           "default": null,
           "values": null,
-          "description": "The index of the column drawn in the title emphasis, for the row's main label.",
+          "description": "Props for the table a `kind` draws: its head, rows, label and state",
           "deprecated": null
         },
         {
-          "name": "rowStates",
-          "type": "enum",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "A state per row, by index: `rest`, `highlighted`, `selected` or `disabled`.",
-          "deprecated": null
-        },
-        {
-          "name": "summary",
-          "type": "arrayOf",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Cells for a summary row at the bottom of the table, one per column, such as totals.",
-          "deprecated": null
-        },
-        {
-          "name": "emptyState",
+          "name": "children",
           "type": "node",
           "required": false,
           "default": null,
           "values": null,
-          "description": "Content shown in a single row spanning all columns when `rows` is empty.",
+          "description": "The table itself, a `StaticTable`, `DynamicTable` or `TreeTable`; wins over `kind`",
           "deprecated": null
         },
         {
@@ -14567,16 +14865,34 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Content drawn under the table inside its wrapper, such as pagination.",
+          "description": "Footer slot under the table (range, page-size Select, Pagination); hidden while the empty state shows",
           "deprecated": null
         },
         {
-          "name": "onRowClick",
-          "type": "func",
+          "name": "emptyState",
+          "type": "node",
           "required": false,
           "default": null,
           "values": null,
-          "description": "Called with the row index when a row is clicked. The row gets no button role or key handling, so put any keyboard action in a control inside a cell.",
+          "description": "Empty-state slot: replaces the table and footer when `empty` is true",
+          "deprecated": null
+        },
+        {
+          "name": "empty",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Replace the table with the `emptyState` slot; with `empty` and no `emptyState`, the table renders normally",
+          "deprecated": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The table's accessible name, kept on the empty state box when the table is replaced",
           "deprecated": null
         },
         {
@@ -14585,54 +14901,22 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": "Extra class names added to the `table` element beside the component's own.",
-          "deprecated": null
-        },
-        {
-          "name": "style",
-          "type": "object",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Inline styles for the table's wrapper element.",
+          "description": null,
           "deprecated": null
         }
       ],
+      "stories": [
+        "StaticKind",
+        "DynamicKind",
+        "TreeKind",
+        "TableAsChild",
+        "EmptyState",
+        "EmptyHiddenByFilter",
+        "EmptyNothingToCreate",
+        "Interactive"
+      ],
       "tokens": [
-        "--body-default",
-        "--body-sm",
-        "--border-width-default",
-        "--ds-background-neutral-subtle-hovered",
-        "--ds-background-neutral-subtle-pressed",
-        "--ds-background-selected",
-        "--ds-background-selected-hovered",
-        "--ds-background-selected-pressed",
-        "--ds-background-warning-bold",
-        "--ds-border",
-        "--ds-border-bold",
-        "--ds-border-focused",
-        "--ds-text",
-        "--ds-text-danger",
-        "--ds-text-disabled",
-        "--ds-text-subtle",
-        "--focus-ring-width",
-        "--heading-xxs",
-        "--icon-md",
-        "--icon-sm",
-        "--inline-md",
-        "--plus-table-cell-max-width",
-        "--plus-table-row-height",
-        "--radius-md",
-        "--row-height-lg",
-        "--row-height-md",
-        "--row-height-sm",
-        "--table-cell-max-width",
-        "--table-footer-height",
-        "--table-inline",
-        "--table-pad-x-cell",
-        "--table-pad-y-cell",
-        "--table-radius",
-        "--type-weight-semibold"
+        "--table-inline"
       ]
     },
     {
@@ -17230,6 +17514,150 @@
         "--ds-motion-spatial-fast",
         "--ds-motion-spatial-fast-duration",
         "--plus-popup-reach"
+      ]
+    },
+    {
+      "name": "TreeTable",
+      "kind": "component",
+      "import": "import { TreeTable } from '@/components';",
+      "group": "text-and-data-display",
+      "source": "design-system/src/components/text-and-data-display/TreeTable/TreeTable.jsx",
+      "summary": "Tree table. Records that nest: a school, its classes, their students. Each level indents one step and keeps every column, so the nested rows can still be read across. Built on the table shell with `HeadCell`s and the shared `TableRow` and `TableCell` parts. - **Data.** `items` is one `{ id, cells, children, hasChildren, count }` per row; `cells` is one `{ content }` per column, and `children` nests the same shape. A row with `hasChildren` and no `children` gets them from `loadChildren(item)`, which returns them or a promise of them; until they arrive a loading message row sits under it, and an empty answer leaves an empty message row. - **Expand and collapse.** The chevron toggles a parent (12 tall in a 24 hit area). `shouldExpandOnClick` lets a press anywhere on the row toggle it too, but never a press on a control inside the row, so use it only on rows without controls. `defaultExpandedIds` seeds the open rows; `expandedIds` with `onExpandedChange` hands them to the page. - **Keyboard.** The WAI-ARIA treegrid pattern in row-focus mode, written here because Base UI has no treegrid part (an ADR-037 exception, like the Select keyboard):  the table is one tab stop; Down and Up move between rows, Home and End to the ends; Right opens a closed parent, then moves to its first child; Left closes an open parent, then moves to the parent row; Enter toggles. Every row carries `aria-level`, `aria-posinset` and `aria-setsize`, and a parent `aria-expanded`.",
+      "props": [
+        {
+          "name": "head",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "One `{ key, content, width, align }` per column",
+          "deprecated": null
+        },
+        {
+          "name": "items",
+          "type": "arrayOf",
+          "required": false,
+          "default": "[]",
+          "values": null,
+          "description": "One `{ id, cells, children, hasChildren, count }` per row",
+          "deprecated": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The treegrid's accessible name.",
+          "deprecated": null
+        },
+        {
+          "name": "loadChildren",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Returns a row's children, or a promise of them, the first time it opens.",
+          "deprecated": null
+        },
+        {
+          "name": "shouldExpandOnClick",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "A press anywhere on a parent row toggles it; never a press on a control in the row.",
+          "deprecated": null
+        },
+        {
+          "name": "expandedIds",
+          "type": "arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The open rows' ids, owned by the page.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultExpandedIds",
+          "type": "arrayOf",
+          "required": false,
+          "default": "[]",
+          "values": null,
+          "description": "The rows open at first when the table holds its own expansion.",
+          "deprecated": null
+        },
+        {
+          "name": "onExpandedChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with every open row's id when a row opens or closes.",
+          "deprecated": null
+        },
+        {
+          "name": "emptyMessage",
+          "type": "node",
+          "required": false,
+          "default": "'Nothing in here yet'",
+          "values": null,
+          "description": "The message under an open parent with nothing in it.",
+          "deprecated": null
+        },
+        {
+          "name": "size",
+          "type": "enum",
+          "required": false,
+          "default": "40",
+          "values": [
+            "32",
+            "40",
+            "48"
+          ],
+          "description": "Row height: 32, 40 or 48.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra class names added to the table's wrapper beside the component's own.",
+          "deprecated": null
+        },
+        {
+          "name": "testId",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Maps to `data-testid`, for test queries.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "LoadingChildren",
+        "Keyboard",
+        "ExpandOnRowPress",
+        "Rest",
+        "Focused",
+        "Interactive",
+        "MotionOpenClose",
+        "MotionReduced"
+      ],
+      "tokens": [
+        "--control-sm",
+        "--ds-text-subtle",
+        "--focus-ring-width",
+        "--icon-sm",
+        "--inline-md",
+        "--plus-table-row-height",
+        "--plus-tree-table-level",
+        "--table-indent",
+        "--type-weight-regular"
       ]
     },
     {

@@ -8,23 +8,23 @@
     {
       "id": "queue-page",
       "screen": "Session review queue page",
-      "template": "Frame + Page + PatternSection + PatternTable",
-      "variant": "Frame · Default / Page · Default / PatternSection · Toolbar / PatternTable · Dynamic table",
+      "template": "Frame + Page + PatternSection + Table",
+      "variant": "Frame · Default / Page · Default / PatternSection · Toolbar / Table · Dynamic table",
       "page": "design-system/src/patterns/Frame/index.md",
       "section": "Anatomy",
       "pages": [
         "design-system/src/patterns/Frame/index.md",
         "design-system/src/patterns/Page/index.md",
         "design-system/src/patterns/PatternSection/index.md",
-        "design-system/src/patterns/PatternTable/index.md"
+        "design-system/src/patterns/Table/index.md"
       ],
       "guides": ["frame", "page", "section", "table", "templates"],
       "scoring": "checker",
       "check": {
         "kind": "template",
-        "components": ["Frame", "Page", "PatternSection", "PatternTable"]
+        "components": ["Frame", "Page", "PatternSection", "Table"]
       },
-      "expectation": "Full-page shell on Frame with Sidebar and Page containing PageHeader, a PatternSection with PatternSection.Toolbar for search and quick filters, and a Dynamic PatternTable."
+      "expectation": "Full-page shell on Frame with Sidebar and Page containing PageHeader, a PatternSection with PatternSection.Toolbar for search and quick filters, and a Dynamic Table."
     },
     {
       "id": "review-panel",
@@ -183,7 +183,7 @@
         "prop": "toolbar",
         "components": ["SearchField"]
       },
-      "expectation": "SearchField and filter controls sit in PatternSection's toolbar prop via PatternSection.Toolbar, above PatternTable."
+      "expectation": "SearchField and filter controls sit in PatternSection's toolbar prop via PatternSection.Toolbar, above Table."
     },
     {
       "id": "detail-in-frame-panel",

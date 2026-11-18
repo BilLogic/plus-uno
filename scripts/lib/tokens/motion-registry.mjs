@@ -624,12 +624,18 @@ export const MOTION_REGISTRY = [
     },
   },
   {
-    name: 'Table',
+    name: 'DynamicTable',
+    tier: 'component',
+    events: {
+      change: { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Rows are added, removed and reordered; sort is Reorder, a filter is Swap content. Ticking rows cross-fades the head row into the bulk bar, same height, nothing slides.' },
+      roster: { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'A student joins or leaves the session roster: the row is added or removed.', sound: { token: 'roster', when: 'in a session; changes within 2 s play once' } },
+    },
+  },
+  {
+    name: 'TreeTable',
     tier: 'component',
     events: {
       expand: { transition: 'Expand and collapse', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Tree rows reveal from their parent by spring height; collapse completes before removal. Reduced motion holds the final size and fades.' },
-      change: { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Rows are added, removed and reordered; sort is Reorder, a filter is Swap content. Ticking rows cross-fades the head row into the bulk bar, same height, nothing slides.' },
-      roster: { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'A student joins or leaves the session roster: the row is added or removed.', sound: { token: 'roster', when: 'in a session; changes within 2 s play once' } },
     },
   },
   {

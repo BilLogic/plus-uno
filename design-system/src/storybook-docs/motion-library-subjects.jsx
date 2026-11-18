@@ -18,6 +18,7 @@ import {
     DatePicker,
     DateTimePicker,
     DropdownMenu,
+    DynamicTable,
     FileItem,
     FileUpload,
     FilterButton,
@@ -59,7 +60,6 @@ import {
     Spinner,
     SplitButton,
     Suggestion,
-    Table,
     Tabs,
     TagInput,
     TextArea,
@@ -746,19 +746,18 @@ export const COMPONENT_SUBJECTS = Object.freeze({
         />
     ),
 
-    Table: ({ step }) => (
+    DynamicTable: ({ step }) => (
         <div style={{ width: '100%' }}>
-            <Table
-                size={32}
-                headers={['Student', 'Status']}
-                rows={
-                    step === 'landing'
-                        ? [
-                            ['Maya Lin', 'Present'],
-                            ['Leo Park', 'Joined'],
-                        ]
-                        : [['Maya Lin', 'Present']]
-                }
+            <DynamicTable
+                label="Session roster"
+                head={{ cells: [{ key: 'student', content: 'Student' }, { key: 'status', content: 'Status' }] }}
+                rows={(step === 'landing'
+                    ? [['Maya Lin', 'Present'], ['Leo Park', 'Joined']]
+                    : [['Maya Lin', 'Present']]
+                ).map(([student, status]) => ({
+                    key: student,
+                    cells: [{ key: 'student', content: student }, { key: 'status', content: status }],
+                }))}
             />
         </div>
     ),

@@ -2,7 +2,7 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
-import { Button, DynamicTable, EmptyState, HeadCell, Table } from '@/components';
+import { Button, DynamicTable, EmptyState, HeadCell, StaticTable } from '@/components';
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import PatternSection, { SectionToolbar } from '@/patterns/PatternSection';
 import { HeadingLevelContext } from '@/lib/headingLevel';
@@ -628,7 +628,7 @@ export const Focused = {
 /** Disabled: the table has no disabled sort; a row can be disabled (see the Static table) and takes the disabled ink. */
 export const DisabledRow = {
     render: () => (
-        <Table
+        <StaticTable
             headers={['Session date', 'Student', 'Hours', { text: 'Amount', align: 'number' }]}
             rows={[['Jul 3', 'Priya Nair', '1.0 hrs', { content: '$32.00', align: 'number' }]]}
             rowStates={['disabled']}

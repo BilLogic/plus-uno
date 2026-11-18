@@ -103,10 +103,10 @@ Space owned by a template: page, section, card, table, modal, popup. Inside a te
 --section-radius  /* Corner rounding of a PatternSection that has a fill. */
 --table-empty-radius  /* Corner rounding of the empty state box that replaces an empty table. */
 --table-empty-surface  /* Surface of the empty state box that replaces an empty table. */
---table-footer-height  /* Height of a PatternTable footer row: the range, the page-size Select and Pagination on one line. */
---table-inline  /* Horizontal gap between controls in a PatternTable footer. */
---table-overflow-reach  /* How far a PatternTable lets a row's overflow, such as a focus ring, reach past its clip. */
---table-radius  /* Corner rounding of a PatternTable. */
+--table-footer-height  /* Height of a table footer row: the range, the page-size Select and Pagination on one line. */
+--table-inline  /* Horizontal gap between controls in a table footer. */
+--table-overflow-reach  /* How far a table lets a row's overflow, such as a focus ring, reach past its clip. */
+--table-radius  /* Corner rounding of a table. */
 ```
 
 ## Ladder Components
@@ -391,10 +391,10 @@ The templates on the page frame, per breakpoint: page, section, card, table, ove
 --section-stack-md  /* Vertical gap between blocks inside a PatternSection. */
 --section-stack-sm  /* Vertical gap between a section header and its content. */
 --table-indent  /* Indent of each nested level in a tree table. */
---table-min-width-title  /* Narrowest a PatternTable's title column may shrink. */
---table-pad-x-cell  /* Horizontal padding inside a PatternTable cell. */
---table-pad-x-footer  /* Horizontal padding of a PatternTable footer, such as its Pagination row. */
---table-pad-y-cell  /* Vertical padding inside a PatternTable cell. */
+--table-min-width-title  /* Narrowest a table's title column may shrink. */
+--table-pad-x-cell  /* Horizontal padding inside a table cell. */
+--table-pad-x-footer  /* Horizontal padding of a table footer, such as its Pagination row. */
+--table-pad-y-cell  /* Vertical padding inside a table cell. */
 --tooltip-max-width  /* Widest a Tooltip may grow before its text wraps. */
 --tooltip-pad-y  /* Vertical padding inside a Tooltip. */
 ```

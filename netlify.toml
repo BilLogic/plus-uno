@@ -736,7 +736,7 @@
   status = 301
   force = true
 
-# PatternTable retired: the shell stories moved off Templates/Table, and Overview became the Static table story.
+# The old table pattern is retired: its shell stories moved off Templates/Table, and Overview became the Static table story.
 
 [[redirects]]
   from = "/storybook/"

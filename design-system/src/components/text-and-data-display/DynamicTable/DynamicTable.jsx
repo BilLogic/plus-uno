@@ -6,11 +6,11 @@ import Select from '@/components/forms-and-inputs/Select';
 import Spinner from '@/components/loading/Spinner';
 import Checkbox from '@/components/forms-and-inputs/Checkbox';
 import VisuallyHidden from '@/components/text-and-data-display/VisuallyHidden';
-import HeadCell from './HeadCell';
-import TableBulkActions from './TableBulkActions';
-import { TableCell, TableRow, TableFooter, TableShell } from './TableParts';
-import './Table.scss';
-import './DynamicTable.scss';
+import HeadCell from '../Table/HeadCell';
+import TableBulkActions from '../Table/TableBulkActions';
+import { TableCell, TableRow, TableFooter, TableShell } from '../Table/TableParts';
+import '../Table/Table.scss';
+import '../Table/DynamicTable.scss';
 
 const classes = (...names) => names.filter(Boolean).join(' ');
 
@@ -51,6 +51,24 @@ const deriveState = (state, isLoading, rowCount) => {
     if (state && STATES.includes(state)) return state;
     if (isLoading) return rowCount > 0 ? 'refreshing' : 'loading';
     return rowCount > 0 ? 'default' : 'empty';
+};
+
+/** Whether the window is under the 768 desktop floor, where the footer drops its range. */
+const NARROW_QUERY = '(max-width: 767.98px)';
+const useNarrow = () => {
+    const [narrow, setNarrow] = useState(() => (
+        typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+        && window.matchMedia(NARROW_QUERY).matches
+    ));
+    useEffect(() => {
+        if (typeof window.matchMedia !== 'function') return undefined;
+        const query = window.matchMedia(NARROW_QUERY);
+        const update = () => setNarrow(query.matches);
+        update();
+        query.addEventListener('change', update);
+        return () => query.removeEventListener('change', update);
+    }, []);
+    return narrow;
 };
 
 /**
@@ -96,24 +114,6 @@ const deriveState = (state, isLoading, rowCount) => {
  *   content, unless a head cell sets `width`; `isFixedSize` holds every column
  *   to its set width.
  */
-/** Whether the window is under the 768 desktop floor, where the footer drops its range. */
-const NARROW_QUERY = '(max-width: 767.98px)';
-const useNarrow = () => {
-    const [narrow, setNarrow] = useState(() => (
-        typeof window !== 'undefined' && typeof window.matchMedia === 'function'
-        && window.matchMedia(NARROW_QUERY).matches
-    ));
-    useEffect(() => {
-        if (typeof window.matchMedia !== 'function') return undefined;
-        const query = window.matchMedia(NARROW_QUERY);
-        const update = () => setNarrow(query.matches);
-        update();
-        query.addEventListener('change', update);
-        return () => query.removeEventListener('change', update);
-    }, []);
-    return narrow;
-};
-
 const DynamicTable = ({
     head,
     rows = [],
@@ -475,6 +475,7 @@ DynamicTable.propTypes = {
     sortOrder: PropTypes.oneOf(['ascending', 'descending', 'none']),
     /** The column the table starts sorted by when it holds its own sort. */
     defaultSortKey: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    /** The direction the table starts sorted in when it holds its own sort. */
     defaultSortOrder: PropTypes.oneOf(['ascending', 'descending']),
     /** Called with `{ key, sortOrder }` when a head cell asks for a sort. */
     onSort: PropTypes.func,
@@ -517,6 +518,7 @@ DynamicTable.propTypes = {
     maxHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     /** Pin the first column (the title column too, beside the checkboxes). */
     isFrozen: PropTypes.bool,
+    /** Extra class names added to the table's wrapper beside the component's own. */
     className: PropTypes.string,
     /** Maps to `data-testid`, for test queries. */
     testId: PropTypes.string,

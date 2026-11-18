@@ -511,9 +511,9 @@
       "code": {
         "import": "@/components/text-and-data-display",
         "export": "default",
-        "mdxPath": "design-system/src/components/text-and-data-display/Table/DynamicTable.mdx",
+        "mdxPath": "design-system/src/components/text-and-data-display/DynamicTable/DynamicTable.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Table",
-        "source": "design-system/src/components/text-and-data-display/Table/DynamicTable.jsx",
+        "source": "design-system/src/components/text-and-data-display/DynamicTable/DynamicTable.jsx",
         "storybookId": "components-text-and-data-display-dynamic-table--docs"
       },
       "figma": {
@@ -1556,9 +1556,9 @@
       "code": {
         "import": "@/components/text-and-data-display",
         "export": "default",
-        "mdxPath": "design-system/src/components/text-and-data-display/Table/StaticTable.mdx",
+        "mdxPath": "design-system/src/components/text-and-data-display/StaticTable/StaticTable.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Table",
-        "source": "design-system/src/components/text-and-data-display/Table/StaticTable.jsx",
+        "source": "design-system/src/components/text-and-data-display/StaticTable/StaticTable.jsx",
         "storybookId": "components-text-and-data-display-static-table--docs",
         "props": {
           "size": {
@@ -2024,9 +2024,9 @@
       "code": {
         "import": "@/components/text-and-data-display",
         "export": "default",
-        "mdxPath": "design-system/src/components/text-and-data-display/Table/TreeTable.mdx",
+        "mdxPath": "design-system/src/components/text-and-data-display/TreeTable/TreeTable.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Table",
-        "source": "design-system/src/components/text-and-data-display/Table/TreeTable.jsx",
+        "source": "design-system/src/components/text-and-data-display/TreeTable/TreeTable.jsx",
         "storybookId": "components-text-and-data-display-tree-table--docs"
       },
       "figma": {
