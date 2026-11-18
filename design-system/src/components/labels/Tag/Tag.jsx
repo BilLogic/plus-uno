@@ -16,7 +16,7 @@ import './Tag.scss';
  *
  * OUTLINED, SO IT NEVER READS AS A STATUS. A Status tag is filled because its color
  * is a meaning; a Tag is outlined because its color is only a category. The text
- * stays neutral, and the hue sits on the border. One size, 22 tall, for every
+ * stays neutral, and the hue sits on the border. One size, 20 tall, for every
  * behavior.
  *
  * TWO OPT-IN LEADS. A plain tag leads with nothing. `swatchBefore` adds a 10
@@ -28,7 +28,7 @@ import './Tag.scss';
  * FOUR TYPES. A plain tag is the default. A person, an agent or a team leads
  * with a 16 avatar, shaped so the three never read as one
  * another: a person is round (and so is the whole tag, and its ×), an agent is
- * a hexagon, a team is a square with radius-2 corners. The tag stays 22 tall and pads
+ * a hexagon, a team is a square with radius-2 corners. The tag stays 20 tall and pads
  * 4 on the avatar side, as a plain tag does on its leading side.
  *
  * ON AN IMAGE. `isElevated` lifts a read-only or link tag onto a photo or a
