@@ -106,7 +106,7 @@ Don't: An EmptyState under a Table with an empty body.
 - `Illustration`: use when placing a PLUS character in the `image` slot.
 - Empty: use when choosing empty and error states across pages, sections and tables.
 
-Same group: `Banner` · `Flag` · `InlineMessage` · `Modal` · `NotificationItem` · `SectionMessage` · `Spotlight`
+Same group: `Banner` · `Dialog` · `Flag` · `InlineMessage` · `NotificationItem` · `SectionMessage` · `Spotlight`
 
 ## Parts
 

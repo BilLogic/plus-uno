@@ -228,14 +228,14 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-loading-spinner--docs"
   ],
   [
+    "design-system/src/components/messaging/Dialog/",
+    "Dialog",
+    "components-messaging-dialog--docs"
+  ],
+  [
     "design-system/src/components/messaging/Flag/",
     "Flag",
     "components-messaging-flag--docs"
-  ],
-  [
-    "design-system/src/components/messaging/Modal/",
-    "Modal",
-    "components-messaging-modal--docs"
   ],
   [
     "design-system/src/components/messaging/NotificationItem/",

@@ -1874,11 +1874,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1159,
+    "scssTokenCount": 1169,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1776,
-      "resolved": 1739,
+      "total": 1775,
+      "resolved": 1738,
       "percent": 98,
       "skippedCollections": [
         {

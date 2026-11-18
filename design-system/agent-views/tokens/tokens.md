@@ -57,7 +57,6 @@ Start here for space, size and radius (ADR-038). A component reads its component
 Space owned by a template: page, section, card, table, modal, popup. Inside a template, read its token before a semantics step.
 
 ```css
---blanket-fill  /* Fill of the Blanket that dims the page behind a Modal. */
 --blanket-max-height-modal  /* Tallest a Modal may grow inside its Blanket. */
 --blanket-pad-x  /* Horizontal space between the screen edge and a Modal on its Blanket. */
 --blanket-pad-y  /* Vertical space between the screen edge and a Modal on its Blanket; shrinks on short screens. */
@@ -139,6 +138,17 @@ Tokens one component owns, named for it.
 --choice-grid-control-size-12  /* Size of the control in a ChoiceGrid with size 14 or 16. */
 --choice-tile-width  /* Width of a choice tile in a Radio, RadioGroup, Checkbox or CheckboxGroup with tile appearance. */
 --count-tag-dot-size  /* Size of the dot in a CountTag. */
+--dialog-body-min-height  /* Minimum height of a Dialog's body, so a short body does not collapse the dialog. */
+--dialog-inline-lg  /* Horizontal gap between columns in a Dialog. */
+--dialog-inline-md  /* Horizontal gap between the actions in a Dialog footer. */
+--dialog-inline-sm  /* Horizontal gap between small items in a Dialog header or footer. */
+--dialog-pad-x-default  /* Horizontal padding of a Dialog with default spacing. */
+--dialog-pad-x-spacious  /* Horizontal padding of a Dialog with spacious spacing. */
+--dialog-radius  /* Corner rounding of a Dialog. */
+--dialog-shadow  /* Shadow of a Dialog. */
+--dialog-stack-lg  /* Vertical gap between blocks in a Dialog's body. */
+--dialog-stack-md  /* Vertical gap between a Dialog's header, body and footer. */
+--dialog-stack-sm  /* Vertical gap between a Dialog's title and its description or tabs. */
 --file-item-height  /* Fixed height of a FileItem row across queued, uploading, done and error states. */
 --flag-min-height  /* Minimum height of a Flag. */
 --flag-offset  /* Distance between a Flag and the edge of the screen. */

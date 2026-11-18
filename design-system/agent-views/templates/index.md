@@ -4,10 +4,10 @@
 
 - [Form](Form.md)
 - [Frame](../../src/patterns/Frame/index.md)
+- [Modal](../../src/patterns/Modal/index.md)
 - [Page](../../src/patterns/Page/index.md)
 - [Panel](Panel.md)
 - [Card](../../src/patterns/PatternCard/index.md)
-- [Modal](../../src/patterns/PatternModal/index.md)
 - [Section](../../src/patterns/PatternSection/index.md)
 - [Table](../../src/patterns/PatternTable/index.md)
 - [Popup](Popup.md)

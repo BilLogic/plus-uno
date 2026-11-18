@@ -976,109 +976,6 @@
       ]
     },
     {
-      "name": "Blanket",
-      "kind": "pattern",
-      "import": "import { Blanket } from '@/patterns';",
-      "group": "patterns",
-      "source": "design-system/src/patterns/Blanket/Blanket.jsx",
-      "summary": null,
-      "props": [
-        {
-          "name": "show",
-          "type": "bool",
-          "required": false,
-          "default": "true",
-          "values": null,
-          "description": "Keep mounted and set false to finish the exit before removal.",
-          "deprecated": null
-        },
-        {
-          "name": "inline",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Draw in the page flow at a stand-in screen, for docs and previews, instead of fixed over the page.",
-          "deprecated": null
-        },
-        {
-          "name": "screenWidth",
-          "type": "number",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Inline only: the screen width (px) the layers inside take their width from, such as 768, 1024 or 1440.",
-          "deprecated": null
-        },
-        {
-          "name": "screenHeight",
-          "type": "number",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Inline only: the screen height (px); a layer inside caps at it less Blanket/pad-y above and below. The pad follows the real viewport (24 under 640 tall), not this height, as Figma's frames do.",
-          "deprecated": null
-        },
-        {
-          "name": "onBlanketClick",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Called for a click on the blanket, not on the layer it holds.",
-          "deprecated": null
-        },
-        {
-          "name": "className",
-          "type": "string",
-          "required": false,
-          "default": "''",
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "style",
-          "type": "object",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "children",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "The layer it holds: a PatternModal, or a confirm over one.",
-          "deprecated": null
-        }
-      ],
-      "stories": [
-        "Inline",
-        "ConfirmOverPanel",
-        "Layers",
-        "Pads",
-        "ScreenGrid",
-        "Interactive",
-        "MotionOpenClose",
-        "MotionReduced"
-      ],
-      "tokens": [
-        "--blanket-pad-x",
-        "--blanket-pad-y",
-        "--ds-blanket",
-        "--layer-blanket",
-        "--layer-modal",
-        "--plus-overlay-origin",
-        "--plus-overlay-screen",
-        "--plus-overlay-screen-height",
-        "--transform-origin"
-      ]
-    },
-    {
       "name": "Breadcrumb",
       "kind": "component",
       "import": "import { Breadcrumb } from '@/components';",
@@ -4028,6 +3925,275 @@
         "--stack-md",
         "--stack-sm",
         "--type-weight-medium"
+      ]
+    },
+    {
+      "name": "Dialog",
+      "kind": "component",
+      "import": "import { Dialog } from '@/components';",
+      "group": "messaging",
+      "source": "design-system/src/components/messaging/Dialog/Dialog.jsx",
+      "summary": "The dialog panel itself: header (title, optional description, header actions, close button, or custom header / tabs), scrolling body, and optional footer slots. Sizes from the screen grid (`4-col · 6-col · 8-col · 10-col`) and renders inline with no Blanket and no modal behavior. For a blocking overlay dialog with Blanket, portal, focus trap, Escape and scroll lock, use the `Modal` template from `@/patterns`.",
+      "props": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The `id` attribute of the dialog panel.",
+          "deprecated": null
+        },
+        {
+          "name": "title",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The dialog's h1, and its accessible name.",
+          "deprecated": null
+        },
+        {
+          "name": "description",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "A line under the title, read as the dialog's description.",
+          "deprecated": null
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The dialog's accessible name when it has no visible `title` or uses a custom `header`.",
+          "deprecated": null
+        },
+        {
+          "name": "header",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Custom header slot replacing the title row (title and close button), so the caller owns both and names the dialog with `ariaLabel`.",
+          "deprecated": null
+        },
+        {
+          "name": "headerActions",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Icon buttons in the header, before the close button.",
+          "deprecated": null
+        },
+        {
+          "name": "showCloseButton",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The header's close button. Off for a dialog that has to be answered.",
+          "deprecated": null
+        },
+        {
+          "name": "tabs",
+          "type": "arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Tab group under the title (`{ key, label, content, disabled? }`). The body becomes the tab panel and shows the selected tab's `content`.",
+          "deprecated": null
+        },
+        {
+          "name": "activeTab",
+          "type": "string or number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Selected tab's key when controlled; update from `onTabChange`.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultActiveTab",
+          "type": "string or number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Initial tab key when uncontrolled; defaults to the first enabled tab.",
+          "deprecated": null
+        },
+        {
+          "name": "onTabChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with the key of the selected tab.",
+          "deprecated": null
+        },
+        {
+          "name": "body",
+          "type": "string or node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The main content of the dialog. A string is drawn as body text; a node is drawn as given. `children` is rendered after it.",
+          "deprecated": null
+        },
+        {
+          "name": "height",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "hug",
+            "fill"
+          ],
+          "description": "`hug` grows with the content to the cap and then scrolls its body; `fill` sits at that cap.",
+          "deprecated": null
+        },
+        {
+          "name": "showBottomButtons",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Show the footer: `footer`, or the secondary and primary buttons.",
+          "deprecated": null
+        },
+        {
+          "name": "footer",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Custom footer content in place of the built-in pair, such as a three-button or leading-text FooterActions layout.",
+          "deprecated": null
+        },
+        {
+          "name": "primaryButton",
+          "type": "buttonShape",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The confirming footer button, drawn on the right. Takes `text` (default \"Confirm\"), `onClick`, `appearance` (default `primary`), `spacing` and `icon`.",
+          "deprecated": null
+        },
+        {
+          "name": "secondaryButton",
+          "type": "buttonShape",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The secondary footer button, drawn in the left half when a primary button is also given. Takes `text` (default \"Discard\"), `onClick`, `appearance` (default `default`), `spacing` and `icon`.",
+          "deprecated": null
+        },
+        {
+          "name": "dividers",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "A rule under the header and over the footer.",
+          "deprecated": null
+        },
+        {
+          "name": "loading",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Skeleton bars in place of the body while its content loads.",
+          "deprecated": null
+        },
+        {
+          "name": "onClose",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called when the close button is clicked.",
+          "deprecated": null
+        },
+        {
+          "name": "width",
+          "type": "enum or number or string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`4-col` · `6-col` · `8-col` · `10-col`: 4 · 6 · 8 · 10 columns of the screen grid plus the dialog pad. Grows with the screen, never shrinks, ignores the sidebar. A number or a length sets a fixed width.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Extra class names added to the dialog panel beside the component's own.",
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline styles for the dialog panel. A fixed `width` is applied after them.",
+          "deprecated": null
+        },
+        {
+          "name": "children",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "More content rendered in the body after `body`, for composing the dialog contents directly.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Width4Col",
+        "Width6Col",
+        "Width8Col",
+        "Width10Col",
+        "HeightHug",
+        "HeightFill",
+        "HeaderOptions",
+        "WithoutCloseButton",
+        "Tabs",
+        "Loading",
+        "Content",
+        "Layout",
+        "Interactive",
+        "Overview",
+        "FooterLayouts",
+        "SizeToContent",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused"
+      ],
+      "tokens": [
+        "--blanket-max-height-modal",
+        "--body-default",
+        "--border-width-default",
+        "--dialog-body-min-height",
+        "--dialog-inline-sm",
+        "--dialog-pad-x-default",
+        "--dialog-radius",
+        "--dialog-shadow",
+        "--dialog-stack-md",
+        "--dialog-stack-sm",
+        "--ds-border",
+        "--ds-surface-overlay",
+        "--ds-text",
+        "--ds-text-subtle",
+        "--heading-md",
+        "--plus-overlay-max-height"
       ]
     },
     {
@@ -7650,11 +7816,11 @@
     },
     {
       "name": "Modal",
-      "kind": "component",
-      "import": "import { Modal } from '@/components';",
-      "group": "messaging",
-      "source": "design-system/src/components/messaging/Modal/Modal.jsx",
-      "summary": "Universal modal component for creating dialog windows that overlay the main content. It is a real dialog on Base UI's `Dialog`, placed in `Blanket`: opening it moves focus inside and keeps it there, the page behind is hidden from assistive tech and stops scrolling, Escape and a press on the blanket close it, and closing returns focus to what had it. It takes a stack slot from the shared overlay module (`@/lib/overlay`): a second Modal stays closed and calls `onClose`. A follow-up about the dialog itself — \"discard these edits?\" — is best shown in place: the caller swaps `title`, `body` and the footer buttons, driven by its own state. A Modal never opens on another Modal.",
+      "kind": "pattern",
+      "import": "import { Modal } from '@/patterns';",
+      "group": "patterns",
+      "source": "design-system/src/patterns/Modal/Modal.jsx",
+      "summary": "`@base-ui/react` Dialog (portal, focus trap, Escape, scroll lock, and the blanket-press rule). One Modal is open at a time (`useOverlaySlot`). `inline` renders the Blanket + Dialog in flow for docs previews and static stages without a portal, focus trap, Escape handling or scroll lock.",
       "props": [
         {
           "name": "id",
@@ -7667,7 +7833,7 @@
         },
         {
           "name": "title",
-          "type": "string",
+          "type": "node",
           "required": false,
           "default": null,
           "values": null,
@@ -7689,7 +7855,70 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "The dialog's accessible name when it has no visible `title`.",
+          "description": "The dialog's accessible name when it has no visible `title` or uses a custom `header`.",
+          "deprecated": null
+        },
+        {
+          "name": "header",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Custom header slot replacing the title row (title and close button), so the caller owns both and names the dialog with `ariaLabel`.",
+          "deprecated": null
+        },
+        {
+          "name": "headerActions",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Icon buttons in the header, before the close button.",
+          "deprecated": null
+        },
+        {
+          "name": "showCloseButton",
+          "type": "bool",
+          "required": false,
+          "default": "true",
+          "values": null,
+          "description": "The header's close button. Off for a dialog that has to be answered.",
+          "deprecated": null
+        },
+        {
+          "name": "tabs",
+          "type": "arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Tab group under the title (`{ key, label, content, disabled? }`). The body becomes the tab panel and shows the selected tab's `content`.",
+          "deprecated": null
+        },
+        {
+          "name": "activeTab",
+          "type": "string or number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Selected tab's key when controlled; update from `onTabChange`.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultActiveTab",
+          "type": "string or number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Initial tab key when uncontrolled; defaults to the first enabled tab.",
+          "deprecated": null
+        },
+        {
+          "name": "onTabChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with the key of the selected tab.",
           "deprecated": null
         },
         {
@@ -7710,7 +7939,7 @@
             "hug",
             "fill"
           ],
-          "description": "`hug` grows with the content to the screen less 128 and then scrolls its body; `fill` sits at that cap.",
+          "description": "`hug` grows with the content to the cap and then scrolls its body; `fill` sits at that cap.",
           "deprecated": null
         },
         {
@@ -7723,30 +7952,30 @@
           "deprecated": null
         },
         {
-          "name": "showCloseButton",
-          "type": "bool",
-          "required": false,
-          "default": "true",
-          "values": null,
-          "description": "The header's close button. Off for a dialog that has to be answered.",
-          "deprecated": null
-        },
-        {
-          "name": "headerActions",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Icon buttons in the header, before the close button.",
-          "deprecated": null
-        },
-        {
           "name": "footer",
           "type": "node",
           "required": false,
           "default": null,
           "values": null,
           "description": "Custom footer content in place of the built-in pair, such as a three-button or leading-text FooterActions layout.",
+          "deprecated": null
+        },
+        {
+          "name": "primaryButton",
+          "type": "buttonShape",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The confirming footer button, drawn on the right. Takes `text` (default \"Confirm\"), `onClick`, `appearance` (default `primary`), `spacing` and `icon`.",
+          "deprecated": null
+        },
+        {
+          "name": "secondaryButton",
+          "type": "buttonShape",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The secondary footer button, drawn in the left half when a primary button is also given. Takes `text` (default \"Discard\"), `onClick`, `appearance` (default `default`), `spacing` and `icon`.",
           "deprecated": null
         },
         {
@@ -7773,7 +8002,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Whether the dialog is open. Controlled by the parent: set it to false in `onClose` to close.",
+          "description": "Whether the modal is open. Controlled by the parent: set it to false in `onClose` to close.",
           "deprecated": null
         },
         {
@@ -7784,7 +8013,7 @@
           "values": [
             "static"
           ],
-          "description": "`true` (default): a click on the blanket closes. `static`: the blanket shows but refuses to close on a click. `false`: no close on a click.",
+          "description": "`true` (default): a press on the Blanket closes. `static` or `false`: the Blanket shows but refuses to close on a press.",
           "deprecated": null
         },
         {
@@ -7793,37 +8022,34 @@
           "required": false,
           "default": "true",
           "values": null,
-          "description": "Escape closes, by default. `false` for a dialog that has to be answered.",
+          "description": "Escape closes by default. `false` for a dialog that has to be answered.",
           "deprecated": null
         },
         {
-          "name": "renderAs",
-          "type": "enum",
+          "name": "inline",
+          "type": "bool",
           "required": false,
-          "default": "'modal'",
-          "values": [
-            "modal",
-            "inline"
-          ],
-          "description": "`modal` (default) opens as a real dialog over the page; `inline` draws the same panel in place as a plain block, for docs previews.",
+          "default": "false",
+          "values": null,
+          "description": "Renders Blanket and Dialog inline in flow for docs previews and mockups, without portal, focus trap, Escape or scroll lock.",
           "deprecated": null
         },
         {
-          "name": "primaryButton",
-          "type": "buttonShape",
+          "name": "screenWidth",
+          "type": "number or string",
           "required": false,
           "default": null,
           "values": null,
-          "description": "The confirming footer button, drawn on the right. Takes `text` (default \"Confirm\"), `onClick`, `appearance` (default `primary`), `spacing` and `icon`.",
+          "description": "Stand-in screen width when `inline` is true.",
           "deprecated": null
         },
         {
-          "name": "secondaryButton",
-          "type": "buttonShape",
+          "name": "screenHeight",
+          "type": "number or string",
           "required": false,
           "default": null,
           "values": null,
-          "description": "The secondary footer button, drawn in the left half when a primary button is also given. Takes `text` (default \"Discard\"), `onClick`, `appearance` (default `default`), `spacing` and `icon`.",
+          "description": "Stand-in screen height when `inline` is true.",
           "deprecated": null
         },
         {
@@ -7832,7 +8058,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Called when the dialog asks to close: the close button, Escape (unless `keyboard` is false) or a press on the blanket (unless `blanket` blocks it). The parent sets `show` to false.",
+          "description": "Called when the modal asks to close: Close button, Escape (unless `keyboard` is false) or a press on the Blanket (unless `blanket` blocks it).",
           "deprecated": null
         },
         {
@@ -7841,7 +8067,7 @@
           "required": false,
           "default": "'6-col'",
           "values": null,
-          "description": "`4-col` · `6-col` · `8-col` · `10-col`: 4 · 6 · 8 · 10 columns of the screen grid plus the modal pad. Grows with the screen, never shrinks, ignores the sidebar. A number or a length is a fixed width, kept for the callers that still pass one.",
+          "description": "`4-col` · `6-col` · `8-col` · `10-col`: 4 · 6 · 8 · 10 columns of the screen grid plus the modal pad.",
           "deprecated": null
         },
         {
@@ -7850,7 +8076,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": "Extra class names added to the dialog panel beside the component's own.",
+          "description": "Extra class names added to the dialog panel.",
           "deprecated": null
         },
         {
@@ -7859,7 +8085,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Inline styles for the dialog panel. A fixed `width` is applied after them.",
+          "description": "Inline styles for the dialog panel.",
           "deprecated": null
         },
         {
@@ -7868,56 +8094,79 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "More content rendered in the body after `body`, for composing the dialog contents directly.",
+          "description": "More content rendered in the body after `body`.",
           "deprecated": null
         }
       ],
       "stories": [
+        "Overview",
+        "Widths",
+        "Heights",
+        "Tabs",
+        "BodyMinHeight",
+        "CustomHeader",
+        "Divider",
+        "Loading",
         "Width4Col",
         "Width6Col",
         "Width8Col",
         "Width10Col",
-        "HeightHug",
+        "HugLong",
         "HeightFill",
-        "HeaderOptions",
-        "WithoutCloseButton",
-        "Loading",
-        "Content",
-        "Layout",
+        "TabsStill",
         "Interactive",
-        "Overview",
-        "ConfirmView",
-        "ConfirmViewEscape",
-        "ModalOverModalRefused",
+        "LiveBehavior",
+        "StaticBlanketRefusesToClose",
         "BlockingShadow",
         "SelectKeepsOverlayShadow",
-        "Rest",
-        "Hovered",
-        "Pressed",
-        "Focused",
-        "FooterLayouts",
-        "SizeToContent",
-        "MotionOpenAndClose",
-        "MotionReduced"
+        "TypePassive",
+        "TypeActive",
+        "TypeAcknowledge",
+        "TypeSteps",
+        "AnatomyActive",
+        "WidthStrip",
+        "ResponsiveWidth",
+        "TierActive",
+        "TierDanger",
+        "TierTypeName",
+        "FooterOne",
+        "FooterTwo",
+        "FooterThree",
+        "FooterTextLeft",
+        "FooterDestructive",
+        "FooterNarrow",
+        "KeyLongContent",
+        "KeyLoading",
+        "KeyConfirmInside",
+        "StackConfirmOverPanel",
+        "StackModalOnModalRefused",
+        "BlanketInline",
+        "BlanketPads",
+        "BlanketScreenGrid",
+        "BlanketInteractive",
+        "BlanketLayers",
+        "BlanketConfirmOverPanel",
+        "MotionOpenClose",
+        "MotionReduced",
+        "BlanketMotionOpenClose",
+        "BlanketMotionReduced"
       ],
       "tokens": [
-        "--blanket-max-height-modal",
-        "--body-default",
-        "--ds-border",
-        "--ds-shadow-blocking",
-        "--ds-surface-overlay",
-        "--ds-text",
-        "--ds-text-subtle",
-        "--heading-md",
-        "--inline-sm",
+        "--blanket-pad-x",
+        "--blanket-pad-y",
+        "--ds-blanket",
+        "--layer-blanket",
+        "--layer-modal",
+        "--modal-body-min-height",
         "--modal-inline-sm",
         "--modal-pad-x-default",
         "--modal-radius",
+        "--modal-shadow",
         "--modal-stack-md",
+        "--modal-stack-sm",
         "--plus-overlay-origin",
-        "--stack-md",
-        "--stack-sm",
-        "--stroke-1",
+        "--plus-overlay-screen",
+        "--plus-overlay-screen-height",
         "--transform-origin"
       ]
     },
@@ -8976,234 +9225,6 @@
         "--ds-text-subtle",
         "--ds-utility-elevation-surface-current",
         "--heading-md"
-      ]
-    },
-    {
-      "name": "PatternModal",
-      "kind": "pattern",
-      "import": "import { PatternModal } from '@/patterns';",
-      "group": "patterns",
-      "source": "design-system/src/patterns/PatternModal/PatternModal.jsx",
-      "summary": "Modal pattern for PLUS design system. Modal shell rendered inline (no portal, focus trap or Escape): header with title and close button, body slot, footer slot. Width is a step of the screen grid (xs · sm · md · lg: 4 · 6 · 8 · 10 columns plus the modal pad), and height hugs the content up to the screen less 128 or fills to it, the body scrolling past it. Place it in `Blanket`. Baked-in tokens: `--ds-surface-overlay` with `--modal-shadow` (`--ds-shadow-blocking`), as the Modal component draws it, and Modal/pad, Modal/stack-md and Modal/radius. Mirrors \"Pattern/Modal\" in the Figma design system file. For a real overlay dialog (blanket, focus trap), use the core Modal component. A dialog is its own page: the title is its h1, at Heading/medium 20, and a section inside it opens at h2. `tabs` puts a tab group under the title, as Figma's `_Modal header` type=tabs: `Tabs` in the header, so it stays put while only the body scrolls. The body becomes the tab panel, named by the selected tab, and shows that tab's content in place of `children`. `header` is Figma's `_Modal header` type=custom: a slot that takes the place of the title row (the title and the close button), so the caller owns both and names the dialog with `aria-label` or `aria-labelledby`. `divider` draws a rule under the header and above the footer, as Figma's `divider?`. `loading` swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. The body never draws shorter than Modal/body-min-height 96.",
-      "props": [
-        {
-          "name": "show",
-          "type": "bool",
-          "required": false,
-          "default": "true",
-          "values": null,
-          "description": "Keep mounted and set false to finish the exit before removal; also follows its Blanket.",
-          "deprecated": null
-        },
-        {
-          "name": "id",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "title",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Modal title in the header row: the dialog's h1, at Heading/medium 20, and its name",
-          "deprecated": null
-        },
-        {
-          "name": "header",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Custom header slot, Figma's `_Modal header` type=custom. It replaces the title row (the title and the close button), so name the dialog with `aria-label`.",
-          "deprecated": null
-        },
-        {
-          "name": "divider",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "A rule under the header and above the footer, as Figma's `divider?`. Off by default.",
-          "deprecated": null
-        },
-        {
-          "name": "loading",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. Off by default.",
-          "deprecated": null
-        },
-        {
-          "name": "onClose",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Close handler — renders the close button when provided",
-          "deprecated": null
-        },
-        {
-          "name": "footer",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Footer slot (typically action buttons)",
-          "deprecated": null
-        },
-        {
-          "name": "width",
-          "type": "oneOf",
-          "required": false,
-          "default": "'sm'",
-          "values": [
-            "xs",
-            "sm",
-            "md",
-            "lg"
-          ],
-          "description": "`xs` · `sm` · `md` · `lg`: 4 · 6 · 8 · 10 columns of the screen grid plus the modal pad (261 · 384 · 507 · 629 at 768, 347 · 512 · 677 · 843 at 1024, 432 · 640 · 848 · 1056 at 1440). Grows with the screen, never shrinks, ignores the sidebar.",
-          "deprecated": null
-        },
-        {
-          "name": "height",
-          "type": "oneOf",
-          "required": false,
-          "default": "'hug'",
-          "values": [
-            "hug",
-            "fill"
-          ],
-          "description": "`hug` grows with the content to the screen less 128 and then scrolls its body; `fill` sits at that cap.",
-          "deprecated": null
-        },
-        {
-          "name": "tabs",
-          "type": "arrayOf",
-          "required": true,
-          "default": null,
-          "values": null,
-          "description": "A tab group under the title: `{ key, label, content, disabled? }` per tab. The tabs stay put in the header and the body, now the tab panel, shows the selected tab's content in place of `children`. Arrow keys move between tabs, Home and End jump to the ends.",
-          "deprecated": null
-        },
-        {
-          "name": "activeTab",
-          "type": "string or number",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "The selected tab's key, when the caller holds it; move it from `onTabChange`.",
-          "deprecated": null
-        },
-        {
-          "name": "defaultActiveTab",
-          "type": "string or number",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "The tab to start on when the modal holds the selection; the first enabled tab by default.",
-          "deprecated": null
-        },
-        {
-          "name": "onTabChange",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Called with the key of the tab a person selects.",
-          "deprecated": null
-        },
-        {
-          "name": "className",
-          "type": "string",
-          "required": false,
-          "default": "''",
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "style",
-          "type": "object",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "children",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Body content slot; with `tabs`, the selected tab's `content` takes its place",
-          "deprecated": null
-        }
-      ],
-      "stories": [
-        "Overview",
-        "Widths",
-        "Heights",
-        "Tabs",
-        "BodyMinHeight",
-        "CustomHeader",
-        "Divider",
-        "Loading",
-        "WidthXSmall",
-        "WidthSmall",
-        "WidthMedium",
-        "WidthLarge",
-        "HugLong",
-        "HeightFill",
-        "TabsStill",
-        "Interactive",
-        "TypePassive",
-        "TypeActive",
-        "TypeAcknowledge",
-        "TypeSteps",
-        "AnatomyActive",
-        "WidthStrip",
-        "ResponsiveWidth",
-        "TierActive",
-        "TierDanger",
-        "TierTypeName",
-        "FooterOne",
-        "FooterTwo",
-        "FooterThree",
-        "FooterTextLeft",
-        "FooterDestructive",
-        "FooterNarrow",
-        "KeyLongContent",
-        "KeyLoading",
-        "KeyConfirmInside",
-        "StackConfirmOverPanel",
-        "StackModalOnModalRefused",
-        "MotionOpenClose",
-        "MotionReduced"
-      ],
-      "tokens": [
-        "--border-width-default",
-        "--ds-border",
-        "--ds-surface-overlay",
-        "--ds-text",
-        "--heading-md",
-        "--modal-body-min-height",
-        "--modal-inline-sm",
-        "--modal-pad-x-default",
-        "--modal-radius",
-        "--modal-shadow",
-        "--modal-stack-md",
-        "--modal-stack-sm",
-        "--plus-overlay-origin",
-        "--transform-origin"
       ]
     },
     {
