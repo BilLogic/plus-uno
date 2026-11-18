@@ -53,7 +53,7 @@ DisableTitleStyles.play = async ({ canvas }) => {
 };
 
 export const Interactive = {
-    args: { title: 'Page title' },
+    args: { title: 'Session plans' },
     render: (args) => <PageHeader {...args} />,
 };
 

@@ -17,7 +17,7 @@ export const FullComposition = () => (
             actions={<PanelActionGroup><PanelMoreAction /><PanelCloseAction /></PanelActionGroup>}
         />
         <PanelSubheader>Thursday, 4:00 PM</PanelSubheader>
-        <PanelBody>Panel body content goes here.</PanelBody>
+        <PanelBody>Review warm-up problems and practice goals before Thursday's math session.</PanelBody>
         <PanelFooter>
             <PanelDisclaimer>Changes save automatically.</PanelDisclaimer>
             <Button appearance="primary" text="Done" />
@@ -35,7 +35,7 @@ FullComposition.play = async ({ canvasElement }) => {
 export const MinimalHeaderAndBody = () => (
     <PanelContainer id="panel-minimal">
         <PanelHeader title="Quick notes" />
-        <PanelBody>Nothing else here.</PanelBody>
+        <PanelBody>Worked through two-step equations and checked three exit-ticket problems.</PanelBody>
     </PanelContainer>
 );
 
@@ -43,7 +43,7 @@ export const WidthFromProvider = () => (
     <PanelProvider defaultWidth="var(--width-3000)">
         <PanelContainer id="panel-provider-width">
             <PanelHeader title="Wide panel" />
-            <PanelBody>Takes its width from PanelProvider.</PanelBody>
+            <PanelBody>Session notes and lesson materials adapt to the PanelProvider width.</PanelBody>
         </PanelContainer>
     </PanelProvider>
 );
@@ -58,7 +58,7 @@ export const Interactive = {
     args: {
         width: '360px',
         title: 'Session details',
-        body: 'Panel body content goes here.',
+        body: "Review warm-up problems and practice goals before Thursday's math session.",
     },
     argTypes: {
         width: { control: 'text' },
@@ -81,7 +81,7 @@ export const Interactive = {
 const Subject = (props) => (
     <PanelContainer width={'360px' /* token gap: 360px */} {...props}>
         <PanelHeader title="Session details" actions={<PanelActionGroup><PanelCloseAction /></PanelActionGroup>} />
-        <PanelBody>Panel body content goes here.</PanelBody>
+        <PanelBody>Review warm-up problems and practice goals before Thursday's math session.</PanelBody>
     </PanelContainer>
 );
 const root = (canvasElement) => canvasElement.firstElementChild;

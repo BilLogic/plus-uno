@@ -67,30 +67,30 @@ function PopupLayoutDemos() {
             <Popup
                 trigger={<Button text="Popup on Top" />}
                 placement="top"
-                title="Popup Title"
+                title="Session note"
             >
-                And here's some amazing content. It's very engaging. Right?
+                Maya K. completed three practice sets before Thursday's session.
             </Popup>
             <Popup
                 trigger={<Button text="Popup on Bottom" />}
                 placement="bottom"
-                title="Popup Title"
+                title="Session note"
             >
-                And here's some amazing content. It's very engaging. Right?
+                Maya K. completed three practice sets before Thursday's session.
             </Popup>
             <Popup
                 trigger={<Button text="Popup on Left" />}
                 placement="left"
-                title="Popup Title"
+                title="Session note"
             >
-                And here's some amazing content. It's very engaging. Right?
+                Maya K. completed three practice sets before Thursday's session.
             </Popup>
             <Popup
                 trigger={<Button text="Popup on Right" />}
                 placement="right"
-                title="Popup Title"
+                title="Session note"
             >
-                And here's some amazing content. It's very engaging. Right?
+                Maya K. completed three practice sets before Thursday's session.
             </Popup>
         </section>
     );
@@ -101,10 +101,10 @@ function PopupContentDemo() {
         <section>
             <DemoLabel>NO TITLE</DemoLabel>
             <Popup
-                trigger={<Button text="Content Only" appearance="primary" />}
+                trigger={<Button text="Session note" appearance="primary" />}
                 placement="right"
             >
-                This popup has no title, only body content.
+                Maya K. joined on time for the 4:00 PM ET math session.
             </Popup>
         </section>
     );
@@ -119,19 +119,19 @@ function PopupInteractionStatesDemos() {
                     trigger={<Button text="Click (Default)" appearance="primary" />}
                     triggerType="click"
                 >
-                    Clicked to toggle.
+                    Session details opened on click.
                 </Popup>
                 <Popup
                     trigger={<Button text="Hover" appearance="primary" />}
                     triggerType="hover"
                 >
-                    Hovered to show.
+                    Session summary shown on hover.
                 </Popup>
                 <Popup
                     trigger={<Button text="Focus" appearance="primary" />}
                     triggerType="focus"
                 >
-                    Focus to show (tab to this button).
+                    Lesson goals shown on keyboard focus.
                 </Popup>
             </div>
         </section>
@@ -158,12 +158,11 @@ export const InteractionStates = () => (
 
 export const Overview = () => (
     <div className="plus-popup-overview-static">
-        <Button type="button" text="Toggle popup" appearance="primary" />
+        <Button type="button" text="View session details" appearance="primary" />
         <div className="plus-popup">
-            <div className="plus-popup-title">Popup title</div>
+            <div className="plus-popup-title">Session details</div>
             <div className="plus-popup-body">
-                Body content appears below the title. This overview is non-interactive; use Interactive for
-                click/hover behavior.
+                Maya K. is scheduled for Thursday at 4:00 PM ET at Lincoln Middle.
             </div>
         </div>
     </div>
@@ -176,9 +175,9 @@ Overview.parameters = {
 
 export const Interactive = {
     args: {
-        triggerLabel: 'Interactive Trigger',
-        title: 'Interactive Popup',
-        children: 'Change my placement or title in the controls.',
+        triggerLabel: 'Session details',
+        title: 'Session note',
+        children: "Maya K. completed two-step equations in Tuesday's session.",
         placement: 'top',
         triggerType: 'click'
     },
