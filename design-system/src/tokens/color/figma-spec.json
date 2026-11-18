@@ -16582,6 +16582,595 @@
      }
     },
     {
+     "name": "color/logo/plus",
+     "codeSyntax": {
+      "WEB": "var(--ds-logo-plus)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Plus glyph fill inside the filled, dark, colored, and colored-dark Logo marks. PLUS: PLUS addition: brand artwork stays identical across color modes.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "neutral/0"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "neutral/0"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "neutral/0"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "neutral/0"
+      }
+     }
+    },
+    {
+     "name": "color/logo/ground",
+     "codeSyntax": {
+      "WEB": "var(--ds-logo-ground)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Ground fill behind the glows inside the colored and colored-dark Logo marks. PLUS: PLUS addition: brand artwork stays identical across color modes.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "neutral/0"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "neutral/0"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "neutral/0"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "neutral/0"
+      }
+     }
+    },
+    {
+     "name": "color/logo/tile/default",
+     "codeSyntax": {
+      "WEB": "var(--ds-logo-tile)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Tile fill of the filled Logo mark. PLUS: PLUS addition: brand artwork stays identical across color modes.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "lagoon/700"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "lagoon/700"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "lagoon/700"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "lagoon/700"
+      }
+     }
+    },
+    {
+     "name": "color/logo/tile/dark",
+     "codeSyntax": {
+      "WEB": "var(--ds-logo-tile-dark)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Tile fill of the dark Logo mark. PLUS: PLUS addition: brand artwork stays identical across color modes.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "lagoon/900"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "lagoon/900"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "lagoon/900"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "lagoon/900"
+      }
+     }
+    },
+    {
+     "name": "color/logo/mark/default",
+     "codeSyntax": {
+      "WEB": "var(--ds-logo-mark)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Ring stroke and plus fill of the outlined Logo mark. PLUS: PLUS addition: brand artwork stays identical across color modes.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "neutral/1000"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "neutral/1000"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "neutral/1000"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "neutral/1000"
+      }
+     }
+    },
+    {
+     "name": "color/logo/mark/reversed",
+     "codeSyntax": {
+      "WEB": "var(--ds-logo-mark-reversed)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Ring stroke and plus fill of the outlined-reversed Logo mark. PLUS: PLUS addition: brand artwork stays identical across color modes.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/1000"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/1000"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/1000"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/1000"
+      }
+     }
+    },
+    {
+     "name": "color/logo/wordmark/default",
+     "codeSyntax": {
+      "WEB": "var(--ds-logo-wordmark)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Default wordmark fill on light surfaces. PLUS: PLUS addition: brand artwork stays identical across color modes.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "neutral/1000"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "neutral/1000"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "neutral/1000"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "neutral/1000"
+      }
+     }
+    },
+    {
+     "name": "color/logo/wordmark/reversed",
+     "codeSyntax": {
+      "WEB": "var(--ds-logo-wordmark-reversed)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Reversed wordmark fill on dark surfaces. PLUS: PLUS addition: brand artwork stays identical across color modes.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/1000"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/1000"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/1000"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/1000"
+      }
+     }
+    },
+    {
+     "name": "color/logo/wordmark/stroke",
+     "codeSyntax": {
+      "WEB": "var(--ds-logo-wordmark-stroke)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Hairline stroke in the dark ground color around light wordmark letters on dark grounds. PLUS: PLUS addition: brand artwork stays identical across color modes.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/0"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/0"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/0"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/0"
+      }
+     }
+    },
+    {
+     "name": "color/logo/glow/light/0",
+     "codeSyntax": {
+      "WEB": "var(--ds-logo-glow-light-0)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "First glow layer of the colored Logo mark on light grounds. PLUS: PLUS addition: brand artwork stays identical across color modes.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "yellow/300"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "yellow/300"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "yellow/300"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "yellow/300"
+      }
+     }
+    },
+    {
+     "name": "color/logo/glow/light/1",
+     "codeSyntax": {
+      "WEB": "var(--ds-logo-glow-light-1)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Second glow layer of the colored Logo mark on light grounds. PLUS: PLUS addition: brand artwork stays identical across color modes.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "yellow/250"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "yellow/250"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "yellow/250"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "yellow/250"
+      }
+     }
+    },
+    {
+     "name": "color/logo/glow/light/2",
+     "codeSyntax": {
+      "WEB": "var(--ds-logo-glow-light-2)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Third glow layer of the colored Logo mark on light grounds. PLUS: PLUS addition: brand artwork stays identical across color modes.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "teal/200"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "teal/200"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "teal/200"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "teal/200"
+      }
+     }
+    },
+    {
+     "name": "color/logo/glow/light/3",
+     "codeSyntax": {
+      "WEB": "var(--ds-logo-glow-light-3)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Fourth glow layer of the colored Logo mark on light grounds. PLUS: PLUS addition: brand artwork stays identical across color modes.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "red/200"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "red/200"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "red/200"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "red/200"
+      }
+     }
+    },
+    {
+     "name": "color/logo/glow/light/4",
+     "codeSyntax": {
+      "WEB": "var(--ds-logo-glow-light-4)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Fifth glow layer of the colored Logo mark on light grounds. PLUS: PLUS addition: brand artwork stays identical across color modes.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "lagoon/400"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "lagoon/400"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "lagoon/400"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "lagoon/400"
+      }
+     }
+    },
+    {
+     "name": "color/logo/glow/dark/0",
+     "codeSyntax": {
+      "WEB": "var(--ds-logo-glow-dark-0)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "First glow layer of the colored-dark Logo mark and dark-mode colored Logo mark. PLUS: PLUS addition: brand artwork stays identical across color modes.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "yellow/400"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "yellow/400"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "yellow/400"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "yellow/400"
+      }
+     }
+    },
+    {
+     "name": "color/logo/glow/dark/1",
+     "codeSyntax": {
+      "WEB": "var(--ds-logo-glow-dark-1)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Second glow layer of the colored-dark Logo mark and dark-mode colored Logo mark. PLUS: PLUS addition: brand artwork stays identical across color modes.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "yellow/300"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "yellow/300"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "yellow/300"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "yellow/300"
+      }
+     }
+    },
+    {
+     "name": "color/logo/glow/dark/2",
+     "codeSyntax": {
+      "WEB": "var(--ds-logo-glow-dark-2)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Third glow layer of the colored-dark Logo mark and dark-mode colored Logo mark. PLUS: PLUS addition: brand artwork stays identical across color modes.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "teal/300"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "teal/300"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "teal/300"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "teal/300"
+      }
+     }
+    },
+    {
+     "name": "color/logo/glow/dark/3",
+     "codeSyntax": {
+      "WEB": "var(--ds-logo-glow-dark-3)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Fourth glow layer of the colored-dark Logo mark and dark-mode colored Logo mark. PLUS: PLUS addition: brand artwork stays identical across color modes.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "red/300"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "red/300"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "red/300"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "red/300"
+      }
+     }
+    },
+    {
+     "name": "color/logo/glow/dark/4",
+     "codeSyntax": {
+      "WEB": "var(--ds-logo-glow-dark-4)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL",
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Fifth glow layer of the colored-dark Logo mark and dark-mode colored Logo mark. PLUS: PLUS addition: brand artwork stays identical across color modes.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "lagoon/500"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "lagoon/500"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "lagoon/500"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "lagoon/500"
+      }
+     }
+    },
+    {
      "name": "color/background/competency/mastering-content/default",
      "codeSyntax": {
       "WEB": "var(--ds-background-competency-mastering-content)"

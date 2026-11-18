@@ -12,8 +12,10 @@ import { resolve } from 'node:path';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { CORNER_TOKEN, HEIGHTS, PAINT, ROLE_SOURCES } from '../src/storybook-docs/illustrations/paint.js';
+import { Illustration } from '../src/storybook-docs/illustrations/Illustration.jsx';
 import * as primitives from '../src/storybook-docs/illustrations/primitives.jsx';
 import * as compositions from '../src/storybook-docs/illustrations/compositions.jsx';
+import * as construction from '../src/storybook-docs/illustrations/construction.jsx';
 
 const SRC = resolve(__dirname, '../src');
 const paints = new Set(Object.values(PAINT));
@@ -93,6 +95,22 @@ describe('every drawn paint resolves to a role', () => {
     ...Object.entries(compositions)
       .filter(([, C]) => typeof C === 'function')
       .map(([name, C]) => [name, name === 'ResponsiveReflow' ? <C width={1280} /> : <C />]),
+    ['Measure accent=false', <construction.Measure x={4} y={4} w={100} h={60} label="size-200" accent={false} />],
+    ['Measure accent=true', <construction.Measure x={4} y={4} w={100} h={60} label="size-200" accent={true} />],
+    ['Zone (gap) accent=false', <construction.Zone x={4} y={4} w={100} h={60} label="space-100" accent={false} />],
+    ['Zone (gap) accent=true', <construction.Zone x={4} y={4} w={100} h={60} label="space-100" accent={true} />],
+    ['Zone (pad) accent=false', <construction.Zone kind="pad" x={4} y={4} w={100} h={60} inset={8} accent={false} />],
+    ['Zone (pad) accent=true', <construction.Zone kind="pad" x={4} y={4} w={100} h={60} inset={8} accent={true} />],
+    ['Baseline accent=false', <construction.Baseline x={4} y={4} w={100} h={60} accent={false} />],
+    ['Baseline accent=true', <construction.Baseline x={4} y={4} w={100} h={60} accent={true} />],
+    ['Columns accent=false', <construction.Columns x={4} y={4} w={100} h={60} accent={false} />],
+    ['Columns accent=true', <construction.Columns x={4} y={4} w={100} h={60} accent={true} />],
+    ...construction.CONSTRUCTION_SETS.flatMap(([name, draw]) => [
+      [`gallery:${name} accent=false`, draw(false)],
+      [`gallery:${name} accent=true`, draw(true)],
+    ]),
+    ['ScaleStrip', <construction.ScaleStrip />],
+    ['ControlConstruction', <construction.ControlConstruction />],
   ];
   for (const [name, node] of drawn) {
     it(name, () => {
@@ -116,4 +134,51 @@ describe('every drawn paint resolves to a role', () => {
       }
     });
   }
+
+  it('CoreSizeMatrix', () => {
+    const html = renderToStaticMarkup(<construction.CoreSizeMatrix />);
+    expect(html).not.toMatch(/#[0-9a-f]{3,8}\b|rgba?\(|hsla?\(/i);
+    for (const [, value] of html.matchAll(/\b(?:fill|stroke)="([^"]*)"/g)) {
+      expect(value === 'none' || paints.has(value), `${value} in CoreSizeMatrix`).toBe(true);
+    }
+  });
+});
+
+describe('Zone label cap is per figure', () => {
+  it('caps total labeled zones at MAX_LABELED_ZONES across multiple Zone instances in one Illustration', () => {
+    const html = renderToStaticMarkup(
+      <Illustration viewBox="0 0 360 156" scale={1} title="Two Zone instances">
+        <construction.Zone
+          x={24}
+          y={20}
+          w={100}
+          h={20}
+          labels={[
+            { text: 'space-075', x: 140, y: 30 },
+            { text: 'space-100', x: 140, y: 50 },
+          ]}
+        />
+        <construction.Zone
+          x={24}
+          y={60}
+          w={100}
+          h={20}
+          labels={[
+            { text: 'space-150', x: 140, y: 70 },
+            { text: 'space-200', x: 140, y: 90 },
+          ]}
+        />
+      </Illustration>,
+    );
+    const renderedLabels = html.match(/data-zone-label="/g) ?? [];
+    expect(renderedLabels.length).toBe(construction.MAX_LABELED_ZONES);
+  });
+
+  it('ControlConstruction keeps both Button and Tag halves within MAX_LABELED_ZONES', () => {
+    const html = renderToStaticMarkup(<construction.ControlConstruction />);
+    expect(html).toContain('data-control="button"');
+    expect(html).toContain('data-control="tag"');
+    const renderedLabels = html.match(/data-zone-label="/g) ?? [];
+    expect(renderedLabels.length).toBe(construction.MAX_LABELED_ZONES);
+  });
 });

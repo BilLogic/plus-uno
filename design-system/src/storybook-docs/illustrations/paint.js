@@ -143,6 +143,13 @@ const ROLES = {
   swatchNeutral3: ['--ds-border-bold', null],
   swatchNeutral4: ['--ds-text-subtle', null],
   swatchNeutral5: ['--ds-text', null],
+  // Construction kit: Measure brackets, Zone tints, Baseline rules and Columns overlay.
+  measureLine: ['--ds-border-accent-magenta', null],
+  measureText: ['--ds-text-accent-magenta', null],
+  measureSubtleText: ['--ds-text-subtle', null],
+  zone: ['--ds-background-accent-magenta-subtler', null],
+  baseline: ['--ds-background-accent-magenta-subtler', null],
+  columns: ['--ds-background-accent-blue-subtler', null],
 };
 
 /**
@@ -163,6 +170,8 @@ export const HEIGHTS = {
 const CORNERS = {
   window: ['--radius-control-sm', null],
   button: ['--button-radius-default', 'components/forms-and-inputs/Button/Button.scss'],
+  buttonCompact: ['--button-radius-compact', 'components/forms-and-inputs/Button/Button.scss'],
+  buttonSpacious: ['--button-radius-spacious', 'components/forms-and-inputs/Button/Button.scss'],
   card: ['--card-radius', 'patterns/PatternCard/PatternCard.scss'],
   section: ['--section-radius', 'patterns/PatternSection/PatternSection.scss'],
   popup: ['--popup-radius', 'components/overlays-and-layering/Popup/Popup.scss'],
@@ -173,6 +182,7 @@ const CORNERS = {
   sidebarRow: ['--frame-sidebar-row-radius', 'patterns/Sidebar/Sidebar.scss'],
   tab: ['--radius-control-md', 'components/navigation/Tabs/Tabs.scss'],
   count: ['--radius-md', 'components/labels/CountTag/CountTag.scss'],
+  tag: ['--radius-md', 'components/labels/Tag/Tag.scss'],
   icon: ['--radius-sm', null],
   tracker: ['--radius-control-md', 'components/status-indicators/ProgressTracker/ProgressTracker.scss'],
   cardImage: ['--card-radius-compact', 'patterns/PatternCard/PatternCard.scss'],
@@ -201,6 +211,9 @@ export const CORNER = {
   ...Object.fromEntries(Object.entries(CORNERS).map(([role, [token]]) => [role, `calc(var(${token}) / 2)`])),
 };
 
+/** A corner role scaled for 2x or 4x construction close-ups. */
+export const scaledCorner = (role, factor) => `calc(${CORNER_TOKEN[role]} * ${factor})`;
+
 /**
  * The hairline every outline and divider draws with. A hero draws one unit as 2px,
  * so `HeroDrawing` sets `--stroke-hairline` to half a stroke and every kit
@@ -222,4 +235,14 @@ export const LABEL_FONT = {
   fontFamily: 'var(--type-family-body)',
   fontWeight: 'var(--type-weight-semibold)',
   fontSize: 'calc(var(--type-size-0875) / 2)',
+};
+
+/**
+ * Mono label for construction-kit brackets and zone callouts, at 1:1 scale
+ * (`--type-size-075`).
+ */
+export const MONO_LABEL_FONT = {
+  fontFamily: 'var(--type-family-code)',
+  fontWeight: 'var(--type-weight-medium)',
+  fontSize: 'var(--type-size-075)',
 };
