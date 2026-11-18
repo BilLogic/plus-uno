@@ -19,8 +19,8 @@ export const WINDOW_HEIGHT = 440; // docs-literal
 const FOCUSED_SCREEN = 1024; // docs-literal
 /** The focused type's step rail, 256 wide (320 for long labels): the Section side's width. */
 export const STEPS_RAIL = 256; // docs-literal
-/** The focused bottom bar's height in the ledger: the 32 button plus 16 of padding, `--space-300`. */
-export const BAR_TOKEN = '--space-300';
+/** The focused bottom bar's height in the ledger: 48px (--height-300, matching the 32 button plus 16 padding). */
+export const BAR_TOKEN = '--height-300';
 /** Four or fewer steps run across the top; five or more go down the left. */
 export const STEPS_ACROSS_MAX = 4;
 
@@ -67,7 +67,7 @@ export const FocusedTask = ({ count = 5, start = 1, labels: given, title = 'Plan
         <div style={{ display: 'flex', flexDirection: 'column', blockSize: '100%' }}>
             <Frame
                 header={(
-                    <div style={{ display: 'flex', alignItems: 'center', flex: '1 1 auto', gap: 'var(--space-100)', minInlineSize: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', flex: '1 1 auto', gap: 'var(--grid-gutter)', minInlineSize: 0 }}>
                         <IconButton appearance="subtle" icon="xmark" label="Close" onClick={() => {}} />
                         <h1 style={{ margin: 0, font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>{title}</h1>
                     </div>
@@ -75,7 +75,7 @@ export const FocusedTask = ({ count = 5, start = 1, labels: given, title = 'Plan
                 width="reading"
                 style={{ flex: '1 1 auto', minBlockSize: 0 }}
             >
-                <div data-probe="steps-layout" data-steps={down ? 'down' : 'across'} style={{ display: 'flex', flexDirection: down ? 'row' : 'column', gap: 'var(--space-200)' }}>
+                <div data-probe="steps-layout" data-steps={down ? 'down' : 'across'} style={{ display: 'flex', flexDirection: down ? 'row' : 'column', gap: 'var(--page-pad-x-default)' }}>
                     <div data-probe="steps" style={down ? { flex: `0 0 ${STEPS_RAIL}px`, inlineSize: STEPS_RAIL } : undefined}>{tracker}</div>
                     <div style={{ flex: '1 1 auto', minInlineSize: 0 }}>
                         <StepStage step={at} axis={placement} maxSteps={labels.length} labels={labels}>

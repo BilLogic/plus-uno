@@ -161,7 +161,7 @@ export const EmptyState = {
 export const EmptyWithStickyColumn = {
     parameters: { docs: { disable: true } },
     render: () => (
-        <PatternTable empty emptyState={emptyStateSlot} stickyColumn stickyHeader maxHeight={240}>
+        <PatternTable empty emptyState={emptyStateSlot} stickyColumn stickyHeader maxHeight="var(--width-1500)">
             {tableContent}
         </PatternTable>
     ),
@@ -276,9 +276,9 @@ export const RowStates = {
  */
 export const Sticky = {
     render: () => (
-        <div style={{ maxWidth: '480px' }}>
+        <div style={{ maxWidth: 'var(--width-3000)' }}>
             <PatternSection title="Tutors">
-                <PatternTable stickyHeader stickyColumn maxHeight={240}>
+                <PatternTable stickyHeader stickyColumn maxHeight="var(--width-1500)">
                     {wideTable}
                 </PatternTable>
             </PatternSection>

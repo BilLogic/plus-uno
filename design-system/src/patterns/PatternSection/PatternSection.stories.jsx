@@ -37,7 +37,7 @@ import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs
 import { iconClass } from '../../lib/icon';
 import { ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
 
-const col = { display: 'flex', flexDirection: 'column', gap: 'var(--space-200)' };
+const col = { display: 'flex', flexDirection: 'column', gap: 'var(--page-pad-x-default)' };
 
 const Actions = () => (
     <>
@@ -335,7 +335,7 @@ const SearchableStudents = () => {
                 />
             )}
         >
-            <ul style={{ margin: 0, paddingInlineStart: 'var(--space-250)', font: 'var(--body-default)' }}>
+            <ul style={{ margin: 0, paddingInlineStart: 'var(--page-pad-x-spacious)', font: 'var(--body-default)' }}>
                 {rows.map((student) => <li key={student.name}>{student.name}</li>)}
             </ul>
         </PatternSection>
@@ -498,10 +498,10 @@ export const ColorModes = {
 export const SplitLayout = {
     render: () => (
         <div style={col}>
-            <div data-probe="wide" style={{ width: 960 }}>
+            <div data-probe="wide" style={{ width: 960 /* token gap: 960px */ }}>
                 <PatternSection title="Wide" layout="split" side={slotContent('Side')}>{slotContent('Main')}</PatternSection>
             </div>
-            <div data-probe="narrow" style={{ width: 600 }}>
+            <div data-probe="narrow" style={{ width: 600 /* token gap: 600px */ }}>
                 <PatternSection title="Narrow" layout="split" side={slotContent('Side')}>{slotContent('Main')}</PatternSection>
             </div>
         </div>
