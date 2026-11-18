@@ -320,7 +320,7 @@ const preview = {
               "Tag",
               [
                 "Tag",
-                "Smart tag"
+                "Competency tag"
               ],
               "Tag group"
             ],

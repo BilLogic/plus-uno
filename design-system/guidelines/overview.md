@@ -4,7 +4,7 @@ summary: The staged build — Template, Blocks, Pieces, Polish, Motion — and w
 
 # Building a PLUS screen
 
-A screen starts from a template (`@/patterns`) and each choice on it from its pattern, built in five stages. A brief-shaped `ds_find` query (or three or more component names) returns the kit for the first two stages: the template, the governing patterns, the components and the token roles.
+A screen starts from a template (`@/patterns`) and each choice from its pattern, built in five stages. A brief-shaped `ds_find` query (or three or more component names) returns the kit for the first two stages: the template, the governing patterns, the components and the token roles.
 
 | Stage | What it settles | Where the answer comes from |
 |---|---|---|

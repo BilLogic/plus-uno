@@ -66,10 +66,10 @@ export const AVATAR_TAG_TYPES = ['person', 'agent', 'team'];
 export const TAG_TYPES = ['plain', ...AVATAR_TAG_TYPES];
 
 /**
- * Each SMART subject, by its token name, and the accent its SMART tokens alias:
- * the Tag color a SMART subject draws. The SMART layer (`color.*.smart.{subject}`) holds the
- * same pairing in the tokens; `SmartTag` reads it through this map, so the
- * two must name the same accent.
+ * Curriculum subject → Tag `color` hue. Kept as a separate map because it names
+ * the Tag color a competency area draws. The competency layer (`color.*.competency.{subject}`) holds the
+ * same pairing in the tokens; `CompetencyTag` reads it through this map, so the
+ * Tag stays a Tag in every prop and slot.
  */
 export const TAG_COLOR_OF_CURRICULUM = Object.freeze({
     'social-emotional': 'orange',

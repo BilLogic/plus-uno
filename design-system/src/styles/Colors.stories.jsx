@@ -171,11 +171,11 @@ export const SmartSubjects = () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
             {SMART.map(([key, title]) => (
                 <div key={key} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 'var(--inline-md)', alignItems: 'center' }}>
-                    <span style={{ font: 'var(--body-default)', padding: '0 var(--pad-x-xs)', borderRadius: 'var(--radius-md)', background: `var(--ds-background-smart-${key})`, color: `var(--ds-text-smart-${key})`, boxShadow: `inset 0 0 0 var(--border-width-default) var(--ds-border-smart-${key})`, justifySelf: 'start' }}>
+                    <span style={{ font: 'var(--body-default)', padding: '0 var(--pad-x-xs)', borderRadius: 'var(--radius-md)', background: `var(--ds-background-competency-${key})`, color: `var(--ds-text-competency-${key})`, boxShadow: `inset 0 0 0 var(--border-width-default) var(--ds-border-competency-${key})`, justifySelf: 'start' }}>
                         {title}
                     </span>
-                    <div aria-hidden="true" style={{ height: 'var(--row-height-sm)', borderRadius: 'var(--radius-full)', background: `var(--ds-background-smart-${key}-subtle)` }} />
-                    <div aria-hidden="true" style={{ height: 'var(--row-height-sm)', borderRadius: 'var(--radius-lg)', background: `var(--ds-background-smart-${key}-bold)` }} />
+                    <div aria-hidden="true" style={{ height: 'var(--row-height-sm)', borderRadius: 'var(--radius-full)', background: `var(--ds-background-competency-${key}-subtle)` }} />
+                    <div aria-hidden="true" style={{ height: 'var(--row-height-sm)', borderRadius: 'var(--radius-lg)', background: `var(--ds-background-competency-${key}-bold)` }} />
                 </div>
             ))}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 'var(--inline-md)' }}>

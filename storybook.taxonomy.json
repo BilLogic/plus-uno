@@ -68,7 +68,7 @@
       "Date tag",
       "Status tag",
       "Tag",
-      "Smart tag",
+      "Competency tag",
       "Tag group"
     ],
     "Layout and structure": [
@@ -314,7 +314,7 @@
         "Tag",
         [
           "Tag",
-          "Smart tag"
+          "Competency tag"
         ],
         "Tag group"
       ],

@@ -74,7 +74,7 @@ It renders a `span` with no role and no click handler: `onClick`, `role` and
 - `Sparkline`: use when showing the shape of a trend beside a metric and its `ChangeTag`.
 - `CountTag`: use when showing an absolute count rather than a delta.
 
-Same group: `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `AiMessage` · `CompetencyTag` · `CountTag` · `DateTag` · `PromptStarters` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
 ## Parts
 

@@ -71,14 +71,14 @@ file:
 | Figma says | the system says |
 |---|---|
 | `error` | `danger` (`--ds-background-danger-bold`) |
-| `mastering` | `--ds-*-smart-mastering-content` |
-| `social` | `--ds-*-smart-social-emotional` |
-| `technology` | `--ds-*-smart-technology-tools` |
+| `mastering` | `--ds-*-competency-mastering-content` |
+| `social` | `--ds-*-competency-social-emotional` |
+| `technology` | `--ds-*-competency-technology-tools` |
 
 `error` is the one that matters: it is a different word for a semantic the rest
 of the library, the token file and every component call `danger`. The domain
 names are truncations rather than different words, but a designer reading
-`social` in a picker has no route to `--ds-*-smart-social-emotional`.
+`social` in a picker has no route to `--ds-*-competency-social-emotional`.
 
 ### Values that are literals where the system has tokens
 

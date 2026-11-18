@@ -23,8 +23,8 @@
  *
  * The text stays neutral (`color.text`) on every name: the steps it sits on
  * are the accent's lightest, made for neutral text. Gray is the accent gray,
- * which is the neutral ramp. A SMART area is not a hue: it reads the SMART
- * layer through `SmartTag`, so the subject-to-hue pairing lives in the
+ * which is the neutral ramp. A competency area is not a hue: it reads the competency
+ * layer through `CompetencyTag`, so the subject-to-hue pairing lives in the
  * tokens alone. The map holds whole `var()` references so the generated docs
  * list them.
  */

@@ -96,7 +96,7 @@ Don't: A Tag styled as a suggestion is not a button, so nobody can accept it wit
 
 - For a value already in the field, use `Tag`, inside a `TagGroup`.
 
-Same group: `AiMessage` · `ChangeTag` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Tag` · `TagGroup`
+Same group: `AiMessage` · `ChangeTag` · `CompetencyTag` · `CountTag` · `DateTag` · `PromptStarters` · `StatusTag` · `Tag` · `TagGroup`
 
 ## Parts
 
