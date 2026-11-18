@@ -6,26 +6,32 @@ import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
 import {
     BehaviorGuide,
+    ByTemplateGrid,
     ClipDemo,
     ContrastDemo,
     CrossSection,
+    ElevationPanel,
     ExplodedStack,
     LayerStack,
     LevelTiles as LevelTilesBlock,
     LiftDemo,
+    OverviewStack,
+    PageSurfacesStack,
     ScrollShadowDemo,
     ShadowComposer,
+    ShadowRampFigure,
     ShadowSlotTable,
+    ShadowTokensEquation,
     SurfaceLadder,
 } from '@/storybook-docs/elevation-demos.jsx';
 import { parseShadow } from '@/storybook-docs/lib/shadow-anatomy';
 
 /**
- * Live blocks for Foundations/Elevation. Each interactive block has a play
+ * Live blocks for Foundations/Visual/Elevation. Each interactive block has a play
  * test; the values every block shows are read from the page's tokens.
  */
 export default {
-    title: 'Foundations/Visual/Elevation',
+    title: 'Foundations/Visual/Elevation/Demos',
     tags: ['!dev', '!autodocs'],
 };
 
@@ -608,3 +614,271 @@ export const OneFocalPoint = () => (
         </Dont>
     </DoDont>
 );
+
+/* ------------------------------------------------------------ folder part A figures */
+
+const assertPanelContainer = async (panel) => {
+    await expect(panel).not.toBeNull();
+    const cs = getComputedStyle(panel);
+    await expect(parseFloat(cs.borderTopLeftRadius)).toBeGreaterThan(0);
+    await expect(cs.backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
+};
+
+/** Overview key figure: the five layers in stack order inside the shared panel container. */
+export const OverviewLayers = {
+    render: () => <OverviewStack />,
+    play: async ({ canvasElement }) => {
+        const panel = canvasElement.querySelector('[data-elevation-panel]');
+        await assertPanelContainer(panel);
+        const figure = panel.querySelector('[data-testid="overview-stack"]');
+        await expect(figure).not.toBeNull();
+        const plates = [...figure.querySelectorAll('[data-plate]')];
+        await expect(plates.map((p) => p.dataset.plate)).toEqual([
+            'frame',
+            'page',
+            'navigation',
+            'non-blocking-overlay',
+            'blocking-overlay',
+        ]);
+        for (const plate of plates) {
+            await expect(plate.querySelector('svg text, text'), `${plate.dataset.plate} draws no words`).toBeNull();
+        }
+    },
+};
+
+/** Layer system key figure: the three page surfaces inside the shared panel container. */
+export const WithinThePage = {
+    render: () => <PageSurfacesStack />,
+    play: async ({ canvasElement }) => {
+        const panel = canvasElement.querySelector('[data-elevation-panel]');
+        await assertPanelContainer(panel);
+        const figure = panel.querySelector('[data-testid="page-surfaces-stack"]');
+        await expect(figure).not.toBeNull();
+        const plates = [...figure.querySelectorAll('[data-plate]')];
+        await expect(plates.map((p) => p.dataset.plate)).toEqual(['default', 'sunken', 'raised']);
+        for (const plate of plates) {
+            await expect(plate.querySelector('svg text, text'), `${plate.dataset.plate} draws no words`).toBeNull();
+        }
+    },
+};
+
+/** Shadow ramp key figure: four shadows in light and dark inside the shared panel container. */
+export const Ramp = {
+    render: () => <ShadowRampFigure />,
+    play: async ({ canvasElement }) => {
+        const panel = canvasElement.querySelector('[data-elevation-panel]');
+        await assertPanelContainer(panel);
+        const figure = panel.querySelector('[data-testid="shadow-ramp"]');
+        await expect(figure).not.toBeNull();
+        const modes = [...figure.querySelectorAll('[data-color-mode]')];
+        await expect(modes.map((m) => m.dataset.colorMode)).toEqual(['light', 'dark']);
+        for (const mode of modes) {
+            const discs = [...mode.querySelectorAll('[data-shadow-step]')];
+            await expect(discs.map((d) => d.dataset.shadowStep)).toEqual(['raised', 'overflow', 'overlay', 'blocking']);
+            for (const disc of discs) {
+                await expect(getComputedStyle(disc).boxShadow).not.toBe('none');
+            }
+        }
+    },
+};
+
+/** Within-the-page summary grouped by Section, Table, and Card inside the shared panel container. */
+export const ByTemplate = {
+    render: () => <ByTemplateGrid />,
+    play: async ({ canvasElement }) => {
+        const panel = canvasElement.querySelector('[data-elevation-panel]');
+        await assertPanelContainer(panel);
+        await expect(panel.getAttribute('data-testid')).toBe('by-template-grid');
+    },
+};
+
+/** Edge + Key + Ambient = --ds-shadow-blocking inside the shared panel container. */
+export const ShadowEquation = {
+    render: () => <ShadowTokensEquation />,
+    play: async ({ canvasElement }) => {
+        const panel = canvasElement.querySelector('[data-elevation-panel]');
+        await assertPanelContainer(panel);
+        await expect(panel.getAttribute('data-testid')).toBe('shadow-equation');
+        await expect(panel.querySelectorAll('[data-equation-part]').length).toBe(4);
+    },
+};
+
+const skelBar = (width) => ({
+    display: 'block',
+    width,
+    height: 'var(--space-100)',
+    borderRadius: 'var(--radius-sm)',
+    background: 'var(--ds-skeleton)',
+});
+
+const codeChip = (danger = false) => ({
+    font: 'var(--code-default)',
+    color: danger ? 'var(--ds-text-danger)' : 'var(--ds-text-subtle)',
+});
+
+/** Shadow ramp Do/Don't 1: use the layer's token, never a raw shadow. */
+export const UsingShadowTokens = () => (
+    <DoDont>
+        <Do caption="Use the layer’s token.">
+            <ElevationPanel style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 'var(--stack-md)' }}>
+                <div
+                    style={{
+                        width: '62%',
+                        padding: 'var(--card-pad-default)',
+                        borderRadius: 'var(--card-radius-compact)',
+                        background: 'var(--ds-surface-overlay)',
+                        boxShadow: 'var(--ds-shadow-overlay)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 'var(--stack-sm)',
+                    }}
+                >
+                    <span style={skelBar('65%')} />
+                    <span style={skelBar('44%')} />
+                </div>
+                <code style={codeChip(false)}>var(--ds-shadow-overlay)</code>
+            </ElevationPanel>
+        </Do>
+        <Dont caption="Don’t write a raw shadow.">
+            <ElevationPanel style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 'var(--stack-md)' }}>
+                <div
+                    style={{
+                        width: '62%',
+                        padding: 'var(--card-pad-default)',
+                        borderRadius: 'var(--card-radius-compact)',
+                        background: 'var(--ds-surface-overlay)',
+                        boxShadow: '0 6px 18px rgba(0, 0, 0, 0.22)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 'var(--stack-sm)',
+                    }}
+                >
+                    <span style={skelBar('65%')} />
+                    <span style={skelBar('44%')} />
+                </div>
+                <code style={codeChip(true)}>0 6px 18px rgba(0,0,0,.22)</code>
+            </ElevationPanel>
+        </Dont>
+    </DoDont>
+);
+
+/** Shadow ramp Do/Don't 2: tokens adapt in dark; a raw shadow vanishes. */
+export const TokensAdaptInDark = () => (
+    <DoDont>
+        <Do caption="Tokens adapt: in dark the Flag steps lighter and keeps its ring.">
+            <ElevationPanel style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
+                {(['light', 'dark']).map((mode) => (
+                    <div
+                        key={mode}
+                        data-color-mode={mode}
+                        style={{
+                            padding: 'var(--card-pad-compact)',
+                            borderRadius: 'var(--card-radius-compact)',
+                            background: 'var(--ds-surface)',
+                            display: 'flex',
+                            justifyContent: 'center',
+                        }}
+                    >
+                        <div
+                            style={{
+                                width: '78%',
+                                padding: 'var(--card-pad-compact)',
+                                borderRadius: 'var(--radius-lg)',
+                                background: 'var(--ds-surface-overlay)',
+                                boxShadow: 'var(--ds-shadow-overlay)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 'var(--stack-sm)',
+                            }}
+                        >
+                            <span style={skelBar('68%')} />
+                            <span style={skelBar('44%')} />
+                        </div>
+                    </div>
+                ))}
+            </ElevationPanel>
+        </Do>
+        <Dont caption="A hand-made shadow vanishes in dark.">
+            <ElevationPanel style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
+                {(['light', 'dark']).map((mode) => (
+                    <div
+                        key={mode}
+                        data-color-mode={mode}
+                        style={{
+                            padding: 'var(--card-pad-compact)',
+                            borderRadius: 'var(--card-radius-compact)',
+                            background: 'var(--ds-surface)',
+                            display: 'flex',
+                            justifyContent: 'center',
+                        }}
+                    >
+                        <div
+                            style={{
+                                width: '78%',
+                                padding: 'var(--card-pad-compact)',
+                                borderRadius: 'var(--radius-lg)',
+                                background: 'var(--ds-surface)',
+                                boxShadow: '0 6px 18px rgba(0, 0, 0, 0.22)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 'var(--stack-sm)',
+                            }}
+                        >
+                            <span style={skelBar('68%')} />
+                            <span style={skelBar('44%')} />
+                        </div>
+                    </div>
+                ))}
+            </ElevationPanel>
+        </Dont>
+    </DoDont>
+);
+
+/** Shadow ramp Do/Don't 3: keep the shadow token a component ships with. */
+export const KeepComponentShadow = () => (
+    <DoDont>
+        <Do caption="A Popup keeps the overlay pair it ships with.">
+            <ElevationPanel style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 'var(--stack-md)' }}>
+                <div
+                    style={{
+                        width: '62%',
+                        padding: 'var(--card-pad-default)',
+                        borderRadius: 'var(--radius-lg)',
+                        background: 'var(--ds-surface-overlay)',
+                        boxShadow: 'var(--ds-shadow-overlay)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 'var(--stack-sm)',
+                    }}
+                >
+                    <span style={skelBar('74%')} />
+                    <span style={skelBar('56%')} />
+                    <span style={skelBar('64%')} />
+                </div>
+                <code style={codeChip(false)}>Popup · --ds-shadow-overlay</code>
+            </ElevationPanel>
+        </Do>
+        <Dont caption="Reassigning a component’s shadow puts it on the wrong layer.">
+            <ElevationPanel style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 'var(--stack-md)' }}>
+                <div
+                    style={{
+                        width: '62%',
+                        padding: 'var(--card-pad-default)',
+                        borderRadius: 'var(--radius-lg)',
+                        background: 'var(--ds-surface-overlay)',
+                        boxShadow: 'var(--ds-shadow-raised)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 'var(--stack-sm)',
+                    }}
+                >
+                    <span style={skelBar('74%')} />
+                    <span style={skelBar('56%')} />
+                    <span style={skelBar('64%')} />
+                </div>
+                <code style={codeChip(true)}>Popup · --ds-shadow-raised</code>
+            </ElevationPanel>
+        </Dont>
+    </DoDont>
+);
+

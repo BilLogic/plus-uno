@@ -1,0 +1,79 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { C, RefTable } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import {
+    FoundationSection,
+    FoundationSubsection,
+} from '@/storybook-docs/foundation-page.jsx';
+import * as ElevationStories from './Elevation.stories.jsx';
+
+<Meta title="Foundations/Visual/Elevation/Shadow ramp" />
+
+<DocsLanding
+    page="foundations-visual-elevation-shadow-ramp"
+    eyebrow="Foundation · Elevation"
+    title="Shadow ramp"
+    purpose="Four shadows, in layer order. The higher ones are stronger on purpose, so a floating surface separates clearly from what is under it."
+/>
+
+<Canvas of={ElevationStories.Ramp} sourceState="none" />
+
+<RefTable
+    head={['Token', 'Layer', 'Used by']}
+    rows={[
+        [<C>--ds-shadow-raised</C>, 'Page · Raised', 'A Card at rest, a grabbed control'],
+        [<C>--ds-shadow-overflow</C>, 'Navigation', 'A sticky header or column once content scrolls under it'],
+        [
+            <C>--ds-shadow-overlay</C>,
+            'Non-blocking overlay',
+            'Popups, Flag, floating Sidebar and Panel, a hovered clickable Card, a dragged Card',
+        ],
+        [<C>--ds-shadow-blocking</C>, 'Blocking overlay', 'The Modal, on the Blanket'],
+    ]}
+/>
+
+<FoundationSection title="Shadow tokens">
+
+Each token adds three layers: an edge, a key and an ambient shadow. Overflow is a scroll-edge shadow only.
+
+<Canvas of={ElevationStories.ShadowEquation} sourceState="none" />
+
+<FoundationSubsection title="Interactive composer">
+
+Switch each slot off to see what it carries on a live surface.
+
+<Canvas of={ElevationStories.Composer} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Cross-section">
+
+How dark the ground is at each px below a surface's edge, computed from the tokens on this page. The tick on the axis is each shadow's reach.
+
+<Canvas of={ElevationStories.CrossSectionChart} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Every slot">
+
+Each value reads offset x and y, blur, spread, then ink opacity. In dark the ambient is a tight dark halo: a wide soft shadow does not show on a dark ground.
+
+<Canvas of={ElevationStories.SlotTable} sourceState="none" />
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Using the tokens">
+
+<Canvas of={ElevationStories.UsingShadowTokens} sourceState="none" />
+
+<Canvas of={ElevationStories.TokensAdaptInDark} sourceState="none" />
+
+<FoundationSubsection title="Keep the token a component ships with">
+
+<Canvas of={ElevationStories.KeepComponentShadow} sourceState="none" />
+
+</FoundationSubsection>
+
+</FoundationSection>

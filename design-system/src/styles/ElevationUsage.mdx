@@ -9,30 +9,14 @@ import {
 import { LevelTiles, LEVELS } from '@/storybook-docs/elevation-demos.jsx';
 import * as ElevationStories from './Elevation.stories.jsx';
 
-
-<Meta of={ElevationStories} />
+<Meta title="Foundations/Visual/Elevation/Usage" />
 
 <DocsLanding
-    page="foundations-visual-elevation"
-    eyebrow="Foundation"
-    title="Elevation"
-    purpose="What sits above what, and whether it blocks. Shadow and surface color show it."
-    links={{
-        items: [
-            { title: 'Levels', href: '#foundation-the-levels' },
-            { title: 'Shadow', href: '#foundation-shadow-anatomy' },
-            { title: 'Surface color', href: '#foundation-surface-color-and-dark-mode' },
-        ],
-    }}
+    page="foundations-visual-elevation-usage"
+    eyebrow="Foundation · Elevation"
+    title="Usage"
+    purpose="Which surface and shadow each behavior takes, how surfaces step in dark mode, how lifts move, and how edges hold under contrast."
 />
-
-<FoundationSection title="Overview">
-
-**Elevation** is the order of layers: which surface sits above which, and whether it blocks the one below. **Shadow** is one way to show that order; surface color does the rest.
-
-<Canvas of={ElevationStories.Stack} sourceState="none" />
-
-</FoundationSection>
 
 <FoundationSection title="The levels">
 
@@ -54,30 +38,6 @@ Raised and overlay have `-hovered` and `-pressed` surfaces for a surface that ca
 Pick the level by what the surface does, never by how strong a shadow looks. Answer the questions to land on a row.
 
 <Canvas of={ElevationStories.Behavior} sourceState="none" />
-
-</FoundationSection>
-
-<FoundationSection title="Shadow anatomy">
-
-Every shadow is three slots: **edge**, **key** and **ambient**. A new shadow fills all three, or says why one is empty. Switch each slot off to see what it carries.
-
-<Canvas of={ElevationStories.Composer} sourceState="none" />
-
-<FoundationSubsection title="Cross-section">
-
-How dark the ground is at each px below a surface's edge, computed from the tokens on this page. The tick on the axis is each shadow's reach.
-
-<Canvas of={ElevationStories.CrossSectionChart} sourceState="none" />
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Every slot">
-
-Each value reads offset x and y, blur, spread, then ink opacity. In dark the ambient is a tight dark halo: a wide soft shadow does not show on a dark ground.
-
-<Canvas of={ElevationStories.SlotTable} sourceState="none" />
-
-</FoundationSubsection>
 
 </FoundationSection>
 

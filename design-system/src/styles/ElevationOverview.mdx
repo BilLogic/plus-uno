@@ -1,0 +1,84 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { C, Callout, RefTable } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import {
+    DocsLink,
+    FoundationSection,
+} from '@/storybook-docs/foundation-page.jsx';
+import * as ElevationStories from './Elevation.stories.jsx';
+
+<Meta title="Foundations/Visual/Elevation/Overview" />
+
+<DocsLanding
+    page="foundations-visual-elevation-overview"
+    eyebrow="Foundation · Elevation"
+    title="Overview"
+    purpose="Elevation says what sits above what, and what you can act on. Surface color and shadow are the cues that show it."
+/>
+
+<Canvas of={ElevationStories.OverviewLayers} sourceState="none" />
+
+<Callout title="This page owns">
+
+The five layers and the three page surfaces · the four shadows and when each is used · surface color and dark mode · the elevation rules. Not here: token values and stacking order (<DocsLink id="foundations-tokens-elevation-and-layers">Tokens › Elevation and layers</DocsLink>); how each template takes its surface (<DocsLink id="templates-overview">Templates</DocsLink>); corners (<DocsLink id="foundations-visual-radius">Radius</DocsLink>); strokes and the focus ring (<DocsLink id="foundations-visual-border">Border</DocsLink>); how a lift animates (<DocsLink id="foundations-expression-motion-physics">Motion</DocsLink>).
+
+</Callout>
+
+It is never decoration: each cue answers what floats, what groups and what you can press.
+
+<Callout title="Why two cues">
+
+Surface color and shadow do one job: they build the sense of layers, so you can tell what sits above what and what you can act on. Each cue covers what the other cannot.
+
+- **Surface color** separates before any shadow: Sunken groups, while Raised and overlay surfaces read as a different plane.
+- **Shadow** says how high: contact, then height, stronger for each layer up.
+
+Used together, they make one layer read the same way everywhere.
+
+</Callout>
+
+<FoundationSection title="Terms">
+
+<RefTable
+    head={['Term', 'Means']}
+    rows={[
+        [
+            'Layer',
+            'Where a surface sits in the stack: Frame, Page, Navigation, Non-blocking overlay, Blocking overlay. A higher layer is always above a lower one.',
+        ],
+        [
+            'Surface',
+            <>
+                The color a layer or element sits on: <C>--ds-surface</C> (Default), <C>--ds-surface-sunken</C>, <C>--ds-surface-raised</C>, <C>--ds-surface-overlay</C>.
+            </>,
+        ],
+        [
+            'Shadow',
+            <>
+                How high a surface floats: <C>--ds-shadow-raised</C>, <C>--ds-shadow-overflow</C>, <C>--ds-shadow-overlay</C>, <C>--ds-shadow-blocking</C>.
+            </>,
+        ],
+        [
+            'Blanket',
+            <>
+                The dim layer (<C>--ds-blanket</C>) behind a blocking overlay. It tells you the page behind cannot be used.
+            </>,
+        ],
+    ]}
+/>
+
+</FoundationSection>
+
+<FoundationSection title="Golden rules">
+
+1. **Flat by default.** The Frame, the Page, Sections and Tables carry no shadow.
+2. **Lift means you can act on it,** or it sits over the page. Never lift to decorate.
+3. **Raise one thing per view** at rest. If every card is Raised, none is.
+4. **Group with a surface color or a border,** never a shadow.
+5. **A blocking overlay sits on the Blanket.** Without the Blanket it is non-blocking.
+6. **One blocking overlay at a time.** Never stack a Modal on a Modal.
+7. **No stroke on an elevated surface.** Its shadow already draws the 1px edge.
+8. **Pair the surface with its shadow.** Never mix layers.
+9. **Never invent a shadow.** The four tokens are the whole ramp.
+
+</FoundationSection>

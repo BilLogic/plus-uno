@@ -1,0 +1,175 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { C } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import {
+    DocsLink,
+    FoundationSection,
+    FoundationSubsection,
+} from '@/storybook-docs/foundation-page.jsx';
+import { LayerDetailRow } from '@/storybook-docs/elevation-demos.jsx';
+import * as ElevationStories from './Elevation.stories.jsx';
+
+<Meta title="Foundations/Visual/Elevation/Layer system" />
+
+<DocsLanding
+    page="foundations-visual-elevation-layer-system"
+    eyebrow="Foundation · Elevation"
+    title="Layer system"
+    purpose="Every surface sits in one of five layers. Frame and Page are flat; Navigation, Non-blocking overlay and Blocking overlay are elevated. Then, within the page, three surfaces set what groups and what stands out."
+/>
+
+<FoundationSection title="The five layers">
+
+<FoundationSubsection title="Frame">
+
+<LayerDetailRow variant="frame">
+
+The app shell behind the page: the ground and a docked Sidebar or Panel.
+
+**Usage and styling**
+
+- **Flat:** no shadow.
+- **Docked chrome shares this ground;** floating chrome moves to Non-blocking overlay.
+
+Stacking: base
+
+</LayerDetailRow>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Page">
+
+<LayerDetailRow variant="page">
+
+Where work sits: Sections, Tables, Lists, Forms, Cards. Flat as a layer; three surfaces inside it.
+
+**Usage and styling**
+
+- **No shadow on the Page itself.**
+- **Meets the Frame** at a 1px hairline (<C>--ds-border</C>).
+
+Stacking: <C>--layer-card</C>
+
+</LayerDetailRow>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Navigation">
+
+<LayerDetailRow variant="navigation">
+
+Bars and headers that stay put while the page scrolls under them.
+
+**Usage and styling**
+
+- **Flat at rest:** a hairline only before scroll.
+- **Takes <C>--ds-shadow-overflow</C>** only while content passes under it.
+
+Stacking: <C>--layer-navigation</C>
+
+</LayerDetailRow>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Non-blocking overlay">
+
+<LayerDetailRow variant="non-blocking-overlay">
+
+Surfaces that float while the page stays live: Popups, Menus, Select lists, Flag, floating Sidebar and Panel, Spotlight, a dragged Card.
+
+**Usage and styling**
+
+- **No Blanket:** the page stays usable.
+- **Dismisses** on outside click, Escape or timer.
+
+Stacking: <C>--layer-popup</C> <C>--layer-flag</C> <C>--layer-spotlight</C>
+
+</LayerDetailRow>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Blocking overlay">
+
+<LayerDetailRow variant="blocking-overlay">
+
+The Modal, over the Blanket. Blocks the page until you answer.
+
+**Usage and styling**
+
+- **Always on the Blanket;** traps focus and inert-locks the page.
+- **One at a time;** a Flag may sit above it.
+
+Stacking: <C>--layer-blanket</C> <C>--layer-modal</C>
+
+</LayerDetailRow>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Not a layer">
+
+A **focused view** replaces the page rather than floating over it: <C>--ds-surface</C>, no shadow, <C>--layer-dialog</C>. A **Tooltip** labels a control: no shadow, <C>--layer-tooltip</C>.
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Within the page">
+
+The Page has three surfaces: Default, Sunken and Raised.
+
+<Canvas of={ElevationStories.WithinThePage} sourceState="none" />
+
+<FoundationSubsection title="Default">
+
+<LayerDetailRow variant="surface-default">
+
+Most of the page: a Section and its side, tables, lists, forms; rows are hairlines.
+
+**Usage and styling**
+
+- **A Section takes no surface:** no fill, no padding, no border.
+
+</LayerDetailRow>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Sunken">
+
+<LayerDetailRow variant="surface-sunken">
+
+A backdrop that groups static content, such as a subtle Section.
+
+**Usage and styling**
+
+- **Only on the Default surface;** one step only.
+- **Flat:** no shadow, no border.
+
+</LayerDetailRow>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Raised">
+
+<LayerDetailRow variant="surface-raised">
+
+The card surface on the page, and a grabbed control.
+
+**Usage and styling**
+
+- **One focal card per view at rest.**
+- **Always the pair:** raised surface with raised shadow.
+- **Clickable hover** lifts to <C>--ds-shadow-overlay</C>; **dragged,** it takes the overlay pair.
+
+</LayerDetailRow>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="By template">
+
+<Canvas of={ElevationStories.ByTemplate} sourceState="none" />
+
+How a Section, its side and its detail sit on the page is in <DocsLink id="templates-section">Templates › Section</DocsLink>. Elevation sets only their surface: by default a Section takes none.
+
+</FoundationSubsection>
+
+</FoundationSection>
