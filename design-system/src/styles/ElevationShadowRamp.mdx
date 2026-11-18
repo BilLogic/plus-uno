@@ -53,3 +53,31 @@ Each token adds three layers: an edge, a key and an ambient shadow. Overflow is 
 </FoundationSubsection>
 
 </FoundationSection>
+
+<FoundationSection title="Shadow anatomy">
+
+<FoundationSubsection title="Interactive composer">
+
+Switch each slot off to see what it carries on a live surface.
+
+<Canvas of={ElevationStories.Composer} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Cross-section">
+
+How dark the ground is at each px below a surface's edge, computed from the tokens on this page. The tick on the axis is each shadow's reach.
+
+<Canvas of={ElevationStories.CrossSectionChart} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Every slot">
+
+Each value reads offset x and y, blur, spread, then ink opacity. In dark the ambient is a tight dark halo: a wide soft shadow does not show on a dark ground.
+
+<Canvas of={ElevationStories.SlotTable} sourceState="none" />
+
+</FoundationSubsection>
+
+</FoundationSection>

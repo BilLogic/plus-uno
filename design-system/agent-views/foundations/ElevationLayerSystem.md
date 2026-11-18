@@ -12,13 +12,58 @@ Every surface sits in one of five layers. Layers 0 and 1 are flat; 2 to 4 are el
 
 ### Layer 0 · Frame
 
+The ground the app sits on, and the docked Sidebar on it.
+
+#### Usage & styling
+
+- **Flat.** Never a shadow, never floats.
+- **Docked Sidebar** shares the Frame; floating, it moves to Layer 3.
+
 ### Layer 1 · Page
+
+The page and everything in its flow. What sits on it is broken down below, in Within the page.
+
+#### Usage & styling
+
+- **Flat by default.** Set off from the Frame by tone alone.
 
 ### Layer 2 · Navigation
 
+Edges that stay put while content scrolls under them: a sticky table header and column.
+
+#### Usage & styling
+
+- **Border first;** the overflow shadow appears only once content scrolls beneath.
+
+#### Stacking
+
+`--layer-card`
+
 ### Layer 3 · Non-blocking overlay
 
+Floats while the page stays usable: the floating Sidebar and Panel, Popup types, Inline edit, Flag, Spotlight, a dragged Card.
+
+#### Usage & styling
+
+- **Overlay pair,** no border.
+- **Dark mode:** steps lighter.
+
+#### Stacking
+
+`--layer-navigation` · `--layer-popup` · `--layer-flag` · `--layer-spotlight`
+
 ### Layer 4 · Blocking overlay
+
+The Modal, and nothing else.
+
+#### Usage & styling
+
+- **Always on the Blanket;** nothing else dims the page.
+- **One at a time;** a Flag may sit above it.
+
+#### Stacking
+
+`--layer-blanket` · `--layer-modal`
 
 ### Not a layer
 
@@ -30,9 +75,30 @@ Layer 1 has three surfaces: Default, Sunken and Raised.
 
 ### Default
 
+Most of the page: a Section and its side, tables, lists, forms; rows are hairlines.
+
+#### Usage & styling
+
+- **A Section takes no surface:** no fill, no padding, no border.
+
 ### Sunken
 
+A backdrop that groups static content, such as a subtle Section.
+
+#### Usage & styling
+
+- **Only on the Default surface;** one step only, never a Card inside a Card.
+- **Flat:** no shadow, no border.
+
 ### Raised
+
+The one card a view is about, a clickable card on hover, a grabbed control.
+
+#### Usage & styling
+
+- **One per view at rest.**
+- **Always the pair:** raised surface with raised shadow.
+- **Dragged,** it takes the overlay pair.
 
 ### By template
 

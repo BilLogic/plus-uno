@@ -27,20 +27,6 @@ Higher is lighter. In light the lifted surfaces share the page color and the sha
 
 Dark blocking is the same as dark overlay. On the dark Blanket a shadow barely shows, so the lighter overlay surface is what lifts the Modal.
 
-## Shadow anatomy
-
-### Interactive composer
-
-Switch each slot off to see what it carries on a live surface.
-
-### Cross-section
-
-How dark the ground is at each px below a surface's edge, computed from the tokens on this page. The tick on the axis is each shadow's reach.
-
-### Every slot
-
-Each value reads offset x and y, blur, spread, then ink opacity. In dark the ambient is a tight dark halo: a wide soft shadow does not show on a dark ground.
-
 ## Layering
 
 Each layer is a `--layer-*` z-index token, set in code only. Components name the token, never a number.

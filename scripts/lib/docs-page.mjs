@@ -482,6 +482,7 @@ function elementText(el) {
     case 'Banner':
     case 'Description':
     case 'FoundationProse':
+    case 'LayerDetailRow':
     case 'DocsTabs':
     case 'DocsTab':
     case 'div':
