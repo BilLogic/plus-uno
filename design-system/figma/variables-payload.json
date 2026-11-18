@@ -663,13 +663,6 @@
           }
         },
         {
-          "name": "Calendar/nav-size",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--calendar-nav-size)"
-          }
-        },
-        {
           "name": "Progress/indicator-dot-size-8",
           "resolvedType": "FLOAT",
           "codeSyntax": {

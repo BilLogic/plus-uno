@@ -3,10 +3,10 @@
   "figmaFileKey": "zAecJNRdvJzAUOcjV32tRX",
   "figmaFileName": "Design System - BS4 Foundation (Component LIbrary)",
   "capturedAt": "2026-11-16",
-  "totalVariables": 1644,
+  "totalVariables": 1643,
   "byType": {
     "COLOR": 984,
-    "FLOAT": 645,
+    "FLOAT": 644,
     "BOOLEAN": 10,
     "STRING": 5
   },
@@ -2695,7 +2695,6 @@
         "Calendar/day-lg",
         "Calendar/day-md",
         "Calendar/day-sm",
-        "Calendar/nav-size",
         "Carousel/control-offset",
         "Carousel/control-pad",
         "Carousel/control-size",
@@ -2800,7 +2799,6 @@
         "Calendar/day-lg": "var(--calendar-day-lg)",
         "Calendar/day-md": "var(--calendar-day-md)",
         "Calendar/day-sm": "var(--calendar-day-sm)",
-        "Calendar/nav-size": "var(--calendar-nav-size)",
         "Carousel/control-offset": "var(--carousel-control-offset)",
         "Carousel/control-pad": "var(--carousel-control-pad)",
         "Carousel/control-size": "var(--carousel-control-size)",
