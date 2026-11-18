@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 
-import { SidebarTab } from '@/patterns/Sidebar';
+import { SidebarTab } from '@/components';
 
 /**
  * Opening a sidebar row without a mouse.

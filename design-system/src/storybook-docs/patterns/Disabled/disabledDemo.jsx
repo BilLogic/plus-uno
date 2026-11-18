@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 
-import { Button, ButtonItem, IconButton, RadioGroup, SectionMessage, Select, TextField } from '@/components';
-import { PatternSidebar } from '@/patterns';
+import { Button, ButtonItem, IconButton, RadioGroup, SectionMessage, Select, Sidebar, TextField } from '@/components';
 import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
 import { LiveMenu } from '@/storybook-docs/lib/dropdown-menu-cases.jsx';
 
 /**
  * The Disabled pattern's examples, drawn with the real Button, TextField,
- * Select, RadioGroup, SectionMessage, DropdownMenu and PatternSidebar. Each
+ * Select, RadioGroup, SectionMessage, DropdownMenu and Sidebar. Each
  * picture starts in the state its heading names, and stays interactive: none
  * carries a reason in a tooltip; the reason is visible text where the cause is.
  *
@@ -19,7 +18,7 @@ import { LiveMenu } from '@/storybook-docs/lib/dropdown-menu-cases.jsx';
  *   SelfEvident         Back on step one and a Danger button until the name matches
  *   Sending             the one time a button disables, Cancel still live
  *   HiddenForRole       a menu with no Delete: left out for this role
- *   LockedToolkitDemo   a PatternSidebar with Toolkit locked during onboarding
+ *   LockedToolkitDemo   a Sidebar with Toolkit locked during onboarding
  */
 
 /** The width the card pictures lay out at, so their words stay legible at card size. Docs geometry, in px. */
@@ -279,9 +278,9 @@ export const LockedToolkitDemo = () => {
     return (
         <DocsOverlayBoundary fit={false} containHeight>
             <div style={pad}>
-                {/* Sidebar.examples.jsx defines `Box` unexported, so mirror its docked Frame sidebar wrapper here without altering locked Sidebar files. */}
+                {/* Sidebar.examples.jsx defines `Box` unexported, so mirror its docked Frame sidebar wrapper here. */}
                 <div className="plus-frame__sidebar plus-frame__sidebar--docked not-prose sb-unstyled">
-                    <PatternSidebar
+                    <Sidebar
                         label="Toolkit during onboarding"
                         storageKey={null}
                         onToggle={noop}

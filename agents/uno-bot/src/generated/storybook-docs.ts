@@ -268,6 +268,11 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-navigation-pagination--docs"
   ],
   [
+    "design-system/src/components/navigation/Sidebar/",
+    "Sidebar",
+    "components-navigation-navigation-system-navigation-system--docs"
+  ],
+  [
     "design-system/src/components/navigation/Tabs/",
     "Tabs",
     "components-navigation-tabs--docs"
@@ -306,10 +311,5 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "design-system/src/components/text-and-data-display/Table/TreeTable.",
     "TreeTable",
     "components-text-and-data-display-tree-table--docs"
-  ],
-  [
-    "design-system/src/patterns/Sidebar/",
-    "Sidebar",
-    "components-navigation-navigation-system-navigation-system--docs"
   ]
 ];

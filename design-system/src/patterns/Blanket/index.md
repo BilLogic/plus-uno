@@ -27,7 +27,7 @@ Blanket reads these motion tokens and no literal duration or curve.
 
 ## Related
 
-Same group: `AiChat` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
+Same group: `AiChat` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternTable`
 
 ## Props
 

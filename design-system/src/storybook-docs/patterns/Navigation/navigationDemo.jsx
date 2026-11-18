@@ -13,7 +13,7 @@ import {
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { RECORD_CRUMBS } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { StudentsTable, ViewBar } from '@/storybook-docs/lib/view-bar.jsx';
-import { NamesDo, TabLabelDo, TabLabelDont } from '../../../patterns/Sidebar/Sidebar.examples.jsx';
+import { NamesDo, TabLabelDo, TabLabelDont } from '../../../components/navigation/Sidebar/Sidebar.examples.jsx';
 
 /**
  * The Navigation pattern's examples, drawn with the real Sidebar, Tabs,

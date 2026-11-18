@@ -95,9 +95,9 @@
     {
       "not": "Navbar",
       "use": [
-        "PatternSidebar"
+        "Sidebar"
       ],
-      "why": "a pattern, inside Frame",
+      "why": "a Navigation component, used in Frame",
       "retired": true
     },
     {

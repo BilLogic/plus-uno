@@ -27,7 +27,7 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `Jumbotron` | `PatternSection`, `SectionMessage` (PatternSection at page level) |
 | `ListGroup` | `DropdownMenu`, `Table` |
 | `MediaObject` | `Avatar`, `Tile` |
-| `Navbar` | `PatternSidebar` (a pattern, inside Frame) |
+| `Navbar` | `Sidebar` (a Navigation component, used in Frame) |
 | `Scrollspy` | `Tabs`, `ProgressTracker` |
 | `Collapse` | `Accordion` |
 | `InputGroup` | `TextField` |
@@ -74,7 +74,6 @@ A template is a shell that owns the frame (fill, pad, radius, elevation) and lea
 | Group | Name | Import | Reach for it when |
 |---|---|---|---|
 | Templates | [`Frame`](../../src/patterns/Frame/Frame.mdx) | `import { Frame } from '@/patterns';` | Every full page: the app frame (Sidebar, Page with its 12-column content grid, and Panel, with no top bar). The default template puts the PLUS `Sidebar` (@/components) in `sidebar` and a `Breadcrumb` in `header`; the focused template, for one task the person finishes or leaves, has no `sidebar`, `width="reading"`, the task's name as the `h1` in `header`, and `onBack` and `onClose`. |
-| Frame | [`PatternSidebar`](../../src/patterns/Sidebar/Sidebar.mdx) | `import { PatternSidebar } from '@/patterns';` | The Frame's Sidebar with its open tabs. The PLUS `Sidebar` (@/components) fills it from the role's config; reach for this only for a sidebar that isn't the app's. |
 | Page | [`Page`](../../src/patterns/Page/Page.mdx) | `import { Page } from '@/patterns';` | A tokenized box with a level (fill and shadow together), a pad and a radius. The Frame draws the page's own; use it for any other block that needs a level. |
 | Section | [`PatternSection`](../../src/patterns/PatternSection/PatternSection.mdx) | `import { PatternSection } from '@/patterns';` | A span of the page grid under one heading, with its header, toolbar and tabs. No box of its own: the Page supplies the pad. `detail` for a list with a detail region. |
 | Card | [`PatternCard`](../../src/patterns/PatternCard/PatternCard.mdx) | `import { PatternCard } from '@/patterns';` | A raised container for one object: a student, a session, a metric. Optional image, a header over the body, optional footer. |

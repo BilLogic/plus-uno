@@ -74,18 +74,18 @@ test('real repo: a pattern answers with its kind and barrel', () => {
   assert.equal(loadFacts(REPO_ROOT).lookup('PatternCard.padding=xl').status, 'unknown');
 });
 
-test('real repo: Frame and PatternSidebar answer with their props, from source', () => {
+test('real repo: Frame and Sidebar answer with their props, from source', () => {
   const facts = loadFacts(REPO_ROOT);
   const frame = facts.lookup('Frame');
   assert.equal(frame.kind, 'pattern');
   assert.equal(frame.import, "import { Frame } from '@/patterns';");
   assert.deepEqual(frame.props.find((p) => p.name === 'width').values, ['content', 'reading']);
-  const sidebar = facts.lookup('PatternSidebar');
-  assert.equal(sidebar.kind, 'pattern');
-  assert.equal(sidebar.source, 'design-system/src/patterns/Sidebar/Sidebar.jsx');
+  const sidebar = facts.lookup('Sidebar');
+  assert.equal(sidebar.kind, 'component');
+  assert.equal(sidebar.source, 'design-system/src/components/navigation/Sidebar/Sidebar.jsx');
   assert.ok(sidebar.props.length > 0);
   assert.equal(facts.lookup('Button').kind, 'component');
-  assert.ok(facts.barrels['@/patterns'].has('useOpenTabs'));
+  assert.ok(facts.barrels['@/components'].has('useOpenTabs'));
 });
 
 test('real repo: a prop lookup answers values, and an invented prop names its replacement', () => {

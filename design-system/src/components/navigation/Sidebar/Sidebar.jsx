@@ -715,18 +715,20 @@ const tabShape = PropTypes.shape({
     live: PropTypes.bool,
 });
 
+const groupShape = PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    /** The section title; a group without one has no title row and never collapses */
+    title: PropTypes.string,
+    items: PropTypes.arrayOf(itemShape).isRequired,
+    /** Locked while `modulesLeft` is above 0 */
+    lockedDuringOnboarding: PropTypes.bool,
+});
+
 Sidebar.propTypes = {
     /** Role whose navigation fills the Sidebar when `groups` is omitted (defaults to `'tutor'`), or merged into `groups` when both are passed */
     user: PropTypes.oneOf(['tutor', 'supervisor']),
     /** Groups to render directly, or merged by `id` into the role's config (`sidebarConfig.js`) when `user` is also passed */
-    groups: PropTypes.arrayOf(PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        /** The section title; a group without one has no title row and never collapses */
-        title: PropTypes.string,
-        items: PropTypes.arrayOf(itemShape).isRequired,
-        /** Locked while `modulesLeft` is above 0 */
-        lockedDuringOnboarding: PropTypes.bool,
-    })),
+    groups: PropTypes.arrayOf(groupShape),
     /** Id of the selected row or tab; it carries `aria-current="page"` */
     activeId: PropTypes.string,
     /** Id of the row to show as selected when `activeId` is not set (e.g. `'sessions'`, `'home'`) */

@@ -152,7 +152,7 @@ Docked, collapsed, peeking and overlay are the Frame's states, on the Frame page
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `user` | enum | — | Role whose navigation fills the Sidebar when `groups` is omitted (defaults to `'tutor'`), or merged into `groups` when both are passed |
-| `groups` | arrayOf (required) | — | Groups to render directly, or merged by `id` into the role's config (`sidebarConfig.js`) when `user` is also passed |
+| `groups` | arrayOf | — | Groups to render directly, or merged by `id` into the role's config (`sidebarConfig.js`) when `user` is also passed |
 | `activeId` | string | — | Id of the selected row or tab; it carries `aria-current="page"` |
 | `activeTabId` | string | — | Id of the row to show as selected when `activeId` is not set (e.g. `'sessions'`, `'home'`) |
 | `onSelect` | func | — | Called with `(id, item)` when a row other than an external link is pressed |

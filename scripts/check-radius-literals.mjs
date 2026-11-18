@@ -183,6 +183,12 @@ export const RADIUS_EXCEPTIONS = [
     "why": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
   },
   {
+    "file": "design-system/src/components/navigation/Sidebar/Sidebar.scss",
+    "token": "--radius-sm",
+    "count": 2,
+    "why": "Keep the existing 2px small mark on the lock focus ring and sidebar count; the control roles are 6/8/10px and would change its shape."
+  },
+  {
     "file": "design-system/src/components/text-and-data-display/Code/Code.scss",
     "token": "--radius-md",
     "count": 1,
