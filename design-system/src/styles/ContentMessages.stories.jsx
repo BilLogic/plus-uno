@@ -153,7 +153,7 @@ export const FieldErrors = {
             <Do caption="An instruction, with the unit.">
                 <TextField
                     id="msg-length-do"
-                    label="Session length (minutes)"
+                    label="Session length"
                     defaultValue="95"
                     isInvalid
                     errorMessage="Enter 30 to 90 minutes."
