@@ -2,7 +2,7 @@
 
 # Filtering
 
-How a person narrows a collection, with filters at the end of the Section's view bar in one of five tiers.
+How a person narrows a collection, with filters in the Section's header in one of five tiers.
 
 **Kind:** Pattern
 
@@ -20,7 +20,7 @@ Choose a tier by the number of categories and the length of their lists. See Bes
 
 ## What is on
 
-The control that holds a filter shows it: the FilterButton's count, or the Filter icon's own count on the selected fill. No row of tags under the bar.
+The control that holds a filter shows it: the FilterButton's count, or the Filter icon's own count on the selected fill. No row of tags under the header.
 
 ## Key cases
 
@@ -34,7 +34,7 @@ A one-list menu is auto: at least the trigger, 160 to 320, truncating with a too
 
 ## Usage
 
-Use Filtering when a person narrows a collection by its attributes. Filters live at the end of the view bar, in the bar's order: a format switch if any, Search, then the filters, then More and the Primary. Views at the start are not filters: a view is one of a fixed set, and filters combine.
+Use Filtering when a person narrows a collection by its attributes. Filters live in the Section header's third row, after Search: "Field: value" triggers, then More filters. Views in the second row are not filters: a view is one of a fixed set, and filters combine.
 
 | Tier | Use when | Controls | Applies | Shows it is on |
 | --- | --- | --- | --- | --- |
@@ -83,7 +83,7 @@ Use Filtering when a person narrows a collection by its attributes. Filters live
 
 ## Related
 
-- Section: use when the question is the view bar the filters sit in.
+- Section: use when the question is the header the filters sit in.
 - Popup: use when the question is where a menu opens or how wide it is.
 - Filter menu: use when building a tier 2b or 2c menu.
 - Search: use for finding by name.
@@ -159,18 +159,21 @@ From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#Filteri
 
 ```jsx
 import { useState } from 'react';
-import { FilterButton, PopupSelect } from '@/components';
 import { PatternSection } from '@/patterns';
 
 function QuickFilterExample() {
     const [status, setStatus] = useState('All');
     return (
-        <PatternSection title="Sessions" toolbar={
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}><PopupSelect label="Status" options={['All', 'Needs review', 'Reviewed']}
-                value={status} onChange={setStatus}
-                trigger={<FilterButton text="Status" trailingMetric={status === 'All' ? undefined : 1} />}
-            /></div>
-        }>
+        <PatternSection
+            title="Sessions"
+            filters={[{
+                key: 'status',
+                label: 'Status',
+                text: status,
+                isSelected: status !== 'All',
+                onClick: () => setStatus(STATUSES[(STATUSES.indexOf(status) + 1) % STATUSES.length]),
+            }]}
+        >
             <p role="status">Showing: {status}</p>
         </PatternSection>
     );

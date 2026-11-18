@@ -18,7 +18,7 @@ Three modes share one field. Choose by the amount of data and the cost of search
 
 ## Active search
 
-The field sits in the Section's view bar, compact, and collapses to an icon until it is needed. The results area under the bar holds the count, the rows and the states; the bar never moves.
+The field starts the Section header's third row, compact, and collapses to an icon until it is needed. The results area under the header holds the count, the rows and the states; the header never moves.
 
 ## Focused search
 
@@ -93,7 +93,7 @@ Use Search when a person knows what a record is called. Search finds by name; Fi
 - Filtering: use for narrowing by attributes; its Reset clears the search.
 - Empty: use for the No matches state.
 - Loading: use for the wait while results load.
-- Section: use for where the view bar sits.
+- Section: use for where the header rows sit.
 
 ## Motion
 
@@ -160,7 +160,7 @@ Esc empties the text and keeps the field. In focused, the first Esc closes the p
 
 **Checked:** Review
 
-The view bar holds controls of one height, so the field takes `spacing="compact"` there. A search in a page body takes the default spacing and stays open.
+The Section header holds controls of one height, 32, so the field takes `spacing="compact"` there. A search in a page body takes the default spacing and stays open.
 
 ## In code
 
@@ -174,11 +174,10 @@ import { PatternSection } from '@/patterns';
 function SearchExample() {
     const [query, setQuery] = useState('');
     return (
-        <PatternSection title="Students" toolbar={
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <SearchField placeholder="Search students" mode="active" value={query} onValueChange={setQuery} />
-            </div>
-        }>
+        <PatternSection
+            title="Students"
+            search={<SearchField placeholder="Search students" mode="active" spacing="compact" value={query} onValueChange={setQuery} />}
+        >
             <p role="status">{['Ana Ruiz', 'Ben Okafor'].filter((name) => name.toLowerCase().includes(query.toLowerCase())).join(', ')}</p>
         </PatternSection>
     );
