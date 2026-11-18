@@ -33,7 +33,7 @@ const TARGETS = [
     'design-system/src/components/labels/AiMessage/AiMessage.scss',
     'design-system/src/components/labels/CountTag/CountTag.scss',
     'design-system/src/components/labels/Tag/Tag.scss',
-    'design-system/src/components/messaging/Modal/Modal.scss',
+    'design-system/src/patterns/Modal/Modal.scss',
     'design-system/src/components/overlays-and-layering/Tooltip/Tooltip.scss',
 ];
 

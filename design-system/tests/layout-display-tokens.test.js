@@ -24,7 +24,7 @@ const TARGETS = [
     { file: 'design-system/src/components/layout-and-structure/PageHeader/PageHeader.scss' },
     { file: 'design-system/src/patterns/PatternSection/PatternSection.scss' },
     { file: 'design-system/src/patterns/PatternSection/PatternSection.jsx' },
-    { file: 'design-system/src/patterns/PatternTable/PatternTable.scss' },
+    { file: 'design-system/src/patterns/Table/Table.scss' },
     { file: 'design-system/src/components/text-and-data-display/Table/Table.scss' },
     { file: 'design-system/src/styles/_base.scss' },
     { file: 'design-system/src/styles/main.scss', allowVisuallyHidden: true },

@@ -372,6 +372,12 @@ export const FAMILIES = [
   { family: 'tile', prefix: '--tile-', what: 'Tile radius where a size has no shared radius role' },
   { family: 'col', prefix: '--col-', what: 'grid column widths' },
   { family: 'breakpoint', prefix: '--breakpoint-', what: 'breakpoint minima' },
+  { family: 'date-time-picker', prefix: '--date-time-picker-', what: 'the DateTimePicker section gap' },
+  { family: 'rating', prefix: '--rating-', what: 'the Rating star gap' },
+  { family: 'rich-text-editor', prefix: '--rich-text-editor-', what: 'the RichTextEditor maximum width' },
+  { family: 'ai-message', prefix: '--ai-message-', what: 'the AI message caret and dot sizes' },
+  { family: 'comment', prefix: '--comment-', what: 'Comment pad, gap and the reply stack and indent' },
+  { family: 'progress-tracker', prefix: '--progress-tracker-', what: 'the ProgressTracker connector width and dot size' },
 ];
 
 /** Longest prefix first, so a specific family is never read as its parent. */
