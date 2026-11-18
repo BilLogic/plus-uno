@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { Button, EmptyState, FilterButton, FilterMenu, IconButton, PopupSelect, Skeleton } from '@/components';
+import { Button, EmptyState, FilterMenu, PopupSelect, Skeleton } from '@/components';
 import { LoadThenReveal } from '@/lib/loadRevealMotion';
 import { SwapInPlace } from '@/lib/swapMotion';
 import { Page, PatternCard, PatternSection, SECTION_DETAIL_FLOOR } from '@/patterns';
@@ -23,7 +23,7 @@ import { FilterSide, StudentsTable, ViewPills, useLayerMount } from '@/storybook
 export const STAGE = 1024;
 
 /** The room a held-open picture keeps, so its menu hangs below its trigger whole: a stacked menu runs to its max height. Docs geometry, in px. */
-const OPEN_ROOM = { short: 440, stacked: 640 };
+const OPEN_ROOM = { short: 500, stacked: 700 };
 
 /** A Popup reads its column steps against the screen; a picture reads them at this one, in px. Docs geometry. */
 const READ_SCREEN = 1280;
@@ -66,47 +66,65 @@ const ROSTER_COLUMNS = ['Name', 'Grade', 'School', 'Subject'];
 const flat = (value) => Object.values(value).flat();
 
 /**
- * Tier 1: a FilterButton per category, each opening its own list at the
- * bar's end, applied as you pick. The list is a Popup select, one value at a
- * time; several at once is Planned on it.
+ * Tier 1: a "Field: value" trigger per category in the Section's third row,
+ * each opening its own list from the trigger's end edge, applied as you pick.
+ * The list is a Popup select, one value at a time; several at once is Planned
+ * on it. The Section draws the trigger and hands it to the menu.
  */
-export const QuickFilter = ({ category, value, onPick, open, onOpenChange, mount, placement = 'bottom-end' }) => {
+export const quickFilters = (categories, value, onPick, { mount, menuProps = () => ({}), placement = 'bottom-end' } = {}) => categories.map((category) => {
     const picked = (value[category.id] ?? [])[0];
-    return (
-        <PopupSelect
-            label={category.label}
-            options={category.options}
-            value={picked ?? null}
-            onChange={(next) => onPick(category.id, next === picked ? [] : [next])}
-            isSearchable={false}
-            placement={placement}
-            {...(open !== undefined ? { open, onOpenChange } : {})}
-            container={mount ?? undefined}
-            trigger={<FilterButton text={category.label} appearance="subtle" trailingMetric={picked ? 1 : undefined} isSelected={Boolean(picked)} />}
-        />
-    );
-};
+    return {
+        key: category.id,
+        label: category.label,
+        text: picked ?? 'All',
+        isSelected: Boolean(picked),
+        menu: (trigger) => (
+            <PopupSelect
+                label={category.label}
+                options={category.options}
+                value={picked ?? null}
+                onChange={(next) => onPick(category.id, next === picked ? [] : [next])}
+                isSearchable={false}
+                placement={placement}
+                {...menuProps(category.id)}
+                container={mount ?? undefined}
+                trigger={trigger}
+            />
+        ),
+    };
+});
 
-/** Tier 2a: the Filter icon opens one list, applied as you pick, with no footer. */
-const OneListMenu = ({ category, value, onPick, open, onOpenChange, mount }) => {
+/** The Filter trigger of a tier 2 menu: one button in the third row, its count the values applied. */
+export const filterTrigger = (count, menu) => [{
+    key: 'filters',
+    text: 'Filters',
+    iconBefore: 'filter',
+    hasChevronDown: false,
+    trailingMetric: count > 0 ? count : undefined,
+    isSelected: count > 0,
+    menu,
+}];
+
+/** Tier 2a: the Filter trigger opens one list, applied as you pick, with no footer. */
+const oneListFilters = ({ category, value, onPick, menuProps, mount }) => {
     const picked = value[category.id][0];
-    return (
+    return filterTrigger(picked ? 1 : 0, (trigger) => (
         <PopupSelect
             label={category.label}
             options={category.options}
             value={picked ?? null}
             onChange={(next) => onPick(category.id, next === picked ? [] : [next])}
             isSearchable={false}
-            placement="bottom-end"
-            {...(open !== undefined ? { open, onOpenChange } : {})}
+            placement="bottom-start"
+            {...menuProps}
             container={mount ?? undefined}
-            trigger={<IconButton icon="filter" label="Filters" appearance="subtle" trailingMetric={picked ? 1 : undefined} />}
+            trigger={trigger}
         />
-    );
+    ));
 };
 
 /**
- * The view bar's filters in one tier, and what the rows show.
+ * The Section's filters in one tier, in its third header row, and what the rows show.
  *
  * @param {object} props
  * @param {'1'|'2a'|'2b'|'2c'|'3'} props.tier
@@ -165,31 +183,32 @@ export const FilteredStudents = ({
         }
         : {});
 
-    // The Section draws row 3 itself: tier 1 hands it "Field: value" triggers, and a folded or side-less width opens the side. A Filter icon menu is the one control at the end of the views row.
+    // The Section draws row 3 itself: every tier hands it triggers, and a folded or side-less width opens the side. A menu a trigger opens is the trigger's `menu`.
     const opensSide = (entries) => entries.map((entry) => ({ ...entry, onClick: () => setShowSide(true) }));
     let filters;
-    let menu = null;
     if (tier === '1') {
-        filters = folded ? opensSide(categoryFilters(cats, value, pick)) : categoryFilters(cats, value, pick);
+        filters = folded ? opensSide(categoryFilters(cats, value, pick)) : quickFilters(cats, value, pick, { mount, menuProps });
     } else if (tier === '2a') {
-        menu = <OneListMenu category={cats[0]} value={value} onPick={pick} {...menuProps('filters')} mount={mount} />;
+        filters = oneListFilters({ category: cats[0], value, onPick: pick, menuProps: menuProps('filters'), mount });
     } else if (tier === '2b' || tier === '2c') {
-        menu = (
+        filters = filterTrigger(appliedCount(value), (trigger) => (
             <FilterMenu
                 categories={cats}
                 value={value}
                 onApply={setValue}
                 layout={tier === '2b' ? 'side-by-side' : 'stacked'}
+                placement="bottom-start"
                 {...menuProps('filters')}
                 container={mount ?? undefined}
+                trigger={trigger}
             />
-        );
+        ));
     } else if (tier === '3' && !sideFits) {
         filters = opensSide(categoryFilters(cats, value, pick));
     }
 
     // A menu a press opens mounts where `container` points at that moment: until the picture's element is in state, that menu waits, so none lands on the page. A held-open menu waits on its own (`held`).
-    if (mount === null && !openMenu) menu = null;
+    if (mount === null && !openMenu && filters?.some((entry) => entry.menu)) filters = undefined;
 
     const status = <span role="status" style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{countWords(rows, value)}</span>;
     const swapKey = `${activeView}:${JSON.stringify(value)}`;
@@ -290,7 +309,6 @@ export const FilteredStudents = ({
                                     onOpenChange: openMenu === 'view' ? (next) => setActiveMenu(next ? 'view' : null) : undefined,
                                 })
                                 : <ViewPills views={views} activeView={activeView} onViewChange={setActiveView} />}
-                            format={menu ?? undefined}
                             filters={filters}
                             onClearAll={reset}
                             onOpenFilters={() => setShowSide(true)}

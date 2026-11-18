@@ -1,4 +1,4 @@
-import React, { useId, useRef, useState } from 'react';
+import React, { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Collapsible } from '@base-ui/react/collapsible';
 import { Button, FilterButton, Icon, Skeleton } from '@/components';
@@ -34,8 +34,11 @@ import './PatternSection.scss';
  * filters take the selected state and the row ends with the `count` and Clear
  * all. Three triggers show and the rest go in "More filters" with a count;
  * under 768 Search takes the row and the triggers fold into one Filter button
- * with the applied count. A Section with no views drops row 2 and the format
- * switch moves to the end of row 3; nothing to search or filter drops row 3.
+ * with the applied count, and the count and Clear all stay at the end of the
+ * Search row. A trigger can open a menu of its own (`menu`). When the triggers
+ * no longer fit beside Search they wrap to their own row, end-aligned. A
+ * Section with no views drops row 2 and the format switch moves to the end of
+ * row 3; nothing to search or filter drops row 3.
  *
  * LEVEL. The title is one heading level below what holds it, and one size
  * smaller: a section on a page is an h2 at Heading/medium 20, a section
@@ -90,6 +93,37 @@ const SectionHeaderRows = ({ views, format, search, filters = [], count, onClear
     const hidden = filters.length - shown.length;
     const hiddenApplied = filters.slice(SECTION_VISIBLE_FILTERS).some((filter) => filter.isSelected);
     const formatInRow3 = !views && Boolean(format);
+    // One trigger is already one button, so a narrow Section keeps it rather than fold it.
+    const folded = narrow && filters.length > 1;
+
+    const searchRef = useRef(null);
+    const filtersRef = useRef(null);
+
+    // The triggers wrap to their own end-aligned row once they no longer fit beside Search. CSS cannot see a flex item wrap, so each layout clears the mark, reads where the triggers fall against Search, and sets it again before paint.
+    const markWrap = () => {
+        const triggers = filtersRef.current;
+        const field = searchRef.current;
+        if (!triggers) return;
+        triggers.removeAttribute('data-wrapped');
+        if (field && triggers.getBoundingClientRect().top >= field.getBoundingClientRect().bottom) {
+            triggers.setAttribute('data-wrapped', '');
+        }
+    };
+    const markWrapRef = useRef(markWrap);
+    markWrapRef.current = markWrap;
+    useLayoutEffect(markWrap);
+    useEffect(() => {
+        const triggers = filtersRef.current;
+        if (!triggers || typeof ResizeObserver === 'undefined') return undefined;
+        const observer = new ResizeObserver(() => markWrapRef.current());
+        observer.observe(triggers.parentElement);
+        return () => observer.disconnect();
+    }, [hasFilters, folded]);
+
+    const renderTrigger = ({ key, menu, ...filter }) => {
+        const trigger = <FilterButton key={key ?? filter.label ?? filter.text} {...filter} />;
+        return menu ? <React.Fragment key={key ?? filter.label ?? filter.text}>{menu(trigger)}</React.Fragment> : trigger;
+    };
 
     return (
         <div className="plus-section-rows">
@@ -101,8 +135,8 @@ const SectionHeaderRows = ({ views, format, search, filters = [], count, onClear
             )}
             {hasRow3 && (
                 <div className="plus-section-row plus-section-row--filters">
-                    {search && <div className={`plus-section-row__search${narrow ? ' plus-section-row__search--fill' : ''}`}>{search}</div>}
-                    {hasFilters && narrow && (
+                    {search && <div ref={searchRef} className={`plus-section-row__search${narrow ? ' plus-section-row__search--fill' : ''}`}>{search}</div>}
+                    {hasFilters && folded && (
                         <FilterButton
                             text="Filter"
                             iconBefore="filter"
@@ -112,9 +146,9 @@ const SectionHeaderRows = ({ views, format, search, filters = [], count, onClear
                             onClick={onOpenFilters}
                         />
                     )}
-                    {hasFilters && !narrow && (
-                        <div className="plus-section-row__filters">
-                            {shown.map(({ key, ...filter }) => <FilterButton key={key ?? filter.label ?? filter.text} {...filter} />)}
+                    {hasFilters && !folded && (
+                        <div ref={filtersRef} className="plus-section-row__filters">
+                            {shown.map(renderTrigger)}
                             {hidden > 0 && (
                                 <FilterButton
                                     text="More filters"
@@ -126,7 +160,7 @@ const SectionHeaderRows = ({ views, format, search, filters = [], count, onClear
                             )}
                         </div>
                     )}
-                    {hasFilters && applied > 0 && !narrow && (
+                    {hasFilters && applied > 0 && (
                         <div className="plus-section-row__applied">
                             {count && <span className="plus-section-row__count" role="status">{count}</span>}
                             {onClearAll && <Button text="Clear all" appearance="subtle" onClick={onClearAll} />}
@@ -502,13 +536,14 @@ PatternSection.propTypes = {
      * @ds-context Governed by: Search (ds guide search)
      */
     search: PropTypes.node,
-    /** Row 3, after Search: one `{ key, label, text, isSelected, onClick }` per trigger, drawn as a FilterButton that reads "label: text". Three show; the rest go in "More filters" with a count. Under 768 they fold into one Filter button. */
+    /** Row 3, after Search: one `{ key, label, text, isSelected, onClick, menu }` per trigger, drawn as a FilterButton that reads "label: text". `menu` is `(trigger) => node`: hand the trigger to a Popup select or a Filter menu, so the same button opens the list and keeps its selected state. Three show; the rest go in "More filters" with a count. Under 768 they fold into one Filter button. When they do not fit beside Search they wrap to their own row, end-aligned. */
     filters: PropTypes.arrayOf(PropTypes.shape({
         key: PropTypes.string,
         label: PropTypes.string,
         text: PropTypes.string.isRequired,
         isSelected: PropTypes.bool,
         onClick: PropTypes.func,
+        menu: PropTypes.func,
     })),
     /** Row 3, at the end once a filter is applied: how many rows match, such as "3 of 12".
      * @ds-context Used in: Section.count (ds guide section)

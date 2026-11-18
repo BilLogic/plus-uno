@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 
-import { FilterMenu, IconButton, Tag, TagGroup } from '@/components';
+import { FilterButton, FilterMenu, Tag, TagGroup } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { PatternSection } from '@/patterns';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
-import { HeaderSearch, categoryFilters } from '@/storybook-docs/lib/section-header.jsx';
+import { HeaderSearch } from '@/storybook-docs/lib/section-header.jsx';
 import { StudentsTable, ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
-import { CATEGORIES, QuickFilter, narrow } from './filteringDemo.jsx';
+import { CATEGORIES, appliedCount, filterTrigger, narrow, quickFilters } from './filteringDemo.jsx';
 
 /**
  * Live Do / Don't cases on the Filtering pattern page, composed from
- * `PatternSection` and its header props, `ViewPills`, `QuickFilter`, `FilterMenu`,
+ * `PatternSection` and its header props, `ViewPills`, `quickFilters`, `FilterMenu`,
  * `TagGroup`, and `StudentsTable`.
  */
 
@@ -67,12 +67,12 @@ const FilteringCaseSection = ({
     );
 };
 
-/** Live Do: one filter tier per bar (three quick filters, no Filter icon). */
+/** Live Do: one filter tier per bar (three quick filters, no Filter button). */
 export const OneTierCase = () => {
     const [value, pick] = useQuickFilters();
     return (
         <FilteringCaseSection
-            filters={categoryFilters(QUICK(['grade', 'school', 'subject']), value, pick)}
+            filters={quickFilters(QUICK(['grade', 'school', 'subject']), value, pick)}
             rows={narrow(value)}
             limit={3}
         />
@@ -85,15 +85,18 @@ export const TwoTiersCase = () => {
     const [menuValue, setMenuValue] = useState({ subject: [], tutor: [] });
     return (
         <FilteringCaseSection
-            filters={categoryFilters(QUICK(['grade', 'school']), value, pick)}
-            format={(
-                <FilterMenu
-                    categories={[CATEGORIES.subject, CATEGORIES.tutor]}
-                    value={menuValue}
-                    onApply={setMenuValue}
-                    layout="side-by-side"
-                />
-            )}
+            filters={[
+                ...quickFilters(QUICK(['grade', 'school']), value, pick),
+                ...filterTrigger(appliedCount(menuValue), (trigger) => (
+                    <FilterMenu
+                        categories={[CATEGORIES.subject, CATEGORIES.tutor]}
+                        value={menuValue}
+                        onApply={setMenuValue}
+                        layout="side-by-side"
+                        trigger={trigger}
+                    />
+                )),
+            ]}
             rows={narrow({ ...value, ...menuValue })}
             limit={3}
         />
@@ -110,14 +113,14 @@ export const FiltersAtEndCase = () => {
             activeView={view}
             onViewChange={setView}
             search
-            filters={categoryFilters(QUICK(['grade', 'school']), value, pick)}
+            filters={quickFilters(QUICK(['grade', 'school']), value, pick)}
             rows={narrow(value)}
             limit={3}
         />
     );
 };
 
-/** Live Don't: filters squeezed beside the views at the start of the bar. */
+/** Live Don't: the same triggers squeezed beside the views, in the views row instead of the third. */
 export const FiltersAmongViewsCase = () => {
     const [view, setView] = useState('All students');
     const [value, pick] = useQuickFilters();
@@ -127,8 +130,8 @@ export const FiltersAmongViewsCase = () => {
             viewsNode={(
                 <>
                     <ViewPills views={['All students', 'Needs follow-up']} activeView={view} onViewChange={setView} />
-                    {['grade', 'school'].map((id) => (
-                        <QuickFilter key={id} category={CATEGORIES[id]} value={value} onPick={pick} placement="bottom-start" />
+                    {quickFilters(QUICK(['grade', 'school']), value, pick, { placement: 'bottom-start' }).map(({ key, menu, ...trigger }) => (
+                        <React.Fragment key={key}>{menu(<FilterButton {...trigger} />)}</React.Fragment>
                     ))}
                 </>
             )}
@@ -139,19 +142,20 @@ export const FiltersAmongViewsCase = () => {
     );
 };
 
-/** Live Do: active count shown directly on the Filter icon's selected fill. */
+/** Live Do: the active count shown on the Filter button's selected fill. */
 export const CountOnIconCase = () => {
     const [value, setValue] = useState({ grade: ['Grade 7'], school: ['Lincoln Middle'] });
     return (
         <FilteringCaseSection
-            format={(
+            filters={filterTrigger(appliedCount(value), (trigger) => (
                 <FilterMenu
                     categories={[CATEGORIES.grade, CATEGORIES.school]}
                     value={value}
                     onApply={setValue}
                     layout="side-by-side"
+                    trigger={trigger}
                 />
-            )}
+            ))}
             rows={narrow(value)}
         />
     );
@@ -166,15 +170,15 @@ export const TagRowCase = () => {
     };
     return (
         <FilteringCaseSection
-            format={(
+            filters={filterTrigger(appliedCount(value), (trigger) => (
                 <FilterMenu
                     categories={[CATEGORIES.grade, CATEGORIES.school]}
                     value={value}
                     onApply={(next) => setTags([...next.grade, ...next.school])}
                     layout="side-by-side"
-                    trigger={<IconButton icon="filter" label="Filters" appearance="subtle" />}
+                    trigger={trigger}
                 />
-            )}
+            ))}
             rows={narrow(value)}
             beforeTable={tags.length > 0 ? (
                 <TagGroup label="Applied filters">

@@ -26,6 +26,7 @@ describe('Filtering live cases and links', () => {
         expect(screen.queryByRole('button', { name: /^Filters/ })).toBeNull();
 
         await user.click(screen.getByRole('button', { name: 'Grade: All' }));
+        await user.click(await screen.findByRole('option', { name: 'Grade 6' }));
         expect(screen.getByRole('button', { name: 'Grade: Grade 6' })).toHaveAttribute('aria-pressed', 'true');
         unmount();
 
@@ -46,7 +47,7 @@ describe('Filtering live cases and links', () => {
         const { container } = render(<FiltersAmongViewsCase />);
         expect(container.querySelector('.plus-section-rows')).not.toBeNull();
         expect(screen.getByRole('tab', { name: 'All students' })).toHaveAttribute('aria-selected', 'true');
-        expect(screen.getByRole('button', { name: 'Grade' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Grade: All' }).closest('.plus-section-row__views')).not.toBeNull();
 
         const searchbox = await screen.findByRole('searchbox', { name: 'Search students' });
         await user.type(searchbox, 'Sofia');
@@ -57,7 +58,7 @@ describe('Filtering live cases and links', () => {
     it('CountOnIconCase and TagRowCase render live count vs removable tag row with live FilterMenu', async () => {
         const user = userEvent.setup();
         const { unmount } = render(<CountOnIconCase />);
-        expect(screen.getByRole('button', { name: 'Filters, 2 applied' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /^Filters\s*2/ })).toBeInTheDocument();
         expect(screen.queryByRole('list', { name: 'Applied filters' })).toBeNull();
         unmount();
 
@@ -67,7 +68,7 @@ describe('Filtering live cases and links', () => {
         await user.click(screen.getByRole('button', { name: /Remove.*Grade 7/i }));
         expect(within(list).queryByText('Grade 7')).toBeNull();
 
-        await user.click(screen.getByRole('button', { name: 'Filters' }));
+        await user.click(screen.getByRole('button', { name: /^Filters/ }));
         expect(await screen.findByRole('checkbox', { name: 'Grade 7' })).toBeInTheDocument();
     });
 

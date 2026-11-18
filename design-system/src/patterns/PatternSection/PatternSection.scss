@@ -154,6 +154,12 @@
     min-width: 0;
 }
 
+/* Triggers that no longer fit beside Search take their own row, at its end. */
+.plus-section-row__filters[data-wrapped] {
+    flex: 1 1 100%;
+    justify-content: flex-end;
+}
+
 .plus-section-row__applied {
     display: flex;
     align-items: center;
