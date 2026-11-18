@@ -652,9 +652,9 @@ export const BlockingOnBlanket = {
 export const SunkenNeverFloats = {
     render: () => (
         <DoDont>
-            <Do caption="Sunken is the ground: the frame, or a subtle Section.">
+            <Do caption="Sunken is the ground: the frame, or a sunken Card.">
                 <div style={ground}>
-                    <PatternSection fill="subtle" title="This week" description="12 sessions" />
+                    <PatternCard surface="sunken" title="This week" description="12 sessions" />
                 </div>
             </Do>
             <Dont caption="A sunken fill with a shadow: the gray says recessed, the shadow says lifted.">
@@ -665,12 +665,12 @@ export const SunkenNeverFloats = {
         </DoDont>
     ),
     play: async ({ canvasElement }) => {
-        const section = canvasElement.querySelector('.plus-pattern-section-fill-subtle');
-        const card = canvasElement.querySelector('.plus-pattern-card');
-        await expect(section).not.toBeNull();
-        await expect(getComputedStyle(section).boxShadow).toBe('none');
-        await expect(card).not.toBeNull();
-        await expect(getComputedStyle(card).boxShadow).not.toBe('none');
+        const sunken = canvasElement.querySelector('.plus-pattern-card--surface-sunken');
+        const raised = canvasElement.querySelector('.plus-pattern-card--surface-raised');
+        await expect(sunken).not.toBeNull();
+        await expect(getComputedStyle(sunken).boxShadow).toBe('none');
+        await expect(raised).not.toBeNull();
+        await expect(getComputedStyle(raised).boxShadow).not.toBe('none');
     },
 };
 
