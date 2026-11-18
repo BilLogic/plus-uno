@@ -89,6 +89,10 @@ test('docs preserve explicit heading size classes', () => {
   });
 });
 
+test('docs stylesheet reads no numbered primitive tokens', () => {
+  assert.doesNotMatch(docsCss, /var\(\s*--(?:space|radius|size|stroke)-\d/);
+});
+
 
 for (const size of ['heading-xs', 'heading-xxs', 'body-lg', 'body-sm', 'metric-lg', 'metric-md', 'metric-sm']) {
   test(`generated .${size} uses the matching text style`, () => {
