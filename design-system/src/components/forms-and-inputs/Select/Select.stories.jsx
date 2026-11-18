@@ -139,7 +139,7 @@ const statusOptions = [
     { value: 'canceled', label: 'Canceled' },
 ];
 
-const grid = { pointerEvents: 'auto', display: 'grid', gap: 'var(--space-125)', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' };
+const grid = { pointerEvents: 'auto', display: 'grid', gap: 'var(--section-stack-md)', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' };
 
 const field = { maxWidth: 'var(--width-2500)' };
 
@@ -215,7 +215,7 @@ export const SpacingCompact = {
 /** Spacing — default (40) and compact (32). */
 export const Spacing = {
     render: () => (
-        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', display: 'flex', flexDirection: 'column', gap: 'var(--space-125)' }}>
+        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
             <Select label="Default" spacing="default" options={sampleOptions} placeholder="Select..." />
             <Select label="Compact" spacing="compact" options={sampleOptions} placeholder="Select..." />
         </div>
@@ -434,7 +434,7 @@ const COLOR_OPTIONS = [
 export const Colors = {
     parameters: { docs: { disable: true } },
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '320px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: 'var(--width-2000)' }}>
             <Select label="Site" options={COLOR_OPTIONS} placeholder="Pick a site" />
             <Select label="Sites" isMulti selectAll options={COLOR_OPTIONS} defaultValue={['lincoln-middle']} />
         </div>
@@ -532,7 +532,7 @@ export const FieldReadOnlyShowsLabel = {
 /** A read-only value is shown whole: it wraps, and is never clipped to one line. */
 export const FieldReadOnlyLongValue = {
     render: () => (
-        <div style={{ ...wrap, maxWidth: '200px' }}>
+        <div style={{ ...wrap, maxWidth: 'var(--width-1400)' }}>
             <Select
                 id="select-ex-readonly-long"
                 label="Option"

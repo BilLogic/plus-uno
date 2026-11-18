@@ -23,7 +23,7 @@ export default {
     },
 };
 
-const row = { display: 'flex', gap: '24px', alignItems: 'center' };
+const row = { display: 'flex', gap: 'var(--section-stack-lg)', alignItems: 'center' };
 
 export const Overview = () => <Spinner />;
 Overview.parameters = {
@@ -55,7 +55,7 @@ export const Size24 = () => <Spinner size={24} />;
 export const Size48 = () => <Spinner size={48} />;
 
 export const Invert = () => (
-    <div style={{ padding: '16px', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--radius-md)' }}>
+    <div style={{ padding: 'var(--pad-x-lg)', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--radius-md)' }}>
         <Spinner appearance="invert" />
     </div>
 );

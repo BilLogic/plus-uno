@@ -14,7 +14,7 @@ import Select from './Select';
  * the highlighted row is its `aria-activedescendant`.
  */
 
-const stack = { display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '640px' };
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--panel-max-width)' };
 
 const schools = [
     { value: 'north', label: 'North High' },
@@ -354,7 +354,7 @@ PickLimitDisablesRows.play = async ({ canvasElement }) => {
 
 /** Without focus, the tags that do not fit collapse into "+n". */
 export const CollapsedTagsShowPlusN = () => (
-    <div style={{ ...stack, width: 220 }}>
+    <div style={{ ...stack, width: 'var(--width-1400)' }}>
         <Button>Before</Button>
         <Select
             id="scommit-collapse"
@@ -676,7 +676,7 @@ export const ControlledOpenAsksTheParent = {
  * the field's size.
  */
 export const ListFollowsWrappingTags = () => (
-    <div style={{ ...stack, maxWidth: '220px' }}>
+    <div style={{ ...stack, maxWidth: 'var(--width-1400)' }}>
         <Select id="sopen-wrap" label="Schools" isMulti options={schools} />
     </div>
 );

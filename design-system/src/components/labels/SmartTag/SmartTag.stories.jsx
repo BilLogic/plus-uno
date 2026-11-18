@@ -29,7 +29,7 @@ export default {
     },
 };
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--grid-gutter)', alignItems: 'center' };
 
 const iconIn = (el) => el.querySelector('i');
 
