@@ -24,8 +24,8 @@ import { MotionPreferenceContext } from '@/lib/motionPreference';
  * x 208, thread x 32, section title x 20.
  */
 
-const ACCOUNT = { id: 'story-john-doe', name: 'John Doe', role: 'Lead' };
-const TUTOR = { id: 'story-john-doe-tutor', name: 'John Doe', role: 'Tutor' };
+const ACCOUNT = { id: 'story-maya-k', name: 'Maya K.', role: 'Lead' };
+const TUTOR = { id: 'story-maya-k-tutor', name: 'Maya K.', role: 'Tutor' };
 
 const groups = (view) => [
     {
