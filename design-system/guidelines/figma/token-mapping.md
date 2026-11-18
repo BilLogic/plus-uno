@@ -113,7 +113,7 @@ The spacing / primitives and spacing / foundations collections (Foundations hold
 | — (code only) | `var(--layer-card)` … `var(--layer-tooltip)` | PLUS layers: card 100, navigation 200, dialog 300, popup 400, scrim 500, modal 510, flag 600, spotlight 700, tooltip 800. A popup opened from a field inside a modal mounts in the modal's overlay and takes its layer. Figma has no z-index |
 | — (code only) | `var(--listbox-max-width)` | 320, the widest a popup from a field or button grows. A popup with columns (Cascader, the calendar) is exempt |
 | — (code only) | `var(--checkbox-control-size)` · `var(--radio-control-size)` | 18 and 12, the checkbox box and radio dot; a description or reveal under the label indents by one plus the label gap |
-| — (code only) | `var(--calendar-day-sm)` · `var(--calendar-day-md)` · `var(--calendar-day-lg)` · `var(--calendar-nav-size)` | 28 / 36 / 44 calendar days by picker size, and the 32 month buttons |
+| — (code only) | `var(--calendar-day-sm)` · `var(--calendar-day-md)` · `var(--calendar-day-lg)` | 24 / 32 / 40 calendar days by size |
 | — (code only) | `var(--join-row-width)` | 520, the Home Join button with the session Select beside it |
 
 ## Rules for create_design_system_rules

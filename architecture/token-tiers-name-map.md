@@ -202,7 +202,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Calendar | `--calendar-day-sm` |  |
 | Calendar | `--calendar-day-md` |  |
 | Calendar | `--calendar-day-lg` |  |
-| Calendar | `--calendar-nav-size` |  |
 | Progress indicator | `--progress-indicator-dot-size-8` | ProgressIndicator size 8 |
 | Progress indicator | `--progress-indicator-dot-size-12` | ProgressIndicator size 12 |
 | Checkbox | `--checkbox-control-size` |  |

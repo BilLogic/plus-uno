@@ -98,7 +98,6 @@ export const KindAction = {
         await fitsCanvas(canvasElement);
         await userEvent.click(cancel);
         await expect(canvas.getByRole('button', { name: 'Save session' })).not.toHaveAttribute('aria-busy');
-        await settleAnimations(canvasElement);
     },
 };
 
@@ -161,7 +160,6 @@ export const KeyOverTenSeconds = {
         await waitFor(() => expect(canvas.getByText('Still loading students')).toBeInTheDocument());
         await expect(canvas.getByText(/you can keep working/), 'it says the person can keep working').toBeInTheDocument();
         await fitsCanvas(canvasElement);
-        await settleAnimations(canvasElement);
     },
 };
 
