@@ -23,11 +23,11 @@
     align-items: stretch;
 }
 
-.plus-progress-tracker--comfortable .plus-progress-tracker__list {
+.plus-progress-tracker--spacious .plus-progress-tracker__list {
     gap: var(--stack-lg);
 }
 
-.plus-progress-tracker--cozy .plus-progress-tracker__list {
+.plus-progress-tracker--default .plus-progress-tracker__list {
     gap: var(--stack-md);
 }
 
