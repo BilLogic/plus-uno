@@ -90,7 +90,7 @@ export const Interactive = (args) => {
     }, [args.initialContent]);
 
     return (
-        <div style={{ maxWidth: 'var(--size-5400)' }}>
+        <div style={{ maxWidth: 'var(--content-max-width-reading)' }}>
             <RichTextEditor
                 label="Session notes"
                 spacing={args.spacing}
@@ -117,7 +117,7 @@ Interactive.args = {
 
 /** The compact toolbar's block-style menu: open, select, keyboard. */
 export const BlockStyleMenu = () => (
-    <div style={{ width: '100%', paddingBottom: 200 }}>
+    <div style={{ width: '100%', paddingBottom: 'var(--dropdown-menu-max-height)' }}>
         <RichTextEditor label="Session notes" defaultValue="<p>Hello</p>" minHeight={150} />
     </div>
 );

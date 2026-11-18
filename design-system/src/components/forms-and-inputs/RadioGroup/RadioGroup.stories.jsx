@@ -51,7 +51,7 @@ export default {
     },
 };
 
-const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: '560px' };
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--width-3000)' };
 
 const subjects = [
     { value: 'math', label: 'Math' },
