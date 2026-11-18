@@ -4,7 +4,6 @@ import { expect, userEvent, within } from 'storybook/test';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
-import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { EmptyTableBoxCase, EmptyType, FullPage, InCard, InPanel, InTable, SMALL_STAGE, STAGE, TYPE_STAGE } from './emptyDemo.jsx';
 
@@ -180,7 +179,6 @@ export const KeyNoMatchesInTable = {
         await expect(canvas.getByRole('tab', { name: 'Needs follow-up' })).toHaveAttribute('aria-selected', 'true');
         await userEvent.click(canvas.getByRole('tab', { name: 'All students' }));
         await expect(canvas.getByRole('heading', { name: 'No students match these filters' })).toBeVisible();
-        await settleAnimations(canvasElement);
     },
 };
 

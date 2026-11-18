@@ -108,11 +108,17 @@ export const TOKEN_LADDER = [
   { tier: 'semantics', group: 'Stack', new: '--stack-sm', old: '--element-stack-sm', ref: 'var(--space-025)', use: 'Vertical gap between tightly related items, such as a label and its control.' },
   { tier: 'semantics', group: 'Stack', new: '--stack-md', old: '--element-stack-md', ref: 'var(--space-050)', use: 'Vertical gap between items in a list or a group of fields.' },
   { tier: 'semantics', group: 'Stack', new: '--stack-lg', old: '--element-stack-lg', ref: 'var(--space-075)', use: 'Vertical gap between groups inside one control or component.' },
+  { tier: 'semantics', group: 'Stack', new: '--stack-xl', old: null, value: '--space-100', use: 'Vertical gap between related groups or blocks inside one container.' },
+  { tier: 'semantics', group: 'Stack', new: '--stack-2xl', old: null, value: '--space-150', use: 'Vertical gap between major groups inside one container.' },
+  { tier: 'semantics', group: 'Stack', new: '--stack-3xl', old: null, value: '--space-200', use: 'Vertical gap between distinct areas inside a large container.' },
 
   // ─── Semantics / Inline ───────────────────────────────────────────────
   { tier: 'semantics', group: 'Inline', new: '--inline-sm', old: '--element-inline-sm', ref: 'var(--space-025)', use: 'Horizontal gap between an icon and its label inside a control.' },
   { tier: 'semantics', group: 'Inline', new: '--inline-md', old: '--element-inline-md', ref: 'var(--space-050)', use: 'Horizontal gap between items in a row, such as buttons in a ButtonGroup.' },
   { tier: 'semantics', group: 'Inline', new: '--inline-lg', old: '--element-inline-lg', ref: 'var(--space-075)', use: 'Horizontal gap between loosely related items in a row.' },
+  { tier: 'semantics', group: 'Inline', new: '--inline-xl', old: null, value: '--space-100', use: 'Horizontal gap between distinct groups or columns in a row.' },
+  { tier: 'semantics', group: 'Inline', new: '--inline-2xl', old: null, value: '--space-150', use: 'Horizontal gap between wide groups or panels in a row.' },
+  { tier: 'semantics', group: 'Inline', new: '--inline-3xl', old: null, value: '--space-200', use: 'Horizontal gap between major regions in a row.' },
 
   // ─── Semantics / Radius (non-control, + control-by-height) ───────────
   { tier: 'semantics', group: 'Radius', new: '--radius-sm', old: '--element-radius-sm', ref: 'var(--space-0125)', use: 'Corner rounding for small marks: a checkbox, a small tag.' },
@@ -324,10 +330,9 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Dialog', new: '--dialog-shadow', old: null, ref: 'var(--ds-shadow-blocking)', use: 'Shadow of a Dialog.' },
 
   // ─── Components / Calendar ────────────────────────────────────────────
-  { tier: 'components', group: 'Calendar', new: '--calendar-day-sm', old: '--layout-calendar-day-sm', ref: '28px', use: 'Size of a day cell in a compact Calendar.' },
-  { tier: 'components', group: 'Calendar', new: '--calendar-day-md', old: '--layout-calendar-day-md', ref: '36px', use: 'Size of a day cell in a default Calendar.' },
-  { tier: 'components', group: 'Calendar', new: '--calendar-day-lg', old: '--layout-calendar-day-lg', ref: '44px', use: 'Size of a day cell in a large Calendar.' },
-  { tier: 'components', group: 'Calendar', new: '--calendar-nav-size', old: '--layout-calendar-nav', ref: '32px', use: 'Size of the Calendar\'s previous and next month buttons.' },
+  { tier: 'components', group: 'Calendar', new: '--calendar-day-sm', old: '--layout-calendar-day-sm', ref: 'var(--control-sm)', use: 'Size of a day cell in a compact Calendar.' },
+  { tier: 'components', group: 'Calendar', new: '--calendar-day-md', old: '--layout-calendar-day-md', ref: 'var(--control-md)', use: 'Size of a day cell in a default Calendar.' },
+  { tier: 'components', group: 'Calendar', new: '--calendar-day-lg', old: '--layout-calendar-day-lg', ref: 'var(--control-lg)', use: 'Size of a day cell in a large Calendar.' },
 
   // ─── Components / Progress indicator ──────────────────────────────────
   { tier: 'components', group: 'Progress indicator', new: '--progress-indicator-dot-size-8', old: null, ref: 'var(--space-050)', note: 'ProgressIndicator size 8', use: 'Dot size of a ProgressIndicator with size 8.' },
@@ -411,8 +416,6 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Spotlight', new: '--spotlight-width', old: null, ref: 'var(--width-2500)', use: 'Width of a Spotlight.' },
   { tier: 'components', group: 'Spotlight', new: '--spotlight-media-height', old: null, ref: 'calc(var(--size-750) + var(--space-150))', use: 'Height of the media area in a Spotlight.' },
   { tier: 'components', group: 'Menu group', new: '--menu-group-min-width', old: null, ref: 'var(--size-1400)', use: 'Minimum width of a menu group.' },
-  { tier: 'components', group: 'Menu group', new: '--menu-group-pad-x', old: null, ref: 'var(--space-150)', use: 'Horizontal padding of a menu group.' },
-  { tier: 'components', group: 'Menu group', new: '--menu-group-gap', old: null, ref: 'var(--space-100)', use: 'Vertical gap between groups in a menu.' },
   { tier: 'components', group: 'Popup', new: '--popup-min-width', old: null, ref: 'var(--width-1000)', use: 'Narrowest an auto-width Popup gets, unless its trigger is wider.' },
   { tier: 'components', group: 'Popup', new: '--popup-max-width', old: null, ref: 'var(--width-2000)', use: 'Widest an auto-width Popup grows to fit its content, unless its trigger is wider.' },
   { tier: 'components', group: 'Popup', new: '--popup-clip-reach', old: null, ref: 'var(--space-300)', use: 'How far past its edges a Popup\'s opening clip stays, so the overlay shadow is never cut.' },
@@ -499,6 +502,7 @@ export const RETIRED_RENAMES = {
   '--card-pad-sm': '--card-pad-compact',
   '--card-pad-md': '--card-pad-default',
   '--card-pad-lg': '--card-pad-spacious',
+  '--layout-calendar-nav': '--control-sm',
 };
 
 /** Retired name -> its replacement: the explicit table above, then each ladder row's `old` (first row wins). */

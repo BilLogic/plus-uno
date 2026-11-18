@@ -213,15 +213,17 @@ export const SlotTable = {
 
 /* ----------------------------------------------------- surface and dark */
 
-/** The surfaces lowest to highest; in dark each step up is lighter. */
+/** The surfaces lowest to highest; in dark only overlays step lighter past the page. */
 export const Ladder = {
     render: () => <SurfaceLadder />,
     play: async ({ canvasElement }) => {
         const dark = canvasElement.querySelector('[data-ladder="dark"]');
         const steps = () => [...dark.querySelectorAll('[data-lightness]')].map((n) => Number(n.dataset.lightness));
         await waitFor(() => expect(steps().every((v) => v > 0)).toBe(true));
-        const l = steps();
-        for (let i = 1; i < l.length; i += 1) await expect(l[i], 'higher is lighter in dark').toBeGreaterThan(l[i - 1]);
+        const [sunken, page, raised, overlay] = steps();
+        await expect(page, 'page is lighter than sunken in dark').toBeGreaterThan(sunken);
+        await expect(raised, 'dark raised matches the page tone').toBe(page);
+        await expect(overlay, 'overlay steps lighter in dark').toBeGreaterThan(raised);
     },
 };
 
@@ -511,7 +513,7 @@ export const LiftWithShadow = () => (
         </Do>
         <Dont caption="A gray fill reads as a hole in the page, and dark loses the step.">
             <div style={ground}>
-                <PatternCard title="Upcoming sessions" description="3 this week" style={{ background: 'var(--ds-surface-container)', boxShadow: 'none' }} />
+                <PatternCard title="Upcoming sessions" description="3 this week" style={{ background: 'var(--ds-surface-sunken)', boxShadow: 'none' }} />
             </div>
         </Dont>
     </DoDont>

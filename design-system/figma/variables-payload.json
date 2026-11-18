@@ -86,6 +86,27 @@
           }
         },
         {
+          "name": "Stack/xl",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--stack-xl)"
+          }
+        },
+        {
+          "name": "Stack/2xl",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--stack-2xl)"
+          }
+        },
+        {
+          "name": "Stack/3xl",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--stack-3xl)"
+          }
+        },
+        {
           "name": "Inline/sm",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -104,6 +125,27 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--inline-lg)"
+          }
+        },
+        {
+          "name": "Inline/xl",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--inline-xl)"
+          }
+        },
+        {
+          "name": "Inline/2xl",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--inline-2xl)"
+          }
+        },
+        {
+          "name": "Inline/3xl",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--inline-3xl)"
           }
         },
         {
@@ -754,13 +796,6 @@
           }
         },
         {
-          "name": "Calendar/nav-size",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--calendar-nav-size)"
-          }
-        },
-        {
           "name": "Progress/indicator-dot-size-8",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -1255,20 +1290,6 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--menu-group-min-width)"
-          }
-        },
-        {
-          "name": "Menu/group-pad-x",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--menu-group-pad-x)"
-          }
-        },
-        {
-          "name": "Menu/group-gap",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--menu-group-gap)"
           }
         },
         {

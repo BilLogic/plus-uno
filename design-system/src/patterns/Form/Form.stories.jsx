@@ -118,7 +118,6 @@ export const TypeSteps = {
         await expect(canvas.getByLabelText(/Session date/)).toBeInTheDocument();
         await userEvent.click(canvas.getByRole('button', { name: 'Back' }));
         await expect(canvas.getByLabelText(/Student/)).toBeInTheDocument();
-        await settleAnimations(canvasElement.ownerDocument.body);
     },
 };
 
@@ -223,7 +222,6 @@ export const AnatomySteps = {
         await expect(canvas.getByLabelText(/Session date/)).toBeInTheDocument();
         await userEvent.click(canvas.getByRole('button', { name: 'Back' }));
         await expect(canvas.getByLabelText(/Student/)).toBeInTheDocument();
-        await settleAnimations(canvasElement.ownerDocument.body);
     },
 };
 
@@ -233,8 +231,7 @@ export const AnatomySteps = {
 export const KeyFieldError = {
     name: 'Key state: Field error on blur',
     render: () => <ScreenStage width={PAGE_WIDTH} scrollable><FormInPage /></ScreenStage>,
-    play: async ({ canvas, canvasElement }) => {
-        await settleAnimations(canvasElement.ownerDocument.body);
+    play: async ({ canvas }) => {
         const student = canvas.getByLabelText(/Student/);
         await userEvent.click(student);
         await userEvent.tab();
@@ -250,8 +247,7 @@ export const KeyFieldError = {
 export const KeyDisabledReason = {
     name: 'Key state: Disabled with its reason',
     render: () => <ScreenStage width={PAGE_WIDTH} scrollable><FormInPage subjectWaits /></ScreenStage>,
-    play: async ({ canvas, canvasElement }) => {
-        await settleAnimations(canvasElement.ownerDocument.body);
+    play: async ({ canvas }) => {
         await expect(canvas.getByText('Choose a student first.'), 'the reason is visible text on the field').toBeInTheDocument();
         await expect(canvas.getByRole('button', { name: 'Save session' }), 'Save stays enabled').not.toBeDisabled();
     },
@@ -313,8 +309,7 @@ export const KeySending = {
 export const KeyLeaving = {
     name: 'Key state: Leaving with edits',
     render: () => <ScreenStage width={STAGE} scrollable><FormInModal /></ScreenStage>,
-    play: async ({ canvas, canvasElement }) => {
-        await settleAnimations(canvasElement.ownerDocument.body);
+    play: async ({ canvas }) => {
         await userEvent.type(canvas.getByLabelText(/Student/), 'Ana');
         await userEvent.click(canvas.getByRole('button', { name: 'Discard' }));
         await expect(await canvas.findByRole('heading', { level: 1, name: 'Discard changes?' })).toBeInTheDocument();

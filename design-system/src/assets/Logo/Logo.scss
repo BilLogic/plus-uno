@@ -1,6 +1,6 @@
 /**
- * Logo: the mark's grounds, glows and wordmark take their colors from the
- * palette, so the logo looks the same on every surface. Only the wordmark in
+ * Logo: the mark's grounds, glows and wordmark take fixed `--ds-logo-*` brand
+ * tokens, so the logo looks the same on every surface. Only the wordmark in
  * the colored appearance follows the color mode, through `--ds-text`.
  */
 
@@ -17,45 +17,45 @@
 }
 
 /* Plus and ground per appearance. */
-.plus-logo__plus rect { fill: var(--palette-neutral-0); }
-.plus-logo__ground { fill: var(--palette-neutral-0); }
+.plus-logo__plus rect { fill: var(--ds-logo-plus); }
+.plus-logo__ground { fill: var(--ds-logo-ground); }
 
-.plus-logo--filled .plus-logo__tile { fill: var(--palette-lagoon-700); }
-.plus-logo--dark .plus-logo__tile { fill: var(--palette-lagoon-900); }
+.plus-logo--filled .plus-logo__tile { fill: var(--ds-logo-tile); }
+.plus-logo--dark .plus-logo__tile { fill: var(--ds-logo-tile-dark); }
 
-.plus-logo--outlined .plus-logo__ring { stroke: var(--palette-neutral-1000); }
-.plus-logo--outlined .plus-logo__plus rect { fill: var(--palette-neutral-1000); }
-.plus-logo--outlined-reversed .plus-logo__ring { stroke: var(--palette-dark-neutral-1000); }
-.plus-logo--outlined-reversed .plus-logo__plus rect { fill: var(--palette-dark-neutral-1000); }
+.plus-logo--outlined .plus-logo__ring { stroke: var(--ds-logo-mark); }
+.plus-logo--outlined .plus-logo__plus rect { fill: var(--ds-logo-mark); }
+.plus-logo--outlined-reversed .plus-logo__ring { stroke: var(--ds-logo-mark-reversed); }
+.plus-logo--outlined-reversed .plus-logo__plus rect { fill: var(--ds-logo-mark-reversed); }
 
 /* Wordmark. */
-.plus-logo__wordmark path { fill: var(--palette-neutral-1000); }
+.plus-logo__wordmark path { fill: var(--ds-logo-wordmark); }
 .plus-logo--colored .plus-logo__wordmark path { fill: var(--ds-text); }
 .plus-logo--colored-dark .plus-logo__wordmark path,
 .plus-logo--dark .plus-logo__wordmark path,
-.plus-logo--outlined-reversed .plus-logo__wordmark path { fill: var(--palette-dark-neutral-1000); }
+.plus-logo--outlined-reversed .plus-logo__wordmark path { fill: var(--ds-logo-wordmark-reversed); }
 
 /* Light letters on a dark ground read heavier, so each takes a hairline stroke in the ground color. */
 .plus-logo--colored-dark .plus-logo__wordmark path,
 .plus-logo--dark .plus-logo__wordmark path,
 .plus-logo--outlined-reversed .plus-logo__wordmark path {
-    stroke: var(--palette-dark-neutral-0);
+    stroke: var(--ds-logo-wordmark-stroke);
     stroke-width: 0.55;
     stroke-linejoin: round;
 }
 
 /* Glows: today's on light, one step up each ramp on dark. */
-.plus-logo__glows--light .plus-logo__glow--0 { fill: var(--palette-yellow-300); }
-.plus-logo__glows--light .plus-logo__glow--1 { fill: var(--palette-yellow-250); }
-.plus-logo__glows--light .plus-logo__glow--2 { fill: var(--palette-teal-200); }
-.plus-logo__glows--light .plus-logo__glow--3 { fill: var(--palette-red-200); }
-.plus-logo__glows--light .plus-logo__glow--4 { fill: var(--palette-lagoon-400); }
+.plus-logo__glows--light .plus-logo__glow--0 { fill: var(--ds-logo-glow-light-0); }
+.plus-logo__glows--light .plus-logo__glow--1 { fill: var(--ds-logo-glow-light-1); }
+.plus-logo__glows--light .plus-logo__glow--2 { fill: var(--ds-logo-glow-light-2); }
+.plus-logo__glows--light .plus-logo__glow--3 { fill: var(--ds-logo-glow-light-3); }
+.plus-logo__glows--light .plus-logo__glow--4 { fill: var(--ds-logo-glow-light-4); }
 
-.plus-logo__glows--dark .plus-logo__glow--0 { fill: var(--palette-yellow-400); }
-.plus-logo__glows--dark .plus-logo__glow--1 { fill: var(--palette-yellow-300); }
-.plus-logo__glows--dark .plus-logo__glow--2 { fill: var(--palette-teal-300); }
-.plus-logo__glows--dark .plus-logo__glow--3 { fill: var(--palette-red-300); }
-.plus-logo__glows--dark .plus-logo__glow--4 { fill: var(--palette-lagoon-500); }
+.plus-logo__glows--dark .plus-logo__glow--0 { fill: var(--ds-logo-glow-dark-0); }
+.plus-logo__glows--dark .plus-logo__glow--1 { fill: var(--ds-logo-glow-dark-1); }
+.plus-logo__glows--dark .plus-logo__glow--2 { fill: var(--ds-logo-glow-dark-2); }
+.plus-logo__glows--dark .plus-logo__glow--3 { fill: var(--ds-logo-glow-dark-3); }
+.plus-logo__glows--dark .plus-logo__glow--4 { fill: var(--ds-logo-glow-dark-4); }
 
 /* The colored mark shows one set: light by default, dark when the mode is dark. */
 .plus-logo--colored .plus-logo__glows--dark { display: none; }
@@ -64,7 +64,7 @@
     .plus-logo__glows--light { display: none; }
     .plus-logo__glows--dark { display: inline; }
     .plus-logo__wordmark path {
-        stroke: var(--palette-dark-neutral-0);
+        stroke: var(--ds-logo-wordmark-stroke);
         stroke-width: 0.55;
         stroke-linejoin: round;
     }
@@ -73,7 +73,7 @@
 @media (prefers-color-scheme: dark) {
     :is([data-color-mode="auto"]) .plus-logo--colored {
         .plus-logo__wordmark path {
-            stroke: var(--palette-dark-neutral-0);
+            stroke: var(--ds-logo-wordmark-stroke);
             stroke-width: 0.55;
             stroke-linejoin: round;
         }

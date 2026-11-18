@@ -60,11 +60,10 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `--space-025 (4px)` | `--stack-sm`, `--inline-sm`, `--pad-x-xs` (a primitive; read the step for the role) |
 | `--space-050 (8px)` | `--stack-md`, `--inline-md`, `--pad-x-sm` |
 | `--space-075 (12px)` | `--stack-lg`, `--inline-lg`, `--pad-x-md` |
-| `--space-100 (16px)` | `--pad-x-lg`, `--section-stack-md`, `--modal-pad-x-default` |
-| `--space-150 (24px)` | `--page-stack-md`, `--page-pad`, `--section-stack-lg` |
-| `--space-200 (32px) and up` | `--page-stack-lg` (space this large belongs to a page; it is rarely right inside a component) |
+| `--space-100 (16px)` | `--stack-xl`, `--inline-xl`, `--pad-x-lg` |
+| `--space-150 (24px)` | `--stack-2xl`, `--inline-2xl`, `--page-pad` |
+| `--space-200 (32px) and up` | `--stack-3xl`, `--inline-3xl` (general gaps; --page-stack-lg is only for Page) |
 | `--radius-<n>` | `--radius-md`, `--radius-xl` (read the semantic step for the role: --radius-sm to --radius-xxl, or --radius-control-sm, -md, -lg for a control by height) |
-| `--stack-xl` | `--stack-lg`, `--section-stack-lg` |
 | `--ds-on-surface` | `--ds-text`, `--ds-text-subtle` |
 | `--size-element-*, --element-*` | `--pad-x-md`, `--stack-md`, `--radius-md` (retired; these are the commonest replacements, and check:ds-usage names the exact one for each old name) |
 

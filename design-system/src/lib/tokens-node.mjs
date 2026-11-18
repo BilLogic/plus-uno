@@ -360,7 +360,7 @@ export const FAMILIES = [
   { family: 'spotlight', prefix: '--spotlight-', what: 'the Spotlight media height' },
   { family: 'ai-chat', prefix: '--ai-chat-', what: 'the AI chat width' },
   { family: 'inbox', prefix: '--inbox-', what: 'the Inbox Panel width' },
-  { family: 'menu-group', prefix: '--menu-group-', what: 'Menu group minimum width, pad and gap' },
+  { family: 'menu-group', prefix: '--menu-group-', what: 'Menu group minimum width' },
   { family: 'popup', prefix: '--popup-', what: 'the Popup pad' },
   { family: 'avatar', prefix: '--avatar-', what: 'the two largest Avatar sizes, 96 and 128' },
   { family: 'layer', prefix: '--layer-', what: 'the z-index scale, card to tooltip' },

@@ -194,7 +194,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
         <Calendar
             viewDate={step === 'landing' ? CALENDAR_NEXT_DATE : CALENDAR_BASE_DATE}
             selected="2026-11-16"
-            size={28}
+            size={24}
             onViewDateChange={NOOP}
             onPick={NOOP}
         />

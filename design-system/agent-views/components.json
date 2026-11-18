@@ -1398,7 +1398,7 @@
       "import": "import { Calendar } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Calendar/Calendar.jsx",
-      "summary": "Calendar — the month grid DatePicker and DateTimePicker open (Figma `_Calendar`), public for a caller who wants the grid on its own rather than behind a field's popup. It is the same component the pickers use. - **Grid:** always six weeks, 42 cells, so the panel never changes height. Days of the months either side are drawn and can't be picked. - **Days:** each is a button named with its full date. `aria-pressed` marks the picked day, or both ends of a range; `data-in-range` marks the days between; `aria-current=\"date\"` marks today. - **Bounds:** days before `minDate` or after `maxDate` are disabled. - **Size:** a pixel width, 28, 36 or 44, drawn from the `--calendar-day-*` tokens.",
+      "summary": "Calendar — the month grid DatePicker and DateTimePicker open (Figma `_Calendar`), public for a caller who wants the grid on its own rather than behind a field's popup. It is the same component the pickers use. - **Grid:** always six weeks, 42 cells, so the panel never changes height. Days of the months either side are drawn and can't be picked. - **Days:** each is a button named with its full date. `aria-pressed` marks the picked day, or both ends of a range; `data-in-range` marks the days between; `aria-current=\"date\"` marks today. - **Bounds:** days before `minDate` or after `maxDate` are disabled. - **Size:** a pixel width, 24, 32 or 40, drawn from the `--calendar-day-*` tokens.",
       "props": [
         {
           "name": "viewDate",
@@ -1469,11 +1469,11 @@
           "required": false,
           "default": null,
           "values": [
-            "28",
-            "36",
-            "44"
+            "24",
+            "32",
+            "40"
           ],
-          "description": "Day width in pixels: 28, 36 or 44.",
+          "description": "Day width in pixels: 24, 32 or 40.",
           "deprecated": null
         },
         {
@@ -1496,9 +1496,9 @@
         }
       ],
       "stories": [
-        "Size28",
-        "Size36",
-        "Size44",
+        "Size24",
+        "Size32",
+        "Size40",
         "PickADay",
         "TurnMonths",
         "TurnMonthsReduced",
@@ -2618,7 +2618,7 @@
         "--checkbox-control-size",
         "--choice-grid-control-size-10",
         "--choice-grid-control-size-12",
-        "--ds-surface-container",
+        "--ds-surface-sunken",
         "--ds-text",
         "--ds-text-subtle",
         "--pad-x-md",
@@ -3325,12 +3325,78 @@
           "deprecated": null
         },
         {
+          "name": "defaultValue",
+          "type": "string or arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Initial value when uncontrolled.",
+          "deprecated": null
+        },
+        {
           "name": "range",
           "type": "bool",
           "required": false,
           "default": "false",
           "values": null,
           "description": "Pick a first and a last day",
+          "deprecated": null
+        },
+        {
+          "name": "presets",
+          "type": "bool or arrayOf or shape or string or func",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Show preset ranges beside the calendar with Clear and Apply actions",
+          "deprecated": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Filter trigger label for the preset range popup",
+          "deprecated": null
+        },
+        {
+          "name": "trigger",
+          "type": "node or func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Custom trigger element or `({ isOpen, value, summary }) => node` for the filter popup.",
+          "deprecated": null
+        },
+        {
+          "name": "placement",
+          "type": "enum",
+          "required": false,
+          "default": "'bottom-start'",
+          "values": [
+            "bottom-start",
+            "bottom-end"
+          ],
+          "description": "Popup placement relative to a filter trigger.",
+          "deprecated": null
+        },
+        {
+          "name": "today",
+          "type": "string or instanceOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Reference date used for relative presets and `lookBack`; defaults to today.",
+          "deprecated": null
+        },
+        {
+          "name": "lookBack",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Disable days after `today`. Defaults to true when `presets` or a filter `label` is set.",
           "deprecated": null
         },
         {
@@ -3413,6 +3479,15 @@
           "deprecated": null
         },
         {
+          "name": "container",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Where a filter popup portals to; defaults to the page overlay layer.",
+          "deprecated": null
+        },
+        {
           "name": "onChange",
           "type": "func",
           "required": false,
@@ -3482,10 +3557,22 @@
         "TypedEntry",
         "DaysAnnounceTheirDate",
         "ClearControl",
-        "MonthTurnKeepsPopupHeight"
+        "MonthTurnKeepsPopupHeight",
+        "RangePopup",
+        "RangePopupPresetKeyboard",
+        "RangePopupClearCommits",
+        "RangePopupPresetBounds",
+        "RangePopupReadOnly"
       ],
       "tokens": [
-        "--ds-icon-subtle"
+        "--border-width-default",
+        "--calendar-day-sm",
+        "--ds-icon-subtle",
+        "--inline-md",
+        "--pad-x-md",
+        "--popup-pad",
+        "--popup-width-md",
+        "--width-1000"
       ]
     },
     {
@@ -8177,22 +8264,26 @@
         "ClearSpace"
       ],
       "tokens": [
-        "--ds-text",
-        "--palette-dark-neutral-0",
-        "--palette-dark-neutral-1000",
-        "--palette-lagoon-400",
-        "--palette-lagoon-500",
-        "--palette-lagoon-700",
-        "--palette-lagoon-900",
-        "--palette-neutral-0",
-        "--palette-neutral-1000",
-        "--palette-red-200",
-        "--palette-red-300",
-        "--palette-teal-200",
-        "--palette-teal-300",
-        "--palette-yellow-250",
-        "--palette-yellow-300",
-        "--palette-yellow-400"
+        "--ds-logo-glow-dark-0",
+        "--ds-logo-glow-dark-1",
+        "--ds-logo-glow-dark-2",
+        "--ds-logo-glow-dark-3",
+        "--ds-logo-glow-dark-4",
+        "--ds-logo-glow-light-0",
+        "--ds-logo-glow-light-1",
+        "--ds-logo-glow-light-2",
+        "--ds-logo-glow-light-3",
+        "--ds-logo-glow-light-4",
+        "--ds-logo-ground",
+        "--ds-logo-mark",
+        "--ds-logo-mark-reversed",
+        "--ds-logo-plus",
+        "--ds-logo-tile",
+        "--ds-logo-tile-dark",
+        "--ds-logo-wordmark",
+        "--ds-logo-wordmark-reversed",
+        "--ds-logo-wordmark-stroke",
+        "--ds-text"
       ]
     },
     {

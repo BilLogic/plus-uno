@@ -130,7 +130,7 @@ Use `DropdownMenu` for a trigger that opens a menu of actions or navigation link
 
 ### Menu items
 
-Dropdown menu exports the four row parts: `Section`, `ButtonItem`, `LinkItem` and `CustomItem`. `ButtonItem` runs an action and `LinkItem` navigates with `href`. `CustomItem` renders through a `component` of the caller's choosing, such as a `label` around a checkbox. All three take `elemBefore`, `elemAfter`, `description`, `isSelected` and `isDisabled`. `Section` takes a `title` and `hasSeparator` and groups rows. Arrow keys move between enabled rows and wrap at the ends.
+Dropdown menu exports the four row parts: `Section`, `ButtonItem`, `LinkItem` and `CustomItem`. `ButtonItem` runs an action and `LinkItem` navigates with `href`. `CustomItem` renders through a `component` of the caller's choosing, such as a `label` around a checkbox. All three take `elemBefore`, `elemAfter`, `description`, `isSelected` and `isDisabled`. `Section` takes a `title` and `hasSeparator` and groups rows. Arrow keys move between enabled rows and wrap at the ends. Standalone menus wrap rows in `MenuGroup`, which takes `spacing` (`default` 32, `compact` 24, `spacious` 40).
 
 <ComponentExample of={MenuItemStories.ButtonAndLinkItems} title="Sections, buttons and links" description={<>A group of button and link items, with a titled section and a separator.</>} />
 
@@ -160,9 +160,11 @@ Dropdown menu exports the four row parts: `Section`, `ButtonItem`, `LinkItem` an
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Row text</td><td><code>--ds-text</code>, body default; disabled <code>--ds-text-disabled</code>.</td></tr>
+<tr><td>Surface padding</td><td><code>--dropdown-menu-pad</code> (4).</td></tr>
+<tr><td>Row height</td><td><code>--control-md</code> (32) default; <code>--control-sm</code> (24) compact; <code>--control-lg</code> (40) spacious on <code>MenuGroup</code>.</td></tr>
+<tr><td>Row text</td><td><code>--ds-text</code>, <code>--body-default</code> (14); disabled <code>--ds-text-disabled</code>.</td></tr>
 <tr><td>Row icon</td><td><code>--ds-icon-subtle</code>.</td></tr>
-<tr><td>Row padding, radius</td><td><code>--space-0625</code> and <code>--space-150</code>; <code>--radius-lg</code>.</td></tr>
+<tr><td>Row padding, gap, radius</td><td><code>--pad-x-md</code> and <code>--pad-y-md</code> (12 × 6); gap <code>--inline-md</code> (8); <code>--radius-control-md</code> (8).</td></tr>
 <tr><td>Focus ring</td><td><code>--ds-border-focused</code>, 2px, 2px offset.</td></tr>
 </tbody>
 </DocsTable>

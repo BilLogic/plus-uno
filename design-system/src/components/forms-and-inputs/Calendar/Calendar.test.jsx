@@ -11,11 +11,11 @@ const grid = (size) => {
 
 describe('Calendar size', () => {
     it('takes the day width in pixels and marks the grid with it', () => {
-        expect(grid(28)).toHaveAttribute('data-size', '28');
-        expect(grid(44)).toHaveAttribute('data-size', '44');
+        expect(grid(24)).toHaveAttribute('data-size', '24');
+        expect(grid(40)).toHaveAttribute('data-size', '40');
     });
 
-    it('draws 36 when size is left out', () => {
-        expect(grid()).toHaveAttribute('data-size', '36');
+    it('draws 32 when size is left out', () => {
+        expect(grid()).toHaveAttribute('data-size', '32');
     });
 });

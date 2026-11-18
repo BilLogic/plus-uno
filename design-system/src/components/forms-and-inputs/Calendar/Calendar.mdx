@@ -47,11 +47,11 @@ A calendar is the month grid that Date picker and Date time picker open, on its 
 
 ## Size
 
-<ComponentExample of={CalendarStories.Size28} title="28" description="The smallest day cell." />
+<ComponentExample of={CalendarStories.Size24} title="24" description="The smallest day cell, used inside Date picker popups." />
 
-<ComponentExample of={CalendarStories.Size36} title="36" description="The default day cell." />
+<ComponentExample of={CalendarStories.Size32} title="32" description="The default day cell for inline calendars." />
 
-<ComponentExample of={CalendarStories.Size44} title="44" description="The largest day cell." />
+<ComponentExample of={CalendarStories.Size40} title="40" description="The largest day cell for inline calendars." />
 
 </div>
 
@@ -157,14 +157,14 @@ Use `Calendar` directly only when a month grid must stay visible on the page wit
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Month</td><td><code>--heading-sm</code> in <code>--ds-text</code>.</td></tr>
-<tr><td>Month buttons</td><td><code>--calendar-nav-size</code> square, <code>--ds-icon-subtle</code>, hovered <code>--ds-background-neutral-subtle-hovered</code>.</td></tr>
+<tr><td>Month</td><td><code>--heading-xs</code> in <code>--ds-text</code>.</td></tr>
+<tr><td>Month buttons</td><td>Compact <code>IconButton</code> (<code>--control-sm</code> square), <code>--ds-icon-subtle</code>, hovered <code>--ds-background-neutral-subtle-hovered</code>.</td></tr>
 <tr><td>Weekday names</td><td><code>--body-sm</code> in <code>--ds-text-subtle</code>.</td></tr>
 <tr><td>Day text</td><td><code>--body-default</code> in <code>--ds-text</code>.</td></tr>
-<tr><td>Day size</td><td><code>--calendar-day-sm</code> (28), <code>--calendar-day-md</code> (36), <code>--calendar-day-lg</code> (44).</td></tr>
+<tr><td>Day size</td><td><code>--calendar-day-sm</code> (24), <code>--calendar-day-md</code> (32), <code>--calendar-day-lg</code> (40).</td></tr>
 <tr><td>Day radius</td><td><code>--radius-md</code>.</td></tr>
-<tr><td>Gaps</td><td><code>--stack-md</code> between header, weekdays and days; <code>--stack-sm</code> between cells.</td></tr>
-<tr><td>Padding</td><td><code>--space-025</code> top and bottom, <code>--pad-x-sm</code> either side.</td></tr>
+<tr><td>Gaps</td><td><code>--stack-md</code> between header, weekdays and days; <code>--stack-sm</code> between rows.</td></tr>
+<tr><td>Padding</td><td><code>--space-025</code> top and bottom, <code>--pad-x-md</code> either side.</td></tr>
 </tbody>
 </DocsTable>
 

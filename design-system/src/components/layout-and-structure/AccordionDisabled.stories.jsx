@@ -1,4 +1,3 @@
-import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import React from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 
@@ -65,5 +64,4 @@ DisabledSectionsStayShut.play = async ({ canvasElement }) => {
     // The one beside it still works, so this is not "nothing opens".
     await userEvent.click(open);
     await expect(open.getAttribute('aria-expanded')).toBe('true');
-    await settleAnimations(canvasElement);
 };
