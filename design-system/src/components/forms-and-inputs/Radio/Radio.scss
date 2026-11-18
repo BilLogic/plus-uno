@@ -8,17 +8,17 @@
 @use '../_internal/choice-tile';
 
 .plus-form-radio-wrapper {
-    --plus-choice-indent: calc(var(--radio-control-size) + var(--space-050));
+    --plus-choice-indent: calc(var(--radio-control-size) + var(--inline-md));
     display: flex;
     flex-direction: column;
-    gap: var(--space-025);
+    gap: var(--stack-sm);
     width: 100%;
 }
 
 .plus-form-radio-row {
     display: flex;
     align-items: center;
-    gap: var(--space-050);
+    gap: var(--inline-md);
     min-height: var(--control-sm);
 }
 
@@ -32,7 +32,7 @@
     min-height: var(--radio-control-size);
     padding: 0;
     margin: 0;
-    border: var(--stroke-2, 2px) solid var(--ds-border-input);
+    border: var(--border-width-selected) solid var(--ds-border-input);
     border-radius: var(--radius-full);
     background-color: var(--ds-background-input);
     cursor: pointer;
@@ -138,8 +138,8 @@
 }
 
 .plus-choice-card {
-    padding: var(--space-0375) var(--pad-x-md);
-    border: var(--stroke-1) solid var(--ds-border);
+    padding: var(--pad-y-md) var(--pad-x-md);
+    border: var(--border-width-default) solid var(--ds-border);
     border-radius: var(--radius-control-md);
     background-color: var(--ds-surface);
 

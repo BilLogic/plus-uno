@@ -277,9 +277,9 @@ const sizedCard = (size) => (
     </div>
 );
 
-export const SizeSmall = { name: 'Small', render: () => sizedCard('sm') };
-export const SizeMedium = { name: 'Medium', render: () => sizedCard('md') };
-export const SizeLarge = { name: 'Large', render: () => sizedCard('lg') };
+export const SizeCompact = { name: 'Compact', render: () => sizedCard('sm') };
+export const SizeDefault = { name: 'Default', render: () => sizedCard('md') };
+export const SizeSpacious = { name: 'Spacious', render: () => sizedCard('lg') };
 
 /** One image ratio per story, edge to edge above the padded content. */
 const imageCard = (ratio) => (

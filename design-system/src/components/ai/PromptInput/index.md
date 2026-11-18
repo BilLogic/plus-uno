@@ -156,7 +156,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-width-default` · `--control-md` · `--height-250` · `--pad-x-md` · `--pad-x-xs` · `--pad-y-md` · `--plus-prompt-input-max-height` · `--stack-md` · `--stack-sm` · `--type-line-height-125`
+`--border-width-default` · `--control-md` · `--pad-x-md` · `--pad-x-xs` · `--pad-y-md` · `--plus-prompt-input-max-height` · `--prompt-input-min-height` · `--stack-md` · `--stack-sm` · `--type-line-height-125`
 
 From `design-system/src/components/ai/PromptInput/PromptInput.scss`. Override these through the token layer, never with a literal.
 

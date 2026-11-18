@@ -12,9 +12,11 @@ A token a plan defines carries its intent as a comment: the place or situation i
 Start here for space, size and radius (ADR-038). A component reads its component token, else a template token, else one of these steps: `--pad-x-*` and `--pad-y-*` inside a control, `--stack-*` between stacked items, `--inline-*` between items in a row, `--radius-*` for corners. The primitives at the end of this file are what these resolve to.
 
 ```css
+--content-list-indent  /* Left padding on ordered and unordered lists. */
 --content-max-width  /* Widest a page's main content column may grow. */
 --content-max-width-reading  /* Widest a column of running text may grow, to keep lines readable. */
 --content-min-width  /* Narrowest a page's main content column may shrink. */
+--content-prose-stack  /* Bottom margin on prose blocks (paragraphs, lists, blockquotes and preformatted blocks). */
 --content-width  /* Width of the main content column at the current breakpoint. */
 --control-lg  /* Height of a large control: 40px high. */
 --control-md  /* Height of a default control: 32px high. */
@@ -94,8 +96,14 @@ Space owned by a template: page, section, card, table, modal, popup. Inside a te
 --page-pad-y-compact  /* Vertical padding of a Page with compact spacing. */
 --page-pad-y-default  /* Vertical padding of a Page with default spacing. */
 --page-pad-y-spacious  /* Vertical padding of a Page with spacious spacing. */
+--panel-inline-lg  /* Horizontal gap between a Panel footer disclaimer and its actions. */
+--panel-inline-md  /* Horizontal gap between parts of a Panel header. */
+--panel-inline-sm  /* Horizontal gap between actions in a Panel header action group. */
 --panel-max-width  /* Widest the Panel may be dragged. */
 --panel-min-width  /* Narrowest the Panel may be dragged. */
+--panel-pad  /* Padding inside a Panel body and horizontal padding of its header, subheader and footer. */
+--panel-pad-y  /* Vertical padding of a Panel header and footer. */
+--panel-subheader-pad-y  /* Vertical padding of a Panel subheader. */
 --panel-width-default  /* Width the Panel opens at. */
 --popup-radius  /* Corner rounding of a Popup. */
 --popup-width-3-col  /* Width of a 3-column Popup, such as a short picker. */
@@ -107,6 +115,8 @@ Space owned by a template: page, section, card, table, modal, popup. Inside a te
 --section-pad-y-default  /* Vertical padding of a PatternSection with default spacing. */
 --section-pad-y-spacious  /* Vertical padding of a PatternSection with spacious spacing. */
 --section-radius  /* Corner rounding of a PatternSection that has a fill. */
+--section-toolbar-count-min-width  /* Minimum width of the result count in a PatternSection toolbar before it truncates. */
+--section-toolbar-min-width  /* Minimum width of the start group in a PatternSection toolbar before its controls wrap. */
 --table-empty-radius  /* Corner rounding of the empty state box that replaces an empty table. */
 --table-empty-surface  /* Surface of the empty state box that replaces an empty table. */
 --table-footer-height  /* Height of a table footer row: the range, the page-size Select and Pagination on one line. */
@@ -120,8 +130,8 @@ Tokens one component owns, named for it.
 
 ```css
 --ai-chat-width  /* Width of the AI chat when it opens as a popup or floats beside the page. */
---ai-message-caret-width  /* Width of the streaming caret in an AiMessage. */
---ai-message-dot-size  /* Diameter of each pulsing dot in an AiMessage typing indicator. */
+--ai-message-caret-width  /* Width and leading gap of the streaming caret in an AiMessage. */
+--ai-message-dot-size  /* Diameter of each typing-indicator dot in an AiMessage. */
 --avatar-size-128  /* Size of the largest UserAvatar, such as on a profile page. */
 --avatar-size-96  /* Size of an extra-large UserAvatar, such as in a profile header. */
 --button-radius-compact  /* Corner rounding of a Button with compact spacing. */
@@ -138,6 +148,7 @@ Tokens one component owns, named for it.
 --carousel-indicator-height-spacious  /* Height of a Carousel's slide indicator with spacious spacing. */
 --carousel-indicator-width  /* Width of a Carousel's slide indicator with default spacing. */
 --carousel-indicator-width-compact  /* Width of a Carousel's slide indicator with compact spacing. */
+--carousel-slide-max-width  /* Maximum width of a Carousel slide on wide stages. */
 --carousel-slide-min-height  /* Minimum height of a Carousel slide with default spacing. */
 --carousel-slide-min-height-compact  /* Minimum height of a Carousel slide with compact spacing. */
 --carousel-slide-min-height-spacious  /* Minimum height of a Carousel slide with spacious spacing. */
@@ -147,7 +158,13 @@ Tokens one component owns, named for it.
 --choice-grid-control-size-10  /* Size of the control in a ChoiceGrid with size 12. */
 --choice-grid-control-size-12  /* Size of the control in a ChoiceGrid with size 14 or 16. */
 --choice-tile-width  /* Width of a choice tile in a Radio, RadioGroup, Checkbox or CheckboxGroup with tile appearance. */
+--comment-gap  /* Horizontal gap between a Comment avatar and body, and between its actions. */
+--comment-pad  /* Padding around a Comment. */
+--comment-replies-indent  /* Indentation and inner padding of nested replies in a Comment. */
+--comment-replies-stack  /* Vertical gap above nested replies in a Comment. */
 --count-tag-dot-size  /* Size of the dot in a CountTag. */
+--count-tag-ring-width  /* Cutout ring width around a CountTag pinned to an icon or avatar. */
+--date-time-picker-section-gap  /* Vertical gap between the date and time sections of a DateTimePicker. */
 --dialog-body-min-height  /* Minimum height of a Dialog's body, so a short body does not collapse the dialog. */
 --dialog-inline-lg  /* Horizontal gap between columns in a Dialog. */
 --dialog-inline-md  /* Horizontal gap between the actions in a Dialog footer. */
@@ -159,6 +176,7 @@ Tokens one component owns, named for it.
 --dialog-stack-lg  /* Vertical gap between blocks in a Dialog's body. */
 --dialog-stack-md  /* Vertical gap between a Dialog's header, body and footer. */
 --dialog-stack-sm  /* Vertical gap between a Dialog's title and its description or tabs. */
+--field-gap  /* Horizontal gap between slots inside a field. */
 --file-item-height  /* Fixed height of a FileItem row across queued, uploading, done and error states. */
 --flag-min-height  /* Minimum height of a Flag. */
 --flag-offset  /* Distance between a Flag and the edge of the screen. */
@@ -175,6 +193,8 @@ Tokens one component owns, named for it.
 --option-row-control-gap  /* Horizontal gap between an option row's control and its label. */
 --option-row-dot-size  /* Size of the dot in an option row, such as a radio's selected mark. */
 --option-row-indent-step  /* Indent added for each level of a nested option row. */
+--page-header-gap  /* Horizontal gap between a PageHeader title and its actions. */
+--page-header-stack  /* Vertical gap between a PageHeader breadcrumbs row, title row and bottom bar. */
 --popup-clip-reach  /* How far past its edges a Popup's opening clip stays, so the overlay shadow is never cut. */
 --popup-max-width  /* Widest an auto-width Popup grows to fit its content, unless its trigger is wider. */
 --popup-min-width  /* Narrowest an auto-width Popup gets, unless its trigger is wider. */
@@ -182,9 +202,13 @@ Tokens one component owns, named for it.
 --progress-indicator-dot-size-12  /* Dot size of a ProgressIndicator with size 12. */
 --progress-indicator-dot-size-8  /* Dot size of a ProgressIndicator with size 8. */
 --progress-ring-stroke  /* Stroke width of a ProgressRing track and fill. */
+--progress-tracker-connector-width  /* Width of the connecting line between steps in a horizontal ProgressTracker. */
+--progress-tracker-dot-size  /* Diameter of an unvisited step dot in a ProgressTracker. */
+--prompt-input-min-height  /* Shortest a PromptInput text area gets, one line plus its padding. */
 --radio-control-size  /* Size of the Radio circle. */
 --radio-control-size-10  /* Size of the circle in a RadioGroup with size 10. */
 --radio-control-size-14  /* Size of the circle in a RadioGroup with size 14. */
+--radio-group-inline-gap  /* Horizontal gap between inline options and between scale ends in a RadioGroup. */
 --range-dot-size-12  /* Thumb size of a Range with size 12. */
 --range-dot-size-16  /* Thumb size of a Range with size 16. */
 --range-dot-size-8  /* Thumb size of a Range with size 8. */
@@ -192,6 +216,8 @@ Tokens one component owns, named for it.
 --range-track-height-4  /* Track height of a Range with size 8 or no size set. */
 --range-track-height-6  /* Track height of a Range with size 12. */
 --range-track-height-8  /* Track height of a Range with size 16. */
+--rating-gap  /* Horizontal gap between rating items in a Rating. */
+--rich-text-editor-max-width  /* Maximum width of a RichTextEditor unless fullWidth is set. */
 --scroll-bar-max-height  /* Maximum height of a scrolling area that shows a scroll bar. */
 --scroll-bar-size  /* Thickness of a scroll bar. */
 --setting-row-end-min-height  /* Minimum height of a SettingRow end slot so compact controls align with the first line of the label. */
@@ -209,9 +235,14 @@ Tokens one component owns, named for it.
 --spinner-size-lg  /* Size of a large Spinner, such as one loading a whole section. */
 --spinner-size-md  /* Size of a default Spinner. */
 --spinner-size-sm  /* Size of a small Spinner, such as one inside a Button. */
+--spotlight-footer-stack  /* Vertical gap above a Spotlight footer. */
+--spotlight-gap  /* Gap between blocks inside a Spotlight (header, media, body and footer). */
 --spotlight-media-height  /* Height of the media area in a Spotlight. */
+--spotlight-pad  /* Padding inside a Spotlight. */
+--spotlight-screen-pad  /* Minimum clearance between a Spotlight and the viewport edges. */
 --spotlight-width  /* Width of a Spotlight. */
 --table-cell-max-width  /* Maximum width of a table cell before its text truncates. */
+--table-message-gap  /* Vertical gap between parts of a Table empty or error message row. */
 --tag-dot-size  /* Size of the dot in a Tag. */
 --tag-gap  /* Horizontal gap between a Tag's parts with default spacing. */
 --tag-gap-compact  /* Horizontal gap between a Tag's parts with compact spacing. */

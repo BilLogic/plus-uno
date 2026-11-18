@@ -229,20 +229,21 @@ export const TAB_UNDERLINE = { strokeWidth: 'var(--border-width-selected)' };
 
 /**
  * A real-fidelity label. Drawings show at up to twice their viewBox, so the
- * size is the real label size halved: at full width it reads at true size.
+ * size is the real label size halved (`--kit-label-drawing-size`, docs-rhythm.css):
+ * at full width it reads at true size.
  */
 export const LABEL_FONT = {
   fontFamily: 'var(--type-family-body)',
   fontWeight: 'var(--type-weight-semibold)',
-  fontSize: 'calc(var(--type-size-0875) / 2)',
+  fontSize: 'var(--kit-label-drawing-size)',
 };
 
 /**
  * Mono label for construction-kit brackets and zone callouts, at 1:1 scale
- * (`--type-size-075`).
+ * (`--kit-label-mono-drawing-size`, docs-rhythm.css).
  */
 export const MONO_LABEL_FONT = {
   fontFamily: 'var(--type-family-code)',
   fontWeight: 'var(--type-weight-medium)',
-  fontSize: 'var(--type-size-075)',
+  fontSize: 'var(--kit-label-mono-drawing-size)',
 };

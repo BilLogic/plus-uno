@@ -101,8 +101,8 @@ A comment has no hover, pressed, focus or disabled state of its own. The actions
 | Author | Body default, semibold. |
 | Time, edited, restricted, saving | `--ds-text-subtle`, body small. |
 | Highlight fill | `--ds-background-selected`. |
-| Padding and gaps | `--space-100`, `--space-075`, `--space-050`, `--space-025`. |
-| Replies indent and rule | `--space-150`; `--ds-border`. |
+| Padding and gaps | `--comment-pad`, `--comment-gap`, `--inline-lg`, `--stack-md`, `--stack-sm`. |
+| Replies indent and rule | `--comment-replies-stack`, `--comment-replies-indent`; `--ds-border`. |
 
 ## Content guidelines
 
@@ -140,7 +140,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-sm` · `--border-width-default` · `--card-radius-compact` · `--ds-background-selected` · `--ds-border` · `--ds-text-subtle` · `--space-025` · `--space-050` · `--space-075` · `--space-100` · `--space-150` · `--type-weight-semibold`
+`--body-default` · `--body-sm` · `--border-width-default` · `--card-radius-compact` · `--comment-gap` · `--comment-pad` · `--comment-replies-indent` · `--comment-replies-stack` · `--ds-background-selected` · `--ds-border` · `--ds-text-subtle` · `--inline-lg` · `--stack-md` · `--stack-sm` · `--type-weight-semibold`
 
 From `design-system/src/components/forms-and-inputs/Comment/Comment.scss`. Override these through the token layer, never with a literal.
 

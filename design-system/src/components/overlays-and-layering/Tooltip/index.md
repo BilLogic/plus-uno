@@ -199,7 +199,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-sm` · `--ds-background-neutral-bold` · `--ds-text-inverse` · `--layer-tooltip` · `--pad-x-sm` · `--plus-overlay-origin` · `--radius-control-sm` · `--tooltip-max-width` · `--tooltip-pad-y` · `--transform-origin`
+`--body-sm` · `--border-width-default` · `--ds-background-neutral-bold` · `--ds-text-inverse` · `--layer-tooltip` · `--pad-x-sm` · `--plus-overlay-origin` · `--radius-control-sm` · `--tooltip-max-width` · `--tooltip-pad-y` · `--transform-origin`
 
 From `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.scss`. Override these through the token layer, never with a literal.
 

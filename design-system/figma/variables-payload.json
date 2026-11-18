@@ -310,6 +310,20 @@
           }
         },
         {
+          "name": "Content/prose-stack",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--content-prose-stack)"
+          }
+        },
+        {
+          "name": "Content/list-indent",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--content-list-indent)"
+          }
+        },
+        {
           "name": "Control/sm",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -455,6 +469,48 @@
           }
         },
         {
+          "name": "Panel/pad",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--panel-pad)"
+          }
+        },
+        {
+          "name": "Panel/pad-y",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--panel-pad-y)"
+          }
+        },
+        {
+          "name": "Panel/subheader-pad-y",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--panel-subheader-pad-y)"
+          }
+        },
+        {
+          "name": "Panel/inline-sm",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--panel-inline-sm)"
+          }
+        },
+        {
+          "name": "Panel/inline-md",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--panel-inline-md)"
+          }
+        },
+        {
+          "name": "Panel/inline-lg",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--panel-inline-lg)"
+          }
+        },
+        {
           "name": "Section/pad-x-compact",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -501,6 +557,20 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--section-radius)"
+          }
+        },
+        {
+          "name": "Section/toolbar-min-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--section-toolbar-min-width)"
+          }
+        },
+        {
+          "name": "Section/toolbar-count-min-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--section-toolbar-count-min-width)"
           }
         },
         {
@@ -1048,6 +1118,62 @@
           }
         },
         {
+          "name": "Count/tag-ring-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--count-tag-ring-width)"
+          }
+        },
+        {
+          "name": "Date/time-picker-section-gap",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--date-time-picker-section-gap)"
+          }
+        },
+        {
+          "name": "Field/gap",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--field-gap)"
+          }
+        },
+        {
+          "name": "Radio/group-inline-gap",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--radio-group-inline-gap)"
+          }
+        },
+        {
+          "name": "Rating/gap",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--rating-gap)"
+          }
+        },
+        {
+          "name": "Rich/text-editor-max-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--rich-text-editor-max-width)"
+          }
+        },
+        {
+          "name": "Ai/message-caret-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--ai-message-caret-width)"
+          }
+        },
+        {
+          "name": "Ai/message-dot-size",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--ai-message-dot-size)"
+          }
+        },
+        {
           "name": "Tag/dot-size",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -1157,6 +1283,13 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--carousel-indicator-height-spacious)"
+          }
+        },
+        {
+          "name": "Carousel/slide-max-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--carousel-slide-max-width)"
           }
         },
         {
@@ -1286,6 +1419,34 @@
           }
         },
         {
+          "name": "Spotlight/screen-pad",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--spotlight-screen-pad)"
+          }
+        },
+        {
+          "name": "Spotlight/pad",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--spotlight-pad)"
+          }
+        },
+        {
+          "name": "Spotlight/gap",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--spotlight-gap)"
+          }
+        },
+        {
+          "name": "Spotlight/footer-stack",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--spotlight-footer-stack)"
+          }
+        },
+        {
           "name": "Menu/group-min-width",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -1321,17 +1482,10 @@
           }
         },
         {
-          "name": "Ai/message-caret-width",
+          "name": "Prompt/input-min-height",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--ai-message-caret-width)"
-          }
-        },
-        {
-          "name": "Ai/message-dot-size",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--ai-message-dot-size)"
+            "WEB": "var(--prompt-input-min-height)"
           }
         },
         {
@@ -1346,6 +1500,69 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--table-cell-max-width)"
+          }
+        },
+        {
+          "name": "Table/message-gap",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--table-message-gap)"
+          }
+        },
+        {
+          "name": "Page/header-stack",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--page-header-stack)"
+          }
+        },
+        {
+          "name": "Page/header-gap",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--page-header-gap)"
+          }
+        },
+        {
+          "name": "Comment/pad",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--comment-pad)"
+          }
+        },
+        {
+          "name": "Comment/gap",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--comment-gap)"
+          }
+        },
+        {
+          "name": "Comment/replies-stack",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--comment-replies-stack)"
+          }
+        },
+        {
+          "name": "Comment/replies-indent",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--comment-replies-indent)"
+          }
+        },
+        {
+          "name": "Progress/tracker-connector-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--progress-tracker-connector-width)"
+          }
+        },
+        {
+          "name": "Progress/tracker-dot-size",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--progress-tracker-dot-size)"
           }
         },
         {

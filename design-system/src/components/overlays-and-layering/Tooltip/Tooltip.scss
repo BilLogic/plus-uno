@@ -24,7 +24,7 @@
 
 @media (forced-colors: active) {
     .plus-tooltip {
-        outline: 1px solid CanvasText;
+        outline: var(--border-width-default) solid CanvasText;
     }
 }
 

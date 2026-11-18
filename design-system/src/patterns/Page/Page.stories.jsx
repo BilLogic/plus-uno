@@ -140,12 +140,12 @@ const OneStep = ({ step }) => (
 
 /** padding and radius none: the content runs to the edge. */
 export const StepNone = { name: 'None', render: () => <OneStep step="none" /> };
-/** padding and radius sm. */
-export const StepSmall = { name: 'Small', render: () => <OneStep step="sm" /> };
-/** padding and radius md: the frame's own pad. */
-export const StepMedium = { name: 'Medium', render: () => <OneStep step="md" /> };
-/** padding and radius lg. */
-export const StepLarge = { name: 'Large', render: () => <OneStep step="lg" /> };
+/** padding and radius sm (compact). */
+export const StepCompact = { name: 'Compact', render: () => <OneStep step="sm" /> };
+/** padding and radius md: the frame's own pad (default). */
+export const StepDefault = { name: 'Default', render: () => <OneStep step="md" /> };
+/** padding and radius lg (spacious). */
+export const StepSpacious = { name: 'Spacious', render: () => <OneStep step="lg" /> };
 
 /** border: a bold 2px border, drawn in place of the default level's edge ring. */
 export const Bordered = {

@@ -23,7 +23,7 @@ vi.mock('@/dataviz/PlusChart', () => ({
 }));
 
 describe('DonutChart', () => {
-    it('enters on the shared spring by default with no animation props and styles its center figure with lg, md or sm Metric tokens only', () => {
+    it('enters on the shared spring by default with no animation props and styles its center figure with metric-lg, metric-md or metric-sm Metric tokens only', () => {
         capturedOptions.length = 0;
         const trackSegments = [
             { value: 25, color: BRAND, label: 'Done' },
@@ -54,14 +54,17 @@ describe('DonutChart', () => {
 
         expect(getByText('75%').classList.contains('metric-lg')).toBe(true);
 
-        rerender(React.createElement(DonutChart, { value: '75%', segments: trackSegments, centerTextSize: 'md' }));
+        rerender(React.createElement(DonutChart, { value: '75%', segments: trackSegments, centerTextSize: 'metric-md' }));
         expect(getByText('75%').classList.contains('metric-md')).toBe(true);
 
-        rerender(React.createElement(DonutChart, { value: '75%', segments: trackSegments, centerTextSize: 'sm' }));
+        rerender(React.createElement(DonutChart, { value: '75%', segments: trackSegments, centerTextSize: 'metric-sm' }));
         expect(getByText('75%').classList.contains('metric-sm')).toBe(true);
 
-        // Retired type-scale aliases are not mapped onto metric-md / metric-sm.
+        // Retired t-shirt and type-scale aliases are not mapped onto metric-md / metric-sm.
         const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        rerender(React.createElement(DonutChart, { value: '75%', segments: trackSegments, centerTextSize: 'md' }));
+        expect(getByText('75%').classList.contains('metric-md')).toBe(false);
+        expect(getByText('75%').classList.contains('metric-lg')).toBe(true);
         rerender(React.createElement(DonutChart, { value: '75%', segments: trackSegments, centerTextSize: 'h4' }));
         expect(getByText('75%').classList.contains('metric-md')).toBe(false);
         expect(getByText('75%').classList.contains('metric-lg')).toBe(true);
@@ -92,7 +95,7 @@ describe('DonutChart', () => {
 });
 
 describe('DonutChartSVG', () => {
-    it('maps only lg, md and sm to .metric-* classes, keeps hover on appearance.fast and rounds its tooltip with --popup-radius', () => {
+    it('maps only metric-lg, metric-md and metric-sm to .metric-* classes, keeps hover on appearance.fast and rounds its tooltip with --popup-radius', () => {
         const paths = [
             { d: 'M 0 0 L 10 0 L 10 10 Z', fill: CATEGORICAL[0], label: 'Segment 1', percentage: 73 },
             { d: 'M 10 0 L 20 0 L 20 10 Z', fill: CHROME.track, label: 'Remaining', percentage: 27 },
@@ -120,9 +123,9 @@ describe('DonutChartSVG', () => {
         expect(tooltip.style.top).toContain('var(--popup-offset)');
         fireEvent.mouseLeave(container.querySelector('svg'));
 
-        rerender(React.createElement(DonutChartSVG, { value: '73%', paths, centerTextSize: 'md' }));
+        rerender(React.createElement(DonutChartSVG, { value: '73%', paths, centerTextSize: 'metric-md' }));
         expect(getByText('73%').classList.contains('metric-md')).toBe(true);
-        rerender(React.createElement(DonutChartSVG, { value: '73%', paths, centerTextSize: 'sm' }));
+        rerender(React.createElement(DonutChartSVG, { value: '73%', paths, centerTextSize: 'metric-sm' }));
         expect(getByText('73%').classList.contains('metric-sm')).toBe(true);
 
         const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});

@@ -34,7 +34,7 @@ export const SEARCH_ROOTS = ['design-system/src/components', 'design-system/src/
 export const SEARCHED = /\.(scss|css|jsx|js)$/;
 const SKIPPED = /\.(test|stories)\.[cm]?[jt]sx?$/;
 
-const PRIMITIVE = /^--(space|radius|size|stroke)-\d+$/;
+const PRIMITIVE = /^--(space|radius|size|stroke|height|width|type-size)-\d+$/;
 
 /** Whether a custom property name is a numbered primitive step. */
 export const isPrimitive = (name) => PRIMITIVE.test(name);
@@ -124,7 +124,7 @@ function record() {
   ratchet.update(found, {
     seed: {
       why:
-        'Reads of a numbered primitive (--space-<n>, --radius-<n>, --size-<n>, --stroke-<n>) in design-system/src/components and ' +
+        'Reads of a numbered primitive (--space-<n>, --radius-<n>, --size-<n>, --stroke-<n>, --height-<n>, --width-<n>, --type-size-<n>) in design-system/src/components and ' +
         'design-system/src/patterns, per file. The record only falls. Regenerate with `npm run check:no-primitive-reads -- --update`; never edit by hand.',
     },
   });

@@ -127,12 +127,12 @@ Same group: `Banner` · `Dialog` · `EmptyState` · `Flag` · `InlineMessage` ·
 
 | Part | Token |
 | --- | --- |
-| Surface | `--ds-background-brand-bold`, `--ds-shadow-overlay`, `--spotlight-width`, `--radius-xxl`, `--space-150` |
+| Surface | `--ds-background-brand-bold`, `--ds-shadow-overlay`, `--spotlight-width`, `--popup-radius`, `--spotlight-pad` |
 | Text | `--ds-text-inverse`, `--heading-sm`, `--body-default`; step count `--body-sm` |
 | Dismiss | `--ds-icon-inverse`, `--ds-interaction-inverse-hovered`, `--ds-interaction-inverse-pressed`, `--radius-md` |
 | Primary action | `--ds-surface-overlay`, `--ds-text` |
 | Secondary action | `--ds-text-inverse` text and `--border-width-default` edge |
-| Actions | `--radius-lg`, `--radius-lg`, `--radius-xxl`, `--space-075` between |
+| Actions | `--radius-lg`, `--radius-lg`, `--radius-xxl`, `--inline-lg` between |
 | Media | `--radius-lg` |
 | Focus ring | `--ds-border-focused-inverse` |
 
@@ -169,7 +169,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-sm` · `--ds-background-brand-bold` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--heading-sm` · `--plus-overlay-origin` · `--popup-radius` · `--radius-lg` · `--space-075` · `--space-100` · `--space-150` · `--spotlight-media-height` · `--spotlight-width` · `--transform-origin`
+`--body-default` · `--body-sm` · `--ds-background-brand-bold` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--heading-sm` · `--inline-lg` · `--plus-overlay-origin` · `--popup-radius` · `--radius-lg` · `--spotlight-footer-stack` · `--spotlight-gap` · `--spotlight-media-height` · `--spotlight-pad` · `--spotlight-screen-pad` · `--spotlight-width` · `--transform-origin`
 
 From `design-system/src/components/messaging/Spotlight/Spotlight.scss`. Override these through the token layer, never with a literal.
 

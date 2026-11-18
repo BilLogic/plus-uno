@@ -377,7 +377,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
         <GenerativeBorder isActive={step === 'landing'} radius="radius-lg">
             <div
                 style={{
-                    padding: 'var(--space-100) var(--space-150)',
+                    padding: 'var(--card-pad-compact) var(--card-pad-spacious)',
                     background: 'var(--ds-surface)',
                     borderRadius: 'var(--radius-lg)',
                     font: 'var(--body-sm)',
@@ -403,7 +403,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
         <div style={{ width: '100%' }}>
             <InlineEdit
                 label="Session goal"
-                compact
+                spacing="compact"
                 defaultValue={step === 'landing' ? 'Equivalent fractions' : 'Number lines'}
                 readView={() => (
                     <span>{step === 'landing' ? 'Equivalent fractions' : 'Number lines'}</span>
@@ -420,7 +420,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
         <div style={{ width: '100%' }}>
             <InlineEditableTextfield
                 label="Student nickname"
-                compact
+                spacing="compact"
                 value={step === 'landing' ? 'Maya L.' : 'Maya'}
                 placeholder="Enter nickname"
                 onConfirm={NOOP}
@@ -505,7 +505,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 'var(--space-075)',
+                gap: 'var(--stack-lg)',
             }}
         >
             <Popup
@@ -518,7 +518,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
             <div
                 className="plus-popup"
                 style={{
-                    padding: 'var(--space-100) var(--space-150)',
+                    padding: 'var(--card-pad-compact) var(--card-pad-spacious)',
                     borderRadius: 'var(--radius-lg)',
                     background: 'var(--ds-surface-overlay)',
                     boxShadow: 'var(--ds-shadow-overlay)',
@@ -712,7 +712,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
     Skeleton: ({ step }) => (
         <div style={{ width: '100%' }}>
             {step === 'landing' ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-075)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
                     <Skeleton preset="paragraph" lines={2} />
                 </div>
             ) : (
@@ -852,7 +852,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 'var(--space-075)',
+                gap: 'var(--stack-lg)',
             }}
         >
             <div className="plus-tooltip">
@@ -1207,7 +1207,7 @@ export const MotionComponentStage = ({
             style={{
                 position: 'relative',
                 minHeight: 168,
-                padding: 'var(--space-200)',
+                padding: 'var(--section-pad-x-spacious)',
                 borderRadius: 'var(--card-radius)',
                 background: 'var(--ds-surface-sunken)',
                 display: 'flex',

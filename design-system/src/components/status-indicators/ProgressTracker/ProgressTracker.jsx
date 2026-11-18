@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import Icon from '../../images-and-icons/Icon';
 import './ProgressTracker.scss';
 
-export const PROGRESS_TRACKER_SPACINGS = ['comfortable', 'cozy', 'compact'];
+export const PROGRESS_TRACKER_SPACINGS = ['default', 'compact', 'spacious'];
 export const PROGRESS_TRACKER_ORIENTATIONS = ['horizontal', 'vertical'];
 export const PROGRESS_TRACKER_STATUSES = ['disabled', 'unvisited', 'current', 'visited'];
 
@@ -33,13 +33,13 @@ const markerFor = (status) => {
  *
  * @param {object} props
  * @param {{ id: string, label: string, status: 'disabled'|'unvisited'|'current'|'visited', href?: string, onClick?: () => void }[]} props.items
- * @param {'comfortable'|'cozy'|'compact'} [props.spacing='cozy']
+ * @param {'default'|'compact'|'spacious'} [props.spacing='default']
  * @param {'horizontal'|'vertical'} [props.orientation='horizontal']
  * @param {string} [props.label='Progress tracker'] - Accessible name for the step list.
  */
 const ProgressTracker = ({
     items,
-    spacing = 'cozy',
+    spacing = 'default',
     orientation = 'horizontal',
     label = 'Progress tracker',
 }) => (

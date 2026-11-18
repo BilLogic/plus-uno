@@ -6,11 +6,11 @@
     @include overlay-motion(plus-overlay-scale-in, none, default, fast);
     transform-origin: var(--transform-origin, var(--plus-overlay-origin, center));
     width: var(--spotlight-width);
-    max-width: calc(100vw - var(--space-100) * 2);
+    max-width: calc(100vw - var(--spotlight-screen-pad) * 2);
     background: var(--ds-background-brand-bold);
     color: var(--ds-text-inverse);
     border-radius: var(--popup-radius);
-    padding: var(--space-150);
+    padding: var(--spotlight-pad);
     box-shadow: var(--ds-shadow-overlay);
 }
 
@@ -18,7 +18,7 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: var(--space-100);
+    gap: var(--spotlight-gap);
 }
 
 .plus-spotlight-headline {
@@ -35,7 +35,7 @@
 .plus-spotlight-media {
     width: 100%;
     height: var(--spotlight-media-height);
-    margin: var(--space-100) auto;
+    margin: var(--spotlight-gap) auto;
     border-radius: var(--radius-lg);
     overflow: hidden;
 
@@ -49,15 +49,15 @@
 .plus-spotlight-body {
     font: var(--body-default);
     color: var(--ds-text-inverse);
-    margin-top: var(--space-100);
+    margin-top: var(--spotlight-gap);
 }
 
 .plus-spotlight-footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--space-100);
-    margin-top: var(--space-150);
+    gap: var(--spotlight-gap);
+    margin-top: var(--spotlight-footer-stack);
 }
 
 .plus-spotlight-step-count {
@@ -67,7 +67,7 @@
 
 .plus-spotlight-actions {
     display: flex;
-    gap: var(--space-075);
+    gap: var(--inline-lg);
     margin-inline-start: auto;
 }
 

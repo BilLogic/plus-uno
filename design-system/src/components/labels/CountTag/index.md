@@ -109,7 +109,7 @@ Same group: `ChangeTag` · `CompetencyTag` · `DateTag` · `StatusTag` · `Tag` 
 | Subtle | `--ds-background-neutral` with `--ds-text`, and the same pair for each other appearance. |
 | Bold | `--ds-background-neutral-bold` with `--ds-text-inverse`; warning takes `--ds-text-warning-inverse`. |
 | Inverse | `--ds-surface` with `--ds-text-subtle`. |
-| Ring | `--stroke-2` in `--ds-surface`. |
+| Ring | `--count-tag-ring-width` in `--ds-surface`. |
 
 ## Content guidelines
 
@@ -144,7 +144,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-sm` · `--control-sm` · `--count-tag-dot-size` · `--ds-background-competency-mastering-content` · `--ds-background-competency-mastering-content-bold` · `--ds-background-danger` · `--ds-background-danger-bold` · `--ds-background-information` · `--ds-background-information-bold` · `--ds-background-neutral` · `--ds-background-neutral-bold` · `--ds-background-success` · `--ds-background-success-bold` · `--ds-background-warning` · `--ds-background-warning-bold` · `--ds-icon-competency-mastering-content` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-surface` · `--ds-text` · `--ds-text-competency-mastering-content` · `--ds-text-danger` · `--ds-text-information` · `--ds-text-inverse` · `--ds-text-subtle` · `--ds-text-success` · `--ds-text-warning` · `--ds-text-warning-inverse` · `--pad-x-xs` · `--plus-count-min` · `--plus-count-size` · `--radius-full` · `--radius-md` · `--stroke-2`
+`--body-sm` · `--control-sm` · `--count-tag-dot-size` · `--count-tag-ring-width` · `--ds-background-competency-mastering-content` · `--ds-background-competency-mastering-content-bold` · `--ds-background-danger` · `--ds-background-danger-bold` · `--ds-background-information` · `--ds-background-information-bold` · `--ds-background-neutral` · `--ds-background-neutral-bold` · `--ds-background-success` · `--ds-background-success-bold` · `--ds-background-warning` · `--ds-background-warning-bold` · `--ds-icon-competency-mastering-content` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-surface` · `--ds-text` · `--ds-text-competency-mastering-content` · `--ds-text-danger` · `--ds-text-information` · `--ds-text-inverse` · `--ds-text-subtle` · `--ds-text-success` · `--ds-text-warning` · `--ds-text-warning-inverse` · `--pad-x-xs` · `--plus-count-min` · `--plus-count-size` · `--radius-full` · `--radius-md`
 
 From `design-system/src/components/labels/CountTag/CountTag.scss`. Override these through the token layer, never with a literal.
 
