@@ -53,7 +53,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Session structure</Heading>
+                <Heading as="h3" size="sm">Session structure</Heading>
                 <p style={captionStyle}>
                     Click an inner ring to drill into a university partner and its school sites.
                 </p>

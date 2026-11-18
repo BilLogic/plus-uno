@@ -25,7 +25,9 @@
  *   prop:style|fill|size   lines with the retired prop values: `style="primary"`
  *                    (a bare identifier, which no inline CSS is), `fill="filled"`,
  *                    `size="small|medium|large|sm|md|lg"`. A `<Heading>`'s size is the type
- *                    scale (xxlarge to xxsmall), current vocabulary, so it is exempt.
+ *                    scale (`xxl|xl|lg|md|sm|xs|xxs`), so those token names are allowed on
+ *                    `<Heading>` while its old words (`xxlarge|xlarge|large|medium|small|xsmall|xxsmall`)
+ *                    are flagged; on any other tag `small|medium|large|sm|md|lg` stay flagged.
  *   proptype:size    lines declaring `size: PropTypes.oneOf(['small', ...])`, the prop-type
  *                    side of `prop:size`: a component that declares the old vocabulary
  *                    never writes it as JSX, so only the declaration shows it.
@@ -124,25 +126,38 @@ const LINE_RULES = [
 ];
 
 /**
- * Components whose `size` is the type scale (xxlarge to xxsmall), the current
- * vocabulary, not the retired small / medium / large control sizes.
+ * Components whose `size` is the type scale (`xxl|xl|lg|md|sm|xs|xxs`), not
+ * the retired `small | medium | large | sm | md | lg` control sizes.
  */
 const TYPE_SCALE_TAGS = new Set(['Heading']);
+const TYPE_SCALE_TOKENS = new Set(['xxl', 'xl', 'lg', 'md', 'sm', 'xs', 'xxs']);
+const TYPE_SCALE_OLD_SIZE = /\bsize="(?:xxlarge|xlarge|large|medium|small|xsmall|xxsmall)"/g;
+
+/** Find the nearest `<Tag` before `index` on line `i` that no `>` has closed yet. */
+function tagOwner(lines, i, index) {
+  const prior = lines.slice(Math.max(0, i - 20), i).join('\n');
+  const head = `${prior}\n${lines[i].slice(0, index)}`;
+  const open = [...head.matchAll(/<([A-Za-z][\w.]*)/g)].pop();
+  if (!open || /(?<!=)>/.test(head.slice(open.index + 1))) return null;
+  return open[1];
+}
 
 /**
- * Is every retired `size="…"` on line `i` on a type-scale tag? Each one is
- * owned by the nearest `<Tag` before it that no `>` has closed yet.
+ * Is every `size="…"` on line `i` an allowed token-named size (`xxl` to `xxs`)
+ * on a type-scale tag, with no retired type-scale words (`xxlarge` to `xxsmall`)
+ * on a type-scale tag?
  */
 function typeScaleSize(lines, i) {
-  const prior = lines.slice(Math.max(0, i - 20), i).join('\n');
   const line = lines[i];
-  const owner = (head) => {
-    const open = [...head.matchAll(/<([A-Za-z][\w.]*)/g)].pop();
-    if (!open || /(?<!=)>/.test(head.slice(open.index + 1))) return null;
-    return open[1];
-  };
-  const bad = [...line.matchAll(/\bsize="(?:small|medium|large|sm|md|lg)"/g)];
-  return bad.length > 0 && bad.every((m) => TYPE_SCALE_TAGS.has(owner(`${prior}\n${line.slice(0, m.index)}`)));
+  const oldOnTypeScale = [...line.matchAll(TYPE_SCALE_OLD_SIZE)].some((m) =>
+    TYPE_SCALE_TAGS.has(tagOwner(lines, i, m.index)),
+  );
+  if (oldOnTypeScale) return false;
+  const bad = [...line.matchAll(/\bsize="(small|medium|large|sm|md|lg)"/g)];
+  return (
+    bad.length > 0 &&
+    bad.every((m) => TYPE_SCALE_TAGS.has(tagOwner(lines, i, m.index)) && TYPE_SCALE_TOKENS.has(m[1]))
+  );
 }
 
 /** An import statement that binds `name`; capture 1 is where it comes from. */
@@ -193,7 +208,13 @@ export function measure(sources) {
     }
     const live = text.split('\n').map((l) => (ALLOWED_LINE.test(l) ? '' : l));
     for (const [rule, re] of LINE_RULES) {
-      const hits = live.flatMap((l, i) => (re.test(l) && !(rule === 'prop:size' && typeScaleSize(live, i)) ? [i + 1] : []));
+      const hits = live.flatMap((l, i) => {
+        if (rule !== 'prop:size') return re.test(l) ? [i + 1] : [];
+        const hasOldTypeScale = [...l.matchAll(TYPE_SCALE_OLD_SIZE)].some((m) =>
+          TYPE_SCALE_TAGS.has(tagOwner(live, i, m.index)),
+        );
+        return (re.test(l) || hasOldTypeScale) && !typeScaleSize(live, i) ? [i + 1] : [];
+      });
       add(rule, file, hits.length, hits[0]);
     }
     // `size: PropTypes.oneOf(SIZES)` with `const SIZES = ['sm', ...]` in the same file.

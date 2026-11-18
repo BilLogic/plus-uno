@@ -14,7 +14,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--layout-height-topbar)"
+        "WEB": "var(--frame-topbar-height)"
       },
       "valuesByMode": {
         "19378:1": {
@@ -45,7 +45,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--layout-width-sidebar)"
+        "WEB": "var(--frame-sidebar-width)"
       },
       "valuesByMode": {
         "19378:1": {
@@ -96,7 +96,7 @@
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--layout-gutter)"
+        "WEB": "var(--grid-gutter)"
       },
       "valuesByMode": {
         "19378:1": {
@@ -127,7 +127,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--layout-width-column)"
+        "WEB": "var(--grid-width-column)"
       },
       "valuesByMode": {
         "19378:1": 45.33333206176758,
@@ -149,7 +149,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--layout-max-width-content)"
+        "WEB": "var(--content-max-width)"
       },
       "valuesByMode": {
         "19378:1": {
@@ -180,7 +180,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--layout-max-width-reading)"
+        "WEB": "var(--content-max-width-reading)"
       },
       "valuesByMode": {
         "19378:1": {
@@ -211,7 +211,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--layout-min-width-content)"
+        "WEB": "var(--content-min-width)"
       },
       "valuesByMode": {
         "19378:1": {
@@ -242,7 +242,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--layout-width-content)"
+        "WEB": "var(--content-width)"
       },
       "valuesByMode": {
         "19378:1": 720,
@@ -264,7 +264,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--layout-width-modal-sm)"
+        "WEB": "var(--modal-width-sm)"
       },
       "valuesByMode": {
         "19378:1": 384,
@@ -286,7 +286,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--layout-width-modal-md)"
+        "WEB": "var(--modal-width-md)"
       },
       "valuesByMode": {
         "19378:1": 507,
@@ -308,7 +308,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--layout-width-modal-lg)"
+        "WEB": "var(--modal-width-lg)"
       },
       "valuesByMode": {
         "19378:1": 629,
@@ -454,7 +454,7 @@
         "CORNER_RADIUS"
       ],
       "codeSyntax": {
-        "WEB": "var(--page-radius)"
+        "WEB": "var(--radius-lg)"
       },
       "valuesByMode": {
         "19378:1": {
@@ -485,7 +485,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--layout-width-screen)"
+        "WEB": "var(--screen-width)"
       },
       "valuesByMode": {
         "19378:1": 768,
@@ -507,7 +507,7 @@
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--layout-pad-x-screen)"
+        "WEB": "var(--screen-pad-x)"
       },
       "valuesByMode": {
         "19378:1": {
@@ -538,7 +538,7 @@
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--layout-columns)"
+        "WEB": "var(--grid-columns)"
       },
       "valuesByMode": {
         "19378:1": 12,
@@ -560,7 +560,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--layout-min-width-screen)"
+        "WEB": "var(--screen-min-width)"
       },
       "valuesByMode": {
         "19378:1": 768,
@@ -582,7 +582,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--layout-max-width-screen)"
+        "WEB": "var(--screen-max-width)"
       },
       "valuesByMode": {
         "19378:1": 1023,
@@ -605,7 +605,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--layout-width-column-screen)"
+        "WEB": "var(--grid-width-column-screen)"
       },
       "valuesByMode": {
         "19378:1": 45.33333206176758,

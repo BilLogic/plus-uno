@@ -491,7 +491,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
         <div style={{ width: '100%' }}>
             <PageHeader
                 disableTitleStyles
-                title={<Heading size="small" as="div">Upcoming sessions</Heading>}
+                title={<Heading size="sm" as="div">Upcoming sessions</Heading>}
                 actions={<Button spacing="compact" onClick={NOOP}>Schedule</Button>}
             />
         </div>

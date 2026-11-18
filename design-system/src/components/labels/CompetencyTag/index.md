@@ -12,7 +12,7 @@ Also asked as: skill tag.
 
 **Source:** `design-system/src/components/labels/CompetencyTag/CompetencyTag.jsx`
 
-**Stories:** `design-system/src/components/labels/CompetencyTag/CompetencyTag.stories.jsx` — Overview, CustomLabel, PassesThroughTagProps, UnknownSubjectFallsBack, Interactive, Rest, Hovered, Pressed, Focused, Disabled
+**Stories:** `design-system/src/components/labels/CompetencyTag/CompetencyTag.stories.jsx` — Overview, CustomLabel, PassesThroughTagProps, UnknownSubjectFallsBack, BesideHeading, Interactive, Rest, Hovered, Pressed, Focused, Disabled
 
 **Storybook page:** `design-system/src/components/labels/CompetencyTag/CompetencyTag.mdx`
 
@@ -106,8 +106,8 @@ Same group: `AiMessage` · `ChangeTag` · `CountTag` · `DateTag` · `PromptStar
 | Hovered, pressed | `--ds-background-accent-orange-subtlest` and `--ds-background-accent-orange-subtlest-pressed`. |
 | Selected | `--ds-background-accent-orange-subtler` with a `--ds-border-accent-orange` edge. |
 | Disabled | `--ds-background-disabled` with `--ds-text-disabled`. |
-| Subject icon | `--icon-sm`, matching Tag's 12 text. |
-| Height | 22, as Tag. |
+| Subject icon | `--icon-sm` (12) at default, matching Tag's 12 text; `--icon-md` (16) when spacious. |
+| Height | `--label-height-md` (20), or `--control-md` (32) when spacious. |
 
 ## Content guidelines
 
@@ -122,18 +122,22 @@ Same group: `AiMessage` · `ChangeTag` · `CountTag` · `DateTag` · `PromptStar
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `subject` | enum | — | The competency area. Fixes the Tag color and the leading icon. |
+| `spacing` | enum | `'default'` | `default` (20) in rows, lists and sentences; `spacious` (32) beside a heading. |
 | `children` | node | — | The label (alternative to `text`). Defaults to the subject's own name. |
 | `text` | string | — | The label (alternative to `children`). Defaults to the subject's own name. |
+| `className` | string | `''` | Extra class on the tag element. |
 
 ## Variants
 
 **`subject`** — `social-emotional` · `mastering-content` · `advocacy` · `relationship` · `technology-tools` · `socio-emotional` · `relationships`
 
+**`spacing`** — `default` · `spacious`
+
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
-`--icon-sm`
+`--body-default` · `--icon-md` · `--icon-sm` · `--pad-x-md` · `--radius-control-md` · `--tag-gap`
 
 From `design-system/src/components/labels/CompetencyTag/CompetencyTag.scss`. Override these through the token layer, never with a literal.
 

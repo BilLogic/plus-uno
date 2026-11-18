@@ -45,7 +45,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Single measure and status gauges</Heading>
+                <Heading as="h3" size="sm">Single measure and status gauges</Heading>
                 <p style={captionStyle}>
                     A single measure uses the brand chart token by default; status tokens pair with a status label.
                 </p>

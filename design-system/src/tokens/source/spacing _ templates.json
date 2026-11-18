@@ -117,7 +117,7 @@
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--card-pad-sm)"
+        "WEB": "var(--card-pad-compact)"
       },
       "valuesByMode": {
         "19378:4": {
@@ -138,7 +138,7 @@
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--card-pad-md)"
+        "WEB": "var(--card-pad-default)"
       },
       "valuesByMode": {
         "19378:4": {
@@ -159,7 +159,7 @@
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--card-pad-lg)"
+        "WEB": "var(--card-pad-spacious)"
       },
       "valuesByMode": {
         "19378:4": {
@@ -390,7 +390,7 @@
         "CORNER_RADIUS"
       ],
       "codeSyntax": {
-        "WEB": "var(--card-radius-sm)"
+        "WEB": "var(--card-radius-compact)"
       },
       "valuesByMode": {
         "19378:4": {
@@ -495,7 +495,7 @@
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--overlay-pad-x)"
+        "WEB": "var(--blanket-pad-x)"
       },
       "valuesByMode": {
         "19378:4": {
@@ -516,7 +516,7 @@
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--overlay-pad-y)"
+        "WEB": "var(--blanket-pad-y)"
       },
       "valuesByMode": {
         "19378:4": {
@@ -915,7 +915,7 @@
         "CORNER_RADIUS"
       ],
       "codeSyntax": {
-        "WEB": "var(--popup-radius-menu-sm)"
+        "WEB": "var(--popup-radius)"
       },
       "valuesByMode": {
         "19378:4": {
@@ -936,7 +936,7 @@
         "CORNER_RADIUS"
       ],
       "codeSyntax": {
-        "WEB": "var(--popup-radius-menu-md)"
+        "WEB": "var(--popup-radius)"
       },
       "valuesByMode": {
         "19378:4": {
@@ -999,7 +999,7 @@
         "CORNER_RADIUS"
       ],
       "codeSyntax": {
-        "WEB": "var(--tooltip-radius)"
+        "WEB": "var(--radius-control-sm)"
       },
       "valuesByMode": {
         "19378:4": {
@@ -1146,7 +1146,7 @@
         "CORNER_RADIUS"
       ],
       "codeSyntax": {
-        "WEB": "var(--tile-radius-lg)"
+        "WEB": "var(--radius-control-lg)"
       },
       "valuesByMode": {
         "19378:4": {

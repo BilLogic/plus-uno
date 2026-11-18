@@ -72,7 +72,7 @@ export const PanelHeader = ({ backAction, titleIcon, title, actions, className, 
     <header className={clsx('plus-panel-header', className)} {...props}>
         {backAction && <div className="plus-panel-header-back">{backAction}</div>}
         {titleIcon && <div className="plus-panel-header-icon">{titleIcon}</div>}
-        <div className="plus-panel-header-title"><Heading size="xsmall">{title}</Heading></div>
+        <div className="plus-panel-header-title"><Heading size="xs">{title}</Heading></div>
         {actions && <PanelActionGroup className="plus-panel-header-actions">{actions}</PanelActionGroup>}
     </header>
 );

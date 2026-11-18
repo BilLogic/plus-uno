@@ -126,7 +126,7 @@ Same group: `Accordion` · `Carousel` · `Panel` · `ScrollBar`
 
 | Part | Token |
 | --- | --- |
-| Title | `Heading` at `large` (24/28); see Best practices for heading level. |
+| Title | `Heading` at `lg` (24/28); see Best practices for heading level. |
 | Rows | `--space-100` between breadcrumbs, title row and bottom bar. |
 | Title row | `--space-150` between the title and its actions; `--space-075` between actions. |
 | Breadcrumbs | `--body-sm`. |
@@ -143,7 +143,7 @@ Same group: `Accordion` · `Carousel` · `Panel` · `ScrollBar`
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `title` | node | — | The page title. Drawn as a `large` `Heading` (at the ambient heading level, `h1` by default) unless `disableTitleStyles` is set. `children` is used when it is omitted. |
+| `title` | node | — | The page title. Drawn as a `lg` `Heading` (at the ambient heading level, `h1` by default) unless `disableTitleStyles` is set. `children` is used when it is omitted. |
 | `children` | node | — | `children` is the title when `title` is not given. |
 | `breadcrumbs` | node | — | A breadcrumb trail shown above the title row. Pass a `Breadcrumb`. |
 | `actions` | node | — | Controls shown at the end of the title row, such as a primary button or a menu. |

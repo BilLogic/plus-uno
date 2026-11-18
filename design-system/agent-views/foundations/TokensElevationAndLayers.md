@@ -10,6 +10,6 @@ Shadow and opacity for how high a surface sits, and the layer order for what sta
 
 ## Overview
 
-Elevation is shown by shadow and surface color ([Elevation](?path=/docs/foundations-visual-elevation--docs)); layers decide stacking. Opacity steps live here too.
+Elevation is shown by shadow and surface color ([Elevation](?path=/docs/foundations-visual-elevation-overview--docs)); layers decide stacking. Opacity steps live here too.
 
 ## Related

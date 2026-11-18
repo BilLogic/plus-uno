@@ -13,7 +13,7 @@
         "SHAPE_FILL"
       ],
       "codeSyntax": {
-        "WEB": "var(--overlay-scrim)"
+        "WEB": "var(--blanket-fill)"
       },
       "valuesByMode": {
         "19378:5": {

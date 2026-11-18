@@ -46,7 +46,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Subject enrollment trends</Heading>
+                <Heading as="h3" size="sm">Subject enrollment trends</Heading>
                 <p style={captionStyle}>
                     Shows how enrollment across subjects shifts from month to month.
                 </p>

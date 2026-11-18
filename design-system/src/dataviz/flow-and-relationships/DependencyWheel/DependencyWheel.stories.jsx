@@ -46,7 +46,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Skill interconnections</Heading>
+                <Heading as="h3" size="sm">Skill interconnections</Heading>
                 <p style={captionStyle}>
                     How reading, writing and math skills reinforce each other across tutoring sessions.
                 </p>

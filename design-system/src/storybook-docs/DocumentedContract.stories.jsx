@@ -410,6 +410,7 @@ export const ComponentsSetTheirOwnType = {
       { name: 'DateTag', props: { date: 'Nov 15', spacing: 'spacious' }, selector: '.plus-date-tag', expected: bodyDefault },
       { name: 'ChangeTag', props: { value: 3 }, selector: '.plus-change-tag', expected: bodySm },
       { name: 'CompetencyTag', props: { text: 'Algebra', subject: 'mastering-content' }, selector: '.plus-tag', expected: bodySm },
+      { name: 'CompetencyTag', props: { text: 'Algebra', subject: 'mastering-content', spacing: 'spacious' }, selector: '.plus-tag', expected: bodyDefault },
       { name: 'Suggestion', props: { label: 'Summarize notes' }, selector: '.plus-suggestion', expected: bodySm },
       { name: 'Avatar', props: { name: 'Ada Lovelace' }, selector: '.plus-avatar', expected: headingXs },
       { name: 'Button', props: { children: 'Save' }, selector: '.plus-btn', expected: bodyDefaultMedium },

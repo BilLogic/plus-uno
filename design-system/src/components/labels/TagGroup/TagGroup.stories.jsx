@@ -168,7 +168,7 @@ Collapse.play = async ({ canvasElement }) => {
     await waitFor(() => expectFits(canvasElement));
     const at300 = readCollapse(canvasElement).shown.length;
     await expect(at300, 'at 300 some tags are hidden').toBeLessThan(SUBJECTS.length);
-    await expect(px(getComputedStyle(readCollapse(canvasElement).list).height), 'one line').toBe(22);
+    await expect(px(getComputedStyle(readCollapse(canvasElement).list).height), 'one line').toBe(20);
 
     // Wider: more tags show, and +n counts fewer.
     frame.style.width = '480px';
@@ -588,7 +588,7 @@ OverflowTag.play = async ({ canvasElement }) => {
     await expect(more).toHaveAttribute('aria-expanded', 'false');
     await expect(more, 'a menu button, not a toggle').not.toHaveAttribute('aria-pressed');
     await expect(more.textContent).toBe('+5');
-    await expect(px(getComputedStyle(more).height)).toBe(22);
+    await expect(px(getComputedStyle(more).height)).toBe(20);
 
     // No swatch: the label is the only thing inside, so the text starts at
     // the padding.

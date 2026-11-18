@@ -22,7 +22,7 @@ test('collections prefixed with "archived / " are skipped, and active collection
     'archived / size / primitive',
     'archived / size / semantics',
     'archived / spacing / layout',
-    'archived / color / patterns',
+    'archived / color / templates',
   ]) {
     assert.equal(ARCHIVED_COLLECTION.test(collection), true, collection);
   }

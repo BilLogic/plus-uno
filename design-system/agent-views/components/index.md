@@ -50,7 +50,7 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `Button disabled` | `Button isDisabled` |
 | `Button appearance="secondary"` | `Button appearance="default"` |
 | `Heading level` | `Heading as` (the level comes from the surrounding sections; set as only to override the element) |
-| `Heading size="sm" / "lg"` | `Heading size="small"`, `Heading size="large"` (sizes are words, xxsmall to xxlarge) |
+| `Heading size="small" / "large"` | `Heading size="sm"`, `Heading size="lg"` (sizes match the tokens, xxl to xxs) |
 
 **Tokens**
 

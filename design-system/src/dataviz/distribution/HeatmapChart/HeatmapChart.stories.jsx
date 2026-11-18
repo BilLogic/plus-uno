@@ -78,7 +78,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Session activity by hour</Heading>
+                <Heading as="h3" size="sm">Session activity by hour</Heading>
                 <p style={captionStyle}>
                     Sequential blue ramp across five weekdays; the strongest step marks the busiest hour and cell labels use tabular figures.
                 </p>
@@ -86,7 +86,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Topic mastery matrix</Heading>
+                <Heading as="h3" size="sm">Topic mastery matrix</Heading>
                 <p style={captionStyle}>
                     Sequential green ramp for mastery percentage across four units.
                 </p>
@@ -94,7 +94,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Diverging ramp around zero</Heading>
+                <Heading as="h3" size="sm">Diverging ramp around zero</Heading>
                 <p style={captionStyle}>
                     Two hues through neutral gray for values below and above a zero midpoint.
                 </p>
