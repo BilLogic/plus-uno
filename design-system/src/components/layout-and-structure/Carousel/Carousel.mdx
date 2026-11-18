@@ -18,12 +18,23 @@ export const DemoSlide = ({ children }) => (
     </div>
 );
 export const titled = [
-    { title: 'Prep a session in two minutes', description: "See a student's goals and your last notes before you join." },
-    { title: 'Reflect while it is fresh', description: 'Record what worked and what to try next time.' },
-    { title: 'Training between sessions', description: 'Lessons run ten minutes or less.' },
-].map((slide, k) => ({ ...slide, media: <DemoSlide>{`Feature ${k + 1}`}</DemoSlide> }));
+    { label: 'Session prep', title: 'Prep a session in two minutes', description: "See a student's goals and your last notes before you join." },
+    { label: 'Reflection', title: 'Reflect while it is fresh', description: 'Record what worked and what to try next time.' },
+    { label: 'Training', title: 'Training between sessions', description: 'Lessons run ten minutes or less.' },
+].map(({ label, ...slide }) => ({ ...slide, media: <DemoSlide>{label}</DemoSlide> }));
 export const untitled = titled.map(({ media }) => ({ media }));
-export const many = Array.from({ length: 10 }, (_, k) => ({ title: `Feature ${k + 1}`, media: <DemoSlide>{`Feature ${k + 1}`}</DemoSlide> }));
+export const many = [
+    'Session prep',
+    'Quick reflection',
+    'Ten-minute lessons',
+    'Skills profile',
+    'Weekly schedule',
+    'Warm-up ideas',
+    'Exit tickets',
+    'Call-off cover',
+    'Lead tutor notes',
+    'Term progress',
+].map((label) => ({ title: label, media: <DemoSlide>{label}</DemoSlide> }));
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",

@@ -58,7 +58,7 @@ export const PageItem = ({ text, href, isCurrent }) => (
     </nav>
 );
 PageItem.args = {
-    text: 'Page Title',
+    text: 'Lesson plans',
     href: '#',
     isCurrent: false,
 };
