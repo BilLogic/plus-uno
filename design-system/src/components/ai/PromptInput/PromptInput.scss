@@ -36,7 +36,7 @@
 // The box pads 4 around the 32 button; the text area pads itself 6 so a line of
 // text centers in that 32.
 .plus-prompt-input .plus-prompt-input__field.plus-field--multiline {
-    min-height: var(--height-250);
+    min-height: var(--prompt-input-min-height);
     padding-block: calc(var(--pad-x-xs) - var(--border-width-default));
 }
 

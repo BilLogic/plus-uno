@@ -2,12 +2,11 @@
 
 # Labels
 
-10 components. Each row links to the generated facts; the three columns after it are the
+7 components. Each row links to the generated facts; the three columns after it are the
 authored half, counted rather than assumed.
 
 ## Which component to reach for
 
-- **[AiMessage](AiMessage/index.md)** — Use `AiMessage` for every AI reply, in chat, a panel or elsewhere. Choose its status from the table below.
 - **[ChangeTag](ChangeTag/index.md)** — Use `ChangeTag` beside a number to say how it moved since the last period: in a card header, a table cell or a chart tooltip. For the number itself, use plain text.
   - For a count on its own, use `CountTag`.
   - For the condition something is in, use `StatusTag`.
@@ -24,13 +23,11 @@ authored half, counted rather than assumed.
   - For a workflow condition such as "Completed" or "Needs review", use `StatusTag`.
   - For a category or subject or person, use `Tag`.
   - For a numeric count, use `CountTag`.
-- **[PromptStarters](PromptStarters/index.md)** — Use `PromptStarters` before a person types into an empty chat, new reflection or blank prompt field. For a single follow-up during a conversation, use `Suggestion`.
 - **[StatusTag](StatusTag/index.md)** — Use `StatusTag` for the condition something is in when that condition can change: completed, needs review, missed, in progress. It is the same component whether the system calculated the state or a person set it.
   - For a number on its own, use `CountTag`.
   - For a due or event date, use `DateTag`.
   - For a change over time such as "+3 vs last week", use `ChangeTag`.
   - For a category or subject or person, use `Tag` or `CompetencyTag`.
-- **[Suggestion](Suggestion/index.md)** — Use `Suggestion` when the system proposes a value and a person decides whether to take it: an AI-suggested focus area beside the ones already chosen, or a suggested question beside a chat box. Put it in the row where the accepted value will land, after the tags already there.
 - **[Tag](Tag/index.md)** — Use `Tag` for a subject, a focus area, a person, an agent, a team or a category. A tag is outlined and a status is filled, so a reader tells a category from a workflow state without reading the words.
   - For one of the five competency areas, use `CompetencyTag`.
   - For the condition something is in when that condition can change, use `StatusTag`.
@@ -44,18 +41,15 @@ authored half, counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
-| [AiMessage](AiMessage/index.md) | 11 | ✅ | ✅ | ✅ |
 | [ChangeTag](ChangeTag/index.md) | 7 | ✅ | ✅ | ✅ |
 | [CompetencyTag](CompetencyTag/index.md) | 5 | ✅ | ✅ | ✅ |
 | [CountTag](CountTag/index.md) | 11 | ✅ | ✅ | ✅ |
 | [DateTag](DateTag/index.md) | 6 | ✅ | ✅ | ✅ |
-| [PromptStarters](PromptStarters/index.md) | 4 | ✅ | ✅ | ✅ |
 | [StatusTag](StatusTag/index.md) | 9 | ✅ | ✅ | ✅ |
-| [Suggestion](Suggestion/index.md) | 9 | ✅ | ✅ | ✅ |
 | [Tag](Tag/index.md) | 22 | ✅ | ✅ | ✅ |
 | [TagGroup](TagGroup/index.md) | 10 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 10/10 (100%) · Correct/incorrect 10/10 (100%) · Accessibility 10/10 (100%)
+**Authored coverage:** When to use 7/7 (100%) · Correct/incorrect 7/7 (100%) · Accessibility 7/7 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

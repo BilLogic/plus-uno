@@ -107,7 +107,7 @@ warning · danger).
 - `CountTag`: use when nesting a metric inside `StatusTag` through `trailingMetric`.
 - `Select`: use when letting a person change a record's status in a form or table cell.
 
-Same group: `AiMessage` · `ChangeTag` · `CompetencyTag` · `CountTag` · `DateTag` · `PromptStarters` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `ChangeTag` · `CompetencyTag` · `CountTag` · `DateTag` · `Tag` · `TagGroup`
 
 ## Parts
 

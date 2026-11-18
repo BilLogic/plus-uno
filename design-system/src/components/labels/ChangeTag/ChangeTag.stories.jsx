@@ -39,7 +39,7 @@ export default {
     },
 };
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--grid-gutter)', alignItems: 'center' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-xl) var(--inline-xl)', alignItems: 'center' };
 
 /** [fill, text, inside border] per tone. */
 const TONE_LOOK = {

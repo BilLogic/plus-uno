@@ -177,6 +177,9 @@
     /* AI chat */
     --ai-chat-width: var(--width-2500);
 
+    /* Prompt input */
+    --prompt-input-min-height: var(--height-250);
+
     /* Inbox */
     --inbox-width: calc(var(--width-2000) + var(--space-250)); /* 360px */
 

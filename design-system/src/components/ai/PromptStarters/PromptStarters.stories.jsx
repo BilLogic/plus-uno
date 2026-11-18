@@ -87,7 +87,7 @@ EmptyRendersNothing.play = async ({ canvasElement }) => {
 export const FillsThePromptInput = () => {
     const [value, setValue] = useState('');
     return (
-        <div style={{ ...wrap, display: 'flex', flexDirection: 'column', gap: 'var(--grid-gutter)' }}>
+        <div style={{ ...wrap, display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
             <PromptInput label="Message to AI chat" value={value} onChange={(e) => setValue(e.target.value)} onSubmit={fn()} />
             <PromptStarters
                 label="Suggested prompts"

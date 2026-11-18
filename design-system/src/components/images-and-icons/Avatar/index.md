@@ -83,7 +83,7 @@ Don't: A dot on a tiny byline, where presence is not the question.
 - `Sidebar`: use when showing the signed-in person with a name and role in the account row.
 - `Tile`: use when framing a school, tool or lesson in a square.
 
-Same group: `AiIcon` · `AvatarGroup` · `Icon` · `Illustration` · `Image` · `Object` · `Tile`
+Same group: `AvatarGroup` · `Icon` · `Illustration` · `Image` · `Object` · `Tile`
 
 ## Parts
 

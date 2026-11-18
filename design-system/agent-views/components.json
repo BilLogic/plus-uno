@@ -382,8 +382,8 @@
       "name": "AiIcon",
       "kind": "component",
       "import": "import { AiIcon } from '@/components';",
-      "group": "images-and-icons",
-      "source": "design-system/src/components/images-and-icons/AiIcon/AiIcon.jsx",
+      "group": "ai",
+      "source": "design-system/src/components/ai/AiIcon/AiIcon.jsx",
       "summary": "An icon for an AI action: generate, ask, rewrite, summarize, plan, suggest or stop generating. Each icon with a sparkle mark is a Font Awesome Free glyph with one four-point sparkle in its top-right corner and a clean gap cut around it. Generate is the sparkle alone, and stop generating has none because stopping is not generative. - **name** picks the icon. - **size** is 16 (the default) or 24. Generate and stop generating also have 12. Asking another icon for 12 draws it at 16 and warns. - **label** names the icon for assistive technology. Without it the icon is hidden, so pair it with visible text. The shapes fill with `currentColor`, which starts at the icon color; set `color` to change it. Pair every icon with a label unless its meaning is obvious.",
       "props": [
         {
@@ -463,8 +463,8 @@
       "name": "AiMessage",
       "kind": "component",
       "import": "import { AiMessage } from '@/components';",
-      "group": "labels",
-      "source": "design-system/src/components/labels/AiMessage/AiMessage.jsx",
+      "group": "ai",
+      "source": "design-system/src/components/ai/AiMessage/AiMessage.jsx",
       "summary": "An assistant reply, marked as AI by the small AI icon at its start (named \"AI\" for assistive technology), so no answer reads as a person's. Text is Markdown: paragraphs, lists, headings, code, bold, italic and links. The content is `text`, or `parts` when a reply mixes text with other content: a part is `{ type: 'text', text }` or any other `{ type, ... }`, which `renderPart` draws. - `status=\"complete\"` is a finished message. - `status=\"streaming\"` is text still arriving: a caret follows the last character and the message is marked busy for assistive technology. - `status=\"thinking\"` is the typing indicator, before any text exists. `sources` lists what a finished answer read, folded under the message behind one toggle: the answer links what it names in its own text, so the list is there to check, not to read. `onFeedback` puts thumbs up and down under a finished answer; `feedback` holds the rating when the page owns it.",
       "props": [
         {
@@ -6595,8 +6595,8 @@
       "name": "GenerativeBorder",
       "kind": "component",
       "import": "import { GenerativeBorder } from '@/components';",
-      "group": "loading",
-      "source": "design-system/src/components/loading/GenerativeBorder/GenerativeBorder.jsx",
+      "group": "ai",
+      "source": "design-system/src/components/ai/GenerativeBorder/GenerativeBorder.jsx",
       "summary": "The border that shows the AI is generating content: a 2px rounded stroke in two flat colors, in hard-edged segments that run clockwise around the edge. - **isActive** shows the ring and sets `aria-busy` on the wrapper. Off, the children render inside the wrapper with no ring at all. - **radius** names the radius token the ring follows; match the content it wraps. Defaults to `radius-xxl`. The segments turn slowly while active. The ring is decorative and hidden from assistive technology; `aria-busy` is what says content is changing. Under reduced motion the same segments hold still. Use it only while generating, one ring per piece of content. Do not nest two.",
       "props": [
         {
@@ -11242,8 +11242,8 @@
       "name": "PromptInput",
       "kind": "component",
       "import": "import { PromptInput } from '@/components';",
-      "group": "forms-and-inputs",
-      "source": "design-system/src/components/forms-and-inputs/PromptInput/PromptInput.jsx",
+      "group": "ai",
+      "source": "design-system/src/components/ai/PromptInput/PromptInput.jsx",
       "summary": "Where a person writes to the AI: a text area that grows from one line up to five, then scrolls, with an optional control before the text and one send action after it. - **value / defaultValue / onChange** control or seed the text. Uncontrolled, the field clears itself after a send; controlled, the owner clears it in `onSubmit`. - **onSubmit(value)** runs on Enter or the send button, with the text as typed. Shift+Enter starts a new line. Nothing sends while the field is empty, disabled, loading, or an input method is mid-composition. - **isLoading** turns the send button into Stop (`onStop`) and rings the field in a `GenerativeBorder`. - **startSlot** is one quiet control before the text, such as an attach button. **attachments** renders a row of staged files above the text. **actions** is a slot for extra controls beside the send button. A PLUS composition of `FieldBox`, `IconButton` and `GenerativeBorder`.",
       "props": [
         {
@@ -11412,11 +11412,11 @@
       "tokens": [
         "--border-width-default",
         "--control-md",
-        "--height-250",
         "--pad-x-md",
         "--pad-x-xs",
         "--pad-y-md",
         "--plus-prompt-input-max-height",
+        "--prompt-input-min-height",
         "--stack-md",
         "--stack-sm",
         "--type-line-height-125"
@@ -11426,8 +11426,8 @@
       "name": "PromptStarters",
       "kind": "component",
       "import": "import { PromptStarters } from '@/components';",
-      "group": "labels",
-      "source": "design-system/src/components/labels/PromptStarters/PromptStarters.jsx",
+      "group": "ai",
+      "source": "design-system/src/components/ai/PromptStarters/PromptStarters.jsx",
       "summary": "A few things a person could ask the AI, as a wrapping row of prompt `Suggestion` tags. - **starters** are `{ id, label, text }`: the short `label` on the tag and the longer `text` it stands for. - **onSelect(starter)** runs when a tag is pressed, with the whole starter and nothing else. A starter suggests; it never sends on its own, so the caller decides what happens — usually putting `text` in a `PromptInput` for a person to read and send. - **label** names the group for assistive technology.",
       "props": [
         {
@@ -14795,8 +14795,8 @@
       "name": "Suggestion",
       "kind": "component",
       "import": "import { Suggestion } from '@/components';",
-      "group": "labels",
-      "source": "design-system/src/components/labels/Suggestion/Suggestion.jsx",
+      "group": "ai",
+      "source": "design-system/src/components/ai/Suggestion/Suggestion.jsx",
       "summary": "Suggestion: a tag for a value or question the system proposes, which a person accepts or leaves.",
       "props": [
         {

@@ -173,7 +173,7 @@ and every tag inside follows:
 - `CompetencyTag`: use when tagging one of the five competency areas.
 - `Suggestion`: use when offering proposed tags for the person to accept.
 
-Same group: `AiMessage` · `ChangeTag` · `CompetencyTag` · `CountTag` · `DateTag` · `PromptStarters` · `StatusTag` · `Suggestion` · `TagGroup`
+Same group: `ChangeTag` · `CompetencyTag` · `CountTag` · `DateTag` · `StatusTag` · `TagGroup`
 
 ## Parts
 

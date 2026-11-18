@@ -6,11 +6,11 @@ The border that shows the AI is generating content: a 2px rounded stroke in two 
 
 **Import:** `import { GenerativeBorder } from '@/components';`
 
-**Source:** `design-system/src/components/loading/GenerativeBorder/GenerativeBorder.jsx`
+**Source:** `design-system/src/components/ai/GenerativeBorder/GenerativeBorder.jsx`
 
-**Stories:** `design-system/src/components/loading/GenerativeBorder/GenerativeBorder.stories.jsx` — Idle, Generating, ReducedMotion, Radii, Interactive, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/ai/GenerativeBorder/GenerativeBorder.stories.jsx` — Idle, Generating, ReducedMotion, Radii, Interactive, Rest, Hovered, Pressed, Focused
 
-**Storybook page:** `design-system/src/components/loading/GenerativeBorder/GenerativeBorder.mdx`
+**Storybook page:** `design-system/src/components/ai/GenerativeBorder/GenerativeBorder.mdx`
 
 **Motion:** change `linear` · pulse `loop`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
@@ -65,7 +65,7 @@ Don't: Two rings nested around the same content.
 - For the icons that start an AI action, use `AiIcon`.
 - For a general wait, use `Spinner`, `Skeleton` or `ProgressBar`.
 
-Same group: `ProgressBar` · `ProgressRing` · `Skeleton` · `Spinner`
+Same group: `AiIcon` · `AiMessage` · `PromptInput` · `PromptStarters` · `Suggestion`
 
 ## Parts
 
@@ -120,6 +120,6 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 `--border-width-selected` · `--ds-border-brand` · `--ds-border-discovery` · `--ds-motion-loop` · `--ds-motion-loop-duration` · `--generative-border-angle` · `--generative-border-radius` · `--generative-border-rest` · `--generative-border-width`
 
-From `design-system/src/components/loading/GenerativeBorder/GenerativeBorder.scss`. Override these through the token layer, never with a literal.
+From `design-system/src/components/ai/GenerativeBorder/GenerativeBorder.scss`. Override these through the token layer, never with a literal.
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

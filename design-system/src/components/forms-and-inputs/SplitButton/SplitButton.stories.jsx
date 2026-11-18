@@ -6,7 +6,7 @@ import SplitButton from './SplitButton';
 import { expectFocusRing, expectHovered, expectPressed } from '@/storybook-docs/lib/button-states.js';
 import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--grid-gutter)', alignItems: 'center' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-xl) var(--inline-xl)', alignItems: 'center' };
 const title = (name) => name.charAt(0).toUpperCase() + name.slice(1);
 const chevronDown = <Icon name="chevron-down" size={12} />;
 

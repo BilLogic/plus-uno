@@ -314,6 +314,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Popup | `--popup-max-width` |  |
 | Popup | `--popup-clip-reach` |  |
 | AI chat | `--ai-chat-width` |  |
+| Prompt input | `--prompt-input-min-height` |  |
 | Inbox | `--inbox-width` | 360px |
 | Table | `--table-cell-max-width` |  |
 | Table | `--table-message-gap` |  |

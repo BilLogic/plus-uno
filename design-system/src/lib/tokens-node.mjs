@@ -359,6 +359,8 @@ export const FAMILIES = [
   { family: 'flag', prefix: '--flag-', what: 'the Flag minimum height, pad and offset' },
   { family: 'spotlight', prefix: '--spotlight-', what: 'the Spotlight media height' },
   { family: 'ai-chat', prefix: '--ai-chat-', what: 'the AI chat width' },
+  { family: 'ai-message', prefix: '--ai-message-', what: 'the AiMessage streaming caret width and typing-dot size' },
+  { family: 'prompt-input', prefix: '--prompt-input-', what: 'the PromptInput text area minimum height' },
   { family: 'inbox', prefix: '--inbox-', what: 'the Inbox Panel width' },
   { family: 'menu-group', prefix: '--menu-group-', what: 'Menu group minimum width' },
   { family: 'popup', prefix: '--popup-', what: 'the Popup pad' },
@@ -375,7 +377,6 @@ export const FAMILIES = [
   { family: 'date-time-picker', prefix: '--date-time-picker-', what: 'the DateTimePicker section gap' },
   { family: 'rating', prefix: '--rating-', what: 'the Rating star gap' },
   { family: 'rich-text-editor', prefix: '--rich-text-editor-', what: 'the RichTextEditor maximum width' },
-  { family: 'ai-message', prefix: '--ai-message-', what: 'the AI message caret and dot sizes' },
   { family: 'comment', prefix: '--comment-', what: 'Comment pad, gap and the reply stack and indent' },
   { family: 'progress-tracker', prefix: '--progress-tracker-', what: 'the ProgressTracker connector width and dot size' },
 ];

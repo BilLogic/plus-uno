@@ -6,9 +6,6 @@
         "design-system/src/components/forms-and-inputs/DatePicker/DatePicker.scss": {
           "count": 1
         },
-        "design-system/src/components/forms-and-inputs/PromptInput/PromptInput.scss": {
-          "count": 1
-        },
         "design-system/src/components/forms-and-inputs/Select/Select.scss": {
           "count": 2
         },

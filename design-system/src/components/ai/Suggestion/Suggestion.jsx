@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useTagContext } from '../Tag';
+import { useTagContext } from '../../labels/Tag';
 import Icon from '../../images-and-icons/Icon';
 import './Suggestion.scss';
 

@@ -42,7 +42,7 @@ export default {
     },
 };
 
-const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--content-max-width-reading)' };
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--content-max-width-reading)' };
 
 const subjects = [
     { value: 'math', label: 'Math' },

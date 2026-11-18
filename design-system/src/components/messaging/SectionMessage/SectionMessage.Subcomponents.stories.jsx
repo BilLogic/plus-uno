@@ -49,7 +49,7 @@ export const ContentStructure = {
  * with a title, the first body line without.
  */
 export const DismissButton = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
         <SectionMessage appearance="primary" title="With a title">The × centers on the title line.</SectionMessage>
         <SectionMessage appearance="primary">Without a title the × centers on the first body line.</SectionMessage>
     </div>

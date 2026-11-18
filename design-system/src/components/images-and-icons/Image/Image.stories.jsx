@@ -15,7 +15,7 @@ export default {
 };
 
 export const Sizes = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
         {IMAGE_SIZES.map((size) => (
             <div key={size} style={{ width: '200px' /* token gap: 200px */ }}>
                 <Image src={sessionSummaryLight} alt="" size={size} testId={`image-${size}`} />

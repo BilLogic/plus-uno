@@ -30,7 +30,7 @@ const TARGETS = [
     'design-system/src/components/forms-and-inputs/Toggle/Toggle.scss',
     'design-system/src/components/forms-and-inputs/_internal/Calendar.scss',
     'design-system/src/components/forms-and-inputs/_internal/FieldBox.scss',
-    'design-system/src/components/labels/AiMessage/AiMessage.scss',
+    'design-system/src/components/ai/AiMessage/AiMessage.scss',
     'design-system/src/components/labels/CountTag/CountTag.scss',
     'design-system/src/components/labels/Tag/Tag.scss',
     'design-system/src/patterns/Modal/Modal.scss',

@@ -6,11 +6,11 @@ An icon for an AI action: generate, ask, rewrite, summarize, plan, suggest or st
 
 **Import:** `import { AiIcon } from '@/components';`
 
-**Source:** `design-system/src/components/images-and-icons/AiIcon/AiIcon.jsx`
+**Source:** `design-system/src/components/ai/AiIcon/AiIcon.jsx`
 
-**Stories:** `design-system/src/components/images-and-icons/AiIcon/AiIcon.stories.jsx` — AllIcons, CloseUp, Labeled, Color, Interactive, Rest
+**Stories:** `design-system/src/components/ai/AiIcon/AiIcon.stories.jsx` — AllIcons, CloseUp, Labeled, Color, Interactive, Rest
 
-**Storybook page:** `design-system/src/components/images-and-icons/AiIcon/AiIcon.mdx`
+**Storybook page:** `design-system/src/components/ai/AiIcon/AiIcon.mdx`
 
 ## Usage
 
@@ -49,7 +49,7 @@ Don't: The sparkle on an action that is not AI.
 - For any non-AI icon, use a Font Awesome Free glyph.
 - For the border that shows generation in progress, use `GenerativeBorder`.
 
-Same group: `Avatar` · `AvatarGroup` · `Icon` · `Illustration` · `Image` · `Object` · `Tile`
+Same group: `AiMessage` · `GenerativeBorder` · `PromptInput` · `PromptStarters` · `Suggestion`
 
 ## Parts
 
@@ -100,6 +100,6 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 `--ds-icon` · `--icon-lg` · `--icon-md` · `--icon-sm`
 
-From `design-system/src/components/images-and-icons/AiIcon/AiIcon.scss`. Override these through the token layer, never with a literal.
+From `design-system/src/components/ai/AiIcon/AiIcon.scss`. Override these through the token layer, never with a literal.
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

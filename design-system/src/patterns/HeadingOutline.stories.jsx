@@ -138,7 +138,7 @@ FlagTitle.play = async ({ canvasElement }) => {
 
 /** Group labels are 12 semibold: a menu group's label, and a table's column headers. */
 export const GroupLabels = () => (
-    <div style={{ display: 'flex', gap: 'var(--section-stack-lg)', alignItems: 'flex-start' }}>
+    <div style={{ display: 'flex', gap: 'var(--inline-2xl)', alignItems: 'flex-start' }}>
         <DropdownMenu isOpen trigger={<Button>Sort</Button>}>
             <Section title="Order">
                 <ButtonItem onClick={() => {}}>Newest</ButtonItem>

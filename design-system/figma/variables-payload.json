@@ -1482,6 +1482,13 @@
           }
         },
         {
+          "name": "Prompt/input-min-height",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--prompt-input-min-height)"
+          }
+        },
+        {
           "name": "Inbox/width",
           "resolvedType": "FLOAT",
           "codeSyntax": {

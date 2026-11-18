@@ -40,7 +40,7 @@ const Playground = ({ mod }) => {
 
 const Gallery = () => (
     <ChartMotionArea>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 'var(--stack-xl) var(--inline-xl)', color: 'var(--ds-text)' }}>
             <section data-chart="bar">
                 <h3 style={heading}>Bar, two series</h3>
                 <BarChart height={220} categories={['Grade 6', 'Grade 7', 'Grade 8']} series={[{ name: 'This term', data: [45, 72, 58] }, { name: 'Last term', data: [32, 55, 48] }]} />

@@ -61,7 +61,7 @@ Overview.parameters = {
 
 /** Rows: the field is 80 high at least, and `rows` grows it from there. */
 export const Rows = () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--section-stack-lg)', maxWidth: '1000px' /* token gap: 1000px */ }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--stack-2xl) var(--inline-2xl)', maxWidth: '1000px' /* token gap: 1000px */ }}>
         {[1, 3, 6].map((rows) => (
             <div key={rows}>
                 <DemoLabel>{rows === 1 ? '1 ROW' : `${rows} ROWS`}</DemoLabel>
@@ -83,7 +83,7 @@ Rows.play = async ({ canvasElement }) => {
 
 /** Spacing: the same 80 minimum, with 10 corners by default and 8 compact, like the single-line field beside it. */
 export const Spacing = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: '600px' /* token gap: 600px */ }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)', maxWidth: '600px' /* token gap: 600px */ }}>
         {['default', 'compact'].map((spacing) => (
             <div key={spacing}>
                 <DemoLabel>{spacing.toUpperCase()}</DemoLabel>

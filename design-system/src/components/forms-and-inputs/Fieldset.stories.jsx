@@ -25,7 +25,7 @@ export default {
     },
 };
 
-const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--size-3000)' };
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--size-3000)' };
 
 export const Default = () => (
     <Fieldset legend="Your details">
