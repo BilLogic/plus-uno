@@ -62,7 +62,7 @@ const expectInTree = async (el, name) => {
 /* ------------------------------------------------------------------ default */
 
 export const Overview = () => (
-    <p className="plus-body-1" style={{ margin: 0 }}>
+    <p style={{ margin: 0, font: 'var(--body-default)' }}>
         Order total: $42.00
         <VisuallyHidden>, including shipping</VisuallyHidden>
     </p>
@@ -107,7 +107,7 @@ NamesAControl.play = async ({ canvasElement }) => {
 /* ----------------------------------------------------------------- header cell */
 
 export const HiddenColumnHeaders = () => (
-    <table className="table" style={{ maxWidth: 420 }}>
+    <table className="table" style={{ maxWidth: '420px' /* token gap: 420px */ }}>
         <thead>
             <tr>
                 <th scope="col"><VisuallyHidden>Select</VisuallyHidden></th>
@@ -163,7 +163,7 @@ RoleAndId.play = async ({ canvasElement }) => {
 /* -------------------------------------------------------------- playground */
 
 export const Interactive = (args) => (
-    <p className="plus-body-1" style={{ margin: 0 }}>
+    <p style={{ margin: 0, font: 'var(--body-default)' }}>
         Visible text.
         <VisuallyHidden {...args} />
     </p>

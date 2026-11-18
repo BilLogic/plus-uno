@@ -50,13 +50,13 @@ export default {
     }
 };
 
-const ratingCol = { display: 'flex', flexDirection: 'column', gap: 'var(--space-200)', maxWidth: 'var(--size-5400)' };
+const ratingCol = { display: 'flex', flexDirection: 'column', gap: '32px' /* token gap: 32px */, maxWidth: 'var(--content-max-width-reading)' };
 
 export const Overview = () => {
     const [value, setValue] = useState(3);
 
     return (
-        <div style={{ ...ratingCol, maxWidth: 'var(--size-3000)' }}>
+        <div style={{ ...ratingCol, maxWidth: 'var(--width-3000)' }}>
             <Rating
                 id="rating-overview"
                 label="Rating"
@@ -80,7 +80,7 @@ export const Content = () => {
     return (
         <div style={ratingCol}>
             <section>
-                <span style={{ display: 'block', marginBottom: 'var(--space-050)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>BASELINE RATING</span>
+                <span style={{ display: 'block', marginBottom: 'var(--stack-md)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>BASELINE RATING</span>
                 <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Labeled comments-style rating with a required indicator.
                 </p>
@@ -104,14 +104,14 @@ export const Variants = () => {
     return (
         <div style={ratingCol}>
             <section>
-                <span style={{ display: 'block', marginBottom: 'var(--space-050)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>COMMENTS</span>
+                <span style={{ display: 'block', marginBottom: 'var(--stack-md)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>COMMENTS</span>
                 <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Label appears below the stars for open-ended feedback flows.
                 </p>
                 <Rating id="rating-comments-variant" value={commentsValue} variant="comments" onChange={setCommentsValue} />
             </section>
             <section>
-                <span style={{ display: 'block', marginBottom: 'var(--space-050)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>NUMERIC</span>
+                <span style={{ display: 'block', marginBottom: 'var(--stack-md)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>NUMERIC</span>
                 <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Numeric labels above each star for more explicit scales.
                 </p>
@@ -124,7 +124,7 @@ export const Variants = () => {
 export const InteractionStates = () => (
     <div style={ratingCol}>
         <section>
-            <span style={{ display: 'block', marginBottom: 'var(--space-050)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>DISABLED</span>
+            <span style={{ display: 'block', marginBottom: 'var(--stack-md)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>DISABLED</span>
             <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                 Disabled ratings remain visible but cannot be changed.
             </p>
@@ -144,7 +144,7 @@ export const Interactive = (args) => {
     }, [args.variant]);
 
     return (
-        <div style={{ maxWidth: 'var(--size-2500)' }}>
+        <div style={{ maxWidth: 'var(--width-2500)' }}>
             <Rating
                 label={args.label}
                 isRequired={args.isRequired}
@@ -199,7 +199,7 @@ PropsRender.play = async ({ canvasElement }) => {
 };
 
 /** One story per state, for the Examples tab. */
-const frame = { maxWidth: 'var(--size-3000)' };
+const frame = { maxWidth: 'var(--width-3000)' };
 
 export const Unrated = {
     render: () => (

@@ -22,7 +22,7 @@ export default {
  * The internal layout of title and message text.
  */
 export const ContentStructure = () => (
-    <div className="plus-section-message" style={{ border: '1px dashed var(--ds-border)' }}>
+    <div className="plus-section-message" style={{ border: 'var(--border-width-default) dashed var(--ds-border)' }}>
         <div className="plus-section-message-content">
             <div className="plus-section-message-title heading-lg">Section message title</div>
             <div className="plus-section-message-text body-lg">This is the message body text within the content area.</div>
@@ -36,7 +36,7 @@ export const ContentStructure = () => (
  * with a title, the first body line without.
  */
 export const DismissButton = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
         <SectionMessage appearance="primary" title="With a title">The × centers on the title line.</SectionMessage>
         <SectionMessage appearance="primary">Without a title the × centers on the first body line.</SectionMessage>
     </div>

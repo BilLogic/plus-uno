@@ -70,7 +70,7 @@ export default {
     },
 };
 
-const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxWidth: '360px' };
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxWidth: '360px' /* token gap: 360px */ };
 
 /** A controlled group of radios sharing one name. */
 const Group = ({ name, options, initial, ...radioProps }) => {
@@ -196,7 +196,7 @@ ReadOnly.play = async ({ canvasElement }) => {
 
 /** A description under the label, and the card appearance. */
 export const DescriptionAndCard = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxWidth: '360px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxWidth: '360px' /* token gap: 360px */ }}>
         <Radio id="radio-desc" name="radio-desc" label="Weekly" value="weekly" description="Every week at the same time."/>
         <Radio id="radio-card" name="radio-card" label="Just once" value="once" description="A single session." appearance="card" defaultChecked/>
     </div>
@@ -485,7 +485,7 @@ const BigSvg = () => (
 );
 
 export const TileNarrowLargeIllustrations = () => (
-    <div style={{ width: 320, /* 320px: the narrow-phone container width the ticket names */ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
+    <div style={{ width: 'var(--width-2000)', /* 320px: the narrow-phone container width the ticket names */ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         <Radio id="radio-narrow-character" name="radio-narrow" value="a" label="Character" illustration={<Illustration character="relationships" size={240} />} appearance="tile" />
         <Radio id="radio-narrow-svg" name="radio-narrow" value="b" label="Svg" illustration={<BigSvg />} appearance="tile" />
         <Radio
@@ -497,7 +497,7 @@ export const TileNarrowLargeIllustrations = () => (
             appearance="tile"
         />
         {/* 160px: the smallest container a tile is asked to fit */}
-        <div style={{ width: 160 }}>
+        <div style={{ width: 'var(--width-1000)' }}>
             <Radio id="radio-narrow-small" name="radio-narrow-small" value="d" label="Smallest" illustration={<Illustration character="relationships" size={240} />} appearance="tile" />
         </div>
     </div>

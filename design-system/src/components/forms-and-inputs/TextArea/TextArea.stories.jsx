@@ -3,6 +3,7 @@ import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid, expectReadOnly } from '../_internal/fieldStatePlays';
+import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 import TextArea from './TextArea';
 
 export default {
@@ -44,7 +45,6 @@ export default {
 };
 
 const fieldWrap = { maxWidth: 'var(--width-2500)' };
-const label = 'text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3';
 const px = (value) => Math.round(parseFloat(value));
 
 export const Overview = () => (
@@ -61,10 +61,10 @@ Overview.parameters = {
 
 /** Rows: the field is 80 high at least, and `rows` grows it from there. */
 export const Rows = () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', maxWidth: '1000px' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--section-stack-lg)', maxWidth: '1000px' /* token gap: 1000px */ }}>
         {[1, 3, 6].map((rows) => (
             <div key={rows}>
-                <span className={label}>{rows === 1 ? '1 ROW' : `${rows} ROWS`}</span>
+                <DemoLabel>{rows === 1 ? '1 ROW' : `${rows} ROWS`}</DemoLabel>
                 <TextArea id={`text-area-rows-${rows}`} label={`${rows} rows`} isLabelHidden placeholder="Enter text..." rows={rows} />
             </div>
         ))}
@@ -83,10 +83,10 @@ Rows.play = async ({ canvasElement }) => {
 
 /** Spacing: the same 80 minimum, with 10 corners by default and 8 compact, like the single-line field beside it. */
 export const Spacing = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '600px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: '600px' /* token gap: 600px */ }}>
         {['default', 'compact'].map((spacing) => (
             <div key={spacing}>
-                <span className={label}>{spacing.toUpperCase()}</span>
+                <DemoLabel>{spacing.toUpperCase()}</DemoLabel>
                 <TextArea id={`text-area-spacing-${spacing}`} label={`${spacing} text area`} isLabelHidden placeholder="Enter text..." spacing={spacing} rows={2} />
             </div>
         ))}
@@ -115,7 +115,7 @@ export const Warning = () => <div style={fieldWrap}><TextArea label="Notes" defa
 
 /** Focus is a ring only: no fill, border or text color changes. */
 export const FocusRing = () => (
-    <div style={{ maxWidth: '600px' }}>
+    <div style={{ maxWidth: '600px' /* token gap: 600px */ }}>
         <TextArea id="text-area-focus" label="Notes" placeholder="Enter text..." />
     </div>
 );

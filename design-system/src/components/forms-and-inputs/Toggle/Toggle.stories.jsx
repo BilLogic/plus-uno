@@ -75,10 +75,10 @@ export default {
     },
 };
 
-const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxWidth: '360px' };
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxWidth: '360px' /* token gap: 360px */ };
 
 export const Overview = () => (
-    <div style={{ maxWidth: '600px' }}>
+    <div style={{ maxWidth: '600px' /* token gap: 600px */ }}>
         <Toggle id="toggle-overview" name="toggle-overview" label="Allow pull requests" defaultChecked />
     </div>
 );

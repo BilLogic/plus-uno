@@ -300,7 +300,7 @@ const MANY = ['Session prep', 'Tutor coaching', 'Reflections', 'Attendance', 'Tr
 
 /** Without focus, tags past one line collapse into "+n". With focus, every tag shows. */
 export const CollapsesWithoutFocus = () => (
-    <div style={{ ...stack, maxWidth: '280px' }}>
+    <div style={{ ...stack, maxWidth: '280px' /* token gap: 280px */ }}>
         <TagInput label="Topics" options={TOPICS} defaultTags={MANY} />
     </div>
 );
@@ -734,7 +734,7 @@ const tidyArgTypes = {
 export const OptionMenu = {
     args: { menu: true, reorder: true, spacing: 'default' },
     argTypes: tidyArgTypes,
-    render: (args) => <div style={{ ...stack, minHeight: 'var(--size-3000)' }}><Tidy {...args} /></div>,
+    render: (args) => <div style={{ ...stack, minHeight: 'var(--width-3000)' }}><Tidy {...args} /></div>,
     play: async ({ canvasElement, args }) => {
         if (!args.menu) return;
         await userEvent.click(await openMenuButton(canvasElement, 'Decision recall'));
@@ -745,7 +745,7 @@ export const OptionMenu = {
 export const Reordering = {
     args: { menu: true, reorder: true, spacing: 'default' },
     argTypes: tidyArgTypes,
-    render: (args) => <div style={{ ...stack, minHeight: 'var(--size-2000)' }}><Tidy {...args} /></div>,
+    render: (args) => <div style={{ ...stack, minHeight: 'var(--height-2000)' }}><Tidy {...args} /></div>,
     play: async ({ canvasElement, args }) => {
         if (!args.reorder) return;
         const canvas = within(canvasElement);

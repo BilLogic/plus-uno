@@ -79,8 +79,8 @@ const GROUND_TOKEN = {
     info: '--ds-background-information',
 };
 
-const sectionMessageCol = { display: 'flex', flexDirection: 'column', gap: '48px' };
-const contentVariantCol = { display: 'flex', flexDirection: 'column', gap: '24px' };
+const sectionMessageCol = { display: 'flex', flexDirection: 'column', gap: '48px' /* token gap: 48px */ };
+const contentVariantCol = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' };
 
 function SectionMessageContentDemos() {
     return (
@@ -88,7 +88,7 @@ function SectionMessageContentDemos() {
             <DemoLabel>CONTENT VARIANTS (PRIMARY STYLE)</DemoLabel>
             <section>
                 <DemoLabel>WITH TITLE</DemoLabel>
-                <p className="body-default" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Use when the message benefits from a short heading.
                 </p>
                 <SectionMessage appearance="primary" title="With Title" dismissible>
@@ -97,7 +97,7 @@ function SectionMessageContentDemos() {
             </section>
             <section>
                 <DemoLabel>BODY ONLY</DemoLabel>
-                <p className="body-default" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Use when concise copy does not require a heading.
                 </p>
                 <SectionMessage appearance="primary" dismissible>
@@ -106,7 +106,7 @@ function SectionMessageContentDemos() {
             </section>
             <section>
                 <DemoLabel>NON-DISMISSIBLE</DemoLabel>
-                <p className="body-default" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Use for critical information that must remain visible.
                 </p>
                 <SectionMessage appearance="primary" title="Non-dismissible message" dismissible={false}>
@@ -115,7 +115,7 @@ function SectionMessageContentDemos() {
             </section>
             <section>
                 <DemoLabel>RICH CONTENT</DemoLabel>
-                <p className="body-default" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Supports inline emphasis and links inside the body.
                 </p>
                 <SectionMessage appearance="info" title="Rich Content">
@@ -125,7 +125,7 @@ function SectionMessageContentDemos() {
             </section>
             <section>
                 <DemoLabel>ACTIONS</DemoLabel>
-                <p className="body-default" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Up to two link-button actions after the body.
                 </p>
                 <SectionMessage
@@ -201,7 +201,7 @@ Interactive.args = {
  * 16px icon whatever the text size beside it.
  */
 export const DismissPlacement = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '400px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--width-2500)' }}>
         <SectionMessage appearance="primary" title="With a title" data-testid="placement-title">
             The × centers on the title line, not on the message.
         </SectionMessage>
@@ -260,7 +260,7 @@ DismissPlacement.play = async ({ canvasElement }) => {
  * decorative: the message's role and its text already say what it is.
  */
 export const LeadingIcon = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '400px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--width-2500)' }}>
         {SECTION_MESSAGE_APPEARANCES.map((appearance) => (
             <SectionMessage key={appearance} appearance={appearance} title="Title" data-testid={`icon-${appearance}`}>
                 You have a message here — come check it out!

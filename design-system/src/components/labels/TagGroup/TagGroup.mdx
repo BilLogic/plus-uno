@@ -202,9 +202,9 @@ at the end of the row, after the tags and `+n`.
 `Suggestion` children are offers, not values: they are not counted into `+n`, never appear in its menu and always sit after it. Their width comes off the row before tags are counted, so a group with suggestions shows fewer tags, not fewer suggestions. Pass `Suggestion`s as direct children; a custom wrapper must copy the marker (`MySuggestion.isSuggestion = Suggestion.isSuggestion`) or it is counted as a tag. In the `+n` menu, a selectable tag toggles (`aria-pressed`) with the menu staying open, a link tag navigates, a saving tag is a disabled, busy row, a read-only or removable tag is a static row, and remove is only offered on the row, never from the menu.
 
 <DoDontPair
-    doExample={<div style={{ width: 'var(--size-1500)' }}><TagGroup label="Skills" overflow="collapse"><Tag color="blue">Lincoln Middle</Tag><Tag color="lime">Advocacy</Tag><Tag color="purple">Fractions</Tag><Tag color="magenta">Relationships</Tag><Tag color="teal">Roosevelt K-8</Tag></TagGroup></div>}
+    doExample={<div style={{ width: 'var(--width-1500)' }}><TagGroup label="Skills" overflow="collapse"><Tag color="blue">Lincoln Middle</Tag><Tag color="lime">Advocacy</Tag><Tag color="purple">Fractions</Tag><Tag color="magenta">Relationships</Tag><Tag color="teal">Roosevelt K-8</Tag></TagGroup></div>}
     doCaption="Collapse in a tight row."
-    dontExample={<div style={{ width: 'var(--size-1500)' }}><TagGroup label="Skills"><Tag color="blue">Lincoln Middle</Tag><Tag color="lime">Advocacy</Tag><Tag color="purple">Fractions</Tag><Tag color="magenta">Relationships</Tag><Tag color="teal">Roosevelt K-8</Tag></TagGroup></div>}
+    dontExample={<div style={{ width: 'var(--width-1500)' }}><TagGroup label="Skills"><Tag color="blue">Lincoln Middle</Tag><Tag color="lime">Advocacy</Tag><Tag color="purple">Fractions</Tag><Tag color="magenta">Relationships</Tag><Tag color="teal">Roosevelt K-8</Tag></TagGroup></div>}
     dontCaption="Wrap pushes the row taller."
 />
 

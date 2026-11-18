@@ -40,14 +40,14 @@ export default {
 const containerStyle = {
     display: 'flex',
     flexWrap: 'wrap',
-    padding: 'var(--space-250) var(--space-125)',
+    padding: '40px 20px' /* token gap: 40px vertical / 20px horizontal pad */,
     backgroundColor: 'var(--ds-surface)',
     borderRadius: 'var(--radius-xl)',
-    border: '1px solid var(--ds-border)',
+    border: 'var(--border-width-default) solid var(--ds-border)',
 };
 
 const blockStyle = {
-    margin: 'var(--space-250) var(--space-400)',
+    margin: 'var(--page-stack-lg) calc(var(--section-pad-x-spacious) * 2)',
 };
 
 function TooltipVariantsDemos() {
@@ -82,17 +82,17 @@ function TooltipVariantsDemos() {
 }
 
 export const Placements = () => (
-    <div style={{ marginBottom: 'var(--space-400)' }}>
+    <div style={{ marginBottom: 'calc(var(--section-pad-x-spacious) * 2)' }}>
         <TooltipVariantsDemos />
     </div>
 );
 
 const tooltipPlaygroundPadding = {
-    padding: 'var(--space-150)',
+    padding: 'var(--section-pad-y-default) var(--section-pad-x-default)',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    minHeight: 'calc(var(--space-100) * 7.5)',
+    minHeight: 'var(--height-750)',
 };
 
 export const Interactive = {

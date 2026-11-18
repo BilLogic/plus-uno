@@ -23,7 +23,7 @@ export default {
     },
 };
 
-const row = { display: 'flex', gap: '24px', alignItems: 'center' };
+const row = { display: 'flex', gap: 'var(--section-stack-lg)', alignItems: 'center' };
 
 export const Overview = () => <Spinner />;
 Overview.parameters = {
@@ -37,8 +37,8 @@ export const Sizes = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        // Each size reads a size-scale token and keeps its pixel value.
-        const scale = { 16: '--size-100', 24: '--size-150', 48: '--size-300' };
+        // Each size reads a spinner-size token and keeps its pixel value.
+        const scale = { 16: '--spinner-size-sm', 24: '--spinner-size-md', 48: '--spinner-size-lg' };
         for (const el of canvasElement.querySelectorAll('.plus-spinner')) {
             const size = Number(el.dataset.size);
             await expect(el.getBoundingClientRect().width, `size ${size}`).toBe(size);
@@ -55,7 +55,7 @@ export const Size24 = () => <Spinner size={24} />;
 export const Size48 = () => <Spinner size={48} />;
 
 export const Invert = () => (
-    <div style={{ padding: '16px', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--radius-md)' }}>
+    <div style={{ padding: 'var(--section-pad-y-compact) var(--section-pad-x-compact)', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--radius-md)' }}>
         <Spinner appearance="invert" />
     </div>
 );
