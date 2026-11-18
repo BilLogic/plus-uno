@@ -1,0 +1,25 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import { FoundationSection } from '@/storybook-docs/foundation-page.jsx';
+import * as ElevationStories from './Elevation.stories.jsx';
+
+<Meta title="Foundations/Visual/Elevation/Accessibility" />
+
+<DocsLanding
+    page="foundations-visual-elevation-accessibility"
+    eyebrow="Foundation · Elevation"
+    title="Accessibility"
+    purpose="A boundary someone needs to find a control or read its state meets 3:1 in every mode, drawn with a border or a surface color, never a shadow alone."
+/>
+
+<Canvas of={ElevationStories.ControlBoundary} />
+
+<Canvas of={ElevationStories.CardEdgeContrast} />
+
+<FoundationSection title="Cards in forced colors">
+
+Forced colors drop background fills and shadows but keep borders. Every card carries a 1px transparent border, so its edge still shows there.
+
+<Canvas of={ElevationStories.CardsInForcedColors} />
+
+</FoundationSection>

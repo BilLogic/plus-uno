@@ -2,114 +2,47 @@
 
 # Usage
 
-Which surface and shadow each behavior takes, how surfaces step in dark mode, how lifts move, and how edges hold under contrast.
+Choose elevation by what a surface does, never by how strong a shadow looks.
+
+| What it does | Where it sits | Templates and components |
+| --- | --- | --- |
+| Blocks the page | **Layer 4 · Blocking** | Modal on the Blanket |
+| Floats, page stays usable | **Layer 3 · Non-blocking** | Floating Sidebar and Panel, Popup types, Inline edit, Flag, Spotlight, a dragged Card |
+| Stays put while content scrolls | **Layer 2 · Navigation** | Sticky table header and column |
+| The one object the view is about | **Page · Raised** | Primary card, a clickable card on hover, Range thumb, current Carousel slide |
+| Groups static content | **Page · Sunken** | Card (default), empty box, a clickable card at rest |
+| Everything else in the flow | **Page · Default** | Section and its side, table, list, form; a Default card, bordered |
+| Holds the app | **Layer 0 · Frame** | The Frame and the docked Sidebar |
+| Labels a control | **Not a layer** | Tooltip, no shadow |
 
 **Kind:** Foundation
 
 **Storybook page:** `design-system/src/styles/ElevationUsage.mdx`
 
-## The levels
+## Golden rules
 
-Six levels, lowest first. A surface and its shadow always travel together.
+Ten rules, each as a Do and a Don’t.
 
-| Level | Surface | Shadow |
-| --- | --- | --- |
+### 1. Flat by default
 
-Raised and overlay have `-hovered` and `-pressed` surfaces for a surface that can be clicked. `--ds-surface-container` is a translucent well inside a surface, and it is not a level.
+### 2. Lift means you can act on it
 
-## Choose by behavior
+### 3. Raise one thing per view
 
-Pick the level by what the surface does, never by how strong a shadow looks. Answer the questions to land on a row.
+### 4. Group with a surface color or a border, never a shadow
 
-## Surface color and dark mode
+### 5. A blocking overlay sits on the Blanket
 
-Higher is lighter. In light the lifted surfaces share the page color and the shadow lifts them; in dark the surface itself steps up.
+### 6. One blocking overlay at a time
 
-Dark blocking is the same as dark overlay. On the dark Blanket a shadow barely shows, so the lighter overlay surface is what lifts the Modal.
+### 7. No stroke on an elevated surface
 
-## Layering
+### 8. Pair the surface with its shadow
 
-Each layer is a `--layer-*` z-index token, set in code only. Components name the token, never a number.
+### 9. Dark mode lightens only what floats
 
-- **A confirm Modal may open over a Panel or a Popup,** with its own Blanket.
-- **Never a Modal on a Modal.** A Modal confirms inside itself, with a warning SectionMessage and the danger button.
-- **A Panel never has a Blanket.** It floats beside a usable page.
-- **Popups and Tooltips open over a Modal.** A Popup opened inside a Modal portals into it.
-- **A Flag sits above all of it**, so a message is never hidden.
-- **`--layer-dialog`** holds a view that replaces the page: AiChat full screen.
+### 10. A control’s boundary meets 3:1
 
-## Elevation in the system
+### In motion
 
-### Card
-
-Raised at rest; a clickable Card lifts to overlay on hover and while dragged.
-
-### Popup and an open Select
-
-### Floating Sidebar and floating Panel
-
-Both take the overlay pair, with no Blanket: the page beside them stays usable.
-
-### Modal over its Blanket
-
-### Sticky header, scrolled
-
-A border marks the cut first; the overflow shadow is for where a border would be missed.
-
-### Tooltip
-
-A label, so it has no shadow: the dark fill sets it apart.
-
-## Motion
-
-A shadow moves on `--ds-motion-appearance-*`, documented in [Motion](?path=/docs/foundations-expression-motion-physics--docs).
-
-### A shadow changes with its fill
-
-It moves on `--ds-motion-appearance-default`, together with the surface. Click the Card.
-
-### A clip never cuts a shadow
-
-A clip-path open runs on `--ds-motion-appearance-default` and rests past the shadow's reach, drawn dashed.
-
-### A scroll shadow tracks the scroll
-
-It grows one to one with the scroll position, with no spring token of its own.
-
-## Accessibility
-
-- **A shadow is never the boundary.** The edge slot is: under increased contrast it becomes a 3:1 line. Turn it on below.
-- **Forced colors keep an edge.** Shadows disappear there, so a lifted surface carries a transparent border that the system paints.
-- **Text clears 4.5:1 on every level**, in light and dark. Check a new pairing on the overlay surface in dark, where it is lightest. See [Color](?path=/docs/foundations-visual-color--docs).
-
-## Do and don't
-
-### Lift with shadow, not a darker fill
-
-A lifted surface gets its height from its shadow; a darker fill reads as a different surface.
-
-### No border on a lifted surface
-
-The shadow's edge slot is the border, so a drawn border doubles it.
-
-### Pair the surface with its shadow
-
-A level's surface and shadow travel together.
-
-### Blocking only on the Blanket
-
-The blocking shadow belongs to the Modal over its Blanket, and nothing else.
-
-### Sunken never floats
-
-A sunken surface is a ground, so it sits behind the work and never lifts.
-
-### Keep the Tooltip flat
-
-A Tooltip is a label, so it has no shadow.
-
-### Raise one focal point
-
-Raise the one object a person acts on; a page of raised cards has no focus.
-
-## Related
+Elevation changes on a spring and never jumps. A clip never cuts a shadow: a scrolling area leaves room for the shadow of what floats inside it.

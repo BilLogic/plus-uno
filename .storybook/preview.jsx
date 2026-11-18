@@ -198,12 +198,14 @@ const preview = {
               "Color",
               "Typography",
               "Iconography",
-              "Elevation",
               [
+                "Elevation",
                 "Overview",
                 "Layer system",
                 "Shadow ramp",
-                "Usage"
+                "Usage",
+                "Color",
+                "Accessibility"
               ],
               "Radius",
               "Border"
