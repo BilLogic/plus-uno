@@ -274,7 +274,7 @@ export const NestingDiagram = () => (
             <g transform="translate(8 8)" fill="none" stroke={PAINT.annotation} strokeDasharray="1 1.5" vectorEffect="non-scaling-stroke" style={HAIRLINE}>
                 <circle vectorEffect="non-scaling-stroke" style={{ cx: 'var(--popup-radius)', cy: 'var(--popup-radius)', r: 'var(--popup-radius)' }} />
                 <circle vectorEffect="non-scaling-stroke" style={{ cx: 'var(--popup-radius)', cy: 'var(--popup-radius)', r: ROW_CORNER }} />
-                <circle style={{ cx: 'var(--popup-radius)', cy: 'var(--popup-radius)', r: 'var(--stroke-2)' }} fill={PAINT.annotation} stroke="none" />
+                <circle style={{ cx: 'var(--popup-radius)', cy: 'var(--popup-radius)', r: 'var(--border-width-selected)' }} fill={PAINT.annotation} stroke="none" />
             </g>
         </Illustration>
     </CloseUp>

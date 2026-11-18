@@ -32,7 +32,7 @@ import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 
-const col = { display: 'flex', flexDirection: 'column', gap: '24px' };
+const col = { display: 'flex', flexDirection: 'column', gap: 'var(--page-stack-md)' };
 
 /** What each level must draw: its fill and its shadow, as a pair. */
 const LEVEL_PAIRS = {
@@ -380,7 +380,7 @@ export const AnatomyRecord = {
 export const AnatomyRecordScaledDown = {
     name: 'Anatomy, scaled down',
     render: () => (
-        <div style={{ width: 880 }}>
+        <div style={{ width: 880 /* token gap: 880px */ }}>
             <LiveAnatomy live width={PAGE_STAGE} parts={ANATOMY_PARTS} title="A record page with its parts numbered">
                 <RecordPage banner />
             </LiveAnatomy>
@@ -528,7 +528,7 @@ export const ResponsiveWidth = {
     },
     render: ({ width }) => (
         <ScrollStage width={width} data-probe="stage">
-            <div style={{ height: 480 }}>
+            <div style={{ height: 'var(--width-3000)' }}>
                 <Frame>
                     <DemoPageHeader title="Sessions" />
                     <CardsSection title="Upcoming sessions" />

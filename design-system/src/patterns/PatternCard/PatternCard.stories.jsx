@@ -63,7 +63,7 @@ function PatternCardRowsDemo() {
         ['Marcus Lee', 'Roosevelt K-8 · Thu 5:00 PM'],
     ];
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-300)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' /* token gap: 48px */ }}>
             {[['Medium', 720], ['Large', 736], ['X-Large', 1152]].map(([mode, width]) => (
                 <div key={mode}>
                     <DemoCaption>{`${mode} · content ${width}`}</DemoCaption>
@@ -207,10 +207,10 @@ export const Interactive = {
 export const Elevation = {
     parameters: { docs: { disable: true } },
     render: () => (
-        <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
-            <PatternCard title="Static" minWidth={200}>{bodyCopy}</PatternCard>
-            <PatternCard title="Clickable" minWidth={200} role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</PatternCard>
-            <PatternCard title="Dragging" minWidth={200} dragging>{bodyCopy}</PatternCard>
+        <div style={{ display: 'flex', gap: 'var(--section-stack-lg)', flexWrap: 'wrap' }}>
+            <PatternCard title="Static" minWidth={200 /* token gap: 200px */}>{bodyCopy}</PatternCard>
+            <PatternCard title="Clickable" minWidth={200 /* token gap: 200px */} role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</PatternCard>
+            <PatternCard title="Dragging" minWidth={200 /* token gap: 200px */} dragging>{bodyCopy}</PatternCard>
         </div>
     ),
     play: async ({ canvas, canvasElement }) => {
@@ -449,7 +449,7 @@ export const PlacementBoundary = {
             {['start', 'end'].flatMap((placement) => ['1/3', '1/2'].map((split) => (
                 <PatternCard key={`${placement}-${split}`} imagePlacement={placement} imageSplit={split}
                     image={imagePlaceholder('1:1')} title="Ana Ruiz" role="article"
-                    aria-label={`${placement} ${split}`} style={{ width: 479 }}>
+                    aria-label={`${placement} ${split}`} style={{ width: 479 /* token gap: 479px */ }}>
                     {sessionBody}
                 </PatternCard>
             )))}

@@ -35,7 +35,7 @@ export default {
 
 /** Columns rounding only the value end, at `--chart-bar-radius`. */
 export const BarRadius = () => (
-    <div style={{ maxWidth: 480 }}>
+    <div style={{ maxWidth: 'var(--card-min-width-lg)' }}>
         <BarChart
             sort={false}
             categories={['Mon', 'Tue', 'Wed', 'Thu', 'Fri']}
@@ -55,8 +55,7 @@ export const TooltipSurface = () => (
                 boxShadow: 'var(--ds-shadow-overlay)',
                 padding: 'var(--popup-pad)',
                 color: 'var(--ds-text)',
-                fontFamily: 'var(--type-family-body)',
-                fontSize: 'var(--type-size-0875)',
+                font: 'var(--body-default)',
                 fontWeight: 'var(--type-weight-medium)',
                 fontVariantNumeric: 'tabular-nums',
             }}
@@ -105,15 +104,14 @@ const barStyle = {
 
 const labelStyle = {
     color: 'var(--ds-text-subtle)',
-    fontFamily: 'var(--type-family-body)',
-    fontSize: 'var(--type-size-0875)',
+    font: 'var(--body-default)',
     fontWeight: 'var(--type-weight-medium)',
     fontVariantNumeric: 'tabular-nums',
 };
 
 const gridStyle = {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' /* token gap: 220px */,
     gap: 'var(--section-stack-md)',
 };
 
@@ -208,8 +206,7 @@ export const TypeAndNumbers = {
                     boxShadow: 'var(--ds-shadow-overlay)',
                     padding: 'var(--popup-pad)',
                     color: 'var(--ds-text)',
-                    fontFamily: 'var(--type-family-body)',
-                    fontSize: 'var(--type-size-0875)',
+                    font: 'var(--body-default)',
                     fontWeight: 'var(--type-weight-medium)',
                     fontVariantNumeric: 'tabular-nums',
                     alignSelf: 'flex-start',
