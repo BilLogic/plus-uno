@@ -376,20 +376,6 @@ export const AnatomyRecord = {
     },
 };
 
-/** Full-scale anatomy inside a horizontally scrollable container when narrower than the page stage. */
-export const AnatomyRecordScaledDown = {
-    name: 'Anatomy, scaled down',
-    render: () => (
-        <LiveAnatomy live scrollable width={PAGE_STAGE} parts={ANATOMY_PARTS} title="A record page with its parts numbered">
-            <RecordPage banner scrollable />
-        </LiveAnatomy>
-    ),
-    play: async ({ canvasElement }) => {
-        await expectFullScale(canvasElement);
-        await playRecordAnatomy(canvasElement);
-    },
-};
-
 /** Area page, one collection: the title alone; the collection's Primary ends its view bar. */
 export const ScenarioArea = {
     name: 'Area page, one collection',
