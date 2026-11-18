@@ -7,8 +7,8 @@ name: Refresh Figma Component Snapshot
 # FIGMA_ACCESS_TOKEN, and only this repo's secret holds one, which is why the
 # refresh runs here and not on a laptop.
 #
-# Loop shape: a publish or a manual dispatch → one fetch → one PR (changed, or a
-# date refresh near the age ceiling), or a "no change" summary that closes any
+# Loop shape: a publish or a manual dispatch → one fetch → one PR when at
+# least one component or hash changed, or a "no change" summary that closes any
 # stale refresh PR → stop. Never a cron: a refresh follows a library publish
 # somebody meant, and each one is a PR a human reviews.
 #   • ONCE PER PUBLISH (#898). uno-bot's end-of-day run, once its Figma jobs
@@ -55,6 +55,7 @@ concurrency:
 
 env:
   SNAPSHOT: scripts/figma-component-snapshot.json
+  REPORT_FILE: scripts/figma-snapshot-changes.md
   BRANCH: chore/figma-snapshot-refresh
 
 jobs:
@@ -131,20 +132,21 @@ jobs:
 
       - name: Compare with main
         id: compare
-        # The verdict script ignores `lastChecked` (it moves on every run), row
-        # order and key order. An unchanged library whose snapshot on main is
-        # past half check:figma-snapshots' age ceiling reads as `date-only`, so
-        # the refresh can clear that check. A file that is not JSON fails here
-        # rather than reading as a change. When anything changed, it writes the
-        # PR body naming every changed component.
+        # The verdict script ignores `lastChecked`, `versionIds`, row order and
+        # key order. A file that is not JSON fails here rather than reading as a
+        # change. When components changed, it writes the PR body naming every
+        # changed component (linking to REPORT_FILE if it exceeds the PR limit).
         env:
           BASE: ${{ github.event.repository.default_branch }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          REPO_URL: ${{ github.server_url }}/${{ github.repository }}
         run: |
           set -euo pipefail
           git show "HEAD:$SNAPSHOT" > "$RUNNER_TEMP/main-snapshot.json"
           node scripts/figma-snapshot-verdict.mjs "$RUNNER_TEMP/main-snapshot.json" "$SNAPSHOT" \
             --pr-body "$RUNNER_TEMP/pr-body.md" \
+            --report-file "$REPORT_FILE" \
+            --report-url "$REPO_URL/blob/$BRANCH/$REPORT_FILE" \
             --delta-file "$RUNNER_TEMP/delta.md" \
             --base "$BASE" \
             --branch "$BRANCH" \
@@ -186,19 +188,18 @@ jobs:
         if: steps.compare.outputs.verdict != 'unchanged'
         # The branch is rebuilt from main on every run, so the force push
         # replaces an older refresh rather than stacking on it.
-        env:
-          VERDICT: ${{ steps.compare.outputs.verdict }}
         run: |
           set -euo pipefail
           git config --local user.name "github-actions[bot]"
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git switch -C "$BRANCH"
           git add "$SNAPSHOT"
-          if [ "$VERDICT" = "date-only" ]; then
-            git commit -m "chore: refresh Figma component snapshot date"
+          if [ -f "$REPORT_FILE" ]; then
+            git add "$REPORT_FILE"
           else
-            git commit -m "chore: refresh Figma component snapshot"
+            git rm -f --ignore-unmatch "$REPORT_FILE"
           fi
+          git commit -m "chore: refresh Figma component snapshot"
           git push --force origin "$BRANCH"
 
       - name: Open or update the draft PR

@@ -24,6 +24,7 @@ import {
   DEFAULT_FILE_KEY,
   MISSING_TOKEN,
   buildRefreshPrBody,
+  buildRefreshPrOutput,
   changedComponents,
   changedSets,
   diff,
@@ -192,13 +193,12 @@ test('component order and hash key order are not changes', () => {
   assert.equal(refreshVerdict(before, after, { now: NOW, maxAgeDays: 180 }).verdict, 'unchanged');
 });
 
-test('any other difference is a change — a description, a node id, a hash, a version', () => {
+test('any component or hash difference is a change, while publish-history-only is unchanged', () => {
   const before = snap('2026-09-20T00:00:00.000Z');
   const edits = [
     { components: [{ ...before.components[0], description: 'new' }, before.components[1]] },
     { components: [{ ...before.components[0], nodeId: '9:9' }, before.components[1]] },
     { nodeHashes: { '1:1': 'h1', '1:2': 'changed' } },
-    { versionIds: [{ id: 'v1' }] },
   ];
   for (const edit of edits) {
     assert.equal(
@@ -207,28 +207,24 @@ test('any other difference is a change — a description, a node id, a hash, a v
       JSON.stringify(edit),
     );
   }
+  assert.equal(
+    refreshVerdict(before, snap(NOW.toISOString(), { versionIds: [{ id: 'v1' }] }), { now: NOW, maxAgeDays: 180 }).verdict,
+    'unchanged',
+  );
 });
 
-test('an unchanged library past half the age ceiling is a date refresh, so the age check can clear', () => {
+test('an unchanged library opens no PR even past half the age ceiling or with an unreadable/future date', () => {
   const at = (days) => snap(new Date(NOW.getTime() - days * 86400000).toISOString());
   const after = snap(NOW.toISOString());
   assert.equal(refreshVerdict(at(90), after, { now: NOW, maxAgeDays: 180 }).verdict, 'unchanged');
   assert.deepEqual(refreshVerdict(at(91), after, { now: NOW, maxAgeDays: 180 }), {
-    verdict: 'date-only',
+    verdict: 'unchanged',
     ageDays: 91,
   });
-});
-
-test('a lastChecked that cannot be read is treated as old', () => {
-  const after = snap(NOW.toISOString());
-  assert.equal(refreshVerdict(snap('not a date'), after, { now: NOW, maxAgeDays: 180 }).verdict, 'date-only');
-});
-
-test('a lastChecked in the future is treated as old, like an unreadable one', () => {
-  const after = snap(NOW.toISOString());
+  assert.equal(refreshVerdict(snap('not a date'), after, { now: NOW, maxAgeDays: 180 }).verdict, 'unchanged');
   const ahead = snap(new Date(NOW.getTime() + 3 * 86400000).toISOString());
   assert.deepEqual(refreshVerdict(ahead, after, { now: NOW, maxAgeDays: 180 }), {
-    verdict: 'date-only',
+    verdict: 'unchanged',
     ageDays: -3,
   });
 });
@@ -237,7 +233,7 @@ test('the verdict command prints GITHUB_OUTPUT lines, and fails on a file that i
   const cli = path.join(REPO_ROOT, 'scripts/figma-snapshot-verdict.mjs');
   const live = path.join(REPO_ROOT, 'scripts/figma-component-snapshot.json');
   const out = execFileSync('node', [cli, live, live], { encoding: 'utf8' });
-  assert.match(out, /^verdict=(unchanged|date-only)\nage_days=\d+\n$/);
+  assert.match(out, /^verdict=unchanged\nage_days=\d+\n$/);
 
   const bad = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'verdict-')), 'bad.json');
   fs.writeFileSync(bad, '{not json');
@@ -515,75 +511,159 @@ for (const endpoint of ['/components', '/versions']) {
 
 // ── canonical node hashing & PR body (#2799) ────────────────────────────────
 
-function recordedNodeFixtures() {
+function recordedLibraryRestFetch1() {
   return {
-    '10:1': {
-      document: {
-        id: '10:1',
-        name: 'appearance=primary, state=default',
-        type: 'COMPONENT',
-        layoutMode: 'HORIZONTAL',
-        paddingLeft: 16,
-        paddingRight: 16,
-        itemSpacing: 8,
-        cornerRadius: 8,
-        size: { x: 120, y: 40 },
-        absoluteBoundingBox: { x: 100, y: 200, width: 120, height: 40 },
-        absoluteRenderBounds: { x: 100, y: 200, width: 120, height: 40 },
-        fills: [
+    componentsResponse: {
+      status: 200,
+      error: false,
+      meta: {
+        components: [
           {
-            type: 'SOLID',
-            color: { r: 0.1, g: 0.2, b: 0.8, a: 1 },
-            boundVariables: { color: { type: 'VARIABLE_ALIAS', id: 'VariableID:1:10' } },
+            key: 'k1',
+            file_key: DEFAULT_FILE_KEY,
+            node_id: '10:1',
+            thumbnail_url: 'https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/thumb-run-1-a',
+            name: 'appearance=primary, state=default',
+            description: 'Primary button',
+            created_at: '2026-01-01T00:00:00Z',
+            updated_at: '2026-11-16T00:00:00Z',
+            user: { id: 'u1', handle: 'bill' },
+            containing_frame: { name: 'Button', nodeId: '10:0', pageName: 'Components' },
           },
-        ],
-        strokes: [],
-        effects: [{ type: 'DROP_SHADOW', visible: true, radius: 4, offset: { x: 0, y: 2 } }],
-        styles: { fill: 'S:fill-primary' },
-        componentPropertyDefinitions: {
-          'Label#10:0': { type: 'TEXT', defaultValue: 'Save' },
-        },
-        pluginData: { figmaTokens: { syncedAt: '2026-11-16T00:00:00Z' } },
-        sharedPluginData: { codeConnect: { stamp: 'run-1' } },
-        devStatus: { type: 'READY_FOR_DEV' },
-        fillGeometry: [{ path: 'M0 0L120 0L120 40L0 40Z', windingRule: 'NONZERO' }],
-        children: [
           {
-            id: 'I10:1;10:2',
-            name: 'Label',
-            type: 'TEXT',
-            characters: 'Save',
-            visible: true,
-            style: { fontFamily: 'Inter', fontSize: 14, fontWeight: 600 },
-            componentPropertyReferences: { characters: 'Label#10:0' },
-            pluginData: { noise: 'a' },
+            key: 'k2',
+            file_key: DEFAULT_FILE_KEY,
+            node_id: '10:2',
+            thumbnail_url: 'https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/thumb-run-1-b',
+            name: 'tone=neutral, size=sm',
+            description: 'Neutral tag',
+            created_at: '2026-01-01T00:00:00Z',
+            updated_at: '2026-11-16T00:00:00Z',
+            user: { id: 'u1', handle: 'bill' },
+            containing_frame: { name: 'Tag', nodeId: '20:0', pageName: 'Components' },
           },
         ],
       },
     },
-    '10:2': {
-      document: {
-        id: '10:2',
-        name: 'tone=neutral, size=sm',
-        type: 'COMPONENT',
-        layoutMode: 'HORIZONTAL',
-        size: { x: 64, y: 24 },
-        fills: [{ type: 'SOLID', color: { r: 0.9, g: 0.9, b: 0.9, a: 1 } }],
-        strokes: [{ type: 'SOLID', color: { r: 0.7, g: 0.7, b: 0.7, a: 1 } }],
-        strokeWeight: 1,
-        boundVariables: { topLeftRadius: { type: 'VARIABLE_ALIAS', id: 'VariableID:2:5' } },
-        children: [
-          {
-            id: '10:3',
-            name: 'Icon',
-            type: 'INSTANCE',
-            componentId: '99:1',
-            componentProperties: {
-              'Show#99:0': { type: 'BOOLEAN', value: true },
+    versionsResponse: {
+      versions: [
+        {
+          id: '5001',
+          created_at: '2026-11-16T00:00:00Z',
+          label: 'v1.0.0',
+          description: 'Initial library release',
+          user: { handle: 'bill' },
+        },
+        {
+          id: '5000',
+          created_at: '2026-11-15T23:55:00Z',
+          label: null,
+          description: null,
+          user: { handle: 'bill' },
+        },
+      ],
+    },
+    nodesResponse: {
+      name: 'Design System - BS4 Foundation',
+      lastModified: '2026-11-16T00:00:00Z',
+      version: '5001',
+      nodes: {
+        '10:1': {
+          document: {
+            id: '10:1',
+            name: 'appearance=primary, state=default',
+            type: 'COMPONENT',
+            layoutMode: 'HORIZONTAL',
+            paddingLeft: 16,
+            paddingRight: 16,
+            itemSpacing: 8,
+            cornerRadius: 8,
+            size: { x: 120, y: 40 },
+            rotation: 0,
+            relativeTransform: [
+              [1, 0, 100],
+              [0, 1, 200],
+            ],
+            absoluteBoundingBox: { x: 100, y: 200, width: 120, height: 40 },
+            absoluteRenderBounds: { x: 100, y: 200, width: 120, height: 40 },
+            fills: [
+              {
+                type: 'SOLID',
+                color: { r: 0.1, g: 0.2, b: 0.8, a: 1 },
+                boundVariables: { color: { type: 'VARIABLE_ALIAS', id: 'VariableID:1:10' } },
+              },
+            ],
+            strokes: [],
+            effects: [{ type: 'DROP_SHADOW', visible: true, radius: 4, offset: { x: 0, y: 2 } }],
+            styles: { fill: 'S:fill-primary' },
+            componentPropertyDefinitions: {
+              'Label#10:0': { type: 'TEXT', defaultValue: 'Save' },
             },
-            overrides: [{ id: 'I10:3;99:2', overriddenFields: ['fills'] }],
+            pluginData: { figmaTokens: { syncedAt: '2026-11-16T00:00:00Z' } },
+            sharedPluginData: { codeConnect: { stamp: 'run-1' } },
+            devStatus: { type: 'READY_FOR_DEV' },
+            fillGeometry: [{ path: 'M0 0L120 0L120 40L0 40Z', windingRule: 'NONZERO', overrideID: 1 }],
+            strokeGeometry: [],
+            children: [
+              {
+                id: 'I10:1;10:2',
+                name: 'Label',
+                type: 'TEXT',
+                characters: 'Save',
+                visible: true,
+                size: { x: 40, y: 20 },
+                rotation: 0,
+                relativeTransform: [
+                  [1, 0, 16],
+                  [0, 1, 10],
+                ],
+                absoluteBoundingBox: { x: 116, y: 210, width: 40, height: 20 },
+                style: { fontFamily: 'Inter', fontSize: 14, fontWeight: 600 },
+                componentPropertyReferences: { characters: 'Label#10:0' },
+                pluginData: { noise: 'a' },
+              },
+            ],
           },
-        ],
+        },
+        '10:2': {
+          document: {
+            id: '10:2',
+            name: 'tone=neutral, size=sm',
+            type: 'COMPONENT',
+            layoutMode: 'HORIZONTAL',
+            size: { x: 64, y: 24 },
+            rotation: 0,
+            relativeTransform: [
+              [1, 0, 300],
+              [0, 1, 200],
+            ],
+            absoluteBoundingBox: { x: 300, y: 200, width: 64, height: 24 },
+            fills: [{ type: 'SOLID', color: { r: 0.9, g: 0.9, b: 0.9, a: 1 } }],
+            strokes: [{ type: 'SOLID', color: { r: 0.7, g: 0.7, b: 0.7, a: 1 } }],
+            strokeWeight: 1,
+            boundVariables: { topLeftRadius: { type: 'VARIABLE_ALIAS', id: 'VariableID:2:5' } },
+            children: [
+              {
+                id: '10:3',
+                name: 'Icon',
+                type: 'INSTANCE',
+                componentId: '99:1',
+                size: { x: 16, y: 16 },
+                rotation: 0,
+                relativeTransform: [
+                  [1, 0, 8],
+                  [0, 1, 4],
+                ],
+                absoluteBoundingBox: { x: 308, y: 204, width: 16, height: 16 },
+                fillGeometry: [{ path: 'M0 0L16 0L8 16Z', windingRule: 'NONZERO', overrideID: 2 }],
+                componentProperties: {
+                  'Show#99:0': { type: 'BOOLEAN', value: true },
+                },
+                overrides: [{ id: 'I10:3;99:2', overriddenFields: ['fills'] }],
+              },
+            ],
+          },
+        },
       },
     },
   };
@@ -598,62 +678,174 @@ function shuffleKeys(value) {
   return value;
 }
 
-test('two fetches of an unchanged file give identical hashes despite volatile fields and key order', async () => {
-  const rows = [
-    { key: 'k1', name: 'appearance=primary, state=default', description: '', nodeId: '10:1', containingFrame: 'Button' },
-    { key: 'k2', name: 'tone=neutral, size=sm', description: '', nodeId: '10:2', containingFrame: 'Tag' },
+function recordedLibraryRestFetch2() {
+  const base = shuffleKeys(recordedLibraryRestFetch1());
+  // Reverse /components order & mutate volatile REST metadata
+  base.componentsResponse.meta.components = [...base.componentsResponse.meta.components].reverse().map((c) => ({
+    ...c,
+    thumbnail_url: `${c.thumbnail_url}-reissued`,
+    updated_at: '2026-11-18T12:00:00Z',
+    user: { id: 'u2', handle: 'bot' },
+  }));
+  // Add a publish-history version without changing any component
+  base.versionsResponse.versions.unshift({
+    id: '5002',
+    created_at: '2026-11-18T12:00:00Z',
+    label: 'v1.0.1',
+    description: 'Re-published without component edits',
+    user: { handle: 'bot' },
+  });
+  // Mutate volatile / canvas-position / reissued fields on /nodes response
+  base.nodesResponse.lastModified = '2026-11-18T12:00:00Z';
+  base.nodesResponse.version = '5002';
+  const n1 = base.nodesResponse.nodes['10:1'].document;
+  n1.id = '999:1';
+  n1.pluginData = { figmaTokens: { syncedAt: '2026-11-18T00:00:00Z' } };
+  n1.sharedPluginData = { codeConnect: { stamp: 'run-2' }, extra: true };
+  n1.devStatus = { type: 'NONE' };
+  // Whole component moved on canvas by (+700, +1000) and float jitter in child transform
+  n1.relativeTransform = [
+    [1, 0, 800],
+    [0, 1, 1200],
   ];
+  n1.absoluteBoundingBox = { x: 800, y: 1200, width: 120, height: 40 };
+  n1.absoluteRenderBounds = { x: 800, y: 1200, width: 120, height: 40 };
+  n1.fillGeometry = [{ path: 'M 0.00001 0 L 120 0 L 120 40 L 0 40 Z', windingRule: 'NONZERO', overrideID: 99 }];
+  n1.children[0].id = 'I999:1;888:2';
+  n1.children[0].pluginData = { noise: 'b' };
+  n1.children[0].rotation = 0.00001;
+  n1.children[0].relativeTransform = [
+    [1, 0, 16.00001],
+    [0, 1, 9.99999],
+  ];
+  n1.children[0].absoluteBoundingBox = { x: 816, y: 1210, width: 40, height: 20 };
 
-  const fetch1Nodes = recordedNodeFixtures();
-  const fetch2Nodes = shuffleKeys(recordedNodeFixtures());
-  // Mutate volatile / version-dependent / reissued fields on fetch 2.
-  fetch2Nodes['10:1'].document.id = '999:1';
-  fetch2Nodes['10:1'].document.pluginData = { figmaTokens: { syncedAt: '2026-11-18T00:00:00Z' } };
-  fetch2Nodes['10:1'].document.sharedPluginData = { codeConnect: { stamp: 'run-2' }, extra: true };
-  fetch2Nodes['10:1'].document.devStatus = { type: 'NONE' };
-  fetch2Nodes['10:1'].document.absoluteBoundingBox = { x: 800, y: 1200, width: 120, height: 40 };
-  fetch2Nodes['10:1'].document.absoluteRenderBounds = { x: 800, y: 1200, width: 120, height: 40 };
-  fetch2Nodes['10:1'].document.fillGeometry = [{ path: 'M0 0L120 0L120 40L0 40Z', windingRule: 'EVENODD' }];
-  fetch2Nodes['10:1'].document.children[0].id = 'I999:1;888:2';
-  fetch2Nodes['10:1'].document.children[0].pluginData = { noise: 'b' };
-  fetch2Nodes['10:2'].document.children[0].id = '777:3';
-  fetch2Nodes['10:2'].document.children[0].componentId = '99:999';
-  fetch2Nodes['10:2'].document.children[0].overrides = [{ id: 'I777:3;99:99', overriddenFields: ['fills'] }];
+  const n2 = base.nodesResponse.nodes['10:2'].document;
+  n2.children[0].id = '777:3';
+  n2.children[0].componentId = '99:999';
+  n2.children[0].overrides = [{ id: 'I777:3;99:99', overriddenFields: ['fills'] }];
+  n2.children[0].fillGeometry = [{ path: 'M0 0L16 0L8 16Z', windingRule: 'NONZERO', overrideID: 88 }];
+  return base;
+}
 
-  const first = await fetchNodeHashes(rows, 'KEY', 'tok', async () => ({ nodes: fetch1Nodes }), 0);
-  const second = await fetchNodeHashes(rows, 'KEY', 'tok', async () => ({ nodes: fetch2Nodes }), 0);
+test('two full REST fetches of an unchanged library give identical hashes and verdict=unchanged', async () => {
+  const fetch1 = recordedLibraryRestFetch1();
+  const fetch2 = recordedLibraryRestFetch2();
 
-  assert.deepEqual(first.failed, []);
-  assert.deepEqual(second.failed, []);
-  assert.deepEqual(second.hashes, first.hashes);
-  assert.equal(projectNode(fetch1Nodes['10:1'].document).pluginData, undefined);
+  const makeGet = (rest) => async (endpoint) => {
+    if (endpoint.endsWith('/components')) return rest.componentsResponse;
+    if (endpoint.endsWith('/versions')) return rest.versionsResponse;
+    if (endpoint.includes('/nodes?')) return rest.nodesResponse;
+    throw new Error(`unexpected endpoint ${endpoint}`);
+  };
+
+  const rows1 = rowsFrom(await makeGet(fetch1)(`/files/${DEFAULT_FILE_KEY}/components`));
+  const versions1 = versionsFrom(await makeGet(fetch1)(`/files/${DEFAULT_FILE_KEY}/versions`));
+  const hashes1 = await fetchNodeHashes(rows1, DEFAULT_FILE_KEY, 'tok', makeGet(fetch1), 0);
+
+  const rows2 = rowsFrom(await makeGet(fetch2)(`/files/${DEFAULT_FILE_KEY}/components`));
+  const versions2 = versionsFrom(await makeGet(fetch2)(`/files/${DEFAULT_FILE_KEY}/versions`));
+  const hashes2 = await fetchNodeHashes(rows2, DEFAULT_FILE_KEY, 'tok', makeGet(fetch2), 0);
+
+  assert.deepEqual(hashes1.failed, []);
+  assert.deepEqual(hashes2.failed, []);
+  assert.deepEqual(hashes2.hashes, hashes1.hashes);
+  assert.equal(projectNode(fetch1.nodesResponse.nodes['10:1'].document).pluginData, undefined);
+
+  // Even past half the age ceiling and with a new publish version, no PR is opened.
+  const snap1 = snapshotFrom({
+    rows: rows1,
+    versions: versions1,
+    nodeHashes: hashes1.hashes,
+    fileKey: DEFAULT_FILE_KEY,
+    now: new Date('2026-01-01T00:00:00Z'),
+  });
+  const snap2 = snapshotFrom({
+    rows: rows2,
+    versions: versions2,
+    nodeHashes: hashes2.hashes,
+    fileKey: DEFAULT_FILE_KEY,
+    now: new Date('2026-11-18T00:00:00Z'),
+  });
+  assert.equal(
+    refreshVerdict(snap1, snap2, { now: new Date('2026-11-18T00:00:00Z'), maxAgeDays: 180 }).verdict,
+    'unchanged',
+  );
+});
+
+test('moving a child without resizing changes the hash, while moving the whole component does not', () => {
+  const baseDoc = recordedLibraryRestFetch1().nodesResponse.nodes['10:1'].document;
+  const baseHash = hashNodeDocument(baseDoc);
+
+  // Moving the whole component on canvas (root + children shifted equally) keeps the hash identical.
+  const movedWhole = structuredClone(baseDoc);
+  movedWhole.relativeTransform = [
+    [1, 0, 500],
+    [0, 1, 700],
+  ];
+  movedWhole.absoluteBoundingBox = { x: 500, y: 700, width: 120, height: 40 };
+  movedWhole.children[0].absoluteBoundingBox = { x: 516, y: 710, width: 40, height: 20 };
+  assert.equal(hashNodeDocument(movedWhole), baseHash, 'whole-component canvas move must not change hash');
+
+  // Moving the child relative to its parent without resizing MUST change the hash.
+  const movedChildBounds = structuredClone(baseDoc);
+  movedChildBounds.children[0].relativeTransform = [
+    [1, 0, 32],
+    [0, 1, 10],
+  ];
+  movedChildBounds.children[0].absoluteBoundingBox = { x: 132, y: 210, width: 40, height: 20 };
+  assert.notEqual(hashNodeDocument(movedChildBounds), baseHash, 'child position change must change hash');
+
+  // Moving a child that only updates absoluteBoundingBox (without relativeTransform) also changes hash.
+  const boxOnlyBase = structuredClone(baseDoc);
+  delete boxOnlyBase.relativeTransform;
+  delete boxOnlyBase.children[0].relativeTransform;
+  const boxOnlyMoved = structuredClone(boxOnlyBase);
+  boxOnlyMoved.children[0].absoluteBoundingBox = { x: 132, y: 210, width: 40, height: 20 };
+  assert.notEqual(hashNodeDocument(boxOnlyMoved), hashNodeDocument(boxOnlyBase));
+
+  // Rotating a child without resizing MUST change the hash.
+  const rotatedChild = structuredClone(baseDoc);
+  rotatedChild.children[0].rotation = 15;
+  assert.notEqual(hashNodeDocument(rotatedChild), baseHash, 'child rotation change must change hash');
+});
+
+test('editing vector path geometry with the same bounds, fills, and strokes changes the hash', () => {
+  const baseDoc = recordedLibraryRestFetch1().nodesResponse.nodes['10:2'].document;
+  const baseHash = hashNodeDocument(baseDoc);
+
+  const editedPath = structuredClone(baseDoc);
+  editedPath.children[0].fillGeometry = [{ path: 'M0 0L16 8L0 16Z', windingRule: 'NONZERO', overrideID: 2 }];
+  assert.notEqual(hashNodeDocument(editedPath), baseHash, 'vector path edit with same bounds must change hash');
+
+  const editedWinding = structuredClone(baseDoc);
+  editedWinding.children[0].fillGeometry = [{ path: 'M0 0L16 0L8 16Z', windingRule: 'EVENODD', overrideID: 2 }];
+  assert.notEqual(hashNodeDocument(editedWinding), baseHash, 'windingRule change must change hash');
 });
 
 test('a real edit (a fill or a property change) changes only that component hash', async () => {
-  const rows = [
-    { key: 'k1', name: 'appearance=primary, state=default', description: '', nodeId: '10:1', containingFrame: 'Button' },
-    { key: 'k2', name: 'tone=neutral, size=sm', description: '', nodeId: '10:2', containingFrame: 'Tag' },
-  ];
+  const fetch1 = recordedLibraryRestFetch1();
+  const rows = rowsFrom(fetch1.componentsResponse);
 
-  const base = await fetchNodeHashes(rows, 'KEY', 'tok', async () => ({ nodes: recordedNodeFixtures() }), 0);
+  const base = await fetchNodeHashes(rows, 'KEY', 'tok', async () => fetch1.nodesResponse, 0);
 
   // Fill edit on 10:1 only
-  const fillEditNodes = recordedNodeFixtures();
-  fillEditNodes['10:1'].document.fills[0].color.r = 0.5;
-  const afterFill = await fetchNodeHashes(rows, 'KEY', 'tok', async () => ({ nodes: fillEditNodes }), 0);
+  const fillEditNodes = structuredClone(fetch1.nodesResponse);
+  fillEditNodes.nodes['10:1'].document.fills[0].color.r = 0.5;
+  const afterFill = await fetchNodeHashes(rows, 'KEY', 'tok', async () => fillEditNodes, 0);
   assert.notEqual(afterFill.hashes['10:1'], base.hashes['10:1'], 'fill change updates Button hash');
   assert.equal(afterFill.hashes['10:2'], base.hashes['10:2'], 'unchanged Tag hash stays identical');
 
   // Component property edit on 10:2 only
-  const propEditNodes = recordedNodeFixtures();
-  propEditNodes['10:2'].document.children[0].componentProperties['Show#99:0'].value = false;
-  const afterProp = await fetchNodeHashes(rows, 'KEY', 'tok', async () => ({ nodes: propEditNodes }), 0);
+  const propEditNodes = structuredClone(fetch1.nodesResponse);
+  propEditNodes.nodes['10:2'].document.children[0].componentProperties['Show#99:0'].value = false;
+  const afterProp = await fetchNodeHashes(rows, 'KEY', 'tok', async () => propEditNodes, 0);
   assert.equal(afterProp.hashes['10:1'], base.hashes['10:1'], 'unchanged Button hash stays identical');
   assert.notEqual(afterProp.hashes['10:2'], base.hashes['10:2'], 'property change updates Tag hash');
 });
 
 test('hashNodeDocument detects changes across all design fields', () => {
-  const doc = recordedNodeFixtures()['10:1'].document;
+  const doc = recordedLibraryRestFetch1().nodesResponse.nodes['10:1'].document;
   const baseHash = hashNodeDocument(doc);
   const mutate = (fn) => {
     const copy = structuredClone(doc);
@@ -671,25 +863,28 @@ test('hashNodeDocument detects changes across all design fields', () => {
 });
 
 test('no PR is opened when nothing changed, and the PR body names the changed components', () => {
-  const rows = [
-    { key: 'k1', name: 'appearance=primary, state=default', description: '', nodeId: '10:1', containingFrame: 'Button' },
-    { key: 'k2', name: 'tone=neutral, size=sm', description: '', nodeId: '10:2', containingFrame: 'Tag' },
-  ];
+  const fetch1 = recordedLibraryRestFetch1();
+  const fetch2 = recordedLibraryRestFetch2();
+  const rows = rowsFrom(fetch1.componentsResponse);
   const baseHashes = {
-    '10:1': hashNodeDocument(recordedNodeFixtures()['10:1'].document),
-    '10:2': hashNodeDocument(recordedNodeFixtures()['10:2'].document),
+    '10:1': hashNodeDocument(fetch1.nodesResponse.nodes['10:1'].document),
+    '10:2': hashNodeDocument(fetch1.nodesResponse.nodes['10:2'].document),
   };
-  const before = snapshotFrom({ rows, versions: [], nodeHashes: baseHashes, fileKey: DEFAULT_FILE_KEY, now: new Date('2026-11-16T00:00:00Z') });
-
-  // Second fetch with volatile churn only -> identical hashes -> verdict is unchanged (workflow opens no PR)
-  const unchangedNodes = shuffleKeys(recordedNodeFixtures());
-  unchangedNodes['10:1'].document.pluginData = { changed: true };
-  const afterUnchanged = snapshotFrom({
+  const before = snapshotFrom({
     rows,
-    versions: [],
+    versions: versionsFrom(fetch1.versionsResponse),
+    nodeHashes: baseHashes,
+    fileKey: DEFAULT_FILE_KEY,
+    now: new Date('2026-01-01T00:00:00Z'),
+  });
+
+  // Second fetch with volatile churn, new version, and old baseline -> verdict is unchanged (no PR)
+  const afterUnchanged = snapshotFrom({
+    rows: rowsFrom(fetch2.componentsResponse),
+    versions: versionsFrom(fetch2.versionsResponse),
     nodeHashes: {
-      '10:1': hashNodeDocument(unchangedNodes['10:1'].document),
-      '10:2': hashNodeDocument(unchangedNodes['10:2'].document),
+      '10:1': hashNodeDocument(fetch2.nodesResponse.nodes['10:1'].document),
+      '10:2': hashNodeDocument(fetch2.nodesResponse.nodes['10:2'].document),
     },
     fileKey: DEFAULT_FILE_KEY,
     now: new Date('2026-11-18T00:00:00Z'),
@@ -700,11 +895,11 @@ test('no PR is opened when nothing changed, and the PR body names the changed co
   );
 
   // Real edit on 10:1 only -> PR body lists Button / appearance=primary, state=default by name
-  const editedNodes = recordedNodeFixtures();
+  const editedNodes = structuredClone(fetch1.nodesResponse.nodes);
   editedNodes['10:1'].document.fills[0].color.r = 0.4;
   const afterEdited = snapshotFrom({
     rows,
-    versions: [],
+    versions: versionsFrom(fetch1.versionsResponse),
     nodeHashes: {
       '10:1': hashNodeDocument(editedNodes['10:1'].document),
       '10:2': hashNodeDocument(editedNodes['10:2'].document),
@@ -735,33 +930,103 @@ test('no PR is opened when nothing changed, and the PR body names the changed co
   assert.doesNotMatch(body, /Tag \/ tone=neutral, size=sm/);
   assert.doesNotMatch(body, /\b1 hash(es)? changed\b/i);
 
-  // Workflow check: unchanged verdict gates out PR creation, and Compare passes --pr-body
+  // Workflow check: unchanged verdict gates out PR creation, and Compare passes --pr-body and --report-file
   const workflow = fs.readFileSync(path.join(REPO_ROOT, '.github/workflows/figma-snapshot-refresh.yml'), 'utf8');
   assert.match(workflow, /--pr-body/);
+  assert.match(workflow, /--report-file/);
   assert.match(workflow, /if:\s*steps\.compare\.outputs\.verdict\s*!=\s*'unchanged'/);
+  assert.doesNotMatch(workflow, /date-only/);
 });
 
-test('the verdict CLI writes a PR body naming changed components and skips writing when unchanged', () => {
+test('when changed components exceed the PR body limit, a linked committed report holds every name without truncation', () => {
+  const manyRows = Array.from({ length: 40 }, (_, i) => ({
+    key: `k${String(i).padStart(3, '0')}`,
+    name: `variant=${String(i).padStart(3, '0')}`,
+    description: '',
+    nodeId: `100:${i}`,
+    containingFrame: 'LargeSet',
+  }));
+  const beforeHashes = Object.fromEntries(manyRows.map((r) => [r.nodeId, 'old']));
+  const afterHashes = Object.fromEntries(manyRows.map((r) => [r.nodeId, 'new']));
+  const before = snapshotFrom({ rows: manyRows, versions: [], nodeHashes: beforeHashes, fileKey: DEFAULT_FILE_KEY, now: new Date('2026-11-16T00:00:00Z') });
+  const after = snapshotFrom({ rows: manyRows, versions: [], nodeHashes: afterHashes, fileKey: DEFAULT_FILE_KEY, now: new Date('2026-11-18T00:00:00Z') });
+
+  const { body, report } = buildRefreshPrOutput({
+    before,
+    after,
+    verdict: 'changed',
+    maxChars: 900,
+    reportPath: 'scripts/figma-snapshot-changes.md',
+    reportUrl: 'https://github.com/BilLogic/plus-uno/blob/chore/figma-snapshot-refresh/scripts/figma-snapshot-changes.md',
+  });
+
+  assert.ok(report, 'overflow produces a report file');
+  assert.equal(report.path, 'scripts/figma-snapshot-changes.md');
+  assert.ok(body.length <= 900, `PR body (${body.length}) fits within limit`);
+  assert.match(body, /https:\/\/github\.com\/BilLogic\/plus-uno\/blob\/chore\/figma-snapshot-refresh\/scripts\/figma-snapshot-changes\.md/);
+  assert.doesNotMatch(body, /and \d+ more/i);
+  for (const row of manyRows) {
+    assert.ok(report.content.includes(`LargeSet / ${row.name}`), `report includes ${row.name}`);
+  }
+});
+
+test('the verdict CLI writes a PR body naming changed components, writes a report only on overflow, and skips both when unchanged', () => {
   const cli = path.join(REPO_ROOT, 'scripts/figma-snapshot-verdict.mjs');
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'verdict-pr-'));
   const beforePath = path.join(dir, 'before.json');
   const unchangedPath = path.join(dir, 'unchanged.json');
   const editedPath = path.join(dir, 'edited.json');
   const prBodyPath = path.join(dir, 'pr-body.md');
+  const reportPath = path.join(dir, 'report.md');
 
   const today = new Date().toISOString();
   const baseSnap = snap(today);
   fs.writeFileSync(beforePath, JSON.stringify(baseSnap));
-  fs.writeFileSync(unchangedPath, JSON.stringify({ ...baseSnap, lastChecked: new Date().toISOString() }));
+  fs.writeFileSync(
+    unchangedPath,
+    JSON.stringify({ ...baseSnap, lastChecked: new Date().toISOString(), versionIds: [{ id: 'v2' }] }),
+  );
   fs.writeFileSync(editedPath, JSON.stringify({ ...baseSnap, nodeHashes: { '1:1': 'edited', '1:2': 'h2' } }));
 
-  const outUnchanged = execFileSync('node', [cli, beforePath, unchangedPath, '--pr-body', prBodyPath], { encoding: 'utf8' });
+  const outUnchanged = execFileSync('node', [cli, beforePath, unchangedPath, '--pr-body', prBodyPath, '--report-file', reportPath], {
+    encoding: 'utf8',
+  });
   assert.match(outUnchanged, /^verdict=unchanged\n/);
   assert.equal(fs.existsSync(prBodyPath), false, 'no PR body written when unchanged');
+  assert.equal(fs.existsSync(reportPath), false, 'no report written when unchanged');
 
-  const outChanged = execFileSync('node', [cli, beforePath, editedPath, '--pr-body', prBodyPath], { encoding: 'utf8' });
+  // Overflow run writes both PR body (linked) and full report
+  const manyRows = Array.from({ length: 30 }, (_, i) => ({
+    key: `k${String(i).padStart(3, '0')}`,
+    name: `variant=${String(i).padStart(3, '0')}`,
+    description: '',
+    nodeId: `200:${i}`,
+    containingFrame: 'BigSet',
+  }));
+  const bigBefore = path.join(dir, 'big-before.json');
+  const bigAfter = path.join(dir, 'big-after.json');
+  fs.writeFileSync(bigBefore, JSON.stringify({ ...baseSnap, components: manyRows, nodeHashes: Object.fromEntries(manyRows.map((r) => [r.nodeId, 'a'])) }));
+  fs.writeFileSync(bigAfter, JSON.stringify({ ...baseSnap, components: manyRows, nodeHashes: Object.fromEntries(manyRows.map((r) => [r.nodeId, 'b'])) }));
+
+  const outBig = execFileSync(
+    'node',
+    [cli, bigBefore, bigAfter, '--pr-body', prBodyPath, '--report-file', reportPath, '--max-body-chars', '800'],
+    { encoding: 'utf8' },
+  );
+  assert.match(outBig, /^verdict=changed\n/);
+  assert.equal(fs.existsSync(reportPath), true, 'overflow writes report file');
+  const bigReport = fs.readFileSync(reportPath, 'utf8');
+  for (const row of manyRows) assert.ok(bigReport.includes(`BigSet / ${row.name}`));
+
+  // Subsequent small edit removes stale reportPath and puts names inline
+  const outChanged = execFileSync(
+    'node',
+    [cli, beforePath, editedPath, '--pr-body', prBodyPath, '--report-file', reportPath],
+    { encoding: 'utf8' },
+  );
   assert.match(outChanged, /^verdict=changed\n/);
   const body = fs.readFileSync(prBodyPath, 'utf8');
   assert.match(body, /A \/ a/);
   assert.doesNotMatch(body, /B \/ b/);
+  assert.equal(fs.existsSync(reportPath), false, 'stale report file is removed when PR body fits inline');
 });

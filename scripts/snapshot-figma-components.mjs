@@ -187,12 +187,46 @@ export function canonicalJson(value) {
   return JSON.stringify(sortKeys(value));
 }
 
+/** Round coordinates/transforms to 4 decimals and normalize -0 to 0 to suppress float noise. */
+function roundNumber(value) {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return value;
+  const rounded = Math.round(value * 1e4) / 1e4;
+  return rounded === 0 ? 0 : rounded;
+}
+
+function projectTransform(matrix) {
+  if (!Array.isArray(matrix)) return undefined;
+  return matrix.map((row) => (Array.isArray(row) ? row.map(roundNumber) : row));
+}
+
+function normalizeSvgPath(pathStr) {
+  const tokens = String(pathStr).match(/[a-zA-Z]|-?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?/g);
+  if (!tokens) return '';
+  return tokens
+    .map((tok) => {
+      if (/^[a-zA-Z]$/.test(tok)) return tok;
+      const n = Number(tok);
+      return Number.isFinite(n) ? String(roundNumber(n)) : tok;
+    })
+    .join(' ');
+}
+
+function projectGeometry(geometryList) {
+  if (!Array.isArray(geometryList) || geometryList.length === 0) return undefined;
+  return geometryList.map((item) => {
+    const out = {};
+    if (item?.path !== undefined) out.path = normalizeSvgPath(item.path);
+    if (item?.windingRule !== undefined) out.windingRule = item.windingRule;
+    return out;
+  });
+}
+
 /**
  * Design-relevant fields on a Figma REST node document. Everything outside this
  * allowlist — `id`, `pluginData`, `sharedPluginData`, `devStatus`, `annotations`,
- * canvas `absoluteBoundingBox` x/y, `absoluteRenderBounds`, `fillGeometry`,
- * `strokeGeometry`, `componentId`, `overrides`, and any future volatile keys —
- * is dropped so unchanged components hash identically across fetches.
+ * canvas `absoluteBoundingBox` x/y, `absoluteRenderBounds`, `overrideID`,
+ * `componentId`, `overrides`, and any future volatile keys — is dropped so
+ * unchanged components hash identically across fetches.
  */
 const DESIGN_NODE_FIELDS = [
   // structure & identity
@@ -204,7 +238,7 @@ const DESIGN_NODE_FIELDS = [
   'booleanOperation',
   'blendMode',
   'opacity',
-  'rotation',
+  'arcData',
   // component properties & variant values
   'componentPropertyDefinitions',
   'componentProperties',
@@ -278,28 +312,58 @@ const DESIGN_NODE_FIELDS = [
   'explicitVariableModes',
 ];
 
-/** Canonical projection of a Figma node document, recursing through `children`. */
-export function projectNode(node) {
+/**
+ * Canonical projection of a Figma node document, recursing through `children`.
+ * Root canvas placement (`absoluteBoundingBox` x/y, root `relativeTransform`)
+ * is ignored, while child placement relative to its parent and canonical local
+ * vector geometry (`fillGeometry` / `strokeGeometry`) are preserved.
+ */
+export function projectNode(node, parent = null) {
   if (!node || typeof node !== 'object') return node;
   const projected = {};
   for (const field of DESIGN_NODE_FIELDS) {
     if (node[field] !== undefined) projected[field] = node[field];
   }
+  if (typeof node.rotation === 'number') {
+    projected.rotation = roundNumber(node.rotation);
+  }
   if (node.visible === false) projected.visible = false;
-  if (node.size !== undefined) {
-    projected.size = node.size;
+  if (node.size && typeof node.size.x === 'number' && typeof node.size.y === 'number') {
+    projected.size = { x: roundNumber(node.size.x), y: roundNumber(node.size.y) };
   } else if (
     node.absoluteBoundingBox &&
     typeof node.absoluteBoundingBox.width === 'number' &&
     typeof node.absoluteBoundingBox.height === 'number'
   ) {
     projected.size = {
-      x: node.absoluteBoundingBox.width,
-      y: node.absoluteBoundingBox.height,
+      x: roundNumber(node.absoluteBoundingBox.width),
+      y: roundNumber(node.absoluteBoundingBox.height),
     };
   }
+  if (parent !== null) {
+    if (Array.isArray(node.relativeTransform)) {
+      projected.relativeTransform = projectTransform(node.relativeTransform);
+    }
+    if (
+      node.absoluteBoundingBox &&
+      parent.absoluteBoundingBox &&
+      typeof node.absoluteBoundingBox.x === 'number' &&
+      typeof node.absoluteBoundingBox.y === 'number' &&
+      typeof parent.absoluteBoundingBox.x === 'number' &&
+      typeof parent.absoluteBoundingBox.y === 'number'
+    ) {
+      projected.relativePosition = {
+        x: roundNumber(node.absoluteBoundingBox.x - parent.absoluteBoundingBox.x),
+        y: roundNumber(node.absoluteBoundingBox.y - parent.absoluteBoundingBox.y),
+      };
+    }
+  }
+  const fillGeom = projectGeometry(node.fillGeometry);
+  if (fillGeom) projected.fillGeometry = fillGeom;
+  const strokeGeom = projectGeometry(node.strokeGeometry);
+  if (strokeGeom) projected.strokeGeometry = strokeGeom;
   if (Array.isArray(node.children)) {
-    projected.children = node.children.map(projectNode);
+    projected.children = node.children.map((child) => projectNode(child, node));
   }
   return sortKeys(projected);
 }
@@ -380,79 +444,100 @@ export function changedComponents(before = {}, after = {}) {
   };
 }
 
-const MAX_PR_COMPONENT_LIST_CHARS = 45_000;
+export const MAX_PR_BODY_CHARS = 45_000;
+export const DEFAULT_REPORT_PATH = 'scripts/figma-snapshot-changes.md';
 
-/** Build the refresh PR description, listing changed components by name. */
-export function buildRefreshPrBody({
+/**
+ * Build the refresh PR description and, when the full changed-component list
+ * exceeds `maxChars`, a committed markdown report holding every changed name
+ * without truncation.
+ */
+export function buildRefreshPrOutput({
   before,
   after,
-  verdict,
-  ageDays,
   deltaLog = '',
-  base = 'main',
   branch = 'chore/figma-snapshot-refresh',
   snapshotPath = SNAPSHOT,
   runUrl = '',
+  maxChars = MAX_PR_BODY_CHARS,
+  reportPath = DEFAULT_REPORT_PATH,
+  reportUrl = '',
 }) {
-  const lines = [`Refreshes \`${snapshotPath}\` from the published Figma library.`, ''];
+  const changes = changedComponents(before, after);
 
-  if (verdict === 'date-only') {
-    lines.push(
-      `**Date refresh only.** The published library matches ${base}. This PR moves \`lastChecked\` forward because the snapshot on ${base} was ${ageDays ?? 'an unreadable number of'} days old, past half of the \`check:figma-snapshots\` age ceiling.`,
-      '',
-    );
-  } else {
-    const changes = changedComponents(before, after);
+  const assembleBody = (componentLines) => {
+    const lines = [`Refreshes \`${snapshotPath}\` from the published Figma library.`, ''];
     lines.push('## Changed components', '');
-    if (changes.names.length) {
-      let chars = 0;
-      let shown = 0;
-      for (const name of changes.names) {
-        const line = `- \`${name}\``;
-        if (chars + line.length + 1 > MAX_PR_COMPONENT_LIST_CHARS) break;
-        lines.push(line);
-        chars += line.length + 1;
-        shown += 1;
+    lines.push(...componentLines, '');
+
+    if (deltaLog.trim()) {
+      const trimmed = deltaLog.trim();
+      lines.push('## Delta', '');
+      if (trimmed.startsWith('```')) {
+        lines.push(trimmed);
+      } else {
+        lines.push('```', trimmed, '```');
       }
-      if (shown < changes.names.length) {
-        lines.push(`- … and ${changes.names.length - shown} more (truncated to fit PR body size limit)`);
-      }
-    } else {
-      lines.push('No component changes (publish history updated).');
+      lines.push('');
     }
-    lines.push('');
-  }
 
-  if (deltaLog.trim()) {
-    const trimmed = deltaLog.trim();
-    lines.push('## Delta', '');
-    if (trimmed.startsWith('```')) {
-      lines.push(trimmed);
-    } else {
-      lines.push('```', trimmed, '```');
+    lines.push(
+      '## Before merging',
+      '',
+      'This PR was opened by the workflow\'s `GITHUB_TOKEN`, and GitHub starts no other workflow from that token\'s events, so **the pull_request checks have not run**. To run them, close this PR and reopen it. Mark it ready for review once they pass.',
+      '',
+      `Each later run force-pushes \`${branch}\` and rewrites this description, and its checks need another close and reopen. A later run that finds no change closes this PR.`,
+    );
+
+    if (runUrl) {
+      lines.push('', `Opened by [Refresh Figma Component Snapshot](${runUrl}).`);
     }
-    lines.push('');
+
+    return `${lines.join('\n')}\n`;
+  };
+
+  const inlineLines = changes.names.length
+    ? changes.names.map((name) => `- \`${name}\``)
+    : ['No component changes.'];
+  const fullBody = assembleBody(inlineLines);
+
+  if (fullBody.length <= maxChars || changes.names.length === 0) {
+    return { body: fullBody, report: null };
   }
 
-  lines.push(
-    '## Before merging',
+  const target = reportUrl || reportPath;
+  const linkedLines = [
+    `${changes.names.length} changed component(s) exceed the PR description limit; see the [full changed-component report](${target}).`,
+  ];
+  const reportContent = [
+    '# Figma Component Snapshot — Changed Components',
     '',
-    'This PR was opened by the workflow\'s `GITHUB_TOKEN`, and GitHub starts no other workflow from that token\'s events, so **the pull_request checks have not run**. To run them, close this PR and reopen it. Mark it ready for review once they pass.',
+    `${changes.names.length} changed component(s) in \`${snapshotPath}\`:`,
     '',
-    `Each later run force-pushes \`${branch}\` and rewrites this description, and its checks need another close and reopen. A later run that finds no change closes this PR.`,
-  );
+    ...changes.names.map((name) => `- \`${name}\``),
+    '',
+  ].join('\n');
 
-  if (runUrl) {
-    lines.push('', `Opened by [Refresh Figma Component Snapshot](${runUrl}).`);
-  }
-
-  return `${lines.join('\n')}\n`;
+  return {
+    body: assembleBody(linkedLines),
+    report: { path: reportPath, content: reportContent },
+  };
 }
 
-/** A snapshot as a comparable string: `lastChecked` dropped, rows by key, object keys sorted. */
+/** Build the refresh PR description string. */
+export function buildRefreshPrBody(opts) {
+  return buildRefreshPrOutput(opts).body;
+}
+
+/**
+ * A snapshot as a comparable string: `lastChecked` and `versionIds` dropped,
+ * rows by key, object keys sorted. Neither timestamp moves nor publish-history
+ * additions without component/hash changes open a PR.
+ */
 function comparable(snapshot) {
   const rest = { ...snapshot };
   delete rest.lastChecked;
+  delete rest.versionIds;
   const rows = [...(rest.components ?? [])].sort(byKey);
   return canonicalJson({ ...rest, components: rows });
 }
@@ -460,16 +545,12 @@ function comparable(snapshot) {
 /**
  * What a refresh found, for the workflow that opens its PR.
  *
- * `changed` when anything but `lastChecked` differs. `date-only` when nothing
- * did but the snapshot on main is past half the age ceiling: `check:figma-
- * snapshots` fails at the ceiling, and a refresh that always discarded an
- * unchanged run's date could never clear it. `unchanged` otherwise. A date
- * that cannot be read, or that lies in the future, counts as old.
+ * `changed` only when component rows, `nodeHashes`, or `figmaFileKey` differ;
+ * `unchanged` otherwise (including timestamp-only and publish-history-only runs).
  */
-export function refreshVerdict(before, after, { now, maxAgeDays }) {
+export function refreshVerdict(before, after, { now } = {}) {
   const ageDays = ageInDays(before.lastChecked, now);
   if (comparable(before) !== comparable(after)) return { verdict: 'changed', ageDays };
-  if (ageDays === null || ageDays < 0 || ageDays > maxAgeDays / 2) return { verdict: 'date-only', ageDays };
   return { verdict: 'unchanged', ageDays };
 }
 
