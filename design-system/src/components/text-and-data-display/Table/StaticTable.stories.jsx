@@ -128,7 +128,7 @@ export const Bordered = {
 export const Sizes = {
     parameters: { docs: { description: { story: 'Rows are 32, 40 or 48 tall at minimum, from `--row-height-sm`, `--row-height-md` and `--row-height-lg`.' } } },
     render: () => (
-        <div style={{ display: 'grid', gap: 'var(--section-stack-md)' }}>
+        <div style={{ display: 'grid', gap: 'var(--stack-xl) var(--inline-xl)' }}>
             {[32, 40, 48].map((size) => (
                 <Table
                     key={size}

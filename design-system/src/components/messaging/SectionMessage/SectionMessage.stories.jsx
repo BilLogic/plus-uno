@@ -81,8 +81,8 @@ const GROUND_TOKEN = {
     info: '--ds-background-information',
 };
 
-const sectionMessageCol = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' };
-const contentVariantCol = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' };
+const sectionMessageCol = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)' };
+const contentVariantCol = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)' };
 
 function SectionMessageContentDemos() {
     return (
@@ -203,7 +203,7 @@ Interactive.args = {
  * 16px icon whatever the text size beside it.
  */
 export const DismissPlacement = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--width-2500)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--width-2500)' }}>
         <SectionMessage appearance="primary" title="With a title" data-testid="placement-title">
             The × centers on the title line, not on the message.
         </SectionMessage>
@@ -263,7 +263,7 @@ DismissPlacement.play = async ({ canvasElement }) => {
  * decorative: the message's role and its text already say what it is.
  */
 export const LeadingIcon = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--width-2500)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--width-2500)' }}>
         {SECTION_MESSAGE_APPEARANCES.map((appearance) => (
             <SectionMessage key={appearance} appearance={appearance} title="Session update" data-testid={`icon-${appearance}`}>
                 Thursday&apos;s math session starts at 4:00 PM ET.
@@ -377,7 +377,7 @@ export const GroundAndText = () => (
         style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 'var(--section-stack-lg)',
+            gap: 'var(--stack-2xl)',
             padding: 'var(--section-pad-y-default) var(--section-pad-x-default)',
             background: 'var(--ds-surface-sunken)',
         }}

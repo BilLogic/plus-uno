@@ -23,7 +23,7 @@ export default {
     },
 };
 
-const row = { display: 'flex', gap: 'var(--section-stack-lg)', alignItems: 'center' };
+const row = { display: 'flex', gap: 'var(--inline-2xl)', alignItems: 'center' };
 
 export const Overview = () => <Spinner />;
 Overview.parameters = {

@@ -6,7 +6,7 @@ import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import CloseButton from './CloseButton';
 import { INVERSE_GROUNDS } from './inverseGrounds.js';
 
-const row = { display: 'flex', gap: 'var(--section-stack-lg)', alignItems: 'center', flexWrap: 'wrap' };
+const row = { display: 'flex', gap: 'var(--inline-2xl)', alignItems: 'center', flexWrap: 'wrap' };
 const inverseGround = {
     ...row,
     padding: 'var(--pad-x-lg)',
@@ -80,7 +80,7 @@ export const Spacing = {
 
 export const Tones = {
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)', alignItems: 'flex-start' }}>
             <div style={row}>
                 <CloseButton label="Dismiss default example" />
             </div>
@@ -113,7 +113,7 @@ export const Tones = {
 
 export const Focus = {
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)', alignItems: 'flex-start' }}>
             <div style={row}>
                 <CloseButton label="Close default focus example" />
             </div>

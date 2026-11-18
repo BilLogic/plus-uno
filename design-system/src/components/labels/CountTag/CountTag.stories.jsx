@@ -35,7 +35,7 @@ export default {
     },
 };
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--grid-gutter)', alignItems: 'center' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-xl)', alignItems: 'center' };
 
 /* ------------------------------------------------------------------ helpers */
 

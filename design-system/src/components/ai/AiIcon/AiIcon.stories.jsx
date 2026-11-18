@@ -56,7 +56,7 @@ const ModeSet = ({ mode }) => (
         }}
     >
         <div style={{ font: 'var(--heading-sm)', marginBottom: 'var(--inline-md)' }}>{mode === 'dark' ? 'Dark' : 'Light'}</div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, auto)', gap: 'var(--grid-gutter)', justifyContent: 'start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, auto)', gap: 'var(--stack-xl) var(--inline-xl)', justifyContent: 'start' }}>
             {AI_ICON_NAMES.flatMap((name) => AI_ICON_ALL_SIZES.filter((size) => AI_ICON_SIZES[name].includes(size)).map((size) => (
                 <div key={`${name}-${size}`} style={cell}>
                     <AiIcon name={name} size={size} data-name={name} data-size={size} />
@@ -70,7 +70,7 @@ const ModeSet = ({ mode }) => (
 /* ---------------------------------------------------------------- the set */
 
 export const AllIcons = () => (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--grid-gutter)' }}>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-xl)' }}>
         <ModeSet mode="light" />
         <ModeSet mode="dark" />
     </div>
@@ -98,7 +98,7 @@ AllIcons.play = async ({ canvasElement }) => {
 /* ------------------------------------------------------- native token sizes */
 
 export const CloseUp = () => (
-    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', gap: 'var(--grid-gutter)', color: 'var(--ds-icon)' }}>
+    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start', gap: 'var(--inline-xl)', color: 'var(--ds-icon)' }}>
         {AI_ICON_NAMES.map((name) => (
             <div key={name} style={cell}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
@@ -127,7 +127,7 @@ CloseUp.play = async ({ canvasElement }) => {
 /* ------------------------------------------------------------ accessibility */
 
 export const Labeled = () => (
-    <div style={{ display: 'flex', gap: 'var(--grid-gutter)', alignItems: 'center' }}>
+    <div style={{ display: 'flex', gap: 'var(--inline-xl)', alignItems: 'center' }}>
         <AiIcon name="summarize" label="Summarize" data-testid="named" />
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
             <AiIcon name="rewrite" data-testid="decorative" />
@@ -148,7 +148,7 @@ Labeled.play = async ({ canvasElement }) => {
 /* -------------------------------------------------------------------- color */
 
 export const Color = () => (
-    <div style={{ display: 'flex', gap: 'var(--grid-gutter)', alignItems: 'center' }}>
+    <div style={{ display: 'flex', gap: 'var(--inline-xl)', alignItems: 'center' }}>
         <AiIcon name="suggest" data-testid="default" />
         <AiIcon name="suggest" data-testid="brand" style={{ color: 'var(--ds-icon-brand)' }} />
     </div>

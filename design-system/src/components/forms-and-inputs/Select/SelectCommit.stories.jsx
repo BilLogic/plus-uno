@@ -14,7 +14,7 @@ import Select from './Select';
  * the highlighted row is its `aria-activedescendant`.
  */
 
-const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--panel-max-width)' };
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--panel-max-width)' };
 
 const schools = [
     { value: 'north', label: 'North High' },

@@ -13,7 +13,7 @@ export default {
 /** Which text and icon token goes on which fill. */
 export const ContrastPairings = {
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
             <ModeCompare>
                 {() => (
                     <PatternCard

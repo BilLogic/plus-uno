@@ -120,7 +120,7 @@ export const Overview = {
 /** sm · md · lg at the 1024 screen: 512 · 677 · 843, as Figma's Large mode draws them. */
 export const Widths = {
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
             {BLANKET_WIDTHS.map((width) => (
                 <InBlanket key={width} height={320}>
                     <PatternModal title={`width="${width}"`} width={width} onClose={() => {}} footer={footerActions}>
@@ -145,7 +145,7 @@ export const Widths = {
  */
 export const Heights = {
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
             <InBlanket>
                 <PatternModal title='height="hug", short' onClose={() => {}} footer={footerActions}>
                     {bodyCopy}
@@ -220,7 +220,7 @@ const saveActions = (
  */
 export const Tabs = {
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
             <InBlanket>
                 <PatternModal title="Session settings" tabs={sessionTabs} onClose={() => {}} footer={saveActions} />
             </InBlanket>
@@ -619,7 +619,7 @@ export const AnatomyActive = {
 export const WidthStrip = {
     render: () => (
         <ScrollStage width={STAGE}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
                 {BLANKET_WIDTHS.map((width) => [width, `${BLANKET_SPANS[width]}-col`]).map(([width, label]) => (
                     <Demo.ModalStage key={width} width={width} height={240} title={label} footer={<Demo.TwoCells action="Save" />}>
                         <p style={{ margin: 0, font: 'var(--body-default)' }}>{`${label} on the 1024 screen grid.`}</p>

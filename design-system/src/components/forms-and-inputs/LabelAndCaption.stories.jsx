@@ -26,7 +26,7 @@ export default {
 };
 
 const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', maxWidth: 'var(--size-3000)' };
-const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--section-stack-md)', alignItems: 'flex-start' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-xl)', alignItems: 'flex-start' };
 const cell = { minWidth: 'var(--size-1000)' };
 
 export const Overview = () => (
@@ -68,19 +68,19 @@ LabelRequired.play = async ({ canvasElement }) => {
 export const CaptionVariants = () => (
     <div style={row}>
         <section style={cell}>
-            <h6 className="heading-sm" style={{ marginBottom: 'var(--section-stack-md)' }}>Default</h6>
+            <h6 className="heading-sm" style={{ marginBottom: 'var(--stack-xl)' }}>Default</h6>
             <Caption text="caption" state="default" />
         </section>
         <section style={cell}>
-            <h6 className="heading-sm" style={{ marginBottom: 'var(--section-stack-md)' }}>Success</h6>
+            <h6 className="heading-sm" style={{ marginBottom: 'var(--stack-xl)' }}>Success</h6>
             <Caption text="caption" state="success" />
         </section>
         <section style={cell}>
-            <h6 className="heading-sm" style={{ marginBottom: 'var(--section-stack-md)' }}>Danger</h6>
+            <h6 className="heading-sm" style={{ marginBottom: 'var(--stack-xl)' }}>Danger</h6>
             <Caption text="caption" state="danger" />
         </section>
         <section style={cell}>
-            <h6 className="heading-sm" style={{ marginBottom: 'var(--section-stack-md)' }}>Warning</h6>
+            <h6 className="heading-sm" style={{ marginBottom: 'var(--stack-xl)' }}>Warning</h6>
             <Caption text="caption" state="warning" />
         </section>
     </div>
@@ -108,33 +108,33 @@ export const CaptionWarning = () => <Caption text="This number looks like a land
 
 /** Label, control and caption stacked as the fields draw them, one per caption state. */
 export const Layout = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)' }}>
         <section>
-            <h6 className="heading-sm" style={{ marginBottom: 'var(--section-stack-lg)' }}>Default</h6>
+            <h6 className="heading-sm" style={{ marginBottom: 'var(--stack-2xl)' }}>Default</h6>
             <div style={stack}>
                 <TextField id="layout-email" type="email" label="Email address" isRequired placeholder="Enter your email" caption="We'll never share your email with anyone else." />
             </div>
         </section>
         <section>
-            <h6 className="heading-sm" style={{ marginBottom: 'var(--section-stack-lg)' }}>Success</h6>
+            <h6 className="heading-sm" style={{ marginBottom: 'var(--stack-2xl)' }}>Success</h6>
             <div style={stack}>
                 <TextField id="layout-username" label="Username" isRequired defaultValue="john_doe" successMessage="Username is available." />
             </div>
         </section>
         <section>
-            <h6 className="heading-sm" style={{ marginBottom: 'var(--section-stack-lg)' }}>Error</h6>
+            <h6 className="heading-sm" style={{ marginBottom: 'var(--stack-2xl)' }}>Error</h6>
             <div style={stack}>
                 <TextField id="layout-password" type="password" label="Password" isRequired defaultValue="123" isInvalid errorMessage="Password must be at least 8 characters long." />
             </div>
         </section>
         <section>
-            <h6 className="heading-sm" style={{ marginBottom: 'var(--section-stack-lg)' }}>Warning</h6>
+            <h6 className="heading-sm" style={{ marginBottom: 'var(--stack-2xl)' }}>Warning</h6>
             <div style={stack}>
                 <TextField id="layout-phone" type="tel" label="Phone number" defaultValue="555-0123" warningMessage="Include a country code for international numbers." />
             </div>
         </section>
         <section>
-            <h6 className="heading-sm" style={{ marginBottom: 'var(--section-stack-lg)' }}>Disabled</h6>
+            <h6 className="heading-sm" style={{ marginBottom: 'var(--stack-2xl)' }}>Disabled</h6>
             <div style={stack}>
                 <TextField id="layout-account-type" label="Account type" isRequired defaultValue="Premium" isDisabled />
             </div>

@@ -154,7 +154,7 @@ ReducedMotion.play = async ({ canvasElement }) => {
 /* ------------------------------------------------------------------- radius */
 
 export const Radii = () => (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--grid-gutter)' }}>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-xl)' }}>
         {GENERATIVE_BORDER_RADII.map((radius) => (
             <GenerativeBorder key={radius} isActive radius={radius}>
                 <div style={{ ...box, minWidth: 'var(--card-min-width-sm)' }}>
@@ -178,7 +178,7 @@ Radii.play = async ({ canvasElement }) => {
 export const Interactive = (args) => {
     const [isActive, setIsActive] = useState(Boolean(args.isActive));
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--grid-gutter)', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)', alignItems: 'flex-start' }}>
             <GenerativeBorder {...args} isActive={isActive} data-testid="wrapper" style={wrap}>
                 <Draft />
             </GenerativeBorder>

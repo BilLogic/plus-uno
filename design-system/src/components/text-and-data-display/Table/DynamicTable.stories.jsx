@@ -146,7 +146,7 @@ const STATES = ['empty', 'no results', 'loading', 'error'];
 
 export const States = {
     render: (args) => (
-        <div style={{ display: 'grid', gap: 'var(--section-stack-lg)' }}>
+        <div style={{ display: 'grid', gap: 'var(--stack-2xl) var(--inline-2xl)' }}>
             {STATES.map((state) => (
                 <DynamicTable key={state} {...args} state={state} label={`Students, ${state}`} testId={`state-${state}`} />
             ))}
@@ -233,7 +233,7 @@ const LONG = 'Alexandria Montgomery-Vasquez, transferred from Roosevelt K-8 in t
 
 export const Widths = {
     render: (args) => (
-        <div style={{ display: 'grid', gap: 'var(--section-stack-lg)' }}>
+        <div style={{ display: 'grid', gap: 'var(--stack-2xl) var(--inline-2xl)' }}>
             {[
                 [480, 'var(--width-3000)'],
                 [768, '768px' /* token gap: 768px */],

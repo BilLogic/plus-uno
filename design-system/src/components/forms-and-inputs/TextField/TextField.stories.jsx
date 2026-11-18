@@ -57,7 +57,7 @@ export default {
     }
 };
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--section-stack-lg)', alignItems: 'flex-start' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-2xl)', alignItems: 'flex-start' };
 const px = (value) => Math.round(parseFloat(value));
 const icon = (name) => <i className={iconClass(name)} aria-hidden="true" />;
 const fieldWrap = { maxWidth: 'var(--width-2500)' };
@@ -306,7 +306,7 @@ Warning.play = async ({ canvasElement }) => {
 
 /** `autoComplete` reaches the input, for the browser and password managers. */
 export const Autofill = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: '360px' /* token gap: 360px */ }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)', maxWidth: '360px' /* token gap: 360px */ }}>
         <TextField id="text-field-autofill-email" label="Email address" type="email" autoComplete="email" />
         <TextField id="text-field-autofill-password" label="Password" type="password" autoComplete="current-password" />
         <TextField id="text-field-autofill-code" label="Access code" autoComplete="one-time-code" />
@@ -322,7 +322,7 @@ Autofill.play = async ({ canvasElement }) => {
 
 /** Search: the magnifier before the control and a visually hidden label. */
 export const Search = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: '360px' /* token gap: 360px */ }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)', maxWidth: '360px' /* token gap: 360px */ }}>
         <TextField id="text-field-search-compact" label="Search tutors" isLabelHidden type="search" spacing="compact" placeholder="Search tutors" elemBeforeInput={icon('magnifying-glass')} />
         <TextField id="text-field-search" label="Search tutors" isLabelHidden type="search" placeholder="Search tutors" elemBeforeInput={icon('magnifying-glass')} />
     </div>
@@ -336,7 +336,7 @@ Search.play = async ({ canvasElement }) => {
 
 /** Buttons in the slots: 32 in the 40 field, 24 in the 32 field, centered, 4 from the edge. */
 export const ButtonsInside = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: '360px' /* token gap: 360px */ }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)', maxWidth: '360px' /* token gap: 360px */ }}>
         <div data-field="default">
             <TextField
                 label="Invite by email"
@@ -435,7 +435,7 @@ Subtle.play = async ({ canvasElement, args }) => {
 
 /** Helper text is `text.subtle`; an error message is `text.danger` on a `border.danger` field. */
 export const CaptionColors = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: 'var(--field-width-lg)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)', maxWidth: 'var(--field-width-lg)' }}>
         <TextField id="caption-help" label="Email" caption="We only use it for reminders." />
         <TextField id="caption-invalid" label="Phone" isInvalid errorMessage="Enter a 10-digit number" />
     </div>
@@ -488,7 +488,7 @@ NumberSteppers.play = async ({ canvasElement }) => {
 export const NumberEmptyIsNotZero = () => {
     const [value, setValue] = useState('');
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: 'var(--field-width-lg)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)', maxWidth: 'var(--field-width-lg)' }}>
             <TextField id="text-field-empty" type="number" label="Hours" value={value} onChange={(e) => setValue(e.target.value)} />
             <output data-testid="held">{JSON.stringify(value)}</output>
             <TextField id="text-field-floor" type="number" label="Students" min={5} />

@@ -5,7 +5,7 @@ import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import IconButton, { ICON_BUTTON_APPEARANCES } from './IconButton';
 import { expectFocusRing, expectHovered, expectPressed } from '@/storybook-docs/lib/button-states.js';
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--grid-gutter)', alignItems: 'center' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-xl)', alignItems: 'center' };
 const title = (name) => name.charAt(0).toUpperCase() + name.slice(1);
 
 export default {

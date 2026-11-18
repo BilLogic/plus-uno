@@ -227,7 +227,7 @@ export const ScreenGrid = {
                         transform: 'translateX(-50%)',
                         display: 'grid',
                         gridTemplateColumns: 'repeat(12, minmax(0, 1fr))',
-                        columnGap: 'var(--grid-gutter)',
+                        columnGap: 'var(--inline-xl)',
                         pointerEvents: 'none',
                     }}
                 >

@@ -15,7 +15,7 @@ import {
 /** The popup is a portal; `within(canvasElement)` cannot see it. */
 const documentOf = (canvasElement) => within(canvasElement.ownerDocument.body);
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--grid-gutter)', alignItems: 'center' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-xl)', alignItems: 'center' };
 const title = (name) => name.charAt(0).toUpperCase() + name.slice(1);
 
 export default {
@@ -185,7 +185,7 @@ export const Focused = {
 export const BestPracticesLive = {
     parameters: { docs: { disable: true } },
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)' }}>
             <DoDontPair
                 doExample={<TintMeaningDo />}
                 doCaption="Info for a neutral note."
