@@ -58,9 +58,9 @@ const Blanket = ({
         <div
             data-reduced={reduced ? 'true' : undefined}
             ref={surface}
-            data-ending-style={inline && !show ? '' : undefined}
-            aria-hidden={inline && !show ? true : undefined}
-            inert={inline && !show ? true : undefined}
+            data-ending-style={!show ? '' : undefined}
+            aria-hidden={!show ? true : undefined}
+            inert={!show ? true : undefined}
             className={classes}
             style={blanketStyle}
             onClick={handleClick}
