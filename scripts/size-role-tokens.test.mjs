@@ -55,3 +55,14 @@ test('no role or table token is named for a Section', () => {
   const minted = [...Object.keys(ROLES), ...Object.keys(TABLE)];
   for (const name of minted) assert.doesNotMatch(name, /section/, name);
 });
+
+test('every height role (control, row, label and media sizes) resolves to a multiple of 4', () => {
+  const heightRole = /^--(control|row-height|label-height|image|icon)-/;
+  const entries = [...corpus.entries()].filter(([name]) => heightRole.test(name));
+  assert.ok(entries.length >= 18, `expected at least 18 height role tokens, got ${entries.length}`);
+  for (const [name, entry] of entries) {
+    const match = /^(\d+(?:\.\d+)?)px$/.exec(entry.value);
+    assert.ok(match, `${name} resolved to ${entry.value}, expected px`);
+    assert.equal(Number(match[1]) % 4, 0, `${name} (${entry.value}) must be a multiple of 4`);
+  }
+});
