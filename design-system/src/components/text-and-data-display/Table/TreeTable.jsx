@@ -1,10 +1,9 @@
 import { AnimatePresence, HeightRow } from '@/lib/heightMotion';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import PatternTable from '@/patterns/PatternTable';
 import Spinner from '@/components/loading/Spinner';
 import HeadCell from './HeadCell';
-import { TableCell, TableRow, TableMessageRow } from './TableParts';
+import { TableCell, TableRow, TableMessageRow, TableShell } from './TableParts';
 import Icon from '../../images-and-icons/Icon';
 import './Table.scss';
 import './DynamicTable.scss';
@@ -38,7 +37,7 @@ const flatten = (items, { isExpanded, childrenOf, loading }, level = 0, parentId
 /**
  * Tree table. Records that nest: a school, its classes, their students. Each
  * level indents one step and keeps every column, so the nested rows can still
- * be read across. Built on the `PatternTable` shell with `HeadCell`s and the
+ * be read across. Built on the table shell with `HeadCell`s and the
  * shared `TableRow` and `TableCell` parts.
  *
  * - **Data.** `items` is one `{ id, cells, children, hasChildren, count }`
@@ -196,7 +195,7 @@ const TreeTable = ({
 
     return (
         <div className={classes('plus-tree-table', className)} data-testid={testId} {...props}>
-            <PatternTable
+            <TableShell
                 tableProps={{
                     role: 'treegrid',
                     'aria-label': label,
@@ -304,7 +303,7 @@ const TreeTable = ({
                     })}
                     </AnimatePresence>
                 </tbody>
-            </PatternTable>
+            </TableShell>
         </div>
     );
 };

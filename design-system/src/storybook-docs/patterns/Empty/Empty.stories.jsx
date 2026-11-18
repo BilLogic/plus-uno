@@ -210,7 +210,7 @@ export const KeyEmptyBoxNothingYet = {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(canvas.queryByRole('table')).toBeNull();
-        const box = canvasElement.querySelector('.plus-pattern-table-empty');
+        const box = canvasElement.querySelector('.plus-table-shell-empty');
         await expect(box, 'empty box rendered').not.toBeNull();
         await expect(getComputedStyle(box).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
         await expect(px(getComputedStyle(box).borderTopLeftRadius)).toBe(tokenLength(canvasElement, '--table-empty-radius'));
@@ -232,7 +232,7 @@ export const KeyEmptyBoxHiddenByFilter = {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(canvas.queryByRole('table')).toBeNull();
-        const box = canvasElement.querySelector('.plus-pattern-table-empty');
+        const box = canvasElement.querySelector('.plus-table-shell-empty');
         await expect(box, 'empty box rendered').not.toBeNull();
         await expect(getComputedStyle(box).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
         await expect(px(getComputedStyle(box).borderTopLeftRadius)).toBe(tokenLength(canvasElement, '--table-empty-radius'));
@@ -253,7 +253,7 @@ export const KeyEmptyBoxNothingToCreate = {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(canvas.queryByRole('table')).toBeNull();
-        const box = canvasElement.querySelector('.plus-pattern-table-empty');
+        const box = canvasElement.querySelector('.plus-table-shell-empty');
         await expect(box, 'empty box rendered').not.toBeNull();
         await expect(getComputedStyle(box).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
         await expect(px(getComputedStyle(box).borderTopLeftRadius)).toBe(tokenLength(canvasElement, '--table-empty-radius'));

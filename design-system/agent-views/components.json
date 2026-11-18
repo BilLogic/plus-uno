@@ -10047,7 +10047,7 @@
         "--pattern-table-overflow-reach",
         "--pattern-table-z-corner",
         "--pattern-table-z-sticky",
-        "--plus-pattern-table-row-state",
+        "--plus-table-shell-row-state",
         "--row-height-md",
         "--stack-md",
         "--stack-sm",

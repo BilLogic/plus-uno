@@ -137,6 +137,24 @@ test('every retired Modal component story id redirects to a live Dialog or Modal
 });
 
 
+test('every retired PatternTable story id redirects to a live Table template or Table shell story id', async () => {
+  const { storybookId } = await import('./lib/storybook-id.mjs');
+  const exportIds = (relPath, title) => {
+    const src = fs.readFileSync(new URL(relPath, import.meta.url), 'utf8');
+    return [...src.matchAll(/^export const ([A-Z][A-Za-z0-9]*)\b/gm)]
+      .map((m) => storybookId(title, m[1].replace(/([a-z0-9])([A-Z])/g, '$1 $2')));
+  };
+  const targets = new Set([
+    ...exportIds('../design-system/src/patterns/Table/Table.stories.jsx', 'Templates/Table'),
+    ...exportIds('../design-system/src/components/text-and-data-display/Table/TableShell.stories.jsx', 'Components/Text and data display/Table shell'),
+  ]);
+  const tableRules = storyRules.filter((r) => r.from.startsWith('templates-table--'));
+  assert.equal(tableRules.length, 13);
+  for (const rule of tableRules) {
+    assert.ok(targets.has(rule.to), `redirect target ${rule.to} is not a live story id`);
+  }
+});
+
 test('historical Modal Backdrop bookmarks land on the Blanket section', () => {
   assert.deepEqual(rules.find((r) => r.from === 'templates-modal-backdrop'), {
     from: 'templates-modal-backdrop', to: 'templates-modal', anchor: '#blanket',

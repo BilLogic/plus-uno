@@ -736,6 +736,99 @@
   status = 301
   force = true
 
+# PatternTable retired: the shell stories moved off Templates/Table, and Overview became the Static table story.
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--overview" }
+  to = "/storybook/?path=/story/templates-table--static-kind"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--empty-with-sticky-column" }
+  to = "/storybook/?path=/story/components-text-and-data-display-table-shell--empty-with-sticky-column"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--row-states" }
+  to = "/storybook/?path=/story/components-text-and-data-display-table-shell--row-states"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--sticky" }
+  to = "/storybook/?path=/story/components-text-and-data-display-table-shell--sticky"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--sticky-header-needs-max-height" }
+  to = "/storybook/?path=/story/components-text-and-data-display-table-shell--sticky-header-needs-max-height"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--sticky-header" }
+  to = "/storybook/?path=/story/components-text-and-data-display-table-shell--sticky-header"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--sticky-column" }
+  to = "/storybook/?path=/story/components-text-and-data-display-table-shell--sticky-column"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--motion-add-row" }
+  to = "/storybook/?path=/story/components-text-and-data-display-table-shell--motion-add-row"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--motion-add-row-reduced" }
+  to = "/storybook/?path=/story/components-text-and-data-display-table-shell--motion-add-row-reduced"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--motion-remove-row" }
+  to = "/storybook/?path=/story/components-text-and-data-display-table-shell--motion-remove-row"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--motion-remove-row-reduced" }
+  to = "/storybook/?path=/story/components-text-and-data-display-table-shell--motion-remove-row-reduced"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--motion-reorder-rows" }
+  to = "/storybook/?path=/story/components-text-and-data-display-table-shell--motion-reorder-rows"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--motion-reorder-rows-reduced" }
+  to = "/storybook/?path=/story/components-text-and-data-display-table-shell--motion-reorder-rows-reduced"
+  status = 301
+  force = true
+
 [[redirects]]
   from = "/storybook/*"
   to = "/storybook/:splat"

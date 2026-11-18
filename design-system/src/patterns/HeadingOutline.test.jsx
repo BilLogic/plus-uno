@@ -8,7 +8,7 @@ import { ButtonItem, Section } from '@/components/forms-and-inputs/_internal/Men
 import PageHeader from '@/components/layout-and-structure/PageHeader';
 import Dialog from '@/components/messaging/Dialog';
 import Sidebar from '@/components/navigation/Sidebar';
-import Table from '@/components/text-and-data-display/Table';
+import { StaticTable } from '@/components';
 import Modal from './Modal';
 import PatternSection from './PatternSection';
 import Page from './Page';
@@ -136,7 +136,7 @@ describe('group labels', () => {
     });
 
     it('label a table column as a column header', () => {
-        render(<Table headers={['Student', 'Grade']} rows={[['Ana', '7']]} />);
+        render(<StaticTable headers={['Student', 'Grade']} rows={[['Ana', '7']]} />);
         expect(screen.getAllByRole('columnheader').map((th) => [th.textContent, th.getAttribute('scope')]))
             .toEqual([['Student', 'col'], ['Grade', 'col']]);
         expect(screen.queryAllByRole('heading')).toEqual([]);

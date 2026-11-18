@@ -17,7 +17,7 @@ Code-free guidance for a situation, shown on annotated **Template**s used as the
 _Avoid_: "layout component", "practice"
 
 **Template**:
-An arrangement of components with named **Slot**s, holding its key scenarios and key states and linking to each component for the rest: **Frame**, **Page**, **Section**, Form, Modal, Panel and Popup. The tie-break: behavior splits out into a component, and a template that only redraws one component stays a component. How pieces sit in one template goes on that template's page; a rule that holds across two or more templates is a **Pattern**.
+An arrangement of components with named **Slot**s, holding its key scenarios and key states and linking to each component for the rest: **Frame**, **Page**, **Section**, Table, Form, Modal, Panel and Popup. The tie-break: behavior splits out into a component, and a template that only redraws one component stays a component. How pieces sit in one template goes on that template's page; a rule that holds across two or more templates is a **Pattern**.
 _Avoid_: "container", "starter", "page template" for the **Frame** alone
 
 **Frame**:
@@ -102,8 +102,12 @@ _Avoid_: "children area", "placeholder" for the slot itself
 A component group name, identical in Figma pages, Storybook and code folders, such as Forms and inputs or Text and data display; the component index lists them.
 _Avoid_: "Actions", "group" for a category
 
+**Table**:
+The template (`@/patterns`) for how a table sits on a page: a **Section** whose header carries the title and toolbar, then one of the three table kinds, the footer (range, page size, Pagination) and the empty state box when there are no rows. It takes a `kind` (`static`, `dynamic` or `tree`) or the table itself, and holds the type guidance as its chooser. There is one Table template and three table components; the base table and its parts (`TableRow`, `TableCell`, `HeadCell`, `TableFooter`, `TableMessageRow`, `TableSummaryRow`, `TableBulkActions`) are shared by all three.
+_Avoid_: "PatternTable", "Table component" for the template
+
 **Static table**:
-A fixed grid people read, with nothing to act on: a link in a cell is fine, and rows rest or are highlighted. Which table type to use is `design-system/src/patterns/PatternTable/index.md` § Type guidance.
+A fixed grid people read, with nothing to act on: a link in a cell is fine, and rows rest or are highlighted. Which table type to use is `design-system/src/patterns/Table/index.md` § Type guidance.
 _Avoid_: "basic table", bare "table" for this type
 
 **Dynamic table**:

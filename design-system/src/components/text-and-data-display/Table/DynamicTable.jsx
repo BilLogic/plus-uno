@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import PatternTable from '@/patterns/PatternTable';
 import EmptyState from '@/components/messaging/EmptyState';
 import Pagination from '@/components/navigation/Pagination';
 import Select from '@/components/forms-and-inputs/Select';
@@ -9,7 +8,7 @@ import Checkbox from '@/components/forms-and-inputs/Checkbox';
 import VisuallyHidden from '@/components/text-and-data-display/VisuallyHidden';
 import HeadCell from './HeadCell';
 import TableBulkActions from './TableBulkActions';
-import { TableCell, TableRow, TableFooter } from './TableParts';
+import { TableCell, TableRow, TableFooter, TableShell } from './TableParts';
 import './Table.scss';
 import './DynamicTable.scss';
 
@@ -56,7 +55,7 @@ const deriveState = (state, isLoading, rowCount) => {
 
 /**
  * Dynamic table. A table people sort, page or act on, built on the
- * `PatternTable` shell: its `footer` and `emptyState` slots,
+ * table shell: its `footer` and `emptyState` slots,
  * sortable `HeadCell`s in the head row and the shared `TableRow` and
  * `TableCell` parts in the body.
  *
@@ -287,7 +286,7 @@ const DynamicTable = ({
             data-testid={testId}
             {...props}
         >
-            <PatternTable
+            <TableShell
                 footer={footer}
                 empty={isEmptyState}
                 stickyHeader={stickyHeader}
@@ -363,9 +362,9 @@ const DynamicTable = ({
                 </thead>
                 <tbody>
                     {showsBodyMessage ? (
-                        <tr className="plus-pattern-table-message-row">
-                            <td className="plus-pattern-table-message" colSpan={columnCount}>
-                                <div className="plus-pattern-table-message-body">
+                        <tr className="plus-table-shell-message-row">
+                            <td className="plus-table-shell-message" colSpan={columnCount}>
+                                <div className="plus-table-shell-message-body">
                                     <span className={classes('plus-dynamic-table-message', `plus-dynamic-table-message--${bodyState.replace(/\s+/g, '-')}`)}>
                                         {bodyMessage}
                                     </span>
@@ -415,7 +414,7 @@ const DynamicTable = ({
                         );
                     })}
                 </tbody>
-            </PatternTable>
+            </TableShell>
             {isSelectable && (
                 // Mounted from the start, so the first selection is announced too.
                 <VisuallyHidden role="status">{selected.length > 0 ? `${selected.length} selected` : ''}</VisuallyHidden>

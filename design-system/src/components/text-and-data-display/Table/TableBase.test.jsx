@@ -1,7 +1,8 @@
 import React from 'react';
 import { render, screen, within, fireEvent } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { Table, StaticTable, TableRow, TableCell, TableMessageRow, TableSummaryRow, TableFooter } from '.';
+import { StaticTable, TableRow, TableCell, TableMessageRow, TableSummaryRow, TableFooter } from '.';
+import { TableBase as Table } from './TableParts';
 
 const headers = ['Student', { text: 'Grade', align: 'text' }, { text: 'Sessions', align: 'number' }];
 const rows = [

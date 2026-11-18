@@ -1,26 +1,23 @@
 import React from 'react';
-import PatternTable from '@/patterns/PatternTable';
 import PatternSection from '@/patterns/PatternSection';
-import { DynamicTable, Icon, TreeTable } from '@/components';
+import { DynamicTable, Icon, StaticTable, TreeTable } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 
 /**
  * The do and don't examples of the Table page: the composition pairs and the
- * type pairs, each side built from the table pattern and the components a real
- * table would use.
+ * type pairs, each side built from the table components a real table would use.
  */
 
 /**
  * Storybook styles every table in a docs page except inside `.sb-unstyled`,
  * which is what its own canvases use. The examples sit outside a canvas, so
- * each carries the class, and the pattern keeps its own borders and padding.
+ * each carries the class, and the table keeps its own borders and padding.
  */
 const unstyled = (Case) => {
     const Wrapped = () => <div className="sb-unstyled"><Case /></div>;
     return Wrapped;
 };
 
-const numeric = { textAlign: 'right' };
 const subtle = { color: 'var(--ds-text-subtle)' };
 const icon = (name) => <Icon name={name} size={12} />;
 
@@ -86,22 +83,16 @@ const DynamicRosterCase = () => (
 
 /** The same roster as a Static table: no sort, no selection, no paging. */
 const RosterAsStaticCase = () => (
-    <PatternTable>
-        <thead>
-            <tr><th>Student</th><th>School</th><th style={numeric}>Sessions</th></tr>
-        </thead>
-        <tbody>
-            {[
-                ['Ava Thompson', 'Lincoln Middle', 12],
-                ['Marcus Lee', 'Lincoln Middle', 9],
-                ['Sofia Ramirez', 'Lincoln Middle', 15],
-                ['Jordan Patel', 'Lincoln Middle', 4],
-                ['Emily Chen', 'Roosevelt K-8', 11],
-            ].map(([student, school, sessions]) => (
-                <tr key={student}><td>{student}</td><td>{school}</td><td style={numeric}>{sessions}</td></tr>
-            ))}
-        </tbody>
-    </PatternTable>
+    <StaticTable
+        headers={['Student', 'School', { text: 'Sessions', align: 'number' }]}
+        rows={[
+            ['Ava Thompson', 'Lincoln Middle', { content: 12, align: 'number' }],
+            ['Marcus Lee', 'Lincoln Middle', { content: 9, align: 'number' }],
+            ['Sofia Ramirez', 'Lincoln Middle', { content: 15, align: 'number' }],
+            ['Jordan Patel', 'Lincoln Middle', { content: 4, align: 'number' }],
+            ['Emily Chen', 'Roosevelt K-8', { content: 11, align: 'number' }],
+        ]}
+    />
 );
 
 const treeNode = (id, name, type, sessions, more = {}) => ({
@@ -136,39 +127,53 @@ const TreeHierarchyCase = () => (
 
 /** A hierarchy faked with expandable rows: the nested rows lose their columns. */
 const TreeAsExpandableCase = () => (
-    <PatternTable>
-        <thead>
-            <tr><th>School</th><th style={numeric}>Classes</th><th style={numeric}>Students</th><th style={numeric}>Sessions</th></tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
-                        {icon('chevron-down')}Lincoln Middle
-                    </span>
-                </td>
-                <td style={numeric}>2</td>
-                <td style={numeric}>4</td>
-                <td style={numeric}>40</td>
-            </tr>
-            <tr>
-                <td colSpan={4} style={{ paddingInlineStart: 'calc(var(--table-indent) + var(--icon-sm))' }}>
-                    <div style={{ font: 'var(--heading-xxs)', ...subtle }}>Classes</div>
-                    <div>Grade 7 · Math: Ava Thompson, Sofia Ramirez. Grade 8 · Math: Marcus Lee, Jordan Patel.</div>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
-                        {icon('chevron-right')}Roosevelt K-8
-                    </span>
-                </td>
-                <td style={numeric}>3</td>
-                <td style={numeric}>6</td>
-                <td style={numeric}>31</td>
-            </tr>
-        </tbody>
-    </PatternTable>
+    <StaticTable
+        headers={[
+            'School',
+            { text: 'Classes', align: 'number' },
+            { text: 'Students', align: 'number' },
+            { text: 'Sessions', align: 'number' },
+        ]}
+        rows={[
+            [
+                {
+                    content: (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
+                            {icon('chevron-down')}Lincoln Middle
+                        </span>
+                    ),
+                },
+                { content: 2, align: 'number' },
+                { content: 4, align: 'number' },
+                { content: 40, align: 'number' },
+            ],
+            [
+                {
+                    colSpan: 4,
+                    overflow: 'wrap',
+                    style: { paddingInlineStart: 'calc(var(--table-indent) + var(--icon-sm))' },
+                    content: (
+                        <>
+                            <div style={{ font: 'var(--heading-xxs)', ...subtle }}>Classes</div>
+                            <div>Grade 7 · Math: Ava Thompson, Sofia Ramirez. Grade 8 · Math: Marcus Lee, Jordan Patel.</div>
+                        </>
+                    ),
+                },
+            ],
+            [
+                {
+                    content: (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
+                            {icon('chevron-right')}Roosevelt K-8
+                        </span>
+                    ),
+                },
+                { content: 3, align: 'number' },
+                { content: 6, align: 'number' },
+                { content: 31, align: 'number' },
+            ],
+        ]}
+    />
 );
 
 export const DynamicRoster = unstyled(DynamicRosterCase);
@@ -185,16 +190,10 @@ const students = [
 ];
 
 const studentTable = (
-    <PatternTable>
-        <thead>
-            <tr><th>Student</th><th>Tutor</th><th style={numeric}>Sessions</th></tr>
-        </thead>
-        <tbody>
-            {students.map(([student, tutor, sessions]) => (
-                <tr key={student}><td>{student}</td><td>{tutor}</td><td style={numeric}>{sessions}</td></tr>
-            ))}
-        </tbody>
-    </PatternTable>
+    <StaticTable
+        headers={['Student', 'Tutor', { text: 'Sessions', align: 'number' }]}
+        rows={students.map(([student, tutor, sessions]) => [student, tutor, { content: sessions, align: 'number' }])}
+    />
 );
 
 const countToolbar = <PatternSection.Toolbar count="340 students" />;

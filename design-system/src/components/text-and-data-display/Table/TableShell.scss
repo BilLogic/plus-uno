@@ -1,24 +1,23 @@
 /**
- * Table pattern (Patterns/Table)
- * Table shell: no-fill table, tokenized cell spacing, row states layered over
+ * Table shell (the scroll region the Dynamic and Tree tables draw on): no-fill table, tokenized cell spacing, row states layered over
  * whatever fill a cell already has. Never set a solid background on the table
  * itself; the surrounding surface or card owns it.
  */
 
-@use '../../styles/state' as *;
+@use '../../../styles/state' as *;
 
-.plus-pattern-table {
+.plus-table-shell {
     // How far past a sticky edge `clip-path` lets the overflow shadow reach.
     // It must cover `--ds-shadow-overflow`'s blur (12px in dark, the widest
     // mode), so it is a length of its own, with room to spare, rather than a
     // multiple of the cell padding, which a density change would shrink until
     // the shadow clipped. Raise it if the overflow shadow's blur grows.
-    --pattern-table-overflow-reach: var(--table-overflow-reach);
+    --table-shell-overflow-reach: var(--table-overflow-reach);
     // Sticky cells stack only inside the scroll region (which isolates), so
     // these are local orders on the card layer: a sticky row or column rides
     // over the body, and the corner cell over both.
-    --pattern-table-z-sticky: var(--layer-card);
-    --pattern-table-z-corner: calc(var(--pattern-table-z-sticky) + 1);
+    --table-shell-z-sticky: var(--layer-card);
+    --table-shell-z-corner: calc(var(--table-shell-z-sticky) + 1);
 
     display: flex;
     flex-direction: column;
@@ -27,7 +26,7 @@
     color: var(--ds-text);
 }
 
-.plus-pattern-table-scroll {
+.plus-table-shell-scroll {
     overflow: auto;
     // Sticky cells stack inside the table, never over the page around it.
     isolation: isolate;
@@ -40,9 +39,9 @@
     }
 }
 
-.plus-pattern-table-table {
+.plus-table-shell-table {
     // The row state a row's cells draw over their fill: transparent at rest.
-    --plus-pattern-table-row-state: transparent;
+    --plus-table-shell-row-state: transparent;
 
     width: 100%;
     // Separate borders, so a sticky cell carries its own rule as it moves; a
@@ -60,7 +59,7 @@
         color: var(--ds-text);
         // Row states are layered over the fill, never swapped for it, so an
         // opaque sticky cell keeps the highlight.
-        background-image: linear-gradient(var(--plus-pattern-table-row-state), var(--plus-pattern-table-row-state));
+        background-image: linear-gradient(var(--plus-table-shell-row-state), var(--plus-table-shell-row-state));
     }
 
     // A head cell is a group label, not a heading: Heading/xxsmall, over the
@@ -73,8 +72,8 @@
 
     @include plus-state(
         (
-            hovered: (--plus-pattern-table-row-state: var(--ds-background-neutral-subtle-hovered)),
-            pressed: (--plus-pattern-table-row-state: var(--ds-background-neutral-subtle-pressed)),
+            hovered: (--plus-table-shell-row-state: var(--ds-background-neutral-subtle-hovered)),
+            pressed: (--plus-table-shell-row-state: var(--ds-background-neutral-subtle-pressed)),
         ),
         $ring: false,
         $hovered-selector: 'tbody tr:hover',
@@ -88,13 +87,13 @@
      * of a `role="grid"` table, the kind whose rows can be selected.
      */
     tbody tr[aria-selected=true] {
-        --plus-pattern-table-row-state: var(--ds-background-selected);
+        --plus-table-shell-row-state: var(--ds-background-selected);
     }
 
     @include plus-state(
         (
-            hovered: (--plus-pattern-table-row-state: var(--ds-background-selected-hovered)),
-            pressed: (--plus-pattern-table-row-state: var(--ds-background-selected-pressed)),
+            hovered: (--plus-table-shell-row-state: var(--ds-background-selected-hovered)),
+            pressed: (--plus-table-shell-row-state: var(--ds-background-selected-pressed)),
         ),
         $ring: false,
         $hovered-selector: 'tbody tr[aria-selected=true]:hover',
@@ -108,37 +107,37 @@
  * content is scrolled under it, and `clip-path` keeps that shadow on the side
  * that faces the content.
  */
-.plus-pattern-table--sticky-header thead th {
+.plus-table-shell--sticky-header thead th {
     position: sticky;
     top: 0;
-    z-index: var(--pattern-table-z-sticky);
+    z-index: var(--table-shell-z-sticky);
     background-color: var(--ds-utility-elevation-surface-current);
 }
 
-.plus-pattern-table--sticky-column :is(th, td):first-child:not(.plus-pattern-table-message) {
+.plus-table-shell--sticky-column :is(th, td):first-child:not(.plus-table-message) {
     position: sticky;
     left: 0;
-    z-index: var(--pattern-table-z-sticky);
+    z-index: var(--table-shell-z-sticky);
     background-color: var(--ds-utility-elevation-surface-current);
 }
 
 // The corner cell rides over both the sticky row and the sticky column.
-.plus-pattern-table--sticky-header.plus-pattern-table--sticky-column thead th:first-child {
-    z-index: var(--pattern-table-z-corner);
+.plus-table-shell--sticky-header.plus-table-shell--sticky-column thead th:first-child {
+    z-index: var(--table-shell-z-corner);
 }
 
-.plus-pattern-table--sticky-header .plus-pattern-table-scroll[data-scrolled-y] thead th {
+.plus-table-shell--sticky-header .plus-table-shell-scroll[data-scrolled-y] thead th {
     box-shadow: var(--ds-shadow-overflow);
-    clip-path: inset(0 0 calc(-1 * var(--pattern-table-overflow-reach)) 0);
+    clip-path: inset(0 0 calc(-1 * var(--table-shell-overflow-reach)) 0);
 }
 
-.plus-pattern-table--sticky-column .plus-pattern-table-scroll[data-scrolled-x] :is(th, td):first-child:not(.plus-pattern-table-message) {
+.plus-table-shell--sticky-column .plus-table-shell-scroll[data-scrolled-x] :is(th, td):first-child:not(.plus-table-message) {
     box-shadow: var(--ds-shadow-overflow);
-    clip-path: inset(0 calc(-1 * var(--pattern-table-overflow-reach)) 0 0);
+    clip-path: inset(0 calc(-1 * var(--table-shell-overflow-reach)) 0 0);
 }
 
-.plus-pattern-table--sticky-header.plus-pattern-table--sticky-column .plus-pattern-table-scroll[data-scrolled-x][data-scrolled-y] thead th:first-child {
-    clip-path: inset(0 calc(-1 * var(--pattern-table-overflow-reach)) calc(-1 * var(--pattern-table-overflow-reach)) 0);
+.plus-table-shell--sticky-header.plus-table-shell--sticky-column .plus-table-shell-scroll[data-scrolled-x][data-scrolled-y] thead th:first-child {
+    clip-path: inset(0 calc(-1 * var(--table-shell-overflow-reach)) calc(-1 * var(--table-shell-overflow-reach)) 0);
 }
 
 /*
@@ -147,7 +146,7 @@
  * EmptyState provides its own compact padding, while inline content gets the
  * message row's spacing.
  */
-.plus-pattern-table-empty {
+.plus-table-shell-empty {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -164,39 +163,7 @@
     }
 }
 
-/*
- * Message rows (loading and error in DynamicTable): one cell spanning every
- * column under the head row. It is not a data row, so it takes no hover or
- * press state, and it spans the sticky column rather than pinning to it.
- */
-.plus-pattern-table-table .plus-pattern-table-message-row {
-    --plus-pattern-table-row-state: transparent;
-
-    @include plus-state(
-        (
-            hovered: (--plus-pattern-table-row-state: transparent),
-            pressed: (--plus-pattern-table-row-state: transparent),
-        ),
-        $ring: false
-    );
-}
-
-.plus-pattern-table-table .plus-pattern-table-message {
-    height: var(--row-height-md);
-    padding: var(--table-pad-y-cell) var(--table-pad-x-cell);
-    color: var(--ds-text-subtle);
-    text-align: center;
-}
-
-.plus-pattern-table-message-body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: var(--stack-sm);
-}
-
-.plus-pattern-table-footer {
+.plus-table-shell-footer {
     display: flex;
     align-items: center;
     justify-content: flex-end;

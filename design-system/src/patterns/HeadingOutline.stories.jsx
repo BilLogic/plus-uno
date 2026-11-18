@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 
-import { DropdownMenu, Popup, Table, Flag, ButtonItem, Section, Button } from '@/components';
+import { DropdownMenu, Popup, StaticTable, Flag, ButtonItem, Section, Button } from '@/components';
 import { Modal, PatternCard, PatternSection, Page } from '@/patterns';
 
 /**
@@ -145,7 +145,7 @@ export const GroupLabels = () => (
                 <ButtonItem onClick={() => {}}>Oldest</ButtonItem>
             </Section>
         </DropdownMenu>
-        <Table headers={['Student', 'Grade']} rows={[['Ana', '7'], ['Ben', '8']]} />
+        <StaticTable headers={['Student', 'Grade']} rows={[['Ana', '7'], ['Ben', '8']]} />
     </div>
 );
 

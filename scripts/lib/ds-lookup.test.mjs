@@ -62,7 +62,7 @@ test('find answers "card" with Card as not here and PatternCard with its import'
 });
 
 test('find ranks a task in words, resolves a Figma name, and flags a Pro icon', () => {
-  assert.equal(lookup.find('a table of students').results[0].name, 'PatternTable');
+  assert.equal(lookup.find('a table of students').results[0].name, 'Table');
   const figma = lookup.find('Form Switch Button').results[0];
   assert.deepEqual([figma.name, figma.figma], ['Toggle', 'Form Switch Button']);
   const pro = lookup.find('fa-light fa-house').results[0];
@@ -262,7 +262,7 @@ test('guide answers pattern, template and foundation topics and situation aliase
     ['pattern', 'design-system/agent-views/patterns/PatternsOverview.md'],
     ['frame', 'design-system/src/patterns/Frame/index.md'],
     ['card', 'design-system/src/patterns/PatternCard/index.md'],
-    ['table', 'design-system/src/patterns/PatternTable/index.md'],
+    ['table', 'design-system/src/patterns/Table/index.md'],
     ['modal', 'design-system/src/patterns/Modal/index.md'],
     ['form', 'design-system/agent-views/templates/Form.md'],
     ['panel', 'design-system/agent-views/templates/Panel.md'],
@@ -376,7 +376,7 @@ test('component lookups expose capped template and pattern back-edges in every a
 });
 
 test('a brief or three component names returns a screen kit in one answer', () => {
-  for (const query of ['Build a student list screen with search and filters', 'Frame Sidebar Page PageHeader PatternSection PatternTable Panel']) {
+  for (const query of ['Build a student list screen with search and filters', 'Frame Sidebar Page PageHeader PatternSection Table Panel']) {
     const result = lookup.find(query);
     assert.equal(result.kit.template.kind, 'template');
     assert.ok(result.kit.patterns.length);

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import { Button, HeadingContextProvider, PanelBody, PanelContainer, PanelHeader, Popup, Select, Tooltip } from '@/components';
-import { Modal, PatternCard, PatternSection, PatternTable } from '@/patterns';
+import { Button, DynamicTable, HeadingContextProvider, PanelBody, PanelContainer, PanelHeader, Popup, Select, StaticTable, Tooltip } from '@/components';
+import { Modal, PatternCard, PatternSection } from '@/patterns';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
 import { Illustration } from '@/storybook-docs/illustrations/Illustration.jsx';
@@ -406,20 +406,22 @@ export const StickyHeaderScrolled = {
         const Demo = () => {
             const ref = useRef(null);
             useEffect(() => {
-                const scroller = ref.current?.querySelector('.plus-pattern-table-scroll');
+                const scroller = ref.current?.querySelector('.plus-table-shell-scroll');
                 if (scroller) scroller.scrollTop = scroller.scrollHeight;
             }, []);
             return (
                 <div ref={ref}>
                     <PatternSection title="Tutors">
-                        <PatternTable stickyHeader maxHeight="var(--card-max-height-sm)">
-                            <thead><tr><th>Tutor</th><th>Sessions</th></tr></thead>
-                            <tbody>
-                                {['Ana Ruiz', 'Ben Cho', 'Cara Diaz', 'Dev Shah', 'Eli Park', 'Fay Wu', 'Gus Lee', 'Hana Ito', 'Ivy Moss', 'Jon Bell'].map((n, i) => (
-                                    <tr key={n}><td>{n}</td><td>{12 - i}</td></tr>
-                                ))}
-                            </tbody>
-                        </PatternTable>
+                        <DynamicTable
+                            label="Tutors"
+                            stickyHeader
+                            maxHeight="var(--card-max-height-sm)"
+                            head={{ cells: [{ key: 'tutor', content: 'Tutor' }, { key: 'sessions', content: 'Sessions', align: 'number' }] }}
+                            rows={['Ana Ruiz', 'Ben Cho', 'Cara Diaz', 'Dev Shah', 'Eli Park', 'Fay Wu', 'Gus Lee', 'Hana Ito', 'Ivy Moss', 'Jon Bell'].map((n, i) => ({
+                                key: n,
+                                cells: [{ key: 'tutor', content: n }, { key: 'sessions', content: String(12 - i) }],
+                            }))}
+                        />
                     </PatternSection>
                 </div>
             );
@@ -597,12 +599,10 @@ export const OneFocalPoint = () => (
             <div style={ground}>
                 <PatternSection title="Sessions">
                     <PatternCard title="Next session" description="Today, 4:30 PM" />
-                    <PatternTable>
-                        <tbody>
-                            <tr><td>Past session</td><td>Monday</td></tr>
-                            <tr><td>Past session</td><td>Friday</td></tr>
-                        </tbody>
-                    </PatternTable>
+                    <StaticTable
+                        headers={['Session', 'Day']}
+                        rows={[['Past session', 'Monday'], ['Past session', 'Friday']]}
+                    />
                 </PatternSection>
             </div>
         </Do>

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Table from './Table';
+import { TableBase } from './TableParts';
 
 /**
  * The Static table: a fixed grid people read. Rows rest or are highlighted
@@ -12,7 +12,7 @@ import Table from './Table';
  * `titleColumn`, `summary`, `verticalLines`, `striped`).
  */
 const StaticTable = ({ className = '', ...props }) => (
-    <Table {...props} hover={false} className={['plus-static-table', className].filter(Boolean).join(' ')} />
+    <TableBase {...props} hover={false} className={['plus-static-table', className].filter(Boolean).join(' ')} />
 );
 
 StaticTable.propTypes = {

@@ -46,7 +46,7 @@ line on what goes here, and the one action that fills it.
 
 <ComponentExample of={EmptyStateStories.Compact} title="Compact" description="For a table body or a card, with a smaller picture." />
 
-<ComponentExample of={EmptyStateStories.InATable} title="In a table" description="Passed to DynamicTable's emptyView (or PatternTable's emptyState), it replaces the whole table with no header row or footer." />
+<ComponentExample of={EmptyStateStories.InATable} title="In a table" description="Passed to DynamicTable's emptyView (or the Table template's emptyState), it replaces the whole table with no header row or footer." />
 
 </div>
 
@@ -238,7 +238,7 @@ person to a message above it.
 
 ### Replace a Table with it, never stack it under one.
 
-Pass `EmptyState` to `DynamicTable`'s `emptyView` (or `PatternTable`'s `emptyState` with `empty`) so it replaces the whole table, header row and footer included. Never stack an `EmptyState` under an empty `Table`.
+Pass `EmptyState` to `DynamicTable`'s `emptyView` (or the Table template's `emptyState` with `empty`) so it replaces the whole table, header row and footer included. Never stack an `EmptyState` under an empty `Table`.
 
 <DoDontPair
     doExample={<DynamicTable head={{ cells: [{ key: 'student', content: 'Student' }, { key: 'grade', content: 'Grade' }] }} rows={[]} label="Students" emptyView={<EmptyState spacing="compact" icon="user-group" header="No students yet" description="Add a student to see them here." />} />}

@@ -50,19 +50,19 @@ describe('Empty live cases and TypeCard links', () => {
         expectTypeCardAnchors(join(__dirname, 'Empty.mdx'), 8);
     });
 
-    it('renders the three EmptyTableBoxCase variants inside .plus-pattern-table-empty', async () => {
+    it('renders the three EmptyTableBoxCase variants inside .plus-table-shell-empty', async () => {
         const user = userEvent.setup();
         const { container, rerender } = render(<EmptyTableBoxCase variant="nothingYet" />);
-        expect(container.querySelector('.plus-pattern-table-empty')).not.toBeNull();
+        expect(container.querySelector('.plus-table-shell-empty')).not.toBeNull();
         expect(screen.getAllByRole('button', { name: 'Add students' })).toHaveLength(2);
 
         rerender(<EmptyTableBoxCase variant="hiddenByFilter" />);
-        expect(container.querySelector('.plus-pattern-table-empty')).not.toBeNull();
+        expect(container.querySelector('.plus-table-shell-empty')).not.toBeNull();
         await user.click(screen.getByRole('button', { name: 'Reset filters' }));
         expect(screen.getByRole('table')).toBeInTheDocument();
 
         rerender(<EmptyTableBoxCase variant="nothingToCreate" />);
-        expect(container.querySelector('.plus-pattern-table-empty')).not.toBeNull();
+        expect(container.querySelector('.plus-table-shell-empty')).not.toBeNull();
         expect(screen.queryAllByRole('button')).toHaveLength(0);
     });
 });

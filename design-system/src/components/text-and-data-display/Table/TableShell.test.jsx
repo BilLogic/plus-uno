@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import PatternTable from './PatternTable';
+import { TableShell } from './TableParts';
 
 const head = (
     <thead>
@@ -24,17 +24,17 @@ const body = (
     </tbody>
 );
 
-describe('PatternTable', () => {
+describe('TableShell', () => {
     afterEach(() => {
         vi.restoreAllMocks();
     });
 
     it('renders the empty state instead of the table, with no column headers or footer', () => {
         render(
-            <PatternTable empty emptyState={<span>No members yet</span>} footer={<span>1 of 4</span>}>
+            <TableShell empty emptyState={<span>No members yet</span>} footer={<span>1 of 4</span>}>
                 {head}
                 {body}
-            </PatternTable>
+            </TableShell>
         );
         expect(screen.queryByRole('table')).toBeNull();
         expect(screen.queryAllByRole('columnheader')).toHaveLength(0);
@@ -46,14 +46,14 @@ describe('PatternTable', () => {
 
     it('keeps the accessible name from tableProps without leaving table roles', () => {
         render(
-            <PatternTable
+            <TableShell
                 empty
                 emptyState={<span>Nothing here</span>}
                 tableProps={{ 'aria-label': 'Team members' }}
             >
                 {head}
                 {body}
-            </PatternTable>
+            </TableShell>
         );
         expect(screen.queryByRole('table')).toBeNull();
         expect(screen.queryAllByRole('columnheader')).toHaveLength(0);
@@ -71,11 +71,11 @@ describe('PatternTable', () => {
             </thead>
         );
         render(
-            <PatternTable empty emptyState={<span>No members yet</span>}>
+            <TableShell empty emptyState={<span>No members yet</span>}>
                 <caption>Team members</caption>
                 <Head />
                 {body}
-            </PatternTable>
+            </TableShell>
         );
         expect(screen.queryByRole('table')).toBeNull();
         expect(screen.queryByRole('columnheader')).toBeNull();
@@ -86,10 +86,10 @@ describe('PatternTable', () => {
 
     it('omits the region role when empty without an accessible name or caption', () => {
         render(
-            <PatternTable empty emptyState={<span>No members yet</span>}>
+            <TableShell empty emptyState={<span>No members yet</span>}>
                 {head}
                 {body}
-            </PatternTable>
+            </TableShell>
         );
         expect(screen.queryByRole('table')).toBeNull();
         expect(screen.queryByRole('region')).toBeNull();
@@ -98,10 +98,10 @@ describe('PatternTable', () => {
 
     it('renders the table normally when empty is true without emptyState', () => {
         render(
-            <PatternTable empty footer={<span>1 of 4</span>}>
+            <TableShell empty footer={<span>1 of 4</span>}>
                 {head}
                 {body}
-            </PatternTable>
+            </TableShell>
         );
         expect(screen.getByRole('table')).toBeInTheDocument();
         expect(screen.getAllByRole('columnheader')).toHaveLength(3);
@@ -111,33 +111,33 @@ describe('PatternTable', () => {
 
     it('renders the rows and pagination when not empty', () => {
         render(
-            <PatternTable emptyState={<span>No members yet</span>} footer={<span>1 of 4</span>}>
+            <TableShell emptyState={<span>No members yet</span>} footer={<span>1 of 4</span>}>
                 {head}
                 {body}
-            </PatternTable>
+            </TableShell>
         );
         expect(screen.getByText('Jordan Blake')).toBeInTheDocument();
         expect(screen.queryByText('No members yet')).toBeNull();
         expect(screen.getByText('1 of 4')).toBeInTheDocument();
     });
 
-    it('renders empty state inside .plus-pattern-table-empty and reveals rows when cleared', () => {
+    it('renders empty state inside .plus-table-shell-empty and reveals rows when cleared', () => {
         const { container, rerender } = render(
-            <PatternTable empty emptyState={<span>No members match</span>}>
+            <TableShell empty emptyState={<span>No members match</span>}>
                 {head}
                 {body}
-            </PatternTable>
+            </TableShell>
         );
-        expect(container.querySelector('.plus-pattern-table-empty')).not.toBeNull();
+        expect(container.querySelector('.plus-table-shell-empty')).not.toBeNull();
         expect(screen.queryByRole('table')).toBeNull();
 
         rerender(
-            <PatternTable empty={false} emptyState={<span>No members match</span>}>
+            <TableShell empty={false} emptyState={<span>No members match</span>}>
                 {head}
                 {body}
-            </PatternTable>
+            </TableShell>
         );
-        expect(container.querySelector('.plus-pattern-table-empty')).toBeNull();
+        expect(container.querySelector('.plus-table-shell-empty')).toBeNull();
         expect(screen.getByRole('table')).toBeInTheDocument();
     });
 

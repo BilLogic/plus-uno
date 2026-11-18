@@ -232,7 +232,7 @@ describe('the Harness tab', () => {
 
   it('resolves every template, pattern and foundation page to an existing generated file', () => {
     const pages = [
-      ...['Frame', 'Page', 'PatternSection', 'PatternCard', 'PatternTable', 'Modal', 'Form', 'Panel', 'Popup'].map(
+      ...['Frame', 'Page', 'PatternSection', 'PatternCard', 'Table', 'Modal', 'Form', 'Panel', 'Popup'].map(
         (n) => `design-system/src/patterns/${n}/${n}.mdx`,
       ),
       'design-system/src/storybook-docs/templates/TemplatesOverview.mdx',

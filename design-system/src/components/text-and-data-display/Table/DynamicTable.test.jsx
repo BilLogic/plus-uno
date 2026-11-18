@@ -34,10 +34,10 @@ const bodyNames = () => within(screen.getByRole('table'))
     .map((row) => within(row).getAllByRole('cell')[0].textContent);
 
 describe('DynamicTable', () => {
-    it('renders the head cells and the rows on the PatternTable shell', () => {
+    it('renders the head cells and the rows on the table shell', () => {
         render(<DynamicTable head={head} rows={rows} label="Students" />);
         const table = screen.getByRole('table', { name: 'Students' });
-        expect(table.closest('.plus-pattern-table')).not.toBeNull();
+        expect(table.closest('.plus-table-shell')).not.toBeNull();
         expect(screen.getAllByRole('columnheader')).toHaveLength(3);
         expect(bodyNames()).toEqual(people.map(([name]) => name));
     });
@@ -178,7 +178,7 @@ describe('DynamicTable', () => {
         const region = screen.getByRole('region', { name: 'Session roster' });
         expect(within(region).getByRole('heading', { name: 'No sessions yet' })).toBeVisible();
         expect(within(region).getByText('Book a session to begin.')).toBeVisible();
-        expect(container.querySelector('.plus-pattern-table-empty > .plus-empty-state')).not.toBeNull();
+        expect(container.querySelector('.plus-table-shell-empty > .plus-empty-state')).not.toBeNull();
     });
 
     it('replaces the table with a plain-element emptyView on the wrapper padding path', () => {
@@ -193,8 +193,8 @@ describe('DynamicTable', () => {
         expect(screen.queryByRole('table')).toBeNull();
         expect(screen.queryAllByRole('columnheader')).toHaveLength(0);
         const region = screen.getByRole('region', { name: 'Students' });
-        expect(region).toHaveClass('plus-pattern-table-empty');
-        expect(container.querySelector('.plus-pattern-table-empty > .plus-empty-state')).toBeNull();
+        expect(region).toHaveClass('plus-table-shell-empty');
+        expect(container.querySelector('.plus-table-shell-empty > .plus-empty-state')).toBeNull();
         expect(within(region).getByText('No rows right now')).toBeVisible();
     });
 
@@ -204,7 +204,7 @@ describe('DynamicTable', () => {
         );
         expect(screen.queryByRole('table')).toBeNull();
         expect(screen.queryByRole('region')).toBeNull();
-        expect(container.querySelector('.plus-pattern-table-empty')).not.toBeNull();
+        expect(container.querySelector('.plus-table-shell-empty')).not.toBeNull();
         expect(screen.getByRole('heading', { name: 'No students yet' })).toBeVisible();
     });
 
@@ -349,13 +349,13 @@ describe('DynamicTable bulk bar', () => {
 describe('DynamicTable sticky header and frozen column', () => {
     it('pins the head row inside its own bounded scroll region', () => {
         const { container } = render(<DynamicTable head={head} rows={rows} stickyHeader maxHeight={200} />);
-        expect(container.querySelector('.plus-pattern-table')).toHaveClass('plus-pattern-table--sticky-header');
-        expect(container.querySelector('.plus-pattern-table-scroll')).toHaveStyle({ maxHeight: '200px' });
+        expect(container.querySelector('.plus-table-shell')).toHaveClass('plus-table-shell--sticky-header');
+        expect(container.querySelector('.plus-table-shell-scroll')).toHaveStyle({ maxHeight: '200px' });
     });
 
     it('freezes the first column, and the title column beside the checkboxes when selectable', () => {
         const { container, rerender } = render(<DynamicTable head={head} rows={rows} isFrozen />);
-        expect(container.querySelector('.plus-pattern-table')).toHaveClass('plus-pattern-table--sticky-column');
+        expect(container.querySelector('.plus-table-shell')).toHaveClass('plus-table-shell--sticky-column');
         expect(container.querySelector('.plus-dynamic-table')).not.toHaveClass('plus-dynamic-table--frozen-pair');
         rerender(<DynamicTable head={head} rows={rows} isFrozen isSelectable />);
         expect(container.querySelector('.plus-dynamic-table')).toHaveClass('plus-dynamic-table--frozen-pair');
@@ -407,7 +407,7 @@ describe('DynamicTable empty state box cases', () => {
             );
         };
         const { container, rerender } = render(<Filterable />);
-        expect(container.querySelector('.plus-pattern-table-empty')).not.toBeNull();
+        expect(container.querySelector('.plus-table-shell-empty')).not.toBeNull();
         fireEvent.click(screen.getByRole('button', { name: 'Clear filter' }));
         expect(screen.getByRole('table')).toBeInTheDocument();
         expect(screen.getByText('Ava Thompson')).toBeInTheDocument();
@@ -420,7 +420,7 @@ describe('DynamicTable empty state box cases', () => {
                 emptyView={<EmptyState spacing="compact" header="Every reflection is reviewed" description="New ones arrive after Friday's sessions." />}
             />
         );
-        expect(container.querySelector('.plus-pattern-table-empty')).not.toBeNull();
+        expect(container.querySelector('.plus-table-shell-empty')).not.toBeNull();
         expect(screen.queryAllByRole('button')).toHaveLength(0);
     });
 });

@@ -9,7 +9,7 @@ import { HeadingLevelContext } from '@/lib/headingLevel';
 
 /**
  * The Dynamic table: a table people sort, page or act on. `DynamicTable` is
- * built on the `PatternTable` shell (its pagination and empty-state slots), with sortable `HeadCell`s and the shared `TableRow` and
+ * built on the table shell (its pagination and empty-state slots), with sortable `HeadCell`s and the shared `TableRow` and
  * `TableCell` parts.
  */
 
@@ -171,7 +171,7 @@ export const States = {
         for (const state of keptHeaderStates) {
             const root = canvas.getByTestId(`state-${state}`);
             await expect(root).toHaveAttribute('data-state', state);
-            const message = root.querySelector('.plus-pattern-table-message');
+            const message = root.querySelector('.plus-table-shell-message');
             await expect(message, `${state}: one message row`).not.toBeNull();
             await expect(message.colSpan).toBe(4);
             await expect(within(root).getAllByRole('columnheader')).toHaveLength(4);
@@ -399,7 +399,7 @@ export const Widths = {
     parameters: { docs: { description: { story: 'Under the content minimum (720) the table scrolls sideways instead of squeezing. Wider, the first column fills the room and the rest size to their content; a long name ends in an ellipsis.' } } },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        const scroll = (width) => canvas.getByTestId(`width-${width}`).querySelector('.plus-pattern-table-scroll');
+        const scroll = (width) => canvas.getByTestId(`width-${width}`).querySelector('.plus-table-shell-scroll');
         const narrow = scroll(480);
         await expect(narrow.scrollWidth, 'at 480 the table scrolls sideways').toBeGreaterThan(narrow.clientWidth);
         await expect(px(getComputedStyle(narrow.querySelector('table')).minWidth)).toBe(tokenLength(canvasElement, '--content-min-width'));
@@ -491,7 +491,7 @@ export const StickyHeaderAndFrozenColumn = {
     render: (args) => <div style={{ width: 'var(--width-3000)' }}><DynamicTable {...args} /></div>,
     parameters: { docs: { description: { story: 'The head row stays pinned while the rows scroll under it inside the table\'s own region. The checkboxes and the title column stay frozen on an opaque surface; while the table scrolls sideways their edge draws a stronger divider and the overflow shadow.' } } },
     play: async ({ canvasElement }) => {
-        const scroll = canvasElement.querySelector('.plus-pattern-table-scroll');
+        const scroll = canvasElement.querySelector('.plus-table-shell-scroll');
         const head = canvasElement.querySelector('thead th');
         await expect(getComputedStyle(head).position).toBe('sticky');
         const title = canvasElement.querySelector('tbody td:nth-child(2)');

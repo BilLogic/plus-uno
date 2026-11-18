@@ -18,7 +18,7 @@ export const plainRows = [['Ava Thompson', 'Nov 2'], ['Marcus Lee', 'Oct 24'], [
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-  "modelNote": "The Dynamic table page: sort, filter, selection with bulk actions, paging, expanding rows, a frozen column and the loading, empty and error states. `DynamicTable` draws it in code on the `PatternTable` shell, with sortable `HeadCell`s and `TableFooter`. Listed here as a docs page, not a set to write back to.",
+  "modelNote": "The Dynamic table page: sort, filter, selection with bulk actions, paging, expanding rows, a frozen column and the loading, empty and error states. `DynamicTable` draws it in code on the table shell, with sortable `HeadCell`s and `TableFooter`. Listed here as a docs page, not a set to write back to.",
   "sets": [
     {
       "id": "dynamic-table",
@@ -36,7 +36,7 @@ export const figmaMeta = {
 
 <Title />
 
-A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` shell, with sortable `HeadCell`s in the head row and the same row and cell parts the Static table uses.
+A table people sort, page or act on. `DynamicTable` sits on the table shell, with sortable `HeadCell`s in the head row and the same row and cell parts the Static table uses.
 
 <DocsTabs of={DynamicTableStories}>
 
@@ -302,6 +302,7 @@ With `totalRows`, `rows` is the current page only (`rowsPerPage`), and the foote
 ## Related
 
 - `Pagination`: use when splitting a long result set across numbered pages.
+- <a href="?path=/docs/templates-table--docs">Table</a>: use when choosing between Static, Dynamic and Tree tables.
 - <a href="?path=/docs/templates-section--docs">Section</a>: use when placing search, filters and actions in the toolbar above the table; selected rows never change it.
 
 </div>

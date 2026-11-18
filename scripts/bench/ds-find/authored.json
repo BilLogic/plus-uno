@@ -157,7 +157,7 @@
  {
   "q": "list of students with filters",
   "want": [
-   "PatternTable",
+   "Table",
    "Table",
    "FilterButton"
   ],
@@ -167,7 +167,7 @@
   "q": "data grid with sorting and paging",
   "want": [
    "Table",
-   "PatternTable"
+   "Table"
   ],
   "kind": "intent"
  },
@@ -359,7 +359,7 @@
   "q": "table",
   "want": [
    "Table",
-   "PatternTable"
+   "Table"
   ],
   "kind": "name"
  },

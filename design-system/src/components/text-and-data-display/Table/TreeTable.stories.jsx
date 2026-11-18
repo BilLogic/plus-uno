@@ -6,7 +6,7 @@ import { tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.j
 
 /**
  * The Tree table: records nested up to three levels, built in Figma from
- * `_Tree row`. `TreeTable` draws it on the `PatternTable` shell with the
+ * `_Tree row`. `TreeTable` draws it on the table shell with the
  * shared `TableRow` and `TableCell` parts, and follows the WAI-ARIA treegrid
  * pattern for the keyboard.
  */

@@ -5,7 +5,7 @@ import { alpha, computedShadow, tokenColor, tokenLength, px } from '@/storybook-
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
-import PatternTable from '@/patterns/PatternTable';
+import { TableShell } from './TableParts';
 import PatternSection, { SectionToolbar } from '@/patterns/PatternSection';
 import { Checkbox, Button, EmptyState as PlusEmptyState } from '@/components';
 
@@ -88,8 +88,8 @@ const wideTable = (
 );
 
 export default {
-    title: 'Templates/Table',
-    component: PatternTable,
+    title: 'Components/Text and data display/Table shell',
+    component: TableShell,
     tags: ['!dev', '!autodocs'],
     argTypes: {
         children: { table: { disable: true } },
@@ -126,9 +126,9 @@ export default {
 
 export const Overview = () => (
     <PatternSection title="Team members" actions={sectionActions}>
-        <PatternTable footer={paginationSlot}>
+        <TableShell footer={paginationSlot}>
             {tableContent}
-        </PatternTable>
+        </TableShell>
     </PatternSection>
 );
 
@@ -140,9 +140,9 @@ export const Overview = () => (
 export const EmptyState = {
     render: () => (
         <PatternSection title="Team members" actions={sectionActions}>
-            <PatternTable empty emptyState={emptyStateSlot} footer={paginationSlot}>
+            <TableShell empty emptyState={emptyStateSlot} footer={paginationSlot}>
                 {tableContent}
-            </PatternTable>
+            </TableShell>
         </PatternSection>
     ),
     play: async ({ canvasElement }) => {
@@ -153,7 +153,7 @@ export const EmptyState = {
             await expect(canvas.queryAllByRole('columnheader'), `${mode}: no column headers`).toHaveLength(0);
             await expect(canvas.queryByText('Jordan Blake'), `${mode}: no body rows`).toBeNull();
             await expect(canvas.queryByText(/Pagination slot/), `${mode}: no pager without rows`).toBeNull();
-            const box = canvasElement.querySelector('.plus-pattern-table-empty');
+            const box = canvasElement.querySelector('.plus-table-shell-empty');
             await expect(box, `${mode}: empty box present`).not.toBeNull();
             await expect(getComputedStyle(box).backgroundColor, `${mode}: empty box uses sunken surface`)
                 .toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
@@ -188,7 +188,7 @@ const FilteredMembersTable = () => {
                 />
             )}
         >
-            <PatternTable
+            <TableShell
                 empty={visible.length === 0}
                 emptyState={(
                     <PlusEmptyState
@@ -208,7 +208,7 @@ const FilteredMembersTable = () => {
                 )}
             >
                 {tableContent}
-            </PatternTable>
+            </TableShell>
         </PatternSection>
     );
 };
@@ -222,7 +222,7 @@ export const EmptyHiddenByFilter = {
     render: () => <FilteredMembersTable />,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        const box = canvasElement.querySelector('.plus-pattern-table-empty');
+        const box = canvasElement.querySelector('.plus-table-shell-empty');
         await expect(box, 'empty box rendered').not.toBeNull();
         await expect(getComputedStyle(box).backgroundColor, 'empty box uses sunken surface')
             .toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
@@ -242,7 +242,7 @@ export const EmptyNothingToCreate = {
     name: 'Empty: Nothing to create',
     render: () => (
         <PatternSection title="Activity">
-            <PatternTable
+            <TableShell
                 empty
                 emptyState={(
                     <PlusEmptyState
@@ -254,12 +254,12 @@ export const EmptyNothingToCreate = {
                 )}
             >
                 {tableContent}
-            </PatternTable>
+            </TableShell>
         </PatternSection>
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        const box = canvasElement.querySelector('.plus-pattern-table-empty');
+        const box = canvasElement.querySelector('.plus-table-shell-empty');
         await expect(box, 'empty box rendered').not.toBeNull();
         await expect(getComputedStyle(box).backgroundColor, 'empty box uses sunken surface')
             .toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
@@ -276,15 +276,15 @@ export const EmptyNothingToCreate = {
 export const EmptyWithStickyColumn = {
     parameters: { docs: { disable: true } },
     render: () => (
-        <PatternTable empty emptyState={emptyStateSlot} stickyColumn stickyHeader maxHeight="var(--width-1500)">
+        <TableShell empty emptyState={emptyStateSlot} stickyColumn stickyHeader maxHeight="var(--width-1500)">
             {tableContent}
-        </PatternTable>
+        </TableShell>
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expect(canvas.queryByRole('table'), 'no table when empty').toBeNull();
         await expect(canvas.queryAllByRole('columnheader'), 'no sticky column headers when empty').toHaveLength(0);
-        await expect(canvasElement.querySelector('.plus-pattern-table-scroll'), 'no scroll region when empty').toBeNull();
+        await expect(canvasElement.querySelector('.plus-table-shell-scroll'), 'no scroll region when empty').toBeNull();
         await expect(canvas.getByRole('heading', { name: 'No members yet' })).toBeVisible();
         await expect(canvas.getByRole('button', { name: 'Add member' })).toBeVisible();
     },
@@ -298,7 +298,7 @@ export const Interactive = {
         maxHeight: '',
     },
     render: (args) => (
-        <PatternTable
+        <TableShell
             footer={paginationSlot}
             emptyState={emptyStateSlot}
             empty={args.empty}
@@ -307,10 +307,10 @@ export const Interactive = {
             maxHeight={args.maxHeight || undefined}
         >
             {tableContent}
-        </PatternTable>
+        </TableShell>
     ),
     play: async ({ canvasElement }) => {
-        const scroll = canvasElement.querySelector('.plus-pattern-table-scroll');
+        const scroll = canvasElement.querySelector('.plus-table-shell-scroll');
         await expect(getComputedStyle(scroll).borderTopLeftRadius, 'Table scroll region is flush so row rules are not clipped').toBe('0px');
     },
 };
@@ -324,7 +324,7 @@ export const Interactive = {
  */
 export const RowStates = {
     render: () => (
-        <PatternTable>
+        <TableShell>
             <thead>
                 <tr>
                     <th><span className="visually-hidden">Select</span></th>
@@ -343,7 +343,7 @@ export const RowStates = {
                     </tr>
                 ))}
             </tbody>
-        </PatternTable>
+        </TableShell>
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
@@ -394,15 +394,15 @@ export const Sticky = {
     render: () => (
         <div style={{ maxWidth: 'var(--width-3000)' }}>
             <PatternSection title="Tutors">
-                <PatternTable stickyHeader stickyColumn maxHeight="var(--width-1500)">
+                <TableShell stickyHeader stickyColumn maxHeight="var(--width-1500)">
                     {wideTable}
-                </PatternTable>
+                </TableShell>
             </PatternSection>
         </div>
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        const scroller = canvasElement.querySelector('.plus-pattern-table-scroll');
+        const scroller = canvasElement.querySelector('.plus-table-shell-scroll');
         const head = canvas.getByText('Role');
         const selectedFirst = canvas.getByText('Casey R.');
         const color = (token) => tokenColor(canvasElement, token);
@@ -442,12 +442,12 @@ export const Sticky = {
 export const StickyHeaderNeedsMaxHeight = {
     parameters: { docs: { disable: true } },
     render: () => (
-        <PatternTable stickyHeader>
+        <TableShell stickyHeader>
             {tableContent}
-        </PatternTable>
+        </TableShell>
     ),
     play: async ({ canvasElement }) => {
-        const scroller = canvasElement.querySelector('.plus-pattern-table-scroll');
+        const scroller = canvasElement.querySelector('.plus-table-shell-scroll');
         await expect(getComputedStyle(within(canvasElement).getByText('Role')).position, 'an unbounded header is not pinned').not.toBe('sticky');
         await expect(scroller.hasAttribute('tabindex'), 'an unbounded region takes no tab stop').toBe(false);
     },
@@ -460,9 +460,9 @@ export const StickyHeader = {
     name: 'Sticky header',
     render: () => (
         <PatternSection title="Tutors">
-            <PatternTable stickyHeader maxHeight="var(--card-max-height-sm)">
+            <TableShell stickyHeader maxHeight="var(--card-max-height-sm)">
                 {wideTable}
-            </PatternTable>
+            </TableShell>
         </PatternSection>
     ),
 };
@@ -473,9 +473,9 @@ export const StickyColumn = {
     render: () => (
         <div style={{ maxWidth: 'var(--card-min-width-lg)' }}>
             <PatternSection title="Tutors">
-                <PatternTable stickyColumn>
+                <TableShell stickyColumn>
                     {wideTable}
-                </PatternTable>
+                </TableShell>
             </PatternSection>
         </div>
     ),
@@ -514,7 +514,7 @@ const AddRemoveTableDemo = ({ mode }) => {
                 />
             ) : undefined}
         >
-            <PatternTable>
+            <TableShell>
                 <thead>
                     <tr>
                         <th>Student</th>
@@ -542,7 +542,7 @@ const AddRemoveTableDemo = ({ mode }) => {
                         </tr>
                     ))}
                 </tbody>
-            </PatternTable>
+            </TableShell>
         </PatternSection>
     );
 };
@@ -643,7 +643,7 @@ const ReorderTableDemo = () => {
                 />
             )}
         >
-            <PatternTable>
+            <TableShell>
                 <thead>
                     <tr>
                         <th>Student</th>
@@ -660,7 +660,7 @@ const ReorderTableDemo = () => {
                         </tr>
                     ))}
                 </tbody>
-            </PatternTable>
+            </TableShell>
         </PatternSection>
     );
 };

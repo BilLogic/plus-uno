@@ -72,7 +72,7 @@ export const MOTION_REGISTRY = [
     },
   },
   {
-    name: 'PatternTable',
+    name: 'Table',
     tier: 'template',
     events: {
       selection: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'Ticking a row turns the head row into the bulk bar: labels cross-fade, same row, same height, nothing slides. Selected rows take the selected fill. The view bar above never moves.' },

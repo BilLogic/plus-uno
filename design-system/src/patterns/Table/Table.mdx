@@ -3,7 +3,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
-import * as PatternTableStories from './PatternTable.stories.jsx';
+import * as TableStories from './Table.stories.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 import {
     ComponentExample,
@@ -21,36 +21,38 @@ import {
     FramedTable,
     SecondToolbar,
     TwoTables,
-} from './PatternTableCases.jsx';
+} from './TableCases.jsx';
 
-<Meta of={PatternTableStories} />
+<Meta of={TableStories} />
 
 <DocsLanding
     page="templates-table"
     eyebrow="Template"
     title="Table"
-    purpose="The table pattern is how a table sits on a page. A Section holds the table, and the Section header carries the title and the toolbar. The table spans the section under it, plain, with no card around it and no padding of its own. The shell takes your head and rows, and adds a pagination slot and an empty-state slot."
+    purpose="The Table template is how a table sits on a page. A Section holds the table, and the Section header carries the title and the toolbar. The table spans the section under it, plain, with no card around it and no padding of its own. Pick a Static, Dynamic or Tree table, and the template adds the footer and the empty state box."
     links={{
         label: 'Uses',
         items: [
             { title: 'Section', href: './?path=/docs/templates-section--docs' },
-            { title: 'Table component', href: './?path=/docs/components-text-and-data-display-static-table--docs' },
+            { title: 'Static table', href: './?path=/docs/components-text-and-data-display-static-table--docs' },
+            { title: 'Dynamic table', href: './?path=/docs/components-text-and-data-display-dynamic-table--docs' },
+            { title: 'Tree table', href: './?path=/docs/components-text-and-data-display-tree-table--docs' },
             { title: 'Pagination', href: './?path=/docs/components-navigation-pagination--docs' },
         ],
     }}
 />
 
-`StaticTable`, `DynamicTable` and `TreeTable` are the components for the three table types.
+`StaticTable`, `DynamicTable` and `TreeTable` are the components for the three table kinds; the template takes any of them.
 
 The examples on this page follow the toolbar's Color mode switch.
 
-<DocsTabs of={PatternTableStories}>
+<DocsTabs of={TableStories}>
 
 <DocsTab tab="examples">
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=21757-21086"
-    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/PatternTable"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/Table"
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
@@ -59,17 +61,11 @@ The examples on this page follow the toolbar's Color mode switch.
 
 ## Appearance
 
-<ComponentExample of={PatternTableStories.Overview} title="Table in a Section" description="The Section header carries the title and the actions, and the footer slot sits under the rows." />
+<ComponentExample of={TableStories.StaticKind} title="Static table" description="People only read it. The Section header carries the title and the action, and the footer sits under the rows." />
 
-</div>
+<ComponentExample of={TableStories.DynamicKind} title="Dynamic table" description="People sort, page or act on the rows. The toolbar sits in the Section header, and the table draws its own footer." />
 
-<div className="sb-ds-doc-section">
-
-## Behavior
-
-<ComponentExample of={PatternTableStories.StickyHeader} title="Sticky header" description={<><code>stickyHeader</code> with <code>maxHeight</code> pins the head row; it takes the overflow shadow once rows scroll under it.</>} />
-
-<ComponentExample of={PatternTableStories.StickyColumn} title="Sticky column" description={<><code>stickyColumn</code> pins the first column while the others scroll sideways.</>} />
+<ComponentExample of={TableStories.TreeKind} title="Tree table" description="Rows nest under a parent, each level indented, with the columns kept." />
 
 </div>
 
@@ -77,13 +73,11 @@ The examples on this page follow the toolbar's Color mode switch.
 
 ## State
 
-<ComponentExample of={PatternTableStories.RowStates} title="Row states" description="Hover a row to see its layer; the second row is selected, its checkbox checked and the whole row filled." />
+<ComponentExample of={TableStories.EmptyState} title="Empty: nothing yet" description={<>With <code>empty</code>, <code>emptyState</code> sits in a sunken, card-rounded box in place of the table and footer, with a default action matching the title row.</>} />
 
-<ComponentExample of={PatternTableStories.EmptyState} title="Empty: nothing yet" description={<>With <code>empty</code>, <code>emptyState</code> sits in a sunken, card-rounded box with a default action matching the title row.</>} />
+<ComponentExample of={TableStories.EmptyHiddenByFilter} title="Empty: hidden by filter" description="The Section title and filter bar stay above the box; clearing the filter reveals the rows." />
 
-<ComponentExample of={PatternTableStories.EmptyHiddenByFilter} title="Empty: hidden by filter" description="The Section title and filter bar stay above the box; clearing the filter reveals the rows." />
-
-<ComponentExample of={PatternTableStories.EmptyNothingToCreate} title="Empty: nothing to create" description="When there is no create action, the empty state box shows the title and line alone." />
+<ComponentExample of={TableStories.EmptyNothingToCreate} title="Empty: nothing to create" description="When there is no create action, the empty state box shows the title and line alone." />
 
 </div>
 
@@ -92,7 +86,7 @@ The examples on this page follow the toolbar's Color mode switch.
 ## Interactive playground
 
 <DocsInteractivePlayground
-    of={PatternTableStories.Interactive}
+    of={TableStories.Interactive}
     description={
         <>
             Use the table below to change props. The preview is rendered{' '}
@@ -107,7 +101,7 @@ The examples on this page follow the toolbar's Color mode switch.
 
 ## Motion
 
-<MotionSection component="PatternTable" tier="template" />
+<MotionSection component="Table" tier="template" />
 
 </div>
 
@@ -140,7 +134,7 @@ Choose by what people do with the rows. Read the questions in order and stop at 
 </tbody>
 </DocsTable>
 
-Search, filters and actions sit in the Section header: `<PatternSection toolbar={<PatternSection.Toolbar />}>`.
+Search, filters and actions sit in the Section header: `<Table title="Students" toolbar={<PatternSection.Toolbar />} kind="dynamic" tableProps={...} />`. Pass the table as `children` instead of `kind` when you build it yourself.
 
 </div>
 
@@ -150,7 +144,7 @@ Search, filters and actions sit in the Section header: `<PatternSection toolbar=
 
 1. **Head row.** Names the columns. Its rule is the bold border.
 2. **Rows.** The data you pass as `tbody`. Each draws a thin rule, and there is no zebra striping.
-3. **Pagination** (optional). A slot under the rows, aligned to the end. It hides while the empty state shows.
+3. **Footer** (optional). The `footer` slot under the rows, aligned to the end: the range, the page-size Select and Pagination. It hides while the empty state shows. A Dynamic table draws its own.
 4. **Empty state.** The `emptyState` slot, which replaces the whole table (head row, caption and footer included) when `empty` is true; with `empty` and no `emptyState`, the table renders normally.
 
 ### States
@@ -278,7 +272,7 @@ Never mix a Static, Dynamic or Tree table in one Section either.
 - Selection is never color alone. The row's checkbox is checked, and the head row says "2 selected".
 - A region that scrolls takes keyboard focus, so people can scroll it without a pointer. That covers a region with `maxHeight` and one with a sticky column.
 - When empty, the empty state replaces the table with no table roles left behind, and keeps the table's accessible name when one was provided.
-- Name the table through `tableProps`, such as `aria-label`, when no caption names it.
+- Name the table with its `label`, or `label` on the template for the empty state box, when no caption names it.
 
 </div>
 
@@ -287,7 +281,7 @@ Never mix a Static, Dynamic or Tree table in one Section either.
 ## Related
 
 - <DocsLink id="templates-section">Section</DocsLink>: the header types, toolbar and tabs, that sit above every table.
-- <DocsLink id="components-text-and-data-display-static-table">Table component</DocsLink>: the table components, with a set of headers and rows.
+- <DocsLink id="components-text-and-data-display-static-table">Static table</DocsLink>, <DocsLink id="components-text-and-data-display-dynamic-table">Dynamic table</DocsLink> and <DocsLink id="components-text-and-data-display-tree-table">Tree table</DocsLink>: the three table components the template takes.
 - <DocsLink id="components-navigation-pagination">Pagination</DocsLink>: the pager that fills the footer slot.
 - <DocsLink id="templates-card">Card</DocsLink>: a table never sits inside a card.
 
