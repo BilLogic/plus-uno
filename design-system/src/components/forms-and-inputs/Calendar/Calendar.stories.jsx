@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Calendar from './Calendar';
@@ -76,9 +77,24 @@ TurnMonths.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByText('October 2026')).toBeVisible();
     await userEvent.click(canvas.getByRole('button', { name: 'Next month' }));
+    await settleAnimations(canvasElement);
     await expect(canvas.getByText('November 2026')).toBeVisible();
     await userEvent.click(canvas.getByRole('button', { name: 'Previous month' }));
+    await settleAnimations(canvasElement);
     await expect(canvas.getByText('October 2026')).toBeVisible();
+};
+
+export const TurnMonthsReduced = {
+    decorators: [withReducedMotion],
+    render: () => <TurnMonths />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByText('October 2026')).toBeVisible();
+        await userEvent.click(canvas.getByRole('button', { name: 'Next month' }));
+        await settleAnimations(canvasElement);
+        await expect(canvas.getByText('November 2026')).toBeVisible();
+        await expect(canvasElement.querySelector('[data-view-role="previous"]')).toBeNull();
+    },
 };
 
 /** One story per state, for the Examples tab. */

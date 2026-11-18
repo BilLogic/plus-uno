@@ -177,7 +177,7 @@ export const PickRange = () => {
 
     return (
         <div style={{ paddingBottom: 'var(--width-1900)', maxWidth: 'var(--field-width-lg)' }}>
-            <h6 style={{ marginBottom: 'var(--section-stack-md)' }}>Select a Date Range</h6>
+            <p className="heading-xxs" style={{ marginBottom: 'var(--section-stack-md)' }}>Select a Date Range</p>
             <p className="body-default" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--section-stack-md)' }}>
                 Click a first day, then a last day. The days between are marked.
             </p>
@@ -237,7 +237,7 @@ export const Interactive = (args) => {
 
     return (
         <div style={{ paddingBottom: 'var(--width-1900)' }}>
-            <p>Selected Date: {date || 'None'}</p>
+            <p className="body-default">Selected Date: {date || 'None'}</p>
             <DatePicker {...args} value={date} onChange={setDate} />
         </div>
     );

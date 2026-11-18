@@ -63,7 +63,7 @@ const col = { display: 'flex', flexDirection: 'column', gap: 'calc(var(--section
 
 function PopupLayoutDemos() {
     return (
-        <section style={{ display: 'flex', gap: '32px' /* token gap: 32px */, flexWrap: 'wrap', justifyContent: 'center' }}>
+        <section style={{ display: 'flex', gap: 'var(--section-stack-lg)', flexWrap: 'wrap', justifyContent: 'center' }}>
             <Popup
                 trigger={<Button text="Session note on top" />}
                 placement="top"
