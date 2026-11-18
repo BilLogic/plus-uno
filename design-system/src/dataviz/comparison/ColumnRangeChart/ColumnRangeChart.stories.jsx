@@ -51,7 +51,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Weekly schedule availability</Heading>
+                <Heading as="h3" size="sm">Weekly schedule availability</Heading>
                 <p style={captionStyle}>
                     Availability windows from start hour to end hour across the week.
                 </p>

@@ -38,7 +38,7 @@ export default {
 
 /* ------------------------------------------------------------------ default */
 
-export const Overview = () => <Heading size={'large'}>Student progress</Heading>;
+export const Overview = () => <Heading size={'lg'}>Student progress</Heading>;
 
 /** At the top level (no provider above it) a heading opens at h1. */
 Overview.play = async ({ canvasElement }) => {
@@ -74,7 +74,7 @@ Sizes.play = async ({ canvasElement }) => {
 
 /* --------------------------------------------------------------------- tag */
 
-export const OverridesTheTag = () => <Heading as="div" size="xxsmall">Section label</Heading>;
+export const OverridesTheTag = () => <Heading as="div" size="xxs">Section label</Heading>;
 
 /** `as` wins over the ambient level. */
 OverridesTheTag.play = async ({ canvasElement }) => {
@@ -86,9 +86,9 @@ OverridesTheTag.play = async ({ canvasElement }) => {
 
 export const NestedContext = () => (
     <HeadingContextProvider value={2}>
-        <Heading size="xxlarge">Page section</Heading>
+        <Heading size="xxl">Page section</Heading>
         <HeadingContextProvider>
-            <Heading size={'medium'}>Subsection</Heading>
+            <Heading size={'md'}>Subsection</Heading>
         </HeadingContextProvider>
     </HeadingContextProvider>
 );
@@ -104,7 +104,7 @@ NestedContext.play = async ({ canvasElement }) => {
 
 export const InverseColor = () => (
     <div style={{ background: 'var(--ds-text)', padding: 'var(--pad-x-lg)' }}>
-        <Heading as="div" size={'medium'} color="color.text.inverse">On a dark ground</Heading>
+        <Heading as="div" size={'md'} color="color.text.inverse">On a dark ground</Heading>
     </div>
 );
 
@@ -119,7 +119,7 @@ InverseColor.play = async ({ canvasElement }) => {
 /* ---------------------------------------------------------------- playground */
 
 export const Interactive = (args) => <Heading {...args} />;
-Interactive.args = { size: 'medium', children: 'Interactive heading' };
+Interactive.args = { size: 'md', children: 'Interactive heading' };
 
 const headingOf = (canvasElement) => within(canvasElement).getByText('Student progress');
 

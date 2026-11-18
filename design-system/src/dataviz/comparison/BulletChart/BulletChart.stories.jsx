@@ -46,7 +46,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Program goals against targets</Heading>
+                <Heading as="h3" size="sm">Program goals against targets</Heading>
                 <p style={captionStyle}>
                     Shows actual vs. target with quality ranges in the danger, warning and success backgrounds.
                 </p>

@@ -52,7 +52,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Test score distribution</Heading>
+                <Heading as="h3" size="sm">Test score distribution</Heading>
                 <p style={captionStyle}>
                     Bins stay in ascending range order so the shape of 50 student scores reads left to right.
                 </p>
@@ -66,7 +66,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Session duration distribution</Heading>
+                <Heading as="h3" size="sm">Session duration distribution</Heading>
                 <p style={captionStyle}>
                     Frequency of tutoring session lengths in 10-minute bins.
                 </p>

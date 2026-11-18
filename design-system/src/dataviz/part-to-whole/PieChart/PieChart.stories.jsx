@@ -46,7 +46,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Sessions by subject</Heading>
+                <Heading as="h3" size="sm">Sessions by subject</Heading>
                 <p style={captionStyle}>
                     Slices sort from largest to smallest and label each share with tabular figures.
                 </p>

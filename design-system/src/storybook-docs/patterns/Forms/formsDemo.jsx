@@ -345,7 +345,7 @@ export const QuestionStep = ({
                     textAlign: 'center',
                 }}
             >
-                <Heading as="h1" size="medium" id={headingId}>
+                <Heading as="h1" size="md" id={headingId}>
                     {step.heading}
                 </Heading>
                 <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>

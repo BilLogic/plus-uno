@@ -50,7 +50,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Term enrollment changes</Heading>
+                <Heading as="h3" size="sm">Term enrollment changes</Heading>
                 <p style={captionStyle}>
                     Shows how starting enrollment reaches the current total through sequential additions and withdrawals.
                 </p>

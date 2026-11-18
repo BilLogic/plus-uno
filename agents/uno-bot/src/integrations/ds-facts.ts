@@ -156,7 +156,7 @@ function tokenMatchers(not: string): RegExp[] {
   });
 }
 
-/** `Button variant`, `Button appearance="secondary"`, `Heading size="sm" / "lg"` → its parts. */
+/** `Button variant`, `Button appearance="secondary"`, `Heading size="small" / "large"` → its parts. */
 function parsePropRow(not: string): { component: string; prop: string; values: string[] } | null {
   const m = not.match(/^(\w+)\s+(\w+)(.*)$/);
   if (!m) return null;

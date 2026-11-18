@@ -50,7 +50,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Monthly active students</Heading>
+                <Heading as="h3" size="sm">Monthly active students</Heading>
                 <p style={captionStyle}>
                     Tracks participation over time with a year-over-year comparison.
                 </p>

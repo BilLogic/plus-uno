@@ -73,7 +73,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Study hours vs. test score vs. sessions</Heading>
+                <Heading as="h3" size="sm">Study hours vs. test score vs. sessions</Heading>
                 <p style={captionStyle}>
                     Compares study time, score and session count across two classes with categorical series colors and ladder-sized bubbles.
                 </p>
@@ -87,7 +87,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Single cohort progression</Heading>
+                <Heading as="h3" size="sm">Single cohort progression</Heading>
                 <p style={captionStyle}>
                     A single series uses the brand chart color without implying separate categories.
                 </p>

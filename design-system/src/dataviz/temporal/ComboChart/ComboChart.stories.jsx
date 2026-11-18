@@ -47,7 +47,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Sessions held vs. attendance rate</Heading>
+                <Heading as="h3" size="sm">Sessions held vs. attendance rate</Heading>
                 <p style={captionStyle}>
                     Combines columns for volume on the left axis with a line for percentage rate on the right axis.
                 </p>

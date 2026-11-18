@@ -53,7 +53,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Referral to subject placement</Heading>
+                <Heading as="h3" size="sm">Referral to subject placement</Heading>
                 <p style={captionStyle}>
                     How incoming student referrals consolidate at first session and split into subject tracks.
                 </p>
@@ -61,7 +61,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Tutoring session progression</Heading>
+                <Heading as="h3" size="sm">Tutoring session progression</Heading>
                 <p style={captionStyle}>
                     Branching activity flow across a tutoring block, with link width proportional to session count.
                 </p>
