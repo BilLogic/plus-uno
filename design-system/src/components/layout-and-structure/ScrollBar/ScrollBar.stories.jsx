@@ -49,12 +49,50 @@ const demoBox = {
     padding: 'var(--section-pad-y-compact) var(--section-pad-x-compact)'
 };
 
+const sessionRows = [
+    'Maya K. — Two-step equations (Lincoln Middle)',
+    'Jordan T. — Linear graphs (North High)',
+    'Elena R. — Fraction operations (Roosevelt K-8)',
+    'Marcus B. — Reading comprehension (Lincoln Middle)',
+    'Priya S. — Ratios and rates (Oak Creek Elementary)',
+    'Noah W. — Paragraph structure (Westview Academy)',
+    'Sofia L. — Slope-intercept form (North High)',
+    'Liam D. — Main idea summary (Roosevelt K-8)',
+    'Chloe M. — Proportional reasoning (Lincoln Middle)',
+    'Ethan H. — Vocabulary in context (Oak Creek Elementary)',
+    'Zoe P. — Systems of equations (North High)',
+    'Ava C. — Informational text (Westview Academy)',
+    'Leo G. — Order of operations (Roosevelt K-8)',
+    'Nora F. — Evidence-based claims (Lincoln Middle)',
+    'Owen K. — Function tables (North High)',
+    'Hannah V. — Inference practice (Westview Academy)',
+    'Lucas M. — Decimal division (Roosevelt K-8)',
+    'Grace T. — Point of view (Oak Creek Elementary)',
+    'Caleb R. — Angle pairs (Lincoln Middle)',
+    'Ruby S. — Argument writing (North High)',
+];
+
+const lessonCards = [
+    'Warm-up check',
+    'Two-step equations',
+    'Graphing lines',
+    'Slope practice',
+    'Function tables',
+    'Word problems',
+    'Ratios and rates',
+    'Fraction review',
+    'Reading fluency',
+    'Main idea claims',
+    'Exit ticket',
+    'Session reflection',
+];
+
 function TallContent({ count = 12 }) {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
-            {Array.from({ length: count }, (_, i) => (
+            {sessionRows.slice(0, count).map((row, i) => (
                 <p key={i} className="body-sm" style={{ margin: 0, color: 'var(--ds-text)' }}>
-                    Row {i + 1} — scrollable content inside the wrapper.
+                    {row}
                 </p>
             ))}
         </div>
@@ -64,7 +102,7 @@ function TallContent({ count = 12 }) {
 function WideContent({ count = 12 }) {
     return (
         <div style={{ display: 'flex', gap: 'var(--inline-lg)', width: 'max-content' }}>
-            {Array.from({ length: count }, (_, i) => (
+            {lessonCards.slice(0, count).map((title, i) => (
                 <div
                     key={i}
                     style={{
@@ -73,7 +111,7 @@ function WideContent({ count = 12 }) {
                         backgroundColor: 'var(--ds-surface-container)'
                     }}
                 >
-                    <p className="body-sm" style={{ margin: 0, color: 'var(--ds-text)' }}>Card {i + 1}</p>
+                    <p className="body-sm" style={{ margin: 0, color: 'var(--ds-text)' }}>{title}</p>
                 </div>
             ))}
         </div>
@@ -157,8 +195,8 @@ export const Interactive = {
 
 
 const Subject = (props) => (
-    <ScrollBar maxHeight="var(--width-1000)" aria-label="Notes" {...props}>
-        {Array.from({ length: 20 }, (_, i) => <p key={i}>Note {i + 1}</p>)}
+    <ScrollBar maxHeight="var(--width-1000)" aria-label="Session notes" {...props}>
+        {sessionRows.map((row, i) => <p key={i}>{row}</p>)}
     </ScrollBar>
 );
 const root = (canvasElement) => canvasElement.firstElementChild;

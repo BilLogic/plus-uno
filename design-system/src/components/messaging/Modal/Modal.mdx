@@ -31,7 +31,10 @@ export const figmaMeta = {
 {/* Pairs draw the inline panel, never a live dialog. A narrow stand-in screen keeps every width inside a pair card. */}
 export const narrowScreen = { '--plus-overlay-screen': 'var(--width-3000)', width: '100%' };
 export const shortCap = { ...narrowScreen, '--blanket-max-height-modal': 'var(--height-2000)' };
-export const longBody = `${'Long body copy. '.repeat(40)}The body scrolls once the content runs past the cap.`;
+export const longBody =
+    'Review the session summary before publishing it to the student profile. Note which two-step equation problems Maya K. solved independently, which steps still needed a prompt, and which practice set is assigned for Thursday at 4:00 PM ET at Lincoln Middle. Families and lead tutors read this note together before the next check-in. ' +
+    'Make sure the attendance record, warm-up check, and exit ticket results match what you covered during the call before confirming. ' +
+    'The body scrolls once the content runs past the cap.';
 
 <Meta of={ModalStories} />
 

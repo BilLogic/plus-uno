@@ -59,7 +59,7 @@ export const Overview = () => {
         <div style={{ ...ratingCol, maxWidth: 'var(--width-3000)' }}>
             <Rating
                 id="rating-overview"
-                label="Rating"
+                label="How was the session?"
                 isRequired
                 value={value}
                 variant="comments"
@@ -86,7 +86,7 @@ export const Content = () => {
                 </p>
                 <Rating
                     id="rating-content"
-                    label="Rating"
+                    label="How was the session?"
                     isRequired
                     value={value}
                     variant="comments"
@@ -157,7 +157,7 @@ export const Interactive = (args) => {
     );
 };
 Interactive.args = {
-    label: 'Rating',
+    label: 'How was the session?',
     isRequired: false,
     variant: 'comments',
     isDisabled: false,
@@ -166,15 +166,15 @@ Interactive.args = {
 /** Each prop shows up in the DOM: numeric labels, comments label, icon family, minority marker. */
 export const PropsRender = () => (
     <div style={ratingCol}>
-        <Rating id="rating-props-numeric" label="Numeric" variant="numeric" icon="thumbs-up" isRequired labelMarker="required" value={2} />
-        <Rating id="rating-props-comments" label="Comments" variant="comments" commentsLabel="Tell us more" value={2} />
+        <Rating id="rating-props-numeric" label="Session pacing" variant="numeric" icon="thumbs-up" isRequired labelMarker="required" value={2} />
+        <Rating id="rating-props-comments" label="Tutor feedback" variant="comments" commentsLabel="Tell us more" value={2} />
     </div>
 );
 PropsRender.parameters = { docs: { disable: true } };
 PropsRender.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const numeric = canvas.getByRole('radiogroup', { name: 'Numeric' });
-    const comments = canvas.getByRole('radiogroup', { name: 'Comments' });
+    const numeric = canvas.getByRole('radiogroup', { name: 'Session pacing' });
+    const comments = canvas.getByRole('radiogroup', { name: 'Tutor feedback' });
 
     // variant=numeric: a label 1-5 above each item, no comments label.
     for (const n of [1, 2, 3, 4, 5]) {

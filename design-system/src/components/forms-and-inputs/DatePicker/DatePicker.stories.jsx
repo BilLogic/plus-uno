@@ -104,11 +104,11 @@ export const Spacing = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', paddingBottom: 'var(--width-1900)' }}>
         <div>
             <DemoLabel>DEFAULT (40)</DemoLabel>
-            <DatePicker spacing="default" placeholder="Default" />
+            <DatePicker spacing="default" placeholder="MM/DD/YYYY" />
         </div>
         <div>
             <DemoLabel>COMPACT (32)</DemoLabel>
-            <DatePicker spacing="compact" placeholder="Compact" />
+            <DatePicker spacing="compact" placeholder="MM/DD/YYYY" />
         </div>
     </div>
 );
@@ -121,19 +121,19 @@ export const InteractionStates = () => (
         <div style={{ display: 'flex', gap: 'var(--section-stack-lg)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
             <div>
                 <DemoLabel>DEFAULT</DemoLabel>
-                <DatePicker placeholder="Default" />
+                <DatePicker placeholder="MM/DD/YYYY" />
             </div>
             <div>
                 <DemoLabel>WITH VALUE</DemoLabel>
-                <DatePicker value="2023-10-25" placeholder="With Value" />
+                <DatePicker value="2023-10-25" placeholder="MM/DD/YYYY" />
             </div>
             <div>
                 <DemoLabel>DISABLED</DemoLabel>
-                <DatePicker isDisabled placeholder="Disabled" />
+                <DatePicker isDisabled placeholder="MM/DD/YYYY" />
             </div>
             <div>
                 <DemoLabel>READ ONLY</DemoLabel>
-                <DatePicker isReadOnly value="2023-10-25" placeholder="Read Only" />
+                <DatePicker isReadOnly value="2023-10-25" placeholder="MM/DD/YYYY" />
             </div>
         </div>
     </div>
@@ -243,7 +243,7 @@ export const Interactive = (args) => {
     );
 };
 Interactive.args = {
-    placeholder: 'Select a date',
+    placeholder: 'MM/DD/YYYY',
     spacing: 'default',
     isDisabled: false,
     isReadOnly: false,

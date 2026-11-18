@@ -34,7 +34,7 @@ export default {
     },
 };
 
-const VALUES = ['first', 'second', 'third', 'fourth'];
+const VALUES = ['Session setup', 'Warm-up', 'Practice', 'Reflection'];
 
 export const Default = () => <ProgressIndicator values={VALUES} selectedIndex={1} />;
 Default.play = async ({ canvasElement }) => {

@@ -610,7 +610,7 @@ OverflowTag.play = async ({ canvasElement }) => {
     });
 };
 
-const MANY = Array.from({ length: 14 }, (_, i) => `T${i + 1}`);
+const MANY = ['Math', 'ELA', 'Art', 'ESL', 'STEM', 'Band', 'Code', 'Film', 'Gym', 'Law', 'Bio', 'Chem', 'Tech', 'Latin'];
 
 /**
  * Fourteen short tags, so `+n` goes from `+10` to `+9` as the row widens. At
@@ -620,7 +620,7 @@ const MANY = Array.from({ length: 14 }, (_, i) => `T${i + 1}`);
  */
 export const DigitBoundary = () => (
     <div data-testid="frame" style={{ width: 'var(--width-1000)' }}>
-        <TagGroup label="Many" overflow="collapse">
+        <TagGroup label="Subjects" overflow="collapse">
             {MANY.map((s) => <Tag key={s} color="blue">{s}</Tag>)}
         </TagGroup>
     </div>
@@ -634,7 +634,7 @@ const frames = (n) => new Promise((resolve) => {
 DigitBoundary.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const frame = canvas.getByTestId('frame');
-    const list = canvas.getByRole('list', { name: 'Many' });
+    const list = canvas.getByRole('list', { name: 'Subjects' });
     const label = () => within(list).queryByRole('button', { name: /more tags$/ })?.textContent ?? '';
 
     const seen = new Set();

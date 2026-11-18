@@ -57,26 +57,26 @@ function TooltipVariantsDemos() {
         <div style={containerStyle}>
             <div style={blockStyle}>
                 <DemoLabel>TOP</DemoLabel>
-                <Tooltip text="Tooltip on top" placement="top" show={true}>
-                    <Button appearance="primary" text="Top" />
+                <Tooltip text="Opens the session notes" placement="top" show={true}>
+                    <Button appearance="primary" text="Session notes" />
                 </Tooltip>
             </div>
             <div style={blockStyle}>
                 <DemoLabel>BOTTOM</DemoLabel>
-                <Tooltip text="Tooltip on bottom" placement="bottom" show={true}>
-                    <Button appearance="primary" text="Bottom" />
+                <Tooltip text="Shares your availability" placement="bottom" show={true}>
+                    <Button appearance="primary" text="Availability" />
                 </Tooltip>
             </div>
             <div style={blockStyle}>
                 <DemoLabel>LEFT</DemoLabel>
-                <Tooltip text="Tooltip on left" placement="left" show={true}>
-                    <Button appearance="primary" text="Left" />
+                <Tooltip text="Copies the invite link" placement="left" show={true}>
+                    <Button appearance="primary" text="Invite link" />
                 </Tooltip>
             </div>
             <div style={blockStyle}>
                 <DemoLabel>RIGHT</DemoLabel>
-                <Tooltip text="Tooltip on right" placement="right" show={true}>
-                    <Button appearance="primary" text="Right" />
+                <Tooltip text="Shows student goals" placement="right" show={true}>
+                    <Button appearance="primary" text="Student goals" />
                 </Tooltip>
             </div>
         </div>
@@ -99,7 +99,7 @@ const tooltipPlaygroundPadding = {
 
 export const Interactive = {
     args: {
-        text: 'Tooltip text',
+        text: 'Opens the session notes',
         placement: 'top',
     },
     parameters: {
@@ -108,7 +108,7 @@ export const Interactive = {
     render: (args) => (
         <div style={tooltipPlaygroundPadding}>
             <Tooltip {...args}>
-                <Button appearance="primary" text="Hover or focus me" />
+                <Button appearance="primary" text="Session notes" />
             </Tooltip>
         </div>
     ),
@@ -116,14 +116,14 @@ export const Interactive = {
 
 export const Overview = {
     args: {
-        text: 'Tooltip text',
+        text: 'Opens the session notes',
         placement: 'top',
         show: true,
     },
     render: (args) => (
         <div style={tooltipPlaygroundPadding}>
             <Tooltip {...args}>
-                <Button appearance="primary" text="Hover me" />
+                <Button appearance="primary" text="Session notes" />
             </Tooltip>
         </div>
     ),

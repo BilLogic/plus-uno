@@ -108,9 +108,9 @@ export const Layout = () => (
         <section>
             <DemoLabel>JUSTIFIED</DemoLabel>
             <Tabs alignment="justified" defaultActiveKey="1">
-                <Tabs.Tab eventKey="1">Tab One</Tabs.Tab>
-                <Tabs.Tab eventKey="2">Tab Two</Tabs.Tab>
-                <Tabs.Tab eventKey="3">Tab Three</Tabs.Tab>
+                <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
+                <Tabs.Tab eventKey="2">Sessions</Tabs.Tab>
+                <Tabs.Tab eventKey="3">Reports</Tabs.Tab>
             </Tabs>
         </section>
     </div>
@@ -277,9 +277,9 @@ export const Interactive = (args) => {
             activeKey={activeKey}
             onSelect={(k) => setActiveKey(k)}
         >
-            <Tabs.Tab eventKey="1">Tab 1</Tabs.Tab>
-            <Tabs.Tab eventKey="2">Tab 2</Tabs.Tab>
-            <Tabs.Tab eventKey="3">Tab 3</Tabs.Tab>
+            <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
+            <Tabs.Tab eventKey="2">Sessions</Tabs.Tab>
+            <Tabs.Tab eventKey="3">Progress</Tabs.Tab>
         </Tabs>
     );
 };

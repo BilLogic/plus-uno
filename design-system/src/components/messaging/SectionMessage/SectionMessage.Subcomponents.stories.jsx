@@ -33,7 +33,7 @@ export const ContentStructure = {
                 { text: 'Notify student', onClick: () => {} },
             ]}
         >
-            Your Tuesday Algebra B session with Maya moved to 4:30 PM.
+            Your Tuesday Algebra B session with Maya K. moved to 4:30 PM.
         </SectionMessage>
     ),
     play: async ({ canvas }) => {

@@ -88,9 +88,9 @@ export const WithNestedReplies = () => (
     <Comment
         id="comment-nested"
         author="Ari Patel"
-        content="Top-level comment"
+        content="Should we review fractions again before Friday's quiz?"
         nestedReplies={(
-            <Comment author="Teacher" content="A reply" />
+            <Comment author="Maya K." content="Yes, let's start with a five-minute warm-up." />
         )}
     />
 );
@@ -98,12 +98,12 @@ export const WithNestedReplies = () => (
 WithNestedReplies.play = async ({ canvasElement }) => {
     const node = canvasElement.querySelector('#comment-nested');
     const replies = node.querySelector('.plus-comment-replies');
-    await expect(replies).toHaveTextContent('A reply');
+    await expect(replies).toHaveTextContent("Yes, let's start with a five-minute warm-up.");
     await expect(replies.querySelectorAll('.plus-comment')).toHaveLength(1);
 };
 
 export const Interactive = {
-    args: { author: 'Ari Patel', content: 'Comment text', isSaving: false, isHighlighted: false },
+    args: { author: 'Ari Patel', content: 'Moved Maya K. to the 4:00 PM ET math group.', isSaving: false, isHighlighted: false },
     render: (args) => <Comment {...args} />,
 };
 

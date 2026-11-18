@@ -111,8 +111,8 @@ export const PickTime = () => {
 
     return (
         <div style={{ maxWidth: 'var(--width-1400)' }}>
-            <h6 style={{ marginBottom: 'var(--section-stack-md)' }}>Set a Time</h6>
-            <TimePicker aria-label="Time" value={value} onChange={setValue} />
+            <h6 style={{ marginBottom: 'var(--section-stack-md)' }}>Set a reminder time</h6>
+            <TimePicker aria-label="Reminder time" value={value} onChange={setValue} />
             {value && (
                 <div
                     style={{
