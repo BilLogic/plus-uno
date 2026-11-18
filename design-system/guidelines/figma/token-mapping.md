@@ -73,7 +73,7 @@ Two kinds of text node carry no text style, and each binds its type variables di
 | Element radius | `var(--radius-{sm\|md\|lg\|full})` |
 | Modal padding | `var(--modal-pad-x-{default\|spacious})` |
 | Section padding | `var(--section-pad-{x\|y}-{compact\|default\|spacious})` |
-| Page padding | `var(--page-pad-{x\|y}-{compact\|default\|spacious})` |
+| Page padding | `var(--page-pad)` |
 | Table cell | `var(--table-pad-x-cell)` 8 · `var(--table-pad-y-cell)` 4 |
 | Size roles | `var(--icon-md)`, `var(--control-md)`, `var(--row-height-md)`, `var(--image-sm)`: Icon sm · md · lg 12 · 16 · 24, Control sm · md · lg 24 · 32 · 40, Row sm · md · lg 32 · 40 · 48, Image xxs … xl 16 · 20 · 24 · 32 · 40 · 48 |
 

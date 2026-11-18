@@ -22,7 +22,7 @@ const InDocs = ({ children }) => (
 /** "Add" ends the collection's view bar; the header carries only page actions. */
 export const AddInViewBar = () => (
     <InDocs>
-        <Page header={<PageHeader title="Students" titleAs="h4" />} padding="md">
+        <Page header={<PageHeader title="Students" titleAs="h4" />}>
             <PatternSection title="Students" type="tabs-only" tabs={<ViewBarWithAdd />} />
         </Page>
     </InDocs>
@@ -39,7 +39,6 @@ export const AddTwice = () => (
                     actions={<Button text="Add student" iconBefore="user-plus" appearance="primary" onClick={() => {}} />}
                 />
             )}
-            padding="md"
         >
             <PatternSection title="Students" type="tabs-only" tabs={<ViewBarWithAdd />} />
         </Page>
@@ -60,7 +59,6 @@ export const OneTabSystem = () => {
                         bottomBar={<PageTabs active={tab} onSelect={setTab} labels={['Overview', 'Sessions']} />}
                     />
                 )}
-                padding="md"
             >
                 {tab === 'overview' ? (
                     <PatternSection title="Overview">
@@ -89,7 +87,6 @@ export const TwoTabSystems = () => {
                         bottomBar={<PageTabs active={tab} onSelect={setTab} labels={['Overview', 'Sessions']} />}
                     />
                 )}
-                padding="md"
             >
                 <PatternSection
                     title="Sessions"
