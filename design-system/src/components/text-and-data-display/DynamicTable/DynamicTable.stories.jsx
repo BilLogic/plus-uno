@@ -1,0 +1,646 @@
+import React from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
+import { tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
+import { Button, DynamicTable, EmptyState, HeadCell, StaticTable } from '@/components';
+import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
+import PatternSection, { SectionToolbar } from '@/patterns/PatternSection';
+import { HeadingLevelContext } from '@/lib/headingLevel';
+
+/**
+ * The Dynamic table: a table people sort, page or act on. `DynamicTable` is
+ * built on the table shell (its pagination and empty-state slots), with sortable `HeadCell`s and the shared `TableRow` and
+ * `TableCell` parts.
+ */
+
+export default {
+    title: 'Components/Text and data display/Dynamic table',
+    component: DynamicTable,
+    tags: ['!dev', '!autodocs'],
+    parameters: {
+        docs: {
+            description: {
+                component:
+                    'A table people sort, page or act on. `head.cells` names the columns and `rows` holds one `{ key, cells }` per row; a column sorts by its cells\' `key`. Left alone the table holds its own sort and page; pass `sortKey`/`sortOrder` or `page` and the page owns them. `empty` and `no results` replace the whole table (no head row, footer or pagination) with `EmptyState`; `loading` and `error` keep the head row and swap the body for one message row.'
+            }
+        }
+    },
+    argTypes: {
+        head: { control: 'object', description: 'One `{ key, content, isSortable, width, align }` per column', table: { category: 'Content' } },
+        rows: { control: 'object', description: 'One `{ key, cells, onClick }` per row; each cell `{ key, content }`', table: { category: 'Content' } },
+        caption: { control: 'text', table: { category: 'Content' } },
+        label: { control: 'text', table: { category: 'Content' } },
+        emptyView: { control: 'text', table: { category: 'Content' } },
+        noResultsView: { control: 'text', table: { category: 'Content' } },
+        errorView: { control: 'text', table: { category: 'Content' } },
+        state: { control: 'select', options: ['default', 'empty', 'no results', 'loading', 'refreshing', 'error'], table: { category: 'State' } },
+        isLoading: { control: 'boolean', table: { category: 'State' } },
+        highlightedRowIndex: { control: 'number', table: { category: 'State' } },
+        rowsPerPage: { control: 'number', table: { category: 'Paging' } },
+        page: { control: false, table: { category: 'Paging' } },
+        defaultPage: { control: 'number', table: { category: 'Paging' } },
+        totalRows: { control: 'number', table: { category: 'Paging' } },
+        onSetPage: { control: false, table: { category: 'Paging' } },
+        sortKey: { control: false, table: { category: 'Sorting' } },
+        sortOrder: { control: false, table: { category: 'Sorting' } },
+        defaultSortKey: { control: 'text', table: { category: 'Sorting' } },
+        defaultSortOrder: { control: 'inline-radio', options: ['ascending', 'descending'], table: { category: 'Sorting' } },
+        onSort: { control: false, table: { category: 'Sorting' } },
+        size: { control: 'inline-radio', options: [32, 40, 48], table: { category: 'Appearance' } },
+        isFixedSize: { control: 'boolean', table: { category: 'Appearance' } },
+        verticalLines: { control: 'boolean', table: { category: 'Appearance' } },
+        wrap: { control: 'boolean', table: { category: 'Appearance' } },
+        isSelectable: { control: 'boolean', table: { category: 'Selection' } },
+        selectedRowKeys: { control: false, table: { category: 'Selection' } },
+        defaultSelectedRowKeys: { control: 'object', table: { category: 'Selection' } },
+        onSelectionChange: { control: false, table: { category: 'Selection' } },
+        bulkActions: { control: 'object', table: { category: 'Selection' } },
+        stickyHeader: { control: 'boolean', table: { category: 'Scrolling' } },
+        maxHeight: { control: 'text', table: { category: 'Scrolling' } },
+        isFrozen: { control: 'boolean', table: { category: 'Scrolling' } },
+        className: { control: false, table: { disable: true, category: 'Development' } },
+        testId: { control: false, table: { disable: true, category: 'Development' } }
+    }
+};
+
+const head = {
+    cells: [
+        { key: 'student', content: 'Student', isSortable: true },
+        { key: 'tutor', content: 'Tutor', isSortable: true },
+        { key: 'last', content: 'Last session', isSortable: true },
+        { key: 'sessions', content: 'Sessions', isSortable: true, align: 'number' }
+    ]
+};
+
+const ROSTER = [
+    ['Ava Thompson', 'Priya Nair', 'Oct 24', 20261024, 12],
+    ['Marcus Lee', 'Daniel Kim', 'Oct 23', 20261023, 9],
+    ['Sofia Ramirez', 'Priya Nair', 'Oct 23', 20261023, 15],
+    ['Jordan Patel', 'Grace Okafor', 'Oct 21', 20261021, 4],
+    ['Emily Chen', 'Daniel Kim', 'Oct 20', 20261020, 11],
+    ['Noah Williams', 'Grace Okafor', 'Oct 18', 20261018, 7],
+    ['Lena Park', 'Priya Nair', 'Oct 17', 20261017, 3],
+    ['Diego Ruiz', 'Daniel Kim', 'Oct 15', 20261015, 14]
+];
+
+const toRow = ([student, tutor, last, lastKey, sessions]) => ({
+    key: student,
+    cells: [
+        { key: student, content: student },
+        { key: tutor, content: tutor },
+        { key: lastKey, content: last },
+        { key: sessions, content: String(sessions) }
+    ]
+});
+
+const rows = ROSTER.map(toRow);
+
+const bodyRows = (canvas) => within(canvas.getByRole('table')).getAllByRole('row').slice(1);
+const firstCells = (canvas) => bodyRows(canvas).map((row) => within(row).getAllByRole('cell')[0].textContent);
+
+export const Default = {
+    args: { head, rows, label: 'Students', rowsPerPage: 5 },
+    parameters: { docs: { description: { story: 'Left alone the table holds its own sort and page. A head press sorts by the column\'s cell keys; the footer states the range and the pager moves through it.' } } },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(firstCells(canvas)).toHaveLength(5);
+        await expect(canvas.getByText('1–5 of 8')).toBeVisible();
+        const sessions = canvas.getByRole('columnheader', { name: /Sessions/ });
+        await userEvent.click(within(sessions).getByRole('button'));
+        await expect(sessions).toHaveAttribute('aria-sort', 'ascending');
+        await expect(firstCells(canvas)[0]).toBe('Lena Park');
+        await userEvent.click(canvas.getByRole('button', { name: 'Next' }));
+        await expect(canvas.getByText('6–8 of 8')).toBeVisible();
+        await expect(firstCells(canvas)).toHaveLength(3);
+    }
+};
+
+const StatelessRoster = (args) => {
+    const [sort, setSort] = React.useState({ key: 'student', order: 'ascending' });
+    const [page, setPage] = React.useState(1);
+    return (
+        <DynamicTable
+            {...args}
+            sortKey={sort.key}
+            sortOrder={sort.order}
+            onSort={({ key, sortOrder }) => setSort({ key, order: sortOrder })}
+            page={page}
+            onSetPage={setPage}
+        />
+    );
+};
+
+export const Stateless = {
+    render: (args) => <StatelessRoster {...args} />,
+    args: { head, rows: rows.slice(0, 4), label: 'Students', rowsPerPage: 25, totalRows: 8500 },
+    parameters: { docs: { description: { story: 'The page owns the sort and the page. With `totalRows`, `rows` is already the current page — paged on a server — and the footer counts against the total: 340 pages here.' } } },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByText('1–25 of 8500')).toBeVisible();
+        await userEvent.click(canvas.getByRole('button', { name: 'Next' }));
+        await expect(canvas.getByText('26–50 of 8500')).toBeVisible();
+    }
+};
+
+const STATES = ['empty', 'no results', 'loading', 'error'];
+
+export const States = {
+    render: (args) => (
+        <div style={{ display: 'grid', gap: 'var(--section-stack-lg)' }}>
+            {STATES.map((state) => (
+                <DynamicTable key={state} {...args} state={state} label={`Students, ${state}`} testId={`state-${state}`} />
+            ))}
+            <DynamicTable {...args} isLoading label="Students, refreshing" testId="state-refreshing" />
+        </div>
+    ),
+    args: { head, rows: rows.slice(0, 3), rowsPerPage: 2 },
+    parameters: { docs: { description: { story: 'Empty and no results replace the whole table (no head row, footer or pagination) with EmptyState; loading and error keep the head row and swap the body for one message row; refreshing keeps the rows at the loading opacity under a spinner.' } } },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const emptyStates = STATES.filter((state) => state === 'empty' || state === 'no results');
+        const keptHeaderStates = STATES.filter((state) => !emptyStates.includes(state));
+        for (const state of emptyStates) {
+            const root = canvas.getByTestId(`state-${state}`);
+            await expect(root).toHaveAttribute('data-state', state);
+            await expect(within(root).queryByRole('table'), `${state}: no table`).toBeNull();
+            await expect(within(root).queryAllByRole('columnheader'), `${state}: no column headers`).toHaveLength(0);
+            await expect(within(root).queryByRole('navigation'), `${state}: no pagination`).toBeNull();
+            const region = within(root).getByRole('region', { name: `Students, ${state}` });
+            await expect(within(region).getByRole('heading'), `${state}: EmptyState heading visible`).toBeVisible();
+        }
+        for (const state of keptHeaderStates) {
+            const root = canvas.getByTestId(`state-${state}`);
+            await expect(root).toHaveAttribute('data-state', state);
+            const message = root.querySelector('.plus-table-shell-message');
+            await expect(message, `${state}: one message row`).not.toBeNull();
+            await expect(message.colSpan).toBe(4);
+            await expect(within(root).getAllByRole('columnheader')).toHaveLength(4);
+        }
+        const refreshing = canvas.getByTestId('state-refreshing');
+        await expect(refreshing).toHaveAttribute('aria-busy', 'true');
+        const body = refreshing.querySelector('tbody');
+        await expect(getComputedStyle(body).opacity).toBe('0.2');
+    }
+};
+
+export const Empty = {
+    args: { head, rows: [], label: 'Students', rowsPerPage: 5, emptyView: 'No students yet' },
+    parameters: {
+        docs: { description: { story: 'With no rows, the whole table (header row, footer and pagination) is replaced by `EmptyState` inside the sunken empty box.' } }
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.queryByRole('table')).toBeNull();
+        await expect(canvas.queryAllByRole('columnheader')).toHaveLength(0);
+        await expect(canvas.queryByRole('navigation')).toBeNull();
+        const region = canvas.getByRole('region', { name: 'Students' });
+        await expect(getComputedStyle(region).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+        await expect(px(getComputedStyle(region).borderTopLeftRadius)).toBe(tokenLength(canvasElement, '--table-empty-radius'));
+        await expect(within(region).getByRole('heading', { name: 'No students yet' })).toBeVisible();
+    }
+};
+
+export const NoResults = {
+    args: {
+        head,
+        rows,
+        state: 'no results',
+        label: 'Students',
+        rowsPerPage: 5,
+        noResultsView: (
+            <EmptyState
+                spacing="compact"
+                icon="magnifying-glass"
+                header="No matching students"
+                description="Try another search or reset the filters."
+                primaryAction={<Button text="Reset filters" appearance="default" spacing="compact" onClick={() => {}} />}
+            />
+        ),
+    },
+    parameters: {
+        docs: { description: { story: 'With `state="no results"`, the whole table (header row, footer and pagination) is replaced by `EmptyState` inside the sunken empty box.' } }
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.queryByRole('table')).toBeNull();
+        await expect(canvas.queryAllByRole('columnheader')).toHaveLength(0);
+        await expect(canvas.queryByRole('navigation')).toBeNull();
+        const region = canvas.getByRole('region', { name: 'Students' });
+        await expect(getComputedStyle(region).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+        await expect(px(getComputedStyle(region).borderTopLeftRadius)).toBe(tokenLength(canvasElement, '--table-empty-radius'));
+        await expect(within(region).getByRole('heading', { name: 'No matching students' })).toBeVisible();
+        await expect(within(region).getByRole('button', { name: 'Reset filters' })).toBeVisible();
+    }
+};
+
+export const EmptyNothingYet = {
+    name: 'Empty box: Nothing yet',
+    render: () => (
+        <HeadingLevelContext.Provider value={3}>
+            <PatternSection
+                title="Students"
+                actions={<Button text="Add student" appearance="primary" spacing="compact" onClick={() => {}} />}
+            >
+                <DynamicTable
+                    head={head}
+                    rows={[]}
+                    label="Students"
+                    emptyView={(
+                        <EmptyState
+                            spacing="compact"
+                            icon="user-group"
+                            header="No students yet"
+                            description="Add students to schedule sessions and track their progress."
+                            primaryAction={<Button text="Add student" appearance="default" spacing="compact" onClick={() => {}} />}
+                        />
+                    )}
+                />
+            </PatternSection>
+        </HeadingLevelContext.Provider>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await inEveryColorMode(async (mode) => {
+            await expect(canvas.queryByRole('table'), `${mode}: no table`).toBeNull();
+            const box = canvas.getByRole('region', { name: 'Students' });
+            await expect(getComputedStyle(box).backgroundColor, `${mode}: sunken empty box`)
+                .toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+            await expect(px(getComputedStyle(box).borderTopLeftRadius), `${mode}: card radius`)
+                .toBe(tokenLength(canvasElement, '--table-empty-radius'));
+            await expect(within(box).getByRole('heading', { name: 'No students yet' })).toBeVisible();
+            const boxAction = within(box).getByRole('button', { name: 'Add student' });
+            await expect(boxAction).toBeVisible();
+            await expect(boxAction.className, `${mode}: empty box button is default`).not.toContain('primary');
+            await expect(canvas.getAllByRole('button', { name: 'Add student' })[0], `${mode}: title row primary action stays usable`).toBeEnabled();
+        });
+    },
+};
+
+const FilteredDynamicTable = () => {
+    const [filtered, setFiltered] = React.useState(true);
+    const visible = filtered ? [] : rows;
+    return (
+        <HeadingLevelContext.Provider value={3}>
+            <PatternSection
+                title="Students"
+                toolbar={(
+                    <SectionToolbar
+                        count={`${visible.length} students`}
+                        filters={(
+                            <Button
+                                text={filtered ? 'Grade: Grade 5' : 'All grades'}
+                                appearance="subtle"
+                                spacing="compact"
+                                onClick={() => setFiltered((prev) => !prev)}
+                            />
+                        )}
+                    />
+                )}
+            >
+                <DynamicTable
+                    head={head}
+                    rows={visible}
+                    label="Students"
+                    state={visible.length === 0 ? 'no results' : undefined}
+                    noResultsView={(
+                        <EmptyState
+                            spacing="compact"
+                            icon="magnifying-glass"
+                            header="No students match these filters"
+                            description="Nothing matches Grade 5. Clear the filter to see every student."
+                            primaryAction={(
+                                <Button
+                                    text="Clear filter"
+                                    appearance="default"
+                                    spacing="compact"
+                                    onClick={() => setFiltered(false)}
+                                />
+                            )}
+                        />
+                    )}
+                />
+            </PatternSection>
+        </HeadingLevelContext.Provider>
+    );
+};
+
+export const EmptyHiddenByFilter = {
+    name: 'Empty box: Hidden by filter',
+    render: () => <FilteredDynamicTable />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const box = canvas.getByRole('region', { name: 'Students' });
+        await expect(getComputedStyle(box).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+        await expect(px(getComputedStyle(box).borderTopLeftRadius)).toBe(tokenLength(canvasElement, '--table-empty-radius'));
+        await expect(canvas.getByRole('button', { name: 'Grade: Grade 5' })).toBeVisible();
+        const clear = within(box).getByRole('button', { name: 'Clear filter' });
+        await expect(clear.className).not.toContain('primary');
+        await userEvent.click(clear);
+        await expect(canvas.getByRole('table')).toBeVisible();
+        await expect(canvas.getByText('Ava Thompson')).toBeVisible();
+    },
+};
+
+export const EmptyNothingToCreate = {
+    name: 'Empty box: Nothing to create',
+    render: () => (
+        <HeadingLevelContext.Provider value={3}>
+            <PatternSection title="Reflections">
+                <DynamicTable
+                    head={head}
+                    rows={[]}
+                    label="Reflections"
+                    emptyView={(
+                        <EmptyState
+                            spacing="compact"
+                            icon="circle-check"
+                            header="Every reflection is reviewed"
+                            description="New ones arrive after Friday's sessions."
+                        />
+                    )}
+                />
+            </PatternSection>
+        </HeadingLevelContext.Provider>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const box = canvas.getByRole('region', { name: 'Reflections' });
+        await expect(getComputedStyle(box).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+        await expect(px(getComputedStyle(box).borderTopLeftRadius)).toBe(tokenLength(canvasElement, '--table-empty-radius'));
+        await expect(within(box).getByRole('heading', { name: 'Every reflection is reviewed' })).toBeVisible();
+        await expect(within(box).getByText("New ones arrive after Friday's sessions.")).toBeVisible();
+        await expect(canvas.queryAllByRole('button')).toHaveLength(0);
+    },
+};
+
+const LONG = 'Alexandria Montgomery-Vasquez, transferred from Roosevelt K-8 in the spring term';
+
+export const Widths = {
+    render: (args) => (
+        <div style={{ display: 'grid', gap: 'var(--section-stack-lg)' }}>
+            {[
+                [480, 'var(--width-3000)'],
+                [768, '768px' /* token gap: 768px */],
+                [1024, '1024px' /* token gap: 1024px */],
+                [1920, '1920px' /* token gap: 1920px */],
+            ].map(([labelWidth, width]) => (
+                <div key={labelWidth} data-testid={`width-${labelWidth}`} style={{ width }}>
+                    <DynamicTable {...args} label={`Students at ${labelWidth}`} />
+                </div>
+            ))}
+        </div>
+    ),
+    args: {
+        head,
+        rows: [toRow([LONG, 'Priya Nair', 'Oct 24', 20261024, 12]), ...rows.slice(1, 4)],
+        rowsPerPage: 25,
+        totalRows: 8500
+    },
+    parameters: { docs: { description: { story: 'Under the content minimum (720) the table scrolls sideways instead of squeezing. Wider, the first column fills the room and the rest size to their content; a long name ends in an ellipsis.' } } },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const scroll = (width) => canvas.getByTestId(`width-${width}`).querySelector('.plus-table-shell-scroll');
+        const narrow = scroll(480);
+        await expect(narrow.scrollWidth, 'at 480 the table scrolls sideways').toBeGreaterThan(narrow.clientWidth);
+        await expect(px(getComputedStyle(narrow.querySelector('table')).minWidth)).toBe(tokenLength(canvasElement, '--content-min-width'));
+        const wide = scroll(1920);
+        await expect(wide.scrollWidth, 'at 1920 nothing scrolls').toBeLessThanOrEqual(wide.clientWidth);
+        const [first, ...rest] = within(wide).getAllByRole('columnheader');
+        for (const other of rest) {
+            await expect(first.offsetWidth, 'the first column fills').toBeGreaterThan(other.offsetWidth);
+        }
+    }
+};
+
+const BULK = ['Message', 'Export', 'Assign tutor', 'Remove'];
+
+const RosterWithBulkBar = (args) => {
+    const [selected, setSelected] = React.useState([]);
+    return (
+        <HeadingLevelContext.Provider value={3}>
+            <PatternSection title="Students" toolbar={<SectionToolbar count={`${args.rows.length} students`} />}>
+                <DynamicTable
+                    {...args}
+                    isSelectable
+                    selectedRowKeys={selected}
+                    onSelectionChange={setSelected}
+                    bulkActions={BULK.map((label) => ({ label, onClick: () => {} }))}
+                />
+            </PatternSection>
+        </HeadingLevelContext.Provider>
+    );
+};
+
+export const Selection = {
+    render: (args) => <RosterWithBulkBar {...args} />,
+    args: { head, rows, label: 'Students' },
+    parameters: { docs: { description: { story: 'A checkbox column as wide as the row is tall. Select-all in the head is checked when every row is selected and mixed when only some are. While rows are selected the head row becomes the bulk bar: the count, then up to three `bulkActions` with an overflow menu for the rest. The labels cross-fade in place and the row keeps its height. There is no Clear; the checkboxes clear it. The Section toolbar stays put.' } } },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const headRow = () => canvasElement.querySelector('thead tr');
+        const restHeight = headRow().getBoundingClientRect().height;
+        const all = canvas.getByRole('checkbox', { name: 'Select all rows' });
+        await expect(all).toHaveAttribute('aria-checked', 'false');
+        await userEvent.click(canvas.getByRole('checkbox', { name: 'Select row 2' }));
+        await expect(all).toHaveAttribute('aria-checked', 'mixed');
+        const bar = headRow().querySelector('.plus-dynamic-table-bulk');
+        await expect(bar, 'the head row is the bulk bar').toHaveTextContent('1 selected');
+        // The toolbar's result count is its own live region; the selection count is the one that says "selected".
+        const selectionLive = canvas.getAllByRole('status').filter((node) => /selected/.test(node.textContent));
+        await expect(selectionLive, 'one live region announces the selection').toHaveLength(1);
+        await expect(selectionLive[0], 'announced from the first selection').toHaveTextContent('1 selected');
+        await expect(bar.querySelector('.plus-table-bulk-actions__count')).not.toHaveAttribute('aria-live');
+        await expect(headRow().getBoundingClientRect().height, 'the row keeps its height').toBe(restHeight);
+        await expect(canvas.getByText('Marcus Lee').closest('tr')).toHaveAttribute('aria-selected', 'true');
+        // The bar fades in over the motion token's short duration.
+        await waitFor(() => expect(within(bar).getByRole('button', { name: 'More actions' })).toBeVisible());
+        await expect(canvas.queryByRole('button', { name: /clear/i }), 'no Clear button').toBeNull();
+        await expect(canvas.getByText('8 students'), 'the toolbar stays put').toBeVisible();
+        await userEvent.click(all);
+        await expect(all).toHaveAttribute('aria-checked', 'true');
+        await expect(bar).toHaveTextContent('8 selected');
+        await userEvent.click(all);
+        await expect(all).toHaveAttribute('aria-checked', 'false');
+        await expect(headRow().querySelector('.plus-dynamic-table-bulk'), 'the head row comes back').toBeNull();
+        await waitFor(() => expect(canvas.getByRole('button', { name: /Student/ })).toBeVisible());
+        await expect(headRow().getBoundingClientRect().height).toBe(restHeight);
+    }
+};
+
+export const StickyHeaderAndFrozenColumn = {
+    args: {
+        head: {
+            cells: [
+                ...head.cells,
+                { key: 'grade', content: 'Grade' },
+                { key: 'school', content: 'School' },
+                { key: 'attendance', content: 'Attendance', align: 'number' },
+                { key: 'next', content: 'Next session' }
+            ]
+        },
+        rows: ROSTER.map((r) => {
+            const row = toRow(r);
+            return { ...row, cells: [...row.cells, { content: 'Grade 7' }, { content: 'Lincoln Middle School' }, { content: '92%' }, { content: 'Thursday, 4:30 PM' }] };
+        }),
+        label: 'Students',
+        isSelectable: true,
+        isFrozen: true,
+        stickyHeader: true,
+        maxHeight: 200
+    },
+    render: (args) => <div style={{ width: 'var(--width-3000)' }}><DynamicTable {...args} /></div>,
+    parameters: { docs: { description: { story: 'The head row stays pinned while the rows scroll under it inside the table\'s own region. The checkboxes and the title column stay frozen on an opaque surface; while the table scrolls sideways their edge draws a stronger divider and the overflow shadow.' } } },
+    play: async ({ canvasElement }) => {
+        const scroll = canvasElement.querySelector('.plus-table-shell-scroll');
+        const head = canvasElement.querySelector('thead th');
+        await expect(getComputedStyle(head).position).toBe('sticky');
+        const title = canvasElement.querySelector('tbody td:nth-child(2)');
+        await expect(getComputedStyle(title).position).toBe('sticky');
+        await expect(getComputedStyle(title).backgroundColor, 'the frozen cell is opaque').not.toBe('rgba(0, 0, 0, 0)');
+        await expect(getComputedStyle(title).boxShadow, 'no edge before a scroll').toBe('none');
+        scroll.scrollLeft = 200;
+        scroll.dispatchEvent(new Event('scroll'));
+        await waitFor(() => expect(scroll).toHaveAttribute('data-scrolled-x'));
+        await expect(getComputedStyle(title).boxShadow, 'the edge shows while scrolled').not.toBe('none');
+        const before = title.getBoundingClientRect().left;
+        scroll.scrollLeft = 260;
+        scroll.dispatchEvent(new Event('scroll'));
+        await expect(title.getBoundingClientRect().left, 'the frozen column does not move').toBe(before);
+    }
+};
+
+const HeadRow = ({ children }) => (
+    <table className="plus-table plus-table-40" style={{ tableLayout: 'fixed' }}>
+        <thead><tr>{children}</tr></thead>
+    </table>
+);
+
+const SortableHeads = () => {
+    const [sorted, setSorted] = React.useState({ key: null, sort: 'none' });
+    const head = (key, label, extra = {}) => (
+        <HeadCell
+            key={key}
+            label={label}
+            isSortable
+            sort={sorted.key === key ? sorted.sort : 'none'}
+            onSort={(sort) => setSorted({ key, sort })}
+            {...extra}
+        />
+    );
+    return (
+        <HeadRow>
+            {head('student', 'Student', { width: '200px' /* token gap: 200px */ })}
+            {head('sessions', 'Sessions', { width: '140px' /* token gap: 140px */, align: 'number' })}
+        </HeadRow>
+    );
+};
+
+export const SortableHeadCells = {
+    render: () => <SortableHeads />,
+    parameters: { docs: { description: { story: 'A sortable column puts `aria-sort` on the header and a real button inside it. A press asks for ascending, then descending, then no sort; the page owns the sort. The unsorted arrow shows on hover and focus and a sorted column keeps its arrow, always 12 tall. Focus is a ring inset in the cell, never a fill.' } } },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const th = canvas.getByRole('columnheader', { name: /Student/ });
+        const button = within(th).getByRole('button');
+        const arrow = th.querySelector('.plus-table-head-cell-sort');
+        await expect(th).toHaveAttribute('aria-sort', 'none');
+        // The suite's real pointer persists between stories and may rest on the button
+        // when this one starts; hover is the other thing that shows the arrow.
+        await expect(getComputedStyle(arrow).opacity, 'unsorted arrow is hidden at rest').toBe(button.matches(':hover') ? '1' : '0');
+        await userEvent.tab();
+        await expect(button, 'the button takes focus from the keyboard').toHaveFocus();
+        await expect(getComputedStyle(arrow).opacity, 'and the arrow shows on focus').toBe('1');
+        await expect(px(getComputedStyle(arrow).fontSize)).toBe(tokenLength(canvasElement, '--icon-sm'));
+        button.blur();
+
+        await userEvent.click(button);
+        await expect(th).toHaveAttribute('aria-sort', 'ascending');
+        await expect(arrow).toHaveClass('fa-sort-up');
+        await userEvent.unhover(button);
+        await expect(getComputedStyle(arrow).opacity, 'a sorted arrow stays').toBe('1');
+        await userEvent.click(button);
+        await expect(th).toHaveAttribute('aria-sort', 'descending');
+        await expect(arrow).toHaveClass('fa-sort-down');
+        await userEvent.click(button);
+        await expect(th).toHaveAttribute('aria-sort', 'none');
+
+        await inEveryColorMode(async (mode) => {
+            button.blur();
+            await userEvent.tab();
+            await expect(button, `${mode}: keyboard focus`).toHaveFocus();
+            const style = getComputedStyle(button);
+            await expect(style.outlineStyle, `${mode}: focus is a ring`).toBe('solid');
+            await expect(style.outlineColor, `${mode}: ring color`).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+            // The real pointer may still rest on the button after the clicks above; its
+            // hover fill is the only fill the cell may carry. Focus adds none.
+            const fill = button.matches(':hover') ? tokenColor(canvasElement, '--ds-background-neutral-subtle-hovered') : 'rgba(0, 0, 0, 0)';
+            await expect(style.backgroundColor, `${mode}: focus is not a fill`).toBe(fill);
+            button.blur();
+        });
+    }
+};
+
+const sortButton = (canvasElement) => within(within(canvasElement).getByRole('columnheader', { name: /Student/ })).getByRole('button');
+
+/** Rest: a sortable head cell is clear, with its arrow hidden until the cell is hovered or focused. */
+export const Rest = {
+    render: () => <SortableHeads />,
+    play: async ({ canvasElement }) => {
+        const th = within(canvasElement).getByRole('columnheader', { name: /Student/ });
+        await expect(th).toHaveAttribute('aria-sort', 'none');
+        await expect(getComputedStyle(sortButton(canvasElement)).backgroundColor).toBe(
+            sortButton(canvasElement).matches(':hover') ? tokenColor(canvasElement, '--ds-background-neutral-subtle-hovered') : 'rgba(0, 0, 0, 0)',
+        );
+    },
+};
+
+/** Hovered: the head cell takes the subtle hovered step. */
+export const Hovered = {
+    render: () => <SortableHeads />,
+    play: async ({ canvasElement }) => {
+        await expectGroundUnder(canvasElement, sortButton(canvasElement), ':hover', '--ds-background-neutral-subtle-hovered', 'head cell');
+    },
+};
+
+/** Pressed: the head cell takes the subtle pressed step. */
+export const Pressed = {
+    render: () => <SortableHeads />,
+    play: async ({ canvasElement }) => {
+        await expectGroundUnder(canvasElement, sortButton(canvasElement), ':active', '--ds-background-neutral-subtle-pressed', 'head cell');
+    },
+};
+
+/** Focused: the sort button shows the 2px ring inset in the cell, and the arrow appears. */
+export const Focused = {
+    render: () => <SortableHeads />,
+    play: async ({ canvasElement }) => {
+        const button = sortButton(canvasElement);
+        button.focus({ focusVisible: true });
+        await expect(button.matches(':focus-visible')).toBe(true);
+        const style = getComputedStyle(button);
+        await expect(style.outlineStyle).toBe('solid');
+        await expect(style.outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        await expect(getComputedStyle(button.querySelector('.plus-table-head-cell-sort')).opacity).toBe('1');
+        button.blur();
+    },
+};
+
+/** Disabled: the table has no disabled sort; a row can be disabled (see the Static table) and takes the disabled ink. */
+export const DisabledRow = {
+    render: () => (
+        <StaticTable
+            headers={['Session date', 'Student', 'Hours', { text: 'Amount', align: 'number' }]}
+            rows={[['Jul 3', 'Priya Nair', '1.0 hrs', { content: '$32.00', align: 'number' }]]}
+            rowStates={['disabled']}
+        />
+    ),
+    play: async ({ canvasElement }) => {
+        const row = within(canvasElement).getByText('Priya Nair').closest('tr');
+        await expect(row).toHaveAttribute('aria-disabled', 'true');
+    },
+};
+
+/** The playground: the default story's args, with every control live. */
+export const Interactive = {
+    args: { ...Default.args }
+};

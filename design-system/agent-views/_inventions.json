@@ -137,10 +137,21 @@
       "retired": true
     },
     {
-      "not": "Dialog",
+      "not": "ModalDialog",
       "use": [
+        "Dialog",
         "Modal"
-      ]
+      ],
+      "why": "Dialog is inline; Modal is blocking"
+    },
+    {
+      "not": "PatternModal",
+      "use": [
+        "Modal",
+        "Dialog"
+      ],
+      "why": "renamed to Modal",
+      "retired": true
     },
     {
       "not": "Input",

@@ -69,7 +69,7 @@ Use Empty when a list, table, card, Panel or page has no records to show, a sear
 | --- | --- | --- |
 | The block | Empty state | Picture or icon, header, one line and the action; `spacing` is `default` for a view and `compact` for a table body or card. |
 | The action | Button | `primaryAction` takes one Button; a No matches action is Default. |
-| Table slot | Table | `emptyState` (`PatternTable`) and `emptyView` / `noResultsView` (`DynamicTable`) take the block and replace the whole table, header and footer included. |
+| Table slot | Table | `emptyState` (the Table template) and `emptyView` / `noResultsView` (`DynamicTable`) take the block and replace the whole table, header and footer included. |
 | In a Panel | Panel | The record-gone state at the top of the body. |
 
 ## Related
@@ -147,18 +147,17 @@ An illustration for a full view a person meets once, such as a new tutor's first
 From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#Empty`.
 
 ```jsx
-import { Button, EmptyState } from '@/components';
-import { PatternTable } from '@/patterns';
+import { Button, EmptyState, StaticTable } from '@/components';
+import { Table } from '@/patterns';
 
 function EmptyExample() {
     return (
-        <PatternTable empty emptyState={
+        <Table title="Sessions" empty emptyState={
             <EmptyState spacing="compact" header="No matching sessions" description="Try another search or reset the filters."
                 secondaryAction={<Button text="Reset filters" spacing="compact" />} />
         }>
-            <thead><tr><th>Student</th><th>Status</th></tr></thead>
-            <tbody />
-        </PatternTable>
+            <StaticTable headers={['Student', 'Status']} rows={[]} />
+        </Table>
     );
 }
 ```

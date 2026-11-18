@@ -453,14 +453,14 @@
     .plus-comment,
     .plus-pattern-section,
     .plus-pattern-card,
-    .plus-pattern-table,
+    .plus-table-shell,
     .plus-table-container,
     .plus-dynamic-table,
     .plus-static-table,
     .plus-tree-table,
     table,
     [style*="display: grid"],
-    :has(.plus-pattern-section, .plus-pattern-card, .plus-pattern-table, .plus-banner, .plus-section-message, .plus-progress-bar, .plus-range, table)
+    :has(.plus-pattern-section, .plus-pattern-card, .plus-table-shell, .plus-banner, .plus-section-message, .plus-progress-bar, .plus-range, table)
 ) {
     align-self: stretch;
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { HeadingLevelContext } from '@/lib/headingLevel';
-import { Table } from '@/components';
+import { StaticTable } from '@/components';
 import EmptyState from '.';
 
 describe('EmptyState', () => {
@@ -50,9 +50,9 @@ describe('EmptyState', () => {
         expect(container.querySelector('.plus-empty-state__actions')).toBeNull();
     });
 
-    it('fills a Table emptyState slot', () => {
+    it('fills a Static table emptyState slot', () => {
         render(
-            <Table
+            <StaticTable
                 headers={['Student']}
                 rows={[]}
                 emptyState={<EmptyState spacing="compact" header="No students yet" />}

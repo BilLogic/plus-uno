@@ -8,7 +8,7 @@ import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-examp
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
-import { TierActive, TierDanger, TierTypeName } from '../../../patterns/PatternModal/modalDemo.jsx';
+import { TierActive, TierDanger, TierTypeName } from '../../../patterns/Modal/modalDemo.jsx';
 import {
     APPEARANCES,
     Appearances,

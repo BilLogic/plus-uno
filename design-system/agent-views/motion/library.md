@@ -17,6 +17,10 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Frame | template | focused-open | Drill into and climb back out | `--ds-motion-appearance-default` |  |
 | Frame | template | focused-close | Drill into and climb back out | `--ds-motion-appearance-fast` |  |
 | Frame | template | step | Step to the next or previous | `--ds-motion-spatial-default` · `--ds-motion-appearance-fast` |  |
+| Modal | template | enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` |  |
+| Modal | template | exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` |  |
+| Modal | template | swap | Swap content in place | `--ds-motion-appearance-fast` |  |
+| Modal | template | rejected | Call attention | `--ds-motion-spatial-fast` |  |
 | Page | template | title | Scroll to a spot on the page | `--ds-motion-linear` |  |
 | Page | template | anchor | Scroll to a spot on the page | `--ds-motion-linear` |  |
 | Page | template | tabs-shadow | Update a value or state | `--ds-motion-appearance-fast` |  |
@@ -28,19 +32,15 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Panel | template | narrow-exit | Open and close an overlay | `--ds-motion-spatial-default` |  |
 | PatternCard | template | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | PatternCard | template | milestone | Load content | `--ds-motion-spatial-default` | `sound.done.milestone` on land: onboarding complete, first session, goal reached, term start or end, badge claimed; goal reached is shared, so the student hears it |
-| PatternModal | template | enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` |  |
-| PatternModal | template | exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` |  |
-| PatternModal | template | swap | Swap content in place | `--ds-motion-appearance-fast` |  |
-| PatternModal | template | rejected | Call attention | `--ds-motion-spatial-fast` |  |
 | PatternSection | template | view-bar | Swap content in place | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | PatternSection | template | side-open | Expand and collapse | `--ds-motion-spatial-default` |  |
 | PatternSection | template | side-close | Expand and collapse | `--ds-motion-spatial-default` |  |
 | PatternSection | template | detail | Expand and collapse | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | PatternSection | template | body | Load content | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | PatternSection | template | footer | Step to the next or previous | `--ds-motion-spatial-default` |  |
-| PatternTable | template | selection | Update a value or state | `--ds-motion-appearance-fast` |  |
 | Popup | template | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Popup | template | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
+| Table | template | selection | Update a value or state | `--ds-motion-appearance-fast` |  |
 | Common actions | pattern | selection | Update a value or state | `--ds-motion-appearance-fast` |  |
 | Common actions | pattern | confirm | Open and close an overlay | `--ds-motion-appearance-fast` | `sound.done.sent` on land: only a call-off or lead request sent; other confirms stay silent |
 | Common actions | pattern | cancel | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
@@ -122,6 +122,8 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | DateTimePicker | component | change | Step to the next or previous | `--ds-motion-spatial-default` |  |
 | DropdownMenu | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | DropdownMenu | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
+| DynamicTable | component | change | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
+| DynamicTable | component | roster | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | `sound.roster` on land: in a session; changes within 2 s play once |
 | FileItem | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | FileItem | component | progress | Load content | `--ds-motion-linear` |  |
 | FileUpload | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
@@ -148,9 +150,6 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Link | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | LinkButton | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | LinkIconButton | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
-| Modal | component | enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` |  |
-| Modal | component | exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` |  |
-| Modal | component | rejected | Call attention | `--ds-motion-spatial-fast` |  |
 | NotificationItem | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | PageHeader | component | change | Scroll to a spot on the page | `--ds-motion-linear` |  |
 | Pagination | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
@@ -190,9 +189,6 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Spotlight | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Suggestion | component | enter | Swap content in place | `--ds-motion-appearance-fast` |  |
 | Suggestion | component | exit | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
-| Table | component | expand | Expand and collapse | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
-| Table | component | change | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
-| Table | component | roster | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | `sound.roster` on land: in a session; changes within 2 s play once |
 | Tabs | component | change | Switch views | `--ds-motion-spatial-fast` |  |
 | TagInput | component | change | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | TextArea | component | change | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
@@ -206,3 +202,4 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | TreeSelect | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | TreeSelect | component | exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` |  |
 | TreeSelect | component | change | Expand and collapse | `--ds-motion-spatial-fast` |  |
+| TreeTable | component | expand | Expand and collapse | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |

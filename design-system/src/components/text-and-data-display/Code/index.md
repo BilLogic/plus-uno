@@ -62,7 +62,7 @@ Don't: A trailing period inside the span, which the reader may type.
 
 - `CodeBlock`: use when displaying several lines of code with line numbers or line highlights.
 
-Same group: `CodeBlock` · `Heading` · `InlineEdit` · `Table` · `VisuallyHidden`
+Same group: `CodeBlock` · `DynamicTable` · `Heading` · `InlineEdit` · `StaticTable` · `TreeTable` · `VisuallyHidden`
 
 ## Parts
 

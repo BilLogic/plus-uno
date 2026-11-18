@@ -57,17 +57,17 @@ const ROLES = {
   panelEdge: ['--ds-border', 'components/layout-and-structure/Panel/Panel.scss'],
   // A floating Panel (peek or overlay) takes Frame's overlay shadow; a docked one has none.
   panelFloatingShadow: ['--ds-shadow-overlay', 'patterns/Frame/Frame.scss'],
-  modalSurface: ['--ds-surface-overlay', 'components/messaging/Modal/Modal.scss'],
-  modalShadow: ['--ds-shadow-blocking', 'components/messaging/Modal/Modal.scss'],
-  modalDivider: ['--ds-border', 'components/messaging/Modal/Modal.scss'],
-  blanket: ['--ds-blanket', 'patterns/Blanket/Blanket.scss'],
+  modalSurface: ['--ds-surface-overlay', 'components/messaging/Dialog/Dialog.scss'],
+  modalShadow: ['--ds-shadow-blocking', 'tokens/ladder/_templates.scss'],
+  modalDivider: ['--ds-border', 'components/messaging/Dialog/Dialog.scss'],
+  blanket: ['--ds-blanket', 'patterns/Modal/Modal.scss'],
   // Placeholder text: the Skeleton component's own bar
   placeholderText: ['--ds-skeleton', 'components/loading/Skeleton/Skeleton.scss'],
   placeholderHeading: ['--ds-skeleton', 'components/loading/Skeleton/Skeleton.scss'],
   // Table row
   rowDivider: ['--ds-border', 'components/text-and-data-display/Table/Table.scss'],
   // Overflow: a part that stays put while content scrolls under it, such as a sticky table header
-  overflowShadow: ['--ds-shadow-overflow', 'patterns/PatternTable/PatternTable.scss'],
+  overflowShadow: ['--ds-shadow-overflow', 'components/text-and-data-display/Table/TableShell.scss'],
   rowSelected: ['--ds-background-selected', 'components/text-and-data-display/Table/Table.scss'],
   // Field
   fieldSurface: ['--ds-background-input', 'components/forms-and-inputs/_internal/FieldBox.scss'],
@@ -177,7 +177,7 @@ const CORNERS = {
   popup: ['--popup-radius', 'components/overlays-and-layering/Popup/Popup.scss'],
   flag: ['--popup-radius', 'components/messaging/Flag/Flag.scss'],
   tooltip: ['--radius-control-sm', 'components/overlays-and-layering/Tooltip/Tooltip.scss'],
-  modal: ['--modal-radius', 'components/messaging/Modal/Modal.scss'],
+  modal: ['--modal-radius', 'patterns/Modal/Modal.scss'],
   field: ['--radius-control-lg', 'components/forms-and-inputs/_internal/FieldBox.scss'],
   sidebarRow: ['--frame-sidebar-row-radius', 'patterns/Sidebar/Sidebar.scss'],
   tab: ['--radius-control-md', 'components/navigation/Tabs/Tabs.scss'],

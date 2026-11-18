@@ -1,6 +1,6 @@
 import React from 'react';
 import { expect } from 'storybook/test';
-import { EmptyState, Flag, Modal, SectionMessage, TextField } from '@/components';
+import { Dialog, EmptyState, Flag, SectionMessage, TextField } from '@/components';
 import { Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
 
 export default {
@@ -65,9 +65,7 @@ export const Warnings = {
         <DoDont>
             <Do caption="The tutor sees the ripple before deciding.">
                 <div style={narrowOverlay}>
-                    <Modal
-                        show
-                        renderAs="inline"
+                    <Dialog
                         width="6-col"
                         title="Call off Thursday’s session?"
                         body="Jordan’s teacher gets a note, and we look for a fill-in."
@@ -79,9 +77,7 @@ export const Warnings = {
             </Do>
             <Dont caption="Clear action, but it hides the people it touches.">
                 <div style={narrowOverlay}>
-                    <Modal
-                        show
-                        renderAs="inline"
+                    <Dialog
                         width="6-col"
                         title="Call off this session?"
                         body="You can’t undo this."

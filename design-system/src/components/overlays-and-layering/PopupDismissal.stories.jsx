@@ -1,7 +1,8 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button, Modal, Popup } from '@/components';
+import { Button, Popup } from '@/components';
+import { Modal } from '@/patterns';
 /**
  * Getting a `Popup` shut again.
  *

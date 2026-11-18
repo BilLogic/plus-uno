@@ -3,9 +3,9 @@
   "figmaFileKey": "zAecJNRdvJzAUOcjV32tRX",
   "figmaFileName": "Design System - BS4 Foundation (Component LIbrary)",
   "capturedAt": "2026-11-16",
-  "totalVariables": 1638,
+  "totalVariables": 1637,
   "byType": {
-    "COLOR": 981,
+    "COLOR": 980,
     "FLOAT": 642,
     "BOOLEAN": 10,
     "STRING": 5
@@ -833,7 +833,6 @@
         "X-Large (1440px)"
       ],
       "variables": [
-        "Blanket/fill",
         "Blanket/pad-x",
         "Blanket/pad-y",
         "Card/inline-lg",
@@ -952,7 +951,6 @@
         "Table/radius"
       ],
       "codeSyntax": {
-        "Blanket/fill": "var(--blanket-fill)",
         "Blanket/pad-x": "var(--blanket-pad-x)",
         "Blanket/pad-y": "var(--blanket-pad-y)",
         "Card/inline-lg": "var(--card-inline-lg)",
@@ -996,9 +994,9 @@
         "Modal/stack-lg": "var(--modal-stack-lg)",
         "Modal/stack-md": "var(--modal-stack-md)",
         "Modal/stack-sm": "var(--modal-stack-sm)",
-        "Modal/width-lg": "var(--modal-width-lg)",
-        "Modal/width-md": "var(--modal-width-md)",
-        "Modal/width-sm": "var(--modal-width-sm)",
+        "Modal/width-lg": "var(--modal-width-10-col)",
+        "Modal/width-md": "var(--modal-width-8-col)",
+        "Modal/width-sm": "var(--modal-width-6-col)",
         "Page/border-width": "var(--page-border-width)",
         "Page/pad": "var(--page-pad)",
         "Page/pad-x-compact": "var(--page-pad-x-compact)",

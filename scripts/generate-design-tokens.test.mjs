@@ -84,7 +84,6 @@ test('no collection, Figma variable or code name carries the spec name, "roles" 
 
 test('a COLOR row is typed COLOR and a code-only row stays out of the payload', () => {
   const variables = variablesPayload().collections.flatMap((c) => c.variables);
-  assert.equal(variables.find((v) => v.name === 'Blanket/fill')?.resolvedType, 'COLOR');
   assert.equal(variables.find((v) => v.name === 'Blanket/max-height-modal'), undefined);
   for (const row of TOKEN_LADDER.filter((r) => r.codeOnly)) {
     assert.equal(variables.find((v) => v.codeSyntax.WEB === `var(${row.new})`), undefined, `${row.new} is code only`);

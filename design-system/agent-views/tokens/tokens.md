@@ -63,7 +63,6 @@ Start here for space, size and radius (ADR-038). A component reads its component
 Space owned by a template: page, section, card, table, modal, popup. Inside a template, read its token before a semantics step.
 
 ```css
---blanket-fill  /* Fill of the Blanket that dims the page behind a Modal. */
 --blanket-max-height-modal  /* Tallest a Modal may grow inside its Blanket. */
 --blanket-pad-x  /* Horizontal space between the screen edge and a Modal on its Blanket. */
 --blanket-pad-y  /* Vertical space between the screen edge and a Modal on its Blanket; shrinks on short screens. */
@@ -83,10 +82,11 @@ Space owned by a template: page, section, card, table, modal, popup. Inside a te
 --modal-pad-x-default  /* Horizontal padding of a Modal with default spacing. */
 --modal-pad-x-spacious  /* Horizontal padding of a Modal with spacious spacing. */
 --modal-radius  /* Corner rounding of a Modal. */
---modal-width-lg  /* Width of a large Modal, such as a table or a long form. */
---modal-width-md  /* Width of a default Modal, such as a short form. */
---modal-width-sm  /* Width of a small Modal, such as a single question or a one-field form. */
---modal-width-xs  /* Width of a compact Modal, such as a confirmation. */
+--modal-shadow  /* Shadow of a Modal on its Blanket. */
+--modal-width-10-col  /* Width of a large Modal, such as a table or a long form. */
+--modal-width-4-col  /* Width of a compact Modal, such as a confirmation. */
+--modal-width-6-col  /* Width of a small Modal, such as a single question or a one-field form. */
+--modal-width-8-col  /* Width of a default Modal, such as a short form. */
 --page-border-width  /* Width of the edge drawn around a Page frame. */
 --page-pad-x-compact  /* Horizontal padding of a Page with compact spacing. */
 --page-pad-x-default  /* Horizontal padding of a Page with default spacing. */
@@ -107,9 +107,12 @@ Space owned by a template: page, section, card, table, modal, popup. Inside a te
 --section-pad-y-default  /* Vertical padding of a PatternSection with default spacing. */
 --section-pad-y-spacious  /* Vertical padding of a PatternSection with spacious spacing. */
 --section-radius  /* Corner rounding of a PatternSection that has a fill. */
---table-footer-height  /* Height of a PatternTable footer row: the range, the page-size Select and Pagination on one line. */
---table-overflow-reach  /* How far a PatternTable lets a row's overflow, such as a focus ring, reach past its clip. */
---table-radius  /* Corner rounding of a PatternTable. */
+--table-empty-radius  /* Corner rounding of the empty state box that replaces an empty table. */
+--table-empty-surface  /* Surface of the empty state box that replaces an empty table. */
+--table-footer-height  /* Height of a table footer row: the range, the page-size Select and Pagination on one line. */
+--table-inline  /* Horizontal gap between controls in a table footer. */
+--table-overflow-reach  /* How far a table lets a row's overflow, such as a focus ring, reach past its clip. */
+--table-radius  /* Corner rounding of a table. */
 ```
 
 ## Ladder Components
@@ -143,6 +146,17 @@ Tokens one component owns, named for it.
 --choice-grid-control-size-12  /* Size of the control in a ChoiceGrid with size 14 or 16. */
 --choice-tile-width  /* Width of a choice tile in a Radio, RadioGroup, Checkbox or CheckboxGroup with tile appearance. */
 --count-tag-dot-size  /* Size of the dot in a CountTag. */
+--dialog-body-min-height  /* Minimum height of a Dialog's body, so a short body does not collapse the dialog. */
+--dialog-inline-lg  /* Horizontal gap between columns in a Dialog. */
+--dialog-inline-md  /* Horizontal gap between the actions in a Dialog footer. */
+--dialog-inline-sm  /* Horizontal gap between small items in a Dialog header or footer. */
+--dialog-pad-x-default  /* Horizontal padding of a Dialog with default spacing. */
+--dialog-pad-x-spacious  /* Horizontal padding of a Dialog with spacious spacing. */
+--dialog-radius  /* Corner rounding of a Dialog. */
+--dialog-shadow  /* Shadow of a Dialog. */
+--dialog-stack-lg  /* Vertical gap between blocks in a Dialog's body. */
+--dialog-stack-md  /* Vertical gap between a Dialog's header, body and footer. */
+--dialog-stack-sm  /* Vertical gap between a Dialog's title and its description or tabs. */
 --file-item-height  /* Fixed height of a FileItem row across queued, uploading, done and error states. */
 --flag-min-height  /* Minimum height of a Flag. */
 --flag-offset  /* Distance between a Flag and the edge of the screen. */
@@ -380,10 +394,10 @@ The templates on the page frame, per breakpoint: page, section, card, table, ove
 --section-stack-md  /* Vertical gap between blocks inside a PatternSection. */
 --section-stack-sm  /* Vertical gap between a section header and its content. */
 --table-indent  /* Indent of each nested level in a tree table. */
---table-min-width-title  /* Narrowest a PatternTable's title column may shrink. */
---table-pad-x-cell  /* Horizontal padding inside a PatternTable cell. */
---table-pad-x-footer  /* Horizontal padding of a PatternTable footer, such as its Pagination row. */
---table-pad-y-cell  /* Vertical padding inside a PatternTable cell. */
+--table-min-width-title  /* Narrowest a table's title column may shrink. */
+--table-pad-x-cell  /* Horizontal padding inside a table cell. */
+--table-pad-x-footer  /* Horizontal padding of a table footer, such as its Pagination row. */
+--table-pad-y-cell  /* Vertical padding inside a table cell. */
 --tooltip-max-width  /* Widest a Tooltip may grow before its text wraps. */
 --tooltip-pad-y  /* Vertical padding inside a Tooltip. */
 ```

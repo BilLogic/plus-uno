@@ -68,7 +68,7 @@ export const TOOL_ORDER = ['ds_find', 'ds_get', 'ds_tokens', 'ds_guide', 'ds_che
 export const ORIENTATION = `PLUS design system: the React components, templates, patterns and tokens every PLUS prototype is built from. A name the lookup does not know does not exist here: propose it rather than write it.
 
 Barrels (import only from these):
-- ${BARRELS[1]}: the templates (Frame, which every full page starts from, Page, PatternSection, PatternCard, PatternTable, overlays)
+- ${BARRELS[1]}: the templates (Frame, which every full page starts from, Page, PatternSection, PatternCard, Table, overlays)
 - ${BARRELS[0]}: the components (Button, TextField, SectionMessage...)
 
 Build in five stages:
@@ -222,7 +222,7 @@ const PRO_FAMILY = /\bfa-(?:sharp-duotone|sharp|duotone|light|thin)\b/;
 const GUIDELINES = 'design-system/guidelines';
 const AGENT_VIEWS = 'design-system/agent-views';
 const PATTERNS_SRC = 'design-system/src/patterns';
-const TEMPLATE_COMPONENTS = ['Frame', 'Page', 'PatternSection', 'PatternCard', 'PatternTable', 'PatternModal'];
+const TEMPLATE_COMPONENTS = ['Frame', 'Page', 'PatternSection', 'PatternCard', 'Table', 'Modal'];
 const readIf = (file) => (fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null);
 const firstSentence = (text, max = 160) => {
   if (!text) return null;

@@ -267,7 +267,6 @@
       "Stack/sm": "var(--stack-sm)"
     },
     "spacing / templates": {
-      "Blanket/fill": "var(--blanket-fill)",
       "Blanket/pad-x": "var(--blanket-pad-x)",
       "Blanket/pad-y": "var(--blanket-pad-y)",
       "Card/inline-lg": "var(--card-inline-lg)",
@@ -311,9 +310,9 @@
       "Modal/stack-lg": "var(--modal-stack-lg)",
       "Modal/stack-md": "var(--modal-stack-md)",
       "Modal/stack-sm": "var(--modal-stack-sm)",
-      "Modal/width-lg": "var(--modal-width-lg)",
-      "Modal/width-md": "var(--modal-width-md)",
-      "Modal/width-sm": "var(--modal-width-sm)",
+      "Modal/width-lg": "var(--modal-width-10-col)",
+      "Modal/width-md": "var(--modal-width-8-col)",
+      "Modal/width-sm": "var(--modal-width-6-col)",
       "Page/border-width": "var(--page-border-width)",
       "Page/pad": "var(--page-pad)",
       "Page/pad-x-compact": "var(--page-pad-x-compact)",
@@ -1885,11 +1884,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1177,
+    "scssTokenCount": 1191,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1786,
-      "resolved": 1749,
+      "total": 1785,
+      "resolved": 1748,
       "percent": 98,
       "skippedCollections": [
         {

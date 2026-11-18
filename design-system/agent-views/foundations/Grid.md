@@ -111,10 +111,10 @@ Cards per row is the most of 4, 3, 2 or 1 that keeps each card at its minimum wi
 
 A modal spans 4, 6, 8 or 10 screen-grid columns, the gutters between them, and its own 16 pad on each side (`width = n × --grid-width-column-screen + (n − 1) × --grid-gutter + 2 × --modal-pad-x-default`). It grows with the screen between breakpoints, stops past a 1280 screen, never shrinks below its Medium width, ignores the sidebar and never comes closer than 16 to the side of the screen. Pass `width="4-col"`, `"6-col"`, `"8-col"` or `"10-col"` to Modal; a fixed pixel width ignores the screen grid. The tokens below are each mode's width rounded to a whole pixel: `4-col` 261 · 347 · 432, `6-col` 384 · 512 · 640, `8-col` 507 · 677 · 848 and `10-col` 629 · 843 · 1056 at Medium · Large · X-Large.
 
-- `--modal-width-xs`
-- `--modal-width-sm` (Modal/width-modal-sm)
-- `--modal-width-md` (Modal/width-modal-md)
-- `--modal-width-lg` (Modal/width-modal-lg)
+- `--modal-width-4-col`
+- `--modal-width-6-col` (Modal/width-modal-sm)
+- `--modal-width-8-col` (Modal/width-modal-md)
+- `--modal-width-10-col` (Modal/width-modal-lg)
 - `--blanket-pad-x` (Blanket/pad-x)
 - `--blanket-pad-y` (Blanket/pad-y)
 

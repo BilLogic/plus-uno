@@ -64,7 +64,7 @@ Don't: Person Avatar initials on an automated system reminder.
 - `Tile`: use when the system triggered the notification (`actor`).
 - `EmptyState`: use when all unread items in the Inbox have been cleared.
 
-Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `SectionMessage` · `Spotlight`
+Same group: `Banner` · `Dialog` · `EmptyState` · `Flag` · `InlineMessage` · `SectionMessage` · `Spotlight`
 
 ## Parts
 

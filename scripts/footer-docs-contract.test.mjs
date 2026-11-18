@@ -21,7 +21,8 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
 const PAGES = {
   FooterActions: 'design-system/src/components/forms-and-inputs/FooterActions/FooterActions.mdx',
   Button: 'design-system/src/components/forms-and-inputs/Button/Button.mdx',
-  Modal: 'design-system/src/components/messaging/Modal/Modal.mdx',
+  Dialog: 'design-system/src/components/messaging/Dialog/Dialog.mdx',
+  Modal: 'design-system/src/patterns/Modal/Modal.mdx',
 };
 
 const read = (rel) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');
@@ -70,7 +71,7 @@ test('Button and Modal pages each have a Footer actions section and link to Foot
   const footerDocsId = readStorybookPage(REPO_ROOT, PAGES.FooterActions).docsId;
   assert.ok(footerDocsId, 'FooterActions.mdx resolves to a Storybook docsId');
 
-  for (const name of ['Button', 'Modal']) {
+  for (const name of ['Button', 'Dialog']) {
     const src = read(PAGES[name]);
     const page = readDocsPage(src);
     assert.ok(
