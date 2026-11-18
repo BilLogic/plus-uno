@@ -57,6 +57,21 @@
     gap: var(--stack-sm);
 }
 
+.plus-calendar [data-slide-views] {
+    display: grid;
+    overflow: clip;
+
+    > [data-view-role='previous'],
+    > [data-view-role='current'] {
+        position: static;
+        grid-area: 1 / 1;
+    }
+
+    > [data-view-role='previous'] {
+        pointer-events: none;
+    }
+}
+
 .plus-calendar-weekday {
     font: var(--body-sm);
     text-align: center;

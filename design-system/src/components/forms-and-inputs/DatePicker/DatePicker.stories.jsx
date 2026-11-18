@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
+import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import { expectFieldDisabled, expectFieldFocused, expectFieldHovered, expectFieldInvalid, expectFieldReadOnly, fieldBox } from '@/storybook-docs/lib/field-states.js';
 import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
@@ -635,5 +636,35 @@ ClearControl.play = async ({ args, canvasElement }) => {
     await expect(rangeInput).toHaveValue('');
     await expect(args.onRangeChange).toHaveBeenLastCalledWith([null, null]);
     await expect(rangeInput).toHaveFocus();
+};
+
+/** Turning a month inside the DatePicker popup keeps the popup height unchanged mid-turn and after. */
+export const MonthTurnKeepsPopupHeight = () => (
+    <div style={{ maxWidth: '296px' }}>
+        <DatePicker aria-label="Session date" value="2026-10-21" />
+    </div>
+);
+MonthTurnKeepsPopupHeight.parameters = { docs: { disable: true } };
+MonthTurnKeepsPopupHeight.play = async ({ canvasElement }) => {
+    const input = within(canvasElement).getByRole('combobox', { name: 'Session date' });
+    await userEvent.click(input);
+    const popup = await waitFor(() => {
+        const el = calendar();
+        if (!el) throw new Error('DatePicker popup not open yet');
+        return el;
+    });
+    await settleAnimations(popup);
+    const initialHeight = popup.getBoundingClientRect().height;
+
+    await userEvent.click(within(popup).getByRole('button', { name: 'Next month' }));
+    await waitFor(() => {
+        if (!popup.querySelector('[data-view-role="previous"]')) {
+            throw new Error('Expected previous month view during slide');
+        }
+    });
+    await expect(Math.round(popup.getBoundingClientRect().height), 'popup height unchanged mid-turn').toBe(Math.round(initialHeight));
+    await settleAnimations(popup);
+    await expect(within(popup).getByText('November 2026')).toBeVisible();
+    await expect(Math.round(popup.getBoundingClientRect().height), 'popup height unchanged after turn').toBe(Math.round(initialHeight));
 };
 

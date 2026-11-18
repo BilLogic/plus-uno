@@ -75,10 +75,20 @@ export const TurnMonths = () => {
 };
 TurnMonths.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    const cal = canvasElement.querySelector('.plus-calendar');
+    const initialHeight = cal.getBoundingClientRect().height;
     await expect(canvas.getByText('October 2026')).toBeVisible();
     await userEvent.click(canvas.getByRole('button', { name: 'Next month' }));
+    const prevView = await waitFor(() => {
+        const el = canvasElement.querySelector('[data-view-role="previous"]');
+        if (!el) throw new Error('Expected sliding previous view mid-turn');
+        return el;
+    });
+    await expect(prevView).toBeTruthy();
+    await expect(Math.round(cal.getBoundingClientRect().height), 'calendar height unchanged mid-turn').toBe(Math.round(initialHeight));
     await settleAnimations(canvasElement);
     await expect(canvas.getByText('November 2026')).toBeVisible();
+    await expect(Math.round(cal.getBoundingClientRect().height), 'calendar height unchanged after turn').toBe(Math.round(initialHeight));
     await userEvent.click(canvas.getByRole('button', { name: 'Previous month' }));
     await settleAnimations(canvasElement);
     await expect(canvas.getByText('October 2026')).toBeVisible();
