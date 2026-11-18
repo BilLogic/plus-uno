@@ -67,8 +67,8 @@ export const Overview = () => (
     <div style={fieldWrap}>
         <TextField
             id="text-field-overview"
-            label="Label"
-            placeholder="Placeholder"
+            label="Tutor email"
+            placeholder="name@school.edu"
             isRequired
             elemAfterInput={icon('icons')}
         />
@@ -102,11 +102,11 @@ export const Success = () => (
 );
 
 export const SpacingDefault = () => (
-    <div style={fieldWrap}><TextField label="Your name" placeholder="Placeholder" spacing="default" elemAfterInput={icon('icons')} /></div>
+    <div style={fieldWrap}><TextField label="Your name" placeholder="Maya Johnson" spacing="default" elemAfterInput={icon('icons')} /></div>
 );
 
 export const SpacingCompact = () => (
-    <div style={fieldWrap}><TextField label="Your name" placeholder="Placeholder" spacing="compact" elemAfterInput={icon('icons')} /></div>
+    <div style={fieldWrap}><TextField label="Your name" placeholder="Maya Johnson" spacing="compact" elemAfterInput={icon('icons')} /></div>
 );
 
 /** Spacing: 40 by default, 32 compact. */
@@ -119,7 +119,7 @@ export const Spacing = () => (
                     id={`text-field-spacing-${spacing}`}
                     label={`${spacing} field`}
                     isLabelHidden
-                    placeholder="Placeholder"
+                    placeholder="Maya Johnson"
                     spacing={spacing}
                     elemAfterInput={icon('icons')}
                 />
@@ -197,8 +197,8 @@ Interactive.args = {
     errorMessage: '',
     isLabelHidden: false,
     isRequired: true,
-    label: 'Label',
-    placeholder: 'Placeholder',
+    label: 'Tutor email',
+    placeholder: 'name@school.edu',
 };
 
 /**
@@ -285,7 +285,7 @@ export const Warning = () => (
         <TextField
             id="text-field-warning"
             label="Meeting link"
-            defaultValue="http://example.com"
+            defaultValue="http://tutoring.lincoln.edu/room"
             warningMessage="This link is not secure."
         />
     </div>

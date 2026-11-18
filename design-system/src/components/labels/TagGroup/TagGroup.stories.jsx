@@ -610,7 +610,7 @@ OverflowTag.play = async ({ canvasElement }) => {
     });
 };
 
-const MANY = Array.from({ length: 14 }, (_, i) => `T${i + 1}`);
+const MANY = ['Add', 'Sub', 'Mul', 'Div', 'Sum', 'Geo', 'Alg', 'Art', 'ESL', 'Bio', 'Lab', 'Map', 'Dot', 'Arc'];
 
 /**
  * Fourteen short tags, so `+n` goes from `+10` to `+9` as the row widens. At

@@ -242,11 +242,11 @@ export const PastedTagsGetTagColors = {
         const input = canvas.getByRole('combobox', { name: 'Topics' });
 
         await userEvent.click(input);
-        await userEvent.paste('a, b, c');
+        await userEvent.paste('Math, Reading, Writing');
         await expect(tagsIn(canvas, 'Topics').getAllByRole('listitem')).toHaveLength(3);
         await expect(args.onCreateSpy).toHaveBeenCalledTimes(3);
         const reported = args.onCreateSpy.mock.calls.map(([call]) => call);
-        await expect(reported.map(({ value }) => value)).toEqual(['a', 'b', 'c']);
+        await expect(reported.map(({ value }) => value)).toEqual(['Math', 'Reading', 'Writing']);
         for (const { color } of reported) {
             await expect(TAG_COLORS).toContain(color);
         }
