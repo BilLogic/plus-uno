@@ -3520,7 +3520,8 @@
         "BoundedDatesBehavior",
         "TypedEntry",
         "DaysAnnounceTheirDate",
-        "ClearControl"
+        "ClearControl",
+        "MonthTurnKeepsPopupHeight"
       ],
       "tokens": [
         "--ds-icon-subtle"

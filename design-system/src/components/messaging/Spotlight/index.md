@@ -14,7 +14,7 @@ Also asked as: onboarding, feature tour, coach mark, new feature highlight, walk
 
 **Storybook page:** `design-system/src/components/messaging/Spotlight/Spotlight.mdx`
 
-**Motion:** enter `spatial.default` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Motion:** enter `spatial.default` + `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -28,7 +28,7 @@ Spotlight reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| enter | Open and close an overlay | `--ds-motion-spatial-default` | Each coachmark step is Step. |
+| enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-fast` | Each coachmark step is Step. |
 | exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. |
 
 ## Alternatives

@@ -149,7 +149,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | LinkButton | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | LinkIconButton | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | Modal | component | enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` |  |
-| Modal | component | exit | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
+| Modal | component | exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` |  |
 | Modal | component | rejected | Call attention | `--ds-motion-spatial-fast` |  |
 | NotificationItem | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | PageHeader | component | change | Scroll to a spot on the page | `--ds-motion-linear` |  |
@@ -186,7 +186,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | SplitButton | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | SplitButton | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | SplitButton | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
-| Spotlight | component | enter | Open and close an overlay | `--ds-motion-spatial-default` |  |
+| Spotlight | component | enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-fast` |  |
 | Spotlight | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Suggestion | component | enter | Swap content in place | `--ds-motion-appearance-fast` |  |
 | Suggestion | component | exit | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
