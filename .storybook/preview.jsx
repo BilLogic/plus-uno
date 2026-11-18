@@ -592,7 +592,7 @@ const preview = {
     // Template carries the browser, the Frame is the app alone. A story can opt
     // in or out with parameters.browserFrame ('chrome' | 'safari' | 'none').
     (Story, context) => {
-      const framed = /^Patterns\/Templates/.test(context.title);
+      const framed = /^Templates\//.test(context.title);
       const browser = context.parameters.browserFrame || (framed ? context.globals.plusBrowser : 'none');
       return (
         <BrowserFrame browser={browser || 'none'}>
