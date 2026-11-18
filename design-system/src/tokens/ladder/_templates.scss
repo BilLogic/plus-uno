@@ -65,12 +65,21 @@
     --modal-width-sm: 384px; /* lifted out of spacing / layout, beside the template’s pad/stack tokens */
     --modal-width-md: 507px;
     --modal-width-lg: 629px;
-    --modal-body-min-height: var(--space-500);
+    --modal-body-min-height: var(--height-500);
 
     /* Popup */
     --popup-radius: var(--radius-xl);
     --popup-width-3-col: 200px; /* 3 · 4 screen-grid columns plus 2 × 16 popup pad at 768 · 1024 · 1440 */
     --popup-width-4-col: 261px;
+}
+
+/* Mode-sensitive aliases re-evaluate at subtree mode or contrast boundaries. */
+:root,
+[data-color-mode],
+[data-contrast-mode] {
+
+    /* Modal */
+    --modal-shadow: var(--ds-shadow-blocking);
 }
 
 @media (max-height: 639.98px) {
