@@ -97,7 +97,7 @@
       "Element padding": "var(--pad-x-{xs|sm|md|lg})",
       "Element gap": "var(--stack-{sm|md|lg})",
       "Element radius": "var(--radius-{sm|md|lg|full})",
-      "Modal padding": "var(--modal-pad-{x|y}-{compact|default|spacious})",
+      "Modal padding": "var(--modal-pad-x-{default|spacious})",
       "Section padding": "var(--section-pad-{x|y}-{compact|default|spacious})",
       "Page padding": "var(--page-pad-{x|y}-{compact|default|spacious})",
       "Table cell": "var(--table-pad-x-cell)",
@@ -165,12 +165,10 @@
       "Space/space-00625": "var(--space-00625)",
       "Space/space-0125": "var(--space-0125)",
       "Space/space-025": "var(--space-025)",
-      "Space/space-03125": "var(--space-03125)",
       "Space/space-0375": "var(--space-0375)",
       "Space/space-050": "var(--space-050)",
       "Space/space-0625": "var(--space-0625)",
       "Space/space-075": "var(--space-075)",
-      "Space/space-0875": "var(--space-0875)",
       "Space/space-100": "var(--space-100)",
       "Space/space-125": "var(--space-125)",
       "Space/space-150": "var(--space-150)",
@@ -318,13 +316,8 @@
       "Modal/inline-lg": "var(--modal-inline-lg)",
       "Modal/inline-md": "var(--modal-inline-md)",
       "Modal/inline-sm": "var(--modal-inline-sm)",
-      "Modal/pad": "var(--modal-pad)",
-      "Modal/pad-x-compact": "var(--modal-pad-x-compact)",
       "Modal/pad-x-default": "var(--modal-pad-x-default)",
       "Modal/pad-x-spacious": "var(--modal-pad-x-spacious)",
-      "Modal/pad-y-compact": "var(--modal-pad-y-compact)",
-      "Modal/pad-y-default": "var(--modal-pad-y-default)",
-      "Modal/pad-y-spacious": "var(--modal-pad-y-spacious)",
       "Modal/radius": "var(--modal-radius)",
       "Modal/stack-lg": "var(--modal-stack-lg)",
       "Modal/stack-md": "var(--modal-stack-md)",
@@ -372,8 +365,7 @@
       "Table/pad-x-cell": "var(--table-pad-x-cell)",
       "Table/pad-x-footer": "var(--table-pad-x-footer)",
       "Table/pad-y-cell": "var(--table-pad-y-cell)",
-      "Table/radius": "var(--table-radius)",
-      "Table/stack": "var(--table-stack)"
+      "Table/radius": "var(--table-radius)"
     },
     "color / primitives": {
       "blackAlpha/60": "var(--palette-black-alpha-60)",
@@ -1226,7 +1218,6 @@
       "Listbox/max-width": "var(--listbox-max-width)",
       "Listbox/min-height": "var(--listbox-min-height)",
       "Menu/group-gap": "var(--menu-group-gap)",
-      "Menu/group-item-pad-y": "var(--menu-group-item-pad-y)",
       "Menu/group-min-width": "var(--menu-group-min-width)",
       "Menu/group-pad-x": "var(--menu-group-pad-x)",
       "Option/menu-width": "var(--option-menu-width)",
@@ -1895,11 +1886,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1167,
+    "scssTokenCount": 1158,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1785,
-      "resolved": 1759,
+      "total": 1776,
+      "resolved": 1750,
       "percent": 99,
       "skippedCollections": [
         {

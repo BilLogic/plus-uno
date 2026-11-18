@@ -74,12 +74,8 @@ Space owned by a template: page, section, card, table, modal, popup. Inside a te
 --frame-sidebar-width-nav  /* Fixed width of the side navigation inside the Frame. */
 --frame-topbar-height  /* Height of the Frame's top bar. */
 --modal-body-min-height  /* Minimum height of a Modal's body, so a short body does not collapse the dialog. */
---modal-pad-x-compact  /* Horizontal padding of a Modal with compact spacing. */
 --modal-pad-x-default  /* Horizontal padding of a Modal with default spacing. */
 --modal-pad-x-spacious  /* Horizontal padding of a Modal with spacious spacing. */
---modal-pad-y-compact  /* Vertical padding of a Modal with compact spacing. */
---modal-pad-y-default  /* Vertical padding of a Modal with default spacing. */
---modal-pad-y-spacious  /* Vertical padding of a Modal with spacious spacing. */
 --modal-radius  /* Corner rounding of a Modal. */
 --modal-width-lg  /* Width of a large Modal, such as a table or a long form. */
 --modal-width-md  /* Width of a default Modal, such as a short form. */
@@ -154,7 +150,6 @@ Tokens one component owns, named for it.
 --listbox-max-width  /* Widest a Select or Cascader listbox may grow. */
 --listbox-min-height  /* Shortest a Select or Cascader listbox may be. */
 --menu-group-gap  /* Vertical gap between groups in a menu. */
---menu-group-item-pad-y  /* Vertical padding of an item in a menu group. */
 --menu-group-min-width  /* Minimum width of a menu group. */
 --menu-group-pad-x  /* Horizontal padding of a menu group. */
 --option-menu-width  /* Width of a fixed-width option menu. */
@@ -363,7 +358,6 @@ The templates on the page frame, per breakpoint: page, section, card, table, ove
 --modal-inline-lg  /* Horizontal gap between columns in a Modal. */
 --modal-inline-md  /* Horizontal gap between the actions in a Modal footer. */
 --modal-inline-sm  /* Horizontal gap between small items in a Modal row. */
---modal-pad  /* Padding inside a Modal at the current breakpoint. */
 --modal-stack-lg  /* Vertical gap between a Modal's header, body and footer. */
 --modal-stack-md  /* Vertical gap between blocks in a Modal's body. */
 --modal-stack-sm  /* Vertical gap between a Modal's title and its description. */
@@ -387,7 +381,6 @@ The templates on the page frame, per breakpoint: page, section, card, table, ove
 --table-pad-x-cell  /* Horizontal padding inside a PatternTable cell. */
 --table-pad-x-footer  /* Horizontal padding of a PatternTable footer, such as its Pagination row. */
 --table-pad-y-cell  /* Vertical padding inside a PatternTable cell. */
---table-stack  /* Vertical gap between a PatternTable and its toolbar or footer. */
 --tooltip-max-width  /* Widest a Tooltip may grow before its text wraps. */
 --tooltip-pad-y  /* Vertical padding inside a Tooltip. */
 ```
@@ -1235,12 +1228,10 @@ The primitives (spacing / primitives), named by rem × 100; point semantic token
 --space-00625
 --space-0125
 --space-025
---space-03125
 --space-0375
 --space-050
 --space-0625
 --space-075
---space-0875
 --space-100
 --space-125
 --space-150

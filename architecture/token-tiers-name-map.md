@@ -138,7 +138,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Table | `--table-pad-y-cell` (declared elsewhere) |  |
 | Table | `--table-indent` (declared elsewhere) |  |
 | Table | `--table-radius` |  |
-| Table | `--table-stack` (declared elsewhere) |  |
 | Table | `--table-pad-x-footer` (declared elsewhere) |  |
 | Table | `--table-footer-height` |  |
 | Table | `--table-min-width-title` (declared elsewhere) |  |
@@ -146,13 +145,8 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Blanket | `--blanket-pad-y` |  |
 | Blanket | `--blanket-fill` | the Blanket's own fill color; the old declaration's value, written directly so this file carries no old-language word |
 | Blanket | `--blanket-max-height-modal` | a calc() of the pad above: code only, no Figma variable |
-| Modal | `--modal-pad` (declared elsewhere) |  |
-| Modal | `--modal-pad-x-compact` |  |
 | Modal | `--modal-pad-x-default` |  |
 | Modal | `--modal-pad-x-spacious` |  |
-| Modal | `--modal-pad-y-compact` |  |
-| Modal | `--modal-pad-y-default` |  |
-| Modal | `--modal-pad-y-spacious` |  |
 | Modal | `--modal-stack-sm` (declared elsewhere) |  |
 | Modal | `--modal-stack-md` (declared elsewhere) |  |
 | Modal | `--modal-stack-lg` (declared elsewhere) |  |
@@ -276,7 +270,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Menu group | `--menu-group-min-width` |  |
 | Menu group | `--menu-group-pad-x` |  |
 | Menu group | `--menu-group-gap` |  |
-| Menu group | `--menu-group-item-pad-y` |  |
 | Popup | `--popup-min-width` |  |
 | Popup | `--popup-max-width` |  |
 | Popup | `--popup-clip-reach` |  |
