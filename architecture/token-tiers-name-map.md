@@ -93,12 +93,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Frame | `--frame-sidebar-group-gap` | two Sidebar groups sit 16 apart |
 | Frame | `--frame-sidebar-row-radius` | the rounding of a Sidebar row (6) |
 | Page | `--page-pad` (declared elsewhere) |  |
-| Page | `--page-pad-x-compact` |  |
-| Page | `--page-pad-x-default` |  |
-| Page | `--page-pad-x-spacious` |  |
-| Page | `--page-pad-y-compact` |  |
-| Page | `--page-pad-y-default` |  |
-| Page | `--page-pad-y-spacious` |  |
 | Page | `--page-stack-sm` (declared elsewhere) |  |
 | Page | `--page-stack-md` (declared elsewhere) |  |
 | Page | `--page-stack-lg` (declared elsewhere) |  |
@@ -158,7 +152,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Modal | `--modal-width-sm` | lifted out of spacing / layout, beside the template’s pad/stack tokens |
 | Modal | `--modal-width-md` |  |
 | Modal | `--modal-width-lg` |  |
-| Page | `--page-border-width` |  |
 | Table | `--table-overflow-reach` |  |
 | Modal | `--modal-body-min-height` |  |
 | Popup | `--popup-pad` (declared elsewhere) |  |
