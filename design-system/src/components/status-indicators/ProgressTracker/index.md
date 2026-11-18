@@ -139,13 +139,13 @@ Same group: `ProgressIndicator`
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `items` | enum | — | — |
-| `spacing` | enum | `'cozy'` | — |
+| `spacing` | enum | `'default'` | — |
 | `orientation` | enum | `'horizontal'` | — |
 | `label` | string | `'Progress tracker'` | — |
 
 ## Variants
 
-**`spacing`** — `comfortable` · `cozy` · `compact`
+**`spacing`** — `default` · `compact` · `spacious`
 
 **`orientation`** — `horizontal` · `vertical`
 

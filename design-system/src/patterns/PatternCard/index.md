@@ -14,7 +14,7 @@ Also asked as: summary card, object card.
 
 **Source:** `design-system/src/patterns/PatternCard/PatternCard.jsx`
 
-**Stories:** `design-system/src/patterns/PatternCard/PatternCard.stories.jsx` — Overview, Interactive, Elevation, Anatomy, Jobs, SizeSmall, SizeMedium, SizeLarge, ImageWide, ImageStandard, ImageSquare, ImageTop, ImageTopHovered, ImageTopPressed, ImageTopDragging, ImageStart, ImageStartHovered, ImageStartPressed, ImageStartDragging, ImageEnd, ImageEndHovered, ImageEndPressed, ImageEndDragging, ImageStartHalf, ImageEndHalf, ImageTopIgnoresSplit, BodyOnly, WithFooter, CustomHeader, Static, Clickable, Dragging, LoadingCard, Rows, PlacementBoundary
+**Stories:** `design-system/src/patterns/PatternCard/PatternCard.stories.jsx` — Overview, Interactive, Elevation, Anatomy, Jobs, SizeCompact, SizeDefault, SizeSpacious, ImageWide, ImageStandard, ImageSquare, ImageTop, ImageTopHovered, ImageTopPressed, ImageTopDragging, ImageStart, ImageStartHovered, ImageStartPressed, ImageStartDragging, ImageEnd, ImageEndHovered, ImageEndPressed, ImageEndDragging, ImageStartHalf, ImageEndHalf, ImageTopIgnoresSplit, BodyOnly, WithFooter, CustomHeader, Static, Clickable, Dragging, LoadingCard, Rows, PlacementBoundary
 
 **Storybook page:** `design-system/src/patterns/PatternCard/PatternCard.mdx`
 

@@ -6763,12 +6763,15 @@
           "deprecated": null
         },
         {
-          "name": "compact",
-          "type": "bool",
+          "name": "spacing",
+          "type": "enum",
           "required": false,
-          "default": "false",
-          "values": null,
-          "description": "The 24 height, with the compact buttons.",
+          "default": "'default'",
+          "values": [
+            "default",
+            "compact"
+          ],
+          "description": "Field and button height: `default` (40) or `compact` (32).",
           "deprecated": null
         },
         {
@@ -6995,12 +6998,15 @@
           "deprecated": null
         },
         {
-          "name": "compact",
-          "type": "bool",
+          "name": "spacing",
+          "type": "oneOf",
           "required": false,
-          "default": "false",
-          "values": null,
-          "description": null,
+          "default": "'default'",
+          "values": [
+            "default",
+            "compact"
+          ],
+          "description": "Field and button height: `default` (40) or `compact` (32).",
           "deprecated": null
         },
         {
@@ -8281,9 +8287,9 @@
         "Raised",
         "Overlay",
         "StepNone",
-        "StepSmall",
-        "StepMedium",
-        "StepLarge",
+        "StepCompact",
+        "StepDefault",
+        "StepSpacious",
         "Bordered",
         "WithTitle",
         "HeaderAndBanner",
@@ -8921,9 +8927,9 @@
         "Elevation",
         "Anatomy",
         "Jobs",
-        "SizeSmall",
-        "SizeMedium",
-        "SizeLarge",
+        "SizeCompact",
+        "SizeDefault",
+        "SizeSpacious",
         "ImageWide",
         "ImageStandard",
         "ImageSquare",
@@ -10598,11 +10604,11 @@
           "name": "spacing",
           "type": "enum",
           "required": false,
-          "default": "'comfortable'",
+          "default": "'spacious'",
           "values": [
-            "comfortable",
-            "cozy",
-            "compact"
+            "default",
+            "compact",
+            "spacious"
           ],
           "description": null,
           "deprecated": null
@@ -10816,11 +10822,11 @@
           "name": "spacing",
           "type": "enum",
           "required": false,
-          "default": "'cozy'",
+          "default": "'default'",
           "values": [
-            "comfortable",
-            "cozy",
-            "compact"
+            "default",
+            "compact",
+            "spacious"
           ],
           "description": null,
           "deprecated": null

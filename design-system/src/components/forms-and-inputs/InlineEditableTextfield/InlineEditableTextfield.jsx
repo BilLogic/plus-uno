@@ -86,6 +86,7 @@ InlineEditableTextfield.propTypes = {
     keepEditViewOpenOnBlur: PropTypes.bool,
     startWithEditViewOpen: PropTypes.bool,
     hideActionButtons: PropTypes.bool,
+    /** Field and button height: `default` (40) or `compact` (32). */
     spacing: PropTypes.oneOf(INLINE_EDIT_SPACINGS),
     readViewFitContainerWidth: PropTypes.bool,
     editLabel: PropTypes.string,
