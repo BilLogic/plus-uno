@@ -69,16 +69,23 @@ export const OneStepPerLevel = () => (
 export const LabelStyle = {
     render: () => (
         <DoDont>
-            <Do caption="Body/default with the medium weight on a button label, as every Button draws it.">
+            <Do caption="Body/default/medium on a button or tab label.">
                 <span><Button text="Save changes" appearance="primary" /></span>
             </Do>
-            <Dont caption="A heading style on a button label. It changes the Item’s height and reads as a title.">
-                <span><Button appearance="primary"><span style={{ font: 'var(--heading-md)' }}>Save changes</span></Button></span>
+            <Dont caption="Regular or bold weight, or a heading style, on a button or tab label.">
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-md)' }}>
+                    <Button appearance="primary">
+                        <span style={{ font: 'var(--body-default)', fontWeight: 'var(--type-weight-regular)' }}>Save changes</span>
+                    </Button>
+                    <Button appearance="primary">
+                        <span style={{ font: 'var(--heading-sm)' }}>Save changes</span>
+                    </Button>
+                </div>
             </Dont>
         </DoDont>
     ),
     play: async ({ canvas }) => {
-        await expect(canvas.getAllByRole('button', { name: 'Save changes' })).toHaveLength(2);
+        await expect(canvas.getAllByRole('button', { name: 'Save changes' })).toHaveLength(3);
     },
 };
 
@@ -114,7 +121,7 @@ export const HeadingStyleOverBold = {
     render: () => (
         <DoDont>
             <Do caption="Heading/small, tagged as the section's heading.">
-                <Heading as="span" size="small">Next session</Heading>
+                <Heading as="h3" size="small">Next session</Heading>
             </Do>
             <Dont caption="Bold body text looks like a heading but carries no structure.">
                 <span style={{ font: 'var(--body-default)', fontWeight: 'var(--type-weight-semibold)' }}>Next session</span>
@@ -122,6 +129,7 @@ export const HeadingStyleOverBold = {
         </DoDont>
     ),
     play: async ({ canvas }) => {
+        await expect(canvas.getByRole('heading', { level: 3, name: 'Next session' })).toBeInTheDocument();
         await expect(canvas.getAllByText('Next session')).toHaveLength(2);
     },
 };
