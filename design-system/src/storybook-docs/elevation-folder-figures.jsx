@@ -24,6 +24,7 @@ import { CORNER, HAIRLINE, PAINT } from '@/storybook-docs/illustrations/paint.js
 import { staggerDelays } from '@/storybook-docs/illustrations/motion-choreography.jsx';
 import { TURN, turnPoint, turnTransform } from '@/storybook-docs/lib/iso-turn.js';
 import { composeShadow, parseShadow, slotted } from '@/storybook-docs/lib/shadow-anatomy';
+import { usePageContrast } from '@/storybook-docs/lib/use-page-contrast.js';
 
 const PLATE = { w: 160, h: 90 };
 
@@ -932,7 +933,9 @@ const RAMP_STEPS = [
 ];
 
 /** Shadow ramp key figure: four shadows in layer order, shown side by side in light and dark. */
-export const ShadowRampFigure = () => (
+export const ShadowRampFigure = () => {
+    const contrast = usePageContrast();
+    return (
     <ElevationPanel>
         <div
             data-testid="shadow-ramp"
@@ -948,6 +951,7 @@ export const ShadowRampFigure = () => (
                 <div
                     key={mode}
                     data-color-mode={mode}
+                    {...(contrast ? { 'data-contrast-mode': contrast } : {})}
                     style={{
                         background: 'var(--ds-surface)',
                         color: 'var(--ds-text)',
@@ -1001,7 +1005,8 @@ export const ShadowRampFigure = () => (
             ))}
         </div>
     </ElevationPanel>
-);
+    );
+};
 
 const formatLayerSummary = (layer) => {
     if (!layer) return '0';

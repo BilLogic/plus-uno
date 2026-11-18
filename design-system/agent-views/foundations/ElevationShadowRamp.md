@@ -27,7 +27,7 @@ Each token adds three layers: an edge, a key and an ambient shadow. Overflow is 
 
 ### Interactive composer
 
-Switch each slot off to see what it carries on a live surface.
+Every shadow is three slots: **edge**, **key** and **ambient**. A new shadow fills all three, or says why one is empty. Switch each slot off to see what it carries on a live surface.
 
 ### Cross-section
 
