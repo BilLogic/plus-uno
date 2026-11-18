@@ -242,7 +242,7 @@ const RichTextEditor = ({
                         <>
                             <DropdownMenu
                                 spacing="compact"
-                                minWidth="10rem"
+                                minWidth="var(--dropdown-menu-min-width)"
                                 trigger={(
                                     <Button
                                         id={`${fieldId}-block-format`}
