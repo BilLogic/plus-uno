@@ -18,13 +18,13 @@
 .plus-radio-group-inline .plus-radio-group-options {
     flex-direction: row;
     flex-wrap: wrap;
-    column-gap: var(--space-0625);
+    column-gap: var(--radio-group-inline-gap);
 }
 
 .plus-radio-group-scale {
     display: flex;
     align-items: center;
-    gap: var(--space-0625);
+    gap: var(--radio-group-inline-gap);
 }
 
 .plus-radio-group-scale-end {
