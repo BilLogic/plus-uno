@@ -118,7 +118,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Size | `--range-dot-size-8`, `-12`, `-16`; track `--range-track-height-4`, `-6`, `-8`. |
 | Corner | `--radius-full` on track, fill and handle. |
 | Hit area | `--control-md` (32), the whole row. |
-| Label | `--ds-text`, body default; gap `--space-025`. |
+| Label | `--ds-text`, body default; gap `--stack-sm`. |
 
 ## Content guidelines
 
@@ -156,7 +156,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--control-md` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-icon-disabled` · `--ds-shadow-raised` · `--ds-text` · `--radius-full` · `--range-dot-size-12` · `--range-dot-size-16` · `--range-dot-size-8` · `--range-dot-size-default` · `--range-track-height-4` · `--range-track-height-6` · `--range-track-height-8` · `--space-025`
+`--body-default` · `--control-md` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-icon-disabled` · `--ds-shadow-raised` · `--ds-text` · `--radius-full` · `--range-dot-size-12` · `--range-dot-size-16` · `--range-dot-size-8` · `--range-dot-size-default` · `--range-track-height-4` · `--range-track-height-6` · `--range-track-height-8` · `--stack-sm`
 
 From `design-system/src/components/forms-and-inputs/Range/Range.scss`. Override these through the token layer, never with a literal.
 

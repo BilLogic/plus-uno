@@ -586,6 +586,8 @@
         "WithFeedback"
       ],
       "tokens": [
+        "--ai-message-caret-width",
+        "--ai-message-dot-size",
         "--body-default",
         "--body-sm",
         "--code-default",
@@ -2359,18 +2361,15 @@
         "--ds-surface",
         "--ds-surface-hovered",
         "--ds-text",
+        "--inline-md",
         "--pad-x-lg",
         "--pad-x-md",
+        "--pad-y-md",
         "--plus-choice-indent",
         "--radius-control-md",
         "--radius-md",
-        "--space-025",
-        "--space-0375",
-        "--space-050",
         "--stack-lg",
         "--stack-sm",
-        "--stroke-1",
-        "--stroke-2",
         "--type-weight-medium"
       ]
     },
@@ -3350,6 +3349,7 @@
         "--body-sm",
         "--control-sm",
         "--count-tag-dot-size",
+        "--count-tag-ring-width",
         "--ds-background-competency-mastering-content",
         "--ds-background-competency-mastering-content-bold",
         "--ds-background-danger",
@@ -3382,8 +3382,7 @@
         "--plus-count-min",
         "--plus-count-size",
         "--radius-full",
-        "--radius-md",
-        "--stroke-2"
+        "--radius-md"
       ]
     },
     {
@@ -4025,9 +4024,9 @@
       "tokens": [
         "--body-default",
         "--body-sm",
+        "--date-time-picker-section-gap",
         "--ds-text",
         "--ds-text-subtle",
-        "--space-0625",
         "--stack-md",
         "--stack-sm",
         "--type-weight-medium"
@@ -7911,6 +7910,7 @@
       "tokens": [
         "--blanket-max-height-modal",
         "--body-default",
+        "--border-width-default",
         "--ds-border",
         "--ds-shadow-blocking",
         "--ds-surface-overlay",
@@ -7925,7 +7925,6 @@
         "--plus-overlay-origin",
         "--stack-md",
         "--stack-sm",
-        "--stroke-1",
         "--transform-origin"
       ]
     },
@@ -11410,18 +11409,15 @@
         "--ds-surface",
         "--ds-surface-hovered",
         "--ds-text",
+        "--inline-md",
         "--pad-x-lg",
         "--pad-x-md",
+        "--pad-y-md",
         "--plus-choice-indent",
         "--radio-control-size",
         "--radius-control-md",
         "--radius-full",
-        "--space-025",
-        "--space-0375",
-        "--space-050",
         "--stack-sm",
-        "--stroke-1",
-        "--stroke-2",
         "--type-weight-medium"
       ]
     },
@@ -11666,7 +11662,7 @@
         "--radio-control-size",
         "--radio-control-size-10",
         "--radio-control-size-14",
-        "--space-0625",
+        "--radio-group-inline-gap",
         "--stack-md"
       ]
     },
@@ -11843,7 +11839,7 @@
         "--range-track-height-4",
         "--range-track-height-6",
         "--range-track-height-8",
-        "--space-025"
+        "--stack-sm"
       ]
     },
     {
@@ -12020,7 +12016,7 @@
         "--icon-md",
         "--plus-rating-stagger",
         "--radius-full",
-        "--space-0625",
+        "--rating-gap",
         "--stack-md",
         "--stack-sm",
         "--type-weight-regular"
@@ -12277,6 +12273,7 @@
         "--pad-y-lg",
         "--pad-y-md",
         "--radius-control-lg",
+        "--rich-text-editor-max-width",
         "--rte-content-pad-x",
         "--rte-content-pad-y",
         "--stack-md",
@@ -13340,9 +13337,9 @@
         "--focus-ring-width",
         "--icon-sm",
         "--pad-x-md",
+        "--pad-x-xs",
         "--pad-y-md",
         "--radius-md",
-        "--space-025",
         "--stack-md",
         "--stack-sm",
         "--type-size-0875"
@@ -15207,7 +15204,6 @@
         "--radius-md",
         "--radius-sm",
         "--stack-sm",
-        "--stroke-2",
         "--tag-dot-size",
         "--type-family-heading",
         "--type-weight-semibold"
@@ -15660,8 +15656,8 @@
         "--option-menu-width",
         "--pad-x-md",
         "--pad-x-sm",
+        "--pad-x-xs",
         "--plus-tag-input-max-height",
-        "--space-025",
         "--stack-md"
       ]
     },
@@ -17011,6 +17007,7 @@
       ],
       "tokens": [
         "--body-sm",
+        "--border-width-default",
         "--ds-background-neutral-bold",
         "--ds-text-inverse",
         "--layer-tooltip",

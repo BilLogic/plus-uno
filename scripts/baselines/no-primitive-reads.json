@@ -2,47 +2,7 @@
   "why": "Reads of a numbered primitive (--space-<n>, --radius-<n>, --size-<n>, --stroke-<n>) in design-system/src/components and design-system/src/patterns, per file. The record only falls. Regenerate with `npm run check:no-primitive-reads -- --update`; never edit by hand.",
   "sets": {
     "main": {
-      "entries": {
-        "design-system/src/components/forms-and-inputs/Checkbox/Checkbox.scss": {
-          "count": 6
-        },
-        "design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicker.scss": {
-          "count": 1
-        },
-        "design-system/src/components/forms-and-inputs/Radio/Radio.scss": {
-          "count": 6
-        },
-        "design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.scss": {
-          "count": 2
-        },
-        "design-system/src/components/forms-and-inputs/Range/Range.scss": {
-          "count": 1
-        },
-        "design-system/src/components/forms-and-inputs/Rating/Rating.scss": {
-          "count": 1
-        },
-        "design-system/src/components/forms-and-inputs/Select/Select.scss": {
-          "count": 1
-        },
-        "design-system/src/components/forms-and-inputs/TagInput/TagInput.scss": {
-          "count": 2
-        },
-        "design-system/src/components/forms-and-inputs/_internal/Calendar.scss": {
-          "count": 2
-        },
-        "design-system/src/components/forms-and-inputs/_internal/FieldBox.scss": {
-          "count": 1
-        },
-        "design-system/src/components/labels/CountTag/CountTag.scss": {
-          "count": 1
-        },
-        "design-system/src/components/labels/Tag/Tag.scss": {
-          "count": 2
-        },
-        "design-system/src/components/messaging/Modal/Modal.scss": {
-          "count": 1
-        }
-      }
+      "entries": {}
     }
   }
 }
