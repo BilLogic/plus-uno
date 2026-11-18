@@ -28,12 +28,12 @@
     {
       "id": "delete-node-modal",
       "screen": "Delete node confirmation dialog",
-      "template": "PatternModal",
+      "template": "Modal",
       "variant": "Modal · Destructive",
-      "page": "design-system/src/patterns/PatternModal/index.md",
+      "page": "design-system/src/patterns/Modal/index.md",
       "section": "Types",
       "pages": [
-        "design-system/src/patterns/PatternModal/index.md"
+        "design-system/src/patterns/Modal/index.md"
       ],
       "guides": ["modal"],
       "scoring": "judge",

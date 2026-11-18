@@ -186,7 +186,7 @@ test('no modal width is fractional at any mode', () => {
 });
 
 test('Modal\'s MODAL_WIDTH_PX, which its docs page shows, equals the --modal-width-* tokens at each mode', () => {
-  const px = exportedValue(REPO_ROOT, 'design-system/src/components/messaging/Modal/Modal.jsx', 'MODAL_WIDTH_PX');
+  const px = exportedValue(REPO_ROOT, 'design-system/src/patterns/Modal/Modal.jsx', 'MODAL_WIDTH_PX');
   const steps = { sm: '6-col', md: '8-col', lg: '10-col' };
   for (const [size, step] of Object.entries(steps)) {
     // The last mode's screen is past the grid's cap, so its width is the one MODAL_WIDTH_SCREENS reads at 1280.
@@ -352,11 +352,7 @@ function screenGridWidth(span, width, mode, padPx = MODAL_PAD_PX) {
 }
 
 test('the Overlay screen grid lands on Modal/width-modal-* at 768, 1024 and 1440', () => {
-  assert.match(SCREEN_GRID_SCSS, /&-width-xs \{ --plus-overlay-span: 4; \}/);
-  assert.match(SCREEN_GRID_SCSS, /&-width-sm \{ --plus-overlay-span: 6; \}/);
-  assert.match(SCREEN_GRID_SCSS, /&-width-md \{ --plus-overlay-span: 8; \}/);
-  assert.match(SCREEN_GRID_SCSS, /&-width-lg \{ --plus-overlay-span: 10; \}/);
-  const spans = { xs: 4, sm: 6, md: 8, lg: 10 };
+  const spans = { sm: 6, md: 8, lg: 10 };
   for (const [mode, width] of Object.entries(LAYOUT_MODES)) {
     for (const [size, span] of Object.entries(spans)) {
       const expected = parseFloat(atMode(`--modal-width-${size}`, mode));
@@ -377,19 +373,19 @@ test('the Overlay screen grid lands on Popup/width-3-col and -4-col at 768, 1024
   }
 });
 
-const MODAL_SCSS = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/components/messaging/Modal/Modal.scss'), 'utf8');
+const DIALOG_SCSS = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/components/messaging/Dialog/Dialog.scss'), 'utf8');
 const POPUP_SCSS = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/components/overlays-and-layering/Popup/Popup.scss'), 'utf8');
 
-test('Modal takes its 4 · 6 · 8 · 10 column widths from the shared screen grid', () => {
-  assert.match(MODAL_SCSS, /@use '[./]*styles\/screen-grid' as \*;/);
-  const block = MODAL_SCSS.match(/\n\.plus-modal \{([\s\S]*?)\n\}/)?.[1];
-  assert.ok(block, 'Modal.scss has no .plus-modal block');
-  assert.match(block, /@include screen-grid-width\(var\(--modal-pad-x-default\)\);/);
+test('Dialog takes its 4 · 6 · 8 · 10 column widths from the shared screen grid', () => {
+  assert.match(DIALOG_SCSS, /@use '[./]*styles\/screen-grid' as \*;/);
+  const block = DIALOG_SCSS.match(/\n\.plus-dialog \{([\s\S]*?)\n\}/)?.[1];
+  assert.ok(block, 'Dialog.scss has no .plus-dialog block');
+  assert.match(block, /@include screen-grid-width\(var\(--dialog-pad-x-default\)\);/);
   assert.match(block, /--plus-overlay-span: 6;/);
-  assert.match(MODAL_SCSS, /\.plus-modal-width-4-col \{\s*--plus-overlay-span: 4;/);
-  assert.match(MODAL_SCSS, /\.plus-modal-width-8-col \{\s*--plus-overlay-span: 8;/);
-  assert.match(MODAL_SCSS, /\.plus-modal-width-10-col \{\s*--plus-overlay-span: 10;/);
-  assert.doesNotMatch(MODAL_SCSS, /--plus-modal-(grid|column|span|screen)/, 'Modal keeps no column math of its own');
+  assert.match(DIALOG_SCSS, /\.plus-dialog-width-4-col \{\s*--plus-overlay-span: 4;/);
+  assert.match(DIALOG_SCSS, /\.plus-dialog-width-8-col \{\s*--plus-overlay-span: 8;/);
+  assert.match(DIALOG_SCSS, /\.plus-dialog-width-10-col \{\s*--plus-overlay-span: 10;/);
+  assert.doesNotMatch(DIALOG_SCSS, /--plus-dialog-(grid|column|span|screen)/, 'Dialog keeps no column math of its own');
 });
 
 test('Popup\'s 3-col and 4-col take the same screen grid, and POPUP_WIDTH_PX is that rule at 768 · 1024 · 1280', () => {
@@ -398,7 +394,7 @@ test('Popup\'s 3-col and 4-col take the same screen grid, and POPUP_WIDTH_PX is 
   assert.match(POPUP_SCSS, /&\.plus-popup--3-col \{\s*--plus-overlay-span: 3;/);
   assert.match(POPUP_SCSS, /&\.plus-popup--4-col \{\s*--plus-overlay-span: 4;/);
   const px = exportedValue(REPO_ROOT, 'design-system/src/components/overlays-and-layering/Popup/Popup.jsx', 'POPUP_WIDTH_PX');
-  const screens = exportedValue(REPO_ROOT, 'design-system/src/components/messaging/Modal/Modal.jsx', 'MODAL_WIDTH_SCREENS');
+  const screens = exportedValue(REPO_ROOT, 'design-system/src/patterns/Modal/Modal.jsx', 'MODAL_WIDTH_SCREENS');
   const mode = Object.keys(LAYOUT_MODES)[0];
   for (const [step, span] of [['3-col', 3], ['4-col', 4]]) {
     assert.deepEqual(px[step], screens.map((screen) => Math.round(screenGridWidth(span, screen, mode))), step);

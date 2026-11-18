@@ -44,12 +44,12 @@
     {
       "id": "resolve-modal",
       "screen": "Resolve confirmation dialog",
-      "template": "PatternModal",
+      "template": "Modal",
       "variant": "Modal · Active",
-      "page": "design-system/src/patterns/PatternModal/index.md",
+      "page": "design-system/src/patterns/Modal/index.md",
       "section": "Types",
       "pages": [
-        "design-system/src/patterns/PatternModal/index.md"
+        "design-system/src/patterns/Modal/index.md"
       ],
       "guides": ["modal"],
       "scoring": "judge",

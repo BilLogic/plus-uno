@@ -8,7 +8,7 @@ A screen starts from a template (`@/patterns`) and each choice from its pattern,
 
 | Stage | What it settles | Where the answer comes from |
 |---|---|---|
-| **1. Template** | The outer shell (`Frame` with `Sidebar`, `Page`, `PatternModal`, `Panel`, `Popup`) and what fills each slot | `ds_find` kit answer · `ds guide templates` · [`TemplatesOverview.md`](../agent-views/templates/TemplatesOverview.md) · [`components/index.md`](../agent-views/components/index.md) § Templates |
+| **1. Template** | The outer shell (`Frame` with `Sidebar`, `Page`, `Modal`, `Panel`, `Popup`) and what fills each slot | `ds_find` kit answer · `ds guide templates` · [`TemplatesOverview.md`](../agent-views/templates/TemplatesOverview.md) · [`components/index.md`](../agent-views/components/index.md) § Templates |
 | **2. Blocks** | The `PatternSection`, `PatternCard`, `PatternTable` and `Form` shells on the grid, and which pattern governs each situation (Filtering, Search, Forms, Common actions, Navigation, Notifications, Indicators, Empty, Loading, Errors, Disabled, Read-only, Overflow) | `ds_find` kit answer · `ds guide <pattern>` · [`PatternsOverview.md`](../agent-views/patterns/PatternsOverview.md) |
 | **3. Pieces** | The components inside each slot (`@/components`), their exact props and values, or a local component when the system has no fit | `ds_find` → `ds_get` · [`components/index.md`](../agent-views/components/index.md) · [`local-components.md`](../../docs/engineering/local-components.md) |
 | **4. Polish** | Spacing, typography, color, radius and elevation tokens by role, plus copy and accessibility | `ds_tokens("<role>")` · `ds guide <foundation>` · [`foundations/overview.md`](foundations/overview.md) · [`tokens/tokens.md`](../agent-views/tokens/tokens.md) |

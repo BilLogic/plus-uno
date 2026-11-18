@@ -77,12 +77,16 @@ The pattern for the container of one object, raised at rest with no border. Rela
 _Avoid_: "tile" (Tile is its own component), "panel" (Panel is the Frame's right area)
 
 **Blanket**:
-The pattern for the layer that dims what sits behind it: full screen for a **Modal**, which it also holds and sizes. A **Panel** floats with none.
-_Avoid_: "backdrop", "overlay" for the pattern (the word is a **Panel** and **Sidebar** state), "scrim"
+The layer within the **Modal** template that dims what sits behind it and holds and sizes the **Dialog**. It is part of the Modal template, not exported on its own; a **Panel** floats with none.
+_Avoid_: "backdrop", "overlay" for the Blanket (the word is a **Panel** and **Sidebar** state), "scrim"
+
+**Dialog**:
+The component (`@/components`) for the dialog panel itself: header (title, close), body and footer slots, widths on the screen grid, rendered inline with no **Blanket** and no modal behavior.
+_Avoid_: "PatternModal"
 
 **Modal**:
-The component and pattern for content that takes over the screen until it is closed: a follow-up decision swaps the same Modal's content for its confirm view, and one Modal is open at a time. `Modal` is the component; `PatternModal` draws its shell inline.
-_Avoid_: "Modal dialog", "ModalDialog", "popup" for a blocking dialog
+The template (`@/patterns`) for content that takes over the screen until it is closed: a **Dialog** on the **Blanket** with modal behavior on Base UI (portal, focus trap, Escape, scroll lock). A follow-up decision swaps the same Modal's content for its confirm view, and one Modal is open at a time.
+_Avoid_: "Modal dialog" for the template, "ModalDialog", "PatternModal", "popup" for a blocking dialog
 
 **Part**:
 A `_`-prefixed piece only its parent uses, such as `_Section header` or `_Modal header`: it lives inside its parent and stays out of the public exports.

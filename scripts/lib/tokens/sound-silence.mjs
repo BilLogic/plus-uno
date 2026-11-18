@@ -15,7 +15,7 @@ export const SOUND_SILENT = [
   { row: 'Errors', event: 'field', why: 'Field errors are corrections, never an alert.' },
   { row: 'Forms', event: 'blocked', why: 'A blocked submit shakes and stays silent.' },
   { row: 'Errors', event: 'blocked', why: 'A blocked submit shakes and stays silent.' },
-  { row: 'PatternModal', event: 'rejected', why: 'A blocked submit shakes and stays silent.' },
+  { row: 'Modal', event: 'rejected', why: 'A blocked submit shakes and stays silent.' },
   { row: 'InlineEdit', event: 'rejected', why: 'A blocked submit shakes and stays silent.' },
   { row: 'InlineEditableTextfield', event: 'rejected', why: 'A blocked submit shakes and stays silent.' },
   { row: 'Empty', why: 'An empty state, and a load failure shown in its slot, are silent.' },

@@ -79,7 +79,7 @@ export const MOTION_REGISTRY = [
     },
   },
   {
-    name: 'PatternModal',
+    name: 'Modal',
     tier: 'template',
     events: {
       enter: { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.default', note: 'Scales from 96% and fades in; the Blanket dims on appearance.default. It opens only from something the person did, and focus moves to its first input as the motion starts.' },
@@ -461,15 +461,6 @@ export const MOTION_REGISTRY = [
     events: {
       enter: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fade only, after 250 ms. A second Tooltip soon after shows at once.' },
       exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades 100 ms after the pointer leaves.' },
-    },
-  },
-  {
-    name: 'Modal',
-    tier: 'component',
-    events: {
-      enter: { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.default', note: 'Scales from 96% while it fades in; the Blanket dims on the same fade.' },
-      exit: { transition: 'Open and close an overlay', spatial: 'spatial.exit', appearance: 'appearance.fast', note: 'Scales to 98% while it fades.' },
-      rejected: { transition: 'Call attention', spatial: 'spatial.fast', note: 'A blocked submit shakes it once; never in reduced motion.' },
     },
   },
   {
