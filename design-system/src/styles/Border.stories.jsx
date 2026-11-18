@@ -181,7 +181,7 @@ export const SidebarEdges = {
                     panelStorageKey={null}
                     breadcrumbs={[{ text: 'Home', href: '#home' }, { text: 'Sessions' }]}
                 >
-                    <Page level="surface" padding="sm">
+                    <Page>
                         <PatternSection title="Upcoming sessions" />
                     </Page>
                 </InAppFrame>
@@ -203,7 +203,7 @@ export const SidebarEdges = {
                         </div>
                     )}
                 >
-                    <Page level="surface" padding="sm">
+                    <Page>
                         <PatternSection title="Upcoming sessions" />
                     </Page>
                 </InAppFrame>

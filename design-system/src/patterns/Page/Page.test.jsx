@@ -4,6 +4,8 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ComponentExample, exampleSlug } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard } from '@/storybook-docs/lib/template-page.jsx';
+import * as PageModule from './Page.jsx';
+import Page from './Page.jsx';
 import { AddInViewBar, AddTwice, OneTabSystem, TwoTabSystems } from './PageCases.jsx';
 
 vi.mock('@storybook/addon-docs/blocks', async () => {
@@ -84,5 +86,27 @@ describe('Page live cases', () => {
         for (const title of exampleTitles) {
             expect(within(document.body).getByRole('heading', { level: 3, name: title })).toHaveAttribute('id', exampleSlug(title));
         }
+    });
+});
+
+describe('Page surface', () => {
+    it('renders one surface without level, padding, radius, or border modifiers or exports', () => {
+        expect(PageModule.PAGE_LEVELS).toBeUndefined();
+        expect(PageModule.PAGE_EDGE).toBeUndefined();
+        expect(Page.propTypes.level).toBeUndefined();
+        expect(Page.propTypes.padding).toBeUndefined();
+        expect(Page.propTypes.radius).toBeUndefined();
+        expect(Page.propTypes.border).toBeUndefined();
+
+        const { container } = render(
+            <Page title="Sessions">
+                <p>Body</p>
+            </Page>,
+        );
+        const root = container.firstElementChild;
+        expect(root).toHaveClass('plus-pattern-page');
+        expect(root.className).toBe('plus-pattern-page');
+        expect(screen.getByRole('heading', { level: 1, name: 'Sessions' })).toBeInTheDocument();
+        expect(screen.getByText('Body')).toBeInTheDocument();
     });
 });

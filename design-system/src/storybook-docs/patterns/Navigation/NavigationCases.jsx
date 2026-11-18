@@ -21,7 +21,6 @@ export const BreadcrumbCase = ({ record = true }) => (
     <CaseSurface border="none" padding="none" surface={false}>
         <HeadingLevelContext.Provider value={5}>
             <Page
-                padding="md"
                 header={(
                     <PageHeader
                         title={record ? 'Maya Rodriguez' : 'Students'}

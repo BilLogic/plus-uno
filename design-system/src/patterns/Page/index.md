@@ -2,7 +2,7 @@
 
 # Page
 
-Bare tokenized content box: pick an elevation level, padding scale, radius scale and border — children fill the content slot. The level sets the fill and its shadow together: sunken (the frame's blanket), default (the page, edged by the surface border), raised (a card) and overlay (anything over the UI). A Page can carry its `title`: the page's one h1, at Heading/large 24, above the content. Sections inside it open at h2.
+The Page surface: paints `--ds-surface` edge to edge with `--page-pad` (24) on every side and no radius, border, or shadow; children fill the content slot. A Page can carry its `title`: the page's one h1, at Heading/large 24, above the content. Sections inside it open at h2.
 
 Also asked as: surface.
 
@@ -14,7 +14,7 @@ Also asked as: surface.
 
 **Source:** `design-system/src/patterns/Page/Page.jsx`
 
-**Stories:** `design-system/src/patterns/Page/Page.stories.jsx` — Overview, Sunken, DefaultLevel, Raised, Overlay, StepNone, StepSmall, StepMedium, StepLarge, Bordered, WithTitle, HeaderAndBanner, OptionalSlots, ColorModes, MediumPad, Interactive, TypeDefault, TypeFullWidth, AnatomyRecord, ScenarioArea, ScenarioSeveralSections, ScenarioRecordTabs, ScenarioTwoLevels, KeyBanner, ResponsiveWidth, MotionSwitchViews, MotionSwitchViewsReduced, MotionScrollToSpot, MotionScrollToSpotReduced
+**Stories:** `design-system/src/patterns/Page/Page.stories.jsx` — Overview, WithTitle, HeaderAndBanner, OptionalSlots, ColorModes, MediumPad, Interactive, TypeDefault, TypeFullWidth, AnatomyRecord, ScenarioArea, ScenarioSeveralSections, ScenarioRecordTabs, ScenarioTwoLevels, KeyBanner, ResponsiveWidth, MotionSwitchViews, MotionSwitchViewsReduced, MotionScrollToSpot, MotionScrollToSpotReduced
 
 **Storybook page:** `design-system/src/patterns/Page/Page.mdx`
 
@@ -146,7 +146,7 @@ A record page one level down shows every header slot, with markers in the gutter
 | `banner` | One page `Banner`, below the header. Page separates the slots and content with `--page-stack-md`. |
 | `width` | Planned. `default` or `full`; today the Frame's `width` sets `content` or `reading`. |
 | Scrolled header | Planned. The sticky one-row header. |
-| `level` · `padding` · `radius` · `border` · `as` | The container: its fill and shadow as a pair, its pad and corner, and its element. |
+| `as` | The container element. |
 
 ## Sizes
 
@@ -175,10 +175,6 @@ A record page one level down shows every header slot, with markers in the gutter
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `id` | string | — | — |
-| `level` | enum | `'default'` | Elevation level: its fill and its shadow, as a pair |
-| `padding` | enum | `'md'` | Padding scale (md is the frame's own pad) |
-| `radius` | enum | `'none'` | Radius scale |
-| `border` | bool | `false` | A bold border on/off |
 | `as` | elementType | — | Render element / component |
 | `title` | node | — | The page's title: its one h1, at Heading/large 24. Leave it unset on a Page that is not a whole page. |
 | `header` | node | — | One PageHeader with the page's h1, actions and tabs. Replaces title. |
@@ -187,19 +183,9 @@ A record page one level down shows every header slot, with markers in the gutter
 | `style` | object | — | — |
 | `children` | node | — | Content slot |
 
-## Variants
-
-**`level`** — `sunken` · `default` · `raised` · `overlay`
-
-**`padding`** — `none` · `sm` · `md` · `lg`
-
-**`radius`** — `none` · `sm` · `md` · `lg`
-
-The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
-
 ## Tokens touched
 
-`--ds-border-bold` · `--ds-shadow-overlay` · `--ds-shadow-raised` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-raised` · `--ds-surface-sunken` · `--ds-text` · `--heading-lg` · `--heading-lg-tracking` · `--page-border-width` · `--page-pad` · `--page-pad-x-compact` · `--page-pad-x-spacious` · `--page-pad-y-compact` · `--page-pad-y-spacious` · `--page-stack-md` · `--radius-lg` · `--radius-xl` · `--radius-xxl`
+`--ds-surface` · `--ds-text` · `--heading-lg` · `--heading-lg-tracking` · `--page-pad` · `--page-stack-md`
 
 From `design-system/src/patterns/Page/Page.scss`. Override these through the token layer, never with a literal.
 

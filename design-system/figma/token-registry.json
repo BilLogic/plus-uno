@@ -99,7 +99,7 @@
       "Element radius": "var(--radius-{sm|md|lg|full})",
       "Modal padding": "var(--modal-pad-x-{default|spacious})",
       "Section padding": "var(--section-pad-{x|y}-{compact|default|spacious})",
-      "Page padding": "var(--page-pad-{x|y}-{compact|default|spacious})",
+      "Page padding": "var(--page-pad)",
       "Table cell": "var(--table-pad-x-cell)",
       "Size roles": "var(--icon-md)"
     },
@@ -314,14 +314,7 @@
       "Modal/width-lg": "var(--modal-width-lg)",
       "Modal/width-md": "var(--modal-width-md)",
       "Modal/width-sm": "var(--modal-width-sm)",
-      "Page/border-width": "var(--page-border-width)",
       "Page/pad": "var(--page-pad)",
-      "Page/pad-x-compact": "var(--page-pad-x-compact)",
-      "Page/pad-x-default": "var(--page-pad-x-default)",
-      "Page/pad-x-spacious": "var(--page-pad-x-spacious)",
-      "Page/pad-y-compact": "var(--page-pad-y-compact)",
-      "Page/pad-y-default": "var(--page-pad-y-default)",
-      "Page/pad-y-spacious": "var(--page-pad-y-spacious)",
       "Page/stack-lg": "var(--page-stack-lg)",
       "Page/stack-md": "var(--page-stack-md)",
       "Page/stack-sm": "var(--page-stack-sm)",
@@ -1875,11 +1868,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1158,
+    "scssTokenCount": 1151,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1776,
-      "resolved": 1739,
+      "total": 1769,
+      "resolved": 1732,
       "percent": 98,
       "skippedCollections": [
         {

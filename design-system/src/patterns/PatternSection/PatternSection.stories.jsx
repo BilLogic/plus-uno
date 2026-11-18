@@ -37,7 +37,7 @@ import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs
 import { iconClass } from '../../lib/icon';
 import { ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
 
-const col = { display: 'flex', flexDirection: 'column', gap: 'var(--page-pad-x-default)' };
+const col = { display: 'flex', flexDirection: 'column', gap: 'var(--page-pad)' };
 
 const Actions = () => (
     <>
@@ -335,7 +335,7 @@ const SearchableStudents = () => {
                 />
             )}
         >
-            <ul style={{ margin: 0, paddingInlineStart: 'var(--page-pad-x-spacious)', font: 'var(--body-default)' }}>
+            <ul style={{ margin: 0, paddingInlineStart: 'var(--page-pad)', font: 'var(--body-default)' }}>
                 {rows.map((student) => <li key={student.name}>{student.name}</li>)}
             </ul>
         </PatternSection>

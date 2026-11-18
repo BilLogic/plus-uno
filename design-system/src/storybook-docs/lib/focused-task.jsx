@@ -75,7 +75,7 @@ export const FocusedTask = ({ count = 5, start = 1, labels: given, title = 'Plan
                 width="reading"
                 style={{ flex: '1 1 auto', minBlockSize: 0 }}
             >
-                <div data-probe="steps-layout" data-steps={down ? 'down' : 'across'} style={{ display: 'flex', flexDirection: down ? 'row' : 'column', gap: 'var(--page-pad-x-default)' }}>
+                <div data-probe="steps-layout" data-steps={down ? 'down' : 'across'} style={{ display: 'flex', flexDirection: down ? 'row' : 'column', gap: 'var(--page-pad)' }}>
                     <div data-probe="steps" style={down ? { flex: `0 0 ${STEPS_RAIL}px`, inlineSize: STEPS_RAIL } : undefined}>{tracker}</div>
                     <div style={{ flex: '1 1 auto', minInlineSize: 0 }}>
                         <StepStage step={at} axis={placement} maxSteps={labels.length} labels={labels}>

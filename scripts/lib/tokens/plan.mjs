@@ -193,12 +193,6 @@ export const TOKEN_LADDER = [
 
   // ─── Templates / Page ──────────────────────────────────────────────────
   { tier: 'templates', group: 'Page', new: '--page-pad', old: '--page-pad', use: 'Padding around a Page\'s content at the current breakpoint.' },
-  { tier: 'templates', group: 'Page', new: '--page-pad-x-compact', old: null, value: '--space-150', use: 'Horizontal padding of a Page with compact spacing.' },
-  { tier: 'templates', group: 'Page', new: '--page-pad-x-default', old: null, value: '--space-200', use: 'Horizontal padding of a Page with default spacing.' },
-  { tier: 'templates', group: 'Page', new: '--page-pad-x-spacious', old: null, value: '--space-250', use: 'Horizontal padding of a Page with spacious spacing.' },
-  { tier: 'templates', group: 'Page', new: '--page-pad-y-compact', old: null, value: '--space-100', use: 'Vertical padding of a Page with compact spacing.' },
-  { tier: 'templates', group: 'Page', new: '--page-pad-y-default', old: null, value: '--space-150', use: 'Vertical padding of a Page with default spacing.' },
-  { tier: 'templates', group: 'Page', new: '--page-pad-y-spacious', old: null, value: '--space-200', use: 'Vertical padding of a Page with spacious spacing.' },
   { tier: 'templates', group: 'Page', new: '--page-stack-sm', old: '--page-stack-sm', use: 'Vertical gap between closely related blocks on a Page, such as a header and its subtitle.' },
   { tier: 'templates', group: 'Page', new: '--page-stack-md', old: '--page-stack-md', use: 'Vertical gap between sections on a Page.' },
   { tier: 'templates', group: 'Page', new: '--page-stack-lg', old: '--page-stack-lg', use: 'Vertical gap between major regions of a Page.' },
@@ -270,7 +264,6 @@ export const TOKEN_LADDER = [
   { tier: 'templates', group: 'Modal', new: '--modal-width-sm', old: '--layout-width-modal-sm', ref: '384px', at: { '(min-width: 1024px)': '512px', '(min-width: 1440px)': '640px' }, note: 'lifted out of spacing / layout, beside the template’s pad/stack tokens', use: 'Width of a small Modal, such as a single question or a one-field form.' },
   { tier: 'templates', group: 'Modal', new: '--modal-width-md', old: '--layout-width-modal-md', ref: '507px', at: { '(min-width: 1024px)': '677px', '(min-width: 1440px)': '848px' }, use: 'Width of a default Modal, such as a short form.' },
   { tier: 'templates', group: 'Modal', new: '--modal-width-lg', old: '--layout-width-modal-lg', ref: '629px', at: { '(min-width: 1024px)': '843px', '(min-width: 1440px)': '1056px' }, use: 'Width of a large Modal, such as a table or a long form.' },
-  { tier: 'templates', group: 'Page', new: '--page-border-width', old: null, ref: 'var(--stroke-2)', use: 'Width of the edge drawn around a Page frame.' },
   { tier: 'templates', group: 'Table', new: '--table-overflow-reach', old: null, ref: 'var(--space-150)', use: 'How far a PatternTable lets a row\'s overflow, such as a focus ring, reach past its clip.' },
   { tier: 'templates', group: 'Modal', new: '--modal-body-min-height', old: null, ref: 'var(--space-500)', use: 'Minimum height of a Modal\'s body, so a short body does not collapse the dialog.' },
 
