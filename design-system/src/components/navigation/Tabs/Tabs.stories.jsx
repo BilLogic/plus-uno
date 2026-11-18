@@ -58,7 +58,7 @@ export default {
     }
 };
 
-const col = { display: 'flex', flexDirection: 'column', gap: '48px' };
+const col = { display: 'flex', flexDirection: 'column', gap: 'var(--page-stack-lg)' };
 
 export const Overview = () => {
     const [activeKey, setActiveKey] = useState('1');
@@ -236,12 +236,12 @@ function InteractionStatesDemos() {
     return (
         <section>
             <DemoLabel>INTERACTION STATES</DemoLabel>
-            <p className="body-default" style={{ marginBottom: '24px', color: 'var(--ds-text-subtle)' }}>
+            <p className="body-default" style={{ marginBottom: 'var(--section-stack-lg)', color: 'var(--ds-text-subtle)' }}>
                 States below are artificially forced for demonstration.
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-pad-x-spacious)' }}>
                 <div>
-                    <p className="body-sm" style={{ marginBottom: '16px', fontWeight: 'bold' }}>Unselected tab states</p>
+                    <p className="body-sm" style={{ marginBottom: 'var(--section-stack-md)', fontWeight: 'bold' }}>Unselected tab states</p>
                     <Tabs defaultActiveKey="none">
                         <Tabs.Tab eventKey="default">Default</Tabs.Tab>
                         <Tabs.Tab eventKey="hover" className="pseudo-hover">Hovered</Tabs.Tab>
@@ -250,7 +250,7 @@ function InteractionStatesDemos() {
                     </Tabs>
                 </div>
                 <div>
-                    <p className="body-sm" style={{ marginBottom: '16px', fontWeight: 'bold' }}>Disabled</p>
+                    <p className="body-sm" style={{ marginBottom: 'var(--section-stack-md)', fontWeight: 'bold' }}>Disabled</p>
                     <Tabs defaultActiveKey="none">
                         <Tabs.Tab eventKey="disabled" isDisabled>Disabled</Tabs.Tab>
                     </Tabs>

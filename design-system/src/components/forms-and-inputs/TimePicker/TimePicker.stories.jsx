@@ -48,13 +48,13 @@ export default {
 };
 
 export const Overview = () => (
-    <div style={{ maxWidth: 'var(--size-1400)' }}>
+    <div style={{ maxWidth: 'var(--width-1400)' }}>
         <TimePicker placeholder="__ : __" aria-label="Time" />
     </div>
 );
 
 export const Spacing = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', maxWidth: 'var(--size-1400)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--width-1400)' }}>
         <div>
             <DemoLabel>DEFAULT (40)</DemoLabel>
             <TimePicker spacing="default" aria-label="Time" placeholder="Default" />
@@ -75,7 +75,7 @@ Spacing.play = async ({ canvasElement }) => {
 };
 
 export const InteractionStates = () => (
-    <div style={{ display: 'flex', gap: 'var(--space-150)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+    <div style={{ display: 'flex', gap: 'var(--section-stack-lg)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div>
             <DemoLabel>DEFAULT</DemoLabel>
             <TimePicker aria-label="Time" placeholder="Default" />
@@ -110,19 +110,19 @@ export const PickTime = () => {
     const [value, setValue] = useState('');
 
     return (
-        <div style={{ maxWidth: 'var(--size-1400)' }}>
-            <h6 style={{ marginBottom: 'var(--space-100)' }}>Set a Time</h6>
+        <div style={{ maxWidth: 'var(--width-1400)' }}>
+            <h6 style={{ marginBottom: 'var(--section-stack-md)' }}>Set a Time</h6>
             <TimePicker aria-label="Time" value={value} onChange={setValue} />
             {value && (
                 <div
                     style={{
-                        marginTop: 'var(--space-100)',
-                        padding: 'var(--space-075)',
+                        marginTop: 'var(--section-stack-md)',
+                        padding: 'var(--pad-x-md)',
                         backgroundColor: 'var(--ds-surface-container)',
                         borderRadius: 'var(--radius-md)',
                     }}
                 >
-                    <p style={{ margin: 0, fontSize: 'var(--type-size-0875)' }}>
+                    <p style={{ margin: 0, font: 'var(--body-default)' }}>
                         <strong>Time:</strong> {value}
                     </p>
                 </div>
@@ -165,7 +165,7 @@ TwentyFourHourValueIsSplit.play = async ({ canvasElement }) => {
 };
 
 /** One story per state, for the Examples tab. */
-const wrap = { maxWidth: 'var(--size-1400)' };
+const wrap = { maxWidth: 'var(--width-1400)' };
 const input = (canvasElement) => within(canvasElement).getByRole('combobox');
 
 export const Default = {
