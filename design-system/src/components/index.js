@@ -55,7 +55,7 @@ export { default as Tile, TILE_APPEARANCES, TILE_COLORS, TILE_CONTENTS, TILE_SIZ
 
 export { default as AiMessage, AI_MESSAGE_STATUSES, AiFeedback, AiSources, TypingText } from '@/components/labels/AiMessage';
 export { default as ChangeTag, CHANGE_TAG_FORMATS, CHANGE_TAG_GOOD_DIRECTIONS, CHANGE_TAG_ICONS, changeTone, describeChange } from '@/components/labels/ChangeTag';
-export { default as CompetencyTag, COMPETENCY_TAG_SUBJECTS } from '@/components/labels/CompetencyTag';
+export { default as CompetencyTag, COMPETENCY_TAG_SPACINGS, COMPETENCY_TAG_SUBJECTS } from '@/components/labels/CompetencyTag';
 export { default as CountTag, COUNT_TAG_APPEARANCES, formatCount } from '@/components/labels/CountTag';
 export { default as DateTag, DATE_TAG_APPEARANCES, DATE_TAG_ICONS, DATE_TAG_SPACINGS } from '@/components/labels/DateTag';
 export { default as PromptStarters } from '@/components/labels/PromptStarters';

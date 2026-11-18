@@ -123,7 +123,7 @@ Same group: `AiMessage` · `ChangeTag` · `CompetencyTag` · `CountTag` · `Date
 | Hovered, pressed | `--ds-background-discovery` and `--ds-background-discovery-hovered`. |
 | Focus ring | `--ds-border-focused`, `--focus-ring-width` wide and offset. |
 | Disabled | `--ds-background-disabled`, `--ds-text-disabled`, `--ds-icon-disabled`. |
-| Box | The same height (22), padding (`--pad-x-xs`) and radius (`--radius-md`) as Tag, so it fits the row where the value will land. |
+| Box | The same height (`--label-height-md`, 20), padding (`--pad-x-xs`) and radius (`--radius-md`) as Tag, so it fits the row where the value will land. |
 
 ## Content guidelines
 

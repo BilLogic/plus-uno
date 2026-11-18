@@ -1,5 +1,5 @@
 {
-  "note": "HAND-AUTHORED source for the `patterns` section of component-registry.json. Patterns are the layout/composition layer: Figma component sets that govern how a container is laid out, each bound to one `size / semantics` token family. They deliberately do NOT map to a code component — there is no `PatternCard` export — which is why they cannot come from MDX figmaMeta like components do. Edit here, then run `npm run generate:component-registry`.",
+  "note": "HAND-AUTHORED source for the `patterns` section of component-registry.json. Patterns are the layout/composition layer: Figma component sets that govern how a container is laid out, each bound to one `size / semantics` token family. PatternCard, PatternSection, PatternModal, and PatternTable are exported from `@/patterns` (`design-system/src/patterns/index.js`), while `Pattern/Surface container` has no standalone code export; they are kept here separately from `components` because their MDX files do not carry `figmaMeta`. Edit here, then run `npm run generate:component-registry`.",
   "figmaFileKey": "zAecJNRdvJzAUOcjV32tRX",
   "patterns": {
     "Pattern/Card": {
