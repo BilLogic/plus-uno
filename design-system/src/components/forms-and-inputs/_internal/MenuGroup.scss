@@ -6,11 +6,15 @@
     flex-direction: column;
     overflow: auto;
     min-width: var(--menu-group-min-width);
-    padding: var(--pad-y-lg) 0;
+    padding: var(--dropdown-menu-pad);
 
-    // The same rows as OptionRow: Item 32 by default, Item 24 compact.
+    // The same rows as OptionRow: Item 32 by default, Item 24 compact, Item 40 spacious.
     &--compact .plus-menu-item {
         @include row-spacing.size('compact');
+    }
+
+    &--spacious .plus-menu-item {
+        @include row-spacing.size('spacious');
     }
 }
 
@@ -26,24 +30,15 @@
     font: var(--heading-xxs);
     color: var(--ds-text-subtlest);
     text-transform: uppercase;
-    padding: var(--stack-lg) var(--menu-group-pad-x) var(--stack-sm);
+    padding: var(--stack-lg) var(--pad-x-md) var(--stack-sm);
 }
 
 .plus-menu-item {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    gap: var(--menu-group-gap);
-    box-sizing: border-box;
+    @include row-spacing.row;
     @include row-spacing.size('default');
-    padding-inline: var(--menu-group-pad-x);
-    border: none;
     background: none;
-    border-radius: var(--radius-control-md);
-    color: var(--ds-text);
     text-decoration: none;
     cursor: pointer;
-    font: var(--body-default);
 
     @include plus-state((
         hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
@@ -63,6 +58,7 @@
 
 .plus-menu-item-content {
     display: flex;
+    flex: 1;
     flex-direction: column;
     min-width: 0;
     text-align: start;
