@@ -43,8 +43,8 @@ RadioGroup reads these motion tokens and no literal duration or curve.
 
 In a flow of choice questions (onboarding, quizzes, check-ins, surveys), pick one default selection type for the flow: the majority type uses `appearance="soft"` without a visible radio dot or checkbox box, while the minority type keeps its visible control (`card` or `plain`) so people notice when a question switches between single-select and multi-select, following the same exception-marking rule as required and optional fields on [Forms](?path=/docs/patterns-forms--docs).
 
-Do: Two single-select questions use soft rows without radio dots; the one multi-select question keeps its visible checkboxes.
-Don't: The two majority single-select questions keep their radio dots while the minority multi-select question goes soft without checkboxes.
+Do: Two single-select questions use soft rows without radio indicators; the one multi-select question keeps its visible checkboxes.
+Don't: The two majority single-select questions keep their radio indicators while the minority multi-select question goes soft without checkboxes.
 
 ### Name the question with a group label. {#name-the-question-with-a-group-label}
 
