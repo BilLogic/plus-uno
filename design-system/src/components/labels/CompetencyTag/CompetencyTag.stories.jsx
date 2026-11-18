@@ -168,7 +168,7 @@ UnknownSubjectFallsBack.play = async ({ canvasElement }) => {
 /** `spacing="spacious"` draws 32 beside a heading, with 14/20 text and a 16 icon. */
 export const BesideHeading = () => (
     <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}>
-        <Heading size="large">Mastering linear equations</Heading>
+        <Heading size="lg">Mastering linear equations</Heading>
         <CompetencyTag subject="mastering-content" spacing="spacious" data-testid="spacious" />
     </div>
 );

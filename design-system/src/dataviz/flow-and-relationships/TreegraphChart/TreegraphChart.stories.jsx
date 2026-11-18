@@ -44,7 +44,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Curriculum topic hierarchy</Heading>
+                <Heading as="h3" size="sm">Curriculum topic hierarchy</Heading>
                 <p style={captionStyle}>
                     Subject, unit and lesson breakdown with node boxes rounded on the card-nesting role radius.
                 </p>

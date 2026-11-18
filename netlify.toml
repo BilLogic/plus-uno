@@ -245,7 +245,14 @@
 [[redirects]]
   from = "/storybook/"
   query = { path = "/docs/foundations-elevation--docs" }
-  to = "/storybook/?path=/docs/foundations-visual-elevation--docs"
+  to = "/storybook/?path=/docs/foundations-visual-elevation-overview--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/foundations-visual-elevation--docs" }
+  to = "/storybook/?path=/docs/foundations-visual-elevation-overview--docs"
   status = 301
   force = true
 

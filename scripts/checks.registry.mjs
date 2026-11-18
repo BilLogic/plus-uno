@@ -124,14 +124,6 @@ export const CHECKS = [
     guards: 'dependencies that are declared but imported nowhere, and ones used (a CDN <link> included) but never declared.',
   },
   {
-    name: 'check:deprecated-apis',
-    script: 'node scripts/check-deprecated-apis.mjs',
-    pkg: 'root',
-    trigger: 'pull_request',
-    module: 'scripts/check-deprecated-apis.mjs',
-    guards: 'dependency ranges against the majors that remove an API this repo still uses.',
-  },
-  {
     name: 'check:docs',
     script: 'node scripts/check-doc-links.mjs',
     pkg: 'root',

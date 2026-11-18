@@ -4,8 +4,13 @@ import { Button, HeadingContextProvider, Modal, PanelBody, PanelContainer, Panel
 import { Blanket, PatternCard, PatternSection, PatternTable } from '@/patterns';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
+import { Illustration } from '@/storybook-docs/illustrations/Illustration.jsx';
+import { Flag as FlagIllustration, Layer, Rect, SkeletonBar } from '@/storybook-docs/illustrations/primitives.jsx';
+import { PAINT } from '@/storybook-docs/illustrations/paint.js';
+import { usePageContrast } from '@/storybook-docs/lib/use-page-contrast.js';
 import {
     BehaviorGuide,
+    ByTemplateGrid,
     ClipDemo,
     ContrastDemo,
     CrossSection,
@@ -13,19 +18,23 @@ import {
     LayerStack,
     LevelTiles as LevelTilesBlock,
     LiftDemo,
+    OverviewStack,
+    PageSurfacesStack,
     ScrollShadowDemo,
     ShadowComposer,
+    ShadowRampFigure,
     ShadowSlotTable,
+    ShadowTokensEquation,
     SurfaceLadder,
 } from '@/storybook-docs/elevation-demos.jsx';
 import { parseShadow } from '@/storybook-docs/lib/shadow-anatomy';
 
 /**
- * Live blocks for Foundations/Elevation. Each interactive block has a play
+ * Live blocks for Foundations/Visual/Elevation. Each interactive block has a play
  * test; the values every block shows are read from the page's tokens.
  */
 export default {
-    title: 'Foundations/Visual/Elevation',
+    title: 'Foundations/Visual/Elevation/Demos',
     tags: ['!dev', '!autodocs'],
 };
 
@@ -610,3 +619,238 @@ export const OneFocalPoint = () => (
         </Dont>
     </DoDont>
 );
+
+/* ------------------------------------------------------------ folder part A figures */
+
+const assertPanelContainer = async (panel) => {
+    await expect(panel).not.toBeNull();
+    const cs = getComputedStyle(panel);
+    await expect(parseFloat(cs.borderTopLeftRadius)).toBeGreaterThan(0);
+    await expect(cs.backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
+};
+
+/** Overview key figure: the five layers in stack order inside the shared panel container. */
+export const OverviewLayers = {
+    render: () => <OverviewStack />,
+    play: async ({ canvasElement }) => {
+        const panel = canvasElement.querySelector('[data-elevation-panel]');
+        await assertPanelContainer(panel);
+        const figure = panel.querySelector('[data-testid="overview-stack"]');
+        await expect(figure).not.toBeNull();
+        const plates = [...figure.querySelectorAll('[data-plate]')];
+        await expect(plates.map((p) => p.dataset.plate)).toEqual([
+            'frame',
+            'page',
+            'navigation',
+            'non-blocking-overlay',
+            'blocking-overlay',
+        ]);
+        for (const plate of plates) {
+            await expect(plate.querySelector('svg text, text'), `${plate.dataset.plate} draws no words`).toBeNull();
+        }
+        // Plates stay fixed in geometry (no rising from below) as opacity settles to 1.
+        const initialTransforms = plates.map((p) => p.querySelector('[data-turn]').getAttribute('transform'));
+        await waitFor(() => {
+            for (const plate of plates) {
+                expect(Number(plate.getAttribute('opacity'))).toBe(1);
+            }
+        });
+        await expect(plates.map((p) => p.querySelector('[data-turn]').getAttribute('transform'))).toEqual(initialTransforms);
+
+        // Legend controls are PLUS Buttons that show selection; pointer click on a plate and keyboard activation both select and focus the control.
+        const buttons = [...figure.querySelectorAll('ol button.plus-btn')];
+        await expect(buttons).toHaveLength(5);
+        const pageButton = within(figure).getByRole('button', { name: 'Layer 1 · Page' });
+        await userEvent.click(figure.querySelector('[data-plate="page"]'));
+        await expect(figure.querySelector('[data-plate="page"]')).toHaveAttribute('data-active', 'true');
+        await expect(pageButton).toHaveAttribute('aria-pressed', 'true');
+        await expect(document.activeElement).toBe(pageButton);
+
+        const navButton = within(figure).getByRole('button', { name: 'Layer 2 · Navigation' });
+        navButton.focus();
+        await userEvent.keyboard('{Enter}');
+        await expect(figure.querySelector('[data-plate="navigation"]')).toHaveAttribute('data-active', 'true');
+        await expect(navButton).toHaveAttribute('aria-pressed', 'true');
+        await expect(document.activeElement).toBe(navButton);
+    },
+};
+
+/** Layer system key figure: the three page surfaces inside the shared panel container. */
+export const WithinThePage = {
+    render: () => <PageSurfacesStack />,
+    play: async ({ canvasElement }) => {
+        const panel = canvasElement.querySelector('[data-elevation-panel]');
+        await assertPanelContainer(panel);
+        const figure = panel.querySelector('[data-testid="page-surfaces-stack"]');
+        await expect(figure).not.toBeNull();
+        const plates = [...figure.querySelectorAll('[data-plate]')];
+        await expect(plates.map((p) => p.dataset.plate)).toEqual(['default', 'sunken', 'raised']);
+        for (const plate of plates) {
+            await expect(plate.querySelector('svg text, text'), `${plate.dataset.plate} draws no words`).toBeNull();
+        }
+        const sunkenButton = within(figure).getByRole('button', { name: 'Sunken' });
+        await userEvent.click(figure.querySelector('[data-plate="sunken"]'));
+        await expect(sunkenButton).toHaveAttribute('aria-pressed', 'true');
+        await expect(document.activeElement).toBe(sunkenButton);
+    },
+};
+
+/** Shadow ramp key figure: four shadows in light and dark inside the shared panel container. */
+export const Ramp = {
+    render: () => <ShadowRampFigure />,
+    play: async ({ canvasElement }) => {
+        const panel = canvasElement.querySelector('[data-elevation-panel]');
+        await assertPanelContainer(panel);
+        const figure = panel.querySelector('[data-testid="shadow-ramp"]');
+        await expect(figure).not.toBeNull();
+        const modes = [...figure.querySelectorAll('[data-color-mode]')];
+        await expect(modes.map((m) => m.dataset.colorMode)).toEqual(['light', 'dark']);
+
+        const rectsIntersect = (a, b) =>
+            a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+        const textBoxOf = (el) => {
+            const range = document.createRange();
+            range.selectNodeContents(el);
+            return range.getBoundingClientRect();
+        };
+
+        const steps = ['raised', 'overflow', 'overlay', 'blocking'];
+        for (const mode of modes) {
+            const stepWraps = [...mode.querySelectorAll('[data-shadow-step]')];
+            await expect(stepWraps.map((d) => d.dataset.shadowStep)).toEqual(steps);
+            const discs = stepWraps.map((w) => w.querySelector('foreignObject div'));
+            for (const disc of discs) {
+                await expect(disc).not.toBeNull();
+                await expect(getComputedStyle(disc).boxShadow).not.toBe('none');
+            }
+            const discRects = discs.map((d) => d.getBoundingClientRect());
+            for (let i = 0; i < discRects.length; i += 1) {
+                await expect(discRects[i].width, `${steps[i]} disc width`).toBeGreaterThanOrEqual(40);
+                await expect(discRects[i].height, `${steps[i]} disc height`).toBeGreaterThanOrEqual(40);
+                for (let j = i + 1; j < discRects.length; j += 1) {
+                    await expect(
+                        rectsIntersect(discRects[i], discRects[j]),
+                        `${steps[i]} and ${steps[j]} discs must not intersect`,
+                    ).toBe(false);
+                }
+            }
+
+            const labels = steps.map((step) => within(mode).getByText(step));
+            const labelRects = labels.map((el) => el.getBoundingClientRect());
+            const textRects = labels.map(textBoxOf);
+            for (let i = 0; i < labels.length; i += 1) {
+                await expect(labelRects[i].top, `${steps[i]} label sits below its disc`).toBeGreaterThanOrEqual(discRects[i].bottom - 1);
+                for (let j = i + 1; j < labels.length; j += 1) {
+                    await expect(
+                        rectsIntersect(labelRects[i], labelRects[j]),
+                        `${steps[i]} and ${steps[j]} label boxes must not intersect`,
+                    ).toBe(false);
+                    await expect(
+                        rectsIntersect(textRects[i], textRects[j]),
+                        `${steps[i]} and ${steps[j]} label text must not intersect`,
+                    ).toBe(false);
+                }
+            }
+        }
+
+        const [lightRect, darkRect] = modes.map((m) => m.getBoundingClientRect());
+        await expect(lightRect.right, 'light and dark halves sit side by side').toBeLessThanOrEqual(darkRect.left + 1);
+        await expect(Math.abs(lightRect.top - darkRect.top), 'light and dark halves align vertically').toBeLessThan(2);
+    },
+};
+
+/** Within-the-page summary grouped by Section, Table, and Card inside the shared panel container. */
+export const ByTemplate = {
+    render: () => <ByTemplateGrid />,
+    play: async ({ canvasElement }) => {
+        const panel = canvasElement.querySelector('[data-elevation-panel]');
+        await assertPanelContainer(panel);
+        await expect(panel.getAttribute('data-testid')).toBe('by-template-grid');
+        const svgs = [...panel.querySelectorAll('svg')];
+        await expect(svgs.length).toBe(11);
+        for (const svg of svgs) {
+            await expect(svg.querySelector('text'), 'template tiles draw no words').toBeNull();
+        }
+    },
+};
+
+/** Edge + Key + Ambient = --ds-shadow-blocking inside the shared panel container. */
+export const ShadowEquation = {
+    render: () => <ShadowTokensEquation />,
+    play: async ({ canvasElement }) => {
+        const panel = canvasElement.querySelector('[data-elevation-panel]');
+        await assertPanelContainer(panel);
+        await expect(panel.getAttribute('data-testid')).toBe('shadow-equation');
+        await expect(panel.querySelectorAll('[data-equation-part]').length).toBe(4);
+    },
+};
+
+/** Shadow ramp Do/Don't 1: use the layer's token, never a raw shadow. */
+export const UsingShadowTokens = () => (
+    <DoDont>
+        <Do caption="Use the layer’s token.">
+            {menu()}
+        </Do>
+        <Dont caption="Don’t write a raw shadow.">
+            {menu({ boxShadow: '0 6px 18px rgba(0, 0, 0, 0.22)' })}
+        </Dont>
+    </DoDont>
+);
+
+const FlagAdaptIllustration = ({ raw = false }) => {
+    const contrast = usePageContrast();
+    const modeProps = (mode) => ({
+        'data-color-mode': mode,
+        ...(contrast ? { 'data-contrast-mode': contrast } : {}),
+    });
+    return (
+        <Illustration
+            width={160}
+            height={96}
+            title={raw ? 'Flag in light and dark mode with a hand-made shadow' : 'Flag in light and dark mode using elevation tokens'}
+        >
+            {(['light', 'dark']).map((mode, idx) => {
+                const y = idx === 0 ? 4 : 50;
+                return (
+                    <g key={mode} {...modeProps(mode)}>
+                        <Rect x={4} y={y} w={152} h={42} fill={PAINT.pageSurface} stroke={PAINT.frameDivider} corner="card" />
+                        {raw ? (
+                            <>
+                                <Layer x={20} y={y + 6} w={120} h={30} fill={PAINT.pageSurface} shadow="0 6px 18px rgba(0, 0, 0, 0.22)" corner="flag" />
+                                <SkeletonBar x={40} y={y + 13} w={48} h={4} heading />
+                                <SkeletonBar x={40} y={y + 22} w={78} />
+                            </>
+                        ) : (
+                            <FlagIllustration x={20} y={y + 6} w={120} h={30} />
+                        )}
+                    </g>
+                );
+            })}
+        </Illustration>
+    );
+};
+
+/** Shadow ramp Do/Don't 2: tokens adapt in dark; a raw shadow vanishes. */
+export const TokensAdaptInDark = () => (
+    <DoDont>
+        <Do caption="Tokens adapt: in dark the Flag steps lighter and keeps its ring.">
+            <FlagAdaptIllustration />
+        </Do>
+        <Dont caption="A hand-made shadow vanishes in dark.">
+            <FlagAdaptIllustration raw />
+        </Dont>
+    </DoDont>
+);
+
+/** Shadow ramp Do/Don't 3: keep the shadow token a component ships with. */
+export const KeepComponentShadow = () => (
+    <DoDont>
+        <Do caption="A Popup keeps the overlay pair it ships with.">
+            {menu()}
+        </Do>
+        <Dont caption="Reassigning a component’s shadow puts it on the wrong layer.">
+            {menu({ boxShadow: 'var(--ds-shadow-raised)' })}
+        </Dont>
+    </DoDont>
+);
+

@@ -63,7 +63,7 @@ const text = (copy) => <p style={{ margin: 0, font: 'var(--body-default)', color
 /** A record's Section inside a Panel body: a small heading and its lines. */
 const Block = ({ title, children }) => (
     <section style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-        <Heading size="xxsmall">{title}</Heading>
+        <Heading size="xxs">{title}</Heading>
         {children}
     </section>
 );

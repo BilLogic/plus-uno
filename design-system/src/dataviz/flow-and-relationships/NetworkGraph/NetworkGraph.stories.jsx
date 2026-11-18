@@ -59,7 +59,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Math concept map</Heading>
+                <Heading as="h3" size="sm">Math concept map</Heading>
                 <p style={captionStyle}>
                     Unweighted prerequisite and topic links rendered in the single-series brand color.
                 </p>
@@ -67,7 +67,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Peer study network</Heading>
+                <Heading as="h3" size="sm">Peer study network</Heading>
                 <p style={captionStyle}>
                     Co-tutoring pairs across a smaller cohort at a compact height.
                 </p>

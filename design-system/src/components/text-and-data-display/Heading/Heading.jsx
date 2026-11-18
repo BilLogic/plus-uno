@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
 import './Heading.scss';
 
-export const HEADING_SIZES = ['xxlarge', 'xlarge', 'large', 'medium', 'small', 'xsmall', 'xxsmall'];
+export const HEADING_SIZES = ['xxl', 'xl', 'lg', 'md', 'sm', 'xs', 'xxs'];
 export const HEADING_COLORS = ['color.text', 'color.text.inverse', 'color.text.warning.inverse'];
 export const HEADING_TAGS = ['div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'span'];
 

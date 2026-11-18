@@ -74,7 +74,7 @@ Same group: `Code` · `CodeBlock` · `InlineEdit` · `Table` · `VisuallyHidden`
 
 ## Parts
 
-1. **Text.** Set in the text style of `size`, from `xxlarge` to `xxsmall`.
+1. **Text.** Set in the text style of `size`, from `xxl` to `xxs`.
 2. **Tag.** Follows the ambient heading level, or `as` when given.
 3. **Color.** Default ink, inverse ink on a dark ground, or the warning inverse ink.
 
@@ -91,7 +91,7 @@ Same group: `Code` · `CodeBlock` · `InlineEdit` · `Table` · `VisuallyHidden`
 
 | Part | Token |
 | --- | --- |
-| Text style | `--heading-xxl` to `--heading-xxs`, with tracking for xxlarge, xlarge and large |
+| Text style | `--heading-xxl` to `--heading-xxs`, with tracking for xxl, xl and lg |
 | Default ink | `--ds-text` |
 | Inverse ink | `--ds-text-inverse` |
 | Warning inverse ink | `--ds-text-warning-inverse` |
@@ -120,7 +120,7 @@ Same group: `Code` · `CodeBlock` · `InlineEdit` · `Table` · `VisuallyHidden`
 
 **`as`** — `div` · `h1` · `h2` · `h3` · `h4` · `h5` · `h6` · `span`
 
-**`size`** — `xxlarge` · `xlarge` · `large` · `medium` · `small` · `xsmall` · `xxsmall`
+**`size`** — `xxl` · `xl` · `lg` · `md` · `sm` · `xs` · `xxs`
 
 **`color`** — `color.text` · `color.text.inverse` · `color.text.warning.inverse`
 

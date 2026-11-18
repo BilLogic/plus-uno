@@ -12,6 +12,7 @@ import { CORNER, HAIRLINE, PAINT } from '@/storybook-docs/illustrations/paint.js
 import { staggerDelays } from '@/storybook-docs/illustrations/motion-choreography.jsx';
 import { TURN, turnPoint, turnTransform } from '@/storybook-docs/lib/iso-turn.js';
 import { composeShadow, groundDarkness, ink, parseShadow, shadowReach, slotted } from '@/storybook-docs/lib/shadow-anatomy';
+import { ElevationPanel } from './elevation-folder-figures.jsx';
 
 /**
  * The live blocks of Foundations/Elevation. Every value a block shows is read
@@ -45,13 +46,13 @@ const SLOT_WHY = {
 
 /** Rows of the behavior table, each landing on one level. */
 export const BEHAVIORS = [
-    { id: 'holds', behavior: 'Holds the work', level: 'sunken', layer: null, uses: 'Frame topbar, docked Sidebar' },
+    { id: 'holds', behavior: 'Holds the work', level: 'sunken', layer: null, uses: 'Frame, docked Sidebar' },
     { id: 'flow', behavior: 'In the flow', level: 'default', layer: null, uses: 'Page, Section (sunken for a subtle one), Table, docked AI panel' },
     { id: 'marks', behavior: 'Marks one object', level: 'raised', layer: null, uses: 'Card, Carousel slide, Range thumb' },
     { id: 'stays', behavior: 'Stays put while content scrolls', level: 'overflow', layer: '--layer-card', uses: 'Sticky table header and column, with a border first' },
     { id: 'floats', behavior: 'Floats, page usable', level: 'overlay', layer: ['--layer-navigation', '--layer-popup', '--layer-flag', '--layer-spotlight'], uses: 'Floating Sidebar, floating Panel, Popup types (Popup, DropdownMenu, a Select list), Inline edit, Flag, Spotlight, a dragged Card' },
     { id: 'blocks', behavior: 'Blocks the page', level: 'blocking', layer: '--layer-modal', uses: 'Modal only, on the Blanket (--layer-blanket)' },
-    { id: 'replaces', behavior: 'Replaces the page', level: 'default', layer: '--layer-dialog', uses: 'Frame · focused, AiChat full screen' },
+    { id: 'replaces', behavior: 'Replaces the page', level: 'default', layer: '--layer-dialog', uses: 'AiChat full screen' },
     { id: 'labels', behavior: 'Labels a control', level: null, layer: '--layer-tooltip', uses: 'Tooltip, with no shadow' },
 ];
 
@@ -59,7 +60,7 @@ export const BEHAVIORS = [
 export const LAYERS = [
     { token: '--layer-card', who: 'Sticky headers and columns' },
     { token: '--layer-navigation', who: 'The floating Sidebar and Panel' },
-    { token: '--layer-dialog', who: 'A page that replaces the page: Frame · focused, AiChat full screen' },
+    { token: '--layer-dialog', who: 'A page that replaces the page: AiChat full screen' },
     { token: '--layer-popup', who: 'Popups, menus, a Select list' },
     { token: '--layer-blanket', who: 'The Blanket' },
     { token: '--layer-modal', who: 'The Modal, above its Blanket' },
@@ -718,51 +719,53 @@ export const ShadowComposer = () => {
     const onCount = layers.filter((l) => enabled[l.slot] !== false).length;
 
     return (
-        <div style={stack} data-testid="shadow-composer">
-            <div style={{ ...row, justifyContent: 'space-between' }}>
-                <Choice name="Level" options={SLOTTED_LEVELS.map((l) => ({ id: l.id, label: l.name }))} value={levelId} onChange={setLevelId} />
-                <Choice name="Color mode" options={MODE_OPTIONS} value={mode} onChange={setMode} />
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-md)), 1fr))', gap: 'var(--grid-gutter)', alignItems: 'start' }}>
-                <div
-                    ref={ground}
-                    data-color-mode={mode}
-                    {...(contrast ? { 'data-contrast-mode': contrast } : {})}
-                    data-docs-stage style={{ ...well, display: 'grid', placeItems: 'center', minHeight: 'calc(var(--image-xl) * 3.5)', background: levelId === 'blocking' ? 'linear-gradient(var(--ds-blanket), var(--ds-blanket)), var(--ds-surface)' : 'var(--ds-surface)' }}
-                >
+        <ElevationPanel>
+            <div style={stack} data-testid="shadow-composer">
+                <div style={{ ...row, justifyContent: 'space-between' }}>
+                    <Choice name="Level" options={SLOTTED_LEVELS.map((l) => ({ id: l.id, label: l.name }))} value={levelId} onChange={setLevelId} />
+                    <Choice name="Color mode" options={MODE_OPTIONS} value={mode} onChange={setMode} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-md)), 1fr))', gap: 'var(--grid-gutter)', alignItems: 'start' }}>
                     <div
-                        data-testid="composer-surface"
-                        data-layers={onCount}
-                        style={{
-                            width: '60%',
-                            minHeight: 'var(--image-xl)',
-                            display: 'grid',
-                            placeItems: 'center',
-                            borderRadius: 'var(--card-radius)',
-                            background: `var(${level.surface})`,
-                            boxShadow: composed,
-                            color: 'var(--ds-text)',
-                            font: 'var(--heading-xs)',
-                        }}
+                        ref={ground}
+                        data-color-mode={mode}
+                        {...(contrast ? { 'data-contrast-mode': contrast } : {})}
+                        data-docs-stage style={{ ...well, display: 'grid', placeItems: 'center', minHeight: 'calc(var(--image-xl) * 3.5)', background: levelId === 'blocking' ? 'linear-gradient(var(--ds-blanket), var(--ds-blanket)), var(--ds-surface)' : 'var(--ds-surface)' }}
                     >
-                        {level.name}
+                        <div
+                            data-testid="composer-surface"
+                            data-layers={onCount}
+                            style={{
+                                width: '60%',
+                                minHeight: 'var(--image-xl)',
+                                display: 'grid',
+                                placeItems: 'center',
+                                borderRadius: 'var(--card-radius)',
+                                background: `var(${level.surface})`,
+                                boxShadow: composed,
+                                color: 'var(--ds-text)',
+                                font: 'var(--heading-xs)',
+                            }}
+                        >
+                            {level.name}
+                        </div>
+                    </div>
+                    <div style={stack}>
+                        {layers.map((l) => (
+                            <div key={l.slot} data-slot={l.slot} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
+                                <Toggle
+                                    label={l.slot[0].toUpperCase() + l.slot.slice(1)}
+                                    isChecked={enabled[l.slot] !== false}
+                                    onChange={() => setEnabled((e) => ({ ...e, [l.slot]: e[l.slot] === false }))}
+                                />
+                                <SlotValues layer={l} />
+                                <span style={small}>{SLOT_WHY[l.slot]}</span>
+                            </div>
+                        ))}
                     </div>
                 </div>
-                <div style={stack}>
-                    {layers.map((l) => (
-                        <div key={l.slot} data-slot={l.slot} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                            <Toggle
-                                label={l.slot[0].toUpperCase() + l.slot.slice(1)}
-                                isChecked={enabled[l.slot] !== false}
-                                onChange={() => setEnabled((e) => ({ ...e, [l.slot]: e[l.slot] === false }))}
-                            />
-                            <SlotValues layer={l} />
-                            <span style={small}>{SLOT_WHY[l.slot]}</span>
-                        </div>
-                    ))}
-                </div>
             </div>
-        </div>
+        </ElevationPanel>
     );
 };
 
@@ -799,48 +802,50 @@ export const CrossSection = () => {
     const y = (v) => H - B - (Math.min(v, peak) / peak) * (H - B - 12);
 
     return (
-        <div style={stack} data-testid="cross-section">
-            <div style={{ ...row, justifyContent: 'space-between' }}>
-                <ul aria-label="Levels" style={{ ...row, margin: 0, padding: 0, listStyle: 'none' }}>
-                    {series.map((s) => (
-                        <li key={s.level.id} style={{ ...row, gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
-                            <span aria-hidden="true" style={{ width: 'var(--image-xs)', height: 'calc(var(--border-width-default) * 2)', background: CHART_TONES[s.level.id] }} />
-                            {s.level.name} <span style={small}>reaches {Math.round(s.reach)}</span>
-                        </li>
-                    ))}
-                </ul>
-                <Choice name="Color mode" options={MODE_OPTIONS} value={mode} onChange={setMode} />
+        <ElevationPanel>
+            <div style={stack} data-testid="cross-section">
+                <div style={{ ...row, justifyContent: 'space-between' }}>
+                    <ul aria-label="Levels" style={{ ...row, margin: 0, padding: 0, listStyle: 'none' }}>
+                        {series.map((s) => (
+                            <li key={s.level.id} style={{ ...row, gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+                                <span aria-hidden="true" style={{ width: 'var(--image-xs)', height: 'calc(var(--border-width-default) * 2)', background: CHART_TONES[s.level.id] }} />
+                                {s.level.name} <span style={small}>reaches {Math.round(s.reach)}</span>
+                            </li>
+                        ))}
+                    </ul>
+                    <Choice name="Color mode" options={MODE_OPTIONS} value={mode} onChange={setMode} />
+                </div>
+                <div ref={ref} data-color-mode={mode} {...(contrast ? { 'data-contrast-mode': contrast } : {})} data-docs-stage style={{ ...well, background: 'var(--ds-surface)' }}>
+                    <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-labelledby="elevation-cross-title" style={{ display: 'block', width: '100%', height: 'auto', overflow: 'visible' }}>
+                        <title id="elevation-cross-title">
+                            {`Darkness of the ground below the edge. ${series.map((s) => `${s.level.name} reaches ${Math.round(s.reach)} px`).join(', ')}.`}
+                        </title>
+                        <line x1={L} y1={H - B} x2={W - 8} y2={H - B} stroke="var(--ds-border)" />
+                        <line x1={L} y1={12} x2={L} y2={H - B} stroke="var(--ds-border)" />
+                        {[0, 0.5, 1].map((t) => (
+                            <text key={t} x={L - 6} y={y(t * peak) + 4} textAnchor="end" fill="var(--ds-text-subtle)" style={{ font: 'var(--body-sm)' }}>
+                                {`${Math.round(t * peak * 100)}%`}
+                            </text>
+                        ))}
+                        {[0, 0.25, 0.5, 0.75, 1].map((t) => (
+                            <text key={t} x={x(t * span)} y={H - B + 16} textAnchor="middle" fill="var(--ds-text-subtle)" style={{ font: 'var(--body-sm)' }}>
+                                {Math.round(t * span)}
+                            </text>
+                        ))}
+                        <text x={W - 8} y={H - 2} textAnchor="end" fill="var(--ds-text-subtle)" style={{ font: 'var(--body-sm)' }}>px below the edge</text>
+                        {series.map((s) => {
+                            const pts = samples(s.layers).filter(([d]) => d >= 1);
+                            return (
+                                <g key={s.level.id} data-series={s.level.id}>
+                                    <polyline fill="none" stroke={CHART_TONES[s.level.id]} strokeWidth="2" strokeLinejoin="round" points={pts.map(([d, v]) => `${x(d)},${y(v)}`).join(' ')} />
+                                    <line x1={x(s.reach)} y1={H - B} x2={x(s.reach)} y2={H - B - 6} stroke={CHART_TONES[s.level.id]} strokeWidth="2" />
+                                </g>
+                            );
+                        })}
+                    </svg>
+                </div>
             </div>
-            <div ref={ref} data-color-mode={mode} {...(contrast ? { 'data-contrast-mode': contrast } : {})} data-docs-stage style={well}>
-                <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-labelledby="elevation-cross-title" style={{ display: 'block', width: '100%', height: 'auto', overflow: 'visible' }}>
-                    <title id="elevation-cross-title">
-                        {`Darkness of the ground below the edge. ${series.map((s) => `${s.level.name} reaches ${Math.round(s.reach)} px`).join(', ')}.`}
-                    </title>
-                    <line x1={L} y1={H - B} x2={W - 8} y2={H - B} stroke="var(--ds-border)" />
-                    <line x1={L} y1={12} x2={L} y2={H - B} stroke="var(--ds-border)" />
-                    {[0, 0.5, 1].map((t) => (
-                        <text key={t} x={L - 6} y={y(t * peak) + 4} textAnchor="end" fill="var(--ds-text-subtle)" style={{ font: 'var(--body-sm)' }}>
-                            {`${Math.round(t * peak * 100)}%`}
-                        </text>
-                    ))}
-                    {[0, 0.25, 0.5, 0.75, 1].map((t) => (
-                        <text key={t} x={x(t * span)} y={H - B + 16} textAnchor="middle" fill="var(--ds-text-subtle)" style={{ font: 'var(--body-sm)' }}>
-                            {Math.round(t * span)}
-                        </text>
-                    ))}
-                    <text x={W - 8} y={H - 2} textAnchor="end" fill="var(--ds-text-subtle)" style={{ font: 'var(--body-sm)' }}>px below the edge</text>
-                    {series.map((s) => {
-                        const pts = samples(s.layers).filter(([d]) => d >= 1);
-                        return (
-                            <g key={s.level.id} data-series={s.level.id}>
-                                <polyline fill="none" stroke={CHART_TONES[s.level.id]} strokeWidth="2" strokeLinejoin="round" points={pts.map(([d, v]) => `${x(d)},${y(v)}`).join(' ')} />
-                                <line x1={x(s.reach)} y1={H - B} x2={x(s.reach)} y2={H - B - 6} stroke={CHART_TONES[s.level.id]} strokeWidth="2" />
-                            </g>
-                        );
-                    })}
-                </svg>
-            </div>
-        </div>
+        </ElevationPanel>
     );
 };
 
@@ -1111,3 +1116,16 @@ export const ContrastDemo = () => {
         </div>
     );
 };
+
+export {
+    ByTemplateGrid,
+    ElevationPanel,
+    LayerDetailRow,
+    LayerDiagramPanel,
+    OverviewStack,
+    PageSurfacesStack,
+    ShadowRampFigure,
+    ShadowTokensEquation,
+} from './elevation-folder-figures.jsx';
+
+
