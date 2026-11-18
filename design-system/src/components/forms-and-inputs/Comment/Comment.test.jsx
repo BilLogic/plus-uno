@@ -25,9 +25,9 @@ describe('Comment', () => {
     it('pins nestedReplies headings to headingLevel via HeadingContextProvider', () => {
         render(
             <Comment
-                author="Ari"
+                author="Sam"
                 content="Top"
-                nestedReplies={<Heading size="xsmall">Reply heading</Heading>}
+                nestedReplies={<Heading size="xs">Reply heading</Heading>}
                 headingLevel={3}
             />
         );

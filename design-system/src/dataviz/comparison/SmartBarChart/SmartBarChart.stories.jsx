@@ -66,7 +66,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Grade distribution</Heading>
+                <Heading as="h3" size="sm">Grade distribution</Heading>
                 <p style={captionStyle}>
                     Ordinal grades (A–E) keep their axis order with {'sort={false}'} while toneByRank places the darkest tone on the largest share.
                 </p>
@@ -74,7 +74,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Weekly activity</Heading>
+                <Heading as="h3" size="sm">Weekly activity</Heading>
                 <p style={captionStyle}>
                     Visualizes activity levels across weekdays in the single-series brand color.
                 </p>

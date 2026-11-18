@@ -171,7 +171,7 @@ const InboxDayList = ({ items, onMarkRead }) => {
             {groups.map((group) => (
                 <section key={group.day} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                     <div style={{ paddingInline: 'var(--pad-x-md)' }}>
-                        <Heading size="xxsmall">{group.day}</Heading>
+                        <Heading size="xxs">{group.day}</Heading>
                     </div>
                     <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                         {group.items.map((item) => (

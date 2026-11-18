@@ -71,7 +71,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Completion progress</Heading>
+                <Heading as="h3" size="sm">Completion progress</Heading>
                 <p style={captionStyle}>
                     Two-segment ring filling a single measure against the neutral track.
                 </p>
@@ -79,7 +79,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Multi-segment distribution</Heading>
+                <Heading as="h3" size="sm">Multi-segment distribution</Heading>
                 <p style={captionStyle}>
                     Categorical segments sort from most to least and take the categorical palette in order.
                 </p>
@@ -87,7 +87,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Compact size</Heading>
+                <Heading as="h3" size="sm">Compact size</Heading>
                 <p style={captionStyle}>
                     Smaller diameter paired with the small Metric step for dense cards.
                 </p>
