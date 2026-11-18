@@ -102,7 +102,7 @@ Take both width and color from this table.
         <span style={caption}>Invalid: Border/default + color/border/danger</span>
     </div>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-        <span style={field({ outline: 'var(--border-width-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--stroke-2)' })}>Value</span>
+        <span style={field({ outline: 'var(--border-width-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--focus-ring-offset)' })}>Value</span>
         <span style={caption}>Focused: Border/focused + color/border/focused</span>
     </div>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
@@ -131,14 +131,14 @@ The focus ring shows keyboard users where they are. It is a ring, never a fill: 
 
 <FoundationExample caption="A ring, drawn 2 px away from the control in the focused border color, with the field's own fill unchanged.">
 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--section-stack-md)', padding: 'var(--pad-x-md)' }}>
-    <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--control-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', outline: 'var(--border-width-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--stroke-2)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Button</span>
-    <span style={field({ minWidth: 'var(--field-width-md)', outline: 'var(--border-width-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--stroke-2)', color: 'var(--ds-text-subtlest)' })}>Placeholder</span>
+    <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--control-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', outline: 'var(--border-width-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--focus-ring-offset)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Button</span>
+    <span style={field({ minWidth: 'var(--field-width-md)', outline: 'var(--border-width-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--focus-ring-offset)', color: 'var(--ds-text-subtlest)' })}>Placeholder</span>
 </div>
 </FoundationExample>
 
 <DoDont>
 <Do caption="The field keeps its fill and gains the ring.">
-<span style={field({ outline: 'var(--border-width-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--stroke-2)' })}>Lincoln Middle Thursday</span>
+<span style={field({ outline: 'var(--border-width-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--focus-ring-offset)' })}>Lincoln Middle Thursday</span>
 </Do>
 <Dont caption="A filled field reads as selected and hides what is typed.">
 <span style={field({ background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', boxShadow: 'none' })}>Lincoln Middle Thursday</span>
