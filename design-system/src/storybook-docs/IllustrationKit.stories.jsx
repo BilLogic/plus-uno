@@ -208,7 +208,7 @@ export const Zone = {
           y={16}
           w={200}
           h={120}
-          radius={8}
+          radius="var(--card-radius)"
           inner={{ x: 40, y: 32, w: 168, h: 88 }}
           label="space-100"
           labelPos={{ x: 244, y: 24, anchor: 'start' }}
@@ -355,6 +355,13 @@ export const CoreSizeMatrix = {
     await expect(matrix).not.toBeNull();
     await expect(matrix.querySelectorAll('[data-matrix-col]').length).toBe(5);
     await expect(matrix.querySelectorAll('[data-matrix-row]').length).toBe(6);
+    const buttonRow = matrix.querySelector('[data-matrix-row="button"]');
+    const buttonRects = [...buttonRow.querySelectorAll('svg rect')];
+    await expect(buttonRects[0].style.rx).toContain('--button-radius-compact');
+    await expect(buttonRects[2].style.rx).toContain('--button-radius-default');
+    await expect(buttonRects[3].getAttribute('fill')).toBe('var(--ds-skeleton)');
+    await expect(buttonRects[3].getAttribute('opacity')).toBeNull();
+    await expect(buttonRects[4].style.rx).toContain('--button-radius-spacious');
     const rowGroup = matrix.querySelector('[data-matrix-row="row"]');
     await expect(rowGroup.querySelectorAll('[data-row-edge="top"]').length).toBe(3);
     await expect(rowGroup.querySelectorAll('[data-row-edge="bottom"]').length).toBe(3);
@@ -373,6 +380,11 @@ export const ControlConstruction = {
   play: async ({ canvasElement }) => {
     const svg = canvasElement.querySelector('svg[role="img"]');
     await expect(everyPaintIsAToken(svg)).toBe(true);
+    const buttonRect = svg.querySelector('[data-figure="control-construction"] > rect');
+    await expect(buttonRect.style.rx).toContain('--button-radius-default');
+    const clipRect = svg.querySelector('[data-zone-kind="pad"] clipPath rect');
+    await expect(clipRect).not.toBeNull();
+    await expect(clipRect.style.rx).toContain('--button-radius-default');
     await expect(svg.querySelectorAll('[data-part="measure"]').length).toBe(2);
     await expect(svg.querySelectorAll('[data-part="zone"]').length).toBe(1);
     await expect(svg.querySelectorAll('[data-zone-label]').length).toBe(2);

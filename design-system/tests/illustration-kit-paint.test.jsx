@@ -94,11 +94,20 @@ describe('every drawn paint resolves to a role', () => {
     ...Object.entries(compositions)
       .filter(([, C]) => typeof C === 'function')
       .map(([name, C]) => [name, name === 'ResponsiveReflow' ? <C width={1280} /> : <C />]),
-    ['Measure', <construction.Measure x={4} y={4} w={100} h={60} label="size-200" />],
-    ['Zone (gap)', <construction.Zone x={4} y={4} w={100} h={60} label="space-100" />],
-    ['Zone (pad)', <construction.Zone kind="pad" x={4} y={4} w={100} h={60} inset={8} />],
-    ['Baseline', <construction.Baseline x={4} y={4} w={100} h={60} />],
-    ['Columns', <construction.Columns x={4} y={4} w={100} h={60} />],
+    ['Measure accent=false', <construction.Measure x={4} y={4} w={100} h={60} label="size-200" accent={false} />],
+    ['Measure accent=true', <construction.Measure x={4} y={4} w={100} h={60} label="size-200" accent={true} />],
+    ['Zone (gap) accent=false', <construction.Zone x={4} y={4} w={100} h={60} label="space-100" accent={false} />],
+    ['Zone (gap) accent=true', <construction.Zone x={4} y={4} w={100} h={60} label="space-100" accent={true} />],
+    ['Zone (pad) accent=false', <construction.Zone kind="pad" x={4} y={4} w={100} h={60} inset={8} accent={false} />],
+    ['Zone (pad) accent=true', <construction.Zone kind="pad" x={4} y={4} w={100} h={60} inset={8} accent={true} />],
+    ['Baseline accent=false', <construction.Baseline x={4} y={4} w={100} h={60} accent={false} />],
+    ['Baseline accent=true', <construction.Baseline x={4} y={4} w={100} h={60} accent={true} />],
+    ['Columns accent=false', <construction.Columns x={4} y={4} w={100} h={60} accent={false} />],
+    ['Columns accent=true', <construction.Columns x={4} y={4} w={100} h={60} accent={true} />],
+    ...construction.CONSTRUCTION_SETS.flatMap(([name, draw]) => [
+      [`gallery:${name} accent=false`, draw(false)],
+      [`gallery:${name} accent=true`, draw(true)],
+    ]),
     ['ScaleStrip', <construction.ScaleStrip />],
     ['ControlConstruction', <construction.ControlConstruction />],
   ];

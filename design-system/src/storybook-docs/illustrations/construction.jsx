@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useId } from 'react';
 import { Illustration } from './Illustration.jsx';
-import { HAIRLINE, MONO_LABEL_FONT, PAINT, scaledCorner } from './paint.js';
+import { CORNER, HAIRLINE, MONO_LABEL_FONT, PAINT, scaledCorner } from './paint.js';
+import { Rect, SkeletonBar } from './primitives.jsx';
 
 /**
  * Construction-kit parts and layout figures built on top of the illustration
@@ -11,12 +12,14 @@ import { HAIRLINE, MONO_LABEL_FONT, PAINT, scaledCorner } from './paint.js';
 
 export const MAX_LABELED_ZONES = 3;
 
-const CORE_OUTLINE = { strokeWidth: 'var(--stroke-2)' };
+const CORE_OUTLINE = { strokeWidth: 'var(--border-width-selected)' };
 const cornerStyle = (value) => ({ rx: value, ry: value });
-const RADIUS_CONTROL_SM_2X = cornerStyle(scaledCorner('window', 2));
+const RADIUS_BUTTON_COMPACT_2X = cornerStyle(scaledCorner('buttonCompact', 2));
+const RADIUS_BUTTON_DEFAULT_2X = cornerStyle(scaledCorner('button', 2));
+const RADIUS_BUTTON_SPACIOUS_2X = cornerStyle(scaledCorner('buttonSpacious', 2));
+const RADIUS_BUTTON_DEFAULT_4X = cornerStyle(scaledCorner('button', 4));
 const RADIUS_CONTROL_MD_2X = cornerStyle(scaledCorner('tab', 2));
 const RADIUS_CONTROL_LG_2X = cornerStyle(scaledCorner('field', 2));
-const RADIUS_CONTROL_MD_4X = cornerStyle(scaledCorner('tab', 4));
 const RADIUS_4 = cornerStyle('var(--radius-md)');
 const RADIUS_CARD = cornerStyle('var(--card-radius)');
 const RADIUS_6 = cornerStyle('var(--radius-control-sm)');
@@ -24,7 +27,6 @@ const RADIUS_ICON_2X = cornerStyle(scaledCorner('icon', 2));
 
 const PAD_OPACITY = 0.68;
 const COLUMNS_OPACITY = 0.45;
-const PRIMARY_BAR_OPACITY = 0.42;
 
 /**
  * A dimension bracket for a box's own height (`axis="vertical"`) or width
@@ -32,24 +34,26 @@ const PRIMARY_BAR_OPACITY = 0.42;
  * `space-100`) in `--ds-text-accent-magenta` mono 11 and drawn with
  * `--ds-border-accent-magenta`.
  */
-export const Measure = ({ x = 0, y = 0, w, h, axis, side, label, tick = 4 }) => {
+export const Measure = ({ x = 0, y = 0, w, h, axis, side, label, tick = 4, accent = false }) => {
   const horizontal = axis === 'horizontal' || (axis !== 'vertical' && w !== undefined && h === undefined);
+  const linePaint = accent ? PAINT.accent : PAINT.measureLine;
+  const textPaint = accent ? PAINT.accent : PAINT.measureText;
   if (horizontal) {
     const span = Math.max(0, w ?? 0);
     const top = side === 'top';
     const ly = top ? y - tick * 2 : y + tick * 2;
     return (
       <g data-part="measure" data-axis="horizontal">
-        <line x1={x} y1={y} x2={x + span} y2={y} stroke={PAINT.measureLine} style={HAIRLINE} />
-        <line x1={x} y1={y - tick} x2={x} y2={y + tick} stroke={PAINT.measureLine} style={HAIRLINE} />
-        <line x1={x + span} y1={y - tick} x2={x + span} y2={y + tick} stroke={PAINT.measureLine} style={HAIRLINE} />
+        <line x1={x} y1={y} x2={x + span} y2={y} stroke={linePaint} style={HAIRLINE} />
+        <line x1={x} y1={y - tick} x2={x} y2={y + tick} stroke={linePaint} style={HAIRLINE} />
+        <line x1={x + span} y1={y - tick} x2={x + span} y2={y + tick} stroke={linePaint} style={HAIRLINE} />
         {label && (
           <text
             x={x + span / 2}
             y={ly}
             textAnchor="middle"
             dominantBaseline={top ? 'auto' : 'hanging'}
-            fill={PAINT.measureText}
+            fill={textPaint}
             style={MONO_LABEL_FONT}
           >
             {label}
@@ -64,16 +68,16 @@ export const Measure = ({ x = 0, y = 0, w, h, axis, side, label, tick = 4 }) => 
   const lx = right ? x + tick * 2 : x - tick * 2;
   return (
     <g data-part="measure" data-axis="vertical">
-      <line x1={x} y1={y} x2={x} y2={y + span} stroke={PAINT.measureLine} style={HAIRLINE} />
-      <line x1={x - tick} y1={y} x2={x + tick} y2={y} stroke={PAINT.measureLine} style={HAIRLINE} />
-      <line x1={x - tick} y1={y + span} x2={x + tick} y2={y + span} stroke={PAINT.measureLine} style={HAIRLINE} />
+      <line x1={x} y1={y} x2={x} y2={y + span} stroke={linePaint} style={HAIRLINE} />
+      <line x1={x - tick} y1={y} x2={x + tick} y2={y} stroke={linePaint} style={HAIRLINE} />
+      <line x1={x - tick} y1={y + span} x2={x + tick} y2={y + span} stroke={linePaint} style={HAIRLINE} />
       {label && (
         <text
           x={lx}
           y={y + span / 2}
           textAnchor={right ? 'start' : 'end'}
           dominantBaseline="central"
-          fill={PAINT.measureText}
+          fill={textPaint}
           style={MONO_LABEL_FONT}
         >
           {label}
@@ -127,22 +131,36 @@ export const Zone = ({
   labelPos,
   leader,
   labels,
+  accent = false,
 }) => {
+  const clipId = useId().replace(/:/g, '');
   const isPad = kind === 'pad' || Boolean(inner) || inset !== undefined;
   const resolvedInner = isPad ? resolveInner(x, y, w, h, inner, inset) : null;
   const fillOpacity = opacity ?? (isPad || translucent ? PAD_OPACITY : 1);
+  const zoneFill = accent ? PAINT.accent : PAINT.zone;
+  const linePaint = accent ? PAINT.accent : PAINT.measureLine;
+  const textPaint = accent ? PAINT.accent : PAINT.measureText;
+  const useTokenClip = isPad && typeof radius === 'string';
   const callouts = (
     labels ?? (label ? [{ text: label, x: labelPos?.x ?? x + w + 8, y: labelPos?.y ?? y + h / 2, anchor: labelPos?.anchor ?? 'start', leader }] : [])
   ).slice(0, MAX_LABELED_ZONES);
 
   return (
     <g data-part="zone" data-zone-kind={isPad ? 'pad' : 'gap'}>
+      {useTokenClip && (
+        <defs>
+          <clipPath id={clipId}>
+            <rect x={x} y={y} width={Math.max(0, w)} height={Math.max(0, h)} style={cornerStyle(radius)} />
+          </clipPath>
+        </defs>
+      )}
       {isPad ? (
         <path
-          d={padPath({ x, y, w: Math.max(0, w), h: Math.max(0, h), r: radius, inner: resolvedInner })}
-          fill={PAINT.zone}
+          d={padPath({ x, y, w: Math.max(0, w), h: Math.max(0, h), r: useTokenClip ? 0 : radius, inner: resolvedInner })}
+          fill={zoneFill}
           fillRule="evenodd"
           opacity={fillOpacity}
+          clipPath={useTokenClip ? `url(#${clipId})` : undefined}
         />
       ) : (
         <rect
@@ -150,7 +168,7 @@ export const Zone = ({
           y={y}
           width={Math.max(0, w)}
           height={Math.max(0, h)}
-          fill={PAINT.zone}
+          fill={zoneFill}
           opacity={fillOpacity}
         />
       )}
@@ -162,7 +180,7 @@ export const Zone = ({
               y1={c.leader.y1}
               x2={c.leader.x2}
               y2={c.leader.y2}
-              stroke={PAINT.measureLine}
+              stroke={linePaint}
               strokeDasharray="3 3"
               style={HAIRLINE}
             />
@@ -172,7 +190,7 @@ export const Zone = ({
             y={c.y}
             textAnchor={c.anchor ?? 'start'}
             dominantBaseline="central"
-            fill={PAINT.measureText}
+            fill={textPaint}
             style={MONO_LABEL_FONT}
             data-zone-label=""
           >
@@ -188,14 +206,14 @@ export const Zone = ({
  * A 4-unit grid of horizontal hairlines behind a figure (`step = 4` by default,
  * or `step = 8` for a 2x drawing).
  */
-export const Baseline = ({ x = 0, y = 0, w = 100, h = 60, step = 4 }) => {
+export const Baseline = ({ x = 0, y = 0, w = 100, h = 60, step = 4, accent = false }) => {
   const pitch = Math.max(1, step);
   const ys = [];
   for (let ly = y; ly <= y + h + 0.001; ly += pitch) ys.push(ly);
   return (
     <g data-part="baseline" aria-hidden="true">
       {ys.map((ly) => (
-        <line key={ly} x1={x} y1={ly} x2={x + w} y2={ly} stroke={PAINT.baseline} style={HAIRLINE} />
+        <line key={ly} x1={x} y1={ly} x2={x + w} y2={ly} stroke={accent ? PAINT.accent : PAINT.baseline} style={HAIRLINE} />
       ))}
     </g>
   );
@@ -205,7 +223,7 @@ export const Baseline = ({ x = 0, y = 0, w = 100, h = 60, step = 4 }) => {
  * Grid columns only, painted in `--ds-background-accent-blue-subtler` at
  * translucent opacity so underlying surfaces show through.
  */
-export const Columns = ({ x = 0, y = 0, w = 100, h = 60, columns = 12, gutter = 16, opacity = COLUMNS_OPACITY }) => {
+export const Columns = ({ x = 0, y = 0, w = 100, h = 60, columns = 12, gutter = 16, opacity = COLUMNS_OPACITY, accent = false }) => {
   const count = Math.max(1, columns);
   const safeGutter = count > 1 ? Math.min(gutter, w / (count * 2)) : 0;
   const colW = Math.max(0, (w - (count - 1) * safeGutter) / count);
@@ -218,7 +236,7 @@ export const Columns = ({ x = 0, y = 0, w = 100, h = 60, columns = 12, gutter = 
           y={y}
           width={colW}
           height={Math.max(0, h)}
-          fill={PAINT.columns}
+          fill={accent ? PAINT.accent : PAINT.columns}
           opacity={opacity}
         />
       ))}
@@ -350,9 +368,9 @@ const MatrixCellSvg = ({ width, height, label, children }) => (
 );
 
 const BUTTON_SPEC = {
-  24: { w: 86, h: 48, radius: RADIUS_CONTROL_SM_2X, primary: false, barW: 44 },
-  32: { w: 116, h: 64, radius: RADIUS_CONTROL_MD_2X, primary: true, barW: 58 },
-  48: { w: 136, h: 96, radius: RADIUS_CONTROL_LG_2X, primary: false, barW: 68 },
+  24: { w: 86, h: 48, radius: RADIUS_BUTTON_COMPACT_2X, primary: false, barW: 44 },
+  32: { w: 116, h: 64, radius: RADIUS_BUTTON_DEFAULT_2X, primary: true, barW: 58 },
+  48: { w: 136, h: 96, radius: RADIUS_BUTTON_SPACIOUS_2X, primary: false, barW: 68 },
 };
 
 const FIELD_SPEC = {
@@ -377,8 +395,7 @@ export const CoreSizeMatrix = () => (
           data-matrix-col={px}
           style={{
             textAlign: 'center',
-            fontFamily: 'var(--type-family-code)',
-            fontSize: 'var(--type-size-0875)',
+            font: 'var(--code-default)',
             fontWeight: 'var(--type-weight-medium)',
           }}
         >
@@ -427,8 +444,7 @@ export const CoreSizeMatrix = () => (
                 y={(spec.h - 32) / 2}
                 width={spec.barW}
                 height={32}
-                fill={spec.primary ? PAINT.buttonPrimaryText : PAINT.placeholderText}
-                opacity={spec.primary ? PRIMARY_BAR_OPACITY : 1}
+                fill={PAINT.placeholderText}
                 style={RADIUS_CARD}
               />
             </MatrixCellSvg>
@@ -570,7 +586,7 @@ export const ControlConstruction = () => (
     title="A 32 Button built from 6 + 20 + 6 with 12 pad-x around its 20 label line"
   >
     <g data-figure="control-construction">
-      <rect x={80} y={26} width={232} height={128} fill={PAINT.buttonDefault} style={RADIUS_CONTROL_MD_4X} />
+      <rect x={80} y={26} width={232} height={128} fill={PAINT.buttonDefault} style={RADIUS_BUTTON_DEFAULT_4X} />
       <rect x={128} y={58} width={136} height={64} fill={PAINT.placeholderText} style={RADIUS_4} />
       <Zone
         kind="pad"
@@ -578,7 +594,7 @@ export const ControlConstruction = () => (
         y={26}
         w={232}
         h={128}
-        radius={32}
+        radius={scaledCorner('button', 4)}
         inner={{ x: 128, y: 50, w: 136, h: 80 }}
         labels={[
           { text: 'space-0375', x: 336, y: 38, anchor: 'start', leader: { x1: 288, y1: 38, x2: 330, y2: 38 } },
@@ -590,3 +606,36 @@ export const ControlConstruction = () => (
     </g>
   </Illustration>
 );
+
+/** Gallery entries, neutral above and accented below, in the kit gallery's 160 x 100 cell. */
+export const CONSTRUCTION_SETS = [
+  [
+    'Measure',
+    (a) => (
+      <>
+        <Rect x={44} y={26} w={84} h={48} fill={PAINT.shape} corner="shape" />
+        <Measure x={32} y={26} h={48} accent={a} />
+      </>
+    ),
+  ],
+  [
+    'Zone',
+    (a) => (
+      <>
+        <Rect x={28} y={22} w={104} h={56} fill={PAINT.shape} corner="shape" />
+        <Zone kind="pad" x={28} y={22} w={104} h={56} inset={10} radius={CORNER.shape} accent={a} />
+      </>
+    ),
+  ],
+  [
+    'Baseline',
+    (a) => (
+      <>
+        <Baseline x={16} y={18} w={128} h={64} step={8} accent={a} />
+        <SkeletonBar x={24} y={34} w={88} h={8} />
+        <SkeletonBar x={24} y={50} w={64} h={8} />
+      </>
+    ),
+  ],
+  ['Columns', (a) => <Columns x={16} y={16} w={128} h={68} columns={12} gutter={4} accent={a} />],
+];

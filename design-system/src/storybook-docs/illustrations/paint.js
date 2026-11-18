@@ -170,6 +170,8 @@ export const HEIGHTS = {
 const CORNERS = {
   window: ['--radius-control-sm', null],
   button: ['--button-radius-default', 'components/forms-and-inputs/Button/Button.scss'],
+  buttonCompact: ['--button-radius-compact', 'components/forms-and-inputs/Button/Button.scss'],
+  buttonSpacious: ['--button-radius-spacious', 'components/forms-and-inputs/Button/Button.scss'],
   card: ['--card-radius', 'patterns/PatternCard/PatternCard.scss'],
   section: ['--section-radius', 'patterns/PatternSection/PatternSection.scss'],
   popup: ['--popup-radius', 'components/overlays-and-layering/Popup/Popup.scss'],
@@ -236,10 +238,10 @@ export const LABEL_FONT = {
 
 /**
  * Mono 11 label for construction-kit brackets and zone callouts, built from
- * tokens (12px `--type-size-075` minus 1px `--stroke-1`).
+ * tokens (12px `--type-size-075` minus 1px `--border-width-default`).
  */
 export const MONO_LABEL_FONT = {
   fontFamily: 'var(--type-family-code)',
   fontWeight: 'var(--type-weight-medium)',
-  fontSize: 'calc(var(--type-size-075) - var(--stroke-1))',
+  fontSize: 'calc(var(--type-size-075) - var(--border-width-default))',
 };
