@@ -833,7 +833,6 @@
         "X-Large (1440px)"
       ],
       "variables": [
-        "Blanket/fill",
         "Blanket/pad-x",
         "Blanket/pad-y",
         "Card/inline-lg",
@@ -952,7 +951,6 @@
         "Table/radius"
       ],
       "codeSyntax": {
-        "Blanket/fill": "var(--blanket-fill)",
         "Blanket/pad-x": "var(--blanket-pad-x)",
         "Blanket/pad-y": "var(--blanket-pad-y)",
         "Card/inline-lg": "var(--card-inline-lg)",

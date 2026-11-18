@@ -267,7 +267,6 @@
       "Stack/sm": "var(--stack-sm)"
     },
     "spacing / templates": {
-      "Blanket/fill": "var(--blanket-fill)",
       "Blanket/pad-x": "var(--blanket-pad-x)",
       "Blanket/pad-y": "var(--blanket-pad-y)",
       "Card/inline-lg": "var(--card-inline-lg)",

@@ -236,16 +236,12 @@ test('every one-mode frame and layer token resolves to its value', () => {
   }
 });
 
-test('the scrim is black at 38%', () => {
-  assert.equal(corpus.get('--blanket-fill')?.value, 'rgba(0, 0, 0, 0.38)');
-});
-
 test('a modal is never taller than the screen less the overlay pad above and below', () => {
   assert.equal(corpus.get('--blanket-max-height-modal')?.raw, 'calc(100dvh - 2 * var(--blanket-pad-y))');
 });
 
 test('no new token name uses a banned word', () => {
-  const names = [...Object.keys(LAYOUT), ...Object.keys(FIXED), '--page-pad', '--blanket-fill'];
+  const names = [...Object.keys(LAYOUT), ...Object.keys(FIXED), '--page-pad'];
   for (const name of names) {
     assert.doesNotMatch(name, /margin|shell|slot|viewport|top-bar/, name);
   }
@@ -281,7 +277,7 @@ test('every exported variable offers itself only where it belongs: explicit scop
 });
 
 test('the new names take no family prefix, and never land on an old --size-* name', () => {
-  for (const name of [...Object.keys(LAYOUT), ...Object.keys(FIXED), '--page-pad', '--blanket-fill']) {
+  for (const name of [...Object.keys(LAYOUT), ...Object.keys(FIXED), '--page-pad']) {
     assert.doesNotMatch(name, /^--(size|color)-/, name);
   }
   // Specs reference these ahead of time with fallbacks; they stay undefined until the Modal migration.
