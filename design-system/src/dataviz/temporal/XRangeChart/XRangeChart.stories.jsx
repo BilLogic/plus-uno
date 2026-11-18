@@ -34,6 +34,8 @@ const captionStyle = {
 
 const monday = Date.UTC(2026, 8, 7);
 const day = 24 * 36e5;
+const hour = 36e5;
+const minute = 60e3;
 
 const scheduleData = {
     categories: ['Tutor A', 'Tutor B', 'Tutor C'],
@@ -74,8 +76,24 @@ export const Interactive = {
     args: {
         categories: ['Maya Lin', 'Devon Brooks'],
         data: [
-            { start: monday, end: monday + day, y: 0, name: 'Algebra I at Lincoln Middle' },
-            { start: monday + day, end: monday + day * 2, y: 1, name: 'Fractions at Roosevelt K-8' },
+            {
+                start: monday + 15 * hour + 30 * minute,
+                end: monday + 16 * hour + 30 * minute,
+                y: 0,
+                name: 'Algebra I at Lincoln Middle',
+            },
+            {
+                start: monday + day + 16 * hour,
+                end: monday + day + 16 * hour + 45 * minute,
+                y: 1,
+                name: 'Fractions at Roosevelt K-8',
+            },
+            {
+                start: monday + day * 2 + 15 * hour + 45 * minute,
+                end: monday + day * 2 + 16 * hour + 30 * minute,
+                y: 0,
+                name: 'Linear equations at Lincoln Middle',
+            },
         ],
         height: 400,
         sort: false,
