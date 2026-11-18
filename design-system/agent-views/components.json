@@ -9268,7 +9268,7 @@
           "required": true,
           "default": null,
           "values": null,
-          "description": "Row 3, after Search: one `{ key, label, text, isSelected, onClick }` per trigger, drawn as a FilterButton that reads \"label: text\". Three show; the rest go in \"More filters\" with a count. Under 768 they fold into one Filter button.",
+          "description": "Row 3, after Search: one `{ key, label, text, isSelected, onClick, menu }` per trigger, drawn as a FilterButton that reads \"label: text\". `menu` is `(trigger) => node`: hand the trigger to a Popup select or a Filter menu, so the same button opens the list and keeps its selected state. Three show; the rest go in \"More filters\" with a count. Under 768 they fold into one Filter button. When they do not fit beside Search they wrap to their own row, end-aligned.",
           "deprecated": null
         },
         {
@@ -9492,10 +9492,7 @@
       "stories": [
         "Overview",
         "HeaderDefault",
-        "HeaderTabs",
-        "HeaderToolbar",
         "HeaderCustom",
-        "HeaderTabsOnly",
         "LayoutSingle",
         "LayoutSplit",
         "LayoutSubsections",
@@ -9528,6 +9525,7 @@
         "NoViews",
         "ViewsOnly",
         "ManyFilters",
+        "WrappedFilters",
         "RowsSelected",
         "Narrow",
         "Subsection",
@@ -13725,8 +13723,7 @@
             "element-radius-lg",
             "element-radius-full",
             "card-radius-sm",
-            "card-radius-md",
-            "card-radius-lg"
+            "card-radius-md"
           ],
           "description": "A radius token name, such as `element-radius-md` or `card-radius-sm`. Ignored, with a warning, by presets, by `circle` (always round) and by several text `lines`, which keep the text bar's radius.",
           "deprecated": null

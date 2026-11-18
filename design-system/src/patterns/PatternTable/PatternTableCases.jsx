@@ -1,7 +1,7 @@
 import React from 'react';
 import PatternTable from '@/patterns/PatternTable';
 import PatternSection from '@/patterns/PatternSection';
-import { DynamicTable, Icon, SearchField, TreeTable } from '@/components';
+import { DynamicTable, FilterButton, Icon, SearchField, TreeTable } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 
 /**
@@ -223,11 +223,14 @@ const FramedTableCase = () => (
     </InSection>
 );
 
-/** A second toolbar between the Section header and the head row. */
+/** A second row of filters and a count between the Section header and the head row, repeating what the header's own rows carry. */
 const SecondToolbarCase = () => (
     <InSection>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
-            <PatternSection.Toolbar count="12 records" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
+                <FilterButton label="Tutor" text="All" onClick={() => {}} />
+                <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>12 records</span>
+            </div>
             {studentTable}
         </div>
     </InSection>

@@ -15,10 +15,6 @@ import {
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 import {
-    TitleInViewsRow,
-    TitleRowAboveHeaderRows,
-} from '@/storybook-docs/illustrations/section.jsx';
-import {
     ActionsInTitleRow,
     ActionsInTwoHomes,
     CardOwnsSave,
@@ -27,6 +23,8 @@ import {
     RightSideCrowded,
     RightSideInOrder,
     SectionRepeatsCard,
+    TitleInViewsRow,
+    TitleRowAboveHeaderRows,
 } from './PatternSectionCases.jsx';
 
 <Meta of={PatternSectionStories} />
@@ -297,7 +295,7 @@ The title row sits `--section-stack-sm` above the header rows, and the header si
 
 <RuleTag kind="review" />
 
-Actions sit at the end of the title row, More then the labeled Primary, whether or not the Section has views. Row 2 is for views and the format switch, row 3 for Search and filters, so an action there is a second home.
+Actions sit at the end of the title row, More then the labeled Primary, whether or not the Section has views. The views row is for views and the format switch, the third for Search and filters, so an action there is a second home.
 
 <DoDontPair
     doExample={<ActionsInTitleRow />}
@@ -316,11 +314,11 @@ Views are a fixed set the product defines, and one pill stays even with one view
 
 <RuleTag kind="review" />
 
-Row 1 ends with More, then the labeled Primary, which is last. Row 2 holds the views at the start and the format switch at the end. Row 3 holds a compact `SearchField` (`spacing="compact"`, and `isCollapsible` where the row is tight), then the filter triggers; a trigger that opens a list takes a `menu`. More is an Icon button with a Tooltip. Fold extras into More.
+The title row ends with More, then the labeled Primary, which is last. The views row holds the views at the start and the format switch at the end. The filters row holds a compact `SearchField` (`spacing="compact"`, and `isCollapsible` where the row is tight), then the filter triggers; a trigger that opens a list takes a `menu`. More is an Icon button with a Tooltip. Fold extras into More.
 
 <DoDontPair
     doExample={<RightSideInOrder />}
-    doCaption="More and the labeled Primary in the title row; the format switch ends the views row; Search, then the filter, lead row 3."
+    doCaption="More and the labeled Primary in the title row; the format switch ends the views row; Search, then the filter, lead the filters row."
     dontExample={<RightSideCrowded />}
     dontCaption="Five controls in no order, the Primary first, a second labeled button and a Filter icon in the title row: fold extras into More and give the filter its own row."
 />

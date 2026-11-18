@@ -42,7 +42,7 @@ export default {
 const calloutCanvas = {
     display: 'flex',
     justifyContent: 'center',
-    padding: 'calc(var(--section-stack-md) * 4)',
+    padding: 'calc(var(--pad-x-lg) * 4)',
     minHeight: 'var(--width-2500)',
 };
 const calloutCanvasTall = { ...calloutCanvas, minHeight: 'var(--width-3000)' };

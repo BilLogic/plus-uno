@@ -8,9 +8,9 @@ Also asked as: icon only button, icon action.
 
 **Import:** `import { IconButton } from '@/components';`
 
-**Used in:** Frame (`ds guide frame`); Modal (`ds guide modal`); Popup (`ds guide popup`)
+**Used in:** Frame (`ds guide frame`); Modal (`ds guide modal`); Section (`ds guide section`); Popup (`ds guide popup`)
 
-**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Filtering (`ds guide filtering`); Indicators (`ds guide indicators`); Overflow (`ds guide overflow`)
+**Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Indicators (`ds guide indicators`); Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/IconButton/IconButton.jsx`
 

@@ -89,7 +89,7 @@ const modalDocsHostStyle = {
     border: 'var(--border-width-default) solid var(--ds-border)',
     background: 'var(--ds-surface-sunken)',
     overflow: 'hidden',
-    padding: 'var(--section-stack-md)',
+    padding: 'var(--pad-x-lg)',
 };
 
 function InlineModalCanvas({ minHeight = 'var(--width-2500)', modal }) {

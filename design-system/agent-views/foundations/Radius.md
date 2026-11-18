@@ -19,7 +19,7 @@ Nine rules decide a corner. Take the first one that matches. A radius comes only
 5. **Nested:** inner radius = outer radius − padding. Fix an uneven corner with padding, not a new radius.
 6. **Button in a field:** the field's radius − 4, so 6 default and 4 compact.
 7. **Other controls:** the control's height ÷ 4 (`Radius / Control`).
-8. **Templates:** Section, Modal and Card 16; Popup, Table and boxes inside a page 12; the smallest nested visual 8.
+8. **Templates:** Modal and Card 16; Popup, Table and boxes inside a page 12; the smallest nested visual 8.
 9. **Focus ring:** the element's radius + the ring's offset.
 
 ## Scale
@@ -48,7 +48,7 @@ A button group rounds its outer corners and keeps the inner seams square.
 
 ## Templates
 
-Each template owns a token. A Page sits square in the Frame; a Section with a fill and a Card round at 16.
+Each template owns a token. A Page sits square in the Frame; a Card rounds at 16.
 
 | Template | Radius (px) | Token |
 | --- | --- | --- |
@@ -58,7 +58,7 @@ Each template owns a token. A Page sits square in the Frame; a Section with a fi
 | Popup, menu, Flag | 12 | `--popup-radius` |
 | Table | 12 | `--table-radius` |
 
-A box inside a page (Comment, Code block, Section message, File upload) rounds at 12 (`--radius-xl`). The smallest nested visual (a choice card, a spacious Status tag) rounds at 8 (`--radius-lg`).
+A box inside a page (Comment, Code block, Section message, File upload) takes `--card-radius`, 16, like a Card. The smallest nested visual (a choice card, a spacious Status tag) rounds at 8 (`--radius-lg`).
 
 ### Window edge
 
@@ -103,7 +103,7 @@ The `Radius` group names a step by size; `Radius / Control` names it by control 
 - `--radius-sm` (Radius/sm): Small details.
 - `--radius-md` (Radius/md): Tight grids and small tags.
 - `--radius-lg` (Radius/lg): The smallest nested visual.
-- `--radius-xl` (Radius/xl): Boxes inside a page.
+- `--radius-xl` (Radius/xl): Popup, menu, Flag and Table.
 - `--radius-xxl` (Radius/xxl): The largest templates.
 - `--radius-full` (Radius/full): Pills.
 - `--radius-control-sm` (Radius/Control/sm): 24 high controls.

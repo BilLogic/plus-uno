@@ -8,7 +8,7 @@ Also asked as: popover, flyout, inline dialog.
 
 **Import:** `import { Popup } from '@/components';`
 
-**Used in:** Popup (`ds guide popup`)
+**Used in:** Section (`ds guide section`); Popup (`ds guide popup`)
 
 **Governed by:** Common actions (`ds guide common-actions`); Filtering (`ds guide filtering`); Loading (`ds guide loading`); Overflow (`ds guide overflow`); Search (`ds guide search`)
 

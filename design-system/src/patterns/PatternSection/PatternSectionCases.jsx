@@ -39,6 +39,33 @@ const SectionRepeatsCardCase = () => (
     </PatternSection>
 );
 
+/** The title row first, then the views row, so the title, the first pill and the first column share one left edge. */
+const TitleRowAboveHeaderRowsCase = () => (
+    <PatternSection
+        title="Students"
+        description="Lincoln Middle · 24 students"
+        actions={<SectionActions />}
+        views={<ViewPills views={['All students', 'Needs follow-up']} />}
+    >
+        <StudentsTable count={2} />
+    </PatternSection>
+);
+
+/** The title pushed into the views row: the heading and the pills fight for the start, and the description has nowhere to go. */
+const TitleInViewsRowCase = () => (
+    <PatternSection
+        actions={<SectionActions />}
+        views={(
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-lg)' }}>
+                <span style={{ font: 'var(--heading-sm)', color: 'var(--ds-text)' }}>Students</span>
+                <ViewPills views={['All students', 'Needs follow-up']} />
+            </div>
+        )}
+    >
+        <StudentsTable count={2} />
+    </PatternSection>
+);
+
 /** The actions sit at the end of the title row, with the views under it. */
 const ActionsInTitleRowCase = () => (
     <PatternSection
@@ -69,7 +96,7 @@ const ActionsInTwoHomesCase = () => (
     </PatternSection>
 );
 
-/** More and the labeled Primary in the title row; the format switch ends the views row; Search, then the filter, lead row 3. */
+/** More and the labeled Primary in the title row; the format switch ends the views row; Search, then the filter, lead the filters row. */
 const RightSideInOrderCase = () => (
     <PatternSection
         title="Sessions"
@@ -148,6 +175,8 @@ const FooterCommitsCase = () => (
     </PatternSection>
 );
 
+export const TitleRowAboveHeaderRows = unstyled(TitleRowAboveHeaderRowsCase);
+export const TitleInViewsRow = unstyled(TitleInViewsRowCase);
 export const CardStandsAlone = unstyled(CardStandsAloneCase);
 export const SectionRepeatsCard = unstyled(SectionRepeatsCardCase);
 export const ActionsInTitleRow = unstyled(ActionsInTitleRowCase);

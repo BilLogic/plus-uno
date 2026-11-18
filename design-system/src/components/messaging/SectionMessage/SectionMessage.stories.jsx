@@ -378,7 +378,7 @@ export const GroundAndText = () => (
             display: 'flex',
             flexDirection: 'column',
             gap: 'var(--section-stack-lg)',
-            padding: 'var(--section-stack-lg)',
+            padding: 'var(--pad-x-lg)',
             background: 'var(--ds-surface-sunken)',
         }}
     >

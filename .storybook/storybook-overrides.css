@@ -658,7 +658,7 @@ a.sbdocs-a {
     width: 100% !important;
     max-width: none !important;
     box-sizing: border-box !important;
-    padding: calc(var(--section-stack-md) * 2) !important;
+    padding: calc(var(--pad-x-lg) * 2) !important;
     border-radius: var(--card-radius) var(--card-radius) 0 0;
     background: var(--ds-surface-raised) !important;
     border: var(--border-width-default) solid var(--ds-border) !important;
@@ -771,7 +771,7 @@ a.sbdocs-a {
 
 /* Default Storybook canvas padding for unscoped docs stories. */
 .sbdocs .docs-story > div[scale="1"] {
-  padding: calc(var(--section-stack-md) * 2) !important;
+  padding: calc(var(--pad-x-lg) * 2) !important;
 }
 
 /* Flush / custom wells: zero Storybook’s own padding (outer card supplies it). */
@@ -784,7 +784,7 @@ a.sbdocs-a {
  * from the first-child rule above — do NOT zero it (that caused flush widgets).
  */
 .sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story > div[scale="1"] {
-  padding: calc(var(--section-stack-md) * 2) !important;
+  padding: calc(var(--pad-x-lg) * 2) !important;
   background: var(--ds-surface-raised) !important;
   border: var(--border-width-default) solid var(--ds-border) !important;
   border-bottom: none !important;

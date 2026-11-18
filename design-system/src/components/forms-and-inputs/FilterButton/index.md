@@ -8,7 +8,7 @@ Also asked as: filter chip, filter control.
 
 **Import:** `import { FilterButton } from '@/components';`
 
-**Used in:** Popup (`ds guide popup`)
+**Used in:** Section (`ds guide section`); Popup (`ds guide popup`)
 
 **Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.
 

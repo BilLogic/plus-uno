@@ -278,6 +278,16 @@ describe('Template docs live examples', () => {
         expect(screen.getByRole('button', { name: 'Add students' })).toBeInTheDocument();
         r3.unmount();
 
+        const r3b = render(<Cases.TitleRowAboveHeaderRows />);
+        expect(screen.getByRole('heading', { name: 'Students' })).toBeInTheDocument();
+        expect(screen.getByRole('tab', { name: 'All students' })).toBeInTheDocument();
+        r3b.unmount();
+
+        const r3c = render(<Cases.TitleInViewsRow />);
+        expect(screen.queryByRole('heading', { name: 'Students' }), 'the title sits in the views row, not in a heading').toBeNull();
+        expect(screen.getByRole('tab', { name: 'All students' })).toBeInTheDocument();
+        r3c.unmount();
+
         const r4 = render(<Cases.ActionsInTwoHomes />);
         expect(screen.getByRole('heading', { name: 'Students' })).toBeInTheDocument();
         expect(screen.getAllByRole('button', { name: 'Add students' })).toHaveLength(2);

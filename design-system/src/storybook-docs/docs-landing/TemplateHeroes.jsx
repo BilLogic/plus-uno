@@ -28,6 +28,9 @@ import { TURN, turnTransform } from '../lib/iso-turn.js';
  * from the stage's corner. Every surface on the hero ground carries a hairline
  * in `illustrationEdge`, so none blends into the sunken ground.
  *
+ * These stay kit illustrations, not live examples with Show code: each is an
+ * abstract exploded figure with no readable text, which a live Section cannot draw.
+ *
  * Alignment, from `src/patterns/PatternSection/PatternSection.mdx`: a view bar's controls
  * share the content's left and right edges, so a Section's heading starts at
  * the rows' left edge and its last control ends at the content's right edge. A
@@ -116,9 +119,9 @@ export const OverviewHero = () => {
                     )}
                 </AppWindow>
             </Plate>
-            {/* 3 One Section, on the sunken fill with the section radius, and its heading. */}
+            {/* 3 A sunken Card, the Section's detail: the sunken fill, no shadow, the card radius, and its heading. */}
             <Plate i={2}>
-                <Layer {...section} fill={PAINT.sectionSubtleSurface} shadow={PAINT.cardShadow} corner="section" />
+                <Layer {...section} fill={PAINT.cardSunken} corner="card" />
                 <SkeletonBar x={section.x + 7} y={section.y + 7} w={42} h={5} heading />
             </Plate>
             {/* 4 Its rows: a table on the raised surface, one row selected and ringed. */}

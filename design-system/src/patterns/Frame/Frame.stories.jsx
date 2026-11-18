@@ -2351,7 +2351,6 @@ const DrillDemo = ({ initialDepth = 0 }) => {
                                                 {DRILL_STUDENTS.map((student) => (
                                                     <PatternCard
                                                         key={student.id}
-                                                        padding="sm"
                                                         data-drill-row={student.id}
                                                         title={student.name}
                                                         description={student.detail}
@@ -2388,7 +2387,6 @@ const DrillDemo = ({ initialDepth = 0 }) => {
                                                     return (
                                                         <PatternCard
                                                             key={session[0]}
-                                                            padding="sm"
                                                             data-drill-row={rowId}
                                                             title={session[0]}
                                                             actions={(
@@ -2644,7 +2642,6 @@ const RecordOverlayDemo = () => {
                                                 {DRILL_STUDENTS.map((student) => (
                                                     <PatternCard
                                                         key={student.id}
-                                                        padding="sm"
                                                         data-drill-row={student.id}
                                                         title={student.name}
                                                         description={student.detail}
