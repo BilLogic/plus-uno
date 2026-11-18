@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
 import { settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { contrastRatio, paintedOver } from '@/storybook-docs/lib/contrast.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
@@ -536,11 +536,16 @@ export const MotionEnterAndExit = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await userEvent.click(canvas.getByRole('button', { name: 'Show notice' }));
-        await waitFor(() => expect(canvas.getByRole('alert')).toBeVisible());
+        const alert = await canvas.findByRole('alert');
+        const slot = alert.closest('[data-presence-slot]');
+        await expect(slot).toHaveAttribute('data-presence-phase', 'entering');
+        await waitFor(() => expect(alert).toBeVisible());
         await settleAnimations(canvasElement);
 
-        await userEvent.click(canvas.getByRole('button', { name: 'Dismiss message' }));
-        await waitFor(() => expect(canvas.queryByRole('alert')).toBeNull());
+        fireEvent.click(canvas.getByRole('button', { name: 'Dismiss message' }));
+        await expect(alert.isConnected, 'SectionMessage stays connected while exiting').toBe(true);
+        await expect(slot).toHaveAttribute('data-presence-phase', 'exit-fade');
+        await waitFor(() => expect(alert.isConnected).toBe(false));
         await settleAnimations(canvasElement);
     },
 };
@@ -551,11 +556,14 @@ export const MotionReduced = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await userEvent.click(canvas.getByRole('button', { name: 'Show notice' }));
-        await waitFor(() => expect(canvas.getByRole('alert')).toBeVisible());
+        const alert = await canvas.findByRole('alert');
+        const slot = alert.closest('[data-presence-slot]');
+        await expect(slot).toHaveAttribute('data-presence-phase', 'settled');
+        await waitFor(() => expect(alert).toBeVisible());
         await settleAnimations(canvasElement);
 
-        await userEvent.click(canvas.getByRole('button', { name: 'Dismiss message' }));
-        await waitFor(() => expect(canvas.queryByRole('alert')).toBeNull());
+        fireEvent.click(canvas.getByRole('button', { name: 'Dismiss message' }));
+        await waitFor(() => expect(alert.isConnected).toBe(false));
         await settleAnimations(canvasElement);
     },
 };

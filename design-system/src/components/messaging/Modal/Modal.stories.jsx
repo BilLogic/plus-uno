@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
-import { settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expectOverlayExit, settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
+import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { Modal, MODAL_WIDTHS } from '@/components';
 import { FooterActions, IconButton, Button, Select } from '@/components';
@@ -739,8 +739,7 @@ export const MotionOpenAndClose = {
         await expect(getComputedStyle(dialog).animationName, 'Modal scales in on open').toContain('plus-overlay-scale-in');
         await settleAnimations(docBody);
 
-        await userEvent.keyboard('{Escape}');
-        await waitFor(() => expect(within(docBody).queryByRole('dialog')).toBeNull());
+        await expectOverlayExit(dialog, () => fireEvent.keyDown(dialog, { key: 'Escape' }), false);
         await settleAnimations(docBody);
     },
 };
@@ -757,7 +756,6 @@ export const MotionReduced = {
         await expect(getComputedStyle(dialog).animationName).toBe('none');
         await settleAnimations(docBody);
 
-        await userEvent.keyboard('{Escape}');
-        await waitFor(() => expect(within(docBody).queryByRole('dialog')).toBeNull());
+        await expectOverlayExit(dialog, () => fireEvent.keyDown(dialog, { key: 'Escape' }), true);
     },
 };
