@@ -15,8 +15,8 @@ import './PatternCard.scss';
  *   optional `description` (Body/default 14), with
  *   `actions` at the end of the row. `header` replaces that block with custom
  *   content, like the header's `custom` type, for tabs or a toolbar.
- * - **Spacing** comes from the Card tokens: `padding` sets Card/pad-sm · md · lg,
- *   the header sits Card/stack-md above the body (`gap` picks the stack step),
+ * - **Spacing** comes from the Card tokens: `padding` sets Card/pad-compact · default · spacious
+ *   (via prop values `'sm'`, `'md'`, `'lg'`), the header sits Card/stack-md above the body (`gap` picks the stack step),
  *   and the footer sits Card/stack-lg below. The footer is left-aligned.
  * - The card hugs its content; in a row it stretches to the tallest card.
  * - **Elevation**: the raised pair at rest. A card with an `onClick` lifts on
@@ -119,7 +119,7 @@ PatternCard.propTypes = {
      * @ds-context Governed by: Common actions (ds guide common-actions)
      */
     footer: PropTypes.node,
-    /** Padding scale: Card/pad-sm · md · lg (16 · 20 · 24) */
+    /** Padding scale: Card/pad-compact · default · spacious (16 · 20 · 24) */
     padding: PropTypes.oneOf(['sm', 'md', 'lg']),
     /** Header-to-body stack: Card/stack-sm · md · lg (4 · 8 · 12) */
     gap: PropTypes.oneOf(['sm', 'md', 'lg']),
