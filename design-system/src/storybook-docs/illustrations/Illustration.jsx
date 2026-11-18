@@ -5,12 +5,11 @@ import React from 'react';
  * text, so its meaning travels in `title` (read by screen readers) and in the
  * caption beside it, which lives outside the SVG.
  */
-export const Illustration = ({ width, height, viewBox, title, capped = true, children }) => {
+export const Illustration = ({ width, height, viewBox, title, capped = true, scale = 2, children }) => {
   const box = viewBox ?? `0 0 ${width} ${height}`;
-  // One viewBox unit is 2px of product UI, so a drawing stops growing at its
-  // natural width times two and sits centered in its figure. The gallery passes
-  // `capped={false}` and fills its grid cell instead.
-  const natural = Number(box.split(/\s+/)[2]) * 2;
+  // One viewBox unit is 2px of product UI for half-scale drawings (`scale = 2`),
+  // or 1px for 1:1 construction diagrams (`scale = 1`).
+  const natural = Number(box.split(/\s+/)[2]) * scale;
   return (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -42,10 +41,12 @@ export const IllustrationFigure = ({ caption, children }) => (
     }}
   >
     {children}
-    <figcaption
-      style={{ marginBlockStart: 'var(--stack-sm)', font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}
-    >
-      {caption}
-    </figcaption>
+    {caption && (
+      <figcaption
+        style={{ marginBlockStart: 'var(--stack-sm)', font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}
+      >
+        {caption}
+      </figcaption>
+    )}
   </figure>
 );

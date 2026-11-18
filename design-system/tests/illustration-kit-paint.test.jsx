@@ -14,6 +14,7 @@ import { describe, expect, it } from 'vitest';
 import { CORNER_TOKEN, HEIGHTS, PAINT, ROLE_SOURCES } from '../src/storybook-docs/illustrations/paint.js';
 import * as primitives from '../src/storybook-docs/illustrations/primitives.jsx';
 import * as compositions from '../src/storybook-docs/illustrations/compositions.jsx';
+import * as construction from '../src/storybook-docs/illustrations/construction.jsx';
 
 const SRC = resolve(__dirname, '../src');
 const paints = new Set(Object.values(PAINT));
@@ -93,6 +94,13 @@ describe('every drawn paint resolves to a role', () => {
     ...Object.entries(compositions)
       .filter(([, C]) => typeof C === 'function')
       .map(([name, C]) => [name, name === 'ResponsiveReflow' ? <C width={1280} /> : <C />]),
+    ['Measure', <construction.Measure x={4} y={4} w={100} h={60} label="size-200" />],
+    ['Zone (gap)', <construction.Zone x={4} y={4} w={100} h={60} label="space-100" />],
+    ['Zone (pad)', <construction.Zone kind="pad" x={4} y={4} w={100} h={60} inset={8} />],
+    ['Baseline', <construction.Baseline x={4} y={4} w={100} h={60} />],
+    ['Columns', <construction.Columns x={4} y={4} w={100} h={60} />],
+    ['ScaleStrip', <construction.ScaleStrip />],
+    ['ControlConstruction', <construction.ControlConstruction />],
   ];
   for (const [name, node] of drawn) {
     it(name, () => {
@@ -116,4 +124,12 @@ describe('every drawn paint resolves to a role', () => {
       }
     });
   }
+
+  it('CoreSizeMatrix', () => {
+    const html = renderToStaticMarkup(<construction.CoreSizeMatrix />);
+    expect(html).not.toMatch(/#[0-9a-f]{3,8}\b|rgba?\(|hsla?\(/i);
+    for (const [, value] of html.matchAll(/\b(?:fill|stroke)="([^"]*)"/g)) {
+      expect(value === 'none' || paints.has(value), `${value} in CoreSizeMatrix`).toBe(true);
+    }
+  });
 });
