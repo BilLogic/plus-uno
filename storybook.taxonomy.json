@@ -205,7 +205,7 @@
       "Layout",
       [
         "Dimensions",
-              "Spacing",
+        "Spacing",
         "Grid"
       ],
       "Expression",

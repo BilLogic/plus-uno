@@ -36,25 +36,6 @@ Below `100`, four values are not a multiple of 4 px (`025`): 1, 2, 6 and 10. The
 | `0375` | 6 | pad-y-md, radius-control-sm, tag gap |
 | `0625` | 10 | radius-control-lg |
 
-, 'stroke-1'],
-        ['0125',
-
-`size-0125`
-
-, 'stroke-2, focus ring, pad-y-sm'],
-        ['0375',
-
-`size-0375`
-
-, 'pad-y-md, radius-control-sm, tag gap'],
-        ['0625',
-
-`size-0625`
-
-, 'radius-control-lg'],
-    ]}
-/>
-
 ## Heights snap to 4 px (025)
 
 Every line-height, control, row, label and fixed-height box is a multiple of 4 px (025 rem). A box that hugs its content stays on the grid because its lines and pads are on it. The line box snaps, not the glyph: 14 px text sits in a 20 line. Sizes are rem, so a reader who sets a larger default font gets a larger grid, and everything still lands on it.
