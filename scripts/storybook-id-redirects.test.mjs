@@ -27,7 +27,7 @@ const FLATTENED = {
 };
 
 test('the renamed and folded docs ids each redirect to a live page', () => {
-  assert.equal(rules.length, 54);
+  assert.equal(rules.length, 55);
   for (const r of rules) {
     assert.ok(!ids.has(r.from), `${r.from} is a live page and should not redirect`);
     if (r.from in FAMILIES || r.from in FLATTENED) continue;
@@ -47,6 +47,7 @@ test('every pre-regroup Foundations id lands on its page in the new groups', () 
     'foundations-sound-overview': 'foundations-expression-sound-overview',
     'foundations-sound-settings-and-accessibility': 'foundations-expression-sound-settings-and-accessibility',
     'foundations-color': 'foundations-visual-color',
+    'foundations-visual-elevation': 'foundations-visual-elevation-overview',
   };
   for (const [from, target] of Object.entries(expected)) {
     assert.equal(to[from], target, `${from} should redirect to ${target}`);

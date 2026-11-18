@@ -24,7 +24,7 @@ topic, which today only `content/` does.
 | [Icons.mdx](../../src/styles/Icons.mdx) | ✅ | Which icon set, which size |
 | [Illustrations.mdx](../../src/styles/Illustrations.mdx) | ✅ | Illustration style and assets |
 | [Logos.mdx](../../src/styles/Logos.mdx) | ✅ | The marks, clear space, variants |
-| [Elevation.mdx](../../src/styles/Elevation.mdx) | ✅ | Which level for which behavior, and how a shadow is built |
+| [ElevationOverview.mdx](../../src/styles/ElevationOverview.mdx) | ✅ | Which layer and surface for which behavior, and how shadows step |
 | [Border.mdx](../../src/styles/Border.mdx) | ✅ | Border widths |
 | [Radius.mdx](../../src/styles/Radius.mdx) | ✅ | Corner radius scale |
 
