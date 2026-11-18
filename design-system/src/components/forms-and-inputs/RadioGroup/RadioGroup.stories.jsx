@@ -294,14 +294,14 @@ Validation.play = async ({ canvasElement }) => {
 
 export const TwoGroupsWithoutIds = () => (
     <div style={stack}>
-        <RadioGroup legend="First" options={['A', 'B']} />
-        <RadioGroup legend="Second" options={['A', 'B']} />
+        <RadioGroup legend="Tuesday session" options={['In person', 'Online']} />
+        <RadioGroup legend="Thursday session" options={['In person', 'Online']} />
     </div>
 );
 TwoGroupsWithoutIds.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const first = within(canvas.getByRole('radiogroup', { name: 'First' })).getAllByRole('radio');
-    const second = within(canvas.getByRole('radiogroup', { name: 'Second' })).getAllByRole('radio');
+    const first = within(canvas.getByRole('radiogroup', { name: 'Tuesday session' })).getAllByRole('radio');
+    const second = within(canvas.getByRole('radiogroup', { name: 'Thursday session' })).getAllByRole('radio');
 
     // No shared radio name and no shared ids, so answering one leaves the other.
     await expect(first[0].nextElementSibling.name).not.toBe(second[0].nextElementSibling.name);

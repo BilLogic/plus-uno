@@ -78,7 +78,7 @@ ButtonInside.play = async ({ canvasElement }) => {
 /** As the text grows Send stays on the last line, 4 above the bottom edge. */
 export const ButtonStaysBottom = () => (
     <div style={wrap}>
-        <PromptInput label="Message to AI chat" defaultValue={'one\ntwo\nthree'} onSubmit={fn()} />
+        <PromptInput label="Message to AI chat" defaultValue={'Draft a note for Maya K.\nInclude two-step equations\nAdd a short exit ticket'} onSubmit={fn()} />
     </div>
 );
 

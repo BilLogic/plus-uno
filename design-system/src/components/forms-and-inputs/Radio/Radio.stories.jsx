@@ -94,9 +94,9 @@ const Group = ({ name, options, initial, ...radioProps }) => {
 };
 
 const OPTIONS = [
-    { value: 'option1', label: 'Option 1' },
-    { value: 'option2', label: 'Option 2' },
-    { value: 'option3', label: 'Option 3' },
+    { value: 'option1', label: 'In person' },
+    { value: 'option2', label: 'Online' },
+    { value: 'option3', label: 'Hybrid' },
 ];
 
 export const Overview = () => <Group name="radio-overview" options={OPTIONS.slice(0, 2)} initial="option1" />;
@@ -162,9 +162,9 @@ export const Interactive = (args) => {
 };
 
 Interactive.args = {
-    label: 'Option 1',
-    secondLabel: 'Option 2',
-    thirdLabel: 'Option 3',
+    label: 'In person',
+    secondLabel: 'Online',
+    thirdLabel: 'Hybrid',
     isInvalid: false,
     isDisabled: false,
     isReadOnly: false,
