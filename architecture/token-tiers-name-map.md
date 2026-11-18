@@ -128,6 +128,20 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Card | `--card-max-height-sm` (declared elsewhere) |  |
 | Card | `--card-max-height-md` (declared elsewhere) |  |
 | Card | `--card-max-height-lg` (declared elsewhere) |  |
+| Card | `--card-surface-sunken` |  |
+| Card | `--card-surface-default` |  |
+| Card | `--card-surface-raised` |  |
+| Card | `--card-surface-raised-hovered` |  |
+| Card | `--card-surface-raised-pressed` |  |
+| Card | `--card-surface-overlay` |  |
+| Card | `--card-border-default` |  |
+| Card | `--card-border-width` |  |
+| Card | `--card-shadow-raised` |  |
+| Card | `--card-shadow-overlay` |  |
+| Card | `--card-text` |  |
+| Card | `--card-text-subtle` |  |
+| Card | `--card-title-font-lg` |  |
+| Card | `--card-description-font` |  |
 | Table | `--table-pad-x-cell` (declared elsewhere) |  |
 | Table | `--table-pad-y-cell` (declared elsewhere) |  |
 | Table | `--table-indent` (declared elsewhere) |  |
