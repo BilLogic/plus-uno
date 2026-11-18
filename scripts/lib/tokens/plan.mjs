@@ -108,11 +108,17 @@ export const TOKEN_LADDER = [
   { tier: 'semantics', group: 'Stack', new: '--stack-sm', old: '--element-stack-sm', ref: 'var(--space-025)', use: 'Vertical gap between tightly related items, such as a label and its control.' },
   { tier: 'semantics', group: 'Stack', new: '--stack-md', old: '--element-stack-md', ref: 'var(--space-050)', use: 'Vertical gap between items in a list or a group of fields.' },
   { tier: 'semantics', group: 'Stack', new: '--stack-lg', old: '--element-stack-lg', ref: 'var(--space-075)', use: 'Vertical gap between groups inside one control or component.' },
+  { tier: 'semantics', group: 'Stack', new: '--stack-xl', old: null, value: '--space-100', use: 'Vertical gap between related groups or blocks inside one container.' },
+  { tier: 'semantics', group: 'Stack', new: '--stack-2xl', old: null, value: '--space-150', use: 'Vertical gap between major groups inside one container.' },
+  { tier: 'semantics', group: 'Stack', new: '--stack-3xl', old: null, value: '--space-200', use: 'Vertical gap between distinct areas inside a large container.' },
 
   // ─── Semantics / Inline ───────────────────────────────────────────────
   { tier: 'semantics', group: 'Inline', new: '--inline-sm', old: '--element-inline-sm', ref: 'var(--space-025)', use: 'Horizontal gap between an icon and its label inside a control.' },
   { tier: 'semantics', group: 'Inline', new: '--inline-md', old: '--element-inline-md', ref: 'var(--space-050)', use: 'Horizontal gap between items in a row, such as buttons in a ButtonGroup.' },
   { tier: 'semantics', group: 'Inline', new: '--inline-lg', old: '--element-inline-lg', ref: 'var(--space-075)', use: 'Horizontal gap between loosely related items in a row.' },
+  { tier: 'semantics', group: 'Inline', new: '--inline-xl', old: null, value: '--space-100', use: 'Horizontal gap between distinct groups or columns in a row.' },
+  { tier: 'semantics', group: 'Inline', new: '--inline-2xl', old: null, value: '--space-150', use: 'Horizontal gap between wide groups or panels in a row.' },
+  { tier: 'semantics', group: 'Inline', new: '--inline-3xl', old: null, value: '--space-200', use: 'Horizontal gap between major regions in a row.' },
 
   // ─── Semantics / Radius (non-control, + control-by-height) ───────────
   { tier: 'semantics', group: 'Radius', new: '--radius-sm', old: '--element-radius-sm', ref: 'var(--space-0125)', use: 'Corner rounding for small marks: a checkbox, a small tag.' },

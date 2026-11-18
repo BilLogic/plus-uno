@@ -95,7 +95,7 @@
       "Card gap": "var(--card-stack-{sm|md|lg})",
       "Card radius": "var(--card-radius)",
       "Element padding": "var(--pad-x-{xs|sm|md|lg})",
-      "Element gap": "var(--stack-{sm|md|lg})",
+      "Element gap": "var(--stack-{sm|md|lg|xl|2xl|3xl})",
       "Element radius": "var(--radius-{sm|md|lg|full})",
       "Modal padding": "var(--modal-pad-x-{default|spacious})",
       "Section padding": "var(--section-pad-{x|y}-{compact|default|spacious})",
@@ -1892,7 +1892,7 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1175,
+    "scssTokenCount": 1181,
     "unknownTokens": [],
     "figmaVariableCoverage": {
       "total": 1793,
