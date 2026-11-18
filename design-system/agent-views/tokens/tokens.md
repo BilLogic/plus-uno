@@ -897,6 +897,25 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-link-pressed  /* Links in a pressed state */
 --ds-link-visited  /* Visited links */
 --ds-link-visited-pressed  /* Visited links in a pressed state */
+--ds-logo-glow-dark-0  /* First glow layer of the colored-dark Logo mark and dark-mode colored Logo mark. */
+--ds-logo-glow-dark-1  /* Second glow layer of the colored-dark Logo mark and dark-mode colored Logo mark. */
+--ds-logo-glow-dark-2  /* Third glow layer of the colored-dark Logo mark and dark-mode colored Logo mark. */
+--ds-logo-glow-dark-3  /* Fourth glow layer of the colored-dark Logo mark and dark-mode colored Logo mark. */
+--ds-logo-glow-dark-4  /* Fifth glow layer of the colored-dark Logo mark and dark-mode colored Logo mark. */
+--ds-logo-glow-light-0  /* First glow layer of the colored Logo mark on light grounds. */
+--ds-logo-glow-light-1  /* Second glow layer of the colored Logo mark on light grounds. */
+--ds-logo-glow-light-2  /* Third glow layer of the colored Logo mark on light grounds. */
+--ds-logo-glow-light-3  /* Fourth glow layer of the colored Logo mark on light grounds. */
+--ds-logo-glow-light-4  /* Fifth glow layer of the colored Logo mark on light grounds. */
+--ds-logo-ground  /* Ground fill behind the glows inside the colored and colored-dark Logo marks. */
+--ds-logo-mark  /* Ring stroke and plus fill of the outlined Logo mark. */
+--ds-logo-mark-reversed  /* Ring stroke and plus fill of the outlined-reversed Logo mark. */
+--ds-logo-plus  /* Plus glyph fill inside the filled, dark, colored, and colored-dark Logo marks. */
+--ds-logo-tile  /* Tile fill of the filled Logo mark. */
+--ds-logo-tile-dark  /* Tile fill of the dark Logo mark. */
+--ds-logo-wordmark  /* Default wordmark fill on light surfaces. */
+--ds-logo-wordmark-reversed  /* Reversed wordmark fill on dark surfaces. */
+--ds-logo-wordmark-stroke  /* Hairline stroke in the dark ground color around light wordmark letters on dark grounds. */
 --ds-skeleton  /* Skeleton loading states */
 --ds-surface  /* The primary background for the UI */
 --ds-surface-container  /* A neutral container surface background */

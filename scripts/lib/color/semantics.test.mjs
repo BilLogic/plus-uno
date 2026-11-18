@@ -16,10 +16,10 @@ const refs = (key, name) => {
 };
 const hex = (key, name, mode = 'light') => buildPlan(key).semantics.rows.find((row) => row.name === name)[mode];
 
-test('536 tokens, every value a primitive reference', () => {
+test('555 tokens, every value a primitive reference', () => {
   const { rows } = buildPlan('A').semantics;
-  assert.equal(rows.length, 536);
-  assert.equal(new Set(rows.map((r) => r.name)).size, 536);
+  assert.equal(rows.length, 555);
+  assert.equal(new Set(rows.map((r) => r.name)).size, 555);
   for (const r of rows) {
     for (const m of ['light', 'dark', 'light_ic', 'dark_ic']) {
       assert.match(r[`${m}_ref`], /^(transparent|[a-zA-Z]+\.[0-9]+(a[0-9]+)?)$/, `${r.name} ${m}`);
