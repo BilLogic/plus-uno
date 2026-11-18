@@ -81,7 +81,7 @@ A dot has no number, so `label` is its accessible name; without one it is announ
 - `StatusTag`: use when nesting a `CountTag` inside a condition label through `trailingMetric`.
 - `Tag`: use when nesting a `CountTag` on a selectable filter tag through `trailingMetric`.
 
-Same group: `AiMessage` · `ChangeTag` · `CompetencyTag` · `DateTag` · `PromptStarters` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `ChangeTag` · `CompetencyTag` · `DateTag` · `StatusTag` · `Tag` · `TagGroup`
 
 ## Parts
 

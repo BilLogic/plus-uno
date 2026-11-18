@@ -112,7 +112,7 @@ Overview.parameters = {
 };
 
 export const Spacing = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', paddingBottom: 'var(--width-1900)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', paddingBottom: 'var(--width-1900)' }}>
         <div>
             <DemoLabel>DEFAULT (40)</DemoLabel>
             <DatePicker spacing="default" placeholder="MM/DD/YYYY" />
@@ -125,11 +125,11 @@ export const Spacing = () => (
 );
 
 export const InteractionStates = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', paddingBottom: 'var(--width-1900)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', paddingBottom: 'var(--width-1900)' }}>
         <p className="body-default" style={{ color: 'var(--ds-text-subtle)' }}>
             Empty, with value, disabled, and read-only.
         </p>
-        <div style={{ display: 'flex', gap: 'var(--section-stack-lg)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 'var(--stack-2xl) var(--inline-2xl)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
             <div>
                 <DemoLabel>DEFAULT</DemoLabel>
                 <DatePicker placeholder="MM/DD/YYYY" />
@@ -159,7 +159,7 @@ export const PickDate = () => {
             {date && (
                 <div
                     style={{
-                        marginTop: 'var(--section-stack-md)',
+                        marginTop: 'var(--stack-xl)',
                         padding: 'var(--pad-x-md)',
                         backgroundColor: 'var(--ds-surface-sunken)',
                         borderRadius: 'var(--radius-md)',
@@ -188,15 +188,15 @@ export const PickRange = () => {
 
     return (
         <div style={{ paddingBottom: 'var(--width-1900)', maxWidth: 'var(--field-width-lg)' }}>
-            <p className="heading-xxs" style={{ marginBottom: 'var(--section-stack-md)' }}>Select a Date Range</p>
-            <p className="body-default" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--section-stack-md)' }}>
+            <p className="heading-xxs" style={{ marginBottom: 'var(--stack-xl)' }}>Select a Date Range</p>
+            <p className="body-default" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--stack-xl)' }}>
                 Click a first day, then a last day. The days between are marked.
             </p>
             <DatePicker range value={range} onChange={setRange} />
             {(start || end) && (
                 <div
                     style={{
-                        marginTop: 'var(--section-stack-md)',
+                        marginTop: 'var(--stack-xl)',
                         padding: 'var(--pad-x-md)',
                         backgroundColor: 'var(--ds-surface-sunken)',
                         borderRadius: 'var(--radius-md)',

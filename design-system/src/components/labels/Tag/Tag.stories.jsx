@@ -13,7 +13,7 @@ import { iconClass } from '../../../lib/icon';
 
 /**
  * `Tag` — a category, outlined: color on the border, neutral text, one size
- * (22), selectable, removable and link. A color swatch and a leading icon are
+ * (20), selectable, removable and link. A color swatch and a leading icon are
  * opt-in.
  *
  * THE TEST SEAM IS THIS FILE. Story `play:` functions run by `check:storybook`
@@ -1229,7 +1229,7 @@ export const OnImages = () => (
 
 /**
  * Elevated: the overlay pair (a solid overlay surface and the overlay shadow),
- * no border and neutral text, with the hue kept on the swatch, still 22 tall.
+ * no border and neutral text, with the hue kept on the swatch, still 20 tall.
  * A link's hover and press lay the neutral subtle hovered and pressed steps
  * over the solid fill rather than replacing it, and its focus ring has a 2px
  * surface gap inside it, so the ring reads on a dark picture.

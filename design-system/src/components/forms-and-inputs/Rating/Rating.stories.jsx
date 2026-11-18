@@ -51,7 +51,7 @@ export default {
     }
 };
 
-const ratingCol = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--content-max-width-reading)' };
+const ratingCol = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--content-max-width-reading)' };
 
 export const Overview = () => {
     const [value, setValue] = useState(3);
@@ -129,7 +129,7 @@ export const InteractionStates = () => (
             <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                 Disabled ratings remain visible but cannot be changed.
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)' }}>
                 <Rating id="rating-disabled-comments" value={3} variant="comments" isDisabled />
                 <Rating id="rating-disabled-numeric" value={3} variant="numeric" isDisabled />
             </div>

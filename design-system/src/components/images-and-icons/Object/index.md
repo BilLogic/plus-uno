@@ -74,7 +74,7 @@ Don't: A second glyph to hint at a status.
 - `StatusTag`: use when pairing a record's kind with its workflow state.
 - `Breadcrumb`: use when showing a page or project icon in a hierarchy trail.
 
-Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Icon` · `Illustration` · `Image` · `Tile`
+Same group: `Avatar` · `AvatarGroup` · `Icon` · `Illustration` · `Image` · `Tile`
 
 ## Parts
 

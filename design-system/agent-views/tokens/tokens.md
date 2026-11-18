@@ -120,6 +120,8 @@ Tokens one component owns, named for it.
 
 ```css
 --ai-chat-width  /* Width of the AI chat when it opens as a popup or floats beside the page. */
+--ai-message-caret-width  /* Width of the streaming caret in an AiMessage. */
+--ai-message-dot-size  /* Diameter of each pulsing dot in an AiMessage typing indicator. */
 --avatar-size-128  /* Size of the largest UserAvatar, such as on a profile page. */
 --avatar-size-96  /* Size of an extra-large UserAvatar, such as in a profile header. */
 --button-radius-compact  /* Corner rounding of a Button with compact spacing. */

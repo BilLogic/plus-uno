@@ -270,7 +270,7 @@ export const Focused = {
 export const BestPracticesLive = {
     parameters: { docs: { disable: true } },
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)' }}>
             <DoDontPair
                 doExample={<FeatureHeadlineDo />}
                 doCaption="Short headline, one-sentence body."

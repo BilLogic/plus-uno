@@ -22,7 +22,7 @@ export default {
 const stackStyle = {
     display: 'flex',
     flexDirection: 'column',
-    gap: 'var(--section-stack-lg)',
+    gap: 'var(--stack-2xl)',
 };
 
 const sectionStyle = {

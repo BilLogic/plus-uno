@@ -92,7 +92,7 @@ Don't: A loose spinner beside a button that can still be pressed.
 - `Button`: use when a button is busy by setting its `isLoading` prop rather than placing a loose `Spinner` beside it.
 - Loading: use when choosing wait thresholds and loading states across a view.
 
-Same group: `GenerativeBorder` · `ProgressBar` · `ProgressRing` · `Skeleton`
+Same group: `ProgressBar` · `ProgressRing` · `Skeleton`
 
 ## Parts
 

@@ -204,7 +204,7 @@ export const WidthSteps = {
     name: 'Widths',
     render: () => (
         <ScrollStage width={WIDTHS_STAGE}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.3fr', gap: 'var(--section-stack-md)' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.3fr', gap: 'var(--stack-xl) var(--inline-xl)' }}>
                 {['auto', '3-col', '4-col'].map((width) => (
                     <Demo.PopupStage key={width} height={200}>
                         {(mount) => (
@@ -246,7 +246,7 @@ export const WidthSteps = {
 /** The same pair of lines the page states: 4 below the trigger, on the trigger's own side of the bar. */
 export const Placement = {
     render: () => (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--section-stack-md)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--stack-xl) var(--inline-xl)' }}>
             <Demo.PopupStage height={HEIGHT.menu} side="start">
                 {(mount) => <Demo.SelectList mount={mount} />}
             </Demo.PopupStage>

@@ -103,13 +103,13 @@ function AccordionVariantsDemos() {
     return (
         <>
             <section>
-                <p className="body-default" style={{ marginBottom: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--stack-xl)', color: 'var(--ds-text)' }}>
                     Standard accordion with borders and one item open at a time.
                 </p>
                 <Accordion items={sampleItems} defaultActiveKey="0" />
             </section>
             <section>
-                <p className="body-default" style={{ marginBottom: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--stack-xl)', color: 'var(--ds-text)' }}>
                     Borderless accordion for seamless integration with surrounding content.
                 </p>
                 <div style={{ border: 'var(--border-width-default) dashed var(--ds-border)', padding: 0 }}>
@@ -125,14 +125,14 @@ function AccordionBehaviorDemos() {
         <>
             <section>
                 <DemoLabel>ALWAYS OPEN (MULTIPLE EXPANDED)</DemoLabel>
-                <p className="body-default" style={{ marginBottom: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--stack-xl)', color: 'var(--ds-text)' }}>
                     Multiple accordion items can be open simultaneously.
                 </p>
                 <Accordion items={sampleItems} defaultActiveKey={['0', '1']} alwaysOpen />
             </section>
             <section>
                 <DemoLabel>ALL COLLAPSED</DemoLabel>
-                <p className="body-default" style={{ marginBottom: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--stack-xl)', color: 'var(--ds-text)' }}>
                     Accordion with no default expanded item.
                 </p>
                 <Accordion items={sampleItems} />
@@ -145,7 +145,7 @@ function AccordionInteractionDemos() {
     return (
         <section>
             <DemoLabel>WITH DISABLED ITEM</DemoLabel>
-            <p className="body-default" style={{ marginBottom: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
+            <p className="body-default" style={{ marginBottom: 'var(--stack-xl)', color: 'var(--ds-text)' }}>
                 Individual items can be disabled to prevent interaction.
             </p>
             <Accordion
@@ -164,7 +164,7 @@ function AccordionContentDemos() {
     return (
         <section>
             <DemoLabel>USING CHILDREN (ALTERNATIVE PATTERN)</DemoLabel>
-            <p className="body-default" style={{ marginBottom: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
+            <p className="body-default" style={{ marginBottom: 'var(--stack-xl)', color: 'var(--ds-text)' }}>
                 Accordion supports both the <code>items</code> array prop and direct child components.
             </p>
             <Accordion defaultActiveKey="custom-1">

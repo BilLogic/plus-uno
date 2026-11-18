@@ -21,19 +21,19 @@ export default {
 const stackStyle = {
     display: 'flex',
     flexDirection: 'column',
-    gap: 'var(--section-stack-lg)',
+    gap: 'var(--stack-2xl)',
 };
 
 const sectionStyle = {
     display: 'flex',
     flexDirection: 'column',
-    gap: 'var(--section-stack-md)',
+    gap: 'var(--stack-xl)',
 };
 
 const rowStyle = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(var(--width-1500), 1fr))',
-    gap: 'var(--section-stack-lg)',
+    gap: 'var(--stack-2xl) var(--inline-2xl)',
 };
 
 const captionStyle = {

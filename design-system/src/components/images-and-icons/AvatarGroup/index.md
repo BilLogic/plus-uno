@@ -62,7 +62,7 @@ Don't: Folding most of a roster behind +n: link to the list instead.
 - `Avatar`: use when configuring each child avatar's name, picture, initials or fallback.
 - `Popup`: use when building a custom anchored overlay outside an avatar stack.
 
-Same group: `AiIcon` · `Avatar` · `Icon` · `Illustration` · `Image` · `Object` · `Tile`
+Same group: `Avatar` · `Icon` · `Illustration` · `Image` · `Object` · `Tile`
 
 ## Parts
 

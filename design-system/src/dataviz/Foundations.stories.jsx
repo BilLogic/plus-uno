@@ -111,7 +111,7 @@ const TERM_DATASETS = {
 const stackStyle = {
     display: 'flex',
     flexDirection: 'column',
-    gap: 'var(--section-stack-md)',
+    gap: 'var(--stack-xl)',
 };
 
 const barStyle = {
@@ -131,7 +131,7 @@ const labelStyle = {
 const gridStyle = {
     display: 'grid',
     gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' /* token gap: 220px */,
-    gap: 'var(--section-stack-md)',
+    gap: 'var(--stack-xl) var(--inline-xl)',
 };
 
 const cardStyle = {

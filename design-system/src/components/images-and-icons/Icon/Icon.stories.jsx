@@ -37,7 +37,7 @@ export default {
     },
 };
 
-const row = { display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--grid-gutter)' };
+const row = { display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--stack-xl) var(--inline-xl)' };
 const cell = { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--inline-sm)' };
 const caption = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
 

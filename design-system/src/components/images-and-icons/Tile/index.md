@@ -67,7 +67,7 @@ Don't: A bold ground on the logo, which keeps its own.
 - `Avatar`: use when representing a person, team or agent.
 - `Object`: use when placing a compact record-kind glyph inline with a title.
 
-Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Icon` · `Illustration` · `Image` · `Object`
+Same group: `Avatar` · `AvatarGroup` · `Icon` · `Illustration` · `Image` · `Object`
 
 ## Parts
 

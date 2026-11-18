@@ -8,6 +8,11 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-images-and-icons-logo--docs"
   ],
   [
+    "design-system/src/components/ai/Suggestion/",
+    "Suggestion",
+    "ai-ui-components-suggestion--docs"
+  ],
+  [
     "design-system/src/components/forms-and-inputs/Button/",
     "Button",
     "components-forms-and-inputs-button-button--docs"
@@ -166,11 +171,6 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "design-system/src/components/labels/CountTag/",
     "CountTag",
     "components-labels-count-tag--docs"
-  ],
-  [
-    "design-system/src/components/labels/Suggestion/",
-    "Suggestion",
-    "ai-ui-components-suggestion--docs"
   ],
   [
     "design-system/src/components/labels/Tag/",

@@ -134,7 +134,7 @@ export const Overview = {
 /** 4-col · 6-col · 8-col · 10-col at the 1024 screen: 347 · 512 · 677 · 843. */
 export const Widths = {
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
             {MODAL_WIDTHS.map((width) => (
                 <Demo.ModalStage key={width} title={`width="${width}"`} width={width} screenHeight={320} footer={footerActions}>
                     {bodyCopy}
@@ -154,7 +154,7 @@ export const Widths = {
 /** Hug grows with its content up to the screen less the blanket pad, then scrolls; Fill sits at that height. */
 export const Heights = {
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
             <Demo.ModalStage title='height="hug", short' screenHeight={SCREEN.height} footer={footerActions}>
                 {bodyCopy}
             </Demo.ModalStage>
@@ -214,7 +214,7 @@ const saveActions = (
 
 export const Tabs = {
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
             <Demo.ModalStage title="Session settings" screenHeight={SCREEN.height} tabs={sessionTabs} footer={saveActions} />
             <Modal
                 inline
@@ -704,7 +704,7 @@ export const AnatomyActive = {
 export const WidthStrip = {
     render: () => (
         <ScrollStage width={STAGE}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
                 {MODAL_WIDTHS.map((width) => (
                     <Demo.ModalStage key={width} width={width} screenHeight={240} title={width} footer={<Demo.TwoCells action="Save" />}>
                         <p style={{ margin: 0, font: 'var(--body-default)' }}>{`${width} on the 1024 screen grid.`}</p>

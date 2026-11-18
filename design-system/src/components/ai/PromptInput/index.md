@@ -8,11 +8,11 @@ Also asked as: ask the assistant, prompt box, chat input.
 
 **Import:** `import { PromptInput } from '@/components';`
 
-**Source:** `design-system/src/components/forms-and-inputs/PromptInput/PromptInput.jsx`
+**Source:** `design-system/src/components/ai/PromptInput/PromptInput.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/PromptInput/PromptInput.stories.jsx` — Default, ButtonInside, ButtonStaysBottom, RingFollowsField, EnterSends, ShiftEnterStartsALine, CannotSendWhenEmpty, Loading, WithSlots, ComposingDoesNotSend, Focused, Disabled, Interactive
+**Stories:** `design-system/src/components/ai/PromptInput/PromptInput.stories.jsx` — Default, ButtonInside, ButtonStaysBottom, RingFollowsField, EnterSends, ShiftEnterStartsALine, CannotSendWhenEmpty, Loading, WithSlots, ComposingDoesNotSend, Focused, Disabled, Interactive
 
-**Storybook page:** `design-system/src/components/forms-and-inputs/PromptInput/PromptInput.mdx`
+**Storybook page:** `design-system/src/components/ai/PromptInput/PromptInput.mdx`
 
 **Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
@@ -87,7 +87,7 @@ Don't: A disabled idle field blocks the next question.
 - For the border treatment shown while loading, see `GenerativeBorder`.
 - For a short, tappable prompt suggestion, use `Suggestion` or `PromptStarters`.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
+Same group: `AiIcon` · `AiMessage` · `GenerativeBorder` · `PromptStarters` · `Suggestion`
 
 ## Parts
 
@@ -158,6 +158,6 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 `--border-width-default` · `--control-md` · `--height-250` · `--pad-x-md` · `--pad-x-xs` · `--pad-y-md` · `--plus-prompt-input-max-height` · `--stack-md` · `--stack-sm` · `--type-line-height-125`
 
-From `design-system/src/components/forms-and-inputs/PromptInput/PromptInput.scss`. Override these through the token layer, never with a literal.
+From `design-system/src/components/ai/PromptInput/PromptInput.scss`. Override these through the token layer, never with a literal.
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

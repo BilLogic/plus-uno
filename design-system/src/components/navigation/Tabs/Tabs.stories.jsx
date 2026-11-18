@@ -279,12 +279,12 @@ function InteractionStatesDemos() {
     return (
         <section>
             <DemoLabel>INTERACTION STATES</DemoLabel>
-            <p className="body-default" style={{ marginBottom: 'var(--section-stack-lg)', color: 'var(--ds-text-subtle)' }}>
+            <p className="body-default" style={{ marginBottom: 'var(--stack-2xl)', color: 'var(--ds-text-subtle)' }}>
                 States below are artificially forced for demonstration.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' /* token gap: 32px */ }}>
                 <div>
-                    <p className="body-sm" style={{ marginBottom: 'var(--section-stack-md)', fontWeight: 'bold' }}>Unselected tab states</p>
+                    <p className="body-sm" style={{ marginBottom: 'var(--stack-xl)', fontWeight: 'bold' }}>Unselected tab states</p>
                     <Tabs defaultActiveKey="none">
                         <Tabs.Tab eventKey="default">Default</Tabs.Tab>
                         <Tabs.Tab eventKey="hover" className="pseudo-hover">Hovered</Tabs.Tab>
@@ -293,7 +293,7 @@ function InteractionStatesDemos() {
                     </Tabs>
                 </div>
                 <div>
-                    <p className="body-sm" style={{ marginBottom: 'var(--section-stack-md)', fontWeight: 'bold' }}>Disabled</p>
+                    <p className="body-sm" style={{ marginBottom: 'var(--stack-xl)', fontWeight: 'bold' }}>Disabled</p>
                     <Tabs defaultActiveKey="none">
                         <Tabs.Tab eventKey="disabled" isDisabled>Disabled</Tabs.Tab>
                     </Tabs>

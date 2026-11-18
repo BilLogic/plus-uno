@@ -3,6 +3,13 @@
 
 import '../styles/main.scss';
 
+export { default as AiIcon, AI_ICON_ALL_SIZES, AI_ICON_NAMES, AI_ICON_SIZES } from '@/components/ai/AiIcon';
+export { default as AiMessage, AI_MESSAGE_STATUSES, AiFeedback, AiSources, TypingText } from '@/components/ai/AiMessage';
+export { default as GenerativeBorder, GENERATIVE_BORDER_RADII } from '@/components/ai/GenerativeBorder';
+export { default as PromptInput } from '@/components/ai/PromptInput';
+export { default as PromptStarters } from '@/components/ai/PromptStarters';
+export { default as Suggestion, SUGGESTION_TYPES } from '@/components/ai/Suggestion';
+
 export { default as Button, BUTTON_APPEARANCES, BUTTON_SPACINGS } from '@/components/forms-and-inputs/Button';
 export { default as ButtonGroup } from '@/components/forms-and-inputs/ButtonGroup';
 export { default as Calendar } from '@/components/forms-and-inputs/Calendar';
@@ -26,7 +33,6 @@ export { default as InlineEditableTextfield } from '@/components/forms-and-input
 export { default as LinkButton } from '@/components/forms-and-inputs/LinkButton';
 export { default as LinkIconButton } from '@/components/forms-and-inputs/LinkIconButton';
 export { default as PopupSelect, POPUP_SELECT_PLACEMENTS, POPUP_SELECT_SPACINGS } from '@/components/forms-and-inputs/PopupSelect';
-export { default as PromptInput } from '@/components/forms-and-inputs/PromptInput';
 export { default as Radio } from '@/components/forms-and-inputs/Radio';
 export { default as RadioGroup } from '@/components/forms-and-inputs/RadioGroup';
 export { default as Range } from '@/components/forms-and-inputs/Range';
@@ -43,7 +49,6 @@ export { default as TimePicker, DEFAULT_TIMES, parseTime } from '@/components/fo
 export { default as Toggle } from '@/components/forms-and-inputs/Toggle';
 export { default as TreeSelect, TREE_SELECT_SPACINGS } from '@/components/forms-and-inputs/TreeSelect';
 
-export { default as AiIcon, AI_ICON_ALL_SIZES, AI_ICON_NAMES, AI_ICON_SIZES } from '@/components/images-and-icons/AiIcon';
 export { default as Avatar, AVATAR_COLORS, AVATAR_SHAPES, AVATAR_SIZES, AVATAR_STATUSES, initialsOf } from '@/components/images-and-icons/Avatar';
 export { default as AvatarGroup } from '@/components/images-and-icons/AvatarGroup';
 export { default as Icon, ICON_COLORS, ICON_SIZES, ICON_STYLES } from '@/components/images-and-icons/Icon';
@@ -53,14 +58,11 @@ export { default as Logo } from '@/components/images-and-icons/Logo';
 export { default as Object, BugIcon, createObjectIcon, IdeaIcon, OBJECT_SIZES, PageIcon, ProjectIcon, PullRequestIcon, TaskIcon } from '@/components/images-and-icons/Object';
 export { default as Tile, TILE_APPEARANCES, TILE_COLORS, TILE_CONTENTS, TILE_SIZES } from '@/components/images-and-icons/Tile';
 
-export { default as AiMessage, AI_MESSAGE_STATUSES, AiFeedback, AiSources, TypingText } from '@/components/labels/AiMessage';
 export { default as ChangeTag, CHANGE_TAG_FORMATS, CHANGE_TAG_GOOD_DIRECTIONS, CHANGE_TAG_ICONS, changeTone, describeChange } from '@/components/labels/ChangeTag';
 export { default as CompetencyTag, COMPETENCY_TAG_SPACINGS, COMPETENCY_TAG_SUBJECTS } from '@/components/labels/CompetencyTag';
 export { default as CountTag, COUNT_TAG_APPEARANCES, formatCount } from '@/components/labels/CountTag';
 export { default as DateTag, DATE_TAG_APPEARANCES, DATE_TAG_ICONS, DATE_TAG_SPACINGS } from '@/components/labels/DateTag';
-export { default as PromptStarters } from '@/components/labels/PromptStarters';
 export { default as StatusTag, STATUS_TAG_APPEARANCES, STATUS_TAG_SPACINGS } from '@/components/labels/StatusTag';
-export { default as Suggestion, SUGGESTION_TYPES } from '@/components/labels/Suggestion';
 export { default as Tag, AVATAR_TAG_TYPES, resolveTagKind, TAG_COLOR_OF_CURRICULUM, TAG_COLORS, TAG_TYPES, TagContext, useTagContext } from '@/components/labels/Tag';
 export { default as TagGroup, TAG_GROUP_ALIGNMENTS, TAG_GROUP_OVERFLOWS } from '@/components/labels/TagGroup';
 
@@ -70,7 +72,6 @@ export { default as PageHeader } from '@/components/layout-and-structure/PageHea
 export { default as Panel, PanelActionGroup, PanelBackAction, PanelBody, PanelCloseAction, PanelContainer, PanelDisclaimer, PanelDownAction, PanelFooter, PanelHeader, PanelHostContext, PanelMoreAction, PanelNewTabAction, PanelProvider, PanelSubheader, PanelUpAction, PanelViewSwitcher, usePanelManager } from '@/components/layout-and-structure/Panel';
 export { default as ScrollBar } from '@/components/layout-and-structure/ScrollBar';
 
-export { default as GenerativeBorder, GENERATIVE_BORDER_RADII } from '@/components/loading/GenerativeBorder';
 export { default as ProgressBar, PROGRESS_BAR_APPEARANCES } from '@/components/loading/ProgressBar';
 export { default as ProgressRing, PROGRESS_RING_APPEARANCES, PROGRESS_RING_SIZES } from '@/components/loading/ProgressRing';
 export { default as Skeleton } from '@/components/loading/Skeleton';
