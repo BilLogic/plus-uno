@@ -269,7 +269,6 @@ export const ShownOnBlur = {
         await userEvent.type(student, 'Ana Ruiz');
         await userEvent.tab();
         await waitFor(() => expect(student, 'typing clears the error once valid').not.toHaveAttribute('aria-invalid', 'true'));
-        await settleAnimations(canvasElement);
         await fitsCanvas(canvasElement);
     },
 };
@@ -288,7 +287,6 @@ export const ShownSubmitStaysEnabled = {
         await expect(canvas.getByRole('button', { name: 'Save session' }), 'still enabled').not.toBeDisabled();
         await userEvent.type(student, 'Ana Ruiz');
         await expect(student).toHaveValue('Ana Ruiz');
-        await settleAnimations(canvasElement);
         await fitsCanvas(canvasElement);
     },
 };
@@ -307,7 +305,6 @@ export const ShownBlockedSubmit = {
         await expect(canvas.getByText('Choose a site.')).toBeInTheDocument();
         await userEvent.type(student, 'Ana Ruiz');
         await expect(student).toHaveValue('Ana Ruiz');
-        await settleAnimations(canvasElement);
         await fitsCanvas(canvasElement);
     },
 };

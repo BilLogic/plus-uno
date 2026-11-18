@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
-import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import { px, probe, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
 import { Button, Flag, FlagGroup, Select, StatusTag, Toggle } from '@/components';
@@ -334,7 +333,6 @@ export const Saved = {
     name: 'State: Saved (Flag confirms)',
     render: () => <SavedExample />,
     play: async ({ canvasElement }) => {
-        await settleAnimations(canvasElement);
         const canvas = within(canvasElement);
         const toggle = canvas.getByRole('switch', { name: 'Session reminders' });
         await expect(toggle).toHaveAttribute('aria-checked', 'false');

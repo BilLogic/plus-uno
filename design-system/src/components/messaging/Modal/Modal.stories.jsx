@@ -740,7 +740,6 @@ export const MotionOpenAndClose = {
         await settleAnimations(docBody);
 
         await expectOverlayExit(dialog, () => fireEvent.keyDown(dialog, { key: 'Escape' }), false);
-        await settleAnimations(docBody);
     },
 };
 

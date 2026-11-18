@@ -87,7 +87,6 @@ export const PlacementPage = {
         await userEvent.clear(student);
         await userEvent.click(save);
         await expect(await canvas.findByText('Enter the student’s name.'), 'pressing Save validates inline').toBeInTheDocument();
-        await settleAnimations(canvasElement.ownerDocument.body);
         await fitsCanvas(canvasElement);
     },
 };
@@ -187,7 +186,6 @@ export const CopyValue = {
     name: 'Copy',
     render: () => staged(<Copy held />, 480),
     play: async ({ canvas, canvasElement }) => {
-        await settleAnimations(canvasElement.ownerDocument.body);
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         const copy = canvas.getByRole('button', { name: 'Copy' });
