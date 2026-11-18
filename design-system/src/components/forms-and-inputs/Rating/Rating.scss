@@ -22,7 +22,7 @@
 .plus-rating-container {
     display: flex;
     align-items: flex-start;
-    gap: var(--space-0625);
+    gap: var(--rating-gap);
 }
 
 .plus-rating-star-group {

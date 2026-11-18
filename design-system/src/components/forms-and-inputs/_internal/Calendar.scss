@@ -20,7 +20,7 @@
     flex-direction: column;
     align-items: center;
     gap: var(--stack-md);
-    padding: var(--space-025) var(--pad-x-sm);
+    padding: var(--pad-x-xs) var(--pad-x-sm);
 }
 
 .plus-calendar[data-size='28'] {
@@ -108,7 +108,7 @@
     }
 
     &--today {
-        border: var(--stroke-1) solid var(--ds-border-brand);
+        border: var(--border-width-default) solid var(--ds-border-brand);
         color: var(--ds-text-brand);
     }
 
@@ -136,6 +136,6 @@
     }
 
     .plus-calendar-day--in-range {
-        @include plus-ring($ring-offset: 0, $ring-token: Highlight, $ring-width: 1px, $ring-style: dashed);
+        @include plus-ring($ring-offset: 0, $ring-token: Highlight, $ring-width: var(--border-width-default), $ring-style: dashed);
     }
 }

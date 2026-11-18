@@ -619,7 +619,7 @@ $tag-elevated: (
     outline: var(--focus-ring-width) solid var(--ds-border-focused);
     outline-offset: var(--focus-ring-width);
     box-shadow:
-        0 0 0 var(--stroke-2) var(--ds-surface-overlay),
+        0 0 0 var(--focus-ring-width) var(--ds-surface-overlay),
         var(--ds-shadow-overlay);
 }
 
@@ -631,5 +631,5 @@ $tag-elevated: (
 .plus-tag--elevated .plus-tag__remove:focus-visible {
     outline: var(--focus-ring-width) solid var(--ds-border-focused);
     outline-offset: var(--focus-ring-width);
-    box-shadow: 0 0 0 var(--stroke-2) var(--ds-surface-overlay);
+    box-shadow: 0 0 0 var(--focus-ring-width) var(--ds-surface-overlay);
 }

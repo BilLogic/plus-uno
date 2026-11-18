@@ -999,6 +999,62 @@
           }
         },
         {
+          "name": "Count/tag-ring-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--count-tag-ring-width)"
+          }
+        },
+        {
+          "name": "Date/time-picker-section-gap",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--date-time-picker-section-gap)"
+          }
+        },
+        {
+          "name": "Field/gap",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--field-gap)"
+          }
+        },
+        {
+          "name": "Radio/group-inline-gap",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--radio-group-inline-gap)"
+          }
+        },
+        {
+          "name": "Rating/gap",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--rating-gap)"
+          }
+        },
+        {
+          "name": "Rich/text-editor-max-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--rich-text-editor-max-width)"
+          }
+        },
+        {
+          "name": "Ai/message-caret-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--ai-message-caret-width)"
+          }
+        },
+        {
+          "name": "Ai/message-dot-size",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--ai-message-dot-size)"
+          }
+        },
+        {
           "name": "Tag/dot-size",
           "resolvedType": "FLOAT",
           "codeSyntax": {

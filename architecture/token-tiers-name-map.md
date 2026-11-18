@@ -244,6 +244,14 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Option row | `--option-row-control-gap` |  |
 | Option row | `--option-row-dot-size` |  |
 | Count tag | `--count-tag-dot-size` |  |
+| Count tag | `--count-tag-ring-width` |  |
+| Date time picker | `--date-time-picker-section-gap` |  |
+| Field | `--field-gap` |  |
+| Radio group | `--radio-group-inline-gap` |  |
+| Rating | `--rating-gap` |  |
+| Rich text editor | `--rich-text-editor-max-width` |  |
+| AI message | `--ai-message-caret-width` |  |
+| AI message | `--ai-message-dot-size` |  |
 | Tag | `--tag-dot-size` |  |
 | Tag | `--tag-pad-x-end-compact` |  |
 | Tag | `--tag-gap-compact` |  |

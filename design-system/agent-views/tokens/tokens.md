@@ -122,6 +122,8 @@ Tokens one component owns, named for it.
 
 ```css
 --ai-chat-width  /* Width of the AI chat when it opens as a popup or floats beside the page. */
+--ai-message-caret-width  /* Width and leading gap of the streaming caret in an AiMessage. */
+--ai-message-dot-size  /* Diameter of each typing-indicator dot in an AiMessage. */
 --avatar-size-128  /* Size of the largest UserAvatar, such as on a profile page. */
 --avatar-size-96  /* Size of an extra-large UserAvatar, such as in a profile header. */
 --button-radius-compact  /* Corner rounding of a Button with compact spacing. */
@@ -154,6 +156,9 @@ Tokens one component owns, named for it.
 --comment-replies-indent  /* Indentation and inner padding of nested replies in a Comment. */
 --comment-replies-stack  /* Vertical gap above nested replies in a Comment. */
 --count-tag-dot-size  /* Size of the dot in a CountTag. */
+--count-tag-ring-width  /* Cutout ring width around a CountTag pinned to an icon or avatar. */
+--date-time-picker-section-gap  /* Vertical gap between the date and time sections of a DateTimePicker. */
+--field-gap  /* Horizontal gap between slots inside a field. */
 --file-item-height  /* Fixed height of a FileItem row across queued, uploading, done and error states. */
 --flag-min-height  /* Minimum height of a Flag. */
 --flag-offset  /* Distance between a Flag and the edge of the screen. */
@@ -186,6 +191,7 @@ Tokens one component owns, named for it.
 --radio-control-size  /* Size of the Radio circle. */
 --radio-control-size-10  /* Size of the circle in a RadioGroup with size 10. */
 --radio-control-size-14  /* Size of the circle in a RadioGroup with size 14. */
+--radio-group-inline-gap  /* Horizontal gap between inline options and between scale ends in a RadioGroup. */
 --range-dot-size-12  /* Thumb size of a Range with size 12. */
 --range-dot-size-16  /* Thumb size of a Range with size 16. */
 --range-dot-size-8  /* Thumb size of a Range with size 8. */
@@ -193,6 +199,8 @@ Tokens one component owns, named for it.
 --range-track-height-4  /* Track height of a Range with size 8 or no size set. */
 --range-track-height-6  /* Track height of a Range with size 12. */
 --range-track-height-8  /* Track height of a Range with size 16. */
+--rating-gap  /* Horizontal gap between rating items in a Rating. */
+--rich-text-editor-max-width  /* Maximum width of a RichTextEditor unless fullWidth is set. */
 --scroll-bar-max-height  /* Maximum height of a scrolling area that shows a scroll bar. */
 --scroll-bar-size  /* Thickness of a scroll bar. */
 --setting-row-end-min-height  /* Minimum height of a SettingRow end slot so compact controls align with the first line of the label. */
