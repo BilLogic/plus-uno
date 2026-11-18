@@ -1,6 +1,6 @@
 import React from 'react';
 import { expect, waitFor } from 'storybook/test';
-import { IconButton, PanelContainer, PanelHeader } from '@/components';
+import { Icon, IconButton, PanelContainer, PanelHeader } from '@/components';
 import { Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
 import {
     ButtonInField,
@@ -175,7 +175,7 @@ export const Pill = {
 export const CloseControl = {
     render: () => (
         <DoDont>
-            <Do caption="The subtle IconButton: the button radius, the ring and the states come with it.">
+            <Do caption="The subtle Icon button: the button radius, the ring and the states come with it.">
                 <PanelContainer width="100%">
                     <PanelHeader
                         title="Session details"
@@ -183,18 +183,32 @@ export const CloseControl = {
                     />
                 </PanelContainer>
             </Do>
-            <Dont caption="A round button on a panel header instead of the default button radius.">
+            <Dont caption="A hand-built circle. Its corner, its states and its focus ring are all guesses.">
                 <PanelContainer width="100%">
                     <PanelHeader
                         title="Session details"
-                        actions={<IconButton icon="xmark" label="Close session details" appearance="subtle" shape="circle" />}
+                        actions={(
+                            <span
+                                aria-hidden="true"
+                                style={{
+                                    display: 'grid',
+                                    placeItems: 'center',
+                                    width: 'var(--control-md)',
+                                    height: 'var(--control-md)',
+                                    borderRadius: 'var(--radius-full)',
+                                    background: 'var(--ds-background-neutral)',
+                                    color: 'var(--ds-icon-subtle)',
+                                }}
+                            >
+                                <Icon name="xmark" size={16} />
+                            </span>
+                        )}
                     />
                 </PanelContainer>
             </Dont>
         </DoDont>
     ),
     play: async ({ canvas }) => {
-        const buttons = canvas.getAllByRole('button', { name: 'Close session details' });
-        await expect(buttons).toHaveLength(2);
+        await expect(canvas.getAllByRole('button', { name: 'Close session details' })).toHaveLength(1);
     },
 };
