@@ -44,7 +44,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Student rankings</Heading>
+                <Heading as="h3" size="sm">Student rankings</Heading>
                 <p style={captionStyle}>
                     Lighter alternative to horizontal bars when comparing a ranked list.
                 </p>

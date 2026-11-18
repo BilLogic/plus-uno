@@ -44,7 +44,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Student enrollment tiers</Heading>
+                <Heading as="h3" size="sm">Student enrollment tiers</Heading>
                 <p style={captionStyle}>
                     Bands stack from the largest base to the narrowest tier at the top.
                 </p>

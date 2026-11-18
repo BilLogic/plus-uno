@@ -39,6 +39,14 @@ leading icon, and every other `Tag` prop passes straight through.
 
 <div className="sb-ds-doc-section">
 
+## Size and layout
+
+<ComponentExample of={CompetencyTagStories.BesideHeading} title="Spacious" description={<><code>spacing="spacious"</code> draws 32 beside a heading, with 14/20 text and a 16 icon.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Behavior
 
 <ComponentExample of={CompetencyTagStories.CustomLabel} title="Custom label" description={<><code>children</code> or <code>text</code> overrides the default label.</>} />
@@ -156,8 +164,8 @@ meaning with a different color.
 <tr><td>Hovered, pressed</td><td><code>--ds-background-accent-orange-subtlest</code> and <code>--ds-background-accent-orange-subtlest-pressed</code>.</td></tr>
 <tr><td>Selected</td><td><code>--ds-background-accent-orange-subtler</code> with a <code>--ds-border-accent-orange</code> edge.</td></tr>
 <tr><td>Disabled</td><td><code>--ds-background-disabled</code> with <code>--ds-text-disabled</code>.</td></tr>
-<tr><td>Subject icon</td><td><code>--icon-sm</code>, matching Tag's 12 text.</td></tr>
-<tr><td>Height</td><td>22, as Tag.</td></tr>
+<tr><td>Subject icon</td><td><code>--icon-sm</code> (12) at default, matching Tag's 12 text; <code>--icon-md</code> (16) when spacious.</td></tr>
+<tr><td>Height</td><td><code>--label-height-md</code> (20), or <code>--control-md</code> (32) when spacious.</td></tr>
 </tbody>
 </DocsTable>
 

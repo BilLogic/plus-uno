@@ -46,7 +46,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Weekly score range</Heading>
+                <Heading as="h3" size="sm">Weekly score range</Heading>
                 <p style={captionStyle}>
                     Filled band from the lowest to highest session score each week.
                 </p>

@@ -45,7 +45,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Program supervision structure</Heading>
+                <Heading as="h3" size="sm">Program supervision structure</Heading>
                 <p style={captionStyle}>
                     Reporting lines from program leadership to school and subject cohorts, colored by tree depth.
                 </p>

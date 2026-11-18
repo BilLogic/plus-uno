@@ -876,7 +876,7 @@
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--element-pad-x-xs)"
+        "WEB": "var(--pad-x-xs)"
       },
       "description": "Tag, Status, Count"
     },
@@ -898,7 +898,7 @@
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--element-pad-x-sm)"
+        "WEB": "var(--pad-x-sm)"
       },
       "description": "24-high items, tooltip"
     },
@@ -920,7 +920,7 @@
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--element-pad-x-md)"
+        "WEB": "var(--pad-x-md)"
       },
       "description": "32-high items"
     },
@@ -942,7 +942,7 @@
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--element-pad-y-sm)"
+        "WEB": "var(--pad-y-sm)"
       },
       "description": "24-high items, labels (20 high)"
     },
@@ -964,7 +964,7 @@
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--element-pad-y-md)"
+        "WEB": "var(--pad-y-md)"
       },
       "description": "32-high items"
     },
@@ -986,7 +986,7 @@
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--element-stack-sm)"
+        "WEB": "var(--stack-sm)"
       },
       "description": "title to description"
     },
@@ -1008,7 +1008,7 @@
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--element-stack-md)"
+        "WEB": "var(--stack-md)"
       },
       "description": "label to field"
     },
@@ -1030,7 +1030,7 @@
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--element-stack-lg)"
+        "WEB": "var(--stack-lg)"
       },
       "description": "field to help text group"
     },
@@ -1052,7 +1052,7 @@
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--element-inline-sm)"
+        "WEB": "var(--inline-sm)"
       },
       "description": "icon to label"
     },
@@ -1074,7 +1074,7 @@
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--element-inline-md)"
+        "WEB": "var(--inline-md)"
       },
       "description": "buttons in a row"
     },
@@ -1096,7 +1096,7 @@
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--element-inline-lg)"
+        "WEB": "var(--inline-lg)"
       },
       "description": "looser rows"
     },
@@ -1118,7 +1118,7 @@
         "CORNER_RADIUS"
       ],
       "codeSyntax": {
-        "WEB": "var(--element-radius-sm)"
+        "WEB": "var(--radius-sm)"
       },
       "description": "small parts"
     },
@@ -1140,7 +1140,7 @@
         "CORNER_RADIUS"
       ],
       "codeSyntax": {
-        "WEB": "var(--element-radius-md)"
+        "WEB": "var(--radius-md)"
       },
       "description": "small parts"
     },
@@ -1162,7 +1162,7 @@
         "CORNER_RADIUS"
       ],
       "codeSyntax": {
-        "WEB": "var(--element-radius-lg)"
+        "WEB": "var(--radius-lg)"
       },
       "description": "small parts"
     },
@@ -1184,7 +1184,7 @@
         "CORNER_RADIUS"
       ],
       "codeSyntax": {
-        "WEB": "var(--element-radius-item-sm)"
+        "WEB": "var(--radius-control-sm)"
       },
       "description": "24-high items (height ÷ 4)"
     },
@@ -1206,7 +1206,7 @@
         "CORNER_RADIUS"
       ],
       "codeSyntax": {
-        "WEB": "var(--element-radius-item-md)"
+        "WEB": "var(--radius-control-md)"
       },
       "description": "32-high items"
     },
@@ -1228,7 +1228,7 @@
         "CORNER_RADIUS"
       ],
       "codeSyntax": {
-        "WEB": "var(--element-radius-full)"
+        "WEB": "var(--radius-full)"
       },
       "description": "pills, circles"
     },

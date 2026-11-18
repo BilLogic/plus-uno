@@ -54,7 +54,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Student score changes</Heading>
+                <Heading as="h3" size="sm">Student score changes</Heading>
                 <p style={captionStyle}>
                     Compare pre-test and post-test scores to see improvement across students.
                 </p>

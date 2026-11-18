@@ -51,7 +51,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Tutor schedule</Heading>
+                <Heading as="h3" size="sm">Tutor schedule</Heading>
                 <p style={captionStyle}>
                     Time spans across tutors over the week, each session plotted on its tutor's row.
                 </p>

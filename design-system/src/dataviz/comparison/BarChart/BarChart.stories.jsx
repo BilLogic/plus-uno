@@ -65,7 +65,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Vertical (column chart)</Heading>
+                <Heading as="h3" size="sm">Vertical (column chart)</Heading>
                 <p style={captionStyle}>
                     Default orientation for short category labels, sorted from most to least.
                 </p>
@@ -73,7 +73,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Horizontal (bar chart)</Heading>
+                <Heading as="h3" size="sm">Horizontal (bar chart)</Heading>
                 <p style={captionStyle}>
                     Use when category labels are long or when showing a ranked list.
                 </p>
@@ -81,7 +81,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Grouped over time (sort opted out)</Heading>
+                <Heading as="h3" size="sm">Grouped over time (sort opted out)</Heading>
                 <p style={captionStyle}>
                     Pass {'sort={false}'} on temporal axes such as quarters to preserve chronological order.
                 </p>

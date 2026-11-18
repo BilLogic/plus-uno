@@ -219,12 +219,12 @@
       "why": "the level comes from the surrounding sections; set as only to override the element"
     },
     {
-      "not": "Heading size=\"sm\" / \"lg\"",
+      "not": "Heading size=\"small\" / \"large\"",
       "use": [
-        "Heading.size=small",
-        "Heading.size=large"
+        "Heading.size=sm",
+        "Heading.size=lg"
       ],
-      "why": "sizes are words, xxsmall to xxlarge"
+      "why": "sizes match the tokens, xxl to xxs"
     }
   ],
   "tokens": [

@@ -57,7 +57,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Line radar (default)</Heading>
+                <Heading as="h3" size="sm">Line radar (default)</Heading>
                 <p style={captionStyle}>
                     Spoke connections for comparing planned vs. completed tutoring minutes across subjects.
                 </p>
@@ -65,7 +65,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Filled area radar</Heading>
+                <Heading as="h3" size="sm">Filled area radar</Heading>
                 <p style={captionStyle}>
                     Fills the primary series to emphasize overall coverage across SMART competencies.
                 </p>

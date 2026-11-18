@@ -6,11 +6,10 @@ import { tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
 import { compare, refusals } from './token-generation.mjs';
 import { FRAME_LAYER_COLLECTIONS, frameLayerFile, frameLayerFolder, frameLayerToken } from './lib/frame-layer-collections.mjs';
 import { dropRetired, planOwnedTokens } from './lib/tokens/retire.mjs';
-import { RETIRED_TOKENS } from './lib/tokens/plan.mjs';
 import { TYPOGRAPHY_FILE, TYPOGRAPHY_FOLDERS, typographyFolder, typographyToken } from './lib/typography-collection.mjs';
 
-/** Names dropped from the SCSS the Figma exports write: retired ones, and the ones the token plan now owns. */
-const DROPPED = new Set([...RETIRED_TOKENS, ...planOwnedTokens()]);
+/** Names dropped from the SCSS the Figma exports write: the ones the token plan now owns. */
+const DROPPED = planOwnedTokens();
 
 /**
  * The Figma exports the SCSS is generated FROM, and where the SCSS lands.
@@ -110,13 +109,15 @@ const webName = (syntax) => /^var\((--[a-z0-9-]+)\)$/.exec(syntax ?? '')?.[1] ??
 function generateScalesSCSS() {
     const sources = SCALE_COLLECTIONS.map(({ file, heading }) => ({ file, heading, ...readSource(file, { oneMode: true }) }));
     const nameById = {};
-    const seen = new Set();
-    for (const { file, json } of sources) {
+    const seen = new Map();
+    for (const { file, json, modes: [mode] } of sources) {
         for (const v of json.variables) {
             const name = webName(v.codeSyntax?.WEB);
             if (!name) throw new Error(`${file}: ${v.name} has no WEB code syntax of the form var(--name). Set it in Figma and export again.`);
-            if (seen.has(name)) throw new Error(`${file}: ${name} is the code syntax of two variables.`);
-            seen.add(name);
+            const value = v.valuesByMode[mode];
+            const isSameNameAlias = value?.type === 'VARIABLE_ALIAS' && seen.get(name) === value.id;
+            if (seen.has(name) && !isSameNameAlias) throw new Error(`${file}: ${name} is the code syntax of two variables.`);
+            if (!seen.has(name)) seen.set(name, v.id);
             nameById[v.id] = name;
         }
     }
@@ -141,6 +142,7 @@ function generateScalesSCSS() {
             if (value?.type === 'VARIABLE_ALIAS') {
                 if (!nameById[value.id]) throw new Error(`${file}: ${v.name} aliases ${value.id}, which none of the scale exports holds.`);
                 css = `var(${nameById[value.id]})`;
+                if (css === `var(${nameById[v.id]})`) continue;
             } else if (typeof value === 'number') {
                 css = px(value);
             } else {
@@ -217,7 +219,7 @@ function generateFrameLayersSCSS() {
     const frameLayerName = {};
     for (const { name: collection } of FRAME_LAYER_COLLECTIONS) {
         for (const v of readSource(frameLayerFile(collection)).json.variables) {
-            if (v.resolvedType !== 'BOOLEAN') frameLayerName[v.id] = `--${frameLayerToken(collection, v.name)}`;
+            if (v.resolvedType !== 'BOOLEAN') frameLayerName[v.id] = webName(v.codeSyntax?.WEB);
         }
     }
 
@@ -252,11 +254,18 @@ function generateFrameLayersSCSS() {
                 }
                 continue;
             }
-            const token = frameLayerToken(collection, v.name);
-            if (v.codeSyntax?.WEB !== `var(--${token})`) {
-                throw new Error(`${file}: ${v.name} has Figma code syntax ${v.codeSyntax?.WEB ?? '(none)'}, but code declares --${token}.`);
+            const web = webName(v.codeSyntax?.WEB);
+            if (!web) {
+                throw new Error(`${file}: ${v.name} has no WEB code syntax of the form var(--name).`);
             }
-            if (declared.has(token)) throw new Error(`${file}: ${v.name} and ${declared.get(token)} are both --${token}.`);
+            const token = web.slice(2);
+            if (!DROPPED.has(web)) {
+                const expected = frameLayerToken(collection, v.name);
+                if (token !== expected) {
+                    throw new Error(`${file}: ${v.name} has Figma code syntax ${v.codeSyntax?.WEB ?? '(none)'}, but code declares --${expected}.`);
+                }
+                if (declared.has(token)) throw new Error(`${file}: ${v.name} and ${declared.get(token)} are both --${token}.`);
+            }
             declared.set(token, `${file} ${v.name}`);
             if (frameLayerFolder(v.name) !== folder) {
                 folder = frameLayerFolder(v.name);
@@ -300,7 +309,7 @@ function generateFrameLayersSCSS() {
 
     let scss = `/**
  * Frame and Layer Tokens
- * Generated from the spacing / layout, spacing / patterns and color / patterns
+ * Generated from the spacing / layout, spacing / templates and color / templates
  * sets in Figma. spacing / layout has modes Medium (768px) · Large (1024px) ·
  * X-Large (1440px): the Medium value is in :root, wider modes override below.
  *

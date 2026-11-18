@@ -216,11 +216,29 @@ const expectCorner = async (frame, surface) => {
 
 export const Overview = {
     // An ordinary page: no Back, no Close. Only a focused page shows them.
-    play: async ({ canvasElement }) => {
+    play: async ({ canvasElement, globals = {}, parameters = {} }) => {
         const canvas = within(canvasElement);
         await expect(canvas.queryByRole('button', { name: 'Back' }), 'no Back on an ordinary page').toBeNull();
         await expect(canvas.queryByRole('button', { name: 'Close' }), 'no Close on an ordinary page').toBeNull();
         await expect(canvasElement.querySelector('.plus-frame__back, .plus-frame__close'), 'no Back or Close in the header row').toBeNull();
+        const expected = parameters.browserFrame || globals.plusBrowser || 'chrome';
+        const browserFrame = canvasElement.querySelector('.plus-browser-frame');
+        if (expected === 'none') {
+            await expect(browserFrame, 'plusBrowser: none renders no browser frame').toBeNull();
+        } else {
+            await expect(browserFrame, 'Templates/ stories render with a browser frame').not.toBeNull();
+            await expect(browserFrame).toHaveAttribute('data-browser', expected);
+            await expect(browserFrame.querySelector('.plus-browser-frame__toolbar')).not.toBeNull();
+        }
+    },
+};
+
+/** Opting out of the default template browser frame via `parameters.browserFrame: 'none'`. */
+export const WithoutBrowserFrame = {
+    parameters: { browserFrame: 'none', docs: { disable: true } },
+    play: async ({ canvasElement }) => {
+        await expect(canvasElement.querySelector('.plus-browser-frame'), 'browserFrame: none opts out of the browser frame').toBeNull();
+        await expect(canvasElement.querySelector('.plus-frame')).not.toBeNull();
     },
 };
 
