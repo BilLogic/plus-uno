@@ -83,6 +83,26 @@
 
     /* Count tag */
     --count-tag-dot-size: var(--space-050);
+    --count-tag-ring-width: var(--stroke-2);
+
+    /* Date time picker */
+    --date-time-picker-section-gap: var(--space-0625);
+
+    /* Field */
+    --field-gap: var(--space-0625);
+
+    /* Radio group */
+    --radio-group-inline-gap: var(--space-0625);
+
+    /* Rating */
+    --rating-gap: var(--space-0625);
+
+    /* Rich text editor */
+    --rich-text-editor-max-width: 56rem;
+
+    /* AI message */
+    --ai-message-caret-width: var(--space-0125);
+    --ai-message-dot-size: var(--space-0375);
 
     /* Tag */
     --tag-dot-size: var(--space-0625);
