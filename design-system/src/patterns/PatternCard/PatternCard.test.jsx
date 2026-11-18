@@ -28,3 +28,22 @@ describe('PatternCard image placements', () => {
         expect(screen.getByText('Practice set 4 assigned')).toBeVisible();
     });
 });
+
+describe('PatternCard surfaces', () => {
+    it('defaults to sunken and applies surface, clickable, and dragging modifiers', () => {
+        const { container, rerender } = render(<PatternCard title="Sunken">Body</PatternCard>);
+        const card = () => container.firstElementChild;
+
+        expect(card()).toHaveClass('plus-pattern-card', 'plus-pattern-card--surface-sunken');
+        expect(card()).not.toHaveClass('plus-pattern-card--surface-default', 'plus-pattern-card--surface-raised');
+
+        rerender(<PatternCard surface="default" title="Default">Body</PatternCard>);
+        expect(card()).toHaveClass('plus-pattern-card--surface-default');
+
+        rerender(<PatternCard surface="raised" onClick={() => {}} title="Raised">Body</PatternCard>);
+        expect(card()).toHaveClass('plus-pattern-card--surface-raised', 'plus-pattern-card--clickable');
+
+        rerender(<PatternCard surface="sunken" dragging title="Dragging">Body</PatternCard>);
+        expect(card()).toHaveClass('plus-pattern-card--surface-sunken', 'plus-pattern-card--dragging');
+    });
+});

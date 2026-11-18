@@ -1,4 +1,4 @@
-/* PLUS card: raised surface and shadow, full-bleed image, padded content. */
+/* PLUS card: sunken, default, or raised surface, full-bleed image, padded content. */
 
 @use '../../styles/card-title' as *;
 @use '../../styles/state' as *;
@@ -6,7 +6,7 @@
 .plus-pattern-card {
     // A surface tells what sits on it which surface it is: a sticky table
     // cell inside the card paints this, so it matches the card, not the page.
-    --ds-utility-elevation-surface-current: var(--ds-surface-raised);
+    --ds-utility-elevation-surface-current: var(--card-surface-sunken);
 
     display: flex;
     flex-direction: row;
@@ -14,47 +14,92 @@
     container: pattern-card / inline-size;
     box-sizing: border-box;
     min-width: 0;
+    background-color: var(--ds-utility-elevation-surface-current);
+    color: var(--card-text);
+    // Every card keeps a 1px border (transparent on sunken and raised) so
+    // forced colors draw its edge.
+    border: var(--card-border-width) solid transparent;
+    border-radius: var(--card-radius);
+    box-shadow: none;
+    overflow: hidden; // clip the image to the card radius
+    transition: box-shadow var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), border-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+}
+
+.plus-pattern-card--surface-sunken {
+    --ds-utility-elevation-surface-current: var(--card-surface-sunken);
+    border-color: transparent;
+    box-shadow: none;
+}
+
+.plus-pattern-card--surface-default {
+    --ds-utility-elevation-surface-current: var(--card-surface-default);
+    border-color: var(--card-border-default);
+    box-shadow: none;
+}
+
+.plus-pattern-card--surface-raised {
     // The raised pair travels together: the surface and its shadow, never one
     // without the other, or the card loses its edge in dark.
-    background-color: var(--ds-utility-elevation-surface-current);
-    color: var(--ds-text);
-    border-radius: var(--card-radius);
-    box-shadow: var(--ds-shadow-raised);
-    overflow: hidden; // clip the image to the card radius
-    transition: box-shadow var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+    --ds-utility-elevation-surface-current: var(--card-surface-raised);
+    border-color: transparent;
+    box-shadow: var(--card-shadow-raised);
 }
 
 .plus-pattern-card--clickable {
     cursor: pointer;
 }
 
-// A clickable card lifts while hovered: the raised surface's hovered step
-// under the overlay shadow. Pressed settles back onto the raised shadow.
+// A clickable sunken or default card lifts to Raised on hover in place;
+// pressed settles to the raised shadow.
 @include plus-state(
     (
         hovered: (
-            --ds-utility-elevation-surface-current: var(--ds-surface-raised-hovered),
-            box-shadow: var(--ds-shadow-overlay),
+            --ds-utility-elevation-surface-current: var(--card-surface-raised),
+            border-color: transparent,
+            box-shadow: var(--card-shadow-raised),
         ),
         pressed: (
-            --ds-utility-elevation-surface-current: var(--ds-surface-raised-pressed),
-            box-shadow: var(--ds-shadow-raised),
+            --ds-utility-elevation-surface-current: var(--card-surface-raised-pressed),
+            border-color: transparent,
+            box-shadow: var(--card-shadow-raised),
         ),
     ),
     $ring: false,
-    $hovered-selector: '.plus-pattern-card--clickable:hover, .plus-pattern-card--clickable[data-hovered]',
-    $pressed-selector: '.plus-pattern-card--clickable:active, .plus-pattern-card--clickable[data-pressed]'
+    $hovered-selector: '.plus-pattern-card--clickable:not(.plus-pattern-card--dragging):hover, .plus-pattern-card--clickable:not(.plus-pattern-card--dragging)[data-hovered]',
+    $pressed-selector: '.plus-pattern-card--clickable:not(.plus-pattern-card--dragging):active, .plus-pattern-card--clickable:not(.plus-pattern-card--dragging)[data-pressed]'
+);
+
+// A clickable raised card lifts while hovered (raised hovered step under the
+// overlay shadow) and settles back onto the raised shadow while pressed.
+@include plus-state(
+    (
+        hovered: (
+            --ds-utility-elevation-surface-current: var(--card-surface-raised-hovered),
+            border-color: transparent,
+            box-shadow: var(--card-shadow-overlay),
+        ),
+        pressed: (
+            --ds-utility-elevation-surface-current: var(--card-surface-raised-pressed),
+            border-color: transparent,
+            box-shadow: var(--card-shadow-raised),
+        ),
+    ),
+    $ring: false,
+    $hovered-selector: '.plus-pattern-card--surface-raised.plus-pattern-card--clickable:not(.plus-pattern-card--dragging):hover, .plus-pattern-card--surface-raised.plus-pattern-card--clickable:not(.plus-pattern-card--dragging)[data-hovered]',
+    $pressed-selector: '.plus-pattern-card--surface-raised.plus-pattern-card--clickable:not(.plus-pattern-card--dragging):active, .plus-pattern-card--surface-raised.plus-pattern-card--clickable:not(.plus-pattern-card--dragging)[data-pressed]'
 );
 
 // A dragged card is over the UI: the overlay pair, held under hover and press.
 $-dragging: (
-    --ds-utility-elevation-surface-current: var(--ds-surface-overlay),
-    box-shadow: var(--ds-shadow-overlay),
+    --ds-utility-elevation-surface-current: var(--card-surface-overlay),
+    border-color: transparent,
+    box-shadow: var(--card-shadow-overlay),
 );
 
 .plus-pattern-card--dragging {
-    --ds-utility-elevation-surface-current: var(--ds-surface-overlay);
-    box-shadow: var(--ds-shadow-overlay);
+    --ds-utility-elevation-surface-current: var(--card-surface-overlay);
+    border-color: transparent;
+    box-shadow: var(--card-shadow-overlay);
 }
 
 @include plus-state(
@@ -63,6 +108,12 @@ $-dragging: (
     $hovered-selector: '.plus-pattern-card--dragging:hover, .plus-pattern-card--dragging[data-hovered]',
     $pressed-selector: '.plus-pattern-card--dragging:active, .plus-pattern-card--dragging[data-pressed]'
 );
+
+@media (forced-colors: active) {
+    .plus-pattern-card {
+        border-color: CanvasText;
+    }
+}
 
 .plus-pattern-card-pad-sm {
     border-radius: var(--card-radius-compact);
@@ -120,9 +171,9 @@ $-dragging: (
     min-width: 0;
 }
 
-// Large card minimum width (the --card-min-width-lg size boundary).
-// Container queries use the card width, independently of the page breakpoint.
-@container pattern-card (min-width: 480px) {
+// Large card minimum width (480px --card-min-width-lg minus the 1px border on each side).
+// Container queries use the card's content width, independently of the page breakpoint.
+@container pattern-card (min-width: 478px) {
     .plus-pattern-card--image-start,
     .plus-pattern-card--image-end {
         > .plus-pattern-card-image {
@@ -141,7 +192,7 @@ $-dragging: (
         }
         &.plus-pattern-card--image-half {
             > .plus-pattern-card-image { flex-basis: 50%; }
-            .plus-pattern-card-title { font: var(--heading-md); }
+            .plus-pattern-card-title { font: var(--card-title-font-lg); }
         }
     }
     .plus-pattern-card--image-end > .plus-pattern-card-image { order: 1; }
@@ -169,13 +220,13 @@ $-dragging: (
 // The card title type, shared with Card (`styles/_card-title.scss`).
 .plus-pattern-card-title {
     @include card-title-type;
-    color: var(--ds-text);
+    color: var(--card-text);
 }
 
 .plus-pattern-card-description {
     margin: 0;
-    font: var(--body-default);
-    color: var(--ds-text-subtle);
+    font: var(--card-description-font);
+    color: var(--card-text-subtle);
 }
 
 .plus-pattern-card-actions {

@@ -29,7 +29,7 @@ import {
     page="templates-card"
     eyebrow="Template"
     title="Card"
-    purpose="A raised container for one student, session, metric or other object, with slots for an image, header, body and footer."
+    purpose="A container for one student, session, metric or other object, with slots for an image, header, body and footer."
     links={{
         label: 'Uses',
         items: [
@@ -113,13 +113,27 @@ The examples on this page follow the toolbar's Color mode switch.
 
 <div className="sb-ds-doc-section">
 
+## Surface
+
+<ComponentExample of={PatternCardStories.SurfaceSunken} title="Sunken" description={<><code>surface="sunken"</code> (default): <code>--ds-surface-sunken</code>, flat, for grouping static content.</>} />
+
+<ComponentExample of={PatternCardStories.SurfaceDefault} title="Default" description={<><code>surface="default"</code>: <code>--ds-surface</code> with a 1px <code>--ds-border</code>, flat, for cards on the Frame, on Sunken or colored areas, or dense with rows.</>} />
+
+<ComponentExample of={PatternCardStories.SurfaceRaised} title="Raised" description={<><code>surface="raised"</code>: <code>--ds-surface-raised</code> with <code>--ds-shadow-raised</code>, for the one primary card per view.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## State
 
-<ComponentExample of={PatternCardStories.Static} title="Rest" description="A card rests on the raised pair." />
+<ComponentExample of={PatternCardStories.Static} title="Rest" description="A card defaults to the flat sunken surface." />
 
-<ComponentExample of={PatternCardStories.Clickable} title="Clickable" description={<>With <code>onClick</code>, the card lifts on hover and settles back while pressed. Hover it.</>} />
+<ComponentExample of={PatternCardStories.Clickable} title="Clickable" description={<>With <code>onClick</code>, a sunken or default card lifts to Raised on hover in place and settles to the raised shadow while pressed. Hover it.</>} />
 
 <ComponentExample of={PatternCardStories.Dragging} title="Dragging" description={<><code>dragging</code> puts the card on the overlay pair while it moves.</>} />
+
+<ComponentExample of={PatternCardStories.ForcedColors} title="Forced colors" description="Every card carries a 1px border (transparent on sunken and raised) so forced colors draw its edge." />
 
 <ComponentExample of={PatternCardStories.LoadingCard} title="Loading" description="Skeleton bars at the text line heights, in a card kept at its final size." />
 
@@ -161,12 +175,16 @@ The examples on this page follow the toolbar's Color mode switch.
 
 ## Usage
 
-Use a card when one object needs its own container on the page. It uses the raised fill and shadow with no border. A card holds a heading, content and an optional footer for actions. Fill its slots with your own parts.
+Use a card when one object needs its own container on the page. Pick `surface` by the card's role: `sunken` (default) groups static content on `--ds-surface-sunken` without a shadow; `default` pairs `--ds-surface` with a 1px `--ds-border` on the Frame, on Sunken or colored areas, and for dense rows; `raised` pairs `--ds-surface-raised` with `--ds-shadow-raised` for the one primary card per view, first in reading order. A card holds a heading, content and an optional footer for actions. Fill its slots with your own parts.
 
 1. Pick the size by what the card holds.
 2. Choose a header, or omit it when the body carries its own title.
 3. Fill the body slot. Add spacing only inside slot content, using Card stack tokens.
 4. Add a footer only for actions that commit.
+
+### Color
+
+To give a card a semantic or accent fill, swap its surface token for a solid brand (`--ds-background-brand-subtlest`, or `--ds-background-brand-bold` with `--ds-text-inverse`), status (`--ds-background-information`, `--ds-background-success`), accent-subtlest (`--ds-background-accent-teal-subtlest`), or selected (`--ds-background-selected`) background token. `surface="raised"` keeps `--ds-shadow-raised`. On a clickable colored card, hovered and pressed states use that same token's `-hovered` and `-pressed` steps.
 
 ### Size guidance
 
@@ -224,9 +242,9 @@ The image sits above (or, in a side layout, beside) a padded frame, and the head
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Rest</td><td>The raised pair: <code>--ds-surface-raised</code> with <code>--ds-shadow-raised</code>.</td></tr>
-<tr><td>Hovered</td><td>A clickable card only: <code>--ds-surface-raised-hovered</code> with <code>--ds-shadow-overlay</code>. A card with no <code>onClick</code> does not change.</td></tr>
-<tr><td>Pressed</td><td>A clickable card only: <code>--ds-surface-raised-pressed</code> with <code>--ds-shadow-raised</code>.</td></tr>
+<tr><td>Rest</td><td><code>sunken</code> (default): <code>--ds-surface-sunken</code>, flat. <code>default</code>: <code>--ds-surface</code> with a 1px <code>--ds-border</code>, flat. <code>raised</code>: <code>--ds-surface-raised</code> with <code>--ds-shadow-raised</code>. Every surface keeps a 1px border (transparent on sunken and raised) for forced colors.</td></tr>
+<tr><td>Hovered</td><td>A clickable card only: <code>sunken</code> and <code>default</code> lift in place to <code>--ds-surface-raised</code> with <code>--ds-shadow-raised</code>; <code>raised</code> lifts to <code>--ds-surface-raised-hovered</code> with <code>--ds-shadow-overlay</code>. A card with no <code>onClick</code> does not change.</td></tr>
+<tr><td>Pressed</td><td>A clickable card only: settles to <code>--ds-surface-raised-pressed</code> with <code>--ds-shadow-raised</code>.</td></tr>
 <tr><td>Focused</td><td>The card has no focus style of its own. A card made clickable as a whole takes <code>role</code> and <code>tabIndex</code> from you.</td></tr>
 <tr><td>Disabled</td><td>A card is never disabled. Disable the controls inside it.</td></tr>
 <tr><td>Dragging</td><td><code>--ds-surface-overlay</code> with <code>--ds-shadow-overlay</code>, held under hover and press.</td></tr>
@@ -248,12 +266,13 @@ The image sits above (or, in a side layout, beside) a padded frame, and the head
 <tr><td><code>--card-inline-md</code></td><td>8</td><td>Items on a row, such as actions in the header.</td></tr>
 <tr><td><code>--card-min-width-sm</code>, <code>-md</code>, <code>-lg</code></td><td>224 · 304 · 480</td><td>The minimum width of each size.</td></tr>
 <tr><td><code>--card-max-height-sm</code>, <code>-md</code>, <code>-lg</code></td><td>304 · 400 · 640</td><td>The height cap of each size.</td></tr>
-<tr><td><code>--ds-surface-raised</code>, <code>--ds-shadow-raised</code></td><td>color pair</td><td>The card at rest.</td></tr>
-<tr><td><code>--ds-surface-raised-hovered</code>, <code>--ds-surface-raised-pressed</code></td><td>color</td><td>A clickable card while hovered and pressed.</td></tr>
-<tr><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code></td><td>color pair</td><td>A dragged card, and the hover lift's shadow.</td></tr>
-<tr><td><code>--heading-xs</code>, <code>--body-default</code></td><td>type</td><td>The regular title and the description.</td></tr>
-<tr><td><code>--heading-md</code></td><td>type</td><td>The title beside a half-width side image.</td></tr>
-<tr><td><code>--ds-text</code>, <code>--ds-text-subtle</code></td><td>color</td><td>The title and the description.</td></tr>
+<tr><td><code>--card-surface-sunken</code>, <code>-default</code>, <code>-raised</code></td><td>color</td><td>The card fill at rest (<code>--ds-surface-sunken</code>, <code>--ds-surface</code>, <code>--ds-surface-raised</code>).</td></tr>
+<tr><td><code>--card-border-default</code>, <code>--card-border-width</code></td><td>border</td><td>The 1px <code>--ds-border</code> on <code>default</code> cards, and the 1px width kept on every card for forced colors.</td></tr>
+<tr><td><code>--card-shadow-raised</code>, <code>-overlay</code></td><td>shadow</td><td><code>--ds-shadow-raised</code> on raised and hovered clickable cards; <code>--ds-shadow-overlay</code> while dragged or hovering a raised card.</td></tr>
+<tr><td><code>--card-surface-raised-hovered</code>, <code>-pressed</code>, <code>-overlay</code></td><td>color</td><td>Clickable hover/press steps and the dragged overlay surface.</td></tr>
+<tr><td><code>--heading-xs</code>, <code>--card-description-font</code></td><td>type</td><td>The regular title and the description (<code>--body-default</code>).</td></tr>
+<tr><td><code>--card-title-font-lg</code></td><td>type</td><td>The title beside a half-width side image (<code>--heading-md</code>).</td></tr>
+<tr><td><code>--card-text</code>, <code>--card-text-subtle</code></td><td>color</td><td>The title and the description (<code>--ds-text</code>, <code>--ds-text-subtle</code>).</td></tr>
 </tbody>
 </DocsTable>
 
@@ -276,7 +295,7 @@ Visible empty space inside the card means size down. A clipped or crowded body m
 
 ### Never put a card inside a card.
 
-A card's raised fill and shadow are its own object boundary. Group related cards in a Section instead.
+A card's fill and edge are its own object boundary. Group related cards in a Section instead.
 
 <DoDontPair
     doExample={<MetricsWithDividers />}
@@ -325,8 +344,9 @@ A card that holds actions that commit a change gets a footer, and its actions st
 - A card that is clickable as a whole needs a role and a tab stop, and it must answer Enter and Space. When the card has one action, put a Button in the footer instead.
 - Mark the card `aria-busy` while it loads. The skeleton bars are hidden from assistive technology.
 - The hover lift is never the only cue that a card is clickable. Pair it with a visible action or a link in the card.
-- Text sits on the raised surface in `--ds-text` and `--ds-text-subtle`, which meet contrast in every color mode.
-- The card sets the current surface to its raised fill, so a sticky table cell inside it matches the card.
+- Every card keeps a 1px border (transparent on sunken and raised) so forced colors draw its edge.
+- Text sits on each surface in `--ds-text` and `--ds-text-subtle`, which meet contrast in every color mode.
+- The card sets `--ds-utility-elevation-surface-current` to its chosen surface, so a sticky table cell inside it matches the card.
 
 </div>
 
