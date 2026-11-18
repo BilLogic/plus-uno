@@ -140,7 +140,7 @@ Same group: `ProgressTracker`
 | `selectedIndex` | number (required) | — | — |
 | `appearance` | enum | `'default'` | — |
 | `size` | enum | `8` | — |
-| `spacing` | enum | `'comfortable'` | — |
+| `spacing` | enum | `'spacious'` | — |
 | `onSelect` | func | — | — |
 | `ariaControls` | string | — | — |
 | `label` | string | `'Progress'` | — |
@@ -152,7 +152,7 @@ Same group: `ProgressTracker`
 
 **`size`** — `8` · `12`
 
-**`spacing`** — `comfortable` · `cozy` · `compact`
+**`spacing`** — `default` · `compact` · `spacious`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 

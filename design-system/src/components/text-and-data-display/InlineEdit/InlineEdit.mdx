@@ -45,7 +45,7 @@ any edit view; `InlineEditableTextfield` is the one built on `TextField`.
 
 <ComponentExample of={InlineEditStories.SpacingDefault} title="Default" description="The read view is drawn on the field's own box, 40 high, so the text does not move when the editor opens." />
 
-<ComponentExample of={InlineEditStories.SpacingCompact} title="Compact" description="`compact` draws both views 32 high." />
+<ComponentExample of={InlineEditStories.SpacingCompact} title="Compact" description={<><code>spacing="compact"</code> draws both views 32 high.</>} />
 
 <ComponentExample of={InlineEditStories.ButtonsDoNotMoveThePage} title="Buttons over the page" description="The buttons hang under the field over whatever follows it, so showing them does not push the page down." />
 
@@ -201,12 +201,12 @@ Both save; Escape cancels. The inline edit saves itself, so it needs no Save but
     dontCaption="A separate Save step beside an inline edit."
 />
 
-### Use compact in dense lists.
+### Use compact spacing in dense lists.
 
-`compact` draws both views at `--control-md`, to sit in a table cell or a dense row.
+`spacing="compact"` draws both views at `--control-md`, to sit in a table cell or a dense row.
 
 <DoDontPair
-    doExample={<div><div style={{ borderBottom: 'var(--border-width-default) solid var(--ds-border)' }}><InlineEditableTextfield defaultValue="Ada Lovelace" compact /></div><div style={{ borderBottom: 'var(--border-width-default) solid var(--ds-border)' }}><InlineEditableTextfield defaultValue="Grace Hopper" compact /></div><div style={{ borderBottom: 'var(--border-width-default) solid var(--ds-border)' }}><InlineEditableTextfield defaultValue="Katherine Johnson" compact /></div></div>}
+    doExample={<div><div style={{ borderBottom: 'var(--border-width-default) solid var(--ds-border)' }}><InlineEditableTextfield defaultValue="Ada Lovelace" spacing="compact" /></div><div style={{ borderBottom: 'var(--border-width-default) solid var(--ds-border)' }}><InlineEditableTextfield defaultValue="Grace Hopper" spacing="compact" /></div><div style={{ borderBottom: 'var(--border-width-default) solid var(--ds-border)' }}><InlineEditableTextfield defaultValue="Katherine Johnson" spacing="compact" /></div></div>}
     doCaption="Compact rows in a dense list."
     dontExample={<div><div style={{ borderBottom: 'var(--border-width-default) solid var(--ds-border)' }}><InlineEditableTextfield defaultValue="Ada Lovelace" /></div><div style={{ borderBottom: 'var(--border-width-default) solid var(--ds-border)' }}><InlineEditableTextfield defaultValue="Grace Hopper" /></div><div style={{ borderBottom: 'var(--border-width-default) solid var(--ds-border)' }}><InlineEditableTextfield defaultValue="Katherine Johnson" /></div></div>}
     dontCaption="The default height spreads a dense list out."

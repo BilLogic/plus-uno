@@ -14,7 +14,7 @@ Also asked as: surface.
 
 **Source:** `design-system/src/patterns/Page/Page.jsx`
 
-**Stories:** `design-system/src/patterns/Page/Page.stories.jsx` — Overview, Sunken, DefaultLevel, Raised, Overlay, StepNone, StepSmall, StepMedium, StepLarge, Bordered, WithTitle, HeaderAndBanner, OptionalSlots, ColorModes, MediumPad, Interactive, TypeDefault, TypeFullWidth, AnatomyRecord, ScenarioArea, ScenarioSeveralSections, ScenarioRecordTabs, ScenarioTwoLevels, KeyBanner, ResponsiveWidth, MotionSwitchViews, MotionSwitchViewsReduced, MotionScrollToSpot, MotionScrollToSpotReduced
+**Stories:** `design-system/src/patterns/Page/Page.stories.jsx` — Overview, Sunken, DefaultLevel, Raised, Overlay, StepNone, StepCompact, StepDefault, StepSpacious, Bordered, WithTitle, HeaderAndBanner, OptionalSlots, ColorModes, MediumPad, Interactive, TypeDefault, TypeFullWidth, AnatomyRecord, ScenarioArea, ScenarioSeveralSections, ScenarioRecordTabs, ScenarioTwoLevels, KeyBanner, ResponsiveWidth, MotionSwitchViews, MotionSwitchViewsReduced, MotionScrollToSpot, MotionScrollToSpotReduced
 
 **Storybook page:** `design-system/src/patterns/Page/Page.mdx`
 

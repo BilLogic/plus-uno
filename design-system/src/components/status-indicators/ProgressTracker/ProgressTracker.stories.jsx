@@ -76,8 +76,8 @@ Vertical.play = async ({ canvasElement }) => {
 
 export const Spacing = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-150)' }}>
-        <ProgressTracker items={ITEMS} spacing="comfortable" label="Progress tracker, comfortable" />
-        <ProgressTracker items={ITEMS} spacing="cozy" label="Progress tracker, cozy" />
+        <ProgressTracker items={ITEMS} spacing="spacious" label="Progress tracker, spacious" />
+        <ProgressTracker items={ITEMS} spacing="default" label="Progress tracker, default" />
         <ProgressTracker items={ITEMS} spacing="compact" label="Progress tracker, compact" />
     </div>
 );

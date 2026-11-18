@@ -8,6 +8,8 @@ import './InlineEdit.scss';
 /** What the edit view's control is, to put the caret in it when the view opens. */
 const CONTROL = 'input, textarea, select, [contenteditable="true"]';
 
+export const INLINE_EDIT_SPACINGS = ['default', 'compact'];
+
 /**
  * InlineEdit — text that reads as text and becomes a field when it is pressed.
  *
@@ -36,7 +38,7 @@ const InlineEdit = ({
     keepEditViewOpenOnBlur = false,
     startWithEditViewOpen = false,
     hideActionButtons = false,
-    compact = false,
+    spacing = 'default',
     readViewFitContainerWidth = false,
     editLabel = 'Edit',
     confirmLabel = 'Confirm',
@@ -152,12 +154,12 @@ const InlineEdit = ({
 
     const classes = [
         'plus-inline-edit',
-        compact && 'plus-inline-edit--compact',
+        spacing === 'compact' && 'plus-inline-edit--compact',
         editing && 'plus-inline-edit--editing',
         className,
     ].filter(Boolean).join(' ');
 
-    const buttonSpacing = compact ? 'compact' : 'default';
+    const buttonSpacing = spacing === 'compact' ? 'compact' : 'default';
 
     return (
         <div
@@ -249,8 +251,8 @@ InlineEdit.propTypes = {
     startWithEditViewOpen: PropTypes.bool,
     /** Leaves off the confirm and cancel buttons. Enter, Escape and leaving the editor still work. */
     hideActionButtons: PropTypes.bool,
-    /** The 24 height, with the compact buttons. */
-    compact: PropTypes.bool,
+    /** Field and button height: `default` (40) or `compact` (32). */
+    spacing: PropTypes.oneOf(INLINE_EDIT_SPACINGS),
     /** The read view fills its container, so the whole row is one press target. */
     readViewFitContainerWidth: PropTypes.bool,
     /** What a screen reader hears after the read view, naming what pressing does. */

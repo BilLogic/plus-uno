@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import ProgressIndicator from '.';
+import ProgressIndicator, { PROGRESS_INDICATOR_SPACINGS } from '.';
 
 const VALUES = ['One', 'Two', 'Three'];
 const dots = (container) => [...container.querySelectorAll('.plus-progress-indicator__dot')];
@@ -36,5 +36,15 @@ describe('ProgressIndicator progress', () => {
         expect(current).toHaveAttribute('aria-current', 'step');
         expect(current).toHaveAccessibleName('Three');
         expect(current.querySelector('.plus-progress-indicator__bar')).toHaveAttribute('aria-hidden', 'true');
+    });
+
+    it('uses PLUS spacing vocabulary (default, compact, spacious) with spacious as default', () => {
+        expect(PROGRESS_INDICATOR_SPACINGS).toEqual(['default', 'compact', 'spacious']);
+        const { container, rerender } = render(<ProgressIndicator values={VALUES} selectedIndex={1} />);
+        expect(container.querySelector('.plus-progress-indicator')).toHaveClass('plus-progress-indicator--spacious');
+        rerender(<ProgressIndicator values={VALUES} selectedIndex={1} spacing="default" />);
+        expect(container.querySelector('.plus-progress-indicator')).toHaveClass('plus-progress-indicator--default');
+        rerender(<ProgressIndicator values={VALUES} selectedIndex={1} spacing="compact" />);
+        expect(container.querySelector('.plus-progress-indicator')).toHaveClass('plus-progress-indicator--compact');
     });
 });

@@ -2,9 +2,9 @@ import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 
 const METRIC_CLASSES = {
-    lg: 'metric-lg',
-    md: 'metric-md',
-    sm: 'metric-sm',
+    'metric-lg': 'metric-lg',
+    'metric-md': 'metric-md',
+    'metric-sm': 'metric-sm',
 };
 
 /**
@@ -17,12 +17,12 @@ const DonutChartSVG = ({
     paths = [],
     value,
     label = '',
-    centerTextSize = 'lg',
+    centerTextSize = 'metric-lg',
 }) => {
     const [hoveredIndex, setHoveredIndex] = useState(null);
     const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0, visible: false });
     const svgRef = useRef(null);
-    const metricClass = METRIC_CLASSES[centerTextSize] || METRIC_CLASSES.lg;
+    const metricClass = METRIC_CLASSES[centerTextSize] || METRIC_CLASSES['metric-lg'];
 
     const updateTooltipPosition = (event) => {
         if (!svgRef.current) return;
@@ -178,8 +178,8 @@ DonutChartSVG.propTypes = {
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     /** Label text below the value */
     label: PropTypes.string,
-    /** Metric scale step for the center figure */
-    centerTextSize: PropTypes.oneOf(['lg', 'md', 'sm']),
+    /** Metric scale type token for the center figure */
+    centerTextSize: PropTypes.oneOf(['metric-lg', 'metric-md', 'metric-sm']),
 };
 
 export default DonutChartSVG;

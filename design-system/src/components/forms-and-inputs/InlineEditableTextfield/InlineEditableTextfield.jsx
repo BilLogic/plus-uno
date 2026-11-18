@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import TextField from '../TextField/TextField';
-import InlineEdit from '@/components/text-and-data-display/InlineEdit';
+import InlineEdit, { INLINE_EDIT_SPACINGS } from '@/components/text-and-data-display/InlineEdit';
 
 /**
  * InlineEditableTextfield — `InlineEdit` with a Text field for its edit view.
@@ -23,7 +23,7 @@ const InlineEditableTextfield = ({
     type = 'text',
     required = false,
     onConfirm,
-    compact = false,
+    spacing = 'default',
     ...inlineEditProps
 }) => {
     const [kept, setKept] = useState(defaultValue);
@@ -38,7 +38,7 @@ const InlineEditableTextfield = ({
     return (
         <InlineEdit
             {...inlineEditProps}
-            compact={compact}
+            spacing={spacing}
             id={id}
             label={label}
             defaultValue={text}
@@ -54,7 +54,7 @@ const InlineEditableTextfield = ({
                     placeholder={placeholder}
                     maxLength={maxLength}
                     type={type}
-                    spacing={compact ? 'compact' : 'default'}
+                    spacing={spacing}
                     isRequired={required}
                     isInvalid={validation === 'invalid'}
                     errorMessage={validationMessage}
@@ -86,7 +86,8 @@ InlineEditableTextfield.propTypes = {
     keepEditViewOpenOnBlur: PropTypes.bool,
     startWithEditViewOpen: PropTypes.bool,
     hideActionButtons: PropTypes.bool,
-    compact: PropTypes.bool,
+    /** Field and button height: `default` (40) or `compact` (32). */
+    spacing: PropTypes.oneOf(INLINE_EDIT_SPACINGS),
     readViewFitContainerWidth: PropTypes.bool,
     editLabel: PropTypes.string,
     confirmLabel: PropTypes.string,

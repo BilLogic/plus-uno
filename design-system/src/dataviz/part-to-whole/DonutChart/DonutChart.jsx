@@ -5,10 +5,12 @@ import chartTheme from '@/dataviz/chartTheme';
 import { tooltipPointFormat } from '@/dataviz/chartFormat';
 import { CATEGORICAL, CHROME, mostToLeast } from '@/dataviz/palette';
 
+export const DONUT_CENTER_TEXT_SIZES = ['metric-lg', 'metric-md', 'metric-sm'];
+
 const METRIC_CLASSES = {
-    lg: 'metric-lg',
-    md: 'metric-md',
-    sm: 'metric-sm',
+    'metric-lg': 'metric-lg',
+    'metric-md': 'metric-md',
+    'metric-sm': 'metric-sm',
 };
 
 /**
@@ -20,7 +22,7 @@ const DonutChart = ({
     segments = [],
     value,
     label,
-    centerTextSize = 'lg',
+    centerTextSize = 'metric-lg',
     sort = true,
 }) => {
     const hasTrack = useMemo(
@@ -42,7 +44,7 @@ const DonutChart = ({
         [orderedSegments],
     );
 
-    const metricClass = METRIC_CLASSES[centerTextSize] || METRIC_CLASSES.lg;
+    const metricClass = METRIC_CLASSES[centerTextSize] || METRIC_CLASSES['metric-lg'];
 
     const options = useMemo(() => ({
         ...chartTheme,
@@ -146,8 +148,8 @@ DonutChart.propTypes = {
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     /** Label text below the value */
     label: PropTypes.string,
-    /** Metric scale step for the center figure */
-    centerTextSize: PropTypes.oneOf(['lg', 'md', 'sm']),
+    /** Metric scale type token for the center figure */
+    centerTextSize: PropTypes.oneOf(DONUT_CENTER_TEXT_SIZES),
     /** Sort categorical segments from most to least by default; pass false to keep input order. */
     sort: PropTypes.bool,
 };
