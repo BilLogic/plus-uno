@@ -403,7 +403,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
         <div style={{ width: '100%' }}>
             <InlineEdit
                 label="Session goal"
-                compact
+                spacing="compact"
                 defaultValue={step === 'landing' ? 'Equivalent fractions' : 'Number lines'}
                 readView={() => (
                     <span>{step === 'landing' ? 'Equivalent fractions' : 'Number lines'}</span>
@@ -420,7 +420,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
         <div style={{ width: '100%' }}>
             <InlineEditableTextfield
                 label="Student nickname"
-                compact
+                spacing="compact"
                 value={step === 'landing' ? 'Maya L.' : 'Maya'}
                 placeholder="Enter nickname"
                 onConfirm={NOOP}
