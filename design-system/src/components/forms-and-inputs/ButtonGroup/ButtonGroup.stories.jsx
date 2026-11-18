@@ -7,7 +7,7 @@ import { expectFocusRing, expectHovered, expectPressed } from '@/storybook-docs/
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { Button, IconButton } from '@/components';
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: '24px', alignItems: 'center' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-lg)', alignItems: 'center' };
 
 export default {
     title: 'Components/Forms and inputs/Button/Button group',

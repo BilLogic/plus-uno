@@ -4,6 +4,7 @@ import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import { expectInk } from '@/storybook-docs/lib/navigation-states.js';
 import MenuGroup, { ButtonItem, CustomItem, LinkItem, Section } from '@/components/forms-and-inputs/_internal/MenuGroup';
+import { Checkbox } from '@/components';
 import { iconClass } from '../../../lib/icon';
 
 export default {
@@ -65,8 +66,8 @@ export const Selected = () => (
 function CustomRow() {
     const [checked, setChecked] = useState(false);
     return (
-        <CustomItem component="label" description="A row rendered through the caller's own component">
-            <input type="checkbox" checked={checked} onChange={(e) => setChecked(e.target.checked)} /> Custom row
+        <CustomItem component="span" description="A row rendered through the caller's own component">
+            <Checkbox label="Custom row" isChecked={checked} onChange={(e) => setChecked(e.target.checked)} />
         </CustomItem>
     );
 }

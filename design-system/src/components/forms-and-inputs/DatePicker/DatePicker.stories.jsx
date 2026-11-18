@@ -176,22 +176,22 @@ export const PickRange = () => {
     const [start, end] = range;
 
     return (
-        <div style={{ paddingBottom: 'var(--size-1900)', maxWidth: 'var(--size-2000)' }}>
-            <h6 style={{ marginBottom: 'var(--space-100)' }}>Select a Date Range</h6>
-            <p style={{ fontSize: 'var(--type-size-0875)', color: 'var(--ds-text-subtle)', marginBottom: 'var(--space-100)' }}>
+        <div style={{ paddingBottom: 'var(--height-2000)', maxWidth: 'var(--field-width-md)' }}>
+            <h6 className="heading-xxs" style={{ margin: '0 0 var(--section-stack-md)' }}>Select a Date Range</h6>
+            <p className="body-default" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--section-stack-md)' }}>
                 Click a first day, then a last day. The days between are marked.
             </p>
             <DatePicker range value={range} onChange={setRange} />
             {(start || end) && (
                 <div
                     style={{
-                        marginTop: 'var(--space-100)',
-                        padding: 'var(--space-075)',
+                        marginTop: 'var(--section-stack-md)',
+                        padding: 'var(--pad-y-lg) var(--pad-x-md)',
                         backgroundColor: 'var(--ds-surface-container)',
                         borderRadius: 'var(--radius-md)',
                     }}
                 >
-                    <p style={{ margin: 0, fontSize: 'var(--type-size-0875)' }}>
+                    <p className="body-default" style={{ margin: 0 }}>
                         <strong>Range:</strong> {start || '(not set)'} → {end || '(not set)'}
                     </p>
                 </div>
@@ -388,7 +388,7 @@ const box = (input) => input.closest('.plus-field').getBoundingClientRect();
 
 /** The calendar opens 4px under the field, its left edge on the field's. */
 export const CalendarOpensFourPixelsBelow = () => (
-    <div style={{ maxWidth: '296px', marginLeft: '16px' }}>
+    <div style={{ maxWidth: 'var(--field-width-md)', marginLeft: 'var(--inline-lg)' }}>
         <DatePicker aria-label="Session date" value="2026-10-21" />
     </div>
 );
@@ -406,7 +406,7 @@ CalendarOpensFourPixelsBelow.play = async ({ canvasElement }) => {
 
 /** With no room below, the calendar opens above, the same 4px away. */
 export const CalendarFlipsAboveNearTheBottom = () => (
-    <div style={{ position: 'fixed', left: '16px', bottom: '16px', width: '296px' }}>
+    <div style={{ position: 'fixed', left: 'var(--page-pad)', bottom: 'var(--page-pad)', width: 'var(--field-width-md)' }}>
         <DatePicker aria-label="Session date" value="2026-10-21" />
     </div>
 );
