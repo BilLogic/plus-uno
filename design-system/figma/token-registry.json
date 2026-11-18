@@ -1203,9 +1203,7 @@
       "Listbox/max-height": "var(--listbox-max-height)",
       "Listbox/max-width": "var(--listbox-max-width)",
       "Listbox/min-height": "var(--listbox-min-height)",
-      "Menu/group-gap": "var(--menu-group-gap)",
       "Menu/group-min-width": "var(--menu-group-min-width)",
-      "Menu/group-pad-x": "var(--menu-group-pad-x)",
       "Option/menu-width": "var(--option-menu-width)",
       "Option/row-control-gap": "var(--option-row-control-gap)",
       "Option/row-dot-size": "var(--option-row-dot-size)",
@@ -1869,11 +1867,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1155,
+    "scssTokenCount": 1153,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1770,
-      "resolved": 1733,
+      "total": 1768,
+      "resolved": 1731,
       "percent": 98,
       "skippedCollections": [
         {
