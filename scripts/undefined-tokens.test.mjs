@@ -23,11 +23,11 @@ import { run } from './check-undefined-tokens.mjs';
 import {
   EXTERNAL,
   audit,
-  corpus,
   definitions,
   isInterpolated,
   ratchetFailures,
   stripComments,
+  tokenCorpus,
   usages,
 } from './undefined-tokens.mjs';
 
@@ -175,7 +175,7 @@ test('uses and bare are judged apart, and a new name is said once', () => {
 /* ------------------------------------------------------------- the corpus */
 
 test('the real corpus is walked, and the real baseline matches it', () => {
-  const files = corpus(REPO_ROOT, ['design-system/src', '.storybook', 'prototypes']).map((rel) => ({
+  const files = tokenCorpus(REPO_ROOT, ['design-system/src', '.storybook', 'prototypes']).map((rel) => ({
     path: rel,
     text: fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8'),
   }));
@@ -190,7 +190,7 @@ test('the real corpus is walked, and the real baseline matches it', () => {
 });
 
 test('the tokens this pass repointed are gone from the corpus', () => {
-  const files = corpus(REPO_ROOT, ['design-system/src']).map((rel) => ({
+  const files = tokenCorpus(REPO_ROOT, ['design-system/src']).map((rel) => ({
     path: rel,
     text: fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8'),
   }));
@@ -211,7 +211,7 @@ test('a property no file defines is a finding; only the runtime properties Base 
 });
 
 test('no bare use of a token the system does not have remains', () => {
-  const files = corpus(REPO_ROOT, ['design-system/src', '.storybook', 'prototypes']).map((rel) => ({
+  const files = tokenCorpus(REPO_ROOT, ['design-system/src', '.storybook', 'prototypes']).map((rel) => ({
     path: rel,
     text: fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8'),
   }));
@@ -273,4 +273,43 @@ test('an empty token directory fires the sentinel floor, not a clean sweep', () 
   } finally {
     done();
   }
+});
+
+test('a string-built unknown token in design-system/src fails, and a known one passes', () => {
+  const { root, done } = policyTree({
+    'design-system/src/tokens/_chart.scss': ':root { --chart-blue-bold: #00f; --ds-background-accent-blue-subtler: #cef; }\n',
+    'design-system/src/styles/Colors.mdx':
+      "const tones = ['--chart-blue-bold', '--ds-background-accent-blue-subtler', \"--chart-blue-subtle\"];\n",
+    'design-system/src/dataviz/tones.js': "export const missing = '--chart-missing-step';\nexport const ok = '--chart-blue-bold';\n",
+    'design-system/src/components/CloseButton.stories.jsx': "const s = x.replace('--ds-background-', '');\n",
+    'design-system/src/dataviz/palette.test.js': "const synthetic = ['--a', '--b'];\n",
+    'design-system/src/storybook-docs/TokenLibrary.test.jsx': "search('--ds-text-sub');\n",
+    'scripts/baselines/undefined-token-baseline.json': UNDEFINED_BASELINE,
+  });
+  try {
+    const found = messagesOf(run, root);
+    assert.ok(
+      found.some((message) => /NEW\s+--chart-blue-subtle/.test(message)),
+      `expected NEW --chart-blue-subtle finding, got:\n${found.join('\n')}`,
+    );
+    assert.ok(
+      found.some((message) => /NEW\s+--chart-missing-step/.test(message)),
+      `expected NEW --chart-missing-step finding, got:\n${found.join('\n')}`,
+    );
+    assert.ok(
+      !found.some((message) => /--chart-blue-bold|--ds-background-accent-blue-subtler|--ds-background-|--a|--b|--ds-text-sub/.test(message)),
+      `unexpected false positive in:\n${found.join('\n')}`,
+    );
+  } finally {
+    done();
+  }
+});
+
+test('a string-built known token in design-system/src passes with zero findings', () => {
+  const { undefinedTokens } = audit([
+    file('design-system/src/tokens/_chart.scss', ':root { --ds-background-accent-blue-subtler: #cef; }'),
+    file('design-system/src/styles/Colors.mdx', "const tones = ['--ds-background-accent-blue-subtler'];"),
+    file('design-system/src/dataviz/tones.js', 'export const tone = "--ds-background-accent-blue-subtler";'),
+  ]);
+  assert.deepEqual(undefinedTokens, {});
 });
