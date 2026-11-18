@@ -148,9 +148,7 @@ Tokens one component owns, named for it.
 --listbox-max-height  /* Tallest a Select or Cascader listbox may grow before it scrolls. */
 --listbox-max-width  /* Widest a Select or Cascader listbox may grow. */
 --listbox-min-height  /* Shortest a Select or Cascader listbox may be. */
---menu-group-gap  /* Vertical gap between groups in a menu. */
 --menu-group-min-width  /* Minimum width of a menu group. */
---menu-group-pad-x  /* Horizontal padding of a menu group. */
 --option-menu-width  /* Width of a fixed-width option menu. */
 --option-row-control-gap  /* Horizontal gap between an option row's control and its label. */
 --option-row-dot-size  /* Size of the dot in an option row, such as a radio's selected mark. */

@@ -117,6 +117,13 @@ body,
     color: var(--ds-text) !important;
 }
 
+/* FoundationSubsection h3 renders at --heading-md, so an h4 nested inside it steps down to --heading-sm. */
+.sbdocs .sb-docs-subsection h4:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
+    font: var(--heading-sm) !important;
+    color: var(--ds-text) !important;
+    margin: 0 !important;
+}
+
 .sbdocs h5:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
     font: var(--heading-sm) !important;
     color: var(--ds-text) !important;

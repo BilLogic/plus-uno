@@ -1160,20 +1160,6 @@
           }
         },
         {
-          "name": "Menu/group-pad-x",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--menu-group-pad-x)"
-          }
-        },
-        {
-          "name": "Menu/group-gap",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--menu-group-gap)"
-          }
-        },
-        {
           "name": "Popup/min-width",
           "resolvedType": "FLOAT",
           "codeSyntax": {

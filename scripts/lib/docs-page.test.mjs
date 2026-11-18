@@ -290,6 +290,53 @@ test('token and reference tables become text lines; examples are dropped', () =>
   assert.doesNotMatch(focus, /Algebra|A ring\.|style=/);
 });
 
+test('LayerDetailRow keeps its prose, lists and #### headings on a foundation page', () => {
+  const src = `import { Meta } from '@storybook/addon-docs/blocks';
+import { FoundationSection, FoundationSubsection } from '@/storybook-docs/foundation-page.jsx';
+import { LayerDetailRow } from '@/storybook-docs/elevation-folder-figures.jsx';
+import { C } from '@/storybook-docs/foundation-blocks.jsx';
+
+<Meta title="Foundations/Visual/Elevation/Layer system" />
+
+<DocsLanding
+    page="foundations-visual-elevation-layer-system"
+    eyebrow="Foundation · Elevation"
+    title="Layer system"
+    purpose="Five layers."
+/>
+
+<FoundationSection title="The five layers">
+
+<FoundationSubsection title="Layer 2 · Navigation">
+
+<LayerDetailRow variant="navigation">
+
+Edges that stay put while content scrolls under them.
+
+#### Usage & styling
+
+- **Border first;** the overflow shadow appears only once content scrolls beneath.
+
+#### Stacking
+
+<C>--layer-card</C>
+
+</LayerDetailRow>
+
+</FoundationSubsection>
+
+</FoundationSection>
+`;
+  const page = readDocsPage(src);
+  const layers = sectionText(page, 'The five layers');
+  assert.match(layers, /^### Layer 2 · Navigation$/m);
+  assert.match(layers, /Edges that stay put while content scrolls under them\./);
+  assert.match(layers, /^#### Usage & styling$/m);
+  assert.match(layers, /^- \*\*Border first;\*\* the overflow shadow appears only once content scrolls beneath\.$/m);
+  assert.match(layers, /^#### Stacking$/m);
+  assert.match(layers, /^`--layer-card`$/m);
+});
+
 // ── finding a component's page ─────────────────────────────────────────────
 
 function tree(files) {

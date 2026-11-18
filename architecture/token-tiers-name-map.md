@@ -267,8 +267,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Spotlight | `--spotlight-width` |  |
 | Spotlight | `--spotlight-media-height` |  |
 | Menu group | `--menu-group-min-width` |  |
-| Menu group | `--menu-group-pad-x` |  |
-| Menu group | `--menu-group-gap` |  |
 | Popup | `--popup-min-width` |  |
 | Popup | `--popup-max-width` |  |
 | Popup | `--popup-clip-reach` |  |

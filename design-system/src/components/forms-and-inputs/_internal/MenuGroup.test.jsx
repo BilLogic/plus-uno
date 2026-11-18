@@ -54,4 +54,36 @@ describe('MenuGroup', () => {
         fireEvent.keyDown(one, { key: 'ArrowDown' });
         expect(document.activeElement).toBe(three);
     });
+
+    it('applies spacing classes for default, compact, and spacious and does not read density', () => {
+        const { rerender } = render(
+            <MenuGroup>
+                <ButtonItem>One</ButtonItem>
+            </MenuGroup>
+        );
+        const menu = screen.getByRole('menu');
+        expect(menu).toHaveClass('plus-menu-group--default');
+
+        rerender(
+            <MenuGroup spacing="compact">
+                <ButtonItem>One</ButtonItem>
+            </MenuGroup>
+        );
+        expect(menu).toHaveClass('plus-menu-group--compact');
+
+        rerender(
+            <MenuGroup spacing="spacious">
+                <ButtonItem>One</ButtonItem>
+            </MenuGroup>
+        );
+        expect(menu).toHaveClass('plus-menu-group--spacious');
+
+        rerender(
+            <MenuGroup density="compact">
+                <ButtonItem>One</ButtonItem>
+            </MenuGroup>
+        );
+        expect(menu).toHaveClass('plus-menu-group--default');
+        expect(menu).not.toHaveClass('plus-menu-group--compact');
+    });
 });

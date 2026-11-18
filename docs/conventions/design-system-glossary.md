@@ -289,7 +289,7 @@ A color token that names the state it paints, such as `--ds-background-brand-bol
 _Avoid_: "state layer", "08/12/16"
 
 **Elevation**:
-Six levels, lowest first: Sunken, Default, Raised, Overlay, Blocking and Overflow; a surface and its shadow travel together, while Overflow is shadow only. Layer tokens name z-index, not elevation; `design-system/src/styles/Elevation.mdx` owns the choice by behavior.
+Six levels, lowest first: Sunken, Default, Raised, Overlay, Blocking and Overflow; a surface and its shadow travel together, while Overflow is shadow only. Layer tokens name z-index, not elevation; `design-system/src/styles/ElevationOverview.mdx` opens the Elevation folder.
 _Avoid_: "surface" for a layout box
 
 **Radius**:

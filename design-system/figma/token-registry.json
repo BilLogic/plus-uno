@@ -1170,6 +1170,7 @@
       "Calendar/day-lg": "var(--calendar-day-lg)",
       "Calendar/day-md": "var(--calendar-day-md)",
       "Calendar/day-sm": "var(--calendar-day-sm)",
+      "Calendar/nav-size": "var(--calendar-nav-size)",
       "Carousel/control-offset": "var(--carousel-control-offset)",
       "Carousel/control-pad": "var(--carousel-control-pad)",
       "Carousel/control-size": "var(--carousel-control-size)",
@@ -1205,9 +1206,7 @@
       "Listbox/max-height": "var(--listbox-max-height)",
       "Listbox/max-width": "var(--listbox-max-width)",
       "Listbox/min-height": "var(--listbox-min-height)",
-      "Menu/group-gap": "var(--menu-group-gap)",
       "Menu/group-min-width": "var(--menu-group-min-width)",
-      "Menu/group-pad-x": "var(--menu-group-pad-x)",
       "Option/menu-width": "var(--option-menu-width)",
       "Option/row-control-gap": "var(--option-row-control-gap)",
       "Option/row-dot-size": "var(--option-row-dot-size)",
@@ -1874,11 +1873,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1157,
+    "scssTokenCount": 1156,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1775,
-      "resolved": 1738,
+      "total": 1774,
+      "resolved": 1737,
       "percent": 98,
       "skippedCollections": [
         {
