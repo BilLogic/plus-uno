@@ -47,6 +47,6 @@ export const assertContained = async ({ canvasElement, tags = [] }) => {
     if (!tags.includes('dev') || !canvasElement) return;
     const escapes = findEscapes(canvasElement);
     if (escapes.length) {
-        throw new Error(`This docs demo leaves its canvas; render it in place (Modal renderAs="inline", FlagGroup containerPosition="static", or a frame):\n${escapes.join('\n')}`);
+        throw new Error(`This docs demo leaves its canvas; render it in place (Dialog, Modal inline, FlagGroup containerPosition="static", or a frame):\n${escapes.join('\n')}`);
     }
 };

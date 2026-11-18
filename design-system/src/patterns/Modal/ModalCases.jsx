@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { Button, FooterActions, ProgressTracker, TextField } from '@/components';
-import { PatternModal } from '@/patterns';
+import { Button, Dialog, FooterActions, ProgressTracker, TextField } from '@/components';
 import { CaseBlanket } from '@/storybook-docs/lib/case-surface.jsx';
 import { stepItems } from '@/storybook-docs/lib/focused-task.jsx';
 
 /**
  * The live do and don't examples on the Modal template page, composed from
- * `Blanket`, `PatternModal`, `FooterActions`, `ProgressTracker` and `Button`.
+ * `CaseBlanket`, `Dialog`, `FooterActions`, `ProgressTracker` and `Button`.
  */
 
 const SESSION_NOTES = [
@@ -21,7 +20,7 @@ const SESSION_NOTES = [
 /** Past the cap the body scrolls while header and footer stay pinned. */
 export const FooterPinnedModal = () => (
     <CaseBlanket height={290}>
-        <PatternModal
+        <Dialog
             title="Session notes"
             height="fill"
             onClose={() => {}}
@@ -38,16 +37,17 @@ export const FooterPinnedModal = () => (
                     <p key={i} style={{ margin: 0, font: 'var(--body-default)' }}>{line}</p>
                 ))}
             </div>
-        </PatternModal>
+        </Dialog>
     </CaseBlanket>
 );
 
 /** The Save button sits inside the scrolling body instead of a pinned footer. */
 export const ButtonInBodyModal = () => (
     <CaseBlanket height={290}>
-        <PatternModal
+        <Dialog
             title="Session notes"
             height="fill"
+            showBottomButtons={false}
             onClose={() => {}}
             style={{ inlineSize: '100%' }}
         >
@@ -59,7 +59,7 @@ export const ButtonInBodyModal = () => (
                     <Button text="Save" appearance="primary" onClick={() => {}} />
                 </div>
             </div>
-        </PatternModal>
+        </Dialog>
     </CaseBlanket>
 );
 
@@ -73,7 +73,7 @@ export const StepsFooterModal = () => {
     const last = at === STEP_LABELS.length - 1;
     return (
         <CaseBlanket height={300}>
-            <PatternModal
+            <Dialog
                 title="Schedule a session"
                 onClose={() => {}}
                 style={{ inlineSize: '100%' }}
@@ -100,7 +100,7 @@ export const StepsFooterModal = () => {
                         <p style={{ margin: 0, font: 'var(--body-default)' }}>{`${student} · ${slot}`}</p>
                     ) : null}
                 </div>
-            </PatternModal>
+            </Dialog>
         </CaseBlanket>
     );
 };
@@ -128,7 +128,7 @@ export const TabsForStepsModal = () => {
     ];
     return (
         <CaseBlanket height={300}>
-            <PatternModal
+            <Dialog
                 title="Schedule a session"
                 onClose={() => {}}
                 style={{ inlineSize: '100%' }}
