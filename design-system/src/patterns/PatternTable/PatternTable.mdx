@@ -29,7 +29,7 @@ import {
     page="templates-table"
     eyebrow="Template"
     title="Table"
-    purpose="The table pattern is how a table sits on a page. A Section holds the table, and the Section header carries the title and the toolbar. The table spans the section under it, plain, with no card around it and no padding of its own. The shell takes your head and rows, and adds a pagination slot and an empty-state slot."
+    purpose="The table pattern is how a table sits on a page. A Section holds the table, and the Section header carries the title, the actions, Search and the filters. The table spans the section under it, plain, with no card around it and no padding of its own. The shell takes your head and rows, and adds a pagination slot and an empty-state slot."
     links={{
         label: 'Uses',
         items: [
@@ -119,7 +119,7 @@ The examples on this page follow the toolbar's Color mode switch.
 
 ## Usage
 
-A table sits in a Section and spans it. Its first and last cells sit flush with the section edge. The Section header carries the toolbar and the tabs: search, filters and the record count use the toolbar type, and saved views use the tabs type. The bulk bar is never in the Section header: while rows are selected, a Dynamic table's head row becomes it, so the toolbar stays put. Empty and no results replace the whole table so the Section header stays usable; loading and error states happen inside the table, under its header. Paging stays under the rows, inside the same Section.
+A table sits in a Section and spans it. Its first and last cells sit flush with the section edge. The Section header carries the views, then Search and the "Field: value" filters with the record count. The bulk bar is never in the Section header: while rows are selected, a Dynamic table's head row becomes it, so the header rows stay put. Empty and no results replace the whole table so the Section header stays usable; loading and error states happen inside the table, under its header. Paging stays under the rows, inside the same Section.
 
 ### Type guidance
 
@@ -136,7 +136,7 @@ Choose by what people do with the rows. Read the questions in order and stop at 
 </tbody>
 </DocsTable>
 
-Search, filters and actions sit in the Section header: `<PatternSection toolbar={<PatternSection.Toolbar />}>`.
+Search, filters and actions sit in the Section header: `<PatternSection views={...} search={...} filters={[...]} count="340 students">`.
 
 </div>
 
@@ -209,7 +209,7 @@ Row states are layered over each cell's fill, never swapped for it.
 
 <DoDontPair
     doExample={<PlainTable />}
-    doCaption="Search, filters and the record count live in the Section header toolbar. The head row follows directly."
+    doCaption="Search, filters and the record count live in the Section header rows. The head row follows directly."
     dontExample={<SecondToolbar />}
     dontCaption="A second toolbar sits between the Section header and the head row. The table has no toolbar of its own."
 />
@@ -220,9 +220,9 @@ Never mix a Static, Dynamic or Tree table in one Section either.
 
 <DoDontPair
     doExample={<PlainTable />}
-    doCaption="One table per Section, with its own header, so people always know which rows a toolbar acts on."
+    doCaption="One table per Section, with its own header, so people always know which rows its Search and filters act on."
     dontExample={<TwoTables />}
-    dontCaption="Two tables share one Section and one header. The toolbar no longer says which table it acts on."
+    dontCaption="Two tables share one Section and one header. Search and filters no longer say which table they act on."
 />
 
 ### Use a Dynamic table for rows people act on.
@@ -255,7 +255,7 @@ Never mix a Static, Dynamic or Tree table in one Section either.
 </thead>
 <tbody>
 <tr><td>Name every column with a short head, in sentence case: "Last session".</td><td>A blank head, or one in all caps.</td></tr>
-<tr><td>Give the count in words in the toolbar: "340 students".</td><td>A count in the head row or under the table.</td></tr>
+<tr><td>Give the count in words in the header: "340 students".</td><td>A count in the head row or under the table.</td></tr>
 <tr><td>An empty message that says what will appear and the first action: "No members yet", "Invite a member".</td><td>An empty table body with no message.</td></tr>
 </tbody>
 </DocsTable>
@@ -280,7 +280,7 @@ Never mix a Static, Dynamic or Tree table in one Section either.
 
 ## Related
 
-- <DocsLink id="templates-section">Section</DocsLink>: the header types, toolbar and tabs, that sit above every table.
+- <DocsLink id="templates-section">Section</DocsLink>: the header rows that sit above every table.
 - <DocsLink id="components-text-and-data-display-static-table">Table component</DocsLink>: the table components, with a set of headers and rows.
 - <DocsLink id="components-navigation-pagination">Pagination</DocsLink>: the pager that fills the footer slot.
 - <DocsLink id="templates-card">Card</DocsLink>: a table never sits inside a card.

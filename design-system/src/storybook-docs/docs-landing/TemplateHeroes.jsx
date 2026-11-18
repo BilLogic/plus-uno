@@ -191,19 +191,25 @@ export const SectionHero = () => {
     const s = { x: 0, y: 12, w: 300, h: 136 };
     const left = s.x + 14;
     const right = s.x + s.w - 14;
-    const side = { x: right - 76, y: s.y + 44, w: 76, h: 52 };
+    const side = { x: right - 76, y: s.y + 62, w: 76, h: 52 };
     return (
         <HeroDrawing>
             <PageFill {...s} ring />
             {/* The header: heading at the content's left edge. */}
             <SkeletonBar x={left} y={s.y + 12} w={44} h={5} accent heading />
             <SkeletonBar x={left + 52} y={s.y + 13} w={40} />
-            <Rule x1={left} x2={left + 30} y1={s.y + 26} y2={s.y + 26} stroke={PAINT.tabSelected} thick />
-            {/* The view bar: its last control ends at the content's right edge. */}
+            {/* Row 2: the views as pills at the start. */}
+            <Rect x={left} y={s.y + 24} w={30} h={8} fill={PAINT.tabSelected} corner="button" />
+            <Rect x={left + 34} y={s.y + 24} w={26} h={8} fill={PAINT.buttonDefault} corner="button" />
+            {/* The actions end the title row, at the content's right edge. */}
             <Rect x={right - 10 - 4 - 40} y={s.y + 10} w={40} h={8} fill={PAINT.buttonDefault} corner="button" />
             <Rect x={right - 10} y={s.y + 10} w={10} h={8} fill={PAINT.buttonDefault} corner="button" />
+            {/* Row 3: Search, then the Field: value triggers. */}
+            <Rect x={left} y={s.y + 38} w={44} h={8} fill={PAINT.fieldSurface} stroke={PAINT.fieldBorder} corner="button" />
+            <Rect x={left + 48} y={s.y + 38} w={34} h={8} fill={PAINT.buttonDefault} corner="button" />
+            <Rect x={left + 86} y={s.y + 38} w={34} h={8} fill={PAINT.buttonDefault} corner="button" />
             {/* The body, and the side beside it. */}
-            <Rows x={left} w={side.x - 14 - left} y={s.y + 38} n={6} pitch={14} />
+            <Rows x={left} w={side.x - 14 - left} y={s.y + 58} n={5} pitch={14} />
             <CardBox {...side} />
             <SkeletonBar x={side.x + 8} y={side.y + 10} w={40} h={4} heading />
             <SkeletonBar x={side.x + 8} y={side.y + 22} w={56} />

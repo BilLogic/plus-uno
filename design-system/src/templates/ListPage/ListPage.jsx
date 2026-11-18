@@ -14,7 +14,7 @@ const ROWS = [
  */
 const ListPage = ({ title = 'Members', rows = ROWS, sidebar, onAdd }) => (
     <Frame sidebar={sidebar} header={<Breadcrumb items={[{ text: 'Home', href: '/' }, { text: title }]} />}>
-        <PatternSection level="page" title={title} actions={<Button text="Add member" appearance="primary" spacing="compact" onClick={onAdd} />}>
+        <PatternSection level="page" title={title} actions={<Button text="Add member" appearance="primary" onClick={onAdd} />}>
             <PatternTable>
                 <thead>
                     <tr>

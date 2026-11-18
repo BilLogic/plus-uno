@@ -20,7 +20,8 @@ import {
     PageTabs,
     RecordTabSection,
     SessionsTable,
-    ViewBarWithAdd,
+    StudentViews,
+    AddStudentAction,
     ViewSelect,
 } from './pageDemo.jsx';
 import Page from '@/patterns/Page';
@@ -281,13 +282,13 @@ export const AnatomyRecord = {
     },
 };
 
-/** Area page, one collection: the title alone; the collection's Primary ends its view bar. */
+/** Area page, one collection: the title alone; the collection's Primary sits in the Section's title row. */
 export const ScenarioArea = {
     name: 'Area page, one collection',
     render: () => (
         <PageStage scrollable>
             <DemoPageHeader title="Students" />
-            <PatternSection title="Students" type="tabs-only" tabs={<ViewBarWithAdd />}>
+            <PatternSection title="Students" views={<StudentViews />} actions={<AddStudentAction />}>
                 <StudentsTable count={4} />
             </PatternSection>
         </PageStage>
@@ -299,7 +300,9 @@ export const ScenarioArea = {
         await expect(canvas.getAllByRole('heading', { level: 1 }), 'one h1').toHaveLength(1);
         await expect(canvasElement.querySelector('.plus-page-header-actions'), 'no page actions on an area page').toBeNull();
         const add = canvas.getByRole('button', { name: 'Add student' });
-        await expect(add.closest('.plus-section-view-bar'), '"Add student" ends the view bar, not the header').not.toBeNull();
+        await expect(add.closest('.plus-pattern-section-actions'), '"Add student" sits in the Section title row, not the page header').not.toBeNull();
+        await expect(Math.round(add.getBoundingClientRect().height), 'the action draws 32').toBe(32);
+        await expect(canvasElement.querySelectorAll('.plus-section-rows > .plus-section-row'), 'views row only; no search or filter row').toHaveLength(1);
     },
 };
 
@@ -457,7 +460,7 @@ const SwitchViewsDemo = () => {
             </PatternSection>
         ),
         sessions: (
-            <PatternSection title="Sessions" type="tabs-only" tabs={<ViewSelect value={status} onChange={setStatus} />}>
+            <PatternSection title="Sessions" views={<ViewSelect value={status} onChange={setStatus} />}>
                 <SessionsTable status={status} />
             </PatternSection>
         ),

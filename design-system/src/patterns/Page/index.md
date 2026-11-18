@@ -66,8 +66,8 @@ Don't: A breadcrumb on a top-level area page, repeating the Sidebar's place.
 
 Page actions sit at the end of the title row and are about the page only. Where an add action goes: the Navigation pattern.
 
-Do: "Add" ends the collection's view bar; the header carries only page actions.
-Don't: The same Primary twice: in the page header and in the Section's view bar.
+Do: "Add" is the Section's one action, in its title row; the page header carries only page actions.
+Don't: The same Primary twice: in the page header and in the Section's title row.
 
 ### Keep the description to one line. {#keep-the-description-to-one-line}
 
@@ -84,14 +84,14 @@ Don't: A paragraph under the title pushes the first Section down.
 
 The rule and its reasons: the Navigation pattern. Page tabs name views of one subject; the Section's views become one labeled PopupSelect.
 
-Do: Under page tabs the Section's views are one labeled PopupSelect at the start of its bar.
+Do: Under page tabs the Section's views are one labeled PopupSelect in its views row.
 Don't: Pill views under page tabs: two tab systems on one page.
 
 ### Shrink the scrolled header to one sticky row. {#shrink-the-scrolled-header-to-one-sticky-row}
 
 **Checked:** Review
 
-The breadcrumb with the title at its end, then the page actions; page tabs stick under it. The Section view bar scrolls away. This state is planned.
+The breadcrumb with the title at its end, then the page actions; page tabs stick under it. The Section header rows scroll away. This state is planned.
 
 ### Show one banner at a time, scrolling with the content. {#show-one-banner-at-a-time-scrolling-with-the-content}
 
@@ -111,7 +111,7 @@ Which tier a message belongs to: the Notifications pattern.
 ## Related
 
 - Frame: use when deciding which type the page sits in.
-- Section: use when a region needs its own heading, view bar or detail.
+- Section: use when a region needs its own heading, views or detail.
 - Card: use when one object has a shape already agreed.
 - Elevation: use when picking which shadow goes with which level.
 - Patterns: use when deciding where a breadcrumb or a tab belongs (Navigation), or choosing the StatusTag beside the title (Indicators).

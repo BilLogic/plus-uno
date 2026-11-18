@@ -1,7 +1,7 @@
 import React from 'react';
 import PatternTable from '@/patterns/PatternTable';
 import PatternSection from '@/patterns/PatternSection';
-import { DynamicTable, Icon, TreeTable } from '@/components';
+import { DynamicTable, Icon, SearchField, TreeTable } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 
 /**
@@ -53,10 +53,18 @@ const rosterRows = roster.map(([student, tutor, last, sessions, attendance]) => 
     ],
 }));
 
+/** The header rows a list carries: Search, one applied filter, then the count in words. */
+const listHeader = {
+    search: <SearchField mode="active" spacing="compact" placeholder="Search students" />,
+    filters: [{ key: 'status', label: 'Status', text: 'Active', isSelected: true, onClick: () => {} }],
+    count: '340 students',
+    onClearAll: () => {},
+};
+
 const RosterSection = () => {
     const [selected, setSelected] = React.useState(['Ava Thompson', 'Marcus Lee']);
     return (
-        <PatternSection title="Students" toolbar={<PatternSection.Toolbar count="340 students" />}>
+        <PatternSection title="Students" {...listHeader}>
             <DynamicTable
                 head={rosterHead}
                 rows={rosterRows}
@@ -197,11 +205,9 @@ const studentTable = (
     </PatternTable>
 );
 
-const countToolbar = <PatternSection.Toolbar count="340 students" />;
-
-const InSection = ({ children, toolbar = countToolbar }) => (
+const InSection = ({ children }) => (
     <HeadingLevelContext.Provider value={5}>
-        <PatternSection title="Students" toolbar={<PatternSection.Toolbar count="340 students" />}>{children}</PatternSection>
+        <PatternSection title="Students" {...listHeader}>{children}</PatternSection>
     </HeadingLevelContext.Provider>
 );
 
