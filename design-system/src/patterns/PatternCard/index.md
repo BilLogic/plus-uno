@@ -2,7 +2,7 @@
 
 # PatternCard
 
-PLUS card: an optional image, content and footer on a `sunken`, `default`, or `raised` surface. - **Surface**: `sunken` (default, flat), `default` (page surface with a 1px border, flat), or `raised` (raised surface and shadow). Every card carries a 1px border (transparent on sunken and raised) so forced colors draw its edge. - **Image placement**: `top` (default), `start` or `end`. Side images apply at the large card minimum width and fill the height. `imageSplit` chooses one third (default) or one half; half uses Heading medium on a side card. Below the large minimum width, the image returns to the top with its own ratio. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: `padding` sets Card/pad-compact · default · spacious (via prop values `'sm'`, `'md'`, `'lg'`), the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: a clickable `sunken` or `default` card lifts to Raised on hover in place and settles to the raised shadow while pressed; a clickable `raised` card lifts to the raised hovered step under the overlay shadow and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.
+PLUS card: an optional image, content and footer on a `sunken`, `default`, or `raised` surface. - **Surface**: `sunken` (default, flat), `default` (page surface with a 1px border, flat), or `raised` (raised surface and shadow). Every card carries a 1px border (transparent on sunken and raised) so forced colors draw its edge. - **Image placement**: `top` (default), `start` or `end`. Side images apply at the large card minimum width and fill the height. `imageSplit` chooses one third (default) or one half; half uses Heading medium on a side card. Below the large minimum width, the image returns to the top with its own ratio. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: padding uses `--card-pad` and radius uses `--card-radius` at every size, the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: a clickable `sunken` or `default` card lifts to Raised on hover in place and settles to the raised shadow while pressed; a clickable `raised` card lifts to the raised hovered step under the overlay shadow and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.
 
 Also asked as: summary card, object card.
 
@@ -39,11 +39,11 @@ Content picks the size. Choose the smallest card that holds the content without 
 
 | Size | When to use | Pad | Radius | Minimum width | Height cap |
 | --- | --- | --- | --- | --- | --- |
-| `sm` | One number or one line. | 16 | 12 | 224 | 304 |
-| `md` | A short list or a few lines. | 20 | 16 | 304 | 400 |
-| `lg` | A summary with several parts. | 24 | 16 | 480 | 640 |
+| `sm` | One number or one line. | 16 | 16 | 224 | 304 |
+| `md` | A short list or a few lines. | 16 | 16 | 304 | 400 |
+| `lg` | A summary with several parts. | 16 | 16 | 480 | 640 |
 
-In Figma, `size` picks the pad, the radius and the minimum width together. In code, `padding` sets the pad and the radius, and `minWidth` sets the minimum width. A height cap is set with `style`'s `maxHeight`, and the card clips what passes it.
+In Figma, `size` picks the minimum width. In code, `minWidth` sets the minimum width; every size uses `--card-pad` (16) and `--card-radius` (16). A height cap is set with `style`'s `maxHeight`, and the card clips what passes it.
 
 ### Cards in a row
 
@@ -133,9 +133,8 @@ The image sits above (or, in a side layout, beside) a padded frame, and the head
 
 | Token | Value | Used for |
 | --- | --- | --- |
-| `--card-pad-compact`, `-default`, `-spacious` | 16 · 20 · 24 | The pad of a small, medium and large card. |
-| `--card-radius-compact` | 12 | The radius of a small card, and of a card inside a filled Section. |
-| `--card-radius` | 16 | The radius of medium and large cards. |
+| `--card-pad` | 16 | Padding inside a card at every size. |
+| `--card-radius` | 16 | Corner rounding of a card at every size. |
 | `--card-stack-sm`, `-md`, `-lg` | 4 · 8 · 12 | Title to description; header to body, set by `gap`; body to footer. |
 | `--card-inline-md` | 8 | Items on a row, such as actions in the header. |
 | `--card-min-width-sm`, `-md`, `-lg` | 224 · 304 · 480 | The minimum width of each size. |
@@ -170,7 +169,6 @@ The image sits above (or, in a side layout, beside) a padded frame, and the head
 | `imageSplit` | enum | `'1/3'` | Side image share. One half also steps the title up to Heading medium. Ignored for top placement. |
 | `footer` | node | — | Footer slot: commit actions, left-aligned, Card/stack-lg below the body |
 | `surface` | enum | `'sunken'` | Surface level: sunken (default, flat), default (page fill with a 1px border, flat), or raised (raised fill and shadow) |
-| `padding` | enum | `'md'` | Padding scale: Card/pad-compact · default · spacious (16 · 20 · 24) |
 | `gap` | enum | `'md'` | Header-to-body stack: Card/stack-sm · md · lg (4 · 8 · 12) |
 | `minWidth` | number or string | — | Minimum width constraint (number of px or any CSS length) |
 | `onClick` | func | — | Click handler, passed to the card's root element. Its presence adds the clickable class: a pointer cursor and the hover lift. It adds no role or tab stop; pass `role` and `tabIndex` for a card clickable as a whole. |
@@ -188,15 +186,13 @@ The image sits above (or, in a side layout, beside) a padded frame, and the head
 
 **`surface`** — `sunken` · `default` · `raised`
 
-**`padding`** — `sm` · `md` · `lg`
-
 **`gap`** — `sm` · `md` · `lg`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
-`--card-border-default` · `--card-border-width` · `--card-description-font` · `--card-inline-md` · `--card-pad-compact` · `--card-pad-default` · `--card-pad-spacious` · `--card-radius` · `--card-radius-compact` · `--card-shadow-overlay` · `--card-shadow-raised` · `--card-stack-lg` · `--card-stack-md` · `--card-stack-sm` · `--card-surface-default` · `--card-surface-overlay` · `--card-surface-raised` · `--card-surface-raised-hovered` · `--card-surface-raised-pressed` · `--card-surface-sunken` · `--card-text` · `--card-text-subtle` · `--card-title-font-lg` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-utility-elevation-surface-current`
+`--card-border-default` · `--card-border-width` · `--card-description-font` · `--card-inline-md` · `--card-pad` · `--card-radius` · `--card-shadow-overlay` · `--card-shadow-raised` · `--card-stack-lg` · `--card-stack-md` · `--card-stack-sm` · `--card-surface-default` · `--card-surface-overlay` · `--card-surface-raised` · `--card-surface-raised-hovered` · `--card-surface-raised-pressed` · `--card-surface-sunken` · `--card-text` · `--card-text-subtle` · `--card-title-font-lg` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-utility-elevation-surface-current`
 
 From `design-system/src/patterns/PatternCard/PatternCard.scss`. Override these through the token layer, never with a literal.
 

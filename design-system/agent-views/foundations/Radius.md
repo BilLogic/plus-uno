@@ -19,7 +19,7 @@ Nine rules decide a corner. Take the first one that matches. A radius comes only
 5. **Nested:** inner radius = outer radius − padding. Fix an uneven corner with padding, not a new radius.
 6. **Button in a field:** the field's radius − 4, so 6 default and 4 compact.
 7. **Other controls:** the control's height ÷ 4 (`Radius / Control`).
-8. **Templates:** Section, Modal and Card 16; Popup, compact Card, Table and boxes inside a page 12; the smallest nested visual 8.
+8. **Templates:** Section, Modal and Card 16; Popup, Table and boxes inside a page 12; the smallest nested visual 8.
 9. **Focus ring:** the element's radius + the ring's offset.
 
 ## Scale
@@ -48,7 +48,7 @@ A button group rounds its outer corners and keeps the inner seams square.
 
 ## Templates
 
-Each template owns a token. A Page sits square in the Frame; a Section with a fill and a Card round at 16; a Card inside a filled Section takes the compact 12.
+Each template owns a token. A Page sits square in the Frame; a Section with a fill and a Card round at 16.
 
 | Template | Radius (px) | Token |
 | --- | --- | --- |
@@ -56,7 +56,6 @@ Each template owns a token. A Page sits square in the Frame; a Section with a fi
 | Section with a fill | 16 | `--section-radius` |
 | Modal | 16 | `--modal-radius` |
 | Card | 16 | `--card-radius` |
-| Card, compact, or inside a filled Section | 12 | `--card-radius-compact` |
 | Popup, menu, Flag | 12 | `--popup-radius` |
 | Table | 12 | `--table-radius` |
 

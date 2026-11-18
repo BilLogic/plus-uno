@@ -111,8 +111,8 @@
       "tokens": [
         "--body-lg",
         "--border-width-default",
-        "--card-pad-default",
-        "--card-radius-compact",
+        "--card-pad",
+        "--card-radius",
         "--ds-background-neutral-subtle-hovered",
         "--ds-background-neutral-subtle-pressed",
         "--ds-background-selected",
@@ -2331,7 +2331,7 @@
         "--body-default",
         "--border-width-default",
         "--border-width-selected",
-        "--card-pad-default",
+        "--card-pad",
         "--checkbox-control-size",
         "--choice-tile-width",
         "--control-sm",
@@ -2939,7 +2939,7 @@
       ],
       "tokens": [
         "--border-width-default",
-        "--card-radius-compact",
+        "--card-radius",
         "--code-default",
         "--ds-background-code-default",
         "--ds-background-code-gutter",
@@ -3113,7 +3113,7 @@
         "--body-default",
         "--body-sm",
         "--border-width-default",
-        "--card-radius-compact",
+        "--card-radius",
         "--ds-background-selected",
         "--ds-border",
         "--ds-text-subtle",
@@ -4886,7 +4886,8 @@
         "--body-default",
         "--body-sm",
         "--border-width-default",
-        "--card-radius-compact",
+        "--card-pad",
+        "--card-radius",
         "--ds-background-brand-subtlest",
         "--ds-background-danger-subtler",
         "--ds-background-disabled",
@@ -4911,8 +4912,6 @@
         "--focus-ring-width",
         "--icon-sm",
         "--inline-md",
-        "--pad-x-md",
-        "--pad-y-md",
         "--stack-md",
         "--stack-sm"
       ]
@@ -8662,7 +8661,7 @@
       "import": "import { PatternCard } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/PatternCard/PatternCard.jsx",
-      "summary": "PLUS card: an optional image, content and footer on a `sunken`, `default`, or `raised` surface. - **Surface**: `sunken` (default, flat), `default` (page surface with a 1px border, flat), or `raised` (raised surface and shadow). Every card carries a 1px border (transparent on sunken and raised) so forced colors draw its edge. - **Image placement**: `top` (default), `start` or `end`. Side images apply at the large card minimum width and fill the height. `imageSplit` chooses one third (default) or one half; half uses Heading medium on a side card. Below the large minimum width, the image returns to the top with its own ratio. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: `padding` sets Card/pad-compact · default · spacious (via prop values `'sm'`, `'md'`, `'lg'`), the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: a clickable `sunken` or `default` card lifts to Raised on hover in place and settles to the raised shadow while pressed; a clickable `raised` card lifts to the raised hovered step under the overlay shadow and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.",
+      "summary": "PLUS card: an optional image, content and footer on a `sunken`, `default`, or `raised` surface. - **Surface**: `sunken` (default, flat), `default` (page surface with a 1px border, flat), or `raised` (raised surface and shadow). Every card carries a 1px border (transparent on sunken and raised) so forced colors draw its edge. - **Image placement**: `top` (default), `start` or `end`. Side images apply at the large card minimum width and fill the height. `imageSplit` chooses one third (default) or one half; half uses Heading medium on a side card. Below the large minimum width, the image returns to the top with its own ratio. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: padding uses `--card-pad` and radius uses `--card-radius` at every size, the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: a clickable `sunken` or `default` card lifts to Raised on hover in place and settles to the raised shadow while pressed; a clickable `raised` card lifts to the raised hovered step under the overlay shadow and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.",
       "props": [
         {
           "name": "id",
@@ -8763,19 +8762,6 @@
             "raised"
           ],
           "description": "Surface level: sunken (default, flat), default (page fill with a 1px border, flat), or raised (raised fill and shadow)",
-          "deprecated": null
-        },
-        {
-          "name": "padding",
-          "type": "enum",
-          "required": false,
-          "default": "'md'",
-          "values": [
-            "sm",
-            "md",
-            "lg"
-          ],
-          "description": "Padding scale: Card/pad-compact · default · spacious (16 · 20 · 24)",
           "deprecated": null
         },
         {
@@ -8901,11 +8887,8 @@
         "--card-border-width",
         "--card-description-font",
         "--card-inline-md",
-        "--card-pad-compact",
-        "--card-pad-default",
-        "--card-pad-spacious",
+        "--card-pad",
         "--card-radius",
-        "--card-radius-compact",
         "--card-shadow-overlay",
         "--card-shadow-raised",
         "--card-stack-lg",
@@ -11322,7 +11305,7 @@
         "--body-default",
         "--border-width-default",
         "--border-width-selected",
-        "--card-pad-default",
+        "--card-pad",
         "--choice-tile-width",
         "--control-sm",
         "--ds-background-disabled",
@@ -12790,8 +12773,8 @@
         "--body-default",
         "--border-width-default",
         "--card-inline-sm",
-        "--card-pad-compact",
-        "--card-radius-compact",
+        "--card-pad",
+        "--card-radius",
         "--control-md",
         "--ds-border",
         "--ds-text",

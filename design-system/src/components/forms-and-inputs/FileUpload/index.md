@@ -110,7 +110,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | State | What changes |
 | --- | --- |
-| Rest | 1px `--ds-border` edge around the drop zone at `--card-radius-compact`. |
+| Rest | 1px `--ds-border` edge around the drop zone at `--card-radius`. |
 | Drag-over | `--ds-background-brand-subtlest` fill and `--ds-border-brand` edge while dragged items hover over the drop zone. |
 | Focused | `--ds-border-focused` edge and a `--focus-ring-width` ring in the same color when the input or picker control holds focus. |
 | Invalid | `--ds-border-danger` edge and a `--ds-background-danger-subtler` ring; the message takes `--ds-text-danger`, and the input sets `aria-invalid`. |
@@ -123,7 +123,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Part | Token |
 | --- | --- |
 | Label, minority marker, and batch status | `--ds-text` in `--body-default`; batch status in `--body-sm` and `--ds-text-subtle`; disabled `--ds-text-subtle`. |
-| Drop zone container | Padding `--pad-y-md` and `--pad-x-md`; radius `--card-radius-compact`; border `--ds-border`; drag-over `--ds-background-brand-subtlest` and `--ds-border-brand`. |
+| Drop zone container | Padding `--card-pad`; radius `--card-radius`; border `--ds-border`; drag-over `--ds-background-brand-subtlest` and `--ds-border-brand`. |
 | Error message | `--ds-text-danger`, `--ds-icon-danger`. |
 | Success message | `--ds-text-success`, `--ds-icon-success`. |
 | Focus ring | `--ds-border-focused`, `--focus-ring-width`. |
@@ -173,7 +173,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-sm` · `--border-width-default` · `--card-radius-compact` · `--ds-background-brand-subtlest` · `--ds-background-danger-subtler` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-success-subtler` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-focused` · `--ds-border-success` · `--ds-icon-danger` · `--ds-icon-success` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-brand` · `--ds-text-danger` · `--ds-text-disabled` · `--ds-text-subtle` · `--ds-text-success` · `--focus-ring-width` · `--icon-sm` · `--inline-md` · `--pad-x-md` · `--pad-y-md` · `--stack-md` · `--stack-sm`
+`--body-default` · `--body-sm` · `--border-width-default` · `--card-pad` · `--card-radius` · `--ds-background-brand-subtlest` · `--ds-background-danger-subtler` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-success-subtler` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-focused` · `--ds-border-success` · `--ds-icon-danger` · `--ds-icon-success` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text` · `--ds-text-brand` · `--ds-text-danger` · `--ds-text-disabled` · `--ds-text-subtle` · `--ds-text-success` · `--focus-ring-width` · `--icon-sm` · `--inline-md` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/forms-and-inputs/FileUpload/FileUpload.scss`. Override these through the token layer, never with a literal.
 

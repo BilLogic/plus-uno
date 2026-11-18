@@ -211,7 +211,7 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 | `--section-stack-md` | Header to body; body to footer. |
 | `--section-stack-lg` | Between subsections. |
 | `--section-min-width-main`, `--section-min-width-side` | The main and side columns of a split. |
-| `--section-radius` | 16: the corner of a Section with `fill="subtle"`. A Card inside it takes `--card-radius-compact` (12) instead of `--card-radius`. |
+| `--section-radius` | 16: the corner of a Section with `fill="subtle"`. A Card inside it keeps `--card-radius` (16). |
 | `--section-pad-x-default`, `--section-pad-y-default` | A Section with `fill="subtle"`, on `--ds-surface-sunken`. |
 | `--heading-md`, `--heading-sm` | A Section title and a subsection title. |
 
