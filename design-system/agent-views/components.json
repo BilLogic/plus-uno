@@ -7828,7 +7828,8 @@
         "Hovered",
         "Pressed",
         "Focused",
-        "FooterLayouts"
+        "FooterLayouts",
+        "SizeToContent"
       ],
       "tokens": [
         "--blanket-max-height-modal",
@@ -16974,7 +16975,9 @@
         "Wrapping",
         "MotionOpenClose",
         "MotionReduced",
-        "BestPractices"
+        "SayWhatControlDoes",
+        "KeepToOneLine",
+        "InteractiveContentInPopup"
       ],
       "tokens": [
         "--body-sm",

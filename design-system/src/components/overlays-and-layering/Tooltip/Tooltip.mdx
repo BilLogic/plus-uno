@@ -1,21 +1,11 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Canvas, Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as TooltipStories from './Tooltip.stories.jsx';
-import { Button } from '@/components';
-import {
-    InteractivePopupDo,
-    InteractiveTooltipDont,
-    LabelDo,
-    LabelDont,
-    ShortLineDo,
-    ShortLineDont,
-} from '@/storybook-docs/lib/tooltip-cases.jsx';
 import {
     ComponentExample,
     DocsInteractivePlayground,
     DocsTable,
-    DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -196,21 +186,19 @@ after `250` ms, hiding `400` ms after you leave.
 
 ### Say what the control does.
 
-<DoDontPair
-    doExample={<LabelDo />}
-    doCaption="A few words on what the control does."
-    dontExample={<LabelDont />}
-    dontCaption="Repeats the label the control already shows."
-/>
+Do: A few words on what the control does.
+
+Don't: Repeats the label the control already shows.
+
+<Canvas of={TooltipStories.SayWhatControlDoes} />
 
 ### Keep it to one short line.
 
-<DoDontPair
-    doExample={<ShortLineDo />}
-    doCaption="One line, sentence case, no closing period."
-    dontExample={<ShortLineDont />}
-    dontCaption="Two sentences that wrap, with a closing period."
-/>
+Do: One line, sentence case, no closing period.
+
+Don't: Two sentences that wrap, with a closing period.
+
+<Canvas of={TooltipStories.KeepToOneLine} />
 
 ### Never put a tooltip on a disabled control.
 
@@ -228,12 +216,11 @@ A disabled control takes no hover and no focus, so a tooltip on it never opens, 
 
 ### Put anything the user can click in a `Popup`.
 
-<DoDontPair
-    doExample={<InteractivePopupDo />}
-    doCaption="A popup holds content the user can reach."
-    dontExample={<InteractiveTooltipDont />}
-    dontCaption="A link in a tooltip: moving toward it leaves the trigger, and the tooltip hides."
-/>
+Do: A popup holds content the user can reach.
+
+Don't: A link in a tooltip: moving toward it leaves the trigger, and the tooltip hides.
+
+<Canvas of={TooltipStories.InteractiveContentInPopup} />
 
 </div>
 

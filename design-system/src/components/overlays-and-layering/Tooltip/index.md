@@ -14,7 +14,7 @@ Also asked as: hover hint, hover text.
 
 **Source:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.jsx`
 
-**Stories:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.stories.jsx` — Placements, Interactive, Overview, Rest, Hovered, Pressed, Focused, Disabled, PlacementTop, PlacementBottom, PlacementLeft, PlacementRight, Wrapping, MotionOpenClose, MotionReduced, BestPractices
+**Stories:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.stories.jsx` — Placements, Interactive, Overview, Rest, Hovered, Pressed, Focused, Disabled, PlacementTop, PlacementBottom, PlacementLeft, PlacementRight, Wrapping, MotionOpenClose, MotionReduced, SayWhatControlDoes, KeepToOneLine, InteractiveContentInPopup
 
 **Storybook page:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.mdx`
 
@@ -60,11 +60,13 @@ Tooltip reads these motion tokens and no literal duration or curve.
 ### Say what the control does. {#say-what-the-control-does}
 
 Do: A few words on what the control does.
+
 Don't: Repeats the label the control already shows.
 
 ### Keep it to one short line. {#keep-it-to-one-short-line}
 
 Do: One line, sentence case, no closing period.
+
 Don't: Two sentences that wrap, with a closing period.
 
 ### Never put a tooltip on a disabled control. {#never-put-a-tooltip-on-a-disabled-control}
@@ -84,6 +86,7 @@ A disabled control takes no hover and no focus, so a tooltip on it never opens, 
 ### Put anything the user can click in a `Popup`. {#put-anything-the-user-can-click-in-a-popup}
 
 Do: A popup holds content the user can reach.
+
 Don't: A link in a tooltip: moving toward it leaves the trigger, and the tooltip hides.
 
 ## Accessibility
