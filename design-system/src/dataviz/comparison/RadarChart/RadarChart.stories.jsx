@@ -34,20 +34,20 @@ const captionStyle = {
     color: 'var(--ds-text-subtle)',
 };
 
-const budgetData = {
-    categories: ['Sales', 'Marketing', 'Development', 'Customer support', 'IT', 'Admin'],
+const sessionMinutesData = {
+    categories: ['Algebra', 'Geometry', 'Fractions', 'Reading', 'Writing', 'Study skills'],
     series: [
-        { name: 'Allocated budget', data: [43000, 19000, 60000, 35000, 17000, 10000] },
-        { name: 'Actual spending', data: [50000, 39000, 42000, 31000, 26000, 14000] },
+        { name: 'Planned minutes', data: [45, 30, 50, 40, 35, 25] },
+        { name: 'Completed minutes', data: [42, 35, 45, 38, 30, 28] },
     ],
     height: 400,
 };
 
-const skillsData = {
-    categories: ['Communication', 'Teamwork', 'Problem solving', 'Technical skills', 'Creativity'],
+const competencyData = {
+    categories: ['Social-emotional', 'Mastering content', 'Advocacy', 'Relationships', 'Technology tools'],
     yAxisMax: 5,
     series: [
-        { name: 'Tutor A', data: [4, 5, 3, 5, 4] },
+        { name: 'Maya K.', data: [4, 5, 3, 5, 4] },
         { name: 'Cohort average', data: [3.5, 4, 3.5, 4, 3] },
     ],
     filled: true,
@@ -59,17 +59,17 @@ export const Overview = {
             <section style={sectionStyle}>
                 <Heading as="h3" size="small">Line radar (default)</Heading>
                 <p style={captionStyle}>
-                    Spoke connections for comparing two profiles across shared measures.
+                    Spoke connections for comparing planned vs. completed tutoring minutes across subjects.
                 </p>
-                <RadarChart {...budgetData} />
+                <RadarChart {...sessionMinutesData} />
             </section>
 
             <section style={sectionStyle}>
                 <Heading as="h3" size="small">Filled area radar</Heading>
                 <p style={captionStyle}>
-                    Fills the primary series to emphasize overall coverage across competencies.
+                    Fills the primary series to emphasize overall coverage across SMART competencies.
                 </p>
-                <RadarChart {...skillsData} />
+                <RadarChart {...competencyData} />
             </section>
         </div>
     ),

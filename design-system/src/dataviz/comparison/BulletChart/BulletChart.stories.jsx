@@ -33,11 +33,11 @@ const captionStyle = {
 };
 
 const kpiData = {
-    categories: ['Revenue', 'Profit', 'Customer satisfaction'],
+    categories: ['Session completion', 'Attendance', 'Reflection rate'],
     data: [
         { y: 78, target: 85 },
-        { y: 65, target: 70 },
         { y: 92, target: 90 },
+        { y: 64, target: 75 },
     ],
     height: 250,
 };
@@ -46,7 +46,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Goal progress against targets</Heading>
+                <Heading as="h3" size="small">Program goals against targets</Heading>
                 <p style={captionStyle}>
                     Shows actual vs. target with quality ranges in the danger, warning and success backgrounds.
                 </p>

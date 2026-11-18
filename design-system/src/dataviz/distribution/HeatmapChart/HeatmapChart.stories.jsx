@@ -56,7 +56,7 @@ const activityData = {
 
 const masteryData = {
     xCategories: ['Unit 1', 'Unit 2', 'Unit 3', 'Unit 4'],
-    yCategories: ['Group A', 'Group B', 'Group C'],
+    yCategories: ['Grade 6', 'Grade 7', 'Grade 8'],
     data: [
         [0, 0, 92], [1, 0, 85], [2, 0, 78], [3, 0, 88],
         [0, 1, 75], [1, 1, 82], [2, 1, 90], [3, 1, 86],

@@ -30,13 +30,15 @@ export const WithinTheLimit = () => (
     </div>
 );
 
+const schools = ['Lincoln Middle', 'Roosevelt K-8', 'North High', 'South High', 'Hillside', 'Westview', 'Oak Grove', 'Central'];
+
 /** Eight series: past the limit the sequence reaches into its overflow slots and the legend stops being readable. */
 export const PastTheLimit = () => (
     <div style={frame}>
         <BarChart
             height={200}
             categories={categories}
-            series={Array.from({ length: 8 }, (_, i) => ({ name: `Group ${i + 1}`, data: [20 + i * 3, 30 + i * 2, 25 + i] }))}
+            series={schools.map((name, i) => ({ name, data: [20 + i * 3, 30 + i * 2, 25 + i] }))}
         />
     </div>
 );

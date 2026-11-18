@@ -43,11 +43,11 @@ const Gallery = () => (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
             <section data-chart="bar">
                 <h3 style={heading}>Bar, two series</h3>
-                <BarChart height={220} categories={['A', 'B', 'C']} series={[{ name: 'This term', data: [45, 72, 58] }, { name: 'Last term', data: [32, 55, 48] }]} />
+                <BarChart height={220} categories={['Grade 6', 'Grade 7', 'Grade 8']} series={[{ name: 'This term', data: [45, 72, 58] }, { name: 'Last term', data: [32, 55, 48] }]} />
             </section>
             <section data-chart="line">
                 <h3 style={heading}>Line, one series</h3>
-                <LineChart height={220} data={[{ name: 'Average score', data: [60, 66, 71, 74], categories: ['W1', 'W2', 'W3', 'W4'] }]} />
+                <LineChart height={220} data={[{ name: 'Average score', data: [60, 66, 71, 74], categories: ['Week 1', 'Week 2', 'Week 3', 'Week 4'] }]} />
             </section>
             <section data-chart="stacked">
                 <h3 style={heading}>Stacked bar</h3>
