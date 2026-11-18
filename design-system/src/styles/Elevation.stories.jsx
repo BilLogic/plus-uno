@@ -237,9 +237,9 @@ export const Layers = {
 export const CardLevels = {
     render: () => (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)', padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' }}>
-            <PatternCard title="At rest" description="Raised." />
-            <PatternCard title="Clickable" description="Lifts to overlay on hover." onClick={() => {}} />
-            <PatternCard title="Dragged" description="Overlay while it moves." dragging />
+            <PatternCard surface="raised" title="At rest" description="Raised." />
+            <PatternCard surface="raised" title="Clickable" description="Lifts to overlay on hover." onClick={() => {}} />
+            <PatternCard surface="raised" title="Dragged" description="Overlay while it moves." dragging />
         </div>
     ),
     play: async ({ canvasElement }) => {
@@ -496,11 +496,11 @@ const menu = (style) => (
 export const LiftWithShadow = () => (
     <DoDont>
         <Do caption={<>The card keeps the page color and lifts on <C>--ds-shadow-raised</C>.</>}>
-            <div style={ground}><PatternCard title="Upcoming sessions" description="3 this week" /></div>
+            <div style={ground}><PatternCard surface="raised" title="Upcoming sessions" description="3 this week" /></div>
         </Do>
         <Dont caption="A gray fill reads as a hole in the page, and dark loses the step.">
             <div style={ground}>
-                <PatternCard title="Upcoming sessions" description="3 this week" style={{ background: 'var(--ds-surface-container)', boxShadow: 'none' }} />
+                <PatternCard surface="raised" title="Upcoming sessions" description="3 this week" style={{ background: 'var(--ds-surface-container)', boxShadow: 'none' }} />
             </div>
         </Dont>
     </DoDont>
@@ -589,7 +589,7 @@ export const OneFocalPoint = () => (
         <Do caption="One raised Card marks the next session.">
             <div style={ground}>
                 <PatternSection title="Sessions">
-                    <PatternCard title="Next session" description="Today, 4:30 PM" />
+                    <PatternCard surface="raised" title="Next session" description="Today, 4:30 PM" />
                     <PatternTable>
                         <tbody>
                             <tr><td>Past session</td><td>Monday</td></tr>
@@ -601,9 +601,9 @@ export const OneFocalPoint = () => (
         </Do>
         <Dont caption="Every row raised: nothing stands out.">
             <div style={{ ...ground, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-                <PatternCard title="Next session" description="Today, 4:30 PM" />
-                <PatternCard title="Past session" description="Monday" />
-                <PatternCard title="Past session" description="Friday" />
+                <PatternCard surface="raised" title="Next session" description="Today, 4:30 PM" />
+                <PatternCard surface="raised" title="Past session" description="Monday" />
+                <PatternCard surface="raised" title="Past session" description="Friday" />
             </div>
         </Dont>
     </DoDont>

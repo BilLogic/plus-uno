@@ -45,8 +45,8 @@ const ROLES = {
   // Section and Card
   // Only the subtle variant has a surface; the default Section draws none.
   sectionSubtleSurface: ['--ds-surface-sunken', 'patterns/PatternSection/PatternSection.scss'],
-  cardSurface: ['--ds-surface-raised', 'patterns/PatternCard/PatternCard.scss'],
-  cardShadow: ['--ds-shadow-raised', 'patterns/PatternCard/PatternCard.scss'],
+  cardSurface: ['--ds-surface-raised', 'tokens/ladder/_templates.scss'],
+  cardShadow: ['--ds-shadow-raised', 'tokens/ladder/_templates.scss'],
   // Overlays
   popupSurface: ['--ds-surface-overlay', 'components/overlays-and-layering/Popup/Popup.scss'],
   popupShadow: ['--ds-shadow-overlay', 'components/overlays-and-layering/Popup/Popup.scss'],

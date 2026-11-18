@@ -993,6 +993,7 @@ export const LiftDemo = () => {
         <div ref={ref} data-docs-stage style={{ ...well, display: 'grid', placeItems: 'center' }} data-testid="lift-demo" data-lifted={lifted}>
             <div style={{ width: 'min(100%, var(--card-min-width-md))' }}>
                 <PatternCard
+                    surface="raised"
                     title="Session with Ana"
                     description={lifted ? 'Lifted: the overlay shadow' : 'At rest: the raised shadow'}
                     role="button"
@@ -1102,7 +1103,7 @@ export const ContrastDemo = () => {
                 data-contrast-mode={more ? 'more' : 'no-preference'}
                 data-docs-stage style={{ ...well, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-sm)), 1fr))', gap: 'var(--grid-gutter)', background: 'var(--ds-surface)' }}
             >
-                <PatternCard title="Card" description="The raised ring." />
+                <PatternCard surface="raised" title="Card" description="The raised ring." />
                 <div className="plus-popup" style={{ position: 'relative', width: 'auto' }}>
                     <div className="plus-popup-title">Popup</div>
                     <div className="plus-popup-body">The overlay ring.</div>

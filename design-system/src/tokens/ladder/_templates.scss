@@ -36,6 +36,9 @@
     --card-pad-spacious: var(--space-150);
     --card-radius: var(--radius-xxl);
     --card-radius-compact: var(--radius-xl);
+    --card-border-width: var(--border-width-default);
+    --card-title-font-lg: var(--heading-md);
+    --card-description-font: var(--body-default);
 
     /* Table */
     --table-radius: var(--radius-xl);
@@ -62,6 +65,25 @@
     --popup-radius: var(--radius-xl);
     --popup-width-3-col: 200px; /* 3 · 4 screen-grid columns plus 2 × 16 popup pad at 768 · 1024 · 1440 */
     --popup-width-4-col: 261px;
+}
+
+/* Mode-sensitive aliases re-evaluate at subtree mode or contrast boundaries. */
+:root,
+[data-color-mode],
+[data-contrast-mode] {
+
+    /* Card */
+    --card-surface-sunken: var(--ds-surface-sunken);
+    --card-surface-default: var(--ds-surface);
+    --card-surface-raised: var(--ds-surface-raised);
+    --card-surface-raised-hovered: var(--ds-surface-raised-hovered);
+    --card-surface-raised-pressed: var(--ds-surface-raised-pressed);
+    --card-surface-overlay: var(--ds-surface-overlay);
+    --card-border-default: var(--ds-border);
+    --card-shadow-raised: var(--ds-shadow-raised);
+    --card-shadow-overlay: var(--ds-shadow-overlay);
+    --card-text: var(--ds-text);
+    --card-text-subtle: var(--ds-text-subtle);
 }
 
 @media (max-height: 639.98px) {
