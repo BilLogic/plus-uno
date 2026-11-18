@@ -25,9 +25,15 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Stack | `--stack-sm` |  |
 | Stack | `--stack-md` |  |
 | Stack | `--stack-lg` |  |
+| Stack | `--stack-xl` |  |
+| Stack | `--stack-2xl` |  |
+| Stack | `--stack-3xl` |  |
 | Inline | `--inline-sm` |  |
 | Inline | `--inline-md` |  |
 | Inline | `--inline-lg` |  |
+| Inline | `--inline-xl` |  |
+| Inline | `--inline-2xl` |  |
+| Inline | `--inline-3xl` |  |
 | Radius | `--radius-sm` |  |
 | Radius | `--radius-md` |  |
 | Radius | `--radius-lg` |  |

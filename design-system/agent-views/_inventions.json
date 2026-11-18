@@ -285,13 +285,6 @@
       "why": "read the semantic step for the role: --radius-sm to --radius-xxl, or --radius-control-sm, -md, -lg for a control by height"
     },
     {
-      "not": "--stack-xl",
-      "use": [
-        "--stack-lg",
-        "--section-stack-lg"
-      ]
-    },
-    {
       "not": "--ds-on-surface",
       "use": [
         "--ds-text",

@@ -3,10 +3,10 @@
   "figmaFileKey": "zAecJNRdvJzAUOcjV32tRX",
   "figmaFileName": "Design System - BS4 Foundation (Component LIbrary)",
   "capturedAt": "2026-11-16",
-  "totalVariables": 1644,
+  "totalVariables": 1650,
   "byType": {
     "COLOR": 984,
-    "FLOAT": 645,
+    "FLOAT": 651,
     "BOOLEAN": 10,
     "STRING": 5
   },
@@ -605,9 +605,12 @@
         "Grid/gutter",
         "Grid/width-column",
         "Grid/width-column-screen",
+        "Inline/2xl",
+        "Inline/3xl",
         "Inline/lg",
         "Inline/md",
         "Inline/sm",
+        "Inline/xl",
         "Pad/x-lg",
         "Pad/x-md",
         "Pad/x-sm",
@@ -670,9 +673,12 @@
         "Size/Width/2500",
         "Size/Width/3000",
         "Size/Width/500",
+        "Stack/2xl",
+        "Stack/3xl",
         "Stack/lg",
         "Stack/md",
-        "Stack/sm"
+        "Stack/sm",
+        "Stack/xl"
       ],
       "codeSyntax": {
         "Border/width-default": "var(--border-width-default)",
@@ -691,9 +697,12 @@
         "Grid/gutter": "var(--grid-gutter)",
         "Grid/width-column": "var(--grid-width-column)",
         "Grid/width-column-screen": "var(--grid-width-column-screen)",
+        "Inline/2xl": "var(--inline-2xl)",
+        "Inline/3xl": "var(--inline-3xl)",
         "Inline/lg": "var(--inline-lg)",
         "Inline/md": "var(--inline-md)",
         "Inline/sm": "var(--inline-sm)",
+        "Inline/xl": "var(--inline-xl)",
         "Pad/x-lg": "var(--pad-x-lg)",
         "Pad/x-md": "var(--pad-x-md)",
         "Pad/x-sm": "var(--pad-x-sm)",
@@ -756,9 +765,12 @@
         "Size/Width/2500": "var(--width-2500)",
         "Size/Width/3000": "var(--width-3000)",
         "Size/Width/500": "var(--width-500)",
+        "Stack/2xl": "var(--stack-2xl)",
+        "Stack/3xl": "var(--stack-3xl)",
         "Stack/lg": "var(--stack-lg)",
         "Stack/md": "var(--stack-md)",
-        "Stack/sm": "var(--stack-sm)"
+        "Stack/sm": "var(--stack-sm)",
+        "Stack/xl": "var(--stack-xl)"
       }
     },
     "archived / spacing / layout": {

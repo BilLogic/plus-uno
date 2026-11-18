@@ -26,9 +26,12 @@ Start here for space, size and radius (ADR-038). A component reads its component
 --grid-gutter  /* Gap between columns of the page grid. */
 --grid-width-column  /* Width of one column of the content grid at the current breakpoint. */
 --grid-width-column-screen  /* Width of one column of the full-screen grid at the current breakpoint. */
+--inline-2xl  /* Horizontal gap between wide groups or panels in a row. */
+--inline-3xl  /* Horizontal gap between major regions in a row. */
 --inline-lg  /* Horizontal gap between loosely related items in a row. */
 --inline-md  /* Horizontal gap between items in a row, such as buttons in a ButtonGroup. */
 --inline-sm  /* Horizontal gap between an icon and its label inside a control. */
+--inline-xl  /* Horizontal gap between distinct groups or columns in a row. */
 --pad-x-lg  /* Horizontal padding inside a large control or a roomy row. */
 --pad-x-md  /* Horizontal padding inside a default control: a Button, a field, a menu item. */
 --pad-x-sm  /* Horizontal padding inside a compact control, such as a Button with compact spacing. */
@@ -48,9 +51,12 @@ Start here for space, size and radius (ADR-038). A component reads its component
 --screen-min-width  /* Narrowest the screen frame gets at the current breakpoint. */
 --screen-pad-x  /* Horizontal padding between the screen edge and the page content. */
 --screen-width  /* Width of the screen frame at the current breakpoint. */
+--stack-2xl  /* Vertical gap between major groups inside one container. */
+--stack-3xl  /* Vertical gap between distinct areas inside a large container. */
 --stack-lg  /* Vertical gap between groups inside one control or component. */
 --stack-md  /* Vertical gap between items in a list or a group of fields. */
 --stack-sm  /* Vertical gap between tightly related items, such as a label and its control. */
+--stack-xl  /* Vertical gap between related groups or blocks inside one container. */
 ```
 
 ## Ladder Templates

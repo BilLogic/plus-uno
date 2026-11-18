@@ -95,7 +95,7 @@
       "Card gap": "var(--card-stack-{sm|md|lg})",
       "Card radius": "var(--card-radius)",
       "Element padding": "var(--pad-x-{xs|sm|md|lg})",
-      "Element gap": "var(--stack-{sm|md|lg})",
+      "Element gap": "var(--stack-{sm|md|lg|xl|2xl|3xl})",
       "Element radius": "var(--radius-{sm|md|lg|full})",
       "Modal padding": "var(--modal-pad-x-{default|spacious})",
       "Section padding": "var(--section-pad-{x|y}-{compact|default|spacious})",
@@ -197,9 +197,12 @@
       "Grid/gutter": "var(--grid-gutter)",
       "Grid/width-column": "var(--grid-width-column)",
       "Grid/width-column-screen": "var(--grid-width-column-screen)",
+      "Inline/2xl": "var(--inline-2xl)",
+      "Inline/3xl": "var(--inline-3xl)",
       "Inline/lg": "var(--inline-lg)",
       "Inline/md": "var(--inline-md)",
       "Inline/sm": "var(--inline-sm)",
+      "Inline/xl": "var(--inline-xl)",
       "Pad/x-lg": "var(--pad-x-lg)",
       "Pad/x-md": "var(--pad-x-md)",
       "Pad/x-sm": "var(--pad-x-sm)",
@@ -262,9 +265,12 @@
       "Size/Width/2500": "var(--width-2500)",
       "Size/Width/3000": "var(--width-3000)",
       "Size/Width/500": "var(--width-500)",
+      "Stack/2xl": "var(--stack-2xl)",
+      "Stack/3xl": "var(--stack-3xl)",
       "Stack/lg": "var(--stack-lg)",
       "Stack/md": "var(--stack-md)",
-      "Stack/sm": "var(--stack-sm)"
+      "Stack/sm": "var(--stack-sm)",
+      "Stack/xl": "var(--stack-xl)"
     },
     "spacing / templates": {
       "Blanket/fill": "var(--blanket-fill)",
@@ -1886,11 +1892,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1158,
+    "scssTokenCount": 1164,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1776,
-      "resolved": 1750,
+      "total": 1782,
+      "resolved": 1756,
       "percent": 99,
       "skippedCollections": [
         {
