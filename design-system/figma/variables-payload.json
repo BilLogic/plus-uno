@@ -1209,6 +1209,20 @@
           }
         },
         {
+          "name": "Ai/message-caret-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--ai-message-caret-width)"
+          }
+        },
+        {
+          "name": "Ai/message-dot-size",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--ai-message-dot-size)"
+          }
+        },
+        {
           "name": "Inbox/width",
           "resolvedType": "FLOAT",
           "codeSyntax": {

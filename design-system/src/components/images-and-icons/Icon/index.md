@@ -60,7 +60,7 @@ Don't: The brand role on a status mark.
 - Iconography: use when choosing which glyph, style or size step fits a surface.
 - `IconButton`: use when an icon is an interactive trigger with no visible text label.
 
-Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Object` · `Tile`
+Same group: `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Object` · `Tile`
 
 ## Parts
 

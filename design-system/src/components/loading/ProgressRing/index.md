@@ -97,7 +97,7 @@ Don't: Default appearance lost against a brand-bold fill.
 - `Spinner`: use when a wait has no known duration or percent to report.
 - `Flag`: use when a background upload completes and needs a brief confirmation notice.
 
-Same group: `GenerativeBorder` · `ProgressBar` · `Skeleton` · `Spinner`
+Same group: `ProgressBar` · `Skeleton` · `Spinner`
 
 ## Parts
 

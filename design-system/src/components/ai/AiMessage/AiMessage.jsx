@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
-import AiIcon from '@/components/images-and-icons/AiIcon';
+import AiIcon from '../AiIcon';
 import AiSources from './AiSources';
 import AiFeedback from './AiFeedback';
 import AiMarkdown from './aiMarkdown';

@@ -428,7 +428,7 @@ test('PatternTable: row states are layered over the cell fill — neutral subtle
 /* ─── Suggestion ─────────────────────────────────────────────────────────── */
 
 test('Suggestion: discovery on hover, its hovered step pressed, focus the ring alone', () => {
-  const file = 'components/labels/Suggestion/Suggestion.scss';
+  const file = 'components/ai/Suggestion/Suggestion.scss';
   expectRule(file, '.plus-suggestion:hover', { 'background-color': layer('--ds-background-discovery') });
   expectRule(file, '.plus-suggestion:active', { 'background-color': layer('--ds-background-discovery-hovered') });
   expectRule(file, '.plus-suggestion:focus-visible', DS_RING_OUTSIDE);
