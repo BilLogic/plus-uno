@@ -53,9 +53,9 @@ Three modes share one field. Choose by the amount of data and the cost of search
 
 ## Active search
 
-The field sits in the Section's view bar, compact, and collapses to an icon until it is needed. The results area under the bar holds the count, the rows and the states; the bar never moves.
+The field starts the Section header's third row, compact, and collapses to an icon until it is needed. The results area under the header holds the count, the rows and the states; the header never moves.
 
-<ComponentExample of={SearchStories.Closed} title="Closed" description="The compact icon in the view bar, named by its scope. The count shows from the start." />
+<ComponentExample of={SearchStories.Closed} title="Closed" description="The compact icon in the Section header, named by its scope. The count shows from the start." />
 
 <ComponentExample of={SearchStories.Narrowing} title="Narrowing" description="Rows filter as you type. The count updates in the results header, in words; the clear button appears in the field." />
 
@@ -91,7 +91,7 @@ The field alone. Typing runs nothing; Enter runs the search and a results page t
 
 <ComponentExample of={SearchStories.WithScope} title="Scope filter" description="A select before the field, with &quot;All&quot; first and selected. Add one when the search covers more than one kind of record." />
 
-<ComponentExample of={SearchStories.BodyDefault} title="In a page body" description="A search in a page body takes default spacing and stays open. The view bar takes compact." />
+<ComponentExample of={SearchStories.BodyDefault} title="In a page body" description="A search in a page body takes default spacing and stays open. The Section header takes compact." />
 
 </div>
 
@@ -213,7 +213,7 @@ Esc empties the text and keeps the field. In focused, the first Esc closes the p
 
 <RuleTag kind="review" />
 
-The view bar holds controls of one height, so the field takes `spacing="compact"` there. A search in a page body takes the default spacing and stays open.
+The Section header holds controls of one height, 32, so the field takes `spacing="compact"` there. A search in a page body takes the default spacing and stays open.
 
 </div>
 
@@ -276,7 +276,7 @@ The view bar holds controls of one height, so the field takes `spacing="compact"
 - <a target="_top" href="./?path=/docs/patterns-filtering--docs">Filtering</a>: use for narrowing by attributes; its Reset clears the search.
 - <a target="_top" href="./?path=/docs/patterns-states-empty--docs">Empty</a>: use for the No matches state.
 - <a target="_top" href="./?path=/docs/patterns-states-loading--docs">Loading</a>: use for the wait while results load.
-- <a target="_top" href="./?path=/docs/templates-section--docs">Section</a>: use for where the view bar sits.
+- <a target="_top" href="./?path=/docs/templates-section--docs">Section</a>: use for where the header rows sit.
 
 </div>
 

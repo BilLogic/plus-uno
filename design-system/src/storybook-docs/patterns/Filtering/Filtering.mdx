@@ -23,7 +23,7 @@ import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
     page="patterns-filtering"
     eyebrow="Pattern"
     title="Filtering"
-    purpose="How a person narrows a collection, with filters at the end of the Section's view bar in one of five tiers."
+    purpose="How a person narrows a collection, with filters in the Section's header in one of five tiers."
     links={{
         label: 'Uses',
         items: [
@@ -56,7 +56,7 @@ Choose a tier by the number of categories and the length of their lists. See Bes
 <TypeCard of={FilteringStories.TierFilterSide} to="#3-filter-side" title="3 · Filter side" stage={STAGE}>Filtering is the main job: a side at the Section's start, "Reset filters" at its top and a count beside each category.</TypeCard>
 </TypeGrid>
 
-<ComponentExample of={FilteringStories.TierQuickFilters} title="1 · Quick filters" description="Each category sits at the bar's end as a FilterButton; picking a value narrows the rows at once and marks the button." />
+<ComponentExample of={FilteringStories.TierQuickFilters} title="1 · Quick filters" description="Each category is a "Field: value" trigger in the header's third row; picking a value narrows the rows at once and marks the trigger." />
 
 <ComponentExample of={FilteringStories.TierOneList} title="2a · Menu, one category" description="Clicking the Filter icon opens a single radio list that updates the table as soon as a choice is picked." />
 
@@ -72,7 +72,7 @@ Choose a tier by the number of categories and the length of their lists. See Bes
 
 ## What is on
 
-The control that holds a filter shows it: the FilterButton's count, or the Filter icon's own count on the selected fill. No row of tags under the bar.
+The control that holds a filter shows it: the FilterButton's count, or the Filter icon's own count on the selected fill. No row of tags under the header.
 
 <ComponentExample of={FilteringStories.FilterCount} title="The Filter icon's count" description="Open the menu, tick two and press Apply. The button widens and the count fades in on the selected fill, and the icon reads &quot;Filters, 2 applied&quot;. The result count above the rows narrows in words. Reset in the menu clears the ticks; Apply then clears the count." />
 
@@ -82,9 +82,9 @@ The control that holds a filter shows it: the FilterButton's count, or the Filte
 
 ## Key cases
 
-<ComponentExample of={FilteringStories.UnderPageTabs} title="Under page tabs" description="The view picker at the bar's start picks a view, not a filter, and its menu meets the trigger's start edge. The filters stay at the end, where a menu meets its trigger's end edge. Both hang 4 below their trigger." />
+<ComponentExample of={FilteringStories.UnderPageTabs} title="Under page tabs" description="The view picker at the header's start picks a view, not a filter, and its menu meets the trigger's start edge. The filters stay at the end, where a menu meets its trigger's end edge. Both hang 4 below their trigger." />
 
-<DocsInteractivePlayground of={FilteringStories.NarrowWidth} description="Below 768, tier 1 folds into a stacked menu behind the Filter icon, which carries every count. Drag the Section's width." />
+<DocsInteractivePlayground of={FilteringStories.NarrowWidth} description="Below 768, the tier 1 triggers fold into one Filter button, which carries every count and opens the filters. Drag the Section's width." />
 
 <ComponentExample of={FilteringStories.NoMatches} title="No matches" description="The empty state replaces the table, names the filters that are on and offers &quot;Reset filters&quot;. The count stays on the icon until they are reset." />
 
@@ -118,7 +118,7 @@ A one-list menu is auto: at least the trigger, 160 to 320, truncating with a too
 
 ## Usage
 
-Use Filtering when a person narrows a collection by its attributes. Filters live at the end of the view bar, in the bar's order: a format switch if any, Search, then the filters, then More and the Primary. Views at the start are not filters: a view is one of a fixed set, and filters combine.
+Use Filtering when a person narrows a collection by its attributes. Filters live in the Section header's third row, after Search: "Field: value" triggers, then More filters. Views in the second row are not filters: a view is one of a fixed set, and filters combine.
 
 <DocsTable>
 <thead>
@@ -265,7 +265,7 @@ Below 960 the side hides and the Filter icon returns with its count; pressing it
 
 ## Related
 
-- <a target="_top" href="./?path=/docs/templates-section--docs">Section</a>: use when the question is the view bar the filters sit in.
+- <a target="_top" href="./?path=/docs/templates-section--docs">Section</a>: use when the question is the header the filters sit in.
 - <a target="_top" href="./?path=/docs/templates-popup--docs">Popup</a>: use when the question is where a menu opens or how wide it is.
 - <a target="_top" href="./?path=/docs/components-forms-and-inputs-filter-menu--docs">Filter menu</a>: use when building a tier 2b or 2c menu.
 - <a target="_top" href="./?path=/docs/patterns-search--docs">Search</a>: use for finding by name.

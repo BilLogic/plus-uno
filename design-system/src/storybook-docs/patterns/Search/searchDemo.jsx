@@ -1,16 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { Button, DynamicTable, EmptyState, PageHeader, SearchField, SearchFieldAction, Skeleton, Tabs } from '@/components';
+import { Button, DynamicTable, EmptyState, PageHeader, SearchField, SearchFieldAction, Skeleton } from '@/components';
 import { PatternSection } from '@/patterns';
-import { BarEnd, STUDENTS, row, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
+import { SectionActions } from '@/storybook-docs/lib/section-header.jsx';
+import { STUDENTS, ViewPills, row, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
 
 /**
  * The Search pattern's examples: the real SearchField in each of its three
- * modes, inside the real Section and its view bar, with a Dynamic table, an
+ * modes, inside the real Section and its header rows, with a Dynamic table, an
  * Empty state and Skeleton bars as the results. A picture holds the state its
  * heading names through props, never a play.
  *
- *   SearchStudents      active: the view bar's field, rows narrow as you type
+ *   SearchStudents      active: the header's field, rows narrow as you type
  *   FocusedStudents     focused: the panel of recent searches or grouped results
  *   BasicStudents       basic: the field, submitted on Enter
  *   FocusedPage         focused in a page header, its panel held open for a picture
@@ -86,7 +87,7 @@ const Results = ({ shown, total, query, loading, onReset, noun = 'students', hea
 );
 
 /**
- * A Section whose view bar carries a compact, collapsible SearchField. The
+ * A Section whose header carries a compact, collapsible SearchField. The
  * table narrows as the text changes; a query nothing matches replaces the table
  * with the empty state; `isLoading` shows the loading body in the same slot.
  */
@@ -103,25 +104,19 @@ export const SearchStudents = ({ initialQuery = '', initialOpen = false, isLoadi
             <PatternSection
                 title="Students"
                 description="Lincoln Middle"
-                tabs={(
-                    <div className="plus-section-view-bar" style={{ ...row, inlineSize: '100%' }}>
-                        <Tabs appearance="pill" activeKey={view} onSelect={setView} aria-label="Views">
-                            {VIEWS.map((name) => <Tabs.Tab key={name} eventKey={name}>{name}</Tabs.Tab>)}
-                        </Tabs>
-                        <div style={{ ...row, marginInlineStart: 'auto', flexShrink: 0 }}>
-                            <SearchField
-                                key={key}
-                                placeholder={SCOPE}
-                                spacing="compact"
-                                isCollapsible
-                                defaultOpen={initialOpen || Boolean(initialQuery)}
-                                value={query}
-                                onValueChange={setQuery}
-                                isLoading={isLoading}
-                            />
-                            <BarEnd search={false} />
-                        </div>
-                    </div>
+                actions={<SectionActions />}
+                views={<ViewPills views={VIEWS} activeView={view} onViewChange={setView} />}
+                search={(
+                    <SearchField
+                        key={key}
+                        placeholder={SCOPE}
+                        spacing="compact"
+                        isCollapsible
+                        defaultOpen={initialOpen || Boolean(initialQuery)}
+                        value={query}
+                        onValueChange={setQuery}
+                        isLoading={isLoading}
+                    />
                 )}
             >
                 <Results shown={shown} total={inView.length} query={query} loading={isLoading} onReset={reset} />

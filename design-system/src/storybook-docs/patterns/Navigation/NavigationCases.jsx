@@ -47,7 +47,7 @@ export const BreadcrumbCase = ({ record = true }) => (
                         <SessionsTable rows={MAYA_UPCOMING_SESSIONS} />
                     </PatternSection>
                 ) : (
-                    <PatternSection title="Students" type="tabs-only">
+                    <PatternSection title="All students">
                         <StudentsTable count={3} />
                     </PatternSection>
                 )}
