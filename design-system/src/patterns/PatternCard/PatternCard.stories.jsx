@@ -8,6 +8,7 @@ import { Skeleton, Button, IconButton } from '@/components';
 import { CardJobs } from './PatternCardCases.jsx';
 import { ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
+import sessionSummaryLight from '@/assets/images/kit/session-summary-light.svg';
 
 const bodyCopy = (
     <p className="body-lg" style={{ margin: 0 }}>
@@ -35,21 +36,16 @@ const sessionBody = (
 const viewSession = <Button text="View session" appearance="subtle" spacing="compact" onClick={() => {}} />;
 
 const imagePlaceholder = (ratio) => (
-    <div
+    <img
+        src={sessionSummaryLight}
+        alt={`Weekly tutoring session summary (${ratio})`}
         style={{
+            display: 'block',
+            width: '100%',
             aspectRatio: ratio.replace(':', ' / '),
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 'var(--inline-md)',
-            backgroundColor: 'var(--ds-background-neutral)',
-            color: 'var(--ds-text-subtle)',
-            font: 'var(--body-default)',
+            objectFit: 'cover',
         }}
-    >
-        <i className="fa-solid fa-book-open" aria-hidden="true" />
-        {`Lesson preview · ${ratio}`}
-    </div>
+    />
 );
 
 /** A row of cards at three content widths: the most that keeps each card at its minimum. */
@@ -302,8 +298,8 @@ export const ImageSquare = { name: 'Image 1:1', render: () => imageCard('1:1') }
 const placementStory = (imagePlacement, state = 'rest', imageSplit = '1/3') => ({
     render: () => (
         <PatternCard imagePlacement={imagePlacement} imageSplit={imageSplit}
-            image={<img alt="Session illustration" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='90'%3E%3C/svg%3E"
-                style={{ display: 'block', width: '100%', aspectRatio: '16 / 9', background: 'var(--ds-skeleton)' }} />}
+            image={<img alt="Session illustration" src={sessionSummaryLight}
+                style={{ display: 'block', width: '100%', aspectRatio: '16 / 9', objectFit: 'cover' }} />}
             title="Ana Ruiz" description="Lincoln Middle · Thu 4:00 PM" footer={viewSession}
             role="article" aria-label="Session summary" dragging={state === 'dragging'}
             onClick={state === 'hovered' || state === 'pressed' ? () => {} : undefined}
@@ -366,6 +362,8 @@ export const ImageStartHalf = placementStory('start', 'rest', '1/2');
 export const ImageEndHalf = placementStory('end', 'rest', '1/2');
 export const ImageTopIgnoresSplit = placementStory('top', 'rest', '1/2');
 
+const slotNote = (text) => <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{text}</span>;
+
 /** No header: the body carries its own title, as a metric tile does. */
 export const BodyOnly = () => (
     <PatternCard style={{ maxWidth: 'var(--card-min-width-lg)' }}>{bodyCopy}</PatternCard>
@@ -375,8 +373,8 @@ export const BodyOnly = () => (
 export const WithFooter = () => (
     <PatternCard
         title="Grade 7 math · Session 4"
-        actions={<IconButton icon="ellipsis-vertical" appearance="subtle" spacing="compact" label="More actions" onClick={() => {}} />}
-        footer={viewSession}
+        actions={slotNote('Save or edit')}
+        footer={slotNote('Next: Practice set 4')}
         style={{ maxWidth: 'var(--card-min-width-lg)' }}
     >
         {bodyCopy}
@@ -385,15 +383,7 @@ export const WithFooter = () => (
 
 /** `header` replaces the title, description and actions. */
 export const CustomHeader = () => (
-    <PatternCard
-        header={(
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--card-inline-md)' }}>
-                <span style={{ font: 'var(--heading-xs)' }}>Session notes · Oct 24</span>
-                <Button text="Add note" appearance="subtle" spacing="compact" onClick={() => {}} />
-            </div>
-        )}
-        style={{ maxWidth: 'var(--card-min-width-lg)' }}
-    >
+    <PatternCard header={slotNote('Session notes · Oct 24')} style={{ maxWidth: 'var(--card-min-width-lg)' }}>
         {bodyCopy}
     </PatternCard>
 );
