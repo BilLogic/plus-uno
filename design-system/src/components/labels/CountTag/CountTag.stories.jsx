@@ -183,13 +183,13 @@ export const Ring = () => (
     <div style={row}>
         <span style={{ position: 'relative', display: 'inline-flex' }}>
             <Icon name="bell" size={24} />
-            <span style={{ position: 'absolute', top: 'calc(-1 * var(--pad-y-md))', right: 'calc(-1 * var(--pad-x-sm))' }}>
+            <span style={{ position: 'absolute', top: 'calc(-1 * var(--pad-y-md))', right: '-10px' /* token gap: -10px */ }}>
                 <CountTag value={3} isBold appearance="danger" hasRing label="3 notifications" />
             </span>
         </span>
         <span style={{ position: 'relative', display: 'inline-flex' }}>
             <Icon name="bell" size={24} />
-            <span style={{ position: 'absolute', top: 'calc(-1 * var(--pad-y-sm))', right: 'calc(-1 * var(--pad-x-xs))', display: 'flex' }}>
+            <span style={{ position: 'absolute', top: 'calc(-1 * var(--pad-y-sm))', right: 'calc(-1 * var(--pad-y-sm))', display: 'flex' }}>
                 <CountTag isDot appearance="danger" hasRing label="New notifications" />
             </span>
         </span>

@@ -90,7 +90,7 @@ export default {
 };
 
 export const Overview = () => (
-    <div style={{ paddingBottom: 'var(--pad-y-lg)', maxWidth: 'var(--width-1900)' }}>
+    <div style={{ paddingBottom: 'var(--width-1900)', maxWidth: 'var(--width-1900)' }}>
         <DatePicker placeholder="MM/DD/YYYY" />
     </div>
 );
@@ -101,7 +101,7 @@ Overview.parameters = {
 };
 
 export const Spacing = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', paddingBottom: 'var(--pad-y-lg)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', paddingBottom: 'var(--width-1900)' }}>
         <div>
             <DemoLabel>DEFAULT (40)</DemoLabel>
             <DatePicker spacing="default" placeholder="Default" />
@@ -114,7 +114,7 @@ export const Spacing = () => (
 );
 
 export const InteractionStates = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', paddingBottom: 'var(--pad-y-lg)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', paddingBottom: 'var(--width-1900)' }}>
         <p className="body-default" style={{ color: 'var(--ds-text-subtle)' }}>
             Empty, with value, disabled, and read-only.
         </p>
@@ -143,13 +143,13 @@ export const PickDate = () => {
     const [date, setDate] = useState('');
 
     return (
-        <div style={{ paddingBottom: 'var(--pad-y-lg)', maxWidth: 'var(--width-1900)' }}>
+        <div style={{ paddingBottom: 'var(--width-1900)', maxWidth: 'var(--width-1900)' }}>
             <DatePicker aria-label="Session date" value={date} onChange={setDate} placeholder="Select a date" />
             {date && (
                 <div
                     style={{
-                        marginTop: 'var(--stack-lg)',
-                        padding: 'var(--pad-y-lg) var(--pad-x-md)',
+                        marginTop: 'var(--section-stack-md)',
+                        padding: 'var(--pad-x-md)',
                         backgroundColor: 'var(--ds-surface-container)',
                         borderRadius: 'var(--radius-md)',
                     }}
@@ -176,17 +176,17 @@ export const PickRange = () => {
     const [start, end] = range;
 
     return (
-        <div style={{ paddingBottom: 'var(--pad-y-lg)', maxWidth: 'var(--field-width-lg)' }}>
-            <h6 className="heading-xxs" style={{ marginBottom: 'var(--stack-lg)' }}>Select a Date Range</h6>
-            <p className="body-default" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--stack-lg)' }}>
+        <div style={{ paddingBottom: 'var(--width-1900)', maxWidth: 'var(--field-width-lg)' }}>
+            <h6 style={{ marginBottom: 'var(--section-stack-md)' }}>Select a Date Range</h6>
+            <p className="body-default" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--section-stack-md)' }}>
                 Click a first day, then a last day. The days between are marked.
             </p>
             <DatePicker range value={range} onChange={setRange} />
             {(start || end) && (
                 <div
                     style={{
-                        marginTop: 'var(--stack-lg)',
-                        padding: 'var(--pad-y-lg) var(--pad-x-md)',
+                        marginTop: 'var(--section-stack-md)',
+                        padding: 'var(--pad-x-md)',
                         backgroundColor: 'var(--ds-surface-container)',
                         borderRadius: 'var(--radius-md)',
                     }}
@@ -212,7 +212,7 @@ export const Bounds = () => {
     const [date, setDate] = useState('');
 
     return (
-        <div style={{ paddingBottom: 'var(--pad-y-lg)', maxWidth: 'var(--width-1900)' }}>
+        <div style={{ paddingBottom: 'var(--width-1900)', maxWidth: 'var(--width-1900)' }}>
             <DatePicker
                 value={date}
                 onChange={setDate}
@@ -236,7 +236,7 @@ export const Interactive = (args) => {
     const [date, setDate] = useState('');
 
     return (
-        <div style={{ paddingBottom: 'var(--pad-y-lg)' }}>
+        <div style={{ paddingBottom: 'var(--width-1900)' }}>
             <p>Selected Date: {date || 'None'}</p>
             <DatePicker {...args} value={date} onChange={setDate} />
         </div>
@@ -388,7 +388,7 @@ const box = (input) => input.closest('.plus-field').getBoundingClientRect();
 
 /** The calendar opens 4px under the field, its left edge on the field's. */
 export const CalendarOpensFourPixelsBelow = () => (
-    <div style={{ maxWidth: 'var(--field-width-lg)', marginLeft: 'var(--pad-x-lg)' }}>
+    <div style={{ maxWidth: '296px' /* token gap: 296px */, marginLeft: 'var(--pad-x-lg)' }}>
         <DatePicker aria-label="Session date" value="2026-10-21" />
     </div>
 );
@@ -406,7 +406,7 @@ CalendarOpensFourPixelsBelow.play = async ({ canvasElement }) => {
 
 /** With no room below, the calendar opens above, the same 4px away. */
 export const CalendarFlipsAboveNearTheBottom = () => (
-    <div style={{ position: 'fixed', left: 'var(--pad-x-lg)', bottom: 'var(--pad-y-lg)', width: 'var(--field-width-lg)' }}>
+    <div style={{ position: 'fixed', left: 'var(--pad-x-lg)', bottom: 'var(--section-pad-y-compact)', width: '296px' /* token gap: 296px */ }}>
         <DatePicker aria-label="Session date" value="2026-10-21" />
     </div>
 );

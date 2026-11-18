@@ -4,7 +4,7 @@ import { tokenColor as stateTokenColor } from '@/storybook-docs/lib/style-probes
 import { expect, within } from 'storybook/test';
 import Banner, { BANNER_APPEARANCES } from './Banner';
 
-const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' };
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' };
 const title = (name) => name.charAt(0).toUpperCase() + name.slice(1);
 
 export default {

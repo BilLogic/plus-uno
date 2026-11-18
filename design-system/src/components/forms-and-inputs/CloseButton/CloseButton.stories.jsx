@@ -80,7 +80,7 @@ export const Spacing = {
 
 export const Tones = {
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', alignItems: 'flex-start' }}>
             <div style={row}>
                 <CloseButton label="Dismiss default example" />
             </div>
@@ -113,7 +113,7 @@ export const Tones = {
 
 export const Focus = {
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', alignItems: 'flex-start' }}>
             <div style={row}>
                 <CloseButton label="Close default focus example" />
             </div>
