@@ -29,10 +29,9 @@ export const figmaMeta = {
 };
 
 {/* Pairs draw the inline panel, never a live dialog. A narrow stand-in screen keeps every width inside a pair card. */}
-export const narrowScreen = { '--plus-overlay-screen': 'calc(var(--size-2000) * 1.5)', width: '100%' };
-// Pair one draws both widths at three quarters, so ten columns fit beside six at the same scale.
-export const scaledScreen = { ...narrowScreen, zoom: 0.75 };
-export const shortCap = { ...narrowScreen, '--blanket-max-height-modal': 'var(--size-2000)' };
+export const narrowScreen = { '--plus-overlay-screen': 'var(--width-3000)', width: '100%' };
+export const scaledScreen = narrowScreen;
+export const shortCap = { ...narrowScreen, '--blanket-max-height-modal': 'var(--height-2000)' };
 export const longBody = `${'Long body copy. '.repeat(40)}The body scrolls once the content runs past the cap.`;
 
 <Meta of={ModalStories} />
