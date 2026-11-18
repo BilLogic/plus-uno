@@ -106,6 +106,7 @@ export const TypeSteps = {
     name: 'Type: In steps',
     render: () => <ScreenStage width={STAGE} scrollable><FormInSteps /></ScreenStage>,
     play: async ({ canvas, canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(canvas.getByRole('navigation', { name: 'Steps' }), 'four steps run across the top').toHaveClass('plus-progress-tracker--horizontal');

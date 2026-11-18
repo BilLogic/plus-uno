@@ -10,21 +10,27 @@ const fakeAnimation = ({ playState = 'running', iterations = 1, finished } = {})
     const promise = finished ?? new Promise((resolve) => {
         resolveFinished = resolve;
     });
-    return {
+    const animation = {
         playState,
         effect: { getComputedTiming: () => ({ iterations }) },
         finished: promise,
-        finishNow: () => resolveFinished?.(),
+        finishNow: () => {
+            animation.playState = 'finished';
+            resolveFinished?.();
+        },
     };
+    return animation;
 };
 
 describe('settleAnimations', () => {
     it('waits for running finite animations and follow-up animations spawned while waiting', async () => {
+        vi.useFakeTimers();
         const first = fakeAnimation();
         const second = fakeAnimation();
         const active = [first];
         const element = { getAnimations: () => active };
 
+        const start = Date.now();
         let settled = false;
         const run = settleAnimations(element, 1000).then(() => {
             settled = true;
@@ -36,12 +42,13 @@ describe('settleAnimations', () => {
         // Spawn a follow-up animation (e.g. PresenceSlot's delayed fade) before the first ends.
         active.push(second);
         first.finishNow();
-        await new Promise((resolve) => setTimeout(resolve, 0));
+        await vi.advanceTimersByTimeAsync(0);
         expect(settled).toBe(false);
 
         second.finishNow();
         await run;
         expect(settled).toBe(true);
+        expect(Date.now() - start).toBeLessThan(1000);
     });
 
     it('ignores infinite-iteration and paused animations', async () => {
