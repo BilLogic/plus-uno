@@ -54,6 +54,8 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Content | `--content-max-width-reading` |  |
 | Content | `--content-min-width` |  |
 | Content | `--content-width` |  |
+| Content | `--content-prose-stack` |  |
+| Content | `--content-list-indent` |  |
 | Size | `--icon-sm` (declared elsewhere) |  |
 | Size | `--icon-md` (declared elsewhere) |  |
 | Size | `--icon-lg` (declared elsewhere) |  |
@@ -105,6 +107,12 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Panel | `--panel-min-width` | the narrowest the splitter allows (320) |
 | Panel | `--panel-width-default` | the width a Panel opens at (400) |
 | Panel | `--panel-max-width` | the widest the splitter allows (640) |
+| Panel | `--panel-pad` |  |
+| Panel | `--panel-pad-y` |  |
+| Panel | `--panel-subheader-pad-y` |  |
+| Panel | `--panel-inline-sm` |  |
+| Panel | `--panel-inline-md` |  |
+| Panel | `--panel-inline-lg` |  |
 | Section | `--section-pad-x-compact` |  |
 | Section | `--section-pad-x-default` |  |
 | Section | `--section-pad-x-spacious` |  |
@@ -117,6 +125,8 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Section | `--section-stack-lg` (declared elsewhere) |  |
 | Section | `--section-min-width-main` (declared elsewhere) |  |
 | Section | `--section-min-width-side` (declared elsewhere) |  |
+| Section | `--section-toolbar-min-width` |  |
+| Section | `--section-toolbar-count-min-width` |  |
 | Card | `--card-pad-compact` |  |
 | Card | `--card-pad-default` |  |
 | Card | `--card-pad-spacious` |  |
@@ -140,6 +150,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Table | `--table-radius` |  |
 | Table | `--table-pad-x-footer` (declared elsewhere) |  |
 | Table | `--table-footer-height` |  |
+| Table | `--table-footer-gap` |  |
 | Table | `--table-min-width-title` (declared elsewhere) |  |
 | Blanket | `--blanket-pad-x` |  |
 | Blanket | `--blanket-pad-y` |  |
@@ -249,6 +260,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Carousel | `--carousel-indicator-height-compact` |  |
 | Carousel | `--carousel-indicator-height` |  |
 | Carousel | `--carousel-indicator-height-spacious` |  |
+| Carousel | `--carousel-slide-max-width` |  |
 | Scroll bar | `--scroll-bar-size` |  |
 | Scroll bar | `--scroll-bar-max-height` |  |
 | Skeleton | `--skeleton-height` |  |
@@ -267,6 +279,10 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Flag | `--flag-timer-height` |  |
 | Spotlight | `--spotlight-width` |  |
 | Spotlight | `--spotlight-media-height` |  |
+| Spotlight | `--spotlight-screen-pad` |  |
+| Spotlight | `--spotlight-pad` |  |
+| Spotlight | `--spotlight-gap` |  |
+| Spotlight | `--spotlight-footer-stack` |  |
 | Menu group | `--menu-group-min-width` |  |
 | Menu group | `--menu-group-pad-x` |  |
 | Menu group | `--menu-group-gap` |  |
@@ -276,6 +292,15 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | AI chat | `--ai-chat-width` |  |
 | Inbox | `--inbox-width` | 360px |
 | Table | `--table-cell-max-width` |  |
+| Table | `--table-message-gap` |  |
+| Page header | `--page-header-stack` |  |
+| Page header | `--page-header-gap` |  |
+| Comment | `--comment-pad` |  |
+| Comment | `--comment-gap` |  |
+| Comment | `--comment-replies-stack` |  |
+| Comment | `--comment-replies-indent` |  |
+| Progress tracker | `--progress-tracker-connector-width` |  |
+| Progress tracker | `--progress-tracker-dot-size` |  |
 | Avatar | `--avatar-size-96` |  |
 | Avatar | `--avatar-size-128` |  |
 | Spinner | `--spinner-size-sm` |  |
