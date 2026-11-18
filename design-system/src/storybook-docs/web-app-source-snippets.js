@@ -153,7 +153,7 @@ export const webAppSourceSnippets = {
     modal: snippet([
         '<Modal',
         '  show',
-        '  renderAs="inline"',
+        '  inline',
         '  title="Modal title"',
         '  body="Modal body text goes here."',
         '  width="6-col"',

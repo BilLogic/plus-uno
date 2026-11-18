@@ -13,7 +13,7 @@ import './PatternCard.scss';
  *   edge.
  * - **Image placement**: `top` (default), `start` or `end`. Side images apply
  *   at the large card minimum width and fill the height. `imageSplit` chooses
- *   one third (default) or one half; half uses Heading medium on a side card.
+ *   one third (default) or one half; half uses Heading md on a side card.
  *   Below the large minimum width, the image returns to the top with its own ratio.
  * - **Header** (`_Card header`): `title` (the card title type, shared with Card
  *   in `styles/_card-title.scss`, one heading level below its section) over an
@@ -118,7 +118,7 @@ PatternCard.propTypes = {
     image: PropTypes.node,
     /** Image position. Side placements apply from the large card minimum width; narrower cards put the image on top. */
     imagePlacement: PropTypes.oneOf(['top', 'start', 'end']),
-    /** Side image share. One half also steps the title up to Heading medium. Ignored for top placement. */
+    /** Side image share. One half also steps the title up to Heading md. Ignored for top placement. */
     imageSplit: PropTypes.oneOf(['1/3', '1/2']),
     /** Footer slot: commit actions, left-aligned, Card/stack-lg below the body
      * @ds-context Used in: Card.footer (ds guide card)

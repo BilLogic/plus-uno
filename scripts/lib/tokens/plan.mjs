@@ -108,11 +108,17 @@ export const TOKEN_LADDER = [
   { tier: 'semantics', group: 'Stack', new: '--stack-sm', old: '--element-stack-sm', ref: 'var(--space-025)', use: 'Vertical gap between tightly related items, such as a label and its control.' },
   { tier: 'semantics', group: 'Stack', new: '--stack-md', old: '--element-stack-md', ref: 'var(--space-050)', use: 'Vertical gap between items in a list or a group of fields.' },
   { tier: 'semantics', group: 'Stack', new: '--stack-lg', old: '--element-stack-lg', ref: 'var(--space-075)', use: 'Vertical gap between groups inside one control or component.' },
+  { tier: 'semantics', group: 'Stack', new: '--stack-xl', old: null, value: '--space-100', use: 'Vertical gap between related groups or blocks inside one container.' },
+  { tier: 'semantics', group: 'Stack', new: '--stack-2xl', old: null, value: '--space-150', use: 'Vertical gap between major groups inside one container.' },
+  { tier: 'semantics', group: 'Stack', new: '--stack-3xl', old: null, value: '--space-200', use: 'Vertical gap between distinct areas inside a large container.' },
 
   // ─── Semantics / Inline ───────────────────────────────────────────────
   { tier: 'semantics', group: 'Inline', new: '--inline-sm', old: '--element-inline-sm', ref: 'var(--space-025)', use: 'Horizontal gap between an icon and its label inside a control.' },
   { tier: 'semantics', group: 'Inline', new: '--inline-md', old: '--element-inline-md', ref: 'var(--space-050)', use: 'Horizontal gap between items in a row, such as buttons in a ButtonGroup.' },
   { tier: 'semantics', group: 'Inline', new: '--inline-lg', old: '--element-inline-lg', ref: 'var(--space-075)', use: 'Horizontal gap between loosely related items in a row.' },
+  { tier: 'semantics', group: 'Inline', new: '--inline-xl', old: null, value: '--space-100', use: 'Horizontal gap between distinct groups or columns in a row.' },
+  { tier: 'semantics', group: 'Inline', new: '--inline-2xl', old: null, value: '--space-150', use: 'Horizontal gap between wide groups or panels in a row.' },
+  { tier: 'semantics', group: 'Inline', new: '--inline-3xl', old: null, value: '--space-200', use: 'Horizontal gap between major regions in a row.' },
 
   // ─── Semantics / Radius (non-control, + control-by-height) ───────────
   { tier: 'semantics', group: 'Radius', new: '--radius-sm', old: '--element-radius-sm', ref: 'var(--space-0125)', use: 'Corner rounding for small marks: a checkbox, a small tag.' },
@@ -240,18 +246,20 @@ export const TOKEN_LADDER = [
   { tier: 'templates', group: 'Card', new: '--card-description-font', old: null, ref: 'var(--body-default)', codeOnly: true, use: 'Description font of a PatternCard.' },
 
   // ─── Templates / Table ─────────────────────────────────────────────────
-  { tier: 'templates', group: 'Table', new: '--table-pad-x-cell', old: '--table-pad-x-cell', use: 'Horizontal padding inside a PatternTable cell.' },
-  { tier: 'templates', group: 'Table', new: '--table-pad-y-cell', old: '--table-pad-y-cell', use: 'Vertical padding inside a PatternTable cell.' },
+  { tier: 'templates', group: 'Table', new: '--table-pad-x-cell', old: '--table-pad-x-cell', use: 'Horizontal padding inside a table cell.' },
+  { tier: 'templates', group: 'Table', new: '--table-pad-y-cell', old: '--table-pad-y-cell', use: 'Vertical padding inside a table cell.' },
   { tier: 'templates', group: 'Table', new: '--table-indent', old: '--table-indent', use: 'Indent of each nested level in a tree table.' },
-  { tier: 'templates', group: 'Table', new: '--table-radius', old: null, ref: 'var(--radius-xl)', use: 'Corner rounding of a PatternTable.' },
-  { tier: 'templates', group: 'Table', new: '--table-pad-x-footer', old: '--table-pad-x-footer', use: 'Horizontal padding of a PatternTable footer, such as its Pagination row.' },
-  { tier: 'templates', group: 'Table', new: '--table-footer-height', old: null, ref: 'var(--space-300)', use: 'Height of a PatternTable footer row: the range, the page-size Select and Pagination on one line.' },
-  { tier: 'templates', group: 'Table', new: '--table-min-width-title', old: '--table-min-width-title', use: 'Narrowest a PatternTable\'s title column may shrink.' },
+  { tier: 'templates', group: 'Table', new: '--table-radius', old: null, ref: 'var(--radius-xl)', use: 'Corner rounding of a table.' },
+  { tier: 'templates', group: 'Table', new: '--table-pad-x-footer', old: '--table-pad-x-footer', use: 'Horizontal padding of a table footer, such as its Pagination row.' },
+  { tier: 'templates', group: 'Table', new: '--table-inline', old: null, ref: 'var(--inline-md)', use: 'Horizontal gap between controls in a table footer.' },
+  { tier: 'templates', group: 'Table', new: '--table-footer-height', old: null, ref: 'var(--height-300)', use: 'Height of a table footer row: the range, the page-size Select and Pagination on one line.' },
+  { tier: 'templates', group: 'Table', new: '--table-min-width-title', old: '--table-min-width-title', use: 'Narrowest a table\'s title column may shrink.' },
+  { tier: 'templates', group: 'Table', new: '--table-empty-surface', old: null, type: 'COLOR', ref: 'var(--ds-surface-sunken)', use: 'Surface of the empty state box that replaces an empty table.' },
+  { tier: 'templates', group: 'Table', new: '--table-empty-radius', old: null, ref: 'var(--radius-xxl)', use: 'Corner rounding of the empty state box that replaces an empty table.' },
 
   // ─── Templates / Blanket (renamed from Overlay) ───────────────────────
   { tier: 'templates', group: 'Blanket', new: '--blanket-pad-x', old: '--overlay-pad-x', ref: 'var(--space-100)', use: 'Horizontal space between the screen edge and a Modal on its Blanket.' },
   { tier: 'templates', group: 'Blanket', new: '--blanket-pad-y', old: '--overlay-pad-y', ref: 'var(--space-400)', at: { '(max-height: 639.98px)': 'var(--space-150)' }, use: 'Vertical space between the screen edge and a Modal on its Blanket; shrinks on short screens.' },
-  { tier: 'templates', group: 'Blanket', new: '--blanket-fill', old: '--overlay-scrim', type: 'COLOR', ref: 'rgba(0, 0, 0, 0.38)', note: "the Blanket's own fill color; the old declaration's value, written directly so this file carries no old-language word", use: 'Fill of the Blanket that dims the page behind a Modal.' },
   { tier: 'templates', group: 'Blanket', new: '--blanket-max-height-modal', old: '--layout-max-height-modal', ref: 'calc(100dvh - 2 * var(--blanket-pad-y))', codeOnly: true, note: 'a calc() of the pad above: code only, no Figma variable', use: 'Tallest a Modal may grow inside its Blanket.' },
 
   // ─── Templates / Modal ─────────────────────────────────────────────────
@@ -264,12 +272,14 @@ export const TOKEN_LADDER = [
   { tier: 'templates', group: 'Modal', new: '--modal-inline-md', old: '--modal-inline-md', use: 'Horizontal gap between the actions in a Modal footer.' },
   { tier: 'templates', group: 'Modal', new: '--modal-inline-lg', old: '--modal-inline-lg', use: 'Horizontal gap between columns in a Modal.' },
   { tier: 'templates', group: 'Modal', new: '--modal-radius', old: null, ref: 'var(--radius-xxl)', use: 'Corner rounding of a Modal.' },
-  { tier: 'templates', group: 'Modal', new: '--modal-width-xs', old: null, ref: '261px', at: { '(min-width: 1024px)': '347px', '(min-width: 1440px)': '432px' }, codeOnly: true, note: '4 screen-grid columns plus 2 × 16 modal pad at 768 · 1024 · 1440', use: 'Width of a compact Modal, such as a confirmation.' },
-  { tier: 'templates', group: 'Modal', new: '--modal-width-sm', old: '--layout-width-modal-sm', ref: '384px', at: { '(min-width: 1024px)': '512px', '(min-width: 1440px)': '640px' }, note: 'lifted out of spacing / layout, beside the template’s pad/stack tokens', use: 'Width of a small Modal, such as a single question or a one-field form.' },
-  { tier: 'templates', group: 'Modal', new: '--modal-width-md', old: '--layout-width-modal-md', ref: '507px', at: { '(min-width: 1024px)': '677px', '(min-width: 1440px)': '848px' }, use: 'Width of a default Modal, such as a short form.' },
-  { tier: 'templates', group: 'Modal', new: '--modal-width-lg', old: '--layout-width-modal-lg', ref: '629px', at: { '(min-width: 1024px)': '843px', '(min-width: 1440px)': '1056px' }, use: 'Width of a large Modal, such as a table or a long form.' },
-  { tier: 'templates', group: 'Table', new: '--table-overflow-reach', old: null, ref: 'var(--space-150)', use: 'How far a PatternTable lets a row\'s overflow, such as a focus ring, reach past its clip.' },
-  { tier: 'templates', group: 'Modal', new: '--modal-body-min-height', old: null, ref: 'var(--space-500)', use: 'Minimum height of a Modal\'s body, so a short body does not collapse the dialog.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-width-4-col', old: null, ref: '261px', at: { '(min-width: 1024px)': '347px', '(min-width: 1440px)': '432px' }, codeOnly: true, note: '4 screen-grid columns plus 2 × 16 modal pad at 768 · 1024 · 1440', use: 'Width of a compact Modal, such as a confirmation.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-width-6-col', old: '--layout-width-modal-sm', ref: '384px', at: { '(min-width: 1024px)': '512px', '(min-width: 1440px)': '640px' }, note: 'lifted out of spacing / layout, beside the template’s pad/stack tokens', use: 'Width of a small Modal, such as a single question or a one-field form.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-width-8-col', old: '--layout-width-modal-md', ref: '507px', at: { '(min-width: 1024px)': '677px', '(min-width: 1440px)': '848px' }, use: 'Width of a default Modal, such as a short form.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-width-10-col', old: '--layout-width-modal-lg', ref: '629px', at: { '(min-width: 1024px)': '843px', '(min-width: 1440px)': '1056px' }, use: 'Width of a large Modal, such as a table or a long form.' },
+  { tier: 'templates', group: 'Page', new: '--page-border-width', old: null, ref: 'var(--stroke-2)', use: 'Width of the edge drawn around a Page frame.' },
+  { tier: 'templates', group: 'Table', new: '--table-overflow-reach', old: null, ref: 'var(--space-150)', use: 'How far a table lets a row\'s overflow, such as a focus ring, reach past its clip.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-body-min-height', old: null, ref: 'var(--height-500)', use: 'Minimum height of a Modal\'s body, so a short body does not collapse the dialog.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-shadow', old: null, ref: 'var(--ds-shadow-blocking)', codeOnly: true, use: 'Shadow of a Modal on its Blanket.' },
 
   // ─── Templates / Popup ───────────────────────────────────────────────
   { tier: 'templates', group: 'Popup', new: '--popup-pad', old: '--popup-pad', use: 'Padding inside a Popup.' },
@@ -304,11 +314,23 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Button', new: '--button-radius-compact', old: '--element-radius-md', ref: 'calc(var(--radius-control-md) - var(--pad-x-xs))', note: 'nests in a 32-high field: its radius 8 minus the 4 slot inset = 4', use: 'Corner rounding of a Button with compact spacing.' },
   { tier: 'components', group: 'Button', new: '--button-radius-spacious', old: null, ref: 'var(--radius-control-lg)', note: '48-high footer button; pairs with --control-xl', use: 'Corner rounding of a Button with spacious spacing.' },
 
+  // ─── Components / Dialog ──────────────────────────────────────────────
+  { tier: 'components', group: 'Dialog', new: '--dialog-pad-x-default', old: null, ref: 'var(--space-100)', use: 'Horizontal padding of a Dialog with default spacing.' },
+  { tier: 'components', group: 'Dialog', new: '--dialog-pad-x-spacious', old: null, ref: 'var(--space-150)', use: 'Horizontal padding of a Dialog with spacious spacing.' },
+  { tier: 'components', group: 'Dialog', new: '--dialog-stack-sm', old: null, ref: 'var(--space-050)', use: 'Vertical gap between a Dialog\'s title and its description or tabs.' },
+  { tier: 'components', group: 'Dialog', new: '--dialog-stack-md', old: null, ref: 'var(--space-100)', use: 'Vertical gap between a Dialog\'s header, body and footer.' },
+  { tier: 'components', group: 'Dialog', new: '--dialog-stack-lg', old: null, ref: 'var(--space-150)', use: 'Vertical gap between blocks in a Dialog\'s body.' },
+  { tier: 'components', group: 'Dialog', new: '--dialog-inline-sm', old: null, ref: 'var(--space-050)', use: 'Horizontal gap between small items in a Dialog header or footer.' },
+  { tier: 'components', group: 'Dialog', new: '--dialog-inline-md', old: null, ref: 'var(--space-100)', use: 'Horizontal gap between the actions in a Dialog footer.' },
+  { tier: 'components', group: 'Dialog', new: '--dialog-inline-lg', old: null, ref: 'var(--space-150)', use: 'Horizontal gap between columns in a Dialog.' },
+  { tier: 'components', group: 'Dialog', new: '--dialog-radius', old: null, ref: 'var(--radius-xxl)', use: 'Corner rounding of a Dialog.' },
+  { tier: 'components', group: 'Dialog', new: '--dialog-body-min-height', old: null, ref: 'var(--height-500)', use: 'Minimum height of a Dialog\'s body, so a short body does not collapse the dialog.' },
+  { tier: 'components', group: 'Dialog', new: '--dialog-shadow', old: null, ref: 'var(--ds-shadow-blocking)', use: 'Shadow of a Dialog.' },
+
   // ─── Components / Calendar ────────────────────────────────────────────
-  { tier: 'components', group: 'Calendar', new: '--calendar-day-sm', old: '--layout-calendar-day-sm', ref: '28px', use: 'Size of a day cell in a compact Calendar.' },
-  { tier: 'components', group: 'Calendar', new: '--calendar-day-md', old: '--layout-calendar-day-md', ref: '36px', use: 'Size of a day cell in a default Calendar.' },
-  { tier: 'components', group: 'Calendar', new: '--calendar-day-lg', old: '--layout-calendar-day-lg', ref: '44px', use: 'Size of a day cell in a large Calendar.' },
-  { tier: 'components', group: 'Calendar', new: '--calendar-nav-size', old: '--layout-calendar-nav', ref: '32px', use: 'Size of the Calendar\'s previous and next month buttons.' },
+  { tier: 'components', group: 'Calendar', new: '--calendar-day-sm', old: '--layout-calendar-day-sm', ref: 'var(--control-sm)', use: 'Size of a day cell in a compact Calendar.' },
+  { tier: 'components', group: 'Calendar', new: '--calendar-day-md', old: '--layout-calendar-day-md', ref: 'var(--control-md)', use: 'Size of a day cell in a default Calendar.' },
+  { tier: 'components', group: 'Calendar', new: '--calendar-day-lg', old: '--layout-calendar-day-lg', ref: 'var(--control-lg)', use: 'Size of a day cell in a large Calendar.' },
 
   // ─── Components / Progress indicator ──────────────────────────────────
   { tier: 'components', group: 'Progress indicator', new: '--progress-indicator-dot-size-8', old: null, ref: 'var(--space-050)', note: 'ProgressIndicator size 8', use: 'Dot size of a ProgressIndicator with size 8.' },
@@ -392,8 +414,6 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Spotlight', new: '--spotlight-width', old: null, ref: 'var(--width-2500)', use: 'Width of a Spotlight.' },
   { tier: 'components', group: 'Spotlight', new: '--spotlight-media-height', old: null, ref: 'calc(var(--size-750) + var(--space-150))', use: 'Height of the media area in a Spotlight.' },
   { tier: 'components', group: 'Menu group', new: '--menu-group-min-width', old: null, ref: 'var(--size-1400)', use: 'Minimum width of a menu group.' },
-  { tier: 'components', group: 'Menu group', new: '--menu-group-pad-x', old: null, ref: 'var(--space-150)', use: 'Horizontal padding of a menu group.' },
-  { tier: 'components', group: 'Menu group', new: '--menu-group-gap', old: null, ref: 'var(--space-100)', use: 'Vertical gap between groups in a menu.' },
   { tier: 'components', group: 'Popup', new: '--popup-min-width', old: null, ref: 'var(--width-1000)', use: 'Narrowest an auto-width Popup gets, unless its trigger is wider.' },
   { tier: 'components', group: 'Popup', new: '--popup-max-width', old: null, ref: 'var(--width-2000)', use: 'Widest an auto-width Popup grows to fit its content, unless its trigger is wider.' },
   { tier: 'components', group: 'Popup', new: '--popup-clip-reach', old: null, ref: 'var(--space-300)', use: 'How far past its edges a Popup\'s opening clip stays, so the overlay shadow is never cut.' },
@@ -477,6 +497,7 @@ export const RETIRED_RENAMES = {
   '--tile-radius-sm': '--space-0375',
   '--tile-radius-lg': '--radius-control-lg',
   '--card-radius-sm': '--card-radius',
+  '--layout-calendar-nav': '--control-sm',
 };
 
 /** Retired name -> its replacement: the explicit table above, then each ladder row's `old` (first row wins). */

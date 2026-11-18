@@ -151,10 +151,21 @@ export const LightAndDark = {
             const el = canvas.getByTestId(id);
             return getComputedStyle(el.querySelector('.plus-logo__glows--light') ?? el.querySelector('.plus-logo__glows--dark')).display;
         };
+        const fill = (id, selector) => getComputedStyle(canvas.getByTestId(id).querySelector(selector)).fill;
         // The colored mark swaps its light glows out for the strong set in dark mode.
         await expect(glows('light-colored')).not.toBe('none');
         const darkLight = canvas.getByTestId('dark-colored').querySelector('.plus-logo__glows--light');
         await expect(getComputedStyle(darkLight).display).toBe('none');
+        // Brand tokens keep the same computed fills in both light and dark modes.
+        const filledTile = fill('light-filled', '.plus-logo__tile');
+        await expect(filledTile).toMatch(/^rgb\(/);
+        await expect(fill('dark-filled', '.plus-logo__tile')).toBe(filledTile);
+        const lightGlow = fill('light-colored', '.plus-logo__glows--light .plus-logo__glow--0');
+        await expect(lightGlow).toMatch(/^rgb\(/);
+        await expect(fill('dark-colored', '.plus-logo__glows--light .plus-logo__glow--0')).toBe(lightGlow);
+        const darkGlow = fill('light-colored-dark', '.plus-logo__glows--dark .plus-logo__glow--0');
+        await expect(darkGlow).toMatch(/^rgb\(/);
+        await expect(fill('dark-colored-dark', '.plus-logo__glows--dark .plus-logo__glow--0')).toBe(darkGlow);
     },
 };
 

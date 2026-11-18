@@ -1,8 +1,8 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 
-import { DropdownMenu, Modal, Popup, Table, Flag, ButtonItem, Section, Button } from '@/components';
-import { PatternCard, PatternSection, Page } from '@/patterns';
+import { DropdownMenu, Popup, StaticTable, Flag, ButtonItem, Section, Button } from '@/components';
+import { Modal, PatternCard, PatternSection, Page } from '@/patterns';
 
 /**
  * Headings step down one size per nesting level, and their tags follow the
@@ -85,7 +85,7 @@ CardTitles.play = async ({ canvasElement }) => {
 export const ModalTitle = () => (
     <Modal
         show
-        renderAs="inline"
+        inline
         title="Edit session"
         description="Changes apply to every session in the series."
         onClose={() => {}}
@@ -145,7 +145,7 @@ export const GroupLabels = () => (
                 <ButtonItem onClick={() => {}}>Oldest</ButtonItem>
             </Section>
         </DropdownMenu>
-        <Table headers={['Student', 'Grade']} rows={[['Ana', '7'], ['Ben', '8']]} />
+        <StaticTable headers={['Student', 'Grade']} rows={[['Ana', '7'], ['Ben', '8']]} />
     </div>
 );
 

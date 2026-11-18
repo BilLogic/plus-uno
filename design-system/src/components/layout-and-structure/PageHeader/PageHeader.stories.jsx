@@ -13,7 +13,7 @@ export const Basic = () => <PageHeader title="Session plans" id="page-header-bas
 
 Basic.play = async ({ canvas }) => {
     const heading = canvas.getByRole('heading', { level: 1, name: 'Session plans' });
-    await expect(heading).toHaveAttribute('data-size', 'large');
+    await expect(heading).toHaveAttribute('data-size', 'lg');
 };
 
 export const SecondaryLevel = () => (
@@ -22,7 +22,7 @@ export const SecondaryLevel = () => (
 
 SecondaryLevel.play = async ({ canvas }) => {
     const heading = canvas.getByRole('heading', { level: 2, name: 'Section overview' });
-    await expect(heading).toHaveAttribute('data-size', 'large');
+    await expect(heading).toHaveAttribute('data-size', 'lg');
 };
 
 export const WithBreadcrumbsActionsAndBottomBar = () => (

@@ -4,6 +4,8 @@ import {
   AccessibilityHero,
   BorderHero,
   ElevationHero,
+  ElevationLayersHero,
+  ElevationRampHero,
   GridHero,
   IconographyHero,
   IllustrationsHero,
@@ -82,7 +84,22 @@ export const HEROES = {
     description:
       'Two surfaces bleed off the edge; only the edge is drawn.',
   },
-  'foundations-visual-elevation': {
+  'foundations-visual-elevation-overview': {
+    Hero: ElevationHero,
+    description:
+      'The layers lifted apart, light on the left and dark on the right.',
+  },
+  'foundations-visual-elevation-layer-system': {
+    Hero: ElevationLayersHero,
+    description:
+      'Five horizontal planes stacked from Frame at the base to the accented Modal on top.',
+  },
+  'foundations-visual-elevation-shadow-ramp': {
+    Hero: ElevationRampHero,
+    description:
+      'Four overlapping discs stepping across the shadow ramp, with the blocking step ringed in the brand color.',
+  },
+  'foundations-visual-elevation-usage': {
     Hero: ElevationHero,
     description:
       'The layers lifted apart, light on the left and dark on the right.',

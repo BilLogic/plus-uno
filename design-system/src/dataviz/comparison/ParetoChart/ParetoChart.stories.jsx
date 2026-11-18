@@ -42,7 +42,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Support ticket analysis</Heading>
+                <Heading as="h3" size="sm">Support ticket analysis</Heading>
                 <p style={captionStyle}>
                     Columns sorted from largest to smallest with a cumulative share line.
                 </p>

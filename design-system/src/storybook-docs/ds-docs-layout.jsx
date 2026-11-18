@@ -167,7 +167,7 @@ export function ResourcesBlock({ figmaLink, githubLink }) {
     );
 }
 
-/** Filled + bordered padded inner well (`--ds-surface-container`) —
+/** Filled + bordered padded inner well (`--ds-surface-sunken`) —
  *  shared by DocsDemoBlock and DocsCanvasShell so every display block is distinguishable. */
 export function DocsPreviewCard({ children, innerClassName = '' }) {
     return (
@@ -176,7 +176,7 @@ export function DocsPreviewCard({ children, innerClassName = '' }) {
             style={{
                 overflow: 'visible',
                 borderRadius: 'var(--card-radius)',
-                backgroundColor: 'var(--ds-surface-container)',
+                backgroundColor: 'var(--ds-surface-sunken)',
                 border: 'var(--border-width-default) solid var(--ds-border)',
             }}
         >
@@ -500,7 +500,7 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
                 style={{
                     overflow: 'visible',
                     borderRadius: 'var(--card-radius)',
-                    backgroundColor: 'var(--ds-surface-container)',
+                    backgroundColor: 'var(--ds-surface-sunken)',
                     border: 'var(--border-width-default) solid var(--ds-border)',
                 }}
             >
@@ -526,7 +526,7 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
                         padding: 'var(--page-stack-md) var(--page-stack-lg)',
                         // Canvas and controls are two groups in one well; the line separates them.
                         borderTop: 'var(--border-width-default) solid var(--ds-border)',
-                        backgroundColor: 'var(--ds-surface-container)',
+                        backgroundColor: 'var(--ds-surface-sunken)',
                         // The panel is overflow-visible (Controls popups), so this
                         // last child's own background must follow the panel's curve
                         // or it squares off the bottom corners.

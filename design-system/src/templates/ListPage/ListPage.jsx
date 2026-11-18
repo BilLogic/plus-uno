@@ -1,6 +1,6 @@
 import React from 'react';
-import { Breadcrumb, Button } from '@/components';
-import { Frame, PatternSection, PatternTable } from '@/patterns';
+import { Breadcrumb, Button, StaticTable } from '@/components';
+import { Frame, PatternSection } from '@/patterns';
 
 const ROWS = [
     { name: 'Jordan Blake', role: 'Tutor', status: 'Active' },
@@ -14,25 +14,12 @@ const ROWS = [
  */
 const ListPage = ({ title = 'Members', rows = ROWS, sidebar, onAdd }) => (
     <Frame sidebar={sidebar} header={<Breadcrumb items={[{ text: 'Home', href: '/' }, { text: title }]} />}>
-        <PatternSection level="page" title={title} actions={<Button text="Add member" appearance="primary" onClick={onAdd} />}>
-            <PatternTable>
-                <thead>
-                    <tr>
-                        <th className="body-sm">Name</th>
-                        <th className="body-sm">Role</th>
-                        <th className="body-sm">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {rows.map((row) => (
-                        <tr key={row.name}>
-                            <td className="body-lg">{row.name}</td>
-                            <td className="body-lg">{row.role}</td>
-                            <td className="body-lg">{row.status}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </PatternTable>
+        <PatternSection level="page" title={title} actions={<Button text="Add member" appearance="primary" spacing="compact" onClick={onAdd} />}>
+            <StaticTable
+                headers={['Name', 'Role', 'Status']}
+                rows={rows.map((row) => [row.name, row.role, row.status])}
+                titleColumn={0}
+            />
         </PatternSection>
     </Frame>
 );

@@ -57,7 +57,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Subject score vs. student count</Heading>
+                <Heading as="h3" size="sm">Subject score vs. student count</Heading>
                 <p style={captionStyle}>
                     Column height encodes average score and column width encodes enrollment, sorted from highest score to lowest in the brand color.
                 </p>
@@ -70,7 +70,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Ordinal grade cohorts</Heading>
+                <Heading as="h3" size="sm">Ordinal grade cohorts</Heading>
                 <p style={captionStyle}>
                     Grades keep their natural order with {'sort={false}'} while toneByRank puts the darkest step on the highest average.
                 </p>

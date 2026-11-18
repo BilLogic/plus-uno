@@ -50,7 +50,7 @@ on any level of the page.
 
 ## Overview
 
-<ComponentExample of={HeadingStories.Overview} description={<>A <code>large</code> heading.</>} />
+<ComponentExample of={HeadingStories.Overview} description={<>A <code>lg</code> heading.</>} />
 
 </div>
 
@@ -58,7 +58,7 @@ on any level of the page.
 
 ## Sizes
 
-<ComponentExample of={HeadingStories.Sizes} description={<>Seven sizes, <code>xxlarge</code> to <code>xxsmall</code>. Size is a style choice, independent of the tag the heading renders as.</>} />
+<ComponentExample of={HeadingStories.Sizes} description={<>Seven sizes, <code>xxl</code> to <code>xxs</code>. Size is a style choice, independent of the tag the heading renders as.</>} />
 
 </div>
 
@@ -66,7 +66,7 @@ on any level of the page.
 
 ## Tag and context
 
-<ComponentExample of={HeadingStories.OverridesTheTag} title="Overrides the tag" description={<><code>as</code> overrides the tag directly: here a <code>div</code> carrying <code>xxsmall</code> text with no heading semantics.</>} />
+<ComponentExample of={HeadingStories.OverridesTheTag} title="Overrides the tag" description={<><code>as</code> overrides the tag directly: here a <code>div</code> carrying <code>xxs</code> text with no heading semantics.</>} />
 
 <ComponentExample of={HeadingStories.NestedContext} title="Nested context" description={<>Without <code>as</code>, the tag tracks the ambient level from <code>HeadingContextProvider</code>: a heading nested one level deeper renders one tag level down.</>} />
 
@@ -140,7 +140,7 @@ sits. Pass `size` for the look; reach for `as` only to break that link on purpos
 
 ## Parts
 
-1. **Text.** Set in the text style of `size`, from `xxlarge` to `xxsmall`.
+1. **Text.** Set in the text style of `size`, from `xxl` to `xxs`.
 2. **Tag.** Follows the ambient heading level, or `as` when given.
 3. **Color.** Default ink, inverse ink on a dark ground, or the warning inverse ink.
 
@@ -165,7 +165,7 @@ sits. Pass `size` for the look; reach for `as` only to break that link on purpos
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Text style</td><td><code>--heading-xxl</code> to <code>--heading-xxs</code>, with tracking for xxlarge, xlarge and large</td></tr>
+<tr><td>Text style</td><td><code>--heading-xxl</code> to <code>--heading-xxs</code>, with tracking for xxl, xl and lg</td></tr>
 <tr><td>Default ink</td><td><code>--ds-text</code></td></tr>
 <tr><td>Inverse ink</td><td><code>--ds-text-inverse</code></td></tr>
 <tr><td>Warning inverse ink</td><td><code>--ds-text-warning-inverse</code></td></tr>
@@ -183,27 +183,27 @@ sits. Pass `size` for the look; reach for `as` only to break that link on purpos
 `size` is required, and it is separate from the tag the context picks.
 
 <DoDontPair
-    doExample={<Heading size="xsmall">Student progress</Heading>}
+    doExample={<Heading size="xs">Student progress</Heading>}
     doCaption="Pass the size the spot needs and let the level pick the tag."
-    dontExample={<Heading as="h5" size="xsmall">Student progress</Heading>}
+    dontExample={<Heading as="h5" size="xs">Student progress</Heading>}
     dontCaption="Pick a tag to get a size, which breaks the outline."
 />
 
 ### Use `as="div"` for a label that is not a heading.
 
 <DoDontPair
-    doExample={<Heading as="div" size="xxsmall">Section label</Heading>}
+    doExample={<Heading as="div" size="xxs">Section label</Heading>}
     doCaption="Heading style with no heading meaning."
-    dontExample={<Heading size="xxsmall">Section label</Heading>}
+    dontExample={<Heading size="xxs">Section label</Heading>}
     dontCaption="A real heading that screen reader users meet in the outline."
 />
 
 ### Let the ground set the ink.
 
 <DoDontPair
-    doExample={<div style={{ background: 'var(--ds-text)', padding: 'var(--pad-x-md)' }}><Heading as="div" size="xlarge" color="color.text.inverse">On a dark ground</Heading></div>}
+    doExample={<div style={{ background: 'var(--ds-text)', padding: 'var(--pad-x-md)' }}><Heading as="div" size="xl" color="color.text.inverse">On a dark ground</Heading></div>}
     doCaption="The inverse color on a dark ground."
-    dontExample={<div style={{ background: 'var(--ds-text)', padding: 'var(--pad-x-md)' }}><Heading as="div" size="xlarge">On a dark ground</Heading></div>}
+    dontExample={<div style={{ background: 'var(--ds-text)', padding: 'var(--pad-x-md)' }}><Heading as="div" size="xl">On a dark ground</Heading></div>}
     dontCaption="The default ink on a dark ground, which barely reads."
 />
 

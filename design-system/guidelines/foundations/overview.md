@@ -24,7 +24,7 @@ topic, which today only `content/` does.
 | [Icons.mdx](../../src/styles/Icons.mdx) | ✅ | Which icon set, which size |
 | [Illustrations.mdx](../../src/styles/Illustrations.mdx) | ✅ | Illustration style and assets |
 | [Logos.mdx](../../src/styles/Logos.mdx) | ✅ | The marks, clear space, variants |
-| [Elevation.mdx](../../src/styles/Elevation.mdx) | ✅ | Which level for which behavior, and how a shadow is built |
+| [ElevationOverview.mdx](../../src/styles/ElevationOverview.mdx) | ✅ | Which layer and surface for which behavior, and how shadows step |
 | [Border.mdx](../../src/styles/Border.mdx) | ✅ | Border widths |
 | [Radius.mdx](../../src/styles/Radius.mdx) | ✅ | Corner radius scale |
 
@@ -59,6 +59,8 @@ foundations say which to reach for and why.
 - Choose the tier first (component, then template, then semantics, then primitives), then pick the token.
 - Use primitives only for token-definition work, never in feature implementation.
 - Fallback rule: reach for a component token first; if none fits, the template token; failing that, the semantic step. A template token is one whose value would change if the template changed.
+- Section and Page tokens are never used as general gaps.
+- Demo-only container sizes in stories (example frames such as 296, 420, 800) may stay literals with a `/* demo frame */` note.
 
 ## Known drift
 

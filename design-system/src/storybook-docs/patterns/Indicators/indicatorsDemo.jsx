@@ -119,7 +119,7 @@ export const InARow = () => (
 /** A spacious Status tag after the page title. */
 export const BesideTitle = () => (
     <div style={{ ...frame, ...line }}>
-        <Heading size="large">Session with Ana Ruiz</Heading>
+        <Heading size="lg">Session with Ana Ruiz</Heading>
         <StatusTag appearance="warning" spacing="spacious">Needs review</StatusTag>
     </div>
 );

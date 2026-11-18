@@ -108,12 +108,13 @@ test('real repo: tokens by name, by role, and retired', () => {
   assert.equal(stack.tier, 'semantic');
   assert.match(stack.intent, /gap/);
   const role = facts.tokens('stack').map((t) => t.name);
-  assert.ok(role.includes('--stack-sm') && role.includes('--stack-lg'));
+  assert.ok(role.includes('--stack-sm') && role.includes('--stack-lg') && role.includes('--stack-xl'));
   assert.ok(role.every((name) => name.startsWith('--stack-')));
   assert.deepEqual(facts.tokens('--element-pad-default'), [
     { name: '--element-pad-default', status: 'retired', tier: null, group: null, value: null, intent: null, replacement: ['--pad-x-md'], why: null },
   ]);
-  assert.equal(facts.tokens('--stack-xl')[0].status, 'not-here');
+  assert.equal(facts.tokens('--stack-xl')[0].status, 'exists');
+  assert.equal(facts.tokens('--ds-on-surface')[0].status, 'not-here');
   assert.deepEqual(facts.tokens('--nothing-like-this'), []);
 });
 

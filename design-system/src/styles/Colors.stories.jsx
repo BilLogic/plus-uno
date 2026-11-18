@@ -127,7 +127,7 @@ export const BackgroundRoles = () => (
 );
 
 export const SurfaceRoles = () => (
-    <Swatches kind="surface" tokens={['--ds-surface-sunken', '--ds-surface', '--ds-surface-raised', '--ds-surface-overlay', '--ds-surface-container']} />
+    <Swatches kind="surface" tokens={['--ds-surface-sunken', '--ds-surface', '--ds-surface-raised', '--ds-surface-overlay']} />
 );
 
 const STATUSES = ['danger', 'warning', 'success', 'information', 'discovery'];

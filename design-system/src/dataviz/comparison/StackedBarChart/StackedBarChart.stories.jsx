@@ -74,7 +74,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Weekly breakdown</Heading>
+                <Heading as="h3" size="sm">Weekly breakdown</Heading>
                 <p style={captionStyle}>
                     Shows part-to-whole relationships across weekdays with contrasting segment labels.
                 </p>

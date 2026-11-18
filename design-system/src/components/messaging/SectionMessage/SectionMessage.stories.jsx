@@ -251,7 +251,6 @@ DismissPlacement.play = async ({ canvasElement }) => {
     const body = canvas.getByTestId('placement-body');
     await userEvent.click(within(body).getByRole('button', { name: 'Dismiss message' }));
     await waitFor(() => expect(canvas.queryByTestId('placement-body')).toBeNull());
-    await settleAnimations(canvasElement);
 };
 
 
@@ -362,7 +361,6 @@ LeadingIcon.play = async ({ canvasElement }) => {
     // The × is unchanged beside the icon: it still dismisses its message.
     await userEvent.click(within(none).getByRole('button', { name: 'Dismiss message' }));
     await waitFor(() => expect(canvas.queryByTestId('icon-none')).toBeNull());
-    await settleAnimations(canvasElement);
 };
 
 /**
@@ -446,7 +444,6 @@ Actions.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const message = canvas.getByTestId('actions');
     await waitFor(() => expect(within(message).getByRole('button', { name: 'Reschedule' })).toBeVisible());
-    await settleAnimations(canvasElement);
     await expect(within(message).getByRole('link', { name: 'Learn more' })).toHaveAttribute('href', '#');
 };
 
@@ -546,7 +543,6 @@ export const MotionEnterAndExit = {
         await expect(alert.isConnected, 'SectionMessage stays connected while exiting').toBe(true);
         await expect(slot).toHaveAttribute('data-presence-phase', 'exit-fade');
         await waitFor(() => expect(alert.isConnected).toBe(false));
-        await settleAnimations(canvasElement);
     },
 };
 
@@ -564,6 +560,5 @@ export const MotionReduced = {
 
         fireEvent.click(canvas.getByRole('button', { name: 'Dismiss message' }));
         await waitFor(() => expect(alert.isConnected).toBe(false));
-        await settleAnimations(canvasElement);
     },
 };

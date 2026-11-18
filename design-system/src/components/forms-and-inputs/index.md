@@ -170,7 +170,7 @@ authored half, counted rather than assumed.
 | [ChoiceGrid](ChoiceGrid/index.md) | 12 | ✅ | ✅ | ✅ |
 | [CloseButton](CloseButton/index.md) | 5 | ✅ | ✅ | ✅ |
 | [Comment](Comment/index.md) | 14 | ✅ | ✅ | ✅ |
-| [DatePicker](DatePicker/index.md) | 18 | ✅ | ✅ | ✅ |
+| [DatePicker](DatePicker/index.md) | 26 | ✅ | ✅ | ✅ |
 | [DateTimePicker](DateTimePicker/index.md) | 31 | ✅ | ✅ | ✅ |
 | [DropdownMenu](DropdownMenu/index.md) | 17 | ✅ | ✅ | ✅ |
 | [Fieldset](Fieldset.md) | 9 | ✅ | ✅ | ✅ |

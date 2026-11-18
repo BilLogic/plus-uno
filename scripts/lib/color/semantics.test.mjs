@@ -16,15 +16,38 @@ const refs = (key, name) => {
 };
 const hex = (key, name, mode = 'light') => buildPlan(key).semantics.rows.find((row) => row.name === name)[mode];
 
-test('536 tokens, every value a primitive reference', () => {
+test('552 tokens, every value a primitive reference', () => {
   const { rows } = buildPlan('A').semantics;
-  assert.equal(rows.length, 536);
-  assert.equal(new Set(rows.map((r) => r.name)).size, 536);
+  assert.equal(rows.length, 552);
+  assert.equal(new Set(rows.map((r) => r.name)).size, 552);
   for (const r of rows) {
     for (const m of ['light', 'dark', 'light_ic', 'dark_ic']) {
       assert.match(r[`${m}_ref`], /^(transparent|[a-zA-Z]+\.[0-9]+(a[0-9]+)?)$/, `${r.name} ${m}`);
     }
   }
+});
+
+test('surface-container tokens are retired and dark raised equals dark surface', () => {
+  for (const key of ['A', 'B']) {
+    const { rows } = buildPlan(key).semantics;
+    const names = new Set(rows.map((r) => r.name));
+    for (const retired of [
+      'elevation.surface.container',
+      'elevation.surface.container.hovered',
+      'elevation.surface.container.pressed',
+    ]) {
+      assert.equal(names.has(retired), false, `${retired} is retired in Plan ${key}`);
+    }
+
+    const surface = refs(key, 'elevation.surface');
+    const raised = refs(key, 'elevation.surface.raised');
+    // Light and light IC stay neutral.0; dark and dark IC match elevation.surface (darkNeutral.100).
+    assert.deepEqual(raised, ['neutral.0', surface[1], 'neutral.0', surface[3]]);
+    assert.equal(hex(key, 'elevation.surface.raised', 'light'), '#ffffff');
+    assert.equal(hex(key, 'elevation.surface.raised', 'dark'), hex(key, 'elevation.surface', 'dark'));
+    assert.equal(hex(key, 'elevation.surface.raised', 'dark_ic'), hex(key, 'elevation.surface', 'dark_ic'));
+  }
+  assert.equal(hex('A', 'elevation.surface.raised', 'dark'), '#191919');
 });
 
 test("Atlassian's neutrals and hues resolve onto PLUS steps", () => {

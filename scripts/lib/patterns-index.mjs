@@ -23,7 +23,7 @@ export const PATTERNS_FILE = 'design-system/agent-views/_patterns.json';
 const ROW_FIELDS = new Set(['group', 'name', 'use']);
 
 /** A pattern with no page of its own: the section of its parent's page that documents it. */
-const FOLDED_INTO = { Blanket: 'design-system/src/patterns/PatternModal/PatternModal.mdx' };
+const FOLDED_INTO = {};
 
 /** A pattern's Storybook page: the MDX beside its source, or the page it is folded into. */
 const docOf = (answer, name) => FOLDED_INTO[name] ?? answer.source?.replace(/\.jsx$/, '.mdx') ?? null;

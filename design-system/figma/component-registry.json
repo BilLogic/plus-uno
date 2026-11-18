@@ -482,13 +482,38 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703"
       }
     },
+    "Dialog": {
+      "code": {
+        "import": "@/components/messaging",
+        "export": "default",
+        "mdxPath": "design-system/src/components/messaging/Dialog/Dialog.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Dialog",
+        "source": "design-system/src/components/messaging/Dialog/Dialog.jsx",
+        "storybookId": "components-messaging-dialog--docs"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "dialog",
+            "name": "Dialog",
+            "componentSetNodeId": "20701:48348",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20701-48348",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19502"
+      }
+    },
     "DynamicTable": {
       "code": {
         "import": "@/components/text-and-data-display",
         "export": "default",
-        "mdxPath": "design-system/src/components/text-and-data-display/Table/DynamicTable.mdx",
+        "mdxPath": "design-system/src/components/text-and-data-display/DynamicTable/DynamicTable.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Table",
-        "source": "design-system/src/components/text-and-data-display/Table/DynamicTable.jsx",
+        "source": "design-system/src/components/text-and-data-display/DynamicTable/DynamicTable.jsx",
         "storybookId": "components-text-and-data-display-dynamic-table--docs"
       },
       "figma": {
@@ -999,31 +1024,6 @@
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19592-515"
-      }
-    },
-    "Modal": {
-      "code": {
-        "import": "@/components/messaging",
-        "export": "default",
-        "mdxPath": "design-system/src/components/messaging/Modal/Modal.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Modal",
-        "source": "design-system/src/components/messaging/Modal/Modal.jsx",
-        "storybookId": "components-messaging-modal--docs"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "modal",
-            "name": "Modal",
-            "componentSetNodeId": "20701:48348",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20701-48348",
-            "source": "manual",
-            "status": "verified",
-            "isComponentSet": true
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19502"
       }
     },
     "NotificationItem": {
@@ -1556,9 +1556,9 @@
       "code": {
         "import": "@/components/text-and-data-display",
         "export": "default",
-        "mdxPath": "design-system/src/components/text-and-data-display/Table/StaticTable.mdx",
+        "mdxPath": "design-system/src/components/text-and-data-display/StaticTable/StaticTable.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Table",
-        "source": "design-system/src/components/text-and-data-display/Table/StaticTable.jsx",
+        "source": "design-system/src/components/text-and-data-display/StaticTable/StaticTable.jsx",
         "storybookId": "components-text-and-data-display-static-table--docs",
         "props": {
           "size": {
@@ -2024,9 +2024,9 @@
       "code": {
         "import": "@/components/text-and-data-display",
         "export": "default",
-        "mdxPath": "design-system/src/components/text-and-data-display/Table/TreeTable.mdx",
+        "mdxPath": "design-system/src/components/text-and-data-display/TreeTable/TreeTable.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Table",
-        "source": "design-system/src/components/text-and-data-display/Table/TreeTable.jsx",
+        "source": "design-system/src/components/text-and-data-display/TreeTable/TreeTable.jsx",
         "storybookId": "components-text-and-data-display-tree-table--docs"
       },
       "figma": {
@@ -2084,10 +2084,11 @@
       "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17169-43279",
       "isComponentSet": true,
       "variantProps": {
-        "size": [
-          "sm",
-          "md",
-          "lg"
+        "width": [
+          "4-col",
+          "6-col",
+          "8-col",
+          "10-col"
         ]
       },
       "tokenFamily": "Modal",

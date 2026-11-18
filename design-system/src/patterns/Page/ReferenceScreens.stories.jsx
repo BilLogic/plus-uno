@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import {
     Banner, Button, EmptyState, FooterActions, PageHeader,
-    PanelBody, PanelContainer, PanelFooter, PanelHeader, SearchField, StatusTag, TextField,
+    PanelBody, PanelContainer, PanelFooter, PanelHeader, SearchField, StaticTable, StatusTag, TextField,
 } from '@/components';
-import { Frame, Page, PatternSection, PatternTable, usePanelControl } from '@/patterns';
+import { Frame, Page, PatternSection, Table, usePanelControl } from '@/patterns';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
 
@@ -36,7 +36,7 @@ export const ListWithFilters = {
                     header={<PageHeader title="Session review queue" />}
                     banner={<Banner appearance="announcement">Review notes are visible to the session tutor.</Banner>}
                 >
-                    <PatternSection
+                    <Table
                         title="Sessions"
                         views={<ViewPills views={['All sessions']} />}
                         search={<SearchField mode="active" spacing="compact" placeholder="Search students" value={query} onValueChange={setQuery} />}
@@ -49,17 +49,21 @@ export const ListWithFilters = {
                         }]}
                         count={`${rows.length} of ${sessions.length}`}
                         onClearAll={reset}
-                    >
-                        <PatternTable empty={!rows.length} emptyState={
+                        empty={!rows.length}
+                        label="Sessions"
+                        emptyState={
                             <EmptyState spacing="compact" header="No matching sessions" description="Try another search or reset the filters."
                                 secondaryAction={<Button text="Reset filters" onClick={reset} />} />
-                        }>
-                            <thead><tr><th>Student</th><th>Status</th></tr></thead>
-                            <tbody>{rows.map((row) => <tr key={row.student}>
-                                <td>{row.student}</td><td><StatusTag appearance={row.status === 'Reviewed' ? 'success' : 'warning'}>{row.status}</StatusTag></td>
-                            </tr>)}</tbody>
-                        </PatternTable>
-                    </PatternSection>
+                        }
+                    >
+                        <StaticTable
+                            headers={['Student', 'Status']}
+                            rows={rows.map((row) => [
+                                row.student,
+                                <StatusTag appearance={row.status === 'Reviewed' ? 'success' : 'warning'}>{row.status}</StatusTag>,
+                            ])}
+                        />
+                    </Table>
                 </Page>
             </Frame>
         );

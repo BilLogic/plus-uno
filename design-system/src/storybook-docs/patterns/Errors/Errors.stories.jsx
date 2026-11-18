@@ -51,7 +51,6 @@ export const PlaceField = {
         await userEvent.type(field, 'ana@school.org');
         await expect(field).not.toHaveAttribute('aria-invalid', 'true');
         await waitFor(() => expect(canvas.queryByText('Enter a full email, like name@school.org')).toBeNull());
-        await settleAnimations(canvasElement);
     },
 };
 
@@ -98,7 +97,6 @@ export const PlaceBackgroundJob = {
         await expect(canvas.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
         await expect(canvas.getByRole('alert'), 'a danger Flag is an alert').toBeInTheDocument();
         await fitsCanvas(canvasElement);
-        await settleAnimations(canvasElement);
     },
 };
 
@@ -129,7 +127,6 @@ export const PlaceMenu = {
         await fitsCanvas(canvasElement);
         await userEvent.click(retry);
         await expect(await canvas.findByRole('menuitem', { name: 'Edit' })).toBeInTheDocument();
-        await settleAnimations(canvasElement);
     },
 };
 
@@ -150,7 +147,6 @@ export const KeyBlockedSubmit = {
         await userEvent.type(student, 'Ana Ruiz');
         await expect(student).not.toHaveAttribute('aria-invalid', 'true');
         await waitFor(() => expect(canvas.queryByText('Enter the student’s name.')).toBeNull());
-        await settleAnimations(canvasElement);
     },
 };
 
@@ -167,7 +163,6 @@ export const KeyRejectedSubmit = {
         await expect(within(message).getByRole('alert'), 'announced when it appears').toBeInTheDocument();
         await expect(message.getBoundingClientRect().top, 'at the top of the form').toBeLessThanOrEqual(canvas.getByLabelText(/Student/).getBoundingClientRect().top);
         await fitsCanvas(canvasElement);
-        await settleAnimations(canvasElement);
     },
 };
 
@@ -186,7 +181,6 @@ export const KeySectionFailed = {
         await expect(canvas.getByRole('table')).toBeVisible();
         await userEvent.click(canvas.getByRole('tab', { name: 'Next week' }));
         await expect(canvas.getByRole('tab', { name: 'Next week' })).toHaveAttribute('aria-selected', 'true');
-        await settleAnimations(canvasElement);
     },
 };
 
@@ -201,7 +195,6 @@ export const KeyFlagOnPage = {
         await fitsCanvas(canvasElement);
         await userEvent.click(canvas.getByRole('button', { name: 'Try again' }));
         await expect(canvas.getByText('Session note saved')).toBeInTheDocument();
-        await settleAnimations(canvasElement);
     },
 };
 

@@ -63,7 +63,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Practice time vs. assessment score</Heading>
+                <Heading as="h3" size="sm">Practice time vs. assessment score</Heading>
                 <p style={captionStyle}>
                     Two grade cohorts plotted on ladder-sized markers with shared hover and inactive states.
                 </p>
@@ -76,7 +76,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Attendance rate vs. final grade</Heading>
+                <Heading as="h3" size="sm">Attendance rate vs. final grade</Heading>
                 <p style={captionStyle}>
                     A single series uses the brand chart color across all observations.
                 </p>

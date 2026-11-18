@@ -9,7 +9,6 @@ export const BACKGROUND_OPTIONS = {
   'surface-sunken': { name: 'surface-sunken', value: 'var(--ds-surface-sunken)' },
   'surface-raised': { name: 'surface-raised', value: 'var(--ds-surface-raised)' },
   'surface-overlay': { name: 'surface-overlay', value: 'var(--ds-surface-overlay)' },
-  'surface-container': { name: 'surface-container', value: 'var(--ds-surface-container)' },
 };
 
 export const DEFAULT_BACKGROUND = 'surface';

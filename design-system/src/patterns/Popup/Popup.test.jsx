@@ -23,9 +23,9 @@ vi.mock('@storybook/addon-docs/blocks', async () => {
 const popupMdx = readFileSync(join(__dirname, 'Popup.mdx'), 'utf8');
 
 describe('Popup live cases and docs links', () => {
-    it('renders FieldsInModalCase with a Modal and Discard/Save footer', () => {
+    it('renders FieldsInModalCase with a Dialog and Discard/Save footer', () => {
         render(<FieldsInModalCase />);
-        expect(screen.getByRole('dialog', { name: 'Add session' })).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Add session' })).toBeInTheDocument();
         expect(screen.getByRole('textbox', { name: 'Student' })).toHaveValue('Ana Ruiz');
         expect(screen.getByRole('button', { name: 'Discard' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();

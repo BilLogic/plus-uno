@@ -108,7 +108,7 @@ function WideContent({ count = 12 }) {
                     style={{
                         ...demoBox,
                         minWidth: 'var(--width-1000)',
-                        backgroundColor: 'var(--ds-surface-container)'
+                        backgroundColor: 'var(--ds-surface-sunken)'
                     }}
                 >
                     <p className="body-sm" style={{ margin: 0, color: 'var(--ds-text)' }}>{title}</p>

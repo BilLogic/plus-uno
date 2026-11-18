@@ -184,7 +184,6 @@ export const TRANSITION_SCENE_FACTORIES = Object.freeze({
         }
         if (
             row.name === 'Modal' ||
-            row.name === 'PatternModal' ||
             row.name === 'Blanket' ||
             event.event.startsWith('narrow-')
         ) {
@@ -220,7 +219,7 @@ export const TRANSITION_SCENE_FACTORIES = Object.freeze({
         if (row.name === 'Form' || row.name === 'Forms' || event.event === 'error') {
             return errFieldScene({ ...tokens, early: false });
         }
-        if (row.name === 'Modal' || row.name === 'PatternModal') {
+        if (row.name === 'Modal') {
             return errModalScene({ ...tokens, shakes: false });
         }
         return attentionScene({

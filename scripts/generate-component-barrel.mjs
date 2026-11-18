@@ -11,6 +11,8 @@
  * `index.js` exposes (tracing one `export * from './X'` hop into the
  * component's own file, the usual shape) comes along too —
  * `TagContext`/`useTagContext`, `ToastContainer`, the `Table` sub-parts.
+ * A folder whose `index.js` has no default export (`Table`: three kinds and
+ * their shared parts) names no `<Name>` and exports only the named parts.
  * `<Name>` itself is never duplicated: a component whose own file both
  * default- and named-exports itself (`Button`) gets one `Button` binding, not
  * two.
@@ -98,6 +100,22 @@ function namedExportsOf(file, seen = new Set()) {
   return names;
 }
 
+/**
+ * Whether a module exposes a default export, directly (`export default`) or
+ * through a re-export (`export { default } from './X'`, `export { X as default }`).
+ * A folder that only gathers parts and kinds (`Table`) has none, and the barrel
+ * then names no component after the folder.
+ */
+function hasDefaultExport(file) {
+  if (!file) return false;
+  const src = fs.readFileSync(file, 'utf8');
+  if (/^export\s+default\b/m.test(src)) return true;
+  for (const m of src.matchAll(/export\s*\{([^}]*)\}/g)) {
+    if (m[1].split(',').some((item) => /^(?:default|\w+\s+as\s+default)$/.test(item.trim()))) return true;
+  }
+  return false;
+}
+
 function groupBlock(group) {
   const groupDir = path.join(COMPONENTS_DIR, group);
   const entries = fs.readdirSync(groupDir);
@@ -117,7 +135,7 @@ function groupBlock(group) {
       ? path.join(groupDir, name, 'index.js')
       : path.join(groupDir, `${name}.jsx`);
     const extra = [...namedExportsOf(sourceFile)].filter((n) => n !== name).sort((a, b) => a.localeCompare(b));
-    const binding = [`default as ${name}`, ...extra].join(', ');
+    const binding = [...(hasDefaultExport(sourceFile) ? [`default as ${name}`] : []), ...extra].join(', ');
     return `export { ${binding} } from '@/components/${group}/${name}';`;
   });
 }

@@ -14,6 +14,13 @@
     "componentName": null
   },
   {
+    "file": "design-system/src/patterns/Modal/Modal.mdx",
+    "title": "Templates/Modal",
+    "categoryRoot": "Templates",
+    "componentSource": "design-system/src/patterns/Modal/Modal.jsx",
+    "componentName": null
+  },
+  {
     "file": "design-system/src/patterns/Page/Page.mdx",
     "title": "Templates/Page",
     "categoryRoot": "Templates",
@@ -35,13 +42,6 @@
     "componentName": null
   },
   {
-    "file": "design-system/src/patterns/PatternModal/PatternModal.mdx",
-    "title": "Templates/Modal",
-    "categoryRoot": "Templates",
-    "componentSource": "design-system/src/patterns/PatternModal/PatternModal.jsx",
-    "componentName": null
-  },
-  {
     "file": "design-system/src/patterns/PatternSection/PatternSection.mdx",
     "title": "Templates/Section",
     "categoryRoot": "Templates",
@@ -49,17 +49,17 @@
     "componentName": null
   },
   {
-    "file": "design-system/src/patterns/PatternTable/PatternTable.mdx",
-    "title": "Templates/Table",
-    "categoryRoot": "Templates",
-    "componentSource": "design-system/src/patterns/PatternTable/PatternTable.jsx",
-    "componentName": null
-  },
-  {
     "file": "design-system/src/patterns/Popup/Popup.mdx",
     "title": "Templates/Popup",
     "categoryRoot": "Templates",
     "componentSource": null,
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/patterns/Table/Table.mdx",
+    "title": "Templates/Table",
+    "categoryRoot": "Templates",
+    "componentSource": "design-system/src/patterns/Table/Table.jsx",
     "componentName": null
   },
   {

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 
-import { Button, ButtonItem, DropdownMenu, Fieldset, FooterActions, IconButton, InlineEdit, TextField, Tooltip } from '@/components';
-import { PatternCard, PatternModal, PatternSection } from '@/patterns';
+import { Button, ButtonItem, Dialog, DropdownMenu, Fieldset, FooterActions, IconButton, InlineEdit, TextField, Tooltip } from '@/components';
+import { PatternCard, PatternSection } from '@/patterns';
 import { HeaderSearch, SectionActions } from '@/storybook-docs/lib/section-header.jsx';
 import { FilterSide, StudentsTable, ViewPills, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
 import { CaseBlanket, CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { FocusedType } from '@/storybook-docs/lib/focused-task.jsx';
 import { FILLED, FormInPage, PAGE_WIDTH as FORM_PAGE_WIDTH } from '../../../patterns/Form/formDemo.jsx';
-import { ModalStage, TwoCells } from '../../../patterns/PatternModal/modalDemo.jsx';
+import { ModalStage, TwoCells } from '../../../patterns/Modal/modalDemo.jsx';
 
 /**
  * The Common actions pattern's examples: real Buttons, placed where each
@@ -250,8 +250,8 @@ export const PageButtonsFarRightCase = () => (
 /** Do: two buttons filling the Modal footer edge to edge. */
 export const ModalFooterFullBleedCase = () => (
     <CaseBlanket height={280}>
-        <PatternModal
-            width="xs"
+        <Dialog
+            width="4-col"
             title="Log a session"
             onClose={() => {}}
             footer={(
@@ -262,7 +262,7 @@ export const ModalFooterFullBleedCase = () => (
             )}
         >
             <TextField label="Student" defaultValue="Ana Ruiz" />
-        </PatternModal>
+        </Dialog>
     </CaseBlanket>
 );
 
@@ -270,8 +270,8 @@ export const ModalFooterFullBleedCase = () => (
 // Deliberately mirrors the inset footer (non-full-bleed) as the Don't example.
 export const ModalFooterInsetCase = () => (
     <CaseBlanket height={280}>
-        <PatternModal
-            width="xs"
+        <Dialog
+            width="4-col"
             title="Log a session"
             onClose={() => {}}
             footer={(
@@ -280,7 +280,7 @@ export const ModalFooterInsetCase = () => (
                         display: 'flex',
                         justifyContent: 'flex-end',
                         gap: 'var(--inline-md)',
-                        paddingInline: 'var(--modal-pad-x-default)',
+                        paddingInline: 'var(--dialog-pad-x-default)',
                         paddingBlock: 'var(--stack-md)',
                         borderTop: 'var(--border-width-default) solid var(--ds-border)',
                     }}
@@ -291,6 +291,6 @@ export const ModalFooterInsetCase = () => (
             )}
         >
             <TextField label="Student" defaultValue="Ana Ruiz" />
-        </PatternModal>
+        </Dialog>
     </CaseBlanket>
 );

@@ -39,7 +39,7 @@ c. **Follow the staged build** (`design-system/guidelines/overview.md`):
    Look names up with `ds find` / `ds get` / `ds tokens` (or the MCP tools
    `ds_find`, `ds_get`, `ds_tokens`, `ds_guide`).
 d. **One human check-in after the Template stage.** Once Stage 1 (Template) is
-   in place — the outer shell (`Frame` with `Sidebar`, `Page`, `PatternModal`,
+   in place — the outer shell (`Frame` with `Sidebar`, `Page`, `Modal`,
    `Panel`, `Popup`) and what fills each slot — pause for one check-in with the
    designer before building Blocks, Pieces, Polish and Motion. Headless runs
    continue through all five stages in one pass.

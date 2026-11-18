@@ -72,16 +72,16 @@
     font: var(--heading-sm);
 }
 
-/* Inside a Modal (whose h1 is already Heading/medium 20), a section steps down to Heading/small 16 and its header-to-body gap to Section/stack-sm 8. */
-:is(.plus-modal, .plus-pattern-modal) .plus-pattern-section-title--section {
+/* Inside a Dialog or Modal (whose h1 is already Heading/medium 20), a section steps down to Heading/small 16 and its header-to-body gap to Section/stack-sm 8. */
+:is(.plus-dialog, .plus-modal) .plus-pattern-section-title--section {
     font: var(--heading-sm);
 }
 
-:is(.plus-modal, .plus-pattern-modal) .plus-pattern-section-title--subsection {
+:is(.plus-dialog, .plus-modal) .plus-pattern-section-title--subsection {
     font: var(--heading-xs);
 }
 
-:is(.plus-modal, .plus-pattern-modal) .plus-pattern-section-spacing-default {
+:is(.plus-dialog, .plus-modal) .plus-pattern-section-spacing-default {
     gap: var(--section-stack-sm);
 }
 
@@ -197,8 +197,8 @@
     min-width: 0;
 }
 
-/* Inside a Modal, body text sets in Body/default and the last paragraph keeps no trailing margin. */
-:is(.plus-modal, .plus-pattern-modal) .plus-pattern-section-content {
+/* Inside a Dialog or Modal, body text sets in Body/default and the last paragraph keeps no trailing margin. */
+:is(.plus-dialog, .plus-modal) .plus-pattern-section-content {
     font: var(--body-default);
 
     > p:last-child {

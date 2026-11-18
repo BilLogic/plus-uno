@@ -58,17 +58,17 @@ const ROLES = {
   panelEdge: ['--ds-border', 'components/layout-and-structure/Panel/Panel.scss'],
   // A floating Panel (peek or overlay) takes Frame's overlay shadow; a docked one has none.
   panelFloatingShadow: ['--ds-shadow-overlay', 'patterns/Frame/Frame.scss'],
-  modalSurface: ['--ds-surface-overlay', 'components/messaging/Modal/Modal.scss'],
-  modalShadow: ['--ds-shadow-blocking', 'components/messaging/Modal/Modal.scss'],
-  modalDivider: ['--ds-border', 'components/messaging/Modal/Modal.scss'],
-  blanket: ['--ds-blanket', 'patterns/Blanket/Blanket.scss'],
+  modalSurface: ['--ds-surface-overlay', 'components/messaging/Dialog/Dialog.scss'],
+  modalShadow: ['--ds-shadow-blocking', 'tokens/ladder/_templates.scss'],
+  modalDivider: ['--ds-border', 'components/messaging/Dialog/Dialog.scss'],
+  blanket: ['--ds-blanket', 'patterns/Modal/Modal.scss'],
   // Placeholder text: the Skeleton component's own bar
   placeholderText: ['--ds-skeleton', 'components/loading/Skeleton/Skeleton.scss'],
   placeholderHeading: ['--ds-skeleton', 'components/loading/Skeleton/Skeleton.scss'],
   // Table row
   rowDivider: ['--ds-border', 'components/text-and-data-display/Table/Table.scss'],
   // Overflow: a part that stays put while content scrolls under it, such as a sticky table header
-  overflowShadow: ['--ds-shadow-overflow', 'patterns/PatternTable/PatternTable.scss'],
+  overflowShadow: ['--ds-shadow-overflow', 'components/text-and-data-display/Table/TableShell.scss'],
   rowSelected: ['--ds-background-selected', 'components/text-and-data-display/Table/Table.scss'],
   // Field
   fieldSurface: ['--ds-background-input', 'components/forms-and-inputs/_internal/FieldBox.scss'],
@@ -144,6 +144,13 @@ const ROLES = {
   swatchNeutral3: ['--ds-border-bold', null],
   swatchNeutral4: ['--ds-text-subtle', null],
   swatchNeutral5: ['--ds-text', null],
+  // Construction kit: Measure brackets, Zone tints, Baseline rules and Columns overlay.
+  measureLine: ['--ds-border-accent-magenta', null],
+  measureText: ['--ds-text-accent-magenta', null],
+  measureSubtleText: ['--ds-text-subtle', null],
+  zone: ['--ds-background-accent-magenta-subtler', null],
+  baseline: ['--ds-background-accent-magenta-subtler', null],
+  columns: ['--ds-background-accent-blue-subtler', null],
 };
 
 /**
@@ -164,16 +171,19 @@ export const HEIGHTS = {
 const CORNERS = {
   window: ['--radius-control-sm', null],
   button: ['--button-radius-default', 'components/forms-and-inputs/Button/Button.scss'],
+  buttonCompact: ['--button-radius-compact', 'components/forms-and-inputs/Button/Button.scss'],
+  buttonSpacious: ['--button-radius-spacious', 'components/forms-and-inputs/Button/Button.scss'],
   card: ['--card-radius', 'patterns/PatternCard/PatternCard.scss'],
   section: ['--card-radius', 'patterns/PatternCard/PatternCard.scss'],
   popup: ['--popup-radius', 'components/overlays-and-layering/Popup/Popup.scss'],
   flag: ['--popup-radius', 'components/messaging/Flag/Flag.scss'],
   tooltip: ['--radius-control-sm', 'components/overlays-and-layering/Tooltip/Tooltip.scss'],
-  modal: ['--modal-radius', 'components/messaging/Modal/Modal.scss'],
+  modal: ['--modal-radius', 'patterns/Modal/Modal.scss'],
   field: ['--radius-control-lg', 'components/forms-and-inputs/_internal/FieldBox.scss'],
   sidebarRow: ['--frame-sidebar-row-radius', 'patterns/Sidebar/Sidebar.scss'],
   tab: ['--radius-control-md', 'components/navigation/Tabs/Tabs.scss'],
   count: ['--radius-md', 'components/labels/CountTag/CountTag.scss'],
+  tag: ['--radius-md', 'components/labels/Tag/Tag.scss'],
   icon: ['--radius-sm', null],
   tracker: ['--radius-control-md', 'components/status-indicators/ProgressTracker/ProgressTracker.scss'],
   cardImage: ['--card-radius', 'patterns/PatternCard/PatternCard.scss'],
@@ -202,6 +212,9 @@ export const CORNER = {
   ...Object.fromEntries(Object.entries(CORNERS).map(([role, [token]]) => [role, `calc(var(${token}) / 2)`])),
 };
 
+/** A corner role scaled for 2x or 4x construction close-ups. */
+export const scaledCorner = (role, factor) => `calc(${CORNER_TOKEN[role]} * ${factor})`;
+
 /**
  * The hairline every outline and divider draws with. A hero draws one unit as 2px,
  * so `HeroDrawing` sets `--stroke-hairline` to half a stroke and every kit
@@ -223,4 +236,14 @@ export const LABEL_FONT = {
   fontFamily: 'var(--type-family-body)',
   fontWeight: 'var(--type-weight-semibold)',
   fontSize: 'calc(var(--type-size-0875) / 2)',
+};
+
+/**
+ * Mono label for construction-kit brackets and zone callouts, at 1:1 scale
+ * (`--type-size-075`).
+ */
+export const MONO_LABEL_FONT = {
+  fontFamily: 'var(--type-family-code)',
+  fontWeight: 'var(--type-weight-medium)',
+  fontSize: 'var(--type-size-075)',
 };

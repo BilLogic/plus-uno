@@ -46,7 +46,7 @@ body :is(.fa-solid, .fa-regular, .fas, .far) {
 }
 
 /* Bare heading elements take the heading text style that matches their level
-   (h1 xxlarge through h6 xsmall), the same pairing the Heading component uses; a
+   (h1 xxl through h6 xs), the same pairing the Heading component uses; a
    component that names its own text style wins. A glyph in a heading takes the
    heading's size. */
 h1,

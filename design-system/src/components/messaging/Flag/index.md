@@ -145,7 +145,7 @@ The × is on default flags only, so a stack is all default flags or all bold.
 - `CloseButton`: use when rendering the dismiss control on a default flag.
 - `EmptyState`: use when a whole view fails to load rather than a background sync.
 
-Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `NotificationItem` · `SectionMessage` · `Spotlight`
+Same group: `Banner` · `Dialog` · `EmptyState` · `InlineMessage` · `NotificationItem` · `SectionMessage` · `Spotlight`
 
 ## Parts
 

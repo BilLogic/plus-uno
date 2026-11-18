@@ -1,18 +1,62 @@
-import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
+import { Radio as BaseRadio } from '@base-ui/react/radio';
+import { RadioGroup as BaseRadioGroup } from '@base-ui/react/radio-group';
+import Popup from '@/components/overlays-and-layering/Popup/Popup';
 import FieldBox from '../_internal/FieldBox';
 import Calendar from '../_internal/Calendar';
 import AnchoredListboxSurface from '../_internal/AnchoredListboxSurface';
 import clearLabel from '../_internal/clearLabel';
-import { formatDisplay, formatIso, outOfBounds, parseDate, parseTyped } from '../_internal/dates';
+import { formatDisplay, formatIso, outOfBounds, parseDate, parseTyped, sameDay } from '../_internal/dates';
 import { Button } from '../Button/Button';
+import { FilterButton } from '../FilterButton/FilterButton';
 import { IconButton } from '../IconButton/IconButton';
 import Icon from '../../images-and-icons/Icon';
 import '../_internal/Listbox.scss';
+import '../_internal/OptionRow.scss';
 import './DatePicker.scss';
 
 /** Joins a range's two ends in the field: "10/19/2026 – 10/23/2026". */
 const RANGE_JOIN = ' – ';
+
+/** Local midnight of a date. */
+const startOfDay = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
+/** Shifts a local date by `days`. */
+const addDays = (date, days) => new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
+
+/** Built-in range presets for the preset popup. */
+const DEFAULT_PRESETS = [
+    { id: 'all-time', label: 'All time', value: [null, null] },
+    { id: 'today', label: 'Today', range: (ref) => [ref, ref] },
+    { id: 'last-7-days', label: 'Last 7 days', range: (ref) => [addDays(ref, -6), ref] },
+    { id: 'last-30-days', label: 'Last 30 days', range: (ref) => [addDays(ref, -29), ref] },
+];
+
+const presetKey = (preset) => preset.id ?? preset.label;
+
+const isRangeOutOfBounds = (rangeToCheck, minDate, maxDate) => {
+    const [start, end] = Array.isArray(rangeToCheck) ? rangeToCheck : [null, null];
+    if (!start && !end) return false;
+    if (!start || !end || start > end) return true;
+    return outOfBounds(start, minDate, maxDate) || outOfBounds(end, minDate, maxDate);
+};
+
+const resolvePresetRange = (preset, refDate) => {
+    if (typeof preset.range === 'function') {
+        const [start, end] = preset.range(refDate) ?? [null, null];
+        return [parseDate(start), parseDate(end)];
+    }
+    const [start, end] = Array.isArray(preset.value) ? preset.value : [null, null];
+    return [parseDate(start), parseDate(end)];
+};
+
+const matchesPresetRange = (preset, current, refDate) => {
+    const [pStart, pEnd] = resolvePresetRange(preset, refDate);
+    const [cStart, cEnd] = current;
+    if (!pStart && !pEnd) return !cStart && !cEnd;
+    return sameDay(pStart, cStart) && sameDay(pEnd, cEnd);
+};
 
 /**
  * The text a value shows in the field.
@@ -74,7 +118,14 @@ const DatePicker = ({
     name,
     placeholder,
     value,
+    defaultValue,
     range = false,
+    presets = false,
+    label,
+    trigger,
+    placement = 'bottom-start',
+    today,
+    lookBack,
     spacing = 'default',
     isDisabled = false,
     isReadOnly = false,
@@ -83,6 +134,7 @@ const DatePicker = ({
     minDate,
     maxDate,
     calendarAlign = 'left',
+    container,
     onChange,
     onFocus,
     onBlur,
@@ -94,12 +146,44 @@ const DatePicker = ({
     const fieldId = id || name || `plus-date-picker-${autoId.replace(/:/g, '')}`;
     const popupId = `${fieldId}-calendar`;
 
-    const [picked, setPicked] = useState(() => fromValue(value, range));
-    const [text, setText] = useState(() => display(fromValue(value, range)));
+    const hasPresets = Boolean(presets);
+    const isFilterMode = Boolean(label || trigger);
+    const effectiveRange = range || hasPresets || isFilterMode;
+    const todayDate = useMemo(() => startOfDay(parseDate(today) || new Date()), [today]);
+    const shouldLookBack = lookBack !== undefined ? lookBack : (hasPresets || isFilterMode);
+    const effectiveMaxDate = maxDate !== undefined ? maxDate : (shouldLookBack ? todayDate : undefined);
+
+    const resolvedPresets = useMemo(() => {
+        if (Array.isArray(presets)) return presets;
+        if (hasPresets || isFilterMode) return DEFAULT_PRESETS;
+        return [];
+    }, [presets, hasPresets, isFilterMode]);
+
+    const interactive = !isDisabled && !isReadOnly;
+
+    const isPresetDisabled = useCallback((preset) => (
+        isRangeOutOfBounds(resolvePresetRange(preset, todayDate), minDate, effectiveMaxDate)
+    ), [todayDate, minDate, effectiveMaxDate]);
+
+    const initialValue = value !== undefined ? value : defaultValue;
+    const [picked, setPicked] = useState(() => fromValue(initialValue, effectiveRange));
+    const [text, setText] = useState(() => display(fromValue(initialValue, effectiveRange)));
     const [typedInvalid, setTypedInvalid] = useState(false);
     const [open, setOpen] = useState(false);
     const firstDay = (current) => (Array.isArray(current) ? current[0] || current[1] : current);
-    const [viewDate, setViewDate] = useState(() => firstDay(fromValue(value, range)) || new Date());
+    const [viewDate, setViewDate] = useState(() => firstDay(fromValue(initialValue, effectiveRange)) || todayDate);
+
+    // Draft range & preset state used when the popup has presets and Clear/Apply actions.
+    const [draft, setDraft] = useState(() => (Array.isArray(picked) ? picked : [null, null]));
+    const [draftPreset, setDraftPreset] = useState(() => {
+        if (!resolvedPresets.length) return null;
+        const initialRange = Array.isArray(picked) ? picked : [null, null];
+        const match = resolvedPresets.find((preset) => (
+            !isRangeOutOfBounds(resolvePresetRange(preset, todayDate), minDate, effectiveMaxDate)
+            && matchesPresetRange(preset, initialRange, todayDate)
+        ));
+        return match ? presetKey(match) : null;
+    });
 
     const fieldRef = useRef(null);
     const inputRef = useRef(null);
@@ -107,25 +191,43 @@ const DatePicker = ({
     const valueKey = Array.isArray(value) ? value.join('|') : value;
     useEffect(() => {
         if (value === undefined) return;
-        const next = fromValue(value, range);
+        const next = fromValue(value, effectiveRange);
         setPicked(next);
         setText(display(next));
         setTypedInvalid(false);
         if (firstDay(next)) setViewDate(firstDay(next));
-    }, [valueKey, range]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [valueKey, effectiveRange]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const syncDraftFromApplied = useCallback((source) => {
+        const appliedRange = Array.isArray(source) ? source : [null, null];
+        setDraft(appliedRange);
+        const match = resolvedPresets.find((preset) => (
+            !isPresetDisabled(preset) && matchesPresetRange(preset, appliedRange, todayDate)
+        ));
+        setDraftPreset(match ? presetKey(match) : null);
+        setViewDate(firstDay(appliedRange) || todayDate);
+    }, [isPresetDisabled, resolvedPresets, todayDate]);
+
+    const handlePopupToggle = useCallback((nextOpen) => {
+        if (nextOpen) {
+            if (!interactive) return;
+            syncDraftFromApplied(picked);
+        }
+        setOpen(Boolean(nextOpen));
+    }, [interactive, picked, syncDraftFromApplied]);
 
     const close = useCallback(() => setOpen(false), []);
 
-    const interactive = !isDisabled && !isReadOnly;
-
     const openCalendar = () => {
         if (!interactive || open) return;
-        setViewDate(firstDay(picked) || new Date());
+        if (resolvedPresets.length) syncDraftFromApplied(picked);
+        else setViewDate(firstDay(picked) || todayDate);
         setOpen(true);
     };
 
     /** Records a pick and tells the caller. */
     const commit = (next) => {
+        if (!interactive) return;
         setPicked(next);
         setText(display(next));
         setTypedInvalid(false);
@@ -135,13 +237,13 @@ const DatePicker = ({
 
     /** Reads the typed text: picks a valid date, marks anything else invalid. */
     const commitText = () => {
-        if (text === display(picked)) return;
+        if (!interactive || text === display(picked)) return;
         if (!text.trim()) {
-            commit(range ? [null, null] : null);
+            commit(effectiveRange ? [null, null] : null);
             return;
         }
-        const allowed = (date) => date && !outOfBounds(date, minDate, maxDate);
-        if (range) {
+        const allowed = (date) => date && !outOfBounds(date, minDate, effectiveMaxDate);
+        if (effectiveRange) {
             const [first, second = ''] = text.split(/\s*[–—-]\s*/);
             const start = parseTyped(first);
             const end = second.trim() ? parseTyped(second) : null;
@@ -158,7 +260,23 @@ const DatePicker = ({
     };
 
     const pick = (date) => {
-        if (!range) {
+        if (!interactive || !date || outOfBounds(date, minDate, effectiveMaxDate)) return;
+        if (resolvedPresets.length) {
+            const [start, end] = draft;
+            if (!start || end || date < start) {
+                setDraft([date, null]);
+                setDraftPreset(null);
+                return;
+            }
+            const nextDraft = [start, date];
+            setDraft(nextDraft);
+            const match = resolvedPresets.find((preset) => (
+                !isPresetDisabled(preset) && matchesPresetRange(preset, nextDraft, todayDate)
+            ));
+            setDraftPreset(match ? presetKey(match) : null);
+            return;
+        }
+        if (!effectiveRange) {
             commit(date);
             setOpen(false);
             inputRef.current?.focus();
@@ -174,10 +292,45 @@ const DatePicker = ({
         inputRef.current?.focus();
     };
 
+    const selectPreset = (preset) => {
+        if (!interactive || !preset || isPresetDisabled(preset)) return;
+        const nextRange = resolvePresetRange(preset, todayDate);
+        setDraft(nextRange);
+        setDraftPreset(presetKey(preset));
+        setViewDate(nextRange[1] || nextRange[0] || todayDate);
+    };
+
+    const handleDraftClear = () => {
+        if (!interactive) return;
+        setDraft([null, null]);
+        setDraftPreset(null);
+        commit([null, null]);
+    };
+
+    const [rangeStart, rangeEnd] = Array.isArray(picked) ? picked : [null, null];
+    const [draftStart, draftEnd] = draft;
+    const hasDraftEnds = Boolean(draftStart && draftEnd);
+    const isEmptyPresetSelected = Boolean(draftPreset && resolvedPresets.some((preset) => {
+        if (presetKey(preset) !== draftPreset || isPresetDisabled(preset)) return false;
+        const [start, end] = resolvePresetRange(preset, todayDate);
+        return !start && !end;
+    }));
+    const canApply = interactive && (
+        (hasDraftEnds && !isRangeOutOfBounds(draft, minDate, effectiveMaxDate))
+        || (isEmptyPresetSelected && Boolean(rangeStart || rangeEnd))
+    );
+
+    const handleDraftApply = () => {
+        if (!interactive || !canApply || isRangeOutOfBounds(draft, minDate, effectiveMaxDate)) return;
+        commit(draft);
+        setOpen(false);
+        inputRef.current?.focus();
+    };
+
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
             event.preventDefault();
-            commitText();
+            if (interactive) commitText();
             setOpen(false);
         } else if (event.key === 'Escape') {
             if (open) event.preventDefault();
@@ -196,19 +349,132 @@ const DatePicker = ({
     };
 
     const invalid = isInvalid || typedInvalid;
-    const [rangeStart, rangeEnd] = Array.isArray(picked) ? picked : [null, null];
     const hasPicked = Array.isArray(picked) ? Boolean(rangeStart || rangeEnd) : Boolean(picked);
     const hasValue = hasPicked || Boolean(text);
-    const clearName = clearLabel(props['aria-label'], range ? 'dates' : 'date');
+    const clearName = clearLabel(props['aria-label'], effectiveRange ? 'dates' : 'date');
 
     const clear = () => {
+        if (!interactive) return;
         if (!hasPicked) {
             setText('');
             setTypedInvalid(false);
             return;
         }
-        commit(range ? [null, null] : null);
+        commit(effectiveRange ? [null, null] : null);
     };
+
+    const presetRangePopupContent = (
+        <div className="plus-date-range-popup__layout">
+            <BaseRadioGroup
+                className="plus-date-range-popup__presets"
+                aria-label="Date range presets"
+                value={draftPreset ?? null}
+                disabled={isDisabled}
+                readOnly={isReadOnly}
+                onValueChange={(nextValue) => {
+                    const match = resolvedPresets.find((preset) => presetKey(preset) === nextValue);
+                    if (match) selectPreset(match);
+                }}
+            >
+                {resolvedPresets.map((preset) => {
+                    const key = presetKey(preset);
+                    const isSelected = draftPreset === key;
+                    const presetDisabled = isPresetDisabled(preset);
+                    return (
+                        <BaseRadio.Root
+                            key={key}
+                            value={key}
+                            disabled={isDisabled || presetDisabled}
+                            className={[
+                                'plus-option-row',
+                                'plus-date-range-popup__preset',
+                                isSelected && 'is-selected',
+                                presetDisabled && 'is-disabled',
+                            ].filter(Boolean).join(' ')}
+                            onKeyDown={(event) => {
+                                if (event.key === 'Enter' && !presetDisabled && interactive) {
+                                    event.preventDefault();
+                                    selectPreset(preset);
+                                }
+                            }}
+                        >
+                            {preset.label}
+                        </BaseRadio.Root>
+                    );
+                })}
+            </BaseRadioGroup>
+            <div className="plus-date-range-popup__calendar">
+                <Calendar
+                    size={24}
+                    viewDate={viewDate}
+                    onViewDateChange={setViewDate}
+                    rangeStart={draftStart}
+                    rangeEnd={draftEnd}
+                    minDate={minDate}
+                    maxDate={effectiveMaxDate}
+                    onPick={pick}
+                />
+                <div className="plus-date-range-popup__footer">
+                    <Button
+                        appearance="subtle"
+                        spacing="compact"
+                        onClick={handleDraftClear}
+                    >
+                        Clear
+                    </Button>
+                    <Button
+                        appearance="default"
+                        spacing="compact"
+                        isDisabled={!canApply}
+                        onClick={handleDraftApply}
+                    >
+                        Apply
+                    </Button>
+                </div>
+            </div>
+        </div>
+    );
+
+    const isOpen = interactive && open;
+
+    if (isFilterMode) {
+        const appliedPreset = resolvedPresets.find((preset) => matchesPresetRange(preset, [rangeStart, rangeEnd], todayDate));
+        const summaryText = rangeStart && rangeEnd
+            ? (appliedPreset ? appliedPreset.label : `${formatDisplay(rangeStart)}${RANGE_JOIN}${formatDisplay(rangeEnd)}`)
+            : (appliedPreset?.label ?? 'All time');
+
+        let triggerNode;
+        if (typeof trigger === 'function') {
+            triggerNode = trigger({ isOpen, value: [rangeStart, rangeEnd], summary: summaryText });
+        } else if (trigger) {
+            triggerNode = trigger;
+        } else {
+            triggerNode = (
+                <FilterButton
+                    text={label ? `${label}: ${summaryText}` : summaryText}
+                    appearance="subtle"
+                    spacing={spacing}
+                    isDisabled={isDisabled}
+                    className="plus-date-picker__filter-trigger"
+                />
+            );
+        }
+
+        return (
+            <Popup
+                trigger={triggerNode}
+                label={label || 'Choose dates'}
+                placement={placement}
+                show={isOpen}
+                onToggle={handlePopupToggle}
+                container={container}
+                id={popupId}
+                className={['plus-date-range-popup', className].filter(Boolean).join(' ')}
+            >
+                {presetRangePopupContent}
+            </Popup>
+        );
+    }
 
     return (
         <>
@@ -219,7 +485,7 @@ const DatePicker = ({
                 readOnly={isReadOnly}
                 invalid={invalid}
                 valid={isValid}
-                className={['plus-date-picker', open && 'plus-date-picker--open', className].filter(Boolean).join(' ')}
+                className={['plus-date-picker', isOpen && 'plus-date-picker--open', className].filter(Boolean).join(' ')}
                 style={style}
                 // A read-only value cannot be changed, so the trailing controls are not drawn.
                 elemAfter={isReadOnly ? null : (
@@ -246,7 +512,7 @@ const DatePicker = ({
                                 if (!interactive) return;
                                 event.preventDefault();
                                 inputRef.current?.focus();
-                                if (open) setOpen(false); else openCalendar();
+                                if (isOpen) setOpen(false); else openCalendar();
                             }}
                         >
                             <Icon name="calendar-day" />
@@ -264,16 +530,17 @@ const DatePicker = ({
                     role="combobox"
                     autoComplete="off"
                     aria-haspopup="dialog"
-                    aria-expanded={open}
-                    aria-controls={open ? popupId : undefined}
+                    aria-expanded={isOpen}
+                    aria-controls={isOpen ? popupId : undefined}
                     aria-invalid={invalid || undefined}
-                    placeholder={placeholder ?? (range ? `MM/DD/YYYY${RANGE_JOIN}MM/DD/YYYY` : 'MM/DD/YYYY')}
+                    placeholder={placeholder ?? (effectiveRange ? `MM/DD/YYYY${RANGE_JOIN}MM/DD/YYYY` : 'MM/DD/YYYY')}
                     value={text}
                     disabled={isDisabled}
                     readOnly={isReadOnly}
                     aria-readonly={isReadOnly || undefined}
                     onClick={openCalendar}
                     onChange={(event) => {
+                        if (!interactive) return;
                         setText(event.target.value);
                         setTypedInvalid(false);
                     }}
@@ -283,42 +550,47 @@ const DatePicker = ({
                 />
             </FieldBox>
             <AnchoredListboxSurface
-                open={open}
+                open={isOpen}
                 anchorRef={fieldRef}
                 align={calendarAlign}
                 onClose={close}
                 preserveFieldFocus
                 id={popupId}
                 role="dialog"
-                aria-label={range ? 'Choose dates' : 'Choose a date'}
-                className="plus-date-popup"
+                aria-label={effectiveRange ? 'Choose dates' : 'Choose a date'}
+                className={resolvedPresets.length ? 'plus-date-popup plus-date-range-popup' : 'plus-date-popup'}
             >
-                <Calendar
-                    viewDate={viewDate}
-                    onViewDateChange={setViewDate}
-                    selected={range ? undefined : picked}
-                    rangeStart={rangeStart}
-                    rangeEnd={rangeEnd}
-                    minDate={minDate}
-                    maxDate={maxDate}
-                    onPick={pick}
-                />
-                {hasValue && interactive && (
-                    <div className="plus-listbox-footer">
-                        <div className="plus-listbox-footer-actions">
-                            <Button
-                                appearance="subtle"
-                                spacing="compact"
-                                onClick={() => {
-                                    clear();
-                                    setOpen(false);
-                                    inputRef.current?.focus();
-                                }}
-                            >
-                                Clear
-                            </Button>
-                        </div>
-                    </div>
+                {resolvedPresets.length ? presetRangePopupContent : (
+                    <>
+                        <Calendar
+                            size={24}
+                            viewDate={viewDate}
+                            onViewDateChange={setViewDate}
+                            selected={effectiveRange ? undefined : picked}
+                            rangeStart={rangeStart}
+                            rangeEnd={rangeEnd}
+                            minDate={minDate}
+                            maxDate={effectiveMaxDate}
+                            onPick={pick}
+                        />
+                        {hasValue && interactive && (
+                            <div className="plus-listbox-footer">
+                                <div className="plus-listbox-footer-actions">
+                                    <Button
+                                        appearance="subtle"
+                                        spacing="compact"
+                                        onClick={() => {
+                                            clear();
+                                            setOpen(false);
+                                            inputRef.current?.focus();
+                                        }}
+                                    >
+                                        Clear
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+                    </>
                 )}
             </AnchoredListboxSurface>
         </>
@@ -334,9 +606,31 @@ DatePicker.propTypes = {
     placeholder: PropTypes.string,
     /** ISO `YYYY-MM-DD`; with `range`, `[start, end]`, either end may be null. */
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
+    /** Initial value when uncontrolled. */
+    defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
     /** Pick a first and a last day. */
     range: PropTypes.bool,
-    /** `default` is 40; `compact` is 32. */
+    /** Show preset ranges (`All time`, `Today`, `Last 7 days`, `Last 30 days`) beside the range calendar with Clear and Apply actions. */
+    presets: PropTypes.oneOfType([
+        PropTypes.bool,
+        PropTypes.arrayOf(PropTypes.shape({
+            id: PropTypes.string,
+            label: PropTypes.string.isRequired,
+            value: PropTypes.arrayOf(PropTypes.string),
+            range: PropTypes.func,
+        })),
+    ]),
+    /** Filter trigger label (such as `"Created"`). When set, opens the preset range popup from a `FilterButton`. */
+    label: PropTypes.string,
+    /** Custom trigger element or `({ isOpen, value, summary }) => node` for the filter popup. */
+    trigger: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
+    /** Popup placement relative to a filter trigger. */
+    placement: PropTypes.oneOf(['bottom-start', 'bottom-end']),
+    /** Reference date used for relative presets and `lookBack`; defaults to today. */
+    today: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
+    /** Disable days after `today`. Defaults to true when `presets` or a filter `label` is set. */
+    lookBack: PropTypes.bool,
+    /** `default` is 40 (32 on a filter trigger); `compact` is 32 (24 on a filter trigger). */
     spacing: PropTypes.oneOf(['default', 'compact']),
     /** Disables the input and the calendar. */
     isDisabled: PropTypes.bool,
@@ -352,6 +646,8 @@ DatePicker.propTypes = {
     maxDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
     /** Which edge of the field the calendar lines up with. */
     calendarAlign: PropTypes.oneOf(['left', 'center', 'right']),
+    /** Where a filter popup portals to; defaults to the page overlay layer. */
+    container: PropTypes.object,
     /** `(iso)`, or `([start, end])` with `range`; '' or nulls when cleared. */
     onChange: PropTypes.func,
     /** Called with the focus event when the input gains focus. */

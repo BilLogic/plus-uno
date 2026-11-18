@@ -121,7 +121,7 @@ export const HeadingStyleOverBold = {
     render: () => (
         <DoDont>
             <Do caption="Heading/small, tagged as the section's heading.">
-                <Heading as="h3" size="small">Next session</Heading>
+                <Heading as="h3" size="sm">Next session</Heading>
             </Do>
             <Dont caption="Bold body text looks like a heading but carries no structure.">
                 <span style={{ font: 'var(--body-default)', fontWeight: 'var(--type-weight-semibold)' }}>Next session</span>
@@ -141,23 +141,23 @@ export const StepHeadingLevels = {
             <Do caption="h1, then h2, then h3.">
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                     <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 'var(--inline-md)' }}>
-                        <C>h1</C> <Heading as="span" size="large">Tutor dashboard</Heading>
+                        <C>h1</C> <Heading as="span" size="lg">Tutor dashboard</Heading>
                     </span>
                     <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 'var(--inline-md)' }}>
-                        <C>h2</C> <Heading as="span" size="medium">Upcoming sessions</Heading>
+                        <C>h2</C> <Heading as="span" size="md">Upcoming sessions</Heading>
                     </span>
                     <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 'var(--inline-md)' }}>
-                        <C>h3</C> <Heading as="span" size="small">Grade 6 math</Heading>
+                        <C>h3</C> <Heading as="span" size="sm">Grade 6 math</Heading>
                     </span>
                 </div>
             </Do>
             <Dont caption="An h3 straight after the h1 skips the h2.">
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                     <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 'var(--inline-md)' }}>
-                        <C>h1</C> <Heading as="span" size="large">Tutor dashboard</Heading>
+                        <C>h1</C> <Heading as="span" size="lg">Tutor dashboard</Heading>
                     </span>
                     <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 'var(--inline-md)' }}>
-                        <C>h3</C> <Heading as="span" size="small">Grade 6 math</Heading>
+                        <C>h3</C> <Heading as="span" size="sm">Grade 6 math</Heading>
                     </span>
                 </div>
             </Dont>
@@ -180,7 +180,7 @@ export const MetricNumbers = {
             </Do>
             <Dont caption="Heading/medium for a number.">
                 <div>
-                    <Heading as="span" size="medium">1,284</Heading>
+                    <Heading as="span" size="md">1,284</Heading>
                     <div style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
                 </div>
             </Dont>

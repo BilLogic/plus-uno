@@ -46,7 +46,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Cohort seats by grade</Heading>
+                <Heading as="h3" size="sm">Cohort seats by grade</Heading>
                 <p style={captionStyle}>
                     Each dot represents one student seat, grouped by grade in input order.
                 </p>

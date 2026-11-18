@@ -117,6 +117,13 @@ body,
     color: var(--ds-text) !important;
 }
 
+/* FoundationSubsection h3 renders at --heading-md, so an h4 nested inside it steps down to --heading-sm. */
+.sbdocs .sb-docs-subsection h4:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
+    font: var(--heading-sm) !important;
+    color: var(--ds-text) !important;
+    margin: 0 !important;
+}
+
 .sbdocs h5:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
     font: var(--heading-sm) !important;
     color: var(--ds-text) !important;
@@ -1040,7 +1047,7 @@ html[data-color-mode="dark"] .docs-story {
 }
 
 .docblock-typeset {
-  background: var(--ds-surface-container) !important;
+  background: var(--ds-surface-sunken) !important;
   border: var(--border-width-default) solid var(--ds-border) !important;
   border-radius: var(--radius-lg) !important;
   box-shadow: none !important;
@@ -1130,7 +1137,7 @@ html[data-color-mode="dark"] .docs-story {
 }
 
 .sbdocs .sb-ds-docs-source pre {
-    background: var(--ds-surface-container);
+    background: var(--ds-surface-sunken);
 }
 
 .sbdocs .sb-ds-docs-stories .docs-story {
