@@ -1,7 +1,7 @@
 /**
  * The bare heading elements take the Heading size paired with their level:
- * h1 xxlarge (32), h2 xlarge (28), h3 large (24), h4 medium (20), h5 small (16),
- * h6 xsmall (14). Every level is Noto Sans at 600.
+ * h1 xxl (32), h2 xl (28), h3 lg (24), h4 md (20), h5 sm (16),
+ * h6 xs (14). Every level is Noto Sans at 600.
  *
  * `_fonts.scss` gives each bare `h1`-`h6` a heading text style. This compiles
  * it and reads what each element's `font` resolves to, so a heading that drifts

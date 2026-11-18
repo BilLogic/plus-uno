@@ -50,7 +50,7 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `Button disabled` | `Button isDisabled` |
 | `Button appearance="secondary"` | `Button appearance="default"` |
 | `Heading level` | `Heading as` (the level comes from the surrounding sections; set as only to override the element) |
-| `Heading size="sm" / "lg"` | `Heading size="small"`, `Heading size="large"` (sizes are words, xxsmall to xxlarge) |
+| `Heading size="small" / "large"` | `Heading size="sm"`, `Heading size="lg"` (sizes match the tokens, xxl to xxs) |
 
 **Tokens**
 
@@ -59,7 +59,7 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `--space-025 (4px)` | `--stack-sm`, `--inline-sm`, `--pad-x-xs` (a primitive; read the step for the role) |
 | `--space-050 (8px)` | `--stack-md`, `--inline-md`, `--pad-x-sm` |
 | `--space-075 (12px)` | `--stack-lg`, `--inline-lg`, `--pad-x-md` |
-| `--space-100 (16px)` | `--pad-x-lg`, `--section-stack-md`, `--modal-pad` |
+| `--space-100 (16px)` | `--pad-x-lg`, `--section-stack-md`, `--modal-pad-x-default` |
 | `--space-150 (24px)` | `--page-stack-md`, `--page-pad`, `--section-stack-lg` |
 | `--space-200 (32px) and up` | `--page-stack-lg` (space this large belongs to a page; it is rarely right inside a component) |
 | `--radius-<n>` | `--radius-md`, `--radius-xl` (read the semantic step for the role: --radius-sm to --radius-xxl, or --radius-control-sm, -md, -lg for a control by height) |
@@ -106,6 +106,7 @@ A template is a shell that owns the frame (fill, pad, radius, elevation) and lea
 - [Code](../../src/components/text-and-data-display/Code/index.md)
 - [CodeBlock](../../src/components/text-and-data-display/CodeBlock/index.md)
 - [Comment](../../src/components/forms-and-inputs/Comment/index.md)
+- [CompetencyTag](../../src/components/labels/CompetencyTag/index.md)
 - [CountTag](../../src/components/labels/CountTag/index.md)
 - [DatePicker](../../src/components/forms-and-inputs/DatePicker/index.md)
 - [DateTag](../../src/components/labels/DateTag/index.md)
@@ -158,7 +159,6 @@ A template is a shell that owns the frame (fill, pad, radius, elevation) and lea
 - [SettingRow](../../src/components/forms-and-inputs/SettingRow/index.md)
 - [Sidebar](../../src/components/navigation/Sidebar/index.md)
 - [Skeleton](../../src/components/loading/Skeleton/index.md)
-- [SmartTag](../../src/components/labels/SmartTag/index.md)
 - [Spinner](../../src/components/loading/Spinner/index.md)
 - [SplitButton](../../src/components/forms-and-inputs/SplitButton/index.md)
 - [Spotlight](../../src/components/messaging/Spotlight/index.md)

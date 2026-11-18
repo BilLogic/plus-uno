@@ -44,17 +44,55 @@ export default {
 };
 
 const demoBox = {
-    border: 'var(--stroke-1) solid var(--ds-border)',
-    borderRadius: '8px',
-    padding: '16px'
+    border: 'var(--border-width-default) solid var(--ds-border)',
+    borderRadius: 'var(--radius-lg)',
+    padding: 'var(--section-pad-y-compact) var(--section-pad-x-compact)'
 };
+
+const sessionRows = [
+    'Maya K. — Two-step equations (Lincoln Middle)',
+    'Jordan T. — Linear graphs (North High)',
+    'Elena R. — Fraction operations (Roosevelt K-8)',
+    'Marcus B. — Reading comprehension (Lincoln Middle)',
+    'Priya S. — Ratios and rates (Oak Creek Elementary)',
+    'Noah W. — Paragraph structure (Westview Academy)',
+    'Sofia L. — Slope-intercept form (North High)',
+    'Liam D. — Main idea summary (Roosevelt K-8)',
+    'Chloe M. — Proportional reasoning (Lincoln Middle)',
+    'Ethan H. — Vocabulary in context (Oak Creek Elementary)',
+    'Zoe P. — Systems of equations (North High)',
+    'Ava C. — Informational text (Westview Academy)',
+    'Leo G. — Order of operations (Roosevelt K-8)',
+    'Nora F. — Evidence-based claims (Lincoln Middle)',
+    'Owen K. — Function tables (North High)',
+    'Hannah V. — Inference practice (Westview Academy)',
+    'Lucas M. — Decimal division (Roosevelt K-8)',
+    'Grace T. — Point of view (Oak Creek Elementary)',
+    'Caleb R. — Angle pairs (Lincoln Middle)',
+    'Ruby S. — Argument writing (North High)',
+];
+
+const lessonCards = [
+    'Warm-up check',
+    'Two-step equations',
+    'Graphing lines',
+    'Slope practice',
+    'Function tables',
+    'Word problems',
+    'Ratios and rates',
+    'Fraction review',
+    'Reading fluency',
+    'Main idea claims',
+    'Exit ticket',
+    'Session reflection',
+];
 
 function TallContent({ count = 12 }) {
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {Array.from({ length: count }, (_, i) => (
-                <p key={i} className="plus-body-2" style={{ margin: 0, color: 'var(--ds-text)' }}>
-                    Row {i + 1} — scrollable content inside the wrapper.
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
+            {sessionRows.slice(0, count).map((row, i) => (
+                <p key={i} className="body-sm" style={{ margin: 0, color: 'var(--ds-text)' }}>
+                    {row}
                 </p>
             ))}
         </div>
@@ -63,17 +101,17 @@ function TallContent({ count = 12 }) {
 
 function WideContent({ count = 12 }) {
     return (
-        <div style={{ display: 'flex', gap: '12px', width: 'max-content' }}>
-            {Array.from({ length: count }, (_, i) => (
+        <div style={{ display: 'flex', gap: 'var(--inline-lg)', width: 'max-content' }}>
+            {lessonCards.slice(0, count).map((title, i) => (
                 <div
                     key={i}
                     style={{
                         ...demoBox,
-                        minWidth: '160px',
+                        minWidth: 'var(--width-1000)',
                         backgroundColor: 'var(--ds-surface-container)'
                     }}
                 >
-                    <p className="plus-body-2" style={{ margin: 0, color: 'var(--ds-text)' }}>Card {i + 1}</p>
+                    <p className="body-sm" style={{ margin: 0, color: 'var(--ds-text)' }}>{title}</p>
                 </div>
             ))}
         </div>
@@ -81,9 +119,9 @@ function WideContent({ count = 12 }) {
 }
 
 export const Overview = () => (
-    <div style={{ width: '100%', maxWidth: '600px' }}>
+    <div style={{ width: '100%', maxWidth: '600px' /* token gap: 600px */ }}>
         <div style={demoBox}>
-            <ScrollBar maxHeight="200px">
+            <ScrollBar maxHeight={'200px' /* token gap: 200px */}>
                 <TallContent />
             </ScrollBar>
         </div>
@@ -91,21 +129,21 @@ export const Overview = () => (
 );
 
 export const Layout = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', width: '100%', maxWidth: '600px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' /* token gap: 48px */, width: '100%', maxWidth: '600px' /* token gap: 600px */ }}>
         <section>
             <DemoLabel>VERTICAL (DEFAULT)</DemoLabel>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
+            <p className="body-sm" style={{ marginBottom: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
                 Content scrolls vertically once it exceeds maxHeight.
             </p>
             <div style={demoBox}>
-                <ScrollBar maxHeight="160px">
+                <ScrollBar maxHeight="var(--width-1000)">
                     <TallContent />
                 </ScrollBar>
             </div>
         </section>
         <section>
             <DemoLabel>HORIZONTAL</DemoLabel>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
+            <p className="body-sm" style={{ marginBottom: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
                 Wide content scrolls sideways with the same thin, tokenized scrollbar.
             </p>
             <div style={demoBox}>
@@ -118,14 +156,14 @@ export const Layout = () => (
 );
 
 export const Content = () => (
-    <div style={{ width: '100%', maxWidth: '600px' }}>
+    <div style={{ width: '100%', maxWidth: '600px' /* token gap: 600px */ }}>
         <DemoLabel>USE CASE EXAMPLE</DemoLabel>
-        <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
+        <p className="body-sm" style={{ marginBottom: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
             A list panel with the Design System scrollbar instead of the browser default.
         </p>
         <div style={{ ...demoBox, padding: 0 }}>
-            <ScrollBar maxHeight="220px">
-                <div style={{ padding: '16px' }}>
+            <ScrollBar maxHeight={'220px' /* token gap: 220px */}>
+                <div style={{ padding: 'var(--section-pad-y-compact) var(--section-pad-x-compact)' }}>
                     <TallContent count={16} />
                 </div>
             </ScrollBar>
@@ -139,11 +177,11 @@ export const Content = () => (
  */
 export const Interactive = {
     args: {
-        maxHeight: '200px',
+        maxHeight: '200px' /* token gap: 200px */,
         horizontal: false
     },
     render: (args) => (
-        <div style={{ width: '100%', maxWidth: '600px' }}>
+        <div style={{ width: '100%', maxWidth: '600px' /* token gap: 600px */ }}>
             <div style={demoBox}>
                 <ScrollBar {...args}>
                     {args.horizontal ? <WideContent /> : <TallContent />}
@@ -157,8 +195,8 @@ export const Interactive = {
 
 
 const Subject = (props) => (
-    <ScrollBar maxHeight="160px" aria-label="Notes" {...props}>
-        {Array.from({ length: 20 }, (_, i) => <p key={i}>Note {i + 1}</p>)}
+    <ScrollBar maxHeight="var(--width-1000)" aria-label="Session notes" {...props}>
+        {sessionRows.map((row, i) => <p key={i}>{row}</p>)}
     </ScrollBar>
 );
 const root = (canvasElement) => canvasElement.firstElementChild;

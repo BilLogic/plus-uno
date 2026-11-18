@@ -44,7 +44,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Subject connections</Heading>
+                <Heading as="h3" size="sm">Subject connections</Heading>
                 <p style={captionStyle}>
                     Weighted co-enrollment links across ordered subjects, with arc thickness encoding shared student count.
                 </p>

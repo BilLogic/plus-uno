@@ -1,0 +1,31 @@
+/*
+ * Competency tag — a thin wrapper on Tag: 20 tall by default, and 32 when
+ * `spacing="spacious"`, matching StatusTag and DateTag (`_label-heights.scss`).
+ * `elemBefore` carries no size of its own (Tag leaves that to the caller), and
+ * a competency area's icon reads at the same size as the label it sits beside:
+ * `--icon-sm` (12) at default, `--icon-md` (16) when spacious.
+ */
+@use '../label-heights' as label;
+@use '../../../styles/type' as *;
+
+.plus-competency-tag__icon {
+    font-size: var(--icon-sm);
+    line-height: 1;
+}
+
+.plus-tag.plus-competency-tag--spacious {
+    --plus-tag-height: #{label.$status-height-spacious};
+
+    padding: 0 var(--pad-x-md);
+    gap: var(--tag-gap);
+    border-radius: var(--radius-control-md);
+    @include ds-type(var(--body-default));
+
+    .plus-competency-tag__icon {
+        font-size: var(--icon-md);
+    }
+
+    .plus-tag__link {
+        gap: var(--tag-gap);
+    }
+}

@@ -63,7 +63,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Standard area</Heading>
+                <Heading as="h3" size="sm">Standard area</Heading>
                 <p style={captionStyle}>
                     Shows magnitude of values over time.
                 </p>
@@ -71,7 +71,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Stacked area</Heading>
+                <Heading as="h3" size="sm">Stacked area</Heading>
                 <p style={captionStyle}>
                     Shows how parts contribute to a total over time.
                 </p>
@@ -101,8 +101,8 @@ export const Interactive = {
         height: 300,
         sort: false,
         data: [
-            { name: 'Series 1', data: [100, 150, 120, 180, 200] },
-            { name: 'Series 2', data: [80, 100, 90, 120, 140] },
+            { name: 'Lincoln Middle', data: [100, 150, 120, 180, 200] },
+            { name: 'Roosevelt K-8', data: [80, 100, 90, 120, 140] },
         ],
     },
 };

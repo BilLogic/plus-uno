@@ -1,5 +1,4 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
-import { IconButton } from '@/components';
 import { Illustration } from '@/storybook-docs/illustrations/Illustration.jsx';
 import { PAINT, HAIRLINE } from '@/storybook-docs/illustrations/paint.js';
 import { ButtonShape, Card, Frame, Rule, Screen, SkeletonBar } from '@/storybook-docs/illustrations/primitives.jsx';
@@ -274,7 +273,7 @@ export const NestingDiagram = () => (
             <g transform="translate(8 8)" fill="none" stroke={PAINT.annotation} strokeDasharray="1 1.5" vectorEffect="non-scaling-stroke" style={HAIRLINE}>
                 <circle vectorEffect="non-scaling-stroke" style={{ cx: 'var(--popup-radius)', cy: 'var(--popup-radius)', r: 'var(--popup-radius)' }} />
                 <circle vectorEffect="non-scaling-stroke" style={{ cx: 'var(--popup-radius)', cy: 'var(--popup-radius)', r: ROW_CORNER }} />
-                <circle style={{ cx: 'var(--popup-radius)', cy: 'var(--popup-radius)', r: 'var(--stroke-2)' }} fill={PAINT.annotation} stroke="none" />
+                <circle style={{ cx: 'var(--popup-radius)', cy: 'var(--popup-radius)', r: 'var(--border-width-selected)' }} fill={PAINT.annotation} stroke="none" />
             </g>
         </Illustration>
     </CloseUp>
@@ -432,25 +431,3 @@ const TightGrid = ({ big, title }) => (
 
 export const TightDo = () => <TightGrid title="Six tiles 2 apart, rounded at 4" />;
 export const TightDont = () => <TightGrid big title="Six tiles 2 apart, rounded at 12, pinched at every gap" />;
-
-/** A Modal header with its title and close control. */
-const Header = ({ children }) => (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--inline-md)', padding: 'var(--card-pad-default)', borderRadius: 'var(--modal-radius)', background: 'var(--ds-surface-overlay)', boxShadow: 'var(--ds-shadow-overlay)' }}>
-        <span style={{ font: 'var(--heading-sm)', color: 'var(--ds-text)' }}>Session details</span>
-        {children}
-    </div>
-);
-
-export const CloseDo = () => (
-    <Header>
-        <IconButton icon="xmark" label="Close" appearance="subtle" isTooltipDisabled />
-    </Header>
-);
-
-export const CloseDont = () => (
-    <Header>
-        <span aria-hidden="true" style={{ display: 'grid', placeItems: 'center', width: 'var(--control-md)', height: 'var(--control-md)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-neutral)', color: 'var(--ds-icon-subtle)' }}>
-            <i className="fa-solid fa-xmark" />
-        </span>
-    </Header>
-);

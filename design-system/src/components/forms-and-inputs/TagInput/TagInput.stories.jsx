@@ -242,11 +242,11 @@ export const PastedTagsGetTagColors = {
         const input = canvas.getByRole('combobox', { name: 'Topics' });
 
         await userEvent.click(input);
-        await userEvent.paste('a, b, c');
+        await userEvent.paste('Math, Reading, Writing');
         await expect(tagsIn(canvas, 'Topics').getAllByRole('listitem')).toHaveLength(3);
         await expect(args.onCreateSpy).toHaveBeenCalledTimes(3);
         const reported = args.onCreateSpy.mock.calls.map(([call]) => call);
-        await expect(reported.map(({ value }) => value)).toEqual(['a', 'b', 'c']);
+        await expect(reported.map(({ value }) => value)).toEqual(['Math', 'Reading', 'Writing']);
         for (const { color } of reported) {
             await expect(TAG_COLORS).toContain(color);
         }
@@ -300,7 +300,7 @@ const MANY = ['Session prep', 'Tutor coaching', 'Reflections', 'Attendance', 'Tr
 
 /** Without focus, tags past one line collapse into "+n". With focus, every tag shows. */
 export const CollapsesWithoutFocus = () => (
-    <div style={{ ...stack, maxWidth: '280px' }}>
+    <div style={{ ...stack, maxWidth: '280px' /* token gap: 280px */ }}>
         <TagInput label="Topics" options={TOPICS} defaultTags={MANY} />
     </div>
 );
@@ -318,7 +318,7 @@ CollapsesWithoutFocus.play = async ({ canvasElement }) => {
 };
 
 /**
- * The field fits its tags: every tag, "+n" included, is Tag's one height, 22,
+ * The field fits its tags: every tag, "+n" included, is Tag's one height, 20,
  * and sits inside the field's border at any width, and the field stays as tall
  * as an Input.
  */
@@ -352,7 +352,7 @@ SmallFitsItsTags.play = async ({ canvasElement }) => {
         await expect(shown.some((tag) => tag.matches('.plus-tag-group__overflow'))).toBe(true);
         for (const tag of shown) {
             const box = tag.getBoundingClientRect();
-            await expect(Math.round(box.height)).toBe(22);
+            await expect(Math.round(box.height)).toBe(20);
             await expect(box.top).toBeGreaterThanOrEqual(inner.top + border);
             await expect(box.bottom).toBeLessThanOrEqual(inner.bottom - border);
             await expect(box.right).toBeLessThanOrEqual(inner.right - border);
@@ -734,7 +734,7 @@ const tidyArgTypes = {
 export const OptionMenu = {
     args: { menu: true, reorder: true, spacing: 'default' },
     argTypes: tidyArgTypes,
-    render: (args) => <div style={{ ...stack, minHeight: 'var(--size-3000)' }}><Tidy {...args} /></div>,
+    render: (args) => <div style={{ ...stack, minHeight: 'var(--width-3000)' }}><Tidy {...args} /></div>,
     play: async ({ canvasElement, args }) => {
         if (!args.menu) return;
         await userEvent.click(await openMenuButton(canvasElement, 'Decision recall'));
@@ -745,7 +745,7 @@ export const OptionMenu = {
 export const Reordering = {
     args: { menu: true, reorder: true, spacing: 'default' },
     argTypes: tidyArgTypes,
-    render: (args) => <div style={{ ...stack, minHeight: 'var(--size-2000)' }}><Tidy {...args} /></div>,
+    render: (args) => <div style={{ ...stack, minHeight: 'var(--height-2000)' }}><Tidy {...args} /></div>,
     play: async ({ canvasElement, args }) => {
         if (!args.reorder) return;
         const canvas = within(canvasElement);

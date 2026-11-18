@@ -14,7 +14,7 @@ Also asked as: switch views, tab bar, segmented, view switcher.
 
 **Source:** `design-system/src/components/navigation/Tabs/Tabs.jsx`
 
-**Stories:** `design-system/src/components/navigation/Tabs/Tabs.stories.jsx` — Overview, Layout, Alignment, Appearance, UnderlineRadius, WithPanels, InteractionStates, Interactive, Rest, Hovered, Pressed, Focused, Selected, SelectedPill, Disabled
+**Stories:** `design-system/src/components/navigation/Tabs/Tabs.stories.jsx` — Overview, Layout, Alignment, Appearance, UnderlineRadius, WithCount, WithPanels, InteractionStates, Interactive, Rest, Hovered, Pressed, Focused, Selected, SelectedPill, Disabled
 
 **Storybook page:** `design-system/src/components/navigation/Tabs/Tabs.mdx`
 

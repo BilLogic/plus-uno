@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
-import { expect, userEvent, within } from 'storybook/test';
+import { settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
+import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { contrastRatio, paintedOver } from '@/storybook-docs/lib/contrast.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { Button } from '@/components';
 import SectionMessage, { SECTION_MESSAGE_ICONS, SECTION_MESSAGE_APPEARANCES } from './SectionMessage';
 import { iconClass } from '../../../lib/icon';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
@@ -79,8 +81,8 @@ const GROUND_TOKEN = {
     info: '--ds-background-information',
 };
 
-const sectionMessageCol = { display: 'flex', flexDirection: 'column', gap: '48px' };
-const contentVariantCol = { display: 'flex', flexDirection: 'column', gap: '24px' };
+const sectionMessageCol = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' };
+const contentVariantCol = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' };
 
 function SectionMessageContentDemos() {
     return (
@@ -88,44 +90,44 @@ function SectionMessageContentDemos() {
             <DemoLabel>CONTENT VARIANTS (PRIMARY STYLE)</DemoLabel>
             <section>
                 <DemoLabel>WITH TITLE</DemoLabel>
-                <p className="body-default" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Use when the message benefits from a short heading.
                 </p>
-                <SectionMessage appearance="primary" title="With Title" dismissible>
-                    Message with title and body text.
+                <SectionMessage appearance="primary" title="Session notes saved" dismissible>
+                    Your notes for Maya K. are ready to share with her family.
                 </SectionMessage>
             </section>
             <section>
                 <DemoLabel>BODY ONLY</DemoLabel>
-                <p className="body-default" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Use when concise copy does not require a heading.
                 </p>
                 <SectionMessage appearance="primary" dismissible>
-                    Message without title — body only. The dismiss button centers on the first body line.
+                    Session start times appear in Eastern Time. Update your profile if you travel.
                 </SectionMessage>
             </section>
             <section>
                 <DemoLabel>NON-DISMISSIBLE</DemoLabel>
-                <p className="body-default" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Use for critical information that must remain visible.
                 </p>
-                <SectionMessage appearance="primary" title="Non-dismissible message" dismissible={false}>
-                    This message cannot be dismissed.
+                <SectionMessage appearance="primary" title="Schedule locked for Friday" dismissible={false}>
+                    Sessions within 24 hours cannot be moved here. Contact your lead tutor.
                 </SectionMessage>
             </section>
             <section>
                 <DemoLabel>RICH CONTENT</DemoLabel>
-                <p className="body-default" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Supports inline emphasis and links inside the body.
                 </p>
-                <SectionMessage appearance="info" title="Rich Content">
-                    <strong>Note:</strong> You can include <em>rich HTML content</em> and even{' '}
-                    <a href="#">links</a> inside a message.
+                <SectionMessage appearance="info" title="New math curriculum">
+                    <strong>Note:</strong> Grade 7 linear equations now include <em>updated exit tickets</em> on the{' '}
+                    <a href="#">lesson plan page</a>.
                 </SectionMessage>
             </section>
             <section>
                 <DemoLabel>ACTIONS</DemoLabel>
-                <p className="body-default" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Up to two link-button actions after the body.
                 </p>
                 <SectionMessage
@@ -167,8 +169,8 @@ export const Content = () => (
 );
 
 export const Overview = () => (
-    <SectionMessage appearance="primary" title="With Title" dismissible>
-        Message with title and body text.
+    <SectionMessage appearance="primary" title="Session notes saved" dismissible>
+        Your notes for Maya K. are ready to share with her family.
     </SectionMessage>
 );
 Overview.parameters = {
@@ -183,11 +185,11 @@ Overview.parameters = {
  */
 export const Interactive = (args) => (
     <SectionMessage {...args}>
-        This is an interactive message. Use the controls below to customize it.
+        Maya K. joins at 4:00 PM ET for Grade 7 math at Lincoln Middle.
     </SectionMessage>
 );
 Interactive.args = {
-    title: 'Interactive message',
+    title: 'Session reminder',
     appearance: 'info',
     icon: true,
     dismissible: true,
@@ -201,7 +203,7 @@ Interactive.args = {
  * 16px icon whatever the text size beside it.
  */
 export const DismissPlacement = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '400px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--width-2500)' }}>
         <SectionMessage appearance="primary" title="With a title" data-testid="placement-title">
             The × centers on the title line, not on the message.
         </SectionMessage>
@@ -245,10 +247,11 @@ DismissPlacement.play = async ({ canvasElement }) => {
         await expect(Math.abs(center - line.center), `${id}: × is centered on the first line`).toBeLessThanOrEqual(1);
     }
 
-    // Dismissal is unchanged: the button removes its message.
+    // Dismissal is unchanged: the button removes its message after the exit finishes.
     const body = canvas.getByTestId('placement-body');
     await userEvent.click(within(body).getByRole('button', { name: 'Dismiss message' }));
-    await expect(canvas.queryByTestId('placement-body')).toBeNull();
+    await waitFor(() => expect(canvas.queryByTestId('placement-body')).toBeNull());
+    await settleAnimations(canvasElement);
 };
 
 
@@ -260,10 +263,10 @@ DismissPlacement.play = async ({ canvasElement }) => {
  * decorative: the message's role and its text already say what it is.
  */
 export const LeadingIcon = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '400px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--width-2500)' }}>
         {SECTION_MESSAGE_APPEARANCES.map((appearance) => (
-            <SectionMessage key={appearance} appearance={appearance} title="Title" data-testid={`icon-${appearance}`}>
-                You have a message here — come check it out!
+            <SectionMessage key={appearance} appearance={appearance} title="Session update" data-testid={`icon-${appearance}`}>
+                Thursday&apos;s math session starts at 4:00 PM ET.
             </SectionMessage>
         ))}
         <SectionMessage appearance="warning" data-testid="icon-body">
@@ -323,7 +326,7 @@ LeadingIcon.play = async ({ canvasElement }) => {
         await expect(icon.closest('[aria-hidden="true"]'), `${id} icon is decorative`).not.toBeNull();
 
         // The icon comes before the message, the × after it.
-        const title = within(message).getByText('Title');
+        const title = within(message).getByText('Session update');
         await expect(icon.getBoundingClientRect().right, `${id}: icon leads the text`).toBeLessThanOrEqual(title.getBoundingClientRect().left);
         await expectOnFirstLine(id, icon, title);
     }
@@ -358,7 +361,8 @@ LeadingIcon.play = async ({ canvasElement }) => {
 
     // The × is unchanged beside the icon: it still dismisses its message.
     await userEvent.click(within(none).getByRole('button', { name: 'Dismiss message' }));
-    await expect(canvas.queryByTestId('icon-none')).toBeNull();
+    await waitFor(() => expect(canvas.queryByTestId('icon-none')).toBeNull());
+    await settleAnimations(canvasElement);
 };
 
 /**
@@ -379,8 +383,8 @@ export const GroundAndText = () => (
         }}
     >
         {SECTION_MESSAGE_APPEARANCES.map((appearance) => (
-            <SectionMessage key={appearance} appearance={appearance} title="Title" data-testid={`ground-${appearance}`}>
-                You have a message here, with <a href="#">a link</a> in it.
+            <SectionMessage key={appearance} appearance={appearance} title="Session update" data-testid={`ground-${appearance}`}>
+                Maya K.&apos;s session moved to Thursday, with <a href="#">updated details</a> on the calendar.
             </SectionMessage>
         ))}
     </div>
@@ -413,9 +417,9 @@ GroundAndText.play = async ({ canvasElement }) => {
             .toBeGreaterThanOrEqual(4.5);
 
         // Title, body and link are on-surface.
-        const title = within(message).getByText('Title');
-        const body = within(message).getByText(/You have a message here/);
-        const link = within(message).getByRole('link', { name: 'a link' });
+        const title = within(message).getByText('Session update');
+        const body = within(message).getByText(/Maya K\.'s session moved/);
+        const link = within(message).getByRole('link', { name: 'updated details' });
         await expect(getComputedStyle(title).color, `${id}: title color`).toBe(onSurface);
         await expect(getComputedStyle(body).color, `${id}: body color`).toBe(onSurface);
         await expect(getComputedStyle(link).color, `${id}: link inherits the text color`).toBe(onSurface);
@@ -441,7 +445,8 @@ export const Actions = () => (
 Actions.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const message = canvas.getByTestId('actions');
-    await expect(within(message).getByRole('button', { name: 'Reschedule' })).toBeVisible();
+    await waitFor(() => expect(within(message).getByRole('button', { name: 'Reschedule' })).toBeVisible());
+    await settleAnimations(canvasElement);
     await expect(within(message).getByRole('link', { name: 'Learn more' })).toHaveAttribute('href', '#');
 };
 
@@ -498,4 +503,67 @@ export const Focused = {
 const radiusOf = (root, selector) => getComputedStyle(root.querySelector(selector)).borderTopLeftRadius;
 Overview.play = async ({ canvasElement }) => {
     await expect(radiusOf(canvasElement, '.plus-section-message'), 'Section message radius is 12').toBe('12px');
+};
+
+function SectionMessageMotionDemo() {
+    const [visible, setVisible] = useState(false);
+    const [instanceKey, setInstanceKey] = useState(0);
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', alignItems: 'flex-start' }}>
+            <Button
+                text={visible ? 'Hide notice' : 'Show notice'}
+                onClick={() => {
+                    if (!visible) setInstanceKey((k) => k + 1);
+                    setVisible((v) => !v);
+                }}
+            />
+            {visible && (
+                <SectionMessage
+                    key={instanceKey}
+                    appearance="info"
+                    title="Session reminder"
+                    onDismiss={() => setVisible(false)}
+                >
+                    Maya K. joins at 4:00 PM ET for Grade 7 math at Lincoln Middle.
+                </SectionMessage>
+            )}
+        </div>
+    );
+}
+
+export const MotionEnterAndExit = {
+    render: () => <SectionMessageMotionDemo />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await userEvent.click(canvas.getByRole('button', { name: 'Show notice' }));
+        const alert = await canvas.findByRole('alert');
+        const slot = alert.closest('[data-presence-slot]');
+        await expect(slot).toHaveAttribute('data-presence-phase', 'entering');
+        await waitFor(() => expect(alert).toBeVisible());
+        await settleAnimations(canvasElement);
+
+        fireEvent.click(canvas.getByRole('button', { name: 'Dismiss message' }));
+        await expect(alert.isConnected, 'SectionMessage stays connected while exiting').toBe(true);
+        await expect(slot).toHaveAttribute('data-presence-phase', 'exit-fade');
+        await waitFor(() => expect(alert.isConnected).toBe(false));
+        await settleAnimations(canvasElement);
+    },
+};
+
+export const MotionReduced = {
+    decorators: [withReducedMotion],
+    render: () => <SectionMessageMotionDemo />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await userEvent.click(canvas.getByRole('button', { name: 'Show notice' }));
+        const alert = await canvas.findByRole('alert');
+        const slot = alert.closest('[data-presence-slot]');
+        await expect(slot).toHaveAttribute('data-presence-phase', 'settled');
+        await waitFor(() => expect(alert).toBeVisible());
+        await settleAnimations(canvasElement);
+
+        fireEvent.click(canvas.getByRole('button', { name: 'Dismiss message' }));
+        await waitFor(() => expect(alert.isConnected).toBe(false));
+        await settleAnimations(canvasElement);
+    },
 };

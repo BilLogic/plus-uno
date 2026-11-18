@@ -326,7 +326,7 @@ const preview = {
               "Tag",
               [
                 "Tag",
-                "Smart tag"
+                "Competency tag"
               ],
               "Tag group"
             ],
@@ -552,15 +552,15 @@ const preview = {
 
   globalTypes: {
     plusBrowser: {
-      description: 'Browser window chrome around the Template stories (docs only)',
+      description: 'Browser window chrome around the Template stories (Chrome by default)',
       toolbar: {
         title: 'Browser',
         icon: 'browser',
         items: [
-          { value: 'none', title: 'No browser' },
           { value: 'chrome', title: 'Chrome' },
           { value: 'safari', title: 'Safari' },
           { value: 'edge', title: 'Edge' },
+          { value: 'none', title: 'No browser' },
         ],
         dynamicTitle: true,
       },
@@ -598,7 +598,7 @@ const preview = {
     // Template carries the browser, the Frame is the app alone. A story can opt
     // in or out with parameters.browserFrame ('chrome' | 'safari' | 'none').
     (Story, context) => {
-      const framed = /^Patterns\/Templates/.test(context.title);
+      const framed = /^Templates\//.test(context.title);
       const browser = context.parameters.browserFrame || (framed ? context.globals.plusBrowser : 'none');
       return (
         <BrowserFrame browser={browser || 'none'}>
@@ -642,7 +642,7 @@ const preview = {
     backgrounds: {
       value: DEFAULT_BACKGROUND
     },
-    plusBrowser: 'none',
+    plusBrowser: 'chrome',
     plusColorMode: 'light',
     plusContrastMode: 'no-preference',
   },

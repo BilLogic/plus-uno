@@ -1,5 +1,6 @@
 import React from 'react';
-import SectionMessage from './SectionMessage'; // We import the main component to extract/mock subcomponents styling for demo
+import { expect } from 'storybook/test';
+import SectionMessage from './SectionMessage';
 
 /**
  * Subcomponent documentation for SectionMessage.
@@ -19,16 +20,28 @@ export default {
 
 /**
  * Content Structure
- * The internal layout of title and message text.
+ * The internal layout of title, message text, and link actions inside a live SectionMessage.
  */
-export const ContentStructure = () => (
-    <div className="plus-section-message" style={{ border: '1px dashed var(--ds-border)' }}>
-        <div className="plus-section-message-content">
-            <div className="plus-section-message-title heading-lg">Section message title</div>
-            <div className="plus-section-message-text body-lg">This is the message body text within the content area.</div>
-        </div>
-    </div>
-);
+export const ContentStructure = {
+    render: () => (
+        <SectionMessage
+            appearance="primary"
+            title="Session schedule updated"
+            dismissible={false}
+            actions={[
+                { text: 'View schedule', href: '#schedule' },
+                { text: 'Notify student', onClick: () => {} },
+            ]}
+        >
+            Your Tuesday Algebra B session with Maya K. moved to 4:30 PM.
+        </SectionMessage>
+    ),
+    play: async ({ canvas }) => {
+        await expect(canvas.getByRole('heading', { name: 'Session schedule updated' })).toBeInTheDocument();
+        await expect(canvas.getByRole('link', { name: 'View schedule' })).toBeInTheDocument();
+        await expect(canvas.getByRole('button', { name: 'Notify student' })).toBeInTheDocument();
+    },
+};
 
 /**
  * Dismiss Button
@@ -36,7 +49,7 @@ export const ContentStructure = () => (
  * with a title, the first body line without.
  */
 export const DismissButton = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
         <SectionMessage appearance="primary" title="With a title">The × centers on the title line.</SectionMessage>
         <SectionMessage appearance="primary">Without a title the × centers on the first body line.</SectionMessage>
     </div>

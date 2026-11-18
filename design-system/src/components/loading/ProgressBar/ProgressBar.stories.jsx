@@ -22,10 +22,10 @@ export default {
     },
 };
 
-const col = { display: 'flex', flexDirection: 'column', gap: '16px' };
+const col = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' };
 
 export const Overview = () => (
-    <div style={{ width: '100%', minWidth: '200px', maxWidth: '100%' }}>
+    <div style={{ width: '100%', minWidth: '200px' /* token gap: 200px */, maxWidth: '100%' }}>
         <ProgressBar value={50} />
     </div>
 );
@@ -37,7 +37,7 @@ export const Appearances = () => (
     <div style={col}>
         <ProgressBar value={60} appearance="default" />
         <ProgressBar value={100} appearance="success" />
-        <div style={{ padding: '16px', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--radius-md)' }}>
+        <div style={{ padding: 'var(--section-pad-y-compact) var(--section-pad-x-compact)', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--radius-md)' }}>
             <ProgressBar value={60} appearance="inverse" />
         </div>
     </div>
@@ -49,14 +49,14 @@ export const Default = () => <ProgressBar value={60} appearance="default" />;
 export const Success = () => <ProgressBar value={100} appearance="success" />;
 
 export const Inverse = () => (
-    <div style={{ padding: 'var(--space-100)', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--radius-md)' }}>
+    <div style={{ padding: 'var(--section-pad-y-compact) var(--section-pad-x-compact)', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--radius-md)' }}>
         <ProgressBar value={60} appearance="inverse" />
     </div>
 );
 
 /** For a visible percent or description, put the text beside the bar — the bar's own 8px height has no room for it. */
 export const WithACaption = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '240px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', width: 'var(--width-1500)' }}>
         <ProgressBar value={68} ariaLabel="68% of goals met" />
         <span className="body-sm">68% of goals met</span>
     </div>
@@ -77,7 +77,7 @@ export const Interactive = {
         isIndeterminate: false,
     },
     render: (args) => (
-        <div style={{ width: '100%', minWidth: '200px', maxWidth: '480px' }}>
+        <div style={{ width: '100%', minWidth: '200px' /* token gap: 200px */, maxWidth: 'var(--width-3000)' }}>
             <ProgressBar {...args} />
         </div>
     ),
@@ -86,7 +86,7 @@ export const Interactive = {
 /* ------------------------------------------------------------------- states */
 
 
-const Subject = (props) => <div style={{ width: '240px' }}><ProgressBar value={50} ariaLabel="Goals met" {...props} /></div>;
+const Subject = (props) => <div style={{ width: 'var(--width-1500)' }}><ProgressBar value={50} ariaLabel="Goals met" {...props} /></div>;
 const root = (canvasElement) => canvasElement.firstElementChild;
 
 /** Rest: progress bar. */

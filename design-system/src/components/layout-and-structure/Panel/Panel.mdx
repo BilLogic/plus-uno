@@ -27,7 +27,7 @@ export const DemoPanel = ({ width, title = 'Session details', titleIcon, backAct
     <PanelContainer width={width}>
         <PanelHeader backAction={backAction} titleIcon={titleIcon} title={title} actions={<PanelActionGroup><PanelCloseAction /></PanelActionGroup>} />
         {subheader && <PanelSubheader>{subheader}</PanelSubheader>}
-        <PanelBody>Panel body content goes here.</PanelBody>
+        <PanelBody>Review warm-up problems and practice goals before Thursday's math session.</PanelBody>
         {footer && <PanelFooter><PanelDisclaimer>Changes save automatically.</PanelDisclaimer><Button appearance="primary" text="Done" /></PanelFooter>}
     </PanelContainer>
 );

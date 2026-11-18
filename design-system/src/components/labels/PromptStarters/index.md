@@ -72,7 +72,7 @@ no conditional wrapper is needed.
 - For a single follow-up prompt once a conversation is underway, use `Suggestion` directly.
 - For where a selected starter's text typically lands, see `PromptInput`.
 
-Same group: `AiMessage` · `ChangeTag` · `CountTag` · `DateTag` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `AiMessage` · `ChangeTag` · `CompetencyTag` · `CountTag` · `DateTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
 ## Parts
 

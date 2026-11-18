@@ -11,7 +11,7 @@ const sampleItems = [
     { text: 'Home', href: '/' },
     { text: 'Training', href: '/training' },
     { text: 'Lessons', href: '/lessons' },
-    { text: 'Current Page' },
+    { text: 'Two-step equations' },
 ];
 
 export default {
@@ -71,7 +71,7 @@ function BreadcrumbShortDemo() {
             <DemoLabel>SHORT BREADCRUMB (2 LEVELS)</DemoLabel>
             <Breadcrumb items={[
                 { text: 'Home', href: '/' },
-                { text: 'Current Page' }
+                { text: 'Session plans' }
             ]} />
         </div>
     );
@@ -106,15 +106,15 @@ export const Interactive = (args) => (
         items={{
             short: [
                 { text: 'Home', href: '/' },
-                { text: 'Current Page' }
+                { text: 'Session plans' }
             ],
             standard: sampleItems,
             deep: [
                 { text: 'Home', href: '/' },
                 { text: 'Training', href: '/training' },
                 { text: 'Lessons', href: '/lessons' },
-                { text: 'Module 3', href: '/lessons/module-3' },
-                { text: 'Current Page' }
+                { text: 'Grade 7 math', href: '/lessons/grade-7-math' },
+                { text: 'Two-step equations' }
             ]
         }[args.pathPreset] || sampleItems}
     />

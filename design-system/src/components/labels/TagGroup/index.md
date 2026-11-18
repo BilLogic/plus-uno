@@ -73,10 +73,10 @@ Don't: A read-only group that looks editable.
 ## Related
 
 - `Tag`: use when configuring individual items inside the group.
-- `SmartTag`: use when tagging SMART competency areas inside the group.
+- `CompetencyTag`: use when tagging competency areas inside the group.
 - `Suggestion`: use when offering proposed tags at the end of the group.
 
-Same group: `AiMessage` · `ChangeTag` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag`
+Same group: `AiMessage` · `ChangeTag` · `CompetencyTag` · `CountTag` · `DateTag` · `PromptStarters` · `StatusTag` · `Suggestion` · `Tag`
 
 ## Parts
 

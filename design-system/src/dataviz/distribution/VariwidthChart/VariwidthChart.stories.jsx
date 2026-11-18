@@ -57,7 +57,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Subject score vs. student count</Heading>
+                <Heading as="h3" size="sm">Subject score vs. student count</Heading>
                 <p style={captionStyle}>
                     Column height encodes average score and column width encodes enrollment, sorted from highest score to lowest in the brand color.
                 </p>
@@ -70,7 +70,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Ordinal grade cohorts</Heading>
+                <Heading as="h3" size="sm">Ordinal grade cohorts</Heading>
                 <p style={captionStyle}>
                     Grades keep their natural order with {'sort={false}'} while toneByRank puts the darkest step on the highest average.
                 </p>
@@ -100,9 +100,9 @@ export const Overview = {
 export const Interactive = {
     args: {
         data: [
-            { name: 'A', y: 50, z: 10 },
-            { name: 'B', y: 30, z: 20 },
-            { name: 'C', y: 40, z: 5 },
+            { name: 'Grade 6', y: 84, z: 32 },
+            { name: 'Grade 7', y: 88, z: 45 },
+            { name: 'Grade 8', y: 91, z: 28 },
         ],
         height: 400,
         sort: true,

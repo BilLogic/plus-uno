@@ -10,11 +10,11 @@ Also asked as: onboarding, feature tour, coach mark, new feature highlight, walk
 
 **Source:** `design-system/src/components/messaging/Spotlight/Spotlight.jsx`
 
-**Stories:** `design-system/src/components/messaging/Spotlight/Spotlight.stories.jsx` — Basic, WithMedia, LinkAction, PrimaryAction, SecondaryAction, Interactive, Rest, Hovered, Pressed, Focused, BestPracticesLive
+**Stories:** `design-system/src/components/messaging/Spotlight/Spotlight.stories.jsx` — Basic, WithMedia, LinkAction, PrimaryAction, SecondaryAction, Interactive, Rest, Hovered, Pressed, Focused, BestPracticesLive, MotionOpenAndClose, MotionReduced
 
 **Storybook page:** `design-system/src/components/messaging/Spotlight/Spotlight.mdx`
 
-**Motion:** enter `spatial.default` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Motion:** enter `spatial.default` + `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -28,7 +28,7 @@ Spotlight reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| enter | Open and close an overlay | `--ds-motion-spatial-default` | Each coachmark step is Step. |
+| enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-fast` | Each coachmark step is Step. |
 | exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. |
 
 ## Alternatives
@@ -169,7 +169,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-sm` · `--ds-background-brand-bold` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--heading-sm` · `--popup-radius` · `--radius-lg` · `--space-075` · `--space-100` · `--space-150` · `--spotlight-media-height` · `--spotlight-width`
+`--body-default` · `--body-sm` · `--ds-background-brand-bold` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--heading-sm` · `--plus-overlay-origin` · `--popup-radius` · `--radius-lg` · `--space-075` · `--space-100` · `--space-150` · `--spotlight-media-height` · `--spotlight-width` · `--transform-origin`
 
 From `design-system/src/components/messaging/Spotlight/Spotlight.scss`. Override these through the token layer, never with a literal.
 

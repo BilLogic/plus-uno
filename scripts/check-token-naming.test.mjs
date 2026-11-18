@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { test } from 'node:test';
+import { fileURLToPath } from 'node:url';
 
 import { exitCodeFor } from './lib/findings.mjs';
 import {
@@ -368,4 +369,24 @@ test('Tooltip/radius is a documented exception: it shares --radius-control-sm', 
     },
   });
   assert.deepEqual(checkTokenNaming(snapshot, new Set(['--radius-control-sm'])), []);
+});
+
+test('competency semantic color tokens map to --ds-*-competency-* and no --ds-*-smart-* remain', () => {
+  assert.equal(expectedToken('color / semantics', 'color/background/competency/advocacy/default'), '--ds-background-competency-advocacy');
+  assert.equal(expectedToken('color / semantics', 'color/background/competency/mastering-content/bold/hovered'), '--ds-background-competency-mastering-content-bold-hovered');
+  assert.equal(expectedToken('color / semantics', 'color/text/competency/social-emotional'), '--ds-text-competency-social-emotional');
+  const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+  const snapshot = JSON.parse(readFileSync(join(repoRoot, SNAPSHOT_PATH), 'utf8'));
+  const sem = snapshot.collections['color / semantics'];
+  assert.ok(sem.variables.includes('color/background/competency/advocacy/default'));
+  assert.equal(
+    sem.variables.some((v) => v.includes('/smart/') && !v.startsWith('color/chart/smart/')),
+    false,
+    'snapshot has no non-chart color/*/smart/* variables',
+  );
+  assert.equal(
+    Object.values(sem.codeSyntax).some((v) => v.includes('--ds-') && v.includes('-smart-')),
+    false,
+    'snapshot has no --ds-*-smart-* codeSyntax',
+  );
 });

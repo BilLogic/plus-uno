@@ -75,11 +75,11 @@ export default {
     },
 };
 
-const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxWidth: '360px' };
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxWidth: '360px' /* token gap: 360px */ };
 
 export const Overview = () => (
-    <div style={{ maxWidth: '600px' }}>
-        <Toggle id="toggle-overview" name="toggle-overview" label="Allow pull requests" defaultChecked />
+    <div style={{ maxWidth: '600px' /* token gap: 600px */ }}>
+        <Toggle id="toggle-overview" name="toggle-overview" label="Session reminders" defaultChecked />
     </div>
 );
 Overview.parameters = {
@@ -91,14 +91,14 @@ Overview.parameters = {
 /** 16 is the default; 20 calls attention to one setting. */
 export const Sizes = () => (
     <div style={stack}>
-        <Toggle id="toggle-16" label="Size 16" size={16} defaultChecked />
-        <Toggle id="toggle-20" label="Size 20" size={20} defaultChecked />
+        <Toggle id="toggle-16" label="Email reminders" size={16} defaultChecked />
+        <Toggle id="toggle-20" label="Session alerts" size={20} defaultChecked />
     </div>
 );
 Sizes.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const small = canvas.getByRole('switch', { name: 'Size 16' });
-    const large = canvas.getByRole('switch', { name: 'Size 20' });
+    const small = canvas.getByRole('switch', { name: 'Email reminders' });
+    const large = canvas.getByRole('switch', { name: 'Session alerts' });
     await expect(px(getComputedStyle(small).height), 'size 16 track height').toBe(16);
     await expect(px(getComputedStyle(small).width), 'size 16 track width').toBe(32);
     await expect(px(getComputedStyle(large).height), 'size 20 track height').toBe(20);
@@ -108,10 +108,10 @@ Sizes.play = async ({ canvasElement }) => {
 /** Off, on, and disabled in each position. */
 export const States = () => (
     <div style={stack}>
-        <Toggle id="toggle-off" label="Off" />
-        <Toggle id="toggle-on" label="On" defaultChecked />
-        <Toggle id="toggle-disabled" label="Disabled" isDisabled />
-        <Toggle id="toggle-disabled-on" label="Disabled and on" isDisabled defaultChecked />
+        <Toggle id="toggle-off" label="Session alerts" />
+        <Toggle id="toggle-on" label="Email reminders" defaultChecked />
+        <Toggle id="toggle-disabled" label="Auto-assign cover" isDisabled />
+        <Toggle id="toggle-disabled-on" label="Family recap" isDisabled defaultChecked />
     </div>
 );
 
@@ -131,8 +131,8 @@ Loading.play = async ({ canvasElement }) => {
 /** Short and long labels. */
 export const Content = () => (
     <div style={stack}>
-        <Toggle id="toggle-short" label="Wi-Fi" defaultChecked />
-        <Toggle id="toggle-long" label="Enable email notifications for all activity" />
+        <Toggle id="toggle-short" label="Reminders" defaultChecked />
+        <Toggle id="toggle-long" label="Email reminders for all upcoming sessions" />
     </div>
 );
 
@@ -154,7 +154,7 @@ export const Interactive = (args) => {
 };
 
 Interactive.args = {
-    label: 'Allow pull requests',
+    label: 'Session reminders',
     size: 16,
     isDisabled: false,
     isReadOnly: false,
@@ -201,10 +201,10 @@ KeyboardFocus.play = async ({ canvasElement }) => {
  */
 export const TrackColors = () => (
     <div style={stack}>
-        <Toggle id="toggle-c-off" label="Off" />
-        <Toggle id="toggle-c-on" label="On" defaultChecked />
-        <Toggle id="toggle-c-dis" label="Disabled off" isDisabled />
-        <Toggle id="toggle-c-dis-on" label="Disabled on" isDisabled defaultChecked />
+        <Toggle id="toggle-c-off" label="Session alerts" />
+        <Toggle id="toggle-c-on" label="Email reminders" defaultChecked />
+        <Toggle id="toggle-c-dis" label="Auto-assign cover" isDisabled />
+        <Toggle id="toggle-c-dis-on" label="Family recap" isDisabled defaultChecked />
     </div>
 );
 TrackColors.parameters = { docs: { disable: true } };
@@ -214,13 +214,13 @@ TrackColors.play = async ({ canvasElement }) => {
     const fill = (el) => getComputedStyle(el).backgroundColor;
     const hovered = (el) => withForcedPseudo(el, ':hover', () => getComputedStyle(el).backgroundColor);
     await inEveryColorModeOf(canvasElement, async (mode, token) => {
-        await expect(fill(control('Off')), `${mode}: off track`).toBe(token('--ds-background-neutral-bold'));
-        await expect(fill(control('On')), `${mode}: on track`).toBe(token('--ds-background-selected-bold'));
-        await expect(hovered(control('Off')), `${mode}: off hovered`).toBe(token('--ds-background-neutral-bold-hovered'));
-        await expect(hovered(control('On')), `${mode}: on hovered`).toBe(token('--ds-background-selected-bold-hovered'));
+        await expect(fill(control('Session alerts')), `${mode}: off track`).toBe(token('--ds-background-neutral-bold'));
+        await expect(fill(control('Email reminders')), `${mode}: on track`).toBe(token('--ds-background-selected-bold'));
+        await expect(hovered(control('Session alerts')), `${mode}: off hovered`).toBe(token('--ds-background-neutral-bold-hovered'));
+        await expect(hovered(control('Email reminders')), `${mode}: on hovered`).toBe(token('--ds-background-selected-bold-hovered'));
         const thumb = (el) => el.querySelector('.plus-toggle-thumb');
-        await expect(getComputedStyle(thumb(control('On'))).backgroundColor, `${mode}: thumb`).toBe(token('--ds-icon-inverse'));
-        for (const name of ['Disabled off', 'Disabled on']) {
+        await expect(getComputedStyle(thumb(control('Email reminders'))).backgroundColor, `${mode}: thumb`).toBe(token('--ds-icon-inverse'));
+        for (const name of ['Auto-assign cover', 'Family recap']) {
             await expect(fill(control(name)), `${mode}: ${name} track`).toBe(token('--ds-background-disabled'));
             await expect(getComputedStyle(thumb(control(name))).backgroundColor, `${mode}: ${name} thumb`).toBe(token('--ds-icon-disabled'));
         }

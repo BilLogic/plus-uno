@@ -143,6 +143,7 @@ WidthFromTheBrowser.play = async ({ canvasElement }) => {
     const doc = documentOf(canvasElement);
     const view = canvasElement.ownerDocument.defaultView;
     const dialog = (await doc.findByText('Read from the screen')).closest('.plus-modal');
+    await settleAnimations(dialog);
     // Screen pad 24: from 1440, where the pad is 32, the grid is capped either way.
     const grid = Math.min(1232, Math.max(720, view.innerWidth - 2 * 24));
     const column = (grid - 11 * 16) / 12;
@@ -169,7 +170,12 @@ function HeightCase({ height, body, title }) {
 }
 
 const capOf = (canvasElement) => lengthOf(canvasElement.ownerDocument, '--blanket-max-height-modal');
-const dialogOf = async (canvasElement, title) => (await documentOf(canvasElement).findByText(title)).closest('.plus-modal');
+/** The open dialog, read once its entrance has settled: geometry is measured on the resting surface. */
+const dialogOf = async (canvasElement, title) => {
+    const dialog = (await documentOf(canvasElement).findByText(title)).closest('.plus-modal');
+    await settleAnimations(dialog);
+    return dialog;
+};
 
 export const HugShort = () => <HeightCase height="hug" body={SHORT} title="Hug, short" />;
 HugShort.play = async ({ canvasElement }) => {

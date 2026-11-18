@@ -4,6 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { Button } from '@/components';
 import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid, expectReadOnly } from '../_internal/fieldStatePlays';
+import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 import TextField from './TextField';
 import { iconClass } from '../../../lib/icon';
 
@@ -56,8 +57,7 @@ export default {
     }
 };
 
-const caption = 'text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3';
-const row = { display: 'flex', flexWrap: 'wrap', gap: 24, alignItems: 'flex-start' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--section-stack-lg)', alignItems: 'flex-start' };
 const px = (value) => Math.round(parseFloat(value));
 const icon = (name) => <i className={iconClass(name)} aria-hidden="true" />;
 const fieldWrap = { maxWidth: 'var(--width-2500)' };
@@ -67,8 +67,8 @@ export const Overview = () => (
     <div style={fieldWrap}>
         <TextField
             id="text-field-overview"
-            label="Label"
-            placeholder="Placeholder"
+            label="Tutor email"
+            placeholder="name@school.edu"
             isRequired
             elemAfterInput={icon('icons')}
         />
@@ -102,11 +102,11 @@ export const Success = () => (
 );
 
 export const SpacingDefault = () => (
-    <div style={fieldWrap}><TextField label="Your name" placeholder="Placeholder" spacing="default" elemAfterInput={icon('icons')} /></div>
+    <div style={fieldWrap}><TextField label="Your name" placeholder="Maya Johnson" spacing="default" elemAfterInput={icon('icons')} /></div>
 );
 
 export const SpacingCompact = () => (
-    <div style={fieldWrap}><TextField label="Your name" placeholder="Placeholder" spacing="compact" elemAfterInput={icon('icons')} /></div>
+    <div style={fieldWrap}><TextField label="Your name" placeholder="Maya Johnson" spacing="compact" elemAfterInput={icon('icons')} /></div>
 );
 
 /** Spacing: 40 by default, 32 compact. */
@@ -114,12 +114,12 @@ export const Spacing = () => (
     <div style={row}>
         {['default', 'compact'].map((spacing) => (
             <div key={spacing}>
-                <span className={caption}>{spacing === 'default' ? 'DEFAULT (40)' : 'COMPACT (32)'}</span>
+                <DemoLabel>{spacing === 'default' ? 'DEFAULT (40)' : 'COMPACT (32)'}</DemoLabel>
                 <TextField
                     id={`text-field-spacing-${spacing}`}
                     label={`${spacing} field`}
                     isLabelHidden
-                    placeholder="Placeholder"
+                    placeholder="Maya Johnson"
                     spacing={spacing}
                     elemAfterInput={icon('icons')}
                 />
@@ -142,7 +142,7 @@ Spacing.play = async ({ canvasElement }) => {
  * they were at rest, and a 2px ring in `border.focused` is drawn 2px off the box.
  */
 export const FocusRing = () => (
-    <div style={{ maxWidth: 320 }}>
+    <div style={{ maxWidth: 'var(--field-width-lg)' }}>
         <TextField id="text-field-focus" label="Your name" placeholder="Name" />
     </div>
 );
@@ -197,8 +197,8 @@ Interactive.args = {
     errorMessage: '',
     isLabelHidden: false,
     isRequired: true,
-    label: 'Label',
-    placeholder: 'Placeholder',
+    label: 'Tutor email',
+    placeholder: 'name@school.edu',
 };
 
 /**
@@ -206,7 +206,7 @@ Interactive.args = {
  * carries a message on the left and a count on the right.
  */
 export const Anatomy = () => (
-    <div style={{ maxWidth: '360px' }}>
+    <div style={{ maxWidth: '360px' /* token gap: 360px */ }}>
         <TextField
             id="text-field-anatomy"
             label="Full name"
@@ -249,7 +249,7 @@ Anatomy.play = async ({ canvasElement }) => {
 export const ErrorAndCount = () => {
     const [value, setValue] = useState('A summary that runs long');
     return (
-        <div style={{ maxWidth: '360px' }}>
+        <div style={{ maxWidth: '360px' /* token gap: 360px */ }}>
             <TextField
                 id="text-field-count"
                 label="Headline"
@@ -281,11 +281,11 @@ ErrorAndCount.play = async ({ canvasElement }) => {
 
 /** A warning accepts the value: the field is not invalid, and it is described, not announced. */
 export const Warning = () => (
-    <div style={{ maxWidth: '360px' }}>
+    <div style={{ maxWidth: '360px' /* token gap: 360px */ }}>
         <TextField
             id="text-field-warning"
             label="Meeting link"
-            defaultValue="http://example.com"
+            defaultValue="http://tutoring.lincoln.edu/room"
             warningMessage="This link is not secure."
         />
     </div>
@@ -306,7 +306,7 @@ Warning.play = async ({ canvasElement }) => {
 
 /** `autoComplete` reaches the input, for the browser and password managers. */
 export const Autofill = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: '360px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: '360px' /* token gap: 360px */ }}>
         <TextField id="text-field-autofill-email" label="Email address" type="email" autoComplete="email" />
         <TextField id="text-field-autofill-password" label="Password" type="password" autoComplete="current-password" />
         <TextField id="text-field-autofill-code" label="Access code" autoComplete="one-time-code" />
@@ -322,7 +322,7 @@ Autofill.play = async ({ canvasElement }) => {
 
 /** Search: the magnifier before the control and a visually hidden label. */
 export const Search = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: '360px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: '360px' /* token gap: 360px */ }}>
         <TextField id="text-field-search-compact" label="Search tutors" isLabelHidden type="search" spacing="compact" placeholder="Search tutors" elemBeforeInput={icon('magnifying-glass')} />
         <TextField id="text-field-search" label="Search tutors" isLabelHidden type="search" placeholder="Search tutors" elemBeforeInput={icon('magnifying-glass')} />
     </div>
@@ -336,7 +336,7 @@ Search.play = async ({ canvasElement }) => {
 
 /** Buttons in the slots: 32 in the 40 field, 24 in the 32 field, centered, 4 from the edge. */
 export const ButtonsInside = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: '360px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: '360px' /* token gap: 360px */ }}>
         <div data-field="default">
             <TextField
                 label="Invite by email"
@@ -380,7 +380,7 @@ const slowSave = (value) => new Promise((resolve, reject) => {
 export const Subtle = (args) => {
     const [saved, setSaved] = useState('8th grade');
     return (
-        <div style={{ maxWidth: '360px' }}>
+        <div style={{ maxWidth: '360px' /* token gap: 360px */ }}>
             <TextField
                 id="text-field-subtle"
                 label="Grade level"
@@ -435,7 +435,7 @@ Subtle.play = async ({ canvasElement, args }) => {
 
 /** Helper text is `text.subtle`; an error message is `text.danger` on a `border.danger` field. */
 export const CaptionColors = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '320px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: 'var(--field-width-lg)' }}>
         <TextField id="caption-help" label="Email" caption="We only use it for reminders." />
         <TextField id="caption-invalid" label="Phone" isInvalid errorMessage="Enter a 10-digit number" />
     </div>
@@ -459,7 +459,7 @@ CaptionColors.play = async ({ canvasElement }) => {
  * plus, named for the field they change. They are 32 in the 40 field.
  */
 export const NumberSteppers = () => (
-    <div style={{ maxWidth: '320px' }}>
+    <div style={{ maxWidth: 'var(--field-width-lg)' }}>
         <TextField id="text-field-steppers" type="number" label="Tutors per session" defaultValue="3" min={1} max={5} />
     </div>
 );
@@ -488,7 +488,7 @@ NumberSteppers.play = async ({ canvasElement }) => {
 export const NumberEmptyIsNotZero = () => {
     const [value, setValue] = useState('');
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16, maxWidth: '320px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: 'var(--field-width-lg)' }}>
             <TextField id="text-field-empty" type="number" label="Hours" value={value} onChange={(e) => setValue(e.target.value)} />
             <output data-testid="held">{JSON.stringify(value)}</output>
             <TextField id="text-field-floor" type="number" label="Students" min={5} />
@@ -516,7 +516,7 @@ NumberEmptyIsNotZero.play = async ({ canvasElement }) => {
 
 /** A typed number outside min and max is brought inside when the field loses focus. */
 export const NumberClampOnBlur = () => (
-    <div style={{ maxWidth: '320px' }}>
+    <div style={{ maxWidth: 'var(--field-width-lg)' }}>
         <TextField id="text-field-clamp" type="number" label="Sessions" min={1} max={10} />
     </div>
 );
@@ -535,7 +535,7 @@ NumberClampOnBlur.play = async ({ canvasElement }) => {
 
 /** Scrolling over a focused number field does not change the number. */
 export const NumberWheelLeavesTheValue = () => (
-    <div style={{ maxWidth: '320px' }}>
+    <div style={{ maxWidth: 'var(--field-width-lg)' }}>
         <TextField id="text-field-wheel" type="number" label="Capacity" defaultValue="4" />
     </div>
 );
@@ -551,7 +551,7 @@ NumberWheelLeavesTheValue.play = async ({ canvasElement }) => {
 
 /** A read-only number field hides the steppers; the value can still be read. */
 export const NumberReadOnly = () => (
-    <div style={{ maxWidth: '320px' }}>
+    <div style={{ maxWidth: 'var(--field-width-lg)' }}>
         <TextField id="text-field-number-readonly" type="number" label="Seats" defaultValue="12" isReadOnly />
     </div>
 );

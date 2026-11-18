@@ -14,7 +14,7 @@ Also asked as: callout, inline alert, warning box.
 
 **Source:** `design-system/src/components/messaging/SectionMessage/SectionMessage.jsx`
 
-**Stories:** `design-system/src/components/messaging/SectionMessage/SectionMessage.stories.jsx` — Primary, Secondary, Success, Danger, Warning, Info, Content, Overview, Interactive, DismissPlacement, LeadingIcon, GroundAndText, Actions, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/messaging/SectionMessage/SectionMessage.stories.jsx` — Primary, Secondary, Success, Danger, Warning, Info, Content, Overview, Interactive, DismissPlacement, LeadingIcon, GroundAndText, Actions, Rest, Hovered, Pressed, Focused, MotionEnterAndExit, MotionReduced
 
 **Storybook page:** `design-system/src/components/messaging/SectionMessage/SectionMessage.mdx`
 

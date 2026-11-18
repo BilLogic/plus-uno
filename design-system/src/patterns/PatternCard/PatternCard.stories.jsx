@@ -4,14 +4,15 @@ import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { computedShadow, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { PatternCard } from '@/patterns';
-import { Skeleton, Button, IconButton } from '@/components';
+import { Skeleton, Button, IconButton, Image } from '@/components';
 import { CardJobs } from './PatternCardCases.jsx';
 import { ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
+import sessionSummaryLight from '@/assets/images/kit/session-summary-light.svg';
 
 const bodyCopy = (
     <p className="body-lg" style={{ margin: 0 }}>
-        Some quick example text to fill the body slot of the card shell.
+        Reviewed two-step equations with Ava T. and assigned practice set 4 for Thursday’s session.
     </p>
 );
 
@@ -35,21 +36,14 @@ const sessionBody = (
 const viewSession = <Button text="View session" appearance="subtle" spacing="compact" onClick={() => {}} />;
 
 const imagePlaceholder = (ratio) => (
-    <div
+    <Image
+        src={sessionSummaryLight}
+        alt={`Weekly tutoring session summary (${ratio})`}
         style={{
             aspectRatio: ratio.replace(':', ' / '),
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 'var(--inline-md)',
-            backgroundColor: 'var(--ds-background-neutral)',
-            color: 'var(--ds-text-subtle)',
-            font: 'var(--body-default)',
+            objectFit: 'cover',
         }}
-    >
-        <i className="fa-regular fa-image" aria-hidden="true" />
-        {ratio}
-    </div>
+    />
 );
 
 /** A row of cards at three content widths: the most that keeps each card at its minimum. */
@@ -63,7 +57,7 @@ function PatternCardRowsDemo() {
         ['Marcus Lee', 'Roosevelt K-8 · Thu 5:00 PM'],
     ];
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-300)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' /* token gap: 48px */ }}>
             {[['Medium', 720], ['Large', 736], ['X-Large', 1152]].map(([mode, width]) => (
                 <div key={mode}>
                     <DemoCaption>{`${mode} · content ${width}`}</DemoCaption>
@@ -159,7 +153,7 @@ export default {
 
 export const Overview = () => (
     <div style={{ maxWidth: 'var(--card-min-width-lg)', width: '100%' }}>
-        <PatternCard title="Card title" description="A line that says what the card holds.">
+        <PatternCard title="Grade 7 math · Session 4" description="Lincoln Middle · Thu 4:00 PM">
             {bodyCopy}
         </PatternCard>
     </div>
@@ -207,10 +201,10 @@ export const Interactive = {
 export const Elevation = {
     parameters: { docs: { disable: true } },
     render: () => (
-        <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
-            <PatternCard title="Static" minWidth={200}>{bodyCopy}</PatternCard>
-            <PatternCard title="Clickable" minWidth={200} role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</PatternCard>
-            <PatternCard title="Dragging" minWidth={200} dragging>{bodyCopy}</PatternCard>
+        <div style={{ display: 'flex', gap: 'var(--section-stack-lg)', flexWrap: 'wrap' }}>
+            <PatternCard title="Static" minWidth={200 /* token gap: 200px */}>{bodyCopy}</PatternCard>
+            <PatternCard title="Clickable" minWidth={200 /* token gap: 200px */} role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</PatternCard>
+            <PatternCard title="Dragging" minWidth={200 /* token gap: 200px */} dragging>{bodyCopy}</PatternCard>
         </div>
     ),
     play: async ({ canvas, canvasElement }) => {
@@ -302,8 +296,8 @@ export const ImageSquare = { name: 'Image 1:1', render: () => imageCard('1:1') }
 const placementStory = (imagePlacement, state = 'rest', imageSplit = '1/3') => ({
     render: () => (
         <PatternCard imagePlacement={imagePlacement} imageSplit={imageSplit}
-            image={<img alt="Session illustration" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='90'%3E%3C/svg%3E"
-                style={{ display: 'block', width: '100%', aspectRatio: '16 / 9', background: 'var(--ds-skeleton)' }} />}
+            image={<Image alt="Session illustration" src={sessionSummaryLight}
+                style={{ aspectRatio: '16 / 9', objectFit: 'cover' }} />}
             title="Ana Ruiz" description="Lincoln Middle · Thu 4:00 PM" footer={viewSession}
             role="article" aria-label="Session summary" dragging={state === 'dragging'}
             onClick={state === 'hovered' || state === 'pressed' ? () => {} : undefined}
@@ -376,9 +370,9 @@ export const BodyOnly = () => (
 /** A header with actions over the body, and a footer for actions that commit. */
 export const WithFooter = () => (
     <PatternCard
-        title="Card title"
-        actions={slotNote('Actions slot')}
-        footer={slotNote('Footer slot')}
+        title="Grade 7 math · Session 4"
+        actions={slotNote('Save or edit')}
+        footer={slotNote('Next: Practice set 4')}
         style={{ maxWidth: 'var(--card-min-width-lg)' }}
     >
         {bodyCopy}
@@ -387,7 +381,7 @@ export const WithFooter = () => (
 
 /** `header` replaces the title, description and actions. */
 export const CustomHeader = () => (
-    <PatternCard header={slotNote('Custom header slot: tabs or a toolbar')} style={{ maxWidth: 'var(--card-min-width-lg)' }}>
+    <PatternCard header={slotNote('Session notes · Oct 24')} style={{ maxWidth: 'var(--card-min-width-lg)' }}>
         {bodyCopy}
     </PatternCard>
 );
@@ -449,7 +443,7 @@ export const PlacementBoundary = {
             {['start', 'end'].flatMap((placement) => ['1/3', '1/2'].map((split) => (
                 <PatternCard key={`${placement}-${split}`} imagePlacement={placement} imageSplit={split}
                     image={imagePlaceholder('1:1')} title="Ana Ruiz" role="article"
-                    aria-label={`${placement} ${split}`} style={{ width: 479 }}>
+                    aria-label={`${placement} ${split}`} style={{ width: 479 /* token gap: 479px */ }}>
                     {sessionBody}
                 </PatternCard>
             )))}

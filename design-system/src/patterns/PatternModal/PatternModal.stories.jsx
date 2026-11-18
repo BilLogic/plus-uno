@@ -858,7 +858,8 @@ export const KeyConfirmInside = {
         await userEvent.click(canvas.getByRole('button', { name: 'Delete session' }));
         await expect(canvas.getAllByRole('dialog'), 'still one Modal').toHaveLength(1);
         await expect(canvas.getByRole('heading', { level: 1, name: 'Delete session?' }), 'the title swaps in place').toBeInTheDocument();
-        await expect(canvas.getByText(/cannot be undone/), 'a warning SectionMessage says the consequence').toBeVisible();
+        await waitFor(() => expect(canvas.getByText(/cannot be undone/), 'a warning SectionMessage says the consequence').toBeVisible());
+        await settleAnimations(canvasElement);
         await expect(canvasElement.querySelector('.plus-section-message--warning, [class*="section-message"][class*="warning"]'), 'the message is the warning appearance').not.toBeNull();
         await expect(canvas.getByRole('button', { name: 'Delete session' }), 'the action is Danger').toHaveClass('plus-btn--danger');
         await userEvent.click(canvas.getByRole('button', { name: 'Back' }));

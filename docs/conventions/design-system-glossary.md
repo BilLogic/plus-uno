@@ -180,8 +180,8 @@ _Avoid_: "delta tag", "trend indicator"
 A label that shows a date or due date, colored by how close it is.
 _Avoid_: "date pill"
 
-**SMART tag**:
-A label for one of the **SMART** competencies, in its curriculum color.
+**Competency tag**:
+A label for one of the **SMART** competency areas, in its curriculum color.
 _Avoid_: "skill tag"
 
 **Suggestion**:

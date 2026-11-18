@@ -70,7 +70,7 @@ export default {
     },
 };
 
-const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxWidth: '360px' };
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxWidth: '360px' /* token gap: 360px */ };
 
 /** A controlled group of radios sharing one name. */
 const Group = ({ name, options, initial, ...radioProps }) => {
@@ -94,9 +94,9 @@ const Group = ({ name, options, initial, ...radioProps }) => {
 };
 
 const OPTIONS = [
-    { value: 'option1', label: 'Option 1' },
-    { value: 'option2', label: 'Option 2' },
-    { value: 'option3', label: 'Option 3' },
+    { value: 'option1', label: 'In person' },
+    { value: 'option2', label: 'Online' },
+    { value: 'option3', label: 'Hybrid' },
 ];
 
 export const Overview = () => <Group name="radio-overview" options={OPTIONS.slice(0, 2)} initial="option1" />;
@@ -162,9 +162,9 @@ export const Interactive = (args) => {
 };
 
 Interactive.args = {
-    label: 'Option 1',
-    secondLabel: 'Option 2',
-    thirdLabel: 'Option 3',
+    label: 'In person',
+    secondLabel: 'Online',
+    thirdLabel: 'Hybrid',
     isInvalid: false,
     isDisabled: false,
     isReadOnly: false,
@@ -196,7 +196,7 @@ ReadOnly.play = async ({ canvasElement }) => {
 
 /** A description under the label, and the card appearance. */
 export const DescriptionAndCard = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxWidth: '360px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxWidth: '360px' /* token gap: 360px */ }}>
         <Radio id="radio-desc" name="radio-desc" label="Weekly" value="weekly" description="Every week at the same time."/>
         <Radio id="radio-card" name="radio-card" label="Just once" value="once" description="A single session." appearance="card" defaultChecked/>
     </div>
@@ -485,20 +485,20 @@ const BigSvg = () => (
 );
 
 export const TileNarrowLargeIllustrations = () => (
-    <div style={{ width: 320, /* 320px: the narrow-phone container width the ticket names */ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-        <Radio id="radio-narrow-character" name="radio-narrow" value="a" label="Character" illustration={<Illustration character="relationships" size={240} />} appearance="tile" />
-        <Radio id="radio-narrow-svg" name="radio-narrow" value="b" label="Svg" illustration={<BigSvg />} appearance="tile" />
+    <div style={{ width: 'var(--width-2000)', /* 320px: the narrow-phone container width the ticket names */ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
+        <Radio id="radio-narrow-character" name="radio-narrow" value="a" label="One-on-one" illustration={<Illustration character="relationships" size={240} />} appearance="tile" />
+        <Radio id="radio-narrow-svg" name="radio-narrow" value="b" label="Small group" illustration={<BigSvg />} appearance="tile" />
         <Radio
             id="radio-narrow-img"
             name="radio-narrow"
             value="c"
-            label="Image"
+            label="Drop-in lab"
             illustration={<img alt="" width="300" height="300" src={SQUARE_IMAGE} />}
             appearance="tile"
         />
         {/* 160px: the smallest container a tile is asked to fit */}
-        <div style={{ width: 160 }}>
-            <Radio id="radio-narrow-small" name="radio-narrow-small" value="d" label="Smallest" illustration={<Illustration character="relationships" size={240} />} appearance="tile" />
+        <div style={{ width: 'var(--width-1000)' }}>
+            <Radio id="radio-narrow-small" name="radio-narrow-small" value="d" label="Study hall" illustration={<Illustration character="relationships" size={240} />} appearance="tile" />
         </div>
     </div>
 );

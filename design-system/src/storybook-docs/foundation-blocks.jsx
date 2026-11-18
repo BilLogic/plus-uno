@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StatusTag, Icon } from '@/components';
+import { Button, StatusTag, Icon } from '@/components';
 import { DocsTable, DoDontCard } from '@/storybook-docs/ds-docs-layout.jsx';
 import { usePageContrast } from '@/storybook-docs/lib/use-page-contrast.js';
 
@@ -167,25 +167,15 @@ export const ModeCompare = ({ children, initial = 'both', stacked = false }) => 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-sm)' }}>
             <div role="group" aria-label="Color mode for these examples" style={{ display: 'inline-flex', gap: 'var(--inline-sm)' }}>
                 {MODES.map((m) => (
-                    <button
+                    <Button
                         key={m.id}
-                        type="button"
+                        appearance="subtle"
+                        spacing="compact"
+                        isSelected={mode === m.id}
                         aria-pressed={mode === m.id}
                         onClick={() => setMode(m.id)}
-                        style={{
-                            height: 'var(--control-md)',
-                            padding: '0 var(--pad-x-md)',
-                            borderRadius: 'var(--radius-control-md)',
-                            border: 'var(--border-width-default) solid var(--ds-border)',
-                            background: mode === m.id ? 'var(--ds-background-selected)' : 'var(--ds-background-neutral-subtle)',
-                            color: mode === m.id ? 'var(--ds-text-selected)' : 'var(--ds-text-subtle)',
-                            font: 'var(--body-default)',
-                            fontWeight: 'var(--type-weight-medium)',
-                            cursor: 'pointer',
-                        }}
-                    >
-                        {m.label}
-                    </button>
+                        text={m.label}
+                    />
                 ))}
             </div>
             <div

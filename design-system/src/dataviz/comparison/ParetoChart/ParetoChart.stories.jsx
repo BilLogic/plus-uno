@@ -42,7 +42,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Support ticket analysis</Heading>
+                <Heading as="h3" size="sm">Support ticket analysis</Heading>
                 <p style={captionStyle}>
                     Columns sorted from largest to smallest with a cumulative share line.
                 </p>
@@ -65,9 +65,9 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        categories: ['A', 'B', 'C', 'D', 'E'],
+        categories: ['Fractions', 'Linear equations', 'Reading fluency', 'Geometry', 'Essay structure'],
         data: [50, 30, 12, 5, 3],
-        yAxisLabel: 'Count',
+        yAxisLabel: 'Tutoring sessions',
         height: 400,
     },
 };

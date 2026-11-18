@@ -11,7 +11,7 @@ export default {
 };
 
 export const Kinds = () => (
-    <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+    <div style={{ display: 'flex', gap: 'var(--grid-gutter)', alignItems: 'center' }}>
         <TaskIcon testId="object-task" />
         <BugIcon testId="object-bug" />
         <IdeaIcon testId="object-idea" />
@@ -27,7 +27,7 @@ Kinds.play = async ({ canvasElement }) => {
 };
 
 export const Sizes = () => (
-    <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+    <div style={{ display: 'flex', gap: 'var(--grid-gutter)', alignItems: 'center' }}>
         {OBJECT_SIZES.map((size) => <TaskIcon key={size} size={size} testId={`object-size-${size}`} />)}
     </div>
 );

@@ -53,7 +53,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Session structure</Heading>
+                <Heading as="h3" size="sm">Session structure</Heading>
                 <p style={captionStyle}>
                     Click an inner ring to drill into a university partner and its school sites.
                 </p>
@@ -79,13 +79,13 @@ export const Interactive = {
         height: 400,
         sort: true,
         data: [
-            { id: 'root', parent: '', name: 'Root' },
-            { id: 'a', parent: 'root', name: 'A' },
-            { id: 'b', parent: 'root', name: 'B' },
-            { id: 'a1', parent: 'a', name: 'A1', value: 10 },
-            { id: 'a2', parent: 'a', name: 'A2', value: 15 },
-            { id: 'b1', parent: 'b', name: 'B1', value: 20 },
-            { id: 'b2', parent: 'b', name: 'B2', value: 10 },
+            { id: 'root', parent: '', name: 'Lincoln Middle' },
+            { id: 'math', parent: 'root', name: 'Math' },
+            { id: 'reading', parent: 'root', name: 'Reading' },
+            { id: 'g6-math', parent: 'math', name: 'Grade 6', value: 10 },
+            { id: 'g7-math', parent: 'math', name: 'Grade 7', value: 15 },
+            { id: 'g6-read', parent: 'reading', name: 'Grade 6', value: 20 },
+            { id: 'g7-read', parent: 'reading', name: 'Grade 7', value: 10 },
         ],
     },
 };

@@ -133,22 +133,6 @@
       }
     },
     {
-      "id": "VariableID:19364:206",
-      "name": "Space/space-0875",
-      "variableCollectionId": "VariableCollectionId:19364:197",
-      "resolvedType": "FLOAT",
-      "valuesByMode": {
-        "19364:14": 14
-      },
-      "resolvedValuesByMode": {
-        "19364:14": 14
-      },
-      "scopes": [],
-      "codeSyntax": {
-        "WEB": "var(--space-0875)"
-      }
-    },
-    {
       "id": "VariableID:19364:207",
       "name": "Space/space-100",
       "variableCollectionId": "VariableCollectionId:19364:197",
@@ -672,22 +656,6 @@
       },
       "resolvedValuesByMode": {
         "19364:14": 640
-      }
-    },
-    {
-      "id": "VariableID:19675:181",
-      "name": "Space/space-03125",
-      "variableCollectionId": "VariableCollectionId:19364:197",
-      "resolvedType": "FLOAT",
-      "valuesByMode": {
-        "19364:14": 5
-      },
-      "resolvedValuesByMode": {
-        "19364:14": 5
-      },
-      "scopes": [],
-      "codeSyntax": {
-        "WEB": "var(--space-03125)"
       }
     }
   ]

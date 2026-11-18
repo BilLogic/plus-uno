@@ -9,9 +9,9 @@
  * (`__content`) whose right padding, added to the outer right padding, makes
  * the label's right inset equal its left one: 4 in default, 12 in spacious. A
  * nested count is the outer box's last child, so it sits at the outer right
- * padding — 2 in default, 6 in spacious — which, centered in the height, is the
- * same inset from the top. The 2 and 6 have no Element token, so they take the
- * spacing primitives Figma binds.
+ * padding — 2 in default, 6 in spacious — and the 16 count centers vertically
+ * in both. The 2 and 6 have no Element token, so they take the spacing
+ * primitives Figma binds.
  *
  * THE BORDER IS AN INSET SHADOW. A 1px inside border that takes no layout, as
  * a Figma inside stroke does, so the height and the padding stay exact.
@@ -109,7 +109,7 @@ $status-state: (
     'warning': (var(--ds-background-warning), var(--ds-text-warning), var(--ds-background-warning-pressed)),
     'danger': (var(--ds-background-danger), var(--ds-text-danger), var(--ds-background-danger-pressed)),
     'info': (var(--ds-background-information), var(--ds-text-information), var(--ds-background-information-pressed)),
-    'discovery': (var(--ds-background-smart-mastering-content), var(--ds-text-smart-mastering-content), var(--ds-background-smart-mastering-content-pressed)),
+    'discovery': (var(--ds-background-competency-mastering-content), var(--ds-text-competency-mastering-content), var(--ds-background-competency-mastering-content-pressed)),
 );
 
 @each $name, $look in $status-state {

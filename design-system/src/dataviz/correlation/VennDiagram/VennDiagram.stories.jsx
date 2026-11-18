@@ -50,7 +50,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Subject tutoring certifications</Heading>
+                <Heading as="h3" size="sm">Subject tutoring certifications</Heading>
                 <p style={captionStyle}>
                     Three overlapping certification sets across tutoring subjects.
                 </p>
@@ -58,7 +58,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Program participation overlap</Heading>
+                <Heading as="h3" size="sm">Program participation overlap</Heading>
                 <p style={captionStyle}>
                     Students enrolled in tutoring, study hall or both programs.
                 </p>
@@ -82,9 +82,9 @@ export const Overview = {
 export const Interactive = {
     args: {
         data: [
-            { sets: ['A'], value: 10, name: 'Set A' },
-            { sets: ['B'], value: 8, name: 'Set B' },
-            { sets: ['A', 'B'], value: 4, name: 'A & B' },
+            { sets: ['Math'], value: 120, name: 'Math tutoring' },
+            { sets: ['Reading'], value: 96, name: 'Reading tutoring' },
+            { sets: ['Math', 'Reading'], value: 42, name: 'Math and reading' },
         ],
         height: 400,
     },

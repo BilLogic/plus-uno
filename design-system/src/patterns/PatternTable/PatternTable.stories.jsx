@@ -59,8 +59,13 @@ const emptyStateSlot = (
 );
 
 const wideColumns = ['Name', 'Role', 'Status', 'School', 'Platform', 'Sessions', 'Last session', 'Mentor'];
-const wideRows = Array.from({ length: 12 }, (_, i) => [
-    `Tutor ${i + 1}`, i % 2 ? 'Coach' : 'Tutor', i % 3 ? 'Active' : 'Invited',
+const wideTutors = [
+    'Maya K.', 'Jordan B.', 'Casey R.', 'Morgan L.',
+    'Priya N.', 'Daniel K.', 'Grace O.', 'Ana R.',
+    'Marcus L.', 'Sofia P.', 'Liam T.', 'Nadia H.',
+];
+const wideRows = wideTutors.map((name, i) => [
+    name, i % 2 ? 'Coach' : 'Tutor', i % 3 ? 'Active' : 'Invited',
     'Lincoln Middle', 'Zoom', `${10 + i}`, `Oct ${i + 1}`, 'Avery Kim',
 ]);
 
@@ -161,7 +166,7 @@ export const EmptyState = {
 export const EmptyWithStickyColumn = {
     parameters: { docs: { disable: true } },
     render: () => (
-        <PatternTable empty emptyState={emptyStateSlot} stickyColumn stickyHeader maxHeight={240}>
+        <PatternTable empty emptyState={emptyStateSlot} stickyColumn stickyHeader maxHeight="var(--width-1500)">
             {tableContent}
         </PatternTable>
     ),
@@ -276,9 +281,9 @@ export const RowStates = {
  */
 export const Sticky = {
     render: () => (
-        <div style={{ maxWidth: '480px' }}>
+        <div style={{ maxWidth: 'var(--width-3000)' }}>
             <PatternSection title="Tutors">
-                <PatternTable stickyHeader stickyColumn maxHeight={240}>
+                <PatternTable stickyHeader stickyColumn maxHeight="var(--width-1500)">
                     {wideTable}
                 </PatternTable>
             </PatternSection>
@@ -288,7 +293,7 @@ export const Sticky = {
         const canvas = within(canvasElement);
         const scroller = canvasElement.querySelector('.plus-pattern-table-scroll');
         const head = canvas.getByText('Role');
-        const selectedFirst = canvas.getByText('Tutor 3');
+        const selectedFirst = canvas.getByText('Casey R.');
         const color = (token) => tokenColor(canvasElement, token);
         const shadow = (el) => getComputedStyle(el).boxShadow;
 

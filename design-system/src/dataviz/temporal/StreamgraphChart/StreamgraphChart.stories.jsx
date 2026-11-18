@@ -46,7 +46,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Subject enrollment trends</Heading>
+                <Heading as="h3" size="sm">Subject enrollment trends</Heading>
                 <p style={captionStyle}>
                     Shows how enrollment across subjects shifts from month to month.
                 </p>
@@ -69,10 +69,10 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        categories: ['Q1', 'Q2', 'Q3', 'Q4'],
+        categories: ['Fall 2025', 'Winter 2025', 'Spring 2026', 'Summer 2026'],
         series: [
-            { name: 'Series A', data: [10, 20, 30, 25] },
-            { name: 'Series B', data: [15, 25, 20, 30] },
+            { name: 'Math', data: [10, 20, 30, 25] },
+            { name: 'Reading', data: [15, 25, 20, 30] },
         ],
         height: 400,
         sort: false,

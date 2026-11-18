@@ -216,11 +216,29 @@ const expectCorner = async (frame, surface) => {
 
 export const Overview = {
     // An ordinary page: no Back, no Close. Only a focused page shows them.
-    play: async ({ canvasElement }) => {
+    play: async ({ canvasElement, globals = {}, parameters = {} }) => {
         const canvas = within(canvasElement);
         await expect(canvas.queryByRole('button', { name: 'Back' }), 'no Back on an ordinary page').toBeNull();
         await expect(canvas.queryByRole('button', { name: 'Close' }), 'no Close on an ordinary page').toBeNull();
         await expect(canvasElement.querySelector('.plus-frame__back, .plus-frame__close'), 'no Back or Close in the header row').toBeNull();
+        const expected = parameters.browserFrame || globals.plusBrowser || 'chrome';
+        const browserFrame = canvasElement.querySelector('.plus-browser-frame');
+        if (expected === 'none') {
+            await expect(browserFrame, 'plusBrowser: none renders no browser frame').toBeNull();
+        } else {
+            await expect(browserFrame, 'Templates/ stories render with a browser frame').not.toBeNull();
+            await expect(browserFrame).toHaveAttribute('data-browser', expected);
+            await expect(browserFrame.querySelector('.plus-browser-frame__toolbar')).not.toBeNull();
+        }
+    },
+};
+
+/** Opting out of the default template browser frame via `parameters.browserFrame: 'none'`. */
+export const WithoutBrowserFrame = {
+    parameters: { browserFrame: 'none', docs: { disable: true } },
+    play: async ({ canvasElement }) => {
+        await expect(canvasElement.querySelector('.plus-browser-frame'), 'browserFrame: none opts out of the browser frame').toBeNull();
+        await expect(canvasElement.querySelector('.plus-frame')).not.toBeNull();
     },
 };
 
@@ -240,8 +258,8 @@ export const ColorModes = {
         const aside = sidebar();
         await expect(rect(aside).right, 'the sidebar sits flush against the surface').toBeCloseTo(rect(surface).left, 0);
         const edgeLine = 'var(--border-width-default) 0 0 0 var(--ds-border)';
-        await expect(tokenLength(frame, '--stroke-2'), 'the surface edge covers the divider')
-            .toBeGreaterThanOrEqual(tokenLength(frame, '--stroke-1'));
+        await expect(tokenLength(frame, '--page-border-width'), 'the surface edge covers the divider')
+            .toBeGreaterThanOrEqual(tokenLength(frame, '--border-width-default'));
         await inEveryColorMode(async (mode) => {
             const frameStyle = getComputedStyle(frame);
             const surfaceStyle = getComputedStyle(surface);
@@ -267,7 +285,7 @@ export const Reading = { args: { width: 'reading' } };
  * Docs examples. They render inline at a fixed height, so they follow the
  * toolbar's color mode like the rest of the page. Hidden from the sidebar.
  */
-const DOCS_HEIGHT = '420px';
+const DOCS_HEIGHT = '420px'; /* token gap: 420px */
 const DocsFrame = (args) => <FrameWithSlots {...args} height={DOCS_HEIGHT} />;
 
 export const DocsOverview = { render: DocsFrame, parameters: { layout: 'padded' } };
@@ -355,7 +373,7 @@ export const Medium768 = {
 
         await expect(offset(frame, surface).x, 'surface starts at the window edge').toBeCloseTo(0, 0);
         await expect(surfacePad(surface), 'surface pad').toBeCloseTo(tokenLength(frame, '--page-pad'), 0);
-        await expect(surfacePad(surface), 'surface pad is 24 at every width').toBeCloseTo(tokenLength(frame, '--space-150'), 0);
+        await expect(surfacePad(surface), 'surface pad is 24 at every width').toBeCloseTo(tokenLength(frame, '--page-pad-y-default'), 0);
         await expect(rect(content).width, 'content width').toBeCloseTo(tokenLength(frame, '--content-width'), 0);
         await expectNoSeam(frame, surface);
 
@@ -415,7 +433,7 @@ export const Large1024 = {
         await expect(getComputedStyle(sidebar()).position).not.toBe('absolute');
         await expect(offset(frame, surface).x).toBeCloseTo(tokenLength(frame, '--frame-sidebar-width'), 0);
         await expect(surfacePad(surface)).toBeCloseTo(tokenLength(frame, '--page-pad'), 0);
-        await expect(surfacePad(surface), 'surface pad is 24 at every width').toBeCloseTo(tokenLength(frame, '--space-150'), 0);
+        await expect(surfacePad(surface), 'surface pad is 24 at every width').toBeCloseTo(tokenLength(frame, '--page-pad-y-default'), 0);
         await expect(rect(content).width).toBeCloseTo(tokenLength(frame, '--content-width'), 0);
         await expectNoSeam(frame, surface);
         await expectCorner(frame, surface);
@@ -503,7 +521,7 @@ export const XLarge1440 = {
         await waitFor(() => expect(sidebar()).not.toBeNull());
         await expectToggleHome(frame, p.toggle);
         await expect(surfacePad(surface), 'surface pad from 1440').toBeCloseTo(tokenLength(frame, '--page-pad'), 0);
-        await expect(surfacePad(surface)).toBeCloseTo(tokenLength(frame, '--space-150'), 0);
+        await expect(surfacePad(surface)).toBeCloseTo(tokenLength(frame, '--page-pad-y-default'), 0);
         await expect(rect(content).width).toBeCloseTo(tokenLength(frame, '--content-width'), 0);
     }),
 };
@@ -845,7 +863,7 @@ export const PanelDockedAt1440 = {
         await expect(rect(panel).right, 'flush to the window edge').toBeCloseTo(rect(p.frame).right, 0);
         await expect(rect(panel).top, 'full height, from the top').toBeCloseTo(rect(p.frame).top, 0);
         await expect(rect(p.surface).right, 'the Page meets the Panel').toBeCloseTo(rect(panel).left, 0);
-        await expect(px(getComputedStyle(panel).borderLeftWidth), 'at a hairline').toBeCloseTo(tokenLength(p.frame, '--stroke-1'), 1);
+        await expect(px(getComputedStyle(panel).borderLeftWidth), 'at a hairline').toBeCloseTo(tokenLength(p.frame, '--border-width-default'), 1);
         await expect(getComputedStyle(panel).borderLeftColor, 'the start edge draws in the border color').toBe(tokenColor(p.frame, '--ds-border'));
         await expect(getComputedStyle(panel).backgroundColor, 'docked, the Panel is the Page fill').toBe(tokenColor(p.frame, '--ds-surface'));
         await expect(p.sidebar(), 'the Sidebar stays docked').not.toBeNull();
@@ -1517,7 +1535,7 @@ export const StateAt1440 = frameState(1440, {}, async (p) => sidebarIs(p, 'docke
 /** A page body made of placeholder bars, so the Frame's own structure is what reads. */
 const SkeletonSection = ({ title }) => (
     <PatternSection title={title}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-100)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
             <Skeleton preset="text" lines={3} />
         </div>
     </PatternSection>
@@ -1578,7 +1596,7 @@ const BareSignIn = () => {
     return (
         <BrowserWindow address="app.plus.org/sign-in" height={WINDOW_HEIGHT}>
             <Frame surfaceDirect>
-                <div data-probe="bare-column" style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 'var(--space-150)', maxInlineSize: 'var(--panel-min-width)', marginInline: 'auto', paddingBlock: 'var(--space-300)' }}>
+                <div data-probe="bare-column" style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 'var(--section-stack-lg)', maxInlineSize: 'var(--panel-min-width)', marginInline: 'auto', paddingBlock: '48px' /* token gap: 48px */ }}>
                     <Logo />
                     <TextField label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
                     <Button text="Sign in" appearance="primary" onClick={() => {}} />
@@ -2769,7 +2787,7 @@ const FocusedTaskTransitionDemo = () => {
                             <div style={{ display: 'flex', flexDirection: 'column', blockSize: '100%' }}>
                                 <Frame
                                     header={(
-                                        <div style={{ display: 'flex', alignItems: 'center', flex: '1 1 auto', gap: 'var(--space-100)', minInlineSize: 0 }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', flex: '1 1 auto', gap: 'var(--grid-gutter)', minInlineSize: 0 }}>
                                             <IconButton appearance="subtle" icon="xmark" label="Close" onClick={requestLeave} />
                                             <h1 style={{ margin: 0, font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>Log a session</h1>
                                         </div>
@@ -2894,8 +2912,8 @@ const FocusedStepMotionDemo = ({ count = 4, allowExtraBranch = false }) => {
                 <div style={{ display: 'flex', flexDirection: 'column', blockSize: '100%' }}>
                     <Frame
                         header={(
-                            <div data-probe="step-head" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: '1 1 auto', gap: 'var(--space-100)', minInlineSize: 0 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-100)' }}>
+                            <div data-probe="step-head" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: '1 1 auto', gap: 'var(--grid-gutter)', minInlineSize: 0 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--grid-gutter)' }}>
                                     <IconButton appearance="subtle" icon="xmark" label="Close" onClick={() => {}} />
                                     <h1 style={{ margin: 0, font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>Plan a tutoring term</h1>
                                 </div>
@@ -2907,7 +2925,7 @@ const FocusedStepMotionDemo = ({ count = 4, allowExtraBranch = false }) => {
                         width="reading"
                         style={{ flex: '1 1 auto', minBlockSize: 0 }}
                     >
-                        <div data-probe="steps-layout" data-steps={placement} style={{ display: 'flex', flexDirection: down ? 'row' : 'column', gap: 'var(--space-200)' }}>
+                        <div data-probe="steps-layout" data-steps={placement} style={{ display: 'flex', flexDirection: down ? 'row' : 'column', gap: 'var(--page-pad-x-default)' }}>
                             <div data-probe="steps" style={down ? { flex: `0 0 ${STEPS_RAIL}px`, inlineSize: STEPS_RAIL } : undefined}>
                                 <ProgressTracker
                                     label="Steps"

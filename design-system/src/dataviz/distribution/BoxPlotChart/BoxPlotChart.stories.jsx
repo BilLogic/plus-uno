@@ -53,7 +53,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Student score distribution by class</Heading>
+                <Heading as="h3" size="sm">Student score distribution by class</Heading>
                 <p style={captionStyle}>
                     Shows minimum, lower quartile, median, upper quartile and maximum scores, sorted from highest median to lowest.
                 </p>
@@ -66,7 +66,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Session duration by week</Heading>
+                <Heading as="h3" size="sm">Session duration by week</Heading>
                 <p style={captionStyle}>
                     Temporal weeks keep chronological order with {'sort={false}'}.
                 </p>
@@ -95,13 +95,13 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        categories: ['Group 1', 'Group 2', 'Group 3'],
+        categories: ['Grade 6', 'Grade 7', 'Grade 8'],
         data: [
-            [10, 25, 50, 75, 90],
-            [20, 35, 55, 70, 85],
-            [15, 30, 45, 65, 80],
+            [54, 68, 76, 85, 94],
+            [58, 71, 79, 87, 96],
+            [62, 74, 82, 89, 97],
         ],
-        yAxisLabel: 'Value',
+        yAxisLabel: 'Competency score',
         height: 400,
         sort: true,
     },

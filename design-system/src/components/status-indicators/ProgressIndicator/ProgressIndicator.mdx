@@ -199,9 +199,9 @@ Without `onSelect` the markers are decorative and only `aria-current` marks the 
 A short row reads at a glance. With many steps, position stops being readable.
 
 <DoDontPair
-    doExample={<ProgressIndicator values={['a', 'b', 'c', 'd', 'e']} selectedIndex={2} />}
+    doExample={<ProgressIndicator values={['Session setup', 'Warm-up', 'Practice', 'Reflection']} selectedIndex={1} />}
     doCaption="A handful of steps, so the current one is easy to find."
-    dontExample={<ProgressIndicator values={Array.from({ length: 24 }, (_, i) => String(i))} selectedIndex={11} size={8} spacing="compact" />}
+    dontExample={<ProgressIndicator values={Array.from({ length: 24 }, (_, i) => `Step ${i + 1}`)} selectedIndex={11} size={8} spacing="compact" />}
     dontCaption="Two dozen steps, where the current one is lost in the row."
 />
 
@@ -210,9 +210,9 @@ A short row reads at a glance. With many steps, position stops being readable.
 `inverted` is for a dark surface; on a light one use `default`, `primary` or `help`.
 
 <DoDontPair
-    doExample={<div style={{ display: 'inline-flex', padding: 'var(--pad-y-lg) var(--pad-x-md)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--ds-background-inverse-subtle)' }}><ProgressIndicator values={['a', 'b', 'c', 'd']} selectedIndex={1} appearance="inverted" /></div>}
+    doExample={<div style={{ display: 'inline-flex', padding: 'var(--pad-y-lg) var(--pad-x-md)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--ds-background-inverse-subtle)' }}><ProgressIndicator values={['Session setup', 'Warm-up', 'Practice', 'Reflection']} selectedIndex={1} appearance="inverted" /></div>}
     doCaption="Inverted indicator on a dark ground."
-    dontExample={<ProgressIndicator values={['a', 'b', 'c', 'd']} selectedIndex={1} appearance="inverted" />}
+    dontExample={<ProgressIndicator values={['Session setup', 'Warm-up', 'Practice', 'Reflection']} selectedIndex={1} appearance="inverted" />}
     dontCaption="Inverted indicator on a light surface, where it vanishes."
 />
 

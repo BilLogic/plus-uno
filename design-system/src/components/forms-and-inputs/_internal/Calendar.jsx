@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
+import { SlideViews } from '@/lib/navigationMotion';
 import Icon from '../../images-and-icons/Icon';
 import { formatMonthYear, outOfBounds, parseDate, sameDay } from './dates';
 import { IconButton } from '../IconButton/IconButton';
@@ -37,6 +38,15 @@ const Calendar = ({
 }) => {
     const year = viewDate.getFullYear();
     const month = viewDate.getMonth();
+    const monthKey = year * 12 + month;
+    const prevMonthKeyRef = useRef(monthKey);
+    const prevMonthKey = prevMonthKeyRef.current;
+    const slideKeys = prevMonthKey === monthKey
+        ? [monthKey]
+        : [Math.min(prevMonthKey, monthKey), Math.max(prevMonthKey, monthKey)];
+    useEffect(() => {
+        prevMonthKeyRef.current = monthKey;
+    }, [monthKey]);
     const firstWeekday = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const lastOfPrevious = new Date(year, month, 0).getDate();
@@ -103,7 +113,9 @@ const Calendar = ({
             <div className="plus-calendar-weekdays" aria-hidden="true">
                 {WEEKDAYS.map((day) => <div key={day} className="plus-calendar-weekday">{day}</div>)}
             </div>
-            <div className="plus-calendar-days">{cells}</div>
+            <SlideViews activeKey={monthKey} keys={slideKeys} size="panel">
+                <div className="plus-calendar-days">{cells}</div>
+            </SlideViews>
         </div>
     );
 };

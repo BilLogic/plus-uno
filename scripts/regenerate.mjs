@@ -51,6 +51,7 @@ const GENERATORS = [
   'npm run generate:figma-links',
   'npm run generate:icon-lists',
   'npm run generate:brand-image',
+  'node scripts/export-kit-art.mjs',
   'npm run generate:knowledge-components',
   'npm run generate:index',
   'npm run generate:color-tokens',

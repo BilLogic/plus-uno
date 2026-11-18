@@ -47,7 +47,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Sessions held vs. attendance rate</Heading>
+                <Heading as="h3" size="sm">Sessions held vs. attendance rate</Heading>
                 <p style={captionStyle}>
                     Combines columns for volume on the left axis with a line for percentage rate on the right axis.
                 </p>
@@ -70,11 +70,11 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        primaryAxisLabel: 'Primary metric',
-        secondaryAxisLabel: 'Secondary metric',
-        categories: ['Period 1', 'Period 2', 'Period 3', 'Period 4'],
-        barData: [{ name: 'Volume', data: [50, 80, 60, 100] }],
-        lineData: [{ name: 'Rate', data: [5, 8, 6, 10], yAxis: 1 }],
+        primaryAxisLabel: 'Sessions held',
+        secondaryAxisLabel: 'Attendance rate (%)',
+        categories: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+        barData: [{ name: 'Sessions', data: [50, 80, 60, 100] }],
+        lineData: [{ name: 'Attendance rate', data: [82, 88, 85, 92], yAxis: 1 }],
         height: 400,
         sort: false,
     },

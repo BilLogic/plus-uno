@@ -14,7 +14,7 @@ Also asked as: cta, submit.
 
 **Source:** `design-system/src/components/forms-and-inputs/Button/Button.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Button/Button.stories.jsx` — Overview, Appearances, Spacing, Icons, States, Default, Primary, Subtle, Warning, Danger, Discovery, Ai, Compact, Spacious, Selected, Disabled, Loading, ExplainsOnPress, FitContainer, Truncation, Interactive, StateSteps, KeyboardFocus, AnchorKeyboard, AnchorHref, Anatomy, FooterLayouts
+**Stories:** `design-system/src/components/forms-and-inputs/Button/Button.stories.jsx` — Overview, Appearances, Spacing, Icons, WithCount, States, Default, Primary, Subtle, Warning, Danger, Discovery, Ai, Compact, Spacious, Selected, Disabled, Loading, ExplainsOnPress, FitContainer, Truncation, Interactive, StateSteps, KeyboardFocus, AnchorKeyboard, AnchorHref, Anatomy, FooterLayouts
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Button/Button.mdx`
 

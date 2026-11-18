@@ -3,9 +3,9 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
-import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Popup from './Popup';
 import { Button } from '@/components';
+import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 export default {
@@ -59,38 +59,38 @@ export default {
     }
 };
 
-const col = { display: 'flex', flexDirection: 'column', gap: 'var(--space-400)', padding: 'var(--space-300)', alignItems: 'center' };
+const col = { display: 'flex', flexDirection: 'column', gap: 'calc(var(--section-pad-x-spacious) * 2)', padding: 'var(--popup-clip-reach)', alignItems: 'center' };
 
 function PopupLayoutDemos() {
     return (
-        <section style={{ display: 'flex', gap: 'var(--space-200)', flexWrap: 'wrap', justifyContent: 'center' }}>
+        <section style={{ display: 'flex', gap: 'var(--section-stack-lg)', flexWrap: 'wrap', justifyContent: 'center' }}>
             <Popup
-                trigger={<Button text="Popup on Top" />}
+                trigger={<Button text="Session note on top" />}
                 placement="top"
-                title="Popup Title"
+                title="Session note"
             >
-                And here's some amazing content. It's very engaging. Right?
+                Maya K. completed three practice sets before Thursday's session.
             </Popup>
             <Popup
-                trigger={<Button text="Popup on Bottom" />}
+                trigger={<Button text="Session note on bottom" />}
                 placement="bottom"
-                title="Popup Title"
+                title="Session note"
             >
-                And here's some amazing content. It's very engaging. Right?
+                Maya K. completed three practice sets before Thursday's session.
             </Popup>
             <Popup
-                trigger={<Button text="Popup on Left" />}
+                trigger={<Button text="Session note on left" />}
                 placement="left"
-                title="Popup Title"
+                title="Session note"
             >
-                And here's some amazing content. It's very engaging. Right?
+                Maya K. completed three practice sets before Thursday's session.
             </Popup>
             <Popup
-                trigger={<Button text="Popup on Right" />}
+                trigger={<Button text="Session note on right" />}
                 placement="right"
-                title="Popup Title"
+                title="Session note"
             >
-                And here's some amazing content. It's very engaging. Right?
+                Maya K. completed three practice sets before Thursday's session.
             </Popup>
         </section>
     );
@@ -101,10 +101,10 @@ function PopupContentDemo() {
         <section>
             <DemoLabel>NO TITLE</DemoLabel>
             <Popup
-                trigger={<Button text="Content Only" appearance="primary" />}
+                trigger={<Button text="Session note" appearance="primary" />}
                 placement="right"
             >
-                This popup has no title, only body content.
+                Maya K. joined on time for the 4:00 PM ET math session.
             </Popup>
         </section>
     );
@@ -114,24 +114,24 @@ function PopupInteractionStatesDemos() {
     return (
         <section>
             <DemoLabel>TRIGGER TYPES</DemoLabel>
-            <div style={{ display: 'flex', gap: 'var(--space-100)', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 'var(--grid-gutter)', flexWrap: 'wrap' }}>
                 <Popup
-                    trigger={<Button text="Click (Default)" appearance="primary" />}
+                    trigger={<Button text="Click for session details (default)" appearance="primary" />}
                     triggerType="click"
                 >
-                    Clicked to toggle.
+                    Session details opened on click.
                 </Popup>
                 <Popup
-                    trigger={<Button text="Hover" appearance="primary" />}
+                    trigger={<Button text="Hover for session summary" appearance="primary" />}
                     triggerType="hover"
                 >
-                    Hovered to show.
+                    Session summary shown on hover.
                 </Popup>
                 <Popup
-                    trigger={<Button text="Focus" appearance="primary" />}
+                    trigger={<Button text="Focus for lesson goals" appearance="primary" />}
                     triggerType="focus"
                 >
-                    Focus to show (tab to this button).
+                    Lesson goals shown on keyboard focus.
                 </Popup>
             </div>
         </section>
@@ -156,36 +156,47 @@ export const InteractionStates = () => (
     </div>
 );
 
-export const Overview = () => (
-    <div className="plus-popup-overview-static">
-        <Button type="button" text="Toggle popup" appearance="primary" />
-        <div className="plus-popup">
-            <div className="plus-popup-title">Popup title</div>
-            <div className="plus-popup-body">
-                Body content appears below the title. This overview is non-interactive; use Interactive for
-                click/hover behavior.
+export const Overview = {
+    render: () => (
+        <DocsOverlayBoundary fit={false} containHeight>
+            <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--section-pad-y-default) var(--section-pad-x-default)' }}>
+                <Popup
+                    trigger={<Button type="button" text="Session details" appearance="primary" />}
+                    title="Session 12"
+                    placement="bottom"
+                    defaultShow
+                >
+                    Math · Fractions and unit rates with Jordan T. (45 min).
+                </Popup>
             </div>
-        </div>
-    </div>
-);
-Overview.parameters = {
-    docs: {
-        source: { language: 'jsx', code: webAppSourceSnippets.popup }
-    }
+        </DocsOverlayBoundary>
+    ),
+    play: async ({ canvas, canvasElement }) => {
+        const doc = canvasElement.ownerDocument;
+        const trigger = canvas.getByRole('button', { name: 'Session details' });
+        await waitFor(() => expect(doc.querySelector('.plus-popup')).not.toBeNull());
+        await expect(doc.querySelector('.plus-popup')).toHaveTextContent('Math · Fractions and unit rates with Jordan T. (45 min).');
+        await userEvent.click(trigger);
+        await waitFor(() => expect(doc.querySelector('.plus-popup')).toBeNull());
+        await userEvent.click(trigger);
+        await waitFor(() => expect(doc.querySelector('.plus-popup')).not.toBeNull());
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(doc.querySelector('.plus-popup')).toBeNull());
+    },
 };
 
 export const Interactive = {
     args: {
-        triggerLabel: 'Interactive Trigger',
-        title: 'Interactive Popup',
-        children: 'Change my placement or title in the controls.',
+        triggerLabel: 'Session details',
+        title: 'Session note',
+        children: "Maya K. completed two-step equations in Tuesday's session.",
         placement: 'top',
         triggerType: 'click'
     },
     render: (args) => {
         const { triggerLabel, ...popupProps } = args;
         return (
-            <div style={{ padding: 'var(--space-300)', display: 'flex', justifyContent: 'center' }}>
+            <div style={{ padding: 'var(--popup-clip-reach)', display: 'flex', justifyContent: 'center' }}>
                 <Popup
                     {...popupProps}
                     trigger={<Button text={triggerLabel} appearance="primary" />}
@@ -211,7 +222,7 @@ const openPopup = async (canvasElement) => {
 };
 
 const StatePopup = () => (
-    <div style={{ padding: 'var(--space-400)', display: 'flex', justifyContent: 'center' }}>
+    <div style={{ padding: 'calc(var(--section-pad-x-spacious) * 2)' /* 64px fixed */, display: 'flex', justifyContent: 'center' }}>
         <Popup trigger={<Button appearance="primary" text="Details" />} title="Session 12" triggerType="manual" show>
             Ran 45 minutes over.
         </Popup>
@@ -276,7 +287,7 @@ export const Open = {
 
 /** Where the popup opens, one story per side. It stays open so the page can show it. */
 const OpenPopup = ({ placement = 'top', width, title, children = 'Ran 45 minutes over.' }) => (
-    <div style={{ padding: 'calc(var(--space-400) * 4) var(--space-400)', display: 'flex', justifyContent: 'center' }}>
+    <div style={{ padding: 'calc(var(--section-pad-x-spacious) * 8) calc(var(--section-pad-x-spacious) * 2)', display: 'flex', justifyContent: 'center' }}>
         <Popup
             trigger={<Button appearance="primary" text="Details" />}
             title={title}
@@ -335,7 +346,7 @@ export const WidthAutoCaps = {
  */
 export const WidthColumns = {
     render: () => (
-        <div style={{ padding: 'calc(var(--space-400) * 4) var(--space-400)', display: 'flex', gap: 'var(--space-400)', justifyContent: 'center' }}>
+        <div style={{ padding: 'calc(var(--section-pad-x-spacious) * 8) calc(var(--section-pad-x-spacious) * 2)', display: 'flex', gap: 'calc(var(--section-pad-x-spacious) * 2)' /* 64px fixed */, justifyContent: 'center' }}>
             {['3-col', '4-col'].map((width) => (
                 <Popup
                     key={width}
@@ -365,7 +376,7 @@ export const WidthColumns = {
 /** Opened by a pointer, it clips out from the trigger's corner; only clip-path and opacity move, never the width. */
 export const OpensWithAClip = {
     render: () => (
-        <div style={{ padding: 'calc(var(--space-400) * 4) var(--space-400)', display: 'flex', justifyContent: 'center' }}>
+        <div style={{ padding: 'calc(var(--section-pad-x-spacious) * 8) calc(var(--section-pad-x-spacious) * 2)', display: 'flex', justifyContent: 'center' }}>
             <Popup id="popup-motion-pointer" trigger={<Button appearance="primary" text="Details" />} title="Session 12" placement="bottom-start">
                 Ran 45 minutes over.
             </Popup>
@@ -391,7 +402,7 @@ export const OpensWithAClip = {
 /** Opened from the keyboard, it appears at once. */
 export const KeyboardOpenIsInstant = {
     render: () => (
-        <div style={{ padding: 'calc(var(--space-400) * 4) var(--space-400)', display: 'flex', justifyContent: 'center' }}>
+        <div style={{ padding: 'calc(var(--section-pad-x-spacious) * 8) calc(var(--section-pad-x-spacious) * 2)', display: 'flex', justifyContent: 'center' }}>
             <Popup id="popup-motion-keyboard" trigger={<Button appearance="primary" text="Details" />} title="Session 12" placement="bottom-start">
                 Ran 45 minutes over.
             </Popup>
@@ -408,7 +419,7 @@ export const KeyboardOpenIsInstant = {
 };
 
 const MotionStory = ({ id }) => (
-    <div style={{ padding: 'calc(var(--space-400) * 4) var(--space-400)', display: 'flex', justifyContent: 'center' }}>
+    <div style={{ padding: 'calc(var(--section-pad-x-spacious) * 8) calc(var(--section-pad-x-spacious) * 2)', display: 'flex', justifyContent: 'center' }}>
         <Popup id={id} trigger={<Button appearance="primary" text="Details" />} title="Session 12" placement="bottom-start">
             Ran 45 minutes over.
         </Popup>
@@ -468,7 +479,7 @@ export const ReducedMotion = {
 export const BodyOnly = { render: () => <OpenPopup>Ran 45 minutes over.</OpenPopup> };
 
 const TriggerStory = ({ triggerType, text }) => (
-    <div style={{ padding: 'var(--space-400)', display: 'flex', justifyContent: 'center' }}>
+    <div style={{ padding: 'calc(var(--section-pad-x-spacious) * 2)' /* 64px fixed */, display: 'flex', justifyContent: 'center' }}>
         <Popup trigger={<Button appearance="primary" text={text} />} title="Session 12" triggerType={triggerType}>
             Ran 45 minutes over.
         </Popup>

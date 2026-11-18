@@ -3,6 +3,7 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as TileStories from './Tile.stories.jsx';
 import { Tile } from '@/components';
+import partnerMarkLight from '@/assets/images/kit/partner-mark-light.svg';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -209,7 +210,7 @@ logo keeps its own. Images cover the whole tile, so color does not apply.
 <DoDontPair
     doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile icon="book-open" appearance="bold" color="blue" /><Tile icon="book-open" /></div>}
     doCaption="Icons take appearance and color; logos keep their own."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile content="logo" src="https://placehold.co/48" appearance="bold" /></div>}
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile content="logo" src={partnerMarkLight} label="Partner logo" appearance="bold" /></div>}
     dontCaption="A bold appearance on a logo, which does nothing."
 />
 
@@ -230,9 +231,9 @@ item across the app, or leave tiles gray.
 Logos default to white. Set a ground color only to match a surface; never recolor the logo.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile content="logo" src="https://placehold.co/48" /></div>}
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile content="logo" src={partnerMarkLight} label="Partner logo" /></div>}
     doCaption="A logo on the default white ground."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile content="logo" src="https://placehold.co/48" color="blue" appearance="bold" /></div>}
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile content="logo" src={partnerMarkLight} label="Partner logo" color="blue" appearance="bold" /></div>}
     dontCaption="A bold ground on the logo, which keeps its own."
 />
 

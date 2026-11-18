@@ -139,7 +139,7 @@ const statusOptions = [
     { value: 'canceled', label: 'Canceled' },
 ];
 
-const grid = { pointerEvents: 'auto', display: 'grid', gap: 'var(--space-125)', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' };
+const grid = { pointerEvents: 'auto', display: 'grid', gap: '20px' /* token gap: 20px */, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' };
 
 const field = { maxWidth: 'var(--width-2500)' };
 
@@ -215,9 +215,9 @@ export const SpacingCompact = {
 /** Spacing — default (40) and compact (32). */
 export const Spacing = {
     render: () => (
-        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', display: 'flex', flexDirection: 'column', gap: 'var(--space-125)' }}>
-            <Select label="Default" spacing="default" options={sampleOptions} placeholder="Select..." />
-            <Select label="Compact" spacing="compact" options={sampleOptions} placeholder="Select..." />
+        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', display: 'flex', flexDirection: 'column', gap: '20px' /* token gap: 20px */ }}>
+            <Select label="Default" spacing="default" options={sampleOptions} placeholder="Select a site" />
+            <Select label="Compact" spacing="compact" options={sampleOptions} placeholder="Select a site" />
         </div>
     ),
     play: async ({ canvasElement }) => {
@@ -256,7 +256,25 @@ export const DependentFields = {
     }
 };
 
-const people = Array.from({ length: 80 }, (_, i) => ({ value: `p${i + 1}`, label: `Tutor ${i + 1}` }));
+const tutorNames = [
+    'Ari P.', 'Maya K.', 'Jordan T.', 'Elena R.', 'Marcus B.',
+    'Priya S.', 'Noah W.', 'Sofia L.', 'Liam D.', 'Chloe M.',
+    'Ethan H.', 'Zoe P.', 'Ava C.', 'Leo G.', 'Nora F.',
+    'Owen K.', 'Hannah V.', 'Lucas M.', 'Grace T.', 'Caleb R.',
+    'Ruby S.', 'Isaac B.', 'Clara N.', 'Julian P.', 'Hazel C.',
+    'Miles R.', 'Stella W.', 'Theo J.', 'Iris D.', 'Eli F.',
+    'Lydia R.', 'Gavin P.', 'Mila J.', 'Asher L.', 'Naomi P.',
+    'Wesley H.', 'Audrey M.', 'Roman F.', 'Carmen G.', 'Darius B.',
+    'Camila O.', 'Jonas K.', 'Beatrice C.', 'Simon H.', 'Tessa W.',
+    'Mateo S.', 'Claire P.', 'Nathan C.', 'Eva S.', 'Adrian S.',
+    'Leah G.', 'Victor W.', 'Sonia M.', 'Callum B.', 'Alice B.',
+    'Jasper C.', 'Phoebe D.', 'Rowan W.', 'Dahlia S.', 'Declan H.',
+    'Sienna F.', 'Felix S.', 'Corinne L.', 'Tobias N.', 'Molly W.',
+    'Cyrus D.', 'Freya M.', 'Oscar B.', 'Gianna H.', 'Arthur S.',
+    'Lucy F.', 'Hugo W.', 'Fiona M.', 'Devon B.', 'Talia G.',
+    'Jonah L.', 'Vera S.', 'Malcolm C.', 'Kira W.', 'Elias B.',
+];
+const people = tutorNames.map((name, i) => ({ value: `p${i + 1}`, label: name }));
 
 /** LongList — past 50 options, Recent and Suggested come first and typing searches the rest. */
 export const LongList = {
@@ -270,7 +288,33 @@ export const LongList = {
 /** Rows live in a portal on `document.body`, so they are looked up on the whole page. */
 const page = () => within(document.body);
 
-const students = Array.from({ length: 120 }, (_, i) => ({ value: `s${i + 1}`, label: `Student ${i + 1}` }));
+const studentNames = [
+    'Ari P.', 'Maya K.', 'Jordan T.', 'Elena R.', 'Marcus B.',
+    'Priya S.', 'Noah W.', 'Sofia L.', 'Liam D.', 'Chloe M.',
+    'Ethan H.', 'Zane P.', 'Ava C.', 'Leo G.', 'Nora F.',
+    'Owen K.', 'Hannah V.', 'Lucas M.', 'Grace T.', 'Caleb R.',
+    'Ruby S.', 'Isaac B.', 'Clara N.', 'Julian P.', 'Hazel C.',
+    'Miles R.', 'Stella W.', 'Theo J.', 'Iris D.', 'Eli F.',
+    'Lydia R.', 'Gavin P.', 'Mila J.', 'Asher L.', 'Naomi P.',
+    'Wesley H.', 'Audrey M.', 'Roman F.', 'Carmen G.', 'Darius B.',
+    'Camila O.', 'Jonas K.', 'Beatrice C.', 'Simon H.', 'Tessa W.',
+    'Mateo S.', 'Claire P.', 'Nathan C.', 'Eva S.', 'Adrian S.',
+    'Leah G.', 'Victor W.', 'Sonia M.', 'Callum B.', 'Alice B.',
+    'Jasper C.', 'Phoebe D.', 'Rowan W.', 'Dahlia S.', 'Declan H.',
+    'Sienna F.', 'Felix S.', 'Corinne L.', 'Tobias N.', 'Molly W.',
+    'Cyrus D.', 'Freya M.', 'Oscar B.', 'Gianna H.', 'Arthur S.',
+    'Lucy F.', 'Hugo W.', 'Fiona M.', 'Devon B.', 'Talia G.',
+    'Jonah L.', 'Vera S.', 'Malcolm C.', 'Kira W.', 'Elias B.',
+    'Amara T.', 'Bennett R.', 'Camille D.', 'Desmond K.', 'Eliza N.',
+    'Fabian L.', 'Gemma W.', 'Henrik P.', 'Imogen B.', 'Jude M.',
+    'Keira H.', 'Landon F.', 'Margot S.', 'Nico V.', 'Ophelia G.',
+    'Parker C.', 'Quinn R.', 'Rafael T.', 'Sabrina J.', 'Tristan D.',
+    'Uma K.', 'Valerie N.', 'Wyatt B.', 'Xander L.', 'Yara M.',
+    'Zuri H.', 'Aiden W.', 'Brielle P.', 'Carter S.', 'Delilah F.',
+    'Emmett G.', 'Flora C.', 'Gideon R.', 'Harper T.', 'Isaiah N.',
+    'Josie B.', 'Kieran D.', 'Lilah M.', 'Micah V.', 'Nadia W.',
+];
+const students = studentNames.map((name, i) => ({ value: `s${i + 1}`, label: name }));
 
 /** A server stand-in: filters by the typed text and answers a page after a short wait. */
 const loadStudents = (query, { offset, limit }) => new Promise((resolve) => {
@@ -298,8 +342,9 @@ export const Async = {
         fireEvent.scroll(body);
         await expect(await page().findByText('Showing 100 of 120')).toBeInTheDocument();
 
-        await userEvent.type(field, 'Student 11');
-        await waitFor(() => expect(page().getAllByRole('option')).toHaveLength(11));
+        await userEvent.type(field, 'Maya K.');
+        await waitFor(() => expect(page().getAllByRole('option')).toHaveLength(1));
+        await expect(page().getByRole('option', { name: 'Maya K.' })).toBeInTheDocument();
         await expect(page().queryByText(/^Showing/)).toBeNull();
     },
 };
@@ -364,7 +409,7 @@ export const Overview = {
             className="sb-select-interactive-override"
             style={{ pointerEvents: 'auto', maxWidth: 'var(--width-2500)', width: '100%' }}
         >
-            <Select aria-label="Option" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
+            <Select aria-label="Site" options={sampleOptions} placeholder="Select a site" />
         </div>
     ),
     parameters: {
@@ -405,8 +450,8 @@ export const Interactive = {
     },
     args: {
         isMulti: false,
-        label: 'Option',
-        placeholder: 'Select...',
+        label: 'Site',
+        placeholder: 'Select a site',
         caption: '',
         isSearchable: true,
         isCreatable: false,
@@ -434,7 +479,7 @@ const COLOR_OPTIONS = [
 export const Colors = {
     parameters: { docs: { disable: true } },
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '320px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: 'var(--width-2000)' }}>
             <Select label="Site" options={COLOR_OPTIONS} placeholder="Pick a site" />
             <Select label="Sites" isMulti selectAll options={COLOR_OPTIONS} defaultValue={['lincoln-middle']} />
         </div>
@@ -472,36 +517,36 @@ export const Colors = {
 };
 
 /** One story per state, for the Examples tab. */
-const controlOf = (canvasElement) => within(canvasElement).getByRole('combobox', { name: 'Option' });
+const controlOf = (canvasElement) => within(canvasElement).getByRole('combobox', { name: 'Site' });
 const wrap = { maxWidth: 'var(--width-2500)', minHeight: 'var(--height-250)' };
 
 export const Rest = {
-    render: () => <div style={wrap}><Select id="select-ex-rest" label="Option" options={sampleOptions} placeholder="Please select" /></div>,
+    render: () => <div style={wrap}><Select id="select-ex-rest" label="Site" options={sampleOptions} placeholder="Select a site" /></div>,
     play: async ({ canvasElement }) => expectRest(canvasElement, controlOf(canvasElement)),
 };
 
 export const Hovered = {
-    render: () => <div style={wrap}><Select id="select-ex-hover" label="Option" options={sampleOptions} placeholder="Please select" /></div>,
+    render: () => <div style={wrap}><Select id="select-ex-hover" label="Site" options={sampleOptions} placeholder="Select a site" /></div>,
     play: async ({ canvasElement }) => expectHovered(canvasElement, controlOf(canvasElement)),
 };
 
 export const Focused = {
-    render: () => <div style={wrap}><Select id="select-ex-focus" label="Option" options={sampleOptions} placeholder="Please select" /></div>,
+    render: () => <div style={wrap}><Select id="select-ex-focus" label="Site" options={sampleOptions} placeholder="Select a site" /></div>,
     play: async ({ canvasElement }) => expectFocused(canvasElement, controlOf(canvasElement)),
 };
 
 export const FieldDisabled = {
-    render: () => <div style={wrap}><Select id="select-ex-disabled" label="Option" options={sampleOptions} placeholder="Please select" isDisabled /></div>,
+    render: () => <div style={wrap}><Select id="select-ex-disabled" label="Site" options={sampleOptions} placeholder="Select a site" isDisabled /></div>,
     play: async ({ canvasElement }) => expectDisabled(canvasElement, controlOf(canvasElement)),
 };
 
 export const FieldInvalid = {
-    render: () => <div style={wrap}><Select id="select-ex-invalid" label="Option" options={sampleOptions} placeholder="Please select" isInvalid errorMessage="Pick an option." /></div>,
+    render: () => <div style={wrap}><Select id="select-ex-invalid" label="Site" options={sampleOptions} placeholder="Select a site" isInvalid errorMessage="Choose a site." /></div>,
     play: async ({ canvasElement }) => expectInvalid(canvasElement, controlOf(canvasElement)),
 };
 
 export const FieldReadOnly = {
-    render: () => <div style={wrap}><Select id="select-ex-readonly" label="Option" options={sampleOptions} placeholder="Please select" isReadOnly /></div>,
+    render: () => <div style={wrap}><Select id="select-ex-readonly" label="Site" options={sampleOptions} placeholder="Select a site" isReadOnly /></div>,
     play: async ({ canvasElement }) => {
         await expectReadOnly(canvasElement, controlOf(canvasElement));
         // Nothing to open: the chevron is not drawn, and a press or Enter leaves the list shut.
@@ -532,13 +577,13 @@ export const FieldReadOnlyShowsLabel = {
 /** A read-only value is shown whole: it wraps, and is never clipped to one line. */
 export const FieldReadOnlyLongValue = {
     render: () => (
-        <div style={{ ...wrap, maxWidth: '200px' }}>
+        <div style={{ ...wrap, maxWidth: '200px' /* token gap: 200px */ }}>
             <Select
                 id="select-ex-readonly-long"
-                label="Option"
+                label="Lesson topic"
                 isReadOnly
                 value="long"
-                options={[{ value: 'long', label: 'Introduction to organic chemistry for first-year students' }]}
+                options={[{ value: 'long', label: 'Two-step linear equations with variables on both sides and word problems' }]}
             />
         </div>
     ),

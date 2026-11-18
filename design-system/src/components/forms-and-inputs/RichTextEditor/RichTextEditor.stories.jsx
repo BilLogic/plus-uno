@@ -73,7 +73,7 @@ export default {
 
 export const Overview = () => (
     <div style={{ width: '100%' }}>
-        <RichTextEditor label="Session notes" placeholder="Type something..." minHeight={150} />
+        <RichTextEditor label="Session notes" placeholder="What did you cover?" minHeight={150} />
     </div>
 );
 Overview.parameters = {
@@ -90,7 +90,7 @@ export const Interactive = (args) => {
     }, [args.initialContent]);
 
     return (
-        <div style={{ maxWidth: 'var(--size-5400)' }}>
+        <div style={{ maxWidth: 'var(--content-max-width-reading)' }}>
             <RichTextEditor
                 label="Session notes"
                 spacing={args.spacing}
@@ -106,8 +106,8 @@ export const Interactive = (args) => {
     );
 };
 Interactive.args = {
-    placeholder: 'Interactive editor...',
-    initialContent: '<p>Initial content...</p>',
+    placeholder: 'What did you cover?',
+    initialContent: '<p>Maya K. solved three two-step equation problems.</p>',
     spacing: 'default',
     readOnly: false,
     disabled: false,
@@ -117,8 +117,8 @@ Interactive.args = {
 
 /** The compact toolbar's block-style menu: open, select, keyboard. */
 export const BlockStyleMenu = () => (
-    <div style={{ width: '100%', paddingBottom: 200 }}>
-        <RichTextEditor label="Session notes" defaultValue="<p>Hello</p>" minHeight={150} />
+    <div style={{ width: '100%', paddingBottom: '200px' /* token gap: 200px */ }}>
+        <RichTextEditor label="Session notes" defaultValue="<p>Reviewed linear equations and slope intercepts.</p>" minHeight={150} />
     </div>
 );
 BlockStyleMenu.play = async ({ canvasElement }) => {
@@ -163,10 +163,10 @@ BlockStyleMenu.play = async ({ canvasElement }) => {
 const writing = (canvasElement) => within(canvasElement).getByRole('textbox');
 
 export const Empty = {
-    render: () => <RichTextEditor label="Session notes" placeholder="Type something..." minHeight={150} />,
+    render: () => <RichTextEditor label="Session notes" placeholder="What did you cover?" minHeight={150} />,
     play: async ({ canvasElement }) => {
         const area = writing(canvasElement);
-        await expect(area).toHaveAttribute('data-placeholder', 'Type something...');
+        await expect(area).toHaveAttribute('data-placeholder', 'What did you cover?');
         await expect(area.textContent).toBe('');
     },
 };
@@ -189,7 +189,7 @@ export const BoxRadius = {
 };
 
 export const Focused = {
-    render: () => <RichTextEditor label="Session notes" placeholder="Type something..." minHeight={150} />,
+    render: () => <RichTextEditor label="Session notes" placeholder="What did you cover?" minHeight={150} />,
     play: async ({ canvasElement }) => {
         const area = writing(canvasElement);
         // The ring wraps the box that holds the toolbar and the writing area.
@@ -233,14 +233,14 @@ export const DisabledState = {
 };
 
 export const Compact = {
-    render: () => <RichTextEditor label="Session notes" spacing="compact" placeholder="Type something..." minHeight={150} />,
+    render: () => <RichTextEditor label="Session notes" spacing="compact" placeholder="What did you cover?" minHeight={150} />,
     play: async ({ canvasElement }) => {
         await expect(canvasElement.querySelector('.plus-rich-text-editor')).toHaveClass('plus-rich-text-editor--compact');
     },
 };
 
 export const FullToolbar = {
-    render: () => <RichTextEditor label="Session notes" toolbarPreset="full" placeholder="Type something..." minHeight={150} />,
+    render: () => <RichTextEditor label="Session notes" toolbarPreset="full" placeholder="What did you cover?" minHeight={150} />,
     play: async ({ canvasElement }) => {
         await expect(canvasElement.querySelector('.plus-rich-text-editor')).toHaveClass('plus-rich-text-editor--full');
         await expect(within(canvasElement).getByRole('button', { name: 'Bold' })).toBeInTheDocument();
@@ -250,7 +250,7 @@ export const FullToolbar = {
 const boldButton = (canvasElement) => within(canvasElement).getByRole('button', { name: 'Bold' });
 
 export const ToolbarButtonHovered = {
-    render: () => <RichTextEditor label="Session notes" placeholder="Type something..." minHeight={150} />,
+    render: () => <RichTextEditor label="Session notes" placeholder="What did you cover?" minHeight={150} />,
     play: async ({ canvasElement }) => {
         const button = boldButton(canvasElement);
         button.style.transition = 'none';
@@ -260,7 +260,7 @@ export const ToolbarButtonHovered = {
 };
 
 export const ToolbarButtonPressed = {
-    render: () => <RichTextEditor label="Session notes" placeholder="Type something..." minHeight={150} />,
+    render: () => <RichTextEditor label="Session notes" placeholder="What did you cover?" minHeight={150} />,
     play: async ({ canvasElement }) => {
         const button = boldButton(canvasElement);
         button.style.transition = 'none';

@@ -11,13 +11,36 @@ import {
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
+export const noteItems = [
+    'Maya K. — Two-step equations',
+    'Jordan T. — Linear graphs',
+    'Elena R. — Fraction review',
+    'Marcus B. — Reading claims',
+    'Priya S. — Ratios and rates',
+    'Noah W. — Paragraph structure',
+    'Sofia L. — Slope practice',
+    'Liam D. — Main idea summary',
+    'Chloe M. — Proportional tables',
+    'Ethan H. — Context clues',
+    'Zoe P. — Systems of equations',
+    'Ava C. — Text evidence',
+    'Leo G. — Order of operations',
+    'Nora F. — Argument structure',
+    'Owen K. — Function tables',
+    'Hannah V. — Inference check',
+    'Lucas M. — Decimal division',
+    'Grace T. — Point of view',
+    'Caleb R. — Angle pairs',
+    'Ruby S. — Exit ticket notes',
+];
+
 export const Notes = ({ count }) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', padding: 'var(--pad-y-lg) var(--pad-x-md)' }}>
-        {Array.from({ length: count }, (_, i) => <p key={i} style={{ margin: 0 }}>Note {i + 1}</p>)}
+        {noteItems.slice(0, count).map((note, i) => <p key={i} style={{ margin: 0 }}>{note}</p>)}
     </div>
 );
-export const box = { border: 'var(--stroke-1) solid var(--ds-border)', borderRadius: 'var(--radius-md)' };
-export const smallCap = 'calc(var(--size-1000) * 0.75)';
+export const box = { border: 'var(--border-width-default) solid var(--ds-border)', borderRadius: 'var(--radius-md)' };
+export const smallCap = 'var(--height-750)';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -177,7 +200,7 @@ Two bars side by side suggest two scrolling areas where there is one. Do not nes
 <DoDontPair
     doExample={<div style={box}><ScrollBar maxHeight={smallCap} aria-label="Notes, one region"><Notes count={12} /></ScrollBar></div>}
     doCaption="A single scrollbar."
-    dontExample={<div style={box}><ScrollBar maxHeight={smallCap} aria-label="Notes, outer region"><div style={{ ...box, margin: 'var(--pad-y-lg) var(--pad-x-md)' }}><ScrollBar maxHeight="calc(var(--size-1000) * 1.25)" aria-label="Notes, inner region"><Notes count={20} /></ScrollBar></div></ScrollBar></div>}
+    dontExample={<div style={box}><ScrollBar maxHeight={smallCap} aria-label="Notes, outer region"><div style={{ ...box, margin: 'var(--pad-y-lg) var(--pad-x-md)' }}><ScrollBar maxHeight="calc(var(--height-500) * 2.5)" aria-label="Notes, inner region"><Notes count={20} /></ScrollBar></div></ScrollBar></div>}
     dontCaption="A region nested in another: two scrollbars on one region."
 />
 
@@ -201,9 +224,9 @@ A region around content that already fits shows no bar and still adds a tab stop
 `maxHeight` is a cap. In a taller container, give the region the height you want it to take, such as `maxHeight="100%"`.
 
 <DoDontPair
-    doExample={<div style={{ ...box, height: 'calc(var(--size-1000) * 1.5)' }}><ScrollBar maxHeight="100%" aria-label="Notes, filled"><Notes count={16} /></ScrollBar></div>}
+    doExample={<div style={{ ...box, height: 'calc(var(--height-750) * 2)' }}><ScrollBar maxHeight="100%" aria-label="Notes, filled"><Notes count={16} /></ScrollBar></div>}
     doCaption="The region fills its container and scrolls."
-    dontExample={<div style={{ ...box, height: 'calc(var(--size-1000) * 1.5)' }}><ScrollBar maxHeight={smallCap} aria-label="Notes, capped"><Notes count={16} /></ScrollBar></div>}
+    dontExample={<div style={{ ...box, height: 'calc(var(--height-750) * 2)' }}><ScrollBar maxHeight={smallCap} aria-label="Notes, capped"><Notes count={16} /></ScrollBar></div>}
     dontCaption="A smaller cap leaves the space below it empty."
 />
 

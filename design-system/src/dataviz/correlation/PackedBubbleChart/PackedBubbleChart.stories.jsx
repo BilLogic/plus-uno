@@ -62,7 +62,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Students by university and school (split clusters)</Heading>
+                <Heading as="h3" size="sm">Students by university and school (split clusters)</Heading>
                 <p style={captionStyle}>
                     Groups and bubbles sort from largest total to smallest so the biggest partner cluster leads.
                 </p>
@@ -70,7 +70,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Combined view</Heading>
+                <Heading as="h3" size="sm">Combined view</Heading>
                 <p style={captionStyle}>
                     Packs every school into one shared cluster while keeping university colors.
                 </p>
@@ -95,17 +95,17 @@ export const Interactive = {
     args: {
         data: [
             {
-                name: 'Group A',
+                name: 'Lincoln Middle',
                 data: [
-                    { name: 'Item 1', value: 100 },
-                    { name: 'Item 2', value: 80 },
+                    { name: 'Grade 6', value: 100 },
+                    { name: 'Grade 7', value: 84 },
                 ],
             },
             {
-                name: 'Group B',
+                name: 'Roosevelt K-8',
                 data: [
-                    { name: 'Item 3', value: 120 },
-                    { name: 'Item 4', value: 60 },
+                    { name: 'Grade 7', value: 120 },
+                    { name: 'Grade 8', value: 64 },
                 ],
             },
         ],

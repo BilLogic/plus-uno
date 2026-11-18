@@ -1,11 +1,13 @@
-import React, { useId, useLayoutEffect, useState } from 'react';
+import React, { useId, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Dialog } from '@base-ui/react/dialog';
 import Button from '@/components/forms-and-inputs/Button';
 import CloseButton from '@/components/forms-and-inputs/CloseButton';
 import Skeleton from '@/components/loading/Skeleton';
 import { HeadingLevelContext } from '@/lib/headingLevel';
+import { useMotionReduced } from '@/lib/motionPreference';
 import { useOverlaySlot, reportFocusLost } from '@/lib/overlay';
+import { useOverlayOrigin } from '@/lib/overlayMotion';
 import Blanket from '@/patterns/Blanket';
 import FooterActions from '@/components/forms-and-inputs/FooterActions';
 
@@ -132,9 +134,12 @@ const Modal = ({
     const titleId = useId();
     const descriptionId = useId();
     const [bodyEl, setBodyEl] = useState(null);
+    const panelRef = useRef(null);
+    const reduced = useMotionReduced();
 
     const [placed, trigger] = useOverlaySlot(show && renderAs === 'modal', onClose);
     const visible = renderAs === 'inline' ? show : show && placed;
+    useOverlayOrigin(visible && renderAs === 'modal', panelRef);
 
     const hasFooter = showBottomButtons && Boolean(footer || primaryButton || secondaryButton);
     const bodyOnly = !title && !description && !headerActions && !showBottomButtons;
@@ -148,10 +153,10 @@ const Modal = ({
     // in-flight operation a stray click should not abandon.
     const blanketCloses = blanket !== false && blanket !== 'static';
     const handleOpenChange = (nextOpen, details) => {
-        if (nextOpen || !onClose) return;
+        if (nextOpen) return;
         if (details?.reason === 'escape-key' && !keyboard) return;
         if (details?.reason === 'outside-press' && !blanketCloses) return;
-        onClose(details?.event);
+        onClose?.(details?.event);
     };
 
     // Closing gives focus back to the trigger `useOverlaySlot` captured, so a
@@ -167,10 +172,12 @@ const Modal = ({
 
     if (renderAs === 'inline' && !visible) return null;
 
+    const isModal = renderAs === 'modal';
     const resolvedWidth = width === 'xs' ? '4-col' : width;
     const classes = [
         'plus-modal',
         'plus-modal-default',
+        !isModal ? 'plus-modal--inline' : '',
         MODAL_WIDTHS.includes(resolvedWidth) ? `plus-modal-width-${resolvedWidth}` : '',
         `plus-modal-height-${height}`,
         showBottomButtons ? 'plus-modal-with-buttons' : 'plus-modal-no-buttons',
@@ -187,13 +194,18 @@ const Modal = ({
     // overlay draws it from Base UI's dialog parts, which own the role, the
     // name and description wiring, focus and dismissal. Base UI leaves
     // `aria-modal` to the caller, so it is set here.
-    const isModal = renderAs === 'modal';
     const parts = isModal
         ? {
             Panel: Dialog.Popup,
             Title: Dialog.Title,
             Description: Dialog.Description,
-            panelProps: { 'aria-modal': 'true', 'aria-label': !title ? ariaLabel : undefined, finalFocus },
+            panelProps: {
+                ref: panelRef,
+                'aria-modal': 'true',
+                'aria-label': !title ? ariaLabel : undefined,
+                'data-reduced': reduced ? 'true' : undefined,
+                finalFocus,
+            },
             titleProps: { render: <h1 /> },
         }
         : { Panel: 'div', Title: 'h1', Description: 'div', panelProps: {}, titleProps: {} };
@@ -301,7 +313,7 @@ const Modal = ({
     return (
         <Dialog.Root open={visible} onOpenChange={handleOpenChange}>
             <Dialog.Portal>
-                <Blanket>{panel}</Blanket>
+                <Blanket show={visible}>{panel}</Blanket>
             </Dialog.Portal>
         </Dialog.Root>
     );

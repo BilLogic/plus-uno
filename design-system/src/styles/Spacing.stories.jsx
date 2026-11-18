@@ -65,7 +65,7 @@ export const ItemHeights = () => (
         </div>
         <div style={col('var(--stack-md)')}>
             <span><Tag text="Grade 7" /></span>
-            <span style={tag}>Label 20 · pad-x 4 · Tag, Status, Count</span>
+            <span style={tag}>Label 20 · pad-x 4 · Tag, Status · Count 16</span>
         </div>
     </div>
 );
@@ -172,7 +172,7 @@ const Footer = () => (
 /** 5 · White space: a modal breathes before its footer. */
 export const WhiteSpace = () => (
     <DoDont>
-        <Do caption={<><C>--modal-pad</C> 16 on every side, <C>--modal-stack-lg</C> (24) from the fields to the footer.</>}>
+        <Do caption={<><C>--modal-pad-x-default</C> 16 on every side, <C>--modal-stack-lg</C> (24) from the fields to the footer.</>}>
             <div style={{ ...box, ...col('var(--modal-stack-lg)') }}>
                 <span style={{ font: 'var(--heading-md)' }}>Create new session</span>
                 <div style={col('var(--modal-stack-md)')}><School id="ws-do" /><SessionDate id="ws-do" /></div>

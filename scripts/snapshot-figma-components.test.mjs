@@ -47,7 +47,7 @@ const componentsResponse = {
         node_id: '42:6019',
         containing_frame: { name: 'Tooltip' },
       },
-      { key: 'k2', name: 'size=lg', description: '', node_id: '1:2', containing_frame: { name: 'Badge' } },
+      { key: 'k2', name: 'size=lg', description: '', node_id: '1:2', containing_frame: { name: 'StatusTag' } },
       // Dropped by the shared ignore list, exactly as the poller drops them.
       { key: 'k3', name: '_Tooltip Arrow', description: '', node_id: '1:3', containing_frame: { name: 'Tooltip' } },
       { key: 'k4', name: 'grid', description: '', node_id: '1:4', containing_frame: { name: 'layout-blocks/x' } },
@@ -75,12 +75,12 @@ test('the ignore list is the poller’s, so the two writers agree on the populat
   assert.equal(isIgnored({ name: 'Spacing Token Guidelines', containingFrame: 'Docs' }), true);
   assert.equal(isIgnored({ name: 'draft', containingFrame: 'Docs' }), true);
   assert.equal(isIgnored({ name: '', containingFrame: '' }), true);
-  assert.equal(isIgnored({ name: 'size=lg', containingFrame: 'Badge' }), false);
+  assert.equal(isIgnored({ name: 'size=lg', containingFrame: 'StatusTag' }), false);
 });
 
 test('a missing description becomes an empty string, never undefined', () => {
-  const [, badge] = rowsFrom(componentsResponse);
-  assert.equal(badge.description, '');
+  const [, statusTag] = rowsFrom(componentsResponse);
+  assert.equal(statusTag.description, '');
 });
 
 test('autosave versions are dropped — versionIds is a publish history, not a clock', () => {
@@ -104,7 +104,7 @@ test('the diff is by published key, so a rename is a rename and not a delete plu
   const before = [{ key: 'k1', name: 'old', containingFrame: 'Tooltip' }];
   const after = [
     { key: 'k1', name: 'new', containingFrame: 'Tooltip' },
-    { key: 'k2', name: 'fresh', containingFrame: 'Badge' },
+    { key: 'k2', name: 'fresh', containingFrame: 'StatusTag' },
   ];
   const { created, deleted, renamed } = diff(before, after);
   assert.deepEqual(created.map((c) => c.key), ['k2']);
@@ -122,15 +122,15 @@ test('the changed sets name every set an add, a removal or a rename touched, onc
     { key: 'd1', name: 'size=1px', containingFrame: 'Divider' },
     { key: 'd2', name: 'size=2px', containingFrame: 'Divider' },
     { key: 't1', name: 'state=default', containingFrame: 'Tag' },
-    { key: 'b1', name: 'size=lg', containingFrame: 'Badge' },
+    { key: 'b1', name: 'size=lg', containingFrame: 'StatusTag' },
   ];
   const after = [
     { key: 'd1', name: 'size=sm', containingFrame: 'Divider' },
     { key: 'd2', name: 'size=lg', containingFrame: 'Divider' },
     { key: 't1', name: 'state=default', containingFrame: 'Tag' },
-    { key: 'c1', name: 'size=md', containingFrame: 'Count' },
+    { key: 'c1', name: 'size=md', containingFrame: 'CountTag' },
   ];
-  assert.deepEqual(changedSets(before, after), ['Badge', 'Count', 'Divider']);
+  assert.deepEqual(changedSets(before, after), ['CountTag', 'Divider', 'StatusTag']);
 });
 
 test('a component moved between sets names both the set it left and the one it joined', () => {

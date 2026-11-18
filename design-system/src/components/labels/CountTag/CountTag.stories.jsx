@@ -4,7 +4,7 @@ import { expect, spyOn, userEvent, within } from 'storybook/test';
 import { contrastRatio as contrast } from '@/storybook-docs/lib/contrast.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { Button, Icon } from '@/components';
-import CountTag, { COUNT_TAG_APPEARANCES, COUNT_TAG_SPACINGS } from './CountTag';
+import CountTag, { COUNT_TAG_APPEARANCES } from './CountTag';
 import { expectGroundUnder, expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 
 /**
@@ -99,6 +99,10 @@ Appearances.play = async ({ canvasElement }) => {
     }
 
     // The figures are tabular and sit in the middle of the countTag, in a button too.
+    for (const text of ['12', '13', '14', '15']) {
+        const pill = pillOf(canvas, text);
+        await expect(pill.getBoundingClientRect().height, `${text}: count is 16 tall`).toBe(16);
+    }
     for (const text of ['12', '14']) {
         const value = canvas.getByText(text);
         const countTag = pillOf(canvas, text).getBoundingClientRect();
@@ -119,32 +123,29 @@ Appearances.play = async ({ canvasElement }) => {
     await expect(px(d.borderRadius), 'the dot stays round').toBeGreaterThanOrEqual(4);
 };
 
-/** Both spacings: 20 on its own, 16 (compact) inside a Status tag or Tag. Min-width is 24, so a digit is a near-square. */
-export const Spacings = () => (
+/** Always 16 tall and at least 24 wide, so one digit is a small rectangle and more digits grow it from the trailing edge. */
+export const Size = () => (
     <div style={row}>
         <CountTag value={1} />
-        <CountTag value={2} spacing="compact" />
         <CountTag value={1204} />
     </div>
 );
-Spacings.play = async ({ canvasElement }) => {
+Size.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    for (const [text, size] of [['1', 20], ['2', 16]]) {
-        const pill = pillOf(canvas, text);
-        const s = getComputedStyle(pill);
-        await expect(pill.getBoundingClientRect().height, `${text} is ${size} tall`).toBe(size);
-        await expect(px(s.minWidth), 'min-width is size-150').toBe(24);
-        await expect(pill.getBoundingClientRect().width, 'one digit is 24 wide').toBe(24);
-        await expect(px(s.paddingLeft), 'padding is the Element xs token, not 8').toBe(4);
-        await expect(px(s.paddingRight)).toBe(4);
-        await expect(px(s.borderRadius), 'corner is radius-md').toBe(4);
-        await expect(px(getComputedStyle(canvas.getByText(text)).fontSize), 'B3 12').toBe(12);
-    }
+    const pill = pillOf(canvas, '1');
+    const s = getComputedStyle(pill);
+    await expect(pill.getBoundingClientRect().height, '1 is 16 tall').toBe(16);
+    await expect(px(s.minWidth), 'min-width is size-150').toBe(24);
+    await expect(pill.getBoundingClientRect().width, 'one digit is 24 wide').toBe(24);
+    await expect(px(s.paddingLeft), 'padding is the Element xs token, not 8').toBe(4);
+    await expect(px(s.paddingRight)).toBe(4);
+    await expect(px(s.borderRadius), 'corner is radius-md').toBe(4);
+    await expect(px(getComputedStyle(canvas.getByText('1')).fontSize), 'B3 12').toBe(12);
 
     const wide = pillOf(canvas, '99+');
     await expect(wide.getBoundingClientRect().width, 'grows with its digits').toBeGreaterThan(24);
-    await expect(wide.getBoundingClientRect().height).toBe(20);
+    await expect(wide.getBoundingClientRect().height).toBe(16);
 };
 
 /** `max` caps the number with a `+`. */
@@ -206,30 +207,29 @@ Ring.play = async ({ canvasElement }) => {
         await expect(shadow, 'the ring is the surface color').toContain(surface);
         await expect(shadow, 'the ring is 2px, spread outside the box').toMatch(/0px 0px 0px 2px/);
     }
-    await expect(numeric.getBoundingClientRect().height, 'the ring does not change the height').toBe(20);
+    await expect(numeric.getBoundingClientRect().height, 'the ring does not change the height').toBe(16);
     await expect(dot.getBoundingClientRect().height).toBe(8);
 };
 
 /**
- * Every style, subtle and bold, at both sizes, and the dot. Bold warning uses
+ * Every style, subtle and bold, and the dot. Bold warning uses
  * Warning Container.
  */
 export const Styles = () => (
     <div style={{ display: 'grid', gap: 'var(--stack-lg)' }}>
-        {[false, true].flatMap((isBold) => COUNT_TAG_SPACINGS.map((spacing) => (
-            <div key={`${isBold}-${spacing}`} style={row}>
+        {[false, true].map((isBold) => (
+            <div key={String(isBold)} style={row}>
                 {COUNT_TAG_APPEARANCES.map((appearance) => (
                     <CountTag
                         key={appearance}
                         value={12}
                         isBold={isBold}
                         appearance={appearance}
-                        spacing={spacing}
-                        label={`${isBold ? 'bold' : 'subtle'} ${appearance} ${spacing}`}
+                        label={`${isBold ? 'bold' : 'subtle'} ${appearance}`}
                     />
                 ))}
             </div>
-        )))}
+        ))}
         <div style={row}>
             {COUNT_TAG_APPEARANCES.map((appearance) => (
                 <CountTag key={appearance} isDot appearance={appearance} label={`dot ${appearance}`} />
@@ -249,7 +249,7 @@ Styles.play = async ({ canvasElement }) => {
             warning: ['--ds-background-warning', '--ds-text-warning'],
             danger: ['--ds-background-danger', '--ds-text-danger'],
             info: ['--ds-background-information', '--ds-text-information'],
-            discovery: ['--ds-background-smart-mastering-content', '--ds-text-smart-mastering-content'],
+            discovery: ['--ds-background-competency-mastering-content', '--ds-text-competency-mastering-content'],
         },
         bold: {
             neutral: ['--ds-background-neutral-bold', '--ds-text-inverse'],
@@ -257,7 +257,7 @@ Styles.play = async ({ canvasElement }) => {
             warning: ['--ds-background-warning-bold', '--ds-text-warning-inverse'],
             danger: ['--ds-background-danger-bold', '--ds-text-inverse'],
             info: ['--ds-background-information-bold', '--ds-text-inverse'],
-            discovery: ['--ds-background-smart-mastering-content-bold', '--ds-text-inverse'],
+            discovery: ['--ds-background-competency-mastering-content-bold', '--ds-text-inverse'],
         },
     };
 
@@ -265,14 +265,12 @@ Styles.play = async ({ canvasElement }) => {
     // ink is a themed token, so a light-only color fails here.
     await inEveryColorModeOf(canvasElement, async (mode, token) => {
         for (const [appearance, styles] of Object.entries(expected)) {
-            for (const size of COUNT_TAG_SPACINGS) {
-                for (const [style, [ground, ink]] of Object.entries(styles)) {
-                    const name = `${appearance} ${style} ${size}`;
-                    const s = getComputedStyle(pill(name));
-                    await expect(s.backgroundColor, `${mode}: ${name} ground`).toBe(token(ground));
-                    await expect(s.color, `${mode}: ${name} ink`).toBe(token(ink));
-                    await expect(pill(name).getBoundingClientRect().height, `${name} height`).toBe(size === 'compact' ? 16 : 20);
-                }
+            for (const [style, [ground, ink]] of Object.entries(styles)) {
+                const name = `${appearance} ${style}`;
+                const s = getComputedStyle(pill(name));
+                await expect(s.backgroundColor, `${mode}: ${name} ground`).toBe(token(ground));
+                await expect(s.color, `${mode}: ${name} ink`).toBe(token(ink));
+                await expect(pill(name).getBoundingClientRect().height, `${name} height`).toBe(16);
             }
         }
 
@@ -282,7 +280,7 @@ Styles.play = async ({ canvasElement }) => {
             warning: '--ds-icon-warning',
             danger: '--ds-icon-danger',
             info: '--ds-icon-information',
-            discovery: '--ds-icon-smart-mastering-content',
+            discovery: '--ds-icon-competency-mastering-content',
         };
         for (const [style, fill] of Object.entries(dots)) {
             const dot = canvas.getByRole('img', { name: `dot ${style}` });
@@ -348,7 +346,6 @@ export const Interactive = {
         max: 99,
         showZero: false,
         appearance: 'neutral',
-        spacing: 'default',
         isBold: false,
         isInverse: false,
         isDot: false,
@@ -357,7 +354,6 @@ export const Interactive = {
     },
     argTypes: {
         appearance: { control: 'select', options: COUNT_TAG_APPEARANCES },
-        spacing: { control: 'inline-radio', options: COUNT_TAG_SPACINGS },
     },
     render: (args) => <CountTag {...args} label={args.label || (args.isDot ? 'Notification' : undefined)} />,
 };
@@ -370,6 +366,7 @@ export const Rest = {
     play: async ({ canvasElement }) => {
         const el = within(canvasElement).getByTestId('count');
         await expectGroundUnder(canvasElement, el, undefined, '--ds-background-neutral', 'count');
+        await expect(el.getBoundingClientRect().height, 'count is 16 tall').toBe(16);
         await expect(el).toHaveTextContent('4');
         await expect(el).not.toHaveAttribute('tabindex');
     },

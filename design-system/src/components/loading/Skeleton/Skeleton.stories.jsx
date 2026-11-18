@@ -43,8 +43,8 @@ export default {
     },
 };
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' };
-const pair = { display: 'inline-flex', gap: '8px', alignItems: 'center' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--grid-gutter)', alignItems: 'center' };
+const pair = { display: 'inline-flex', gap: 'var(--inline-md)', alignItems: 'center' };
 
 /* ------------------------------------------------------------------ helpers */
 
@@ -128,9 +128,9 @@ LabelPresets.play = async ({ canvasElement }) => {
     await expect(radius(canvas.getByTestId('status-spacious'))).toBe(8);
     const count = canvas.getByTestId('count');
     await expect(box(count).width, 'count is 24 wide').toBe(24);
-    await expect(box(canvas.getByTestId('tag')).height).toBe(22);
+    await expect(box(canvas.getByTestId('tag')).height).toBe(20);
     const person = canvas.getByTestId('tag-person');
-    await expect(box(person).height).toBe(22);
+    await expect(box(person).height).toBe(20);
     await expect(radius(person), 'tag-person is fully round').toBeGreaterThanOrEqual(box(person).height / 2);
 };
 
@@ -153,7 +153,7 @@ PresetWinsOverShape.play = async ({ canvasElement }) => {
 
 /** A loading TagGroup: three tag shapes at the group's gap. */
 export const TagGroupPreset = () => (
-    <div style={{ display: 'grid', gap: '16px' }}>
+    <div style={{ display: 'grid', gap: 'var(--section-stack-md)' }}>
         <Skeleton preset="tag-group" data-testid="group" />
         <TagGroup>
             <Tag text="Lincoln Middle" />
@@ -243,7 +243,7 @@ export const Text = () => <Skeleton shape="text" width={160} />;
  * `"text"` draw exactly what `shape` does, and resize the same way.
  */
 export const PresetNamesAShape = () => (
-    <div style={{ display: 'grid', gap: '16px' }}>
+    <div style={{ display: 'grid', gap: 'var(--section-stack-md)' }}>
         <div style={row}>
             <Skeleton preset="rect" width={160} height={64} data-testid="preset-rect" />
             <Skeleton preset="circle" data-testid="preset-circle" />
@@ -279,7 +279,7 @@ PresetNamesAShape.play = async ({ canvasElement }) => {
 
 /** `lines` repeats the text bar; the last line is shorter so it reads as text. */
 export const Paragraph = () => (
-    <div style={{ display: 'grid', gap: '24px', width: '240px' }}>
+    <div style={{ display: 'grid', gap: 'var(--section-stack-lg)', width: 'var(--width-1500)' }}>
         <Skeleton shape="text" lines={3} data-testid="lines" />
         <Skeleton preset="paragraph" data-testid="paragraph" />
     </div>
@@ -403,13 +403,13 @@ export const LoadingTable = () => {
     const [loaded, setLoaded] = useState(false);
     const message = useLoadingMessage(!loaded, { busy: 'Loading students…', done: 'Students loaded' });
     return (
-        <div style={{ display: 'grid', gap: '12px', justifyItems: 'start' }}>
+        <div style={{ display: 'grid', gap: 'var(--stack-lg)', justifyItems: 'start' }}>
             <div role="status" className="visually-hidden" data-testid="live">{message}</div>
             <section aria-labelledby="skeleton-students" aria-busy={loaded ? undefined : 'true'}>
                 <h3 id="skeleton-students" className="heading-sm">Students</h3>
-                <div style={{ display: 'grid', gap: '12px' }}>
+                <div style={{ display: 'grid', gap: 'var(--stack-lg)' }}>
                     {[['Rosa Chen', 140], ['Kai Brooks', 110], ['Amara Okafor', 160]].map(([name, width]) => (
-                        <div key={name} style={{ display: 'flex', gap: '48px', alignItems: 'center' }}>
+                        <div key={name} style={{ display: 'flex', gap: '48px' /* token gap: 48px */, alignItems: 'center' }}>
                             {loaded ? (
                                 <>
                                     <span className="body-default" style={{ width }}>{name}</span>
@@ -465,7 +465,7 @@ export const LoadingCard = () => {
     const [loaded, setLoaded] = useState(false);
     const message = useLoadingMessage(!loaded, { busy: 'Loading session summary…', done: 'Session summary loaded' });
     return (
-        <div style={{ display: 'grid', gap: '12px', justifyItems: 'start' }}>
+        <div style={{ display: 'grid', gap: 'var(--stack-lg)', justifyItems: 'start' }}>
             <div role="status" className="visually-hidden" data-testid="live">{message}</div>
             <div
                 aria-busy={loaded ? undefined : 'true'}
@@ -473,10 +473,10 @@ export const LoadingCard = () => {
                 role="group"
                 style={{
                     display: 'grid',
-                    gap: '10px',
-                    width: '294px',
-                    padding: '16px',
-                    border: '1px solid var(--ds-border)',
+                    gap: '10px' /* token gap: 10px */,
+                    width: '294px' /* token gap: 294px */,
+                    padding: 'var(--card-pad-compact)',
+                    border: 'var(--border-width-default) solid var(--ds-border)',
                     borderRadius: 'var(--card-radius-compact)',
                 }}
             >
@@ -484,7 +484,7 @@ export const LoadingCard = () => {
                     <>
                         <p className="body-lg" style={{ margin: 0 }}>Unit 3 review</p>
                         <p className="body-sm" style={{ margin: 0 }}>Four students worked through ratios and rates.</p>
-                        <span style={{ display: 'flex', gap: '8px' }}>
+                        <span style={{ display: 'flex', gap: 'var(--inline-md)' }}>
                             <Tag text="Ratios" />
                             <Tag text="Rates" />
                         </span>
@@ -493,7 +493,7 @@ export const LoadingCard = () => {
                     <>
                         <Skeleton shape="text" width={180} />
                         <Skeleton shape="text" lines={2} />
-                        <span style={{ display: 'flex', gap: '8px' }}>
+                        <span style={{ display: 'flex', gap: 'var(--inline-md)' }}>
                             <Skeleton shape="text" width={56} />
                             <Skeleton shape="text" width={56} />
                         </span>
@@ -550,7 +550,7 @@ export const IgnoredPropsWarn = () => {
         'Shape preset sized': <Skeleton preset="circle" width={40} />,
     };
     return (
-        <div style={{ display: 'grid', gap: '12px' }}>
+        <div style={{ display: 'grid', gap: 'var(--stack-lg)' }}>
             <div style={row}>
                 {Object.keys(cases).map((name) => (
                     <Button key={name} onClick={() => setMounted(name)}>{name}</Button>

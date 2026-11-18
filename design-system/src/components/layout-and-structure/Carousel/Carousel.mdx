@@ -18,12 +18,23 @@ export const DemoSlide = ({ children }) => (
     </div>
 );
 export const titled = [
-    { title: 'Prep a session in two minutes', description: "See a student's goals and your last notes before you join." },
-    { title: 'Reflect while it is fresh', description: 'Record what worked and what to try next time.' },
-    { title: 'Training between sessions', description: 'Lessons run ten minutes or less.' },
-].map((slide, k) => ({ ...slide, media: <DemoSlide>{`Feature ${k + 1}`}</DemoSlide> }));
+    { label: 'Session prep', title: 'Prep a session in two minutes', description: "See a student's goals and your last notes before you join." },
+    { label: 'Reflection', title: 'Reflect while it is fresh', description: 'Record what worked and what to try next time.' },
+    { label: 'Training', title: 'Training between sessions', description: 'Lessons run ten minutes or less.' },
+].map(({ label, ...slide }) => ({ ...slide, media: <DemoSlide>{label}</DemoSlide> }));
 export const untitled = titled.map(({ media }) => ({ media }));
-export const many = Array.from({ length: 10 }, (_, k) => ({ title: `Feature ${k + 1}`, media: <DemoSlide>{`Feature ${k + 1}`}</DemoSlide> }));
+export const many = [
+    'Session prep',
+    'Quick reflection',
+    'Ten-minute lessons',
+    'Skills profile',
+    'Weekly schedule',
+    'Warm-up ideas',
+    'Exit tickets',
+    'Call-off cover',
+    'Lead tutor notes',
+    'Term progress',
+].map((label) => ({ title: label, media: <DemoSlide>{label}</DemoSlide> }));
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -164,7 +175,7 @@ progress indicator. Autoplay is on by default (`interval` `5000`), and loops.
 <tr><td>Ring</td><td><code>--control-lg</code> across, <code>--border-width-selected</code> wide. Track <code>--ds-border</code>; progress <code>--ds-background-brand-bold</code>.</td></tr>
 <tr><td>Progress indicator</td><td>The default <code>ProgressIndicator</code>: steps <code>--progress-indicator-dot-size-8</code>, the bar <code>--control-md</code> long, each step a <code>--control-sm</code> target.</td></tr>
 <tr><td>Motion</td><td>A move takes <code>--ds-motion-spatial-default</code>, fading on <code>--ds-motion-appearance-slow</code>. The caption lifts out over <code>--ds-motion-appearance-fast</code> and rises in over <code>--ds-motion-appearance-default</code>.</td></tr>
-<tr><td>Caption</td><td><code>Heading</code> size small; line in <code>--body-default</code> and <code>--ds-text-subtle</code>; at most <code>--content-max-width-reading</code> wide.</td></tr>
+<tr><td>Caption</td><td><code>Heading</code> size sm; line in <code>--body-default</code> and <code>--ds-text-subtle</code>; at most <code>--content-max-width-reading</code> wide.</td></tr>
 <tr><td>Spacing</td><td><code>--section-stack-md</code> between the stage, the controls and the caption; <code>--inline-md</code> between controls.</td></tr>
 </tbody>
 </DocsTable>

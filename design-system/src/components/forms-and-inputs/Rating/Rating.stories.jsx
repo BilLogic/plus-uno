@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
@@ -50,16 +51,16 @@ export default {
     }
 };
 
-const ratingCol = { display: 'flex', flexDirection: 'column', gap: 'var(--space-200)', maxWidth: 'var(--size-5400)' };
+const ratingCol = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--content-max-width-reading)' };
 
 export const Overview = () => {
     const [value, setValue] = useState(3);
 
     return (
-        <div style={{ ...ratingCol, maxWidth: 'var(--size-3000)' }}>
+        <div style={{ ...ratingCol, maxWidth: 'var(--width-3000)' }}>
             <Rating
                 id="rating-overview"
-                label="Rating"
+                label="How was the session?"
                 isRequired
                 value={value}
                 variant="comments"
@@ -80,13 +81,13 @@ export const Content = () => {
     return (
         <div style={ratingCol}>
             <section>
-                <span style={{ display: 'block', marginBottom: 'var(--space-050)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>BASELINE RATING</span>
+                <span style={{ display: 'block', marginBottom: 'var(--stack-md)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>BASELINE RATING</span>
                 <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Labeled comments-style rating with a required indicator.
                 </p>
                 <Rating
                     id="rating-content"
-                    label="Rating"
+                    label="How was the session?"
                     isRequired
                     value={value}
                     variant="comments"
@@ -104,14 +105,14 @@ export const Variants = () => {
     return (
         <div style={ratingCol}>
             <section>
-                <span style={{ display: 'block', marginBottom: 'var(--space-050)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>COMMENTS</span>
+                <span style={{ display: 'block', marginBottom: 'var(--stack-md)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>COMMENTS</span>
                 <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Label appears below the stars for open-ended feedback flows.
                 </p>
                 <Rating id="rating-comments-variant" value={commentsValue} variant="comments" onChange={setCommentsValue} />
             </section>
             <section>
-                <span style={{ display: 'block', marginBottom: 'var(--space-050)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>NUMERIC</span>
+                <span style={{ display: 'block', marginBottom: 'var(--stack-md)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>NUMERIC</span>
                 <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Numeric labels above each star for more explicit scales.
                 </p>
@@ -124,7 +125,7 @@ export const Variants = () => {
 export const InteractionStates = () => (
     <div style={ratingCol}>
         <section>
-            <span style={{ display: 'block', marginBottom: 'var(--space-050)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>DISABLED</span>
+            <span style={{ display: 'block', marginBottom: 'var(--stack-md)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>DISABLED</span>
             <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                 Disabled ratings remain visible but cannot be changed.
             </p>
@@ -144,7 +145,7 @@ export const Interactive = (args) => {
     }, [args.variant]);
 
     return (
-        <div style={{ maxWidth: 'var(--size-2500)' }}>
+        <div style={{ maxWidth: 'var(--width-2500)' }}>
             <Rating
                 label={args.label}
                 isRequired={args.isRequired}
@@ -157,24 +158,38 @@ export const Interactive = (args) => {
     );
 };
 Interactive.args = {
-    label: 'Rating',
+    label: 'How was the session?',
     isRequired: false,
     variant: 'comments',
     isDisabled: false,
+};
+Interactive.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const star4 = canvas.getByRole('radio', { name: 'Rate 4' });
+    await userEvent.click(star4);
+    await settleAnimations(canvasElement);
+    await expect(star4).toHaveAttribute('aria-checked', 'true');
+    await expect(getComputedStyle(star4.querySelector('i')).color).toBe(tokenColor(canvasElement, '--ds-icon-selected'));
+
+    const star5 = canvas.getByRole('radio', { name: 'Rate 5' });
+    await userEvent.click(star5);
+    await expect(star5.style.getPropertyValue('--plus-rating-stagger')).toBe('0ms');
+    await settleAnimations(canvasElement);
+    await expect(star5).toHaveAttribute('aria-checked', 'true');
 };
 
 /** Each prop shows up in the DOM: numeric labels, comments label, icon family, minority marker. */
 export const PropsRender = () => (
     <div style={ratingCol}>
-        <Rating id="rating-props-numeric" label="Numeric" variant="numeric" icon="thumbs-up" isRequired labelMarker="required" value={2} />
-        <Rating id="rating-props-comments" label="Comments" variant="comments" commentsLabel="Tell us more" value={2} />
+        <Rating id="rating-props-numeric" label="Session pacing" variant="numeric" icon="thumbs-up" isRequired labelMarker="required" value={2} />
+        <Rating id="rating-props-comments" label="Tutor feedback" variant="comments" commentsLabel="Tell us more" value={2} />
     </div>
 );
 PropsRender.parameters = { docs: { disable: true } };
 PropsRender.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const numeric = canvas.getByRole('radiogroup', { name: 'Numeric' });
-    const comments = canvas.getByRole('radiogroup', { name: 'Comments' });
+    const numeric = canvas.getByRole('radiogroup', { name: 'Session pacing' });
+    const comments = canvas.getByRole('radiogroup', { name: 'Tutor feedback' });
 
     // variant=numeric: a label 1-5 above each item, no comments label.
     for (const n of [1, 2, 3, 4, 5]) {
@@ -199,7 +214,7 @@ PropsRender.play = async ({ canvasElement }) => {
 };
 
 /** One story per state, for the Examples tab. */
-const frame = { maxWidth: 'var(--size-3000)' };
+const frame = { maxWidth: 'var(--width-3000)' };
 
 export const Unrated = {
     render: () => (

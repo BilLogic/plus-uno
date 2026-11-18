@@ -27,7 +27,7 @@ Primitives hold raw ramps and stay hidden; bind only semantic tokens. Names read
 | --- | --- | --- | --- |
 | color | Namespace | `color` | Dropped in CSS. Surface and shadow tokens start with elevation. |
 | background | Property | `text` · `icon` · `border` · `background` · `link` · `surface` · `shadow` · `blanket` · `skeleton` · `interaction` · `chart` | What the color paints. |
-| danger | Role | `brand` · `neutral` · `selected` · `input` · `inverse` · `disabled` · `focused` · `danger` · `warning` · `success` · `information` · `discovery` · `accent-*` · `smart-*` | What it means. Omitted for default neutral. |
+| danger | Role | `brand` · `neutral` · `selected` · `input` · `inverse` · `disabled` · `focused` · `danger` · `warning` · `success` · `information` · `discovery` · `accent-*` · `competency-*` | What it means. Omitted for default neutral. |
 | bold | Emphasis | `subtlest` · `subtler` · `subtle` · (default) · `bold` · `bolder` · `boldest` | Contrast against the surface. |
 | hovered | State | `hovered` · `pressed` · `visited` | Interactive backgrounds and links only. |
 
@@ -65,9 +65,9 @@ Danger, warning, success, information and discovery each ship four emphasis leve
 
 Eleven hues decorate tags, charts, avatars and illustrations. An accent hue carries no status meaning; when color carries meaning, use a role.
 
-## SMART subjects
+## Competency areas
 
-The five SMART tutoring areas each have their own role (`social-emotional` orange, `mastering-content` teal, `advocacy` lime, `relationship` magenta, `technology-tools` brown): `background/smart/<subject>` with `text/smart/<subject>` and `border/smart/<subject>` for a Tag, `subtle` for illustration bodies, and `bold` for filled marks. Use a SMART color only for its subject.
+The five competency areas each have their own role (`social-emotional` orange, `mastering-content` teal, `advocacy` lime, `relationship` magenta, `technology-tools` brown): `background/competency/<subject>` with `text/competency/<subject>` and `border/competency/<subject>` for a Tag, `subtle` for illustration bodies, and `bold` for filled marks. Use a competency color only for its area.
 
 ## Surfaces and border
 

@@ -43,7 +43,7 @@ const Preview = ({ row, value }) => {
     if (row.collection === 'spacing' && /^-?[\d.]+(px|rem)$/.test(value)) {
         return (
             <span aria-hidden="true" style={{ display: 'inline-flex', width: 'var(--icon-lg)', alignItems: 'center' }}>
-                <span style={{ width: `min(${value}, var(--icon-lg))`, height: 'var(--stroke-2)', background: 'var(--ds-icon)' }} />
+                <span style={{ width: `min(${value}, var(--icon-lg))`, height: 'var(--border-width-selected)', background: 'var(--ds-icon)' }} />
             </span>
         );
     }

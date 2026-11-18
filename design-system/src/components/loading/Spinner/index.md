@@ -16,7 +16,7 @@ Also asked as: loading, busy indicator, wait indicator, loading indicator.
 
 **Storybook page:** `design-system/src/components/loading/Spinner/Spinner.mdx`
 
-**Motion:** change `linear`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Motion:** change `loop`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -37,7 +37,7 @@ Spinner reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| change | Load content | `--ds-motion-linear` | Turns while work runs and stops the moment it stops. A static label in reduced motion. |
+| change | Load content | `--ds-motion-loop` | Swings on the loop spring while work runs and stops the moment it stops. A static label in reduced motion. |
 
 ## Alternatives
 
@@ -85,9 +85,7 @@ Don't: A loose spinner beside a button that can still be pressed.
   region where it will still be there afterward and swap its contents.
 - **Say what is loading when it is not obvious.** "Loading" beside a form is
   fine; "Loading" as the only thing on a page needs a specific `label`.
-- **Reduced motion is handled.** The rotation slows under
-  `prefers-reduced-motion: reduce` rather than stopping outright, so the ring
-  still reads as working.
+- **Reduced motion is handled.** The ring holds still under `prefers-reduced-motion: reduce`, and the hidden status label still names the wait.
 
 ## Related
 
@@ -105,7 +103,7 @@ Same group: `GenerativeBorder` · `ProgressBar` · `ProgressRing` · `Skeleton`
 
 | State | What changes |
 | --- | --- |
-| Rest | The ring turns once every 0.75s. Under reduced motion it holds still, and the hidden label still names the wait. |
+| Rest | The ring swings on the loop spring. Under reduced motion it holds still, and the hidden label still names the wait. |
 | Hovered | None. It is not a control. |
 | Pressed | None. |
 | Focused | None. It is not in the tab order. |

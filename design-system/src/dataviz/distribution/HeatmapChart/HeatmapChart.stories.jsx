@@ -56,7 +56,7 @@ const activityData = {
 
 const masteryData = {
     xCategories: ['Unit 1', 'Unit 2', 'Unit 3', 'Unit 4'],
-    yCategories: ['Group A', 'Group B', 'Group C'],
+    yCategories: ['Grade 6', 'Grade 7', 'Grade 8'],
     data: [
         [0, 0, 92], [1, 0, 85], [2, 0, 78], [3, 0, 88],
         [0, 1, 75], [1, 1, 82], [2, 1, 90], [3, 1, 86],
@@ -78,7 +78,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Session activity by hour</Heading>
+                <Heading as="h3" size="sm">Session activity by hour</Heading>
                 <p style={captionStyle}>
                     Sequential blue ramp across five weekdays; the strongest step marks the busiest hour and cell labels use tabular figures.
                 </p>
@@ -86,7 +86,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Topic mastery matrix</Heading>
+                <Heading as="h3" size="sm">Topic mastery matrix</Heading>
                 <p style={captionStyle}>
                     Sequential green ramp for mastery percentage across four units.
                 </p>
@@ -94,7 +94,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Diverging ramp around zero</Heading>
+                <Heading as="h3" size="sm">Diverging ramp around zero</Heading>
                 <p style={captionStyle}>
                     Two hues through neutral gray for values below and above a zero midpoint.
                 </p>
@@ -148,8 +148,8 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        xCategories: ['A', 'B', 'C', 'D'],
-        yCategories: ['Row 1', 'Row 2', 'Row 3'],
+        xCategories: ['Mon', 'Tue', 'Wed', 'Thu'],
+        yCategories: ['Grade 6', 'Grade 7', 'Grade 8'],
         height: 300,
         hue: 'blue',
         data: [

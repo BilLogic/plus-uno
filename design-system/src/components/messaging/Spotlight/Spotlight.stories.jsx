@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
+import { expectOverlayExit, settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
 import { DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
@@ -41,10 +42,10 @@ export default {
 const calloutCanvas = {
     display: 'flex',
     justifyContent: 'center',
-    padding: 'var(--space-400)',
-    minHeight: 'var(--size-2500)',
+    padding: 'calc(var(--section-pad-x-spacious) * 2)',
+    minHeight: 'var(--width-2500)',
 };
-const calloutCanvasTall = { ...calloutCanvas, minHeight: 'var(--size-3000)' };
+const calloutCanvasTall = { ...calloutCanvas, minHeight: 'var(--width-3000)' };
 
 export const Basic = () => (
     <SpotlightProvider>
@@ -76,13 +77,25 @@ Basic.play = async () => {
 export const WithMedia = () => (
     <SpotlightProvider>
         <div style={calloutCanvasTall}>
-            <SpotlightTarget><Button text="Target" /></SpotlightTarget>
+            <SpotlightTarget><Button text="Session prep" /></SpotlightTarget>
             <Spotlight
-                headline="See it in action"
-                media={<img src="https://placehold.co/295x135" alt="" />}
+                headline="See session prep in action"
+                media={(
+                    <svg
+                        viewBox="0 0 295 135"
+                        aria-hidden="true"
+                        style={{ width: '100%', height: '100%', display: 'block', background: 'var(--ds-surface-raised)' }}
+                    >
+                        <rect x="20" y="20" width="140" height="14" rx="4" fill="var(--ds-background-brand-subtlest)" />
+                        <rect x="20" y="46" width="255" height="10" rx="4" fill="var(--ds-background-neutral)" />
+                        <rect x="20" y="64" width="215" height="10" rx="4" fill="var(--ds-background-neutral)" />
+                        <rect x="20" y="88" width="96" height="26" rx="6" fill="var(--ds-background-brand-bold)" />
+                        <rect x="124" y="88" width="84" height="26" rx="6" fill="var(--ds-background-neutral)" />
+                    </svg>
+                )}
                 primaryAction={<SpotlightAction appearance="primary">Got it</SpotlightAction>}
             >
-                A short preview of the feature.
+                A short preview of the session prep view.
             </Spotlight>
         </div>
     </SpotlightProvider>
@@ -91,13 +104,13 @@ export const WithMedia = () => (
 export const LinkAction = () => (
     <SpotlightProvider>
         <div style={calloutCanvas}>
-            <SpotlightTarget><Button text="Target" /></SpotlightTarget>
+            <SpotlightTarget><Button text="Session guide" /></SpotlightTarget>
             <Spotlight
-                headline="Read more"
-                primaryAction={<SpotlightAction appearance="primary" href="https://example.com">Learn more</SpotlightAction>}
+                headline="Read the session guide"
+                primaryAction={<SpotlightAction appearance="primary" href="#session-guide">Learn more</SpotlightAction>}
                 id="spotlight-link-action"
             >
-                This action links out instead of calling a handler.
+                Follow the step-by-step guide on this page.
             </Spotlight>
         </div>
     </SpotlightProvider>
@@ -113,10 +126,10 @@ export function Dismissible() {
     return (
         <SpotlightProvider>
             <div style={calloutCanvas}>
-                <SpotlightTarget><Button text="Target" /></SpotlightTarget>
+                <SpotlightTarget><Button text="Session tips" /></SpotlightTarget>
                 {isOpen && (
-                    <Spotlight headline="Dismiss me" onDismiss={() => setIsOpen(false)}>
-                        Click the X to close this.
+                    <Spotlight headline="Warm-up notes added" onDismiss={() => setIsOpen(false)}>
+                        See what your student practiced before the session. Select the close button to dismiss it.
                     </Spotlight>
                 )}
             </div>
@@ -129,7 +142,7 @@ export function Dismissible() {
 /** A SpotlightAction on the callout's brand bold ground, without opening a popup. */
 const actionStory = (appearance, label) => ({
     render: () => (
-        <div style={{ display: 'inline-flex', padding: 'var(--space-150)', borderRadius: 'var(--radius-xxl)', background: 'var(--ds-background-brand-bold)' }}>
+        <div style={{ display: 'inline-flex', padding: 'var(--section-pad-y-default) var(--section-pad-x-default)', borderRadius: 'var(--radius-xxl)', background: 'var(--ds-background-brand-bold)' }}>
             <SpotlightAction appearance={appearance}>{label}</SpotlightAction>
         </div>
     ),
@@ -345,4 +358,55 @@ export const BestPracticesLive = {
         await userEvent.click(within(cards[4]).getByRole('button', { name: 'Calendar' }));
         await waitFor(() => expect(within(cards[4]).getByRole('link', { name: 'Learn more' })).toBeVisible());
     },
+};
+
+function SpotlightMotionDemo() {
+    const [open, setOpen] = useState(false);
+    return (
+        <SpotlightProvider>
+            <div style={calloutCanvas}>
+                <SpotlightTarget>
+                    <Button text="Open spotlight" onClick={() => setOpen(true)} />
+                </SpotlightTarget>
+                <Spotlight
+                    isOpen={open}
+                    headline="Warm-up notes added"
+                    onDismiss={() => setOpen(false)}
+                    primaryAction={<SpotlightAction appearance="primary" onClick={() => setOpen(false)}>Got it</SpotlightAction>}
+                >
+                    See what your student practiced before the session.
+                </Spotlight>
+            </div>
+        </SpotlightProvider>
+    );
+}
+
+const spotlightMotionPlay = (reduced = false) => async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const docBody = canvasElement.ownerDocument.body;
+    await userEvent.click(canvas.getByRole('button', { name: 'Open spotlight' }));
+    const popup = await waitFor(() => {
+        const el = docBody.querySelector('.plus-spotlight');
+        if (!el) throw new Error('Spotlight not open yet');
+        return el;
+    });
+    if (reduced) {
+        await expect(popup).toHaveAttribute('data-reduced', 'true');
+        await expect(getComputedStyle(popup).animationName).toBe('none');
+    } else {
+        await expect(getComputedStyle(popup).animationName).toContain('plus-overlay-scale-in');
+    }
+    await settleAnimations(docBody);
+    await expectOverlayExit(popup, () => userEvent.click(within(popup).getByRole('button', { name: 'Got it' })), reduced);
+};
+
+export const MotionOpenAndClose = {
+    render: () => <SpotlightMotionDemo />,
+    play: spotlightMotionPlay(false),
+};
+
+export const MotionReduced = {
+    decorators: [withReducedMotion],
+    render: () => <SpotlightMotionDemo />,
+    play: spotlightMotionPlay(true),
 };

@@ -70,6 +70,8 @@ export const WrapTitlesAndErrors = {
         await expect(rect(title).height, 'the title runs to more than one line').toBeGreaterThan(lineHeight * 1.5);
         await expect(rect(error).height, 'the error runs to more than one line').toBeGreaterThan(parseFloat(getComputedStyle(error).lineHeight) * 1.5);
         await fitsCanvas(canvasElement);
+        // The SectionMessage fades in on mount; the a11y scan reads its resting contrast.
+        await settleAnimations(canvasElement);
     },
 };
 

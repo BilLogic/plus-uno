@@ -63,7 +63,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Practice time vs. assessment score</Heading>
+                <Heading as="h3" size="sm">Practice time vs. assessment score</Heading>
                 <p style={captionStyle}>
                     Two grade cohorts plotted on ladder-sized markers with shared hover and inactive states.
                 </p>
@@ -76,7 +76,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Attendance rate vs. final grade</Heading>
+                <Heading as="h3" size="sm">Attendance rate vs. final grade</Heading>
                 <p style={captionStyle}>
                     A single series uses the brand chart color across all observations.
                 </p>
@@ -104,12 +104,12 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        xAxisLabel: 'X axis',
-        yAxisLabel: 'Y axis',
+        xAxisLabel: 'Minutes tutored',
+        yAxisLabel: 'Competency score',
         height: 400,
         data: [
-            { name: 'Dataset 1', data: [[10, 20], [30, 40], [50, 60], [70, 80]] },
-            { name: 'Dataset 2', data: [[15, 35], [25, 55], [45, 45], [65, 75]] },
+            { name: 'Lincoln Middle', data: [[15, 64], [25, 73], [35, 82], [45, 91]] },
+            { name: 'Roosevelt K-8', data: [[18, 69], [28, 76], [38, 80], [42, 87]] },
         ],
     },
 };

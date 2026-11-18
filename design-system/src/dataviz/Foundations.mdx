@@ -22,7 +22,7 @@ import * as FoundationsStories from './Foundations.stories.jsx';
 
 A chart sits in a Card: <C>--card-pad-compact</C> sets the chart inset, and the chart adds no outer padding of its own. The tooltip uses the Popup pattern's surface, shadow, radius, padding and layer tokens rather than built-in SVG shadow or corner options.
 
-<Canvas of={FoundationsStories.TooltipSurface} sourceState="none" />
+<Canvas of={FoundationsStories.TooltipSurface} />
 
 <RefTable
     head={['Role', 'Token']}
@@ -91,7 +91,7 @@ Removing a border or line with `0` needs no token.
 
 Every text slot in a chart — title, subtitle, caption, axis labels and titles, legend items, data labels, tooltips and empty-data notices — sets the Noto Sans body family (<C>--type-family-body</C>) and current text tokens ([Typography](?path=/docs/foundations-visual-typography--docs)) — never a <C>'12px'</C> literal or a <C>var()</C> with a literal fallback. Titles and emphasized values use semibold (<C>--type-weight-semibold</C>, 600); labels and supporting text use medium (<C>--type-weight-medium</C>, 500). Nothing renders at 700 or 300, data-label text outlines stay off, and number slots set tabular figures (<C>tabular-nums</C>) so values align digit for digit without switching to a monospace font. Inside a tooltip, text stays in <C>--ds-text</C> while only the leading dot swatch takes the series color.
 
-<Canvas of={FoundationsStories.TypeAndNumbers} sourceState="none" />
+<Canvas of={FoundationsStories.TypeAndNumbers} />
 
 <RefTable
     head={['Slot', 'Tokens and rules']}

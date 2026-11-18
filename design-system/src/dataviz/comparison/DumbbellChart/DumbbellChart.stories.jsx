@@ -54,7 +54,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Student score changes</Heading>
+                <Heading as="h3" size="sm">Student score changes</Heading>
                 <p style={captionStyle}>
                     Compare pre-test and post-test scores to see improvement across students.
                 </p>
@@ -77,16 +77,16 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        categories: ['Item A', 'Item B', 'Item C', 'Item D'],
+        categories: ['Algebra I', 'Fractions', 'Reading fluency', 'Essay structure'],
         data: [
-            { low: 20, high: 45 },
-            { low: 30, high: 60 },
-            { low: 15, high: 35 },
-            { low: 40, high: 75 },
+            { low: 52, high: 78 },
+            { low: 60, high: 86 },
+            { low: 48, high: 74 },
+            { low: 64, high: 90 },
         ],
-        lowLabel: 'Start',
-        highLabel: 'End',
-        yAxisLabel: 'Value',
+        lowLabel: 'Baseline',
+        highLabel: 'End of term',
+        yAxisLabel: 'Competency score',
         height: 400,
         horizontal: true,
         sort: true,

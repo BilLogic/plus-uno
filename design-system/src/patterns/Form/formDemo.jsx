@@ -7,7 +7,7 @@ import { Blanket, PatternModal, PatternSection } from '@/patterns';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
-import { BAR_TOKEN, FocusedType, WINDOW_HEIGHT } from '@/storybook-docs/lib/focused-task.jsx';
+import { FocusedType, WINDOW_HEIGHT } from '@/storybook-docs/lib/focused-task.jsx';
 
 /**
  * The Form template's examples. There is no Form component: a form is the
@@ -16,13 +16,6 @@ import { BAR_TOKEN, FocusedType, WINDOW_HEIGHT } from '@/storybook-docs/lib/focu
  * and the in-place sending button are composed from Button, because the Modal
  * and the Panel have no footer prop for either yet.
  */
-
-/** The Modal's own pad, which a full-bleed footer cancels. */
-const MODAL_PAD = '--modal-pad-x-default';
-
-/** The Modal's corner radius, which the full-bleed footer's bottom corners follow. */
-const HOST_RADIUS = '--modal-radius';
-
 
 /** The Modal's stand-in screen on the docs page: docs geometry, in px. */
 /** A page form needs more room than the other windows: the fields, the footer below them, and a server message above. */
@@ -101,7 +94,7 @@ export const FormMessage = ({ children }) => (
 
 /** Left-aligned under the fields, Primary first, Cancel Subtle: a form on its own page. */
 export const PageFooter = ({ sending, onSave }) => (
-    <div data-probe="footer" style={{ display: 'flex', gap: 'var(--stack-md)', marginBlockStart: `var(${BAR_TOKEN})` }}>
+    <div data-probe="footer" style={{ display: 'flex', gap: 'var(--stack-md)', marginBlockStart: '48px' /* token gap: 48px */ }}>
         <Button text="Save session" appearance="primary" isLoading={sending} onClick={onSave} />
         <Button text="Cancel" appearance="subtle" onClick={() => {}} />
     </div>
@@ -225,7 +218,6 @@ export const FormInModal = ({ initial, server, sendingForever, marked, sending, 
                         onClose={() => setConfirming(false)}
                         footer={(
                             <FullBleedFooter
-                                bleed={MODAL_PAD}
                                 primary="Discard"
                                 cancel="Back"
                                 onCancel={() => setConfirming(false)}
@@ -241,7 +233,7 @@ export const FormInModal = ({ initial, server, sendingForever, marked, sending, 
                         height={height}
                         title="Log a session"
                         onClose={close}
-                        footer={<FullBleedFooter bleed={MODAL_PAD} sending={f.sending} onSave={f.submit} onCancel={close} />}
+                        footer={<FullBleedFooter sending={f.sending} onSave={f.submit} onCancel={close} />}
                     >
                         <PresenceSlot show={Boolean(f.serverError)}>
                             <FormMessage>{SERVER_MESSAGE}</FormMessage>

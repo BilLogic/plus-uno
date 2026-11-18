@@ -468,7 +468,7 @@ export const MOTION_REGISTRY = [
     tier: 'component',
     events: {
       enter: { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.default', note: 'Scales from 96% while it fades in; the Blanket dims on the same fade.' },
-      exit: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Scales to 98% while it fades.' },
+      exit: { transition: 'Open and close an overlay', spatial: 'spatial.exit', appearance: 'appearance.fast', note: 'Scales to 98% while it fades.' },
       rejected: { transition: 'Call attention', spatial: 'spatial.fast', note: 'A blocked submit shakes it once; never in reduced motion.' },
     },
   },
@@ -544,7 +544,7 @@ export const MOTION_REGISTRY = [
     name: 'Spotlight',
     tier: 'component',
     events: {
-      enter: { transition: 'Open and close an overlay', spatial: 'spatial.default', note: 'Each coachmark step is Step.' },
+      enter: { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.fast', note: 'Each coachmark step is Step.' },
       exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades.' },
     },
   },
@@ -629,7 +629,7 @@ export const MOTION_REGISTRY = [
     name: 'Pagination',
     tier: 'component',
     events: {
-      change: { transition: 'Step to the next or previous', spatial: 'spatial.default', note: 'A page change is Step.' },
+      change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'Page segments change fill and ink in place; the paged body uses Step.' },
     },
   },
   {
@@ -729,7 +729,7 @@ export const MOTION_REGISTRY = [
     name: 'Spinner',
     tier: 'component',
     events: {
-      change: { transition: 'Load content', appearance: 'linear', note: 'Turns while work runs and stops the moment it stops. A static label in reduced motion.' },
+      change: { transition: 'Load content', appearance: 'loop', note: 'Swings on the loop spring while work runs and stops the moment it stops. A static label in reduced motion.' },
     },
   },
   {

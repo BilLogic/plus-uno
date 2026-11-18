@@ -1,7 +1,7 @@
 /**
  * The frame and layer token collections from the Layout Grid Lab, as code
  * reads them after generation: spacing / layout (modes Medium (768px) ·
- * Large (1024px) · X-Large (1440px)), spacing / patterns and color / patterns.
+ * Large (1024px) · X-Large (1440px)), spacing / templates and color / templates.
  *
  * Every token is pinned by name and resolved value, per mode where the
  * collection has modes. The retired names these replaced are gone; the
@@ -118,7 +118,6 @@ const FIXED = {
   '--table-pad-y-cell': '4px',
   '--table-indent': '24px',
   '--table-radius': '12px',
-  '--table-stack': '8px',
   '--blanket-pad-x': '16px',
   '--blanket-pad-y': '64px',
   '--modal-stack-sm': '8px',
@@ -264,7 +263,7 @@ test('Layout/sidebar-docked is false at Medium and true from Large, in the Figma
 test('every exported variable offers itself only where it belongs: explicit scopes, never ALL_SCOPES', () => {
   // Figma has no scope for a layout grid's count, so the column count takes GAP, the scope its gutter and offset take.
   const EXPECTED = { GAP: /pad|stack|inline|gutter|indent|gap-screen|^columns$/, CORNER_RADIUS: /radius/, WIDTH_HEIGHT: /height|width/ };
-  for (const file of ['spacing _ layout', 'spacing _ patterns', 'color _ patterns']) {
+  for (const file of ['spacing _ layout', 'spacing _ templates', 'color _ templates']) {
     const { variables } = JSON.parse(fs.readFileSync(path.join(SOURCE_DIR, `${file}.json`), 'utf8'));
     for (const v of variables) {
       const label = `${file} > ${v.name}`;
@@ -301,7 +300,6 @@ test('every alias lands on the scales, never on an old --size-* primitive', () =
     '--card-max-height-sm': 'var(--size-1900)',
     '--card-max-height-md': 'var(--size-2500)',
     '--card-max-height-lg': 'var(--size-4000)',
-    '--table-stack': 'var(--space-050)',
     '--screen-pad-x': 'var(--space-150)',
     '--section-min-width-main': 'var(--width-3000)',
     '--modal-radius': 'var(--radius-xxl)',

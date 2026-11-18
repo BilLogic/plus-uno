@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expectOverlayExit, settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
+import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { Modal, MODAL_WIDTHS } from '@/components';
 import { FooterActions, IconButton, Button, Select } from '@/components';
+import { Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
@@ -67,28 +69,30 @@ export default {
     },
 };
 
-const col = { display: 'flex', flexDirection: 'column', gap: '24px', alignItems: 'flex-start' };
+const col = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', alignItems: 'flex-start' };
 const contentVariantGrid = {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))',
-    gap: '24px',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))' /* token gap: 360px */,
+    gap: 'var(--section-stack-lg)',
     width: '100%',
 };
 
-const longBody = `${'Long body copy. '.repeat(24)}A Hug modal scrolls its own body once the content runs past the cap.`;
+const longBody =
+    'Review the session summary before publishing it to the student profile. Note which two-step equation problems Maya K. solved on her own, which steps still needed a prompt, and which practice set is assigned for Thursday at 4:00 PM ET at Lincoln Middle. Families and lead tutors read this note together before the next check-in. ' +
+    'A Hug modal scrolls its own body once the content runs past the cap.';
 
 const modalDocsHostStyle = {
     position: 'relative',
     width: '100%',
-    maxWidth: 800,
-    borderRadius: 12,
-    border: '1px solid var(--ds-border)',
+    maxWidth: '800px' /* token gap: 800px */,
+    borderRadius: 'var(--radius-xl)',
+    border: 'var(--border-width-default) solid var(--ds-border)',
     background: 'var(--ds-surface-sunken)',
     overflow: 'hidden',
-    padding: 16,
+    padding: 'var(--section-pad-y-compact) var(--section-pad-x-compact)',
 };
 
-function InlineModalCanvas({ minHeight = 400, modal }) {
+function InlineModalCanvas({ minHeight = 'var(--width-2500)', modal }) {
     return (
         <div style={{ ...modalDocsHostStyle, minHeight }}>
             {modal}
@@ -102,7 +106,7 @@ function ContentVariantCanvas({ title, description, minHeight, modal }) {
             <DemoLabel>
                 {title}
             </DemoLabel>
-            <p className="body-default" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
+            <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                 {description}
             </p>
             <InlineModalCanvas minHeight={minHeight} modal={modal} />
@@ -116,23 +120,23 @@ function ModalContentDemos() {
             <ContentVariantCanvas
                 title="Default + Buttons"
                 description="Use for short confirmation content with primary and secondary actions."
-                minHeight={320}
+                minHeight="var(--height-2000)"
                 modal={
                     <Modal
                         show
                         renderAs="inline"
-                        title="Modal title"
-                        body="Modal body text goes here."
+                        title="Publish session notes?"
+                        body="Families can view published notes on the student profile."
                         showBottomButtons
                         primaryButton={{
-                            text: 'Primary',
+                            text: 'Publish notes',
                             appearance: 'primary',
-                            onClick: () => console.log('Primary clicked'),
+                            onClick: () => console.log('Publish notes clicked'),
                         }}
                         secondaryButton={{
-                            text: 'Secondary',
+                            text: 'Keep draft',
                             appearance: 'default',
-                            onClick: () => console.log('Secondary clicked'),
+                            onClick: () => console.log('Keep draft clicked'),
                         }}
                         onClose={() => {}}
                     />
@@ -141,23 +145,23 @@ function ModalContentDemos() {
             <ContentVariantCanvas
                 title="Long + Buttons"
                 description="Use for longer content that still needs explicit footer actions."
-                minHeight={340}
+                minHeight={'340px' /* token gap: 340px */}
                 modal={
                     <Modal
                         show
                         renderAs="inline"
-                        title="Modal title"
+                        title="Session summary guidelines"
                         body={longBody}
                         showBottomButtons
                         primaryButton={{
-                            text: 'Primary',
+                            text: 'Publish notes',
                             appearance: 'primary',
-                            onClick: () => console.log('Primary clicked'),
+                            onClick: () => console.log('Publish notes clicked'),
                         }}
                         secondaryButton={{
-                            text: 'Secondary',
+                            text: 'Keep draft',
                             appearance: 'default',
-                            onClick: () => console.log('Secondary clicked'),
+                            onClick: () => console.log('Keep draft clicked'),
                         }}
                         onClose={() => {}}
                     />
@@ -166,13 +170,13 @@ function ModalContentDemos() {
             <ContentVariantCanvas
                 title="Default + No Buttons"
                 description="Use for informational content where closing from the header is sufficient."
-                minHeight={320}
+                minHeight="var(--height-2000)"
                 modal={
                     <Modal
                         show
                         renderAs="inline"
-                        title="Modal title"
-                        body="Modal body text goes here."
+                        title="Session notes saved"
+                        body="Your draft for Maya K. is saved to this device."
                         showBottomButtons={false}
                         onClose={() => {}}
                     />
@@ -181,12 +185,12 @@ function ModalContentDemos() {
             <ContentVariantCanvas
                 title="Long + No Buttons"
                 description="Use for long read-only content without footer actions."
-                minHeight={360}
+                minHeight={'360px' /* token gap: 360px */}
                 modal={
                     <Modal
                         show
                         renderAs="inline"
-                        title="Modal title"
+                        title="Tutoring session checklist"
                         body={longBody}
                         showBottomButtons={false}
                         onClose={() => {}}
@@ -201,13 +205,13 @@ function ModalLayoutDemos() {
     return (
         <>
             <InlineModalCanvas
-                minHeight={360}
+                minHeight={'360px' /* token gap: 360px */}
                 modal={
                     <Modal
                         show
                         renderAs="inline"
-                        title="Modal title"
-                        body="Modal body text goes here."
+                        title="Session details"
+                        body="Thursday, 4:00 PM ET with Maya K. at Lincoln Middle."
                         showBottomButtons={false}
                         onClose={() => {}}
                     />
@@ -215,13 +219,13 @@ function ModalLayoutDemos() {
             />
 
             <InlineModalCanvas
-                minHeight={400}
+                minHeight="var(--width-2500)"
                 modal={
                     <Modal
                         show
                         renderAs="inline"
-                        title="Modal title"
-                        body="Modal body text goes here."
+                        title="Publish session plan?"
+                        body="Students and families see updated goals right away."
                         showBottomButtons
                         primaryButton={{
                             text: 'Confirm',
@@ -243,13 +247,13 @@ function ModalLayoutDemos() {
 
 /** One grid width, drawn at the 1024 screen. */
 const widthStory = (size) => () => (
-    <div style={{ '--plus-overlay-screen': '1024px', width: '100%' }}>
+    <div style={{ '--plus-overlay-screen': '1024px' /* token gap: 1024px */, width: '100%' }}>
         <Modal
             show
             renderAs="inline"
             width={size}
             title={`width="${size}"`}
-            body="Modal body text goes here."
+            body="Review the session plan and goals before sharing with Maya K.'s family."
             secondaryButton={{ text: 'Discard' }}
             primaryButton={{ text: 'Save' }}
             onClose={() => {}}
@@ -271,8 +275,8 @@ const heightStory = (height, title, body) => () => (
     <div
         style={{
             ...modalDocsHostStyle,
-            '--blanket-max-height-modal': 'var(--size-2000)',
-            minHeight: 'calc(var(--size-2000) + 2 * var(--space-100))',
+            '--blanket-max-height-modal': 'var(--height-2000)',
+            minHeight: 'calc(var(--height-2000) + 2 * var(--section-pad-y-compact))',
         }}
     >
         <Modal show renderAs="inline" height={height} title={title} body={body} primaryButton={{ text: 'Done' }} onClose={() => {}} />
@@ -303,7 +307,7 @@ export const WithoutCloseButton = () => (
 );
 
 export const Loading = () => (
-    <Modal show renderAs="inline" loading title="Session details" body="Loaded content" showBottomButtons={false} onClose={() => {}} />
+    <Modal show renderAs="inline" loading title="Session details" body="Session notes and practice sets for Thursday at 4:00 PM ET." showBottomButtons={false} onClose={() => {}} />
 );
 
 export const Content = () => (
@@ -315,15 +319,15 @@ export const Content = () => (
 export const Layout = () => <div style={col}><ModalLayoutDemos /></div>;
 
 const modalDocsShellStyle = {
-    minHeight: 400,
+    minHeight: 'var(--width-2500)',
     width: '100%',
 };
 
 export const Interactive = {
     args: {
         show: true,
-        title: 'Modal title',
-        body: 'Modal body text goes here.',
+        title: 'Publish session notes?',
+        body: 'Families can view published notes on the student profile.',
         width: '6-col',
         height: 'hug',
         showBottomButtons: true,
@@ -336,18 +340,18 @@ export const Interactive = {
                 primaryButton={
                     args.showBottomButtons
                         ? {
-                              text: 'Primary',
+                              text: 'Publish notes',
                               appearance: 'primary',
-                              onClick: () => console.log('Primary clicked'),
+                              onClick: () => console.log('Publish notes clicked'),
                           }
                         : null
                 }
                 secondaryButton={
                     args.showBottomButtons
                         ? {
-                              text: 'Secondary',
+                              text: 'Keep draft',
                               appearance: 'default',
-                              onClick: () => console.log('Secondary clicked'),
+                              onClick: () => console.log('Keep draft clicked'),
                           }
                         : null
                 }
@@ -449,16 +453,16 @@ export const ModalOverModalRefused = {
         const [secondOpen, setSecondOpen] = useState(false);
         return (
             <>
-                <Button text="Open first" onClick={() => setFirstOpen(true)} />
+                <Button text="Open session" onClick={() => setFirstOpen(true)} />
                 <Modal
                     show={firstOpen}
                     width="6-col"
-                    title="First"
-                    body="One."
-                    primaryButton={{ text: 'Open second', onClick: () => setSecondOpen(true) }}
+                    title="Session details"
+                    body="Review Thursday's lesson plan with Maya K."
+                    primaryButton={{ text: 'Delete session', onClick: () => setSecondOpen(true) }}
                     onClose={() => setFirstOpen(false)}
                 />
-                <Modal show={secondOpen} width="6-col" title="Second" body="A Modal never opens on another Modal." onClose={() => setSecondOpen(false)} />
+                <Modal show={secondOpen} width="6-col" title="Confirm delete" body="A Modal never opens on another Modal." onClose={() => setSecondOpen(false)} />
             </>
         );
     },
@@ -469,12 +473,12 @@ export const ModalOverModalRefused = {
         const warn = console.warn;
         console.warn = () => {};
         try {
-            await userEvent.click(canvas.getByRole('button', { name: 'Open first' }));
-            await waitFor(() => expect(dialogNamed(canvasElement, 'First')).not.toBeNull());
+            await userEvent.click(canvas.getByRole('button', { name: 'Open session' }));
+            await waitFor(() => expect(dialogNamed(canvasElement, 'Session details')).not.toBeNull());
 
-            await userEvent.click(body.getByRole('button', { name: 'Open second' }));
-            await expect(hiddenDialog('Second'), 'a Modal over a Modal is refused').toBeNull();
-            await expect(dialogNamed(canvasElement, 'First'), 'the first Modal stays open').not.toBeNull();
+            await userEvent.click(body.getByRole('button', { name: 'Delete session' }));
+            await expect(hiddenDialog('Confirm delete'), 'a Modal over a Modal is refused').toBeNull();
+            await expect(dialogNamed(canvasElement, 'Session details'), 'the first Modal stays open').not.toBeNull();
             await expect(canvasElement.ownerDocument.querySelectorAll('.plus-pattern-blanket').length, 'one Blanket').toBe(1);
         } finally {
             console.warn = warn;
@@ -499,7 +503,7 @@ export const BlockingShadow = {
     render: () => (
         <div style={col}>
             {MODAL_WIDTHS.map((width) => (
-                <Modal key={width} show renderAs="inline" width={width} title={`Modal ${width}`} body="Blocks the page." onClose={() => {}} />
+                <Modal key={width} show renderAs="inline" width={width} title={`Session review (${width})`} body="Confirm before removing this session from the schedule." onClose={() => {}} />
             ))}
         </div>
     ),
@@ -581,7 +585,7 @@ HeaderOptions.play = async ({ canvasElement }) => {
 /** Footer actions (r5): 4-track placement inside Modal padding, spacious (48) fit buttons, no Cancel. */
 export const FooterLayouts = {
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', '--plus-overlay-screen': '1024px', width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', '--plus-overlay-screen': '1024px' /* token gap: 1024px */, width: '100%' }}>
             <Modal
                 show
                 renderAs="inline"
@@ -662,5 +666,96 @@ export const FooterLayouts = {
         const destructiveModal = canvas.getByTestId('modal-footer-destructive');
         const del = within(destructiveModal).getByRole('button', { name: 'Delete recording' });
         await expect(del).toHaveClass('plus-btn--danger');
+    },
+};
+
+const narrowPairScreen = { '--plus-overlay-screen': 'var(--width-3000)', width: '100%' };
+
+/** Size the Modal to its content with a step of MODAL_WIDTHS. */
+export const SizeToContent = {
+    render: () => (
+        <DoDont>
+            <Do caption="The narrowest step for a short question.">
+                <div style={narrowPairScreen}>
+                    <Modal
+                        show
+                        renderAs="inline"
+                        width="6-col"
+                        title="Remove this session?"
+                        body="The student is told it was canceled."
+                        secondaryButton={{ text: 'Keep session' }}
+                        primaryButton={{ text: 'Remove', appearance: 'danger' }}
+                        onClose={() => {}}
+                    />
+                </div>
+            </Do>
+            <Dont caption="The widest step around one sentence.">
+                <div style={narrowPairScreen}>
+                    <Modal
+                        show
+                        renderAs="inline"
+                        width="10-col"
+                        title="Remove this session?"
+                        body="The student is told it was canceled."
+                        secondaryButton={{ text: 'Keep session' }}
+                        primaryButton={{ text: 'Remove', appearance: 'danger' }}
+                        onClose={() => {}}
+                    />
+                </div>
+            </Dont>
+        </DoDont>
+    ),
+    play: async ({ canvas }) => {
+        await expect(canvas.getAllByRole('heading', { name: 'Remove this session?' })).toHaveLength(2);
+        await expect(canvas.getAllByRole('button', { name: 'Remove' })).toHaveLength(2);
+    },
+};
+
+function ModalMotionDemo() {
+    const [open, setOpen] = useState(false);
+    return (
+        <>
+            <Button text="Open session modal" onClick={() => setOpen(true)} />
+            <Modal
+                show={open}
+                width="6-col"
+                title="Publish session notes?"
+                body="Families can view published notes on the student profile."
+                secondaryButton={{ text: 'Keep draft', onClick: () => setOpen(false) }}
+                primaryButton={{ text: 'Publish notes', onClick: () => setOpen(false) }}
+                onClose={() => setOpen(false)}
+            />
+        </>
+    );
+}
+
+export const MotionOpenAndClose = {
+    render: () => <ModalMotionDemo />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const docBody = canvasElement.ownerDocument.body;
+        await userEvent.click(canvas.getByRole('button', { name: 'Open session modal' }));
+        const dialog = await within(docBody).findByRole('dialog', { name: 'Publish session notes?' });
+        await expect(getComputedStyle(dialog).animationName, 'Modal scales in on open').toContain('plus-overlay-scale-in');
+        await settleAnimations(docBody);
+
+        await expectOverlayExit(dialog, () => fireEvent.keyDown(dialog, { key: 'Escape' }), false);
+        await settleAnimations(docBody);
+    },
+};
+
+export const MotionReduced = {
+    decorators: [withReducedMotion],
+    render: () => <ModalMotionDemo />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const docBody = canvasElement.ownerDocument.body;
+        await userEvent.click(canvas.getByRole('button', { name: 'Open session modal' }));
+        const dialog = await within(docBody).findByRole('dialog', { name: 'Publish session notes?' });
+        await expect(dialog).toHaveAttribute('data-reduced', 'true');
+        await expect(getComputedStyle(dialog).animationName).toBe('none');
+        await settleAnimations(docBody);
+
+        await expectOverlayExit(dialog, () => fireEvent.keyDown(dialog, { key: 'Escape' }), true);
     },
 };

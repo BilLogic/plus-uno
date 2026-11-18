@@ -254,7 +254,7 @@ export const LoadingRevealDemo = () => {
         <div aria-hidden="true" style={stack}>
             <Skeleton shape="text" width="40%" isShimmering={!reduced} />
             <SkeletonRows rows={4} reduced={reduced} />
-            <Skeleton width={140} height="var(--height-250)" radius="element-radius-sm" isShimmering={!reduced} />
+            <Skeleton width={140 /* token gap: 140px */} height="var(--height-250)" radius="element-radius-sm" isShimmering={!reduced} />
         </div>
     );
     return (

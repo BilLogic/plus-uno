@@ -50,7 +50,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Monthly active students</Heading>
+                <Heading as="h3" size="sm">Monthly active students</Heading>
                 <p style={captionStyle}>
                     Tracks participation over time with a year-over-year comparison.
                 </p>
@@ -73,14 +73,14 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        xAxisLabel: 'Period',
-        yAxisLabel: 'Value',
+        xAxisLabel: 'Week',
+        yAxisLabel: 'Sessions per week',
         categories: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Wk 6'],
         height: 300,
         sort: false,
         data: [
-            { name: 'Series A', data: [10, 25, 15, 40, 35, 50] },
-            { name: 'Series B', data: [20, 15, 30, 25, 45, 40] },
+            { name: 'Lincoln Middle', data: [18, 25, 22, 40, 35, 50] },
+            { name: 'Roosevelt K-8', data: [20, 18, 30, 28, 45, 42] },
         ],
     },
 };

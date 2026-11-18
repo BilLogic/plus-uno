@@ -8,15 +8,15 @@ import './PatternCard.scss';
  *
  * - **Image placement**: `top` (default), `start` or `end`. Side images apply
  *   at the large card minimum width and fill the height. `imageSplit` chooses
- *   one third (default) or one half; half uses Heading medium on a side card.
+ *   one third (default) or one half; half uses Heading md on a side card.
  *   Below the large minimum width, the image returns to the top with its own ratio.
  * - **Header** (`_Card header`): `title` (the card title type, shared with Card
  *   in `styles/_card-title.scss`, one heading level below its section) over an
  *   optional `description` (Body/default 14), with
  *   `actions` at the end of the row. `header` replaces that block with custom
  *   content, like the header's `custom` type, for tabs or a toolbar.
- * - **Spacing** comes from the Card tokens: `padding` sets Card/pad-sm · md · lg,
- *   the header sits Card/stack-md above the body (`gap` picks the stack step),
+ * - **Spacing** comes from the Card tokens: `padding` sets Card/pad-compact · default · spacious
+ *   (via prop values `'sm'`, `'md'`, `'lg'`), the header sits Card/stack-md above the body (`gap` picks the stack step),
  *   and the footer sits Card/stack-lg below. The footer is left-aligned.
  * - The card hugs its content; in a row it stretches to the tallest card.
  * - **Elevation**: the raised pair at rest. A card with an `onClick` lifts on
@@ -112,14 +112,14 @@ PatternCard.propTypes = {
     image: PropTypes.node,
     /** Image position. Side placements apply from the large card minimum width; narrower cards put the image on top. */
     imagePlacement: PropTypes.oneOf(['top', 'start', 'end']),
-    /** Side image share. One half also steps the title up to Heading medium. Ignored for top placement. */
+    /** Side image share. One half also steps the title up to Heading md. Ignored for top placement. */
     imageSplit: PropTypes.oneOf(['1/3', '1/2']),
     /** Footer slot: commit actions, left-aligned, Card/stack-lg below the body
      * @ds-context Used in: Card.footer (ds guide card)
      * @ds-context Governed by: Common actions (ds guide common-actions)
      */
     footer: PropTypes.node,
-    /** Padding scale: Card/pad-sm · md · lg (16 · 20 · 24) */
+    /** Padding scale: Card/pad-compact · default · spacious (16 · 20 · 24) */
     padding: PropTypes.oneOf(['sm', 'md', 'lg']),
     /** Header-to-body stack: Card/stack-sm · md · lg (4 · 8 · 12) */
     gap: PropTypes.oneOf(['sm', 'md', 'lg']),

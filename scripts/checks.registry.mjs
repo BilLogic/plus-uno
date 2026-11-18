@@ -124,14 +124,6 @@ export const CHECKS = [
     guards: 'dependencies that are declared but imported nowhere, and ones used (a CDN <link> included) but never declared.',
   },
   {
-    name: 'check:deprecated-apis',
-    script: 'node scripts/check-deprecated-apis.mjs',
-    pkg: 'root',
-    trigger: 'pull_request',
-    module: 'scripts/check-deprecated-apis.mjs',
-    guards: 'dependency ranges against the majors that remove an API this repo still uses.',
-  },
-  {
     name: 'check:docs',
     script: 'node scripts/check-doc-links.mjs',
     pkg: 'root',
@@ -186,6 +178,14 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/generate-brand-image.js',
     guards: 'the generated `.storybook/brand-image.js` data-URI module against `design-system/src/assets/storybook-brand.svg`.',
+  },
+  {
+    name: 'check:kit-art',
+    script: 'node scripts/export-kit-art.mjs --check',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/export-kit-art.mjs',
+    guards: 'the exported static kit SVGs in design-system/src/assets/images/kit/ against the shared illustration kit scene and tokens.',
   },
   {
     name: 'check:figma-node-types',

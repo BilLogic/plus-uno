@@ -6,6 +6,7 @@ import { expectInk } from '@/storybook-docs/lib/navigation-states.js';
 
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { CountTag } from '@/components';
 import Tabs from './Tabs';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
@@ -58,7 +59,7 @@ export default {
     }
 };
 
-const col = { display: 'flex', flexDirection: 'column', gap: '48px' };
+const col = { display: 'flex', flexDirection: 'column', gap: '48px' /* token gap: 48px */ };
 
 export const Overview = () => {
     const [activeKey, setActiveKey] = useState('1');
@@ -108,9 +109,9 @@ export const Layout = () => (
         <section>
             <DemoLabel>JUSTIFIED</DemoLabel>
             <Tabs alignment="justified" defaultActiveKey="1">
-                <Tabs.Tab eventKey="1">Tab One</Tabs.Tab>
-                <Tabs.Tab eventKey="2">Tab Two</Tabs.Tab>
-                <Tabs.Tab eventKey="3">Tab Three</Tabs.Tab>
+                <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
+                <Tabs.Tab eventKey="2">Sessions</Tabs.Tab>
+                <Tabs.Tab eventKey="3">Reports</Tabs.Tab>
             </Tabs>
         </section>
     </div>
@@ -210,6 +211,48 @@ Appearance.play = async ({ canvasElement }) => {
     }
 };
 
+/** A trailing `CountTag` sits at 16 inside default (32) and compact (24) tabs. */
+export const WithCount = {
+    render: () => (
+        <div style={col}>
+            <section>
+                <DemoLabel>DEFAULT (32)</DemoLabel>
+                <Tabs defaultActiveKey="1">
+                    <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
+                    <Tabs.Tab eventKey="2">Sessions <CountTag value={4} label="4 sessions" /></Tabs.Tab>
+                    <Tabs.Tab eventKey="3">Messages <CountTag value={12} isBold appearance="danger" label="12 unread" /></Tabs.Tab>
+                </Tabs>
+            </section>
+            <section>
+                <DemoLabel>COMPACT (24)</DemoLabel>
+                <Tabs spacing="compact" appearance="pill" defaultActiveKey="1">
+                    <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
+                    <Tabs.Tab eventKey="2">Sessions <CountTag value={4} label="4 sessions" /></Tabs.Tab>
+                    <Tabs.Tab eventKey="3">Messages <CountTag value={12} isBold appearance="danger" label="12 unread" /></Tabs.Tab>
+                </Tabs>
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const strips = [...canvasElement.querySelectorAll('.plus-tabs')];
+        for (const [strip, expectedHeight] of [[strips[0], 32], [strips[1], 24]]) {
+            for (const tab of strip.querySelectorAll('.plus-tab')) {
+                const tabRect = tab.getBoundingClientRect();
+                await expect(Math.round(tabRect.height), `${tab.textContent} tab height`).toBe(expectedHeight);
+                const count = tab.querySelector('.plus-count');
+                if (count) {
+                    const countRect = count.getBoundingClientRect();
+                    await expect(countRect.height, `${tab.textContent} count height`).toBe(16);
+                    await expect(
+                        Math.abs((countRect.top + countRect.bottom) / 2 - (tabRect.top + tabRect.bottom) / 2),
+                        `${tab.textContent} count centered`,
+                    ).toBeLessThanOrEqual(0.5);
+                }
+            }
+        }
+    },
+};
+
 /**
  * A tab wired to a panel: `aria-controls`/`aria-labelledby` are handled by
  * Base UI, and a disabled tab is still reachable by the arrow keys (so its
@@ -236,12 +279,12 @@ function InteractionStatesDemos() {
     return (
         <section>
             <DemoLabel>INTERACTION STATES</DemoLabel>
-            <p className="body-default" style={{ marginBottom: '24px', color: 'var(--ds-text-subtle)' }}>
+            <p className="body-default" style={{ marginBottom: 'var(--section-stack-lg)', color: 'var(--ds-text-subtle)' }}>
                 States below are artificially forced for demonstration.
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' /* token gap: 32px */ }}>
                 <div>
-                    <p className="body-sm" style={{ marginBottom: '16px', fontWeight: 'bold' }}>Unselected tab states</p>
+                    <p className="body-sm" style={{ marginBottom: 'var(--section-stack-md)', fontWeight: 'bold' }}>Unselected tab states</p>
                     <Tabs defaultActiveKey="none">
                         <Tabs.Tab eventKey="default">Default</Tabs.Tab>
                         <Tabs.Tab eventKey="hover" className="pseudo-hover">Hovered</Tabs.Tab>
@@ -250,7 +293,7 @@ function InteractionStatesDemos() {
                     </Tabs>
                 </div>
                 <div>
-                    <p className="body-sm" style={{ marginBottom: '16px', fontWeight: 'bold' }}>Disabled</p>
+                    <p className="body-sm" style={{ marginBottom: 'var(--section-stack-md)', fontWeight: 'bold' }}>Disabled</p>
                     <Tabs defaultActiveKey="none">
                         <Tabs.Tab eventKey="disabled" isDisabled>Disabled</Tabs.Tab>
                     </Tabs>
@@ -277,9 +320,9 @@ export const Interactive = (args) => {
             activeKey={activeKey}
             onSelect={(k) => setActiveKey(k)}
         >
-            <Tabs.Tab eventKey="1">Tab 1</Tabs.Tab>
-            <Tabs.Tab eventKey="2">Tab 2</Tabs.Tab>
-            <Tabs.Tab eventKey="3">Tab 3</Tabs.Tab>
+            <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
+            <Tabs.Tab eventKey="2">Sessions</Tabs.Tab>
+            <Tabs.Tab eventKey="3">Progress</Tabs.Tab>
         </Tabs>
     );
 };

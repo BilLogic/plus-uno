@@ -52,7 +52,7 @@ export const BesideTitleCase = () => {
     return (
         <div style={{ ...frame, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--inline-md)', flexWrap: 'wrap' }}>
             <div style={line}>
-                <Heading size="large">Session with Ana Ruiz</Heading>
+                <Heading size="lg">Session with Ana Ruiz</Heading>
                 <StatusTag appearance={reviewed ? 'success' : 'warning'} spacing="spacious">
                     {reviewed ? 'Completed' : 'Needs review'}
                 </StatusTag>

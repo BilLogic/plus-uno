@@ -24,8 +24,8 @@ import { MotionPreferenceContext } from '@/lib/motionPreference';
  * x 208, thread x 32, section title x 20.
  */
 
-const ACCOUNT = { id: 'story-john-doe', name: 'John Doe', role: 'Lead' };
-const TUTOR = { id: 'story-john-doe-tutor', name: 'John Doe', role: 'Tutor' };
+const ACCOUNT = { id: 'story-maya-k', name: 'Maya K.', role: 'Lead' };
+const TUTOR = { id: 'story-maya-k-tutor', name: 'Maya K.', role: 'Tutor' };
 
 const groups = (view) => [
     {
@@ -314,7 +314,9 @@ export const OnboardingInProgress = {
         const lessons = rowNamed(canvasElement, /^Lessons/);
         const onboarding = rowNamed(canvasElement, /^Onboarding/);
         await expect(lessons.querySelector('.plus-count:not(.plus-count--dot)'), 'a Count tag, not a dot').toHaveTextContent('2 assigned lessons left');
+        await expect(lessons.querySelector('.plus-count:not(.plus-count--dot)').getBoundingClientRect().height, 'lessons count is 16 tall').toBe(16);
         await expect(onboarding.querySelector('.plus-count:not(.plus-count--dot)')).toHaveTextContent('3 onboarding modules left');
+        await expect(onboarding.querySelector('.plus-count:not(.plus-count--dot)').getBoundingClientRect().height, 'onboarding count is 16 tall').toBe(16);
         await expect(lessons.querySelector('.plus-count--dot')).toBeNull();
         const sessions = rowNamed(canvasElement, 'Sessions');
         await expect(sessions).toHaveAttribute('aria-disabled', 'true');
@@ -539,7 +541,9 @@ export const TabsCollapsedWithSelection = {
         await expect(selectedRows(canvasElement)).toHaveLength(1);
         // At rest (focus elsewhere) the count shows; on hover and focus Close all takes its place.
         document.activeElement?.blur();
-        await expect(within(sessions).getByText('2')).toBeVisible();
+        const collapsedCount = within(sessions).getByText('2').closest('.plus-count');
+        await expect(collapsedCount).toBeVisible();
+        await expect(collapsedCount.getBoundingClientRect().height, 'collapsed tabs count is 16 tall').toBe(16);
         sessions.focus();
         await userEvent.click(within(nav(canvasElement)).getByRole('button', { name: 'Show Sessions tabs' }));
         await expect(tabNamed(canvasElement, /5:30 PM · Mr. Patel/)).toHaveAttribute('aria-current', 'page');

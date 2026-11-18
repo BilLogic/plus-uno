@@ -34,7 +34,7 @@ export default {
     },
 };
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-lg)', alignItems: 'center' };
 
 /** The inner size each tile size insets its icon or logo to. */
 const INNER = { 16: 12, 20: 12, 24: 16, 32: 16, 40: 24, 48: 24 };
@@ -163,7 +163,7 @@ const Logo = () => (
 );
 
 export const Logos = () => (
-    <div style={{ display: 'grid', gap: '12px' }}>
+    <div style={{ display: 'grid', gap: 'var(--stack-lg)' }}>
         <div style={row}>
             {TILE_SIZES.map((size) => (
                 <Tile key={size} content="logo" size={size} data-testid={`logo-${size}`}>

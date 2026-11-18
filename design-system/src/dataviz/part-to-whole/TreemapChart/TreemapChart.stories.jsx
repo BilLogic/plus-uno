@@ -63,7 +63,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Categorical breakdown</Heading>
+                <Heading as="h3" size="sm">Categorical breakdown</Heading>
                 <p style={captionStyle}>
                     Tiles sort from largest to smallest and take the categorical palette in order.
                 </p>
@@ -71,7 +71,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Sequential ramp</Heading>
+                <Heading as="h3" size="sm">Sequential ramp</Heading>
                 <p style={captionStyle}>
                     Past six tiles, {'colorByPoint={false}'} shades one hue ramp with the darkest tone on the largest tile.
                 </p>
@@ -99,11 +99,11 @@ export const Interactive = {
         hue: 'blue',
         sort: true,
         data: [
-            { name: 'Category A', value: 100 },
-            { name: 'Category B', value: 80 },
-            { name: 'Category C', value: 60 },
-            { name: 'Category D', value: 40 },
-            { name: 'Category E', value: 20 },
+            { name: 'Lincoln Middle', value: 100 },
+            { name: 'Roosevelt K-8', value: 80 },
+            { name: 'North High', value: 60 },
+            { name: 'Oakwood Elementary', value: 40 },
+            { name: 'South High', value: 20 },
         ],
     },
 };

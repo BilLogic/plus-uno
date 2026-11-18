@@ -150,9 +150,9 @@ function AccordionInteractionDemos() {
             </p>
             <Accordion
                 items={[
-                    { eventKey: '0', header: 'Active Item', body: 'This item is active and clickable.' },
-                    { eventKey: '1', header: 'Disabled Item', body: 'This content is not accessible.', disabled: true },
-                    { eventKey: '2', header: 'Another Active Item', body: 'This item is also active.' }
+                    { eventKey: '0', header: 'Session notes', body: 'Worked through two-step equations with Maya K. at Lincoln Middle.' },
+                    { eventKey: '1', header: 'Parent summary', body: 'Available once your session reflection is submitted.', disabled: true },
+                    { eventKey: '2', header: 'Next steps', body: 'Assign two practice sets on solving equations before Thursday.' }
                 ]}
                 defaultActiveKey="0"
             />
@@ -168,14 +168,14 @@ function AccordionContentDemos() {
                 Accordion supports both the <code>items</code> array prop and direct child components.
             </p>
             <Accordion defaultActiveKey="custom-1">
-                <Accordion.Item eventKey="custom-1" header="Custom Header One">
-                    <p>This is custom content passed as children.</p>
+                <Accordion.Item eventKey="custom-1" header="Session plan">
+                    <p>Review the warm-up problems and target goal before starting the call.</p>
                     <Button appearance="primary" spacing="compact">
-                        Action Button
+                        Open lesson plan
                     </Button>
                 </Accordion.Item>
-                <Accordion.Item eventKey="custom-2" header="Custom Header Two">
-                    <p>Another custom content area with more flexibility.</p>
+                <Accordion.Item eventKey="custom-2" header="Warm-up check">
+                    <p>Three quick problems on two-step equations to check recall from Tuesday.</p>
                 </Accordion.Item>
             </Accordion>
         </section>
@@ -225,12 +225,41 @@ Overview.parameters = {
  * Interactive Playground
  * Customize the accordion attributes in real-time.
  */
+const interactiveItems = [
+    {
+        eventKey: '0',
+        header: 'Session notes',
+        body: 'Worked through two-step equations with Maya K. and checked three practice problems.'
+    },
+    {
+        eventKey: '1',
+        header: 'Goals',
+        body: 'Solve equations with variables on both sides without a worked example by Nov 24.'
+    },
+    {
+        eventKey: '2',
+        header: 'Materials',
+        body: 'Linear equations slide deck and Lincoln Middle Grade 7 practice worksheet.'
+    },
+    {
+        eventKey: '3',
+        header: 'Practice sets',
+        body: 'Two independent sets assigned for Thursday before the next check-in.'
+    },
+    {
+        eventKey: '4',
+        header: 'Attendance',
+        body: 'Maya K. joined on time at 3:30 PM ET for the full 45-minute math session.'
+    },
+    {
+        eventKey: '5',
+        header: 'Lead tutor note',
+        body: 'Good pacing during the warm-up; leave five minutes for the exit ticket.'
+    }
+];
+
 export const Interactive = (args) => {
-    const items = Array.from({ length: args.itemCount || 3 }, (_, i) => ({
-        eventKey: String(i),
-        header: `Accordion Item #${i + 1}`,
-        body: `This is the content for accordion item ${i + 1}. It can contain any content including text, images, or other components.`
-    }));
+    const items = interactiveItems.slice(0, args.itemCount || 3);
 
     return (
         <div style={{ maxWidth: '800px' /* token gap: 800px */ }}>

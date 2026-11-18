@@ -50,7 +50,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Term enrollment changes</Heading>
+                <Heading as="h3" size="sm">Term enrollment changes</Heading>
                 <p style={captionStyle}>
                     Shows how starting enrollment reaches the current total through sequential additions and withdrawals.
                 </p>
@@ -73,9 +73,9 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        categories: ['Initial', 'Add 1', 'Add 2', 'Subtract', 'Total'],
+        categories: ['Start of term', 'New enrollments', 'Transfers in', 'Completed', 'Current active'],
         data: [{ y: 100, color: BRAND }, 50, 30, -40, { isSum: true, color: BRAND }],
-        yAxisLabel: 'Value',
+        yAxisLabel: 'Enrolled students',
         height: 400,
     },
 };

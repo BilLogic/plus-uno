@@ -41,11 +41,11 @@ export default {
 
 /** The body token each character should paint, as the Figma Docs map it. */
 const BODY_TOKEN = {
-    'mastering-content': '--ds-background-smart-mastering-content-subtle',
-    advocacy: '--ds-background-smart-advocacy-subtle',
-    technology: '--ds-background-smart-technology-tools-subtle',
-    relationships: '--ds-background-smart-relationship-subtle',
-    'social-emotional': '--ds-background-smart-social-emotional-subtle',
+    'mastering-content': '--ds-background-competency-mastering-content-subtle',
+    advocacy: '--ds-background-competency-advocacy-subtle',
+    technology: '--ds-background-competency-technology-tools-subtle',
+    relationships: '--ds-background-competency-relationship-subtle',
+    'social-emotional': '--ds-background-competency-social-emotional-subtle',
     dot: '--ds-background-accent-red-subtle',
     'approximately-equal': '--ds-background-accent-blue-subtle',
     root: '--ds-background-accent-green-subtle',

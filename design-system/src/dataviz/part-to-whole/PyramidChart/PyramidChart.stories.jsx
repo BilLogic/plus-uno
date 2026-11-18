@@ -44,7 +44,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Student enrollment tiers</Heading>
+                <Heading as="h3" size="sm">Student enrollment tiers</Heading>
                 <p style={captionStyle}>
                     Bands stack from the largest base to the narrowest tier at the top.
                 </p>
@@ -69,10 +69,10 @@ export const Interactive = {
     args: {
         sort: false,
         data: [
-            { name: 'Stage 1', value: 1000 },
-            { name: 'Stage 2', value: 600 },
-            { name: 'Stage 3', value: 300 },
-            { name: 'Stage 4', value: 100 },
+            { name: 'Referred', value: 1000 },
+            { name: 'Enrolled', value: 600 },
+            { name: 'Attending weekly', value: 300 },
+            { name: 'Met goal', value: 100 },
         ],
         height: 400,
     },

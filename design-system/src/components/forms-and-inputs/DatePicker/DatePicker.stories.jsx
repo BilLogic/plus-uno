@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
+import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import { expectFieldDisabled, expectFieldFocused, expectFieldHovered, expectFieldInvalid, expectFieldReadOnly, fieldBox } from '@/storybook-docs/lib/field-states.js';
 import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
@@ -104,11 +105,11 @@ export const Spacing = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', paddingBottom: 'var(--width-1900)' }}>
         <div>
             <DemoLabel>DEFAULT (40)</DemoLabel>
-            <DatePicker spacing="default" placeholder="Default" />
+            <DatePicker spacing="default" placeholder="MM/DD/YYYY" />
         </div>
         <div>
             <DemoLabel>COMPACT (32)</DemoLabel>
-            <DatePicker spacing="compact" placeholder="Compact" />
+            <DatePicker spacing="compact" placeholder="MM/DD/YYYY" />
         </div>
     </div>
 );
@@ -121,19 +122,19 @@ export const InteractionStates = () => (
         <div style={{ display: 'flex', gap: 'var(--section-stack-lg)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
             <div>
                 <DemoLabel>DEFAULT</DemoLabel>
-                <DatePicker placeholder="Default" />
+                <DatePicker placeholder="MM/DD/YYYY" />
             </div>
             <div>
                 <DemoLabel>WITH VALUE</DemoLabel>
-                <DatePicker value="2023-10-25" placeholder="With Value" />
+                <DatePicker value="2023-10-25" placeholder="MM/DD/YYYY" />
             </div>
             <div>
                 <DemoLabel>DISABLED</DemoLabel>
-                <DatePicker isDisabled placeholder="Disabled" />
+                <DatePicker isDisabled placeholder="MM/DD/YYYY" />
             </div>
             <div>
                 <DemoLabel>READ ONLY</DemoLabel>
-                <DatePicker isReadOnly value="2023-10-25" placeholder="Read Only" />
+                <DatePicker isReadOnly value="2023-10-25" placeholder="MM/DD/YYYY" />
             </div>
         </div>
     </div>
@@ -177,7 +178,7 @@ export const PickRange = () => {
 
     return (
         <div style={{ paddingBottom: 'var(--width-1900)', maxWidth: 'var(--field-width-lg)' }}>
-            <h6 style={{ marginBottom: 'var(--section-stack-md)' }}>Select a Date Range</h6>
+            <p className="heading-xxs" style={{ marginBottom: 'var(--section-stack-md)' }}>Select a Date Range</p>
             <p className="body-default" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--section-stack-md)' }}>
                 Click a first day, then a last day. The days between are marked.
             </p>
@@ -237,13 +238,13 @@ export const Interactive = (args) => {
 
     return (
         <div style={{ paddingBottom: 'var(--width-1900)' }}>
-            <p>Selected Date: {date || 'None'}</p>
+            <p className="body-default">Selected Date: {date || 'None'}</p>
             <DatePicker {...args} value={date} onChange={setDate} />
         </div>
     );
 };
 Interactive.args = {
-    placeholder: 'Select a date',
+    placeholder: 'MM/DD/YYYY',
     spacing: 'default',
     isDisabled: false,
     isReadOnly: false,
@@ -635,5 +636,35 @@ ClearControl.play = async ({ args, canvasElement }) => {
     await expect(rangeInput).toHaveValue('');
     await expect(args.onRangeChange).toHaveBeenLastCalledWith([null, null]);
     await expect(rangeInput).toHaveFocus();
+};
+
+/** Turning a month inside the DatePicker popup keeps the popup height unchanged mid-turn and after. */
+export const MonthTurnKeepsPopupHeight = () => (
+    <div style={{ maxWidth: '296px' }}>
+        <DatePicker aria-label="Session date" value="2026-10-21" />
+    </div>
+);
+MonthTurnKeepsPopupHeight.parameters = { docs: { disable: true } };
+MonthTurnKeepsPopupHeight.play = async ({ canvasElement }) => {
+    const input = within(canvasElement).getByRole('combobox', { name: 'Session date' });
+    await userEvent.click(input);
+    const popup = await waitFor(() => {
+        const el = calendar();
+        if (!el) throw new Error('DatePicker popup not open yet');
+        return el;
+    });
+    await settleAnimations(popup);
+    const initialHeight = popup.getBoundingClientRect().height;
+
+    await userEvent.click(within(popup).getByRole('button', { name: 'Next month' }));
+    await waitFor(() => {
+        if (!popup.querySelector('[data-view-role="previous"]')) {
+            throw new Error('Expected previous month view during slide');
+        }
+    });
+    await expect(Math.round(popup.getBoundingClientRect().height), 'popup height unchanged mid-turn').toBe(Math.round(initialHeight));
+    await settleAnimations(popup);
+    await expect(within(popup).getByText('November 2026')).toBeVisible();
+    await expect(Math.round(popup.getBoundingClientRect().height), 'popup height unchanged after turn').toBe(Math.round(initialHeight));
 };
 

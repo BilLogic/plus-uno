@@ -44,7 +44,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Student rankings</Heading>
+                <Heading as="h3" size="sm">Student rankings</Heading>
                 <p style={captionStyle}>
                     Lighter alternative to horizontal bars when comparing a ranked list.
                 </p>
@@ -67,9 +67,9 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        categories: ['A', 'B', 'C', 'D', 'E'],
-        data: [50, 40, 70, 30, 60],
-        yAxisLabel: 'Value',
+        categories: ['Lincoln Middle', 'Roosevelt K-8', 'North High', 'Oakwood Elementary', 'South High'],
+        data: [54, 42, 76, 34, 63],
+        yAxisLabel: 'Sessions per week',
         height: 400,
         horizontal: true,
         sort: true,

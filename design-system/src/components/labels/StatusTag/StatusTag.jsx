@@ -13,7 +13,7 @@ import './StatusTag.scss';
  * WHICH LABEL, IN FOUR QUESTIONS. Is it a number? Count tag. Is it a due or
  * event date? Date tag. Is it the condition something is in, and can that
  * condition change? Status tag, whether the system calculated it or a person
- * set it. Otherwise, Tag (or SmartTag for a SMART subject). A Status tag is
+ * set it. Otherwise, Tag (or CompetencyTag for a competency area). A Status tag is
  * filled (a meaning); Tag is outlined (a category).
  *
  * THE NAMES FOLLOW THE LIBRARY. `appearance`, `spacing`, `iconBefore` and
@@ -123,7 +123,6 @@ export const StatusTag = ({
                         <CountTag
                             value={trailingMetric}
                             appearance={metricAppearance}
-                            spacing={effectiveSpacing === 'spacious' ? 'default' : 'compact'}
                         />
                     )}
                 </span>
@@ -141,7 +140,7 @@ StatusTag.propTypes = {
     spacing: PropTypes.oneOf(STATUS_TAG_SPACINGS),
     /** One icon before the label: a Font Awesome Free name (`circle-check`). */
     iconBefore: PropTypes.string,
-    /** A small count at the end of the tag, a Count tag nested inside it: compact (16) in default, default (20) in spacious. Hidden at 0. */
+    /** A small count at the end of the tag, a 16 Count tag nested inside it. Hidden at 0. */
     trailingMetric: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     /** The Count tag's appearance. Defaults to the Status tag's own. */
     trailingMetricAppearance: PropTypes.oneOf(COUNT_TAG_APPEARANCES),

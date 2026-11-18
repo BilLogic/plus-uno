@@ -85,7 +85,7 @@ Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Icon` · `Image` · `Objec
 
 | Part | Token |
 | --- | --- |
-| Body, SMART characters | The area's `subtle` background, such as `--ds-background-smart-advocacy-subtle`. |
+| Body, SMART characters | The area's `subtle` background, such as `--ds-background-competency-advocacy-subtle`. |
 | Body, math characters | An accent `subtle` background: red, blue, green or purple. |
 | Line work | `--ds-icon-subtle` |
 
@@ -117,7 +117,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-background-accent-blue-subtle` · `--ds-background-accent-green-subtle` · `--ds-background-accent-purple-subtle` · `--ds-background-accent-red-subtle` · `--ds-background-smart-advocacy-subtle` · `--ds-background-smart-mastering-content-subtle` · `--ds-background-smart-relationship-subtle` · `--ds-background-smart-social-emotional-subtle` · `--ds-background-smart-technology-tools-subtle` · `--ds-icon-subtle`
+`--ds-background-accent-blue-subtle` · `--ds-background-accent-green-subtle` · `--ds-background-accent-purple-subtle` · `--ds-background-accent-red-subtle` · `--ds-background-competency-advocacy-subtle` · `--ds-background-competency-mastering-content-subtle` · `--ds-background-competency-relationship-subtle` · `--ds-background-competency-social-emotional-subtle` · `--ds-background-competency-technology-tools-subtle` · `--ds-icon-subtle`
 
 From `design-system/src/components/images-and-icons/Illustration/Illustration.scss`. Override these through the token layer, never with a literal.
 

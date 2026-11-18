@@ -84,7 +84,7 @@ Pad the modal on every side, and leave the largest gap of its tier between the c
 
 <FoundationSection title="Tokens">
 
-Primitives are the raw scale, named rem × 100 (`--space-100` is 16 px), and are hidden in Figma, so nothing binds them. Every other tier points at a primitive and names a job as `Collection/property-variant` in Figma, and the same words joined by dashes in code: `Section/pad-x-default` is `--section-pad-x-default`. A collection with a single property skips the variant (`--table-stack`).
+Primitives are the raw scale, named rem × 100 (`--space-100` is 16 px), and are hidden in Figma, so nothing binds them. Every other tier points at a primitive and names a job as `Collection/property-variant` in Figma, and the same words joined by dashes in code: `Section/pad-x-default` is `--section-pad-x-default`. A collection with a single property skips the variant (`--table-indent`).
 
 Name the relationship first, then pick the token from the four-tier ladder on [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs). If you cannot name the context a value belongs to, step back to the box that holds it.
 
@@ -250,7 +250,6 @@ Plain and full-span by default.
         { token: '--table-pad-x-cell', figma: 'Table/pad-x-cell' },
         { token: '--table-pad-y-cell', figma: 'Table/pad-y-cell' },
         { token: '--table-indent', figma: 'Table/indent' },
-        { token: '--table-stack', figma: 'Table/stack' },
         { token: '--table-pad-x-footer', figma: 'Table/pad-x-footer' },
         { token: '--table-min-width-title', figma: 'Table/min-width-title' },
     ]}
@@ -266,7 +265,7 @@ The Blanket pads the screen. A modal pads 16 on every side at every width.
     rows={[
         { token: '--blanket-pad-x', figma: 'Blanket/pad-x' },
         { token: '--blanket-pad-y', figma: 'Blanket/pad-y' },
-        { token: '--modal-pad', figma: 'Modal/pad' },
+        { token: '--modal-pad-x-default', figma: 'Modal/pad-x-default' },
         { token: '--modal-stack-sm', figma: 'Modal/stack-sm' },
         { token: '--modal-stack-md', figma: 'Modal/stack-md', use: 'Between related fields' },
         { token: '--modal-stack-lg', figma: 'Modal/stack-lg', use: 'Between groups, and before the footer' },

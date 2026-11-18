@@ -97,7 +97,7 @@
       "Element padding": "var(--pad-x-{xs|sm|md|lg})",
       "Element gap": "var(--stack-{sm|md|lg})",
       "Element radius": "var(--radius-{sm|md|lg|full})",
-      "Modal padding": "var(--modal-pad-{x|y}-{compact|default|spacious})",
+      "Modal padding": "var(--modal-pad-x-{default|spacious})",
       "Section padding": "var(--section-pad-{x|y}-{compact|default|spacious})",
       "Page padding": "var(--page-pad-{x|y}-{compact|default|spacious})",
       "Table cell": "var(--table-pad-x-cell)",
@@ -165,12 +165,10 @@
       "Space/space-00625": "var(--space-00625)",
       "Space/space-0125": "var(--space-0125)",
       "Space/space-025": "var(--space-025)",
-      "Space/space-03125": "var(--space-03125)",
       "Space/space-0375": "var(--space-0375)",
       "Space/space-050": "var(--space-050)",
       "Space/space-0625": "var(--space-0625)",
       "Space/space-075": "var(--space-075)",
-      "Space/space-0875": "var(--space-0875)",
       "Space/space-100": "var(--space-100)",
       "Space/space-125": "var(--space-125)",
       "Space/space-150": "var(--space-150)",
@@ -289,17 +287,6 @@
       "Card/stack-lg": "var(--card-stack-lg)",
       "Card/stack-md": "var(--card-stack-md)",
       "Card/stack-sm": "var(--card-stack-sm)",
-      "Deprecated/Drawer/inline-lg": "var(--inline-lg)",
-      "Deprecated/Drawer/inline-md": "var(--inline-md)",
-      "Deprecated/Drawer/inline-sm": "var(--inline-sm)",
-      "Deprecated/Drawer/stack-lg": "var(--stack-lg)",
-      "Deprecated/Drawer/stack-md": "var(--stack-md)",
-      "Deprecated/Drawer/stack-sm": "var(--stack-sm)",
-      "Deprecated/Menu/radius-lg": "var(--radius-lg)",
-      "Deprecated/Menu/radius-md": "var(--radius-md)",
-      "Deprecated/Menu/radius-sm": "var(--radius-sm)",
-      "Deprecated/Tile/radius-lg": "var(--radius-lg)",
-      "Deprecated/Tile/radius-sm": "var(--radius-sm)",
       "Focused page/inline-md": "var(--focused-page-inline-md)",
       "Focused page/inline-sm": "var(--focused-page-inline-sm)",
       "Focused page/pad-x": "var(--focused-page-pad-x)",
@@ -318,13 +305,8 @@
       "Modal/inline-lg": "var(--modal-inline-lg)",
       "Modal/inline-md": "var(--modal-inline-md)",
       "Modal/inline-sm": "var(--modal-inline-sm)",
-      "Modal/pad": "var(--modal-pad)",
-      "Modal/pad-x-compact": "var(--modal-pad-x-compact)",
       "Modal/pad-x-default": "var(--modal-pad-x-default)",
       "Modal/pad-x-spacious": "var(--modal-pad-x-spacious)",
-      "Modal/pad-y-compact": "var(--modal-pad-y-compact)",
-      "Modal/pad-y-default": "var(--modal-pad-y-default)",
-      "Modal/pad-y-spacious": "var(--modal-pad-y-spacious)",
       "Modal/radius": "var(--modal-radius)",
       "Modal/stack-lg": "var(--modal-stack-lg)",
       "Modal/stack-md": "var(--modal-stack-md)",
@@ -372,8 +354,7 @@
       "Table/pad-x-cell": "var(--table-pad-x-cell)",
       "Table/pad-x-footer": "var(--table-pad-x-footer)",
       "Table/pad-y-cell": "var(--table-pad-y-cell)",
-      "Table/radius": "var(--table-radius)",
-      "Table/stack": "var(--table-stack)"
+      "Table/radius": "var(--table-radius)"
     },
     "color / primitives": {
       "blackAlpha/60": "var(--palette-black-alpha-60)",
@@ -731,6 +712,41 @@
       "color/background/code/highlight": "var(--ds-background-code-highlight)",
       "color/background/code/removed/highlight": "var(--ds-background-code-removed-highlight)",
       "color/background/code/removed/line": "var(--ds-background-code-removed-line)",
+      "color/background/competency/advocacy/bold/default": "var(--ds-background-competency-advocacy-bold)",
+      "color/background/competency/advocacy/bold/hovered": "var(--ds-background-competency-advocacy-bold-hovered)",
+      "color/background/competency/advocacy/bold/pressed": "var(--ds-background-competency-advocacy-bold-pressed)",
+      "color/background/competency/advocacy/default": "var(--ds-background-competency-advocacy)",
+      "color/background/competency/advocacy/hovered": "var(--ds-background-competency-advocacy-hovered)",
+      "color/background/competency/advocacy/pressed": "var(--ds-background-competency-advocacy-pressed)",
+      "color/background/competency/advocacy/subtle": "var(--ds-background-competency-advocacy-subtle)",
+      "color/background/competency/mastering-content/bold/default": "var(--ds-background-competency-mastering-content-bold)",
+      "color/background/competency/mastering-content/bold/hovered": "var(--ds-background-competency-mastering-content-bold-hovered)",
+      "color/background/competency/mastering-content/bold/pressed": "var(--ds-background-competency-mastering-content-bold-pressed)",
+      "color/background/competency/mastering-content/default": "var(--ds-background-competency-mastering-content)",
+      "color/background/competency/mastering-content/hovered": "var(--ds-background-competency-mastering-content-hovered)",
+      "color/background/competency/mastering-content/pressed": "var(--ds-background-competency-mastering-content-pressed)",
+      "color/background/competency/mastering-content/subtle": "var(--ds-background-competency-mastering-content-subtle)",
+      "color/background/competency/relationship/bold/default": "var(--ds-background-competency-relationship-bold)",
+      "color/background/competency/relationship/bold/hovered": "var(--ds-background-competency-relationship-bold-hovered)",
+      "color/background/competency/relationship/bold/pressed": "var(--ds-background-competency-relationship-bold-pressed)",
+      "color/background/competency/relationship/default": "var(--ds-background-competency-relationship)",
+      "color/background/competency/relationship/hovered": "var(--ds-background-competency-relationship-hovered)",
+      "color/background/competency/relationship/pressed": "var(--ds-background-competency-relationship-pressed)",
+      "color/background/competency/relationship/subtle": "var(--ds-background-competency-relationship-subtle)",
+      "color/background/competency/social-emotional/bold/default": "var(--ds-background-competency-social-emotional-bold)",
+      "color/background/competency/social-emotional/bold/hovered": "var(--ds-background-competency-social-emotional-bold-hovered)",
+      "color/background/competency/social-emotional/bold/pressed": "var(--ds-background-competency-social-emotional-bold-pressed)",
+      "color/background/competency/social-emotional/default": "var(--ds-background-competency-social-emotional)",
+      "color/background/competency/social-emotional/hovered": "var(--ds-background-competency-social-emotional-hovered)",
+      "color/background/competency/social-emotional/pressed": "var(--ds-background-competency-social-emotional-pressed)",
+      "color/background/competency/social-emotional/subtle": "var(--ds-background-competency-social-emotional-subtle)",
+      "color/background/competency/technology-tools/bold/default": "var(--ds-background-competency-technology-tools-bold)",
+      "color/background/competency/technology-tools/bold/hovered": "var(--ds-background-competency-technology-tools-bold-hovered)",
+      "color/background/competency/technology-tools/bold/pressed": "var(--ds-background-competency-technology-tools-bold-pressed)",
+      "color/background/competency/technology-tools/default": "var(--ds-background-competency-technology-tools)",
+      "color/background/competency/technology-tools/hovered": "var(--ds-background-competency-technology-tools-hovered)",
+      "color/background/competency/technology-tools/pressed": "var(--ds-background-competency-technology-tools-pressed)",
+      "color/background/competency/technology-tools/subtle": "var(--ds-background-competency-technology-tools-subtle)",
       "color/background/danger/bold/default": "var(--ds-background-danger-bold)",
       "color/background/danger/bold/hovered": "var(--ds-background-danger-bold-hovered)",
       "color/background/danger/bold/pressed": "var(--ds-background-danger-bold-pressed)",
@@ -783,41 +799,6 @@
       "color/background/selected/default": "var(--ds-background-selected)",
       "color/background/selected/hovered": "var(--ds-background-selected-hovered)",
       "color/background/selected/pressed": "var(--ds-background-selected-pressed)",
-      "color/background/smart/advocacy/bold/default": "var(--ds-background-smart-advocacy-bold)",
-      "color/background/smart/advocacy/bold/hovered": "var(--ds-background-smart-advocacy-bold-hovered)",
-      "color/background/smart/advocacy/bold/pressed": "var(--ds-background-smart-advocacy-bold-pressed)",
-      "color/background/smart/advocacy/default": "var(--ds-background-smart-advocacy)",
-      "color/background/smart/advocacy/hovered": "var(--ds-background-smart-advocacy-hovered)",
-      "color/background/smart/advocacy/pressed": "var(--ds-background-smart-advocacy-pressed)",
-      "color/background/smart/advocacy/subtle": "var(--ds-background-smart-advocacy-subtle)",
-      "color/background/smart/mastering-content/bold/default": "var(--ds-background-smart-mastering-content-bold)",
-      "color/background/smart/mastering-content/bold/hovered": "var(--ds-background-smart-mastering-content-bold-hovered)",
-      "color/background/smart/mastering-content/bold/pressed": "var(--ds-background-smart-mastering-content-bold-pressed)",
-      "color/background/smart/mastering-content/default": "var(--ds-background-smart-mastering-content)",
-      "color/background/smart/mastering-content/hovered": "var(--ds-background-smart-mastering-content-hovered)",
-      "color/background/smart/mastering-content/pressed": "var(--ds-background-smart-mastering-content-pressed)",
-      "color/background/smart/mastering-content/subtle": "var(--ds-background-smart-mastering-content-subtle)",
-      "color/background/smart/relationship/bold/default": "var(--ds-background-smart-relationship-bold)",
-      "color/background/smart/relationship/bold/hovered": "var(--ds-background-smart-relationship-bold-hovered)",
-      "color/background/smart/relationship/bold/pressed": "var(--ds-background-smart-relationship-bold-pressed)",
-      "color/background/smart/relationship/default": "var(--ds-background-smart-relationship)",
-      "color/background/smart/relationship/hovered": "var(--ds-background-smart-relationship-hovered)",
-      "color/background/smart/relationship/pressed": "var(--ds-background-smart-relationship-pressed)",
-      "color/background/smart/relationship/subtle": "var(--ds-background-smart-relationship-subtle)",
-      "color/background/smart/social-emotional/bold/default": "var(--ds-background-smart-social-emotional-bold)",
-      "color/background/smart/social-emotional/bold/hovered": "var(--ds-background-smart-social-emotional-bold-hovered)",
-      "color/background/smart/social-emotional/bold/pressed": "var(--ds-background-smart-social-emotional-bold-pressed)",
-      "color/background/smart/social-emotional/default": "var(--ds-background-smart-social-emotional)",
-      "color/background/smart/social-emotional/hovered": "var(--ds-background-smart-social-emotional-hovered)",
-      "color/background/smart/social-emotional/pressed": "var(--ds-background-smart-social-emotional-pressed)",
-      "color/background/smart/social-emotional/subtle": "var(--ds-background-smart-social-emotional-subtle)",
-      "color/background/smart/technology-tools/bold/default": "var(--ds-background-smart-technology-tools-bold)",
-      "color/background/smart/technology-tools/bold/hovered": "var(--ds-background-smart-technology-tools-bold-hovered)",
-      "color/background/smart/technology-tools/bold/pressed": "var(--ds-background-smart-technology-tools-bold-pressed)",
-      "color/background/smart/technology-tools/default": "var(--ds-background-smart-technology-tools)",
-      "color/background/smart/technology-tools/hovered": "var(--ds-background-smart-technology-tools-hovered)",
-      "color/background/smart/technology-tools/pressed": "var(--ds-background-smart-technology-tools-pressed)",
-      "color/background/smart/technology-tools/subtle": "var(--ds-background-smart-technology-tools-subtle)",
       "color/background/success/bold/default": "var(--ds-background-success-bold)",
       "color/background/success/bold/hovered": "var(--ds-background-success-bold-hovered)",
       "color/background/success/bold/pressed": "var(--ds-background-success-bold-pressed)",
@@ -866,6 +847,11 @@
       "color/border/bold": "var(--ds-border-bold)",
       "color/border/brand": "var(--ds-border-brand)",
       "color/border/code": "var(--ds-border-code)",
+      "color/border/competency/advocacy": "var(--ds-border-competency-advocacy)",
+      "color/border/competency/mastering-content": "var(--ds-border-competency-mastering-content)",
+      "color/border/competency/relationship": "var(--ds-border-competency-relationship)",
+      "color/border/competency/social-emotional": "var(--ds-border-competency-social-emotional)",
+      "color/border/competency/technology-tools": "var(--ds-border-competency-technology-tools)",
       "color/border/danger/default": "var(--ds-border-danger)",
       "color/border/danger/subtle": "var(--ds-border-danger-subtle)",
       "color/border/default": "var(--ds-border)",
@@ -880,11 +866,6 @@
       "color/border/input/search": "var(--ds-border-input-search)",
       "color/border/inverse": "var(--ds-border-inverse)",
       "color/border/selected": "var(--ds-border-selected)",
-      "color/border/smart/advocacy": "var(--ds-border-smart-advocacy)",
-      "color/border/smart/mastering-content": "var(--ds-border-smart-mastering-content)",
-      "color/border/smart/relationship": "var(--ds-border-smart-relationship)",
-      "color/border/smart/social-emotional": "var(--ds-border-smart-social-emotional)",
-      "color/border/smart/technology-tools": "var(--ds-border-smart-technology-tools)",
       "color/border/success/default": "var(--ds-border-success)",
       "color/border/success/subtle": "var(--ds-border-success-subtle)",
       "color/border/surface": "var(--ds-border-surface)",
@@ -1018,6 +999,11 @@
       "color/icon/accent/teal": "var(--ds-icon-accent-teal)",
       "color/icon/accent/yellow": "var(--ds-icon-accent-yellow)",
       "color/icon/brand": "var(--ds-icon-brand)",
+      "color/icon/competency/advocacy": "var(--ds-icon-competency-advocacy)",
+      "color/icon/competency/mastering-content": "var(--ds-icon-competency-mastering-content)",
+      "color/icon/competency/relationship": "var(--ds-icon-competency-relationship)",
+      "color/icon/competency/social-emotional": "var(--ds-icon-competency-social-emotional)",
+      "color/icon/competency/technology-tools": "var(--ds-icon-competency-technology-tools)",
       "color/icon/danger": "var(--ds-icon-danger)",
       "color/icon/default": "var(--ds-icon)",
       "color/icon/disabled": "var(--ds-icon-disabled)",
@@ -1025,11 +1011,6 @@
       "color/icon/information": "var(--ds-icon-information)",
       "color/icon/inverse": "var(--ds-icon-inverse)",
       "color/icon/selected": "var(--ds-icon-selected)",
-      "color/icon/smart/advocacy": "var(--ds-icon-smart-advocacy)",
-      "color/icon/smart/mastering-content": "var(--ds-icon-smart-mastering-content)",
-      "color/icon/smart/relationship": "var(--ds-icon-smart-relationship)",
-      "color/icon/smart/social-emotional": "var(--ds-icon-smart-social-emotional)",
-      "color/icon/smart/technology-tools": "var(--ds-icon-smart-technology-tools)",
       "color/icon/subtle": "var(--ds-icon-subtle)",
       "color/icon/subtlest": "var(--ds-icon-subtlest)",
       "color/icon/success": "var(--ds-icon-success)",
@@ -1080,6 +1061,11 @@
       "color/text/code/operators": "var(--ds-text-code-operators)",
       "color/text/code/strings": "var(--ds-text-code-strings)",
       "color/text/code/tags": "var(--ds-text-code-tags)",
+      "color/text/competency/advocacy": "var(--ds-text-competency-advocacy)",
+      "color/text/competency/mastering-content": "var(--ds-text-competency-mastering-content)",
+      "color/text/competency/relationship": "var(--ds-text-competency-relationship)",
+      "color/text/competency/social-emotional": "var(--ds-text-competency-social-emotional)",
+      "color/text/competency/technology-tools": "var(--ds-text-competency-technology-tools)",
       "color/text/danger/bolder": "var(--ds-text-danger-bolder)",
       "color/text/danger/default": "var(--ds-text-danger)",
       "color/text/default": "var(--ds-text)",
@@ -1090,11 +1076,6 @@
       "color/text/information/default": "var(--ds-text-information)",
       "color/text/inverse": "var(--ds-text-inverse)",
       "color/text/selected": "var(--ds-text-selected)",
-      "color/text/smart/advocacy": "var(--ds-text-smart-advocacy)",
-      "color/text/smart/mastering-content": "var(--ds-text-smart-mastering-content)",
-      "color/text/smart/relationship": "var(--ds-text-smart-relationship)",
-      "color/text/smart/social-emotional": "var(--ds-text-smart-social-emotional)",
-      "color/text/smart/technology-tools": "var(--ds-text-smart-technology-tools)",
       "color/text/subtle": "var(--ds-text-subtle)",
       "color/text/subtlest": "var(--ds-text-subtlest)",
       "color/text/success/bolder": "var(--ds-text-success-bolder)",
@@ -1226,7 +1207,6 @@
       "Listbox/max-width": "var(--listbox-max-width)",
       "Listbox/min-height": "var(--listbox-min-height)",
       "Menu/group-gap": "var(--menu-group-gap)",
-      "Menu/group-item-pad-y": "var(--menu-group-item-pad-y)",
       "Menu/group-min-width": "var(--menu-group-min-width)",
       "Menu/group-pad-x": "var(--menu-group-pad-x)",
       "Option/menu-width": "var(--option-menu-width)",
@@ -1832,56 +1812,56 @@
       "color/ai/background/bold/default": "var(--ds-ai-background-bold)",
       "color/ai/background/bold/hovered": "var(--ds-ai-background-bold-hovered)",
       "color/ai/background/bold/pressed": "var(--ds-ai-background-bold-pressed)",
-      "color/background/smart/mastering-content/default": "var(--ds-background-smart-mastering-content)",
-      "color/background/smart/mastering-content/hovered": "var(--ds-background-smart-mastering-content-hovered)",
-      "color/background/smart/mastering-content/pressed": "var(--ds-background-smart-mastering-content-pressed)",
-      "color/background/smart/mastering-content/subtle": "var(--ds-background-smart-mastering-content-subtle)",
-      "color/background/smart/mastering-content/bold/default": "var(--ds-background-smart-mastering-content-bold)",
-      "color/background/smart/mastering-content/bold/hovered": "var(--ds-background-smart-mastering-content-bold-hovered)",
-      "color/background/smart/mastering-content/bold/pressed": "var(--ds-background-smart-mastering-content-bold-pressed)",
-      "color/text/smart/mastering-content": "var(--ds-text-smart-mastering-content)",
-      "color/icon/smart/mastering-content": "var(--ds-icon-smart-mastering-content)",
-      "color/border/smart/mastering-content": "var(--ds-border-smart-mastering-content)",
-      "color/background/smart/relationship/default": "var(--ds-background-smart-relationship)",
-      "color/background/smart/relationship/hovered": "var(--ds-background-smart-relationship-hovered)",
-      "color/background/smart/relationship/pressed": "var(--ds-background-smart-relationship-pressed)",
-      "color/background/smart/relationship/subtle": "var(--ds-background-smart-relationship-subtle)",
-      "color/background/smart/relationship/bold/default": "var(--ds-background-smart-relationship-bold)",
-      "color/background/smart/relationship/bold/hovered": "var(--ds-background-smart-relationship-bold-hovered)",
-      "color/background/smart/relationship/bold/pressed": "var(--ds-background-smart-relationship-bold-pressed)",
-      "color/text/smart/relationship": "var(--ds-text-smart-relationship)",
-      "color/icon/smart/relationship": "var(--ds-icon-smart-relationship)",
-      "color/border/smart/relationship": "var(--ds-border-smart-relationship)",
-      "color/background/smart/social-emotional/default": "var(--ds-background-smart-social-emotional)",
-      "color/background/smart/social-emotional/hovered": "var(--ds-background-smart-social-emotional-hovered)",
-      "color/background/smart/social-emotional/pressed": "var(--ds-background-smart-social-emotional-pressed)",
-      "color/background/smart/social-emotional/subtle": "var(--ds-background-smart-social-emotional-subtle)",
-      "color/background/smart/social-emotional/bold/default": "var(--ds-background-smart-social-emotional-bold)",
-      "color/background/smart/social-emotional/bold/hovered": "var(--ds-background-smart-social-emotional-bold-hovered)",
-      "color/background/smart/social-emotional/bold/pressed": "var(--ds-background-smart-social-emotional-bold-pressed)",
-      "color/text/smart/social-emotional": "var(--ds-text-smart-social-emotional)",
-      "color/icon/smart/social-emotional": "var(--ds-icon-smart-social-emotional)",
-      "color/border/smart/social-emotional": "var(--ds-border-smart-social-emotional)",
-      "color/background/smart/advocacy/default": "var(--ds-background-smart-advocacy)",
-      "color/background/smart/advocacy/hovered": "var(--ds-background-smart-advocacy-hovered)",
-      "color/background/smart/advocacy/pressed": "var(--ds-background-smart-advocacy-pressed)",
-      "color/background/smart/advocacy/subtle": "var(--ds-background-smart-advocacy-subtle)",
-      "color/background/smart/advocacy/bold/default": "var(--ds-background-smart-advocacy-bold)",
-      "color/background/smart/advocacy/bold/hovered": "var(--ds-background-smart-advocacy-bold-hovered)",
-      "color/background/smart/advocacy/bold/pressed": "var(--ds-background-smart-advocacy-bold-pressed)",
-      "color/text/smart/advocacy": "var(--ds-text-smart-advocacy)",
-      "color/icon/smart/advocacy": "var(--ds-icon-smart-advocacy)",
-      "color/border/smart/advocacy": "var(--ds-border-smart-advocacy)",
-      "color/background/smart/technology-tools/default": "var(--ds-background-smart-technology-tools)",
-      "color/background/smart/technology-tools/hovered": "var(--ds-background-smart-technology-tools-hovered)",
-      "color/background/smart/technology-tools/pressed": "var(--ds-background-smart-technology-tools-pressed)",
-      "color/background/smart/technology-tools/subtle": "var(--ds-background-smart-technology-tools-subtle)",
-      "color/background/smart/technology-tools/bold/default": "var(--ds-background-smart-technology-tools-bold)",
-      "color/background/smart/technology-tools/bold/hovered": "var(--ds-background-smart-technology-tools-bold-hovered)",
-      "color/background/smart/technology-tools/bold/pressed": "var(--ds-background-smart-technology-tools-bold-pressed)",
-      "color/text/smart/technology-tools": "var(--ds-text-smart-technology-tools)",
-      "color/icon/smart/technology-tools": "var(--ds-icon-smart-technology-tools)",
-      "color/border/smart/technology-tools": "var(--ds-border-smart-technology-tools)",
+      "color/background/competency/mastering-content/default": "var(--ds-background-competency-mastering-content)",
+      "color/background/competency/mastering-content/hovered": "var(--ds-background-competency-mastering-content-hovered)",
+      "color/background/competency/mastering-content/pressed": "var(--ds-background-competency-mastering-content-pressed)",
+      "color/background/competency/mastering-content/subtle": "var(--ds-background-competency-mastering-content-subtle)",
+      "color/background/competency/mastering-content/bold/default": "var(--ds-background-competency-mastering-content-bold)",
+      "color/background/competency/mastering-content/bold/hovered": "var(--ds-background-competency-mastering-content-bold-hovered)",
+      "color/background/competency/mastering-content/bold/pressed": "var(--ds-background-competency-mastering-content-bold-pressed)",
+      "color/text/competency/mastering-content": "var(--ds-text-competency-mastering-content)",
+      "color/icon/competency/mastering-content": "var(--ds-icon-competency-mastering-content)",
+      "color/border/competency/mastering-content": "var(--ds-border-competency-mastering-content)",
+      "color/background/competency/relationship/default": "var(--ds-background-competency-relationship)",
+      "color/background/competency/relationship/hovered": "var(--ds-background-competency-relationship-hovered)",
+      "color/background/competency/relationship/pressed": "var(--ds-background-competency-relationship-pressed)",
+      "color/background/competency/relationship/subtle": "var(--ds-background-competency-relationship-subtle)",
+      "color/background/competency/relationship/bold/default": "var(--ds-background-competency-relationship-bold)",
+      "color/background/competency/relationship/bold/hovered": "var(--ds-background-competency-relationship-bold-hovered)",
+      "color/background/competency/relationship/bold/pressed": "var(--ds-background-competency-relationship-bold-pressed)",
+      "color/text/competency/relationship": "var(--ds-text-competency-relationship)",
+      "color/icon/competency/relationship": "var(--ds-icon-competency-relationship)",
+      "color/border/competency/relationship": "var(--ds-border-competency-relationship)",
+      "color/background/competency/social-emotional/default": "var(--ds-background-competency-social-emotional)",
+      "color/background/competency/social-emotional/hovered": "var(--ds-background-competency-social-emotional-hovered)",
+      "color/background/competency/social-emotional/pressed": "var(--ds-background-competency-social-emotional-pressed)",
+      "color/background/competency/social-emotional/subtle": "var(--ds-background-competency-social-emotional-subtle)",
+      "color/background/competency/social-emotional/bold/default": "var(--ds-background-competency-social-emotional-bold)",
+      "color/background/competency/social-emotional/bold/hovered": "var(--ds-background-competency-social-emotional-bold-hovered)",
+      "color/background/competency/social-emotional/bold/pressed": "var(--ds-background-competency-social-emotional-bold-pressed)",
+      "color/text/competency/social-emotional": "var(--ds-text-competency-social-emotional)",
+      "color/icon/competency/social-emotional": "var(--ds-icon-competency-social-emotional)",
+      "color/border/competency/social-emotional": "var(--ds-border-competency-social-emotional)",
+      "color/background/competency/advocacy/default": "var(--ds-background-competency-advocacy)",
+      "color/background/competency/advocacy/hovered": "var(--ds-background-competency-advocacy-hovered)",
+      "color/background/competency/advocacy/pressed": "var(--ds-background-competency-advocacy-pressed)",
+      "color/background/competency/advocacy/subtle": "var(--ds-background-competency-advocacy-subtle)",
+      "color/background/competency/advocacy/bold/default": "var(--ds-background-competency-advocacy-bold)",
+      "color/background/competency/advocacy/bold/hovered": "var(--ds-background-competency-advocacy-bold-hovered)",
+      "color/background/competency/advocacy/bold/pressed": "var(--ds-background-competency-advocacy-bold-pressed)",
+      "color/text/competency/advocacy": "var(--ds-text-competency-advocacy)",
+      "color/icon/competency/advocacy": "var(--ds-icon-competency-advocacy)",
+      "color/border/competency/advocacy": "var(--ds-border-competency-advocacy)",
+      "color/background/competency/technology-tools/default": "var(--ds-background-competency-technology-tools)",
+      "color/background/competency/technology-tools/hovered": "var(--ds-background-competency-technology-tools-hovered)",
+      "color/background/competency/technology-tools/pressed": "var(--ds-background-competency-technology-tools-pressed)",
+      "color/background/competency/technology-tools/subtle": "var(--ds-background-competency-technology-tools-subtle)",
+      "color/background/competency/technology-tools/bold/default": "var(--ds-background-competency-technology-tools-bold)",
+      "color/background/competency/technology-tools/bold/hovered": "var(--ds-background-competency-technology-tools-bold-hovered)",
+      "color/background/competency/technology-tools/bold/pressed": "var(--ds-background-competency-technology-tools-bold-pressed)",
+      "color/text/competency/technology-tools": "var(--ds-text-competency-technology-tools)",
+      "color/icon/competency/technology-tools": "var(--ds-icon-competency-technology-tools)",
+      "color/border/competency/technology-tools": "var(--ds-border-competency-technology-tools)",
       "color/chart/smart/social-emotional/default": "var(--chart-smart-social-emotional)",
       "color/chart/smart/social-emotional/hovered": "var(--chart-smart-social-emotional-hovered)",
       "color/chart/smart/mastering-content/default": "var(--chart-smart-mastering-content)",
@@ -1895,12 +1875,12 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1167,
+    "scssTokenCount": 1158,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1785,
-      "resolved": 1759,
-      "percent": 99,
+      "total": 1776,
+      "resolved": 1739,
+      "percent": 98,
       "skippedCollections": [
         {
           "collection": "archived / colors / accent",
@@ -1984,7 +1964,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Card/pad-lg",
           "tried": [
-            "--pad-lg"
+            "--deprecated-pad-lg"
           ],
           "reason": "no code syntax"
         },
@@ -1992,7 +1972,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Card/pad-md",
           "tried": [
-            "--pad-md"
+            "--deprecated-pad-md"
           ],
           "reason": "no code syntax"
         },
@@ -2000,7 +1980,31 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Card/pad-sm",
           "tried": [
-            "--pad-sm"
+            "--deprecated-pad-sm"
+          ],
+          "reason": "no code syntax"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Drawer/inline-lg",
+          "tried": [
+            "--deprecated-inline-lg"
+          ],
+          "reason": "no code syntax"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Drawer/inline-md",
+          "tried": [
+            "--deprecated-inline-md"
+          ],
+          "reason": "no code syntax"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Drawer/inline-sm",
+          "tried": [
+            "--deprecated-inline-sm"
           ],
           "reason": "no code syntax"
         },
@@ -2008,7 +2012,31 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Drawer/pad",
           "tried": [
-            "--pad"
+            "--deprecated-pad"
+          ],
+          "reason": "no code syntax"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Drawer/stack-lg",
+          "tried": [
+            "--deprecated-stack-lg"
+          ],
+          "reason": "no code syntax"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Drawer/stack-md",
+          "tried": [
+            "--deprecated-stack-md"
+          ],
+          "reason": "no code syntax"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Drawer/stack-sm",
+          "tried": [
+            "--deprecated-stack-sm"
           ],
           "reason": "no code syntax"
         },
@@ -2016,7 +2044,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Drawer/width-lg",
           "tried": [
-            "--width-lg"
+            "--deprecated-width-lg"
           ],
           "reason": "no code syntax"
         },
@@ -2024,7 +2052,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Drawer/width-md",
           "tried": [
-            "--width-md"
+            "--deprecated-width-md"
           ],
           "reason": "no code syntax"
         },
@@ -2032,7 +2060,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Drawer/width-sm",
           "tried": [
-            "--width-sm"
+            "--deprecated-width-sm"
           ],
           "reason": "no code syntax"
         },
@@ -2040,7 +2068,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Dropdown menu/max-height",
           "tried": [
-            "--max-height"
+            "--deprecated-max-height"
           ],
           "reason": "no code syntax"
         },
@@ -2048,7 +2076,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Dropdown menu/max-width",
           "tried": [
-            "--max-width"
+            "--deprecated-max-width"
           ],
           "reason": "no code syntax"
         },
@@ -2056,7 +2084,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Dropdown menu/min-width",
           "tried": [
-            "--min-width"
+            "--deprecated-min-width"
           ],
           "reason": "no code syntax"
         },
@@ -2064,7 +2092,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Dropdown menu/pad",
           "tried": [
-            "--pad"
+            "--deprecated-pad"
           ],
           "reason": "no code syntax"
         },
@@ -2072,7 +2100,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Flag/stack",
           "tried": [
-            "--stack"
+            "--deprecated-stack"
           ],
           "reason": "no code syntax"
         },
@@ -2080,7 +2108,31 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Flag/width",
           "tried": [
-            "--width"
+            "--deprecated-width"
+          ],
+          "reason": "no code syntax"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Menu/radius-lg",
+          "tried": [
+            "--deprecated-radius-lg"
+          ],
+          "reason": "no code syntax"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Menu/radius-md",
+          "tried": [
+            "--deprecated-radius-md"
+          ],
+          "reason": "no code syntax"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Menu/radius-sm",
+          "tried": [
+            "--deprecated-radius-sm"
           ],
           "reason": "no code syntax"
         },
@@ -2088,7 +2140,23 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Page/radius",
           "tried": [
-            "--radius"
+            "--deprecated-radius"
+          ],
+          "reason": "no code syntax"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Tile/radius-lg",
+          "tried": [
+            "--deprecated-radius-lg"
+          ],
+          "reason": "no code syntax"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Tile/radius-sm",
+          "tried": [
+            "--deprecated-radius-sm"
           ],
           "reason": "no code syntax"
         },
@@ -2096,7 +2164,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Tooltip/max-width",
           "tried": [
-            "--max-width"
+            "--deprecated-max-width"
           ],
           "reason": "no code syntax"
         },
@@ -2104,7 +2172,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Tooltip/pad-y",
           "tried": [
-            "--pad-y"
+            "--deprecated-pad-y"
           ],
           "reason": "no code syntax"
         },
@@ -2112,7 +2180,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Tooltip/radius",
           "tried": [
-            "--radius"
+            "--deprecated-radius"
           ],
           "reason": "no code syntax"
         },
@@ -2120,7 +2188,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Frame/sidebar-docked",
           "tried": [
-            "--sidebar-docked"
+            "--frame-sidebar-docked"
           ],
           "reason": "no code syntax"
         },

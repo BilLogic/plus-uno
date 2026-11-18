@@ -39,7 +39,7 @@ import { fileURLToPath } from 'node:url';
 import { CONSUMER_ROOTS, LIBRARY_ROOT, STORYBOOK_ROOT } from './lib/ds-facts.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 import { acrossSets, openRatchet } from './lib/ratchet.mjs';
-import { audit, corpus, ratchetFailures } from './undefined-tokens.mjs';
+import { audit, ratchetFailures, tokenCorpus } from './undefined-tokens.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -64,10 +64,10 @@ export const REMEDY =
 /**
  * The corpus walk and the audit over it, once per repo root. `run` asks what is
  * new, `summary` asks how big the recorded population is, and `--report` asks
- * for all of it — three questions over one read of 1361 files.
+ * for all of it — three questions over one read of the searched files.
  */
 const inputs = byRoot((repoRoot) => {
-  const files = corpus(repoRoot, ROOTS).map((rel) => ({
+  const files = tokenCorpus(repoRoot, ROOTS).map((rel) => ({
     path: rel,
     text: fs.readFileSync(path.join(repoRoot, rel), 'utf8'),
   }));

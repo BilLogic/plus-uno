@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Button } from '@/components';
 import BarChart from '@/dataviz/comparison/BarChart/BarChart';
@@ -8,10 +8,8 @@ import PlusChart from '@/dataviz/PlusChart';
 import chartTheme from '@/dataviz/chartTheme';
 import {
     dataLabelFormat,
-    seriesSwatch,
     tooltipHeaderFormat,
     tooltipPointFormat,
-    valueSpan,
 } from '@/dataviz/chartFormat';
 import { CATEGORICAL, hoveredColor } from '@/dataviz/palette';
 import Highcharts from '@/dataviz/highchartsModules';
@@ -35,7 +33,7 @@ export default {
 
 /** Columns rounding only the value end, at `--chart-bar-radius`. */
 export const BarRadius = () => (
-    <div style={{ maxWidth: 480 }}>
+    <div style={{ maxWidth: 'var(--card-min-width-lg)' }}>
         <BarChart
             sort={false}
             categories={['Mon', 'Tue', 'Wed', 'Thu', 'Fri']}
@@ -45,27 +43,47 @@ export const BarRadius = () => (
     </div>
 );
 
-/** The tooltip's surface, shadow, radius and padding — the Popup pattern's tokens, not Highcharts' own `shadow`/`borderRadius`. */
-export const TooltipSurface = () => (
-    <div style={{ padding: 'var(--card-pad-compact)', background: 'var(--ds-surface-sunken)', display: 'inline-block' }}>
-        <div
-            style={{
-                background: 'var(--ds-surface-overlay)',
-                borderRadius: 'var(--popup-radius)',
-                boxShadow: 'var(--ds-shadow-overlay)',
-                padding: 'var(--popup-pad)',
-                color: 'var(--ds-text)',
-                fontFamily: 'var(--type-family-body)',
-                fontSize: 'var(--type-size-0875)',
-                fontWeight: 'var(--type-weight-medium)',
-                fontVariantNumeric: 'tabular-nums',
-            }}
-        >
-            <span style={{ color: 'var(--chart-brand)' }}>●</span> Thursday:{' '}
-            <span className="plus-chart-value">24 sessions</span>
+/** The tooltip's surface, shadow, radius and padding — the Popup pattern's tokens on a live chart tooltip. */
+function TooltipSurfaceSpecimen() {
+    const slotRef = useRef(null);
+    useEffect(() => {
+        const slot = slotRef.current;
+        if (!slot) return undefined;
+        const chart = findChart(slot);
+        if (chart?.series?.[0]?.points?.[3]) {
+            chart.tooltip.refresh(chart.series[0].points[3]);
+        }
+        return undefined;
+    }, []);
+
+    return (
+        <div style={stackStyle}>
+            <span style={labelStyle}>Tooltip styled with Popup surface, shadow, radius and padding tokens (open at rest; hover any bar to move it).</span>
+            <div ref={slotRef} data-specimen="tooltip-chart" style={{ ...cardStyle, maxWidth: 'var(--card-min-width-lg)' }}>
+                <BarChart
+                    sort={false}
+                    height={220}
+                    categories={['Mon', 'Tue', 'Wed', 'Thu', 'Fri']}
+                    series={[{ name: 'Sessions', data: [12, 19, 8, 24, 16] }]}
+                    showLegend={false}
+                />
+            </div>
         </div>
-    </div>
-);
+    );
+}
+
+export const TooltipSurface = {
+    render: () => <TooltipSurfaceSpecimen />,
+    play: async ({ canvasElement }) => {
+        const slot = canvasElement.querySelector('[data-specimen="tooltip-chart"]');
+        await waitFor(() => expect(slot.querySelector('.highcharts-container')).not.toBeNull());
+        const doc = canvasElement.ownerDocument;
+        await waitFor(() => expect(doc.querySelector('.highcharts-tooltip-container .plus-chart-value')).not.toBeNull());
+        const tooltip = doc.querySelector('.highcharts-tooltip-container');
+        expect(tooltip).toHaveTextContent('24');
+        expect(getComputedStyle(tooltip).backgroundColor).toBe(resolveColor('--ds-surface-overlay', canvasElement));
+    },
+};
 
 const TERM_DATASETS = {
     current: {
@@ -105,15 +123,14 @@ const barStyle = {
 
 const labelStyle = {
     color: 'var(--ds-text-subtle)',
-    fontFamily: 'var(--type-family-body)',
-    fontSize: 'var(--type-size-0875)',
+    font: 'var(--body-default)',
     fontWeight: 'var(--type-weight-medium)',
     fontVariantNumeric: 'tabular-nums',
 };
 
 const gridStyle = {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' /* token gap: 220px */,
     gap: 'var(--section-stack-md)',
 };
 
@@ -196,48 +213,43 @@ const TYPE_OPTIONS = {
  */
 export const TypeAndNumbers = {
     render: () => (
-        <div style={stackStyle}>
-            <div data-specimen="type-chart" style={cardStyle}>
-                <PlusChart options={TYPE_OPTIONS} />
-            </div>
-            <div
-                data-specimen="type-tooltip"
-                style={{
-                    background: 'var(--ds-surface-overlay)',
-                    borderRadius: 'var(--popup-radius)',
-                    boxShadow: 'var(--ds-shadow-overlay)',
-                    padding: 'var(--popup-pad)',
-                    color: 'var(--ds-text)',
-                    fontFamily: 'var(--type-family-body)',
-                    fontSize: 'var(--type-size-0875)',
-                    fontWeight: 'var(--type-weight-medium)',
-                    fontVariantNumeric: 'tabular-nums',
-                    alignSelf: 'flex-start',
-                }}
-                dangerouslySetInnerHTML={{
-                    __html: `${valueSpan('Cohort 4')}<br/>${seriesSwatch('var(--chart-categorical-1)')} Completed: ${valueSpan('435')}`,
+        <div data-specimen="type-chart" style={cardStyle}>
+            <PlusChart
+                options={TYPE_OPTIONS}
+                callback={(chart) => {
+                    if (chart?.series?.[0]?.points?.[3]) {
+                        chart.tooltip.refresh(chart.series[0].points[3]);
+                    }
                 }}
             />
         </div>
     ),
     play: async ({ canvasElement }) => {
+        const slot = canvasElement.querySelector('[data-specimen="type-chart"]');
         await waitFor(() => {
-            expect(canvasElement.querySelector('[data-specimen="type-chart"] .highcharts-container')).not.toBeNull();
+            expect(slot.querySelector('.highcharts-container')).not.toBeNull();
         });
 
-        const container = canvasElement.querySelector('[data-specimen="type-chart"] .highcharts-container');
+        const doc = canvasElement.ownerDocument;
+        await waitFor(() => {
+            expect(doc.querySelector('.highcharts-tooltip-container .plus-chart-value')).not.toBeNull();
+        });
+
+        const container = slot.querySelector('.highcharts-container');
         const title = container.querySelector('.highcharts-title');
         const subtitle = container.querySelector('.highcharts-subtitle');
         const caption = container.querySelector('.highcharts-caption');
         const axisLabel = container.querySelector('.highcharts-axis-labels text');
         const dataLabelValue = container.querySelector('.highcharts-data-label .plus-chart-value');
         const legendItem = container.querySelector('.highcharts-legend-item text');
-        const tooltipValue = canvasElement.querySelector('[data-specimen="type-tooltip"] .plus-chart-value');
+        const tooltipEl = doc.querySelector('.highcharts-tooltip-container .highcharts-tooltip');
+        const tooltipValue = doc.querySelector('.highcharts-tooltip-container .plus-chart-value');
 
         expect(getComputedStyle(title).fontFamily).toContain('Noto Sans');
         expect(getComputedStyle(title).fontWeight).toBe('600');
         expect(getComputedStyle(subtitle).fontWeight).toBe('500');
         expect(getComputedStyle(caption).fontWeight).toBe('500');
+        expect(getComputedStyle(tooltipEl).color).toBe(resolveColor('--ds-text', canvasElement));
 
         for (const numEl of [axisLabel, dataLabelValue, legendItem, tooltipValue]) {
             expect(numEl).not.toBeNull();

@@ -90,7 +90,7 @@ category.
 
 ## Behavior
 
-<ComponentExample of={TagStories.Behaviors} title="Read-only, removable, selectable and link" description="Every kind is 22 tall and outlined, with neutral text and the color on the border." />
+<ComponentExample of={TagStories.Behaviors} title="Read-only, removable, selectable and link" description="Every kind is 20 tall and outlined, with neutral text and the color on the border." />
 
 <ComponentExample of={TagStories.TypeBehaviors} title="Kinds on every type" description="Removable, selectable, link with a separate ×, saving and disabled all work on every type." />
 
@@ -98,7 +98,7 @@ category.
 
 <ComponentExample of={TagStories.AnswerTags} title="Answer choices" description="Each option is a selectable tag, toggled with Space, Enter or a click, with the caller holding which are on." />
 
-<ComponentExample of={TagStories.CountOnSelectable} title="Count on a selectable tag" description={<><code>trailingMetric</code> adds a compact neutral Count tag to a selectable tag, such as a filter's result count; on any other tag it is ignored.</>} />
+<ComponentExample of={TagStories.CountOnSelectable} title="Count on a selectable tag" description={<><code>trailingMetric</code> adds a neutral Count tag to a selectable tag, such as a filter's result count; on any other tag it is ignored.</>} />
 
 <ComponentExample of={TagStories.Removing} title="Removable" description="The × is named from the label, so a row of tags does not expose a row of identical controls." />
 
@@ -180,7 +180,7 @@ category from a workflow state without reading the words.
 
 ## Alternatives
 
-- For one of the five SMART competency areas, use `SmartTag`.
+- For one of the five competency areas, use `CompetencyTag`.
 - For the condition something is in when that condition can change, use `StatusTag`.
 - For a number on its own, use `CountTag`.
 - For a due or event date, use `DateTag`.
@@ -194,7 +194,7 @@ category from a workflow state without reading the words.
 
 1. **Lead, optional.** Nothing by default. A `10` swatch (`swatchBefore`), an icon (`elemBefore`), or for a person, an agent or a team a `16` avatar.
 2. **Label.** Neutral text; the hue never colors the words.
-3. **Trailing metric.** Optional on a selectable tag: a compact `CountTag`, such as a filter's result count.
+3. **Trailing metric.** Optional on a selectable tag: a `CountTag`, such as a filter's result count.
 4. **Remove button.** Optional, with its own focus ring and a name that says what it removes.
 
 ### States
@@ -407,7 +407,7 @@ and every tag inside follows:
 ## Related
 
 - `TagGroup`: use when laying out a set of tags with shared spacing, alignment and overflow.
-- `SmartTag`: use when tagging one of the five SMART competency areas.
+- `CompetencyTag`: use when tagging one of the five competency areas.
 - `Suggestion`: use when offering proposed tags for the person to accept.
 
 </div>

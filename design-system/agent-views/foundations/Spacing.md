@@ -43,7 +43,7 @@ Pad the modal on every side, and leave the largest gap of its tier between the c
 
 ## Tokens
 
-Primitives are the raw scale, named rem × 100 (`--space-100` is 16 px), and are hidden in Figma, so nothing binds them. Every other tier points at a primitive and names a job as `Collection/property-variant` in Figma, and the same words joined by dashes in code: `Section/pad-x-default` is `--section-pad-x-default`. A collection with a single property skips the variant (`--table-stack`).
+Primitives are the raw scale, named rem × 100 (`--space-100` is 16 px), and are hidden in Figma, so nothing binds them. Every other tier points at a primitive and names a job as `Collection/property-variant` in Figma, and the same words joined by dashes in code: `Section/pad-x-default` is `--section-pad-x-default`. A collection with a single property skips the variant (`--table-indent`).
 
 Name the relationship first, then pick the token from the four-tier ladder on [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs). If you cannot name the context a value belongs to, step back to the box that holds it.
 
@@ -157,7 +157,6 @@ Plain and full-span by default.
 - `--table-pad-x-cell` (Table/pad-x-cell)
 - `--table-pad-y-cell` (Table/pad-y-cell)
 - `--table-indent` (Table/indent)
-- `--table-stack` (Table/stack)
 - `--table-pad-x-footer` (Table/pad-x-footer)
 - `--table-min-width-title` (Table/min-width-title)
 
@@ -167,7 +166,7 @@ The Blanket pads the screen. A modal pads 16 on every side at every width.
 
 - `--blanket-pad-x` (Blanket/pad-x)
 - `--blanket-pad-y` (Blanket/pad-y)
-- `--modal-pad` (Modal/pad)
+- `--modal-pad-x-default` (Modal/pad-x-default)
 - `--modal-stack-sm` (Modal/stack-sm)
 - `--modal-stack-md` (Modal/stack-md): Between related fields
 - `--modal-stack-lg` (Modal/stack-lg): Between groups, and before the footer

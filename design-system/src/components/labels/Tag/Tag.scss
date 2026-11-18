@@ -1,9 +1,9 @@
 /*
  * Tag — a category, outlined.
  *
- * ONE SIZE: 22 tall including a 1px border, B3 12 text, padding 4, gap 4,
- * radius 4. The label heights (16/20/22/32) have no semantic token yet, so the
- * 22 is a local custom property set from `_label-heights.scss`, as Count does.
+ * ONE SIZE: 20 tall including a 1px border, B3 12 text, padding 4, gap 4,
+ * radius 4. Height is a local custom property set from `_label-heights.scss`
+ * (`--label-height-md`), as Status and Count do.
  * The swatch 10, radius 2, × 16, the 16 avatar box (space-300) and the 12
  * spinner inside it (space-200) are Figma-bound spacing and radius
  * primitives, because no Element token names them.
@@ -23,8 +23,8 @@
  *
  * The text stays neutral (`color.text`) on every name: the steps it sits on
  * are the accent's lightest, made for neutral text. Gray is the accent gray,
- * which is the neutral ramp. A SMART area is not a hue: it reads the SMART
- * layer through `SmartTag`, so the subject-to-hue pairing lives in the
+ * which is the neutral ramp. A competency area is not a hue: it reads the competency
+ * layer through `CompetencyTag`, so the subject-to-hue pairing lives in the
  * tokens alone. The map holds whole `var()` references so the generated docs
  * list them.
  */

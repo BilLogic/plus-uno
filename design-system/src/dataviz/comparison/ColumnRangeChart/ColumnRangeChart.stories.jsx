@@ -51,7 +51,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Weekly schedule availability</Heading>
+                <Heading as="h3" size="sm">Weekly schedule availability</Heading>
                 <p style={captionStyle}>
                     Availability windows from start hour to end hour across the week.
                 </p>
@@ -74,14 +74,14 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        categories: ['A', 'B', 'C', 'D'],
+        categories: ['Lincoln Middle', 'Roosevelt K-8', 'North High', 'South High'],
         data: [
-            { low: 10, high: 40 },
-            { low: 20, high: 50 },
-            { low: 5, high: 35 },
-            { low: 15, high: 55 },
+            { low: 20, high: 45 },
+            { low: 25, high: 50 },
+            { low: 15, high: 35 },
+            { low: 30, high: 55 },
         ],
-        yAxisLabel: 'Value',
+        yAxisLabel: 'Minutes tutored',
         height: 400,
         horizontal: false,
         sort: true,

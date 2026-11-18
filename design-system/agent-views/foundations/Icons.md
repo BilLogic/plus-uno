@@ -88,6 +88,7 @@ Before proposing a new glyph through Intake, verify that no existing glyph fits,
 Solid, regular and brands are licensed here, including brand glyphs.
 
 Do: Free families (fa-regular, fa-solid, fa-brands) render everywhere.
+
 Don't: Pro families (fa-light, fa-thin, fa-sharp, fa-duotone) render blank.
 
 ### Use 16 by default, 12 sparingly
@@ -95,6 +96,7 @@ Don't: Pro families (fa-light, fa-thin, fa-sharp, fa-duotone) render blank.
 Icons are 16 beside body text. Keep 12 for chevrons, validation and compact parts.
 
 Do: A 16 icon leads the label; the trailing chevron is 12.
+
 Don't: A 12 leading icon is too small beside 14 body text.
 
 ### Use a symbol people recognize
@@ -102,6 +104,7 @@ Don't: A 12 leading icon is too small beside 14 body text.
 Pick the glyph most people read the same way.
 
 Do: A bell for notifications.
+
 Don't: A gear reads as settings, so it misleads here.
 
 ## Accessibility

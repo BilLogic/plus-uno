@@ -30,12 +30,10 @@ const PRIMITIVES = {
   '--space-00625': [1, null],
   '--space-0125': [2, null],
   '--space-025': [4, null],
-  '--space-03125': [5, null],
   '--space-0375': [6, null],
   '--space-050': [8, null],
   '--space-0625': [10, null],
   '--space-075': [12, null],
-  '--space-0875': [14, null],
   '--space-100': [16, null],
   '--space-125': [20, null],
   '--space-150': [24, null],
@@ -197,4 +195,21 @@ test('the retired size names are gone', () => {
   for (const name of ['--size-element-pad-x-xs', '--size-element-pad-y-sm', '--size-element-radius-sm', '--size-element-border', '--element-pad-x-xs']) {
     assert.equal(corpus.get(name), undefined, `${name} is retired`);
   }
+});
+
+test('the unused spacing tokens removed in #2719 are gone', () => {
+  for (const name of [
+    '--space-0875',
+    '--space-03125',
+    '--modal-pad-x-compact',
+    '--menu-group-item-pad-y',
+    '--modal-pad',
+    '--modal-pad-y-compact',
+    '--modal-pad-y-default',
+    '--modal-pad-y-spacious',
+    '--table-stack',
+  ]) {
+    assert.equal(corpus.get(name), undefined, `${name} was removed`);
+  }
+  assert.ok(corpus.get('--type-size-0875'), '--type-size-0875 stays');
 });

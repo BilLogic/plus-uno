@@ -1375,6 +1375,7 @@
         "Appearances",
         "Spacing",
         "Icons",
+        "WithCount",
         "States",
         "Default",
         "Primary",
@@ -1603,6 +1604,7 @@
         "Size44",
         "PickADay",
         "TurnMonths",
+        "TurnMonthsReduced",
         "Default",
         "Selected",
         "Range",
@@ -2014,18 +2016,6 @@
           "default": null,
           "values": null,
           "description": "What the change is measured against, such as \"vs last week\", in subtle text after the tag.",
-          "deprecated": null
-        },
-        {
-          "name": "spacing",
-          "type": "enum",
-          "required": false,
-          "default": "'default'",
-          "values": [
-            "default",
-            "compact"
-          ],
-          "description": "`default` (20) in cards and headers; `compact` (16) in table cells.",
           "deprecated": null
         },
         {
@@ -3136,6 +3126,93 @@
       ]
     },
     {
+      "name": "CompetencyTag",
+      "kind": "component",
+      "import": "import { CompetencyTag } from '@/components';",
+      "group": "labels",
+      "source": "design-system/src/components/labels/CompetencyTag/CompetencyTag.jsx",
+      "summary": "A tag for one of the five competency areas. The `subject` fixes its color and leading icon, and the rest is passed to Tag.",
+      "props": [
+        {
+          "name": "subject",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "social-emotional",
+            "mastering-content",
+            "advocacy",
+            "relationship",
+            "technology-tools",
+            "socio-emotional",
+            "relationships"
+          ],
+          "description": "The competency area. Fixes the Tag color and the leading icon.",
+          "deprecated": null
+        },
+        {
+          "name": "spacing",
+          "type": "enum",
+          "required": false,
+          "default": "'default'",
+          "values": [
+            "default",
+            "spacious"
+          ],
+          "description": "`default` (20) in rows, lists and sentences; `spacious` (32) beside a heading.",
+          "deprecated": null
+        },
+        {
+          "name": "children",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The label (alternative to `text`). Defaults to the subject's own name.",
+          "deprecated": null
+        },
+        {
+          "name": "text",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The label (alternative to `children`). Defaults to the subject's own name.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra class on the tag element.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "CustomLabel",
+        "PassesThroughTagProps",
+        "UnknownSubjectFallsBack",
+        "BesideHeading",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "Disabled"
+      ],
+      "tokens": [
+        "--body-default",
+        "--icon-md",
+        "--icon-sm",
+        "--pad-x-md",
+        "--radius-control-md",
+        "--tag-gap"
+      ]
+    },
+    {
       "name": "CountTag",
       "kind": "component",
       "import": "import { CountTag } from '@/components';",
@@ -3184,18 +3261,6 @@
             "discovery"
           ],
           "description": "The intent. Use one only when the number carries it.",
-          "deprecated": null
-        },
-        {
-          "name": "spacing",
-          "type": "enum",
-          "required": false,
-          "default": "'default'",
-          "values": [
-            "default",
-            "compact"
-          ],
-          "description": "`default` (20) on its own; `compact` (16) is for use inside a label. A dot is always 8.",
           "deprecated": null
         },
         {
@@ -3264,7 +3329,7 @@
       ],
       "stories": [
         "Appearances",
-        "Spacings",
+        "Size",
         "Max",
         "Zero",
         "Ring",
@@ -3282,30 +3347,30 @@
         "--body-sm",
         "--control-sm",
         "--count-tag-dot-size",
+        "--ds-background-competency-mastering-content",
+        "--ds-background-competency-mastering-content-bold",
         "--ds-background-danger",
         "--ds-background-danger-bold",
         "--ds-background-information",
         "--ds-background-information-bold",
         "--ds-background-neutral",
         "--ds-background-neutral-bold",
-        "--ds-background-smart-mastering-content",
-        "--ds-background-smart-mastering-content-bold",
         "--ds-background-success",
         "--ds-background-success-bold",
         "--ds-background-warning",
         "--ds-background-warning-bold",
+        "--ds-icon-competency-mastering-content",
         "--ds-icon-danger",
         "--ds-icon-information",
-        "--ds-icon-smart-mastering-content",
         "--ds-icon-subtle",
         "--ds-icon-success",
         "--ds-icon-warning",
         "--ds-surface",
         "--ds-text",
+        "--ds-text-competency-mastering-content",
         "--ds-text-danger",
         "--ds-text-information",
         "--ds-text-inverse",
-        "--ds-text-smart-mastering-content",
         "--ds-text-subtle",
         "--ds-text-success",
         "--ds-text-warning",
@@ -3519,7 +3584,8 @@
         "BoundedDatesBehavior",
         "TypedEntry",
         "DaysAnnounceTheirDate",
-        "ClearControl"
+        "ClearControl",
+        "MonthTurnKeepsPopupHeight"
       ],
       "tokens": [
         "--ds-icon-subtle"
@@ -5749,6 +5815,7 @@
       ],
       "stories": [
         "Overview",
+        "WithoutBrowserFrame",
         "ColorModes",
         "Reading",
         "DocsOverview",
@@ -6006,13 +6073,13 @@
           "required": false,
           "default": null,
           "values": [
-            "xxlarge",
-            "xlarge",
-            "large",
-            "medium",
-            "small",
-            "xsmall",
-            "xxsmall"
+            "xxl",
+            "xl",
+            "lg",
+            "md",
+            "sm",
+            "xs",
+            "xxs"
           ],
           "description": "The text style. Required: a heading with no size is not a heading.",
           "deprecated": null
@@ -6490,11 +6557,11 @@
         "--ds-background-accent-green-subtle",
         "--ds-background-accent-purple-subtle",
         "--ds-background-accent-red-subtle",
-        "--ds-background-smart-advocacy-subtle",
-        "--ds-background-smart-mastering-content-subtle",
-        "--ds-background-smart-relationship-subtle",
-        "--ds-background-smart-social-emotional-subtle",
-        "--ds-background-smart-technology-tools-subtle",
+        "--ds-background-competency-advocacy-subtle",
+        "--ds-background-competency-mastering-content-subtle",
+        "--ds-background-competency-relationship-subtle",
+        "--ds-background-competency-social-emotional-subtle",
+        "--ds-background-competency-technology-tools-subtle",
         "--ds-icon-subtle"
       ]
     },
@@ -7828,7 +7895,10 @@
         "Hovered",
         "Pressed",
         "Focused",
-        "FooterLayouts"
+        "FooterLayouts",
+        "SizeToContent",
+        "MotionOpenAndClose",
+        "MotionReduced"
       ],
       "tokens": [
         "--blanket-max-height-modal",
@@ -7844,9 +7914,11 @@
         "--modal-pad-x-default",
         "--modal-radius",
         "--modal-stack-md",
+        "--plus-overlay-origin",
         "--stack-md",
         "--stack-sm",
-        "--stroke-1"
+        "--stroke-1",
+        "--transform-origin"
       ]
     },
     {
@@ -8223,7 +8295,6 @@
         "TypeDefault",
         "TypeFullWidth",
         "AnatomyRecord",
-        "AnatomyRecordScaledDown",
         "ScenarioArea",
         "ScenarioSeveralSections",
         "ScenarioRecordTabs",
@@ -8272,7 +8343,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "The page title. Drawn as a `large` `Heading` (at the ambient heading level, `h1` by default) unless `disableTitleStyles` is set. `children` is used when it is omitted.",
+          "description": "The page title. Drawn as a `lg` `Heading` (at the ambient heading level, `h1` by default) unless `disableTitleStyles` is set. `children` is used when it is omitted.",
           "deprecated": null
         },
         {
@@ -8665,7 +8736,7 @@
       "import": "import { PatternCard } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/PatternCard/PatternCard.jsx",
-      "summary": "PLUS card: an optional image, content and footer on the raised surface and shadow. - **Image placement**: `top` (default), `start` or `end`. Side images apply at the large card minimum width and fill the height. `imageSplit` chooses one third (default) or one half; half uses Heading medium on a side card. Below the large minimum width, the image returns to the top with its own ratio. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: `padding` sets Card/pad-sm · md · lg, the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: the raised pair at rest. A card with an `onClick` lifts on hover to the raised surface's hovered step under the overlay shadow, and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.",
+      "summary": "PLUS card: an optional image, content and footer on the raised surface and shadow. - **Image placement**: `top` (default), `start` or `end`. Side images apply at the large card minimum width and fill the height. `imageSplit` chooses one third (default) or one half; half uses Heading md on a side card. Below the large minimum width, the image returns to the top with its own ratio. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: `padding` sets Card/pad-compact · default · spacious (via prop values `'sm'`, `'md'`, `'lg'`), the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: the raised pair at rest. A card with an `onClick` lifts on hover to the raised surface's hovered step under the overlay shadow, and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.",
       "props": [
         {
           "name": "id",
@@ -8743,7 +8814,7 @@
             "1/3",
             "1/2"
           ],
-          "description": "Side image share. One half also steps the title up to Heading medium. Ignored for top placement.",
+          "description": "Side image share. One half also steps the title up to Heading md. Ignored for top placement.",
           "deprecated": null
         },
         {
@@ -8765,7 +8836,7 @@
             "md",
             "lg"
           ],
-          "description": "Padding scale: Card/pad-sm · md · lg (16 · 20 · 24)",
+          "description": "Padding scale: Card/pad-compact · default · spacious (16 · 20 · 24)",
           "deprecated": null
         },
         {
@@ -11938,6 +12009,7 @@
         "--ds-text",
         "--icon-lg",
         "--icon-md",
+        "--plus-rating-stagger",
         "--radius-full",
         "--space-0625",
         "--stack-md",
@@ -12763,7 +12835,9 @@
         "Rest",
         "Hovered",
         "Pressed",
-        "Focused"
+        "Focused",
+        "MotionEnterAndExit",
+        "MotionReduced"
       ],
       "tokens": [
         "--body-default",
@@ -13746,66 +13820,6 @@
       ]
     },
     {
-      "name": "SmartTag",
-      "kind": "component",
-      "import": "import { SmartTag } from '@/components';",
-      "group": "labels",
-      "source": "design-system/src/components/labels/SmartTag/SmartTag.jsx",
-      "summary": "A tag for one of the five SMART competency areas. The `subject` fixes its color and leading icon, and the rest is passed to Tag.",
-      "props": [
-        {
-          "name": "subject",
-          "type": "enum",
-          "required": false,
-          "default": null,
-          "values": [
-            "social-emotional",
-            "mastering-content",
-            "advocacy",
-            "relationship",
-            "technology-tools",
-            "socio-emotional",
-            "relationships"
-          ],
-          "description": "The SMART subject. Fixes the Tag color and the leading icon.",
-          "deprecated": null
-        },
-        {
-          "name": "children",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "The label (alternative to `text`). Defaults to the subject's own name.",
-          "deprecated": null
-        },
-        {
-          "name": "text",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "The label (alternative to `children`). Defaults to the subject's own name.",
-          "deprecated": null
-        }
-      ],
-      "stories": [
-        "Overview",
-        "CustomLabel",
-        "PassesThroughTagProps",
-        "UnknownSubjectFallsBack",
-        "Interactive",
-        "Rest",
-        "Hovered",
-        "Pressed",
-        "Focused",
-        "Disabled"
-      ],
-      "tokens": [
-        "--icon-sm"
-      ]
-    },
-    {
       "name": "Spinner",
       "kind": "component",
       "import": "import { Spinner } from '@/components';",
@@ -14073,7 +14087,9 @@
         "Hovered",
         "Pressed",
         "Focused",
-        "BestPracticesLive"
+        "BestPracticesLive",
+        "MotionOpenAndClose",
+        "MotionReduced"
       ],
       "tokens": [
         "--body-default",
@@ -14086,13 +14102,15 @@
         "--ds-text",
         "--ds-text-inverse",
         "--heading-sm",
+        "--plus-overlay-origin",
         "--popup-radius",
         "--radius-lg",
         "--space-075",
         "--space-100",
         "--space-150",
         "--spotlight-media-height",
-        "--spotlight-width"
+        "--spotlight-width",
+        "--transform-origin"
       ]
     },
     {
@@ -14155,7 +14173,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "A small count at the end of the tag, a Count tag nested inside it: compact (16) in default, default (20) in spacious. Hidden at 0.",
+          "description": "A small count at the end of the tag, a 16 Count tag nested inside it. Hidden at 0.",
           "deprecated": null
         },
         {
@@ -14223,22 +14241,22 @@
         "--body-default",
         "--body-sm",
         "--border-width-default",
+        "--ds-background-competency-mastering-content",
+        "--ds-background-competency-mastering-content-pressed",
         "--ds-background-danger",
         "--ds-background-danger-pressed",
         "--ds-background-information",
         "--ds-background-information-pressed",
         "--ds-background-neutral",
         "--ds-background-neutral-pressed",
-        "--ds-background-smart-mastering-content",
-        "--ds-background-smart-mastering-content-pressed",
         "--ds-background-success",
         "--ds-background-success-pressed",
         "--ds-background-warning",
         "--ds-background-warning-pressed",
         "--ds-text",
+        "--ds-text-competency-mastering-content",
         "--ds-text-danger",
         "--ds-text-information",
-        "--ds-text-smart-mastering-content",
         "--ds-text-success",
         "--ds-text-warning",
         "--icon-md",
@@ -14701,6 +14719,7 @@
         "Alignment",
         "Appearance",
         "UnderlineRadius",
+        "WithCount",
         "WithPanels",
         "InteractionStates",
         "Interactive",
@@ -14882,7 +14901,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Selectable tags only: a compact neutral Count tag after the label, such as a filter's result count. Ignored with a warning elsewhere.",
+          "description": "Selectable tags only: a neutral Count tag after the label, such as a filter's result count. Ignored with a warning elsewhere.",
           "deprecated": null
         },
         {
@@ -16973,7 +16992,10 @@
         "PlacementRight",
         "Wrapping",
         "MotionOpenClose",
-        "MotionReduced"
+        "MotionReduced",
+        "SayWhatControlDoes",
+        "KeepToOneLine",
+        "InteractiveContentInPopup"
       ],
       "tokens": [
         "--body-sm",

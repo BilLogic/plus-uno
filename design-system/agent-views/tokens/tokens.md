@@ -74,12 +74,8 @@ Space owned by a template: page, section, card, table, modal, popup. Inside a te
 --frame-sidebar-width-nav  /* Fixed width of the side navigation inside the Frame. */
 --frame-topbar-height  /* Height of the Frame's top bar. */
 --modal-body-min-height  /* Minimum height of a Modal's body, so a short body does not collapse the dialog. */
---modal-pad-x-compact  /* Horizontal padding of a Modal with compact spacing. */
 --modal-pad-x-default  /* Horizontal padding of a Modal with default spacing. */
 --modal-pad-x-spacious  /* Horizontal padding of a Modal with spacious spacing. */
---modal-pad-y-compact  /* Vertical padding of a Modal with compact spacing. */
---modal-pad-y-default  /* Vertical padding of a Modal with default spacing. */
---modal-pad-y-spacious  /* Vertical padding of a Modal with spacious spacing. */
 --modal-radius  /* Corner rounding of a Modal. */
 --modal-width-lg  /* Width of a large Modal, such as a table or a long form. */
 --modal-width-md  /* Width of a default Modal, such as a short form. */
@@ -154,7 +150,6 @@ Tokens one component owns, named for it.
 --listbox-max-width  /* Widest a Select or Cascader listbox may grow. */
 --listbox-min-height  /* Shortest a Select or Cascader listbox may be. */
 --menu-group-gap  /* Vertical gap between groups in a menu. */
---menu-group-item-pad-y  /* Vertical padding of an item in a menu group. */
 --menu-group-min-width  /* Minimum width of a menu group. */
 --menu-group-pad-x  /* Horizontal padding of a menu group. */
 --option-menu-width  /* Width of a fixed-width option menu. */
@@ -363,7 +358,6 @@ The templates on the page frame, per breakpoint: page, section, card, table, ove
 --modal-inline-lg  /* Horizontal gap between columns in a Modal. */
 --modal-inline-md  /* Horizontal gap between the actions in a Modal footer. */
 --modal-inline-sm  /* Horizontal gap between small items in a Modal row. */
---modal-pad  /* Padding inside a Modal at the current breakpoint. */
 --modal-stack-lg  /* Vertical gap between a Modal's header, body and footer. */
 --modal-stack-md  /* Vertical gap between blocks in a Modal's body. */
 --modal-stack-sm  /* Vertical gap between a Modal's title and its description. */
@@ -387,7 +381,6 @@ The templates on the page frame, per breakpoint: page, section, card, table, ove
 --table-pad-x-cell  /* Horizontal padding inside a PatternTable cell. */
 --table-pad-x-footer  /* Horizontal padding of a PatternTable footer, such as its Pagination row. */
 --table-pad-y-cell  /* Vertical padding inside a PatternTable cell. */
---table-stack  /* Vertical gap between a PatternTable and its toolbar or footer. */
 --tooltip-max-width  /* Widest a Tooltip may grow before its text wraps. */
 --tooltip-pad-y  /* Vertical padding inside a Tooltip. */
 ```
@@ -710,6 +703,41 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-background-code-highlight  /* Highlighted unchanged code lines */
 --ds-background-code-removed-highlight  /* Highlighted removed code lines */
 --ds-background-code-removed-line  /* Removed code lines */
+--ds-background-competency-advocacy  /* Competency tag fill. Aliases the lime accent. */
+--ds-background-competency-advocacy-bold  /* Bold competency area fill (art, a filled tag). Aliases the lime accent. */
+--ds-background-competency-advocacy-bold-hovered  /* Hovered bold competency area fill. Aliases the lime accent. */
+--ds-background-competency-advocacy-bold-pressed  /* Pressed bold competency area fill. Aliases the lime accent. */
+--ds-background-competency-advocacy-hovered  /* Hovered competency tag. Aliases the lime accent. */
+--ds-background-competency-advocacy-pressed  /* Pressed competency tag. Aliases the lime accent. */
+--ds-background-competency-advocacy-subtle  /* Illustration bodies and other mid-strength competency fills. Aliases the lime accent. */
+--ds-background-competency-mastering-content  /* Competency tag fill. Aliases the teal accent. */
+--ds-background-competency-mastering-content-bold  /* Bold competency area fill (art, a filled tag). Aliases the teal accent. */
+--ds-background-competency-mastering-content-bold-hovered  /* Hovered bold competency area fill. Aliases the teal accent. */
+--ds-background-competency-mastering-content-bold-pressed  /* Pressed bold competency area fill. Aliases the teal accent. */
+--ds-background-competency-mastering-content-hovered  /* Hovered competency tag. Aliases the teal accent. */
+--ds-background-competency-mastering-content-pressed  /* Pressed competency tag. Aliases the teal accent. */
+--ds-background-competency-mastering-content-subtle  /* Illustration bodies and other mid-strength competency fills. Aliases the teal accent. */
+--ds-background-competency-relationship  /* Competency tag fill. Aliases the magenta accent. */
+--ds-background-competency-relationship-bold  /* Bold competency area fill (art, a filled tag). Aliases the magenta accent. */
+--ds-background-competency-relationship-bold-hovered  /* Hovered bold competency area fill. Aliases the magenta accent. */
+--ds-background-competency-relationship-bold-pressed  /* Pressed bold competency area fill. Aliases the magenta accent. */
+--ds-background-competency-relationship-hovered  /* Hovered competency tag. Aliases the magenta accent. */
+--ds-background-competency-relationship-pressed  /* Pressed competency tag. Aliases the magenta accent. */
+--ds-background-competency-relationship-subtle  /* Illustration bodies and other mid-strength competency fills. Aliases the magenta accent. */
+--ds-background-competency-social-emotional  /* Competency tag fill. Aliases the orange accent. */
+--ds-background-competency-social-emotional-bold  /* Bold competency area fill (art, a filled tag). Aliases the orange accent. */
+--ds-background-competency-social-emotional-bold-hovered  /* Hovered bold competency area fill. Aliases the orange accent. */
+--ds-background-competency-social-emotional-bold-pressed  /* Pressed bold competency area fill. Aliases the orange accent. */
+--ds-background-competency-social-emotional-hovered  /* Hovered competency tag. Aliases the orange accent. */
+--ds-background-competency-social-emotional-pressed  /* Pressed competency tag. Aliases the orange accent. */
+--ds-background-competency-social-emotional-subtle  /* Illustration bodies and other mid-strength competency fills. Aliases the orange accent. */
+--ds-background-competency-technology-tools  /* Competency tag fill. Aliases the brown accent. */
+--ds-background-competency-technology-tools-bold  /* Bold competency area fill (art, a filled tag). Aliases the brown accent. */
+--ds-background-competency-technology-tools-bold-hovered  /* Hovered bold competency area fill. Aliases the brown accent. */
+--ds-background-competency-technology-tools-bold-pressed  /* Pressed bold competency area fill. Aliases the brown accent. */
+--ds-background-competency-technology-tools-hovered  /* Hovered competency tag. Aliases the brown accent. */
+--ds-background-competency-technology-tools-pressed  /* Pressed competency tag. Aliases the brown accent. */
+--ds-background-competency-technology-tools-subtle  /* Illustration bodies and other mid-strength competency fills. Aliases the brown accent. */
 --ds-background-danger  /* Backgrounds communicating critical information, such as in error section messages */
 --ds-background-danger-bold  /* A vibrant background option for communicating critical information, such as in danger buttons and error banners */
 --ds-background-danger-bold-hovered
@@ -762,41 +790,6 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-background-selected-bold-pressed  /* The background of a selected control that uses --ds-background-selected-bold while it is being pressed, such as a checked checkbox. Pair with --ds-text-inverse or --ds-icon-inverse for foreground content. Do not use for an unselected control or keyboard focus alone */
 --ds-background-selected-hovered  /* The background of an element that is selected and hovered. This preserves selection while showing pointer hover; do not use for an unselected element or keyboard focus alone */
 --ds-background-selected-pressed  /* The background of an element that is selected and being pressed. Return to --ds-background-selected or --ds-background-selected-hovered when the press ends and the element remains selected. Do not use for an unselected element or keyboard focus alone */
---ds-background-smart-advocacy  /* Subject tag fill. Aliases the lime accent. */
---ds-background-smart-advocacy-bold  /* Bold subject fill (art, a filled tag). Aliases the lime accent. */
---ds-background-smart-advocacy-bold-hovered  /* Hovered bold subject fill. Aliases the lime accent. */
---ds-background-smart-advocacy-bold-pressed  /* Pressed bold subject fill. Aliases the lime accent. */
---ds-background-smart-advocacy-hovered  /* Hovered subject tag. Aliases the lime accent. */
---ds-background-smart-advocacy-pressed  /* Pressed subject tag. Aliases the lime accent. */
---ds-background-smart-advocacy-subtle  /* Illustration bodies and other mid-strength SMART fills. Aliases the lime accent. */
---ds-background-smart-mastering-content  /* Subject tag fill. Aliases the teal accent. */
---ds-background-smart-mastering-content-bold  /* Bold subject fill (art, a filled tag). Aliases the teal accent. */
---ds-background-smart-mastering-content-bold-hovered  /* Hovered bold subject fill. Aliases the teal accent. */
---ds-background-smart-mastering-content-bold-pressed  /* Pressed bold subject fill. Aliases the teal accent. */
---ds-background-smart-mastering-content-hovered  /* Hovered subject tag. Aliases the teal accent. */
---ds-background-smart-mastering-content-pressed  /* Pressed subject tag. Aliases the teal accent. */
---ds-background-smart-mastering-content-subtle  /* Illustration bodies and other mid-strength SMART fills. Aliases the teal accent. */
---ds-background-smart-relationship  /* Subject tag fill. Aliases the magenta accent. */
---ds-background-smart-relationship-bold  /* Bold subject fill (art, a filled tag). Aliases the magenta accent. */
---ds-background-smart-relationship-bold-hovered  /* Hovered bold subject fill. Aliases the magenta accent. */
---ds-background-smart-relationship-bold-pressed  /* Pressed bold subject fill. Aliases the magenta accent. */
---ds-background-smart-relationship-hovered  /* Hovered subject tag. Aliases the magenta accent. */
---ds-background-smart-relationship-pressed  /* Pressed subject tag. Aliases the magenta accent. */
---ds-background-smart-relationship-subtle  /* Illustration bodies and other mid-strength SMART fills. Aliases the magenta accent. */
---ds-background-smart-social-emotional  /* Subject tag fill. Aliases the orange accent. */
---ds-background-smart-social-emotional-bold  /* Bold subject fill (art, a filled tag). Aliases the orange accent. */
---ds-background-smart-social-emotional-bold-hovered  /* Hovered bold subject fill. Aliases the orange accent. */
---ds-background-smart-social-emotional-bold-pressed  /* Pressed bold subject fill. Aliases the orange accent. */
---ds-background-smart-social-emotional-hovered  /* Hovered subject tag. Aliases the orange accent. */
---ds-background-smart-social-emotional-pressed  /* Pressed subject tag. Aliases the orange accent. */
---ds-background-smart-social-emotional-subtle  /* Illustration bodies and other mid-strength SMART fills. Aliases the orange accent. */
---ds-background-smart-technology-tools  /* Subject tag fill. Aliases the brown accent. */
---ds-background-smart-technology-tools-bold  /* Bold subject fill (art, a filled tag). Aliases the brown accent. */
---ds-background-smart-technology-tools-bold-hovered  /* Hovered bold subject fill. Aliases the brown accent. */
---ds-background-smart-technology-tools-bold-pressed  /* Pressed bold subject fill. Aliases the brown accent. */
---ds-background-smart-technology-tools-hovered  /* Hovered subject tag. Aliases the brown accent. */
---ds-background-smart-technology-tools-pressed  /* Pressed subject tag. Aliases the brown accent. */
---ds-background-smart-technology-tools-subtle  /* Illustration bodies and other mid-strength SMART fills. Aliases the brown accent. */
 --ds-background-success  /* Backgrounds communicating a favorable outcome, such as in success section messages */
 --ds-background-success-bold  /* A vibrant background option for communicating a favorable outcome, such as in checked toggles */
 --ds-background-success-bold-hovered
@@ -846,6 +839,11 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-border-bold  /* A neutral border option that passes min 3:1 contrast ratios */
 --ds-border-brand  /* Borders or visual indicators of elements that reinforce our brand, such as logos or primary buttons */
 --ds-border-code  /* Code block and code diff borders */
+--ds-border-competency-advocacy  /* Competency area edge. Aliases the lime accent. */
+--ds-border-competency-mastering-content  /* Competency area edge. Aliases the teal accent. */
+--ds-border-competency-relationship  /* Competency area edge. Aliases the magenta accent. */
+--ds-border-competency-social-emotional  /* Competency area edge. Aliases the orange accent. */
+--ds-border-competency-technology-tools  /* Competency area edge. Aliases the brown accent. */
 --ds-border-danger  /* Borders communicating critical information, such as the borders on invalid text fields */
 --ds-border-danger-subtle  /* Decorative danger borders that do not need to meet 3:1 contrast requirements */
 --ds-border-disabled  /* Borders of elements in a disabled state */
@@ -859,11 +857,6 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-border-input-search  /* The border of search inputs */
 --ds-border-inverse  /* Borders on bold backgrounds */
 --ds-border-selected  /* Borders or visual indicators that communicate selection, such as the active tab or a selected menu item, or the opened state of a dropdown trigger. Do not use as a keyboard focus indicator; use --ds-border-focused for focus and preserve the selected treatment when both states apply */
---ds-border-smart-advocacy  /* Subject edge. Aliases the lime accent. */
---ds-border-smart-mastering-content  /* Subject edge. Aliases the teal accent. */
---ds-border-smart-relationship  /* Subject edge. Aliases the magenta accent. */
---ds-border-smart-social-emotional  /* Subject edge. Aliases the orange accent. */
---ds-border-smart-technology-tools  /* Subject edge. Aliases the brown accent. */
 --ds-border-success  /* Borders communicating a favorable outcome, such as the borders on validated text fields */
 --ds-border-success-subtle  /* Decorative success borders that do not need to meet 3:1 contrast requirements */
 --ds-border-surface  /* A container's 1px edge. Invisible except in light increased contrast, where the sunken frame turns white. */
@@ -882,17 +875,17 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-icon-accent-teal  /* Teal icons on non-bold backgrounds when there is no meaning tied to the color, such as file type icons */
 --ds-icon-accent-yellow  /* Yellow icons on non-bold backgrounds when there is no meaning tied to the color, such as file type icons */
 --ds-icon-brand  /* Icons that reinforce our brand */
+--ds-icon-competency-advocacy  /* Competency area icon. Aliases the lime accent. */
+--ds-icon-competency-mastering-content  /* Competency area icon. Aliases the teal accent. */
+--ds-icon-competency-relationship  /* Competency area icon. Aliases the magenta accent. */
+--ds-icon-competency-social-emotional  /* Competency area icon. Aliases the orange accent. */
+--ds-icon-competency-technology-tools  /* Competency area icon. Aliases the brown accent. */
 --ds-icon-danger  /* Icons communicating critical information, such as those used in error handling */
 --ds-icon-disabled  /* Icons in a disabled state */
 --ds-icon-discovery  /* Icons communicating change or something new, such as discovery section messages */
 --ds-icon-information  /* Icons communicating information or something in-progress, such as information section messages */
 --ds-icon-inverse  /* Icons on bold backgrounds */
 --ds-icon-selected  /* Icons that communicate selection, such as icons in selected navigation items, or the opened state of a dropdown trigger. On bold selected backgrounds, use --ds-icon-inverse instead. Do not use for brand emphasis or hover alone. Keep the selected icon treatment when the element also has focus */
---ds-icon-smart-advocacy  /* Subject icon. Aliases the lime accent. */
---ds-icon-smart-mastering-content  /* Subject icon. Aliases the teal accent. */
---ds-icon-smart-relationship  /* Subject icon. Aliases the magenta accent. */
---ds-icon-smart-social-emotional  /* Subject icon. Aliases the orange accent. */
---ds-icon-smart-technology-tools  /* Subject icon. Aliases the brown accent. */
 --ds-icon-subtle  /* Icons paired with --ds-text-subtle */
 --ds-icon-subtlest  /* Icons paired with --ds-text-subtlest */
 --ds-icon-success  /* Icons communicating a favorable outcome, such as those used in success section messages */
@@ -956,6 +949,11 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-text-code-operators  /* Operators and punctuation in syntax-highlighted code */
 --ds-text-code-strings  /* String values in syntax-highlighted code */
 --ds-text-code-tags  /* Tags in syntax-highlighted code */
+--ds-text-competency-advocacy  /* Text on the competency area fill. Aliases the lime accent. */
+--ds-text-competency-mastering-content  /* Text on the competency area fill. Aliases the teal accent. */
+--ds-text-competency-relationship  /* Text on the competency area fill. Aliases the magenta accent. */
+--ds-text-competency-social-emotional  /* Text on the competency area fill. Aliases the orange accent. */
+--ds-text-competency-technology-tools  /* Text on the competency area fill. Aliases the brown accent. */
 --ds-text-danger  /* Critical text, such as input field error messaging */
 --ds-text-danger-bolder  /* Text on top of danger semantic labels to ensure accessibility and desired visual appearance */
 --ds-text-disabled  /* Text in a disabled state */
@@ -965,11 +963,6 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-text-information-bolder  /* Text on top of information semantic labels to ensure accessibility and desired visual appearance */
 --ds-text-inverse  /* Text on bold backgrounds */
 --ds-text-selected  /* Text that communicates selection, such as the active tab or a selected navigation item, or the opened state of a dropdown trigger. On bold selected backgrounds, use --ds-text-inverse instead. Do not use for unselected links, brand emphasis, or hover alone. Keep the selected text treatment when the element also has focus */
---ds-text-smart-advocacy  /* Text on the subject fill. Aliases the lime accent. */
---ds-text-smart-mastering-content  /* Text on the subject fill. Aliases the teal accent. */
---ds-text-smart-relationship  /* Text on the subject fill. Aliases the magenta accent. */
---ds-text-smart-social-emotional  /* Text on the subject fill. Aliases the orange accent. */
---ds-text-smart-technology-tools  /* Text on the subject fill. Aliases the brown accent. */
 --ds-text-subtle  /* Secondary text, such as navigation, subtle button links, input field labels, and all caps subheadings */
 --ds-text-subtlest  /* Tertiary text, such as meta-data, breadcrumbs, input field placeholder and helper text */
 --ds-text-success  /* Text to communicate a favorable outcome, such as input field success messaging */
@@ -1235,12 +1228,10 @@ The primitives (spacing / primitives), named by rem × 100; point semantic token
 --space-00625
 --space-0125
 --space-025
---space-03125
 --space-0375
 --space-050
 --space-0625
 --space-075
---space-0875
 --space-100
 --space-125
 --space-150

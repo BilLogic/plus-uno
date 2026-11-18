@@ -73,8 +73,8 @@ export default {
 
 export const Overview = () => (
     <FlagGroup style={{ padding: 'var(--card-pad-compact)' }} containerPosition="static">
-        <Flag title="Normal flag" timestamp="Just now" autohide={false}>
-            This is a normal flag (default).
+        <Flag title="Notes copied" timestamp="Just now" autohide={false}>
+            The session notes are on your clipboard.
         </Flag>
     </FlagGroup>
 );
@@ -184,7 +184,7 @@ const FlagInteractiveWrapper = ({ appearance, position, title, children, show, a
                 </Flag>
             </FlagGroup>
             <div className="plus-flag-interactive-demo__trigger">
-                <Button appearance="primary" text="Trigger Flag" onClick={() => setIsOpen(true)} />
+                <Button appearance="primary" text="Show flag" onClick={() => setIsOpen(true)} />
             </div>
         </div>
     );
@@ -195,8 +195,8 @@ Interactive.args = {
     show: false,
     appearance: 'success',
     position: 'top-end',
-    title: 'Flag Title',
-    children: 'This is an interactive flag message.',
+    title: 'Plan saved',
+    children: 'Your session plan is saved for Monday.',
     autohide: false,
     delay: 3000
 };

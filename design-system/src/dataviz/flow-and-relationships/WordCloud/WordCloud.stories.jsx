@@ -50,7 +50,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Student session feedback</Heading>
+                <Heading as="h3" size="sm">Student session feedback</Heading>
                 <p style={captionStyle}>
                     Common themes in post-session student notes, ordered from highest to lowest frequency by default.
                 </p>

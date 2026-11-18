@@ -23,14 +23,14 @@ const HEIGHT = 900;
 const DOCS_HEIGHT = 'calc(var(--height-2000) * 2 + var(--height-300) + var(--page-pad) * 3)';
 
 const STARTERS = [
-    { id: 'summarize', label: 'Summarize this page', text: 'Summarize this page for me.' },
-    { id: 'next', label: 'What is next?', text: 'What should I do next?' },
+    { id: 'summarize', label: 'Summarize today’s sessions', text: 'Summarize my upcoming sessions at Lincoln Middle.' },
+    { id: 'next', label: 'Review SMART goals', text: 'Which students need a SMART goal check-in next?' },
 ];
 
-const BREADCRUMBS = [{ text: 'Home', href: '#' }, { text: 'Dashboard' }];
-const ACCOUNT = { id: 'john-doe', name: 'John Doe', role: 'Lead' };
+const BREADCRUMBS = [{ text: 'Home', href: '#' }, { text: 'Sessions' }];
+const ACCOUNT = { id: 'maya-k', name: 'Maya K.', role: 'Lead' };
 
-const respond = async (text) => `You asked: "${text}". Here is what I found on this page.`;
+const respond = async (text) => `You asked: "${text}". Maya K. has 3 Grade 7 math sessions at Lincoln Middle today.`;
 
 const ChatPage = ({ height = '100vh', withModal = false, ...args }) => {
     const [modal, setModal] = React.useState(false);
@@ -43,7 +43,7 @@ const ChatPage = ({ height = '100vh', withModal = false, ...args }) => {
             starters={STARTERS}
             {...args}
         >
-            {slotContent('Page content')}
+            {slotContent('Today’s Grade 7 math sessions at Lincoln Middle')}
             {withModal ? <div><Button text="Page settings" onClick={() => setModal(true)} /></div> : null}
             {withModal ? (
                 <Modal
@@ -113,7 +113,7 @@ const press = (scope, name) => userEvent.click(scope.getByRole('button', { name 
 
 /** Overview: chat closed, the button at the bottom right of the Page. A short, wide Page: the button sits in its corner. */
 export const Overview = {
-    args: { height: 'var(--size-1500)' },
+    args: { height: 'var(--width-1500)' },
 };
 
 /** Docs: the popup, open, in an inline frame. Nothing is remembered. */

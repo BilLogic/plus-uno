@@ -468,6 +468,84 @@
   status = 301
   force = true
 
+# Retired tag story ids redirect to CompetencyTag.
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/components-labels-tag-smart-tag--docs" }
+  to = "/storybook/?path=/docs/components-labels-tag-competency-tag--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-labels-tag-smart-tag--overview" }
+  to = "/storybook/?path=/story/components-labels-tag-competency-tag--overview"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-labels-tag-smart-tag--custom-label" }
+  to = "/storybook/?path=/story/components-labels-tag-competency-tag--custom-label"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-labels-tag-smart-tag--passes-through-tag-props" }
+  to = "/storybook/?path=/story/components-labels-tag-competency-tag--passes-through-tag-props"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-labels-tag-smart-tag--unknown-subject-falls-back" }
+  to = "/storybook/?path=/story/components-labels-tag-competency-tag--unknown-subject-falls-back"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-labels-tag-smart-tag--interactive" }
+  to = "/storybook/?path=/story/components-labels-tag-competency-tag--interactive"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-labels-tag-smart-tag--rest" }
+  to = "/storybook/?path=/story/components-labels-tag-competency-tag--rest"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-labels-tag-smart-tag--hovered" }
+  to = "/storybook/?path=/story/components-labels-tag-competency-tag--hovered"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-labels-tag-smart-tag--pressed" }
+  to = "/storybook/?path=/story/components-labels-tag-competency-tag--pressed"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-labels-tag-smart-tag--focused" }
+  to = "/storybook/?path=/story/components-labels-tag-competency-tag--focused"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-labels-tag-smart-tag--disabled" }
+  to = "/storybook/?path=/story/components-labels-tag-competency-tag--disabled"
+  status = 301
+  force = true
+
 [[redirects]]
   from = "/storybook/*"
   to = "/storybook/:splat"

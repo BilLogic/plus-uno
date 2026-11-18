@@ -66,10 +66,10 @@ export const AVATAR_TAG_TYPES = ['person', 'agent', 'team'];
 export const TAG_TYPES = ['plain', ...AVATAR_TAG_TYPES];
 
 /**
- * Each SMART subject, by its token name, and the accent its SMART tokens alias:
- * the Tag color a SMART subject draws. The SMART layer (`color.*.smart.{subject}`) holds the
- * same pairing in the tokens; `SmartTag` reads it through this map, so the
- * two must name the same accent.
+ * Curriculum subject → Tag `color` hue. Kept as a separate map because it names
+ * the Tag color a competency area draws. The competency layer (`color.*.competency.{subject}`) holds the
+ * same pairing in the tokens; `CompetencyTag` reads it through this map, so the
+ * Tag stays a Tag in every prop and slot.
  */
 export const TAG_COLOR_OF_CURRICULUM = Object.freeze({
     'social-emotional': 'orange',
@@ -398,7 +398,7 @@ export const Tag = ({
                     >
                         {lead}
                         {labelNode}
-                        {showCount && <CountTag value={trailingMetric} spacing="compact" />}
+                        {showCount && <CountTag value={trailingMetric} />}
                     </button>,
                 )}
                 {status}
@@ -484,7 +484,7 @@ Tag.propTypes = {
     type: PropTypes.oneOf(TAG_TYPES),
     /** The avatar of a person, agent or team tag: an image source, or a node. Missing or broken, it falls back to initials. Decorative. */
     avatar: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
-    /** Selectable tags only: a compact neutral Count tag after the label, such as a filter's result count. Ignored with a warning elsewhere. */
+    /** Selectable tags only: a neutral Count tag after the label, such as a filter's result count. Ignored with a warning elsewhere. */
     trailingMetric: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     /** The leading icon slot, empty by default: an icon in front of the text, for when the icon carries meaning. Plain tags only: an avatar type leads with its avatar. Sits after `swatchBefore` when both are set. */
     elemBefore: PropTypes.node,

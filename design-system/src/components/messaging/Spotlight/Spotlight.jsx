@@ -2,6 +2,7 @@ import React, { createContext, useContext, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
 import { Popover } from '@base-ui/react/popover';
+import { useMotionReduced } from '@/lib/motionPreference';
 import { useBoundedOverlay } from '@/lib/overlay';
 import { Button } from '../../forms-and-inputs/Button/Button';
 import CloseButton from '../../forms-and-inputs/CloseButton';
@@ -110,6 +111,7 @@ export const Spotlight = ({
     const anchor = target ?? contextAnchor;
     const anchorNode = typeof anchor === 'function' ? anchor() : (anchor?.current ?? anchor ?? null);
     const bounded = useBoundedOverlay({ fromNode: anchorNode });
+    const reduced = useMotionReduced();
     const [side, align] = PLACEMENT_TO_SIDE_ALIGN[placement] ?? PLACEMENT_TO_SIDE_ALIGN.bottom;
 
     const dismissControl = dismissible && (
@@ -133,7 +135,10 @@ export const Spotlight = ({
                     collisionBoundary={bounded?.collisionBoundary}
                     collisionAvoidance={bounded?.collisionAvoidance}
                 >
-                    <Popover.Popup className={clsx('plus-spotlight', className)}>
+                    <Popover.Popup
+                        className={clsx('plus-spotlight', className)}
+                        data-reduced={reduced ? 'true' : undefined}
+                    >
                         <SpotlightHeader headline={headline} dismissControl={dismissControl} />
                         {media && <div className="plus-spotlight-media">{media}</div>}
                         <Popover.Description className="plus-spotlight-body">{children}</Popover.Description>

@@ -12,17 +12,16 @@ Also asked as: counter, unread count, numeric badge.
 
 **Source:** `design-system/src/components/labels/CountTag/CountTag.jsx`
 
-**Stories:** `design-system/src/components/labels/CountTag/CountTag.stories.jsx` — Appearances, Spacings, Max, Zero, Ring, Styles, DotNeedsALabel, LabeledNumber, Interactive, Rest, Hovered, Pressed, Focused, Disabled
+**Stories:** `design-system/src/components/labels/CountTag/CountTag.stories.jsx` — Appearances, Size, Max, Zero, Ring, Styles, DotNeedsALabel, LabeledNumber, Interactive, Rest, Hovered, Pressed, Focused, Disabled
 
 **Storybook page:** `design-system/src/components/labels/CountTag/CountTag.mdx`
 
 ## Usage
 
 Use `CountTag` for a number on its own: unread messages on a nav item, results on a
-tab, errors in a section header, a notification on a bell.
-
-`spacing="compact"` (`16`) is for use inside a label: `StatusTag` nests it through its
-`trailingMetric` prop, and `Tag` nests it on a selectable tag.
+tab, errors in a section header, a notification on a bell. It is always `16` tall,
+including inside `Button`, `Tabs`, `Sidebar` rows, `StatusTag` (`trailingMetric`)
+and selectable `Tag` (`trailingMetric`).
 
 ## Alternatives
 
@@ -82,12 +81,12 @@ A dot has no number, so `label` is its accessible name; without one it is announ
 - `StatusTag`: use when nesting a `CountTag` inside a condition label through `trailingMetric`.
 - `Tag`: use when nesting a `CountTag` on a selectable filter tag through `trailingMetric`.
 
-Same group: `AiMessage` · `ChangeTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `AiMessage` · `ChangeTag` · `CompetencyTag` · `DateTag` · `PromptStarters` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
 ## Parts
 
 1. **Number.** The count in the body-sm size with tabular digits, hidden at 0 unless `showZero`, capped at `max` with a `+`.
-2. **Pill.** `20` tall on its own and `16` inside a label, `24` wide at minimum, so one digit is a small rectangle and more digits grow it from the trailing edge.
+2. **Pill.** `16` tall, `24` wide at minimum, so one digit is a small rectangle and more digits grow it from the trailing edge.
 3. **Dot.** Presence without a number: an `8` circle that needs a `label` for its name.
 4. **Ring.** Optional, in the surface color, for a count pinned to the corner of an icon or an avatar.
 
@@ -104,7 +103,7 @@ Same group: `AiMessage` · `ChangeTag` · `DateTag` · `PromptStarters` · `Smar
 
 | Part | Token |
 | --- | --- |
-| Height | `--label-height-md` (20) on its own, `--label-height-sm` (16) when compact. |
+| Height | `--label-height-sm` (16). |
 | Width and padding | `--control-sm` for the minimum, `--pad-x-xs` either side. |
 | Corner | `--radius-md`; the dot is `--radius-full`. |
 | Subtle | `--ds-background-neutral` with `--ds-text`, and the same pair for each other appearance. |
@@ -129,7 +128,6 @@ Same group: `AiMessage` · `ChangeTag` · `DateTag` · `PromptStarters` · `Smar
 | `max` | number | `99` | Above this the count shows `{max}+`. |
 | `showZero` | bool | `false` | Render a count of 0 instead of nothing. |
 | `appearance` | enum | `'neutral'` | The intent. Use one only when the number carries it. |
-| `spacing` | enum | `'default'` | `default` (20) on its own; `compact` (16) is for use inside a label. A dot is always 8. |
 | `isBold` | bool | `false` | The solid fill: asks for action now (at most one per area). |
 | `isInverse` | bool | `false` | A solid white countTag with dark text, for filled buttons and dark grounds. Always neutral. |
 | `isDot` | bool | `false` | Presence without a number. Needs `label`. |
@@ -142,13 +140,11 @@ Same group: `AiMessage` · `ChangeTag` · `DateTag` · `PromptStarters` · `Smar
 
 **`appearance`** — `neutral` · `success` · `warning` · `danger` · `info` · `discovery`
 
-**`spacing`** — `default` · `compact`
-
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
-`--body-sm` · `--control-sm` · `--count-tag-dot-size` · `--ds-background-danger` · `--ds-background-danger-bold` · `--ds-background-information` · `--ds-background-information-bold` · `--ds-background-neutral` · `--ds-background-neutral-bold` · `--ds-background-smart-mastering-content` · `--ds-background-smart-mastering-content-bold` · `--ds-background-success` · `--ds-background-success-bold` · `--ds-background-warning` · `--ds-background-warning-bold` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-smart-mastering-content` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-surface` · `--ds-text` · `--ds-text-danger` · `--ds-text-information` · `--ds-text-inverse` · `--ds-text-smart-mastering-content` · `--ds-text-subtle` · `--ds-text-success` · `--ds-text-warning` · `--ds-text-warning-inverse` · `--pad-x-xs` · `--plus-count-min` · `--plus-count-size` · `--radius-full` · `--radius-md` · `--stroke-2`
+`--body-sm` · `--control-sm` · `--count-tag-dot-size` · `--ds-background-competency-mastering-content` · `--ds-background-competency-mastering-content-bold` · `--ds-background-danger` · `--ds-background-danger-bold` · `--ds-background-information` · `--ds-background-information-bold` · `--ds-background-neutral` · `--ds-background-neutral-bold` · `--ds-background-success` · `--ds-background-success-bold` · `--ds-background-warning` · `--ds-background-warning-bold` · `--ds-icon-competency-mastering-content` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-surface` · `--ds-text` · `--ds-text-competency-mastering-content` · `--ds-text-danger` · `--ds-text-information` · `--ds-text-inverse` · `--ds-text-subtle` · `--ds-text-success` · `--ds-text-warning` · `--ds-text-warning-inverse` · `--pad-x-xs` · `--plus-count-min` · `--plus-count-size` · `--radius-full` · `--radius-md` · `--stroke-2`
 
 From `design-system/src/components/labels/CountTag/CountTag.scss`. Override these through the token layer, never with a literal.
 

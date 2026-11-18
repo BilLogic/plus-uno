@@ -44,4 +44,15 @@ describe('SectionMessage Component', () => {
         );
         expect(screen.getByRole('button', { name: 'Reschedule' })).toBeInTheDocument();
     });
+
+    it('passes className and style to the outer presence slot', () => {
+        const { container } = render(
+            <SectionMessage className="custom-placement" style={{ marginTop: '16px' }}>
+                Placed notice
+            </SectionMessage>
+        );
+        const slot = container.querySelector('[data-presence-slot]');
+        expect(slot).toHaveClass('custom-placement');
+        expect(slot).toHaveStyle({ marginTop: '16px' });
+    });
 });

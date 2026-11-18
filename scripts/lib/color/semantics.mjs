@@ -405,26 +405,26 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
     }
   }
 
-  // ---- SMART subjects: a product layer aliasing the non-role accents. Each subject takes an
-  // accent no semantic role uses, so a subject tag never reads as information, success, warning, danger or discovery.
-  const SMART_MAP = [
-    ['color.background.smart.{s}', 'color.background.accent.{f}.subtler', 'Subject tag and chip fill.'],
-    ['color.background.smart.{s}.hovered', 'color.background.accent.{f}.subtler.hovered', 'Hovered subject chip.'],
-    ['color.background.smart.{s}.pressed', 'color.background.accent.{f}.subtler.pressed', 'Pressed subject chip.'],
-    ['color.background.smart.{s}.subtle', 'color.background.accent.{f}.subtle', 'Illustration bodies and other mid-strength SMART fills.'],
-    ['color.background.smart.{s}.bold', 'color.background.accent.{f}.bolder', 'Bold subject fill (art, a filled badge).'],
-    ['color.background.smart.{s}.bold.hovered', 'color.background.accent.{f}.bolder.hovered', 'Hovered bold subject fill.'],
-    ['color.background.smart.{s}.bold.pressed', 'color.background.accent.{f}.bolder.pressed', 'Pressed bold subject fill.'],
-    ['color.text.smart.{s}', 'color.text.accent.{f}', 'Text on the subject fill.'],
-    ['color.icon.smart.{s}', 'color.icon.accent.{f}', 'Subject icon.'],
-    ['color.border.smart.{s}', 'color.border.accent.{f}', 'Subject edge.'],
+  // ---- competency areas: a product layer aliasing the non-role accents. Each area takes an
+  // accent no semantic role uses, so a competency tag never reads as information, success, warning, danger or discovery.
+  const COMPETENCY_MAP = [
+    ['color.background.competency.{s}', 'color.background.accent.{f}.subtler', 'Competency tag fill.'],
+    ['color.background.competency.{s}.hovered', 'color.background.accent.{f}.subtler.hovered', 'Hovered competency tag.'],
+    ['color.background.competency.{s}.pressed', 'color.background.accent.{f}.subtler.pressed', 'Pressed competency tag.'],
+    ['color.background.competency.{s}.subtle', 'color.background.accent.{f}.subtle', 'Illustration bodies and other mid-strength competency fills.'],
+    ['color.background.competency.{s}.bold', 'color.background.accent.{f}.bolder', 'Bold competency area fill (art, a filled tag).'],
+    ['color.background.competency.{s}.bold.hovered', 'color.background.accent.{f}.bolder.hovered', 'Hovered bold competency area fill.'],
+    ['color.background.competency.{s}.bold.pressed', 'color.background.accent.{f}.bolder.pressed', 'Pressed bold competency area fill.'],
+    ['color.text.competency.{s}', 'color.text.accent.{f}', 'Text on the competency area fill.'],
+    ['color.icon.competency.{s}', 'color.icon.accent.{f}', 'Competency area icon.'],
+    ['color.border.competency.{s}', 'color.border.accent.{f}', 'Competency area edge.'],
   ];
   for (const [subject, fam] of Object.entries(SMART)) {
-    for (const [tn, src, use] of SMART_MAP) {
+    for (const [tn, src, use] of COMPETENCY_MAP) {
       const r0 = byName[src.replace('{f}', fam)];
       const n = tn.replace('{s}', subject);
       const r = { ...r0, name: n, atl_light: '—', atl_dark: '—', use: `${use} Aliases the ${fam} accent.`,
-        deviation: `PLUS product layer: SMART ${subject} is the ${fam} accent.` };
+        deviation: `PLUS product layer: competency ${subject} is the ${fam} accent.` };
       rows.push(r);
       byName[n] = r;
     }
