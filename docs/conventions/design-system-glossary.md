@@ -17,7 +17,7 @@ Code-free guidance for a situation, shown on annotated **Template**s used as the
 _Avoid_: "layout component", "practice"
 
 **Template**:
-An arrangement of components with named **Slot**s, holding its key scenarios and key states and linking to each component for the rest: **Frame**, **Page**, **Section**, Form, Modal, Panel and Popup. The tie-break: behavior splits out into a component, and a template that only redraws one component stays a component. How pieces sit in one template goes on that template's page; a rule that holds across two or more templates is a **Pattern**.
+An arrangement of components with named **Slot**s, holding its key scenarios and key states and linking to each component for the rest: **Frame**, **Page**, **Section**, Table, Form, Modal, Panel and Popup. The tie-break: behavior splits out into a component, and a template that only redraws one component stays a component. How pieces sit in one template goes on that template's page; a rule that holds across two or more templates is a **Pattern**.
 _Avoid_: "container", "starter", "page template" for the **Frame** alone
 
 **Frame**:
@@ -77,12 +77,16 @@ The pattern for the container of one object, raised at rest with no border. Rela
 _Avoid_: "tile" (Tile is its own component), "panel" (Panel is the Frame's right area)
 
 **Blanket**:
-The pattern for the layer that dims what sits behind it: full screen for a **Modal**, which it also holds and sizes. A **Panel** floats with none.
-_Avoid_: "backdrop", "overlay" for the pattern (the word is a **Panel** and **Sidebar** state), "scrim"
+The layer within the **Modal** template that dims what sits behind it and holds and sizes the **Dialog**. It is part of the Modal template, not exported on its own; a **Panel** floats with none.
+_Avoid_: "backdrop", "overlay" for the Blanket (the word is a **Panel** and **Sidebar** state), "scrim"
+
+**Dialog**:
+The component (`@/components`) for the dialog panel itself: header (title, close), body and footer slots, widths on the screen grid, rendered inline with no **Blanket** and no modal behavior.
+_Avoid_: "PatternModal"
 
 **Modal**:
-The component and pattern for content that takes over the screen until it is closed: a follow-up decision swaps the same Modal's content for its confirm view, and one Modal is open at a time. `Modal` is the component; `PatternModal` draws its shell inline.
-_Avoid_: "Modal dialog", "ModalDialog", "popup" for a blocking dialog
+The template (`@/patterns`) for content that takes over the screen until it is closed: a **Dialog** on the **Blanket** with modal behavior on Base UI (portal, focus trap, Escape, scroll lock). A follow-up decision swaps the same Modal's content for its confirm view, and one Modal is open at a time.
+_Avoid_: "Modal dialog" for the template, "ModalDialog", "PatternModal", "popup" for a blocking dialog
 
 **Part**:
 A `_`-prefixed piece only its parent uses, such as `_Section header` or `_Modal header`: it lives inside its parent and stays out of the public exports.
@@ -98,8 +102,12 @@ _Avoid_: "children area", "placeholder" for the slot itself
 A component group name, identical in Figma pages, Storybook and code folders, such as Forms and inputs or Text and data display; the component index lists them.
 _Avoid_: "Actions", "group" for a category
 
+**Table**:
+The template (`@/patterns`) for how a table sits on a page: a **Section** whose header carries the title and toolbar, then one of the three table kinds, the footer (range, page size, Pagination) and the empty state box when there are no rows. It takes a `kind` (`static`, `dynamic` or `tree`) or the table itself, and holds the type guidance as its chooser. There is one Table template and three table components; the base table and its parts (`TableRow`, `TableCell`, `HeadCell`, `TableFooter`, `TableMessageRow`, `TableSummaryRow`, `TableBulkActions`) are shared by all three.
+_Avoid_: "Table component" for the template, "table pattern"
+
 **Static table**:
-A fixed grid people read, with nothing to act on: a link in a cell is fine, and rows rest or are highlighted. Which table type to use is `design-system/src/patterns/PatternTable/index.md` § Type guidance.
+A fixed grid people read, with nothing to act on: a link in a cell is fine, and rows rest or are highlighted. Which table type to use is `design-system/src/patterns/Table/index.md` § Type guidance.
 _Avoid_: "basic table", bare "table" for this type
 
 **Dynamic table**:
@@ -289,7 +297,7 @@ A color token that names the state it paints, such as `--ds-background-brand-bol
 _Avoid_: "state layer", "08/12/16"
 
 **Elevation**:
-Six levels, lowest first: Sunken, Default, Raised, Overlay, Blocking and Overflow; a surface and its shadow travel together, while Overflow is shadow only. Layer tokens name z-index, not elevation; `design-system/src/styles/Elevation.mdx` owns the choice by behavior.
+Six levels, lowest first: Sunken, Default, Raised, Overlay, Blocking and Overflow; a surface and its shadow travel together, while Overflow is shadow only. Layer tokens name z-index, not elevation; `design-system/src/styles/ElevationOverview.mdx` opens the Elevation folder.
 _Avoid_: "surface" for a layout box
 
 **Radius**:

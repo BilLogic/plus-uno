@@ -1,9 +1,25 @@
 @use 'sass:map';
 
-// Shared by option and menu rows. Horizontal insets belong to each surface;
+// Shared by option and menu rows: 12px horizontal pad, 8px icon/label gap, 8px radius, 14px type.
+@mixin row {
+    display: flex;
+    align-items: center;
+    gap: var(--inline-md);
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    padding-inline: var(--pad-x-md);
+    margin: 0;
+    border: none;
+    border-radius: var(--radius-control-md);
+    color: var(--ds-text);
+    font: var(--body-default);
+}
+
+// Shared by option and menu rows. Horizontal insets belong to the row mixin above;
 // min-height lets a description grow past the single-line sizing floor.
 @mixin size($spacing: 'default') {
-    $steps: ('default': 'md', 'compact': 'sm');
+    $steps: ('default': 'md', 'compact': 'sm', 'spacious': 'lg');
     @if not map.has-key($steps, $spacing) {
         @error 'Unknown row spacing: #{$spacing}';
     }

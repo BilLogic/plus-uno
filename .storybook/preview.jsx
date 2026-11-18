@@ -19,6 +19,7 @@ import { addons } from 'storybook/preview-api';
 import { GLOBALS_UPDATED, SET_GLOBALS, STORY_CHANGED } from 'storybook/internal/core-events';
 import { BACKGROUND_OPTIONS, DEFAULT_BACKGROUND } from './backgrounds.js';
 import { assertContained } from '../design-system/src/storybook-docs/lib/contained-demos';
+import { settleAnimations } from '../design-system/src/storybook-docs/lib/overlay-motion-plays';
 
 // ---- Docs floating button (AI agent, Marketplace, Uno Blueprint) -----------------------
 mountDocsFab();
@@ -199,6 +200,12 @@ const preview = {
               "Typography",
               "Iconography",
               "Elevation",
+              [
+                "Overview",
+                "Layer system",
+                "Shadow ramp",
+                "Usage"
+              ],
               "Radius",
               "Border"
             ],
@@ -342,10 +349,10 @@ const preview = {
             "Messaging",
             [
               "Banner",
+              "Dialog",
               "Empty state",
               "Flag",
               "Inline message",
-              "Modal dialog",
               "Notification item",
               "Section message",
               "Spotlight"
@@ -546,15 +553,15 @@ const preview = {
 
   globalTypes: {
     plusBrowser: {
-      description: 'Browser window chrome around the Template stories (docs only)',
+      description: 'Browser window chrome around the Template stories (Chrome by default)',
       toolbar: {
         title: 'Browser',
         icon: 'browser',
         items: [
-          { value: 'none', title: 'No browser' },
           { value: 'chrome', title: 'Chrome' },
           { value: 'safari', title: 'Safari' },
           { value: 'edge', title: 'Edge' },
+          { value: 'none', title: 'No browser' },
         ],
         dynamicTitle: true,
       },
@@ -592,7 +599,7 @@ const preview = {
     // Template carries the browser, the Frame is the app alone. A story can opt
     // in or out with parameters.browserFrame ('chrome' | 'safari' | 'none').
     (Story, context) => {
-      const framed = /^Patterns\/Templates/.test(context.title);
+      const framed = /^Templates\//.test(context.title);
       const browser = context.parameters.browserFrame || (framed ? context.globals.plusBrowser : 'none');
       return (
         <BrowserFrame browser={browser || 'none'}>
@@ -636,7 +643,7 @@ const preview = {
     backgrounds: {
       value: DEFAULT_BACKGROUND
     },
-    plusBrowser: 'none',
+    plusBrowser: 'chrome',
     plusColorMode: 'light',
     plusContrastMode: 'no-preference',
   },
@@ -645,7 +652,20 @@ const preview = {
 
   // A demo shown in the docs stays inside its canvas: no modal, Blanket or
   // fixed Flag stack over the docs page (test-only `!dev` stories are exempt).
-  afterEach: assertContained,
+  // Story animations settle before the a11y scan (afterEach runs in reverse order).
+  afterEach: [
+    assertContained,
+    async ({ canvasElement, viewMode, globals, parameters }) => {
+      if (viewMode !== 'story' || !canvasElement) return;
+      if (
+        globals?.ghostStories ||
+        parameters?.a11y?.disable === true ||
+        parameters?.a11y?.test === 'off' ||
+        globals?.a11y?.manual === true
+      ) return;
+      await settleAnimations(canvasElement.ownerDocument?.body ?? canvasElement);
+    },
+  ],
 };
 
 export default preview;

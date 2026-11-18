@@ -141,14 +141,33 @@ function tierScss({ tier, heading }) {
 
 :root {
 `;
+  const isModeSensitive = (row) => /var\(--ds-/.test(rowValue(row));
   for (const [group, groupRows] of byGroup) {
+    const staticRows = groupRows.filter((row) => !isModeSensitive(row));
+    if (!staticRows.length) continue;
     scss += `\n    /* ${group} */\n`;
-    for (const row of groupRows) {
+    for (const row of staticRows) {
       const note = row.note ? ` /* ${row.note} */` : '';
       scss += `    ${row.new}: ${rowValue(row)};${note}\n`;
     }
   }
   scss += `}\n`;
+  const modeSensitiveGroups = new Map();
+  for (const [group, groupRows] of byGroup) {
+    const dynamicRows = groupRows.filter(isModeSensitive);
+    if (dynamicRows.length) modeSensitiveGroups.set(group, dynamicRows);
+  }
+  if (modeSensitiveGroups.size) {
+    scss += `\n/* Mode-sensitive aliases re-evaluate at subtree mode or contrast boundaries. */\n:root,\n[data-color-mode],\n[data-contrast-mode] {\n`;
+    for (const [group, groupRows] of modeSensitiveGroups) {
+      scss += `\n    /* ${group} */\n`;
+      for (const row of groupRows) {
+        const note = row.note ? ` /* ${row.note} */` : '';
+        scss += `    ${row.new}: ${rowValue(row)};${note}\n`;
+      }
+    }
+    scss += `}\n`;
+  }
   const queries = new Map();
   for (const row of rows) {
     for (const [query, value] of Object.entries(row.at ?? {})) {

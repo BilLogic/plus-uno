@@ -56,7 +56,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Beside a stat</Heading>
+                <Heading as="h3" size="sm">Beside a stat</Heading>
                 <div style={rowStyle}>
                     <span style={valueStyle}>82%</span>
                     <Sparkline
@@ -69,7 +69,7 @@ export const Overview = {
                 </div>
             </section>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Status tones</Heading>
+                <Heading as="h3" size="sm">Status tones</Heading>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
                     {[
                         ['success', 'Attendance, on track', [80, 84, 83, 88, 90, 91, 93]],

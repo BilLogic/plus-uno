@@ -8,6 +8,8 @@ Also asked as: slider, range slider.
 
 **Import:** `import { Range } from '@/components';`
 
+**Used in:** Table (`ds guide table`)
+
 **Governed by:** Overflow (`ds guide overflow`)
 
 **Source:** `design-system/src/components/forms-and-inputs/Range/Range.jsx`

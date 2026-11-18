@@ -2,7 +2,7 @@
 
 # PatternCard
 
-PLUS card: an optional image, content and footer on the raised surface and shadow. - **Image placement**: `top` (default), `start` or `end`. Side images apply at the large card minimum width and fill the height. `imageSplit` chooses one third (default) or one half; half uses Heading medium on a side card. Below the large minimum width, the image returns to the top with its own ratio. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: `padding` sets Card/pad-sm · md · lg, the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: the raised pair at rest. A card with an `onClick` lifts on hover to the raised surface's hovered step under the overlay shadow, and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.
+PLUS card: an optional image, content and footer on the raised surface and shadow. - **Image placement**: `top` (default), `start` or `end`. Side images apply at the large card minimum width and fill the height. `imageSplit` chooses one third (default) or one half; half uses Heading md on a side card. Below the large minimum width, the image returns to the top with its own ratio. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: `padding` sets Card/pad-compact · default · spacious (via prop values `'sm'`, `'md'`, `'lg'`), the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: the raised pair at rest. A card with an `onClick` lifts on hover to the raised surface's hovered step under the overlay shadow, and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.
 
 Also asked as: summary card, object card.
 
@@ -101,12 +101,12 @@ A card that holds actions that commit a change gets a footer, and its actions st
 - Page for the content area's own fill, header and elevation.
 - Modal for something that must be decided before the page can continue.
 
-Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
+Same group: `AiChat` · `Frame` · `Modal` · `Page` · `PatternSection` · `PatternSidebar` · `Table`
 
 ## Parts
 
 1. **Image** (optional). A slot above everything else, or beside the content in a side layout. It runs edge to edge, outside the pad, and the card radius clips its corners. On top, give the image you pass an aspect ratio of 16:9, 4:3 or 1:1; beside the content it fills the full height at one third or one half of the width and crops to cover.
-2. **Header.** The title, an optional description and an optional actions slot. A custom `header` replaces all three. The title uses Heading xsmall at every heading level, stepping up to Heading medium for a half side image. The description uses Body default. In Figma the title truncates to one line and the description's `text` variant truncates at three lines or wraps; code leaves wrapping to CSS.
+2. **Header.** The title, an optional description and an optional actions slot. A custom `header` replaces all three. The title uses Heading xs at every heading level, stepping up to Heading md for a half side image. The description uses Body default. In Figma the title truncates to one line and the description's `text` variant truncates at three lines or wraps; code leaves wrapping to CSS.
 3. **Body.** A slot for text, a list or media.
 4. **Footer** (optional). A left-aligned slot for actions that commit a change.
 
@@ -161,9 +161,9 @@ The image sits above (or, in a side layout, beside) a padded frame, and the head
 | `header` | node | — | Custom header that replaces title, description and actions (tabs, a toolbar) |
 | `image` | node | — | Image slot, full bleed: above the content, or at the start or end edge per `imagePlacement` |
 | `imagePlacement` | enum | `'top'` | Image position. Side placements apply from the large card minimum width; narrower cards put the image on top. |
-| `imageSplit` | enum | `'1/3'` | Side image share. One half also steps the title up to Heading medium. Ignored for top placement. |
+| `imageSplit` | enum | `'1/3'` | Side image share. One half also steps the title up to Heading md. Ignored for top placement. |
 | `footer` | node | — | Footer slot: commit actions, left-aligned, Card/stack-lg below the body |
-| `padding` | enum | `'md'` | Padding scale: Card/pad-sm · md · lg (16 · 20 · 24) |
+| `padding` | enum | `'md'` | Padding scale: Card/pad-compact · default · spacious (16 · 20 · 24) |
 | `gap` | enum | `'md'` | Header-to-body stack: Card/stack-sm · md · lg (4 · 8 · 12) |
 | `minWidth` | number or string | — | Minimum width constraint (number of px or any CSS length) |
 | `onClick` | func | — | Click handler, passed to the card's root element. Its presence adds the clickable class: a pointer cursor and the hover lift. It adds no role or tab stop; pass `role` and `tabIndex` for a card clickable as a whole. |

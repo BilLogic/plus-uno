@@ -44,7 +44,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Student learning journey</Heading>
+                <Heading as="h3" size="sm">Student learning journey</Heading>
                 <p style={captionStyle}>
                     Milestones in chronological order from application through completion.
                 </p>

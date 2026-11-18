@@ -143,7 +143,7 @@ Same group: `Accordion` · `Carousel` · `Panel` · `ScrollBar`
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `title` | node | — | The page title. Drawn as a `large` `Heading` (at the ambient heading level, `h1` by default) unless `disableTitleStyles` is set. `children` is used when it is omitted. |
+| `title` | node | — | The page title. Drawn as a `lg` `Heading` (at the ambient heading level, `h1` by default) unless `disableTitleStyles` is set. `children` is used when it is omitted. |
 | `children` | node | — | `children` is the title when `title` is not given. |
 | `breadcrumbs` | node | — | A breadcrumb trail shown above the title row. Pass a `Breadcrumb`. |
 | `actions` | node | — | Controls shown at the end of the title row, such as a primary button or a menu. |

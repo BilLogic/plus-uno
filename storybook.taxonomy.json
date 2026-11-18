@@ -86,10 +86,10 @@
     ],
     "Messaging": [
       "Banner",
+      "Dialog",
       "Empty state",
       "Flag",
       "Inline message",
-      "Modal dialog",
       "Notification item",
       "Section message",
       "Spotlight"
@@ -128,12 +128,10 @@
       "design-system/src/patterns/Form/",
       "design-system/src/patterns/Frame/",
       "design-system/src/patterns/Page/",
-      "design-system/src/patterns/PageTemplates/",
       "design-system/src/patterns/PatternSection/",
       "design-system/src/patterns/PatternCard/",
-      "design-system/src/patterns/PatternTable/",
-      "design-system/src/patterns/Blanket/",
-      "design-system/src/patterns/PatternModal/",
+      "design-system/src/patterns/Table/",
+      "design-system/src/patterns/Modal/",
       "design-system/src/patterns/Panel/",
       "design-system/src/patterns/Popup/",
       "design-system/src/patterns/HeadingOutline",
@@ -193,6 +191,12 @@
         "Typography",
         "Iconography",
         "Elevation",
+        [
+          "Overview",
+          "Layer system",
+          "Shadow ramp",
+          "Usage"
+        ],
         "Radius",
         "Border"
       ],
@@ -336,10 +340,10 @@
       "Messaging",
       [
         "Banner",
+        "Dialog",
         "Empty state",
         "Flag",
         "Inline message",
-        "Modal dialog",
         "Notification item",
         "Section message",
         "Spotlight"

@@ -125,7 +125,7 @@ Same group: `Accordion` · `PageHeader` · `Panel` · `ScrollBar`
 | Ring | `--control-lg` across, `--border-width-selected` wide. Track `--ds-border`; progress `--ds-background-brand-bold`. |
 | Progress indicator | The default `ProgressIndicator`: steps `--progress-indicator-dot-size-8`, the bar `--control-md` long, each step a `--control-sm` target. |
 | Motion | A move takes `--ds-motion-spatial-default`, fading on `--ds-motion-appearance-slow`. The caption lifts out over `--ds-motion-appearance-fast` and rises in over `--ds-motion-appearance-default`. |
-| Caption | `Heading` size small; line in `--body-default` and `--ds-text-subtle`; at most `--content-max-width-reading` wide. |
+| Caption | `Heading` size sm; line in `--body-default` and `--ds-text-subtle`; at most `--content-max-width-reading` wide. |
 | Spacing | `--section-stack-md` between the stage, the controls and the caption; `--inline-md` between controls. |
 
 ## Props

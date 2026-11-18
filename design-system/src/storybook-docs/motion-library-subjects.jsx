@@ -18,6 +18,7 @@ import {
     DatePicker,
     DateTimePicker,
     DropdownMenu,
+    DynamicTable,
     FileItem,
     FileUpload,
     FilterButton,
@@ -33,7 +34,6 @@ import {
     Link,
     LinkButton,
     LinkIconButton,
-    Modal,
     NotificationItem,
     PageHeader,
     Pagination,
@@ -60,7 +60,6 @@ import {
     Spinner,
     SplitButton,
     Suggestion,
-    Table,
     Tabs,
     TagInput,
     TextArea,
@@ -69,6 +68,7 @@ import {
     Toggle,
     Tooltip,
     TreeSelect,
+    TreeTable,
 } from '@/components';
 import { OverlayContainer } from '@/lib/overlay';
 import { BEAT, springFor } from '@/storybook-docs/illustrations/motion.jsx';
@@ -195,7 +195,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
         <Calendar
             viewDate={step === 'landing' ? CALENDAR_NEXT_DATE : CALENDAR_BASE_DATE}
             selected="2026-11-16"
-            size={28}
+            size={24}
             onViewDateChange={NOOP}
             onPick={NOOP}
         />
@@ -460,21 +460,6 @@ export const COMPONENT_SUBJECTS = Object.freeze({
         />
     ),
 
-    Modal: () => (
-        <div style={{ width: '100%' }}>
-            <Modal
-                renderAs="inline"
-                show
-                title="End session early?"
-                body="Progress so far will be saved to the session log."
-                width="100%"
-                primaryButton={{ text: 'Save & end', appearance: 'primary', spacing: 'compact', onClick: NOOP }}
-                secondaryButton={{ text: 'Keep going', appearance: 'default', spacing: 'compact', onClick: NOOP }}
-                onClose={NOOP}
-            />
-        </div>
-    ),
-
     NotificationItem: ({ step }) => (
         <div style={{ width: '100%' }}>
             <NotificationItem
@@ -491,7 +476,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
         <div style={{ width: '100%' }}>
             <PageHeader
                 disableTitleStyles
-                title={<Heading size="small" as="div">Upcoming sessions</Heading>}
+                title={<Heading size="sm" as="div">Upcoming sessions</Heading>}
                 actions={<Button spacing="compact" onClick={NOOP}>Schedule</Button>}
             />
         </div>
@@ -762,19 +747,37 @@ export const COMPONENT_SUBJECTS = Object.freeze({
         />
     ),
 
-    Table: ({ step }) => (
+    DynamicTable: ({ step }) => (
         <div style={{ width: '100%' }}>
-            <Table
-                size={32}
-                headers={['Student', 'Status']}
-                rows={
-                    step === 'landing'
-                        ? [
-                            ['Maya Lin', 'Present'],
-                            ['Leo Park', 'Joined'],
-                        ]
-                        : [['Maya Lin', 'Present']]
-                }
+            <DynamicTable
+                label="Session roster"
+                head={{ cells: [{ key: 'student', content: 'Student' }, { key: 'status', content: 'Status' }] }}
+                rows={(step === 'landing'
+                    ? [['Maya Lin', 'Present'], ['Leo Park', 'Joined']]
+                    : [['Maya Lin', 'Present']]
+                ).map(([student, status]) => ({
+                    key: student,
+                    cells: [{ key: 'student', content: student }, { key: 'status', content: status }],
+                }))}
+            />
+        </div>
+    ),
+
+    TreeTable: ({ step }) => (
+        <div style={{ width: '100%' }}>
+            <TreeTable
+                label="School roster"
+                head={{ cells: [{ key: 'name', content: 'Name' }, { key: 'type', content: 'Type' }] }}
+                items={[{
+                    id: 'lincoln',
+                    cells: [{ content: 'Lincoln Middle' }, { content: 'School' }],
+                    children: [
+                        { id: 'g7', cells: [{ content: 'Grade 7 · Math' }, { content: 'Class' }] },
+                        { id: 'g6', cells: [{ content: 'Grade 6 · Reading' }, { content: 'Class' }] },
+                    ],
+                }]}
+                expandedIds={step === 'landing' ? ['lincoln'] : []}
+                onExpandedChange={NOOP}
             />
         </div>
     ),

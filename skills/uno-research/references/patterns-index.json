@@ -61,10 +61,10 @@
     },
     {
       "name": "table_styling_alignment",
-      "rule": "Respect global table behavior and build tables on the Table pattern.",
+      "rule": "Respect global table behavior and build tables on the Table template.",
       "references": [
         "design-system/src/styles/main.scss",
-        "design-system/src/patterns/PatternTable/PatternTable.scss"
+        "design-system/src/patterns/Table/Table.scss"
       ]
     },
     {

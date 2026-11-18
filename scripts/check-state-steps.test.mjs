@@ -394,13 +394,13 @@ test('RichTextEditor: the toolbar draws no button state of its own — its subtl
   assert.deepEqual(overrides, [], 'hover, press, focus and selected come from Button, not from the editor');
 });
 
-/* ─── PatternTable rows ──────────────────────────────────────────────────── */
+/* ─── Table shell rows ──────────────────────────────────────────────────── */
 
-test('PatternTable: row states are layered over the cell fill — neutral subtle hover and press, the selected ladder with no leading bar', () => {
-  const file = 'patterns/PatternTable/PatternTable.scss';
-  const table = '.plus-pattern-table-table';
+test('Table shell: row states are layered over the cell fill — neutral subtle hover and press, the selected ladder with no leading bar', () => {
+  const file = 'components/text-and-data-display/Table/TableShell.scss';
+  const table = '.plus-table-shell-table';
   const row = `${table} tbody tr`;
-  const state = '--plus-pattern-table-row-state';
+  const state = '--plus-table-shell-row-state';
   const over = (token) => `linear-gradient(${layer(token)}, ${layer(token)})`;
   // Every cell draws the row's state as an image over its fill, never as the fill.
   expectRule(file, `${table} th`, { 'background-image': over(state) });

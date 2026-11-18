@@ -55,7 +55,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Tutor onboarding stages</Heading>
+                <Heading as="h3" size="sm">Tutor onboarding stages</Heading>
                 <p style={captionStyle}>
                     Stages keep their sequential process order by default ({'sort={false}'}), with counts formatted in tabular figures.
                 </p>
@@ -63,7 +63,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Student enrollment toned by volume</Heading>
+                <Heading as="h3" size="sm">Student enrollment toned by volume</Heading>
                 <p style={captionStyle}>
                     Pair sequential stage order with toneByRank so the largest stage carries the darkest sequential step.
                 </p>

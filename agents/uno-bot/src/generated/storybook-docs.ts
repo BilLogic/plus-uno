@@ -228,14 +228,14 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-loading-spinner--docs"
   ],
   [
+    "design-system/src/components/messaging/Dialog/",
+    "Dialog",
+    "components-messaging-dialog--docs"
+  ],
+  [
     "design-system/src/components/messaging/Flag/",
     "Flag",
     "components-messaging-flag--docs"
-  ],
-  [
-    "design-system/src/components/messaging/Modal/",
-    "Modal",
-    "components-messaging-modal--docs"
   ],
   [
     "design-system/src/components/messaging/NotificationItem/",
@@ -283,6 +283,11 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-overlays-and-layering-tooltip--docs"
   ],
   [
+    "design-system/src/components/text-and-data-display/DynamicTable/",
+    "DynamicTable",
+    "components-text-and-data-display-dynamic-table--docs"
+  ],
+  [
     "design-system/src/components/text-and-data-display/Heading/",
     "Heading",
     "components-text-and-data-display-heading--docs"
@@ -293,17 +298,12 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-text-and-data-display-inline-edit--docs"
   ],
   [
-    "design-system/src/components/text-and-data-display/Table/DynamicTable.",
-    "DynamicTable",
-    "components-text-and-data-display-dynamic-table--docs"
-  ],
-  [
-    "design-system/src/components/text-and-data-display/Table/StaticTable.",
+    "design-system/src/components/text-and-data-display/StaticTable/",
     "StaticTable",
     "components-text-and-data-display-static-table--docs"
   ],
   [
-    "design-system/src/components/text-and-data-display/Table/TreeTable.",
+    "design-system/src/components/text-and-data-display/TreeTable/",
     "TreeTable",
     "components-text-and-data-display-tree-table--docs"
   ],

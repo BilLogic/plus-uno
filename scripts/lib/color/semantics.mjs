@@ -36,7 +36,8 @@ export function loadAtlassian({ root = REPO_ROOT } = {}) {
 }
 
 // Rovo is Atlassian's AI layer: out of scope until the AI hue is decided.
-const SKIP = ['color.rovo', 'elevation.rovo', 'elevation.shadow'];
+// elevation.surface.container* is retired (not in the elevation model).
+const SKIP = ['color.rovo', 'elevation.rovo', 'elevation.shadow', 'elevation.surface.container'];
 const HUES = ['blue', 'teal', 'green', 'lime', 'yellow', 'orange', 'red', 'magenta', 'purple', 'gray', 'brown'];
 const DIRECT = {
   Blue: 'blue', Teal: 'teal', Green: 'green', Lime: 'lime', Yellow: 'yellow', Orange: 'orange',
@@ -167,6 +168,8 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
     '(pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a ' +
     "non-color cue (a check, an icon, the medium label weight or the active tab's underline), never a side stripe.";
   const overrides = {
+    'elevation.surface.raised': [null, D(100), null, null,
+      'In dark, raised cards sit at the page tone (darkNeutral.100); only overlay layers (3 and 4) step lighter.'],
     'color.border.focused': [H('lagoon', 700), H('lagoon', 300), H('lagoon', 800), H('lagoon', 300),
       'Two steps darker than Atlassian (500): 5.0:1 on white, and 3:1 on the hovered and selected grounds it sits on. Drawn with a 2px offset, never inset on a fill.'],
     'color.interaction.hovered': [NA(8), DA(8), null, null, 'PLUS state-layer ruling (2026-10-24): hover overlay 8%. Atlassian uses 16%. Only for fills that cannot change (avatars, images).'],
@@ -212,6 +215,63 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
       'PLUS addition: AI is a register, not a hue, so the ground is neutral ink like neutral.bold until the AI hue is decided; change these three aliases to re-ground every AI action.'],
     ['color.ai.background.bold.hovered', N(900), D(900), null, null, 'Hovered ground of an AI action.', 'PLUS addition: see color.ai.background.bold.'],
     ['color.ai.background.bold.pressed', N(800), D(800), null, null, 'Pressed ground of an AI action.', 'PLUS addition: see color.ai.background.bold.'],
+    ['color.logo.plus', N(0), N(0), null, null,
+      'Plus glyph fill inside the filled, dark, colored, and colored-dark Logo marks.',
+      'PLUS addition: brand artwork stays identical across color modes.'],
+    ['color.logo.ground', N(0), N(0), null, null,
+      'Ground fill behind the glows inside the colored and colored-dark Logo marks.',
+      'PLUS addition: brand artwork stays identical across color modes.'],
+    ['color.logo.tile', H('lagoon', 700), H('lagoon', 700), null, null,
+      'Tile fill of the filled Logo mark.',
+      'PLUS addition: brand artwork stays identical across color modes.'],
+    ['color.logo.tile.dark', H('lagoon', 900), H('lagoon', 900), null, null,
+      'Tile fill of the dark Logo mark.',
+      'PLUS addition: brand artwork stays identical across color modes.'],
+    ['color.logo.mark', N(1000), N(1000), null, null,
+      'Ring stroke and plus fill of the outlined Logo mark.',
+      'PLUS addition: brand artwork stays identical across color modes.'],
+    ['color.logo.mark.reversed', D(1000), D(1000), null, null,
+      'Ring stroke and plus fill of the outlined-reversed Logo mark.',
+      'PLUS addition: brand artwork stays identical across color modes.'],
+    ['color.logo.wordmark', N(1000), N(1000), null, null,
+      'Default wordmark fill on light surfaces.',
+      'PLUS addition: brand artwork stays identical across color modes.'],
+    ['color.logo.wordmark.reversed', D(1000), D(1000), null, null,
+      'Reversed wordmark fill on dark surfaces.',
+      'PLUS addition: brand artwork stays identical across color modes.'],
+    ['color.logo.wordmark.stroke', D(0), D(0), null, null,
+      'Hairline stroke in the dark ground color around light wordmark letters on dark grounds.',
+      'PLUS addition: brand artwork stays identical across color modes.'],
+    ['color.logo.glow.light.0', H('yellow', 300), H('yellow', 300), null, null,
+      'First glow layer of the colored Logo mark on light grounds.',
+      'PLUS addition: brand artwork stays identical across color modes.'],
+    ['color.logo.glow.light.1', H('yellow', 250), H('yellow', 250), null, null,
+      'Second glow layer of the colored Logo mark on light grounds.',
+      'PLUS addition: brand artwork stays identical across color modes.'],
+    ['color.logo.glow.light.2', H('teal', 200), H('teal', 200), null, null,
+      'Third glow layer of the colored Logo mark on light grounds.',
+      'PLUS addition: brand artwork stays identical across color modes.'],
+    ['color.logo.glow.light.3', H('red', 200), H('red', 200), null, null,
+      'Fourth glow layer of the colored Logo mark on light grounds.',
+      'PLUS addition: brand artwork stays identical across color modes.'],
+    ['color.logo.glow.light.4', H('lagoon', 400), H('lagoon', 400), null, null,
+      'Fifth glow layer of the colored Logo mark on light grounds.',
+      'PLUS addition: brand artwork stays identical across color modes.'],
+    ['color.logo.glow.dark.0', H('yellow', 400), H('yellow', 400), null, null,
+      'First glow layer of the colored-dark Logo mark and dark-mode colored Logo mark.',
+      'PLUS addition: brand artwork stays identical across color modes.'],
+    ['color.logo.glow.dark.1', H('yellow', 300), H('yellow', 300), null, null,
+      'Second glow layer of the colored-dark Logo mark and dark-mode colored Logo mark.',
+      'PLUS addition: brand artwork stays identical across color modes.'],
+    ['color.logo.glow.dark.2', H('teal', 300), H('teal', 300), null, null,
+      'Third glow layer of the colored-dark Logo mark and dark-mode colored Logo mark.',
+      'PLUS addition: brand artwork stays identical across color modes.'],
+    ['color.logo.glow.dark.3', H('red', 300), H('red', 300), null, null,
+      'Fourth glow layer of the colored-dark Logo mark and dark-mode colored Logo mark.',
+      'PLUS addition: brand artwork stays identical across color modes.'],
+    ['color.logo.glow.dark.4', H('lagoon', 500), H('lagoon', 500), null, null,
+      'Fifth glow layer of the colored-dark Logo mark and dark-mode colored Logo mark.',
+      'PLUS addition: brand artwork stays identical across color modes.'],
   ];
 
   const KEYS = ['light', 'dark', 'lic', 'dic'];

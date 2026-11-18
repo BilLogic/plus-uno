@@ -28,6 +28,7 @@ const FLATTENED = {
 
 const RENAMED_COMPONENTS = {
   'components-labels-tag-smart-tag': 'Components/Labels/Tag/Competency tag',
+  'components-messaging-modal': 'Templates/Modal',
 };
 
 const storyRules = [
@@ -37,7 +38,7 @@ const storyRules = [
 ].map((m) => ({ from: m[1], to: m[2] }));
 
 test('the renamed and folded docs ids each redirect to a live page', () => {
-  assert.equal(rules.length, 55);
+  assert.equal(rules.length, 57);
   for (const r of rules) {
     assert.ok(!ids.has(r.from), `${r.from} is a live page and should not redirect`);
     if (r.from in FAMILIES || r.from in FLATTENED || r.from in RENAMED_COMPONENTS) continue;
@@ -57,6 +58,7 @@ test('every pre-regroup Foundations id lands on its page in the new groups', () 
     'foundations-sound-overview': 'foundations-expression-sound-overview',
     'foundations-sound-settings-and-accessibility': 'foundations-expression-sound-settings-and-accessibility',
     'foundations-color': 'foundations-visual-color',
+    'foundations-visual-elevation': 'foundations-visual-elevation-overview',
   };
   for (const [from, target] of Object.entries(expected)) {
     assert.equal(to[from], target, `${from} should redirect to ${target}`);
@@ -107,13 +109,51 @@ test('every retired tag story id redirects to the matching CompetencyTag story i
   );
   assert.ok(storyExports.length > 0, 'expected CompetencyTag story exports');
   const targets = new Set(storyExports.map((name) => storybookId('Components/Labels/Tag/Competency tag', name)));
-  assert.ok(storyRules.length > 0, 'expected retired tag story redirects');
-  for (const rule of storyRules) {
+  const smartTagRules = storyRules.filter((r) => r.from.startsWith('components-labels-tag-smart-tag--'));
+  assert.ok(smartTagRules.length > 0, 'expected retired tag story redirects');
+  for (const rule of smartTagRules) {
     assert.ok(targets.has(rule.to), `redirect target ${rule.to} is not a live CompetencyTag story`);
     assert.equal(rule.from, rule.to.replace('competency-tag--', 'smart-tag--'), `unexpected redirect source ${rule.from}`);
   }
 });
 
+test('every retired Modal component story id redirects to a live Dialog or Modal story id', async () => {
+  const { storybookId } = await import('./lib/storybook-id.mjs');
+  const exportIds = (relPath, title) => {
+    const src = fs.readFileSync(new URL(relPath, import.meta.url), 'utf8');
+    const names = [...src.matchAll(/^export const ([A-Z][A-Za-z0-9]*)\b[^\n]*\n(?:[A-Za-z0-9_]+\.storyName = '([^']+)';)?/gm)]
+      .map((m) => m[2] || m[1].replace(/([a-z0-9])([A-Z])/g, '$1 $2'));
+    return names.map((name) => storybookId(title, name));
+  };
+  const targets = new Set([
+    ...exportIds('../design-system/src/components/messaging/Dialog/Dialog.stories.jsx', 'Components/Messaging/Dialog'),
+    ...exportIds('../design-system/src/patterns/Modal/Modal.stories.jsx', 'Templates/Modal'),
+  ]);
+  const modalRules = storyRules.filter((r) => r.from.startsWith('components-messaging-modal--'));
+  assert.equal(modalRules.length, 26);
+  for (const rule of modalRules) {
+    assert.ok(targets.has(rule.to), `redirect target ${rule.to} is not a live Dialog or Modal story`);
+  }
+});
+
+
+test('every retired table-pattern story id redirects to a live Table template or Table shell story id', async () => {
+  const { storybookId } = await import('./lib/storybook-id.mjs');
+  const exportIds = (relPath, title) => {
+    const src = fs.readFileSync(new URL(relPath, import.meta.url), 'utf8');
+    return [...src.matchAll(/^export const ([A-Z][A-Za-z0-9]*)\b/gm)]
+      .map((m) => storybookId(title, m[1].replace(/([a-z0-9])([A-Z])/g, '$1 $2')));
+  };
+  const targets = new Set([
+    ...exportIds('../design-system/src/patterns/Table/Table.stories.jsx', 'Templates/Table'),
+    ...exportIds('../design-system/src/components/text-and-data-display/Table/TableShell.stories.jsx', 'Components/Text and data display/Table shell'),
+  ]);
+  const tableRules = storyRules.filter((r) => r.from.startsWith('templates-table--'));
+  assert.equal(tableRules.length, 13);
+  for (const rule of tableRules) {
+    assert.ok(targets.has(rule.to), `redirect target ${rule.to} is not a live story id`);
+  }
+});
 
 test('historical Modal Backdrop bookmarks land on the Blanket section', () => {
   assert.deepEqual(rules.find((r) => r.from === 'templates-modal-backdrop'), {

@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Breadcrumb, Button, FooterActions, IconButton, Logo, Modal, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, ProgressTracker, Sidebar, Skeleton, StatusTag, TextField } from '@/components';
-import { Blanket, Frame, PANEL_STORAGE_KEY, PatternCard, PatternModal, PatternSection, usePanelControl, useSidebarControl } from '@/patterns';
+import { Breadcrumb, Button, FooterActions, IconButton, Logo, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, ProgressTracker, Sidebar, Skeleton, StatusTag, TextField } from '@/components';
+import { Frame, Modal, PANEL_STORAGE_KEY, PatternCard, PatternSection, usePanelControl, useSidebarControl } from '@/patterns';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { FRAME_LAYOUT } from './frameLayout';
 import { BrowserWindow, LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
@@ -216,11 +216,29 @@ const expectCorner = async (frame, surface) => {
 
 export const Overview = {
     // An ordinary page: no Back, no Close. Only a focused page shows them.
-    play: async ({ canvasElement }) => {
+    play: async ({ canvasElement, globals = {}, parameters = {} }) => {
         const canvas = within(canvasElement);
         await expect(canvas.queryByRole('button', { name: 'Back' }), 'no Back on an ordinary page').toBeNull();
         await expect(canvas.queryByRole('button', { name: 'Close' }), 'no Close on an ordinary page').toBeNull();
         await expect(canvasElement.querySelector('.plus-frame__back, .plus-frame__close'), 'no Back or Close in the header row').toBeNull();
+        const expected = parameters.browserFrame || globals.plusBrowser || 'chrome';
+        const browserFrame = canvasElement.querySelector('.plus-browser-frame');
+        if (expected === 'none') {
+            await expect(browserFrame, 'plusBrowser: none renders no browser frame').toBeNull();
+        } else {
+            await expect(browserFrame, 'Templates/ stories render with a browser frame').not.toBeNull();
+            await expect(browserFrame).toHaveAttribute('data-browser', expected);
+            await expect(browserFrame.querySelector('.plus-browser-frame__toolbar')).not.toBeNull();
+        }
+    },
+};
+
+/** Opting out of the default template browser frame via `parameters.browserFrame: 'none'`. */
+export const WithoutBrowserFrame = {
+    parameters: { browserFrame: 'none', docs: { disable: true } },
+    play: async ({ canvasElement }) => {
+        await expect(canvasElement.querySelector('.plus-browser-frame'), 'browserFrame: none opts out of the browser frame').toBeNull();
+        await expect(canvasElement.querySelector('.plus-frame')).not.toBeNull();
     },
 };
 
@@ -964,7 +982,7 @@ export const ModalLeavesPanelOpen = {
         await waitFor(() => expect(dialog(canvasElement)).not.toBeNull());
         await expect(p.frame.querySelector('.plus-frame__panel'), 'the Panel stays open under the Modal').not.toBeNull();
         await userEvent.click(within(dialog(canvasElement)).getByRole('button', { name: 'Done' }));
-        await waitFor(() => expect(dialog(canvasElement)).toBeNull());
+        await waitFor(() => expect(dialog(canvasElement)).toBeNull(), { timeout: 3000 });
         await expect(p.panel(), 'still open after the Modal').not.toBeNull();
     }),
 };
@@ -985,7 +1003,7 @@ export const ModalOverOverlayPanelAt1100 = {
         await userEvent.click(within(dialog(canvasElement)).getByText('The Panel stays open under this Modal.'));
         await expect(p.panel(), 'a press inside the Modal is not outside the Panel').not.toBeNull();
         await userEvent.keyboard('{Escape}');
-        await waitFor(() => expect(dialog(canvasElement)).toBeNull());
+        await waitFor(() => expect(dialog(canvasElement)).toBeNull(), { timeout: 3000 });
         await expect(p.panel(), 'Escape closed the Modal only').not.toBeNull();
         await waitFor(() => expect(canvasElement.ownerDocument.activeElement, 'focus is back on what raised the Modal').toBe(settings));
     }),
@@ -2660,15 +2678,15 @@ const RecordOverlayDemo = () => {
                             }}
                         />
                     </Frame>
-                    <Blanket inline show={Boolean(modalStudent)}>
-                        <PatternModal
-                            title={modalStudent ? `Edit ${modalStudent.name}` : 'Edit student'}
-                            onClose={closeModal}
-                            footer={<Button text="Done" appearance="primary" onClick={closeModal} />}
-                        >
-                            <TextField label="Notes" value={modalStudent?.detail ?? ''} onChange={() => {}} />
-                        </PatternModal>
-                    </Blanket>
+                    <Modal
+                        inline
+                        show={Boolean(modalStudent)}
+                        title={modalStudent ? `Edit ${modalStudent.name}` : 'Edit student'}
+                        onClose={closeModal}
+                        footer={<Button text="Done" appearance="primary" onClick={closeModal} />}
+                    >
+                        <TextField label="Notes" value={modalStudent?.detail ?? ''} onChange={() => {}} />
+                    </Modal>
                 </div>
             </BrowserWindow>
         </FitStage>
@@ -2683,8 +2701,8 @@ const recordOverlayPlay = (reduced) => async ({ canvasElement }) => {
 
     const editBtn = canvas.getByRole('button', { name: 'Edit Maya Rodriguez' });
     await userEvent.click(editBtn);
-    const modal = canvasElement.querySelector('.plus-pattern-modal');
-    await expect(modal, 'record opens as PatternModal via shared overlay helper').not.toBeNull();
+    const modal = canvasElement.querySelector('.plus-modal');
+    await expect(modal, 'record opens as Modal via shared overlay helper').not.toBeNull();
     await expectOverlayExit(modal, () => within(modal).getByRole('button', { name: 'Done' }).click(), reduced);
     await expect(surface.scrollTop, 'closing Modal preserves scroll').toBeCloseTo(savedScroll, 0);
     await expect(canvasElement.ownerDocument.activeElement, 'closing Modal returns focus to row button').toBe(editBtn);
@@ -2803,20 +2821,20 @@ const FocusedTaskTransitionDemo = () => {
                             </div>
                         )}
                     />
-                    <Blanket inline show={confirmDiscard}>
-                        <PatternModal
-                            title="Discard unsaved session?"
-                            onClose={() => setConfirmDiscard(false)}
-                            footer={(
-                                <FooterActions>
-                                    <Button text="Keep editing" onClick={() => setConfirmDiscard(false)} />
-                                    <Button text="Discard" appearance="danger" onClick={discardAndLeave} />
-                                </FooterActions>
-                            )}
-                        >
-                            Your notes have not been saved yet.
-                        </PatternModal>
-                    </Blanket>
+                    <Modal
+                        inline
+                        show={confirmDiscard}
+                        title="Discard unsaved session?"
+                        onClose={() => setConfirmDiscard(false)}
+                        footer={(
+                            <FooterActions>
+                                <Button text="Keep editing" onClick={() => setConfirmDiscard(false)} />
+                                <Button text="Discard" appearance="danger" onClick={discardAndLeave} />
+                            </FooterActions>
+                        )}
+                    >
+                        Your notes have not been saved yet.
+                    </Modal>
                 </div>
             </BrowserWindow>
         </FitStage>
@@ -2842,7 +2860,7 @@ const focusedTaskPlay = (reduced) => async ({ canvasElement }) => {
     await userEvent.type(field, 'Linear equations');
     await userEvent.click(canvas.getByRole('button', { name: 'Close' }));
 
-    const modal = canvasElement.querySelector('.plus-pattern-modal');
+    const modal = canvasElement.querySelector('.plus-modal');
     await expect(modal, 'unsaved work asks first in a Modal').not.toBeNull();
     await expectOverlayExit(modal, () => within(modal).getByRole('button', { name: 'Discard' }).click(), reduced);
 

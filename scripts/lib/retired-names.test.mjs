@@ -55,6 +55,6 @@ test('every token the plan retires is in Not-here with the plan replacement', ()
 test('a hand-kept token row that covers retired names offers only what the plan maps them to', () => {
   assert.deepEqual(tokenRowConflicts(inventions(), retiredRenames()), []);
   const plan = new Map([['--element-pad-default', '--pad-x-md']]);
-  const table = { components: [], props: [], tokens: [{ not: '--element-*', use: ['--pad-x-md', '--stack-xl'] }] };
-  assert.deepEqual(tokenRowConflicts(table, plan), ['--element-*: --stack-xl is not what the plan maps any name it covers to']);
+  const table = { components: [], props: [], tokens: [{ not: '--element-*', use: ['--pad-x-md', '--stack-none'] }] };
+  assert.deepEqual(tokenRowConflicts(table, plan), ['--element-*: --stack-none is not what the plan maps any name it covers to']);
 });

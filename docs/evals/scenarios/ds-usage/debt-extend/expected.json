@@ -8,14 +8,14 @@
     {
       "id": "reviews-page",
       "screen": "Monthly reviews list page",
-      "template": "Page + PatternSection + PatternTable",
-      "variant": "Page · Default / PatternSection · Toolbar / PatternTable",
+      "template": "Page + PatternSection + Table",
+      "variant": "Page · Default / PatternSection · Toolbar / Table",
       "page": "design-system/src/patterns/PatternSection/index.md",
       "section": "Anatomy",
       "pages": [
         "design-system/src/patterns/Page/index.md",
         "design-system/src/patterns/PatternSection/index.md",
-        "design-system/src/patterns/PatternTable/index.md"
+        "design-system/src/patterns/Table/index.md"
       ],
       "guides": ["page", "section", "table", "templates"],
       "scoring": "judge",

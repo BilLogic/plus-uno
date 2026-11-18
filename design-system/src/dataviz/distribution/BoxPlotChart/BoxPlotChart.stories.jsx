@@ -53,7 +53,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Student score distribution by class</Heading>
+                <Heading as="h3" size="sm">Student score distribution by class</Heading>
                 <p style={captionStyle}>
                     Shows minimum, lower quartile, median, upper quartile and maximum scores, sorted from highest median to lowest.
                 </p>
@@ -66,7 +66,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Session duration by week</Heading>
+                <Heading as="h3" size="sm">Session duration by week</Heading>
                 <p style={captionStyle}>
                     Temporal weeks keep chronological order with {'sort={false}'}.
                 </p>

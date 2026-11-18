@@ -164,7 +164,7 @@ export function readBarrel(root, spec = COMPONENTS_BARREL, { onUnresolved } = {}
 const readJson = (file) => JSON.parse(fs.readFileSync(file, 'utf8'));
 const importLine = (name, from) => `import { ${name} } from '${from}';`;
 
-/** `Button variant`, `Button appearance="secondary"`, `Heading size="sm" / "lg"` → its parts. */
+/** `Button variant`, `Button appearance="secondary"`, `Heading size="small" / "large"` → its parts. */
 function parsePropRow(not) {
   const m = not.match(/^(\w+)\s+(\w+)(.*)$/);
   if (!m) return null;

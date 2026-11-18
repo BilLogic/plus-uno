@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import {
     Banner, Button, EmptyState, FilterButton, FooterActions, PageHeader,
-    PanelBody, PanelContainer, PanelFooter, PanelHeader, PopupSelect, SearchField, StatusTag, Tabs, TextField,
+    PanelBody, PanelContainer, PanelFooter, PanelHeader, PopupSelect, SearchField, StaticTable, StatusTag, Tabs, TextField,
 } from '@/components';
-import { Frame, Page, PatternSection, PatternTable, usePanelControl } from '@/patterns';
+import { Frame, Page, PatternSection, Table, usePanelControl } from '@/patterns';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 
 export default {
@@ -33,7 +33,7 @@ export const ListWithFilters = {
                     header={<PageHeader title="Session review queue" />}
                     banner={<Banner appearance="announcement">Review notes are visible to the session tutor.</Banner>}
                 >
-                    <PatternSection title="Sessions" toolbar={
+                    <Table title="Sessions" toolbar={
                         <div className="plus-section-view-bar" style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
                             <Tabs appearance="pill" defaultActiveKey="all" aria-label="Session views"><Tabs.Tab eventKey="all">All sessions</Tabs.Tab></Tabs>
                             <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', marginInlineStart: 'auto' }}>
@@ -42,17 +42,18 @@ export const ListWithFilters = {
                                 trigger={<FilterButton text="Status" trailingMetric={status === 'All' ? undefined : 1} />} />
                             </div>
                         </div>
+                    } empty={!rows.length} label="Sessions" emptyState={
+                        <EmptyState spacing="compact" header="No matching sessions" description="Try another search or reset the filters."
+                            secondaryAction={<Button text="Reset filters" onClick={reset} />} />
                     }>
-                        <PatternTable empty={!rows.length} emptyState={
-                            <EmptyState spacing="compact" header="No matching sessions" description="Try another search or reset the filters."
-                                secondaryAction={<Button text="Reset filters" onClick={reset} />} />
-                        }>
-                            <thead><tr><th>Student</th><th>Status</th></tr></thead>
-                            <tbody>{rows.map((row) => <tr key={row.student}>
-                                <td>{row.student}</td><td><StatusTag appearance={row.status === 'Reviewed' ? 'success' : 'warning'}>{row.status}</StatusTag></td>
-                            </tr>)}</tbody>
-                        </PatternTable>
-                    </PatternSection>
+                        <StaticTable
+                            headers={['Student', 'Status']}
+                            rows={rows.map((row) => [
+                                row.student,
+                                <StatusTag appearance={row.status === 'Reviewed' ? 'success' : 'warning'}>{row.status}</StatusTag>,
+                            ])}
+                        />
+                    </Table>
                 </Page>
             </Frame>
         );

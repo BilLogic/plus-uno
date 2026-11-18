@@ -23,11 +23,11 @@
     padding: var(--pad-x-xs) var(--pad-x-sm);
 }
 
-.plus-calendar[data-size='28'] {
+.plus-calendar[data-size='24'] {
     --plus-calendar-day: var(--calendar-day-sm);
 }
 
-.plus-calendar[data-size='44'] {
+.plus-calendar[data-size='40'] {
     --plus-calendar-day: var(--calendar-day-lg);
 }
 
@@ -38,15 +38,9 @@
     align-self: stretch;
 }
 
-// The month buttons are IconButtons; only their size follows the calendar.
-.plus-calendar-nav.plus-btn {
-    width: var(--calendar-nav-size);
-    height: var(--calendar-nav-size);
-}
-
 .plus-calendar-month {
     margin: 0;
-    font: var(--heading-sm);
+    font: var(--heading-xs);
     color: var(--ds-text);
 }
 
@@ -54,7 +48,13 @@
 .plus-calendar-days {
     display: grid;
     grid-template-columns: repeat(7, var(--plus-calendar-day));
-    gap: var(--stack-sm);
+    column-gap: 0;
+    row-gap: var(--stack-sm);
+}
+
+.plus-calendar-days {
+    position: relative;
+    isolation: isolate;
 }
 
 .plus-calendar [data-slide-views] {
@@ -80,6 +80,9 @@
 }
 
 .plus-calendar-day {
+    --_calendar-day-radius: var(--radius-md);
+
+    position: relative;
     font: var(--body-default);
     display: flex;
     align-items: center;
@@ -89,7 +92,7 @@
     padding: 0;
     background: transparent;
     border: none;
-    border-radius: var(--radius-md);
+    border-radius: var(--_calendar-day-radius);
     color: var(--ds-text);
     cursor: pointer;
 
@@ -114,6 +117,38 @@
 
     &--in-range {
         background-color: var(--ds-background-selected);
+        border-radius: 0;
+
+        &:nth-child(7n + 1) {
+            border-start-start-radius: var(--_calendar-day-radius);
+            border-end-start-radius: var(--_calendar-day-radius);
+        }
+
+        &:nth-child(7n) {
+            border-start-end-radius: var(--_calendar-day-radius);
+            border-end-end-radius: var(--_calendar-day-radius);
+        }
+    }
+
+    &--range-start:not(:nth-child(7n))::before,
+    &--range-end:not(:nth-child(7n + 1))::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        background-color: var(--ds-background-selected);
+        z-index: -1;
+        pointer-events: none;
+    }
+
+    &--range-start:not(:nth-child(7n))::before {
+        left: 50%;
+        right: 0;
+    }
+
+    &--range-end:not(:nth-child(7n + 1))::before {
+        left: 0;
+        right: 50%;
     }
 
     &--selected {

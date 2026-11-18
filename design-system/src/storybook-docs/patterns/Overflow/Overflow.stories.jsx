@@ -4,7 +4,6 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
-import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import {
     ClippedCell,
     FOLD_STAGE,
@@ -70,8 +69,6 @@ export const WrapTitlesAndErrors = {
         await expect(rect(title).height, 'the title runs to more than one line').toBeGreaterThan(lineHeight * 1.5);
         await expect(rect(error).height, 'the error runs to more than one line').toBeGreaterThan(parseFloat(getComputedStyle(error).lineHeight) * 1.5);
         await fitsCanvas(canvasElement);
-        // The SectionMessage fades in on mount; the a11y scan reads its resting contrast.
-        await settleAnimations(canvasElement);
     },
 };
 
@@ -95,7 +92,6 @@ export const TruncatedCell = {
         await expect(isClipped(fits), 'a short note is not cut').toBe(false);
         await expect(fits.getAttribute('tabindex'), 'an unclipped cell is not a tab stop').toBeNull();
         await fitsCanvas(canvasElement);
-        await settleAnimations(canvasElement);
     },
 };
 
@@ -111,7 +107,6 @@ export const TruncatedCellTooltip = {
         const stop = clipped.getAttribute('tabindex') !== null ? clipped : clipped.closest('[tabindex="0"]');
         stop.focus();
         await waitFor(() => expect(bodyOf(canvasElement).getAllByRole('tooltip').some((tip) => tip.textContent === LONG_NOTE), 'the Tooltip opens on focus').toBe(true));
-        await settleAnimations(canvasElement);
     },
 };
 
@@ -174,7 +169,6 @@ export const FoldedTagGroup = {
         await userEvent.click(fold());
         await expect(await canvas.findByRole('menuitem', { name: 'History' })).toBeVisible();
         await userEvent.keyboard('{Escape}');
-        await settleAnimations(canvasElement);
     },
 };
 

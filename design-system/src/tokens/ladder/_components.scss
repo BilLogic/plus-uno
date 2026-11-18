@@ -12,11 +12,22 @@
     --button-radius-compact: calc(var(--radius-control-md) - var(--pad-x-xs)); /* nests in a 32-high field: its radius 8 minus the 4 slot inset = 4 */
     --button-radius-spacious: var(--radius-control-lg); /* 48-high footer button; pairs with --control-xl */
 
+    /* Dialog */
+    --dialog-pad-x-default: var(--space-100);
+    --dialog-pad-x-spacious: var(--space-150);
+    --dialog-stack-sm: var(--space-050);
+    --dialog-stack-md: var(--space-100);
+    --dialog-stack-lg: var(--space-150);
+    --dialog-inline-sm: var(--space-050);
+    --dialog-inline-md: var(--space-100);
+    --dialog-inline-lg: var(--space-150);
+    --dialog-radius: var(--radius-xxl);
+    --dialog-body-min-height: var(--height-500);
+
     /* Calendar */
-    --calendar-day-sm: 28px;
-    --calendar-day-md: 36px;
-    --calendar-day-lg: 44px;
-    --calendar-nav-size: 32px;
+    --calendar-day-sm: var(--control-sm);
+    --calendar-day-md: var(--control-md);
+    --calendar-day-lg: var(--control-lg);
 
     /* Progress indicator */
     --progress-indicator-dot-size-8: var(--space-050); /* ProgressIndicator size 8 */
@@ -157,8 +168,6 @@
 
     /* Menu group */
     --menu-group-min-width: var(--size-1400);
-    --menu-group-pad-x: var(--space-150);
-    --menu-group-gap: var(--space-100);
 
     /* Popup */
     --popup-min-width: var(--width-1000);
@@ -203,4 +212,13 @@
 
     /* Progress ring */
     --progress-ring-stroke: var(--stroke-2);
+}
+
+/* Mode-sensitive aliases re-evaluate at subtree mode or contrast boundaries. */
+:root,
+[data-color-mode],
+[data-contrast-mode] {
+
+    /* Dialog */
+    --dialog-shadow: var(--ds-shadow-blocking);
 }

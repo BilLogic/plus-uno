@@ -62,7 +62,7 @@ export const Overview = {
     render: () => (
         <div style={stackStyle}>
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Students by university and school (split clusters)</Heading>
+                <Heading as="h3" size="sm">Students by university and school (split clusters)</Heading>
                 <p style={captionStyle}>
                     Groups and bubbles sort from largest total to smallest so the biggest partner cluster leads.
                 </p>
@@ -70,7 +70,7 @@ export const Overview = {
             </section>
 
             <section style={sectionStyle}>
-                <Heading as="h3" size="small">Combined view</Heading>
+                <Heading as="h3" size="sm">Combined view</Heading>
                 <p style={captionStyle}>
                     Packs every school into one shared cluster while keeping university colors.
                 </p>

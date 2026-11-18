@@ -56,30 +56,42 @@
 
     /* Table */
     --table-radius: var(--radius-xl);
-    --table-footer-height: var(--space-300);
-    --table-footer-gap: var(--space-0625);
+    --table-inline: var(--inline-md);
+    --table-footer-height: var(--height-300);
+    --table-empty-radius: var(--radius-xxl);
     --table-overflow-reach: var(--space-150);
 
     /* Blanket */
     --blanket-pad-x: var(--space-100);
     --blanket-pad-y: var(--space-400);
-    --blanket-fill: rgba(0, 0, 0, 0.38); /* the Blanket's own fill color; the old declaration's value, written directly so this file carries no old-language word */
     --blanket-max-height-modal: calc(100dvh - 2 * var(--blanket-pad-y)); /* a calc() of the pad above: code only, no Figma variable */
 
     /* Modal */
     --modal-pad-x-default: var(--space-100);
     --modal-pad-x-spacious: var(--space-125);
     --modal-radius: var(--radius-xxl);
-    --modal-width-xs: 261px; /* 4 screen-grid columns plus 2 × 16 modal pad at 768 · 1024 · 1440 */
-    --modal-width-sm: 384px; /* lifted out of spacing / layout, beside the template’s pad/stack tokens */
-    --modal-width-md: 507px;
-    --modal-width-lg: 629px;
-    --modal-body-min-height: var(--space-500);
+    --modal-width-4-col: 261px; /* 4 screen-grid columns plus 2 × 16 modal pad at 768 · 1024 · 1440 */
+    --modal-width-6-col: 384px; /* lifted out of spacing / layout, beside the template’s pad/stack tokens */
+    --modal-width-8-col: 507px;
+    --modal-width-10-col: 629px;
+    --modal-body-min-height: var(--height-500);
 
     /* Popup */
     --popup-radius: var(--radius-xl);
     --popup-width-3-col: 200px; /* 3 · 4 screen-grid columns plus 2 × 16 popup pad at 768 · 1024 · 1440 */
     --popup-width-4-col: 261px;
+}
+
+/* Mode-sensitive aliases re-evaluate at subtree mode or contrast boundaries. */
+:root,
+[data-color-mode],
+[data-contrast-mode] {
+
+    /* Table */
+    --table-empty-surface: var(--ds-surface-sunken);
+
+    /* Modal */
+    --modal-shadow: var(--ds-shadow-blocking);
 }
 
 @media (max-height: 639.98px) {
@@ -90,10 +102,10 @@
 
 @media (min-width: 1024px) {
     :root {
-        --modal-width-xs: 347px;
-        --modal-width-sm: 512px;
-        --modal-width-md: 677px;
-        --modal-width-lg: 843px;
+        --modal-width-4-col: 347px;
+        --modal-width-6-col: 512px;
+        --modal-width-8-col: 677px;
+        --modal-width-10-col: 843px;
         --popup-width-3-col: 264px;
         --popup-width-4-col: 347px;
     }
@@ -101,10 +113,10 @@
 
 @media (min-width: 1440px) {
     :root {
-        --modal-width-xs: 432px;
-        --modal-width-sm: 640px;
-        --modal-width-md: 848px;
-        --modal-width-lg: 1056px;
+        --modal-width-4-col: 432px;
+        --modal-width-6-col: 640px;
+        --modal-width-8-col: 848px;
+        --modal-width-10-col: 1056px;
         --popup-width-3-col: 328px;
         --popup-width-4-col: 432px;
     }

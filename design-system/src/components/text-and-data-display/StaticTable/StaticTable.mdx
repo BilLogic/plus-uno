@@ -1,0 +1,297 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as StaticTableStories from './StaticTable.stories.jsx';
+import { StaticTable } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const rosterHeaders = [{ text: 'Session date', width: '30%' }, { text: 'Student', width: '40%' }, { text: 'Amount', align: 'number', width: '30%' }];
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "size": { "type": "enum", "values": [32, 40, 48] },
+    "frame": { "type": "enum", "values": ["plain", "framed"] },
+    "verticalLines": { "type": "boolean" },
+    "striped": { "type": "boolean" },
+    "hover": { "type": "boolean" },
+    "bordered": { "type": "boolean" }
+  },
+  "modelNote": "Figma has three table pages under Text and data display: Static table for fixed records, Dynamic table for a table people sort, filter, select, page or act on, and Tree table for rows that nest. Each is a set built from shared _Table parts (head cell, cell, row, footer). This component is the static case, with `headers` + `rows`. `DynamicTable` and `TreeTable` draw the other two on the table shell. The three pages are listed here as docs pages, not as sets to write back to. `size`, `frame`, `verticalLines`, `striped`, `hover` and `bordered` are code-only until a set maps them. The shared `_Table` parts are exported as `TableRow`, `TableCell`, `TableMessageRow`, `TableSummaryRow` and `TableFooter`, and `StaticTable` is this table with no hover.",
+  "sets": [
+    {
+      "id": "static-table",
+      "name": "Static table",
+      "componentSetNodeId": "20095:12263",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-12263",
+      "source": "manual",
+      "status": "verified",
+      "isComponentSet": true
+    }
+  ]
+};
+
+<Meta of={StaticTableStories} />
+
+<Title />
+
+A fixed grid people read. Cells accept any node, so a row can carry Status tags, Count tags, formatted currency, or an icon. Nothing in a Static table hovers, sorts, selects, pages or expands: see the Dynamic table for that.
+
+<DocsTabs of={StaticTableStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17156-122"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Table"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<ComponentExample of={StaticTableStories.Overview} description={<>The default: 40 row size and the title column set.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Appearance
+
+<ComponentExample of={StaticTableStories.Striped} title="Striped" description={<>Alternate rows take a subtle ground. Striped and bordered are independent switches.</>} />
+
+<ComponentExample of={StaticTableStories.Bordered} title="Bordered" description="A line between every cell, at the 32 row size." />
+
+<ComponentExample of={StaticTableStories.FramedAndLines} title="Framed and lines" description="Plain is the default. Framed draws its own edge, for a table beside other content or in a modal body; vertical lines add a divider between columns." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Row size
+
+<ComponentExample of={StaticTableStories.Sizes} title="Sizes" description={<>Rows are 32, 40 or 48 tall at minimum: pick by how much each row holds, not by screen width.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Cells
+
+<ComponentExample of={StaticTableStories.Cells} description={<>Text, a muted second line, wrapping, the title emphasis, text, number and icon alignment, an `elemBefore` slot, an error and a loading cell.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Head cells
+
+<ComponentExample of={StaticTableStories.HeadCells} description={<>The head cell holds a label and an optional type icon. It aligns as text, number or icon, and a label too long for its width ends in an ellipsis.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Row states
+
+<ComponentExample of={StaticTableStories.RowStates} description={<>A row rests, is highlighted, selected or disabled.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Summary
+
+<ComponentExample of={StaticTableStories.Summary} description={<>The summary row closes the table with one calculation per column.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## The Static table
+
+<ComponentExample of={StaticTableStories.Static} title="Static" description={<>A fixed grid people read: rows rest or are highlighted, and nothing hovers.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## State
+
+<ComponentExample of={StaticTableStories.Rest} title="Rest" description={<>A rest row is clear; a selected row is on the selected ground.</>} />
+
+<ComponentExample of={StaticTableStories.Hovered} title="Hovered" description={<>A Static table never hovers: a row under the pointer keeps its ground.</>} />
+
+<ComponentExample of={StaticTableStories.Pressed} title="Pressed" description={<>A Static table never presses: a row held down keeps its ground.</>} />
+
+<ComponentExample of={StaticTableStories.Focused} title="Focused" description={<>A row has no focus stop; Tab skips it.</>} />
+
+<ComponentExample of={StaticTableStories.Disabled} title="Disabled" description={<>The row takes the disabled ink, ignores the pointer and is <code>aria-disabled</code>.</>} />
+
+<ComponentExample of={StaticTableStories.Invalid} title="Invalid" description={<>A cell in the error state takes the danger ink.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground of={StaticTableStories.Interactive} />
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use `StaticTable` for a grid people only read: a record, a summary, a rate
+card.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a table people sort or filter or page, use `Table`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Head cell.** A label with an optional type icon.
+2. **Row.** Cells in a band; rest, highlighted, selected or disabled.
+3. **Cell.** Text, a number, an icon or any node, with optional secondary text and an `elemBefore` slot.
+4. **Summary row.** One calculation per column, muted, with no rule under it.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Clear row; a striped table shades alternate rows.</td></tr>
+<tr><td>Hovered</td><td>Not applicable; a Static table never hovers.</td></tr>
+<tr><td>Pressed</td><td>Not applicable; a Static table never presses.</td></tr>
+<tr><td>Focused</td><td>Not applicable; a row is not a control.</td></tr>
+<tr><td>Disabled</td><td>Disabled ink, no pointer events, <code>aria-disabled</code>.</td></tr>
+<tr><td>Invalid</td><td>A cell with <code>state: 'error'</code> takes the danger ink.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Row hovered, pressed</td><td><code>--ds-background-neutral-subtle-hovered</code>, <code>--ds-background-neutral-subtle-pressed</code></td></tr>
+<tr><td>Selected row</td><td><code>--ds-background-selected</code>, <code>--ds-background-selected-hovered</code>, <code>--ds-background-selected-pressed</code></td></tr>
+<tr><td>Highlighted row</td><td><code>--ds-background-warning-bold</code> washed</td></tr>
+<tr><td>Disabled ink</td><td><code>--ds-text-disabled</code></td></tr>
+<tr><td>Error ink</td><td><code>--ds-text-danger</code></td></tr>
+<tr><td>Hairlines</td><td><code>--ds-border</code></td></tr>
+<tr><td>Row height</td><td><code>--row-height-sm</code>, <code>--row-height-md</code>, <code>--row-height-lg</code></td></tr>
+<tr><td>Cell padding</td><td><code>--table-pad-x-cell</code>, <code>--table-pad-y-cell</code></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Right-align numbers.
+
+<DoDontPair
+    doExample={<StaticTable headers={rosterHeaders} rows={[['Jul 3', 'Priya Nair', { content: '$32.00', align: 'number' }], ['Jul 9', 'Marcus Lee', { content: '$6.50', align: 'number' }]]} />}
+    doCaption="Numbers align by their digits, so the amounts line up."
+    dontExample={<StaticTable headers={[{ text: 'Session date', width: '30%' }, { text: 'Student', width: '40%' }, { text: 'Amount', width: '30%' }]} rows={[['Jul 3', 'Priya Nair', '$32.00'], ['Jul 9', 'Marcus Lee', '$6.50']]} />}
+    dontCaption="Left-aligned numbers do not line up."
+/>
+
+### Name the record in one column.
+
+<DoDontPair
+    doExample={<StaticTable headers={rosterHeaders} titleColumn={1} rows={[['Jul 3', 'Priya Nair', { content: '$32.00', align: 'number' }], ['Jul 9', 'Marcus Lee', { content: '$6.50', align: 'number' }]]} />}
+    doCaption={<><code>titleColumn</code> marks the one column that names the row.</>}
+    dontExample={<StaticTable headers={rosterHeaders} rows={[[{ content: 'Jul 3', emphasis: 'title' }, { content: 'Priya Nair', emphasis: 'title' }, { content: '$32.00', align: 'number', emphasis: 'title' }]]} />}
+    dontCaption="Emphasis on every cell, so nothing stands out."
+/>
+
+### Keep a cell to one line.
+
+<DoDontPair
+    doExample={<div style={{ width: 'var(--field-width-lg)' }}><StaticTable headers={[{ text: 'Student' }, { text: 'Note' }]} rows={[['Priya Nair', 'Needs a longer session on fractions and ratios this week']]} /></div>}
+    doCaption="Long text truncates with an ellipsis and shows in full in a tooltip."
+    dontExample={<div style={{ width: 'var(--field-width-lg)' }}><StaticTable headers={[{ text: 'Student' }, { text: 'Note' }]} rows={[['Priya Nair', { content: 'Needs a longer session on fractions and ratios this week', overflow: 'wrap' }]]} /></div>}
+    dontCaption="Every cell wrapped, so rows grow uneven."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Title the one column that names the record.</td><td>Bold several columns.</td></tr>
+<tr><td>Right-align numbers and keep units in the header.</td><td>Left-align numbers or repeat units in every cell.</td></tr>
+<tr><td>Keep a cell to one line; let long text truncate with its tooltip.</td><td>Wrap every cell.</td></tr>
+<tr><td>Use a dash for an empty cell.</td><td>Leave a cell blank or write "N/A".</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **It is a real table.** Headers are `th` in a `thead`, so a screen reader announces the column for each cell.
+- **Rows are not controls.** Nothing in a Static table takes focus; a table people interact with is a Dynamic table.
+- **State is not color alone.** A selected row sets `aria-selected`, a disabled row `aria-disabled`.
+- **Truncated text keeps its full value.** A cell that ends in an ellipsis shows the whole text in a tooltip.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- `StatusTag`: use when showing a record's condition inside a cell.
+- `CountTag`: use when showing a numeric count inside a cell.
+- <a href="?path=/docs/templates-table--docs">Table</a>: use when choosing between Static, Dynamic and Tree tables.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

@@ -8,9 +8,9 @@
  * - `spacing / layout`: what changes by breakpoint, in modes Medium (768px) ·
  *   Large (1024px) · X-Large (1440px), named as `size / layout` names them.
  *   Folders Topbar · Sidebar · Grid · Content · Modal, and Page.
- * - `spacing / patterns`: one folder per pattern (Frame, Section,
+ * - `spacing / templates`: one folder per template (Frame, Section,
  *   Card, Table, Overlay, Modal, Popover), one mode.
- * - `color / patterns`: pattern colors, starting with `Overlay/scrim`.
+ * - `color / templates`: template colors, starting with `Overlay/scrim`.
  *
  * Each is exported to `design-system/src/tokens/source/` with ` / ` written
  * as ` _ `, as the older `size / *` exports are.
@@ -27,8 +27,8 @@
  */
 export const FRAME_LAYER_COLLECTIONS = [
   { name: 'spacing / layout', layout: true, heading: 'spacing / layout: the frame and the surface, per breakpoint' },
-  { name: 'spacing / patterns', heading: 'spacing / patterns' },
-  { name: 'color / patterns', heading: 'color / patterns' },
+  { name: 'spacing / templates', heading: 'spacing / templates' },
+  { name: 'color / templates', heading: 'color / templates' },
 ];
 
 const BY_NAME = new Map(FRAME_LAYER_COLLECTIONS.map((c) => [c.name, c]));
@@ -43,7 +43,7 @@ export const frameLayerFile = (name) => `${name.replace(/ \/ /g, ' _ ')}.json`;
  * The custom property (without `--`) a variable in one of these sets is
  * declared as.
  *
- * @param {string} collection Figma collection name, e.g. `spacing / patterns`
+ * @param {string} collection Figma collection name, e.g. `spacing / templates`
  * @param {string} variable Figma variable name, e.g. `Popover/Menu/pad-menu`
  */
 export function frameLayerToken(collection, variable) {

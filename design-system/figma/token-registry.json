@@ -95,7 +95,7 @@
       "Card gap": "var(--card-stack-{sm|md|lg})",
       "Card radius": "var(--card-radius)",
       "Element padding": "var(--pad-x-{xs|sm|md|lg})",
-      "Element gap": "var(--stack-{sm|md|lg})",
+      "Element gap": "var(--stack-{sm|md|lg|xl|2xl|3xl})",
       "Element radius": "var(--radius-{sm|md|lg|full})",
       "Modal padding": "var(--modal-pad-x-{default|spacious})",
       "Section padding": "var(--section-pad-{x|y}-{compact|default|spacious})",
@@ -267,7 +267,6 @@
       "Stack/sm": "var(--stack-sm)"
     },
     "spacing / templates": {
-      "Blanket/fill": "var(--blanket-fill)",
       "Blanket/pad-x": "var(--blanket-pad-x)",
       "Blanket/pad-y": "var(--blanket-pad-y)",
       "Card/inline-lg": "var(--card-inline-lg)",
@@ -287,17 +286,6 @@
       "Card/stack-lg": "var(--card-stack-lg)",
       "Card/stack-md": "var(--card-stack-md)",
       "Card/stack-sm": "var(--card-stack-sm)",
-      "Deprecated/Drawer/inline-lg": "var(--inline-lg)",
-      "Deprecated/Drawer/inline-md": "var(--inline-md)",
-      "Deprecated/Drawer/inline-sm": "var(--inline-sm)",
-      "Deprecated/Drawer/stack-lg": "var(--stack-lg)",
-      "Deprecated/Drawer/stack-md": "var(--stack-md)",
-      "Deprecated/Drawer/stack-sm": "var(--stack-sm)",
-      "Deprecated/Menu/radius-lg": "var(--radius-lg)",
-      "Deprecated/Menu/radius-md": "var(--radius-md)",
-      "Deprecated/Menu/radius-sm": "var(--radius-sm)",
-      "Deprecated/Tile/radius-lg": "var(--radius-lg)",
-      "Deprecated/Tile/radius-sm": "var(--radius-sm)",
       "Focused page/inline-md": "var(--focused-page-inline-md)",
       "Focused page/inline-sm": "var(--focused-page-inline-sm)",
       "Focused page/pad-x": "var(--focused-page-pad-x)",
@@ -322,9 +310,9 @@
       "Modal/stack-lg": "var(--modal-stack-lg)",
       "Modal/stack-md": "var(--modal-stack-md)",
       "Modal/stack-sm": "var(--modal-stack-sm)",
-      "Modal/width-lg": "var(--modal-width-lg)",
-      "Modal/width-md": "var(--modal-width-md)",
-      "Modal/width-sm": "var(--modal-width-sm)",
+      "Modal/width-lg": "var(--modal-width-10-col)",
+      "Modal/width-md": "var(--modal-width-8-col)",
+      "Modal/width-sm": "var(--modal-width-6-col)",
       "Page/border-width": "var(--page-border-width)",
       "Page/pad": "var(--page-pad)",
       "Page/pad-x-compact": "var(--page-pad-x-compact)",
@@ -1149,9 +1137,6 @@
       "elevation/shadow/raised/layer-3/offsetY": "var(--ds-shadow-raised)",
       "elevation/shadow/raised/layer-3/radius": "var(--ds-shadow-raised)",
       "elevation/shadow/raised/layer-3/spread": "var(--ds-shadow-raised)",
-      "elevation/surface/container/default": "var(--ds-surface-container)",
-      "elevation/surface/container/hovered": "var(--ds-surface-container-hovered)",
-      "elevation/surface/container/pressed": "var(--ds-surface-container-pressed)",
       "elevation/surface/default": "var(--ds-surface)",
       "elevation/surface/hovered": "var(--ds-surface-hovered)",
       "elevation/surface/overlay/default": "var(--ds-surface-overlay)",
@@ -1181,7 +1166,6 @@
       "Calendar/day-lg": "var(--calendar-day-lg)",
       "Calendar/day-md": "var(--calendar-day-md)",
       "Calendar/day-sm": "var(--calendar-day-sm)",
-      "Calendar/nav-size": "var(--calendar-nav-size)",
       "Carousel/control-offset": "var(--carousel-control-offset)",
       "Carousel/control-pad": "var(--carousel-control-pad)",
       "Carousel/control-size": "var(--carousel-control-size)",
@@ -1217,9 +1201,7 @@
       "Listbox/max-height": "var(--listbox-max-height)",
       "Listbox/max-width": "var(--listbox-max-width)",
       "Listbox/min-height": "var(--listbox-min-height)",
-      "Menu/group-gap": "var(--menu-group-gap)",
       "Menu/group-min-width": "var(--menu-group-min-width)",
-      "Menu/group-pad-x": "var(--menu-group-pad-x)",
       "Option/menu-width": "var(--option-menu-width)",
       "Option/row-control-gap": "var(--option-row-control-gap)",
       "Option/row-dot-size": "var(--option-row-dot-size)",
@@ -1781,9 +1763,6 @@
       "elevation/surface/default": "var(--ds-surface)",
       "elevation/surface/hovered": "var(--ds-surface-hovered)",
       "elevation/surface/pressed": "var(--ds-surface-pressed)",
-      "elevation/surface/container/default": "var(--ds-surface-container)",
-      "elevation/surface/container/hovered": "var(--ds-surface-container-hovered)",
-      "elevation/surface/container/pressed": "var(--ds-surface-container-pressed)",
       "elevation/surface/overlay/default": "var(--ds-surface-overlay)",
       "elevation/surface/overlay/hovered": "var(--ds-surface-overlay-hovered)",
       "elevation/surface/overlay/pressed": "var(--ds-surface-overlay-pressed)",
@@ -1823,6 +1802,25 @@
       "color/ai/background/bold/default": "var(--ds-ai-background-bold)",
       "color/ai/background/bold/hovered": "var(--ds-ai-background-bold-hovered)",
       "color/ai/background/bold/pressed": "var(--ds-ai-background-bold-pressed)",
+      "color/logo/plus": "var(--ds-logo-plus)",
+      "color/logo/ground": "var(--ds-logo-ground)",
+      "color/logo/tile/default": "var(--ds-logo-tile)",
+      "color/logo/tile/dark": "var(--ds-logo-tile-dark)",
+      "color/logo/mark/default": "var(--ds-logo-mark)",
+      "color/logo/mark/reversed": "var(--ds-logo-mark-reversed)",
+      "color/logo/wordmark/default": "var(--ds-logo-wordmark)",
+      "color/logo/wordmark/reversed": "var(--ds-logo-wordmark-reversed)",
+      "color/logo/wordmark/stroke": "var(--ds-logo-wordmark-stroke)",
+      "color/logo/glow/light/0": "var(--ds-logo-glow-light-0)",
+      "color/logo/glow/light/1": "var(--ds-logo-glow-light-1)",
+      "color/logo/glow/light/2": "var(--ds-logo-glow-light-2)",
+      "color/logo/glow/light/3": "var(--ds-logo-glow-light-3)",
+      "color/logo/glow/light/4": "var(--ds-logo-glow-light-4)",
+      "color/logo/glow/dark/0": "var(--ds-logo-glow-dark-0)",
+      "color/logo/glow/dark/1": "var(--ds-logo-glow-dark-1)",
+      "color/logo/glow/dark/2": "var(--ds-logo-glow-dark-2)",
+      "color/logo/glow/dark/3": "var(--ds-logo-glow-dark-3)",
+      "color/logo/glow/dark/4": "var(--ds-logo-glow-dark-4)",
       "color/background/competency/mastering-content/default": "var(--ds-background-competency-mastering-content)",
       "color/background/competency/mastering-content/hovered": "var(--ds-background-competency-mastering-content-hovered)",
       "color/background/competency/mastering-content/pressed": "var(--ds-background-competency-mastering-content-pressed)",
@@ -1886,12 +1884,12 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1191,
+    "scssTokenCount": 1223,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1776,
-      "resolved": 1750,
-      "percent": 99,
+      "total": 1785,
+      "resolved": 1748,
+      "percent": 98,
       "skippedCollections": [
         {
           "collection": "archived / colors / accent",
@@ -1975,7 +1973,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Card/pad-lg",
           "tried": [
-            "--pad-lg"
+            "--deprecated-pad-lg"
           ],
           "reason": "no code syntax"
         },
@@ -1983,7 +1981,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Card/pad-md",
           "tried": [
-            "--pad-md"
+            "--deprecated-pad-md"
           ],
           "reason": "no code syntax"
         },
@@ -1991,7 +1989,31 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Card/pad-sm",
           "tried": [
-            "--pad-sm"
+            "--deprecated-pad-sm"
+          ],
+          "reason": "no code syntax"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Drawer/inline-lg",
+          "tried": [
+            "--deprecated-inline-lg"
+          ],
+          "reason": "no code syntax"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Drawer/inline-md",
+          "tried": [
+            "--deprecated-inline-md"
+          ],
+          "reason": "no code syntax"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Drawer/inline-sm",
+          "tried": [
+            "--deprecated-inline-sm"
           ],
           "reason": "no code syntax"
         },
@@ -1999,7 +2021,31 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Drawer/pad",
           "tried": [
-            "--pad"
+            "--deprecated-pad"
+          ],
+          "reason": "no code syntax"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Drawer/stack-lg",
+          "tried": [
+            "--deprecated-stack-lg"
+          ],
+          "reason": "no code syntax"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Drawer/stack-md",
+          "tried": [
+            "--deprecated-stack-md"
+          ],
+          "reason": "no code syntax"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Drawer/stack-sm",
+          "tried": [
+            "--deprecated-stack-sm"
           ],
           "reason": "no code syntax"
         },
@@ -2007,7 +2053,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Drawer/width-lg",
           "tried": [
-            "--width-lg"
+            "--deprecated-width-lg"
           ],
           "reason": "no code syntax"
         },
@@ -2015,7 +2061,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Drawer/width-md",
           "tried": [
-            "--width-md"
+            "--deprecated-width-md"
           ],
           "reason": "no code syntax"
         },
@@ -2023,7 +2069,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Drawer/width-sm",
           "tried": [
-            "--width-sm"
+            "--deprecated-width-sm"
           ],
           "reason": "no code syntax"
         },
@@ -2031,7 +2077,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Dropdown menu/max-height",
           "tried": [
-            "--max-height"
+            "--deprecated-max-height"
           ],
           "reason": "no code syntax"
         },
@@ -2039,7 +2085,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Dropdown menu/max-width",
           "tried": [
-            "--max-width"
+            "--deprecated-max-width"
           ],
           "reason": "no code syntax"
         },
@@ -2047,7 +2093,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Dropdown menu/min-width",
           "tried": [
-            "--min-width"
+            "--deprecated-min-width"
           ],
           "reason": "no code syntax"
         },
@@ -2055,7 +2101,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Dropdown menu/pad",
           "tried": [
-            "--pad"
+            "--deprecated-pad"
           ],
           "reason": "no code syntax"
         },
@@ -2063,7 +2109,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Flag/stack",
           "tried": [
-            "--stack"
+            "--deprecated-stack"
           ],
           "reason": "no code syntax"
         },
@@ -2071,7 +2117,31 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Flag/width",
           "tried": [
-            "--width"
+            "--deprecated-width"
+          ],
+          "reason": "no code syntax"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Menu/radius-lg",
+          "tried": [
+            "--deprecated-radius-lg"
+          ],
+          "reason": "no code syntax"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Menu/radius-md",
+          "tried": [
+            "--deprecated-radius-md"
+          ],
+          "reason": "no code syntax"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Menu/radius-sm",
+          "tried": [
+            "--deprecated-radius-sm"
           ],
           "reason": "no code syntax"
         },
@@ -2079,7 +2149,23 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Page/radius",
           "tried": [
-            "--radius"
+            "--deprecated-radius"
+          ],
+          "reason": "no code syntax"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Tile/radius-lg",
+          "tried": [
+            "--deprecated-radius-lg"
+          ],
+          "reason": "no code syntax"
+        },
+        {
+          "collection": "spacing / templates",
+          "figmaVariable": "Deprecated/Tile/radius-sm",
+          "tried": [
+            "--deprecated-radius-sm"
           ],
           "reason": "no code syntax"
         },
@@ -2087,7 +2173,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Tooltip/max-width",
           "tried": [
-            "--max-width"
+            "--deprecated-max-width"
           ],
           "reason": "no code syntax"
         },
@@ -2095,7 +2181,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Tooltip/pad-y",
           "tried": [
-            "--pad-y"
+            "--deprecated-pad-y"
           ],
           "reason": "no code syntax"
         },
@@ -2103,7 +2189,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Deprecated/Tooltip/radius",
           "tried": [
-            "--radius"
+            "--deprecated-radius"
           ],
           "reason": "no code syntax"
         },
@@ -2111,7 +2197,7 @@
           "collection": "spacing / templates",
           "figmaVariable": "Frame/sidebar-docked",
           "tried": [
-            "--sidebar-docked"
+            "--frame-sidebar-docked"
           ],
           "reason": "no code syntax"
         },
