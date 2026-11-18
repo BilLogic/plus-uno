@@ -121,4 +121,24 @@ describe('PatternTable', () => {
         expect(screen.getByText('1 of 4')).toBeInTheDocument();
     });
 
+    it('renders empty state inside .plus-pattern-table-empty and reveals rows when cleared', () => {
+        const { container, rerender } = render(
+            <PatternTable empty emptyState={<span>No members match</span>}>
+                {head}
+                {body}
+            </PatternTable>
+        );
+        expect(container.querySelector('.plus-pattern-table-empty')).not.toBeNull();
+        expect(screen.queryByRole('table')).toBeNull();
+
+        rerender(
+            <PatternTable empty={false} emptyState={<span>No members match</span>}>
+                {head}
+                {body}
+            </PatternTable>
+        );
+        expect(container.querySelector('.plus-pattern-table-empty')).toBeNull();
+        expect(screen.getByRole('table')).toBeInTheDocument();
+    });
+
 });

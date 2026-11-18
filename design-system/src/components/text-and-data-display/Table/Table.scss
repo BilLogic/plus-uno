@@ -279,7 +279,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: var(--space-0625);
+    gap: var(--table-inline);
 }
 
 // ------------------------------------------------------------- summary row
@@ -298,7 +298,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--inline-md);
+    gap: var(--table-inline);
     min-height: var(--table-footer-height);
     padding-inline: var(--table-pad-x-cell);
     font: var(--body-default);
@@ -317,7 +317,7 @@
 .plus-table-footer-actions {
     display: flex;
     align-items: center;
-    gap: var(--space-0625);
+    gap: var(--table-inline);
 }
 
 // ---------------------------------------------------------------- head cell

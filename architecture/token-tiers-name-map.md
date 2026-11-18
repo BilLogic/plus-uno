@@ -139,8 +139,11 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Table | `--table-indent` (declared elsewhere) |  |
 | Table | `--table-radius` |  |
 | Table | `--table-pad-x-footer` (declared elsewhere) |  |
+| Table | `--table-inline` |  |
 | Table | `--table-footer-height` |  |
 | Table | `--table-min-width-title` (declared elsewhere) |  |
+| Table | `--table-empty-surface` |  |
+| Table | `--table-empty-radius` |  |
 | Blanket | `--blanket-pad-x` |  |
 | Blanket | `--blanket-pad-y` |  |
 | Blanket | `--blanket-max-height-modal` | a calc() of the pad above: code only, no Figma variable |

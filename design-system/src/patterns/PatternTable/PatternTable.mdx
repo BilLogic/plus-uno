@@ -79,7 +79,11 @@ The examples on this page follow the toolbar's Color mode switch.
 
 <ComponentExample of={PatternTableStories.RowStates} title="Row states" description="Hover a row to see its layer; the second row is selected, its checkbox checked and the whole row filled." />
 
-<ComponentExample of={PatternTableStories.EmptyState} title="Empty" description={<>With <code>empty</code>, <code>emptyState</code> replaces the whole table, with no head row, no caption and no footer.</>} />
+<ComponentExample of={PatternTableStories.EmptyState} title="Empty: nothing yet" description={<>With <code>empty</code>, <code>emptyState</code> sits in a sunken, card-rounded box with a default action matching the title row.</>} />
+
+<ComponentExample of={PatternTableStories.EmptyHiddenByFilter} title="Empty: hidden by filter" description="The Section title and filter bar stay above the box; clearing the filter reveals the rows." />
+
+<ComponentExample of={PatternTableStories.EmptyNothingToCreate} title="Empty: nothing to create" description="When there is no create action, the empty state box shows the title and line alone." />
 
 </div>
 
@@ -179,14 +183,16 @@ Row states are layered over each cell's fill, never swapped for it.
 <tr><td><code>--ds-border-bold</code></td><td>color</td><td>The rule under the head row.</td></tr>
 <tr><td><code>--ds-text</code>, <code>--body-default</code></td><td>14/20</td><td>Body cells.</td></tr>
 <tr><td><code>--ds-text-subtle</code>, <code>--heading-xxs</code></td><td>color, type</td><td>Head cells, message rows, and empty-state wrapper text.</td></tr>
-<tr><td><code>--table-pad-x-cell</code>, <code>--table-pad-y-cell</code>, <code>--stack-md</code></td><td>length</td><td>Cell padding, the gap between table and footer, and the side pad (8) of message rows and plain empty-state wrappers.</td></tr>
+<tr><td><code>--table-pad-x-cell</code>, <code>--table-pad-y-cell</code></td><td>length</td><td>Cell padding, message row padding, and plain empty-state wrapper padding.</td></tr>
+<tr><td><code>--table-inline</code>, <code>--table-footer-height</code></td><td>8, 48</td><td>The gap between controls in the footer and the footer row height.</td></tr>
+<tr><td><code>--table-empty-surface</code>, <code>--table-empty-radius</code></td><td>color, 16</td><td>The sunken background and card-rounded corners of the empty state box.</td></tr>
 <tr><td><code>--ds-background-neutral-subtle-hovered</code>, <code>-pressed</code></td><td>color</td><td>A hovered and a pressed row.</td></tr>
 <tr><td><code>--ds-background-selected</code>, <code>-hovered</code>, <code>-pressed</code></td><td>color</td><td>A selected row.</td></tr>
 <tr><td><code>--ds-shadow-overflow</code></td><td>shadow</td><td>A sticky edge, only while content is scrolled under it.</td></tr>
 <tr><td><code>--ds-utility-elevation-surface-current</code></td><td>color</td><td>The fill of sticky cells, so they match what the table sits on.</td></tr>
 <tr><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code></td><td>focus ring</td><td>The ring of a scroll region.</td></tr>
 <tr><td><code>--row-height-md</code></td><td>40</td><td>The least height of the message row.</td></tr>
-<tr><td><code>--section-stack-md</code>, <code>--stack-sm</code></td><td>16, 4</td><td>Space around message rows and plain empty-state wrappers, and the gap inside them.</td></tr>
+<tr><td><code>--stack-md</code>, <code>--stack-sm</code></td><td>8, 4</td><td>Gap between the table and footer, and inside message and empty-state wrappers.</td></tr>
 </tbody>
 </DocsTable>
 

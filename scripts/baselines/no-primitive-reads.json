@@ -54,13 +54,7 @@
         "design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.scss": {
           "count": 4
         },
-        "design-system/src/components/text-and-data-display/Table/Table.scss": {
-          "count": 2
-        },
         "design-system/src/patterns/PatternSection/PatternSection.scss": {
-          "count": 1
-        },
-        "design-system/src/patterns/PatternTable/PatternTable.scss": {
           "count": 1
         }
       }

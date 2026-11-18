@@ -186,7 +186,7 @@ export const States = {
 export const Empty = {
     args: { head, rows: [], label: 'Students', rowsPerPage: 5, emptyView: 'No students yet' },
     parameters: {
-        docs: { description: { story: 'With no rows, the whole table (header row, footer and pagination) is replaced by `EmptyState`.' } }
+        docs: { description: { story: 'With no rows, the whole table (header row, footer and pagination) is replaced by `EmptyState` inside the sunken empty box.' } }
     },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
@@ -194,6 +194,8 @@ export const Empty = {
         await expect(canvas.queryAllByRole('columnheader')).toHaveLength(0);
         await expect(canvas.queryByRole('navigation')).toBeNull();
         const region = canvas.getByRole('region', { name: 'Students' });
+        await expect(getComputedStyle(region).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+        await expect(px(getComputedStyle(region).borderTopLeftRadius)).toBe(tokenLength(canvasElement, '--table-empty-radius'));
         await expect(within(region).getByRole('heading', { name: 'No students yet' })).toBeVisible();
     }
 };
@@ -216,7 +218,7 @@ export const NoResults = {
         ),
     },
     parameters: {
-        docs: { description: { story: 'With `state="no results"`, the whole table (header row, footer and pagination) is replaced by `EmptyState`.' } }
+        docs: { description: { story: 'With `state="no results"`, the whole table (header row, footer and pagination) is replaced by `EmptyState` inside the sunken empty box.' } }
     },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
@@ -224,9 +226,151 @@ export const NoResults = {
         await expect(canvas.queryAllByRole('columnheader')).toHaveLength(0);
         await expect(canvas.queryByRole('navigation')).toBeNull();
         const region = canvas.getByRole('region', { name: 'Students' });
+        await expect(getComputedStyle(region).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+        await expect(px(getComputedStyle(region).borderTopLeftRadius)).toBe(tokenLength(canvasElement, '--table-empty-radius'));
         await expect(within(region).getByRole('heading', { name: 'No matching students' })).toBeVisible();
         await expect(within(region).getByRole('button', { name: 'Reset filters' })).toBeVisible();
     }
+};
+
+export const EmptyNothingYet = {
+    name: 'Empty box: Nothing yet',
+    render: () => (
+        <HeadingLevelContext.Provider value={3}>
+            <PatternSection
+                title="Students"
+                actions={<Button text="Add student" appearance="primary" spacing="compact" onClick={() => {}} />}
+            >
+                <DynamicTable
+                    head={head}
+                    rows={[]}
+                    label="Students"
+                    emptyView={(
+                        <EmptyState
+                            spacing="compact"
+                            icon="user-group"
+                            header="No students yet"
+                            description="Add students to schedule sessions and track their progress."
+                            primaryAction={<Button text="Add student" appearance="default" spacing="compact" onClick={() => {}} />}
+                        />
+                    )}
+                />
+            </PatternSection>
+        </HeadingLevelContext.Provider>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await inEveryColorMode(async (mode) => {
+            await expect(canvas.queryByRole('table'), `${mode}: no table`).toBeNull();
+            const box = canvas.getByRole('region', { name: 'Students' });
+            await expect(getComputedStyle(box).backgroundColor, `${mode}: sunken empty box`)
+                .toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+            await expect(px(getComputedStyle(box).borderTopLeftRadius), `${mode}: card radius`)
+                .toBe(tokenLength(canvasElement, '--table-empty-radius'));
+            await expect(within(box).getByRole('heading', { name: 'No students yet' })).toBeVisible();
+            const boxAction = within(box).getByRole('button', { name: 'Add student' });
+            await expect(boxAction).toBeVisible();
+            await expect(boxAction.className, `${mode}: empty box button is default`).not.toContain('primary');
+            await expect(canvas.getAllByRole('button', { name: 'Add student' })[0], `${mode}: title row primary action stays usable`).toBeEnabled();
+        });
+    },
+};
+
+const FilteredDynamicTable = () => {
+    const [filtered, setFiltered] = React.useState(true);
+    const visible = filtered ? [] : rows;
+    return (
+        <HeadingLevelContext.Provider value={3}>
+            <PatternSection
+                title="Students"
+                toolbar={(
+                    <SectionToolbar
+                        count={`${visible.length} students`}
+                        filters={(
+                            <Button
+                                text={filtered ? 'Grade: Grade 5' : 'All grades'}
+                                appearance="subtle"
+                                spacing="compact"
+                                onClick={() => setFiltered((prev) => !prev)}
+                            />
+                        )}
+                    />
+                )}
+            >
+                <DynamicTable
+                    head={head}
+                    rows={visible}
+                    label="Students"
+                    state={visible.length === 0 ? 'no results' : undefined}
+                    noResultsView={(
+                        <EmptyState
+                            spacing="compact"
+                            icon="magnifying-glass"
+                            header="No students match these filters"
+                            description="Nothing matches Grade 5. Clear the filter to see every student."
+                            primaryAction={(
+                                <Button
+                                    text="Clear filter"
+                                    appearance="default"
+                                    spacing="compact"
+                                    onClick={() => setFiltered(false)}
+                                />
+                            )}
+                        />
+                    )}
+                />
+            </PatternSection>
+        </HeadingLevelContext.Provider>
+    );
+};
+
+export const EmptyHiddenByFilter = {
+    name: 'Empty box: Hidden by filter',
+    render: () => <FilteredDynamicTable />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const box = canvas.getByRole('region', { name: 'Students' });
+        await expect(getComputedStyle(box).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+        await expect(px(getComputedStyle(box).borderTopLeftRadius)).toBe(tokenLength(canvasElement, '--table-empty-radius'));
+        await expect(canvas.getByRole('button', { name: 'Grade: Grade 5' })).toBeVisible();
+        const clear = within(box).getByRole('button', { name: 'Clear filter' });
+        await expect(clear.className).not.toContain('primary');
+        await userEvent.click(clear);
+        await expect(canvas.getByRole('table')).toBeVisible();
+        await expect(canvas.getByText('Ava Thompson')).toBeVisible();
+    },
+};
+
+export const EmptyNothingToCreate = {
+    name: 'Empty box: Nothing to create',
+    render: () => (
+        <HeadingLevelContext.Provider value={3}>
+            <PatternSection title="Reflections">
+                <DynamicTable
+                    head={head}
+                    rows={[]}
+                    label="Reflections"
+                    emptyView={(
+                        <EmptyState
+                            spacing="compact"
+                            icon="circle-check"
+                            header="Every reflection is reviewed"
+                            description="New ones arrive after Friday's sessions."
+                        />
+                    )}
+                />
+            </PatternSection>
+        </HeadingLevelContext.Provider>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const box = canvas.getByRole('region', { name: 'Reflections' });
+        await expect(getComputedStyle(box).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+        await expect(px(getComputedStyle(box).borderTopLeftRadius)).toBe(tokenLength(canvasElement, '--table-empty-radius'));
+        await expect(within(box).getByRole('heading', { name: 'Every reflection is reviewed' })).toBeVisible();
+        await expect(within(box).getByText("New ones arrive after Friday's sessions.")).toBeVisible();
+        await expect(canvas.queryAllByRole('button')).toHaveLength(0);
+    },
 };
 
 const LONG = 'Alexandria Montgomery-Vasquez, transferred from Roosevelt K-8 in the spring term';

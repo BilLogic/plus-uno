@@ -247,8 +247,11 @@ export const TOKEN_LADDER = [
   { tier: 'templates', group: 'Table', new: '--table-indent', old: '--table-indent', use: 'Indent of each nested level in a tree table.' },
   { tier: 'templates', group: 'Table', new: '--table-radius', old: null, ref: 'var(--radius-xl)', use: 'Corner rounding of a PatternTable.' },
   { tier: 'templates', group: 'Table', new: '--table-pad-x-footer', old: '--table-pad-x-footer', use: 'Horizontal padding of a PatternTable footer, such as its Pagination row.' },
-  { tier: 'templates', group: 'Table', new: '--table-footer-height', old: null, ref: 'var(--space-300)', use: 'Height of a PatternTable footer row: the range, the page-size Select and Pagination on one line.' },
+  { tier: 'templates', group: 'Table', new: '--table-inline', old: null, ref: 'var(--inline-md)', use: 'Horizontal gap between controls in a PatternTable footer.' },
+  { tier: 'templates', group: 'Table', new: '--table-footer-height', old: null, ref: 'var(--height-300)', use: 'Height of a PatternTable footer row: the range, the page-size Select and Pagination on one line.' },
   { tier: 'templates', group: 'Table', new: '--table-min-width-title', old: '--table-min-width-title', use: 'Narrowest a PatternTable\'s title column may shrink.' },
+  { tier: 'templates', group: 'Table', new: '--table-empty-surface', old: null, type: 'COLOR', ref: 'var(--ds-surface-sunken)', use: 'Surface of the empty state box that replaces an empty table.' },
+  { tier: 'templates', group: 'Table', new: '--table-empty-radius', old: null, ref: 'var(--radius-xxl)', use: 'Corner rounding of the empty state box that replaces an empty table.' },
 
   // ─── Templates / Blanket (renamed from Overlay) ───────────────────────
   { tier: 'templates', group: 'Blanket', new: '--blanket-pad-x', old: '--overlay-pad-x', ref: 'var(--space-100)', use: 'Horizontal space between the screen edge and a Modal on its Blanket.' },

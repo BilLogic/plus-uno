@@ -101,7 +101,10 @@ Space owned by a template: page, section, card, table, modal, popup. Inside a te
 --section-pad-y-default  /* Vertical padding of a PatternSection with default spacing. */
 --section-pad-y-spacious  /* Vertical padding of a PatternSection with spacious spacing. */
 --section-radius  /* Corner rounding of a PatternSection that has a fill. */
+--table-empty-radius  /* Corner rounding of the empty state box that replaces an empty table. */
+--table-empty-surface  /* Surface of the empty state box that replaces an empty table. */
 --table-footer-height  /* Height of a PatternTable footer row: the range, the page-size Select and Pagination on one line. */
+--table-inline  /* Horizontal gap between controls in a PatternTable footer. */
 --table-overflow-reach  /* How far a PatternTable lets a row's overflow, such as a focus ring, reach past its clip. */
 --table-radius  /* Corner rounding of a PatternTable. */
 ```
