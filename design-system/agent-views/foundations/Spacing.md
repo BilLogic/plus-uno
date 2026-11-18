@@ -103,9 +103,15 @@ Gaps come in tiers that grow with the box. The space between sections is two to 
 - `--stack-sm` (Stack/stack-sm)
 - `--stack-md` (Stack/stack-md)
 - `--stack-lg` (Stack/stack-lg)
+- `--stack-xl` (Stack/xl)
+- `--stack-2xl` (Stack/2xl)
+- `--stack-3xl` (Stack/3xl)
 - `--inline-sm` (Inline/inline-sm)
 - `--inline-md` (Inline/inline-md)
 - `--inline-lg` (Inline/inline-lg)
+- `--inline-xl` (Inline/xl)
+- `--inline-2xl` (Inline/2xl)
+- `--inline-3xl` (Inline/3xl)
 
 ## Template tokens
 
