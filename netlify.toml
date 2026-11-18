@@ -546,6 +546,289 @@
   status = 301
   force = true
 
+# Retired Modal component docs and story ids redirect to Modal template or Dialog component.
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/components-messaging-modal--docs" }
+  to = "/storybook/?path=/docs/templates-modal--docs"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--width-4-col" }
+  to = "/storybook/?path=/story/components-messaging-dialog--width-4-col"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--width-6-col" }
+  to = "/storybook/?path=/story/components-messaging-dialog--width-6-col"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--width-8-col" }
+  to = "/storybook/?path=/story/components-messaging-dialog--width-8-col"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--width-10-col" }
+  to = "/storybook/?path=/story/components-messaging-dialog--width-10-col"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--height-hug" }
+  to = "/storybook/?path=/story/components-messaging-dialog--height-hug"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--height-fill" }
+  to = "/storybook/?path=/story/components-messaging-dialog--height-fill"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--header-options" }
+  to = "/storybook/?path=/story/components-messaging-dialog--header-options"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--without-close-button" }
+  to = "/storybook/?path=/story/components-messaging-dialog--without-close-button"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--loading" }
+  to = "/storybook/?path=/story/components-messaging-dialog--loading"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--content" }
+  to = "/storybook/?path=/story/components-messaging-dialog--content"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--layout" }
+  to = "/storybook/?path=/story/components-messaging-dialog--layout"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--interactive" }
+  to = "/storybook/?path=/story/components-messaging-dialog--interactive"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--overview" }
+  to = "/storybook/?path=/story/components-messaging-dialog--overview"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--footer-layouts" }
+  to = "/storybook/?path=/story/components-messaging-dialog--footer-layouts"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--size-to-content" }
+  to = "/storybook/?path=/story/components-messaging-dialog--size-to-content"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--rest" }
+  to = "/storybook/?path=/story/components-messaging-dialog--rest"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--hovered" }
+  to = "/storybook/?path=/story/components-messaging-dialog--hovered"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--pressed" }
+  to = "/storybook/?path=/story/components-messaging-dialog--pressed"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--focused" }
+  to = "/storybook/?path=/story/components-messaging-dialog--focused"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--confirm-view" }
+  to = "/storybook/?path=/story/templates-modal--key-confirm-inside"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--confirm-view-escape" }
+  to = "/storybook/?path=/story/templates-modal--live-behavior"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--modal-over-modal-refused" }
+  to = "/storybook/?path=/story/templates-modal--stack-modal-on-modal-refused"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--blocking-shadow" }
+  to = "/storybook/?path=/story/templates-modal--blocking-shadow"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--select-keeps-overlay-shadow" }
+  to = "/storybook/?path=/story/templates-modal--select-keeps-overlay-shadow"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--motion-open-and-close" }
+  to = "/storybook/?path=/story/templates-modal--motion-open-close"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/components-messaging-modal--motion-reduced" }
+  to = "/storybook/?path=/story/templates-modal--motion-reduced"
+  status = 301
+  force = true
+
+# The old table pattern is retired: its shell stories moved off Templates/Table, and Overview became the Static table story.
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--overview" }
+  to = "/storybook/?path=/story/templates-table--static-kind"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--empty-with-sticky-column" }
+  to = "/storybook/?path=/story/components-text-and-data-display-table-shell--empty-with-sticky-column"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--row-states" }
+  to = "/storybook/?path=/story/components-text-and-data-display-table-shell--row-states"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--sticky" }
+  to = "/storybook/?path=/story/components-text-and-data-display-table-shell--sticky"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--sticky-header-needs-max-height" }
+  to = "/storybook/?path=/story/components-text-and-data-display-table-shell--sticky-header-needs-max-height"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--sticky-header" }
+  to = "/storybook/?path=/story/components-text-and-data-display-table-shell--sticky-header"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--sticky-column" }
+  to = "/storybook/?path=/story/components-text-and-data-display-table-shell--sticky-column"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--motion-add-row" }
+  to = "/storybook/?path=/story/components-text-and-data-display-table-shell--motion-add-row"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--motion-add-row-reduced" }
+  to = "/storybook/?path=/story/components-text-and-data-display-table-shell--motion-add-row-reduced"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--motion-remove-row" }
+  to = "/storybook/?path=/story/components-text-and-data-display-table-shell--motion-remove-row"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--motion-remove-row-reduced" }
+  to = "/storybook/?path=/story/components-text-and-data-display-table-shell--motion-remove-row-reduced"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--motion-reorder-rows" }
+  to = "/storybook/?path=/story/components-text-and-data-display-table-shell--motion-reorder-rows"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/story/templates-table--motion-reorder-rows-reduced" }
+  to = "/storybook/?path=/story/components-text-and-data-display-table-shell--motion-reorder-rows-reduced"
+  status = 301
+  force = true
+
 [[redirects]]
   from = "/storybook/*"
   to = "/storybook/:splat"

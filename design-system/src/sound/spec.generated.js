@@ -575,7 +575,7 @@ export const SOUND_MOMENTS = [
     "spring": "spatial.default"
   },
   {
-    "row": "Table",
+    "row": "DynamicTable",
     "tier": "component",
     "event": "roster",
     "transition": "Add or remove an item",

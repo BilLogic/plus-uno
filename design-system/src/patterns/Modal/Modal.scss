@@ -1,0 +1,67 @@
+@use '../../styles/overlay-motion' as *;
+
+/**
+ * Modal template styles (`patterns/Modal/Modal.scss`).
+ * Combines the Blanket layer (`--layer-blanket`, `--ds-blanket`, `--blanket-pad-*`)
+ * with `--modal-*` template tokens on the Dialog panel.
+ */
+.plus-pattern-blanket {
+    position: fixed;
+    inset: 0;
+    z-index: var(--layer-blanket);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+    padding: var(--blanket-pad-y) var(--blanket-pad-x);
+    background-color: var(--ds-blanket);
+    box-sizing: border-box;
+    @include overlay-motion($fade: default);
+    transform-origin: var(--transform-origin, var(--plus-overlay-origin, center));
+
+    // The layer it holds sits on the modal layer (`--layer-modal`, 510),
+    // above the blanket (`--layer-blanket`, 500). Keep `position: relative`
+    // on the panel itself so portaled floating surfaces keep `position: fixed`.
+    > * {
+        z-index: var(--layer-modal);
+    }
+
+    // Center safely even when the modal is taller or wider than the blanket:
+    // margin: auto centers inside flex when there is room and keeps the top/left
+    // reachable by scrolling when the viewport shrinks.
+    > .plus-dialog,
+    > .plus-modal {
+        position: relative;
+        margin: auto;
+    }
+}
+
+.plus-pattern-blanket-inline {
+    position: relative;
+    inset: auto;
+    z-index: auto;
+    width: var(--plus-overlay-screen, 100%);
+    height: var(--plus-overlay-screen-height, auto);
+    min-height: var(--plus-overlay-screen-height, 0);
+    max-width: 100%;
+    --plus-overlay-max-height: calc(var(--plus-overlay-screen-height, 100dvh) - 2 * var(--blanket-pad-y));
+
+    > * {
+        z-index: auto;
+    }
+}
+
+.plus-modal {
+    --dialog-pad-x-default: var(--modal-pad-x-default);
+    --dialog-stack-sm: var(--modal-stack-sm);
+    --dialog-stack-md: var(--modal-stack-md);
+    --dialog-inline-sm: var(--modal-inline-sm);
+    --dialog-radius: var(--modal-radius);
+    --dialog-body-min-height: var(--modal-body-min-height);
+    --dialog-shadow: var(--modal-shadow);
+
+    box-shadow: var(--modal-shadow);
+    --plus-overlay-origin: center;
+    @include overlay-motion(plus-overlay-scale-in, plus-overlay-scale-out, default, default);
+    transform-origin: var(--transform-origin, var(--plus-overlay-origin, center));
+}

@@ -33,8 +33,8 @@ Buttons fill in only two places: filled tracks inside `FooterActions`, and a sin
 | --- | --- | --- |
 | Page header | `default` 32; at most one `primary`, rightmost | Layout/PageHeader |
 | Card or section header | `subtle` `compact` text button and/or `subtle` icon button | Patterns/PatternCard, Section |
-| Table toolbar | `compact`; `subtle` secondary, `primary` rightmost | Patterns/PatternTable |
-| Table row | `subtle` icon buttons or one `subtle` `compact` text action; never filled | PatternTable, DynamicTable |
+| Table toolbar | `compact`; `subtle` secondary, `primary` rightmost | Patterns/Table |
+| Table row | `subtle` icon buttons or one `subtle` `compact` text action; never filled | Table template, DynamicTable |
 | Popup inline confirm | `compact`; `subtle` Cancel plus the action | Patterns/Popup |
 | Empty state | centered; `default` 32 on a page, `compact` 24 in a card | Messaging/EmptyState, Docs/Empty |
 | Banner and Flag | `subtle` `compact` text actions after the message | Messaging/Banner, Messaging/Flag |

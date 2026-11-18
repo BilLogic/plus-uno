@@ -349,10 +349,10 @@ const preview = {
             "Messaging",
             [
               "Banner",
+              "Dialog",
               "Empty state",
               "Flag",
               "Inline message",
-              "Modal dialog",
               "Notification item",
               "Section message",
               "Spotlight"

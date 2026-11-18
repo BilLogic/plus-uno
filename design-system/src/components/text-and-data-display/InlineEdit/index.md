@@ -94,7 +94,7 @@ thought, and keep the buttons so there is a clear way out.
 - `TextField`: use when configuring the text input inside `InlineEditableTextfield` or editing in place with `appearance="subtle"`.
 - `TextArea`: use when passing a multi-line edit view to `InlineEdit`.
 
-Same group: `Code` · `CodeBlock` · `Heading` · `Table` · `VisuallyHidden`
+Same group: `Code` · `CodeBlock` · `DynamicTable` · `Heading` · `StaticTable` · `TreeTable` · `VisuallyHidden`
 
 ## Parts
 

@@ -732,7 +732,7 @@ test('structuralFit + fitJudge: structural items are scored by the checker while
     fs.writeFileSync(
       path.join(dir, 'src/App.jsx'),
       [
-        "import { Frame, Page, PageHeader, PatternSection, PatternTable } from '@/patterns';",
+        "import { Frame, Page, PageHeader, PatternSection, Table } from '@/patterns';",
         "import { Banner, FilterButton, Panel, SearchField, usePanelControl } from '@/components';",
         'export default function App() {',
         '  const panel = usePanelControl();',
@@ -740,7 +740,7 @@ test('structuralFit + fitJudge: structural items are scored by the checker while
         '    <Frame panel={<Panel>Details</Panel>}>',
         '      <Page header={<PageHeader title="Queue" />} banner={<Banner appearance="warning">Overdue</Banner>}>',
         '        <PatternSection title="Sessions" toolbar={<PatternSection.Toolbar search={<SearchField label="Search" />} filters={<FilterButton label="Status" />} />}>',
-        '          <PatternTable />',
+        '          <Table />',
         '        </PatternSection>',
         '      </Page>',
         '    </Frame>',
@@ -790,7 +790,7 @@ test('structuralFit + fitJudge: structural items are scored by the checker while
 test('PRD-style briefs: active build briefs do not hand over template or component names', () => {
   const srqBrief = fs.readFileSync(path.join(REPO_ROOT, SCENARIOS, 'session-review-queue/BRIEF.md'), 'utf8');
   const trBrief = fs.readFileSync(path.join(REPO_ROOT, SCENARIOS, 'triage-repair/BRIEF.md'), 'utf8');
-  for (const name of ['PatternSection', 'PatternTable', 'PageHeader', 'FilterButton', 'FilterMenu', 'SearchField', 'StatusTag', 'RadioGroup', 'FlagGroup', 'EmptyState']) {
+  for (const name of ['PatternSection', 'Table', 'PageHeader', 'FilterButton', 'FilterMenu', 'SearchField', 'StatusTag', 'RadioGroup', 'FlagGroup', 'EmptyState']) {
     assert.doesNotMatch(srqBrief, new RegExp(`\\b${name}\\b`), `session-review-queue brief does not name ${name}`);
     assert.doesNotMatch(trBrief, new RegExp(`\\b${name}\\b`), `triage-repair brief does not name ${name}`);
   }

@@ -59,7 +59,7 @@ const LABELS = [
 
 const AI = ['Suggestion'].map((name) => `design-system/src/components/ai/${name}/${name}.mdx`);
 
-const MESSAGING = ['Banner', 'EmptyState', 'Flag', 'InlineMessage', 'Modal', 'SectionMessage', 'Spotlight'].map(
+const MESSAGING = ['Banner', 'Dialog', 'EmptyState', 'Flag', 'InlineMessage', 'SectionMessage', 'Spotlight'].map(
   (name) => `design-system/src/components/messaging/${name}/${name}.mdx`,
 );
 

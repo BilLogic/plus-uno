@@ -1,0 +1,150 @@
+/**
+ * PLUS Dialog component styles.
+ * Used by the Dialog component (components/messaging/Dialog/Dialog.jsx).
+ * Import via main.scss so any app using the design system gets correct dialog appearance.
+ */
+@use '../../../styles/screen-grid' as *;
+@use '../../../styles/state' as *;
+
+.plus-dialog {
+    @include screen-grid-width(var(--dialog-pad-x-default));
+    --plus-overlay-span: 6;
+
+    background-color: var(--ds-surface-overlay);
+    color: var(--ds-text);
+    border-radius: var(--dialog-radius);
+    box-shadow: var(--dialog-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: var(--dialog-stack-md);
+    padding: var(--dialog-pad-x-default);
+    overflow: hidden;
+    max-height: var(--plus-overlay-max-height, var(--blanket-max-height-modal));
+    box-sizing: border-box;
+}
+
+.plus-dialog-width-4-col {
+    --plus-overlay-span: 4;
+}
+
+.plus-dialog-width-6-col {
+    --plus-overlay-span: 6;
+}
+
+.plus-dialog-width-8-col {
+    --plus-overlay-span: 8;
+}
+
+.plus-dialog-width-10-col {
+    --plus-overlay-span: 10;
+}
+
+.plus-dialog-height-fill {
+    height: var(--plus-overlay-max-height, var(--blanket-max-height-modal));
+}
+
+.plus-dialog.plus-dialog-body-only {
+    background-color: transparent;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 0;
+    overflow: visible;
+
+    .plus-dialog-body {
+        min-height: 0;
+        overflow: visible;
+    }
+}
+
+.plus-dialog-header-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dialog-stack-sm);
+    flex-shrink: 0;
+}
+
+.plus-dialog-header {
+    display: flex;
+    align-items: center;
+    gap: var(--dialog-inline-sm);
+    flex-shrink: 0;
+}
+
+.plus-dialog-header-custom {
+    display: block;
+}
+
+.plus-dialog-heading {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dialog-stack-sm);
+    flex: 1;
+    min-width: 0;
+}
+
+.plus-dialog-title {
+    margin: 0;
+    font: var(--heading-md);
+    color: var(--ds-text);
+}
+
+.plus-dialog-body-text {
+    font: var(--body-default);
+    color: var(--ds-text);
+}
+
+.plus-dialog-description {
+    margin: 0;
+    font: var(--body-default);
+    color: var(--ds-text-subtle);
+}
+
+.plus-dialog-header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--dialog-inline-sm);
+    flex-shrink: 0;
+}
+
+.plus-dialog-close-btn {
+    flex-shrink: 0;
+}
+
+.plus-dialog-tabs {
+    min-width: 0;
+}
+
+.plus-dialog-divider {
+    height: var(--border-width-default);
+    background-color: var(--ds-border);
+    flex-shrink: 0;
+}
+
+.plus-dialog-body {
+    flex: 1 1 auto;
+    min-height: var(--dialog-body-min-height);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.plus-dialog-content {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.plus-dialog-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--dialog-stack-md);
+}
+
+.plus-dialog-footer {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: var(--dialog-inline-sm);
+    border-radius: 0;
+}

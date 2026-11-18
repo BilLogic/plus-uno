@@ -8,7 +8,7 @@ Also asked as: surface.
 
 **Import:** `import { Page } from '@/patterns';`
 
-**Used in:** Form (`ds guide form`); Frame (`ds guide frame`); Page (`ds guide page`); Panel (`ds guide panel`); Modal (`ds guide modal`); Section (`ds guide section`); Popup (`ds guide popup`)
+**Used in:** Form (`ds guide form`); Frame (`ds guide frame`); Modal (`ds guide modal`); Page (`ds guide page`); Panel (`ds guide panel`); Section (`ds guide section`); Popup (`ds guide popup`); Table (`ds guide table`)
 
 **Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Empty (`ds guide empty`); Errors (`ds guide errors`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); +1 more
 
@@ -116,7 +116,7 @@ Which tier a message belongs to: the Notifications pattern.
 - Elevation: use when picking which shadow goes with which level.
 - Patterns: use when deciding where a breadcrumb or a tab belongs (Navigation), or choosing the StatusTag beside the title (Indicators).
 
-Same group: `AiChat` · `Blanket` · `Frame` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
+Same group: `AiChat` · `Frame` · `Modal` · `PatternCard` · `PatternSection` · `PatternSidebar` · `Table`
 
 ## Types
 

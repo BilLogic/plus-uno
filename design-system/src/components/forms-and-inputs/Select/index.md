@@ -8,7 +8,7 @@ Also asked as: combobox, picklist, option list, async select.
 
 **Import:** `import { Select } from '@/components';`
 
-**Used in:** Form (`ds guide form`); Section (`ds guide section`)
+**Used in:** Form (`ds guide form`); Section (`ds guide section`); Table (`ds guide table`)
 
 **Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.; Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Read-only (`ds guide read-only`); +1 more
 

@@ -1,8 +1,8 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Breadcrumb, Button, Modal, Sidebar } from '@/components';
-import { AiChat, AI_CHAT_STORAGE_KEY, PANEL_STORAGE_KEY } from '@/patterns';
+import { Breadcrumb, Button, Sidebar } from '@/components';
+import { AiChat, AI_CHAT_STORAGE_KEY, Modal, PANEL_STORAGE_KEY } from '@/patterns';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 import { slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
 import DocsAiAgent from '@/storybook-docs/chrome/DocsAiAgent';

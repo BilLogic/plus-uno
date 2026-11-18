@@ -60,8 +60,9 @@ test('every floating layer takes the overlay pair, and only the Modal blocks', (
   assert.ok(blocking, 'token-mapping.md has no Blocking shadow row');
   assert.match(blocking, /Modal/);
   assert.ok(blocking.includes('var(--ds-shadow-blocking)'), 'the Blocking shadow row does not name var(--ds-shadow-blocking)');
-  const file = 'design-system/src/patterns/PatternModal/PatternModal.scss';
-  assert.match(fs.readFileSync(path.join(REPO_ROOT, file), 'utf8'), /--ds-shadow-overlay/, `${file} does not take the overlay shadow`);
+  const file = 'design-system/src/patterns/Modal/Modal.scss';
+  assert.match(fs.readFileSync(path.join(REPO_ROOT, file), 'utf8'), /--modal-shadow/, `${file} does not take --modal-shadow`);
+  assert.equal(resolveTemplateValue('var(--modal-shadow)'), 'var(--ds-shadow-blocking)', '--modal-shadow does not resolve to --ds-shadow-blocking');
 });
 
 /**
@@ -69,12 +70,13 @@ test('every floating layer takes the overlay pair, and only the Modal blocks', (
  *
  * The Elevation page assigns the levels by pattern. The floating
  * layers on the new color tokens (menus and dropdowns, Listbox, Popover,
- * Toast) and modals take the overlay pair, `--ds-surface-overlay`
+ * Toast) take the overlay pair, `--ds-surface-overlay`
  * with `--ds-shadow-overlay`; the Frame's floating sidebar floats too, so it
- * takes the overlay pair. A card is on the
- * raised pair or lifts while a clickable card is hovered or dragged. Each row
- * is one surface and the shadow its rule must name; a rule that names another
- * level, or a literal shadow, fails.
+ * takes the overlay pair. The Dialog and Modal sit on a Blanket, so
+ * they take `--ds-surface-overlay` with `--ds-shadow-blocking` (`--dialog-shadow` / `--modal-shadow`).
+ * A card is on the raised pair or lifts while a clickable card is hovered or
+ * dragged. Each row is one surface and the shadow its rule must name; a rule
+ * that names another level, or a literal shadow, fails.
  */
 const SURFACES = [
   { file: 'design-system/src/patterns/PatternCard/PatternCard.scss', rule: '.plus-pattern-card--dragging {', shadow: '--ds-shadow-overlay' },
@@ -82,11 +84,30 @@ const SURFACES = [
   { file: 'design-system/src/components/messaging/Flag/Flag.scss', rule: '.plus-flag', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
   // The floating Sidebar floats, so it takes the overlay pair; the docked one stays on the sunken fill.
   { file: 'design-system/src/patterns/Frame/Frame.scss', rule: '.plus-frame__sidebar--raised {', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
-  { file: 'design-system/src/components/messaging/Modal/Modal.scss', rule: '.plus-modal', shadow: '--ds-shadow-blocking', fill: '--ds-surface-overlay' },
-  { file: 'design-system/src/patterns/PatternModal/PatternModal.scss', rule: '.plus-pattern-modal {', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
+  { file: 'design-system/src/components/messaging/Dialog/Dialog.scss', rule: '.plus-dialog {', shadow: '--ds-shadow-blocking', fill: '--ds-surface-overlay' },
+  { file: 'design-system/src/patterns/Modal/Modal.scss', rule: '.plus-modal {', shadow: '--ds-shadow-blocking' },
   { file: 'design-system/src/components/forms-and-inputs/_internal/Listbox.scss', rule: '', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
   { file: 'design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.scss', rule: '.plus-dropdown-menu {', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
 ];
+
+const TEMPLATES_FILE = 'design-system/src/tokens/ladder/_templates.scss';
+const COMPONENTS_FILE = 'design-system/src/tokens/ladder/_components.scss';
+
+function tokenMap(relFile) {
+  const src = fs.readFileSync(path.join(REPO_ROOT, relFile), 'utf8');
+  const map = new Map();
+  for (const m of src.matchAll(/^\s*(--[a-z0-9-]+):\s*([^;]+);/gm)) {
+    map.set(m[1], m[2].trim());
+  }
+  return map;
+}
+
+const TOKEN_DEFINITIONS = new Map([...tokenMap(TEMPLATES_FILE), ...tokenMap(COMPONENTS_FILE)]);
+function resolveTemplateValue(value) {
+  if (!value) return value;
+  const m = /^var\((--(?:modal|dialog)-[a-z0-9-]+)\)$/.exec(value.trim());
+  return m && TOKEN_DEFINITIONS.has(m[1]) ? TOKEN_DEFINITIONS.get(m[1]) : value.trim();
+}
 
 /**
  * THE CARD PATTERN IS ON ATLASSIAN'S RAISED PAIR (color proposal, decision
@@ -117,7 +138,7 @@ function firstAfter(source, rule, property) {
 for (const surface of SURFACES) {
   test(`${path.basename(surface.file)} lifts its surface with ${surface.shadow}`, () => {
     const source = fs.readFileSync(path.join(REPO_ROOT, surface.file), 'utf8');
-    const shadow = firstAfter(source, surface.rule, 'box-shadow');
+    const shadow = resolveTemplateValue(firstAfter(source, surface.rule, 'box-shadow'));
     assert.ok(shadow, `no box-shadow after "${surface.rule}" in ${surface.file}`);
     assert.match(
       shadow,
@@ -125,7 +146,7 @@ for (const surface of SURFACES) {
       `${surface.file} lifts its surface with "${shadow}"; the Elevation page and the role layer say var(${surface.shadow}).`,
     );
     if (surface.fill) {
-      assert.equal(firstAfter(source, surface.rule, 'background-color'), `var(${surface.fill})`);
+      assert.equal(resolveTemplateValue(firstAfter(source, surface.rule, 'background-color')), `var(${surface.fill})`);
     }
   });
 }

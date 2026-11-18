@@ -8,22 +8,22 @@
     {
       "id": "roster-page",
       "screen": "Student roster table view",
-      "template": "Page + PatternSection + PatternTable",
-      "variant": "Page · Default / PatternSection · Default / PatternTable · Dynamic table",
-      "page": "design-system/src/patterns/PatternTable/index.md",
+      "template": "Page + PatternSection + Table",
+      "variant": "Page · Default / PatternSection · Default / Table · Dynamic table",
+      "page": "design-system/src/patterns/Table/index.md",
       "section": "Anatomy",
       "pages": [
         "design-system/src/patterns/Page/index.md",
         "design-system/src/patterns/PatternSection/index.md",
-        "design-system/src/patterns/PatternTable/index.md"
+        "design-system/src/patterns/Table/index.md"
       ],
       "guides": ["page", "section", "table", "templates"],
       "scoring": "checker",
       "check": {
         "kind": "template",
-        "components": ["Page", "PatternSection", "PatternTable"]
+        "components": ["Page", "PatternSection", "Table"]
       },
-      "expectation": "Student roster built on Page, PatternSection, and PatternTable with sortable Name and Last session columns."
+      "expectation": "Student roster built on Page, PatternSection, and Table with sortable Name and Last session columns."
     }
   ],
   "patterns": [

@@ -35,17 +35,6 @@
 }
 
 /**
- * The width steps: `&-width-xs` · `-sm` · `-md` · `-lg` set the span to 4 · 6 · 8 · 10.
- * The numbers match BLANKET_SPANS in patterns/Blanket/Blanket.jsx.
- */
-@mixin screen-grid-width-steps {
-    &-width-xs { --plus-overlay-span: 4; }
-    &-width-sm { --plus-overlay-span: 6; }
-    &-width-md { --plus-overlay-span: 8; }
-    &-width-lg { --plus-overlay-span: 10; }
-}
-
-/**
  * The tallest a layer gets: the screen less Overlay/pad-y above and below.
  * An inline Blanket sets `--plus-overlay-max-height` from its stand-in screen;
  * otherwise it is the viewport's (`--blanket-max-height-modal`).

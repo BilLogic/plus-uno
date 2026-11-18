@@ -50,15 +50,15 @@
       "name": "table",
       "token_scope": "--table-*",
       "typical_locations": [
-        "design-system/src/patterns/PatternTable/"
+        "design-system/src/patterns/Table/"
       ]
     },
     {
       "name": "modal",
       "token_scope": "--modal-*",
       "typical_locations": [
-        "design-system/src/components/",
-        "design-system/src/patterns/PatternModal/"
+        "design-system/src/components/messaging/Dialog/",
+        "design-system/src/patterns/Modal/"
       ]
     },
     {

@@ -78,10 +78,10 @@ export { default as Skeleton } from '@/components/loading/Skeleton';
 export { default as Spinner, SPINNER_APPEARANCES, SPINNER_SIZES } from '@/components/loading/Spinner';
 
 export { default as Banner, BANNER_APPEARANCES, BANNER_ICONS } from '@/components/messaging/Banner';
+export { default as Dialog, DIALOG_HEIGHTS, DIALOG_WIDTH_PX, DIALOG_WIDTH_SCREENS, DIALOG_WIDTHS } from '@/components/messaging/Dialog';
 export { default as EmptyState, EMPTY_STATE_SPACINGS } from '@/components/messaging/EmptyState';
 export { default as Flag, FLAG_APPEARANCES, FLAG_AUTO_CLOSE_MS, FlagGroup, useFlagQueue } from '@/components/messaging/Flag';
 export { default as InlineMessage, INLINE_MESSAGE_APPEARANCES } from '@/components/messaging/InlineMessage';
-export { default as Modal, MODAL_WIDTH_PX, MODAL_WIDTH_SCREENS, MODAL_WIDTHS } from '@/components/messaging/Modal';
 export { default as NotificationItem } from '@/components/messaging/NotificationItem';
 export { default as SectionMessage, SECTION_MESSAGE_APPEARANCES, SECTION_MESSAGE_ICONS } from '@/components/messaging/SectionMessage';
 export { default as Spotlight, SPOTLIGHT_PLACEMENTS, SpotlightAction, SpotlightProvider, SpotlightTarget } from '@/components/messaging/Spotlight';
@@ -100,9 +100,12 @@ export { default as ProgressTracker, PROGRESS_TRACKER_ORIENTATIONS, PROGRESS_TRA
 
 export { default as Code } from '@/components/text-and-data-display/Code';
 export { default as CodeBlock, parseHighlight } from '@/components/text-and-data-display/CodeBlock';
+export { default as DynamicTable } from '@/components/text-and-data-display/DynamicTable';
 export { default as Heading, HEADING_COLORS, HEADING_SIZES, HeadingContextProvider, useHeadingLevel } from '@/components/text-and-data-display/Heading';
 export { default as InlineEdit } from '@/components/text-and-data-display/InlineEdit';
-export { default as Table, DynamicTable, HeadCell, StaticTable, TableBulkActions, TableCell, TableFooter, TableMessageRow, TableRow, TableSummaryRow, TreeTable } from '@/components/text-and-data-display/Table';
+export { default as StaticTable } from '@/components/text-and-data-display/StaticTable';
+export { HeadCell, TableBulkActions, TableCell, TableEmptyBox, TableFooter, TableFooterRow, TableMessageRow, TableRow, TableSummaryRow } from '@/components/text-and-data-display/Table';
+export { default as TreeTable } from '@/components/text-and-data-display/TreeTable';
 export { default as VisuallyHidden } from '@/components/text-and-data-display/VisuallyHidden';
 
 // Siblings of components/, not groups inside it.

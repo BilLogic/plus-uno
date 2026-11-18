@@ -157,7 +157,7 @@ A docs page groups its content the way a PLUS page does, on the app's Page and S
 | A heading and its one-line description | `--stack-sm` | title to description |
 | A heading and its body; blocks in one group | `--section-stack-md` | heading to body |
 
-A heading is a real heading: a sub-topic is a `FoundationSubsection` or an `###`, never a bold paragraph, so it takes the subsection gap and appears in the page outline. Demos render inside their canvas (Modal `renderAs="inline"`, `FlagGroup containerPosition="static"`, or a frame); the Storybook tests fail a docs story whose demo covers the page.
+A heading is a real heading: a sub-topic is a `FoundationSubsection` or an `###`, never a bold paragraph, so it takes the subsection gap and appears in the page outline. Demos render inside their canvas (`Modal` `inline`, `FlagGroup containerPosition="static"`, or a frame); the Storybook tests fail a docs story whose demo covers the page.
 
 ## Which Foundations page owns what
 
