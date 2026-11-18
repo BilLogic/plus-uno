@@ -1,12 +1,10 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
-import { C, ModeCompare, RefTable } from '@/storybook-docs/foundation-blocks.jsx';
+import { RefTable } from '@/storybook-docs/foundation-blocks.jsx';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import {
     FoundationSection,
     FoundationSubsection,
-    FoundationRelated,
 } from '@/storybook-docs/foundation-page.jsx';
-import { LevelTiles, LEVELS } from '@/storybook-docs/elevation-demos.jsx';
 import * as ElevationStories from './Elevation.stories.jsx';
 
 <Meta title="Foundations/Visual/Elevation/Usage" />
@@ -15,218 +13,93 @@ import * as ElevationStories from './Elevation.stories.jsx';
     page="foundations-visual-elevation-usage"
     eyebrow="Foundation · Elevation"
     title="Usage"
-    purpose="Which surface and shadow each behavior takes, how surfaces step in dark mode, how lifts move, and how edges hold under contrast."
+    purpose="Choose elevation by what a surface does, never by how strong a shadow looks."
 />
-
-<FoundationSection title="The levels">
-
-Six levels, lowest first. A surface and its shadow always travel together.
-
-<ModeCompare stacked>{() => <LevelTiles />}</ModeCompare>
 
 <RefTable
-    head={['Level', 'Surface', 'Shadow']}
-    rows={LEVELS.map((l) => [l.name, l.surface ? <C>{l.surface}</C> : '—', l.shadow ? <C>{l.shadow}</C> : '—'])}
-/>
-
-Raised and overlay have `-hovered` and `-pressed` surfaces for a surface that can be clicked.
-
-</FoundationSection>
-
-<FoundationSection title="Choose by behavior">
-
-Pick the level by what the surface does, never by how strong a shadow looks. Answer the questions to land on a row.
-
-<Canvas of={ElevationStories.Behavior} sourceState="none" />
-
-</FoundationSection>
-
-<FoundationSection title="Surface color and dark mode">
-
-In light the lifted surfaces share the page color and the shadow lifts them; in dark, Raised keeps the page tone and is told apart by its shadow, while overlay surfaces still step up.
-
-<Canvas of={ElevationStories.Ladder} sourceState="none" />
-
-Dark blocking is the same as dark overlay. On the dark Blanket a shadow barely shows, so the lighter overlay surface is what lifts the Modal.
-
-</FoundationSection>
-
-<FoundationSection title="Layering">
-
-Each layer is a `--layer-*` z-index token, set in code only. Components name the token, never a number.
-
-<Canvas of={ElevationStories.Layers} sourceState="none" />
-
-- **A confirm Modal may open over a Panel or a Popup,** with its own Blanket.
-- **Never a Modal on a Modal.** A Modal confirms inside itself, with a warning SectionMessage and the danger button.
-- **A Panel never has a Blanket.** It floats beside a usable page.
-- **Popups and Tooltips open over a Modal.** A Popup opened inside a Modal portals into it.
-- **A Flag sits above all of it**, so a message is never hidden.
-- **`--layer-dialog`** holds a view that replaces the page: AiChat full screen.
-
-</FoundationSection>
-
-<FoundationSection title="Elevation in the system">
-
-<FoundationSubsection title="Card">
-
-Raised at rest; a clickable Card lifts to overlay on hover and while dragged.
-
-<Canvas of={ElevationStories.CardLevels} sourceState="none" />
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Popup and an open Select">
-
-<Canvas of={ElevationStories.OpenPopup} sourceState="none" />
-
-<Canvas of={ElevationStories.OpenSelect} sourceState="none" />
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Floating Sidebar and floating Panel">
-
-Both take the overlay pair, with no Blanket: the page beside them stays usable.
-
-<Canvas of={ElevationStories.FloatingSidebar} sourceState="none" />
-
-<Canvas of={ElevationStories.FloatingPanel} sourceState="none" />
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Modal over its Blanket">
-
-<Canvas of={ElevationStories.ModalOnBlanket} sourceState="none" />
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Sticky header, scrolled">
-
-A border marks the cut first; the overflow shadow is for where a border would be missed.
-
-<Canvas of={ElevationStories.StickyHeaderScrolled} sourceState="none" />
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Tooltip">
-
-A label, so it has no shadow: the dark fill sets it apart.
-
-<Canvas of={ElevationStories.OpenTooltip} sourceState="none" />
-
-</FoundationSubsection>
-
-</FoundationSection>
-
-<FoundationSection title="Motion">
-
-A shadow moves on `--ds-motion-appearance-*`, documented in [Motion](?path=/docs/foundations-expression-motion-physics--docs).
-
-<FoundationSubsection title="A shadow changes with its fill">
-
-It moves on `--ds-motion-appearance-default`, together with the surface. Click the Card.
-
-<Canvas of={ElevationStories.Lift} sourceState="none" />
-
-</FoundationSubsection>
-
-<FoundationSubsection title="A clip never cuts a shadow">
-
-A clip-path open runs on `--ds-motion-appearance-default` and rests past the shadow's reach, drawn dashed.
-
-<Canvas of={ElevationStories.Clip} sourceState="none" />
-
-</FoundationSubsection>
-
-<FoundationSubsection title="A scroll shadow tracks the scroll">
-
-It grows one to one with the scroll position, with no spring token of its own.
-
-<Canvas of={ElevationStories.ScrollShadow} sourceState="none" />
-
-</FoundationSubsection>
-
-</FoundationSection>
-
-<FoundationSection title="Accessibility">
-
-- **A shadow is never the boundary.** The edge slot is: under increased contrast it becomes a 3:1 line. Turn it on below.
-- **Forced colors keep an edge.** Shadows disappear there, so a lifted surface carries a transparent border that the system paints.
-- **Text clears 4.5:1 on every level**, in light and dark. Check a new pairing on the overlay surface in dark, where it is lightest. See [Color](?path=/docs/foundations-visual-color--docs).
-
-<Canvas of={ElevationStories.Contrast} sourceState="none" />
-
-</FoundationSection>
-
-<FoundationSection title="Do and don't">
-
-<FoundationSubsection title="Lift with shadow, not a darker fill">
-
-A lifted surface gets its height from its shadow; a darker fill reads as a different surface.
-
-<Canvas of={ElevationStories.LiftWithShadow} sourceState="none" />
-
-</FoundationSubsection>
-
-<FoundationSubsection title="No border on a lifted surface">
-
-The shadow's edge slot is the border, so a drawn border doubles it.
-
-<Canvas of={ElevationStories.NoBorder} sourceState="none" />
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Pair the surface with its shadow">
-
-A level's surface and shadow travel together.
-
-<Canvas of={ElevationStories.AlwaysPair} sourceState="none" />
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Blocking only on the Blanket">
-
-The blocking shadow belongs to the Modal over its Blanket, and nothing else.
-
-<Canvas of={ElevationStories.BlockingOnBlanket} sourceState="none" />
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Sunken never floats">
-
-A sunken surface is a ground, so it sits behind the work and never lifts.
-
-<Canvas of={ElevationStories.SunkenNeverFloats} sourceState="none" />
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Keep the Tooltip flat">
-
-A Tooltip is a label, so it has no shadow.
-
-<Canvas of={ElevationStories.TooltipFlat} sourceState="none" />
-
-</FoundationSubsection>
-
-<FoundationSubsection title="Raise one focal point">
-
-Raise the one object a person acts on; a page of raised cards has no focus.
-
-<Canvas of={ElevationStories.OneFocalPoint} sourceState="none" />
-
-</FoundationSubsection>
-
-</FoundationSection>
-
-<FoundationSection title="Related">
-
-<FoundationRelated
-    items={[
-        { title: "Color", description: "The surface and text tokens each level sits with.", href: "?path=/docs/foundations-visual-color--docs" },
-        { title: "Motion", description: "The springs a shadow moves on.", href: "?path=/docs/foundations-expression-motion-physics--docs" },
-        { title: "Templates", description: "The Frame, Card and Modal, which bake their level in.", href: "?path=/docs/templates-overview--docs" },
-        { title: "Border", description: "The line a sticky part draws before any shadow.", href: "?path=/docs/foundations-visual-border--docs" },
+    head={['What it does', 'Where it sits', 'Templates and components']}
+    rows={[
+        ['Blocks the page', <strong>Layer 4 · Blocking</strong>, 'Modal on the Blanket'],
+        ['Floats, page stays usable', <strong>Layer 3 · Non-blocking</strong>, 'Floating Sidebar and Panel, Popup types, Inline edit, Flag, Spotlight, a dragged Card'],
+        ['Stays put while content scrolls', <strong>Layer 2 · Navigation</strong>, 'Sticky table header and column'],
+        ['The one object the view is about', <strong>Page · Raised</strong>, 'Primary card, a clickable card on hover, Range thumb, current Carousel slide'],
+        ['Groups static content', <strong>Page · Sunken</strong>, 'Card (default), empty box, a clickable card at rest'],
+        ['Everything else in the flow', <strong>Page · Default</strong>, 'Section and its side, table, list, form; a Default card, bordered'],
+        ['Holds the app', <strong>Layer 0 · Frame</strong>, 'The Frame and the docked Sidebar'],
+        ['Labels a control', <strong>Not a layer</strong>, 'Tooltip, no shadow'],
     ]}
 />
+
+<FoundationSection title="Golden rules">
+
+Ten rules, each as a Do and a Don’t.
+
+<FoundationSubsection title="1. Flat by default">
+
+<Canvas of={ElevationStories.UsageRule1} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="2. Lift means you can act on it">
+
+<Canvas of={ElevationStories.UsageRule2} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="3. Raise one thing per view">
+
+<Canvas of={ElevationStories.UsageRule3} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="4. Group with a surface color or a border, never a shadow">
+
+<Canvas of={ElevationStories.UsageRule4} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="5. A blocking overlay sits on the Blanket">
+
+<Canvas of={ElevationStories.UsageRule5} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="6. One blocking overlay at a time">
+
+<Canvas of={ElevationStories.UsageRule6} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="7. No stroke on an elevated surface">
+
+<Canvas of={ElevationStories.UsageRule7} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="8. Pair the surface with its shadow">
+
+<Canvas of={ElevationStories.UsageRule8} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="9. Dark mode lightens only what floats">
+
+<Canvas of={ElevationStories.UsageRule9} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="10. A control’s boundary meets 3:1">
+
+<Canvas of={ElevationStories.UsageRule10} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="In motion">
+
+Elevation changes on a spring and never jumps. A clip never cuts a shadow: a scrolling area leaves room for the shadow of what floats inside it.
+
+<Canvas of={ElevationStories.InMotion} />
+
+</FoundationSubsection>
 
 </FoundationSection>

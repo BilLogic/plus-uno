@@ -64,7 +64,7 @@ test('the real tree passes, and covers Color, the 20 other Foundations pages, th
   const ids = PAGES.map((p) => p.id);
   assert.equal(ids.filter((id) => id.startsWith('patterns-')).length, 14);
   assert.equal(ids.filter((id) => id.startsWith('templates-')).length, 10);
-  assert.equal(ids.filter((id) => id.startsWith('foundations-')).length, 35);
+  assert.equal(ids.filter((id) => id.startsWith('foundations-')).length, 37);
   assert.equal(ids.filter((id) => id.startsWith('foundations-expression-motion-')).length, 6);
   assert.equal(ids.filter((id) => id.startsWith('foundations-expression-sound-')).length, 5);
   assert.ok(ids.includes('foundations-visual-color'));

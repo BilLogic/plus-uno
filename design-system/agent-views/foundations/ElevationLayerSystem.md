@@ -60,6 +60,9 @@ The Modal, and nothing else.
 
 - **Always on the Blanket;** nothing else dims the page.
 - **One at a time;** a Flag may sit above it.
+- **A confirm Modal may open over a Panel or a Popup,** with its own Blanket.
+- **Popups and Tooltips open over a Modal.**
+- **`--layer-*` tokens are set in code only.** Components name the token, never a number.
 
 #### Stacking
 

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Button, Toggle } from '@/components';
+import { Button, DynamicTable, Popup, Toggle } from '@/components';
 import { Page, PatternCard } from '@/patterns';
+import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
 import { DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
 import { C, RefTable } from '@/storybook-docs/foundation-blocks.jsx';
 import { usePageContrast } from '@/storybook-docs/lib/use-page-contrast.js';
@@ -217,8 +218,6 @@ const PAD = 8;
 const CLIMB = -turnPoint(0, 0, PLATE.w, 0).y;
 /** Where each label's tick meets its plate, on the plate's right edge. */
 const TICK_Y = 64;
-/** How far below its place a plate starts its rise. */
-const RISE = 24;
 const COUNT = 7;
 const STAGE = {
     w: PAD + (COUNT - 1) * STEP.dx + PLATE.w * TURN.scaleX + 16,
@@ -337,8 +336,8 @@ const PLATES = [
 /** The two lower corners of a plate's subject, where its leaders start. */
 const footOf = ({ x, y, w, h }) => [[x, y + h], [x + w, y + h]];
 
-/** Rises each plate into place once, bottom first, when the figure scrolls into view. */
-const useRise = (ref) => {
+/** Fades each plate in place on the appearance spring, bottom first, when the figure scrolls into view. */
+const useFadeInPlace = (ref) => {
     const reduced = useReducedMotion();
     const [offsets, setOffsets] = useState(() => PLATES.map(() => (reduced ? 0 : 1)));
     useEffect(() => {
@@ -381,21 +380,6 @@ const useNarrow = (ref) => {
     return narrow;
 };
 
-const resetButton = {
-    display: 'inline-flex',
-    flexWrap: 'wrap',
-    alignItems: 'baseline',
-    gap: 'var(--inline-sm)',
-    padding: 0,
-    border: 0,
-    background: 'none',
-    font: 'var(--body-sm)',
-    color: 'inherit',
-    textAlign: 'start',
-    cursor: 'default',
-    borderRadius: 'var(--radius-sm)',
-};
-
 /**
  * One screen taken apart into its layers, as an exploded view: the Frame, the
  * Page, a Card, a Popup, the Blanket, the Modal and a Tooltip, each on its own
@@ -407,16 +391,14 @@ const resetButton = {
 export const ExplodedStack = () => {
     const stage = useRef(null);
     const layers = useVarsOn(stage, LAYERS.map((l) => l.token));
-    const offsets = useRise(stage);
+    const offsets = useFadeInPlace(stage);
     const narrow = useNarrow(stage);
     const [active, setActive] = useState(PLATES[PLATES.length - 1].id);
-    const [focusRing, setFocusRing] = useState(null);
     const share = (STAGE.w / (STAGE.w + LABEL_W)) * 100;
 
     const placed = PLATES.map((plate, i) => {
         const at = plateAt(i);
-        const rise = offsets[i] * RISE;
-        return { ...plate, x: at.x, y: at.y + rise, opacity: 1 - offsets[i] };
+        return { ...plate, x: at.x, y: at.y, opacity: 1 - offsets[i] };
     });
     const point = (p, lx, ly) => turnPoint(p.x, p.y, lx, ly);
 
@@ -485,25 +467,19 @@ export const ExplodedStack = () => {
                 onMouseEnter={() => setActive(plate.id)}
                 style={narrow ? null : { position: 'absolute', insetInline: 0, insetBlockStart: `${(tickY / STAGE.h) * 100}%`, transform: 'translateY(-50%)', paddingInlineStart: 'var(--inline-sm)' }}
             >
-                <button
-                    type="button"
-                    aria-current={on ? 'true' : undefined}
-                    onFocus={(e) => {
-                        setActive(plate.id);
-                        setFocusRing(e.currentTarget.matches(':focus-visible') ? plate.id : null);
-                    }}
-                    onBlur={() => setFocusRing(null)}
-                    style={{
-                        ...resetButton,
-                        color: on ? 'var(--ds-text-brand)' : 'var(--ds-text)',
-                        outline: focusRing === plate.id ? 'var(--border-width-focused) solid var(--ds-border-focused)' : 'none',
-                        outlineOffset: 'var(--stroke-1)',
-                    }}
-                >
-                    <strong>{plate.title}</strong>
+                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: 'var(--inline-sm)', font: 'var(--body-sm)' }}>
+                    <Button
+                        appearance="subtle"
+                        spacing="compact"
+                        isSelected={on}
+                        aria-current={on ? 'true' : undefined}
+                        text={plate.title}
+                        onClick={() => setActive(plate.id)}
+                        onFocus={() => setActive(plate.id)}
+                    />
                     <code style={{ ...codeText, color: on ? 'var(--ds-text-brand)' : 'var(--ds-text-subtle)' }}>{plate.layer ? `${plate.layer} ${layers[plate.layer] ?? ''}` : 'no layer'}</code>
                     <span style={{ ...(shadowNote(plate).startsWith('--') ? codeText : null), color: on ? 'var(--ds-text-brand)' : 'var(--ds-text-subtle)' }}>{shadowNote(plate)}</span>
-                </button>
+                </div>
             </li>
         );
     }).reverse();
@@ -1033,13 +1009,26 @@ export const ClipDemo = () => {
                     style={{
                         position: 'relative',
                         width: 'min(100%, var(--popup-width-sm))',
+                        display: 'flex',
+                        justifyContent: 'center',
                         clipPath: `inset(calc(-1 * ${reachLen}) calc(-1 * ${reachLen}) calc(${(1 - t) * 100}% - ${t} * ${reachLen}) calc(-1 * ${reachLen}))`,
                     }}
                 >
-                    <div className="plus-popup" style={{ position: 'relative', width: '100%' }}>
-                        <div className="plus-popup-title">Session 12</div>
-                        <div className="plus-popup-body">Ran 45 minutes over.</div>
-                    </div>
+                    <DocsOverlayBoundary containHeight>
+                        <div style={{ display: 'flex', justifyContent: 'center', paddingBlockEnd: 'calc(var(--image-xl) * 2)' }}>
+                            <Popup
+                                trigger={<Button text="Session notes" />}
+                                title="Session 12"
+                                placement="bottom"
+                                triggerType="manual"
+                                show
+                                rootClose={false}
+                                initialFocus={false}
+                            >
+                                Ran 45 minutes over.
+                            </Popup>
+                        </div>
+                    </DocsOverlayBoundary>
                 </div>
                 <div
                     aria-hidden="true"
@@ -1058,7 +1047,20 @@ export const ClipDemo = () => {
     );
 };
 
-/** A sticky header whose overflow shadow follows the scroll position one to one. */
+const SESSION_ROWS = [
+    ['Ana Ruiz', 'Algebra II', '4:00 PM'],
+    ['Ben Cho', 'Geometry', '4:30 PM'],
+    ['Cara Diaz', 'Precalculus', '5:00 PM'],
+    ['Dev Shah', 'Reading', '5:30 PM'],
+    ['Eli Park', 'Biology', '6:00 PM'],
+    ['Fay Wu', 'Chemistry', '6:30 PM'],
+    ['Gus Lee', 'US History', '7:00 PM'],
+    ['Hana Ito', 'Calculus', '7:30 PM'],
+    ['Ivy Moss', 'Physics', '8:00 PM'],
+    ['Jon Bell', 'Writing', '8:30 PM'],
+];
+
+/** A sticky table header whose overflow shadow follows the scroll position. */
 export const ScrollShadowDemo = () => {
     const ref = useRef(null);
     const [scroll, setScroll] = useState(0);
@@ -1066,25 +1068,30 @@ export const ScrollShadowDemo = () => {
     const full = parseShadow(values['--ds-shadow-overflow']);
     const reach = Math.max(1, shadowReach(full));
     const t = Math.min(1, scroll / reach);
-    const shadow = full.length ? composeShadow(slotted(full.map((l) => ({ ...l, color: { ...l.color, a: l.color.a * t } })))) : 'none';
     return (
-        <div data-docs-stage style={well} data-testid="scroll-demo" data-progress={Math.round(t * 100)}>
-            <div
-                ref={ref}
-                data-scroller
-                tabIndex={0}
-                aria-label="Scrolling list of sessions"
-                onScroll={(e) => setScroll(e.currentTarget.scrollTop)}
-                style={{ maxHeight: 'calc(var(--image-xl) * 3)', overflowY: 'auto', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' }}
-            >
-                <div data-header style={{ position: 'sticky', top: 0, zIndex: 'var(--layer-card)', padding: 'var(--pad-y-md) var(--pad-x-md)', background: 'var(--ds-surface)', font: 'var(--heading-xs)', boxShadow: shadow, color: 'var(--ds-text)' }}>
-                    Sessions
-                </div>
-                {Array.from({ length: 12 }, (_, i) => (
-                    <div key={i} style={{ padding: 'var(--pad-y-md) var(--pad-x-md)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
-                        Session {i + 1}
-                    </div>
-                ))}
+        <div
+            ref={ref}
+            data-docs-stage
+            style={well}
+            data-testid="scroll-demo"
+            data-progress={Math.round(t * 100)}
+            onScrollCapture={(e) => {
+                if (e.target?.classList?.contains('plus-table-shell-scroll')) {
+                    setScroll(e.target.scrollTop);
+                }
+            }}
+        >
+            <div style={{ borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)', overflow: 'hidden' }}>
+                <DynamicTable
+                    label="Upcoming sessions"
+                    stickyHeader
+                    maxHeight="calc(var(--image-xl) * 3)"
+                    head={{ cells: [{ key: 'tutor', content: 'Tutor' }, { key: 'subject', content: 'Subject' }, { key: 'time', content: 'Time' }] }}
+                    rows={SESSION_ROWS.map(([tutor, subject, time]) => ({
+                        key: tutor,
+                        cells: [{ key: 'tutor', content: tutor }, { key: 'subject', content: subject }, { key: 'time', content: time }],
+                    }))}
+                />
             </div>
             <p style={{ ...small, margin: 0, marginBlockStart: 'var(--stack-sm)' }}>Shadow at {Math.round(t * 100)}%: it reaches full strength after {reach} of scroll.</p>
         </div>
@@ -1106,13 +1113,22 @@ export const ContrastDemo = () => {
             <div
                 data-color-mode={mode}
                 data-contrast-mode={more ? 'more' : 'no-preference'}
-                data-docs-stage style={{ ...well, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-sm)), 1fr))', gap: 'var(--grid-gutter)', background: 'var(--ds-surface)' }}
+                data-docs-stage style={{ ...well, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-sm)), 1fr))', gap: 'var(--grid-gutter)', background: 'var(--ds-surface)', alignItems: 'start' }}
             >
                 <PatternCard surface="raised" title="Card" description="The raised ring." />
-                <div className="plus-popup" style={{ position: 'relative', width: 'auto' }}>
-                    <div className="plus-popup-title">Popup</div>
-                    <div className="plus-popup-body">The overlay ring.</div>
-                </div>
+                <DocsOverlayBoundary containHeight>
+                    <Popup
+                        trigger={<Button text="Details" />}
+                        title="Popup"
+                        placement="bottom-start"
+                        triggerType="manual"
+                        show
+                        rootClose={false}
+                        initialFocus={false}
+                    >
+                        The overlay ring.
+                    </Popup>
+                </DocsOverlayBoundary>
             </div>
         </div>
     );

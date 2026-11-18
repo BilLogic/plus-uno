@@ -43,8 +43,8 @@ const ROLES = {
   sidebarSelected: ['--ds-background-selected', 'patterns/Sidebar/Sidebar.scss'],
   sidebarIcon: ['--ds-icon-subtle', 'patterns/Sidebar/Sidebar.scss'],
   // Section and Card
-  // Only the subtle variant has a surface; the default Section draws none.
-  sectionSubtleSurface: ['--ds-surface-sunken', 'patterns/PatternSection/PatternSection.scss'],
+  // A Section draws no surface; a sunken box inside one is a sunken Card.
+  sectionSubtleSurface: ['--card-surface-sunken', 'patterns/PatternCard/PatternCard.scss'],
   cardSurface: ['--ds-surface-raised', 'tokens/ladder/_templates.scss'],
   cardSunken: ['--card-surface-sunken', 'patterns/PatternCard/PatternCard.scss'],
   cardShadow: ['--ds-shadow-raised', 'tokens/ladder/_templates.scss'],

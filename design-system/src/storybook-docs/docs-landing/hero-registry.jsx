@@ -104,6 +104,16 @@ export const HEROES = {
     description:
       'The layers lifted apart, light on the left and dark on the right.',
   },
+  'foundations-visual-elevation-color': {
+    Hero: ElevationHero,
+    description:
+      'The layers lifted apart, light on the left and dark on the right.',
+  },
+  'foundations-visual-elevation-accessibility': {
+    Hero: AccessibilityHero,
+    description:
+      'One big button: its focus ring and the target around it.',
+  },
   'foundations-layout-grid': {
     Hero: GridHero,
     description:

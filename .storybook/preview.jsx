@@ -204,7 +204,9 @@ const preview = {
                 "Overview",
                 "Layer system",
                 "Shadow ramp",
-                "Usage"
+                "Usage",
+                "Color",
+                "Accessibility"
               ],
               "Radius",
               "Border"
