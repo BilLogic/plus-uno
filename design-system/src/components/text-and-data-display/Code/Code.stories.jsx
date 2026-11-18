@@ -38,7 +38,7 @@ export default {
 /* ------------------------------------------------------------------ default */
 
 export const Overview = () => (
-    <p className="plus-body-1" style={{ margin: 0 }}>
+    <p className="body-default" style={{ margin: 0 }}>
         Call <Code>getSession()</Code> before you render the page.
     </p>
 );
@@ -64,7 +64,7 @@ Overview.play = async ({ canvasElement }) => {
 /* ------------------------------------------------------------------- scaling */
 
 export const InHeading = () => (
-    <h2 className="plus-heading-sm" style={{ margin: 0 }}>
+    <h2 className="heading-sm" style={{ margin: 0 }}>
         The <Code>useSession</Code> hook
     </h2>
 );
@@ -80,7 +80,7 @@ InHeading.play = async ({ canvasElement }) => {
 /* ------------------------------------------------------------------- wrapping */
 
 export const WrapsAtTheEdge = () => (
-    <p className="plus-body-1" style={{ margin: 0, width: 160 }}>
+    <p className="body-default" style={{ margin: 0, width: 'var(--width-1000)' }}>
         <Code>a_very_long_identifier_with_no_spaces_in_it</Code>
     </p>
 );
@@ -94,7 +94,7 @@ WrapsAtTheEdge.play = async ({ canvasElement }) => {
 /* ---------------------------------------------------------------- playground */
 
 export const Interactive = (args) => (
-    <p className="plus-body-1" style={{ margin: 0 }}>
+    <p className="body-default" style={{ margin: 0 }}>
         Run <Code {...args} /> to start.
     </p>
 );

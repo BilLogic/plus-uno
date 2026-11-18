@@ -550,12 +550,12 @@ export const LandsWithNotify = {
  * gap closes as it goes, never after it. Both stories pin `reducedMotion` themselves: CI's
  * Chromium reports reduced motion, and the page-wide preference is shared with other files.
  */
-const STACK_SLOT = { position: 'relative', width: 420, height: 360 };
+const STACK_SLOT = { position: 'relative', width: 'var(--width-3000)', height: 'var(--height-2000)' };
 
 const ClosingStack = ({ reducedMotion }) => {
     const [middleOpen, setMiddleOpen] = useState(true);
     return (
-        <div style={{ position: 'relative', display: 'flex', gap: 24, height: 360 }}>
+        <div style={{ position: 'relative', display: 'flex', gap: 'var(--inline-lg)', height: 'var(--height-2000)' }}>
             <div style={STACK_SLOT}>
                 <FlagGroup position="top-start" containerPosition="absolute" reducedMotion={reducedMotion} data-testid="stack-three">
                     <Flag title="First" autohide={false} data-testid="three-first" />
