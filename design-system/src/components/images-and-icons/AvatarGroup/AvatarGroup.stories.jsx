@@ -30,7 +30,7 @@ export default {
     },
 };
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: '24px', alignItems: 'center' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--section-stack-lg)', alignItems: 'center' };
 
 const box = (el) => {
     const r = el.getBoundingClientRect();

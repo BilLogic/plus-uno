@@ -40,8 +40,8 @@ export default {
     },
 };
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' };
-const grid = { display: 'grid', gap: '12px' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--grid-gutter)', alignItems: 'center' };
+const grid = { display: 'grid', gap: 'var(--stack-lg)' };
 
 const SIZE = { default: 20, compact: 16 };
 

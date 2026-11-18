@@ -15,7 +15,7 @@ import {
 /** The popup is a portal; `within(canvasElement)` cannot see it. */
 const documentOf = (canvasElement) => within(canvasElement.ownerDocument.body);
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--grid-gutter)', alignItems: 'center' };
 const title = (name) => name.charAt(0).toUpperCase() + name.slice(1);
 
 export default {

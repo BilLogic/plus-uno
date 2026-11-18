@@ -3,7 +3,7 @@ import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { px } from '@/storybook-docs/lib/style-probes.js';
-import { Button, InlineEditableTextfield } from '@/components';
+import { Button, InlineEditableTextfield, Select } from '@/components';
 import InlineEdit from './InlineEdit';
 /**
  * `InlineEdit` and `InlineEditableTextfield`: text that becomes a field when pressed.
@@ -30,7 +30,7 @@ export default {
     },
 };
 
-const column = { display: 'flex', flexDirection: 'column', gap: 'var(--space-200)', maxWidth: 'var(--width-2500)' };
+const column = { display: 'flex', flexDirection: 'column', gap: 'var(--page-pad-x-default)', maxWidth: 'var(--width-2500)' };
 
 const height = (el) => Math.round(el.getBoundingClientRect().height);
 
@@ -341,11 +341,18 @@ export const WithAnotherEditView = () => {
                 readView={() => level}
                 onConfirm={(next) => setLevel(next)}
                 editView={({ id, value, onChange }) => (
-                    <select id={id} value={value} onChange={onChange}>
-                        <option>Beginner</option>
-                        <option>Intermediate</option>
-                        <option>Advanced</option>
-                    </select>
+                    <Select
+                        id={id}
+                        aria-labelledby={`${id}-label`}
+                        value={value}
+                        options={[
+                            { label: 'Beginner', value: 'Beginner' },
+                            { label: 'Intermediate', value: 'Intermediate' },
+                            { label: 'Advanced', value: 'Advanced' },
+                        ]}
+                        clearable={false}
+                        onChange={onChange}
+                    />
                 )}
             />
         </div>
@@ -357,7 +364,9 @@ WithAnotherEditView.play = async ({ canvasElement }) => {
     await userEvent.click(canvas.getByRole('button', { name: 'Level Intermediate' }));
     const select = canvas.getByRole('combobox', { name: 'Level' });
     await expect(select).toHaveFocus();
-    await userEvent.selectOptions(select, 'Advanced');
+    await userEvent.click(select);
+    const option = await within(canvasElement.ownerDocument.body).findByRole('option', { name: 'Advanced' });
+    await userEvent.click(option);
     await userEvent.click(canvas.getByRole('button', { name: 'Confirm' }));
     await waitFor(() => expect(canvas.getByRole('button', { name: 'Level Advanced' })).toBeTruthy());
 };

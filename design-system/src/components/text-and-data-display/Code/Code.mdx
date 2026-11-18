@@ -154,7 +154,7 @@ A long inline span wraps awkwardly and loses its structure. A block keeps lines 
 <DoDontPair
     doExample={<CodeBlock text={'npm install\nnpm run dev'} label="Start the app" />}
     doCaption="Several lines go in a code block."
-    dontExample={<p className="plus-body-1" style={{ margin: 0 }}>Run <Code>npm install and then npm run dev to start the app</Code></p>}
+    dontExample={<p className="body-default" style={{ margin: 0 }}>Run <Code>npm install and then npm run dev to start the app</Code></p>}
     dontCaption="A whole instruction in inline code."
 />
 
@@ -163,18 +163,18 @@ A long inline span wraps awkwardly and loses its structure. A block keeps lines 
 `Code` tells readers "this is literal text to type". Use bold or a button label for emphasis.
 
 <DoDontPair
-    doExample={<p className="plus-body-1" style={{ margin: 0 }}>Press <strong>Continue</strong> to proceed.</p>}
+    doExample={<p className="body-default" style={{ margin: 0 }}>Press <strong>Continue</strong> to proceed.</p>}
     doCaption="Bold for emphasis, in the reader's words."
-    dontExample={<p className="plus-body-1" style={{ margin: 0 }}>Press <Code>important</Code> to continue.</p>}
+    dontExample={<p className="body-default" style={{ margin: 0 }}>Press <Code>important</Code> to continue.</p>}
     dontCaption="Inline code on a word that is not code."
 />
 
 ### Write it as the reader would type it.
 
 <DoDontPair
-    doExample={<p className="plus-body-1" style={{ margin: 0 }}>Call <Code>getSession()</Code> first.</p>}
+    doExample={<p className="body-default" style={{ margin: 0 }}>Call <Code>getSession()</Code> first.</p>}
     doCaption="The exact name, with its brackets."
-    dontExample={<p className="plus-body-1" style={{ margin: 0 }}>Call <Code>getSession().</Code> first.</p>}
+    dontExample={<p className="body-default" style={{ margin: 0 }}>Call <Code>getSession().</Code> first.</p>}
     dontCaption="A trailing period inside the span, which the reader may type."
 />
 

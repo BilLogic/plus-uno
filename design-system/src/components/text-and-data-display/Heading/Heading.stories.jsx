@@ -103,7 +103,7 @@ NestedContext.play = async ({ canvasElement }) => {
 /* -------------------------------------------------------------------- color */
 
 export const InverseColor = () => (
-    <div style={{ background: 'var(--ds-text)', padding: 16 }}>
+    <div style={{ background: 'var(--ds-text)', padding: 'var(--pad-x-lg)' }}>
         <Heading as="div" size={'medium'} color="color.text.inverse">On a dark ground</Heading>
     </div>
 );
