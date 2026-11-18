@@ -86,6 +86,27 @@
           }
         },
         {
+          "name": "Stack/xl",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--stack-xl)"
+          }
+        },
+        {
+          "name": "Stack/2xl",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--stack-2xl)"
+          }
+        },
+        {
+          "name": "Stack/3xl",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--stack-3xl)"
+          }
+        },
+        {
           "name": "Inline/sm",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -104,6 +125,27 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--inline-lg)"
+          }
+        },
+        {
+          "name": "Inline/xl",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--inline-xl)"
+          }
+        },
+        {
+          "name": "Inline/2xl",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--inline-2xl)"
+          }
+        },
+        {
+          "name": "Inline/3xl",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--inline-3xl)"
           }
         },
         {
@@ -504,10 +546,31 @@
           }
         },
         {
+          "name": "Table/inline",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--table-inline)"
+          }
+        },
+        {
           "name": "Table/footer-height",
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--table-footer-height)"
+          }
+        },
+        {
+          "name": "Table/empty-surface",
+          "resolvedType": "COLOR",
+          "codeSyntax": {
+            "WEB": "var(--table-empty-surface)"
+          }
+        },
+        {
+          "name": "Table/empty-radius",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--table-empty-radius)"
           }
         },
         {
@@ -522,13 +585,6 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--blanket-pad-y)"
-          }
-        },
-        {
-          "name": "Blanket/fill",
-          "resolvedType": "COLOR",
-          "codeSyntax": {
-            "WEB": "var(--blanket-fill)"
           }
         },
         {
@@ -553,24 +609,24 @@
           }
         },
         {
-          "name": "Modal/width-sm",
+          "name": "Modal/width-6-col",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--modal-width-sm)"
+            "WEB": "var(--modal-width-6-col)"
           }
         },
         {
-          "name": "Modal/width-md",
+          "name": "Modal/width-8-col",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--modal-width-md)"
+            "WEB": "var(--modal-width-8-col)"
           }
         },
         {
-          "name": "Modal/width-lg",
+          "name": "Modal/width-10-col",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--modal-width-lg)"
+            "WEB": "var(--modal-width-10-col)"
           }
         },
         {
@@ -642,6 +698,83 @@
           }
         },
         {
+          "name": "Dialog/pad-x-default",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--dialog-pad-x-default)"
+          }
+        },
+        {
+          "name": "Dialog/pad-x-spacious",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--dialog-pad-x-spacious)"
+          }
+        },
+        {
+          "name": "Dialog/stack-sm",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--dialog-stack-sm)"
+          }
+        },
+        {
+          "name": "Dialog/stack-md",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--dialog-stack-md)"
+          }
+        },
+        {
+          "name": "Dialog/stack-lg",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--dialog-stack-lg)"
+          }
+        },
+        {
+          "name": "Dialog/inline-sm",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--dialog-inline-sm)"
+          }
+        },
+        {
+          "name": "Dialog/inline-md",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--dialog-inline-md)"
+          }
+        },
+        {
+          "name": "Dialog/inline-lg",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--dialog-inline-lg)"
+          }
+        },
+        {
+          "name": "Dialog/radius",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--dialog-radius)"
+          }
+        },
+        {
+          "name": "Dialog/body-min-height",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--dialog-body-min-height)"
+          }
+        },
+        {
+          "name": "Dialog/shadow",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--dialog-shadow)"
+          }
+        },
+        {
           "name": "Calendar/day-sm",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -660,13 +793,6 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--calendar-day-lg)"
-          }
-        },
-        {
-          "name": "Calendar/nav-size",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--calendar-nav-size)"
           }
         },
         {

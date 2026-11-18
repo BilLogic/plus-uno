@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { Button, FooterActions, Popup, TextField } from '@/components';
-import { PatternModal } from '@/patterns';
+import { Button, Dialog, FooterActions, Popup, TextField } from '@/components';
 import { CaseBlanket, CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 
 /**
  * The live do and don't examples on the Popup template page, composed from
- * `Blanket`, `PatternModal`, `Popup`, `FooterActions`, `TextField` and `Button`.
+ * `CaseBlanket`, `Dialog`, `Popup`, `FooterActions`, `TextField` and `Button`.
  */
 
 /** Fields the person must finish sit in a Modal over a Blanket. */
@@ -14,7 +13,7 @@ export const FieldsInModalCase = () => {
     const [topic, setTopic] = useState('Two-step equations');
     return (
         <CaseBlanket height={280}>
-            <PatternModal
+            <Dialog
                 title="Add session"
                 onClose={() => {}}
                 style={{ inlineSize: '100%' }}
@@ -29,7 +28,7 @@ export const FieldsInModalCase = () => {
                     <TextField label="Student" value={student} onChange={(e) => setStudent(e.target.value)} />
                     <TextField label="Topic" value={topic} onChange={(e) => setTopic(e.target.value)} />
                 </div>
-            </PatternModal>
+            </Dialog>
         </CaseBlanket>
     );
 };

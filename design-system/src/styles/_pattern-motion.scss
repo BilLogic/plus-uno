@@ -1,5 +1,5 @@
 // Shared pattern-level motion surfaces: SwapInPlace clean fades, LoadThenReveal
-// skeleton crossfades, PresenceSlot seams, and PatternTable row seams.
+// skeleton crossfades, PresenceSlot seams, and table row seams.
 // All movement runs through SPRINGS from @/tokens/ladder/springs.generated.js.
 
 [data-swap-stage] {
@@ -47,6 +47,6 @@
     min-width: 0;
 }
 
-.plus-pattern-table-seam {
+.plus-table-shell-seam {
     min-width: 0;
 }

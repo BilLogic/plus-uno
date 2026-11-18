@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { Button, DropdownMenu, Modal } from '@/components';
+import { Button, DropdownMenu } from '@/components';
+import { Modal } from '@/patterns';
 import { OverlayContainer } from '@/lib/overlay';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 

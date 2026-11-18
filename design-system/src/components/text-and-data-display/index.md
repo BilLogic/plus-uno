@@ -2,7 +2,7 @@
 
 # Text and data display
 
-6 components. Each row links to the generated facts; the three columns after it are the
+8 components. Each row links to the generated facts; the three columns after it are the
 authored half, counted rather than assumed.
 
 ## Which component to reach for
@@ -11,13 +11,17 @@ authored half, counted rather than assumed.
   - For several lines of code or a snippet with line numbers, use `CodeBlock`.
 - **[CodeBlock](CodeBlock/index.md)** — Use `CodeBlock` for code a reader may copy or follow line by line: an example, a command sequence, a config file.
   - For a name or short phrase inside a sentence, use `Code`.
+- **[DynamicTable](DynamicTable/index.md)** — Use `DynamicTable` for a table of sessions or records where people act on the data: sort a column, filter or search the rows, select some for a bulk action, or split a long result across numbered pages. It holds its own sort and page until the page passes `sortKey` or `page`.
+  - For a fixed grid people only read or a nested hierarchy, use `Table`.
 - **[Heading](Heading/index.md)** — Use `Heading` for every heading in the product: a page title, a section header, a card title. Never style plain text to look like a heading: a sighted-only "heading" breaks navigation by heading for anyone using assistive technology.
   - For a page's top title row with breadcrumbs and actions, use `PageHeader`.
 - **[InlineEdit](InlineEdit/index.md)** — Use `InlineEdit` for a value that is read far more often than it is changed and that can be saved on its own: a title, a name or a short note on a record or a profile page.
   - For a field in a form where a Save button submits every field together, use `TextField`: an inline edit saves when confirmed and has no say in the form's submit, so placing one in a form leaves two ways to save.
   - For several lines edited in a form, use `TextArea`.
-- **[Table](Table/index.md)** — Use `StaticTable` for a grid people only read: a record, a summary, a rate card.
+- **[StaticTable](StaticTable/index.md)** — Use `StaticTable` for a grid people only read: a record, a summary, a rate card.
   - For a table people sort or filter or page, use `Table`.
+- **[TreeTable](TreeTable/index.md)** — Use `TreeTable` for records that nest up to three levels: a curriculum of units and lessons, a folder of sessions.
+  - For a flat grid people read or sort or page, use `Table`.
 - **[VisuallyHidden](VisuallyHidden/index.md)** — Use `VisuallyHidden` when the words a screen reader needs are not words a sighted person needs: the name of an icon-only button, the title of a table column that holds only checkboxes, the count in a status message, a table caption the layout already explains.
   - For an icon-only button that already takes a required `label` prop, use `IconButton`.
   - For a short visible label on hover and focus over a control, use `Tooltip`.
@@ -26,12 +30,14 @@ authored half, counted rather than assumed.
 |-----------|------:|:---:|:---:|:---:|
 | [Code](Code/index.md) | 2 | ✅ | ✅ | ✅ |
 | [CodeBlock](CodeBlock/index.md) | 7 | ✅ | ✅ | ✅ |
+| [DynamicTable](DynamicTable/index.md) | 37 | ✅ | ✅ | ✅ |
 | [Heading](Heading/index.md) | 6 | ✅ | ✅ | ✅ |
 | [InlineEdit](InlineEdit/index.md) | 18 | ✅ | ✅ | ✅ |
-| [Table](Table/index.md) | 17 | ✅ | ✅ | ✅ |
+| [StaticTable](StaticTable/index.md) | 15 | ✅ | ✅ | ✅ |
+| [TreeTable](TreeTable/index.md) | 12 | ✅ | ✅ | ✅ |
 | [VisuallyHidden](VisuallyHidden/index.md) | 3 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 6/6 (100%) · Correct/incorrect 6/6 (100%) · Accessibility 6/6 (100%)
+**Authored coverage:** When to use 8/8 (100%) · Correct/incorrect 8/8 (100%) · Accessibility 8/8 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

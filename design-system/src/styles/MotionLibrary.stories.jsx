@@ -37,7 +37,7 @@ export default {
 };
 
 const ROWS = motionLibraryOf();
-const MULTI_EVENT_ROW = ROWS.find((r) => r.tier === 'component' && r.name === 'Modal') ?? ROWS.find((r) => r.events.length > 1);
+const MULTI_EVENT_ROW = ROWS.find((r) => r.tier === 'component' && r.name === 'Popup') ?? ROWS.find((r) => r.tier === 'component' && r.events.length > 1);
 const CHECKBOX_ROW = ROWS.find((r) => r.tier === 'component' && r.name === 'Checkbox') ?? MULTI_EVENT_ROW;
 const FALLBACK_ROW = ROWS.find((r) => r.tier === 'component' && r.name === 'Sidebar');
 const PATTERN_ROW = ROWS.find((r) => r.tier === 'pattern') ?? ROWS[0];
@@ -312,10 +312,10 @@ export const ComponentSubjectCoverage = {
         await expect(staleSubjects).toEqual([]);
         await expect(staleFallbacks).toEqual([]);
 
-        // Modal renders its real PLUS Modal inline inside the card
-        const modalCard = canvasElement.querySelector('[data-motion-card="component:Modal"]');
-        await expect(modalCard.querySelector('[data-subject="component"]')).toBeTruthy();
-        await expect(modalCard.querySelector('.plus-modal')).toBeTruthy();
+        // Popup renders its real PLUS subject inside the component card
+        const popupCard = canvasElement.querySelector(`[data-motion-card="component:${MULTI_EVENT_ROW.name}"]`);
+        await expect(popupCard.querySelector('[data-subject="component"]')).toBeTruthy();
+        await expect(popupCard.querySelector('.plus-popup')).toBeTruthy();
 
         // Fallback component row and pattern row keep their kit drawing
         if (FALLBACK_ROW) {

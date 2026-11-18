@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Button, Popup, Toggle } from '@/components';
-import { Page, PatternCard, PatternTable } from '@/patterns';
+import { Button, DynamicTable, Popup, Toggle } from '@/components';
+import { Page, PatternCard } from '@/patterns';
 import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
 import { DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
 import { C, RefTable } from '@/storybook-docs/foundation-blocks.jsx';
@@ -1075,34 +1075,22 @@ export const ScrollShadowDemo = () => {
             data-testid="scroll-demo"
             data-progress={Math.round(t * 100)}
             onScrollCapture={(e) => {
-                if (e.target?.classList?.contains('plus-pattern-table-scroll')) {
+                if (e.target?.classList?.contains('plus-table-shell-scroll')) {
                     setScroll(e.target.scrollTop);
                 }
             }}
         >
             <div style={{ borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)', overflow: 'hidden' }}>
-                <PatternTable
+                <DynamicTable
+                    label="Upcoming sessions"
                     stickyHeader
                     maxHeight="calc(var(--image-xl) * 3)"
-                    tableProps={{ 'aria-label': 'Upcoming sessions' }}
-                >
-                    <thead>
-                        <tr>
-                            <th>Tutor</th>
-                            <th>Subject</th>
-                            <th>Time</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {SESSION_ROWS.map(([tutor, subject, time]) => (
-                            <tr key={tutor}>
-                                <td>{tutor}</td>
-                                <td>{subject}</td>
-                                <td>{time}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </PatternTable>
+                    head={{ cells: [{ key: 'tutor', content: 'Tutor' }, { key: 'subject', content: 'Subject' }, { key: 'time', content: 'Time' }] }}
+                    rows={SESSION_ROWS.map(([tutor, subject, time]) => ({
+                        key: tutor,
+                        cells: [{ key: 'tutor', content: tutor }, { key: 'subject', content: subject }, { key: 'time', content: time }],
+                    }))}
+                />
             </div>
             <p style={{ ...small, margin: 0, marginBlockStart: 'var(--stack-sm)' }}>Shadow at {Math.round(t * 100)}%: it reaches full strength after {reach} of scroll.</p>
         </div>

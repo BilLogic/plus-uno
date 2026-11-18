@@ -118,7 +118,6 @@ export const TypeSteps = {
         await expect(canvas.getByLabelText(/Session date/)).toBeInTheDocument();
         await userEvent.click(canvas.getByRole('button', { name: 'Back' }));
         await expect(canvas.getByLabelText(/Student/)).toBeInTheDocument();
-        await settleAnimations(canvasElement.ownerDocument.body);
     },
 };
 
@@ -176,8 +175,8 @@ export const AnatomyPanel = {
 };
 
 const ANATOMY_MODAL_PARTS = [
-    { selector: '.plus-pattern-modal-header', label: 'Header', at: 'start' },
-    { selector: '.plus-pattern-modal-body', label: 'Body', at: 'middle' },
+    { selector: '.plus-dialog-header', label: 'Header', at: 'start' },
+    { selector: '.plus-dialog-body', label: 'Body', at: 'middle' },
     { selector: '[data-probe="footer"]', label: 'Footer', at: 'end' },
 ];
 
@@ -223,7 +222,6 @@ export const AnatomySteps = {
         await expect(canvas.getByLabelText(/Session date/)).toBeInTheDocument();
         await userEvent.click(canvas.getByRole('button', { name: 'Back' }));
         await expect(canvas.getByLabelText(/Student/)).toBeInTheDocument();
-        await settleAnimations(canvasElement.ownerDocument.body);
     },
 };
 
@@ -233,8 +231,7 @@ export const AnatomySteps = {
 export const KeyFieldError = {
     name: 'Key state: Field error on blur',
     render: () => <ScreenStage width={PAGE_WIDTH} scrollable><FormInPage /></ScreenStage>,
-    play: async ({ canvas, canvasElement }) => {
-        await settleAnimations(canvasElement.ownerDocument.body);
+    play: async ({ canvas }) => {
         const student = canvas.getByLabelText(/Student/);
         await userEvent.click(student);
         await userEvent.tab();
@@ -250,8 +247,7 @@ export const KeyFieldError = {
 export const KeyDisabledReason = {
     name: 'Key state: Disabled with its reason',
     render: () => <ScreenStage width={PAGE_WIDTH} scrollable><FormInPage subjectWaits /></ScreenStage>,
-    play: async ({ canvas, canvasElement }) => {
-        await settleAnimations(canvasElement.ownerDocument.body);
+    play: async ({ canvas }) => {
         await expect(canvas.getByText('Choose a student first.'), 'the reason is visible text on the field').toBeInTheDocument();
         await expect(canvas.getByRole('button', { name: 'Save session' }), 'Save stays enabled').not.toBeDisabled();
     },
@@ -284,7 +280,7 @@ export const KeyServerSaysNo = {
     play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
         const message = canvasElement.querySelector('[data-probe="message"]');
-        const body = canvasElement.querySelector('.plus-pattern-modal-body');
+        const body = canvasElement.querySelector('.plus-dialog-body');
         await expect(within(message).getByRole('alert'), 'announced').toBeInTheDocument();
         await expect(rect(message).top, 'at the top of the body').toBeLessThanOrEqual(rect(canvas.getByLabelText(/Student/)).top);
         await expect(body.contains(message)).toBe(true);
@@ -313,8 +309,7 @@ export const KeySending = {
 export const KeyLeaving = {
     name: 'Key state: Leaving with edits',
     render: () => <ScreenStage width={STAGE} scrollable><FormInModal /></ScreenStage>,
-    play: async ({ canvas, canvasElement }) => {
-        await settleAnimations(canvasElement.ownerDocument.body);
+    play: async ({ canvas }) => {
         await userEvent.type(canvas.getByLabelText(/Student/), 'Ana');
         await userEvent.click(canvas.getByRole('button', { name: 'Discard' }));
         await expect(await canvas.findByRole('heading', { level: 1, name: 'Discard changes?' })).toBeInTheDocument();

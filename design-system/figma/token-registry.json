@@ -95,7 +95,7 @@
       "Card gap": "var(--card-stack-{sm|md|lg})",
       "Card radius": "var(--card-radius)",
       "Element padding": "var(--pad-x-{xs|sm|md|lg})",
-      "Element gap": "var(--stack-{sm|md|lg})",
+      "Element gap": "var(--stack-{sm|md|lg|xl|2xl|3xl})",
       "Element radius": "var(--radius-{sm|md|lg|full})",
       "Modal padding": "var(--modal-pad-x-{default|spacious})",
       "Section padding": "var(--section-pad-{x|y}-{compact|default|spacious})",
@@ -267,7 +267,6 @@
       "Stack/sm": "var(--stack-sm)"
     },
     "spacing / templates": {
-      "Blanket/fill": "var(--blanket-fill)",
       "Blanket/pad-x": "var(--blanket-pad-x)",
       "Blanket/pad-y": "var(--blanket-pad-y)",
       "Card/inline-lg": "var(--card-inline-lg)",
@@ -311,9 +310,9 @@
       "Modal/stack-lg": "var(--modal-stack-lg)",
       "Modal/stack-md": "var(--modal-stack-md)",
       "Modal/stack-sm": "var(--modal-stack-sm)",
-      "Modal/width-lg": "var(--modal-width-lg)",
-      "Modal/width-md": "var(--modal-width-md)",
-      "Modal/width-sm": "var(--modal-width-sm)",
+      "Modal/width-lg": "var(--modal-width-10-col)",
+      "Modal/width-md": "var(--modal-width-8-col)",
+      "Modal/width-sm": "var(--modal-width-6-col)",
       "Page/border-width": "var(--page-border-width)",
       "Page/pad": "var(--page-pad)",
       "Page/pad-x-compact": "var(--page-pad-x-compact)",
@@ -1138,9 +1137,6 @@
       "elevation/shadow/raised/layer-3/offsetY": "var(--ds-shadow-raised)",
       "elevation/shadow/raised/layer-3/radius": "var(--ds-shadow-raised)",
       "elevation/shadow/raised/layer-3/spread": "var(--ds-shadow-raised)",
-      "elevation/surface/container/default": "var(--ds-surface-container)",
-      "elevation/surface/container/hovered": "var(--ds-surface-container-hovered)",
-      "elevation/surface/container/pressed": "var(--ds-surface-container-pressed)",
       "elevation/surface/default": "var(--ds-surface)",
       "elevation/surface/hovered": "var(--ds-surface-hovered)",
       "elevation/surface/overlay/default": "var(--ds-surface-overlay)",
@@ -1170,7 +1166,6 @@
       "Calendar/day-lg": "var(--calendar-day-lg)",
       "Calendar/day-md": "var(--calendar-day-md)",
       "Calendar/day-sm": "var(--calendar-day-sm)",
-      "Calendar/nav-size": "var(--calendar-nav-size)",
       "Carousel/control-offset": "var(--carousel-control-offset)",
       "Carousel/control-pad": "var(--carousel-control-pad)",
       "Carousel/control-size": "var(--carousel-control-size)",
@@ -1768,9 +1763,6 @@
       "elevation/surface/default": "var(--ds-surface)",
       "elevation/surface/hovered": "var(--ds-surface-hovered)",
       "elevation/surface/pressed": "var(--ds-surface-pressed)",
-      "elevation/surface/container/default": "var(--ds-surface-container)",
-      "elevation/surface/container/hovered": "var(--ds-surface-container-hovered)",
-      "elevation/surface/container/pressed": "var(--ds-surface-container-pressed)",
       "elevation/surface/overlay/default": "var(--ds-surface-overlay)",
       "elevation/surface/overlay/hovered": "var(--ds-surface-overlay-hovered)",
       "elevation/surface/overlay/pressed": "var(--ds-surface-overlay-pressed)",
@@ -1892,11 +1884,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1175,
+    "scssTokenCount": 1191,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1793,
-      "resolved": 1756,
+      "total": 1785,
+      "resolved": 1748,
       "percent": 98,
       "skippedCollections": [
         {

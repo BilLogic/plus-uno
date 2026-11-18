@@ -1,0 +1,314 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as DynamicTableStories from './DynamicTable.stories.jsx';
+import { DynamicTable } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
+
+export const sortHead = { cells: [{ key: 'student', content: 'Student', isSortable: true }, { key: 'date', content: 'Date', isSortable: true }] };
+export const keyedRows = [['Ava Thompson', 'Nov 2', 20261102], ['Marcus Lee', 'Oct 24', 20261024], ['Sofia Ramirez', 'Oct 9', 20261009]].map(([s, d, k]) => ({ key: s, cells: [{ key: s, content: s }, { key: k, content: d }] }));
+export const plainRows = [['Ava Thompson', 'Nov 2'], ['Marcus Lee', 'Oct 24'], ['Sofia Ramirez', 'Oct 9']].map(([s, d]) => ({ key: s, cells: [{ content: s }, { content: d }] }));
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "modelNote": "The Dynamic table page: sort, filter, selection with bulk actions, paging, expanding rows, a frozen column and the loading, empty and error states. `DynamicTable` draws it in code on the table shell, with sortable `HeadCell`s and `TableFooter`. Listed here as a docs page, not a set to write back to.",
+  "sets": [
+    {
+      "id": "dynamic-table",
+      "name": "Dynamic table",
+      "componentSetNodeId": "20095:14282",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-14282",
+      "source": "manual",
+      "status": "verified",
+      "isComponentSet": true
+    }
+  ]
+};
+
+<Meta of={DynamicTableStories} />
+
+<Title />
+
+A table people sort, page or act on. `DynamicTable` sits on the table shell, with sortable `HeadCell`s in the head row and the same row and cell parts the Static table uses.
+
+<DocsTabs of={DynamicTableStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27042"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Table"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<ComponentExample of={DynamicTableStories.Default} title="Default" description={<>Left alone the table holds its own sort and page. A head press sorts by the column's cell keys, and the footer states the range under a pager.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Stateless
+
+<ComponentExample of={DynamicTableStories.Stateless} description={<>The page owns the sort and the page through <code>sortKey</code>, <code>sortOrder</code> and <code>page</code>. With <code>totalRows</code>, the rows are already one page from a server and the footer counts against the total.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Body states
+
+<ComponentExample of={DynamicTableStories.States} description={<><code>empty</code> and <code>no results</code> replace the whole table (no head row, footer or pagination) with <code>EmptyState</code>; <code>loading</code> and <code>error</code> keep the head row and swap the body for one message row; <code>refreshing</code> keeps the rows at the loading opacity under a spinner.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Empty state
+
+<ComponentExample of={DynamicTableStories.Empty} title="Empty" description={<>With no rows, a cleared filter or a new account, <code>emptyView</code> replaces the whole table with <code>EmptyState</code> inside the sunken empty box.</>} />
+
+<ComponentExample of={DynamicTableStories.NoResults} title="No results" description={<>With <code>state="no results"</code>, <code>noResultsView</code> replaces the whole table with <code>EmptyState</code> inside the sunken empty box.</>} />
+
+<ComponentExample of={DynamicTableStories.EmptyNothingYet} title="Empty box: nothing yet" description={<>Title, one line and a default button repeating the Section title row's primary action.</>} />
+
+<ComponentExample of={DynamicTableStories.EmptyHiddenByFilter} title="Empty box: hidden by filter" description={<>The Section title and filter row stay above the box; clearing the filter reveals the rows.</>} />
+
+<ComponentExample of={DynamicTableStories.EmptyNothingToCreate} title="Empty box: nothing to create" description={<>Title and one line only when there is nothing to create.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Selection and the bulk bar
+
+<ComponentExample of={DynamicTableStories.Selection} title="Selection" description={<>A checkbox column as wide as the row is tall, with select-all in the head. While rows are selected, the head row becomes the bulk bar: select-all, mixed while only some rows are selected, then the count and up to three <code>bulkActions</code> at the start, with an overflow menu for the rest. There is no Clear; the checkboxes clear the selection and the head row comes back. The Section toolbar stays put.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Sticky header and frozen column
+
+<ComponentExample of={DynamicTableStories.StickyHeaderAndFrozenColumn} description={<>The head row stays pinned inside the table's own scroll region. The frozen column sits on an opaque surface and draws a stronger divider while the table scrolls sideways.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Widths
+
+<ComponentExample of={DynamicTableStories.Widths} description={<>Under 720 the table scrolls sideways instead of squeezing. Wider, the first column fills the room and the rest size to their content.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Sortable head cells
+
+<ComponentExample of={DynamicTableStories.SortableHeadCells} description={<>A press asks for ascending, then descending, then no sort. The arrow shows on hover and focus, and a sorted column keeps it.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## State
+
+<ComponentExample of={DynamicTableStories.Rest} title="Rest" description={<>A sortable head cell is clear; its arrow shows on hover or focus.</>} />
+
+<ComponentExample of={DynamicTableStories.Hovered} title="Hovered" description={<>The head cell takes the subtle hovered step.</>} />
+
+<ComponentExample of={DynamicTableStories.Pressed} title="Pressed" description={<>The head cell takes the subtle pressed step.</>} />
+
+<ComponentExample of={DynamicTableStories.Focused} title="Focused" description="The sort button shows the focus ring inset in the cell, and the arrow appears." />
+
+<ComponentExample of={DynamicTableStories.DisabledRow} title="Disabled row" description={<>A row can be disabled and takes the disabled ink.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="DynamicTable" />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground of={DynamicTableStories.Interactive} />
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use `DynamicTable` for a table of sessions or records where people act on the
+data: sort a column, filter or search the rows, select some for a bulk action,
+or split a long result across numbered pages. It holds its own sort and page until the page passes `sortKey` or `page`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a fixed grid people only read or a nested hierarchy, use `Table`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Head cell.** A label with an optional type icon; a sortable one holds a button across the whole cell.
+2. **Sort arrow.** `12` tall; hidden until hover or focus, kept once sorted.
+3. **Row.** Cells in a band, with hover and selected grounds.
+4. **Footer.** States the range on a table that pages.
+5. **Message row.** The `loading` and `error` states, spanning every column under the head row. `empty` and `no results` replace the whole table with `EmptyState`.
+6. **Checkbox column.** With `isSelectable`: as wide as the row is tall, select-all in the head.
+7. **Bulk bar.** While rows are selected, the head row itself: select-all in its cell, then the count and `bulkActions` in one cell across the columns. The labels cross-fade in place and the row keeps its height.
+8. **Frozen column.** With `isFrozen`: an opaque first column with a stronger divider while scrolled sideways.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Head cells clear; sorted columns keep their arrow.</td></tr>
+<tr><td>Hovered</td><td>A sortable head cell takes the subtle hovered ground and shows its arrow.</td></tr>
+<tr><td>Pressed</td><td>A sortable head cell takes the subtle pressed ground.</td></tr>
+<tr><td>Focused</td><td>The sort button shows the focus ring inset; focus is never a fill.</td></tr>
+<tr><td>Disabled</td><td>A row takes the disabled ink and ignores the pointer; there is no disabled sort.</td></tr>
+<tr><td>Rows selected</td><td>The head row becomes the bulk bar, at the same height; selected rows keep the selected ground.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Head cell hovered, pressed</td><td><code>--ds-background-neutral-subtle-hovered</code>, <code>--ds-background-neutral-subtle-pressed</code></td></tr>
+<tr><td>Row hovered, pressed</td><td><code>--ds-background-neutral-subtle-hovered</code>, <code>--ds-background-neutral-subtle-pressed</code></td></tr>
+<tr><td>Selected row</td><td><code>--ds-background-selected</code> and its states</td></tr>
+<tr><td>Disabled row</td><td><code>--ds-text-disabled</code></td></tr>
+<tr><td>Row height</td><td><code>--row-height-sm</code>, <code>--row-height-md</code>, <code>--row-height-lg</code></td></tr>
+<tr><td>Cell padding</td><td><code>--table-pad-x-cell</code>, <code>--table-pad-y-cell</code></td></tr>
+<tr><td>Footer</td><td><code>--table-inline</code>, <code>--table-footer-height</code></td></tr>
+<tr><td>Empty state box</td><td><code>--table-empty-surface</code>, <code>--table-empty-radius</code></td></tr>
+<tr><td>Ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Give a column a sortable key.
+
+A date needs a key that sorts, such as `20261024`, and its readable text as `content`.
+
+<DoDontPair
+    doExample={<DynamicTable head={sortHead} rows={keyedRows} label="Sessions" defaultSortKey="date" defaultSortOrder="ascending" />}
+    doCaption="A key per cell sorts chronologically rather than alphabetically."
+    dontExample={<DynamicTable head={sortHead} rows={plainRows} label="Sessions" defaultSortKey="date" defaultSortOrder="ascending" />}
+    dontCaption="No key, so the formatted strings sort alphabetically instead."
+/>
+
+### Say what an empty table is for.
+
+`empty` and `no results` replace the whole table (header row, footer and pagination included) with `EmptyState`. Word the message with `emptyView`.
+
+<DoDontPair
+    doExample={<DynamicTable head={sortHead} rows={[]} label="Sessions" emptyView="No sessions yet. They appear here once one is booked." />}
+    doCaption="A message that says what is missing and what happens next."
+    dontExample={<DynamicTable head={sortHead} rows={[]} label="Sessions" emptyView="No data" />}
+    dontCaption="No data, with no hint of why."
+/>
+
+### Page on the server when the list is long.
+
+With `totalRows`, `rows` is the current page only (`rowsPerPage`), and the footer counts against the total.
+
+<DoDontPair
+    doExample={<DynamicTable head={sortHead} rows={keyedRows} label="Sessions" rowsPerPage={3} totalRows={8500} />}
+    doCaption="One page of rows, counted against the total."
+    dontExample={<DynamicTable head={sortHead} rows={keyedRows} label="Sessions" rowsPerPage={3} />}
+    dontCaption="The whole list loaded to page on the screen, when it is thousands of rows."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Label a column with the noun it holds: "Session date".</td><td>Label a column with a sentence or an instruction.</td></tr>
+<tr><td>Say what is missing when a table is empty: "No sessions yet".</td><td>Leave an empty table blank.</td></tr>
+<tr><td>Write the footer as a range: "1–3 of 3".</td><td>Write "Showing results".</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Sorting is announced.** A sortable header carries `aria-sort` (`none`, `ascending` or `descending`) and holds a real button, so a keyboard reaches it with Tab and a press asks for the next sort.
+- **Focus is a ring.** The ring is inset in the cell and focus never changes the fill.
+- **The arrow is decorative.** The sort state is in `aria-sort`, so color and the arrow never carry it alone.
+- **A disabled row is announced.** It is `aria-disabled` and takes no pointer events.
+- **Row selection is named and announced.** Each checkbox is "Select row N" and the head's is "Select all rows", mixed when only some rows are selected; a status says how many are selected, from the first one. The bulk bar's count is not announced a second time.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- `Pagination`: use when splitting a long result set across numbered pages.
+- <a href="?path=/docs/templates-table--docs">Table</a>: use when choosing between Static, Dynamic and Tree tables.
+- <a href="?path=/docs/templates-section--docs">Section</a>: use when placing search, filters and actions in the toolbar above the table; selected rows never change it.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

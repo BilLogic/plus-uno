@@ -2,7 +2,7 @@
   "$about": "Hand-kept, reviewed in PRs. The words a person uses for a component that its name, summary and Usage text do not say, so ds_find can answer them. A row is generic UI vocabulary someone would use unprompted, lowercase; never a phrase copied from a ds_find benchmark query (scripts/bench/ds-find/), never a name that exists here, and never a name that does not: a word for something this system lacks is a not-here row in _inventions.json, with what to use instead. Every key must be a component or pattern in components.json (scripts/lib/aliases.test.mjs). Read by the DS facts module (scripts/lib/ds-facts.mjs) as lookup(name).aliases; ds_find indexes it and ds_get prints it.",
   "components": {
     "Modal": ["confirm", "confirmation dialog", "destructive confirm", "popup window"],
-    "PatternModal": ["dialog layout", "confirm layout"],
+    "Dialog": ["dialog panel", "dialog layout"],
     "Flag": ["notification", "snackbar", "success message", "undo", "temporary message", "notify", "save confirmation"],
     "Banner": ["announcement", "top of page", "system message", "outage"],
     "SectionMessage": ["callout", "inline alert", "warning box"],
@@ -43,8 +43,7 @@
     "Frame": ["page template", "page shell", "page layout", "full page", "new page"],
     "VisuallyHidden": ["screen reader only", "sr-only", "assistive text", "screen reader text"],
     "Spotlight": ["onboarding", "feature tour", "coach mark", "new feature highlight", "walkthrough"],
-    "PatternTable": ["list of records", "data table on a page", "sortable list", "records with filters"],
-    "Table": ["rows and columns", "grid"],
+    "Table": ["list of records", "data table on a page", "sortable list", "records with filters", "rows and columns", "grid"],
     "FilterButton": ["filter chip", "filter control"],
     "PatternCard": ["summary card", "object card"],
     "PatternSection": ["page section", "toolbar", "section header"],

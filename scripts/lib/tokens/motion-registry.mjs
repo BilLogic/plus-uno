@@ -72,14 +72,14 @@ export const MOTION_REGISTRY = [
     },
   },
   {
-    name: 'PatternTable',
+    name: 'Table',
     tier: 'template',
     events: {
       selection: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'Ticking a row turns the head row into the bulk bar: labels cross-fade, same row, same height, nothing slides. Selected rows take the selected fill. The view bar above never moves.' },
     },
   },
   {
-    name: 'PatternModal',
+    name: 'Modal',
     tier: 'template',
     events: {
       enter: { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.default', note: 'Scales from 96% and fades in; the Blanket dims on appearance.default. It opens only from something the person did, and focus moves to its first input as the motion starts.' },
@@ -464,15 +464,6 @@ export const MOTION_REGISTRY = [
     },
   },
   {
-    name: 'Modal',
-    tier: 'component',
-    events: {
-      enter: { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.default', note: 'Scales from 96% while it fades in; the Blanket dims on the same fade.' },
-      exit: { transition: 'Open and close an overlay', spatial: 'spatial.exit', appearance: 'appearance.fast', note: 'Scales to 98% while it fades.' },
-      rejected: { transition: 'Call attention', spatial: 'spatial.fast', note: 'A blocked submit shakes it once; never in reduced motion.' },
-    },
-  },
-  {
     name: 'Panel',
     tier: 'component',
     events: {
@@ -633,12 +624,18 @@ export const MOTION_REGISTRY = [
     },
   },
   {
-    name: 'Table',
+    name: 'DynamicTable',
+    tier: 'component',
+    events: {
+      change: { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Rows are added, removed and reordered; sort is Reorder, a filter is Swap content. Ticking rows cross-fades the head row into the bulk bar, same height, nothing slides.' },
+      roster: { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'A student joins or leaves the session roster: the row is added or removed.', sound: { token: 'roster', when: 'in a session; changes within 2 s play once' } },
+    },
+  },
+  {
+    name: 'TreeTable',
     tier: 'component',
     events: {
       expand: { transition: 'Expand and collapse', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Tree rows reveal from their parent by spring height; collapse completes before removal. Reduced motion holds the final size and fades.' },
-      change: { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Rows are added, removed and reordered; sort is Reorder, a filter is Swap content. Ticking rows cross-fades the head row into the bulk bar, same height, nothing slides.' },
-      roster: { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'A student joins or leaves the session roster: the row is added or removed.', sound: { token: 'roster', when: 'in a session; changes within 2 s play once' } },
     },
   },
   {

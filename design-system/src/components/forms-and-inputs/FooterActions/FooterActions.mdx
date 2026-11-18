@@ -113,7 +113,7 @@ single action spans the full width.
 
 ## Usage
 
-Use `FooterActions` inside <DocsLink id="components-messaging-modal">Modal</DocsLink>, <DocsLink id="templates-panel">Panel</DocsLink> (`PanelFooter`) and the <DocsLink id="templates-frame">focused view</DocsLink> to place one to three filled `Button` actions on a four-track grid with an optional leading action. Secondary buttons draw the `default` soft neutral fill (`--ds-background-neutral`) with no outline so pairs balance without heavy borders.
+Use `FooterActions` inside <DocsLink id="templates-modal">Modal</DocsLink>, <DocsLink id="templates-panel">Panel</DocsLink> (`PanelFooter`) and the <DocsLink id="templates-frame">focused view</DocsLink> to place one to three filled `Button` actions on a four-track grid with an optional leading action. Secondary buttons draw the `default` soft neutral fill (`--ds-background-neutral`) with no outline so pairs balance without heavy borders.
 
 1. **Four equal tracks.** `FooterActions` divides the width inside container padding into four equal tracks separated by `--inline-md`; every filled track button is cloned with `spacing="spacious"` (`48` high) and `shouldFitContainer`.
 2. **One action.** Sits in the right half (tracks `3` and `4`). A single action fills the full width (all four tracks) only when the footer itself is `400` px wide or less (`@container (max-width: 400px)`) and there is no leading action.
@@ -135,8 +135,8 @@ Buttons fill in only two places: filled tracks inside `FooterActions`, and a sin
 <tbody>
 <tr><td>Page header</td><td><code>default</code> 32; at most one <code>primary</code>, rightmost</td><td><DocsLink id="components-layout-and-structure-page-header">Layout/PageHeader</DocsLink></td></tr>
 <tr><td>Card or section header</td><td><code>subtle</code> <code>compact</code> text button and/or <code>subtle</code> icon button</td><td><DocsLink id="templates-card">Patterns/PatternCard</DocsLink>, <DocsLink id="templates-section">Section</DocsLink></td></tr>
-<tr><td>Table toolbar</td><td><code>compact</code>; <code>subtle</code> secondary, <code>primary</code> rightmost</td><td><DocsLink id="templates-table">Patterns/PatternTable</DocsLink></td></tr>
-<tr><td>Table row</td><td><code>subtle</code> icon buttons or one <code>subtle</code> <code>compact</code> text action; never filled</td><td><DocsLink id="templates-table">PatternTable</DocsLink>, <DocsLink id="components-text-and-data-display-dynamic-table">DynamicTable</DocsLink></td></tr>
+<tr><td>Table toolbar</td><td><code>compact</code>; <code>subtle</code> secondary, <code>primary</code> rightmost</td><td><DocsLink id="templates-table">Patterns/Table</DocsLink></td></tr>
+<tr><td>Table row</td><td><code>subtle</code> icon buttons or one <code>subtle</code> <code>compact</code> text action; never filled</td><td><DocsLink id="templates-table">Table template</DocsLink>, <DocsLink id="components-text-and-data-display-dynamic-table">DynamicTable</DocsLink></td></tr>
 <tr><td>Popup inline confirm</td><td><code>compact</code>; <code>subtle</code> Cancel plus the action</td><td><DocsLink id="templates-popup">Patterns/Popup</DocsLink></td></tr>
 <tr><td>Empty state</td><td>centered; <code>default</code> 32 on a page, <code>compact</code> 24 in a card</td><td><DocsLink id="components-messaging-empty-state">Messaging/EmptyState</DocsLink>, <DocsLink id="patterns-states-empty">Docs/Empty</DocsLink></td></tr>
 <tr><td>Banner and Flag</td><td><code>subtle</code> <code>compact</code> text actions after the message</td><td><DocsLink id="components-messaging-banner">Messaging/Banner</DocsLink>, <DocsLink id="components-messaging-flag">Messaging/Flag</DocsLink></td></tr>

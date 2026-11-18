@@ -3,7 +3,7 @@ import React, { useRef, useState } from 'react';
 import { Button, Fieldset, PanelBody, PanelCloseAction, PanelContainer, PanelFooter, PanelHeader, SectionMessage, Select, Skeleton, TextField } from '@/components';
 import { PresenceSlot } from '@/lib/listMotion';
 import { SwapInPlace } from '@/lib/swapMotion';
-import { Blanket, PatternModal, PatternSection } from '@/patterns';
+import { Modal, PatternSection } from '@/patterns';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
@@ -210,38 +210,44 @@ export const FormInModal = ({ initial, server, sendingForever, marked, sending, 
     const close = () => { if (dirty) setConfirming(true); };
     return (
         <BrowserWindow address="app.plus.org/students" height={stageHeight}>
-            <Blanket inline screenWidth={SCREEN.width} screenHeight={screenHeight}>
-                {confirming ? (
-                    <PatternModal
-                        width="sm"
-                        title="Discard changes?"
-                        onClose={() => setConfirming(false)}
-                        footer={(
-                            <FullBleedFooter
-                                primary="Discard"
-                                cancel="Back"
-                                onCancel={() => setConfirming(false)}
-                                onSave={() => { f.setValues(EMPTY); setConfirming(false); }}
-                            />
-                        )}
-                    >
-                        <SectionMessage appearance="warning">Your edits to this session will be lost.</SectionMessage>
-                    </PatternModal>
-                ) : (
-                    <PatternModal
-                        width="md"
-                        height={height}
-                        title="Log a session"
-                        onClose={close}
-                        footer={<FullBleedFooter sending={f.sending} onSave={f.submit} onCancel={close} />}
-                    >
-                        <PresenceSlot show={Boolean(f.serverError)}>
-                            <FormMessage>{SERVER_MESSAGE}</FormMessage>
-                        </PresenceSlot>
-                        <FormFields values={f.values} onChange={f.setValues} errors={f.errors} onBlurField={f.onBlurField} setRef={f.setRef} />
-                    </PatternModal>
-                )}
-            </Blanket>
+            {confirming ? (
+                <Modal
+                    inline
+                    show
+                    screenWidth={SCREEN.width}
+                    screenHeight={screenHeight}
+                    width="6-col"
+                    title="Discard changes?"
+                    onClose={() => setConfirming(false)}
+                    footer={(
+                        <FullBleedFooter
+                            primary="Discard"
+                            cancel="Back"
+                            onCancel={() => setConfirming(false)}
+                            onSave={() => { f.setValues(EMPTY); setConfirming(false); }}
+                        />
+                    )}
+                >
+                    <SectionMessage appearance="warning">Your edits to this session will be lost.</SectionMessage>
+                </Modal>
+            ) : (
+                <Modal
+                    inline
+                    show
+                    screenWidth={SCREEN.width}
+                    screenHeight={screenHeight}
+                    width="8-col"
+                    height={height}
+                    title="Log a session"
+                    onClose={close}
+                    footer={<FullBleedFooter sending={f.sending} onSave={f.submit} onCancel={close} />}
+                >
+                    <PresenceSlot show={Boolean(f.serverError)}>
+                        <FormMessage>{SERVER_MESSAGE}</FormMessage>
+                    </PresenceSlot>
+                    <FormFields values={f.values} onChange={f.setValues} errors={f.errors} onBlurField={f.onBlurField} setRef={f.setRef} />
+                </Modal>
+            )}
         </BrowserWindow>
     );
 };

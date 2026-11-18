@@ -25,9 +25,15 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Stack | `--stack-sm` |  |
 | Stack | `--stack-md` |  |
 | Stack | `--stack-lg` |  |
+| Stack | `--stack-xl` |  |
+| Stack | `--stack-2xl` |  |
+| Stack | `--stack-3xl` |  |
 | Inline | `--inline-sm` |  |
 | Inline | `--inline-md` |  |
 | Inline | `--inline-lg` |  |
+| Inline | `--inline-xl` |  |
+| Inline | `--inline-2xl` |  |
+| Inline | `--inline-3xl` |  |
 | Radius | `--radius-sm` |  |
 | Radius | `--radius-md` |  |
 | Radius | `--radius-lg` |  |
@@ -139,11 +145,13 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Table | `--table-indent` (declared elsewhere) |  |
 | Table | `--table-radius` |  |
 | Table | `--table-pad-x-footer` (declared elsewhere) |  |
+| Table | `--table-inline` |  |
 | Table | `--table-footer-height` |  |
 | Table | `--table-min-width-title` (declared elsewhere) |  |
+| Table | `--table-empty-surface` |  |
+| Table | `--table-empty-radius` |  |
 | Blanket | `--blanket-pad-x` |  |
 | Blanket | `--blanket-pad-y` |  |
-| Blanket | `--blanket-fill` | the Blanket's own fill color; the old declaration's value, written directly so this file carries no old-language word |
 | Blanket | `--blanket-max-height-modal` | a calc() of the pad above: code only, no Figma variable |
 | Modal | `--modal-pad-x-default` |  |
 | Modal | `--modal-pad-x-spacious` |  |
@@ -154,13 +162,14 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Modal | `--modal-inline-md` (declared elsewhere) |  |
 | Modal | `--modal-inline-lg` (declared elsewhere) |  |
 | Modal | `--modal-radius` |  |
-| Modal | `--modal-width-xs` | 4 screen-grid columns plus 2 × 16 modal pad at 768 · 1024 · 1440 |
-| Modal | `--modal-width-sm` | lifted out of spacing / layout, beside the template’s pad/stack tokens |
-| Modal | `--modal-width-md` |  |
-| Modal | `--modal-width-lg` |  |
+| Modal | `--modal-width-4-col` | 4 screen-grid columns plus 2 × 16 modal pad at 768 · 1024 · 1440 |
+| Modal | `--modal-width-6-col` | lifted out of spacing / layout, beside the template’s pad/stack tokens |
+| Modal | `--modal-width-8-col` |  |
+| Modal | `--modal-width-10-col` |  |
 | Page | `--page-border-width` |  |
 | Table | `--table-overflow-reach` |  |
 | Modal | `--modal-body-min-height` |  |
+| Modal | `--modal-shadow` |  |
 | Popup | `--popup-pad` (declared elsewhere) |  |
 | Popup | `--popup-width-sm` (declared elsewhere) |  |
 | Popup | `--popup-width-md` (declared elsewhere) |  |
@@ -193,10 +202,20 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Button | `--button-radius-default` | nests in a 40-high field: its radius 10 minus the 4 slot inset = 6 |
 | Button | `--button-radius-compact` | nests in a 32-high field: its radius 8 minus the 4 slot inset = 4 |
 | Button | `--button-radius-spacious` | 48-high footer button; pairs with --control-xl |
+| Dialog | `--dialog-pad-x-default` |  |
+| Dialog | `--dialog-pad-x-spacious` |  |
+| Dialog | `--dialog-stack-sm` |  |
+| Dialog | `--dialog-stack-md` |  |
+| Dialog | `--dialog-stack-lg` |  |
+| Dialog | `--dialog-inline-sm` |  |
+| Dialog | `--dialog-inline-md` |  |
+| Dialog | `--dialog-inline-lg` |  |
+| Dialog | `--dialog-radius` |  |
+| Dialog | `--dialog-body-min-height` |  |
+| Dialog | `--dialog-shadow` |  |
 | Calendar | `--calendar-day-sm` |  |
 | Calendar | `--calendar-day-md` |  |
 | Calendar | `--calendar-day-lg` |  |
-| Calendar | `--calendar-nav-size` |  |
 | Progress indicator | `--progress-indicator-dot-size-8` | ProgressIndicator size 8 |
 | Progress indicator | `--progress-indicator-dot-size-12` | ProgressIndicator size 12 |
 | Checkbox | `--checkbox-control-size` |  |

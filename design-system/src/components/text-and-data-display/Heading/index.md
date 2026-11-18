@@ -70,7 +70,7 @@ Don't: The default ink on a dark ground, which barely reads.
 - `PageHeader`: use when rendering a page's top title row, which uses `Heading` by default.
 - Typography: use when checking the heading scale and document outline rules.
 
-Same group: `Code` · `CodeBlock` · `InlineEdit` · `Table` · `VisuallyHidden`
+Same group: `Code` · `CodeBlock` · `DynamicTable` · `InlineEdit` · `StaticTable` · `TreeTable` · `VisuallyHidden`
 
 ## Parts
 

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import {
     Banner, Breadcrumb, Button, EmptyState, FilterButton,
-    PopupSelect, SearchField, Skeleton, StatusTag, TextField,
+    PopupSelect, SearchField, Skeleton, StaticTable, StatusTag, TextField,
 } from '@/components';
-import { PatternCard, PatternSection, PatternTable } from '@/patterns';
+import { PatternCard, PatternSection, Table } from '@/patterns';
 
 export default {
     title: 'Patterns/Overview/Code examples',
@@ -99,13 +99,12 @@ export const Empty = {
     tags: ['pattern:Empty'],
     render: function EmptyExample() {
         return (
-            <PatternTable empty emptyState={
+            <Table title="Sessions" empty emptyState={
                 <EmptyState spacing="compact" header="No matching sessions" description="Try another search or reset the filters."
                     secondaryAction={<Button text="Reset filters" spacing="compact" />} />
             }>
-                <thead><tr><th>Student</th><th>Status</th></tr></thead>
-                <tbody />
-            </PatternTable>
+                <StaticTable headers={['Student', 'Status']} rows={[]} />
+            </Table>
         );
     },
 };

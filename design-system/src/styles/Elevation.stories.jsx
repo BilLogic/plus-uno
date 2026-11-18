@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import { Button, HeadingContextProvider, Modal, PanelBody, PanelContainer, PanelHeader, Popup, Select, Tooltip } from '@/components';
-import { Blanket, PatternCard, PatternSection, PatternTable } from '@/patterns';
+import { Button, DynamicTable, HeadingContextProvider, PanelBody, PanelContainer, PanelHeader, Popup, Select, StaticTable, Tooltip } from '@/components';
+import { Modal, PatternCard, PatternSection } from '@/patterns';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
 import { Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
@@ -235,15 +235,17 @@ export const SlotTable = {
 
 /* ----------------------------------------------------- surface and dark */
 
-/** The surfaces lowest to highest; in dark each step up is lighter. */
+/** The surfaces lowest to highest; in dark only overlays step lighter past the page. */
 export const Ladder = {
     render: () => <SurfaceLadder />,
     play: async ({ canvasElement }) => {
         const dark = canvasElement.querySelector('[data-ladder="dark"]');
         const steps = () => [...dark.querySelectorAll('[data-lightness]')].map((n) => Number(n.dataset.lightness));
         await waitFor(() => expect(steps().every((v) => v > 0)).toBe(true));
-        const l = steps();
-        for (let i = 1; i < l.length; i += 1) await expect(l[i], 'higher is lighter in dark').toBeGreaterThan(l[i - 1]);
+        const [sunken, page, raised, overlay] = steps();
+        await expect(page, 'page is lighter than sunken in dark').toBeGreaterThan(sunken);
+        await expect(raised, 'dark raised matches the page tone').toBe(page);
+        await expect(overlay, 'overlay steps lighter in dark').toBeGreaterThan(raised);
     },
 };
 
@@ -353,18 +355,18 @@ export const FloatingSidebar = {
 /** The Modal on its Blanket. */
 export const ModalOnBlanket = {
     render: () => (
-        <Blanket inline screenWidth={768} screenHeight={420}>
-            <Modal
-                show
-                renderAs="inline"
-                width="6-col"
-                title="Move session"
-                body="Move Thursday’s session with Ana Ruiz to 4:30 PM?"
-                primaryButton={{ text: 'Move session', onClick: () => {} }}
-                secondaryButton={{ text: 'Cancel', onClick: () => {} }}
-                onClose={() => {}}
-            />
-        </Blanket>
+        <Modal
+            inline
+            show
+            screenWidth={768}
+            screenHeight={420}
+            width="6-col"
+            title="Move session"
+            body="Move Thursday’s session with Ana Ruiz to 4:30 PM?"
+            primaryButton={{ text: 'Move session', onClick: () => {} }}
+            secondaryButton={{ text: 'Cancel', onClick: () => {} }}
+            onClose={() => {}}
+        />
     ),
     play: async ({ canvasElement }) => {
         const modal = canvasElement.querySelector('.plus-modal');
@@ -430,20 +432,22 @@ export const StickyHeaderScrolled = {
         const Demo = () => {
             const ref = useRef(null);
             useEffect(() => {
-                const scroller = ref.current?.querySelector('.plus-pattern-table-scroll');
+                const scroller = ref.current?.querySelector('.plus-table-shell-scroll');
                 if (scroller) scroller.scrollTop = scroller.scrollHeight;
             }, []);
             return (
                 <div ref={ref}>
                     <PatternSection title="Tutors">
-                        <PatternTable stickyHeader maxHeight="var(--card-max-height-sm)">
-                            <thead><tr><th>Tutor</th><th>Sessions</th></tr></thead>
-                            <tbody>
-                                {['Ana Ruiz', 'Ben Cho', 'Cara Diaz', 'Dev Shah', 'Eli Park', 'Fay Wu', 'Gus Lee', 'Hana Ito', 'Ivy Moss', 'Jon Bell'].map((n, i) => (
-                                    <tr key={n}><td>{n}</td><td>{12 - i}</td></tr>
-                                ))}
-                            </tbody>
-                        </PatternTable>
+                        <DynamicTable
+                            label="Tutors"
+                            stickyHeader
+                            maxHeight="var(--card-max-height-sm)"
+                            head={{ cells: [{ key: 'tutor', content: 'Tutor' }, { key: 'sessions', content: 'Sessions', align: 'number' }] }}
+                            rows={['Ana Ruiz', 'Ben Cho', 'Cara Diaz', 'Dev Shah', 'Eli Park', 'Fay Wu', 'Gus Lee', 'Hana Ito', 'Ivy Moss', 'Jon Bell'].map((n, i) => ({
+                                key: n,
+                                cells: [{ key: 'tutor', content: n }, { key: 'sessions', content: String(12 - i) }],
+                            }))}
+                        />
                     </PatternSection>
                 </div>
             );
@@ -451,7 +455,7 @@ export const StickyHeaderScrolled = {
         return <Demo />;
     },
     play: async ({ canvasElement }) => {
-        const scroller = canvasElement.querySelector('.plus-pattern-table-scroll');
+        const scroller = canvasElement.querySelector('.plus-table-shell-scroll');
         await expect(scroller).not.toBeNull();
         scroller.scrollTop = scroller.scrollHeight;
         scroller.dispatchEvent(new Event('scroll'));
@@ -495,7 +499,7 @@ export const ScrollShadow = {
     render: () => <ScrollShadowDemo />,
     play: async ({ canvasElement }) => {
         const root = canvasElement.querySelector('[data-testid="scroll-demo"]');
-        const scroller = root.querySelector('.plus-pattern-table-scroll');
+        const scroller = root.querySelector('.plus-table-shell-scroll');
         await expect(scroller).not.toBeNull();
         await expect(root).toHaveAttribute('data-progress', '0');
         scroller.scrollTop = 4;
@@ -559,7 +563,7 @@ export const LiftWithShadow = {
             </Do>
             <Dont caption="A gray fill reads as a hole in the page, and dark loses the step.">
                 <div style={ground}>
-                    <PatternCard title="Upcoming sessions" description="3 this week" style={{ background: 'var(--ds-surface-container)', boxShadow: 'none' }} />
+                    <PatternCard title="Upcoming sessions" description="3 this week" style={{ background: 'var(--ds-surface-sunken)', boxShadow: 'none' }} />
                 </div>
             </Dont>
         </DoDont>
@@ -617,9 +621,7 @@ export const BlockingOnBlanket = {
     render: () => (
         <DoDont>
             <Do caption="The Modal on the Blanket takes the blocking shadow.">
-                <Blanket inline screenWidth={360} screenHeight={300}>
-                    <Modal show renderAs="inline" width={280} title="Move session" body="To 4:30 PM?" primaryButton={{ text: 'Move', onClick: () => {} }} onClose={() => {}} />
-                </Blanket>
+                <Modal inline show screenWidth={360} screenHeight={300} width={280} title="Move session" body="To 4:30 PM?" primaryButton={{ text: 'Move', onClick: () => {} }} onClose={() => {}} />
             </Do>
             <Dont caption="A Panel with the blocking shadow and no Blanket. If it needs full attention, make it a Modal.">
                 <div style={ground}>
@@ -713,12 +715,10 @@ export const OneFocalPoint = {
                 <div style={ground}>
                     <PatternSection title="Sessions">
                         <PatternCard title="Next session" description="Today, 4:30 PM" />
-                        <PatternTable>
-                            <tbody>
-                                <tr><td>Past session</td><td>Monday</td></tr>
-                                <tr><td>Past session</td><td>Friday</td></tr>
-                            </tbody>
-                        </PatternTable>
+                        <StaticTable
+                            headers={['Session', 'Day']}
+                            rows={[['Past session', 'Monday'], ['Past session', 'Friday']]}
+                        />
                     </PatternSection>
                 </div>
             </Do>
@@ -736,7 +736,7 @@ export const OneFocalPoint = {
         await expect(pair).not.toBeNull();
         const cards = pair.querySelectorAll('.plus-pattern-card');
         await expect(cards).toHaveLength(4);
-        await expect(pair.querySelectorAll('.plus-pattern-table')).toHaveLength(1);
+        await expect(pair.querySelectorAll('.plus-static-table')).toHaveLength(1);
     },
 };
 

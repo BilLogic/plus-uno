@@ -1,0 +1,172 @@
+/**
+ * Table shell (the scroll region the Dynamic and Tree tables draw on): no-fill table, tokenized cell spacing, row states layered over
+ * whatever fill a cell already has. Never set a solid background on the table
+ * itself; the surrounding surface or card owns it.
+ */
+
+@use '../../../styles/state' as *;
+
+.plus-table-shell {
+    // How far past a sticky edge `clip-path` lets the overflow shadow reach.
+    // It must cover `--ds-shadow-overflow`'s blur (12px in dark, the widest
+    // mode), so it is a length of its own, with room to spare, rather than a
+    // multiple of the cell padding, which a density change would shrink until
+    // the shadow clipped. Raise it if the overflow shadow's blur grows.
+    --table-shell-overflow-reach: var(--table-overflow-reach);
+    // Sticky cells stack only inside the scroll region (which isolates), so
+    // these are local orders on the card layer: a sticky row or column rides
+    // over the body, and the corner cell over both.
+    --table-shell-z-sticky: var(--layer-card);
+    --table-shell-z-corner: calc(var(--table-shell-z-sticky) + 1);
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--stack-md);
+    background-color: transparent;
+    color: var(--ds-text);
+}
+
+.plus-table-shell-scroll {
+    overflow: auto;
+    // Sticky cells stack inside the table, never over the page around it.
+    isolation: isolate;
+
+    // A bounded table's scroll region takes keyboard focus: the focus ring,
+    // 2px offset 2px onto the surface.
+    &:focus-visible {
+        outline: var(--focus-ring-width) solid var(--ds-border-focused);
+        outline-offset: var(--focus-ring-width);
+    }
+}
+
+.plus-table-shell-table {
+    // The row state a row's cells draw over their fill: transparent at rest.
+    --plus-table-shell-row-state: transparent;
+
+    width: 100%;
+    // Separate borders, so a sticky cell carries its own rule as it moves; a
+    // collapsed border belongs to the table and stays behind.
+    border-collapse: separate;
+    border-spacing: 0;
+    background-color: transparent;
+
+    th,
+    td {
+        padding: var(--table-pad-y-cell) var(--table-pad-x-cell);
+        text-align: left;
+        border-bottom: var(--border-width-default) solid var(--ds-border);
+        font: var(--body-default);
+        color: var(--ds-text);
+        // Row states are layered over the fill, never swapped for it, so an
+        // opaque sticky cell keeps the highlight.
+        background-image: linear-gradient(var(--plus-table-shell-row-state), var(--plus-table-shell-row-state));
+    }
+
+    // A head cell is a group label, not a heading: Heading/xxsmall, over the
+    // head rule.
+    thead th {
+        font: var(--heading-xxs);
+        color: var(--ds-text-subtle);
+        border-bottom-color: var(--ds-border-bold);
+    }
+
+    @include plus-state(
+        (
+            hovered: (--plus-table-shell-row-state: var(--ds-background-neutral-subtle-hovered)),
+            pressed: (--plus-table-shell-row-state: var(--ds-background-neutral-subtle-pressed)),
+        ),
+        $ring: false,
+        $hovered-selector: 'tbody tr:hover',
+        $pressed-selector: 'tbody tr:active'
+    );
+
+    /*
+     * A selected row is neutral ink across the whole row, held under hover and
+     * press, never a stripe on one edge. The checkbox a selectable row carries
+     * is the cue that does not rest on color. `aria-selected` belongs to a row
+     * of a `role="grid"` table, the kind whose rows can be selected.
+     */
+    tbody tr[aria-selected=true] {
+        --plus-table-shell-row-state: var(--ds-background-selected);
+    }
+
+    @include plus-state(
+        (
+            hovered: (--plus-table-shell-row-state: var(--ds-background-selected-hovered)),
+            pressed: (--plus-table-shell-row-state: var(--ds-background-selected-pressed)),
+        ),
+        $ring: false,
+        $hovered-selector: 'tbody tr[aria-selected=true]:hover',
+        $pressed-selector: 'tbody tr[aria-selected=true]:active'
+    );
+}
+
+/*
+ * Sticky cells paint the current surface (the page's, or the raised card's they
+ * sit in) so they match it. A sticky edge takes the overflow shadow only while
+ * content is scrolled under it, and `clip-path` keeps that shadow on the side
+ * that faces the content.
+ */
+.plus-table-shell--sticky-header thead th {
+    position: sticky;
+    top: 0;
+    z-index: var(--table-shell-z-sticky);
+    background-color: var(--ds-utility-elevation-surface-current);
+}
+
+.plus-table-shell--sticky-column :is(th, td):first-child:not(.plus-table-message) {
+    position: sticky;
+    left: 0;
+    z-index: var(--table-shell-z-sticky);
+    background-color: var(--ds-utility-elevation-surface-current);
+}
+
+// The corner cell rides over both the sticky row and the sticky column.
+.plus-table-shell--sticky-header.plus-table-shell--sticky-column thead th:first-child {
+    z-index: var(--table-shell-z-corner);
+}
+
+.plus-table-shell--sticky-header .plus-table-shell-scroll[data-scrolled-y] thead th {
+    box-shadow: var(--ds-shadow-overflow);
+    clip-path: inset(0 0 calc(-1 * var(--table-shell-overflow-reach)) 0);
+}
+
+.plus-table-shell--sticky-column .plus-table-shell-scroll[data-scrolled-x] :is(th, td):first-child:not(.plus-table-message) {
+    box-shadow: var(--ds-shadow-overflow);
+    clip-path: inset(0 calc(-1 * var(--table-shell-overflow-reach)) 0 0);
+}
+
+.plus-table-shell--sticky-header.plus-table-shell--sticky-column .plus-table-shell-scroll[data-scrolled-x][data-scrolled-y] thead th:first-child {
+    clip-path: inset(0 calc(-1 * var(--table-shell-overflow-reach)) calc(-1 * var(--table-shell-overflow-reach)) 0);
+}
+
+/*
+ * An empty table renders its empty state in place of the whole table (no
+ * column headers, no footer). Center the block in a sunken, card-rounded box;
+ * EmptyState provides its own compact padding, while inline content gets the
+ * message row's spacing.
+ */
+.plus-table-shell-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--stack-sm);
+    width: 100%;
+    background-color: var(--table-empty-surface);
+    border-radius: var(--table-empty-radius);
+    color: var(--ds-text-subtle);
+    text-align: center;
+
+    &:not(:has(> .plus-empty-state)) {
+        padding: var(--table-pad-y-cell) var(--table-pad-x-cell);
+    }
+}
+
+.plus-table-shell-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--table-inline);
+    min-height: var(--table-footer-height);
+}
