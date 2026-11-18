@@ -212,7 +212,7 @@ export const Interactive = (args) => {
                     style={{
                         marginTop: 'var(--space-100)',
                         padding: 'var(--space-075)',
-                        backgroundColor: 'var(--ds-surface-container)',
+                        backgroundColor: 'var(--ds-surface-sunken)',
                         borderRadius: 'var(--radius-md)',
                     }}
                 >

@@ -75,7 +75,7 @@ const contentVariantCard = {
     padding: 'var(--pad-x-md)',
     border: 'var(--border-width-default) solid var(--ds-border)',
     borderRadius: 'var(--radius-lg)',
-    background: 'var(--ds-surface-container)',
+    background: 'var(--ds-surface-sunken)',
 };
 
 function PaginationContentDemos() {

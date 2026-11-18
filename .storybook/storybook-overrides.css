@@ -1040,7 +1040,7 @@ html[data-color-mode="dark"] .docs-story {
 }
 
 .docblock-typeset {
-  background: var(--ds-surface-container) !important;
+  background: var(--ds-surface-sunken) !important;
   border: var(--border-width-default) solid var(--ds-border) !important;
   border-radius: var(--radius-lg) !important;
   box-shadow: none !important;
@@ -1130,7 +1130,7 @@ html[data-color-mode="dark"] .docs-story {
 }
 
 .sbdocs .sb-ds-docs-source pre {
-    background: var(--ds-surface-container);
+    background: var(--ds-surface-sunken);
 }
 
 .sbdocs .sb-ds-docs-stories .docs-story {
