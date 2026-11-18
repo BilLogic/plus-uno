@@ -77,9 +77,15 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 
 ## Empty state
 
-<ComponentExample of={DynamicTableStories.Empty} title="Empty" description={<>With no rows, a cleared filter or a new account, <code>emptyView</code> replaces the whole table with <code>EmptyState</code>.</>} />
+<ComponentExample of={DynamicTableStories.Empty} title="Empty" description={<>With no rows, a cleared filter or a new account, <code>emptyView</code> replaces the whole table with <code>EmptyState</code> inside the sunken empty box.</>} />
 
-<ComponentExample of={DynamicTableStories.NoResults} title="No results" description={<>With <code>state="no results"</code>, <code>noResultsView</code> replaces the whole table with <code>EmptyState</code>.</>} />
+<ComponentExample of={DynamicTableStories.NoResults} title="No results" description={<>With <code>state="no results"</code>, <code>noResultsView</code> replaces the whole table with <code>EmptyState</code> inside the sunken empty box.</>} />
+
+<ComponentExample of={DynamicTableStories.EmptyNothingYet} title="Empty box: nothing yet" description={<>Title, one line and a default button repeating the Section title row's primary action.</>} />
+
+<ComponentExample of={DynamicTableStories.EmptyHiddenByFilter} title="Empty box: hidden by filter" description={<>The Section title and filter row stay above the box; clearing the filter reveals the rows.</>} />
+
+<ComponentExample of={DynamicTableStories.EmptyNothingToCreate} title="Empty box: nothing to create" description={<>Title and one line only when there is nothing to create.</>} />
 
 </div>
 
@@ -215,6 +221,8 @@ or page through a long result with pagination. It holds its own sort and page un
 <tr><td>Disabled row</td><td><code>--ds-text-disabled</code></td></tr>
 <tr><td>Row height</td><td><code>--row-height-sm</code>, <code>--row-height-md</code>, <code>--row-height-lg</code></td></tr>
 <tr><td>Cell padding</td><td><code>--table-pad-x-cell</code>, <code>--table-pad-y-cell</code></td></tr>
+<tr><td>Footer</td><td><code>--table-inline</code>, <code>--table-footer-height</code></td></tr>
+<tr><td>Empty state box</td><td><code>--table-empty-surface</code>, <code>--table-empty-radius</code></td></tr>
 <tr><td>Ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code></td></tr>
 </tbody>
 </DocsTable>

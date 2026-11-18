@@ -504,10 +504,31 @@
           }
         },
         {
+          "name": "Table/inline",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--table-inline)"
+          }
+        },
+        {
           "name": "Table/footer-height",
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--table-footer-height)"
+          }
+        },
+        {
+          "name": "Table/empty-surface",
+          "resolvedType": "COLOR",
+          "codeSyntax": {
+            "WEB": "var(--table-empty-surface)"
+          }
+        },
+        {
+          "name": "Table/empty-radius",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--table-empty-radius)"
           }
         },
         {

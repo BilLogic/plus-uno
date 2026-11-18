@@ -384,3 +384,43 @@ describe('DynamicTable half-controlled sort', () => {
         expect(bodyNames()[0]).toBe('Priya Nair');
     });
 });
+
+describe('DynamicTable empty state box cases', () => {
+    it('clears a filter from the empty state box to reveal rows and supports nothing-to-create with no buttons', () => {
+        const Filterable = () => {
+            const [filtered, setFiltered] = React.useState(true);
+            return (
+                <DynamicTable
+                    head={head}
+                    rows={filtered ? [] : rows}
+                    label="Students"
+                    state={filtered ? 'no results' : undefined}
+                    noResultsView={(
+                        <EmptyState
+                            spacing="compact"
+                            header="No students match these filters"
+                            description="Clear the filter to see every student."
+                            primaryAction={<button type="button" onClick={() => setFiltered(false)}>Clear filter</button>}
+                        />
+                    )}
+                />
+            );
+        };
+        const { container, rerender } = render(<Filterable />);
+        expect(container.querySelector('.plus-pattern-table-empty')).not.toBeNull();
+        fireEvent.click(screen.getByRole('button', { name: 'Clear filter' }));
+        expect(screen.getByRole('table')).toBeInTheDocument();
+        expect(screen.getByText('Ava Thompson')).toBeInTheDocument();
+
+        rerender(
+            <DynamicTable
+                head={head}
+                rows={[]}
+                label="Reflections"
+                emptyView={<EmptyState spacing="compact" header="Every reflection is reviewed" description="New ones arrive after Friday's sessions." />}
+            />
+        );
+        expect(container.querySelector('.plus-pattern-table-empty')).not.toBeNull();
+        expect(screen.queryAllByRole('button')).toHaveLength(0);
+    });
+});

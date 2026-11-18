@@ -1,12 +1,12 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
-import { alpha, computedShadow, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { alpha, computedShadow, tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
 import PatternTable from '@/patterns/PatternTable';
-import PatternSection from '@/patterns/PatternSection';
+import PatternSection, { SectionToolbar } from '@/patterns/PatternSection';
 import { Checkbox, Button, EmptyState as PlusEmptyState } from '@/components';
 
 const sampleRows = [
@@ -47,14 +47,14 @@ const paginationSlot = (
     </span>
 );
 
-/** The empty state replacing the table: icon, heading, description and action. */
+/** The empty state replacing the table: icon, heading, description and default action. */
 const emptyStateSlot = (
     <PlusEmptyState
         spacing="compact"
         icon="folder"
         header="No members yet"
         description="Members you invite show up here."
-        primaryAction={<Button text="Invite a member" appearance="subtle" spacing="compact" onClick={() => {}} />}
+        primaryAction={<Button text="Add member" appearance="default" spacing="compact" onClick={() => {}} />}
     />
 );
 
@@ -133,8 +133,9 @@ export const Overview = () => (
 );
 
 /**
- * The empty state replaces the whole table (no head row, no footer); the
- * Section header above stays usable. Held in all four modes.
+ * The empty state sits in a sunken, card-rounded box replacing the whole table
+ * (no head row, no footer); the Section header above stays usable. Held in all
+ * four modes.
  */
 export const EmptyState = {
     render: () => (
@@ -152,10 +153,119 @@ export const EmptyState = {
             await expect(canvas.queryAllByRole('columnheader'), `${mode}: no column headers`).toHaveLength(0);
             await expect(canvas.queryByText('Jordan Blake'), `${mode}: no body rows`).toBeNull();
             await expect(canvas.queryByText(/Pagination slot/), `${mode}: no pager without rows`).toBeNull();
+            const box = canvasElement.querySelector('.plus-pattern-table-empty');
+            await expect(box, `${mode}: empty box present`).not.toBeNull();
+            await expect(getComputedStyle(box).backgroundColor, `${mode}: empty box uses sunken surface`)
+                .toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+            await expect(px(getComputedStyle(box).borderTopLeftRadius), `${mode}: empty box uses card radius`)
+                .toBe(tokenLength(canvasElement, '--table-empty-radius'));
             await expect(canvas.getByRole('heading', { name: 'No members yet' }), `${mode}: EmptyState heading visible`).toBeVisible();
-            await expect(canvas.getByRole('button', { name: 'Invite a member' }), `${mode}: EmptyState action visible`).toBeVisible();
-            await expect(canvas.getByRole('button', { name: 'Add member' }), `${mode}: the Section header stays usable`).toBeEnabled();
+            const boxButton = within(box).getByRole('button', { name: 'Add member' });
+            await expect(boxButton, `${mode}: EmptyState default action visible`).toBeVisible();
+            await expect(boxButton.className, `${mode}: empty box button is default, not primary`).not.toContain('primary');
+            await expect(canvas.getAllByRole('button', { name: 'Add member' })[0], `${mode}: the Section header action stays usable`).toBeEnabled();
         });
+    },
+};
+
+const FilteredMembersTable = () => {
+    const [filtered, setFiltered] = React.useState(true);
+    const visible = filtered ? [] : sampleRows;
+    return (
+        <PatternSection
+            title="Team members"
+            toolbar={(
+                <SectionToolbar
+                    count={`${visible.length} members`}
+                    filters={(
+                        <Button
+                            text={filtered ? 'Role: Admin' : 'All roles'}
+                            appearance="subtle"
+                            spacing="compact"
+                            onClick={() => setFiltered((prev) => !prev)}
+                        />
+                    )}
+                />
+            )}
+        >
+            <PatternTable
+                empty={visible.length === 0}
+                emptyState={(
+                    <PlusEmptyState
+                        spacing="compact"
+                        icon="magnifying-glass"
+                        header="No members match this filter"
+                        description="Nothing matches Role: Admin. Clear the filter to see every member."
+                        primaryAction={(
+                            <Button
+                                text="Clear filter"
+                                appearance="default"
+                                spacing="compact"
+                                onClick={() => setFiltered(false)}
+                            />
+                        )}
+                    />
+                )}
+            >
+                {tableContent}
+            </PatternTable>
+        </PatternSection>
+    );
+};
+
+/**
+ * Empty because a default filter hides every row: the Section title and filter
+ * row stay above the sunken empty state box, and its button clears the filter.
+ */
+export const EmptyHiddenByFilter = {
+    name: 'Empty: Hidden by filter',
+    render: () => <FilteredMembersTable />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const box = canvasElement.querySelector('.plus-pattern-table-empty');
+        await expect(box, 'empty box rendered').not.toBeNull();
+        await expect(getComputedStyle(box).backgroundColor, 'empty box uses sunken surface')
+            .toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+        await expect(canvas.getByRole('button', { name: 'Role: Admin' }), 'filter stays above').toBeVisible();
+        const clear = within(box).getByRole('button', { name: 'Clear filter' });
+        await expect(clear.className, 'clear button is default').not.toContain('primary');
+        await userEvent.click(clear);
+        await expect(canvas.getByRole('table'), 'clearing the filter shows rows').toBeVisible();
+        await expect(canvas.getByText('Jordan Blake')).toBeVisible();
+    },
+};
+
+/**
+ * Empty when there is nothing to create: title and one line only, with no action button.
+ */
+export const EmptyNothingToCreate = {
+    name: 'Empty: Nothing to create',
+    render: () => (
+        <PatternSection title="Activity">
+            <PatternTable
+                empty
+                emptyState={(
+                    <PlusEmptyState
+                        spacing="compact"
+                        icon="clock"
+                        header="No activity yet"
+                        description="Completed sessions appear here automatically."
+                    />
+                )}
+            >
+                {tableContent}
+            </PatternTable>
+        </PatternSection>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const box = canvasElement.querySelector('.plus-pattern-table-empty');
+        await expect(box, 'empty box rendered').not.toBeNull();
+        await expect(getComputedStyle(box).backgroundColor, 'empty box uses sunken surface')
+            .toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+        await expect(canvas.getByRole('heading', { name: 'No activity yet' })).toBeVisible();
+        await expect(canvas.getByText('Completed sessions appear here automatically.')).toBeVisible();
+        await expect(canvas.queryAllByRole('button'), 'no action button when nothing to create').toHaveLength(0);
     },
 };
 
@@ -176,6 +286,7 @@ export const EmptyWithStickyColumn = {
         await expect(canvas.queryAllByRole('columnheader'), 'no sticky column headers when empty').toHaveLength(0);
         await expect(canvasElement.querySelector('.plus-pattern-table-scroll'), 'no scroll region when empty').toBeNull();
         await expect(canvas.getByRole('heading', { name: 'No members yet' })).toBeVisible();
+        await expect(canvas.getByRole('button', { name: 'Add member' })).toBeVisible();
     },
 };
 

@@ -14,7 +14,7 @@ Also asked as: list of records, data table on a page, sortable list, records wit
 
 **Source:** `design-system/src/patterns/PatternTable/PatternTable.jsx`
 
-**Stories:** `design-system/src/patterns/PatternTable/PatternTable.stories.jsx` — Overview, EmptyState, EmptyWithStickyColumn, Interactive, RowStates, Sticky, StickyHeaderNeedsMaxHeight, StickyHeader, StickyColumn, MotionAddRow, MotionAddRowReduced, MotionRemoveRow, MotionRemoveRowReduced, MotionReorderRows, MotionReorderRowsReduced
+**Stories:** `design-system/src/patterns/PatternTable/PatternTable.stories.jsx` — Overview, EmptyState, EmptyHiddenByFilter, EmptyNothingToCreate, EmptyWithStickyColumn, Interactive, RowStates, Sticky, StickyHeaderNeedsMaxHeight, StickyHeader, StickyColumn, MotionAddRow, MotionAddRowReduced, MotionRemoveRow, MotionRemoveRowReduced, MotionReorderRows, MotionReorderRowsReduced
 
 **Storybook page:** `design-system/src/patterns/PatternTable/PatternTable.mdx`
 
@@ -121,14 +121,16 @@ Row states are layered over each cell's fill, never swapped for it.
 | `--ds-border-bold` | color | The rule under the head row. |
 | `--ds-text`, `--body-default` | 14/20 | Body cells. |
 | `--ds-text-subtle`, `--heading-xxs` | color, type | Head cells, message rows, and empty-state wrapper text. |
-| `--table-pad-x-cell`, `--table-pad-y-cell`, `--stack-md` | length | Cell padding, the gap between table and footer, and the side pad (8) of message rows and plain empty-state wrappers. |
+| `--table-pad-x-cell`, `--table-pad-y-cell` | length | Cell padding, message row padding, and plain empty-state wrapper padding. |
+| `--table-inline`, `--table-footer-height` | 8, 48 | The gap between controls in the footer and the footer row height. |
+| `--table-empty-surface`, `--table-empty-radius` | color, 16 | The sunken background and card-rounded corners of the empty state box. |
 | `--ds-background-neutral-subtle-hovered`, `-pressed` | color | A hovered and a pressed row. |
 | `--ds-background-selected`, `-hovered`, `-pressed` | color | A selected row. |
 | `--ds-shadow-overflow` | shadow | A sticky edge, only while content is scrolled under it. |
 | `--ds-utility-elevation-surface-current` | color | The fill of sticky cells, so they match what the table sits on. |
 | `--ds-border-focused`, `--focus-ring-width` | focus ring | The ring of a scroll region. |
 | `--row-height-md` | 40 | The least height of the message row. |
-| `--section-stack-md`, `--stack-sm` | 16, 4 | Space around message rows and plain empty-state wrappers, and the gap inside them. |
+| `--stack-md`, `--stack-sm` | 8, 4 | Gap between the table and footer, and inside message and empty-state wrappers. |
 
 ## Content guidelines
 
@@ -156,7 +158,7 @@ Row states are layered over each cell's fill, never swapped for it.
 
 ## Tokens touched
 
-`--body-default` · `--border-width-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-border` · `--ds-border-bold` · `--ds-border-focused` · `--ds-shadow-overflow` · `--ds-text` · `--ds-text-subtle` · `--ds-utility-elevation-surface-current` · `--focus-ring-width` · `--heading-xxs` · `--layer-card` · `--pattern-table-overflow-reach` · `--pattern-table-z-corner` · `--pattern-table-z-sticky` · `--plus-pattern-table-row-state` · `--row-height-md` · `--section-stack-md` · `--space-0625` · `--stack-md` · `--stack-sm` · `--table-footer-height` · `--table-overflow-reach` · `--table-pad-x-cell` · `--table-pad-y-cell`
+`--body-default` · `--border-width-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-border` · `--ds-border-bold` · `--ds-border-focused` · `--ds-shadow-overflow` · `--ds-text` · `--ds-text-subtle` · `--ds-utility-elevation-surface-current` · `--focus-ring-width` · `--heading-xxs` · `--layer-card` · `--pattern-table-overflow-reach` · `--pattern-table-z-corner` · `--pattern-table-z-sticky` · `--plus-pattern-table-row-state` · `--row-height-md` · `--stack-md` · `--stack-sm` · `--table-empty-radius` · `--table-empty-surface` · `--table-footer-height` · `--table-inline` · `--table-overflow-reach` · `--table-pad-x-cell` · `--table-pad-y-cell`
 
 From `design-system/src/patterns/PatternTable/PatternTable.scss`. Override these through the token layer, never with a literal.
 

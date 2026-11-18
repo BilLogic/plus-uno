@@ -143,8 +143,9 @@
 
 /*
  * An empty table renders its empty state in place of the whole table (no
- * column headers, no footer). Center the block; EmptyState provides its own
- * compact padding, while inline content gets the message row's spacing.
+ * column headers, no footer). Center the block in a sunken, card-rounded box;
+ * EmptyState provides its own compact padding, while inline content gets the
+ * message row's spacing.
  */
 .plus-pattern-table-empty {
     display: flex;
@@ -153,10 +154,13 @@
     justify-content: center;
     gap: var(--stack-sm);
     width: 100%;
+    background-color: var(--table-empty-surface);
+    border-radius: var(--table-empty-radius);
     color: var(--ds-text-subtle);
+    text-align: center;
 
     &:not(:has(> .plus-empty-state)) {
-        padding: var(--section-stack-md) var(--table-pad-x-cell);
+        padding: var(--table-pad-y-cell) var(--table-pad-x-cell);
     }
 }
 
@@ -179,7 +183,7 @@
 
 .plus-pattern-table-table .plus-pattern-table-message {
     height: var(--row-height-md);
-    padding: var(--section-stack-md) var(--table-pad-x-cell);
+    padding: var(--table-pad-y-cell) var(--table-pad-x-cell);
     color: var(--ds-text-subtle);
     text-align: center;
 }
@@ -196,6 +200,6 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: var(--space-0625);
+    gap: var(--table-inline);
     min-height: var(--table-footer-height);
 }
