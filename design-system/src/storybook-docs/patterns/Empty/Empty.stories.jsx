@@ -3,6 +3,7 @@ import { expect, userEvent, within } from 'storybook/test';
 
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { expectSectionHeader } from '@/storybook-docs/lib/section-header-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import { EmptyType, FullPage, InCard, InPanel, InTable, SMALL_STAGE, STAGE, TYPE_STAGE } from './emptyDemo.jsx';
@@ -110,7 +111,7 @@ export const PlaceFullPage = {
     },
 };
 
-/** A table: the empty state replaces the whole table (no head row, no footer); the view bar stays. */
+/** A table: the empty state replaces the whole table (no head row, no footer); the header rows stay. */
 export const PlaceTable = {
     name: 'Place: In a table',
     render: () => staged(<InTable />),
@@ -121,7 +122,8 @@ export const PlaceTable = {
         await expect(canvas.queryByRole('table'), 'no table, so no column headers and no footer').toBeNull();
         await expect(canvas.queryAllByRole('columnheader'), 'no column headers').toHaveLength(0);
         await expect(canvas.queryByRole('navigation'), 'no pagination').toBeNull();
-        await expect(canvasElement.querySelector('.plus-section-view-bar'), 'the view bar stays').not.toBeNull();
+        await expect(canvasElement.querySelector('.plus-section-rows'), 'the header rows stay').not.toBeNull();
+        await expectSectionHeader(canvasElement, 1);
         await expect(canvas.getByRole('heading', { name: 'No students in this group yet' })).toBeVisible();
         await fitsCanvas(canvasElement);
     },

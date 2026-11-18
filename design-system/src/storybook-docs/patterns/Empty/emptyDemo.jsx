@@ -6,8 +6,9 @@ import { DemoPageHeader, SessionsTable } from '../../../patterns/Page/pageDemo.j
 import { GonePanel } from '../../../patterns/Panel/panelDemo.jsx';
 import { ResetExampleButton } from '@/storybook-docs/lib/reset-example.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
-import { StudentsTable, ViewBar } from '@/storybook-docs/lib/view-bar.jsx';
-import { CATEGORIES, QuickFilter } from '../Filtering/filteringDemo.jsx';
+import { HeaderSearch, SectionActions, categoryFilters } from '@/storybook-docs/lib/section-header.jsx';
+import { StudentsTable, ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
+import { CATEGORIES } from '../Filtering/filteringDemo.jsx';
 
 /**
  * The Empty pattern's examples: the real EmptyState in the four types and the
@@ -123,7 +124,7 @@ export const FullPage = () => (
 const NO_MATCHES_FILTERS = { grade: ['Grade 6'], subject: ['Math'] };
 const CLEARED_FILTERS = { grade: [], subject: [] };
 
-/** A Section whose table is empty: the empty state replaces the whole table; the view bar above stays. */
+/** A Section whose table is empty: the empty state replaces the whole table; the header rows above stay. */
 export const InTable = ({ kind = 'first' }) => {
     const [view, setView] = useState('All students');
     const [resolved, setResolved] = useState(false);
@@ -135,28 +136,22 @@ export const InTable = ({ kind = 'first' }) => {
         if (updated.grade.length === 0 || updated.subject.length === 0) setResolved(true);
     };
 
+    const changeView = (next) => {
+        setView(next);
+        setResolved(false);
+        if (kind === 'matches' && next === 'All students') setFilters(NO_MATCHES_FILTERS);
+    };
+
     return (
         <div style={{ padding: 'var(--page-pad)', boxSizing: 'border-box' }}>
             <PatternSection
                 title="Students"
                 description="Lincoln Middle"
-                tabs={(
-                    <ViewBar
-                        views={['All students', 'Needs follow-up']}
-                        activeView={view}
-                        onViewChange={(next) => {
-                            setView(next);
-                            setResolved(false);
-                            if (kind === 'matches' && next === 'All students') setFilters(NO_MATCHES_FILTERS);
-                        }}
-                        filters={kind === 'matches' ? (
-                            <>
-                                <QuickFilter category={CATEGORIES.grade} value={resolved ? CLEARED_FILTERS : filters} onPick={pickFilter} />
-                                <QuickFilter category={CATEGORIES.subject} value={resolved ? CLEARED_FILTERS : filters} onPick={pickFilter} />
-                            </>
-                        ) : null}
-                    />
-                )}
+                actions={<SectionActions />}
+                views={<ViewPills views={['All students', 'Needs follow-up']} activeView={view} onViewChange={changeView} />}
+                search={kind === 'matches' ? <HeaderSearch /> : undefined}
+                filters={kind === 'matches' ? categoryFilters([CATEGORIES.grade, CATEGORIES.subject], resolved ? CLEARED_FILTERS : filters, pickFilter) : undefined}
+                onClearAll={() => { setResolved(true); setFilters(CLEARED_FILTERS); }}
             >
                 {showingRows ? (
                     <StudentsTable count={4} view={view} sortable />

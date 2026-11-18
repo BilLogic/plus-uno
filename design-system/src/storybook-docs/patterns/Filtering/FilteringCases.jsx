@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 
-import { FilterMenu, IconButton, SearchField, Tag, TagGroup } from '@/components';
+import { FilterMenu, IconButton, Tag, TagGroup } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { PatternSection } from '@/patterns';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
-import { StudentsTable, ViewBar, ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
+import { HeaderSearch, categoryFilters } from '@/storybook-docs/lib/section-header.jsx';
+import { StudentsTable, ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
 import { CATEGORIES, QuickFilter, narrow } from './filteringDemo.jsx';
 
 /**
  * Live Do / Don't cases on the Filtering pattern page, composed from
- * `PatternSection`, `ViewBar`, `QuickFilter`, `FilterMenu`, `SearchField`,
+ * `PatternSection` and its header props, `ViewPills`, `QuickFilter`, `FilterMenu`,
  * `TagGroup`, and `StudentsTable`.
  */
 
@@ -19,23 +20,16 @@ const useQuickFilters = (initial = {}) => {
     return [value, pick];
 };
 
-const renderQuickFilters = (ids, value, pick, placement = 'bottom-end') => ids.map((id) => (
-    <QuickFilter
-        key={id}
-        category={CATEGORIES[id]}
-        value={value}
-        onPick={pick}
-        placement={placement}
-    />
-));
+const QUICK = (ids) => ids.map((id) => CATEGORIES[id]);
 
 const FilteringCaseSection = ({
     views = ['All students'],
     activeView,
     onViewChange,
-    start,
+    viewsNode,
     search = false,
     filters,
+    format,
     rows,
     limit,
     beforeTable,
@@ -54,27 +48,10 @@ const FilteringCaseSection = ({
             <HeadingLevelContext.Provider value={4}>
                 <PatternSection
                     title="Students"
-                    type="tabs-only"
-                    tabs={(
-                        <ViewBar
-                            views={views}
-                            activeView={activeView}
-                            onViewChange={onViewChange}
-                            start={start}
-                            search={search ? (
-                                <SearchField
-                                    placeholder="Search students"
-                                    spacing="compact"
-                                    isCollapsible
-                                    value={query}
-                                    onValueChange={setQuery}
-                                />
-                            ) : false}
-                            more={false}
-                            primary={null}
-                            filters={filters}
-                        />
-                    )}
+                    views={viewsNode ?? <ViewPills views={views} activeView={activeView} onViewChange={onViewChange} />}
+                    format={format}
+                    search={search ? <HeaderSearch value={query} onValueChange={setQuery} /> : undefined}
+                    filters={filters}
                 >
                     {beforeTable ? (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
@@ -95,7 +72,7 @@ export const OneTierCase = () => {
     const [value, pick] = useQuickFilters();
     return (
         <FilteringCaseSection
-            filters={renderQuickFilters(['grade', 'school', 'subject'], value, pick)}
+            filters={categoryFilters(QUICK(['grade', 'school', 'subject']), value, pick)}
             rows={narrow(value)}
             limit={3}
         />
@@ -108,16 +85,14 @@ export const TwoTiersCase = () => {
     const [menuValue, setMenuValue] = useState({ subject: [], tutor: [] });
     return (
         <FilteringCaseSection
-            filters={(
-                <>
-                    {renderQuickFilters(['grade', 'school'], value, pick)}
-                    <FilterMenu
-                        categories={[CATEGORIES.subject, CATEGORIES.tutor]}
-                        value={menuValue}
-                        onApply={setMenuValue}
-                        layout="side-by-side"
-                    />
-                </>
+            filters={categoryFilters(QUICK(['grade', 'school']), value, pick)}
+            format={(
+                <FilterMenu
+                    categories={[CATEGORIES.subject, CATEGORIES.tutor]}
+                    value={menuValue}
+                    onApply={setMenuValue}
+                    layout="side-by-side"
+                />
             )}
             rows={narrow({ ...value, ...menuValue })}
             limit={3}
@@ -135,7 +110,7 @@ export const FiltersAtEndCase = () => {
             activeView={view}
             onViewChange={setView}
             search
-            filters={renderQuickFilters(['grade', 'school'], value, pick)}
+            filters={categoryFilters(QUICK(['grade', 'school']), value, pick)}
             rows={narrow(value)}
             limit={3}
         />
@@ -149,10 +124,12 @@ export const FiltersAmongViewsCase = () => {
     return (
         <FilteringCaseSection
             search
-            start={(
+            viewsNode={(
                 <>
                     <ViewPills views={['All students', 'Needs follow-up']} activeView={view} onViewChange={setView} />
-                    {renderQuickFilters(['grade', 'school'], value, pick, 'bottom-start')}
+                    {['grade', 'school'].map((id) => (
+                        <QuickFilter key={id} category={CATEGORIES[id]} value={value} onPick={pick} placement="bottom-start" />
+                    ))}
                 </>
             )}
             activeView={view}
@@ -167,7 +144,7 @@ export const CountOnIconCase = () => {
     const [value, setValue] = useState({ grade: ['Grade 7'], school: ['Lincoln Middle'] });
     return (
         <FilteringCaseSection
-            filters={(
+            format={(
                 <FilterMenu
                     categories={[CATEGORIES.grade, CATEGORIES.school]}
                     value={value}
@@ -189,7 +166,7 @@ export const TagRowCase = () => {
     };
     return (
         <FilteringCaseSection
-            filters={(
+            format={(
                 <FilterMenu
                     categories={[CATEGORIES.grade, CATEGORIES.school]}
                     value={value}

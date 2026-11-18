@@ -7,7 +7,8 @@ import { Page, PatternCard, PatternSection, SECTION_DETAIL_FLOOR } from '@/patte
 import { FRAME_LAYOUT } from '@/patterns/Frame/frameLayout';
 import { useOwnWidth } from '@/patterns/Frame/useOwnWidth';
 import { PageTabs, SessionsTable } from '@/patterns/Page/pageDemo.jsx';
-import { FilterSide, StudentsTable, ViewBar, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
+import { SectionActions, categoryFilters } from '@/storybook-docs/lib/section-header.jsx';
+import { FilterSide, StudentsTable, ViewPills, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
 
 /**
  * The Filtering pattern's examples: a real Section with its view bar, the
@@ -123,7 +124,6 @@ export const FilteredStudents = ({
     views = ['All students', 'Needs follow-up'],
     start,
     loading = false,
-    sectionType,
     pageTabs = false,
 }) => {
     const ref = useRef(null);
@@ -165,15 +165,16 @@ export const FilteredStudents = ({
         }
         : {});
 
-    let filters = null;
-    if (tier === '1' && !folded) {
-        filters = cats.map((category) => (
-            <QuickFilter key={category.id} category={category} value={value} onPick={pick} {...menuProps(category.id)} mount={mount} />
-        ));
+    // The Section draws row 3 itself: tier 1 hands it "Field: value" triggers, and a folded or side-less width opens the side. A Filter icon menu is the one control at the end of the views row.
+    const opensSide = (entries) => entries.map((entry) => ({ ...entry, onClick: () => setShowSide(true) }));
+    let filters;
+    let menu = null;
+    if (tier === '1') {
+        filters = folded ? opensSide(categoryFilters(cats, value, pick)) : categoryFilters(cats, value, pick);
     } else if (tier === '2a') {
-        filters = <OneListMenu category={cats[0]} value={value} onPick={pick} {...menuProps('filters')} mount={mount} />;
-    } else if (tier === '2b' || tier === '2c' || folded) {
-        filters = (
+        menu = <OneListMenu category={cats[0]} value={value} onPick={pick} {...menuProps('filters')} mount={mount} />;
+    } else if (tier === '2b' || tier === '2c') {
+        menu = (
             <FilterMenu
                 categories={cats}
                 value={value}
@@ -184,11 +185,11 @@ export const FilteredStudents = ({
             />
         );
     } else if (tier === '3' && !sideFits) {
-        filters = <IconButton icon="filter" label="Filters" appearance="subtle" trailingMetric={count || undefined} onClick={() => setShowSide(true)} />;
+        filters = opensSide(categoryFilters(cats, value, pick));
     }
 
-    // A menu a press opens mounts where `container` points at that moment: until the picture's element is in state, those filters wait, so no menu lands on the page. A held-open menu waits on its own (`held`).
-    if (mount === null && !openMenu) filters = null;
+    // A menu a press opens mounts where `container` points at that moment: until the picture's element is in state, that menu waits, so none lands on the page. A held-open menu waits on its own (`held`).
+    if (mount === null && !openMenu) menu = null;
 
     const status = <span role="status" style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{countWords(rows, value)}</span>;
     const swapKey = `${activeView}:${JSON.stringify(value)}`;
@@ -222,7 +223,7 @@ export const FilteredStudents = ({
     );
 
     let body = <>{status}{results}</>;
-    if (tier === '3') {
+    if (tier === '3' || folded) {
         const toggle = (v) => {
             const id = cats.find((category) => category.options.includes(v)).id;
             pick(id, value[id].includes(v) ? value[id].filter((x) => x !== v) : [...value[id], v]);
@@ -235,7 +236,7 @@ export const FilteredStudents = ({
                 filters={cats.map((category) => [category.label, category.options])}
             />
         );
-        if (sideFits) {
+        if (tier === '3' && sideFits) {
             body = (
                 <div style={{ display: 'grid', gridTemplateColumns: 'minmax(var(--section-min-width-side), 3fr) minmax(0, 9fr)', gap: 'var(--grid-gutter)' }}>
                     <section aria-label="Filters">{side}</section>
@@ -280,25 +281,19 @@ export const FilteredStudents = ({
                         <PatternSection
                             title="Students"
                             description="Lincoln Middle"
-                            type={pageTabs ? 'tabs-only' : sectionType}
-                            tabs={(
-                                <ViewBar
-                                    views={views}
-                                    activeView={activeView}
-                                    onViewChange={setActiveView}
-                                    start={start
-                                        ? start(mount, {
-                                            activeView,
-                                            onViewChange: setActiveView,
-                                            open: openMenu === 'view' ? mount !== null && activeMenu === 'view' : undefined,
-                                            onOpenChange: openMenu === 'view' ? (next) => setActiveMenu(next ? 'view' : null) : undefined,
-                                        })
-                                        : undefined}
-                                    filters={filters}
-                                    primary="Add students"
-                                    narrow={width < FRAME_LAYOUT.fullWidthBelow}
-                                />
-                            )}
+                            actions={<SectionActions primary="Add students" more={false} />}
+                            views={start
+                                ? start(mount, {
+                                    activeView,
+                                    onViewChange: setActiveView,
+                                    open: openMenu === 'view' ? mount !== null && activeMenu === 'view' : undefined,
+                                    onOpenChange: openMenu === 'view' ? (next) => setActiveMenu(next ? 'view' : null) : undefined,
+                                })
+                                : <ViewPills views={views} activeView={activeView} onViewChange={setActiveView} />}
+                            format={menu ?? undefined}
+                            filters={filters}
+                            onClearAll={reset}
+                            onOpenFilters={() => setShowSide(true)}
                         >
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>{body}</div>
                         </PatternSection>

@@ -15,18 +15,18 @@ import {
 vi.mock('@storybook/addon-docs/blocks', () => import('@/storybook-docs/lib/addon-docs-blocks-mock.jsx'));
 
 describe('Filtering live cases and links', () => {
-    it('OneTierCase and TwoTiersCase render non-inert live view bar filter controls', async () => {
+    it('OneTierCase and TwoTiersCase render non-inert live Section header filter triggers', async () => {
         const user = userEvent.setup();
         const { container, unmount } = render(<OneTierCase />);
         expect(container.querySelector('[inert]')).toBeNull();
-        expect(screen.getByRole('button', { name: 'Grade' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'School' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Subject' })).toBeInTheDocument();
+        expect(container.querySelector('.plus-section-row--filters')).not.toBeNull();
+        expect(screen.getByRole('button', { name: 'Grade: All' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'School: All' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Subject: All' })).toBeInTheDocument();
         expect(screen.queryByRole('button', { name: /^Filters/ })).toBeNull();
 
-        await user.click(screen.getByRole('button', { name: 'Grade' }));
-        await user.click(await screen.findByRole('option', { name: 'Grade 7' }));
-        expect(screen.getByRole('button', { name: /Grade/ })).toHaveTextContent('1');
+        await user.click(screen.getByRole('button', { name: 'Grade: All' }));
+        expect(screen.getByRole('button', { name: 'Grade: Grade 6' })).toHaveAttribute('aria-pressed', 'true');
         unmount();
 
         render(<TwoTiersCase />);
@@ -35,7 +35,7 @@ describe('Filtering live cases and links', () => {
         expect(await screen.findByRole('checkbox', { name: 'Math' })).toBeInTheDocument();
     });
 
-    it('FiltersAtEndCase and FiltersAmongViewsCase render live view tabs, ViewBar slots, and SearchField', async () => {
+    it('FiltersAtEndCase and FiltersAmongViewsCase render live view tabs, Section header slots, and SearchField', async () => {
         const user = userEvent.setup();
         const { unmount } = render(<FiltersAtEndCase />);
         const followUp = screen.getByRole('tab', { name: 'Needs follow-up' });
@@ -44,11 +44,10 @@ describe('Filtering live cases and links', () => {
         unmount();
 
         const { container } = render(<FiltersAmongViewsCase />);
-        expect(container.querySelector('.plus-section-view-bar')).not.toBeNull();
+        expect(container.querySelector('.plus-section-rows')).not.toBeNull();
         expect(screen.getByRole('tab', { name: 'All students' })).toHaveAttribute('aria-selected', 'true');
         expect(screen.getByRole('button', { name: 'Grade' })).toBeInTheDocument();
 
-        await user.click(screen.getByRole('button', { name: 'Search students' }));
         const searchbox = await screen.findByRole('searchbox', { name: 'Search students' });
         await user.type(searchbox, 'Sofia');
         expect(screen.getByText('Sofia Ramirez')).toBeInTheDocument();
