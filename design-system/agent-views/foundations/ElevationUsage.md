@@ -23,7 +23,7 @@ Pick the level by what the surface does, never by how strong a shadow looks. Ans
 
 ## Surface color and dark mode
 
-Higher is lighter. In light the lifted surfaces share the page color and the shadow lifts them; in dark the surface itself steps up.
+In light the lifted surfaces share the page color and the shadow lifts them; in dark, Raised keeps the page tone and is told apart by its shadow, while overlay surfaces still step up.
 
 Dark blocking is the same as dark overlay. On the dark Blanket a shadow barely shows, so the lighter overlay surface is what lifts the Modal.
 
