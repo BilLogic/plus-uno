@@ -59,6 +59,8 @@ foundations say which to reach for and why.
 - Choose the tier first (component, then template, then semantics, then primitives), then pick the token.
 - Use primitives only for token-definition work, never in feature implementation.
 - Fallback rule: reach for a component token first; if none fits, the template token; failing that, the semantic step. A template token is one whose value would change if the template changed.
+- Section and Page tokens are never used as general gaps.
+- Demo-only container sizes in stories (example frames such as 296, 420, 800) may stay literals with a `/* demo frame */` note.
 
 ## Known drift
 
