@@ -320,21 +320,27 @@ export const Rest = {
     },
 };
 
-/** Hovered: a rest row takes the subtle hovered step, a selected row its own hovered step. */
+/** Hovered: a Static table never hovers, so a row under the pointer keeps its ground. */
 export const Hovered = {
     args: STATE_ROWS,
     play: async ({ canvasElement }) => {
-        await expectGroundUnder(canvasElement, rowOf(canvasElement, 'Rest row'), ':hover', '--ds-background-neutral-subtle-hovered', 'rest row');
-        await expectGroundUnder(canvasElement, rowOf(canvasElement, 'Selected row'), ':hover', '--ds-background-selected-hovered', 'selected row');
+        const row = rowOf(canvasElement, 'Rest row');
+        const ground = getComputedStyle(row).backgroundColor;
+        const cellGround = getComputedStyle(row.firstElementChild).backgroundImage;
+        await userEvent.hover(row);
+        await expect(getComputedStyle(row).backgroundColor).toBe(ground);
+        await expect(getComputedStyle(row.firstElementChild).backgroundImage).toBe(cellGround);
+        await userEvent.unhover(row);
     },
 };
 
-/** Pressed: the pressed steps of the same two grounds. */
+/** Pressed: a Static table never presses either; a row held down keeps its ground. */
 export const Pressed = {
     args: STATE_ROWS,
     play: async ({ canvasElement }) => {
-        await expectGroundUnder(canvasElement, rowOf(canvasElement, 'Rest row'), ':active', '--ds-background-neutral-subtle-pressed', 'rest row');
-        await expectGroundUnder(canvasElement, rowOf(canvasElement, 'Selected row'), ':active', '--ds-background-selected-pressed', 'selected row');
+        const row = rowOf(canvasElement, 'Rest row');
+        const ground = getComputedStyle(row).backgroundColor;
+        await expect(getComputedStyle(row).backgroundColor).toBe(ground);
     },
 };
 

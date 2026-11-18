@@ -69,8 +69,8 @@ Same group: `Code` · `CodeBlock` · `DynamicTable` · `Heading` · `InlineEdit`
 | State | What changes |
 | --- | --- |
 | Rest | Clear row; a striped table shades alternate rows. |
-| Hovered | With `hover` on: the subtle hovered ground; selected rows take the selected hovered ground. |
-| Pressed | The pressed steps of the same grounds. |
+| Hovered | Not applicable; a Static table never hovers. |
+| Pressed | Not applicable; a Static table never presses. |
 | Focused | Not applicable; a row is not a control. |
 | Disabled | Disabled ink, no pointer events, `aria-disabled`. |
 | Invalid | A cell with `state: 'error'` takes the danger ink. |
