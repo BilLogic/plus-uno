@@ -2721,7 +2721,7 @@
         "--checkbox-control-size",
         "--choice-grid-control-size-10",
         "--choice-grid-control-size-12",
-        "--ds-surface-container",
+        "--ds-surface-sunken",
         "--ds-text",
         "--ds-text-subtle",
         "--pad-x-md",

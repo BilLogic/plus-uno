@@ -19,7 +19,7 @@ Six levels, lowest first. A surface and its shadow always travel together.
 | Level | Surface | Shadow |
 | --- | --- | --- |
 
-Raised and overlay have `-hovered` and `-pressed` surfaces for a surface that can be clicked. `--ds-surface-container` is a translucent well inside a surface, and it is not a level.
+Raised and overlay have `-hovered` and `-pressed` surfaces for a surface that can be clicked.
 
 ## Choose by behavior
 
