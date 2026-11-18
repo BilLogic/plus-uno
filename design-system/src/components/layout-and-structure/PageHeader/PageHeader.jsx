@@ -32,7 +32,7 @@ export const PageHeader = ({
                 </div>
                 {actions && <div className="plus-page-header-actions">{actions}</div>}
             </div>
-            {bottomBar && <div className="plus-page-header-bottom">{bottomBar}</div>}
+            {bottomBar && <div className="plus-page-header-bottom-bar">{bottomBar}</div>}
         </header>
     );
 };
