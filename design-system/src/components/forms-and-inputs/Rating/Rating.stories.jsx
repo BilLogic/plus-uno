@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
@@ -50,7 +51,7 @@ export default {
     }
 };
 
-const ratingCol = { display: 'flex', flexDirection: 'column', gap: '32px' /* token gap: 32px */, maxWidth: 'var(--content-max-width-reading)' };
+const ratingCol = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--content-max-width-reading)' };
 
 export const Overview = () => {
     const [value, setValue] = useState(3);
@@ -161,6 +162,14 @@ Interactive.args = {
     isRequired: false,
     variant: 'comments',
     isDisabled: false,
+};
+Interactive.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const star4 = canvas.getByRole('radio', { name: 'Rate 4' });
+    await userEvent.click(star4);
+    await settleAnimations(canvasElement);
+    await expect(star4).toHaveAttribute('aria-checked', 'true');
+    await expect(getComputedStyle(star4.querySelector('i')).color).toBe(tokenColor(canvasElement, '--ds-icon-selected'));
 };
 
 /** Each prop shows up in the DOM: numeric labels, comments label, icon family, minority marker. */

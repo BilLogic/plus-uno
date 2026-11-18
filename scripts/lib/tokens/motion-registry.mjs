@@ -629,7 +629,7 @@ export const MOTION_REGISTRY = [
     name: 'Pagination',
     tier: 'component',
     events: {
-      change: { transition: 'Step to the next or previous', spatial: 'spatial.default', note: 'A page change is Step.' },
+      change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'Page segments change fill and ink in place; the paged body uses Step.' },
     },
   },
   {
@@ -729,7 +729,7 @@ export const MOTION_REGISTRY = [
     name: 'Spinner',
     tier: 'component',
     events: {
-      change: { transition: 'Load content', appearance: 'linear', note: 'Turns while work runs and stops the moment it stops. A static label in reduced motion.' },
+      change: { transition: 'Load content', appearance: 'loop', note: 'Swings on the loop spring while work runs and stops the moment it stops. A static label in reduced motion.' },
     },
   },
   {

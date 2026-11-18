@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { RadioGroup as BaseRadioGroup } from '@base-ui/react/radio-group';
 import { Radio as BaseRadio } from '@base-ui/react/radio';
+import { STAGGER } from '@/lib/listMotion';
+import { useMotionReduced } from '@/lib/motionPreference';
 import useFieldId from '../useFieldId';
 import { LabelMarker } from '../_internal/FieldFrame';
 import Icon from '../../images-and-icons/Icon';
@@ -141,14 +143,20 @@ const RatingItem = ({
     icon = 'star',
     disabled = false,
     className = '',
+    style,
     ...props
 }) => {
+    const reduced = useMotionReduced();
     const itemClasses = [
         'plus-rating-item',
         selected ? 'plus-rating-item-selected' : 'plus-rating-item-unselected',
         disabled ? 'plus-rating-item-disabled' : '',
         className
     ].filter(Boolean).join(' ');
+
+    const itemStyle = selected && !reduced
+        ? { '--plus-rating-stagger': `${(value - 1) * STAGGER.gap}ms`, ...style }
+        : style;
 
     return (
         <div className="plus-rating-item-wrapper">
@@ -168,6 +176,7 @@ const RatingItem = ({
                 value={value}
                 disabled={disabled}
                 className={itemClasses}
+                style={itemStyle}
                 aria-label={`Rate ${value}`}
                 {...props}
             >
