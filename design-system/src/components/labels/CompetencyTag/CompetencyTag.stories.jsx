@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Button } from '@/components';
+import { Button, Heading } from '@/components';
 import { expect, spyOn, userEvent, within } from 'storybook/test';
 
-import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 
-import CompetencyTag, { COMPETENCY_TAG_SUBJECTS } from './CompetencyTag';
+import CompetencyTag, { COMPETENCY_TAG_SPACINGS, COMPETENCY_TAG_SUBJECTS } from './CompetencyTag';
 import { expectGroundUnder, expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 
@@ -76,6 +76,7 @@ Overview.play = async ({ canvasElement }) => {
     for (const subject of COMPETENCY_TAG_SUBJECTS) {
         const el = canvas.getByTestId(subject);
         const color = SUBJECT_COLOR[subject];
+        await expect(px(getComputedStyle(el).height), `${subject} is 20 tall`).toBe(20);
         await expect(getComputedStyle(el).borderColor, `${subject} border`).toBe(token(`--ds-border-accent-${color}-subtle`));
 
         const glyph = iconIn(el);
@@ -164,16 +165,40 @@ UnknownSubjectFallsBack.play = async ({ canvasElement }) => {
     }
 };
 
+/** `spacing="spacious"` draws 32 beside a heading, with 14/20 text and a 16 icon. */
+export const BesideHeading = () => (
+    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}>
+        <Heading size="large">Mastering linear equations</Heading>
+        <CompetencyTag subject="mastering-content" spacing="spacious" data-testid="spacious" />
+    </div>
+);
+BesideHeading.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const heading = canvas.getByRole('heading', { name: 'Mastering linear equations' });
+    const el = canvas.getByTestId('spacious');
+    const s = getComputedStyle(el);
+
+    await expect(px(s.height), 'spacious CompetencyTag is 32 tall').toBe(32);
+    await expect(px(s.borderTopLeftRadius), 'spacious uses control-md radius 8').toBe(8);
+    await expect(px(s.fontSize), 'spacious text is 14').toBe(14);
+    await expect(px(getComputedStyle(iconIn(el)).fontSize), 'spacious icon is 16').toBe(16);
+    await expect(el.getBoundingClientRect().left, 'sits beside the heading').toBeGreaterThanOrEqual(
+        heading.getBoundingClientRect().right,
+    );
+};
+
 /* -------------------------------------------------------------- playground */
 
 /** Interactive playground. */
 export const Interactive = {
     args: {
         subject: 'mastering-content',
+        spacing: 'default',
         text: '',
     },
     argTypes: {
         subject: { control: 'select', options: COMPETENCY_TAG_SUBJECTS },
+        spacing: { control: 'radio', options: COMPETENCY_TAG_SPACINGS },
     },
     render: ({ text, ...args }) => <CompetencyTag {...args} text={text || undefined} />,
 };

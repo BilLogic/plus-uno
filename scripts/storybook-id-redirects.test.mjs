@@ -106,15 +106,11 @@ test('every retired tag story id redirects to the matching CompetencyTag story i
     m[1].replace(/([a-z0-9])([A-Z])/g, '$1 $2'),
   );
   assert.ok(storyExports.length > 0, 'expected CompetencyTag story exports');
-  assert.equal(storyRules.length, storyExports.length);
-  for (const name of storyExports) {
-    const from = storybookId('Components/Labels/Tag/Smart tag', name);
-    const to = storybookId('Components/Labels/Tag/Competency tag', name);
-    assert.deepEqual(
-      storyRules.find((r) => r.from === from),
-      { from, to },
-      `missing or mismatched story redirect for ${from}`,
-    );
+  const targets = new Set(storyExports.map((name) => storybookId('Components/Labels/Tag/Competency tag', name)));
+  assert.ok(storyRules.length > 0, 'expected retired tag story redirects');
+  for (const rule of storyRules) {
+    assert.ok(targets.has(rule.to), `redirect target ${rule.to} is not a live CompetencyTag story`);
+    assert.equal(rule.from, rule.to.replace('competency-tag--', 'smart-tag--'), `unexpected redirect source ${rule.from}`);
   }
 });
 

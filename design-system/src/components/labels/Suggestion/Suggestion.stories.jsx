@@ -91,7 +91,7 @@ export const InATagRow = () => (
 );
 
 /**
- * The same box as Tag: 22 tall with a 1px border, padding 4, radius 4, gap 4,
+ * The same box as Tag: 20 tall with a 1px border, padding 4, radius 4, gap 4,
  * and the words on the same baseline, so the row reads as one line. The
  * border is dashed in `border.discovery`, the words are `text.discovery` and
  * the glyph `icon.discovery`.
@@ -103,7 +103,7 @@ InATagRow.play = async ({ canvasElement }) => {
     const t = getComputedStyle(tag);
     const s = getComputedStyle(suggestion);
 
-    await expect(px(s.height), 'is 22 tall').toBe(22);
+    await expect(px(s.height), 'is 20 tall').toBe(20);
     await expect(px(s.height), 'as tall as the Tag').toBe(px(t.height));
     for (const prop of ['paddingLeft', 'paddingRight', 'borderTopWidth', 'borderTopLeftRadius', 'columnGap']) {
         await expect(s[prop], `${prop} matches Tag`).toBe(t[prop]);
@@ -203,7 +203,7 @@ StateLayers.play = async ({ canvasElement }) => {
             await expect(whileForced(el, ':active', bg), `${name}: pressed is background.discovery.hovered`)
                 .toBe(t('--ds-background-discovery-hovered'));
             // The box never moves between states.
-            await expect(px(whileForced(el, ':active', 'height'))).toBe(22);
+            await expect(px(whileForced(el, ':active', 'height'))).toBe(20);
         }
     });
 };
@@ -293,7 +293,7 @@ DisabledBesideTags.play = async ({ canvasElement, args }) => {
         await expect(s.color, `${name}: the disabled Tag's words`)
             .toBe(getComputedStyle(tag).color);
         await expect(getComputedStyle(el.querySelector('i')).color, `${name}: and an icon.disabled glyph`).toBe(mark);
-        await expect(px(s.height), `${name}: the box does not move`).toBe(22);
+        await expect(px(s.height), `${name}: the box does not move`).toBe(20);
 
         // No hover or press: the ground never changes under a pointer.
         await expect(whileForced(el, ':hover', 'backgroundColor'), `${name}: no hover`).toBe(fill);

@@ -1,9 +1,9 @@
 /*
  * Suggestion — a proposed value, as a button that sits in a tag row.
  *
- * THE TAG'S BOX: 22 tall including a 1px border, B3 12 text, padding 4, gap 4,
- * radius 4, so a suggestion lines up with the tags beside it. The 22 has no
- * semantic token yet, so it is a local custom property, as Tag's is.
+ * THE TAG'S BOX: 20 tall including a 1px border, B3 12 text, padding 4, gap 4,
+ * radius 4, so a suggestion lines up with the tags beside it. Height is a local
+ * custom property set from `_label-heights.scss` (`--label-height-md`), as Tag's is.
  *
  * DISCOVERY. A suggestion is something the system proposes, which is
  * discovery's job: a dashed edge in `border.discovery`, the words in

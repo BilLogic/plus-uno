@@ -15,6 +15,7 @@ import './CompetencyTag.scss';
  */
 
 export const COMPETENCY_TAG_SUBJECTS = ['social-emotional', 'mastering-content', 'advocacy', 'relationship', 'technology-tools'];
+export const COMPETENCY_TAG_SPACINGS = ['default', 'spacious'];
 
 /** Spellings carried over from the area as it used to be written. */
 const SUBJECT_ALIASES = {
@@ -47,7 +48,7 @@ const warn = (message) => {
 };
 
 /** A tag for one of the five competency areas. The `subject` fixes its color and leading icon, and the rest is passed to Tag. */
-export const CompetencyTag = ({ subject, children, text, ...rest }) => {
+export const CompetencyTag = ({ subject, spacing = 'default', children, text, className = '', ...rest }) => {
     const normalized = SUBJECT_ALIASES[subject] || subject;
     let effectiveSubject = normalized;
     if (!COMPETENCY_TAG_SUBJECTS.includes(effectiveSubject)) {
@@ -55,11 +56,23 @@ export const CompetencyTag = ({ subject, children, text, ...rest }) => {
         effectiveSubject = 'social-emotional';
     }
 
+    let effectiveSpacing = spacing;
+    if (!COMPETENCY_TAG_SPACINGS.includes(spacing)) {
+        warn(`spacing="${spacing}" is not one of ${COMPETENCY_TAG_SPACINGS.join(', ')}; it falls back to default.`);
+        effectiveSpacing = 'default';
+    }
+
     const label = children ?? text ?? SUBJECT_LABELS[effectiveSubject];
+    const classes = [
+        'plus-competency-tag',
+        `plus-competency-tag--${effectiveSpacing}`,
+        className,
+    ].filter(Boolean).join(' ');
 
     return (
         <Tag
             {...rest}
+            className={classes}
             color={TAG_COLOR_OF_CURRICULUM[effectiveSubject]}
             elemBefore={<Icon name={SUBJECT_ICONS[effectiveSubject]} className="plus-competency-tag__icon" />}
         >
@@ -74,10 +87,14 @@ CompetencyTag.propTypes = {
         'social-emotional', 'mastering-content', 'advocacy', 'relationship', 'technology-tools',
         'socio-emotional', 'relationships',
     ]).isRequired,
+    /** `default` (20) in rows, lists and sentences; `spacious` (32) beside a heading. */
+    spacing: PropTypes.oneOf(COMPETENCY_TAG_SPACINGS),
     /** The label (alternative to `text`). Defaults to the subject's own name. */
     children: PropTypes.node,
     /** The label (alternative to `children`). Defaults to the subject's own name. */
     text: PropTypes.string,
+    /** Extra class on the tag element. */
+    className: PropTypes.string,
 };
 
 export default CompetencyTag;
