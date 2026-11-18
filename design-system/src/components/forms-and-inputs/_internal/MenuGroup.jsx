@@ -18,7 +18,7 @@ function useRoving() {
 /**
  * MenuGroup: the scrollable list a menu's sections sit in.
  */
-export const MenuGroup = ({ density = 'default', maxHeight, maxWidth, minWidth, testId, className, children, ...props }) => {
+export const MenuGroup = ({ spacing = 'default', maxHeight, maxWidth, minWidth, testId, className, children, ...props }) => {
     const itemsRef = useRef([]);
 
     const register = useCallback((node) => {
@@ -43,7 +43,7 @@ export const MenuGroup = ({ density = 'default', maxHeight, maxWidth, minWidth, 
             <div
                 role="menu"
                 data-testid={testId}
-                className={clsx('plus-menu-group', `plus-menu-group--${density}`, className)}
+                className={clsx('plus-menu-group', `plus-menu-group--${spacing}`, className)}
                 style={{ maxHeight, maxWidth, minWidth }}
                 {...props}
             >
@@ -54,8 +54,8 @@ export const MenuGroup = ({ density = 'default', maxHeight, maxWidth, minWidth, 
 };
 
 MenuGroup.propTypes = {
-    /** `default` (32 rows) or `compact` (24), the row height. */
-    density: PropTypes.oneOf(['default', 'compact']),
+    /** `default` (32 rows), `compact` (24) or `spacious` (40), the row height. */
+    spacing: PropTypes.oneOf(['default', 'compact', 'spacious']),
     maxHeight: PropTypes.string,
     maxWidth: PropTypes.string,
     minWidth: PropTypes.string,

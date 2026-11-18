@@ -88,7 +88,7 @@ const DropdownMenu = ({
                         onClick={handleRowPick}
                     >
                         {hasError && !loading ? (
-                            <MenuGroup density={spacing} minWidth={minWidth}>
+                            <MenuGroup spacing={spacing} minWidth={minWidth}>
                                 <CustomItem elemBefore={<Icon name="circle-exclamation" />}>Couldn't load options</CustomItem>
                                 <ButtonItem onClick={onRetry} data-keep-open="true">Retry</ButtonItem>
                             </MenuGroup>
@@ -102,7 +102,7 @@ const DropdownMenu = ({
                                 <span>Loading options</span>
                             </div>
                         ) : (
-                            <MenuGroup density={spacing} maxHeight={maxHeight} minWidth={minWidth}>
+                            <MenuGroup spacing={spacing} maxHeight={maxHeight} minWidth={minWidth}>
                                 {children}
                             </MenuGroup>
                         )}
