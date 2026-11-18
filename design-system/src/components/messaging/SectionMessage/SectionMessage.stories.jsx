@@ -7,7 +7,6 @@ import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.j
 import { contrastRatio, paintedOver } from '@/storybook-docs/lib/contrast.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { Button } from '@/components';
-import { PresenceSlot } from '@/lib/listMotion';
 import SectionMessage, { SECTION_MESSAGE_ICONS, SECTION_MESSAGE_APPEARANCES } from './SectionMessage';
 import { iconClass } from '../../../lib/icon';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
@@ -446,7 +445,8 @@ export const Actions = () => (
 Actions.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const message = canvas.getByTestId('actions');
-    await expect(within(message).getByRole('button', { name: 'Reschedule' })).toBeVisible();
+    await waitFor(() => expect(within(message).getByRole('button', { name: 'Reschedule' })).toBeVisible());
+    await settleAnimations(canvasElement);
     await expect(within(message).getByRole('link', { name: 'Learn more' })).toHaveAttribute('href', '#');
 };
 
@@ -517,7 +517,7 @@ function SectionMessageMotionDemo() {
                     setVisible((v) => !v);
                 }}
             />
-            <PresenceSlot show={visible}>
+            {visible && (
                 <SectionMessage
                     key={instanceKey}
                     appearance="info"
@@ -526,7 +526,7 @@ function SectionMessageMotionDemo() {
                 >
                     Maya K. joins at 4:00 PM ET for Grade 7 math at Lincoln Middle.
                 </SectionMessage>
-            </PresenceSlot>
+            )}
         </div>
     );
 }

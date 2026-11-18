@@ -372,7 +372,7 @@ export const ExplainsOnPress = {
         await expect(save).toBeEnabled();
         await expect(canvas.queryByText('Add the session notes before saving.')).toBeNull();
         await userEvent.click(save);
-        await expect(await canvas.findByText('Add the session notes before saving.')).toBeVisible();
+        await waitFor(() => expect(canvas.getByText('Add the session notes before saving.')).toBeVisible());
         await expect(save).toBeEnabled();
     },
 };

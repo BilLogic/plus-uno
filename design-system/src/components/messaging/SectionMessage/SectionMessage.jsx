@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { PresenceSlot } from '@/lib/listMotion';
+import { useMotionReduced } from '@/lib/motionPreference';
 import CloseButton from '@/components/forms-and-inputs/CloseButton';
 import { headingTag } from '@/lib/headingLevel';
 import { messageIcon } from '../messageAppearance';
@@ -51,13 +52,19 @@ const SectionMessage = ({
     dismissible = true,
     onDismiss,
     className = '',
+    style,
     ...props
 }) => {
+    const reduced = useMotionReduced();
     const [show, setShow] = useState(true);
+    const onDismissRef = useRef(onDismiss);
+    onDismissRef.current = onDismiss;
+    const handleExited = useCallback(() => {
+        onDismissRef.current?.();
+    }, []);
 
     const handleClose = () => {
         setShow(false);
-        if (onDismiss) onDismiss();
     };
 
     const sectionMessageAppearance = appearance || 'primary';
@@ -76,11 +83,18 @@ const SectionMessage = ({
     const visual = icon === true ? (SECTION_MESSAGE_ICONS[sectionMessageAppearance] ?? SECTION_MESSAGE_ICONS.primary) : icon;
 
     return (
-        <PresenceSlot show={show}>
+        <PresenceSlot
+            show={show}
+            animateOnMount={!reduced}
+            reducedMotion={reduced}
+            className={className}
+            style={style}
+            onExited={handleExited}
+        >
             <div
                 id={id}
                 role="alert"
-                className={`plus-section-message ${sectionMessageAppearance} ${className}`}
+                className={`plus-section-message ${sectionMessageAppearance}`}
                 {...props}
             >
                 {visual !== false && visual != null && (
