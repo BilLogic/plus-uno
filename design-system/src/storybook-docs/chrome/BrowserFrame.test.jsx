@@ -1,6 +1,10 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import BrowserFrame from './BrowserFrame';
+
+const PRIMITIVE_READ = /var\(\s*--(?:space|radius|size|stroke)-\d/;
 
 describe('BrowserFrame', () => {
     it('renders children bare for none', () => {
@@ -37,5 +41,16 @@ describe('BrowserFrame', () => {
             <BrowserFrame browser="chrome"><BrowserFrame browser="safari"><p>page</p></BrowserFrame></BrowserFrame>,
         );
         expect(container.querySelectorAll('[data-browser]')).toHaveLength(1);
+    });
+
+    it('reads no numbered primitive tokens in BrowserFrame or BrowserWindow', () => {
+        for (const file of [
+            join(__dirname, 'BrowserFrame.scss'),
+            join(__dirname, 'BrowserFrame.jsx'),
+            join(__dirname, '..', 'lib', 'template-page.jsx'),
+        ]) {
+            const source = readFileSync(file, 'utf8');
+            expect(source, file).not.toMatch(PRIMITIVE_READ);
+        }
     });
 });
