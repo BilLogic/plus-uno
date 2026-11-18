@@ -18,7 +18,7 @@ const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
  *   the picked day, or both ends of a range; `data-in-range` marks the days
  *   between; `aria-current="date"` marks today.
  * - **Bounds:** days before `minDate` or after `maxDate` are disabled.
- * - **Size:** a pixel width, 28, 36 or 44, drawn from the `--calendar-day-*` tokens.
+ * - **Size:** a pixel width, 24, 32 or 40, drawn from the `--calendar-day-*` tokens.
  *
  * @param {object} props
  * @returns {JSX.Element}
@@ -31,7 +31,7 @@ const Calendar = ({
     rangeEnd,
     minDate,
     maxDate,
-    size = 36,
+    size = 32,
     onPick,
     className = '',
     ...props
@@ -62,6 +62,9 @@ const Calendar = ({
     for (let day = 1; day <= daysInMonth; day += 1) {
         const date = new Date(year, month, day);
         const disabled = outOfBounds(date, minDate, maxDate);
+        const isRange = Boolean(start && end) && !sameDay(start, end);
+        const isRangeStart = isRange && sameDay(date, start);
+        const isRangeEnd = isRange && sameDay(date, end);
         const isEnd = sameDay(date, start) || sameDay(date, end);
         const isSelected = sameDay(date, picked) || isEnd;
         const inRange = Boolean(start && end) && date > start && date < end;
@@ -85,6 +88,8 @@ const Calendar = ({
                     'plus-calendar-day',
                     disabled && 'plus-calendar-day--disabled',
                     isSelected && 'plus-calendar-day--selected',
+                    isRangeStart && 'plus-calendar-day--range-start',
+                    isRangeEnd && 'plus-calendar-day--range-end',
                     inRange && 'plus-calendar-day--in-range',
                     isToday && 'plus-calendar-day--today',
                 ].filter(Boolean).join(' ')}
@@ -106,9 +111,9 @@ const Calendar = ({
             {...props}
         >
             <div className="plus-calendar-header">
-                <IconButton icon={<Icon name="chevron-left" size={12} />} label="Previous month" appearance="subtle" isTooltipDisabled className="plus-calendar-nav" onClick={() => turn(-1)} />
+                <IconButton icon={<Icon name="chevron-left" size={12} />} label="Previous month" appearance="subtle" spacing="compact" isTooltipDisabled className="plus-calendar-nav" onClick={() => turn(-1)} />
                 <div className="plus-calendar-month" aria-live="polite">{formatMonthYear(viewDate)}</div>
-                <IconButton icon={<Icon name="chevron-right" size={12} />} label="Next month" appearance="subtle" isTooltipDisabled className="plus-calendar-nav" onClick={() => turn(1)} />
+                <IconButton icon={<Icon name="chevron-right" size={12} />} label="Next month" appearance="subtle" spacing="compact" isTooltipDisabled className="plus-calendar-nav" onClick={() => turn(1)} />
             </div>
             <div className="plus-calendar-weekdays" aria-hidden="true">
                 {WEEKDAYS.map((day) => <div key={day} className="plus-calendar-weekday">{day}</div>)}
@@ -132,8 +137,8 @@ Calendar.propTypes = {
     rangeEnd: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
     minDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
     maxDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
-    /** Day width in pixels: 28, 36 or 44. */
-    size: PropTypes.oneOf([28, 36, 44]),
+    /** Day width in pixels: 24, 32 or 40. */
+    size: PropTypes.oneOf([24, 32, 40]),
     /** `(date)` when an enabled day is pressed. */
     onPick: PropTypes.func.isRequired,
     className: PropTypes.string,

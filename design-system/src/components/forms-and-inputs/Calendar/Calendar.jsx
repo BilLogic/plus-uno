@@ -13,7 +13,7 @@ import InternalCalendar from '../_internal/Calendar';
  *   the picked day, or both ends of a range; `data-in-range` marks the days
  *   between; `aria-current="date"` marks today.
  * - **Bounds:** days before `minDate` or after `maxDate` are disabled.
- * - **Size:** a pixel width, 28, 36 or 44, drawn from the `--calendar-day-*` tokens.
+ * - **Size:** a pixel width, 24, 32 or 40, drawn from the `--calendar-day-*` tokens.
  *
  * @param {object} props
  * @returns {JSX.Element}
@@ -34,8 +34,8 @@ Calendar.propTypes = {
     minDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
     /** The latest day that can be picked, as ISO `YYYY-MM-DD` or a Date. Later days are disabled. */
     maxDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
-    /** Day width in pixels: 28, 36 or 44. */
-    size: PropTypes.oneOf([28, 36, 44]),
+    /** Day width in pixels: 24, 32 or 40. */
+    size: PropTypes.oneOf([24, 32, 40]),
     /** `(date)` when an enabled day is pressed. */
     onPick: PropTypes.func.isRequired,
     className: PropTypes.string,

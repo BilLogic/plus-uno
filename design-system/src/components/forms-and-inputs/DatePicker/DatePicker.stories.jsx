@@ -87,6 +87,16 @@ export default {
             description: 'Optional maximum allowed date',
             table: { category: 'Behavior' },
         },
+        presets: {
+            control: 'boolean',
+            description: 'Show preset ranges beside the calendar with Clear and Apply actions',
+            table: { category: 'Behavior', defaultValue: { summary: 'false' } },
+        },
+        label: {
+            control: 'text',
+            description: 'Filter trigger label for the preset range popup',
+            table: { category: 'Content' },
+        },
     },
 };
 
@@ -667,4 +677,102 @@ MonthTurnKeepsPopupHeight.play = async ({ canvasElement }) => {
     await expect(within(popup).getByText('November 2026')).toBeVisible();
     await expect(Math.round(popup.getBoundingClientRect().height), 'popup height unchanged after turn').toBe(Math.round(initialHeight));
 };
+
+/**
+ * Filter trigger ("Created: All time") opening the 400px preset range popup:
+ * 160px presets left, 192px 24px-day range calendar right, continuous band with
+ * week-edge rounding, days after today disabled, and Clear/Apply compact buttons.
+ */
+export const RangePopup = {
+    args: {
+        onChange: fn(),
+        today: '2026-10-21',
+    },
+    render: ({ onChange, today }) => {
+        const [range, setRange] = useState([null, null]);
+        return (
+            <div style={{ paddingBottom: 'var(--width-2500)' }}>
+                <DatePicker
+                    range
+                    presets
+                    label="Created"
+                    today={today}
+                    value={range}
+                    onChange={(next) => {
+                        setRange(next);
+                        onChange?.(next);
+                    }}
+                />
+            </div>
+        );
+    },
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const page = within(canvasElement.ownerDocument.body);
+        const trigger = canvas.getByRole('button', { name: 'Created: All time' });
+        await userEvent.click(trigger);
+
+        const popup = await page.findByRole('dialog', { name: 'Created' });
+        await settleAnimations(popup);
+
+        await expect(Math.round(popup.getBoundingClientRect().width), 'popup width').toBe(400);
+        const presetColumn = popup.querySelector('.plus-date-range-popup__presets');
+        await expect(Math.round(presetColumn.getBoundingClientRect().width), 'preset column width').toBe(160);
+        const calendarColumn = popup.querySelector('.plus-date-range-popup__calendar');
+        await expect(Math.round(calendarColumn.getBoundingClientRect().width), 'calendar column width').toBe(192);
+
+        const presetRows = within(presetColumn).getAllByRole('option');
+        await expect(presetRows.map((row) => row.textContent)).toEqual(['All time', 'Today', 'Last 7 days', 'Last 30 days']);
+        await expect(Math.round(presetRows[0].getBoundingClientRect().height), 'preset row height').toBe(32);
+
+        const clearBtn = within(popup).getByRole('button', { name: 'Clear' });
+        const applyBtn = within(popup).getByRole('button', { name: 'Apply' });
+        await expect(Math.round(clearBtn.getBoundingClientRect().height), 'Clear height').toBe(24);
+        await expect(Math.round(applyBtn.getBoundingClientRect().height), 'Apply height').toBe(24);
+        await expect(applyBtn).toBeDisabled();
+
+        // Days after today (2026-10-21) are disabled when looking back.
+        await expect(within(popup).getByRole('button', { name: /October 22, 2026/ })).toBeDisabled();
+
+        // Picking one end keeps Apply disabled; picking the second end enables Apply.
+        await userEvent.click(within(popup).getByRole('button', { name: /October 8, 2026/ }));
+        await expect(applyBtn).toBeDisabled();
+        await userEvent.click(within(popup).getByRole('button', { name: /October 13, 2026/ }));
+        await expect(applyBtn).toBeEnabled();
+
+        // Range band: mid-week day is unrounded (0px); week-end / week-start round on outer corners.
+        const midWeekStyle = getComputedStyle(within(popup).getByRole('button', { name: /October 9, 2026/ }));
+        await expect(px(midWeekStyle.borderTopLeftRadius), 'mid-week top-left').toBe(0);
+        await expect(px(midWeekStyle.borderTopRightRadius), 'mid-week top-right').toBe(0);
+        await expect(px(midWeekStyle.borderBottomRightRadius), 'mid-week bottom-right').toBe(0);
+        await expect(px(midWeekStyle.borderBottomLeftRadius), 'mid-week bottom-left').toBe(0);
+
+        const weekEndStyle = getComputedStyle(within(popup).getByRole('button', { name: /October 10, 2026/ }));
+        await expect(px(weekEndStyle.borderTopLeftRadius), 'week-end top-left').toBe(0);
+        await expect(px(weekEndStyle.borderBottomLeftRadius), 'week-end bottom-left').toBe(0);
+        await expect(px(weekEndStyle.borderTopRightRadius), 'week-end top-right').toBeGreaterThan(0);
+        await expect(px(weekEndStyle.borderBottomRightRadius), 'week-end bottom-right').toBeGreaterThan(0);
+
+        const weekStartStyle = getComputedStyle(within(popup).getByRole('button', { name: /October 11, 2026/ }));
+        await expect(px(weekStartStyle.borderTopLeftRadius), 'week-start top-left').toBeGreaterThan(0);
+        await expect(px(weekStartStyle.borderBottomLeftRadius), 'week-start bottom-left').toBeGreaterThan(0);
+        await expect(px(weekStartStyle.borderTopRightRadius), 'week-start top-right').toBe(0);
+        await expect(px(weekStartStyle.borderBottomRightRadius), 'week-start bottom-right').toBe(0);
+
+        await userEvent.click(applyBtn);
+        await waitFor(() => expect(canvasElement.ownerDocument.querySelector('.plus-date-range-popup')).toBeNull());
+        await expect(args.onChange).toHaveBeenLastCalledWith(['2026-10-08', '2026-10-13']);
+        await expect(canvas.getByRole('button', { name: 'Created: 10/08/2026 – 10/13/2026' })).toBeVisible();
+
+        // Selecting a preset and clicking Apply updates the filter trigger label.
+        await userEvent.click(canvas.getByRole('button', { name: 'Created: 10/08/2026 – 10/13/2026' }));
+        const reopened = await page.findByRole('dialog', { name: 'Created' });
+        await settleAnimations(reopened);
+        await userEvent.click(within(reopened).getByRole('option', { name: 'Last 7 days' }));
+        await userEvent.click(within(reopened).getByRole('button', { name: 'Apply' }));
+        await expect(args.onChange).toHaveBeenLastCalledWith(['2026-10-15', '2026-10-21']);
+        await expect(canvas.getByRole('button', { name: 'Created: Last 7 days' })).toBeVisible();
+    },
+};
+
 
