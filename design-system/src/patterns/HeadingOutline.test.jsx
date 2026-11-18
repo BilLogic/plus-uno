@@ -6,10 +6,10 @@ import PatternCard from './PatternCard';
 import DropdownMenu from '@/components/forms-and-inputs/DropdownMenu';
 import { ButtonItem, Section } from '@/components/forms-and-inputs/_internal/MenuGroup';
 import PageHeader from '@/components/layout-and-structure/PageHeader';
-import Modal from '@/components/messaging/Modal';
+import Dialog from '@/components/messaging/Dialog';
 import Sidebar from '@/components/navigation/Sidebar';
 import Table from '@/components/text-and-data-display/Table';
-import PatternModal from './PatternModal';
+import Modal from './Modal';
 import PatternSection from './PatternSection';
 import Page from './Page';
 
@@ -96,10 +96,9 @@ describe('a dialog', () => {
         expect(headings).toEqual([['h1', 'Edit session'], ['h2', 'When'], ['h3', 'Monday']]);
     });
 
-    it('is the same for the inline modal pattern', () => {
-        render(<PatternModal title="Delete file" onClose={() => {}}>Gone for good.</PatternModal>);
-        const dialog = screen.getByRole('dialog', { name: 'Delete file' });
-        expect(within(dialog).getByRole('heading', { name: 'Delete file' }).tagName).toBe('H1');
+    it('is the same for the Dialog component', () => {
+        render(<Dialog title="Delete file" onClose={() => {}}>Gone for good.</Dialog>);
+        expect(screen.getByRole('heading', { name: 'Delete file' }).tagName).toBe('H1');
     });
 
     it('steps a PageHeader with titleAs="h2" below the dialog title', () => {

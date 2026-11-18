@@ -36,21 +36,15 @@ const Blanket = ({
         className,
     ].filter(Boolean).join(' ');
 
-    const vars = {};
-    if (inline && screenWidth !== undefined) {
-        vars['--plus-overlay-screen'] = typeof screenWidth === 'number' ? `${screenWidth}px` : screenWidth;
-    }
-    if (inline && screenHeight !== undefined) {
-        const h = typeof screenHeight === 'number' ? `${screenHeight}px` : screenHeight;
-        vars['--plus-overlay-screen-height'] = h;
-        const pad = typeof screenHeight === 'number' && screenHeight < 640 ? 24 : 64;
-        vars['--plus-overlay-max-height'] = typeof screenHeight === 'number'
-            ? `${Math.max(0, screenHeight - 2 * pad)}px`
-            : `calc(${h} - 2 * var(--blanket-pad-y))`;
-        if (typeof screenHeight === 'number' && screenHeight < 640) {
-            vars['--blanket-pad-y'] = 'var(--space-150)';
-        }
-    }
+    const blanketStyle = {
+        ...(inline && screenWidth != null
+            ? { '--plus-overlay-screen': typeof screenWidth === 'number' ? `${screenWidth}px` : screenWidth }
+            : {}),
+        ...(inline && screenHeight != null
+            ? { '--plus-overlay-screen-height': typeof screenHeight === 'number' ? `${screenHeight}px` : screenHeight }
+            : {}),
+        ...style,
+    };
 
     const handleClick = (event) => {
         if (onBlanketClick && event.target === event.currentTarget) {
@@ -68,7 +62,7 @@ const Blanket = ({
             aria-hidden={inline && !show ? true : undefined}
             inert={inline && !show ? true : undefined}
             className={classes}
-            style={{ ...vars, ...style }}
+            style={blanketStyle}
             onClick={handleClick}
             {...props}
         >

@@ -20,9 +20,9 @@
     transform-origin: var(--transform-origin, var(--plus-overlay-origin, center));
 
     // The layer it holds sits on the modal layer (`--layer-modal`, 510),
-    // above the blanket (`--layer-blanket`, 500).
+    // above the blanket (`--layer-blanket`, 500). Keep `position: relative`
+    // on the panel itself so portaled floating surfaces keep `position: fixed`.
     > * {
-        position: relative;
         z-index: var(--layer-modal);
     }
 
@@ -31,6 +31,7 @@
     // reachable by scrolling when the viewport shrinks.
     > .plus-dialog,
     > .plus-modal {
+        position: relative;
         margin: auto;
     }
 }

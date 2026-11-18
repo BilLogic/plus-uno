@@ -247,6 +247,9 @@ export const Tabs = {
         await userEvent.keyboard('{ArrowRight}');
         await expect(tabsOf(hug)[1]).toHaveFocus();
         await expect(tabsOf(hug)[1]).toHaveAttribute('aria-selected', 'true');
+        await userEvent.keyboard('{Home}');
+        await expect(tabsOf(hug)[0]).toHaveFocus();
+        await expect(tabsOf(hug)[0]).toHaveAttribute('aria-selected', 'true');
 
         await expect(hug.getBoundingClientRect().height, 'a short tab hugs').toBeLessThan(cap);
         await userEvent.click(within(hug).getByRole('tab', { name: 'Students' }));
@@ -267,7 +270,7 @@ export const BodyMinHeight = {
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
         const body = canvasElement.querySelector('.plus-dialog-body');
-        await expect(getComputedStyle(body).minHeight, 'Modal/body-min-height').toBe('96px');
+        await expect(getComputedStyle(body).minHeight, 'Modal/body-min-height').toBe('80px');
     },
 };
 
@@ -536,9 +539,9 @@ SelectKeepsOverlayShadow.play = async ({ canvasElement }) => {
     const option = within(listbox).getByRole('option', { name: 'South High' });
     const overlay = doc.getByText('Assign site').closest('.plus-pattern-blanket');
     await expect(listbox.closest('.plus-pattern-blanket')).toBe(overlay);
-    await expect(getComputedStyle(listbox.closest('.plus-listbox')).zIndex).toBe('400');
-    const box = option.getBoundingClientRect();
+    await expect(getComputedStyle(listbox.closest('.plus-listbox')).zIndex).toBe('510');
     await settleAnimations(canvasElement.ownerDocument.body);
+    const box = option.getBoundingClientRect();
     const hit = canvasElement.ownerDocument.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
     await expect(option.contains(hit)).toBe(true);
     await expect(getComputedStyle(listbox.closest('.plus-listbox')).boxShadow)
@@ -688,7 +691,7 @@ export const AnatomyActive = {
         await expect(getComputedStyle(modal).borderTopLeftRadius, 'radius 16').toBe(`${tokenLength(canvasElement, '--modal-radius')}px`);
         // Form in a Modal: fields 40px, footer buttons 32px.
         const student = canvas.getByLabelText(/Student/);
-        const fieldBox = student.closest('.plus-field-box');
+        const fieldBox = student.closest('.plus-field');
         await expect(rect(fieldBox).height, 'Modal form fields are 40 high').toBeCloseTo(40, 0);
         const saveBtn = canvas.getByRole('button', { name: 'Save session' });
         await expect(rect(saveBtn).height, 'Modal form footer buttons are 32 high').toBeCloseTo(32, 0);

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import { Button, HeadingContextProvider, Modal, PanelBody, PanelContainer, PanelHeader, Popup, Select, Tooltip } from '@/components';
-import { Blanket, PatternCard, PatternSection, PatternTable } from '@/patterns';
+import { Button, HeadingContextProvider, PanelBody, PanelContainer, PanelHeader, Popup, Select, Tooltip } from '@/components';
+import { Modal, PatternCard, PatternSection, PatternTable } from '@/patterns';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
 import { Illustration } from '@/storybook-docs/illustrations/Illustration.jsx';
@@ -329,18 +329,18 @@ export const FloatingSidebar = {
 /** The Modal on its Blanket. */
 export const ModalOnBlanket = {
     render: () => (
-        <Blanket inline screenWidth={768} screenHeight={420}>
-            <Modal
-                show
-                renderAs="inline"
-                width="6-col"
-                title="Move session"
-                body="Move Thursday’s session with Ana Ruiz to 4:30 PM?"
-                primaryButton={{ text: 'Move session', onClick: () => {} }}
-                secondaryButton={{ text: 'Cancel', onClick: () => {} }}
-                onClose={() => {}}
-            />
-        </Blanket>
+        <Modal
+            inline
+            show
+            screenWidth={768}
+            screenHeight={420}
+            width="6-col"
+            title="Move session"
+            body="Move Thursday’s session with Ana Ruiz to 4:30 PM?"
+            primaryButton={{ text: 'Move session', onClick: () => {} }}
+            secondaryButton={{ text: 'Cancel', onClick: () => {} }}
+            onClose={() => {}}
+        />
     ),
     play: async ({ canvasElement }) => {
         const modal = canvasElement.querySelector('.plus-modal');
@@ -543,9 +543,7 @@ export const AlwaysPair = () => (
 export const BlockingOnBlanket = () => (
     <DoDont>
         <Do caption="The Modal on the Blanket takes the blocking shadow.">
-            <Blanket inline screenWidth={360} screenHeight={300}>
-                <Modal show renderAs="inline" width={280} title="Move session" body="To 4:30 PM?" primaryButton={{ text: 'Move', onClick: () => {} }} onClose={() => {}} />
-            </Blanket>
+            <Modal inline show screenWidth={360} screenHeight={300} width={280} title="Move session" body="To 4:30 PM?" primaryButton={{ text: 'Move', onClick: () => {} }} onClose={() => {}} />
         </Do>
         <Dont caption="A Panel with the blocking shadow and no Blanket. If it needs full attention, make it a Modal.">
             <div style={ground}>

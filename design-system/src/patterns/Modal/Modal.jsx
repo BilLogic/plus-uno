@@ -207,15 +207,23 @@ const tabShape = PropTypes.shape({
 Modal.propTypes = {
     /** The `id` attribute of the dialog panel. */
     id: PropTypes.string,
-    /** The dialog's h1, and its accessible name. */
+    /** The dialog's h1, and its accessible name.
+     * @ds-context Used in: Modal.title (ds guide modal)
+     */
     title: PropTypes.node,
-    /** A line under the title, read as the dialog's description. */
+    /** A line under the title, read as the dialog's description.
+     * @ds-context Used in: Modal.description (ds guide modal)
+     */
     description: PropTypes.node,
     /** The dialog's accessible name when it has no visible `title` or uses a custom `header`. */
     ariaLabel: PropTypes.string,
-    /** Custom header slot replacing the title row (title and close button), so the caller owns both and names the dialog with `ariaLabel`. */
+    /** Custom header slot replacing the title row (title and close button), so the caller owns both and names the dialog with `ariaLabel`.
+     * @ds-context Used in: Modal.header (ds guide modal)
+     */
     header: PropTypes.node,
-    /** Icon buttons in the header, before the close button. */
+    /** Icon buttons in the header, before the close button.
+     * @ds-context Used in: Modal.headerActions (ds guide modal)
+     */
     headerActions: PropTypes.node,
     /** The header's close button. Off for a dialog that has to be answered. */
     showCloseButton: PropTypes.bool,
@@ -233,7 +241,9 @@ Modal.propTypes = {
     height: PropTypes.oneOf(MODAL_HEIGHTS),
     /** Show the footer: `footer`, or the secondary and primary buttons. */
     showBottomButtons: PropTypes.bool,
-    /** Custom footer content in place of the built-in pair, such as a three-button or leading-text FooterActions layout. */
+    /** Custom footer content in place of the built-in pair, such as a three-button or leading-text FooterActions layout.
+     * @ds-context Used in: Modal.footer (ds guide modal)
+     */
     footer: PropTypes.node,
     /** The confirming footer button, drawn on the right. Takes `text` (default "Confirm"), `onClick`, `appearance` (default `primary`), `spacing` and `icon`. */
     primaryButton: buttonShape,
@@ -263,7 +273,9 @@ Modal.propTypes = {
     className: PropTypes.string,
     /** Inline styles for the dialog panel. */
     style: PropTypes.object,
-    /** More content rendered in the body after `body`. */
+    /** More content rendered in the body after `body`.
+     * @ds-context Used in: Modal.children (ds guide modal)
+     */
     children: PropTypes.node,
 };
 
