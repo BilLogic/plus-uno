@@ -185,7 +185,7 @@ Same group: `GenerativeBorder` · `ProgressBar` · `ProgressRing` · `Spinner`
 
 **`preset`** — `rect` · `circle` · `text` · `status` · `status-spacious` · `count` · `tag` · `tag-person` · `tag-group` · `paragraph`
 
-**`radius`** — `none` · `element-radius-sm` · `element-radius-md` · `element-radius-lg` · `element-radius-full` · `card-radius-sm` · `card-radius-md` · `section-radius-sm` · `section-radius-md` · `section-radius-lg`
+**`radius`** — `none` · `element-radius-sm` · `element-radius-md` · `element-radius-lg` · `element-radius-full` · `card-radius-sm` · `card-radius-md` · `card-radius-lg`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 

@@ -24,7 +24,7 @@ const sessionCard = (
     <PatternCard
         title="Upcoming session"
         description="Tuesday at 4:30 PM · Lincoln Middle · 6 students"
-        actions={<Button text="Join session" appearance="primary" spacing="compact" onClick={() => {}} />}
+        actions={<Button text="Join session" appearance="primary" onClick={() => {}} />}
     />
 );
 

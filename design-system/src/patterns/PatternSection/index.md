@@ -14,7 +14,7 @@ Also asked as: page section, toolbar, section header, block, region.
 
 **Source:** `design-system/src/patterns/PatternSection/PatternSection.jsx`
 
-**Stories:** `design-system/src/patterns/PatternSection/PatternSection.stories.jsx` — Overview, HeaderDefault, HeaderTabs, HeaderToolbar, HeaderCustom, HeaderTabsOnly, LayoutSingle, LayoutSplit, LayoutSubsections, SunkenCard, DetailIsSunkenCard, CardNesting, NoSurfaceNoPad, Footer, Anatomy, Levels, ToolbarSearch, LoadingDefault, LoadingToolbar, LoadingTabsOnly, Interactive, ColorModes, SplitLayout, Spacing, Detail, TypeList, TypeQueue, TypeCards, TypeStats, TypeDetails, TypeMainAndSide, TypeForm, TypeSubsections, HeaderTypeTitle, HeaderTypeTitleAndActions, HeaderTypeViewBarOneView, HeaderTypeViewBarSeveralViews, HeaderTypeFormatSwitch, HeaderTypeViewBarAlone, HeaderTypeUnderPageTabs, HeaderTypeSubsection, SideAtEnd, FilterSideAtStart, ResponsiveWidth, RowsSelected, EmptyInTable, AnatomyQueue
+**Stories:** `design-system/src/patterns/PatternSection/PatternSection.stories.jsx` — Overview, HeaderDefault, HeaderTabs, HeaderToolbar, HeaderCustom, HeaderTabsOnly, LayoutSingle, LayoutSplit, LayoutSubsections, SunkenCard, DetailIsSunkenCard, CardNesting, NoSurfaceNoPad, Footer, Anatomy, Levels, ToolbarSearch, LoadingDefault, LoadingToolbar, LoadingTabsOnly, Interactive, ColorModes, SplitLayout, Spacing, Detail, TypeList, TypeQueue, TypeCards, TypeStats, TypeDetails, TypeMainAndSide, TypeForm, TypeSubsections, Full, FiltersApplied, NoViews, ViewsOnly, ManyFilters, RowsSelected, Narrow, Subsection, SideAtEnd, FilterSideAtStart, ResponsiveWidth, EmptyInTable, AnatomyQueue
 
 **Storybook page:** `design-system/src/patterns/PatternSection/PatternSection.mdx`
 
@@ -162,19 +162,6 @@ Each Section type combines a header and body, with an optional side or detail. T
 - **Form.** Fields in a card, with the card's own Save and Cancel at its bottom.
 - **Subsections.** Sections nested one level, each an h3, for a long settings page.
 
-## Header types
-
-A starting set, picked by what the Section holds. Every control state lives on its component: Icon button, Filter button and Tabs. Which filters the bar takes is Filtering; how the search field behaves is the Search pattern, listed in Patterns.
-
-- **Title.** A title and a description, nothing to act on. Most Sections that hold cards or a form.
-- **Title and actions.** Section actions in the title row. One Primary and two others at most.
-- **View bar, one view.** One pill names the rows and stays, so nothing moves when a second view arrives.
-- **View bar, several views.** Two to five views of the same rows, a fixed set the product defines. Extra pills fold into More.
-- **Format switch.** When the rows show as a table or cards, equal-width segments sit first at the end.
-- **View bar alone.** The page title already names the collection, so the title row is hidden from sight and stays in the page for screen readers.
-- **Under page tabs.** One tab system per page: the views become one labeled PopupSelect at the start of the bar. It picks a view, not a filter.
-- **Subsection.** Any type nests once. The title drops to an h3; the view bar keeps its size.
-
 ## Anatomy
 
 A Section with a view bar, a detail and a footer. The title, the first pill and the first column share one left edge.
@@ -235,6 +222,14 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 | `toolbar` | node | — | Toolbar row under the title row (header type `toolbar`), usually a `PatternSection.Toolbar` |
 | `header` | node | — | Free-form header in place of title and description (header type `custom`) |
 | `type` | enum | — | Header type. Read from the slots when left off; pass `tabs-only` to show only the tabs row |
+| `views` | node | — | Row 2, at the start: the views, usually Tabs in the pill appearance. It scrolls sideways when it does not fit. |
+| `format` | node | — | Row 2, at the end: the format switch (Table / Cards). With no `views` it moves to the end of row 3. |
+| `search` | node | — | Row 3, at the start: the Search field at compact spacing, which draws 32. |
+| `filters` | arrayOf (required) | — | Row 3, after Search: one `{ key, label, text, isSelected, onClick }` per trigger, drawn as a FilterButton that reads "label: text". Three show; the rest go in "More filters" with a count. Under 768 they fold into one Filter button. |
+| `count` | node | — | Row 3, at the end once a filter is applied: how many rows match, such as "3 of 12". |
+| `onClearAll` | func | — | Runs when "Clear all" is pressed. The button shows once a filter is applied. |
+| `onMoreFilters` | func | — | Runs when "More filters" is pressed. |
+| `onOpenFilters` | func | — | Runs when the Filter button of a narrow Section is pressed. |
 | `onAddView` | func | — | Puts "Add view" at the end of the tabs row, and runs when it is pressed |
 | `addViewLabel` | string | `'Add view'` | The "Add view" button's label |
 | `loading` | bool | `false` | Swaps the header for skeleton bars and marks the section busy |

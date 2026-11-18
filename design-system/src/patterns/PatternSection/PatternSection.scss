@@ -98,6 +98,75 @@
     flex-shrink: 0;
 }
 
+/*
+ * Rows 2 and 3 of the header: views and the format switch, then Search and the
+ * filter triggers. They stack Section/stack-sm under the title row, and every
+ * control in them sits on the one 32 line.
+ */
+.plus-section-rows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-stack-sm);
+    min-width: 0;
+}
+
+.plus-section-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: var(--inline-md);
+    row-gap: var(--section-stack-sm);
+    min-width: 0;
+    min-height: var(--control-md);
+}
+
+/* Row 2: the views scroll sideways; the format switch stays. */
+.plus-section-row--views {
+    flex-wrap: nowrap;
+}
+
+.plus-section-row__views {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+}
+
+.plus-section-row__end {
+    flex-shrink: 0;
+    margin-inline-start: auto;
+}
+
+/* Row 3: Search, then the triggers; the applied count and Clear all end the row. */
+.plus-section-row__search {
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+.plus-section-row__search--fill {
+    flex: 1 1 0;
+}
+
+.plus-section-row__filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--inline-md);
+    min-width: 0;
+}
+
+.plus-section-row__applied {
+    display: flex;
+    align-items: center;
+    gap: var(--inline-md);
+    margin-inline-start: auto;
+}
+
+.plus-section-row__count {
+    font: var(--body-sm);
+    color: var(--ds-text-subtle);
+    white-space: nowrap;
+}
+
 /* Tabs row: the tabs, then "Add view" at its end. */
 .plus-pattern-section-tabs {
     display: flex;

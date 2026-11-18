@@ -310,3 +310,80 @@ describe('Template docs live examples', () => {
         r8.unmount();
     });
 });
+
+describe('PatternSection header rows', () => {
+    const filters = [
+        { key: 'status', label: 'Status', text: 'Upcoming' },
+        { key: 'group', label: 'Group', text: 'All' },
+        { key: 'date', label: 'Date', text: 'All time' },
+    ];
+    const rows = (container) => [...container.querySelectorAll('.plus-section-rows > .plus-section-row')];
+
+    it('draws views and the format switch in row 2, Search and filters in row 3', () => {
+        const { container } = render(
+            <PatternSection
+                title="Sessions"
+                views={<div data-testid="views" />}
+                format={<div data-testid="format" />}
+                search={<div data-testid="search" />}
+                filters={filters}
+            >
+                Body
+            </PatternSection>,
+        );
+        const [row2, row3] = rows(container);
+        expect(within(row2).getByTestId('views')).toBeInTheDocument();
+        expect(within(row2).getByTestId('format')).toBeInTheDocument();
+        expect(within(row3).getByTestId('search')).toBeInTheDocument();
+        expect(within(row3).getByRole('button', { name: 'Status: Upcoming' })).toBeInTheDocument();
+    });
+
+    it('drops row 2 without views and moves the format switch to the end of row 3', () => {
+        const { container } = render(
+            <PatternSection title="Students" format={<div data-testid="format" />} search={<div />} filters={filters}>Body</PatternSection>,
+        );
+        const found = rows(container);
+        expect(found).toHaveLength(1);
+        expect(within(found[0]).getByTestId('format')).toBeInTheDocument();
+    });
+
+    it('drops row 3 when there is nothing to search or filter', () => {
+        const { container } = render(<PatternSection title="Reflections" views={<div />}>Body</PatternSection>);
+        expect(rows(container)).toHaveLength(1);
+    });
+
+    it('ends row 3 with the count and Clear all once a filter is applied', () => {
+        const onClearAll = vi.fn();
+        const applied = filters.map((f, i) => ({ ...f, isSelected: i < 2 }));
+        render(<PatternSection title="Sessions" search={<div />} filters={applied} count="3 of 12" onClearAll={onClearAll}>Body</PatternSection>);
+        expect(screen.getByText('3 of 12')).toBeInTheDocument();
+        screen.getByRole('button', { name: 'Clear all' }).click();
+        expect(onClearAll).toHaveBeenCalled();
+    });
+
+    it('shows no count or Clear all while nothing is applied', () => {
+        render(<PatternSection title="Sessions" search={<div />} filters={filters} count="12 of 12" onClearAll={() => {}}>Body</PatternSection>);
+        expect(screen.queryByRole('button', { name: 'Clear all' })).toBeNull();
+    });
+
+    it('shows three filters and folds the rest into More filters with a count', () => {
+        const many = [...filters, { key: 'grade', label: 'Grade', text: 'All' }, { key: 'tutor', label: 'Tutor', text: 'Any' }];
+        render(<PatternSection title="Sessions" search={<div />} filters={many}>Body</PatternSection>);
+        expect(screen.getByRole('button', { name: 'Date: All time' })).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Grade: All' })).toBeNull();
+        expect(screen.getByRole('button', { name: /More filters/ })).toHaveTextContent('2');
+    });
+
+    it('folds the triggers into one Filter button with the applied count under 768', () => {
+        const before = window.innerWidth;
+        window.innerWidth = 600;
+        try {
+            const applied = filters.map((f, i) => ({ ...f, isSelected: i === 0 }));
+            render(<PatternSection title="Sessions" search={<div data-testid="search" />} filters={applied}>Body</PatternSection>);
+            expect(screen.queryByRole('button', { name: 'Status: Upcoming' })).toBeNull();
+            expect(screen.getByRole('button', { name: /^Filter/ })).toHaveTextContent('1');
+        } finally {
+            window.innerWidth = before;
+        }
+    });
+});

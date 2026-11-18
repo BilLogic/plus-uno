@@ -98,36 +98,40 @@ A Section with a view bar, a detail and a footer. The title, the first pill and 
 
 <div className="sb-ds-doc-section">
 
-## Header types
+## Header rows
 
 A starting set, picked by what the Section holds. Every control state lives on its component: <DocsLink id="components-forms-and-inputs-button-icon-button">Icon button</DocsLink>, <DocsLink id="components-forms-and-inputs-button-filter-button">Filter button</DocsLink> and <DocsLink id="components-navigation-tabs">Tabs</DocsLink>. Which filters the bar takes is <DocsLink id="patterns-filtering">Filtering</DocsLink>; how the search field behaves is the Search pattern, listed in <DocsLink id="patterns-overview">Patterns</DocsLink>.
 
+A header has up to three rows, all on one 32 line. Row 1 is the title with its actions: usually one Primary standing alone, with a `…` Icon button or a secondary button beside it. Row 2 is the views at the start and the format switch at the end. Row 3 is Search, then the filter triggers, each reading "Field: value". A Section with no views drops row 2 and the format switch moves to the end of row 3; one with nothing to search or filter drops row 3.
+
+Every control in a header row is 32: Buttons, Icon buttons and Filter buttons at default spacing, Search and text fields at compact spacing. A Tag beside them is 20. Applied filters take the selected state, and the row ends with the count and Clear all. Three triggers show and the rest go in More filters with a count. Under 768 Search takes the row and the triggers fold into one Filter button with a count.
+
 <TypeGrid>
-<TypeCard of={PatternSectionStories.HeaderTypeTitle} to="#title" title="Title">A title and a description, nothing to act on. Most Sections that hold cards or a form.</TypeCard>
-<TypeCard of={PatternSectionStories.HeaderTypeTitleAndActions} to="#title-and-actions" title="Title and actions">Section actions in the title row. One Primary and two others at most.</TypeCard>
-<TypeCard of={PatternSectionStories.HeaderTypeViewBarOneView} to="#view-bar-one-view" title="View bar, one view">One pill names the rows and stays, so nothing moves when a second view arrives.</TypeCard>
-<TypeCard of={PatternSectionStories.HeaderTypeViewBarSeveralViews} to="#view-bar-several-views" title="View bar, several views">Two to five views of the same rows, a fixed set the product defines. Extra pills fold into More.</TypeCard>
-<TypeCard of={PatternSectionStories.HeaderTypeFormatSwitch} to="#format-switch" title="Format switch">When the rows show as a table or cards, equal-width segments sit first at the end.</TypeCard>
-<TypeCard of={PatternSectionStories.HeaderTypeViewBarAlone} to="#view-bar-alone" title="View bar alone">The page title already names the collection, so the title row is hidden from sight and stays in the page for screen readers.</TypeCard>
-<TypeCard of={PatternSectionStories.HeaderTypeUnderPageTabs} to="#under-page-tabs" title="Under page tabs">One tab system per page: the views become one labeled PopupSelect at the start of the bar. It picks a view, not a filter.</TypeCard>
-<TypeCard of={PatternSectionStories.HeaderTypeSubsection} to="#subsection" title="Subsection">Any type nests once. The title drops to an h3; the view bar keeps its size.</TypeCard>
+<TypeCard of={PatternSectionStories.Full} to="#full" title="Full">Title and actions, views and the format switch, then Search and three triggers.</TypeCard>
+<TypeCard of={PatternSectionStories.FiltersApplied} to="#filters-applied" title="Filters applied">Applied triggers take the selected state; the row ends with the count and Clear all.</TypeCard>
+<TypeCard of={PatternSectionStories.NoViews} to="#no-views" title="No views">Row 2 goes; the format switch joins the end of row 3.</TypeCard>
+<TypeCard of={PatternSectionStories.ViewsOnly} to="#views-only" title="Views only">Nothing to search or filter, so row 3 goes.</TypeCard>
+<TypeCard of={PatternSectionStories.ManyFilters} to="#many-filters" title="Many filters">Three triggers show; the rest sit in More filters with a count.</TypeCard>
+<TypeCard of={PatternSectionStories.RowsSelected} to="#rows-selected" title="Rows selected">The header stays; the table's head row becomes the bulk bar.</TypeCard>
+<TypeCard of={PatternSectionStories.Narrow} to="#narrow" title="Narrow">Search takes the row; the triggers fold into one Filter button with a count.</TypeCard>
+<TypeCard of={PatternSectionStories.Subsection} to="#subsection" title="Subsection">A smaller title; its primary acts on it alone.</TypeCard>
 </TypeGrid>
 
-<ComponentExample of={PatternSectionStories.HeaderTypeTitle} title="Title" description="A title and a description, nothing to act on. Most Sections that hold cards or a form." />
+<ComponentExample of={PatternSectionStories.Full} title="Full" description="Title and actions, views and the format switch, then Search and three triggers." />
 
-<ComponentExample of={PatternSectionStories.HeaderTypeTitleAndActions} title="Title and actions" description="Section actions in the title row. One Primary and two others at most." />
+<ComponentExample of={PatternSectionStories.FiltersApplied} title="Filters applied" description="Applied triggers take the selected state; the row ends with the count and Clear all." />
 
-<ComponentExample of={PatternSectionStories.HeaderTypeViewBarOneView} title="View bar, one view" description="One pill names the rows and stays, so nothing moves when a second view arrives." />
+<ComponentExample of={PatternSectionStories.NoViews} title="No views" description="Row 2 goes; the format switch joins the end of row 3." />
 
-<ComponentExample of={PatternSectionStories.HeaderTypeViewBarSeveralViews} title="View bar, several views" description="Two to five views of the same rows, a fixed set the product defines. Extra pills fold into More." />
+<ComponentExample of={PatternSectionStories.ViewsOnly} title="Views only" description="Nothing to search or filter, so row 3 goes." />
 
-<ComponentExample of={PatternSectionStories.HeaderTypeFormatSwitch} title="Format switch" description="When the rows show as a table or cards, equal-width segments sit first at the end." />
+<ComponentExample of={PatternSectionStories.ManyFilters} title="Many filters" description="Three triggers show; the rest sit in More filters with a count." />
 
-<ComponentExample of={PatternSectionStories.HeaderTypeViewBarAlone} title="View bar alone" description="The page title already names the collection, so the title row is hidden from sight and stays in the page for screen readers." />
+<ComponentExample of={PatternSectionStories.RowsSelected} title="Rows selected" description={'The header stays. The Dynamic table\'s head row becomes the bulk bar at its 40 height: the part-ticked select-all, "3 selected", up to three subtle compact actions and a …, all at the start. The checkboxes clear it, so it has no Clear. Which actions go in the bar, and their words, are the Common actions pattern.'} />
 
-<ComponentExample of={PatternSectionStories.HeaderTypeUnderPageTabs} title="Under page tabs" description="One tab system per page: the views become one labeled PopupSelect at the start of the bar. It picks a view, not a filter." />
+<ComponentExample of={PatternSectionStories.Narrow} title="Narrow" description="At 600 wide the views scroll sideways and the format switch stays; Search takes row 3 and the triggers fold into one Filter button with a count." />
 
-<ComponentExample of={PatternSectionStories.HeaderTypeSubsection} title="Subsection" description="Any type nests once. The title drops to an h3; the view bar keeps its size." />
+<ComponentExample of={PatternSectionStories.Subsection} title="Subsection" description="Any header nests once. The title drops to the subsection size and its primary acts on it alone." />
 
 <ComponentExample of={PatternSectionStories.ToolbarSearch} title="Search" description={<>The Search field, a collapsible compact <code>SearchField</code>, grows left into a field. Esc clears it, a second Esc closes it, and it stays open while it holds text.</>} />
 
@@ -158,8 +162,6 @@ Drag the width through 960 and 768. From 960 the filter side sits at the start. 
 <div className="sb-ds-doc-section">
 
 ## Key states
-
-<ComponentExample of={PatternSectionStories.RowsSelected} title="Rows selected" description={'The Dynamic table\'s head row becomes the bulk bar: the part-ticked select-all, "2 selected", then the actions, at the start. The checkboxes clear it, so it has no Cancel. Which actions go in the bar, and their words, are the Common actions pattern.'} />
 
 <ComponentExample of={PatternSectionStories.EmptyInTable} title="Empty, in a table" description={'The empty state replaces the whole table, column headers and footer too, and offers "Reset filters". The rule is the Empty pattern\'s.'} />
 

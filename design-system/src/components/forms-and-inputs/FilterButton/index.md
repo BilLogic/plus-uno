@@ -14,7 +14,7 @@ Also asked as: filter chip, filter control.
 
 **Source:** `design-system/src/components/forms-and-inputs/FilterButton/FilterButton.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/FilterButton/FilterButton.stories.jsx` — Overview, Metric, Appearances, Spacing, States, Selected, Disabled, Loading, HoveredState, PressedState, KeyboardFocus, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/FilterButton/FilterButton.stories.jsx` — Overview, Label, Metric, Appearances, Spacing, States, Selected, Disabled, Loading, HoveredState, PressedState, KeyboardFocus, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/FilterButton/FilterButton.mdx`
 
@@ -106,9 +106,10 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 ## Parts
 
 1. **Container.** A Button, 32 at default spacing and 24 at compact.
-2. **Label.** The filter's name.
-3. **Metric** (optional). The count of applied values, after the name. `0` shows; leave it out to hide it.
-4. **Chevron** (optional). Drawn by default; turn it off when the button toggles instead of opening a menu.
+2. **Label** (optional). The field the filter narrows, in subtle text before the text; the button then reads "Field: value".
+3. **Text.** The filter's name, or its value when there is a label, in ink.
+4. **Metric** (optional). The count of applied values, after the name. `0` shows; leave it out to hide it.
+5. **Chevron** (optional). Drawn by default; turn it off when the button toggles instead of opening a menu.
 
 ### States
 
@@ -142,7 +143,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `text` | string (required) | — | The filter's name. |
+| `label` | string | — | The field the filter narrows, such as "Status". With it the button reads "Status: Upcoming": the label quiet, `text` the value in ink. |
+| `text` | string (required) | — | The filter's name, or its value when `label` is set. |
 | `trailingMetric` | number or string | — | The count shown after the name. `0` shows; leave it out to hide it. |
 | `hasChevronDown` | bool | `true` | The chevron that says a menu opens. |
 | `appearance` | enum | `'default'` | — |
@@ -163,7 +165,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-text-subtlest` · `--inline-md` · `--inline-sm`
+`--ds-text` · `--ds-text-subtle` · `--ds-text-subtlest` · `--inline-md` · `--inline-sm`
 
 From `design-system/src/components/forms-and-inputs/FilterButton/FilterButton.scss`. Override these through the token layer, never with a literal.
 

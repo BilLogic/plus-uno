@@ -1,10 +1,11 @@
 import React, { useId, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Collapsible } from '@base-ui/react/collapsible';
-import { Button, Icon, Skeleton } from '@/components';
+import { Button, FilterButton, Icon, Skeleton } from '@/components';
 import { HeadingLevelContext, headingTag, useHeadingLevel } from '@/lib/headingLevel';
 import { AnimatePresence, HeightSurface } from '@/lib/heightMotion';
 import { FRAME_LAYOUT } from '../Frame/frameLayout';
+import { useOwnWidth } from '../Frame/useOwnWidth';
 import PatternCard from '../PatternCard/PatternCard';
 import './PatternSection.scss';
 
@@ -26,6 +27,15 @@ import './PatternSection.scss';
  * `tabs-only` or to override. In `custom` and `tabs-only` the title stays in
  * the markup as its heading, visually hidden, so assistive tech still has it.
  * `loading` swaps the header for skeleton bars while the section loads.
+ *
+ * ROWS. Under the title row a header can carry two more, all on one 32 line.
+ * Row 2 holds the `views` at the start and the `format` switch at the end.
+ * Row 3 holds `search`, then the `filters` as "Field: value" triggers; applied
+ * filters take the selected state and the row ends with the `count` and Clear
+ * all. Three triggers show and the rest go in "More filters" with a count;
+ * under 768 Search takes the row and the triggers fold into one Filter button
+ * with the applied count. A Section with no views drops row 2 and the format
+ * switch moves to the end of row 3; nothing to search or filter drops row 3.
  *
  * LEVEL. The title is one heading level below what holds it, and one size
  * smaller: a section on a page is an h2 at Heading/medium 20, a section
@@ -62,6 +72,83 @@ const inferType = ({ header, toolbar, tabs }) => {
     if (toolbar) return 'toolbar';
     if (tabs) return 'tabs';
     return 'default';
+};
+
+/** How many filter triggers show before the rest go in "More filters". */
+export const SECTION_VISIBLE_FILTERS = 3;
+
+/**
+ * Rows 2 and 3 of the header: the views and the format switch, then Search and
+ * the filter triggers. Every control sits on the one 32 line, so Search is the
+ * compact field and the buttons keep their default spacing.
+ */
+const SectionHeaderRows = ({ views, format, search, filters = [], count, onClearAll, onMoreFilters, onOpenFilters, narrow }) => {
+    const hasFilters = filters.length > 0;
+    const hasRow3 = Boolean(search) || hasFilters || (!views && Boolean(format));
+    const applied = filters.filter((filter) => filter.isSelected).length;
+    const shown = filters.slice(0, SECTION_VISIBLE_FILTERS);
+    const hidden = filters.length - shown.length;
+    const hiddenApplied = filters.slice(SECTION_VISIBLE_FILTERS).some((filter) => filter.isSelected);
+    const formatInRow3 = !views && Boolean(format);
+
+    return (
+        <div className="plus-section-rows">
+            {views && (
+                <div className="plus-section-row plus-section-row--views">
+                    <div className="plus-section-row__views">{views}</div>
+                    {format && <div className="plus-section-row__end">{format}</div>}
+                </div>
+            )}
+            {hasRow3 && (
+                <div className="plus-section-row plus-section-row--filters">
+                    {search && <div className={`plus-section-row__search${narrow ? ' plus-section-row__search--fill' : ''}`}>{search}</div>}
+                    {hasFilters && narrow && (
+                        <FilterButton
+                            text="Filter"
+                            iconBefore="filter"
+                            hasChevronDown={false}
+                            trailingMetric={applied > 0 ? applied : undefined}
+                            isSelected={applied > 0}
+                            onClick={onOpenFilters}
+                        />
+                    )}
+                    {hasFilters && !narrow && (
+                        <div className="plus-section-row__filters">
+                            {shown.map(({ key, ...filter }) => <FilterButton key={key ?? filter.label ?? filter.text} {...filter} />)}
+                            {hidden > 0 && (
+                                <FilterButton
+                                    text="More filters"
+                                    iconBefore="filter"
+                                    trailingMetric={hidden}
+                                    isSelected={hiddenApplied}
+                                    onClick={onMoreFilters}
+                                />
+                            )}
+                        </div>
+                    )}
+                    {hasFilters && applied > 0 && !narrow && (
+                        <div className="plus-section-row__applied">
+                            {count && <span className="plus-section-row__count" role="status">{count}</span>}
+                            {onClearAll && <Button text="Clear all" appearance="subtle" onClick={onClearAll} />}
+                        </div>
+                    )}
+                    {formatInRow3 && <div className="plus-section-row__end">{format}</div>}
+                </div>
+            )}
+        </div>
+    );
+};
+
+SectionHeaderRows.propTypes = {
+    views: PropTypes.node,
+    format: PropTypes.node,
+    search: PropTypes.node,
+    filters: PropTypes.arrayOf(PropTypes.object),
+    count: PropTypes.node,
+    onClearAll: PropTypes.func,
+    onMoreFilters: PropTypes.func,
+    onOpenFilters: PropTypes.func,
+    narrow: PropTypes.bool,
 };
 
 /** Title line height per rank, so the skeleton bar is as tall as the title it stands in for. */
@@ -147,6 +234,14 @@ const PatternSection = ({
     toolbar,
     header,
     type: typeProp,
+    views,
+    format,
+    search,
+    filters,
+    count,
+    onClearAll,
+    onMoreFilters,
+    onOpenFilters,
     onAddView,
     addViewLabel = 'Add view',
     loading = false,
@@ -174,11 +269,16 @@ const PatternSection = ({
         className,
     ].filter(Boolean).join(' ');
 
+    const rootRef = useRef(null);
+    const ownWidth = useOwnWidth(rootRef);
+    const narrow = ownWidth < FRAME_LAYOUT.fullWidthBelow;
+    const hasRows = Boolean(views || format || search || (filters && filters.length));
+
     const type = typeProp ?? inferType({ header, toolbar, tabs });
     const tabsOnly = type === 'tabs-only';
     const custom = type === 'custom';
     const bottomRow = type === 'toolbar' ? toolbar : (type === 'tabs' || tabsOnly) ? tabs : null;
-    const hasHeader = loading || title || description || actions || bottomRow || (custom && header);
+    const hasHeader = loading || title || description || actions || bottomRow || hasRows || (custom && header);
 
     const parentLevel = useHeadingLevel();
     const isPage = rankProp === 'page';
@@ -219,11 +319,24 @@ const PatternSection = ({
                         {actions && <div className="plus-pattern-section-actions">{actions}</div>}
                     </div>
                 )}
+                {hasRows && (
+                    <SectionHeaderRows
+                        views={views}
+                        format={format}
+                        search={search}
+                        filters={filters}
+                        count={count}
+                        onClearAll={onClearAll}
+                        onMoreFilters={onMoreFilters}
+                        onOpenFilters={onOpenFilters}
+                        narrow={narrow}
+                    />
+                )}
                 {bottomRow && (
                     <div className={type === 'toolbar' ? 'plus-pattern-section-toolbar' : 'plus-pattern-section-tabs'}>
                         {bottomRow}
                         {type !== 'toolbar' && onAddView && (
-                            <Button text={addViewLabel} appearance="subtle" spacing="compact" iconBefore="plus" onClick={onAddView} />
+                            <Button text={addViewLabel} appearance="subtle" iconBefore="plus" onClick={onAddView} />
                         )}
                     </div>
                 )}
@@ -326,6 +439,7 @@ const PatternSection = ({
 
     return (
         <section
+            ref={rootRef}
             id={id}
             className={classes}
             style={style}
@@ -374,6 +488,39 @@ PatternSection.propTypes = {
     header: PropTypes.node,
     /** Header type. Read from the slots when left off; pass `tabs-only` to show only the tabs row */
     type: PropTypes.oneOf(SECTION_HEADER_TYPES),
+    /** Row 2, at the start: the views, usually Tabs in the pill appearance. It scrolls sideways when it does not fit.
+     * @ds-context Used in: Section.views (ds guide section)
+     */
+    views: PropTypes.node,
+    /** Row 2, at the end: the format switch (Table / Cards). With no `views` it moves to the end of row 3.
+     * @ds-context Used in: Section.format (ds guide section)
+     * @ds-context Governed by: Forms (ds guide forms)
+     */
+    format: PropTypes.node,
+    /** Row 3, at the start: the Search field at compact spacing, which draws 32.
+     * @ds-context Used in: Section.search (ds guide section)
+     * @ds-context Governed by: Search (ds guide search)
+     */
+    search: PropTypes.node,
+    /** Row 3, after Search: one `{ key, label, text, isSelected, onClick }` per trigger, drawn as a FilterButton that reads "label: text". Three show; the rest go in "More filters" with a count. Under 768 they fold into one Filter button. */
+    filters: PropTypes.arrayOf(PropTypes.shape({
+        key: PropTypes.string,
+        label: PropTypes.string,
+        text: PropTypes.string.isRequired,
+        isSelected: PropTypes.bool,
+        onClick: PropTypes.func,
+    })),
+    /** Row 3, at the end once a filter is applied: how many rows match, such as "3 of 12".
+     * @ds-context Used in: Section.count (ds guide section)
+     * @ds-context Governed by: Filtering (ds guide filtering)
+     */
+    count: PropTypes.node,
+    /** Runs when "Clear all" is pressed. The button shows once a filter is applied. */
+    onClearAll: PropTypes.func,
+    /** Runs when "More filters" is pressed. */
+    onMoreFilters: PropTypes.func,
+    /** Runs when the Filter button of a narrow Section is pressed. */
+    onOpenFilters: PropTypes.func,
     /** Puts "Add view" at the end of the tabs row, and runs when it is pressed */
     onAddView: PropTypes.func,
     /** The "Add view" button's label */

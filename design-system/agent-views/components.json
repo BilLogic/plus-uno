@@ -4925,12 +4925,21 @@
       "summary": "Filter button: opens or toggles a filter. It shows the filter's name, an optional count of what is applied, and a chevron when it opens a menu.",
       "props": [
         {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The field the filter narrows, such as \"Status\". With it the button reads \"Status: Upcoming\": the label quiet, `text` the value in ink.",
+          "deprecated": null
+        },
+        {
           "name": "text",
           "type": "string",
           "required": true,
           "default": null,
           "values": null,
-          "description": "The filter's name.",
+          "description": "The filter's name, or its value when `label` is set.",
           "deprecated": null
         },
         {
@@ -5023,6 +5032,7 @@
       ],
       "stories": [
         "Overview",
+        "Label",
         "Metric",
         "Appearances",
         "Spacing",
@@ -5036,6 +5046,8 @@
         "Interactive"
       ],
       "tokens": [
+        "--ds-text",
+        "--ds-text-subtle",
         "--ds-text-subtlest",
         "--inline-md",
         "--inline-sm"
@@ -9224,6 +9236,78 @@
           "deprecated": null
         },
         {
+          "name": "views",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Row 2, at the start: the views, usually Tabs in the pill appearance. It scrolls sideways when it does not fit.",
+          "deprecated": null
+        },
+        {
+          "name": "format",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Row 2, at the end: the format switch (Table / Cards). With no `views` it moves to the end of row 3.",
+          "deprecated": null
+        },
+        {
+          "name": "search",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Row 3, at the start: the Search field at compact spacing, which draws 32.",
+          "deprecated": null
+        },
+        {
+          "name": "filters",
+          "type": "arrayOf",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "Row 3, after Search: one `{ key, label, text, isSelected, onClick }` per trigger, drawn as a FilterButton that reads \"label: text\". Three show; the rest go in \"More filters\" with a count. Under 768 they fold into one Filter button.",
+          "deprecated": null
+        },
+        {
+          "name": "count",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Row 3, at the end once a filter is applied: how many rows match, such as \"3 of 12\".",
+          "deprecated": null
+        },
+        {
+          "name": "onClearAll",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Runs when \"Clear all\" is pressed. The button shows once a filter is applied.",
+          "deprecated": null
+        },
+        {
+          "name": "onMoreFilters",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Runs when \"More filters\" is pressed.",
+          "deprecated": null
+        },
+        {
+          "name": "onOpenFilters",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Runs when the Filter button of a narrow Section is pressed.",
+          "deprecated": null
+        },
+        {
           "name": "onAddView",
           "type": "func",
           "required": false,
@@ -9439,18 +9523,17 @@
         "TypeMainAndSide",
         "TypeForm",
         "TypeSubsections",
-        "HeaderTypeTitle",
-        "HeaderTypeTitleAndActions",
-        "HeaderTypeViewBarOneView",
-        "HeaderTypeViewBarSeveralViews",
-        "HeaderTypeFormatSwitch",
-        "HeaderTypeViewBarAlone",
-        "HeaderTypeUnderPageTabs",
-        "HeaderTypeSubsection",
+        "Full",
+        "FiltersApplied",
+        "NoViews",
+        "ViewsOnly",
+        "ManyFilters",
+        "RowsSelected",
+        "Narrow",
+        "Subsection",
         "SideAtEnd",
         "FilterSideAtStart",
         "ResponsiveWidth",
-        "RowsSelected",
         "EmptyInTable",
         "AnatomyQueue"
       ],
@@ -13643,9 +13726,7 @@
             "element-radius-full",
             "card-radius-sm",
             "card-radius-md",
-            "section-radius-sm",
-            "section-radius-md",
-            "section-radius-lg"
+            "card-radius-lg"
           ],
           "description": "A radius token name, such as `element-radius-md` or `card-radius-sm`. Ignored, with a warning, by presets, by `circle` (always round) and by several text `lines`, which keep the text bar's radius.",
           "deprecated": null
