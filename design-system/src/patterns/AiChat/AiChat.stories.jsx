@@ -2,8 +2,9 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { Breadcrumb, Button, Modal, Sidebar } from '@/components';
-import { AiChat, AI_CHAT_STORAGE_KEY, PANEL_STORAGE_KEY, PatternCard } from '@/patterns';
+import { AiChat, AI_CHAT_STORAGE_KEY, PANEL_STORAGE_KEY } from '@/patterns';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
+import { slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
 import DocsAiAgent from '@/storybook-docs/chrome/DocsAiAgent';
 import { buildDocsEntries } from '@/storybook-docs/chrome/docsSearch';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
@@ -42,18 +43,8 @@ const ChatPage = ({ height = '100vh', withModal = false, ...args }) => {
             starters={STARTERS}
             {...args}
         >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
-                <PatternCard
-                    title="Lincoln Middle · Grade 7 math"
-                    description="Tue, Oct 24 · 4:00 to 4:45 PM"
-                    style={{ maxWidth: 'var(--card-min-width-lg)' }}
-                >
-                    <p className="body-default" style={{ margin: 0, color: 'var(--ds-text-subtle)' }}>
-                        Tutor: Maya K. · Students: Ava T., Marcus L. · SMART focus: Mastering content (two-step equations).
-                    </p>
-                </PatternCard>
-                {withModal ? <div><Button text="Page settings" onClick={() => setModal(true)} /></div> : null}
-            </div>
+            {slotContent('Today’s Grade 7 math sessions at Lincoln Middle')}
+            {withModal ? <div><Button text="Page settings" onClick={() => setModal(true)} /></div> : null}
             {withModal ? (
                 <Modal
                     show={modal}

@@ -36,15 +36,32 @@
  * findings rather than counted as either.
  */
 import { documents } from './lib/corpus.mjs';
+import { LIBRARY_ROOT } from './lib/ds-facts.mjs';
 
 import { TOKEN_NAME, varReferencePattern } from '../design-system/src/lib/tokens.mjs';
 
 /** The extensions a token name can be written in. */
 const SEARCHED = ['.scss', '.css', '.jsx', '.tsx', '.mdx', '.html'];
+const LIBRARY_PREFIX = `${LIBRARY_ROOT}/`;
+const isTestFile = (file) => /\.test\.[^/]+$/.test(file);
+const isLibraryStringFile = (file) =>
+  file.startsWith(LIBRARY_PREFIX) && /\.(mdx|jsx|js)$/.test(file) && !isTestFile(file);
 
 /** Every searched file under the roots, repo-relative. */
 export function corpus(repoRoot, roots) {
   return roots.flatMap((root) => documents(root, { root: repoRoot, ext: SEARCHED })).sort();
+}
+
+/**
+ * Every file `check:undefined-tokens` audits: the shared corpus plus non-test
+ * `.js` files under `design-system/src`, where token arrays and lookup maps
+ * hold `'--name'` literals passed into `var(${tone})`.
+ */
+export function tokenCorpus(repoRoot, roots) {
+  const base = corpus(repoRoot, roots);
+  if (!roots.includes(LIBRARY_ROOT)) return base;
+  const jsFiles = documents(LIBRARY_ROOT, { root: repoRoot, ext: ['.js'] }).filter((f) => !isTestFile(f));
+  return [...new Set([...base, ...jsFiles])].sort();
 }
 
 /**
@@ -87,7 +104,13 @@ export function stripComments(text) {
     .replace(/(^|\s)\/\/[^\n]*/g, (m, lead) => lead + blank(m.slice(lead.length)));
 }
 
-/** Every `var(--x)` in the corpus, with whether it carries a fallback. */
+const STRING_TOKEN = () => new RegExp(`(['"])(${TOKEN_NAME})\\1`, 'g');
+
+/**
+ * Every `var(--x)` in the corpus (with whether it carries a fallback), plus
+ * quoted `'--name'` / `"--name"` string literals in non-test `.mdx`, `.jsx`,
+ * and `.js` files under `design-system/src`.
+ */
 export function usages(files) {
   const out = [];
   for (const { path: file, text: raw } of files) {
@@ -101,6 +124,19 @@ export function usages(files) {
         // is read off the text after it rather than captured: `var(--x)` is bare,
         // `var(--x, 14px)` is not, and the two are different defects.
         bare: !/^\s*,/.test(text.slice(m.index + m[0].length)),
+      });
+    }
+    if (!isLibraryStringFile(file)) continue;
+    for (const m of text.matchAll(STRING_TOKEN())) {
+      const name = m[2];
+      // Trailing-hyphen literals like `'--ds-background-'` are prefix strings
+      // (e.g. `.replace('--ds-background-', '')`), not complete token names.
+      if (name.endsWith('-')) continue;
+      out.push({
+        name,
+        file,
+        line: text.slice(0, m.index).split('\n').length,
+        bare: true,
       });
     }
   }

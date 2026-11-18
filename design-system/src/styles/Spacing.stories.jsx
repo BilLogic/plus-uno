@@ -65,7 +65,7 @@ export const ItemHeights = () => (
         </div>
         <div style={col('var(--stack-md)')}>
             <span><Tag text="Grade 7" /></span>
-            <span style={tag}>Label 20 · pad-x 4 · Tag, Status, Count</span>
+            <span style={tag}>Label 20 · pad-x 4 · Tag, Status · Count 16</span>
         </div>
     </div>
 );

@@ -100,9 +100,9 @@ export const Overview = {
 export const Interactive = {
     args: {
         data: [
-            { name: 'A', y: 50, z: 10 },
-            { name: 'B', y: 30, z: 20 },
-            { name: 'C', y: 40, z: 5 },
+            { name: 'Grade 6', y: 84, z: 32 },
+            { name: 'Grade 7', y: 88, z: 45 },
+            { name: 'Grade 8', y: 91, z: 28 },
         ],
         height: 400,
         sort: true,

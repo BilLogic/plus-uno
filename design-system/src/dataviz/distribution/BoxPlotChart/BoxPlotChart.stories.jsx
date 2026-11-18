@@ -95,13 +95,13 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        categories: ['Group 1', 'Group 2', 'Group 3'],
+        categories: ['Grade 6', 'Grade 7', 'Grade 8'],
         data: [
-            [10, 25, 50, 75, 90],
-            [20, 35, 55, 70, 85],
-            [15, 30, 45, 65, 80],
+            [54, 68, 76, 85, 94],
+            [58, 71, 79, 87, 96],
+            [62, 74, 82, 89, 97],
         ],
-        yAxisLabel: 'Value',
+        yAxisLabel: 'Competency score',
         height: 400,
         sort: true,
     },

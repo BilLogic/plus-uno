@@ -266,7 +266,7 @@ Students by grade in the tutoring cohort.
 <DoDont>
 <Do caption="Biggest at the top, darkest tone on the biggest value.">
 <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-    {[['Grade 9', 48, '--chart-blue-boldest'], ['Grade 10', 36, '--chart-blue-bolder'], ['Grade 11', 27, '--chart-blue-bold'], ['Grade 12', 15, '--chart-blue-subtle']].map(([label, n, tone]) => (
+    {[['Grade 9', 48, '--chart-blue-boldest'], ['Grade 10', 36, '--chart-blue-bolder'], ['Grade 11', 27, '--chart-blue-bold'], ['Grade 12', 15, '--ds-background-accent-blue-subtler']].map(([label, n, tone]) => (
         <li key={label} style={{ display: 'grid', gridTemplateColumns: 'var(--card-min-width-sm) 1fr', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-sm)' }}>
             <span>{label}</span>
             <span style={{ display: 'block', height: 'var(--icon-md)', width: `${n * 2}%`, borderRadius: 'var(--radius-sm)', background: `var(${tone})` }} />

@@ -95,9 +95,9 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        data: [1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 8, 8, 9, 10],
-        xAxisLabel: 'Value range',
-        yAxisLabel: 'Value',
+        data: [22, 26, 28, 30, 32, 34, 35, 36, 38, 40, 42, 44, 45, 45, 48, 50, 52, 55, 58, 60, 62, 65, 68, 70, 74, 78],
+        xAxisLabel: 'Minutes tutored',
+        yAxisLabel: 'Sessions',
         height: 400,
     },
 };

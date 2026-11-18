@@ -6,6 +6,7 @@ import { expectInk } from '@/storybook-docs/lib/navigation-states.js';
 
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { CountTag } from '@/components';
 import Tabs from './Tabs';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
@@ -208,6 +209,48 @@ Appearance.play = async ({ canvasElement }) => {
         await expect(px(t.borderBottomWidth), `${tab.textContent}: no underline`).toBe(0);
         await expect(px(t.marginBottom), `${tab.textContent}: not pulled onto a baseline`).toBe(0);
     }
+};
+
+/** A trailing `CountTag` sits at 16 inside default (32) and compact (24) tabs. */
+export const WithCount = {
+    render: () => (
+        <div style={col}>
+            <section>
+                <DemoLabel>DEFAULT (32)</DemoLabel>
+                <Tabs defaultActiveKey="1">
+                    <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
+                    <Tabs.Tab eventKey="2">Sessions <CountTag value={4} label="4 sessions" /></Tabs.Tab>
+                    <Tabs.Tab eventKey="3">Messages <CountTag value={12} isBold appearance="danger" label="12 unread" /></Tabs.Tab>
+                </Tabs>
+            </section>
+            <section>
+                <DemoLabel>COMPACT (24)</DemoLabel>
+                <Tabs spacing="compact" appearance="pill" defaultActiveKey="1">
+                    <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
+                    <Tabs.Tab eventKey="2">Sessions <CountTag value={4} label="4 sessions" /></Tabs.Tab>
+                    <Tabs.Tab eventKey="3">Messages <CountTag value={12} isBold appearance="danger" label="12 unread" /></Tabs.Tab>
+                </Tabs>
+            </section>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const strips = [...canvasElement.querySelectorAll('.plus-tabs')];
+        for (const [strip, expectedHeight] of [[strips[0], 32], [strips[1], 24]]) {
+            for (const tab of strip.querySelectorAll('.plus-tab')) {
+                const tabRect = tab.getBoundingClientRect();
+                await expect(Math.round(tabRect.height), `${tab.textContent} tab height`).toBe(expectedHeight);
+                const count = tab.querySelector('.plus-count');
+                if (count) {
+                    const countRect = count.getBoundingClientRect();
+                    await expect(countRect.height, `${tab.textContent} count height`).toBe(16);
+                    await expect(
+                        Math.abs((countRect.top + countRect.bottom) / 2 - (tabRect.top + tabRect.bottom) / 2),
+                        `${tab.textContent} count centered`,
+                    ).toBeLessThanOrEqual(0.5);
+                }
+            }
+        }
+    },
 };
 
 /**

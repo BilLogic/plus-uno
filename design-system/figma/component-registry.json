@@ -401,13 +401,6 @@
               "discovery"
             ]
           },
-          "spacing": {
-            "type": "enum",
-            "values": [
-              "default",
-              "compact"
-            ]
-          },
           "isBold": {
             "type": "boolean"
           },
@@ -433,7 +426,7 @@
             "source": "manual",
             "status": "verified",
             "isComponentSet": true,
-            "notes": "On the Labels page, Status, count & tag. Figma values carry a (default) suffix on subtle, neutral and default; hasRing is the ring in Figma. Inverse exists in neutral only, and dot at default spacing only. Docs page: node 17883:1895."
+            "notes": "On the Labels page, Status, count & tag. Figma values carry a (default) suffix on subtle and neutral; hasRing is the ring in Figma. Inverse exists in neutral only. Docs page: node 17883:1895."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20454-869"

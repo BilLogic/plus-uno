@@ -113,7 +113,7 @@ Same group: `AiMessage` · `ChangeTag` · `CompetencyTag` · `CountTag` · `Date
 
 1. **Icon before.** Optional: a Font Awesome Free icon by name.
 2. **Label.** The condition, in a word or two. Past `maxWidth` it ends in an ellipsis and the full text is a tooltip.
-3. **Trailing metric.** Optional: a compact `CountTag` nested inside, with its own appearance when it means something else.
+3. **Trailing metric.** Optional: a 16 `CountTag` nested inside, with its own appearance when it means something else.
 4. **Fill.** The appearance's tinted ground with its words and an inset edge one step darker.
 
 ### States
@@ -153,7 +153,7 @@ Same group: `AiMessage` · `ChangeTag` · `CompetencyTag` · `CountTag` · `Date
 | `appearance` | enum | `'neutral'` | The meaning. Info is Tertiary; discovery is the curriculum purple. |
 | `spacing` | enum | `'default'` | `default` (20) in rows, lists and sentences; `spacious` (32) beside a heading. |
 | `iconBefore` | string | — | One icon before the label: a Font Awesome Free name (`circle-check`). |
-| `trailingMetric` | number or string | — | A small count at the end of the tag, a Count tag nested inside it: compact (16) in default, default (20) in spacious. Hidden at 0. |
+| `trailingMetric` | number or string | — | A small count at the end of the tag, a 16 Count tag nested inside it. Hidden at 0. |
 | `trailingMetricAppearance` | oneOf | — | The Count tag's appearance. Defaults to the Status tag's own. |
 | `maxWidth` | number or string | `200` | The widest the Status tag grows, in px or any CSS length, and never wider than its container. Past it the label ends in an ellipsis and the full text is a tooltip. |
 | `className` | string | `''` | Extra class names added to the tag element beside the component's own. |

@@ -8,7 +8,6 @@ import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import ChangeTag, {
     CHANGE_TAG_FORMATS,
     CHANGE_TAG_GOOD_DIRECTIONS,
-    CHANGE_TAG_SPACINGS,
 } from './ChangeTag';
 import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 
@@ -41,9 +40,6 @@ export default {
 };
 
 const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--grid-gutter)', alignItems: 'center' };
-const grid = { display: 'grid', gap: 'var(--stack-lg)' };
-
-const SIZE = { default: 20, compact: 16 };
 
 /** [fill, text, inside border] per tone. */
 const TONE_LOOK = {
@@ -132,16 +128,12 @@ Overview.play = async ({ canvasElement }) => {
     }
 };
 
-/** Every tone at every spacing, and the comparison in subtle text outside the fill. */
+/** Every tone, 16 tall, and the comparison in subtle text outside the fill. */
 export const Styles = () => (
-    <div style={grid}>
-        {CHANGE_TAG_SPACINGS.map((size) => (
-            <div key={size} style={row}>
-                <ChangeTag value={0} spacing={size} comparison="vs last week" data-testid={`neutral-${size}`} />
-                <ChangeTag value={3} goodDirection="up" spacing={size} comparison="vs last week" data-testid={`success-${size}`} />
-                <ChangeTag value={3} goodDirection="down" spacing={size} comparison="vs last week" data-testid={`danger-${size}`} />
-            </div>
-        ))}
+    <div style={row}>
+        <ChangeTag value={0} comparison="vs last week" data-testid="neutral" />
+        <ChangeTag value={3} goodDirection="up" comparison="vs last week" data-testid="success" />
+        <ChangeTag value={3} goodDirection="down" comparison="vs last week" data-testid="danger" />
     </div>
 );
 Styles.play = async ({ canvasElement }) => {
@@ -149,33 +141,28 @@ Styles.play = async ({ canvasElement }) => {
     const token = (name) => tokenColor(canvasElement, name);
 
     await inEveryColorModeOf(canvasElement, async (mode, themed) => {
-        for (const size of CHANGE_TAG_SPACINGS) {
-            for (const [tone, [fill, ink, edge]] of Object.entries(TONE_LOOK)) {
-                const tag = tagOf(canvas.getByTestId(`${tone}-${size}`));
-                const name = `${mode}: ${tone}-${size}`;
-                tag.style.transition = 'none';
-                await expect(getComputedStyle(tag).backgroundColor, `${name} fill`).toBe(themed(fill));
-                await expect(getComputedStyle(tag).color, `${name} text`).toBe(themed(ink));
-                await expect(innerBorder(tag), `${name} border`).toBe(themed(edge));
-            }
+        for (const [tone, [fill, ink, edge]] of Object.entries(TONE_LOOK)) {
+            const tag = tagOf(canvas.getByTestId(tone));
+            const name = `${mode}: ${tone}`;
+            tag.style.transition = 'none';
+            await expect(getComputedStyle(tag).backgroundColor, `${name} fill`).toBe(themed(fill));
+            await expect(getComputedStyle(tag).color, `${name} text`).toBe(themed(ink));
+            await expect(innerBorder(tag), `${name} border`).toBe(themed(edge));
         }
     });
 
-    for (const size of CHANGE_TAG_SPACINGS) {
-        for (const [tone, [, ink]] of Object.entries(TONE_LOOK)) {
-            const name = `${tone}-${size}`;
-            const el = canvas.getByTestId(name);
-            const tag = tagOf(el);
-            await expect(tag.getBoundingClientRect().height, `${name} height`).toBe(SIZE[size]);
-            await expect(px(getComputedStyle(tag).borderRadius), `${name} radius`).toBe(4);
-            const glyph = iconIn(el);
-            await expect(glyph).toHaveAttribute('aria-hidden', 'true');
-            await expect(getComputedStyle(glyph).color, `${name} arrow color`).toBe(token(ink));
-            await expect(px(getComputedStyle(glyph).fontSize), `${name} arrow size`).toBe(12);
-            const comparison = within(el).getByText('vs last week', { selector: '[aria-hidden="true"]' });
-            await expect(getComputedStyle(comparison).color, `${name} comparison`).toBe(token('--ds-text-subtle'));
-            await expect(tag.contains(comparison), `${name} comparison sits outside the fill`).toBe(false);
-        }
+    for (const [tone, [, ink]] of Object.entries(TONE_LOOK)) {
+        const el = canvas.getByTestId(tone);
+        const tag = tagOf(el);
+        await expect(tag.getBoundingClientRect().height, `${tone} height`).toBe(16);
+        await expect(px(getComputedStyle(tag).borderRadius), `${tone} radius`).toBe(4);
+        const glyph = iconIn(el);
+        await expect(glyph).toHaveAttribute('aria-hidden', 'true');
+        await expect(getComputedStyle(glyph).color, `${tone} arrow color`).toBe(token(ink));
+        await expect(px(getComputedStyle(glyph).fontSize), `${tone} arrow size`).toBe(12);
+        const comparison = within(el).getByText('vs last week', { selector: '[aria-hidden="true"]' });
+        await expect(getComputedStyle(comparison).color, `${tone} comparison`).toBe(token('--ds-text-subtle'));
+        await expect(tag.contains(comparison), `${tone} comparison sits outside the fill`).toBe(false);
     }
 };
 
@@ -298,14 +285,14 @@ NeverAButton.play = async ({ canvasElement }) => {
     }
 };
 
-/** An unknown format, good direction or spacing falls back to the default, with a development warning. */
+/** An unknown format or good direction falls back to the default, with a development warning. */
 export const UnknownValuesFallBack = () => {
     const [mounted, setMounted] = useState(false);
     return (
         <div style={row}>
             <Button onClick={() => setMounted(true)}>Mount unknown values</Button>
             <ChangeTag value={3} data-testid="plain" />
-            {mounted && <ChangeTag value={3} format="ratio" goodDirection="sideways" spacing="huge" data-testid="fallback" />}
+            {mounted && <ChangeTag value={3} format="ratio" goodDirection="sideways" data-testid="fallback" />}
         </div>
     );
 };
@@ -316,12 +303,11 @@ UnknownValuesFallBack.play = async ({ canvasElement }) => {
         await userEvent.click(canvas.getByRole('button', { name: 'Mount unknown values' }));
         await expect(warn).toHaveBeenCalledWith(expect.stringContaining('falls back to number'));
         await expect(warn).toHaveBeenCalledWith(expect.stringContaining('falls back to none'));
-        await expect(warn).toHaveBeenCalledWith(expect.stringContaining('falls back to default'));
         const fallback = canvas.getByTestId('fallback');
         const plain = canvas.getByTestId('plain');
         await expect(seen(fallback)).toBe(seen(plain));
         await expect(getComputedStyle(tagOf(fallback)).backgroundColor).toBe(getComputedStyle(tagOf(plain)).backgroundColor);
-        await expect(tagOf(fallback).getBoundingClientRect().height).toBe(20);
+        await expect(tagOf(fallback).getBoundingClientRect().height).toBe(16);
     } finally {
         warn.mockRestore();
     }
@@ -336,13 +322,11 @@ export const Interactive = {
         format: 'number',
         goodDirection: 'up',
         comparison: 'vs last week',
-        spacing: 'default',
     },
     argTypes: {
         value: { control: 'number' },
         format: { control: 'inline-radio', options: CHANGE_TAG_FORMATS },
         goodDirection: { control: 'inline-radio', options: CHANGE_TAG_GOOD_DIRECTIONS },
-        spacing: { control: 'inline-radio', options: CHANGE_TAG_SPACINGS },
         comparison: { control: 'text' },
         iconBefore: { control: 'text' },
     },
@@ -356,7 +340,7 @@ export const Rest = {
     render: () => <ChangeTag value={3} goodDirection="up" comparison="vs last week" data-testid="change" />,
     play: async ({ canvasElement }) => {
         const el = within(canvasElement).getByTestId('change');
-        await expect(px(getComputedStyle(tagOf(el)).height), 'default is 20').toBe(20);
+        await expect(px(getComputedStyle(tagOf(el)).height), 'change tag is 16').toBe(16);
         await expect(el).not.toHaveAttribute('tabindex');
     },
 };

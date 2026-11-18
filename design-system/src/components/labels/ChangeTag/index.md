@@ -96,7 +96,7 @@ Same group: `AiMessage` · `CompetencyTag` · `CountTag` · `DateTag` · `Prompt
 
 | Part | Token |
 | --- | --- |
-| Height | `--label-height-md` (20), or `--label-height-sm` (16) when compact. |
+| Height | `--label-height-sm` (16). |
 | Padding and gap | `--pad-x-xs` on both sides, 2 between arrow and value, `--inline-sm` before the comparison. |
 | Corner | `--radius-md`. |
 | Neutral | `--ds-background-neutral` fill, `--ds-text` words, `--ds-background-neutral-pressed` edge. |
@@ -121,7 +121,6 @@ Same group: `AiMessage` · `CompetencyTag` · `CountTag` · `DateTag` · `Prompt
 | `format` | enum | `'number'` | `number` (+3), `percent` (+12%) or `points` (+3 pts). Always signed. |
 | `goodDirection` | enum | `'none'` | Which way is good: `up` or `down` turn the tag success or danger; `none` keeps it neutral for a change with no value judgment. |
 | `comparison` | node | — | What the change is measured against, such as "vs last week", in subtle text after the tag. |
-| `spacing` | enum | `'default'` | `default` (20) in cards and headers; `compact` (16) in table cells. |
 | `iconBefore` | string | — | Replaces the direction arrow: a Font Awesome Free name (`arrow-trend-up`). Decorative; the words carry the direction. |
 | `className` | string | `''` | Extra class names added to the tag element beside the component's own. |
 | `id` | string | — | The `id` attribute of the tag element. |
@@ -131,8 +130,6 @@ Same group: `AiMessage` · `CompetencyTag` · `CountTag` · `DateTag` · `Prompt
 **`format`** — `number` · `percent` · `points`
 
 **`goodDirection`** — `up` · `down` · `none`
-
-**`spacing`** — `default` · `compact`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 

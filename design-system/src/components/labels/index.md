@@ -14,7 +14,7 @@ authored half, counted rather than assumed.
 - **[CompetencyTag](CompetencyTag/index.md)** — Use `CompetencyTag` wherever training content, a tutor's strengths or a feedback item is tagged by competency area. `CompetencyTag` fixes the color and icon per subject and delegates every other behavior to `Tag`.
   - For a category outside the five competency areas, use `Tag`.
   - For a workflow condition such as "Completed" or "Needs review", use `StatusTag`.
-- **[CountTag](CountTag/index.md)** — Use `CountTag` for a number on its own: unread messages on a nav item, results on a tab, errors in a section header, a notification on a bell.
+- **[CountTag](CountTag/index.md)** — Use `CountTag` for a number on its own: unread messages on a nav item, results on a tab, errors in a section header, a notification on a bell. It is always `16` tall, including inside `Button`, `Tabs`, `Sidebar` rows, `StatusTag` (`trailingMetric`) and selectable `Tag` (`trailingMetric`).
   - For the condition something is in, use `StatusTag`.
   - For a change over time such as "+3 vs last week", use `ChangeTag`.
   - For a due or event date, use `DateTag`.
@@ -45,9 +45,9 @@ authored half, counted rather than assumed.
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [AiMessage](AiMessage/index.md) | 11 | ✅ | ✅ | ✅ |
-| [ChangeTag](ChangeTag/index.md) | 8 | ✅ | ✅ | ✅ |
+| [ChangeTag](ChangeTag/index.md) | 7 | ✅ | ✅ | ✅ |
 | [CompetencyTag](CompetencyTag/index.md) | 3 | ✅ | ✅ | ✅ |
-| [CountTag](CountTag/index.md) | 12 | ✅ | ✅ | ✅ |
+| [CountTag](CountTag/index.md) | 11 | ✅ | ✅ | ✅ |
 | [DateTag](DateTag/index.md) | 6 | ✅ | ✅ | ✅ |
 | [PromptStarters](PromptStarters/index.md) | 4 | ✅ | ✅ | ✅ |
 | [StatusTag](StatusTag/index.md) | 9 | ✅ | ✅ | ✅ |

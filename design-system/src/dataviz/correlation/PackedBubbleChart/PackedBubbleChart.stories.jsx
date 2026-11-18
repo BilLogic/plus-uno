@@ -95,17 +95,17 @@ export const Interactive = {
     args: {
         data: [
             {
-                name: 'Group A',
+                name: 'Lincoln Middle',
                 data: [
-                    { name: 'Item 1', value: 100 },
-                    { name: 'Item 2', value: 80 },
+                    { name: 'Grade 6', value: 100 },
+                    { name: 'Grade 7', value: 84 },
                 ],
             },
             {
-                name: 'Group B',
+                name: 'Roosevelt K-8',
                 data: [
-                    { name: 'Item 3', value: 120 },
-                    { name: 'Item 4', value: 60 },
+                    { name: 'Grade 7', value: 120 },
+                    { name: 'Grade 8', value: 64 },
                 ],
             },
         ],

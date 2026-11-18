@@ -61,6 +61,18 @@ export const WithDescription = { args: { text: 'Lin Chen', iconBefore: 'user', d
 export const WithCount = {
     args: { text: 'Compliance', iconBefore: 'flag', onClick: () => {} },
     render: (args) => <SidebarTab {...args} elemAfter={<CountTag value={3} label="3 open flags" />} />,
+    play: async ({ canvasElement }) => {
+        const row = canvasElement.querySelector('.plus-sidebar-tab');
+        const count = row.querySelector('.plus-count');
+        const rowRect = row.getBoundingClientRect();
+        const countRect = count.getBoundingClientRect();
+        await expect(Math.round(rowRect.height), 'sidebar row is 32 tall').toBe(32);
+        await expect(countRect.height, 'count in sidebar row is 16 tall').toBe(16);
+        await expect(
+            Math.abs((countRect.top + countRect.bottom) / 2 - (rowRect.top + rowRect.bottom) / 2),
+            'count is vertically centered in row',
+        ).toBeLessThanOrEqual(0.5);
+    },
 };
 
 /** Controls shown on hover and focus, beside the row rather than inside it. */

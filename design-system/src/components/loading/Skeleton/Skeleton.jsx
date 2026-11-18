@@ -6,8 +6,8 @@ import './Skeleton.scss';
  * `Skeleton` — a gray placeholder shape while content loads.
  *
  * ONE PIECE, MANY SHAPES. A rectangle, a circle or a text bar that can repeat
- * as lines, plus presets sized to the labels: Status (20 and 32), Count (20,
- * round), Tag (22), person Tag (22, round), a tag group and a paragraph. A
+ * as lines, plus presets sized to the labels: Status (20 and 32), Count (16),
+ * Tag (22), person Tag (22, round), a tag group and a paragraph. A
  * preset sets shape, height and corners together and wins over them, so a
  * label placeholder is the label's size without anyone looking it up. The
  * preset heights come from `_label-heights.scss`, the file the labels read

@@ -1,15 +1,13 @@
 /*
  * Count tag — a number on its own, as a near-square countTag.
  *
- * EVERY NUMBER IS A BADGE: 20 high on its own, 16 for use inside a label, a
- * 2 corner and a minimum width of 24, so one digit is a small rectangle and
- * two or three digits grow it from the trailing edge. Only the dot is round.
+ * EVERY NUMBER IS A BADGE: 16 high everywhere, a 4 corner and a minimum width
+ * of 24, so one digit is a small rectangle and two or three digits grow it
+ * from the trailing edge. Only the dot is round.
  *
- * The two heights have no semantic token yet (label heights 16/20/22/32 are a
- * token follow-up), so they are local custom properties set from
- * `_label-heights.scss`, which Skeleton reads too. The minimum widths and
- * the dot take the spacing primitives Figma binds them to. Padding is the
- * Element token, which is 4.
+ * The height is a local custom property set from `_label-heights.scss`, which
+ * Skeleton reads too. The minimum width and the dot take the spacing
+ * primitives Figma binds them to. Padding is the Element token, which is 4.
  */
 @use '../label-heights' as label;
 @use '../../../styles/type' as *;
@@ -31,11 +29,6 @@
     @include ds-type(var(--body-sm));
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
-}
-
-.plus-count--compact {
-    --plus-count-size: #{label.$count-height-compact};
-    --plus-count-min: var(--control-sm);
 }
 
 /*
@@ -126,7 +119,7 @@ $count-dot: (
 }
 
 /*
- * The compact countTag is 16 tall and the B3 line is 20; the flex box centers the
+ * The countTag is 16 tall and the B3 line is 20; the flex box centers the
  * line, and a line height of the countTag keeps the digits from being clipped.
  */
 .plus-count .plus-count__value {
