@@ -213,6 +213,7 @@ const preview = {
             ],
             "Layout",
             [
+              "Dimensions",
               "Spacing",
               "Grid"
             ],
