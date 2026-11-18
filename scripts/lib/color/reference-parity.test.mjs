@@ -54,8 +54,8 @@ const values = (rows) => rows.map((r) => Object.fromEntries(VALUE_KEYS.map((k) =
 const withoutProse = (value) =>
   JSON.parse(currentNames(JSON.stringify(value, (k, v) => (k === 'description' || k === 'use' || k === 'deviation' ? undefined : v))));
 /** Tokens PLUS added after the reference was cut. */
-const PLUS_ONLY_TOKEN = /^color[./]background[./]competency[./][a-z-]+[./]subtle$|^color[./]ai[./]background[./]bold|^opacity[./]chart[./]/;
-const PLUS_ONLY_SCSS_DECL = /^ +--ds-(?:background-competency-[a-z-]+-subtle|ai-background-bold[a-z-]*|opacity-chart-[a-z]+): [^\n]*\n/gm;
+const PLUS_ONLY_TOKEN = /^color[./]background[./]competency[./][a-z-]+[./]subtle$|^color[./]ai[./]background[./]bold|^color[./]logo[./]|^opacity[./]chart[./]/;
+const PLUS_ONLY_SCSS_DECL = /^ +--ds-(?:background-competency-[a-z-]+-subtle|ai-background-bold[a-z-]*|logo-[a-z0-9-]+|opacity-chart-[a-z]+): [^\n]*\n/gm;
 const withoutPlusOnly = (spec) => ({
   ...spec,
   collections: spec.collections.map((c) => ({ ...c, variables: c.variables.filter((v) => !PLUS_ONLY_TOKEN.test(v.name)) })),
