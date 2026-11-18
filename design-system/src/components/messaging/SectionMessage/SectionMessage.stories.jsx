@@ -91,8 +91,8 @@ function SectionMessageContentDemos() {
                 <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Use when the message benefits from a short heading.
                 </p>
-                <SectionMessage appearance="primary" title="With Title" dismissible>
-                    Message with title and body text.
+                <SectionMessage appearance="primary" title="Session notes saved" dismissible>
+                    Your notes for Maya K. are ready to share with her family.
                 </SectionMessage>
             </section>
             <section>
@@ -101,7 +101,7 @@ function SectionMessageContentDemos() {
                     Use when concise copy does not require a heading.
                 </p>
                 <SectionMessage appearance="primary" dismissible>
-                    Message without title — body only. The dismiss button centers on the first body line.
+                    Session start times appear in Eastern Time. Update your profile if you travel.
                 </SectionMessage>
             </section>
             <section>
@@ -109,8 +109,8 @@ function SectionMessageContentDemos() {
                 <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Use for critical information that must remain visible.
                 </p>
-                <SectionMessage appearance="primary" title="Non-dismissible message" dismissible={false}>
-                    This message cannot be dismissed.
+                <SectionMessage appearance="primary" title="Schedule locked for Friday" dismissible={false}>
+                    Sessions within 24 hours cannot be moved here. Contact your lead tutor.
                 </SectionMessage>
             </section>
             <section>
@@ -118,9 +118,9 @@ function SectionMessageContentDemos() {
                 <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Supports inline emphasis and links inside the body.
                 </p>
-                <SectionMessage appearance="info" title="Rich Content">
-                    <strong>Note:</strong> You can include <em>rich HTML content</em> and even{' '}
-                    <a href="#">links</a> inside a message.
+                <SectionMessage appearance="info" title="New math curriculum">
+                    <strong>Note:</strong> Grade 7 linear equations now include <em>updated exit tickets</em> on the{' '}
+                    <a href="#">lesson plan page</a>.
                 </SectionMessage>
             </section>
             <section>
@@ -167,8 +167,8 @@ export const Content = () => (
 );
 
 export const Overview = () => (
-    <SectionMessage appearance="primary" title="With Title" dismissible>
-        Message with title and body text.
+    <SectionMessage appearance="primary" title="Session notes saved" dismissible>
+        Your notes for Maya K. are ready to share with her family.
     </SectionMessage>
 );
 Overview.parameters = {
@@ -183,11 +183,11 @@ Overview.parameters = {
  */
 export const Interactive = (args) => (
     <SectionMessage {...args}>
-        This is an interactive message. Use the controls below to customize it.
+        Maya K. joins at 4:00 PM ET for Grade 7 math at Lincoln Middle.
     </SectionMessage>
 );
 Interactive.args = {
-    title: 'Interactive message',
+    title: 'Session reminder',
     appearance: 'info',
     icon: true,
     dismissible: true,
@@ -262,8 +262,8 @@ DismissPlacement.play = async ({ canvasElement }) => {
 export const LeadingIcon = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--width-2500)' }}>
         {SECTION_MESSAGE_APPEARANCES.map((appearance) => (
-            <SectionMessage key={appearance} appearance={appearance} title="Title" data-testid={`icon-${appearance}`}>
-                You have a message here — come check it out!
+            <SectionMessage key={appearance} appearance={appearance} title="Session update" data-testid={`icon-${appearance}`}>
+                Thursday&apos;s math session starts at 4:00 PM ET.
             </SectionMessage>
         ))}
         <SectionMessage appearance="warning" data-testid="icon-body">
@@ -323,7 +323,7 @@ LeadingIcon.play = async ({ canvasElement }) => {
         await expect(icon.closest('[aria-hidden="true"]'), `${id} icon is decorative`).not.toBeNull();
 
         // The icon comes before the message, the × after it.
-        const title = within(message).getByText('Title');
+        const title = within(message).getByText('Session update');
         await expect(icon.getBoundingClientRect().right, `${id}: icon leads the text`).toBeLessThanOrEqual(title.getBoundingClientRect().left);
         await expectOnFirstLine(id, icon, title);
     }
@@ -379,8 +379,8 @@ export const GroundAndText = () => (
         }}
     >
         {SECTION_MESSAGE_APPEARANCES.map((appearance) => (
-            <SectionMessage key={appearance} appearance={appearance} title="Title" data-testid={`ground-${appearance}`}>
-                You have a message here, with <a href="#">a link</a> in it.
+            <SectionMessage key={appearance} appearance={appearance} title="Session update" data-testid={`ground-${appearance}`}>
+                Maya K.&apos;s session moved to Thursday, with <a href="#">updated details</a> on the calendar.
             </SectionMessage>
         ))}
     </div>
@@ -413,9 +413,9 @@ GroundAndText.play = async ({ canvasElement }) => {
             .toBeGreaterThanOrEqual(4.5);
 
         // Title, body and link are on-surface.
-        const title = within(message).getByText('Title');
-        const body = within(message).getByText(/You have a message here/);
-        const link = within(message).getByRole('link', { name: 'a link' });
+        const title = within(message).getByText('Session update');
+        const body = within(message).getByText(/Maya K\.'s session moved/);
+        const link = within(message).getByRole('link', { name: 'updated details' });
         await expect(getComputedStyle(title).color, `${id}: title color`).toBe(onSurface);
         await expect(getComputedStyle(body).color, `${id}: body color`).toBe(onSurface);
         await expect(getComputedStyle(link).color, `${id}: link inherits the text color`).toBe(onSurface);

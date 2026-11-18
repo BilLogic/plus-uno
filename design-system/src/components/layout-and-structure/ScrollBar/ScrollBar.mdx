@@ -11,9 +11,32 @@ import {
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
+export const noteItems = [
+    'Maya K. — Two-step equations',
+    'Jordan T. — Linear graphs',
+    'Elena R. — Fraction review',
+    'Marcus B. — Reading claims',
+    'Priya S. — Ratios and rates',
+    'Noah W. — Paragraph structure',
+    'Sofia L. — Slope practice',
+    'Liam D. — Main idea summary',
+    'Chloe M. — Proportional tables',
+    'Ethan H. — Context clues',
+    'Zoe P. — Systems of equations',
+    'Ava C. — Text evidence',
+    'Leo G. — Order of operations',
+    'Nora F. — Argument structure',
+    'Owen K. — Function tables',
+    'Hannah V. — Inference check',
+    'Lucas M. — Decimal division',
+    'Grace T. — Point of view',
+    'Caleb R. — Angle pairs',
+    'Ruby S. — Exit ticket notes',
+];
+
 export const Notes = ({ count }) => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', padding: 'var(--pad-y-lg) var(--pad-x-md)' }}>
-        {Array.from({ length: count }, (_, i) => <p key={i} style={{ margin: 0 }}>Note {i + 1}</p>)}
+        {noteItems.slice(0, count).map((note, i) => <p key={i} style={{ margin: 0 }}>{note}</p>)}
     </div>
 );
 export const box = { border: 'var(--border-width-default) solid var(--ds-border)', borderRadius: 'var(--radius-md)' };

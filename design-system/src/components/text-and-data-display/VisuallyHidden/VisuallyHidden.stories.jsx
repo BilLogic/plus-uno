@@ -63,8 +63,8 @@ const expectInTree = async (el, name) => {
 
 export const Overview = () => (
     <p style={{ margin: 0, font: 'var(--body-default)' }}>
-        Order total: $42.00
-        <VisuallyHidden>, including shipping</VisuallyHidden>
+        Sessions completed: 12
+        <VisuallyHidden>, this term</VisuallyHidden>
     </p>
 );
 
@@ -74,11 +74,11 @@ export const Overview = () => (
  */
 Overview.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const hidden = canvas.getByText(', including shipping');
+    const hidden = canvas.getByText(', this term');
     await inEveryColorMode((mode) => expectNotDrawn(hidden, 'the hidden text', mode));
     await expectInTree(hidden, 'the hidden text');
     await expect(hidden.tagName, 'it is a span').toBe('SPAN');
-    await expect(canvas.getByText(/Order total/), 'visible text still draws').toBeVisible();
+    await expect(canvas.getByText(/Sessions completed/), 'visible text still draws').toBeVisible();
 };
 
 /* ------------------------------------------------------------ accessible name */
@@ -164,12 +164,12 @@ RoleAndId.play = async ({ canvasElement }) => {
 
 export const Interactive = (args) => (
     <p style={{ margin: 0, font: 'var(--body-default)' }}>
-        Visible text.
+        Maya K., Grade 7
         <VisuallyHidden {...args} />
     </p>
 );
 Interactive.args = {
-    children: ' This sentence is only announced.',
+    children: ', Lincoln Middle math session',
 };
 Interactive.argTypes = {
     children: { control: 'text' },

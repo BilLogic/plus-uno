@@ -76,13 +76,13 @@ Basic.play = async () => {
 export const WithMedia = () => (
     <SpotlightProvider>
         <div style={calloutCanvasTall}>
-            <SpotlightTarget><Button text="Target" /></SpotlightTarget>
+            <SpotlightTarget><Button text="Session prep" /></SpotlightTarget>
             <Spotlight
-                headline="See it in action"
+                headline="See session prep in action"
                 media={<img src="https://placehold.co/295x135" alt="" />}
                 primaryAction={<SpotlightAction appearance="primary">Got it</SpotlightAction>}
             >
-                A short preview of the feature.
+                A short preview of the session prep view.
             </Spotlight>
         </div>
     </SpotlightProvider>
@@ -91,13 +91,13 @@ export const WithMedia = () => (
 export const LinkAction = () => (
     <SpotlightProvider>
         <div style={calloutCanvas}>
-            <SpotlightTarget><Button text="Target" /></SpotlightTarget>
+            <SpotlightTarget><Button text="Session guide" /></SpotlightTarget>
             <Spotlight
-                headline="Read more"
-                primaryAction={<SpotlightAction appearance="primary" href="https://example.com">Learn more</SpotlightAction>}
+                headline="Read the session guide"
+                primaryAction={<SpotlightAction appearance="primary" href="#session-guide">Learn more</SpotlightAction>}
                 id="spotlight-link-action"
             >
-                This action links out instead of calling a handler.
+                Follow the step-by-step guide on this page.
             </Spotlight>
         </div>
     </SpotlightProvider>
@@ -113,10 +113,10 @@ export function Dismissible() {
     return (
         <SpotlightProvider>
             <div style={calloutCanvas}>
-                <SpotlightTarget><Button text="Target" /></SpotlightTarget>
+                <SpotlightTarget><Button text="Session tips" /></SpotlightTarget>
                 {isOpen && (
-                    <Spotlight headline="Dismiss me" onDismiss={() => setIsOpen(false)}>
-                        Click the X to close this.
+                    <Spotlight headline="Warm-up notes added" onDismiss={() => setIsOpen(false)}>
+                        See what your student practiced before the session. Select the close button to dismiss it.
                     </Spotlight>
                 )}
             </div>

@@ -127,7 +127,7 @@ export const Styles = () => (
                 acceptedFormats={formats}
                 buttonText="Choose a file"
                 validation="invalid"
-                validationMessage="Validation message"
+                validationMessage="That file is too large. Choose one under 10 MB."
             />
         </div>
         <div>
@@ -139,7 +139,7 @@ export const Styles = () => (
                 acceptedFormats={formats}
                 buttonText="Choose a file"
                 validation="valid"
-                validationMessage="Validation message"
+                validationMessage="Session recording added."
             />
         </div>
     </div>

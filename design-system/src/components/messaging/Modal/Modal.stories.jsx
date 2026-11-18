@@ -75,7 +75,9 @@ const contentVariantGrid = {
     width: '100%',
 };
 
-const longBody = `${'Long body copy. '.repeat(24)}A Hug modal scrolls its own body once the content runs past the cap.`;
+const longBody =
+    'Review the session summary before publishing it to the student profile. Note which two-step equation problems Maya K. solved on her own, which steps still needed a prompt, and which practice set is assigned for Thursday at 4:00 PM ET at Lincoln Middle. Families and lead tutors read this note together before the next check-in. ' +
+    'A Hug modal scrolls its own body once the content runs past the cap.';
 
 const modalDocsHostStyle = {
     position: 'relative',
@@ -121,18 +123,18 @@ function ModalContentDemos() {
                     <Modal
                         show
                         renderAs="inline"
-                        title="Modal title"
-                        body="Modal body text goes here."
+                        title="Publish session notes?"
+                        body="Families can view published notes on the student profile."
                         showBottomButtons
                         primaryButton={{
-                            text: 'Primary',
+                            text: 'Publish notes',
                             appearance: 'primary',
-                            onClick: () => console.log('Primary clicked'),
+                            onClick: () => console.log('Publish notes clicked'),
                         }}
                         secondaryButton={{
-                            text: 'Secondary',
+                            text: 'Keep draft',
                             appearance: 'default',
-                            onClick: () => console.log('Secondary clicked'),
+                            onClick: () => console.log('Keep draft clicked'),
                         }}
                         onClose={() => {}}
                     />
@@ -146,18 +148,18 @@ function ModalContentDemos() {
                     <Modal
                         show
                         renderAs="inline"
-                        title="Modal title"
+                        title="Session summary guidelines"
                         body={longBody}
                         showBottomButtons
                         primaryButton={{
-                            text: 'Primary',
+                            text: 'Publish notes',
                             appearance: 'primary',
-                            onClick: () => console.log('Primary clicked'),
+                            onClick: () => console.log('Publish notes clicked'),
                         }}
                         secondaryButton={{
-                            text: 'Secondary',
+                            text: 'Keep draft',
                             appearance: 'default',
-                            onClick: () => console.log('Secondary clicked'),
+                            onClick: () => console.log('Keep draft clicked'),
                         }}
                         onClose={() => {}}
                     />
@@ -171,8 +173,8 @@ function ModalContentDemos() {
                     <Modal
                         show
                         renderAs="inline"
-                        title="Modal title"
-                        body="Modal body text goes here."
+                        title="Session notes saved"
+                        body="Your draft for Maya K. is saved to this device."
                         showBottomButtons={false}
                         onClose={() => {}}
                     />
@@ -186,7 +188,7 @@ function ModalContentDemos() {
                     <Modal
                         show
                         renderAs="inline"
-                        title="Modal title"
+                        title="Tutoring session checklist"
                         body={longBody}
                         showBottomButtons={false}
                         onClose={() => {}}
@@ -206,8 +208,8 @@ function ModalLayoutDemos() {
                     <Modal
                         show
                         renderAs="inline"
-                        title="Modal title"
-                        body="Modal body text goes here."
+                        title="Session details"
+                        body="Thursday, 4:00 PM ET with Maya K. at Lincoln Middle."
                         showBottomButtons={false}
                         onClose={() => {}}
                     />
@@ -220,8 +222,8 @@ function ModalLayoutDemos() {
                     <Modal
                         show
                         renderAs="inline"
-                        title="Modal title"
-                        body="Modal body text goes here."
+                        title="Publish session plan?"
+                        body="Students and families see updated goals right away."
                         showBottomButtons
                         primaryButton={{
                             text: 'Confirm',
@@ -249,7 +251,7 @@ const widthStory = (size) => () => (
             renderAs="inline"
             width={size}
             title={`width="${size}"`}
-            body="Modal body text goes here."
+            body="Review the session plan and goals before sharing with Maya K.'s family."
             secondaryButton={{ text: 'Discard' }}
             primaryButton={{ text: 'Save' }}
             onClose={() => {}}
@@ -303,7 +305,7 @@ export const WithoutCloseButton = () => (
 );
 
 export const Loading = () => (
-    <Modal show renderAs="inline" loading title="Session details" body="Loaded content" showBottomButtons={false} onClose={() => {}} />
+    <Modal show renderAs="inline" loading title="Session details" body="Session notes and practice sets for Thursday at 4:00 PM ET." showBottomButtons={false} onClose={() => {}} />
 );
 
 export const Content = () => (
@@ -322,8 +324,8 @@ const modalDocsShellStyle = {
 export const Interactive = {
     args: {
         show: true,
-        title: 'Modal title',
-        body: 'Modal body text goes here.',
+        title: 'Publish session notes?',
+        body: 'Families can view published notes on the student profile.',
         width: '6-col',
         height: 'hug',
         showBottomButtons: true,
@@ -336,18 +338,18 @@ export const Interactive = {
                 primaryButton={
                     args.showBottomButtons
                         ? {
-                              text: 'Primary',
+                              text: 'Publish notes',
                               appearance: 'primary',
-                              onClick: () => console.log('Primary clicked'),
+                              onClick: () => console.log('Publish notes clicked'),
                           }
                         : null
                 }
                 secondaryButton={
                     args.showBottomButtons
                         ? {
-                              text: 'Secondary',
+                              text: 'Keep draft',
                               appearance: 'default',
-                              onClick: () => console.log('Secondary clicked'),
+                              onClick: () => console.log('Keep draft clicked'),
                           }
                         : null
                 }
@@ -449,16 +451,16 @@ export const ModalOverModalRefused = {
         const [secondOpen, setSecondOpen] = useState(false);
         return (
             <>
-                <Button text="Open first" onClick={() => setFirstOpen(true)} />
+                <Button text="Open session" onClick={() => setFirstOpen(true)} />
                 <Modal
                     show={firstOpen}
                     width="6-col"
-                    title="First"
-                    body="One."
-                    primaryButton={{ text: 'Open second', onClick: () => setSecondOpen(true) }}
+                    title="Session details"
+                    body="Review Thursday's lesson plan with Maya K."
+                    primaryButton={{ text: 'Delete session', onClick: () => setSecondOpen(true) }}
                     onClose={() => setFirstOpen(false)}
                 />
-                <Modal show={secondOpen} width="6-col" title="Second" body="A Modal never opens on another Modal." onClose={() => setSecondOpen(false)} />
+                <Modal show={secondOpen} width="6-col" title="Confirm delete" body="A Modal never opens on another Modal." onClose={() => setSecondOpen(false)} />
             </>
         );
     },
@@ -469,12 +471,12 @@ export const ModalOverModalRefused = {
         const warn = console.warn;
         console.warn = () => {};
         try {
-            await userEvent.click(canvas.getByRole('button', { name: 'Open first' }));
-            await waitFor(() => expect(dialogNamed(canvasElement, 'First')).not.toBeNull());
+            await userEvent.click(canvas.getByRole('button', { name: 'Open session' }));
+            await waitFor(() => expect(dialogNamed(canvasElement, 'Session details')).not.toBeNull());
 
-            await userEvent.click(body.getByRole('button', { name: 'Open second' }));
-            await expect(hiddenDialog('Second'), 'a Modal over a Modal is refused').toBeNull();
-            await expect(dialogNamed(canvasElement, 'First'), 'the first Modal stays open').not.toBeNull();
+            await userEvent.click(body.getByRole('button', { name: 'Delete session' }));
+            await expect(hiddenDialog('Confirm delete'), 'a Modal over a Modal is refused').toBeNull();
+            await expect(dialogNamed(canvasElement, 'Session details'), 'the first Modal stays open').not.toBeNull();
             await expect(canvasElement.ownerDocument.querySelectorAll('.plus-pattern-blanket').length, 'one Blanket').toBe(1);
         } finally {
             console.warn = warn;
@@ -499,7 +501,7 @@ export const BlockingShadow = {
     render: () => (
         <div style={col}>
             {MODAL_WIDTHS.map((width) => (
-                <Modal key={width} show renderAs="inline" width={width} title={`Modal ${width}`} body="Blocks the page." onClose={() => {}} />
+                <Modal key={width} show renderAs="inline" width={width} title={`Session review (${width})`} body="Confirm before removing this session from the schedule." onClose={() => {}} />
             ))}
         </div>
     ),

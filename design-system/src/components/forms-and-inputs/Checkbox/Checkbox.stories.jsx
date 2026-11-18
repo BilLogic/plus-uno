@@ -79,7 +79,7 @@ const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)'
 
 export const Overview = () => (
     <div style={{ maxWidth: 'var(--size-4000)' }}>
-        <Checkbox id="cb-overview" name="cb-overview" label="Option" defaultChecked />
+        <Checkbox id="cb-overview" name="cb-overview" label="Email session recap" defaultChecked />
     </div>
 );
 Overview.parameters = {
@@ -217,7 +217,7 @@ export const Interactive = (args) => {
 };
 
 Interactive.args = {
-    label: 'Checkbox label',
+    label: 'Send session recap',
     isIndeterminate: false,
     isInvalid: false,
     isDisabled: false,

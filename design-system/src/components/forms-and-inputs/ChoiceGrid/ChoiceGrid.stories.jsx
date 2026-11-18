@@ -59,13 +59,20 @@ export default {
 };
 
 const columns = [
-    { id: 'col-1', label: 'Column 1' },
-    { id: 'col-2', label: 'Column 2' },
-    { id: 'col-3', label: 'Column 3' },
-    { id: 'col-4', label: 'Column 4' },
+    { id: 'col-1', label: 'Morning' },
+    { id: 'col-2', label: 'Midday' },
+    { id: 'col-3', label: 'Afternoon' },
+    { id: 'col-4', label: 'Evening' },
 ];
 
-const singleRow = [{ id: 'row-1', label: 'Row 1' }];
+const singleRow = [{ id: 'row-1', label: 'Monday' }];
+
+const interactiveRows = [
+    { id: 'row-1', label: 'Monday' },
+    { id: 'row-2', label: 'Tuesday' },
+    { id: 'row-3', label: 'Wednesday' },
+    { id: 'row-4', label: 'Thursday' },
+];
 
 const overviewColumns = columns.slice(0, 3);
 
@@ -144,9 +151,9 @@ export const Layout = () => (
             name="choice-grid-multiple-rows"
             type="radio"
             rows={[
-                { id: 'row-1', label: 'Row 1' },
-                { id: 'row-2', label: 'Row 2' },
-                { id: 'row-3', label: 'Row 3' },
+                { id: 'row-1', label: 'Monday' },
+                { id: 'row-2', label: 'Tuesday' },
+                { id: 'row-3', label: 'Wednesday' },
             ]}
             columns={columns}
             values={{
@@ -181,7 +188,7 @@ export const Size = () => (
 );
 Size.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const wrappers = canvas.getAllByRole('radio', { name: 'Row 1 Column 2' })
+    const wrappers = canvas.getAllByRole('radio', { name: 'Monday Midday' })
         .map((radio) => radio.closest('.plus-choice-grid-wrapper'));
     await expect(wrappers.map((w) => w.getAttribute('data-size'))).toEqual(['12', '14', '16']);
 };
@@ -228,7 +235,7 @@ export const TwoGridsWithoutIds = () => {
 };
 TwoGridsWithoutIds.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const radios = canvas.getAllByRole('radio', { name: 'Row 1 Column 1' });
+    const radios = canvas.getAllByRole('radio', { name: 'Monday Morning' });
     await expect(radios).toHaveLength(2);
     await expect(radios[0].id).not.toBe(radios[1].id);
     await expect(radios[0].nextElementSibling.name).not.toBe(radios[1].nextElementSibling.name);
@@ -257,7 +264,7 @@ export const ReadOnly = () => (
 );
 ReadOnly.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const cell = canvas.getByRole('checkbox', { name: 'Row 1 Column 2' });
+    const cell = canvas.getByRole('checkbox', { name: 'Monday Midday' });
     await expect(cell.getAttribute('aria-readonly')).toBe('true');
     await userEvent.click(cell);
     await expect(cell.nextElementSibling.checked).toBe(false);
@@ -274,10 +281,7 @@ export const Interactive = (args) => {
         setCheckboxValues(args.type === 'checkbox' ? { 'row-1': { 'col-1': false } } : {});
     }, [args.type, args.rowCount, args.columnCount]);
 
-    const rows = Array.from({ length: args.rowCount || 1 }, (_, index) => ({
-        id: `row-${index + 1}`,
-        label: `Row ${index + 1}`
-    }));
+    const rows = interactiveRows.slice(0, args.rowCount || 1);
     const cols = columns.slice(0, args.columnCount || columns.length);
 
     return (
@@ -358,7 +362,7 @@ export const Unselected = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        await expect(cell(canvasElement, 'Row 1 Column 2')).toHaveAttribute('aria-checked', 'false');
+        await expect(cell(canvasElement, 'Monday Midday')).toHaveAttribute('aria-checked', 'false');
     },
 };
 
@@ -369,7 +373,7 @@ export const Selected = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const el = cell(canvasElement, 'Row 1 Column 2');
+        const el = cell(canvasElement, 'Monday Midday');
         await expect(el).toHaveAttribute('aria-checked', 'true');
         await expect(getComputedStyle(el).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected-bold'));
     },
@@ -382,7 +386,7 @@ export const Hovered = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const el = cell(canvasElement, 'Row 1 Column 1');
+        const el = cell(canvasElement, 'Monday Morning');
         el.style.transition = 'none';
         const border = withForcedPseudo(el, ':hover', () => getComputedStyle(el).borderTopColor);
         await expect(border).toBe(tokenColor(canvasElement, '--ds-border-brand'));
@@ -396,7 +400,7 @@ export const Focused = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const el = cell(canvasElement, 'Row 1 Column 1', 'checkbox');
+        const el = cell(canvasElement, 'Monday Morning', 'checkbox');
         el.style.transition = 'none';
         el.focus({ focusVisible: true });
         const style = getComputedStyle(el);
@@ -414,7 +418,7 @@ export const Disabled = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const el = cell(canvasElement, 'Row 1 Column 1');
+        const el = cell(canvasElement, 'Monday Morning');
         await expect(el).toHaveAttribute('data-disabled');
         await expect(getComputedStyle(el).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-disabled'));
     },

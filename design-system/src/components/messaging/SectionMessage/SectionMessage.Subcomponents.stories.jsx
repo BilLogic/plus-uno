@@ -24,8 +24,8 @@ export default {
 export const ContentStructure = () => (
     <div className="plus-section-message" style={{ border: 'var(--border-width-default) dashed var(--ds-border)' }}>
         <div className="plus-section-message-content">
-            <div className="plus-section-message-title heading-lg">Section message title</div>
-            <div className="plus-section-message-text body-lg">This is the message body text within the content area.</div>
+            <div className="plus-section-message-title heading-lg">Session notes saved</div>
+            <div className="plus-section-message-text body-lg">Your notes for Maya K. are ready to share with her family.</div>
         </div>
     </div>
 );

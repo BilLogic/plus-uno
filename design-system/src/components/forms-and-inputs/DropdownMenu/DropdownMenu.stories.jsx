@@ -33,15 +33,15 @@ const onRetry = fn();
 
 const basicMenu = (
     <>
-        <ButtonItem onClick={() => {}}>Action</ButtonItem>
-        <ButtonItem onClick={() => {}}>Another action</ButtonItem>
-        <ButtonItem onClick={() => {}}>Something else here</ButtonItem>
+        <ButtonItem onClick={() => {}}>Edit note</ButtonItem>
+        <ButtonItem onClick={() => {}}>Share summary</ButtonItem>
+        <ButtonItem onClick={() => {}}>Archive session</ButtonItem>
     </>
 );
 
 export const Overview = () => (
     <div style={{ padding: 'var(--space-500) var(--space-150) var(--size-1000)' }}>
-        <DropdownMenu trigger={<Button text="Dropdown" iconAfter={<Icon name="chevron-down" size={12} />} />}>
+        <DropdownMenu trigger={<Button text="Session actions" iconAfter={<Icon name="chevron-down" size={12} />} />}>
             {basicMenu}
         </DropdownMenu>
     </div>
@@ -49,7 +49,7 @@ export const Overview = () => (
 
 Overview.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const toggle = canvas.getByRole('button', { name: 'Dropdown' });
+    const toggle = canvas.getByRole('button', { name: 'Session actions' });
 
     // The default pattern (Button + chevron) shows selected while open.
     await expect(px(getComputedStyle(toggle.querySelector('.plus-btn-visual i')).fontSize), 'trigger chevron is --icon-sm').toBe(tokenLength(canvasElement, '--icon-sm'));
@@ -90,12 +90,12 @@ Spacing.play = async ({ canvasElement }) => {
     const body = within(canvasElement.ownerDocument.body);
 
     await userEvent.click(canvas.getByRole('button', { name: 'Default' }));
-    const defaultRow = await body.findByRole('menuitem', { name: 'Action' });
+    const defaultRow = await body.findByRole('menuitem', { name: 'Edit note' });
     await expect(Math.round(defaultRow.getBoundingClientRect().height), 'default rows are 32').toBe(32);
     await userEvent.keyboard('{Escape}');
 
     await userEvent.click(canvas.getByRole('button', { name: 'Compact' }));
-    const compactRow = await body.findByRole('menuitem', { name: 'Action' });
+    const compactRow = await body.findByRole('menuitem', { name: 'Edit note' });
     await expect(Math.round(compactRow.getBoundingClientRect().height), 'compact rows are 24').toBe(24);
 };
 
@@ -216,7 +216,7 @@ export const Interactive = {
     },
     render: (args) => (
         <div style={{ padding: 'var(--space-500) var(--space-300)' }}>
-            <DropdownMenu trigger={<Button>Dropdown</Button>} {...args}>
+            <DropdownMenu trigger={<Button>Session actions</Button>} {...args}>
                 {basicMenu}
             </DropdownMenu>
         </div>
@@ -251,7 +251,7 @@ export const Open = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        await expect(await body(canvasElement).findByRole('menuitem', { name: 'Action' })).toBeVisible();
+        await expect(await body(canvasElement).findByRole('menuitem', { name: 'Edit note' })).toBeVisible();
         await expect(within(canvasElement).getByRole('button', { name: 'Actions' })).toHaveAttribute('aria-expanded', 'true');
     },
 };
@@ -265,7 +265,7 @@ export const CompactRows = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const row = await body(canvasElement).findByRole('menuitem', { name: 'Action' });
+        const row = await body(canvasElement).findByRole('menuitem', { name: 'Edit note' });
         await expect(Math.round(row.getBoundingClientRect().height)).toBe(24);
     },
 };
@@ -315,7 +315,7 @@ export const HoveredState = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const row = await body(canvasElement).findByRole('menuitem', { name: 'Another action' });
+        const row = await body(canvasElement).findByRole('menuitem', { name: 'Share summary' });
         row.style.transition = 'none';
         await expect(withForcedPseudo(row, ':hover', () => getComputedStyle(row).backgroundColor), 'hovered row').toBe(tokenColor(canvasElement, '--ds-background-neutral-subtle-hovered'));
         await expect(withForcedPseudo(row, ':active', () => getComputedStyle(row).backgroundColor), 'pressed row').toBe(tokenColor(canvasElement, '--ds-background-neutral-subtle-pressed'));
@@ -354,7 +354,7 @@ export const OpenMenuEdge = {
     parameters: { docs: { disable: true } },
     render: Open.render,
     play: async ({ canvasElement }) => {
-        await body(canvasElement).findByRole('menuitem', { name: 'Action' });
+        await body(canvasElement).findByRole('menuitem', { name: 'Edit note' });
         const menu = document.querySelector('.plus-dropdown-menu');
         const style = getComputedStyle(menu);
         await expect(style.borderTopColor, 'no painted border').toBe('rgba(0, 0, 0, 0)');
