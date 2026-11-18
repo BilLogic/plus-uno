@@ -101,8 +101,8 @@ export const Interactive = {
         height: 300,
         sort: false,
         data: [
-            { name: 'Series 1', data: [100, 150, 120, 180, 200] },
-            { name: 'Series 2', data: [80, 100, 90, 120, 140] },
+            { name: 'Lincoln Middle', data: [100, 150, 120, 180, 200] },
+            { name: 'Roosevelt K-8', data: [80, 100, 90, 120, 140] },
         ],
     },
 };

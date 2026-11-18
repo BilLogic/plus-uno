@@ -69,8 +69,8 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        categories: ['Metric'],
-        data: [{ y: 75, target: 80 }],
+        categories: ['Attendance rate (%)'],
+        data: [{ y: 86, target: 90 }],
         height: 120,
         sort: true,
     },

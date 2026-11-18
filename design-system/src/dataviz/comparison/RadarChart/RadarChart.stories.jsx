@@ -88,10 +88,10 @@ export const Overview = {
 
 export const Interactive = {
     args: {
-        categories: ['Metric A', 'Metric B', 'Metric C', 'Metric D', 'Metric E'],
+        categories: ['Problem solving', 'Concept clarity', 'Session engagement', 'Attendance rate', 'Homework completion'],
         series: [
-            { name: 'Dataset 1', data: [80, 60, 90, 70, 85] },
-            { name: 'Dataset 2', data: [60, 80, 50, 90, 70] },
+            { name: 'Lincoln Middle', data: [80, 68, 90, 76, 85] },
+            { name: 'District average', data: [65, 78, 62, 84, 70] },
         ],
         filled: false,
         sort: false,

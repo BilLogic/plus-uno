@@ -70,10 +70,10 @@ export const Overview = {
 export const Interactive = {
     args: {
         data: [
-            [0, 10, 20], [1, 12, 22], [2, 15, 25], [3, 18, 28], [4, 16, 24],
+            [0, 25, 45], [1, 28, 48], [2, 30, 50], [3, 32, 55], [4, 30, 52],
         ],
         xAxisLabel: 'Week',
-        yAxisLabel: 'Value',
+        yAxisLabel: 'Minutes tutored',
         height: 400,
     },
 };

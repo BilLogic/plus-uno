@@ -112,14 +112,14 @@ export const Overview = {
 export const Interactive = {
     args: {
         size: 250,
-        value: '50%',
-        label: 'Label',
+        value: '100',
+        label: 'Sessions',
         centerTextSize: 'lg',
         sort: true,
         segments: [
-            { value: 50, color: CATEGORICAL[0], label: 'Segment A' },
-            { value: 30, color: CATEGORICAL[1], label: 'Segment B' },
-            { value: 20, color: CATEGORICAL[2], label: 'Segment C' },
+            { value: 50, color: CATEGORICAL[0], label: 'Math' },
+            { value: 30, color: CATEGORICAL[1], label: 'Reading' },
+            { value: 20, color: CATEGORICAL[2], label: 'Science' },
         ],
     },
 };

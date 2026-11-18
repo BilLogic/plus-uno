@@ -73,10 +73,10 @@ export const Interactive = {
         showLegend: true,
         sort: true,
         data: [
-            { name: 'Category A', y: 40 },
-            { name: 'Category B', y: 30 },
-            { name: 'Category C', y: 20 },
-            { name: 'Category D', y: 10 },
+            { name: 'Lincoln Middle', y: 40 },
+            { name: 'Roosevelt K-8', y: 30 },
+            { name: 'North High', y: 20 },
+            { name: 'Oakwood Elementary', y: 10 },
         ],
     },
 };
