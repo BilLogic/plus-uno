@@ -544,7 +544,7 @@ export const MOTION_REGISTRY = [
     name: 'Spotlight',
     tier: 'component',
     events: {
-      enter: { transition: 'Open and close an overlay', spatial: 'spatial.default', note: 'Each coachmark step is Step.' },
+      enter: { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.fast', note: 'Each coachmark step is Step.' },
       exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades.' },
     },
   },
