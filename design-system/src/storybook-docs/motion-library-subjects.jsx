@@ -68,6 +68,7 @@ import {
     Toggle,
     Tooltip,
     TreeSelect,
+    TreeTable,
 } from '@/components';
 import { OverlayContainer } from '@/lib/overlay';
 import { BEAT, springFor } from '@/storybook-docs/illustrations/motion.jsx';
@@ -758,6 +759,25 @@ export const COMPONENT_SUBJECTS = Object.freeze({
                     key: student,
                     cells: [{ key: 'student', content: student }, { key: 'status', content: status }],
                 }))}
+            />
+        </div>
+    ),
+
+    TreeTable: ({ step }) => (
+        <div style={{ width: '100%' }}>
+            <TreeTable
+                label="School roster"
+                head={{ cells: [{ key: 'name', content: 'Name' }, { key: 'type', content: 'Type' }] }}
+                items={[{
+                    id: 'lincoln',
+                    cells: [{ content: 'Lincoln Middle' }, { content: 'School' }],
+                    children: [
+                        { id: 'g7', cells: [{ content: 'Grade 7 · Math' }, { content: 'Class' }] },
+                        { id: 'g6', cells: [{ content: 'Grade 6 · Reading' }, { content: 'Class' }] },
+                    ],
+                }]}
+                expandedIds={step === 'landing' ? ['lincoln'] : []}
+                onExpandedChange={NOOP}
             />
         </div>
     ),

@@ -54,13 +54,17 @@ const Blanket = ({
 
     if (inline && !present) return null;
 
+    // `data-ending-style` fades the dim out in both modes. Only the inline Blanket goes inert as it
+    // leaves: the portaled one holds the focused Dialog, and inert would strip focus to the body
+    // before Base UI can hand it back to the trigger.
+
     return (
         <div
             data-reduced={reduced ? 'true' : undefined}
             ref={surface}
             data-ending-style={!show ? '' : undefined}
-            aria-hidden={!show ? true : undefined}
-            inert={!show ? true : undefined}
+            aria-hidden={inline && !show ? true : undefined}
+            inert={inline && !show ? true : undefined}
             className={classes}
             style={blanketStyle}
             onClick={handleClick}
