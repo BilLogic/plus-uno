@@ -3,11 +3,11 @@
   "sets": {
     "main": {
       "entries": {
+        "inline-style-literal design-system/src/components/ai/GenerativeBorder/GenerativeBorder.jsx": {
+          "count": 1
+        },
         "inline-style-literal design-system/src/components/images-and-icons/Illustration/Illustration.jsx": {
           "count": 2
-        },
-        "inline-style-literal design-system/src/components/loading/GenerativeBorder/GenerativeBorder.jsx": {
-          "count": 1
         },
         "inline-style-literal design-system/src/components/messaging/InlineMessage/InlineMessage.jsx": {
           "count": 1

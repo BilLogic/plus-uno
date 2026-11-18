@@ -6,11 +6,11 @@ A few things a person could ask the AI, as a wrapping row of prompt `Suggestion`
 
 **Import:** `import { PromptStarters } from '@/components';`
 
-**Source:** `design-system/src/components/labels/PromptStarters/PromptStarters.jsx`
+**Source:** `design-system/src/components/ai/PromptStarters/PromptStarters.jsx`
 
-**Stories:** `design-system/src/components/labels/PromptStarters/PromptStarters.stories.jsx` — Default, SelectHandsBackTheStarter, EmptyRendersNothing, FillsThePromptInput, Interactive
+**Stories:** `design-system/src/components/ai/PromptStarters/PromptStarters.stories.jsx` — Default, SelectHandsBackTheStarter, EmptyRendersNothing, FillsThePromptInput, Interactive
 
-**Storybook page:** `design-system/src/components/labels/PromptStarters/PromptStarters.mdx`
+**Storybook page:** `design-system/src/components/ai/PromptStarters/PromptStarters.mdx`
 
 **Motion:** enter `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
@@ -72,7 +72,7 @@ no conditional wrapper is needed.
 - For a single follow-up prompt once a conversation is underway, use `Suggestion` directly.
 - For where a selected starter's text typically lands, see `PromptInput`.
 
-Same group: `AiMessage` · `ChangeTag` · `CompetencyTag` · `CountTag` · `DateTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `AiIcon` · `AiMessage` · `GenerativeBorder` · `PromptInput` · `Suggestion`
 
 ## Parts
 
@@ -114,6 +114,6 @@ Same group: `AiMessage` · `ChangeTag` · `CompetencyTag` · `CountTag` · `Date
 
 `--stack-md`
 
-From `design-system/src/components/labels/PromptStarters/PromptStarters.scss`. Override these through the token layer, never with a literal.
+From `design-system/src/components/ai/PromptStarters/PromptStarters.scss`. Override these through the token layer, never with a literal.
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

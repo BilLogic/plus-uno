@@ -1608,11 +1608,11 @@
     },
     "Suggestion": {
       "code": {
-        "import": "@/components/labels",
+        "import": "@/components/ai",
         "export": "default",
-        "mdxPath": "design-system/src/components/labels/Suggestion/Suggestion.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/Suggestion",
-        "source": "design-system/src/components/labels/Suggestion/Suggestion.jsx",
+        "mdxPath": "design-system/src/components/ai/Suggestion/Suggestion.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/ai/Suggestion",
+        "source": "design-system/src/components/ai/Suggestion/Suggestion.jsx",
         "storybookId": "ai-ui-components-suggestion--docs",
         "props": {
           "type": {

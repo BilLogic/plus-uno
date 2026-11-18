@@ -2,12 +2,11 @@
 
 # Loading
 
-5 components. Each row links to the generated facts; the three columns after it are the
+4 components. Each row links to the generated facts; the three columns after it are the
 authored half, counted rather than assumed.
 
 ## Which component to reach for
 
-- **[GenerativeBorder](GenerativeBorder/index.md)** — Use `GenerativeBorder` only while the AI is generating into a piece of content, one ring per piece. It is never decoration, and two must not nest. For other waits, use `Spinner` or `Skeleton`.
 - **[ProgressBar](ProgressBar/index.md)** — Use `ProgressBar` for progress through a task: an upload, a course, a multi-step form. When the task's length is unknown, set `isIndeterminate`.
   - For an indeterminate wait with no track at all, use `Spinner`.
   - For a compact determinate ring beside a title or a file row, use `ProgressRing`.
@@ -27,13 +26,12 @@ authored half, counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
-| [GenerativeBorder](GenerativeBorder/index.md) | 5 | ✅ | ✅ | ✅ |
 | [ProgressBar](ProgressBar/index.md) | 6 | ✅ | ✅ | ✅ |
 | [ProgressRing](ProgressRing/index.md) | 6 | ✅ | ✅ | ✅ |
 | [Skeleton](Skeleton/index.md) | 9 | ✅ | ✅ | ✅ |
 | [Spinner](Spinner/index.md) | 4 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 5/5 (100%) · Correct/incorrect 5/5 (100%) · Accessibility 5/5 (100%)
+**Authored coverage:** When to use 4/4 (100%) · Correct/incorrect 4/4 (100%) · Accessibility 4/4 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

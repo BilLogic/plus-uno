@@ -66,7 +66,7 @@ Don't: Fixed in a narrow container: the picture overflows it.
 - `Tile`: use when framing a thumbnail or logo in a fixed square step.
 - `Illustration`: use when placing a vector PLUS character that adapts to color mode through tokens.
 
-Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Icon` · `Illustration` · `Object` · `Tile`
+Same group: `Avatar` · `AvatarGroup` · `Icon` · `Illustration` · `Object` · `Tile`
 
 ## Parts
 

@@ -126,7 +126,7 @@ useEffect(() => {
 - `TagGroup`: use when replacing a `preset="tag-group"` placeholder once the tags load.
 - Loading: use when deciding between `Skeleton`, `Spinner` and `ProgressBar` across a view.
 
-Same group: `GenerativeBorder` · `ProgressBar` · `ProgressRing` · `Spinner`
+Same group: `ProgressBar` · `ProgressRing` · `Spinner`
 
 ## Parts
 

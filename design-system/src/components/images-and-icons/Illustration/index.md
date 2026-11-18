@@ -65,7 +65,7 @@ Don't: Clipping the box cuts off the limbs.
 - Illustrations: use when choosing a character or checking its safe-area clearance and body token.
 - `EmptyState`: use when pairing a character with a heading, body and action in an empty view.
 
-Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Icon` · `Image` · `Object` · `Tile`
+Same group: `Avatar` · `AvatarGroup` · `Icon` · `Image` · `Object` · `Tile`
 
 ## Parts
 
