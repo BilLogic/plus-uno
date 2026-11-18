@@ -83,7 +83,7 @@ the tooltip holding the full date.
 - `DatePicker`: use when the person picks or edits a date in a form field.
 - `StatusTag`: use when showing the workflow state of a dated item.
 
-Same group: `AiMessage` · `ChangeTag` · `CountTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `AiMessage` · `ChangeTag` · `CompetencyTag` · `CountTag` · `PromptStarters` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
 ## Parts
 

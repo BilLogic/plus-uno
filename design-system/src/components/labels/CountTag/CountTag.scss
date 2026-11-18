@@ -55,7 +55,7 @@ $count-subtle: (
     'warning': (var(--ds-background-warning), var(--ds-text-warning)),
     'danger': (var(--ds-background-danger), var(--ds-text-danger)),
     'info': (var(--ds-background-information), var(--ds-text-information)),
-    'discovery': (var(--ds-background-smart-mastering-content), var(--ds-text-smart-mastering-content)),
+    'discovery': (var(--ds-background-competency-mastering-content), var(--ds-text-competency-mastering-content)),
 );
 
 $count-bold: (
@@ -64,7 +64,7 @@ $count-bold: (
     'warning': (var(--ds-background-warning-bold), var(--ds-text-warning-inverse)),
     'danger': (var(--ds-background-danger-bold), var(--ds-text-inverse)),
     'info': (var(--ds-background-information-bold), var(--ds-text-inverse)),
-    'discovery': (var(--ds-background-smart-mastering-content-bold), var(--ds-text-inverse)),
+    'discovery': (var(--ds-background-competency-mastering-content-bold), var(--ds-text-inverse)),
 );
 
 $count-dot: (
@@ -73,7 +73,7 @@ $count-dot: (
     'warning': var(--ds-icon-warning),
     'danger': var(--ds-icon-danger),
     'info': var(--ds-icon-information),
-    'discovery': var(--ds-icon-smart-mastering-content),
+    'discovery': var(--ds-icon-competency-mastering-content),
 );
 
 @each $name, $pair in $count-subtle {

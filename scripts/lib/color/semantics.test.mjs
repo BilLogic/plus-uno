@@ -44,7 +44,7 @@ test('PLUS overrides win: links at lagoon.800, the line alpha, a hue at an opaci
 test('checked controls follow brand.bold; tags step one further; SMART aliases its accent', () => {
   assert.deepEqual(refs('A', 'color.background.selected.bold'), refs('A', 'color.background.brand.bold'));
   assert.deepEqual(refs('A', 'color.text.accent.blue'), ['blue.850', 'blue.250', 'blue.1000', 'blue.100']);
-  assert.deepEqual(refs('A', 'color.text.smart.relationship'), refs('A', 'color.text.accent.magenta'));
+  assert.deepEqual(refs('A', 'color.text.competency.relationship'), refs('A', 'color.text.accent.magenta'));
   assert.deepEqual(refs('A', 'color.background.accent.brown.subtler'), ['brown.200', 'brown.900', 'brown.200', 'brown.900']);
   // The categorical chart order is brand-led: lagoon, orange, blue, magenta, lime, ...
   assert.deepEqual(refs('A', 'color.chart.categorical.1'), ['lagoon.600', 'lagoon.500', 'lagoon.850', 'lagoon.300']);
@@ -74,13 +74,14 @@ test('the base palette is not mutated by registering hue alphas', () => {
   assert.equal(extended.red['500a8'].hex, '#e16c6214');
 });
 
-test('SMART subtle: every subject, every mode, its accent subtle; the line work it carries', () => {
+test('competency subtle: every subject, every mode, its accent subtle; the line work it carries', () => {
   for (const key of ['A', 'B']) {
     const byName = Object.fromEntries(buildPlan(key).semantics.rows.map((r) => [r.name, r]));
     for (const [subject, hue] of Object.entries(SMART)) {
-      const name = `color.background.smart.${subject}.subtle`;
+      const name = `color.background.competency.${subject}.subtle`;
       const accent = byName[`color.background.accent.${hue}.subtle`];
       assert.ok(byName[name], `${name} exists in Plan ${key}`);
+      assert.equal(`color.background.smart.${subject}` in byName, false, `old smart token removed for ${subject}`);
       assert.equal(`${name}.hovered` in byName || `${name}.pressed` in byName, false, `${name} has no states`);
       for (const m of ['light', 'dark', 'light_ic', 'dark_ic']) {
         assert.equal(byName[name][`${m}_ref`], accent[`${m}_ref`], `${name} ${m}`);

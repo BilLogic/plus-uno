@@ -1,8 +1,8 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
-import * as SmartTagStories from './SmartTag.stories.jsx';
-import { SmartTag, Tag } from '@/components';
+import * as CompetencyTagStories from './CompetencyTag.stories.jsx';
+import { CompetencyTag, Tag } from '@/components';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -11,20 +11,20 @@ import {
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
-<Meta of={SmartTagStories} />
+<Meta of={CompetencyTagStories} />
 
 <Title />
-A SMART competency area: one of the five areas tutor training is organized
+A competency area: one of the five areas tutor training is organized
 around. It is a thin wrapper on `Tag`: `subject` fixes the color and the
-leading icon, and every other `Tag` prop passes straight through.
+leading icon, and every other `Tag` prop passes straight through. Formerly SmartTag.
 
-<DocsTabs of={SmartTagStories}>
+<DocsTabs of={CompetencyTagStories}>
 
 <DocsTab tab="examples">
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-8547"
-    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/SmartTag"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/CompetencyTag"
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
@@ -33,7 +33,7 @@ leading icon, and every other `Tag` prop passes straight through.
 
 ## Appearance
 
-<ComponentExample of={SmartTagStories.Overview} title="Subjects" description="All five SMART subjects, each with its own fixed color and icon." />
+<ComponentExample of={CompetencyTagStories.Overview} title="Subjects" description="All five competency areas, each with its own fixed color and icon." />
 
 </div>
 
@@ -41,9 +41,9 @@ leading icon, and every other `Tag` prop passes straight through.
 
 ## Behavior
 
-<ComponentExample of={SmartTagStories.CustomLabel} title="Custom label" description={<><code>children</code> or <code>text</code> overrides the default label.</>} />
+<ComponentExample of={CompetencyTagStories.CustomLabel} title="Custom label" description={<><code>children</code> or <code>text</code> overrides the default label.</>} />
 
-<ComponentExample of={SmartTagStories.PassesThroughTagProps} title="Tag props" description={<>Every other <code>Tag</code> prop passes straight through; here <code>isRemovable</code> and <code>isSelected</code>, unchanged.</>} />
+<ComponentExample of={CompetencyTagStories.PassesThroughTagProps} title="Tag props" description={<>Every other <code>Tag</code> prop passes straight through; here <code>isRemovable</code> and <code>isSelected</code>, unchanged.</>} />
 
 </div>
 
@@ -51,15 +51,15 @@ leading icon, and every other `Tag` prop passes straight through.
 
 ## State
 
-<ComponentExample of={SmartTagStories.Rest} title="Rest" description="A span with its subject's hue on the border and a fixed icon." />
+<ComponentExample of={CompetencyTagStories.Rest} title="Rest" description="A span with its subject's hue on the border and a fixed icon." />
 
-<ComponentExample of={SmartTagStories.Hovered} title="Hovered" description="Nothing on the plain tag; once selectable, the subject's subtlest step." />
+<ComponentExample of={CompetencyTagStories.Hovered} title="Hovered" description="Nothing on the plain tag; once selectable, the subject's subtlest step." />
 
-<ComponentExample of={SmartTagStories.Pressed} title="Pressed" description="Nothing on the plain tag; once selectable, the subtlest pressed step." />
+<ComponentExample of={CompetencyTagStories.Pressed} title="Pressed" description="Nothing on the plain tag; once selectable, the subtlest pressed step." />
 
-<ComponentExample of={SmartTagStories.Focused} title="Focused" description="The plain tag is skipped; a selectable one takes the focus ring." />
+<ComponentExample of={CompetencyTagStories.Focused} title="Focused" description="The plain tag is skipped; a selectable one takes the focus ring." />
 
-<ComponentExample of={SmartTagStories.Disabled} title="Disabled" description="The disabled ground and words, as any Tag." />
+<ComponentExample of={CompetencyTagStories.Disabled} title="Disabled" description="The disabled ground and words, as any Tag." />
 
 </div>
 
@@ -68,7 +68,7 @@ leading icon, and every other `Tag` prop passes straight through.
 ## Interactive playground
 
 <DocsInteractivePlayground
-    of={SmartTagStories.Interactive}
+    of={CompetencyTagStories.Interactive}
     description="Change props in the table below."
 />
 
@@ -86,9 +86,9 @@ leading icon, and every other `Tag` prop passes straight through.
 
 ## Usage
 
-Use `SmartTag` wherever training content, a tutor's strengths or a feedback
-item is tagged by SMART area. `SmartTag` fixes the color and icon per subject
-and delegates every other behavior to `Tag`.
+Use `CompetencyTag` wherever training content, a tutor's strengths or a feedback
+item is tagged by competency area. `CompetencyTag` fixes the color and icon per
+subject and delegates every other behavior to `Tag`.
 
 ### Subject guidance
 
@@ -118,7 +118,7 @@ meaning with a different color.
 
 ## Alternatives
 
-- For a category outside the five SMART subjects, use `Tag`.
+- For a category outside the five competency areas, use `Tag`.
 - For a workflow condition such as "Completed" or "Needs review", use `StatusTag`.
 
 </div>
@@ -172,9 +172,9 @@ meaning with a different color.
 The label defaults to the subject name; a long rewrite breaks the one-line tag. Override it with `children` or `text` only when the surrounding content needs a shorter or longer phrasing.
 
 <DoDontPair
-    doExample={<SmartTag subject="social-emotional" />}
+    doExample={<CompetencyTag subject="social-emotional" />}
     doCaption="The subject name."
-    dontExample={<SmartTag subject="social-emotional">Social-emotional learning and wellbeing</SmartTag>}
+    dontExample={<CompetencyTag subject="social-emotional">Social-emotional learning and wellbeing</CompetencyTag>}
     dontCaption="A long custom label."
 />
 
@@ -183,9 +183,9 @@ The label defaults to the subject name; a long rewrite breaks the one-line tag. 
 Repeating a subject adds nothing; a row lists the different subjects.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><SmartTag subject="social-emotional" /><SmartTag subject="mastering-content" /></div>}
+    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><CompetencyTag subject="social-emotional" /><CompetencyTag subject="mastering-content" /></div>}
     doCaption="Distinct subjects."
-    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><SmartTag subject="social-emotional" /><SmartTag subject="social-emotional" /><SmartTag subject="social-emotional" /></div>}
+    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><CompetencyTag subject="social-emotional" /><CompetencyTag subject="social-emotional" /><CompetencyTag subject="social-emotional" /></div>}
     dontCaption="The same subject three times."
 />
 
@@ -194,7 +194,7 @@ Repeating a subject adds nothing; a row lists the different subjects.
 The icon is part of the subject's identity, so it is never dropped. A plain `Tag` in the subject's color loses it.
 
 <DoDontPair
-    doExample={<SmartTag subject="technology-tools" />}
+    doExample={<CompetencyTag subject="technology-tools" />}
     doCaption="Icon and label."
     dontExample={<Tag color="brown">Technology tools</Tag>}
     dontCaption="Label without the icon."
@@ -218,7 +218,7 @@ spelling; the aliases exist for content written before it changed.
 </thead>
 <tbody>
 <tr><td>Let the default label stand: "Mastering content".</td><td>Rename a subject to taste: "Math stuff".</td></tr>
-<tr><td>Use a SMART tag only for a SMART subject.</td><td>Use one as a general colored label. Use Tag.</td></tr>
+<tr><td>Use a competency tag only for a competency area.</td><td>Use one as a general colored label. Use Tag.</td></tr>
 <tr><td>Write a custom label only where the context needs it, in the same register.</td><td>Shorten it to an abbreviation nobody has met.</td></tr>
 </tbody>
 </DocsTable>
@@ -240,8 +240,8 @@ spelling; the aliases exist for content written before it changed.
 
 ## Related
 
-- `Tag`: use when configuring selection, removal, links or elevation on a `SmartTag`.
-- `TagGroup`: use when laying out a set of smart tags with shared spacing and overflow.
+- `Tag`: use when configuring selection, removal, links or elevation on a `CompetencyTag`.
+- `TagGroup`: use when laying out a set of competency tags with shared spacing and overflow.
 
 </div>
 

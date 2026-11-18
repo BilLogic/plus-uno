@@ -249,7 +249,7 @@ Styles.play = async ({ canvasElement }) => {
             warning: ['--ds-background-warning', '--ds-text-warning'],
             danger: ['--ds-background-danger', '--ds-text-danger'],
             info: ['--ds-background-information', '--ds-text-information'],
-            discovery: ['--ds-background-smart-mastering-content', '--ds-text-smart-mastering-content'],
+            discovery: ['--ds-background-competency-mastering-content', '--ds-text-competency-mastering-content'],
         },
         bold: {
             neutral: ['--ds-background-neutral-bold', '--ds-text-inverse'],
@@ -257,7 +257,7 @@ Styles.play = async ({ canvasElement }) => {
             warning: ['--ds-background-warning-bold', '--ds-text-warning-inverse'],
             danger: ['--ds-background-danger-bold', '--ds-text-inverse'],
             info: ['--ds-background-information-bold', '--ds-text-inverse'],
-            discovery: ['--ds-background-smart-mastering-content-bold', '--ds-text-inverse'],
+            discovery: ['--ds-background-competency-mastering-content-bold', '--ds-text-inverse'],
         },
     };
 
@@ -282,7 +282,7 @@ Styles.play = async ({ canvasElement }) => {
             warning: '--ds-icon-warning',
             danger: '--ds-icon-danger',
             info: '--ds-icon-information',
-            discovery: '--ds-icon-smart-mastering-content',
+            discovery: '--ds-icon-competency-mastering-content',
         };
         for (const [style, fill] of Object.entries(dots)) {
             const dot = canvas.getByRole('img', { name: `dot ${style}` });

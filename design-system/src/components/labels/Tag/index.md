@@ -31,7 +31,7 @@ category from a workflow state without reading the words.
 
 ## Alternatives
 
-- For one of the five SMART competency areas, use `SmartTag`.
+- For one of the five competency areas, use `CompetencyTag`.
 - For the condition something is in when that condition can change, use `StatusTag`.
 - For a number on its own, use `CountTag`.
 - For a due or event date, use `DateTag`.
@@ -170,10 +170,10 @@ and every tag inside follows:
 ## Related
 
 - `TagGroup`: use when laying out a set of tags with shared spacing, alignment and overflow.
-- `SmartTag`: use when tagging one of the five SMART competency areas.
+- `CompetencyTag`: use when tagging one of the five competency areas.
 - `Suggestion`: use when offering proposed tags for the person to accept.
 
-Same group: `AiMessage` · `ChangeTag` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `TagGroup`
+Same group: `AiMessage` · `ChangeTag` · `CompetencyTag` · `CountTag` · `DateTag` · `PromptStarters` · `StatusTag` · `Suggestion` · `TagGroup`
 
 ## Parts
 

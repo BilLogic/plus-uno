@@ -16582,16 +16582,16 @@
      }
     },
     {
-     "name": "color/background/smart/mastering-content/default",
+     "name": "color/background/competency/mastering-content/default",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-mastering-content)"
+      "WEB": "var(--ds-background-competency-mastering-content)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Subject tag and chip fill. Aliases the teal accent. PLUS: PLUS product layer: SMART mastering-content is the teal accent.",
+     "description": "Competency tag fill. Aliases the teal accent. PLUS: PLUS product layer: competency mastering-content is the teal accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -16612,16 +16612,16 @@
      }
     },
     {
-     "name": "color/background/smart/mastering-content/hovered",
+     "name": "color/background/competency/mastering-content/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-mastering-content-hovered)"
+      "WEB": "var(--ds-background-competency-mastering-content-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Hovered subject chip. Aliases the teal accent. PLUS: PLUS product layer: SMART mastering-content is the teal accent.",
+     "description": "Hovered competency tag. Aliases the teal accent. PLUS: PLUS product layer: competency mastering-content is the teal accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -16642,16 +16642,16 @@
      }
     },
     {
-     "name": "color/background/smart/mastering-content/pressed",
+     "name": "color/background/competency/mastering-content/pressed",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-mastering-content-pressed)"
+      "WEB": "var(--ds-background-competency-mastering-content-pressed)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Pressed subject chip. Aliases the teal accent. PLUS: PLUS product layer: SMART mastering-content is the teal accent.",
+     "description": "Pressed competency tag. Aliases the teal accent. PLUS: PLUS product layer: competency mastering-content is the teal accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -16672,16 +16672,16 @@
      }
     },
     {
-     "name": "color/background/smart/mastering-content/subtle",
+     "name": "color/background/competency/mastering-content/subtle",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-mastering-content-subtle)"
+      "WEB": "var(--ds-background-competency-mastering-content-subtle)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Illustration bodies and other mid-strength SMART fills. Aliases the teal accent. PLUS: PLUS product layer: SMART mastering-content is the teal accent.",
+     "description": "Illustration bodies and other mid-strength competency fills. Aliases the teal accent. PLUS: PLUS product layer: competency mastering-content is the teal accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -16702,16 +16702,16 @@
      }
     },
     {
-     "name": "color/background/smart/mastering-content/bold/default",
+     "name": "color/background/competency/mastering-content/bold/default",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-mastering-content-bold)"
+      "WEB": "var(--ds-background-competency-mastering-content-bold)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Bold subject fill (art, a filled badge). Aliases the teal accent. PLUS: PLUS product layer: SMART mastering-content is the teal accent.",
+     "description": "Bold competency area fill (art, a filled tag). Aliases the teal accent. PLUS: PLUS product layer: competency mastering-content is the teal accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -16732,16 +16732,16 @@
      }
     },
     {
-     "name": "color/background/smart/mastering-content/bold/hovered",
+     "name": "color/background/competency/mastering-content/bold/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-mastering-content-bold-hovered)"
+      "WEB": "var(--ds-background-competency-mastering-content-bold-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Hovered bold subject fill. Aliases the teal accent. PLUS: PLUS product layer: SMART mastering-content is the teal accent.",
+     "description": "Hovered bold competency area fill. Aliases the teal accent. PLUS: PLUS product layer: competency mastering-content is the teal accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -16762,16 +16762,16 @@
      }
     },
     {
-     "name": "color/background/smart/mastering-content/bold/pressed",
+     "name": "color/background/competency/mastering-content/bold/pressed",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-mastering-content-bold-pressed)"
+      "WEB": "var(--ds-background-competency-mastering-content-bold-pressed)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Pressed bold subject fill. Aliases the teal accent. PLUS: PLUS product layer: SMART mastering-content is the teal accent.",
+     "description": "Pressed bold competency area fill. Aliases the teal accent. PLUS: PLUS product layer: competency mastering-content is the teal accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -16792,15 +16792,15 @@
      }
     },
     {
-     "name": "color/text/smart/mastering-content",
+     "name": "color/text/competency/mastering-content",
      "codeSyntax": {
-      "WEB": "var(--ds-text-smart-mastering-content)"
+      "WEB": "var(--ds-text-competency-mastering-content)"
      },
      "scopes": [
       "TEXT_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Text on the subject fill. Aliases the teal accent. PLUS: PLUS product layer: SMART mastering-content is the teal accent.",
+     "description": "Text on the competency area fill. Aliases the teal accent. PLUS: PLUS product layer: competency mastering-content is the teal accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -16821,9 +16821,9 @@
      }
     },
     {
-     "name": "color/icon/smart/mastering-content",
+     "name": "color/icon/competency/mastering-content",
      "codeSyntax": {
-      "WEB": "var(--ds-icon-smart-mastering-content)"
+      "WEB": "var(--ds-icon-competency-mastering-content)"
      },
      "scopes": [
       "TEXT_FILL",
@@ -16831,7 +16831,7 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": false,
-     "description": "Subject icon. Aliases the teal accent. PLUS: PLUS product layer: SMART mastering-content is the teal accent.",
+     "description": "Competency area icon. Aliases the teal accent. PLUS: PLUS product layer: competency mastering-content is the teal accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -16852,15 +16852,15 @@
      }
     },
     {
-     "name": "color/border/smart/mastering-content",
+     "name": "color/border/competency/mastering-content",
      "codeSyntax": {
-      "WEB": "var(--ds-border-smart-mastering-content)"
+      "WEB": "var(--ds-border-competency-mastering-content)"
      },
      "scopes": [
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": false,
-     "description": "Subject edge. Aliases the teal accent. PLUS: PLUS product layer: SMART mastering-content is the teal accent.",
+     "description": "Competency area edge. Aliases the teal accent. PLUS: PLUS product layer: competency mastering-content is the teal accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -16881,16 +16881,16 @@
      }
     },
     {
-     "name": "color/background/smart/relationship/default",
+     "name": "color/background/competency/relationship/default",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-relationship)"
+      "WEB": "var(--ds-background-competency-relationship)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Subject tag and chip fill. Aliases the magenta accent. PLUS: PLUS product layer: SMART relationship is the magenta accent.",
+     "description": "Competency tag fill. Aliases the magenta accent. PLUS: PLUS product layer: competency relationship is the magenta accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -16911,16 +16911,16 @@
      }
     },
     {
-     "name": "color/background/smart/relationship/hovered",
+     "name": "color/background/competency/relationship/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-relationship-hovered)"
+      "WEB": "var(--ds-background-competency-relationship-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Hovered subject chip. Aliases the magenta accent. PLUS: PLUS product layer: SMART relationship is the magenta accent.",
+     "description": "Hovered competency tag. Aliases the magenta accent. PLUS: PLUS product layer: competency relationship is the magenta accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -16941,16 +16941,16 @@
      }
     },
     {
-     "name": "color/background/smart/relationship/pressed",
+     "name": "color/background/competency/relationship/pressed",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-relationship-pressed)"
+      "WEB": "var(--ds-background-competency-relationship-pressed)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Pressed subject chip. Aliases the magenta accent. PLUS: PLUS product layer: SMART relationship is the magenta accent.",
+     "description": "Pressed competency tag. Aliases the magenta accent. PLUS: PLUS product layer: competency relationship is the magenta accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -16971,16 +16971,16 @@
      }
     },
     {
-     "name": "color/background/smart/relationship/subtle",
+     "name": "color/background/competency/relationship/subtle",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-relationship-subtle)"
+      "WEB": "var(--ds-background-competency-relationship-subtle)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Illustration bodies and other mid-strength SMART fills. Aliases the magenta accent. PLUS: PLUS product layer: SMART relationship is the magenta accent.",
+     "description": "Illustration bodies and other mid-strength competency fills. Aliases the magenta accent. PLUS: PLUS product layer: competency relationship is the magenta accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17001,16 +17001,16 @@
      }
     },
     {
-     "name": "color/background/smart/relationship/bold/default",
+     "name": "color/background/competency/relationship/bold/default",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-relationship-bold)"
+      "WEB": "var(--ds-background-competency-relationship-bold)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Bold subject fill (art, a filled badge). Aliases the magenta accent. PLUS: PLUS product layer: SMART relationship is the magenta accent.",
+     "description": "Bold competency area fill (art, a filled tag). Aliases the magenta accent. PLUS: PLUS product layer: competency relationship is the magenta accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17031,16 +17031,16 @@
      }
     },
     {
-     "name": "color/background/smart/relationship/bold/hovered",
+     "name": "color/background/competency/relationship/bold/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-relationship-bold-hovered)"
+      "WEB": "var(--ds-background-competency-relationship-bold-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Hovered bold subject fill. Aliases the magenta accent. PLUS: PLUS product layer: SMART relationship is the magenta accent.",
+     "description": "Hovered bold competency area fill. Aliases the magenta accent. PLUS: PLUS product layer: competency relationship is the magenta accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17061,16 +17061,16 @@
      }
     },
     {
-     "name": "color/background/smart/relationship/bold/pressed",
+     "name": "color/background/competency/relationship/bold/pressed",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-relationship-bold-pressed)"
+      "WEB": "var(--ds-background-competency-relationship-bold-pressed)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Pressed bold subject fill. Aliases the magenta accent. PLUS: PLUS product layer: SMART relationship is the magenta accent.",
+     "description": "Pressed bold competency area fill. Aliases the magenta accent. PLUS: PLUS product layer: competency relationship is the magenta accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17091,15 +17091,15 @@
      }
     },
     {
-     "name": "color/text/smart/relationship",
+     "name": "color/text/competency/relationship",
      "codeSyntax": {
-      "WEB": "var(--ds-text-smart-relationship)"
+      "WEB": "var(--ds-text-competency-relationship)"
      },
      "scopes": [
       "TEXT_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Text on the subject fill. Aliases the magenta accent. PLUS: PLUS product layer: SMART relationship is the magenta accent.",
+     "description": "Text on the competency area fill. Aliases the magenta accent. PLUS: PLUS product layer: competency relationship is the magenta accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17120,9 +17120,9 @@
      }
     },
     {
-     "name": "color/icon/smart/relationship",
+     "name": "color/icon/competency/relationship",
      "codeSyntax": {
-      "WEB": "var(--ds-icon-smart-relationship)"
+      "WEB": "var(--ds-icon-competency-relationship)"
      },
      "scopes": [
       "TEXT_FILL",
@@ -17130,7 +17130,7 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": false,
-     "description": "Subject icon. Aliases the magenta accent. PLUS: PLUS product layer: SMART relationship is the magenta accent.",
+     "description": "Competency area icon. Aliases the magenta accent. PLUS: PLUS product layer: competency relationship is the magenta accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17151,15 +17151,15 @@
      }
     },
     {
-     "name": "color/border/smart/relationship",
+     "name": "color/border/competency/relationship",
      "codeSyntax": {
-      "WEB": "var(--ds-border-smart-relationship)"
+      "WEB": "var(--ds-border-competency-relationship)"
      },
      "scopes": [
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": false,
-     "description": "Subject edge. Aliases the magenta accent. PLUS: PLUS product layer: SMART relationship is the magenta accent.",
+     "description": "Competency area edge. Aliases the magenta accent. PLUS: PLUS product layer: competency relationship is the magenta accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17180,16 +17180,16 @@
      }
     },
     {
-     "name": "color/background/smart/social-emotional/default",
+     "name": "color/background/competency/social-emotional/default",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-social-emotional)"
+      "WEB": "var(--ds-background-competency-social-emotional)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Subject tag and chip fill. Aliases the orange accent. PLUS: PLUS product layer: SMART social-emotional is the orange accent.",
+     "description": "Competency tag fill. Aliases the orange accent. PLUS: PLUS product layer: competency social-emotional is the orange accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17210,16 +17210,16 @@
      }
     },
     {
-     "name": "color/background/smart/social-emotional/hovered",
+     "name": "color/background/competency/social-emotional/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-social-emotional-hovered)"
+      "WEB": "var(--ds-background-competency-social-emotional-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Hovered subject chip. Aliases the orange accent. PLUS: PLUS product layer: SMART social-emotional is the orange accent.",
+     "description": "Hovered competency tag. Aliases the orange accent. PLUS: PLUS product layer: competency social-emotional is the orange accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17240,16 +17240,16 @@
      }
     },
     {
-     "name": "color/background/smart/social-emotional/pressed",
+     "name": "color/background/competency/social-emotional/pressed",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-social-emotional-pressed)"
+      "WEB": "var(--ds-background-competency-social-emotional-pressed)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Pressed subject chip. Aliases the orange accent. PLUS: PLUS product layer: SMART social-emotional is the orange accent.",
+     "description": "Pressed competency tag. Aliases the orange accent. PLUS: PLUS product layer: competency social-emotional is the orange accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17270,16 +17270,16 @@
      }
     },
     {
-     "name": "color/background/smart/social-emotional/subtle",
+     "name": "color/background/competency/social-emotional/subtle",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-social-emotional-subtle)"
+      "WEB": "var(--ds-background-competency-social-emotional-subtle)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Illustration bodies and other mid-strength SMART fills. Aliases the orange accent. PLUS: PLUS product layer: SMART social-emotional is the orange accent.",
+     "description": "Illustration bodies and other mid-strength competency fills. Aliases the orange accent. PLUS: PLUS product layer: competency social-emotional is the orange accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17300,16 +17300,16 @@
      }
     },
     {
-     "name": "color/background/smart/social-emotional/bold/default",
+     "name": "color/background/competency/social-emotional/bold/default",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-social-emotional-bold)"
+      "WEB": "var(--ds-background-competency-social-emotional-bold)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Bold subject fill (art, a filled badge). Aliases the orange accent. PLUS: PLUS product layer: SMART social-emotional is the orange accent.",
+     "description": "Bold competency area fill (art, a filled tag). Aliases the orange accent. PLUS: PLUS product layer: competency social-emotional is the orange accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17330,16 +17330,16 @@
      }
     },
     {
-     "name": "color/background/smart/social-emotional/bold/hovered",
+     "name": "color/background/competency/social-emotional/bold/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-social-emotional-bold-hovered)"
+      "WEB": "var(--ds-background-competency-social-emotional-bold-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Hovered bold subject fill. Aliases the orange accent. PLUS: PLUS product layer: SMART social-emotional is the orange accent.",
+     "description": "Hovered bold competency area fill. Aliases the orange accent. PLUS: PLUS product layer: competency social-emotional is the orange accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17360,16 +17360,16 @@
      }
     },
     {
-     "name": "color/background/smart/social-emotional/bold/pressed",
+     "name": "color/background/competency/social-emotional/bold/pressed",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-social-emotional-bold-pressed)"
+      "WEB": "var(--ds-background-competency-social-emotional-bold-pressed)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Pressed bold subject fill. Aliases the orange accent. PLUS: PLUS product layer: SMART social-emotional is the orange accent.",
+     "description": "Pressed bold competency area fill. Aliases the orange accent. PLUS: PLUS product layer: competency social-emotional is the orange accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17390,15 +17390,15 @@
      }
     },
     {
-     "name": "color/text/smart/social-emotional",
+     "name": "color/text/competency/social-emotional",
      "codeSyntax": {
-      "WEB": "var(--ds-text-smart-social-emotional)"
+      "WEB": "var(--ds-text-competency-social-emotional)"
      },
      "scopes": [
       "TEXT_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Text on the subject fill. Aliases the orange accent. PLUS: PLUS product layer: SMART social-emotional is the orange accent.",
+     "description": "Text on the competency area fill. Aliases the orange accent. PLUS: PLUS product layer: competency social-emotional is the orange accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17419,9 +17419,9 @@
      }
     },
     {
-     "name": "color/icon/smart/social-emotional",
+     "name": "color/icon/competency/social-emotional",
      "codeSyntax": {
-      "WEB": "var(--ds-icon-smart-social-emotional)"
+      "WEB": "var(--ds-icon-competency-social-emotional)"
      },
      "scopes": [
       "TEXT_FILL",
@@ -17429,7 +17429,7 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": false,
-     "description": "Subject icon. Aliases the orange accent. PLUS: PLUS product layer: SMART social-emotional is the orange accent.",
+     "description": "Competency area icon. Aliases the orange accent. PLUS: PLUS product layer: competency social-emotional is the orange accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17450,15 +17450,15 @@
      }
     },
     {
-     "name": "color/border/smart/social-emotional",
+     "name": "color/border/competency/social-emotional",
      "codeSyntax": {
-      "WEB": "var(--ds-border-smart-social-emotional)"
+      "WEB": "var(--ds-border-competency-social-emotional)"
      },
      "scopes": [
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": false,
-     "description": "Subject edge. Aliases the orange accent. PLUS: PLUS product layer: SMART social-emotional is the orange accent.",
+     "description": "Competency area edge. Aliases the orange accent. PLUS: PLUS product layer: competency social-emotional is the orange accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17479,16 +17479,16 @@
      }
     },
     {
-     "name": "color/background/smart/advocacy/default",
+     "name": "color/background/competency/advocacy/default",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-advocacy)"
+      "WEB": "var(--ds-background-competency-advocacy)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Subject tag and chip fill. Aliases the lime accent. PLUS: PLUS product layer: SMART advocacy is the lime accent.",
+     "description": "Competency tag fill. Aliases the lime accent. PLUS: PLUS product layer: competency advocacy is the lime accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17509,16 +17509,16 @@
      }
     },
     {
-     "name": "color/background/smart/advocacy/hovered",
+     "name": "color/background/competency/advocacy/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-advocacy-hovered)"
+      "WEB": "var(--ds-background-competency-advocacy-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Hovered subject chip. Aliases the lime accent. PLUS: PLUS product layer: SMART advocacy is the lime accent.",
+     "description": "Hovered competency tag. Aliases the lime accent. PLUS: PLUS product layer: competency advocacy is the lime accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17539,16 +17539,16 @@
      }
     },
     {
-     "name": "color/background/smart/advocacy/pressed",
+     "name": "color/background/competency/advocacy/pressed",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-advocacy-pressed)"
+      "WEB": "var(--ds-background-competency-advocacy-pressed)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Pressed subject chip. Aliases the lime accent. PLUS: PLUS product layer: SMART advocacy is the lime accent.",
+     "description": "Pressed competency tag. Aliases the lime accent. PLUS: PLUS product layer: competency advocacy is the lime accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17569,16 +17569,16 @@
      }
     },
     {
-     "name": "color/background/smart/advocacy/subtle",
+     "name": "color/background/competency/advocacy/subtle",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-advocacy-subtle)"
+      "WEB": "var(--ds-background-competency-advocacy-subtle)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Illustration bodies and other mid-strength SMART fills. Aliases the lime accent. PLUS: PLUS product layer: SMART advocacy is the lime accent.",
+     "description": "Illustration bodies and other mid-strength competency fills. Aliases the lime accent. PLUS: PLUS product layer: competency advocacy is the lime accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17599,16 +17599,16 @@
      }
     },
     {
-     "name": "color/background/smart/advocacy/bold/default",
+     "name": "color/background/competency/advocacy/bold/default",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-advocacy-bold)"
+      "WEB": "var(--ds-background-competency-advocacy-bold)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Bold subject fill (art, a filled badge). Aliases the lime accent. PLUS: PLUS product layer: SMART advocacy is the lime accent.",
+     "description": "Bold competency area fill (art, a filled tag). Aliases the lime accent. PLUS: PLUS product layer: competency advocacy is the lime accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17629,16 +17629,16 @@
      }
     },
     {
-     "name": "color/background/smart/advocacy/bold/hovered",
+     "name": "color/background/competency/advocacy/bold/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-advocacy-bold-hovered)"
+      "WEB": "var(--ds-background-competency-advocacy-bold-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Hovered bold subject fill. Aliases the lime accent. PLUS: PLUS product layer: SMART advocacy is the lime accent.",
+     "description": "Hovered bold competency area fill. Aliases the lime accent. PLUS: PLUS product layer: competency advocacy is the lime accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17659,16 +17659,16 @@
      }
     },
     {
-     "name": "color/background/smart/advocacy/bold/pressed",
+     "name": "color/background/competency/advocacy/bold/pressed",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-advocacy-bold-pressed)"
+      "WEB": "var(--ds-background-competency-advocacy-bold-pressed)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Pressed bold subject fill. Aliases the lime accent. PLUS: PLUS product layer: SMART advocacy is the lime accent.",
+     "description": "Pressed bold competency area fill. Aliases the lime accent. PLUS: PLUS product layer: competency advocacy is the lime accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17689,15 +17689,15 @@
      }
     },
     {
-     "name": "color/text/smart/advocacy",
+     "name": "color/text/competency/advocacy",
      "codeSyntax": {
-      "WEB": "var(--ds-text-smart-advocacy)"
+      "WEB": "var(--ds-text-competency-advocacy)"
      },
      "scopes": [
       "TEXT_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Text on the subject fill. Aliases the lime accent. PLUS: PLUS product layer: SMART advocacy is the lime accent.",
+     "description": "Text on the competency area fill. Aliases the lime accent. PLUS: PLUS product layer: competency advocacy is the lime accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17718,9 +17718,9 @@
      }
     },
     {
-     "name": "color/icon/smart/advocacy",
+     "name": "color/icon/competency/advocacy",
      "codeSyntax": {
-      "WEB": "var(--ds-icon-smart-advocacy)"
+      "WEB": "var(--ds-icon-competency-advocacy)"
      },
      "scopes": [
       "TEXT_FILL",
@@ -17728,7 +17728,7 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": false,
-     "description": "Subject icon. Aliases the lime accent. PLUS: PLUS product layer: SMART advocacy is the lime accent.",
+     "description": "Competency area icon. Aliases the lime accent. PLUS: PLUS product layer: competency advocacy is the lime accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17749,15 +17749,15 @@
      }
     },
     {
-     "name": "color/border/smart/advocacy",
+     "name": "color/border/competency/advocacy",
      "codeSyntax": {
-      "WEB": "var(--ds-border-smart-advocacy)"
+      "WEB": "var(--ds-border-competency-advocacy)"
      },
      "scopes": [
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": false,
-     "description": "Subject edge. Aliases the lime accent. PLUS: PLUS product layer: SMART advocacy is the lime accent.",
+     "description": "Competency area edge. Aliases the lime accent. PLUS: PLUS product layer: competency advocacy is the lime accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17778,16 +17778,16 @@
      }
     },
     {
-     "name": "color/background/smart/technology-tools/default",
+     "name": "color/background/competency/technology-tools/default",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-technology-tools)"
+      "WEB": "var(--ds-background-competency-technology-tools)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Subject tag and chip fill. Aliases the brown accent. PLUS: PLUS product layer: SMART technology-tools is the brown accent.",
+     "description": "Competency tag fill. Aliases the brown accent. PLUS: PLUS product layer: competency technology-tools is the brown accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17808,16 +17808,16 @@
      }
     },
     {
-     "name": "color/background/smart/technology-tools/hovered",
+     "name": "color/background/competency/technology-tools/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-technology-tools-hovered)"
+      "WEB": "var(--ds-background-competency-technology-tools-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Hovered subject chip. Aliases the brown accent. PLUS: PLUS product layer: SMART technology-tools is the brown accent.",
+     "description": "Hovered competency tag. Aliases the brown accent. PLUS: PLUS product layer: competency technology-tools is the brown accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17838,16 +17838,16 @@
      }
     },
     {
-     "name": "color/background/smart/technology-tools/pressed",
+     "name": "color/background/competency/technology-tools/pressed",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-technology-tools-pressed)"
+      "WEB": "var(--ds-background-competency-technology-tools-pressed)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Pressed subject chip. Aliases the brown accent. PLUS: PLUS product layer: SMART technology-tools is the brown accent.",
+     "description": "Pressed competency tag. Aliases the brown accent. PLUS: PLUS product layer: competency technology-tools is the brown accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17868,16 +17868,16 @@
      }
     },
     {
-     "name": "color/background/smart/technology-tools/subtle",
+     "name": "color/background/competency/technology-tools/subtle",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-technology-tools-subtle)"
+      "WEB": "var(--ds-background-competency-technology-tools-subtle)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Illustration bodies and other mid-strength SMART fills. Aliases the brown accent. PLUS: PLUS product layer: SMART technology-tools is the brown accent.",
+     "description": "Illustration bodies and other mid-strength competency fills. Aliases the brown accent. PLUS: PLUS product layer: competency technology-tools is the brown accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17898,16 +17898,16 @@
      }
     },
     {
-     "name": "color/background/smart/technology-tools/bold/default",
+     "name": "color/background/competency/technology-tools/bold/default",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-technology-tools-bold)"
+      "WEB": "var(--ds-background-competency-technology-tools-bold)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Bold subject fill (art, a filled badge). Aliases the brown accent. PLUS: PLUS product layer: SMART technology-tools is the brown accent.",
+     "description": "Bold competency area fill (art, a filled tag). Aliases the brown accent. PLUS: PLUS product layer: competency technology-tools is the brown accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17928,16 +17928,16 @@
      }
     },
     {
-     "name": "color/background/smart/technology-tools/bold/hovered",
+     "name": "color/background/competency/technology-tools/bold/hovered",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-technology-tools-bold-hovered)"
+      "WEB": "var(--ds-background-competency-technology-tools-bold-hovered)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Hovered bold subject fill. Aliases the brown accent. PLUS: PLUS product layer: SMART technology-tools is the brown accent.",
+     "description": "Hovered bold competency area fill. Aliases the brown accent. PLUS: PLUS product layer: competency technology-tools is the brown accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17958,16 +17958,16 @@
      }
     },
     {
-     "name": "color/background/smart/technology-tools/bold/pressed",
+     "name": "color/background/competency/technology-tools/bold/pressed",
      "codeSyntax": {
-      "WEB": "var(--ds-background-smart-technology-tools-bold-pressed)"
+      "WEB": "var(--ds-background-competency-technology-tools-bold-pressed)"
      },
      "scopes": [
       "FRAME_FILL",
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Pressed bold subject fill. Aliases the brown accent. PLUS: PLUS product layer: SMART technology-tools is the brown accent.",
+     "description": "Pressed bold competency area fill. Aliases the brown accent. PLUS: PLUS product layer: competency technology-tools is the brown accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -17988,15 +17988,15 @@
      }
     },
     {
-     "name": "color/text/smart/technology-tools",
+     "name": "color/text/competency/technology-tools",
      "codeSyntax": {
-      "WEB": "var(--ds-text-smart-technology-tools)"
+      "WEB": "var(--ds-text-competency-technology-tools)"
      },
      "scopes": [
       "TEXT_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Text on the subject fill. Aliases the brown accent. PLUS: PLUS product layer: SMART technology-tools is the brown accent.",
+     "description": "Text on the competency area fill. Aliases the brown accent. PLUS: PLUS product layer: competency technology-tools is the brown accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -18017,9 +18017,9 @@
      }
     },
     {
-     "name": "color/icon/smart/technology-tools",
+     "name": "color/icon/competency/technology-tools",
      "codeSyntax": {
-      "WEB": "var(--ds-icon-smart-technology-tools)"
+      "WEB": "var(--ds-icon-competency-technology-tools)"
      },
      "scopes": [
       "TEXT_FILL",
@@ -18027,7 +18027,7 @@
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": false,
-     "description": "Subject icon. Aliases the brown accent. PLUS: PLUS product layer: SMART technology-tools is the brown accent.",
+     "description": "Competency area icon. Aliases the brown accent. PLUS: PLUS product layer: competency technology-tools is the brown accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -18048,15 +18048,15 @@
      }
     },
     {
-     "name": "color/border/smart/technology-tools",
+     "name": "color/border/competency/technology-tools",
      "codeSyntax": {
-      "WEB": "var(--ds-border-smart-technology-tools)"
+      "WEB": "var(--ds-border-competency-technology-tools)"
      },
      "scopes": [
       "STROKE_COLOR"
      ],
      "hiddenFromPublishing": false,
-     "description": "Subject edge. Aliases the brown accent. PLUS: PLUS product layer: SMART technology-tools is the brown accent.",
+     "description": "Competency area edge. Aliases the brown accent. PLUS: PLUS product layer: competency technology-tools is the brown accent.",
      "values": {
       "Light": {
        "alias": "color / primitives",

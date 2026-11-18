@@ -55,7 +55,7 @@ const STATE_COLORS = {
     warning: ['--ds-background-warning', '--ds-text-warning', '--ds-background-warning-pressed'],
     danger: ['--ds-background-danger', '--ds-text-danger', '--ds-background-danger-pressed'],
     info: ['--ds-background-information', '--ds-text-information', '--ds-background-information-pressed'],
-    discovery: ['--ds-background-smart-mastering-content', '--ds-text-smart-mastering-content', '--ds-background-smart-mastering-content-pressed'],
+    discovery: ['--ds-background-competency-mastering-content', '--ds-text-competency-mastering-content', '--ds-background-competency-mastering-content-pressed'],
 };
 
 /** The 1px inside border is an inset box-shadow, so the height stays exact. */

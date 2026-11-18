@@ -11,6 +11,9 @@ authored half, counted rather than assumed.
 - **[ChangeTag](ChangeTag/index.md)** — Use `ChangeTag` beside a number to say how it moved since the last period: in a card header, a table cell or a chart tooltip. For the number itself, use plain text.
   - For a count on its own, use `CountTag`.
   - For the condition something is in, use `StatusTag`.
+- **[CompetencyTag](CompetencyTag/index.md)** — Use `CompetencyTag` wherever training content, a tutor's strengths or a feedback item is tagged by competency area. `CompetencyTag` fixes the color and icon per subject and delegates every other behavior to `Tag`.
+  - For a category outside the five competency areas, use `Tag`.
+  - For a workflow condition such as "Completed" or "Needs review", use `StatusTag`.
 - **[CountTag](CountTag/index.md)** — Use `CountTag` for a number on its own: unread messages on a nav item, results on a tab, errors in a section header, a notification on a bell.
   - For the condition something is in, use `StatusTag`.
   - For a change over time such as "+3 vs last week", use `ChangeTag`.
@@ -22,17 +25,14 @@ authored half, counted rather than assumed.
   - For a category or subject or person, use `Tag`.
   - For a numeric count, use `CountTag`.
 - **[PromptStarters](PromptStarters/index.md)** — Use `PromptStarters` before a person types into an empty chat, new reflection or blank prompt field. For a single follow-up during a conversation, use `Suggestion`.
-- **[SmartTag](SmartTag/index.md)** — Use `SmartTag` wherever training content, a tutor's strengths or a feedback item is tagged by SMART area. `SmartTag` fixes the color and icon per subject and delegates every other behavior to `Tag`.
-  - For a category outside the five SMART subjects, use `Tag`.
-  - For a workflow condition such as "Completed" or "Needs review", use `StatusTag`.
 - **[StatusTag](StatusTag/index.md)** — Use `StatusTag` for the condition something is in when that condition can change: completed, needs review, missed, in progress. It is the same component whether the system calculated the state or a person set it.
   - For a number on its own, use `CountTag`.
   - For a due or event date, use `DateTag`.
   - For a change over time such as "+3 vs last week", use `ChangeTag`.
-  - For a category or subject or person, use `Tag` or `SmartTag`.
+  - For a category or subject or person, use `Tag` or `CompetencyTag`.
 - **[Suggestion](Suggestion/index.md)** — Use `Suggestion` when the system proposes a value and a person decides whether to take it: an AI-suggested focus area beside the ones already chosen, or a suggested question beside a chat box. Put it in the row where the accepted value will land, after the tags already there.
 - **[Tag](Tag/index.md)** — Use `Tag` for a subject, a focus area, a person, an agent, a team or a category. A tag is outlined and a status is filled, so a reader tells a category from a workflow state without reading the words.
-  - For one of the five SMART competency areas, use `SmartTag`.
+  - For one of the five competency areas, use `CompetencyTag`.
   - For the condition something is in when that condition can change, use `StatusTag`.
   - For a number on its own, use `CountTag`.
   - For a due or event date, use `DateTag`.
@@ -46,10 +46,10 @@ authored half, counted rather than assumed.
 |-----------|------:|:---:|:---:|:---:|
 | [AiMessage](AiMessage/index.md) | 11 | ✅ | ✅ | ✅ |
 | [ChangeTag](ChangeTag/index.md) | 8 | ✅ | ✅ | ✅ |
+| [CompetencyTag](CompetencyTag/index.md) | 3 | ✅ | ✅ | ✅ |
 | [CountTag](CountTag/index.md) | 12 | ✅ | ✅ | ✅ |
 | [DateTag](DateTag/index.md) | 6 | ✅ | ✅ | ✅ |
 | [PromptStarters](PromptStarters/index.md) | 4 | ✅ | ✅ | ✅ |
-| [SmartTag](SmartTag/index.md) | 3 | ✅ | ✅ | ✅ |
 | [StatusTag](StatusTag/index.md) | 9 | ✅ | ✅ | ✅ |
 | [Suggestion](Suggestion/index.md) | 9 | ✅ | ✅ | ✅ |
 | [Tag](Tag/index.md) | 22 | ✅ | ✅ | ✅ |

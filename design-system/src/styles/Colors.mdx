@@ -54,7 +54,7 @@ Primitives hold raw ramps and stay hidden; bind only semantic tokens. Names read
     rows={[
         ['color', 'Namespace', <C>color</C>, 'Dropped in CSS. Surface and shadow tokens start with elevation.'],
         ['background', 'Property', <><C>text</C> · <C>icon</C> · <C>border</C> · <C>background</C> · <C>link</C> · <C>surface</C> · <C>shadow</C> · <C>blanket</C> · <C>skeleton</C> · <C>interaction</C> · <C>chart</C></>, 'What the color paints.'],
-        ['danger', 'Role', <><C>brand</C> · <C>neutral</C> · <C>selected</C> · <C>input</C> · <C>inverse</C> · <C>disabled</C> · <C>focused</C> · <C>danger</C> · <C>warning</C> · <C>success</C> · <C>information</C> · <C>discovery</C> · <C>accent-*</C> · <C>smart-*</C></>, 'What it means. Omitted for default neutral.'],
+        ['danger', 'Role', <><C>brand</C> · <C>neutral</C> · <C>selected</C> · <C>input</C> · <C>inverse</C> · <C>disabled</C> · <C>focused</C> · <C>danger</C> · <C>warning</C> · <C>success</C> · <C>information</C> · <C>discovery</C> · <C>accent-*</C> · <C>competency-*</C></>, 'What it means. Omitted for default neutral.'],
         ['bold', 'Emphasis', <><C>subtlest</C> · <C>subtler</C> · <C>subtle</C> · (default) · <C>bold</C> · <C>bolder</C> · <C>boldest</C></>, 'Contrast against the surface.'],
         ['hovered', 'State', <><C>hovered</C> · <C>pressed</C> · <C>visited</C></>, 'Interactive backgrounds and links only.'],
     ]}
@@ -117,9 +117,9 @@ Eleven hues decorate tags, charts, avatars and illustrations. An accent hue carr
 
 </FoundationSection>
 
-<FoundationSection title="SMART subjects">
+<FoundationSection title="Competency areas">
 
-The five SMART tutoring areas each have their own role (`social-emotional` orange, `mastering-content` teal, `advocacy` lime, `relationship` magenta, `technology-tools` brown): `background/smart/<subject>` with `text/smart/<subject>` and `border/smart/<subject>` for a Tag, `subtle` for illustration bodies, and `bold` for filled marks. Use a SMART color only for its subject.
+The five competency areas each have their own role (`social-emotional` orange, `mastering-content` teal, `advocacy` lime, `relationship` magenta, `technology-tools` brown): `background/competency/<subject>` with `text/competency/<subject>` and `border/competency/<subject>` for a Tag, `subtle` for illustration bodies, and `bold` for filled marks. Use a competency color only for its area.
 
 <Canvas of={ColorsStories.SmartSubjects} sourceState="none" />
 

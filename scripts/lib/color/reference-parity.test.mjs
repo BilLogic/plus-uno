@@ -40,15 +40,19 @@ import { figmaSpec } from './figma.mjs';
 const REF = process.env.COLOR_REFERENCE_DIR ?? join(homedir(), 'Documents/Claude/Projects/PLUS/color-system');
 const skip = existsSync(join(REF, 'generator')) ? false : `reference folder not found at ${REF}`;
 const json = (rel) => JSON.parse(readFileSync(join(REF, rel), 'utf8'));
-const currentNames = (text) => text.replace(/--ds-(chart-|skeleton-)/g, '--$1');
+const currentNames = (text) =>
+  text
+    .replace(/--ds-(chart-|skeleton-)/g, '--$1')
+    .replace(/(color[./](?:background|text|icon|border)[./])smart([./])/g, '$1competency$2')
+    .replace(/(--ds-(?:background|text|icon|border)-)smart-/g, '$1competency-');
 const body = (text) => currentNames(text.slice(text.indexOf('\n') + 1));
 const VALUE_KEYS = ['name', 'light_ref', 'light', 'dark_ref', 'dark', 'light_ic_ref', 'light_ic', 'dark_ic_ref', 'dark_ic'];
-const values = (rows) => rows.map((r) => Object.fromEntries(VALUE_KEYS.map((k) => [k, r[k]])));
+const values = (rows) => rows.map((r) => Object.fromEntries(VALUE_KEYS.map((k) => [k, k === 'name' ? currentNames(r[k]) : r[k]])));
 const withoutProse = (value) =>
   JSON.parse(currentNames(JSON.stringify(value, (k, v) => (k === 'description' || k === 'use' || k === 'deviation' ? undefined : v))));
 /** Tokens PLUS added after the reference was cut. */
-const PLUS_ONLY_TOKEN = /^color[./]background[./]smart[./][a-z-]+[./]subtle$|^color[./]ai[./]background[./]bold|^opacity[./]chart[./]/;
-const PLUS_ONLY_SCSS_DECL = /^ +--ds-(?:background-smart-[a-z-]+-subtle|ai-background-bold[a-z-]*|opacity-chart-[a-z]+): [^\n]*\n/gm;
+const PLUS_ONLY_TOKEN = /^color[./]background[./]competency[./][a-z-]+[./]subtle$|^color[./]ai[./]background[./]bold|^opacity[./]chart[./]/;
+const PLUS_ONLY_SCSS_DECL = /^ +--ds-(?:background-competency-[a-z-]+-subtle|ai-background-bold[a-z-]*|opacity-chart-[a-z]+): [^\n]*\n/gm;
 const withoutPlusOnly = (spec) => ({
   ...spec,
   collections: spec.collections.map((c) => ({ ...c, variables: c.variables.filter((v) => !PLUS_ONLY_TOKEN.test(v.name)) })),
