@@ -98,7 +98,7 @@ export const FoundationRelated = ({ items }) => (
                         gap: 'var(--card-stack-sm)',
                         height: '100%',
                         boxSizing: 'border-box',
-                        padding: 'var(--card-pad-compact)',
+                        padding: 'var(--card-pad)',
                         borderRadius: 'var(--card-radius)',
                         background: 'var(--ds-surface-raised)',
                         boxShadow: 'var(--ds-shadow-raised)',
@@ -119,7 +119,7 @@ export const FoundationExample = ({ caption, children }) => (
     <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         <div
             style={{
-                padding: 'var(--card-pad-spacious)',
+                padding: 'var(--card-pad)',
                 borderRadius: 'var(--card-radius)',
                 background: 'var(--ds-surface-sunken)',
                 color: 'var(--ds-text)',

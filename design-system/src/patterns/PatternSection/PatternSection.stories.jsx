@@ -238,7 +238,7 @@ export const FillSubtle = {
     },
 };
 
-/** A Card in a Section with a fill is nested and takes the compact radius; in an unfilled Section it keeps the Card radius. */
+/** A Card in a Section with a fill keeps the Card radius, same as in an unfilled Section. */
 export const CardNesting = {
     name: 'Card in a Section',
     render: () => (
@@ -253,7 +253,7 @@ export const CardNesting = {
     ),
     play: async ({ canvasElement }) => {
         const radius = (id) => getComputedStyle(canvasElement.querySelector(`[data-testid="${id}"] .plus-pattern-card`)).borderTopLeftRadius;
-        await expect(radius('filled'), 'Card in a filled Section: 12').toBe('12px');
+        await expect(radius('filled'), 'Card in a filled Section: 16').toBe('16px');
         await expect(radius('plain'), 'Card in an unfilled Section: 16').toBe('16px');
     },
 };

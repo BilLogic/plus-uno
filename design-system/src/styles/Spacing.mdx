@@ -30,7 +30,7 @@ import * as SpacingStories from './Spacing.stories.jsx';
 Spacing tokens name a job, not a size. Pick the template you are in (Page, Section, Card, Modal, Popup, Table or a control), then the relationship (pad inside a box, stack between rows, inline between things side by side), then the size. Bind the semantic token, never a primitive or a typed number.
 
 ```css
-padding: var(--card-pad-default);
+padding: var(--card-pad);
 gap: var(--card-stack-md);
 ```
 
@@ -91,7 +91,7 @@ Name the relationship first, then pick the token from the four-tier ladder on [T
 <RefTable
     head={['Word', 'Means', 'Example']}
     rows={[
-        [<C>pad</C>, 'The space between a box’s edge and its content, the same on all four sides', <><C>--card-pad-default</C> 20</>],
+        [<C>pad</C>, 'The space between a box’s edge and its content, the same on all four sides', <><C>--card-pad</C> 16</>],
         [<><C>pad-x</C> · <C>pad-y</C></>, 'Used only when the two axes differ, as on an Item', <><C>--pad-x-md</C> 12 · <C>--pad-y-md</C> 6</>],
         [<C>stack</C>, 'The vertical gap between rows, chosen by use, never by the size of the box', <><C>--section-stack-md</C> 16</>],
         [<C>inline</C>, 'The horizontal gap between things side by side', <><C>--modal-inline-sm</C> 8</>],
@@ -217,13 +217,11 @@ A span of the page grid under one heading. A plain section has no fill, no pad a
 
 <FoundationSubsection title="Card">
 
-Pad and radius follow the card's size; stack and inline follow use.
+Pad and radius stay 16 at every size; stack and inline follow use.
 
 <TokenTable
     rows={[
-        { token: '--card-pad-compact', figma: 'Card/pad-sm' },
-        { token: '--card-pad-default', figma: 'Card/pad-md' },
-        { token: '--card-pad-spacious', figma: 'Card/pad-lg' },
+        { token: '--card-pad', figma: 'Card/pad' },
         { token: '--card-stack-sm', figma: 'Card/stack-sm', use: 'Title to description' },
         { token: '--card-stack-md', figma: 'Card/stack-md', use: 'Header to body' },
         { token: '--card-stack-lg', figma: 'Card/stack-lg', use: 'Body to footer' },
@@ -414,7 +412,7 @@ Pad tokens for controls, card tokens for cards.
 
 <DoDont>
 <Do caption="A card pads with a card token, so the content breathes at the card scale.">
-<div style={{ padding: 'var(--card-pad-default)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-raised)', boxShadow: 'var(--ds-shadow-raised)', font: 'var(--body-default)' }}>Session summary</div>
+<div style={{ padding: 'var(--card-pad)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-raised)', boxShadow: 'var(--ds-shadow-raised)', font: 'var(--body-default)' }}>Session summary</div>
 </Do>
 <Dont caption="A control pad on a card squeezes the content to a button-sized pad.">
 <div style={{ padding: 'var(--pad-x-xs)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-raised)', boxShadow: 'var(--ds-shadow-raised)', font: 'var(--body-default)' }}>Session summary</div>
@@ -428,7 +426,7 @@ Pad tokens for controls, card tokens for cards.
 Always use the variable; the code token is the same name with `var()`.
 
 <DoDont>
-<Do caption="Bound to the variable, so the pad follows the system."><C>padding: var(--card-pad-default)</C></Do>
+<Do caption="Bound to the variable, so the pad follows the system."><C>padding: var(--card-pad)</C></Do>
 <Dont caption="A literal 13 matches no step on the scale and will not follow a token change."><C>padding: 13px</C></Dont>
 </DoDont>
 

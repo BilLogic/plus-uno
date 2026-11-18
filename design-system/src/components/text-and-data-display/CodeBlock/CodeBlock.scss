@@ -18,7 +18,7 @@
     background-color: var(--ds-background-code-default);
     color: var(--ds-text-code-default);
     border: var(--border-width-default) solid var(--ds-border);
-    border-radius: var(--card-radius-compact);
+    border-radius: var(--card-radius);
     tab-size: 4;
 
     &:focus-visible {

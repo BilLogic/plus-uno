@@ -45,7 +45,7 @@ Nine rules decide a corner. Take the first one that matches. A radius comes only
 5. **Nested:** inner radius = outer radius − padding. Fix an uneven corner with padding, not a new radius.
 6. **Button in a field:** the field's radius − 4, so 6 default and 4 compact.
 7. **Other controls:** the control's height ÷ 4 (`Radius / Control`).
-8. **Templates:** Section, Modal and Card 16; Popup, compact Card, Table and boxes inside a page 12; the smallest nested visual 8.
+8. **Templates:** Section, Modal and Card 16; Popup, Table and boxes inside a page 12; the smallest nested visual 8.
 9. **Focus ring:** the element's radius + the ring's offset.
 
 </FoundationSection>
@@ -91,7 +91,7 @@ A button group rounds its outer corners and keeps the inner seams square.
 
 <FoundationSection title="Templates">
 
-Each template owns a token. A Page sits square in the Frame; a Section with a fill and a Card round at 16; a Card inside a filled Section takes the compact 12.
+Each template owns a token. A Page sits square in the Frame; a Section with a fill and a Card round at 16.
 
 <Canvas of={RadiusStories.Templates} sourceState="none" />
 
@@ -102,7 +102,6 @@ Each template owns a token. A Page sits square in the Frame; a Section with a fi
         ['Section with a fill', '16', <C>--section-radius</C>],
         ['Modal', '16', <C>--modal-radius</C>],
         ['Card', '16', <C>--card-radius</C>],
-        ['Card, compact, or inside a filled Section', '12', <C>--card-radius-compact</C>],
         ['Popup, menu, Flag', '12', <C>--popup-radius</C>],
         ['Table', '12', <C>--table-radius</C>],
     ]}

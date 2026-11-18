@@ -37,7 +37,7 @@ export const ThreeKinds = () => (
             <span style={tag}>A minimum height, and pad-x larger than pad-y: 32 = 20 line + 2 × 6, pad-x 12. Button, Text field, Tag, a menu or table row.</span>
         </div>
         <div style={col('var(--stack-md)')}>
-            <PatternCard title="Container" description="Card/pad-md, 20 on every side." />
+            <PatternCard title="Container" description="Card/pad, 16 on every side." />
             <span style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>Container</span>
             <span style={tag}>A background and one pad on every side; the height hugs. Card, Modal, Popup, Flag, Section message.</span>
         </div>
@@ -231,9 +231,9 @@ export const NoCardInCard = () => (
         <Dont caption="Three mini cards inside the card. Shadows pile up and the hierarchy flattens.">
             <PatternCard title="Sessions this week" gap="lg">
                 <div style={col('var(--card-stack-md)')}>
-                    <PatternCard padding="sm"><Metric value="128" label="Completed" /></PatternCard>
-                    <PatternCard padding="sm"><Metric value="12" label="Canceled" /></PatternCard>
-                    <PatternCard padding="sm"><Metric value="4" label="No-shows" /></PatternCard>
+                    <PatternCard><Metric value="128" label="Completed" /></PatternCard>
+                    <PatternCard><Metric value="12" label="Canceled" /></PatternCard>
+                    <PatternCard><Metric value="4" label="No-shows" /></PatternCard>
                 </div>
             </PatternCard>
         </Dont>

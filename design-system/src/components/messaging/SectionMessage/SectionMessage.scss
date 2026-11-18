@@ -8,12 +8,12 @@
 .plus-section-message {
     display: flex;
     align-items: flex-start;
-    border-radius: var(--card-radius-compact);
+    border-radius: var(--card-radius);
     width: 100%;
     max-width: 100%;
     color: var(--ds-text);
     box-sizing: border-box;
-    padding: var(--card-pad-compact) var(--card-pad-compact);
+    padding: var(--card-pad);
     gap: var(--card-inline-sm);
 }
 

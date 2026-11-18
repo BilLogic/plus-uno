@@ -31,8 +31,8 @@
     display: flex;
     flex-direction: column;
     gap: var(--stack-md);
-    padding: var(--pad-y-md) var(--pad-x-md);
-    border-radius: var(--card-radius-compact);
+    padding: var(--card-pad);
+    border-radius: var(--card-radius);
     transition:
         background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast),
         border-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast),

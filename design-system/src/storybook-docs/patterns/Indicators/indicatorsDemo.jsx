@@ -260,7 +260,7 @@ export const ChecklistCard = ({
 
     if (dismissible && allDone) {
         return (
-            <PatternCard padding="sm" data-checklist-completed-banner="">
+            <PatternCard data-checklist-completed-banner="">
                 <div
                     style={{
                         display: 'flex',
@@ -443,7 +443,7 @@ export const CompactChecklist = ({
     const nextStep = ordered.find((step) => !step.done);
 
     return (
-        <PatternCard padding="sm" gap="sm" onClick={onOpen} data-checklist-compact="">
+        <PatternCard gap="sm" onClick={onOpen} data-checklist-compact="">
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-md)' }}>
                 <div
                     style={{

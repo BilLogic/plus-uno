@@ -121,11 +121,6 @@ export default {
             options: ['sunken', 'default', 'raised'],
             table: { category: 'Design' },
         },
-        padding: {
-            control: 'select',
-            options: ['sm', 'md', 'lg'],
-            table: { category: 'Design' },
-        },
         gap: {
             control: 'select',
             options: ['sm', 'md', 'lg'],
@@ -172,7 +167,6 @@ export const Interactive = {
         header: '',
         footer: 'Footer slot',
         surface: 'sunken',
-        padding: 'md',
         gap: 'md',
         minWidth: '',
         imagePlacement: 'top',
@@ -186,7 +180,6 @@ export const Interactive = {
             header={args.header || undefined}
             footer={args.footer || undefined}
             surface={args.surface}
-            padding={args.padding}
             image={imagePlaceholder('16:9')}
             imagePlacement={args.imagePlacement}
             imageSplit={args.imageSplit}
@@ -315,11 +308,10 @@ export const Anatomy = () => (
 
 export const Jobs = () => <CardJobs />;
 
-/** One size per story: the pad, the radius and the minimum width move together. */
+/** One size per story: every size uses the same pad (16) and radius (16), differing by minimum width. */
 const sizedCard = (size) => (
     <div style={{ display: 'flex', alignItems: 'flex-start' }}>
     <PatternCard
-        padding={size}
         minWidth={`var(--card-min-width-${size})`}
         title="Ana Ruiz"
         description="Lincoln Middle · Thu 4:00 PM"
@@ -330,9 +322,22 @@ const sizedCard = (size) => (
     </div>
 );
 
-export const SizeSmall = { name: 'Small', render: () => sizedCard('sm') };
-export const SizeMedium = { name: 'Medium', render: () => sizedCard('md') };
-export const SizeLarge = { name: 'Large', render: () => sizedCard('lg') };
+const assertCardPadAndRadius = async ({ canvasElement }) => {
+    const card = canvasElement.querySelector('.plus-pattern-card');
+    const inner = canvasElement.querySelector('.plus-pattern-card-inner');
+    const cardStyle = getComputedStyle(card);
+    const innerStyle = getComputedStyle(inner);
+    for (const corner of ['TopLeft', 'TopRight', 'BottomRight', 'BottomLeft']) {
+        await expect(cardStyle[`border${corner}Radius`], `card ${corner} radius is 16px`).toBe('16px');
+    }
+    for (const side of ['Top', 'Right', 'Bottom', 'Left']) {
+        await expect(innerStyle[`padding${side}`], `card ${side} padding is 16px`).toBe('16px');
+    }
+};
+
+export const SizeSmall = { name: 'Small', render: () => sizedCard('sm'), play: assertCardPadAndRadius };
+export const SizeMedium = { name: 'Medium', render: () => sizedCard('md'), play: assertCardPadAndRadius };
+export const SizeLarge = { name: 'Large', render: () => sizedCard('lg'), play: assertCardPadAndRadius };
 
 /** One image ratio per story, edge to edge above the padded content. */
 const imageCard = (ratio) => (

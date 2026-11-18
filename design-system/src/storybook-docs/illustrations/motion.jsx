@@ -359,7 +359,7 @@ const Tile = ({ scene, state, arrows, dim, showArrows }) => {
           background: 'var(--ds-surface)',
           overflow: 'hidden',
           // Vertical room around the drawing: a frame never sits against the tile edge.
-          paddingBlock: 'var(--card-pad-default)',
+          paddingBlock: 'var(--card-pad)',
           // One viewBox unit is 2px, so every kit outline here is half a stroke: 1px, as in the heroes.
           '--stroke-hairline': HERO_HAIRLINE,
         }}
@@ -658,7 +658,7 @@ export const MotionDemo = ({
         display: 'flex',
         flexDirection: 'column',
         gap: 'var(--stack-md)',
-        padding: 'var(--card-pad-default)',
+        padding: 'var(--card-pad)',
         borderRadius: 'var(--card-radius)',
         background: 'var(--ds-surface-sunken)',
       }}

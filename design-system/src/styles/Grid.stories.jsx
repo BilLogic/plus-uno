@@ -51,7 +51,7 @@ export const ColumnSpans = () => (
     </div>
 );
 
-const ground = { padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' };
+const ground = { padding: 'var(--card-pad)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' };
 
 /** Keep the gutter 16 at every width. */
 export const Gutter = () => (
@@ -70,12 +70,12 @@ export const SpanWholeColumns = () => (
     <DoDont>
         <Do caption="Three cards, four columns each. Every edge lands on a column edge.">
             <div style={{ ...ground, ...grid12 }}>
-                {['Lincoln Middle', 'Roosevelt K-8', 'Riverside Academy'].map((t) => <div key={t} style={{ gridColumn: 'span 4' }}><PatternCard title={t} padding="sm" /></div>)}
+                {['Lincoln Middle', 'Roosevelt K-8', 'Riverside Academy'].map((t) => <div key={t} style={{ gridColumn: 'span 4' }}><PatternCard title={t} /></div>)}
             </div>
         </Do>
         <Dont caption="Cards sized by hand. Their edges fall mid-gutter and mid-column, so nothing lines up with the rows above and below.">
             <div style={{ ...ground, display: 'flex', gap: 'var(--space-0625)' }}>
-                {[['Lincoln Middle', '41%'], ['Roosevelt K-8', '23%'], ['Riverside Academy', '30%']].map(([t, w]) => <div key={t} style={{ width: w }}><PatternCard title={t} padding="sm" /></div>)}
+                {[['Lincoln Middle', '41%'], ['Roosevelt K-8', '23%'], ['Riverside Academy', '30%']].map(([t, w]) => <div key={t} style={{ width: w }}><PatternCard title={t} /></div>)}
             </div>
         </Dont>
     </DoDont>

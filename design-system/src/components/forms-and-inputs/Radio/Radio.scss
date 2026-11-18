@@ -170,7 +170,7 @@
 .plus-form-radio-wrapper.plus-choice-tile {
     width: var(--choice-tile-width);
     max-width: 100%;
-    padding: var(--card-pad-default) var(--pad-x-lg);
+    padding: var(--card-pad) var(--pad-x-lg);
     border: var(--border-width-default) solid var(--ds-border);
     border-radius: var(--radius-control-md);
     background-color: var(--ds-surface);
@@ -233,7 +233,7 @@
         background-color: var(--ds-background-selected);
         border-width: var(--border-width-selected);
         border-color: var(--ds-border-selected);
-        padding: calc(var(--card-pad-default) - var(--border-width-selected) + var(--border-width-default)) calc(var(--pad-x-lg) - var(--border-width-selected) + var(--border-width-default));
+        padding: calc(var(--card-pad) - var(--border-width-selected) + var(--border-width-default)) calc(var(--pad-x-lg) - var(--border-width-selected) + var(--border-width-default));
     }
 
     @include plus-state(

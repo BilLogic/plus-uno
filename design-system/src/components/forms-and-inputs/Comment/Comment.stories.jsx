@@ -109,5 +109,5 @@ export const Interactive = {
 
 const radiusOf = (root, selector) => getComputedStyle(root.querySelector(selector)).borderTopLeftRadius;
 Basic.play = async ({ canvasElement }) => {
-    await expect(radiusOf(canvasElement, '.plus-comment'), 'Comment radius is 12').toBe('12px');
+    await expect(radiusOf(canvasElement, '.plus-comment'), 'Comment radius is 16').toBe('16px');
 };

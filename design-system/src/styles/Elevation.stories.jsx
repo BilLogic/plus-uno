@@ -236,7 +236,7 @@ export const Layers = {
 /** A Card at rest, a clickable Card, and a Card being dragged. */
 export const CardLevels = {
     render: () => (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)', padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)', padding: 'var(--card-pad)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' }}>
             <PatternCard surface="raised" title="At rest" description="Raised." />
             <PatternCard surface="raised" title="Clickable" description="Lifts to overlay on hover." onClick={() => {}} />
             <PatternCard surface="raised" title="Dragged" description="Overlay while it moves." dragging />
@@ -253,7 +253,7 @@ const options = ['Lincoln Middle', 'Roosevelt K-8', 'North High', 'South High'].
 /** A Popup held open beside its trigger. */
 export const OpenPopup = {
     render: () => (
-        <div style={{ minHeight: 'calc(var(--image-xl) * 2)', display: 'flex', alignItems: 'flex-start', padding: 'var(--card-pad-compact)' }}>
+        <div style={{ minHeight: 'calc(var(--image-xl) * 2)', display: 'flex', alignItems: 'flex-start', padding: 'var(--card-pad)' }}>
             <Popup trigger={<Button text="Details" />} title="Session 12" placement="right-start" triggerType="manual" show initialFocus={false}>
                 Ran 45 minutes over.
             </Popup>
@@ -344,7 +344,7 @@ export const ModalOnBlanket = {
 /** A Tooltip held open on its trigger. */
 export const OpenTooltip = {
     render: () => (
-        <div style={{ padding: 'var(--card-pad-spacious)', display: 'flex', justifyContent: 'center' }}>
+        <div style={{ padding: 'var(--card-pad)', display: 'flex', justifyContent: 'center' }}>
             <Tooltip text="Reschedule this session" show>
                 <Button text="Reschedule" />
             </Tooltip>
@@ -484,7 +484,7 @@ export const Contrast = {
 
 /* ------------------------------------------------------------ do, don't */
 
-const ground = { padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' };
+const ground = { padding: 'var(--card-pad)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' };
 const menu = (style) => (
     <div className="plus-popup" style={{ position: 'relative', width: 'auto', ...style }}>
         <div className="plus-popup-title">Session 12</div>
