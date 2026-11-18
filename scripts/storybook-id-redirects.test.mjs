@@ -26,11 +26,21 @@ const FLATTENED = {
     'Components/Forms and inputs/Date time picker/Date picker',
 };
 
+const RENAMED_COMPONENTS = {
+  'components-labels-tag-smart-tag': 'Components/Labels/Tag/Competency tag',
+};
+
+const storyRules = [
+  ...toml.matchAll(
+    /from = "\/storybook\/"\n\s+query = \{ path = "\/story\/([a-z0-9-]+--[a-z0-9-]+)" \}\n\s+to = "\/storybook\/\?path=\/story\/([a-z0-9-]+--[a-z0-9-]+)"/g,
+  ),
+].map((m) => ({ from: m[1], to: m[2] }));
+
 test('the renamed and folded docs ids each redirect to a live page', () => {
-  assert.equal(rules.length, 54);
+  assert.equal(rules.length, 55);
   for (const r of rules) {
     assert.ok(!ids.has(r.from), `${r.from} is a live page and should not redirect`);
-    if (r.from in FAMILIES || r.from in FLATTENED) continue;
+    if (r.from in FAMILIES || r.from in FLATTENED || r.from in RENAMED_COMPONENTS) continue;
     assert.ok(ids.has(r.to), `${r.from} redirects to ${r.to}, which is not a page`);
   }
 });
@@ -81,10 +91,30 @@ test('a component family parent redirects to its Name/Name page, whose story is 
     .filter((f) => f.endsWith('.stories.jsx'))
     .map((f) => fs.readFileSync(root + f, 'utf8'))
     .join('\n');
-  for (const [from, title] of Object.entries({ ...FAMILIES, ...FLATTENED })) {
+  for (const [from, title] of Object.entries({ ...FAMILIES, ...FLATTENED, ...RENAMED_COMPONENTS })) {
     const rule = rules.find((r) => r.from === from);
     assert.equal(rule?.to + '--docs', storybookId(title, 'Docs'), `${from} target`);
     assert.ok(sources.includes(`title: '${title}',`), `no story is titled ${title}`);
+  }
+});
+
+test('every retired tag story id redirects to the matching CompetencyTag story id', async () => {
+  const { storybookId } = await import('./lib/storybook-id.mjs');
+  const storyFile = new URL('../design-system/src/components/labels/CompetencyTag/CompetencyTag.stories.jsx', import.meta.url);
+  const src = fs.readFileSync(storyFile, 'utf8');
+  const storyExports = [...src.matchAll(/^export const ([A-Z][A-Za-z0-9]*)\s*=/gm)].map((m) =>
+    m[1].replace(/([a-z0-9])([A-Z])/g, '$1 $2'),
+  );
+  assert.ok(storyExports.length > 0, 'expected CompetencyTag story exports');
+  assert.equal(storyRules.length, storyExports.length);
+  for (const name of storyExports) {
+    const from = storybookId('Components/Labels/Tag/Smart tag', name);
+    const to = storybookId('Components/Labels/Tag/Competency tag', name);
+    assert.deepEqual(
+      storyRules.find((r) => r.from === from),
+      { from, to },
+      `missing or mismatched story redirect for ${from}`,
+    );
   }
 });
 

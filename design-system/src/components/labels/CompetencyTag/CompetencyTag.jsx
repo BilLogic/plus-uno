@@ -3,18 +3,18 @@ import PropTypes from 'prop-types';
 
 import Tag, { TAG_COLOR_OF_CURRICULUM } from '../Tag/Tag';
 import Icon from '../../images-and-icons/Icon';
-import './SmartTag.scss';
+import './CompetencyTag.scss';
 
 /**
- * `SmartTag` — a SMART competency area.
+ * `CompetencyTag` — a competency area.
  *
- * A THIN WRAPPER ON TAG. A SMART subject is a category, not a condition that
+ * A THIN WRAPPER ON TAG. A competency area is a category, not a condition that
  * changes, so it is a Tag: `subject` fixes the color and the leading icon,
  * everything else (`isSelected`, `isRemovable`, `href`, `maxWidth`, ...) is
  * Tag's own prop, passed straight through.
  */
 
-export const SMART_TAG_SUBJECTS = ['social-emotional', 'mastering-content', 'advocacy', 'relationship', 'technology-tools'];
+export const COMPETENCY_TAG_SUBJECTS = ['social-emotional', 'mastering-content', 'advocacy', 'relationship', 'technology-tools'];
 
 /** Spellings carried over from the area as it used to be written. */
 const SUBJECT_ALIASES = {
@@ -43,15 +43,15 @@ const SUBJECT_ICONS = {
 const warn = (message) => {
     if (process.env.NODE_ENV === 'production') return;
     // eslint-disable-next-line no-console
-    console.warn(`[SmartTag] ${message}`);
+    console.warn(`[CompetencyTag] ${message}`);
 };
 
-/** A tag for one of the five SMART competency areas. The `subject` fixes its color and leading icon, and the rest is passed to Tag. */
-export const SmartTag = ({ subject, children, text, ...rest }) => {
+/** A tag for one of the five competency areas. The `subject` fixes its color and leading icon, and the rest is passed to Tag. */
+export const CompetencyTag = ({ subject, children, text, ...rest }) => {
     const normalized = SUBJECT_ALIASES[subject] || subject;
     let effectiveSubject = normalized;
-    if (!SMART_TAG_SUBJECTS.includes(effectiveSubject)) {
-        warn(`subject="${subject}" is not one of ${SMART_TAG_SUBJECTS.join(', ')}; it falls back to social-emotional.`);
+    if (!COMPETENCY_TAG_SUBJECTS.includes(effectiveSubject)) {
+        warn(`subject="${subject}" is not one of ${COMPETENCY_TAG_SUBJECTS.join(', ')}; it falls back to social-emotional.`);
         effectiveSubject = 'social-emotional';
     }
 
@@ -61,15 +61,15 @@ export const SmartTag = ({ subject, children, text, ...rest }) => {
         <Tag
             {...rest}
             color={TAG_COLOR_OF_CURRICULUM[effectiveSubject]}
-            elemBefore={<Icon name={SUBJECT_ICONS[effectiveSubject]} className="plus-smart-tag__icon" />}
+            elemBefore={<Icon name={SUBJECT_ICONS[effectiveSubject]} className="plus-competency-tag__icon" />}
         >
             {label}
         </Tag>
     );
 };
 
-SmartTag.propTypes = {
-    /** The SMART subject. Fixes the Tag color and the leading icon. */
+CompetencyTag.propTypes = {
+    /** The competency area. Fixes the Tag color and the leading icon. */
     subject: PropTypes.oneOf([
         'social-emotional', 'mastering-content', 'advocacy', 'relationship', 'technology-tools',
         'socio-emotional', 'relationships',
@@ -80,4 +80,4 @@ SmartTag.propTypes = {
     text: PropTypes.string,
 };
 
-export default SmartTag;
+export default CompetencyTag;

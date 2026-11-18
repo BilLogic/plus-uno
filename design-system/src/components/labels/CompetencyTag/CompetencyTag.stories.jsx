@@ -4,12 +4,12 @@ import { expect, spyOn, userEvent, within } from 'storybook/test';
 
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 
-import SmartTag, { SMART_TAG_SUBJECTS } from './SmartTag';
+import CompetencyTag, { COMPETENCY_TAG_SUBJECTS } from './CompetencyTag';
 import { expectGroundUnder, expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 
 /**
- * `SmartTag` — a SMART competency area, as a thin wrapper on Tag.
+ * `CompetencyTag` — a competency area, as a thin wrapper on Tag.
  *
  * THE TEST SEAM IS THIS FILE: story `play:` functions run by `check:storybook`
  * in a real browser. Colors are compared against the token they should
@@ -17,13 +17,13 @@ import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
  */
 
 export default {
-    title: 'Components/Labels/Tag/Smart tag',
-    component: SmartTag,
+    title: 'Components/Labels/Tag/Competency tag',
+    component: CompetencyTag,
     tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
-                component: 'A SMART competency area. The subject fixes the Tag color and the leading icon.',
+                component: 'A competency area. The subject fixes the Tag color and the leading icon.',
             },
         },
     },
@@ -64,8 +64,8 @@ const SUBJECT_COLOR = {
 /** One of each subject, with its fixed color and icon. */
 export const Overview = () => (
     <div style={row}>
-        {SMART_TAG_SUBJECTS.map((subject) => (
-            <SmartTag key={subject} subject={subject} data-testid={subject} />
+        {COMPETENCY_TAG_SUBJECTS.map((subject) => (
+            <CompetencyTag key={subject} subject={subject} data-testid={subject} />
         ))}
     </div>
 );
@@ -73,7 +73,7 @@ Overview.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const token = (name) => tokenColor(canvasElement, name);
 
-    for (const subject of SMART_TAG_SUBJECTS) {
+    for (const subject of COMPETENCY_TAG_SUBJECTS) {
         const el = canvas.getByTestId(subject);
         const color = SUBJECT_COLOR[subject];
         await expect(getComputedStyle(el).borderColor, `${subject} border`).toBe(token(`--ds-border-accent-${color}-subtle`));
@@ -89,9 +89,9 @@ Overview.play = async ({ canvasElement }) => {
 /** `children` or `text` overrides the subject's default label. */
 export const CustomLabel = () => (
     <div style={row}>
-        <SmartTag subject="mastering-content" data-testid="default" />
-        <SmartTag subject="mastering-content" text="Mastering fractions" data-testid="text" />
-        <SmartTag subject="advocacy" data-testid="children">Self-advocacy</SmartTag>
+        <CompetencyTag subject="mastering-content" data-testid="default" />
+        <CompetencyTag subject="mastering-content" text="Mastering fractions" data-testid="text" />
+        <CompetencyTag subject="advocacy" data-testid="children">Self-advocacy</CompetencyTag>
     </div>
 );
 CustomLabel.play = async ({ canvasElement }) => {
@@ -107,14 +107,14 @@ export const PassesThroughTagProps = () => {
     const [removed, setRemoved] = useState(false);
     return (
         <div style={row}>
-            <SmartTag
+            <CompetencyTag
                 subject="technology-tools"
                 isSelected={selected}
                 onClick={() => setSelected((v) => !v)}
                 data-testid="selectable"
             />
             {!removed && (
-                <SmartTag
+                <CompetencyTag
                     subject="advocacy"
                     isRemovable
                     onAfterRemoveAction={() => setRemoved(true)}
@@ -143,9 +143,9 @@ export const UnknownSubjectFallsBack = () => {
     const [mounted, setMounted] = useState(false);
     return (
         <div style={row}>
-            <SmartTag subject="social-emotional" data-testid="default" />
+            <CompetencyTag subject="social-emotional" data-testid="default" />
             <Button onClick={() => setMounted(true)}>Mount an unknown subject</Button>
-            {mounted && <SmartTag subject="chemistry" data-testid="unknown" />}
+            {mounted && <CompetencyTag subject="chemistry" data-testid="unknown" />}
         </div>
     );
 };
@@ -173,18 +173,18 @@ export const Interactive = {
         text: '',
     },
     argTypes: {
-        subject: { control: 'select', options: SMART_TAG_SUBJECTS },
+        subject: { control: 'select', options: COMPETENCY_TAG_SUBJECTS },
     },
-    render: ({ text, ...args }) => <SmartTag {...args} text={text || undefined} />,
+    render: ({ text, ...args }) => <CompetencyTag {...args} text={text || undefined} />,
 };
 
 /* ------------------------------------------------------------------- states */
 
-/** Rest: a SMART tag is a Tag, so on its own it is a span with its subject's hue on the border. */
+/** Rest: a competency tag is a Tag, so on its own it is a span with its subject's hue on the border. */
 export const Rest = {
-    render: () => <SmartTag subject="mastering-content" data-testid="smart" />,
+    render: () => <CompetencyTag subject="mastering-content" data-testid="competency" />,
     play: async ({ canvasElement }) => {
-        const el = within(canvasElement).getByTestId('smart');
+        const el = within(canvasElement).getByTestId('competency');
         await expect(el.tagName).toBe('SPAN');
         await expect(getComputedStyle(el).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-accent-teal-subtle'));
         await expect(el).not.toHaveAttribute('tabindex');
@@ -195,13 +195,13 @@ export const Rest = {
 export const Hovered = {
     render: () => (
         <div style={row}>
-            <SmartTag subject="mastering-content" data-testid="smart" />
-            <SmartTag subject="advocacy" isSelected={false} data-testid="selectable" />
+            <CompetencyTag subject="mastering-content" data-testid="competency" />
+            <CompetencyTag subject="advocacy" isSelected={false} data-testid="selectable" />
         </div>
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expectNoStateChange(canvas.getByTestId('smart'), ':hover', 'SmartTag');
+        await expectNoStateChange(canvas.getByTestId('competency'), ':hover', 'CompetencyTag');
         await expectGroundUnder(canvasElement, canvas.getByTestId('selectable'), ':hover', '--ds-background-accent-lime-subtlest', 'selectable');
     },
 };
@@ -210,13 +210,13 @@ export const Hovered = {
 export const Pressed = {
     render: () => (
         <div style={row}>
-            <SmartTag subject="mastering-content" data-testid="smart" />
-            <SmartTag subject="advocacy" isSelected={false} data-testid="selectable" />
+            <CompetencyTag subject="mastering-content" data-testid="competency" />
+            <CompetencyTag subject="advocacy" isSelected={false} data-testid="selectable" />
         </div>
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expectNoStateChange(canvas.getByTestId('smart'), ':active', 'SmartTag');
+        await expectNoStateChange(canvas.getByTestId('competency'), ':active', 'CompetencyTag');
         await expectGroundUnder(canvasElement, canvas.getByTestId('selectable'), ':active', '--ds-background-accent-lime-subtlest-pressed', 'selectable');
     },
 };
@@ -225,22 +225,22 @@ export const Pressed = {
 export const Focused = {
     render: () => (
         <div style={row}>
-            <SmartTag subject="mastering-content" data-testid="smart" />
-            <SmartTag subject="advocacy" isSelected={false} data-testid="selectable" />
+            <CompetencyTag subject="mastering-content" data-testid="competency" />
+            <CompetencyTag subject="advocacy" isSelected={false} data-testid="selectable" />
         </div>
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expectNotAControl(canvas.getByTestId('smart'), 'SmartTag');
-        await expectFocusRing(canvasElement, canvas.getByTestId('selectable'), 'selectable SmartTag');
+        await expectNotAControl(canvas.getByTestId('competency'), 'CompetencyTag');
+        await expectFocusRing(canvasElement, canvas.getByTestId('selectable'), 'selectable CompetencyTag');
     },
 };
 
 /** Disabled: the disabled ground and words, as any Tag. */
 export const Disabled = {
-    render: () => <SmartTag subject="mastering-content" isSelected={false} isDisabled data-testid="smart" />,
+    render: () => <CompetencyTag subject="mastering-content" isSelected={false} isDisabled data-testid="competency" />,
     play: async ({ canvasElement }) => {
-        const el = within(canvasElement).getByTestId('smart');
+        const el = within(canvasElement).getByTestId('competency');
         await expect(el).toBeDisabled();
         await expectGroundUnder(canvasElement, el, undefined, '--ds-background-disabled', 'disabled');
         await expect(getComputedStyle(el).color).toBe(tokenColor(canvasElement, '--ds-text-disabled'));

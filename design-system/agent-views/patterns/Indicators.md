@@ -40,7 +40,7 @@ Use Indicators when something needs a small label that says how it is. Ask what 
 
 - For a message about the thing, use a Section message or a Flag; the Notifications pattern picks between them.
 - For a due or event date, use `DateTag`.
-- For a competency, use `SmartTag`.
+- For a competency area, use `CompetencyTag`.
 - For something the AI proposes, use `Suggestion`.
 
 ## Content guidelines

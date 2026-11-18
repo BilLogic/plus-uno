@@ -27,15 +27,15 @@ The five SMART characters each stand for an area; the seven math characters stan
 
 ## Color and SMART mapping
 
-All 12 bodies sit at one mid strength so the set reads equally light in Light and Dark. SMART characters take `color/background/smart/<area>/subtle`. Math characters take `color/background/accent/<hue>/subtle` (red, blue, green or purple) and never a SMART hue. Line work takes `color/icon/subtle`.
+All 12 bodies sit at one mid strength so the set reads equally light in Light and Dark. SMART characters take `color/background/competency/<area>/subtle`. Math characters take `color/background/accent/<hue>/subtle` (red, blue, green or purple) and never a SMART hue. Line work takes `color/icon/subtle`.
 
 | Character | Body token |
 | --- | --- |
-| mastering content | `--ds-background-smart-mastering-content-subtle` |
-| advocacy | `--ds-background-smart-advocacy-subtle` |
-| technology | `--ds-background-smart-technology-tools-subtle` |
-| relationships | `--ds-background-smart-relationship-subtle` |
-| social emotional | `--ds-background-smart-social-emotional-subtle` |
+| mastering content | `--ds-background-competency-mastering-content-subtle` |
+| advocacy | `--ds-background-competency-advocacy-subtle` |
+| technology | `--ds-background-competency-technology-tools-subtle` |
+| relationships | `--ds-background-competency-relationship-subtle` |
+| social emotional | `--ds-background-competency-social-emotional-subtle` |
 | dot · pi | `--ds-background-accent-red-subtle` |
 | approximately equal · equal | `--ds-background-accent-blue-subtle` |
 | root · divider | `--ds-background-accent-green-subtle` |

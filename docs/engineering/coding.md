@@ -82,7 +82,7 @@ A component names a before or after slot by what the slot accepts, so the right 
 | Name | Accepts | Used by |
 |---|---|---|
 | `iconBefore` / `iconAfter` | an icon only | Button, Link button, Status tag, Date tag, Change tag, Sidebar tab |
-| `elemBefore` / `elemAfter` | any element: an avatar, a count, a tag | Tag, Smart tag, menu items, Sidebar tab end slot, Table cells, the field box, listbox and option row |
+| `elemBefore` / `elemAfter` | any element: an avatar, a count, a tag | Tag, Competency tag, menu items, Sidebar tab end slot, Table cells, the field box, listbox and option row |
 | `icon` | the single icon of an icon-led component | Icon button, Banner, Section message, Empty state, Tile, Modal, Rating |
 | `trailingMetric` | the count after a label | Tag, Status tag, Filter button |
 

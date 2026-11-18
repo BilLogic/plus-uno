@@ -13,7 +13,7 @@ import './StatusTag.scss';
  * WHICH LABEL, IN FOUR QUESTIONS. Is it a number? Count tag. Is it a due or
  * event date? Date tag. Is it the condition something is in, and can that
  * condition change? Status tag, whether the system calculated it or a person
- * set it. Otherwise, Tag (or SmartTag for a SMART subject). A Status tag is
+ * set it. Otherwise, Tag (or CompetencyTag for a competency area). A Status tag is
  * filled (a meaning); Tag is outlined (a category).
  *
  * THE NAMES FOLLOW THE LIBRARY. `appearance`, `spacing`, `iconBefore` and
