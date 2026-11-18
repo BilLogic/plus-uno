@@ -206,7 +206,7 @@ const HeaderSkeleton = ({ rank, hasBottomRow, tabsOnly }) => (
             </>
         )}
         {(hasBottomRow || tabsOnly) && (
-            <Skeleton className="plus-pattern-section-skeleton__row" width="100%" height="var(--height-250)" radius="element-radius-sm" />
+            <Skeleton className="plus-pattern-section-skeleton__row" width="100%" height="var(--row-height-md)" radius="element-radius-sm" />
         )}
     </div>
 );

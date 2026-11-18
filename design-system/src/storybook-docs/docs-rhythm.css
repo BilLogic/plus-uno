@@ -219,6 +219,31 @@
     --stroke-hairline: var(--stroke-1);
 }
 
+/* Docs chrome roles over the size scale: the docs' own measures, named for the job
+   so no docs stylesheet reads a size primitive. */
+:root {
+    --docs-text-size: var(--type-size-100);
+    --docs-code-size: var(--type-size-075);
+    --docs-header-offset: var(--height-500);
+    --docs-browser-tab-width: var(--width-1500);
+    --docs-browser-field-width: var(--width-3000);
+    --loop-stage-height: calc(var(--height-100) * 9);
+    --loop-puck-size: var(--height-500);
+    --loop-bar-height: var(--height-150);
+}
+
+/* The illustration kit's label type: a real label's size, sans and mono, and the
+   size a drawing draws it at. Sans-label drawings show at up to twice their viewBox,
+   so their drawing size is the real size halved; at full width a label reads at true
+   size. Construction drawings (mono labels) are drawn 1:1, so the mono drawing size
+   is the real mono size. */
+:root {
+    --kit-label-size: var(--type-size-0875);
+    --kit-label-mono-size: var(--type-size-075);
+    --kit-label-drawing-size: calc(var(--kit-label-size) / 2);
+    --kit-label-mono-drawing-size: var(--kit-label-mono-size);
+}
+
 /* The hero frame: full column at 5:2, sunken, on a dot ground (one dot per
    Stack/md step, 16px). Its drawing is composed on a centered stage
    (HeroDrawing.jsx). A split hero lays two panes, each its own color mode,

@@ -6,6 +6,8 @@ import { CHART_VALUE_CLASS, valueSpan } from '@/dataviz/chartFormat';
 import { HUES, divergingRamp, rampStops, sequentialRamp } from '@/dataviz/palette';
 import { inkFor, resolveColor, textInks, useColorModeKey } from '@/dataviz/colorMode';
 
+export const HEATMAP_CHART_SPACINGS = ['default', 'compact'];
+
 /**
  * HeatmapChart Component
  * Displays data as a matrix of colored cells.
@@ -32,19 +34,20 @@ const HeatmapChart = ({
     showLegend = true,
     /** When true, hides legend pagination/navigation (e.g. scroll arrows). */
     hideLegendNavigation = false,
-    /** When true, uses smaller chart spacing so the heatmap appears larger. */
-    compactSpacing = false,
+    /** Chart spacing preset (`default` or `compact`). `compact` trims the chart inset. */
+    spacing = 'default',
     /** When false, hides values in cells; value is represented by color/opacity only. */
     showDataLabels = true,
     /** Gap between cells (0–1). Larger = more room for breath. */
     pointPadding = 0
 }) => {
     const mode = useColorModeKey();
+    const isCompact = spacing === 'compact';
     const options = useMemo(() => {
         const ramp = diverging ? divergingRamp(...diverging) : sequentialRamp(hue);
         const inks = textInks();
         const defaultInset = chartTheme.chart.spacing[0];
-        const verticalInset = compactSpacing ? CHART_SPACING_COMPACT : defaultInset;
+        const verticalInset = isCompact ? CHART_SPACING_COMPACT : defaultInset;
         // Highcharts defaults a vertical colorAxis bar to a fixed length that overflows short plots;
         // subtract container insets, the x-axis category band, and end-label clearance.
         const xAxisMargin = xCategories.length > 0 ? defaultInset * 2 : 0;
@@ -58,7 +61,7 @@ const HeatmapChart = ({
             ...chartTheme.chart,
             type: 'heatmap',
             height: height,
-            ...(compactSpacing && { spacing: [CHART_SPACING_COMPACT, CHART_SPACING_COMPACT, CHART_SPACING_COMPACT, CHART_SPACING_COMPACT] })
+            ...(isCompact && { spacing: [CHART_SPACING_COMPACT, CHART_SPACING_COMPACT, CHART_SPACING_COMPACT, CHART_SPACING_COMPACT] })
         },
         title: { text: null },
         xAxis: {
@@ -117,11 +120,11 @@ const HeatmapChart = ({
         }]
     };
     }, [
-        compactSpacing,
         data,
         diverging,
         height,
         hue,
+        isCompact,
         max,
         min,
         mode,
@@ -160,8 +163,8 @@ HeatmapChart.propTypes = {
     showLegend: PropTypes.bool,
     /** When true, hides legend pagination/navigation */
     hideLegendNavigation: PropTypes.bool,
-    /** When true, uses smaller chart spacing for a larger heatmap */
-    compactSpacing: PropTypes.bool,
+    /** Chart spacing preset (`default` or `compact`). `compact` trims the chart inset. */
+    spacing: PropTypes.oneOf(HEATMAP_CHART_SPACINGS),
     /** When false, hides values in cells (color/opacity only) */
     showDataLabels: PropTypes.bool,
     /** Gap between cells (0–1) for visual breathing room */

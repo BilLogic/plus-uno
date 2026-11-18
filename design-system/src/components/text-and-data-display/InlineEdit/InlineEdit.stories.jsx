@@ -250,7 +250,7 @@ StartsOpen.play = async ({ canvasElement }) => {
 export const SameHeight = () => (
     <div style={column}>
         <InlineEditableTextfield label="Regular" defaultValue="Ada Lovelace" />
-        <InlineEditableTextfield label="Compact" defaultValue="Ada Lovelace" compact />
+        <InlineEditableTextfield label="Compact" defaultValue="Ada Lovelace" spacing="compact" />
     </div>
 );
 
@@ -307,7 +307,7 @@ export const SpacingDefault = () => (
 
 export const SpacingCompact = () => (
     <div style={column}>
-        <InlineEditableTextfield label="Display name" defaultValue="Ada Lovelace" compact />
+        <InlineEditableTextfield label="Display name" defaultValue="Ada Lovelace" spacing="compact" />
     </div>
 );
 
@@ -395,7 +395,7 @@ Interactive.args = {
     label: 'Display name',
     defaultValue: 'Ada Lovelace',
     placeholder: 'Add a name',
-    compact: false,
+    spacing: 'default',
     keepEditViewOpenOnBlur: false,
     hideActionButtons: false,
     readViewFitContainerWidth: false,

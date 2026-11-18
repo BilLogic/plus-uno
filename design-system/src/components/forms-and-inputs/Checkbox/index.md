@@ -147,8 +147,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `CheckboxGr
 | --- | --- |
 | Box fill | `--ds-background-input`; selected `--ds-background-selected-bold`. |
 | Box edge | `--ds-border-input`; selected `--ds-border-selected`; invalid `--ds-border-danger`. |
-| Box size, radius | `--checkbox-control-size` (18); `--radius-md`; `--stroke-2` edge. |
-| Row | `--control-sm` (24); gap `--space-050`. |
+| Box size, radius | `--checkbox-control-size` (18); `--radius-md`; `--border-width-selected` edge. |
+| Row | `--control-sm` (24); gap `--inline-md`. |
 | Label | `--ds-text`, body default. |
 | Focus ring | `--ds-border-focused`, 2px, 2px offset. |
 | Soft row | `--radius-control-md`, `--ds-background-neutral` fill at rest; selected `--ds-background-selected` fill, `--border-width-default` `--ds-border-selected` edge, and `--icon-sm` trailing check in `--ds-icon-selected`. |
@@ -201,7 +201,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--border-width-default` · `--border-width-selected` · `--card-pad` · `--checkbox-control-size` · `--choice-tile-width` · `--control-sm` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-neutral` · `--ds-background-selected` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-surface` · `--ds-surface-hovered` · `--ds-text` · `--pad-x-lg` · `--pad-x-md` · `--plus-choice-indent` · `--radius-control-md` · `--radius-md` · `--space-025` · `--space-0375` · `--space-050` · `--stack-lg` · `--stack-sm` · `--stroke-1` · `--stroke-2` · `--type-weight-medium`
+`--body-default` · `--border-width-default` · `--border-width-selected` · `--card-pad` · `--checkbox-control-size` · `--choice-tile-width` · `--control-sm` · `--ds-background-disabled` · `--ds-background-input` · `--ds-background-input-hovered` · `--ds-background-neutral` · `--ds-background-selected` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-border-brand` · `--ds-border-danger` · `--ds-border-disabled` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-disabled` · `--ds-icon-inverse` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-surface` · `--ds-surface-hovered` · `--ds-text` · `--inline-md` · `--pad-x-lg` · `--pad-x-md` · `--pad-y-md` · `--plus-choice-indent` · `--radius-control-md` · `--radius-md` · `--stack-lg` · `--stack-sm` · `--type-weight-medium`
 
 From `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.scss`. Override these through the token layer, never with a literal.
 

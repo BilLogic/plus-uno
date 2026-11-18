@@ -102,7 +102,7 @@ export { default as Code } from '@/components/text-and-data-display/Code';
 export { default as CodeBlock, parseHighlight } from '@/components/text-and-data-display/CodeBlock';
 export { default as DynamicTable } from '@/components/text-and-data-display/DynamicTable';
 export { default as Heading, HEADING_COLORS, HEADING_SIZES, HeadingContextProvider, useHeadingLevel } from '@/components/text-and-data-display/Heading';
-export { default as InlineEdit } from '@/components/text-and-data-display/InlineEdit';
+export { default as InlineEdit, INLINE_EDIT_SPACINGS } from '@/components/text-and-data-display/InlineEdit';
 export { default as StaticTable } from '@/components/text-and-data-display/StaticTable';
 export { HeadCell, TableBulkActions, TableCell, TableEmptyBox, TableFooter, TableFooterRow, TableMessageRow, TableRow, TableSummaryRow } from '@/components/text-and-data-display/Table';
 export { default as TreeTable } from '@/components/text-and-data-display/TreeTable';

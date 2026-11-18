@@ -360,6 +360,7 @@ export const FAMILIES = [
   { family: 'spotlight', prefix: '--spotlight-', what: 'the Spotlight media height' },
   { family: 'ai-chat', prefix: '--ai-chat-', what: 'the AI chat width' },
   { family: 'ai-message', prefix: '--ai-message-', what: 'the AiMessage streaming caret width and typing-dot size' },
+  { family: 'prompt-input', prefix: '--prompt-input-', what: 'the PromptInput text area minimum height' },
   { family: 'inbox', prefix: '--inbox-', what: 'the Inbox Panel width' },
   { family: 'menu-group', prefix: '--menu-group-', what: 'Menu group minimum width' },
   { family: 'popup', prefix: '--popup-', what: 'the Popup pad' },
@@ -373,6 +374,11 @@ export const FAMILIES = [
   { family: 'tile', prefix: '--tile-', what: 'Tile radius where a size has no shared radius role' },
   { family: 'col', prefix: '--col-', what: 'grid column widths' },
   { family: 'breakpoint', prefix: '--breakpoint-', what: 'breakpoint minima' },
+  { family: 'date-time-picker', prefix: '--date-time-picker-', what: 'the DateTimePicker section gap' },
+  { family: 'rating', prefix: '--rating-', what: 'the Rating star gap' },
+  { family: 'rich-text-editor', prefix: '--rich-text-editor-', what: 'the RichTextEditor maximum width' },
+  { family: 'comment', prefix: '--comment-', what: 'Comment pad, gap and the reply stack and indent' },
+  { family: 'progress-tracker', prefix: '--progress-tracker-', what: 'the ProgressTracker connector width and dot size' },
 ];
 
 /** Longest prefix first, so a specific family is never read as its parent. */

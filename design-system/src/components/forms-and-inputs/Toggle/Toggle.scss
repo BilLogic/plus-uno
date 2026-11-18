@@ -20,7 +20,7 @@
     font: var(--body-default);
     align-items: center;
     width: 100%;
-    gap: var(--stack-md, 8px);
+    gap: var(--stack-md);
 
     // A choice row is 24 (`--control-sm`); a bare track with no label
     // keeps its own, smaller height.

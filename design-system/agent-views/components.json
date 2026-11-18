@@ -1645,6 +1645,7 @@
         "--carousel-ring-size",
         "--carousel-ring-stroke",
         "--carousel-slide-max",
+        "--carousel-slide-max-width",
         "--carousel-slide-share",
         "--carousel-slide-share-md",
         "--carousel-slide-share-sm",
@@ -2257,18 +2258,15 @@
         "--ds-surface",
         "--ds-surface-hovered",
         "--ds-text",
+        "--inline-md",
         "--pad-x-lg",
         "--pad-x-md",
+        "--pad-y-md",
         "--plus-choice-indent",
         "--radius-control-md",
         "--radius-md",
-        "--space-025",
-        "--space-0375",
-        "--space-050",
         "--stack-lg",
         "--stack-sm",
-        "--stroke-1",
-        "--stroke-2",
         "--type-weight-medium"
       ]
     },
@@ -3013,14 +3011,16 @@
         "--body-sm",
         "--border-width-default",
         "--card-radius",
+        "--comment-gap",
+        "--comment-pad",
+        "--comment-replies-indent",
+        "--comment-replies-stack",
         "--ds-background-selected",
         "--ds-border",
         "--ds-text-subtle",
-        "--space-025",
-        "--space-050",
-        "--space-075",
-        "--space-100",
-        "--space-150",
+        "--inline-lg",
+        "--stack-md",
+        "--stack-sm",
         "--type-weight-semibold"
       ]
     },
@@ -3246,6 +3246,7 @@
         "--body-sm",
         "--control-sm",
         "--count-tag-dot-size",
+        "--count-tag-ring-width",
         "--ds-background-competency-mastering-content",
         "--ds-background-competency-mastering-content-bold",
         "--ds-background-danger",
@@ -3278,8 +3279,7 @@
         "--plus-count-min",
         "--plus-count-size",
         "--radius-full",
-        "--radius-md",
-        "--stroke-2"
+        "--radius-md"
       ]
     },
     {
@@ -4008,9 +4008,9 @@
       "tokens": [
         "--body-default",
         "--body-sm",
+        "--date-time-picker-section-gap",
         "--ds-text",
         "--ds-text-subtle",
-        "--space-0625",
         "--stack-md",
         "--stack-sm",
         "--type-weight-medium"
@@ -7411,12 +7411,15 @@
           "deprecated": null
         },
         {
-          "name": "compact",
-          "type": "bool",
+          "name": "spacing",
+          "type": "enum",
           "required": false,
-          "default": "false",
-          "values": null,
-          "description": "The 24 height, with the compact buttons.",
+          "default": "'default'",
+          "values": [
+            "default",
+            "compact"
+          ],
+          "description": "Field and button height: `default` (40) or `compact` (32).",
           "deprecated": null
         },
         {
@@ -7643,12 +7646,15 @@
           "deprecated": null
         },
         {
-          "name": "compact",
-          "type": "bool",
+          "name": "spacing",
+          "type": "oneOf",
           "required": false,
-          "default": "false",
-          "values": null,
-          "description": null,
+          "default": "'default'",
+          "values": [
+            "default",
+            "compact"
+          ],
+          "description": "Field and button height: `default` (40) or `compact` (32).",
           "deprecated": null
         },
         {
@@ -9092,9 +9098,9 @@
       ],
       "tokens": [
         "--body-sm",
-        "--space-075",
-        "--space-100",
-        "--space-150"
+        "--inline-lg",
+        "--page-header-gap",
+        "--page-header-stack"
       ]
     },
     {
@@ -9384,10 +9390,12 @@
         "--ds-border",
         "--ds-surface-overlay",
         "--ds-text-subtle",
-        "--space-025",
-        "--space-075",
-        "--space-100",
-        "--space-150"
+        "--panel-inline-lg",
+        "--panel-inline-md",
+        "--panel-inline-sm",
+        "--panel-pad",
+        "--panel-pad-y",
+        "--panel-subheader-pad-y"
       ]
     },
     {
@@ -10055,9 +10063,9 @@
         "--section-stack-lg",
         "--section-stack-md",
         "--section-stack-sm",
-        "--size-300",
-        "--stack-sm",
-        "--width-3000"
+        "--section-toolbar-count-min-width",
+        "--section-toolbar-min-width",
+        "--stack-sm"
       ],
       "subComponents": [
         {
@@ -10931,11 +10939,11 @@
           "name": "spacing",
           "type": "enum",
           "required": false,
-          "default": "'comfortable'",
+          "default": "'spacious'",
           "values": [
-            "comfortable",
-            "cozy",
-            "compact"
+            "default",
+            "compact",
+            "spacious"
           ],
           "description": null,
           "deprecated": null
@@ -11149,11 +11157,11 @@
           "name": "spacing",
           "type": "enum",
           "required": false,
-          "default": "'cozy'",
+          "default": "'default'",
           "values": [
-            "comfortable",
-            "cozy",
-            "compact"
+            "default",
+            "compact",
+            "spacious"
           ],
           "description": null,
           "deprecated": null
@@ -11216,14 +11224,13 @@
         "--icon-sm",
         "--inline-sm",
         "--pad-x-md",
+        "--progress-tracker-connector-width",
+        "--progress-tracker-dot-size",
         "--radius-control-md",
         "--radius-full",
-        "--space-050",
-        "--space-150",
         "--stack-lg",
         "--stack-md",
         "--stack-sm",
-        "--stroke-1",
         "--type-weight-medium"
       ]
     },
@@ -11401,11 +11408,11 @@
       "tokens": [
         "--border-width-default",
         "--control-md",
-        "--height-250",
         "--pad-x-md",
         "--pad-x-xs",
         "--pad-y-md",
         "--plus-prompt-input-max-height",
+        "--prompt-input-min-height",
         "--stack-md",
         "--stack-sm",
         "--type-line-height-125"
@@ -11733,18 +11740,15 @@
         "--ds-surface",
         "--ds-surface-hovered",
         "--ds-text",
+        "--inline-md",
         "--pad-x-lg",
         "--pad-x-md",
+        "--pad-y-md",
         "--plus-choice-indent",
         "--radio-control-size",
         "--radius-control-md",
         "--radius-full",
-        "--space-025",
-        "--space-0375",
-        "--space-050",
         "--stack-sm",
-        "--stroke-1",
-        "--stroke-2",
         "--type-weight-medium"
       ]
     },
@@ -11989,7 +11993,7 @@
         "--radio-control-size",
         "--radio-control-size-10",
         "--radio-control-size-14",
-        "--space-0625",
+        "--radio-group-inline-gap",
         "--stack-md"
       ]
     },
@@ -12166,7 +12170,7 @@
         "--range-track-height-4",
         "--range-track-height-6",
         "--range-track-height-8",
-        "--space-025"
+        "--stack-sm"
       ]
     },
     {
@@ -12343,7 +12347,7 @@
         "--icon-md",
         "--plus-rating-stagger",
         "--radius-full",
-        "--space-0625",
+        "--rating-gap",
         "--stack-md",
         "--stack-sm",
         "--type-weight-regular"
@@ -12600,6 +12604,7 @@
         "--pad-y-lg",
         "--pad-y-md",
         "--radius-control-lg",
+        "--rich-text-editor-max-width",
         "--rte-content-pad-x",
         "--rte-content-pad-y",
         "--stack-md",
@@ -13663,9 +13668,9 @@
         "--focus-ring-width",
         "--icon-sm",
         "--pad-x-md",
+        "--pad-x-xs",
         "--pad-y-md",
         "--radius-md",
-        "--space-025",
         "--stack-md",
         "--stack-sm",
         "--type-size-0875"
@@ -14431,13 +14436,15 @@
         "--ds-text",
         "--ds-text-inverse",
         "--heading-sm",
+        "--inline-lg",
         "--plus-overlay-origin",
         "--popup-radius",
         "--radius-lg",
-        "--space-075",
-        "--space-100",
-        "--space-150",
+        "--spotlight-footer-stack",
+        "--spotlight-gap",
         "--spotlight-media-height",
+        "--spotlight-pad",
+        "--spotlight-screen-pad",
         "--spotlight-width",
         "--transform-origin"
       ]
@@ -15588,7 +15595,6 @@
         "--radius-md",
         "--radius-sm",
         "--stack-sm",
-        "--stroke-2",
         "--tag-dot-size",
         "--type-family-heading",
         "--type-weight-semibold"
@@ -16041,8 +16047,8 @@
         "--option-menu-width",
         "--pad-x-md",
         "--pad-x-sm",
+        "--pad-x-xs",
         "--plus-tag-input-max-height",
-        "--space-025",
         "--stack-md"
       ]
     },
@@ -17392,6 +17398,7 @@
       ],
       "tokens": [
         "--body-sm",
+        "--border-width-default",
         "--ds-background-neutral-bold",
         "--ds-text-inverse",
         "--layer-tooltip",

@@ -29,7 +29,7 @@ describe('HeatmapChart options', () => {
                 enableAnimation: false,
                 animationDuration: 0,
                 animate: false,
-                compactSpacing: true,
+                spacing: 'compact',
             }),
         );
         const options = capturedOptions.at(-1);

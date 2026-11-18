@@ -90,8 +90,8 @@ export const Sizes = () => (
 
 export const Spacing = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-100)' }}>
-        <ProgressIndicator values={VALUES} selectedIndex={1} spacing="comfortable" />
-        <ProgressIndicator values={VALUES} selectedIndex={1} spacing="cozy" />
+        <ProgressIndicator values={VALUES} selectedIndex={1} spacing="spacious" />
+        <ProgressIndicator values={VALUES} selectedIndex={1} spacing="default" />
         <ProgressIndicator values={VALUES} selectedIndex={1} spacing="compact" />
     </div>
 );

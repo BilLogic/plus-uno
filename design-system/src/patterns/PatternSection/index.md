@@ -278,7 +278,7 @@ Implemented as `SectionToolbar`.
 
 ## Tokens touched
 
-`--body-default` · `--body-sm` · `--card-stack-md` · `--control-md` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-text` · `--ds-text-subtle` · `--grid-gutter` · `--heading-lg` · `--heading-lg-tracking` · `--heading-md` · `--heading-sm` · `--heading-xs` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--section-min-width-main` · `--section-min-width-side` · `--section-stack-lg` · `--section-stack-md` · `--section-stack-sm` · `--size-300` · `--stack-sm` · `--width-3000`
+`--body-default` · `--body-sm` · `--card-stack-md` · `--control-md` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-text` · `--ds-text-subtle` · `--grid-gutter` · `--heading-lg` · `--heading-lg-tracking` · `--heading-md` · `--heading-sm` · `--heading-xs` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--section-min-width-main` · `--section-min-width-side` · `--section-stack-lg` · `--section-stack-md` · `--section-stack-sm` · `--section-toolbar-count-min-width` · `--section-toolbar-min-width` · `--stack-sm`
 
 From `design-system/src/patterns/PatternSection/PatternSection.scss`. Override these through the token layer, never with a literal.
 

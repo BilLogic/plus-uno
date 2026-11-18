@@ -20,6 +20,16 @@
     --panel-min-width: var(--width-2000); /* the narrowest the splitter allows (320) */
     --panel-width-default: var(--width-2500); /* the width a Panel opens at (400) */
     --panel-max-width: var(--size-4000); /* the widest the splitter allows (640) */
+    --panel-pad: var(--space-150);
+    --panel-pad-y: var(--space-100);
+    --panel-subheader-pad-y: var(--space-075);
+    --panel-inline-sm: var(--space-025);
+    --panel-inline-md: var(--space-075);
+    --panel-inline-lg: var(--space-100);
+
+    /* Section */
+    --section-toolbar-min-width: var(--width-3000);
+    --section-toolbar-count-min-width: var(--size-300);
 
     /* Card */
     --card-pad: var(--space-100);

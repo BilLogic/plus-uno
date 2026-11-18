@@ -71,6 +71,10 @@ describe('Motion principles', () => {
         expect(nthBlocks).toHaveLength(4);
         for (const [, body] of nthBlocks) expect(body).not.toContain('--from');
         const itemRule = css.match(/\[data-loop='simplicity'\]\s*\.loop-group\s*>\s*i\s*\{([^}]*)\}/)?.[1] ?? '';
-        expect(itemRule).toMatch(/--from:\s*0\s+calc\(var\(--space-050\)\s*\*\s*-1\)/);
+        expect(itemRule).toMatch(/--from:\s*0\s+calc\(var\(--stack-md\)\s*\*\s*-1\)/);
+    });
+
+    it('reads no numbered primitive tokens', () => {
+        expect(css).not.toMatch(/var\(\s*--(?:space|radius|size|stroke)-\d/);
     });
 });

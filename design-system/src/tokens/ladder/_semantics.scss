@@ -65,6 +65,8 @@
     --content-max-width-reading: var(--size-5400);
     --content-min-width: var(--size-4500);
     --content-width: 720px;
+    --content-prose-stack: var(--space-100);
+    --content-list-indent: var(--space-200);
 
     /* Size */
     --control-sm: var(--size-150); /* new role; Control was missing from the Icon/Image/Item/Label/Row/Field set */

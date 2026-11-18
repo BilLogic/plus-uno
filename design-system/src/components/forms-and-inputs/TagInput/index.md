@@ -214,9 +214,9 @@ On a row's handle and in its menu:
 | Tags and entry | `--stack-md` between them; with focus, up to three rows of tags before the content scrolls. |
 | Entry text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
 | List | `--ds-surface-overlay` with a `--ds-border` edge, `--popup-radius` and `--ds-shadow-overlay`. |
-| List hint | `--body-sm` in `--ds-text-subtle`, `--space-025` `--pad-x-md`. |
+| List hint | `--body-sm` in `--ds-text-subtle`, `--pad-x-xs` `--pad-x-md`. |
 | Row handle | `--ds-icon-subtle`. |
-| Option menu | `--option-menu-width` wide; the name field `--space-025` `--pad-x-sm`; a `--border-width-default` rule in `--ds-border` above the colors. |
+| Option menu | `--option-menu-width` wide; the name field `--pad-x-xs` `--pad-x-sm`; a `--border-width-default` rule in `--ds-border` above the colors. |
 
 The tags take Tag's own tokens.
 
@@ -272,7 +272,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-sm` · `--border-width-default` · `--ds-border` · `--ds-icon-subtle` · `--ds-text-subtle` · `--option-menu-width` · `--pad-x-md` · `--pad-x-sm` · `--plus-tag-input-max-height` · `--space-025` · `--stack-md`
+`--body-sm` · `--border-width-default` · `--ds-border` · `--ds-icon-subtle` · `--ds-text-subtle` · `--option-menu-width` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--plus-tag-input-max-height` · `--stack-md`
 
 From `design-system/src/components/forms-and-inputs/TagInput/TagInput.scss`. Override these through the token layer, never with a literal.
 

@@ -1,7 +1,7 @@
 .plus-page-header {
     display: flex;
     flex-direction: column;
-    gap: var(--space-100);
+    gap: var(--page-header-stack);
 }
 
 .plus-page-header-breadcrumbs {
@@ -12,7 +12,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--space-150);
+    gap: var(--page-header-gap);
 }
 
 .plus-page-header-title {
@@ -23,7 +23,7 @@
 .plus-page-header-actions {
     display: flex;
     align-items: center;
-    gap: var(--space-075);
+    gap: var(--inline-lg);
     flex: none;
 }
 

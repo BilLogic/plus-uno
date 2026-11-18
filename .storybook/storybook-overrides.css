@@ -172,7 +172,7 @@ body,
 .sbdocs .sbdocs-content p:not([class]):not(:where(.docs-story *, .sb-ds-dodont-card *)),
 .sbdocs .sbdocs-content li:not([class]):not(:where(.docs-story *, .sb-ds-dodont-card *)) {
     font-family: var(--type-family-body);
-    font-size: var(--type-size-100);
+    font-size: var(--docs-text-size);
     line-height: var(--type-line-height-150);
     font-weight: var(--type-weight-regular);
     color: var(--ds-text);
@@ -299,16 +299,14 @@ body,
  * compared by eye, which is exactly how they drift.
  */
 html {
-    /* Literal on purpose — see the block above: this mirrors
-       `unsafeTocbotOptions.headingsOffset` in preview.jsx, a plain integer. */
-    scroll-padding-top: var(--space-500);
+    /* Mirrors `unsafeTocbotOptions.headingsOffset` in preview.jsx, a plain integer. */
+    scroll-padding-top: var(--docs-header-offset);
 }
 
 @media (min-width: 768px) {
     html {
-        /* Literal on purpose — see the block above: this mirrors
-           `unsafeTocbotOptions.headingsOffset` in preview.jsx, a plain integer. */
-        scroll-padding-top: calc(var(--space-500) + var(--section-stack-md));
+        /* Mirrors `unsafeTocbotOptions.headingsOffset` in preview.jsx, a plain integer. */
+        scroll-padding-top: calc(var(--docs-header-offset) + var(--section-stack-md));
     }
 }
 
@@ -317,9 +315,8 @@ html {
  * Horizontal padding + max-width: inset from iframe edges (sidebar seam / scrollbar) and narrow measure.
  */
 .sbdocs-wrapper {
-    /* Literal on purpose — see the block above: this mirrors
-       `unsafeTocbotOptions.headingsOffset` in preview.jsx, a plain integer. */
-    scroll-padding-top: var(--space-500);
+    /* Mirrors `unsafeTocbotOptions.headingsOffset` in preview.jsx, a plain integer. */
+    scroll-padding-top: var(--docs-header-offset);
     box-sizing: border-box;
     width: 100%;
     max-width: calc(var(--content-max-width) + var(--page-pad) * 2);
@@ -331,9 +328,8 @@ html {
 
 @media (min-width: 768px) {
     .sbdocs-wrapper {
-        /* Literal on purpose — see the block above: this mirrors
-           `unsafeTocbotOptions.headingsOffset` in preview.jsx, a plain integer. */
-        scroll-padding-top: calc(var(--space-500) + var(--section-stack-md));
+        /* Mirrors `unsafeTocbotOptions.headingsOffset` in preview.jsx, a plain integer. */
+        scroll-padding-top: calc(var(--docs-header-offset) + var(--section-stack-md));
     }
 }
 
@@ -884,7 +880,7 @@ a.sbdocs-a {
   .sb-ds-docs-canvas-attached-root:has(.sbdocs-preview-actions)
   .docs-story
   > div[scale="1"] {
-  padding-bottom: calc(var(--space-250) * 2) !important;
+  padding-bottom: calc(var(--card-pad) * 5) !important;
 }
 
 /*
@@ -930,7 +926,7 @@ a.sbdocs-a {
     gap: var(--section-stack-lg);
     align-items: stretch;
     box-shadow: inset 0 -1px 0 var(--ds-border);
-    margin: 0 0 var(--space-200);
+    margin: 0 0 calc(var(--card-pad) * 2);
     overflow-x: auto;
     /* Explicit, because `overflow-x: auto` would otherwise compute it to `auto`.
        Belt and braces: nothing overflows vertically any more, but the next
@@ -951,7 +947,7 @@ a.sbdocs-a {
     padding: var(--stack-lg) 0;
     color: var(--ds-text-subtle);
     font-family: var(--type-family-heading);
-    font-size: var(--type-size-100);
+    font-size: var(--docs-text-size);
     font-weight: var(--type-weight-medium);
     line-height: 1.5;
     white-space: nowrap;
@@ -974,35 +970,35 @@ a.sbdocs-a {
 }
 
 .sb-ds-docs-tabs__panel:focus-visible {
-    outline: var(--stroke-2) solid var(--ds-border-focused);
+    outline: var(--focus-ring-width) solid var(--ds-border-focused);
     outline-offset: var(--stack-sm);
 }
 
 /* Harness tab (ADR-040): a lead line, one row of actions, then the file. */
 .sb-ds-agent-view__lead {
     color: var(--ds-text-subtle);
-    margin: 0 0 var(--space-150);
+    margin: 0 0 var(--section-stack-lg);
 }
 
 .sb-ds-agent-view__actions {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-100);
-    margin: 0 0 var(--space-300);
+    gap: var(--grid-gutter);
+    margin: 0 0 48px; /* docs-literal: token gap: 48px */
 }
 
 .sb-ds-agent-view__rendered {
-    padding-top: var(--space-200);
+    padding-top: var(--section-stack-lg);
 }
 
 /* A rule's id under its heading: the handle agents cite, quiet below the rule.
    The class name is RULE_ID_CLASS in design-system/src/storybook-docs/lib/component-tabs-contract.js. */
 .sb-ds-agent-view__rule-id {
     display: block;
-    margin-top: var(--space-050);
+    margin-top: var(--stack-md);
     color: var(--ds-text-subtlest);
     font-family: var(--type-family-code);
-    font-size: var(--type-size-075);
+    font-size: var(--docs-code-size);
     font-weight: var(--type-weight-regular);
     line-height: var(--type-line-height-100);
 }

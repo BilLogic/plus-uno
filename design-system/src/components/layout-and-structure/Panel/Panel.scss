@@ -16,8 +16,8 @@
 .plus-panel-header {
     display: flex;
     align-items: center;
-    gap: var(--space-075);
-    padding: var(--space-100) var(--space-150);
+    gap: var(--panel-inline-md);
+    padding: var(--panel-pad-y) var(--panel-pad);
     border-bottom: var(--border-width-default) solid var(--ds-border);
     flex: none;
 }
@@ -29,7 +29,7 @@
 }
 
 .plus-panel-subheader {
-    padding: var(--space-075) var(--space-150);
+    padding: var(--panel-subheader-pad-y) var(--panel-pad);
     border-bottom: var(--border-width-default) solid var(--ds-border);
     flex: none;
 }
@@ -37,21 +37,21 @@
 .plus-panel-action-group {
     display: flex;
     align-items: center;
-    gap: var(--space-025);
+    gap: var(--panel-inline-sm);
 }
 
 .plus-panel-body {
     flex: 1;
     overflow: auto;
-    padding: var(--space-150);
+    padding: var(--panel-pad);
 }
 
 .plus-panel-footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--space-100);
-    padding: var(--space-100) var(--space-150);
+    gap: var(--panel-inline-lg);
+    padding: var(--panel-pad-y) var(--panel-pad);
     border-top: var(--border-width-default) solid var(--ds-border);
     flex: none;
 }
