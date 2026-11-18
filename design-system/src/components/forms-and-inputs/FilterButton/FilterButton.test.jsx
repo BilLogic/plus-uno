@@ -27,4 +27,17 @@ describe('FilterButton', () => {
         expect(button).toHaveTextContent('99+');
         expect(button).toHaveAttribute('aria-pressed', 'true');
     });
+
+    it('reads "label: text" with the label quiet and the value in ink', () => {
+        const { container } = render(<FilterButton label="Status" text="Upcoming" />);
+        expect(screen.getByRole('button', { name: 'Status: Upcoming' })).toBeInTheDocument();
+        expect(container.querySelector('.plus-filter-btn__label')).toHaveTextContent('Status:');
+        expect(container.querySelector('.plus-filter-btn__value')).toHaveTextContent('Upcoming');
+    });
+
+    it('keeps a plain name when there is no label', () => {
+        const { container } = render(<FilterButton text="Status" />);
+        expect(container.querySelector('.plus-filter-btn__label')).toBeNull();
+        expect(container.querySelector('.plus-filter-btn__value')).toBeNull();
+    });
 });
