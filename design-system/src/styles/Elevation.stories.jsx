@@ -556,9 +556,9 @@ export const BlockingOnBlanket = () => (
 /** Sunken holds the work; it never floats. */
 export const SunkenNeverFloats = () => (
     <DoDont>
-        <Do caption="Sunken is the ground: the frame, or a subtle Section.">
+        <Do caption="Sunken is the ground: the frame, or a sunken Card.">
             <div style={ground}>
-                <PatternSection fill="subtle" title="This week" description="12 sessions" />
+                <PatternCard surface="sunken" title="This week" description="12 sessions" />
             </div>
         </Do>
         <Dont caption="A sunken fill with a shadow: the gray says recessed, the shadow says lifted.">

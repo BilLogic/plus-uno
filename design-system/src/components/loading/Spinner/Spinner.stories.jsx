@@ -55,7 +55,7 @@ export const Size24 = () => <Spinner size={24} />;
 export const Size48 = () => <Spinner size={48} />;
 
 export const Invert = () => (
-    <div style={{ padding: 'var(--section-pad-y-compact) var(--section-pad-x-compact)', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--radius-md)' }}>
+    <div style={{ padding: 'var(--section-stack-md)', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--radius-md)' }}>
         <Spinner appearance="invert" />
     </div>
 );

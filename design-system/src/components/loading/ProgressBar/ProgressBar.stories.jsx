@@ -37,7 +37,7 @@ export const Appearances = () => (
     <div style={col}>
         <ProgressBar value={60} appearance="default" />
         <ProgressBar value={100} appearance="success" />
-        <div style={{ padding: 'var(--section-pad-y-compact) var(--section-pad-x-compact)', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--radius-md)' }}>
+        <div style={{ padding: 'var(--section-stack-md)', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--radius-md)' }}>
             <ProgressBar value={60} appearance="inverse" />
         </div>
     </div>
@@ -49,7 +49,7 @@ export const Default = () => <ProgressBar value={60} appearance="default" />;
 export const Success = () => <ProgressBar value={100} appearance="success" />;
 
 export const Inverse = () => (
-    <div style={{ padding: 'var(--section-pad-y-compact) var(--section-pad-x-compact)', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--radius-md)' }}>
+    <div style={{ padding: 'var(--section-stack-md)', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--radius-md)' }}>
         <ProgressBar value={60} appearance="inverse" />
     </div>
 );

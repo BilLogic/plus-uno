@@ -407,7 +407,7 @@ CalendarOpensFourPixelsBelow.play = async ({ canvasElement }) => {
 
 /** With no room below, the calendar opens above, the same 4px away. */
 export const CalendarFlipsAboveNearTheBottom = () => (
-    <div style={{ position: 'fixed', left: 'var(--pad-x-lg)', bottom: 'var(--section-pad-y-compact)', width: '296px' /* token gap: 296px */ }}>
+    <div style={{ position: 'fixed', left: 'var(--pad-x-lg)', bottom: 'var(--section-stack-md)', width: '296px' /* token gap: 296px */ }}>
         <DatePicker aria-label="Session date" value="2026-10-21" />
     </div>
 );

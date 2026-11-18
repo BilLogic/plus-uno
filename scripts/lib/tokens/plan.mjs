@@ -203,13 +203,6 @@ export const TOKEN_LADDER = [
   { tier: 'templates', group: 'Panel', new: '--panel-max-width', old: null, ref: 'var(--size-4000)', note: 'the widest the splitter allows (640)', use: 'Widest the Panel may be dragged.' },
 
   // ─── Templates / Section ───────────────────────────────────────────────
-  { tier: 'templates', group: 'Section', new: '--section-pad-x-compact', old: null, value: '--space-100', use: 'Horizontal padding of a PatternSection with compact spacing.' },
-  { tier: 'templates', group: 'Section', new: '--section-pad-x-default', old: null, value: '--space-150', use: 'Horizontal padding of a PatternSection with default spacing.' },
-  { tier: 'templates', group: 'Section', new: '--section-pad-x-spacious', old: null, value: '--space-200', use: 'Horizontal padding of a PatternSection with spacious spacing.' },
-  { tier: 'templates', group: 'Section', new: '--section-pad-y-compact', old: null, value: '--space-100', use: 'Vertical padding of a PatternSection with compact spacing.' },
-  { tier: 'templates', group: 'Section', new: '--section-pad-y-default', old: null, value: '--space-150', use: 'Vertical padding of a PatternSection with default spacing.' },
-  { tier: 'templates', group: 'Section', new: '--section-pad-y-spacious', old: null, value: '--space-200', use: 'Vertical padding of a PatternSection with spacious spacing.' },
-  { tier: 'templates', group: 'Section', new: '--section-radius', old: null, ref: 'var(--radius-xxl)', note: 'the rounding of a Section with a fill', use: 'Corner rounding of a PatternSection that has a fill.' },
   { tier: 'templates', group: 'Section', new: '--section-stack-sm', old: '--section-stack-sm', use: 'Vertical gap between a section header and its content.' },
   { tier: 'templates', group: 'Section', new: '--section-stack-md', old: '--section-stack-md', use: 'Vertical gap between blocks inside a PatternSection.' },
   { tier: 'templates', group: 'Section', new: '--section-stack-lg', old: '--section-stack-lg', use: 'Vertical gap between groups of blocks inside a PatternSection.' },

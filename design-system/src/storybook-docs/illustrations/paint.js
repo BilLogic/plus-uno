@@ -164,7 +164,7 @@ const CORNERS = {
   window: ['--radius-control-sm', null],
   button: ['--button-radius-default', 'components/forms-and-inputs/Button/Button.scss'],
   card: ['--card-radius', 'patterns/PatternCard/PatternCard.scss'],
-  section: ['--section-radius', 'patterns/PatternSection/PatternSection.scss'],
+  section: ['--card-radius', 'patterns/PatternCard/PatternCard.scss'],
   popup: ['--popup-radius', 'components/overlays-and-layering/Popup/Popup.scss'],
   flag: ['--popup-radius', 'components/messaging/Flag/Flag.scss'],
   tooltip: ['--radius-control-sm', 'components/overlays-and-layering/Tooltip/Tooltip.scss'],

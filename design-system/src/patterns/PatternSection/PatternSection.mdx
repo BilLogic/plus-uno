@@ -91,7 +91,7 @@ A Section with a view bar, a detail and a footer. The title, the first pill and 
 1. **Title row.** The h2, an optional one-line description, and actions only when there is no view bar.
 2. **View bar** (optional). Pill views at the start; at the end, in order, the format switch, Search, filters, More and the labeled Primary.
 3. **Body.** A Table, a card grid, a list, a form or subsections. A Table's head row follows the bar with nothing between.
-4. **Detail** (optional). An inline expand on the subtle fill that opens in place inside the Section and pushes the content below it down. Never use it for a queue page, which docks a `Panel` beside the list.
+4. **Detail** (optional). An inline expand, drawn as a sunken Card, that opens in place inside the Section and pushes the content below it down. Never use it for a queue page, which docks a `Panel` beside the list.
 5. **Footer** (optional). Paging or "View all".
 
 </div>
@@ -180,8 +180,7 @@ Loading, errors and the search field follow their patterns and components: Loadi
 <tr><td><code>--section-stack-md</code></td><td>Header to body; body to footer.</td></tr>
 <tr><td><code>--section-stack-lg</code></td><td>Between subsections.</td></tr>
 <tr><td><code>--section-min-width-main</code>, <code>--section-min-width-side</code></td><td>The main and side columns of a split.</td></tr>
-<tr><td><code>--section-radius</code></td><td>16: the corner of a Section with <code>fill="subtle"</code>. A Card inside it keeps <code>--card-radius</code> (16).</td></tr>
-<tr><td><code>--section-pad-x-default</code>, <code>--section-pad-y-default</code></td><td>A Section with <code>fill="subtle"</code>, on <code>--ds-surface-sunken</code>.</td></tr>
+<tr><td><code>--card-pad</code>, <code>--card-radius</code></td><td>The detail, which is a sunken Card, on <code>--ds-surface-sunken</code>.</td></tr>
 <tr><td><code>--heading-md</code>, <code>--heading-sm</code></td><td>A Section title and a subsection title.</td></tr>
 </tbody>
 </DocsTable>
@@ -217,7 +216,7 @@ Loading, errors and the search field follow their patterns and components: Loadi
 <tr><td><code>viewBar</code> <PlannedTag /></td><td>Planned. Pill Tabs at the start; at the end the format switch, Search, the filters, More and the labeled Primary. Today the view bar goes in <code>tabs</code>.</td></tr>
 <tr><td><code>toolbar</code></td><td>A <code>SectionToolbar</code>, the row under the title row for the search, filters and actions of a table. Pass a <code>PatternSection.Toolbar</code> as the <code>toolbar</code> prop. It takes the place of <code>tabs</code> when both are passed.</td></tr>
 <tr><td><code>tabs</code> · <code>type="tabs-only"</code></td><td>The row under the title row; <code>tabs-only</code> hides the title row from sight when the page title names the collection.</td></tr>
-<tr><td><code>fill</code></td><td><code>none</code> or <code>subtle</code>, for the Section; the detail always takes <code>subtle</code>.</td></tr>
+<tr><td><code>spacing</code></td><td><code>compact</code>, <code>default</code> or <code>spacious</code>: the space between the header, the body and the footer.</td></tr>
 <tr><td><code>children</code></td><td>The body: a Table, a card grid, a list, a form or subsections.</td></tr>
 <tr><td><code>layout="split"</code> · <code>side</code></td><td>A second column at the end, for a summary.</td></tr>
 <tr><td><code>sidePlacement</code> <PlannedTag /></td><td>Planned. <code>start</code> puts the side first, for a filter side or a step rail.</td></tr>
@@ -245,7 +244,7 @@ The bulk bar lives in the Dynamic table's head row, through its <code>bulkAction
 
 Use `PatternSection` when content has a heading, shares actions, shows or hides as a unit, or takes its own span of the grid; otherwise the content belongs to the Section above it. The header is the Section's, not the Table's: the title row names it, and the view bar under it holds the views at the start and everything that acts on the content at the end, so switching views can swap a table for cards while the bar stays put.
 
-A Section has two looks, `none` and `subtle`, and five parts: header, body, side, detail and footer. The side takes either fill; the detail is an inline expand on the subtle fill that opens in place inside the Section and pushes the content below it down.
+A Section takes no fill and no pad, and has five parts: header, body, side, detail and footer. The detail is an inline expand, drawn as a sunken Card, that opens in place inside the Section and pushes the content below it down.
 
 </div>
 
@@ -352,11 +351,11 @@ Actions that commit changes belong in the card or form that holds the fields.
     dontCaption="Cancel and Save in the Section footer, away from the fields they commit."
 />
 
-### Use the subtle fill only to stand apart.
+### Give a part a fill with a Card, not a Section.
 
 <RuleTag kind="review" />
 
-The subtle fill sets a part apart from its neighbor, such as a detail or a filter side. Plain Sections take no fill.
+A padded box with a fill is a Card. A Section takes no fill and no pad, so a part that stands apart from its neighbor, such as a detail, is a sunken Card.
 
 ### Nest a Section once at most.
 

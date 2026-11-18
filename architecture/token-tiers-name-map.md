@@ -99,13 +99,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Panel | `--panel-min-width` | the narrowest the splitter allows (320) |
 | Panel | `--panel-width-default` | the width a Panel opens at (400) |
 | Panel | `--panel-max-width` | the widest the splitter allows (640) |
-| Section | `--section-pad-x-compact` |  |
-| Section | `--section-pad-x-default` |  |
-| Section | `--section-pad-x-spacious` |  |
-| Section | `--section-pad-y-compact` |  |
-| Section | `--section-pad-y-default` |  |
-| Section | `--section-pad-y-spacious` |  |
-| Section | `--section-radius` | the rounding of a Section with a fill |
 | Section | `--section-stack-sm` (declared elsewhere) |  |
 | Section | `--section-stack-md` (declared elsewhere) |  |
 | Section | `--section-stack-lg` (declared elsewhere) |  |

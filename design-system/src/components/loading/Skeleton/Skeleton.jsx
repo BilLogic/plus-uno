@@ -68,9 +68,9 @@ export const SKELETON_RADII = {
     'element-radius-full': 'var(--radius-full)',
     'card-radius-sm': 'var(--card-radius)',
     'card-radius-md': 'var(--card-radius)',
-    'section-radius-sm': 'var(--section-radius)',
-    'section-radius-md': 'var(--section-radius)',
-    'section-radius-lg': 'var(--section-radius)',
+    'section-radius-sm': 'var(--card-radius)',
+    'section-radius-md': 'var(--card-radius)',
+    'section-radius-lg': 'var(--card-radius)',
 };
 
 const toLength = (value) => (typeof value === 'number' ? `${value}px` : value);

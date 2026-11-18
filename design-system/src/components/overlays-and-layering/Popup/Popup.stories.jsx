@@ -59,7 +59,7 @@ export default {
     }
 };
 
-const col = { display: 'flex', flexDirection: 'column', gap: 'calc(var(--section-pad-x-spacious) * 2)', padding: 'var(--popup-clip-reach)', alignItems: 'center' };
+const col = { display: 'flex', flexDirection: 'column', gap: 'calc(var(--section-stack-md) * 4)', padding: 'var(--popup-clip-reach)', alignItems: 'center' };
 
 function PopupLayoutDemos() {
     return (
@@ -159,7 +159,7 @@ export const InteractionStates = () => (
 export const Overview = {
     render: () => (
         <DocsOverlayBoundary fit={false} containHeight>
-            <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--section-pad-y-default) var(--section-pad-x-default)' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', padding: 'var(--section-stack-lg)' }}>
                 <Popup
                     trigger={<Button type="button" text="Session details" appearance="primary" />}
                     title="Session 12"
@@ -222,7 +222,7 @@ const openPopup = async (canvasElement) => {
 };
 
 const StatePopup = () => (
-    <div style={{ padding: 'calc(var(--section-pad-x-spacious) * 2)' /* 64px fixed */, display: 'flex', justifyContent: 'center' }}>
+    <div style={{ padding: 'calc(var(--section-stack-md) * 4)' /* 64px fixed */, display: 'flex', justifyContent: 'center' }}>
         <Popup trigger={<Button appearance="primary" text="Details" />} title="Session 12" triggerType="manual" show>
             Ran 45 minutes over.
         </Popup>
@@ -287,7 +287,7 @@ export const Open = {
 
 /** Where the popup opens, one story per side. It stays open so the page can show it. */
 const OpenPopup = ({ placement = 'top', width, title, children = 'Ran 45 minutes over.' }) => (
-    <div style={{ padding: 'calc(var(--section-pad-x-spacious) * 8) calc(var(--section-pad-x-spacious) * 2)', display: 'flex', justifyContent: 'center' }}>
+    <div style={{ padding: 'calc(var(--section-stack-md) * 16) calc(var(--section-stack-md) * 4)', display: 'flex', justifyContent: 'center' }}>
         <Popup
             trigger={<Button appearance="primary" text="Details" />}
             title={title}
@@ -346,7 +346,7 @@ export const WidthAutoCaps = {
  */
 export const WidthColumns = {
     render: () => (
-        <div style={{ padding: 'calc(var(--section-pad-x-spacious) * 8) calc(var(--section-pad-x-spacious) * 2)', display: 'flex', gap: 'calc(var(--section-pad-x-spacious) * 2)' /* 64px fixed */, justifyContent: 'center' }}>
+        <div style={{ padding: 'calc(var(--section-stack-md) * 16) calc(var(--section-stack-md) * 4)', display: 'flex', gap: 'calc(var(--section-stack-md) * 4)' /* 64px fixed */, justifyContent: 'center' }}>
             {['3-col', '4-col'].map((width) => (
                 <Popup
                     key={width}
@@ -376,7 +376,7 @@ export const WidthColumns = {
 /** Opened by a pointer, it clips out from the trigger's corner; only clip-path and opacity move, never the width. */
 export const OpensWithAClip = {
     render: () => (
-        <div style={{ padding: 'calc(var(--section-pad-x-spacious) * 8) calc(var(--section-pad-x-spacious) * 2)', display: 'flex', justifyContent: 'center' }}>
+        <div style={{ padding: 'calc(var(--section-stack-md) * 16) calc(var(--section-stack-md) * 4)', display: 'flex', justifyContent: 'center' }}>
             <Popup id="popup-motion-pointer" trigger={<Button appearance="primary" text="Details" />} title="Session 12" placement="bottom-start">
                 Ran 45 minutes over.
             </Popup>
@@ -402,7 +402,7 @@ export const OpensWithAClip = {
 /** Opened from the keyboard, it appears at once. */
 export const KeyboardOpenIsInstant = {
     render: () => (
-        <div style={{ padding: 'calc(var(--section-pad-x-spacious) * 8) calc(var(--section-pad-x-spacious) * 2)', display: 'flex', justifyContent: 'center' }}>
+        <div style={{ padding: 'calc(var(--section-stack-md) * 16) calc(var(--section-stack-md) * 4)', display: 'flex', justifyContent: 'center' }}>
             <Popup id="popup-motion-keyboard" trigger={<Button appearance="primary" text="Details" />} title="Session 12" placement="bottom-start">
                 Ran 45 minutes over.
             </Popup>
@@ -419,7 +419,7 @@ export const KeyboardOpenIsInstant = {
 };
 
 const MotionStory = ({ id }) => (
-    <div style={{ padding: 'calc(var(--section-pad-x-spacious) * 8) calc(var(--section-pad-x-spacious) * 2)', display: 'flex', justifyContent: 'center' }}>
+    <div style={{ padding: 'calc(var(--section-stack-md) * 16) calc(var(--section-stack-md) * 4)', display: 'flex', justifyContent: 'center' }}>
         <Popup id={id} trigger={<Button appearance="primary" text="Details" />} title="Session 12" placement="bottom-start">
             Ran 45 minutes over.
         </Popup>
@@ -479,7 +479,7 @@ export const ReducedMotion = {
 export const BodyOnly = { render: () => <OpenPopup>Ran 45 minutes over.</OpenPopup> };
 
 const TriggerStory = ({ triggerType, text }) => (
-    <div style={{ padding: 'calc(var(--section-pad-x-spacious) * 2)' /* 64px fixed */, display: 'flex', justifyContent: 'center' }}>
+    <div style={{ padding: 'calc(var(--section-stack-md) * 4)' /* 64px fixed */, display: 'flex', justifyContent: 'center' }}>
         <Popup trigger={<Button appearance="primary" text={text} />} title="Session 12" triggerType={triggerType}>
             Ran 45 minutes over.
         </Popup>

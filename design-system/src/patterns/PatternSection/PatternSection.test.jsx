@@ -31,11 +31,19 @@ describe('PatternSection', () => {
         expect(cls).not.toMatch(/plus-pattern-section-bg-/);
     });
 
-    describe('fill', () => {
-        it('takes a subtle fill on request, and none otherwise', () => {
-            const { container, rerender } = render(<PatternSection title="Flag" fill="subtle">Body</PatternSection>);
-            expect(section(container).className).toContain('plus-pattern-section-fill-subtle');
-            rerender(<PatternSection title="Flag">Body</PatternSection>);
+    describe('spacing', () => {
+        it('puts the default step on the Section, and each other step on request', () => {
+            const { container, rerender } = render(<PatternSection title="Flag">Body</PatternSection>);
+            expect(section(container).className).toContain('plus-pattern-section-spacing-default');
+            rerender(<PatternSection title="Flag" spacing="compact">Body</PatternSection>);
+            expect(section(container).className).toContain('plus-pattern-section-spacing-compact');
+            rerender(<PatternSection title="Flag" spacing="spacious">Body</PatternSection>);
+            expect(section(container).className).toContain('plus-pattern-section-spacing-spacious');
+        });
+
+        it('takes no fill prop: a padded box with a fill is a Card', () => {
+            const removed = { fill: 'subtle' };
+            const { container } = render(<PatternSection title="Flag" {...removed}>Body</PatternSection>);
             expect(section(container).className).not.toMatch(/plus-pattern-section-fill-/);
         });
     });

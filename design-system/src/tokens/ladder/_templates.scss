@@ -21,15 +21,6 @@
     --panel-width-default: var(--width-2500); /* the width a Panel opens at (400) */
     --panel-max-width: var(--size-4000); /* the widest the splitter allows (640) */
 
-    /* Section */
-    --section-pad-x-compact: var(--space-100);
-    --section-pad-x-default: var(--space-150);
-    --section-pad-x-spacious: var(--space-200);
-    --section-pad-y-compact: var(--space-100);
-    --section-pad-y-default: var(--space-150);
-    --section-pad-y-spacious: var(--space-200);
-    --section-radius: var(--radius-xxl); /* the rounding of a Section with a fill */
-
     /* Card */
     --card-pad: var(--space-100);
     --card-radius: var(--radius-xxl);

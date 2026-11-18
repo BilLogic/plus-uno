@@ -31,7 +31,7 @@ import { Button, Alert, Badge, Accordion, Breadcrumb } from '@/components';
 
 function App() {
   return (
-    <div style={{ padding: 'var(--section-pad-x-spacious)' }}>
+    <div style={{ padding: 'calc(var(--section-stack-md) * 2)' }}>
       <Button appearance="primary">Click me</Button>
       <Alert style="success" title="Success!">Operation completed.</Alert>
       <Badge style="info">New</Badge>

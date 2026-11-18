@@ -5,12 +5,13 @@ import { Button, Icon, Skeleton } from '@/components';
 import { HeadingLevelContext, headingTag, useHeadingLevel } from '@/lib/headingLevel';
 import { AnimatePresence, HeightSurface } from '@/lib/heightMotion';
 import { FRAME_LAYOUT } from '../Frame/frameLayout';
+import PatternCard from '../PatternCard/PatternCard';
 import './PatternSection.scss';
 
 /**
  * Section pattern for PLUS design system: a span of the page grid that
- * groups content under one heading. It has no fill, no pad and no size
- * options unless `fill="subtle"` is set; the Page around it supplies the pad. It mirrors
+ * groups content under one heading. It has no fill and no pad: a padded box
+ * with a fill is a Card, and the Page around the Section supplies the pad. It mirrors
  * `Pattern/Section` in the Figma design system file.
  *
  * Its parts stack Section/stack-md: the `_Section header`, the body, then an
@@ -37,12 +38,12 @@ import './PatternSection.scss';
  * min Section/min-width-side); when a column would drop below its minimum,
  * they stack. `subsections` stacks nested sections Section/stack-lg apart.
  *
- * FILL. A section has none by default. `fill="subtle"` sets it on the sunken
- * surface with a pad and a radius, for a section that stands apart from the
- * content beside it, such as the `detail` region.
+ * SPACING. `spacing` sets the gap between the header, the body and the
+ * footer: `compact`, `default` (the Figma value) or `spacious`.
  *
  * DETAIL. An inline expand built on Base UI's Collapsible: a disclosure row
- * opens in place inside the Section and pushes the content below it down.
+ * opens in place inside the Section and pushes the content below it down. It
+ * is a sunken Card, so it takes the Card's pad and radius.
  * Queue pages dock a Panel beside the list instead.
  *
  * FOOTER. Only for "View all" or paging, aligned to the end. Actions that
@@ -51,7 +52,7 @@ import './PatternSection.scss';
 
 export const SECTION_HEADER_TYPES = ['default', 'tabs', 'toolbar', 'custom', 'tabs-only'];
 export const SECTION_LAYOUTS = ['single', 'split', 'subsections'];
-export const SECTION_FILLS = ['none', 'subtle'];
+export const SECTION_SPACINGS = ['default', 'compact', 'spacious'];
 
 /** Section width from which the filter side sits beside the body. */
 export const SECTION_DETAIL_FLOOR = FRAME_LAYOUT.splitFloor;
@@ -160,8 +161,7 @@ const PatternSection = ({
     defaultDetailOpen = false,
     onDetailOpenChange,
     level: rankProp,
-    gap = 'md',
-    fill = 'none',
+    spacing = 'default',
     named = false,
     className = '',
     style,
@@ -170,8 +170,7 @@ const PatternSection = ({
 }) => {
     const classes = [
         'plus-pattern-section',
-        `plus-pattern-section-gap-${gap}`,
-        fill !== 'none' && `plus-pattern-section-fill-${fill}`,
+        `plus-pattern-section-spacing-${spacing}`,
         className,
     ].filter(Boolean).join(' ');
 
@@ -271,7 +270,8 @@ const PatternSection = ({
             <Collapsible.Root
                 open={isDetailOpen}
                 onOpenChange={handleDetailOpenChange}
-                className="plus-pattern-section-detail plus-pattern-section-fill-subtle"
+                className="plus-pattern-section-detail"
+                render={(rootProps) => <PatternCard surface="sunken" {...rootProps} />}
             >
                 <Collapsible.Trigger
                     ref={detailTriggerRef}
@@ -414,10 +414,8 @@ PatternSection.propTypes = {
     onDetailOpenChange: PropTypes.func,
     /** `page` makes the title the page's h1 at Heading/large 24; by default it nests one level down */
     level: PropTypes.oneOf(['page']),
-    /** Gap between the header, the body and the footer (Section/stack tokens); `md` is the Figma value */
-    gap: PropTypes.oneOf(['sm', 'md', 'lg']),
-    /** `subtle` sets the section on the sunken surface with a pad and a radius; `none` (default) draws nothing */
-    fill: PropTypes.oneOf(SECTION_FILLS),
+    /** Space between the header, the body and the footer (Section/stack tokens); `default` is the Figma value */
+    spacing: PropTypes.oneOf(SECTION_SPACINGS),
     /** Makes the section a region named by its title, for a section that stands apart as a landmark */
     named: PropTypes.bool,
     className: PropTypes.string,

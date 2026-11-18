@@ -13,24 +13,17 @@
     color: var(--ds-text);
 }
 
-/* Gap between the header, the body and the footer: Section/stack-md is the Figma value. */
-.plus-pattern-section-gap-sm {
+/* Space between the header, the body and the footer: Section/stack-md is the Figma value. */
+.plus-pattern-section-spacing-compact {
     gap: var(--section-stack-sm);
 }
 
-.plus-pattern-section-gap-md {
+.plus-pattern-section-spacing-default {
     gap: var(--section-stack-md);
 }
 
-.plus-pattern-section-gap-lg {
+.plus-pattern-section-spacing-spacious {
     gap: var(--section-stack-lg);
-}
-
-/* Subtle fill: the sunken surface, padded and rounded, for a section beside a list. */
-.plus-pattern-section-fill-subtle {
-    padding: var(--section-pad-y-default) var(--section-pad-x-default);
-    border-radius: var(--section-radius);
-    background-color: var(--ds-surface-sunken);
 }
 
 /* `_Section header`: the title row, then the tabs or toolbar row when there is one */
@@ -88,7 +81,7 @@
     font: var(--heading-xs);
 }
 
-:is(.plus-modal, .plus-pattern-modal) .plus-pattern-section-gap-md {
+:is(.plus-modal, .plus-pattern-modal) .plus-pattern-section-spacing-default {
     gap: var(--section-stack-sm);
 }
 
@@ -160,13 +153,9 @@
     min-width: 0;
 }
 
+/* The detail is a sunken PatternCard: the Card supplies the surface, the pad and the radius. */
 .plus-pattern-section-detail {
-    display: flex;
-    flex-direction: column;
     min-width: 0;
-    padding: 0;
-    border-radius: var(--section-radius);
-    background-color: var(--ds-surface-sunken);
 }
 
 .plus-pattern-section-detail-trigger {
@@ -175,19 +164,18 @@
     justify-content: space-between;
     gap: var(--inline-md);
     width: 100%;
-    padding: var(--section-pad-y-default) var(--section-pad-x-default);
+    padding: 0;
     border: none;
-    border-radius: var(--section-radius);
     background-color: transparent;
     color: var(--ds-text);
     font: var(--body-default);
     text-align: left;
     cursor: pointer;
-    transition: background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+    transition: color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 
     @include plus-state((
-        hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
-        pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
+        hovered: (color: var(--ds-text-subtle)),
+        pressed: (color: var(--ds-text-subtle)),
     ));
 }
 
@@ -230,8 +218,8 @@
 .plus-pattern-section-detail-body {
     display: flex;
     flex-direction: column;
-    gap: var(--section-stack-md);
-    padding: 0 var(--section-pad-x-default) var(--section-pad-y-default);
+    gap: var(--card-stack-md);
+    padding-top: var(--card-stack-md);
 }
 
 .plus-pattern-section-detail-content {

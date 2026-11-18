@@ -48,7 +48,7 @@ export const TypePage = {
         await expect(rect(footer).left, 'the footer starts at the fields’ edge').toBeCloseTo(rect(canvasElement.querySelector('.plus-fieldset')).left, 0);
         await expect(cancel.className, 'Cancel is Subtle').toContain('subtle');
         await expect(canvas.getByRole('heading', { level: 1, name: 'Log a session' }), 'the form’s title is the page’s h1').toBeInTheDocument();
-        await expect(canvasElement.querySelector('.plus-pattern-section-fill-subtle'), 'the form sits on the Page, not in a subtle Section').toBeNull();
+        await expect(canvasElement.querySelector('.plus-pattern-card--surface-sunken'), 'the form sits on the Page, not in a sunken Card').toBeNull();
         const student = canvas.getByLabelText(/Student/);
         await userEvent.type(student, 'Ana Ruiz');
         await expect(student).toHaveValue('Ana Ruiz');

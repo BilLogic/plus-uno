@@ -9356,28 +9356,16 @@
           "deprecated": null
         },
         {
-          "name": "gap",
+          "name": "spacing",
           "type": "enum",
           "required": false,
-          "default": "'md'",
+          "default": "'default'",
           "values": [
-            "sm",
-            "md",
-            "lg"
+            "default",
+            "compact",
+            "spacious"
           ],
-          "description": "Gap between the header, the body and the footer (Section/stack tokens); `md` is the Figma value",
-          "deprecated": null
-        },
-        {
-          "name": "fill",
-          "type": "enum",
-          "required": false,
-          "default": "'none'",
-          "values": [
-            "none",
-            "subtle"
-          ],
-          "description": "`subtle` sets the section on the sunken surface with a pad and a radius; `none` (default) draws nothing",
+          "description": "Space between the header, the body and the footer (Section/stack tokens); `default` is the Figma value",
           "deprecated": null
         },
         {
@@ -9427,8 +9415,9 @@
         "LayoutSingle",
         "LayoutSplit",
         "LayoutSubsections",
-        "FillSubtle",
+        "SunkenCard",
         "CardNesting",
+        "NoSurfaceNoPad",
         "Footer",
         "Anatomy",
         "Levels",
@@ -9467,15 +9456,13 @@
       "tokens": [
         "--body-default",
         "--body-sm",
+        "--card-stack-md",
         "--control-md",
-        "--ds-background-neutral-subtle-hovered",
-        "--ds-background-neutral-subtle-pressed",
         "--ds-icon-subtle",
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
         "--ds-motion-spatial-fast",
         "--ds-motion-spatial-fast-duration",
-        "--ds-surface-sunken",
         "--ds-text",
         "--ds-text-subtle",
         "--grid-gutter",
@@ -9489,9 +9476,6 @@
         "--inline-sm",
         "--section-min-width-main",
         "--section-min-width-side",
-        "--section-pad-x-default",
-        "--section-pad-y-default",
-        "--section-radius",
         "--section-stack-lg",
         "--section-stack-md",
         "--section-stack-sm",

@@ -117,7 +117,11 @@ export default {
             table: { category: 'Design' },
         },
         loading: { control: 'boolean', table: { category: 'State' } },
-        gap: { control: false, table: { category: 'Design' } },
+        spacing: {
+            control: 'select',
+            options: ['default', 'compact', 'spacious'],
+            table: { category: 'Design' },
+        },
         id: { control: false, table: { disable: true, category: 'Development' } },
         className: { control: false, table: { disable: true, category: 'Development' } },
     },
@@ -225,36 +229,53 @@ export const LayoutSubsections = {
     ),
 };
 
-/** `fill="subtle"`: the sunken surface with a pad and a radius, for a section that stands apart. */
-export const FillSubtle = {
-    name: 'Subtle fill',
+/** A box with a fill is a Card: a sunken Card sits in a Section, and the Section draws nothing of its own. */
+export const SunkenCard = {
+    name: 'Sunken Card in a Section',
     render: () => (
-        <PatternSection title="Flag 3 of 12" description={description} fill="subtle">
-            {slotContent('Record')}
+        <PatternSection title="Flag 3 of 12" description={description} data-testid="host">
+            <PatternCard surface="sunken" title="Record" description="Needs a follow-up call this week." data-testid="sunken-card" />
         </PatternSection>
     ),
     play: async ({ canvasElement }) => {
-        await expect(getComputedStyle(canvasElement.querySelector('.plus-pattern-section-fill-subtle')).borderTopLeftRadius, 'Section radius is 16').toBe('16px');
+        const card = getComputedStyle(canvasElement.querySelector('[data-testid="sunken-card"]'));
+        await expect(card.backgroundColor, 'the Card is on the sunken surface').toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+        await expect(card.borderTopLeftRadius, 'Card radius is 16').toBe('16px');
+        await expect(getComputedStyle(canvasElement.querySelector('.plus-pattern-card-inner')).paddingTop, 'Card pad is 16').toBe('16px');
     },
 };
 
-/** A Card in a Section with a fill keeps the Card radius, same as in an unfilled Section. */
+/** A Card in a Section keeps the Card radius. */
 export const CardNesting = {
     name: 'Card in a Section',
     render: () => (
-        <div style={col}>
-            <PatternSection title="With a fill" fill="subtle" data-testid="filled">
-                <StatCard title="Sessions this week" body="12 scheduled · 2 need a tutor" />
-            </PatternSection>
-            <PatternSection title="Without a fill" data-testid="plain">
-                <StatCard title="Sessions this week" body="12 scheduled · 2 need a tutor" />
-            </PatternSection>
-        </div>
+        <PatternSection title="Sessions" data-testid="plain">
+            <StatCard title="Sessions this week" body="12 scheduled · 2 need a tutor" />
+        </PatternSection>
     ),
     play: async ({ canvasElement }) => {
         const radius = (id) => getComputedStyle(canvasElement.querySelector(`[data-testid="${id}"] .plus-pattern-card`)).borderTopLeftRadius;
-        await expect(radius('filled'), 'Card in a filled Section: 16').toBe('16px');
-        await expect(radius('plain'), 'Card in an unfilled Section: 16').toBe('16px');
+        await expect(radius('plain'), 'Card in a Section: 16').toBe('16px');
+    },
+};
+
+/** No Section draws a surface or a pad of its own, however it is composed. */
+export const NoSurfaceNoPad = {
+    name: 'No fill, no pad',
+    render: () => (
+        <PatternSection title="Sessions" layout="subsections" detail={<p style={{ margin: 0 }}>Notes</p>} detailTitle="Ava Thompson">
+            <PatternSection title="This week" spacing="compact">{slotContent('Rows')}</PatternSection>
+            <PatternSection title="Next week" spacing="spacious">{slotContent('Rows')}</PatternSection>
+        </PatternSection>
+    ),
+    play: async ({ canvasElement }) => {
+        const sections = [...canvasElement.querySelectorAll('.plus-pattern-section')];
+        await expect(sections.length).toBe(3);
+        sections.forEach((section) => {
+            const style = getComputedStyle(section);
+            expect(style.backgroundColor, 'no fill').toBe('rgba(0, 0, 0, 0)');
+            ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => expect(style[`padding${side}`], `no ${side} pad`).toBe('0px'));
+        });
     },
 };
 

@@ -89,7 +89,7 @@ const modalDocsHostStyle = {
     border: 'var(--border-width-default) solid var(--ds-border)',
     background: 'var(--ds-surface-sunken)',
     overflow: 'hidden',
-    padding: 'var(--section-pad-y-compact) var(--section-pad-x-compact)',
+    padding: 'var(--section-stack-md)',
 };
 
 function InlineModalCanvas({ minHeight = 'var(--width-2500)', modal }) {
@@ -276,7 +276,7 @@ const heightStory = (height, title, body) => () => (
         style={{
             ...modalDocsHostStyle,
             '--blanket-max-height-modal': 'var(--height-2000)',
-            minHeight: 'calc(var(--height-2000) + 2 * var(--section-pad-y-compact))',
+            minHeight: 'calc(var(--height-2000) + 2 * var(--section-stack-md))',
         }}
     >
         <Modal show renderAs="inline" height={height} title={title} body={body} primaryButton={{ text: 'Done' }} onClose={() => {}} />

@@ -53,7 +53,6 @@ Each template owns a token. A Page sits square in the Frame; a Section with a fi
 | Template | Radius (px) | Token |
 | --- | --- | --- |
 | Page in the Frame | 0 | — |
-| Section with a fill | 16 | `--section-radius` |
 | Modal | 16 | `--modal-radius` |
 | Card | 16 | `--card-radius` |
 | Popup, menu, Flag | 12 | `--popup-radius` |

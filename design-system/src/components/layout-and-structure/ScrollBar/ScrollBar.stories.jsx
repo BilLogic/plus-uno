@@ -46,7 +46,7 @@ export default {
 const demoBox = {
     border: 'var(--border-width-default) solid var(--ds-border)',
     borderRadius: 'var(--radius-lg)',
-    padding: 'var(--section-pad-y-compact) var(--section-pad-x-compact)'
+    padding: 'var(--section-stack-md)'
 };
 
 const sessionRows = [
@@ -163,7 +163,7 @@ export const Content = () => (
         </p>
         <div style={{ ...demoBox, padding: 0 }}>
             <ScrollBar maxHeight={'220px' /* token gap: 220px */}>
-                <div style={{ padding: 'var(--section-pad-y-compact) var(--section-pad-x-compact)' }}>
+                <div style={{ padding: 'var(--section-stack-md)' }}>
                     <TallContent count={16} />
                 </div>
             </ScrollBar>

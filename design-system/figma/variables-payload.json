@@ -371,55 +371,6 @@
           }
         },
         {
-          "name": "Section/pad-x-compact",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--section-pad-x-compact)"
-          }
-        },
-        {
-          "name": "Section/pad-x-default",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--section-pad-x-default)"
-          }
-        },
-        {
-          "name": "Section/pad-x-spacious",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--section-pad-x-spacious)"
-          }
-        },
-        {
-          "name": "Section/pad-y-compact",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--section-pad-y-compact)"
-          }
-        },
-        {
-          "name": "Section/pad-y-default",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--section-pad-y-default)"
-          }
-        },
-        {
-          "name": "Section/pad-y-spacious",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--section-pad-y-spacious)"
-          }
-        },
-        {
-          "name": "Section/radius",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--section-radius)"
-          }
-        },
-        {
           "name": "Card/pad",
           "resolvedType": "FLOAT",
           "codeSyntax": {
