@@ -98,12 +98,13 @@ export const Overview = {
 export const Interactive = {
     args: {
         height: 250,
-        sort: true,
+        sort: false,
         data: [
-            { letter: '6th', height: '82', color: BRAND },
-            { letter: '7th', height: '88', color: BRAND },
-            { letter: '8th', height: '79', color: BRAND },
-            { letter: '9th', height: '91', color: BRAND },
+            { letter: 'M', height: '84', color: BRAND },
+            { letter: 'T', height: '91', color: BRAND },
+            { letter: 'W', height: '88', color: BRAND },
+            { letter: 'R', height: '93', color: BRAND },
+            { letter: 'F', height: '78', color: BRAND },
         ],
     },
 };
