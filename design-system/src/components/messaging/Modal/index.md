@@ -14,7 +14,7 @@ Also asked as: confirm, confirmation dialog, destructive confirm, popup window, 
 
 **Source:** `design-system/src/components/messaging/Modal/Modal.jsx`
 
-**Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Width4Col, Width6Col, Width8Col, Width10Col, HeightHug, HeightFill, HeaderOptions, WithoutCloseButton, Loading, Content, Layout, Interactive, Overview, ConfirmView, ConfirmViewEscape, ModalOverModalRefused, BlockingShadow, SelectKeepsOverlayShadow, Rest, Hovered, Pressed, Focused, FooterLayouts, SizeToContent
+**Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Width4Col, Width6Col, Width8Col, Width10Col, HeightHug, HeightFill, HeaderOptions, WithoutCloseButton, Loading, Content, Layout, Interactive, Overview, ConfirmView, ConfirmViewEscape, ModalOverModalRefused, BlockingShadow, SelectKeepsOverlayShadow, Rest, Hovered, Pressed, Focused, FooterLayouts, SizeToContent, MotionOpenAndClose, MotionReduced
 
 **Storybook page:** `design-system/src/components/messaging/Modal/Modal.mdx`
 
@@ -233,7 +233,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--blanket-max-height-modal` · `--body-default` · `--ds-border` · `--ds-shadow-blocking` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtle` · `--heading-md` · `--inline-sm` · `--modal-inline-sm` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--stack-md` · `--stack-sm` · `--stroke-1`
+`--blanket-max-height-modal` · `--body-default` · `--ds-border` · `--ds-shadow-blocking` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtle` · `--heading-md` · `--inline-sm` · `--modal-inline-sm` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--plus-overlay-origin` · `--stack-md` · `--stack-sm` · `--stroke-1` · `--transform-origin`
 
 From `design-system/src/components/messaging/Modal/Modal.scss`. Override these through the token layer, never with a literal.
 

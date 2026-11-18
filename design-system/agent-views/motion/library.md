@@ -153,7 +153,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Modal | component | rejected | Call attention | `--ds-motion-spatial-fast` |  |
 | NotificationItem | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | PageHeader | component | change | Scroll to a spot on the page | `--ds-motion-linear` |  |
-| Pagination | component | change | Step to the next or previous | `--ds-motion-spatial-default` |  |
+| Pagination | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | Panel | component | enter | Dock and undock a panel | `--ds-motion-spatial-slow` |  |
 | Panel | component | exit | Dock and undock a panel | `--ds-motion-spatial-default` |  |
 | Popup | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
@@ -182,7 +182,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Sidebar | component | enter | Dock and undock a panel | `--ds-motion-spatial-default` |  |
 | Sidebar | component | exit | Dock and undock a panel | `--ds-motion-spatial-fast` |  |
 | Skeleton | component | change | Load content | `--ds-motion-linear` |  |
-| Spinner | component | change | Load content | `--ds-motion-linear` |  |
+| Spinner | component | change | Load content | `--ds-motion-loop` |  |
 | SplitButton | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | SplitButton | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | SplitButton | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |

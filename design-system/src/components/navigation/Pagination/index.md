@@ -18,7 +18,7 @@ Also asked as: paging, pager, next page, page numbers.
 
 **Storybook page:** `design-system/src/components/navigation/Pagination/Pagination.mdx`
 
-**Motion:** change `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -40,7 +40,7 @@ Pagination reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| change | Step to the next or previous | `--ds-motion-spatial-default` | A page change is Step. |
+| change | Update a value or state | `--ds-motion-appearance-fast` | Page segments change fill and ink in place; the paged body uses Step. |
 
 ## Alternatives
 
