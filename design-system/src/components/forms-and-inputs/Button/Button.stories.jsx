@@ -8,7 +8,7 @@ import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-examp
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import Button, { BUTTON_APPEARANCES, BUTTON_SPACINGS } from './Button';
-import { FooterActions, Icon, SectionMessage } from '@/components';
+import { CountTag, FooterActions, Icon, SectionMessage } from '@/components';
 const icons = {
     'none': null,
     'plus': 'plus',
@@ -247,6 +247,65 @@ export const Icons = {
         const both = canvas.getByRole('button', { name: 'Both' });
         await expect(px(getComputedStyle(both.querySelector('.plus-btn-visual--before')).fontSize), 'leading icon is --icon-md').toBe(tokenLength(canvasElement, '--icon-md'));
         await expect(px(getComputedStyle(both.querySelector('.plus-btn-visual--after')).fontSize), 'chevron is --icon-sm').toBe(tokenLength(canvasElement, '--icon-sm'));
+    },
+};
+
+/** Counts sit at 16 across compact (24), default (32) and spacious (48) buttons; filled appearances take `isInverse`. */
+export const WithCount = {
+    render: () => (
+        <div style={{ display: 'grid', gap: 'var(--stack-lg)' }}>
+            <div style={row}>
+                <Button spacing="compact" iconAfter={<CountTag value={4} />} text="Compact 24" />
+                <Button spacing="default" iconAfter={<CountTag value={4} />} text="Default 32" />
+                <Button spacing="spacious" iconAfter={<CountTag value={4} />} text="Spacious 48" />
+                <Button appearance="subtle" iconAfter={<CountTag value={4} />} text="Subtle" />
+            </div>
+            <div style={row}>
+                <Button appearance="primary" spacing="compact" iconAfter={<CountTag value={4} isInverse />} text="Primary 24" />
+                <Button appearance="primary" iconAfter={<CountTag value={4} isInverse />} text="Primary 32" />
+                <Button appearance="primary" spacing="spacious" iconAfter={<CountTag value={4} isInverse />} text="Primary 48" />
+                <Button appearance="warning" iconAfter={<CountTag value={4} isInverse />} text="Warning" />
+                <Button appearance="danger" iconAfter={<CountTag value={4} isInverse />} text="Danger" />
+                <Button appearance="discovery" iconAfter={<CountTag value={4} isInverse />} text="Discovery" />
+                <Button appearance="ai" iconAfter={<CountTag value={4} isInverse />} text="AI" />
+            </div>
+        </div>
+    ),
+    play: async ({ canvas, canvasElement }) => {
+        const expectedHeights = [
+            ['Compact 24', 24],
+            ['Default 32', 32],
+            ['Spacious 48', 48],
+            ['Subtle', 32],
+            ['Primary 24', 24],
+            ['Primary 32', 32],
+            ['Primary 48', 48],
+            ['Warning', 32],
+            ['Danger', 32],
+            ['Discovery', 32],
+            ['AI', 32],
+        ];
+        for (const [name, height] of expectedHeights) {
+            const button = canvas.getByRole('button', { name: new RegExp(`^${name}\\b`) });
+            const btnRect = button.getBoundingClientRect();
+            const count = button.querySelector('.plus-count');
+            const countRect = count.getBoundingClientRect();
+            await expect(Math.round(btnRect.height), `${name} height`).toBe(height);
+            await expect(countRect.height, `${name} count height`).toBe(16);
+            await expect(
+                Math.abs((countRect.top + countRect.bottom) / 2 - (btnRect.top + btnRect.bottom) / 2),
+                `${name} count centered`,
+            ).toBeLessThanOrEqual(0.5);
+        }
+
+        const surface = tokenColor(canvasElement, '--ds-surface');
+        const subtleInk = tokenColor(canvasElement, '--ds-text-subtle');
+        for (const name of ['Primary 24', 'Primary 32', 'Primary 48', 'Warning', 'Danger', 'Discovery', 'AI']) {
+            const count = canvas.getByRole('button', { name: new RegExp(`^${name}\\b`) }).querySelector('.plus-count');
+            const s = getComputedStyle(count);
+            await expect(s.backgroundColor, `${name} uses inverse ground`).toBe(surface);
+            await expect(s.color, `${name} uses inverse ink`).toBe(subtleInk);
+        }
     },
 };
 

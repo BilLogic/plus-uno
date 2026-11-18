@@ -58,9 +58,12 @@ export const ThreeTags = {
             await expect(tagOf(canvas.getByText(label)).className, `${label} takes ${appearance}`).toContain(appearance);
         }
         await expect(canvas.getByText('4'), 'a count is the bare number').toBeInTheDocument();
+        await expect(canvas.getByText('4').closest('.plus-count').getBoundingClientRect().height, 'count is 16 tall').toBe(16);
         await expect(canvas.getByText('99+'), 'a count past max is capped with a plus').toBeInTheDocument();
         await expect(canvas.queryByText(/items?$/), 'a count never carries a word').toBeNull();
-        await expect(canvas.getAllByText('vs last week', { exact: false })[0], 'a change names its comparison').toBeInTheDocument();
+        const change = canvas.getAllByText('vs last week', { exact: false })[0];
+        await expect(change, 'a change names its comparison').toBeInTheDocument();
+        await expect(change.closest('.plus-change-tag').querySelector('.plus-change-tag__tag').getBoundingClientRect().height, 'change tag is 16 tall').toBe(16);
         await fitsCanvas(canvasElement);
     },
 };
@@ -118,6 +121,7 @@ export const CountsOnNavigation = {
         await expectFullScale(canvasElement);
         const item = (name) => canvasElement.querySelector(`[data-nav-item="${name}"]`);
         await expect(within(item('Inbox')).getByText('3'), 'a quiet count').toBeInTheDocument();
+        await expect(within(item('Inbox')).getByText('3').closest('.plus-count').getBoundingClientRect().height, 'nav count is 16 tall').toBe(16);
         await expect(tagOf(within(item('Reflections')).getByText('5')).className, 'bold asks for action now').toContain('bold');
         await expect(item('Archive').querySelector('.plus-count'), 'nothing renders at zero').toBeNull();
         await expect(within(item('Messages')).getByText('99+'), 'capped past max').toBeInTheDocument();

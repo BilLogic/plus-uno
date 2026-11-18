@@ -238,14 +238,14 @@ const PatternSidebar = ({
         if (training) {
             return (
                 <span className="plus-pattern-sidebar__end">
-                    <CountTag value={training.count} spacing="compact" label={training.label} />
+                    <CountTag value={training.count} label={training.label} />
                 </span>
             );
         }
         if (item.count) {
             return (
                 <span className="plus-pattern-sidebar__end">
-                    <CountTag value={item.count} spacing="compact" label={item.countLabel} />
+                    <CountTag value={item.count} label={item.countLabel} />
                 </span>
             );
         }
@@ -425,7 +425,7 @@ const PatternSidebar = ({
                         rowClass,
                         current: rowSelected || standsIn,
                         onPress: select,
-                        extra: shut ? <CountTag value={own.length} spacing="compact" label={`${own.length} open tabs`} /> : undefined,
+                        extra: shut ? <CountTag value={own.length} label={`${own.length} open tabs`} /> : undefined,
                     })}
                     <IconButton
                         className="plus-pattern-sidebar__twist"

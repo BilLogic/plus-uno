@@ -123,7 +123,6 @@ export const StatusTag = ({
                         <CountTag
                             value={trailingMetric}
                             appearance={metricAppearance}
-                            spacing={effectiveSpacing === 'spacious' ? 'default' : 'compact'}
                         />
                     )}
                 </span>
@@ -141,7 +140,7 @@ StatusTag.propTypes = {
     spacing: PropTypes.oneOf(STATUS_TAG_SPACINGS),
     /** One icon before the label: a Font Awesome Free name (`circle-check`). */
     iconBefore: PropTypes.string,
-    /** A small count at the end of the tag, a Count tag nested inside it: compact (16) in default, default (20) in spacious. Hidden at 0. */
+    /** A small count at the end of the tag, a 16 Count tag nested inside it. Hidden at 0. */
     trailingMetric: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     /** The Count tag's appearance. Defaults to the Status tag's own. */
     trailingMetricAppearance: PropTypes.oneOf(COUNT_TAG_APPEARANCES),

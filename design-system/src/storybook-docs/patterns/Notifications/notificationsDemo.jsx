@@ -243,7 +243,7 @@ export const NotificationsInboxPanel = ({
                 <Tabs.Tab eventKey="unread">
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-sm)' }}>
                         <span>Unread</span>
-                        {unreadCount > 0 ? <CountTag value={unreadCount} spacing="compact" /> : null}
+                        {unreadCount > 0 ? <CountTag value={unreadCount} /> : null}
                     </span>
                 </Tabs.Tab>
                 <Tabs.Tab eventKey="all">All</Tabs.Tab>
