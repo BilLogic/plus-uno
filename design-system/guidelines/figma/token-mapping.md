@@ -65,9 +65,9 @@ Two kinds of text node carry no text style, and each binds its type variables di
 
 | Figma Spacing Context | PLUS CSS Token Pattern |
 |----------------------|----------------------|
-| Card padding | `var(--card-pad-{compact\|default\|spacious})` |
+| Card padding | `var(--card-pad)` |
 | Card gap | `var(--card-stack-{sm\|md\|lg})`, `var(--card-inline-{sm\|md\|lg})` |
-| Card radius | `var(--card-radius)`, `var(--card-radius-compact)` |
+| Card radius | `var(--card-radius)` |
 | Element padding | `var(--pad-x-{xs\|sm\|md\|lg})`, `var(--pad-y-{sm\|md\|lg})` (ADR-038) |
 | Element gap | `var(--stack-{sm\|md\|lg})`, `var(--inline-{sm\|md\|lg})`; the 10px step reads `var(--space-0625)` |
 | Element radius | `var(--radius-{sm\|md\|lg\|full})` |

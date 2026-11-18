@@ -91,7 +91,7 @@
       ]
     },
     "spacing": {
-      "Card padding": "var(--card-pad-{compact|default|spacious})",
+      "Card padding": "var(--card-pad)",
       "Card gap": "var(--card-stack-{sm|md|lg})",
       "Card radius": "var(--card-radius)",
       "Element padding": "var(--pad-x-{xs|sm|md|lg})",
@@ -279,11 +279,8 @@
       "Card/min-width-lg": "var(--card-min-width-lg)",
       "Card/min-width-md": "var(--card-min-width-md)",
       "Card/min-width-sm": "var(--card-min-width-sm)",
-      "Card/pad-compact": "var(--card-pad-compact)",
-      "Card/pad-default": "var(--card-pad-default)",
-      "Card/pad-spacious": "var(--card-pad-spacious)",
+      "Card/pad": "var(--card-pad)",
       "Card/radius": "var(--card-radius)",
-      "Card/radius-compact": "var(--card-radius-compact)",
       "Card/stack-lg": "var(--card-stack-lg)",
       "Card/stack-md": "var(--card-stack-md)",
       "Card/stack-sm": "var(--card-stack-sm)",
@@ -1868,11 +1865,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1165,
+    "scssTokenCount": 1162,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1769,
-      "resolved": 1732,
+      "total": 1766,
+      "resolved": 1729,
       "percent": 98,
       "skippedCollections": [
         {

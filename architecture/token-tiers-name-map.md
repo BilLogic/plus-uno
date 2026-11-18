@@ -111,9 +111,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Section | `--section-stack-lg` (declared elsewhere) |  |
 | Section | `--section-min-width-main` (declared elsewhere) |  |
 | Section | `--section-min-width-side` (declared elsewhere) |  |
-| Card | `--card-pad-compact` |  |
-| Card | `--card-pad-default` |  |
-| Card | `--card-pad-spacious` |  |
+| Card | `--card-pad` |  |
 | Card | `--card-stack-sm` (declared elsewhere) |  |
 | Card | `--card-stack-md` (declared elsewhere) |  |
 | Card | `--card-stack-lg` (declared elsewhere) |  |
@@ -124,7 +122,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Card | `--card-min-width-md` (declared elsewhere) |  |
 | Card | `--card-min-width-lg` (declared elsewhere) |  |
 | Card | `--card-radius` |  |
-| Card | `--card-radius-compact` |  |
 | Card | `--card-max-height-sm` (declared elsewhere) |  |
 | Card | `--card-max-height-md` (declared elsewhere) |  |
 | Card | `--card-max-height-lg` (declared elsewhere) |  |

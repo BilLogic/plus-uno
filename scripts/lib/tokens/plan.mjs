@@ -217,9 +217,7 @@ export const TOKEN_LADDER = [
   { tier: 'templates', group: 'Section', new: '--section-min-width-side', old: '--section-min-width-side', use: 'Narrowest the side column of a two-column PatternSection may shrink.' },
 
   // ─── Templates / Card ──────────────────────────────────────────────────
-  { tier: 'templates', group: 'Card', new: '--card-pad-compact', old: null, value: '--space-100', use: 'Padding inside a PatternCard with compact spacing.' },
-  { tier: 'templates', group: 'Card', new: '--card-pad-default', old: null, value: '--space-125', use: 'Padding inside a PatternCard with default spacing.' },
-  { tier: 'templates', group: 'Card', new: '--card-pad-spacious', old: null, value: '--space-150', use: 'Padding inside a PatternCard with spacious spacing.' },
+  { tier: 'templates', group: 'Card', new: '--card-pad', old: null, value: '--space-100', use: 'Padding inside a PatternCard at every size.' },
   { tier: 'templates', group: 'Card', new: '--card-stack-sm', old: '--card-stack-sm', use: 'Vertical gap between tightly related lines in a PatternCard, such as a title and its meta.' },
   { tier: 'templates', group: 'Card', new: '--card-stack-md', old: '--card-stack-md', use: 'Vertical gap between blocks in a PatternCard.' },
   { tier: 'templates', group: 'Card', new: '--card-stack-lg', old: '--card-stack-lg', use: 'Vertical gap between a PatternCard\'s header, body and footer.' },
@@ -230,7 +228,6 @@ export const TOKEN_LADDER = [
   { tier: 'templates', group: 'Card', new: '--card-min-width-md', old: '--card-min-width-md', use: 'Narrowest a default PatternCard may shrink in a grid.' },
   { tier: 'templates', group: 'Card', new: '--card-min-width-lg', old: '--card-min-width-lg', use: 'Narrowest a large PatternCard may shrink in a grid.' },
   { tier: 'templates', group: 'Card', new: '--card-radius', old: null, ref: 'var(--radius-xxl)', use: 'Corner rounding of a PatternCard.' },
-  { tier: 'templates', group: 'Card', new: '--card-radius-compact', old: '--card-radius-sm', ref: 'var(--radius-xl)', use: 'Corner rounding of a compact PatternCard or a card nested in another surface.' },
   { tier: 'templates', group: 'Card', new: '--card-max-height-sm', old: '--card-max-height-sm', use: 'Tallest a short scrolling PatternCard may grow.' },
   { tier: 'templates', group: 'Card', new: '--card-max-height-md', old: '--card-max-height-md', use: 'Tallest a default scrolling PatternCard may grow.' },
   { tier: 'templates', group: 'Card', new: '--card-max-height-lg', old: '--card-max-height-lg', use: 'Tallest a tall scrolling PatternCard may grow.' },
@@ -446,7 +443,6 @@ export const TOKEN_LADDER = [
  *    instead, and its 1.5px and 3px strokes take the 2px stroke.
  *  - `--element-{pad|gap|radius}-{default|compact}`: the role tokens this
  *    plan's first pass wrote; no "roles" concept survives (Bill, 2026-11-04).
- *  - `--card-pad-{sm|md|lg}`: the same 16/20/24 as `--card-pad-{compact|default|spacious}`.
  */
 export const RETIRED_RENAMES = {
   '--size-element-pad-x-lg': '--pad-x-lg',
@@ -487,9 +483,7 @@ export const RETIRED_RENAMES = {
   '--page-radius-md': '--radius-xl',
   '--tile-radius-sm': '--space-0375',
   '--tile-radius-lg': '--radius-control-lg',
-  '--card-pad-sm': '--card-pad-compact',
-  '--card-pad-md': '--card-pad-default',
-  '--card-pad-lg': '--card-pad-spacious',
+  '--card-radius-sm': '--card-radius',
 };
 
 /** Retired name -> its replacement: the explicit table above, then each ladder row's `old` (first row wins). */

@@ -420,24 +420,10 @@
           }
         },
         {
-          "name": "Card/pad-compact",
+          "name": "Card/pad",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--card-pad-compact)"
-          }
-        },
-        {
-          "name": "Card/pad-default",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--card-pad-default)"
-          }
-        },
-        {
-          "name": "Card/pad-spacious",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--card-pad-spacious)"
+            "WEB": "var(--card-pad)"
           }
         },
         {
@@ -445,13 +431,6 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--card-radius)"
-          }
-        },
-        {
-          "name": "Card/radius-compact",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--card-radius-compact)"
           }
         },
         {

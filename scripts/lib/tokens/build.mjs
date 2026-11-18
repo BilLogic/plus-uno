@@ -181,7 +181,7 @@ function tierScss({ tier, heading }) {
   return scss;
 }
 
-/** `--card-pad-default` -> `Card/pad-default` (Figma variable name, folder/leaf). */
+/** `--card-pad` -> `Card/pad` (Figma variable name, folder/leaf). */
 function figmaName(token) {
   return token
     .replace(/^--/, '')
