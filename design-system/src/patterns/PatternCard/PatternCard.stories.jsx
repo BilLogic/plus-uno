@@ -11,7 +11,7 @@ import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-examp
 
 const bodyCopy = (
     <p className="body-lg" style={{ margin: 0 }}>
-        Some quick example text to fill the body slot of the card shell.
+        Reviewed two-step equations with Ava T. and assigned practice set 4 for Thursday’s session.
     </p>
 );
 
@@ -47,8 +47,8 @@ const imagePlaceholder = (ratio) => (
             font: 'var(--body-default)',
         }}
     >
-        <i className="fa-regular fa-image" aria-hidden="true" />
-        {ratio}
+        <i className="fa-solid fa-book-open" aria-hidden="true" />
+        {`Lesson preview · ${ratio}`}
     </div>
 );
 
@@ -159,7 +159,7 @@ export default {
 
 export const Overview = () => (
     <div style={{ maxWidth: 'var(--card-min-width-lg)', width: '100%' }}>
-        <PatternCard title="Card title" description="A line that says what the card holds.">
+        <PatternCard title="Grade 7 math · Session 4" description="Lincoln Middle · Thu 4:00 PM">
             {bodyCopy}
         </PatternCard>
     </div>
@@ -366,8 +366,6 @@ export const ImageStartHalf = placementStory('start', 'rest', '1/2');
 export const ImageEndHalf = placementStory('end', 'rest', '1/2');
 export const ImageTopIgnoresSplit = placementStory('top', 'rest', '1/2');
 
-const slotNote = (text) => <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{text}</span>;
-
 /** No header: the body carries its own title, as a metric tile does. */
 export const BodyOnly = () => (
     <PatternCard style={{ maxWidth: 'var(--card-min-width-lg)' }}>{bodyCopy}</PatternCard>
@@ -376,9 +374,9 @@ export const BodyOnly = () => (
 /** A header with actions over the body, and a footer for actions that commit. */
 export const WithFooter = () => (
     <PatternCard
-        title="Card title"
-        actions={slotNote('Actions slot')}
-        footer={slotNote('Footer slot')}
+        title="Grade 7 math · Session 4"
+        actions={<IconButton icon="ellipsis-vertical" appearance="subtle" spacing="compact" label="More actions" onClick={() => {}} />}
+        footer={viewSession}
         style={{ maxWidth: 'var(--card-min-width-lg)' }}
     >
         {bodyCopy}
@@ -387,7 +385,15 @@ export const WithFooter = () => (
 
 /** `header` replaces the title, description and actions. */
 export const CustomHeader = () => (
-    <PatternCard header={slotNote('Custom header slot: tabs or a toolbar')} style={{ maxWidth: 'var(--card-min-width-lg)' }}>
+    <PatternCard
+        header={(
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 'var(--card-inline-md)' }}>
+                <span style={{ font: 'var(--heading-xs)' }}>Session notes · Oct 24</span>
+                <Button text="Add note" appearance="subtle" spacing="compact" onClick={() => {}} />
+            </div>
+        )}
+        style={{ maxWidth: 'var(--card-min-width-lg)' }}
+    >
         {bodyCopy}
     </PatternCard>
 );

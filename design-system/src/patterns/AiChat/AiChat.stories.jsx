@@ -2,9 +2,8 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { Breadcrumb, Button, Modal, Sidebar } from '@/components';
-import { AiChat, AI_CHAT_STORAGE_KEY, PANEL_STORAGE_KEY } from '@/patterns';
+import { AiChat, AI_CHAT_STORAGE_KEY, PANEL_STORAGE_KEY, PatternCard } from '@/patterns';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
-import { slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
 import DocsAiAgent from '@/storybook-docs/chrome/DocsAiAgent';
 import { buildDocsEntries } from '@/storybook-docs/chrome/docsSearch';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
@@ -23,14 +22,14 @@ const HEIGHT = 900;
 const DOCS_HEIGHT = 'calc(var(--height-2000) * 2 + var(--height-300) + var(--page-pad) * 3)';
 
 const STARTERS = [
-    { id: 'summarize', label: 'Summarize this page', text: 'Summarize this page for me.' },
-    { id: 'next', label: 'What is next?', text: 'What should I do next?' },
+    { id: 'summarize', label: 'Summarize today’s sessions', text: 'Summarize my upcoming sessions at Lincoln Middle.' },
+    { id: 'next', label: 'Review SMART goals', text: 'Which students need a SMART goal check-in next?' },
 ];
 
-const BREADCRUMBS = [{ text: 'Home', href: '#' }, { text: 'Dashboard' }];
-const ACCOUNT = { id: 'john-doe', name: 'John Doe', role: 'Lead' };
+const BREADCRUMBS = [{ text: 'Home', href: '#' }, { text: 'Sessions' }];
+const ACCOUNT = { id: 'maya-k', name: 'Maya K.', role: 'Lead' };
 
-const respond = async (text) => `You asked: "${text}". Here is what I found on this page.`;
+const respond = async (text) => `You asked: "${text}". Maya K. has 3 Grade 7 math sessions at Lincoln Middle today.`;
 
 const ChatPage = ({ height = '100vh', withModal = false, ...args }) => {
     const [modal, setModal] = React.useState(false);
@@ -43,8 +42,18 @@ const ChatPage = ({ height = '100vh', withModal = false, ...args }) => {
             starters={STARTERS}
             {...args}
         >
-            {slotContent('Page content')}
-            {withModal ? <div><Button text="Page settings" onClick={() => setModal(true)} /></div> : null}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+                <PatternCard
+                    title="Lincoln Middle · Grade 7 math"
+                    description="Tue, Oct 24 · 4:00 to 4:45 PM"
+                    style={{ maxWidth: 'var(--card-min-width-lg)' }}
+                >
+                    <p className="body-default" style={{ margin: 0, color: 'var(--ds-text-subtle)' }}>
+                        Tutor: Maya K. · Students: Ava T., Marcus L. · SMART focus: Mastering content (two-step equations).
+                    </p>
+                </PatternCard>
+                {withModal ? <div><Button text="Page settings" onClick={() => setModal(true)} /></div> : null}
+            </div>
             {withModal ? (
                 <Modal
                     show={modal}
