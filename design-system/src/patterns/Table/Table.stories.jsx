@@ -274,8 +274,12 @@ export const EmptyHiddenByFilter = {
         const canvas = within(canvasElement);
         const box = canvasElement.querySelector('.plus-table-shell-empty');
         await expect(box, 'empty box rendered').not.toBeNull();
+        await expect(getComputedStyle(box).backgroundColor, 'empty box uses the sunken surface')
+            .toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
         await expect(canvas.getByRole('button', { name: 'Role: Admin' }), 'the filter stays above').toBeVisible();
-        await userEvent.click(within(box).getByRole('button', { name: 'Clear filter' }));
+        const clear = within(box).getByRole('button', { name: 'Clear filter' });
+        await expect(clear.className, 'the box action is default, not primary').not.toContain('primary');
+        await userEvent.click(clear);
         await expect(canvas.getByRole('table'), 'clearing the filter shows the rows').toBeVisible();
         await expect(canvas.getByText('Jordan Blake')).toBeVisible();
     },
@@ -302,8 +306,12 @@ export const EmptyNothingToCreate = {
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(canvasElement.querySelector('.plus-table-shell-empty')).not.toBeNull();
+        const box = canvasElement.querySelector('.plus-table-shell-empty');
+        await expect(box, 'empty box rendered').not.toBeNull();
+        await expect(getComputedStyle(box).backgroundColor, 'empty box uses the sunken surface')
+            .toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
         await expect(canvas.getByRole('heading', { name: 'No activity yet' })).toBeVisible();
+        await expect(within(box).queryAllByRole('button'), 'no box action when there is nothing to create').toHaveLength(0);
         await expect(canvas.queryAllByRole('button'), 'no action when there is nothing to create').toHaveLength(0);
     },
 };
