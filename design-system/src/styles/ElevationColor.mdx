@@ -1,0 +1,73 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { C, RefTable } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import {
+    FoundationSection,
+    FoundationSubsection,
+} from '@/storybook-docs/foundation-page.jsx';
+import * as ElevationStories from './Elevation.stories.jsx';
+
+<Meta title="Foundations/Visual/Elevation/Color" />
+
+<DocsLanding
+    page="foundations-visual-elevation-color"
+    eyebrow="Foundation · Elevation"
+    title="Color"
+    purpose="Each layer has its surface color. A surface tone separates before any shadow; Sunken marks a different surface, never a recess. In dark mode only floating and blocking surfaces step lighter."
+/>
+
+<Canvas of={ElevationStories.SurfaceColorTable} />
+
+<FoundationSection title="States and adaptive fills">
+
+<RefTable
+    head={['Token', 'Behavior']}
+    rows={[
+        [<C>-hovered · -pressed</C>, 'Every surface has both. A clickable surface changes tone on hover and press; a clickable Sunken card lifts to Raised on hover instead. Never both at once.'],
+        [<C>--ds-background-neutral</C>, 'Translucent: darkens in light, lightens in dark. For a fill that must adapt to whatever surface it sits on (a button, a chip). Not a container.'],
+    ]}
+/>
+
+</FoundationSection>
+
+<FoundationSection title="Colored surfaces">
+
+A surface token may be swapped for a solid background token when the color means something: brand, status or selection.
+
+<FoundationSubsection title="Swap the surface; never stack it">
+
+<Canvas of={ElevationStories.ColoredSurfaceSwap} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Keep the shadow with the color">
+
+<Canvas of={ElevationStories.ColoredSurfaceShadow} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Solid color only">
+
+<Canvas of={ElevationStories.ColoredSurfaceSolid} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Color means brand, status or selection">
+
+<Canvas of={ElevationStories.ColoredSurfaceMeaning} />
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Dark mode">
+
+Shadows read weakly on dark surfaces, so floating and blocking surfaces step lighter. Which ones step lighter is rule 9 under Usage; here is how.
+
+<FoundationSubsection title="Pair a lighter surface with its shadow">
+
+<Canvas of={ElevationStories.DarkModeOverlay} />
+
+</FoundationSubsection>
+
+</FoundationSection>
