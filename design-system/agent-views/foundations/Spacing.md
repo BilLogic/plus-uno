@@ -13,7 +13,7 @@ The kind of box sets its pad; the template it sits in sets its stack and inline.
 Spacing tokens name a job, not a size. Pick the template you are in (Page, Section, Card, Modal, Popup, Table or a control), then the relationship (pad inside a box, stack between rows, inline between things side by side), then the size. Bind the semantic token, never a primitive or a typed number.
 
 ```css
-padding: var(--card-pad-default);
+padding: var(--card-pad);
 gap: var(--card-stack-md);
 ```
 
@@ -49,7 +49,7 @@ Name the relationship first, then pick the token from the four-tier ladder on [T
 
 | Word | Means | Example |
 | --- | --- | --- |
-| `pad` | The space between a box’s edge and its content, the same on all four sides | `--card-pad-default` 20 |
+| `pad` | The space between a box’s edge and its content, the same on all four sides | `--card-pad` 16 |
 | `pad-x` · `pad-y` | Used only when the two axes differ, as on an Item | `--pad-x-md` 12 · `--pad-y-md` 6 |
 | `stack` | The vertical gap between rows, chosen by use, never by the size of the box | `--section-stack-md` 16 |
 | `inline` | The horizontal gap between things side by side | `--modal-inline-sm` 8 |
@@ -132,11 +132,9 @@ A span of the page grid under one heading. A plain section has no fill, no pad a
 
 ### Card
 
-Pad and radius follow the card's size; stack and inline follow use.
+Pad and radius stay 16 at every size; stack and inline follow use.
 
-- `--card-pad-compact` (Card/pad-sm)
-- `--card-pad-default` (Card/pad-md)
-- `--card-pad-spacious` (Card/pad-lg)
+- `--card-pad` (Card/pad)
 - `--card-stack-sm` (Card/stack-sm): Title to description
 - `--card-stack-md` (Card/stack-md): Header to body
 - `--card-stack-lg` (Card/stack-lg): Body to footer

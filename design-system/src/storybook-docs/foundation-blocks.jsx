@@ -43,7 +43,7 @@ const plain = (value) => (/^-?\d+(\.\d+)?px$/.test(value) ? value.replace(/px$/,
 
 const codeStyle = { font: 'var(--code-default)', color: 'var(--ds-text)', wordBreak: 'break-word' };
 
-/** Inline code for JSX prose: `<C>--card-pad-default</C>`. */
+/** Inline code for JSX prose: `<C>--card-pad</C>`. */
 export const C = ({ children }) => <code style={codeStyle}>{children}</code>;
 
 /**
@@ -194,7 +194,7 @@ export const ModeCompare = ({ children, initial = 'both', stacked = false }) => 
                             display: 'flex',
                             flexDirection: 'column',
                             gap: 'var(--section-stack-sm)',
-                            padding: 'var(--card-pad-spacious)',
+                            padding: 'var(--card-pad)',
                             borderRadius: 'var(--card-radius)',
                             background: 'var(--ds-surface-sunken)',
                             color: 'var(--ds-text)',
@@ -219,7 +219,7 @@ export const ModeCompare = ({ children, initial = 'both', stacked = false }) => 
 export const Callout = ({ title, children }) => (
     <aside
         style={{
-            padding: 'var(--card-pad-default)',
+            padding: 'var(--card-pad)',
             borderRadius: 'var(--card-radius)',
             background: 'var(--ds-surface-sunken)',
             color: 'var(--ds-text)',

@@ -20,8 +20,8 @@ import './PatternCard.scss';
  *   optional `description` (Body/default 14), with
  *   `actions` at the end of the row. `header` replaces that block with custom
  *   content, like the header's `custom` type, for tabs or a toolbar.
- * - **Spacing** comes from the Card tokens: `padding` sets Card/pad-compact · default · spacious
- *   (via prop values `'sm'`, `'md'`, `'lg'`), the header sits Card/stack-md above the body (`gap` picks the stack step),
+ * - **Spacing** comes from the Card tokens: padding uses `--card-pad` and radius
+ *   uses `--card-radius` at every size, the header sits Card/stack-md above the body (`gap` picks the stack step),
  *   and the footer sits Card/stack-lg below. The footer is left-aligned.
  * - The card hugs its content; in a row it stretches to the tallest card.
  * - **Elevation**: a clickable `sunken` or `default` card lifts to Raised on
@@ -42,7 +42,6 @@ const PatternCard = ({
     surface = 'sunken',
     imagePlacement = 'top',
     imageSplit = '1/3',
-    padding = 'md',
     gap = 'md',
     minWidth,
     dragging = false,
@@ -56,7 +55,6 @@ const PatternCard = ({
         `plus-pattern-card--surface-${surface}`,
         image ? `plus-pattern-card--image-${imagePlacement}` : '',
         image && imageSplit === '1/2' ? 'plus-pattern-card--image-half' : '',
-        `plus-pattern-card-pad-${padding}`,
         `plus-pattern-card-gap-${gap}`,
         props.onClick ? 'plus-pattern-card--clickable' : '',
         dragging ? 'plus-pattern-card--dragging' : '',
@@ -129,8 +127,6 @@ PatternCard.propTypes = {
     footer: PropTypes.node,
     /** Surface level: sunken (default, flat), default (page fill with a 1px border, flat), or raised (raised fill and shadow) */
     surface: PropTypes.oneOf(['sunken', 'default', 'raised']),
-    /** Padding scale: Card/pad-compact · default · spacious (16 · 20 · 24) */
-    padding: PropTypes.oneOf(['sm', 'md', 'lg']),
     /** Header-to-body stack: Card/stack-sm · md · lg (4 · 8 · 12) */
     gap: PropTypes.oneOf(['sm', 'md', 'lg']),
     /** Minimum width constraint (number of px or any CSS length) */

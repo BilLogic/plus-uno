@@ -45,5 +45,7 @@ describe('PatternCard surfaces', () => {
 
         rerender(<PatternCard surface="sunken" dragging title="Dragging">Body</PatternCard>);
         expect(card()).toHaveClass('plus-pattern-card--surface-sunken', 'plus-pattern-card--dragging');
+        expect(card().className).not.toMatch(/plus-pattern-card-pad-/);
+        expect(card().querySelector('.plus-pattern-card-inner')).toBeInTheDocument();
     });
 });

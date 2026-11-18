@@ -64,11 +64,8 @@ Space owned by a template: page, section, card, table, modal, popup. Inside a te
 --card-border-default  /* Border color of a default PatternCard. */
 --card-border-width  /* Border width on every PatternCard (transparent on sunken and raised so forced colors draw an edge). */
 --card-description-font  /* Description font of a PatternCard. */
---card-pad-compact  /* Padding inside a PatternCard with compact spacing. */
---card-pad-default  /* Padding inside a PatternCard with default spacing. */
---card-pad-spacious  /* Padding inside a PatternCard with spacious spacing. */
+--card-pad  /* Padding inside a PatternCard at every size. */
 --card-radius  /* Corner rounding of a PatternCard. */
---card-radius-compact  /* Corner rounding of a compact PatternCard or a card nested in another surface. */
 --card-shadow-overlay  /* Shadow of a dragged PatternCard, and of a clickable raised card on hover. */
 --card-shadow-raised  /* Shadow of a raised PatternCard, of a clickable sunken or default card on hover, and when pressed. */
 --card-surface-default  /* Surface fill of a default PatternCard. */

@@ -55,11 +55,11 @@ The examples on this page follow the toolbar's Color mode switch.
 
 ## Size and layout
 
-<ComponentExample of={PatternCardStories.SizeSmall} title="Small" description={<><code>padding="sm"</code>, for one number or one line.</>} />
+<ComponentExample of={PatternCardStories.SizeSmall} title="Small" description={<>Minimum width <code>--card-min-width-sm</code> (224), for one number or one line.</>} />
 
-<ComponentExample of={PatternCardStories.SizeMedium} title="Medium" description={<><code>padding="md"</code>, the default, for a short list or a few lines.</>} />
+<ComponentExample of={PatternCardStories.SizeMedium} title="Medium" description={<>Minimum width <code>--card-min-width-md</code> (304), for a short list or a few lines.</>} />
 
-<ComponentExample of={PatternCardStories.SizeLarge} title="Large" description={<><code>padding="lg"</code>, for a summary with several parts.</>} />
+<ComponentExample of={PatternCardStories.SizeLarge} title="Large" description={<>Minimum width <code>--card-min-width-lg</code> (480), for a summary with several parts.</>} />
 
 <ComponentExample of={PatternCardStories.Rows} title="Cards in a row" description="Six medium cards at each content width: 2, 2 and 3 to a row." />
 
@@ -195,13 +195,13 @@ Content picks the size. Choose the smallest card that holds the content without 
 <tr><th>Size</th><th>When to use</th><th>Pad</th><th>Radius</th><th>Minimum width</th><th>Height cap</th></tr>
 </thead>
 <tbody>
-<tr><td><code>sm</code></td><td>One number or one line.</td><td>16</td><td>12</td><td>224</td><td>304</td></tr>
-<tr><td><code>md</code></td><td>A short list or a few lines.</td><td>20</td><td>16</td><td>304</td><td>400</td></tr>
-<tr><td><code>lg</code></td><td>A summary with several parts.</td><td>24</td><td>16</td><td>480</td><td>640</td></tr>
+<tr><td><code>sm</code></td><td>One number or one line.</td><td>16</td><td>16</td><td>224</td><td>304</td></tr>
+<tr><td><code>md</code></td><td>A short list or a few lines.</td><td>16</td><td>16</td><td>304</td><td>400</td></tr>
+<tr><td><code>lg</code></td><td>A summary with several parts.</td><td>16</td><td>16</td><td>480</td><td>640</td></tr>
 </tbody>
 </DocsTable>
 
-In Figma, `size` picks the pad, the radius and the minimum width together. In code, `padding` sets the pad and the radius, and `minWidth` sets the minimum width. A height cap is set with `style`'s `maxHeight`, and the card clips what passes it.
+In Figma, `size` picks the minimum width. In code, `minWidth` sets the minimum width; every size uses `--card-pad` (16) and `--card-radius` (16). A height cap is set with `style`'s `maxHeight`, and the card clips what passes it.
 
 ### Cards in a row
 
@@ -259,9 +259,8 @@ The image sits above (or, in a side layout, beside) a padded frame, and the head
 <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
 </thead>
 <tbody>
-<tr><td><code>--card-pad-compact</code>, <code>-default</code>, <code>-spacious</code></td><td>16 · 20 · 24</td><td>The pad of a small, medium and large card.</td></tr>
-<tr><td><code>--card-radius-compact</code></td><td>12</td><td>The radius of a small card, and of a card inside a filled Section.</td></tr>
-<tr><td><code>--card-radius</code></td><td>16</td><td>The radius of medium and large cards.</td></tr>
+<tr><td><code>--card-pad</code></td><td>16</td><td>Padding inside a card at every size.</td></tr>
+<tr><td><code>--card-radius</code></td><td>16</td><td>Corner rounding of a card at every size.</td></tr>
 <tr><td><code>--card-stack-sm</code>, <code>-md</code>, <code>-lg</code></td><td>4 · 8 · 12</td><td>Title to description; header to body, set by <code>gap</code>; body to footer.</td></tr>
 <tr><td><code>--card-inline-md</code></td><td>8</td><td>Items on a row, such as actions in the header.</td></tr>
 <tr><td><code>--card-min-width-sm</code>, <code>-md</code>, <code>-lg</code></td><td>224 · 304 · 480</td><td>The minimum width of each size.</td></tr>

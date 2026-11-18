@@ -470,7 +470,7 @@ a.sbdocs-a {
   width: 100%;
   margin: var(--stack-md) 0 0;
   border: var(--border-width-default) solid var(--ds-border);
-  border-radius: var(--card-radius-compact);
+  border-radius: var(--card-radius);
   background: var(--ds-surface);
 }
 
@@ -659,7 +659,7 @@ a.sbdocs-a {
     max-width: none !important;
     box-sizing: border-box !important;
     padding: var(--section-pad-y-spacious) var(--section-pad-x-spacious) !important;
-    border-radius: var(--card-radius-compact) var(--card-radius-compact) 0 0;
+    border-radius: var(--card-radius) var(--card-radius) 0 0;
     background: var(--ds-surface-raised) !important;
     border: var(--border-width-default) solid var(--ds-border) !important;
     border-bottom: none !important;
@@ -735,7 +735,7 @@ a.sbdocs-a {
     .sbdocs.sbdocs-preview:not(:has(pre))
     .docs-story
     > *:last-child:not(:only-child) {
-    border-radius: 0 0 var(--card-radius-compact) var(--card-radius-compact) !important;
+    border-radius: 0 0 var(--card-radius) var(--card-radius) !important;
     border-bottom: none !important;
 }
 
@@ -753,8 +753,8 @@ a.sbdocs-a {
 .sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .sbdocs.sbdocs-preview pre {
     border-top-left-radius: 0 !important;
     border-top-right-radius: 0 !important;
-    border-bottom-left-radius: var(--card-radius-compact) !important;
-    border-bottom-right-radius: var(--card-radius-compact) !important;
+    border-bottom-left-radius: var(--card-radius) !important;
+    border-bottom-right-radius: var(--card-radius) !important;
     margin-top: 0 !important;
     box-shadow: none !important;
 }
@@ -788,7 +788,7 @@ a.sbdocs-a {
   background: var(--ds-surface-raised) !important;
   border: var(--border-width-default) solid var(--ds-border) !important;
   border-bottom: none !important;
-  border-radius: var(--card-radius-compact) var(--card-radius-compact) 0 0;
+  border-radius: var(--card-radius) var(--card-radius) 0 0;
   box-sizing: border-box !important;
 }
 
@@ -864,7 +864,7 @@ a.sbdocs-a {
   border-bottom-width: var(--border-width-default) !important;
   border-bottom-style: solid !important;
   border-bottom-color: var(--ds-border) !important;
-  border-radius: var(--card-radius-compact);
+  border-radius: var(--card-radius);
 }
 
 /*
@@ -1099,7 +1099,7 @@ html[data-color-mode="dark"] .docs-story {
 .sbdocs .sb-ds-docs-all-props .docblock-argstable,
 .sbdocs .sb-ds-docs-source pre {
     margin: 0 !important;
-    border-radius: var(--card-radius-compact);
+    border-radius: var(--card-radius);
     border: var(--border-width-default) solid var(--ds-border);
     box-shadow: none;
 }
@@ -1196,8 +1196,8 @@ html[data-color-mode="dark"] .docs-story {
   flex-direction: column;
   gap: var(--card-stack-lg);
   width: calc(var(--control-lg) * 5);
-  padding: var(--card-pad-default);
-  border-radius: var(--card-radius-compact);
+  padding: var(--card-pad);
+  border-radius: var(--card-radius);
   background: var(--ds-surface-raised);
   box-shadow: var(--ds-shadow-raised);
   color: var(--ds-text);
@@ -1226,8 +1226,8 @@ html[data-color-mode="dark"] .docs-story {
 
 .sb-ds-resource-card__external {
   position: absolute;
-  inset-block-start: var(--card-pad-default);
-  inset-inline-end: var(--card-pad-default);
+  inset-block-start: var(--card-pad);
+  inset-inline-end: var(--card-pad);
   font-size: var(--icon-sm);
   color: var(--ds-icon-subtle);
 }

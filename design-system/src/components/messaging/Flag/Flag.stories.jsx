@@ -72,7 +72,7 @@ export default {
 };
 
 export const Overview = () => (
-    <FlagGroup style={{ padding: 'var(--card-pad-compact)' }} containerPosition="static">
+    <FlagGroup style={{ padding: 'var(--card-pad)' }} containerPosition="static">
         <Flag title="Notes copied" timestamp="Just now" autohide={false}>
             The session notes are on your clipboard.
         </Flag>
@@ -170,7 +170,7 @@ const FlagInteractiveWrapper = ({ appearance, position, title, children, show, a
 
     return (
         <div className="plus-flag-interactive-demo">
-            <FlagGroup position={position} style={{ padding: 'var(--card-pad-compact)' }}>
+            <FlagGroup position={position} style={{ padding: 'var(--card-pad)' }}>
                 <Flag
                     show={isOpen}
                     onDismiss={() => setIsOpen(false)}

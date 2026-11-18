@@ -21,7 +21,7 @@ const ground = {
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 'var(--card-min-width-sm)',
-    padding: 'var(--card-pad-spacious)',
+    padding: 'var(--card-pad)',
     borderRadius: 'var(--card-radius)',
     background: 'var(--ds-surface-sunken)',
 };
@@ -85,7 +85,7 @@ const Example = ({ title, expression, children }) => (
 );
 Example.propTypes = { title: PropTypes.string.isRequired, expression: PropTypes.string.isRequired, children: PropTypes.node.isRequired };
 
-const pad = { padding: 'var(--card-pad-compact)', display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', width: '100%' };
+const pad = { padding: 'var(--card-pad)', display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', width: '100%' };
 
 /**
  * The Logos page's two expressions: the logomark that marks the app and the

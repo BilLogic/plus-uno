@@ -135,7 +135,7 @@ export const SpringPlayground = ({ reduced: forcedReduced }) => {
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-sm)), 1fr))',
         gap: 'var(--grid-gutter)',
-        padding: 'var(--card-pad-default)',
+        padding: 'var(--card-pad)',
         borderRadius: 'var(--card-radius)',
         background: 'var(--ds-surface-sunken)',
         alignItems: 'start',
@@ -414,7 +414,7 @@ export const DragPastLimit = ({ reduced: forcedReduced }) => {
         display: 'flex',
         flexDirection: 'column',
         gap: 'var(--stack-md)',
-        padding: 'var(--card-pad-default)',
+        padding: 'var(--card-pad)',
         borderRadius: 'var(--card-radius)',
         background: 'var(--ds-surface-sunken)',
       }}
@@ -423,7 +423,7 @@ export const DragPastLimit = ({ reduced: forcedReduced }) => {
         style={{
           borderRadius: 'var(--radius-lg)',
           background: 'var(--ds-surface)',
-          paddingBlock: 'var(--card-pad-default)',
+          paddingBlock: 'var(--card-pad)',
           '--stroke-hairline': HERO_HAIRLINE,
           touchAction: 'none',
         }}

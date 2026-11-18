@@ -175,7 +175,7 @@ const CORNERS = {
   count: ['--radius-md', 'components/labels/CountTag/CountTag.scss'],
   icon: ['--radius-sm', null],
   tracker: ['--radius-control-md', 'components/status-indicators/ProgressTracker/ProgressTracker.scss'],
-  cardImage: ['--card-radius-compact', 'patterns/PatternCard/PatternCard.scss'],
+  cardImage: ['--card-radius', 'patterns/PatternCard/PatternCard.scss'],
   shape: ['--radius-control-sm', null],
   full: ['--radius-full', 'components/status-indicators/ProgressTracker/ProgressTracker.scss'],
 };

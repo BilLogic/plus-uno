@@ -73,7 +73,7 @@ test('component SCSS reads radius roles, with counted central exceptions', async
   const file = 'design-system/src/components/x/X.scss';
   const files = [{ path: file, text: '.x { border-radius: var(--radius-md); --corner: var(--radius-sm); }' }];
   assert.equal(roleRadii(files, []).length, 2);
-  assert.deepEqual(roleRadii([{ path: file, text: '.x { border-radius: var(--radius-control-md); --corner: var(--card-radius-compact); }' }], []), []);
+  assert.deepEqual(roleRadii([{ path: file, text: '.x { border-radius: var(--radius-control-md); --corner: var(--card-radius); }' }], []), []);
   const exceptions = [{ file, token: '--radius-md', count: 1, why: 'Preserve the existing 4px mark pending design review.' }, { file, token: '--radius-sm', count: 1, why: 'Preserve the existing 2px mark pending design review.' }];
   assert.deepEqual(roleRadii(files, exceptions), []);
   assert.match(roleRadii([{ path: file, text: '' }], exceptions)[0].message, /stale radius exception/);
@@ -102,7 +102,7 @@ test('role substitutions resolve to the same primitive in the single-mode radius
     return resolve(row.ref.slice(4, -1));
   };
   for (const [scale, role] of [
-    ['--radius-lg', '--radius-control-md'], ['--radius-xl', '--card-radius-compact'],
+    ['--radius-lg', '--radius-control-md'],
     ['--radius-xl', '--popup-radius'], ['--radius-xl', '--table-radius'], ['--radius-xxl', '--card-radius'],
   ]) assert.equal(resolve(role), resolve(scale), `${scale} → ${role}`);
 });

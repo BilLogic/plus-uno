@@ -96,9 +96,9 @@ test('tokens: one record per name, tier and group from the section, first value 
   const m = buildTokensManifest([
     { group: 'Color Tokens', tier: 'semantic', tokens: [{ name: '--ds-text', value: 'var(--palette-neutral-1000)' }] },
     { group: 'Color Primitives', tier: 'primitive', tokens: [{ name: '--palette-neutral-1000', value: '#172b4d' }] },
-    { group: 'Frame and Layer Tokens', tier: 'template', tokens: [{ name: '--card-pad-default', value: 'var(--space-200)' }] },
+    { group: 'Frame and Layer Tokens', tier: 'template', tokens: [{ name: '--card-pad', value: 'var(--space-100)' }] },
   ]);
-  assert.deepEqual(m.tokens.map((t) => t.name), ['--card-pad-default', '--ds-text', '--palette-neutral-1000']);
+  assert.deepEqual(m.tokens.map((t) => t.name), ['--card-pad', '--ds-text', '--palette-neutral-1000']);
   const text = m.tokens.find((t) => t.name === '--ds-text');
   assert.equal(text.tier, 'semantic');
   assert.equal(text.group, 'Color Tokens');

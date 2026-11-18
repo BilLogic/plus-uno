@@ -110,14 +110,14 @@
     },
     {
       "id": "VariableID:19378:46234",
-      "name": "Card/pad-sm",
+      "name": "Card/pad",
       "variableCollectionId": "VariableCollectionId:19378:46226",
       "resolvedType": "FLOAT",
       "scopes": [
         "GAP"
       ],
       "codeSyntax": {
-        "WEB": "var(--card-pad-compact)"
+        "WEB": "var(--card-pad)"
       },
       "valuesByMode": {
         "19378:4": {
@@ -127,48 +127,6 @@
       },
       "resolvedValuesByMode": {
         "19378:4": 16
-      }
-    },
-    {
-      "id": "VariableID:19378:46235",
-      "name": "Card/pad-md",
-      "variableCollectionId": "VariableCollectionId:19378:46226",
-      "resolvedType": "FLOAT",
-      "scopes": [
-        "GAP"
-      ],
-      "codeSyntax": {
-        "WEB": "var(--card-pad-default)"
-      },
-      "valuesByMode": {
-        "19378:4": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:208"
-        }
-      },
-      "resolvedValuesByMode": {
-        "19378:4": 20
-      }
-    },
-    {
-      "id": "VariableID:19378:46236",
-      "name": "Card/pad-lg",
-      "variableCollectionId": "VariableCollectionId:19378:46226",
-      "resolvedType": "FLOAT",
-      "scopes": [
-        "GAP"
-      ],
-      "codeSyntax": {
-        "WEB": "var(--card-pad-spacious)"
-      },
-      "valuesByMode": {
-        "19378:4": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:209"
-        }
-      },
-      "resolvedValuesByMode": {
-        "19378:4": 24
       }
     },
     {
@@ -379,27 +337,6 @@
       },
       "resolvedValuesByMode": {
         "19378:4": 16
-      }
-    },
-    {
-      "id": "VariableID:19378:46247",
-      "name": "Card/radius-sm",
-      "variableCollectionId": "VariableCollectionId:19378:46226",
-      "resolvedType": "FLOAT",
-      "scopes": [
-        "CORNER_RADIUS"
-      ],
-      "codeSyntax": {
-        "WEB": "var(--card-radius-compact)"
-      },
-      "valuesByMode": {
-        "19378:4": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:205"
-        }
-      },
-      "resolvedValuesByMode": {
-        "19378:4": 12
       }
     },
     {

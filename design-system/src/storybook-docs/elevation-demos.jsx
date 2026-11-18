@@ -179,7 +179,7 @@ const codeText = { font: 'var(--code-default)', color: 'var(--ds-text)', wordBre
 const valueText = { ...codeText, whiteSpace: 'nowrap', wordBreak: 'normal' };
 const well = {
     position: 'relative',
-    padding: 'var(--card-pad-spacious)',
+    padding: 'var(--card-pad)',
     borderRadius: 'var(--card-radius)',
     background: 'var(--ds-surface-sunken)',
     color: 'var(--ds-text)',
@@ -542,7 +542,7 @@ export const LevelTiles = () => (
                     key={l.id}
                     data-level={l.id}
                     style={{
-                        padding: 'var(--card-pad-compact)',
+                        padding: 'var(--card-pad)',
                         borderRadius: 'var(--card-radius)',
                         background: onBlanket ? 'linear-gradient(var(--ds-blanket), var(--ds-blanket)), var(--ds-surface)' : l.id === 'sunken' ? 'var(--ds-surface)' : 'var(--ds-surface-sunken)',
                     }}
@@ -553,7 +553,7 @@ export const LevelTiles = () => (
                             flexDirection: 'column',
                             gap: 'var(--card-stack-sm)',
                             minHeight: 'var(--image-xl)',
-                            padding: 'var(--card-pad-compact)',
+                            padding: 'var(--card-pad)',
                             borderRadius: 'var(--card-radius)',
                             background: l.surface ? `var(${l.surface})` : 'var(--ds-surface)',
                             boxShadow: l.shadow ? `var(${l.shadow})` : 'none',

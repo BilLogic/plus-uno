@@ -34,7 +34,7 @@ const Ground = ({ mode, children }) => (
         data-color-mode={mode}
         style={{
             ...row,
-            padding: 'var(--card-pad-spacious)',
+            padding: 'var(--card-pad)',
             borderRadius: 'var(--card-radius)',
             background: 'var(--ds-surface)',
             color: 'var(--ds-text)',

@@ -128,7 +128,7 @@ export const FocusRingDoDont = {
 export const Dividers = {
     render: () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
-            <PatternCard padding="md">
+            <PatternCard>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                         <span style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>Upcoming sessions</span>

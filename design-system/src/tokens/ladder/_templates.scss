@@ -31,11 +31,8 @@
     --section-radius: var(--radius-xxl); /* the rounding of a Section with a fill */
 
     /* Card */
-    --card-pad-compact: var(--space-100);
-    --card-pad-default: var(--space-125);
-    --card-pad-spacious: var(--space-150);
+    --card-pad: var(--space-100);
     --card-radius: var(--radius-xxl);
-    --card-radius-compact: var(--radius-xl);
     --card-border-width: var(--border-width-default);
     --card-title-font-lg: var(--heading-md);
     --card-description-font: var(--body-default);
