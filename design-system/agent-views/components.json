@@ -3661,7 +3661,11 @@
         "DaysAnnounceTheirDate",
         "ClearControl",
         "MonthTurnKeepsPopupHeight",
-        "RangePopup"
+        "RangePopup",
+        "RangePopupPresetKeyboard",
+        "RangePopupClearCommits",
+        "RangePopupPresetBounds",
+        "RangePopupReadOnly"
       ],
       "tokens": [
         "--border-width-default",

@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
+import { Radio as BaseRadio } from '@base-ui/react/radio';
+import { RadioGroup as BaseRadioGroup } from '@base-ui/react/radio-group';
 import Popup from '@/components/overlays-and-layering/Popup/Popup';
 import FieldBox from '../_internal/FieldBox';
 import Calendar from '../_internal/Calendar';
@@ -30,6 +32,15 @@ const DEFAULT_PRESETS = [
     { id: 'last-7-days', label: 'Last 7 days', range: (ref) => [addDays(ref, -6), ref] },
     { id: 'last-30-days', label: 'Last 30 days', range: (ref) => [addDays(ref, -29), ref] },
 ];
+
+const presetKey = (preset) => preset.id ?? preset.label;
+
+const isRangeOutOfBounds = (rangeToCheck, minDate, maxDate) => {
+    const [start, end] = Array.isArray(rangeToCheck) ? rangeToCheck : [null, null];
+    if (!start && !end) return false;
+    if (!start || !end || start > end) return true;
+    return outOfBounds(start, minDate, maxDate) || outOfBounds(end, minDate, maxDate);
+};
 
 const resolvePresetRange = (preset, refDate) => {
     if (typeof preset.range === 'function') {
@@ -148,6 +159,12 @@ const DatePicker = ({
         return [];
     }, [presets, hasPresets, isFilterMode]);
 
+    const interactive = !isDisabled && !isReadOnly;
+
+    const isPresetDisabled = useCallback((preset) => (
+        isRangeOutOfBounds(resolvePresetRange(preset, todayDate), minDate, effectiveMaxDate)
+    ), [todayDate, minDate, effectiveMaxDate]);
+
     const initialValue = value !== undefined ? value : defaultValue;
     const [picked, setPicked] = useState(() => fromValue(initialValue, effectiveRange));
     const [text, setText] = useState(() => display(fromValue(initialValue, effectiveRange)));
@@ -161,7 +178,11 @@ const DatePicker = ({
     const [draftPreset, setDraftPreset] = useState(() => {
         if (!resolvedPresets.length) return null;
         const initialRange = Array.isArray(picked) ? picked : [null, null];
-        return resolvedPresets.find((preset) => matchesPresetRange(preset, initialRange, todayDate))?.id ?? null;
+        const match = resolvedPresets.find((preset) => (
+            !isRangeOutOfBounds(resolvePresetRange(preset, todayDate), minDate, effectiveMaxDate)
+            && matchesPresetRange(preset, initialRange, todayDate)
+        ));
+        return match ? presetKey(match) : null;
     });
 
     const fieldRef = useRef(null);
@@ -180,21 +201,22 @@ const DatePicker = ({
     const syncDraftFromApplied = useCallback((source) => {
         const appliedRange = Array.isArray(source) ? source : [null, null];
         setDraft(appliedRange);
-        const match = resolvedPresets.find((preset) => matchesPresetRange(preset, appliedRange, todayDate));
-        setDraftPreset(match?.id ?? null);
+        const match = resolvedPresets.find((preset) => (
+            !isPresetDisabled(preset) && matchesPresetRange(preset, appliedRange, todayDate)
+        ));
+        setDraftPreset(match ? presetKey(match) : null);
         setViewDate(firstDay(appliedRange) || todayDate);
-    }, [resolvedPresets, todayDate]);
+    }, [isPresetDisabled, resolvedPresets, todayDate]);
 
     const handlePopupToggle = useCallback((nextOpen) => {
-        if (nextOpen && !isDisabled && !isReadOnly) {
+        if (nextOpen) {
+            if (!interactive) return;
             syncDraftFromApplied(picked);
         }
         setOpen(Boolean(nextOpen));
-    }, [isDisabled, isReadOnly, picked, syncDraftFromApplied]);
+    }, [interactive, picked, syncDraftFromApplied]);
 
     const close = useCallback(() => setOpen(false), []);
-
-    const interactive = !isDisabled && !isReadOnly;
 
     const openCalendar = () => {
         if (!interactive || open) return;
@@ -205,6 +227,7 @@ const DatePicker = ({
 
     /** Records a pick and tells the caller. */
     const commit = (next) => {
+        if (!interactive) return;
         setPicked(next);
         setText(display(next));
         setTypedInvalid(false);
@@ -214,7 +237,7 @@ const DatePicker = ({
 
     /** Reads the typed text: picks a valid date, marks anything else invalid. */
     const commitText = () => {
-        if (text === display(picked)) return;
+        if (!interactive || text === display(picked)) return;
         if (!text.trim()) {
             commit(effectiveRange ? [null, null] : null);
             return;
@@ -237,6 +260,7 @@ const DatePicker = ({
     };
 
     const pick = (date) => {
+        if (!interactive || !date || outOfBounds(date, minDate, effectiveMaxDate)) return;
         if (resolvedPresets.length) {
             const [start, end] = draft;
             if (!start || end || date < start) {
@@ -246,8 +270,10 @@ const DatePicker = ({
             }
             const nextDraft = [start, date];
             setDraft(nextDraft);
-            const match = resolvedPresets.find((preset) => matchesPresetRange(preset, nextDraft, todayDate));
-            setDraftPreset(match?.id ?? null);
+            const match = resolvedPresets.find((preset) => (
+                !isPresetDisabled(preset) && matchesPresetRange(preset, nextDraft, todayDate)
+            ));
+            setDraftPreset(match ? presetKey(match) : null);
             return;
         }
         if (!effectiveRange) {
@@ -267,18 +293,35 @@ const DatePicker = ({
     };
 
     const selectPreset = (preset) => {
+        if (!interactive || !preset || isPresetDisabled(preset)) return;
         const nextRange = resolvePresetRange(preset, todayDate);
         setDraft(nextRange);
-        setDraftPreset(preset.id);
+        setDraftPreset(presetKey(preset));
         setViewDate(nextRange[1] || nextRange[0] || todayDate);
     };
 
     const handleDraftClear = () => {
+        if (!interactive) return;
         setDraft([null, null]);
         setDraftPreset(null);
+        commit([null, null]);
     };
 
+    const [rangeStart, rangeEnd] = Array.isArray(picked) ? picked : [null, null];
+    const [draftStart, draftEnd] = draft;
+    const hasDraftEnds = Boolean(draftStart && draftEnd);
+    const isEmptyPresetSelected = Boolean(draftPreset && resolvedPresets.some((preset) => {
+        if (presetKey(preset) !== draftPreset || isPresetDisabled(preset)) return false;
+        const [start, end] = resolvePresetRange(preset, todayDate);
+        return !start && !end;
+    }));
+    const canApply = interactive && (
+        (hasDraftEnds && !isRangeOutOfBounds(draft, minDate, effectiveMaxDate))
+        || (isEmptyPresetSelected && Boolean(rangeStart || rangeEnd))
+    );
+
     const handleDraftApply = () => {
+        if (!interactive || !canApply || isRangeOutOfBounds(draft, minDate, effectiveMaxDate)) return;
         commit(draft);
         setOpen(false);
         inputRef.current?.focus();
@@ -287,7 +330,7 @@ const DatePicker = ({
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
             event.preventDefault();
-            commitText();
+            if (interactive) commitText();
             setOpen(false);
         } else if (event.key === 'Escape') {
             if (open) event.preventDefault();
@@ -306,12 +349,12 @@ const DatePicker = ({
     };
 
     const invalid = isInvalid || typedInvalid;
-    const [rangeStart, rangeEnd] = Array.isArray(picked) ? picked : [null, null];
     const hasPicked = Array.isArray(picked) ? Boolean(rangeStart || rangeEnd) : Boolean(picked);
     const hasValue = hasPicked || Boolean(text);
     const clearName = clearLabel(props['aria-label'], effectiveRange ? 'dates' : 'date');
 
     const clear = () => {
+        if (!interactive) return;
         if (!hasPicked) {
             setText('');
             setTypedInvalid(false);
@@ -320,29 +363,46 @@ const DatePicker = ({
         commit(effectiveRange ? [null, null] : null);
     };
 
-    const [draftStart, draftEnd] = draft;
-    const hasDraftEnds = Boolean(draftStart && draftEnd);
-    const canApply = hasDraftEnds || (draftPreset === 'all-time' && Boolean(rangeStart || rangeEnd));
-
     const presetRangePopupContent = (
         <div className="plus-date-range-popup__layout">
-            <div className="plus-date-range-popup__presets" role="listbox" aria-label="Date range presets">
+            <BaseRadioGroup
+                className="plus-date-range-popup__presets"
+                aria-label="Date range presets"
+                value={draftPreset ?? null}
+                disabled={isDisabled}
+                readOnly={isReadOnly}
+                onValueChange={(nextValue) => {
+                    const match = resolvedPresets.find((preset) => presetKey(preset) === nextValue);
+                    if (match) selectPreset(match);
+                }}
+            >
                 {resolvedPresets.map((preset) => {
-                    const isSelected = draftPreset === preset.id;
+                    const key = presetKey(preset);
+                    const isSelected = draftPreset === key;
+                    const presetDisabled = isPresetDisabled(preset);
                     return (
-                        <button
-                            key={preset.id || preset.label}
-                            type="button"
-                            role="option"
-                            aria-selected={isSelected}
-                            className={['plus-option-row', 'plus-date-range-popup__preset', isSelected && 'is-selected'].filter(Boolean).join(' ')}
-                            onClick={() => selectPreset(preset)}
+                        <BaseRadio.Root
+                            key={key}
+                            value={key}
+                            disabled={isDisabled || presetDisabled}
+                            className={[
+                                'plus-option-row',
+                                'plus-date-range-popup__preset',
+                                isSelected && 'is-selected',
+                                presetDisabled && 'is-disabled',
+                            ].filter(Boolean).join(' ')}
+                            onKeyDown={(event) => {
+                                if (event.key === 'Enter' && !presetDisabled && interactive) {
+                                    event.preventDefault();
+                                    selectPreset(preset);
+                                }
+                            }}
                         >
                             {preset.label}
-                        </button>
+                        </BaseRadio.Root>
                     );
                 })}
-            </div>
+            </BaseRadioGroup>
             <div className="plus-date-range-popup__calendar">
                 <Calendar
                     size={24}
@@ -375,6 +435,8 @@ const DatePicker = ({
         </div>
     );
 
+    const isOpen = interactive && open;
+
     if (isFilterMode) {
         const appliedPreset = resolvedPresets.find((preset) => matchesPresetRange(preset, [rangeStart, rangeEnd], todayDate));
         const summaryText = rangeStart && rangeEnd
@@ -383,7 +445,7 @@ const DatePicker = ({
 
         let triggerNode;
         if (typeof trigger === 'function') {
-            triggerNode = trigger({ isOpen: open, value: [rangeStart, rangeEnd], summary: summaryText });
+            triggerNode = trigger({ isOpen, value: [rangeStart, rangeEnd], summary: summaryText });
         } else if (trigger) {
             triggerNode = trigger;
         } else {
@@ -403,7 +465,7 @@ const DatePicker = ({
                 trigger={triggerNode}
                 label={label || 'Choose dates'}
                 placement={placement}
-                show={open}
+                show={isOpen}
                 onToggle={handlePopupToggle}
                 container={container}
                 id={popupId}
@@ -423,7 +485,7 @@ const DatePicker = ({
                 readOnly={isReadOnly}
                 invalid={invalid}
                 valid={isValid}
-                className={['plus-date-picker', open && 'plus-date-picker--open', className].filter(Boolean).join(' ')}
+                className={['plus-date-picker', isOpen && 'plus-date-picker--open', className].filter(Boolean).join(' ')}
                 style={style}
                 // A read-only value cannot be changed, so the trailing controls are not drawn.
                 elemAfter={isReadOnly ? null : (
@@ -450,7 +512,7 @@ const DatePicker = ({
                                 if (!interactive) return;
                                 event.preventDefault();
                                 inputRef.current?.focus();
-                                if (open) setOpen(false); else openCalendar();
+                                if (isOpen) setOpen(false); else openCalendar();
                             }}
                         >
                             <Icon name="calendar-day" />
@@ -468,8 +530,8 @@ const DatePicker = ({
                     role="combobox"
                     autoComplete="off"
                     aria-haspopup="dialog"
-                    aria-expanded={open}
-                    aria-controls={open ? popupId : undefined}
+                    aria-expanded={isOpen}
+                    aria-controls={isOpen ? popupId : undefined}
                     aria-invalid={invalid || undefined}
                     placeholder={placeholder ?? (effectiveRange ? `MM/DD/YYYY${RANGE_JOIN}MM/DD/YYYY` : 'MM/DD/YYYY')}
                     value={text}
@@ -478,6 +540,7 @@ const DatePicker = ({
                     aria-readonly={isReadOnly || undefined}
                     onClick={openCalendar}
                     onChange={(event) => {
+                        if (!interactive) return;
                         setText(event.target.value);
                         setTypedInvalid(false);
                     }}
@@ -487,7 +550,7 @@ const DatePicker = ({
                 />
             </FieldBox>
             <AnchoredListboxSurface
-                open={open}
+                open={isOpen}
                 anchorRef={fieldRef}
                 align={calendarAlign}
                 onClose={close}

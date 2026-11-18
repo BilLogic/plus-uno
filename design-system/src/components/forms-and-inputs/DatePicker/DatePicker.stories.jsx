@@ -721,7 +721,7 @@ export const RangePopup = {
         const calendarColumn = popup.querySelector('.plus-date-range-popup__calendar');
         await expect(Math.round(calendarColumn.getBoundingClientRect().width), 'calendar column width').toBe(192);
 
-        const presetRows = within(presetColumn).getAllByRole('option');
+        const presetRows = within(presetColumn).getAllByRole('radio');
         await expect(presetRows.map((row) => row.textContent)).toEqual(['All time', 'Today', 'Last 7 days', 'Last 30 days']);
         await expect(Math.round(presetRows[0].getBoundingClientRect().height), 'preset row height').toBe(32);
 
@@ -768,10 +768,241 @@ export const RangePopup = {
         await userEvent.click(canvas.getByRole('button', { name: 'Created: 10/08/2026 – 10/13/2026' }));
         const reopened = await page.findByRole('dialog', { name: 'Created' });
         await settleAnimations(reopened);
-        await userEvent.click(within(reopened).getByRole('option', { name: 'Last 7 days' }));
+        await userEvent.click(within(reopened).getByRole('radio', { name: 'Last 7 days' }));
         await userEvent.click(within(reopened).getByRole('button', { name: 'Apply' }));
         await expect(args.onChange).toHaveBeenLastCalledWith(['2026-10-15', '2026-10-21']);
         await expect(canvas.getByRole('button', { name: 'Created: Last 7 days' })).toBeVisible();
+    },
+};
+
+export const RangePopupPresetKeyboard = {
+    args: {
+        onChange: fn(),
+        today: '2026-10-21',
+    },
+    parameters: { docs: { disable: true } },
+    render: ({ onChange, today }) => {
+        const [range, setRange] = useState([null, null]);
+        return (
+            <div style={{ paddingBottom: 'var(--width-2500)' }}>
+                <DatePicker
+                    range
+                    presets
+                    label="Created"
+                    today={today}
+                    value={range}
+                    onChange={(next) => {
+                        setRange(next);
+                        onChange?.(next);
+                    }}
+                />
+            </div>
+        );
+    },
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const page = within(canvasElement.ownerDocument.body);
+        await userEvent.click(canvas.getByRole('button', { name: 'Created: All time' }));
+
+        const popup = await page.findByRole('dialog', { name: 'Created' });
+        await settleAnimations(popup);
+
+        const allTime = within(popup).getByRole('radio', { name: 'All time' });
+        const todayItem = within(popup).getByRole('radio', { name: 'Today' });
+        const last7 = within(popup).getByRole('radio', { name: 'Last 7 days' });
+
+        allTime.focus();
+        await expect(allTime).toHaveAttribute('tabindex', '0');
+        await expect(todayItem).toHaveAttribute('tabindex', '-1');
+
+        await userEvent.keyboard('{ArrowDown}');
+        await expect(todayItem).toHaveFocus();
+        await expect(todayItem).toHaveAttribute('aria-checked', 'true');
+        await expect(todayItem).toHaveAttribute('tabindex', '0');
+        await expect(allTime).toHaveAttribute('tabindex', '-1');
+
+        await userEvent.keyboard('{ArrowDown}');
+        await expect(last7).toHaveFocus();
+        await expect(last7).toHaveAttribute('aria-checked', 'true');
+
+        await userEvent.keyboard('{ArrowUp}');
+        await expect(todayItem).toHaveFocus();
+        await expect(todayItem).toHaveAttribute('aria-checked', 'true');
+
+        last7.focus();
+        await userEvent.keyboard('{Enter}');
+        await expect(last7).toHaveAttribute('aria-checked', 'true');
+
+        todayItem.focus();
+        await userEvent.keyboard(' ');
+        await expect(todayItem).toHaveAttribute('aria-checked', 'true');
+
+        await userEvent.click(within(popup).getByRole('button', { name: 'Apply' }));
+        await expect(args.onChange).toHaveBeenLastCalledWith(['2026-10-21', '2026-10-21']);
+    },
+};
+
+export const RangePopupClearCommits = {
+    args: {
+        onChange: fn(),
+        today: '2026-10-21',
+    },
+    parameters: { docs: { disable: true } },
+    render: ({ onChange, today }) => {
+        const [range, setRange] = useState(['2026-10-08', '2026-10-13']);
+        return (
+            <div style={{ paddingBottom: 'var(--width-2500)' }}>
+                <DatePicker
+                    range
+                    presets
+                    label="Created"
+                    today={today}
+                    value={range}
+                    onChange={(next) => {
+                        setRange(next);
+                        onChange?.(next);
+                    }}
+                />
+            </div>
+        );
+    },
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const page = within(canvasElement.ownerDocument.body);
+        const trigger = canvas.getByRole('button', { name: 'Created: 10/08/2026 – 10/13/2026' });
+        await userEvent.click(trigger);
+
+        const popup = await page.findByRole('dialog', { name: 'Created' });
+        await settleAnimations(popup);
+
+        await userEvent.click(within(popup).getByRole('button', { name: 'Clear' }));
+        await expect(args.onChange).toHaveBeenLastCalledWith([null, null]);
+        await expect(canvas.getByRole('button', { name: 'Created: All time' })).toBeVisible();
+
+        const applyBtn = within(popup).getByRole('button', { name: 'Apply' });
+        await expect(applyBtn).toBeDisabled();
+
+        // Incomplete single-day draft keeps Apply disabled.
+        await userEvent.click(within(popup).getByRole('button', { name: /October 15, 2026/ }));
+        await expect(applyBtn).toBeDisabled();
+
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(canvasElement.ownerDocument.querySelector('.plus-date-range-popup')).toBeNull());
+
+        await userEvent.click(canvas.getByRole('button', { name: 'Created: All time' }));
+        const reopened = await page.findByRole('dialog', { name: 'Created' });
+        await settleAnimations(reopened);
+        await expect(reopened.querySelectorAll('[aria-pressed="true"]').length).toBe(0);
+        await expect(within(reopened).getByRole('button', { name: 'Apply' })).toBeDisabled();
+    },
+};
+
+export const RangePopupPresetBounds = {
+    args: {
+        onChange: fn(),
+        today: '2026-10-21',
+    },
+    parameters: { docs: { disable: true } },
+    render: ({ onChange, today }) => {
+        const [range, setRange] = useState([null, null]);
+        return (
+            <div style={{ paddingBottom: 'var(--width-2500)', display: 'flex', gap: 'var(--inline-lg)' }}>
+                <DatePicker
+                    range
+                    presets
+                    label="Created"
+                    today={today}
+                    minDate="2026-10-20"
+                    value={range}
+                    onChange={(next) => {
+                        setRange(next);
+                        onChange?.(next);
+                    }}
+                />
+                <DatePicker
+                    range
+                    presets
+                    label="Stale"
+                    today={today}
+                    minDate="2026-10-20"
+                    value={['2026-10-15', '2026-10-21']}
+                    onChange={onChange}
+                />
+            </div>
+        );
+    },
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const page = within(canvasElement.ownerDocument.body);
+        await userEvent.click(canvas.getByRole('button', { name: 'Created: All time' }));
+
+        const popup = await page.findByRole('dialog', { name: 'Created' });
+        await settleAnimations(popup);
+
+        const allTime = within(popup).getByRole('radio', { name: 'All time' });
+        const todayItem = within(popup).getByRole('radio', { name: 'Today' });
+        const last7 = within(popup).getByRole('radio', { name: 'Last 7 days' });
+        const last30 = within(popup).getByRole('radio', { name: 'Last 30 days' });
+
+        await expect(allTime).not.toHaveAttribute('aria-disabled', 'true');
+        await expect(todayItem).not.toHaveAttribute('aria-disabled', 'true');
+        await expect(last7).toHaveAttribute('aria-disabled', 'true');
+        await expect(last30).toHaveAttribute('aria-disabled', 'true');
+
+        await userEvent.click(last7);
+        await expect(within(popup).getByRole('button', { name: 'Apply' })).toBeDisabled();
+        await expect(args.onChange).not.toHaveBeenCalled();
+
+        // Arrow navigation skips disabled presets.
+        allTime.focus();
+        await userEvent.keyboard('{ArrowDown}');
+        await expect(todayItem).toHaveFocus();
+        await userEvent.keyboard('{ArrowDown}');
+        await expect(allTime).toHaveFocus();
+
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(canvasElement.ownerDocument.querySelector('.plus-date-range-popup')).toBeNull());
+
+        // An out-of-bounds value cannot be committed by Apply.
+        await userEvent.click(canvas.getByRole('button', { name: /Stale:/ }));
+        const stalePopup = await page.findByRole('dialog', { name: 'Stale' });
+        await settleAnimations(stalePopup);
+        const staleApply = within(stalePopup).getByRole('button', { name: 'Apply' });
+        await expect(staleApply).toBeDisabled();
+        staleApply.click();
+        await expect(args.onChange).not.toHaveBeenCalled();
+    },
+};
+
+export const RangePopupReadOnly = {
+    args: {
+        onChange: fn(),
+        today: '2026-10-21',
+    },
+    parameters: { docs: { disable: true } },
+    render: ({ onChange, today }) => (
+        <DatePicker
+            range
+            presets
+            label="Created"
+            today={today}
+            isReadOnly
+            value={['2026-10-08', '2026-10-13']}
+            onChange={onChange}
+        />
+    ),
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const trigger = canvas.getByRole('button', { name: 'Created: 10/08/2026 – 10/13/2026' });
+        await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+        await userEvent.click(trigger);
+        trigger.focus();
+        await userEvent.keyboard('{Enter}');
+
+        await expect(canvasElement.ownerDocument.querySelector('[role="dialog"]')).toBeNull();
+        await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+        await expect(args.onChange).not.toHaveBeenCalled();
     },
 };
 

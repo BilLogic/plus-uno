@@ -14,7 +14,7 @@ Also asked as: calendar input, date field, date input, date selector.
 
 **Source:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.stories.jsx` — Overview, Spacing, InteractionStates, PickDate, PickRange, Bounds, Interactive, CalendarColors, Default, WithValue, Compact, Invalid, ReadOnly, Disabled, HoveredState, KeyboardFocus, CalendarOpensFourPixelsBelow, CalendarFlipsAboveNearTheBottom, RangePicksASpan, BoundedDatesBehavior, TypedEntry, DaysAnnounceTheirDate, ClearControl, MonthTurnKeepsPopupHeight, RangePopup
+**Stories:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.stories.jsx` — Overview, Spacing, InteractionStates, PickDate, PickRange, Bounds, Interactive, CalendarColors, Default, WithValue, Compact, Invalid, ReadOnly, Disabled, HoveredState, KeyboardFocus, CalendarOpensFourPixelsBelow, CalendarFlipsAboveNearTheBottom, RangePicksASpan, BoundedDatesBehavior, TypedEntry, DaysAnnounceTheirDate, ClearControl, MonthTurnKeepsPopupHeight, RangePopup, RangePopupPresetKeyboard, RangePopupClearCommits, RangePopupPresetBounds, RangePopupReadOnly
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.mdx`
 
@@ -112,7 +112,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 2. **Clear button.** A subtle `IconButton` (`xmark` at `--icon-sm`) before the calendar icon when a date, range or typed text is in a live field (not read-only or disabled).
 3. **Calendar icon.** Opens the calendar. Decoration for assistive technology; the input is the control.
 4. **Calendar.** A month grid of 24px day cells (`--calendar-day-sm`) in a popup `--stack-sm` below the field, flipped above when there is no room. A picked day or range end is a filled square; days between form a continuous band that rounds where a week starts or ends.
-5. **Presets and footer.** With `presets`, a 160px (`--width-1000`) column of 32px rows (`All time`, `Today`, `Last 7 days`, `Last 30 days`) sits beside the calendar, with compact `Clear` and `Apply` buttons below; otherwise, a compact subtle "Clear" `Button` sits at the end of the popup footer while a value or typed text is in the field.
+5. **Presets and footer.** With `presets`, a 160px (`--width-1000`) column of 32px radio rows (`All time`, `Today`, `Last 7 days`, `Last 30 days`) sits beside the calendar with arrow-key navigation and `Enter`/`Space` selection, and presets outside `minDate`–`maxDate` are disabled. Compact `Clear` and `Apply` buttons sit below: `Clear` commits `[null, null]` immediately while `Apply` stays disabled until an in-bounds complete range (or `All time` over a non-empty filter) is ready. Otherwise, a compact subtle "Clear" `Button` sits at the end of the popup footer while a value or typed text is in the field.
 
 ### States
 
@@ -122,7 +122,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Hovered | The border takes `--ds-border-focused`. |
 | Focused | A 2px ring in `--ds-border-focused`, 2px off the box. |
 | Invalid | The border takes `--ds-border-danger` and the input sets `aria-invalid`. |
-| Read-only | The box takes `--ds-background-neutral`, at full contrast with no hover. The clear button and calendar icon are not drawn and a press opens no calendar. The date can be read, selected and copied. |
+| Read-only | The box takes `--ds-background-neutral`, at full contrast with no hover. The clear button and calendar icon are not drawn and a press opens no calendar (nor does a read-only filter trigger). The date can be read, selected and copied. |
 | Disabled | The box fades to `--ds-opacity-disabled`, hides the clear button, and leaves the tab order. |
 
 ### Tokens
