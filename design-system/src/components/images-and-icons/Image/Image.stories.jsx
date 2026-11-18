@@ -36,7 +36,7 @@ export const DarkVariant = () => (
     <Image
         src={sessionSummaryLight}
         srcDark={sessionSummaryDark}
-        alt="Weekly tutoring session summary in light and dark mode"
+        alt="Weekly tutoring session summary"
         testId="image-dark"
     />
 );
