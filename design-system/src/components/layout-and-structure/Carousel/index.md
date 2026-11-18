@@ -10,11 +10,11 @@ Also asked as: slideshow, gallery.
 
 **Source:** `design-system/src/components/layout-and-structure/Carousel/Carousel.jsx`
 
-**Stories:** `design-system/src/components/layout-and-structure/Carousel/Carousel.stories.jsx` — Overview, Static, NoLoop, FewSlides, ReducedMotion, Interactive, NoPeek, PauseStopsProgress, DotRestartsClock, ArrowKeysMove, HoverHolds, InactiveSlidesHidden, RegionIsNamed, NeighborsWrap, DotFills, StaticBarFull, DotTargets
+**Stories:** `design-system/src/components/layout-and-structure/Carousel/Carousel.stories.jsx` — Overview, Static, NoLoop, CaptionFadesInPlace, FewSlides, ReducedMotion, Interactive, NoPeek, PauseStopsProgress, DotRestartsClock, ArrowKeysMove, HoverHolds, InactiveSlidesHidden, RegionIsNamed, NeighborsWrap, DotFills, StaticBarFull, DotTargets
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Carousel/Carousel.mdx`
 
-**Motion:** change `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Motion:** change `spatial.default` · enter `appearance.default` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -36,6 +36,8 @@ Carousel reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | change | Step to the next or previous | `--ds-motion-spatial-default` | No autoplay by default; if it plays, it has a visible pause. |
+| enter | Update a value or state | `--ds-motion-appearance-default` | The caption fades in place with no vertical travel. |
+| exit | Update a value or state | `--ds-motion-appearance-fast` | The caption fades out in place before the next words swap in. |
 
 ## Alternatives
 
@@ -124,7 +126,7 @@ Same group: `Accordion` · `PageHeader` · `Panel` · `ScrollBar`
 | Neighbors | Faded under `--ds-surface` at 45%, `--section-stack-lg` apart (`--inline-lg` on a narrow stage). |
 | Ring | `--control-lg` across, `--border-width-selected` wide. Track `--ds-border`; progress `--ds-background-brand-bold`. |
 | Progress indicator | The default `ProgressIndicator`: steps `--progress-indicator-dot-size-8`, the bar `--control-md` long, each step a `--control-sm` target. |
-| Motion | A move takes `--ds-motion-spatial-default`, fading on `--ds-motion-appearance-slow`. The caption lifts out over `--ds-motion-appearance-fast` and rises in over `--ds-motion-appearance-default`. |
+| Motion | A move takes `--ds-motion-spatial-default`, fading on `--ds-motion-appearance-slow`. The caption fades out over `--ds-motion-appearance-fast` and fades in over `--ds-motion-appearance-default`, with no vertical travel. |
 | Caption | `Heading` size sm; line in `--body-default` and `--ds-text-subtle`; at most `--content-max-width-reading` wide. |
 | Spacing | `--section-stack-md` between the stage, the controls and the caption; `--inline-md` between controls. |
 
@@ -145,7 +147,7 @@ Same group: `Accordion` · `PageHeader` · `Panel` · `ScrollBar`
 
 ## Tokens touched
 
-`--body-default` · `--border-width-selected` · `--card-radius` · `--carousel-aspect` · `--carousel-edge-fade` · `--carousel-neighbor-dim` · `--carousel-neighbor-gap` · `--carousel-neighbor-scale` · `--carousel-offset` · `--carousel-progress` · `--carousel-ring-size` · `--carousel-ring-stroke` · `--carousel-slide-max` · `--carousel-slide-max-width` · `--carousel-slide-share` · `--carousel-slide-share-md` · `--carousel-slide-share-sm` · `--carousel-slide-width` · `--carousel-step` · `--content-max-width-reading` · `--control-lg` · `--ds-background-brand-bold` · `--ds-border` · `--ds-motion-appearance-default` · `--ds-motion-appearance-default-duration` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-appearance-slow` · `--ds-motion-appearance-slow-duration` · `--ds-motion-spatial-default` · `--ds-motion-spatial-default-duration` · `--ds-shadow-raised` · `--ds-surface` · `--ds-surface-raised` · `--ds-text` · `--ds-text-subtle` · `--inline-lg` · `--inline-md` · `--page-stack-md` · `--section-stack-lg` · `--section-stack-md` · `--stack-md` · `--stack-sm`
+`--body-default` · `--border-width-selected` · `--card-radius` · `--carousel-aspect` · `--carousel-edge-fade` · `--carousel-neighbor-dim` · `--carousel-neighbor-gap` · `--carousel-neighbor-scale` · `--carousel-offset` · `--carousel-progress` · `--carousel-ring-size` · `--carousel-ring-stroke` · `--carousel-slide-max` · `--carousel-slide-max-width` · `--carousel-slide-share` · `--carousel-slide-share-md` · `--carousel-slide-share-sm` · `--carousel-slide-width` · `--carousel-step` · `--content-max-width-reading` · `--control-lg` · `--ds-background-brand-bold` · `--ds-border` · `--ds-motion-appearance-default` · `--ds-motion-appearance-default-duration` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-appearance-slow` · `--ds-motion-appearance-slow-duration` · `--ds-motion-spatial-default` · `--ds-motion-spatial-default-duration` · `--ds-shadow-raised` · `--ds-surface` · `--ds-surface-raised` · `--ds-text` · `--ds-text-subtle` · `--inline-lg` · `--inline-md` · `--page-stack-md` · `--section-stack-lg` · `--section-stack-md` · `--stack-sm`
 
 From `design-system/src/components/layout-and-structure/Carousel/Carousel.scss`. Override these through the token layer, never with a literal.
 

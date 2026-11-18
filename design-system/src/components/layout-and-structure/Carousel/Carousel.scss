@@ -211,20 +211,16 @@
 }
 
 .plus-carousel-caption-inner {
-    transition:
-        opacity var(--ds-motion-appearance-default-duration) var(--ds-motion-appearance-default),
-        transform var(--ds-motion-appearance-default-duration) var(--ds-motion-appearance-default);
+    transition: opacity var(--ds-motion-appearance-default-duration) var(--ds-motion-appearance-default);
 
     &--out {
         opacity: 0;
-        transform: translateY(calc(-1 * var(--stack-sm)));
         transition-duration: var(--ds-motion-appearance-fast-duration);
         transition-timing-function: var(--ds-motion-appearance-fast);
     }
 
     &--pre {
         opacity: 0;
-        transform: translateY(var(--stack-md));
         transition: none;
     }
 }

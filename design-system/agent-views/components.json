@@ -1616,6 +1616,7 @@
         "Overview",
         "Static",
         "NoLoop",
+        "CaptionFadesInPlace",
         "FewSlides",
         "ReducedMotion",
         "Interactive",
@@ -1673,7 +1674,6 @@
         "--page-stack-md",
         "--section-stack-lg",
         "--section-stack-md",
-        "--stack-md",
         "--stack-sm"
       ]
     },
