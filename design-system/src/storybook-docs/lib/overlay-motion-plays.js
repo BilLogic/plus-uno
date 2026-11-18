@@ -23,9 +23,37 @@ export const selectMotionPlay = (reduced = false) => async ({ canvasElement }) =
     await expect(field).toHaveAttribute('aria-expanded', 'false');
 };
 
-/** Geometry and hit testing read a settled surface rather than an entrance frame. */
-export async function settleAnimations(element) {
-    const animations = element.getAnimations({ subtree: true })
-        .filter((animation) => animation.effect.getComputedTiming().iterations !== Infinity);
-    await Promise.allSettled(animations.map((animation) => animation.finished));
+const DEFAULT_SETTLE_TIMEOUT_MS = 2000;
+
+const runningFiniteAnimations = (element) => {
+    if (!element?.getAnimations) return [];
+    return element.getAnimations({ subtree: true }).filter((animation) => {
+        if (animation.playState !== 'running') return false;
+        return animation.effect?.getComputedTiming?.().iterations !== Infinity;
+    });
+};
+
+/**
+ * Geometry, hit testing, and the a11y scan read a settled surface rather than
+ * an entrance frame. Loops until no finite running animations remain (so
+ * multi-phase animations like PresenceSlot finish their follow-up fade), capped
+ * at `timeoutMs` so a looping or stuck animation cannot hang.
+ */
+export async function settleAnimations(element, timeoutMs = DEFAULT_SETTLE_TIMEOUT_MS) {
+    if (!element?.getAnimations) return;
+    const deadline = Date.now() + timeoutMs;
+    while (true) {
+        const animations = runningFiniteAnimations(element);
+        if (animations.length === 0) break;
+        const remaining = deadline - Date.now();
+        if (remaining <= 0) break;
+        let timer;
+        const settled = Promise.allSettled(animations.map((animation) => animation.finished));
+        const timedOut = new Promise((resolve) => {
+            timer = setTimeout(() => resolve('timeout'), remaining);
+        });
+        const winner = await Promise.race([settled.then(() => 'settled'), timedOut]);
+        clearTimeout(timer);
+        if (winner === 'timeout') break;
+    }
 }
