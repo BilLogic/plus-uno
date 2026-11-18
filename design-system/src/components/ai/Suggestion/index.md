@@ -10,11 +10,11 @@ Also asked as: ai chip.
 
 **Governed by:** Indicators (`ds guide indicators`)
 
-**Source:** `design-system/src/components/labels/Suggestion/Suggestion.jsx`
+**Source:** `design-system/src/components/ai/Suggestion/Suggestion.jsx`
 
-**Stories:** `design-system/src/components/labels/Suggestion/Suggestion.stories.jsx` — Types, InATagRow, Callbacks, StateLayers, FocusRing, DisabledBesideTags, AcceptIntoTags, Interactive, Rest, Hovered, Pressed, Focused, Disabled
+**Stories:** `design-system/src/components/ai/Suggestion/Suggestion.stories.jsx` — Types, InATagRow, Callbacks, StateLayers, FocusRing, DisabledBesideTags, AcceptIntoTags, Interactive, Rest, Hovered, Pressed, Focused, Disabled
 
-**Storybook page:** `design-system/src/components/labels/Suggestion/Suggestion.mdx`
+**Storybook page:** `design-system/src/components/ai/Suggestion/Suggestion.mdx`
 
 **Motion:** enter `appearance.fast` · exit `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
@@ -96,7 +96,7 @@ Don't: A Tag styled as a suggestion is not a button, so nobody can accept it wit
 
 - For a value already in the field, use `Tag`, inside a `TagGroup`.
 
-Same group: `AiMessage` · `ChangeTag` · `CompetencyTag` · `CountTag` · `DateTag` · `PromptStarters` · `StatusTag` · `Tag` · `TagGroup`
+Same group: `AiIcon` · `AiMessage` · `GenerativeBorder` · `PromptInput` · `PromptStarters`
 
 ## Parts
 
@@ -157,7 +157,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 `--body-sm` · `--border-width-default` · `--ds-background-disabled` · `--ds-background-discovery` · `--ds-background-discovery-hovered` · `--ds-border` · `--ds-border-discovery` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-discovery` · `--ds-text-disabled` · `--ds-text-discovery` · `--focus-ring-width` · `--icon-sm` · `--pad-x-xs` · `--plus-suggestion-height` · `--radius-md` · `--stack-sm`
 
-From `design-system/src/components/labels/Suggestion/Suggestion.scss`. Override these through the token layer, never with a literal.
+From `design-system/src/components/ai/Suggestion/Suggestion.scss`. Override these through the token layer, never with a literal.
 
 ## Figma
 

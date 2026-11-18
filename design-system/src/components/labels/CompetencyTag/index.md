@@ -81,7 +81,7 @@ spelling; the aliases exist for content written before it changed.
 - `Tag`: use when configuring selection, removal, links or elevation on a `CompetencyTag`.
 - `TagGroup`: use when laying out a set of competency tags with shared spacing and overflow.
 
-Same group: `AiMessage` · `ChangeTag` · `CountTag` · `DateTag` · `PromptStarters` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `ChangeTag` · `CountTag` · `DateTag` · `StatusTag` · `Tag` · `TagGroup`
 
 ## Parts
 

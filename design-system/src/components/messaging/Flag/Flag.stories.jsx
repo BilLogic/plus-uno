@@ -555,7 +555,7 @@ const STACK_SLOT = { position: 'relative', width: 420 /* token gap: 420px */, he
 const ClosingStack = ({ reducedMotion }) => {
     const [middleOpen, setMiddleOpen] = useState(true);
     return (
-        <div style={{ position: 'relative', display: 'flex', gap: 'var(--section-stack-lg)', height: 360 /* token gap: 360px */ }}>
+        <div style={{ position: 'relative', display: 'flex', gap: 'var(--inline-2xl)', height: 360 /* token gap: 360px */ }}>
             <div style={STACK_SLOT}>
                 <FlagGroup position="top-start" containerPosition="absolute" reducedMotion={reducedMotion} data-testid="stack-three">
                     <Flag title="First" autohide={false} data-testid="three-first" />

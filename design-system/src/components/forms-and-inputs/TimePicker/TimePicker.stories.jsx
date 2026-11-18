@@ -54,7 +54,7 @@ export const Overview = () => (
 );
 
 export const Spacing = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--width-1400)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--width-1400)' }}>
         <div>
             <DemoLabel>DEFAULT (40)</DemoLabel>
             <TimePicker spacing="default" aria-label="Time" placeholder="Default" />
@@ -75,7 +75,7 @@ Spacing.play = async ({ canvasElement }) => {
 };
 
 export const InteractionStates = () => (
-    <div style={{ display: 'flex', gap: 'var(--section-stack-lg)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+    <div style={{ display: 'flex', gap: 'var(--stack-2xl) var(--inline-2xl)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div>
             <DemoLabel>DEFAULT</DemoLabel>
             <TimePicker aria-label="Time" placeholder="Default" />
@@ -111,12 +111,12 @@ export const PickTime = () => {
 
     return (
         <div style={{ maxWidth: 'var(--width-1400)' }}>
-            <h6 style={{ marginBottom: 'var(--section-stack-md)' }}>Set a reminder time</h6>
+            <h6 style={{ marginBottom: 'var(--stack-xl)' }}>Set a reminder time</h6>
             <TimePicker aria-label="Reminder time" value={value} onChange={setValue} />
             {value && (
                 <div
                     style={{
-                        marginTop: 'var(--section-stack-md)',
+                        marginTop: 'var(--stack-xl)',
                         padding: 'var(--pad-x-md)',
                         backgroundColor: 'var(--ds-surface-sunken)',
                         borderRadius: 'var(--radius-md)',

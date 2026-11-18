@@ -108,7 +108,7 @@ export const Variants = () => {
     });
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--size-5400)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--size-5400)' }}>
             <div>
                 <span style={{ display: 'block', marginBottom: 'var(--space-050)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Radio (one per row)</span>
                 <ChoiceGrid
@@ -143,7 +143,7 @@ export const Variants = () => {
 
 export const Layout = () => (
     <div style={{ maxWidth: 'var(--size-5400)' }}>
-        <p className="body-default" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--section-stack-md)' }}>
+        <p className="body-default" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--stack-xl)' }}>
             Multiple rows share the same columns; each row tracks its own selection.
         </p>
         <ChoiceGrid
@@ -168,7 +168,7 @@ export const Layout = () => (
 
 /** `size` sets the option-label font and the control width that goes with it. */
 export const Size = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--size-5400)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--size-5400)' }}>
         {[12, 14, 16].map((size) => (
             <div key={size}>
                 <span style={{ display: 'block', marginBottom: 'var(--space-050)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{size}</span>
@@ -215,7 +215,7 @@ export const TwoGridsWithoutIds = () => {
     const [first, setFirst] = useState({});
     const [second, setSecond] = useState({});
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--size-5400)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--size-5400)' }}>
             <ChoiceGrid
                 type="radio"
                 rows={singleRow}

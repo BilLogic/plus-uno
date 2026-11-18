@@ -65,7 +65,7 @@ The logo has two parts: the logomark and the wordmark. Together they form the lo
 The logomark ships in fixed heights: 16, 20, 24, 32, 48, 64 and 96. At 24 and below it uses a heavier small-size drawing so the plus stays open. Pick a step; never scale an instance by hand.
 
 <FoundationExample>
-<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--section-stack-lg)' }}>
+<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--stack-2xl) var(--inline-2xl)' }}>
     {LOGO_SIZES.map((s) => (
         <figure key={s} style={{ margin: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--stack-sm)' }}>
             <Mark size={s} />
@@ -91,7 +91,7 @@ The logomark is drawn on a 12 by 12 unit square (1 unit = 8 of the 96 drawing co
 
 Choose the color option for the ground the logo sits on.
 
-<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)' }}>
+<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--stack-xl) var(--inline-xl)' }}>
     <Ground token="--ds-surface" caption="Colored, on a light surface."><Mark color="colored" size={64} wordmark /></Ground>
     <Ground token="--ds-surface" mode="dark" caption="Colored dark, with stronger glows, on a dark ground."><Mark color="colored-dark" size={64} wordmark /></Ground>
     <Ground token="--ds-surface" caption="Filled, on a light ground."><Mark color="filled" size={64} wordmark /></Ground>

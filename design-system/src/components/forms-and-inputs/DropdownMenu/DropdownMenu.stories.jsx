@@ -366,7 +366,7 @@ export const OpenMenuEdge = {
 export const BestPracticesLive = {
     parameters: { docs: { disable: true } },
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)' }}>
             <DoDontPair
                 doExample={<OrderDo />}
                 doCaption="Delete sits last, after the common actions."

@@ -6,11 +6,11 @@ An assistant reply, marked as AI by the small AI icon at its start (named "AI" f
 
 **Import:** `import { AiMessage } from '@/components';`
 
-**Source:** `design-system/src/components/labels/AiMessage/AiMessage.jsx`
+**Source:** `design-system/src/components/ai/AiMessage/AiMessage.jsx`
 
-**Stories:** `design-system/src/components/labels/AiMessage/AiMessage.stories.jsx` — Message, Streaming, TypingIndicator, TypedOut, WithParts, Interactive, WithSources, WithMarkdown, WithFeedback
+**Stories:** `design-system/src/components/ai/AiMessage/AiMessage.stories.jsx` — Message, Streaming, TypingIndicator, TypedOut, WithParts, Interactive, WithSources, WithMarkdown, WithFeedback
 
-**Storybook page:** `design-system/src/components/labels/AiMessage/AiMessage.mdx`
+**Storybook page:** `design-system/src/components/ai/AiMessage/AiMessage.mdx`
 
 **Motion:** change `appearance.fast` · ready `appearance.fast`, sound `sound.ai.ready` · strong `appearance.fast`, sound `sound.ai.strong` · refine `appearance.fast`, sound `sound.ai.refine`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
@@ -88,7 +88,7 @@ Don't: A finished answer with no way to rate it.
 - `PromptInput`, which sends the message.
 - AI sources and AI feedback, which sit under a finished reply.
 
-Same group: `ChangeTag` · `CompetencyTag` · `CountTag` · `DateTag` · `PromptStarters` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `AiIcon` · `GenerativeBorder` · `PromptInput` · `PromptStarters` · `Suggestion`
 
 ## Parts
 
@@ -154,8 +154,8 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-sm` · `--code-default` · `--ds-background-neutral` · `--ds-motion-loop` · `--ds-motion-loop-duration` · `--ds-text` · `--ds-text-subtle` · `--heading-xs` · `--icon-md` · `--inline-md` · `--inline-sm` · `--pad-x-lg` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-md` · `--plus-ai-message-caret` · `--plus-ai-message-dot` · `--radius-full` · `--radius-md` · `--radius-sm` · `--stack-md` · `--stack-sm`
+`--ai-message-caret-width` · `--ai-message-dot-size` · `--body-default` · `--body-sm` · `--code-default` · `--ds-background-neutral` · `--ds-motion-loop` · `--ds-motion-loop-duration` · `--ds-text` · `--ds-text-subtle` · `--heading-xs` · `--icon-md` · `--inline-md` · `--inline-sm` · `--pad-x-lg` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-md` · `--plus-ai-message-caret` · `--plus-ai-message-dot` · `--radius-full` · `--radius-md` · `--radius-sm` · `--stack-md` · `--stack-sm`
 
-From `design-system/src/components/labels/AiMessage/AiMessage.scss`. Override these through the token layer, never with a literal.
+From `design-system/src/components/ai/AiMessage/AiMessage.scss`. Override these through the token layer, never with a literal.
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

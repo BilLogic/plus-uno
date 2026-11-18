@@ -95,7 +95,7 @@ Don't: A finished task left as a brand bar.
 - `ProgressRing`: use when showing determinate progress in a compact circular slot.
 - `ProgressTracker`: use when showing discrete named steps in a multi-step flow.
 
-Same group: `GenerativeBorder` · `ProgressRing` · `Skeleton` · `Spinner`
+Same group: `ProgressRing` · `Skeleton` · `Spinner`
 
 ## Parts
 

@@ -121,7 +121,7 @@
       "Visually hidden"
     ]
   },
-  "$aiComponentsComment": "AI components: titled AI UI/Components/<name>, folder stays under its category (check:storybook-categories).",
+  "$aiComponentsComment": "AI components: titled AI UI/Components/<name>, folder lives under components/ai/ (check:storybook-categories).",
   "$rootSourcesComment": "Source folders (or file prefixes) of each shared root. A page titled under one of these roots sits in one of its sources, and a page in a source is titled under that root (check:storybook-categories).",
   "rootSources": {
     "Templates": [

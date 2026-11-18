@@ -103,7 +103,7 @@ Overview.parameters = {
 
 export const Content = () => (
     <div style={{ maxWidth: 'var(--size-5400)' }}>
-        <p className="body-default" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--section-stack-md)' }}>
+        <p className="body-default" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--stack-xl)' }}>
             Label, minority marker, accepted formats, and button copy.
         </p>
         <FileUpload

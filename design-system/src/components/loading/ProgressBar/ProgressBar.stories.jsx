@@ -22,7 +22,7 @@ export default {
     },
 };
 
-const col = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' };
+const col = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' };
 
 export const Overview = () => (
     <div style={{ width: '100%', minWidth: '200px' /* token gap: 200px */, maxWidth: '100%' }}>

@@ -152,6 +152,10 @@
     /* AI chat */
     --ai-chat-width: var(--width-2500);
 
+    /* AI message */
+    --ai-message-caret-width: var(--space-0125);
+    --ai-message-dot-size: var(--space-0375);
+
     /* Inbox */
     --inbox-width: calc(var(--width-2000) + var(--space-250)); /* 360px */
 

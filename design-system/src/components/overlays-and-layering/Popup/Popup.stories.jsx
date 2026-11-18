@@ -63,7 +63,7 @@ const col = { display: 'flex', flexDirection: 'column', gap: 'calc(var(--section
 
 function PopupLayoutDemos() {
     return (
-        <section style={{ display: 'flex', gap: 'var(--section-stack-lg)', flexWrap: 'wrap', justifyContent: 'center' }}>
+        <section style={{ display: 'flex', gap: 'var(--inline-2xl)', flexWrap: 'wrap', justifyContent: 'center' }}>
             <Popup
                 trigger={<Button text="Session note on top" />}
                 placement="top"
@@ -114,7 +114,7 @@ function PopupInteractionStatesDemos() {
     return (
         <section>
             <DemoLabel>TRIGGER TYPES</DemoLabel>
-            <div style={{ display: 'flex', gap: 'var(--grid-gutter)', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 'var(--inline-xl)', flexWrap: 'wrap' }}>
                 <Popup
                     trigger={<Button text="Click for session details (default)" appearance="primary" />}
                     triggerType="click"

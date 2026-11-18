@@ -1,10 +1,10 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { IconButton } from '../IconButton/IconButton';
-import useFieldId from '../useFieldId';
-import FieldBox from '../_internal/FieldBox';
-import { FieldFrame } from '../_internal/FieldFrame';
-import GenerativeBorder from '@/components/loading/GenerativeBorder';
+import { IconButton } from '../../forms-and-inputs/IconButton/IconButton';
+import useFieldId from '../../forms-and-inputs/useFieldId';
+import FieldBox from '../../forms-and-inputs/_internal/FieldBox';
+import { FieldFrame } from '../../forms-and-inputs/_internal/FieldFrame';
+import GenerativeBorder from '../GenerativeBorder';
 import './PromptInput.scss';
 
 /**
