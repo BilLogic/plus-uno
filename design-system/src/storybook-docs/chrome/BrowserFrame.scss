@@ -1,5 +1,5 @@
-// Docs-only window chrome for Storybook. Color tokens and the x16
-// primitives only; the traffic lights are the one macOS-fixed artwork, drawn
+// Docs-only window chrome for Storybook. App color, semantic and spacing
+// tokens only; the traffic lights are the one macOS-fixed artwork, drawn
 // from the accent tokens. The outline is an outline, not a border, so the
 // page inside keeps its width and left edge.
 .plus-browser-frame {
@@ -7,8 +7,8 @@
     flex-direction: column;
     width: 100%;
     background: var(--ds-surface);
-    outline: var(--stroke-1) solid var(--ds-border);
-    outline-offset: calc(-1 * var(--stroke-1));
+    outline: var(--border-width-default) solid var(--ds-border);
+    outline-offset: calc(-1 * var(--border-width-default));
     border-radius: var(--radius-xl);
     overflow: hidden;
 }
@@ -34,12 +34,12 @@
 
 .plus-browser-frame__lights {
     display: flex;
-    gap: var(--space-050);
-    padding-inline: var(--space-0125) var(--space-025);
+    gap: var(--inline-md);
+    padding-inline: var(--pad-y-sm) var(--pad-x-xs);
 
     b {
-        width: var(--space-075);
-        height: var(--space-075);
+        width: var(--icon-sm);
+        height: var(--icon-sm);
         border-radius: var(--radius-full);
         background: var(--ds-background-accent-red-bolder);
     }
@@ -50,9 +50,9 @@
 .plus-browser-frame__tabs {
     display: flex;
     align-items: flex-end;
-    gap: var(--space-075);
-    height: var(--size-250);
-    padding-inline: var(--space-075);
+    gap: var(--inline-lg);
+    height: var(--height-250);
+    padding-inline: var(--pad-x-md);
     background: var(--ds-surface-sunken);
 
     .plus-browser-frame__lights,
@@ -62,10 +62,10 @@
 .plus-browser-frame__tab {
     display: flex;
     align-items: center;
-    gap: var(--space-050);
-    width: var(--size-1500);
-    height: var(--size-200);
-    padding-inline: var(--space-075);
+    gap: var(--inline-md);
+    width: var(--width-1500);
+    height: var(--height-200);
+    padding-inline: var(--pad-x-md);
     background: var(--ds-surface);
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
@@ -88,17 +88,17 @@
 .plus-browser-frame__toolbar {
     display: flex;
     align-items: center;
-    gap: var(--space-075);
-    height: var(--size-250);
-    padding-inline: var(--space-075);
+    gap: var(--inline-lg);
+    height: var(--height-250);
+    padding-inline: var(--pad-x-md);
     background: var(--ds-surface);
-    border-bottom: var(--stroke-1) solid var(--ds-border);
+    border-bottom: var(--border-width-default) solid var(--ds-border);
 }
 
 .plus-browser-frame__toolbar--safari {
-    gap: var(--space-100);
-    height: var(--size-300);
-    padding-inline: var(--space-100);
+    gap: var(--grid-gutter);
+    height: var(--height-300);
+    padding-inline: var(--pad-x-lg);
     background: var(--ds-surface-sunken);
 }
 
@@ -106,9 +106,9 @@
     flex: 1;
     display: flex;
     align-items: center;
-    gap: var(--space-050);
-    height: var(--size-200);
-    padding-inline: var(--space-100);
+    gap: var(--inline-md);
+    height: var(--height-200);
+    padding-inline: var(--pad-x-lg);
     border-radius: var(--radius-full);
     background: var(--ds-background-input);
     font: var(--body-default);
@@ -120,13 +120,13 @@
 }
 
 .plus-browser-frame__field {
-    flex: 0 1 var(--size-3000);
+    flex: 0 1 var(--width-3000);
     margin-inline: auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-050);
-    height: var(--size-200);
+    gap: var(--inline-md);
+    height: var(--height-200);
     border-radius: var(--radius-lg);
     background: var(--ds-background-neutral);
     font: var(--body-default);
@@ -134,7 +134,7 @@
 
 .plus-browser-frame__tools {
     display: flex;
-    gap: var(--space-100);
+    gap: var(--grid-gutter);
 }
 
 // Edge: Chrome's layout with rounder tabs and a pill address bar.

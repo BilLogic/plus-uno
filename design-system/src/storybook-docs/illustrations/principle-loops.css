@@ -49,7 +49,7 @@
 [data-principle-loop] {
     --loop-cycle: calc(var(--ds-motion-spatial-default-duration) * 10);
     position: relative;
-    height: calc(var(--space-100) * 9);
+    height: calc(var(--height-100) * 9);
     background: var(--ds-surface-sunken);
     overflow: hidden;
 }
@@ -65,9 +65,9 @@
 [data-loop='responsive'] .loop-press {
     inset-block-start: 50%;
     inset-inline-start: 50%;
-    width: var(--space-500);
-    height: var(--space-500);
-    margin: calc(var(--space-250) * -1) 0 0 calc(var(--space-250) * -1);
+    width: var(--width-500);
+    height: var(--height-500);
+    margin: calc(var(--height-500) / -2) 0 0 calc(var(--width-500) / -2);
     border-radius: var(--radius-full);
     background: var(--ds-background-brand-bold);
     animation-name: loop-press;
@@ -76,11 +76,11 @@
 [data-loop='responsive'] .loop-ring {
     inset-block-start: 50%;
     inset-inline-start: 50%;
-    width: var(--space-500);
-    height: var(--space-500);
-    margin: calc(var(--space-250) * -1) 0 0 calc(var(--space-250) * -1);
+    width: var(--width-500);
+    height: var(--height-500);
+    margin: calc(var(--height-500) / -2) 0 0 calc(var(--width-500) / -2);
     border-radius: var(--radius-full);
-    border: var(--stroke-2) solid var(--ds-border-brand);
+    border: var(--border-width-selected) solid var(--ds-border-brand);
     opacity: 0;
     animation-name: loop-ring;
 }
@@ -97,16 +97,16 @@
 
 /* Build understanding: a Panel leaves and returns by the edge it came from. */
 [data-loop='understanding'] .loop-bar {
-    inset-inline-start: var(--space-300);
-    height: var(--space-150);
+    inset-inline-start: 48px; /* docs-literal: token gap: 48px */
+    height: var(--height-150);
     border-radius: var(--radius-sm);
     background: var(--ds-skeleton);
 }
-[data-loop='understanding'] .loop-bar--a { inset-block-start: var(--space-300); width: 40%; }
-[data-loop='understanding'] .loop-bar--b { inset-block-start: var(--space-500); width: 30%; }
+[data-loop='understanding'] .loop-bar--a { inset-block-start: 48px; /* docs-literal: token gap: 48px */ width: 40%; }
+[data-loop='understanding'] .loop-bar--b { inset-block-start: var(--height-500); width: 30%; }
 [data-loop='understanding'] .loop-panel {
-    inset-block: var(--space-200);
-    inset-inline-end: var(--space-200);
+    inset-block: var(--section-pad-y-spacious);
+    inset-inline-end: var(--section-pad-x-spacious);
     width: 36%;
     border-radius: var(--radius-md);
     background: var(--ds-background-brand-bold);
@@ -122,9 +122,9 @@
 [data-loop='empathy'] .loop-win,
 [data-loop='empathy'] .loop-miss {
     inset-block-start: 50%;
-    width: var(--space-500);
-    height: var(--space-500);
-    margin-top: calc(var(--space-300) * -1);
+    width: var(--width-500);
+    height: var(--height-500);
+    margin-top: -48px; /* docs-literal: token gap: -48px */
 }
 [data-loop='empathy'] .loop-win {
     inset-inline-start: 22%;
@@ -145,7 +145,7 @@
     40%, 100% { transform: scale(1); opacity: 1; }
 }
 @keyframes loop-miss {
-    0%, 45% { opacity: 0; transform: translateY(calc(var(--space-050) * -1)); }
+    0%, 45% { opacity: 0; transform: translateY(calc(var(--stack-md) * -1)); }
     75%, 100% { opacity: 1; transform: translateY(0); }
 }
 
@@ -160,11 +160,11 @@
     animation-timing-function: var(--ds-motion-appearance-default);
 }
 [data-loop='simplicity'] .loop-group > i {
-    --from: 0 calc(var(--space-050) * -1);
+    --from: 0 calc(var(--stack-md) * -1);
     display: block;
     position: absolute;
     inset-inline-start: 0;
-    height: var(--space-150);
+    height: var(--height-150);
     border-radius: var(--radius-sm);
     background: var(--ds-background-brand-bold);
     animation-duration: var(--loop-cycle);

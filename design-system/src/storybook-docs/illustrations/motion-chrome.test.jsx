@@ -96,4 +96,9 @@ describe('Motion demo tiles', () => {
         await waitFor(() => expect(root.dataset.phase).toBe('still'), { timeout: 5000 });
         expect(seenX.every((x) => x === 0 || x === 100)).toBe(true);
     });
+
+    it('reads no numbered primitive tokens in motion-library-subjects.jsx', () => {
+        const subjects = readFileSync(join(__dirname, '..', 'motion-library-subjects.jsx'), 'utf8');
+        expect(subjects).not.toMatch(/var\(\s*--(?:space|radius|size|stroke)-\d/);
+    });
 });
