@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { PresenceSlot } from '@/lib/listMotion';
 import CloseButton from '@/components/forms-and-inputs/CloseButton';
 import { headingTag } from '@/lib/headingLevel';
 import { messageIcon } from '../messageAppearance';
@@ -54,8 +55,6 @@ const SectionMessage = ({
 }) => {
     const [show, setShow] = useState(true);
 
-    if (!show) return null;
-
     const handleClose = () => {
         setShow(false);
         if (onDismiss) onDismiss();
@@ -77,54 +76,56 @@ const SectionMessage = ({
     const visual = icon === true ? (SECTION_MESSAGE_ICONS[sectionMessageAppearance] ?? SECTION_MESSAGE_ICONS.primary) : icon;
 
     return (
-        <div
-            id={id}
-            role="alert"
-            className={`plus-section-message ${sectionMessageAppearance} ${className}`}
-            {...props}
-        >
-            {visual !== false && visual != null && (
-                <div className="plus-section-message-leading" aria-hidden="true">
-                    {strut}
-                    {typeof visual === 'string'
-                        ? <Icon name={visual} className="plus-section-message-leading-icon" />
-                        : <span className="plus-section-message-leading-icon">{visual}</span>}
-                </div>
-            )}
+        <PresenceSlot show={show}>
+            <div
+                id={id}
+                role="alert"
+                className={`plus-section-message ${sectionMessageAppearance} ${className}`}
+                {...props}
+            >
+                {visual !== false && visual != null && (
+                    <div className="plus-section-message-leading" aria-hidden="true">
+                        {strut}
+                        {typeof visual === 'string'
+                            ? <Icon name={visual} className="plus-section-message-leading-icon" />
+                            : <span className="plus-section-message-leading-icon">{visual}</span>}
+                    </div>
+                )}
 
-            <div className="plus-section-message-content">
-                {title && <HeadingTag className="plus-section-message-title">{title}</HeadingTag>}
-                <div className="plus-section-message-text">{children}</div>
-                {actions && actions.length > 0 && (
-                    <div className="plus-section-message-actions">
-                        {actions.map((action, index) => {
-                            const ActionTag = action.href ? 'a' : 'button';
-                            return (
-                                <React.Fragment key={action.text}>
-                                    {index > 0 && <span className="plus-section-message-actions-divider" aria-hidden="true" />}
-                                    <ActionTag
-                                        type={action.href ? undefined : 'button'}
-                                        className="plus-section-message-action"
-                                        href={action.href}
-                                        target={action.target}
-                                        onClick={action.onClick}
-                                    >
-                                        {action.text}
-                                    </ActionTag>
-                                </React.Fragment>
-                            );
-                        })}
+                <div className="plus-section-message-content">
+                    {title && <HeadingTag className="plus-section-message-title">{title}</HeadingTag>}
+                    <div className="plus-section-message-text">{children}</div>
+                    {actions && actions.length > 0 && (
+                        <div className="plus-section-message-actions">
+                            {actions.map((action, index) => {
+                                const ActionTag = action.href ? 'a' : 'button';
+                                return (
+                                    <React.Fragment key={action.text}>
+                                        {index > 0 && <span className="plus-section-message-actions-divider" aria-hidden="true" />}
+                                        <ActionTag
+                                            type={action.href ? undefined : 'button'}
+                                            className="plus-section-message-action"
+                                            href={action.href}
+                                            target={action.target}
+                                            onClick={action.onClick}
+                                        >
+                                            {action.text}
+                                        </ActionTag>
+                                    </React.Fragment>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+
+                {dismissible && (
+                    <div className="plus-section-message-dismiss">
+                        {strut}
+                        <CloseButton label="Dismiss message" onClick={handleClose} />
                     </div>
                 )}
             </div>
-
-            {dismissible && (
-                <div className="plus-section-message-dismiss">
-                    {strut}
-                    <CloseButton label="Dismiss message" onClick={handleClose} />
-                </div>
-            )}
-        </div>
+        </PresenceSlot>
     );
 };
 

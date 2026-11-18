@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
+import { expectOverlayExit, settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
 import { DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
@@ -79,7 +80,19 @@ export const WithMedia = () => (
             <SpotlightTarget><Button text="Session prep" /></SpotlightTarget>
             <Spotlight
                 headline="See session prep in action"
-                media={<img src="https://placehold.co/295x135" alt="" />}
+                media={(
+                    <svg
+                        viewBox="0 0 295 135"
+                        aria-hidden="true"
+                        style={{ width: '100%', height: '100%', display: 'block', background: 'var(--ds-surface-raised)' }}
+                    >
+                        <rect x="20" y="20" width="140" height="14" rx="4" fill="var(--ds-background-brand-subtlest)" />
+                        <rect x="20" y="46" width="255" height="10" rx="4" fill="var(--ds-background-neutral)" />
+                        <rect x="20" y="64" width="215" height="10" rx="4" fill="var(--ds-background-neutral)" />
+                        <rect x="20" y="88" width="96" height="26" rx="6" fill="var(--ds-background-brand-bold)" />
+                        <rect x="124" y="88" width="84" height="26" rx="6" fill="var(--ds-background-neutral)" />
+                    </svg>
+                )}
                 primaryAction={<SpotlightAction appearance="primary">Got it</SpotlightAction>}
             >
                 A short preview of the session prep view.
@@ -345,4 +358,55 @@ export const BestPracticesLive = {
         await userEvent.click(within(cards[4]).getByRole('button', { name: 'Calendar' }));
         await waitFor(() => expect(within(cards[4]).getByRole('link', { name: 'Learn more' })).toBeVisible());
     },
+};
+
+function SpotlightMotionDemo() {
+    const [open, setOpen] = useState(false);
+    return (
+        <SpotlightProvider>
+            <div style={calloutCanvas}>
+                <SpotlightTarget>
+                    <Button text="Open spotlight" onClick={() => setOpen(true)} />
+                </SpotlightTarget>
+                <Spotlight
+                    isOpen={open}
+                    headline="Warm-up notes added"
+                    onDismiss={() => setOpen(false)}
+                    primaryAction={<SpotlightAction appearance="primary" onClick={() => setOpen(false)}>Got it</SpotlightAction>}
+                >
+                    See what your student practiced before the session.
+                </Spotlight>
+            </div>
+        </SpotlightProvider>
+    );
+}
+
+const spotlightMotionPlay = (reduced = false) => async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const docBody = canvasElement.ownerDocument.body;
+    await userEvent.click(canvas.getByRole('button', { name: 'Open spotlight' }));
+    const popup = await waitFor(() => {
+        const el = docBody.querySelector('.plus-spotlight');
+        if (!el) throw new Error('Spotlight not open yet');
+        return el;
+    });
+    if (reduced) {
+        await expect(popup).toHaveAttribute('data-reduced', 'true');
+        await expect(getComputedStyle(popup).animationName).toBe('none');
+    } else {
+        await expect(getComputedStyle(popup).animationName).toContain('plus-overlay-scale-in');
+    }
+    await settleAnimations(docBody);
+    await expectOverlayExit(popup, () => userEvent.click(within(popup).getByRole('button', { name: 'Got it' })), reduced);
+};
+
+export const MotionOpenAndClose = {
+    render: () => <SpotlightMotionDemo />,
+    play: spotlightMotionPlay(false),
+};
+
+export const MotionReduced = {
+    decorators: [withReducedMotion],
+    render: () => <SpotlightMotionDemo />,
+    play: spotlightMotionPlay(true),
 };

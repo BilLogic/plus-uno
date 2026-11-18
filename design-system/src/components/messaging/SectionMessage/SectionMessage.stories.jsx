@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
-import { expect, userEvent, within } from 'storybook/test';
+import { settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { contrastRatio, paintedOver } from '@/storybook-docs/lib/contrast.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { Button } from '@/components';
+import { PresenceSlot } from '@/lib/listMotion';
 import SectionMessage, { SECTION_MESSAGE_ICONS, SECTION_MESSAGE_APPEARANCES } from './SectionMessage';
 import { iconClass } from '../../../lib/icon';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
@@ -79,7 +82,7 @@ const GROUND_TOKEN = {
     info: '--ds-background-information',
 };
 
-const sectionMessageCol = { display: 'flex', flexDirection: 'column', gap: '48px' /* token gap: 48px */ };
+const sectionMessageCol = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' };
 const contentVariantCol = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' };
 
 function SectionMessageContentDemos() {
@@ -245,10 +248,11 @@ DismissPlacement.play = async ({ canvasElement }) => {
         await expect(Math.abs(center - line.center), `${id}: × is centered on the first line`).toBeLessThanOrEqual(1);
     }
 
-    // Dismissal is unchanged: the button removes its message.
+    // Dismissal is unchanged: the button removes its message after the exit finishes.
     const body = canvas.getByTestId('placement-body');
     await userEvent.click(within(body).getByRole('button', { name: 'Dismiss message' }));
-    await expect(canvas.queryByTestId('placement-body')).toBeNull();
+    await waitFor(() => expect(canvas.queryByTestId('placement-body')).toBeNull());
+    await settleAnimations(canvasElement);
 };
 
 
@@ -358,7 +362,8 @@ LeadingIcon.play = async ({ canvasElement }) => {
 
     // The × is unchanged beside the icon: it still dismisses its message.
     await userEvent.click(within(none).getByRole('button', { name: 'Dismiss message' }));
-    await expect(canvas.queryByTestId('icon-none')).toBeNull();
+    await waitFor(() => expect(canvas.queryByTestId('icon-none')).toBeNull());
+    await settleAnimations(canvasElement);
 };
 
 /**
@@ -498,4 +503,59 @@ export const Focused = {
 const radiusOf = (root, selector) => getComputedStyle(root.querySelector(selector)).borderTopLeftRadius;
 Overview.play = async ({ canvasElement }) => {
     await expect(radiusOf(canvasElement, '.plus-section-message'), 'Section message radius is 12').toBe('12px');
+};
+
+function SectionMessageMotionDemo() {
+    const [visible, setVisible] = useState(false);
+    const [instanceKey, setInstanceKey] = useState(0);
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', alignItems: 'flex-start' }}>
+            <Button
+                text={visible ? 'Hide notice' : 'Show notice'}
+                onClick={() => {
+                    if (!visible) setInstanceKey((k) => k + 1);
+                    setVisible((v) => !v);
+                }}
+            />
+            <PresenceSlot show={visible}>
+                <SectionMessage
+                    key={instanceKey}
+                    appearance="info"
+                    title="Session reminder"
+                    onDismiss={() => setVisible(false)}
+                >
+                    Maya K. joins at 4:00 PM ET for Grade 7 math at Lincoln Middle.
+                </SectionMessage>
+            </PresenceSlot>
+        </div>
+    );
+}
+
+export const MotionEnterAndExit = {
+    render: () => <SectionMessageMotionDemo />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await userEvent.click(canvas.getByRole('button', { name: 'Show notice' }));
+        await waitFor(() => expect(canvas.getByRole('alert')).toBeVisible());
+        await settleAnimations(canvasElement);
+
+        await userEvent.click(canvas.getByRole('button', { name: 'Dismiss message' }));
+        await waitFor(() => expect(canvas.queryByRole('alert')).toBeNull());
+        await settleAnimations(canvasElement);
+    },
+};
+
+export const MotionReduced = {
+    decorators: [withReducedMotion],
+    render: () => <SectionMessageMotionDemo />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await userEvent.click(canvas.getByRole('button', { name: 'Show notice' }));
+        await waitFor(() => expect(canvas.getByRole('alert')).toBeVisible());
+        await settleAnimations(canvasElement);
+
+        await userEvent.click(canvas.getByRole('button', { name: 'Dismiss message' }));
+        await waitFor(() => expect(canvas.queryByRole('alert')).toBeNull());
+        await settleAnimations(canvasElement);
+    },
 };
