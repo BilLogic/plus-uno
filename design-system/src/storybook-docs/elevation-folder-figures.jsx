@@ -1,8 +1,24 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Button } from '@/components';
 import { settleMsOf, springBack } from '@/lib/damping';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { Illustration } from '@/storybook-docs/illustrations/Illustration.jsx';
-import { Layer, Rule, SkeletonBar } from '@/storybook-docs/illustrations/primitives.jsx';
+import {
+    Blanket,
+    ButtonShape,
+    CardBox,
+    Frame,
+    Layer,
+    Modal,
+    Page,
+    Popup,
+    Row,
+    Rule,
+    Section,
+    Sidebar,
+    SkeletonBar,
+    StickyHeader,
+} from '@/storybook-docs/illustrations/primitives.jsx';
 import { CORNER, HAIRLINE, PAINT } from '@/storybook-docs/illustrations/paint.js';
 import { staggerDelays } from '@/storybook-docs/illustrations/motion-choreography.jsx';
 import { TURN, turnPoint, turnTransform } from '@/storybook-docs/lib/iso-turn.js';
@@ -79,7 +95,6 @@ const useVarsOn = (ref, names) => {
 const ISO_PAD = 14;
 const CLIMB = -turnPoint(0, 0, PLATE.w, 0).y;
 const TICK_Y = 64;
-const RISE = 24;
 const LABEL_W = 240;
 const NARROW_PX = 560;
 
@@ -97,7 +112,8 @@ const PlateOutline = ({ x = 0, y = 0, w = PLATE.w, h = PLATE.h, corner = 'window
     />
 );
 
-const usePlateRise = (ref, count) => {
+/** Fades each plate in place on the appearance spring; settles immediately under reduced motion. */
+const usePlateFade = (ref, count) => {
     const reduced = useReducedMotion();
     const [offsets, setOffsets] = useState(() => Array.from({ length: count }, () => (reduced ? 0 : 1)));
     useEffect(() => {
@@ -144,27 +160,12 @@ const useNarrowStage = (ref) => {
     return narrow;
 };
 
-const resetLabelButton = {
-    display: 'inline-flex',
-    flexWrap: 'wrap',
-    alignItems: 'baseline',
-    gap: 'var(--inline-sm)',
-    padding: 0,
-    border: 0,
-    background: 'none',
-    font: 'var(--body-default)',
-    color: 'inherit',
-    textAlign: 'start',
-    cursor: 'default',
-    borderRadius: 'var(--radius-sm)',
-};
-
 const IsometricStack = ({ testId, ariaTitle, legendLabel, plates, stepDy = 52 }) => {
     const stageRef = useRef(null);
-    const offsets = usePlateRise(stageRef, plates.length);
+    const controlRefs = useRef({});
+    const offsets = usePlateFade(stageRef, plates.length);
     const narrow = useNarrowStage(stageRef);
     const [active, setActive] = useState(plates[plates.length - 1].id);
-    const [focusRing, setFocusRing] = useState(null);
 
     const stageW = ISO_PAD + PLATE.w * TURN.scaleX + 20;
     const stageH = ISO_PAD + CLIMB + (plates.length - 1) * stepDy + PLATE.h + ISO_PAD;
@@ -173,9 +174,16 @@ const IsometricStack = ({ testId, ariaTitle, legendLabel, plates, stepDy = 52 })
 
     const placed = plates.map((plate, i) => {
         const at = plateAt(i);
-        return { ...plate, x: at.x, y: at.y + offsets[i] * RISE, opacity: 1 - offsets[i] };
+        return { ...plate, x: at.x, y: at.y, opacity: 1 - offsets[i] };
     });
     const point = (p, lx, ly) => turnPoint(p.x, p.y, lx, ly);
+
+    const selectPlate = (id, moveFocus = false) => {
+        setActive(id);
+        if (moveFocus) {
+            controlRefs.current[id]?.focus();
+        }
+    };
 
     const svgFigure = (
         <Illustration viewBox={`0 0 ${stageW} ${stageH}`} capped={false} title={ariaTitle}>
@@ -188,8 +196,9 @@ const IsometricStack = ({ testId, ariaTitle, legendLabel, plates, stepDy = 52 })
                             data-plate={plate.id}
                             data-active={on}
                             opacity={plate.opacity}
+                            style={{ cursor: 'pointer' }}
                             onMouseEnter={() => setActive(plate.id)}
-                            onClick={() => setActive(plate.id)}
+                            onClick={() => selectPlate(plate.id, true)}
                         >
                             <g data-turn="" transform={turnTransform(plate.x, plate.y)}>
                                 {plate.ground && (
@@ -240,7 +249,7 @@ const IsometricStack = ({ testId, ariaTitle, legendLabel, plates, stepDy = 52 })
                     onMouseEnter={() => setActive(plate.id)}
                     style={
                         narrow
-                            ? { margin: 0 }
+                            ? { margin: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--stack-sm)' }
                             : {
                                 position: 'absolute',
                                 insetInline: 0,
@@ -248,34 +257,35 @@ const IsometricStack = ({ testId, ariaTitle, legendLabel, plates, stepDy = 52 })
                                 transform: 'translateY(-50%)',
                                 paddingInlineStart: 'var(--inline-md)',
                                 margin: 0,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'flex-start',
+                                gap: 'var(--stack-sm)',
                             }
                     }
                 >
-                    <button
-                        type="button"
-                        aria-current={on ? 'true' : undefined}
-                        onFocus={(e) => {
-                            setActive(plate.id);
-                            setFocusRing(e.currentTarget.matches(':focus-visible') ? plate.id : null);
+                    <Button
+                        ref={(el) => {
+                            controlRefs.current[plate.id] = el;
                         }}
-                        onBlur={() => setFocusRing(null)}
-                        style={{
-                            ...resetLabelButton,
-                            color: on ? 'var(--ds-text-brand)' : 'var(--ds-text)',
-                            outline:
-                                focusRing === plate.id
-                                    ? 'var(--border-width-focused) solid var(--ds-border-focused)'
-                                    : 'none',
-                            outlineOffset: 'var(--stroke-1)',
-                        }}
-                    >
-                        <strong style={{ fontWeight: 'inherit' }}>{plate.title}</strong>
-                        {plate.subtitle && (
-                            <span style={{ color: on ? 'var(--ds-text-brand)' : 'var(--ds-text-subtle)', font: 'var(--code-default)' }}>
-                                {plate.subtitle}
-                            </span>
-                        )}
-                    </button>
+                        appearance="subtle"
+                        spacing="compact"
+                        isSelected={on}
+                        text={plate.title}
+                        onClick={() => selectPlate(plate.id)}
+                        onFocus={() => setActive(plate.id)}
+                    />
+                    {plate.subtitle && (
+                        <span
+                            style={{
+                                paddingInlineStart: 'var(--pad-x-sm)',
+                                color: on ? 'var(--ds-text-brand)' : 'var(--ds-text-subtle)',
+                                font: 'var(--code-default)',
+                            }}
+                        >
+                            {plate.subtitle}
+                        </span>
+                    )}
                 </li>
             );
         })
@@ -288,7 +298,7 @@ const IsometricStack = ({ testId, ariaTitle, legendLabel, plates, stepDy = 52 })
                 {narrow ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
                         <div style={{ width: '100%' }}>{svgFigure}</div>
-                        <ol aria-label={legendLabel} style={{ ...listStyle, display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
+                        <ol aria-label={legendLabel} style={{ ...listStyle, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
                             {labels}
                         </ol>
                     </div>
@@ -326,7 +336,7 @@ const IsometricStack = ({ testId, ariaTitle, legendLabel, plates, stepDy = 52 })
 const OVERVIEW_PLATES = [
     {
         id: 'frame',
-        title: 'Frame',
+        title: 'Layer 0 · Frame',
         subtitle: '--ds-surface-sunken',
         ground: PAINT.frameSunken,
         draw: () => (
@@ -339,7 +349,7 @@ const OVERVIEW_PLATES = [
     },
     {
         id: 'page',
-        title: 'Page',
+        title: 'Layer 1 · Page',
         subtitle: '--ds-surface',
         ground: null,
         draw: () => (
@@ -371,7 +381,7 @@ const OVERVIEW_PLATES = [
     },
     {
         id: 'navigation',
-        title: 'Navigation',
+        title: 'Layer 2 · Navigation',
         subtitle: '--ds-shadow-overflow',
         ground: null,
         dashed: true,
@@ -384,7 +394,7 @@ const OVERVIEW_PLATES = [
     },
     {
         id: 'non-blocking-overlay',
-        title: 'Non-blocking overlay',
+        title: 'Layer 3 · Non-blocking overlay',
         subtitle: '--ds-shadow-overlay',
         ground: null,
         dashed: true,
@@ -404,7 +414,7 @@ const OVERVIEW_PLATES = [
     },
     {
         id: 'blocking-overlay',
-        title: 'Blocking overlay',
+        title: 'Layer 4 · Blocking overlay',
         subtitle: '--ds-shadow-blocking',
         ground: PAINT.blanket,
         draw: () => (
@@ -413,9 +423,8 @@ const OVERVIEW_PLATES = [
                 <SkeletonBar x={46} y={24} w={38} h={4} heading />
                 <SkeletonBar x={46} y={34} w={64} h={3} />
                 <SkeletonBar x={46} y={41} w={52} h={3} />
-                <Rule x1={38} x2={122} y1={56} y2={56} stroke={PAINT.modalDivider} />
-                <SkeletonBar x={76} y={61} w={18} h={7} />
-                <SkeletonBar x={98} y={61} w={18} h={7} accent />
+                <SkeletonBar x={76} y={60} w={18} h={7} />
+                <SkeletonBar x={98} y={60} w={18} h={7} accent />
             </>
         ),
     },
@@ -425,7 +434,7 @@ const OVERVIEW_PLATES = [
 export const OverviewStack = () => (
     <IsometricStack
         testId="overview-stack"
-        ariaTitle="The five layers in stack order: Frame, Page, Navigation, Non-blocking overlay and Blocking overlay"
+        ariaTitle="The five layers in stack order: Layer 0 Frame, Layer 1 Page, Layer 2 Navigation, Layer 3 Non-blocking overlay and Layer 4 Blocking overlay"
         legendLabel="Layers, top first"
         plates={OVERVIEW_PLATES}
         stepDy={52}
@@ -502,30 +511,12 @@ export const PageSurfacesStack = () => (
 
 /* ------------------------------------------- layer & page-surface diagrams */
 
-const SkelLines = ({ widths, gap = 'var(--stack-sm)', tall = false }) => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap, minWidth: 0 }}>
-        {widths.map((w, i) => (
-            <span
-                key={i}
-                data-skeleton=""
-                style={{
-                    display: 'block',
-                    width: w,
-                    height: tall ? 'var(--space-100)' : 'var(--space-075)',
-                    borderRadius: 'var(--radius-sm)',
-                    background: 'var(--ds-skeleton)',
-                }}
-            />
-        ))}
-    </div>
-);
-
 const TokenBadge = ({ children }) => (
     <code
         style={{
             display: 'inline-flex',
             alignItems: 'center',
-            padding: 'var(--space-025) var(--inline-md)',
+            padding: 'var(--pad-y-sm) var(--pad-x-md)',
             borderRadius: 'var(--radius-md)',
             background: 'var(--ds-surface)',
             boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border)',
@@ -538,38 +529,150 @@ const TokenBadge = ({ children }) => (
     </code>
 );
 
-const HairlineRows = ({ widths }) => (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-        {widths.map((w, i) => (
-            <div
-                key={i}
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    paddingBlock: 'var(--space-075)',
-                    borderBottom: 'var(--border-width-default) solid var(--ds-border)',
-                }}
-            >
-                <div style={{ flex: 1 }}>
-                    <SkelLines widths={[w]} />
-                </div>
-            </div>
-        ))}
-    </div>
-);
+const DIAGRAM_TITLE = {
+    frame: 'Layer 0 Frame: sunken ground with the docked Sidebar',
+    page: 'Layer 1 Page: page surface beside the docked Sidebar',
+    navigation: 'Layer 2 Navigation: sticky header over scrolling rows',
+    'non-blocking-overlay': 'Layer 3 Non-blocking overlay: floating Popup over the usable Page',
+    'blocking-overlay': 'Layer 4 Blocking overlay: Modal on the Blanket over the dimmed Page',
+    'surface-default': 'Default surface: page rows and side section without a fill',
+    'surface-sunken': 'Sunken surface: subtle Section grouping static content on the Page',
+    'surface-raised': 'Raised surface: one raised focal Card beside flat Sections',
+};
+
+const drawLayerDiagram = (variant) => {
+    const shell = (pageContent, { accentFrame = false, dimSidebar = true, dimPage = false, accentPage = false } = {}) => (
+        <>
+            <Frame x={2} y={2} w={196} h={108} chrome={false} accent={accentFrame} />
+            <g opacity={dimSidebar ? 0.5 : 1}>
+                <Sidebar x={2} y={2} w={42} h={108} accent={accentFrame} />
+            </g>
+            {pageContent !== null && (
+                <Page x={44} y={2} w={154} h={108} accent={accentPage}>
+                    <g opacity={dimPage ? 0.45 : 1}>{pageContent}</g>
+                </Page>
+            )}
+        </>
+    );
+
+    if (variant === 'frame') {
+        return (
+            <>
+                <Frame x={2} y={2} w={196} h={108} chrome={false} accent />
+                <Sidebar x={2} y={2} w={42} h={108} accent />
+            </>
+        );
+    }
+
+    if (variant === 'page') {
+        return shell(
+            <>
+                <SkeletonBar x={52} y={10} w={44} h={4.5} heading />
+                <CardBox x={52} y={20} w={66} h={28} />
+                <SkeletonBar x={58} y={26} w={36} h={3.5} />
+                <SkeletonBar x={58} y={34} w={24} h={3.5} />
+                <Section x={124} y={20} w={64} h={28} rows={2} subtle />
+                <Row x={52} y={54} w={136} />
+                <Row x={52} y={68} w={136} />
+                <Row x={52} y={82} w={136} />
+            </>,
+            { accentPage: true },
+        );
+    }
+
+    if (variant === 'navigation') {
+        return shell(
+            <StickyHeader x={44} y={2} w={154} h={106} accent />,
+        );
+    }
+
+    if (variant === 'non-blocking-overlay') {
+        return (
+            <>
+                {shell(
+                    <>
+                        <SkeletonBar x={52} y={10} w={44} h={4.5} heading />
+                        <ButtonShape x={52} y={20} w={26} />
+                        <ButtonShape x={82} y={20} w={22} />
+                        <Row x={52} y={36} w={136} />
+                        <Row x={52} y={50} w={136} />
+                        <Row x={52} y={64} w={136} />
+                        <Row x={52} y={78} w={136} />
+                    </>,
+                )}
+                <ButtonShape x={160} y={18} w={28} />
+                <Popup x={122} y={30} w={66} h={48} accent />
+            </>
+        );
+    }
+
+    if (variant === 'blocking-overlay') {
+        return (
+            <>
+                {shell(
+                    <>
+                        <SkeletonBar x={52} y={10} w={44} h={4.5} heading />
+                        <Row x={52} y={24} w={136} />
+                        <Row x={52} y={38} w={136} />
+                        <Row x={52} y={52} w={136} />
+                    </>,
+                    { dimSidebar: false },
+                )}
+                <Blanket x={2} y={2} w={196} h={108} />
+                <Modal x={54} y={22} w={96} h={64} divider={false} accent />
+            </>
+        );
+    }
+
+    if (variant === 'surface-default') {
+        return shell(
+            <>
+                <SkeletonBar x={52} y={10} w={44} h={4.5} heading />
+                <Row x={52} y={22} w={82} />
+                <Row x={52} y={36} w={82} />
+                <Row x={52} y={50} w={82} />
+                <Row x={52} y={64} w={82} />
+                <Row x={52} y={78} w={82} />
+                <Section x={142} y={24} w={46} h={58} rows={3} />
+            </>,
+            { accentPage: true },
+        );
+    }
+
+    if (variant === 'surface-sunken') {
+        return shell(
+            <>
+                <SkeletonBar x={52} y={10} w={44} h={4.5} heading />
+                <Section x={52} y={22} w={136} h={74} rows={4} subtle accent />
+            </>,
+        );
+    }
+
+    // surface-raised
+    return shell(
+        <>
+            <SkeletonBar x={52} y={10} w={44} h={4.5} heading />
+            <CardBox x={52} y={22} w={82} h={48} accent />
+            <SkeletonBar x={58} y={29} w={48} h={4} heading />
+            <SkeletonBar x={58} y={38} w={32} h={3.5} />
+            <ButtonShape x={58} y={54} w={30} appearance="primary" />
+            <Section x={140} y={22} w={48} h={48} rows={2} subtle />
+            <Section x={52} y={76} w={136} h={24} rows={1} subtle />
+        </>,
+    );
+};
 
 /**
- * Miniature app-shell wireframe inside the shared panel container, paired with
- * token callout pills for the layer or page surface being explained.
+ * Miniature app-shell wireframe composed from the shared illustration kit inside
+ * the shared panel container, paired with token callout pills.
  */
 export const LayerDiagramPanel = ({ variant }) => {
-    const dimSidebar = variant !== 'frame';
     const badgesByVariant = {
         frame: ['--ds-surface-sunken'],
         page: ['--ds-surface'],
-        navigation: ['--ds-surface', '--ds-shadow-overflow'],
+        navigation: ['--ds-shadow-overflow'],
         'non-blocking-overlay': ['--ds-surface-overlay', '--ds-shadow-overlay'],
-        'blocking-overlay': ['--ds-blanket', '--ds-surface-overlay', '--ds-shadow-blocking'],
+        'blocking-overlay': ['--ds-surface-overlay', '--ds-shadow-blocking', '--ds-blanket'],
         'surface-default': ['--ds-border', '--ds-surface'],
         'surface-sunken': ['--ds-surface-sunken'],
         'surface-raised': ['--ds-surface-raised', '--ds-shadow-raised'],
@@ -586,210 +689,10 @@ export const LayerDiagramPanel = ({ variant }) => {
                     alignItems: 'center',
                 }}
             >
-                {/* Miniature app shell */}
-                <div
-                    style={{
-                        position: 'relative',
-                        display: 'grid',
-                        gridTemplateColumns: 'minmax(var(--image-lg), 22%) minmax(0, 1fr)',
-                        minHeight: 'var(--image-xl)',
-                        borderRadius: 'var(--card-radius-compact)',
-                        background: 'var(--ds-surface-sunken)',
-                        boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border)',
-                        overflow: 'hidden',
-                    }}
-                >
-                    {/* Docked Frame sidebar */}
-                    <div
-                        style={{
-                            padding: 'var(--card-pad-default) var(--card-pad-compact)',
-                            opacity: dimSidebar ? 0.55 : 1,
-                        }}
-                    >
-                        <SkelLines widths={['80%', '95%', '70%', '85%', '65%']} gap="var(--stack-md)" />
-                    </div>
-
-                    {/* Page sheet */}
-                    <div
-                        style={{
-                            position: 'relative',
-                            background: 'var(--ds-surface)',
-                            borderInlineStart: 'var(--border-width-default) solid var(--ds-border)',
-                            padding: variant === 'navigation' ? 0 : 'var(--card-pad-default)',
-                            opacity: variant === 'frame' ? 0.5 : 1,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: 'var(--stack-md)',
-                        }}
-                    >
-                        {variant === 'navigation' && (
-                            <>
-                                <div
-                                    style={{
-                                        position: 'relative',
-                                        zIndex: 1,
-                                        background: 'var(--ds-surface)',
-                                        borderBottom: 'var(--border-width-default) solid var(--ds-border)',
-                                        boxShadow: 'var(--ds-shadow-overflow)',
-                                        padding: 'var(--card-pad-compact) var(--card-pad-default)',
-                                    }}
-                                >
-                                    <SkelLines widths={['36%']} tall />
-                                </div>
-                                <div style={{ paddingInline: 'var(--card-pad-default)', paddingBottom: 'var(--card-pad-compact)', opacity: 0.65 }}>
-                                    <HairlineRows widths={['84%', '68%', '76%', '60%']} />
-                                </div>
-                            </>
-                        )}
-
-                        {(variant === 'frame' || variant === 'page' || variant === 'surface-default') && (
-                            <>
-                                <SkelLines widths={['34%']} tall />
-                                <HairlineRows widths={['85%', '70%', '78%', '64%', '72%']} />
-                            </>
-                        )}
-
-                        {variant === 'non-blocking-overlay' && (
-                            <>
-                                <div style={{ opacity: 0.45, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-                                    <SkelLines widths={['34%']} tall />
-                                    <HairlineRows widths={['82%', '68%', '74%']} />
-                                </div>
-                                {/* Floating Popup */}
-                                <div
-                                    style={{
-                                        position: 'absolute',
-                                        insetBlockStart: 'var(--card-pad-default)',
-                                        insetInlineEnd: 'var(--card-pad-default)',
-                                        width: '44%',
-                                        padding: 'var(--card-pad-compact)',
-                                        borderRadius: 'var(--radius-lg)',
-                                        background: 'var(--ds-surface-overlay)',
-                                        boxShadow: 'var(--ds-shadow-overlay)',
-                                    }}
-                                >
-                                    <SkelLines widths={['80%', '60%', '70%']} />
-                                </div>
-                                {/* Floating Flag */}
-                                <div
-                                    style={{
-                                        position: 'absolute',
-                                        insetBlockEnd: 'var(--card-pad-compact)',
-                                        insetInlineStart: 'var(--card-pad-default)',
-                                        width: '52%',
-                                        padding: 'var(--card-pad-compact)',
-                                        borderRadius: 'var(--radius-lg)',
-                                        background: 'var(--ds-surface-overlay)',
-                                        boxShadow: 'var(--ds-shadow-overlay)',
-                                    }}
-                                >
-                                    <SkelLines widths={['75%', '48%']} />
-                                </div>
-                            </>
-                        )}
-
-                        {variant === 'blocking-overlay' && (
-                            <>
-                                <div style={{ opacity: 0.4, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-                                    <SkelLines widths={['34%']} tall />
-                                    <HairlineRows widths={['82%', '68%', '74%']} />
-                                </div>
-                            </>
-                        )}
-
-                        {variant === 'surface-sunken' && (
-                            <>
-                                <SkelLines widths={['32%']} tall />
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--stack-sm)' }}>
-                                    <div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius-compact)', background: 'var(--ds-surface-sunken)' }}>
-                                        <SkelLines widths={['62%', '42%']} />
-                                    </div>
-                                    <div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius-compact)', background: 'var(--ds-surface-sunken)' }}>
-                                        <SkelLines widths={['52%']} />
-                                    </div>
-                                    <div style={{ gridColumn: '1 / -1', padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius-compact)', background: 'var(--ds-surface-sunken)' }}>
-                                        <SkelLines widths={['70%', '48%']} />
-                                    </div>
-                                </div>
-                            </>
-                        )}
-
-                        {variant === 'surface-raised' && (
-                            <>
-                                <SkelLines widths={['32%']} tall />
-                                <div style={{ display: 'grid', gridTemplateColumns: '1.35fr 1fr', gap: 'var(--stack-sm)', alignItems: 'stretch' }}>
-                                    <div
-                                        style={{
-                                            padding: 'var(--card-pad-compact)',
-                                            borderRadius: 'var(--card-radius-compact)',
-                                            background: 'var(--ds-surface-raised)',
-                                            boxShadow: 'var(--ds-shadow-raised)',
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            gap: 'var(--stack-md)',
-                                        }}
-                                    >
-                                        <SkelLines widths={['64%', '44%']} />
-                                        <span
-                                            data-skeleton=""
-                                            style={{
-                                                display: 'block',
-                                                marginTop: 'auto',
-                                                width: '42%',
-                                                height: 'var(--space-200)',
-                                                borderRadius: 'var(--radius-sm)',
-                                                background: 'var(--ds-background-brand-bold)',
-                                            }}
-                                        />
-                                    </div>
-                                    <div
-                                        style={{
-                                            padding: 'var(--card-pad-compact)',
-                                            borderRadius: 'var(--card-radius-compact)',
-                                            background: 'var(--ds-surface-sunken)',
-                                        }}
-                                    >
-                                        <SkelLines widths={['58%']} />
-                                    </div>
-                                </div>
-                            </>
-                        )}
-                    </div>
-
-                    {/* Full-shell Blanket + Modal for Blocking overlay */}
-                    {variant === 'blocking-overlay' && (
-                        <div
-                            style={{
-                                position: 'absolute',
-                                inset: 0,
-                                background: 'var(--ds-blanket)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                padding: 'var(--card-pad-default)',
-                            }}
-                        >
-                            <div
-                                style={{
-                                    width: '56%',
-                                    padding: 'var(--card-pad-default)',
-                                    borderRadius: 'var(--card-radius-compact)',
-                                    background: 'var(--ds-surface-overlay)',
-                                    boxShadow: 'var(--ds-shadow-blocking)',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    gap: 'var(--stack-md)',
-                                }}
-                            >
-                                <SkelLines widths={['54%']} tall />
-                                <SkelLines widths={['90%', '72%']} />
-                                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--inline-sm)' }}>
-                                    <span style={{ width: '24%', height: 'var(--space-200)', borderRadius: 'var(--radius-sm)', background: 'var(--ds-skeleton)' }} />
-                                    <span style={{ width: '28%', height: 'var(--space-200)', borderRadius: 'var(--radius-sm)', background: 'var(--ds-background-brand-bold)' }} />
-                                </div>
-                            </div>
-                        </div>
-                    )}
+                <div style={{ minWidth: 0 }}>
+                    <Illustration width={200} height={112} capped={false} title={DIAGRAM_TITLE[variant] ?? variant}>
+                        {drawLayerDiagram(variant)}
+                    </Illustration>
                 </div>
 
                 {/* Token callouts */}
@@ -799,7 +702,7 @@ export const LayerDiagramPanel = ({ variant }) => {
                             <span
                                 aria-hidden="true"
                                 style={{
-                                    width: 'var(--space-200)',
+                                    width: 'var(--icon-md)',
                                     height: 'var(--border-width-default)',
                                     background: 'var(--ds-border)',
                                 }}
@@ -834,24 +737,22 @@ export const LayerDetailRow = ({ variant, children }) => (
 
 /* ----------------------------------------------------- by-template gallery */
 
-const TemplateTile = ({ title, description, tokens, children }) => (
+const TemplateTile = ({ title, description, tokens, ariaTitle, children }) => (
     <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
         <div
             style={{
                 boxSizing: 'border-box',
-                minHeight: 'var(--image-xl)',
-                padding: 'var(--card-pad-default)',
+                padding: 'var(--card-pad-compact)',
                 borderRadius: 'var(--card-radius-compact)',
                 background: 'var(--ds-surface)',
                 boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border)',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
             }}
         >
-            {children}
+            <Illustration width={160} height={84} capped={false} title={ariaTitle ?? title}>
+                {children}
+            </Illustration>
         </div>
-        <figcaption style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-025)' }}>
+        <figcaption style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
             <strong style={{ font: 'var(--body-default)', fontWeight: 'inherit', color: 'var(--ds-text)' }}>
                 {title}
             </strong>
@@ -874,23 +775,22 @@ export const ByTemplateGrid = () => (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
                 <h4 style={{ margin: 0, font: 'var(--heading-sm)', color: 'var(--ds-text)' }}>Section</h4>
                 <div style={TEMPLATE_GRID_STYLE}>
-                    <TemplateTile title="Section" description="Default: heading, view bar, body" tokens="no surface · no shadow">
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-                            <SkelLines widths={['40%']} tall />
-                            <SkelLines widths={['90%', '75%', '82%']} />
-                        </div>
+                    <TemplateTile
+                        title="Section"
+                        description="Default: heading, view bar, body"
+                        tokens="no surface · no shadow"
+                        ariaTitle="Section on the Default surface with no shadow"
+                    >
+                        <Section x={12} y={14} w={136} h={56} rows={3} />
                     </TemplateTile>
-                    <TemplateTile title="Section and its side" description="Default: two columns, set apart by the gap" tokens="no surface · no line">
-                        <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 'var(--grid-gutter)' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-                                <SkelLines widths={['50%']} tall />
-                                <SkelLines widths={['90%', '75%', '82%']} />
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-                                <SkelLines widths={['60%']} tall />
-                                <SkelLines widths={['85%', '70%']} />
-                            </div>
-                        </div>
+                    <TemplateTile
+                        title="Section and its side"
+                        description="Default: two columns, set apart by the gap"
+                        tokens="no surface · no line"
+                        ariaTitle="Section and its side column separated by the gap"
+                    >
+                        <Section x={10} y={14} w={84} h={56} rows={3} />
+                        <Section x={104} y={14} w={46} h={56} rows={2} />
                     </TemplateTile>
                 </div>
             </div>
@@ -898,25 +798,24 @@ export const ByTemplateGrid = () => (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
                 <h4 style={{ margin: 0, font: 'var(--heading-sm)', color: 'var(--ds-text)' }}>Table</h4>
                 <div style={TEMPLATE_GRID_STYLE}>
-                    <TemplateTile title="Table" description="Default, hairline rows, no head fill" tokens="--ds-border">
-                        <HairlineRows widths={['50%', '85%', '70%', '78%']} />
+                    <TemplateTile
+                        title="Table"
+                        description="Default, hairline rows, no head fill"
+                        tokens="--ds-border"
+                        ariaTitle="Table on the Default surface with hairline rows"
+                    >
+                        <Row x={10} y={12} w={140} />
+                        <Row x={10} y={26} w={140} />
+                        <Row x={10} y={40} w={140} />
+                        <Row x={10} y={54} w={140} />
                     </TemplateTile>
-                    <TemplateTile title="Sticky header, scrolled" description="Navigation: rows pass under the header" tokens="--ds-shadow-overflow">
-                        <div style={{ overflow: 'hidden', borderRadius: 'var(--radius-sm)' }}>
-                            <div
-                                style={{
-                                    position: 'relative',
-                                    zIndex: 1,
-                                    paddingBlock: 'var(--space-075)',
-                                    background: 'var(--ds-surface)',
-                                    borderBottom: 'var(--border-width-default) solid var(--ds-border)',
-                                    boxShadow: 'var(--ds-shadow-overflow)',
-                                }}
-                            >
-                                <SkelLines widths={['42%']} />
-                            </div>
-                            <HairlineRows widths={['70%', '85%', '60%']} />
-                        </div>
+                    <TemplateTile
+                        title="Sticky header, scrolled"
+                        description="Layer 2 · Navigation: rows pass under the header"
+                        tokens="--ds-shadow-overflow"
+                        ariaTitle="Table with a sticky header carrying the overflow shadow"
+                    >
+                        <StickyHeader x={10} y={12} w={140} h={60} />
                     </TemplateTile>
                 </div>
             </div>
@@ -924,55 +823,28 @@ export const ByTemplateGrid = () => (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
                 <h4 style={{ margin: 0, font: 'var(--heading-sm)', color: 'var(--ds-text)' }}>Card</h4>
                 <div style={TEMPLATE_GRID_STYLE}>
-                    <TemplateTile title="Card at rest" description="Raised at rest, one focal card per view" tokens="--ds-surface-raised · --ds-shadow-raised">
-                        <div
-                            style={{
-                                padding: 'var(--card-pad-compact)',
-                                borderRadius: 'var(--card-radius-compact)',
-                                background: 'var(--ds-surface-raised)',
-                                boxShadow: 'var(--ds-shadow-raised)',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: 'var(--stack-md)',
-                            }}
-                        >
-                            <SkelLines widths={['55%', '35%']} />
-                            <span
-                                data-skeleton=""
-                                style={{
-                                    display: 'block',
-                                    width: '38%',
-                                    height: 'var(--space-250)',
-                                    borderRadius: 'var(--radius-sm)',
-                                    background: 'var(--ds-background-brand-bold)',
-                                }}
-                            />
-                        </div>
+                    <TemplateTile
+                        title="Primary card"
+                        description="Raised at rest, one per view"
+                        tokens="--ds-surface-raised · --ds-shadow-raised"
+                        ariaTitle="Primary card on the raised surface and shadow"
+                    >
+                        <CardBox x={18} y={14} w={124} h={56} />
+                        <SkeletonBar x={26} y={22} w={68} h={4} heading />
+                        <SkeletonBar x={26} y={32} w={46} />
+                        <ButtonShape x={26} y={48} w={40} appearance="primary" />
                     </TemplateTile>
-                    <TemplateTile title="Clickable card, hover" description="Lifts on hover: hovered raised surface, overlay shadow" tokens="--ds-surface-raised-hovered · --ds-shadow-overlay">
-                        <div
-                            style={{
-                                padding: 'var(--card-pad-compact)',
-                                borderRadius: 'var(--card-radius-compact)',
-                                background: 'var(--ds-surface-raised-hovered)',
-                                boxShadow: 'var(--ds-shadow-overlay)',
-                            }}
-                        >
-                            <SkelLines widths={['60%', '40%']} />
-                        </div>
-                    </TemplateTile>
-                    <TemplateTile title="Dragged card" description="Leaves the page for Non-blocking overlay" tokens="--ds-surface-overlay · --ds-shadow-overlay">
-                        <div
-                            style={{
-                                padding: 'var(--card-pad-compact)',
-                                borderRadius: 'var(--card-radius-compact)',
-                                background: 'var(--ds-surface-overlay)',
-                                boxShadow: 'var(--ds-shadow-overlay)',
-                                transform: 'rotate(-2deg)',
-                            }}
-                        >
-                            <SkelLines widths={['55%', '35%']} />
-                        </div>
+                    <TemplateTile
+                        title="Dragged card"
+                        description="leaves the page for Layer 3 · Non-blocking overlay"
+                        tokens="--ds-surface-overlay · --ds-shadow-overlay"
+                        ariaTitle="Dragged card lifted onto the overlay surface and shadow"
+                    >
+                        <g transform="rotate(-2 80 42)">
+                            <Layer x={18} y={14} w={124} h={56} fill={PAINT.popupSurface} shadow={PAINT.popupShadow} corner="card" />
+                            <SkeletonBar x={26} y={24} w={68} h={4} heading />
+                            <SkeletonBar x={26} y={34} w={46} />
+                        </g>
                     </TemplateTile>
                 </div>
             </div>
@@ -1087,7 +959,8 @@ export const ShadowTokensEquation = () => {
         {
             id: 'edge',
             title: 'Edge',
-            description: 'The border: a hairline ring; a 3:1 line under increased contrast.',
+            // docs-literal: board EL-D3 prose copy describing the edge slot's 1px ring
+            description: 'The border: a 1px ring; a 3:1 line under increased contrast.',
             boxShadow: only('edge'),
             code: formatLayerSummary(slots.edge),
         },
@@ -1140,7 +1013,7 @@ export const ShadowTokensEquation = () => {
                             }}
                         >
                             <div style={discStyle(part.boxShadow)} />
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-025)' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                                 <strong style={{ font: 'var(--body-default)', fontWeight: 'inherit', color: 'var(--ds-text)' }}>
                                     {part.title}
                                 </strong>
@@ -1172,7 +1045,7 @@ export const ShadowTokensEquation = () => {
                     }}
                 >
                     <div style={discStyle('var(--ds-shadow-blocking)')} />
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-025)' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                         <strong style={{ font: 'var(--code-default)', fontWeight: 'inherit', color: 'var(--ds-text)' }}>
                             --ds-shadow-blocking
                         </strong>
