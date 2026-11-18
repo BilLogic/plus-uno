@@ -126,7 +126,7 @@ Same group: `Accordion` · `Carousel` · `Panel` · `ScrollBar`
 
 | Part | Token |
 | --- | --- |
-| Title | `Heading` at `large` (24/28); see Best practices for heading level. |
+| Title | `Heading` at `lg` (24/28); see Best practices for heading level. |
 | Rows | `--page-header-stack` between breadcrumbs, title row and bottom bar. |
 | Title row | `--page-header-gap` between the title and its actions; `--inline-lg` between actions. |
 | Breadcrumbs | `--body-sm`. |

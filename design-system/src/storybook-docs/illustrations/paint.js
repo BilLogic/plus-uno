@@ -240,10 +240,10 @@ export const LABEL_FONT = {
 
 /**
  * Mono label for construction-kit brackets and zone callouts, at 1:1 scale
- * (`--type-size-075`).
+ * (`--kit-label-mono-drawing-size`, docs-rhythm.css).
  */
 export const MONO_LABEL_FONT = {
   fontFamily: 'var(--type-family-code)',
   fontWeight: 'var(--type-weight-medium)',
-  fontSize: 'var(--type-size-075)',
+  fontSize: 'var(--kit-label-mono-drawing-size)',
 };

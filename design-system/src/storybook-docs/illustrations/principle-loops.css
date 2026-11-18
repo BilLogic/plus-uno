@@ -49,7 +49,7 @@
 [data-principle-loop] {
     --loop-cycle: calc(var(--ds-motion-spatial-default-duration) * 10);
     position: relative;
-    height: calc(var(--height-100) * 9);
+    height: var(--loop-stage-height);
     background: var(--ds-surface-sunken);
     overflow: hidden;
 }
@@ -65,9 +65,9 @@
 [data-loop='responsive'] .loop-press {
     inset-block-start: 50%;
     inset-inline-start: 50%;
-    width: var(--width-500);
-    height: var(--height-500);
-    margin: calc(var(--height-500) / -2) 0 0 calc(var(--width-500) / -2);
+    width: var(--loop-puck-size);
+    height: var(--loop-puck-size);
+    margin: calc(var(--loop-puck-size) / -2) 0 0 calc(var(--loop-puck-size) / -2);
     border-radius: var(--radius-full);
     background: var(--ds-background-brand-bold);
     animation-name: loop-press;
@@ -76,9 +76,9 @@
 [data-loop='responsive'] .loop-ring {
     inset-block-start: 50%;
     inset-inline-start: 50%;
-    width: var(--width-500);
-    height: var(--height-500);
-    margin: calc(var(--height-500) / -2) 0 0 calc(var(--width-500) / -2);
+    width: var(--loop-puck-size);
+    height: var(--loop-puck-size);
+    margin: calc(var(--loop-puck-size) / -2) 0 0 calc(var(--loop-puck-size) / -2);
     border-radius: var(--radius-full);
     border: var(--border-width-selected) solid var(--ds-border-brand);
     opacity: 0;
@@ -98,12 +98,12 @@
 /* Build understanding: a Panel leaves and returns by the edge it came from. */
 [data-loop='understanding'] .loop-bar {
     inset-inline-start: 48px; /* docs-literal: token gap: 48px */
-    height: var(--height-150);
+    height: var(--loop-bar-height);
     border-radius: var(--radius-sm);
     background: var(--ds-skeleton);
 }
 [data-loop='understanding'] .loop-bar--a { inset-block-start: 48px; /* docs-literal: token gap: 48px */ width: 40%; }
-[data-loop='understanding'] .loop-bar--b { inset-block-start: var(--height-500); width: 30%; }
+[data-loop='understanding'] .loop-bar--b { inset-block-start: var(--loop-puck-size); width: 30%; }
 [data-loop='understanding'] .loop-panel {
     inset-block: var(--section-pad-y-spacious);
     inset-inline-end: var(--section-pad-x-spacious);
@@ -122,8 +122,8 @@
 [data-loop='empathy'] .loop-win,
 [data-loop='empathy'] .loop-miss {
     inset-block-start: 50%;
-    width: var(--width-500);
-    height: var(--height-500);
+    width: var(--loop-puck-size);
+    height: var(--loop-puck-size);
     margin-top: -48px; /* docs-literal: token gap: -48px */
 }
 [data-loop='empathy'] .loop-win {
@@ -164,7 +164,7 @@
     display: block;
     position: absolute;
     inset-inline-start: 0;
-    height: var(--height-150);
+    height: var(--loop-bar-height);
     border-radius: var(--radius-sm);
     background: var(--ds-background-brand-bold);
     animation-duration: var(--loop-cycle);

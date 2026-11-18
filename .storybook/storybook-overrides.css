@@ -172,7 +172,7 @@ body,
 .sbdocs .sbdocs-content p:not([class]):not(:where(.docs-story *, .sb-ds-dodont-card *)),
 .sbdocs .sbdocs-content li:not([class]):not(:where(.docs-story *, .sb-ds-dodont-card *)) {
     font-family: var(--type-family-body);
-    font-size: var(--type-size-100);
+    font-size: var(--docs-text-size);
     line-height: var(--type-line-height-150);
     font-weight: var(--type-weight-regular);
     color: var(--ds-text);
@@ -300,13 +300,13 @@ body,
  */
 html {
     /* Mirrors `unsafeTocbotOptions.headingsOffset` in preview.jsx, a plain integer. */
-    scroll-padding-top: var(--height-500);
+    scroll-padding-top: var(--docs-header-offset);
 }
 
 @media (min-width: 768px) {
     html {
         /* Mirrors `unsafeTocbotOptions.headingsOffset` in preview.jsx, a plain integer. */
-        scroll-padding-top: calc(var(--height-500) + var(--section-stack-md));
+        scroll-padding-top: calc(var(--docs-header-offset) + var(--section-stack-md));
     }
 }
 
@@ -316,7 +316,7 @@ html {
  */
 .sbdocs-wrapper {
     /* Mirrors `unsafeTocbotOptions.headingsOffset` in preview.jsx, a plain integer. */
-    scroll-padding-top: var(--height-500);
+    scroll-padding-top: var(--docs-header-offset);
     box-sizing: border-box;
     width: 100%;
     max-width: calc(var(--content-max-width) + var(--page-pad) * 2);
@@ -329,7 +329,7 @@ html {
 @media (min-width: 768px) {
     .sbdocs-wrapper {
         /* Mirrors `unsafeTocbotOptions.headingsOffset` in preview.jsx, a plain integer. */
-        scroll-padding-top: calc(var(--height-500) + var(--section-stack-md));
+        scroll-padding-top: calc(var(--docs-header-offset) + var(--section-stack-md));
     }
 }
 
@@ -947,7 +947,7 @@ a.sbdocs-a {
     padding: var(--stack-lg) 0;
     color: var(--ds-text-subtle);
     font-family: var(--type-family-heading);
-    font-size: var(--type-size-100);
+    font-size: var(--docs-text-size);
     font-weight: var(--type-weight-medium);
     line-height: 1.5;
     white-space: nowrap;
@@ -998,7 +998,7 @@ a.sbdocs-a {
     margin-top: var(--stack-md);
     color: var(--ds-text-subtlest);
     font-family: var(--type-family-code);
-    font-size: var(--type-size-075);
+    font-size: var(--docs-code-size);
     font-weight: var(--type-weight-regular);
     line-height: var(--type-line-height-100);
 }

@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { LABEL_FONT } from './paint.js';
+import { LABEL_FONT, MONO_LABEL_FONT } from './paint.js';
 
 /**
  * The kit's labels read a semantic role, not a font-size primitive. The role is
@@ -20,12 +20,13 @@ describe('illustration kit label type', () => {
 
     it('draws labels at the drawing-scale role', () => {
         expect(LABEL_FONT.fontSize).toBe('var(--kit-label-drawing-size)');
+        expect(MONO_LABEL_FONT.fontSize).toBe('var(--kit-label-mono-drawing-size)');
     });
 
-    it('derives the drawing size by halving the real label size, sans and mono', () => {
+    it('derives the sans drawing size by halving the real label size; mono draws 1:1', () => {
         expect(rhythm).toMatch(/--kit-label-size:\s*var\(--type-size-0875\)/);
         expect(rhythm).toMatch(/--kit-label-mono-size:\s*var\(--type-size-075\)/);
         expect(rhythm).toMatch(/--kit-label-drawing-size:\s*calc\(var\(--kit-label-size\) \/ 2\)/);
-        expect(rhythm).toMatch(/--kit-label-mono-drawing-size:\s*calc\(var\(--kit-label-mono-size\) \/ 2\)/);
+        expect(rhythm).toMatch(/--kit-label-mono-drawing-size:\s*var\(--kit-label-mono-size\);/);
     });
 });

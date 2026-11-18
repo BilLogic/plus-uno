@@ -51,7 +51,7 @@
     display: flex;
     align-items: flex-end;
     gap: var(--inline-lg);
-    height: var(--height-250);
+    height: var(--row-height-md);
     padding-inline: var(--pad-x-md);
     background: var(--ds-surface-sunken);
 
@@ -63,8 +63,8 @@
     display: flex;
     align-items: center;
     gap: var(--inline-md);
-    width: var(--width-1500);
-    height: var(--height-200);
+    width: var(--docs-browser-tab-width);
+    height: var(--row-height-sm);
     padding-inline: var(--pad-x-md);
     background: var(--ds-surface);
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
@@ -89,7 +89,7 @@
     display: flex;
     align-items: center;
     gap: var(--inline-lg);
-    height: var(--height-250);
+    height: var(--row-height-md);
     padding-inline: var(--pad-x-md);
     background: var(--ds-surface);
     border-bottom: var(--border-width-default) solid var(--ds-border);
@@ -97,7 +97,7 @@
 
 .plus-browser-frame__toolbar--safari {
     gap: var(--grid-gutter);
-    height: var(--height-300);
+    height: var(--row-height-lg);
     padding-inline: var(--pad-x-lg);
     background: var(--ds-surface-sunken);
 }
@@ -107,7 +107,7 @@
     display: flex;
     align-items: center;
     gap: var(--inline-md);
-    height: var(--height-200);
+    height: var(--row-height-sm);
     padding-inline: var(--pad-x-lg);
     border-radius: var(--radius-full);
     background: var(--ds-background-input);
@@ -120,13 +120,13 @@
 }
 
 .plus-browser-frame__field {
-    flex: 0 1 var(--width-3000);
+    flex: 0 1 var(--docs-browser-field-width);
     margin-inline: auto;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: var(--inline-md);
-    height: var(--height-200);
+    height: var(--row-height-sm);
     border-radius: var(--radius-lg);
     background: var(--ds-background-neutral);
     font: var(--body-default);
