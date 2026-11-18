@@ -32,7 +32,7 @@ export default {
     },
 };
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-lg)', alignItems: 'center' };
 
 const box = (el) => {
     const r = el.getBoundingClientRect();
@@ -49,7 +49,7 @@ const PHOTO = 'data:image/svg+xml;utf8,'
 /* ------------------------------------------------------------- initials */
 
 export const Initials = () => (
-    <div style={{ display: 'grid', gap: '4px' }}>
+    <div style={{ display: 'grid', gap: 'var(--stack-sm)' }}>
         <span data-testid="initials-two"><Avatar name="Jane Park" /></span>
         <span data-testid="initials-three"><Avatar name="Mary Ann Smith" /></span>
         <span data-testid="initials-one"><Avatar name="Plato" /></span>

@@ -36,7 +36,7 @@ export default {
     },
 };
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-lg)', alignItems: 'center' };
 
 /* ------------------------------------------------------------------ helpers */
 
@@ -68,7 +68,7 @@ export const Appearances = () => (
         <CountTag value={12} />
         <CountTag value={13} isBold appearance="danger" />
         <Button appearance="primary" iconAfter={<CountTag value={14} isInverse />}>Review</Button>
-        <span style={{ background: 'var(--ds-background-neutral-bold)', padding: '8px', borderRadius: '6px' }}>
+        <span style={{ background: 'var(--ds-background-neutral-bold)', padding: 'var(--pad-y-lg) var(--pad-x-sm)', borderRadius: 'var(--radius-control-sm)' }}>
             <CountTag value={15} isInverse />
         </span>
         <CountTag isDot appearance="danger" label="New activity" />
@@ -183,14 +183,14 @@ Zero.play = async ({ canvasElement }) => {
 export const Ring = () => (
     <div style={row}>
         <span style={{ position: 'relative', display: 'inline-flex' }}>
-            <i className={iconClass('bell')} aria-hidden="true" style={{ fontSize: '20px' }} />
-            <span style={{ position: 'absolute', top: '-6px', right: '-10px' }}>
+            <i className={iconClass('bell')} aria-hidden="true" style={{ fontSize: 'var(--icon-lg)' }} />
+            <span style={{ position: 'absolute', top: 'calc(-1 * var(--pad-y-md))', right: 'calc(-1 * var(--pad-x-sm))' }}>
                 <CountTag value={3} isBold appearance="danger" hasRing label="3 notifications" />
             </span>
         </span>
         <span style={{ position: 'relative', display: 'inline-flex' }}>
-            <i className={iconClass('bell')} aria-hidden="true" style={{ fontSize: '20px' }} />
-            <span style={{ position: 'absolute', top: '-2px', right: '-2px', display: 'flex' }}>
+            <i className={iconClass('bell')} aria-hidden="true" style={{ fontSize: 'var(--icon-lg)' }} />
+            <span style={{ position: 'absolute', top: 'calc(-1 * var(--pad-y-sm))', right: 'calc(-1 * var(--pad-y-sm))', display: 'flex' }}>
                 <CountTag isDot appearance="danger" hasRing label="New notifications" />
             </span>
         </span>
@@ -216,7 +216,7 @@ Ring.play = async ({ canvasElement }) => {
  * Warning Container.
  */
 export const Styles = () => (
-    <div style={{ display: 'grid', gap: '12px' }}>
+    <div style={{ display: 'grid', gap: 'var(--stack-lg)' }}>
         {[false, true].flatMap((isBold) => COUNT_TAG_SPACINGS.map((spacing) => (
             <div key={`${isBold}-${spacing}`} style={row}>
                 {COUNT_TAG_APPEARANCES.map((appearance) => (

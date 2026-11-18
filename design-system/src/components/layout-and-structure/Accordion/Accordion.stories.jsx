@@ -92,22 +92,27 @@ const sampleItems = [
 // a11y "landmark-unique" rule even though they belong to different accordions.
 const flushSampleItems = sampleItems.map((item) => ({ ...item, header: `${item.header} (flush)` }));
 
-const accordionPage = { display: 'flex', flexDirection: 'column', gap: '48px', maxWidth: '800px' };
+const accordionPage = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 'var(--page-stack-lg)',
+    maxWidth: 'var(--content-max-width-reading)',
+};
 
 function AccordionVariantsDemos() {
     return (
         <>
             <section>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
                     Standard accordion with borders and one item open at a time.
                 </p>
                 <Accordion items={sampleItems} defaultActiveKey="0" />
             </section>
             <section>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
                     Borderless accordion for seamless integration with surrounding content.
                 </p>
-                <div style={{ border: '1px dashed var(--ds-border)', padding: '0' }}>
+                <div style={{ border: 'var(--border-width-default) dashed var(--ds-border)', padding: 0 }}>
                     <Accordion items={flushSampleItems} defaultActiveKey="0" flush />
                 </div>
             </section>
@@ -120,14 +125,14 @@ function AccordionBehaviorDemos() {
         <>
             <section>
                 <DemoLabel>ALWAYS OPEN (MULTIPLE EXPANDED)</DemoLabel>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
                     Multiple accordion items can be open simultaneously.
                 </p>
                 <Accordion items={sampleItems} defaultActiveKey={['0', '1']} alwaysOpen />
             </section>
             <section>
                 <DemoLabel>ALL COLLAPSED</DemoLabel>
-                <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
                     Accordion with no default expanded item.
                 </p>
                 <Accordion items={sampleItems} />
@@ -140,7 +145,7 @@ function AccordionInteractionDemos() {
     return (
         <section>
             <DemoLabel>WITH DISABLED ITEM</DemoLabel>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
+            <p className="body-default" style={{ marginBottom: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
                 Individual items can be disabled to prevent interaction.
             </p>
             <Accordion
@@ -159,7 +164,7 @@ function AccordionContentDemos() {
     return (
         <section>
             <DemoLabel>USING CHILDREN (ALTERNATIVE PATTERN)</DemoLabel>
-            <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
+            <p className="body-default" style={{ marginBottom: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
                 Accordion supports both the <code>items</code> array prop and direct child components.
             </p>
             <Accordion defaultActiveKey="custom-1">
@@ -228,7 +233,7 @@ export const Interactive = (args) => {
     }));
 
     return (
-        <div style={{ maxWidth: '800px' }}>
+        <div style={{ maxWidth: 'var(--content-max-width-reading)' }}>
             <Accordion
                 flush={args.flush}
                 alwaysOpen={args.alwaysOpen}

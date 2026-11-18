@@ -36,8 +36,8 @@ export default {
     },
 };
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' };
-const grid = { display: 'grid', gap: '12px' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-lg)', alignItems: 'center' };
+const grid = { display: 'grid', gap: 'var(--stack-lg)' };
 
 const SIZE = { default: 20, spacious: 32 };
 const PAD = { default: 4, spacious: 12 };
