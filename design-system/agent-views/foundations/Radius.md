@@ -136,9 +136,6 @@ Don't: The same tiles at 12. Every gap pinches where the curves meet.
 
 ### Close with an Icon button
 
-Do: The subtle Icon button: the button radius, the ring and the states come with it.
-Don't: A hand-built circle. Its corner, its states and its focus ring are all guesses.
-
 ### Read a token, never a px value
 
 Do: The token follows the rules when a value moves.

@@ -83,9 +83,6 @@ Every page has one `h1` (visually hidden when the topbar or tab strip replaces a
 
 Button, tab and menu labels use `Body/default/medium` (`font: var(--body-default); font-weight: var(--type-weight-medium)`), which pairs with icon stroke weight. A Sidebar tab is a navigation row: its label is regular weight at rest and medium when selected.
 
-Do: Body/default/medium on a button or tab label.
-Don't: Regular or bold weight, or a heading style, on a button or tab label.
-
 ## Code
 
 `Code/default` (12/16, Noto Sans Mono) sets code samples, token names and property values. In CSS, `var(--code-default)` sets `0.875em` of the parent size so inline code scales with surrounding text.
@@ -102,24 +99,15 @@ Names and titles truncate; primary content wraps. Never shrink font size to fit 
 
 A student name in a roster row.
 
-Do: One line with an ellipsis. The Status keeps its place.
-Don't: The name wraps onto extra lines and makes the row taller than its neighbors.
-
 ## Do and don't
 
 ### Use a heading style
 
 Introduce a section with a heading style, not with bold body text.
 
-Do: Heading/small, tagged as the section's heading.
-Don't: Bold body text looks like a heading but carries no structure.
-
 ### Do not skip heading levels
 
 Headings step down one level at a time.
-
-Do: h1, then h2, then h3.
-Don't: An h3 straight after the h1 skips the h2.
 
 ## Headings, numbers and mono
 
@@ -132,9 +120,6 @@ Semibold at 28 and 32 sits close to bold body text. Keep 600 and do not add a 70
 ### Numbers
 
 Metric styles are Noto Sans 600 with tabular figures. Use the `.num` class, or `font-variant-numeric: tabular-nums`, for numbers that line up vertically: table columns, times in schedules and timelines, and counts in lists. Running text keeps proportional figures. A time or duration ("3:30 to 4:30", "12 min") takes the body or heading style of its context, never mono.
-
-Do: Metric/large for the figure.
-Don't: Heading/medium for a number.
 
 ### Mono
 

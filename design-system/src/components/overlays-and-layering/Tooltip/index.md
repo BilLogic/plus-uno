@@ -14,7 +14,7 @@ Also asked as: hover hint, hover text.
 
 **Source:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.jsx`
 
-**Stories:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.stories.jsx` — Placements, Interactive, Overview, Rest, Hovered, Pressed, Focused, Disabled, PlacementTop, PlacementBottom, PlacementLeft, PlacementRight, Wrapping, MotionOpenClose, MotionReduced
+**Stories:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.stories.jsx` — Placements, Interactive, Overview, Rest, Hovered, Pressed, Focused, Disabled, PlacementTop, PlacementBottom, PlacementLeft, PlacementRight, Wrapping, MotionOpenClose, MotionReduced, BestPractices
 
 **Storybook page:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.mdx`
 

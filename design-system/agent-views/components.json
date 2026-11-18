@@ -16973,7 +16973,8 @@
         "PlacementRight",
         "Wrapping",
         "MotionOpenClose",
-        "MotionReduced"
+        "MotionReduced",
+        "BestPractices"
       ],
       "tokens": [
         "--body-sm",
