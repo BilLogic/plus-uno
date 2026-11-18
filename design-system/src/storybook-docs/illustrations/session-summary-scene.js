@@ -49,7 +49,7 @@ export const sessionSummaryNodes = ({ x = 0, y = 0, w = SESSION_SUMMARY_BOX.widt
 
   return [
     { kind: 'rect', x, y, w, h, fill: PAINT.frameSunken, corner: 'shape' },
-    { kind: 'rect', x: cardX, y: cardY, w: cardW, h: cardH, fill: PAINT.cardSurface, stroke: PAINT.frameDivider, corner: 'card' },
+    { kind: 'rect', x: cardX, y: cardY, w: cardW, h: cardH, fill: PAINT.pageSurface, stroke: PAINT.frameDivider, corner: 'card' },
     { kind: 'circle', cx: avatarX, cy: avatarY, r: 6, fill: accent ? PAINT.accent : PAINT.shape, opacity: accent ? 0.16 : undefined },
     { kind: 'circle', cx: avatarX, cy: avatarY, r: 2.5, fill: accent ? PAINT.accent : PAINT.iconGlyph },
     { kind: 'skeleton', x: avatarX + 11, y: cardY + 10, w: 48, h: 4, tone: PAINT.placeholderHeading },
