@@ -1887,7 +1887,7 @@
     "scssTokenCount": 1191,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1791,
+      "total": 1785,
       "resolved": 1748,
       "percent": 98,
       "skippedCollections": [
@@ -2216,54 +2216,6 @@
             "--icon"
           ],
           "reason": "no code syntax"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/surface/container/default",
-          "tried": [
-            "--ds-surface-container"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/surface/container/hovered",
-          "tried": [
-            "--ds-surface-container-hovered"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "color / semantics",
-          "figmaVariable": "elevation/surface/container/pressed",
-          "tried": [
-            "--ds-surface-container-pressed"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / components",
-          "figmaVariable": "Calendar/nav-size",
-          "tried": [
-            "--calendar-nav-size"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / components",
-          "figmaVariable": "Menu/group-gap",
-          "tried": [
-            "--menu-group-gap"
-          ],
-          "reason": "code syntax names a token the code does not have"
-        },
-        {
-          "collection": "spacing / components",
-          "figmaVariable": "Menu/group-pad-x",
-          "tried": [
-            "--menu-group-pad-x"
-          ],
-          "reason": "code syntax names a token the code does not have"
         }
       ]
     }

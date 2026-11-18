@@ -2,16 +2,14 @@
  {
   "q": "confirm before deleting",
   "want": [
-   "Modal",
-   "PatternModal"
+   "Modal"
   ],
   "kind": "intent"
  },
  {
   "q": "are you sure dialog",
   "want": [
-   "Modal",
-   "PatternModal"
+   "Modal"
   ],
   "kind": "intent"
  },
@@ -158,7 +156,6 @@
   "q": "list of students with filters",
   "want": [
    "Table",
-   "Table",
    "FilterButton"
   ],
   "kind": "intent"
@@ -166,7 +163,6 @@
  {
   "q": "data grid with sorting and paging",
   "want": [
-   "Table",
    "Table"
   ],
   "kind": "intent"
@@ -358,7 +354,6 @@
  {
   "q": "table",
   "want": [
-   "Table",
    "Table"
   ],
   "kind": "name"

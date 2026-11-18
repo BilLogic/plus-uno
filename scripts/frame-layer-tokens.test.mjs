@@ -157,11 +157,14 @@ test('every Layout token resolves to its value at Medium, Large and X-Large', ()
   }
 });
 
+// Figma names the modal widths sm · md · lg; the code names them for the grid columns they span.
+const MODAL_COLS = { sm: '6-col', md: '8-col', lg: '10-col' };
+
 test('the derived Layout rows are the frame rules worked at each mode width', () => {
   for (const [mode, width] of Object.entries(LAYOUT_MODES)) {
     for (const [leaf, value] of Object.entries(deriveLayout(width))) {
       // The modal widths live with the Modal template tokens; 4-col was born there, with no Layout name to retire.
-      const name = leaf.startsWith('width-modal-') ? `--modal-width-${leaf.slice('width-modal-'.length)}` : renamed(`--layout-${leaf}`);
+      const name = leaf.startsWith('width-modal-') ? `--modal-width-${{ xs: '4-col', ...MODAL_COLS }[leaf.slice('width-modal-'.length)]}` : renamed(`--layout-${leaf}`);
       assert.equal(atMode(name, mode), px(value), `${leaf} at ${mode}`);
     }
   }
@@ -178,7 +181,7 @@ test('the screen pad aliases the space scale per mode, its own rule apart from t
 });
 
 test('no modal width is fractional at any mode', () => {
-  for (const size of ['sm', 'md', 'lg']) {
+  for (const size of Object.values(MODAL_COLS)) {
     for (const mode of Object.keys(LAYOUT_MODES)) {
       assert.match(atMode(`--modal-width-${size}`, mode), /^\d+px$/, `${size} at ${mode}`);
     }
@@ -187,8 +190,8 @@ test('no modal width is fractional at any mode', () => {
 
 test('Modal\'s MODAL_WIDTH_PX, which its docs page shows, equals the --modal-width-* tokens at each mode', () => {
   const px = exportedValue(REPO_ROOT, 'design-system/src/patterns/Modal/Modal.jsx', 'MODAL_WIDTH_PX');
-  const steps = { sm: '6-col', md: '8-col', lg: '10-col' };
-  for (const [size, step] of Object.entries(steps)) {
+  for (const step of Object.values(MODAL_COLS)) {
+    const size = step;
     // The last mode's screen is past the grid's cap, so its width is the one MODAL_WIDTH_SCREENS reads at 1280.
     assert.deepEqual(px[step], Object.keys(LAYOUT_MODES).map((mode) => parseInt(atMode(`--modal-width-${size}`, mode), 10)), step);
   }
@@ -352,7 +355,7 @@ function screenGridWidth(span, width, mode, padPx = MODAL_PAD_PX) {
 }
 
 test('the Overlay screen grid lands on Modal/width-modal-* at 768, 1024 and 1440', () => {
-  const spans = { sm: 6, md: 8, lg: 10 };
+  const spans = { '6-col': 6, '8-col': 8, '10-col': 10 };
   for (const [mode, width] of Object.entries(LAYOUT_MODES)) {
     for (const [size, span] of Object.entries(spans)) {
       const expected = parseFloat(atMode(`--modal-width-${size}`, mode));

@@ -13,7 +13,7 @@ const SIZES = [32, 40, 48];
  * Takes `headers` and `rows`, plus `size`, `frame`, `titleColumn`, `summary`,
  * `verticalLines` and `striped`.
  */
-const StaticTable = ({ className = '', ...props }) => (
+const StaticTable = ({ className = '', onRowClick: _onRowClick, ...props }) => (
     <TableBase {...props} hover={false} className={['plus-static-table', className].filter(Boolean).join(' ')} />
 );
 

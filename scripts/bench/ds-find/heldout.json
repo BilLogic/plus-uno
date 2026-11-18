@@ -10,7 +10,6 @@
  {
   "q": "table",
   "want": [
-   "Table",
    "Table"
   ],
   "kind": "real-name",
@@ -163,7 +162,6 @@
  {
   "q": "table of sessions with status, filter, search, pagination",
   "want": [
-   "Table",
    "Table"
   ],
   "kind": "real-intent",
@@ -172,7 +170,6 @@
  {
   "q": "table of sessions with filter, search, pagination, status badge",
   "want": [
-   "Table",
    "Table"
   ],
   "kind": "real-intent",
