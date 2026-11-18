@@ -36,7 +36,8 @@ export function loadAtlassian({ root = REPO_ROOT } = {}) {
 }
 
 // Rovo is Atlassian's AI layer: out of scope until the AI hue is decided.
-const SKIP = ['color.rovo', 'elevation.rovo', 'elevation.shadow'];
+// elevation.surface.container* is retired (not in the elevation model).
+const SKIP = ['color.rovo', 'elevation.rovo', 'elevation.shadow', 'elevation.surface.container'];
 const HUES = ['blue', 'teal', 'green', 'lime', 'yellow', 'orange', 'red', 'magenta', 'purple', 'gray', 'brown'];
 const DIRECT = {
   Blue: 'blue', Teal: 'teal', Green: 'green', Lime: 'lime', Yellow: 'yellow', Orange: 'orange',
@@ -167,6 +168,8 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
     '(pressed stops at 14% so subtle text and links on it keep 4.5:1), a step past hover (6%); always paired with a ' +
     "non-color cue (a check, an icon, the medium label weight or the active tab's underline), never a side stripe.";
   const overrides = {
+    'elevation.surface.raised': [null, D(100), null, null,
+      'In dark, raised cards sit at the page tone (darkNeutral.100); only overlay layers (3 and 4) step lighter.'],
     'color.border.focused': [H('lagoon', 700), H('lagoon', 300), H('lagoon', 800), H('lagoon', 300),
       'Two steps darker than Atlassian (500): 5.0:1 on white, and 3:1 on the hovered and selected grounds it sits on. Drawn with a 2px offset, never inset on a fill.'],
     'color.interaction.hovered': [NA(8), DA(8), null, null, 'PLUS state-layer ruling (2026-10-24): hover overlay 8%. Atlassian uses 16%. Only for fills that cannot change (avatars, images).'],

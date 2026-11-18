@@ -924,9 +924,6 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-logo-wordmark-stroke  /* Hairline stroke in the dark ground color around light wordmark letters on dark grounds. */
 --ds-skeleton  /* Skeleton loading states */
 --ds-surface  /* The primary background for the UI */
---ds-surface-container  /* A neutral container surface background */
---ds-surface-container-hovered
---ds-surface-container-pressed
 --ds-surface-hovered
 --ds-surface-overlay  /* The background of elements that sit on top of the UI, such as modals, dropdown menus, floating toolbars, and floating single-action buttons. Also use for the background of raised cards in a dragged state. Combine with --ds-shadow-overlay */
 --ds-surface-overlay-hovered

@@ -161,7 +161,7 @@ export const PickDate = () => {
                     style={{
                         marginTop: 'var(--section-stack-md)',
                         padding: 'var(--pad-x-md)',
-                        backgroundColor: 'var(--ds-surface-container)',
+                        backgroundColor: 'var(--ds-surface-sunken)',
                         borderRadius: 'var(--radius-md)',
                     }}
                 >
@@ -198,7 +198,7 @@ export const PickRange = () => {
                     style={{
                         marginTop: 'var(--section-stack-md)',
                         padding: 'var(--pad-x-md)',
-                        backgroundColor: 'var(--ds-surface-container)',
+                        backgroundColor: 'var(--ds-surface-sunken)',
                         borderRadius: 'var(--radius-md)',
                     }}
                 >

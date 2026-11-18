@@ -28,6 +28,9 @@
 // - Lagoon was retuned toward Notion's teal after the reference was cut (plan-a.json
 //   `accents`). The reference's Lagoon hexes are swapped for ours, step for step,
 //   before any comparison, so every other value is still held to the reference.
+// - Surface elevation moved after the reference was cut: `elevation.surface.container*`
+//   was retired, and dark `elevation.surface.raised` moved to the page tone
+//   (`darkNeutral.100`), held by `semantics.test.mjs` and `check:color-system`.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
@@ -59,7 +62,8 @@ const withoutPlusOnly = (spec) => ({
 });
 /** Top-level blocks of a stylesheet body (each ends with a `}` in column 0). */
 const CHART_DEPARTURE = /^color\.chart\.(categorical|smart)\.|^color\.chart\.(neutral|gray\.bold)$/;
-const isDeparture = (name) => CHART_DEPARTURE.test(name);
+const SURFACE_DEPARTURE = /^elevation\.surface\.(container(\.|$)|raised$)/;
+const isDeparture = (name) => CHART_DEPARTURE.test(name) || SURFACE_DEPARTURE.test(name);
 const keptRows = (rows) => rows.filter((r) => !isDeparture(r.name));
 /** A Figma spec without the departed variables (`color/chart/neutral/default` is `color.chart.neutral`). */
 const keptSpec = (spec) => ({
@@ -80,7 +84,11 @@ const refShape = (palette) => ({
 const withoutElevation2 = (rows) => rows.filter((r) => !ELEVATION_2.test(r.name));
 const withoutElevation2Lines = (css) => css.split('\n').filter((l) => !ELEVATION_2.test(l)).join('\n');
 /** A stylesheet without the departed declarations. */
-const keptCss = (css) => css.split('\n').filter((l) => !/--chart-(categorical|smart)-|--chart-(neutral|gray-bold):/.test(l)).join('\n');
+const keptCss = (css) =>
+  css
+    .split('\n')
+    .filter((l) => !/--chart-(categorical|smart)-|--chart-(neutral|gray-bold):|--ds-surface-(container(-hovered|-pressed)?|raised):/.test(l))
+    .join('\n');
 /** Rewrites the reference's Lagoon values (hex, bare hex and rgb triplets) to ours, for the plan's retuned steps. */
 function lagoonSwap(key) {
   const ours = buildPlan(key).semantics.palette.lagoon;
