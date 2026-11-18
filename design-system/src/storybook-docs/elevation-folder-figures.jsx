@@ -999,7 +999,7 @@ export const ShadowRampFigure = () => (
                 gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-md)), 1fr))',
                 borderRadius: 'var(--card-radius-compact)',
                 overflow: 'hidden',
-                boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border)',
+                border: 'var(--border-width-default) solid var(--ds-border)',
             }}
         >
             {(['light', 'dark']).map((mode) => (
@@ -1009,43 +1009,52 @@ export const ShadowRampFigure = () => (
                     style={{
                         background: 'var(--ds-surface)',
                         color: 'var(--ds-text)',
-                        padding: 'var(--section-stack-md) var(--card-pad-default) var(--card-pad-default)',
+                        padding: 'var(--card-pad-spacious) var(--card-pad-default)',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        gap: 'var(--stack-md)',
+                        gap: 'var(--stack-lg)',
                     }}
                 >
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        {RAMP_STEPS.map((step, i) => (
+                    <div
+                        style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+                            gap: 'var(--inline-sm)',
+                            width: '100%',
+                        }}
+                    >
+                        {RAMP_STEPS.map((step) => (
                             <div
                                 key={step.id}
-                                data-shadow-step={step.id}
                                 style={{
-                                    width: 'var(--image-md)',
-                                    height: 'var(--image-md)',
-                                    borderRadius: 'var(--radius-full)',
-                                    background: `var(${step.surface})`,
-                                    boxShadow: `var(${step.shadow})`,
-                                    marginInlineStart: i === 0 ? 0 : 'calc(-1 * var(--space-250))',
-                                    position: 'relative',
-                                    zIndex: i,
-                                }}
-                            />
-                        ))}
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 'var(--inline-sm)', width: '100%', maxWidth: 'calc(4 * var(--image-md))' }}>
-                        {RAMP_STEPS.map((step) => (
-                            <span
-                                key={step.id}
-                                style={{
-                                    textAlign: 'center',
-                                    font: 'var(--code-default)',
-                                    color: 'var(--ds-text-subtle)',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    gap: 'var(--stack-md)',
                                 }}
                             >
-                                {step.label}
-                            </span>
+                                <div
+                                    data-shadow-step={step.id}
+                                    style={{
+                                        width: 'var(--image-xl)',
+                                        height: 'var(--image-xl)',
+                                        borderRadius: 'var(--radius-full)',
+                                        background: `var(${step.surface})`,
+                                        boxShadow: `var(${step.shadow})`,
+                                    }}
+                                />
+                                <span
+                                    style={{
+                                        textAlign: 'center',
+                                        font: 'var(--code-default)',
+                                        color: 'var(--ds-text-subtle)',
+                                        whiteSpace: 'nowrap',
+                                    }}
+                                >
+                                    {step.label}
+                                </span>
+                            </div>
                         ))}
                     </div>
                     <span style={{ font: 'var(--heading-xxs)', color: 'var(--ds-text-subtle)' }}>

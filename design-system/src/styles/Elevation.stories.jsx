@@ -672,13 +672,55 @@ export const Ramp = {
         await expect(figure).not.toBeNull();
         const modes = [...figure.querySelectorAll('[data-color-mode]')];
         await expect(modes.map((m) => m.dataset.colorMode)).toEqual(['light', 'dark']);
+
+        const rectsIntersect = (a, b) =>
+            a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top;
+        const textBoxOf = (el) => {
+            const range = document.createRange();
+            range.selectNodeContents(el);
+            return range.getBoundingClientRect();
+        };
+
+        const steps = ['raised', 'overflow', 'overlay', 'blocking'];
         for (const mode of modes) {
             const discs = [...mode.querySelectorAll('[data-shadow-step]')];
-            await expect(discs.map((d) => d.dataset.shadowStep)).toEqual(['raised', 'overflow', 'overlay', 'blocking']);
+            await expect(discs.map((d) => d.dataset.shadowStep)).toEqual(steps);
+            const discRects = discs.map((d) => d.getBoundingClientRect());
             for (const disc of discs) {
                 await expect(getComputedStyle(disc).boxShadow).not.toBe('none');
             }
+            for (let i = 0; i < discRects.length; i += 1) {
+                await expect(discRects[i].width, `${steps[i]} disc width`).toBeGreaterThanOrEqual(40);
+                await expect(discRects[i].height, `${steps[i]} disc height`).toBeGreaterThanOrEqual(40);
+                for (let j = i + 1; j < discRects.length; j += 1) {
+                    await expect(
+                        rectsIntersect(discRects[i], discRects[j]),
+                        `${steps[i]} and ${steps[j]} discs must not intersect`,
+                    ).toBe(false);
+                }
+            }
+
+            const labels = steps.map((step) => within(mode).getByText(step));
+            const labelRects = labels.map((el) => el.getBoundingClientRect());
+            const textRects = labels.map(textBoxOf);
+            for (let i = 0; i < labels.length; i += 1) {
+                await expect(labelRects[i].top, `${steps[i]} label sits below its disc`).toBeGreaterThanOrEqual(discRects[i].bottom - 1);
+                for (let j = i + 1; j < labels.length; j += 1) {
+                    await expect(
+                        rectsIntersect(labelRects[i], labelRects[j]),
+                        `${steps[i]} and ${steps[j]} label boxes must not intersect`,
+                    ).toBe(false);
+                    await expect(
+                        rectsIntersect(textRects[i], textRects[j]),
+                        `${steps[i]} and ${steps[j]} label text must not intersect`,
+                    ).toBe(false);
+                }
+            }
         }
+
+        const [lightRect, darkRect] = modes.map((m) => m.getBoundingClientRect());
+        await expect(lightRect.right, 'light and dark halves sit side by side').toBeLessThanOrEqual(darkRect.left + 1);
+        await expect(Math.abs(lightRect.top - darkRect.top), 'light and dark halves align vertically').toBeLessThan(2);
     },
 };
 
