@@ -101,7 +101,7 @@ export default {
 
 export const Overview = () => (
     <div style={{ maxWidth: 'var(--size-4000)' }}>
-        <DateTimePicker id="datetime-overview" label="Month" isRequired showSectionLabels={false} />
+        <DateTimePicker id="datetime-overview" label="Session start" isRequired showSectionLabels={false} />
     </div>
 );
 Overview.parameters = {
@@ -114,11 +114,11 @@ export const Spacing = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', maxWidth: 'var(--size-5400)' }}>
         <div>
             <DemoLabel>DEFAULT (40)</DemoLabel>
-            <DateTimePicker id="dt-default" label="Month" isRequired spacing="default" showSectionLabels={false} />
+            <DateTimePicker id="dt-default" label="Session start" isRequired spacing="default" showSectionLabels={false} />
         </div>
         <div>
             <DemoLabel>COMPACT (32)</DemoLabel>
-            <DateTimePicker id="dt-compact" label="Month" isRequired spacing="compact" showSectionLabels={false} />
+            <DateTimePicker id="dt-compact" label="Session start" isRequired spacing="compact" showSectionLabels={false} />
         </div>
     </div>
 );
@@ -129,10 +129,10 @@ export const Validation = () => (
             <DemoLabel>INVALID</DemoLabel>
             <DateTimePicker
                 id="datetime-error"
-                label="Month"
+                label="Session start"
                 isRequired
                 isInvalid
-                errorMessage="Validation message"
+                errorMessage="Choose a start date and time."
                 showSectionLabels={false}
             />
         </div>
@@ -140,10 +140,10 @@ export const Validation = () => (
             <DemoLabel>VALID</DemoLabel>
             <DateTimePicker
                 id="datetime-success"
-                label="Month"
+                label="Session start"
                 isRequired
                 isValid
-                successMessage="Validation message"
+                successMessage="Start time saved."
                 showSectionLabels={false}
             />
         </div>
@@ -154,15 +154,15 @@ export const InteractionStates = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', maxWidth: 'var(--size-5400)' }}>
         <div>
             <DemoLabel>DEFAULT</DemoLabel>
-            <DateTimePicker id="datetime-default" label="Month" isRequired showSectionLabels={false} />
+            <DateTimePicker id="datetime-default" label="Session start" isRequired showSectionLabels={false} />
         </div>
         <div>
             <DemoLabel>DISABLED</DemoLabel>
-            <DateTimePicker id="datetime-disabled" label="Month" isRequired isDisabled showSectionLabels={false} />
+            <DateTimePicker id="datetime-disabled" label="Session start" isRequired isDisabled showSectionLabels={false} />
         </div>
         <div>
             <DemoLabel>READ ONLY</DemoLabel>
-            <DateTimePicker id="datetime-readonly" label="Month" isRequired isReadOnly showSectionLabels={false} />
+            <DateTimePicker id="datetime-readonly" label="Session start" isRequired isReadOnly showSectionLabels={false} />
         </div>
     </div>
 );
@@ -227,7 +227,7 @@ export const Interactive = (args) => {
 
 Interactive.args = {
     id: 'datetime-interactive',
-    label: 'Month',
+    label: 'Session start',
     isRequired: true,
     datePlaceholder: 'MM/DD/YY',
     timePlaceholder: '__ : __',

@@ -48,7 +48,7 @@ OpenInNewWindow.play = async ({ canvasElement }) => {
 };
 
 export const Interactive = {
-    args: { href: '#', appearance: 'default', children: 'Link text', isOpenInNewWindow: false },
+    args: { href: '#', appearance: 'default', children: 'View session plan', isOpenInNewWindow: false },
     render: (args) => <Link {...args} />,
 };
 
