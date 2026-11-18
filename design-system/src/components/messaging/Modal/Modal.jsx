@@ -10,7 +10,6 @@ import { useOverlaySlot, reportFocusLost } from '@/lib/overlay';
 import { useOverlayOrigin } from '@/lib/overlayMotion';
 import Blanket from '@/patterns/Blanket';
 import FooterActions from '@/components/forms-and-inputs/FooterActions';
-import './Modal.scss';
 
 /** Safe CSS length / custom-property patterns for Modal width. */
 const SAFE_WIDTH_RE = /^(?:\d+(?:\.\d+)?(?:px|rem|%)|var\(--[a-zA-Z0-9-]+(?:\s*,\s*[^)]+)?\))$/;
