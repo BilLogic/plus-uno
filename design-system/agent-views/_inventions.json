@@ -256,25 +256,26 @@
     {
       "not": "--space-100 (16px)",
       "use": [
-        "--pad-x-lg",
-        "--section-stack-md",
-        "--modal-pad-x-default"
+        "--stack-xl",
+        "--inline-xl",
+        "--pad-x-lg"
       ]
     },
     {
       "not": "--space-150 (24px)",
       "use": [
-        "--page-stack-md",
-        "--page-pad",
-        "--section-stack-lg"
+        "--stack-2xl",
+        "--inline-2xl",
+        "--page-pad"
       ]
     },
     {
       "not": "--space-200 (32px) and up",
       "use": [
-        "--page-stack-lg"
+        "--stack-3xl",
+        "--inline-3xl"
       ],
-      "why": "space this large belongs to a page; it is rarely right inside a component"
+      "why": "general gaps; --page-stack-lg is only for Page"
     },
     {
       "not": "--radius-<n>",
