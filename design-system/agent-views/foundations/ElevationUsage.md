@@ -31,12 +31,12 @@ Dark blocking is the same as dark overlay. On the dark Blanket a shadow barely s
 
 Each layer is a `--layer-*` z-index token, set in code only. Components name the token, never a number.
 
-- **A confirm Modal may open over a Panel, a Popup or a focused task,** with its own Blanket.
+- **A confirm Modal may open over a Panel or a Popup,** with its own Blanket.
 - **Never a Modal on a Modal.** A Modal confirms inside itself, with a warning SectionMessage and the danger button.
 - **A Panel never has a Blanket.** It floats beside a usable page.
 - **Popups and Tooltips open over a Modal.** A Popup opened inside a Modal portals into it.
 - **A Flag sits above all of it**, so a message is never hidden.
-- **`--layer-dialog`** holds a view that replaces the page: Frame · focused and AiChat full screen.
+- **`--layer-dialog`** holds a view that replaces the page: AiChat full screen.
 
 ## Elevation in the system
 

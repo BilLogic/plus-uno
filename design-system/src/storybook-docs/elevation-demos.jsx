@@ -46,13 +46,13 @@ const SLOT_WHY = {
 
 /** Rows of the behavior table, each landing on one level. */
 export const BEHAVIORS = [
-    { id: 'holds', behavior: 'Holds the work', level: 'sunken', layer: null, uses: 'Frame topbar, docked Sidebar' },
+    { id: 'holds', behavior: 'Holds the work', level: 'sunken', layer: null, uses: 'Frame, docked Sidebar' },
     { id: 'flow', behavior: 'In the flow', level: 'default', layer: null, uses: 'Page, Section (sunken for a subtle one), Table, docked AI panel' },
     { id: 'marks', behavior: 'Marks one object', level: 'raised', layer: null, uses: 'Card, Carousel slide, Range thumb' },
     { id: 'stays', behavior: 'Stays put while content scrolls', level: 'overflow', layer: '--layer-card', uses: 'Sticky table header and column, with a border first' },
     { id: 'floats', behavior: 'Floats, page usable', level: 'overlay', layer: ['--layer-navigation', '--layer-popup', '--layer-flag', '--layer-spotlight'], uses: 'Floating Sidebar, floating Panel, Popup types (Popup, DropdownMenu, a Select list), Inline edit, Flag, Spotlight, a dragged Card' },
     { id: 'blocks', behavior: 'Blocks the page', level: 'blocking', layer: '--layer-modal', uses: 'Modal only, on the Blanket (--layer-blanket)' },
-    { id: 'replaces', behavior: 'Replaces the page', level: 'default', layer: '--layer-dialog', uses: 'Frame · focused, AiChat full screen' },
+    { id: 'replaces', behavior: 'Replaces the page', level: 'default', layer: '--layer-dialog', uses: 'AiChat full screen' },
     { id: 'labels', behavior: 'Labels a control', level: null, layer: '--layer-tooltip', uses: 'Tooltip, with no shadow' },
 ];
 
@@ -60,7 +60,7 @@ export const BEHAVIORS = [
 export const LAYERS = [
     { token: '--layer-card', who: 'Sticky headers and columns' },
     { token: '--layer-navigation', who: 'The floating Sidebar and Panel' },
-    { token: '--layer-dialog', who: 'A page that replaces the page: Frame · focused, AiChat full screen' },
+    { token: '--layer-dialog', who: 'A page that replaces the page: AiChat full screen' },
     { token: '--layer-popup', who: 'Popups, menus, a Select list' },
     { token: '--layer-blanket', who: 'The Blanket' },
     { token: '--layer-modal', who: 'The Modal, above its Blanket' },

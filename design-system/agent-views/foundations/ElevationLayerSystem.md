@@ -22,7 +22,7 @@ Every surface sits in one of five layers. Frame and Page are flat; Navigation, N
 
 ### Not a layer
 
-A **focused view** replaces the page rather than floating over it: `--ds-surface`, no shadow, `--layer-dialog`. A **Tooltip** labels a control: no shadow, `--layer-tooltip`.
+A **Tooltip** labels a control: no shadow, `--layer-tooltip`.
 
 ## Within the page
 
