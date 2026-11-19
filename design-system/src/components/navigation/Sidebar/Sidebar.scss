@@ -164,7 +164,7 @@ $inset-24: calc((var(--control-md) - var(--icon-lg)) / 2);
     min-width: 0;
 }
 
-// Full width, 32 high, the soft neutral fill. The arrow stays at the start on
+// Full width, 32 high, no fill (a subtle Button: transparent at rest). The arrow stays at the start on
 // the icon column and the area name is centered on the whole row.
 .plus-template-sidebar__back {
     position: relative;
