@@ -457,6 +457,163 @@ export const TileDisabled = {
     },
 };
 
+/** Soft state matrix: rest, hovered, pressed, selected, selected-hovered, focused, invalid, read-only, disabled. */
+const softOptions = [{ value: 'email', label: 'Email summary' }, { value: 'sms', label: 'Text reminder' }];
+const softRows = (canvasElement) => [...canvasElement.querySelectorAll('.plus-choice-soft')].map((row) => {
+    row.style.transition = 'none';
+    return row;
+});
+const softCheck = (row) => row.querySelector('.plus-choice-soft-check');
+
+export const SoftRest = {
+    render: () => <CheckboxGroup name="cbg-soft-rest" legend="Reminders" appearance="soft" options={softOptions} />,
+    play: async ({ canvasElement }) => {
+        const [row] = softRows(canvasElement);
+        await expect(getComputedStyle(row).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+        await expect(getComputedStyle(row).borderTopColor).toBe('rgba(0, 0, 0, 0)');
+        await expect(getComputedStyle(softCheck(row)).opacity).toBe('0');
+    },
+};
+
+export const SoftHovered = {
+    render: () => <CheckboxGroup name="cbg-soft-hover" legend="Reminders" appearance="soft" options={softOptions} />,
+    play: async ({ canvasElement }) => {
+        const [row] = softRows(canvasElement);
+        const hovered = withForcedPseudo(row, ':hover', () => getComputedStyle(row).backgroundColor);
+        await expect(hovered).toBe(tokenColor(canvasElement, '--ds-background-neutral-hovered'));
+    },
+};
+
+export const SoftPressed = {
+    render: () => <CheckboxGroup name="cbg-soft-pressed" legend="Reminders" appearance="soft" options={softOptions} />,
+    play: async ({ canvasElement }) => {
+        const [row] = softRows(canvasElement);
+        const pressed = withForcedPseudo(row, ':active', () => getComputedStyle(row).backgroundColor);
+        await expect(pressed).toBe(tokenColor(canvasElement, '--ds-background-neutral-pressed'));
+    },
+};
+
+export const SoftSelected = {
+    render: () => <CheckboxGroup name="cbg-soft-selected" legend="Reminders" appearance="soft" options={softOptions} defaultValue={['email']} />,
+    play: async ({ canvasElement }) => {
+        const [row] = softRows(canvasElement);
+        await expect(getComputedStyle(row).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected'));
+        await expect(px(getComputedStyle(row).borderTopWidth)).toBe(1);
+        await expect(getComputedStyle(row).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-selected'));
+        await expect(getComputedStyle(softCheck(row)).opacity).toBe('1');
+        await expect(getComputedStyle(softCheck(row)).color).toBe(tokenColor(canvasElement, '--ds-icon-selected'));
+    },
+};
+
+export const SoftSelectedHovered = {
+    render: () => <CheckboxGroup name="cbg-soft-selected-hover" legend="Reminders" appearance="soft" options={softOptions} defaultValue={['email']} />,
+    play: async ({ canvasElement }) => {
+        const [row] = softRows(canvasElement);
+        const hovered = withForcedPseudo(row, ':hover', () => ({
+            backgroundColor: getComputedStyle(row).backgroundColor,
+            borderTopColor: getComputedStyle(row).borderTopColor,
+        }));
+        await expect(hovered.backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected-hovered'));
+        await expect(hovered.borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-selected'));
+        await expect(getComputedStyle(softCheck(row)).opacity).toBe('1');
+    },
+};
+
+export const SoftFocused = {
+    render: () => <CheckboxGroup name="cbg-soft-focus" legend="Reminders" appearance="soft" options={softOptions} defaultValue={['email']} />,
+    play: async ({ canvasElement }) => {
+        const box = within(canvasElement).getByRole('checkbox', { name: 'Email summary' });
+        const [row] = softRows(canvasElement);
+        box.focus({ focusVisible: true });
+        await waitFor(() => expect(getComputedStyle(row).outlineStyle).toBe('solid'));
+        await expect(px(getComputedStyle(row).outlineWidth)).toBe(2);
+        await expect(px(getComputedStyle(row).outlineOffset)).toBe(2);
+        await expect(getComputedStyle(row).outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        box.blur();
+    },
+};
+
+export const SoftInvalid = {
+    render: () => (
+        <CheckboxGroup
+            name="cbg-soft-invalid"
+            legend="Reminders"
+            appearance="soft"
+            options={softOptions}
+            isRequired
+            error="Pick at least one reminder."
+        />
+    ),
+    play: async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByRole('alert').textContent).toBe('Pick at least one reminder.');
+        const [row] = softRows(canvasElement);
+        await expect(getComputedStyle(row).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-danger'));
+        await expect(getComputedStyle(row).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+    },
+};
+
+export const SoftInvalidSelected = {
+    render: () => (
+        <CheckboxGroup
+            name="cbg-soft-invalid-selected"
+            legend="Reminders"
+            appearance="soft"
+            options={softOptions}
+            defaultValue={['email']}
+            error="Pick at least one reminder."
+        />
+    ),
+    play: async ({ canvasElement }) => {
+        const [row] = softRows(canvasElement);
+        await expect(getComputedStyle(row).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected'));
+        await expect(getComputedStyle(row).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-danger'));
+        await expect(getComputedStyle(softCheck(row)).opacity).toBe('1');
+    },
+};
+
+export const SoftReadOnly = {
+    render: () => <CheckboxGroup name="cbg-soft-readonly" legend="Reminders" appearance="soft" options={softOptions} defaultValue={['email']} isReadOnly />,
+    play: async ({ canvasElement }) => {
+        const [selected, other] = softRows(canvasElement);
+        const box = within(selected).getByRole('checkbox', { name: 'Email summary' });
+        await expect(getComputedStyle(selected).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected'));
+        await expect(getComputedStyle(softCheck(selected)).opacity).toBe('1');
+        await expect(getComputedStyle(other).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+        // No hover or pressed step on either row, and the answers stay put.
+        await expect(withForcedPseudo(other, ':hover', () => getComputedStyle(other).backgroundColor)).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+        await expect(withForcedPseudo(selected, ':hover', () => getComputedStyle(selected).backgroundColor)).toBe(tokenColor(canvasElement, '--ds-background-selected'));
+        await expect(getComputedStyle(other).cursor).toBe('default');
+        await userEvent.click(other);
+        await expect(within(other).getByRole('checkbox', { name: 'Text reminder' })).toHaveAttribute('aria-checked', 'false');
+        await expect(box).toHaveAttribute('aria-checked', 'true');
+        // Still focusable, with the ring around the row.
+        box.focus({ focusVisible: true });
+        await expect(document.activeElement).toBe(box);
+        await waitFor(() => expect(getComputedStyle(selected).outlineStyle).toBe('solid'));
+        box.blur();
+    },
+};
+
+export const SoftDisabled = {
+    render: () => <CheckboxGroup name="cbg-soft-disabled" legend="Reminders" appearance="soft" options={softOptions} defaultValue={['email']} isDisabled />,
+    play: async ({ canvasElement }) => {
+        const [selected, other] = softRows(canvasElement);
+        for (const row of [selected, other]) {
+            await expect(getComputedStyle(row).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-disabled'));
+            await expect(getComputedStyle(row).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-disabled'));
+        }
+        await expect(getComputedStyle(softCheck(selected)).opacity).toBe('1');
+        await expect(getComputedStyle(softCheck(selected)).color).toBe(tokenColor(canvasElement, '--ds-icon-disabled'));
+        await expect(getComputedStyle(softCheck(other)).opacity).toBe('0');
+        await expect(withForcedPseudo(other, ':hover', () => getComputedStyle(other).backgroundColor)).toBe(tokenColor(canvasElement, '--ds-background-disabled'));
+        const box = within(selected).getByRole('checkbox', { name: 'Email summary' });
+        await expect(box).toHaveAttribute('data-disabled');
+        await userEvent.tab();
+        await expect(canvasElement.querySelector('fieldset').contains(document.activeElement)).toBe(false);
+        await expect(within(selected).getByRole('checkbox', { name: 'Email summary' })).toHaveAttribute('tabindex', '-1');
+    },
+};
+
 export const Interactive = (args) => {
     const [picked, setPicked] = useState([]);
     const activeOptions = args.appearance === 'tile' ? tileChoices : described;

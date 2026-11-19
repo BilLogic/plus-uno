@@ -59,6 +59,26 @@ A checkbox group asks one question and offers a set of checkbox answers, any num
 
 <ComponentExample of={CheckboxGroupStories.Soft} title="Soft options" description="`appearance=&quot;soft&quot;` draws neutral option rows without a visible checkbox box; selection is carried by the selected fill, 1px selected border, and trailing check." />
 
+<ComponentExample of={CheckboxGroupStories.SoftRest} title="Soft rest" description="Neutral fill, no edge, no check." />
+
+<ComponentExample of={CheckboxGroupStories.SoftHovered} title="Soft hovered" description="Unselected row steps to the hovered neutral fill." />
+
+<ComponentExample of={CheckboxGroupStories.SoftPressed} title="Soft pressed" description="Unselected row steps to the pressed neutral fill." />
+
+<ComponentExample of={CheckboxGroupStories.SoftSelected} title="Soft selected" description="Selected fill, 1px selected edge, and the trailing check." />
+
+<ComponentExample of={CheckboxGroupStories.SoftSelectedHovered} title="Soft selected hovered" description="Selected row steps to the hovered selected fill and keeps its edge and check." />
+
+<ComponentExample of={CheckboxGroupStories.SoftFocused} title="Soft focused" description="Keyboard focus draws the 2px focus ring around the row." />
+
+<ComponentExample of={CheckboxGroupStories.SoftInvalid} title="Soft invalid" description="One group error under the rows, with every unselected row edged in danger." />
+
+<ComponentExample of={CheckboxGroupStories.SoftInvalidSelected} title="Soft invalid, selected" description="A selected row keeps its fill and check but takes the danger edge." />
+
+<ComponentExample of={CheckboxGroupStories.SoftReadOnly} title="Soft read-only" description="Selected answers and checks stay visible, no hover, still focusable, and the answers are locked." />
+
+<ComponentExample of={CheckboxGroupStories.SoftDisabled} title="Soft disabled" description="Disabled fill and edge on every row, the check in the disabled icon color, and out of the tab order." />
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -169,8 +189,8 @@ Use `CheckboxGroup` for one question where a person may pick several answers —
 <tr><td>Pressed</td><td>In <code>soft</code>, an unselected row steps to <code>--ds-background-neutral-pressed</code> and a selected row steps to <code>--ds-background-selected-pressed</code>.</td></tr>
 <tr><td>Focused</td><td>2px ring in <code>--ds-border-focused</code>: around the box in plain/card, and outside the row or tile in <code>soft</code> and <code>tile</code> appearances.</td></tr>
 <tr><td>Invalid</td><td>Unselected options take <code>--ds-border-danger</code> (and in <code>soft</code>, selected options do too), with one error message announced for the group.</td></tr>
-<tr><td>Read-only</td><td>Full contrast, focusable, no hover, <code>aria-readonly</code> on each Checkbox; unchecked controls and tiles take <code>--ds-background-neutral</code>.</td></tr>
-<tr><td>Disabled</td><td>Every option takes the disabled fill and edge and leaves the tab order.</td></tr>
+<tr><td>Read-only</td><td>Full contrast, focusable, no hover, <code>aria-readonly</code> on each Checkbox; unchecked controls and tiles take <code>--ds-background-neutral</code>. In <code>soft</code>, the selected row keeps <code>--ds-background-selected</code>, its <code>--ds-border-selected</code> edge and the trailing check in <code>--ds-icon-selected</code>; unselected rows stay <code>--ds-background-neutral</code>, with no hover or pressed step and a default cursor.</td></tr>
+<tr><td>Disabled</td><td>Every option takes the disabled fill and edge and leaves the tab order. In <code>soft</code>, every row takes <code>--ds-background-disabled</code> and a <code>--ds-border-disabled</code> edge; a selected row keeps its trailing check, in <code>--ds-icon-disabled</code>.</td></tr>
 </tbody>
 </DocsTable>
 

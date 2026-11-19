@@ -138,8 +138,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `CheckboxGr
 | Selected | `--ds-background-selected-bold` fill and `--ds-border-selected` edge; the check is `--ds-icon-inverse`. In `soft`, `--ds-background-selected` fill, 1px `--ds-border-selected` edge, and a trailing check in `--ds-icon-selected`. |
 | Mixed | The same fill and edge as selected; the mark is a dash in `--ds-icon-inverse` (or `fa-solid fa-minus` in `--ds-icon-selected` in `soft`). |
 | Invalid | The unselected box or tile takes `--ds-border-danger` (in `soft`, both unselected and selected rows take `--ds-border-danger`). |
-| Read-only | Full contrast, in the tab order, `aria-readonly`, no hover; an unchecked box takes the `--ds-background-neutral` fill. Ignores clicks and Space. |
-| Disabled | `--ds-background-disabled` fill, `--ds-border-disabled` edge, `--ds-icon-disabled` mark. Out of the tab order. |
+| Read-only | Full contrast, in the tab order, `aria-readonly`, no hover; an unchecked box takes the `--ds-background-neutral` fill. Ignores clicks and Space. In `soft`, a checked row keeps its selected fill, edge and trailing check. |
+| Disabled | `--ds-background-disabled` fill, `--ds-border-disabled` edge, `--ds-icon-disabled` mark. Out of the tab order. In `soft`, the row takes the disabled fill and edge, with the check in `--ds-icon-disabled`. |
 
 ### Tokens
 

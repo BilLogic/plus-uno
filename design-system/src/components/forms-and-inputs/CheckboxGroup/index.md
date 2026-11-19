@@ -10,7 +10,7 @@ CheckboxGroup — one question and its checkbox answers, any number of which may
 
 **Source:** `design-system/src/components/forms-and-inputs/CheckboxGroup/CheckboxGroup.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/CheckboxGroup/CheckboxGroup.stories.jsx` — Overview, Orientation, Descriptions, Reveal, Soft, Tiles, Unselected, Selected, Required, Invalid, ReadOnly, Disabled, TileRest, TileHovered, TileSelected, TileFocused, TileInvalid, TileReadOnly, TileDisabled, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/CheckboxGroup/CheckboxGroup.stories.jsx` — Overview, Orientation, Descriptions, Reveal, Soft, Tiles, Unselected, Selected, Required, Invalid, ReadOnly, Disabled, TileRest, TileHovered, TileSelected, TileFocused, TileInvalid, TileReadOnly, TileDisabled, SoftRest, SoftHovered, SoftPressed, SoftSelected, SoftSelectedHovered, SoftFocused, SoftInvalid, SoftInvalidSelected, SoftReadOnly, SoftDisabled, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/CheckboxGroup/CheckboxGroup.mdx`
 
@@ -98,8 +98,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Pressed | In `soft`, an unselected row steps to `--ds-background-neutral-pressed` and a selected row steps to `--ds-background-selected-pressed`. |
 | Focused | 2px ring in `--ds-border-focused`: around the box in plain/card, and outside the row or tile in `soft` and `tile` appearances. |
 | Invalid | Unselected options take `--ds-border-danger` (and in `soft`, selected options do too), with one error message announced for the group. |
-| Read-only | Full contrast, focusable, no hover, `aria-readonly` on each Checkbox; unchecked controls and tiles take `--ds-background-neutral`. |
-| Disabled | Every option takes the disabled fill and edge and leaves the tab order. |
+| Read-only | Full contrast, focusable, no hover, `aria-readonly` on each Checkbox; unchecked controls and tiles take `--ds-background-neutral`. In `soft`, the selected row keeps `--ds-background-selected`, its `--ds-border-selected` edge and the trailing check in `--ds-icon-selected`; unselected rows stay `--ds-background-neutral`, with no hover or pressed step and a default cursor. |
+| Disabled | Every option takes the disabled fill and edge and leaves the tab order. In `soft`, every row takes `--ds-background-disabled` and a `--ds-border-disabled` edge; a selected row keeps its trailing check, in `--ds-icon-disabled`. |
 
 ### Tokens
 

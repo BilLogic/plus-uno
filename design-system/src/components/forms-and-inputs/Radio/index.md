@@ -118,8 +118,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Focused | A 2px ring in `--ds-border-focused`, 2px off the radio (or around the row in `soft` and `tile`), for keyboard focus only. |
 | Selected | `--ds-background-selected-bold` fill and `--ds-border-selected` edge; the dot is `--ds-icon-inverse`. In `soft`, `--ds-background-selected` fill, 1px `--ds-border-selected` edge, and a trailing check in `--ds-icon-selected`. |
 | Invalid | The unselected radio or tile takes `--ds-border-danger` (in `soft`, both unselected and selected rows take `--ds-border-danger`). |
-| Read-only | Full contrast, in the tab order, no hover; an unchecked radio takes the `--ds-background-neutral` fill. Not changeable. |
-| Disabled | `--ds-background-disabled` fill, `--ds-border-disabled` edge, `--ds-icon-disabled` dot or check. Out of the tab order. |
+| Read-only | Full contrast, in the tab order, no hover; an unchecked radio takes the `--ds-background-neutral` fill. Not changeable. In `soft`, the selected row keeps its selected fill, edge and trailing check. |
+| Disabled | `--ds-background-disabled` fill, `--ds-border-disabled` edge, `--ds-icon-disabled` dot or check. Out of the tab order. In `soft`, the row takes the disabled fill and edge, with the check in `--ds-icon-disabled`. |
 
 ### Tokens
 
