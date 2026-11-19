@@ -728,7 +728,7 @@ export const MaterialAsIs = () => (
 /** Pair 7: neutral material only. */
 export const MaterialNeutralOnly = () => (
   <DoDont>
-    <Do caption="A neutral Tag on media. Color goes on solid surfaces.">
+    <Do caption="A neutral Tag on media. A colored accent takes the colored-material tokens.">
       <Stage title="A neutral Tag in media material on a picture">
         <Picture x={FRAME.x + 12} y={FRAME.y + 10} w={186} h={80} />
         <Plate
@@ -741,7 +741,7 @@ export const MaterialNeutralOnly = () => (
         />
       </Stage>
     </Do>
-    <Dont caption="A colored tint as material. Material is neutral; color goes on solid surfaces.">
+    <Dont caption="A translucent brand color made up by hand. Colored material has its own tokens.">
       <Stage title="A Tag tinted with a translucent brand color on a picture">
         <Picture x={FRAME.x + 12} y={FRAME.y + 10} w={186} h={80} />
         <Rect

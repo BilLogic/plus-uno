@@ -14547,6 +14547,18 @@
           "deprecated": null
         },
         {
+          "name": "material",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "bold",
+            "subtle"
+          ],
+          "description": "Colored material for a status over media or a material surface: bold or subtle, in the appearance's color. Not for neutral.",
+          "deprecated": null
+        },
+        {
           "name": "iconBefore",
           "type": "string",
           "required": false,
@@ -15273,6 +15285,34 @@
           "default": "false",
           "values": null,
           "description": "For a tag on an image or video: a solid surface fill, no border and the Elevation 2 shadow, with the hue kept on the swatch, when there is one, or the avatar's own fill. Disabled keeps the ground and shadow and turns the content Secondary (Text). Focus on the tag or a link's × has a surface gap inside the ring. Read-only and link tags only; ignored with a warning on removable and selectable ones.",
+          "deprecated": null
+        },
+        {
+          "name": "material",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "bold",
+            "subtle"
+          ],
+          "description": "Colored material for a read-only tag over media or a material surface: a bold or subtle fill with the material edge.",
+          "deprecated": null
+        },
+        {
+          "name": "materialColor",
+          "type": "enum",
+          "required": false,
+          "default": "'brand'",
+          "values": [
+            "brand",
+            "success",
+            "warning",
+            "danger",
+            "information",
+            "discovery"
+          ],
+          "description": "The color of the material: a status, brand or category identity.",
           "deprecated": null
         },
         {

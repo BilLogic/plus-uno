@@ -18,7 +18,7 @@ import * as ElevationStories from './Elevation.stories.jsx';
 
 <Callout title="Tokens on this page">
 
-<C>--ds-surface-material-media</C> · <C>--ds-surface-material-control</C> · <C>--ds-surface-material-overlay</C> · <C>--ds-border-material</C>
+<C>--ds-surface-material-media</C> · <C>--ds-surface-material-control</C> · <C>--ds-surface-material-overlay</C> · <C>--ds-border-material</C> · <C>--ds-background-{"{color}"}-material-bold</C>
 
 </Callout>
 
@@ -46,7 +46,46 @@ A material surface is three tokens together. The fill alone dissolves on busy co
 
 </FoundationSection>
 
-{/* Colored material (bold and subtle accents for a Tag, Lozenge or Badge on media) is added here once its tokens ship. */}
+<FoundationSection title="Colored material">
+
+Color identity for small accents on media or on a material surface: a Tag, a Status tag, a rating or a count chip. Two treatments, and each carries the material edge.
+
+<Canvas of={ElevationStories.ColoredTreatments} />
+
+<FoundationSubsection title="Tokens">
+
+One bold token per color. Text uses the on-bold text tokens that already exist.
+
+<Canvas of={ElevationStories.ColoredTokens} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="In use">
+
+A Tag takes <C>material</C> and <C>materialColor</C>, and a Status tag takes <C>material</C> with its own appearance. Neutral has no colored material.
+
+<Canvas of={ElevationStories.ColoredMaterialOnMedia} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="How it composes">
+
+<Canvas of={ElevationStories.ColoredCompose} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Accessibility">
+
+Every colored material has a solid fallback.
+
+- **Text contrast.** On-bold text meets 4.5:1 composited over white and over black. That is why light is 95%: at 92% white text over white measures 4.3:1.
+- **Reduced transparency.** Bold becomes solid <C>--ds-background-{"{color}"}-bold</C>; subtle becomes solid <C>--ds-surface-overlay</C> with the same text.
+- **Increased contrast.** Solid as above, and the edge becomes the 3:1 border.
+- **Forced colors.** System colors replace the fill; the 1px border stays and draws the edge.
+
+</FoundationSubsection>
+
+</FoundationSection>
 
 <FoundationSection title="Do and don’t">
 
@@ -97,6 +136,30 @@ Each rule as a Do and a Don’t.
 <FoundationSubsection title="A blocking material sits on the Blanket">
 
 <Canvas of={ElevationStories.MaterialOnBlanketPair} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Keep colored material small">
+
+<Canvas of={ElevationStories.ColoredSmallPair} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Pair the fill with its on-bold text">
+
+<Canvas of={ElevationStories.ColoredTextPair} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Give colored material the edge">
+
+<Canvas of={ElevationStories.ColoredEdgePair} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Colored material only over something">
+
+<Canvas of={ElevationStories.ColoredOverSomethingPair} />
 
 </FoundationSubsection>
 

@@ -45,6 +45,16 @@ import {
     MaterialValuesTable,
 } from '@/storybook-docs/elevation-material-figures.jsx';
 import {
+    ColoredComposeTable,
+    ColoredMaterialEdge,
+    ColoredMaterialLive,
+    ColoredMaterialOverSomething,
+    ColoredMaterialPairText,
+    ColoredMaterialSmall,
+    ColoredTokensTable,
+    ColoredTreatmentsTable,
+} from '@/storybook-docs/elevation-colored-material-figures.jsx';
+import {
     BehaviorGuide,
     ByTemplateGrid,
     ClipDemo,
@@ -1091,3 +1101,33 @@ export const MaterialNoBlurPair = { render: () => <MaterialNoBlur />, play: asyn
 export const MaterialAsIsPair = { render: () => <MaterialAsIs />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
 export const MaterialNeutralOnlyPair = { render: () => <MaterialNeutralOnly />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
 export const MaterialOnBlanketPair = { render: () => <MaterialOnBlanket />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
+
+/* ------------------------------------------- EL-D6b Colored material section */
+
+const expectPair = async (canvasElement) => {
+    const pair = canvasElement.querySelector('.sb-ds-dodont-pair');
+    await expect(pair).not.toBeNull();
+    await expect(pair.querySelectorAll('figure').length).toBe(2);
+};
+
+export const ColoredTreatments = { render: () => <ColoredTreatmentsTable /> };
+export const ColoredTokens = { render: () => <ColoredTokensTable /> };
+export const ColoredCompose = { render: () => <ColoredComposeTable /> };
+
+/** Tag and Status tag in every color, bold and subtle, over a picture. */
+export const ColoredMaterialOnMedia = {
+    render: () => <ColoredMaterialLive />,
+    play: async ({ canvasElement }) => {
+        for (const m of ['bold', 'subtle']) {
+            const picture = canvasElement.querySelector(`[data-testid="colored-${m}"]`);
+            await expect(picture.querySelectorAll(`.plus-tag--material-${m}`).length).toBe(6);
+            await expect(picture.querySelectorAll(`.plus-status--material-${m}`).length).toBe(5);
+            const tag = picture.querySelector('.plus-tag');
+            await expect(getComputedStyle(tag).borderTopColor).not.toBe('rgba(0, 0, 0, 0)');
+        }
+    },
+};
+export const ColoredSmallPair = { render: () => <ColoredMaterialSmall />, play: async ({ canvasElement }) => expectPair(canvasElement) };
+export const ColoredTextPair = { render: () => <ColoredMaterialPairText />, play: async ({ canvasElement }) => expectPair(canvasElement) };
+export const ColoredEdgePair = { render: () => <ColoredMaterialEdge />, play: async ({ canvasElement }) => expectPair(canvasElement) };
+export const ColoredOverSomethingPair = { render: () => <ColoredMaterialOverSomething />, play: async ({ canvasElement }) => expectPair(canvasElement) };
