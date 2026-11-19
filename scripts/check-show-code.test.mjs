@@ -34,6 +34,11 @@ test('an examples module that imports a docs-only wrapper fails; PLUS parts pass
   assert.ok(messages('design-system/src/templates/X/XExamples.jsx', "import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';").some((m) => /staging/.test(m)));
 });
 
+test('an examples module that reaches outside its folder fails; a barrel import does not', () => {
+  assert.ok(messages('design-system/src/templates/X/XExamples.jsx', "import Blanket from '../Modal/Blanket';").some((m) => /outside its own template folder/.test(m)));
+  assert.deepEqual(messages('design-system/src/templates/X/XExamples.jsx', "import { useMotionReduced } from '@/lib/motionPreference';"), []);
+});
+
 test('the real tree has no hand-typed Show code', () => {
   assert.deepEqual(run(), []);
   assert.match(summary(), /print Show code from source/);

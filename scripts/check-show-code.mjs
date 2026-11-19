@@ -18,8 +18,9 @@
  *      but `{CODE.Name}`: a string or template literal is a typed snippet;
  *   3. a `CODE` export that is not built with `showCode(`, or that holds a
  *      template-literal entry;
- *   4. an `*Examples.jsx` module that imports a docs-only wrapper: anything
- *      from `@/storybook-docs`, which is what Show code would otherwise print.
+ *   4. an `*Examples.jsx` module that imports a docs-only wrapper (anything
+ *      from `@/storybook-docs`) or reaches outside its own template folder
+ *      with a relative path: it imports only the public barrels.
  *
  * WHAT IT CANNOT SEE. Whether an example reads well or is the right one; that
  * is the docs review.
@@ -60,6 +61,9 @@ export function checkFile(file, text) {
   if (/Examples\.jsx$/.test(file)) {
     for (const match of text.matchAll(/^import\s[^;]*?from\s+'(@\/storybook-docs[^']*)'/gm)) {
       found.push({ line: lineOf(text, match.index), message: `imports ${match[1]}; an example is PLUS parts only, and staging belongs in the Cases module` });
+    }
+    for (const match of text.matchAll(/^import\s[^;]*?from\s+'(\.\.[^']*)'/gm)) {
+      found.push({ line: lineOf(text, match.index), message: `imports ${match[1]}, outside its own template folder; import PLUS parts from @/components or @/templates (a Blanket belongs to the Modal, so stage dimming goes in the Cases module)` });
     }
   }
   return found;

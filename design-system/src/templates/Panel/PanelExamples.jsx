@@ -1,7 +1,6 @@
 import React from 'react';
 import { Skeleton, StatusTag } from '@/components';
 import { PanelBody, PanelCloseAction, PanelContainer, PanelHeader, PanelSubheader, Section } from '@/templates';
-import Blanket from '../Modal/Blanket';
 
 /**
  * The Panel page's floating-Panel do and don't examples, as PLUS parts only.
@@ -47,14 +46,6 @@ const DEMO_STAGE_SECOND = { ...DEMO_STAGE_FLOATING, insetInlineEnd: 'var(--inlin
 export const FloatsNoBlanket = () => (
     <>
         <SessionsBehind />
-        <div style={DEMO_STAGE_FLOATING}><DetailsPanel /></div>
-    </>
-);
-
-export const PanelOnBlanket = () => (
-    <>
-        <SessionsBehind />
-        <Blanket inline show style={{ position: 'absolute', inset: 0 }} />
         <div style={DEMO_STAGE_FLOATING}><DetailsPanel /></div>
     </>
 );

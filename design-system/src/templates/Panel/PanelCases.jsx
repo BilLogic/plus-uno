@@ -10,6 +10,7 @@ import {
 } from '@/templates';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
+import Blanket from '../Modal/Blanket';
 import { showCode } from '@/storybook-docs/lib/show-code.js';
 import * as Example from './PanelExamples.jsx';
 import examplesSource from './PanelExamples.jsx?raw';
@@ -66,14 +67,13 @@ export const ReadingWithFooter = () => (
 /** The Show code for each floating-Panel example, read from `PanelExamples.jsx`. */
 const printed = showCode(examplesSource, [
     'FloatsNoBlanket',
-    'PanelOnBlanket',
     'TwoFloatingPanels',
     'BesideAiPanel',
     'CoversAiPanel',
 ]);
 
-/** One Panel is the same example as the one that floats with no Blanket. */
-export const CODE = { ...printed, OneFloatingPanel: printed.FloatsNoBlanket };
+/** The Blanket is the stage's dimming, so the page-dimmed case prints the same Panel. */
+export const CODE = { ...printed, OneFloatingPanel: printed.FloatsNoBlanket, PanelOnBlanket: printed.FloatsNoBlanket };
 
 /** The stage under floating Panels: a box that clips them, at the docs heading level, with room around the page behind. */
 const FloatStage = ({ children }) => (
@@ -88,7 +88,12 @@ const FloatStage = ({ children }) => (
 export const FloatsNoBlanket = () => <FloatStage><Example.FloatsNoBlanket /></FloatStage>;
 
 /** The same Panel with a Blanket dimming the whole page. */
-export const PanelOnBlanket = () => <FloatStage><Example.PanelOnBlanket /></FloatStage>;
+export const PanelOnBlanket = () => (
+    <FloatStage>
+        <Blanket inline show style={{ position: 'absolute', inset: 0 }} />
+        <Example.FloatsNoBlanket />
+    </FloatStage>
+);
 
 /** One Panel; another row swaps what it shows. */
 export const OneFloatingPanel = FloatsNoBlanket;
