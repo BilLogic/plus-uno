@@ -18,15 +18,12 @@ import './PatternSection.scss';
  * Its parts stack Section/stack-md: the `_Section header`, the body, then an
  * optional footer.
  *
- * HEADER. Five types, as in Figma. `default` is the title row: title,
- * description and an actions slot. `tabs` adds a tabs row under it, and
- * `toolbar` a `SectionToolbar`, both Section/stack-sm below the title row.
- * `custom` swaps title and description for a free-form `header` slot.
- * `tabs-only` shows only the tabs row. The type is read from the slots you
- * fill (`header`, then `toolbar`, then `tabs`), so pass `type` only for
- * `tabs-only` or to override. In `custom` and `tabs-only` the title stays in
- * the markup as its heading, visually hidden, so assistive tech still has it.
- * `loading` swaps the header for skeleton bars while the section loads.
+ * HEADER. `default` is the title row: title, description and an actions slot.
+ * `custom` swaps title and description for a free-form `header` slot, and the
+ * title stays in the markup as its heading, visually hidden, so assistive tech
+ * still has it. `loading` swaps the header for skeleton bars while the section
+ * loads. The older `tabs` and `toolbar` props (and the `tabs-only` and
+ * `toolbar` types) are deprecated: use the rows below.
  *
  * ROWS. Under the title row a header can carry two more, all on one 32 line.
  * Row 2 holds the `views` at the start and the `format` switch at the end.
@@ -63,7 +60,7 @@ import './PatternSection.scss';
  * commit changes belong in a card footer, not on the section.
  */
 
-export const SECTION_HEADER_TYPES = ['default', 'tabs', 'toolbar', 'custom', 'tabs-only'];
+export const SECTION_HEADER_TYPES = ['default', 'custom'];
 export const SECTION_LAYOUTS = ['single', 'split', 'subsections'];
 export const SECTION_SPACINGS = ['default', 'compact', 'spacious'];
 
@@ -217,7 +214,7 @@ HeaderSkeleton.propTypes = {
     tabsOnly: PropTypes.bool,
 };
 
-/**
+/** @deprecated use the `search`, `filters` and `count` props of the three-row header.
  * `_Section toolbar`: the row a section header carries above a table or a
  * list. Search, filters and a count at the start, actions at the end; the
  * count truncates first. Selected rows never change it: a Dynamic table's
@@ -256,6 +253,19 @@ SectionToolbar.propTypes = {
     /** Actions slot, at the end */
     actions: PropTypes.node,
     className: PropTypes.string,
+};
+
+/** Dev-only notice, once per prop, that the old header props are on their way out. */
+const warned = new Set();
+const warnDeprecatedHeaderProps = ({ tabs, toolbar }) => {
+    if (process.env.NODE_ENV === 'production') return;
+    const notes = [[tabs, 'tabs', '`views` and `format`'], [toolbar, 'toolbar', '`search` and `filters`']];
+    notes.forEach(([value, name, instead]) => {
+        if (!value || warned.has(name)) return;
+        warned.add(name);
+        // eslint-disable-next-line no-console
+        console.warn(`PatternSection: the \`${name}\` prop is deprecated. Use ${instead} in the three-row header.`);
+    });
 };
 
 /** PatternSection: a span of the page grid under one heading, with its header, toolbar and tabs. */
@@ -303,6 +313,8 @@ const PatternSection = ({
         className,
     ].filter(Boolean).join(' ');
 
+    warnDeprecatedHeaderProps({ tabs, toolbar });
+
     const rootRef = useRef(null);
     const ownWidth = useOwnWidth(rootRef);
     const narrow = ownWidth < FRAME_LAYOUT.fullWidthBelow;
@@ -333,7 +345,7 @@ const PatternSection = ({
             return (
                 <div className={`plus-template-section-header plus-template-section-header--${type}`}>
                     {titleNode && <div className="visually-hidden">{titleNode}</div>}
-                    <HeaderSkeleton rank={rank} hasBottomRow={Boolean(bottomRow)} tabsOnly={tabsOnly} />
+                    <HeaderSkeleton rank={rank} hasBottomRow={Boolean(bottomRow) || hasRows} tabsOnly={tabsOnly} />
                 </div>
             );
         }
@@ -506,13 +518,14 @@ PatternSection.propTypes = {
      * @ds-context Governed by: Common actions (ds guide common-actions)
      */
     actions: PropTypes.node,
-    /** Tabs row under the title row (header type `tabs`, or `tabs-only`)
+    /** @deprecated use `views` (and `format`) in the three-row header. Tabs row under the title row (header type `tabs`, or `tabs-only`).
      * @ds-context Used in: Section.tabs (ds guide section)
+     * @ds-context Governed by: Forms (ds guide forms)
      */
     tabs: PropTypes.node,
-    /** Toolbar row under the title row (header type `toolbar`), usually a `PatternSection.Toolbar`
+    /** @deprecated use `search` and `filters` in the three-row header. Toolbar row under the title row (header type `toolbar`), usually a `PatternSection.Toolbar`.
      * @ds-context Used in: Section.toolbar (ds guide section)
-     * @ds-context Governed by: Common actions (ds guide common-actions); Filtering (ds guide filtering); Search (ds guide search)
+     * @ds-context Governed by: Filtering (ds guide filtering); Search (ds guide search)
      */
     toolbar: PropTypes.node,
     /** Free-form header in place of title and description (header type `custom`)
@@ -520,7 +533,7 @@ PatternSection.propTypes = {
      * @ds-context Governed by: Forms (ds guide forms)
      */
     header: PropTypes.node,
-    /** Header type. Read from the slots when left off; pass `tabs-only` to show only the tabs row */
+    /** Header type: `default` (title and description) or `custom` (your own `header`). Read from the slots when left off. */
     type: PropTypes.oneOf(SECTION_HEADER_TYPES),
     /** Row 2, at the start: the views, usually Tabs in the pill appearance. It scrolls sideways when it does not fit.
      * @ds-context Used in: Section.views (ds guide section)

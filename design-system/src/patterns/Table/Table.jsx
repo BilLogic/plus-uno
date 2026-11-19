@@ -26,7 +26,7 @@ const KIND_COMPONENTS = {
  * it is a Static table.
  *
  * Every other prop goes to the Section (`title`, `description`, `actions`,
- * `toolbar`, `tabs`).
+ * `views`, `search`, `filters`).
  */
 const Table = ({
     kind,

@@ -1,6 +1,7 @@
 import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta } from '@storybook/addon-docs/blocks';
+import { CODE } from './PopupCaseCode.js';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PopupStories from './Popup.stories.jsx';
@@ -18,13 +19,14 @@ import {
     AsWideAsTrigger,
     AtCap,
     EndAligned,
+    FieldsInModalCase,
+    FormInPopupCase,
     NarrowerThanTrigger,
     OneFlatMenu,
     PopupBesidePopup,
     StartAlignedAtEnd,
     WiderThanCap,
-} from '@/storybook-docs/illustrations/popup.jsx';
-import { FieldsInModalCase, FormInPopupCase } from './PopupCases.jsx';
+} from './PopupCases.jsx';
 
 <Meta title="Templates/Popup" tags={['manifest']} />
 
@@ -262,8 +264,10 @@ A trigger at the start of a bar, such as the view picker under page tabs, gets a
 
 <DoDontPair
     doExample={<EndAligned />}
+    doCode={CODE.EndAligned}
     doCaption="More sits at the end of the bar, so its menu aligns to its end edge and grows into the page."
     dontExample={<StartAlignedAtEnd />}
+    dontCode={CODE.StartAlignedAtEnd}
     dontCaption="An end trigger with a start-aligned menu: it runs off the edge of the page."
 />
 
@@ -275,8 +279,10 @@ It hugs the longest item. The width is set once, on open, so it holds still whil
 
 <DoDontPair
     doExample={<AsWideAsTrigger />}
+    doCode={CODE.AsWideAsTrigger}
     doCaption="The menu is at least as wide as its trigger, so their edges line up."
     dontExample={<NarrowerThanTrigger />}
+    dontCode={CODE.NarrowerThanTrigger}
     dontCaption="A menu narrower than the trigger it hangs off: the edges no longer line up."
 />
 
@@ -288,8 +294,10 @@ Anything wider is a Panel or a Modal. Anything with inputs the person must finis
 
 <DoDontPair
     doExample={<AtCap />}
+    doCode={CODE.AtCap}
     doCaption="A content Popup at 4-col, the cap."
     dontExample={<WiderThanCap />}
+    dontCode={CODE.WiderThanCap}
     dontCaption="A Popup wider than 4-col: anything this wide is a Panel or a Modal."
 />
 
@@ -314,8 +322,10 @@ A confirm Modal may open over a Popup and brings its own Blanket. A Popup opened
 
 <DoDontPair
     doExample={<OneFlatMenu />}
+    doCode={CODE.OneFlatMenu}
     doCaption="One flat menu; a choice with two forms is two rows."
     dontExample={<PopupBesidePopup />}
+    dontCode={CODE.PopupBesidePopup}
     dontCaption="A menu opening a second Popup beside it: two layers off one trigger."
 />
 

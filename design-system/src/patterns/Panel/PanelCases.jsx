@@ -9,12 +9,20 @@ import {
     PanelSubheader,
 } from '@/patterns';
 import { HeadingLevelContext } from '@/lib/headingLevel';
+import Blanket from '@/patterns/Modal/Blanket';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
+import { DetailsPanel, SessionsBehind } from './panelDemo.jsx';
 
 /**
  * The live do and don't examples of the Panel template page, built from
  * `PanelContainer`, `PanelHeader`, `PanelBody`, `PanelFooter` and `FooterActions`.
  */
+
+/** The height of the stage a floating Panel sits in. Docs geometry, px. */
+const FLOAT_STAGE = 440; // docs-literal
+
+/** How far a second Panel sits in from the first. Docs geometry, px. */
+const SECOND_OFFSET = 48; // docs-literal
 
 const ReadingPanel = ({ footer, inlineSize }) => (
     <CaseSurface
@@ -55,4 +63,55 @@ export const ReadingWithFooter = () => (
             </FooterActions>
         )}
     />
+);
+
+/** A floating Panel's place: the end of the stage, on the overlay fill with the overlay shadow. */
+const FloatingPanel = ({ inset = 0, onTop = true }) => (
+    <div
+        style={{
+            position: 'absolute',
+            insetBlock: 0,
+            insetInlineEnd: inset,
+            zIndex: onTop ? 2 : 1,
+            boxShadow: 'var(--ds-shadow-overlay)',
+            display: 'flex',
+            maxInlineSize: '100%',
+        }}
+    >
+        <HeadingLevelContext.Provider value={4}>
+            <DetailsPanel />
+        </HeadingLevelContext.Provider>
+    </div>
+);
+
+/** The page under floating Panels, in a box that clips them to the stage. */
+const FloatStage = ({ children }) => (
+    <CaseSurface padding="none" style={{ position: 'relative', blockSize: FLOAT_STAGE, overflow: 'hidden' }}>
+        <div style={{ padding: 'var(--page-pad)' }}><SessionsBehind /></div>
+        {children}
+    </CaseSurface>
+);
+
+/** The Panel floats on its shadow and the page beside it stays undimmed. */
+export const FloatsNoBlanket = () => (
+    <FloatStage><FloatingPanel /></FloatStage>
+);
+
+/** The same Panel with a Blanket dimming the whole page. */
+export const PanelOnBlanket = () => (
+    <FloatStage>
+        <Blanket inline show style={{ position: 'absolute', inset: 0, zIndex: 1 }} />
+        <FloatingPanel />
+    </FloatStage>
+);
+
+/** One Panel; another row swaps what it shows. */
+export const OneFloatingPanel = FloatsNoBlanket;
+
+/** Two Panels open at once, the second covering the first. */
+export const TwoFloatingPanels = () => (
+    <FloatStage>
+        <FloatingPanel inset={SECOND_OFFSET} onTop={false} />
+        <FloatingPanel />
+    </FloatStage>
 );

@@ -5,15 +5,10 @@ import {
     Button,
     DynamicTable,
     EmptyState,
-    FilterButton,
-    Icon,
-    IconButton,
-    PopupSelect,
     SearchField,
     StatusTag,
     TextField,
     Toggle,
-    Tabs as TabsComponent,
 } from '@/components';
 import {
     PANEL_STORAGE_KEY,
@@ -40,7 +35,6 @@ import { FilterSide, FormatSwitch, STUDENTS, StudentsTable, ViewPills, filterStu
 import { HeaderSearch, SectionActions } from '@/storybook-docs/lib/section-header.jsx';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
-import { iconClass } from '../../lib/icon';
 import { ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
 
 const col = { display: 'flex', flexDirection: 'column', gap: 'var(--page-pad)' };
@@ -50,36 +44,6 @@ const Actions = () => (
         <Button text="Secondary" onClick={() => {}} />
         <Button text="Primary" appearance="primary" onClick={() => {}} />
     </>
-);
-
-const ViewTabs = ({ label = 'Views' }) => {
-    const [active, setActive] = useState('all');
-    return (
-        <TabsComponent activeKey={active} onSelect={setActive} aria-label={label}>
-            <TabsComponent.Tab eventKey="all">All students</TabsComponent.Tab>
-            <TabsComponent.Tab eventKey="active">Active</TabsComponent.Tab>
-            <TabsComponent.Tab eventKey="paused">Paused</TabsComponent.Tab>
-        </TabsComponent>
-    );
-};
-
-const DefaultToolbar = () => (
-    <PatternSection.Toolbar
-        search={<TextField label="Search students" isLabelHidden placeholder="Search students" elemBeforeInput={<i className={iconClass('magnifying-glass')} aria-hidden="true" />} type="search" />}
-        filters={(
-            <>
-                <Button text="Status" appearance="subtle" iconAfter={<Icon name="chevron-down" size={12} />} onClick={() => {}} />
-                <Button text="Tutor" appearance="subtle" iconAfter={<Icon name="chevron-down" size={12} />} onClick={() => {}} />
-            </>
-        )}
-        count="48 students"
-        actions={(
-            <>
-                <Button text="Export" iconBefore="download" onClick={() => {}} />
-                <Button text="Add student" appearance="primary" iconBefore="user-plus" onClick={() => {}} />
-            </>
-        )}
-    />
 );
 
 const description = 'Optional supporting description for this section.';
@@ -103,8 +67,6 @@ export default {
         children: { table: { disable: true } },
         style: { table: { disable: true } },
         actions: { table: { disable: true } },
-        tabs: { table: { disable: true } },
-        toolbar: { table: { disable: true } },
         header: { table: { disable: true } },
         side: { table: { disable: true } },
         footer: { table: { disable: true } },
@@ -114,7 +76,7 @@ export default {
         description: { control: 'text', table: { category: 'Slots' } },
         type: {
             control: 'select',
-            options: ['default', 'tabs', 'toolbar', 'custom', 'tabs-only'],
+            options: ['default', 'custom'],
             table: { category: 'Design' },
         },
         layout: {
@@ -424,18 +386,24 @@ export const LoadingDefault = {
 };
 
 export const LoadingToolbar = {
-    name: 'Loading, toolbar',
+    name: 'Loading, search and filters',
     render: () => (
-        <PatternSection title="Students" description={description} toolbar={<DefaultToolbar />} loading>
+        <PatternSection
+            title="Students"
+            description={description}
+            search={<HeaderSearch />}
+            filters={[{ key: 'status', label: 'Status', text: 'All' }]}
+            loading
+        >
             {slotContent('Table')}
         </PatternSection>
     ),
 };
 
 export const LoadingTabsOnly = {
-    name: 'Loading, tabs only',
+    name: 'Loading, views',
     render: () => (
-        <PatternSection type="tabs-only" title="Students" tabs={<ViewTabs label="Students" />} loading>
+        <PatternSection title="Students" views={<ViewPills views={['All students', 'Active', 'Paused']} />} loading>
             {slotContent('Content slot')}
         </PatternSection>
     ),
@@ -450,10 +418,7 @@ export const Interactive = {
         loading: false,
     },
     render: (args) => {
-        const bottom = args.type === 'toolbar' ? { toolbar: <DefaultToolbar /> }
-            : (args.type === 'tabs' || args.type === 'tabs-only') ? { tabs: <ViewTabs /> }
-            : args.type === 'custom' ? { header: slotContent('Custom header') }
-            : {};
+        const bottom = args.type === 'custom' ? { header: slotContent('Custom header') } : {};
         return (
             <PatternSection
                 title={args.title || undefined}

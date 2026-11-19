@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { TextField, Tooltip } from '@/components';
-import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
+import { Button, Dialog, FooterActions, TextField, Tooltip } from '@/components';
+import { CaseBlanket, CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
-import { FieldError, isValidEmail } from './errorsDemo.jsx';
+import { FieldError, LoadFailure, isValidEmail } from './errorsDemo.jsx';
 
 /**
  * The live do and don't examples on the Errors pattern page, composed from
@@ -42,3 +42,25 @@ export const BorderAndTooltipCase = () => {
         </DocsOverlayBoundary>
     );
 };
+
+/** Do: the failure in the Section's slot, with its header rows and the rest of the page still working. */
+export const FailureInSlot = () => <LoadFailure padded={false} />;
+
+/** Don't: a Modal over the whole page to report one Section's failure. */
+export const FailureInModal = () => (
+    <CaseBlanket height={300}>
+        <Dialog
+            title="Couldn't load sessions"
+            onClose={() => {}}
+            style={{ inlineSize: '100%' }}
+            footer={(
+                <FooterActions>
+                    <Button text="Close" onClick={() => {}} />
+                    <Button text="Try again" appearance="primary" onClick={() => {}} />
+                </FooterActions>
+            )}
+        >
+            <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>Check your connection and try again.</p>
+        </Dialog>
+    </CaseBlanket>
+);

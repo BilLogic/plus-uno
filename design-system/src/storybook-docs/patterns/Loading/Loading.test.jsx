@@ -2,7 +2,7 @@ import { join } from 'node:path';
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { expectTypeCardAnchors } from '@/storybook-docs/lib/type-card-anchors.jsx';
-import { MenuOneRowCase, MenuSkeletonRowsCase } from './LoadingCases.jsx';
+import { MenuOneRowCase, MenuSkeletonRowsCase, SkeletonInShape, SpinnerInBlank } from './LoadingCases.jsx';
 
 vi.mock('@storybook/addon-docs/blocks', () => import('@/storybook-docs/lib/addon-docs-blocks-mock.jsx'));
 
@@ -17,6 +17,15 @@ describe('Loading live cases and TypeCard links', () => {
         const { container: skeletonContainer } = render(<MenuSkeletonRowsCase />);
         await waitFor(() => expect(screen.getAllByRole('menuitem')).toHaveLength(3));
         expect(skeletonContainer.querySelectorAll('.plus-skeleton')).toHaveLength(3);
+    });
+
+    it('SkeletonInShape holds skeleton bars in the table shape; SpinnerInBlank holds one spinner and no bars', () => {
+        const shaped = render(<SkeletonInShape />);
+        expect(shaped.container.querySelectorAll('.plus-skeleton').length).toBeGreaterThan(1);
+        shaped.unmount();
+        const blank = render(<SpinnerInBlank />);
+        expect(blank.container.querySelectorAll('.plus-skeleton')).toHaveLength(0);
+        expect(screen.getByText('Loading students')).toBeInTheDocument();
     });
 
     it('links every TypeCard anchor to a ComponentExample heading id in Loading.mdx', () => {

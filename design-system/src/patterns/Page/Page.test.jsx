@@ -4,9 +4,25 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ComponentExample, exampleSlug } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard } from '@/storybook-docs/lib/template-page.jsx';
+import { DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import { CODE as PAGE_CODE } from './PageCaseCode.js';
+import { CODE as POPUP_CODE } from '../Popup/PopupCaseCode.js';
+import { CODE as FORM_CODE } from '../Form/FormCaseCode.js';
+import { CODE as PANEL_CODE } from '../Panel/PanelCaseCode.js';
 import * as PageModule from './Page.jsx';
 import Page from './Page.jsx';
-import { AddInTitleRow, AddTwice, OneTabSystem, TwoTabSystems } from './PageCases.jsx';
+import {
+    AddInTitleRow,
+    AddTwice,
+    AreaPageTitleAlone,
+    BreadcrumbOnAreaPage,
+    HeaderIsTheH1,
+    OneLineDescription,
+    OneTabSystem,
+    ParagraphUnderTitle,
+    SectionsAsTitles,
+    TwoTabSystems,
+} from './PageCases.jsx';
 
 vi.mock('@storybook/addon-docs/blocks', async () => {
     const React = await import('react');
@@ -17,6 +33,7 @@ vi.mock('@storybook/addon-docs/blocks', async () => {
             </div>
         ),
         Story: ({ of }) => (of?.render ? <of.render /> : null),
+        Source: ({ code }) => <pre>{code}</pre>,
         Meta: () => null,
         Title: () => null,
     };
@@ -47,6 +64,38 @@ describe('Page live cases', () => {
 
         fireEvent.click(screen.getByRole('tab', { name: 'Overview' }));
         expect(screen.getByText('Lincoln Middle · Grade 8')).toBeInTheDocument();
+    });
+
+    it('HeaderIsTheH1 renders a page header and one Section, while SectionsAsTitles has two Sections and no header', () => {
+        const r1 = render(<HeaderIsTheH1 />);
+        expect(document.querySelectorAll('.plus-page-header')).toHaveLength(1);
+        expect(screen.getByRole('heading', { name: 'Students' })).toBeInTheDocument();
+        r1.unmount();
+
+        const r2 = render(<SectionsAsTitles />);
+        expect(document.querySelectorAll('.plus-page-header')).toHaveLength(0);
+        expect(screen.getAllByRole('heading', { name: /^(Students|Sessions)$/ })).toHaveLength(2);
+        r2.unmount();
+    });
+
+    it('AreaPageTitleAlone has no breadcrumb, while BreadcrumbOnAreaPage adds one', () => {
+        const r1 = render(<AreaPageTitleAlone />);
+        expect(screen.queryByRole('navigation', { name: 'Breadcrumb' })).toBeNull();
+        r1.unmount();
+
+        render(<BreadcrumbOnAreaPage />);
+        expect(screen.getByRole('navigation', { name: 'Breadcrumb' })).toBeInTheDocument();
+    });
+
+    it('OneLineDescription keeps one short line under the title, while ParagraphUnderTitle runs long', () => {
+        const r1 = render(<OneLineDescription />);
+        const short = document.querySelector('[data-part="description"]').textContent;
+        r1.unmount();
+
+        render(<ParagraphUnderTitle />);
+        const long = document.querySelector('[data-part="description"]').textContent;
+        expect(short.length).toBeLessThan(80);
+        expect(long.length).toBeGreaterThan(160);
     });
 
     it('TwoTabSystems shows the anti-pattern of two tablists on one page', () => {
@@ -86,6 +135,16 @@ describe('Page live cases', () => {
         for (const title of exampleTitles) {
             expect(within(document.body).getByRole('heading', { level: 3, name: title })).toHaveAttribute('id', exampleSlug(title));
         }
+    });
+});
+
+describe('Show code on live pairs', () => {
+    it('every live pair folds its source behind Show code, and each page passes code for every example it makes live', () => {
+        render(<DoDontPair doExample={<i />} doCaption="Do" doCode="<a />" dontExample={<i />} dontCaption="Don't" dontCode="<b />" />);
+        expect(screen.getAllByText('Show code')).toHaveLength(2);
+        const counts = { Page: Object.keys(PAGE_CODE).length, Popup: Object.keys(POPUP_CODE).length, Form: Object.keys(FORM_CODE).length, Panel: Object.keys(PANEL_CODE).length };
+        expect(counts).toEqual({ Page: 6, Popup: 8, Form: 2, Panel: 4 });
+        [PAGE_CODE, POPUP_CODE, FORM_CODE, PANEL_CODE].forEach((code) => Object.values(code).forEach((src) => expect(src.length).toBeGreaterThan(20)));
     });
 });
 

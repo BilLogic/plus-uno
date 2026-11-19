@@ -291,7 +291,7 @@ export const DocsContentGrid = {
 
 /**
  * Do and don't pair variants for the Frame story args. The docs page uses
- * `FrameCases` and `illustrations/frame` directly for its inline examples;
+ * `FrameCases` directly for its inline examples;
  * these stories carry no play because they are static arg configurations.
  */
 

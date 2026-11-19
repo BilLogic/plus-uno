@@ -419,3 +419,32 @@ describe('PatternSection header rows', () => {
         }
     });
 });
+
+describe('PatternSection deprecated header props', () => {
+    it('warns once in development that `tabs` and `toolbar` give way to the rows', async () => {
+        vi.resetModules();
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+        const { default: Fresh } = await import('./PatternSection');
+        const { rerender } = render(<Fresh title="S" tabs={<div />} toolbar={<div />}>Body</Fresh>);
+        rerender(<Fresh title="S" tabs={<div />} toolbar={<div />}>Body</Fresh>);
+        const messages = warn.mock.calls.map(([text]) => text);
+        expect(messages).toHaveLength(2);
+        expect(messages[0]).toMatch(/`tabs`.*deprecated.*`views` and `format`/);
+        expect(messages[1]).toMatch(/`toolbar`.*deprecated.*`search` and `filters`/);
+        warn.mockRestore();
+    });
+
+    it('stays quiet for the three-row slots', async () => {
+        vi.resetModules();
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+        const { default: Fresh } = await import('./PatternSection');
+        render(<Fresh title="S" views={<div />} search={<div />} filters={[{ key: 'a', label: 'Status', text: 'All' }]}>Body</Fresh>);
+        expect(warn).not.toHaveBeenCalled();
+        warn.mockRestore();
+    });
+
+    it('draws the loading skeleton row for the three-row slots', () => {
+        const { container } = render(<PatternSection title="S" views={<div />} loading>Body</PatternSection>);
+        expect(container.querySelector('.plus-pattern-section-skeleton__row')).not.toBeNull();
+    });
+});

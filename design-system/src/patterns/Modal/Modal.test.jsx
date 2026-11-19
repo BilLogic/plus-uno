@@ -4,7 +4,8 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import Modal, { MODAL_HEIGHTS, MODAL_WIDTHS, MODAL_WIDTH_PX, MODAL_WIDTH_SCREENS } from './Modal';
 import { subscribeOverlays } from '@/lib/overlay';
-import { FooterPinnedModal, ButtonInBodyModal, StepsFooterModal, TabsForStepsModal } from './ModalCases';
+import { FooterPinnedModal, ButtonInBodyModal, StepsFooterModal, TabsForStepsModal, ConfirmNarrow, ConfirmWide, ConfirmsInside, ModalOnModal } from './ModalCases';
+import { CODE as MODAL_CODE } from './ModalCaseCode.js';
 
 describe('Modal template', () => {
     const open = async (props = {}) => {
@@ -165,5 +166,30 @@ describe('Modal template', () => {
         expect(onClose).not.toHaveBeenCalled();
         fireEvent.click(container.querySelector('.plus-template-blanket'));
         expect(onClose).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe('Modal live do and dont examples', () => {
+    it('ConfirmNarrow and ConfirmWide render the same confirm at 4-col and 10-col', () => {
+        const narrow = render(<ConfirmNarrow />);
+        expect(screen.getByRole('dialog', { name: 'Delete session?' })).toBeInTheDocument();
+        const narrowClass = narrow.container.querySelector('[role="dialog"]').className;
+        narrow.unmount();
+        const wide = render(<ConfirmWide />);
+        expect(screen.getByRole('dialog', { name: 'Delete session?' })).toBeInTheDocument();
+        expect(wide.container.querySelector('[role="dialog"]').className).not.toBe(narrowClass);
+    });
+
+    it('ConfirmsInside confirms in one dialog; ModalOnModal stacks two', () => {
+        const inside = render(<ConfirmsInside />);
+        expect(screen.getAllByRole('dialog')).toHaveLength(1);
+        expect(screen.getByRole('dialog', { name: 'Delete session?' })).toBeInTheDocument();
+        inside.unmount();
+        render(<ModalOnModal />);
+        expect(screen.getAllByRole('dialog')).toHaveLength(2);
+    });
+
+    it('has Show code source for each', () => {
+        expect(Object.keys(MODAL_CODE)).toEqual(['ConfirmNarrow', 'ConfirmWide', 'ConfirmsInside', 'ModalOnModal']);
     });
 });
