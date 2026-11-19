@@ -1,26 +1,13 @@
 /**
  * The data behind the Foundations pages' Color and Typography blocks.
  *
- * Every function reads the text of a generated token stylesheet and returns the
- * rows a Storybook block draws, so a page never restates a token by hand:
- * regenerate the tokens and the page follows. The stylesheets reach the browser
- * through Vite's `?raw` import (see `token-blocks.jsx`); the tests read the same
- * files from disk and hold these rows against `tokenCorpus`.
+ * Every function reads token entries (`{name, raw}`, from `tokenCollections` in
+ * `token-collections.mjs`) and returns the rows a Storybook block draws, so a
+ * page never restates a token by hand: regenerate the token table and the page
+ * follows.
  *
  * Plain ESM with no Node-only import, so Vite bundles it and `vitest` loads it.
  */
-
-/** The light-mode declarations: the first `{ … }` block of a token stylesheet, name to raw value. */
-export function declarations(scss) {
-  const text = scss.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
-  const open = text.indexOf('{');
-  const close = text.indexOf('}', open);
-  const out = new Map();
-  for (const [, name, value] of text.slice(open + 1, close).matchAll(/(--[a-z0-9-]+)\s*:\s*([^;]+);/g)) {
-    out.set(name, value.trim());
-  }
-  return out;
-}
 
 const var_ = (token) => `var(${token})`;
 const titleCase = (word) => word.charAt(0).toUpperCase() + word.slice(1);
@@ -31,9 +18,9 @@ const titleCase = (word) => word.charAt(0).toUpperCase() + word.slice(1);
  *
  * @returns {{title: string, subtitle: string, colors: Record<string, string>}[]}
  */
-export function accentGroups(scss) {
+export function accentGroups(tokens) {
   const rows = new Map();
-  for (const name of declarations(scss).keys()) {
+  for (const { name } of tokens) {
     const m = name.match(/^--ds-background-accent-(.+)-(subtlest|subtler|subtle|bolder)$/);
     if (!m) continue;
     const [, hue, emphasis] = m;
@@ -50,13 +37,13 @@ export function accentGroups(scss) {
  *
  * @returns {{title: string, subtitle: string, colors: Record<string, string>}[]}
  */
-export function chartGroups(scss) {
+export function chartGroups(tokens) {
   const rows = new Map();
   const add = (key, title, subtitle, label, name) => {
     if (!rows.has(key)) rows.set(key, { title, subtitle, colors: {} });
     rows.get(key).colors[label] = var_(name);
   };
-  for (const name of declarations(scss).keys()) {
+  for (const { name } of tokens) {
     if (!name.startsWith('--chart-') || name.endsWith('-hovered')) continue;
     const rest = name.slice('--chart-'.length);
     let m;
@@ -81,8 +68,8 @@ export function chartGroups(scss) {
  * @returns {{title: string, family: string, familyToken: string, weightToken: string,
  *   styles: {token: string, sizeToken: string, size: string, lineHeight: string}[]}[]}
  */
-export function typeGroups(scss) {
-  const decl = declarations(scss);
+export function typeGroups(tokens) {
+  const decl = new Map(tokens.map((t) => [t.name, t.raw]));
   const resolve = (token) => decl.get(token);
   const families = new Map();
   for (const [name, value] of decl) {

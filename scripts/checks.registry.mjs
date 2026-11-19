@@ -262,7 +262,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-template-roster.mjs',
-    guards: 'six layers naming the eight templates the @/templates barrel exports, and no visible Storybook child title under one.',
+    guards: 'six layers and the barrel naming the same eight templates, tile text matching page purposes, and no visible child title.',
   },
   {
     name: 'check:glossary',

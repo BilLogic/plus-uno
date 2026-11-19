@@ -7,7 +7,10 @@
  * hand-kept agent-view list, the Templates table of the components index and
  * the `Templates/*` Storybook titles. A copy that adds, drops or renames one
  * reads as a template that exists or does not, so each is held to the barrel.
- * `ListPage` has a folder and no export: a CLI starter, not a template.
+ * `ListPage` has a folder and no export: a CLI registry starter, not a template.
+ *
+ * Each row of the agent-view list, and any hand-typed overview tile, reads as
+ * its template page's `purpose`.
  *
  * A template is one page in the Storybook sidebar. A visible story titled
  * beneath it (`Templates/Page/Reference screens`) turns it into a folder, so a
@@ -24,6 +27,8 @@ const OVERVIEW = 'design-system/src/storybook-docs/templates/TemplatesOverview.m
 const AGENT_LIST = 'design-system/agent-views/_templates.json';
 const INDEX = 'design-system/agent-views/components/index.md';
 
+const GUIDELINES = 'design-system/guidelines/overview.md';
+
 const sorted = (names) => [...new Set(names)].sort();
 
 /** The names the barrel exports that are folders of the templates directory, in export order. */
@@ -39,6 +44,19 @@ export function glossaryTemplates(text) {
   const entry = lines[lines.findIndex((l) => l.startsWith('**Template**:')) + 1] ?? '';
   const list = entry.slice(entry.indexOf(':') + 1).split('.')[0];
   return list.replace(/\*\*/g, '').split(/,\s*|\s+and\s+/).map((n) => n.trim()).filter(Boolean);
+}
+
+/** The templates the guidelines' first two stages name, up to what each stage goes on to settle. */
+export function stageTemplates(text) {
+  return text
+    .split('\n')
+    .filter((l) => /^\| \*\*[12]\. /.test(l))
+    .flatMap((l) => [...l.split('|')[2].split(/ and (?:what|which)\b/)[0].matchAll(/`([A-Z]\w+)`/g)].map((m) => m[1]).filter((n) => n !== 'Sidebar'));
+}
+
+/** Hand-typed overview tiles: name to text. */
+export function tileTexts(mdx) {
+  return Object.fromEntries([...mdx.matchAll(/<ThumbTile\s+hero="[^"]*"\s+title="([^"]+)"[^>]*>([^<]*)<\/ThumbTile>/g)].map((m) => [m[1], m[2].trim()]));
 }
 
 /** `[{ file, text }]` -> every `Templates/...` title, as `{ title, file, hidden }`. */
@@ -65,14 +83,16 @@ export const visibleChildren = (files) =>
 
 /**
  * Every layer held to the roster.
- * @param {{roster: string[], layers: Record<string, string[]>, children: {title: string, file: string}[]}} model
+ * @param {{roster: string[], layers: Record<string, string[]>, children: {title: string, file: string}[], purposes?: Record<string, string>, uses?: Record<string, string>, tiles?: Record<string, string>}} model
  */
-export function checkRoster({ roster, layers, children }) {
+export function checkRoster({ roster, layers, children, purposes = {}, uses = {}, tiles = {} }) {
   const problems = [];
   for (const [layer, names] of Object.entries(layers)) {
     for (const name of roster) if (!names.includes(name)) problems.push(`${layer} is missing the ${name} template`);
     for (const name of sorted(names)) if (!roster.includes(name)) problems.push(`${layer} names ${name}, which the @/templates barrel does not export`);
   }
+  for (const [name, use] of Object.entries(uses)) if (purposes[name] !== undefined && use !== purposes[name]) problems.push(`the agent-view list row for ${name} differs from its page purpose`);
+  for (const [name, text] of Object.entries(tiles)) if (purposes[name] !== undefined && text !== purposes[name]) problems.push(`the overview tile for ${name} differs from its page purpose`);
   for (const { title, file } of children) problems.push(`${title} (${file}) shows ${title.split('/')[1]} as a folder in Storybook; tag the stories !dev`);
   return problems;
 }
@@ -90,16 +110,24 @@ export function readRoster(root) {
     .filter((f) => /\.(stories\.jsx|mdx)$/.test(f))
     .map((f) => ({ file: path.relative(root, f), text: fs.readFileSync(f, 'utf8') }));
   const index = read(INDEX);
+  const overview = read(OVERVIEW);
+  const rows = JSON.parse(read(AGENT_LIST)).templates;
+  const byLower = Object.fromEntries(roster.map((n) => [n.toLowerCase(), n]));
+  const purpose = (n) => fs.readFileSync(path.join(root, TEMPLATES_DIR, n, `${n}.mdx`), 'utf8').match(/purpose="([^"]+)"/)?.[1];
   const section = index.slice(index.indexOf('## Templates'), index.indexOf('## UI components'));
   return {
     roster,
     layers: {
       glossary: glossaryTemplates(read(GLOSSARY)),
-      overview: [...read(OVERVIEW).matchAll(/<ThumbTile\s+hero="[^"]*"\s+title="([^"]+)"/g)].map((m) => m[1]),
-      'agent-view list': JSON.parse(read(AGENT_LIST)).templates.map((r) => r.name),
+      overview: [...overview.matchAll(/templates-(\w+)--docs/g)].map((m) => byLower[m[1]] ?? m[1]),
+      'agent-view list': rows.map((r) => r.name),
       'components index': [...section.matchAll(/^\|[^|]*\| \[`(\w+)`\]/gm)].map((m) => m[1]),
       'Storybook titles': titleNames(files),
+      'guidelines stages': stageTemplates(read(GUIDELINES)),
     },
+    purposes: Object.fromEntries(roster.map((n) => [n, purpose(n)])),
+    uses: Object.fromEntries(rows.map((r) => [r.name, r.use])),
+    tiles: tileTexts(overview),
     children: visibleChildren(files),
   };
 }

@@ -75,3 +75,11 @@ test('the live theme equals the token values: light from the corpus, every mode 
     assert.ok(fonts?.fontCode?.includes('Noto Sans Mono'), `${mode} fontCode includes Noto Sans Mono`);
   }
 });
+
+test('the live tokens resolve to the same set of manager colors in every mode', () => {
+  const themes = resolveManagerThemes();
+  const keys = Object.keys(themes['light-no-preference'].theme).sort();
+  assert.ok(keys.length > 10);
+  for (const mode of Object.keys(MANAGER_MODES)) assert.deepEqual(Object.keys(themes[mode].theme).sort(), keys, mode);
+  for (const value of Object.values(themes['dark-no-preference'].theme)) assert.doesNotMatch(value, /var\(/);
+});

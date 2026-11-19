@@ -16,7 +16,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
+import { tokenDeclarationPattern, varReferencePattern } from '../design-system/src/lib/tokens.mjs';
 import { CORNER, HAIRLINE } from '../design-system/src/storybook-docs/illustrations/paint.js';
 import {
   SESSION_SUMMARY_BOX,
@@ -130,7 +130,7 @@ function evalPxExpression(expr) {
 /** Recursively resolve every `var(--name)` inside a token expression. */
 export function resolveCssExpression(expr, tokens, seen = new Set()) {
   if (typeof expr === 'number') return expr;
-  const resolved = String(expr).replace(/var\(\s*(--[a-z0-9-]+)\s*(?:,[^)]*)?\)/g, (_, name) => {
+  const resolved = String(expr).replace(new RegExp(`${varReferencePattern().source}\\s*(?:,[^)]*)?\\)`, 'g'), (_, name) => {
     if (seen.has(name)) throw new Error(`Token cycle at ${name}`);
     const raw = tokens.get(name);
     if (raw === undefined) throw new Error(`Undefined token ${name}`);

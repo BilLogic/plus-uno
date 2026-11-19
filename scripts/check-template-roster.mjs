@@ -3,10 +3,12 @@
  * Template roster check.
  *
  * The templates are the `@/templates` barrel's exports that have a folder, and
- * five other layers list them: the glossary's Template entry, the Templates
- * overview, the agent-view list, the components index and the `Templates/*`
- * Storybook titles. This holds every layer to the barrel's eight, and fails
+ * six other layers list them: the glossary's Template entry, the Templates
+ * overview, the agent-view list, the components index, the guidelines' first
+ * two stages and the `Templates/*` Storybook titles. This holds every layer to the barrel's eight, and fails
  * when a template's page has a visible child title in Storybook.
+ * Each agent-view row and hand-typed overview tile also reads as its page's
+ * `purpose`. `ListPage` is a CLI registry starter, not a template.
  * `scripts/lib/template-roster.mjs` holds the rule.
  *
  * Run: npm run check:template-roster

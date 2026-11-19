@@ -7,15 +7,14 @@ import fs from 'node:fs';
 import test from 'node:test';
 
 import { tokenCorpus } from '../design-system/src/lib/tokens-node.mjs';
-import { buildLibrary, filterLibrary, groupLibrary, readDarkTokens } from '../design-system/src/storybook-docs/lib/token-library.mjs';
+import { darkValues, readDarkTokens } from '../design-system/src/lib/tokens.mjs';
+import { tokenCollections } from '../design-system/src/storybook-docs/lib/token-collections.mjs';
+import { buildLibrary, filterLibrary, groupLibrary } from '../design-system/src/storybook-docs/lib/token-library.mjs';
 
 const read = (f) => fs.readFileSync(new URL(`../design-system/src/tokens/${f}`, import.meta.url), 'utf8');
-const darkSources = ['color/_semantic.scss', 'color/_elevation.scss'].map((file) => ({ file, text: read(file) }));
 const corpus = tokenCorpus();
-const intents = new Map(
-  JSON.parse(fs.readFileSync(new URL('../design-system/agent-views/tokens.json', import.meta.url), 'utf8')).tokens.map((t) => [t.name, t.intent]),
-);
-const library = buildLibrary(corpus, { darkSources, intents });
+const records = JSON.parse(fs.readFileSync(new URL('../design-system/agent-views/tokens.json', import.meta.url), 'utf8')).tokens;
+const library = buildLibrary(tokenCollections(records));
 
 test('every token appears in the library exactly once', () => {
   assert.equal(library.length, corpus.size);
@@ -29,6 +28,23 @@ test('a color role carries a light and a dark value read from the source', () =>
   const text = library.find((e) => e.name === '--ds-text');
   assert.ok(text.light && text.dark && text.light !== text.dark, `${text.light} / ${text.dark}`);
   assert.equal(library.find((e) => e.name === '--space-100').dark, null);
+});
+
+test('the light and dark values equal what the stylesheets say', () => {
+  const dark = new Map();
+  for (const file of ['color/_semantic.scss', 'color/_elevation.scss']) for (const [k, v] of readDarkTokens(read(file))) dark.set(k, v);
+  const light = new Map([...corpus].map(([name, entry]) => [name, entry.raw]));
+  const expected = darkValues(light, dark);
+  for (const row of library) {
+    assert.equal(row.light, corpus.get(row.name).value, row.name);
+    assert.equal(row.dark, expected.get(row.name) ?? null, row.name);
+  }
+});
+
+test('darkValues follows an alias to a token the dark mode changes', () => {
+  const light = new Map([['--a', '#fff'], ['--b', 'var(--a)'], ['--c', '1px']]);
+  const dark = new Map([['--a', '#000']]);
+  assert.deepEqual([...darkValues(light, dark)], [['--a', '#000'], ['--b', '#000']]);
 });
 
 test('readDarkTokens reads only the plain dark block', () => {

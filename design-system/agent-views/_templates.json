@@ -1,5 +1,5 @@
 {
-  "_comment": "Hand-kept, reviewed in PRs. The eight templates, in three layers (shell, blocks, overlays): the shells a page, a block or an overlay is built from. Each row keeps only its layer and its page's first line (the `purpose` of its DocsLanding); the import line and the Storybook page come from the barrels and source, through the DS facts (scripts/lib/ds-facts.mjs). Rendered into components/index.md by npm run generate:agent; scripts/lib/templates-index.mjs holds every name to the facts and every template to a row, and npm run check:template-roster holds every layer to the same eight.",
+  "_comment": "Hand-kept, reviewed in PRs. The eight templates, in three groups (shell, blocks, overlays): the shells a page, a block or an overlay is built from. Each row keeps only its group and its page's first line (the `purpose` of its DocsLanding); the import line and the Storybook page come from the barrels and source, through the DS facts (scripts/lib/ds-facts.mjs). Rendered into components/index.md by npm run generate:agent; scripts/lib/templates-index.mjs holds every name to the facts and every template to a row, and npm run check:template-roster holds every layer to the same eight.",
   "templates": [
     {
       "group": "Shell",
@@ -24,7 +24,7 @@
     {
       "group": "Blocks",
       "name": "Table",
-      "use": "The Table template is how a table sits on a page. A Section holds the table, and the Section header carries the title, the actions, Search and the filters. The table spans the section under it, plain, with no card around it and no padding of its own. Pick a Static, Dynamic or Tree table, and the template adds the footer and the empty state box."
+      "use": "How a table sits on a page: a Section header over a Static, Dynamic or Tree table, with its footer and empty state."
     },
     {
       "group": "Overlays",
