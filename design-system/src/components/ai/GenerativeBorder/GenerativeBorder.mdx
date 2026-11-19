@@ -155,9 +155,9 @@ Wrap the content and toggle `isActive` while the AI generates into it.
 One moving border keeps attention on the content being generated.
 
 <DoDontPair
-    doExample={<FigureRow><GenerativeBorder><FigureBox tone=\"raised\">Summary</FigureBox></GenerativeBorder><GenerativeBorder isActive><FigureBox tone=\"raised\">Goals</FigureBox></GenerativeBorder><GenerativeBorder><FigureBox tone=\"raised\">Next steps</FigureBox></GenerativeBorder></FigureRow>}
+    doExample={<FigureRow><GenerativeBorder><FigureBox tone="raised">Summary</FigureBox></GenerativeBorder><GenerativeBorder isActive><FigureBox tone="raised">Goals</FigureBox></GenerativeBorder><GenerativeBorder><FigureBox tone="raised">Next steps</FigureBox></GenerativeBorder></FigureRow>}
     doCaption="One active border."
-    dontExample={<FigureRow><GenerativeBorder isActive><FigureBox tone=\"raised\">Summary</FigureBox></GenerativeBorder><GenerativeBorder isActive><FigureBox tone=\"raised\">Goals</FigureBox></GenerativeBorder><GenerativeBorder isActive><FigureBox tone=\"raised\">Next steps</FigureBox></GenerativeBorder></FigureRow>}
+    dontExample={<FigureRow><GenerativeBorder isActive><FigureBox tone="raised">Summary</FigureBox></GenerativeBorder><GenerativeBorder isActive><FigureBox tone="raised">Goals</FigureBox></GenerativeBorder><GenerativeBorder isActive><FigureBox tone="raised">Next steps</FigureBox></GenerativeBorder></FigureRow>}
     dontCaption="Every border active."
 />
 
@@ -166,9 +166,9 @@ One moving border keeps attention on the content being generated.
 The border traces the content's corners; a pill around a rectangular card looks detached.
 
 <DoDontPair
-    doExample={<GenerativeBorder isActive radius="radius-xxl"><FigureBox tone=\"raised\">Drafting the session summary…</FigureBox></GenerativeBorder>}
+    doExample={<GenerativeBorder isActive radius="radius-xxl"><FigureBox tone="raised">Drafting the session summary…</FigureBox></GenerativeBorder>}
     doCaption="Radius that matches the content."
-    dontExample={<GenerativeBorder isActive radius="radius-full"><FigureBox tone=\"raised\">Drafting the session summary…</FigureBox></GenerativeBorder>}
+    dontExample={<GenerativeBorder isActive radius="radius-full"><FigureBox tone="raised">Drafting the session summary…</FigureBox></GenerativeBorder>}
     dontCaption="A pill around a rectangle."
 />
 
@@ -177,18 +177,18 @@ The border traces the content's corners; a pill around a rectangular card looks 
 Set `isActive` to false when generation ends.
 
 <DoDontPair
-    doExample={<GenerativeBorder><FigureBox tone=\"raised\">Here is a first draft of the session summary.</FigureBox></GenerativeBorder>}
+    doExample={<GenerativeBorder><FigureBox tone="raised">Here is a first draft of the session summary.</FigureBox></GenerativeBorder>}
     doCaption="Inactive once done."
-    dontExample={<GenerativeBorder isActive><FigureBox tone=\"raised\">Here is a first draft of the session summary.</FigureBox></GenerativeBorder>}
+    dontExample={<GenerativeBorder isActive><FigureBox tone="raised">Here is a first draft of the session summary.</FigureBox></GenerativeBorder>}
     dontCaption="Still animating after completion."
 />
 
 ### Use one ring per piece of content.
 
 <DoDontPair
-    doExample={<GenerativeBorder isActive><FigureBox tone=\"raised\">Drafting the session summary…</FigureBox></GenerativeBorder>}
+    doExample={<GenerativeBorder isActive><FigureBox tone="raised">Drafting the session summary…</FigureBox></GenerativeBorder>}
     doCaption="One ring around the content being generated."
-    dontExample={<GenerativeBorder isActive><FigureStack><GenerativeBorder isActive><FigureBox tone=\"raised\">Drafting the session summary…</FigureBox></GenerativeBorder></FigureStack></GenerativeBorder>}
+    dontExample={<GenerativeBorder isActive><FigureStack><GenerativeBorder isActive><FigureBox tone="raised">Drafting the session summary…</FigureBox></GenerativeBorder></FigureStack></GenerativeBorder>}
     dontCaption="Two rings nested around the same content."
 />
 

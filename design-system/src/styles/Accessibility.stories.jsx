@@ -53,18 +53,8 @@ export const ContrastPairings = {
 export const FocusRing = {
     render: () => (
         <DoDont>
-            <Do caption={<>A 2px ring in <C>--ds-border-focused</C>, 2px outside the button. The fill is unchanged.</>}>
-                <RingDemo style={{ borderRadius: 'var(--radius-control-md)' }}>
-                    <Button text="Save changes" appearance="primary" />
-                </RingDemo>
-            </Do>
-            <Dont caption="Focus shown only by darkening the fill. It reads as hover or press, and it is easy to miss.">
-                <Button
-                    text="Save changes"
-                    appearance="primary"
-                    style={{ backgroundColor: 'var(--ds-background-brand-bold-pressed)' }}
-                />
-            </Dont>
+            <Do caption={<>A 2px ring in <C>--ds-border-focused</C>, 2px outside the button; the fill is unchanged.</>}><A2pxRingDoFigure /></Do>
+            <Dont caption="Focus shown only by darkening the fill; it reads as hover or press, and it is easy to miss."><FocusShownOnlyDontFigure /></Dont>
         </DoDont>
     ),
     play: async ({ canvas, canvasElement }) => {
@@ -82,12 +72,10 @@ export const FocusRing = {
 export const StatusNotColorAlone = {
     render: () => (
         <DoDont>
-            <Do caption="Color, an icon and a word together. The status reads with no color vision.">
+            <Do caption="Color, an icon and a word together; the status reads with no color vision.">
                 <StatusTag appearance="danger" iconBefore="circle-exclamation">Payment failed</StatusTag>
             </Do>
-            <Dont caption="A red dot and no words. Users who cannot tell the colors apart get nothing.">
-                <span style={{ display: 'inline-block', width: 'var(--icon-sm)', height: 'var(--icon-sm)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-danger-bold)' }} />
-            </Dont>
+            <Dont caption="A red dot and no words; users who cannot tell the colors apart get nothing."><ARedDotDontFigure /></Dont>
         </DoDont>
     ),
     play: async ({ canvas }) => {
@@ -125,3 +113,27 @@ export const SettledFadeInPassesScan = {
         await expect(canvas.getByText('Session notes saved.')).toBeInTheDocument();
     },
 };
+
+const A2pxRingDoFigure = () => (
+    <>
+        <RingDemo style={{ borderRadius: 'var(--radius-control-md)' }}>
+            <Button text="Save changes" appearance="primary" />
+        </RingDemo>
+    </>
+);
+
+const FocusShownOnlyDontFigure = () => (
+    <>
+        <Button
+            text="Save changes"
+            appearance="primary"
+            style={{ backgroundColor: 'var(--ds-background-brand-bold-pressed)' }}
+        />
+    </>
+);
+
+const ARedDotDontFigure = () => (
+    <>
+        <span style={{ display: 'inline-block', width: 'var(--icon-sm)', height: 'var(--icon-sm)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-danger-bold)' }} />
+    </>
+);

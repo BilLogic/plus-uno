@@ -624,7 +624,7 @@ export const ColorSwapNeverStack = () => (
                 </PageCanvas>
             </Illustration>
         </Do>
-        <Dont caption="A colored region holding cards. Color goes on the card, one step, like Sunken.">
+        <Dont caption="A colored region holding cards; color goes on the card, one step, like Sunken.">
             <Illustration width={STAGE.w} height={STAGE.h} title="Colored region wrapping two white cards">
                 <PageCanvas>
                     <Layer x={FRAME.x + 28} y={FRAME.y + 22} w={154} h={56} fill="var(--ds-background-warning)" corner="card" />

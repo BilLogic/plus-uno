@@ -133,12 +133,8 @@ All 12 bodies sit at one mid strength so the set reads equally light in Light an
 The body color stands for the area, so a character only appears with its own area.
 
 <DoDont>
-<Do caption="The technology character with the Technology & tools lesson.">
-<FigureRow gap="lg"><Illustration character="technology" size={48} /><strong style={{ font: 'var(--heading-xs)' }}>Technology & tools</strong></FigureRow>
-</Do>
-<Dont caption="The mastering content character on a Relationships lesson.">
-<FigureRow gap="lg"><Illustration character="mastering-content" size={48} /><strong style={{ font: 'var(--heading-xs)' }}>Relationships</strong></FigureRow>
-</Dont>
+<Do caption="The technology character with the Technology & tools lesson."><TheTechnologyCharacterDoFigure /></Do>
+<Dont caption="The mastering content character on a Relationships lesson."><TheMasteringContentDontFigure /></Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -151,9 +147,7 @@ Scale with the size; the limbs and texture distort when stretched.
 <Do caption="Scaled uniformly to a size on the scale.">
 <Illustration character="technology" size={96} />
 </Do>
-<Dont caption="Stretched to fill a banner.">
-<div style={{ width: 'calc(var(--icon-lg) * 6)', height: 'var(--image-xl)', overflow: 'hidden' }}><div style={{ transform: 'scale(2.5, 0.5)', transformOrigin: 'top left' }}><Illustration character="technology" size={96} /></div></div>
-</Dont>
+<Dont caption="Stretched to fill a banner."><StretchedToFillDontFigure /></Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -163,20 +157,8 @@ Scale with the size; the limbs and texture distort when stretched.
 A single character carries the mood; a crowd competes with the message.
 
 <DoDont>
-<Do caption="One character above the empty-state message.">
-<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--stack-md)', textAlign: 'center' }}>
-    <Illustration character="relationships" size={96} />
-    <strong style={{ font: 'var(--heading-xs)' }}>No sessions yet</strong>
-    <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Your scheduled sessions show up here.</span>
-</div>
-</Do>
-<Dont caption="Four characters crowding one empty state. A collage like this belongs on a marketing page, not in the product.">
-<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--stack-md)', textAlign: 'center' }}>
-    <span style={{ display: 'flex' }}>{['mastering-content', 'advocacy', 'technology', 'relationships'].map((c) => <Illustration key={c} character={c} size={48} />)}</span>
-    <strong style={{ font: 'var(--heading-xs)' }}>No sessions yet</strong>
-    <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Your scheduled sessions show up here.</span>
-</div>
-</Dont>
+<Do caption="One character above the empty-state message."><OneCharacterAboveDoFigure /></Do>
+<Dont caption="Four characters crowding one empty state; a collage like this belongs on a marketing page, not in the product."><FourCharactersCrowdingDontFigure /></Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -204,3 +186,41 @@ A single character carries the mood; a crowd competes with the message.
 />
 
 </FoundationSection>
+
+export const TheTechnologyCharacterDoFigure = () => (
+    <>
+    <FigureRow gap="lg"><Illustration character="technology" size={48} /><strong style={{ font: 'var(--heading-xs)' }}>Technology & tools</strong></FigureRow>
+    </>
+);
+
+export const TheMasteringContentDontFigure = () => (
+    <>
+    <FigureRow gap="lg"><Illustration character="mastering-content" size={48} /><strong style={{ font: 'var(--heading-xs)' }}>Relationships</strong></FigureRow>
+    </>
+);
+
+export const StretchedToFillDontFigure = () => (
+    <>
+    <div style={{ width: 'calc(var(--icon-lg) * 6)', height: 'var(--image-xl)', overflow: 'hidden' }}><div style={{ transform: 'scale(2.5, 0.5)', transformOrigin: 'top left' }}><Illustration character="technology" size={96} /></div></div>
+    </>
+);
+
+export const OneCharacterAboveDoFigure = () => (
+    <>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--stack-md)', textAlign: 'center' }}>
+        <Illustration character="relationships" size={96} />
+        <strong style={{ font: 'var(--heading-xs)' }}>No sessions yet</strong>
+        <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Your scheduled sessions show up here.</span>
+    </div>
+    </>
+);
+
+export const FourCharactersCrowdingDontFigure = () => (
+    <>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--stack-md)', textAlign: 'center' }}>
+        <span style={{ display: 'flex' }}>{['mastering-content', 'advocacy', 'technology', 'relationships'].map((c) => <Illustration key={c} character={c} size={48} />)}</span>
+        <strong style={{ font: 'var(--heading-xs)' }}>No sessions yet</strong>
+        <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Your scheduled sessions show up here.</span>
+    </div>
+    </>
+);
