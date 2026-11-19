@@ -410,8 +410,8 @@ test('the Frame stacks its layers by name: no arithmetic on --layer-navigation a
   assert.doesNotMatch(scss, /z-index:\s*-?\d/);
 });
 
-test('the Frame layer steps are named and ordered edge < Sidebar < Blanket < Panel peek', () => {
-  const order = ['edge', 'sidebar', 'blanket', 'panel-peek'].map((n) => `--layer-frame-${n}`);
+test('the Frame layer steps are named and ordered edge < Sidebar < Panel peek', () => {
+  const order = ['edge', 'sidebar', 'panel-peek'].map((n) => `--layer-frame-${n}`);
   const values = order.map((n) => {
     const token = corpus.get(n);
     assert.ok(token, `${n} is not declared`);

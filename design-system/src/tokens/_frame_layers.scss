@@ -69,8 +69,7 @@
     --popup-offset: var(--space-025); /* gap from a Popup to its trigger */
     --layer-frame-edge: calc(var(--layer-navigation) - 1); /* the hover strips that peek a closed Sidebar or Panel */
     --layer-frame-sidebar: var(--layer-navigation); /* the raised Sidebar */
-    --layer-frame-blanket: calc(var(--layer-navigation) + 2); /* the overlay Panel's Blanket */
-    --layer-frame-panel-peek: calc(var(--layer-navigation) + 3); /* a peeking or overlay Panel, above its Blanket */
+    --layer-frame-panel-peek: calc(var(--layer-navigation) + 3); /* a peeking or overlay Panel */
     --layer-frame-splitter: 1; /* local to the Panel's own stacking context, not a step on the navigation scale: the splitter's hit strip */
     --layer-frame-docked-edge: 1; /* local to the Frame's row, not a step on the navigation scale: lifts a docked Sidebar so its 1px edge lies over the Page's first pixel */
 }

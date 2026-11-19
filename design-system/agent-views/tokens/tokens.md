@@ -388,7 +388,6 @@ The templates on the page frame, per breakpoint: page, section, card, table, ove
 --dropdown-menu-pad  /* Padding inside a DropdownMenu or listbox. */
 --flag-stack  /* Vertical gap between stacked Flags. */
 --flag-width  /* Width of a Flag. */
---layer-frame-blanket
 --layer-frame-docked-edge
 --layer-frame-edge
 --layer-frame-panel-peek
