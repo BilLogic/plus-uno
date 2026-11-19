@@ -557,8 +557,9 @@ export const LinkStates = {
             const button = canvas.getByRole('button', { name: label(appearance) });
             settled(button);
             await expect(getComputedStyle(button).textDecorationLine, `${appearance} rest`).toBe('none');
-            const hovered = withForcedPseudo(button, ':hover', () => getComputedStyle(button));
-            await expect(hovered.textDecorationLine, `${appearance} hovered underline`).toBe('underline');
+            // Read inside the callback: the computed style is live, and the forced state is gone once it returns.
+            const hoveredLine = withForcedPseudo(button, ':hover', () => getComputedStyle(button).textDecorationLine);
+            await expect(hoveredLine, `${appearance} hovered underline`).toBe('underline');
             await expect(withForcedPseudo(button, ':active', () => getComputedStyle(button).color), `${appearance} pressed label`).toBe(tokenColor(canvasElement, LINK_PRESSED[appearance]));
         }
         const disabled = canvas.getByRole('button', { name: 'Link disabled' });
