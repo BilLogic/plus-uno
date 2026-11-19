@@ -55,6 +55,8 @@ any edit view; `InlineEditableTextfield` is the one built on `TextField`.
 
 <ComponentExample of={InlineEditStories.SpacingCompact} title="Compact" description={<><code>spacing="compact"</code> draws both views 32 high.</>} />
 
+The `compact` boolean is now `spacing="compact"` (`default` or `compact`). Callers that passed `compact` change to `spacing="compact"`; the `compact` prop is no longer read.
+
 <ComponentExample of={InlineEditStories.ButtonsDoNotMoveThePage} title="Buttons over the page" description="The buttons hang under the field over whatever follows it, so showing them does not push the page down." />
 
 </div>

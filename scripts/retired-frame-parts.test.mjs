@@ -25,9 +25,6 @@ const HISTORY = [
   'scripts/baselines/figma-node-types.json',
   'design-system/figma/node-types.json',
   'design-system/figma/registry-audit.md',
-  'design-system/src/styles/Grid.mdx',
-  'design-system/agent-views/foundations/Grid.md',
-  'design-system/agent-views/ds-index.json', // embeds the Grid guide until its rewrite regenerates it
   'docs/knowledge/figma-clipping-audit-2026-11-12.md',
 ];
 

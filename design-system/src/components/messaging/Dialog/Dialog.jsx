@@ -159,10 +159,8 @@ const Dialog = React.forwardRef(({
 
     const classes = [
         'plus-dialog',
-        'plus-dialog-default',
         DIALOG_WIDTHS.includes(width) ? `plus-dialog-width-${width}` : '',
         `plus-dialog-height-${height}`,
-        showBottomButtons ? 'plus-dialog-with-buttons' : 'plus-dialog-no-buttons',
         bodyOnly ? 'plus-dialog-body-only' : '',
         className,
         rest.className,

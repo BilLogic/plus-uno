@@ -97,9 +97,9 @@ describe('getOverlayPortalRoot', () => {
 });
 
 describe('overlayMountOf', () => {
-    it('mounts in the nearest .plus-template-blanket ancestor, when there is one', () => {
+    it('mounts in the nearest .plus-modal-blanket ancestor, when there is one', () => {
         const blanket = document.createElement('div');
-        blanket.className = 'plus-template-blanket';
+        blanket.className = 'plus-modal-blanket';
         const trigger = document.createElement('button');
         blanket.appendChild(trigger);
         document.body.appendChild(blanket);
@@ -163,7 +163,7 @@ describe('isPressInRaisedOverlay', () => {
         document.body.innerHTML = `
             <button id="chat"></button>
             <div id="popup"><span id="popup-text"></span></div>
-            <div class="plus-template-blanket" id="blanket">
+            <div class="plus-modal-blanket" id="blanket">
                 <div role="dialog"><p id="modal-text"></p><button id="inner"></button></div>
             </div>
             <main id="page"></main>`;
@@ -205,7 +205,7 @@ describe('isOverlayRaisedOver', () => {
     });
 
     it('is true for an owner outside the open Modal, false for one inside it', () => {
-        document.body.innerHTML = '<button id="chat"></button><div class="plus-template-blanket"><button id="inner"></button></div>';
+        document.body.innerHTML = '<button id="chat"></button><div class="plus-modal-blanket"><button id="inner"></button></div>';
         open();
         expect(isOverlayRaisedOver(document.getElementById('chat'))).toBe(true);
         expect(isOverlayRaisedOver(document.getElementById('inner'))).toBe(false);
@@ -236,7 +236,7 @@ describe('useBoundedOverlay', () => {
         const canvas = document.createElement('div');
         const explicit = document.createElement('div');
         const blanket = document.createElement('div');
-        blanket.className = 'plus-template-blanket';
+        blanket.className = 'plus-modal-blanket';
         const trigger = document.createElement('button');
         blanket.appendChild(trigger);
         document.body.appendChild(blanket);
@@ -274,7 +274,7 @@ describe('useFloatingOverlay', () => {
     it('cancels and skips onOpenChange for an outside press inside a raised overlay', () => {
         document.body.innerHTML = `
             <button id="owner"></button>
-            <div class="plus-template-blanket"><button id="in-modal"></button></div>
+            <div class="plus-modal-blanket"><button id="in-modal"></button></div>
             <main id="page"></main>`;
         const owner = document.getElementById('owner');
         const inModal = document.getElementById('in-modal');

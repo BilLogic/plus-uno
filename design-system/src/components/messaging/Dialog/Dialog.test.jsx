@@ -14,7 +14,7 @@ describe('Dialog', () => {
         const panel = container.querySelector('.plus-dialog');
         expect(panel).toBeInTheDocument();
         expect(panel).toHaveClass('plus-dialog-width-6-col', 'plus-dialog-height-hug');
-        expect(document.querySelector('.plus-template-blanket')).toBeNull();
+        expect(document.querySelector('.plus-modal-blanket')).toBeNull();
         expect(screen.queryByRole('dialog')).toBeNull();
         expect(screen.getByRole('heading', { level: 1, name: 'Session details' })).toBeInTheDocument();
     });

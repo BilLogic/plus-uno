@@ -1228,6 +1228,35 @@ export const OnImages = () => (
 );
 
 /**
+ * Colored material: `material` takes a bold or subtle fill in `materialColor`
+ * and the material edge, for a read-only tag over a picture. A removable tag
+ * ignores it.
+ */
+export const ColoredMaterial = () => (
+    <div style={thumbnail}>
+        <div style={picture} aria-hidden="true" />
+        <div style={onPicture}>
+            <Tag material="bold" materialColor="brand" data-testid="bold">Lincoln Middle</Tag>
+            <Tag material="subtle" materialColor="success" data-testid="subtle">Advocacy</Tag>
+            <Tag material="bold" materialColor="danger" isRemovable onAfterRemoveAction={() => {}} data-testid="removable">Unit 3</Tag>
+        </div>
+    </div>
+);
+
+ColoredMaterial.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const t = (token) => tokenColor(canvasElement, token);
+    const bold = getComputedStyle(canvas.getByTestId('bold'));
+    await expect(bold.backgroundColor, 'bold fills in the color').toBe(t('--ds-background-brand-material-bold'));
+    await expect(bold.borderTopColor, 'the material edge').toBe(t('--ds-border-material'));
+    const subtle = getComputedStyle(canvas.getByTestId('subtle'));
+    await expect(subtle.backgroundColor, 'subtle sits on the overlay material').toBe(t('--ds-surface-material-overlay'));
+    await expect(subtle.color, 'subtle text takes the color').toBe(t('--ds-text-success'));
+    await expect(getComputedStyle(canvas.getByTestId('removable')).backgroundColor, 'a removable tag ignores material')
+        .not.toBe(t('--ds-background-danger-material-bold'));
+};
+
+/**
  * Elevated: the overlay pair (a solid overlay surface and the overlay shadow),
  * no border and neutral text, with the hue kept on the swatch, still 20 tall.
  * A link's hover and press lay the neutral subtle hovered and pressed steps

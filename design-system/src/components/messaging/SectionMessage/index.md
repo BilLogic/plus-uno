@@ -177,7 +177,7 @@ Same group: `Banner` · `Dialog` · `EmptyState` · `Flag` · `InlineMessage` ·
 | `headingLevel` | enum | — | Heading level the title renders as, 1 through 6. Defaults to `h2`. |
 | `children` | node (required) | — | Message content - supports text, JSX, or React components |
 | `icon` | bool or string or node | `true` | Leading icon on the first line: `true` for the style's default, a Font Awesome solid name or a node to replace it, `false` to remove it. Always decorative. |
-| `actions` | arrayOf (required) | — | Link-button actions after the body, in the order given. Avoid more than two. |
+| `actions` | arrayOf | — | Link-button actions after the body, in the order given. Avoid more than two. |
 | `dismissible` | bool | `true` | Whether the message can be dismissed |
 | `onDismiss` | func | — | Callback when the message is dismissed |
 | `className` | string | `''` | Additional CSS classes |

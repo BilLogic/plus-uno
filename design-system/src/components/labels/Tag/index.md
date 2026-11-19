@@ -12,7 +12,7 @@ Also asked as: label, keyword.
 
 **Source:** `design-system/src/components/labels/Tag/Tag.jsx`
 
-**Stories:** `design-system/src/components/labels/Tag/Tag.stories.jsx` — Colors, LeadingSwatchAndIcon, SwatchRefusesRawColor, NewColorsContrast, Behaviors, Types, AvatarFallback, TypeBehaviors, PersonFocusRing, RemoveFocusRingOnTypes, AvatarEdgeCases, AvatarFills, Selecting, StateLayers, Removing, RemoveNeedsANameForNodeLabels, FocusRing, LinkWithRemove, DisabledInField, CountOnSelectable, Saving, Truncation, OnImages, ElevatedAvatarTypes, ElevatedDisabled, ElevatedRemoveFocus, ElevatedOnlyReadOnlyAndLink, AnswerTags, IsDisabled, Interactive, Rest, Hovered, Pressed, Focused, Disabled
+**Stories:** `design-system/src/components/labels/Tag/Tag.stories.jsx` — Colors, LeadingSwatchAndIcon, SwatchRefusesRawColor, NewColorsContrast, Behaviors, Types, AvatarFallback, TypeBehaviors, PersonFocusRing, RemoveFocusRingOnTypes, AvatarEdgeCases, AvatarFills, Selecting, StateLayers, Removing, RemoveNeedsANameForNodeLabels, FocusRing, LinkWithRemove, DisabledInField, CountOnSelectable, Saving, Truncation, OnImages, ColoredMaterial, ElevatedAvatarTypes, ElevatedDisabled, ElevatedRemoveFocus, ElevatedOnlyReadOnlyAndLink, AnswerTags, IsDisabled, Interactive, Rest, Hovered, Pressed, Focused, Disabled
 
 **Storybook page:** `design-system/src/components/labels/Tag/Tag.mdx`
 

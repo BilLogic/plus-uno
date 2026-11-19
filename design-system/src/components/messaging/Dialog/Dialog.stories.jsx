@@ -268,7 +268,7 @@ Width10Col.storyName = 'Width 10-col';
 
 const heightStory = (height, title, body) => ({
     render: () => (
-        <div style={{ '--plus-overlay-screen': '1024px' /* token gap: 1024px */, '--blanket-max-height-modal': 'var(--height-2000)', width: '100%' }}>
+        <div style={{ '--plus-overlay-screen': '1024px' /* token gap: 1024px */, '--dialog-max-height': 'var(--height-2000)', width: '100%' }}>
             <Dialog height={height} title={title} body={body} primaryButton={{ text: 'Done' }} onClose={() => {}} />
         </div>
     ),

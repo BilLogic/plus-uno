@@ -247,7 +247,8 @@ function prettyType(raw) {
   if (/PropTypes\.oneOf\(\[/.test(raw)) return 'enum';
   const simple = raw.match(/PropTypes\.(\w+)/);
   let t = simple ? simple[1] : raw;
-  if (/\.isRequired/.test(raw)) t += ' (required)';
+  // Only the prop's own `.isRequired`: a field inside a shape can carry one without the shape being required.
+  if (/\.isRequired\s*$/.test(raw)) t += ' (required)';
   return t;
 }
 

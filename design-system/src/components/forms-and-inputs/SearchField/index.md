@@ -141,7 +141,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `isLoading` | bool | `false` | A search is running. A Spinner takes the search icon's place. `loadResults` sets this by itself. |
 | `isCollapsible` | bool | `false` | Starts as an icon button that grows into the field and collapses when left empty. |
 | `defaultOpen` | bool | `false` | With `isCollapsible`, starts open. |
-| `scopes` | arrayOf (required) | — | Scope filter before the field: `{ value, label, count? }`. "All" is added first and selected unless given. |
+| `scopes` | arrayOf | — | Scope filter before the field: `{ value, label, count? }`. "All" is added first and selected unless given. |
 | `scope` | string | — | The chosen scope value, when the caller holds it. Pair with `onScopeChange`. |
 | `defaultScope` | string | `ALL` | Starting scope when the field holds its own. `all` by default. |
 | `onScopeChange` | func | — | `(value)`: called when another scope is chosen. |

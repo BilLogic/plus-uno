@@ -350,6 +350,13 @@
           "codeSyntax": {
             "WEB": "var(--control-xl)"
           }
+        },
+        {
+          "name": "Footer/height",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--footer-height)"
+          }
         }
       ]
     },

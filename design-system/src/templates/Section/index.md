@@ -221,7 +221,7 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 | `views` | node | — | Row 2, at the start: the views, usually Tabs in the pill appearance. It scrolls sideways when it does not fit. |
 | `format` | node | — | Row 2, at the end: the format switch (Table / Cards). With no `views` it moves to the end of row 3. |
 | `search` | node | — | Row 3, at the start: the Search field at compact spacing, which draws 32. |
-| `filters` | arrayOf (required) | — | Row 3, after Search: one `{ key, label, text, isSelected, onClick, menu }` per trigger, drawn as a FilterButton that reads "label: text". `menu` is `(trigger) => node`: hand the trigger to a Popup select or a Filter menu, so the same button opens the list and keeps its selected state. Three show; the rest go in "More filters" with a count. Under 768 they fold into one Filter button. When they do not fit beside Search they wrap to their own row, end-aligned. |
+| `filters` | arrayOf | — | Row 3, after Search: one `{ key, label, text, isSelected, onClick, menu }` per trigger, drawn as a FilterButton that reads "label: text". `menu` is `(trigger) => node`: hand the trigger to a Popup select or a Filter menu, so the same button opens the list and keeps its selected state. Three show; the rest go in "More filters" with a count. Under 768 they fold into one Filter button. When they do not fit beside Search they wrap to their own row, end-aligned. |
 | `count` | node | — | Row 3, at the end once a filter is applied: how many rows match, such as "3 of 12". |
 | `onClearAll` | func | — | Runs when "Clear all" is pressed. The button shows once a filter is applied. |
 | `onMoreFilters` | func | — | Runs when "More filters" is pressed. |

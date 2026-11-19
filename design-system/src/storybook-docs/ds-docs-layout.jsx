@@ -499,7 +499,7 @@ export function FigureScreen({ short = false, children }) {
             className="sb-ds-figure-screen"
             style={{
                 '--plus-overlay-screen': 'var(--width-3000)',
-                '--blanket-max-height-modal': short ? 'var(--height-2000)' : undefined,
+                '--dialog-max-height': short ? 'var(--height-2000)' : undefined,
                 inlineSize: '100%',
             }}
         >

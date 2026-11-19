@@ -105,7 +105,7 @@ Same group: `AiIcon` · `AiMessage` · `GenerativeBorder` · `PromptInput` · `S
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `starters` | arrayOf (required) | `[]` | What to offer: `id` for the key, `label` on the tag, `text` for the prompt it stands for. |
+| `starters` | arrayOf | `[]` | What to offer: `id` for the key, `label` on the tag, `text` for the prompt it stands for. |
 | `onSelect` | func | — | Called with the starter that was pressed. It never sends anything itself. |
 | `label` | string (required) | — | The group's accessible name, such as "Suggested prompts". |
 | `className` | string | `''` | — |

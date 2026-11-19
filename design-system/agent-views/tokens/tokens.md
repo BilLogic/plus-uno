@@ -24,6 +24,7 @@ Start here for space, size and radius (ADR-038). A component reads its component
 --control-xl  /* Height of an extra-large control: 48px high. */
 --focus-ring-offset  /* Gap between an element and its focus ring, when it must differ from the ring width. */
 --focus-ring-width  /* Width of the keyboard focus ring; also its offset unless the offset must differ. */
+--footer-height  /* Height of a Modal, Panel or multi-step task footer: 48px, one spacious button with no padding of its own. */
 --grid-columns  /* Column count of the page grid. */
 --grid-gutter  /* Gap between columns of the page grid. */
 --grid-width-column  /* Width of one column of the content grid at the current breakpoint. */

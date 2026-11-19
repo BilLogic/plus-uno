@@ -198,7 +198,7 @@ Same group: `Banner` · `Dialog` · `EmptyState` · `InlineMessage` · `Notifica
 | `appearance` | enum | `'normal'` | `normal` (default), `information`, `warning`, `error` or `success`. |
 | `title` | node (required) | — | What happened, in a few words. |
 | `children` | node | — | An optional description under the title. |
-| `actions` | arrayOf (required) | — | Actions under the description, in the order given, at most two. Links on a default flag, buttons on a bold one. An action with an `href` on a bold flag draws a button that navigates. |
+| `actions` | arrayOf | — | Actions under the description, in the order given, at most two. Links on a default flag, buttons on a bold one. An action with an `href` on a bold flag draws a button that navigates. |
 | `icon` | string or node | — | The default flag's leading icon: a status icon name, or an element such as an Avatar. Unset, the information icon in the subtle icon color. Ignored on a bold flag, which shows its appearance's icon. |
 | `defaultExpanded` | bool | `false` | Whether a bold flag starts expanded. |
 | `show` | bool | `true` | Whether the flag renders. Defaults to true; false renders nothing and stops the auto-close timer. |

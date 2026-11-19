@@ -6,7 +6,7 @@ import HeadCell from '../Table/HeadCell';
 import { TableCell, TableRow, TableMessageRow, TableShell } from '../Table/TableParts';
 import Icon from '../../images-and-icons/Icon';
 import '../Table/Table.scss';
-import '../Table/DynamicTable.scss';
+import '../Table/DynamicTreeTable.scss';
 import './TreeTable.scss';
 
 const classes = (...names) => names.filter(Boolean).join(' ');

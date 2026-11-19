@@ -1,6 +1,8 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { Button } from '@/components';
+import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { fitsCanvas, leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
@@ -12,6 +14,7 @@ import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { DetailsFrame, DetailsPanel, FLOAT_STAGE, GoneFrame, InboxFrame, PanelFrame, SessionsBehind } from './panelDemo.jsx';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
+import { PanelActionGroup, PanelBackAction, PanelBody, PanelCloseAction, PanelContainer, PanelDisclaimer, PanelFooter, PanelHeader, PanelMoreAction, PanelProvider, PanelSubheader } from './Panel';
 
 /**
  * Panel: the template page's examples, run in the Storybook tests. They compose
@@ -60,7 +63,7 @@ const expectFloating = async (canvasElement) => {
     await expect(getComputedStyle(el).boxShadow, 'the overlay shadow').toBe(computedShadow(frame, 'var(--ds-shadow-overlay)'));
     await expect(rect(el).top, 'full height, from the top').toBeCloseTo(rect(frame).top, 0);
     await expect(rect(el).right, 'at the right edge').toBeCloseTo(rect(frame).right, 0);
-    await expect(canvasElement.querySelector('.plus-frame__blanket, .plus-template-blanket'), 'a Panel never has a Blanket').toBeNull();
+    await expect(canvasElement.querySelector('.plus-frame__blanket, .plus-modal-blanket'), 'a Panel never has a Blanket').toBeNull();
     // The page under it is not covered by a layer of its own: only the Panel stands over it.
     const hit = document.elementFromPoint(rect(surface).left + 40, rect(surface).top + 40);
     await expect(frame.contains(hit) && !hit.closest('.plus-frame__panel'), 'a point on the page lands on the page').toBe(true);
@@ -198,7 +201,7 @@ const panelMode = (canvasElement, mode) => waitFor(() => expect(
 ).toContain(`plus-frame__panel--${mode}`));
 
 const expectNoBlanket = (canvasElement) => expect(
-    canvasElement.querySelector('.plus-frame__blanket, .plus-template-blanket'),
+    canvasElement.querySelector('.plus-frame__blanket, .plus-modal-blanket'),
     'no Blanket at any width',
 ).toBeNull();
 
@@ -321,7 +324,142 @@ export const KeyUnder1024 = {
         await waitFor(() => expect(panel()).not.toBeNull());
         const narrowest = tokenLength(frame, '--panel-min-width');
         await waitFor(() => expect(panel().offsetWidth, 'capped at its narrowest').toBeCloseTo(narrowest, 0));
-        await expect(canvasElement.querySelector('.plus-frame__blanket, .plus-template-blanket'), 'no Blanket').toBeNull();
+        await expect(canvasElement.querySelector('.plus-frame__blanket, .plus-modal-blanket'), 'no Blanket').toBeNull();
         await fitsCanvas(canvasElement);
+    },
+};
+
+/* ------------------------------------------------------- the parts alone */
+
+/** The parts on their own, outside a Frame: a standalone Panel sits on the page ground at the width it is given. */
+const SESSION_NOTE = "Review warm-up problems and practice goals before Thursday's math session.";
+
+/** Full composition: back, title and actions in the header, a subheader, the body, and a footer with its disclaimer. */
+export const FullComposition = () => (
+    <PanelContainer width="var(--panel-width-default)" id="panel-full">
+        <PanelHeader
+            backAction={<PanelBackAction />}
+            title="Session details"
+            actions={<PanelActionGroup><PanelMoreAction /><PanelCloseAction /></PanelActionGroup>}
+        />
+        <PanelSubheader>Thursday, 4:00 PM</PanelSubheader>
+        <PanelBody>{SESSION_NOTE}</PanelBody>
+        <PanelFooter>
+            <PanelDisclaimer>Changes save automatically.</PanelDisclaimer>
+            <Button appearance="primary" text="Done" />
+        </PanelFooter>
+    </PanelContainer>
+);
+
+FullComposition.play = async ({ canvasElement }) => {
+    const panel = canvasElement.querySelector('#panel-full');
+    await expect(getComputedStyle(panel).width, 'opens at the default width').toBe(`${tokenLength(panel, '--panel-width-default')}px`);
+    const canvas = within(panel);
+    await expect(canvas.getByRole('heading', { name: 'Session details' })).toBeVisible();
+    await expect(canvas.getByRole('button', { name: 'Back' })).toBeVisible();
+    await expect(canvas.getByRole('button', { name: 'More actions' })).toBeVisible();
+    await expect(canvas.getByRole('button', { name: 'Close' })).toBeVisible();
+    await expect(canvas.getByText('Thursday, 4:00 PM')).toBeVisible();
+    await expect(canvas.getByText('Changes save automatically.')).toBeVisible();
+    await expect(canvas.getByRole('button', { name: 'Done' })).toBeVisible();
+};
+
+/** The smallest Panel: a header and a body. */
+export const MinimalHeaderAndBody = () => (
+    <PanelContainer id="panel-minimal">
+        <PanelHeader title="Quick notes" />
+        <PanelBody>Worked through two-step equations and checked three exit-ticket problems.</PanelBody>
+    </PanelContainer>
+);
+
+MinimalHeaderAndBody.play = async ({ canvasElement }) => {
+    const panel = canvasElement.querySelector('#panel-minimal');
+    await expect(within(panel).getByRole('heading', { name: 'Quick notes' })).toBeVisible();
+    await expect(panel.querySelector('.plus-panel-footer'), 'no footer unless one is given').toBeNull();
+    await expect(getComputedStyle(panel).width, 'with no width given, the default').toBe(`${tokenLength(panel, '--panel-width-default')}px`);
+};
+
+/** Width from the provider: a Panel with no width of its own takes `PanelProvider`'s, shared by every Panel under it. */
+export const WidthFromProvider = () => (
+    <PanelProvider defaultWidth="var(--width-3000)">
+        <PanelContainer id="panel-provider-width">
+            <PanelHeader title="Wide Panel" />
+            <PanelBody>Session notes and lesson materials follow the PanelProvider width.</PanelBody>
+        </PanelContainer>
+    </PanelProvider>
+);
+
+WidthFromProvider.play = async ({ canvasElement }) => {
+    const panel = canvasElement.querySelector('#panel-provider-width');
+    await expect(getComputedStyle(panel).width).toBe(`${tokenLength(panel, '--width-3000')}px`);
+};
+
+const PLAYGROUND_WIDTHS = ['var(--panel-min-width)', 'var(--panel-width-default)', 'var(--panel-max-width)'];
+
+/** Playground: set the width from the table, then change the title and the body. */
+export const Playground = {
+    args: {
+        width: 'var(--panel-width-default)',
+        title: 'Session details',
+        body: SESSION_NOTE,
+    },
+    argTypes: {
+        width: { control: 'select', options: PLAYGROUND_WIDTHS, description: 'The Panel\'s width: the narrowest, the default or the widest its splitter allows.' },
+        title: { control: 'text', table: { disable: true } },
+        body: { control: 'text', table: { disable: true } },
+    },
+    render: ({ width, title, body }) => (
+        <PanelContainer width={width} id="panel-playground">
+            <PanelHeader title={title} actions={<PanelActionGroup><PanelCloseAction /></PanelActionGroup>} />
+            <PanelBody>{body}</PanelBody>
+        </PanelContainer>
+    ),
+    play: async ({ canvasElement, args }) => {
+        const panel = canvasElement.querySelector('#panel-playground');
+        await expect(getComputedStyle(panel).width).toBe(`${tokenLength(panel, '--panel-width-default')}px`);
+        await expect(within(panel).getByRole('heading', { name: args.title })).toBeVisible();
+    },
+};
+
+/* ------------------------------------------------------------------- states */
+
+const Subject = () => (
+    <PanelContainer width="var(--panel-width-default)">
+        <PanelHeader title="Session details" actions={<PanelActionGroup><PanelCloseAction /></PanelActionGroup>} />
+        <PanelBody>{SESSION_NOTE}</PanelBody>
+    </PanelContainer>
+);
+const root = (canvasElement) => canvasElement.querySelector('.plus-panel');
+
+/** Rest: the Panel at its width, named by its title. */
+export const Rest = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expect(getComputedStyle(root(canvasElement)).width).toBe(`${tokenLength(root(canvasElement), '--panel-width-default')}px`);
+        await expect(within(canvasElement).getByText('Session details')).toBeVisible();
+    },
+};
+
+/** Hovered: a Panel has no hover layer, so nothing moves. */
+export const Hovered = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(root(canvasElement), ':hover', 'panel');
+    },
+};
+
+/** Pressed: no pressed layer either. */
+export const Pressed = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(root(canvasElement), ':active', 'panel');
+    },
+};
+
+/** Focused: not a control, so Tab skips it. */
+export const Focused = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expectNotAControl(root(canvasElement), 'panel');
     },
 };

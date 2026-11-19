@@ -87,4 +87,20 @@ describe('Table template', () => {
         render(<Table title="Team" kind="static" tableProps={staticProps} empty />);
         expect(screen.getByRole('table')).toBeInTheDocument();
     });
+
+    it('leaves the footer and empty state to a Dynamic or Tree table, which draws its own', () => {
+        render(
+            <Table
+                title="Team"
+                kind="dynamic"
+                tableProps={dynamicProps}
+                footer={<span>template footer</span>}
+                empty
+                emptyState={<span>template empty</span>}
+            />
+        );
+        expect(screen.getByRole('table', { name: 'Members' })).toBeInTheDocument();
+        expect(screen.queryByText('template footer')).toBeNull();
+        expect(screen.queryByText('template empty')).toBeNull();
+    });
 });

@@ -127,7 +127,7 @@ Same group: `Code` · `CodeBlock` · `Heading` · `InlineEdit` · `StaticTable` 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `head` | shape (required) | — | One `{ key, content, isSortable, width, align }` per column |
-| `rows` | arrayOf (required) | `[]` | One `{ key, cells, onClick }` per row; each cell `{ key, content }` |
+| `rows` | arrayOf | `[]` | One `{ key, cells, onClick }` per row; each cell `{ key, content }` |
 | `caption` | node | — | A visible caption that names the table. |
 | `label` | string | — | The table's accessible name when there is no caption. |
 | `rowsPerPage` | number | — | Rows per page; leave it out and the table does not page. |
@@ -157,7 +157,7 @@ Same group: `Code` · `CodeBlock` · `Heading` · `InlineEdit` · `StaticTable` 
 | `selectedRowKeys` | arrayOf | — | The selected rows' keys, owned by the page. |
 | `defaultSelectedRowKeys` | arrayOf | `[]` | The rows selected at first when the table holds its own selection. |
 | `onSelectionChange` | func | — | Called with every selected key when the selection changes. |
-| `bulkActions` | arrayOf (required) | `[]` | The bulk bar's actions, one `{ label, onClick }` each: the first three show as buttons, the rest in an overflow menu. |
+| `bulkActions` | arrayOf | `[]` | The bulk bar's actions, one `{ label, onClick }` each: the first three show as buttons, the rest in an overflow menu. |
 | `stickyHeader` | bool | `false` | Pin the head row inside the table's own scroll region; needs `maxHeight`. |
 | `maxHeight` | number or string | — | Bound the scroll region's height (px or any CSS length). |
 | `isFrozen` | bool | `false` | Pin the first column (the title column too, beside the checkboxes). |

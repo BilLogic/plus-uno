@@ -51,7 +51,6 @@ Documented exceptions:
 - A motion spring's three Figma rows (`damping`, `mass`, `stiffness`) map to the one `--ds-motion-*` spring token code defines (for example `spatial/fast/damping`, `spatial/fast/mass` and `spatial/fast/stiffness` map to `--ds-motion-spatial-fast`); raw `Spring/*` primitives in the same collection map to `--motion-spring-*` (for example `--motion-spring-880`).
 - Elevation shadow layer and geometry parts compose `--ds-shadow-*` (for example `--ds-shadow-raised`).
 - `Tooltip/radius` maps to the shared `--radius-control-sm`: Tooltip takes the small control radius, not a radius of its own.
-- `Modal/width-sm`, `Modal/width-md` and `Modal/width-lg` map to `--modal-width-6-col`, `--modal-width-8-col` and `--modal-width-10-col`: code names a Modal width for the screen-grid columns it spans.
 
 Collections prefixed `archived / ` and rows prefixed `Deprecated/` are legacy and excluded from the check.
 

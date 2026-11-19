@@ -144,7 +144,7 @@ Hover, pressed, focus and disabled belong to the Icon buttons in the header and 
 | `onModeChange` | func | — | Called with the new mode whenever chat moves between popup, Panel and full screen. |
 | `respond` | func | — | Returns the reply (or a promise of it) to a sent message: a string, or `{ text, sources: [{ title, href, type }] }`. Without it nothing answers. |
 | `onFeedback` | func | — | Called with the answer and `{ rating }` (or `{ rating: 'down', comment }`) when a person rates it. Every answer offers thumbs. |
-| `starters` | arrayOf (required) | — | `{ id, label, text }` prompts offered in the empty conversation, under its opening line. |
+| `starters` | arrayOf | — | `{ id, label, text }` prompts offered in the empty conversation, under its opening line. |
 | `title` | string | `'AI chat'` | The chat's name: the header title, the button's label and the Panel landmark. |
 | `placeholder` | string | `'Ask anything'` | The prompt input's placeholder: what this chat can be asked about. Keep it to one line. |
 | `emptyText` | string | `'Ask about what you are working on.'` | The line an empty conversation opens with, above the starters. |

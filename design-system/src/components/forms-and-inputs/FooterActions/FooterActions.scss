@@ -7,6 +7,7 @@
     gap: var(--inline-md);
     align-items: center;
     inline-size: 100%;
+    min-block-size: var(--footer-height);
     box-sizing: border-box;
 }
 

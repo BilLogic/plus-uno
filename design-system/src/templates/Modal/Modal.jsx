@@ -1,32 +1,18 @@
 import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Dialog as BaseDialog } from '@base-ui/react/dialog';
-import { Dialog } from '@/components';
+import { Dialog, DIALOG_HEIGHTS, DIALOG_WIDTH_PX, DIALOG_WIDTH_SCREENS, DIALOG_WIDTHS } from '@/components';
 import { useMotionReduced } from '@/lib/motionPreference';
 import { useOverlaySlot, reportFocusLost } from '@/lib/overlay';
 import { useOverlayOrigin, useOverlayPresence } from '@/lib/overlayMotion';
 import Blanket from './Blanket';
 import './Modal.scss';
 
-/** The `width` steps, from the screen grid: 4 · 6 · 8 · 10 columns plus the modal pad. */
-export const MODAL_WIDTHS = ['4-col', '6-col', '8-col', '10-col'];
-
-/** The screens `MODAL_WIDTH_PX` is read at: 768 and 1024, and 1280, where the grid reaches its cap and the width stops growing. */
-export const MODAL_WIDTH_SCREENS = [768, 1024, 1280];
-
-/** The `height` modes: `hug` grows to the screen cap, `fill` sits at that cap. */
-export const MODAL_HEIGHTS = ['hug', 'fill'];
-
-/**
- * Each `width` step in pixels at `MODAL_WIDTH_SCREENS`, matching `--modal-width-*`
- * at Medium (768), Large (1024), and X-Large (1440 / 1280 cap).
- */
-export const MODAL_WIDTH_PX = {
-    '4-col': [261, 347, 432],
-    '6-col': [384, 512, 640],
-    '8-col': [507, 677, 848],
-    '10-col': [629, 843, 1056],
-};
+/** The Dialog's `width` steps, screens, `height` modes and pixel table, which the Modal shares. */
+export const MODAL_WIDTHS = DIALOG_WIDTHS;
+export const MODAL_WIDTH_SCREENS = DIALOG_WIDTH_SCREENS;
+export const MODAL_HEIGHTS = DIALOG_HEIGHTS;
+export const MODAL_WIDTH_PX = DIALOG_WIDTH_PX;
 
 /**
  * Modal template (`@/templates`): a Dialog on a Blanket with modal behavior on
@@ -37,25 +23,6 @@ export const MODAL_WIDTH_PX = {
  * stages without a portal, focus trap, Escape handling or scroll lock.
  */
 const Modal = ({
-    id,
-    title,
-    description,
-    ariaLabel,
-    header,
-    headerActions,
-    showCloseButton = true,
-    tabs,
-    activeTab,
-    defaultActiveTab,
-    onTabChange,
-    body,
-    height = 'hug',
-    showBottomButtons = true,
-    footer,
-    primaryButton,
-    secondaryButton,
-    dividers = false,
-    loading = false,
     show = false,
     blanket = true,
     keyboard = true,
@@ -63,11 +30,16 @@ const Modal = ({
     screenWidth,
     screenHeight,
     onClose,
-    width = '6-col',
     className = '',
-    style,
     children,
-    'data-testid': dataTestId,
+    // The defaults the Dialog already has, named here so the generated docs show them.
+    width = '6-col',
+    height = 'hug',
+    showCloseButton = true,
+    showBottomButtons = true,
+    dividers = false,
+    loading = false,
+    ...dialogProps
 }) => {
     const reduced = useMotionReduced();
     const onCloseRef = useRef(onClose);
@@ -116,32 +88,7 @@ const Modal = ({
 
     const modalClassName = ['plus-modal', className].filter(Boolean).join(' ');
 
-    const dialogProps = {
-        id,
-        title,
-        description,
-        ariaLabel,
-        header,
-        headerActions,
-        showCloseButton,
-        tabs,
-        activeTab,
-        defaultActiveTab,
-        onTabChange,
-        body,
-        height,
-        showBottomButtons,
-        footer,
-        primaryButton,
-        secondaryButton,
-        dividers,
-        loading,
-        onClose,
-        width,
-        className: modalClassName,
-        style,
-        'data-testid': dataTestId,
-    };
+    const panelProps = { ...dialogProps, width, height, showCloseButton, showBottomButtons, dividers, loading, onClose, className: modalClassName };
 
     if (inline) {
         if (!present && !visible) return null;
@@ -154,7 +101,7 @@ const Modal = ({
                 onBlanketClick={blanketCloses ? onClose : undefined}
             >
                 <Dialog
-                    {...dialogProps}
+                    {...panelProps}
                     ref={panelRef}
                     role="dialog"
                     aria-modal="false"
@@ -177,7 +124,7 @@ const Modal = ({
                         data-reduced={reduced ? 'true' : undefined}
                         finalFocus={finalFocus}
                         render={(popupProps) => (
-                            <Dialog {...popupProps} {...dialogProps}>
+                            <Dialog {...popupProps} {...panelProps}>
                                 {children}
                             </Dialog>
                         )}
@@ -204,6 +151,7 @@ const tabShape = PropTypes.shape({
     disabled: PropTypes.bool,
 });
 
+// Written out in full, with literal enums: the generated docs read propTypes and defaults from this file, so a spread or an imported list would drop them from the Modal page.
 Modal.propTypes = {
     /** The `id` attribute of the dialog panel. */
     id: PropTypes.string,
@@ -238,7 +186,7 @@ Modal.propTypes = {
     /** The main content of the dialog. A string is drawn as body text; a node is drawn as given. `children` is rendered after it. */
     body: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     /** `hug` grows with the content to the cap and then scrolls its body; `fill` sits at that cap. */
-    height: PropTypes.oneOf(MODAL_HEIGHTS),
+    height: PropTypes.oneOf(['hug', 'fill']),
     /** Show the footer: `footer`, or the secondary and primary buttons. */
     showBottomButtons: PropTypes.bool,
     /** Custom footer content in place of the built-in pair, such as a three-button or leading-text FooterActions layout.
@@ -268,7 +216,7 @@ Modal.propTypes = {
     /** Called when the modal asks to close: Close button, Escape (unless `keyboard` is false) or a press on the Blanket (unless `blanket` blocks it). */
     onClose: PropTypes.func,
     /** `4-col` · `6-col` · `8-col` · `10-col`: 4 · 6 · 8 · 10 columns of the screen grid plus the modal pad. */
-    width: PropTypes.oneOfType([PropTypes.oneOf(MODAL_WIDTHS), PropTypes.number, PropTypes.string]),
+    width: PropTypes.oneOfType([PropTypes.oneOf(['4-col', '6-col', '8-col', '10-col']), PropTypes.number, PropTypes.string]),
     /** Extra class names added to the dialog panel. */
     className: PropTypes.string,
     /** Inline styles for the dialog panel. */

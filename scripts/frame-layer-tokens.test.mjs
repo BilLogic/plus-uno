@@ -180,8 +180,8 @@ test('no modal width is fractional at any mode', () => {
   }
 });
 
-test('Modal\'s MODAL_WIDTH_PX, which its docs page shows, equals the --modal-width-* tokens at each mode', () => {
-  const px = exportedValue(REPO_ROOT, 'design-system/src/templates/Modal/Modal.jsx', 'MODAL_WIDTH_PX');
+test('Dialog\'s DIALOG_WIDTH_PX, which the Modal docs page shows, equals the --modal-width-* tokens at each mode', () => {
+  const px = exportedValue(REPO_ROOT, 'design-system/src/components/messaging/Dialog/Dialog.jsx', 'DIALOG_WIDTH_PX');
   for (const step of Object.values(MODAL_COLS)) {
     const size = step;
     // The last mode's screen is past the grid's cap, so its width is the one MODAL_WIDTH_SCREENS reads at 1280.
@@ -387,7 +387,7 @@ test('Popup\'s 3-col and 4-col take the same screen grid, and POPUP_WIDTH_PX is 
   assert.match(POPUP_SCSS, /&\.plus-popup--3-col \{\s*--plus-overlay-span: 3;/);
   assert.match(POPUP_SCSS, /&\.plus-popup--4-col \{\s*--plus-overlay-span: 4;/);
   const px = exportedValue(REPO_ROOT, 'design-system/src/components/overlays-and-layering/Popup/Popup.jsx', 'POPUP_WIDTH_PX');
-  const screens = exportedValue(REPO_ROOT, 'design-system/src/templates/Modal/Modal.jsx', 'MODAL_WIDTH_SCREENS');
+  const screens = exportedValue(REPO_ROOT, 'design-system/src/components/messaging/Dialog/Dialog.jsx', 'DIALOG_WIDTH_SCREENS');
   const mode = Object.keys(LAYOUT_MODES)[0];
   for (const [step, span] of [['3-col', 3], ['4-col', 4]]) {
     assert.deepEqual(px[step], screens.map((screen) => Math.round(screenGridWidth(span, screen, mode))), step);

@@ -112,13 +112,13 @@ export function getOverlayPortalRoot() {
  * Where a trigger's floating surface mounts: the Blanket a Modal placed it in, or the shared portal root. The one rule
  * `popupMountOf` (Popup) and `popupLayerOf` (the field-anchored popups) both
  * resolve through, so there is one spelling of it rather than two copies of
- * `.closest('.plus-template-blanket') ?? document.body`.
+ * `.closest('.plus-modal-blanket') ?? document.body`.
  *
  * @param {Element | null | undefined} fromNode a node inside the trigger
  * @returns {Element | null} `null` only without a `document` (SSR)
  */
 export function overlayMountOf(fromNode) {
-    return fromNode?.closest?.('.plus-template-blanket') ?? getOverlayPortalRoot();
+    return fromNode?.closest?.('.plus-modal-blanket') ?? getOverlayPortalRoot();
 }
 
 /** Compatibility for consumers that hold a trigger ref rather than its node. */
@@ -156,7 +156,7 @@ export function OverlayContainer({ container, boundary = container, children }) 
 export function useBoundedOverlay({ container, fromNode } = {}) {
     const bounded = useContext(OverlayContainerContext);
     if (bounded === undefined || container !== undefined) return null;
-    if (fromNode?.closest?.('.plus-template-blanket')) return null;
+    if (fromNode?.closest?.('.plus-modal-blanket')) return null;
     return {
         container: bounded.container,
         collisionBoundary: bounded.boundary ?? undefined,
@@ -214,7 +214,7 @@ export function useOverlaySlot(active, onRefused) {
  * @returns {boolean}
  */
 export function isPressInRaisedOverlay(target, ownerNode) {
-    const blanket = target?.closest?.('.plus-template-blanket');
+    const blanket = target?.closest?.('.plus-modal-blanket');
     if (!blanket) return false;
     return !blanket.contains(ownerNode ?? null);
 }
@@ -229,7 +229,7 @@ export function isPressInRaisedOverlay(target, ownerNode) {
  */
 export function isOverlayRaisedOver(ownerNode) {
     if (count === 0) return false;
-    return !ownerNode?.closest?.('.plus-template-blanket');
+    return !ownerNode?.closest?.('.plus-modal-blanket');
 }
 
 /** The offset in px when the token can't be read; matches `--popup-offset`. */

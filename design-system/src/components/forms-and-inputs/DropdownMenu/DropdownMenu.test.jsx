@@ -21,8 +21,8 @@ describe('DropdownMenu in a Modal', () => {
         const trigger = await screen.findByRole('button', { name: 'Actions' });
         await user.click(trigger);
         const menu = await screen.findByTestId('actions-menu');
-        expect(menu.closest('.plus-template-blanket')).toBe(trigger.closest('.plus-template-blanket'));
-        expect(menu.closest('.plus-template-blanket')).not.toBeNull();
+        expect(menu.closest('.plus-modal-blanket')).toBe(trigger.closest('.plus-modal-blanket'));
+        expect(menu.closest('.plus-modal-blanket')).not.toBeNull();
     });
 });
 

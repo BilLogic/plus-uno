@@ -88,6 +88,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Size | `--control-md` |  |
 | Size | `--control-lg` |  |
 | Size | `--control-xl` |  |
+| Size | `--footer-height` |  |
 
 ## Templates
 

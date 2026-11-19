@@ -66,7 +66,7 @@ Page content stops growing at a cap. Pick the cap by what the page holds.
 
 ## The frame
 
-Sidebar 240, Page pad 24. There is no topbar: the Page runs to the top of the screen. A Panel opens at 400 and its splitter holds it between 320 and 640. The frame has no seams: the Page meets the Sidebar and the Panel at a hairline, and the content grid recomputes from the width that is left.
+Sidebar 240, Page pad 24. The Page runs to the top of the screen. A Panel opens at 400 and its splitter holds it between 320 and 640. The frame has no seams: the Page meets the Sidebar and the Panel at a hairline, and the content grid recomputes from the width that is left.
 
 | Token | Figma | Value | Use |
 | --- | --- | --- | --- |

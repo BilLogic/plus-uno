@@ -10,7 +10,7 @@ import HeadCell from '../Table/HeadCell';
 import TableBulkActions from '../Table/TableBulkActions';
 import { TableCell, TableRow, TableFooter, TableShell } from '../Table/TableParts';
 import '../Table/Table.scss';
-import '../Table/DynamicTable.scss';
+import '../Table/DynamicTreeTable.scss';
 
 const classes = (...names) => names.filter(Boolean).join(' ');
 

@@ -2,7 +2,7 @@
 
 # Table
 
-Section header carries the title and the toolbar. Under the header come the table, then the footer (range, page size, Pagination), and the empty state box in place of both when there are no rows. Pass the table as `children` (a `StaticTable`, `DynamicTable` or `TreeTable`), or name a `kind` and pass its props as `tableProps`. Choose the kind by what people do with the rows: nesting is a Tree table; sort, filter, select, page, expand or row actions is a Dynamic table; otherwise it is a Static table. Every other prop goes to the Section (`title`, `description`, `actions`, `views`, `search`, `filters`).
+Section header carries the title and the toolbar. Under the header come the table, then the `footer` slot (range, page size, Pagination), and the empty state box in place of both when there are no rows. The template draws no default footer: the slot is the contract. Pass the table as `children` (a `StaticTable`, `DynamicTable` or `TreeTable`), or name a `kind` and pass its props as `tableProps`. Choose the kind by what people do with the rows: nesting is a Tree table; sort, filter, select, page, expand or row actions is a Dynamic table; otherwise it is a Static table. A Dynamic or Tree table already draws its own footer and empty state, so the template's `footer`, `emptyState` and `empty` serve a Static table and are not drawn around the other two. Every other prop goes to the Section (`title`, `description`, `actions`, `views`, `search`, `filters`).
 
 Also asked as: list of records, data table on a page, sortable list, records with filters, rows and columns, grid, table pattern.
 
@@ -96,7 +96,7 @@ Same group: `AiChat` · `Card` · `Frame` · `Modal` · `Page` · `Panel` · `Se
 
 1. **Head row.** Names the columns. Its rule is the bold border.
 2. **Rows.** The data you pass as `tbody`. Each draws a thin rule, and there is no zebra striping.
-3. **Footer** (optional). The `footer` slot under the rows, aligned to the end: the range, the page-size Select and Pagination. It hides while the empty state shows. A Dynamic table draws its own.
+3. **Footer** (optional). The `footer` slot under the rows, aligned to the end: the range, the page-size Select and Pagination. The template draws no default footer: the slot is the contract. It hides while the empty state shows. A Dynamic or Tree table draws its own footer and empty state, so the template's `footer`, `emptyState` and `empty` are for a Static table.
 4. **Empty state.** The `emptyState` slot, which replaces the whole table (head row, caption and footer included) when `empty` is true; with `empty` and no `emptyState`, the table renders normally.
 
 ### States
@@ -147,8 +147,8 @@ Row states are layered over each cell's fill, never swapped for it.
 | `kind` | enum | — | The kind of table to draw when no table is passed as `children` |
 | `tableProps` | object | — | Props for the table a `kind` draws: its head, rows, label and state |
 | `children` | node | — | The table itself, a `StaticTable`, `DynamicTable` or `TreeTable`; wins over `kind` |
-| `footer` | node | — | Footer slot under the table (range, page-size Select, Pagination); hidden while the empty state shows |
-| `emptyState` | node | — | Empty-state slot: replaces the table and footer when `empty` is true |
+| `footer` | node | — | Footer slot under a Static table (range, page-size Select, Pagination); the template draws no default. Not drawn around a Dynamic or Tree table, which has its own; hidden while the empty state shows |
+| `emptyState` | node | — | Empty-state slot: replaces a Static table and its footer when `empty` is true; a Dynamic or Tree table draws its own |
 | `empty` | bool | `false` | Replace the table with the `emptyState` slot; with `empty` and no `emptyState`, the table renders normally |
 | `label` | string | — | The table's accessible name, kept on the empty state box when the table is replaced |
 | `className` | string | `''` | — |

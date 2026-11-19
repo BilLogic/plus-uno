@@ -133,11 +133,11 @@ Same group: `AiIcon` · `GenerativeBorder` · `PromptInput` · `PromptStarters` 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `text` | string | — | A single text reply; shorthand for one text part. |
-| `parts` | arrayOf (required) | — | Parts of a reply, in order: `{ type: 'text', text }` or another `{ type }` that `renderPart` draws. |
+| `parts` | arrayOf | — | Parts of a reply, in order: `{ type: 'text', text }` or another `{ type }` that `renderPart` draws. |
 | `status` | enum | `'complete'` | `complete` is finished, `streaming` is text still arriving, `thinking` is the typing indicator. |
 | `typeOut` | bool | `false` | Types a finished text out character by character, as a reply that has just arrived. |
 | `renderPart` | func | — | Draws a part that is not text: `(part, index) => node`. |
-| `sources` | arrayOf (required) | — | What a finished answer read: one `{ title, href, type }` per source, listed under the message. |
+| `sources` | arrayOf | — | What a finished answer read: one `{ title, href, type }` per source, listed under the message. |
 | `linkTarget` | string | — | Where the reply's links and its source links open, such as `_top` from inside a frame. |
 | `resolveHref` | func | — | Rewrites a link's address in the reply's text: `(href) => href`, such as a docs page named by its title. |
 | `onFeedback` | func | — | Thumbs up and down under a finished answer: called with `{ rating }`, or `{ rating: 'down', comment }`. |

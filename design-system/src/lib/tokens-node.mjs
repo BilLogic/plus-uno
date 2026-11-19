@@ -315,6 +315,7 @@ export const FAMILIES = [
   { family: 'screen', prefix: '--screen-', what: 'the screen at a breakpoint: width, range and side pad' },
   { family: 'content', prefix: '--content-', what: 'the content column: width, minimum, maximum and reading width' },
   { family: 'control', prefix: '--control-', what: 'control heights, 24, 32 and 40' },
+  { family: 'footer', prefix: '--footer-', what: 'the page footer bar height, one spacious button (48)' },
   { family: 'height', prefix: '--height-', what: 'the common height scale' },
   { family: 'width', prefix: '--width-', what: 'the common width scale' },
   { family: 'item', prefix: '--item-', what: 'control heights, 24 and 32' },

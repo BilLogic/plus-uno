@@ -16,7 +16,7 @@ Also asked as: right panel, detail panel, side pane, slide-over, sheet, side she
 
 **Source:** `design-system/src/templates/Panel/Panel.jsx`
 
-**Stories:** `design-system/src/templates/Panel/Panel.stories.jsx` — TypeDetails, TypeNotifications, AnatomyDetails, AnatomyNotifications, ResponsiveWidth, WidthDocked, WidthFloating, KeyEditing, KeyRecordGone, KeyUnder1024
+**Stories:** `design-system/src/templates/Panel/Panel.stories.jsx` — TypeDetails, TypeNotifications, AnatomyDetails, AnatomyNotifications, ResponsiveWidth, WidthDocked, WidthFloating, KeyEditing, KeyRecordGone, KeyUnder1024, FullComposition, MinimalHeaderAndBody, WidthFromProvider, Playground, Rest, Hovered, Pressed, Focused
 
 **Motion:** docked-enter `spatial.slow` + `appearance.fast` · docked-exit `spatial.default` · floating-enter `spatial.default` · floating-exit `spatial.fast` · narrow-enter `spatial.slow` · narrow-exit `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 

@@ -966,6 +966,38 @@ export const InnerTaskOpenRow = {
     },
 };
 
+/** A student has no stages, so the Sidebar stays the main one: the student sits as an open row under Students and the page's Breadcrumb names where they are. */
+export const StudentBreadcrumb = {
+    render: () => (
+        <div style={{ display: 'flex' }}>
+            <Box height={520}>
+                <Sidebar
+                    groups={groups('tutor')}
+                    account={TUTOR}
+                    storageKey={null}
+                    onToggle={() => {}}
+                    tabs={{ students: STUDENT_TABS.slice(0, 1) }}
+                    activeId="t-st1"
+                    onSelect={() => {}}
+                    onSelectTab={() => {}}
+                />
+            </Box>
+            <div data-page="student" style={{ padding: 'var(--page-pad)' }}>
+                <Breadcrumb items={[{ text: 'Students', href: '#students' }, { text: 'Maya R.' }]} />
+            </div>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expect(canvasElement.querySelector('.plus-template-sidebar__inner'), 'no inner sidebar: Back never shows').toBeNull();
+        await expect(within(nav(canvasElement)).getByRole('list', { name: 'Open Students' }), 'the main Sidebar lists the open student').toBeVisible();
+        await expect(selectedRows(canvasElement), 'one selected row: the student').toHaveLength(1);
+        await expect(selectedRows(canvasElement)[0].textContent).toMatch(/Maya R\./);
+        const crumbs = within(canvasElement).getByRole('navigation', { name: 'breadcrumb' });
+        await expect(within(crumbs).getByRole('link', { name: 'Students' })).toHaveAttribute('href', '#students');
+        await expect(within(crumbs).getByText('Maya R.'), 'the last crumb names the student').toBeVisible();
+    },
+};
+
 /** A task's steps: done ones tick and stay pressable; steps past the answers are dimmed, explain why, and do nothing. */
 export const InnerStepsDoneAndOff = {
     render: () => {

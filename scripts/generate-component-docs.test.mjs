@@ -225,3 +225,11 @@ test('group indexes carry a generated chooser from each page\'s Usage and Altern
   }
 });
 
+
+test('a shape prop is required only when the shape itself is, not when a field inside it is', async () => {
+  const fs = await import('node:fs');
+  const sidebar = JSON.parse(fs.readFileSync('design-system/agent-views/components.json', 'utf8')).components.find((c) => c.name === 'Sidebar');
+  const inner = sidebar.props.find((p) => p.name === 'inner');
+  assert.equal(inner.required, false);
+  assert.equal(inner.type, 'shape');
+});

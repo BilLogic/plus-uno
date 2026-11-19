@@ -37,6 +37,6 @@
 /**
  * The tallest a layer gets: the screen less Overlay/pad-y above and below.
  * An inline Blanket sets `--plus-overlay-max-height` from its stand-in screen;
- * otherwise it is the viewport's (`--blanket-max-height-modal`).
+ * otherwise it is `--dialog-max-height`, which the Modal template sets.
  */
-$overlay-max-height: var(--plus-overlay-max-height, var(--blanket-max-height-modal));
+$overlay-max-height: var(--plus-overlay-max-height, var(--dialog-max-height, 100dvh));

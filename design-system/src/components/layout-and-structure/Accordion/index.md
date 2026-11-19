@@ -158,7 +158,7 @@ Same group: `Carousel` · `PageHeader` · `ScrollBar`
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `items` | arrayOf (required) | `[]` | Array of accordion item configurations |
+| `items` | arrayOf | `[]` | Array of accordion item configurations |
 | `children` | node | — | Child AccordionItem components (alternative to items array) |
 | `defaultActiveKey` | string or array | — | Initially expanded item(s) - single key or array for alwaysOpen |
 | `activeKey` | string or array | — | Controlled active key(s) |

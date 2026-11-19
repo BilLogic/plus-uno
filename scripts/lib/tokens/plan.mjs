@@ -189,6 +189,7 @@ export const TOKEN_LADDER = [
   { tier: 'semantics', group: 'Size', new: '--control-md', old: '--size-control-md', ref: 'var(--size-200)', use: 'Height of a default control: 32px high.' },
   { tier: 'semantics', group: 'Size', new: '--control-lg', old: '--size-control-lg', ref: 'var(--size-250)', use: 'Height of a large control: 40px high.' },
   { tier: 'semantics', group: 'Size', new: '--control-xl', old: null, ref: 'var(--size-300)', use: 'Height of an extra-large control: 48px high.' },
+  { tier: 'semantics', group: 'Size', new: '--footer-height', old: null, ref: 'var(--control-xl)', use: 'Height of a Modal, Panel or multi-step task footer: 48px, one spacious button with no padding of its own.' },
 
   // ─── Templates / Frame (with the Sidebar) ──────────────────────
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-width', old: '--layout-width-sidebar', ref: 'var(--width-1500)', use: 'Width of the Frame\'s Sidebar at the current breakpoint.' },
