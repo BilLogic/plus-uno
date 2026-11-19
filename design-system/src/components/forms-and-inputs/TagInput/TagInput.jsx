@@ -100,7 +100,7 @@ const TagInput = ({
     name,
     label,
     labelMarker,
-    required = false,
+    isRequired = false,
     info,
     caption,
     placeholder = 'Select or create a tag',
@@ -110,8 +110,8 @@ const TagInput = ({
     tags,
     defaultTags = [],
     spacing = 'default',
-    disabled = false,
-    readOnly = false,
+    isDisabled = false,
+    isReadOnly = false,
     isInvalid = false,
     errorMessage,
     maxLength,
@@ -150,7 +150,7 @@ const TagInput = ({
     /** The color the next created tag gets, picked ahead so the Create row can show it. */
     const [nextColor, setNextColor] = useState(randomColor);
 
-    const editable = !disabled && !readOnly;
+    const editable = !isDisabled && !isReadOnly;
     // A × is offered only where pressing it can remove something: a list
     // TagInput keeps itself, or a controlled one with a handler.
     const canRemove = editable && (!isControlled || Boolean(onRemove || onChange));
@@ -671,8 +671,8 @@ const TagInput = ({
     const listOpen = open && editable;
 
     return (
-        <FieldFrame disabled={disabled} invalid={tone === 'invalid'} className={`plus-tag-input ${className}`.trim()} style={style}>
-            <FieldLabel htmlFor={fieldId} labelMarker={labelMarker} isRequired={required} info={info}>
+        <FieldFrame disabled={isDisabled} invalid={tone === 'invalid'} className={`plus-tag-input ${className}`.trim()} style={style}>
+            <FieldLabel htmlFor={fieldId} labelMarker={labelMarker} isRequired={isRequired} info={info}>
                 {label}
             </FieldLabel>
             <div
@@ -686,8 +686,8 @@ const TagInput = ({
                 <FieldBox
                     spacing={spacing}
                     grow
-                    disabled={disabled}
-                    readOnly={readOnly}
+                    disabled={isDisabled}
+                    readOnly={isReadOnly}
                     {...toneProps(tone).field}
                     className="plus-tag-input__field"
                 >
@@ -711,7 +711,7 @@ const TagInput = ({
                         {currentTags.length > 0 && (
                             <TagGroup
                                 label={`Selected: ${labelText}`}
-                                isDisabled={disabled}
+                                isDisabled={isDisabled}
                                 overflow={expanded ? 'wrap' : 'collapse'}
                                 onOverflowClick={() => inputRef.current?.focus()}
                                 className="plus-tag-input__tags"
@@ -744,7 +744,7 @@ const TagInput = ({
                             aria-controls={listId}
                             aria-autocomplete="list"
                             aria-activedescendant={listOpen ? activeId : undefined}
-                            aria-required={required || undefined}
+                            aria-required={isRequired || undefined}
                             {...toneProps(tone).control}
                             aria-describedby={describedBy}
                             autoComplete="off"
@@ -752,9 +752,9 @@ const TagInput = ({
                             placeholder={currentTags.length === 0 ? placeholder : undefined}
                             value={filter}
                             maxLength={maxLength}
-                            disabled={disabled}
-                            readOnly={readOnly}
-                            aria-readonly={readOnly || undefined}
+                            disabled={isDisabled}
+                            readOnly={isReadOnly}
+                            aria-readonly={isReadOnly || undefined}
                             onChange={(event) => { setFilter(event.target.value); setOpen(true); }}
                             onClick={() => { if (editable) setOpen(true); }}
                             onKeyDown={handleKeyDown}
@@ -861,7 +861,7 @@ TagInput.propTypes = {
     /** Marks the form's minority case in plain text after the label: `required` or `optional`. */
     labelMarker: PropTypes.oneOf(['required', 'optional']),
     /** Sets `aria-required` on the combobox. Pair with `labelMarker="required"` only when required fields are the minority in the form. */
-    required: PropTypes.bool,
+    isRequired: PropTypes.bool,
     /** Text for an info tooltip beside the label. */
     info: PropTypes.node,
     /** Standing help under the field. A validation message takes its place. */
@@ -889,9 +889,9 @@ TagInput.propTypes = {
     /** `default` draws a 40 field and `compact` a 32 one. */
     spacing: PropTypes.oneOf(['default', 'compact']),
     /** Disables every tag and the entry. */
-    disabled: PropTypes.bool,
+    isDisabled: PropTypes.bool,
     /** Shows the tags with no × and no entry, on the read-only fill. */
-    readOnly: PropTypes.bool,
+    isReadOnly: PropTypes.bool,
     isInvalid: PropTypes.bool,
     /** Shown under the field, and announced, while `isInvalid` is set. */
     errorMessage: PropTypes.node,

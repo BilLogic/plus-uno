@@ -15,7 +15,7 @@ const menuTrigger = <IconButton icon="ellipsis" label="More" appearance="subtle"
 /** Do: a menu that waits shows one "Loading options" row with a spinner. */
 export const MenuOneRowCase = () => (
     <LiveMenu
-        loading
+        isLoading
         minWidth="var(--menu-group-min-width)"
         trigger={menuTrigger}
     />

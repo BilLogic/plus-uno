@@ -228,8 +228,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `isCreatable` | bool | `false` | Offers "Create text " when nothing matches exactly, ignoring case. Implies typing. |
 | `onCreate` | func | — | Called with the text of a created option, which is then picked. |
 | `createOption` | func | — | `(text)` → the option a typed text creates, `{ value, label }`, or null to create nothing. Defaults to the text itself. |
-| `open` | bool | — | Holds the list open or shut. Controlled: Escape, a press outside and a pick ask through `onOpenChange`, and the list stays as it is until the parent changes `open`. |
-| `defaultOpen` | bool | `false` | Whether the list starts open, when `open` is not controlling it. |
+| `isOpen` | bool | — | Holds the list open or shut. Controlled: Escape, a press outside and a pick ask through `onOpenChange`, and the list stays as it is until the parent changes `isOpen`. |
+| `defaultOpen` | bool | `false` | Whether the list starts open, when `isOpen` is not controlling it. |
 | `onOpenChange` | func | — | `(open)`: the list asks to open or close. |
 | `defaultSearchTerm` | string | `''` | The text the search input starts with, so the list opens already filtered. Used by a searchable field. |
 | `displayMode` | enum | `'tags'` | With `isMulti`: `tags` (Tag tags) or `text` (comma-separated). |

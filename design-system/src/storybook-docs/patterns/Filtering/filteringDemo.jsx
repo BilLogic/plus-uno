@@ -149,7 +149,7 @@ export const FilteredStudents = ({
     const sideFits = width >= SECTION_DETAIL_FLOOR;
     const menuProps = (id) => (openMenu
         ? {
-            open: mount !== null && activeMenu === id,
+            isOpen: mount !== null && activeMenu === id,
             onOpenChange: (next) => setActiveMenu(next ? id : null),
         }
         : {});
@@ -301,7 +301,7 @@ export const ViewPicker = ({ open = false, onOpenChange, mount, value, onChange 
         {...(value !== undefined ? { value, onChange } : { defaultValue: 'All students' })}
         isSearchable={false}
         placement="bottom-start"
-        {...(open && mount && onOpenChange ? { open, onOpenChange } : {})}
+        {...(open && mount && onOpenChange ? { isOpen: open, onOpenChange } : {})}
         container={mount ?? undefined}
     />
 );

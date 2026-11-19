@@ -42,7 +42,7 @@ const PopupSelect = ({
     placement = 'bottom-start',
     isSearchable = true,
     searchPlaceholder = 'Search',
-    open,
+    isOpen: isOpenProp,
     defaultOpen = false,
     onOpenChange,
     marker = 'radio',
@@ -64,7 +64,7 @@ const PopupSelect = ({
     const listRef = useRef(null);
 
     const { isOpen, setOpen, closeList } = useOpenState({
-        open,
+        isOpen: isOpenProp,
         defaultOpen,
         onOpenChange,
         onClose: () => setQuery(''),
@@ -151,7 +151,7 @@ const PopupSelect = ({
 PopupSelect.propTypes = {
     /** Where the open menu mounts: an element. Leave it out for the page's overlay layer; name one to keep the menu inside a picture or a scrolling region. */
     container: PropTypes.object,
-    /** Strings, or objects with `value`, `label`, `description`, `disabled` and `group`, as Select takes. */
+    /** Strings, or objects with `value`, `label`, `description`, `isDisabled` and `group`, as Select takes. */
     options: PropTypes.arrayOf(PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.number,
@@ -160,7 +160,7 @@ PopupSelect.propTypes = {
             label: PropTypes.node,
             text: PropTypes.string,
             description: PropTypes.node,
-            disabled: PropTypes.bool,
+            isDisabled: PropTypes.bool,
             group: PropTypes.string,
         }),
     ])),
@@ -181,8 +181,8 @@ PopupSelect.propTypes = {
     /** The search field's placeholder. */
     searchPlaceholder: PropTypes.string,
     /** Whether the menu is open. Leave it out to let the trigger open and close it. */
-    open: PropTypes.bool,
-    /** Opens the menu on first render, when `open` is left out. */
+    isOpen: PropTypes.bool,
+    /** Opens the menu on first render, when `isOpen` is left out. */
     defaultOpen: PropTypes.bool,
     /** `(open)`. */
     onOpenChange: PropTypes.func,

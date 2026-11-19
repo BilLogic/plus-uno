@@ -41,11 +41,11 @@ export default {
             options: ['default', 'compact'],
             table: { category: 'Design' }
         },
-        readOnly: {
+        isReadOnly: {
             control: 'boolean',
             table: { category: 'Behavior' }
         },
-        disabled: {
+        isDisabled: {
             control: 'boolean',
             table: { category: 'Behavior' }
         },
@@ -101,8 +101,8 @@ export const Interactive = (args) => {
             <RichTextEditor
                 label="Session notes"
                 spacing={args.spacing}
-                readOnly={args.readOnly}
-                disabled={args.disabled}
+                isReadOnly={args.isReadOnly}
+                isDisabled={args.isDisabled}
                 placeholder={args.placeholder}
                 minHeight={args.minHeight}
                 toolbarPreset={args.toolbarPreset}
@@ -116,8 +116,8 @@ Interactive.args = {
     placeholder: 'What did you cover?',
     initialContent: '<p>Maya K. solved three two-step equation problems.</p>',
     spacing: 'default',
-    readOnly: false,
-    disabled: false,
+    isReadOnly: false,
+    isDisabled: false,
     minHeight: 200,
     toolbarPreset: 'compact'
 };
@@ -216,7 +216,7 @@ export const Focused = {
 };
 
 export const ReadOnly = {
-    render: () => <RichTextEditor label="Session notes" readOnly defaultValue="<p>Worked through fractions.</p>" minHeight={150} />,
+    render: () => <RichTextEditor label="Session notes" isReadOnly defaultValue="<p>Worked through fractions.</p>" minHeight={150} />,
     play: async ({ canvasElement }) => {
         const area = writing(canvasElement);
         await expect(area).toHaveAttribute('aria-readonly', 'true');
@@ -231,7 +231,7 @@ export const ReadOnly = {
 };
 
 export const DisabledState = {
-    render: () => <RichTextEditor label="Session notes" disabled defaultValue="<p>Worked through fractions.</p>" minHeight={150} />,
+    render: () => <RichTextEditor label="Session notes" isDisabled defaultValue="<p>Worked through fractions.</p>" minHeight={150} />,
     play: async ({ canvasElement }) => {
         const area = writing(canvasElement);
         await expect(area).toHaveAttribute('contenteditable', 'false');

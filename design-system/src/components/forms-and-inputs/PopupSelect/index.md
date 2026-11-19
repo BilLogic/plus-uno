@@ -121,7 +121,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `container` | object | — | Where the open menu mounts: an element. Leave it out for the page's overlay layer; name one to keep the menu inside a picture or a scrolling region. |
-| `options` | arrayOf | `[]` | Strings, or objects with `value`, `label`, `description`, `disabled` and `group`, as Select takes. |
+| `options` | arrayOf | `[]` | Strings, or objects with `value`, `label`, `description`, `isDisabled` and `group`, as Select takes. |
 | `value` | string or number | — | The picked option's `value`. Leave it out to let the menu keep its own. |
 | `defaultValue` | string or number | — | The value it starts with, when `value` is left out. |
 | `onChange` | func | — | `(value, option)`, called the moment a row is picked. |
@@ -130,8 +130,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `placement` | enum | `'bottom-start'` | `bottom-start` (default) for a trigger at the start of a bar, `bottom-end` for one at its end. |
 | `isSearchable` | bool | `true` | A search field above the list. Turn it off for a short list. |
 | `searchPlaceholder` | string | `'Search'` | The search field's placeholder. |
-| `open` | bool | — | Whether the menu is open. Leave it out to let the trigger open and close it. |
-| `defaultOpen` | bool | `false` | Opens the menu on first render, when `open` is left out. |
+| `isOpen` | bool | — | Whether the menu is open. Leave it out to let the trigger open and close it. |
+| `defaultOpen` | bool | `false` | Opens the menu on first render, when `isOpen` is left out. |
 | `onOpenChange` | func | — | `(open)`. |
 | `marker` | enum | `'radio'` | `radio` (default) marks the picked row with a radio before its label; `check` puts a check at the row's end. |
 | `spacing` | enum | `'default'` | `default` draws 32 rows and a 32 trigger; `compact` draws 24 rows and a 24 trigger. |

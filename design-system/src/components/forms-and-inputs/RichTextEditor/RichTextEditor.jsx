@@ -69,8 +69,8 @@ const RichTextEditor = ({
     value,
     defaultValue = '',
     spacing = 'default',
-    readOnly = false,
-    disabled = false,
+    isReadOnly = false,
+    isDisabled = false,
     minHeight,
     toolbarButtons,
     toolbarPreset = 'compact',
@@ -114,7 +114,7 @@ const RichTextEditor = ({
     }, [useFullToolbar, toolbarButtons]);
 
     const execCommand = (command, val) => {
-        if (disabled || readOnly) return;
+        if (isDisabled || isReadOnly) return;
 
         if (command === 'createLink' && !val) {
             const url = prompt('Enter URL:');
@@ -177,8 +177,8 @@ const RichTextEditor = ({
         'plus-rich-text-editor',
         spacing === 'compact' ? 'plus-rich-text-editor--compact' : '',
         useFullToolbar ? 'plus-rich-text-editor--full' : '',
-        readOnly ? 'plus-rich-text-editor-readonly' : '',
-        disabled ? 'plus-rich-text-editor-disabled' : '',
+        isReadOnly ? 'plus-rich-text-editor-readonly' : '',
+        isDisabled ? 'plus-rich-text-editor-disabled' : '',
         className
     ].filter(Boolean).join(' ');
 
@@ -201,7 +201,7 @@ const RichTextEditor = ({
                     e.preventDefault();
                     execCommand(def.command, def.value);
                 }}
-                isDisabled={disabled || readOnly}
+                isDisabled={isDisabled || isReadOnly}
             />
         );
     };
@@ -251,7 +251,7 @@ const RichTextEditor = ({
                                         spacing={toolbarBtnSpacing}
                                         className="plus-rich-text-editor-block-toggle"
                                         iconAfter={<Icon name="chevron-down" size={12} />}
-                                        isDisabled={disabled || readOnly}
+                                        isDisabled={isDisabled || isReadOnly}
                                     >
                                         {blockLabel}
                                     </Button>
@@ -288,7 +288,7 @@ const RichTextEditor = ({
                     ref={editorRef}
                     id={editorId}
                     className="plus-rich-text-editor-content"
-                    contentEditable={!readOnly && !disabled}
+                    contentEditable={!isReadOnly && !isDisabled}
                     /*
                      * #329. `textbox` with `aria-multiline` is what a contentEditable
                      * region has to say about itself; without it, it is announced as
@@ -299,10 +299,10 @@ const RichTextEditor = ({
                     role="textbox"
                     aria-multiline="true"
                     aria-labelledby={labelId}
-                    aria-readonly={readOnly || undefined}
-                    aria-disabled={disabled || undefined}
+                    aria-readonly={isReadOnly || undefined}
+                    aria-disabled={isDisabled || undefined}
                     // Read-only is a value to read: it stays in the tab order. Disabled leaves it.
-                    tabIndex={readOnly && !disabled ? 0 : undefined}
+                    tabIndex={isReadOnly && !isDisabled ? 0 : undefined}
                     data-placeholder={placeholder}
                     style={{ minHeight: minHeight ? `${minHeight}px` : undefined }}
                     onInput={handleInput}
@@ -334,9 +334,9 @@ RichTextEditor.propTypes = {
     /** `default` or `compact`. */
     spacing: PropTypes.oneOf(['default', 'compact']),
     /** Shows the content without letting the user edit it, and disables the toolbar. */
-    readOnly: PropTypes.bool,
+    isReadOnly: PropTypes.bool,
     /** Prevents interaction, disables the toolbar and dims the editor. */
-    disabled: PropTypes.bool,
+    isDisabled: PropTypes.bool,
     /** Minimum height of the editing area, in pixels. */
     minHeight: PropTypes.number,
     toolbarButtons: PropTypes.arrayOf(PropTypes.string),

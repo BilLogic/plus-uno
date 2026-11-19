@@ -60,6 +60,15 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `Rating variant` | `type` |
 | `CloseButton tone` | `appearance` |
 | `Card size` | `minWidth` (a Card has no size; name the minimum width (224, 304 or 480) and let the text set the height. A top image takes imageRatio.) |
+| `TagInput required / disabled / readOnly` | `isRequired`, `isDisabled`, `isReadOnly` |
+| `RichTextEditor readOnly / disabled` | `isReadOnly`, `isDisabled` |
+| `InlineEditableTextfield required` | `isRequired` |
+| `Select open` | `isOpen` |
+| `PopupSelect open` | `isOpen` |
+| `FilterMenu open` | `isOpen` |
+| `DropdownMenu loading` | `isLoading` |
+| `Section loading` | `isLoading` |
+| `Option disabled` | `option isDisabled` |
 
 **Tokens**
 

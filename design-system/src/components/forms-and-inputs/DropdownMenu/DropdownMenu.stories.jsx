@@ -118,7 +118,7 @@ export const WithSections = () => (
 
 export const Loading = () => (
     <div style={{ padding: 'var(--stack-2xl) var(--inline-2xl) var(--size-1400)' }}>
-        <DropdownMenu trigger={<Button>Assignees</Button>} loading isOpen onOpenChange={() => {}} />
+        <DropdownMenu trigger={<Button>Assignees</Button>} isLoading isOpen onOpenChange={() => {}} />
     </div>
 );
 

@@ -325,6 +325,63 @@
         "Card.minWidth"
       ],
       "why": "a Card has no size; name the minimum width (224, 304 or 480) and let the text set the height. A top image takes imageRatio."
+    },
+    {
+      "not": "TagInput required / disabled / readOnly",
+      "use": [
+        "TagInput.isRequired",
+        "TagInput.isDisabled",
+        "TagInput.isReadOnly"
+      ]
+    },
+    {
+      "not": "RichTextEditor readOnly / disabled",
+      "use": [
+        "RichTextEditor.isReadOnly",
+        "RichTextEditor.isDisabled"
+      ]
+    },
+    {
+      "not": "InlineEditableTextfield required",
+      "use": [
+        "InlineEditableTextfield.isRequired"
+      ]
+    },
+    {
+      "not": "Select open",
+      "use": [
+        "Select.isOpen"
+      ]
+    },
+    {
+      "not": "PopupSelect open",
+      "use": [
+        "PopupSelect.isOpen"
+      ]
+    },
+    {
+      "not": "FilterMenu open",
+      "use": [
+        "FilterMenu.isOpen"
+      ]
+    },
+    {
+      "not": "DropdownMenu loading",
+      "use": [
+        "DropdownMenu.isLoading"
+      ]
+    },
+    {
+      "not": "Section loading",
+      "use": [
+        "Section.isLoading"
+      ]
+    },
+    {
+      "not": "Option disabled",
+      "use": [
+        "option isDisabled"
+      ]
     }
   ],
   "tokens": [
@@ -733,7 +790,8 @@
     "a --ds-* color token",
     "a --ds-* shadow or surface token",
     "a space, size, radius or template token",
-    "a text style"
+    "a text style",
+    "option isDisabled"
   ],
   "allowed": [
     {

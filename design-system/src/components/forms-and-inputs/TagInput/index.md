@@ -237,7 +237,7 @@ The tags take Tag's own tokens.
 | `name` | string | — | — |
 | `label` | node | — | Names the field. Give every TagInput one. |
 | `labelMarker` | enum | — | Marks the form's minority case in plain text after the label: `required` or `optional`. |
-| `required` | bool | `false` | Sets `aria-required` on the combobox. Pair with `labelMarker="required"` only when required fields are the minority in the form. |
+| `isRequired` | bool | `false` | Sets `aria-required` on the combobox. Pair with `labelMarker="required"` only when required fields are the minority in the form. |
 | `info` | node | — | Text for an info tooltip beside the label. |
 | `caption` | node | — | Standing help under the field. A validation message takes its place. |
 | `placeholder` | string | `'Select or create a tag'` | Shown in the entry while there are no tags. |
@@ -245,8 +245,8 @@ The tags take Tag's own tokens.
 | `tags` | arrayOf | — | The picked tags, controlled. Pass `onChange` with it. |
 | `defaultTags` | arrayOf | `[]` | The picked tags at first, uncontrolled. |
 | `spacing` | enum | `'default'` | `default` draws a 40 field and `compact` a 32 one. |
-| `disabled` | bool | `false` | Disables every tag and the entry. |
-| `readOnly` | bool | `false` | Shows the tags with no × and no entry, on the read-only fill. |
+| `isDisabled` | bool | `false` | Disables every tag and the entry. |
+| `isReadOnly` | bool | `false` | Shows the tags with no × and no entry, on the read-only fill. |
 | `isInvalid` | bool | `false` | — |
 | `errorMessage` | node | — | Shown under the field, and announced, while `isInvalid` is set. |
 | `maxLength` | number | — | The longest a new value can be. |

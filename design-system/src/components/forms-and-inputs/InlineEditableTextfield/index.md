@@ -34,7 +34,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `placeholder` | string | — | Shown in the read view when there is no text, and in the field. |
 | `maxLength` | number | — | — |
 | `type` | string | `'text'` | — |
-| `required` | bool | `false` | — |
+| `isRequired` | bool | `false` | Sets `aria-required` on the field. |
 | `onConfirm` | func | — | Called with the new text. Throw or reject to keep the field open with the error. |
 | `validate` | func | — | Returns a message to refuse the text, or nothing to accept it. May be async. |
 | `onCancel` | func | — | — |

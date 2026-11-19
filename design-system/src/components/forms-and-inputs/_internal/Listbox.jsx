@@ -113,7 +113,7 @@ const Listbox = ({
 
     /** What the cursor can land on, in order: enabled options, then Create. */
     const stops = useMemo(() => {
-        const list = shown.filter((option) => !option.disabled).map((option) => ({ id: optionId(option), option }));
+        const list = shown.filter((option) => !option.isDisabled).map((option) => ({ id: optionId(option), option }));
         if (canCreate) list.push({ id: createId, create: true });
         return list;
     }, [shown, canCreate, createId, baseId]);
@@ -121,7 +121,7 @@ const Listbox = ({
     /* ---------- the cursor ---------- */
     const [activeId, setActiveId] = useState(null);
     const scrollOnMove = useRef(false);
-    const firstSelected = shown.find((option) => !option.disabled && isSelected(option.value));
+    const firstSelected = shown.find((option) => !option.isDisabled && isSelected(option.value));
     const resolvedActive = stops.some((stop) => stop.id === activeId)
         ? activeId
         : (firstSelected && !query ? optionId(firstSelected) : stops[0]?.id ?? null);
@@ -140,7 +140,7 @@ const Listbox = ({
 
     /* ---------- choosing ---------- */
     const choose = (option) => {
-        if (!option || option.disabled) return;
+        if (!option || option.isDisabled) return;
         let next;
         if (multi) {
             const list = Array.isArray(current) ? current : [];
@@ -304,7 +304,7 @@ const Listbox = ({
                 label={option.label}
                 description={option.description}
                 selected={selected}
-                disabled={option.disabled}
+                disabled={option.isDisabled}
                 highlighted={rowId === resolvedActive}
                 check={!multi && marker !== 'radio'}
                 dragging={option.dragging}
@@ -315,7 +315,7 @@ const Listbox = ({
                 style={revealStyle}
                 className={reveal ? 'plus-listbox-reveal' : undefined}
                 onSelect={() => choose(option)}
-                onMouseMove={() => { if (!option.disabled && rowId !== resolvedActive) setActiveId(rowId); }}
+                onMouseMove={() => { if (!option.isDisabled && rowId !== resolvedActive) setActiveId(rowId); }}
                 {...extra}
             />
         );
@@ -470,7 +470,7 @@ Listbox.propTypes = {
     id: PropTypes.string,
     /**
      * Strings, or objects with `value`, `label` (or `text`), `description`,
-     * `disabled`, `group` (consecutive options with one group share a heading),
+     * `isDisabled`, `group` (consecutive options with one group share a heading),
      * `elemBefore` and `elemAfter`.
      */
     options: PropTypes.arrayOf(PropTypes.oneOfType([
@@ -481,7 +481,7 @@ Listbox.propTypes = {
             label: PropTypes.node,
             text: PropTypes.string,
             description: PropTypes.node,
-            disabled: PropTypes.bool,
+            isDisabled: PropTypes.bool,
             group: PropTypes.string,
             elemBefore: PropTypes.node,
             elemAfter: PropTypes.node,
