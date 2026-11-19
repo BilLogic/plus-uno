@@ -39,7 +39,7 @@ const storyRules = [
 ].map((m) => ({ from: m[1], to: m[2] }));
 
 test('the renamed and folded docs ids each redirect to a live page', () => {
-  assert.equal(rules.length, 58);
+  assert.equal(rules.length, 59);
   for (const r of rules) {
     assert.ok(!ids.has(r.from), `${r.from} is a live page and should not redirect`);
     if (r.from in FAMILIES || r.from in FLATTENED || r.from in RENAMED_COMPONENTS) continue;
