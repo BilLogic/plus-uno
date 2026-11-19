@@ -206,6 +206,7 @@ const preview = {
                 "Shadow ramp",
                 "Usage",
                 "Color",
+                "Material",
                 "Accessibility"
               ],
               "Radius",

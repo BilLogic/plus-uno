@@ -11,3 +11,12 @@ A boundary someone needs to find a control or read its state meets 3:1 in every 
 ## Cards in forced colors
 
 Forced colors drop background fills and shadows but keep borders. Every card carries a 1px transparent border, so its edge still shows there.
+
+## Material
+
+| Case | What happens |
+| --- | --- |
+| Text contrast | Text on material meets 4.5:1 against the busiest content it can float over, and icons 3:1. Check against the darkest and the lightest picture, not the average. |
+| Reduced transparency | Under `prefers-reduced-transparency`, every material falls back to solid `--ds-surface-overlay`. Shape, edge and shadow stay. |
+| Increased contrast | Under `prefers-contrast: more`, solid as above, and the edge becomes the 3:1 border. |
+| Forced colors | The fill is replaced by the system color; the 1px border stays and draws the edge. |

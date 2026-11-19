@@ -29,7 +29,11 @@ Ten rules, each as a Do and a Don’t.
 
 ### 3. Raise one thing per view
 
+The one focal card is Raised and placed first in reading order. Every other card is Sunken, the default surface, or Default with a border. A clickable card lifts in place on hover.
+
 ### 4. Group with a surface color or a border, never a shadow
+
+Every card keeps a 1px border, transparent on Sunken and Raised, so forced colors draw its edge.
 
 ### 5. A blocking overlay sits on the Blanket
 

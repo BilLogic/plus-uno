@@ -152,6 +152,7 @@ Same group: `ChangeTag` · `CompetencyTag` · `CountTag` · `DateTag` · `Tag` �
 | `children` | node (required) | — | The status text, as people say it: "Needs review", "Due tomorrow". |
 | `appearance` | enum | `'neutral'` | The meaning. Info is Tertiary; discovery is the curriculum purple. |
 | `spacing` | enum | `'default'` | `default` (20) in rows, lists and sentences; `spacious` (32) beside a heading. |
+| `material` | enum | — | Colored material for a status over media or a material surface: bold or subtle, in the appearance's color. Not for neutral. |
 | `iconBefore` | string | — | One icon before the label: a Font Awesome Free name (`circle-check`). |
 | `trailingMetric` | number or string | — | A small count at the end of the tag, a 16 Count tag nested inside it. Hidden at 0. |
 | `trailingMetricAppearance` | oneOf | — | The Count tag's appearance. Defaults to the Status tag's own. |
@@ -164,6 +165,8 @@ Same group: `ChangeTag` · `CompetencyTag` · `CountTag` · `DateTag` · `Tag` �
 **`appearance`** — `neutral` · `success` · `warning` · `danger` · `info` · `discovery`
 
 **`spacing`** — `default` · `spacious`
+
+**`material`** — `bold` · `subtle`
 
 **`trailingMetricAppearance`** — `neutral` · `success` · `warning` · `danger` · `info` · `discovery`
 

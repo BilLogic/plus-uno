@@ -13,25 +13,26 @@ import * as ElevationStories from './Elevation.stories.jsx';
     page="foundations-visual-elevation-overview"
     eyebrow="Foundation · Elevation"
     title="Overview"
-    purpose="Elevation says what sits above what, and what you can act on. Surface color and shadow are the cues that show it."
+    purpose="Elevation says what sits above what, and what you can act on. Surface color, shadow and material are the three cues that show it."
 />
 
 <Canvas of={ElevationStories.OverviewLayers} />
 
 <Callout title="This page owns">
 
-The five layers and the three page surfaces · the four shadows and when each is used · surface color and dark mode · the elevation rules. Not here: token values and stacking order (<DocsLink id="foundations-tokens-elevation-and-layers">Tokens › Elevation and layers</DocsLink>); how each template takes its surface (<DocsLink id="templates-overview">Templates</DocsLink>); corners (<DocsLink id="foundations-visual-radius">Radius</DocsLink>); strokes and the focus ring (<DocsLink id="foundations-visual-border">Border</DocsLink>); how a lift animates (<DocsLink id="foundations-expression-motion-physics">Motion</DocsLink>).
+The five layers and the three page surfaces · the four shadows and when each is used · surface color and dark mode · material · the elevation rules. Not here: token values and stacking order (<DocsLink id="foundations-tokens-elevation-and-layers">Tokens › Elevation and layers</DocsLink>); how each template takes its surface (<DocsLink id="templates-overview">Templates</DocsLink>); corners (<DocsLink id="foundations-visual-radius">Radius</DocsLink>); strokes and the focus ring (<DocsLink id="foundations-visual-border">Border</DocsLink>); how a lift animates (<DocsLink id="foundations-expression-motion-physics">Motion</DocsLink>).
 
 </Callout>
 
 It is never decoration: each cue answers what floats, what groups and what you can press.
 
-<Callout title="Why two cues">
+<Callout title="Why three cues">
 
-Surface color and shadow do one job: they build the sense of layers, so you can tell what sits above what and what you can act on. Each cue covers what the others cannot.
+Surface color, shadow and material do one job: they build the sense of layers, so you can tell what sits above what and what you can act on. Each cue covers what the others cannot.
 
 - **Surface color** separates before any shadow: Sunken groups, Raised and overlay surfaces read as a different plane.
 - **Shadow** says how high: contact, then height, stronger for each layer up.
+- **Material** keeps a floating surface tied to what is behind it, so a control over a picture or a Panel over a table still reads as above it, not instead of it.
 
 Used together, they make one layer read the same way everywhere.
 
@@ -56,6 +57,12 @@ Used together, they make one layer read the same way everywhere.
             'Shadow',
             <>
                 How high a surface floats: <C>--ds-shadow-raised</C>, <C>--ds-shadow-overflow</C>, <C>--ds-shadow-overlay</C>, <C>--ds-shadow-blocking</C>.
+            </>,
+        ],
+        [
+            'Material',
+            <>
+                A translucent surface for what floats and stays connected to what is behind it: <C>--ds-surface-material-media</C>, <C>--ds-surface-material-control</C>, <C>--ds-surface-material-overlay</C>.
             </>,
         ],
         [
