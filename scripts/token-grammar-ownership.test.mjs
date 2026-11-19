@@ -50,8 +50,9 @@ test('every declaration and var() pattern in the named checks comes from the gra
 });
 
 /**
- * The eight scripts that matched a token name with a pattern of their own now
- * compose the grammar module's. A spelling like `--[\w-]+` or `--[a-z0-9-]+`
+ * The scripts that matched a token name with a pattern of their own now
+ * compose the grammar module's. A command-line flag is not a token, so
+ * script-reach and generate-check-scripts keep a flag pattern of their own. A spelling like `--[\w-]+` or `--[a-z0-9-]+`
  * in one of them is a second grammar: change the naming scheme and it would not
  * follow.
  */
@@ -60,10 +61,9 @@ const MATCHERS = [
   'check-font-size-literals.mjs',
   'export-kit-art.mjs',
   'lib/ds-usage.mjs',
-  'lib/script-reach.mjs',
   'lib/manager-theme.mjs',
   'lib/tokens/retire.mjs',
-  'generate-check-scripts.mjs',
+  'lib/retirement.mjs',
 ];
 
 test('no script spells the token-name pattern itself', () => {

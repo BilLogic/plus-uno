@@ -53,14 +53,6 @@ describe('TokenLibrary', () => {
         expect(count()).toBeLessThan(global);
     });
 
-    it('shows a light and a dark value on a color role', () => {
-        render(<TokenLibrary />);
-        search('--ds-text');
-        const row = document.querySelector('[data-token-name="--ds-text"]').closest('tr');
-        expect(within(row).getByText(/^Light/)).toBeTruthy();
-        expect(within(row).getByText(/^Dark/)).toBeTruthy();
-    });
-
     it('copies a name from the keyboard and announces it', async () => {
         const writeText = vi.fn().mockResolvedValue();
         Object.assign(navigator, { clipboard: { writeText } });

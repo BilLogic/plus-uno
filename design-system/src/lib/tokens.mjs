@@ -140,23 +140,6 @@ export function readTokens(source, { prefix = '--' } = {}) {
   return values;
 }
 
-const DARK_BLOCK = /\[data-color-mode="dark"\]\s*\{/;
-
-/** The declarations of the first plain dark-mode block of a stylesheet (not the contrast variants), name to raw value. */
-export function readDarkTokens(text) {
-  const start = DARK_BLOCK.exec(text);
-  if (!start) return new Map();
-  let depth = 1;
-  let i = start.index + start[0].length;
-  const open = i;
-  while (i < text.length && depth > 0) {
-    if (text[i] === '{') depth += 1;
-    else if (text[i] === '}') depth -= 1;
-    i += 1;
-  }
-  return readTokens(text.slice(open, i - 1));
-}
-
 /**
  * Follow `--a: var(--b)` until a literal value or a dead end.
  *
@@ -184,25 +167,6 @@ export function resolveToken(token, values, seen = new Set()) {
   if (value === undefined) return undefined;
   const alias = ALIAS.exec(value.trim());
   return alias ? resolveToken(alias[1], values, seen) : value;
-}
-
-/**
- * The dark value of every token the dark mode touches: one the dark block
- * redeclares, or one that aliases a token it does.
- *
- * @param {Map<string, string>} light every token's raw light value
- * @param {Map<string, string>} dark  the dark block's overrides, raw
- * @returns {Map<string, string>} name to dark value, resolved
- */
-export function darkValues(light, dark) {
-  const overlay = new Map([...light].map(([name, value]) => [name, dark.get(name) ?? value]));
-  const out = new Map();
-  for (const [name, raw] of light) {
-    const lit = resolveToken(name, light) ?? raw;
-    const resolved = resolveToken(name, overlay);
-    if (dark.has(name) || (resolved !== undefined && resolved !== lit)) out.set(name, resolved ?? lit);
-  }
-  return out;
 }
 
 /**

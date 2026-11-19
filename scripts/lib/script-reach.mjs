@@ -36,7 +36,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { TOKEN_NAME } from '../../design-system/src/lib/tokens.mjs';
 import { REPO_ROOT } from './corpus.mjs';
 
 /** Block comments and whole-line `//` comments. A trailing `// note` stays. */
@@ -61,11 +60,18 @@ const DECLARED_BINDING = /\b(?:baseline|file)\s*:\s*([A-Za-z_$][\w$]*)\b/g;
 const OPEN_RATCHET = /openRatchet\(\s*\{([^{}]*)\}/g;
 const FILE_ARGUMENT = /\bfile\s*:\s*(?:(['"])([^'"]*)\1|([A-Za-z_$][\w$]*))/;
 
+/**
+ * A command-line flag: `--` and a letter, then letters, digits, hyphens and
+ * underscores, so `--update` and `--allowedTools` match and `--1` does not.
+ * This is not the token grammar: a flag is not a custom property.
+ */
+export const FLAG_NAME = '--[A-Za-z][\\w-]*';
+
 /** A flag read straight off `argv`, for a script that is not on `main()`. */
-const ARGV_FLAG = new RegExp(`argv[^;\\n]*\\.includes\\(\\s*(['"])(${TOKEN_NAME})\\1`, 'g');
+const ARGV_FLAG = new RegExp(`argv[^;\\n]*\\.includes\\(\\s*(['"])(${FLAG_NAME})\\1`, 'g');
 
 /** A `'--flag':` key of one of `main()`'s flag objects. */
-const FLAG_KEY = new RegExp(`(['"])(${TOKEN_NAME})\\1\\s*:`, 'g');
+const FLAG_KEY = new RegExp(`(['"])(${FLAG_NAME})\\1\\s*:`, 'g');
 
 /** What an identifier bound to the declaring row's own path resolves to. */
 const DECLARED = Symbol('the record its caller declares');

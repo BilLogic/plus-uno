@@ -9,8 +9,6 @@
  * Plain ESM with no Node-only import, so Vite bundles it and `vitest` loads it.
  */
 
-const CATEGORIES = ['heading', 'body', 'metric'];
-const ACCENT_EMPHASES = ['subtlest', 'subtler', 'subtle', 'bolder'];
 const var_ = (token) => `var(${token})`;
 const titleCase = (word) => word.charAt(0).toUpperCase() + word.slice(1);
 
@@ -21,18 +19,13 @@ const titleCase = (word) => word.charAt(0).toUpperCase() + word.slice(1);
  * @returns {{title: string, subtitle: string, colors: Record<string, string>}[]}
  */
 export function accentGroups(tokens) {
-  const names = new Set(tokens.map((t) => t.name));
   const rows = new Map();
   for (const { name } of tokens) {
     const m = name.match(/^--ds-background-accent-(.+)-(subtlest|subtler|subtle|bolder)$/);
     if (!m) continue;
-    const hue = m[1];
-    if (!rows.has(hue)) {
-      // The four fills read quietest to loudest, whatever order the table lists them in.
-      const colors = {};
-      for (const emphasis of ACCENT_EMPHASES) if (names.has(`--ds-background-accent-${hue}-${emphasis}`)) colors[emphasis] = var_(`--ds-background-accent-${hue}-${emphasis}`);
-      rows.set(hue, { title: titleCase(hue), subtitle: 'background / accent', colors });
-    }
+    const [, hue, emphasis] = m;
+    if (!rows.has(hue)) rows.set(hue, { title: titleCase(hue), subtitle: 'background / accent', colors: {} });
+    rows.get(hue).colors[emphasis] = var_(name);
   }
   return [...rows.values()];
 }
@@ -92,9 +85,7 @@ export function typeGroups(tokens) {
     }
     families.get(key).styles.push({ token: name, name: m[2], sizeToken, size: resolve(sizeToken), lineHeight: resolve(lineToken) });
   }
-  // Largest style first, and Heading, then Body, then Metric: the order is the type scale's, not the table's.
-  return [...families.values()].sort((a, b) => CATEGORIES.indexOf(a.category) - CATEGORIES.indexOf(b.category)).map((g) => {
-    g.styles.sort((a, b) => parseFloat(b.size) - parseFloat(a.size));
+  return [...families.values()].map((g) => {
     const first = g.styles[0].name;
     const last = g.styles[g.styles.length - 1].name;
     const cat = titleCase(g.category);

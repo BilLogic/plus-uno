@@ -5,6 +5,7 @@
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -179,4 +180,22 @@ test('run: the real tree has no collision and the strict page is clean', () => {
   assert.equal(ENFORCE_STRICT, true);
   const found = run();
   assert.deepEqual(found.filter((f) => f.severity === 'error'), []);
+});
+
+/** Findings are the same on a plain tree, a tracked one, and a tracked one beside a second copy of itself under `.claude/worktrees`. */
+function sameAcrossCopies(root, read) {
+  const key = (found) => JSON.stringify(found, null, 1).split('\n').sort().join('\n');
+  const plain = key(read());
+  execFileSync('git', ['-C', root, 'init', '-q']);
+  execFileSync('git', ['-C', root, 'add', '-A']);
+  assert.equal(key(read()), plain, 'tracked');
+  fs.cpSync(path.join(root, 'design-system'), path.join(root, '.claude/worktrees/other/design-system'), { recursive: true });
+  assert.equal(key(read()), plain, 'beside a worktree copy');
+  return plain;
+}
+
+test('run: a fixture root reads the same tracked, untracked-copy and plain', () => {
+  const root = fixtureRepo({ pages: { Modal: '## Usage\n\nNot a toast.\n', Popup: '## Usage\n\nLike a toast or a snackbar.\n' } });
+  const plain = sameAcrossCopies(root, () => run({ repoRoot: root, enforceStrict: false }));
+  assert.match(plain, /avoid-word/);
 });

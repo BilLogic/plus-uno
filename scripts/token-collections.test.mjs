@@ -63,24 +63,42 @@ test('the sections partition the corpus: no token twice, none missing', () => {
   assert.equal(seen.size, names.length);
 });
 
-test('collections come back in page order, each section in name order with numbers read as numbers', () => {
+test('collections come back in page order, and a section keeps the table order, which is the stylesheet order', () => {
   const collections = tokenCollections(records);
   assert.deepEqual(collections.map((c) => c.collection), COLLECTIONS);
+  const position = new Map(names.map((n, i) => [n, i]));
   for (const { sections } of collections) {
     for (const { tokens } of sections) {
-      const sorted = [...tokens].sort((a, b) => new Intl.Collator('en', { numeric: true }).compare(a.name, b.name));
-      assert.deepEqual(tokens.map((t) => t.name), sorted.map((t) => t.name));
+      const at = tokens.map((t) => position.get(t.name));
+      assert.deepEqual(at, [...at].sort((a, b) => a - b));
     }
   }
   assert.equal(allTokens(collections).length, names.length);
 });
 
-test('a token carries its resolved value, its dark value where the dark mode changes it, and its intent', () => {
+test('ladders render in their meaning: layers by z-index, sizes small to large, motion fast to slow', () => {
+  const sections = tokenCollections(records);
+  const order = (collection, scope, pattern) =>
+    sections.find((c) => c.collection === collection).sections.find((s) => s.scope === scope)
+      .tokens.map((t) => t.name).filter((n) => pattern.test(n));
+  const before = (list, ...names) => {
+    for (const n of names) assert.ok(list.includes(n), `${n} is on its page`);
+    assert.deepEqual(names.map((n) => list.indexOf(n)), names.map((n) => list.indexOf(n)).sort((a, b) => a - b), `${names.join(' < ')} in ${list.join(', ')}`);
+  };
+  for (const n of ['--layer-card', '--layer-navigation', '--layer-dialog']) assert.ok(names.includes(n), n);
+  const layers = order('elevation', 'global', /^--layer-/);
+  before(layers, '--layer-card', '--layer-navigation', '--layer-dialog');
+  const controls = order('spacing', 'global', /^--control-/);
+  before(controls, '--control-sm', '--control-md', '--control-lg');
+  const headings = order('typography', 'global', /^--heading-(xxl|xl|lg|md|sm|xs|xxs)$/);
+  before(headings, '--heading-xxl', '--heading-xl', '--heading-lg', '--heading-md', '--heading-sm', '--heading-xs', '--heading-xxs');
+  const motion = order('motion', 'global', /^--ds-motion-spatial-/);
+  before(motion, '--ds-motion-spatial-fast', '--ds-motion-spatial-default', '--ds-motion-spatial-slow');
+});
+
+test('a token carries its resolved value and its intent', () => {
   const found = new Map(allTokens(tokenCollections(records)).map((t) => [t.name, t]));
-  const text = found.get('--ds-text');
-  assert.notEqual(text.dark, null);
-  assert.notEqual(text.value, text.dark);
-  assert.equal(found.get('--space-100').dark, null);
+  assert.notEqual(found.get('--ds-text').value, found.get('--ds-text').raw);
   assert.equal(found.get('--ds-text-subtle').intent, at.get('--ds-text-subtle').intent ?? '');
 });
 

@@ -1,7 +1,7 @@
 /**
- * The data behind Foundations ▸ Tokens ▸ Library: one row per token, with its
- * light and dark value, filtered by search and by collection, tier and scope,
- * then grouped by collection and subgroup.
+ * The data behind Foundations ▸ Tokens ▸ Library: one row per token, filtered
+ * by search and by collection, tier and scope, then grouped by collection and
+ * subgroup.
  *
  * Placement is `tokenCollections` in `token-collections.mjs` and nothing here
  * restates it, so a token is on exactly one collection page and one Library
@@ -14,7 +14,7 @@ import { COLLECTION_TITLES, SCOPE_TITLES, SCOPES, COLLECTIONS } from './token-co
  * One row per token, in page order, from the docs token collections.
  *
  * @param {ReturnType<import('./token-collections.mjs').tokenCollections>} collections
- * @returns {{name: string, light: string, dark: string|null, description: string, collection: string, tier: string, scope: string|null}[]}
+ * @returns {{name: string, light: string, description: string, collection: string, tier: string, scope: string|null}[]}
  */
 export const buildLibrary = (collections) =>
   collections.flatMap(({ collection, sections }) =>
@@ -22,7 +22,6 @@ export const buildLibrary = (collections) =>
       tokens.map((t) => ({
         name: t.name,
         light: t.value,
-        dark: t.dark,
         description: t.intent || fallbackDescription({ collection, tier, scope }),
         collection,
         tier,

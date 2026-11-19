@@ -5,6 +5,16 @@
  * output), so a guard that counts occurrences lists what git tracks and reads
  * only what is still on disk. The source guards read through `trackedSources`
  * and list through `trackedFiles`; no check walks the file system itself.
+ *
+ * TWO WALKS REMAIN, ON PURPOSE. `filesOnDisk` below is this reader's own
+ * fallback for a tree git does not know: an archive copy the usage eval builds
+ * in, the packaged CLI in a consumer's project, a fixture root. It is the one
+ * walk, here, so a check never needs a second. `corpus.mjs` walks too, for the
+ * documents a sweep names (markdown, by directory or glob, ignoring `.claude`
+ * and build output): a different question, "which documents does this path
+ * hold", asked of any tree, tracked or not; its walk already skips other
+ * worktrees and build copies. A check that wants the tracked source files
+ * lists through here; one that wants documents under a path asks `corpus.mjs`.
  */
 
 import { execFileSync } from 'node:child_process';
@@ -53,12 +63,15 @@ function filesOnDisk(repoRoot, roots) {
  * Outside a git checkout (an archive copy the usage eval builds in, a fixture
  * root) the files on disk stand in, `node_modules` and dot folders skipped.
  * `untracked: true` also lists the files git would not ignore but does not
- * track yet: what a reader of a working copy, rather than of a commit, wants.
+ * track yet, and leaves out a tracked file deleted on disk: what a reader of a
+ * working copy, rather than of a commit, wants.
  * `skipHidden: true` drops what sits in a `node_modules` or dot folder below
  * the root it was listed under, as the on-disk walk always does.
  */
 export function trackedFiles(repoRoot, roots = [], { untracked = false, skipHidden = false } = {}) {
-  const files = list(repoRoot, roots, untracked);
+  let files = list(repoRoot, roots, untracked);
+  // A tracked file deleted on disk is still listed by git; a reader of the working copy wants what is there.
+  if (untracked) files = files.filter((file) => fs.existsSync(path.join(repoRoot, file)));
   if (!skipHidden) return files;
   return files.filter((file) => {
     const root = roots.map((r) => r.replace(/\/$/, '')).find((r) => r !== '' && file.startsWith(`${r}/`));

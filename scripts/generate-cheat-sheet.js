@@ -15,7 +15,7 @@ import {
     COLOR_TOKEN_DIR,
     TOKEN_DIR,
 } from '../design-system/src/lib/tokens-node.mjs';
-import { darkValues, readDarkTokens, tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
+import { tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
 import { AGENT_ROOT } from './agent-views-paths.js';
 import { checkArtifacts, writeArtifacts } from './lib/generated-artifact.js';
 import { buildTokensManifest, serializeManifest } from './lib/agent-manifests.mjs';
@@ -27,7 +27,7 @@ const COLOR_DIR = path.join(ROOT_DIR, COLOR_TOKEN_DIR);
 const OUTPUT_TOKENS = path.join(AGENT_ROOT, 'tokens/tokens.md');
 const OUTPUT_TOKENS_JSON = path.join(AGENT_ROOT, 'tokens.json');
 
-/** Name → its first declared value, in name order. A token written once per mode keeps the first (light) value. */
+/** Name → its first declared value, in source order. A token written once per mode keeps the first (light) value. */
 function extractScssDeclarations(filePath) {
     if (!fs.existsSync(filePath)) return [];
     const content = fs.readFileSync(filePath, 'utf8');
@@ -37,7 +37,7 @@ function extractScssDeclarations(filePath) {
     while ((match = regex.exec(content)) !== null) {
         if (!first.has(match[1])) first.set(match[1], match[2].trim());
     }
-    return [...first.keys()].sort().map((name) => ({ name, value: first.get(name) }));
+    return [...first].map(([name, value]) => ({ name, value }));
 }
 
 const isScalePrimitive = (name) => /^--(space|radius|stroke|size)-[0-9]/.test(name) || name === '--radius-full';
@@ -88,20 +88,8 @@ function tokenLines(tier, names) {
         .join('\n');
 }
 
-/** Every token's resolved dark value where the dark color mode changes it, read from the two color files that carry a dark block. */
-function darkOverrides(sections) {
-    const light = new Map();
-    for (const { tokens } of sections) for (const { name, value } of tokens) if (!light.has(name)) light.set(name, value);
-    const dark = new Map();
-    for (const file of [COLOR_SEMANTIC_FILE, COLOR_ELEVATION_FILE]) {
-        for (const [name, value] of readDarkTokens(fs.readFileSync(path.join(COLOR_DIR, file), 'utf8'))) dark.set(name, value);
-    }
-    return darkValues(light, dark);
-}
-
 function renderTokensManifest(markdown) {
-    const sections = tokenSections();
-    const manifest = buildTokensManifest(sections, INTENTS, darkOverrides(sections));
+    const manifest = buildTokensManifest(tokenSections(), INTENTS);
     // The two views must name the same tokens; a drift here is a generator bug.
     const inDoc = new Set(markdown.split('\n').map((l) => l.match(/^(--[a-z0-9-]+)(?:\s+\/\*.*\*\/)?$/)?.[1]).filter(Boolean));
     const inJson = new Set(manifest.tokens.map((x) => x.name));
@@ -117,7 +105,8 @@ function renderTokensDoc() {
     // Names come from the same sections tokens.json is built from, so the two
     // views cannot list different tokens.
     const sections = tokenSections();
-    const names = Object.fromEntries(sections.map((s) => [s.group, s.tokens.map((d) => d.name)]));
+    // The markdown lists names alphabetically; tokens.json keeps the stylesheet's order, which the docs read.
+    const names = Object.fromEntries(sections.map((s) => [s.group, s.tokens.map((d) => d.name).sort()]));
     const lines = Object.fromEntries(sections.map((s) => [s.group, tokenLines(s.tier, names[s.group])]));
     const ladderSemantics = lines['Ladder Semantics'];
     const ladderTemplates = lines['Ladder Templates'];

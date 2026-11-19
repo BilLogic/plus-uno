@@ -2,8 +2,7 @@
  * Which Foundations ▸ Tokens page each token is shown on, and in which section.
  *
  * ONE LIST, ONE MAPPING. Every docs token block reads the generated token table
- * (`agent-views/tokens.json`: name, value, tier, intent, and the dark value
- * where the dark mode changes it) through `tokenCollections`, which returns
+ * (`agent-views/tokens.json`: name, value, tier, intent) through `tokenCollections`, which returns
  * ordered collections. A token's collection (Color, Typography, Spacing and
  * size, Elevation and layers, Motion), tier (primitive or semantic) and scope
  * (global, components or templates) are derived here from its name and its
@@ -79,34 +78,31 @@ export function placeToken(name, record = {}) {
   return null;
 }
 
-const natural = new Intl.Collator('en', { numeric: true });
-
 /**
  * The docs token collections, in page order: Color, Typography, Spacing and
  * size, Elevation and layers, Motion. Each is ordered sections: Primitives, then
  * Semantics split into Global, Components and Templates, with the tokens of a
- * section in name order (numbers read as numbers). A section with no tokens and
- * a collection with no section are left out.
+ * section in the table's order, which is the stylesheet's: a z-index or size
+ * ladder reads small to large. A section with no tokens and a collection with
+ * no section are left out.
  *
  * A token's value is its alias followed to a literal, as the page resolves it;
- * `raw` is what the stylesheet says; `dark` is its dark-mode value, or null when
- * the dark mode leaves it alone.
+ * `raw` is what the stylesheet says.
  *
- * @param {{name: string, value: string, tier?: string, group?: string, intent?: string, dark?: string}[]} records the rows of `agent-views/tokens.json`
- * @returns {{collection: string, title: string, sections: {id: string, tier: string, scope: string|null, title: string, tokens: {name: string, raw: string, value: string, dark: string|null, intent: string}[]}[]}[]}
+ * @param {{name: string, value: string, tier?: string, group?: string, intent?: string}[]} records the rows of `agent-views/tokens.json`
+ * @returns {{collection: string, title: string, sections: {id: string, tier: string, scope: string|null, title: string, tokens: {name: string, raw: string, value: string, intent: string}[]}[]}[]}
  */
 export function tokenCollections(records) {
   const raw = new Map(records.map((r) => [r.name, r.value]));
   const order = [['primitive', null], ...SCOPES.map((s) => ['semantic', s])];
   const buckets = new Map(COLLECTIONS.flatMap((c) => order.map(([tier, scope]) => [`${c}|${tier}|${scope}`, []])));
-  for (const record of [...records].sort((a, b) => natural.compare(a.name, b.name))) {
+  for (const record of records) {
     const place = placeToken(record.name, record);
     if (!place) continue;
     buckets.get(`${place.collection}|${place.tier}|${place.scope}`).push({
       name: record.name,
       raw: record.value,
       value: resolveToken(record.name, raw) ?? record.value,
-      dark: record.dark ?? null,
       intent: record.intent ?? '',
     });
   }

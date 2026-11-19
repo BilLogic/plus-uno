@@ -39,8 +39,21 @@ test('trackedSources reads matching tracked files, skipping deleted and untracke
 test('untracked: true adds the files git would not ignore, and still skips the ignored ones', () => {
   put('.gitignore', 'ignored.js\n');
   put('src/ignored.js', 'i');
-  assert.deepEqual(trackedFiles(root, ['src'], { untracked: true }).sort(), ['src/a.js', 'src/b.scss', 'src/gone.js', 'src/untracked.js']);
+  assert.deepEqual(trackedFiles(root, ['src'], { untracked: true }).sort(), ['src/a.js', 'src/b.scss', 'src/untracked.js']);
   assert.deepEqual(trackedFiles(root, ['src']).sort(), ['src/a.js', 'src/b.scss', 'src/gone.js']);
+});
+
+test('untracked: true leaves out a tracked file deleted on disk', () => {
+  assert.equal(trackedFiles(root, ['src']).includes('src/gone.js'), true);
+  assert.equal(trackedFiles(root, ['src'], { untracked: true }).includes('src/gone.js'), false);
+});
+
+test('skipHidden drops node_modules and dot folders below the root, not the root itself', () => {
+  put('.dot/a.js', 'x');
+  put('src/.cache/b.js', 'x');
+  put('src/node_modules/c.js', 'x');
+  assert.deepEqual(trackedFiles(root, ['src'], { untracked: true, skipHidden: true }).sort(), ['src/a.js', 'src/b.scss', 'src/untracked.js']);
+  assert.deepEqual(trackedFiles(root, ['.dot'], { untracked: true, skipHidden: true }), ['.dot/a.js']);
 });
 
 test('outside a git checkout, the files on disk stand in for the tracked list', () => {

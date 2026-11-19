@@ -10,8 +10,7 @@ import { TOKEN_COLLECTIONS } from '@/storybook-docs/docs-tokens.js';
 /**
  * Foundations ▸ Tokens ▸ Library: one searchable list of every token. Rows come
  * from the same collections as the collection pages (`docs-tokens.js`), so a
- * token added to the source shows here with no edit. A color role carries its
- * light and dark value in the token table; every other row has one value.
+ * token added to the source shows here with no edit.
  */
 
 const LIBRARY = buildLibrary(TOKEN_COLLECTIONS);
@@ -46,35 +45,18 @@ const Preview = ({ row, value }) => {
     return <span aria-hidden="true" style={{ ...swatchStyle, boxShadow: 'none' }} />;
 };
 
-const Value = ({ row }) =>
-    row.dark === null ? (
-        <C>{row.light}</C>
-    ) : (
-        <span style={{ display: 'inline-flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-            <span><span style={{ color: 'var(--ds-text-subtle)' }}>Light </span><C>{row.light}</C></span>
-            <span><span style={{ color: 'var(--ds-text-subtle)' }}>Dark </span><C>{row.dark}</C></span>
-        </span>
-    );
-
 const Row = ({ row, onCopy }) => (
     <tr>
         <td>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
-                {row.dark === null ? (
-                    <Preview row={row} value={row.light} />
-                ) : (
-                    <span style={{ display: 'inline-flex', gap: 'var(--inline-sm)' }}>
-                        <Preview row={row} value={row.light} />
-                        <Preview row={row} value={row.dark} />
-                    </span>
-                )}
+                <Preview row={row} value={row.light} />
                 <Button appearance="subtle" spacing="compact" aria-label={`${row.name} (copy)`} onClick={() => onCopy(row.name)}>
                     <span data-token-name={row.name} style={{ font: 'var(--code-default)' }}>{row.name}</span>
                 </Button>
             </span>
         </td>
         <td>{row.description}</td>
-        <td><Value row={row} /></td>
+        <td><C>{row.light}</C></td>
     </tr>
 );
 

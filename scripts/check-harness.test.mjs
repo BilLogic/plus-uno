@@ -627,3 +627,10 @@ test('a stepOf that names no row, or prose that disagrees with it, fails', () =>
   assert.ok(messages.some((m) => /check:a declares stepOf 'check:nobody'/.test(m)));
   assert.ok(messages.some((m) => /check:b.*reason.*never names/.test(m)));
 });
+
+test('a row whose update ends in no flag is reported, and one ending in a camelCase flag is read', () => {
+  const row = { name: 'check:x', baseline: 'scripts/baselines/ds-usage.json', script: 'node scripts/check-ds-usage.mjs', update: 'npm run check:x -- --1' };
+  assert.ok(registryGenerator.baselineFindings(row, rootScripts()).some((f) => /ends in no flag/.test(f.message)));
+  const camel = { ...row, update: 'npm run check:x -- --allowedTools' };
+  assert.ok(!registryGenerator.baselineFindings(camel, rootScripts()).some((f) => /ends in no flag/.test(f.message)));
+});
