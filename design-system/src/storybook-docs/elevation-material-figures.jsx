@@ -462,7 +462,7 @@ export const MaterialValuesTable = () => (
 /** Pair 1: over media, use media material. */
 export const MaterialOnMedia = () => (
   <DoDont>
-    <Do caption="On media: a Tag and an icon button on an illustration take media material and the bright edge. The picture stays in view.">
+    <Do caption="On media: a Tag and an icon button on an illustration take media material and the bright edge, so the picture stays in view.">
       <Stage title="A Tag and an icon button in media material on a picture">
         <Picture x={FRAME.x + 12} y={FRAME.y + 10} w={186} h={80} />
         <Plate
@@ -484,7 +484,7 @@ export const MaterialOnMedia = () => (
         />
       </Stage>
     </Do>
-    <Dont caption="A solid chip on media cuts a hole in the picture. Over media, use media material.">
+    <Dont caption="A solid chip on media cuts a hole in the picture: over media, use media material.">
       <Stage title="A solid Tag and a solid icon button hiding part of a picture">
         <Picture x={FRAME.x + 12} y={FRAME.y + 10} w={186} h={80} />
         <Rect
@@ -534,7 +534,7 @@ export const MaterialMatchSurface = () => (
         />
       </Stage>
     </Do>
-    <Dont caption="Media material on a large surface: the rows behind collide with the text on top. Big surfaces take overlay material.">
+    <Dont caption="Media material on a large surface: the rows behind collide with the text on top: big surfaces take overlay material.">
       <Stage title="A large Panel in media material with page rows showing through its text">
         <Rows x={FRAME.x + 9} y={FRAME.y + 10} w={192} count={8} />
         <Plate
@@ -603,7 +603,7 @@ export const MaterialOnlyFloating = () => (
         <PlateBars x={FRAME.x + 112} y={FRAME.y + 12} w={86} />
       </Stage>
     </Do>
-    <Dont caption="Material on the page, a Section or a card. Nothing is behind them; material is never a page background.">
+    <Dont caption="Material on the page, a Section or a card: nothing is behind them, and material is never a page background.">
       <Stage title="A card in material resting on the page with nothing behind it">
         <SkeletonBar x={FRAME.x + 9} y={FRAME.y + 9} w={58} h={5.5} heading />
         <Plate
@@ -649,7 +649,7 @@ export const MaterialNoBlur = () => {
           />
         </Stage>
       </Do>
-      <Dont caption="Blur. Material is transparency only, so it looks the same in every browser and in Figma and costs nothing on scroll.">
+      <Dont caption="Blur: material is transparency only, so it looks the same in every browser and in Figma and costs nothing on scroll.">
         <Stage title="Control material with the rows behind it blurred">
           <BlurFilter id={id} />
           <g filter={`url(#${id})`}>
@@ -693,7 +693,7 @@ export const MaterialAsIs = () => (
         />
       </Stage>
     </Do>
-    <Dont caption="Extra opacity on top of the token: the text fades with the surface. Apply the token as is.">
+    <Dont caption="Extra opacity on top of the token: the text fades with the surface: apply the token as is.">
       <Stage title="Overlay material with extra opacity, its text faded">
         <Rows x={FRAME.x + 9} y={FRAME.y + 10} w={192} count={8} />
         <g opacity={0.5}>
@@ -728,7 +728,7 @@ export const MaterialAsIs = () => (
 /** Pair 7: neutral material only. */
 export const MaterialNeutralOnly = () => (
   <DoDont>
-    <Do caption="A neutral Tag on media. A colored accent takes the colored-material tokens.">
+    <Do caption="A neutral Tag on media: a colored accent takes the colored-material tokens.">
       <Stage title="A neutral Tag in media material on a picture">
         <Picture x={FRAME.x + 12} y={FRAME.y + 10} w={186} h={80} />
         <Plate
@@ -741,7 +741,7 @@ export const MaterialNeutralOnly = () => (
         />
       </Stage>
     </Do>
-    <Dont caption="A translucent brand color made up by hand. Colored material has its own tokens.">
+    <Dont caption="A translucent brand color made up by hand: colored material has its own tokens.">
       <Stage title="A Tag tinted with a translucent brand color on a picture">
         <Picture x={FRAME.x + 12} y={FRAME.y + 10} w={186} h={80} />
         <Rect
@@ -783,7 +783,7 @@ export const MaterialOnBlanket = () => (
         <SkeletonBar x={FRAME.x + 62} y={FRAME.y + 27} w={48} h={4.5} heading />
       </Stage>
     </Do>
-    <Dont caption="The Blanket as a surface by itself. Something blocking always sits on it.">
+    <Dont caption="The Blanket as a surface by itself: something blocking always sits on it.">
       <Stage title="The Blanket drawn as a surface with nothing blocking on it">
         <Rows x={FRAME.x + 9} y={FRAME.y + 10} w={192} count={8} />
         <Rect

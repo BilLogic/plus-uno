@@ -141,6 +141,72 @@ export const ColoredMaterialLive = () => (
   </div>
 );
 
+/** A colored floating Panel on the picture: the fill is the subject. */
+const FloatingPanelDontFigure = () => (
+  <div style={picture}>
+    <div
+      style={{
+        margin: "var(--pad-y-md) var(--pad-x-md)",
+        minHeight: "var(--width-500)",
+        padding: "var(--pad-y-md) var(--pad-x-md)",
+        borderRadius: "var(--radius-lg)",
+        border: "var(--border-width-default) solid var(--ds-border-material)",
+        background: "var(--ds-background-brand-material-bold)",
+        color: "var(--ds-text-inverse)",
+      }}
+    >
+      Floating panel
+    </div>
+  </div>
+);
+
+/** Colored text on a colored fill. */
+const ColoredTextDontFigure = () => (
+  <Picture>
+    <span
+      style={{
+        padding: "0 var(--pad-x-xs)",
+        borderRadius: "var(--radius-md)",
+        border: "var(--border-width-default) solid var(--ds-border-material)",
+        background: "var(--ds-background-danger-material-bold)",
+        color: "var(--ds-text-danger)",
+      }}
+    >
+      Overdue
+    </span>
+  </Picture>
+);
+
+/** A colored chip with no material edge. */
+const NoEdgeDontFigure = () => (
+  <Picture>
+    <span
+      style={{
+        padding: "0 var(--pad-x-xs)",
+        borderRadius: "var(--radius-md)",
+        background: "var(--ds-background-information-material-bold)",
+        color: "var(--ds-text-inverse)",
+      }}
+    >
+      Beta
+    </span>
+  </Picture>
+);
+
+/** Colored material on a plain card. */
+const PlainCardDontFigure = () => (
+  <div
+    style={{
+      padding: "var(--pad-y-md) var(--pad-x-md)",
+      borderRadius: "var(--radius-lg)",
+      background: "var(--ds-surface-raised)",
+      border: "var(--border-width-default) solid var(--ds-border)",
+    }}
+  >
+    <Tag material="bold" materialColor="discovery">Featured</Tag>
+  </div>
+);
+
 /** Pair 1: keep colored material small. */
 export const ColoredMaterialSmall = () => (
   <DoDont>
@@ -150,22 +216,8 @@ export const ColoredMaterialSmall = () => (
         <StatusTag material="subtle" appearance="success">Open</StatusTag>
       </Picture>
     </Do>
-    <Dont caption="A colored floating Panel. Large surfaces take neutral overlay material.">
-      <div style={picture}>
-        <div
-          style={{
-            margin: "var(--pad-y-md) var(--pad-x-md)",
-            minHeight: "var(--width-500)",
-            padding: "var(--pad-y-md) var(--pad-x-md)",
-            borderRadius: "var(--radius-lg)",
-            border: "var(--border-width-default) solid var(--ds-border-material)",
-            background: "var(--ds-background-brand-material-bold)",
-            color: "var(--ds-text-inverse)",
-          }}
-        >
-          Floating panel
-        </div>
-      </div>
+    <Dont caption="A colored floating Panel: large surfaces take neutral overlay material.">
+      <FloatingPanelDontFigure />
     </Dont>
   </DoDont>
 );
@@ -179,19 +231,7 @@ export const ColoredMaterialPairText = () => (
       </Picture>
     </Do>
     <Dont caption="Colored text on a colored fill fails contrast.">
-      <Picture>
-        <span
-          style={{
-            padding: "0 var(--pad-x-xs)",
-            borderRadius: "var(--radius-md)",
-            border: "var(--border-width-default) solid var(--ds-border-material)",
-            background: "var(--ds-background-danger-material-bold)",
-            color: "var(--ds-text-danger)",
-          }}
-        >
-          Overdue
-        </span>
-      </Picture>
+      <ColoredTextDontFigure />
     </Dont>
   </DoDont>
 );
@@ -205,18 +245,7 @@ export const ColoredMaterialEdge = () => (
       </Picture>
     </Do>
     <Dont caption="No edge: the chip bleeds into a busy picture.">
-      <Picture>
-        <span
-          style={{
-            padding: "0 var(--pad-x-xs)",
-            borderRadius: "var(--radius-md)",
-            background: "var(--ds-background-information-material-bold)",
-            color: "var(--ds-text-inverse)",
-          }}
-        >
-          Beta
-        </span>
-      </Picture>
+      <NoEdgeDontFigure />
     </Dont>
   </DoDont>
 );
@@ -229,17 +258,8 @@ export const ColoredMaterialOverSomething = () => (
         <Tag material="bold" materialColor="discovery">Featured</Tag>
       </Picture>
     </Do>
-    <Dont caption="Colored material on a plain card. On a solid surface use the solid bold token.">
-      <div
-        style={{
-          padding: "var(--pad-y-md) var(--pad-x-md)",
-          borderRadius: "var(--radius-lg)",
-          background: "var(--ds-surface-raised)",
-          border: "var(--border-width-default) solid var(--ds-border)",
-        }}
-      >
-        <Tag material="bold" materialColor="discovery">Featured</Tag>
-      </div>
+    <Dont caption="Colored material on a plain card: on a solid surface use the solid bold token.">
+      <PlainCardDontFigure />
     </Dont>
   </DoDont>
 );
