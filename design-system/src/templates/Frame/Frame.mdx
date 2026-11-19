@@ -117,12 +117,12 @@ The default type at 1440 with the AI panel docked.
 
 A task with several steps runs in the Sidebar's inner mode on a default Frame. A one-screen task stays a <DocsLink id="templates-modal">Modal</DocsLink>. When a long task takes over the Sidebar is the <DocsLink id="patterns-navigation">Navigation</DocsLink> pattern.
 
-<ComponentExample of={FrameStories.LayoutMultiStepTask} title="Five steps, in the inner sidebar" description="The steps are the rows. Done steps tick and stay pressable; steps past your answers are off. Save and exit sits at the start of the footer, Back and Next at the end, on one 32 line." />
+<ComponentExample of={FrameStories.LayoutMultiStepTask} title="Five steps, in the inner sidebar" description="The steps are the rows. Done steps tick and stay pressable; steps past your answers are off. Save and exit is a link at the left edge; Back and Next sit in the right half of the footer, on one 32 line." />
 
 1. **Back.** The inner sidebar's first row names the area the task came from and returns to the main Sidebar.
 2. **Steps.** Text-only rows, one noun each. The current step is marked, answered steps carry a tick, and steps past your answers are disabled with the reason in a tooltip.
 3. **Page.** The task's name as the page's one h1, then the step's body at reading width, 864, centered.
-4. **Footer**, fixed along the bottom and 48 high. Save and exit at the start; Back, then Next (Finish on the last step) at the end, each 32 high on one line. Back on the first step is disabled and needs no reason.
+4. **Footer**, fixed along the bottom and 48 high. Save and exit is a link at the left edge. Back (Default), then Next (Primary; Finish on the last step) take the right half. Each is 32 high on one line. Back on the first step is disabled and needs no reason.
 
 <ComponentExample of={FrameStories.LayoutMultiStepTaskLeaves} title="Leaving" description="Save and exit keeps the answers and leaves. Back in the inner sidebar returns to the main Sidebar." />
 
@@ -298,7 +298,7 @@ The footer is fixed along the bottom, one row high, with its buttons on one line
 <DoDontPair
     doExample={<BarInOrder />}
     doCode={CODE.BarInOrder}
-    doCaption="Save and exit at the start; Back and the primary Next at the end, on one line."
+    doCaption="Save and exit as a link at the left edge; Back and the primary Next in the right half, on one line."
     dontExample={<BarScrambled />}
     dontCode={CODE.BarScrambled}
     dontCaption="Cancel repeated in the footer beside Save and exit: two ways out of one task."

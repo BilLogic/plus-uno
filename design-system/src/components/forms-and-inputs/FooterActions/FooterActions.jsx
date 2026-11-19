@@ -7,7 +7,7 @@ const isLeadingNode = (node, totalCount) => {
     if (!React.isValidElement(node)) return false;
     const { appearance, role, href } = node.props ?? {};
     if (node.props?.['data-footer-leading']) return true;
-    if (appearance === 'subtle' || appearance === 'link') return true;
+    if (appearance === 'link') return true;
     if (role === 'link' || href != null) return true;
     if (appearance === 'danger' && totalCount >= 2) return true;
     return false;
@@ -30,7 +30,7 @@ const trackListFor = (count, { hasLeading }) => {
  *
  * Divides the footer into 4 equal tracks separated by `--inline-md`. Every
  * filled action button is cloned at `spacing="spacious"` (48) with
- * `shouldFitContainer`. A leading text or link action hugs the left edge
+ * `shouldFitContainer`. A leading `danger` or link action hugs the left edge
  * without taking a filled track, and containers up to 400 wide split a single
  * action across the full width via `@container (max-width: 400px)`.
  */
@@ -98,7 +98,7 @@ export const FooterActions = ({
 };
 
 FooterActions.propTypes = {
-    /** Optional text or link action hugging the left content edge without taking a filled track. */
+    /** Optional `danger` or link action hugging the left content edge without taking a filled track. */
     leadingAction: PropTypes.node,
     /** Filled action buttons placed across the 4 tracks. */
     children: PropTypes.node,

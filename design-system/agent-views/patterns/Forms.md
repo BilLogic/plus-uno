@@ -32,7 +32,7 @@ Use Forms when a page asks for input that is saved together: adding a student, l
 | The form… | Host | Buttons |
 | --- | --- | --- |
 | is saved as a group on its own page: settings, a profile | In a page | Left-aligned under the fields, Primary first, Cancel Subtle |
-| is a short edit of a row, with the page still in view | In a Panel · Details | Discard (Default) and Save (Primary) full bleed at the bottom, no Cancel |
+| is a short edit of a row, with the page still in view | In a Panel · Details | Discard (Default) and Save (Primary) full bleed at the bottom, no Cancel; a declining action is Default in the left half |
 | is rare and critical, with fewer than five fields | In a Modal, 8-col | Discard (Default) and the action (Primary), full bleed, no Cancel |
 | is long, or has sections someone works through | In steps, a multi-step task on Frame | Save and exit, Back and Next in the footer, no Cancel |
 | asks one big question per step (sign-up, check-in, site setup) | In steps, a multi-step task on Frame | Back (Subtle) and Continue (Primary) centered under the tiles |

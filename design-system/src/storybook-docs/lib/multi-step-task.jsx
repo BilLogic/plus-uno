@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Button, FooterActions, Sidebar, Skeleton } from '@/components';
+import { Button, FooterActions, LinkButton, Sidebar, Skeleton } from '@/components';
 import { Frame } from '@/templates';
 import { StepStage } from '@/lib/navigationMotion';
 import { BrowserWindow } from './template-page.jsx';
@@ -11,8 +11,8 @@ import { ScreenStage } from './fit-stage.jsx';
  * task in the Frame's inner sidebar. Its steps are the rows (done ones tick and
  * stay pressable; steps past the answers are off), the Page holds the task's
  * name and the step's body, and the footer along the bottom holds Save and exit
- * at the start with Back and Next (Finish on the last step) at the end, on one
- * 32 line.
+ * as a link at the left edge, with Back and Next (Finish on the last step) in
+ * tracks 3 and 4, on one 32 line.
  */
 
 /** The browser body's height on the docs page: docs geometry, in px. */
@@ -121,7 +121,7 @@ export const MultiStepTask = ({
                         <FooterActions
                             data-probe="bar-column"
                             style={{ inlineSize: '100%', maxInlineSize: 'var(--content-max-width-reading)', marginInline: 'auto' }}
-                            leadingAction={<Button text="Save and exit" appearance="subtle" spacing="default" onClick={onSaveAndExit ?? (() => {})} />}
+                            leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="subtle" spacing="default" onClick={(event) => { event.preventDefault(); onSaveAndExit?.(); }} />}
                         >
                             <Button text="Back" spacing="default" isDisabled={at === 0} onClick={() => go(at - 1)} />
                             <Button text={last ? 'Finish' : 'Next'} spacing="default" appearance="primary" onClick={() => go(Math.min(at + 1, labels.length - 1))} />
