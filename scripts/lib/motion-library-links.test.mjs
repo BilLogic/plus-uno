@@ -20,7 +20,7 @@ const REGISTRY = [
 test('derives Storybook docs links and section anchors from MDX pages and MotionSection tags', () => {
   const pages = [
     {
-      file: 'design-system/src/patterns/Panel/Panel.mdx',
+      file: 'design-system/src/templates/Panel/Panel.mdx',
       docsId: 'templates-panel--docs',
       source: ['<Meta title="Templates/Panel" />', '', '## Motion', '', '<MotionSection component="Panel" tier="template" />', ''].join('\n'),
     },
@@ -41,7 +41,7 @@ test('derives Storybook docs links and section anchors from MDX pages and Motion
       ].join('\n'),
     },
     {
-      file: 'design-system/src/patterns/PatternModal/PatternModal.mdx',
+      file: 'design-system/src/templates/PatternModal/PatternModal.mdx',
       docsId: 'templates-modal--docs',
       source: [
         '<Meta title="Templates/Modal" />',

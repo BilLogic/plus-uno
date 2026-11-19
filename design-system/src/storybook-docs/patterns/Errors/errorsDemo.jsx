@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import { Banner, Button, ButtonItem, DropdownMenu, EmptyState, Flag, FlagGroup, IconButton, TextField } from '@/components';
 import { Page, Section } from '@/templates';
-import { DemoPageHeader, SessionsTable } from '../../../patterns/Page/pageDemo.jsx';
+import { DemoPageHeader, SessionsTable } from '../../../templates/Page/pageDemo.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { HeaderSearch } from '@/storybook-docs/lib/section-header.jsx';
 import { ViewPills, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';

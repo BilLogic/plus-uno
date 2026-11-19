@@ -8,7 +8,7 @@ Also asked as: icon only button, icon action.
 
 **Import:** `import { IconButton } from '@/components';`
 
-**Used in:** Modal (`ds guide modal`); Panel (`ds guide panel`); Section (`ds guide section`); Popup (`ds guide popup`)
+**Used in:** Modal (`ds guide modal`); Panel (`ds guide panel`); Popup (`ds guide popup`); Section (`ds guide section`)
 
 **Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Indicators (`ds guide indicators`); Overflow (`ds guide overflow`)
 

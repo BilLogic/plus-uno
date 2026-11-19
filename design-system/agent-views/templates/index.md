@@ -2,13 +2,13 @@
 
 # Templates
 
-- [Form](Form.md)
-- [Frame](../../src/patterns/Frame/index.md)
-- [Modal](../../src/patterns/Modal/index.md)
-- [Page](../../src/patterns/Page/index.md)
-- [Panel](Panel.md)
-- [Card](../../src/patterns/PatternCard/index.md)
-- [Section](../../src/patterns/PatternSection/index.md)
-- [Popup](Popup.md)
-- [Table](../../src/patterns/Table/index.md)
 - [Overview](TemplatesOverview.md)
+- [Card](../../src/templates/Card/index.md)
+- [Form](Form.md)
+- [Frame](../../src/templates/Frame/index.md)
+- [Modal](../../src/templates/Modal/index.md)
+- [Page](../../src/templates/Page/index.md)
+- [Panel](Panel.md)
+- [Popup](Popup.md)
+- [Section](../../src/templates/Section/index.md)
+- [Table](../../src/templates/Table/index.md)

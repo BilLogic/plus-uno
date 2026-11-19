@@ -1,5 +1,5 @@
 import React from 'react';
-import { FRAME_LAYOUT } from '@/patterns/Frame/frameLayout';
+import { FRAME_LAYOUT } from '@/templates/Frame/frameLayout';
 
 /**
  * The narrowest screen a whole-screen example reflows to on a docs page: the

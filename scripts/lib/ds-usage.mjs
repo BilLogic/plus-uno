@@ -41,19 +41,19 @@ export const docLink = (rule) => `${RULES_DOC}#${rule.replace('/', '')}`;
 
 const SCRIPT = /\.(jsx|js|mjs|cjs|tsx|ts)$/;
 const STYLE = /\.(scss|css)$/;
-export const isDsStyle = (path) => /^design-system\/src\/(?:components|patterns|templates)\/.+\.(?:scss|css)$/.test(path);
+export const isDsStyle = (path) => /^design-system\/src\/(?:components|templates)\/.+\.(?:scss|css)$/.test(path);
 const MARKUP = /\.html$/;
 
 /**
- * Specifiers that are a public barrel: the components and the patterns. The
+ * Specifiers that are a public barrel: the components and the templates. The
  * capture is the barrel's canonical `@/` name, whichever alias wrote it.
  */
-const BARREL = /^(?:@|@plus-ds)\/(components|patterns|templates)\/?$/;
+const BARREL = /^(?:@|@plus-ds)\/(components|templates)\/?$/;
 const barrelOf = (source) => `@/${source.match(BARREL)[1]}`;
 /** The barrel a manifest record imports from: its import line's specifier, or `@/components`. */
 const homeOf = (record) => record.import?.match(/from '([^']+)'/)?.[1] ?? '@/components';
 /** Specifiers that reach past a barrel into design-system source. */
-const DEEP = /^(?:@|@plus-ds)\/(?:components|patterns|templates|dataviz)\/.+|(?:^|\/)design-system\/(?:src\/)?components(?:\/|$)|(?:^|\/)design-system\/src\//;
+const DEEP = /^(?:@|@plus-ds)\/(?:components|templates|dataviz)\/.+|(?:^|\/)design-system\/(?:src\/)?components(?:\/|$)|(?:^|\/)design-system\/src\//;
 
 /**
  * Props every component takes without declaring them: React's own, and the
@@ -84,7 +84,7 @@ const FONT_WEIGHT = /^font-?weight$/i;
  * `exported` is every name the `@/components` barrel makes importable (parts
  * such as `TableRow` and constants included); a name there is never an unknown
  * component, though only a manifest record holds its props. `barrels` holds the
- * same for the other barrels (`@/patterns` → its hooks and constants too).
+ * same for the other barrels (`@/templates` → its hooks and constants too).
  */
 export function contextFrom({
   components,
@@ -197,7 +197,7 @@ export function escapesIn({ path, text: raw, page = isPageModule(path) }, ctx) {
     const fences = [...raw.matchAll(/^([ \t]*)(`{3,}|~{3,})(jsx?|tsx?|javascript|typescript|html|css|scss)[^\n]*\n([\s\S]*?)^\1\2[ \t]*$/gm)];
     let outside = raw;
     for (const fence of fences) outside = outside.slice(0, fence.index) + fence[0].replace(/[^\n]/g, ' ') + outside.slice(fence.index + fence[0].length);
-    const imports = [...outside.matchAll(/import\s+\{[^}]*\}\s+from\s+['"]@\/(?:components|patterns)['"];?/g)];
+    const imports = [...outside.matchAll(/import\s+\{[^}]*\}\s+from\s+['"]@\/(?:components|templates)['"];?/g)];
     for (const fence of fences) {
       const offset = fence.index + fence[0].indexOf('\n') + 1;
       let prefix = raw.slice(0, offset).replace(/[^\n]/g, ' ');

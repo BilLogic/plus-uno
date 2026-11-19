@@ -151,7 +151,7 @@ test('indexNames reads the components and patterns the generated index lists, no
     '## Not here → use instead',
     '| `Toast` | `Flag` (renamed) |',
     '## Patterns: start here',
-    '| Frame | [`Frame`](../../src/patterns/Frame/Frame.mdx) | x |',
+    '| Frame | [`Frame`](../../src/templates/Frame/Frame.mdx) | x |',
     '## UI components (2)',
     '- [Button](../../src/components/Button/index.md)',
     '- [Flag](../../src/components/Flag/index.md)',
@@ -177,7 +177,7 @@ test('run: the committed Modal page passes every rule, strict', () => {
 });
 
 test('run: the committed Section template page passes every rule, strict', () => {
-  const section = run({ enforceStrict: true }).filter((f) => /\/PatternSection\/PatternSection\.(mdx|stories\.jsx)$/.test(f.file ?? ''));
+  const section = run({ enforceStrict: true }).filter((f) => /\/Section\/Section\.(mdx|stories\.jsx)$/.test(f.file ?? ''));
   assert.deepEqual(section, []);
 });
 

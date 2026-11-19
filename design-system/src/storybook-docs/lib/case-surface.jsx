@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Blanket from '@/patterns/Modal/Blanket';
+import Blanket from '@/templates/Modal/Blanket';
 
 const PADDING = {
     md: 'var(--pad-y-md) var(--pad-x-md)',

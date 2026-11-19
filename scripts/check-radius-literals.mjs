@@ -20,7 +20,7 @@
  * tokens, `--radius-full`, `0`, `inherit`, and a `calc()` / `min()` that
  * scales a token (`calc(var(--tile-size) / 4)`: the corner moves with it).
  *
- * WHERE. `design-system/src/components` and `design-system/src/patterns`.
+ * WHERE. `design-system/src/components` and `design-system/src/templates`.
  * Token-definition files (`design-system/src/styles`) are exempt, as are
  * stories, tests and docs. A JSX value that is an identifier is a variable
  * decided at runtime and is skipped rather than guessed.
@@ -41,7 +41,7 @@ import { documents } from './lib/corpus.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const ROOTS = ['design-system/src/components', 'design-system/src/patterns'];
+const ROOTS = ['design-system/src/components', 'design-system/src/templates'];
 const EXT = ['.scss', '.css', '.jsx', '.js', '.tsx'];
 const EXCLUDED = /\.(stories|test)\.[jt]sx?$/;
 

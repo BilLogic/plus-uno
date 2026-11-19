@@ -28,8 +28,8 @@ const STEPS_RAIL = 256; // docs-literal
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
-import { FormFields, FILLED } from '../../../patterns/Form/formDemo.jsx';
-import { ModalStage, OneCell, SCREEN as MODAL_SCREEN } from '../../../patterns/Modal/modalDemo.jsx';
+import { FormFields, FILLED } from '../../../templates/Form/formDemo.jsx';
+import { ModalStage, OneCell, SCREEN as MODAL_SCREEN } from '../../../templates/Modal/modalDemo.jsx';
 
 /**
  * The Forms pattern's examples. The four hosts, the blocked submit, the server

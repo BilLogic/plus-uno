@@ -84,7 +84,7 @@ test('a renamed-with-no-alias name outside component docs is not flagged', () =>
 
 test('the word Atlassian is zero allowed in MDX, in story doc strings and as a URL, a code comment is not shipped unless it carries a link', () => {
   const hit = (file, text) => run({ sources: [src(file, text)] }).filter((f) => /word:Atlassian/.test(f.message));
-  assert.equal(hit('design-system/src/patterns/P/P.mdx', 'Atlassian is retiring it.\n')[0]?.line, 1);
+  assert.equal(hit('design-system/src/templates/P/P.mdx', 'Atlassian is retiring it.\n')[0]?.line, 1);
   assert.equal(hit('design-system/src/components/B/B.stories.jsx', "x: { summary: 'Props follow Atlassian: `a`' },\n")[0]?.line, 1);
   assert.equal(hit('design-system/src/components/B/B.stories.jsx', "docs: { description: { component: 'Adapted from Atlassian.' } }\n")[0]?.line, 1);
   assert.equal(hit('design-system/src/components/B/B.jsx', '/**\n * Props follow https://atlassian.design/components/button.\n */\n')[0]?.line, 2, 'a JSDoc URL reaches the agent views');

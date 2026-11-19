@@ -1,14 +1,14 @@
 // Templates: the coded shells a page, a section, a card, a table or an overlay
-// is built from. Each is the same component the `@/templates` barrel exports,
-// under its template name, so either import reaches one implementation.
+// is built from. Shells own the frame (tokens for bg/radius/elevation/border/
+// spacing); consumers fill the slots.
 
-export { default as Frame, PANEL_STORAGE_KEY } from '../patterns/Frame';
-export { usePanelControl } from '../patterns/Frame/PanelControl';
-export { default as Page } from '../patterns/Page';
-export { default as Section, SECTION_DETAIL_FLOOR } from '../patterns/PatternSection';
-export { default as Card } from '../patterns/PatternCard';
-export { default as Table, TABLE_KINDS } from '../patterns/Table';
-export { default as Modal, MODAL_WIDTHS, MODAL_WIDTH_PX, MODAL_WIDTH_SCREENS, MODAL_HEIGHTS } from '../patterns/Modal';
+export { default as Frame, PANEL_STORAGE_KEY } from './Frame';
+export { usePanelControl } from './Frame/PanelControl';
+export { default as Page } from './Page';
+export { default as Section, SECTION_DETAIL_FLOOR } from './Section';
+export { default as Card } from './Card';
+export { default as Table, TABLE_KINDS } from './Table';
+export { default as Modal, MODAL_WIDTHS, MODAL_WIDTH_PX, MODAL_WIDTH_SCREENS, MODAL_HEIGHTS } from './Modal';
 export {
     default as Panel,
     PanelActionGroup,
@@ -28,9 +28,9 @@ export {
     PanelUpAction,
     PanelViewSwitcher,
     usePanelManager,
-} from '../patterns/Panel';
+} from './Panel';
 export { Popup } from '@/components';
-export { default as AiChat, useAiChat, AI_CHAT_MODES, AI_CHAT_STORAGE_KEY, AI_CHAT_FULLSCREEN_BELOW, AI_CHAT_DISCLAIMER } from '../patterns/AiChat';
+export { default as AiChat, useAiChat, AI_CHAT_MODES, AI_CHAT_STORAGE_KEY, AI_CHAT_FULLSCREEN_BELOW, AI_CHAT_DISCLAIMER } from './AiChat';
 export { useSidebarControl } from '@/lib/sidebarControl';
 
 // Template motion helpers (Transitions & Choreography)

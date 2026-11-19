@@ -221,21 +221,17 @@ const headed = (page, title) => {
 const PRO_FAMILY = /\bfa-(?:sharp-duotone|sharp|duotone|light|thin)\b/;
 const GUIDELINES = 'design-system/guidelines';
 const AGENT_VIEWS = 'design-system/agent-views';
-const PATTERNS_SRC = 'design-system/src/patterns';
-/** Templates a plain word of a query names: `card` was a not-here redirect to the card pattern before the template took the name. */
+const TEMPLATES_SRC = 'design-system/src/templates';
+/**
+ * Templates a plain word of a query names, which lead the results. Kept for `Card`: "a grid of cards" or "a kanban
+ * with draggable cards" names the template in one word, but BM25 over its name and summary ranks Table and Section above it
+ * (the ds-find bench falls from 41 to 40 hit@1 without it).
+ */
 const NAMED_BY_WORD = ['Card'];
 const TEMPLATE_COMPONENTS = ['Frame', 'Page', 'Section', 'Card', 'Table', 'Modal'];
-/**
- * The name whose record owns a name's page and rendered text. A template owns its own; a pattern a template
- * was renamed from reads through to that template; any other alias reads through to what it aliases.
- */
-function homeNameOf(a, records) {
-  if (a.kind === 'template') return a.name;
-  if (a.kind === 'pattern' && a.source) {
-    const renamed = records.find((r) => r.kind === 'template' && r.source === a.source);
-    if (renamed) return renamed.name;
-  }
-  return a.aliasOf ?? a.name;
+/** The name whose record owns a name's page and rendered text: a template its own, an alias what it aliases. */
+function homeNameOf(a) {
+  return a.kind === 'template' ? a.name : a.aliasOf ?? a.name;
 }
 
 const readIf = (file) => (fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null);
@@ -325,7 +321,7 @@ const mdIn = (root, dir) =>
 /**
  * Topic → the file that answers it: generated template, pattern and
  * foundation agent views (`agent-views/<root>/<Name>.md` and component-backed
- * templates under `src/patterns/<Name>/index.md`), plus any surviving
+ * templates under `src/templates/<Name>/index.md`), plus any surviving
  * `guidelines/` pages.
  */
 function scanTopics(root) {
@@ -347,9 +343,8 @@ function scanTopics(root) {
     }
   }
   for (const sub of TEMPLATE_COMPONENTS) {
-    // A template's folder keeps its pattern name (`PatternSection/`) until the folders are renamed.
-    const rel = [sub, `Pattern${sub}`].map((dir) => `${PATTERNS_SRC}/${dir}/index.md`).find((file) => fs.existsSync(path.join(root, file)));
-    if (!rel) continue;
+    const rel = `${TEMPLATES_SRC}/${sub}/index.md`;
+    if (!fs.existsSync(path.join(root, rel))) continue;
     const kebab = sub.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
     const short = kebab;
     if (short === 'page') {
@@ -433,11 +428,11 @@ export function buildDsIndex(root) {
 
   const entries = records.map((r) => {
     const a = facts.lookup(r.name);
-    const homeName = homeNameOf(a, facts.manifests.components.components);
+    const homeName = homeNameOf(a);
     const home = homeName === a.name ? a : facts.lookup(homeName);
     const srcFile = home.source ?? a.source;
     const src = srcFile ? readIf(path.join(root, srcFile)) : null;
-    const liveSummary = src && !['pattern', 'template'].includes(a.kind) ? (jsdocFor(src, implSymbol(src, homeName)) || null) : a.summary;
+    const liveSummary = src && a.kind !== 'template' ? (jsdocFor(src, implSymbol(src, homeName)) || null) : a.summary;
     const rankPage = pageOf(r.name, a.source)?.page;
     const docs = pageOf(homeName, srcFile);
     const edges = context.edges[homeName];
@@ -547,9 +542,6 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
   const index = loadDsIndex(root, { buildIndex });
   const records = index.entries;
   const entriesByName = new Map(records.map((r) => [r.name, r]));
-  // A pattern name beside the template it was renamed to: find ranks the template alone, and the old name still answers by its exact name.
-  const templateSources = new Set(records.filter((r) => r.kind === 'template').map((r) => r.source));
-  const renamedPatterns = new Set(records.filter((r) => r.kind === 'pattern' && templateSources.has(r.source)).map((r) => r.name));
   const barrels = Object.fromEntries(BARRELS.map((spec) => [spec, new Set(index.barrels[spec] ?? [])]));
   const retired = retiredRenames();
   const inventions = index.inventions ?? { components: [], props: [], tokens: [] };
@@ -709,7 +701,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
   let ranker;
   const rank = () => {
     if (ranker) return ranker;
-    const docs = records.filter((r) => !renamedPatterns.has(r.name)).map((r) => ({
+    const docs = records.map((r) => ({
       id: r.name,
       fields: {
         name: r.name,
@@ -781,7 +773,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     const rows = [];
     for (const { row, bl } of notHere) if (row.kind === 'component' && words.includes(bl)) rows.push(notHereRow(row));
     if (singleWord && ql.length > 2) for (const { row, bl } of notHere) if (row.kind === 'component' && bl.includes(ql)) rows.push(notHereRow(row));
-    // A template a plain word names leads like its not-here redirect did before it shipped under that name.
+    // A template a plain word names leads, as a not-here redirect would.
     for (const name of NAMED_BY_WORD) if (words.includes(name.toLowerCase()) && entriesByName.has(name)) rows.push(item(name));
     return rows;
   }
@@ -795,7 +787,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
         const a = facts.lookup(r.id);
         const phrases = aliases ? a.aliases.filter((al) => al.length > 3 && hasPhrase(ql, al)) : [];
         const bonus = phrases.reduce((sum, al) => sum + aliasPhrase + al.split(' ').length, 0);
-        return { ...r, score: r.score + bonus + (['pattern', 'template'].includes(a.kind) ? patternLift : 0) };
+        return { ...r, score: r.score + bonus + (a.kind === 'template' ? patternLift : 0) };
       })
       .sort((a, b) => b.score - a.score || (a.id < b.id ? -1 : 1));
     const top = ranked[0]?.score ?? 0;
@@ -955,7 +947,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     let kit;
     if (kitQuery) {
       const template = /\b(frame|screen|page|dashboard)\b/.test(c.ql) ? pages.find((p) => p.component === 'Frame') : pageRank('template')[0] ?? pages.find((p) => p.component === 'Frame');
-      const components = [...new Set([...named.map((r) => r.name), ...out.filter((r) => ['component', 'pattern', 'template'].includes(r.kind) && r.import).map((r) => r.name), ...(patternPages[0]?.components ?? [])])].slice(0, 16);
+      const components = [...new Set([...named.map((r) => r.name), ...out.filter((r) => ['component', 'template'].includes(r.kind) && r.import).map((r) => r.name), ...(patternPages[0]?.components ?? [])])].slice(0, 16);
       const governing = components.flatMap((name) => contexts().edges[name]?.governedBy ?? []);
       const frequency = (page) => governing.filter((p) => p.name === page.name).length;
       const patterns = [...new Map([...patternPages.slice(0, 3), ...governing.sort((a, b) => frequency(b) - frequency(a))].map((p) => [p.name, pageRow(p)])).values()].slice(0, 6);
@@ -990,7 +982,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
       return { name: a.name, status: a.status, why: a.why, use: a.replacement.map(brief), next: 'Use the replacement: ds_get it for its props.' };
     }
     if (a.kind === 'prop') return { ...a, next: null };
-    const homeName = homeNameOf(a, records);
+    const homeName = homeNameOf(a);
     const homeEntry = entriesByName.get(homeName);
     const record = {
       name: a.name,
@@ -1059,7 +1051,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
   const isBriefGuide = (rel) =>
     rel.startsWith(`${AGENT_VIEWS}/patterns/`) ||
     rel.startsWith(`${AGENT_VIEWS}/templates/`) ||
-    rel.startsWith(`${PATTERNS_SRC}/`);
+    rel.startsWith(`${TEMPLATES_SRC}/`);
   const summarizeGuide = (rel, fullText) => {
     const parts = fullText.split(/\n(?=## )/);
     const header = parts[0].trim();

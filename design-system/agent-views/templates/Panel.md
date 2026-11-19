@@ -8,7 +8,7 @@ Import the Panel and its parts from `@/templates`. This template documents the p
 
 **Kind:** Template
 
-**Storybook page:** `design-system/src/patterns/Panel/Panel.mdx`
+**Storybook page:** `design-system/src/templates/Panel/Panel.mdx`
 
 ## Types
 

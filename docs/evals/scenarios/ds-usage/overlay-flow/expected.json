@@ -8,31 +8,31 @@
     {
       "id": "session-card",
       "screen": "Upcoming session card",
-      "template": "Page + PatternCard",
-      "variant": "PatternCard · Default",
-      "page": "design-system/src/patterns/PatternCard/index.md",
+      "template": "Page + Card",
+      "variant": "Card · Default",
+      "page": "design-system/src/templates/Card/index.md",
       "section": "Anatomy",
       "pages": [
-        "design-system/src/patterns/Page/index.md",
-        "design-system/src/patterns/PatternCard/index.md"
+        "design-system/src/templates/Page/index.md",
+        "design-system/src/templates/Card/index.md"
       ],
       "guides": ["page", "card", "templates"],
       "scoring": "checker",
       "check": {
         "kind": "template",
-        "components": ["PatternCard"]
+        "components": ["Card"]
       },
-      "expectation": "Upcoming session rendered in a PatternCard with student, date, time, status, and Cancel session action."
+      "expectation": "Upcoming session rendered in a Card with student, date, time, status, and Cancel session action."
     },
     {
       "id": "cancel-modal",
       "screen": "Cancel session confirmation modal",
       "template": "Modal",
       "variant": "Modal · Destructive / Active",
-      "page": "design-system/src/patterns/Modal/index.md",
+      "page": "design-system/src/templates/Modal/index.md",
       "section": "Types",
       "pages": [
-        "design-system/src/patterns/Modal/index.md"
+        "design-system/src/templates/Modal/index.md"
       ],
       "guides": ["modal"],
       "scoring": "checker",

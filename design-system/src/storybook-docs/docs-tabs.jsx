@@ -61,7 +61,7 @@ const AGENT_DOCS = import.meta.glob(
     '../components/*/*/index.md',
     '../components/*/*.md',
     '!../components/*/index.md',
-    '../patterns/*/index.md',
+    '../templates/*/index.md',
     '../assets/*/index.md',
     '../../agent-views/templates/*.md',
     '../../agent-views/patterns/*.md',

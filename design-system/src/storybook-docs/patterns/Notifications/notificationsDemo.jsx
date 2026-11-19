@@ -27,7 +27,7 @@ import {
     PanelContainer,
     PanelHeader,
 } from '@/templates';
-import { DemoPageHeader } from '../../../patterns/Page/pageDemo.jsx';
+import { DemoPageHeader } from '../../../templates/Page/pageDemo.jsx';
 import { WINDOW_HEIGHT } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { StudentsTable, ViewPills } from '@/storybook-docs/lib/view-bar.jsx';

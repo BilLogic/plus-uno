@@ -15,17 +15,17 @@ const cli = (...args) => spawnSync(process.execPath, ['scripts/check-ds-usage.mj
 
 test('reference stories, pattern code stories and MDX code blocks are held to zero', () => {
   for (const file of [
-    'design-system/src/patterns/Page/ReferenceScreens.stories.jsx',
+    'design-system/src/templates/Page/ReferenceScreens.stories.jsx',
     'design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx',
     'design-system/src/storybook-docs/patterns/Filtering/Filtering.mdx',
   ]) assert.ok(inScope(file), file);
-  const text = `# Example\n\nA sentence mentioning 16px is prose.\n\n\`\`\`jsx\nimport { Select, PatternSection } from '@/patterns';\n\`\`\`\n`;
+  const text = `# Example\n\nA sentence mentioning 16px is prose.\n\n\`\`\`jsx\nimport { Select, Section } from '@/templates';\n\`\`\`\n`;
   const found = escapesIn({ path: 'design-system/src/Example.mdx', text }, contextOf(REPO_ROOT));
   assert.ok(found.some((f) => f.rule === 'ds/no-unknown-component' && f.line === 6));
   assert.equal(found.some((f) => f.rule === 'ds/no-raw-literal'), false);
-  const placement = `# Filtering\n\n\`\`\`jsx\nimport { Select } from '@/components';\nimport { PatternSection } from '@/patterns';\n<PatternSection toolbar={<Select options={['All']} />} />;\n\`\`\``;
+  const placement = `# Filtering\n\n\`\`\`jsx\nimport { Select } from '@/components';\nimport { Section } from '@/templates';\n<Section toolbar={<Select options={['All']} />} />;\n\`\`\``;
   assert.ok(escapesIn({ path: 'design-system/src/Example.mdx', text: placement }, contextOf(REPO_ROOT)).some((f) => f.rule === 'ds/placement' && f.line === 6));
-  const outerImport = `import { PatternSection } from '@/patterns';\nimport { Select } from '@/components';\n\n\`\`\`jsx\n<PatternSection toolbar={<Select options={['All']} />} />;\n\`\`\``;
+  const outerImport = `import { Section } from '@/templates';\nimport { Select } from '@/components';\n\n\`\`\`jsx\n<Section toolbar={<Select options={['All']} />} />;\n\`\`\``;
   assert.ok(escapesIn({ path: 'design-system/src/Example.mdx', text: outerImport }, contextOf(REPO_ROOT)).some((f) => f.rule === 'ds/placement' && f.line === 5));
 });
 
@@ -71,7 +71,7 @@ test('scope: consumer code only, tests and stories skipped', () => {
 
 test('DS styles are in scope and raw motion fails while semantic motion passes', () => {
   const ctx = contextOf(REPO_ROOT);
-  for (const kind of ['components', 'patterns', 'templates']) {
+  for (const kind of ['components', 'templates']) {
     const file = `design-system/src/${kind}/Example/Example.scss`;
     assert.ok(inScope(file));
     for (const declaration of [
@@ -134,19 +134,19 @@ test('outside a git checkout, the files on disk stand in for the tracked list', 
 test('the real facts hold patterns: invented name, wrong prop and wrong value fail; valid use passes', () => {
   const ctx = contextOf(REPO_ROOT);
   const rules = (text) => escapesIn({ path: 'prototypes/x/src/App.jsx', text }, ctx).map((f) => f.rule);
-  const head = "import { Frame, PatternCard, PatternSection } from '@/patterns';\n";
-  assert.deepEqual(rules(head + '<Frame width="reading"><PatternSection><PatternCard title="x" gap="md" /></PatternSection></Frame>'), []);
-  assert.deepEqual(rules("import { PatternCardd } from '@/patterns';"), ['ds/no-unknown-component']);
-  assert.deepEqual(rules(head + '<PatternCard heading="x" />'), ['ds/no-unknown-prop']);
-  assert.deepEqual(rules(head + '<PatternCard padding="xl" />'), ['ds/no-unknown-prop']);
+  const head = "import { Frame, Card, Section } from '@/templates';\n";
+  assert.deepEqual(rules(head + '<Frame width="reading"><Section><Card title="x" gap="md" /></Section></Frame>'), []);
+  assert.deepEqual(rules("import { Cardd } from '@/templates';"), ['ds/no-unknown-component']);
+  assert.deepEqual(rules(head + '<Card heading="x" />'), ['ds/no-unknown-prop']);
+  assert.deepEqual(rules(head + '<Card padding="xl" />'), ['ds/no-unknown-prop']);
   assert.deepEqual(rules(head + '<Frame width="wide" />'), ['ds/no-unknown-prop']);
 });
 
 test('repeated toolbar mistakes and hand-styled pages fail with actionable fixes', () => {
   const code = `import { Select } from '@/components';
-import { PatternSection } from '@/patterns';
+import { Section } from '@/templates';
 export default function App() {
-  return <div className="shell"><PatternSection toolbar={<Select options={[]} />} /></div>;
+  return <div className="shell"><Section toolbar={<Select options={[]} />} /></div>;
 }`;
   const found = escapesIn({ path: 'prototypes/x/src/App.jsx', text: code }, contextOf(REPO_ROOT));
   for (const rule of ['ds/placement', 'ds/page-starts-from-pattern']) {
@@ -162,11 +162,11 @@ test('MDX examples and reference-screen stories use the same placement checker',
   const story = 'design-system/src/storybook-docs/Reference.stories.jsx';
   try {
     fs.mkdirSync(path.dirname(path.join(root, mdx)), { recursive: true });
-    fs.writeFileSync(path.join(root, mdx), '# Example\n\n```jsx\n<PatternSection.Toolbar filters={<Select options={[]} />} />\n```\n');
+    fs.writeFileSync(path.join(root, mdx), '# Example\n\n```jsx\n<Section.Toolbar filters={<Select options={[]} />} />\n```\n');
     fs.writeFileSync(path.join(root, story), `import { Select } from '@/components';
-import { PatternSection } from '@/patterns';
+import { Section } from '@/templates';
 export default { tags: ['reference-screen'] };
-export const Queue = { render: () => <PatternSection.Toolbar filters={<Select options={[]} />} /> };`);
+export const Queue = { render: () => <Section.Toolbar filters={<Select options={[]} />} /> };`);
     const found = escapes(root, [mdx, story], ROOT).filter((f) => f.rule === 'ds/placement');
     assert.deepEqual(found.map((f) => [f.file, f.line, f.level]), [[mdx, 4, 'fail'], [story, 4, 'fail']]);
     assert.ok(inScope(mdx));

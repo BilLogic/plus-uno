@@ -29,26 +29,26 @@ test('one record per barrel export, in name order, with the import path', () => 
   assert.equal(m.components[0].import, "import { Button } from '@/components';");
 });
 
-test('a pattern is a record of kind pattern, imported from its own barrel, with props from source', () => {
-  const card = { ...button, name: 'PatternCard', group: 'patterns', source: 'design-system/src/patterns/PatternCard/PatternCard.jsx' };
+test('a template is a record of kind template, imported from its own barrel, with props from source', () => {
+  const card = { ...button, name: 'Card', group: 'templates', source: 'design-system/src/templates/Card/Card.jsx' };
   const m = buildComponentsManifest({
     exports: ['Button'],
-    patterns: [{ name: 'PatternCard', from: '@/patterns' }],
+    templates: [{ name: 'Card', from: '@/templates' }],
     components: [button],
-    parsedPatterns: [card],
+    parsedTemplates: [card],
     version: '0',
   });
   const [b, p] = m.components;
   assert.equal(b.kind, 'component');
-  assert.equal(p.kind, 'pattern');
-  assert.equal(p.import, "import { PatternCard } from '@/patterns';");
+  assert.equal(p.kind, 'template');
+  assert.equal(p.import, "import { Card } from '@/templates';");
   assert.deepEqual(p.props.find((x) => x.name === 'appearance').values, ['primary', 'subtle']);
 });
 
-test('a name both a component and a pattern is refused', () => {
+test('a name both a component and a template is refused', () => {
   assert.throws(
-    () => buildComponentsManifest({ exports: ['Button'], patterns: [{ name: 'Button', from: '@/patterns' }], components: [button], version: '0' }),
-    /Button is exported from both @\/components and @\/patterns/,
+    () => buildComponentsManifest({ exports: ['Button'], templates: [{ name: 'Button', from: '@/templates' }], components: [button], version: '0' }),
+    /Button is exported from both @\/components and @\/templates/,
   );
 });
 
@@ -150,32 +150,7 @@ test('serialized manifests carry the generated header and end in a newline', () 
   assert.equal(Object.keys(parsed)[0], '$generated');
 });
 
-test('a template is a record of kind template, imported from the templates barrel, built from its source file', () => {
-  const section = { ...button, name: 'PatternSection', group: 'patterns', source: 'design-system/src/patterns/PatternSection/PatternSection.jsx' };
-  const m = buildComponentsManifest({
-    exports: ['Button'],
-    patterns: [{ name: 'PatternSection', from: '@/patterns' }, { name: 'Frame', from: '@/patterns' }],
-    templates: [{ name: 'Section', of: 'PatternSection', from: '@/templates' }],
-    components: [button],
-    parsedPatterns: [section, { ...section, name: 'Frame' }],
-    version: '0',
-  });
-  const section2 = m.components.find((c) => c.name === 'Section');
-  assert.equal(section2.kind, 'template');
-  assert.equal(section2.import, "import { Section } from '@/templates';");
-  assert.equal(section2.source, section.source);
-  assert.equal(m.components.find((c) => c.name === 'PatternSection').kind, 'pattern');
-});
-
-test('a name in both the patterns and templates barrels is one record, a template', () => {
-  const frame = { ...button, name: 'Frame', group: 'patterns', source: 'design-system/src/patterns/Frame/Frame.jsx' };
-  const m = buildComponentsManifest({
-    exports: [],
-    patterns: [{ name: 'Frame', from: '@/patterns' }],
-    templates: [{ name: 'Frame', of: 'Frame', from: '@/templates' }],
-    components: [],
-    parsedPatterns: [frame],
-    version: '0',
-  });
-  assert.deepEqual(m.components.map((c) => [c.name, c.kind]), [['Frame', 'template']]);
+test('a template with no parsed source is still listed, with props unknown', () => {
+  const m = buildComponentsManifest({ exports: [], templates: [{ name: 'Frame', from: '@/templates' }], components: [], version: '0' });
+  assert.deepEqual(m.components.map((c) => [c.name, c.kind, c.props]), [['Frame', 'template', null]]);
 });

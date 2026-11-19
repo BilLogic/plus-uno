@@ -9,7 +9,7 @@
 // Free has (`net.ts`). Baked, `github_read`'s `lookup` and the weekly
 // precedence check read the same facts the IDE does, with no fetch at all.
 //
-// WHAT IS KEPT. Only what the bot answers with: each component's and pattern's
+// WHAT IS KEPT. Only what the bot answers with: each component's and template's
 // kind, import, group, summary, source, generated doc and props (name, type,
 // values, default, whether required, a deprecation); each token's tier, group,
 // value and intent; the names each public barrel exports; and the names that

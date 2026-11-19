@@ -1,0 +1,530 @@
+import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+
+import * as ModalStories from './Modal.stories.jsx';
+import * as HeadingOutlineStories from '../HeadingOutline.stories.jsx';
+import { DocsCanvasShell, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+import {
+    ButtonInBodyModal,
+    FooterPinnedModal,
+    StepsFooterModal,
+    TabsForStepsModal,
+    ConfirmNarrow,
+    ConfirmsInside,
+    ConfirmWide,
+    ModalOnModal,
+} from './ModalCases.jsx';
+import { CODE } from './ModalCaseCode.js';
+
+<Meta of={ModalStories} />
+
+<DocsLanding
+    page="templates-modal"
+    eyebrow="Template · Modal"
+    title="Modal"
+    purpose="One task before anything else can happen, centered over a Blanket. Four types: Passive, Active, Acknowledge and Steps."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Form', href: './?path=/docs/templates-form--docs' },
+            { title: 'Dialog', href: './?path=/docs/components-messaging-dialog--docs' },
+        ],
+    }}
+/>
+
+<DocsTabs of={ModalStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=21757-21088"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/templates/Modal"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Types
+
+Picked by what the person has to do. The <DocsLink id="components-messaging-dialog">Dialog</DocsLink> component page holds the panel's props and states; these are the filled Modal layouts.
+
+<TypeGrid>
+<TypeCard of={ModalStories.TypePassive} to="#passive" title="Passive">Information only, with Close. No footer.</TypeCard>
+<TypeCard of={ModalStories.TypeActive} to="#active" title="Active">A choice, a confirm or a short form. Discard (or a real alternative) and the action; no Cancel.</TypeCard>
+<TypeCard of={ModalStories.TypeAcknowledge} to="#acknowledge" title="Acknowledge">One thing to read and one button that fills the footer.</TypeCard>
+<TypeCard of={ModalStories.TypeSteps} to="#steps" title="Steps">A short sequence at 10-col: Back and Next, split 50/50.</TypeCard>
+</TypeGrid>
+
+<ComponentExample of={ModalStories.TypePassive} title="Passive" description="Information only, with Close. No footer." />
+
+<ComponentExample of={ModalStories.TypeAcknowledge} title="Acknowledge" description="One thing to read and one button that fills the footer." />
+
+<ComponentExample of={ModalStories.TypeSteps} title="Steps" description="A short sequence at 10-col: Back and Next, split 50/50." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Anatomy
+
+An Active Modal at 8-col with a short form. Every part once; the pad is 16 on every side, the radius 16, and the parts sit 16 apart.
+
+<ComponentExample of={ModalStories.AnatomyActive} />
+
+1. **Blanket.** Dims the page and holds the Modal centered.
+2. **Header.** The title at 20/24, whatever the level around it, and the Close icon button. With tabs, the tab group sits 8 under the title.
+3. **Body.** Text, a list, fields or a table. It scrolls past the cap and never draws under 96 tall.
+4. **Footer** (optional). Full-bleed buttons; secondary (Default) left, Primary right; Close in the header dismisses, so no Cancel.
+
+<DocsCanvasShell description="A modal with its title, description and a section.">
+    <DsCanvasQuiet of={HeadingOutlineStories.ModalTitle} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Widths
+
+A width is a step of the screen grid plus 16 on each side: 4, 6, 8 and 10 columns, here at 1024. It grows with the window and never shrinks; the Sidebar never changes it.
+
+<ComponentExample of={ModalStories.WidthStrip} title="4 · 6 · 8 · 10-col" description="Each Modal measured against the screen grid at 1024." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Width behavior
+
+Drag the screen's width. The Modal grows with it and never shrinks.
+
+<DocsInteractivePlayground of={ModalStories.ResponsiveWidth} description="The width control sets the screen's width." />
+
+<DocsTable>
+<thead>
+<tr><th>Width</th><th>768</th><th>1024</th><th>1440</th><th>Made of</th></tr>
+</thead>
+<tbody>
+<tr><td>4-col</td><td>261</td><td>347</td><td>432</td><td>4 screen-grid columns + 2 × 16</td></tr>
+<tr><td>6-col</td><td>384</td><td>512</td><td>640</td><td>6 columns + 2 × 16</td></tr>
+<tr><td>8-col</td><td>507</td><td>677</td><td>848</td><td>8 columns + 2 × 16</td></tr>
+<tr><td>10-col</td><td>629</td><td>843</td><td>1056</td><td>10 columns + 2 × 16</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Destructive tiers
+
+Which tier, and its words: <DocsLink id="patterns-common-actions">Common actions</DocsLink>.
+
+<ComponentExample of={ModalStories.TierActive} title="Active" description="A change that can be undone: Discard and the action in Primary." />
+
+<ComponentExample of={ModalStories.TierDanger} title="Active with Danger" description="A delete: the action takes the Danger appearance." />
+
+<ComponentExample of={ModalStories.TierTypeName} title="Danger, type the name" description="A delete that cannot be undone: the caption asks for the name, and Danger enables once it matches." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Footers
+
+The rule for 4-track placement, real actions and Close: <DocsLink id="patterns-common-actions">Common actions</DocsLink>.
+
+<ComponentExample of={ModalStories.FooterOne} title="One button" description="Sits on the right half (tracks 3–4), inside the Modal padding." />
+
+<ComponentExample of={ModalStories.FooterTwo} title="Two buttons" description="A 50/50 split across all four tracks: secondary (Default) left, Primary right." />
+
+<ComponentExample of={ModalStories.FooterThree} title="Three buttons" description="A quarter each in tracks 2, 3 and 4; only the rightmost is Primary." />
+
+<ComponentExample of={ModalStories.FooterTextLeft} title="Text button left" description="A text button hugs the left content edge and takes no track; the filled buttons take tracks 3 and 4." />
+
+<ComponentExample of={ModalStories.FooterDestructive} title="Destructive split" description="The safer alternative is secondary and the danger action is primary, split 50/50." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Key states
+
+<ComponentExample of={ModalStories.KeyLongContent} title="Long content" description="Each width has a maximum height. Past it the body scrolls between the pinned header and footer; the footer never moves." />
+
+<ComponentExample of={ModalStories.KeyLoading} title="Loading" description={<>No skeleton on the Modal itself; the body shows its content's own loading state: <DocsLink id="patterns-states-loading">Loading</DocsLink>.</>} />
+
+A blocked submit is on <DocsLink id="templates-form">Form</DocsLink>, and a Modal that confirms inside itself is under Stacking.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Stacking
+
+A confirm Modal may open over a Panel, a Popup or a multi-step task, and brings its own Blanket. A Modal never opens on another Modal.
+
+<ComponentExample of={ModalStories.StackConfirmOverPanel} title="A confirm over a Panel" description="The Panel stays open under the confirm's own Blanket. Archive instead or Close returns focus to the Panel." />
+
+<ComponentExample of={ModalStories.StackModalOnModalRefused} title="Confirm inside the Modal" description="A Modal that needs a confirm holds it inside itself: a warning SectionMessage in the body and the action in Danger. A second Modal never opens on it." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Sizes
+
+<DocsTable>
+<thead>
+<tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--modal-pad-x-default</code></td><td>16</td><td>Pad on every side.</td></tr>
+<tr><td><code>--modal-radius</code></td><td>16</td><td>Corner radius at every width.</td></tr>
+<tr><td><code>--modal-stack-sm</code>, <code>-md</code>, <code>-lg</code></td><td>8, 16, 24</td><td>Title to tabs; header, body and footer; groups of fields.</td></tr>
+<tr><td><code>--modal-body-min-height</code></td><td>80</td><td>The least the body draws.</td></tr>
+<tr><td><code>--ds-surface-material-overlay</code>, <code>--ds-border-material</code>, <code>--ds-shadow-blocking</code></td><td>pair</td><td>The Modal's fill, edge and elevation, the one surface that lifts above a Blanket. The fill is translucent with no blur, and turns solid under reduced transparency and increased contrast.</td></tr>
+<tr><td><code>--ds-blanket</code></td><td>color</td><td>The Blanket's fill.</td></tr>
+</tbody>
+</DocsTable>
+
+The Modal's maximum height is the screen less `--blanket-pad-y` above and below.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Blanket
+
+The Blanket is the full-screen layer inside the Modal template that holds the dimming fill and the Dialog above it, so the Dialog is placed, not drawn. It fills with the blanket token, pads 16 at the sides and 64 above and below, and centers the Dialog. It is part of this template, not exported on its own. The examples in this section follow the toolbar's Color mode switch.
+
+<ComponentExample of={ModalStories.BlanketInline} title="Modal in a Blanket" description="A modal centered in the blanket at the 768 stand-in screen." />
+
+<ComponentExample of={ModalStories.BlanketPads} title="Pads" description="Pad 16 at the sides and 64 above and below, shaded here; under 640 tall the vertical pad drops to 24." />
+
+<ComponentExample of={ModalStories.BlanketScreenGrid} title="Screen grid" description="12 columns with a 16 gutter, centered and capped at 1232; a modal spans 4, 6, 8 or 10 of them." />
+
+A Blanket interrupts the page for one task. It dims everything behind it with one fill, so the person sees only the layer on top. It never draws content of its own.
+
+A task that keeps the page in view is a Panel, which floats with no Blanket. `inline` draws the Blanket and Dialog in the page flow at a stand-in screen of `screenWidth` and `screenHeight`, for docs and previews.
+
+### Layers
+
+Figma has no z-index, so the order is written here and lives in code.
+
+<DocsTable>
+<thead>
+<tr><th>Layer</th><th>Number</th><th>Token</th><th>Holds</th></tr>
+</thead>
+<tbody>
+<tr><td>Navigation</td><td>200</td><td><code>--layer-navigation</code></td><td>The floating sidebar. It has a shadow and no blanket, and an outside click closes it.</td></tr>
+<tr><td>Menu and Popup</td><td>400</td><td><code>--layer-popup</code></td><td>The Menu and the Popup. One opened from a Modal mounts in it and takes the Modal layer, 510.</td></tr>
+<tr><td>Blanket</td><td>500</td><td><code>--layer-blanket</code></td><td>The Blanket and its fill.</td></tr>
+<tr><td>Modal</td><td>510</td><td><code>--layer-modal</code></td><td>A Modal.</td></tr>
+<tr><td>Flag</td><td>600</td><td><code>--layer-flag</code></td><td>Flags, above a modal.</td></tr>
+<tr><td>Tooltip</td><td>800</td><td><code>--layer-tooltip</code></td><td>Tooltips, above everything.</td></tr>
+</tbody>
+</DocsTable>
+
+### Parts
+
+1. **Blanket.** The screen-size layer with the blanket fill, the screen grid and the pads.
+2. **Dialog.** The panel centered inside it with header, body and footer slots.
+
+The Blanket carries the screen grid; page frames carry the content grid. Height, hug or fill, lives on the Dialog inside it.
+
+### States
+
+The Blanket is shown while the Modal is open and gone when it closes. `blanket` decides whether a press on the Blanket outside the Dialog closes the Modal (`true` by default; `static` or `false` keeps it open).
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Token</th><th>Value</th><th>What it is for</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--ds-blanket</code></td><td>32% in Light, 60% in Dark</td><td>The fill, under every modal.</td></tr>
+<tr><td><code>--blanket-pad-x</code></td><td>16</td><td>The closest a modal gets to the sides.</td></tr>
+<tr><td><code>--blanket-pad-y</code></td><td>64</td><td>The closest a modal gets to the top and bottom. It drops to 24 under 640 tall.</td></tr>
+<tr><td><code>--blanket-max-height-modal</code></td><td>screen height less 2 × pad-y: 128, or 48 under 640 tall</td><td>The tallest a modal or confirm gets. Its body scrolls past it.</td></tr>
+<tr><td><code>--grid-gutter</code></td><td>16</td><td>The gutter between screen-grid columns.</td></tr>
+<tr><td><code>--grid-width-column-screen</code></td><td>45.33, 66.67, 88</td><td>One screen-grid column at 768, 1024 and 1440.</td></tr>
+<tr><td><code>--content-max-width</code></td><td>1232</td><td>The cap on the screen grid.</td></tr>
+<tr><td><code>--layer-blanket</code>, <code>--layer-modal</code></td><td>500, 510</td><td>The Blanket and the layer it holds.</td></tr>
+</tbody>
+</DocsTable>
+
+### Place a modal in the Blanket.
+
+Let the Blanket place the modal. Do not detach it to move things around: the pads are the closest a modal gets to the screen edge.
+
+Do: Center the Dialog on the Blanket with the built-in pads.
+
+Don't: Detach or shift the panel past the Blanket edge pads.
+
+### Blanket content guidelines
+
+The Blanket holds no text of its own. The words belong to the Dialog it holds.
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Title a confirm with the question: "Discard changes?"</td><td>A second dialog that repeats the first one's title.</td></tr>
+<tr><td>Name the confirm's primary action for what it does: "Discard changes".</td><td>"OK" or "Yes".</td></tr>
+</tbody>
+</DocsTable>
+
+### Blanket accessibility
+
+- The Blanket is a layout layer with no role. The Dialog inside it is the `dialog`.
+- The blanket is a pointer shortcut, not a control. A keyboard closes a dialog from inside it, so the blanket takes no role and no key handler.
+- The blanket at `--ds-blanket` keeps the dialog legible in Light and Dark. The toolbar's Contrast switch changes it with the rest of the page.
+- A layer wider than a narrow screen keeps its width, and the Blanket scrolls.
+
+### Blanket playground
+
+<DocsInteractivePlayground
+    of={ModalStories.BlanketInteractive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong>inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+### Blanket related
+
+- <DocsLink id="templates-panel">Panel</DocsLink> floats beside the page for a task that needs it in view, with no Blanket.
+- <DocsLink id="templates-frame">Frame</DocsLink> shows the floating Sidebar and the floating AI panel, which take a shadow and no blanket.
+
+### Blanket motion
+
+<MotionSection component="Blanket" tier="template" />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Modal" tier="template" />
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="code">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Slots
+
+```jsx
+import { Modal } from '@/templates';
+import { Button } from '@/components';
+```
+
+`Modal` places `Dialog` (`@/components`) on the Blanket with Base UI portal, focus trap, Escape, scroll lock and focus return.
+
+<DocsTable>
+<thead>
+<tr><th>Slot or prop</th><th>Holds</th></tr>
+</thead>
+<tbody>
+<tr><td><code>title</code> · <code>onClose</code></td><td>The h1 and the Close icon button.</td></tr>
+<tr><td><code>width</code></td><td><code>4-col</code> · <code>6-col</code> · <code>8-col</code> · <code>10-col</code>.</td></tr>
+<tr><td><code>body</code></td><td>Text, a list, fields or a table. It scrolls past the cap.</td></tr>
+<tr><td><code>footer</code> or <code>primaryButton</code> · <code>secondaryButton</code></td><td>The footer's buttons. Leave them out for Passive.</td></tr>
+<tr><td><code>blanket</code> · <code>keyboard</code></td><td>Whether a Blanket press or Escape closes the Modal (`true` by default; <code>blanket="static"</code> keeps it open).</td></tr>
+<tr><td>Full-bleed footer <PlannedTag /></td><td>Planned. Cells that fill the footer edge to edge, 48 high (a 32 button plus 16 pad, so full bleed never changes the Modal's height), with the inner corners squared. Today the page composes it from Button.</td></tr>
+<tr><td><code>tabs</code></td><td>Two to five views of one thing under the title.</td></tr>
+<tr><td><code>confirmView</code> <PlannedTag /></td><td>Planned. The swapped title, body and footer for a confirm about the Modal itself. Today the caller swaps them in place.</td></tr>
+<tr><td>Blocked-submit shake <PlannedTag /></td><td>Planned. The Modal's single shake when a submit is blocked.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use a Modal when the next step has to happen before anything else can: a confirm, a rare critical task with fewer than five fields, something to read before going on. It is always centered over a Blanket. A Panel that needs full attention becomes a Modal.
+
+<DocsTable>
+<thead>
+<tr><th>Type</th><th>Use when</th><th>Footer</th></tr>
+</thead>
+<tbody>
+<tr><td>Passive</td><td>Something to read, with nothing to decide</td><td>None; Close only</td></tr>
+<tr><td>Active</td><td>A choice, a confirm or a short form</td><td>Secondary (such as Discard or Keep) and the action; no Cancel</td></tr>
+<tr><td>Acknowledge</td><td>One thing to read and accept</td><td>One button</td></tr>
+<tr><td>Steps</td><td>A short ordered sequence</td><td>Back and Next</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For the dialog panel itself with no Blanket or modal behavior, use `Dialog` (`@/components`).
+- For content read beside the page, use `Panel`.
+- For a short aside off a control, use `Popup`.
+- For a long or stepped task, use `Frame`.
+- For a passing notice, use `Flag`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Open a Modal only from a person's action.
+
+<RuleTag kind="review" />
+
+A button, a link, an icon. Never on its own.
+
+Do: Open a Modal when a person clicks an action or trigger.
+
+Don't: Open a Modal automatically on page load.
+
+### Size a confirm at the smallest step and step up with a detail line or a field.
+
+<RuleTag kind="review" />
+
+A confirm takes 4-col or 6-col; a short form is 8-col; a table, editor or steps is 10-col. Choose width by task.
+
+<DoDontPair
+    doExample={<ConfirmNarrow />}
+    doCode={CODE.ConfirmNarrow}
+    doCaption="A confirm at the narrow step: the title, one line and two buttons."
+    dontExample={<ConfirmWide />}
+    dontCode={CODE.ConfirmWide}
+    dontCaption="The same confirm at a wide step: empty width around one line, picked to make it look a certain way."
+/>
+
+### Confirm inside the Modal, and never open a Modal on another Modal.
+
+<RuleTag kind="automatic" />
+
+Stacking holds the rule. The overlay module keeps a second Modal closed and calls its `onClose`.
+
+<DoDontPair
+    doExample={<ConfirmsInside />}
+    doCode={CODE.ConfirmsInside}
+    doCaption="One Modal that confirms inside itself, with a message and its own buttons."
+    dontExample={<ModalOnModal />}
+    dontCode={CODE.ModalOnModal}
+    dontCaption="A Modal opened on another Modal, a second Blanket dimming the first."
+/>
+
+### Scroll the body between a fixed header and footer.
+
+<RuleTag kind="automatic" />
+
+Each width has a maximum height, the screen less `--blanket-pad-y` above and below. Header and footer are pinned and the footer never moves. Actions never sit in the body, which scrolls away; a missing-field error shows on the field and the body scrolls to it, and a rejected submit shows its message at the top of the body.
+
+<DoDontPair
+    doExample={<FooterPinnedModal />}
+    doCaption="Past the cap the body scrolls; the footer stays pinned with its buttons."
+    dontExample={<ButtonInBodyModal />}
+    dontCaption="The button inside the scrolling body: it scrolls out of reach."
+/>
+
+### Use tabs for views, not steps.
+
+<RuleTag kind="review" />
+
+Two to five views of one thing opened in any order; one footer saves them all. Views in order are Steps, with Back and Next in the footer.
+
+<DoDontPair
+    doExample={<StepsFooterModal />}
+    doCaption="Views in order are Steps: Back and Next split across the footer."
+    dontExample={<TabsForStepsModal />}
+    dontCaption="Numbered tabs as steps: any order, one Save, nothing to go back to."
+/>
+
+Footer buttons, real actions and Close, and which destructive tier, including type the name: <DocsLink id="patterns-common-actions">Common actions</DocsLink>. A blocked submit: <DocsLink id="patterns-forms">Forms</DocsLink>. The sending button: <DocsLink id="patterns-states-loading">Loading</DocsLink>.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Title a confirm with the question: "Delete this session?"</td><td>"Are you sure?" or "Warning".</td></tr>
+<tr><td>Give the consequence in one line: "This cannot be undone."</td><td>A paragraph that repeats the title.</td></tr>
+<tr><td>Name the action after the question: "Delete session".</td><td>"OK" or "Yes".</td></tr>
+<tr><td>On the last step, name Next after the outcome: "Schedule".</td><td>"Finish".</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- The Modal is a dialog named by its title, which is its h1; a Section inside opens at h2. A Modal with a custom header needs its own name.
+- Focus moves into the Dialog on open (to the first input or control) and stays trapped until it closes, while the page behind stops scrolling. Escape, Close and the Blanket close it, and focus returns to what opened it.
+- Set `blanket="static"` (or `false`) for an inline confirmation of a destructive action so a stray click outside does not abandon it.
+- A body that scrolls is a tab stop. With tabs, Left and Right move between tabs and the panel is named by its tab.
+- A blocked submit announces the first error; with reduced motion the color, icon, message and focus move carry it without the shake.
+- Close is named "Close". The Danger button in a type-the-name confirm stays disabled until the name matches, and the caption carries the reason.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <DocsLink id="components-messaging-dialog">Dialog</DocsLink>: use when drawing the dialog panel itself with no Blanket or modal behavior, such as in docs and mockups.
+- <DocsLink id="templates-form">Form</DocsLink>: use when the Modal holds fields.
+- <DocsLink id="templates-panel">Panel</DocsLink>: use when the page must stay usable.
+- <DocsLink id="templates-popup">Popup</DocsLink>: use when the content is a menu or a short list.
+- <DocsLink id="patterns-overview">Patterns</DocsLink>: use when you need the rules across Modals: <DocsLink id="patterns-common-actions">Common actions</DocsLink>, <DocsLink id="patterns-forms">Forms</DocsLink>, Errors, Loading.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

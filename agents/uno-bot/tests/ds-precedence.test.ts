@@ -65,16 +65,16 @@ const MEMBERS = ["U0MEMBER1", "U0MEMBER2"];
 
 // ── Fixtures (#339) ──────────────────────────────────────────────────────────
 
-/** The design-system facts, as baked: three components, an alias and a pattern. */
+/** The design-system facts, as baked: three components, an alias and a template. */
 const FACTS: BakedDsFacts = {
   components: [
     { name: "Button", kind: "component", doc: "design-system/src/components/forms-and-inputs/Button/index.md" },
     { name: "Tooltip", kind: "component", doc: "design-system/src/components/overlays-and-layering/Tooltip/index.md" },
     { name: "TreeSelect", kind: "component", doc: "design-system/src/components/forms-and-inputs/TreeSelect.md" },
     { name: "Scale", kind: "component", doc: "design-system/src/components/forms-and-inputs/RadioButtonGroup.md", aliasOf: "RadioButtonGroup" },
-    { name: "PatternCard", kind: "pattern", import: "import { PatternCard } from '@/patterns';" },
+    { name: "Card", kind: "template", import: "import { Card } from '@/templates';" },
   ],
-  barrels: { "@/components": ["Button", "Scale", "Tooltip", "TreeSelect"], "@/patterns": ["PatternCard"] },
+  barrels: { "@/components": ["Button", "Scale", "Tooltip", "TreeSelect"], "@/templates": ["Card"] },
   tokenGroups: [],
   tokens: [],
   inventions: { components: [], props: [], tokens: [] },
@@ -252,7 +252,7 @@ describe("the comparison", () => {
     assert.equal(losingSide("code", "spec-pages"), "spec-pages");
   });
 
-  it("reads the baked facts as the existence list, aliases and patterns left out", () => {
+  it("reads the baked facts as the existence list, aliases and templates left out", () => {
     assert.deepEqual(
       INDEX.map((e) => [e.name, e.docPath]),
       [

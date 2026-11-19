@@ -8,18 +8,18 @@
     {
       "id": "reviews-page",
       "screen": "Monthly reviews list page",
-      "template": "Page + PatternSection + Table",
-      "variant": "Page · Default / PatternSection · Toolbar / Table",
-      "page": "design-system/src/patterns/PatternSection/index.md",
+      "template": "Page + Section + Table",
+      "variant": "Page · Default / Section · Toolbar / Table",
+      "page": "design-system/src/templates/Section/index.md",
       "section": "Anatomy",
       "pages": [
-        "design-system/src/patterns/Page/index.md",
-        "design-system/src/patterns/PatternSection/index.md",
-        "design-system/src/patterns/Table/index.md"
+        "design-system/src/templates/Page/index.md",
+        "design-system/src/templates/Section/index.md",
+        "design-system/src/templates/Table/index.md"
       ],
       "guides": ["page", "section", "table", "templates"],
       "scoring": "judge",
-      "expectation": "Monthly reviews list brought onto PLUS Page / PatternSection structure or clean token-styled table container with status filter above the table and footer pagination."
+      "expectation": "Monthly reviews list brought onto PLUS Page / Section structure or clean token-styled table container with status filter above the table and footer pagination."
     }
   ],
   "patterns": [
@@ -67,7 +67,7 @@
     {
       "id": "pagination-in-footer",
       "placement": "Pagination in table/section footer",
-      "page": "design-system/src/patterns/PatternSection/index.md",
+      "page": "design-system/src/templates/Section/index.md",
       "section": "Best practices",
       "scoring": "checker",
       "check": {
@@ -88,7 +88,7 @@
         "kind": "no-bare-select-in-toolbar",
         "rejects": ["Select", "PopupSelect"]
       },
-      "expectation": "Counts against: placing a bare Select or PopupSelect inside PatternSection's toolbar instead of FilterButton or Tabs."
+      "expectation": "Counts against: placing a bare Select or PopupSelect inside Section's toolbar instead of FilterButton or Tabs."
     }
   ]
 }

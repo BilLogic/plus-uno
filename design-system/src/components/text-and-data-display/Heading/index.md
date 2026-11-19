@@ -8,7 +8,7 @@ Also asked as: title, headline.
 
 **Import:** `import { Heading } from '@/components';`
 
-**Used in:** Page (`ds guide page`); Card (`ds guide card`); Section (`ds guide section`); Table (`ds guide table`)
+**Used in:** Card (`ds guide card`); Page (`ds guide page`); Section (`ds guide section`); Table (`ds guide table`)
 
 **Governed by:** Empty (`ds guide empty`); Forms (`ds guide forms`); Indicators (`ds guide indicators`)
 

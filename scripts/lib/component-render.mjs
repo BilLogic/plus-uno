@@ -69,9 +69,7 @@ export function componentFacts(manifest, name, aliasRows = {}) {
     .filter((r) => r.name !== name && r.source && r.kind === record.kind && r.group === record.group)
     .map((r) => r.name)
     .sort();
-  // A template renamed from a pattern shares that pattern's source: the pattern's name is its old name.
-  const was = record.kind === 'template' ? records.find((r) => r.kind === 'pattern' && r.name !== name && r.source && r.source === record.source)?.name : null;
-  return { ...record, related, aliases: [...(aliasRows[name] ?? [])], was };
+  return { ...record, related, aliases: [...(aliasRows[name] ?? [])] };
 }
 
 /** `<dir>/index.md` for a component in a folder of its own name, `<dir>/<Name>.md` for one filed flat. */
@@ -130,7 +128,7 @@ function usageTab(page, relatedFacts, motion) {
   return d;
 }
 
-const FILTERING_GOVERNED = new Set(['SearchField', 'FilterButton', 'FilterMenu', 'PopupSelect', 'Select', 'Section', 'PatternSection']);
+const FILTERING_GOVERNED = new Set(['SearchField', 'FilterButton', 'FilterMenu', 'PopupSelect', 'Select', 'Section']);
 const FILTERING_LINE =
   'Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.';
 
@@ -160,8 +158,7 @@ export function renderComponent(facts, docs, edges) {
   d += `**Source:** ${code(facts.source)}\n\n`;
   if (facts.stories) d += `**Stories:** ${code(sibling(facts.source, '.stories.jsx'))} — ${facts.stories.join(', ') || 'none exported'}\n\n`;
   if (docs?.path) d += `**Storybook page:** ${code(docs.path)}\n\n`;
-  // A template renamed from a pattern keeps its motion row under the pattern name until the registry follows.
-  const found = motionRowOf(facts.name) ?? (facts.was ? motionRowOf(facts.was) : null);
+  const found = motionRowOf(facts.name);
   const motion = found && { ...found, name: facts.name };
   if (motion) d += motionLineOf(motion);
 

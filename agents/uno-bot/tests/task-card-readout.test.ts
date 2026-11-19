@@ -137,10 +137,10 @@ const ROWS: Row[] = [
   // github_read
   {
     name: "github_read",
-    args: { lookup: "card" },
-    details: "card",
-    result: ok({ lookup: "card", answer: { name: "Card", status: "not-here", replacement: ["PatternCard"] } }),
-    output: "Looked up card",
+    args: { lookup: "tile" },
+    details: "tile",
+    result: ok({ lookup: "tile", answer: { name: "Tile", status: "not-here", replacement: ["Card"] } }),
+    output: "Looked up tile",
     sources: [],
   },
   {

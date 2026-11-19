@@ -4,9 +4,9 @@ import { Button, EmptyState, FilterMenu, PopupSelect, Skeleton } from '@/compone
 import { LoadThenReveal } from '@/lib/loadRevealMotion';
 import { SwapInPlace } from '@/lib/swapMotion';
 import { Page, Card, Section, SECTION_DETAIL_FLOOR } from '@/templates';
-import { FRAME_LAYOUT } from '@/patterns/Frame/frameLayout';
-import { useOwnWidth } from '@/patterns/Frame/useOwnWidth';
-import { PageTabs, SessionsTable } from '@/patterns/Page/pageDemo.jsx';
+import { FRAME_LAYOUT } from '@/templates/Frame/frameLayout';
+import { useOwnWidth } from '@/templates/Frame/useOwnWidth';
+import { PageTabs, SessionsTable } from '@/templates/Page/pageDemo.jsx';
 import { SectionActions, categoryFilters } from '@/storybook-docs/lib/section-header.jsx';
 import { FilterSide, StudentsTable, ViewPills, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
 

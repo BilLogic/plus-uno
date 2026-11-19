@@ -89,10 +89,10 @@ test("'does PLUS have a card?' resolves to the Card template and its import, fro
   assert.equal(answer.status, "exists");
   assert.equal(answer.kind, "template");
   assert.equal(answer.import, "import { Card } from '@/templates';");
-  // The old name keeps working beside it.
-  const old = facts.find("PatternCard").answer;
+  // A name matched in another case reads the same record.
+  const old = facts.find("CARD").answer;
   assert.equal(old.status, "exists");
-  assert.equal("import" in old ? old.import : null, "import { PatternCard } from '@/patterns';");
+  assert.equal("import" in old ? old.import : null, "import { Card } from '@/templates';");
 });
 
 test("a name matched in another case is found, and a miss offers the names that contain it", () => {
@@ -110,8 +110,8 @@ test("the precedence index is the components with a generated doc, by name, with
   const button = index.find((e) => e.name === "Button");
   assert.ok(button, "Button is indexed");
   assert.match(button.docPath, /^design-system\/src\/components\/[^/]+\/Button\/index\.md$/);
-  // Patterns have no generated doc page, and Logo is implemented outside src/components.
-  assert.equal(index.some((e) => e.name === "PatternCard" || e.name === "Logo"), false);
+  // Templates are not in the index, and Logo is implemented outside src/components.
+  assert.equal(index.some((e) => e.name === "Card" || e.name === "Logo"), false);
   assert.ok(index.length > 50, `${index.length} entries`);
 });
 

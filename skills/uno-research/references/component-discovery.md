@@ -15,7 +15,7 @@ summary: How to find out whether a component already exists before proposing a n
    - When a Figma link or audit is involved, load `design-system/figma/component-registry.json` and `design-system/figma/token-registry.json` first (`../../../design-system/guidelines/figma/registry-load-gate.md`), then cross-check with `ds_find` / `ds_get`.
 
 3. **Source hierarchy (when inspecting implementation):**
-   - Templates: `design-system/src/patterns/*`
+   - Templates: `design-system/src/templates/*`
    - Components (re-exported via `@/components`): `design-system/src/components/*` and `design-system/src/dataviz/*`
    - Tokens: `design-system/src/tokens/*` (`ds_tokens` / `npm run ds -- tokens`)
 

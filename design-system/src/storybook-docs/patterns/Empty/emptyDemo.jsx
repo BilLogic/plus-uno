@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 
 import { Button, EmptyState } from '@/components';
 import { Page, Card, Section } from '@/templates';
-import { DemoPageHeader, SessionsTable } from '../../../patterns/Page/pageDemo.jsx';
-import { GonePanel } from '../../../patterns/Panel/panelDemo.jsx';
+import { DemoPageHeader, SessionsTable } from '../../../templates/Page/pageDemo.jsx';
+import { GonePanel } from '../../../templates/Panel/panelDemo.jsx';
 import { ResetExampleButton } from '@/storybook-docs/lib/reset-example.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { HeaderSearch, SectionActions, categoryFilters } from '@/storybook-docs/lib/section-header.jsx';

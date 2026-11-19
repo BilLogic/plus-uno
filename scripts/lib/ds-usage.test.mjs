@@ -67,7 +67,7 @@ test('ds/no-deep-import: a path past the barrel', () => {
   assert.deepEqual(rulesOf('p/App.jsx', "import { Button } from '@/components';\nimport '@/styles/main.scss';"), []);
   assert.deepEqual(rulesOf('p/App.jsx', "import Button from '@/components/forms-and-inputs/Button';"), ['ds/no-deep-import']);
   assert.deepEqual(rulesOf('p/App.jsx', "import X from '../../design-system/src/components/x';"), ['ds/no-deep-import']);
-  assert.deepEqual(rulesOf('p/App.jsx', "import { P } from '@plus-ds/patterns/Card';"), ['ds/no-deep-import']);
+  assert.deepEqual(rulesOf('p/App.jsx', "import { P } from '@plus-ds/templates/Card';"), ['ds/no-deep-import']);
 });
 
 // Patterns are held like components: each to its own barrel.
@@ -76,9 +76,9 @@ const patternCtx = contextFrom({
     components: [
       { name: 'Button', kind: 'component', import: "import { Button } from '@/components';", props: [{ name: 'appearance', values: ['primary'], deprecated: null }] },
       {
-        name: 'PatternCard',
+        name: 'Card',
         kind: 'pattern',
-        import: "import { PatternCard } from '@/patterns';",
+        import: "import { Card } from '@/templates';",
         props: [
           { name: 'title', values: null, deprecated: null },
           { name: 'padding', values: ['sm', 'md', 'lg'], deprecated: null },
@@ -87,52 +87,52 @@ const patternCtx = contextFrom({
       {
         name: 'Frame',
         kind: 'pattern',
-        import: "import { Frame } from '@/patterns';",
+        import: "import { Frame } from '@/templates';",
         props: [{ name: 'width', values: ['content', 'reading'], deprecated: null }],
       },
     ],
   },
   tokens: { tokens: [] },
   exported: new Set(['Button']),
-  barrels: { '@/patterns': new Set(['PatternCard', 'useOpenTabs', 'Frame']) },
+  barrels: { '@/templates': new Set(['Card', 'useOpenTabs', 'Frame']) },
 });
 const patternRules = (text) => escapesIn({ path: 'p/App.jsx', text }, patternCtx).map((f) => f.rule);
-const PATTERNS = "import { PatternCard, useOpenTabs } from '@/patterns';\nimport { Frame } from '@/patterns';\n";
+const PATTERNS = "import { Card, useOpenTabs } from '@/templates';\nimport { Frame } from '@/templates';\n";
 
 test('patterns: a valid Frame and pattern use passes', () => {
-  assert.deepEqual(patternRules(PATTERNS + '<Frame width="reading"><PatternCard title="x" padding="md" /></Frame>'), []);
-  assert.deepEqual(patternRules("import { PatternCard } from '@plus-ds/patterns';\n<PatternCard padding=\"lg\" />"), []);
+  assert.deepEqual(patternRules(PATTERNS + '<Frame width="reading"><Card title="x" padding="md" /></Frame>'), []);
+  assert.deepEqual(patternRules("import { Card } from '@plus-ds/patterns';\n<Card padding=\"lg\" />"), []);
 });
 
-test('patterns: an invented pattern name fails, with the nearest real one', () => {
-  const [f, ...rest] = escapesIn({ path: 'p/App.jsx', text: "import { PatternCrad } from '@/patterns';" }, patternCtx);
+test('patterns: an invented template name fails, with the nearest real one', () => {
+  const [f, ...rest] = escapesIn({ path: 'p/App.jsx', text: "import { Crad } from '@/templates';" }, patternCtx);
   assert.equal(rest.length, 0);
   assert.equal(f.rule, 'ds/no-unknown-component');
-  assert.match(f.fix, /PatternCard/);
-  assert.deepEqual(patternRules("import { PageShell } from '@/patterns';"), ['ds/no-unknown-component']);
+  assert.match(f.fix, /Card/);
+  assert.deepEqual(patternRules("import { PageShell } from '@/templates';"), ['ds/no-unknown-component']);
 });
 
-test('patterns: a pattern imported from a barrel that does not export it fails, naming its barrel', () => {
-  const [f] = escapesIn({ path: 'p/App.jsx', text: "import { PatternCard } from '@/components';" }, patternCtx);
+test('patterns: a template imported from a barrel that does not export it fails, naming its barrel', () => {
+  const [f] = escapesIn({ path: 'p/App.jsx', text: "import { Card } from '@/components';" }, patternCtx);
   assert.equal(f.rule, 'ds/no-unknown-component');
-  assert.match(f.fix, /@\/patterns/);
+  assert.match(f.fix, /@\/templates/);
 });
 
-test('patterns: a wrong prop or a wrong value on PatternCard or Frame fails', () => {
-  assert.deepEqual(patternRules(PATTERNS + '<PatternCard heading="x" />'), ['ds/no-unknown-prop']);
-  assert.deepEqual(patternRules(PATTERNS + '<PatternCard padding="xl" />'), ['ds/no-unknown-prop']);
+test('patterns: a wrong prop or a wrong value on Card or Frame fails', () => {
+  assert.deepEqual(patternRules(PATTERNS + '<Card heading="x" />'), ['ds/no-unknown-prop']);
+  assert.deepEqual(patternRules(PATTERNS + '<Card padding="xl" />'), ['ds/no-unknown-prop']);
   assert.deepEqual(patternRules(PATTERNS + '<Frame width="wide" />'), ['ds/no-unknown-prop']);
   assert.deepEqual(patternRules(PATTERNS + '<Frame layout="focused" />'), ['ds/no-unknown-prop']);
 });
 
-test('patterns: a namespace import of @/patterns holds its members too', () => {
-  assert.deepEqual(patternRules("import * as P from '@/patterns';\n<P.PatternCard padding=\"sm\" /><P.PatternCrad />"), ['ds/no-unknown-component']);
+test('patterns: a namespace import of @/templates holds its members too', () => {
+  assert.deepEqual(patternRules("import * as P from '@/templates';\n<P.Card padding=\"sm\" /><P.Crad />"), ['ds/no-unknown-component']);
 });
 
-test('patterns: a deep pattern import keeps its rule, and its fix names the pattern barrel', () => {
-  const [f] = escapesIn({ path: 'p/App.jsx', text: "import PatternCard from '@/patterns/PatternCard';" }, patternCtx);
+test('patterns: a deep template import keeps its rule, and its fix names the templates barrel', () => {
+  const [f] = escapesIn({ path: 'p/App.jsx', text: "import Card from '@/templates/Card';" }, patternCtx);
   assert.equal(f.rule, 'ds/no-deep-import');
-  assert.match(f.fix, /from '@\/patterns'/);
+  assert.match(f.fix, /from '@\/templates'/);
 });
 
 test('ds/no-unknown-prop: an unknown prop and an enum value outside the list', () => {
@@ -251,11 +251,11 @@ test('ds/page-starts-from-pattern: a page whose outer element is a hand-styled c
 test('ds/page-starts-from-pattern: a Frame or pattern root passes, through a fragment or a provider', () => {
   const layout = PATTERNS + 'export default function App() {\n  return (\n    <Frame width="reading">\n      <div style={{ display: \'flex\' }} />\n    </Frame>\n  );\n}\n';
   assert.deepEqual(pageRules('p/src/App.jsx', layout), []);
-  const card = PATTERNS + 'export default function Home() {\n  return (\n    <>\n      <PatternCard title="x" />\n    </>\n  );\n}\n';
+  const card = PATTERNS + 'export default function Home() {\n  return (\n    <>\n      <Card title="x" />\n    </>\n  );\n}\n';
   assert.deepEqual(pageRules('p/pages/Home/Home.jsx', card), []);
   const provided = 'export default function App() {\n  return (\n    <ThemeProvider value={t}>\n      <div className="shell" />\n    </ThemeProvider>\n  );\n}\n';
   assert.deepEqual(pageRules('p/src/App.jsx', provided), [['ds/page-starts-from-pattern', 'fail']]);
-  assert.deepEqual(pageRules('p/src/App.jsx', 'export default function App() {\n  return <div><PatternCard title="x" /></div>;\n}\n'), [], 'a bare wrapper carries no layout of its own');
+  assert.deepEqual(pageRules('p/src/App.jsx', 'export default function App() {\n  return <div><Card title="x" /></div>;\n}\n'), [], 'a bare wrapper carries no layout of its own');
   assert.deepEqual(pageRules('p/src/App.jsx', 'export default function App() {\n  return null;\n}\n'), []);
   assert.deepEqual(pageRules('p/src/App.jsx', 'export default function App() {\n  return (\n    <>\n      {open && <div className="fab" />}\n    </>\n  );\n}\n'), [], 'a conditional child is not the outer element');
 });
@@ -295,17 +295,17 @@ test('ds/placement: Select or PopupSelect without trigger in a Section toolbar f
         { name: 'PopupSelect', kind: 'component', import: "import { PopupSelect } from '@/components';", props: [{ name: 'options', values: null }, { name: 'label', values: null }, { name: 'trigger', values: null }] },
         { name: 'FilterButton', kind: 'component', import: "import { FilterButton } from '@/components';", props: [{ name: 'text', values: null }] },
         { name: 'FilterMenu', kind: 'component', import: "import { FilterMenu } from '@/components';", props: [{ name: 'categories', values: null }] },
-        { name: 'PatternSection', kind: 'pattern', import: "import { PatternSection } from '@/patterns';", props: [{ name: 'title', values: null }, { name: 'toolbar', values: null }] },
+        { name: 'Section', kind: 'pattern', import: "import { Section } from '@/templates';", props: [{ name: 'title', values: null }, { name: 'toolbar', values: null }] },
       ],
     },
     tokens: { tokens: [] },
     exported: new Set(['Select', 'PopupSelect', 'FilterButton', 'FilterMenu']),
-    barrels: { '@/patterns': new Set(['PatternSection', 'SectionToolbar']) },
+    barrels: { '@/templates': new Set(['Section', 'SectionToolbar']) },
   });
-  const head = "import { Select, PopupSelect, FilterButton, FilterMenu } from '@/components';\nimport { PatternSection, SectionToolbar } from '@/patterns';\n";
+  const head = "import { Select, PopupSelect, FilterButton, FilterMenu } from '@/components';\nimport { Section, SectionToolbar } from '@/templates';\n";
   const warn = (code) => escapesIn({ path: 'p/src/Queue.jsx', text: head + code, page: false }, placementCtx);
 
-  const f1 = warn('<PatternSection title="Queue" toolbar={<PatternSection.Toolbar filters={<Select options={[]} />} />} />');
+  const f1 = warn('<Section title="Queue" toolbar={<Section.Toolbar filters={<Select options={[]} />} />} />');
   assert.deepEqual(f1.map((f) => [f.rule, f.level]), [['ds/placement', 'fail']]);
   assert.match(f1[0].message, /Select/);
   assert.match(f1[0].fix, /FilterButton/);
@@ -316,9 +316,9 @@ test('ds/placement: Select or PopupSelect without trigger in a Section toolbar f
   assert.match(f2[0].message, /PopupSelect/);
 
   // Passing a FilterButton trigger to PopupSelect, or using FilterButton / FilterMenu directly, or Select in the body passes.
-  assert.deepEqual(warn('<PatternSection.Toolbar filters={<PopupSelect label="Status" options={[]} trigger={<FilterButton text="Status" />} />} />'), []);
-  assert.deepEqual(warn('<PatternSection.Toolbar filters={<FilterMenu categories={[]} />} />'), []);
-  assert.deepEqual(warn('<PatternSection title="Form" toolbar={<PatternSection.Toolbar filters={<FilterButton text="Status" />} />}><Select label="Role" options={[]} /></PatternSection>'), []);
+  assert.deepEqual(warn('<Section.Toolbar filters={<PopupSelect label="Status" options={[]} trigger={<FilterButton text="Status" />} />} />'), []);
+  assert.deepEqual(warn('<Section.Toolbar filters={<FilterMenu categories={[]} />} />'), []);
+  assert.deepEqual(warn('<Section title="Form" toolbar={<Section.Toolbar filters={<FilterButton text="Status" />} />}><Select label="Role" options={[]} /></Section>'), []);
 });
 
 test('ds/placement: a Banner before a sibling PageHeader warns; the Page slots pass', () => {
@@ -330,7 +330,7 @@ test('ds/placement: a Banner before a sibling PageHeader warns; the Page slots p
     barrels: facts.barrels,
     placements: facts.placements,
   });
-  const head = "import { Banner as Notice, PageHeader as Header } from '@/components';\nimport { Page } from '@/patterns';\n";
+  const head = "import { Banner as Notice, PageHeader as Header } from '@/components';\nimport { Page } from '@/templates';\n";
   const findings = (code) => escapesIn({ path: 'p/src/Queue.jsx', text: head + code, page: false }, placementCtx);
   const wrong = findings('<Page><Notice>Message</Notice><Header title="Queue" /></Page>');
   assert.deepEqual(wrong.map((f) => [f.rule, f.level]), [['ds/placement', 'warn']]);
@@ -342,7 +342,7 @@ test('ds/placement: a Banner before a sibling PageHeader warns; the Page slots p
   assert.deepEqual(findings('<><Page><Notice>Other page</Notice></Page><Page><Header title="Queue" /></Page></>'), []);
 });
 
-test('patterns: importing template and pattern motion helpers from @/patterns passes with 0 findings', () => {
+test('patterns: importing template and pattern motion helpers from @/templates passes with 0 findings', () => {
   const facts = loadFacts(REPO_ROOT);
   const realCtx = contextFrom({
     components: facts.manifests.components,
@@ -351,7 +351,7 @@ test('patterns: importing template and pattern motion helpers from @/patterns pa
     barrels: facts.barrels,
   });
   const code = [
-    "import { Frame, AreaStage, DrillStack, useDrillStack, SlideViews, StepStage, scrollToSpot, callAttention, SwapInPlace, LoadThenReveal, LoadRevealSlot, PresenceSlot, useMotionReduced, SPRINGS } from '@/patterns';",
+    "import { Frame, AreaStage, DrillStack, useDrillStack, SlideViews, StepStage, scrollToSpot, callAttention, SwapInPlace, LoadThenReveal, LoadRevealSlot, PresenceSlot, useMotionReduced, SPRINGS } from '@/templates';",
     'export default function App() {',
     '  const reduced = useMotionReduced();',
     '  const drill = useDrillStack();',
@@ -400,7 +400,7 @@ test('patterns: importing template and pattern motion helpers from @/patterns pa
     assert.match(found[1].fix, /TextField/);
     assert.match(found[2].fix, /Select/);
     assert.match(found[3].fix, /TextArea/);
-    assert.match(found[4].fix, /PatternCard|@base-ui\/react/);
+    assert.match(found[4].fix, /Card|@base-ui\/react/);
     assert.deepEqual(
     escapesIn(
       {

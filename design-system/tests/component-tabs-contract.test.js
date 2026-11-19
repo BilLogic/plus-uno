@@ -116,8 +116,8 @@ describe('which docs pages are tabbed', () => {
   });
 
   it('tabs a pattern page in its own folder', () => {
-    expect(isTabbedDocsPage('design-system/src/patterns/Modal/Modal.mdx')).toBe(true);
-    expect(isTabbedDocsPage('./design-system/src/patterns/PageTemplates/PageTemplates.mdx')).toBe(true);
+    expect(isTabbedDocsPage('design-system/src/templates/Modal/Modal.mdx')).toBe(true);
+    expect(isTabbedDocsPage('./design-system/src/templates/PageTemplates/PageTemplates.mdx')).toBe(true);
   });
 
   it('tabs a docs-only pattern page in its own folder under storybook-docs/patterns', () => {
@@ -126,7 +126,7 @@ describe('which docs pages are tabbed', () => {
   });
 
   it('leaves the flat pattern reading pages and the foundations untabbed', () => {
-    expect(isTabbedDocsPage('design-system/src/patterns/Introduction.mdx')).toBe(false);
+    expect(isTabbedDocsPage('design-system/src/templates/Introduction.mdx')).toBe(false);
     expect(isTabbedDocsPage('design-system/src/styles/Colors.mdx')).toBe(false);
     expect(TABBED_EXCEPTIONS).toEqual([]);
   });
@@ -138,7 +138,7 @@ describe('importLineFor', () => {
   });
 
   it('names a pattern from the templates barrel', () => {
-    const from = importSourceFor({ importPath: './design-system/src/patterns/Modal/Modal.stories.jsx' });
+    const from = importSourceFor({ importPath: './design-system/src/templates/Modal/Modal.stories.jsx' });
     expect(from).toBe('@/templates');
     expect(importLineFor('Modal', from)).toBe("import { Modal } from '@/templates';");
     expect(importSourceFor({ importPath: './design-system/src/components/messaging/Dialog/Dialog.stories.jsx' })).toBe('@/components');
@@ -146,7 +146,7 @@ describe('importLineFor', () => {
   });
 
   it('shows no import line on a docs-only pattern page, whose props are not its own export', () => {
-    const from = importSourceFor({ importPath: './design-system/src/patterns/PageTemplates/PageTemplates.stories.jsx' }, false);
+    const from = importSourceFor({ importPath: './design-system/src/templates/PageTemplates/PageTemplates.stories.jsx' }, false);
     expect(from).toBeNull();
     expect(importLineFor('PageLayout', from)).toBeNull();
   });
@@ -173,7 +173,7 @@ function rawGlob(repoPaths) {
 describe('the Harness tab', () => {
   const DIALOG = 'design-system/src/components/messaging/Dialog/index.md';
   const FIELDSET = 'design-system/src/components/forms-and-inputs/Fieldset.md';
-  const PATTERN = 'design-system/src/patterns/Modal/index.md';
+  const PATTERN = 'design-system/src/templates/Modal/index.md';
   const PATTERN_PAGE = 'design-system/agent-views/patterns/Filtering.md';
   const TEMPLATE_PAGE = 'design-system/agent-views/templates/Form.md';
   const FOUNDATION_PAGE = 'design-system/agent-views/foundations/Colors.md';
@@ -199,7 +199,7 @@ describe('the Harness tab', () => {
 
   it('shows exactly the generated file for a pattern', () => {
     const entry = agentViewEntry(modules, {
-      importPath: './design-system/src/patterns/Modal/Modal.stories.jsx',
+      importPath: './design-system/src/templates/Modal/Modal.stories.jsx',
     });
     expect(entry).toMatchObject({ path: PATTERN, name: 'Modal' });
     expect(entry.value).toBe(read(PATTERN));
@@ -216,7 +216,7 @@ describe('the Harness tab', () => {
 
   it('shows the generated agent file for a docs-only template page and a foundation page', () => {
     const templateEntry = agentViewEntry(modules, {
-      importPath: './design-system/src/patterns/Form/Form.stories.jsx',
+      importPath: './design-system/src/templates/Form/Form.stories.jsx',
     });
     expect(templateEntry).toMatchObject({ path: TEMPLATE_PAGE, name: 'Form' });
     expect(templateEntry.value).toBe(read(TEMPLATE_PAGE));
@@ -233,9 +233,9 @@ describe('the Harness tab', () => {
   it('resolves every template, pattern and foundation page to an existing generated file', () => {
     const pages = [
       ...fs
-        .readdirSync(path.join(REPO_ROOT, 'design-system/src/patterns'), { withFileTypes: true })
-        .filter((d) => d.isDirectory() && fs.existsSync(path.join(REPO_ROOT, `design-system/src/patterns/${d.name}/${d.name}.mdx`)))
-        .map((d) => `design-system/src/patterns/${d.name}/${d.name}.mdx`),
+        .readdirSync(path.join(REPO_ROOT, 'design-system/src/templates'), { withFileTypes: true })
+        .filter((d) => d.isDirectory() && fs.existsSync(path.join(REPO_ROOT, `design-system/src/templates/${d.name}/${d.name}.mdx`)))
+        .map((d) => `design-system/src/templates/${d.name}/${d.name}.mdx`),
       'design-system/src/storybook-docs/templates/TemplatesOverview.mdx',
       'design-system/src/storybook-docs/patterns/PatternsOverview.mdx',
       ...fs
@@ -255,9 +255,9 @@ describe('the Harness tab', () => {
   });
 
   it('is absent for a pattern page with no generated file beside it', () => {
-    expect(fs.existsSync(path.join(REPO_ROOT, 'design-system/src/patterns/PageTemplates/index.md'))).toBe(false);
+    expect(fs.existsSync(path.join(REPO_ROOT, 'design-system/src/templates/PageTemplates/index.md'))).toBe(false);
     expect(
-      agentViewEntry(modules, { importPath: './design-system/src/patterns/PageTemplates/PageTemplates.stories.jsx' }),
+      agentViewEntry(modules, { importPath: './design-system/src/templates/PageTemplates/PageTemplates.stories.jsx' }),
     ).toBeNull();
   });
 

@@ -63,9 +63,9 @@ test('initialize carries the same instructions as the local server', async () =>
   assert.match(init.instructions, /ds_find.*ds_check/s);
 });
 
-test('tools/call ds_find card answers with PatternCard', async () => {
+test('tools/call ds_find card answers with Card', async () => {
   const out = await result(await make()(rpc('tools/call', { name: 'ds_find', arguments: { query: 'card' } })));
-  assert.match(out.content[0].text, /PatternCard/);
+  assert.match(out.content[0].text, /Card/);
 });
 
 test('ds_check with code runs the checker in memory', async () => {
@@ -143,7 +143,7 @@ test('included_files in netlify.toml covers every file the five tools open', () 
     for (const rule of list.rules) traced.guide(rule);
     const found = traced.find('a table of students');
     const names = traced.find('card').results.map((r) => r.name);
-    traced.get([...new Set([...found.results.map((r) => r.name), ...names, 'Button', 'PatternCard', 'Table', 'Button.appearance', '--ds-text'])]);
+    traced.get([...new Set([...found.results.map((r) => r.name), ...names, 'Button', 'Card', 'Table', 'Button.appearance', '--ds-text'])]);
     for (const role of traced.tokens('nothing').roles) traced.tokens(role);
     traced.check({ code: "import { Button } from '@/components';\nexport default () => <Button appearance=\"x\" />;", path: 'prototypes/a.jsx' });
   } finally {

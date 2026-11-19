@@ -72,7 +72,7 @@ export const TABS = [
  */
 export const TABBED_EXCEPTIONS = [];
 
-const PATTERNS_ROOT = 'design-system/src/patterns';
+const PATTERNS_ROOT = 'design-system/src/templates';
 
 /**
  * Where docs-only template, pattern and foundation pages live and where

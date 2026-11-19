@@ -66,7 +66,7 @@ _Avoid_: \`style\`, \`fill\`
 _Avoid_: "nothing"
 `;
 
-const NAMES = ['Panel', 'Tile', 'PatternCard', 'SectionMessage', 'DropdownMenu', 'Modal', 'Flag', 'Banner'];
+const NAMES = ['Panel', 'Tile', 'Card', 'SectionMessage', 'DropdownMenu', 'Modal', 'Flag', 'Banner'];
 const facts = { names: NAMES, notHere: ['Alert', 'Dropdown'], handAliases: { SectionMessage: ['callout'], Flag: ['toast message'] } };
 
 test('parse: reads each term of a section with its avoid-words, and stops at the next ## heading', () => {
@@ -100,7 +100,7 @@ test('parse: reads each term of a section with its avoid-words, and stops at the
 test('aliases: a design-system term maps to its component, the Pattern name included, and its plain avoid-words become aliases', () => {
   const { aliases } = vocabularyAliases(parseGlossary(GLOSSARY), facts);
   assert.deepEqual(aliases, {
-    PatternCard: ['box'],
+    Card: ['box'],
     DropdownMenu: ['action list'],
     Modal: ['modal dialog'],
   });
@@ -131,7 +131,7 @@ test('parse: a word avoided "as a name" is plain for search and marked named; th
     { word: 'region', plain: true, named: true },
     { word: 'tile', plain: false },
   ]);
-  assert.deepEqual(vocabularyAliases([card], { names: ['PatternCard'] }).aliases, { PatternCard: ['box', 'region'] }, 'a named word still feeds search');
+  assert.deepEqual(vocabularyAliases([card], { names: ['Card'] }).aliases, { Card: ['box', 'region'] }, 'a named word still feeds search');
 });
 
 test('collision: an avoid-word that is another component\'s name or alias is a collision, and never an alias', () => {

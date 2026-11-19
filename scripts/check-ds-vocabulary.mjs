@@ -47,7 +47,7 @@ const GLOSSARY = DS_GLOSSARY;
 const VIEWS = 'design-system/agent-views';
 const REGISTRY = 'design-system/figma/component-registry.json';
 /** The docs pages the vocabulary binds: component, pattern and foundation pages. */
-const PAGE_ROOTS = ['design-system/src/components', 'design-system/src/patterns', 'design-system/src/styles'];
+const PAGE_ROOTS = ['design-system/src/components', 'design-system/src/templates', 'design-system/src/styles'];
 const NAME = 'check:ds-vocabulary';
 
 export { ENFORCE_STRICT, STRICT_PAGES };

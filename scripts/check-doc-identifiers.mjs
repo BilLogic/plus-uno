@@ -129,7 +129,7 @@ function collectTokens(repoRoot = REPO_ROOT) {
  */
 function collectComponents(repoRoot = REPO_ROOT) {
   const index = new Map();
-  const roots = ['components', 'dataviz', 'patterns', 'assets'].map((d) => path.join(dsSrc(repoRoot), d));
+  const roots = ['components', 'dataviz', 'templates', 'assets'].map((d) => path.join(dsSrc(repoRoot), d));
   const files = roots.flatMap((root) =>
     walk(root, (n) => n.endsWith('.jsx') && !/\.(stories|test)\.jsx$/.test(n), repoRoot),
   );

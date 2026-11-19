@@ -7,7 +7,7 @@ import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { alpha, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
-import { EMPTY, FILLED, FormInModal, FormInPage, FormInPanel, FormInSteps, PAGE_WIDTH } from '../../../patterns/Form/formDemo.jsx';
+import { EMPTY, FILLED, FormInModal, FormInPage, FormInPanel, FormInSteps, PAGE_WIDTH } from '../../../templates/Form/formDemo.jsx';
 import { BoundInputs, FIVE_QUESTION_STEPS, Marks, QuestionStepInWindow, SettingsPageInWindow, STAGE } from './formsDemo.jsx';
 
 /**

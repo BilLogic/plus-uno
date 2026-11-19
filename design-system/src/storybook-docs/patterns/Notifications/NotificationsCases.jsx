@@ -5,7 +5,7 @@ import { Banner, Flag, FlagGroup } from '@/components';
 import { Page, Section } from '@/templates';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { STUDENTS, StudentsTable, ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
-import { DemoPageHeader } from '../../../patterns/Page/pageDemo.jsx';
+import { DemoPageHeader } from '../../../templates/Page/pageDemo.jsx';
 
 /**
  * Interactive key cases for the Notifications pattern page, kept beside the

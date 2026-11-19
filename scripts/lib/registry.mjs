@@ -25,8 +25,8 @@ const SCSS_USE = /(@(?:use|forward|import)\s+|meta\.load-css\(\s*)(['"])([^'"\n]
 const NOT_SOURCE = /(\.stories\.|-node\.mjs$|\.test\.|\.mdx$|\.md$|(^|\/)\.storybook\/|(^|\/)storybook-docs\/|(^|\/)prototypes\/|(^|\/)(retired|deprecated|_retired|_deprecated|specs)\/)/;
 const DEPRECATED_TAG = /^\s*\*?\s*@deprecated\b/m;
 
-const BARRELS = { '@/components': `${LIBRARY}/components/index.js`, '@/patterns': `${LIBRARY}/patterns/index.js`, '@/templates': `${LIBRARY}/templates/index.js` };
-const BARREL_IMPORT = /import\s*\{([^}]*)\}\s*from\s*(['"])(@\/components|@\/patterns|@\/templates)\2;?/g;
+const BARRELS = { '@/components': `${LIBRARY}/components/index.js`, '@/templates': `${LIBRARY}/templates/index.js` };
+const BARREL_IMPORT = /import\s*\{([^}]*)\}\s*from\s*(['"])(@\/components|@\/templates)\2;?/g;
 
 /** name -> { spec, imported } for each named export a barrel re-exports from one part (`default as X` maps X to the default). */
 export function barrelMap(root, barrel) {
@@ -65,7 +65,7 @@ export function expandBarrelImports(root, text) {
 
 /** The foundation's stylesheet entry loads every component's styles; a component item brings its own. */
 export function stripComponentStyles(file, text) {
-  return file === `${LIBRARY}/styles/main.scss` ? text.replace(/^[ \t]*@include meta\.load-css\(\s*["']\.\.\/(?:components|assets|patterns)\/[^\n]*\n/gm, '') : text;
+  return file === `${LIBRARY}/styles/main.scss` ? text.replace(/^[ \t]*@include meta\.load-css\(\s*["']\.\.\/(?:components|assets|templates)\/[^\n]*\n/gm, '') : text;
 }
 
 export class Refusal extends Error {}
@@ -154,7 +154,7 @@ export function closure(root, entries) {
       if (!target) { refusals.push(`${file}: imports ${spec}, which does not resolve`); continue; }
       if (!target.startsWith(`${LIBRARY}/`)) { refusals.push(`${file}: imports ${spec}, outside the design system`); continue; }
       if (NOT_SOURCE.test(target)) { refusals.push(`${file}: imports ${spec}, an internal or retired part the registry will not ship`); continue; }
-      if (target === `${LIBRARY}/components/index.js` || target === `${LIBRARY}/patterns/index.js`) { refusals.push(`${file}: imports the ${spec} barrel; import the part directly`); continue; }
+      if (target === `${LIBRARY}/components/index.js` || target === `${LIBRARY}/templates/index.js`) { refusals.push(`${file}: imports the ${spec} barrel; import the part directly`); continue; }
       deps.push(target);
       queue.push(target);
     }
@@ -190,7 +190,7 @@ export function lockVersions(root, names) {
 const PEERS = new Set(['react', 'react-dom']);
 const target = (file) => `${TARGET}/${file.slice(LIBRARY.length + 1)}`;
 
-const FILE_TYPES = [['components/', 'registry:ui'], ['patterns/', 'registry:component'], ['dataviz/', 'registry:component'], ['templates/', 'registry:page']];
+const FILE_TYPES = [['components/', 'registry:ui'], ['templates/', 'registry:component'], ['dataviz/', 'registry:component']];
 
 function fileEntry(root, file) {
   const content = rewriteImports(file, stripComponentStyles(file, expandBarrelImports(root, read(root, file))));
@@ -204,26 +204,27 @@ export function ownerOf(file, units, foundation) {
   return units.find((c) => c.dir && file.startsWith(`${c.dir}/`))?.name ?? units.find((c) => c.main === file || c.files?.includes(file))?.name ?? null;
 }
 
-/** Patterns, as the hand-kept pattern index names them, each at the folder its barrel export comes from. */
-export function patternList(root) {
-  if (!isFile(root, PATTERN_INDEX) || !isFile(root, `${LIBRARY}/patterns/index.js`)) return [];
-  const map = barrelMap(root, `${LIBRARY}/patterns/index.js`);
-  // A row named for a template the templates barrel renamed (Section) is the item its pattern name still ships under (PatternSection).
-  const renamed = isFile(root, `${LIBRARY}/templates/index.js`) ? barrelMap(root, `${LIBRARY}/templates/index.js`) : new Map();
+/** Templates, as the hand-kept index names them, each at the folder its barrel export comes from. */
+export function templateList(root) {
+  if (!isFile(root, PATTERN_INDEX) || !isFile(root, `${LIBRARY}/templates/index.js`)) return [];
+  const map = barrelMap(root, `${LIBRARY}/templates/index.js`);
   const items = new Map();
   for (const { name } of JSON.parse(read(root, PATTERN_INDEX)).patterns) {
-    // A name the patterns barrel does not export is a component the index points at (Popup), already an item.
-    const home = map.get(name) ? { item: name, spec: map.get(name).spec } : renamed.has(name) && !map.has(name) && renamed.get(name).spec.startsWith('@/patterns/') ? { item: path.posix.basename(renamed.get(name).spec), spec: renamed.get(name).spec } : null;
-    if (home && !items.has(home.item)) items.set(home.item, { name: home.item, dir: `${LIBRARY}/${home.spec.slice(2)}`, type: 'registry:component', title: home.item });
+    // A name the templates barrel does not export from its own folder is a component the index points at (Popup), already an item.
+    const home = map.get(name);
+    if (home?.spec.startsWith('@/templates/') && !items.has(name)) items.set(name, { name, dir: `${LIBRARY}/${home.spec.slice(2)}`, type: 'registry:component', title: name });
   }
   return [...items.values()];
 }
 
-/** Page templates: one folder under `templates/` per item, named for its folder. */
-export function templateList(root) {
+/** Page templates: a folder under `templates/` with its own source file that the templates barrel does not export, one item each. */
+export function pageTemplateList(root) {
   const dir = `${LIBRARY}/templates`;
   if (!fs.existsSync(path.join(root, dir))) return [];
-  return fs.readdirSync(path.join(root, dir), { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => ({ name: e.name, dir: `${dir}/${e.name}`, type: 'registry:page', title: e.name }));
+  const exported = isFile(root, `${dir}/index.js`) ? new Set(barrelMap(root, `${dir}/index.js`).keys()) : new Set();
+  return fs.readdirSync(path.join(root, dir), { withFileTypes: true })
+    .filter((e) => e.isDirectory() && !exported.has(e.name) && isFile(root, `${dir}/${e.name}/${e.name}.jsx`))
+    .map((e) => ({ name: e.name, dir: `${dir}/${e.name}`, type: 'registry:page', title: e.name }));
 }
 
 const CHART_THEME = 'chart-theme';
@@ -279,7 +280,7 @@ export function buildRegistry(root, release) {
     meta: stamp,
   }];
 
-  const units = [...components.map((c) => ({ ...c, type: 'registry:ui', title: c.name })), ...patternList(root), ...templateList(root), ...chartList(root)];
+  const units = [...components.map((c) => ({ ...c, type: 'registry:ui', title: c.name })), ...templateList(root), ...pageTemplateList(root), ...chartList(root)];
   const seen = new Set(['foundation']);
   for (const u of units) {
     if (seen.has(u.name)) refusals.push(`${u.name}: more than one registry item has this name`);
@@ -318,7 +319,7 @@ export function buildRegistry(root, release) {
   return { items, refusals: [...new Set(refusals)] };
 }
 
-/** A pattern's folder also holds docs examples and demos built on the docs chrome; they stay behind (`bare`). */
+/** A template's folder also holds docs examples and demos built on the docs chrome; they stay behind (`bare`). */
 const EXAMPLE = /\.examples\.|[dD]emo\.jsx$|Cases\.jsx$/;
 
 function walkSource(root, dir, bare = false) {

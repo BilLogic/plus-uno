@@ -13,16 +13,16 @@
       "page": "design-system/agent-views/templates/Form.md",
       "section": "Anatomy",
       "pages": [
-        "design-system/src/patterns/Page/index.md",
+        "design-system/src/templates/Page/index.md",
         "design-system/agent-views/templates/Form.md"
       ],
       "guides": ["page", "form", "templates"],
       "scoring": "checker",
       "check": {
         "kind": "template",
-        "components": ["Page", "PatternSection", "PatternCard"]
+        "components": ["Page", "Section", "Card"]
       },
-      "expectation": "Form hosted on a Page, PatternSection, or PatternCard template with stacked fields and footer actions."
+      "expectation": "Form hosted on a Page, Section, or Card template with stacked fields and footer actions."
     }
   ],
   "patterns": [

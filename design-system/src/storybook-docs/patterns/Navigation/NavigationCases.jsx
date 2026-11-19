@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Breadcrumb, PageHeader } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { Page, Section } from '@/templates';
-import { SessionsTable, STUDENT_SESSION_CARDS, UPCOMING_SESSIONS } from '../../../patterns/Page/pageDemo.jsx';
+import { SessionsTable, STUDENT_SESSION_CARDS, UPCOMING_SESSIONS } from '../../../templates/Page/pageDemo.jsx';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { StudentsTable } from '@/storybook-docs/lib/view-bar.jsx';
 

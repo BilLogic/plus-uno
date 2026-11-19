@@ -41,15 +41,15 @@ export function checkPatterns(rows, { lookup, exists, required }) {
     const extra = Object.keys(r).filter((k) => !ROW_FIELDS.has(k));
     if (extra.length) problems.push(`${r.name}: ${extra.map((k) => `\`${k}\``).join(', ')} come from source; a row keeps only group, name and use`);
     const answer = lookup(r.name);
-    if (answer.status !== 'exists' || !['pattern', 'template', 'component'].includes(answer.kind)) {
-      problems.push(`${r.name} is not a pattern or component the design system exports`);
+    if (answer.status !== 'exists' || !['template', 'component'].includes(answer.kind)) {
+      problems.push(`${r.name} is not a template or component the design system exports`);
       continue;
     }
     const doc = docOf(answer, r.name);
     if (!doc || !exists(doc)) problems.push(`${r.name}: ${doc ?? 'its source'} is not a file`);
   }
   const listed = new Set(rows.map((r) => r.name));
-  for (const name of required) if (!listed.has(name)) problems.push(`${name} is a pattern and missing from the list`);
+  for (const name of required) if (!listed.has(name)) problems.push(`${name} is a template and missing from the list`);
   return problems;
 }
 
@@ -76,13 +76,8 @@ export function readPatterns(repoRoot) {
 /** The component index that renders the Templates table. */
 export const OVERVIEW_FILE = 'design-system/agent-views/components/index.md';
 
-/** Every pattern the facts hold: the `@/patterns` barrel's. */
-const patternNames = (facts) => {
-  const all = facts.manifests.components.components;
-  // An old pattern name beside the template it was renamed to (same source) is listed once, under the template's name.
-  const renamed = new Set(all.filter((c) => c.kind === 'template' && c.source).map((c) => c.source));
-  return all.filter((c) => (c.kind === 'template' || (c.kind === 'pattern' && !renamed.has(c.source)))).map((c) => c.name);
-};
+/** Every template the facts hold: the `@/templates` barrel's. */
+const patternNames = (facts) => facts.manifests.components.components.filter((c) => c.kind === 'template').map((c) => c.name);
 
 /** The committed list, read against the real facts and the rendered index. */
 export function checkCommitted(repoRoot) {

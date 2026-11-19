@@ -9,7 +9,7 @@ import {
     RecordTabSection,
     SessionsTable,
     STUDENT_SESSION_CARDS,
-} from '../../../patterns/Page/pageDemo.jsx';
+} from '../../../templates/Page/pageDemo.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { RECORD_CRUMBS } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { SectionActions } from '@/storybook-docs/lib/section-header.jsx';

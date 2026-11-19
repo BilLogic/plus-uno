@@ -7,8 +7,8 @@ import { FilterSide, StudentsTable, ViewPills, useLayerMount } from '@/storybook
 import { CaseBlanket, CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { MultiStepTaskType } from '@/storybook-docs/lib/multi-step-task.jsx';
-import { FILLED, FormInPage, PAGE_WIDTH as FORM_PAGE_WIDTH } from '../../../patterns/Form/formDemo.jsx';
-import { ModalStage, TwoCells } from '../../../patterns/Modal/modalDemo.jsx';
+import { FILLED, FormInPage, PAGE_WIDTH as FORM_PAGE_WIDTH } from '../../../templates/Form/formDemo.jsx';
+import { ModalStage, TwoCells } from '../../../templates/Modal/modalDemo.jsx';
 
 /**
  * The Common actions pattern's examples: real Buttons, placed where each

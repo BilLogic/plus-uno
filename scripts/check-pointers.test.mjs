@@ -216,8 +216,8 @@ const pattern = (href) => `import { Meta } from '@storybook/addon-docs/blocks';
 Where the filters sit: <a target="_top" href="./?path=/docs/${href}">Section</a>.
 `;
 const crossRepo = (href) => repo('# Router\n', {
-  'design-system/src/patterns/Section/Section.mdx': SECTION_PAGE,
-  'design-system/src/patterns/Section/Section.stories.jsx': SECTION_STORIES,
+  'design-system/src/templates/Section/Section.mdx': SECTION_PAGE,
+  'design-system/src/templates/Section/Section.stories.jsx': SECTION_STORIES,
   'design-system/src/storybook-docs/patterns/Filtering/Filtering.mdx': pattern(href),
 });
 

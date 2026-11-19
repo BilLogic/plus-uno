@@ -103,7 +103,7 @@ The template (`@/templates`) for how a table sits on a page: a **Section** whose
 _Avoid_: "Table component" for the template, "table pattern"
 
 **Static table**:
-A fixed grid people read, with nothing to act on: a link in a cell is fine, and rows rest or are highlighted. Which table type to use is `design-system/src/patterns/Table/index.md` § Type guidance.
+A fixed grid people read, with nothing to act on: a link in a cell is fine, and rows rest or are highlighted. Which table type to use is `design-system/src/templates/Table/index.md` § Type guidance.
 _Avoid_: "basic table", bare "table" for this type
 
 **Dynamic table**:

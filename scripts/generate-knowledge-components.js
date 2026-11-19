@@ -89,7 +89,7 @@ Nothing here is authored, and nothing here explains a component.
 |------|----------------|---------|
 | \`components/index.md\` | \`src/components/index.js\` exports | Does this component exist? |
 | \`tokens/tokens.md\` | \`src/tokens/*.scss\` | What is this token called? |
-| \`templates/<Name>.md\` | \`src/patterns/<Name>/<Name>.mdx\` and \`src/storybook-docs/templates/TemplatesOverview.mdx\` | Docs-only template agent copies |
+| \`templates/<Name>.md\` | \`src/templates/<Name>/<Name>.mdx\` and \`src/storybook-docs/templates/TemplatesOverview.mdx\` | Docs-only template agent copies |
 | \`patterns/<Name>.md\` | \`src/storybook-docs/patterns/**/*.mdx\` | Pattern agent copies |
 | \`foundations/<Name>.md\` | \`src/styles/*.mdx\` | Foundation agent copies |
 | \`components.json\` | the barrels (\`@/components\`, \`@/templates\`), each component's and pattern's propTypes, defaults and JSDoc | For a program: which components and patterns exist (each record's \`kind\`), which props each takes, which values an enum prop accepts |

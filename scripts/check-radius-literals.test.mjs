@@ -52,7 +52,7 @@ test('a component radius property holds the same rule', () => {
 });
 
 test('JSX style objects are read the same way, and an identifier is not judged', () => {
-  const file = 'design-system/src/patterns/x/X.jsx';
+  const file = 'design-system/src/templates/x/X.jsx';
   assert.deepEqual(at(`<i style={{ borderRadius: 'var(--radius-full)' }} />`, file), []);
   assert.deepEqual(at(`<i style={{ borderRadius: r }} />`, file), []);
   assert.equal(at(`<i style={{ borderRadius: '4px' }} />`, file).length, 1);

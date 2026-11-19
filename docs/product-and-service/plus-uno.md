@@ -29,7 +29,7 @@ Counts are not kept here; they went stale every time a component landed. The gen
 | Part | Location |
 |------|----------|
 | Components, grouped by job | `design-system/src/components/` |
-| Patterns: page structure, overlays, AI chat | `design-system/src/patterns/` |
+| Patterns: page structure, overlays, AI chat | `design-system/src/templates/` |
 | Data visualizations, by question type | `design-system/src/dataviz/` |
 | Tokens (generated, never hand-edited) | `design-system/src/tokens/` |
 | Guidelines | `design-system/guidelines/` |

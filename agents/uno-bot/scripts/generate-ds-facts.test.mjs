@@ -27,7 +27,7 @@ function writeFixtureFacts(root, components) {
   );
   writeFileSync(
     join(views, "_inventions.json"),
-    JSON.stringify({ components: [{ not: "Card", use: ["PatternCard"], why: "a pattern" }], props: [], tokens: [] }),
+    JSON.stringify({ components: [{ not: "Tile", use: ["Card"], why: "a template" }], props: [], tokens: [] }),
     "utf8",
   );
 }
@@ -36,20 +36,20 @@ function writeFixtureFacts(root, components) {
 function fakeFacts() {
   const answers = {
     Button: { kind: "component", import: "import { Button } from '@/components';", group: "forms", source: "x/Button.jsx", summary: null, aliasOf: null, props: [{ name: "appearance", type: "enum", required: false, default: "primary", values: ["primary", "subtle"], description: "long words", deprecated: null }] },
-    PatternCard: { kind: "pattern", import: "import { PatternCard } from '@/patterns';", group: "Card", source: "p/PatternCard.jsx", summary: "A raised container.", aliasOf: null, props: null },
+    Card: { kind: "template", import: "import { Card } from '@/templates';", group: "Card", source: "p/Card.jsx", summary: "A raised container.", aliasOf: null, props: null },
   };
   return {
     manifests: {
-      components: { components: [{ name: "Button" }, { name: "PatternCard" }] },
+      components: { components: [{ name: "Button" }, { name: "Card" }] },
       tokens: { tokens: [{ name: "--stack-md", tier: "semantic", group: "Ladder Semantics", value: "var(--space-050)", intent: "Gap between items." }] },
     },
     lookup: (name) => ({ name, status: "exists", ...answers[name] }),
-    barrels: { "@/components": new Set(["Button", "BUTTON_SIZES"]), "@/patterns": new Set(["PatternCard"]) },
+    barrels: { "@/components": new Set(["Button", "BUTTON_SIZES"]), "@/templates": new Set(["Card"]) },
     retired: new Map([["--stack-xl", "--stack-lg"]]),
   };
 }
 
-const INVENTIONS = { components: [{ not: "Card", use: ["PatternCard"], why: "a pattern" }], props: [], tokens: [] };
+const INVENTIONS = { components: [{ not: "Tile", use: ["Card"], why: "a template" }], props: [], tokens: [] };
 
 describe("the baked DS facts", () => {
   it("keeps what the bot answers with and drops prop descriptions and empty fields", () => {
@@ -64,12 +64,12 @@ describe("the baked DS facts", () => {
         doc: "design-system/src/components/forms/Button/index.md",
         props: [{ name: "appearance", type: "enum", values: ["primary", "subtle"], default: "primary" }],
       },
-      { name: "PatternCard", kind: "pattern", import: "import { PatternCard } from '@/patterns';", group: "Card", source: "p/PatternCard.jsx", summary: "A raised container." },
+      { name: "Card", kind: "template", import: "import { Card } from '@/templates';", group: "Card", source: "p/Card.jsx", summary: "A raised container." },
     ]);
-    assert.deepEqual(baked.barrels, { "@/components": ["BUTTON_SIZES", "Button"], "@/patterns": ["PatternCard"] });
+    assert.deepEqual(baked.barrels, { "@/components": ["BUTTON_SIZES", "Button"], "@/templates": ["Card"] });
     assert.deepEqual(baked.tokens, [["--stack-md", "semantic", 0, "var(--space-050)", "Gap between items."]]);
     assert.deepEqual(baked.tokenGroups, ["Ladder Semantics"]);
-    assert.deepEqual(baked.inventions.components, [{ not: "Card", use: ["PatternCard"], why: "a pattern" }]);
+    assert.deepEqual(baked.inventions.components, [{ not: "Tile", use: ["Card"], why: "a template" }]);
     assert.deepEqual(baked.retired, [["--stack-xl", "--stack-lg"]]);
   });
 

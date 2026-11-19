@@ -127,7 +127,7 @@ test('every retired Modal component story id redirects to a live Dialog or Modal
   };
   const targets = new Set([
     ...exportIds('../design-system/src/components/messaging/Dialog/Dialog.stories.jsx', 'Components/Messaging/Dialog'),
-    ...exportIds('../design-system/src/patterns/Modal/Modal.stories.jsx', 'Templates/Modal'),
+    ...exportIds('../design-system/src/templates/Modal/Modal.stories.jsx', 'Templates/Modal'),
   ]);
   const modalRules = storyRules.filter((r) => r.from.startsWith('components-messaging-modal--'));
   assert.equal(modalRules.length, 26);
@@ -145,7 +145,7 @@ test('every retired table-pattern story id redirects to a live Table template or
       .map((m) => storybookId(title, m[1].replace(/([a-z0-9])([A-Z])/g, '$1 $2')));
   };
   const targets = new Set([
-    ...exportIds('../design-system/src/patterns/Table/Table.stories.jsx', 'Templates/Table'),
+    ...exportIds('../design-system/src/templates/Table/Table.stories.jsx', 'Templates/Table'),
     ...exportIds('../design-system/src/components/text-and-data-display/Table/TableShell.stories.jsx', 'Components/Text and data display/Table shell'),
   ]);
   const tableRules = storyRules.filter((r) => r.from.startsWith('templates-table--'));

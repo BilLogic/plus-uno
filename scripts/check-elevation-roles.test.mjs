@@ -60,7 +60,7 @@ test('every floating layer takes the overlay pair, and only the Modal blocks', (
   assert.ok(blocking, 'token-mapping.md has no Blocking shadow row');
   assert.match(blocking, /Modal/);
   assert.ok(blocking.includes('var(--ds-shadow-blocking)'), 'the Blocking shadow row does not name var(--ds-shadow-blocking)');
-  const file = 'design-system/src/patterns/Modal/Modal.scss';
+  const file = 'design-system/src/templates/Modal/Modal.scss';
   assert.match(fs.readFileSync(path.join(REPO_ROOT, file), 'utf8'), /--modal-shadow/, `${file} does not take --modal-shadow`);
   assert.equal(resolveTemplateValue('var(--modal-shadow)'), 'var(--ds-shadow-blocking)', '--modal-shadow does not resolve to --ds-shadow-blocking');
 });
@@ -79,14 +79,14 @@ test('every floating layer takes the overlay pair, and only the Modal blocks', (
  * that names another level, or a literal shadow, fails.
  */
 const SURFACES = [
-  { file: 'design-system/src/patterns/PatternCard/PatternCard.scss', rule: '.plus-template-card--dragging {', shadow: '--ds-shadow-overlay' },
+  { file: 'design-system/src/templates/Card/Card.scss', rule: '.plus-template-card--dragging {', shadow: '--ds-shadow-overlay' },
   { file: 'design-system/src/components/overlays-and-layering/Popup/Popup.scss', rule: '.plus-popup {', shadow: '--ds-shadow-overlay' },
   { file: 'design-system/src/components/messaging/Flag/Flag.scss', rule: '.plus-flag', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
   // The floating Sidebar floats, so it takes the overlay pair; the docked one stays on the sunken fill.
-  { file: 'design-system/src/patterns/Frame/Frame.scss', rule: '.plus-frame__sidebar--raised {', shadow: '--ds-shadow-overlay', fill: '--ds-surface-material-overlay' },
-  { file: 'design-system/src/patterns/Frame/Frame.scss', rule: '.plus-frame__panel--overlay,\n.plus-frame__panel--peek {\n    position', shadow: '--ds-shadow-overlay', fill: '--ds-surface-material-overlay' },
+  { file: 'design-system/src/templates/Frame/Frame.scss', rule: '.plus-frame__sidebar--raised {', shadow: '--ds-shadow-overlay', fill: '--ds-surface-material-overlay' },
+  { file: 'design-system/src/templates/Frame/Frame.scss', rule: '.plus-frame__panel--overlay,\n.plus-frame__panel--peek {\n    position', shadow: '--ds-shadow-overlay', fill: '--ds-surface-material-overlay' },
   { file: 'design-system/src/components/messaging/Dialog/Dialog.scss', rule: '.plus-dialog {', shadow: '--ds-shadow-blocking', fill: '--ds-surface-material-overlay' },
-  { file: 'design-system/src/patterns/Modal/Modal.scss', rule: '.plus-modal {', shadow: '--ds-shadow-blocking' },
+  { file: 'design-system/src/templates/Modal/Modal.scss', rule: '.plus-modal {', shadow: '--ds-shadow-blocking' },
   { file: 'design-system/src/components/forms-and-inputs/_internal/Listbox.scss', rule: '', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
   { file: 'design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.scss', rule: '.plus-dropdown-menu {', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
 ];
@@ -120,7 +120,7 @@ function resolveTemplateValue(value) {
  */
 
 const PATTERN_CARD = {
-  file: 'design-system/src/patterns/PatternCard/PatternCard.scss',
+  file: 'design-system/src/templates/Card/Card.scss',
   states: [
     ['.plus-template-card', '--ds-surface-sunken', null],
     ['.plus-template-card--surface-sunken', '--ds-surface-sunken', null],
@@ -224,7 +224,7 @@ function compiledDecls(file, selector) {
   return merged;
 }
 
-test('PatternCard pairs each surface with its shadow, at rest, lifted, pressed and dragged', () => {
+test('Card pairs each surface with its shadow, at rest, lifted, pressed and dragged', () => {
   const { file, states } = PATTERN_CARD;
   const rest = compiledDecls(file, '.plus-template-card');
   assert.equal(rest['background-color'], 'var(--ds-utility-elevation-surface-current)', `${file}: the card paints the current surface`);
@@ -259,9 +259,9 @@ test('no pattern or Popover-family stylesheet writes a literal shadow', () => {
 test('the overlay material is the ground of every floating shell, and a standalone Panel is on the page ground', () => {
   const read = (file) => fs.readFileSync(path.join(REPO_ROOT, file), 'utf8');
   // A standalone Panel sits in Layer 1 like a docked one; only a floating Panel is on the overlay material.
-  assert.match(read('design-system/src/patterns/Panel/Panel.scss'), /^\.plus-panel \{[^}]*background: var\(--ds-surface\);/m);
+  assert.match(read('design-system/src/templates/Panel/Panel.scss'), /^\.plus-panel \{[^}]*background: var\(--ds-surface\);/m);
   // Each floating shell keeps a visible edge in the material's border color, which forced colors preserve.
-  const frame = read('design-system/src/patterns/Frame/Frame.scss');
+  const frame = read('design-system/src/templates/Frame/Frame.scss');
   assert.match(frame, /\.plus-frame__sidebar--raised \{[^}]*outline: var\(--border-width-default\) solid var\(--ds-border-material\)/);
   assert.match(frame, /\.plus-frame__panel--peek \{[^}]*border-inline-start-color: var\(--ds-border-material\)/);
   assert.match(read('design-system/src/components/messaging/Dialog/Dialog.scss'), /\.plus-dialog \{[^}]*outline: var\(--border-width-default\) solid var\(--ds-border-material\)/);

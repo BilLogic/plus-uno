@@ -33,13 +33,13 @@
 /** role: [token, source SCSS relative to design-system/src] */
 const ROLES = {
   // Frame and Page
-  pageSurface: ['--ds-surface', 'patterns/Frame/Frame.scss'],
+  pageSurface: ['--ds-surface', 'templates/Frame/Frame.scss'],
   pageEdge: ['--ds-border-surface', 'styles/_surface-edge.scss'],
-  frameSunken: ['--ds-surface-sunken', 'patterns/Frame/Frame.scss'],
-  frameDivider: ['--ds-border', 'patterns/Frame/Frame.scss'],
+  frameSunken: ['--ds-surface-sunken', 'templates/Frame/Frame.scss'],
+  frameDivider: ['--ds-border', 'templates/Frame/Frame.scss'],
   // Sidebar
-  sidebarOverlaySurface: ['--ds-surface-material-overlay', 'patterns/Frame/Frame.scss'],
-  sidebarOverlayShadow: ['--ds-shadow-overlay', 'patterns/Frame/Frame.scss'],
+  sidebarOverlaySurface: ['--ds-surface-material-overlay', 'templates/Frame/Frame.scss'],
+  sidebarOverlayShadow: ['--ds-shadow-overlay', 'templates/Frame/Frame.scss'],
   sidebarSelected: ['--ds-background-selected', 'components/navigation/Sidebar/Sidebar.scss'],
   sidebarIcon: ['--ds-icon-subtle', 'components/navigation/Sidebar/Sidebar.scss'],
   // Section and Card
@@ -54,14 +54,14 @@ const ROLES = {
   // Tooltip: a flat label, no shadow, the fill and text flip with the mode
   tooltipSurface: ['--ds-background-neutral-bold', 'components/overlays-and-layering/Tooltip/Tooltip.scss'],
   tooltipText: ['--ds-text-inverse', 'components/overlays-and-layering/Tooltip/Tooltip.scss'],
-  panelSurface: ['--ds-surface', 'patterns/Panel/Panel.scss'],
-  panelEdge: ['--ds-border', 'patterns/Panel/Panel.scss'],
+  panelSurface: ['--ds-surface', 'templates/Panel/Panel.scss'],
+  panelEdge: ['--ds-border', 'templates/Panel/Panel.scss'],
   // A floating Panel (peek or overlay) takes Frame's overlay shadow; a docked one has none.
-  panelFloatingShadow: ['--ds-shadow-overlay', 'patterns/Frame/Frame.scss'],
+  panelFloatingShadow: ['--ds-shadow-overlay', 'templates/Frame/Frame.scss'],
   modalSurface: ['--ds-surface-material-overlay', 'components/messaging/Dialog/Dialog.scss'],
   modalShadow: ['--ds-shadow-blocking', 'tokens/ladder/_templates.scss'],
   modalDivider: ['--ds-border', 'components/messaging/Dialog/Dialog.scss'],
-  blanket: ['--ds-blanket', 'patterns/Modal/Modal.scss'],
+  blanket: ['--ds-blanket', 'templates/Modal/Modal.scss'],
   // Material: the overlay fill is `modalSurface`/`sidebarOverlaySurface`; media and control have no
   // component yet, so they are drawn from the token alone.
   materialMedia: ['--ds-surface-material-media', null],
@@ -179,12 +179,12 @@ const CORNERS = {
   button: ['--button-radius-default', 'components/forms-and-inputs/Button/Button.scss'],
   buttonCompact: ['--button-radius-compact', 'components/forms-and-inputs/Button/Button.scss'],
   buttonSpacious: ['--button-radius-spacious', 'components/forms-and-inputs/Button/Button.scss'],
-  card: ['--card-radius', 'patterns/PatternCard/PatternCard.scss'],
-  section: ['--card-radius', 'patterns/PatternCard/PatternCard.scss'],
+  card: ['--card-radius', 'templates/Card/Card.scss'],
+  section: ['--card-radius', 'templates/Card/Card.scss'],
   popup: ['--popup-radius', 'components/overlays-and-layering/Popup/Popup.scss'],
   flag: ['--popup-radius', 'components/messaging/Flag/Flag.scss'],
   tooltip: ['--radius-control-sm', 'components/overlays-and-layering/Tooltip/Tooltip.scss'],
-  modal: ['--modal-radius', 'patterns/Modal/Modal.scss'],
+  modal: ['--modal-radius', 'templates/Modal/Modal.scss'],
   field: ['--radius-control-lg', 'components/forms-and-inputs/_internal/FieldBox.scss'],
   sidebarRow: ['--frame-sidebar-row-radius', 'components/navigation/Sidebar/Sidebar.scss'],
   tab: ['--radius-control-md', 'components/navigation/Tabs/Tabs.scss'],
@@ -192,7 +192,7 @@ const CORNERS = {
   tag: ['--radius-md', 'components/labels/Tag/Tag.scss'],
   icon: ['--radius-sm', null],
   tracker: ['--radius-control-md', 'components/status-indicators/ProgressTracker/ProgressTracker.scss'],
-  cardImage: ['--card-radius', 'patterns/PatternCard/PatternCard.scss'],
+  cardImage: ['--card-radius', 'templates/Card/Card.scss'],
   shape: ['--radius-control-sm', null],
   full: ['--radius-full', 'components/status-indicators/ProgressTracker/ProgressTracker.scss'],
 };

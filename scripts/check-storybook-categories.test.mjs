@@ -36,7 +36,7 @@ function fixture(files) {
     componentGroups: { 'Forms and inputs': [], Labels: [] },
     aiComponents: ['AI message'],
     rootSources: {
-      Templates: ['design-system/src/patterns/Frame', 'design-system/src/storybook-docs/templates/'],
+      Templates: ['design-system/src/templates/Frame', 'design-system/src/storybook-docs/templates/'],
       Patterns: ['design-system/src/storybook-docs/patterns/'],
     },
     storySortOrder: [
@@ -171,7 +171,7 @@ test('the sidebar roots lead with the site sections, in order', () => {
 test('a docs page under a root the sidebar does not list goes red', () => {
   const root = fixture({
     'design-system/src/storybook-docs/Intro.mdx': '<Meta title="Getting started/Introduction" />\n',
-    'design-system/src/patterns/Frame.stories.jsx': story('Foundations/Patterns/Frame'),
+    'design-system/src/templates/Frame.stories.jsx': story('Foundations/Patterns/Frame'),
     'design-system/src/storybook-docs/patterns/Filtering.stories.jsx': story('Patterns/Filtering'),
   });
   const found = messages(root);
@@ -206,7 +206,7 @@ test('Templates and Patterns sit above Components, Templates first, and there is
 
 test('a template page and a pattern page in their own roots are green', () => {
   const root = fixture({
-    'design-system/src/patterns/Frame/Frame.stories.jsx': story('Templates/Frame'),
+    'design-system/src/templates/Frame/Frame.stories.jsx': story('Templates/Frame'),
     'design-system/src/storybook-docs/templates/Overview.mdx': '<Meta title="Templates/Overview" />\n',
     'design-system/src/storybook-docs/patterns/Overview.mdx': '<Meta title="Patterns/Overview" />\n',
   });
@@ -215,7 +215,7 @@ test('a template page and a pattern page in their own roots are green', () => {
 
 test('a template page titled under Patterns, or a pattern page under Templates, goes red', () => {
   const root = fixture({
-    'design-system/src/patterns/Frame/Frame.stories.jsx': story('Patterns/Frame'),
+    'design-system/src/templates/Frame/Frame.stories.jsx': story('Patterns/Frame'),
     'design-system/src/storybook-docs/patterns/Filtering.mdx': '<Meta title="Templates/Filtering" />\n',
   });
   const found = messages(root);
