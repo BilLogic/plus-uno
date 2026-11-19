@@ -186,7 +186,9 @@ export function loadFacts(root) {
   const optional = (name, fallback) => (fs.existsSync(path.join(views, name)) ? readJson(path.join(views, name)) : fallback);
 
   const componentManifest = readJson(manifestFile);
-  const tokenManifest = optional('tokens.json', { tokens: [] });
+  const stored = optional('tokens.json', { tokens: [] });
+  // tokens.json keeps each stylesheet's order for the docs; a lookup answers in name order.
+  const tokenManifest = { ...stored, tokens: [...stored.tokens].sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0)) };
   const inventions = optional('_inventions.json', { components: [], props: [], tokens: [] });
   const templates = optional('_templates.json', { templates: [] }).templates;
   const placements = [

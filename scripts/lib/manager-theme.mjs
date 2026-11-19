@@ -13,6 +13,7 @@
  */
 
 import { COLOR_PALETTE_FILE, COLOR_SEMANTIC_FILE, COLOR_TOKEN_DIR, TOKEN_DIR } from '../../design-system/src/lib/tokens-node.mjs';
+import { TOKEN_NAME } from '../../design-system/src/lib/tokens.mjs';
 import { REPO_ROOT, text } from './corpus.mjs';
 
 /**
@@ -74,6 +75,11 @@ export const MANAGER_MODES = {
   },
 };
 
+/** A token declared two spaces in (the palette and a semantic block), then one declared at any indent (the type scale), and a whole-value alias. */
+const INDENTED_DECLARATION = new RegExp(`^ {2}(${TOKEN_NAME}):\\s*([^;]+);`, 'gm');
+const DECLARATION = new RegExp(`^\\s*(${TOKEN_NAME}):\\s*([^;]+);`, 'gm');
+const ALIAS_OF_TOKEN = new RegExp(`^var\\((${TOKEN_NAME})\\)$`);
+
 /** Declarations of the top-level block whose selector is exactly `selector`. */
 function blockDeclarations(css, selector) {
   const open = `${selector} {\n`;
@@ -83,7 +89,7 @@ function blockDeclarations(css, selector) {
   const end = css.indexOf('\n}\n', bodyStart);
   const body = css.slice(bodyStart, end === -1 ? undefined : end);
   const out = new Map();
-  for (const [, name, value] of body.matchAll(/^ {2}(--[\w-]+):\s*([^;]+);/gm)) out.set(name, value.trim());
+  for (const [, name, value] of body.matchAll(INDENTED_DECLARATION)) out.set(name, value.trim());
   return out;
 }
 
@@ -101,7 +107,7 @@ function resolve(name, table, seen = new Set()) {
   let value = table.get(name);
   if (value === undefined || seen.has(name)) throw new Error(`manager-theme: ${name} does not resolve`);
   seen.add(name);
-  const alias = /^var\((--[\w-]+)\)$/.exec(value);
+  const alias = ALIAS_OF_TOKEN.exec(value);
   return alias ? resolve(alias[1], table, seen) : value;
 }
 
@@ -115,8 +121,8 @@ export function resolveManagerThemes({ root = REPO_ROOT } = {}) {
   const semantic = text(`${COLOR_TOKEN_DIR}/${COLOR_SEMANTIC_FILE}`, { root });
   const typeCss = text(`${TOKEN_DIR}/_type.scss`, { root });
   const primitives = new Map();
-  for (const [, name, value] of palette.matchAll(/^ {2}(--[\w-]+):\s*([^;]+);/gm)) primitives.set(name, value.trim());
-  for (const [, name, value] of typeCss.matchAll(/^\s*(--[\w-]+):\s*([^;]+);/gm)) primitives.set(name, value.trim());
+  for (const [, name, value] of palette.matchAll(INDENTED_DECLARATION)) primitives.set(name, value.trim());
+  for (const [, name, value] of typeCss.matchAll(DECLARATION)) primitives.set(name, value.trim());
 
   const themes = {};
   for (const [mode, { base, over }] of Object.entries(MANAGER_MODES)) {

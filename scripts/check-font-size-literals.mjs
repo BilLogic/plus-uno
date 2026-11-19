@@ -40,6 +40,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { TOKEN_NAME, varReferencePattern } from '../design-system/src/lib/tokens.mjs';
 import { documents } from './lib/corpus.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 
@@ -57,6 +58,9 @@ export const REMEDY =
 
 const KEYWORDS = /\b(xx-small|x-small|small|medium|large|x-large|xx-large|xxx-large|smaller|larger)\b/;
 const NUMBER = /(^|[^\w-])\d*\.?\d+/;
+const CALC_OF_TOKEN = new RegExp(`^calc\\(.*var\\(${TOKEN_NAME}\\)`);
+const TOKEN_WITH_FALLBACK = new RegExp(`var\\(${TOKEN_NAME}\\s*,`);
+const WHOLE_VAR = new RegExp(`${varReferencePattern().source}\\s*\\)`, 'g');
 
 /** Blank comments to spaces, keeping line numbers. */
 function stripComments(text, jsLike) {
@@ -71,11 +75,11 @@ function stripComments(text, jsLike) {
 export function isLiteral(value) {
   // A `calc()` that scales a token by a plain number is a size derived from
   // that token; one that adds a length (`+ 2px`) still writes a size.
-  if (/^calc\(.*var\(--[\w-]+\)/.test(value) && !/var\(--[\w-]+\s*,/.test(value)) {
-    const rest = value.replace(/var\(\s*--[\w-]+\s*\)/g, '');
+  if (CALC_OF_TOKEN.test(value) && !TOKEN_WITH_FALLBACK.test(value)) {
+    const rest = value.replace(WHOLE_VAR, '');
     return /\d(px|r?em|%|pt|v[wh]|ch|ex)\b/.test(rest) || /\d%/.test(rest);
   }
-  const rest = value.replace(/var\(\s*--[\w-]+/g, '').replace(/#\{[^}]*\}/g, '');
+  const rest = value.replace(varReferencePattern(), '').replace(/#\{[^}]*\}/g, '');
   return NUMBER.test(rest) || KEYWORDS.test(rest);
 }
 

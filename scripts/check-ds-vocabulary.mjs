@@ -43,7 +43,6 @@
  *   npm run check:ds-vocabulary -- --strict   the strict list enforced; exit 1 on its findings
  */
 
-import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -52,6 +51,7 @@ import { createPageFinder, pagesUnder, readDocsPage } from './lib/docs-page.mjs'
 import { lineOf, readJson, readText, withoutCode } from './lib/ds-check-helpers.mjs';
 import { DS_GLOSSARY, DS_SECTION, aliasInputs, componentOf, parseGlossary, vocabularyAliases } from './lib/ds-vocabulary.mjs';
 import { ENFORCE_STRICT, STRICT_PAGES } from './lib/ds-strict.mjs';
+import { trackedFiles } from './lib/tracked-sources.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const GLOSSARY = DS_GLOSSARY;
@@ -72,15 +72,9 @@ const PLAN = 'scripts/lib/tokens/plan.mjs';
 /** A token row's intent strings: `use: '…'` and `note: '…'`. */
 const INTENT = /\b(?:use|note):\s*(['"`])((?:\\.|(?!\1).)*)\1/g;
 
-function filesUnder(dir) {
-  if (!fs.existsSync(dir)) return [];
-  return fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? filesUnder(path.join(dir, e.name)) : [path.join(dir, e.name)]));
-}
-
 /** The prose sources beyond docs pages: `[{file, text}]`, the plan reduced to its intent strings, one per source line. */
 function proseSources(repoRoot) {
-  const sources = filesUnder(path.join(repoRoot, VIEWS))
-    .map((f) => path.relative(repoRoot, f).split(path.sep).join('/'))
+  const sources = trackedFiles(repoRoot, [VIEWS])
     .filter((f) => VIEW_FILE.test(f))
     .sort()
     .map((file) => ({ file, text: readText(repoRoot, file) ?? '' }));

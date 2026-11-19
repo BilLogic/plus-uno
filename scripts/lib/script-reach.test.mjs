@@ -17,7 +17,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { reachOf } from './script-reach.mjs';
+import { FLAG_NAME, reachOf } from './script-reach.mjs';
 
 /** A scratch tree with the files given, keyed by repo-relative path. */
 function tree(files) {
@@ -182,4 +182,15 @@ test('a cycle terminates', () => {
     'scripts/lib/b.mjs': "import '../check-example.mjs';",
   });
   assert.equal(reachOf('scripts/check-example.mjs', { repoRoot: root }).files.length, 3);
+});
+
+test('a flag is a flag, not a token: camelCase and underscores read, a digit start does not', () => {
+  const root = tree({
+    'scripts/check-flags.mjs': "main(url, 'x', { flags: { '--allowedTools': a, '--no_cache': b, '--1': c, '--update': d } });",
+  });
+  const reach = reachOf('scripts/check-flags.mjs', { repoRoot: root });
+  for (const flag of ['--allowedTools', '--no_cache', '--update']) assert.equal(reach.slotOf(flag), 'flags', flag);
+  assert.equal(reach.slotOf('--1'), null);
+  assert.match('--allowedTools', new RegExp(`^${FLAG_NAME}$`));
+  assert.doesNotMatch('--1', new RegExp(`^${FLAG_NAME}$`));
 });

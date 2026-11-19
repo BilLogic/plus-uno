@@ -1,14 +1,7 @@
 import React from 'react';
 import { render, screen, within } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { SpringPrimitiveTable, SpringSemanticTable, dampingOf, springValues } from './token-collection-blocks.jsx';
-
-// Vitest hands back an empty string for a `.scss?raw` import, so the spring
-// stylesheet is read from disk here; the page code is unchanged.
-vi.mock('@/tokens/ladder/_springs.scss?raw', async () => {
-    const fs = await import('node:fs');
-    return { default: fs.readFileSync(`${process.cwd()}/src/tokens/ladder/_springs.scss`, 'utf8') };
-});
 
 /** Foundations ▸ Tokens ▸ Motion shows each spring as numbers, not a raw `linear()` string. */
 describe('Motion token tables', () => {
@@ -18,7 +11,7 @@ describe('Motion token tables', () => {
         expect(dampingOf({ stiffness: 27.4, ratio: 0 })).toBe(0);
     });
 
-    it('reads the easing and settle time of each primitive from the stylesheet', () => {
+    it('reads the easing and settle time of each primitive from the token table', () => {
         const values = springValues();
         expect(values['880'].duration).toBe('224ms');
         expect(values['880'].easing).toMatch(/^linear\(/);

@@ -5,7 +5,9 @@
  *   node scripts/verify-docs-link-ids.mjs <path to index.json>
  */
 import fs from 'node:fs';
-import path from 'node:path';
+
+import { REPO_ROOT } from './lib/corpus.mjs';
+import { trackedSources } from './lib/tracked-sources.mjs';
 
 const indexPath = process.argv[2];
 if (!indexPath) {
@@ -14,19 +16,10 @@ if (!indexPath) {
 }
 const ids = new Set(Object.keys(JSON.parse(fs.readFileSync(indexPath, 'utf8')).entries));
 const roots = ['design-system/src', '.storybook'];
-const files = [];
-const walk = (d) => {
-  for (const e of fs.readdirSync(d, { withFileTypes: true })) {
-    const p = path.join(d, e.name);
-    if (e.isDirectory()) walk(p);
-    else if (/\.(mdx|jsx|js|mjs|md)$/.test(e.name) && !/\.test\./.test(e.name)) files.push(p);
-  }
-};
-roots.forEach(walk);
+const sources = trackedSources(REPO_ROOT, roots, /\.(mdx|jsx|js|mjs|md)$/).filter(({ path: file }) => !/\.test\./.test(file));
 let checked = 0;
 const missing = [];
-for (const f of files) {
-  const src = fs.readFileSync(f, 'utf8');
+for (const { path: f, text: src } of sources) {
   const hits = [
     ...[...src.matchAll(/\?path=\/(?:docs|story)\/([a-z0-9-]+(?:--[a-z0-9-]+)?)/g)].map((m) => m[1]),
     ...[...src.matchAll(/<DocsLink\b([^>]*)>/g)]
@@ -44,7 +37,7 @@ for (const f of files) {
     if (!ids.has(id)) missing.push(`${f}: ${raw}`);
   }
 }
-console.log(`checked ${checked} link ids in ${files.length} files against ${ids.size} index entries`);
+console.log(`checked ${checked} link ids in ${sources.length} files against ${ids.size} index entries`);
 if (missing.length) {
   console.log(missing.join('\n'));
   process.exit(1);
