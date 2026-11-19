@@ -177,9 +177,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Modal | `--modal-body-min-height` |  |
 | Modal | `--modal-shadow` |  |
 | Popup | `--popup-pad` (declared elsewhere) |  |
-| Popup | `--popup-width-sm` (declared elsewhere) |  |
-| Popup | `--popup-width-md` (declared elsewhere) |  |
-| Popup | `--popup-width-lg` (declared elsewhere) |  |
 | Popup | `--flag-width` (declared elsewhere) |  |
 | Popup | `--flag-stack` (declared elsewhere) |  |
 | Popup | `--popup-radius` |  |
@@ -298,6 +295,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Spotlight | `--spotlight-gap` |  |
 | Spotlight | `--spotlight-footer-stack` |  |
 | Menu group | `--menu-group-min-width` |  |
+| Popup | `--popup-range-width` |  |
 | Popup | `--popup-min-width` |  |
 | Popup | `--popup-max-width` |  |
 | Popup | `--popup-clip-reach` |  |

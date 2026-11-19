@@ -109,8 +109,8 @@ Space owned by a template: page, section, card, table, modal, popup. Inside a te
 --panel-subheader-pad-y  /* Vertical padding of a Panel subheader. */
 --panel-width-default  /* Width the Panel opens at. */
 --popup-radius  /* Corner rounding of a Popup. */
---popup-width-3-col  /* Width of a 3-column Popup, such as a short picker. */
---popup-width-4-col  /* Width of a 4-column Popup, such as a date picker or a menu with descriptions. */
+--popup-width-3-col  /* Width of a 3-column Popup: a filter menu or the profile menu. */
+--popup-width-4-col  /* Width of a 4-column Popup: content, or a stacked filter menu. The widest a Popup goes. */
 --section-toolbar-count-min-width  /* Minimum width of the result count in a Section toolbar before it truncates. */
 --section-toolbar-min-width  /* Minimum width of the start group in a Section toolbar before its controls wrap. */
 --table-empty-radius  /* Corner rounding of the empty state box that replaces an empty table. */
@@ -195,6 +195,7 @@ Tokens one component owns, named for it.
 --popup-clip-reach  /* How far past its edges a Popup's opening clip stays, so the overlay shadow is never cut. */
 --popup-max-width  /* Widest an auto-width Popup grows to fit its content, unless its trigger is wider. */
 --popup-min-width  /* Narrowest an auto-width Popup gets, unless its trigger is wider. */
+--popup-range-width  /* Width of the range picker's Popup: the presets beside the calendar. */
 --progress-bar-height  /* Height of a ProgressBar track. */
 --progress-indicator-dot-size-12  /* Dot size of a ProgressIndicator with size 12. */
 --progress-indicator-dot-size-8  /* Dot size of a ProgressIndicator with size 8. */
@@ -407,9 +408,6 @@ The templates on the page frame, per breakpoint: page, section, card, table, ove
 --popup-gap-screen  /* Space a floating layer keeps from the screen edge, such as a Flag or a listbox. */
 --popup-offset  /* Gap between a Popup, menu or Tooltip and the element that opened it. */
 --popup-pad  /* Padding inside a Popup. */
---popup-width-lg  /* Width of a large Popup. */
---popup-width-md  /* Width of a default Popup. */
---popup-width-sm  /* Width of a small Popup. */
 --section-min-width-main  /* Narrowest the main column of a two-column Section may shrink. */
 --section-min-width-side  /* Narrowest the side column of a two-column Section may shrink. */
 --section-stack-lg  /* Vertical gap between groups of blocks inside a Section. */
