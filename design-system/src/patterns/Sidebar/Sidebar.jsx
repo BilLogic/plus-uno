@@ -459,7 +459,11 @@ const PatternSidebar = ({
                                 open={all}
                                 onOpenChange={() => flip(setShowingAll, item.id)}
                             >
-                                <Collapsible.Trigger className="plus-pattern-sidebar__row">
+                                <Collapsible.Trigger
+                                    className="plus-pattern-sidebar__row"
+                                    // The extra tabs render in the sibling list, so this row owns no panel to point at.
+                                    render={({ 'aria-controls': _owned, ...props }) => <button {...props} />}
+                                >
                                     <span className="plus-pattern-sidebar__slot" aria-hidden="true" />
                                     <span className="plus-pattern-sidebar__label">{all ? 'Show less' : `Show ${more} more`}</span>
                                 </Collapsible.Trigger>

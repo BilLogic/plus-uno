@@ -59,13 +59,17 @@ describe('Sidebar disclosures', () => {
         await user.keyboard('{Enter}');
         const less = screen.getByRole('button', { name: 'Show less' });
         expect(less).toHaveAttribute('aria-expanded', 'true');
+        // The extra tabs live in the sibling list, so the row must not point at a panel that is not there.
+        document.querySelectorAll('[aria-controls]').forEach((el) => {
+            expect(document.getElementById(el.getAttribute('aria-controls'))).not.toBeNull();
+        });
         expect(screen.getByRole('button', { name: 'Five' })).toBeInTheDocument();
 
         await user.keyboard(' ');
         expect(screen.getByRole('button', { name: 'Show 2 more' })).toHaveAttribute('aria-expanded', 'false');
     });
 
-    it('opens the account menu from the keyboard and keeps the group markup free of inline sizing', async () => {
+    it('opens the account menu from the keyboard and renders each group's items in a list', async () => {
         const user = userEvent.setup();
         renderSidebar();
         const group = screen.getByRole('group', { name: 'Toolkit' });
