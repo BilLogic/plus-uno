@@ -6,10 +6,10 @@ ${body}
 
 const SIDEBAR = `<Sidebar user="tutor" activeTabId="home" account={account} />`;
 
-const BAR = (cancel) => `<CaseSurface border="top" padding="sm">
-    <FooterActions>${cancel ? '\n        <Button text="Cancel" appearance="subtle" />' : ''}
-        <Button text="Back" />
-        <Button text="Next" appearance="primary" />
+const BAR = (second) => `<CaseSurface border="top" padding="sm">
+    <FooterActions leadingAction={<Button text="Save and exit" appearance="subtle" spacing="default" />}>
+        <Button text="${second}" spacing="default" />
+        <Button text="Next" appearance="primary" spacing="default" />
     </FooterActions>
 </CaseSurface>`;
 
@@ -25,8 +25,8 @@ const PANEL = (stage, note) => `{/* ${note} */}
 </div>`;
 
 export const CODE = {
-    BarInOrder: BAR(false),
-    BarScrambled: BAR(true),
+    BarInOrder: BAR('Back'),
+    BarScrambled: BAR('Cancel'),
     MultiStepInnerSidebar: WINDOW('app.plus.org/terms/new', `    <Frame
         surfaceDirect
         sidebarDocked
@@ -43,8 +43,8 @@ export const CODE = {
         <ProgressTracker label="Steps" orientation="vertical" items={steps} />
         <Skeleton preset="text" lines={4} />
     </Frame>`),
-    AiPanelDocked: PANEL('1440', 'The stage is 1440 wide: at 1200 or more the Frame docks the panel and the Page narrows beside it.'),
-    AiPanelFloating: PANEL('1100', 'The stage is 1100 wide: under 1200 the Frame cannot dock both, so the panel floats over the Page.'),
+    AiPanelDocked: PANEL('1440', 'The stage is 1440 wide: from 1168 the Frame docks the panel (from 1408 beside an open Sidebar) and the Page narrows beside it.'),
+    AiPanelFloating: PANEL('1100', 'The stage is 1100 wide: under 1168 the Frame cannot dock a 400 panel, so it floats over the Page.'),
     BareColumn: WINDOW('app.plus.org/sign-in', `    <Frame surfaceDirect>
         <Logo />
         <TextField label="Email" type="email" />
