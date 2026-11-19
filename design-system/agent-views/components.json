@@ -175,8 +175,8 @@
     },
     {
       "name": "AiChat",
-      "kind": "pattern",
-      "import": "import { AiChat } from '@/patterns';",
+      "kind": "template",
+      "import": "import { AiChat } from '@/templates';",
       "group": "patterns",
       "source": "design-system/src/patterns/AiChat/AiChat.jsx",
       "summary": "AI chat on a Frame: a floating action button at the bottom right of the Page opens chat as a popup; from there it moves to the Frame's Panel or to full screen. It takes the Frame's props and adds the chat. - The button is the one way in. It hides while chat is open in the Panel or full screen. - The mode is remembered for the tab in sessionStorage (and an open Panel). - Under 768 the popup is shown full screen. - `variant=\"storybook\"` is the Storybook docs' chat: the same chat, with its mode remembered under its own key. - The conversation moves with the mode and is kept for the tab (the last 50 messages, under `${storageKey}-messages`), so a reload keeps it. There is no backend: `respond(text, history)` returns the reply, `history` being the turns before it as `{ role, text }`. A reply is text, or `{ text, sources }`: the pages or records it drew on list under it.",
@@ -1700,6 +1700,7 @@
           "deprecated": null
         }
       ],
+      "implementedAs": "Card",
       "stories": [
         "Overview",
         "Interactive",
@@ -4276,7 +4277,7 @@
       "import": "import { Dialog } from '@/components';",
       "group": "messaging",
       "source": "design-system/src/components/messaging/Dialog/Dialog.jsx",
-      "summary": "The dialog panel itself: header (title, optional description, header actions, close button, or custom header / tabs), scrolling body, and optional footer slots. Sizes from the screen grid (`4-col · 6-col · 8-col · 10-col`) and renders inline with no Blanket and no modal behavior. For a blocking overlay dialog with Blanket, portal, focus trap, Escape and scroll lock, use the `Modal` template from `@/patterns`.",
+      "summary": "The dialog panel itself: header (title, optional description, header actions, close button, or custom header / tabs), scrolling body, and optional footer slots. Sizes from the screen grid (`4-col · 6-col · 8-col · 10-col`) and renders inline with no Blanket and no modal behavior. For a blocking overlay dialog with Blanket, portal, focus trap, Escape and scroll lock, use the `Modal` template from `@/templates`.",
       "props": [
         {
           "name": "id",
@@ -9793,6 +9794,7 @@
           "deprecated": null
         }
       ],
+      "implementedAs": "Card",
       "stories": [
         "Overview",
         "Interactive",
@@ -9866,7 +9868,7 @@
       "import": "import { PatternSection } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/PatternSection/PatternSection.jsx",
-      "summary": "PatternSection: a span of the page grid under one heading, with its header, toolbar and tabs.",
+      "summary": "Section: a span of the page grid under one heading, with its header, toolbar and tabs.",
       "props": [
         {
           "name": "id",
@@ -9921,7 +9923,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "use `search` and `filters` in the three-row header. Toolbar row under the title row (header type `toolbar`), usually a `PatternSection.Toolbar`.",
+          "description": "use `search` and `filters` in the three-row header. Toolbar row under the title row (header type `toolbar`), usually a `Section.Toolbar`.",
           "deprecated": {
             "replacement": "search"
           }
@@ -10201,6 +10203,7 @@
           "deprecated": null
         }
       ],
+      "implementedAs": "Section",
       "stories": [
         "Overview",
         "HeaderDefault",
@@ -12994,7 +12997,7 @@
       "import": "import { Section } from '@/templates';",
       "group": "patterns",
       "source": "design-system/src/patterns/PatternSection/PatternSection.jsx",
-      "summary": "PatternSection: a span of the page grid under one heading, with its header, toolbar and tabs.",
+      "summary": "Section: a span of the page grid under one heading, with its header, toolbar and tabs.",
       "props": [
         {
           "name": "id",
@@ -13038,8 +13041,10 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Tabs row under the title row (header type `tabs`, or `tabs-only`)",
-          "deprecated": null
+          "description": "use `views` (and `format`) in the three-row header. Tabs row under the title row (header type `tabs`, or `tabs-only`).",
+          "deprecated": {
+            "replacement": "views"
+          }
         },
         {
           "name": "toolbar",
@@ -13047,8 +13052,10 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Toolbar row under the title row (header type `toolbar`), usually a `PatternSection.Toolbar`",
-          "deprecated": null
+          "description": "use `search` and `filters` in the three-row header. Toolbar row under the title row (header type `toolbar`), usually a `Section.Toolbar`.",
+          "deprecated": {
+            "replacement": "search"
+          }
         },
         {
           "name": "header",
@@ -13066,12 +13073,9 @@
           "default": null,
           "values": [
             "default",
-            "tabs",
-            "toolbar",
-            "custom",
-            "tabs-only"
+            "custom"
           ],
-          "description": "Header type. Read from the slots when left off; pass `tabs-only` to show only the tabs row",
+          "description": "Header type: `default` (title and description) or `custom` (your own `header`). Read from the slots when left off.",
           "deprecated": null
         },
         {
@@ -13328,6 +13332,7 @@
           "deprecated": null
         }
       ],
+      "implementedAs": "Section",
       "stories": [
         "Overview",
         "HeaderDefault",
@@ -13408,6 +13413,7 @@
         {
           "name": "Toolbar",
           "impl": "SectionToolbar",
+          "deprecated": true,
           "props": [
             {
               "name": "search",

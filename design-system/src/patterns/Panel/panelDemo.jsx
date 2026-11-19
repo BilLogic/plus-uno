@@ -13,7 +13,7 @@ import {
     VisuallyHidden,
 } from '@/components';
 import {
-    PatternSection,
+    Section,
     PanelBody,
     PanelCloseAction,
     PanelContainer,
@@ -23,7 +23,7 @@ import {
     PanelMoreAction,
     PanelSubheader,
     PanelUpAction,
-} from '@/patterns';
+} from '@/templates';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { WINDOW_HEIGHT } from '@/storybook-docs/lib/multi-step-task.jsx';
@@ -51,13 +51,13 @@ const SESSIONS = [
 
 /** The page under a Details Panel: the session list, the picked row highlighted while the Panel is open. */
 export const SessionsBehind = ({ picked = 1 }) => (
-    <PatternSection title="Upcoming sessions">
+    <Section title="Upcoming sessions">
         <StaticTable
             headers={['Student', 'Time', 'Status']}
             rows={SESSIONS}
             rowStates={SESSIONS.map((_, i) => (i === picked ? 'highlighted' : 'rest'))}
         />
-    </PatternSection>
+    </Section>
 );
 
 const text = (copy) => <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>{copy}</p>;

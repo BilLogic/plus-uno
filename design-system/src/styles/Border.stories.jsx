@@ -6,7 +6,7 @@ import {
     Radio,
     TextField,
 } from '@/components';
-import { Page, PatternCard, PatternSection } from '@/patterns';
+import { Page, Card, Section } from '@/templates';
 import { Do, Dont, DoDont, RingDemo } from '@/storybook-docs/foundation-blocks.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo';
 
@@ -128,7 +128,7 @@ export const FocusRingDoDont = {
 export const Dividers = {
     render: () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
-            <PatternCard>
+            <Card>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                         <span style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>Upcoming sessions</span>
@@ -153,7 +153,7 @@ export const Dividers = {
                         </div>
                     </div>
                 </div>
-            </PatternCard>
+            </Card>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', height: 'var(--control-md)' }}>
                 <Button appearance="subtle" text="Day" isSelected />
                 <span
@@ -182,7 +182,7 @@ export const SidebarEdges = {
                     breadcrumbs={[{ text: 'Home', href: '#home' }, { text: 'Sessions' }]}
                 >
                     <Page>
-                        <PatternSection title="Upcoming sessions" />
+                        <Section title="Upcoming sessions" />
                     </Page>
                 </InAppFrame>
             </Do>
@@ -204,7 +204,7 @@ export const SidebarEdges = {
                     )}
                 >
                     <Page>
-                        <PatternSection title="Upcoming sessions" />
+                        <Section title="Upcoming sessions" />
                     </Page>
                 </InAppFrame>
             </Dont>

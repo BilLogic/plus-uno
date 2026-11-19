@@ -1,5 +1,5 @@
 import React from 'react';
-import PatternSection from '@/patterns/PatternSection';
+import Section from '../PatternSection';
 import { DynamicTable, FilterButton, Icon, SearchField, StaticTable, TreeTable } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 
@@ -61,7 +61,7 @@ const listHeader = {
 const RosterSection = () => {
     const [selected, setSelected] = React.useState(['Ava Thompson', 'Marcus Lee']);
     return (
-        <PatternSection title="Students" {...listHeader}>
+        <Section title="Students" {...listHeader}>
             <DynamicTable
                 head={rosterHead}
                 rows={rosterRows}
@@ -74,7 +74,7 @@ const RosterSection = () => {
                 rowsPerPage={25}
                 totalRows={340}
             />
-        </PatternSection>
+        </Section>
     );
 };
 
@@ -206,7 +206,7 @@ const studentTable = (
 
 const InSection = ({ children }) => (
     <HeadingLevelContext.Provider value={5}>
-        <PatternSection title="Students" {...listHeader}>{children}</PatternSection>
+        <Section title="Students" {...listHeader}>{children}</Section>
     </HeadingLevelContext.Provider>
 );
 

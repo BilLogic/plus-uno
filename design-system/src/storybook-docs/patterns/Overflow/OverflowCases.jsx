@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Button } from '@/components';
-import { PatternSection } from '@/patterns';
+import { Section } from '@/templates';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { StudentsTable } from '@/storybook-docs/lib/view-bar.jsx';
 import { ClippedCell, clipStyle, LONG_TITLE } from './overflowDemo.jsx';
 
 /**
  * The live do and don't examples on the Overflow pattern page, composed from
- * `PatternSection`, `StudentsTable`, `ClippedCell`, `Button` and `CaseSurface`.
+ * `Section`, `StudentsTable`, `ClippedCell`, `Button` and `CaseSurface`.
  */
 
 const narrowSectionStyle = { maxInlineSize: 'var(--card-min-width-md)' };
@@ -16,9 +16,9 @@ const narrowSectionStyle = { maxInlineSize: 'var(--card-min-width-md)' };
 export const WrappedSectionTitleCase = () => (
     <CaseSurface>
         <div style={narrowSectionStyle}>
-            <PatternSection title={LONG_TITLE}>
+            <Section title={LONG_TITLE}>
                 <StudentsTable count={2} />
-            </PatternSection>
+            </Section>
         </div>
     </CaseSurface>
 );
@@ -27,9 +27,9 @@ export const WrappedSectionTitleCase = () => (
 export const ClippedSectionTitleCase = () => (
     <CaseSurface>
         <div style={narrowSectionStyle}>
-            <PatternSection title={<span style={clipStyle}>{LONG_TITLE}</span>}>
+            <Section title={<span style={clipStyle}>{LONG_TITLE}</span>}>
                 <StudentsTable count={2} />
-            </PatternSection>
+            </Section>
         </div>
     </CaseSurface>
 );
@@ -53,7 +53,7 @@ export const ShowMoreWithCountCase = () => {
     const [expanded, setExpanded] = useState(false);
     return (
         <CaseSurface>
-            <PatternSection
+            <Section
                 title="Students"
                 footer={(
                     <Button
@@ -65,7 +65,7 @@ export const ShowMoreWithCountCase = () => {
                 )}
             >
                 <StudentsTable count={expanded ? 6 : 2} />
-            </PatternSection>
+            </Section>
         </CaseSurface>
     );
 };
@@ -73,7 +73,7 @@ export const ShowMoreWithCountCase = () => {
 /** Don't: fading a list out hides how many items remain and gives no way to reveal them. */
 export const FadedListCase = () => (
     <CaseSurface>
-        <PatternSection title="Students">
+        <Section title="Students">
             <div
                 style={{
                     maskImage: 'linear-gradient(to bottom, black 35%, transparent)',
@@ -82,6 +82,6 @@ export const FadedListCase = () => (
             >
                 <StudentsTable count={4} />
             </div>
-        </PatternSection>
+        </Section>
     </CaseSurface>
 );

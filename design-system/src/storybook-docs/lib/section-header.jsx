@@ -3,7 +3,7 @@ import React from 'react';
 import { Button, IconButton, SearchField } from '@/components';
 
 /**
- * The parts a pattern example hands to PatternSection's header slots: the
+ * The parts a pattern example hands to Section's header slots: the
  * title row's actions, the compact Search of row 3, and the "Field: value"
  * trigger props for a category. Each part is the real PLUS component; the
  * Section draws the rows, so no example builds header markup of its own.
@@ -29,7 +29,7 @@ export const HeaderSearch = ({ label = 'Search students', ...props }) => (
 );
 
 /**
- * `filters` props for PatternSection from filter categories and their picked
+ * `filters` props for Section from filter categories and their picked
  * values. A press steps through the options and back to "All", so the trigger
  * reads "Grade: Grade 7" and takes the selected state once a value is on.
  *

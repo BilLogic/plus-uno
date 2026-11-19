@@ -12,7 +12,7 @@ import {
     Tabs,
     Heading,
 } from '@/components';
-import { Frame, PatternCard, PatternSection } from '@/patterns';
+import { Frame, Card, Section } from '@/templates';
 import { ReflowStage, ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
 
 /**
@@ -97,16 +97,16 @@ export const STUDENT_SESSION_CARDS = [
 export const SessionCards = ({ items = GROUP_SESSION_CARDS }) => (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 'var(--grid-gutter)' }}>
         {items.map(([t, d]) => (
-            <PatternCard key={t} title={t} description={d} />
+            <Card key={t} title={t} description={d} />
         ))}
     </div>
 );
 
 /** A Section holding the cards under its own title. */
 export const CardsSection = ({ title, actions, description, items }) => (
-    <PatternSection title={title} description={description} actions={actions}>
+    <Section title={title} description={description} actions={actions}>
         <SessionCards items={items} />
-    </PatternSection>
+    </Section>
 );
 
 const SESSION_HEAD = { cells: ['Time', 'Tutor', 'Subject'].map((content) => ({ key: content, content, isSortable: true })) };
@@ -169,15 +169,15 @@ export const RecordTabSection = ({ tab = 'sessions', status = 'upcoming', onStat
     }
     if (tab === 'notes') {
         return (
-            <PatternSection title="Tutor notes">
-                <PatternCard title="Oct 14 reflection" description="Worked through distributive property and two-step equations together." />
-            </PatternSection>
+            <Section title="Tutor notes">
+                <Card title="Oct 14 reflection" description="Worked through distributive property and two-step equations together." />
+            </Section>
         );
     }
     return (
-        <PatternSection title="Sessions" views={<ViewSelect value={status} onChange={onStatusChange} />}>
+        <Section title="Sessions" views={<ViewSelect value={status} onChange={onStatusChange} />}>
             <SessionsTable status={status} />
-        </PatternSection>
+        </Section>
     );
 };
 

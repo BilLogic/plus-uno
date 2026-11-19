@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { Button, EmptyState } from '@/components';
-import { Page, PatternCard, PatternSection } from '@/patterns';
+import { Page, Card, Section } from '@/templates';
 import { DemoPageHeader, SessionsTable } from '../../../patterns/Page/pageDemo.jsx';
 import { GonePanel } from '../../../patterns/Panel/panelDemo.jsx';
 import { ResetExampleButton } from '@/storybook-docs/lib/reset-example.jsx';
@@ -86,13 +86,13 @@ export const EmptyType = ({ kind, spacing = 'default', action = true, onAction }
 
     if (acted && !onAction) {
         return (
-            <PatternSection
+            <Section
                 title="Students"
                 description="Lincoln Middle"
                 actions={<ResetExampleButton onReset={() => setActed(false)} />}
             >
                 <StudentsTable count={3} sortable />
-            </PatternSection>
+            </Section>
         );
     }
 
@@ -154,7 +154,7 @@ export const InTable = ({ kind = 'first' }) => {
 
     return (
         <div style={{ padding: 'var(--page-pad)', boxSizing: 'border-box' }}>
-            <PatternSection
+            <Section
                 title="Students"
                 description="Lincoln Middle"
                 actions={<SectionActions />}
@@ -172,13 +172,13 @@ export const InTable = ({ kind = 'first' }) => {
                     emptyView={emptyNode}
                     noResultsView={emptyNode}
                 />
-            </PatternSection>
+            </Section>
         </div>
     );
 };
 
 /**
- * The three empty state box cases inside a PatternSection + DynamicTable:
+ * The three empty state box cases inside a Section + DynamicTable:
  * - `nothingYet`: title, one line, default Button repeating the title row's primary action
  * - `hiddenByFilter`: title, one line, Button clearing the default filter
  * - `nothingToCreate`: title and line only
@@ -190,7 +190,7 @@ export const EmptyTableBoxCase = ({ variant }) => {
     if (variant === 'nothingToCreate') {
         return (
             <div style={{ padding: 'var(--page-pad)', boxSizing: 'border-box' }}>
-                <PatternSection title="Reflections" description="Lincoln Middle">
+                <Section title="Reflections" description="Lincoln Middle">
                     <StudentsTable
                         count={0}
                         rows={[]}
@@ -204,7 +204,7 @@ export const EmptyTableBoxCase = ({ variant }) => {
                             />
                         )}
                     />
-                </PatternSection>
+                </Section>
             </div>
         );
     }
@@ -217,7 +217,7 @@ export const EmptyTableBoxCase = ({ variant }) => {
         };
         return (
             <div style={{ padding: 'var(--page-pad)', boxSizing: 'border-box' }}>
-                <PatternSection
+                <Section
                     title="Students"
                     description="Lincoln Middle"
                     views={<ViewPills views={['All students']} />}
@@ -249,14 +249,14 @@ export const EmptyTableBoxCase = ({ variant }) => {
                             />
                         )}
                     />
-                </PatternSection>
+                </Section>
             </div>
         );
     }
 
     return (
         <div style={{ padding: 'var(--page-pad)', boxSizing: 'border-box' }}>
-            <PatternSection
+            <Section
                 title="Students"
                 description="Lincoln Middle"
                 actions={<Button text="Add students" appearance="primary" spacing="compact" onClick={() => setResolved(true)} />}
@@ -283,7 +283,7 @@ export const EmptyTableBoxCase = ({ variant }) => {
                         />
                     )}
                 />
-            </PatternSection>
+            </Section>
         </div>
     );
 };
@@ -291,9 +291,9 @@ export const EmptyTableBoxCase = ({ variant }) => {
 /** A card with nothing to show: compact, the block centered in the card. */
 export const InCard = () => (
     <div style={{ padding: 'var(--page-pad)', boxSizing: 'border-box' }}>
-        <PatternCard title="Reflections">
+        <Card title="Reflections">
             <EmptyType kind="done" spacing="compact" />
-        </PatternCard>
+        </Card>
     </div>
 );
 
@@ -304,13 +304,13 @@ export const InPanel = () => {
     return (
         <div style={{ padding: 'var(--page-pad)', boxSizing: 'border-box' }}>
             {returned ? (
-                <PatternSection
+                <Section
                     title="Sessions"
                     description="This week"
                     actions={<ResetExampleButton onReset={() => setReturned(false)} />}
                 >
                     <SessionsTable />
-                </PatternSection>
+                </Section>
             ) : (
                 <GonePanel onClose={() => setReturned(true)} />
             )}

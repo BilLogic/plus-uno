@@ -137,10 +137,10 @@ describe('importLineFor', () => {
     expect(importLineFor('Button')).toBe("import { Button } from '@/components';");
   });
 
-  it('names a pattern from the patterns barrel', () => {
+  it('names a pattern from the templates barrel', () => {
     const from = importSourceFor({ importPath: './design-system/src/patterns/Modal/Modal.stories.jsx' });
-    expect(from).toBe('@/patterns');
-    expect(importLineFor('Modal', from)).toBe("import { Modal } from '@/patterns';");
+    expect(from).toBe('@/templates');
+    expect(importLineFor('Modal', from)).toBe("import { Modal } from '@/templates';");
     expect(importSourceFor({ importPath: './design-system/src/components/messaging/Dialog/Dialog.stories.jsx' })).toBe('@/components');
     expect(importSourceFor(undefined)).toBe('@/components');
   });

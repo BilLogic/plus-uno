@@ -6,6 +6,8 @@ PLUS card: an optional image, content and footer on a `sunken`, `default`, or `r
 
 Also asked as: summary card, object card.
 
+> Implemented as `Card` in the source and exported as `Card`. Import the exported name; read the source under the implementation name.
+
 **Import:** `import { Card } from '@/templates';`
 
 **Used in:** Form (`ds guide form`); Card (`ds guide card`); Section (`ds guide section`); Table (`ds guide table`)
@@ -106,7 +108,7 @@ A card that holds actions that commit a change gets a footer, and its actions st
 - Page for the content area's own fill, header and elevation.
 - Modal for something that must be decided before the page can continue.
 
-Same group: `Frame` · `Modal` · `Page` · `Panel` · `Section` · `Table`
+Same group: `AiChat` · `Frame` · `Modal` · `Page` · `Panel` · `Section` · `Table`
 
 ## Parts
 

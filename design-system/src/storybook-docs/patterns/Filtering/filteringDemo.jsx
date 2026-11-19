@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Button, EmptyState, FilterMenu, PopupSelect, Skeleton } from '@/components';
 import { LoadThenReveal } from '@/lib/loadRevealMotion';
 import { SwapInPlace } from '@/lib/swapMotion';
-import { Page, PatternCard, PatternSection, SECTION_DETAIL_FLOOR } from '@/patterns';
+import { Page, Card, Section, SECTION_DETAIL_FLOOR } from '@/templates';
 import { FRAME_LAYOUT } from '@/patterns/Frame/frameLayout';
 import { useOwnWidth } from '@/patterns/Frame/useOwnWidth';
 import { PageTabs, SessionsTable } from '@/patterns/Page/pageDemo.jsx';
@@ -287,17 +287,17 @@ export const FilteredStudents = ({
                     style={{ minBlockSize: openMenu ? OPEN_ROOM[tier === '2c' ? 'stacked' : 'short'] : undefined }}
                 >
                     {pageTabs && pageTab === 'overview' && (
-                        <PatternSection title="Lincoln Middle">
-                            <PatternCard title="Tuesdays & Thursdays · 4:30 PM" description="Priya Nair · 8 students enrolled this term." />
-                        </PatternSection>
+                        <Section title="Lincoln Middle">
+                            <Card title="Tuesdays & Thursdays · 4:30 PM" description="Priya Nair · 8 students enrolled this term." />
+                        </Section>
                     )}
                     {pageTabs && pageTab === 'sessions' && (
-                        <PatternSection title="Sessions">
+                        <Section title="Sessions">
                             <SessionsTable />
-                        </PatternSection>
+                        </Section>
                     )}
                     {(!pageTabs || pageTab === 'students') && (
-                        <PatternSection
+                        <Section
                             title="Students"
                             description="Lincoln Middle"
                             actions={<SectionActions primary="Add students" more={false} />}
@@ -314,7 +314,7 @@ export const FilteredStudents = ({
                             onOpenFilters={() => setShowSide(true)}
                         >
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>{body}</div>
-                        </PatternSection>
+                        </Section>
                     )}
                 </Page>
             </div>

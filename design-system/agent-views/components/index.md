@@ -80,7 +80,7 @@ A template is a shell that owns the frame (fill, pad, radius, elevation) and lea
 | Panel | [`Panel`](../../src/patterns/Panel/Panel.mdx) | `import { Panel } from '@/templates';` | A full-height layer on the right with no Blanket, docked beside the Page when it fits and floating over it when it does not: `PanelContainer` and its parts (`PanelHeader`, `PanelSubheader`, `PanelBody`, `PanelFooter`), filled into the Frame's `panel`. Two types, Details and Notifications. For content that must be dealt with before anything else, use `Modal`. |
 | Overlays | [`Modal`](../../src/patterns/Modal/Modal.mdx) | `import { Modal } from '@/templates';` | The template for content that takes over the screen until it is closed: a `Dialog` (@/components) on a Blanket with modal behavior on Base UI (portal, focus trap, Escape, scroll lock). For the dialog panel inline with no Blanket or modal behavior, use `Dialog`. |
 | Popups | [`Popup`](../../src/components/overlays-and-layering/Popup/Popup.mdx) | `import { Popup } from '@/components';` | The Popups pattern is four floating layers that never block the page, each a component: `DropdownMenu` lists actions, `Popup` holds a small aside anchored to a control, `Flag` reports what just happened, `Tooltip` names a control. |
-| AI | [`AiChat`](../../src/patterns/AiChat/AiChat.mdx) | `import { AiChat } from '@/patterns';` | AI chat as a popup, in the Frame's Panel or full screen, opened from one floating button. |
+| AI | [`AiChat`](../../src/patterns/AiChat/AiChat.mdx) | `import { AiChat } from '@/templates';` | AI chat as a popup, in the Frame's Panel or full screen, opened from one floating button. |
 
 ## UI components (92)
 

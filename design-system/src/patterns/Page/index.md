@@ -37,8 +37,8 @@ Page reads these motion tokens and no literal duration or curve.
 ## Alternatives
 
 - For one task that takes the whole window, use `Frame`.
-- For a region of the page with its own heading, use `PatternSection`.
-- For one object with an agreed shape, use `PatternCard` inside a Section.
+- For a region of the page with its own heading, use `Section`.
+- For one object with an agreed shape, use `Card` inside a Section.
 
 ## Best practices
 
@@ -116,7 +116,7 @@ Which tier a message belongs to: the Notifications pattern.
 - Elevation: use when picking which shadow goes with which level.
 - Patterns: use when deciding where a breadcrumb or a tab belongs (Navigation), or choosing the StatusTag beside the title (Indicators).
 
-Same group: `Card` · `Frame` · `Modal` · `Panel` · `Section` · `Table`
+Same group: `AiChat` · `Card` · `Frame` · `Modal` · `Panel` · `Section` · `Table`
 
 ## Types
 

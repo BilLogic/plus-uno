@@ -56,7 +56,7 @@ PLUS is at most three levels deep (area, record, one record inside it), so the s
 
 Climbing back one level shrinks the page into the row it came from. Jumping back two or more levels, past a page no longer on screen, fades in place with the Breadcrumb already shorter.
 
-**Used in:** Record page, Table rows, PatternCard, Breadcrumb.
+**Used in:** Record page, Table rows, Card, Breadcrumb.
 
 ### Switch views
 

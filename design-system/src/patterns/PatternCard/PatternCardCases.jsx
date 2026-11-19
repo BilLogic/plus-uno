@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, ProgressBar, Skeleton } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
-import { PatternCard } from '@/patterns';
+import { Card } from '@/templates';
 
 /**
  * The examples of the Card page that compose a card for a job: the size pair
@@ -22,34 +22,34 @@ const InDocs = ({ children }) => <div className="sb-unstyled">{children}</div>;
 /** One number fits a small card, which is only as wide as it needs. */
 export const MetricInSmall = () => (
     <InDocs>
-        <PatternCard minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-sm)' }}>
+        <Card minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-sm)' }}>
             {metric}
-        </PatternCard>
+        </Card>
     </InDocs>
 );
 
 /** The same number in a large card leaves most of it empty. */
 export const MetricInLarge = () => (
     <InDocs>
-        <PatternCard minWidth="var(--card-min-width-lg)">
+        <Card minWidth="var(--card-min-width-lg)">
             {metric}
-        </PatternCard>
+        </Card>
     </InDocs>
 );
 
 /** The same card shell serves a metric tile, a progress display and a session summary. */
 export const CardJobs = () => (
     <div style={{ display: 'flex', gap: 'var(--grid-gutter)', flexWrap: 'wrap', alignItems: 'flex-start' }}>
-        <PatternCard minWidth="var(--card-min-width-sm)">
+        <Card minWidth="var(--card-min-width-sm)">
             {metric}
-        </PatternCard>
-        <PatternCard title="Math fluency" description="Grade 7 · this term" minWidth="var(--card-min-width-md)">
+        </Card>
+        <Card title="Math fluency" description="Grade 7 · this term" minWidth="var(--card-min-width-md)">
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                 <ProgressBar value={68} ariaLabel="68% of goals met" />
                 <p style={{ margin: 0, font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>68% of goals met</p>
             </div>
-        </PatternCard>
-        <PatternCard
+        </Card>
+        <Card
             title="Lincoln Middle · Thursday"
             description="4:30 to 5:15 PM"
             minWidth="var(--card-min-width-md)"
@@ -62,7 +62,7 @@ export const CardJobs = () => (
                 <br />
                 Room · Online
             </p>
-        </PatternCard>
+        </Card>
     </div>
 );
 
@@ -85,7 +85,7 @@ const Outline = ({ children }) => (
 /** One card: three metrics stacked in its body, split by rules. */
 export const MetricsWithDividers = () => (
     <Outline>
-        <PatternCard title="Sessions this week" style={{ maxWidth: 'var(--card-min-width-md)' }}>
+        <Card title="Sessions this week" style={{ maxWidth: 'var(--card-min-width-md)' }}>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
                 {tallies.map((row, i) => (
                     <div
@@ -99,34 +99,34 @@ export const MetricsWithDividers = () => (
                     </div>
                 ))}
             </div>
-        </PatternCard>
+        </Card>
     </Outline>
 );
 
 /** Three mini cards nested inside the card. */
 export const MetricsAsNestedCards = () => (
     <Outline>
-        <PatternCard title="Sessions this week" style={{ maxWidth: 'var(--card-min-width-md)' }}>
+        <Card title="Sessions this week" style={{ maxWidth: 'var(--card-min-width-md)' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-md)' }}>
                 {tallies.map((row) => (
-                    <PatternCard key={row[1]}>{tally(row)}</PatternCard>
+                    <Card key={row[1]}>{tally(row)}</Card>
                 ))}
             </div>
-        </PatternCard>
+        </Card>
     </Outline>
 );
 
 /** The card holds its place while it loads: skeleton bars fill the body. */
 export const LoadingInPlace = () => (
     <InDocs>
-        <PatternCard aria-busy="true" style={{ maxWidth: 'var(--card-min-width-md)' }}>
+        <Card aria-busy="true" style={{ maxWidth: 'var(--card-min-width-md)' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-md)' }}>
                 <Skeleton shape="text" width="50%" />
                 <Skeleton shape="text" width="75%" />
                 <Skeleton shape="text" width="100%" />
                 <Skeleton shape="text" width="40%" />
             </div>
-        </PatternCard>
+        </Card>
     </InDocs>
 );
 

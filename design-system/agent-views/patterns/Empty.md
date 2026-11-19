@@ -148,7 +148,7 @@ From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#Empty`.
 
 ```jsx
 import { Button, EmptyState, StaticTable } from '@/components';
-import { Table } from '@/patterns';
+import { Table } from '@/templates';
 
 function EmptyExample() {
     return (

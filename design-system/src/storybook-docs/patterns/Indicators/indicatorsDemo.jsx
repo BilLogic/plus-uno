@@ -13,7 +13,7 @@ import {
     Sidebar,
     StatusTag,
 } from '@/components';
-import { Frame, PatternCard, PatternSection } from '@/patterns';
+import { Frame, Card, Section } from '@/templates';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 
 /**
@@ -29,9 +29,9 @@ import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
  *   NotColorOnly        an icon joined to the color on a status told apart at a glance
  *   UpIsBad             a rise that is bad, in danger
  *   RollUp              a group showing the worst state among its children
- *   ChecklistCard       PatternCard checklist with aligned progress and 128 action column
- *   ChecklistOnHome     dismissible checklist card in a Home PatternSection
- *   ChecklistInPage     persistent checklist card in a page PatternSection (no X)
+ *   ChecklistCard       Card checklist with aligned progress and 128 action column
+ *   ChecklistOnHome     dismissible checklist card in a Home Section
+ *   ChecklistInPage     persistent checklist card in a page Section (no X)
  *   ChecklistInSidebar  compact checklist at the foot of the Sidebar that opens the full list
  */
 
@@ -209,7 +209,7 @@ const completeInList = (list, id) => {
 };
 
 /**
- * Checklist card built from PatternCard: title at the start, count and
+ * Checklist card built from Card: title at the start, count and
  * ProgressBar aligned to the 128 action column (96 when the 32 dismiss
  * IconButton takes the end), open steps on top with full-width buttons, and
  * done steps below with centered "Completed" text.
@@ -260,7 +260,7 @@ export const ChecklistCard = ({
 
     if (dismissible && allDone) {
         return (
-            <PatternCard data-checklist-completed-banner="">
+            <Card data-checklist-completed-banner="">
                 <div
                     style={{
                         display: 'flex',
@@ -287,7 +287,7 @@ export const ChecklistCard = ({
                         onClick={handleDismiss}
                     />
                 </div>
-            </PatternCard>
+            </Card>
         );
     }
 
@@ -336,7 +336,7 @@ export const ChecklistCard = ({
     let openOrder = 0;
 
     return (
-        <PatternCard title={title} actions={headerActions}>
+        <Card title={title} actions={headerActions}>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
                 {steps.map((step, index) => {
                     const isFirstOpen = !step.done && openOrder === 0;
@@ -422,7 +422,7 @@ export const ChecklistCard = ({
                     );
                 })}
             </div>
-        </PatternCard>
+        </Card>
     );
 };
 
@@ -443,7 +443,7 @@ export const CompactChecklist = ({
     const nextStep = ordered.find((step) => !step.done);
 
     return (
-        <PatternCard gap="sm" onClick={onOpen} data-checklist-compact="">
+        <Card gap="sm" onClick={onOpen} data-checklist-compact="">
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-md)' }}>
                 <div
                     style={{
@@ -483,28 +483,28 @@ export const CompactChecklist = ({
                     {nextStep ? nextStep.title : 'All steps completed'}
                 </Button>
             </div>
-        </PatternCard>
+        </Card>
     );
 };
 
-/** Layout 1 — Card on Home: optional setup checklist inside a Home PatternSection, dismissible. */
+/** Layout 1 — Card on Home: optional setup checklist inside a Home Section, dismissible. */
 export const ChecklistOnHome = ({ defaultSteps = HOME_CHECKLIST_STEPS, now }) => (
     <div style={{ ...frame, display: 'flex', flexDirection: 'column', gap: 'var(--page-stack-md)' }}>
-        <PatternSection title="Home" level="page">
+        <Section title="Home" level="page">
             <ChecklistCard
                 title="Get ready for your first session"
                 defaultSteps={defaultSteps}
                 dismissible
                 now={now}
             />
-        </PatternSection>
+        </Section>
     </div>
 );
 
-/** Layout 2 — Card in a page: required compliance checklist inside a page PatternSection, persistent with no X. */
+/** Layout 2 — Card in a page: required compliance checklist inside a page Section, persistent with no X. */
 export const ChecklistInPage = ({ defaultSteps = PAGE_CHECKLIST_STEPS }) => (
     <div style={{ ...frame, display: 'flex', flexDirection: 'column', gap: 'var(--page-stack-md)' }}>
-        <PatternSection
+        <Section
             title="Required before fall term"
             description="Complete every compliance step to unlock student assignments."
         >
@@ -513,7 +513,7 @@ export const ChecklistInPage = ({ defaultSteps = PAGE_CHECKLIST_STEPS }) => (
                 defaultSteps={defaultSteps}
                 dismissible={false}
             />
-        </PatternSection>
+        </Section>
     </div>
 );
 
@@ -556,7 +556,7 @@ export const ChecklistInSidebar = ({ defaultSteps = HOME_CHECKLIST_STEPS }) => {
         <BrowserWindow address={isHome ? 'app.plus.org/home' : 'app.plus.org/sessions'} height={CHECKLIST_WINDOW_HEIGHT}>
             <Frame sidebar={sidebarSlot}>
                 {isHome ? (
-                    <PatternSection title="Home" level="page">
+                    <Section title="Home" level="page">
                         {!dismissed && (
                             <ChecklistCard
                                 title="Get ready for your first session"
@@ -566,19 +566,19 @@ export const ChecklistInSidebar = ({ defaultSteps = HOME_CHECKLIST_STEPS }) => {
                                 onDismiss={() => setDismissed(true)}
                             />
                         )}
-                    </PatternSection>
+                    </Section>
                 ) : (
-                    <PatternSection
+                    <Section
                         title="Sessions"
                         level="page"
                         description="Your scheduled tutoring sessions appear here once onboarding is complete."
                     >
-                        <PatternCard title="Thursday · 4:00 PM" description="Lincoln Middle · Grade 7 Algebra">
+                        <Card title="Thursday · 4:00 PM" description="Lincoln Middle · Grade 7 Algebra">
                             <p style={{ margin: 0, ...subtle }}>
                                 Finish your setup checklist in the sidebar before joining your first room.
                             </p>
-                        </PatternCard>
-                    </PatternSection>
+                        </Card>
+                    </Section>
                 )}
             </Frame>
         </BrowserWindow>

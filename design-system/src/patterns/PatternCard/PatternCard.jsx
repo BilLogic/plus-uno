@@ -31,7 +31,7 @@ import './PatternCard.scss';
  *   on the overlay pair while it moves. The card also sets the current surface,
  *   so a sticky table cell inside it matches the card.
  */
-const PatternCard = ({
+const Card = ({
     id,
     title,
     description,
@@ -92,7 +92,7 @@ const PatternCard = ({
     );
 };
 
-PatternCard.propTypes = {
+Card.propTypes = {
     id: PropTypes.string,
     /** The card's title, in the card title type (`styles/_card-title.scss`), tagged one heading level below its section
      * @ds-context Used in: Card.title (ds guide card)
@@ -152,4 +152,4 @@ PatternCard.propTypes = {
     children: PropTypes.node,
 };
 
-export default PatternCard;
+export default Card;

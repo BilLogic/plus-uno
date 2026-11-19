@@ -2,14 +2,14 @@ import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 // Module paths rather than the barrels, so the rest stays light.
-import PatternCard from './PatternCard';
+import Card from './PatternCard';
 import DropdownMenu from '@/components/forms-and-inputs/DropdownMenu';
-import { ButtonItem, Section } from '@/components/forms-and-inputs/_internal/MenuGroup';
+import { ButtonItem, Section as MenuSection } from '@/components/forms-and-inputs/_internal/MenuGroup';
 import PageHeader from '@/components/layout-and-structure/PageHeader';
 import Sidebar from '@/components/navigation/Sidebar';
 import { Dialog, StaticTable } from '@/components';
 import Modal from './Modal';
-import PatternSection from './PatternSection';
+import Section from './PatternSection';
 import Page from './Page';
 
 /**
@@ -26,11 +26,11 @@ describe('the page outline', () => {
     it('steps one level per nesting: page h1, section h2, subsection h3', () => {
         render(
             <Page title="Sessions">
-                <PatternSection title="This week">
-                    <PatternSection title="Monday">
+                <Section title="This week">
+                    <Section title="Monday">
                         <p>Two sessions.</p>
-                    </PatternSection>
-                </PatternSection>
+                    </Section>
+                </Section>
             </Page>,
         );
         expect(outline()).toEqual([['h1', 'Sessions'], ['h2', 'This week'], ['h3', 'Monday']]);
@@ -39,9 +39,9 @@ describe('the page outline', () => {
     it('keeps the level through a section with no title', () => {
         render(
             <Page title="Sessions">
-                <PatternSection>
-                    <PatternCard title="Wrapped" />
-                </PatternSection>
+                <Section>
+                    <Card title="Wrapped" />
+                </Section>
             </Page>,
         );
         expect(outline()).toEqual([['h1', 'Sessions'], ['h2', 'Wrapped']]);
@@ -50,13 +50,13 @@ describe('the page outline', () => {
     it('titles a card one level below its section', () => {
         render(
             <Page title="Sessions">
-                <PatternCard title="On the page" />
-                <PatternSection title="This week">
-                    <PatternCard title="In a section" description="Two students" />
-                    <PatternSection title="Monday">
-                        <PatternCard title="In a subsection" />
-                    </PatternSection>
-                </PatternSection>
+                <Card title="On the page" />
+                <Section title="This week">
+                    <Card title="In a section" description="Two students" />
+                    <Section title="Monday">
+                        <Card title="In a subsection" />
+                    </Section>
+                </Section>
             </Page>,
         );
         expect(outline()).toEqual([
@@ -72,9 +72,9 @@ describe('the page outline', () => {
     it('places a Page with PageHeader at h1 and sections inside it at h2', () => {
         render(
             <Page header={<PageHeader title="Sessions" />}>
-                <PatternSection title="This week">
-                    <PatternCard title="Monday" />
-                </PatternSection>
+                <Section title="This week">
+                    <Card title="Monday" />
+                </Section>
             </Page>,
         );
         expect(outline()).toEqual([['h1', 'Sessions'], ['h2', 'This week'], ['h3', 'Monday']]);
@@ -85,9 +85,9 @@ describe('a dialog', () => {
     it('is named by its h1 title, and a section inside it is an h2', () => {
         render(
             <Modal show title="Edit session" description="Changes apply to the series." onClose={() => {}}>
-                <PatternSection title="When">
-                    <PatternCard title="Monday" />
-                </PatternSection>
+                <Section title="When">
+                    <Card title="Monday" />
+                </Section>
             </Modal>,
         );
         const dialog = screen.getByRole('dialog', { name: 'Edit session' });
@@ -116,13 +116,13 @@ describe('group labels', () => {
     it('name a menu group and are not headings', () => {
         render(
             <DropdownMenu isOpen trigger={<button type="button">Sort</button>}>
-                <Section title="Order">
+                <MenuSection title="Order">
                     <ButtonItem onClick={() => {}}>Newest</ButtonItem>
                     <ButtonItem onClick={() => {}}>Oldest</ButtonItem>
-                </Section>
-                <Section title="Group by">
+                </MenuSection>
+                <MenuSection title="Group by">
                     <ButtonItem onClick={() => {}}>Tutor</ButtonItem>
-                </Section>
+                </MenuSection>
             </DropdownMenu>,
         );
         expect(screen.queryAllByRole('heading')).toEqual([]);

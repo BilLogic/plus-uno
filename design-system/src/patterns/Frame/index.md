@@ -48,7 +48,7 @@ Frame reads these motion tokens and no literal duration or curve.
 ## Alternatives
 
 - For a bare fill and elevation, use `Page`.
-- For a region inside the content, use `PatternSection`.
+- For a region inside the content, use `Section`.
 - For a short task that keeps the page in view behind it, use `Modal`. A multi-step task runs in the Sidebar's inner mode.
 
 ## Best practices
@@ -115,7 +115,7 @@ Elevation and fills follow Elevation.
 - Panel: use when the work should float beside the page, not replace it.
 - Grid: use when you need the column math the Frame is sized by.
 
-Same group: `Card` · `Modal` · `Page` · `Panel` · `Section` · `Table`
+Same group: `AiChat` · `Card` · `Modal` · `Page` · `Panel` · `Section` · `Table`
 
 ## Types
 

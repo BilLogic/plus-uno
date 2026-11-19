@@ -3,7 +3,7 @@ import { expect, within, waitFor } from 'storybook/test';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { computedShadow, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
-import { PatternCard } from '@/patterns';
+import { Card } from '@/templates';
 import { Skeleton, Button, IconButton, Image } from '@/components';
 import { CardJobs } from './PatternCardCases.jsx';
 import { ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
@@ -73,9 +73,9 @@ function PatternCardRowsDemo() {
                             }}
                         >
                             {people.map(([name, detail], i) => (
-                                <PatternCard key={`${name}-${i}`} title={name} description={detail} footer={viewSession}>
+                                <Card key={`${name}-${i}`} title={name} description={detail} footer={viewSession}>
                                     {sessionBody}
-                                </PatternCard>
+                                </Card>
                             ))}
                         </div>
                     </ScrollStage>
@@ -87,7 +87,7 @@ function PatternCardRowsDemo() {
 
 export default {
     title: 'Templates/Card',
-    component: PatternCard,
+    component: Card,
     tags: ['!dev', '!autodocs'],
     argTypes: {
         children: { table: { disable: true } },
@@ -153,9 +153,9 @@ export default {
 
 export const Overview = () => (
     <div style={{ maxWidth: 'var(--card-min-width-lg)', width: '100%' }}>
-        <PatternCard title="Grade 7 math · Session 4" description="Lincoln Middle · Thu 4:00 PM">
+        <Card title="Grade 7 math · Session 4" description="Lincoln Middle · Thu 4:00 PM">
             {bodyCopy}
-        </PatternCard>
+        </Card>
     </div>
 );
 
@@ -173,7 +173,7 @@ export const Interactive = {
         imageSplit: '1/3',
     },
     render: (args) => (
-        <PatternCard
+        <Card
             title={args.title || undefined}
             description={args.description || undefined}
             actions={args.actions || undefined}
@@ -187,7 +187,7 @@ export const Interactive = {
             minWidth={args.minWidth || undefined}
         >
             {bodyCopy}
-        </PatternCard>
+        </Card>
     ),
 };
 
@@ -205,25 +205,25 @@ export const Elevation = {
     parameters: { docs: { disable: true } },
     render: () => (
         <div style={{ display: 'flex', gap: 'var(--section-stack-lg)', flexWrap: 'wrap' }}>
-            <PatternCard title="Sunken" minWidth={200 /* token gap: 200px */}>
+            <Card title="Sunken" minWidth={200 /* token gap: 200px */}>
                 <div data-surface-probe="sunken" style={{ background: 'var(--ds-utility-elevation-surface-current)' }}>
                     {bodyCopy}
                 </div>
-            </PatternCard>
-            <PatternCard surface="default" title="Default" minWidth={200 /* token gap: 200px */}>
+            </Card>
+            <Card surface="default" title="Default" minWidth={200 /* token gap: 200px */}>
                 <div data-surface-probe="default" style={{ background: 'var(--ds-utility-elevation-surface-current)' }}>
                     {bodyCopy}
                 </div>
-            </PatternCard>
-            <PatternCard surface="raised" title="Raised" minWidth={200 /* token gap: 200px */}>
+            </Card>
+            <Card surface="raised" title="Raised" minWidth={200 /* token gap: 200px */}>
                 <div data-surface-probe="raised" style={{ background: 'var(--ds-utility-elevation-surface-current)' }}>
                     {bodyCopy}
                 </div>
-            </PatternCard>
-            <PatternCard title="Clickable sunken" minWidth={200 /* token gap: 200px */} role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</PatternCard>
-            <PatternCard surface="default" title="Clickable default" minWidth={200 /* token gap: 200px */} role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</PatternCard>
-            <PatternCard surface="raised" title="Clickable raised" minWidth={200 /* token gap: 200px */} role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</PatternCard>
-            <PatternCard title="Dragging" minWidth={200 /* token gap: 200px */} dragging>{bodyCopy}</PatternCard>
+            </Card>
+            <Card title="Clickable sunken" minWidth={200 /* token gap: 200px */} role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</Card>
+            <Card surface="default" title="Clickable default" minWidth={200 /* token gap: 200px */} role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</Card>
+            <Card surface="raised" title="Clickable raised" minWidth={200 /* token gap: 200px */} role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</Card>
+            <Card title="Dragging" minWidth={200 /* token gap: 200px */} dragging>{bodyCopy}</Card>
         </div>
     ),
     play: async ({ canvas, canvasElement }) => {
@@ -294,7 +294,7 @@ export const Elevation = {
 /** Every part of a card: image, header with actions, body and footer. */
 export const Anatomy = () => (
     <div style={{ maxWidth: 'var(--card-min-width-md)' }}>
-        <PatternCard
+        <Card
             image={imagePlaceholder('16:9')}
             title="Ana Ruiz"
             description="Lincoln Middle · Thu 4:00 PM"
@@ -302,7 +302,7 @@ export const Anatomy = () => (
             footer={viewSession}
         >
             {sessionBody}
-        </PatternCard>
+        </Card>
     </div>
 );
 
@@ -311,14 +311,14 @@ export const Jobs = () => <CardJobs />;
 /** One size per story: every size uses the same pad (16) and radius (16), differing by minimum width. */
 const sizedCard = (size) => (
     <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-    <PatternCard
+    <Card
         minWidth={`var(--card-min-width-${size})`}
         title="Ana Ruiz"
         description="Lincoln Middle · Thu 4:00 PM"
         footer={viewSession}
     >
         {sessionBody}
-    </PatternCard>
+    </Card>
     </div>
 );
 
@@ -341,9 +341,9 @@ export const SizeLarge = { name: 'Large', render: () => sizedCard('lg'), play: a
 
 /** One image ratio per story, edge to edge above the padded content. */
 const imageCard = (ratio) => (
-    <PatternCard image={imagePlaceholder(ratio)} title="Ana Ruiz" description="Lincoln Middle · Thu 4:00 PM" style={{ width: 'var(--card-min-width-md)' }}>
+    <Card image={imagePlaceholder(ratio)} title="Ana Ruiz" description="Lincoln Middle · Thu 4:00 PM" style={{ width: 'var(--card-min-width-md)' }}>
         {sessionBody}
-    </PatternCard>
+    </Card>
 );
 
 export const ImageWide = { name: 'Image 16:9', render: () => imageCard('16:9') };
@@ -353,7 +353,7 @@ export const ImageSquare = { name: 'Image 1:1', render: () => imageCard('1:1') }
 /** Each image placement retains the card's elevation states. */
 const placementStory = (imagePlacement, state = 'rest', imageSplit = '1/3') => ({
     render: () => (
-        <PatternCard surface="raised" imagePlacement={imagePlacement} imageSplit={imageSplit}
+        <Card surface="raised" imagePlacement={imagePlacement} imageSplit={imageSplit}
             image={<Image alt="Session illustration" src={sessionSummaryLight}
                 style={{ aspectRatio: '16 / 9', objectFit: 'cover' }} />}
             title="Ana Ruiz" description="Lincoln Middle · Thu 4:00 PM" footer={viewSession}
@@ -362,7 +362,7 @@ const placementStory = (imagePlacement, state = 'rest', imageSplit = '1/3') => (
             data-hovered={state === 'hovered' || undefined} data-pressed={state === 'pressed' || undefined}
             style={{ width: 'var(--card-min-width-lg)', maxWidth: '100%' }}>
             {sessionBody}
-        </PatternCard>
+        </Card>
     ),
     play: async ({ canvas, canvasElement }) => {
         const card = canvas.getByRole('article', { name: 'Session summary' });
@@ -425,34 +425,34 @@ const slotNote = (text) => <span style={{ font: 'var(--body-sm)', color: 'var(--
 
 /** No header: the body carries its own title, as a metric tile does. */
 export const BodyOnly = () => (
-    <PatternCard style={{ maxWidth: 'var(--card-min-width-lg)' }}>{bodyCopy}</PatternCard>
+    <Card style={{ maxWidth: 'var(--card-min-width-lg)' }}>{bodyCopy}</Card>
 );
 
 /** A header with actions over the body, and a footer for actions that commit. */
 export const WithFooter = () => (
-    <PatternCard
+    <Card
         title="Grade 7 math · Session 4"
         actions={slotNote('Save or edit')}
         footer={slotNote('Next: Practice set 4')}
         style={{ maxWidth: 'var(--card-min-width-lg)' }}
     >
         {bodyCopy}
-    </PatternCard>
+    </Card>
 );
 
 /** `header` replaces the title, description and actions. */
 export const CustomHeader = () => (
-    <PatternCard header={slotNote('Session notes · Oct 24')} style={{ maxWidth: 'var(--card-min-width-lg)' }}>
+    <Card header={slotNote('Session notes · Oct 24')} style={{ maxWidth: 'var(--card-min-width-lg)' }}>
         {bodyCopy}
-    </PatternCard>
+    </Card>
 );
 
 /** Sunken surface (default): `--ds-surface-sunken`, flat. */
 export const SurfaceSunken = {
     render: () => (
-        <PatternCard title="Sunken" description="Default flat surface for grouping static content." minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }}>
+        <Card title="Sunken" description="Default flat surface for grouping static content." minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }}>
             {bodyCopy}
-        </PatternCard>
+        </Card>
     ),
     play: async ({ canvas, canvasElement }) => {
         const card = canvas.getByText('Sunken').closest('.plus-template-card');
@@ -465,9 +465,9 @@ export const SurfaceSunken = {
 /** Default surface: `--ds-surface` with a 1px `--ds-border`, flat. */
 export const SurfaceDefault = {
     render: () => (
-        <PatternCard surface="default" title="Default" description="Page fill with a 1px border, flat." minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }}>
+        <Card surface="default" title="Default" description="Page fill with a 1px border, flat." minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }}>
             {bodyCopy}
-        </PatternCard>
+        </Card>
     ),
     play: async ({ canvas, canvasElement }) => {
         const card = canvas.getByText('Default').closest('.plus-template-card');
@@ -482,9 +482,9 @@ export const SurfaceDefault = {
 /** Raised surface: `--ds-surface-raised` with `--ds-shadow-raised`. */
 export const SurfaceRaised = {
     render: () => (
-        <PatternCard surface="raised" title="Raised" description="Primary card per view, first in reading order." minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }}>
+        <Card surface="raised" title="Raised" description="Primary card per view, first in reading order." minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }}>
             {bodyCopy}
-        </PatternCard>
+        </Card>
     ),
     play: async ({ canvas, canvasElement }) => {
         const card = canvas.getByText('Raised').closest('.plus-template-card');
@@ -496,13 +496,13 @@ export const SurfaceRaised = {
 
 /** A card at rest on the default sunken surface. */
 export const Static = () => (
-    <PatternCard title="Static" minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }}>{bodyCopy}</PatternCard>
+    <Card title="Static" minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }}>{bodyCopy}</Card>
 );
 
 /** A clickable sunken card lifts to Raised on hover and settles to the raised shadow while pressed. */
 export const Clickable = {
     render: () => (
-        <PatternCard title="Clickable" minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }} role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</PatternCard>
+        <Card title="Clickable" minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }} role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</Card>
     ),
     play: async ({ canvas, canvasElement }) => {
         const card = canvas.getByText('Clickable').closest('.plus-template-card');
@@ -517,7 +517,7 @@ export const Clickable = {
 /** A dragged card keeps the overlay pair. */
 export const Dragging = {
     render: () => (
-        <PatternCard title="Dragging" minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }} dragging>{bodyCopy}</PatternCard>
+        <Card title="Dragging" minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }} dragging>{bodyCopy}</Card>
     ),
     play: async ({ canvas, canvasElement }) => {
         const card = canvas.getByText('Dragging').closest('.plus-template-card');
@@ -531,9 +531,9 @@ export const Dragging = {
 export const ForcedColors = {
     render: () => (
         <div style={{ display: 'flex', gap: 'var(--section-stack-lg)', flexWrap: 'wrap' }}>
-            <PatternCard surface="sunken" title="Sunken" minWidth="var(--card-min-width-sm)">{bodyCopy}</PatternCard>
-            <PatternCard surface="default" title="Default" minWidth="var(--card-min-width-sm)">{bodyCopy}</PatternCard>
-            <PatternCard surface="raised" title="Raised" minWidth="var(--card-min-width-sm)">{bodyCopy}</PatternCard>
+            <Card surface="sunken" title="Sunken" minWidth="var(--card-min-width-sm)">{bodyCopy}</Card>
+            <Card surface="default" title="Default" minWidth="var(--card-min-width-sm)">{bodyCopy}</Card>
+            <Card surface="raised" title="Raised" minWidth="var(--card-min-width-sm)">{bodyCopy}</Card>
         </div>
     ),
     play: async ({ canvas }) => {
@@ -549,14 +549,14 @@ export const ForcedColors = {
 export const LoadingCard = {
     name: 'Loading',
     render: () => (
-        <PatternCard aria-busy="true" style={{ width: 'var(--card-min-width-md)' }}>
+        <Card aria-busy="true" style={{ width: 'var(--card-min-width-md)' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-md)' }}>
                 <Skeleton shape="text" width="50%" />
                 <Skeleton shape="text" width="75%" />
                 <Skeleton shape="text" width="100%" />
                 <Skeleton shape="text" width="40%" />
             </div>
-        </PatternCard>
+        </Card>
     ),
 };
 
@@ -585,11 +585,11 @@ export const PlacementBoundary = {
     render: () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
             {['start', 'end'].flatMap((placement) => ['1/3', '1/2'].map((split) => (
-                <PatternCard key={`${placement}-${split}`} imagePlacement={placement} imageSplit={split}
+                <Card key={`${placement}-${split}`} imagePlacement={placement} imageSplit={split}
                     image={imagePlaceholder('1:1')} title="Ana Ruiz" role="article"
                     aria-label={`${placement} ${split}`} style={{ width: 479 /* token gap: 479px */ }}>
                     {sessionBody}
-                </PatternCard>
+                </Card>
             )))}
         </div>
     ),

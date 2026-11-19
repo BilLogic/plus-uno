@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Banner, Button, Link, Tabs } from '@/components';
-import { Frame, PatternCard, PatternSection } from '@/patterns';
+import { Frame, Card, Section, Page } from '@/templates';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { SlideViews } from '@/lib/navigationMotion';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
@@ -24,7 +24,6 @@ import {
     AddStudentAction,
     ViewSelect,
 } from './pageDemo.jsx';
-import Page from '@/patterns/Page';
 import { probe, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { RECORD_CRUMBS, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
@@ -78,7 +77,7 @@ export const HeaderAndBanner = {
                 header={<DemoPageHeader title="Sessions" actions={<Button text="Toggle banner" onClick={() => setShowBanner((show) => !show)} />} />}
                 banner={showBanner && <Banner>Sessions move to the new calendar on Friday.</Banner>}
             >
-                <PatternSection title="Upcoming sessions">{slotContent('Sessions')}</PatternSection>
+                <Section title="Upcoming sessions">{slotContent('Sessions')}</Section>
             </Page>
         );
     },
@@ -288,9 +287,9 @@ export const ScenarioArea = {
     render: () => (
         <PageStage scrollable>
             <DemoPageHeader title="Students" />
-            <PatternSection title="Students" views={<StudentViews />} actions={<AddStudentAction />}>
+            <Section title="Students" views={<StudentViews />} actions={<AddStudentAction />}>
                 <StudentsTable count={4} />
-            </PatternSection>
+            </Section>
         </PageStage>
     ),
     play: async ({ canvasElement }) => {
@@ -319,9 +318,9 @@ export const ScenarioSeveralSections = {
         <PageStage scrollable height={420}>
             <DemoPageHeader title="Home" />
             <CardsSection title="Upcoming sessions" description="Next 7 days" actions={<Button text="View calendar" onClick={() => {}} />} />
-            <PatternSection title="Needs follow-up" actions={<Button text="Review all" onClick={() => {}} />}>
+            <Section title="Needs follow-up" actions={<Button text="Review all" onClick={() => {}} />}>
                 <StudentsTable columns={['Student', 'Session', 'Reflection']} rows={REFLECTION_ROWS} label="Reflections" />
-            </PatternSection>
+            </Section>
         </PageStage>
     ),
     play: async ({ canvasElement }) => {
@@ -377,9 +376,9 @@ export const ScenarioTwoLevels = {
     render: () => (
         <PageStage scrollable>
             <DemoPageHeader breadcrumb={DEEP_CRUMBS} title="Session on Oct 14" actions={<PageActions />} />
-            <PatternSection title="Notes">
-                <PatternCard title="Oct 14 reflection" description="Worked through distributive property and two-step equations together." />
-            </PatternSection>
+            <Section title="Notes">
+                <Card title="Oct 14 reflection" description="Worked through distributive property and two-step equations together." />
+            </Section>
         </PageStage>
     ),
     play: async ({ canvasElement }) => {
@@ -455,19 +454,19 @@ const SwitchViewsDemo = () => {
     const [status, setStatus] = useState('upcoming');
     const views = {
         overview: (
-            <PatternSection title="Current goals">
-                <PatternCard title="Multi-step equations" description="Target 80% accuracy by Friday." />
-            </PatternSection>
+            <Section title="Current goals">
+                <Card title="Multi-step equations" description="Target 80% accuracy by Friday." />
+            </Section>
         ),
         sessions: (
-            <PatternSection title="Sessions" views={<ViewSelect value={status} onChange={setStatus} />}>
+            <Section title="Sessions" views={<ViewSelect value={status} onChange={setStatus} />}>
                 <SessionsTable status={status} />
-            </PatternSection>
+            </Section>
         ),
         notes: (
-            <PatternSection title="Tutor notes">
-                <PatternCard title="Oct 14 reflection" description="Worked through distributive property together." />
-            </PatternSection>
+            <Section title="Tutor notes">
+                <Card title="Oct 14 reflection" description="Worked through distributive property together." />
+            </Section>
         ),
     };
     return (
@@ -568,26 +567,26 @@ const ScrollSpotDemo = () => (
                         <Link href="#spot-escalation">Escalation</Link>
                     </nav>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--page-stack-md)' }}>
-                        <PatternSection id="spot-overview" title="Overview">
+                        <Section id="spot-overview" title="Overview">
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', minBlockSize: 'var(--height-500)' }}>
-                                <PatternCard title="Goal check-in" description="Started with two warm-up problems on linear expressions." />
-                                <PatternCard title="Attendance" description="Arrived on time and stayed for the full hour." />
+                                <Card title="Goal check-in" description="Started with two warm-up problems on linear expressions." />
+                                <Card title="Attendance" description="Arrived on time and stayed for the full hour." />
                             </div>
-                        </PatternSection>
-                        <PatternSection id="spot-practice" title="Practice">
+                        </Section>
+                        <Section id="spot-practice" title="Practice">
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)', minBlockSize: 'var(--height-500)' }}>
-                                <PatternCard title="Guided set" description="Completed four of five word problems independently." />
-                                <PatternCard title="Exit check" description="Paused on negative coefficients." />
+                                <Card title="Guided set" description="Completed four of five word problems independently." />
+                                <Card title="Exit check" description="Paused on negative coefficients." />
                             </div>
-                        </PatternSection>
-                        <PatternSection id="spot-escalation" title="Escalation">
-                            <PatternCard title="Supervisor follow-up" description="Share curriculum packet for negative rational numbers before Tuesday." />
-                        </PatternSection>
-                        <PatternSection id="spot-next" title="Next steps">
+                        </Section>
+                        <Section id="spot-escalation" title="Escalation">
+                            <Card title="Supervisor follow-up" description="Share curriculum packet for negative rational numbers before Tuesday." />
+                        </Section>
+                        <Section id="spot-next" title="Next steps">
                             <div style={{ minBlockSize: 'var(--height-500)' }}>
-                                <PatternCard title="Thursday plan" description="Revisit two-step inequalities with number lines." />
+                                <Card title="Thursday plan" description="Revisit two-step inequalities with number lines." />
                             </div>
-                        </PatternSection>
+                        </Section>
                     </div>
                 </Page>
             </Frame>

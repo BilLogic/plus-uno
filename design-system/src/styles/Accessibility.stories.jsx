@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { animate } from 'motion/react';
 import { expect, userEvent } from 'storybook/test';
 import { Button, StatusTag } from '@/components';
-import { PatternCard } from '@/patterns';
+import { Card } from '@/templates';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { RefTable, C, Do, Dont, DoDont, ModeCompare, RingDemo } from '@/storybook-docs/foundation-blocks.jsx';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
@@ -18,13 +18,13 @@ export const ContrastPairings = {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
             <ModeCompare>
                 {() => (
-                    <PatternCard
+                    <Card
                         title="Algebra B · Lincoln Middle"
                         description="Tuesdays at 4:30 PM with Maya Rodriguez"
                         actions={<StatusTag appearance="success">Active</StatusTag>}
                     >
                         <Button text="Open session notes" appearance="primary" />
-                    </PatternCard>
+                    </Card>
                 )}
             </ModeCompare>
             <RefTable

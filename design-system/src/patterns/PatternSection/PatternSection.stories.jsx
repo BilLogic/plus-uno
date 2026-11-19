@@ -12,8 +12,8 @@ import {
 } from '@/components';
 import {
     PANEL_STORAGE_KEY,
-    PatternCard,
-    PatternSection,
+    Card,
+    Section,
     SECTION_DETAIL_FLOOR,
     PanelBody,
     PanelCloseAction,
@@ -23,7 +23,7 @@ import {
     PanelHeader,
     PanelSubheader,
     PanelUpAction,
-} from '@/patterns';
+} from '@/templates';
 import { FRAME_LAYOUT } from '../Frame/frameLayout';
 import { useOwnWidth } from '../Frame/useOwnWidth';
 import { PAST_SESSIONS, SessionsTable, STUDENT_SESSION_CARDS, UPCOMING_SESSIONS } from '../Page/pageDemo.jsx';
@@ -49,10 +49,10 @@ const Actions = () => (
 const description = 'Optional supporting description for this section.';
 
 const StatCard = ({ title, body }) => (
-    <PatternCard style={{ flex: 1 }} minWidth="var(--card-min-width-sm)">
+    <Card style={{ flex: 1 }} minWidth="var(--card-min-width-sm)">
         <p style={{ margin: 0, font: 'var(--body-default)' }}>{title}</p>
         <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{body}</p>
-    </PatternCard>
+    </Card>
 );
 
 /** These stories read settled layouts, so the Frame's space motion is held off; its own motion stories live in Frame.stories. */
@@ -61,7 +61,7 @@ const settledLayout = (Story) => <MotionPreferenceContext.Provider value><Story 
 export default {
     decorators: [settledLayout],
     title: 'Templates/Section',
-    component: PatternSection,
+    component: Section,
     tags: ['!dev', '!autodocs'],
     argTypes: {
         children: { table: { disable: true } },
@@ -96,9 +96,9 @@ export default {
 };
 
 export const Overview = () => (
-    <PatternSection title="Section title" description={description} actions={<Actions />}>
+    <Section title="Section title" description={description} actions={<Actions />}>
         {slotContent('Content · cards, tables, rows or forms')}
-    </PatternSection>
+    </Section>
 );
 
 /* Header types, one per story. The type is read from the slots you fill. */
@@ -106,16 +106,16 @@ export const Overview = () => (
 export const HeaderDefault = {
     name: 'Default header',
     render: () => (
-        <PatternSection title="Section title" description={description} actions={<Actions />}>
+        <Section title="Section title" description={description} actions={<Actions />}>
             {slotContent('Content slot')}
-        </PatternSection>
+        </Section>
     ),
 };
 
 export const HeaderCustom = {
     name: 'Custom header',
     render: () => (
-        <PatternSection
+        <Section
             title="This week"
             header={(
                 <>
@@ -125,7 +125,7 @@ export const HeaderCustom = {
             )}
         >
             {slotContent('Content slot')}
-        </PatternSection>
+        </Section>
     ),
 };
 
@@ -134,39 +134,39 @@ export const HeaderCustom = {
 export const LayoutSingle = {
     name: 'Single',
     render: () => (
-        <PatternSection title="Section title" description={description} actions={<Actions />}>
+        <Section title="Section title" description={description} actions={<Actions />}>
             <div style={{ display: 'flex', gap: 'var(--grid-gutter)', flexWrap: 'wrap' }}>
                 <StatCard title="Sessions this week" body="12 scheduled · 2 need a tutor" />
                 <StatCard title="Attendance" body="94% across 38 students" />
                 <StatCard title="Notes due" body="3 sessions without notes" />
             </div>
-        </PatternSection>
+        </Section>
     ),
 };
 
 export const LayoutSplit = {
     name: 'Split',
     render: () => (
-        <PatternSection title="Section title" description={description} layout="split" side={slotContent('Side · span 4')}>
+        <Section title="Section title" description={description} layout="split" side={slotContent('Side · span 4')}>
             {slotContent('Main · span 8')}
-        </PatternSection>
+        </Section>
     ),
 };
 
 export const LayoutSubsections = {
     name: 'Subsections',
     render: () => (
-        <PatternSection title="Settings" description="Manage your tutor profile, reminders and who can see your availability." layout="subsections">
-            <PatternSection title="Profile" description="Name, photo and time zone." actions={<Actions />}>
+        <Section title="Settings" description="Manage your tutor profile, reminders and who can see your availability." layout="subsections">
+            <Section title="Profile" description="Name, photo and time zone." actions={<Actions />}>
                 {slotContent('Subsection body')}
-            </PatternSection>
-            <PatternSection title="Notifications" description="Email and text reminders.">
+            </Section>
+            <Section title="Notifications" description="Email and text reminders.">
                 {slotContent('Subsection body')}
-            </PatternSection>
-            <PatternSection title="Privacy" description="Who can see your availability.">
+            </Section>
+            <Section title="Privacy" description="Who can see your availability.">
                 {slotContent('Subsection body')}
-            </PatternSection>
-        </PatternSection>
+            </Section>
+        </Section>
     ),
 };
 
@@ -174,9 +174,9 @@ export const LayoutSubsections = {
 export const SunkenCard = {
     name: 'Sunken Card in a Section',
     render: () => (
-        <PatternSection title="Flag 3 of 12" description={description} data-testid="host">
-            <PatternCard surface="sunken" title="Record" description="Needs a follow-up call this week." data-testid="sunken-card" />
-        </PatternSection>
+        <Section title="Flag 3 of 12" description={description} data-testid="host">
+            <Card surface="sunken" title="Record" description="Needs a follow-up call this week." data-testid="sunken-card" />
+        </Section>
     ),
     play: async ({ canvasElement }) => {
         const card = getComputedStyle(canvasElement.querySelector('[data-testid="sunken-card"]'));
@@ -190,9 +190,9 @@ export const SunkenCard = {
 export const DetailIsSunkenCard = {
     name: 'Detail is a sunken Card',
     render: () => (
-        <PatternSection title="Session reflections" detail={<p style={{ margin: 0 }}>Two goals for next week.</p>} detailTitle="Ava Thompson">
+        <Section title="Session reflections" detail={<p style={{ margin: 0 }}>Two goals for next week.</p>} detailTitle="Ava Thompson">
             {slotContent('Rows')}
-        </PatternSection>
+        </Section>
     ),
     play: async ({ canvasElement }) => {
         const detail = canvasElement.querySelector('.plus-template-section-detail');
@@ -207,9 +207,9 @@ export const DetailIsSunkenCard = {
 export const CardNesting = {
     name: 'Card in a Section',
     render: () => (
-        <PatternSection title="Sessions" data-testid="plain">
+        <Section title="Sessions" data-testid="plain">
             <StatCard title="Sessions this week" body="12 scheduled · 2 need a tutor" />
-        </PatternSection>
+        </Section>
     ),
     play: async ({ canvasElement }) => {
         const radius = (id) => getComputedStyle(canvasElement.querySelector(`[data-testid="${id}"] .plus-template-card`)).borderTopLeftRadius;
@@ -221,10 +221,10 @@ export const CardNesting = {
 export const NoSurfaceNoPad = {
     name: 'No fill, no pad',
     render: () => (
-        <PatternSection title="Sessions" layout="subsections" detail={<p style={{ margin: 0 }}>Notes</p>} detailTitle="Ava Thompson">
-            <PatternSection title="This week" spacing="compact">{slotContent('Rows')}</PatternSection>
-            <PatternSection title="Next week" spacing="spacious">{slotContent('Rows')}</PatternSection>
-        </PatternSection>
+        <Section title="Sessions" layout="subsections" detail={<p style={{ margin: 0 }}>Notes</p>} detailTitle="Ava Thompson">
+            <Section title="This week" spacing="compact">{slotContent('Rows')}</Section>
+            <Section title="Next week" spacing="spacious">{slotContent('Rows')}</Section>
+        </Section>
     ),
     play: async ({ canvasElement }) => {
         const sections = [...canvasElement.querySelectorAll('.plus-template-section')];
@@ -238,18 +238,18 @@ export const NoSurfaceNoPad = {
 };
 
 export const Footer = () => (
-    <PatternSection
+    <Section
         title="Upcoming sessions"
         description={description}
         footer={<Button text="View all" appearance="subtle" onClick={() => {}} />}
     >
         {slotContent('Rows')}
-    </PatternSection>
+    </Section>
 );
 
 /** Every part of a section: header with actions and views, content, side and footer. */
 export const Anatomy = () => (
-    <PatternSection
+    <Section
         title="Upcoming sessions"
         description={description}
         actions={<Actions />}
@@ -259,18 +259,18 @@ export const Anatomy = () => (
         footer={<Button text="View all" appearance="subtle" onClick={() => {}} />}
     >
         {slotContent('Content · span 8')}
-    </PatternSection>
+    </Section>
 );
 
 /** Level comes from nesting: a page title, a section inside it, a subsection inside that. */
 export const Levels = () => (
-    <PatternSection level="page" title="Page title" description={description}>
-        <PatternSection title="Section title" description={description}>
-            <PatternSection title="Subsection title" description={description}>
+    <Section level="page" title="Page title" description={description}>
+        <Section title="Section title" description={description}>
+            <Section title="Subsection title" description={description}>
                 {slotContent('Content slot')}
-            </PatternSection>
-        </PatternSection>
-    </PatternSection>
+            </Section>
+        </Section>
+    </Section>
 );
 
 const SEARCH_STUDENTS = [
@@ -298,7 +298,7 @@ const SearchableStudents = () => {
         setActiveOnly(false);
     };
     return (
-        <PatternSection
+        <Section
             title="Students"
             actions={<SectionActions primary="Add student" more={false} />}
             search={<SearchField mode="active" isCollapsible spacing="compact" placeholder="Search students" value={query} onValueChange={setQuery} />}
@@ -311,7 +311,7 @@ const SearchableStudents = () => {
             <ul style={{ margin: 0, paddingInlineStart: 'var(--page-pad)', font: 'var(--body-default)' }}>
                 {rows.map((student) => <li key={student.name}>{student.name}</li>)}
             </ul>
-        </PatternSection>
+        </Section>
     );
 };
 
@@ -379,16 +379,16 @@ export const ToolbarSearch = {
 export const LoadingDefault = {
     name: 'Loading',
     render: () => (
-        <PatternSection title="Section title" description={description} loading>
+        <Section title="Section title" description={description} loading>
             {slotContent('Content slot')}
-        </PatternSection>
+        </Section>
     ),
 };
 
 export const LoadingToolbar = {
     name: 'Loading, search and filters',
     render: () => (
-        <PatternSection
+        <Section
             title="Students"
             description={description}
             search={<HeaderSearch />}
@@ -396,16 +396,16 @@ export const LoadingToolbar = {
             loading
         >
             {slotContent('Table')}
-        </PatternSection>
+        </Section>
     ),
 };
 
 export const LoadingTabsOnly = {
     name: 'Loading, views',
     render: () => (
-        <PatternSection title="Students" views={<ViewPills views={['All students', 'Active', 'Paused']} />} loading>
+        <Section title="Students" views={<ViewPills views={['All students', 'Active', 'Paused']} />} loading>
             {slotContent('Content slot')}
-        </PatternSection>
+        </Section>
     ),
 };
 
@@ -420,7 +420,7 @@ export const Interactive = {
     render: (args) => {
         const bottom = args.type === 'custom' ? { header: slotContent('Custom header') } : {};
         return (
-            <PatternSection
+            <Section
                 title={args.title || undefined}
                 description={args.description || undefined}
                 actions={<Actions />}
@@ -432,11 +432,11 @@ export const Interactive = {
             >
                 {args.layout === 'subsections' ? (
                     <>
-                        <PatternSection title="Subsection title">{slotContent('Subsection body')}</PatternSection>
-                        <PatternSection title="Subsection title">{slotContent('Subsection body')}</PatternSection>
+                        <Section title="Subsection title">{slotContent('Subsection body')}</Section>
+                        <Section title="Subsection title">{slotContent('Subsection body')}</Section>
                     </>
                 ) : slotContent('Content slot')}
-            </PatternSection>
+            </Section>
         );
     },
 };
@@ -448,9 +448,9 @@ export const Interactive = {
 export const ColorModes = {
     render: () => (
         <div style={col}>
-            <PatternSection data-probe="plain" title="Section title" description="A short description.">
+            <Section data-probe="plain" title="Section title" description="A short description.">
                 {slotContent('Content slot')}
-            </PatternSection>
+            </Section>
         </div>
     ),
     parameters: { docs: { disable: true } },
@@ -475,10 +475,10 @@ export const SplitLayout = {
     render: () => (
         <div style={col}>
             <div data-probe="wide" style={{ width: 960 /* token gap: 960px */ }}>
-                <PatternSection title="Wide" layout="split" side={slotContent('Side')}>{slotContent('Main')}</PatternSection>
+                <Section title="Wide" layout="split" side={slotContent('Side')}>{slotContent('Main')}</Section>
             </div>
             <div data-probe="narrow" style={{ width: 600 /* token gap: 600px */ }}>
-                <PatternSection title="Narrow" layout="split" side={slotContent('Side')}>{slotContent('Main')}</PatternSection>
+                <Section title="Narrow" layout="split" side={slotContent('Side')}>{slotContent('Main')}</Section>
             </div>
         </div>
     ),
@@ -499,9 +499,9 @@ export const SplitLayout = {
 /** Header to body is Section/stack-md; the header rows sit Section/stack-sm under the title row. */
 export const Spacing = {
     render: () => (
-        <PatternSection title="Students" description={description} views={<ViewPills views={['All students', 'Active', 'Paused']} />}>
+        <Section title="Students" description={description} views={<ViewPills views={['All students', 'Active', 'Paused']} />}>
             {slotContent('Content slot')}
-        </PatternSection>
+        </Section>
     ),
     parameters: { docs: { disable: true } },
     play: async ({ canvasElement }) => {
@@ -531,7 +531,7 @@ const atViewport = (width, run) => withTestViewport(width, DETAIL_HEIGHT, run);
 export const Detail = {
     render: (args) => (
         <div style={{ inlineSize: STAGE }}>
-            <PatternSection
+            <Section
                 title="Reflections"
                 description="Week of Oct 20"
                 views={<ViewPills views={['All reflections', 'Needs follow-up']} />}
@@ -550,7 +550,7 @@ export const Detail = {
                 {...args}
             >
                 <StudentsTable count={4} />
-            </PatternSection>
+            </Section>
         </div>
     ),
     play: async ({ canvasElement }) => {
@@ -614,7 +614,7 @@ const SESSIONS = [
 ];
 const SessionCards = ({ items = SESSIONS }) => (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 'var(--grid-gutter)' }}>
-        {items.map(([title, when]) => <PatternCard key={title} title={title} description={when} />)}
+        {items.map(([title, when]) => <Card key={title} title={title} description={when} />)}
     </div>
 );
 
@@ -638,13 +638,13 @@ const STUDENT_FACTS = [['School', 'Lincoln Middle School'], ['Grade', 'Grade 7']
 const TypeListDemo = () => {
     const [view, setView] = useState('All students');
     return (
-        <PatternSection
+        <Section
             title="Students"
             actions={<SectionActions />}
             views={<ViewPills views={['All students', 'Needs follow-up']} activeView={view} onViewChange={setView} />}
         >
             <StudentsTable count={6} rowsPerPage={4} sortable view={view} />
-        </PatternSection>
+        </Section>
     );
 };
 
@@ -728,7 +728,7 @@ export const TypeQueue = {
                 onPanelOpenChange={setOpen}
                 panelStorageKey={null}
             >
-                <PatternSection
+                <Section
                     title="Reflections to review"
                     views={<ViewPills views={['To review']} />}
                 >
@@ -765,7 +765,7 @@ export const TypeQueue = {
                             ],
                         }))}
                     />
-                </PatternSection>
+                </Section>
             </InAppFrame>
         );
     },
@@ -795,9 +795,9 @@ export const TypeQueue = {
 export const TypeCards = {
     name: 'Type: Cards',
     render: () => (
-        <PatternSection title="Upcoming sessions" description="Next 7 days" actions={<Button text="View calendar" onClick={() => {}} />}>
+        <Section title="Upcoming sessions" description="Next 7 days" actions={<Button text="View calendar" onClick={() => {}} />}>
             <SessionCards />
-        </PatternSection>
+        </Section>
     ),
 };
 
@@ -805,13 +805,13 @@ export const TypeCards = {
 export const TypeStats = {
     name: 'Type: Stats',
     render: () => (
-        <PatternSection title="This week">
+        <Section title="This week">
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 'var(--grid-gutter)' }}>
                 {[['18', 'Sessions held'], ['94%', 'Attendance'], ['6', 'Reflections due'], ['3', 'New students']].map(([value, label]) => (
-                    <PatternCard key={label} title={value} description={label} />
+                    <Card key={label} title={value} description={label} />
                 ))}
             </div>
-        </PatternSection>
+        </Section>
     ),
 };
 
@@ -819,9 +819,9 @@ export const TypeStats = {
 export const TypeDetails = {
     name: 'Type: Details',
     render: () => (
-        <PatternSection title="Student details" actions={<Button text="Edit" iconBefore="pen" onClick={() => {}} />}>
+        <Section title="Student details" actions={<Button text="Edit" iconBefore="pen" onClick={() => {}} />}>
             <Facts pairs={STUDENT_FACTS} />
-        </PatternSection>
+        </Section>
     ),
 };
 
@@ -831,9 +831,9 @@ const GROUP_FACTS = [['Tutor', 'Priya Nair'], ['Meets', 'Tuesdays, 4:30 PM'], ['
 export const TypeMainAndSide = {
     name: 'Type: Main and side',
     render: () => (
-        <PatternSection title="Lincoln Middle" description="Tuesdays at 4:30 PM" layout="split" side={<Facts pairs={GROUP_FACTS} columns={1} />}>
+        <Section title="Lincoln Middle" description="Tuesdays at 4:30 PM" layout="split" side={<Facts pairs={GROUP_FACTS} columns={1} />}>
             <StudentsTable count={4} />
-        </PatternSection>
+        </Section>
     ),
 };
 
@@ -841,8 +841,8 @@ export const TypeMainAndSide = {
 export const TypeForm = {
     name: 'Type: Form',
     render: () => (
-        <PatternSection title="Contact details">
-            <PatternCard
+        <Section title="Contact details">
+            <Card
                 footer={(
                     <>
                         <Button text="Save" appearance="primary" onClick={() => {}} />
@@ -854,8 +854,8 @@ export const TypeForm = {
                     <TextField label="Guardian name" defaultValue="Dana Thompson" />
                     <TextField label="Phone" defaultValue="(412) 555-0148" />
                 </div>
-            </PatternCard>
-        </PatternSection>
+            </Card>
+        </Section>
     ),
 };
 
@@ -863,14 +863,14 @@ export const TypeForm = {
 export const TypeSubsections = {
     name: 'Type: Subsections',
     render: () => (
-        <PatternSection title="Notifications" layout="subsections">
-            <PatternSection title="Email">
+        <Section title="Notifications" layout="subsections">
+            <Section title="Email">
                 <Toggle label="Session reminders" defaultChecked />
-            </PatternSection>
-            <PatternSection title="Text messages">
+            </Section>
+            <Section title="Text messages">
                 <Toggle label="Schedule changes" />
-            </PatternSection>
-        </PatternSection>
+            </Section>
+        </Section>
     ),
 };
 
@@ -944,9 +944,9 @@ const rowsIn = (canvasElement) => [...canvasElement.querySelectorAll('.plus-sect
 /** Full: a title with its actions, views and the format switch, then Search and three triggers. */
 export const Full = {
     render: () => (
-        <PatternSection {...fullHeader}>
+        <Section {...fullHeader}>
             <HeaderTable />
-        </PatternSection>
+        </Section>
     ),
     play: async ({ canvasElement }) => {
         await expectOneHeight(canvasElement);
@@ -968,9 +968,9 @@ const FiltersAppliedDemo = () => {
         applied && i < 2 ? { ...filter, text: i === 0 ? 'Upcoming' : 'Whitaker', label: i === 0 ? 'Status' : 'Group', isSelected: true } : filter
     ));
     return (
-        <PatternSection {...fullHeader} filters={filters} count="3 of 12" onClearAll={() => setApplied(false)}>
+        <Section {...fullHeader} filters={filters} count="3 of 12" onClearAll={() => setApplied(false)}>
             <HeaderTable />
-        </PatternSection>
+        </Section>
     );
 };
 
@@ -992,7 +992,7 @@ export const FiltersApplied = {
 export const NoViews = {
     name: 'No views',
     render: () => (
-        <PatternSection
+        <Section
             title="Students"
             actions={<SectionActions primary="Add student" />}
             format={<FormatSwitch />}
@@ -1004,7 +1004,7 @@ export const NoViews = {
             ]}
         >
             <HeaderTable list={HEADER_STUDENTS} names={['Name', 'Grade', 'Group', 'Sessions']} />
-        </PatternSection>
+        </Section>
     ),
     play: async ({ canvasElement }) => {
         await expectOneHeight(canvasElement);
@@ -1018,9 +1018,9 @@ export const NoViews = {
 export const ViewsOnly = {
     name: 'Views only',
     render: () => (
-        <PatternSection title="Reflections" views={<ViewPills views={['Owed', 'Submitted']} />}>
+        <Section title="Reflections" views={<ViewPills views={['Owed', 'Submitted']} />}>
             <HeaderTable list={HEADER_STUDENTS} names={['Name', 'Grade', 'Group', 'Sessions']} />
-        </PatternSection>
+        </Section>
     ),
     play: async ({ canvasElement }) => {
         await expectOneHeight(canvasElement);
@@ -1034,7 +1034,7 @@ export const ViewsOnly = {
 export const ManyFilters = {
     name: 'Many filters',
     render: () => (
-        <PatternSection
+        <Section
             {...fullHeader}
             filters={[
                 ...STATUS_FILTERS,
@@ -1044,7 +1044,7 @@ export const ManyFilters = {
             onMoreFilters={() => {}}
         >
             <HeaderTable />
-        </PatternSection>
+        </Section>
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
@@ -1059,7 +1059,7 @@ export const WrappedFilters = {
     name: 'Wrapped filters',
     render: () => (
         <div data-probe="stage" style={{ inlineSize: 800 }}>
-            <PatternSection
+            <Section
                 {...fullHeader}
                 filters={[
                     ...STATUS_FILTERS,
@@ -1069,7 +1069,7 @@ export const WrappedFilters = {
                 onMoreFilters={() => {}}
             >
                 <HeaderTable />
-            </PatternSection>
+            </Section>
         </div>
     ),
     play: async ({ canvasElement }) => {
@@ -1094,14 +1094,14 @@ export const WrappedFilters = {
 export const RowsSelected = {
     name: 'Rows selected',
     render: () => (
-        <PatternSection {...fullHeader}>
+        <Section {...fullHeader}>
             <HeaderTable
                 list={HEADER_SESSIONS}
                 isSelectable
                 defaultSelectedRowKeys={HEADER_SESSIONS.slice(0, 3).map((cells) => cells.join())}
                 bulkActions={[{ label: 'Call off' }, { label: 'Export' }, { label: 'Move to group' }, { label: 'Remove from group' }]}
             />
-        </PatternSection>
+        </Section>
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
@@ -1124,7 +1124,7 @@ export const Narrow = {
     name: 'Narrow',
     render: () => (
         <div data-probe="stage" style={{ inlineSize: 600 }}>
-            <PatternSection
+            <Section
                 {...fullHeader}
                 filters={STATUS_FILTERS.map((filter, i) => (i === 0 ? { ...filter, isSelected: true } : filter))}
                 count="3 of 12"
@@ -1132,7 +1132,7 @@ export const Narrow = {
                 onOpenFilters={() => {}}
             >
                 <HeaderTable list={HEADER_SESSIONS.slice(0, 3).map((cells) => cells.slice(0, 3))} names={['Date', 'Time', 'Group']} maxHeight={320} />
-            </PatternSection>
+            </Section>
         </div>
     ),
     play: async ({ canvasElement }) => {
@@ -1158,14 +1158,14 @@ export const Narrow = {
 /** Subsection: the title drops to the subsection size; its primary acts on it alone. */
 export const Subsection = {
     render: () => (
-        <PatternSection title="Lincoln Middle">
-            <PatternSection
+        <Section title="Lincoln Middle">
+            <Section
                 {...fullHeader}
                 title="This week"
             >
                 <HeaderTable />
-            </PatternSection>
-        </PatternSection>
+            </Section>
+        </Section>
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
@@ -1183,7 +1183,7 @@ export const Subsection = {
 export const SideAtEnd = {
     name: 'Side at the end',
     render: () => (
-        <PatternSection
+        <Section
             title="Lincoln Middle"
             actions={<SectionActions />}
             views={<ViewPills views={['All students']} />}
@@ -1191,7 +1191,7 @@ export const SideAtEnd = {
             side={<Facts pairs={GROUP_FACTS} columns={1} />}
         >
             <StudentsTable count={4} />
-        </PatternSection>
+        </Section>
     ),
 };
 
@@ -1241,7 +1241,7 @@ const FilterSideSection = () => {
     }
     return (
         <div ref={ref}>
-            <PatternSection
+            <Section
                 title="Students"
                 description={`Lincoln Middle · ${matching.length} ${matching.length === 1 ? 'student' : 'students'}`}
                 actions={<SectionActions narrow={narrow} />}
@@ -1257,7 +1257,7 @@ const FilterSideSection = () => {
                 }]}
             >
                 {body}
-            </PatternSection>
+            </Section>
         </div>
     );
 };
@@ -1338,7 +1338,7 @@ export const ResponsiveWidth = {
 export const EmptyInTable = {
     name: 'Empty, in a table',
     render: () => (
-        <PatternSection title="Students" description="Lincoln Middle · 24 students" views={<ViewPills views={['All students', 'Needs follow-up']} />}>
+        <Section title="Students" description="Lincoln Middle · 24 students" views={<ViewPills views={['All students', 'Needs follow-up']} />}>
             <EmptyState
                 spacing="compact"
                 icon="user-group"
@@ -1346,7 +1346,7 @@ export const EmptyInTable = {
                 description="Try other filters, or reset them to see every student."
                 primaryAction={<Button text="Reset filters" appearance="primary" onClick={() => {}} />}
             />
-        </PatternSection>
+        </Section>
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
@@ -1370,7 +1370,7 @@ export const AnatomyQueue = {
     name: 'Anatomy',
     render: () => (
         <LiveAnatomy live title="A Section with its header, body, detail and footer numbered" parts={ANATOMY_PARTS}>
-            <PatternSection
+            <Section
                 data-anatomy-root
                 title="Reflections"
                 description="Week of Oct 20"
@@ -1383,7 +1383,7 @@ export const AnatomyQueue = {
                 footer={<Button text="View all" appearance="subtle" onClick={() => {}} />}
             >
                 <StudentsTable count={4} />
-            </PatternSection>
+            </Section>
         </LiveAnatomy>
     ),
     play: async ({ canvasElement }) => {

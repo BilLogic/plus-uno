@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, FooterActions, Logo, ProgressTracker, Sidebar, Skeleton, TextField } from '@/components';
-import { Frame, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, PatternSection } from '@/patterns';
+import { Frame, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, Section } from '@/templates';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { MultiStepTaskType, WINDOW_HEIGHT, stepItems } from '@/storybook-docs/lib/multi-step-task.jsx';
@@ -61,9 +61,9 @@ export const MultiStepStepsInPage = () => (
 );
 
 const RowsBehind = () => (
-    <PatternSection title="Upcoming sessions">
+    <Section title="Upcoming sessions">
         <Skeleton preset="text" lines={6} />
-    </PatternSection>
+    </Section>
 );
 
 const AskPanel = ({ onClose }) => (

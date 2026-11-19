@@ -3,7 +3,7 @@ import React, { useRef, useState } from 'react';
 import { Button, Fieldset, SectionMessage, Select, Skeleton, TextField } from '@/components';
 import { PresenceSlot } from '@/lib/listMotion';
 import { SwapInPlace } from '@/lib/swapMotion';
-import { Modal, PatternSection, PanelBody, PanelCloseAction, PanelContainer, PanelFooter, PanelHeader } from '@/patterns';
+import { Modal, Section, PanelBody, PanelCloseAction, PanelContainer, PanelFooter, PanelHeader } from '@/templates';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
@@ -115,9 +115,9 @@ export const FullBleedFooter = ({ sending, onSave, onCancel, primary = 'Save ses
 
 /** A page body made of placeholder bars, so the form is what reads. */
 export const Behind = () => (
-    <PatternSection title="Sessions">
+    <Section title="Sessions">
         <Skeleton preset="text" lines={3} />
-    </PatternSection>
+    </Section>
 );
 
 /** The fields' state, with the blur, submit and server rules each host shares. */
@@ -165,13 +165,13 @@ export const FormInPage = ({ initial, server, subjectWaits, sendingForever, mark
     return (
         <BrowserWindow address="app.plus.org/sessions/new" height={PAGE_HEIGHT}>
             <InAppFrame height="100%" activeTabId="sessions" panelStorageKey={null}>
-                <PatternSection level="page" title="Log a session">
+                <Section level="page" title="Log a session">
                     <PresenceSlot show={Boolean(f.serverError)}>
                         <FormMessage>{SERVER_MESSAGE}</FormMessage>
                     </PresenceSlot>
                     <FormFields values={f.values} onChange={f.setValues} errors={f.errors} onBlurField={f.onBlurField} subjectWaits={subjectWaits} setRef={f.setRef} />
                     <PageFooter sending={f.sending} onSave={f.submit} />
-                </PatternSection>
+                </Section>
             </InAppFrame>
         </BrowserWindow>
     );

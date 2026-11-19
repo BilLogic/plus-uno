@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Checkbox, DatePicker, RadioGroup, Select, TextArea, TextField, Toggle } from '@/components';
-import { PatternSection } from '@/patterns';
+import { Section } from '@/templates';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { InAppFrame, RECORD_CRUMBS } from '@/storybook-docs/lib/pattern-demo.jsx';
 
@@ -63,13 +63,13 @@ const PAGE_HEIGHT = 420; // docs-literal
 export const OwnedForm = () => (
     <BrowserWindow address="app.plus.org/sessions/ana-ruiz" height={PAGE_HEIGHT}>
         <InAppFrame height="100%" activeTabId="sessions" breadcrumbs={RECORD_CRUMBS} panelStorageKey={null}>
-            <PatternSection level="page" title="Session details" description="Set by Lincoln's supervisor.">
+            <Section level="page" title="Session details" description="Set by Lincoln's supervisor.">
                 <div style={column}>
                     <TextField label="Student" value="Ana Ruiz" onChange={noop} isReadOnly />
                     <TextField label="Time" value="Thursday at 4:00 PM" onChange={noop} isReadOnly />
                     <Select label="Site" options={[{ value: 'lincoln', label: 'Lincoln Middle' }]} value="lincoln" onChange={noop} isReadOnly />
                 </div>
-            </PatternSection>
+            </Section>
         </InAppFrame>
     </BrowserWindow>
 );
@@ -87,13 +87,13 @@ export const LongValue = () => (
 /** A value nobody changes here is plain text: a label and a value in a details Section. */
 export const PlainText = ({ padded = true }) => (
     <div style={padded ? pad : undefined}>
-        <PatternSection title="Details" description="Lincoln Middle">
+        <Section title="Details" description="Lincoln Middle">
             <dl style={{ margin: 0, display: 'grid', gridTemplateColumns: 'max-content 1fr', gap: 'var(--stack-sm) var(--inline-lg)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
                 <dt style={{ color: 'var(--ds-text-subtle)' }}>School</dt>
                 <dd style={{ margin: 0 }}>Lincoln Middle School</dd>
                 <dt style={{ color: 'var(--ds-text-subtle)' }}>Created</dt>
                 <dd style={{ margin: 0 }}>Sep 3, 2026</dd>
             </dl>
-        </PatternSection>
+        </Section>
     </div>
 );

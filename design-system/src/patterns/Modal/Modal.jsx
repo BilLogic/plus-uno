@@ -29,7 +29,7 @@ export const MODAL_WIDTH_PX = {
 };
 
 /**
- * Modal template (`@/patterns`): a Dialog on a Blanket with modal behavior on
+ * Modal template (`@/templates`): a Dialog on a Blanket with modal behavior on
  * `@base-ui/react` Dialog (portal, focus trap, Escape, scroll lock, and the
  * blanket-press rule). One Modal is open at a time (`useOverlaySlot`).
  *

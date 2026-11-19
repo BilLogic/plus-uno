@@ -1,6 +1,6 @@
 import React from 'react';
 import { Breadcrumb, Sidebar } from '@/components';
-import { Frame } from '@/patterns';
+import { Frame } from '@/templates';
 
 /**
  * Story chrome shared by the pattern stories: a demo caption, a dashed

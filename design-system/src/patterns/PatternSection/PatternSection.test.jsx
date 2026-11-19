@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ComponentExample } from '@/storybook-docs/ds-docs-layout.jsx';
 import { LiveAnatomy, TypeCard } from '@/storybook-docs/lib/template-page.jsx';
-import PatternSection, { SectionToolbar } from './PatternSection';
+import Section, { SectionToolbar } from './PatternSection';
 import * as Cases from './PatternSectionCases.jsx';
 
 vi.mock('@storybook/addon-docs/blocks', () => ({
@@ -23,9 +23,9 @@ vi.mock('@storybook/addon-docs/blocks', () => ({
  */
 const section = (container) => container.querySelector('section');
 
-describe('PatternSection', () => {
+describe('Section', () => {
     it('has no fill and no pad by default', () => {
-        const { container } = render(<PatternSection title="Sessions">Body</PatternSection>);
+        const { container } = render(<Section title="Sessions">Body</Section>);
         const cls = section(container).className;
         expect(cls).not.toMatch(/plus-template-section-pad-/);
         expect(cls).not.toMatch(/plus-template-section-bg-/);
@@ -33,17 +33,17 @@ describe('PatternSection', () => {
 
     describe('spacing', () => {
         it('puts the default step on the Section, and each other step on request', () => {
-            const { container, rerender } = render(<PatternSection title="Flag">Body</PatternSection>);
+            const { container, rerender } = render(<Section title="Flag">Body</Section>);
             expect(section(container).className).toContain('plus-template-section-spacing-default');
-            rerender(<PatternSection title="Flag" spacing="compact">Body</PatternSection>);
+            rerender(<Section title="Flag" spacing="compact">Body</Section>);
             expect(section(container).className).toContain('plus-template-section-spacing-compact');
-            rerender(<PatternSection title="Flag" spacing="spacious">Body</PatternSection>);
+            rerender(<Section title="Flag" spacing="spacious">Body</Section>);
             expect(section(container).className).toContain('plus-template-section-spacing-spacious');
         });
 
         it('takes no fill prop: a padded box with a fill is a Card', () => {
             const removed = { fill: 'subtle' };
-            const { container } = render(<PatternSection title="Flag" {...removed}>Body</PatternSection>);
+            const { container } = render(<Section title="Flag" {...removed}>Body</Section>);
             expect(section(container).className).not.toMatch(/plus-template-section-fill-/);
         });
     });
@@ -51,7 +51,7 @@ describe('PatternSection', () => {
     describe('header types', () => {
         it('infers `tabs` from the tabs slot and puts the tabs row under the title row', () => {
             const { container } = render(
-                <PatternSection title="Next session" tabs={<div data-testid="tabs" />}>Body</PatternSection>,
+                <Section title="Next session" tabs={<div data-testid="tabs" />}>Body</Section>,
             );
             const header = container.querySelector('.plus-template-section-header');
             expect(header.className).toContain('plus-template-section-header--tabs');
@@ -60,14 +60,14 @@ describe('PatternSection', () => {
 
         it('puts "Add view" at the end of the tabs row when `onAddView` is set', () => {
             const onAddView = vi.fn();
-            render(<PatternSection title="Students" tabs={<div />} onAddView={onAddView}>Body</PatternSection>);
+            render(<Section title="Students" tabs={<div />} onAddView={onAddView}>Body</Section>);
             screen.getByRole('button', { name: 'Add view' }).click();
             expect(onAddView).toHaveBeenCalledOnce();
         });
 
         it('infers `toolbar` from the toolbar slot', () => {
             const { container } = render(
-                <PatternSection title="Students" toolbar={<SectionToolbar count="48 students" />}>Body</PatternSection>,
+                <Section title="Students" toolbar={<SectionToolbar count="48 students" />}>Body</Section>,
             );
             expect(container.querySelector('.plus-template-section-header').className).toContain('plus-template-section-header--toolbar');
             expect(screen.getByText('48 students')).toBeInTheDocument();
@@ -75,9 +75,9 @@ describe('PatternSection', () => {
 
         it('`tabs-only` keeps the title as a heading but hides it visually', () => {
             render(
-                <PatternSection type="tabs-only" title="Students" tabs={<div data-testid="tabs" />} actions={<button type="button">Add</button>}>
+                <Section type="tabs-only" title="Students" tabs={<div data-testid="tabs" />} actions={<button type="button">Add</button>}>
                     Body
-                </PatternSection>,
+                </Section>,
             );
             const heading = screen.getByRole('heading', { name: 'Students' });
             expect(heading.closest('.visually-hidden')).not.toBeNull();
@@ -86,9 +86,9 @@ describe('PatternSection', () => {
 
         it('`custom` swaps title and description for the header slot and keeps the title as a hidden name', () => {
             render(
-                <PatternSection title="This week" description="Not shown" header={<p>Week of October 20</p>}>
+                <Section title="This week" description="Not shown" header={<p>Week of October 20</p>}>
                     Body
-                </PatternSection>,
+                </Section>,
             );
             expect(screen.getByText('Week of October 20')).toBeInTheDocument();
             expect(screen.getByRole('heading', { name: 'This week' }).closest('.visually-hidden')).not.toBeNull();
@@ -99,9 +99,9 @@ describe('PatternSection', () => {
     describe('loading', () => {
         it('swaps the header for skeleton bars and marks the section busy', () => {
             const { container } = render(
-                <PatternSection title="Sessions" description="This week" loading>
+                <Section title="Sessions" description="This week" loading>
                     Body
-                </PatternSection>,
+                </Section>,
             );
             expect(section(container)).toHaveAttribute('aria-busy', 'true');
             expect(container.querySelectorAll('.plus-template-section-skeleton .plus-skeleton')).toHaveLength(2);
@@ -112,29 +112,29 @@ describe('PatternSection', () => {
         });
 
         it('draws the skeleton before a title has arrived', () => {
-            const { container } = render(<PatternSection loading>Body</PatternSection>);
+            const { container } = render(<Section loading>Body</Section>);
             expect(container.querySelectorAll('.plus-template-section-skeleton .plus-skeleton')).toHaveLength(2);
         });
 
         it('adds a bar for the bottom row, and on tabs-only draws only that bar', () => {
-            const { container, rerender } = render(<PatternSection title="S" tabs={<div />} loading>Body</PatternSection>);
+            const { container, rerender } = render(<Section title="S" tabs={<div />} loading>Body</Section>);
             expect(container.querySelectorAll('.plus-template-section-skeleton .plus-skeleton')).toHaveLength(3);
-            rerender(<PatternSection type="tabs-only" title="S" tabs={<div />} loading>Body</PatternSection>);
+            rerender(<Section type="tabs-only" title="S" tabs={<div />} loading>Body</Section>);
             expect(container.querySelectorAll('.plus-template-section-skeleton .plus-skeleton')).toHaveLength(1);
         });
     });
 
     describe('layout', () => {
         it('single by default: the content slot alone', () => {
-            const { container } = render(<PatternSection title="S">Body</PatternSection>);
+            const { container } = render(<Section title="S">Body</Section>);
             expect(container.querySelector('.plus-template-section-content').className).toContain('plus-template-section-content--single');
         });
 
         it('split puts the side slot beside the content', () => {
             const { container } = render(
-                <PatternSection title="S" layout="split" side={<p>Tutor on call</p>}>
+                <Section title="S" layout="split" side={<p>Tutor on call</p>}>
                     <p>Upcoming</p>
-                </PatternSection>,
+                </Section>,
             );
             const body = container.querySelector('.plus-template-section-content--split');
             expect(within(body.querySelector('.plus-template-section-main')).getByText('Upcoming')).toBeInTheDocument();
@@ -143,10 +143,10 @@ describe('PatternSection', () => {
 
         it('subsections stack the nested sections as h3s under the h2', () => {
             const { container } = render(
-                <PatternSection title="Settings" layout="subsections">
-                    <PatternSection title="Profile">A</PatternSection>
-                    <PatternSection title="Notifications">B</PatternSection>
-                </PatternSection>,
+                <Section title="Settings" layout="subsections">
+                    <Section title="Profile">A</Section>
+                    <Section title="Notifications">B</Section>
+                </Section>,
             );
             expect(container.querySelector('.plus-template-section-content--subsections')).not.toBeNull();
             const tags = screen.getAllByRole('heading').map((h) => [h.tagName.toLowerCase(), h.textContent]);
@@ -155,7 +155,7 @@ describe('PatternSection', () => {
 
         it('renders the footer after the body', () => {
             const { container } = render(
-                <PatternSection title="S" footer={<a href="#all">View all</a>}>Body</PatternSection>,
+                <Section title="S" footer={<a href="#all">View all</a>}>Body</Section>,
             );
             const parts = [...section(container).children].map((el) => el.className.split(' ')[0]);
             expect(parts).toEqual(['plus-template-section-header', 'plus-template-section-content', 'plus-template-section-footer']);
@@ -181,8 +181,8 @@ describe('SectionToolbar', () => {
         expect(within(toolbar.querySelector('.plus-section-toolbar__actions')).getByRole('button', { name: 'Export' })).toBeInTheDocument();
     });
 
-    it('is reachable as PatternSection.Toolbar', () => {
-        expect(PatternSection.Toolbar).toBe(SectionToolbar);
+    it('is reachable as Section.Toolbar', () => {
+        expect(Section.Toolbar).toBe(SectionToolbar);
     });
 
     it('announces the count politely', () => {
@@ -191,12 +191,12 @@ describe('SectionToolbar', () => {
     });
 });
 
-describe('PatternSection named', () => {
+describe('Section named', () => {
     it('is a region named by its title only when asked', () => {
-        const { unmount } = render(<PatternSection title="Flag 1" named>Body</PatternSection>);
+        const { unmount } = render(<Section title="Flag 1" named>Body</Section>);
         expect(screen.getByRole('region', { name: 'Flag 1' })).toBeInTheDocument();
         unmount();
-        render(<PatternSection title="Flag 1">Body</PatternSection>);
+        render(<Section title="Flag 1">Body</Section>);
         expect(screen.queryByRole('region')).toBeNull();
     });
 });
@@ -321,7 +321,7 @@ describe('Template docs live examples', () => {
     });
 });
 
-describe('PatternSection header rows', () => {
+describe('Section header rows', () => {
     const filters = [
         { key: 'status', label: 'Status', text: 'Upcoming' },
         { key: 'group', label: 'Group', text: 'All' },
@@ -331,7 +331,7 @@ describe('PatternSection header rows', () => {
 
     it('draws views and the format switch in row 2, Search and filters in row 3', () => {
         const { container } = render(
-            <PatternSection
+            <Section
                 title="Sessions"
                 views={<div data-testid="views" />}
                 format={<div data-testid="format" />}
@@ -339,7 +339,7 @@ describe('PatternSection header rows', () => {
                 filters={filters}
             >
                 Body
-            </PatternSection>,
+            </Section>,
         );
         const [row2, row3] = rows(container);
         expect(within(row2).getByTestId('views')).toBeInTheDocument();
@@ -350,7 +350,7 @@ describe('PatternSection header rows', () => {
 
     it('drops row 2 without views and moves the format switch to the end of row 3', () => {
         const { container } = render(
-            <PatternSection title="Students" format={<div data-testid="format" />} search={<div />} filters={filters}>Body</PatternSection>,
+            <Section title="Students" format={<div data-testid="format" />} search={<div />} filters={filters}>Body</Section>,
         );
         const found = rows(container);
         expect(found).toHaveLength(1);
@@ -358,27 +358,27 @@ describe('PatternSection header rows', () => {
     });
 
     it('drops row 3 when there is nothing to search or filter', () => {
-        const { container } = render(<PatternSection title="Reflections" views={<div />}>Body</PatternSection>);
+        const { container } = render(<Section title="Reflections" views={<div />}>Body</Section>);
         expect(rows(container)).toHaveLength(1);
     });
 
     it('ends row 3 with the count and Clear all once a filter is applied', () => {
         const onClearAll = vi.fn();
         const applied = filters.map((f, i) => ({ ...f, isSelected: i < 2 }));
-        render(<PatternSection title="Sessions" search={<div />} filters={applied} count="3 of 12" onClearAll={onClearAll}>Body</PatternSection>);
+        render(<Section title="Sessions" search={<div />} filters={applied} count="3 of 12" onClearAll={onClearAll}>Body</Section>);
         expect(screen.getByText('3 of 12')).toBeInTheDocument();
         screen.getByRole('button', { name: 'Clear all' }).click();
         expect(onClearAll).toHaveBeenCalled();
     });
 
     it('shows no count or Clear all while nothing is applied', () => {
-        render(<PatternSection title="Sessions" search={<div />} filters={filters} count="12 of 12" onClearAll={() => {}}>Body</PatternSection>);
+        render(<Section title="Sessions" search={<div />} filters={filters} count="12 of 12" onClearAll={() => {}}>Body</Section>);
         expect(screen.queryByRole('button', { name: 'Clear all' })).toBeNull();
     });
 
     it('shows three filters and folds the rest into More filters with a count', () => {
         const many = [...filters, { key: 'grade', label: 'Grade', text: 'All' }, { key: 'tutor', label: 'Tutor', text: 'Any' }];
-        render(<PatternSection title="Sessions" search={<div />} filters={many}>Body</PatternSection>);
+        render(<Section title="Sessions" search={<div />} filters={many}>Body</Section>);
         expect(screen.getByRole('button', { name: 'Date: All time' })).toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'Grade: All' })).toBeNull();
         expect(screen.getByRole('button', { name: /More filters/ })).toHaveTextContent('2');
@@ -386,7 +386,7 @@ describe('PatternSection header rows', () => {
 
     it('hands a filter entry\'s trigger to its menu, so the same button opens it', () => {
         const menu = vi.fn((trigger) => <div data-testid="menu-wrap">{trigger}</div>);
-        render(<PatternSection title="Sessions" search={<div />} filters={[{ key: 'status', label: 'Status', text: 'Upcoming', isSelected: true, menu }]}>Body</PatternSection>);
+        render(<Section title="Sessions" search={<div />} filters={[{ key: 'status', label: 'Status', text: 'Upcoming', isSelected: true, menu }]}>Body</Section>);
         const trigger = screen.getByRole('button', { name: 'Status: Upcoming' });
         expect(menu).toHaveBeenCalled();
         expect(screen.getByTestId('menu-wrap')).toContainElement(trigger);
@@ -398,7 +398,7 @@ describe('PatternSection header rows', () => {
         window.innerWidth = 600;
         try {
             const applied = filters.map((f, i) => ({ ...f, isSelected: i === 0 }));
-            render(<PatternSection title="Sessions" search={<div />} filters={applied} count="3 of 12" onClearAll={() => {}}>Body</PatternSection>);
+            render(<Section title="Sessions" search={<div />} filters={applied} count="3 of 12" onClearAll={() => {}}>Body</Section>);
             expect(screen.getByText('3 of 12')).toBeInTheDocument();
             expect(screen.getByRole('button', { name: 'Clear all' })).toBeInTheDocument();
         } finally {
@@ -411,7 +411,7 @@ describe('PatternSection header rows', () => {
         window.innerWidth = 600;
         try {
             const applied = filters.map((f, i) => ({ ...f, isSelected: i === 0 }));
-            render(<PatternSection title="Sessions" search={<div data-testid="search" />} filters={applied}>Body</PatternSection>);
+            render(<Section title="Sessions" search={<div data-testid="search" />} filters={applied}>Body</Section>);
             expect(screen.queryByRole('button', { name: 'Status: Upcoming' })).toBeNull();
             expect(screen.getByRole('button', { name: /^Filter/ })).toHaveTextContent('1');
         } finally {
@@ -420,7 +420,7 @@ describe('PatternSection header rows', () => {
     });
 });
 
-describe('PatternSection deprecated header props', () => {
+describe('Section deprecated header props', () => {
     it('warns once in development that `tabs` and `toolbar` give way to the rows', async () => {
         vi.resetModules();
         const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -444,7 +444,7 @@ describe('PatternSection deprecated header props', () => {
     });
 
     it('draws the loading skeleton row for the three-row slots', () => {
-        const { container } = render(<PatternSection title="S" views={<div />} loading>Body</PatternSection>);
-        expect(container.querySelector('.plus-pattern-section-skeleton__row')).not.toBeNull();
+        const { container } = render(<Section title="S" views={<div />} loading>Body</Section>);
+        expect(container.querySelector('.plus-template-section-skeleton__row')).not.toBeNull();
     });
 });

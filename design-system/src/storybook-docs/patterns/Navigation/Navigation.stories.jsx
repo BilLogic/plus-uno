@@ -5,7 +5,7 @@ import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { MultiStepTaskType, TASK_STAGE } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
-import { PatternSection } from '@/patterns';
+import { Section } from '@/templates';
 import { ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
 import { expectSectionHeader } from '@/storybook-docs/lib/section-header-asserts.js';
 import {
@@ -216,7 +216,7 @@ export const KeyMultiStepTask = {
 /* ------------------------------------------------------------------- tests */
 
 /** A Section header from a clean start, to drive its views. */
-const Bar = () => <PatternSection title="Sessions" views={<ViewPills views={['Upcoming', 'Past']} />}><p>Sessions</p></PatternSection>;
+const Bar = () => <Section title="Sessions" views={<ViewPills views={['Upcoming', 'Past']} />}><p>Sessions</p></Section>;
 
 /** Test: a view change selects the other tab, with one tab stop and the arrow keys. */
 export const TestViewsSwitch = {

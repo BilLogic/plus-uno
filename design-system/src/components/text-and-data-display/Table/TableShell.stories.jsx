@@ -6,7 +6,7 @@ import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
 import { TableShell } from './TableParts';
-import PatternSection from '@/patterns/PatternSection';
+import { Section } from '@/templates';
 import { Checkbox, Button, EmptyState as PlusEmptyState } from '@/components';
 
 const sampleRows = [
@@ -124,11 +124,11 @@ export default {
 };
 
 export const Overview = () => (
-    <PatternSection title="Team members" actions={sectionActions}>
+    <Section title="Team members" actions={sectionActions}>
         <TableShell footer={paginationSlot}>
             {tableContent}
         </TableShell>
-    </PatternSection>
+    </Section>
 );
 
 /**
@@ -138,11 +138,11 @@ export const Overview = () => (
  */
 export const EmptyState = {
     render: () => (
-        <PatternSection title="Team members" actions={sectionActions}>
+        <Section title="Team members" actions={sectionActions}>
             <TableShell empty emptyState={emptyStateSlot} footer={paginationSlot}>
                 {tableContent}
             </TableShell>
-        </PatternSection>
+        </Section>
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
@@ -171,7 +171,7 @@ const FilteredMembersTable = () => {
     const [filtered, setFiltered] = React.useState(true);
     const visible = filtered ? [] : sampleRows;
     return (
-        <PatternSection
+        <Section
             title="Team members"
             filters={[{
                 key: 'role',
@@ -203,7 +203,7 @@ const FilteredMembersTable = () => {
             >
                 {tableContent}
             </TableShell>
-        </PatternSection>
+        </Section>
     );
 };
 
@@ -235,7 +235,7 @@ export const EmptyHiddenByFilter = {
 export const EmptyNothingToCreate = {
     name: 'Empty: Nothing to create',
     render: () => (
-        <PatternSection title="Activity">
+        <Section title="Activity">
             <TableShell
                 empty
                 emptyState={(
@@ -249,7 +249,7 @@ export const EmptyNothingToCreate = {
             >
                 {tableContent}
             </TableShell>
-        </PatternSection>
+        </Section>
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
@@ -387,11 +387,11 @@ export const RowStates = {
 export const Sticky = {
     render: () => (
         <div style={{ maxWidth: 'var(--width-3000)' }}>
-            <PatternSection title="Tutors">
+            <Section title="Tutors">
                 <TableShell stickyHeader stickyColumn maxHeight="var(--width-1500)">
                     {wideTable}
                 </TableShell>
-            </PatternSection>
+            </Section>
         </div>
     ),
     play: async ({ canvasElement }) => {
@@ -453,11 +453,11 @@ export const StickyHeaderNeedsMaxHeight = {
 export const StickyHeader = {
     name: 'Sticky header',
     render: () => (
-        <PatternSection title="Tutors">
+        <Section title="Tutors">
             <TableShell stickyHeader maxHeight="var(--card-max-height-sm)">
                 {wideTable}
             </TableShell>
-        </PatternSection>
+        </Section>
     ),
 };
 
@@ -466,11 +466,11 @@ export const StickyColumn = {
     name: 'Sticky column',
     render: () => (
         <div style={{ maxWidth: 'var(--card-min-width-lg)' }}>
-            <PatternSection title="Tutors">
+            <Section title="Tutors">
                 <TableShell stickyColumn>
                     {wideTable}
                 </TableShell>
-            </PatternSection>
+            </Section>
         </div>
     ),
 };
@@ -495,7 +495,7 @@ const AddRemoveTableDemo = ({ mode }) => {
     const [rows, setRows] = React.useState(INITIAL_ROSTER);
     const hasMaya = rows.some((row) => row.id === 'maya');
     return (
-        <PatternSection
+        <Section
             title="Sessions"
             actions={mode === 'add' ? (
                 <Button
@@ -536,7 +536,7 @@ const AddRemoveTableDemo = ({ mode }) => {
                     ))}
                 </tbody>
             </TableShell>
-        </PatternSection>
+        </Section>
     );
 };
 
@@ -625,7 +625,7 @@ const ReorderTableDemo = () => {
     }, [descending]);
 
     return (
-        <PatternSection
+        <Section
             title="Students"
             actions={(
                 <Button
@@ -653,7 +653,7 @@ const ReorderTableDemo = () => {
                     ))}
                 </tbody>
             </TableShell>
-        </PatternSection>
+        </Section>
     );
 };
 

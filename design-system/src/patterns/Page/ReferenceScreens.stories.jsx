@@ -14,14 +14,14 @@ import {
 import {
     Frame,
     Page,
-    PatternSection,
+    Section,
     Table,
     usePanelControl,
     PanelBody,
     PanelContainer,
     PanelFooter,
     PanelHeader,
-} from '@/patterns';
+} from '@/templates';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
 
@@ -147,11 +147,11 @@ export const DetailWithPanel = {
                         header={<PageHeader title="Ana Ruiz · Session review" actions={<EditNotes />} />}
                         banner={<Banner appearance="announcement">Saved notes are shared with the tutor.</Banner>}
                     >
-                        <PatternSection title="Session summary">
+                        <Section title="Session summary">
                             <p>Math · Fractions and unit rates</p>
                             <StatusTag appearance="warning">Needs review</StatusTag>
-                        </PatternSection>
-                        <PatternSection title="Saved notes"><p role="status">{saved}</p></PatternSection>
+                        </Section>
+                        <Section title="Saved notes"><p role="status">{saved}</p></Section>
                     </Page>
                 </Frame>
             </FitStage>

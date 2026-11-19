@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import PatternSection from '@/patterns/PatternSection';
+import Section from '../PatternSection';
 import { DynamicTable, StaticTable, TableEmptyBox, TableFooterRow, TreeTable } from '@/components';
 import './Table.scss';
 
@@ -44,7 +44,7 @@ const Table = ({
     const showEmptyState = Boolean(empty && emptyState);
 
     return (
-        <PatternSection {...sectionProps}>
+        <Section {...sectionProps}>
             <div className={['plus-table-template', className].filter(Boolean).join(' ')} data-kind={kind}>
                 {showEmptyState ? (
                     <TableEmptyBox label={label}>{emptyState}</TableEmptyBox>
@@ -55,7 +55,7 @@ const Table = ({
                     </>
                 )}
             </div>
-        </PatternSection>
+        </Section>
     );
 };
 

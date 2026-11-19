@@ -1,8 +1,8 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 
-import { DropdownMenu, Popup, StaticTable, Flag, ButtonItem, Section, Button } from '@/components';
-import { Modal, PatternCard, PatternSection, Page } from '@/patterns';
+import { DropdownMenu, Popup, StaticTable, Flag, ButtonItem, Section as MenuSection, Button } from '@/components';
+import { Modal, Card, Section, Page } from '@/templates';
 
 /**
  * Headings step down one size per nesting level, and their tags follow the
@@ -42,11 +42,11 @@ const headingNamed = (canvas, level, name) => canvas.getByRole('heading', { leve
 /** A page, a section in it, and a subsection in that, each one size smaller. */
 export const PageSectionSubsection = () => (
     <Page title="Sessions">
-        <PatternSection title="This week" description="Every session you tutor from Monday to Sunday.">
-            <PatternSection title="Monday">
+        <Section title="This week" description="Every session you tutor from Monday to Sunday.">
+            <Section title="Monday">
                 <p>Two sessions.</p>
-            </PatternSection>
-        </PatternSection>
+            </Section>
+        </Section>
     </Page>
 );
 
@@ -64,12 +64,12 @@ PageSectionSubsection.play = async ({ canvasElement }) => {
  */
 export const CardTitles = () => (
     <Page title="Sessions">
-        <PatternSection title="This week">
-            <PatternCard title="Lincoln Middle" description="Two students" />
-            <PatternSection title="Monday">
-                <PatternCard title="South High" description="Three students" />
-            </PatternSection>
-        </PatternSection>
+        <Section title="This week">
+            <Card title="Lincoln Middle" description="Two students" />
+            <Section title="Monday">
+                <Card title="South High" description="Three students" />
+            </Section>
+        </Section>
     </Page>
 );
 
@@ -92,9 +92,9 @@ export const ModalTitle = () => (
         primaryButton={{ text: 'Save' }}
         secondaryButton={{ text: 'Cancel' }}
     >
-        <PatternSection title="When">
+        <Section title="When">
             <p>Thursdays at 4:00 PM.</p>
-        </PatternSection>
+        </Section>
     </Modal>
 );
 
@@ -140,10 +140,10 @@ FlagTitle.play = async ({ canvasElement }) => {
 export const GroupLabels = () => (
     <div style={{ display: 'flex', gap: 'var(--inline-2xl)', alignItems: 'flex-start' }}>
         <DropdownMenu isOpen trigger={<Button>Sort</Button>}>
-            <Section title="Order">
+            <MenuSection title="Order">
                 <ButtonItem onClick={() => {}}>Newest</ButtonItem>
                 <ButtonItem onClick={() => {}}>Oldest</ButtonItem>
-            </Section>
+            </MenuSection>
         </DropdownMenu>
         <StaticTable headers={['Student', 'Grade']} rows={[['Ana', '7'], ['Ben', '8']]} />
     </div>

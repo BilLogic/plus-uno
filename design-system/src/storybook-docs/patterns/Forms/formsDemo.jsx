@@ -19,7 +19,7 @@ import {
     TextField,
     Toggle,
 } from '@/components';
-import { Frame, PatternSection } from '@/patterns';
+import { Frame, Section } from '@/templates';
 import { stepItems } from '@/storybook-docs/lib/multi-step-task.jsx';
 
 /** A form in steps: four or fewer run across the top; five or more go down a rail 256 wide. */
@@ -483,8 +483,8 @@ export const SettingsPage = () => {
     return (
         <div style={{ position: 'relative', blockSize: '100%' }}>
             <InAppFrame height="100%" activeTabId="home" panelStorageKey={null}>
-                <PatternSection level="page" title="Settings" layout="subsections">
-                    <PatternSection title="Notifications">
+                <Section level="page" title="Settings" layout="subsections">
+                    <Section title="Notifications">
                         <div>
                             <SettingRow
                                 id="setting-session-reminders"
@@ -528,8 +528,8 @@ export const SettingsPage = () => {
                                 )}
                             />
                         </div>
-                    </PatternSection>
-                    <PatternSection title="Connected accounts">
+                    </Section>
+                    <Section title="Connected accounts">
                         <div>
                             <SettingRow
                                 id="setting-google-calendar"
@@ -551,8 +551,8 @@ export const SettingsPage = () => {
                                 )}
                             />
                         </div>
-                    </PatternSection>
-                </PatternSection>
+                    </Section>
+                </Section>
             </InAppFrame>
             {savedTitle && (
                 <FlagGroup containerPosition="absolute">

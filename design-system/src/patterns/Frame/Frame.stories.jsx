@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { Breadcrumb, Button, IconButton, Logo, Sidebar, Skeleton, StatusTag, TextField } from '@/components';
-import { Frame, Modal, PANEL_STORAGE_KEY, PatternCard, PatternSection, usePanelControl, useSidebarControl, PanelBody, PanelCloseAction, PanelContainer, PanelHeader } from '@/patterns';
+import { Frame, Modal, PANEL_STORAGE_KEY, Card, Section, usePanelControl, useSidebarControl, PanelBody, PanelCloseAction, PanelContainer, PanelHeader } from '@/templates';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { FRAME_LAYOUT } from './frameLayout';
 import { BrowserWindow, LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
@@ -1519,11 +1519,11 @@ export const StateAt1440 = frameState(1440, {}, async (p) => sidebarIs(p, 'docke
 
 /** A page body made of placeholder bars, so the Frame's own structure is what reads. */
 const SkeletonSection = ({ title }) => (
-    <PatternSection title={title}>
+    <Section title={title}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
             <Skeleton preset="text" lines={3} />
         </div>
-    </PatternSection>
+    </Section>
 );
 
 /** The default type: the Sidebar, the Page, and the AI panel as its own region. */
@@ -2208,13 +2208,13 @@ const GoToAreaDemo = () => {
                     )}
                 >
                     <DemoPageHeader title={page.title} />
-                    <PatternSection title={page.section}>
+                    <Section title={page.section}>
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--grid-gutter)' }}>
                             {page.cards.map(([title, description]) => (
-                                <PatternCard key={title} title={title} description={description} />
+                                <Card key={title} title={title} description={description} />
                             ))}
                         </div>
-                    </PatternSection>
+                    </Section>
                 </Frame>
             </BrowserWindow>
         </FitStage>
@@ -2318,10 +2318,10 @@ const DrillDemo = ({ initialDepth = 0 }) => {
                                 return (
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--page-stack-md)' }}>
                                         <DemoPageHeader title="Students" />
-                                        <PatternSection title="All students">
+                                        <Section title="All students">
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
                                                 {DRILL_STUDENTS.map((student) => (
-                                                    <PatternCard
+                                                    <Card
                                                         key={student.id}
                                                         data-drill-row={student.id}
                                                         title={student.name}
@@ -2340,7 +2340,7 @@ const DrillDemo = ({ initialDepth = 0 }) => {
                                                     />
                                                 ))}
                                             </div>
-                                        </PatternSection>
+                                        </Section>
                                     </div>
                                 );
                             }
@@ -2352,12 +2352,12 @@ const DrillDemo = ({ initialDepth = 0 }) => {
                                             status={{ appearance: 'success', text: 'Active' }}
                                             description={entry.student.detail}
                                         />
-                                        <PatternSection title="Sessions">
+                                        <Section title="Sessions">
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
                                                 {entry.student.sessions.map((session, index) => {
                                                     const rowId = `session-${index}`;
                                                     return (
-                                                        <PatternCard
+                                                        <Card
                                                             key={session[0]}
                                                             data-drill-row={rowId}
                                                             title={session[0]}
@@ -2379,7 +2379,7 @@ const DrillDemo = ({ initialDepth = 0 }) => {
                                                     );
                                                 })}
                                             </div>
-                                        </PatternSection>
+                                        </Section>
                                     </div>
                                 );
                             }
@@ -2389,9 +2389,9 @@ const DrillDemo = ({ initialDepth = 0 }) => {
                                         title={entry.session[0]}
                                         description={`${entry.student.name} · ${entry.student.detail}`}
                                     />
-                                    <PatternSection title="Session summary">
-                                        <PatternCard title="Goal progress" description="Solved four linear equations independently and checked each answer." />
-                                    </PatternSection>
+                                    <Section title="Session summary">
+                                        <Card title="Goal progress" description="Solved four linear equations independently and checked each answer." />
+                                    </Section>
                                 </div>
                             );
                         }}
@@ -2600,19 +2600,19 @@ const RecordOverlayDemo = () => {
                                     return (
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--page-stack-md)' }}>
                                             <DemoPageHeader title={entry.student.name} description={entry.student.detail} />
-                                            <PatternSection title="Overview">
-                                                <PatternCard title="Current unit" description="Linear equations and slope-intercept form." />
-                                            </PatternSection>
+                                            <Section title="Overview">
+                                                <Card title="Current unit" description="Linear equations and slope-intercept form." />
+                                            </Section>
                                         </div>
                                     );
                                 }
                                 return (
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--page-stack-md)' }}>
                                         <DemoPageHeader title="Students" />
-                                        <PatternSection title="All students">
+                                        <Section title="All students">
                                             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
                                                 {DRILL_STUDENTS.map((student) => (
-                                                    <PatternCard
+                                                    <Card
                                                         key={student.id}
                                                         data-drill-row={student.id}
                                                         title={student.name}
@@ -2641,7 +2641,7 @@ const RecordOverlayDemo = () => {
                                                     />
                                                 ))}
                                             </div>
-                                        </PatternSection>
+                                        </Section>
                                     </div>
                                 );
                             }}
@@ -2731,9 +2731,9 @@ const StepMotionDemo = ({ count = 4 }) => (
                 {(at) => {
                     const [title, description] = STEP_BODY_BY_LABEL[TASK_STEPS[at]] ?? STEP_BODY_BY_LABEL.Student;
                     return (
-                        <PatternSection title={title} description={description}>
-                            <PatternCard title={`Step ${at + 1}: ${TASK_STEPS[at]}`} description={description} />
-                        </PatternSection>
+                        <Section title={title} description={description}>
+                            <Card title={`Step ${at + 1}: ${TASK_STEPS[at]}`} description={description} />
+                        </Section>
                     );
                 }}
             </MultiStepTask>

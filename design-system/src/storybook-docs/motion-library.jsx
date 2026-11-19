@@ -13,7 +13,7 @@ import {
 } from '@/components';
 import { HeadingContextProvider } from '@/lib/headingLevel';
 import { SwapInPlace } from '@/lib/swapMotion';
-import { PatternCard } from '@/patterns';
+import { Card } from '@/templates';
 import {
     MOTION_FAMILIES,
     MOTION_TIERS,
@@ -298,7 +298,7 @@ export const MotionLibraryCard = ({
             : subject;
 
     return (
-        <PatternCard
+        <Card
             role="group"
             aria-labelledby={titleId}
             minWidth="var(--card-min-width-md)"
@@ -419,7 +419,7 @@ export const MotionLibraryCard = ({
                     )}
                 </div>
             </div>
-        </PatternCard>
+        </Card>
     );
 };
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect, waitFor } from 'storybook/test';
 import { Icon, IconButton } from '@/components';
-import { PanelContainer, PanelHeader } from '@/patterns';
+import { PanelContainer, PanelHeader } from '@/templates';
 import { Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
 import {
     ButtonInField,

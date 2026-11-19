@@ -21,12 +21,12 @@ import {
 import {
     Frame,
     Page,
-    PatternSection,
+    Section,
     PanelBody,
     PanelCloseAction,
     PanelContainer,
     PanelHeader,
-} from '@/patterns';
+} from '@/templates';
 import { DemoPageHeader } from '../../../patterns/Page/pageDemo.jsx';
 import { WINDOW_HEIGHT } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
@@ -348,12 +348,12 @@ export const InboxInSidebar = ({ defaultOpen = true, initialAllRead = false }) =
                 >
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
                         <DemoPageHeader title="Sessions" description="This week" />
-                        <PatternSection title="Upcoming sessions">
+                        <Section title="Upcoming sessions">
                             <StaticTable
                                 headers={['Student', 'Time', 'Status']}
                                 rows={SESSIONS_BEHIND}
                             />
-                        </PatternSection>
+                        </Section>
                     </div>
                 </Frame>
 
@@ -477,12 +477,12 @@ export const TierPage = () => (
 export const TierSection = () => (
     <BrowserWindow address="app.plus.org/students">
         <Page header={<DemoPageHeader title="Students" description="Lincoln Middle" />}>
-            <PatternSection title="All students" views={<ViewPills views={['All students']} />}>
+            <Section title="All students" views={<ViewPills views={['All students']} />}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
                     <Banner appearance="warning">Two students have no guardian contact on file.</Banner>
                     <StudentsTable count={2} />
                 </div>
-            </PatternSection>
+            </Section>
         </Page>
     </BrowserWindow>
 );

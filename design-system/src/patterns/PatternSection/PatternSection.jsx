@@ -6,7 +6,7 @@ import { HeadingLevelContext, headingTag, useHeadingLevel } from '@/lib/headingL
 import { AnimatePresence, HeightSurface } from '@/lib/heightMotion';
 import { FRAME_LAYOUT } from '../Frame/frameLayout';
 import { useOwnWidth } from '../Frame/useOwnWidth';
-import PatternCard from '../PatternCard/PatternCard';
+import Card from '../PatternCard/PatternCard';
 import './PatternSection.scss';
 
 /**
@@ -264,12 +264,12 @@ const warnDeprecatedHeaderProps = ({ tabs, toolbar }) => {
         if (!value || warned.has(name)) return;
         warned.add(name);
         // eslint-disable-next-line no-console
-        console.warn(`PatternSection: the \`${name}\` prop is deprecated. Use ${instead} in the three-row header.`);
+        console.warn(`Section: the \`${name}\` prop is deprecated. Use ${instead} in the three-row header.`);
     });
 };
 
-/** PatternSection: a span of the page grid under one heading, with its header, toolbar and tabs. */
-const PatternSection = ({
+/** Section: a span of the page grid under one heading, with its header, toolbar and tabs. */
+const Section = ({
     id,
     title,
     description,
@@ -430,7 +430,7 @@ const PatternSection = ({
                 open={isDetailOpen}
                 onOpenChange={handleDetailOpenChange}
                 className="plus-template-section-detail"
-                render={(rootProps) => <PatternCard surface="sunken" {...rootProps} />}
+                render={(rootProps) => <Card surface="sunken" {...rootProps} />}
             >
                 <Collapsible.Trigger
                     ref={detailTriggerRef}
@@ -503,7 +503,7 @@ const PatternSection = ({
     );
 };
 
-PatternSection.propTypes = {
+Section.propTypes = {
     id: PropTypes.string,
     /** Section title: an h2 at Heading/medium 20, or an h3 at Heading/small 16 inside another section
      * @ds-context Used in: Section.title (ds guide section)
@@ -523,7 +523,7 @@ PatternSection.propTypes = {
      * @ds-context Governed by: Forms (ds guide forms)
      */
     tabs: PropTypes.node,
-    /** @deprecated use `search` and `filters` in the three-row header. Toolbar row under the title row (header type `toolbar`), usually a `PatternSection.Toolbar`.
+    /** @deprecated use `search` and `filters` in the three-row header. Toolbar row under the title row (header type `toolbar`), usually a `Section.Toolbar`.
      * @ds-context Used in: Section.toolbar (ds guide section)
      * @ds-context Governed by: Filtering (ds guide filtering); Search (ds guide search)
      */
@@ -623,6 +623,6 @@ PatternSection.propTypes = {
     children: PropTypes.node,
 };
 
-PatternSection.Toolbar = SectionToolbar;
+Section.Toolbar = SectionToolbar;
 
-export default PatternSection;
+export default Section;

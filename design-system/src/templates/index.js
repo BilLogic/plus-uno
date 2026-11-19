@@ -1,5 +1,5 @@
 // Templates: the coded shells a page, a section, a card, a table or an overlay
-// is built from. Each is the same component the `@/patterns` barrel exports,
+// is built from. Each is the same component the `@/templates` barrel exports,
 // under its template name, so either import reaches one implementation.
 
 export { default as Frame, PANEL_STORAGE_KEY } from '../patterns/Frame';
@@ -30,3 +30,21 @@ export {
     usePanelManager,
 } from '../patterns/Panel';
 export { Popup } from '@/components';
+export { default as AiChat, useAiChat, AI_CHAT_MODES, AI_CHAT_STORAGE_KEY, AI_CHAT_FULLSCREEN_BELOW, AI_CHAT_DISCLAIMER } from '../patterns/AiChat';
+export { useSidebarControl } from '@/lib/sidebarControl';
+
+// Template motion helpers (Transitions & Choreography)
+export {
+    AreaStage,
+    DrillStack,
+    useDrillStack,
+    SlideViews,
+    StepStage,
+    scrollToSpot,
+    callAttention,
+} from '../lib/navigationMotion';
+export { SwapInPlace } from '../lib/swapMotion';
+export { LoadThenReveal, LoadRevealSlot } from '../lib/loadRevealMotion';
+export { PresenceSlot } from '../lib/listMotion';
+export { useMotionReduced } from '../lib/motionPreference';
+export { SPRINGS } from '../tokens/ladder/springs.generated';

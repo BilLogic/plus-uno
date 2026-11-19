@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { Breadcrumb, Button } from '@/components';
-import { Frame } from '@/patterns';
+import { Frame } from '@/templates';
 import Sidebar, {
     createOpenTabsStore,
     OpenTabsProvider,

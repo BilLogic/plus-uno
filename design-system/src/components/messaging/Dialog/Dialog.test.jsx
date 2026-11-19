@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import Dialog, { DIALOG_HEIGHTS, DIALOG_WIDTHS } from './Dialog';
 import Button from '@/components/forms-and-inputs/Button';
-import PatternSection from '@/patterns/PatternSection';
+import { Section } from '@/templates';
 
 describe('Dialog', () => {
     it('renders inline without a Blanket or modal portal', () => {
@@ -98,7 +98,7 @@ describe('Dialog', () => {
 
         rerender(
             <Dialog title="Schedule">
-                <PatternSection title="Details">Monday at 4:00 PM</PatternSection>
+                <Section title="Details">Monday at 4:00 PM</Section>
             </Dialog>,
         );
         expect(screen.getByRole('heading', { level: 1, name: 'Schedule' })).toBeInTheDocument();

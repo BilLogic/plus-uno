@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import { Button, FooterActions, ProgressTracker, SectionMessage, Skeleton, TextField } from '@/components';
-import { PanelBody, PanelCloseAction, PanelContainer, PanelHeader } from '@/patterns';
+import { PanelBody, PanelCloseAction, PanelContainer, PanelHeader } from '@/templates';
 import Modal from './Modal.jsx';
-import PatternSection from '../PatternSection';
+import Section from '../PatternSection';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { stepItems } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { FormFields, FILLED } from '../Form/formDemo.jsx';
@@ -183,9 +183,9 @@ export const LoadingBody = () => (
 
 /** A page behind the real dialogs: blocked out so the Modal is what reads. */
 const PageBehind = () => (
-    <PatternSection title="Sessions">
+    <Section title="Sessions">
         <Skeleton preset="text" lines={3} />
-    </PatternSection>
+    </Section>
 );
 
 /**

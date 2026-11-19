@@ -194,7 +194,7 @@ Loading, errors and the search field follow their patterns and components: Loadi
 
 ## Motion
 
-<MotionSection component="PatternSection" tier="template" />
+<MotionSection component="Section" tier="template" />
 
 </div>
 
@@ -243,7 +243,7 @@ The bulk bar lives in the Dynamic table's head row, through its <code>bulkAction
 
 ## Usage
 
-Use `PatternSection` when content has a heading, shares actions, shows or hides as a unit, or takes its own span of the grid; otherwise the content belongs to the Section above it. The header is the Section's, not the Table's: the title row names it and carries its actions, and the header rows under it hold the views, then Search and the filters, so switching views can swap a table for cards while the rows stay put.
+Use `Section` when content has a heading, shares actions, shows or hides as a unit, or takes its own span of the grid; otherwise the content belongs to the Section above it. The header is the Section's, not the Table's: the title row names it and carries its actions, and the header rows under it hold the views, then Search and the filters, so switching views can swap a table for cards while the rows stay put.
 
 A Section takes no fill and no pad, and has five parts: header, body, side, detail and footer. The detail is an inline expand, drawn as a sunken Card, that opens in place inside the Section and pushes the content below it down.
 
@@ -253,7 +253,7 @@ A Section takes no fill and no pad, and has five parts: header, body, side, deta
 
 ## Alternatives
 
-- For one object with an agreed shape, use `PatternCard` inside a Section.
+- For one object with an agreed shape, use `Card` inside a Section.
 - For a queue page or a quick look at a row from a table, use `Panel`.
 - For the page's own title, use `PageHeader`; a Section stands under it.
 

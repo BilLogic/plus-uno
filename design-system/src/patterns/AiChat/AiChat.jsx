@@ -20,7 +20,7 @@ import {
     PanelFooter,
     PanelHeader,
     PanelHostContext,
-} from '@/patterns';
+} from '@/templates';
 import {
     AI_CHAT_FULLSCREEN_BELOW,
     AI_CHAT_MODES,

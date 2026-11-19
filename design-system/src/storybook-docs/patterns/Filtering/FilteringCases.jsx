@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import { FilterButton, FilterMenu, Tag, TagGroup } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
-import { PatternSection } from '@/patterns';
+import { Section } from '@/templates';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { HeaderSearch } from '@/storybook-docs/lib/section-header.jsx';
 import { StudentsTable, ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
@@ -10,7 +10,7 @@ import { CATEGORIES, appliedCount, filterTrigger, narrow, quickFilters } from '.
 
 /**
  * Live Do / Don't cases on the Filtering pattern page, composed from
- * `PatternSection` and its header props, `ViewPills`, `quickFilters`, `FilterMenu`,
+ * `Section` and its header props, `ViewPills`, `quickFilters`, `FilterMenu`,
  * `TagGroup`, and `StudentsTable`.
  */
 
@@ -46,7 +46,7 @@ const FilteringCaseSection = ({
     return (
         <CaseSurface border="none" padding="md" surface={false}>
             <HeadingLevelContext.Provider value={4}>
-                <PatternSection
+                <Section
                     title="Students"
                     views={viewsNode ?? <ViewPills views={views} activeView={activeView} onViewChange={onViewChange} />}
                     format={format}
@@ -61,7 +61,7 @@ const FilteringCaseSection = ({
                     ) : (
                         <StudentsTable rows={visibleRows} columns={['Name', 'Grade', 'School']} />
                     )}
-                </PatternSection>
+                </Section>
             </HeadingLevelContext.Provider>
         </CaseSurface>
     );

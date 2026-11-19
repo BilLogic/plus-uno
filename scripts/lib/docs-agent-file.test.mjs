@@ -87,7 +87,7 @@ test('all thirteen pattern examples reach their generated copies and both refere
   for (const name of ['CommonActions', 'Disabled', 'Empty', 'Errors', 'Filtering', 'Forms', 'Indicators', 'Loading', 'Navigation', 'Notifications', 'Overflow', 'ReadOnly', 'Search']) {
     const text = fs.readFileSync(path.join(root, `design-system/agent-views/patterns/${name}.md`), 'utf8');
     assert.match(text, new RegExp(`## In code\\n\\nFrom .*CodeExamples\\.stories\\.jsx#${name}`));
-    assert.match(text, /import .* from '@\/(?:components|patterns)'/);
+    assert.match(text, /import .* from '@\/(?:components|templates|patterns)'/);
   }
   const rows = JSON.parse(fs.readFileSync(path.join(root, 'design-system/agent-views/reference-screens.json'), 'utf8'));
   assert.deepEqual(rows.map((r) => [r.reference, r.url.split('--').at(-1)]), [

@@ -159,12 +159,12 @@ From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#Filteri
 
 ```jsx
 import { useState } from 'react';
-import { PatternSection } from '@/patterns';
+import { Section } from '@/templates';
 
 function QuickFilterExample() {
     const [status, setStatus] = useState('All');
     return (
-        <PatternSection
+        <Section
             title="Sessions"
             filters={[{
                 key: 'status',
@@ -175,7 +175,7 @@ function QuickFilterExample() {
             }]}
         >
             <p role="status">Showing: {status}</p>
-        </PatternSection>
+        </Section>
     );
 }
 ```

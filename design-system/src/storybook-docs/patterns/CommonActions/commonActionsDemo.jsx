@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { Button, ButtonItem, Dialog, DropdownMenu, Fieldset, FooterActions, IconButton, InlineEdit, TextField, Tooltip } from '@/components';
-import { PatternCard, PatternSection } from '@/patterns';
+import { Card, Section } from '@/templates';
 import { HeaderSearch, SectionActions } from '@/storybook-docs/lib/section-header.jsx';
 import { FilterSide, StudentsTable, ViewPills, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
 import { CaseBlanket, CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
@@ -66,7 +66,7 @@ export const MultiStepBar = () => <MultiStepTaskType start={1} />;
 /** A card's main action: Subtle in the footer. */
 export const CardAction = () => (
     <div style={{ display: 'flex', padding: 'var(--page-pad)' }}>
-        <PatternCard
+        <Card
             title="Next session"
             description="Thursday, 4:00 PM with Ana Ruiz"
             footer={<Button text="Open session" appearance="subtle" spacing="compact" onClick={() => {}} />}
@@ -147,7 +147,7 @@ export const EditRecord = ({ held = false }) => {
 export const ManyRows = () => {
     const [view, setView] = useState('All students');
     return (
-        <PatternSection
+        <Section
             title="Students"
             description="Lincoln Middle · 24 students"
             actions={<SectionActions />}
@@ -162,7 +162,7 @@ export const ManyRows = () => {
                 defaultSelectedRowKeys={['Ava Thompson', 'Sofia Ramirez']}
                 bulkActions={[{ label: 'Move to group' }, { label: 'Remove from group' }]}
             />
-        </PatternSection>
+        </Section>
     );
 };
 

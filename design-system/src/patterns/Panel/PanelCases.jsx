@@ -7,9 +7,9 @@ import {
     PanelFooter,
     PanelHeader,
     PanelSubheader,
-} from '@/patterns';
+} from '@/templates';
 import { HeadingLevelContext } from '@/lib/headingLevel';
-import Blanket from '@/patterns/Modal/Blanket';
+import Blanket from '../Modal/Blanket';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { DetailsPanel, SessionsBehind } from './panelDemo.jsx';
 

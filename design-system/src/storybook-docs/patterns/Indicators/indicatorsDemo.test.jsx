@@ -16,7 +16,7 @@ import {
 vi.mock('@storybook/addon-docs/blocks', () => import('@/storybook-docs/lib/addon-docs-blocks-mock.jsx'));
 
 describe('Checklist (Patterns › Indicators)', () => {
-    it('renders card on Home from PatternSection and PatternCard with open steps above done steps and dismiss X', () => {
+    it('renders card on Home from Section and Card with open steps above done steps and dismiss X', () => {
         const { container } = render(<ChecklistOnHome />);
 
         expect(container.querySelector('.plus-template-section')).not.toBeNull();

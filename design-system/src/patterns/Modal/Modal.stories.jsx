@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 import Modal, { MODAL_HEIGHTS, MODAL_WIDTHS, MODAL_WIDTH_PX } from './Modal';
 import { Button, FooterActions, IconButton, Select } from '@/components';
-import { PanelBody, PanelCloseAction, PanelContainer, PanelHeader } from '@/patterns';
+import { PanelBody, PanelCloseAction, PanelContainer, PanelHeader } from '@/templates';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { probe, tokenLength } from '@/storybook-docs/lib/style-probes.js';

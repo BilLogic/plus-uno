@@ -67,7 +67,7 @@ describe('Panel', () => {
 
 describe('Panel barrel', () => {
     it('is exported once, from the patterns barrel, and not from the components barrel', async () => {
-        const patterns = await import('@/patterns');
+        const patterns = await import('@/templates');
         const components = await import('@/components');
         expect(patterns.PanelContainer).toBe(patterns.Panel);
         expect(patterns.PanelHeader).toBeTypeOf('function');

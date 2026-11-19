@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import { Button, DropdownMenu, ButtonItem, Flag, FlagGroup, IconButton, ProgressBar, Skeleton, StatusTag } from '@/components';
 import { LoadRevealSlot, LoadThenReveal } from '@/lib/loadRevealMotion';
-import { PatternSection } from '@/patterns';
+import { Section } from '@/templates';
 import { HeaderSearch } from '@/storybook-docs/lib/section-header.jsx';
 import { StudentsTable, ViewPills, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
 
@@ -90,7 +90,7 @@ const WaitFlag = ({ title, children }) => (
  */
 export const LoadingList = ({ band = 'shape', first = false, reduced }) => (
     <div style={stack}>
-        <PatternSection title="Students" description="Lincoln Middle" views={<ViewPills views={['All students']} />} search={<HeaderSearch />}>
+        <Section title="Students" description="Lincoln Middle" views={<ViewPills views={['All students']} />} search={<HeaderSearch />}>
             <LoadThenReveal
                 as="section"
                 aria-label="Students"
@@ -100,7 +100,7 @@ export const LoadingList = ({ band = 'shape', first = false, reduced }) => (
             >
                 {first ? <div style={{ minBlockSize: BLANK }} /> : <StudentsTable count={4} sortable />}
             </LoadThenReveal>
-        </PatternSection>
+        </Section>
         <LiveLabel>{band === 'under' ? '' : 'Loading students…'}</LiveLabel>
         {band === 'over' && <WaitFlag title="Still loading students">This group is large; you can keep working.</WaitFlag>}
     </div>
@@ -132,11 +132,11 @@ export const LoadingAction = ({ band = 'shape' }) => {
 export const LoadingPage = ({ band = 'shape', reduced }) => (
     <div style={stack}>
         {band === 'under' ? (
-            <PatternSection title="Sessions" description="This week"><StudentsTable count={3} /></PatternSection>
+            <Section title="Sessions" description="This week"><StudentsTable count={3} /></Section>
         ) : (
             <div aria-busy="true" style={stack}>
-                <PatternSection title="Roster" description="Lincoln Middle"><SkeletonRows rows={3} reduced={reduced} /></PatternSection>
-                <PatternSection title="Sessions" description="This week"><SkeletonRows rows={2} reduced={reduced} /></PatternSection>
+                <Section title="Roster" description="Lincoln Middle"><SkeletonRows rows={3} reduced={reduced} /></Section>
+                <Section title="Sessions" description="This week"><SkeletonRows rows={2} reduced={reduced} /></Section>
             </div>
         )}
         {band === 'over' && (
@@ -268,7 +268,7 @@ export const LoadingRevealDemo = () => {
                     onClick={() => setLoading((prev) => !prev)}
                 />
             </div>
-            <PatternSection title="Students" description="Lincoln Middle">
+            <Section title="Students" description="Lincoln Middle">
                 <LoadThenReveal loading={loading} skeleton={skeleton}>
                     <LoadRevealSlot>
                         <p style={{ margin: 0, font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
@@ -284,7 +284,7 @@ export const LoadingRevealDemo = () => {
                         </div>
                     </LoadRevealSlot>
                 </LoadThenReveal>
-            </PatternSection>
+            </Section>
         </div>
     );
 };

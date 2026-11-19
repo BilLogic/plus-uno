@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import { Breadcrumb, PageHeader } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
-import { Page, PatternSection } from '@/patterns';
+import { Page, Section } from '@/templates';
 import { SessionsTable, STUDENT_SESSION_CARDS, UPCOMING_SESSIONS } from '../../../patterns/Page/pageDemo.jsx';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { StudentsTable } from '@/storybook-docs/lib/view-bar.jsx';
@@ -43,13 +43,13 @@ export const BreadcrumbCase = ({ record = true }) => (
                 )}
             >
                 {record ? (
-                    <PatternSection title="Sessions">
+                    <Section title="Sessions">
                         <SessionsTable rows={MAYA_UPCOMING_SESSIONS} />
-                    </PatternSection>
+                    </Section>
                 ) : (
-                    <PatternSection title="All students">
+                    <Section title="All students">
                         <StudentsTable count={3} />
-                    </PatternSection>
+                    </Section>
                 )}
             </Page>
         </HeadingLevelContext.Provider>

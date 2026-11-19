@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Button, DynamicTable, Popup, Toggle } from '@/components';
-import { Page, PatternCard } from '@/patterns';
+import { Page, Card } from '@/templates';
 import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
 import { DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
 import { C, RefTable } from '@/storybook-docs/foundation-blocks.jsx';
@@ -973,7 +973,7 @@ export const LiftDemo = () => {
     return (
         <div ref={ref} data-docs-stage style={{ ...well, display: 'grid', placeItems: 'center' }} data-testid="lift-demo" data-lifted={lifted}>
             <div style={{ width: 'min(100%, var(--card-min-width-md))' }}>
-                <PatternCard
+                <Card
                     surface="raised"
                     title="Session with Ana"
                     description={lifted ? 'Lifted: the overlay shadow' : 'At rest: the raised shadow'}
@@ -1115,7 +1115,7 @@ export const ContrastDemo = () => {
                 data-contrast-mode={more ? 'more' : 'no-preference'}
                 data-docs-stage style={{ ...well, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-sm)), 1fr))', gap: 'var(--grid-gutter)', background: 'var(--ds-surface)', alignItems: 'start' }}
             >
-                <PatternCard surface="raised" title="Card" description="The raised ring." />
+                <Card surface="raised" title="Card" description="The raised ring." />
                 <DocsOverlayBoundary containHeight>
                     <Popup
                         trigger={<Button text="Details" />}

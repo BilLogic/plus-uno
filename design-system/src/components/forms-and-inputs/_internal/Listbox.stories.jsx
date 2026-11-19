@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { TextField } from '@/components';
-import { Modal } from '@/patterns';
+import { Modal } from '@/templates';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import '../TagInput/TagInput.scss';
 import Listbox from './Listbox';

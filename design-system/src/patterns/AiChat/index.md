@@ -6,7 +6,7 @@ AI chat on a Frame: a floating action button at the bottom right of the Page ope
 
 Also asked as: chat, assistant, chatbot, conversation.
 
-**Import:** `import { AiChat } from '@/patterns';`
+**Import:** `import { AiChat } from '@/templates';`
 
 **Source:** `design-system/src/patterns/AiChat/AiChat.jsx`
 
@@ -83,7 +83,7 @@ Don't: An answer from records with nothing to check it against.
 - For one reply on its own, use `AiMessage`.
 - For the field alone, use `PromptInput`; for suggested prompts, `PromptStarters`.
 
-Same group: `PatternCard` · `PatternSection`
+Same group: `Card` · `Frame` · `Modal` · `Page` · `Panel` · `Section` · `Table`
 
 ## Parts
 

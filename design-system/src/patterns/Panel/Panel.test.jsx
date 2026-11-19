@@ -39,12 +39,12 @@ describe('Panel live cases', () => {
         for (const Case of [FloatsNoBlanket, OneFloatingPanel]) {
             const { unmount } = render(<Case />);
             expect(screen.getAllByRole('button', { name: 'Close' })).toHaveLength(1);
-            expect(document.querySelector('.plus-pattern-blanket')).toBeNull();
+            expect(document.querySelector('.plus-template-blanket')).toBeNull();
             unmount();
         }
         render(<PanelOnBlanket />);
         expect(screen.getAllByRole('button', { name: 'Close' })).toHaveLength(1);
-        expect(document.querySelector('.plus-pattern-blanket')).not.toBeNull();
+        expect(document.querySelector('.plus-template-blanket')).not.toBeNull();
     });
 
     it('TwoFloatingPanels opens two Panels at once', () => {

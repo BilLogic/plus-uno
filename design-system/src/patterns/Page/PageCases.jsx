@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Button, PageHeader } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
-import { Page, PatternCard, PatternSection } from '@/patterns';
+import { Page, Card, Section } from '@/templates';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
 import { AddStudentAction, DemoPageHeader, PageTabs, SessionsTable, StudentViews, ViewSelect } from './pageDemo.jsx';
 
 /**
  * The live do and don't examples of the Page template page, built from
- * `Page`, `PageHeader`, `PatternSection`, `PopupSelect`, `Tabs` and `Button`.
+ * `Page`, `PageHeader`, `Section`, `PopupSelect`, `Tabs` and `Button`.
  */
 
 const InDocs = ({ children }) => (
@@ -23,7 +23,7 @@ const InDocs = ({ children }) => (
 export const AddInTitleRow = () => (
     <InDocs>
         <Page header={<PageHeader title="Students" titleAs="h4" />}>
-            <PatternSection title="Students" views={<StudentViews />} actions={<AddStudentAction />} />
+            <Section title="Students" views={<StudentViews />} actions={<AddStudentAction />} />
         </Page>
     </InDocs>
 );
@@ -40,7 +40,7 @@ export const AddTwice = () => (
                 />
             )}
         >
-            <PatternSection title="Students" views={<StudentViews />} actions={<AddStudentAction />} />
+            <Section title="Students" views={<StudentViews />} actions={<AddStudentAction />} />
         </Page>
     </InDocs>
 );
@@ -61,13 +61,13 @@ export const OneTabSystem = () => {
                 )}
             >
                 {tab === 'overview' ? (
-                    <PatternSection title="Overview">
-                        <PatternCard title="Lincoln Middle · Grade 8" description="Math · Tue & Thu at 4:30 PM" />
-                    </PatternSection>
+                    <Section title="Overview">
+                        <Card title="Lincoln Middle · Grade 8" description="Math · Tue & Thu at 4:30 PM" />
+                    </Section>
                 ) : (
-                    <PatternSection title="Sessions" views={<ViewSelect value={status} onChange={setStatus} />}>
+                    <Section title="Sessions" views={<ViewSelect value={status} onChange={setStatus} />}>
                         <SessionsTable status={status} />
-                    </PatternSection>
+                    </Section>
                 )}
             </Page>
         </InDocs>
@@ -88,12 +88,12 @@ export const TwoTabSystems = () => {
                     />
                 )}
             >
-                <PatternSection
+                <Section
                     title="Sessions"
                     views={<ViewPills views={['Upcoming', 'Past']} />}
                 >
                     <SessionsTable status="upcoming" />
-                </PatternSection>
+                </Section>
             </Page>
         </InDocs>
     );
@@ -103,9 +103,9 @@ export const TwoTabSystems = () => {
 export const HeaderIsTheH1 = () => (
     <InDocs>
         <Page header={<PageHeader title="Students" titleAs="h4" />}>
-            <PatternSection title="Sessions" views={<StudentViews />}>
+            <Section title="Sessions" views={<StudentViews />}>
                 <SessionsTable />
-            </PatternSection>
+            </Section>
         </Page>
     </InDocs>
 );
@@ -114,12 +114,12 @@ export const HeaderIsTheH1 = () => (
 export const SectionsAsTitles = () => (
     <InDocs>
         <Page>
-            <PatternSection level="page" title="Students" views={<StudentViews />}>
+            <Section level="page" title="Students" views={<StudentViews />}>
                 <SessionsTable />
-            </PatternSection>
-            <PatternSection level="page" title="Sessions" views={<StudentViews />}>
+            </Section>
+            <Section level="page" title="Sessions" views={<StudentViews />}>
                 <SessionsTable status="past" />
-            </PatternSection>
+            </Section>
         </Page>
     </InDocs>
 );
@@ -128,9 +128,9 @@ export const SectionsAsTitles = () => (
 export const AreaPageTitleAlone = () => (
     <InDocs>
         <Page header={<PageHeader title="Students" titleAs="h4" />}>
-            <PatternSection title="Students" views={<StudentViews />}>
+            <Section title="Students" views={<StudentViews />}>
                 <SessionsTable />
-            </PatternSection>
+            </Section>
         </Page>
     </InDocs>
 );
@@ -139,9 +139,9 @@ export const AreaPageTitleAlone = () => (
 export const BreadcrumbOnAreaPage = () => (
     <InDocs>
         <Page header={<DemoPageHeader breadcrumb={[{ text: 'Students', href: '#students' }, { text: 'Students' }]} title="Students" />}>
-            <PatternSection title="Students" views={<StudentViews />}>
+            <Section title="Students" views={<StudentViews />}>
                 <SessionsTable />
-            </PatternSection>
+            </Section>
         </Page>
     </InDocs>
 );
@@ -150,9 +150,9 @@ export const BreadcrumbOnAreaPage = () => (
 export const OneLineDescription = () => (
     <InDocs>
         <Page header={<DemoPageHeader title="Students" description="Every student you tutor, with their next session." />}>
-            <PatternSection title="Students" views={<StudentViews />}>
+            <Section title="Students" views={<StudentViews />}>
                 <SessionsTable />
-            </PatternSection>
+            </Section>
         </Page>
     </InDocs>
 );
@@ -168,9 +168,9 @@ export const ParagraphUnderTitle = () => (
                 />
             )}
         >
-            <PatternSection title="Students" views={<StudentViews />}>
+            <Section title="Students" views={<StudentViews />}>
                 <SessionsTable />
-            </PatternSection>
+            </Section>
         </Page>
     </InDocs>
 );

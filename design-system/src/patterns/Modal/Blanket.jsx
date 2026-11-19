@@ -13,7 +13,7 @@ export const BlanketOpenContext = createContext(true);
  * Internal Blanket layer for the Modal template (`design-system/src/patterns/Modal/`).
  * Covers the screen (or a stand-in screen when `inline`) with `--ds-blanket`,
  * holds the screen grid and pads (`--blanket-pad-x`, `--blanket-pad-y`), and
- * centers the Dialog inside it. Not exported from `@/patterns`.
+ * centers the Dialog inside it. Not exported from `@/templates`.
  */
 const Blanket = ({
     show = true,

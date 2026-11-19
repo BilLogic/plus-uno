@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Page, PatternSection } from '@/patterns';
+import { Page, Section } from '@/templates';
 import {
     CardsSection,
     DemoPageHeader,
@@ -70,12 +70,12 @@ export const ViewsPicture = () => {
     const [view, setView] = useState('Upcoming');
     return (
         <div style={pad}>
-            <PatternSection
+            <Section
                 title="Sessions"
                 views={<ViewPills views={['Upcoming', 'Past']} activeView={view} onViewChange={setView} />}
             >
                 <SessionsTable status={view === 'Past' ? 'past' : 'upcoming'} />
-            </PatternSection>
+            </Section>
         </div>
     );
 };
@@ -116,9 +116,9 @@ export const DrillPicture = () => (
 export const AreaPagePicture = () => (
     <BrowserWindow address="app.plus.org/students">
         <Page header={<DemoPageHeader title="Students" />}>
-            <PatternSection title="All students" actions={<SectionActions primary="Add student" more={false} />} views={<ViewPills views={['All students']} />}>
+            <Section title="All students" actions={<SectionActions primary="Add student" more={false} />} views={<ViewPills views={['All students']} />}>
                 <StudentsTable count={4} />
-            </PatternSection>
+            </Section>
         </Page>
     </BrowserWindow>
 );

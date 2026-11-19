@@ -17,9 +17,9 @@ const PANEL = (stage, note) => `{/* ${note} */}
 <div style={{ inlineSize: ${stage} }}>
     <BrowserWindow address="app.plus.org/dashboard" height={440}>
         <InAppFrame panelLabel="AI chat" panelStorageKey={null} panel={<AskPanel />} panelOpen>
-            <PatternSection title="Upcoming sessions">
+            <Section title="Upcoming sessions">
                 <Skeleton preset="text" lines={6} />
-            </PatternSection>
+            </Section>
         </InAppFrame>
     </BrowserWindow>
 </div>`;

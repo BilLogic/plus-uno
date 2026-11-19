@@ -3,7 +3,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
-import PatternSection from './PatternSection';
+import Section from './PatternSection';
 
 /**
  * The Section's optional `detail` prop renders an inline expand built on Base
@@ -12,7 +12,7 @@ import PatternSection from './PatternSection';
  */
 const renderDetail = (props = {}) => render(
     <MotionPreferenceContext.Provider value>
-        <PatternSection
+        <Section
             title="Session reflections"
             detail={<div>The reflection names two goals for next week.</div>}
             detailTitle="Ava Thompson"
@@ -21,11 +21,11 @@ const renderDetail = (props = {}) => render(
             {...props}
         >
             <div>Section rows</div>
-        </PatternSection>
+        </Section>
     </MotionPreferenceContext.Provider>,
 );
 
-describe('PatternSection detail (inline expand)', () => {
+describe('Section detail (inline expand)', () => {
     it('starts closed by default with a disclosure button, drawn as a sunken Card', () => {
         const { container } = renderDetail();
         const trigger = screen.getByRole('button', { name: /Ava Thompson/ });
@@ -59,7 +59,7 @@ describe('PatternSection detail (inline expand)', () => {
             const [open, setOpen] = useState(true);
             return (
                 <MotionPreferenceContext.Provider value>
-                    <PatternSection
+                    <Section
                         title="Session reflections"
                         detail={<div>Controlled body</div>}
                         detailTitle="Ava Thompson"
@@ -70,7 +70,7 @@ describe('PatternSection detail (inline expand)', () => {
                         }}
                     >
                         <div>Section rows</div>
-                    </PatternSection>
+                    </Section>
                 </MotionPreferenceContext.Provider>
             );
         };
@@ -114,11 +114,11 @@ describe('PatternSection detail (inline expand)', () => {
     });
 
     it('draws no detail wrapper on a plain Section or when detail is null', () => {
-        const { container, rerender } = render(<PatternSection title="Sessions">Body</PatternSection>);
+        const { container, rerender } = render(<Section title="Sessions">Body</Section>);
         expect(container.querySelector('.plus-template-section-with-detail')).toBeNull();
         expect(container.querySelector('.plus-template-section-detail')).toBeNull();
 
-        rerender(<PatternSection title="Sessions" detail={null}>Body</PatternSection>);
+        rerender(<Section title="Sessions" detail={null}>Body</Section>);
         expect(container.querySelector('.plus-template-section-detail')).toBeNull();
     });
 });

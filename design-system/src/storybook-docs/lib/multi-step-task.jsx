@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { Button, FooterActions, Sidebar, Skeleton } from '@/components';
-import { Frame } from '@/patterns';
+import { Frame } from '@/templates';
 import { StepStage } from '@/lib/navigationMotion';
 import { BrowserWindow } from './template-page.jsx';
 import { ScreenStage } from './fit-stage.jsx';

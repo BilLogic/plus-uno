@@ -166,7 +166,7 @@ export function componentIdentity(entry) {
 
 /**
  * The barrel a docs page's component is imported from: `@/components` for a
- * component page, `@/patterns` for a pattern page. Public code never imports
+ * component page, `@/templates` for a pattern page. Public code never imports
  * from a deep path.
  *
  * A pattern page names its barrel only when the pattern is its own export,
@@ -176,13 +176,13 @@ export function componentIdentity(entry) {
  *
  * @param {{importPath?: string}} [entry] The page's meta entry.
  * @param {boolean} [hasGeneratedDoc] Whether the page has a Harness tab.
- * @returns {'@/patterns' | '@/components' | null}
+ * @returns {'@/templates' | '@/components' | null}
  */
 export function importSourceFor(entry, hasGeneratedDoc = true) {
   const file = entry && typeof entry.importPath === 'string' ? repoPath(entry.importPath) : '';
   if (!file.startsWith(`${PATTERNS_ROOT}/`)) return '@/components';
   if (inOwnFolder(file, PATTERNS_ROOT) && DOCS_ONLY_TEMPLATES.has(file.split('/').at(-2))) return null;
-  return hasGeneratedDoc ? '@/patterns' : null;
+  return hasGeneratedDoc ? '@/templates' : null;
 }
 
 /**

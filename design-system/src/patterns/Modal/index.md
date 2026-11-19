@@ -117,7 +117,7 @@ Footer buttons, real actions and Close, and which destructive tier, including ty
 - Popup: use when the content is a menu or a short list.
 - Patterns: use when you need the rules across Modals: Common actions, Forms, Errors, Loading.
 
-Same group: `Card` · `Frame` · `Page` · `Panel` · `Section` · `Table`
+Same group: `AiChat` · `Card` · `Frame` · `Page` · `Panel` · `Section` · `Table`
 
 ## Types
 
@@ -140,7 +140,7 @@ An Active Modal at 8-col with a short form. Every part once; the pad is 16 on ev
 ## Slots
 
 ```jsx
-import { Modal } from '@/patterns';
+import { Modal } from '@/templates';
 import { Button } from '@/components';
 ```
 

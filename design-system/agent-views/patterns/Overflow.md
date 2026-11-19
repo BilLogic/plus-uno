@@ -142,13 +142,13 @@ Don't: A fade over the list, hiding how much is there.
 From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#Overflow`.
 
 ```jsx
-import { PatternSection } from '@/patterns';
+import { Section } from '@/templates';
 
 function OverflowExample() {
     return (
-        <PatternSection title="Fractions, decimals and percentages: weekly review for the seventh grade group">
+        <Section title="Fractions, decimals and percentages: weekly review for the seventh grade group">
             <p>The section title wraps so the full topic stays readable.</p>
-        </PatternSection>
+        </Section>
     );
 }
 ```
