@@ -143,7 +143,7 @@ describe('Show code on live pairs', () => {
         render(<DoDontPair doExample={<i />} doCaption="Do" doCode="<a />" dontExample={<i />} dontCaption="Don't" dontCode="<b />" />);
         expect(screen.getAllByText('Show code')).toHaveLength(2);
         const counts = { Page: Object.keys(PAGE_CODE).length, Popup: Object.keys(POPUP_CODE).length, Form: Object.keys(FORM_CODE).length, Panel: Object.keys(PANEL_CODE).length };
-        expect(counts).toEqual({ Page: 6, Popup: 8, Form: 2, Panel: 4 });
+        expect(counts).toEqual({ Page: 6, Popup: 8, Form: 2, Panel: 6 });
         [PAGE_CODE, POPUP_CODE, FORM_CODE, PANEL_CODE].forEach((code) => Object.values(code).forEach((src) => expect(src.length).toBeGreaterThan(20)));
     });
 });

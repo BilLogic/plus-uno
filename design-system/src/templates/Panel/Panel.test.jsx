@@ -4,7 +4,7 @@ import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ComponentExample, exampleSlug } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard } from '@/storybook-docs/lib/template-page.jsx';
-import { FloatsNoBlanket, OneFloatingPanel, PanelOnBlanket, ReadingNoFooter, ReadingWithFooter, TwoFloatingPanels } from './PanelCases.jsx';
+import { BesideAiPanel, CoversAiPanel, FloatsNoBlanket, OneFloatingPanel, PanelOnBlanket, ReadingNoFooter, ReadingWithFooter, TwoFloatingPanels } from './PanelCases.jsx';
 
 vi.mock('@storybook/addon-docs/blocks', async () => {
     const React = await import('react');
@@ -50,6 +50,16 @@ describe('Panel live cases', () => {
     it('TwoFloatingPanels opens two Panels at once', () => {
         render(<TwoFloatingPanels />);
         expect(screen.getAllByRole('button', { name: 'Close' })).toHaveLength(2);
+    });
+
+    it('BesideAiPanel and CoversAiPanel are live Panels: the floating Panel clears or covers the docked one', () => {
+        for (const Case of [BesideAiPanel, CoversAiPanel]) {
+            const { unmount } = render(<Case />);
+            expect(screen.getByRole('heading', { name: 'Assistant' })).toBeInTheDocument();
+            expect(screen.getAllByRole('button', { name: 'Close' })).toHaveLength(2);
+            expect(document.querySelector('svg[role="img"]')).toBeNull();
+            unmount();
+        }
     });
 
     it('links Panel TypeCard anchors to unique ComponentExample and heading ids in Panel.mdx', () => {
