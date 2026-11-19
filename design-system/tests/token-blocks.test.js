@@ -1,26 +1,22 @@
 // @vitest-environment node
 /**
  * The Foundations pages draw their Color and Typography blocks from the token
- * stylesheets, not from lists typed into the MDX. These tests hold the blocks'
+ * token table, not from lists typed into the MDX. These tests hold the blocks'
  * data against the token corpus (`tokenCorpus`, the harness's own reader), so a
  * token added to or removed from the generated files shows up on the page, and
  * a hand-typed name that drifts fails here.
  */
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { tokenCorpus } from '../src/lib/tokens-node.mjs';
+import { TOKENS } from '../src/storybook-docs/docs-tokens.js';
 import { accentGroups, chartGroups, typeGroups } from '../src/storybook-docs/lib/token-data.mjs';
 
-const read = (rel) => readFileSync(resolve(__dirname, '../src/tokens', rel), 'utf8');
-const semantic = read('color/_semantic.scss');
-const type = read('_type.scss');
 const corpus = tokenCorpus({ prefix: '--' });
 
 const tokensOf = (groups) => groups.flatMap((g) => Object.values(g.colors).map((v) => v.slice(4, -1)));
 
 describe('accent palette', () => {
-  const tokens = tokensOf(accentGroups(semantic));
+  const tokens = tokensOf(accentGroups(TOKENS));
   const expected = [...corpus.keys()].filter((n) => /^--ds-background-accent-.+-(subtlest|subtler|subtle|bolder)$/.test(n));
 
   it('shows exactly the accent backgrounds the token set defines, once each', () => {
@@ -29,14 +25,14 @@ describe('accent palette', () => {
   });
 
   it('has one row per hue and every value is a var() of a defined token', () => {
-    const groups = accentGroups(semantic);
+    const groups = accentGroups(TOKENS);
     expect(new Set(groups.map((g) => g.title)).size).toBe(groups.length);
     for (const t of tokens) expect(corpus.has(t)).toBe(true);
   });
 });
 
 describe('chart palette', () => {
-  const tokens = tokensOf(chartGroups(semantic));
+  const tokens = tokensOf(chartGroups(TOKENS));
   const expected = [...corpus.keys()].filter((n) => n.startsWith('--chart-') && !n.endsWith('-hovered'));
 
   it('shows exactly the chart tokens the token set defines, once each', () => {
@@ -46,7 +42,7 @@ describe('chart palette', () => {
 });
 
 describe('type scale', () => {
-  const groups = typeGroups(type);
+  const groups = typeGroups(TOKENS);
   const styles = groups.flatMap((g) => g.styles);
   const expected = [...corpus.keys()].filter((n) => /^--(heading|body|metric)-[a-z]+$/.test(n) && !n.endsWith('-tracking'));
 

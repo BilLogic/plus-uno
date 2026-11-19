@@ -2,17 +2,7 @@ import React from 'react';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { TokenLibrary } from './token-library-blocks.jsx';
-import { corpus } from './token-collection-blocks.jsx';
-
-// Vitest hands back an empty string for a `.scss?raw` import, so the token
-// sources the page bundles are read from disk here; the page code is unchanged.
-vi.mock('./token-collection-blocks.jsx', async () => {
-    const fs = await import('node:fs');
-    const { collectTokens } = await import('@/storybook-docs/lib/token-collections.mjs');
-    const files = ['_scales', '_type', '_frame_layers', 'color/_palette', 'color/_semantic', 'color/_elevation', 'ladder/_components', 'ladder/_layers', 'ladder/_templates', 'ladder/_semantics', 'ladder/_springs'];
-    const SOURCES = files.map((f) => ({ file: `${f}.scss`, text: fs.readFileSync(`${process.cwd()}/src/tokens/${f}.scss`, 'utf8') }));
-    return { SOURCES, corpus: collectTokens(SOURCES) };
-});
+import { TOKENS } from './docs-tokens.js';
 
 /**
  * The Library lists every token once, and its search, exact-match toggle and
@@ -28,10 +18,10 @@ const pick = async (label, option) => {
 describe('TokenLibrary', () => {
     it('lists every token exactly once and says how many', () => {
         const { container } = render(<TokenLibrary />);
-        expect(count()).toBe(corpus.size);
+        expect(count()).toBe(TOKENS.length);
         const names = [...container.querySelectorAll('[data-token-name]')].map((n) => n.getAttribute('data-token-name'));
-        expect(names).toHaveLength(corpus.size);
-        expect(new Set(names).size).toBe(corpus.size);
+        expect(names).toHaveLength(TOKENS.length);
+        expect(new Set(names).size).toBe(TOKENS.length);
     });
 
     it('search narrows the count and exact match narrows it to one token', () => {
@@ -55,7 +45,7 @@ describe('TokenLibrary', () => {
         const semantic = count();
         await pick('Scope', 'Global');
         const global = count();
-        expect(corpus.size).toBeGreaterThan(color);
+        expect(TOKENS.length).toBeGreaterThan(color);
         expect(color).toBeGreaterThan(semantic);
         expect(semantic).toBeGreaterThan(global);
         search('border');

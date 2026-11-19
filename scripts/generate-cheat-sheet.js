@@ -15,7 +15,7 @@ import {
     COLOR_TOKEN_DIR,
     TOKEN_DIR,
 } from '../design-system/src/lib/tokens-node.mjs';
-import { tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
+import { darkValues, readDarkTokens, tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
 import { AGENT_ROOT } from './agent-views-paths.js';
 import { checkArtifacts, writeArtifacts } from './lib/generated-artifact.js';
 import { buildTokensManifest, serializeManifest } from './lib/agent-manifests.mjs';
@@ -88,8 +88,20 @@ function tokenLines(tier, names) {
         .join('\n');
 }
 
+/** Every token's resolved dark value where the dark color mode changes it, read from the two color files that carry a dark block. */
+function darkOverrides(sections) {
+    const light = new Map();
+    for (const { tokens } of sections) for (const { name, value } of tokens) if (!light.has(name)) light.set(name, value);
+    const dark = new Map();
+    for (const file of [COLOR_SEMANTIC_FILE, COLOR_ELEVATION_FILE]) {
+        for (const [name, value] of readDarkTokens(fs.readFileSync(path.join(COLOR_DIR, file), 'utf8'))) dark.set(name, value);
+    }
+    return darkValues(light, dark);
+}
+
 function renderTokensManifest(markdown) {
-    const manifest = buildTokensManifest(tokenSections(), INTENTS);
+    const sections = tokenSections();
+    const manifest = buildTokensManifest(sections, INTENTS, darkOverrides(sections));
     // The two views must name the same tokens; a drift here is a generator bug.
     const inDoc = new Set(markdown.split('\n').map((l) => l.match(/^(--[a-z0-9-]+)(?:\s+\/\*.*\*\/)?$/)?.[1]).filter(Boolean));
     const inJson = new Set(manifest.tokens.map((x) => x.name));

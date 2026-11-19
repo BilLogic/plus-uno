@@ -100,11 +100,14 @@ function recordOf(name, c, kind, from) {
  *
  * `intent` is present only where a plan gives one (`token-intent.mjs`): a
  * primitive never carries the field, and neither does a token no plan defines.
+ * `dark` is present only on a token the dark color mode changes: its resolved
+ * dark value, so a page that shows both modes reads them from here.
  *
  * @param {{group: string, tier: string, tokens: {name: string, value: string}[]}[]} sections
  * @param {Map<string, string>} [intents]  token name -> intent
+ * @param {Map<string, string>} [darks]    token name -> resolved dark value
  */
-export function buildTokensManifest(sections, intents = new Map()) {
+export function buildTokensManifest(sections, intents = new Map(), darks = new Map()) {
   const seen = new Map();
   for (const { group, tier, tokens } of sections) {
     if (!TIERS.includes(tier)) {
@@ -115,6 +118,8 @@ export function buildTokensManifest(sections, intents = new Map()) {
       const record = { name, tier, group, value: value.trim() };
       const intent = tier === 'primitive' ? null : intents.get(name);
       if (intent) record.intent = intent;
+      const dark = darks.get(name);
+      if (dark !== undefined) record.dark = dark;
       seen.set(name, record);
     }
   }

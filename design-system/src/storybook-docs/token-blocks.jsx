@@ -1,12 +1,11 @@
 import React from 'react';
 import { ColorPalette, ColorItem, Typeset } from '@storybook/addon-docs/blocks';
-import semanticScss from '@/tokens/color/_semantic.scss?raw';
-import typeScss from '@/tokens/_type.scss?raw';
+import { TOKENS } from './docs-tokens.js';
 import { accentGroups, chartGroups, typeGroups } from './lib/token-data.mjs';
 
 /**
- * Foundations blocks fed from the generated token stylesheets. Rows come from
- * `lib/token-data.mjs`, so a token added to the files shows here with no edit
+ * Foundations blocks fed from the generated token table. Rows come from
+ * `lib/token-data.mjs`, so a token added to the table shows here with no edit
  * to the page. Swatches paint with `var(--ds-*)`, so they follow the Color mode.
  */
 
@@ -21,17 +20,17 @@ const Palette = ({ groups }) => (
 );
 
 /** The eleven accent hues, each with its four background fills. */
-export const AccentPalette = () => <Palette groups={accentGroups(semanticScss)} />;
+export const AccentPalette = () => <Palette groups={accentGroups(TOKENS)} />;
 
 /** The chart tokens, one row per job. */
-export const ChartPalette = () => <Palette groups={chartGroups(semanticScss)} />;
+export const ChartPalette = () => <Palette groups={chartGroups(TOKENS)} />;
 
 const SAMPLE = { metric: '1,284 sessions' };
 
 /** The Heading, Body and Metric text styles, one Typeset per family and weight. */
 export const TypeScaleBlocks = () => (
     <>
-        {typeGroups(typeScss).map((g) => (
+        {typeGroups(TOKENS).map((g) => (
             <section key={g.title} style={{ marginBlock: 'var(--stack-lg)' }}>
                 <h4 style={{ font: 'var(--heading-xs)', margin: 0 }}>
                     {g.title} · {g.family} {g.weight}

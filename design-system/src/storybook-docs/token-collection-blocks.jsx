@@ -3,52 +3,26 @@ import { TokenTable, C } from '@/storybook-docs/foundation-blocks.jsx';
 import { DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
 import { SPRING_PRIMITIVES, MOTION_SEMANTICS } from '../../../scripts/lib/tokens/plan.mjs';
 import { FoundationSection, FoundationSubsection } from '@/storybook-docs/foundation-page.jsx';
-import { collectTokens, groupBySection } from '@/storybook-docs/lib/token-collections.mjs';
-import scales from '@/tokens/_scales.scss?raw';
-import type from '@/tokens/_type.scss?raw';
-import frameLayers from '@/tokens/_frame_layers.scss?raw';
-import palette from '@/tokens/color/_palette.scss?raw';
-import semantic from '@/tokens/color/_semantic.scss?raw';
-import elevation from '@/tokens/color/_elevation.scss?raw';
-import components from '@/tokens/ladder/_components.scss?raw';
-import layers from '@/tokens/ladder/_layers.scss?raw';
-import templates from '@/tokens/ladder/_templates.scss?raw';
-import semantics from '@/tokens/ladder/_semantics.scss?raw';
-import springs from '@/tokens/ladder/_springs.scss?raw';
+import { TOKEN_COLLECTIONS, TOKENS } from '@/storybook-docs/docs-tokens.js';
 
 /**
  * The token sections of one Foundations ▸ Tokens collection page: Primitives,
  * then Semantics split into Global, Components and Templates. Rows come from the
- * token stylesheets through `lib/token-collections.mjs`, so a token added to
- * the source shows on its page with no edit here, and values are read as the
- * page resolves them, so they follow the Color mode.
+ * generated token table through `docs-tokens.js`, so a token added to the
+ * source shows on its page with no edit here, and values are read as the page
+ * resolves them, so they follow the Color mode.
  */
-
-// A file name decides where a Components token with no named family lands.
-export const SOURCES = [
-    ['_scales.scss', scales],
-    ['_type.scss', type],
-    ['_frame_layers.scss', frameLayers],
-    ['color/_palette.scss', palette],
-    ['color/_semantic.scss', semantic],
-    ['color/_elevation.scss', elevation],
-    ['ladder/_components.scss', components],
-    ['ladder/_layers.scss', layers],
-    ['ladder/_templates.scss', templates],
-    ['ladder/_semantics.scss', semantics],
-    ['ladder/_springs.scss', springs],
-].map(([file, text]) => ({ file, text }));
-
-export const corpus = collectTokens(SOURCES);
 
 /* ------------------------------------------------------------------ motion */
 
-/** Each spring primitive's raw `linear()` easing and settle time, read from the generated stylesheet. */
-export const springValues = (text = springs) => {
+/** Each spring primitive's raw `linear()` easing and settle time, read from the token table. */
+export const springValues = (tokens = TOKENS) => {
     const out = {};
-    for (const m of text.matchAll(/--motion-spring-([\w-]+?)(-duration)?:\s*([^;]+);/g)) {
+    for (const { name, raw } of tokens) {
+        const m = name.match(/^--motion-spring-([\w-]+?)(-duration)?$/);
+        if (!m) continue;
         out[m[1]] ??= {};
-        out[m[1]][m[2] ? 'duration' : 'easing'] = m[3].trim();
+        out[m[1]][m[2] ? 'duration' : 'easing'] = raw;
     }
     return out;
 };
@@ -172,7 +146,7 @@ const Tables = ({ section, swatch }) => (
  *   `primitives` and `semantics` are the lead-in sentences of the two sections.
  */
 export const TokenCollection = ({ collection, swatch = false, primitives, semantics }) => {
-    const sections = groupBySection(corpus, collection);
+    const sections = TOKEN_COLLECTIONS.find((c) => c.collection === collection)?.sections ?? [];
     const prim = sections.find((s) => s.tier === 'primitive');
     const sem = sections.filter((s) => s.tier === 'semantic');
     return (

@@ -3,57 +3,31 @@
  * light and dark value, filtered by search and by collection, tier and scope,
  * then grouped by collection and subgroup.
  *
- * Placement is `placeToken` in `token-collections.mjs` and nothing here
+ * Placement is `tokenCollections` in `token-collections.mjs` and nothing here
  * restates it, so a token is on exactly one collection page and one Library
  * row. Plain ESM with no Node-only import, so the page and `node --test` load
  * the same file.
  */
-import { readTokens, resolveToken } from '../../lib/tokens.mjs';
-import { COLLECTIONS, COLLECTION_TITLES, SCOPE_TITLES, SCOPES, placeToken } from './token-collections.mjs';
-
-const DARK_BLOCK = /\[data-color-mode="dark"\]\s*\{/;
-
-/** The declarations of the first plain dark-mode block of a stylesheet (not the contrast variants). */
-export function readDarkTokens(text) {
-  const start = DARK_BLOCK.exec(text);
-  if (!start) return new Map();
-  let depth = 1;
-  let i = start.index + start[0].length;
-  const open = i;
-  while (i < text.length && depth > 0) {
-    if (text[i] === '{') depth += 1;
-    else if (text[i] === '}') depth -= 1;
-    i += 1;
-  }
-  return readTokens(text.slice(open, i - 1));
-}
+import { COLLECTION_TITLES, SCOPE_TITLES, SCOPES, COLLECTIONS } from './token-collections.mjs';
 
 /**
- * @param {Map<string, {raw: string, value: string, file: string}>} corpus
- * @param {{darkSources?: {file: string, text: string}[], intents?: Map<string, string>}} [options]
+ * One row per token, in page order, from the docs token collections.
+ *
+ * @param {ReturnType<import('./token-collections.mjs').tokenCollections>} collections
  * @returns {{name: string, light: string, dark: string|null, description: string, collection: string, tier: string, scope: string|null}[]}
  */
-export function buildLibrary(corpus, { darkSources = [], intents = new Map() } = {}) {
-  const darkRaw = new Map();
-  for (const { text } of darkSources) for (const [k, v] of readDarkTokens(text)) darkRaw.set(k, v);
-  const overlay = new Map();
-  for (const [name, entry] of corpus) overlay.set(name, darkRaw.get(name) ?? entry.raw);
-  const rows = [];
-  for (const [name, entry] of corpus) {
-    const place = placeToken(name, entry.file);
-    if (!place) continue;
-    const dark = resolveToken(name, overlay);
-    const touched = darkRaw.has(name) || (dark !== undefined && dark !== entry.value);
-    rows.push({
-      name,
-      light: entry.value,
-      dark: touched ? dark ?? entry.value : null,
-      description: intents.get(name) || fallbackDescription(place),
-      ...place,
-    });
-  }
-  return rows;
-}
+export const buildLibrary = (collections) =>
+  collections.flatMap(({ collection, sections }) =>
+    sections.flatMap(({ tier, scope, tokens }) =>
+      tokens.map((t) => ({
+        name: t.name,
+        light: t.value,
+        dark: t.dark,
+        description: t.intent || fallbackDescription({ collection, tier, scope }),
+        collection,
+        tier,
+        scope,
+      }))));
 
 /** A token with no written intent is still described by where it sits. */
 const fallbackDescription = ({ collection, tier, scope }) =>

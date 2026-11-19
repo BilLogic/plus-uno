@@ -124,6 +124,17 @@ test('tokens: intent rides on a non-primitive token that has one, and never on a
   assert.equal('intent' in by['--palette-neutral-1000'], false);
 });
 
+test('tokens: the dark value rides on a token the dark mode changes, and nowhere else', () => {
+  const m = buildTokensManifest(
+    [{ group: 'Color Tokens', tier: 'semantic', tokens: [{ name: '--ds-text', value: '#172b4d' }, { name: '--ds-border', value: '#ddd' }] }],
+    new Map(),
+    new Map([['--ds-text', '#fff']]),
+  );
+  const by = Object.fromEntries(m.tokens.map((t) => [t.name, t]));
+  assert.equal(by['--ds-text'].dark, '#fff');
+  assert.equal('dark' in by['--ds-border'], false);
+});
+
 test('tokens: a name in two sections keeps the first section and is not duplicated', () => {
   const m = buildTokensManifest([
     { group: 'A', tier: 'semantic', tokens: [{ name: '--x', value: '1px' }] },

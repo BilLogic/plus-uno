@@ -4,29 +4,40 @@
  * scope, so no page repeats a token and none is left out.
  */
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import test from 'node:test';
 
 import { tokenCorpus } from '../design-system/src/lib/tokens-node.mjs';
+import { documents, text } from './lib/corpus.mjs';
 import {
   COLLECTIONS,
   SCOPES,
   TIERS,
-  groupBySection,
+  allTokens,
   placeToken,
+  tokenCollections,
   tokenNamingAudit,
 } from '../design-system/src/storybook-docs/lib/token-collections.mjs';
 
+const records = JSON.parse(fs.readFileSync(new URL('../design-system/agent-views/tokens.json', import.meta.url), 'utf8')).tokens;
+const names = records.map((r) => r.name);
+const at = new Map(records.map((r) => [r.name, r]));
+const where = (name) => placeToken(name, at.get(name));
 const corpus = tokenCorpus();
-const names = [...corpus.keys()];
 
 test('the source has tokens to place', () => {
   assert.ok(names.length > 1000, `only ${names.length} tokens read`);
 });
 
+test('the token table names exactly the tokens the stylesheets define, with the values they declare', () => {
+  assert.deepEqual([...names].sort(), [...corpus.keys()].sort());
+  for (const r of records) assert.equal(r.value, corpus.get(r.name).raw, r.name);
+});
+
 test('every token lands in exactly one collection, tier and scope', () => {
   const unplaced = [];
-  for (const [name, entry] of corpus) {
-    const place = placeToken(name, entry.file);
+  for (const name of names) {
+    const place = where(name);
     if (!place) {
       unplaced.push(name);
       continue;
@@ -41,8 +52,8 @@ test('every token lands in exactly one collection, tier and scope', () => {
 
 test('the sections partition the corpus: no token twice, none missing', () => {
   const seen = new Map();
-  for (const collection of COLLECTIONS) {
-    for (const section of groupBySection(corpus, collection)) {
+  for (const { collection, sections } of tokenCollections(records)) {
+    for (const section of sections) {
       for (const t of section.tokens) {
         assert.equal(seen.has(t.name), false, `${t.name} is on ${seen.get(t.name)} and ${collection}`);
         seen.set(t.name, collection);
@@ -52,22 +63,43 @@ test('the sections partition the corpus: no token twice, none missing', () => {
   assert.equal(seen.size, names.length);
 });
 
+test('collections come back in page order, each section in name order with numbers read as numbers', () => {
+  const collections = tokenCollections(records);
+  assert.deepEqual(collections.map((c) => c.collection), COLLECTIONS);
+  for (const { sections } of collections) {
+    for (const { tokens } of sections) {
+      const sorted = [...tokens].sort((a, b) => new Intl.Collator('en', { numeric: true }).compare(a.name, b.name));
+      assert.deepEqual(tokens.map((t) => t.name), sorted.map((t) => t.name));
+    }
+  }
+  assert.equal(allTokens(collections).length, names.length);
+});
+
+test('a token carries its resolved value, its dark value where the dark mode changes it, and its intent', () => {
+  const found = new Map(allTokens(tokenCollections(records)).map((t) => [t.name, t]));
+  const text = found.get('--ds-text');
+  assert.notEqual(text.dark, null);
+  assert.notEqual(text.value, text.dark);
+  assert.equal(found.get('--space-100').dark, null);
+  assert.equal(found.get('--ds-text-subtle').intent, at.get('--ds-text-subtle').intent ?? '');
+});
+
 test('frame tokens sit on Spacing and size and layer tokens on Elevation and layers', () => {
-  assert.equal(placeToken('--page-pad', 'ladder/_templates.scss').collection, 'spacing');
-  assert.equal(placeToken('--page-pad', 'ladder/_templates.scss').scope, 'templates');
-  assert.equal(placeToken('--frame-sidebar-width', 'ladder/_templates.scss').collection, 'spacing');
-  assert.equal(placeToken('--layer-modal', 'ladder/_layers.scss').collection, 'elevation');
-  assert.equal(placeToken('--layer-frame-sidebar', '_frame_layers.scss').collection, 'elevation');
-  assert.equal(placeToken('--layer-frame-sidebar', '_frame_layers.scss').scope, 'templates');
-  assert.equal(placeToken('--card-pad', 'ladder/_templates.scss').scope, 'components');
+  assert.equal(where('--page-pad').collection, 'spacing');
+  assert.equal(where('--page-pad').scope, 'templates');
+  assert.equal(where('--frame-sidebar-width').collection, 'spacing');
+  assert.equal(where('--layer-modal').collection, 'elevation');
+  assert.equal(where('--layer-frame-sidebar').collection, 'elevation');
+  assert.equal(where('--layer-frame-sidebar').scope, 'templates');
+  assert.equal(where('--card-pad').scope, 'components');
 });
 
 test('scope follows the family: page-level tokens are Templates, card, modal, popup and table are Components', () => {
   const scopeOf = (family) => {
     const scopes = new Set();
-    for (const [name, entry] of corpus) {
+    for (const name of names) {
       if (!name.startsWith(`--${family}-`)) continue;
-      const p = placeToken(name, entry.file);
+      const p = where(name);
       if (p.collection === 'spacing') scopes.add(p.scope);
     }
     return [...scopes];
@@ -77,7 +109,7 @@ test('scope follows the family: page-level tokens are Templates, card, modal, po
 });
 
 test('the audit names no token twice and gives each a proposed name', () => {
-  const rows = tokenNamingAudit(corpus);
+  const rows = tokenNamingAudit(records);
   assert.equal(new Set(rows.map((r) => r.token)).size, rows.length);
   for (const r of rows) {
     assert.ok(r.token && r.collection && r.problem && r.proposed, JSON.stringify(r));
@@ -87,10 +119,10 @@ test('the audit names no token twice and gives each a proposed name', () => {
 
 
 test('Skeleton colors stay in Color and all Skeleton dimensions stay in Spacing and size', () => {
-  const skeleton = [...corpus].filter(([name]) => name.startsWith('--skeleton-'));
+  const skeleton = names.filter((name) => name.startsWith('--skeleton-'));
   assert.equal(skeleton.length, 10);
-  for (const [name, entry] of skeleton) {
-    assert.deepEqual(placeToken(name, entry.file), {
+  for (const name of skeleton) {
+    assert.deepEqual(where(name), {
       collection: name === '--skeleton-subtle' ? 'color' : 'spacing',
       tier: 'semantic', scope: 'components',
     }, name);
@@ -98,5 +130,15 @@ test('Skeleton colors stay in Color and all Skeleton dimensions stay in Spacing 
 });
 
 test('typography size spelling has zero naming outliers', () => {
-  assert.deepEqual(tokenNamingAudit(corpus).filter((row) => row.problem.startsWith('Size step spelled out')), []);
+  assert.deepEqual(tokenNamingAudit(records).filter((row) => row.problem.startsWith('Size step spelled out')), []);
+});
+
+test('no docs file imports a token stylesheet raw or reads tokens a second way', () => {
+  const files = documents('design-system/src/storybook-docs', { ext: ['.js', '.jsx', '.mjs', '.mdx'] }).filter((f) => !/\.test\./.test(f));
+  assert.ok(files.length > 20, `only ${files.length} docs files read`);
+  for (const file of files) {
+    const src = text(file);
+    assert.equal(/tokens\/[\w/-]*\.scss\?raw/.test(src), false, `${file} imports a token stylesheet raw`);
+    assert.equal(/\b(?:readTokens|tokenCorpus|collectTokens|readDarkTokens)\(/.test(src), false, `${file} collects tokens itself`);
+  }
 });
