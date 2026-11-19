@@ -110,6 +110,11 @@ export const HEROES = {
     description:
       'The layers lifted apart, light on the left and dark on the right.',
   },
+  'foundations-visual-elevation-material': {
+    Hero: ElevationHero,
+    description:
+      'The layers lifted apart, light on the left and dark on the right.',
+  },
   'foundations-visual-elevation-accessibility': {
     Hero: AccessibilityHero,
     description:

@@ -1,0 +1,29 @@
+/*
+ * Colored material, for a small accent over media or a material surface.
+ *
+ * Bold fills with `--ds-background-{color}-material-bold` and takes the on-bold
+ * text (`--ds-text-warning-inverse` on warning, `--ds-text-inverse` elsewhere).
+ * Subtle sits on `--ds-surface-material-overlay` with `--ds-text-{color}`. Both
+ * carry the `--ds-border-material` edge. Transparency only: no blur, no
+ * gradient. The tokens switch to their solid fallbacks under reduced
+ * transparency and increased contrast, so nothing here restates them.
+ *
+ * `$block` is the component's class, `$edge` the property that draws its edge.
+ */
+$colored-material-colors: ('brand', 'success', 'warning', 'danger', 'information', 'discovery');
+
+@mixin colored-material($block, $edge) {
+    @each $color in $colored-material-colors {
+        .#{$block}--material-bold.#{$block}--material-#{$color} {
+            #{$edge}: var(--ds-border-material);
+            background-color: var(--ds-background-#{$color}-material-bold);
+            color: if($color == 'warning', var(--ds-text-warning-inverse), var(--ds-text-inverse));
+        }
+
+        .#{$block}--material-subtle.#{$block}--material-#{$color} {
+            #{$edge}: var(--ds-border-material);
+            background-color: var(--ds-surface-material-overlay);
+            color: var(--ds-text-#{$color});
+        }
+    }
+}

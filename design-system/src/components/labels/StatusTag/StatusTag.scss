@@ -18,6 +18,7 @@
  */
 @use '../label-heights' as label;
 @use '../../../styles/state' as *;
+@use '../colored-material' as cm;
 
 .plus-status {
     --plus-status-height: #{label.$status-height};
@@ -132,3 +133,10 @@ $status-state: (
         border: var(--border-width-default) solid CanvasText;
     }
 }
+
+/*
+ * Colored material, for a status over media or a material surface. Bold or
+ * subtle, in the status color; the edge is the material border.
+ */
+
+@include cm.colored-material('plus-status', '--plus-status-edge');

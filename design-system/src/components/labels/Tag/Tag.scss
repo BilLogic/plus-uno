@@ -30,6 +30,7 @@
  */
 @use '../label-heights' as label;
 @use '../../../styles/state' as *;
+@use '../colored-material' as cm;
 
 $tag-colors: (
     'gray': (
@@ -633,3 +634,13 @@ $tag-elevated: (
     outline-offset: var(--focus-ring-width);
     box-shadow: 0 0 0 var(--focus-ring-width) var(--ds-surface-overlay);
 }
+
+/* -------------------------------------------------------- colored material */
+
+/*
+ * Colored material, for a tag over media or a material surface. Read-only only,
+ * like elevated. Bold or subtle, in a status or brand color; the edge is the
+ * material border, and the text and ground come from the mixin.
+ */
+
+@include cm.colored-material('plus-tag', 'border-color');

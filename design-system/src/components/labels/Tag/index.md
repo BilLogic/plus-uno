@@ -232,6 +232,8 @@ Same group: `ChangeTag` · `CompetencyTag` · `CountTag` · `DateTag` · `Status
 | `isDisabled` | bool | — | Disables this tag. A field disables all of its tags through `TagContext`. |
 | `isLoading` | bool | `false` | Saving: a spinner replaces the swatch, icon or avatar and the tag ignores presses until it is done. |
 | `isElevated` | bool | `false` | For a tag on an image or video: a solid surface fill, no border and the Elevation 2 shadow, with the hue kept on the swatch, when there is one, or the avatar's own fill. Disabled keeps the ground and shadow and turns the content Secondary (Text). Focus on the tag or a link's × has a surface gap inside the ring. Read-only and link tags only; ignored with a warning on removable and selectable ones. |
+| `material` | enum | — | Colored material for a read-only tag over media or a material surface: a bold or subtle fill with the material edge. |
+| `materialColor` | enum | `'brand'` | The color of the material: a status, brand or category identity. |
 | `onClick` | func | — | Fires on a selectable tag and on a link. |
 | `onAfterRemoveAction` | func | — | Called with the tag's text and the event after the Remove button is pressed. The caller removes the tag. |
 | `removeButtonLabel` | string | — | Overrides the Remove button's accessible name. Defaults to `Remove <label>`. |
@@ -244,6 +246,10 @@ Same group: `ChangeTag` · `CompetencyTag` · `CountTag` · `DateTag` · `Status
 **`color`** — `gray` · `blue` · `green` · `purple` · `magenta` · `yellow` · `teal` · `orange` · `lime` · `brown`
 
 **`type`** — `plain` · `person` · `agent` · `team`
+
+**`material`** — `bold` · `subtle`
+
+**`materialColor`** — `brand` · `success` · `warning` · `danger` · `information` · `discovery`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
