@@ -13921,9 +13921,6 @@
         "--radius-sm",
         "--stack-lg",
         "--stack-md",
-        "--swap-a",
-        "--swap-dir",
-        "--swap-p",
         "--type-weight-medium"
       ]
     },

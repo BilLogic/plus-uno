@@ -129,8 +129,8 @@ export const TOKEN_LADDER = [
   { tier: 'semantics', group: 'Radius', new: '--radius-full', old: '--element-radius-full', ref: 'var(--radius-full)', primitive: true, note: 'Figma Radius/full; the code name is the --radius-full primitive, so no second declaration', use: 'Fully rounded ends: an avatar, a pill-shaped tag, a toggle track.' },
 
   // ─── Semantics / Radius / Control (radius = control height ÷ 4) ──────
-  { tier: 'semantics', group: 'Radius / Control', new: '--radius-control-sm', old: '--element-radius-item-sm', figma: 'Radius/Control/sm', ref: 'var(--space-0375)', note: 'pairs with --control-sm; height 24, 24÷4 = 6', use: 'Corner rounding for a control 24px high: a compact field, a Tooltip, a Sidebar row.' },
-  { tier: 'semantics', group: 'Radius / Control', new: '--radius-control-md', old: '--element-radius-item-md', figma: 'Radius/Control/md', ref: 'var(--space-050)', note: 'pairs with --control-md; height 32, 32÷4 = 8', use: 'Corner rounding for a control 32px high: a compact field, a tab, a menu row.' },
+  { tier: 'semantics', group: 'Radius / Control', new: '--radius-control-sm', old: '--element-radius-item-sm', figma: 'Radius/Control/sm', ref: 'var(--space-0375)', note: 'pairs with --control-sm; height 24, 24÷4 = 6', use: 'Corner rounding for a control 24px high: a compact field, a Tooltip.' },
+  { tier: 'semantics', group: 'Radius / Control', new: '--radius-control-md', old: '--element-radius-item-md', figma: 'Radius/Control/md', ref: 'var(--space-050)', note: 'pairs with --control-md; height 32, 32÷4 = 8', use: 'Corner rounding for a control 32px high: a compact field, a tab, a menu row, a Sidebar row.' },
   { tier: 'semantics', group: 'Radius / Control', new: '--radius-control-lg', old: null, figma: 'Radius/Control/lg', ref: 'var(--space-0625)', note: 'pairs with --control-lg; height 40, 40÷4 = 10', use: 'Corner rounding for a control 40px high: a default field.' },
 
   // ─── Semantics / Border (reclassified, unchanged names) ──────────────

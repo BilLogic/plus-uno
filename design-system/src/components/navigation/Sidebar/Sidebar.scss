@@ -133,9 +133,9 @@ $inset-24: calc((var(--control-md) - var(--icon-lg)) / 2);
 
 // The block the main and the inner sidebar swap in. At rest it is a plain
 // column (no transform, no stacking context). While swapping, two springs set
-// `--swap-p` (the slide, 0 to 1) and `--swap-a` (the fade, 0 to 1); `--swap-dir`
+// `--_swap-p` (the slide, 0 to 1) and `--_swap-a` (the fade, 0 to 1); `--_swap-dir`
 // is +1 from the end going in and -1 from the start going back. The slide is
-// 12, `--inline-lg`. With reduced motion `--swap-p` stays 1, so only the fade runs.
+// 12, `--inline-lg`. With reduced motion `--_swap-p` stays 1, so only the fade runs.
 .plus-pattern-sidebar__swap {
     display: flex;
     flex-direction: column;
@@ -143,14 +143,14 @@ $inset-24: calc((var(--control-md) - var(--icon-lg)) / 2);
     gap: var(--frame-sidebar-group-gap);
     min-width: 0;
     // At rest: no slide, fully shown. The swap's springs write these three.
-    --swap-dir: 0;
-    --swap-p: 1;
-    --swap-a: 1;
+    --_swap-dir: 0;
+    --_swap-p: 1;
+    --_swap-a: 1;
 }
 
 .plus-pattern-sidebar__swap[data-swapping='true'] {
-    opacity: var(--swap-a);
-    transform: translateX(calc(var(--inline-lg) * var(--swap-dir) * (1 - var(--swap-p))));
+    opacity: var(--_swap-a);
+    transform: translateX(calc(var(--inline-lg) * var(--_swap-dir) * (1 - var(--_swap-p))));
     will-change: transform, opacity;
 }
 

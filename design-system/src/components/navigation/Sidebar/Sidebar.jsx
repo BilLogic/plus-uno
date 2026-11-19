@@ -264,7 +264,7 @@ const Sidebar = ({
     // enters as one block, sliding 12 from the end going in and from the start
     // going back on spatial.fast while it fades on appearance.fast. The slide and
     // the fade are two springs writing two custom properties the stylesheet reads
-    // (`--swap-p`, `--swap-a`), so the distance stays the `--space-075` token.
+    // (`--_swap-p`, `--_swap-a`), so the distance stays the `--inline-lg` token.
     // Reduced motion drops the slide and keeps the fade.
     const mode = inner ? 'inner' : 'main';
     useLayoutEffect(() => {
@@ -277,9 +277,9 @@ const Sidebar = ({
         el.dataset.swapping = 'true';
         el.dataset.swapMotion = fadeOnly ? 'fade' : 'slide-fade';
         el.dataset.swapFrom = mode === 'inner' ? 'end' : 'start';
-        el.style.setProperty('--swap-dir', String(mode === 'inner' ? direction : -direction));
-        el.style.setProperty('--swap-p', fadeOnly ? '1' : '0');
-        el.style.setProperty('--swap-a', '0');
+        el.style.setProperty('--_swap-dir', String(mode === 'inner' ? direction : -direction));
+        el.style.setProperty('--_swap-p', fadeOnly ? '1' : '0');
+        el.style.setProperty('--_swap-a', '0');
         // The old content unmounted with the focus inside it: put focus where the new content begins.
         if (!document.activeElement || document.activeElement === document.body) {
             const target = mode === 'inner'
@@ -289,11 +289,11 @@ const Sidebar = ({
         }
         const fade = animate(0, 1, {
             ...SPRINGS['appearance.fast'].productive,
-            onUpdate: (value) => el.style.setProperty('--swap-a', String(Math.min(1, value))),
+            onUpdate: (value) => el.style.setProperty('--_swap-a', String(Math.min(1, value))),
         });
         const slide = fadeOnly ? null : animate(0, 1, {
             ...SPRINGS['spatial.fast'].productive,
-            onUpdate: (value) => el.style.setProperty('--swap-p', String(value)),
+            onUpdate: (value) => el.style.setProperty('--_swap-p', String(value)),
         });
         let live = true;
         Promise.all([fade.finished, slide?.finished]).then(() => {
@@ -301,9 +301,9 @@ const Sidebar = ({
             delete el.dataset.swapping;
             delete el.dataset.swapMotion;
             delete el.dataset.swapFrom;
-            el.style.removeProperty('--swap-dir');
-            el.style.removeProperty('--swap-p');
-            el.style.removeProperty('--swap-a');
+            el.style.removeProperty('--_swap-dir');
+            el.style.removeProperty('--_swap-p');
+            el.style.removeProperty('--_swap-a');
         });
         return () => {
             live = false;
