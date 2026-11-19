@@ -45,8 +45,8 @@ authored half, counted rather than assumed.
 | [CompetencyTag](CompetencyTag/index.md) | 5 | ✅ | ✅ | ✅ |
 | [CountTag](CountTag/index.md) | 11 | ✅ | ✅ | ✅ |
 | [DateTag](DateTag/index.md) | 6 | ✅ | ✅ | ✅ |
-| [StatusTag](StatusTag/index.md) | 9 | ✅ | ✅ | ✅ |
-| [Tag](Tag/index.md) | 22 | ✅ | ✅ | ✅ |
+| [StatusTag](StatusTag/index.md) | 10 | ✅ | ✅ | ✅ |
+| [Tag](Tag/index.md) | 24 | ✅ | ✅ | ✅ |
 | [TagGroup](TagGroup/index.md) | 10 | ✅ | ✅ | ✅ |
 
 **Authored coverage:** When to use 7/7 (100%) · Correct/incorrect 7/7 (100%) · Accessibility 7/7 (100%)

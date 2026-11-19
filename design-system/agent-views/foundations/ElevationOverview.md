@@ -2,7 +2,7 @@
 
 # Overview
 
-Elevation says what sits above what, and what you can act on. Surface color and shadow are the cues that show it.
+Elevation says what sits above what, and what you can act on. Surface color, shadow and material are the three cues that show it.
 
 It is never decoration: each cue answers what floats, what groups and what you can press.
 
@@ -17,6 +17,7 @@ It is never decoration: each cue answers what floats, what groups and what you c
 | Layer | Where a surface sits in the stack: Layer 0 · Frame, Layer 1 · Page, Layer 2 · Navigation, Layer 3 · Non-blocking overlay, Layer 4 · Blocking overlay. A higher layer is always above a lower one. |
 | Surface | The color a layer or element sits on: `--ds-surface` (Default), `--ds-surface-sunken`, `--ds-surface-raised`, `--ds-surface-overlay`. |
 | Shadow | How high a surface floats: `--ds-shadow-raised`, `--ds-shadow-overflow`, `--ds-shadow-overlay`, `--ds-shadow-blocking`. |
+| Material | A translucent surface for what floats and stays connected to what is behind it: `--ds-surface-material-media`, `--ds-surface-material-control`, `--ds-surface-material-overlay`. |
 | Blanket | The dimmed layer under a blocking overlay: `--ds-blanket`. |
 | Flat | No shadow, whatever the surface. |
 

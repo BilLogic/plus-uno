@@ -28,6 +28,9 @@ import './StatusTag.scss';
  */
 
 export const STATUS_TAG_APPEARANCES = ['neutral', 'success', 'warning', 'danger', 'info', 'discovery'];
+export const STATUS_TAG_MATERIALS = ['bold', 'subtle'];
+/** The material color token each appearance takes; neutral has none, since a neutral status is never colored material. */
+const MATERIAL_COLOR_OF = { success: 'success', warning: 'warning', danger: 'danger', info: 'information', discovery: 'discovery' };
 export const STATUS_TAG_SPACINGS = ['default', 'spacious'];
 
 const warn = devWarn('StatusTag');
@@ -37,6 +40,7 @@ export const StatusTag = ({
     children,
     appearance = 'neutral',
     spacing = 'default',
+    material,
     iconBefore,
     trailingMetric,
     trailingMetricAppearance,
@@ -71,6 +75,17 @@ export const StatusTag = ({
         effectiveSpacing = 'default';
     }
 
+    let materialColor = null;
+    if (material !== undefined) {
+        if (!STATUS_TAG_MATERIALS.includes(material)) {
+            warn(`material="${material}" is not one of ${STATUS_TAG_MATERIALS.join(', ')}; it is ignored.`);
+        } else if (!(effectiveAppearance in MATERIAL_COLOR_OF)) {
+            warn(`material needs a colored appearance (${Object.keys(MATERIAL_COLOR_OF).join(', ')}); it is ignored on neutral.`);
+        } else {
+            materialColor = MATERIAL_COLOR_OF[effectiveAppearance];
+        }
+    }
+
     const wantsMetric = trailingMetric !== undefined && trailingMetric !== null && formatCount(trailingMetric) !== null;
     let metricAppearance = effectiveAppearance;
     if (trailingMetricAppearance !== undefined) {
@@ -82,6 +97,7 @@ export const StatusTag = ({
         'plus-status',
         `plus-status--${effectiveAppearance}`,
         `plus-status--${effectiveSpacing}`,
+        materialColor ? `plus-status--material-${material} plus-status--material-${materialColor}` : '',
         wantsMetric ? 'plus-status--with-count' : '',
         className,
     ].filter(Boolean).join(' ');
@@ -138,6 +154,8 @@ StatusTag.propTypes = {
     appearance: PropTypes.oneOf(STATUS_TAG_APPEARANCES),
     /** `default` (20) in rows, lists and sentences; `spacious` (32) beside a heading. */
     spacing: PropTypes.oneOf(STATUS_TAG_SPACINGS),
+    /** Colored material for a status over media or a material surface: bold or subtle, in the appearance's color. Not for neutral. */
+    material: PropTypes.oneOf(STATUS_TAG_MATERIALS),
     /** One icon before the label: a Font Awesome Free name (`circle-check`). */
     iconBefore: PropTypes.string,
     /** A small count at the end of the tag, a 16 Count tag nested inside it. Hidden at 0. */

@@ -107,3 +107,18 @@ test('material grounds: a clear overlay material fails body text over the worst 
   assert.ok(!failing(fresh()).includes('material grounds'));
   assert.ok(failing(set(fresh(), 'elevation.surface.material.overlay', 'light', '#ffffff40')).includes('material grounds'));
 });
+
+test('colored material: on-bold text holds over white and black; a pale fill fails', () => {
+  assert.ok(!failing(fresh()).includes('colored material'));
+  assert.ok(failing(set(fresh(), 'color.background.success.material.bold', 'light', '#ffffff80')).includes('colored material'));
+  assert.ok(failing(set(fresh(), 'color.background.warning.material.bold', 'dark', '#000000f0')).includes('colored material'));
+});
+
+test('colored material: a bold at 92% in light would fail white text over white (why light is 95%)', () => {
+  const sem = fresh();
+  const bold = sem.rows.find((r) => r.name === 'color.background.warning.bold');
+  assert.ok(bold);
+  const row = sem.rows.find((r) => r.name === 'color.background.success.material.bold');
+  assert.match(row.light_ref, /a95$/);
+  assert.match(row.dark_ref, /a92$/);
+});

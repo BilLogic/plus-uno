@@ -59,6 +59,10 @@ import './Tag.scss';
  */
 export const TAG_COLORS = ['gray', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal', 'orange', 'lime', 'brown'];
 
+/** The two colored-material treatments, and the colors each takes (a status, brand or category identity). */
+export const TAG_MATERIALS = ['bold', 'subtle'];
+export const TAG_MATERIAL_COLORS = ['brand', 'success', 'warning', 'danger', 'information', 'discovery'];
+
 /** The types that lead with a 16 avatar: a person, an agent or a team. */
 export const AVATAR_TAG_TYPES = ['person', 'agent', 'team'];
 
@@ -206,6 +210,8 @@ export const Tag = ({
     isDisabled: isDisabledProp = false,
     isLoading = false,
     isElevated = false,
+    material,
+    materialColor = 'brand',
     onClick,
     onAfterRemoveAction,
     removeButtonLabel,
@@ -263,6 +269,22 @@ export const Tag = ({
         warn(`\`isElevated\` is only for a read-only tag or a link; it is ignored on "${resolved}".`);
     }
 
+    // Colored material is for a read-only tag over media or a material surface.
+    let effectiveMaterial = null;
+    if (material !== undefined) {
+        if (!TAG_MATERIALS.includes(material)) {
+            warn(`material="${material}" is not one of ${TAG_MATERIALS.join(', ')}; it is ignored.`);
+        } else if (resolved !== 'read-only' || isDisabled) {
+            warn(`\`material\` is only for a read-only tag; it is ignored on "${isDisabled ? 'disabled' : resolved}".`);
+        } else if (!TAG_MATERIAL_COLORS.includes(materialColor)) {
+            warn(`materialColor="${materialColor}" is not one of ${TAG_MATERIAL_COLORS.join(', ')}; it is ignored.`);
+        } else if (isElevated) {
+            warn('`material` and `isElevated` are two grounds for a tag on a picture; `isElevated` wins.');
+        } else {
+            effectiveMaterial = material;
+        }
+    }
+
     // The × renders for removable, and for a link with `isRemovable`. Never in a
     // disabled field: a value you cannot change has nothing to remove.
     const hasRemove = isRemovable && !isDisabled;
@@ -282,6 +304,7 @@ export const Tag = ({
         isSelectable && isSelected ? 'plus-tag--selected' : '',
         isLoading ? 'plus-tag--loading' : '',
         isElevated && canElevate ? 'plus-tag--elevated' : '',
+        effectiveMaterial ? `plus-tag--material-${effectiveMaterial} plus-tag--material-${materialColor}` : '',
         className,
     ].filter(Boolean).join(' ');
 
@@ -506,6 +529,10 @@ Tag.propTypes = {
     isLoading: PropTypes.bool,
     /** For a tag on an image or video: a solid surface fill, no border and the Elevation 2 shadow, with the hue kept on the swatch, when there is one, or the avatar's own fill. Disabled keeps the ground and shadow and turns the content Secondary (Text). Focus on the tag or a link's × has a surface gap inside the ring. Read-only and link tags only; ignored with a warning on removable and selectable ones. */
     isElevated: PropTypes.bool,
+    /** Colored material for a read-only tag over media or a material surface: a bold or subtle fill with the material edge. */
+    material: PropTypes.oneOf(TAG_MATERIALS),
+    /** The color of the material: a status, brand or category identity. */
+    materialColor: PropTypes.oneOf(TAG_MATERIAL_COLORS),
     /** Fires on a selectable tag and on a link. */
     onClick: PropTypes.func,
     /** Called with the tag's text and the event after the Remove button is pressed. The caller removes the tag. */

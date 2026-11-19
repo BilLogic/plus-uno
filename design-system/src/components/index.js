@@ -62,8 +62,8 @@ export { default as ChangeTag, CHANGE_TAG_FORMATS, CHANGE_TAG_GOOD_DIRECTIONS, C
 export { default as CompetencyTag, COMPETENCY_TAG_SPACINGS, COMPETENCY_TAG_SUBJECTS } from '@/components/labels/CompetencyTag';
 export { default as CountTag, COUNT_TAG_APPEARANCES, formatCount } from '@/components/labels/CountTag';
 export { default as DateTag, DATE_TAG_APPEARANCES, DATE_TAG_ICONS, DATE_TAG_SPACINGS } from '@/components/labels/DateTag';
-export { default as StatusTag, STATUS_TAG_APPEARANCES, STATUS_TAG_SPACINGS } from '@/components/labels/StatusTag';
-export { default as Tag, AVATAR_TAG_TYPES, resolveTagKind, TAG_COLOR_OF_CURRICULUM, TAG_COLORS, TAG_TYPES, TagContext, useTagContext } from '@/components/labels/Tag';
+export { default as StatusTag, STATUS_TAG_APPEARANCES, STATUS_TAG_MATERIALS, STATUS_TAG_SPACINGS } from '@/components/labels/StatusTag';
+export { default as Tag, AVATAR_TAG_TYPES, resolveTagKind, TAG_COLOR_OF_CURRICULUM, TAG_COLORS, TAG_MATERIAL_COLORS, TAG_MATERIALS, TAG_TYPES, TagContext, useTagContext } from '@/components/labels/Tag';
 export { default as TagGroup, TAG_GROUP_ALIGNMENTS, TAG_GROUP_OVERFLOWS } from '@/components/labels/TagGroup';
 
 export { default as Accordion } from '@/components/layout-and-structure/Accordion';

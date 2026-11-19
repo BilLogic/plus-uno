@@ -31,6 +31,30 @@ import {
     UsageRaiseOneThing,
 } from '@/storybook-docs/elevation-usage-figures.jsx';
 import {
+    MaterialAnatomyFigure,
+    MaterialAsIs,
+    MaterialChooseTable,
+    MaterialEdge,
+    MaterialMatchSurface,
+    MaterialNeutralOnly,
+    MaterialNoBlur,
+    MaterialOnBlanket,
+    MaterialOnlyFloating,
+    MaterialOnMedia,
+    MaterialRampFigure,
+    MaterialValuesTable,
+} from '@/storybook-docs/elevation-material-figures.jsx';
+import {
+    ColoredComposeTable,
+    ColoredMaterialEdge,
+    ColoredMaterialLive,
+    ColoredMaterialOverSomething,
+    ColoredMaterialPairText,
+    ColoredMaterialSmall,
+    ColoredTokensTable,
+    ColoredTreatmentsTable,
+} from '@/storybook-docs/elevation-colored-material-figures.jsx';
+import {
     BehaviorGuide,
     ByTemplateGrid,
     ClipDemo,
@@ -266,18 +290,19 @@ export const Layers = {
 
 /* ----------------------------------------------------- in the system */
 
-/** A Card at rest, a clickable Card, and a Card being dragged. */
+/** The three card surfaces: Raised is the one focal card, placed first in reading order; Sunken is the default; Default is bordered. */
 export const CardLevels = {
     render: () => (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)', padding: 'var(--card-pad)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' }}>
-            <PatternCard surface="raised" title="At rest" description="Raised." />
-            <PatternCard surface="raised" title="Clickable" description="Lifts to overlay on hover." onClick={() => {}} />
-            <PatternCard surface="raised" title="Dragged" description="Overlay while it moves." dragging />
+            <PatternCard surface="raised" title="Raised" description="The one focal card, first in reading order." />
+            <PatternCard surface="sunken" title="Sunken" description="The default. Clickable, it lifts in place on hover." onClick={() => {}} />
+            <PatternCard surface="default" title="Default" description="Bordered and flat." />
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const [rest, , dragged] = canvasElement.querySelectorAll('.plus-pattern-card');
-        await expect(getComputedStyle(dragged).boxShadow).not.toBe(getComputedStyle(rest).boxShadow);
+        const [raised, sunken, bordered] = canvasElement.querySelectorAll('.plus-pattern-card');
+        await expect(getComputedStyle(raised).boxShadow).not.toBe(getComputedStyle(sunken).boxShadow);
+        await expect(getComputedStyle(bordered).boxShadow).toBe(getComputedStyle(sunken).boxShadow);
     },
 };
 
@@ -558,8 +583,14 @@ const menu = (style) => (
 export const LiftWithShadow = {
     render: () => (
         <DoDont>
-            <Do caption={<>The card keeps the page color and lifts on <C>--ds-shadow-raised</C>.</>}><TheCardKeepsDoFigure /></Do>
-            <Dont caption="A gray fill reads as a hole in the page, and dark loses the step."><AGrayFillDontFigure /></Dont>
+            <Do caption={<>The card keeps the page color and lifts on <C>--ds-shadow-raised</C>.</>}>
+                <div style={ground}><PatternCard surface="raised" title="Upcoming sessions" description="3 this week" /></div>
+            </Do>
+            <Dont caption="A gray fill reads as a hole in the page, and dark loses the step.">
+                <div style={ground}>
+                    <PatternCard surface="raised" title="Upcoming sessions" description="3 this week" style={{ background: 'var(--ds-surface-sunken)', boxShadow: 'none' }} />
+                </div>
+            </Dont>
         </DoDont>
     ),
     play: async ({ canvasElement }) => {
@@ -574,8 +605,12 @@ export const LiftWithShadow = {
 export const NoBorder = {
     render: () => (
         <DoDont>
-            <Do caption="The edge slot is the Popup's border."><TheEdgeSlotDoFigure /></Do>
-            <Dont caption="A border on top doubles the edge and outlines the Popup."><ABorderOnDontFigure /></Dont>
+            <Do caption="The edge slot is the Popup's border.">
+                <div style={ground}>{menu()}</div>
+            </Do>
+            <Dont caption="A border on top doubles the edge and outlines the Popup.">
+                <div style={ground}>{menu({ border: 'var(--border-width-default) solid var(--ds-border-bold)' })}</div>
+            </Dont>
         </DoDont>
     ),
     play: async ({ canvasElement }) => {
@@ -590,8 +625,12 @@ export const NoBorder = {
 export const AlwaysPair = {
     render: () => (
         <DoDont>
-            <Do caption={<>The overlay pair: <C>--ds-surface-overlay</C> with <C>--ds-shadow-overlay</C>.</>}><TheOverlayPairDoFigure /></Do>
-            <Dont caption="The overlay surface with no shadow melts into the page."><TheOverlaySurfaceDontFigure /></Dont>
+            <Do caption={<>The overlay pair: <C>--ds-surface-overlay</C> with <C>--ds-shadow-overlay</C>.</>}>
+                <div style={{ ...ground, background: 'var(--ds-surface-sunken)' }}>{menu()}</div>
+            </Do>
+            <Dont caption="The overlay surface with no shadow melts into the page.">
+                <div style={{ ...ground, background: 'var(--ds-surface-sunken)' }}>{menu({ boxShadow: 'none' })}</div>
+            </Dont>
         </DoDont>
     ),
     play: async ({ canvasElement }) => {
@@ -609,7 +648,18 @@ export const BlockingOnBlanket = {
             <Do caption="The Modal on the Blanket takes the blocking shadow.">
                 <Modal inline show screenWidth={360} screenHeight={300} width={280} title="Move session" body="To 4:30 PM?" primaryButton={{ text: 'Move', onClick: () => {} }} onClose={() => {}} />
             </Do>
-            <Dont caption="A Panel with the blocking shadow and no Blanket; if it needs full attention, make it a Modal."><APanelWithDontFigure /></Dont>
+            <Dont caption="A Panel with the blocking shadow and no Blanket. If it needs full attention, make it a Modal.">
+                <div style={ground}>
+                    <div style={{ boxShadow: 'var(--ds-shadow-blocking)', borderRadius: 'var(--card-radius)' }}>
+                        <HeadingContextProvider value={2}>
+                            <PanelContainer width="100%">
+                                <PanelHeader title="Session notes" />
+                                <PanelBody>Factoring went well.</PanelBody>
+                            </PanelContainer>
+                        </HeadingContextProvider>
+                    </div>
+                </div>
+            </Dont>
         </DoDont>
     ),
     play: async ({ canvasElement }) => {
@@ -627,8 +677,16 @@ export const BlockingOnBlanket = {
 export const SunkenNeverFloats = {
     render: () => (
         <DoDont>
-            <Do caption="Sunken is the ground: the frame, or a sunken Card."><SunkenIsTheDoFigure /></Do>
-            <Dont caption="A sunken fill with a shadow: the gray says recessed, the shadow says lifted."><ASunkenFillDontFigure /></Dont>
+            <Do caption="Sunken is the ground: the frame, or a sunken Card.">
+                <div style={ground}>
+                    <PatternCard surface="sunken" title="This week" description="12 sessions" />
+                </div>
+            </Do>
+            <Dont caption="A sunken fill with a shadow: the gray says recessed, the shadow says lifted.">
+                <div style={ground}>
+                    <PatternCard surface="raised" title="Session 12" description="Ran 45 minutes over." style={{ background: 'var(--ds-surface-sunken)', boxShadow: 'var(--ds-shadow-overlay)' }} />
+                </div>
+            </Dont>
         </DoDont>
     ),
     play: async ({ canvasElement }) => {
@@ -645,8 +703,25 @@ export const SunkenNeverFloats = {
 export const TooltipFlat = {
     render: () => (
         <DoDont>
-            <Do caption="Dark fill, inverse text, no shadow."><DarkFillInverseDoFigure /></Do>
-            <Dont caption="The overlay pair makes it look like a menu, so people try to click it."><TheOverlayPairDontFigure /></Dont>
+            <Do caption="Dark fill, inverse text, no shadow.">
+                <DocsOverlayBoundary containHeight>
+                    <div style={{ ...ground, minHeight: 'calc(var(--image-xl) * 1.5)', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
+                        <Tooltip text="Reschedule this session" placement="top" trigger="manual" show>
+                            <Button text="Reschedule" />
+                        </Tooltip>
+                    </div>
+                </DocsOverlayBoundary>
+            </Do>
+            <Dont caption="The overlay pair makes it look like a menu, so people try to click it.">
+                <DocsOverlayBoundary containHeight>
+                    <div style={{ ...ground, minHeight: 'calc(var(--image-xl) * 1.5)', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
+                        <style>{'.plus-tooltip--dont-overlay { background: var(--ds-surface-overlay); color: var(--ds-text); box-shadow: var(--ds-shadow-overlay); }'}</style>
+                        <Tooltip text="Reschedule this session" placement="top" trigger="manual" show className="plus-tooltip--dont-overlay">
+                            <Button text="Reschedule" />
+                        </Tooltip>
+                    </div>
+                </DocsOverlayBoundary>
+            </Dont>
         </DoDont>
     ),
     play: async ({ canvasElement }) => {
@@ -661,8 +736,24 @@ export const TooltipFlat = {
 export const OneFocalPoint = {
     render: () => (
         <DoDont>
-            <Do caption="One raised Card marks the next session."><OneRaisedCardDoFigure /></Do>
-            <Dont caption="Every row raised: nothing stands out."><EveryRowRaisedDontFigure /></Dont>
+            <Do caption="One raised Card marks the next session.">
+                <div style={ground}>
+                    <PatternSection title="Sessions">
+                        <PatternCard surface="raised" title="Next session" description="Today, 4:30 PM" />
+                        <StaticTable
+                            headers={['Session', 'Day']}
+                            rows={[['Past session', 'Monday'], ['Past session', 'Friday']]}
+                        />
+                    </PatternSection>
+                </div>
+            </Do>
+            <Dont caption="Every row raised: nothing stands out.">
+                <div style={{ ...ground, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
+                    <PatternCard surface="raised" title="Next session" description="Today, 4:30 PM" />
+                    <PatternCard surface="raised" title="Past session" description="Monday" />
+                    <PatternCard surface="raised" title="Past session" description="Friday" />
+                </div>
+            </Dont>
         </DoDont>
     ),
     play: async ({ canvasElement }) => {
@@ -969,120 +1060,75 @@ export const ControlBoundary = { render: () => <ControlBoundaryDoDont everyMode 
 export const CardEdgeContrast = { render: () => <AccessibilityCardEdges />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
 export const CardsInForcedColors = { render: () => <AccessibilityForcedColors />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
 
-const TheCardKeepsDoFigure = () => (
-    <>
-        <div style={ground}><PatternCard surface="raised" title="Upcoming sessions" description="3 this week" /></div>
-    </>
-);
 
-const AGrayFillDontFigure = () => (
-    <>
-        <div style={ground}>
-            <PatternCard surface="raised" title="Upcoming sessions" description="3 this week" style={{ background: 'var(--ds-surface-sunken)', boxShadow: 'none' }} />
-        </div>
-    </>
-);
+/* ----------------------------------------------------- Material page */
 
-const TheEdgeSlotDoFigure = () => (
-    <>
-        <div style={ground}>{menu()}</div>
-    </>
-);
+export const MaterialRamp = {
+    render: () => <MaterialRampFigure />,
+    play: async ({ canvasElement }) => {
+        const panel = canvasElement.querySelector('[data-testid="material-ramp"]');
+        await assertPanelContainer(panel);
+        await expect(panel.querySelectorAll('figure').length).toBe(2);
+        await expect(panel.querySelector('svg text'), 'the ramp draws no words').toBeNull();
+    },
+};
+export const MaterialAnatomy = {
+    render: () => <MaterialAnatomyFigure />,
+    play: async ({ canvasElement }) => {
+        const panel = canvasElement.querySelector('[data-testid="material-anatomy"]');
+        await assertPanelContainer(panel);
+        await expect(panel.querySelectorAll('figure').length).toBe(4);
+    },
+};
+export const MaterialChoose = {
+    render: () => <MaterialChooseTable />,
+    play: async ({ canvasElement }) => {
+        const table = canvasElement.querySelector('[data-testid="material-choose-table"]');
+        await expect(table.querySelectorAll('tbody tr').length).toBe(5);
+    },
+};
+export const MaterialValues = {
+    render: () => <MaterialValuesTable />,
+    play: async ({ canvasElement }) => {
+        const table = canvasElement.querySelector('[data-testid="material-values-table"]');
+        await expect(table.querySelectorAll('tbody tr').length).toBe(4);
+    },
+};
+export const MaterialOnMediaPair = { render: () => <MaterialOnMedia />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
+export const MaterialMatchSurfacePair = { render: () => <MaterialMatchSurface />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
+export const MaterialEdgePair = { render: () => <MaterialEdge />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
+export const MaterialOnlyFloatingPair = { render: () => <MaterialOnlyFloating />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
+export const MaterialNoBlurPair = { render: () => <MaterialNoBlur />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
+export const MaterialAsIsPair = { render: () => <MaterialAsIs />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
+export const MaterialNeutralOnlyPair = { render: () => <MaterialNeutralOnly />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
+export const MaterialOnBlanketPair = { render: () => <MaterialOnBlanket />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
 
-const ABorderOnDontFigure = () => (
-    <>
-        <div style={ground}>{menu({ border: 'var(--border-width-default) solid var(--ds-border-bold)' })}</div>
-    </>
-);
+/* ------------------------------------------- Colored material section */
 
-const TheOverlayPairDoFigure = () => (
-    <>
-        <div style={{ ...ground, background: 'var(--ds-surface-sunken)' }}>{menu()}</div>
-    </>
-);
+const expectPair = async (canvasElement) => {
+    const pair = canvasElement.querySelector('.sb-ds-dodont-pair');
+    await expect(pair).not.toBeNull();
+    await expect(pair.querySelectorAll('figure').length).toBe(2);
+};
 
-const TheOverlaySurfaceDontFigure = () => (
-    <>
-        <div style={{ ...ground, background: 'var(--ds-surface-sunken)' }}>{menu({ boxShadow: 'none' })}</div>
-    </>
-);
+export const ColoredTreatments = { render: () => <ColoredTreatmentsTable /> };
+export const ColoredTokens = { render: () => <ColoredTokensTable /> };
+export const ColoredCompose = { render: () => <ColoredComposeTable /> };
 
-const APanelWithDontFigure = () => (
-    <>
-        <div style={ground}>
-            <div style={{ boxShadow: 'var(--ds-shadow-blocking)', borderRadius: 'var(--card-radius)' }}>
-                <HeadingContextProvider value={2}>
-                    <PanelContainer width="100%">
-                        <PanelHeader title="Session notes" />
-                        <PanelBody>Factoring went well.</PanelBody>
-                    </PanelContainer>
-                </HeadingContextProvider>
-            </div>
-        </div>
-    </>
-);
-
-const SunkenIsTheDoFigure = () => (
-    <>
-        <div style={ground}>
-            <PatternCard surface="sunken" title="This week" description="12 sessions" />
-        </div>
-    </>
-);
-
-const ASunkenFillDontFigure = () => (
-    <>
-        <div style={ground}>
-            <PatternCard surface="raised" title="Session 12" description="Ran 45 minutes over." style={{ background: 'var(--ds-surface-sunken)', boxShadow: 'var(--ds-shadow-overlay)' }} />
-        </div>
-    </>
-);
-
-const DarkFillInverseDoFigure = () => (
-    <>
-        <DocsOverlayBoundary containHeight>
-            <div style={{ ...ground, minHeight: 'calc(var(--image-xl) * 1.5)', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
-                <Tooltip text="Reschedule this session" placement="top" trigger="manual" show>
-                    <Button text="Reschedule" />
-                </Tooltip>
-            </div>
-        </DocsOverlayBoundary>
-    </>
-);
-
-const TheOverlayPairDontFigure = () => (
-    <>
-        <DocsOverlayBoundary containHeight>
-            <div style={{ ...ground, minHeight: 'calc(var(--image-xl) * 1.5)', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
-                <style>{'.plus-tooltip--dont-overlay { background: var(--ds-surface-overlay); color: var(--ds-text); box-shadow: var(--ds-shadow-overlay); }'}</style>
-                <Tooltip text="Reschedule this session" placement="top" trigger="manual" show className="plus-tooltip--dont-overlay">
-                    <Button text="Reschedule" />
-                </Tooltip>
-            </div>
-        </DocsOverlayBoundary>
-    </>
-);
-
-const OneRaisedCardDoFigure = () => (
-    <>
-        <div style={ground}>
-            <PatternSection title="Sessions">
-                <PatternCard surface="raised" title="Next session" description="Today, 4:30 PM" />
-                <StaticTable
-                    headers={['Session', 'Day']}
-                    rows={[['Past session', 'Monday'], ['Past session', 'Friday']]}
-                />
-            </PatternSection>
-        </div>
-    </>
-);
-
-const EveryRowRaisedDontFigure = () => (
-    <>
-        <div style={{ ...ground, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-            <PatternCard surface="raised" title="Next session" description="Today, 4:30 PM" />
-            <PatternCard surface="raised" title="Past session" description="Monday" />
-            <PatternCard surface="raised" title="Past session" description="Friday" />
-        </div>
-    </>
-);
+/** Tag and Status tag in every color, bold and subtle, over a picture. */
+export const ColoredMaterialOnMedia = {
+    render: () => <ColoredMaterialLive />,
+    play: async ({ canvasElement }) => {
+        for (const m of ['bold', 'subtle']) {
+            const picture = canvasElement.querySelector(`[data-testid="colored-${m}"]`);
+            await expect(picture.querySelectorAll(`.plus-tag--material-${m}`).length).toBe(6);
+            await expect(picture.querySelectorAll(`.plus-status--material-${m}`).length).toBe(5);
+            const tag = picture.querySelector('.plus-tag');
+            await expect(getComputedStyle(tag).borderTopColor).not.toBe('rgba(0, 0, 0, 0)');
+        }
+    },
+};
+export const ColoredSmallPair = { render: () => <ColoredMaterialSmall />, play: async ({ canvasElement }) => expectPair(canvasElement) };
+export const ColoredTextPair = { render: () => <ColoredMaterialPairText />, play: async ({ canvasElement }) => expectPair(canvasElement) };
+export const ColoredEdgePair = { render: () => <ColoredMaterialEdge />, play: async ({ canvasElement }) => expectPair(canvasElement) };
+export const ColoredOverSomethingPair = { render: () => <ColoredMaterialOverSomething />, play: async ({ canvasElement }) => expectPair(canvasElement) };
