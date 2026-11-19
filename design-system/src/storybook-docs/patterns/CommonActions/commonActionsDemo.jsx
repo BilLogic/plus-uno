@@ -280,7 +280,7 @@ export const ModalFooterInsetCase = () => (
                         display: 'flex',
                         justifyContent: 'flex-end',
                         gap: 'var(--inline-md)',
-                        paddingInline: 'var(--dialog-pad-x-default)',
+                        paddingInline: 'var(--dialog-pad)',
                         paddingBlock: 'var(--stack-md)',
                         borderTop: 'var(--border-width-default) solid var(--ds-border)',
                     }}

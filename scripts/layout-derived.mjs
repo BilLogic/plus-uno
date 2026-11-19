@@ -41,7 +41,7 @@ const MAX_CONTENT = 1232;
 const MIN_CONTENT = 720;
 const COLUMNS = 12;
 const GUTTER = 16;
-const MODAL_PAD = 16;
+const MODAL_PAD = 20;
 const MODAL_SPANS = { xs: 4, sm: 6, md: 8, lg: 10 };
 
 const clamp = (n) => Math.min(MAX_CONTENT, Math.max(MIN_CONTENT, n));

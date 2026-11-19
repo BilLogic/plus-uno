@@ -7,7 +7,7 @@
 @use '../../../styles/state' as *;
 
 .plus-dialog {
-    @include screen-grid-width(var(--dialog-pad-x-default));
+    @include screen-grid-width(var(--dialog-pad));
     --plus-overlay-span: 6;
 
     background-color: var(--ds-surface-material-overlay);
@@ -20,7 +20,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--dialog-stack-md);
-    padding: var(--dialog-pad-x-default);
+    padding: var(--dialog-pad);
     overflow: hidden;
     max-height: var(--plus-overlay-max-height, var(--dialog-max-height, 100dvh));
     box-sizing: border-box;

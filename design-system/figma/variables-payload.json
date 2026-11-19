@@ -539,17 +539,10 @@
           }
         },
         {
-          "name": "Modal/pad-x-default",
+          "name": "Modal/pad",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--modal-pad-x-default)"
-          }
-        },
-        {
-          "name": "Modal/pad-x-spacious",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--modal-pad-x-spacious)"
+            "WEB": "var(--modal-pad)"
           }
         },
         {
@@ -557,6 +550,13 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--modal-radius)"
+          }
+        },
+        {
+          "name": "Modal/width-4-col",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--modal-width-4-col)"
           }
         },
         {
@@ -649,17 +649,10 @@
           }
         },
         {
-          "name": "Dialog/pad-x-default",
+          "name": "Dialog/pad",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--dialog-pad-x-default)"
-          }
-        },
-        {
-          "name": "Dialog/pad-x-spacious",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--dialog-pad-x-spacious)"
+            "WEB": "var(--dialog-pad)"
           }
         },
         {

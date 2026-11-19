@@ -192,7 +192,7 @@ Between breakpoints the content width is fluid, so a card lands anywhere from it
 
 <FoundationSection title="Modal widths">
 
-A modal’s content area spans 4, 6, 8 or 10 screen-grid columns, and its pad (modal-pad-x-default) sits outside them on each side, so the box bleeds one pad past the columns. The tinted band is that pad, outside the columns. It grows with the screen between breakpoints, stops past a 1280 screen, never shrinks below its Medium width, and ignores the Sidebar, so it sits in the same place either way.
+A modal’s content area spans 4, 6, 8 or 10 screen-grid columns, and its pad (--modal-pad, 20) sits outside them on each side, so the box bleeds one pad past the columns. The tinted band is that pad, outside the columns. It grows with the screen between breakpoints, stops past a 1280 screen, never shrinks below its Medium width, and ignores the Sidebar, so it sits in the same place either way.
 
 <FoundationExample>
     <LayoutFigure name="gr-modals" title="Modals spanning 4, 6, 8 and 10 screen-grid columns" />
@@ -201,10 +201,10 @@ A modal’s content area spans 4, 6, 8 or 10 screen-grid columns, and its pad (m
 <RefTable
     head={['Token', 'Figma', 'Value', 'Use']}
     rows={[
-        [<><C>--modal-width-xs</C></>, '—', '261 · 347 · 432', '4 columns'],
-        [<><C>--modal-width-sm</C></>, <><C>Modal/width-modal-sm</C></>, '384 · 512 · 640', '6 columns'],
-        [<><C>--modal-width-md</C></>, <><C>Modal/width-modal-md</C></>, '507 · 677 · 848', '8 columns'],
-        [<><C>--modal-width-lg</C></>, <><C>Modal/width-modal-lg</C></>, '629 · 843 · 1056', '10 columns'],
+        [<><C>--modal-width-4-col</C></>, <><C>Modal/width-4-col</C></>, '269 · 355 · 440', '4 columns'],
+        [<><C>--modal-width-6-col</C></>, <><C>Modal/width-6-col</C></>, '392 · 520 · 648', '6 columns'],
+        [<><C>--modal-width-8-col</C></>, <><C>Modal/width-8-col</C></>, '515 · 685 · 856', '8 columns'],
+        [<><C>--modal-width-10-col</C></>, <><C>Modal/width-10-col</C></>, '637 · 851 · 1064', '10 columns'],
         [<><C>--popup-width-3-col · 4-col</C></>, '—', '200 · 264 · 328 · 261 · 347 · 432', 'Popups on the screen grid'],
     ]}
 />

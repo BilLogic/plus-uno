@@ -18,7 +18,7 @@ import * as Demo from './modalDemo.jsx';
 /** The stand-in screen the docs draw the overlay at: the Large mode, and a short template. */
 const SCREEN = { width: 1024, height: 520 };
 
-/** Modal widths at 1024: 4 · 6 · 8 · 10 screen columns plus 2 × 16. */
+/** Modal widths at 1024: 4 · 6 · 8 · 10 screen columns plus 2 × 20. */
 const WIDTHS_AT_1024 = {
     '4-col': MODAL_WIDTH_PX['4-col'][1],
     '6-col': MODAL_WIDTH_PX['6-col'][1],
@@ -110,7 +110,11 @@ export const Overview = {
         const overlay = canvasElement.querySelector('.plus-modal-blanket');
         const [modal] = dialogs(canvas);
         const style = getComputedStyle(modal);
-        await expect(style.paddingTop, 'Modal/pad').toBe(`${tokenLength(canvasElement, '--modal-pad-x-default')}px`);
+        await expect(style.paddingTop, 'Modal/pad').toBe(`${tokenLength(canvasElement, '--modal-pad')}px`);
+        await expect(style.paddingTop, 'pad 20 on the top').toBe('20px');
+        await expect(style.paddingRight, 'pad 20 on the right').toBe('20px');
+        await expect(style.paddingBottom, 'pad 20 on the bottom').toBe('20px');
+        await expect(style.paddingLeft, 'pad 20 on the left').toBe('20px');
         await expect(style.rowGap, 'Modal/stack-md').toBe(`${tokenLength(canvasElement, '--modal-stack-md')}px`);
         const header = modal.querySelector('.plus-dialog-header');
         const footer = modal.querySelector('.plus-dialog-footer');
@@ -133,7 +137,7 @@ export const Overview = {
     },
 };
 
-/** 4-col · 6-col · 8-col · 10-col at the 1024 screen: 347 · 512 · 677 · 843. */
+/** 4-col · 6-col · 8-col · 10-col at the 1024 screen: 355 · 520 · 685 · 851. */
 export const Widths = {
     render: () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
@@ -337,6 +341,11 @@ const widthStory = (width) => ({
         await settleAnimations(canvasElement);
         const [modal] = dialogs(canvas);
         await expect(modal.getBoundingClientRect().width, `${width} at 1024`).toBeCloseTo(WIDTHS_AT_1024[width], 0);
+        // The content box, inside the 20 pad, spans exactly N screen-grid columns: N * column + (N - 1) * gutter.
+        const columns = Number.parseInt(width, 10);
+        const column = (SCREEN.width - 2 * 24 - 11 * 16) / 12;
+        const content = modal.getBoundingClientRect().width - 2 * Number.parseFloat(getComputedStyle(modal).paddingLeft);
+        await expect(content, `${width} content box spans ${columns} columns at 1024`).toBeCloseTo(columns * column + (columns - 1) * 16, 0);
     },
 });
 
@@ -689,7 +698,7 @@ export const AnatomyActive = {
         await expect(body.scrollHeight, 'the body shows every field whole: nothing clips').toBeLessThanOrEqual(body.clientHeight + 1);
         leadersCrossNoOtherPart(canvasElement, ANATOMY_PARTS);
         const modal = canvasElement.querySelector('.plus-dialog');
-        await expect(getComputedStyle(modal).paddingTop, 'pad 16 on every side').toBe(`${tokenLength(canvasElement, '--modal-pad-x-default')}px`);
+        await expect(getComputedStyle(modal).paddingTop, 'pad 20 on every side').toBe('20px');
         await expect(getComputedStyle(modal).borderTopLeftRadius, 'radius 16').toBe(`${tokenLength(canvasElement, '--modal-radius')}px`);
         // Form in a Modal: fields 40px, footer buttons 32px.
         const student = canvas.getByLabelText(/Student/);
@@ -1015,7 +1024,7 @@ export const BlanketInline = {
         await settleAnimations(canvasElement);
         const overlay = canvasElement.querySelector('.plus-modal-blanket');
         const modal = canvas.getByRole('dialog');
-        await expect(modal.getBoundingClientRect().width, '6-col at 768').toBeCloseTo(384, 0);
+        await expect(modal.getBoundingClientRect().width, '6-col at 768').toBeCloseTo(MODAL_WIDTH_PX['6-col'][0], 0);
         await inEveryColorModeOf(canvasElement, async (mode, token) => {
             await expect(getComputedStyle(overlay).backgroundColor, `blanket in ${mode}`).toBe(token('--ds-blanket'));
         });
@@ -1080,7 +1089,7 @@ export const BlanketScreenGrid = {
         const grid = canvasElement.querySelector('[data-guide="screen-grid"]');
         await expect(grid.children, '12 columns').toHaveLength(12);
         const modal = canvas.getByRole('dialog');
-        await expect(modal.getBoundingClientRect().width, '6-col at 1024').toBeCloseTo(512, 0);
+        await expect(modal.getBoundingClientRect().width, '6-col at 1024').toBeCloseTo(WIDTHS_AT_1024['6-col'], 0);
     },
 };
 
@@ -1129,7 +1138,7 @@ export const BlanketConfirmOverPanel = {
     play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
         const confirm = canvas.getByRole('dialog', { name: 'Discard changes?' });
-        await expect(confirm.getBoundingClientRect().width, '6-col at 1024').toBeCloseTo(512, 0);
+        await expect(confirm.getBoundingClientRect().width, '6-col at 1024').toBeCloseTo(WIDTHS_AT_1024['6-col'], 0);
         await expect(canvasElement.querySelectorAll('.plus-modal-blanket').length).toBe(1);
     },
 };

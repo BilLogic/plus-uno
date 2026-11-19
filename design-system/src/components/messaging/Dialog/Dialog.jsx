@@ -26,10 +26,10 @@ export const DIALOG_HEIGHTS = ['hug', 'fill'];
  * equal to the `--modal-width-*` tokens.
  */
 export const DIALOG_WIDTH_PX = {
-    '4-col': [261, 347, 432],
-    '6-col': [384, 512, 640],
-    '8-col': [507, 677, 848],
-    '10-col': [629, 843, 1056],
+    '4-col': [269, 355, 440],
+    '6-col': [392, 520, 648],
+    '8-col': [515, 685, 856],
+    '10-col': [637, 851, 1064],
 };
 
 /**

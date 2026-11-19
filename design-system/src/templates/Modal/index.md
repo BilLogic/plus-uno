@@ -130,7 +130,7 @@ Picked by what the person has to do. The Dialog component page holds the panel's
 
 ## Anatomy
 
-An Active Modal at 8-col with a short form. Every part once; the pad is 16 on every side, the radius 16, and the parts sit 16 apart.
+An Active Modal at 8-col with a short form. Every part once; the pad is 20 on every side, the radius 16, and the parts sit 16 apart.
 
 1. **Blanket.** Dims the page and holds the Modal centered.
 2. **Header.** The title at 20/24, whatever the level around it, and the Close icon button. With tabs, the tab group sits 8 under the title.
@@ -153,7 +153,7 @@ import { Button } from '@/components';
 | `body` | Text, a list, fields or a table. It scrolls past the cap. |
 | `footer` or `primaryButton` · `secondaryButton` | The footer's buttons. Leave them out for Passive. |
 | `blanket` · `keyboard` | Whether a Blanket press or Escape closes the Modal (`true` by default; `blanket="static"` keeps it open). |
-| Full-bleed footer | Planned. Cells that fill the footer edge to edge, 48 high (a 32 button plus 16 pad, so full bleed never changes the Modal's height), with the inner corners squared. Today the page composes it from Button. |
+| Full-bleed footer | Planned. Cells that fill the footer edge to edge, 52 high (a 32 button plus 20 pad, so full bleed never changes the Modal's height), with the inner corners squared. Today the page composes it from Button. |
 | `tabs` | Two to five views of one thing under the title. |
 | `confirmView` | Planned. The swapped title, body and footer for a confirm about the Modal itself. Today the caller swaps them in place. |
 | Blocked-submit shake | Planned. The Modal's single shake when a submit is blocked. |
@@ -162,7 +162,7 @@ import { Button } from '@/components';
 
 | Token | Value | Used for |
 | --- | --- | --- |
-| `--modal-pad-x-default` | 16 | Pad on every side. |
+| `--modal-pad` | 20 | Pad on every side. |
 | `--modal-radius` | 16 | Corner radius at every width. |
 | `--modal-stack-sm`, `-md`, `-lg` | 8, 16, 24 | Title to tabs; header, body and footer; groups of fields. |
 | `--modal-body-min-height` | 80 | The least the body draws. |
@@ -225,7 +225,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--blanket-max-height-modal` · `--blanket-pad-x` · `--blanket-pad-y` · `--ds-blanket` · `--layer-blanket` · `--layer-modal` · `--modal-body-min-height` · `--modal-inline-sm` · `--modal-pad-x-default` · `--modal-radius` · `--modal-shadow` · `--modal-stack-md` · `--modal-stack-sm` · `--plus-overlay-origin` · `--plus-overlay-screen` · `--plus-overlay-screen-height` · `--transform-origin`
+`--blanket-max-height-modal` · `--blanket-pad-x` · `--blanket-pad-y` · `--ds-blanket` · `--layer-blanket` · `--layer-modal` · `--modal-body-min-height` · `--modal-inline-sm` · `--modal-pad` · `--modal-radius` · `--modal-shadow` · `--modal-stack-md` · `--modal-stack-sm` · `--plus-overlay-origin` · `--plus-overlay-screen` · `--plus-overlay-screen-height` · `--transform-origin`
 
 From `design-system/src/templates/Modal/Modal.scss`. Override these through the token layer, never with a literal.
 

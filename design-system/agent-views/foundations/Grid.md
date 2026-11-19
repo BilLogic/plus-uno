@@ -99,14 +99,14 @@ Between breakpoints the content width is fluid, so a card lands anywhere from it
 
 ## Modal widths
 
-A modal’s content area spans 4, 6, 8 or 10 screen-grid columns, and its pad (modal-pad-x-default) sits outside them on each side, so the box bleeds one pad past the columns. The tinted band is that pad, outside the columns. It grows with the screen between breakpoints, stops past a 1280 screen, never shrinks below its Medium width, and ignores the Sidebar, so it sits in the same place either way.
+A modal’s content area spans 4, 6, 8 or 10 screen-grid columns, and its pad (--modal-pad, 20) sits outside them on each side, so the box bleeds one pad past the columns. The tinted band is that pad, outside the columns. It grows with the screen between breakpoints, stops past a 1280 screen, never shrinks below its Medium width, and ignores the Sidebar, so it sits in the same place either way.
 
 | Token | Figma | Value | Use |
 | --- | --- | --- | --- |
-| `--modal-width-xs` | — | 261 · 347 · 432 | 4 columns |
-| `--modal-width-sm` | `Modal/width-modal-sm` | 384 · 512 · 640 | 6 columns |
-| `--modal-width-md` | `Modal/width-modal-md` | 507 · 677 · 848 | 8 columns |
-| `--modal-width-lg` | `Modal/width-modal-lg` | 629 · 843 · 1056 | 10 columns |
+| `--modal-width-4-col` | `Modal/width-4-col` | 269 · 355 · 440 | 4 columns |
+| `--modal-width-6-col` | `Modal/width-6-col` | 392 · 520 · 648 | 6 columns |
+| `--modal-width-8-col` | `Modal/width-8-col` | 515 · 685 · 856 | 8 columns |
+| `--modal-width-10-col` | `Modal/width-10-col` | 637 · 851 · 1064 | 10 columns |
 | `--popup-width-3-col · 4-col` | — | 200 · 264 · 328 · 261 · 347 · 432 | Popups on the screen grid |
 
 ## Hug and fill

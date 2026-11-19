@@ -303,6 +303,7 @@ export const HeaderOptions = {
         await expect(canvas.getByRole('button', { name: 'Copy link' })).toBeInTheDocument();
         await expect(canvasElement.querySelectorAll('.plus-dialog-divider')).toHaveLength(2);
         await expect(getComputedStyle(canvasElement.querySelector('.plus-dialog')).borderTopLeftRadius, 'Dialog radius is 16').toBe('16px');
+        await expect(getComputedStyle(canvasElement.querySelector('.plus-dialog')).paddingTop, 'Dialog pad is 20 on every side').toBe('20px');
         await expect(getComputedStyle(canvasElement.querySelector('.plus-dialog-footer')).borderBottomLeftRadius, 'footer inner corners are square').toBe('0px');
     },
 };
