@@ -579,7 +579,7 @@ function tokenEscapes(text, ctx, add) {
       add(
         'ds/no-primitive-read',
         index,
-        `\`${name}\` is a primitive; consumer code reads a semantic, pattern or component token`,
+        `\`${name}\` is a primitive; consumer code reads a semantic, template or component token`,
         tiers.length ? holding(tiers) : 'read the semantic token that holds this value (design-system/agent-views/tokens/tokens.md)',
       );
     } else if (!token && !ctx.defined.has(name)) {

@@ -11,7 +11,7 @@ const REGISTRY = [
   { name: 'Panel', tier: 'template', events: { enter: { transition: 'Dock and undock a panel', spatial: 'spatial.slow' } } },
   { name: 'Carousel', tier: 'component', events: { change: { transition: 'Swap content in place', appearance: 'appearance.fast' } } },
   { name: 'Blanket', tier: 'template', events: { enter: { transition: 'Open and close an overlay', appearance: 'appearance.default' } } },
-  { name: 'PatternModal', tier: 'template', events: { enter: { transition: 'Open and close an overlay', spatial: 'spatial.default' } } },
+  { name: 'Modal', tier: 'template', events: { enter: { transition: 'Open and close an overlay', spatial: 'spatial.default' } } },
   { name: 'Filtering', tier: 'pattern', events: { change: { transition: 'Swap content in place', appearance: 'appearance.fast' } } },
   { name: 'Button', tier: 'component', events: { change: { transition: 'Update a value or state', appearance: 'appearance.fast' } } },
   { name: 'Unpaged', tier: 'component', events: { change: { transition: 'Update a value or state', appearance: 'appearance.fast' } } },
@@ -41,12 +41,12 @@ test('derives Storybook docs links and section anchors from MDX pages and Motion
       ].join('\n'),
     },
     {
-      file: 'design-system/src/templates/PatternModal/PatternModal.mdx',
+      file: 'design-system/src/templates/Modal/Modal.mdx',
       docsId: 'templates-modal--docs',
       source: [
         '<Meta title="Templates/Modal" />',
         '## Motion',
-        '<MotionSection component="PatternModal" tier="template" />',
+        '<MotionSection component="Modal" tier="template" />',
         '### Blanket motion',
         '<MotionSection component="Blanket" tier="template" />',
       ].join('\n'),
@@ -64,7 +64,7 @@ test('derives Storybook docs links and section anchors from MDX pages and Motion
     'pattern:Filtering': '?path=/docs/patterns-filtering--docs#custom-motion',
     'template:Blanket': '?path=/docs/templates-modal--docs#blanket-motion',
     'template:Panel': '?path=/docs/templates-panel--docs#motion',
-    'template:PatternModal': '?path=/docs/templates-modal--docs#motion',
+    'template:Modal': '?path=/docs/templates-modal--docs#motion',
   });
   assert.equal(links['component:Unpaged'], undefined);
 });

@@ -4,7 +4,7 @@
  * radius token, never a number.
  *
  * WHY. Radius is a ladder: the semantic steps, the Radius / Control group,
- * and one token per pattern or component. A `4px`, a `50%` or a primitive
+ * and one token per template or component. A `4px`, a `50%` or a primitive
  * step (`--space-0625`) written in a component is a corner nothing else
  * knows about: the ladder can move in Figma and the generated tokens with it,
  * and that corner stays where it was.
@@ -50,7 +50,7 @@ export const MIN_FILES = 150;
 
 export const REMEDY =
   '  -> Read a radius role: the Control group\n' +
-  '     (`var(--radius-control-lg)`), a pattern or component token, or `var(--radius-full)`\n' +
+  '     (`var(--radius-control-lg)`), a template or component token, or `var(--radius-full)`\n' +
   '     for a circle. No px, no %, no primitive step, no literal fallback.';
 
 // Exact, reviewed holds for existing pixels. A visual migration belongs to

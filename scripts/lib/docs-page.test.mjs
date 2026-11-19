@@ -365,17 +365,18 @@ test('a flat-file component is found through its page\'s Storybook meta', () => 
 
 test('two components with one name each get their own page, and a page-less one gets none', () => {
   const root = tree({
-    [`${src}/patterns/Sidebar/Sidebar.jsx`]: 'export default function Sidebar() {}',
-    [`${src}/patterns/Sidebar/Sidebar.stories.jsx`]: "import { Sidebar as RoleSidebar } from '@/components';\nimport PatternSidebar from './Sidebar';\nexport default {\n    component: PatternSidebar,\n};\n",
-    [`${src}/patterns/Sidebar/Sidebar.mdx`]: page('Sidebar.stories.jsx'),
+    [`${src}/components/navigation/Sidebar/Sidebar.jsx`]: 'export default function Sidebar() {}',
+    [`${src}/components/navigation/Sidebar/Sidebar.stories.jsx`]: "import Sidebar from './Sidebar';\nexport default { component: Sidebar };\n",
+    [`${src}/components/navigation/Sidebar/Sidebar.mdx`]: page('Sidebar.stories.jsx'),
     [`${src}/specs/Sections/Sidebar/Sidebar.jsx`]: 'export default function Sidebar() {}',
     [`${src}/specs/Sections/Sidebar/Sidebar.stories.jsx`]: "import Sidebar from './Sidebar';\nexport default { component: Sidebar };\n",
     [`${src}/specs/Sections/Sidebar/Sidebar.mdx`]: page('Sidebar.stories.jsx'),
-    [`${src}/components/navigation/Sidebar/Sidebar.jsx`]: 'export default function Sidebar() {}',
+    [`${src}/components/navigation/Tabs/Tabs.jsx`]: 'export default function Tabs() {}',
   });
   const find = createPageFinder(root);
-  assert.equal(find({ name: 'PatternSidebar', source: `${src}/patterns/Sidebar/Sidebar.jsx` }), `${src}/patterns/Sidebar/Sidebar.mdx`);
-  assert.equal(find({ name: 'Sidebar', source: `${src}/components/navigation/Sidebar/Sidebar.jsx` }), null);
+  assert.equal(find({ name: 'Sidebar', source: `${src}/components/navigation/Sidebar/Sidebar.jsx` }), `${src}/components/navigation/Sidebar/Sidebar.mdx`);
+  assert.equal(find({ name: 'Sidebar', source: `${src}/specs/Sections/Sidebar/Sidebar.jsx` }), `${src}/specs/Sections/Sidebar/Sidebar.mdx`);
+  assert.equal(find({ name: 'Tabs', source: `${src}/components/navigation/Tabs/Tabs.jsx` }), null);
 });
 
 test('a component the stories import from a barrel is found by its name', () => {
