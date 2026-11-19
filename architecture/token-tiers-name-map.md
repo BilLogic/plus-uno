@@ -193,13 +193,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Popup | `--tooltip-max-width` (declared elsewhere) |  |
 | Popup | `--popup-gap-screen` (declared elsewhere) |  |
 | Popup | `--popup-offset` (declared elsewhere) |  |
-| Focused page | `--focused-page-pad-x` (declared elsewhere) |  |
-| Focused page | `--focused-page-pad-y` (declared elsewhere) |  |
-| Focused page | `--focused-page-stack-sm` (declared elsewhere) |  |
-| Focused page | `--focused-page-stack-md` (declared elsewhere) |  |
-| Focused page | `--focused-page-stack-lg` (declared elsewhere) |  |
-| Focused page | `--focused-page-inline-sm` (declared elsewhere) |  |
-| Focused page | `--focused-page-inline-md` (declared elsewhere) |  |
 
 ## Components
 

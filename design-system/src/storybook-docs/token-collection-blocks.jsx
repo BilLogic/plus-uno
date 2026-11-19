@@ -131,7 +131,7 @@ export const SpringSemanticTable = () => (
     </DocsTable>
 );
 
-const TWO_WORD = new Set(['focused', 'frame', 'font', 'line', 'scroll', 'option', 'menu', 'join', 'choice', 'progress', 'count', 'focus', 'ai', 'motion', 'grid', 'type']);
+const TWO_WORD = new Set(['frame', 'font', 'line', 'scroll', 'option', 'menu', 'join', 'choice', 'progress', 'count', 'focus', 'ai', 'motion', 'grid', 'type']);
 
 /** The family a token's rows are grouped under: `--ds-text-subtle` is text, `--card-pad` is card. */
 const familyKey = (name) => {

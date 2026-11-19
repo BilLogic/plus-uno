@@ -7,7 +7,7 @@
  *
  * - `spacing / layout`: what changes by breakpoint, in modes Medium (768px) ·
  *   Large (1024px) · X-Large (1440px), named as `size / layout` names them.
- *   Folders Topbar · Sidebar · Grid · Content · Modal, and Page.
+ *   Folders Sidebar · Grid · Content · Modal, and Page.
  * - `spacing / templates`: one folder per template (Frame, Section,
  *   Card, Table, Overlay, Modal, Popover), one mode.
  * - `color / templates`: template colors, starting with `Overlay/scrim`.
@@ -19,7 +19,7 @@
  * family prefix: Patterns > `Card/pad` is `--card-pad`, Patterns >
  * `Popover/Menu/pad-menu` is `--dropdown-menu-pad`, Color > `Overlay/scrim` is
  * `--overlay-scrim`. In `spacing / layout` every folder is `--layout-*`
- * (`Topbar/height-topbar` is `--layout-height-topbar`) except Page, which
+ * (`Sidebar/width-sidebar` is `--layout-width-sidebar`) except Page, which
  * keeps its own name (`Page/pad` is `--page-pad`).
  *
  * The generator, the token registry and the Figma sync all read this list, so

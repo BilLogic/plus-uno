@@ -284,13 +284,6 @@
       "Card/stack-lg": "var(--card-stack-lg)",
       "Card/stack-md": "var(--card-stack-md)",
       "Card/stack-sm": "var(--card-stack-sm)",
-      "Focused page/inline-md": "var(--focused-page-inline-md)",
-      "Focused page/inline-sm": "var(--focused-page-inline-sm)",
-      "Focused page/pad-x": "var(--focused-page-pad-x)",
-      "Focused page/pad-y": "var(--focused-page-pad-y)",
-      "Focused page/stack-lg": "var(--focused-page-stack-lg)",
-      "Focused page/stack-md": "var(--focused-page-stack-md)",
-      "Focused page/stack-sm": "var(--focused-page-stack-sm)",
       "Frame/sidebar-group-gap": "var(--frame-sidebar-group-gap)",
       "Frame/sidebar-pad": "var(--frame-sidebar-pad)",
       "Frame/sidebar-row-gap": "var(--frame-sidebar-row-gap)",
@@ -1870,11 +1863,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1230,
+    "scssTokenCount": 1223,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1770,
-      "resolved": 1733,
+      "total": 1763,
+      "resolved": 1726,
       "percent": 98,
       "skippedCollections": [
         {

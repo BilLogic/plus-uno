@@ -72,7 +72,7 @@ test('scope follows the family: page-level tokens are Templates, card, modal, po
     }
     return [...scopes];
   };
-  for (const f of ['page', 'focused-page', 'section']) assert.deepEqual(scopeOf(f), ['templates'], f);
+  for (const f of ['page', 'section']) assert.deepEqual(scopeOf(f), ['templates'], f);
   for (const f of ['card', 'modal', 'popup', 'table']) assert.deepEqual(scopeOf(f), ['components'], f);
 });
 

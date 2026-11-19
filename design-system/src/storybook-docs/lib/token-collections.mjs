@@ -7,7 +7,7 @@
  * stylesheet that defines it, and nowhere else: the collection pages, the
  * Library page and the naming audit all read `placeToken`.
  *
- * Templates are page-level tokens (page, focused page, section, frame and
+ * Templates are page-level tokens (page, section, frame and
  * frame layers); Components are card, modal, popup, table and every
  * per-component token; Global is everything shared. Frame tokens live on
  * Spacing and size, layer tokens on Elevation and layers.
@@ -31,7 +31,7 @@ export const COLLECTION_TITLES = {
 
 export const SCOPE_TITLES = { global: 'Global', components: 'Components', templates: 'Templates' };
 
-const TEMPLATE_PREFIXES = ['page', 'focused-page', 'section', 'frame'];
+const TEMPLATE_PREFIXES = ['page', 'section', 'frame'];
 
 const place = (collection, tier, scope = null) => ({ collection, tier, scope: tier === 'primitive' ? null : scope });
 

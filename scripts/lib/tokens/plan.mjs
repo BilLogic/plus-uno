@@ -308,15 +308,6 @@ export const TOKEN_LADDER = [
   { tier: 'templates', group: 'Popup', new: '--popup-gap-screen', old: '--popup-gap-screen', use: 'Space a floating layer keeps from the screen edge, such as a Flag or a listbox.' },
   { tier: 'templates', group: 'Popup', new: '--popup-offset', old: '--popup-offset', use: 'Gap between a Popup, menu or Tooltip and the element that opened it.' },
 
-  // ─── Templates / Focused page ──────────────────────────────────────────
-  { tier: 'templates', group: 'Focused page', new: '--focused-page-pad-x', old: '--focused-page-pad-x', use: 'Horizontal padding of a focused page: a single task with no Sidebar, such as a wizard step.' },
-  { tier: 'templates', group: 'Focused page', new: '--focused-page-pad-y', old: '--focused-page-pad-y', use: 'Vertical padding of a focused page.' },
-  { tier: 'templates', group: 'Focused page', new: '--focused-page-stack-sm', old: '--focused-page-stack-sm', use: 'Vertical gap between a focused page\'s title and its description.' },
-  { tier: 'templates', group: 'Focused page', new: '--focused-page-stack-md', old: '--focused-page-stack-md', use: 'Vertical gap between blocks on a focused page.' },
-  { tier: 'templates', group: 'Focused page', new: '--focused-page-stack-lg', old: '--focused-page-stack-lg', use: 'Vertical gap between a focused page\'s header, body and actions.' },
-  { tier: 'templates', group: 'Focused page', new: '--focused-page-inline-sm', old: '--focused-page-inline-sm', use: 'Horizontal gap between small items in a focused page row.' },
-  { tier: 'templates', group: 'Focused page', new: '--focused-page-inline-md', old: '--focused-page-inline-md', use: 'Horizontal gap between the actions on a focused page.' },
-
   // ─── Components / Button ──────────────────────────────────────────────
   { tier: 'components', group: 'Button', new: '--button-radius-default', old: '--element-radius-item-sm', ref: 'calc(var(--radius-control-lg) - var(--pad-x-xs))', note: 'nests in a 40-high field: its radius 10 minus the 4 slot inset = 6', use: 'Corner rounding of a Button with default spacing.' },
   { tier: 'components', group: 'Button', new: '--button-radius-compact', old: '--element-radius-md', ref: 'calc(var(--radius-control-md) - var(--pad-x-xs))', note: 'nests in a 32-high field: its radius 8 minus the 4 slot inset = 4', use: 'Corner rounding of a Button with compact spacing.' },
@@ -467,7 +458,7 @@ export const TOKEN_LADDER = [
 
   // ─── Layers (own non-spacing family, code only) ───────────────────────
   { tier: 'layers', group: 'Layer', new: '--layer-card', old: '--layout-z-index-card', ref: '100', use: 'Stacking order of a card raised above page content, such as a sticky table part.' },
-  { tier: 'layers', group: 'Layer', new: '--layer-navigation', old: '--layout-z-index-navigation', ref: '200', use: 'Stacking order of the Frame\'s top bar and Sidebar.' },
+  { tier: 'layers', group: 'Layer', new: '--layer-navigation', old: '--layout-z-index-navigation', ref: '200', use: 'Stacking order of the Frame\'s Sidebar and Panel.' },
   { tier: 'layers', group: 'Layer', new: '--layer-dialog', old: '--layout-z-index-dialog', ref: '300', use: 'Stacking order of a non-modal dialog over the page, below popups.' },
   { tier: 'layers', group: 'Layer', new: '--layer-popup', old: '--layout-z-index-popup', ref: '400', use: 'Stacking order of a Popup, DropdownMenu or listbox.' },
   { tier: 'layers', group: 'Layer', new: '--layer-blanket', old: '--layout-z-index-scrim', ref: '500', note: "the Blanket's z-index; the old declaration's value, written directly so this file carries no old-language word", use: 'Stacking order of the Blanket behind a Modal.' },
