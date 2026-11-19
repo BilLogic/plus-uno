@@ -5,7 +5,7 @@ import { PanelBody, PanelCloseAction, PanelContainer, PanelHeader } from '@/patt
 import Modal from './Modal.jsx';
 import PatternSection from '../PatternSection';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
-import { stepItems } from '@/storybook-docs/lib/focused-task.jsx';
+import { stepItems } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { FormFields, FILLED } from '../Form/formDemo.jsx';
 
 /**

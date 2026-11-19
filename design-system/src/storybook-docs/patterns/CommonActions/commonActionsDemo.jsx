@@ -6,7 +6,7 @@ import { HeaderSearch, SectionActions } from '@/storybook-docs/lib/section-heade
 import { FilterSide, StudentsTable, ViewPills, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
 import { CaseBlanket, CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
-import { FocusedType } from '@/storybook-docs/lib/focused-task.jsx';
+import { MultiStepTaskType } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { FILLED, FormInPage, PAGE_WIDTH as FORM_PAGE_WIDTH } from '../../../patterns/Form/formDemo.jsx';
 import { ModalStage, TwoCells } from '../../../patterns/Modal/modalDemo.jsx';
 
@@ -61,7 +61,7 @@ export const ModalFooter = () => (
 );
 
 /** A focused task's bottom bar: Back and Next split 50/50, Close in the title row, no Cancel. */
-export const FocusedBar = () => <FocusedType start={1} />;
+export const MultiStepBar = () => <MultiStepTaskType start={1} />;
 
 /** A card's main action: Subtle in the footer. */
 export const CardAction = () => (

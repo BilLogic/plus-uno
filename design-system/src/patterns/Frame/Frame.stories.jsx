@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Breadcrumb, Button, FooterActions, IconButton, Logo, ProgressTracker, Sidebar, Skeleton, StatusTag, TextField } from '@/components';
+import { Breadcrumb, Button, IconButton, Logo, Sidebar, Skeleton, StatusTag, TextField } from '@/components';
 import { Frame, Modal, PANEL_STORAGE_KEY, PatternCard, PatternSection, usePanelControl, useSidebarControl, PanelBody, PanelCloseAction, PanelContainer, PanelHeader } from '@/patterns';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { FRAME_LAYOUT } from './frameLayout';
@@ -9,10 +9,10 @@ import { BrowserWindow, LiveAnatomy } from '@/storybook-docs/lib/template-page.j
 import { FitStage, ScreenStage, ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { DemoPageHeader } from '../Page/pageDemo.jsx';
 import { expectOverlayExit } from '@/storybook-docs/lib/overlay-motion-plays.js';
-import { AreaStage, DrillStack, FocusedFrameSwitch, StepStage, resolveStepAxis, useDrillStack } from '@/lib/navigationMotion';
+import { AreaStage, DrillStack, useDrillStack } from '@/lib/navigationMotion';
 import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
-import { BAR_TOKEN, FocusedType, STEPS_RAIL, TASK_STEPS, WINDOW_HEIGHT, stepItems } from '@/storybook-docs/lib/focused-task.jsx';
+import { BAR_TOKEN, MultiStepTask, MultiStepTaskType, TASK_STEPS, WINDOW_HEIGHT } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
@@ -77,12 +77,7 @@ export default {
             ? <div style={{ width: parameters.frameWidth, minWidth: parameters.frameWidth }}><Story /></div>
             : <Story />),
     ],
-    // The preview's `^on[A-Z]` actions rule skips an arg that is already a key, so naming
-    // these keeps an ordinary page from getting a Back or Close. Focused stories pass their own.
-    args: { onBack: undefined, onClose: undefined },
     argTypes: {
-        onBack: { control: false, table: { disable: true } },
-        onClose: { control: false, table: { disable: true } },
         children: { table: { disable: true } },
         header: { table: { disable: true } },
         sidebar: { table: { disable: true } },
@@ -215,12 +210,8 @@ const expectCorner = async (frame, surface) => {
 /* ------------------------------------------------------------- stories */
 
 export const Overview = {
-    // An ordinary page: no Back, no Close. Only a focused page shows them.
     play: async ({ canvasElement, globals = {}, parameters = {} }) => {
         const canvas = within(canvasElement);
-        await expect(canvas.queryByRole('button', { name: 'Back' }), 'no Back on an ordinary page').toBeNull();
-        await expect(canvas.queryByRole('button', { name: 'Close' }), 'no Close on an ordinary page').toBeNull();
-        await expect(canvasElement.querySelector('.plus-frame__back, .plus-frame__close'), 'no Back or Close in the header row').toBeNull();
         const expected = parameters.browserFrame || globals.plusBrowser || 'chrome';
         const browserFrame = canvasElement.querySelector('.plus-browser-frame');
         if (expected === 'none') {
@@ -1585,11 +1576,88 @@ export const TypeDefault = {
 };
 
 
-/** Focused: five steps down the left, the bottom bar, no Sidebar. */
-export const TypeFocused = {
-    name: 'Type: Focused',
+/** Multi-step task: the steps in the inner sidebar, the page footer with Save and exit, Back and Next. */
+export const LayoutMultiStepTask = {
+    name: 'Layout: Multi-step task',
     parameters: { layout: 'padded' },
-    render: () => <FocusedType count={5} />,
+    render: () => <MultiStepTaskType count={5} start={0} scrollable />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        const steps = () => canvas.getByRole('list', { name: 'Steps' });
+        const row = (name) => within(steps()).getByRole('button', { name: new RegExp(`^${name}`) });
+        const bar = canvasElement.querySelector('[data-probe="bar"]');
+        const column = canvasElement.querySelector('[data-probe="bar-column"]');
+        const back = canvas.getByRole('button', { name: 'Back' });
+        const next = canvas.getByRole('button', { name: 'Next' });
+        const save = canvas.getByRole('button', { name: 'Save and exit' });
+
+        // The steps are the Sidebar's inner rows: five, the first current, the rest off.
+        await expect(steps().querySelectorAll('li'), 'five steps are the rows').toHaveLength(5);
+        await expect(canvas.getByRole('button', { name: 'Home' }), 'Back to the main Sidebar leads').toBeInTheDocument();
+        await expect(row('Student'), 'the first step is current').toHaveAttribute('aria-current', 'page');
+        await expect(row('Schedule'), 'a step past the answers is off').toHaveAttribute('aria-disabled', 'true');
+        await expect(canvas.queryByRole('button', { name: 'Close' }), 'no Close: Save and exit leaves').toBeNull();
+
+        // The footer: Save and exit at the start, Back and Next at the end, one 32 line in a 48 bar.
+        const tracks = footerTracks(column);
+        await expect(rect(bar).height, 'the footer is 48 high').toBeCloseTo(tokenLength(bar, BAR_TOKEN), 0);
+        await expect(within(bar).queryByRole('button', { name: 'Cancel' }), 'no Cancel in footers').toBeNull();
+        for (const button of [save, back, next]) {
+            await expect(rect(button).height, 'each action is 32 high').toBeCloseTo(tokenLength(bar, '--control-md'), 0);
+            await expect(rect(button).top, 'on one line').toBeCloseTo(rect(save).top, 0);
+        }
+        await expect(rect(save).left, 'Save and exit starts the line').toBeLessThan(rect(back).left);
+        await expect(rect(back).left, 'Back starts on track 3').toBeCloseTo(tracks.track(3).left, 0);
+        await expect(rect(next).right, 'Next ends on track 4').toBeCloseTo(tracks.track(4).right, 0);
+        await expect(back, 'Back is disabled on the first step').toHaveAttribute('aria-disabled', 'true');
+
+        // Next answers a step: it ticks and the one after opens.
+        await userEvent.click(next);
+        await expect(within(row('Student')).getByText('Done'), 'the answered step ticks').toBeInTheDocument();
+        await expect(row('Schedule'), 'the next step is current').toHaveAttribute('aria-current', 'page');
+        await expect(row('Goals'), 'the one after is still off').toHaveAttribute('aria-disabled', 'true');
+        await expect(back, 'Back works from the second step').not.toHaveAttribute('aria-disabled');
+
+        // Back keeps the answer; a done step is pressable and so is the one still waiting after it.
+        await userEvent.click(back);
+        await expect(row('Student')).toHaveAttribute('aria-current', 'page');
+        await expect(row('Schedule'), 'the step answered stays reachable').not.toHaveAttribute('aria-disabled');
+        await userEvent.click(row('Schedule'));
+        await expect(row('Schedule')).toHaveAttribute('aria-current', 'page');
+        await expect(row('Goals'), 'pressing an off step does nothing').toHaveAttribute('aria-disabled', 'true');
+        await userEvent.click(row('Goals'));
+        await expect(row('Schedule')).toHaveAttribute('aria-current', 'page');
+
+        // The last step says Finish.
+        for (let i = 0; i < 3; i += 1) await userEvent.click(canvas.getByRole('button', { name: /^(Next)$/ }));
+        await expect(canvas.getByRole('button', { name: 'Finish' }), 'the last step finishes').toBeInTheDocument();
+        await expect(canvas.queryByRole('button', { name: 'Next' })).toBeNull();
+    },
+};
+
+/** Save and exit and the inner sidebar's Back call out, and leave the task as the caller decides. */
+export const LayoutMultiStepTaskLeaves = {
+    name: 'Layout: Multi-step task, leaving',
+    parameters: { layout: 'padded' },
+    render: () => {
+        const [left, setLeft] = useState('');
+        return (
+            <div>
+                <p data-probe="left" style={{ margin: 0, font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{left || 'In the task'}</p>
+                <MultiStepTaskType count={4} start={1} scrollable onSaveAndExit={() => setLeft('Saved and exited')} onLeave={() => setLeft('Left through Back')} />
+            </div>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const probe = canvasElement.querySelector('[data-probe="left"]');
+        await userEvent.click(canvas.getByRole('button', { name: 'Save and exit' }));
+        await expect(probe, 'Save and exit leaves').toHaveTextContent('Saved and exited');
+        await userEvent.click(canvas.getByRole('button', { name: 'Home' }));
+        await expect(probe, 'Back in the inner sidebar leaves').toHaveTextContent('Left through Back');
+    },
 };
 
 const BareSignIn = () => {
@@ -1639,14 +1707,6 @@ const ANATOMY_DEFAULT_PARTS = [
     { selector: '.plus-frame__panel', label: 'AI panel', side: 'end' },
 ];
 
-/** The focused anatomy's parts, in the Parts list's order. */
-const ANATOMY_FOCUSED_PARTS = [
-    { selector: '.plus-frame__head', label: 'Title row' },
-    { selector: '[data-probe="steps"]', label: 'Steps' },
-    { selector: '.plus-frame__content', label: 'Body', at: 'end' },
-    { selector: '[data-probe="bar"]', label: 'Bar' },
-];
-
 /** Anatomy: the default type at 1440 with the AI panel docked, a marker on each part. */
 export const AnatomyDefault = {
     name: 'Anatomy: Default',
@@ -1665,88 +1725,6 @@ export const AnatomyDefault = {
         const ask = canvas.getByRole('textbox', { name: 'Ask' });
         await userEvent.type(ask, 'Next session?');
         await expect(ask).toHaveValue('Next session?');
-    },
-};
-
-/** Anatomy: the focused type, five steps, a marker on each part. */
-export const AnatomyFocused = {
-    name: 'Anatomy: Focused',
-    parameters: { layout: 'padded' },
-    render: () => (
-        <LiveAnatomy live scrollable width={1024 /* docs-literal: the Large stage */} title="The focused Frame with its parts numbered" parts={ANATOMY_FOCUSED_PARTS}>
-            <FocusedType count={5} scrollable />
-        </LiveAnatomy>
-    ),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        await expectNotInert(canvasElement);
-        await expectFullScale(canvasElement);
-        await markersLevelWithParts(canvasElement, ANATOMY_FOCUSED_PARTS);
-        leadersCrossNoOtherPart(canvasElement, ANATOMY_FOCUSED_PARTS);
-        const back = canvas.getByRole('button', { name: 'Back' });
-        await expect(back).not.toHaveAttribute('aria-disabled');
-        await userEvent.click(back);
-        await expect(back).toHaveAttribute('aria-disabled', 'true');
-    },
-};
-
-/** Steps down the left: five or more, a rail 256 wide, the bar at 48 with Back and Next. */
-export const FocusedStepsDown = {
-    name: 'Focused: five steps, down the left',
-    parameters: { layout: 'padded' },
-    render: () => <FocusedType count={5} start={0} scrollable />,
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        await expectNotInert(canvasElement);
-        await expectFullScale(canvasElement);
-        const layout = canvasElement.querySelector('[data-probe="steps-layout"]');
-        const steps = canvasElement.querySelector('[data-probe="steps"]');
-        const body = steps.nextElementSibling;
-        await expect(layout, 'five steps run down the left').toHaveAttribute('data-steps', 'down');
-        await expect(canvas.getByRole('navigation', { name: 'Steps' }), 'a vertical tracker').toHaveClass('plus-progress-tracker--vertical');
-        await expect(rect(steps).right, 'the rail sits before the body').toBeLessThanOrEqual(rect(body).left);
-        await expect(rect(steps).width, 'the rail is 256 wide').toBeCloseTo(STEPS_RAIL, 0);
-
-        const bar = canvasElement.querySelector('[data-probe="bar"]');
-        const barColumn = canvasElement.querySelector('[data-probe="bar-column"]');
-        const tracks = footerTracks(barColumn);
-        await expect(rect(bar).height, 'the bar is 48 high').toBeCloseTo(tokenLength(bar, BAR_TOKEN), 0);
-        await expect(within(bar).queryByRole('button', { name: 'Cancel' }), 'no Cancel in footers').toBeNull();
-        const back = canvas.getByRole('button', { name: 'Back' });
-        const next = canvas.getByRole('button', { name: 'Next' });
-        await expect(rect(back).left, 'Back starts on track 1').toBeCloseTo(tracks.span(1, 2).left, 0);
-        await expect(rect(back).right, 'Back ends on track 2').toBeCloseTo(tracks.span(1, 2).right, 0);
-        await expect(rect(next).left, 'Next starts on track 3').toBeCloseTo(tracks.span(3, 4).left, 0);
-        await expect(rect(next).right, 'Next ends on track 4').toBeCloseTo(tracks.span(3, 4).right, 0);
-        await expect(back, 'Back is disabled on the first step').toHaveAttribute('aria-disabled', 'true');
-        await expect(canvas.getByRole('button', { name: 'Close' }), 'Close leads the title row').toBeInTheDocument();
-        // One column: the title row, the body and the bar's actions share the Page's reading edges.
-        const close = canvas.getByRole('button', { name: 'Close' });
-        await expect(rect(close).left, 'Close starts on the body’s left edge').toBeCloseTo(rect(steps).left, 0);
-        await expect(rect(back).left, 'Back starts on the body’s left edge').toBeCloseTo(rect(steps).left, 0);
-        await expect(rect(next).right, 'Next ends on the body’s right edge').toBeCloseTo(rect(layout).right, 0);
-        await expect(canvas.queryByRole('navigation', { name: 'Main' }), 'no Sidebar').toBeNull();
-        await userEvent.click(next);
-        await expect(back, 'Back works from the second step').not.toHaveAttribute('aria-disabled');
-    },
-};
-
-/** Steps across the top: four or fewer, a horizontal tracker above the body. */
-export const FocusedStepsAcross = {
-    name: 'Focused: four steps, across the top',
-    parameters: { layout: 'padded' },
-    render: () => <FocusedType count={4} start={0} scrollable />,
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        await expectNotInert(canvasElement);
-        await expectFullScale(canvasElement);
-        const layout = canvasElement.querySelector('[data-probe="steps-layout"]');
-        const steps = canvasElement.querySelector('[data-probe="steps"]');
-        const body = steps.nextElementSibling;
-        await expect(layout, 'four steps run across the top').toHaveAttribute('data-steps', 'across');
-        await expect(canvas.getByRole('navigation', { name: 'Steps' }), 'a horizontal tracker').toHaveClass('plus-progress-tracker--horizontal');
-        await expect(rect(steps).bottom, 'the steps sit above the body').toBeLessThanOrEqual(rect(body).top);
-        await expect(canvas.getByRole('button', { name: 'Back' })).toHaveAttribute('aria-disabled', 'true');
     },
 };
 
@@ -2745,144 +2723,6 @@ export const MotionRecordOverlayReduced = {
     play: recordOverlayPlay(true),
 };
 
-const FocusedTaskTransitionDemo = () => {
-    const [focused, setFocused] = useState(false);
-    const [notes, setNotes] = useState('');
-    const [confirmDiscard, setConfirmDiscard] = useState(false);
-
-    const requestLeave = () => {
-        if (notes.trim()) {
-            setConfirmDiscard(true);
-            return;
-        }
-        setFocused(false);
-    };
-
-    const discardAndLeave = () => {
-        setConfirmDiscard(false);
-        setNotes('');
-        setFocused(false);
-    };
-
-    return (
-        <FitStage width={DOCKED_BROWSER_STAGE} reflow={false}>
-            <BrowserWindow address={focused ? 'app.plus.org/sessions/log' : 'app.plus.org/sessions'} height={WINDOW_HEIGHT}>
-                <div style={{ position: 'relative', blockSize: '100%' }}>
-                    <FocusedFrameSwitch
-                        focused={focused}
-                        defaultFrame={(
-                            <Frame sidebar={<Sidebar user="tutor" activeTabId="sessions" account={SUPERVISOR_ACCOUNT} />}>
-                                <DemoPageHeader
-                                    title="Sessions"
-                                    actions={<Button text="Log a session" appearance="primary" onClick={() => setFocused(true)} />}
-                                />
-                                <PatternSection title="This week">
-                                    <PatternCard title="Maya Rodriguez · Oct 14" description="Ready for session reflection." />
-                                </PatternSection>
-                            </Frame>
-                        )}
-                        focusedFrame={(
-                            <div style={{ display: 'flex', flexDirection: 'column', blockSize: '100%' }}>
-                                <Frame
-                                    header={(
-                                        <div style={{ display: 'flex', alignItems: 'center', flex: '1 1 auto', gap: 'var(--grid-gutter)', minInlineSize: 0 }}>
-                                            <IconButton appearance="subtle" icon="xmark" label="Close" onClick={requestLeave} />
-                                            <h1 style={{ margin: 0, font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>Log a session</h1>
-                                        </div>
-                                    )}
-                                    width="reading"
-                                    style={{ flex: '1 1 auto', minBlockSize: 0 }}
-                                >
-                                    <PatternSection title="Session summary">
-                                        <TextField label="What did you cover?" value={notes} onChange={(e) => setNotes(e.target.value)} />
-                                    </PatternSection>
-                                </Frame>
-                                <div
-                                    role="group"
-                                    aria-label="Task actions"
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'space-between',
-                                        blockSize: `var(${BAR_TOKEN})`,
-                                        overflow: 'hidden',
-                                        paddingInline: 'var(--page-pad)',
-                                        background: 'var(--ds-surface)',
-                                        borderBlockStart: 'var(--border-width-default) solid var(--ds-border)',
-                                    }}
-                                >
-                                    <FooterActions style={{ maxInlineSize: 'var(--content-max-width-reading)', marginInline: 'auto' }}>
-                                        <Button text="Discard" onClick={requestLeave} />
-                                        <Button text="Submit log" appearance="primary" onClick={() => { setNotes(''); setFocused(false); }} />
-                                    </FooterActions>
-                                </div>
-                            </div>
-                        )}
-                    />
-                    <Modal
-                        inline
-                        show={confirmDiscard}
-                        title="Discard unsaved session?"
-                        onClose={() => setConfirmDiscard(false)}
-                        footer={(
-                            <FooterActions>
-                                <Button text="Keep editing" onClick={() => setConfirmDiscard(false)} />
-                                <Button text="Discard" appearance="danger" onClick={discardAndLeave} />
-                            </FooterActions>
-                        )}
-                    >
-                        Your notes have not been saved yet.
-                    </Modal>
-                </div>
-            </BrowserWindow>
-        </FitStage>
-    );
-};
-
-const focusedTaskPlay = (reduced) => async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const switcher = canvasElement.querySelector('[data-focused-switch]');
-    const opener = canvas.getByRole('button', { name: 'Log a session' });
-    await userEvent.click(opener);
-
-    await expect(switcher, 'focused task transitions as a clean fade, never a grow or slide').toHaveAttribute('data-focused-phase', 'exiting');
-    const frameLayer = switcher.querySelector('[data-focused-layer]');
-    const layerTransform = getComputedStyle(frameLayer).transform;
-    await expect(layerTransform === 'none' || layerTransform === 'matrix(1, 0, 0, 1, 0, 0)').toBe(true);
-
-    await waitFor(() => expect(canvas.getByRole('heading', { level: 1, name: 'Log a session' })).toBeInTheDocument());
-    await waitFor(() => expect(switcher).toHaveAttribute('data-focused-phase', 'settled'));
-    await expect(canvas.queryByRole('navigation', { name: 'Main' }), 'Sidebar has left').toBeNull();
-
-    const field = canvas.getByLabelText('What did you cover?');
-    await userEvent.type(field, 'Linear equations');
-    await userEvent.click(canvas.getByRole('button', { name: 'Close' }));
-
-    const modal = canvasElement.querySelector('.plus-modal');
-    await expect(modal, 'unsaved work asks first in a Modal').not.toBeNull();
-    await expectOverlayExit(modal, () => within(modal).getByRole('button', { name: 'Discard' }).click(), reduced);
-
-    await waitFor(() => expect(canvas.getByRole('heading', { level: 1, name: 'Sessions' })).toBeInTheDocument());
-    await waitFor(() => expect(switcher).toHaveAttribute('data-focused-phase', 'settled'));
-    await expect(canvasElement.ownerDocument.activeElement, 'leaving focused task returns focus to the button that opened it').toBe(canvas.getByRole('button', { name: 'Log a session' }));
-};
-
-export const MotionFocusedTask = {
-    name: 'Navigation motion: Focused task',
-    parameters: { layout: 'padded' },
-    decorators: [motionOn],
-    render: () => <FocusedTaskTransitionDemo />,
-    play: focusedTaskPlay(false),
-};
-
-export const MotionFocusedTaskReduced = {
-    name: 'Navigation motion: Focused task, reduced',
-    parameters: { layout: 'padded' },
-    decorators: [motionOff],
-    render: () => <FocusedTaskTransitionDemo />,
-    play: focusedTaskPlay(true),
-};
-
 const STEP_BODY_BY_LABEL = {
     Student: ['Choose the student', 'Pick who this tutoring plan is for and confirm their grade level.'],
     Schedule: ['Set the weekly schedule', 'Confirm the recurring day, time and school room.'],
@@ -2891,122 +2731,50 @@ const STEP_BODY_BY_LABEL = {
     Review: ['Review and confirm', 'Check every detail before sending the plan to the school lead.'],
 };
 
-const FocusedStepMotionDemo = ({ count = 4, allowExtraBranch = false }) => {
-    const [extra, setExtra] = useState(false);
-    const baseLabels = TASK_STEPS.slice(0, count);
-    const branchLabel = baseLabels.includes('Review') ? TASK_STEPS[count] : 'Review';
-    const longestLabels = allowExtraBranch && branchLabel ? [...baseLabels, branchLabel] : baseLabels;
-    const labels = extra ? longestLabels : baseLabels;
-    const [at, setAt] = useState(0);
-    // Placement is decided once when the task opens, by the longest path the flow can take.
-    const [placement] = useState(() => resolveStepAxis({ maxSteps: longestLabels.length, labels: longestLabels }));
-    const down = placement === 'down';
-    const last = at === labels.length - 1;
-    const [title, description] = STEP_BODY_BY_LABEL[labels[at]] ?? STEP_BODY_BY_LABEL.Student;
+const StepMotionDemo = ({ count = 4 }) => (
+    <ScreenStage width={FRAME_LAYOUT.dockMin} fluid>
+        <BrowserWindow address="app.plus.org/terms/new" height={WINDOW_HEIGHT}>
+            <MultiStepTask count={count} start={0} labels={TASK_STEPS.slice(0, count)}>
+                {(at) => {
+                    const [title, description] = STEP_BODY_BY_LABEL[TASK_STEPS[at]] ?? STEP_BODY_BY_LABEL.Student;
+                    return (
+                        <PatternSection title={title} description={description}>
+                            <PatternCard title={`Step ${at + 1}: ${TASK_STEPS[at]}`} description={description} />
+                        </PatternSection>
+                    );
+                }}
+            </MultiStepTask>
+        </BrowserWindow>
+    </ScreenStage>
+);
 
-    return (
-        <ScreenStage width={FRAME_LAYOUT.dockMin} fluid>
-            <BrowserWindow address="app.plus.org/terms/new" height={WINDOW_HEIGHT}>
-                <div style={{ display: 'flex', flexDirection: 'column', blockSize: '100%' }}>
-                    <Frame
-                        header={(
-                            <div data-probe="step-head" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: '1 1 auto', gap: 'var(--grid-gutter)', minInlineSize: 0 }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--grid-gutter)' }}>
-                                    <IconButton appearance="subtle" icon="xmark" label="Close" onClick={() => {}} />
-                                    <h1 style={{ margin: 0, font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>Plan a tutoring term</h1>
-                                </div>
-                                <span data-probe="step-position" style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
-                                    {`${at + 1} of ${labels.length}`}
-                                </span>
-                            </div>
-                        )}
-                        width="reading"
-                        style={{ flex: '1 1 auto', minBlockSize: 0 }}
-                    >
-                        <div data-probe="steps-layout" data-steps={placement} style={{ display: 'flex', flexDirection: down ? 'row' : 'column', gap: 'var(--page-pad)' }}>
-                            <div data-probe="steps" style={down ? { flex: `0 0 ${STEPS_RAIL}px`, inlineSize: STEPS_RAIL } : undefined}>
-                                <ProgressTracker
-                                    label="Steps"
-                                    orientation={down ? 'vertical' : 'horizontal'}
-                                    items={stepItems(labels, at, setAt)}
-                                />
-                            </div>
-                            <div style={{ flex: '1 1 auto', minInlineSize: 0 }}>
-                                <StepStage step={at} axis={placement} maxSteps={longestLabels.length} labels={labels}>
-                                    <PatternSection title={title} description={description}>
-                                        <PatternCard title={`Step ${at + 1}: ${labels[at]}`} description={description} />
-                                        {allowExtraBranch && !extra ? (
-                                            <div style={{ marginBlockStart: 'var(--stack-md)' }}>
-                                                <Button text="Add review step" spacing="compact" onClick={() => setExtra(true)} />
-                                            </div>
-                                        ) : null}
-                                    </PatternSection>
-                                </StepStage>
-                            </div>
-                        </div>
-                    </Frame>
-                    <div
-                        role="group"
-                        aria-label="Task actions"
-                        data-probe="bar"
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            blockSize: `var(${BAR_TOKEN})`,
-                            flex: '0 0 auto',
-                            boxSizing: 'border-box',
-                            overflow: 'hidden',
-                            paddingInline: 'var(--page-pad)',
-                            background: 'var(--ds-surface)',
-                            borderBlockStart: 'var(--border-width-default) solid var(--ds-border)',
-                        }}
-                    >
-                        <FooterActions style={{ maxInlineSize: 'var(--content-max-width-reading)', marginInline: 'auto' }}>
-                            <Button text="Back" isDisabled={at === 0} onClick={() => setAt(at - 1)} />
-                            <Button text={last ? 'Finish' : 'Next'} appearance="primary" onClick={() => setAt(Math.min(at + 1, labels.length - 1))} />
-                        </FooterActions>
-                    </div>
-                </div>
-            </BrowserWindow>
-        </ScreenStage>
-    );
-};
-
-const stepMotionPlay = ({ expectedPlacement, reduced, initialCount, checkBranchLock = false }) => async ({ canvasElement }) => {
+const stepMotionPlay = ({ reduced }) => async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const stage = canvasElement.querySelector('[data-step-stage]');
-    const head = canvasElement.querySelector('[data-probe="step-head"]');
     const bar = canvasElement.querySelector('[data-probe="bar"]');
-    const trackerItems = () => canvasElement.querySelectorAll('[data-probe="steps"] .plus-progress-tracker__item');
-    const headTop = rect(head).top;
+    const sidebar = canvasElement.querySelector('.plus-frame__sidebar');
     const barTop = rect(bar).top;
+    const sidebarLeft = rect(sidebar).left;
 
-    await expect(stage).toHaveAttribute('data-step-placement', expectedPlacement);
-    await expect(canvasElement.querySelector('[data-probe="step-position"]')).toHaveTextContent(`1 of ${initialCount}`);
-    if (expectedPlacement === 'across') {
-        await expect(trackerItems().length, 'across tracker never exceeds 4 steps').toBeLessThanOrEqual(4);
-    }
-
+    await expect(stage).toHaveAttribute('data-step-placement', 'down');
     await userEvent.click(canvas.getByRole('button', { name: 'Next' }));
-    await expect(canvasElement.querySelector('[data-probe="step-position"]')).toHaveTextContent(`2 of ${initialCount}`);
 
     if (reduced) {
         await expect(stage, 'reduced motion swaps via fade, never sliding').not.toHaveAttribute('data-step-phase', 'sliding');
     } else {
-        await expect(stage, 'step body slides on the same axis as the tracker').toHaveAttribute('data-step-phase', 'sliding');
+        await expect(stage, 'the step body slides on the same axis as the step rows').toHaveAttribute('data-step-phase', 'sliding');
         await expect(stage).toHaveAttribute('data-step-direction', '1');
         const current = stage.querySelector('[data-step-role="current"]');
         const previous = stage.querySelector('[data-step-role="previous"]');
-        await expect(previous, 'previous step slides out together with new step').not.toBeNull();
+        await expect(previous, 'the previous step slides out together with the new one').not.toBeNull();
         await expect(getComputedStyle(current).opacity, 'steps slide with no fade').toBe('1');
-        await expect(getComputedStyle(previous).opacity, 'outgoing step has no fade').toBe('1');
+        await expect(getComputedStyle(previous).opacity, 'the outgoing step has no fade').toBe('1');
     }
 
     await waitFor(() => expect(stage).toHaveAttribute('data-step-phase', 'settled'));
     await expect(canvas.getByRole('heading', { name: 'Set the weekly schedule' })).toBeInTheDocument();
-    await expect(rect(head).top, 'header never moves').toBeCloseTo(headTop, 0);
-    await expect(rect(bar).top, 'bottom bar never moves').toBeCloseTo(barTop, 0);
+    await expect(rect(bar).top, 'the footer never moves').toBeCloseTo(barTop, 0);
+    await expect(rect(sidebar).left, 'the step rows never move').toBeCloseTo(sidebarLeft, 0);
 
     await userEvent.click(canvas.getByRole('button', { name: 'Back' }));
     if (!reduced) {
@@ -3014,46 +2782,20 @@ const stepMotionPlay = ({ expectedPlacement, reduced, initialCount, checkBranchL
     }
     await waitFor(() => expect(stage).toHaveAttribute('data-step-phase', 'settled'));
     await expect(canvas.getByRole('heading', { name: 'Choose the student' })).toBeInTheDocument();
-
-    if (checkBranchLock) {
-        await userEvent.click(canvas.getByRole('button', { name: 'Add review step' }));
-        await expect(stage, 'a branch adding a step mid-task never flips placement').toHaveAttribute('data-step-placement', expectedPlacement);
-        await expect(canvasElement.querySelector('[data-probe="step-position"]')).toHaveTextContent(`1 of ${initialCount + 1}`);
-        if (expectedPlacement === 'across') {
-            await expect(trackerItems().length, 'across story never shows 5 steps across').toBeLessThanOrEqual(4);
-        }
-    }
-};
-
-export const MotionStepAcross = {
-    name: 'Navigation motion: Step across',
-    parameters: { layout: 'padded' },
-    decorators: [motionOn],
-    render: () => <FocusedStepMotionDemo count={3} allowExtraBranch />,
-    play: stepMotionPlay({ expectedPlacement: 'across', reduced: false, initialCount: 3, checkBranchLock: true }),
-};
-
-export const MotionStepAcrossReduced = {
-    name: 'Navigation motion: Step across, reduced',
-    parameters: { layout: 'padded' },
-    decorators: [motionOff],
-    render: () => <FocusedStepMotionDemo count={3} allowExtraBranch />,
-    play: stepMotionPlay({ expectedPlacement: 'across', reduced: true, initialCount: 3, checkBranchLock: true }),
 };
 
 export const MotionStepDown = {
     name: 'Navigation motion: Step down',
     parameters: { layout: 'padded' },
     decorators: [motionOn],
-    render: () => <FocusedStepMotionDemo count={4} allowExtraBranch />,
-    play: stepMotionPlay({ expectedPlacement: 'down', reduced: false, initialCount: 4, checkBranchLock: true }),
+    render: () => <StepMotionDemo count={4} />,
+    play: stepMotionPlay({ reduced: false }),
 };
 
 export const MotionStepDownReduced = {
     name: 'Navigation motion: Step down, reduced',
     parameters: { layout: 'padded' },
     decorators: [motionOff],
-    render: () => <FocusedStepMotionDemo count={4} allowExtraBranch />,
-    play: stepMotionPlay({ expectedPlacement: 'down', reduced: true, initialCount: 4, checkBranchLock: true }),
+    render: () => <StepMotionDemo count={4} />,
+    play: stepMotionPlay({ reduced: true }),
 };
-

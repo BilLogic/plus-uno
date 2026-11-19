@@ -351,7 +351,7 @@ test('patterns: importing template and pattern motion helpers from @/patterns pa
     barrels: facts.barrels,
   });
   const code = [
-    "import { Frame, AreaStage, DrillStack, useDrillStack, SlideViews, StepStage, FocusedFrameSwitch, scrollToSpot, callAttention, SwapInPlace, LoadThenReveal, LoadRevealSlot, PresenceSlot, useMotionReduced, SPRINGS } from '@/patterns';",
+    "import { Frame, AreaStage, DrillStack, useDrillStack, SlideViews, StepStage, scrollToSpot, callAttention, SwapInPlace, LoadThenReveal, LoadRevealSlot, PresenceSlot, useMotionReduced, SPRINGS } from '@/patterns';",
     'export default function App() {',
     '  const reduced = useMotionReduced();',
     '  const drill = useDrillStack();',
@@ -369,7 +369,6 @@ test('patterns: importing template and pattern motion helpers from @/patterns pa
     '          </LoadRevealSlot>',
     '        </LoadThenReveal>',
     '        <SlideViews activeKey="a" keys={["a"]}>{null}</SlideViews>',
-    '        <FocusedFrameSwitch focused={false} defaultFrame={null} focusedFrame={null} />',
     '        <DrillStack controller={drill} renderView={() => null} />',
     '      </AreaStage>',
     '</Frame>',

@@ -14,8 +14,6 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Frame | template | sidebar-close | Dock and undock a panel | `--ds-motion-spatial-fast` |  |
 | Frame | template | panel-dock | Dock and undock a panel | `--ds-motion-spatial-slow` · `--ds-motion-appearance-fast` |  |
 | Frame | template | panel-undock | Dock and undock a panel | `--ds-motion-spatial-default` |  |
-| Frame | template | focused-open | Drill into and climb back out | `--ds-motion-appearance-default` |  |
-| Frame | template | focused-close | Drill into and climb back out | `--ds-motion-appearance-fast` |  |
 | Frame | template | step | Step to the next or previous | `--ds-motion-spatial-default` · `--ds-motion-appearance-fast` |  |
 | Modal | template | enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` |  |
 | Modal | template | exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` |  |

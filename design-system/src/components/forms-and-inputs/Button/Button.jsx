@@ -175,7 +175,7 @@ Button.propTypes = {
     // Appearance
     /** The visual style. `primary` is for the main action on a page, `default` for secondary actions and `subtle` for low-emphasis ones. `warning` and `danger` mark risky or destructive actions, `discovery` points out something new, and `ai` is for AI actions and needs a text label. */
     appearance: PropTypes.oneOf(BUTTON_APPEARANCES),
-    /** `default` draws 32. `compact` draws 24, for tables and tight toolbars. `spacious` draws 48, for modal, panel and focused-view footers. */
+    /** `default` draws 32. `compact` draws 24, for tables and tight toolbars. `spacious` draws 48, for modal and panel footers. */
     spacing: PropTypes.oneOf(BUTTON_SPACINGS),
     /** Stretches the button to the full width of its container, with the label centered. */
     shouldFitContainer: PropTypes.bool,

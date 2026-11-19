@@ -42,7 +42,7 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 164,773 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 164,483 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -53,7 +53,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `docs/connectors/notion/page-writing` | [`docs/connectors/notion/page-writing.md`](../../docs/connectors/notion/page-writing.md) | 6,695 |
 | `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 23,554 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,988 |
-| `docs/conventions/design-system-glossary` | [`docs/conventions/design-system-glossary.md`](../../docs/conventions/design-system-glossary.md) | 23,467 |
+| `docs/conventions/design-system-glossary` | [`docs/conventions/design-system-glossary.md`](../../docs/conventions/design-system-glossary.md) | 23,177 |
 | `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,535 |
 | `draft-a-prd` | [`agents/uno-bot/skills/draft-a-prd/SKILL.md`](../../agents/uno-bot/skills/draft-a-prd/SKILL.md) | 3,724 |
 | `ds-precedence` | [`agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) | 2,262 |
@@ -2030,16 +2030,12 @@ An arrangement of components with named **Slot**s, holding its key scenarios and
 _Avoid_: "container", "starter", "page template" for the **Frame** alone
 
 **Frame**:
-The template for the app's outer shell: the **Sidebar** and **Panel** that stay put while the **Page** inside changes. Frame has three types: **Frame default**, **Frame focused** and **Frame bare**. The browser window is drawn around it in examples only. "App shell" is an informal alias for talk; code and docs say Frame.
+The template for the app's outer shell: the **Sidebar** and **Panel** that stay put while the **Page** inside changes. Frame has two types: **Frame default** and **Frame bare**. A multi-step task runs in the **Sidebar**'s inner mode on a default Frame. The browser window is drawn around it in examples only. "App shell" is an informal alias for talk; code and docs say Frame.
 _Avoid_: "surface container", bare "shell"
 
 **Frame default**:
 The **Frame** type for pages people move among: the **Sidebar**, the **Page** and the slot for the AI **Panel**.
 _Avoid_: "main frame"
-
-**Frame focused**:
-The **Frame** type for one task: no **Sidebar**, a Close button at the start of the title row, steps down a left **Section** side when there are five or more and across the top when there are four or fewer, and a bottom bar with Cancel on the left and Back and Next on the right.
-_Avoid_: "wizard page", "full-screen modal"
 
 **Frame bare**:
 The **Frame** type with no **Sidebar** and one centered column, such as sign-in.

@@ -296,7 +296,6 @@
       "Frame/sidebar-row-gap": "var(--frame-sidebar-row-gap)",
       "Frame/sidebar-row-radius": "var(--frame-sidebar-row-radius)",
       "Frame/sidebar-width": "var(--frame-sidebar-width)",
-      "Frame/topbar-height": "var(--frame-topbar-height)",
       "Modal/body-min-height": "var(--modal-body-min-height)",
       "Modal/inline-lg": "var(--modal-inline-lg)",
       "Modal/inline-md": "var(--modal-inline-md)",
@@ -1871,11 +1870,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1232,
+    "scssTokenCount": 1230,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1771,
-      "resolved": 1734,
+      "total": 1770,
+      "resolved": 1733,
       "percent": 98,
       "skippedCollections": [
         {
@@ -1900,7 +1899,7 @@
         },
         {
           "collection": "archived / spacing / layout",
-          "count": 27
+          "count": 26
         },
         {
           "collection": "archived / color / patterns",

@@ -15,7 +15,7 @@ The place sets the footer. The fields are the same everywhere.
 - **In a page.** Settings and anything saved as a group. Buttons left-aligned under the fields, Primary first.
 - **In a Panel.** Editing a record beside the page. A full-bleed footer, only while editing.
 - **In a Modal.** Fewer than five fields. A full-bleed footer, Primary furthest right.
-- **In steps.** Frame · focused with the form in the body. The bar carries Back and Next.
+- **In steps.** a multi-step task with the form in the body. The footer carries Save and exit, Back and Next.
 
 ## Anatomy
 
@@ -46,7 +46,7 @@ A short form at 8-col: the Modal's header, the fields in its body, its full-blee
 
 ### In steps
 
-A stepped form on its own page is Frame · focused with the form in the body. Back keeps what was typed.
+A stepped form on its own page is a multi-step task on Frame, with the form in the body. Back keeps what was typed.
 
 1. **Steps.** The rail at the start, with done, current and later steps; four or fewer run across the top.
 2. **Body.** One group per step, at reading width.
@@ -60,7 +60,7 @@ These examples show form states within each host. See each field's component pag
 
 | Token | Value | Purpose |
 | --- | --- | --- |
-| `--space-300` | 48 | The height of a full-bleed footer, and of the focused bar: the 32 button plus 16 of pad. It is also the gap from the last field to a page form's footer. |
+| `--space-300` | 48 | The height of a full-bleed footer, and of the multi-step footer: the 32 button plus 16 of pad. It is also the gap from the last field to a page form's footer. |
 | `--panel-width-default` | 400 | The Panel a form opens in. |
 | `--space-200` | 24 | The Panel body's pad from every edge, and the stack between groups. |
 
@@ -70,7 +70,7 @@ These examples show form states within each host. See each field's component pag
 import { Fieldset, TextField, Select, DatePicker, Button, SectionMessage } from '@/components';
 ```
 
-A Form is a composition: the fields in a Fieldset, inside a Page, a Panel, a Modal or a focused Frame. Its footer is the container's.
+A Form is a composition: the fields in a Fieldset, inside a Page, a Panel, a Modal or a multi-step task. Its footer is the container's.
 
 | Slot | Holds |
 | --- | --- |
@@ -82,7 +82,7 @@ A Form is a composition: the fields in a Fieldset, inside a Page, a Panel, a Mod
 
 ## Usage
 
-Use a Form wherever a person enters or changes values that are saved together. The place sets the footer: in a Modal, a Panel and the focused view the corner × dismisses, so their footers carry real actions and no Cancel; the steps footer is Back and Next; page forms and popups have no ×, so they keep a subtle Cancel. A stepped form on its own page is Frame · focused with the form in the body.
+Use a Form wherever a person enters or changes values that are saved together. The place sets the footer: in a Modal and a Panel the corner × dismisses, so their footers carry real actions and no Cancel; the steps footer is Save and exit, Back and Next; page forms and popups have no ×, so they keep a subtle Cancel. A stepped form on its own page is a multi-step task on Frame, with the form in the body.
 
 Pick the host from the task:
 
@@ -91,7 +91,7 @@ Pick the host from the task:
 | is saved as a group on its own page: settings, a profile | In a page | Left-aligned under the fields, Primary first, Cancel Subtle |
 | is a short edit of a row, with the page still in view | In a Panel · Details | Discard (Default) and Save (Primary) full bleed at the bottom, no Cancel |
 | is rare and critical, with fewer than five fields | In a Modal, 8-col | Discard (Default) and the action (Primary), full bleed, no Cancel |
-| is long, or has sections someone works through | In steps on Frame · focused | Back and Next in the bar, no Cancel |
+| is long, or has sections someone works through | In steps, a multi-step task on Frame | Save and exit, Back and Next in the footer, no Cancel |
 
 When to validate, what a blocked submit does, required and optional marks, and leaving with edits are the Forms pattern; where the buttons sit is the Common actions pattern. This page shows how a form sits in each container.
 
@@ -119,7 +119,7 @@ When to validate, what a blocked submit does, required and optional marks, and l
 
 ## Related
 
-- Frame: use for a stepped form on its own page, in the focused type.
+- Frame: use for a stepped form on its own page, as a multi-step task.
 - Section: use for the page header a page form sits under, and for subsections when settings have several groups.
 - Modal: use for a rare, critical task with few fields.
 - Panel: use for a short edit with the page still in view.

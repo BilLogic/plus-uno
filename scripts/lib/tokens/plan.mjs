@@ -190,8 +190,7 @@ export const TOKEN_LADDER = [
   { tier: 'semantics', group: 'Size', new: '--control-lg', old: '--size-control-lg', ref: 'var(--size-250)', use: 'Height of a large control: 40px high.' },
   { tier: 'semantics', group: 'Size', new: '--control-xl', old: null, ref: 'var(--size-300)', use: 'Height of an extra-large control: 48px high.' },
 
-  // ─── Templates / Frame (with Topbar and Sidebar) ──────────────────────
-  { tier: 'templates', group: 'Frame', new: '--frame-topbar-height', old: '--layout-height-topbar', ref: 'var(--height-200)', use: 'Height of the Frame\'s top bar.' },
+  // ─── Templates / Frame (with the Sidebar) ──────────────────────
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-width', old: '--layout-width-sidebar', ref: 'var(--width-1500)', use: 'Width of the Frame\'s Sidebar at the current breakpoint.' },
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-pad', old: null, value: '--space-075', note: 'the Sidebar pads 12 on every side', use: 'Padding on every side inside the Sidebar.' },
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-row-gap', old: null, value: '--space-0125', note: 'two Sidebar rows sit 2 apart', use: 'Vertical gap between two rows in the Sidebar.' },

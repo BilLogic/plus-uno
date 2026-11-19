@@ -30,7 +30,6 @@ import {
 import {
     climbOneScene,
     drillScene,
-    focusedScene,
     goToScene,
     stepScene,
     switchViewsScene,
@@ -110,7 +109,6 @@ export const TRANSITION_SCENE_FACTORIES = Object.freeze({
             spatial: spatialTokenOf(event),
             appearance: appearanceTokenOf(event),
         };
-        if (event.event.startsWith('focused-')) return focusedScene(tokens);
         if (isClosingEvent(event) || event.event === 'climb') return climbOneScene(tokens);
         return drillScene(tokens);
     },

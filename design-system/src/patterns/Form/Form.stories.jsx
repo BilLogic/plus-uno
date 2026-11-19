@@ -7,7 +7,7 @@ import { TextField } from '@/components';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
-import { BAR_TOKEN } from '@/storybook-docs/lib/focused-task.jsx';
+import { BAR_TOKEN } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { FILLED, FormInModal, FormInPage, FormInPanel, FormInSteps, PAGE_WIDTH } from './formDemo.jsx';
@@ -16,7 +16,7 @@ import { ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
 /**
  * Form: the template page's examples, run in the Storybook tests. There is no
  * Form component, so these compose Fieldset, the fields, Section, Panel, Modal
- * and the focused Frame. Each key state asserts what a person sees: the
+ * and the multi-step task. Each key state asserts what a person sees: the
  * footer's height read from its token, the footer holding still while the body
  * changes, and the sending button keeping its width.
  *
@@ -109,11 +109,11 @@ export const TypeSteps = {
         await settleAnimations(canvasElement.ownerDocument.body);
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
-        await expect(canvas.getByRole('navigation', { name: 'Steps' }), 'four steps run across the top').toHaveClass('plus-progress-tracker--horizontal');
+        await expect(canvas.getByRole('list', { name: 'Steps' }).querySelectorAll('li'), 'four steps are the inner sidebar rows').toHaveLength(4);
         await expect(canvas.getByRole('button', { name: 'Back' }), 'Back on the first step is disabled').toHaveAttribute('aria-disabled', 'true');
-        await expect(canvas.getByRole('button', { name: 'Next' }), 'Next in the bar').toBeInTheDocument();
-        await expect(canvas.queryByRole('button', { name: 'Cancel' }), 'no Cancel in steps bar').toBeNull();
-        await expect(canvas.queryByRole('navigation', { name: 'Main' }), 'no Sidebar').toBeNull();
+        await expect(canvas.getByRole('button', { name: 'Next' }), 'Next in the footer').toBeInTheDocument();
+        await expect(canvas.queryByRole('button', { name: 'Cancel' }), 'no Cancel in the steps footer').toBeNull();
+        await expect(canvas.getByRole('button', { name: 'Save and exit' }), 'Save and exit leads the footer').toBeInTheDocument();
         await userEvent.click(canvas.getByRole('button', { name: 'Next' }));
         await expect(canvas.getByLabelText(/Session date/)).toBeInTheDocument();
         await userEvent.click(canvas.getByRole('button', { name: 'Back' }));

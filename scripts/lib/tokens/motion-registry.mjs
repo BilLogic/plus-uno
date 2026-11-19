@@ -37,8 +37,6 @@ export const MOTION_REGISTRY = [
       'sidebar-close': { transition: 'Dock and undock a panel', spatial: 'spatial.fast', note: 'It closes on spatial.fast to its edge and leaves nothing behind: no rail.' },
       'panel-dock': { transition: 'Dock and undock a panel', spatial: 'spatial.slow', appearance: 'appearance.fast', note: 'The AI Panel docks on the right and the Page makes room; its content fades in once the page is about 90% done.' },
       'panel-undock': { transition: 'Dock and undock a panel', spatial: 'spatial.default', note: 'It reverses and stays at the edge.' },
-      'focused-open': { transition: 'Drill into and climb back out', appearance: 'appearance.default', note: 'Focused opens as a change of frame: the page and the Sidebar fade out together on appearance.fast, then the task fades in, in place. A focused task fades; it does not grow or slide. Bare frames, such as sign-in, do not move.' },
-      'focused-close': { transition: 'Drill into and climb back out', appearance: 'appearance.fast', note: 'Close reverses the entrance one speed faster: the task fades out, then the page and Sidebar fade back in, asking first in a Modal if anything is unsaved.' },
       step: { transition: 'Step to the next or previous', spatial: 'spatial.default', appearance: 'appearance.fast', note: 'The body slides on the same axis as the step list: up with the steps down the left, across with four or fewer across the top. Step states change in place. Placement is set once, when the task opens, by the longest path the flow can take.' },
     },
   },

@@ -7,23 +7,22 @@ import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
  * `FooterActions` and `Button`.
  */
 
-/** Back and the primary Next split the bar; Close in the title row leaves the task. */
+/** Save and exit at the start; Back and the primary Next at the end, on one 32 line. */
 export const BarInOrder = () => (
     <CaseSurface border="top" padding="sm">
-        <FooterActions>
-            <Button text="Back" onClick={() => {}} />
-            <Button text="Next" appearance="primary" onClick={() => {}} />
+        <FooterActions leadingAction={<Button text="Save and exit" appearance="subtle" spacing="default" onClick={() => {}} />}>
+            <Button text="Back" spacing="default" onClick={() => {}} />
+            <Button text="Next" appearance="primary" spacing="default" onClick={() => {}} />
         </FooterActions>
     </CaseSurface>
 );
 
-/** Cancel repeated in the bar beside Back and Next: two ways out of one task. */
+/** Cancel repeated in the footer beside Save and exit: two ways out of one task. */
 export const BarScrambled = () => (
     <CaseSurface border="top" padding="sm">
-        <FooterActions>
-            <Button text="Cancel" appearance="subtle" onClick={() => {}} />
-            <Button text="Back" onClick={() => {}} />
-            <Button text="Next" appearance="primary" onClick={() => {}} />
+        <FooterActions leadingAction={<Button text="Save and exit" appearance="subtle" spacing="default" onClick={() => {}} />}>
+            <Button text="Cancel" spacing="default" onClick={() => {}} />
+            <Button text="Next" appearance="primary" spacing="default" onClick={() => {}} />
         </FooterActions>
     </CaseSurface>
 );

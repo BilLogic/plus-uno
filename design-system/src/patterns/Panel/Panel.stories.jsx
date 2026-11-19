@@ -5,7 +5,7 @@ import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { fitsCanvas, leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { FitStage, ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
-import { BAR_TOKEN, WINDOW_HEIGHT } from '@/storybook-docs/lib/focused-task.jsx';
+import { BAR_TOKEN, WINDOW_HEIGHT } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { computedShadow, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { FRAME_LAYOUT } from '@/patterns/Frame/frameLayout';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';

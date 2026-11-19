@@ -21,8 +21,6 @@ import { ABOVE_DEMOS, FEEDBACK_DEMOS, WITHIN_DEMOS } from './motion-transitions-
 const PAGE = { x: 52, y: 18, w: 99, h: 75 };
 const BODY = { x: 60, y: 48, w: 83, h: 42 };
 const ROW = { x: 60, y: 62, w: 83, h: 14 };
-// The Page's button, where a press opens a focused task.
-const HEADER_BUTTON = [128, 34];
 
 // ---------- Drill into and climb back out ----------
 
@@ -194,72 +192,6 @@ const climbTwo = {
     await ctx.spring('n', 1, 'appearance.default');
   },
 };
-
-// ---------- Focused task ----------
-
-/** The task that takes the whole window: a header with its close, the step list, the form and the bottom bar. */
-const TaskLayer = () => (
-  <>
-    <Frame x={8} y={6} w={144} h={88} />
-    <Rect x={16} y={22} w={6} h={6} fill={PAINT.placeholderText} corner="icon" />
-    <SkeletonBar x={28} y={23} w={40} h={5} heading />
-    {[0, 1, 2, 3, 4].map((i) => (
-      <SkeletonBar key={i} x={16} y={40 + i * 9} w={30} heading={i === 1} />
-    ))}
-    <Field x={64} y={36} w={80} />
-    <Field x={64} y={58} w={80} />
-    <Rule x1={9} x2={151} y1={80} y2={80} stroke={PAINT.frameDivider} />
-    <ButtonShape x={16} y={82} w={28} />
-    <ButtonShape x={92} y={82} w={24} />
-    <ButtonShape x={120} y={82} w={28} appearance="primary" />
-  </>
-);
-
-const focused = ({ id, title, caption, slide, spatial = 'spatial.default', appearance = 'appearance.default' }) => ({
-  id,
-  title,
-  caption,
-  viewBox: VIEW,
-  initial: slide ? { fr: 1, x: 1 } : { fr: 1, f: 0 },
-  landing: slide ? { fr: 0, x: 0 } : { fr: 0, f: 1 },
-  arrows: slide ? [{ points: [[152, 50], [80, 50]], ghost: { x: 8, y: 6, w: 144, h: 88 } }] : [],
-  draw: ({ fr, f = 0, x = 0 }) => (
-    <>
-      {/* The window stays; only what is inside it fades, so the tile is never empty. */}
-      <Screen x={8} y={6} w={144} h={88} header={false}>
-        <g opacity={fr}>
-          <PageHeader x={60} y={26} w={83} />
-          <Row x={BODY.x} y={BODY.y} w={BODY.w} />
-          <Row x={BODY.x} y={ROW.y} w={BODY.w} />
-        </g>
-      </Screen>
-      {slide ? (
-        <Clip x={8} y={6} w={144} h={88}>
-          <Moved x={x * 144}>
-            <TaskLayer />
-          </Moved>
-        </Clip>
-      ) : (
-        <g opacity={f}>
-          <TaskLayer />
-        </g>
-      )}
-    </>
-  ),
-  play: async (ctx) => {
-    await ctx.hold(1);
-    await ctx.tap(...HEADER_BUTTON);
-    const frameOut = appearance === 'appearance.default' ? 'appearance.fast' : appearance;
-    if (slide) {
-      await Promise.all([ctx.spring('fr', 0, frameOut), ctx.spring('x', 0, spatial)]);
-      return;
-    }
-    await ctx.spring('fr', 0, frameOut);
-    await ctx.spring('f', 1, appearance);
-  },
-});
-
-export const focusedScene = focused;
 
 // ---------- Go to another area ----------
 
@@ -643,13 +575,6 @@ export const TRANSITION_DEMOS = {
     ),
   },
   climb: { title: 'Climbing back out', scenes: [climbOne, climbTwo] },
-  focused: {
-    title: 'A focused task',
-    scenes: pair(
-      focused({ id: 'focused-fade', title: 'The frame fades, the task fades in', caption: 'The task changes the frame itself, so it is a clean fade in place: the page and Sidebar fade out, then the task fades in. Close reverses it.' }),
-      focused({ id: 'focused-slide', title: 'The task slides in from the side', slide: true, caption: 'A slide says the task sits beside the page. It replaces the frame, so it fades.' }),
-    ),
-  },
   switch: {
     title: 'Switch views',
     scenes: pair(

@@ -26,7 +26,7 @@ import {
 } from '@/patterns';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
-import { WINDOW_HEIGHT } from '@/storybook-docs/lib/focused-task.jsx';
+import { WINDOW_HEIGHT } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { FullBleedFooter } from '../Form/formDemo.jsx';
 
 /**

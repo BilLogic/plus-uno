@@ -66,7 +66,6 @@ const px = (n) => `${+n.toFixed(2)}px`;
 
 /* Layout: one value per mode, Medium · Large · X-Large. */
 const LAYOUT = {
-  '--frame-topbar-height': ['32px', '32px', '32px'],
   '--frame-sidebar-width': ['240px', '240px', '240px'],
   '--grid-gutter': ['16px', '16px', '16px'],
   '--grid-width-column': ['45.33px', '46.67px', '81.33px'],
@@ -290,7 +289,6 @@ test('the new names take no family prefix, and never land on an old --size-* nam
 
 test('every alias lands on the scales, never on an old --size-* primitive', () => {
   const ALIASES = {
-    '--frame-topbar-height': 'var(--height-200)',
     '--frame-sidebar-width': 'var(--width-1500)',
     '--grid-gutter': 'var(--space-100)',
     '--content-max-width': 'var(--size-7700)',
@@ -411,8 +409,8 @@ test('the Frame stacks its layers by name: no arithmetic on --layer-navigation a
   assert.doesNotMatch(scss, /z-index:\s*-?\d/);
 });
 
-test('the Frame layer steps are named and ordered edge < Sidebar < Topbar start < Blanket < Panel peek', () => {
-  const order = ['edge', 'sidebar', 'topbar-start', 'blanket', 'panel-peek'].map((n) => `--layer-frame-${n}`);
+test('the Frame layer steps are named and ordered edge < Sidebar < Blanket < Panel peek', () => {
+  const order = ['edge', 'sidebar', 'blanket', 'panel-peek'].map((n) => `--layer-frame-${n}`);
   const values = order.map((n) => {
     const token = corpus.get(n);
     assert.ok(token, `${n} is not declared`);

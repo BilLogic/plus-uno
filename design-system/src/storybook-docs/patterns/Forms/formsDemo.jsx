@@ -19,7 +19,11 @@ import {
     Toggle,
 } from '@/components';
 import { Frame, PatternSection } from '@/patterns';
-import { STEPS_ACROSS_MAX, STEPS_RAIL, stepItems } from '@/storybook-docs/lib/focused-task.jsx';
+import { stepItems } from '@/storybook-docs/lib/multi-step-task.jsx';
+
+/** A form in steps: four or fewer run across the top; five or more go down a rail 256 wide. */
+const STEPS_ACROSS_MAX = 4;
+const STEPS_RAIL = 256; // docs-literal
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { FormFields, FILLED } from '../../../patterns/Form/formDemo.jsx';

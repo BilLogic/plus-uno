@@ -43,8 +43,6 @@ export const DrillDeeper = story(TRANSITION_DEMOS.deeper);
 export const DrillDeeperReduced = reducedStory(TRANSITION_DEMOS.deeper);
 export const ClimbOut = story(TRANSITION_DEMOS.climb);
 export const ClimbOutReduced = reducedStory(TRANSITION_DEMOS.climb);
-export const FocusedTask = story(TRANSITION_DEMOS.focused);
-export const FocusedTaskReduced = reducedStory(TRANSITION_DEMOS.focused);
 export const SwitchViews = story(TRANSITION_DEMOS.switch);
 export const SwitchViewsReduced = reducedStory(TRANSITION_DEMOS.switch);
 export const Step = story(TRANSITION_DEMOS.step);
@@ -107,9 +105,8 @@ export const Rulings = {
     await expect(treeDrill.landing).not.toEqual(expect.objectContaining({ s: treeDrill.initial.s, r: treeDrill.initial.r, e: treeDrill.initial.e }));
     // Drill grows and the list fades out with nothing dimmed; the record's content follows.
     await expect(scene(TRANSITION_DEMOS.drill, 'drill-grow').landing).toMatchObject({ g: 1, l: 0, c: 1 });
-    // Back two levels fades; a focused task fades; page tabs slide with no fade.
+    // Back two levels fades; page tabs slide with no fade.
     await expect(scene(TRANSITION_DEMOS.climb, 'climb-two').landing).toMatchObject({ f: 0, n: 1 });
-    await expect(scene(TRANSITION_DEMOS.focused, 'focused-fade').landing).toMatchObject({ fr: 0, f: 1 });
     await expect(scene(TRANSITION_DEMOS.switch, 'switch-slide').landing).toMatchObject({ p: 1, i: 1 });
     await expect(scene(TRANSITION_DEMOS.switch, 'switch-slide').landing).not.toHaveProperty('o');
     // Step states change in place: visited, current, unvisited.
@@ -138,8 +135,6 @@ export const Rulings = {
     const goHl = scene(TRANSITION_DEMOS.go, 'go-fade').arrows[0];
     await expect(pointsOf(goHl)[1][1]).toBeGreaterThan(pointsOf(goHl)[0][1]);
     await expect(ghostOf(goHl)).toMatchObject({ x: 12, y: 59, w: 36, h: 16 });
-    // Focused task Do is a clean fade in place, so nothing travels.
-    await expect(scene(TRANSITION_DEMOS.focused, 'focused-fade').arrows).toEqual([]);
     // Switch views: the indicator travels right to tab 1; both content sheets travel left with ghosts.
     const [swInd, swOut, swIn] = scene(TRANSITION_DEMOS.switch, 'switch-slide').arrows;
     await expect(pointsOf(swInd)[1][0]).toBeGreaterThan(pointsOf(swInd)[0][0]);

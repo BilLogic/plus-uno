@@ -15,7 +15,7 @@ Choose among four hosts. The Form template shows their layouts; this pattern gui
 - **In a page.** Settings and anything saved as a group.
 - **In a Panel.** A short edit beside the page, with a full-bleed footer.
 - **In a Modal.** A rare, critical task with fewer than five fields.
-- **In steps.** A stepped task on Frame · focused.
+- **In steps.** A stepped task on Frame.
 
 ## Marks and help
 
@@ -34,8 +34,8 @@ Use Forms when a page asks for input that is saved together: adding a student, l
 | is saved as a group on its own page: settings, a profile | In a page | Left-aligned under the fields, Primary first, Cancel Subtle |
 | is a short edit of a row, with the page still in view | In a Panel · Details | Discard (Default) and Save (Primary) full bleed at the bottom, no Cancel |
 | is rare and critical, with fewer than five fields | In a Modal, 8-col | Discard (Default) and the action (Primary), full bleed, no Cancel |
-| is long, or has sections someone works through | In steps on Frame · focused | Back and Next in the bar, no Cancel |
-| asks one big question per step (sign-up, check-in, site setup) | In steps on Frame · focused | Back (Subtle) and Continue (Primary) centered under the tiles |
+| is long, or has sections someone works through | In steps, a multi-step task on Frame | Save and exit, Back and Next in the footer, no Cancel |
+| asks one big question per step (sign-up, check-in, site setup) | In steps, a multi-step task on Frame | Back (Subtle) and Continue (Primary) centered under the tiles |
 | asks for one value read far more than changed | Inline edit on the record | None; it saves on its own |
 
 ## Alternatives
@@ -143,7 +143,7 @@ Don't: Help only in a tooltip: gone on touch, gone after typing.
 
 **Checked:** Automatic
 
-Close, Discard, Cancel (on a page form) and navigating away raise a 4-col Modal: Back returns without losing anything typed; Discard is Danger. A form already in a Modal asks in that Modal's confirm view, so two layers never become three. A form with no edits leaves at once. In a focused task, Close plays the opening backwards once the person confirms.
+Close, Discard, Cancel (on a page form) and navigating away raise a 4-col Modal: Back returns without losing anything typed; Discard is Danger. A form already in a Modal asks in that Modal's confirm view, so two layers never become three. A form with no edits leaves at once. In a multi-step task, Save and exit keeps the answers and leaves; Back in the inner sidebar asks first if anything is unsaved.
 
 ### Prefer a bound input to a free one. {#prefer-a-bound-input-to-a-free-one}
 

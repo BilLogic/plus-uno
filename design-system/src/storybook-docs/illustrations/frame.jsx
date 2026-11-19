@@ -32,33 +32,37 @@ const Body = ({ x, y = 28, w }) => (
   </g>
 );
 
-/** The focused bottom bar: Back and Next split the bar, with Close in the title row leaving the task. */
+/** The task's footer: Save and exit at the start, Back and Next at the end, on one line. */
 const Bar = () => (
   <g>
     <Rect x={0} y={H - BAR_H} w={W} h={BAR_H} fill={PAINT.pageSurface} />
     <Rule x1={0} x2={W} y1={H - BAR_H} y2={H - BAR_H} />
-    <ButtonShape x={6} y={H - BAR_H + 2} w={(W - 16) / 2} />
-    <ButtonShape x={10 + (W - 16) / 2} y={H - BAR_H + 2} w={(W - 16) / 2} appearance="primary" />
+    <ButtonShape x={SIDE + 6} y={H - BAR_H + 2} w={30} />
+    <ButtonShape x={W - 66} y={H - BAR_H + 2} w={28} />
+    <ButtonShape x={W - 34} y={H - BAR_H + 2} w={28} appearance="primary" />
   </g>
 );
 
-/** A focused task: the whole window, no Sidebar. */
-export const FocusedNoSidebar = ({ title = 'A focused task filling the whole window with no Sidebar, its steps down the left of the body' }) => (
+/** A multi-step task: the steps are the Sidebar's inner rows, so the Page holds only the task. */
+export const MultiStepInnerSidebar = ({ title = 'A multi-step task with its steps as rows in the Sidebar and only the task in the Page' }) => (
   <Canvas title={title}>
-    <PageBox x={0} w={W} h={H - BAR_H} />
-    <SkeletonBar x={8} y={8} w={40} h={6} heading accent />
-    <Body x={8} w={W - 16} />
+    <Sidebar x={0} y={0} w={SIDE} h={H} accent />
+    {[0, 1, 2, 3].map((i) => <SkeletonBar key={i} x={6} y={30 + i * 11} w={SIDE - 12} heading={i === 1} />)}
+    <PageBox x={SIDE} w={W - SIDE} h={H - BAR_H} />
+    <SkeletonBar x={SIDE + 8} y={8} w={40} h={6} heading />
+    <Body x={SIDE + 8} w={W - SIDE - 16} />
     <Bar />
   </Canvas>
 );
 
-/** A focused task with the Sidebar still beside it, inviting the person away. */
-export const FocusedWithSidebar = ({ title = 'A focused task with the Sidebar still docked beside it, so the way out is a click away' }) => (
+/** A second step list in the Page, beside the Sidebar's own rows: two lists for one task. */
+export const MultiStepStepsInPage = ({ title = 'A multi-step task with the steps drawn again inside the Page, beside the Sidebar that still lists the main areas' }) => (
   <Canvas title={title}>
-    <Sidebar x={0} y={0} w={SIDE} h={H} accent />
+    <Sidebar x={0} y={0} w={SIDE} h={H} />
     <PageBox x={SIDE} w={W - SIDE} h={H - BAR_H} />
     <SkeletonBar x={SIDE + 8} y={8} w={40} h={6} heading />
-    <Body x={SIDE + 8} w={W - SIDE - 16} />
+    {[0, 1, 2, 3].map((i) => <SkeletonBar key={i} x={SIDE + 8} y={28 + i * 11} w={28} heading={i === 1} accent={i === 1} />)}
+    <Body x={SIDE + 44} w={W - SIDE - 52} />
     <Bar />
   </Canvas>
 );

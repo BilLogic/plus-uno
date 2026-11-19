@@ -1121,7 +1121,7 @@
             "compact",
             "spacious"
           ],
-          "description": "Height and padding: `default` draws 32, `compact` draws 24, `spacious` draws 48. Compact is for tables and tight toolbars; spacious is for modal, panel and focused-view footers.",
+          "description": "Height and padding: `default` draws 32, `compact` draws 24, `spacious` draws 48. Compact is for tables and tight toolbars; spacious is for modal and panel footers.",
           "deprecated": null
         },
         {
@@ -6164,7 +6164,7 @@
       "import": "import { FooterActions } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/FooterActions/FooterActions.jsx",
-      "summary": "FooterActions — 4-track footer layout for Modal, Panel and Focused view. Divides the footer into 4 equal tracks separated by `--inline-md`. Every filled action button is cloned at `spacing=\"spacious\"` (48) with `shouldFitContainer`. A leading text or link action hugs the left edge without taking a filled track, and containers up to 400 wide split a single action across the full width via `@container (max-width: 400px)`.",
+      "summary": "FooterActions — 4-track footer layout for Modal, Panel and a multi-step task's footer. Divides the footer into 4 equal tracks separated by `--inline-md`. Every filled action button is cloned at `spacing=\"spacious\"` (48) with `shouldFitContainer`. A leading text or link action hugs the left edge without taking a filled track, and containers up to 400 wide split a single action across the full width via `@container (max-width: 400px)`.",
       "props": [
         {
           "name": "leadingAction",
@@ -6230,7 +6230,7 @@
       "import": "import { Frame } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/Frame/Frame.jsx",
-      "summary": "There is no top bar: the Page runs the full height, and meets a docked Sidebar at its 1px edge. - The Frame owns the Sidebar state and hands it to the Sidebar through `SidebarControlContext`. Open, the toggle (`angles-left`) ends the Sidebar's logo row; closed, the Frame draws it (`bars`) at the Page's top left, centered on x 32, and the Page's header row (`header`, the breadcrumb) follows it on the same center line from x 56. - What docks is decided by the layout resolver (`./frameLayout`) from the Frame's own width: from 1024 the Sidebar docks (240, in flow); under 1024 it never docks. - Docked, the Sidebar sits on the sunken fill with a 1px `--ds-border` on its Page-facing edge. Floating (a peek, or opened by hand under 1024) it lies over the Page on `--ds-surface-material-overlay` with `--ds-shadow-overlay` and no Blanket. - Hovering the left edge peeks a closed Sidebar. An outside press, Escape, or the pointer leaving closes the peek. - Either toggle, or Ctrl+[ (Cmd+[ on a Mac), closes a showing Sidebar and opens a closed one; focus follows to the toggle that is left. - Opening a modal closes a floating Sidebar and leaves a docked one alone, and while one is open the Sidebar does not peek. The frame hears it from the shared overlay module (`@/lib/overlay`), so a page does not wire its modals to the frame. A modal opened from inside the floating Sidebar hands focus to the toggle when it closes, since its trigger left with the Sidebar. - The Panel area (`panel`) is the Frame's right-hand area. The resolver docks it beside the Page at a hairline when the content keeps 720, collapsing a default Sidebar first (and restoring it when the Panel closes); otherwise it floats over the Page on the overlay material and shadow, with no Blanket, and a press outside or Escape closes it. Under 1024 it is an overlay capped at 320, and only one overlay is open at a time; under 768 it is full width. As an overlay the Panel is modal: focus moves into it and stays there, the Page and the Sidebar under it are inert, and closing it hands focus back to what opened it. Docked or peeking it is not modal and leaves focus where it is. Its open state, dismissal and focus run on Base UI's `Dialog`, portaled into the Frame's row so a dock or overlay switch never remounts the Panel's content. Its splitter resizes it from 320 to 640 (never past what keeps 720 beside a docked Sidebar) by drag or keys. Width and open state are kept in sessionStorage. A modal leaves it open. Anything inside the Frame opens it through `usePanelControl`. - There is no top bar on any Frame. A focused page (no Sidebar) puts Back (`onBack`, leading) and Close (`onClose`, trailing) in the Page's header row, around the `header` content. - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation; the Panel is a complementary landmark named by `panelLabel`. - The Page pads `--page-pad` (24 at every width) and caps its content at `--content-max-width` (1232), centered, on a 12-column grid with a 16 gutter. Children span all 12 columns unless they set `grid-column`.",
+      "summary": "There is no top bar: the Page runs the full height, and meets a docked Sidebar at its 1px edge. - The Frame owns the Sidebar state and hands it to the Sidebar through `SidebarControlContext`. Open, the toggle (`angles-left`) ends the Sidebar's logo row; closed, the Frame draws it (`bars`) at the Page's top left, centered on x 32, and the Page's header row (`header`, the breadcrumb) follows it on the same center line from x 56. - What docks is decided by the layout resolver (`./frameLayout`) from the Frame's own width: from 1024 the Sidebar docks (240, in flow); under 1024 it never docks. - Docked, the Sidebar sits on the sunken fill with a 1px `--ds-border` on its Page-facing edge. Floating (a peek, or opened by hand under 1024) it lies over the Page on `--ds-surface-material-overlay` with `--ds-shadow-overlay` and no Blanket. - Hovering the left edge peeks a closed Sidebar. An outside press, Escape, or the pointer leaving closes the peek. - Either toggle, or Ctrl+[ (Cmd+[ on a Mac), closes a showing Sidebar and opens a closed one; focus follows to the toggle that is left. - Opening a modal closes a floating Sidebar and leaves a docked one alone, and while one is open the Sidebar does not peek. The frame hears it from the shared overlay module (`@/lib/overlay`), so a page does not wire its modals to the frame. A modal opened from inside the floating Sidebar hands focus to the toggle when it closes, since its trigger left with the Sidebar. - The Panel area (`panel`) is the Frame's right-hand area. The resolver docks it beside the Page at a hairline when the content keeps 720, collapsing a default Sidebar first (and restoring it when the Panel closes); otherwise it floats over the Page on the overlay material and shadow, with no Blanket, and a press outside or Escape closes it. Under 1024 it is an overlay capped at 320, and only one overlay is open at a time; under 768 it is full width. As an overlay the Panel is modal: focus moves into it and stays there, the Page and the Sidebar under it are inert, and closing it hands focus back to what opened it. Docked or peeking it is not modal and leaves focus where it is. Its open state, dismissal and focus run on Base UI's `Dialog`, portaled into the Frame's row so a dock or overlay switch never remounts the Panel's content. Its splitter resizes it from 320 to 640 (never past what keeps 720 beside a docked Sidebar) by drag or keys. Width and open state are kept in sessionStorage. A modal leaves it open. Anything inside the Frame opens it through `usePanelControl`. - There is no top bar on any Frame. A multi-step task runs in the Sidebar's inner mode: its steps are the rows, and the Page's footer holds the task's actions. - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation; the Panel is a complementary landmark named by `panelLabel`. - The Page pads `--page-pad` (24 at every width) and caps its content at `--content-max-width` (1232), centered, on a 12-column grid with a 16 gutter. Children span all 12 columns unless they set `grid-column`.",
       "props": [
         {
           "name": "id",
@@ -6257,51 +6257,6 @@
           "default": null,
           "values": null,
           "description": "The Page's header row, 32 high on the logo row's center line: the breadcrumb. While the Sidebar is closed it follows the toggle.",
-          "deprecated": null
-        },
-        {
-          "name": "onBack",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "A focused page: called when Back is pressed. With it the header row leads with a Back icon button.",
-          "deprecated": null
-        },
-        {
-          "name": "backHref",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "A focused page: where Back goes, as a link.",
-          "deprecated": null
-        },
-        {
-          "name": "backLabel",
-          "type": "string",
-          "required": false,
-          "default": "'Back'",
-          "values": null,
-          "description": "The accessible name of Back.",
-          "deprecated": null
-        },
-        {
-          "name": "onClose",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "A focused page: called when Close is pressed. With it the header row ends with a Close icon button.",
-          "deprecated": null
-        },
-        {
-          "name": "closeLabel",
-          "type": "string",
-          "required": false,
-          "default": "'Close'",
-          "values": null,
-          "description": "The accessible name of Close.",
           "deprecated": null
         },
         {
@@ -6526,12 +6481,10 @@
         "StateAt1024",
         "StateAt1440",
         "TypeDefault",
-        "TypeFocused",
+        "LayoutMultiStepTask",
+        "LayoutMultiStepTaskLeaves",
         "TypeBare",
         "AnatomyDefault",
-        "AnatomyFocused",
-        "FocusedStepsDown",
-        "FocusedStepsAcross",
         "ResponsiveWidth",
         "KeyPanelCollapsesSidebar",
         "KeyUnder1024",
@@ -6557,10 +6510,6 @@
         "MotionClimbTwoLevelsReduced",
         "MotionRecordOverlay",
         "MotionRecordOverlayReduced",
-        "MotionFocusedTask",
-        "MotionFocusedTaskReduced",
-        "MotionStepAcross",
-        "MotionStepAcrossReduced",
         "MotionStepDown",
         "MotionStepDownReduced"
       ],
@@ -13876,6 +13825,7 @@
         "RowsRoundEight",
         "InnerSwapInAndBack",
         "InnerTaskOpenRow",
+        "InnerStepsDoneAndOff",
         "InnerKeyboard",
         "InnerSwapMotion",
         "InnerSwapReducedMotion",

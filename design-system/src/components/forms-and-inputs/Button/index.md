@@ -67,7 +67,7 @@ Don't: A second AI button competes with the first, and Save notes is not an AI a
 
 ### Pick the spacing for the surrounding space. {#pick-the-spacing-for-the-surrounding-space}
 
-Use `default` spacing in most places, `compact` for tables, headers and inline popups, and `spacious` in modal, panel and focused-view footers.
+Use `default` spacing in most places, `compact` for tables, headers and inline popups, and `spacious` in modal and panel footers.
 
 ### Keep an action enabled and explain on press. {#keep-an-action-enabled-and-explain-on-press}
 
@@ -78,7 +78,7 @@ Don't: A disabled submit button gives no direction and leaves the tab order.
 
 ### Align the primary button with its group. {#align-the-primary-button-with-its-group}
 
-In Modal, Panel and focused-view footers, `FooterActions` places the primary action in the rightmost track. On single-page forms and full-page tasks, left-align buttons with the primary first.
+In Modal and Panel footers, `FooterActions` places the primary action in the rightmost track. On single-page forms and full-page tasks, left-align buttons with the primary first.
 
 ## Accessibility
 
@@ -90,7 +90,7 @@ In Modal, Panel and focused-view footers, `FooterActions` places the primary act
 
 ## Related
 
-- `FooterActions`: use when placing spacious buttons across the four-track footer slot of a Modal, Panel or focused view.
+- `FooterActions`: use when placing spacious buttons across the four-track footer slot of a Modal or Panel.
 - `IconButton`: use when space allows only an icon with a tooltip label.
 - `LinkButton`: use when the control navigates to another page or URL.
 - `ButtonGroup`: use when related buttons sit together in a connected row.
@@ -153,7 +153,7 @@ Most buttons need no icon. Add one only when the glyph has an established meanin
 | `children` | node | — | The label, used when `text` is not given. Omit both for an icon-only button. |
 | `title` | string | — | The `title` attribute, a native tooltip on hover. It is left off while the button is disabled or loading. |
 | `appearance` | enum | `'default'` | The visual style. |
-| `spacing` | enum | `'default'` | Height and padding: `default` draws 32, `compact` draws 24, `spacious` draws 48. Compact is for tables and tight toolbars; spacious is for modal, panel and focused-view footers. |
+| `spacing` | enum | `'default'` | Height and padding: `default` draws 32, `compact` draws 24, `spacious` draws 48. Compact is for tables and tight toolbars; spacious is for modal and panel footers. |
 | `shouldFitContainer` | bool | `false` | Stretches the button to the width of its container, with the label centered. |
 | `className` | string | — | Extra class names added to the button element beside the component's own. |
 | `onClick` | func | — | Called with the click event when the button is activated by mouse or keyboard. It does not fire while `isDisabled` or `isLoading` is set. |

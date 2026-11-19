@@ -5,7 +5,7 @@ import { openOverlayCount, subscribeOverlays } from '@/lib/overlay';
 import { useOverlayPresence } from '@/lib/overlayMotion';
 import { useMotionReduced } from '@/lib/motionPreference';
 import { AreaStage } from '@/lib/navigationMotion';
-import { IconButton, LinkIconButton } from '@/components';
+import { IconButton } from '@/components';
 import { PanelHostContext } from '../Panel';
 import { SidebarControlContext } from './SidebarControl';
 import { PanelControlContext } from './PanelControl';
@@ -95,9 +95,9 @@ const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
  *   drag or keys. Width and open state are kept in sessionStorage. A modal
  *   leaves it open. Anything inside the Frame opens it through
  *   `usePanelControl`.
- * - There is no top bar on any Frame. A focused page (no Sidebar) puts Back
- *   (`onBack`, leading) and Close (`onClose`, trailing) in the Page's header
- *   row, around the `header` content.
+ * - There is no top bar on any Frame. A multi-step task runs in the
+ *   Sidebar's inner mode: its steps are the rows, and the Page's footer holds
+ *   the task's actions.
  * - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation; the
  *   Panel is a complementary landmark named by `panelLabel`.
  * - The Page pads `--page-pad` (24 at every width) and caps its content at
@@ -108,11 +108,6 @@ const Frame = ({
     id,
     areaKey,
     header,
-    onBack,
-    backHref,
-    backLabel = 'Back',
-    onClose,
-    closeLabel = 'Close',
     sidebar,
     sidebarDocked,
     panel,
@@ -612,20 +607,10 @@ const Frame = ({
             {...toggleProps}
         />
     ) : null;
-    const backButton = backHref ? (
-        <LinkIconButton className="plus-frame__back" appearance="subtle" icon="arrow-left" label={backLabel} href={backHref} onClick={onBack} />
-    ) : onBack ? (
-        <IconButton className="plus-frame__back" appearance="subtle" icon="arrow-left" label={backLabel} onClick={onBack} type="button" />
-    ) : null;
-    const closeButton = onClose ? (
-        <IconButton className="plus-frame__close" appearance="subtle" icon="xmark" label={closeLabel} onClick={onClose} type="button" />
-    ) : null;
-    const pageHead = pageToggle || header || backButton || closeButton ? (
+    const pageHead = pageToggle || header ? (
         <div className={['plus-frame__head', width === 'reading' ? 'plus-frame__head--reading' : '', pageToggle ? 'plus-frame__head--toggle' : ''].filter(Boolean).join(' ')}>
-            {backButton}
             {pageToggle}
             {header}
-            {closeButton}
         </div>
     ) : null;
 
@@ -692,16 +677,6 @@ Frame.propTypes = {
      * @ds-context Used in: Frame.header (ds guide frame)
      */
     header: PropTypes.node,
-    /** A focused page: called when Back is pressed. With it the header row leads with a Back icon button. */
-    onBack: PropTypes.func,
-    /** A focused page: where Back goes, as a link. */
-    backHref: PropTypes.string,
-    /** The accessible name of Back. */
-    backLabel: PropTypes.string,
-    /** A focused page: called when Close is pressed. With it the header row ends with a Close icon button. */
-    onClose: PropTypes.func,
-    /** The accessible name of Close. */
-    closeLabel: PropTypes.string,
     /** Sidebar content. Without it there is no Sidebar and no toggle.
      * @ds-context Used in: Frame.sidebar (ds guide frame)
      */

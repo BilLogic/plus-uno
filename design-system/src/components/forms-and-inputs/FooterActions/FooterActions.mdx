@@ -15,7 +15,7 @@ import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 <Meta of={FooterActionsStories} />
 
 <Title />
-The 4-track footer action bar for `Modal`, `Panel` and the focused view. Every
+The 4-track footer action bar for `Modal`, `Panel` and a multi-step task's footer. Every
 filled button is sized at `spacing="spacious"` (`48`) with `shouldFitContainer`,
 and when the footer itself is `400` px wide or less with no leading action, a
 single action spans the full width.
@@ -113,7 +113,7 @@ single action spans the full width.
 
 ## Usage
 
-Use `FooterActions` inside <DocsLink id="templates-modal">Modal</DocsLink>, <DocsLink id="templates-panel">Panel</DocsLink> (`PanelFooter`) and the <DocsLink id="templates-frame">focused view</DocsLink> to place one to three filled `Button` actions on a four-track grid with an optional leading action. Secondary buttons draw the `default` soft neutral fill (`--ds-background-neutral`) with no outline so pairs balance without heavy borders.
+Use `FooterActions` inside <DocsLink id="templates-modal">Modal</DocsLink>, <DocsLink id="templates-panel">Panel</DocsLink> (`PanelFooter`) and the <DocsLink id="templates-frame">multi-step task</DocsLink> footer to place one to three filled `Button` actions on a four-track grid with an optional leading action. Secondary buttons draw the `default` soft neutral fill (`--ds-background-neutral`) with no outline so pairs balance without heavy borders.
 
 1. **Four equal tracks.** `FooterActions` divides the width inside container padding into four equal tracks separated by `--inline-md`; every filled track button is cloned with `spacing="spacious"` (`48` high) and `shouldFitContainer`.
 2. **One action.** Sits in the right half (tracks `3` and `4`). A single action fills the full width (all four tracks) only when the footer itself is `400` px wide or less (`@container (max-width: 400px)`) and there is no leading action.
@@ -121,7 +121,7 @@ Use `FooterActions` inside <DocsLink id="templates-modal">Modal</DocsLink>, <Doc
 4. **Three actions.** Take one quarter each in tracks `2`, `3` and `4`; only the rightmost is `primary`.
 5. **Leading action.** A leading text, `link` or `subtle` action (or a link with `href`) hugs the left content edge only when it is the first child (of two or more) or is passed as `leadingAction`. A `danger` first child of two or more is also treated as leading, rendered in danger text ink on a subtle background. Filled actions then sit in tracks `3`–`4` (one filled), `3` and `4` (two filled), or `2`, `3` and `4` (three filled, clamping the leading action to track `1`).
 6. **Destructive confirmations.** Place the safer alternative (`default` secondary, such as "Archive instead") on the left and the `danger` action as the rightmost child, splitting `50/50` across tracks `1`–`2` and `3`–`4`.
-7. **No Cancel in footers.** `Modal`, `Panel` and the focused view already carry a corner close button, so footers name real outcomes ("Discard", "Save", never Cancel). Cancel appears only in inline popups (which have no close button): `compact`, `subtle`, right-aligned beside the action.
+7. **No Cancel in footers.** `Modal` and `Panel` already carry a corner close button, so footers name real outcomes ("Discard", "Save", never Cancel). Cancel appears only in inline popups (which have no close button): `compact`, `subtle`, right-aligned beside the action.
 8. **Steps.** In a multi-step flow, "Back" (`default`) and "Next" (`primary`) split `50/50` across tracks `1`–`2` and `3`–`4`.
 
 ### Hug or fill
@@ -274,7 +274,7 @@ Put the safer alternative in the left half and the `danger` action rightmost; a 
 
 ### Omit Cancel when the corner close button dismisses.
 
-`Modal`, `Panel` and the focused view already provide a corner close control, so the footer names the real secondary outcome (`Discard`, `Keep editing`, `Archive instead`) rather than a generic Cancel.
+`Modal` and `Panel` already provide a corner close control, so the footer names the real secondary outcome (`Discard`, `Keep editing`, `Archive instead`) rather than a generic Cancel.
 
 <DoDontPair
     doExample={

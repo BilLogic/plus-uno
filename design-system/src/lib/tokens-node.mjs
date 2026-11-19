@@ -290,7 +290,7 @@ export const FAMILIES = [
   { family: 'palette', prefix: '--palette-', what: 'the color ramps the `--ds-` tokens alias; never named by a component' },
   { family: 'page', prefix: '--page-', what: 'the Page: its pad, stack, radius and border width' },
   { family: 'panel', prefix: '--panel-', what: 'the Panel: its minimum, default and maximum width' },
-  { family: 'frame', prefix: '--frame-', what: 'the Frame: the topbar height and the sidebar widths' },
+  { family: 'frame', prefix: '--frame-', what: 'the Frame: the sidebar widths and spacing' },
   { family: 'type-size', prefix: '--type-size-', what: 'the font size primitives, by rem × 100' },
   { family: 'type-line-height', prefix: '--type-line-height-', what: 'line height primitives, by rem × 100' },
   { family: 'heading', prefix: '--heading-', what: 'a heading text style: the `font` shorthand' },

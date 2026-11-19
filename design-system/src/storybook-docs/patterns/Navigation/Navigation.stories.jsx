@@ -3,7 +3,7 @@ import { expect, userEvent, within } from 'storybook/test';
 
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
-import { FocusedType } from '@/storybook-docs/lib/focused-task.jsx';
+import { MultiStepTaskType } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { PatternSection } from '@/patterns';
 import { ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
@@ -198,17 +198,17 @@ export const KeyOneTabSystem = {
     },
 };
 
-/** A focused task: Close at the start, no breadcrumb, no Sidebar; the steps down the left from five. */
-export const KeyFocusedTask = {
-    name: 'Key case: A focused task',
-    render: () => staged(<FocusedType />),
+/** A multi-step task: the steps replace the Sidebar's rows, Back leaves; no breadcrumb. */
+export const KeyMultiStepTask = {
+    name: 'Key case: A multi-step task',
+    render: () => staged(<MultiStepTaskType />),
     play: async ({ canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         const canvas = within(canvasElement);
-        await expect(canvas.getByRole('button', { name: 'Close' })).toBeInTheDocument();
+        await expect(canvas.getByRole('button', { name: 'Home' }), 'Back leads the inner sidebar').toBeInTheDocument();
         await expect(canvas.queryByRole('navigation', { name: 'Breadcrumb' }), 'no breadcrumb').toBeNull();
-        await expect(canvasElement.querySelector('[data-steps="down"]'), 'five steps run down the left').not.toBeNull();
+        await expect(canvas.getByRole('list', { name: 'Steps' }).querySelectorAll('li'), 'the steps are the sidebar rows').toHaveLength(5);
         await fitsCanvas(canvasElement);
     },
 };

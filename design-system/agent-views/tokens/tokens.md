@@ -89,7 +89,6 @@ Space owned by a template: page, section, card, table, modal, popup. Inside a te
 --frame-sidebar-row-gap  /* Vertical gap between two rows in the Sidebar. */
 --frame-sidebar-row-radius  /* Corner rounding of a Sidebar row. */
 --frame-sidebar-width  /* Width of the Frame's Sidebar at the current breakpoint. */
---frame-topbar-height  /* Height of the Frame's top bar. */
 --modal-body-min-height  /* Minimum height of a Modal's body, so a short body does not collapse the dialog. */
 --modal-pad-x-default  /* Horizontal padding of a Modal with default spacing. */
 --modal-pad-x-spacious  /* Horizontal padding of a Modal with spacious spacing. */
@@ -401,7 +400,6 @@ The templates on the page frame, per breakpoint: page, section, card, table, ove
 --layer-frame-panel-peek
 --layer-frame-sidebar
 --layer-frame-splitter
---layer-frame-topbar-start
 --modal-inline-lg  /* Horizontal gap between columns in a Modal. */
 --modal-inline-md  /* Horizontal gap between the actions in a Modal footer. */
 --modal-inline-sm  /* Horizontal gap between small items in a Modal row. */

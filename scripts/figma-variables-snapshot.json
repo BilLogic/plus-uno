@@ -3,10 +3,10 @@
   "figmaFileKey": "zAecJNRdvJzAUOcjV32tRX",
   "figmaFileName": "Design System - BS4 Foundation (Component LIbrary)",
   "capturedAt": "2026-11-16",
-  "totalVariables": 1619,
+  "totalVariables": 1617,
   "byType": {
     "COLOR": 980,
-    "FLOAT": 624,
+    "FLOAT": 622,
     "BOOLEAN": 10,
     "STRING": 5
   },
@@ -793,8 +793,7 @@
         "Screen/width-screen",
         "Sidebar/pad-left-container",
         "Sidebar/sidebar-docked",
-        "Sidebar/width-sidebar",
-        "Topbar/height-topbar"
+        "Sidebar/width-sidebar"
       ],
       "codeSyntax": {
         "Content/max-width-content": "var(--layout-max-width-content)",
@@ -821,8 +820,7 @@
         "Screen/pad-x-screen": "var(--layout-pad-x-screen)",
         "Screen/width-screen": "var(--layout-width-screen)",
         "Sidebar/pad-left-container": "var(--layout-pad-left-container)",
-        "Sidebar/width-sidebar": "var(--layout-width-sidebar)",
-        "Topbar/height-topbar": "var(--layout-height-topbar)"
+        "Sidebar/width-sidebar": "var(--layout-width-sidebar)"
       }
     },
     "spacing / templates": {
@@ -890,7 +888,6 @@
         "Frame/sidebar-row-gap",
         "Frame/sidebar-row-radius",
         "Frame/sidebar-width",
-        "Frame/topbar-height",
         "Modal/body-min-height",
         "Modal/inline-lg",
         "Modal/inline-md",
@@ -961,7 +958,6 @@
         "Frame/sidebar-row-gap": "var(--frame-sidebar-row-gap)",
         "Frame/sidebar-row-radius": "var(--frame-sidebar-row-radius)",
         "Frame/sidebar-width": "var(--frame-sidebar-width)",
-        "Frame/topbar-height": "var(--frame-topbar-height)",
         "Modal/body-min-height": "var(--modal-body-min-height)",
         "Modal/inline-lg": "var(--modal-inline-lg)",
         "Modal/inline-md": "var(--modal-inline-md)",

@@ -12,7 +12,7 @@ import { fitsCanvas, leadersCrossNoOtherPart, markersLevelWithParts } from '@/st
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { openOverlay } from '@/lib/overlay.js';
-import { BAR_TOKEN } from '@/storybook-docs/lib/focused-task.jsx';
+import { BAR_TOKEN } from '@/storybook-docs/lib/multi-step-task.jsx';
 import * as Demo from './modalDemo.jsx';
 
 /** The stand-in screen the docs draw the overlay at: the Large mode, and a short template. */

@@ -93,7 +93,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 
 | Group | Token | Note |
 |---|---|---|
-| Frame | `--frame-topbar-height` |  |
 | Frame | `--frame-sidebar-width` |  |
 | Frame | `--frame-sidebar-pad` | the Sidebar pads 12 on every side |
 | Frame | `--frame-sidebar-row-gap` | two Sidebar rows sit 2 apart |

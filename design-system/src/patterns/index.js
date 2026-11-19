@@ -21,7 +21,6 @@ export {
     useDrillStack,
     SlideViews,
     StepStage,
-    FocusedFrameSwitch,
     scrollToSpot,
     callAttention,
 } from '../lib/navigationMotion';
