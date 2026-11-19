@@ -241,11 +241,6 @@
       "use": [
         "CloseButton.appearance"
       ]
-    },
-    {
-      "not": "AiChat variant",
-      "use": [],
-      "why": "docs wrapper owns it"
     }
   ],
   "tokens": [
