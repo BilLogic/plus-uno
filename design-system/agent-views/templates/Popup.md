@@ -145,6 +145,8 @@ Don't: An end trigger with a start-aligned menu: it runs off the edge of the pag
 
 It hugs the longest item. The width is set once, on open, so it holds still while someone types. A long or loading list opens at 320. A long row: Overflow.
 
+Drawn, not live: the Popup never renders narrower than its trigger, so the figure is the only way to show the don't.
+
 Do: The menu is at least as wide as its trigger, so their edges line up.
 Don't: A menu narrower than the trigger it hangs off: the edges no longer line up.
 
@@ -153,6 +155,8 @@ Don't: A menu narrower than the trigger it hangs off: the edges no longer line u
 **Checked:** Review
 
 Anything wider is a Panel or a Modal. Anything with inputs the person must finish, steps or a long scroll belongs in a Modal.
+
+Drawn, not live: the Popup never renders wider than 4-col, so the figure is the only way to show the don't.
 
 Do: A content Popup at 4-col, the cap.
 Don't: A Popup wider than 4-col: anything this wide is a Panel or a Modal.
@@ -171,6 +175,8 @@ Don't: A form in a Popup: an outside click loses what was typed.
 **Checked:** Automatic
 
 A confirm Modal may open over a Popup and brings its own Blanket. A Popup opened from a Modal sits above it; a Tooltip sits above everything.
+
+Drawn, not live: the overlay module keeps a second Popup closed, so the figure is the only way to show the don't.
 
 Do: One flat menu; a choice with two forms is two rows.
 Don't: A menu opening a second Popup beside it: two layers off one trigger.
