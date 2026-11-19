@@ -45,12 +45,12 @@ test('_semantic.scss selector structure: light, dark, auto dark, and all 8 incre
   assert.equal((sem.match(/color-scheme: dark;/g) ?? []).length, 2);
 });
 
-test('light and dark carry all 556 tokens; increased contrast only the rows it changes', () => {
+test('light and dark carry all 562 tokens; increased contrast only the rows it changes', () => {
   const sem = files['_semantic.scss'];
   const blocks = sem.split(/\n(?=\S)/).map((b) => (b.match(/--[\w-]+:/g) ?? []).length).filter(Boolean);
-  assert.deepEqual(blocks.slice(0, 3), [556, 556, 556]);
-  assert.equal(blocks[3], 330); // light IC overrides
-  assert.equal(blocks.at(-3), 301); // dark IC overrides, before the material fallbacks
+  assert.deepEqual(blocks.slice(0, 3), [562, 562, 562]);
+  assert.equal(blocks[3], 336); // light IC overrides
+  assert.equal(blocks.at(-3), 307); // dark IC overrides, before the material fallbacks
   assert.doesNotMatch(sem, /var\(--[^)]*,/); // no fallbacks
 });
 
@@ -128,4 +128,15 @@ test('the material fallbacks come after every mode block and outrank the increas
   assert.ok(sem.indexOf('@media (prefers-reduced-transparency: reduce)') > lastMode);
   assert.ok(sem.indexOf('@media (forced-colors: active)') > lastMode);
   assert.match(sem, /@media \(forced-colors: active\) \{\n {2}:root:root:root,\n {2}\[data-color-mode\]\[data-color-mode\]\[data-color-mode\] \{/);
+});
+
+test('colored material: 95% light, 92% dark, solid bold under reduced transparency and increased contrast', () => {
+  const sem = files['_semantic.scss'];
+  assert.match(sem, /--ds-background-success-material-bold: var\(--palette-green-700-a95\);/);
+  assert.match(sem, /--ds-background-success-material-bold: var\(--palette-green-400-a92\);/);
+  const reduced = /@media \(prefers-reduced-transparency: reduce\) \{[^}]*\}/.exec(sem)?.[0] ?? '';
+  for (const c of ['brand', 'success', 'warning', 'danger', 'information', 'discovery']) {
+    assert.match(reduced, new RegExp(`--ds-background-${c}-material-bold: var\\(--ds-background-${c}-bold\\);`));
+    assert.match(sem, new RegExp(`--ds-background-${c}-material-bold: var\\(--palette-[a-z]+-(900|-?[0-9]+)\\);`));
+  }
 });

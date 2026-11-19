@@ -54,8 +54,8 @@ const values = (rows) => rows.map((r) => Object.fromEntries(VALUE_KEYS.map((k) =
 const withoutProse = (value) =>
   JSON.parse(currentNames(JSON.stringify(value, (k, v) => (k === 'description' || k === 'use' || k === 'deviation' ? undefined : v))));
 /** Tokens PLUS added after the reference was cut. */
-const PLUS_ONLY_TOKEN = /^color[./]background[./]competency[./][a-z-]+[./]subtle$|^color[./]ai[./]background[./]bold|^color[./]logo[./]|^opacity[./]chart[./]|^color[./]border[./]material$|^elevation[./]surface[./]material[./]|^(?:white|overlay)Alpha[./]\d+$/;
-const PLUS_ONLY_SCSS_DECL = /^ +--(?:palette-(?:white|overlay)-alpha-\d+|ds-(?:background-competency-[a-z-]+-subtle|ai-background-bold[a-z-]*|logo-[a-z0-9-]+|opacity-chart-[a-z]+|surface-material-[a-z]+|border-material)): [^\n]*\n/gm;
+const PLUS_ONLY_TOKEN = /^color[./]background[./]competency[./][a-z-]+[./]subtle$|^color[./]ai[./]background[./]bold|^color[./]logo[./]|^opacity[./]chart[./]|^color[./]border[./]material$|^elevation[./]surface[./]material[./]|^color[./]background[./][a-z]+[./]material[./]bold$|^(?:white|overlay)Alpha[./]\d+$|^[a-z]+[./]\d+a9[25]$/;
+const PLUS_ONLY_SCSS_DECL = /^ +--(?:palette-(?:white|overlay)-alpha-\d+|palette-[a-z]+-\d+-a9[25]|ds-(?:background-competency-[a-z-]+-subtle|ai-background-bold[a-z-]*|logo-[a-z0-9-]+|opacity-chart-[a-z]+|surface-material-[a-z]+|background-[a-z]+-material-bold|border-material)): [^\n]*\n/gm;
 /** The material's reduced-transparency and forced-colors blocks, which the reference has no counterpart for. */
 const MATERIAL_FALLBACKS = /\n?@media \((?:prefers-reduced-transparency: reduce|forced-colors: active)\) \{[\s\S]*?\n\}\n/g;
 const withoutPlusOnly = (spec) => ({
@@ -80,7 +80,7 @@ const ELEVATION_2 = /shadow[./-](raised|blocking)\b/;
 const slotsToArray = (spec) => (Array.isArray(spec) ? spec : [spec.edge, spec.key, spec.ambient]);
 /** Our palette with the plan's named shadow slots in the reference's array form, and the departed shadows dropped. */
 const refShape = ({ whiteAlpha, overlayAlpha, ...palette }) => ({
-  ...palette,
+  ...Object.fromEntries(Object.entries(palette).map(([fam, steps]) => [fam, fam === 'shadow' ? steps : Object.fromEntries(Object.entries(steps).filter(([k]) => !/^\d+a9[25]$/.test(k)))])),
   shadow: { overlay: slotsToArray(palette.shadow.overlay) },
 });
 const withoutElevation2 = (rows) => rows.filter((r) => !ELEVATION_2.test(r.name));
@@ -121,7 +121,7 @@ for (const key of ['A', 'B']) {
   test(`Plan ${key}: every primitive matches the reference palette`, { skip }, () => {
     const { semantics } = buildPlan(key);
     const ref = json(`generator/palette_${key}.json`).palette;
-    ref.lagoon = semantics.palette.lagoon; // retuned on purpose, see the header
+    ref.lagoon = Object.fromEntries(Object.entries(semantics.palette.lagoon).filter(([k]) => !/^\d+a9[25]$/.test(k))); // retuned on purpose, see the header
     delete ref.shadow.raised; // Elevation 2.0, see the header
     const ours = refShape(semantics.palette);
     assert.deepEqual(ours, ref);

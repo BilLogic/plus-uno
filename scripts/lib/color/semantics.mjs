@@ -517,6 +517,23 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
     }
   }
 
+  // ---- colored material: each role's bold fill at 95% (light) and 92% (dark); increased contrast is the solid bold ----
+  // 95% because white text over a white backdrop measures 4.3:1 at 92%; dark passes at 92%.
+  const MATERIAL_WHY = 'PLUS addition: colored material for small accents. The role\'s bold fill at 95% in light and 92% in dark; increased contrast and reduced transparency fall back to the solid bold.';
+  for (const role of Object.keys(ROLE_FAM)) {
+    const bold = byName[`color.background.${role}.bold`];
+    const alphaOf = (mode, pct) => {
+      const [fam, step] = famStep(bold[`${mode}_ref`]);
+      return hueAlpha(fam, step, pct);
+    };
+    const solid = (mode) => [bold[`${mode}_ref`], bold[mode]];
+    const r = mk(`color.background.${role}.material.bold`, alphaOf('light', 95), alphaOf('dark', 92), solid('light_ic'), solid('dark_ic'),
+      `Fill of a small ${role} accent (a Tag, Lozenge, Badge or count chip) over media or a material surface. Pair its label with ${role === 'warning' ? 'color.text.warning.inverse' : 'color.text.inverse'} and color.border.material. Transparency only, no blur, no gradient.`,
+      MATERIAL_WHY);
+    rows.push(r);
+    byName[r.name] = r;
+  }
+
   // ---- every value must be a primitive reference ----
   const REF_RE = /^(transparent|[a-zA-Z]+\.[0-9]+(a[0-9]+)?)$/;
   const bad = rows.flatMap((r) => MODES.filter((m) => !REF_RE.test(r[`${m}_ref`])).map((m) => `${r.name} ${m} ${r[`${m}_ref`]}`));

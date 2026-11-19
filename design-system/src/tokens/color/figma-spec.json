@@ -296,6 +296,28 @@
      "hiddenFromPublishing": true
     },
     {
+     "name": "blue/700a95",
+     "value": {
+      "r": 0.1333,
+      "g": 0.4471,
+      "b": 0.7294,
+      "a": 0.949
+     },
+     "scopes": [],
+     "hiddenFromPublishing": true
+    },
+    {
+     "name": "blue/400a92",
+     "value": {
+      "r": 0.4392,
+      "g": 0.6588,
+      "b": 0.8902,
+      "a": 0.9216
+     },
+     "scopes": [],
+     "hiddenFromPublishing": true
+    },
+    {
      "name": "green/100",
      "value": {
       "r": 0.902,
@@ -456,6 +478,28 @@
       "g": 0.2353,
       "b": 0.1804,
       "a": 0.698
+     },
+     "scopes": [],
+     "hiddenFromPublishing": true
+    },
+    {
+     "name": "green/700a95",
+     "value": {
+      "r": 0.1961,
+      "g": 0.4863,
+      "b": 0.3373,
+      "a": 0.949
+     },
+     "scopes": [],
+     "hiddenFromPublishing": true
+    },
+    {
+     "name": "green/400a92",
+     "value": {
+      "r": 0.4745,
+      "g": 0.6863,
+      "b": 0.5647,
+      "a": 0.9216
      },
      "scopes": [],
      "hiddenFromPublishing": true
@@ -742,6 +786,28 @@
       "g": 0.1137,
       "b": 0.0392,
       "a": 1
+     },
+     "scopes": [],
+     "hiddenFromPublishing": true
+    },
+    {
+     "name": "yellow/300a95",
+     "value": {
+      "r": 0.8588,
+      "g": 0.7216,
+      "b": 0.3529,
+      "a": 0.949
+     },
+     "scopes": [],
+     "hiddenFromPublishing": true
+    },
+    {
+     "name": "yellow/300a92",
+     "value": {
+      "r": 0.8588,
+      "g": 0.7216,
+      "b": 0.3529,
+      "a": 0.9216
      },
      "scopes": [],
      "hiddenFromPublishing": true
@@ -1077,6 +1143,28 @@
      "hiddenFromPublishing": true
     },
     {
+     "name": "red/700a95",
+     "value": {
+      "r": 0.7137,
+      "g": 0.3098,
+      "b": 0.2745,
+      "a": 0.949
+     },
+     "scopes": [],
+     "hiddenFromPublishing": true
+    },
+    {
+     "name": "red/400a92",
+     "value": {
+      "r": 0.8863,
+      "g": 0.5529,
+      "b": 0.5176,
+      "a": 0.9216
+     },
+     "scopes": [],
+     "hiddenFromPublishing": true
+    },
+    {
      "name": "magenta/100",
      "value": {
       "r": 0.9922,
@@ -1358,6 +1446,28 @@
       "g": 0.102,
       "b": 0.1765,
       "a": 1
+     },
+     "scopes": [],
+     "hiddenFromPublishing": true
+    },
+    {
+     "name": "purple/700a95",
+     "value": {
+      "r": 0.5412,
+      "g": 0.3608,
+      "b": 0.6667,
+      "a": 0.949
+     },
+     "scopes": [],
+     "hiddenFromPublishing": true
+    },
+    {
+     "name": "purple/400a92",
+     "value": {
+      "r": 0.7255,
+      "g": 0.5882,
+      "b": 0.8353,
+      "a": 0.9216
      },
      "scopes": [],
      "hiddenFromPublishing": true
@@ -2073,6 +2183,28 @@
       "g": 0.1333,
       "b": 0.1451,
       "a": 1
+     },
+     "scopes": [],
+     "hiddenFromPublishing": true
+    },
+    {
+     "name": "lagoon/700a95",
+     "value": {
+      "r": 0.0784,
+      "g": 0.4863,
+      "b": 0.5098,
+      "a": 0.949
+     },
+     "scopes": [],
+     "hiddenFromPublishing": true
+    },
+    {
+     "name": "lagoon/400a92",
+     "value": {
+      "r": 0.4902,
+      "g": 0.8078,
+      "b": 0.8353,
+      "a": 0.9216
      },
      "scopes": [],
      "hiddenFromPublishing": true
@@ -19078,6 +19210,186 @@
       "Dark IC": {
        "alias": "color / primitives",
        "name": "brown/200"
+      }
+     }
+    },
+    {
+     "name": "color/background/brand/material/bold",
+     "codeSyntax": {
+      "WEB": "var(--ds-background-brand-material-bold)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Fill of a small brand accent (a Tag, Lozenge, Badge or count chip) over media or a material surface. Pair its label with color.text.inverse and color.border.material. Transparency only, no blur, no gradient. PLUS: PLUS addition: colored material for small accents. The role's bold fill at 95% in light and 92% in dark; increased contrast and reduced transparency fall back to the solid bold.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "lagoon/700a95"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "lagoon/400a92"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "lagoon/900"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "lagoon/200"
+      }
+     }
+    },
+    {
+     "name": "color/background/danger/material/bold",
+     "codeSyntax": {
+      "WEB": "var(--ds-background-danger-material-bold)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Fill of a small danger accent (a Tag, Lozenge, Badge or count chip) over media or a material surface. Pair its label with color.text.inverse and color.border.material. Transparency only, no blur, no gradient. PLUS: PLUS addition: colored material for small accents. The role's bold fill at 95% in light and 92% in dark; increased contrast and reduced transparency fall back to the solid bold.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "red/700a95"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "red/400a92"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "red/900"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "red/200"
+      }
+     }
+    },
+    {
+     "name": "color/background/warning/material/bold",
+     "codeSyntax": {
+      "WEB": "var(--ds-background-warning-material-bold)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Fill of a small warning accent (a Tag, Lozenge, Badge or count chip) over media or a material surface. Pair its label with color.text.warning.inverse and color.border.material. Transparency only, no blur, no gradient. PLUS: PLUS addition: colored material for small accents. The role's bold fill at 95% in light and 92% in dark; increased contrast and reduced transparency fall back to the solid bold.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "yellow/300a95"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "yellow/300a92"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "yellow/900"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "yellow/200"
+      }
+     }
+    },
+    {
+     "name": "color/background/success/material/bold",
+     "codeSyntax": {
+      "WEB": "var(--ds-background-success-material-bold)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Fill of a small success accent (a Tag, Lozenge, Badge or count chip) over media or a material surface. Pair its label with color.text.inverse and color.border.material. Transparency only, no blur, no gradient. PLUS: PLUS addition: colored material for small accents. The role's bold fill at 95% in light and 92% in dark; increased contrast and reduced transparency fall back to the solid bold.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "green/700a95"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "green/400a92"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "green/900"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "green/200"
+      }
+     }
+    },
+    {
+     "name": "color/background/discovery/material/bold",
+     "codeSyntax": {
+      "WEB": "var(--ds-background-discovery-material-bold)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Fill of a small discovery accent (a Tag, Lozenge, Badge or count chip) over media or a material surface. Pair its label with color.text.inverse and color.border.material. Transparency only, no blur, no gradient. PLUS: PLUS addition: colored material for small accents. The role's bold fill at 95% in light and 92% in dark; increased contrast and reduced transparency fall back to the solid bold.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "purple/700a95"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "purple/400a92"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "purple/900"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "purple/200"
+      }
+     }
+    },
+    {
+     "name": "color/background/information/material/bold",
+     "codeSyntax": {
+      "WEB": "var(--ds-background-information-material-bold)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Fill of a small information accent (a Tag, Lozenge, Badge or count chip) over media or a material surface. Pair its label with color.text.inverse and color.border.material. Transparency only, no blur, no gradient. PLUS: PLUS addition: colored material for small accents. The role's bold fill at 95% in light and 92% in dark; increased contrast and reduced transparency fall back to the solid bold.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "blue/700a95"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "blue/400a92"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "blue/900"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "blue/200"
       }
      }
     },

@@ -85,7 +85,10 @@ function materialFallbacks(rows) {
   const surfaces = rows.filter((r) => /^elevation[.]surface[.]material[.]/.test(r.name)).map((r) => dsName(r.name));
   const border = rows.filter((r) => r.name === 'color.border.material').map((r) => dsName(r.name));
   if (!surfaces.length) return '';
-  const solid = surfaces.map((n) => `${n}: var(--ds-surface-overlay);`);
+  // Colored material: reduced transparency falls back to the role's solid bold fill.
+  const colored = rows.filter((r) => /^color[.]background[.][a-z]+[.]material[.]bold$/.test(r.name))
+    .map((r) => `${dsName(r.name)}: var(${dsName(r.name.replace('.material.bold', '.bold'))});`);
+  const solid = [...surfaces.map((n) => `${n}: var(--ds-surface-overlay);`), ...colored];
   const forced = [...surfaces.map((n) => `${n}: Canvas;`), ...border.map((n) => `${n}: CanvasText;`)];
   const inMedia = (query, lines) => `@media ${query} {\n${block(`${RAISED}`, lines).replace(/^/gm, '  ').replace(/^ {2}$/gm, '')}}\n`;
   return `\n${inMedia('(prefers-reduced-transparency: reduce)', solid)}${inMedia('(forced-colors: active)', forced)}`;
