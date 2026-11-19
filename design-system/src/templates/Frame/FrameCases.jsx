@@ -88,7 +88,7 @@ const PanelWindow = ({ stage }) => (
 /** The panel docked at the right edge, the Page narrowing beside it. */
 export const AiPanelDocked = () => <PanelWindow stage={PANEL_STAGE} />;
 
-/** The panel floating over the Page, hiding the rows beneath it: a Frame under 1200 cannot dock both. */
+/** The panel floating over the Page, hiding the rows beneath it: a Frame under 1168 cannot dock a 400 panel. */
 export const AiPanelFloating = () => <PanelWindow stage={DOCKED_STAGE} />;
 
 const SignInColumn = () => {

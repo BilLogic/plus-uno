@@ -46,7 +46,7 @@ Use the toolbar's **Color mode** switch for these examples.
 
 <ComponentExample of={AiChatStories.Popup} title="Popup" description="The default mode: the popup opens anchored to the button, over the Page." />
 
-<ComponentExample of={AiChatStories.PanelMode} title="Panel" description="The same chat docked beside the Page, or over it on a Blanket when there is no room." />
+<ComponentExample of={AiChatStories.PanelMode} title="Panel" description="The same chat docked beside the Page, or floating over it when there is no room." />
 
 Full screen covers the window and is not shown inline. Below 768, the popup is full screen. Replying runs from sending a prompt until the answer arrives; its indicator uses <a href="?path=/docs/ai-ui-components-ai-message-ai-message--docs">AI message</a>'s `thinking` status. See Best practices for answer identity, sources and feedback.
 
@@ -88,7 +88,7 @@ Use AI chat to ask about the current page. Choose a mode for the task.
 </thead>
 <tbody>
 <tr><td>Popup</td><td>The default. A quick ask that keeps the page in view.</td></tr>
-<tr><td>Panel</td><td>Ongoing work beside the page. The Frame docks it, or opens it over the Page on a Blanket when there is no room.</td></tr>
+<tr><td>Panel</td><td>Ongoing work beside the page. The Frame docks it, or floats it over the Page when there is no room.</td></tr>
 <tr><td>Full screen</td><td>Long answers that need room. It covers the window.</td></tr>
 </tbody>
 </DocsTable>
@@ -131,7 +131,7 @@ The same surface fills every mode; the mode only changes which header controls s
 <tbody>
 <tr><td>Closed</td><td>Only the button shows.</td></tr>
 <tr><td>Popup</td><td>The popup opens anchored to the button, over the Page. The button stays.</td></tr>
-<tr><td>Panel</td><td>Chat docks in the Frame's Panel, or opens over the Page on a Blanket. The button hides.</td></tr>
+<tr><td>Panel</td><td>Chat docks in the Frame's Panel, or floats over the Page. The button hides.</td></tr>
 <tr><td>Full screen</td><td>Chat covers the window, in a column capped at the reading width. The button hides.</td></tr>
 <tr><td>Replying</td><td>A typing indicator stands in for the reply, and the prompt input's send button becomes Stop.</td></tr>
 </tbody>
@@ -240,7 +240,7 @@ Full screen gives long answers room. A docked Panel squeezes them.
 ## Related
 
 - <a href="?path=/docs/templates-frame--docs">Frame</a> places the Panel the chat docks in.
-- <a href="?path=/docs/templates-modal--docs#blanket">Blanket</a> sits under the Panel when it opens over the Page.
+- A Panel never draws a Blanket: it docks beside the Page or floats over it, and the Page stays in view.
 - For one reply on its own, use `AiMessage`.
 - For the field alone, use `PromptInput`; for suggested prompts, `PromptStarters`.
 

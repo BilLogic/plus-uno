@@ -22,7 +22,7 @@ Use `FooterActions` inside Modal, Panel (`PanelFooter`) and the multi-step task 
 4. **Three actions.** Take one quarter each in tracks `2`, `3` and `4`; only the rightmost is `primary`.
 5. **Leading action.** The leading slot holds only a side action that is not one of the footer's two outcomes: a `danger` destructive action such as "Delete", or a `link` that leaves the task, such as "View guidelines". It hugs the left content edge when it is the first child (of two or more) or is passed as `leadingAction`. It is never "Not now", "Cancel" or "Back". An action that declines or postpones ("Not now", "Skip", "Keep editing", "Save for later") is a `default` secondary in the left half, beside the primary. Filled actions sit in tracks `3`–`4` (one filled), `3` and `4` (two filled), or `2`, `3` and `4` (three filled, clamping the leading action to track `1`).
 6. **Destructive confirmations.** Place the safer alternative (`default` secondary, such as "Archive instead") on the left and the `danger` action as the rightmost child, splitting `50/50` across tracks `1`–`2` and `3`–`4`.
-7. **No Cancel in footers.** `Modal` and `Panel` already carry a corner close button, so footers name real outcomes ("Discard", "Save", never Cancel). Cancel appears only in inline popups (which have no close button): `compact`, `subtle`, right-aligned beside the action.
+7. **No Cancel in footers.** `Modal` and `Panel` already carry a corner close button, so footers name real outcomes ("Discard", "Save", never Cancel). Cancel appears only on a page form, which has no close button: `subtle`, after the Primary.
 8. **Steps.** In a multi-step flow, "Back" (`default`) and "Next" (`primary`) split `50/50` across tracks `1`–`2` and `3`–`4`.
 
 ### Hug or fill
@@ -35,7 +35,6 @@ Buttons fill in only two places: filled tracks inside `FooterActions`, and a sin
 | Card or section header | `subtle` `compact` text button and/or `subtle` icon button | Card, Section |
 | Table toolbar | `compact`; `subtle` secondary, `primary` rightmost | Patterns/Table |
 | Table row | `subtle` icon buttons or one `subtle` `compact` text action; never filled | Table template, DynamicTable |
-| Popup inline confirm | `compact`; `subtle` Cancel plus the action | Patterns/Popup |
 | Empty state | centered; `default` 32 on a page, `compact` 24 in a card | Messaging/EmptyState, Docs/Empty |
 | Banner and Flag | `subtle` `compact` text actions after the message | Messaging/Banner, Messaging/Flag |
 | Button group | items hug; selected item is the selected fill plus a 1px border | Navigation/ButtonGroup |

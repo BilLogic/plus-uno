@@ -14,7 +14,7 @@ Import the Panel and its parts from `@/templates`. This template documents the p
 
 Both open on the right with no Blanket: docked beside the Page when it fits and floating over it when it does not (Width behavior has the widths). Floating at every width is Planned.
 
-- **Details.** A quick look at a row, floating over the right of the Page. The picked row stays highlighted.
+- **Details.** A quick look at a row, docked beside the Page or floating over its right by width. The picked row stays highlighted.
 - **Notifications.** The Inbox, opened from the Bell. It lists items by time and stays open as you pick one.
 
 ## Anatomy
@@ -24,7 +24,7 @@ Both open on the right with no Blanket: docked beside the Page when it fits and 
 Opened from a session row. The page behind stays usable.
 
 1. **Splitter.** On the Page-facing edge; it resizes from 320 to 640.
-2. **Header.** The title names the record, with its status in the Subheader row under it; then the fixed actions: Up, Down, More, Close.
+2. **Header.** The title names the record, with its status in the Subheader row under it; then Edit and the fixed actions: Up, Down, More, Close.
 3. **Body.** The record's Sections. It scrolls between the header and the footer.
 
 The picked row stays highlighted on the page while the Panel is open.
@@ -69,20 +69,22 @@ The Panel resizes from 320 to 640 by drag or keys, never past what keeps 720 of 
 import { Frame, PanelContainer, PanelHeader, PanelBody, PanelFooter } from '@/templates';
 ```
 
-The Panel components are the parts: header with its fixed actions, body, footer, and Escape to close. The Frame hosts one and decides whether it docks or floats. The template is its filled layout, one per type. The AI panel is the Frame's `panel`.
+The Panel components are the parts: header with its fixed actions, subheader, body, footer and disclaimer. The Frame hosts one, decides whether it docks or floats, and closes it on Escape. The template is its filled layout, one per type. The AI panel is the Frame's `panel`.
 
 | Slot | Details | Notifications |
 | --- | --- | --- |
 | `title` | The record's name, with its StatusTag under it | "Inbox" |
-| `actions` | Up, Down, More and Close | Archive all and Close (the Show `PopupSelect` sits in the subheader) |
+| `actions` | Edit, then Up, Down, More and Close | Archive all and Close (the Show `PopupSelect` sits in the subheader) |
+| `backAction` · `titleIcon` | Optional, in the header before the title: a back action (`PanelBackAction`) and an icon. Pick the one the task needs. | None |
+| `subheader` (`PanelSubheader`) | The record's StatusTag under the title | The Show `PopupSelect` |
 | `body` | Sections of the record; the form while editing | Items grouped by time |
-| `footer` | Only while editing: Discard and Save, full bleed; Close in the header dismisses, so no Cancel. The page composes it from Button. Planned as a prop. | None |
-| Placement | Floating, right. Floats under 1168; at 1168 and up the Frame docks it. Floating at every width is Planned. | Floating, left, out of the Sidebar. Planned. Today it uses the right-hand area. |
+| `footer` · `disclaimer` (`PanelFooter`, `PanelDisclaimer`) | Only while editing: Discard and Save, full bleed; Close in the header dismisses, so no Cancel. The page composes it from Button. Planned as a prop. A `PanelDisclaimer` carries small print beside the actions. | None |
+| Placement | Right. Docked from 1168; floating under it. Floating at every width is Planned. | Floating, left, out of the Sidebar. Planned. Today it uses the right-hand area. |
 | Beside the AI panel | Planned. The Frame has one Panel area. | Planned. |
 
 ## Usage
 
-Use a Panel when content is read beside the page and outlives a click: a quick look at a row, a short edit with the table in view, the Inbox. It never has a Blanket, so the page behind stays usable. Details floats over the right of the Page; the Inbox floats out of the Sidebar on the left. One floating Panel is open at a time; opening another replaces it.
+Use a Panel when content is read beside the page and outlives a click: a quick look at a row, a short edit with the table in view, the Inbox. It never has a Blanket, so the page behind stays usable. Details sits on the right, docked beside the Page from 1168 and floating over it under that; the Inbox floating out of the Sidebar on the left is  Planned, and today it uses the same right-hand area. One floating Panel is open at a time; opening another replaces it.
 
 The AI panel is not a floating Panel. It is a region of the Frame, docked where there is room, so it persists across pages.
 
@@ -136,7 +138,7 @@ The AI panel is not a floating Panel. It is a region of the Frame, docked where 
 
 - Floating, the Panel is a complementary landmark named by its title, after the Page in reading order. Focus moves to its title on open and returns to the row, or the Bell, on close.
 - Floating at a narrow width it is a dialog: focus is trapped, and Escape, a press outside or Close return it.
-- Escape closes the Panel unless an inner control handles it, such as an open menu.
+- The Frame closes the Panel on Escape unless an inner control handles it, such as an open menu.
 - Up and Down are named "Previous" and "Next" and announce the record that opens.
 - **`usePanelManager` outside a provider fails loudly.** Calling it without a `PanelProvider` ancestor throws, rather than silently falling back, so a missing provider is caught during development.
 - An unread dot is paired with the text "unread" for a screen reader.

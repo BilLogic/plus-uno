@@ -191,8 +191,8 @@ const TITLE_LINE = {
 
 /**
  * The header while the section loads: a bar for the title row (half width,
- * the title's height), one for the description, and one for the tabs or
- * toolbar row when there is one. `tabs-only` draws only that last bar.
+ * the title's height), one for the description, and one for the views or
+ * filters row when there is one. `tabs-only` draws only that last bar.
  */
 const HeaderSkeleton = ({ rank, hasBottomRow, tabsOnly }) => (
     <div className="plus-template-section-skeleton">
@@ -268,7 +268,7 @@ const warnDeprecatedHeaderProps = ({ tabs, toolbar }) => {
     });
 };
 
-/** Section: a span of the page grid under one heading, with its header, toolbar and tabs. */
+/** Section: a span of the page grid under one heading, with its title row, views, search and filters. */
 const Section = ({
     id,
     title,
@@ -530,7 +530,6 @@ Section.propTypes = {
     toolbar: PropTypes.node,
     /** Free-form header in place of title and description (header type `custom`)
      * @ds-context Used in: Section.header (ds guide section)
-     * @ds-context Governed by: Forms (ds guide forms)
      */
     header: PropTypes.node,
     /** Header type: `default` (title and description) or `custom` (your own `header`). Read from the slots when left off. */

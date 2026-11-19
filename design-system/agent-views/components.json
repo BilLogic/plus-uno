@@ -3845,7 +3845,7 @@
         "--inline-md",
         "--pad-x-md",
         "--popup-pad",
-        "--popup-width-md",
+        "--popup-width-range",
         "--width-1000"
       ]
     },
@@ -12319,7 +12319,7 @@
       "import": "import { Section } from '@/templates';",
       "group": "templates",
       "source": "design-system/src/templates/Section/Section.jsx",
-      "summary": "Section: a span of the page grid under one heading, with its header, toolbar and tabs.",
+      "summary": "Section: a span of the page grid under one heading, with its title row, views, search and filters.",
       "props": [
         {
           "name": "id",

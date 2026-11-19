@@ -189,7 +189,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-width-default` · `--calendar-day-sm` · `--ds-icon-subtle` · `--inline-md` · `--pad-x-md` · `--popup-pad` · `--popup-width-md` · `--width-1000`
+`--border-width-default` · `--calendar-day-sm` · `--ds-icon-subtle` · `--inline-md` · `--pad-x-md` · `--popup-pad` · `--popup-width-range` · `--width-1000`
 
 From `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.scss`. Override these through the token layer, never with a literal.
 

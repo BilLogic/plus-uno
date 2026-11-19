@@ -127,9 +127,6 @@ const FIXED = {
   '--modal-inline-lg': '24px',
   '--modal-radius': '16px',
   '--popup-pad': '16px',
-  '--popup-width-sm': '320px',
-  '--popup-width-md': '400px',
-  '--popup-width-lg': '480px',
   '--flag-width': '400px',
   '--flag-stack': '16px',
   '--dropdown-menu-pad': '4px',
@@ -439,4 +436,17 @@ test('a Section draws no surface of its own: no radius token, no fill, no pad', 
 
 test('the Frame names its server-render width instead of writing 1440 bare', () => {
   assert.doesNotMatch(read('design-system/src/templates/Frame/useOwnWidth.js'), /fallback = 1440/);
+});
+
+test('Popup widths are the column steps, and the old size words read as retired', async () => {
+  const { TOKEN_LADDER } = await import('./lib/tokens/plan.mjs');
+  const popupWidths = TOKEN_LADDER.filter((r) => /^--popup-width-/.test(r.new)).map((r) => r.new).sort();
+  assert.deepEqual(popupWidths, ['--popup-width-3-col', '--popup-width-4-col', '--popup-width-range']);
+  const retired = retiredRenames();
+  for (const size of ['sm', 'md', 'lg']) assert.ok(retired.has(`--popup-width-${size}`), `--popup-width-${size} is retired`);
+  const use = (name) => TOKEN_LADDER.find((r) => r.new === name).use;
+  assert.match(use('--popup-width-3-col'), /filter menu/);
+  assert.match(use('--popup-width-3-col'), /profile menu/);
+  assert.match(use('--popup-width-4-col'), /content/);
+  assert.doesNotMatch(use('--popup-width-4-col'), /date picker/);
 });
