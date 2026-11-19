@@ -209,7 +209,6 @@ test('the unused spacing tokens removed in #2719 are gone', () => {
     '--space-03125',
     '--modal-pad-x-compact',
     '--menu-group-item-pad-y',
-    '--modal-pad',
     '--modal-pad-y-compact',
     '--modal-pad-y-default',
     '--modal-pad-y-spacious',

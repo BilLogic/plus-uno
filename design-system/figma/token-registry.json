@@ -97,7 +97,7 @@
       "Element padding": "var(--pad-x-{xs|sm|md|lg})",
       "Element gap": "var(--stack-{sm|md|lg|xl|2xl|3xl})",
       "Element radius": "var(--radius-{sm|md|lg|full})",
-      "Modal padding": "var(--modal-pad-x-{default|spacious})",
+      "Modal padding": "var(--modal-pad)",
       "Section gap": "var(--section-stack-{sm|md|lg})",
       "Page padding": "var(--page-pad)",
       "Table cell": "var(--table-pad-x-cell)",
@@ -293,13 +293,13 @@
       "Modal/inline-lg": "var(--modal-inline-lg)",
       "Modal/inline-md": "var(--modal-inline-md)",
       "Modal/inline-sm": "var(--modal-inline-sm)",
-      "Modal/pad-x-default": "var(--modal-pad-x-default)",
-      "Modal/pad-x-spacious": "var(--modal-pad-x-spacious)",
+      "Modal/pad": "var(--modal-pad)",
       "Modal/radius": "var(--modal-radius)",
       "Modal/stack-lg": "var(--modal-stack-lg)",
       "Modal/stack-md": "var(--modal-stack-md)",
       "Modal/stack-sm": "var(--modal-stack-sm)",
       "Modal/width-10-col": "var(--modal-width-10-col)",
+      "Modal/width-4-col": "var(--modal-width-4-col)",
       "Modal/width-6-col": "var(--modal-width-6-col)",
       "Modal/width-8-col": "var(--modal-width-8-col)",
       "Page/pad": "var(--page-pad)",
@@ -1869,7 +1869,7 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1244,
+    "scssTokenCount": 1242,
     "unknownTokens": [],
     "figmaVariableCoverage": {
       "total": 1769,

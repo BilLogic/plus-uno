@@ -91,8 +91,7 @@ Space owned by a template: page, section, card, table, modal, popup. Inside a te
 --frame-sidebar-row-radius  /* Corner rounding of a Sidebar row. */
 --frame-sidebar-width  /* Width of the Frame's Sidebar at the current breakpoint. */
 --modal-body-min-height  /* Minimum height of a Modal's body, so a short body does not collapse the dialog. */
---modal-pad-x-default  /* Horizontal padding of a Modal with default spacing. */
---modal-pad-x-spacious  /* Horizontal padding of a Modal with spacious spacing. */
+--modal-pad  /* Padding on every side of a Modal. */
 --modal-radius  /* Corner rounding of a Modal. */
 --modal-shadow  /* Shadow of a Modal on its Blanket. */
 --modal-width-10-col  /* Width of a large Modal, such as a table or a long form. */
@@ -168,8 +167,7 @@ Tokens one component owns, named for it.
 --dialog-inline-lg  /* Horizontal gap between columns in a Dialog. */
 --dialog-inline-md  /* Horizontal gap between the actions in a Dialog footer. */
 --dialog-inline-sm  /* Horizontal gap between small items in a Dialog header or footer. */
---dialog-pad-x-default  /* Horizontal padding of a Dialog with default spacing. */
---dialog-pad-x-spacious  /* Horizontal padding of a Dialog with spacious spacing. */
+--dialog-pad  /* Padding on every side of a Dialog. */
 --dialog-radius  /* Corner rounding of a Dialog. */
 --dialog-shadow  /* Shadow of a Dialog. */
 --dialog-stack-lg  /* Vertical gap between blocks in a Dialog's body. */

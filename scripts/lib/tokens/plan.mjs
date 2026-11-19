@@ -272,8 +272,7 @@ export const TOKEN_LADDER = [
   { tier: 'templates', group: 'Blanket', new: '--blanket-max-height-modal', old: '--layout-max-height-modal', ref: 'calc(100dvh - 2 * var(--blanket-pad-y))', codeOnly: true, note: 'a calc() of the pad above: code only, no Figma variable', use: 'Tallest a Modal may grow inside its Blanket.' },
 
   // ─── Templates / Modal ─────────────────────────────────────────────────
-  { tier: 'templates', group: 'Modal', new: '--modal-pad-x-default', old: null, value: '--space-100', use: 'Horizontal padding of a Modal with default spacing.' },
-  { tier: 'templates', group: 'Modal', new: '--modal-pad-x-spacious', old: null, value: '--space-125', use: 'Horizontal padding of a Modal with spacious spacing.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-pad', old: null, value: '--space-125', use: 'Padding on every side of a Modal.' },
   { tier: 'templates', group: 'Modal', new: '--modal-stack-sm', old: '--modal-stack-sm', use: 'Vertical gap between a Modal\'s title and its description.' },
   { tier: 'templates', group: 'Modal', new: '--modal-stack-md', old: '--modal-stack-md', use: 'Vertical gap between blocks in a Modal\'s body.' },
   { tier: 'templates', group: 'Modal', new: '--modal-stack-lg', old: '--modal-stack-lg', use: 'Vertical gap between a Modal\'s header, body and footer.' },
@@ -281,10 +280,10 @@ export const TOKEN_LADDER = [
   { tier: 'templates', group: 'Modal', new: '--modal-inline-md', old: '--modal-inline-md', use: 'Horizontal gap between the actions in a Modal footer.' },
   { tier: 'templates', group: 'Modal', new: '--modal-inline-lg', old: '--modal-inline-lg', use: 'Horizontal gap between columns in a Modal.' },
   { tier: 'templates', group: 'Modal', new: '--modal-radius', old: null, ref: 'var(--radius-xxl)', use: 'Corner rounding of a Modal.' },
-  { tier: 'templates', group: 'Modal', new: '--modal-width-4-col', old: null, ref: '261px', at: { '(min-width: 1024px)': '347px', '(min-width: 1440px)': '432px' }, codeOnly: true, note: '4 screen-grid columns plus 2 × 16 modal pad at 768 · 1024 · 1440', use: 'Width of a compact Modal, such as a confirmation.' },
-  { tier: 'templates', group: 'Modal', new: '--modal-width-6-col', old: '--layout-width-modal-sm', ref: '384px', at: { '(min-width: 1024px)': '512px', '(min-width: 1440px)': '640px' }, note: 'lifted out of spacing / layout, beside the template’s pad/stack tokens', use: 'Width of a small Modal, such as a single question or a one-field form.' },
-  { tier: 'templates', group: 'Modal', new: '--modal-width-8-col', old: '--layout-width-modal-md', ref: '507px', at: { '(min-width: 1024px)': '677px', '(min-width: 1440px)': '848px' }, use: 'Width of a default Modal, such as a short form.' },
-  { tier: 'templates', group: 'Modal', new: '--modal-width-10-col', old: '--layout-width-modal-lg', ref: '629px', at: { '(min-width: 1024px)': '843px', '(min-width: 1440px)': '1056px' }, use: 'Width of a large Modal, such as a table or a long form.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-width-4-col', old: null, ref: '269px', at: { '(min-width: 1024px)': '355px', '(min-width: 1440px)': '440px' }, note: '4 screen-grid columns plus 2 × 20 modal pad at 768 · 1024 · 1440', use: 'Width of a compact Modal, such as a confirmation.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-width-6-col', old: null, ref: '392px', at: { '(min-width: 1024px)': '520px', '(min-width: 1440px)': '648px' }, note: 'lifted out of spacing / layout, beside the template’s pad/stack tokens', use: 'Width of a small Modal, such as a single question or a one-field form.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-width-8-col', old: null, ref: '515px', at: { '(min-width: 1024px)': '685px', '(min-width: 1440px)': '856px' }, use: 'Width of a default Modal, such as a short form.' },
+  { tier: 'templates', group: 'Modal', new: '--modal-width-10-col', old: null, ref: '637px', at: { '(min-width: 1024px)': '851px', '(min-width: 1440px)': '1064px' }, use: 'Width of a large Modal, such as a table or a long form.' },
   { tier: 'templates', group: 'Page', new: '--page-border-width', old: null, ref: 'var(--stroke-2)', use: 'Width of the edge drawn around a Page frame.' },
   { tier: 'templates', group: 'Table', new: '--table-overflow-reach', old: null, ref: 'var(--space-150)', use: 'How far a table lets a row\'s overflow, such as a focus ring, reach past its clip.' },
   { tier: 'templates', group: 'Modal', new: '--modal-body-min-height', old: null, ref: 'var(--height-500)', use: 'Minimum height of a Modal\'s body, so a short body does not collapse the dialog.' },
@@ -315,8 +314,7 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Button', new: '--button-radius-spacious', old: null, ref: 'var(--radius-control-lg)', note: '48-high footer button; pairs with --control-xl', use: 'Corner rounding of a Button with spacious spacing.' },
 
   // ─── Components / Dialog ──────────────────────────────────────────────
-  { tier: 'components', group: 'Dialog', new: '--dialog-pad-x-default', old: null, ref: 'var(--space-100)', use: 'Horizontal padding of a Dialog with default spacing.' },
-  { tier: 'components', group: 'Dialog', new: '--dialog-pad-x-spacious', old: null, ref: 'var(--space-150)', use: 'Horizontal padding of a Dialog with spacious spacing.' },
+  { tier: 'components', group: 'Dialog', new: '--dialog-pad', old: null, ref: 'var(--space-125)', use: 'Padding on every side of a Dialog.' },
   { tier: 'components', group: 'Dialog', new: '--dialog-stack-sm', old: null, ref: 'var(--space-050)', use: 'Vertical gap between a Dialog\'s title and its description or tabs.' },
   { tier: 'components', group: 'Dialog', new: '--dialog-stack-md', old: null, ref: 'var(--space-100)', use: 'Vertical gap between a Dialog\'s header, body and footer.' },
   { tier: 'components', group: 'Dialog', new: '--dialog-stack-lg', old: null, ref: 'var(--space-150)', use: 'Vertical gap between blocks in a Dialog\'s body.' },

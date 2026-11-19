@@ -160,8 +160,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Blanket | `--blanket-pad-x` |  |
 | Blanket | `--blanket-pad-y` |  |
 | Blanket | `--blanket-max-height-modal` | a calc() of the pad above: code only, no Figma variable |
-| Modal | `--modal-pad-x-default` |  |
-| Modal | `--modal-pad-x-spacious` |  |
+| Modal | `--modal-pad` |  |
 | Modal | `--modal-stack-sm` (declared elsewhere) |  |
 | Modal | `--modal-stack-md` (declared elsewhere) |  |
 | Modal | `--modal-stack-lg` (declared elsewhere) |  |
@@ -169,7 +168,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Modal | `--modal-inline-md` (declared elsewhere) |  |
 | Modal | `--modal-inline-lg` (declared elsewhere) |  |
 | Modal | `--modal-radius` |  |
-| Modal | `--modal-width-4-col` | 4 screen-grid columns plus 2 × 16 modal pad at 768 · 1024 · 1440 |
+| Modal | `--modal-width-4-col` | 4 screen-grid columns plus 2 × 20 modal pad at 768 · 1024 · 1440 |
 | Modal | `--modal-width-6-col` | lifted out of spacing / layout, beside the template’s pad/stack tokens |
 | Modal | `--modal-width-8-col` |  |
 | Modal | `--modal-width-10-col` |  |
@@ -202,8 +201,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Button | `--button-radius-default` | nests in a 40-high field: its radius 10 minus the 4 slot inset = 6 |
 | Button | `--button-radius-compact` | nests in a 32-high field: its radius 8 minus the 4 slot inset = 4 |
 | Button | `--button-radius-spacious` | 48-high footer button; pairs with --control-xl |
-| Dialog | `--dialog-pad-x-default` |  |
-| Dialog | `--dialog-pad-x-spacious` |  |
+| Dialog | `--dialog-pad` |  |
 | Dialog | `--dialog-stack-sm` |  |
 | Dialog | `--dialog-stack-md` |  |
 | Dialog | `--dialog-stack-lg` |  |

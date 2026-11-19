@@ -82,7 +82,7 @@ A Card, Modal or Popup carries its own pad on every side. Every Card pads space-
 | Token | Figma | Value | Use |
 | --- | --- | --- | --- |
 | `--card-pad` | `Card/pad` | `space-100` | Every side of every Card, at every size |
-| `--modal-pad-x-default` | `Modal/pad-x-default` | `space-100` | Every side of a Modal |
+| `--modal-pad` | `Modal/pad` | `space-125` | Every side of a Modal |
 | `--popup-pad` | `Popup/pad` | `space-100` | Popup, Flag |
 | `--frame-sidebar-pad` | — | `space-075` | The Sidebar, every side |
 | `--page-pad` | `Page/pad` | `space-150` | Every side of the Page |
@@ -149,7 +149,7 @@ Every template has its own tokens, so a value is read from where it sits.
 |  | `--table-indent` | `space-150` | A nested row’s first cell |
 |  | `--table-pad-x-footer` | `space-100` | The table footer |
 | Blanket | `--blanket-pad-x · pad-y` | `space-100 · space-400` | Around a modal; pad-y drops to 24 on screens under 640 tall |
-| Modal | `--modal-pad-x-default · spacious` | `space-100 · space-125` | Every side |
+| Modal | `--modal-pad` | `space-125` | Every side |
 |  | `--modal-stack · --modal-inline (sm · md · lg)` | `space-050 · space-100 · space-150` | Inside the modal |
 | Popup | `--popup-pad` | `space-100` | Popup, Flag |
 |  | `--popup-gap-screen` | `space-050` | The nearest a popup comes to the screen edge |

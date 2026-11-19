@@ -225,8 +225,30 @@
       }
     },
     {
+      "id": "VariableID:19378:46290",
+      "name": "Modal/width-4-col",
+      "variableCollectionId": "VariableCollectionId:19378:46207",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--modal-width-4-col)"
+      },
+      "valuesByMode": {
+        "19378:1": 269,
+        "19378:2": 355,
+        "19378:3": 440
+      },
+      "resolvedValuesByMode": {
+        "19378:1": 269,
+        "19378:2": 355,
+        "19378:3": 440
+      }
+    },
+    {
       "id": "VariableID:19378:46218",
-      "name": "Modal/width-modal-sm",
+      "name": "Modal/width-6-col",
       "variableCollectionId": "VariableCollectionId:19378:46207",
       "resolvedType": "FLOAT",
       "scopes": [
@@ -236,19 +258,19 @@
         "WEB": "var(--modal-width-6-col)"
       },
       "valuesByMode": {
-        "19378:1": 384,
-        "19378:2": 512,
-        "19378:3": 640
+        "19378:1": 392,
+        "19378:2": 520,
+        "19378:3": 648
       },
       "resolvedValuesByMode": {
-        "19378:1": 384,
-        "19378:2": 512,
-        "19378:3": 640
+        "19378:1": 392,
+        "19378:2": 520,
+        "19378:3": 648
       }
     },
     {
       "id": "VariableID:19378:46219",
-      "name": "Modal/width-modal-md",
+      "name": "Modal/width-8-col",
       "variableCollectionId": "VariableCollectionId:19378:46207",
       "resolvedType": "FLOAT",
       "scopes": [
@@ -258,19 +280,19 @@
         "WEB": "var(--modal-width-8-col)"
       },
       "valuesByMode": {
-        "19378:1": 507,
-        "19378:2": 677,
-        "19378:3": 848
+        "19378:1": 515,
+        "19378:2": 685,
+        "19378:3": 856
       },
       "resolvedValuesByMode": {
-        "19378:1": 507,
-        "19378:2": 677,
-        "19378:3": 848
+        "19378:1": 515,
+        "19378:2": 685,
+        "19378:3": 856
       }
     },
     {
       "id": "VariableID:19378:46220",
-      "name": "Modal/width-modal-lg",
+      "name": "Modal/width-10-col",
       "variableCollectionId": "VariableCollectionId:19378:46207",
       "resolvedType": "FLOAT",
       "scopes": [
@@ -280,14 +302,14 @@
         "WEB": "var(--modal-width-10-col)"
       },
       "valuesByMode": {
-        "19378:1": 629,
-        "19378:2": 843,
-        "19378:3": 1056
+        "19378:1": 637,
+        "19378:2": 851,
+        "19378:3": 1064
       },
       "resolvedValuesByMode": {
-        "19378:1": 629,
-        "19378:2": 843,
-        "19378:3": 1056
+        "19378:1": 637,
+        "19378:2": 851,
+        "19378:3": 1064
       }
     },
     {

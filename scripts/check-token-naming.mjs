@@ -153,12 +153,6 @@ export function expectedToken(collection, variable) {
     return '--radius-control-sm';
   }
 
-  // Modal widths are named for the grid columns they span in code, and sm · md · lg in Figma.
-  const modalWidth = collection === 'spacing / templates' && /^Modal\/width-(sm|md|lg)$/.exec(variable);
-  if (modalWidth) {
-    return `--modal-width-${{ sm: '6-col', md: '8-col', lg: '10-col' }[modalWidth[1]]}`;
-  }
-
   return `--${slugifyPath(dropRedundantFolder(variable))}`;
 }
 

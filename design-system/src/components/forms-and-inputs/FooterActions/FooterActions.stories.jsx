@@ -14,7 +14,7 @@ import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 const stageStyle = {
     inlineSize: '560px',
     maxInlineSize: '100%',
-    padding: 'var(--modal-pad-x-default)',
+    padding: 'var(--modal-pad)',
     background: 'var(--ds-surface-overlay)',
     border: 'var(--border-width-default) solid var(--ds-border)',
     borderRadius: 'var(--radius-lg)',

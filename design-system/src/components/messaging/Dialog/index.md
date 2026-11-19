@@ -34,10 +34,10 @@ many columns of the screen grid plus the dialog pad.
 
 | Width | When to use | `DIALOG_WIDTH_PX` at 768 · 1024 · 1280 |
 | --- | --- | --- |
-| 4-col | A compact confirmation. | 261 · 347 · 432 |
-| 6-col | A confirmation or a short question. | 384 · 512 · 640 |
-| 8-col | A short form. | 507 · 677 · 848 |
-| 10-col | A table or an editor. | 629 · 843 · 1056 |
+| 4-col | A compact confirmation. | 269 · 355 · 440 |
+| 6-col | A confirmation or a short question. | 392 · 520 · 648 |
+| 8-col | A short form. | 515 · 685 · 856 |
+| 10-col | A table or an editor. | 637 · 851 · 1064 |
 
 `Dialog` draws `--ds-surface-material-overlay` and a `--ds-border-material` edge with `--dialog-shadow` (`--ds-shadow-blocking`) in every width. A `Select` list opened inside it keeps `--ds-shadow-overlay`.
 
@@ -190,7 +190,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--border-width-default` · `--dialog-body-min-height` · `--dialog-inline-sm` · `--dialog-max-height` · `--dialog-pad-x-default` · `--dialog-radius` · `--dialog-shadow` · `--dialog-stack-md` · `--dialog-stack-sm` · `--ds-border` · `--ds-border-material` · `--ds-surface-material-overlay` · `--ds-text` · `--ds-text-subtle` · `--heading-md` · `--plus-overlay-max-height`
+`--body-default` · `--border-width-default` · `--dialog-body-min-height` · `--dialog-inline-sm` · `--dialog-max-height` · `--dialog-pad` · `--dialog-radius` · `--dialog-shadow` · `--dialog-stack-md` · `--dialog-stack-sm` · `--ds-border` · `--ds-border-material` · `--ds-surface-material-overlay` · `--ds-text` · `--ds-text-subtle` · `--heading-md` · `--plus-overlay-max-height`
 
 From `design-system/src/components/messaging/Dialog/Dialog.scss`. Override these through the token layer, never with a literal.
 

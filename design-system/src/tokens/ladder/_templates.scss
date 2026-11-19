@@ -49,13 +49,12 @@
     --blanket-max-height-modal: calc(100dvh - 2 * var(--blanket-pad-y)); /* a calc() of the pad above: code only, no Figma variable */
 
     /* Modal */
-    --modal-pad-x-default: var(--space-100);
-    --modal-pad-x-spacious: var(--space-125);
+    --modal-pad: var(--space-125);
     --modal-radius: var(--radius-xxl);
-    --modal-width-4-col: 261px; /* 4 screen-grid columns plus 2 × 16 modal pad at 768 · 1024 · 1440 */
-    --modal-width-6-col: 384px; /* lifted out of spacing / layout, beside the template’s pad/stack tokens */
-    --modal-width-8-col: 507px;
-    --modal-width-10-col: 629px;
+    --modal-width-4-col: 269px; /* 4 screen-grid columns plus 2 × 20 modal pad at 768 · 1024 · 1440 */
+    --modal-width-6-col: 392px; /* lifted out of spacing / layout, beside the template’s pad/stack tokens */
+    --modal-width-8-col: 515px;
+    --modal-width-10-col: 637px;
     --modal-body-min-height: var(--height-500);
 
     /* Page */
@@ -100,10 +99,10 @@
 
 @media (min-width: 1024px) {
     :root {
-        --modal-width-4-col: 347px;
-        --modal-width-6-col: 512px;
-        --modal-width-8-col: 677px;
-        --modal-width-10-col: 843px;
+        --modal-width-4-col: 355px;
+        --modal-width-6-col: 520px;
+        --modal-width-8-col: 685px;
+        --modal-width-10-col: 851px;
         --popup-width-3-col: 264px;
         --popup-width-4-col: 347px;
     }
@@ -111,10 +110,10 @@
 
 @media (min-width: 1440px) {
     :root {
-        --modal-width-4-col: 432px;
-        --modal-width-6-col: 640px;
-        --modal-width-8-col: 848px;
-        --modal-width-10-col: 1056px;
+        --modal-width-4-col: 440px;
+        --modal-width-6-col: 648px;
+        --modal-width-8-col: 856px;
+        --modal-width-10-col: 1064px;
         --popup-width-3-col: 328px;
         --popup-width-4-col: 432px;
     }

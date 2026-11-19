@@ -52,7 +52,7 @@
 }
 
 .plus-modal {
-    --dialog-pad-x-default: var(--modal-pad-x-default);
+    --dialog-pad: var(--modal-pad);
     --dialog-stack-sm: var(--modal-stack-sm);
     --dialog-stack-md: var(--modal-stack-md);
     --dialog-inline-sm: var(--modal-inline-sm);
