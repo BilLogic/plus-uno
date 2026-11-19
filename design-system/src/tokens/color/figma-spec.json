@@ -19223,7 +19223,7 @@
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Fill of a small brand accent (a Tag, Lozenge, Badge or count chip) over media or a material surface. Pair its label with color.text.inverse and color.border.material. Transparency only, no blur, no gradient. PLUS: PLUS addition: colored material for small accents. The role's bold fill at 95% in light and 92% in dark; increased contrast and reduced transparency fall back to the solid bold.",
+     "description": "Fill of a small brand accent (a Tag or Status tag) over media or a material surface. Pair its label with color.text.inverse and color.border.material. Transparency only, no blur, no gradient. PLUS: PLUS addition: colored material for small accents. The role's bold fill at 95% in light and 92% in dark; increased contrast and reduced transparency fall back to the solid bold.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -19253,7 +19253,7 @@
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Fill of a small danger accent (a Tag, Lozenge, Badge or count chip) over media or a material surface. Pair its label with color.text.inverse and color.border.material. Transparency only, no blur, no gradient. PLUS: PLUS addition: colored material for small accents. The role's bold fill at 95% in light and 92% in dark; increased contrast and reduced transparency fall back to the solid bold.",
+     "description": "Fill of a small danger accent (a Tag or Status tag) over media or a material surface. Pair its label with color.text.inverse and color.border.material. Transparency only, no blur, no gradient. PLUS: PLUS addition: colored material for small accents. The role's bold fill at 95% in light and 92% in dark; increased contrast and reduced transparency fall back to the solid bold.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -19283,7 +19283,7 @@
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Fill of a small warning accent (a Tag, Lozenge, Badge or count chip) over media or a material surface. Pair its label with color.text.warning.inverse and color.border.material. Transparency only, no blur, no gradient. PLUS: PLUS addition: colored material for small accents. The role's bold fill at 95% in light and 92% in dark; increased contrast and reduced transparency fall back to the solid bold.",
+     "description": "Fill of a small warning accent (a Tag or Status tag) over media or a material surface. Pair its label with color.text.warning.inverse and color.border.material. Transparency only, no blur, no gradient. PLUS: PLUS addition: colored material for small accents. The role's bold fill at 95% in light and 92% in dark; increased contrast and reduced transparency fall back to the solid bold.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -19313,7 +19313,7 @@
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Fill of a small success accent (a Tag, Lozenge, Badge or count chip) over media or a material surface. Pair its label with color.text.inverse and color.border.material. Transparency only, no blur, no gradient. PLUS: PLUS addition: colored material for small accents. The role's bold fill at 95% in light and 92% in dark; increased contrast and reduced transparency fall back to the solid bold.",
+     "description": "Fill of a small success accent (a Tag or Status tag) over media or a material surface. Pair its label with color.text.inverse and color.border.material. Transparency only, no blur, no gradient. PLUS: PLUS addition: colored material for small accents. The role's bold fill at 95% in light and 92% in dark; increased contrast and reduced transparency fall back to the solid bold.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -19343,7 +19343,7 @@
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Fill of a small discovery accent (a Tag, Lozenge, Badge or count chip) over media or a material surface. Pair its label with color.text.inverse and color.border.material. Transparency only, no blur, no gradient. PLUS: PLUS addition: colored material for small accents. The role's bold fill at 95% in light and 92% in dark; increased contrast and reduced transparency fall back to the solid bold.",
+     "description": "Fill of a small discovery accent (a Tag or Status tag) over media or a material surface. Pair its label with color.text.inverse and color.border.material. Transparency only, no blur, no gradient. PLUS: PLUS addition: colored material for small accents. The role's bold fill at 95% in light and 92% in dark; increased contrast and reduced transparency fall back to the solid bold.",
      "values": {
       "Light": {
        "alias": "color / primitives",
@@ -19373,7 +19373,7 @@
       "SHAPE_FILL"
      ],
      "hiddenFromPublishing": false,
-     "description": "Fill of a small information accent (a Tag, Lozenge, Badge or count chip) over media or a material surface. Pair its label with color.text.inverse and color.border.material. Transparency only, no blur, no gradient. PLUS: PLUS addition: colored material for small accents. The role's bold fill at 95% in light and 92% in dark; increased contrast and reduced transparency fall back to the solid bold.",
+     "description": "Fill of a small information accent (a Tag or Status tag) over media or a material surface. Pair its label with color.text.inverse and color.border.material. Transparency only, no blur, no gradient. PLUS: PLUS addition: colored material for small accents. The role's bold fill at 95% in light and 92% in dark; increased contrast and reduced transparency fall back to the solid bold.",
      "values": {
       "Light": {
        "alias": "color / primitives",

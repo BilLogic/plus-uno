@@ -733,7 +733,7 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-background-brand-boldest  /* The background of elements used to reinforce our brand, that need to stand out a lot */
 --ds-background-brand-boldest-hovered
 --ds-background-brand-boldest-pressed
---ds-background-brand-material-bold  /* Fill of a small brand accent (a Tag, Lozenge, Badge or count chip) over media or a material surface. Pair its label with --ds-text-inverse and --ds-border-material. Transparency only, no blur, no gradient. */
+--ds-background-brand-material-bold  /* Fill of a small brand accent (a Tag or Status tag) over media or a material surface. Pair its label with --ds-text-inverse and --ds-border-material. Transparency only, no blur, no gradient. */
 --ds-background-brand-subtlest  /* The background of elements used to reinforce our brand, but with less emphasis */
 --ds-background-brand-subtlest-hovered
 --ds-background-brand-subtlest-pressed
@@ -784,7 +784,7 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-background-danger-bold-hovered
 --ds-background-danger-bold-pressed
 --ds-background-danger-hovered
---ds-background-danger-material-bold  /* Fill of a small danger accent (a Tag, Lozenge, Badge or count chip) over media or a material surface. Pair its label with --ds-text-inverse and --ds-border-material. Transparency only, no blur, no gradient. */
+--ds-background-danger-material-bold  /* Fill of a small danger accent (a Tag or Status tag) over media or a material surface. Pair its label with --ds-text-inverse and --ds-border-material. Transparency only, no blur, no gradient. */
 --ds-background-danger-pressed
 --ds-background-danger-subtle  /* Background color for non-interactive elements communicating critical danger information (e.g. a StatusTag or CountTag). Sits between subtler and bold in visual emphasis. Not for interactive surfaces — see --ds-background-danger-bold or --ds-background-danger-subtler for interactive states */
 --ds-background-danger-subtler  /* Backgrounds of danger status tags and count tags to ensure accessibility and desired visual appearance */
@@ -796,7 +796,7 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-background-discovery-bold-hovered
 --ds-background-discovery-bold-pressed
 --ds-background-discovery-hovered
---ds-background-discovery-material-bold  /* Fill of a small discovery accent (a Tag, Lozenge, Badge or count chip) over media or a material surface. Pair its label with --ds-text-inverse and --ds-border-material. Transparency only, no blur, no gradient. */
+--ds-background-discovery-material-bold  /* Fill of a small discovery accent (a Tag or Status tag) over media or a material surface. Pair its label with --ds-text-inverse and --ds-border-material. Transparency only, no blur, no gradient. */
 --ds-background-discovery-pressed
 --ds-background-discovery-subtle  /* Background color for non-interactive elements communicating discovery (e.g. a StatusTag or CountTag). Sits between subtler and bold in visual emphasis. Not for interactive surfaces — see --ds-background-discovery-bold or --ds-background-discovery-subtler for interactive states */
 --ds-background-discovery-subtler  /* Backgrounds of discovery status tags and count tags to ensure accessibility and desired visual appearance */
@@ -807,7 +807,7 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-background-information-bold-hovered
 --ds-background-information-bold-pressed
 --ds-background-information-hovered
---ds-background-information-material-bold  /* Fill of a small information accent (a Tag, Lozenge, Badge or count chip) over media or a material surface. Pair its label with --ds-text-inverse and --ds-border-material. Transparency only, no blur, no gradient. */
+--ds-background-information-material-bold  /* Fill of a small information accent (a Tag or Status tag) over media or a material surface. Pair its label with --ds-text-inverse and --ds-border-material. Transparency only, no blur, no gradient. */
 --ds-background-information-pressed
 --ds-background-information-subtle  /* Background color for non-interactive elements communicating information (e.g. a StatusTag or CountTag). Sits between subtler and bold in visual emphasis. Not for interactive surfaces — see --ds-background-information-bold or --ds-background-information-subtler for interactive states */
 --ds-background-information-subtler  /* Backgrounds of information status tags and count tags to ensure accessibility and desired visual appearance */
@@ -839,7 +839,7 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-background-success-bold-hovered
 --ds-background-success-bold-pressed
 --ds-background-success-hovered
---ds-background-success-material-bold  /* Fill of a small success accent (a Tag, Lozenge, Badge or count chip) over media or a material surface. Pair its label with --ds-text-inverse and --ds-border-material. Transparency only, no blur, no gradient. */
+--ds-background-success-material-bold  /* Fill of a small success accent (a Tag or Status tag) over media or a material surface. Pair its label with --ds-text-inverse and --ds-border-material. Transparency only, no blur, no gradient. */
 --ds-background-success-pressed
 --ds-background-success-subtle  /* Background color for non-interactive elements communicating success (e.g. a StatusTag or CountTag). Sits between subtler and bold in visual emphasis. Not for interactive surfaces — see --ds-background-success-bold or --ds-background-success-subtler for interactive states */
 --ds-background-success-subtler  /* Backgrounds of success status tags and count tags to ensure accessibility and desired visual appearance */
@@ -850,7 +850,7 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-background-warning-bold-hovered
 --ds-background-warning-bold-pressed
 --ds-background-warning-hovered
---ds-background-warning-material-bold  /* Fill of a small warning accent (a Tag, Lozenge, Badge or count chip) over media or a material surface. Pair its label with --ds-text-warning-inverse and --ds-border-material. Transparency only, no blur, no gradient. */
+--ds-background-warning-material-bold  /* Fill of a small warning accent (a Tag or Status tag) over media or a material surface. Pair its label with --ds-text-warning-inverse and --ds-border-material. Transparency only, no blur, no gradient. */
 --ds-background-warning-pressed
 --ds-background-warning-subtle  /* Background color for non-interactive elements communicating caution (e.g. a StatusTag). Sits between subtler and bold in visual emphasis. Not for interactive surfaces — see --ds-background-warning-bold or --ds-background-warning-subtler for interactive states */
 --ds-background-warning-subtler  /* Backgrounds of warning status tags and count tags to ensure accessibility and desired visual appearance */

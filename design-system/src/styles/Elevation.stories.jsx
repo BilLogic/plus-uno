@@ -290,18 +290,19 @@ export const Layers = {
 
 /* ----------------------------------------------------- in the system */
 
-/** A Card at rest, a clickable Card, and a Card being dragged. */
+/** The three card surfaces: Raised is the one focal card, placed first in reading order; Sunken is the default; Default is bordered. */
 export const CardLevels = {
     render: () => (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)', padding: 'var(--card-pad)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' }}>
-            <PatternCard surface="raised" title="At rest" description="Raised." />
-            <PatternCard surface="raised" title="Clickable" description="Lifts to overlay on hover." onClick={() => {}} />
-            <PatternCard surface="raised" title="Dragged" description="Overlay while it moves." dragging />
+            <PatternCard surface="raised" title="Raised" description="The one focal card, first in reading order." />
+            <PatternCard surface="sunken" title="Sunken" description="The default. Clickable, it lifts in place on hover." onClick={() => {}} />
+            <PatternCard surface="default" title="Default" description="Bordered and flat." />
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const [rest, , dragged] = canvasElement.querySelectorAll('.plus-pattern-card');
-        await expect(getComputedStyle(dragged).boxShadow).not.toBe(getComputedStyle(rest).boxShadow);
+        const [raised, sunken, bordered] = canvasElement.querySelectorAll('.plus-pattern-card');
+        await expect(getComputedStyle(raised).boxShadow).not.toBe(getComputedStyle(sunken).boxShadow);
+        await expect(getComputedStyle(bordered).boxShadow).toBe(getComputedStyle(sunken).boxShadow);
     },
 };
 
@@ -1060,7 +1061,7 @@ export const CardEdgeContrast = { render: () => <AccessibilityCardEdges />, play
 export const CardsInForcedColors = { render: () => <AccessibilityForcedColors />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
 
 
-/* ----------------------------------------------------- EL-D6 Material page */
+/* ----------------------------------------------------- Material page */
 
 export const MaterialRamp = {
     render: () => <MaterialRampFigure />,
@@ -1102,7 +1103,7 @@ export const MaterialAsIsPair = { render: () => <MaterialAsIs />, play: async ({
 export const MaterialNeutralOnlyPair = { render: () => <MaterialNeutralOnly />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
 export const MaterialOnBlanketPair = { render: () => <MaterialOnBlanket />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
 
-/* ------------------------------------------- EL-D6b Colored material section */
+/* ------------------------------------------- Colored material section */
 
 const expectPair = async (canvasElement) => {
     const pair = canvasElement.querySelector('.sb-ds-dodont-pair');

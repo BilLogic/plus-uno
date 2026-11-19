@@ -161,10 +161,10 @@ export const UsageLiftMeansAction = () => (
     </DoDont>
 );
 
-/** Rule 3: One primary card is Raised; the rest are Sunken vs three lifts compete. */
+/** Rule 3: One focal card is Raised, first in reading order; the rest are Sunken, vs three lifts compete. */
 export const UsageRaiseOneThing = () => (
     <DoDont>
-        <Do caption="One primary card is Raised; the rest are Sunken.">
+        <Do caption="One focal card is Raised and comes first in reading order; the rest are Sunken.">
             <Illustration width={STAGE.w} height={STAGE.h} title="One raised primary card over two flat Sunken cards">
                 <PageCanvas>
                     <Layer x={FRAME.x + 9} y={FRAME.y + 9} w={192} h={48} fill={PAINT.cardSurface} shadow={PAINT.cardShadow} corner="card" />
@@ -208,7 +208,7 @@ export const UsageRaiseOneThing = () => (
 /** Rule 4: Group with a surface color or a border, never a shadow. */
 export const UsageGroupWithoutShadow = () => (
     <DoDont>
-        <Do caption="A Section takes no surface; its cards are Sunken, or Default with a border.">
+        <Do caption="A Section takes no surface; its cards are Sunken (the default), or Default with a border.">
             <Illustration width={STAGE.w} height={STAGE.h} title="Section with no surface holding a bordered Default card and two Sunken cards">
                 <PageCanvas>
                     <SkeletonBar x={FRAME.x + 9} y={FRAME.y + 9} w={58} h={5.5} heading />

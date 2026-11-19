@@ -18,6 +18,29 @@ A material surface is three tokens together. The fill alone dissolves on busy co
 
 ## Choose a material
 
+## Colored material
+
+Color identity for small accents on media or on a material surface: a Tag or a Status tag. Two treatments, and each carries the material edge.
+
+### Tokens
+
+One bold token per color. Text uses the on-bold text tokens that already exist.
+
+### In use
+
+A Tag takes `material` and `materialColor`, and a Status tag takes `material` with its own appearance. Neutral has no colored material.
+
+### How it composes
+
+### Accessibility
+
+Every colored material has a solid fallback.
+
+- **Text contrast.** On-bold text meets 4.5:1 composited over white and over black. That is why light is 95%: at 92% white text over white measures 4.3:1.
+- **Reduced transparency.** Bold becomes solid `--ds-background-{color}-bold`; subtle becomes solid `--ds-surface-overlay` with the same text.
+- **Increased contrast.** Solid as above, and the edge becomes the 3:1 border.
+- **Forced colors.** System colors replace the fill; the 1px border stays and draws the edge.
+
 ## Do and don’t
 
 Each rule as a Do and a Don’t.
@@ -37,3 +60,11 @@ Each rule as a Do and a Don’t.
 ### Neutral material only
 
 ### A blocking material sits on the Blanket
+
+### Keep colored material small
+
+### Pair the fill with its on-bold text
+
+### Give colored material the edge
+
+### Colored material only over something

@@ -528,7 +528,7 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
     };
     const solid = (mode) => [bold[`${mode}_ref`], bold[mode]];
     const r = mk(`color.background.${role}.material.bold`, alphaOf('light', 95), alphaOf('dark', 92), solid('light_ic'), solid('dark_ic'),
-      `Fill of a small ${role} accent (a Tag, Lozenge, Badge or count chip) over media or a material surface. Pair its label with ${role === 'warning' ? 'color.text.warning.inverse' : 'color.text.inverse'} and color.border.material. Transparency only, no blur, no gradient.`,
+      `Fill of a small ${role} accent (a Tag or Status tag) over media or a material surface. Pair its label with ${role === 'warning' ? 'color.text.warning.inverse' : 'color.text.inverse'} and color.border.material. Transparency only, no blur, no gradient.`,
       MATERIAL_WHY);
     rows.push(r);
     byName[r.name] = r;

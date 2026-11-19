@@ -37,7 +37,7 @@ const onPicture = {
   flexWrap: "wrap",
   alignItems: "flex-start",
   gap: "var(--stack-sm)",
-  padding: "var(--pad-md)",
+  padding: "var(--pad-y-md) var(--pad-x-md)",
 };
 
 /** A picture with its accents laid on it. */
@@ -154,9 +154,9 @@ export const ColoredMaterialSmall = () => (
       <div style={picture}>
         <div
           style={{
-            margin: "var(--pad-md)",
+            margin: "var(--pad-y-md) var(--pad-x-md)",
             minHeight: "var(--width-500)",
-            padding: "var(--pad-md)",
+            padding: "var(--pad-y-md) var(--pad-x-md)",
             borderRadius: "var(--radius-lg)",
             border: "var(--border-width-default) solid var(--ds-border-material)",
             background: "var(--ds-background-brand-material-bold)",
@@ -232,7 +232,7 @@ export const ColoredMaterialOverSomething = () => (
     <Dont caption="Colored material on a plain card. On a solid surface use the solid bold token.">
       <div
         style={{
-          padding: "var(--pad-md)",
+          padding: "var(--pad-y-md) var(--pad-x-md)",
           borderRadius: "var(--radius-lg)",
           background: "var(--ds-surface-raised)",
           border: "var(--border-width-default) solid var(--ds-border)",
