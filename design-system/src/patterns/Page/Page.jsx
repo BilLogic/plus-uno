@@ -5,34 +5,16 @@ import { findScrollContainer, scrollToSpot } from '@/lib/navigationMotion';
 import './Page.scss';
 
 /**
- * The elevation levels, lowest to highest. A level is a pair: its fill and the
- * shadow that goes with it, so a page never wears one without the other.
- */
-export const PAGE_LEVELS = ['sunken', 'default', 'raised', 'overlay'];
-
-/**
- * The default page's edge, as the `surface-edge` mixin in
- * `styles/_surface-edge.scss` draws it. For the stories that measure it.
- */
-export const PAGE_EDGE = '0 0 0 var(--page-border-width) var(--ds-border-surface)';
-
-/**
  * Page pattern for PLUS design system.
- * Bare tokenized content box: pick an elevation level, padding scale, radius
- * scale and border — children fill the content slot. The level sets the fill
- * and its shadow together: sunken (the frame's blanket), default (the page,
- * edged by the surface border), raised (a card) and overlay (anything over
- * the UI).
+ * The Page surface: paints `--ds-surface` edge to edge with `--page-pad` (24)
+ * on every side and no radius, border, or shadow; children fill the content
+ * slot.
  *
  * A Page can carry its `title`: the page's one h1, at Heading/large 24,
  * above the content. Sections inside it open at h2.
  */
 const Page = ({
     id,
-    level = 'default',
-    padding = 'md',
-    radius = 'none',
-    border = false,
     as: Component = 'div',
     title,
     header,
@@ -49,10 +31,6 @@ const Page = ({
 
     const classes = [
         'plus-pattern-page',
-        `plus-pattern-page-level-${level}`,
-        `plus-pattern-page-pad-${padding}`,
-        `plus-pattern-page-radius-${radius}`,
-        border ? 'plus-pattern-page-bordered' : '',
         className,
     ].filter(Boolean).join(' ');
 
@@ -82,14 +60,6 @@ const Page = ({
 
 Page.propTypes = {
     id: PropTypes.string,
-    /** Elevation level: its fill and its shadow, as a pair */
-    level: PropTypes.oneOf(PAGE_LEVELS),
-    /** Padding scale (md is the frame's own pad) */
-    padding: PropTypes.oneOf(['none', 'sm', 'md', 'lg']),
-    /** Radius scale */
-    radius: PropTypes.oneOf(['none', 'sm', 'md', 'lg']),
-    /** A bold border on/off */
-    border: PropTypes.bool,
     /** Render element / component */
     as: PropTypes.elementType,
     /** The page's title: its one h1, at Heading/large 24. Leave it unset on a Page that is not a whole page.

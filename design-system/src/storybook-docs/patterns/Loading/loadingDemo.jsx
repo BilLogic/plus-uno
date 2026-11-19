@@ -3,7 +3,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Button, DropdownMenu, ButtonItem, Flag, FlagGroup, IconButton, ProgressBar, Skeleton, StatusTag } from '@/components';
 import { LoadRevealSlot, LoadThenReveal } from '@/lib/loadRevealMotion';
 import { PatternSection } from '@/patterns';
-import { StudentsTable, ViewBar, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
+import { HeaderSearch } from '@/storybook-docs/lib/section-header.jsx';
+import { StudentsTable, ViewPills, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
 
 /**
  * The Loading pattern's examples: what a view shows while PLUS fetches or
@@ -89,7 +90,7 @@ const WaitFlag = ({ title, children }) => (
  */
 export const LoadingList = ({ band = 'shape', first = false, reduced }) => (
     <div style={stack}>
-        <PatternSection title="Students" description="Lincoln Middle" tabs={<ViewBar views={['All students']} filters={null} primary={null} />}>
+        <PatternSection title="Students" description="Lincoln Middle" views={<ViewPills views={['All students']} />} search={<HeaderSearch />}>
             <LoadThenReveal
                 as="section"
                 aria-label="Students"

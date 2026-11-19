@@ -45,7 +45,7 @@ Give each failure one home near its cause. Key cases shows the two submit failur
 
 <TypeGrid>
 <TypeCard of={ErrorsStories.PlaceField} to="#blocked-submit" title="A field" stage={PLACE_STAGE}>The error on the field, after blur. It clears once the rule is met: <a target="_top" href="./?path=/docs/patterns-forms--docs">Forms</a>.</TypeCard>
-<TypeCard of={ErrorsStories.PlaceLoadFailure} to="#a-section-that-could-not-load" title="A view that could not load" stage={PLACE_STAGE}>The error in the empty-state slot, with Try again. The view bar stays.</TypeCard>
+<TypeCard of={ErrorsStories.PlaceLoadFailure} to="#a-section-that-could-not-load" title="A view that could not load" stage={PLACE_STAGE}>The error in the empty-state slot, with Try again. The header rows stay.</TypeCard>
 <TypeCard of={ErrorsStories.PlaceNoAccess} to="#no-access" title="No access" stage={PLACE_STAGE}>The same slot, saying who can help. No action the person cannot take.</TypeCard>
 <TypeCard of={ErrorsStories.PlaceBackgroundJob} to="#a-failed-save-in-the-background" title="A background job" stage={PLACE_STAGE}>A danger Flag that stays, with Try again.</TypeCard>
 <TypeCard of={ErrorsStories.PlacePageCondition} to="#the-whole-page" title="The whole page" stage={PLACE_STAGE}>A danger Banner for a condition that applies to everything on the page, for as long as it holds.</TypeCard>
@@ -155,7 +155,7 @@ It says what happened and what to do, and the field errors it names sit on their
 
 <RuleTag kind="automatic" />
 
-Content that fails to load takes the place an empty view would, in the Section's body, so the view bar and the rest of the page keep working. No access uses the same slot and names who can help.
+Content that fails to load takes the place an empty view would, in the Section's body, so the header rows and the rest of the page keep working. No access uses the same slot and names who can help.
 
 <DoDontPair
     doExample={<FailureInSlot />}

@@ -26,7 +26,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--stack-sm);
-    padding: var(--card-pad-default);
+    padding: var(--card-pad);
 }
 
 .principle-card__framework {
@@ -105,8 +105,8 @@
 [data-loop='understanding'] .loop-bar--a { inset-block-start: 48px; /* docs-literal: token gap: 48px */ width: 40%; }
 [data-loop='understanding'] .loop-bar--b { inset-block-start: var(--loop-puck-size); width: 30%; }
 [data-loop='understanding'] .loop-panel {
-    inset-block: var(--section-pad-y-spacious);
-    inset-inline-end: var(--section-pad-x-spacious);
+    inset-block: calc(var(--card-pad) * 2);
+    inset-inline-end: calc(var(--card-pad) * 2);
     width: 36%;
     border-radius: var(--radius-md);
     background: var(--ds-background-brand-bold);

@@ -376,7 +376,7 @@ export const GroundAndText = () => (
             display: 'flex',
             flexDirection: 'column',
             gap: 'var(--stack-2xl)',
-            padding: 'var(--section-pad-y-default) var(--section-pad-x-default)',
+            padding: 'var(--pad-x-lg)',
             background: 'var(--ds-surface-sunken)',
         }}
     >
@@ -403,9 +403,9 @@ GroundAndText.play = async ({ canvasElement }) => {
             await expect(px(s[`border${side}Width`]), `${id}: no ${side.toLowerCase()} border`).toBe(0);
         }
 
-        // --radius-md corners and the role's named background ground.
-        const radius = tokenLength(canvasElement, '--radius-xl');
-        await expect(radius, 'the radius token is 12px').toBe(12);
+        // --card-radius corners and the role's named background ground.
+        const radius = tokenLength(canvasElement, '--card-radius');
+        await expect(radius, 'the radius token is 16px').toBe(16);
         for (const corner of ['TopLeft', 'TopRight', 'BottomRight', 'BottomLeft']) {
             await expect(px(s[`border${corner}Radius`]), `${id}: ${corner} radius is the section message radius token`).toBe(radius);
         }
@@ -499,7 +499,7 @@ export const Focused = {
 
 const radiusOf = (root, selector) => getComputedStyle(root.querySelector(selector)).borderTopLeftRadius;
 Overview.play = async ({ canvasElement }) => {
-    await expect(radiusOf(canvasElement, '.plus-section-message'), 'Section message radius is 12').toBe('12px');
+    await expect(radiusOf(canvasElement, '.plus-section-message'), 'Section message radius is 16').toBe('16px');
 };
 
 function SectionMessageMotionDemo() {

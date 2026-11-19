@@ -214,7 +214,7 @@ Shapes.play = async ({ canvasElement }) => {
     await expectInert(canvas.getByTestId('stripped'), 'a skeleton given role and tabIndex');
 
     const thumb = canvas.getByTestId('thumb');
-    await expect(radius(thumb), 'radius takes a token name').toBe(12);
+    await expect(radius(thumb), 'radius takes a token name').toBe(16);
 
     // The look: color.skeleton, with the shimmer toward color.skeleton.subtle.
     for (const el of [rect, circle, text, thumb]) {
@@ -475,9 +475,9 @@ export const LoadingCard = () => {
                     display: 'grid',
                     gap: '10px' /* token gap: 10px */,
                     width: '294px' /* token gap: 294px */,
-                    padding: 'var(--card-pad-compact)',
+                    padding: 'var(--card-pad)',
                     border: 'var(--border-width-default) solid var(--ds-border)',
-                    borderRadius: 'var(--card-radius-compact)',
+                    borderRadius: 'var(--card-radius)',
                 }}
             >
                 {loaded ? (

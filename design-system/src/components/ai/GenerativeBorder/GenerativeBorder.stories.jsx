@@ -48,7 +48,7 @@ const box = {
     display: 'flex',
     flexDirection: 'column',
     gap: 'var(--inline-md)',
-    padding: 'var(--card-pad-default)',
+    padding: 'var(--card-pad)',
     border: 'var(--border-width-default) solid var(--ds-border)',
     borderRadius: 'var(--generative-border-radius, var(--card-radius))',
     background: 'var(--ds-surface-raised)',

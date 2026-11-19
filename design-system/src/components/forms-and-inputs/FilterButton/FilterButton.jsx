@@ -12,6 +12,7 @@ export const FILTER_BUTTON_APPEARANCES = ['default', 'subtle'];
  * optional count of what is applied, and a chevron when it opens a menu.
  */
 export const FilterButton = ({
+    label,
     text,
     trailingMetric,
     hasChevronDown = true,
@@ -27,14 +28,22 @@ export const FilterButton = ({
             className={clsx('plus-filter-btn', className)}
             {...props}
         >
-            {text}
+            {label ? (
+                <>
+                    <span className="plus-filter-btn__label">{`${label}:`}</span>
+                    {' '}
+                    <span className="plus-filter-btn__value">{text}</span>
+                </>
+            ) : text}
             {hasMetric && <span className="plus-filter-btn__metric">{trailingMetric}</span>}
         </Button>
     );
 };
 
 FilterButton.propTypes = {
-    /** The filter's name. */
+    /** The field the filter narrows, such as "Status". With it the button reads "Status: Upcoming": the label quiet, `text` the value in ink. */
+    label: PropTypes.string,
+    /** The filter's name, or its value when `label` is set. */
     text: PropTypes.string.isRequired,
     /** The count shown after the name. `0` shows; leave it out to hide it. */
     trailingMetric: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),

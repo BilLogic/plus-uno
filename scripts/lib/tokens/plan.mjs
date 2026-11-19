@@ -201,12 +201,6 @@ export const TOKEN_LADDER = [
 
   // ─── Templates / Page ──────────────────────────────────────────────────
   { tier: 'templates', group: 'Page', new: '--page-pad', old: '--page-pad', use: 'Padding around a Page\'s content at the current breakpoint.' },
-  { tier: 'templates', group: 'Page', new: '--page-pad-x-compact', old: null, value: '--space-150', use: 'Horizontal padding of a Page with compact spacing.' },
-  { tier: 'templates', group: 'Page', new: '--page-pad-x-default', old: null, value: '--space-200', use: 'Horizontal padding of a Page with default spacing.' },
-  { tier: 'templates', group: 'Page', new: '--page-pad-x-spacious', old: null, value: '--space-250', use: 'Horizontal padding of a Page with spacious spacing.' },
-  { tier: 'templates', group: 'Page', new: '--page-pad-y-compact', old: null, value: '--space-100', use: 'Vertical padding of a Page with compact spacing.' },
-  { tier: 'templates', group: 'Page', new: '--page-pad-y-default', old: null, value: '--space-150', use: 'Vertical padding of a Page with default spacing.' },
-  { tier: 'templates', group: 'Page', new: '--page-pad-y-spacious', old: null, value: '--space-200', use: 'Vertical padding of a Page with spacious spacing.' },
   { tier: 'templates', group: 'Page', new: '--page-stack-sm', old: '--page-stack-sm', use: 'Vertical gap between closely related blocks on a Page, such as a header and its subtitle.' },
   { tier: 'templates', group: 'Page', new: '--page-stack-md', old: '--page-stack-md', use: 'Vertical gap between sections on a Page.' },
   { tier: 'templates', group: 'Page', new: '--page-stack-lg', old: '--page-stack-lg', use: 'Vertical gap between major regions of a Page.' },
@@ -223,13 +217,6 @@ export const TOKEN_LADDER = [
   { tier: 'templates', group: 'Panel', new: '--panel-inline-lg', old: null, ref: 'var(--space-100)', use: 'Horizontal gap between a Panel footer disclaimer and its actions.' },
 
   // ─── Templates / Section ───────────────────────────────────────────────
-  { tier: 'templates', group: 'Section', new: '--section-pad-x-compact', old: null, value: '--space-100', use: 'Horizontal padding of a PatternSection with compact spacing.' },
-  { tier: 'templates', group: 'Section', new: '--section-pad-x-default', old: null, value: '--space-150', use: 'Horizontal padding of a PatternSection with default spacing.' },
-  { tier: 'templates', group: 'Section', new: '--section-pad-x-spacious', old: null, value: '--space-200', use: 'Horizontal padding of a PatternSection with spacious spacing.' },
-  { tier: 'templates', group: 'Section', new: '--section-pad-y-compact', old: null, value: '--space-100', use: 'Vertical padding of a PatternSection with compact spacing.' },
-  { tier: 'templates', group: 'Section', new: '--section-pad-y-default', old: null, value: '--space-150', use: 'Vertical padding of a PatternSection with default spacing.' },
-  { tier: 'templates', group: 'Section', new: '--section-pad-y-spacious', old: null, value: '--space-200', use: 'Vertical padding of a PatternSection with spacious spacing.' },
-  { tier: 'templates', group: 'Section', new: '--section-radius', old: null, ref: 'var(--radius-xxl)', note: 'the rounding of a Section with a fill', use: 'Corner rounding of a PatternSection that has a fill.' },
   { tier: 'templates', group: 'Section', new: '--section-stack-sm', old: '--section-stack-sm', use: 'Vertical gap between a section header and its content.' },
   { tier: 'templates', group: 'Section', new: '--section-stack-md', old: '--section-stack-md', use: 'Vertical gap between blocks inside a PatternSection.' },
   { tier: 'templates', group: 'Section', new: '--section-stack-lg', old: '--section-stack-lg', use: 'Vertical gap between groups of blocks inside a PatternSection.' },
@@ -239,9 +226,7 @@ export const TOKEN_LADDER = [
   { tier: 'templates', group: 'Section', new: '--section-toolbar-count-min-width', old: null, ref: 'var(--size-300)', use: 'Minimum width of the result count in a PatternSection toolbar before it truncates.' },
 
   // ─── Templates / Card ──────────────────────────────────────────────────
-  { tier: 'templates', group: 'Card', new: '--card-pad-compact', old: null, value: '--space-100', use: 'Padding inside a PatternCard with compact spacing.' },
-  { tier: 'templates', group: 'Card', new: '--card-pad-default', old: null, value: '--space-125', use: 'Padding inside a PatternCard with default spacing.' },
-  { tier: 'templates', group: 'Card', new: '--card-pad-spacious', old: null, value: '--space-150', use: 'Padding inside a PatternCard with spacious spacing.' },
+  { tier: 'templates', group: 'Card', new: '--card-pad', old: null, value: '--space-100', use: 'Padding inside a PatternCard at every size.' },
   { tier: 'templates', group: 'Card', new: '--card-stack-sm', old: '--card-stack-sm', use: 'Vertical gap between tightly related lines in a PatternCard, such as a title and its meta.' },
   { tier: 'templates', group: 'Card', new: '--card-stack-md', old: '--card-stack-md', use: 'Vertical gap between blocks in a PatternCard.' },
   { tier: 'templates', group: 'Card', new: '--card-stack-lg', old: '--card-stack-lg', use: 'Vertical gap between a PatternCard\'s header, body and footer.' },
@@ -252,10 +237,23 @@ export const TOKEN_LADDER = [
   { tier: 'templates', group: 'Card', new: '--card-min-width-md', old: '--card-min-width-md', use: 'Narrowest a default PatternCard may shrink in a grid.' },
   { tier: 'templates', group: 'Card', new: '--card-min-width-lg', old: '--card-min-width-lg', use: 'Narrowest a large PatternCard may shrink in a grid.' },
   { tier: 'templates', group: 'Card', new: '--card-radius', old: null, ref: 'var(--radius-xxl)', use: 'Corner rounding of a PatternCard.' },
-  { tier: 'templates', group: 'Card', new: '--card-radius-compact', old: '--card-radius-sm', ref: 'var(--radius-xl)', use: 'Corner rounding of a compact PatternCard or a card nested in another surface.' },
   { tier: 'templates', group: 'Card', new: '--card-max-height-sm', old: '--card-max-height-sm', use: 'Tallest a short scrolling PatternCard may grow.' },
   { tier: 'templates', group: 'Card', new: '--card-max-height-md', old: '--card-max-height-md', use: 'Tallest a default scrolling PatternCard may grow.' },
   { tier: 'templates', group: 'Card', new: '--card-max-height-lg', old: '--card-max-height-lg', use: 'Tallest a tall scrolling PatternCard may grow.' },
+  { tier: 'templates', group: 'Card', new: '--card-surface-sunken', old: null, ref: 'var(--ds-surface-sunken)', codeOnly: true, use: 'Surface fill of a sunken PatternCard (the default).' },
+  { tier: 'templates', group: 'Card', new: '--card-surface-default', old: null, ref: 'var(--ds-surface)', codeOnly: true, use: 'Surface fill of a default PatternCard.' },
+  { tier: 'templates', group: 'Card', new: '--card-surface-raised', old: null, ref: 'var(--ds-surface-raised)', codeOnly: true, use: 'Surface fill of a raised PatternCard, and of a clickable card on hover.' },
+  { tier: 'templates', group: 'Card', new: '--card-surface-raised-hovered', old: null, ref: 'var(--ds-surface-raised-hovered)', codeOnly: true, use: 'Surface fill of a clickable raised PatternCard while hovered.' },
+  { tier: 'templates', group: 'Card', new: '--card-surface-raised-pressed', old: null, ref: 'var(--ds-surface-raised-pressed)', codeOnly: true, use: 'Surface fill of a clickable PatternCard while pressed.' },
+  { tier: 'templates', group: 'Card', new: '--card-surface-overlay', old: null, ref: 'var(--ds-surface-overlay)', codeOnly: true, use: 'Surface fill of a PatternCard while dragged.' },
+  { tier: 'templates', group: 'Card', new: '--card-border-default', old: null, ref: 'var(--ds-border)', codeOnly: true, use: 'Border color of a default PatternCard.' },
+  { tier: 'templates', group: 'Card', new: '--card-border-width', old: null, ref: 'var(--border-width-default)', codeOnly: true, use: 'Border width on every PatternCard (transparent on sunken and raised so forced colors draw an edge).' },
+  { tier: 'templates', group: 'Card', new: '--card-shadow-raised', old: null, ref: 'var(--ds-shadow-raised)', codeOnly: true, use: 'Shadow of a raised PatternCard, of a clickable sunken or default card on hover, and when pressed.' },
+  { tier: 'templates', group: 'Card', new: '--card-shadow-overlay', old: null, ref: 'var(--ds-shadow-overlay)', codeOnly: true, use: 'Shadow of a dragged PatternCard, and of a clickable raised card on hover.' },
+  { tier: 'templates', group: 'Card', new: '--card-text', old: null, ref: 'var(--ds-text)', codeOnly: true, use: 'Primary text color inside a PatternCard.' },
+  { tier: 'templates', group: 'Card', new: '--card-text-subtle', old: null, ref: 'var(--ds-text-subtle)', codeOnly: true, use: 'Secondary description text color inside a PatternCard.' },
+  { tier: 'templates', group: 'Card', new: '--card-title-font-lg', old: null, ref: 'var(--heading-md)', codeOnly: true, use: 'Title font of a PatternCard with a half-width side image.' },
+  { tier: 'templates', group: 'Card', new: '--card-description-font', old: null, ref: 'var(--body-default)', codeOnly: true, use: 'Description font of a PatternCard.' },
 
   // ─── Templates / Table ─────────────────────────────────────────────────
   { tier: 'templates', group: 'Table', new: '--table-pad-x-cell', old: '--table-pad-x-cell', use: 'Horizontal padding inside a table cell.' },
@@ -493,7 +491,6 @@ export const TOKEN_LADDER = [
  *    instead, and its 1.5px and 3px strokes take the 2px stroke.
  *  - `--element-{pad|gap|radius}-{default|compact}`: the role tokens this
  *    plan's first pass wrote; no "roles" concept survives (Bill, 2026-11-04).
- *  - `--card-pad-{sm|md|lg}`: the same 16/20/24 as `--card-pad-{compact|default|spacious}`.
  */
 export const RETIRED_RENAMES = {
   '--size-element-pad-x-lg': '--pad-x-lg',
@@ -534,9 +531,7 @@ export const RETIRED_RENAMES = {
   '--page-radius-md': '--radius-xl',
   '--tile-radius-sm': '--space-0375',
   '--tile-radius-lg': '--radius-control-lg',
-  '--card-pad-sm': '--card-pad-compact',
-  '--card-pad-md': '--card-pad-default',
-  '--card-pad-lg': '--card-pad-spacious',
+  '--card-radius-sm': '--card-radius',
   '--layout-calendar-nav': '--control-sm',
 };
 

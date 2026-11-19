@@ -156,7 +156,7 @@ Same group: `Banner` · `Dialog` · `EmptyState` · `Flag` · `InlineMessage` ·
 | Icon | `--ds-icon-brand`, `--ds-icon-subtle`, `--ds-icon-success`, `--ds-icon-danger`, `--ds-icon-warning`, `--ds-icon-information` |
 | Title, body, link | `--heading-sm`, `--body-default`, `--ds-text`; actions at `--type-weight-medium` |
 | Divider | `--ds-border`, `--border-width-default` |
-| Padding, gaps, corner | `--card-pad-compact`, `--card-stack-sm`, `--stack-md`, `--radius-md` |
+| Padding, gaps, corner | `--card-pad`, `--card-stack-sm`, `--stack-md`, `--card-radius` |
 | Dismiss | `--control-md` |
 
 ## Content guidelines
@@ -192,7 +192,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--border-width-default` · `--card-inline-sm` · `--card-pad-compact` · `--card-radius-compact` · `--control-md` · `--ds-border` · `--ds-text` · `--heading-sm` · `--icon-lg` · `--stack-md` · `--type-weight-medium`
+`--body-default` · `--border-width-default` · `--card-inline-sm` · `--card-pad` · `--card-radius` · `--control-md` · `--ds-border` · `--ds-text` · `--heading-sm` · `--icon-lg` · `--stack-md` · `--type-weight-medium`
 
 From `design-system/src/components/messaging/SectionMessage/SectionMessage.scss`. Override these through the token layer, never with a literal.
 

@@ -20,14 +20,14 @@ import * as FoundationsStories from './Foundations.stories.jsx';
 
 <FoundationSection title="Chart container and tooltip">
 
-A chart sits in a Card: <C>--card-pad-compact</C> sets the chart inset, and the chart adds no outer padding of its own. The tooltip uses the Popup pattern's surface, shadow, radius, padding and layer tokens rather than built-in SVG shadow or corner options.
+A chart sits in a Card: <C>--card-pad</C> sets the chart inset, and the chart adds no outer padding of its own. The tooltip uses the Popup pattern's surface, shadow, radius, padding and layer tokens rather than built-in SVG shadow or corner options.
 
 <Canvas of={FoundationsStories.TooltipSurface} />
 
 <RefTable
     head={['Role', 'Token']}
     rows={[
-        ['Chart padding', <C>--card-pad-compact</C>],
+        ['Chart padding', <C>--card-pad</C>],
         ['Tooltip surface', <C>--ds-surface-overlay</C>],
         ['Tooltip shadow', <C>--ds-shadow-overlay</C>],
         ['Tooltip radius', <C>--popup-radius</C>],

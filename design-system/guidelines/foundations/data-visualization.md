@@ -16,7 +16,7 @@ names which token does which job, and why, for `design-system/src/dataviz/`
 ## Chart container
 
 The chart container is a Card: its surface and its padding, not a chart-drawn
-box. `chartTheme.js`'s `chart.spacing` reads `--card-pad-compact` — the
+box. `chartTheme.js`'s `chart.spacing` reads `--card-pad` — the
 density this component already rendered at — not a literal `16`. Highcharts'
 `chart.spacing` is a layout number, not a CSS property, so it can't take a
 `var()` string directly; `chartTheme.js` resolves the token to a pixel number

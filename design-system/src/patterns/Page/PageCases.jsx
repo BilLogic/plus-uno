@@ -3,8 +3,8 @@ import { Button, PageHeader } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { Page, PatternCard, PatternSection } from '@/patterns';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
-import { ViewBar } from '@/storybook-docs/lib/view-bar.jsx';
-import { PageTabs, SessionsTable, ViewBarWithAdd, ViewSelect } from './pageDemo.jsx';
+import { ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
+import { AddStudentAction, PageTabs, SessionsTable, StudentViews, ViewSelect } from './pageDemo.jsx';
 
 /**
  * The live do and don't examples of the Page template page, built from
@@ -19,16 +19,16 @@ const InDocs = ({ children }) => (
     </CaseSurface>
 );
 
-/** "Add" ends the collection's view bar; the header carries only page actions. */
-export const AddInViewBar = () => (
+/** "Add" is the Section's one action, in its title row; the page header carries only page actions. */
+export const AddInTitleRow = () => (
     <InDocs>
-        <Page header={<PageHeader title="Students" titleAs="h4" />} padding="md">
-            <PatternSection title="Students" type="tabs-only" tabs={<ViewBarWithAdd />} />
+        <Page header={<PageHeader title="Students" titleAs="h4" />}>
+            <PatternSection title="Students" views={<StudentViews />} actions={<AddStudentAction />} />
         </Page>
     </InDocs>
 );
 
-/** The same Primary twice: in the page header and in the Section's view bar. */
+/** The same Primary twice: in the page header and in the Section's title row. */
 export const AddTwice = () => (
     <InDocs>
         <Page
@@ -39,9 +39,8 @@ export const AddTwice = () => (
                     actions={<Button text="Add student" iconBefore="user-plus" appearance="primary" onClick={() => {}} />}
                 />
             )}
-            padding="md"
         >
-            <PatternSection title="Students" type="tabs-only" tabs={<ViewBarWithAdd />} />
+            <PatternSection title="Students" views={<StudentViews />} actions={<AddStudentAction />} />
         </Page>
     </InDocs>
 );
@@ -60,14 +59,13 @@ export const OneTabSystem = () => {
                         bottomBar={<PageTabs active={tab} onSelect={setTab} labels={['Overview', 'Sessions']} />}
                     />
                 )}
-                padding="md"
             >
                 {tab === 'overview' ? (
                     <PatternSection title="Overview">
                         <PatternCard title="Lincoln Middle · Grade 8" description="Math · Tue & Thu at 4:30 PM" />
                     </PatternSection>
                 ) : (
-                    <PatternSection title="Sessions" type="tabs-only" tabs={<ViewSelect value={status} onChange={setStatus} />}>
+                    <PatternSection title="Sessions" views={<ViewSelect value={status} onChange={setStatus} />}>
                         <SessionsTable status={status} />
                     </PatternSection>
                 )}
@@ -89,12 +87,10 @@ export const TwoTabSystems = () => {
                         bottomBar={<PageTabs active={tab} onSelect={setTab} labels={['Overview', 'Sessions']} />}
                     />
                 )}
-                padding="md"
             >
                 <PatternSection
                     title="Sessions"
-                    type="tabs-only"
-                    tabs={<ViewBar views={['Upcoming', 'Past']} search={false} more={false} />}
+                    views={<ViewPills views={['Upcoming', 'Past']} />}
                 >
                     <SessionsTable status="upcoming" />
                 </PatternSection>

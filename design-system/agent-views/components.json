@@ -111,8 +111,8 @@
       "tokens": [
         "--body-lg",
         "--border-width-default",
-        "--card-pad-default",
-        "--card-radius-compact",
+        "--card-pad",
+        "--card-radius",
         "--ds-background-neutral-subtle-hovered",
         "--ds-background-neutral-subtle-pressed",
         "--ds-background-selected",
@@ -2231,7 +2231,7 @@
         "--body-default",
         "--border-width-default",
         "--border-width-selected",
-        "--card-pad-default",
+        "--card-pad",
         "--checkbox-control-size",
         "--choice-tile-width",
         "--control-sm",
@@ -2836,7 +2836,7 @@
       ],
       "tokens": [
         "--border-width-default",
-        "--card-radius-compact",
+        "--card-radius",
         "--code-default",
         "--ds-background-code-default",
         "--ds-background-code-gutter",
@@ -3010,7 +3010,7 @@
         "--body-default",
         "--body-sm",
         "--border-width-default",
-        "--card-radius-compact",
+        "--card-radius",
         "--comment-gap",
         "--comment-pad",
         "--comment-replies-indent",
@@ -5522,7 +5522,8 @@
         "--body-default",
         "--body-sm",
         "--border-width-default",
-        "--card-radius-compact",
+        "--card-pad",
+        "--card-radius",
         "--ds-background-brand-subtlest",
         "--ds-background-danger-subtler",
         "--ds-background-disabled",
@@ -5547,8 +5548,6 @@
         "--focus-ring-width",
         "--icon-sm",
         "--inline-md",
-        "--pad-x-md",
-        "--pad-y-md",
         "--stack-md",
         "--stack-sm"
       ]
@@ -5562,12 +5561,21 @@
       "summary": "Filter button: opens or toggles a filter. It shows the filter's name, an optional count of what is applied, and a chevron when it opens a menu.",
       "props": [
         {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The field the filter narrows, such as \"Status\". With it the button reads \"Status: Upcoming\": the label quiet, `text` the value in ink.",
+          "deprecated": null
+        },
+        {
           "name": "text",
           "type": "string",
           "required": true,
           "default": null,
           "values": null,
-          "description": "The filter's name.",
+          "description": "The filter's name, or its value when `label` is set.",
           "deprecated": null
         },
         {
@@ -5660,6 +5668,7 @@
       ],
       "stories": [
         "Overview",
+        "Label",
         "Metric",
         "Appearances",
         "Spacing",
@@ -5673,6 +5682,8 @@
         "Interactive"
       ],
       "tokens": [
+        "--ds-text",
+        "--ds-text-subtle",
         "--ds-text-subtlest",
         "--inline-md",
         "--inline-sm"
@@ -8878,7 +8889,7 @@
       "import": "import { Page } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/Page/Page.jsx",
-      "summary": "Bare tokenized content box: pick an elevation level, padding scale, radius scale and border — children fill the content slot. The level sets the fill and its shadow together: sunken (the frame's blanket), default (the page, edged by the surface border), raised (a card) and overlay (anything over the UI). A Page can carry its `title`: the page's one h1, at Heading/large 24, above the content. Sections inside it open at h2.",
+      "summary": "The Page surface: paints `--ds-surface` edge to edge with `--page-pad` (24) on every side and no radius, border, or shadow; children fill the content slot. A Page can carry its `title`: the page's one h1, at Heading/large 24, above the content. Sections inside it open at h2.",
       "props": [
         {
           "name": "id",
@@ -8887,57 +8898,6 @@
           "default": null,
           "values": null,
           "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "level",
-          "type": "enum",
-          "required": false,
-          "default": "'default'",
-          "values": [
-            "sunken",
-            "default",
-            "raised",
-            "overlay"
-          ],
-          "description": "Elevation level: its fill and its shadow, as a pair",
-          "deprecated": null
-        },
-        {
-          "name": "padding",
-          "type": "enum",
-          "required": false,
-          "default": "'md'",
-          "values": [
-            "none",
-            "sm",
-            "md",
-            "lg"
-          ],
-          "description": "Padding scale (md is the frame's own pad)",
-          "deprecated": null
-        },
-        {
-          "name": "radius",
-          "type": "enum",
-          "required": false,
-          "default": "'none'",
-          "values": [
-            "none",
-            "sm",
-            "md",
-            "lg"
-          ],
-          "description": "Radius scale",
-          "deprecated": null
-        },
-        {
-          "name": "border",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "A bold border on/off",
           "deprecated": null
         },
         {
@@ -9006,15 +8966,6 @@
       ],
       "stories": [
         "Overview",
-        "Sunken",
-        "DefaultLevel",
-        "Raised",
-        "Overlay",
-        "StepNone",
-        "StepCompact",
-        "StepDefault",
-        "StepSpacious",
-        "Bordered",
         "WithTitle",
         "HeaderAndBanner",
         "OptionalSlots",
@@ -9036,26 +8987,12 @@
         "MotionScrollToSpotReduced"
       ],
       "tokens": [
-        "--ds-border-bold",
-        "--ds-shadow-overlay",
-        "--ds-shadow-raised",
         "--ds-surface",
-        "--ds-surface-overlay",
-        "--ds-surface-raised",
-        "--ds-surface-sunken",
         "--ds-text",
         "--heading-lg",
         "--heading-lg-tracking",
-        "--page-border-width",
         "--page-pad",
-        "--page-pad-x-compact",
-        "--page-pad-x-spacious",
-        "--page-pad-y-compact",
-        "--page-pad-y-spacious",
-        "--page-stack-md",
-        "--radius-lg",
-        "--radius-xl",
-        "--radius-xxl"
+        "--page-stack-md"
       ]
     },
     {
@@ -9467,7 +9404,7 @@
       "import": "import { PatternCard } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/PatternCard/PatternCard.jsx",
-      "summary": "PLUS card: an optional image, content and footer on the raised surface and shadow. - **Image placement**: `top` (default), `start` or `end`. Side images apply at the large card minimum width and fill the height. `imageSplit` chooses one third (default) or one half; half uses Heading md on a side card. Below the large minimum width, the image returns to the top with its own ratio. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: `padding` sets Card/pad-compact · default · spacious (via prop values `'sm'`, `'md'`, `'lg'`), the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: the raised pair at rest. A card with an `onClick` lifts on hover to the raised surface's hovered step under the overlay shadow, and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.",
+      "summary": "PLUS card: an optional image, content and footer on a `sunken`, `default`, or `raised` surface. - **Surface**: `sunken` (default, flat), `default` (page surface with a 1px border, flat), or `raised` (raised surface and shadow). Every card carries a 1px border (transparent on sunken and raised) so forced colors draw its edge. - **Image placement**: `top` (default), `start` or `end`. Side images apply at the large card minimum width and fill the height. `imageSplit` chooses one third (default) or one half; half uses Heading md on a side card. Below the large minimum width, the image returns to the top with its own ratio. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: padding uses `--card-pad` and radius uses `--card-radius` at every size, the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: a clickable `sunken` or `default` card lifts to Raised on hover in place and settles to the raised shadow while pressed; a clickable `raised` card lifts to the raised hovered step under the overlay shadow and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.",
       "props": [
         {
           "name": "id",
@@ -9558,16 +9495,16 @@
           "deprecated": null
         },
         {
-          "name": "padding",
+          "name": "surface",
           "type": "enum",
           "required": false,
-          "default": "'md'",
+          "default": "'sunken'",
           "values": [
-            "sm",
-            "md",
-            "lg"
+            "sunken",
+            "default",
+            "raised"
           ],
-          "description": "Padding scale: Card/pad-compact · default · spacious (16 · 20 · 24)",
+          "description": "Surface level: sunken (default, flat), default (page fill with a 1px border, flat), or raised (raised fill and shadow)",
           "deprecated": null
         },
         {
@@ -9653,9 +9590,9 @@
         "Elevation",
         "Anatomy",
         "Jobs",
-        "SizeCompact",
-        "SizeDefault",
-        "SizeSpacious",
+        "SizeSmall",
+        "SizeMedium",
+        "SizeLarge",
         "ImageWide",
         "ImageStandard",
         "ImageSquare",
@@ -9677,36 +9614,41 @@
         "BodyOnly",
         "WithFooter",
         "CustomHeader",
+        "SurfaceSunken",
+        "SurfaceDefault",
+        "SurfaceRaised",
         "Static",
         "Clickable",
         "Dragging",
+        "ForcedColors",
         "LoadingCard",
         "Rows",
         "PlacementBoundary"
       ],
       "tokens": [
-        "--body-default",
+        "--card-border-default",
+        "--card-border-width",
+        "--card-description-font",
         "--card-inline-md",
-        "--card-pad-compact",
-        "--card-pad-default",
-        "--card-pad-spacious",
+        "--card-pad",
         "--card-radius",
-        "--card-radius-compact",
+        "--card-shadow-overlay",
+        "--card-shadow-raised",
         "--card-stack-lg",
         "--card-stack-md",
         "--card-stack-sm",
+        "--card-surface-default",
+        "--card-surface-overlay",
+        "--card-surface-raised",
+        "--card-surface-raised-hovered",
+        "--card-surface-raised-pressed",
+        "--card-surface-sunken",
+        "--card-text",
+        "--card-text-subtle",
+        "--card-title-font-lg",
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
-        "--ds-shadow-overlay",
-        "--ds-shadow-raised",
-        "--ds-surface-overlay",
-        "--ds-surface-raised",
-        "--ds-surface-raised-hovered",
-        "--ds-surface-raised-pressed",
-        "--ds-text",
-        "--ds-text-subtle",
-        "--ds-utility-elevation-surface-current",
-        "--heading-md"
+        "--ds-utility-elevation-surface-current"
       ]
     },
     {
@@ -9793,6 +9735,78 @@
             "tabs-only"
           ],
           "description": "Header type. Read from the slots when left off; pass `tabs-only` to show only the tabs row",
+          "deprecated": null
+        },
+        {
+          "name": "views",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Row 2, at the start: the views, usually Tabs in the pill appearance. It scrolls sideways when it does not fit.",
+          "deprecated": null
+        },
+        {
+          "name": "format",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Row 2, at the end: the format switch (Table / Cards). With no `views` it moves to the end of row 3.",
+          "deprecated": null
+        },
+        {
+          "name": "search",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Row 3, at the start: the Search field at compact spacing, which draws 32.",
+          "deprecated": null
+        },
+        {
+          "name": "filters",
+          "type": "arrayOf",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "Row 3, after Search: one `{ key, label, text, isSelected, onClick, menu }` per trigger, drawn as a FilterButton that reads \"label: text\". `menu` is `(trigger) => node`: hand the trigger to a Popup select or a Filter menu, so the same button opens the list and keeps its selected state. Three show; the rest go in \"More filters\" with a count. Under 768 they fold into one Filter button. When they do not fit beside Search they wrap to their own row, end-aligned.",
+          "deprecated": null
+        },
+        {
+          "name": "count",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Row 3, at the end once a filter is applied: how many rows match, such as \"3 of 12\".",
+          "deprecated": null
+        },
+        {
+          "name": "onClearAll",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Runs when \"Clear all\" is pressed. The button shows once a filter is applied.",
+          "deprecated": null
+        },
+        {
+          "name": "onMoreFilters",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Runs when \"More filters\" is pressed.",
+          "deprecated": null
+        },
+        {
+          "name": "onOpenFilters",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Runs when the Filter button of a narrow Section is pressed.",
           "deprecated": null
         },
         {
@@ -9928,28 +9942,16 @@
           "deprecated": null
         },
         {
-          "name": "gap",
+          "name": "spacing",
           "type": "enum",
           "required": false,
-          "default": "'md'",
+          "default": "'default'",
           "values": [
-            "sm",
-            "md",
-            "lg"
+            "default",
+            "compact",
+            "spacious"
           ],
-          "description": "Gap between the header, the body and the footer (Section/stack tokens); `md` is the Figma value",
-          "deprecated": null
-        },
-        {
-          "name": "fill",
-          "type": "enum",
-          "required": false,
-          "default": "'none'",
-          "values": [
-            "none",
-            "subtle"
-          ],
-          "description": "`subtle` sets the section on the sunken surface with a pad and a radius; `none` (default) draws nothing",
+          "description": "Space between the header, the body and the footer (Section/stack tokens); `default` is the Figma value",
           "deprecated": null
         },
         {
@@ -9992,15 +9994,14 @@
       "stories": [
         "Overview",
         "HeaderDefault",
-        "HeaderTabs",
-        "HeaderToolbar",
         "HeaderCustom",
-        "HeaderTabsOnly",
         "LayoutSingle",
         "LayoutSplit",
         "LayoutSubsections",
-        "FillSubtle",
+        "SunkenCard",
+        "DetailIsSunkenCard",
         "CardNesting",
+        "NoSurfaceNoPad",
         "Footer",
         "Anatomy",
         "Levels",
@@ -10021,33 +10022,31 @@
         "TypeMainAndSide",
         "TypeForm",
         "TypeSubsections",
-        "HeaderTypeTitle",
-        "HeaderTypeTitleAndActions",
-        "HeaderTypeViewBarOneView",
-        "HeaderTypeViewBarSeveralViews",
-        "HeaderTypeFormatSwitch",
-        "HeaderTypeViewBarAlone",
-        "HeaderTypeUnderPageTabs",
-        "HeaderTypeSubsection",
+        "Full",
+        "FiltersApplied",
+        "NoViews",
+        "ViewsOnly",
+        "ManyFilters",
+        "WrappedFilters",
+        "RowsSelected",
+        "Narrow",
+        "Subsection",
         "SideAtEnd",
         "FilterSideAtStart",
         "ResponsiveWidth",
-        "RowsSelected",
         "EmptyInTable",
         "AnatomyQueue"
       ],
       "tokens": [
         "--body-default",
         "--body-sm",
+        "--card-stack-md",
         "--control-md",
-        "--ds-background-neutral-subtle-hovered",
-        "--ds-background-neutral-subtle-pressed",
         "--ds-icon-subtle",
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
         "--ds-motion-spatial-fast",
         "--ds-motion-spatial-fast-duration",
-        "--ds-surface-sunken",
         "--ds-text",
         "--ds-text-subtle",
         "--grid-gutter",
@@ -10061,9 +10060,6 @@
         "--inline-sm",
         "--section-min-width-main",
         "--section-min-width-side",
-        "--section-pad-x-default",
-        "--section-pad-y-default",
-        "--section-radius",
         "--section-stack-lg",
         "--section-stack-md",
         "--section-stack-sm",
@@ -11718,7 +11714,7 @@
         "--body-default",
         "--border-width-default",
         "--border-width-selected",
-        "--card-pad-default",
+        "--card-pad",
         "--choice-tile-width",
         "--control-sm",
         "--ds-background-disabled",
@@ -13184,8 +13180,8 @@
         "--body-default",
         "--border-width-default",
         "--card-inline-sm",
-        "--card-pad-compact",
-        "--card-radius-compact",
+        "--card-pad",
+        "--card-radius",
         "--control-md",
         "--ds-border",
         "--ds-text",
@@ -14068,10 +14064,7 @@
             "element-radius-lg",
             "element-radius-full",
             "card-radius-sm",
-            "card-radius-md",
-            "section-radius-sm",
-            "section-radius-md",
-            "section-radius-lg"
+            "card-radius-md"
           ],
           "description": "A radius token name, such as `element-radius-md` or `card-radius-sm`. Ignored, with a warning, by presets, by `circle` (always round) and by several text `lines`, which keep the text bar's radius.",
           "deprecated": null

@@ -377,7 +377,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
         <GenerativeBorder isActive={step === 'landing'} radius="radius-lg">
             <div
                 style={{
-                    padding: 'var(--card-pad-compact) var(--card-pad-spacious)',
+                    padding: 'var(--card-pad)',
                     background: 'var(--ds-surface)',
                     borderRadius: 'var(--radius-lg)',
                     font: 'var(--body-sm)',
@@ -518,7 +518,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
             <div
                 className="plus-popup"
                 style={{
-                    padding: 'var(--card-pad-compact) var(--card-pad-spacious)',
+                    padding: 'var(--card-pad)',
                     borderRadius: 'var(--radius-lg)',
                     background: 'var(--ds-surface-overlay)',
                     boxShadow: 'var(--ds-shadow-overlay)',
@@ -1207,7 +1207,7 @@ export const MotionComponentStage = ({
             style={{
                 position: 'relative',
                 minHeight: 168,
-                padding: 'var(--section-pad-x-spacious)',
+                padding: 'calc(var(--card-pad) * 2)',
                 borderRadius: 'var(--card-radius)',
                 background: 'var(--ds-surface-sunken)',
                 display: 'flex',

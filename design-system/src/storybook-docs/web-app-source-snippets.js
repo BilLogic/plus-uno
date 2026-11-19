@@ -202,7 +202,7 @@ export const webAppSourceSnippets = {
         '<Spinner />'
     ]),
     flag: snippet([
-        '<FlagGroup style={{ padding: \'var(--card-pad-compact)\' }} containerPosition="static">',
+        '<FlagGroup style={{ padding: \'var(--card-pad)\' }} containerPosition="static">',
         '  <Flag title="Normal flag" timestamp="Just now">',
         '    This is a normal flag (default).',
         '  </Flag>',

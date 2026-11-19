@@ -110,7 +110,7 @@ const FadeInFromZero = () => {
                 opacity: 0,
                 background: 'var(--ds-surface)',
                 color: 'var(--ds-text)',
-                padding: 'var(--section-pad-y-default)',
+                padding: 'var(--section-stack-lg)',
             }}
         >
             Session notes saved.

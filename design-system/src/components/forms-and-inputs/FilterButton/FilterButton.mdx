@@ -35,6 +35,8 @@ what is applied, and a chevron when it opens a menu.
 
 <ComponentExample of={FilterButtonStories.Overview} title="Default" description="A filter's name with a chevron." />
 
+<ComponentExample of={FilterButtonStories.Label} title="Label" description={'The field and its value, "Status: Upcoming": the field in subtle text, the value in ink. Use it when the button names a field and shows what it is set to.'} />
+
 <ComponentExample of={FilterButtonStories.Metric} title="Metric" description="The count of applied values, shown only once something is applied." />
 
 </div>
@@ -112,9 +114,10 @@ Use `FilterButton` for a control in a view bar that opens a filter's options or 
 ## Parts
 
 1. **Container.** A Button, 32 at default spacing and 24 at compact.
-2. **Label.** The filter's name.
-3. **Metric** (optional). The count of applied values, after the name. `0` shows; leave it out to hide it.
-4. **Chevron** (optional). Drawn by default; turn it off when the button toggles instead of opening a menu.
+2. **Label** (optional). The field the filter narrows, in subtle text before the text; the button then reads "Field: value".
+3. **Text.** The filter's name, or its value when there is a label, in ink.
+4. **Metric** (optional). The count of applied values, after the name. `0` shows; leave it out to hide it.
+5. **Chevron** (optional). Drawn by default; turn it off when the button toggles instead of opening a menu.
 
 ### States
 

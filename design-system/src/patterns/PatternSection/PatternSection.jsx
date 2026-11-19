@@ -1,16 +1,18 @@
-import React, { useId, useRef, useState } from 'react';
+import React, { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Collapsible } from '@base-ui/react/collapsible';
-import { Button, Icon, Skeleton } from '@/components';
+import { Button, FilterButton, Icon, Skeleton } from '@/components';
 import { HeadingLevelContext, headingTag, useHeadingLevel } from '@/lib/headingLevel';
 import { AnimatePresence, HeightSurface } from '@/lib/heightMotion';
 import { FRAME_LAYOUT } from '../Frame/frameLayout';
+import { useOwnWidth } from '../Frame/useOwnWidth';
+import PatternCard from '../PatternCard/PatternCard';
 import './PatternSection.scss';
 
 /**
  * Section pattern for PLUS design system: a span of the page grid that
- * groups content under one heading. It has no fill, no pad and no size
- * options unless `fill="subtle"` is set; the Page around it supplies the pad. It mirrors
+ * groups content under one heading. It has no fill and no pad: a padded box
+ * with a fill is a Card, and the Page around the Section supplies the pad. It mirrors
  * `Pattern/Section` in the Figma design system file.
  *
  * Its parts stack Section/stack-md: the `_Section header`, the body, then an
@@ -26,6 +28,18 @@ import './PatternSection.scss';
  * the markup as its heading, visually hidden, so assistive tech still has it.
  * `loading` swaps the header for skeleton bars while the section loads.
  *
+ * ROWS. Under the title row a header can carry two more, all on one 32 line.
+ * Row 2 holds the `views` at the start and the `format` switch at the end.
+ * Row 3 holds `search`, then the `filters` as "Field: value" triggers; applied
+ * filters take the selected state and the row ends with the `count` and Clear
+ * all. Three triggers show and the rest go in "More filters" with a count;
+ * under 768 Search takes the row and the triggers fold into one Filter button
+ * with the applied count, and the count and Clear all stay at the end of the
+ * Search row. A trigger can open a menu of its own (`menu`). When the triggers
+ * no longer fit beside Search they wrap to their own row, end-aligned. A
+ * Section with no views drops row 2 and the format switch moves to the end of
+ * row 3; nothing to search or filter drops row 3.
+ *
  * LEVEL. The title is one heading level below what holds it, and one size
  * smaller: a section on a page is an h2 at Heading/medium 20, a section
  * inside a section is a subsection, an h3 at Heading/small 16. Deeper
@@ -37,12 +51,12 @@ import './PatternSection.scss';
  * min Section/min-width-side); when a column would drop below its minimum,
  * they stack. `subsections` stacks nested sections Section/stack-lg apart.
  *
- * FILL. A section has none by default. `fill="subtle"` sets it on the sunken
- * surface with a pad and a radius, for a section that stands apart from the
- * content beside it, such as the `detail` region.
+ * SPACING. `spacing` sets the gap between the header, the body and the
+ * footer: `compact`, `default` (the Figma value) or `spacious`.
  *
  * DETAIL. An inline expand built on Base UI's Collapsible: a disclosure row
- * opens in place inside the Section and pushes the content below it down.
+ * opens in place inside the Section and pushes the content below it down. It
+ * is a sunken Card, so it takes the Card's pad and radius.
  * Queue pages dock a Panel beside the list instead.
  *
  * FOOTER. Only for "View all" or paging, aligned to the end. Actions that
@@ -51,7 +65,7 @@ import './PatternSection.scss';
 
 export const SECTION_HEADER_TYPES = ['default', 'tabs', 'toolbar', 'custom', 'tabs-only'];
 export const SECTION_LAYOUTS = ['single', 'split', 'subsections'];
-export const SECTION_FILLS = ['none', 'subtle'];
+export const SECTION_SPACINGS = ['default', 'compact', 'spacious'];
 
 /** Section width from which the filter side sits beside the body. */
 export const SECTION_DETAIL_FLOOR = FRAME_LAYOUT.splitFloor;
@@ -61,6 +75,114 @@ const inferType = ({ header, toolbar, tabs }) => {
     if (toolbar) return 'toolbar';
     if (tabs) return 'tabs';
     return 'default';
+};
+
+/** How many filter triggers show before the rest go in "More filters". */
+export const SECTION_VISIBLE_FILTERS = 3;
+
+/**
+ * Rows 2 and 3 of the header: the views and the format switch, then Search and
+ * the filter triggers. Every control sits on the one 32 line, so Search is the
+ * compact field and the buttons keep their default spacing.
+ */
+const SectionHeaderRows = ({ views, format, search, filters = [], count, onClearAll, onMoreFilters, onOpenFilters, narrow }) => {
+    const hasFilters = filters.length > 0;
+    const hasRow3 = Boolean(search) || hasFilters || (!views && Boolean(format));
+    const applied = filters.filter((filter) => filter.isSelected).length;
+    const shown = filters.slice(0, SECTION_VISIBLE_FILTERS);
+    const hidden = filters.length - shown.length;
+    const hiddenApplied = filters.slice(SECTION_VISIBLE_FILTERS).some((filter) => filter.isSelected);
+    const formatInRow3 = !views && Boolean(format);
+    // One trigger is already one button, so a narrow Section keeps it rather than fold it.
+    const folded = narrow && filters.length > 1;
+
+    const searchRef = useRef(null);
+    const filtersRef = useRef(null);
+
+    // The triggers wrap to their own end-aligned row once they no longer fit beside Search. CSS cannot see a flex item wrap, so each layout clears the mark, reads where the triggers fall against Search, and sets it again before paint.
+    const markWrap = () => {
+        const triggers = filtersRef.current;
+        const field = searchRef.current;
+        if (!triggers) return;
+        triggers.removeAttribute('data-wrapped');
+        if (field && triggers.getBoundingClientRect().top >= field.getBoundingClientRect().bottom) {
+            triggers.setAttribute('data-wrapped', '');
+        }
+    };
+    const markWrapRef = useRef(markWrap);
+    markWrapRef.current = markWrap;
+    useLayoutEffect(markWrap);
+    useEffect(() => {
+        const triggers = filtersRef.current;
+        if (!triggers || typeof ResizeObserver === 'undefined') return undefined;
+        const observer = new ResizeObserver(() => markWrapRef.current());
+        observer.observe(triggers.parentElement);
+        return () => observer.disconnect();
+    }, [hasFilters, folded]);
+
+    const renderTrigger = ({ key, menu, ...filter }) => {
+        const trigger = <FilterButton key={key ?? filter.label ?? filter.text} {...filter} />;
+        return menu ? <React.Fragment key={key ?? filter.label ?? filter.text}>{menu(trigger)}</React.Fragment> : trigger;
+    };
+
+    return (
+        <div className="plus-section-rows">
+            {views && (
+                <div className="plus-section-row plus-section-row--views">
+                    <div className="plus-section-row__views">{views}</div>
+                    {format && <div className="plus-section-row__end">{format}</div>}
+                </div>
+            )}
+            {hasRow3 && (
+                <div className="plus-section-row plus-section-row--filters">
+                    {search && <div ref={searchRef} className={`plus-section-row__search${narrow ? ' plus-section-row__search--fill' : ''}`}>{search}</div>}
+                    {hasFilters && folded && (
+                        <FilterButton
+                            text="Filter"
+                            iconBefore="filter"
+                            hasChevronDown={false}
+                            trailingMetric={applied > 0 ? applied : undefined}
+                            isSelected={applied > 0}
+                            onClick={onOpenFilters}
+                        />
+                    )}
+                    {hasFilters && !folded && (
+                        <div ref={filtersRef} className="plus-section-row__filters">
+                            {shown.map(renderTrigger)}
+                            {hidden > 0 && (
+                                <FilterButton
+                                    text="More filters"
+                                    iconBefore="filter"
+                                    trailingMetric={hidden}
+                                    isSelected={hiddenApplied}
+                                    onClick={onMoreFilters}
+                                />
+                            )}
+                        </div>
+                    )}
+                    {hasFilters && applied > 0 && (
+                        <div className="plus-section-row__applied">
+                            {count && <span className="plus-section-row__count" role="status">{count}</span>}
+                            {onClearAll && <Button text="Clear all" appearance="subtle" onClick={onClearAll} />}
+                        </div>
+                    )}
+                    {formatInRow3 && <div className="plus-section-row__end">{format}</div>}
+                </div>
+            )}
+        </div>
+    );
+};
+
+SectionHeaderRows.propTypes = {
+    views: PropTypes.node,
+    format: PropTypes.node,
+    search: PropTypes.node,
+    filters: PropTypes.arrayOf(PropTypes.object),
+    count: PropTypes.node,
+    onClearAll: PropTypes.func,
+    onMoreFilters: PropTypes.func,
+    onOpenFilters: PropTypes.func,
+    narrow: PropTypes.bool,
 };
 
 /** Title line height per rank, so the skeleton bar is as tall as the title it stands in for. */
@@ -146,6 +268,14 @@ const PatternSection = ({
     toolbar,
     header,
     type: typeProp,
+    views,
+    format,
+    search,
+    filters,
+    count,
+    onClearAll,
+    onMoreFilters,
+    onOpenFilters,
     onAddView,
     addViewLabel = 'Add view',
     loading = false,
@@ -160,8 +290,7 @@ const PatternSection = ({
     defaultDetailOpen = false,
     onDetailOpenChange,
     level: rankProp,
-    gap = 'md',
-    fill = 'none',
+    spacing = 'default',
     named = false,
     className = '',
     style,
@@ -170,16 +299,20 @@ const PatternSection = ({
 }) => {
     const classes = [
         'plus-pattern-section',
-        `plus-pattern-section-gap-${gap}`,
-        fill !== 'none' && `plus-pattern-section-fill-${fill}`,
+        `plus-pattern-section-spacing-${spacing}`,
         className,
     ].filter(Boolean).join(' ');
+
+    const rootRef = useRef(null);
+    const ownWidth = useOwnWidth(rootRef);
+    const narrow = ownWidth < FRAME_LAYOUT.fullWidthBelow;
+    const hasRows = Boolean(views || format || search || (filters && filters.length));
 
     const type = typeProp ?? inferType({ header, toolbar, tabs });
     const tabsOnly = type === 'tabs-only';
     const custom = type === 'custom';
     const bottomRow = type === 'toolbar' ? toolbar : (type === 'tabs' || tabsOnly) ? tabs : null;
-    const hasHeader = loading || title || description || actions || bottomRow || (custom && header);
+    const hasHeader = loading || title || description || actions || bottomRow || hasRows || (custom && header);
 
     const parentLevel = useHeadingLevel();
     const isPage = rankProp === 'page';
@@ -220,11 +353,24 @@ const PatternSection = ({
                         {actions && <div className="plus-pattern-section-actions">{actions}</div>}
                     </div>
                 )}
+                {hasRows && (
+                    <SectionHeaderRows
+                        views={views}
+                        format={format}
+                        search={search}
+                        filters={filters}
+                        count={count}
+                        onClearAll={onClearAll}
+                        onMoreFilters={onMoreFilters}
+                        onOpenFilters={onOpenFilters}
+                        narrow={narrow}
+                    />
+                )}
                 {bottomRow && (
                     <div className={type === 'toolbar' ? 'plus-pattern-section-toolbar' : 'plus-pattern-section-tabs'}>
                         {bottomRow}
                         {type !== 'toolbar' && onAddView && (
-                            <Button text={addViewLabel} appearance="subtle" spacing="compact" iconBefore="plus" onClick={onAddView} />
+                            <Button text={addViewLabel} appearance="subtle" iconBefore="plus" onClick={onAddView} />
                         )}
                     </div>
                 )}
@@ -271,7 +417,8 @@ const PatternSection = ({
             <Collapsible.Root
                 open={isDetailOpen}
                 onOpenChange={handleDetailOpenChange}
-                className="plus-pattern-section-detail plus-pattern-section-fill-subtle"
+                className="plus-pattern-section-detail"
+                render={(rootProps) => <PatternCard surface="sunken" {...rootProps} />}
             >
                 <Collapsible.Trigger
                     ref={detailTriggerRef}
@@ -326,6 +473,7 @@ const PatternSection = ({
 
     return (
         <section
+            ref={rootRef}
             id={id}
             className={classes}
             style={style}
@@ -374,6 +522,41 @@ PatternSection.propTypes = {
     header: PropTypes.node,
     /** Header type. Read from the slots when left off; pass `tabs-only` to show only the tabs row */
     type: PropTypes.oneOf(SECTION_HEADER_TYPES),
+    /** Row 2, at the start: the views, usually Tabs in the pill appearance. It scrolls sideways when it does not fit.
+     * @ds-context Used in: Section.views (ds guide section)
+     * @ds-context Governed by: Filtering (ds guide filtering); Forms (ds guide forms); Search (ds guide search)
+     */
+    views: PropTypes.node,
+    /** Row 2, at the end: the format switch (Table / Cards). With no `views` it moves to the end of row 3.
+     * @ds-context Used in: Section.format (ds guide section)
+     * @ds-context Governed by: Filtering (ds guide filtering); Forms (ds guide forms); Search (ds guide search)
+     */
+    format: PropTypes.node,
+    /** Row 3, at the start: the Search field at compact spacing, which draws 32.
+     * @ds-context Used in: Section.search (ds guide section)
+     * @ds-context Governed by: Filtering (ds guide filtering); Forms (ds guide forms); Search (ds guide search)
+     */
+    search: PropTypes.node,
+    /** Row 3, after Search: one `{ key, label, text, isSelected, onClick, menu }` per trigger, drawn as a FilterButton that reads "label: text". `menu` is `(trigger) => node`: hand the trigger to a Popup select or a Filter menu, so the same button opens the list and keeps its selected state. Three show; the rest go in "More filters" with a count. Under 768 they fold into one Filter button. When they do not fit beside Search they wrap to their own row, end-aligned. */
+    filters: PropTypes.arrayOf(PropTypes.shape({
+        key: PropTypes.string,
+        label: PropTypes.string,
+        text: PropTypes.string.isRequired,
+        isSelected: PropTypes.bool,
+        onClick: PropTypes.func,
+        menu: PropTypes.func,
+    })),
+    /** Row 3, at the end once a filter is applied: how many rows match, such as "3 of 12".
+     * @ds-context Used in: Section.count (ds guide section)
+     * @ds-context Governed by: Filtering (ds guide filtering); Forms (ds guide forms); Search (ds guide search)
+     */
+    count: PropTypes.node,
+    /** Runs when "Clear all" is pressed. The button shows once a filter is applied. */
+    onClearAll: PropTypes.func,
+    /** Runs when "More filters" is pressed. */
+    onMoreFilters: PropTypes.func,
+    /** Runs when the Filter button of a narrow Section is pressed. */
+    onOpenFilters: PropTypes.func,
     /** Puts "Add view" at the end of the tabs row, and runs when it is pressed */
     onAddView: PropTypes.func,
     /** The "Add view" button's label */
@@ -414,10 +597,8 @@ PatternSection.propTypes = {
     onDetailOpenChange: PropTypes.func,
     /** `page` makes the title the page's h1 at Heading/large 24; by default it nests one level down */
     level: PropTypes.oneOf(['page']),
-    /** Gap between the header, the body and the footer (Section/stack tokens); `md` is the Figma value */
-    gap: PropTypes.oneOf(['sm', 'md', 'lg']),
-    /** `subtle` sets the section on the sunken surface with a pad and a radius; `none` (default) draws nothing */
-    fill: PropTypes.oneOf(SECTION_FILLS),
+    /** Space between the header, the body and the footer (Section/stack tokens); `default` is the Figma value */
+    spacing: PropTypes.oneOf(SECTION_SPACINGS),
     /** Makes the section a region named by its title, for a section that stands apart as a landmark */
     named: PropTypes.bool,
     className: PropTypes.string,

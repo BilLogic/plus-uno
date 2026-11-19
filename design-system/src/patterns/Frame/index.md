@@ -68,7 +68,7 @@ Don't: The Sidebar left docked beside a focused task, one click from leaving it.
 
 **Checked:** Review
 
-The bottom bar is fixed along the bottom, one row high (48, a 32 button plus 16 of pad). Close in the title row leaves the task, so the bar holds only Back and the primary Next, full bleed. Back on the first step is disabled and needs no reason.
+The bottom bar is fixed along the bottom, one row high, sized by its Buttons and their pad. Close in the title row leaves the task, so the bar holds only Back and the primary Next, full bleed. Back on the first step is disabled and needs no reason.
 
 Do: Back and the primary Next split the bar; Close in the title row leaves the task.
 Don't: Cancel repeated in the bar beside Back and Next: two ways out of one task.

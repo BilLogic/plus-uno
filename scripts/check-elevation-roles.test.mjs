@@ -105,7 +105,7 @@ function tokenMap(relFile) {
 const TOKEN_DEFINITIONS = new Map([...tokenMap(TEMPLATES_FILE), ...tokenMap(COMPONENTS_FILE)]);
 function resolveTemplateValue(value) {
   if (!value) return value;
-  const m = /^var\((--(?:modal|dialog)-[a-z0-9-]+)\)$/.exec(value.trim());
+  const m = /^var\((--(?:modal|dialog|card)-[a-z0-9-]+)\)$/.exec(value.trim());
   return m && TOKEN_DEFINITIONS.has(m[1]) ? TOKEN_DEFINITIONS.get(m[1]) : value.trim();
 }
 
@@ -117,12 +117,18 @@ function resolveTemplateValue(value) {
  * on the overlay pair. The card paints the current surface and sets it, so a
  * sticky table cell inside matches the card.
  */
+
 const PATTERN_CARD = {
   file: 'design-system/src/patterns/PatternCard/PatternCard.scss',
   states: [
-    ['.plus-pattern-card', '--ds-surface-raised', '--ds-shadow-raised'],
-    ['.plus-pattern-card--clickable:hover', '--ds-surface-raised-hovered', '--ds-shadow-overlay'],
-    ['.plus-pattern-card--clickable:active', '--ds-surface-raised-pressed', '--ds-shadow-raised'],
+    ['.plus-pattern-card', '--ds-surface-sunken', null],
+    ['.plus-pattern-card--surface-sunken', '--ds-surface-sunken', null],
+    ['.plus-pattern-card--surface-default', '--ds-surface', null],
+    ['.plus-pattern-card--surface-raised', '--ds-surface-raised', '--ds-shadow-raised'],
+    ['.plus-pattern-card--clickable:not(.plus-pattern-card--dragging):hover', '--ds-surface-raised', '--ds-shadow-raised'],
+    ['.plus-pattern-card--clickable:not(.plus-pattern-card--dragging):active', '--ds-surface-raised-pressed', '--ds-shadow-raised'],
+    ['.plus-pattern-card--surface-raised.plus-pattern-card--clickable:not(.plus-pattern-card--dragging):hover', '--ds-surface-raised-hovered', '--ds-shadow-overlay'],
+    ['.plus-pattern-card--surface-raised.plus-pattern-card--clickable:not(.plus-pattern-card--dragging):active', '--ds-surface-raised-pressed', '--ds-shadow-raised'],
     ['.plus-pattern-card--dragging', '--ds-surface-overlay', '--ds-shadow-overlay'],
   ],
 };
@@ -206,10 +212,11 @@ function compiledRules(file) {
   return compiled.get(file);
 }
 
-/** The declarations every compiled rule listing exactly `selector` sets, in source order. */
+/** The declarations every top-level compiled rule listing exactly `selector` sets, in source order. */
 function compiledDecls(file, selector) {
   const merged = {};
   compiledRules(file).walkRules((rule) => {
+    if (rule.parent?.type === 'atrule') return;
     if (!rule.selectors.map((s) => s.trim()).includes(selector)) return;
     for (const node of rule.nodes) if (node.type === 'decl') merged[node.prop] = node.value;
   });
@@ -220,11 +227,13 @@ test('PatternCard pairs each surface with its shadow, at rest, lifted, pressed a
   const { file, states } = PATTERN_CARD;
   const rest = compiledDecls(file, '.plus-pattern-card');
   assert.equal(rest['background-color'], 'var(--ds-utility-elevation-surface-current)', `${file}: the card paints the current surface`);
-  assert.equal(rest.border ?? rest['border-width'], undefined, `${file}: the shadow's ring is the edge, not a border`);
+  assert.equal(rest.border, 'var(--card-border-width) solid transparent', `${file}: every card keeps a 1px transparent border for forced colors`);
+  const defaultCard = compiledDecls(file, '.plus-pattern-card--surface-default');
+  assert.equal(resolveTemplateValue(defaultCard['border-color']), 'var(--ds-border)', `${file}: default surface uses --ds-border`);
   for (const [selector, surface, shadow] of states) {
     const decls = compiledDecls(file, selector);
-    assert.equal(decls['--ds-utility-elevation-surface-current'], `var(${surface})`, `${file}: "${selector}" surface`);
-    assert.equal(decls['box-shadow'], `var(${shadow})`, `${file}: "${selector}" shadow`);
+    assert.equal(resolveTemplateValue(decls['--ds-utility-elevation-surface-current']), `var(${surface})`, `${file}: "${selector}" surface`);
+    assert.equal(resolveTemplateValue(decls['box-shadow']), shadow ? `var(${shadow})` : 'none', `${file}: "${selector}" shadow`);
   }
   compiledRules(file).walkRules((rule) => {
     for (const selector of rule.selectors) {
