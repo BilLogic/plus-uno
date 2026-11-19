@@ -22,7 +22,7 @@ Also asked as: list of records, data table on a page, sortable list, records wit
 
 ## Usage
 
-A table sits in a Section and spans it. Its first and last cells sit flush with the section edge. The Section header carries the views, then Search and the "Field: value" filters with the record count. The bulk bar is never in the Section header: while rows are selected, a Dynamic table's head row becomes it, so the header rows stay put. Empty and no results replace the whole table so the Section header stays usable; loading and error states happen inside the table, under its header. Paging stays under the rows, inside the same Section.
+A table sits in a Section and spans it. Its first and last cells sit flush with the section edge. The Section header carries the views, then Search and the "Field: value" filters, and once a filter is applied, the record count. The bulk bar is never in the Section header: while rows are selected, a Dynamic table's head row becomes it, so the header rows stay put. Empty and no results replace the whole table so the Section header stays usable; loading and error states happen inside the table, under its header. Paging stays under the rows, inside the same Section.
 
 ### Type guidance
 
@@ -53,7 +53,7 @@ Don't: The table sits inside its own frame with padding; it stops lining up with
 
 ### Put nothing between the header and the head row. {#put-nothing-between-the-header-and-the-head-row}
 
-Do: Search, filters and the record count live in the Section header rows; the head row follows directly.
+Do: Search and filters live in the Section header rows, with the record count once a filter is applied; the head row follows directly.
 Don't: A second toolbar sits between the Section header and the head row; the table has no toolbar of its own.
 
 ### One table per block. {#one-table-per-block}
@@ -122,7 +122,7 @@ Row states are layered over each cell's fill, never swapped for it.
 | `--ds-text`, `--body-default` | 14/20 | Body cells. |
 | `--ds-text-subtle`, `--heading-xxs` | color, type | Head cells, message rows, and empty-state wrapper text. |
 | `--table-pad-x-cell`, `--table-pad-y-cell` | length | Cell padding, message row padding, and plain empty-state wrapper padding. |
-| `--table-inline`, `--table-footer-height` | 8, 48 | The gap between controls in the footer and the footer row height. |
+| `--table-inline`, `--table-footer-height` | 8, 48 | The gap between the table and the footer slot, the gap between controls in the footer, and the footer row height. |
 | `--table-empty-surface`, `--table-empty-radius` | color, 16 | The sunken background and card-rounded corners of the empty state box. |
 | `--ds-background-neutral-subtle-hovered`, `-pressed` | color | A hovered and a pressed row. |
 | `--ds-background-selected`, `-hovered`, `-pressed` | color | A selected row. |
@@ -130,14 +130,14 @@ Row states are layered over each cell's fill, never swapped for it.
 | `--ds-utility-elevation-surface-current` | color | The fill of sticky cells, so they match what the table sits on. |
 | `--ds-border-focused`, `--focus-ring-width` | focus ring | The ring of a scroll region. |
 | `--row-height-md` | 40 | The least height of the message row. |
-| `--stack-md`, `--stack-sm` | 8, 4 | Gap between the table and footer, and inside message and empty-state wrappers. |
+| `--stack-md`, `--stack-sm` | 8, 4 | Gap between a Dynamic or Tree table and the footer it draws itself, and inside message and empty-state wrappers. |
 
 ## Content guidelines
 
 | Do | Don't |
 | --- | --- |
 | Name every column with a short head, in sentence case: "Last session". | A blank head, or one in all caps. |
-| Give the count in words in the header: "340 students". | A count in the head row or under the table. |
+| Give the count in words in the header once a filter is applied: "340 students". | A count in the head row or under the table. |
 | An empty message that says what will appear and the first action: "No members yet", "Invite a member". | An empty table body with no message. |
 
 ## Props

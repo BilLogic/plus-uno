@@ -63,7 +63,7 @@ The examples on this page follow the toolbar's Color mode switch.
 
 <ComponentExample of={TableStories.StaticKind} title="Static table" description="People only read it. The Section header carries the title and the action, and the footer sits under the rows." />
 
-<ComponentExample of={TableStories.DynamicKind} title="Dynamic table" description="People sort, page or act on the rows. The count sits in the Section header, and the table draws its own footer." />
+<ComponentExample of={TableStories.DynamicKind} title="Dynamic table" description="People sort, page or act on the rows. The Section header shows the count once a filter is applied, and the table draws its own footer." />
 
 <ComponentExample of={TableStories.TreeKind} title="Tree table" description="Rows nest under a parent, each level indented, with the columns kept." />
 
@@ -117,7 +117,7 @@ The examples on this page follow the toolbar's Color mode switch.
 
 ## Usage
 
-A table sits in a Section and spans it. Its first and last cells sit flush with the section edge. The Section header carries the views, then Search and the "Field: value" filters with the record count. The bulk bar is never in the Section header: while rows are selected, a Dynamic table's head row becomes it, so the header rows stay put. Empty and no results replace the whole table so the Section header stays usable; loading and error states happen inside the table, under its header. Paging stays under the rows, inside the same Section.
+A table sits in a Section and spans it. Its first and last cells sit flush with the section edge. The Section header carries the views, then Search and the "Field: value" filters, and once a filter is applied, the record count. The bulk bar is never in the Section header: while rows are selected, a Dynamic table's head row becomes it, so the header rows stay put. Empty and no results replace the whole table so the Section header stays usable; loading and error states happen inside the table, under its header. Paging stays under the rows, inside the same Section.
 
 ### Type guidance
 
@@ -178,7 +178,7 @@ Row states are layered over each cell's fill, never swapped for it.
 <tr><td><code>--ds-text</code>, <code>--body-default</code></td><td>14/20</td><td>Body cells.</td></tr>
 <tr><td><code>--ds-text-subtle</code>, <code>--heading-xxs</code></td><td>color, type</td><td>Head cells, message rows, and empty-state wrapper text.</td></tr>
 <tr><td><code>--table-pad-x-cell</code>, <code>--table-pad-y-cell</code></td><td>length</td><td>Cell padding, message row padding, and plain empty-state wrapper padding.</td></tr>
-<tr><td><code>--table-inline</code>, <code>--table-footer-height</code></td><td>8, 48</td><td>The gap between controls in the footer and the footer row height.</td></tr>
+<tr><td><code>--table-inline</code>, <code>--table-footer-height</code></td><td>8, 48</td><td>The gap between the table and the footer slot, the gap between controls in the footer, and the footer row height.</td></tr>
 <tr><td><code>--table-empty-surface</code>, <code>--table-empty-radius</code></td><td>color, 16</td><td>The sunken background and card-rounded corners of the empty state box.</td></tr>
 <tr><td><code>--ds-background-neutral-subtle-hovered</code>, <code>-pressed</code></td><td>color</td><td>A hovered and a pressed row.</td></tr>
 <tr><td><code>--ds-background-selected</code>, <code>-hovered</code>, <code>-pressed</code></td><td>color</td><td>A selected row.</td></tr>
@@ -186,7 +186,7 @@ Row states are layered over each cell's fill, never swapped for it.
 <tr><td><code>--ds-utility-elevation-surface-current</code></td><td>color</td><td>The fill of sticky cells, so they match what the table sits on.</td></tr>
 <tr><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code></td><td>focus ring</td><td>The ring of a scroll region.</td></tr>
 <tr><td><code>--row-height-md</code></td><td>40</td><td>The least height of the message row.</td></tr>
-<tr><td><code>--stack-md</code>, <code>--stack-sm</code></td><td>8, 4</td><td>Gap between the table and footer, and inside message and empty-state wrappers.</td></tr>
+<tr><td><code>--stack-md</code>, <code>--stack-sm</code></td><td>8, 4</td><td>Gap between a Dynamic or Tree table and the footer it draws itself, and inside message and empty-state wrappers.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -209,7 +209,7 @@ Row states are layered over each cell's fill, never swapped for it.
 
 <DoDontPair
     doExample={<PlainTable />}
-    doCaption="Search, filters and the record count live in the Section header rows; the head row follows directly."
+    doCaption="Search and filters live in the Section header rows, with the record count once a filter is applied; the head row follows directly."
     dontExample={<SecondToolbar />}
     dontCaption="A second toolbar sits between the Section header and the head row; the table has no toolbar of its own."
 />
@@ -255,7 +255,7 @@ Never mix a Static, Dynamic or Tree table in one Section either.
 </thead>
 <tbody>
 <tr><td>Name every column with a short head, in sentence case: "Last session".</td><td>A blank head, or one in all caps.</td></tr>
-<tr><td>Give the count in words in the header: "340 students".</td><td>A count in the head row or under the table.</td></tr>
+<tr><td>Give the count in words in the header once a filter is applied: "340 students".</td><td>A count in the head row or under the table.</td></tr>
 <tr><td>An empty message that says what will appear and the first action: "No members yet", "Invite a member".</td><td>An empty table body with no message.</td></tr>
 </tbody>
 </DocsTable>

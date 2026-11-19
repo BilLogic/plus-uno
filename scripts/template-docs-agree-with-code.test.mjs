@@ -86,3 +86,12 @@ test('the Details demo puts Edit in the title row, where Common actions says, no
   assert.doesNotMatch(demo, /<div><Button text="Edit"/);
   assert.match(demo, /actions=\{\(\s*<>\s*\{!editing && onEdit \? <Button text="Edit"/);
 });
+
+test('the Table page names the footer gap its styles use and when the count shows', () => {
+  const page = read('design-system/src/templates/Table/Table.mdx');
+  assert.match(read('design-system/src/templates/Table/Table.scss'), /gap: var\(--table-inline\)/);
+  assert.match(page, /gap between the table and the footer slot/);
+  assert.doesNotMatch(page, /Gap between the table and footer, and inside/);
+  assert.match(page, /once a filter is applied/);
+  assert.doesNotMatch(page, /The count sits in the Section header,|Search, filters and the record count live/);
+});
