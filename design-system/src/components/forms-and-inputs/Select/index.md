@@ -2,7 +2,7 @@
 
 # Select
 
-Select — pick one value, or several, from a list, on `_Field` with the internal `Listbox` under it. - **The field is the combobox.** Focus stays in it, and the highlighted row is its `aria-activedescendant`. The field is a text input: typing in it filters the list. With `isSearchable={false}` it is a select-only combobox. - **Values are ids; options are objects.** `value` is an option's `value` (an array with `isMulti`), controlled or not. - **`isMulti`** shows Tags in a TagGroup (`displayMode="tags"`), which collapse into "+n" without focus. - **Trailing** holds the plain ✕ clear button (not a tab stop; Delete does the same) and the caret; the list's footer also carries a subtle "Clear" action (in the tab order) while a value is set.
+Select — pick one value, or several, from a list, on `_Field` with the internal `Listbox` under it. - **The field is the combobox.** Focus stays in it, and the highlighted row is its `aria-activedescendant`. The field is a text input: typing in it filters the list. With `isSearchable={false}` it is a select-only combobox. - **Values are ids; options are objects.** `value` is an option's `value` (an array with `isMulti`), controlled or not. - **`isMulti`** shows Tags in a TagGroup (`displayMode="tags"`). They wrap by default, so the field is as tall as its tag rows; `lineWrap={false}` keeps one row that scrolls sideways, and `truncate` collapses them into "+n" without focus. - **Trailing** holds the plain ✕ clear button (not a tab stop; Delete does the same) and the caret; the list's footer also carries a subtle "Clear" action (in the tab order) while a value is set.
 
 Also asked as: combobox, picklist, option list, async select.
 
@@ -14,7 +14,7 @@ Also asked as: combobox, picklist, option list, async select.
 
 **Source:** `design-system/src/components/forms-and-inputs/Select/Select.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Empty, Filled, Multi, Searchable, Marker, NotSearchable, Creatable, SpacingDefault, SpacingCompact, Spacing, DependentFields, LongList, Async, AsyncCreatable, AsyncLoading, AsyncFailed, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly, FieldReadOnlyShowsLabel, FieldReadOnlyLongValue, OpenListEdge, MotionOpenClose, MotionReduced, MotionKeyboardOpen
+**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Empty, Filled, Multi, MultiRows, OverflowWrap, OverflowNowrap, OverflowTruncate, Searchable, Marker, NotSearchable, Creatable, SpacingDefault, SpacingCompact, Spacing, DependentFields, LongList, Async, AsyncCreatable, AsyncLoading, AsyncFailed, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly, FieldReadOnlyShowsLabel, FieldReadOnlyLongValue, OpenListEdge, MotionOpenClose, MotionReduced, MotionKeyboardOpen
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Select/Select.mdx`
 
@@ -233,8 +233,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `onOpenChange` | func | — | `(open)`: the list asks to open or close. |
 | `defaultSearchTerm` | string | `''` | The text the search input starts with, so the list opens already filtered. Used by a searchable field. |
 | `displayMode` | enum | `'tags'` | With `isMulti`: `tags` (Tag tags) or `text` (comma-separated). |
-| `lineWrap` | bool | `true` | `text` display mode only: wrap onto more lines. |
-| `truncate` | bool | `false` | `text` display mode only: clip the row with a fade. |
+| `lineWrap` | bool | `true` | With `isMulti`: wrap the picks onto more rows (the default). `false` keeps one row that scrolls sideways. |
+| `truncate` | bool | `false` | With `isMulti`: collapse the picks into a "+n" count until the field is focused. |
 | `spacing` | enum | `'default'` | `default` draws 40 and `compact` draws 32. |
 | `isDisabled` | bool | `false` | Dims the field and blocks opening and changing it. |
 | `isReadOnly` | bool | `false` | Shows the value, stays focusable, and cannot be changed. |

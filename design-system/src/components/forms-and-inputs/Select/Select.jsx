@@ -33,8 +33,10 @@ const isEmpty = (value) => value === undefined || value === null || value === ''
  *   filters the list. With `isSearchable={false}` it is a select-only combobox.
  * - **Values are ids; options are objects.** `value` is an option's `value` (an
  *   array with `isMulti`), controlled or not.
- * - **`isMulti`** shows Tags in a TagGroup (`displayMode="tags"`), which
- *   collapse into "+n" without focus.
+ * - **`isMulti`** shows Tags in a TagGroup (`displayMode="tags"`). They wrap
+ *   by default, so the field is as tall as its tag rows; `lineWrap={false}`
+ *   keeps one row that scrolls sideways, and `truncate` collapses them into
+ *   "+n" without focus.
  * - **Trailing** holds the plain ✕ clear button (not a tab stop; Delete does
  *   the same) and the caret; the list's footer also carries a subtle "Clear"
  *   action (in the tab order) while a value is set.
@@ -361,7 +363,7 @@ const Select = ({
             live={live}
             disabled={disabled}
             label={typeof label === 'string' ? label : props['aria-label']}
-            collapsed={!(focused || shown || isReadOnly)}
+            collapsed={truncate && !(focused || shown || isReadOnly)}
             onOverflowClick={() => { openList(); controlRef.current?.focus(); }}
         />
     ) : null;
@@ -563,9 +565,9 @@ Select.propTypes = {
     defaultSearchTerm: PropTypes.string,
     /** With `isMulti`: `tags` (Tag tags) or `text` (comma-separated). */
     displayMode: PropTypes.oneOf(['tags', 'text']),
-    /** `text` display mode only: wrap onto more lines. */
+    /** With `isMulti`: wrap the picks onto more rows (the default). `false` keeps one row that scrolls sideways. */
     lineWrap: PropTypes.bool,
-    /** `text` display mode only: clip the row with a fade. */
+    /** With `isMulti`: collapse the picks into a "+n" count until the field is focused. */
     truncate: PropTypes.bool,
     /** `default` draws 40 and `compact` draws 32. */
     spacing: PropTypes.oneOf(SELECT_SPACINGS),

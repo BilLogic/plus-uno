@@ -69,7 +69,13 @@ type. A short list, such as a filter menu's, turns typing off with
 
 ## Behavior
 
-<ComponentExample of={SelectStories.Multi} title="Multi" description="isMulti shows picks as Tags that collapse into a count." />
+<ComponentExample of={SelectStories.Multi} title="Multi" description="isMulti shows picks as Tags. A few short tags sit on one row, at the same height as a single select." />
+
+<ComponentExample of={SelectStories.OverflowWrap} title="Multi: wrap" description="The default. Every tag shows and the field grows by whole tag rows. Pick it when the picks should be readable at a glance." />
+
+<ComponentExample of={SelectStories.OverflowNowrap} title="Multi: no wrap" description="lineWrap={false} keeps one row that scrolls sideways. Pick it when the field must stay one line and every pick should stay reachable." />
+
+<ComponentExample of={SelectStories.OverflowTruncate} title="Multi: truncate" description="truncate collapses the tags into a +n count until the field is focused. Pick it for dense forms and filter bars." />
 
 <ComponentExample of={SelectStories.Searchable} title="Searchable" description="Typing in the field filters the list. This is the default." />
 
