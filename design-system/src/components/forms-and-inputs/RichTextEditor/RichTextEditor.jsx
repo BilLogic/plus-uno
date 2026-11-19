@@ -5,6 +5,7 @@ import DropdownMenu from '@/components/forms-and-inputs/DropdownMenu/DropdownMen
 import { ButtonItem } from '@/components/forms-and-inputs/_internal/MenuGroup';
 import IconButton from '@/components/forms-and-inputs/IconButton/IconButton';
 import Button from '@/components/forms-and-inputs/Button/Button';
+import Icon from '@/components/images-and-icons/Icon';
 import './RichTextEditor.scss';
 
 const FULL_DEFAULT_BUTTONS = [
@@ -249,7 +250,7 @@ const RichTextEditor = ({
                                         appearance="subtle"
                                         spacing={toolbarBtnSpacing}
                                         className="plus-rich-text-editor-block-toggle"
-                                        iconAfter="arrows-up-down"
+                                        iconAfter={<Icon name="chevron-down" size={12} />}
                                         isDisabled={disabled || readOnly}
                                     >
                                         {blockLabel}
