@@ -301,6 +301,14 @@
         "RichTextEditor.isReadOnly",
         "RichTextEditor.isDisabled"
       ]
+    },
+    {
+      "not": "Select / PopupSelect / FilterMenu open",
+      "use": [
+        "Select.isOpen",
+        "PopupSelect.isOpen",
+        "FilterMenu.isOpen"
+      ]
     }
   ],
   "tokens": [

@@ -62,6 +62,7 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `InlineEditableTextfield required` | `isRequired` |
 | `TagInput required / disabled / readOnly` | `isRequired`, `isDisabled`, `isReadOnly` |
 | `RichTextEditor readOnly / disabled` | `isReadOnly`, `isDisabled` |
+| `Select / PopupSelect / FilterMenu open` | `isOpen`, `PopupSelect isOpen`, `FilterMenu isOpen` |
 
 **Tokens**
 

@@ -42,7 +42,7 @@ const PopupSelect = ({
     placement = 'bottom-start',
     isSearchable = true,
     searchPlaceholder = 'Search',
-    open,
+    isOpen: isOpenProp,
     defaultOpen = false,
     onOpenChange,
     marker = 'radio',
@@ -64,7 +64,7 @@ const PopupSelect = ({
     const listRef = useRef(null);
 
     const { isOpen, setOpen, closeList } = useOpenState({
-        open,
+        isOpen: isOpenProp,
         defaultOpen,
         onOpenChange,
         onClose: () => setQuery(''),
@@ -181,8 +181,8 @@ PopupSelect.propTypes = {
     /** The search field's placeholder. */
     searchPlaceholder: PropTypes.string,
     /** Whether the menu is open. Leave it out to let the trigger open and close it. */
-    open: PropTypes.bool,
-    /** Opens the menu on first render, when `open` is left out. */
+    isOpen: PropTypes.bool,
+    /** Opens the menu on first render, when `isOpen` is left out. */
     defaultOpen: PropTypes.bool,
     /** `(open)`. */
     onOpenChange: PropTypes.func,

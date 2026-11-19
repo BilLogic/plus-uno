@@ -341,7 +341,7 @@ export const KeyFilterApplied = {
     name: 'Key: Filter applied',
     render: () => (
         <Demo.PopupStage height={96} side="end">
-            {(mount) => <Demo.FilterMenuLayer mount={mount} open={false} defaultValue={{ status: ['Upcoming'], subject: ['Math'] }} />}
+            {(mount) => <Demo.FilterMenuLayer mount={mount} isOpen={false} defaultValue={{ status: ['Upcoming'], subject: ['Math'] }} />}
         </Demo.PopupStage>
     ),
     play: async ({ canvas, canvasElement }) => {

@@ -6066,7 +6066,7 @@
           "deprecated": null
         },
         {
-          "name": "open",
+          "name": "isOpen",
           "type": "bool",
           "required": false,
           "default": null,
@@ -6080,7 +6080,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Opens the menu on first render, when `open` is left out.",
+          "description": "Opens the menu on first render, when `isOpen` is left out.",
           "deprecated": null
         },
         {
@@ -9957,7 +9957,7 @@
           "deprecated": null
         },
         {
-          "name": "open",
+          "name": "isOpen",
           "type": "bool",
           "required": false,
           "default": null,
@@ -9971,7 +9971,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Opens the menu on first render, when `open` is left out.",
+          "description": "Opens the menu on first render, when `isOpen` is left out.",
           "deprecated": null
         },
         {
@@ -12989,12 +12989,12 @@
           "deprecated": null
         },
         {
-          "name": "open",
+          "name": "isOpen",
           "type": "bool",
           "required": false,
           "default": null,
           "values": null,
-          "description": "Holds the list open or shut. Controlled: Escape, a press outside and a pick ask through `onOpenChange`, and the list stays as it is until the parent changes `open`.",
+          "description": "Holds the list open or shut. Controlled: Escape, a press outside and a pick ask through `onOpenChange`, and the list stays as it is until the parent changes `isOpen`.",
           "deprecated": null
         },
         {
@@ -13003,7 +13003,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Whether the list starts open, when `open` is not controlling it.",
+          "description": "Whether the list starts open, when `isOpen` is not controlling it.",
           "deprecated": null
         },
         {

@@ -642,14 +642,14 @@ ClearableDefaults.play = async ({ canvasElement }) => {
 /* ------------------------------------------------------------- open state */
 
 /**
- * A controlled `open` belongs to the parent. Escape and a press outside ask
+ * A controlled `isOpen` belongs to the parent. Escape and a press outside ask
  * through `onOpenChange`; the list stays open until the parent says otherwise.
  */
 export const ControlledOpenAsksTheParent = {
     args: { onOpenChange: fn() },
     render: (args) => (
         <div style={stack}>
-            <Select id="sopen-controlled" label="School" options={schools} open onOpenChange={args.onOpenChange} />
+            <Select id="sopen-controlled" label="School" options={schools} isOpen onOpenChange={args.onOpenChange} />
             <p>Outside the field</p>
         </div>
     ),

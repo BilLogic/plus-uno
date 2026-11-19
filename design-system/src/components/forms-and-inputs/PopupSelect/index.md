@@ -130,8 +130,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `placement` | enum | `'bottom-start'` | `bottom-start` (default) for a trigger at the start of a bar, `bottom-end` for one at its end. |
 | `isSearchable` | bool | `true` | A search field above the list. Turn it off for a short list. |
 | `searchPlaceholder` | string | `'Search'` | The search field's placeholder. |
-| `open` | bool | — | Whether the menu is open. Leave it out to let the trigger open and close it. |
-| `defaultOpen` | bool | `false` | Opens the menu on first render, when `open` is left out. |
+| `isOpen` | bool | — | Whether the menu is open. Leave it out to let the trigger open and close it. |
+| `defaultOpen` | bool | `false` | Opens the menu on first render, when `isOpen` is left out. |
 | `onOpenChange` | func | — | `(open)`. |
 | `marker` | enum | `'radio'` | `radio` (default) marks the picked row with a radio before its label; `check` puts a check at the row's end. |
 | `spacing` | enum | `'default'` | `default` draws 32 rows and a 32 trigger; `compact` draws 24 rows and a 24 trigger. |

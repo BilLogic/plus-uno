@@ -38,7 +38,7 @@ const DropdownMenu = ({
 }) => {
     const reduced = useMotionReduced();
     const { isOpen: open, setOpen: handleOpenChange, closeList } = useOpenState({
-        open: isOpen,
+        isOpen,
         defaultOpen,
         onOpenChange,
     });
