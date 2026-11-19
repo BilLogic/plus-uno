@@ -74,17 +74,17 @@ Take pattern borders from this table rather than adding one of your own.
 | Pattern | Line | Token | Note |
 | --- | --- | --- | --- |
 | Table | Grid lines and the head rule | `color/border/default` · `color/border/bold` | The selected row fills the whole row with color/background/selected. The checkbox is the second cue. |
-| Docked sidebar | One 1 px divider on the edge that faces the Page | `color/border/default` | The topbar and the Page carry no border of their own. |
+| Docked sidebar | One 1 px divider on the edge that faces the Page | `color/border/default` | The Page carries no border of its own. |
 | Banner | None | — | Meaning comes from the fill and the icon. |
 | Card | None | — | The edge comes from elevation, not a border. |
 
-### Give the sidebar one edge and the topbar none
+### Give the sidebar one edge and the page header none
 
-The sidebar ends in a 1 px divider in `color/border/default`. The topbar has no border.
+The sidebar ends in a 1 px divider in `color/border/default`. The page header has no border.
 
 Do: One hairline on the sidebar edge.
 
-Don't: A line under the topbar adds a second edge the Frame does not use.
+Don't: A line under the page header adds a second edge the Frame does not use.
 
 ## Do and don't
 

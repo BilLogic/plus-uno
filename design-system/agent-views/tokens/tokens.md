@@ -260,7 +260,7 @@ Stacking order: `z-index: var(--layer-modal)`.
 --layer-dialog  /* Stacking order of a non-modal dialog over the page, below popups. */
 --layer-flag  /* Stacking order of a Flag, above any Modal. */
 --layer-modal  /* Stacking order of a Modal, above its Blanket. */
---layer-navigation  /* Stacking order of the Frame's top bar and Sidebar. */
+--layer-navigation  /* Stacking order of the Frame's Sidebar and Panel. */
 --layer-popup  /* Stacking order of a Popup, DropdownMenu or listbox. */
 --layer-spotlight  /* Stacking order of a Spotlight, above Flags. */
 --layer-tooltip  /* Stacking order of a Tooltip, above everything else. */
@@ -387,13 +387,6 @@ The templates on the page frame, per breakpoint: page, section, card, table, ove
 --dropdown-menu-pad  /* Padding inside a DropdownMenu or listbox. */
 --flag-stack  /* Vertical gap between stacked Flags. */
 --flag-width  /* Width of a Flag. */
---focused-page-inline-md  /* Horizontal gap between the actions on a focused page. */
---focused-page-inline-sm  /* Horizontal gap between small items in a focused page row. */
---focused-page-pad-x  /* Horizontal padding of a focused page: a single task with no Sidebar, such as a wizard step. */
---focused-page-pad-y  /* Vertical padding of a focused page. */
---focused-page-stack-lg  /* Vertical gap between a focused page's header, body and actions. */
---focused-page-stack-md  /* Vertical gap between blocks on a focused page. */
---focused-page-stack-sm  /* Vertical gap between a focused page's title and its description. */
 --layer-frame-blanket
 --layer-frame-docked-edge
 --layer-frame-edge

@@ -20,8 +20,7 @@ import { InAppFrame, RECORD_CRUMBS } from '@/storybook-docs/lib/pattern-demo.jsx
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 
 /**
- * Frame — the app frame: the Sidebar beside the Page (and the Panel), with no
- * top bar. Open, the Sidebar's own toggle ends its logo row; closed, the
+ * Frame — the app frame: the Sidebar beside the Page (and the Panel). Open, the Sidebar's own toggle ends its logo row; closed, the
  * Frame draws the toggle at the Page's top left.
  *
  * THE TEST SEAM IS THIS FILE. Each width story sets the viewport first, because
@@ -164,11 +163,6 @@ const expectToggleHome = async (frame, toggle) => {
     await expect(r.height, 'toggle height').toBeCloseTo(tokenLength(frame, '--control-md'), 0);
 };
 
-/** No top bar: nothing sits above the Sidebar and the Page. */
-const expectNoTopbar = async (frame) => {
-    await expect(frame.querySelector('.plus-frame__topbar'), 'no top bar').toBeNull();
-};
-
 /** A floating sidebar (peek or under 1024): overlay fill and shadow, over the page, and no Blanket under it. */
 const expectFloating = async (frame, aside, surface, surfaceLeftBefore) => {
     await expect(getComputedStyle(aside).position).toBe('absolute');
@@ -190,9 +184,8 @@ const expectFloating = async (frame, aside, surface, surfaceLeftBefore) => {
 
 const atViewport = (width, run) => withTestViewport(width, HEIGHT, run);
 
-/** No seams: there is no top bar, and the Page runs to the top, right and bottom edges. */
+/** No seams: the Page runs to the top, right and bottom edges. */
 const expectNoSeam = async (frame, surface) => {
-    await expectNoTopbar(frame);
     await expect(rect(surface).top - rect(frame).top, 'the Page runs to the top').toBeCloseTo(0, 0);
     await expect(rect(frame).right - rect(surface).right, 'no seam on the right').toBeCloseTo(0, 0);
     await expect(rect(frame).bottom - rect(surface).bottom, 'no seam at the bottom').toBeCloseTo(0, 0);

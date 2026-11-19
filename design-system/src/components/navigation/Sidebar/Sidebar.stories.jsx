@@ -688,7 +688,6 @@ export const SidebarOpen = {
         await expect(getComputedStyle(aside).backgroundColor, 'the sunken fill').toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
         await expect(getComputedStyle(aside).boxShadow, 'docked: the 1px line, no shadow')
             .toBe(computedShadow(canvasElement, 'var(--border-width-default) 0 0 0 var(--ds-border)'));
-        await expect(canvasElement.querySelector('.plus-frame__topbar'), 'no top bar').toBeNull();
         await userEvent.keyboard('{Control>}[[{/Control}');
         await waitFor(() => expect(canvas.getByRole('button', { name: 'Open sidebar' })).toHaveFocus());
         await userEvent.click(canvas.getByRole('button', { name: 'Open sidebar' }));

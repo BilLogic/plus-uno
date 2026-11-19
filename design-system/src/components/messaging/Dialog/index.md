@@ -120,7 +120,7 @@ Don't: Render a bare `Dialog` over page content on your own.
 
 - `Modal` template: places `Dialog` on a Blanket with portal, focus trap, Escape and scroll lock.
 - `FooterActions`: use when placing three actions or a leading text button across the Dialog's four-track footer slot.
-- Templates: use when choosing between a Modal and a focused page; its Usage section weighs the two.
+- Templates: use when choosing between a Modal and a full page; its Usage section weighs the two.
 
 Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `NotificationItem` · `SectionMessage` · `Spotlight`
 

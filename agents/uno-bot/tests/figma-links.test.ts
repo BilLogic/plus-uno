@@ -351,8 +351,8 @@ describe("only registry components", () => {
     // went with them (-9 net). 67: SidebarTab folded into patterns/Sidebar
     // as a pattern-internal part, and its registry row went with it (-1 net).
     // 66: Dropdown was retired for DropdownMenu, which has no figmaMeta of
-    // its own yet (-1 net); Phase D backfills Figma for it. 65: the Specs
-    // TopBar left when the Sidebar refresh removed the top bar (-1 net).
+    // its own yet (-1 net); Phase D backfills Figma for it. 65: a Specs
+    // frame part left when the Sidebar refresh retired it (-1 net).
     // 63: Footer was deleted from code and AiLabel was deleted when the AI UI
     // section replaced it, and their registry rows went with them (-2 net).
     // 57: the Specs code left main for the archive/legacy-ds branch, and six

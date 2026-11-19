@@ -59,7 +59,7 @@ Don't: Stretched across a wide row.
 
 ### Align with the button group. {#align-with-the-button-group}
 
-Right-align in focused tasks and Modals; left-align on full-page forms and content-heavy screens.
+Right-align in multi-step tasks and Modals; left-align on full-page forms and content-heavy screens.
 
 ## Accessibility
 

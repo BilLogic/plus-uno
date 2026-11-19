@@ -54,8 +54,7 @@ const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
 
 /**
  * Frame pattern: the app frame, the Sidebar beside the Page (and the Panel).
- * There is no top bar: the Page runs the full height, and meets a docked
- * Sidebar at its 1px edge.
+ * The Page runs the full height, and meets a docked Sidebar at its 1px edge.
  *
  * - The Frame owns the Sidebar state and hands it to the Sidebar through
  *   `SidebarControlContext`. Open, the toggle (`angles-left`) ends the
@@ -95,7 +94,7 @@ const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
  *   drag or keys. Width and open state are kept in sessionStorage. A modal
  *   leaves it open. Anything inside the Frame opens it through
  *   `usePanelControl`.
- * - There is no top bar on any Frame. A multi-step task runs in the
+ * - A multi-step task runs in the
  *   Sidebar's inner mode: its steps are the rows, and the Page's footer holds
  *   the task's actions.
  * - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation; the

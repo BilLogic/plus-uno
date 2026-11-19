@@ -60,7 +60,7 @@ export const ModalFooter = () => (
     </ModalStage>
 );
 
-/** A focused task's bottom bar: Back and Next split 50/50, Close in the title row, no Cancel. */
+/** A multi-step task's bottom bar: Back and Next split 50/50, Close in the title row, no Cancel. */
 export const MultiStepBar = () => <MultiStepTaskType start={1} />;
 
 /** A card's main action: Subtle in the footer. */
