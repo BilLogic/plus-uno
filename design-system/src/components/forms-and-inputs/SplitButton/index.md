@@ -28,7 +28,7 @@ SplitButton reads these motion tokens and no literal duration or curve.
 | --- | --- | --- | --- |
 | change | Update a value or state | `--ds-motion-appearance-fast` | As Button; its menu is a Popup. |
 | enter | Open and close an overlay | `--ds-motion-appearance-fast` | The menu fades in place. |
-| exit | Open and close an overlay | `--ds-motion-appearance-fast` | The menu fades. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | The menu fades in place, the same as the enter. |
 
 ## Alternatives
 

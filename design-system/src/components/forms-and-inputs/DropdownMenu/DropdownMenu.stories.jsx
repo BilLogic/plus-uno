@@ -256,7 +256,8 @@ export const Open = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        await waitFor(async () => expect(await body(canvasElement).findByRole('menuitem', { name: 'Edit note' })).toBeVisible());
+        const item = await body(canvasElement).findByRole('menuitem', { name: 'Edit note' });
+        await waitFor(() => expect(item).toBeVisible());
         await expect(within(canvasElement).getByRole('button', { name: 'Actions' })).toHaveAttribute('aria-expanded', 'true');
     },
 };
@@ -366,7 +367,8 @@ Loading.play = async ({ canvasElement }) => {
 WithSections.play = async ({ canvasElement }) => {
     await userEvent.click(within(canvasElement).getByRole('button', { name: 'Views' }));
     const page = within(canvasElement.ownerDocument.body);
-    await waitFor(async () => expect(await page.findByRole('menuitem', { name: 'Rename' })).toBeVisible());
+    const rename = await page.findByRole('menuitem', { name: 'Rename' });
+    await waitFor(() => expect(rename).toBeVisible());
     await expect(page.getByRole('menuitem', { name: 'Archive' })).toHaveAttribute('aria-disabled', 'true');
     await waitFor(() => expect(page.getByRole('menuitem', { name: 'Open report' })).toBeVisible());
     await userEvent.keyboard('{Escape}');

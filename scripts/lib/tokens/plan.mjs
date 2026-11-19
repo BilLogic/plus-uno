@@ -420,7 +420,7 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Popup', new: '--popup-width-range', old: null, ref: 'var(--width-2500)', use: 'Width of the range picker\'s Popup: the presets beside the calendar.' },
   { tier: 'components', group: 'Popup', new: '--popup-min-width', old: null, ref: 'var(--width-1000)', use: 'Narrowest an auto-width Popup gets, unless its trigger is wider.' },
   { tier: 'components', group: 'Popup', new: '--popup-max-width', old: null, ref: 'var(--width-2000)', use: 'Widest an auto-width Popup grows to fit its content, unless its trigger is wider.' },
-  { tier: 'components', group: 'Popup', new: '--popup-clip-reach', old: null, ref: 'var(--space-300)', use: 'How far past its edges a Popup\'s opening clip stays, so the overlay shadow is never cut.' },
+  { tier: 'components', group: 'Popup', new: '--popup-clip-reach', old: null, ref: 'var(--space-300)', use: 'Gutter around a Popup or menu in a story stage, so its shadow and the menu are never cut.' },
   { tier: 'components', group: 'AI chat', new: '--ai-chat-width', old: null, ref: 'var(--width-2500)', use: 'Width of the AI chat when it opens as a popup or floats beside the page.' },
   { tier: 'components', group: 'AI chat', new: '--ai-chat-height', old: null, ref: 'calc(var(--height-2000) * 2)', note: '640px', use: 'Height of the AI chat popup, before the window caps it.' },
   { tier: 'components', group: 'AI chat', new: '--ai-chat-fab-size', old: null, ref: 'var(--height-300)', use: 'Width and height of the floating button that opens the AI chat.' },

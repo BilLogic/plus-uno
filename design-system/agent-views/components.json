@@ -17559,6 +17559,7 @@
         "Focused",
         "FieldDisabled",
         "FieldInvalid",
+        "OpensWithAFade",
         "MotionOpenClose",
         "MotionReduced",
         "MotionKeyboardOpen"

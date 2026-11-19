@@ -1,24 +1,34 @@
 // Shared overlay lifecycle. Base UI supplies data-ending-style; owned shells
 // use the same attributes through useOverlayPresence. Shapes only supply names.
+// Pass `false` for `$enter` and `$exit` to leave out the spatial layer: the
+// surface then runs the fade alone, in and out (the menu family).
 @mixin overlay-motion($enter: none, $exit: none, $speed: fast, $fade: fast, $fade-in: plus-overlay-fade, $fade-out: plus-overlay-fade-out) {
-    animation:
-        #{$enter} var(--ds-motion-spatial-#{$speed}-duration) var(--ds-motion-spatial-#{$speed}),
-        #{$fade-in} var(--ds-motion-appearance-#{$fade}-duration) var(--ds-motion-appearance-#{$fade});
+    $fade-enter: #{$fade-in} var(--ds-motion-appearance-#{$fade}-duration) var(--ds-motion-appearance-#{$fade});
+    $fade-exit: #{$fade-out} var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast) forwards;
+
+    @if $enter {
+        animation: #{$enter} var(--ds-motion-spatial-#{$speed}-duration) var(--ds-motion-spatial-#{$speed}), $fade-enter;
+    } @else {
+        animation: $fade-enter;
+    }
 
     &[data-ending-style], &[data-leaving] {
         pointer-events: none;
-        animation:
-            #{$exit} var(--ds-motion-spatial-exit-duration) var(--ds-motion-spatial-exit) forwards,
-            #{$fade-out} var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast) forwards;
+        @if $exit {
+            animation: #{$exit} var(--ds-motion-spatial-exit-duration) var(--ds-motion-spatial-exit) forwards, $fade-exit;
+        } @else {
+            animation: $fade-exit;
+        }
     }
     &[data-leaving='hand'] {
-        animation: #{$fade-out} var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast) forwards;
+        animation: $fade-exit;
     }
+    // In-app reduced motion: no animation. The OS preference below keeps the fade.
     &[data-reduced='true'] { animation: none; }
     @media (prefers-reduced-motion: reduce) {
-        animation: #{$fade-in} var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+        animation: $fade-enter;
         &[data-ending-style], &[data-leaving] {
-            animation: #{$fade-out} var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast) forwards;
+            animation: $fade-exit;
         }
     }
     &[data-open][data-instant='click'], &[data-instant='keyboard'] { animation: none; }
@@ -30,16 +40,9 @@
 @keyframes plus-overlay-scale-out { from { transform: scale(1); } to { transform: scale(.98); } }
 
 // The menu family's open and close (Popup, Select, DropdownMenu, FilterMenu,
-// PopupSelect, TreeSelect): a fade in place on appearance.fast, both ways. No
-// clip, no scale, no travel. A keyboard open is instant; reduced motion keeps
-// the same fade. Modal, Panel and the other overlays use `overlay-motion`.
+// PopupSelect, TreeSelect): `overlay-motion` with the spatial layer left out, so
+// it is a fade in place on appearance.fast, both ways, and the instant and
+// reduced-motion handling above is the only definition of either.
 @mixin menu-fade {
-    animation: plus-overlay-fade var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
-
-    &[data-ending-style], &[data-leaving] {
-        pointer-events: none;
-        animation: plus-overlay-fade-out var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast) forwards;
-    }
-    &[data-reduced='true'] { animation: none; }
-    &[data-open][data-instant='click'], &[data-instant='keyboard'] { animation: none; }
+    @include overlay-motion(false, false);
 }

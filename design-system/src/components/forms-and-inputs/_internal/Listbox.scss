@@ -212,5 +212,4 @@
 
 .plus-listbox {
     @include menu-fade;
-    transform-origin: var(--transform-origin, var(--plus-overlay-origin, center));
 }

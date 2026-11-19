@@ -1,4 +1,4 @@
-import { withReducedMotion, expectOverlayExit } from '@/storybook-docs/lib/overlay-motion-plays';
+import { withReducedMotion, expectMenuExit } from '@/storybook-docs/lib/overlay-motion-plays';
 import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import React, { useEffect, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
@@ -250,6 +250,17 @@ export const FieldInvalid = {
 };
 
 const motionTreeOptions = [{ value: 'school', label: 'Lincoln School', children: [{ value: 'student', label: 'Ana Ruiz' }] }];
+/** It opens and closes with a plain fade on appearance.fast: no clip, scale or travel. */
+export const OpensWithAFade = {
+    render: () => <TreeSelect label="Student" options={motionTreeOptions} />,
+    play: async ({ canvasElement }) => {
+        await userEvent.click(within(canvasElement).getByRole('combobox'));
+        const parent = await within(canvasElement.ownerDocument.body).findByRole('treeitem', { name: 'Lincoln School' });
+        const surface = parent.closest('.plus-tree-select-menu');
+        await expectMenuExit(surface, () => parent.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })), false);
+    },
+};
+
 const treeMotionPlay = (reduced = false) => async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByRole('combobox'));
@@ -267,7 +278,7 @@ const treeMotionPlay = (reduced = false) => async ({ canvasElement }) => {
     await expect(child.isConnected).toBe(true);
     await waitFor(() => expect(child.isConnected).toBe(false));
     const surface = parent.closest('.plus-tree-select-menu');
-    await expectOverlayExit(surface, () => parent.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })), reduced, true);
+    await expectMenuExit(surface, () => parent.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })), reduced);
 };
 export const MotionOpenClose = { render: () => <TreeSelect label="Student" options={motionTreeOptions} />, play: treeMotionPlay() };
 export const MotionReduced = { ...MotionOpenClose, decorators: [withReducedMotion], play: treeMotionPlay(true) };

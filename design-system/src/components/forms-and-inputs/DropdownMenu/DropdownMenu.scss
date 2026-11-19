@@ -6,7 +6,8 @@
  * Popup/max-width-menu.
  *
  * MOTION. A fade in place on appearance.fast, in and out, the same as every
- * menu; a keyboard open is instant and reduced motion keeps the fade.
+ * menu; a keyboard open is instant, the in-app Reduced setting shows it with no
+ * animation, and the system's reduced-motion setting keeps the fade.
  */
 @use '../../../styles/overlay-motion' as *;
 

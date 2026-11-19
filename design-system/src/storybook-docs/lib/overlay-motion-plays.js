@@ -28,14 +28,24 @@ export async function expectMenuFade(surface, phase = 'enter') {
     await expect(style.scale, `${phase}: no scale`).toBe('none');
 }
 
-/** Assert the public surface stays for its exit, then leaves the document. A menu (`menu`) is held to the fade both ways. */
-export async function expectOverlayExit(surface, close, reduced, menu = false) {
+/** Assert the public surface stays for its exit, then leaves the document. */
+export async function expectOverlayExit(surface, close, reduced) {
     if (!reduced) await expect(getComputedStyle(surface).animationName).not.toBe('none');
-    if (menu && !reduced) await expectMenuFade(surface, 'enter');
     await waitFor(() => expect(surface).toBeVisible());
     close();
     if (!reduced) await expect(surface.isConnected).toBe(true);
-    if (menu && !reduced) await expectMenuFade(surface, 'exit');
+    await waitFor(() => expect(surface.isConnected).toBe(false));
+}
+
+/** The same lifecycle for a menu, held to the fade on the way in and out. Under in-app reduced motion nothing animates, so only the lifecycle is read. */
+export async function expectMenuExit(surface, close, reduced) {
+    if (!reduced) await expectMenuFade(surface, 'enter');
+    await waitFor(() => expect(surface).toBeVisible());
+    close();
+    if (!reduced) {
+        await expect(surface.isConnected).toBe(true);
+        await expectMenuFade(surface, 'exit');
+    }
     await waitFor(() => expect(surface.isConnected).toBe(false));
 }
 
@@ -45,7 +55,7 @@ export const selectMotionPlay = (reduced = false) => async ({ canvasElement }) =
     const list = await within(canvasElement.ownerDocument.body).findByRole('listbox');
     const surface = list.closest('.plus-listbox');
     if (reduced) await expect(getComputedStyle(surface).animationName).toBe('none');
-    await expectOverlayExit(surface, () => fireEvent.keyDown(field, { key: 'Escape' }), reduced, true);
+    await expectMenuExit(surface, () => fireEvent.keyDown(field, { key: 'Escape' }), reduced);
     await expect(field).toHaveAttribute('aria-expanded', 'false');
 };
 

@@ -159,6 +159,9 @@ export const EXTERNAL = new Set([
   // Base UI's Positioner sets it on every floating layer it places: the
   // trigger's width, which an auto-width Popup is never narrower than.
   '--anchor-width',
+  // Base UI's Positioner also sets the point a floating layer grows from, which
+  // Modal, Spotlight and Tooltip read ahead of their own origin.
+  '--transform-origin',
 ]);
 
 /**

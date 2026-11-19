@@ -39,7 +39,8 @@
 // MOTION. It fades in place on appearance.fast, in and out, like every menu;
 // the tokens are the Popup row of the motion registry. Only opacity moves; the
 // width never animates. A keyboard open (`data-instant="click"`) is instant,
-// and reduced motion keeps the same fade.
+// the in-app Reduced setting shows it with no animation, and the
+// system's reduced-motion setting keeps the fade.
 .plus-popup {
     display: flex;
     flex-direction: column;

@@ -207,7 +207,7 @@ test('the tokens this pass repointed are gone from the corpus', () => {
 test('a property no file defines is a finding; only the runtime properties Base UI sets are external', () => {
   const { undefinedTokens } = audit([file('docs.jsx', 'const c = "calc(var(--spacing)*4) var(--anchor-width)";')]);
   assert.deepEqual(Object.keys(undefinedTokens), ['--spacing']);
-  assert.deepEqual([...EXTERNAL], ['--anchor-width']);
+  assert.deepEqual([...EXTERNAL], ['--anchor-width', '--transform-origin']);
 });
 
 test('no bare use of a token the system does not have remains', () => {

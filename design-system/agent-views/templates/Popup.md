@@ -135,7 +135,7 @@ Popup reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| enter | Open and close an overlay | `--ds-motion-appearance-fast` | Fades in place; no clip, no travel. From the keyboard it opens with no animation. |
+| enter | Open and close an overlay | `--ds-motion-appearance-fast` | Fades in place; no clip, no travel. From the keyboard it opens with no animation. In-app Reduced mode shows it with no animation; the system reduced-motion setting keeps the fade. |
 | exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades in place, the same as the enter. |
 
 ## Best practices

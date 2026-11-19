@@ -110,7 +110,7 @@ export const MOTION_REGISTRY = [
     name: 'Popup',
     tier: 'template',
     events: {
-      enter: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades in place; no clip, no travel. From the keyboard it opens with no animation.' },
+      enter: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades in place; no clip, no travel. From the keyboard it opens with no animation. In-app Reduced mode shows it with no animation; the system reduced-motion setting keeps the fade.' },
       exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades in place, the same as the enter.' },
     },
   },
@@ -251,12 +251,12 @@ export const MOTION_REGISTRY = [
       enter: {
         transition: 'Open and close an overlay',
         appearance: 'appearance.fast',
-        note: 'Fades in place on appearance.fast, with no clip, scale or travel. From the keyboard it opens with no animation.',
+        note: 'Fades in place on appearance.fast, with no clip, scale or travel. From the keyboard it opens with no animation. In-app Reduced mode shows it with no animation; the system reduced-motion setting keeps the fade.',
       },
       exit: {
         transition: 'Open and close an overlay',
         appearance: 'appearance.fast',
-        note: 'Fades in place on appearance.fast, the same as the enter. Reduced motion keeps the fade.',
+        note: 'Fades in place on appearance.fast, the same as the enter. In-app Reduced mode shows it with no animation; the system reduced-motion setting keeps the fade.',
       },
     },
   },
@@ -301,7 +301,7 @@ export const MOTION_REGISTRY = [
     events: {
       change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'As Button; its menu is a Popup.' },
       enter: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'The menu fades in place.' },
-      exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'The menu fades.' },
+      exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'The menu fades in place, the same as the enter.' },
     },
   },
   {
