@@ -304,6 +304,15 @@ function matchBrace(src, open) {
   return -1;
 }
 
+/** The JSDoc block right above `export const <symbol>` (or `const`), or ''. */
+function jsdocBefore(source, symbol) {
+  const at = source.search(new RegExp(`^(?:export\\s+)?(?:const|function)\\s+${symbol}\\b`, 'm'));
+  if (at < 0) return '';
+  const head = source.slice(0, at).trimEnd();
+  if (!head.endsWith('*/')) return '';
+  return head.slice(head.lastIndexOf('/**'));
+}
+
 /**
  * `ListGroup.Item = ListGroupItem` — a sub-component an agent can call as
  * `<ListGroup.Item>`. Its props live on the assigned symbol, so without this
@@ -312,7 +321,11 @@ function matchBrace(src, open) {
 function subComponents(source, symbol) {
   const out = [];
   const re = new RegExp(`^${symbol}\\.([A-Z]\\w*)\\s*=\\s*(\\w+)\\s*;`, 'gm');
-  for (const m of source.matchAll(re)) out.push({ name: m[1], impl: m[2] });
+  for (const m of source.matchAll(re)) {
+    // A sub-component whose JSDoc carries `@deprecated` is left out of the agent view.
+    const doc = jsdocBefore(source, m[2]);
+    out.push({ name: m[1], impl: m[2], deprecated: /@deprecated\b/.test(doc) });
+  }
   return out;
 }
 
@@ -392,6 +405,7 @@ function parseEntry({ name, group, jsx }) {
     return {
       name: sub.name,
       impl: sub.impl,
+      deprecated: sub.deprecated,
       props: subProps.map((sp) => ({ name: sp.name, type: sp.type.replace(/\s*\(required\)$/, ''), required: /\(required\)$/.test(sp.type), default: null, description: sp.description || null })),
     };
   });

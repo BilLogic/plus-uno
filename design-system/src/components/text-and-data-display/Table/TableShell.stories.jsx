@@ -6,7 +6,7 @@ import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
 import { TableShell } from './TableParts';
-import PatternSection, { SectionToolbar } from '@/patterns/PatternSection';
+import PatternSection from '@/patterns/PatternSection';
 import { Checkbox, Button, EmptyState as PlusEmptyState } from '@/components';
 
 const sampleRows = [
@@ -94,7 +94,6 @@ export default {
     argTypes: {
         children: { table: { disable: true } },
         style: { table: { disable: true } },
-        toolbar: { table: { disable: true } },
         footer: { table: { disable: true } },
         emptyState: { table: { disable: true } },
         empty: {
@@ -174,19 +173,14 @@ const FilteredMembersTable = () => {
     return (
         <PatternSection
             title="Team members"
-            toolbar={(
-                <SectionToolbar
-                    count={`${visible.length} members`}
-                    filters={(
-                        <Button
-                            text={filtered ? 'Role: Admin' : 'All roles'}
-                            appearance="subtle"
-                            spacing="compact"
-                            onClick={() => setFiltered((prev) => !prev)}
-                        />
-                    )}
-                />
-            )}
+            filters={[{
+                key: 'role',
+                label: 'Role',
+                text: filtered ? 'Admin' : 'All',
+                isSelected: filtered,
+                onClick: () => setFiltered((prev) => !prev),
+            }]}
+            count={`${visible.length} members`}
         >
             <TableShell
                 empty={visible.length === 0}

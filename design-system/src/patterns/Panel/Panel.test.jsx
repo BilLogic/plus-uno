@@ -4,7 +4,7 @@ import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ComponentExample, exampleSlug } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard } from '@/storybook-docs/lib/template-page.jsx';
-import { ReadingNoFooter, ReadingWithFooter } from './PanelCases.jsx';
+import { FloatsNoBlanket, OneFloatingPanel, PanelOnBlanket, ReadingNoFooter, ReadingWithFooter, TwoFloatingPanels } from './PanelCases.jsx';
 
 vi.mock('@storybook/addon-docs/blocks', async () => {
     const React = await import('react');
@@ -33,6 +33,23 @@ describe('Panel live cases', () => {
     it('ReadingWithFooter shows the anti-pattern Done button in the footer while reading', () => {
         render(<ReadingWithFooter />);
         expect(screen.getByRole('button', { name: 'Done' })).toBeInTheDocument();
+    });
+
+    it('FloatsNoBlanket and OneFloatingPanel show one Panel with no Blanket, while PanelOnBlanket adds one', () => {
+        for (const Case of [FloatsNoBlanket, OneFloatingPanel]) {
+            const { unmount } = render(<Case />);
+            expect(screen.getAllByRole('button', { name: 'Close' })).toHaveLength(1);
+            expect(document.querySelector('.plus-pattern-blanket')).toBeNull();
+            unmount();
+        }
+        render(<PanelOnBlanket />);
+        expect(screen.getAllByRole('button', { name: 'Close' })).toHaveLength(1);
+        expect(document.querySelector('.plus-pattern-blanket')).not.toBeNull();
+    });
+
+    it('TwoFloatingPanels opens two Panels at once', () => {
+        render(<TwoFloatingPanels />);
+        expect(screen.getAllByRole('button', { name: 'Close' })).toHaveLength(2);
     });
 
     it('links Panel TypeCard anchors to unique ComponentExample and heading ids in Panel.mdx', () => {
