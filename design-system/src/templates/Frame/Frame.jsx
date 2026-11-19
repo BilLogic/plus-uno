@@ -20,6 +20,18 @@ const PEEK_LEAVE_MS = 200;
 /** The sessionStorage key the Panel's width and open state are kept under, for this tab. */
 export const PANEL_STORAGE_KEY = 'plus-frame-panel';
 
+/** Dev-only notice, once, that the old `width="content"` is now `default`. */
+let warnedContentWidth = false;
+const resolveWidth = (width) => {
+    if (width !== 'content') return width;
+    if (!warnedContentWidth && process.env.NODE_ENV !== 'production') {
+        warnedContentWidth = true;
+        // eslint-disable-next-line no-console
+        console.warn('Frame: width="content" is now width="default".');
+    }
+    return 'default';
+};
+
 const clampPanelWidth = (n) => clamp(n, FRAME_LAYOUT.panelMin, FRAME_LAYOUT.panelMax);
 
 /** The Panel's remembered `{ open, width }`, or null where there is none or no storage. */
@@ -100,7 +112,7 @@ const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
  * - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation; the
  *   Panel is a complementary landmark named by `panelLabel`.
  * - The Page pads `--page-pad` (24 at every width) and caps its content at
- *   `--content-max-width` (1232), centered, on a 12-column grid with a
+ *   `--content-max-width` (1232), centered (`width="full"` lifts the cap, `width="reading"` caps it at 864), on a 12-column grid with a
  *   16 gutter. Children span all 12 columns unless they set `grid-column`.
  */
 const Frame = ({
@@ -117,7 +129,7 @@ const Frame = ({
     panelDefaultWidth = FRAME_LAYOUT.panelDefault,
     panelPeek = false,
     panelStorageKey = PANEL_STORAGE_KEY,
-    width = 'content',
+    width: widthProp = 'default',
     contentAs: Content = 'main',
     contentClassName = '',
     surfaceDirect = false,
@@ -126,6 +138,7 @@ const Frame = ({
     children,
     ...props
 }) => {
+    const width = resolveWidth(widthProp);
     const frameRef = useRef(null);
     const rowRef = useRef(null);
     const toggleRef = useRef(null);
@@ -700,8 +713,8 @@ Frame.propTypes = {
     panelPeek: PropTypes.bool,
     /** The sessionStorage key the Panel's width and open state are kept under; null keeps nothing. */
     panelStorageKey: PropTypes.string,
-    /** Content cap: content 1232, reading 864 */
-    width: PropTypes.oneOf(['content', 'reading']),
+    /** Content type: default caps the grid at 1232, full has no cap (chat, a board, a wide table), reading caps it at 864. `content` is the old name for `default`. */
+    width: PropTypes.oneOf(['default', 'full', 'reading', 'content']),
     /** Element for the content box. `main` by default, the Page's landmark; pass `div` when the page supplies its own `main`. */
     contentAs: PropTypes.elementType,
     contentClassName: PropTypes.string,

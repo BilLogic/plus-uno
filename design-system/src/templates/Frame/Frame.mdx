@@ -106,7 +106,7 @@ The default type at 1440 with the AI panel docked.
 
 1. **Sidebar.** 240 wide, docked from 1024, with the toggle ending its logo row.
 2. **Header row.** The Page's first row, 32 high on the logo row's center line: the breadcrumb, once a person has drilled into a record.
-3. **Content.** The Page's content box: no corner radius, a 24 pad, and a 12-column grid capped at 1232 (864 at reading width).
+3. **Content.** The Page's content box: no corner radius, a 24 pad, and a 12-column grid capped at 1232 (864 at reading width, no cap at full width).
 4. **AI panel.** A Frame region on the right, 320 to 640 and opening at 400, with its splitter on the left hairline. It docks from 1168 with a 400 panel, from 1408 beside an open Sidebar; under that it floats over the Page.
 
 </div>
@@ -225,7 +225,7 @@ Lengths are in pixels. Where the layout mode changes a value, the columns read M
 <tbody>
 <tr><td><code>sidebar</code></td><td>The Sidebar. Without it there is no Sidebar and no toggle.</td></tr>
 <tr><td><code>header</code></td><td>The Page's header row: the breadcrumb.</td></tr>
-<tr><td><code>children</code></td><td>The content: Sections in a 12-column grid. <code>width="reading"</code> caps it at 864.</td></tr>
+<tr><td><code>children</code></td><td>The content: Sections in a 12-column grid. <code>width</code> sets the type: <code>default</code> caps it at 1232, <code>full</code> has no cap, <code>reading</code> caps it at 864.</td></tr>
 <tr><td><code>panel</code> · <code>panelLabel</code> · <code>panelOpen</code></td><td>The AI panel region at the right, named for its content, filled with the Panel parts.</td></tr>
 <tr><td><code>surfaceDirect</code></td><td>Children go straight into the Page with no content box, for a bare column or a full-bleed view.</td></tr>
 <tr><td><code>bar</code> <PlannedTag /></td><td>Planned. The multi-step footer, 48 high, with Save and exit, Back and Next. Today the page places the footer.</td></tr>

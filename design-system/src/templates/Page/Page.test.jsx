@@ -184,3 +184,35 @@ describe('Page reference screens', () => {
         expect(pageMdx).toContain('of={ReferenceScreenStories.DetailWithPanel}');
     });
 });
+
+describe('Page docs match the code', () => {
+    const pageScss = readFileSync(join(__dirname, 'Page.scss'), 'utf8');
+    const headerScss = readFileSync(join(__dirname, '../../components/layout-and-structure/PageHeader/PageHeader.scss'), 'utf8');
+    const sizesTable = pageMdx.split('## Sizes')[1].split('</DocsTable>')[0];
+
+    it('shows the three types live, by Frame width', () => {
+        ['TypeDefault', 'TypeFullWidth', 'TypeReading'].forEach((name) => {
+            expect(pageMdx).toContain(`<TypeCard of={PageStories.${name}}`);
+            expect(pageMdx).toContain(`<ComponentExample of={PageStories.${name}}`);
+        });
+        expect(pageMdx).not.toMatch(/Two types/);
+    });
+
+    it('has no levels section: the Page has one fill and no shadow', () => {
+        expect(pageMdx).not.toMatch(/^## Levels/m);
+        expect(pageScss).toMatch(/box-shadow:\s*none/);
+    });
+
+    it('names in the Sizes table only spacing tokens the styles use', () => {
+        const named = [...sizesTable.matchAll(/<code>(--(?:page|stack|section)[a-z-]*)<\/code>/g)].map(([, token]) => token);
+        expect(named.length).toBeGreaterThan(0);
+        named.forEach((token) => expect(pageScss + headerScss, token).toContain(`var(${token})`));
+    });
+
+    it('prints Show code that uses only the public PageHeader, not a docs-only helper', () => {
+        Object.entries(PAGE_CODE).forEach(([name, code]) => {
+            expect(code, name).not.toContain('DemoPageHeader');
+            expect(code, name).not.toMatch(/<PageHeader[^>]*\sdescription=/);
+        });
+    });
+});

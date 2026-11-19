@@ -38,7 +38,7 @@ import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
     page="templates-page"
     eyebrow="Template · Page"
     title="Page"
-    purpose="The content inside a Frame: a page header, then Sections on the 12-column grid. Two types: default and full width."
+    purpose="The content inside a Frame: a page header, then Sections on the 12-column grid. Three types: default, full width and reading."
     links={{
         label: 'Uses',
         items: [
@@ -65,12 +65,17 @@ import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 
 <TypeGrid wide>
 <TypeCard of={PageStories.TypeDefault} to="#default" title="Default" stage={1920}>The content grid, centered and capped at its content width. Nearly every page.</TypeCard>
-<TypeCard of={PageStories.TypeFullWidth} to="#full-width" title="Full width" stage={1920}>The content runs to the pad with no cap, for a page that fills it, such as chat or a board.</TypeCard>
+<TypeCard of={PageStories.TypeFullWidth} to="#full-width" title="Full width" stage={1920}>The content runs to the pad with no cap, for a page that fills it, such as chat, a board or a wide table.</TypeCard>
+<TypeCard of={PageStories.TypeReading} to="#reading" title="Reading" stage={1920}>The grid capped at 864, the readable measure: training lessons, help articles and policies. A multi-step task and sign-in use it too.</TypeCard>
 </TypeGrid>
 
-<ComponentExample of={PageStories.TypeDefault} title="Default" description="The content grid, centered and capped at its content width. Nearly every page." />
+<ComponentExample of={PageStories.TypeDefault} title="Default" description="The 12-column grid, centered and capped at 1232. Nearly every page." />
 
-<ComponentExample of={PageStories.TypeFullWidth} title="Full width" description="The content runs to the pad with no cap, for a page that fills it, such as chat or a board." />
+<ComponentExample of={PageStories.TypeFullWidth} title="Full width" description="The content runs to the pad with no cap, for a page that fills it, such as chat, a board or a wide table." />
+
+<ComponentExample of={PageStories.TypeReading} title="Reading" description="The grid capped at 864, for text a person reads through: lessons, help articles and policies." />
+
+The Frame's <code>width</code> sets the type: <code>default</code>, <code>full</code> or <code>reading</code>.
 
 </div>
 
@@ -140,14 +145,6 @@ Two whole screens built from the templates: a list that keeps search and quick f
 
 <div className="sb-ds-doc-section">
 
-## Levels
-
-A Page used alone is a tokenized container: a fill and its shadow together. The four levels, Sunken, Default, Raised and Overlay, are taught on <DocsLink id="foundations-visual-elevation-overview">Elevation</DocsLink>.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## Sizes
 
 <DocsTable>
@@ -155,14 +152,13 @@ A Page used alone is a tokenized container: a fill and its shadow together. The 
 <tr><th>Token</th><th>Used for</th></tr>
 </thead>
 <tbody>
-<tr><td><code>--stack-sm</code></td><td>Breadcrumb to title; title to description.</td></tr>
-<tr><td><code>--section-stack-sm</code></td><td>Header to page tabs.</td></tr>
-<tr><td><code>--page-stack-md</code></td><td>Header to the first Section; between Sections.</td></tr>
-<tr><td><code>--page-stack-sm</code></td><td>Between related Sections.</td></tr>
+<tr><td><code>--page-header-stack</code></td><td>Between the breadcrumb, the title row and the page tabs.</td></tr>
+<tr><td><code>--page-header-gap</code></td><td>Between the title and the page actions.</td></tr>
+<tr><td><code>--page-stack-md</code></td><td>Header to the banner and the first Section; between Sections.</td></tr>
 <tr><td><code>--heading-lg</code>, <code>--body-default</code>, <code>--body-sm</code></td><td>The title, the description, the breadcrumb.</td></tr>
-<tr><td><code>--content-max-width</code>, <code>--content-min-width</code></td><td>The cap and the floor of the content grid.</td></tr>
+<tr><td><code>--content-max-width</code>, <code>--content-max-width-reading</code>, <code>--content-min-width</code></td><td>The default cap, the reading cap and the floor of the content grid. Full width has no cap.</td></tr>
 <tr><td><code>--grid-columns</code>, <code>--grid-gutter</code>, <code>--page-pad</code></td><td>The 12-column grid, its gutter and the pad.</td></tr>
-<tr><td><code>--ds-surface-sunken</code>, <code>--ds-surface</code>, <code>--ds-surface-raised</code>, <code>--ds-surface-overlay</code></td><td>The four levels' fills, each with its shadow from <DocsLink id="foundations-visual-elevation-overview">Elevation</DocsLink>.</td></tr>
+<tr><td><code>--ds-surface</code></td><td>The Page's one fill, with no shadow.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -226,9 +222,9 @@ A menu's label names a group, and a table's labels are column headers. Neither j
 <tr><td><code>title</code></td><td>The page's one h1, at the heading-lg size, above the content.</td></tr>
 <tr><td><code>children</code></td><td>The Sections and other page content. Existing pages may still supply the header and banner here.</td></tr>
 <tr><td><code>header</code></td><td>One <code>PageHeader</code>: the h1 with <code>breadcrumbs</code> after a drill-in, <code>actions</code> and page tabs in <code>bottomBar</code>. Replaces <code>title</code>.</td></tr>
-<tr><td><code>description</code> · <code>status</code> <PlannedTag /></td><td>Planned. <code>PageHeader</code> has neither slot; the title block holds them.</td></tr>
+<tr><td><code>description</code> · <code>status</code> <PlannedTag /></td><td>Planned. <code>PageHeader</code> has neither slot yet, so the examples here compose both in its <code>title</code> block: the <code>Heading</code>, a StatusTag after it, then one description line.</td></tr>
 <tr><td><code>banner</code></td><td>One page <code>Banner</code>, below the header. Page separates the slots and content with <code>--page-stack-md</code>.</td></tr>
-<tr><td><code>width</code> <PlannedTag /></td><td>Planned. <code>default</code> or <code>full</code>; today the Frame's <code>width</code> sets <code>content</code> or <code>reading</code>.</td></tr>
+<tr><td>Type</td><td>Set on the Frame's <code>width</code>: <code>default</code> (1232), <code>full</code> (no cap) or <code>reading</code> (864). <code>content</code> still works as <code>default</code> and warns.</td></tr>
 <tr><td>Scrolled header <PlannedTag /></td><td>Planned. The sticky one-row header.</td></tr>
 <tr><td><code>as</code></td><td>The container element.</td></tr>
 </tbody>
@@ -248,7 +244,7 @@ A menu's label names a group, and a table's labels are column headers. Neither j
 
 ## Usage
 
-Use Page for the content of every default Frame. It carries the page header, the one h1, and the Sections under it. The default type caps the grid at its content width; full width is for a page that fills it.
+Use Page for the content of every default Frame. It carries the page header, the one h1, and the Sections under it. The default type caps the grid at 1232; full width is for a page that fills the window, such as chat, a board or a wide table; reading caps it at 864 for text people read through.
 
 </div>
 
@@ -389,7 +385,6 @@ Which tier a message belongs to: the <DocsLink id="patterns-notifications">Notif
 - <DocsLink id="templates-frame">Frame</DocsLink>: use when deciding which type the page sits in.
 - <DocsLink id="templates-section">Section</DocsLink>: use when a region needs its own heading, views or detail.
 - <DocsLink id="templates-card">Card</DocsLink>: use when one object has a shape already agreed.
-- <DocsLink id="foundations-visual-elevation-overview">Elevation</DocsLink>: use when picking which shadow goes with which level.
 - <DocsLink id="patterns-overview">Patterns</DocsLink>: use when deciding where a breadcrumb or a tab belongs (Navigation), or choosing the StatusTag beside the title (Indicators).
 
 </div>
