@@ -120,7 +120,7 @@ export const TwoFloatingPanels = () => (
 const DockedAiPanel = () => (
     <div style={{ position: 'absolute', insetBlock: 0, insetInlineEnd: 0, zIndex: 1, display: 'flex', maxInlineSize: '100%' }}>
         <HeadingLevelContext.Provider value={4}>
-            <PanelContainer>
+            <PanelContainer width="var(--panel-width-default)">
                 <PanelHeader title="Assistant" actions={<PanelCloseAction onClick={() => {}} />} />
                 <PanelBody>
                     <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>

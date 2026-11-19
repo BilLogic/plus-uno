@@ -20,7 +20,7 @@ export const CODE = {
 </>`,
     TwoFloatingPanels: `<>
     <SessionsBehind />
-    <div style={{ position: 'absolute', insetBlock: 0, insetInlineEnd: 48, boxShadow: 'var(--ds-shadow-overlay)' }}>
+    <div style={{ position: 'absolute', insetBlock: 0, insetInlineEnd: SECOND_OFFSET, boxShadow: 'var(--ds-shadow-overlay)' }}>
         <DetailsPanel />
     </div>
     ${PANEL.replace(/\n/g, '\n    ')}
@@ -28,7 +28,7 @@ export const CODE = {
     BesideAiPanel: `<>
     <SessionsBehind />
     <div style={{ position: 'absolute', insetBlock: 0, insetInlineEnd: 0 }}>
-        <PanelContainer>{/* Assistant */}</PanelContainer>
+        <PanelContainer width="var(--panel-width-default)">{/* Assistant */}</PanelContainer>
     </div>
     <div style={{ position: 'absolute', insetBlock: 0, insetInlineEnd: 'var(--panel-width-default)', boxShadow: 'var(--ds-shadow-overlay)' }}>
         <DetailsPanel />
@@ -37,9 +37,9 @@ export const CODE = {
     CoversAiPanel: `<>
     <SessionsBehind />
     <div style={{ position: 'absolute', insetBlock: 0, insetInlineEnd: 0 }}>
-        <PanelContainer>{/* Assistant */}</PanelContainer>
+        <PanelContainer width="var(--panel-width-default)">{/* Assistant */}</PanelContainer>
     </div>
-    <div style={{ position: 'absolute', insetBlock: 0, insetInlineEnd: 48, boxShadow: 'var(--ds-shadow-overlay)' }}>
+    <div style={{ position: 'absolute', insetBlock: 0, insetInlineEnd: SECOND_OFFSET, boxShadow: 'var(--ds-shadow-overlay)' }}>
         <DetailsPanel />
     </div>
 </>`,
