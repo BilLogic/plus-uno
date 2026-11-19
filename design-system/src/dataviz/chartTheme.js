@@ -316,6 +316,9 @@ const chartTheme = {
         backgroundColor: 'transparent',
         borderWidth: 0,
         shadow: false,
+        // The Popup padding plus Highcharts' own 8px inset, inside the box, so the
+        // container div is exactly as wide as the tooltip Highcharts positions.
+        padding: tokenNumber('--popup-pad', 16) + 8,
         headerFormat: tooltipHeaderFormat(),
         pointFormat: tooltipPointFormat(),
         style: {

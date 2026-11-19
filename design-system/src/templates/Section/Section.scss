@@ -37,6 +37,8 @@
 /* Title row: heading block (or the custom header) + actions slot */
 .plus-template-section-title-row {
     display: flex;
+    // Actions that do not fit beside the heading drop under it, still at the end.
+    flex-wrap: wrap;
     align-items: flex-start;
     justify-content: space-between;
     gap: var(--inline-md);
@@ -96,6 +98,8 @@
     align-items: center;
     gap: var(--inline-md);
     flex-shrink: 0;
+    margin-inline-start: auto;
+    max-inline-size: 100%;
 }
 
 /*

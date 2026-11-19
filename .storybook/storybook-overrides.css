@@ -989,6 +989,21 @@ a.sbdocs-a {
 
 .sb-ds-agent-view__rendered {
     padding-top: var(--section-stack-lg);
+    min-inline-size: 0;
+    max-inline-size: 100%;
+}
+
+/* A wide table scrolls in its own box. Positioned, so screen-reader text inside
+   it scrolls with the table instead of widening the page. */
+.sb-ds-agent-view__table {
+    position: relative;
+    overflow-x: auto;
+    max-inline-size: 100%;
+}
+
+.sb-ds-agent-view__table:focus-visible {
+    outline: var(--focus-ring-width) solid var(--ds-border-focused);
+    outline-offset: var(--focus-ring-width);
 }
 
 /* A rule's id under its heading: the handle agents cite, quiet below the rule.

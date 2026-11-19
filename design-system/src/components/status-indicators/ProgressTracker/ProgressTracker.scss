@@ -6,6 +6,13 @@
  */
 @use '../../../styles/state' as *;
 
+// Never wider than the space it sits in: steps shrink and a long label
+// truncates, instead of the row setting its own width.
+.plus-progress-tracker {
+    max-inline-size: 100%;
+    min-inline-size: 0;
+}
+
 .plus-progress-tracker__list {
     display: flex;
     list-style: none;

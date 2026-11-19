@@ -2,5 +2,9 @@
 .plus-prompt-starters {
     display: flex;
     flex-wrap: wrap;
+    // Never wider than the space it sits in: a long label truncates instead of
+    // setting the row's width.
+    max-inline-size: 100%;
+    min-inline-size: 0;
     gap: var(--stack-md);
 }

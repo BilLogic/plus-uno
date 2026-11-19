@@ -452,6 +452,12 @@
     border-width: 0 !important;
 }
 
+/* A demo wider than its card scrolls in the well, not the page. */
+.sbdocs .sb-ds-dodont-card__well {
+    min-inline-size: 0;
+    overflow-x: auto;
+}
+
 /*
  * Do and Don't example well: the live example sits centered in the sunken well,
  * while full-width containers (banners, section messages, tables, 12-column grids)

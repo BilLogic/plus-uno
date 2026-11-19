@@ -28,6 +28,9 @@
 
 .plus-table-shell-scroll {
     overflow: auto;
+    // Positioned, so screen-reader text in a cell scrolls with the table: a
+    // static scroll region lets it sit past the edge and widen the page.
+    position: relative;
     // Sticky cells stack inside the table, never over the page around it.
     isolation: isolate;
 

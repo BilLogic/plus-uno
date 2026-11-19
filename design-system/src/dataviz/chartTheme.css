@@ -137,5 +137,8 @@
     background: var(--ds-surface-overlay);
     border-radius: var(--popup-radius);
     box-shadow: var(--ds-shadow-overlay);
-    padding: var(--popup-pad);
+    /* The Popup padding is drawn inside the tooltip's own box (`tooltip.padding` in
+       chartTheme.js), not around it: Highcharts keeps an outside tooltip inside the
+       window by its own width, which padding on this div would not be part of. */
+    padding: 0;
 }

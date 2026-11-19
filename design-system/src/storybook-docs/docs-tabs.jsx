@@ -185,8 +185,21 @@ function CodeTabPanel({ of, importName, importFrom, children }) {
   );
 }
 
-/** Only `slugify`: Storybook's block keeps its own overrides beside it. */
-const AGENT_VIEW_MARKDOWN = { slugify: agentViewSlug };
+/**
+ * A table in the generated file keeps its own width and scrolls in its own box,
+ * so a wide one never pushes the docs column wide. The box takes focus so the
+ * keyboard can scroll it.
+ */
+function AgentViewTable(props) {
+  return (
+    <div className="sb-ds-agent-view__table" role="region" aria-label="Table" tabIndex={0}>
+      <table {...props} />
+    </div>
+  );
+}
+
+/** `slugify` and the table box: Storybook's block keeps its own overrides beside them. */
+export const AGENT_VIEW_MARKDOWN = { slugify: agentViewSlug, overrides: { table: AgentViewTable } };
 
 /**
  * The Harness tab: the component's generated file, exactly as agents read

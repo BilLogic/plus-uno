@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ArgTypes, Canvas, Controls, Source, Stories, useOf } from '@storybook/addon-docs/blocks';
 
 /**
@@ -322,6 +322,23 @@ export function DoDontCaption({ tone, children, style }) {
     );
 }
 
+/** True while the element's content is wider than the element: it scrolls sideways. */
+function useScrollsSideways(ref) {
+    const [scrolls, setScrolls] = useState(false);
+    useEffect(() => {
+        const well = ref.current;
+        if (!well || typeof ResizeObserver === 'undefined') return undefined;
+        const measure = () => setScrolls(well.scrollWidth > well.clientWidth + 1);
+        measure();
+        const observer = new ResizeObserver(measure);
+        observer.observe(well);
+        // The demo inside can change size on its own (a font or a chart loading).
+        well.querySelectorAll(':scope > * , :scope > * > *').forEach((node) => observer.observe(node));
+        return () => observer.disconnect();
+    }, [ref]);
+    return scrolls;
+}
+
 /**
  * One do or don't card: a sunken example well above a filled caption block.
  * Compose with `DoDontPair`, or pass several pairs to `DoDontGrid`.
@@ -332,6 +349,8 @@ export function DoDontCaption({ tone, children, style }) {
  * @param {string} [code] - the example's source, folded under the caption behind Show code
  */
 export function DoDontCard({ tone, children, caption, code }) {
+    const wellRef = useRef(null);
+    const scrolls = useScrollsSideways(wellRef);
     return (
         <figure
             className="sb-ds-dodont-card"
@@ -357,7 +376,10 @@ export function DoDontCard({ tone, children, caption, code }) {
             }}
         >
             <div
+                ref={wellRef}
                 className="sb-ds-dodont-card__well"
+                // A well that scrolls sideways takes focus, so the keyboard can scroll it.
+                {...(scrolls ? { role: 'region', 'aria-label': 'Example', tabIndex: 0 } : {})}
                 style={{
                     flex: 1,
                     minHeight: 'calc(var(--field-min-height-sm) * 2)',
