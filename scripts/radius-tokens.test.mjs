@@ -26,18 +26,16 @@ const RADIUS = {
   '--radius-control-sm': [6, 'var(--space-0375)'],
   '--radius-control-md': [8, 'var(--space-050)'],
   '--radius-control-lg': [10, 'var(--space-0625)'],
-  '--section-radius': [16, 'var(--radius-xxl)'],
   '--modal-radius': [16, 'var(--radius-xxl)'],
   '--card-radius': [16, 'var(--radius-xxl)'],
-  '--card-radius-compact': [12, 'var(--radius-xl)'],
   '--popup-radius': [12, 'var(--radius-xl)'],
   '--table-radius': [12, 'var(--radius-xl)'],
   '--frame-sidebar-row-radius': [6, 'var(--radius-control-sm)'],
 };
 
-test('--radius-full and the 19 semantic and component tokens exist', () => {
+test('--radius-full and the 17 semantic and component tokens exist', () => {
   for (const name of ['--radius-full', '--button-radius-default', '--button-radius-compact', '--button-radius-spacious']) assert.ok(corpus.has(name), name);
-  assert.equal(Object.keys(RADIUS).length + 4, 19);
+  assert.equal(Object.keys(RADIUS).length + 4, 17);
 });
 
 for (const [name, [px, raw]] of Object.entries(RADIUS)) {

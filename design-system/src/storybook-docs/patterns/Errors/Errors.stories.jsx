@@ -3,6 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { expectSectionHeader } from '@/storybook-docs/lib/section-header-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import { EMPTY, FILLED, FormInModal, FormInPage, PAGE_WIDTH } from '../../../patterns/Form/formDemo.jsx';
@@ -53,7 +54,7 @@ export const PlaceField = {
     },
 };
 
-/** A view that could not load: the error in the empty-state slot, with Try again; the view bar stays. */
+/** A view that could not load: the error in the empty-state slot, with Try again; the header rows stay. */
 export const PlaceLoadFailure = {
     name: 'Place: A view that could not load',
     render: () => staged(<LoadFailure />, PLACE_STAGE),
@@ -64,7 +65,8 @@ export const PlaceLoadFailure = {
         await expect(canvas.getByRole('heading', { name: "Couldn't load this week's sessions" }), 'the heading says what failed').toBeInTheDocument();
         await expect(canvas.getByRole('button', { name: 'Try again' }), 'the way forward').toBeInTheDocument();
         await expect(canvas.queryByRole('table'), 'the table is replaced whole').toBeNull();
-        await expect(canvas.getByRole('tab', { name: 'This week' }), 'the view bar stays').toBeInTheDocument();
+        await expect(canvas.getByRole('tab', { name: 'This week' }), 'the header rows stay').toBeInTheDocument();
+        await expectSectionHeader(canvasElement, 2);
         await fitsCanvas(canvasElement);
     },
 };

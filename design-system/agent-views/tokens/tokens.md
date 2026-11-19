@@ -68,11 +68,22 @@ Space owned by a template: page, section, card, table, modal, popup. Inside a te
 --blanket-max-height-modal  /* Tallest a Modal may grow inside its Blanket. */
 --blanket-pad-x  /* Horizontal space between the screen edge and a Modal on its Blanket. */
 --blanket-pad-y  /* Vertical space between the screen edge and a Modal on its Blanket; shrinks on short screens. */
---card-pad-compact  /* Padding inside a PatternCard with compact spacing. */
---card-pad-default  /* Padding inside a PatternCard with default spacing. */
---card-pad-spacious  /* Padding inside a PatternCard with spacious spacing. */
+--card-border-default  /* Border color of a default PatternCard. */
+--card-border-width  /* Border width on every PatternCard (transparent on sunken and raised so forced colors draw an edge). */
+--card-description-font  /* Description font of a PatternCard. */
+--card-pad  /* Padding inside a PatternCard at every size. */
 --card-radius  /* Corner rounding of a PatternCard. */
---card-radius-compact  /* Corner rounding of a compact PatternCard or a card nested in another surface. */
+--card-shadow-overlay  /* Shadow of a dragged PatternCard, and of a clickable raised card on hover. */
+--card-shadow-raised  /* Shadow of a raised PatternCard, of a clickable sunken or default card on hover, and when pressed. */
+--card-surface-default  /* Surface fill of a default PatternCard. */
+--card-surface-overlay  /* Surface fill of a PatternCard while dragged. */
+--card-surface-raised  /* Surface fill of a raised PatternCard, and of a clickable card on hover. */
+--card-surface-raised-hovered  /* Surface fill of a clickable raised PatternCard while hovered. */
+--card-surface-raised-pressed  /* Surface fill of a clickable PatternCard while pressed. */
+--card-surface-sunken  /* Surface fill of a sunken PatternCard (the default). */
+--card-text  /* Primary text color inside a PatternCard. */
+--card-text-subtle  /* Secondary description text color inside a PatternCard. */
+--card-title-font-lg  /* Title font of a PatternCard with a half-width side image. */
 --frame-sidebar-group-gap  /* Vertical gap between two groups of rows in the Sidebar. */
 --frame-sidebar-pad  /* Padding on every side inside the Sidebar. */
 --frame-sidebar-row-gap  /* Vertical gap between two rows in the Sidebar. */
@@ -90,12 +101,6 @@ Space owned by a template: page, section, card, table, modal, popup. Inside a te
 --modal-width-6-col  /* Width of a small Modal, such as a single question or a one-field form. */
 --modal-width-8-col  /* Width of a default Modal, such as a short form. */
 --page-border-width  /* Width of the edge drawn around a Page frame. */
---page-pad-x-compact  /* Horizontal padding of a Page with compact spacing. */
---page-pad-x-default  /* Horizontal padding of a Page with default spacing. */
---page-pad-x-spacious  /* Horizontal padding of a Page with spacious spacing. */
---page-pad-y-compact  /* Vertical padding of a Page with compact spacing. */
---page-pad-y-default  /* Vertical padding of a Page with default spacing. */
---page-pad-y-spacious  /* Vertical padding of a Page with spacious spacing. */
 --panel-inline-lg  /* Horizontal gap between a Panel footer disclaimer and its actions. */
 --panel-inline-md  /* Horizontal gap between parts of a Panel header. */
 --panel-inline-sm  /* Horizontal gap between actions in a Panel header action group. */
@@ -108,13 +113,6 @@ Space owned by a template: page, section, card, table, modal, popup. Inside a te
 --popup-radius  /* Corner rounding of a Popup. */
 --popup-width-3-col  /* Width of a 3-column Popup, such as a short picker. */
 --popup-width-4-col  /* Width of a 4-column Popup, such as a date picker or a menu with descriptions. */
---section-pad-x-compact  /* Horizontal padding of a PatternSection with compact spacing. */
---section-pad-x-default  /* Horizontal padding of a PatternSection with default spacing. */
---section-pad-x-spacious  /* Horizontal padding of a PatternSection with spacious spacing. */
---section-pad-y-compact  /* Vertical padding of a PatternSection with compact spacing. */
---section-pad-y-default  /* Vertical padding of a PatternSection with default spacing. */
---section-pad-y-spacious  /* Vertical padding of a PatternSection with spacious spacing. */
---section-radius  /* Corner rounding of a PatternSection that has a fill. */
 --section-toolbar-count-min-width  /* Minimum width of the result count in a PatternSection toolbar before it truncates. */
 --section-toolbar-min-width  /* Minimum width of the start group in a PatternSection toolbar before its controls wrap. */
 --table-empty-radius  /* Corner rounding of the empty state box that replaces an empty table. */

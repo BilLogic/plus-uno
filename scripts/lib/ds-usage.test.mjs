@@ -31,7 +31,7 @@ const ctx = contextFrom({
   },
   defined: new Set(['--local-gap', '--element-radius-full']),
   freeRegular: new Set(['bell', 'star']),
-  retired: new Map([['--element-radius-full', '--radius-full'], ['--card-pad-md', '--card-pad-default']]),
+  retired: new Map([['--element-radius-full', '--radius-full'], ['--card-radius-sm', '--card-radius']]),
   promoted: new Set(['--radius-full']),
   exported: new Set(['Button', 'Logo', 'Modal', 'TableRow', 'FLAG_APPEARANCES']),
 });
@@ -221,8 +221,8 @@ test('ds/no-primitive-read: a primitive the token plan names as a semantic step 
 test('a retired token name: a warning while it is still declared, an unknown token once it is not', () => {
   const live = escapesIn({ path: 'p/a.scss', text: '.a { border-radius: var(--element-radius-full); }' }, ctx);
   assert.deepEqual(live.map((f) => [f.rule, f.level, f.fix]), [['ds/no-retired-name', 'warn', 'use var(--radius-full)']]);
-  const gone = escapesIn({ path: 'p/a.scss', text: '.a { padding: var(--card-pad-md); }' }, ctx);
-  assert.deepEqual(gone.map((f) => [f.rule, f.fix]), [['ds/no-unknown-token', 'use var(--card-pad-default)']]);
+  const gone = escapesIn({ path: 'p/a.scss', text: '.a { border-radius: var(--card-radius-sm); }' }, ctx);
+  assert.deepEqual(gone.map((f) => [f.rule, f.fix]), [['ds/no-unknown-token', 'use var(--card-radius)']]);
 });
 
 test('closest: the nearest name within a small edit distance, else null', () => {

@@ -128,7 +128,7 @@ export const FocusRingDoDont = {
 export const Dividers = {
     render: () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
-            <PatternCard padding="md">
+            <PatternCard>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                         <span style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>Upcoming sessions</span>
@@ -181,7 +181,7 @@ export const SidebarEdges = {
                     panelStorageKey={null}
                     breadcrumbs={[{ text: 'Home', href: '#home' }, { text: 'Sessions' }]}
                 >
-                    <Page level="surface" padding="sm">
+                    <Page>
                         <PatternSection title="Upcoming sessions" />
                     </Page>
                 </InAppFrame>
@@ -203,7 +203,7 @@ export const SidebarEdges = {
                         </div>
                     )}
                 >
-                    <Page level="surface" padding="sm">
+                    <Page>
                         <PatternSection title="Upcoming sessions" />
                     </Page>
                 </InAppFrame>

@@ -2,7 +2,7 @@
 // Shells own the frame (tokens for bg/radius/elevation/border/spacing);
 // consumers fill the slots.
 
-export { default as Page, PAGE_LEVELS } from './Page';
+export { default as Page } from './Page';
 export { default as Frame } from './Frame';
 export { useSidebarControl } from './Frame/SidebarControl';
 export { usePanelControl } from './Frame/PanelControl';

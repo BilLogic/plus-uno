@@ -115,7 +115,7 @@ test('kind 2: fails when a live variable has no WEB code syntax and is not on th
   const findings = checkTokenNaming(
     makeSnapshot({
       'spacing / templates': {
-        variables: ['Card/pad-default'],
+        variables: ['Card/pad'],
         codeSyntax: {},
       },
     }),
@@ -125,8 +125,8 @@ test('kind 2: fails when a live variable has no WEB code syntax and is not on th
   assert.equal(findings[0].kind, 'missing-syntax');
   assert.equal(findings[0].severity ?? 'error', 'error');
   assert.match(findings[0].message, /spacing \/ templates/);
-  assert.match(findings[0].message, /Card\/pad-default/);
-  assert.match(findings[0].message, /--card-pad-default/);
+  assert.match(findings[0].message, /Card\/pad/);
+  assert.match(findings[0].message, /--card-pad/);
   assert.equal(exitCodeFor(findings), 1);
 });
 
@@ -340,11 +340,11 @@ test('run(ctx) reads SCSS tokens and snapshot from repoRoot and fails if snapsho
   const okRoot = fixtureTree(
     {
       'spacing / templates': {
-        variables: ['Card/pad-default'],
-        codeSyntax: { 'Card/pad-default': 'var(--card-pad-default)' },
+        variables: ['Card/pad'],
+        codeSyntax: { 'Card/pad': 'var(--card-pad)' },
       },
     },
-    ['--card-pad-default: 16px;'],
+    ['--card-pad: 16px;'],
   );
   assert.deepEqual(run({ repoRoot: okRoot }), []);
 });

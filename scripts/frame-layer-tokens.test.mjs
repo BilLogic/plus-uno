@@ -434,9 +434,9 @@ test('one hairline token across the Frame: the semantic border width, never the 
   assert.doesNotMatch(read('design-system/src/patterns/Frame/Frame.scss'), /--stroke-1/);
 });
 
-test('a Section takes its radius from a Section token, not the Card', () => {
-  assert.equal(corpus.get('--section-radius')?.value, corpus.get('--card-radius')?.value);
-  assert.doesNotMatch(read('design-system/src/patterns/PatternSection/PatternSection.scss'), /--card-radius/);
+test('a Section draws no surface of its own: no radius token, no fill, no pad', () => {
+  assert.equal(corpus.get('--section-radius'), undefined);
+  assert.doesNotMatch(read('design-system/src/patterns/PatternSection/PatternSection.scss'), /--section-radius|--section-pad|--card-radius/);
 });
 
 test('the Frame names its server-render width instead of writing 1440 bare', () => {

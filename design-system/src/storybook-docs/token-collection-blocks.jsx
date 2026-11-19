@@ -133,7 +133,7 @@ export const SpringSemanticTable = () => (
 
 const TWO_WORD = new Set(['focused', 'frame', 'font', 'line', 'scroll', 'option', 'menu', 'join', 'choice', 'progress', 'count', 'focus', 'ai', 'motion', 'grid', 'type']);
 
-/** The family a token's rows are grouped under: `--ds-text-subtle` is text, `--card-pad-default` is card. */
+/** The family a token's rows are grouped under: `--ds-text-subtle` is text, `--card-pad` is card. */
 const familyKey = (name) => {
     const parts = name.replace(/^--(ds-)?/, '').split('-');
     if (parts[0] === 'palette' || (TWO_WORD.has(parts[0]) && parts.length > 1 && !/^\d/.test(parts[1]))) {

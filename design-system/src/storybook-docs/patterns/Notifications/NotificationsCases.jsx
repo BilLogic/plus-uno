@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Banner, Flag, FlagGroup } from '@/components';
 import { Page, PatternSection } from '@/patterns';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
-import { STUDENTS, StudentsTable, ViewBar } from '@/storybook-docs/lib/view-bar.jsx';
+import { STUDENTS, StudentsTable, ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
 import { DemoPageHeader } from '../../../patterns/Page/pageDemo.jsx';
 
 /**
@@ -158,17 +158,8 @@ export const TierSectionCase = () => {
         <BrowserWindow address="app.plus.org/students">
             <Page header={<DemoPageHeader title="Students" description="Lincoln Middle" />}>
                 <PatternSection
-                    title="Students"
-                    type="tabs-only"
-                    tabs={(
-                        <ViewBar
-                            views={['All students', 'Paused']}
-                            activeView={view}
-                            onViewChange={setView}
-                            filters={null}
-                            primary={null}
-                        />
-                    )}
+                    title="All students"
+                    views={<ViewPills views={['All students', 'Paused']} activeView={view} onViewChange={setView} />}
                 >
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
                         <Banner appearance="warning">Two of six students have no guardian contact on file.</Banner>

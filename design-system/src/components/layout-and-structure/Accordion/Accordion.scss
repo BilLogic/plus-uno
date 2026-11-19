@@ -14,7 +14,7 @@
 
 .plus-accordion {
     width: 100%;
-    border-radius: var(--card-radius-compact);
+    border-radius: var(--card-radius);
 
     // --- ACCORDION ITEM ---
     .plus-accordion-item {
@@ -22,22 +22,22 @@
         border: var(--border-width-default) solid var(--ds-border);
 
         &:first-of-type {
-            border-top-left-radius: var(--card-radius-compact);
-            border-top-right-radius: var(--card-radius-compact);
+            border-top-left-radius: var(--card-radius);
+            border-top-right-radius: var(--card-radius);
 
             .plus-accordion-trigger {
-                border-top-left-radius: var(--card-radius-compact);
-                border-top-right-radius: var(--card-radius-compact);
+                border-top-left-radius: var(--card-radius);
+                border-top-right-radius: var(--card-radius);
             }
         }
 
         &:last-of-type {
-            border-bottom-left-radius: var(--card-radius-compact);
-            border-bottom-right-radius: var(--card-radius-compact);
+            border-bottom-left-radius: var(--card-radius);
+            border-bottom-right-radius: var(--card-radius);
 
             .plus-accordion-trigger:not([data-panel-open]) {
-                border-bottom-left-radius: var(--card-radius-compact);
-                border-bottom-right-radius: var(--card-radius-compact);
+                border-bottom-left-radius: var(--card-radius);
+                border-bottom-right-radius: var(--card-radius);
             }
         }
 
@@ -57,7 +57,7 @@
     // --- ACCORDION TRIGGER ---
     .plus-accordion-trigger {
         width: 100%;
-        padding: var(--card-pad-default) var(--card-pad-default);
+        padding: var(--card-pad);
         background-color: var(--ds-surface);
         color: var(--ds-text-subtle);
         font: var(--heading-sm);
@@ -108,7 +108,7 @@
 
     // --- ACCORDION BODY ---
     .plus-accordion-body {
-        padding: var(--card-pad-default) var(--card-pad-default);
+        padding: var(--card-pad);
         background-color: var(--ds-surface);
         color: var(--ds-text-subtle);
         font: var(--body-lg);

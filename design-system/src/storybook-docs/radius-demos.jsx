@@ -101,7 +101,7 @@ const small = { font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' };
 const codeText = { font: 'var(--code-default)', color: 'var(--ds-text-subtle)' };
 const well = {
     position: 'relative',
-    padding: 'var(--card-pad-spacious)',
+    padding: 'var(--card-pad)',
     borderRadius: 'var(--card-radius)',
     background: 'var(--ds-surface-sunken)',
 };
@@ -204,24 +204,22 @@ export const ScaleStrip = () => {
 
 const MAP = { w: 320, h: 180 };
 
-/** Frame, Page, Section and Card: 0 at the window, 16 for each template, 12 nested in a fill. */
+/** Frame, Page and Card: 0 at the window, 16 for each Card. */
 export const TemplateMap = () => (
     <Legended
         testid="radius-templates"
-        title="A Frame holding a Page, a Card, and a Section with a fill holding a compact Card"
+        title="A Frame holding a Page, a Card, and a sunken Card holding a Card"
         stage={MAP}
         parts={[
             { id: 'page', title: 'Page in the Frame', value: '0', at: [306, 168] },
-            { id: 'section', title: 'Section with a fill', token: '--section-radius', at: [170, 46] },
             { id: 'card', title: 'Card', token: '--card-radius', at: [56, 46] },
-            { id: 'card-compact', title: 'Card inside a filled Section', token: '--card-radius-compact', at: [180, 72] },
         ]}
     >
         <Screen x={0} y={0} w={MAP.w} h={MAP.h}>
             <Card x={56} y={46} w={100} h={120} />
-            <TokenRect x={170} y={46} w={138} h={120} token="--section-radius" scale="kit" fill={PAINT.sectionSubtleSurface} data-part="section-box" />
+            <TokenRect x={170} y={46} w={138} h={120} token="--card-radius" scale="kit" fill={PAINT.sectionSubtleSurface} data-part="section-box" />
             <SkeletonBar x={180} y={56} w={44} h={5} heading />
-            <RaisedBox x={180} y={72} w={118} h={84} token="--card-radius-compact" data-part="card-compact" />
+            <RaisedBox x={180} y={72} w={118} h={84} token="--card-radius" data-part="card-nested" />
             <SkeletonBar x={190} y={84} w={60} heading />
             {[0, 1].map((i) => <SkeletonBar key={i} x={190} y={96 + i * 10} w={80 - i * 24} />)}
         </Screen>

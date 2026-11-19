@@ -22,7 +22,7 @@ Also asked as: list of records, data table on a page, sortable list, records wit
 
 ## Usage
 
-A table sits in a Section and spans it. Its first and last cells sit flush with the section edge. The Section header carries the toolbar and the tabs: search, filters and the record count use the toolbar type, and saved views use the tabs type. The bulk bar is never in the Section header: while rows are selected, a Dynamic table's head row becomes it, so the toolbar stays put. Empty and no results replace the whole table so the Section header stays usable; loading and error states happen inside the table, under its header. Paging stays under the rows, inside the same Section.
+A table sits in a Section and spans it. Its first and last cells sit flush with the section edge. The Section header carries the views, then Search and the "Field: value" filters with the record count. The bulk bar is never in the Section header: while rows are selected, a Dynamic table's head row becomes it, so the header rows stay put. Empty and no results replace the whole table so the Section header stays usable; loading and error states happen inside the table, under its header. Paging stays under the rows, inside the same Section.
 
 ### Type guidance
 
@@ -34,7 +34,7 @@ Choose by what people do with the rows. Read the questions in order and stop at 
 | Can people act on the table: sort, filter, select, page, expand rows or use row actions? | Dynamic table |
 | Otherwise, people only read it. | Static table |
 
-Search, filters and actions sit in the Section header: `<Table title="Students" toolbar={<PatternSection.Toolbar />} kind="dynamic" tableProps={...} />`. Pass the table as `children` instead of `kind` when you build it yourself.
+Search, filters and actions sit in the Section header: `<Table title="Students" views={...} search={...} filters={[...]} count="340 students" kind="dynamic" tableProps={...} />`. Pass the table as `children` instead of `kind` when you build it yourself.
 
 ## Motion
 
@@ -53,15 +53,15 @@ Don't: The table sits inside its own frame with padding. It stops lining up with
 
 ### Put nothing between the header and the head row. {#put-nothing-between-the-header-and-the-head-row}
 
-Do: Search, filters and the record count live in the Section header toolbar. The head row follows directly.
+Do: Search, filters and the record count live in the Section header rows. The head row follows directly.
 Don't: A second toolbar sits between the Section header and the head row. The table has no toolbar of its own.
 
 ### One table per block. {#one-table-per-block}
 
 Never mix a Static, Dynamic or Tree table in one Section either.
 
-Do: One table per Section, with its own header, so people always know which rows a toolbar acts on.
-Don't: Two tables share one Section and one header. The toolbar no longer says which table it acts on.
+Do: One table per Section, with its own header, so people always know which rows its Search and filters act on.
+Don't: Two tables share one Section and one header. Search and filters no longer say which table they act on.
 
 ### Use a Dynamic table for rows people act on. {#use-a-dynamic-table-for-rows-people-act-on}
 
@@ -85,7 +85,7 @@ Don't: A hierarchy faked with expandable rows: the classes and students lose the
 
 ## Related
 
-- Section: the header types, toolbar and tabs, that sit above every table.
+- Section: the header rows that sit above every table.
 - Static table, Dynamic table and Tree table: the three table components the template takes.
 - Pagination: the pager that fills the footer slot.
 - Card: a table never sits inside a card.
@@ -137,7 +137,7 @@ Row states are layered over each cell's fill, never swapped for it.
 | Do | Don't |
 | --- | --- |
 | Name every column with a short head, in sentence case: "Last session". | A blank head, or one in all caps. |
-| Give the count in words in the toolbar: "340 students". | A count in the head row or under the table. |
+| Give the count in words in the header: "340 students". | A count in the head row or under the table. |
 | An empty message that says what will appear and the first action: "No members yet", "Invite a member". | An empty table body with no message. |
 
 ## Props

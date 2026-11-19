@@ -3,6 +3,7 @@ import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { expectSectionHeader } from '@/storybook-docs/lib/section-header-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { BasicPage, BasicStudents, BodySearch, FocusedPage, FocusedStudents, PANEL, SCOPE, STAGE, SearchStudents } from './searchDemo.jsx';
 
@@ -30,7 +31,7 @@ const bodyRows = (canvasElement) => canvasElement.querySelectorAll('tbody tr');
 
 /* ---------- the three types, as the page's opening grid ---------- */
 
-/** Active: the field in the view bar, rows narrow as you type. */
+/** Active: the field in the header, rows narrow as you type. */
 export const TypeActive = {
     name: 'Type: active',
     render: () => staged(<SearchStudents initialQuery="ia" />),
@@ -125,7 +126,7 @@ export const BasicField = {
 
 /* ---------- active: states ---------- */
 
-/** Closed: the compact icon in the view bar, named for its scope. */
+/** Closed: the compact icon in the header, named for its scope. */
 export const Closed = {
     name: 'State: closed',
     render: () => staged(<SearchStudents />),
@@ -133,10 +134,11 @@ export const Closed = {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         const canvas = within(canvasElement);
-        const bar = canvasElement.querySelector('.plus-section-view-bar');
+        const bar = canvasElement.querySelector('.plus-section-row--filters');
         const search = canvas.getByRole('button', { name: SCOPE });
-        await expect(bar.contains(search), 'the icon sits in the view bar').toBe(true);
+        await expect(bar.contains(search), 'the icon sits in the third header row').toBe(true);
         await expect(canvas.queryByRole('searchbox'), 'no field while closed').toBeNull();
+        await expectSectionHeader(canvasElement, 2);
         await expect(status(canvas).textContent, 'the count shows with nothing typed').toBe('6 students');
         await fitsCanvas(canvasElement);
     },

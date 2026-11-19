@@ -57,7 +57,7 @@ export const ElevationPanel = React.forwardRef(({ children, style, ...rest }, re
             position: 'relative',
             boxSizing: 'border-box',
             width: '100%',
-            padding: 'var(--card-pad-spacious)',
+            padding: 'var(--card-pad)',
             borderRadius: 'var(--card-radius)',
             background: 'var(--ds-background-neutral)',
             color: 'var(--ds-text)',
@@ -755,8 +755,8 @@ const TemplateTile = ({ title, description, tokens, ariaTitle, children }) => (
         <div
             style={{
                 boxSizing: 'border-box',
-                padding: 'var(--card-pad-compact)',
-                borderRadius: 'var(--card-radius-compact)',
+                padding: 'var(--card-pad)',
+                borderRadius: 'var(--card-radius)',
                 background: 'var(--ds-surface)',
                 boxShadow: 'inset 0 0 0 var(--border-width-default) var(--ds-border)',
             }}
@@ -942,7 +942,7 @@ export const ShadowRampFigure = () => {
             style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-md)), 1fr))',
-                borderRadius: 'var(--card-radius-compact)',
+                borderRadius: 'var(--card-radius)',
                 overflow: 'hidden',
                 border: 'var(--border-width-default) solid var(--ds-border)',
             }}
@@ -955,7 +955,7 @@ export const ShadowRampFigure = () => {
                     style={{
                         background: 'var(--ds-surface)',
                         color: 'var(--ds-text)',
-                        padding: 'var(--card-pad-spacious) var(--card-pad-default)',
+                        padding: 'var(--card-pad)',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',

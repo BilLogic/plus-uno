@@ -13,7 +13,7 @@ Where a failure shows and what it says: the place follows what failed, and the m
 Give each failure one home near its cause. Key cases shows the two submit failures: blocked and rejected.
 
 - **A field.** The error on the field, after blur. It clears once the rule is met: Forms.
-- **A view that could not load.** The error in the empty-state slot, with Try again. The view bar stays.
+- **A view that could not load.** The error in the empty-state slot, with Try again. The header rows stay.
 - **No access.** The same slot, saying who can help. No action the person cannot take.
 - **A background job.** A danger Flag that stays, with Try again.
 - **The whole page.** A danger Banner for a condition that applies to everything on the page, for as long as it holds.
@@ -102,7 +102,7 @@ It says what happened and what to do, and the field errors it names sit on their
 
 **Checked:** Automatic
 
-Content that fails to load takes the place an empty view would, in the Section's body, so the view bar and the rest of the page keep working. No access uses the same slot and names who can help.
+Content that fails to load takes the place an empty view would, in the Section's body, so the header rows and the rest of the page keep working. No access uses the same slot and names who can help.
 
 Do: The failure in the Section's slot; the rest of the page works.
 Don't: A Modal over the whole page to report one Section's failure.

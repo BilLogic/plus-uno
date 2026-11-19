@@ -16,15 +16,6 @@
     --frame-sidebar-group-gap: var(--space-100); /* two Sidebar groups sit 16 apart */
     --frame-sidebar-row-radius: var(--radius-control-sm); /* the rounding of a Sidebar row (6) */
 
-    /* Page */
-    --page-pad-x-compact: var(--space-150);
-    --page-pad-x-default: var(--space-200);
-    --page-pad-x-spacious: var(--space-250);
-    --page-pad-y-compact: var(--space-100);
-    --page-pad-y-default: var(--space-150);
-    --page-pad-y-spacious: var(--space-200);
-    --page-border-width: var(--stroke-2);
-
     /* Panel */
     --panel-min-width: var(--width-2000); /* the narrowest the splitter allows (320) */
     --panel-width-default: var(--width-2500); /* the width a Panel opens at (400) */
@@ -37,22 +28,15 @@
     --panel-inline-lg: var(--space-100);
 
     /* Section */
-    --section-pad-x-compact: var(--space-100);
-    --section-pad-x-default: var(--space-150);
-    --section-pad-x-spacious: var(--space-200);
-    --section-pad-y-compact: var(--space-100);
-    --section-pad-y-default: var(--space-150);
-    --section-pad-y-spacious: var(--space-200);
-    --section-radius: var(--radius-xxl); /* the rounding of a Section with a fill */
     --section-toolbar-min-width: var(--width-3000);
     --section-toolbar-count-min-width: var(--size-300);
 
     /* Card */
-    --card-pad-compact: var(--space-100);
-    --card-pad-default: var(--space-125);
-    --card-pad-spacious: var(--space-150);
+    --card-pad: var(--space-100);
     --card-radius: var(--radius-xxl);
-    --card-radius-compact: var(--radius-xl);
+    --card-border-width: var(--border-width-default);
+    --card-title-font-lg: var(--heading-md);
+    --card-description-font: var(--body-default);
 
     /* Table */
     --table-radius: var(--radius-xl);
@@ -76,6 +60,9 @@
     --modal-width-10-col: 629px;
     --modal-body-min-height: var(--height-500);
 
+    /* Page */
+    --page-border-width: var(--stroke-2);
+
     /* Popup */
     --popup-radius: var(--radius-xl);
     --popup-width-3-col: 200px; /* 3 · 4 screen-grid columns plus 2 × 16 popup pad at 768 · 1024 · 1440 */
@@ -86,6 +73,19 @@
 :root,
 [data-color-mode],
 [data-contrast-mode] {
+
+    /* Card */
+    --card-surface-sunken: var(--ds-surface-sunken);
+    --card-surface-default: var(--ds-surface);
+    --card-surface-raised: var(--ds-surface-raised);
+    --card-surface-raised-hovered: var(--ds-surface-raised-hovered);
+    --card-surface-raised-pressed: var(--ds-surface-raised-pressed);
+    --card-surface-overlay: var(--ds-surface-overlay);
+    --card-border-default: var(--ds-border);
+    --card-shadow-raised: var(--ds-shadow-raised);
+    --card-shadow-overlay: var(--ds-shadow-overlay);
+    --card-text: var(--ds-text);
+    --card-text-subtle: var(--ds-text-subtle);
 
     /* Table */
     --table-empty-surface: var(--ds-surface-sunken);

@@ -2,7 +2,7 @@
 
 # PatternCard
 
-PLUS card: an optional image, content and footer on the raised surface and shadow. - **Image placement**: `top` (default), `start` or `end`. Side images apply at the large card minimum width and fill the height. `imageSplit` chooses one third (default) or one half; half uses Heading md on a side card. Below the large minimum width, the image returns to the top with its own ratio. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: `padding` sets Card/pad-compact · default · spacious (via prop values `'sm'`, `'md'`, `'lg'`), the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: the raised pair at rest. A card with an `onClick` lifts on hover to the raised surface's hovered step under the overlay shadow, and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.
+PLUS card: an optional image, content and footer on a `sunken`, `default`, or `raised` surface. - **Surface**: `sunken` (default, flat), `default` (page surface with a 1px border, flat), or `raised` (raised surface and shadow). Every card carries a 1px border (transparent on sunken and raised) so forced colors draw its edge. - **Image placement**: `top` (default), `start` or `end`. Side images apply at the large card minimum width and fill the height. `imageSplit` chooses one third (default) or one half; half uses Heading md on a side card. Below the large minimum width, the image returns to the top with its own ratio. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: padding uses `--card-pad` and radius uses `--card-radius` at every size, the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: a clickable `sunken` or `default` card lifts to Raised on hover in place and settles to the raised shadow while pressed; a clickable `raised` card lifts to the raised hovered step under the overlay shadow and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.
 
 Also asked as: summary card, object card.
 
@@ -14,7 +14,7 @@ Also asked as: summary card, object card.
 
 **Source:** `design-system/src/patterns/PatternCard/PatternCard.jsx`
 
-**Stories:** `design-system/src/patterns/PatternCard/PatternCard.stories.jsx` — Overview, Interactive, Elevation, Anatomy, Jobs, SizeCompact, SizeDefault, SizeSpacious, ImageWide, ImageStandard, ImageSquare, ImageTop, ImageTopHovered, ImageTopPressed, ImageTopDragging, ImageStart, ImageStartHovered, ImageStartPressed, ImageStartDragging, ImageEnd, ImageEndHovered, ImageEndPressed, ImageEndDragging, ImageStartHalf, ImageEndHalf, ImageTopIgnoresSplit, BodyOnly, WithFooter, CustomHeader, Static, Clickable, Dragging, LoadingCard, Rows, PlacementBoundary
+**Stories:** `design-system/src/patterns/PatternCard/PatternCard.stories.jsx` — Overview, Interactive, Elevation, Anatomy, Jobs, SizeSmall, SizeMedium, SizeLarge, ImageWide, ImageStandard, ImageSquare, ImageTop, ImageTopHovered, ImageTopPressed, ImageTopDragging, ImageStart, ImageStartHovered, ImageStartPressed, ImageStartDragging, ImageEnd, ImageEndHovered, ImageEndPressed, ImageEndDragging, ImageStartHalf, ImageEndHalf, ImageTopIgnoresSplit, BodyOnly, WithFooter, CustomHeader, SurfaceSunken, SurfaceDefault, SurfaceRaised, Static, Clickable, Dragging, ForcedColors, LoadingCard, Rows, PlacementBoundary
 
 **Storybook page:** `design-system/src/patterns/PatternCard/PatternCard.mdx`
 
@@ -22,12 +22,16 @@ Also asked as: summary card, object card.
 
 ## Usage
 
-Use a card when one object needs its own container on the page. It uses the raised fill and shadow with no border. A card holds a heading, content and an optional footer for actions. Fill its slots with your own parts.
+Use a card when one object needs its own container on the page. Pick `surface` by the card's role: `sunken` (default) groups static content on `--ds-surface-sunken` without a shadow; `default` pairs `--ds-surface` with a 1px `--ds-border` on the Frame, on Sunken or colored areas, and for dense rows; `raised` pairs `--ds-surface-raised` with `--ds-shadow-raised` for the one primary card per view, first in reading order. A card holds a heading, content and an optional footer for actions. Fill its slots with your own parts.
 
 1. Pick the size by what the card holds.
 2. Choose a header, or omit it when the body carries its own title.
 3. Fill the body slot. Add spacing only inside slot content, using Card stack tokens.
 4. Add a footer only for actions that commit.
+
+### Color
+
+To give a card a semantic or accent fill, swap its surface token for a solid brand (`--ds-background-brand-subtlest`, or `--ds-background-brand-bold` with `--ds-text-inverse`), status (`--ds-background-information`, `--ds-background-success`), accent-subtlest (`--ds-background-accent-teal-subtlest`), or selected (`--ds-background-selected`) background token. `surface="raised"` keeps `--ds-shadow-raised`. On a clickable colored card, hovered and pressed states use that same token's `-hovered` and `-pressed` steps.
 
 ### Size guidance
 
@@ -35,11 +39,11 @@ Content picks the size. Choose the smallest card that holds the content without 
 
 | Size | When to use | Pad | Radius | Minimum width | Height cap |
 | --- | --- | --- | --- | --- | --- |
-| `sm` | One number or one line. | 16 | 12 | 224 | 304 |
-| `md` | A short list or a few lines. | 20 | 16 | 304 | 400 |
-| `lg` | A summary with several parts. | 24 | 16 | 480 | 640 |
+| `sm` | One number or one line. | 16 | 16 | 224 | 304 |
+| `md` | A short list or a few lines. | 16 | 16 | 304 | 400 |
+| `lg` | A summary with several parts. | 16 | 16 | 480 | 640 |
 
-In Figma, `size` picks the pad, the radius and the minimum width together. In code, `padding` sets the pad and the radius, and `minWidth` sets the minimum width. A height cap is set with `style`'s `maxHeight`, and the card clips what passes it.
+In Figma, `size` picks the minimum width. In code, `minWidth` sets the minimum width; every size uses `--card-pad` (16) and `--card-radius` (16). A height cap is set with `style`'s `maxHeight`, and the card clips what passes it.
 
 ### Cards in a row
 
@@ -71,7 +75,7 @@ Don't: The same number in lg leaves most of the card empty. Size down instead of
 
 ### Never put a card inside a card. {#never-put-a-card-inside-a-card}
 
-A card's raised fill and shadow are its own object boundary. Group related cards in a Section instead.
+A card's fill and edge are its own object boundary. Group related cards in a Section instead.
 
 Do: One card; three metrics stacked in its body, split by dividers.
 Don't: Three mini cards inside the card. Borders and shadows pile up and the hierarchy flattens.
@@ -91,8 +95,9 @@ A card that holds actions that commit a change gets a footer, and its actions st
 - A card that is clickable as a whole needs a role and a tab stop, and it must answer Enter and Space. When the card has one action, put a Button in the footer instead.
 - Mark the card `aria-busy` while it loads. The skeleton bars are hidden from assistive technology.
 - The hover lift is never the only cue that a card is clickable. Pair it with a visible action or a link in the card.
-- Text sits on the raised surface in `--ds-text` and `--ds-text-subtle`, which meet contrast in every color mode.
-- The card sets the current surface to its raised fill, so a sticky table cell inside it matches the card.
+- Every card keeps a 1px border (transparent on sunken and raised) so forced colors draw its edge.
+- Text sits on each surface in `--ds-text` and `--ds-text-subtle`, which meet contrast in every color mode.
+- The card sets `--ds-utility-elevation-surface-current` to its chosen surface, so a sticky table cell inside it matches the card.
 
 ## Related
 
@@ -116,9 +121,9 @@ The image sits above (or, in a side layout, beside) a padded frame, and the head
 
 | State | What changes |
 | --- | --- |
-| Rest | The raised pair: `--ds-surface-raised` with `--ds-shadow-raised`. |
-| Hovered | A clickable card only: `--ds-surface-raised-hovered` with `--ds-shadow-overlay`. A card with no `onClick` does not change. |
-| Pressed | A clickable card only: `--ds-surface-raised-pressed` with `--ds-shadow-raised`. |
+| Rest | `sunken` (default): `--ds-surface-sunken`, flat. `default`: `--ds-surface` with a 1px `--ds-border`, flat. `raised`: `--ds-surface-raised` with `--ds-shadow-raised`. Every surface keeps a 1px border (transparent on sunken and raised) for forced colors. |
+| Hovered | A clickable card only: `sunken` and `default` lift in place to `--ds-surface-raised` with `--ds-shadow-raised`; `raised` lifts to `--ds-surface-raised-hovered` with `--ds-shadow-overlay`. A card with no `onClick` does not change. |
+| Pressed | A clickable card only: settles to `--ds-surface-raised-pressed` with `--ds-shadow-raised`. |
 | Focused | The card has no focus style of its own. A card made clickable as a whole takes `role` and `tabIndex` from you. |
 | Disabled | A card is never disabled. Disable the controls inside it. |
 | Dragging | `--ds-surface-overlay` with `--ds-shadow-overlay`, held under hover and press. |
@@ -128,19 +133,19 @@ The image sits above (or, in a side layout, beside) a padded frame, and the head
 
 | Token | Value | Used for |
 | --- | --- | --- |
-| `--card-pad-compact`, `-default`, `-spacious` | 16 · 20 · 24 | The pad of a small, medium and large card. |
-| `--card-radius-compact` | 12 | The radius of a small card, and of a card inside a filled Section. |
-| `--card-radius` | 16 | The radius of medium and large cards. |
+| `--card-pad` | 16 | Padding inside a card at every size. |
+| `--card-radius` | 16 | Corner rounding of a card at every size. |
 | `--card-stack-sm`, `-md`, `-lg` | 4 · 8 · 12 | Title to description; header to body, set by `gap`; body to footer. |
 | `--card-inline-md` | 8 | Items on a row, such as actions in the header. |
 | `--card-min-width-sm`, `-md`, `-lg` | 224 · 304 · 480 | The minimum width of each size. |
 | `--card-max-height-sm`, `-md`, `-lg` | 304 · 400 · 640 | The height cap of each size. |
-| `--ds-surface-raised`, `--ds-shadow-raised` | color pair | The card at rest. |
-| `--ds-surface-raised-hovered`, `--ds-surface-raised-pressed` | color | A clickable card while hovered and pressed. |
-| `--ds-surface-overlay`, `--ds-shadow-overlay` | color pair | A dragged card, and the hover lift's shadow. |
-| `--heading-xs`, `--body-default` | type | The regular title and the description. |
-| `--heading-md` | type | The title beside a half-width side image. |
-| `--ds-text`, `--ds-text-subtle` | color | The title and the description. |
+| `--card-surface-sunken`, `-default`, `-raised` | color | The card fill at rest (`--ds-surface-sunken`, `--ds-surface`, `--ds-surface-raised`). |
+| `--card-border-default`, `--card-border-width` | border | The 1px `--ds-border` on `default` cards, and the 1px width kept on every card for forced colors. |
+| `--card-shadow-raised`, `-overlay` | shadow | `--ds-shadow-raised` on raised and hovered clickable cards; `--ds-shadow-overlay` while dragged or hovering a raised card. |
+| `--card-surface-raised-hovered`, `-pressed`, `-overlay` | color | Clickable hover/press steps and the dragged overlay surface. |
+| `--heading-xs`, `--card-description-font` | type | The regular title and the description (`--body-default`). |
+| `--card-title-font-lg` | type | The title beside a half-width side image (`--heading-md`). |
+| `--card-text`, `--card-text-subtle` | color | The title and the description (`--ds-text`, `--ds-text-subtle`). |
 
 ## Content guidelines
 
@@ -163,7 +168,7 @@ The image sits above (or, in a side layout, beside) a padded frame, and the head
 | `imagePlacement` | enum | `'top'` | Image position. Side placements apply from the large card minimum width; narrower cards put the image on top. |
 | `imageSplit` | enum | `'1/3'` | Side image share. One half also steps the title up to Heading md. Ignored for top placement. |
 | `footer` | node | — | Footer slot: commit actions, left-aligned, Card/stack-lg below the body |
-| `padding` | enum | `'md'` | Padding scale: Card/pad-compact · default · spacious (16 · 20 · 24) |
+| `surface` | enum | `'sunken'` | Surface level: sunken (default, flat), default (page fill with a 1px border, flat), or raised (raised fill and shadow) |
 | `gap` | enum | `'md'` | Header-to-body stack: Card/stack-sm · md · lg (4 · 8 · 12) |
 | `minWidth` | number or string | — | Minimum width constraint (number of px or any CSS length) |
 | `onClick` | func | — | Click handler, passed to the card's root element. Its presence adds the clickable class: a pointer cursor and the hover lift. It adds no role or tab stop; pass `role` and `tabIndex` for a card clickable as a whole. |
@@ -179,7 +184,7 @@ The image sits above (or, in a side layout, beside) a padded frame, and the head
 
 **`imageSplit`** — `1/3` · `1/2`
 
-**`padding`** — `sm` · `md` · `lg`
+**`surface`** — `sunken` · `default` · `raised`
 
 **`gap`** — `sm` · `md` · `lg`
 
@@ -187,7 +192,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--card-inline-md` · `--card-pad-compact` · `--card-pad-default` · `--card-pad-spacious` · `--card-radius` · `--card-radius-compact` · `--card-stack-lg` · `--card-stack-md` · `--card-stack-sm` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-shadow-overlay` · `--ds-shadow-raised` · `--ds-surface-overlay` · `--ds-surface-raised` · `--ds-surface-raised-hovered` · `--ds-surface-raised-pressed` · `--ds-text` · `--ds-text-subtle` · `--ds-utility-elevation-surface-current` · `--heading-md`
+`--card-border-default` · `--card-border-width` · `--card-description-font` · `--card-inline-md` · `--card-pad` · `--card-radius` · `--card-shadow-overlay` · `--card-shadow-raised` · `--card-stack-lg` · `--card-stack-md` · `--card-stack-sm` · `--card-surface-default` · `--card-surface-overlay` · `--card-surface-raised` · `--card-surface-raised-hovered` · `--card-surface-raised-pressed` · `--card-surface-sunken` · `--card-text` · `--card-text-subtle` · `--card-title-font-lg` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-utility-elevation-surface-current`
 
 From `design-system/src/patterns/PatternCard/PatternCard.scss`. Override these through the token layer, never with a literal.
 

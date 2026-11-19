@@ -3,6 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { expectSectionHeader } from '@/storybook-docs/lib/section-header-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { Flag, FlagGroup } from '@/components';
@@ -166,6 +167,7 @@ export const TierSectionStory = {
         await expectFullScale(canvasElement);
         await expect(canvasElement.querySelectorAll('.plus-banner'), 'one Banner at a time').toHaveLength(1);
         await expect(canvas.getAllByRole('row').slice(1)).toHaveLength(6);
+        await expectSectionHeader(canvasElement, 1);
         await userEvent.click(canvas.getByRole('tab', { name: 'Paused' }));
         await expect(canvas.getAllByRole('row').slice(1)).toHaveLength(2);
         await expect(canvas.getByText('Jordan Patel')).toBeInTheDocument();

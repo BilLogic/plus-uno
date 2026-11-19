@@ -22,7 +22,7 @@ const InDocs = ({ children }) => <div className="sb-unstyled">{children}</div>;
 /** One number fits a small card, which is only as wide as it needs. */
 export const MetricInSmall = () => (
     <InDocs>
-        <PatternCard padding="sm" minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-sm)' }}>
+        <PatternCard minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-sm)' }}>
             {metric}
         </PatternCard>
     </InDocs>
@@ -31,7 +31,7 @@ export const MetricInSmall = () => (
 /** The same number in a large card leaves most of it empty. */
 export const MetricInLarge = () => (
     <InDocs>
-        <PatternCard padding="lg" minWidth="var(--card-min-width-lg)">
+        <PatternCard minWidth="var(--card-min-width-lg)">
             {metric}
         </PatternCard>
     </InDocs>
@@ -40,7 +40,7 @@ export const MetricInLarge = () => (
 /** The same card shell serves a metric tile, a progress display and a session summary. */
 export const CardJobs = () => (
     <div style={{ display: 'flex', gap: 'var(--grid-gutter)', flexWrap: 'wrap', alignItems: 'flex-start' }}>
-        <PatternCard padding="sm" minWidth="var(--card-min-width-sm)">
+        <PatternCard minWidth="var(--card-min-width-sm)">
             {metric}
         </PatternCard>
         <PatternCard title="Math fluency" description="Grade 7 · this term" minWidth="var(--card-min-width-md)">
@@ -109,7 +109,7 @@ export const MetricsAsNestedCards = () => (
         <PatternCard title="Sessions this week" style={{ maxWidth: 'var(--card-min-width-md)' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-md)' }}>
                 {tallies.map((row) => (
-                    <PatternCard key={row[1]} padding="sm">{tally(row)}</PatternCard>
+                    <PatternCard key={row[1]}>{tally(row)}</PatternCard>
                 ))}
             </div>
         </PatternCard>

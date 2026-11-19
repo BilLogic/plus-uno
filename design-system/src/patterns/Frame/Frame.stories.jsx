@@ -17,7 +17,6 @@ import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/li
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 import { InAppFrame, RECORD_CRUMBS } from '@/storybook-docs/lib/pattern-demo.jsx';
-import { PAGE_EDGE } from '@/patterns/Page';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 
 /**
@@ -257,8 +256,9 @@ export const ColorModes = {
         await waitFor(() => expect(getComputedStyle(sidebar()).position, 'docked at 1024, in flow').not.toBe('absolute'));
         const aside = sidebar();
         await expect(rect(aside).right, 'the sidebar sits flush against the surface').toBeCloseTo(rect(surface).left, 0);
+        const surfaceEdge = '0 0 0 var(--stroke-2) var(--ds-border-surface)';
         const edgeLine = 'var(--border-width-default) 0 0 0 var(--ds-border)';
-        await expect(tokenLength(frame, '--page-border-width'), 'the surface edge covers the divider')
+        await expect(tokenLength(frame, '--stroke-2'), 'the surface edge covers the divider')
             .toBeGreaterThanOrEqual(tokenLength(frame, '--border-width-default'));
         await inEveryColorMode(async (mode) => {
             const frameStyle = getComputedStyle(frame);
@@ -268,7 +268,7 @@ export const ColorModes = {
             await expect(frameStyle.color, `${mode}: frame text`).toBe(tokenColor(canvasElement, '--ds-text'));
             await expect(surfaceStyle.backgroundColor, `${mode}: the surface`).toBe(tokenColor(canvasElement, '--ds-surface'));
             await expect(surfaceStyle.boxShadow, `${mode}: the surface edge`)
-                .toBe(computedShadow(canvasElement, PAGE_EDGE));
+                .toBe(computedShadow(canvasElement, surfaceEdge));
             await expect(asideStyle.backgroundColor, `${mode}: the docked sidebar stays sunken`).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
             await expect(asideStyle.boxShadow, `${mode}: the docked sidebar's 1px edge in the border color`)
                 .toBe(computedShadow(canvasElement, edgeLine));
@@ -373,7 +373,7 @@ export const Medium768 = {
 
         await expect(offset(frame, surface).x, 'surface starts at the window edge').toBeCloseTo(0, 0);
         await expect(surfacePad(surface), 'surface pad').toBeCloseTo(tokenLength(frame, '--page-pad'), 0);
-        await expect(surfacePad(surface), 'surface pad is 24 at every width').toBeCloseTo(tokenLength(frame, '--page-pad-y-default'), 0);
+        await expect(surfacePad(surface), 'surface pad is 24 at every width').toBeCloseTo(24, 0);
         await expect(rect(content).width, 'content width').toBeCloseTo(tokenLength(frame, '--content-width'), 0);
         await expectNoSeam(frame, surface);
 
@@ -433,7 +433,7 @@ export const Large1024 = {
         await expect(getComputedStyle(sidebar()).position).not.toBe('absolute');
         await expect(offset(frame, surface).x).toBeCloseTo(tokenLength(frame, '--frame-sidebar-width'), 0);
         await expect(surfacePad(surface)).toBeCloseTo(tokenLength(frame, '--page-pad'), 0);
-        await expect(surfacePad(surface), 'surface pad is 24 at every width').toBeCloseTo(tokenLength(frame, '--page-pad-y-default'), 0);
+        await expect(surfacePad(surface), 'surface pad is 24 at every width').toBeCloseTo(24, 0);
         await expect(rect(content).width).toBeCloseTo(tokenLength(frame, '--content-width'), 0);
         await expectNoSeam(frame, surface);
         await expectCorner(frame, surface);
@@ -521,7 +521,7 @@ export const XLarge1440 = {
         await waitFor(() => expect(sidebar()).not.toBeNull());
         await expectToggleHome(frame, p.toggle);
         await expect(surfacePad(surface), 'surface pad from 1440').toBeCloseTo(tokenLength(frame, '--page-pad'), 0);
-        await expect(surfacePad(surface)).toBeCloseTo(tokenLength(frame, '--page-pad-y-default'), 0);
+        await expect(surfacePad(surface), 'surface pad is 24 at every width').toBeCloseTo(24, 0);
         await expect(rect(content).width).toBeCloseTo(tokenLength(frame, '--content-width'), 0);
     }),
 };
@@ -2351,7 +2351,6 @@ const DrillDemo = ({ initialDepth = 0 }) => {
                                                 {DRILL_STUDENTS.map((student) => (
                                                     <PatternCard
                                                         key={student.id}
-                                                        padding="sm"
                                                         data-drill-row={student.id}
                                                         title={student.name}
                                                         description={student.detail}
@@ -2388,7 +2387,6 @@ const DrillDemo = ({ initialDepth = 0 }) => {
                                                     return (
                                                         <PatternCard
                                                             key={session[0]}
-                                                            padding="sm"
                                                             data-drill-row={rowId}
                                                             title={session[0]}
                                                             actions={(
@@ -2644,7 +2642,6 @@ const RecordOverlayDemo = () => {
                                                 {DRILL_STUDENTS.map((student) => (
                                                     <PatternCard
                                                         key={student.id}
-                                                        padding="sm"
                                                         data-drill-row={student.id}
                                                         title={student.name}
                                                         description={student.detail}
@@ -2925,7 +2922,7 @@ const FocusedStepMotionDemo = ({ count = 4, allowExtraBranch = false }) => {
                         width="reading"
                         style={{ flex: '1 1 auto', minBlockSize: 0 }}
                     >
-                        <div data-probe="steps-layout" data-steps={placement} style={{ display: 'flex', flexDirection: down ? 'row' : 'column', gap: 'var(--page-pad-x-default)' }}>
+                        <div data-probe="steps-layout" data-steps={placement} style={{ display: 'flex', flexDirection: down ? 'row' : 'column', gap: 'var(--page-pad)' }}>
                             <div data-probe="steps" style={down ? { flex: `0 0 ${STEPS_RAIL}px`, inlineSize: STEPS_RAIL } : undefined}>
                                 <ProgressTracker
                                     label="Steps"

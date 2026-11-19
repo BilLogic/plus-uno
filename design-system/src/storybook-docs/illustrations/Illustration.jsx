@@ -54,7 +54,7 @@ export const IllustrationFigure = ({ caption, children }) => (
   <figure
     style={{
       margin: 0,
-      padding: 'var(--card-pad-default)',
+      padding: 'var(--card-pad)',
       background: 'var(--ds-surface)',
       borderRadius: 'var(--radius-lg)',
       boxShadow: 'var(--ds-shadow-raised)',

@@ -116,9 +116,9 @@ export default {
             control: 'text',
             table: { category: 'Slots' },
         },
-        padding: {
+        surface: {
             control: 'select',
-            options: ['sm', 'md', 'lg'],
+            options: ['sunken', 'default', 'raised'],
             table: { category: 'Design' },
         },
         gap: {
@@ -166,7 +166,7 @@ export const Interactive = {
         actions: '',
         header: '',
         footer: 'Footer slot',
-        padding: 'md',
+        surface: 'sunken',
         gap: 'md',
         minWidth: '',
         imagePlacement: 'top',
@@ -179,7 +179,7 @@ export const Interactive = {
             actions={args.actions || undefined}
             header={args.header || undefined}
             footer={args.footer || undefined}
-            padding={args.padding}
+            surface={args.surface}
             image={imagePlaceholder('16:9')}
             imagePlacement={args.imagePlacement}
             imageSplit={args.imageSplit}
@@ -192,18 +192,37 @@ export const Interactive = {
 };
 
 /**
- * A PLUS card rests on the raised pair: the raised surface and its shadow,
- * whose ring is the edge, with no border. A clickable card lifts while hovered
- * (the raised surface's hovered step under the overlay shadow) and settles
- * back while pressed; a dragged card is on the overlay pair. Held in all four
- * modes.
+ * A PLUS card defaults to `sunken` (`--ds-surface-sunken`, flat). `default` uses
+ * `--ds-surface` with a 1px `--ds-border`, flat. `raised` uses the raised
+ * pair. A clickable sunken or default card lifts to Raised on hover in place
+ * and settles to `--ds-surface-raised-pressed` with `--ds-shadow-raised`; a
+ * clickable raised card lifts to hovered + overlay shadow and settles back
+ * while pressed; a dragged card keeps the overlay pair. Held in all four
+ * modes, with a 1px border width on every card and `--ds-utility-elevation-surface-current`
+ * following the chosen surface.
  */
 export const Elevation = {
     parameters: { docs: { disable: true } },
     render: () => (
         <div style={{ display: 'flex', gap: 'var(--section-stack-lg)', flexWrap: 'wrap' }}>
-            <PatternCard title="Static" minWidth={200 /* token gap: 200px */}>{bodyCopy}</PatternCard>
-            <PatternCard title="Clickable" minWidth={200 /* token gap: 200px */} role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</PatternCard>
+            <PatternCard title="Sunken" minWidth={200 /* token gap: 200px */}>
+                <div data-surface-probe="sunken" style={{ background: 'var(--ds-utility-elevation-surface-current)' }}>
+                    {bodyCopy}
+                </div>
+            </PatternCard>
+            <PatternCard surface="default" title="Default" minWidth={200 /* token gap: 200px */}>
+                <div data-surface-probe="default" style={{ background: 'var(--ds-utility-elevation-surface-current)' }}>
+                    {bodyCopy}
+                </div>
+            </PatternCard>
+            <PatternCard surface="raised" title="Raised" minWidth={200 /* token gap: 200px */}>
+                <div data-surface-probe="raised" style={{ background: 'var(--ds-utility-elevation-surface-current)' }}>
+                    {bodyCopy}
+                </div>
+            </PatternCard>
+            <PatternCard title="Clickable sunken" minWidth={200 /* token gap: 200px */} role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</PatternCard>
+            <PatternCard surface="default" title="Clickable default" minWidth={200 /* token gap: 200px */} role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</PatternCard>
+            <PatternCard surface="raised" title="Clickable raised" minWidth={200 /* token gap: 200px */} role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</PatternCard>
             <PatternCard title="Dragging" minWidth={200 /* token gap: 200px */} dragging>{bodyCopy}</PatternCard>
         </div>
     ),
@@ -218,28 +237,55 @@ export const Elevation = {
             return { shadow: style.boxShadow, fill: style.backgroundColor };
         };
         const pair = (surface, shadow) => ({
-            shadow: computedShadow(canvasElement, `var(${shadow})`),
+            shadow: shadow ? computedShadow(canvasElement, `var(${shadow})`) : 'none',
             fill: tokenColor(canvasElement, surface),
         });
         const lightRaised = tokenColor(canvasElement, '--ds-surface-raised');
 
         await inEveryColorMode(async (mode) => {
-            const raised = pair('--ds-surface-raised', '--ds-shadow-raised');
-            const static_ = card('Static');
-            const clickable = card('Clickable');
+            const sunkenRest = pair('--ds-surface-sunken', null);
+            const defaultRest = pair('--ds-surface', null);
+            const raisedRest = pair('--ds-surface-raised', '--ds-shadow-raised');
+            const sunkenStatic = card('Sunken');
+            const defaultStatic = card('Default');
+            const raisedStatic = card('Raised');
+            const clickableSunken = card('Clickable sunken');
+            const clickableDefault = card('Clickable default');
+            const clickableRaised = card('Clickable raised');
 
-            await expect(paint(static_), `${mode}: a card rests on the raised pair`).toEqual(raised);
-            await expect(paint(clickable), `${mode}: a clickable card rests on the raised pair`).toEqual(raised);
-            await expect(withForcedPseudo(static_, ':hover', () => paint(static_)), `${mode}: hovering a static card`).toEqual(raised);
-            await expect(withForcedPseudo(clickable, ':hover', () => paint(clickable)), `${mode}: hovering a clickable card`)
-                .toEqual(pair('--ds-surface-raised-hovered', '--ds-shadow-overlay'));
-            await expect(withForcedPseudo(clickable, ':active', () => paint(clickable)), `${mode}: pressing a clickable card`)
+            await expect(paint(sunkenStatic), `${mode}: default card rests on sunken, flat`).toEqual(sunkenRest);
+            await expect(paint(defaultStatic), `${mode}: default surface rests on --ds-surface, flat`).toEqual(defaultRest);
+            await expect(paint(raisedStatic), `${mode}: raised surface rests on the raised pair`).toEqual(raisedRest);
+
+            await expect(getComputedStyle(canvasElement.querySelector('[data-surface-probe="sunken"]')).backgroundColor, `${mode}: surface-current follows sunken`).toBe(sunkenRest.fill);
+            await expect(getComputedStyle(canvasElement.querySelector('[data-surface-probe="default"]')).backgroundColor, `${mode}: surface-current follows default`).toBe(defaultRest.fill);
+            await expect(getComputedStyle(canvasElement.querySelector('[data-surface-probe="raised"]')).backgroundColor, `${mode}: surface-current follows raised`).toBe(raisedRest.fill);
+
+            await expect(withForcedPseudo(sunkenStatic, ':hover', () => paint(sunkenStatic)), `${mode}: hovering a static sunken card`).toEqual(sunkenRest);
+            await expect(withForcedPseudo(clickableSunken, ':hover', () => paint(clickableSunken)), `${mode}: hovering a clickable sunken card lifts to Raised`)
+                .toEqual(raisedRest);
+            await expect(withForcedPseudo(clickableSunken, ':active', () => paint(clickableSunken)), `${mode}: pressing a clickable sunken card settles to raised shadow`)
                 .toEqual(pair('--ds-surface-raised-pressed', '--ds-shadow-raised'));
+
+            await expect(withForcedPseudo(clickableDefault, ':hover', () => paint(clickableDefault)), `${mode}: hovering a clickable default card lifts to Raised`)
+                .toEqual(raisedRest);
+            await expect(withForcedPseudo(clickableDefault, ':active', () => paint(clickableDefault)), `${mode}: pressing a clickable default card settles to raised shadow`)
+                .toEqual(pair('--ds-surface-raised-pressed', '--ds-shadow-raised'));
+
+            await expect(withForcedPseudo(clickableRaised, ':hover', () => paint(clickableRaised)), `${mode}: hovering a clickable raised card`)
+                .toEqual(pair('--ds-surface-raised-hovered', '--ds-shadow-overlay'));
+            await expect(withForcedPseudo(clickableRaised, ':active', () => paint(clickableRaised)), `${mode}: pressing a clickable raised card`)
+                .toEqual(pair('--ds-surface-raised-pressed', '--ds-shadow-raised'));
+
             await expect(paint(card('Dragging')), `${mode}: a dragged card`).toEqual(pair('--ds-surface-overlay', '--ds-shadow-overlay'));
-            await expect(getComputedStyle(static_).borderTopWidth, `${mode}: the ring is the edge, not a border`).toBe('0px');
-            await expect(getComputedStyle(static_).color, `${mode}: card text`).toBe(tokenColor(canvasElement, '--ds-text'));
+
+            await expect(getComputedStyle(sunkenStatic).borderTopWidth, `${mode}: sunken keeps a 1px transparent border`).toBe('1px');
+            await expect(getComputedStyle(defaultStatic).borderTopWidth, `${mode}: default keeps a 1px border`).toBe('1px');
+            await expect(getComputedStyle(defaultStatic).borderTopColor, `${mode}: default border uses --ds-border`).toBe(tokenColor(canvasElement, '--ds-border'));
+            await expect(getComputedStyle(raisedStatic).borderTopWidth, `${mode}: raised keeps a 1px transparent border`).toBe('1px');
+            await expect(getComputedStyle(sunkenStatic).color, `${mode}: card text`).toBe(tokenColor(canvasElement, '--ds-text'));
             if (mode.startsWith('dark')) {
-                await expect(raised.fill, `${mode}: the raised surface moves with the mode`).not.toBe(lightRaised);
+                await expect(raisedRest.fill, `${mode}: the raised surface moves with the mode`).not.toBe(lightRaised);
             }
         });
     },
@@ -262,11 +308,10 @@ export const Anatomy = () => (
 
 export const Jobs = () => <CardJobs />;
 
-/** One size per story: the pad, the radius and the minimum width move together. */
+/** One size per story: every size uses the same pad (16) and radius (16), differing by minimum width. */
 const sizedCard = (size) => (
     <div style={{ display: 'flex', alignItems: 'flex-start' }}>
     <PatternCard
-        padding={size}
         minWidth={`var(--card-min-width-${size})`}
         title="Ana Ruiz"
         description="Lincoln Middle · Thu 4:00 PM"
@@ -277,9 +322,22 @@ const sizedCard = (size) => (
     </div>
 );
 
-export const SizeCompact = { name: 'Compact', render: () => sizedCard('sm') };
-export const SizeDefault = { name: 'Default', render: () => sizedCard('md') };
-export const SizeSpacious = { name: 'Spacious', render: () => sizedCard('lg') };
+const assertCardPadAndRadius = async ({ canvasElement }) => {
+    const card = canvasElement.querySelector('.plus-pattern-card');
+    const inner = canvasElement.querySelector('.plus-pattern-card-inner');
+    const cardStyle = getComputedStyle(card);
+    const innerStyle = getComputedStyle(inner);
+    for (const corner of ['TopLeft', 'TopRight', 'BottomRight', 'BottomLeft']) {
+        await expect(cardStyle[`border${corner}Radius`], `card ${corner} radius is 16px`).toBe('16px');
+    }
+    for (const side of ['Top', 'Right', 'Bottom', 'Left']) {
+        await expect(innerStyle[`padding${side}`], `card ${side} padding is 16px`).toBe('16px');
+    }
+};
+
+export const SizeSmall = { name: 'Small', render: () => sizedCard('sm'), play: assertCardPadAndRadius };
+export const SizeMedium = { name: 'Medium', render: () => sizedCard('md'), play: assertCardPadAndRadius };
+export const SizeLarge = { name: 'Large', render: () => sizedCard('lg'), play: assertCardPadAndRadius };
 
 /** One image ratio per story, edge to edge above the padded content. */
 const imageCard = (ratio) => (
@@ -295,7 +353,7 @@ export const ImageSquare = { name: 'Image 1:1', render: () => imageCard('1:1') }
 /** Each image placement retains the card's elevation states. */
 const placementStory = (imagePlacement, state = 'rest', imageSplit = '1/3') => ({
     render: () => (
-        <PatternCard imagePlacement={imagePlacement} imageSplit={imageSplit}
+        <PatternCard surface="raised" imagePlacement={imagePlacement} imageSplit={imageSplit}
             image={<Image alt="Session illustration" src={sessionSummaryLight}
                 style={{ aspectRatio: '16 / 9', objectFit: 'cover' }} />}
             title="Ana Ruiz" description="Lincoln Middle · Thu 4:00 PM" footer={viewSession}
@@ -311,22 +369,25 @@ const placementStory = (imagePlacement, state = 'rest', imageSplit = '1/3') => (
         const image = within(card).getByRole('img', { name: 'Session illustration' });
         const heading = within(card).getByRole('heading', { name: 'Ana Ruiz' });
         const root = card.getBoundingClientRect();
+        const inner = { width: card.clientWidth, height: card.clientHeight };
+        const borderX = parseFloat(getComputedStyle(card).borderLeftWidth);
+        const borderY = parseFloat(getComputedStyle(card).borderTopWidth);
         const media = image.getBoundingClientRect();
         const title = heading.getBoundingClientRect();
         if (imagePlacement === 'top') {
-            await expect(media.width).toBeCloseTo(root.width, 0);
+            await expect(media.width).toBeCloseTo(inner.width, 0);
             await expect(title.top).toBeGreaterThanOrEqual(media.bottom);
             await expect(media.width / media.height).toBeCloseTo(16 / 9, 2);
         } else {
-            await expect(media.width).toBeCloseTo(root.width / (imageSplit === '1/2' ? 2 : 3), 0);
-            await expect(media.height).toBeCloseTo(root.height, 0);
-            await expect(media.top).toBe(root.top);
+            await expect(media.width).toBeCloseTo(inner.width / (imageSplit === '1/2' ? 2 : 3), 0);
+            await expect(media.height).toBeCloseTo(inner.height, 0);
+            await expect(media.top).toBeCloseTo(root.top + borderY, 0);
             await expect(getComputedStyle(image).objectFit).toBe('cover');
             if (imagePlacement === 'start') {
-                await expect(media.left).toBe(root.left);
+                await expect(media.left).toBeCloseTo(root.left + borderX, 0);
                 await expect(title.left).toBeGreaterThanOrEqual(media.right);
             } else {
-                await expect(media.right).toBe(root.right);
+                await expect(media.right).toBeCloseTo(root.right - borderX, 0);
                 await expect(title.right).toBeLessThanOrEqual(media.left);
             }
         }
@@ -386,20 +447,103 @@ export const CustomHeader = () => (
     </PatternCard>
 );
 
-/** A card at rest on the raised pair. */
+/** Sunken surface (default): `--ds-surface-sunken`, flat. */
+export const SurfaceSunken = {
+    render: () => (
+        <PatternCard title="Sunken" description="Default flat surface for grouping static content." minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }}>
+            {bodyCopy}
+        </PatternCard>
+    ),
+    play: async ({ canvas, canvasElement }) => {
+        const card = canvas.getByText('Sunken').closest('.plus-pattern-card');
+        card.style.transition = 'none';
+        await expect(getComputedStyle(card).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+        await expect(getComputedStyle(card).boxShadow).toBe('none');
+    },
+};
+
+/** Default surface: `--ds-surface` with a 1px `--ds-border`, flat. */
+export const SurfaceDefault = {
+    render: () => (
+        <PatternCard surface="default" title="Default" description="Page fill with a 1px border, flat." minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }}>
+            {bodyCopy}
+        </PatternCard>
+    ),
+    play: async ({ canvas, canvasElement }) => {
+        const card = canvas.getByText('Default').closest('.plus-pattern-card');
+        card.style.transition = 'none';
+        await expect(getComputedStyle(card).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface'));
+        await expect(getComputedStyle(card).borderTopWidth).toBe('1px');
+        await expect(getComputedStyle(card).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border'));
+        await expect(getComputedStyle(card).boxShadow).toBe('none');
+    },
+};
+
+/** Raised surface: `--ds-surface-raised` with `--ds-shadow-raised`. */
+export const SurfaceRaised = {
+    render: () => (
+        <PatternCard surface="raised" title="Raised" description="Primary card per view, first in reading order." minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }}>
+            {bodyCopy}
+        </PatternCard>
+    ),
+    play: async ({ canvas, canvasElement }) => {
+        const card = canvas.getByText('Raised').closest('.plus-pattern-card');
+        card.style.transition = 'none';
+        await expect(getComputedStyle(card).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-raised'));
+        await expect(getComputedStyle(card).boxShadow).toBe(computedShadow(canvasElement, 'var(--ds-shadow-raised)'));
+    },
+};
+
+/** A card at rest on the default sunken surface. */
 export const Static = () => (
     <PatternCard title="Static" minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }}>{bodyCopy}</PatternCard>
 );
 
-/** A clickable card lifts while hovered and settles while pressed. */
-export const Clickable = () => (
-    <PatternCard title="Clickable" minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }} role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</PatternCard>
-);
+/** A clickable sunken card lifts to Raised on hover and settles to the raised shadow while pressed. */
+export const Clickable = {
+    render: () => (
+        <PatternCard title="Clickable" minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }} role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</PatternCard>
+    ),
+    play: async ({ canvas, canvasElement }) => {
+        const card = canvas.getByText('Clickable').closest('.plus-pattern-card');
+        card.style.transition = 'none';
+        await expect(getComputedStyle(card).boxShadow).toBe('none');
+        const hoveredShadow = withForcedPseudo(card, ':hover', () => getComputedStyle(card).boxShadow);
+        await expect(hoveredShadow).toBe(computedShadow(canvasElement, 'var(--ds-shadow-raised)'));
+        await expect(hoveredShadow).not.toBe('none');
+    },
+};
 
-/** A dragged card is on the overlay pair. */
-export const Dragging = () => (
-    <PatternCard title="Dragging" minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }} dragging>{bodyCopy}</PatternCard>
-);
+/** A dragged card keeps the overlay pair. */
+export const Dragging = {
+    render: () => (
+        <PatternCard title="Dragging" minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }} dragging>{bodyCopy}</PatternCard>
+    ),
+    play: async ({ canvas, canvasElement }) => {
+        const card = canvas.getByText('Dragging').closest('.plus-pattern-card');
+        card.style.transition = 'none';
+        await expect(getComputedStyle(card).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-overlay'));
+        await expect(getComputedStyle(card).boxShadow).toBe(computedShadow(canvasElement, 'var(--ds-shadow-overlay)'));
+    },
+};
+
+/** Every surface keeps a 1px border width so forced colors draw its edge. */
+export const ForcedColors = {
+    render: () => (
+        <div style={{ display: 'flex', gap: 'var(--section-stack-lg)', flexWrap: 'wrap' }}>
+            <PatternCard surface="sunken" title="Sunken" minWidth="var(--card-min-width-sm)">{bodyCopy}</PatternCard>
+            <PatternCard surface="default" title="Default" minWidth="var(--card-min-width-sm)">{bodyCopy}</PatternCard>
+            <PatternCard surface="raised" title="Raised" minWidth="var(--card-min-width-sm)">{bodyCopy}</PatternCard>
+        </div>
+    ),
+    play: async ({ canvas }) => {
+        for (const label of ['Sunken', 'Default', 'Raised']) {
+            const card = canvas.getByText(label).closest('.plus-pattern-card');
+            await expect(getComputedStyle(card).borderTopWidth, `${label} keeps a 1px border width`).toBe('1px');
+            await expect(getComputedStyle(card).borderTopStyle, `${label} border is solid`).toBe('solid');
+        }
+    },
+};
 
 /** Skeleton bars at the text line heights, in a card kept at its final size. */
 export const LoadingCard = {
@@ -458,11 +602,12 @@ export const PlacementBoundary = {
                 for (const width of [479, 480, 600, 479]) {
                     card.style.width = `${width}px`;
                     await waitFor(() => {
+                        const innerWidth = card.clientWidth;
                         const media = image.getBoundingClientRect();
-                        expect(media.width).toBeCloseTo(width < 480 ? width : width / (split === '1/2' ? 2 : 3), 0);
+                        expect(media.width).toBeCloseTo(width < 480 ? innerWidth : innerWidth / (split === '1/2' ? 2 : 3), 0);
                         if (width < 480) {
                             expect(heading.getBoundingClientRect().top).toBeGreaterThanOrEqual(media.bottom);
-                            expect(media.height).toBeCloseTo(width, 0);
+                            expect(media.height).toBeCloseTo(innerWidth, 0);
                         }
                     });
                 }

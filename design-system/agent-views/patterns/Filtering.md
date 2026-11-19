@@ -2,7 +2,7 @@
 
 # Filtering
 
-How a person narrows a collection, with filters at the end of the Section's view bar in one of five tiers.
+How a person narrows a collection, with filters in the Section's header in one of five tiers.
 
 **Kind:** Pattern
 
@@ -12,21 +12,21 @@ How a person narrows a collection, with filters at the end of the Section's view
 
 Choose a tier by the number of categories and the length of their lists. See Best practices for when to move filters into a menu.
 
-- **1 · Quick filters.** One to three categories, each a short list: a FilterButton per category, applied as you pick.
-- **2a · Menu, one category.** The Filter icon opens one list, applied as you pick. No footer.
+- **1 · Quick filters.** One to three categories, each a short list: a "Field: value" trigger per category opening its own list, applied as you pick.
+- **2a · Menu, one category.** The Filter button opens one list, applied as you pick. No footer.
 - **2b · Menu, side by side.** Two or three categories with short lists in columns, with Reset and Apply full bleed.
 - **2c · Menu, stacked.** Four or more categories, or long lists, stacked, with Reset and Apply full bleed.
 - **3 · Filter side.** Filtering is the main job: a side at the Section's start, "Reset filters" at its top and a count beside each category.
 
 ## What is on
 
-The control that holds a filter shows it: the FilterButton's count, or the Filter icon's own count on the selected fill. No row of tags under the bar.
+The control that holds a filter shows it: the FilterButton's count, or the Filter button's own count on the selected fill. No row of tags under the header.
 
 ## Key cases
 
 ### Below 960, the filter side
 
-The side hides and the Filter icon returns with its count. Pressing it gives the filters the Section's whole width, and "Show results" goes back. The Section owns this behavior: Section › Width behavior.
+The side hides and the Filter button returns with its count. Pressing it gives the filters the Section's whole width, and "Show results" goes back. The Section owns this behavior: Section › Width behavior.
 
 ### Widths
 
@@ -34,14 +34,14 @@ A one-list menu is auto: at least the trigger, 160 to 320, truncating with a too
 
 ## Usage
 
-Use Filtering when a person narrows a collection by its attributes. Filters live at the end of the view bar, in the bar's order: a format switch if any, Search, then the filters, then More and the Primary. Views at the start are not filters: a view is one of a fixed set, and filters combine.
+Use Filtering when a person narrows a collection by its attributes. Filters live in the Section header's third row, after Search: "Field: value" triggers, then More filters. Views in the second row are not filters: a view is one of a fixed set, and filters combine.
 
 | Tier | Use when | Controls | Applies | Shows it is on |
 | --- | --- | --- | --- | --- |
 | 1 · Quick filters | One to three categories, each a short list | A FilterButton per category | As you pick | The button's selected fill and count |
-| 2a · Menu, one category | One category, and the bar has no room for a button | The Filter icon, one list | As you pick | The Filter icon's count |
-| 2b · Menu, side by side | Two or three categories with short lists, applied together | The Filter icon, columns, Reset and Apply | On Apply | The Filter icon's count |
-| 2c · Menu, stacked | Four or more categories, or long lists | The Filter icon, stacked categories, Reset and Apply | On Apply | The Filter icon's count |
+| 2a · Menu, one category | One category, and the bar has no room for a button | The Filter button, one list | As you pick | The Filter button's count |
+| 2b · Menu, side by side | Two or three categories with short lists, applied together | The Filter button, columns, Reset and Apply | On Apply | The Filter button's count |
+| 2c · Menu, stacked | Four or more categories, or long lists | The Filter button, stacked categories, Reset and Apply | On Apply | The Filter button's count |
 | 3 · Filter side | Filtering is the main job, such as browsing a long catalog | A side at the Section's start | As you pick, or on "Apply filters" for a batch | A count beside each category |
 
 ## Alternatives
@@ -57,13 +57,13 @@ Use Filtering when a person narrows a collection by its attributes. Filters live
 | Name categories as nouns: "Grade", "School", "Subject". | "Filter by grade", "Choose a school". |
 | Label the menu footer "Reset" and "Apply". | "Clear", "OK", "Done". |
 | Put "Reset filters" at the top of a side; "Apply filters" only for a batch. | "Clear all", "Submit". |
-| Name the Filter icon with filters on: "Filters, 2 applied". | "Filters (2)". |
+| Name the Filter button with filters on: "Filters 2". | "Filters (2)". |
 | Count the results in words: "1 of 8 students". | "1 result". |
 | Go back from the filters on a narrow Section with "Show results". | "Done", "Close". |
 
 ## Accessibility
 
-- The Filter icon's name is "Filters"; with a count it reads "Filters, 2 applied". Apply returns focus to it, so its new name is read.
+- The Filter button's name is "Filters"; with a count it reads "Filters 2". Apply returns focus to it, so its new name is read.
 - A FilterButton's name is its text plus its count. Its list is a listbox the arrow keys move through; Escape closes it and returns focus to the button.
 - The result count is a polite live region: it is read as the rows narrow.
 - Reset and Apply are the last tab stops in a menu.
@@ -74,7 +74,7 @@ Use Filtering when a person narrows a collection by its attributes. Filters live
 | Part | Component | Notes |
 | --- | --- | --- |
 | Quick filter | Filter button | A count only when a value is on; it hugs its label and opens its list at bottom-end. |
-| Filter icon | Icon button | The `filter` icon, tooltip "Filters"; its `trailingMetric` draws the count on the selected fill. |
+| Filter button | Filter button | Text "Filters" with the `filter` icon; its `trailingMetric` draws the count on the selected fill. The Section's `filters` entry hands it to the menu. |
 | One list (tier 1 lists, 2a) | Popup select | Applies as you pick, radios for one. Checkboxes for several are Planned. |
 | Filter menu (2b, 2c) | Filter menu | Holds values until Apply; columns side by side or stacked; Reset and Apply full bleed. |
 | Placement and width | Popup | bottom-end at the end of a bar, bottom-start at its start; 4 from the trigger. |
@@ -83,7 +83,7 @@ Use Filtering when a person narrows a collection by its attributes. Filters live
 
 ## Related
 
-- Section: use when the question is the view bar the filters sit in.
+- Section: use when the question is the header the filters sit in.
 - Popup: use when the question is where a menu opens or how wide it is.
 - Filter menu: use when building a tier 2b or 2c menu.
 - Search: use for finding by name.
@@ -112,27 +112,27 @@ Filtering reads these motion tokens and no literal duration or curve.
 
 **Checked:** Automatic
 
-Quick filters and a filter menu never share a bar: some filters outside and some inside read as two systems. When a Section outgrows tier 1, all of its filters move into the menu. Where the filters sit in the bar, and the bar's order: Section › Order the end of the bar.
+Quick filters and a filter menu never share a bar: some filters outside and some inside read as two systems. When a Section outgrows tier 1, all of its filters move into the menu. Where the filters sit in the header, and the header's order: Section › Order the header.
 
 Do: One tier: three quick filters, all in the bar.
-Don't: Two quick filters plus a Filter icon: two systems in one bar.
+Don't: Two quick filters plus a Filter button: two systems in one bar.
 
-### Keep the filters at the end of the bar. {#keep-the-filters-at-the-end-of-the-bar}
+### Keep the filters in the third row. {#keep-the-filters-in-the-third-row}
 
 **Checked:** Automatic
 
-The start of the bar is for views. The filters come after Search and before More and the Primary, so a person finds them in one place on every Section.
+The first two rows are for the title with its actions and for the views. The filters come after Search in the third row, so a person finds them in one place on every Section.
 
-Do: Views at the start; Search, then the filters, at the end.
+Do: Views in the second row; Search, then the filters, in the third.
 Don't: The filters squeezed in beside the views.
 
 ### Show what is on through the control that holds it. {#show-what-is-on-through-the-control-that-holds-it}
 
 **Checked:** Automatic
 
-A FilterButton's count, the Filter icon's count on the selected fill, or a count beside each category in a side. No separate count tag, and no row of tags under the bar.
+A FilterButton's count, the Filter button's count on the selected fill, or a count beside each category in a side. No separate count tag, and no row of tags under the bar.
 
-Do: The count on the Filter icon, on the selected fill.
+Do: The count on the Filter button, on the selected fill.
 Don't: A row of tags under the bar, repeating what is on.
 
 ### Apply one list as you pick and several categories on Apply. {#apply-one-list-as-you-pick-and-several-categories-on-apply}
@@ -151,7 +151,7 @@ A one-list menu is a Popup select: radios for one choice, not searchable for a s
 
 **Checked:** Automatic
 
-Below 960 the side hides and the Filter icon returns with its count; pressing it gives the filters the Section's whole width, with "Show results" to go back: Section › Drop the Filter icon while a filter side shows. Below 768 quick filters become a stacked menu.
+Below 960 the side hides and the Filter button returns with its count; pressing it gives the filters the Section's whole width, with "Show results" to go back: Section › Drop the Filter button while a filter side shows. Below 768 quick filters become a stacked menu.
 
 ## In code
 
@@ -159,18 +159,21 @@ From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#Filteri
 
 ```jsx
 import { useState } from 'react';
-import { FilterButton, PopupSelect } from '@/components';
 import { PatternSection } from '@/patterns';
 
 function QuickFilterExample() {
     const [status, setStatus] = useState('All');
     return (
-        <PatternSection title="Sessions" toolbar={
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}><PopupSelect label="Status" options={['All', 'Needs review', 'Reviewed']}
-                value={status} onChange={setStatus}
-                trigger={<FilterButton text="Status" trailingMetric={status === 'All' ? undefined : 1} />}
-            /></div>
-        }>
+        <PatternSection
+            title="Sessions"
+            filters={[{
+                key: 'status',
+                label: 'Status',
+                text: status,
+                isSelected: status !== 'All',
+                onClick: () => setStatus(STATUSES[(STATUSES.indexOf(status) + 1) % STATUSES.length]),
+            }]}
+        >
             <p role="status">Showing: {status}</p>
         </PatternSection>
     );

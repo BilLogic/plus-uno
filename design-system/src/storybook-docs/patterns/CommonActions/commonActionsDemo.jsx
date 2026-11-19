@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 
 import { Button, ButtonItem, Dialog, DropdownMenu, Fieldset, FooterActions, IconButton, InlineEdit, TextField, Tooltip } from '@/components';
 import { PatternCard, PatternSection } from '@/patterns';
-import { FilterSide, StudentsTable, ViewBar, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
+import { HeaderSearch, SectionActions } from '@/storybook-docs/lib/section-header.jsx';
+import { FilterSide, StudentsTable, ViewPills, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
 import { CaseBlanket, CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { FocusedType } from '@/storybook-docs/lib/focused-task.jsx';
@@ -149,7 +150,9 @@ export const ManyRows = () => {
         <PatternSection
             title="Students"
             description="Lincoln Middle · 24 students"
-            tabs={<ViewBar views={['All students', 'Needs follow-up']} activeView={view} onViewChange={setView} />}
+            actions={<SectionActions />}
+            views={<ViewPills views={['All students', 'Needs follow-up']} activeView={view} onViewChange={setView} />}
+            search={<HeaderSearch />}
         >
             <StudentsTable
                 count={6}

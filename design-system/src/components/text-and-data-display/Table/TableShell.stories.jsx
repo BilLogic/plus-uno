@@ -38,7 +38,7 @@ const tableContent = (
 
 /** The Section header carries the title and the actions; the table has no toolbar of its own. */
 const sectionActions = (
-    <Button text="Add member" appearance="primary" spacing="compact" onClick={() => {}} />
+    <Button text="Add member" appearance="primary" onClick={() => {}} />
 );
 
 const paginationSlot = (
@@ -507,7 +507,6 @@ const AddRemoveTableDemo = ({ mode }) => {
                 <Button
                     text={hasMaya ? 'Reset roster' : 'Add session'}
                     appearance="primary"
-                    spacing="compact"
                     onClick={() => setRows(hasMaya
                         ? INITIAL_ROSTER
                         : [INITIAL_ROSTER[0], ADDED_MEMBER, ...INITIAL_ROSTER.slice(1)])}
@@ -638,7 +637,6 @@ const ReorderTableDemo = () => {
                 <Button
                     text={descending ? 'Sort by name' : 'Sort by sessions'}
                     appearance="subtle"
-                    spacing="compact"
                     onClick={() => setDescending((prev) => !prev)}
                 />
             )}

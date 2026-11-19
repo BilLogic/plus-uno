@@ -269,10 +269,10 @@ export const Layers = {
 /** A Card at rest, a clickable Card, and a Card being dragged. */
 export const CardLevels = {
     render: () => (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)', padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' }}>
-            <PatternCard title="At rest" description="Raised." />
-            <PatternCard title="Clickable" description="Lifts to overlay on hover." onClick={() => {}} />
-            <PatternCard title="Dragged" description="Overlay while it moves." dragging />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)', padding: 'var(--card-pad)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' }}>
+            <PatternCard surface="raised" title="At rest" description="Raised." />
+            <PatternCard surface="raised" title="Clickable" description="Lifts to overlay on hover." onClick={() => {}} />
+            <PatternCard surface="raised" title="Dragged" description="Overlay while it moves." dragging />
         </div>
     ),
     play: async ({ canvasElement }) => {
@@ -287,7 +287,7 @@ const options = ['Lincoln Middle', 'Roosevelt K-8', 'North High', 'South High'].
 export const OpenPopup = {
     render: () => (
         <DocsOverlayBoundary containHeight>
-            <div style={{ minHeight: 'calc(var(--image-xl) * 2)', display: 'flex', alignItems: 'flex-start', padding: 'var(--card-pad-compact)' }}>
+            <div style={{ minHeight: 'calc(var(--image-xl) * 2)', display: 'flex', alignItems: 'flex-start', padding: 'var(--card-pad)' }}>
                 <Popup trigger={<Button text="Details" />} title="Session 12" placement="right-start" triggerType="manual" show initialFocus={false}>
                     Ran 45 minutes over.
                 </Popup>
@@ -379,7 +379,7 @@ export const ModalOnBlanket = {
 /** A Tooltip held open on its trigger. */
 export const OpenTooltip = {
     render: () => (
-        <div style={{ padding: 'var(--card-pad-spacious)', display: 'flex', justifyContent: 'center' }}>
+        <div style={{ padding: 'var(--card-pad)', display: 'flex', justifyContent: 'center' }}>
             <Tooltip text="Reschedule this session" show>
                 <Button text="Reschedule" />
             </Tooltip>
@@ -534,7 +534,7 @@ export const Contrast = {
 
 /* ------------------------------------------------------------ do, don't */
 
-const ground = { padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' };
+const ground = { padding: 'var(--card-pad)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' };
 const menu = (style) => (
     <DocsOverlayBoundary containHeight>
         <div style={{ minHeight: 'calc(var(--image-xl) * 2)', display: 'flex', alignItems: 'flex-start' }}>
@@ -559,11 +559,11 @@ export const LiftWithShadow = {
     render: () => (
         <DoDont>
             <Do caption={<>The card keeps the page color and lifts on <C>--ds-shadow-raised</C>.</>}>
-                <div style={ground}><PatternCard title="Upcoming sessions" description="3 this week" /></div>
+                <div style={ground}><PatternCard surface="raised" title="Upcoming sessions" description="3 this week" /></div>
             </Do>
             <Dont caption="A gray fill reads as a hole in the page, and dark loses the step.">
                 <div style={ground}>
-                    <PatternCard title="Upcoming sessions" description="3 this week" style={{ background: 'var(--ds-surface-sunken)', boxShadow: 'none' }} />
+                    <PatternCard surface="raised" title="Upcoming sessions" description="3 this week" style={{ background: 'var(--ds-surface-sunken)', boxShadow: 'none' }} />
                 </div>
             </Dont>
         </DoDont>
@@ -652,25 +652,25 @@ export const BlockingOnBlanket = {
 export const SunkenNeverFloats = {
     render: () => (
         <DoDont>
-            <Do caption="Sunken is the ground: the frame, or a subtle Section.">
+            <Do caption="Sunken is the ground: the frame, or a sunken Card.">
                 <div style={ground}>
-                    <PatternSection fill="subtle" title="This week" description="12 sessions" />
+                    <PatternCard surface="sunken" title="This week" description="12 sessions" />
                 </div>
             </Do>
             <Dont caption="A sunken fill with a shadow: the gray says recessed, the shadow says lifted.">
                 <div style={ground}>
-                    <PatternCard title="Session 12" description="Ran 45 minutes over." style={{ background: 'var(--ds-surface-sunken)', boxShadow: 'var(--ds-shadow-overlay)' }} />
+                    <PatternCard surface="raised" title="Session 12" description="Ran 45 minutes over." style={{ background: 'var(--ds-surface-sunken)', boxShadow: 'var(--ds-shadow-overlay)' }} />
                 </div>
             </Dont>
         </DoDont>
     ),
     play: async ({ canvasElement }) => {
-        const section = canvasElement.querySelector('.plus-pattern-section-fill-subtle');
-        const card = canvasElement.querySelector('.plus-pattern-card');
-        await expect(section).not.toBeNull();
-        await expect(getComputedStyle(section).boxShadow).toBe('none');
-        await expect(card).not.toBeNull();
-        await expect(getComputedStyle(card).boxShadow).not.toBe('none');
+        const sunken = canvasElement.querySelector('.plus-pattern-card--surface-sunken');
+        const raised = canvasElement.querySelector('.plus-pattern-card--surface-raised');
+        await expect(sunken).not.toBeNull();
+        await expect(getComputedStyle(sunken).boxShadow).toBe('none');
+        await expect(raised).not.toBeNull();
+        await expect(getComputedStyle(raised).boxShadow).not.toBe('none');
     },
 };
 
@@ -714,7 +714,7 @@ export const OneFocalPoint = {
             <Do caption="One raised Card marks the next session.">
                 <div style={ground}>
                     <PatternSection title="Sessions">
-                        <PatternCard title="Next session" description="Today, 4:30 PM" />
+                        <PatternCard surface="raised" title="Next session" description="Today, 4:30 PM" />
                         <StaticTable
                             headers={['Session', 'Day']}
                             rows={[['Past session', 'Monday'], ['Past session', 'Friday']]}
@@ -724,9 +724,9 @@ export const OneFocalPoint = {
             </Do>
             <Dont caption="Every row raised: nothing stands out.">
                 <div style={{ ...ground, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-                    <PatternCard title="Next session" description="Today, 4:30 PM" />
-                    <PatternCard title="Past session" description="Monday" />
-                    <PatternCard title="Past session" description="Friday" />
+                    <PatternCard surface="raised" title="Next session" description="Today, 4:30 PM" />
+                    <PatternCard surface="raised" title="Past session" description="Monday" />
+                    <PatternCard surface="raised" title="Past session" description="Friday" />
                 </div>
             </Dont>
         </DoDont>

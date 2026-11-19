@@ -95,7 +95,7 @@ export const TypeCard = ({ of, thumb, hero, title, stage = TYPE_STAGE, to, thumb
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 'var(--card-stack-lg)',
-                padding: 'var(--card-pad-default)',
+                padding: 'var(--card-pad)',
                 borderRadius: 'var(--card-radius)',
                 background: 'var(--ds-surface-raised)',
                 boxShadow: 'var(--ds-shadow-raised)',

@@ -101,12 +101,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Frame | `--frame-sidebar-group-gap` | two Sidebar groups sit 16 apart |
 | Frame | `--frame-sidebar-row-radius` | the rounding of a Sidebar row (6) |
 | Page | `--page-pad` (declared elsewhere) |  |
-| Page | `--page-pad-x-compact` |  |
-| Page | `--page-pad-x-default` |  |
-| Page | `--page-pad-x-spacious` |  |
-| Page | `--page-pad-y-compact` |  |
-| Page | `--page-pad-y-default` |  |
-| Page | `--page-pad-y-spacious` |  |
 | Page | `--page-stack-sm` (declared elsewhere) |  |
 | Page | `--page-stack-md` (declared elsewhere) |  |
 | Page | `--page-stack-lg` (declared elsewhere) |  |
@@ -119,13 +113,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Panel | `--panel-inline-sm` |  |
 | Panel | `--panel-inline-md` |  |
 | Panel | `--panel-inline-lg` |  |
-| Section | `--section-pad-x-compact` |  |
-| Section | `--section-pad-x-default` |  |
-| Section | `--section-pad-x-spacious` |  |
-| Section | `--section-pad-y-compact` |  |
-| Section | `--section-pad-y-default` |  |
-| Section | `--section-pad-y-spacious` |  |
-| Section | `--section-radius` | the rounding of a Section with a fill |
 | Section | `--section-stack-sm` (declared elsewhere) |  |
 | Section | `--section-stack-md` (declared elsewhere) |  |
 | Section | `--section-stack-lg` (declared elsewhere) |  |
@@ -133,9 +120,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Section | `--section-min-width-side` (declared elsewhere) |  |
 | Section | `--section-toolbar-min-width` |  |
 | Section | `--section-toolbar-count-min-width` |  |
-| Card | `--card-pad-compact` |  |
-| Card | `--card-pad-default` |  |
-| Card | `--card-pad-spacious` |  |
+| Card | `--card-pad` |  |
 | Card | `--card-stack-sm` (declared elsewhere) |  |
 | Card | `--card-stack-md` (declared elsewhere) |  |
 | Card | `--card-stack-lg` (declared elsewhere) |  |
@@ -146,10 +131,23 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Card | `--card-min-width-md` (declared elsewhere) |  |
 | Card | `--card-min-width-lg` (declared elsewhere) |  |
 | Card | `--card-radius` |  |
-| Card | `--card-radius-compact` |  |
 | Card | `--card-max-height-sm` (declared elsewhere) |  |
 | Card | `--card-max-height-md` (declared elsewhere) |  |
 | Card | `--card-max-height-lg` (declared elsewhere) |  |
+| Card | `--card-surface-sunken` |  |
+| Card | `--card-surface-default` |  |
+| Card | `--card-surface-raised` |  |
+| Card | `--card-surface-raised-hovered` |  |
+| Card | `--card-surface-raised-pressed` |  |
+| Card | `--card-surface-overlay` |  |
+| Card | `--card-border-default` |  |
+| Card | `--card-border-width` |  |
+| Card | `--card-shadow-raised` |  |
+| Card | `--card-shadow-overlay` |  |
+| Card | `--card-text` |  |
+| Card | `--card-text-subtle` |  |
+| Card | `--card-title-font-lg` |  |
+| Card | `--card-description-font` |  |
 | Table | `--table-pad-x-cell` (declared elsewhere) |  |
 | Table | `--table-pad-y-cell` (declared elsewhere) |  |
 | Table | `--table-indent` (declared elsewhere) |  |

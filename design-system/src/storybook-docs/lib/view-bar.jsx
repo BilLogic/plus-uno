@@ -3,13 +3,10 @@ import React, { useState } from 'react';
 import { Button, ButtonGroup, Checkbox, CountTag, DynamicTable, IconButton, Tabs as TabsComponent } from '@/components';
 
 /**
- * The Section's view bar and the rows it acts on, shared by the Section
- * template's stories and every pattern page that shows a bar (Filtering
- * first; Search, Navigation and Common actions copy it). Each part is the real
- * PLUS component; only the arrangement lives here.
+ * The parts a Section example hands to its header slots and the rows it acts
+ * on, shared by the Section template's stories and every pattern page. Each
+ * part is the real PLUS component; only the arrangement lives here.
  *
- *   ViewBar         views at the start, then BarEnd
- *   BarEnd          format switch, Search, filters, More, the labeled Primary
  *   ViewPills       pill views: a fixed set, one pill even with one view
  *   FormatSwitch    equal-width segments
  *   StudentsTable   a Dynamic table of tutoring rows (STUDENTS)
@@ -113,36 +110,6 @@ export const FormatSwitch = ({ iconsOnly = true, format: controlledFormat, onFor
         </ButtonGroup>
     );
 };
-
-/**
- * The view bar's end, in order: format switch, Search, filters, More, the
- * labeled Primary. `narrow` keeps only the Primary's icon, below 768.
- */
-export const BarEnd = ({ format = false, onFormatChange, search = true, searchLabel = 'Search students', filters = null, more = true, primary = 'Add students', primaryIcon = 'user-plus', narrow = false }) => {
-    const formatValue = typeof format === 'string' ? format : undefined;
-    const searchControl = React.isValidElement(search)
-        ? search
-        : (search ? <IconButton icon="magnifying-glass" label={searchLabel} appearance="subtle" onClick={() => {}} /> : null);
-    return (
-        <div style={{ ...row, marginInlineStart: 'auto' }}>
-            {format && <FormatSwitch format={formatValue} onFormatChange={onFormatChange} />}
-            {searchControl}
-            {filters}
-            {more && <IconButton icon="ellipsis" label="More" appearance="subtle" onClick={() => {}} />}
-            {primary && (narrow
-                ? <IconButton icon={primaryIcon} label={primary} appearance="primary" onClick={() => {}} />
-                : <Button text={primary} iconBefore={primaryIcon} appearance="primary" onClick={() => {}} />)}
-        </div>
-    );
-};
-
-/** The view bar: views at the start, everything that acts on the rows at the end. */
-export const ViewBar = ({ views = ['All students'], start, activeView, onViewChange, ...end }) => (
-    <div className="plus-section-view-bar" style={{ ...row, inlineSize: '100%' }}>
-        {start ?? <ViewPills views={views} activeView={activeView} onViewChange={onViewChange} />}
-        <BarEnd {...end} />
-    </div>
-);
 
 export const FILTERS = [
     ['Grade', ['Grade 6', 'Grade 7', 'Grade 8']],

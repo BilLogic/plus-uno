@@ -8,6 +8,7 @@ import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
+import { expectSectionHeader } from '@/storybook-docs/lib/section-header-asserts.js';
 import { FilteredStudents, STAGE, ViewPicker } from './filteringDemo.jsx';
 
 /**
@@ -37,12 +38,13 @@ const scaleOf = (canvasElement) => {
 
 const parts = (canvasElement) => {
     const canvas = within(canvasElement);
-    const bar = canvasElement.querySelector('.plus-section-view-bar');
+    const bar = canvasElement.querySelector('.plus-section-rows');
     return {
         canvas,
         bar,
         views: () => bar.querySelector('[role="tablist"]'),
         filterIcon: () => canvas.queryByRole('button', { name: /^Filters/ }),
+        rows: () => bar.querySelectorAll('.plus-section-row'),
         popup: () => canvasElement.querySelector('[data-filter-stage] [role="dialog"], [data-filter-stage] .plus-popup'),
         status: () => canvasElement.querySelector('.plus-pattern-section-content span[role="status"]'),
     };
@@ -62,33 +64,44 @@ const expectHungFrom = async (canvasElement, trigger, side) => {
     });
 };
 
-/** Filters sit at the bar's end: after the views, never among them. */
-const expectAtEnd = async (canvasElement, controls) => {
+/** Filters sit in the Section's third row: under the views, never among them. */
+const expectInRow3 = async (canvasElement, controls) => {
     const p = parts(canvasElement);
-    const views = rect(p.views());
     for (const control of controls) {
-        await expect(rect(control).left, 'the filters sit at the end of the bar, after the views').toBeGreaterThan(views.right);
+        const viewsRow = p.bar.querySelector('.plus-section-row--views');
+        await expect(control.closest('.plus-section-row--filters'), 'the filters sit in the third header row').not.toBeNull();
+        await expect(rect(control).top, 'under the views').toBeGreaterThanOrEqual(rect(viewsRow).bottom);
     }
+};
+
+/** The Filter button's count: its text reads "Filters" and, once values are on, the number. */
+const expectFilterCount = async (button, count) => {
+    await expect(button.textContent.replace(/\s+/g, ''), 'the label, then the count once values are on').toBe(count > 0 ? `Filters${count}` : 'Filters');
 };
 
 /* ------------------------------------------------------------------ tiers */
 
-/** Tier 1: a FilterButton per category, the Grade list open at the bar's end. */
+/** Tier 1: a "Field: value" trigger per category in the Section's third row, the Grade list held open from its end edge; what is on takes the selected state. */
 export const TierQuickFilters = {
     name: 'Tier 1: Quick filters',
     render: () => staged(<FilteredStudents tier="1" categories={['grade', 'school', 'subject']} initial={{ grade: ['Grade 7'] }} openMenu="grade" />),
     play: async ({ canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
+        await expectSectionHeader(canvasElement, 2);
         const p = parts(canvasElement);
-        const buttons = ['Grade', 'School', 'Subject'].map((name) => p.canvas.getByRole('button', { name: new RegExp(`^${name}`) }));
-        await expect(p.filterIcon(), 'one tier per bar: no Filter icon beside quick filters').toBeNull();
-        await expectAtEnd(canvasElement, buttons);
-        await expect(buttons[0], 'what is on shows on the button: its count').toHaveTextContent('1');
+        const buttons = [['Grade', 'Grade 7'], ['School', 'All'], ['Subject', 'All']].map(([field, value]) => p.canvas.getByRole('button', { name: `${field}: ${value}` }));
+        await expect(p.filterIcon(), 'one tier per bar: no Filter button beside quick filters').toBeNull();
+        await expectInRow3(canvasElement, buttons);
+        await expect(buttons[0], 'what is on takes the selected state').toHaveAttribute('aria-pressed', 'true');
+        await expect(buttons[1], 'what is off does not').not.toHaveAttribute('aria-pressed', 'true');
         await expectHungFrom(canvasElement, buttons[0], 'end');
         await expect(within(p.popup()).queryByRole('button', { name: /Apply|Reset/ }), 'one list applies as you pick: no footer').toBeNull();
         await userEvent.click(within(p.popup()).getByRole('option', { name: 'Grade 8' }));
         await expect(p.status()).toHaveTextContent('3 of 8 students');
+        await waitFor(() => expect(p.canvas.getByRole('button', { name: 'Grade: Grade 8' })).toBeInTheDocument());
+        await userEvent.click(p.canvas.getByRole('button', { name: 'Clear all' }));
+        await expect(p.status()).toHaveTextContent('8 students');
         await fitsCanvas(canvasElement);
     },
 };
@@ -101,10 +114,10 @@ export const TierOneList = {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         const p = parts(canvasElement);
-        await expect(p.filterIcon(), 'the Filter icon reads its count').toHaveAccessibleName('Filters, 1 applied');
+        await expectFilterCount(p.filterIcon(), 1);
         await expect(p.canvas.queryByRole('button', { name: /^Grade/ }), 'one tier per bar: no quick filter beside the menu').toBeNull();
-        await expectAtEnd(canvasElement, [p.filterIcon()]);
-        await expectHungFrom(canvasElement, p.filterIcon(), 'end');
+        await expectInRow3(canvasElement, [p.filterIcon()]);
+        await expectHungFrom(canvasElement, p.filterIcon(), 'start');
         await expect(within(p.popup()).getByRole('listbox'), 'one list').toBeInTheDocument();
         await expect(within(p.popup()).queryByRole('button', { name: /Apply|Reset/ }), 'no footer').toBeNull();
         await userEvent.click(within(p.popup()).getByRole('option', { name: 'Grade 6' }));
@@ -121,8 +134,9 @@ export const TierSideBySide = {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         const p = parts(canvasElement);
-        await expect(p.filterIcon()).toHaveAccessibleName('Filters, 2 applied');
-        await expectHungFrom(canvasElement, p.filterIcon(), 'end');
+        await expectFilterCount(p.filterIcon(), 2);
+        await expectInRow3(canvasElement, [p.filterIcon()]);
+        await expectHungFrom(canvasElement, p.filterIcon(), 'start');
         const menu = within(p.popup());
         await expect(p.popup().closest('.plus-filter-menu') ?? p.popup().querySelector('.plus-filter-menu') ?? p.popup(), 'side by side').toHaveClass('plus-filter-menu--side-by-side');
         await expect(menu.getByRole('button', { name: 'Reset' }), 'a menu says Reset').toBeInTheDocument();
@@ -130,7 +144,7 @@ export const TierSideBySide = {
         await expect(menu.queryByRole('button', { name: 'Reset filters' }), 'never "Reset filters" in a menu').toBeNull();
         await userEvent.click(menu.getByRole('checkbox', { name: 'Grade 8' }));
         await userEvent.click(menu.getByRole('button', { name: 'Apply' }));
-        await expect(p.filterIcon()).toHaveAccessibleName('Filters, 3 applied');
+        await waitFor(() => expectFilterCount(p.filterIcon(), 3));
         await fitsCanvas(canvasElement);
     },
 };
@@ -143,13 +157,14 @@ export const TierStacked = {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         const p = parts(canvasElement);
-        await expect(p.filterIcon()).toHaveAccessibleName('Filters, 1 applied');
-        await expectHungFrom(canvasElement, p.filterIcon(), 'end');
+        await expectFilterCount(p.filterIcon(), 1);
+        await expectInRow3(canvasElement, [p.filterIcon()]);
+        await expectHungFrom(canvasElement, p.filterIcon(), 'start');
         await expect(p.popup().closest('.plus-filter-menu') ?? p.popup().querySelector('.plus-filter-menu') ?? p.popup(), 'stacked').toHaveClass('plus-filter-menu--stacked');
         await expect(within(p.popup()).getAllByRole('group'), 'one group per category').toHaveLength(4);
         await userEvent.click(within(p.popup()).getByRole('checkbox', { name: 'Grade 7' }));
         await userEvent.click(within(p.popup()).getByRole('button', { name: 'Apply' }));
-        await expect(p.filterIcon()).toHaveAccessibleName('Filters, 2 applied');
+        await waitFor(() => expectFilterCount(p.filterIcon(), 2));
         await fitsCanvas(canvasElement);
     },
 };
@@ -193,8 +208,7 @@ export const FilterCount = {
         await waitFor(() => expect(p.filterIcon()).not.toBeNull());
 
         await step('With nothing on, the icon is named "Filters" and shows no count', async () => {
-            await expect(p.filterIcon()).toHaveAccessibleName('Filters');
-            await expect(p.filterIcon()).not.toHaveClass('plus-icon-btn--metric');
+            await expectFilterCount(p.filterIcon(), 0);
             await expect(p.status()).toHaveTextContent('8 students');
         });
 
@@ -208,9 +222,8 @@ export const FilterCount = {
 
         await step('Apply puts the count on the icon and reads "Filters, 2 applied"', async () => {
             await userEvent.click(menu().getByRole('button', { name: 'Apply' }));
-            await waitFor(() => expect(p.filterIcon()).toHaveAccessibleName('Filters, 2 applied'));
-            await expect(p.filterIcon(), 'the button widens for its count').toHaveClass('plus-icon-btn--metric');
-            await expect(p.filterIcon()).toHaveTextContent('2');
+            await waitFor(() => expectFilterCount(p.filterIcon(), 2));
+            await expect(p.filterIcon(), 'what is on takes the selected state').toHaveAttribute('aria-pressed', 'true');
             await waitFor(() => expect(p.filterIcon(), 'focus returns to the trigger').toHaveFocus());
         });
 
@@ -222,16 +235,16 @@ export const FilterCount = {
         });
 
         await step('No row of tags repeats what is on', async () => {
-            await expect(canvasElement.querySelector('.plus-section-view-bar ~ * .plus-tag, .plus-tag-group'), 'no tags under the bar').toBeNull();
+            await expect(canvasElement.querySelector('.plus-pattern-section-content .plus-tag, .plus-tag-group'), 'no tags under the header').toBeNull();
         });
 
         await step('Reset clears the menu; Apply clears the count', async () => {
             await userEvent.click(p.filterIcon());
             await waitFor(() => expect(p.popup()).not.toBeNull());
             await userEvent.click(menu().getByRole('button', { name: 'Reset' }));
-            await expect(p.filterIcon(), 'Reset applies nothing yet').toHaveAccessibleName('Filters, 2 applied');
+            await expectFilterCount(p.filterIcon(), 2);
             await userEvent.click(menu().getByRole('button', { name: 'Apply' }));
-            await waitFor(() => expect(p.filterIcon()).toHaveAccessibleName('Filters'));
+            await waitFor(() => expectFilterCount(p.filterIcon(), 0));
             await expect(p.status()).toHaveTextContent('8 students');
         });
     },
@@ -239,7 +252,7 @@ export const FilterCount = {
 
 /* -------------------------------------------------------------- key cases */
 
-/** The Section's width, as a control: below 768 quick filters fold into a stacked menu behind the Filter icon. */
+/** The Section's width, as a control: below 768 the triggers fold into one Filter button that opens the filters. */
 export const NarrowWidth = {
     name: 'Width behavior',
     args: { width: STAGE },
@@ -254,19 +267,17 @@ export const NarrowWidth = {
         const p = parts(canvasElement);
         const stage = canvasElement.querySelector('[data-fit-stage]');
         const setWidth = (px) => { stage.style.inlineSize = `${px}px`; };
-        const quick = () => p.canvas.queryByRole('button', { name: /^Grade/ });
+        const quick = () => p.canvas.queryByRole('button', { name: /^Grade:/ });
 
-        await waitFor(() => expect(quick(), 'from 768, a FilterButton per category').not.toBeNull());
+        await waitFor(() => expect(quick(), 'from 768, a trigger per category').not.toBeNull());
         await expect(p.filterIcon()).toBeNull();
 
-
         setWidth(FRAME_LAYOUT.fullWidthBelow - 64);
-        await waitFor(() => expect(quick(), 'below 768 the quick filters fold').toBeNull());
-        await expect(p.filterIcon(), 'into the Filter icon, which carries their count').toHaveAccessibleName('Filters, 2 applied');
-        await userEvent.click(p.filterIcon());
-        await waitFor(() => expect(p.popup()).not.toBeNull());
-        await expect(p.popup().closest('.plus-filter-menu') ?? p.popup().querySelector('.plus-filter-menu') ?? p.popup(), 'a stacked menu').toHaveClass('plus-filter-menu--stacked');
-        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(quick(), 'below 768 the triggers fold').toBeNull());
+        const filter = await p.canvas.findByRole('button', { name: /^Filter/ });
+        await expect(filter, 'into one Filter button, which carries their count').toHaveTextContent('2');
+        await userEvent.click(filter);
+        await expect(p.canvas.getByRole('region', { name: 'Filters' }), 'it opens the filters').toBeInTheDocument();
 
         setWidth(SECTION_DETAIL_FLOOR + 64);
         await waitFor(() => expect(quick(), 'back to quick filters').not.toBeNull());
@@ -284,10 +295,10 @@ export const NoMatches = {
         await waitFor(() => expect(p.filterIcon()).not.toBeNull());
         await expect(p.canvas.queryByRole('table'), 'the empty state replaces the whole table').toBeNull();
         await expect(p.canvas.getByText(/Grade 6 and Math/), 'it names the filters that are on').toBeInTheDocument();
-        await expect(p.filterIcon(), 'the count stays on the icon').toHaveAccessibleName('Filters, 2 applied');
+        await expectFilterCount(p.filterIcon(), 2);
         await userEvent.click(p.canvas.getByRole('button', { name: 'Reset filters' }));
         await waitFor(() => expect(p.canvas.getByRole('table')).toBeInTheDocument());
-        await expect(p.filterIcon(), '"Reset filters" clears the count').toHaveAccessibleName('Filters');
+        await expectFilterCount(p.filterIcon(), 0);
         await expect(p.status()).toHaveTextContent('8 students');
         await fitsCanvas(canvasElement);
     },
@@ -314,7 +325,7 @@ export const UnderPageTabs = {
         const p = parts(canvasElement);
         const picker = p.canvas.getByRole('button', { name: /^View/ });
         await expect(rect(picker).left, 'the view picker sits at the bar\'s start').toBeCloseTo(rect(p.bar).left, 0);
-        await expect(rect(p.filterIcon()).left, 'the filters stay at the end').toBeGreaterThan(rect(picker).right);
+        await expectInRow3(canvasElement, [p.filterIcon()]);
         await expectHungFrom(canvasElement, picker, 'start');
 
         await expect(p.status()).toHaveTextContent('3 of 8 students');

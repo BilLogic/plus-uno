@@ -5,7 +5,9 @@ import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { FocusedType } from '@/storybook-docs/lib/focused-task.jsx';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
-import { ViewBar } from '@/storybook-docs/lib/view-bar.jsx';
+import { PatternSection } from '@/patterns';
+import { ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
+import { expectSectionHeader } from '@/storybook-docs/lib/section-header-asserts.js';
 import {
     AreaPagePicture,
     AreaPicture,
@@ -77,7 +79,7 @@ export const TierOpenItems = {
     },
 };
 
-/** Tier 2, Views: pill views in the view bar; one is selected. */
+/** Tier 2, Views: pill views in the Section header; one is selected. */
 export const TierViews = {
     name: 'Tier: Views',
     render: () => staged(<ViewsPicture />, SMALL_STAGE),
@@ -153,7 +155,7 @@ export const TierDrill = {
 
 /* --------------------------------------------------------------- key cases */
 
-/** An area page: no breadcrumb, and the collection's Primary ends its view bar. */
+/** An area page: no breadcrumb, and the collection's Primary sits in its Section's title row. */
 export const KeyAreaPage = {
     name: 'Key case: An area page',
     render: () => staged(<AreaPagePicture />),
@@ -162,7 +164,8 @@ export const KeyAreaPage = {
         await expectFullScale(canvasElement);
         const canvas = within(canvasElement);
         await expect(canvas.queryByRole('navigation', { name: 'Breadcrumb' }), 'nothing to climb out of').toBeNull();
-        await expect(canvas.getByRole('button', { name: 'Add student' }).closest('.plus-section-view-bar'), 'the add action is in the view bar').not.toBeNull();
+        await expect(canvas.getByRole('button', { name: 'Add student' }).closest('.plus-pattern-section-actions'), 'the add action is in the Section title row').not.toBeNull();
+        await expectSectionHeader(canvasElement, 1);
         await fitsCanvas(canvasElement);
     },
 };
@@ -212,8 +215,8 @@ export const KeyFocusedTask = {
 
 /* ------------------------------------------------------------------- tests */
 
-/** A view bar from a clean start, to drive its views. */
-const Bar = () => <ViewBar views={['Upcoming', 'Past']} filters={null} primary={null} more={false} search={false} />;
+/** A Section header from a clean start, to drive its views. */
+const Bar = () => <PatternSection title="Sessions" views={<ViewPills views={['Upcoming', 'Past']} />}><p>Sessions</p></PatternSection>;
 
 /** Test: a view change selects the other tab, with one tab stop and the arrow keys. */
 export const TestViewsSwitch = {

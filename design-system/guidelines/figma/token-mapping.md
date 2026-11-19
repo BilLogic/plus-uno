@@ -65,15 +65,15 @@ Two kinds of text node carry no text style, and each binds its type variables di
 
 | Figma Spacing Context | PLUS CSS Token Pattern |
 |----------------------|----------------------|
-| Card padding | `var(--card-pad-{compact\|default\|spacious})` |
+| Card padding | `var(--card-pad)` |
 | Card gap | `var(--card-stack-{sm\|md\|lg})`, `var(--card-inline-{sm\|md\|lg})` |
-| Card radius | `var(--card-radius)`, `var(--card-radius-compact)` |
+| Card radius | `var(--card-radius)` |
 | Element padding | `var(--pad-x-{xs\|sm\|md\|lg})`, `var(--pad-y-{sm\|md\|lg})` (ADR-038) |
 | Element gap | `var(--stack-{sm\|md\|lg\|xl\|2xl\|3xl})`, `var(--inline-{sm\|md\|lg\|xl\|2xl\|3xl})`; the 10px step reads `var(--space-0625)` |
 | Element radius | `var(--radius-{sm\|md\|lg\|full})` |
 | Modal padding | `var(--modal-pad-x-{default\|spacious})` |
-| Section padding | `var(--section-pad-{x\|y}-{compact\|default\|spacious})` |
-| Page padding | `var(--page-pad-{x\|y}-{compact\|default\|spacious})` |
+| Section gap | `var(--section-stack-{sm\|md\|lg})` |
+| Page padding | `var(--page-pad)` |
 | Table cell | `var(--table-pad-x-cell)` 8 · `var(--table-pad-y-cell)` 4 |
 | Size roles | `var(--icon-md)`, `var(--control-md)`, `var(--row-height-md)`, `var(--image-sm)`: Icon sm · md · lg 12 · 16 · 24, Control sm · md · lg 24 · 32 · 40, Row sm · md · lg 32 · 40 · 48, Image xxs … xl 16 · 20 · 24 · 32 · 40 · 48 |
 

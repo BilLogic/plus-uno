@@ -49,7 +49,7 @@ const containerStyle = {
 };
 
 const blockStyle = {
-    margin: 'var(--page-stack-lg) calc(var(--section-pad-x-spacious) * 2)', /* 40px: no general gap step */
+    margin: 'var(--page-stack-lg) calc(var(--section-stack-md) * 4)',
 };
 
 function TooltipVariantsDemos() {
@@ -84,13 +84,13 @@ function TooltipVariantsDemos() {
 }
 
 export const Placements = () => (
-    <div style={{ marginBottom: 'calc(var(--section-pad-x-spacious) * 2)' }}>
+    <div style={{ marginBottom: 'calc(var(--section-stack-md) * 4)' }}>
         <TooltipVariantsDemos />
     </div>
 );
 
 const tooltipPlaygroundPadding = {
-    padding: 'var(--section-pad-y-default) var(--section-pad-x-default)',
+    padding: 'var(--section-stack-lg)',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',

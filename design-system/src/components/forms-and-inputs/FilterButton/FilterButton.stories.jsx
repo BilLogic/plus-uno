@@ -15,6 +15,7 @@ export default {
         docs: { toc: { title: 'On this page' } },
     },
     argTypes: {
+        label: { control: 'text', table: { category: 'Content' } },
         text: { control: 'text', table: { category: 'Content' } },
         trailingMetric: { control: 'text', table: { category: 'Content' } },
         hasChevronDown: { control: 'boolean', table: { category: 'Design' } },
@@ -35,6 +36,23 @@ export const Overview = {
         const button = within(canvasElement).getByRole('button', { name: 'Status' });
         await expect(button.getBoundingClientRect().height).toBe(32);
         await expect(button.querySelector('.fa-chevron-down')).not.toBeNull();
+    },
+};
+
+export const Label = {
+    render: () => (
+        <div style={row}>
+            <FilterButton label="Status" text="Upcoming" />
+            <FilterButton label="Group" text="Whitaker" isSelected />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const button = canvas.getByRole('button', { name: 'Status: Upcoming' });
+        const label = button.querySelector('.plus-filter-btn__label');
+        const value = button.querySelector('.plus-filter-btn__value');
+        await expect(getComputedStyle(label).color, 'the field is quieter than the value').not.toBe(getComputedStyle(value).color);
+        await expect(button.getBoundingClientRect().height).toBe(32);
     },
 };
 

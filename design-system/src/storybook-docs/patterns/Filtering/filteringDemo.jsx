@@ -1,13 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { Button, EmptyState, FilterButton, FilterMenu, IconButton, PopupSelect, Skeleton } from '@/components';
+import { Button, EmptyState, FilterMenu, PopupSelect, Skeleton } from '@/components';
 import { LoadThenReveal } from '@/lib/loadRevealMotion';
 import { SwapInPlace } from '@/lib/swapMotion';
 import { Page, PatternCard, PatternSection, SECTION_DETAIL_FLOOR } from '@/patterns';
 import { FRAME_LAYOUT } from '@/patterns/Frame/frameLayout';
 import { useOwnWidth } from '@/patterns/Frame/useOwnWidth';
 import { PageTabs, SessionsTable } from '@/patterns/Page/pageDemo.jsx';
-import { FilterSide, StudentsTable, ViewBar, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
+import { SectionActions, categoryFilters } from '@/storybook-docs/lib/section-header.jsx';
+import { FilterSide, StudentsTable, ViewPills, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
 
 /**
  * The Filtering pattern's examples: a real Section with its view bar, the
@@ -22,7 +23,7 @@ import { FilterSide, StudentsTable, ViewBar, useLayerMount } from '@/storybook-d
 export const STAGE = 1024;
 
 /** The room a held-open picture keeps, so its menu hangs below its trigger whole: a stacked menu runs to its max height. Docs geometry, in px. */
-const OPEN_ROOM = { short: 440, stacked: 640 };
+const OPEN_ROOM = { short: 500, stacked: 700 };
 
 /** A Popup reads its column steps against the screen; a picture reads them at this one, in px. Docs geometry. */
 const READ_SCREEN = 1280;
@@ -65,47 +66,65 @@ const ROSTER_COLUMNS = ['Name', 'Grade', 'School', 'Subject'];
 const flat = (value) => Object.values(value).flat();
 
 /**
- * Tier 1: a FilterButton per category, each opening its own list at the
- * bar's end, applied as you pick. The list is a Popup select, one value at a
- * time; several at once is Planned on it.
+ * Tier 1: a "Field: value" trigger per category in the Section's third row,
+ * each opening its own list from the trigger's end edge, applied as you pick.
+ * The list is a Popup select, one value at a time; several at once is Planned
+ * on it. The Section draws the trigger and hands it to the menu.
  */
-export const QuickFilter = ({ category, value, onPick, open, onOpenChange, mount, placement = 'bottom-end' }) => {
+export const quickFilters = (categories, value, onPick, { mount, menuProps = () => ({}), placement = 'bottom-end' } = {}) => categories.map((category) => {
     const picked = (value[category.id] ?? [])[0];
-    return (
-        <PopupSelect
-            label={category.label}
-            options={category.options}
-            value={picked ?? null}
-            onChange={(next) => onPick(category.id, next === picked ? [] : [next])}
-            isSearchable={false}
-            placement={placement}
-            {...(open !== undefined ? { open, onOpenChange } : {})}
-            container={mount ?? undefined}
-            trigger={<FilterButton text={category.label} appearance="subtle" trailingMetric={picked ? 1 : undefined} isSelected={Boolean(picked)} />}
-        />
-    );
-};
+    return {
+        key: category.id,
+        label: category.label,
+        text: picked ?? 'All',
+        isSelected: Boolean(picked),
+        menu: (trigger) => (
+            <PopupSelect
+                label={category.label}
+                options={category.options}
+                value={picked ?? null}
+                onChange={(next) => onPick(category.id, next === picked ? [] : [next])}
+                isSearchable={false}
+                placement={placement}
+                {...menuProps(category.id)}
+                container={mount ?? undefined}
+                trigger={trigger}
+            />
+        ),
+    };
+});
 
-/** Tier 2a: the Filter icon opens one list, applied as you pick, with no footer. */
-const OneListMenu = ({ category, value, onPick, open, onOpenChange, mount }) => {
+/** The Filter trigger of a tier 2 menu: one button in the third row, its count the values applied. */
+export const filterTrigger = (count, menu) => [{
+    key: 'filters',
+    text: 'Filters',
+    iconBefore: 'filter',
+    hasChevronDown: false,
+    trailingMetric: count > 0 ? count : undefined,
+    isSelected: count > 0,
+    menu,
+}];
+
+/** Tier 2a: the Filter trigger opens one list, applied as you pick, with no footer. */
+const oneListFilters = ({ category, value, onPick, menuProps, mount }) => {
     const picked = value[category.id][0];
-    return (
+    return filterTrigger(picked ? 1 : 0, (trigger) => (
         <PopupSelect
             label={category.label}
             options={category.options}
             value={picked ?? null}
             onChange={(next) => onPick(category.id, next === picked ? [] : [next])}
             isSearchable={false}
-            placement="bottom-end"
-            {...(open !== undefined ? { open, onOpenChange } : {})}
+            placement="bottom-start"
+            {...menuProps}
             container={mount ?? undefined}
-            trigger={<IconButton icon="filter" label="Filters" appearance="subtle" trailingMetric={picked ? 1 : undefined} />}
+            trigger={trigger}
         />
-    );
+    ));
 };
 
 /**
- * The view bar's filters in one tier, and what the rows show.
+ * The Section's filters in one tier, in its third header row, and what the rows show.
  *
  * @param {object} props
  * @param {'1'|'2a'|'2b'|'2c'|'3'} props.tier
@@ -123,7 +142,6 @@ export const FilteredStudents = ({
     views = ['All students', 'Needs follow-up'],
     start,
     loading = false,
-    sectionType,
     pageTabs = false,
 }) => {
     const ref = useRef(null);
@@ -165,30 +183,32 @@ export const FilteredStudents = ({
         }
         : {});
 
-    let filters = null;
-    if (tier === '1' && !folded) {
-        filters = cats.map((category) => (
-            <QuickFilter key={category.id} category={category} value={value} onPick={pick} {...menuProps(category.id)} mount={mount} />
-        ));
+    // The Section draws row 3 itself: every tier hands it triggers, and a folded or side-less width opens the side. A menu a trigger opens is the trigger's `menu`.
+    const opensSide = (entries) => entries.map((entry) => ({ ...entry, onClick: () => setShowSide(true) }));
+    let filters;
+    if (tier === '1') {
+        filters = folded ? opensSide(categoryFilters(cats, value, pick)) : quickFilters(cats, value, pick, { mount, menuProps });
     } else if (tier === '2a') {
-        filters = <OneListMenu category={cats[0]} value={value} onPick={pick} {...menuProps('filters')} mount={mount} />;
-    } else if (tier === '2b' || tier === '2c' || folded) {
-        filters = (
+        filters = oneListFilters({ category: cats[0], value, onPick: pick, menuProps: menuProps('filters'), mount });
+    } else if (tier === '2b' || tier === '2c') {
+        filters = filterTrigger(appliedCount(value), (trigger) => (
             <FilterMenu
                 categories={cats}
                 value={value}
                 onApply={setValue}
                 layout={tier === '2b' ? 'side-by-side' : 'stacked'}
+                placement="bottom-start"
                 {...menuProps('filters')}
                 container={mount ?? undefined}
+                trigger={trigger}
             />
-        );
+        ));
     } else if (tier === '3' && !sideFits) {
-        filters = <IconButton icon="filter" label="Filters" appearance="subtle" trailingMetric={count || undefined} onClick={() => setShowSide(true)} />;
+        filters = opensSide(categoryFilters(cats, value, pick));
     }
 
-    // A menu a press opens mounts where `container` points at that moment: until the picture's element is in state, those filters wait, so no menu lands on the page. A held-open menu waits on its own (`held`).
-    if (mount === null && !openMenu) filters = null;
+    // A menu a press opens mounts where `container` points at that moment: until the picture's element is in state, that menu waits, so none lands on the page. A held-open menu waits on its own (`held`).
+    if (mount === null && !openMenu && filters?.some((entry) => entry.menu)) filters = undefined;
 
     const status = <span role="status" style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>{countWords(rows, value)}</span>;
     const swapKey = `${activeView}:${JSON.stringify(value)}`;
@@ -222,7 +242,7 @@ export const FilteredStudents = ({
     );
 
     let body = <>{status}{results}</>;
-    if (tier === '3') {
+    if (tier === '3' || folded) {
         const toggle = (v) => {
             const id = cats.find((category) => category.options.includes(v)).id;
             pick(id, value[id].includes(v) ? value[id].filter((x) => x !== v) : [...value[id], v]);
@@ -235,7 +255,7 @@ export const FilteredStudents = ({
                 filters={cats.map((category) => [category.label, category.options])}
             />
         );
-        if (sideFits) {
+        if (tier === '3' && sideFits) {
             body = (
                 <div style={{ display: 'grid', gridTemplateColumns: 'minmax(var(--section-min-width-side), 3fr) minmax(0, 9fr)', gap: 'var(--grid-gutter)' }}>
                     <section aria-label="Filters">{side}</section>
@@ -280,25 +300,18 @@ export const FilteredStudents = ({
                         <PatternSection
                             title="Students"
                             description="Lincoln Middle"
-                            type={pageTabs ? 'tabs-only' : sectionType}
-                            tabs={(
-                                <ViewBar
-                                    views={views}
-                                    activeView={activeView}
-                                    onViewChange={setActiveView}
-                                    start={start
-                                        ? start(mount, {
-                                            activeView,
-                                            onViewChange: setActiveView,
-                                            open: openMenu === 'view' ? mount !== null && activeMenu === 'view' : undefined,
-                                            onOpenChange: openMenu === 'view' ? (next) => setActiveMenu(next ? 'view' : null) : undefined,
-                                        })
-                                        : undefined}
-                                    filters={filters}
-                                    primary="Add students"
-                                    narrow={width < FRAME_LAYOUT.fullWidthBelow}
-                                />
-                            )}
+                            actions={<SectionActions primary="Add students" more={false} />}
+                            views={start
+                                ? start(mount, {
+                                    activeView,
+                                    onViewChange: setActiveView,
+                                    open: openMenu === 'view' ? mount !== null && activeMenu === 'view' : undefined,
+                                    onOpenChange: openMenu === 'view' ? (next) => setActiveMenu(next ? 'view' : null) : undefined,
+                                })
+                                : <ViewPills views={views} activeView={activeView} onViewChange={setActiveView} />}
+                            filters={filters}
+                            onClearAll={reset}
+                            onOpenFilters={() => setShowSide(true)}
                         >
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>{body}</div>
                         </PatternSection>

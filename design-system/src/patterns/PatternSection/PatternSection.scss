@@ -13,24 +13,17 @@
     color: var(--ds-text);
 }
 
-/* Gap between the header, the body and the footer: Section/stack-md is the Figma value. */
-.plus-pattern-section-gap-sm {
+/* Space between the header, the body and the footer: Section/stack-md is the Figma value. */
+.plus-pattern-section-spacing-compact {
     gap: var(--section-stack-sm);
 }
 
-.plus-pattern-section-gap-md {
+.plus-pattern-section-spacing-default {
     gap: var(--section-stack-md);
 }
 
-.plus-pattern-section-gap-lg {
+.plus-pattern-section-spacing-spacious {
     gap: var(--section-stack-lg);
-}
-
-/* Subtle fill: the sunken surface, padded and rounded, for a section beside a list. */
-.plus-pattern-section-fill-subtle {
-    padding: var(--section-pad-y-default) var(--section-pad-x-default);
-    border-radius: var(--section-radius);
-    background-color: var(--ds-surface-sunken);
 }
 
 /* `_Section header`: the title row, then the tabs or toolbar row when there is one */
@@ -88,7 +81,7 @@
     font: var(--heading-xs);
 }
 
-:is(.plus-dialog, .plus-modal) .plus-pattern-section-gap-md {
+:is(.plus-dialog, .plus-modal) .plus-pattern-section-spacing-default {
     gap: var(--section-stack-sm);
 }
 
@@ -103,6 +96,81 @@
     align-items: center;
     gap: var(--inline-md);
     flex-shrink: 0;
+}
+
+/*
+ * Rows 2 and 3 of the header: views and the format switch, then Search and the
+ * filter triggers. They stack Section/stack-sm under the title row, and every
+ * control in them sits on the one 32 line.
+ */
+.plus-section-rows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-stack-sm);
+    min-width: 0;
+}
+
+.plus-section-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: var(--inline-md);
+    row-gap: var(--section-stack-sm);
+    min-width: 0;
+    min-height: var(--control-md);
+}
+
+/* Row 2: the views scroll sideways; the format switch stays. */
+.plus-section-row--views {
+    flex-wrap: nowrap;
+}
+
+.plus-section-row__views {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+}
+
+.plus-section-row__end {
+    flex-shrink: 0;
+    margin-inline-start: auto;
+}
+
+/* Row 3: Search, then the triggers; the applied count and Clear all end the row. */
+.plus-section-row__search {
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+.plus-section-row__search--fill {
+    flex: 1 1 0;
+}
+
+.plus-section-row__filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--inline-md);
+    min-width: 0;
+}
+
+/* Triggers that no longer fit beside Search take their own row, at its end. */
+.plus-section-row__filters[data-wrapped] {
+    flex: 1 1 100%;
+    justify-content: flex-end;
+}
+
+.plus-section-row__applied {
+    display: flex;
+    align-items: center;
+    gap: var(--inline-md);
+    margin-inline-start: auto;
+}
+
+.plus-section-row__count {
+    font: var(--body-sm);
+    color: var(--ds-text-subtle);
+    white-space: nowrap;
 }
 
 /* Tabs row: the tabs, then "Add view" at its end. */
@@ -160,13 +228,9 @@
     min-width: 0;
 }
 
+/* The detail is a sunken PatternCard: the Card supplies the surface, the pad and the radius. */
 .plus-pattern-section-detail {
-    display: flex;
-    flex-direction: column;
     min-width: 0;
-    padding: 0;
-    border-radius: var(--section-radius);
-    background-color: var(--ds-surface-sunken);
 }
 
 .plus-pattern-section-detail-trigger {
@@ -175,19 +239,18 @@
     justify-content: space-between;
     gap: var(--inline-md);
     width: 100%;
-    padding: var(--section-pad-y-default) var(--section-pad-x-default);
+    padding: 0;
     border: none;
-    border-radius: var(--section-radius);
     background-color: transparent;
     color: var(--ds-text);
     font: var(--body-default);
     text-align: left;
     cursor: pointer;
-    transition: background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+    transition: color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 
     @include plus-state((
-        hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
-        pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
+        hovered: (color: var(--ds-text-subtle)),
+        pressed: (color: var(--ds-text-subtle)),
     ));
 }
 
@@ -230,8 +293,8 @@
 .plus-pattern-section-detail-body {
     display: flex;
     flex-direction: column;
-    gap: var(--section-stack-md);
-    padding: 0 var(--section-pad-x-default) var(--section-pad-y-default);
+    gap: var(--card-stack-md);
+    padding-top: var(--card-stack-md);
 }
 
 .plus-pattern-section-detail-content {

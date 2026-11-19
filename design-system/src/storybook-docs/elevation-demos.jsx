@@ -181,7 +181,7 @@ const codeText = { font: 'var(--code-default)', color: 'var(--ds-text)', wordBre
 const valueText = { ...codeText, whiteSpace: 'nowrap', wordBreak: 'normal' };
 const well = {
     position: 'relative',
-    padding: 'var(--card-pad-spacious)',
+    padding: 'var(--card-pad)',
     borderRadius: 'var(--card-radius)',
     background: 'var(--ds-surface-sunken)',
     color: 'var(--ds-text)',
@@ -519,7 +519,7 @@ export const LevelTiles = () => (
                     key={l.id}
                     data-level={l.id}
                     style={{
-                        padding: 'var(--card-pad-compact)',
+                        padding: 'var(--card-pad)',
                         borderRadius: 'var(--card-radius)',
                         background: onBlanket ? 'linear-gradient(var(--ds-blanket), var(--ds-blanket)), var(--ds-surface)' : l.id === 'sunken' ? 'var(--ds-surface)' : 'var(--ds-surface-sunken)',
                     }}
@@ -530,7 +530,7 @@ export const LevelTiles = () => (
                             flexDirection: 'column',
                             gap: 'var(--card-stack-sm)',
                             minHeight: 'var(--image-xl)',
-                            padding: 'var(--card-pad-compact)',
+                            padding: 'var(--card-pad)',
                             borderRadius: 'var(--card-radius)',
                             background: l.surface ? `var(${l.surface})` : 'var(--ds-surface)',
                             boxShadow: l.shadow ? `var(${l.shadow})` : 'none',
@@ -974,6 +974,7 @@ export const LiftDemo = () => {
         <div ref={ref} data-docs-stage style={{ ...well, display: 'grid', placeItems: 'center' }} data-testid="lift-demo" data-lifted={lifted}>
             <div style={{ width: 'min(100%, var(--card-min-width-md))' }}>
                 <PatternCard
+                    surface="raised"
                     title="Session with Ana"
                     description={lifted ? 'Lifted: the overlay shadow' : 'At rest: the raised shadow'}
                     role="button"
@@ -1114,7 +1115,7 @@ export const ContrastDemo = () => {
                 data-contrast-mode={more ? 'more' : 'no-preference'}
                 data-docs-stage style={{ ...well, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-sm)), 1fr))', gap: 'var(--grid-gutter)', background: 'var(--ds-surface)', alignItems: 'start' }}
             >
-                <PatternCard title="Card" description="The raised ring." />
+                <PatternCard surface="raised" title="Card" description="The raised ring." />
                 <DocsOverlayBoundary containHeight>
                     <Popup
                         trigger={<Button text="Details" />}

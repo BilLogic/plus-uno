@@ -135,16 +135,16 @@ export const SessionsTable = ({ status = 'upcoming', rows: rowsProp }) => {
     );
 };
 
-/** The collection's view bar: one pill at the start, the labeled Primary that adds a row at the end. */
-export const ViewBarWithAdd = () => (
-    <div className="plus-section-view-bar" style={{ ...row, inlineSize: '100%' }}>
-        <Tabs appearance="pill" defaultActiveKey="all" aria-label="Views">
-            <Tabs.Tab eventKey="all">All students</Tabs.Tab>
-        </Tabs>
-        <div style={{ marginInlineStart: 'auto' }}>
-            <Button text="Add student" iconBefore="user-plus" appearance="primary" onClick={() => {}} />
-        </div>
-    </div>
+/** The collection's views: one pill, even with one view. */
+export const StudentViews = () => (
+    <Tabs appearance="pill" defaultActiveKey="all" aria-label="Views">
+        <Tabs.Tab eventKey="all">All students</Tabs.Tab>
+    </Tabs>
+);
+
+/** The Primary that adds a row: the Section's one action, in its title row. */
+export const AddStudentAction = () => (
+    <Button text="Add student" iconBefore="user-plus" appearance="primary" onClick={() => {}} />
 );
 
 const STATUS_OPTIONS = [
@@ -152,17 +152,14 @@ const STATUS_OPTIONS = [
     { value: 'past', label: 'Past' },
 ];
 
-/** The view bar's views as one labeled PopupSelect at the start, the form under page tabs. */
-export const ViewSelect = ({ value, defaultValue = 'upcoming', onChange, actions }) => (
-    <div className="plus-section-view-bar" style={{ ...row, inlineSize: '100%' }}>
-        <PopupSelect
-            label="Status"
-            options={STATUS_OPTIONS}
-            {...(value !== undefined ? { value, onChange } : { defaultValue })}
-            isSearchable={false}
-        />
-        {actions ? <div style={{ marginInlineStart: 'auto' }}>{actions}</div> : null}
-    </div>
+/** The views as one labeled PopupSelect in the views row, the form under page tabs. */
+export const ViewSelect = ({ value, defaultValue = 'upcoming', onChange }) => (
+    <PopupSelect
+        label="Status"
+        options={STATUS_OPTIONS}
+        {...(value !== undefined ? { value, onChange } : { defaultValue })}
+        isSearchable={false}
+    />
 );
 
 /** The Section content under `PageTabs` (`overview`, `sessions`, `notes`). */
@@ -178,7 +175,7 @@ export const RecordTabSection = ({ tab = 'sessions', status = 'upcoming', onStat
         );
     }
     return (
-        <PatternSection title="Sessions" type="tabs-only" tabs={<ViewSelect value={status} onChange={onStatusChange} />}>
+        <PatternSection title="Sessions" views={<ViewSelect value={status} onChange={onStatusChange} />}>
             <SessionsTable status={status} />
         </PatternSection>
     );

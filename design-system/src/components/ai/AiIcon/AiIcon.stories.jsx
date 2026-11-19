@@ -48,7 +48,7 @@ const ModeSet = ({ mode }) => (
         data-color-mode={mode}
         data-testid={`set-${mode}`}
         style={{
-            padding: 'var(--card-pad-default)',
+            padding: 'var(--card-pad)',
             background: 'var(--ds-surface)',
             color: 'var(--ds-text)',
             borderRadius: 'var(--card-radius)',

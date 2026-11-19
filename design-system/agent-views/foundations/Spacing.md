@@ -13,7 +13,7 @@ Four words space everything: pad, stack, inline and gutter. The template you are
 Spacing is the empty space inside a component or template and between the things it holds. Its tokens name a job, not a size. Pick the template you are in (Page, Section, Card, Modal, Popup, Table or a control), then the job (pad around the content, stack between rows, inline between things side by side, gutter between cards on the grid), then the size. Every value is a dimension primitive; bind the token, never a primitive or a typed number.
 
 ```css
-padding: var(--card-pad-compact);   /* space-100 */
+padding: var(--card-pad);           /* space-100 */
 gap: var(--card-stack-md);          /* space-050 */
 ```
 

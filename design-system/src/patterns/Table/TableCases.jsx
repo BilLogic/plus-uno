@@ -1,6 +1,6 @@
 import React from 'react';
 import PatternSection from '@/patterns/PatternSection';
-import { DynamicTable, Icon, StaticTable, TreeTable } from '@/components';
+import { DynamicTable, FilterButton, Icon, SearchField, StaticTable, TreeTable } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 
 /**
@@ -50,10 +50,18 @@ const rosterRows = roster.map(([student, tutor, last, sessions, attendance]) => 
     ],
 }));
 
+/** The header rows a list carries: Search, one applied filter, then the count in words. */
+const listHeader = {
+    search: <SearchField mode="active" spacing="compact" placeholder="Search students" />,
+    filters: [{ key: 'status', label: 'Status', text: 'Active', isSelected: true, onClick: () => {} }],
+    count: '340 students',
+    onClearAll: () => {},
+};
+
 const RosterSection = () => {
     const [selected, setSelected] = React.useState(['Ava Thompson', 'Marcus Lee']);
     return (
-        <PatternSection title="Students" toolbar={<PatternSection.Toolbar count="340 students" />}>
+        <PatternSection title="Students" {...listHeader}>
             <DynamicTable
                 head={rosterHead}
                 rows={rosterRows}
@@ -196,11 +204,9 @@ const studentTable = (
     />
 );
 
-const countToolbar = <PatternSection.Toolbar count="340 students" />;
-
-const InSection = ({ children, toolbar = countToolbar }) => (
+const InSection = ({ children }) => (
     <HeadingLevelContext.Provider value={5}>
-        <PatternSection title="Students" toolbar={<PatternSection.Toolbar count="340 students" />}>{children}</PatternSection>
+        <PatternSection title="Students" {...listHeader}>{children}</PatternSection>
     </HeadingLevelContext.Provider>
 );
 
@@ -216,11 +222,14 @@ const FramedTableCase = () => (
     </InSection>
 );
 
-/** A second toolbar between the Section header and the head row. */
+/** A second row of filters and a count between the Section header and the head row, repeating what the header's own rows carry. */
 const SecondToolbarCase = () => (
     <InSection>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
-            <PatternSection.Toolbar count="12 records" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
+                <FilterButton label="Tutor" text="All" onClick={() => {}} />
+                <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>12 records</span>
+            </div>
             {studentTable}
         </div>
     </InSection>

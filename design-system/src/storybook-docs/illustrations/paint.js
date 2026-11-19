@@ -43,10 +43,11 @@ const ROLES = {
   sidebarSelected: ['--ds-background-selected', 'patterns/Sidebar/Sidebar.scss'],
   sidebarIcon: ['--ds-icon-subtle', 'patterns/Sidebar/Sidebar.scss'],
   // Section and Card
-  // Only the subtle variant has a surface; the default Section draws none.
-  sectionSubtleSurface: ['--ds-surface-sunken', 'patterns/PatternSection/PatternSection.scss'],
-  cardSurface: ['--ds-surface-raised', 'patterns/PatternCard/PatternCard.scss'],
-  cardShadow: ['--ds-shadow-raised', 'patterns/PatternCard/PatternCard.scss'],
+  // A Section draws no surface; a sunken box inside one is a sunken Card.
+  sectionSubtleSurface: ['--ds-surface-sunken', 'tokens/ladder/_templates.scss'],
+  cardSurface: ['--ds-surface-raised', 'tokens/ladder/_templates.scss'],
+  cardSunken: ['--ds-surface-sunken', 'tokens/ladder/_templates.scss'],
+  cardShadow: ['--ds-shadow-raised', 'tokens/ladder/_templates.scss'],
   // Overlays
   popupSurface: ['--ds-surface-overlay', 'components/overlays-and-layering/Popup/Popup.scss'],
   popupShadow: ['--ds-shadow-overlay', 'components/overlays-and-layering/Popup/Popup.scss'],
@@ -173,7 +174,7 @@ const CORNERS = {
   buttonCompact: ['--button-radius-compact', 'components/forms-and-inputs/Button/Button.scss'],
   buttonSpacious: ['--button-radius-spacious', 'components/forms-and-inputs/Button/Button.scss'],
   card: ['--card-radius', 'patterns/PatternCard/PatternCard.scss'],
-  section: ['--section-radius', 'patterns/PatternSection/PatternSection.scss'],
+  section: ['--card-radius', 'patterns/PatternCard/PatternCard.scss'],
   popup: ['--popup-radius', 'components/overlays-and-layering/Popup/Popup.scss'],
   flag: ['--popup-radius', 'components/messaging/Flag/Flag.scss'],
   tooltip: ['--radius-control-sm', 'components/overlays-and-layering/Tooltip/Tooltip.scss'],
@@ -185,7 +186,7 @@ const CORNERS = {
   tag: ['--radius-md', 'components/labels/Tag/Tag.scss'],
   icon: ['--radius-sm', null],
   tracker: ['--radius-control-md', 'components/status-indicators/ProgressTracker/ProgressTracker.scss'],
-  cardImage: ['--card-radius-compact', 'patterns/PatternCard/PatternCard.scss'],
+  cardImage: ['--card-radius', 'patterns/PatternCard/PatternCard.scss'],
   shape: ['--radius-control-sm', null],
   full: ['--radius-full', 'components/status-indicators/ProgressTracker/ProgressTracker.scss'],
 };
