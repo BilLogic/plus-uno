@@ -31,11 +31,11 @@
       "screen": "Escalation detail page",
       "template": "Page + Form",
       "variant": "Page · Narrow / Form · On a Page",
-      "page": "design-system/agent-views/templates/Form.md",
+      "page": "design-system/agent-views/patterns/Forms.md",
       "section": "Anatomy",
       "pages": [
         "design-system/src/templates/Page/index.md",
-        "design-system/agent-views/templates/Form.md"
+        "design-system/agent-views/patterns/Forms.md"
       ],
       "guides": ["page", "form"],
       "scoring": "judge",

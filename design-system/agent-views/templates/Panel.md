@@ -50,6 +50,8 @@ The parts on their own, outside a Frame, at the width they are given.
 
 - **Editing.** The same Panel with the form open and its full-bleed footer: Discard (Default) left and Save (Primary) right; Close in the header dismisses, so no Cancel. Save returns to reading, which has no footer.
 
+- **With a form.** A short edit of a row with the page still in view: the fields in the body and the Panel's own footer. Validation and leaving with edits: Forms.
+
 - **Record gone.** When the row no longer exists the body shows its empty state with a way back: Empty.
 
 - **Under 1024.** Too narrow to dock beside the table: the Panel floats on the overlay material and shadow, capped as Width behavior says, still with no Blanket.
@@ -154,7 +156,7 @@ The AI panel is not a floating Panel. It is a region of the Frame, docked where 
 - Frame: use when the question is the AI panel, which is a Frame region.
 - Section: use when a row or card opens in place inside its Section.
 - Modal: use when the task needs full attention.
-- Form: use when the Panel edits a record.
+- Forms: use when the Panel edits a record.
 - Patterns: use when you need the rules around a Panel: Navigation, Empty, Notifications.
 
 ## Motion

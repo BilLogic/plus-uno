@@ -2,20 +2,20 @@
 
 # Forms
 
-How a form takes and checks what someone types: its host, when it validates, what a blocked submit does.
+The kinds of form and how a form takes and checks what someone types: when it validates, what a blocked submit does.
 
 **Kind:** Pattern
 
 **Storybook page:** `design-system/src/storybook-docs/patterns/Forms/Forms.mdx`
 
-## The hosts
+## The kinds of form
 
-Choose among four hosts. The Form template shows their layouts; this pattern guides host selection and form behavior.
+There is no Form component or template. A form is a `Fieldset` of fields inside a host, and the host owns the title and the footer. Pick the kind by the task; its host page has the layout, the footer and the sizes.
 
-- **In a page.** Settings and anything saved as a group.
-- **In a Panel.** A short edit beside the page, with a full-bleed footer.
-- **In a Modal.** A rare, critical task with fewer than five fields.
-- **In steps.** A stepped task on Frame.
+- **Settings.** Values saved as a group, on their own page.
+- **Create.** A rare, critical task with fewer than five fields.
+- **Quick edit.** A short edit of a row, with the page still in view.
+- **In steps.** A long form someone works through.
 
 ## Marks and help
 
@@ -29,14 +29,15 @@ Choose among four hosts. The Form template shows their layouts; this pattern gui
 
 Use Forms when a page asks for input that is saved together: adding a student, logging a session, a reflection, profile settings. Ask only what is needed, group fields under a `Fieldset` legend of two or three words, keep one column except for pairs that belong together (first and last name, date and time), and reveal a conditional field under the answer that needs it rather than adding a separate one.
 
-| The form… | Host | Buttons |
+| The form… | Kind | Host |
 | --- | --- | --- |
-| is saved as a group on its own page: settings, a profile | In a page | Left-aligned under the fields, Primary first, Cancel Subtle |
-| is a short edit of a row, with the page still in view | In a Panel · Details | Discard (Default) and Save (Primary) full bleed at the bottom, no Cancel; a declining action is Default in the left half |
-| is rare and critical, with fewer than five fields | In a Modal, 8-col | Discard (Default) and the action (Primary), full bleed, no Cancel |
-| is long, or has sections someone works through | In steps, a multi-step task on Frame | Save and exit, Back and Next in the footer, no Cancel |
-| asks one big question per step (sign-up, check-in, site setup) | In steps, a multi-step task on Frame | Back (Subtle) and Continue (Primary) centered under the tiles |
-| asks for one value read far more than changed | Inline edit on the record | None; it saves on its own |
+| is saved as a group on its own page: settings, a profile | Settings | Section page header on the Page |
+| is rare and critical, with fewer than five fields | Create | Modal, 8-col |
+| is a short edit of a row, with the page still in view | Quick edit | Panel, Details |
+| is long, or has sections someone works through | In steps | Multi-step task on Frame |
+| asks for one value read far more than changed | None: inline edit | The record, which saves on its own |
+
+Where the buttons sit and in which look is each host's footer, and Common actions for the rules across them. A Popup never holds a form.
 
 ## Alternatives
 
@@ -68,18 +69,17 @@ Use Forms when a page asks for input that is saved together: adding a student, l
 
 | Part | Component | Notes |
 | --- | --- | --- |
-| Fields | Form template | There is no Form component: a Fieldset groups the fields inside a host. |
+| Fields | `Fieldset` | There is no Form component: a Fieldset groups the fields inside a host. |
 | Rejection at the top | `SectionMessage` | A danger message, scrolled into view. |
 | Choices | `RadioGroup`, `CheckboxGroup`, `Select`, `DatePicker` | A control that cannot be wrong; pictured tiles for one big question per step. |
 | Settings rows | `SettingRow`, `Toggle`, `Select`, `StatusTag`, `Flag` | Divided rows under section headings with no card per row; flipping a toggle confirms via Flag. |
-| Step progress | `ProgressIndicator`, `ProgressTracker` | Progress indicator centered above a single-question step under five steps; the left step list at five or more. |
-| Hosts | Frame, Panel, Modal | A page (on the Page itself, no Section around it), a Panel, a Modal, or steps on Frame · focused. |
+| Hosts | Section, Panel, Modal, Frame | A page (under its Section header, no Section around the fields), a Panel, a Modal, or the multi-step task on Frame. Each owns its footer. |
 | Confirm view | Modal | Swapped in place today. A confirm view prop is Planned. |
 
 ## Related
 
 - Common actions: use for where the buttons sit and which look they take.
-- Form: use for how a form sits in each host.
+- Modal, Panel, Frame: use for each host's layout and footer.
 - Loading: use for a form that is sending.
 - Disabled: use for a submit that cannot run yet.
 - Errors: use for where a failed save shows.
@@ -143,7 +143,7 @@ Don't: Help only in a tooltip: gone on touch, gone after typing.
 
 **Checked:** Automatic
 
-Close, Discard, Cancel (on a page form) and navigating away raise a 4-col Modal: Back returns without losing anything typed; Discard is Danger. A form already in a Modal asks in that Modal's confirm view, so two layers never become three. A form with no edits leaves at once. In a multi-step task, Save and exit keeps the answers and leaves; Back in the inner sidebar asks first if anything is unsaved.
+Close, Discard, Cancel (on a page form) and navigating away raise a 4-col Modal: Back returns without losing anything typed; Discard is Danger. A form already in a Modal asks in that Modal's confirm view, so two layers never become three. A form with no edits leaves at once. In a multi-step task, Back in the inner sidebar asks first if anything is unsaved.
 
 ### Prefer a bound input to a free one. {#prefer-a-bound-input-to-a-free-one}
 
@@ -155,19 +155,31 @@ Up to five choices: `RadioGroup` or checkboxes, visible at once. Six or more: `S
 
 **Checked:** Review
 
-The form's title is the page, Panel or Modal heading. Groups take a `Fieldset` legend, two or three words, a noun phrase. Labels are sentence case, one to three words, naming the field rather than what to do.
+The form's title is the page, Panel or Modal heading, never a generic "Form". Groups take a `Fieldset` legend, two or three words, a noun phrase. Labels are sentence case, one to three words, naming the field rather than what to do.
+
+### Keep a form to one column. {#keep-a-form-to-one-column}
+
+**Checked:** Review
+
+Pair two fields side by side only when they belong together, such as first and last name, or date and time. Anything else reads down one column.
+
+Do: One column, so the eye moves straight down.
+Don't: Unrelated fields scattered across two columns.
+
+### Keep a short edit beside the page. {#keep-a-short-edit-beside-the-page}
+
+**Checked:** Review
+
+Editing a row opens a Panel so the person keeps the page in view. A Modal is for a rare, critical task with fewer than five fields.
+
+Do: A short edit in a Panel, the rows still in view.
+Don't: The same short edit in a Modal that covers the rows.
 
 ### Set autofill on every field the browser can fill. {#set-autofill-on-every-field-the-browser-can-fill}
 
 **Checked:** Automatic
 
 `autoComplete` on name, email, phone and address fields. Prefill what is already known, such as the student picked from a row.
-
-### Center the Progress indicator above a single-question step under five steps. {#center-the-progress-indicator-above-a-single-question-step-under-five-steps}
-
-**Checked:** Automatic
-
-When the In steps host asks one focal question per step with two to four pictured `RadioGroup` or `CheckboxGroup` tiles, center the `ProgressIndicator` above the heading while there are fewer than five steps, and center Back (Subtle) and Continue (Primary) under the tiles. At five steps or more, switch to the host's left step list. Continue stays enabled and validates on press.
 
 ## In code
 

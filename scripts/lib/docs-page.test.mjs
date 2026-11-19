@@ -140,7 +140,7 @@ test('a Key states section keeps each example as a line, and other sections drop
 
 <ComponentExample of={S.Flipped} title="Flipped" description="With no room below, the layer opens above." />
 
-<ComponentExample of={S.Loading} title="Loading" description={<>One row: <DocsLink id="x">Loading</DocsLink>.</>} />
+<ComponentExample of={S.Loading} title="Loading" description={<>One row: <DocsLink id="templates-panel">Loading</DocsLink>.</>} />
 
 ## Sizes
 

@@ -6,13 +6,13 @@ import { BAR_TOKEN, TASK_STAGE } from '@/storybook-docs/lib/multi-step-task.jsx'
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
-import { alpha, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
-import { EMPTY, FILLED, FormInModal, FormInPage, FormInPanel, FormInSteps, PAGE_WIDTH } from '../../../templates/Form/formDemo.jsx';
-import { BoundInputs, FIVE_QUESTION_STEPS, Marks, QuestionStepInWindow, SettingsPageInWindow, STAGE } from './formsDemo.jsx';
+import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { EMPTY, FILLED, FormInModal, FormInPage, FormInPanel, FormInSteps, PAGE_WIDTH } from './formHosts.jsx';
+import { BoundInputs, Marks, SettingsPageInWindow, STAGE } from './formsDemo.jsx';
 
 /**
  * Forms: the pattern page's examples, run in the Storybook tests. The hosts and
- * the Modal's key states are the Form template's own demos; each story here
+ * the Modal's key states are the host demos (formHosts.jsx); each story here
  * asserts the ruling the pattern makes: a field checks itself when it loses
  * focus, the submit stays enabled and shows what is missing, a blocked submit
  * keeps the Modal open, a rejection shows at the top, a sending button keeps
@@ -35,8 +35,8 @@ const staged = (story, width = STAGE) => <FitStage width={width} scrollable>{sto
 
 /* ------------------------------------------------------------------- hosts */
 
-export const HostPage = {
-    name: 'Host: In a page',
+export const KindSettingsPage = {
+    name: 'Kind: Settings',
     render: () => staged(<FormInPage />, PAGE_WIDTH),
     play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
@@ -52,8 +52,8 @@ export const HostPage = {
 };
 
 /** Instant settings on a page: grouped SettingRows with Toggle, compact Select, and Button + StatusTag, confirming saves with a Flag. */
-export const SettingsInPage = {
-    name: 'Host: Settings on a page',
+export const KindInstantSettings = {
+    name: 'Kind: Instant settings',
     render: () => staged(<SettingsPageInWindow />, PAGE_WIDTH),
     play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
@@ -91,8 +91,8 @@ export const SettingsInPage = {
     },
 };
 
-export const HostPanel = {
-    name: 'Host: In a Panel',
+export const KindQuickEdit = {
+    name: 'Kind: Quick edit',
     render: () => staged(<FormInPanel />),
     play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
@@ -108,8 +108,8 @@ export const HostPanel = {
     },
 };
 
-export const HostModal = {
-    name: 'Host: In a Modal',
+export const KindCreate = {
+    name: 'Kind: Create',
     render: () => staged(<FormInModal />),
     play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
@@ -124,8 +124,8 @@ export const HostModal = {
     },
 };
 
-export const HostSteps = {
-    name: 'Host: In steps',
+export const KindSteps = {
+    name: 'Kind: In steps',
     render: () => staged(<FormInSteps />, TASK_STAGE),
     play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
@@ -137,90 +137,6 @@ export const HostSteps = {
         await expect(await canvas.findByRole('textbox', { name: /Session date/ })).toBeInTheDocument();
         await userEvent.click(canvas.getByRole('button', { name: 'Back' }));
         await expect(await canvas.findByRole('textbox', { name: /Student/ })).toBeInTheDocument();
-        await fitsCanvas(canvasElement);
-    },
-};
-
-/** One question per step in the In steps host: centered dots under five steps, tiles, centered Back and Continue, and validation on press. */
-export const OneQuestionPerStep = {
-    name: 'Host: In steps (one question per step)',
-    render: () => staged(<QuestionStepInWindow />),
-    play: async ({ canvas, canvasElement }) => {
-        await settleAnimations(canvasElement);
-        await expectNotInert(canvasElement);
-        await expectFullScale(canvasElement);
-        const centerX = (el) => {
-            const box = rect(el);
-            return (box.left + box.right) / 2;
-        };
-
-        await expect(canvas.queryByRole('navigation', { name: 'Main' }), 'the form sits in the Page, with no Sidebar').toBeNull();
-        await expect(canvas.queryByRole('navigation', { name: 'Steps' }), 'under five steps omits the left step list').toBeNull();
-
-        const progress = canvas.getByRole('group', { name: 'Setup progress' });
-        const heading = canvas.getByRole('heading', { level: 1, name: 'How would you like to tutor?' });
-        const group = canvas.getByRole('radiogroup', { name: 'How would you like to tutor?' });
-        const actions = canvas.getByRole('group', { name: 'Step actions' });
-        const back = canvas.getByRole('button', { name: 'Back' });
-        const next = canvas.getByRole('button', { name: 'Continue' });
-
-        await expect(progress.children).toHaveLength(3);
-        await expect(progress.children[0]).toHaveAttribute('aria-current', 'step');
-        await expect(rect(progress).bottom, 'dots sit above the heading').toBeLessThanOrEqual(rect(heading).top);
-        await expect(centerX(progress), 'dots are centered above the question').toBeCloseTo(centerX(heading), 0);
-
-        await expect(rect(actions).top, 'actions sit under the tiles').toBeGreaterThanOrEqual(rect(group).bottom - 0.5);
-        await expect(centerX(actions), 'Back and Continue are centered').toBeCloseTo(centerX(heading), 0);
-        await expect(rect(back).right, 'Back sits before Continue').toBeLessThanOrEqual(rect(next).left);
-        await expect(back, 'Back is disabled on the first step').toBeDisabled();
-        await expect(next, 'Continue stays enabled while unanswered').not.toBeDisabled();
-        await expect(alpha(getComputedStyle(back).backgroundColor), 'Back uses the subtle transparent fill').toBe(0);
-        await expect(getComputedStyle(next).backgroundColor, 'Continue uses the primary fill').toBe(tokenColor(canvasElement, '--ds-background-brand-bold'));
-
-        // Continue stays enabled and validates on press.
-        await userEvent.click(next);
-        await expect(await canvas.findByRole('alert')).toHaveTextContent('Choose a tutoring format to continue.');
-        await expect(next, 'Continue remains enabled after validation').not.toBeDisabled();
-        const firstOption = canvas.getByRole('radio', { name: 'One-on-one' });
-        await expect(firstOption, 'focus moves to the first tile').toHaveFocus();
-
-        // Step forward and back, keeping selections.
-        await userEvent.click(canvas.getByText('One-on-one'));
-        await waitFor(() => expect(canvas.queryByRole('alert')).toBeNull());
-        await userEvent.click(next);
-
-        await expect(await canvas.findByRole('heading', { level: 1, name: 'Which subjects can you tutor?' })).toBeInTheDocument();
-        await expect(progress.children[1]).toHaveAttribute('aria-current', 'step');
-        await expect(canvas.getByRole('button', { name: 'Back' })).not.toBeDisabled();
-
-        await userEvent.click(canvas.getByText('Algebra'));
-        await userEvent.click(canvas.getByRole('button', { name: 'Back' }));
-
-        await expect(await canvas.findByRole('heading', { level: 1, name: 'How would you like to tutor?' })).toBeInTheDocument();
-        await expect(progress.children[0]).toHaveAttribute('aria-current', 'step');
-        await expect(canvas.getByRole('radio', { name: 'One-on-one' })).toHaveAttribute('aria-checked', 'true');
-
-        await fitsCanvas(canvasElement);
-    },
-};
-
-/** At five or more steps, the question step switches from dots to the host's left step list. */
-export const QuestionStepFiveOrMore = {
-    name: 'Test: In steps at five or more steps',
-    render: () => staged(<QuestionStepInWindow steps={FIVE_QUESTION_STEPS} />),
-    play: async ({ canvas, canvasElement }) => {
-        await settleAnimations(canvasElement);
-        await expectNotInert(canvasElement);
-        await expectFullScale(canvasElement);
-
-        await expect(canvas.queryByRole('group', { name: 'Setup progress' }), 'dots give way to the step list at five steps').toBeNull();
-        const tracker = canvas.getByRole('navigation', { name: 'Steps' });
-        const heading = canvas.getByRole('heading', { level: 1, name: 'How would you like to tutor?' });
-        await expect(rect(tracker).right, 'the left step list sits before the question').toBeLessThanOrEqual(rect(heading).left);
-
-        const actions = canvas.getByRole('group', { name: 'Step actions' });
-        await expect((rect(actions).left + rect(actions).right) / 2, 'Back and Continue stay centered under the question').toBeCloseTo((rect(heading).left + rect(heading).right) / 2, 0);
-
         await fitsCanvas(canvasElement);
     },
 };

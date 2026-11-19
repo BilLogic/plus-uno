@@ -8,8 +8,6 @@ Also asked as: steps, stepper, wizard, multi-step, checkout steps.
 
 **Import:** `import { ProgressTracker } from '@/components';`
 
-**Governed by:** Forms (`ds guide forms`)
-
 **Source:** `design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.jsx`
 
 **Stories:** `design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.stories.jsx` — Default, Interactive, Vertical, Spacing, Clickable, Completed, Rest, Hovered, Pressed, Focused, Disabled

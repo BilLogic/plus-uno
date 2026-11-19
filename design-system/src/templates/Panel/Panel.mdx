@@ -39,7 +39,6 @@ import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
             { title: 'Section', href: './?path=/docs/templates-section--docs' },
             { title: 'Modal', href: './?path=/docs/templates-modal--docs' },
             { title: 'Frame', href: './?path=/docs/templates-frame--docs' },
-            { title: 'Form', href: './?path=/docs/templates-form--docs' },
         ],
     }}
 />
@@ -129,6 +128,8 @@ The parts on their own, outside a Frame, at the width they are given.
 ## Key states
 
 <ComponentExample of={PanelStories.KeyEditing} title="Editing" description="The same Panel with the form open and its full-bleed footer: Discard (Default) left and Save (Primary) right; Close in the header dismisses, so no Cancel. Save returns to reading, which has no footer." />
+
+<ComponentExample of={PanelStories.KeyWithForm} title="With a form" description={<>A short edit of a row with the page still in view: the fields in the body and the Panel's own footer. Validation and leaving with edits: <DocsLink id="patterns-forms">Forms</DocsLink>.</>} />
 
 <ComponentExample of={PanelStories.KeyRecordGone} title="Record gone" description={<>When the row no longer exists the body shows its empty state with a way back: <DocsLink id="patterns-states-empty">Empty</DocsLink>.</>} />
 
@@ -454,7 +455,7 @@ For the step up when the quick look is not enough.
 - <DocsLink id="templates-frame">Frame</DocsLink>: use when the question is the AI panel, which is a Frame region.
 - <DocsLink id="templates-section">Section</DocsLink>: use when a row or card opens in place inside its Section.
 - <DocsLink id="templates-modal">Modal</DocsLink>: use when the task needs full attention.
-- <DocsLink id="templates-form">Form</DocsLink>: use when the Panel edits a record.
+- <DocsLink id="patterns-forms">Forms</DocsLink>: use when the Panel edits a record.
 - <DocsLink id="patterns-overview">Patterns</DocsLink>: use when you need the rules around a Panel: Navigation, Empty, Notifications.
 
 </div>

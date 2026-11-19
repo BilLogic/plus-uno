@@ -3,10 +3,10 @@ import { Dialog, Fieldset, Select, TextField } from '@/components';
 import { PanelBody, PanelCloseAction, PanelContainer, PanelFooter, PanelHeader } from '@/templates';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { CaseBlanket, CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
-import { Behind, FILLED, FormFields, FullBleedFooter } from './formDemo.jsx';
+import { Behind, FILLED, FormFields, FullBleedFooter } from './formHosts.jsx';
 
 /**
- * The live do and don't field-layout examples on the Form template page,
+ * The live do and don't field-layout examples on the Forms pattern page,
  * built from `Fieldset`, `TextField`, `Select`, `PanelContainer` and `Dialog`.
  */
 

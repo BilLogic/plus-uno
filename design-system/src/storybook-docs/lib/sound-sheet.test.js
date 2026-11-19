@@ -57,6 +57,6 @@ describe('silentGroupsOf', () => {
     const groups = silentGroupsOf();
     expect(groups.flatMap((g) => g.rows)).toHaveLength(SOUND_SILENT.length);
     expect(new Set(groups.map((g) => g.why)).size).toBe(groups.length);
-    expect(groups.find((g) => g.why.startsWith('Field errors')).rows).toEqual(['Form · error', 'Forms · error', 'Errors · field']);
+    expect(groups.find((g) => g.why.startsWith('Field errors')).rows).toEqual(['Forms · error', 'Errors · field']);
   });
 });

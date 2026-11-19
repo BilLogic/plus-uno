@@ -38,7 +38,7 @@ Buttons fill in only two places: filled tracks inside `FooterActions`, and a sin
 | Empty state | centered; `default` 32 on a page, `compact` 24 in a card | Messaging/EmptyState, Docs/Empty |
 | Banner and Flag | `subtle` `compact` text actions after the message | Messaging/Banner, Messaging/Flag |
 | Button group | items hug; selected item is the selected fill plus a 1px border | Navigation/ButtonGroup |
-| Inline with a field | same height as the field, `default` appearance | Docs/Forms, Patterns/Form |
+| Inline with a field | same height as the field, `default` appearance | Docs/Forms |
 
 ## Alternatives
 
