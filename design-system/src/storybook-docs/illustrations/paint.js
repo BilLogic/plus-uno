@@ -38,7 +38,7 @@ const ROLES = {
   frameSunken: ['--ds-surface-sunken', 'patterns/Frame/Frame.scss'],
   frameDivider: ['--ds-border', 'patterns/Frame/Frame.scss'],
   // Sidebar
-  sidebarOverlaySurface: ['--ds-surface-overlay', 'patterns/Frame/Frame.scss'],
+  sidebarOverlaySurface: ['--ds-surface-material-overlay', 'patterns/Frame/Frame.scss'],
   sidebarOverlayShadow: ['--ds-shadow-overlay', 'patterns/Frame/Frame.scss'],
   sidebarSelected: ['--ds-background-selected', 'components/navigation/Sidebar/Sidebar.scss'],
   sidebarIcon: ['--ds-icon-subtle', 'components/navigation/Sidebar/Sidebar.scss'],
@@ -54,11 +54,11 @@ const ROLES = {
   // Tooltip: a flat label, no shadow, the fill and text flip with the mode
   tooltipSurface: ['--ds-background-neutral-bold', 'components/overlays-and-layering/Tooltip/Tooltip.scss'],
   tooltipText: ['--ds-text-inverse', 'components/overlays-and-layering/Tooltip/Tooltip.scss'],
-  panelSurface: ['--ds-surface-overlay', 'patterns/Panel/Panel.scss'],
+  panelSurface: ['--ds-surface', 'patterns/Panel/Panel.scss'],
   panelEdge: ['--ds-border', 'patterns/Panel/Panel.scss'],
   // A floating Panel (peek or overlay) takes Frame's overlay shadow; a docked one has none.
   panelFloatingShadow: ['--ds-shadow-overlay', 'patterns/Frame/Frame.scss'],
-  modalSurface: ['--ds-surface-overlay', 'components/messaging/Dialog/Dialog.scss'],
+  modalSurface: ['--ds-surface-material-overlay', 'components/messaging/Dialog/Dialog.scss'],
   modalShadow: ['--ds-shadow-blocking', 'tokens/ladder/_templates.scss'],
   modalDivider: ['--ds-border', 'components/messaging/Dialog/Dialog.scss'],
   blanket: ['--ds-blanket', 'patterns/Modal/Modal.scss'],

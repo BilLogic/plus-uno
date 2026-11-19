@@ -23,17 +23,18 @@ vi.mock('@storybook/addon-docs/blocks', async () => {
 const frameMdx = readFileSync(join(__dirname, 'Frame.mdx'), 'utf8');
 
 describe('Frame live cases', () => {
-    it('BarInOrder renders Back and Next in FooterActions without Cancel', () => {
+    it('BarInOrder renders Save and exit, Back and Next in FooterActions without Cancel', () => {
         render(<BarInOrder />);
+        expect(screen.getByRole('button', { name: 'Save and exit' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Next' })).toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'Cancel' })).toBeNull();
     });
 
-    it('BarScrambled renders the anti-pattern Cancel beside Back and Next', () => {
+    it('BarScrambled renders the anti-pattern Cancel beside Save and exit and Next', () => {
         render(<BarScrambled />);
         expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Save and exit' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Next' })).toBeInTheDocument();
     });
 
