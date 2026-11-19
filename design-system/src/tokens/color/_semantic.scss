@@ -557,6 +557,12 @@
   --chart-smart-relationship-hovered: var(--palette-magenta-900);
   --chart-smart-technology-tools: var(--palette-brown-500);
   --chart-smart-technology-tools-hovered: var(--palette-brown-600);
+  --ds-background-brand-material-bold: var(--palette-lagoon-700-a95);
+  --ds-background-danger-material-bold: var(--palette-red-700-a95);
+  --ds-background-warning-material-bold: var(--palette-yellow-300-a95);
+  --ds-background-success-material-bold: var(--palette-green-700-a95);
+  --ds-background-discovery-material-bold: var(--palette-purple-700-a95);
+  --ds-background-information-material-bold: var(--palette-blue-700-a95);
 }
 
 [data-color-mode="dark"] {
@@ -1117,6 +1123,12 @@
   --chart-smart-relationship-hovered: var(--palette-magenta-200);
   --chart-smart-technology-tools: var(--palette-brown-600);
   --chart-smart-technology-tools-hovered: var(--palette-brown-500);
+  --ds-background-brand-material-bold: var(--palette-lagoon-400-a92);
+  --ds-background-danger-material-bold: var(--palette-red-400-a92);
+  --ds-background-warning-material-bold: var(--palette-yellow-300-a92);
+  --ds-background-success-material-bold: var(--palette-green-400-a92);
+  --ds-background-discovery-material-bold: var(--palette-purple-400-a92);
+  --ds-background-information-material-bold: var(--palette-blue-400-a92);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -1678,6 +1690,12 @@
     --chart-smart-relationship-hovered: var(--palette-magenta-200);
     --chart-smart-technology-tools: var(--palette-brown-600);
     --chart-smart-technology-tools-hovered: var(--palette-brown-500);
+    --ds-background-brand-material-bold: var(--palette-lagoon-400-a92);
+    --ds-background-danger-material-bold: var(--palette-red-400-a92);
+    --ds-background-warning-material-bold: var(--palette-yellow-300-a92);
+    --ds-background-success-material-bold: var(--palette-green-400-a92);
+    --ds-background-discovery-material-bold: var(--palette-purple-400-a92);
+    --ds-background-information-material-bold: var(--palette-blue-400-a92);
   }
 }
 
@@ -2012,6 +2030,12 @@
   --chart-smart-relationship-hovered: var(--palette-magenta-1100);
   --chart-smart-technology-tools: var(--palette-brown-800);
   --chart-smart-technology-tools-hovered: var(--palette-brown-900);
+  --ds-background-brand-material-bold: var(--palette-lagoon-900);
+  --ds-background-danger-material-bold: var(--palette-red-900);
+  --ds-background-warning-material-bold: var(--palette-yellow-900);
+  --ds-background-success-material-bold: var(--palette-green-900);
+  --ds-background-discovery-material-bold: var(--palette-purple-900);
+  --ds-background-information-material-bold: var(--palette-blue-900);
 }
 @media (prefers-contrast: more) {
   :is([data-color-mode="light"], :not([data-color-mode]))[data-contrast-mode="auto"] {
@@ -2345,6 +2369,12 @@
   --chart-smart-relationship-hovered: var(--palette-magenta-1100);
   --chart-smart-technology-tools: var(--palette-brown-800);
   --chart-smart-technology-tools-hovered: var(--palette-brown-900);
+  --ds-background-brand-material-bold: var(--palette-lagoon-900);
+  --ds-background-danger-material-bold: var(--palette-red-900);
+  --ds-background-warning-material-bold: var(--palette-yellow-900);
+  --ds-background-success-material-bold: var(--palette-green-900);
+  --ds-background-discovery-material-bold: var(--palette-purple-900);
+  --ds-background-information-material-bold: var(--palette-blue-900);
 }
 }
 @media (prefers-color-scheme: light) {
@@ -2679,6 +2709,12 @@
   --chart-smart-relationship-hovered: var(--palette-magenta-1100);
   --chart-smart-technology-tools: var(--palette-brown-800);
   --chart-smart-technology-tools-hovered: var(--palette-brown-900);
+  --ds-background-brand-material-bold: var(--palette-lagoon-900);
+  --ds-background-danger-material-bold: var(--palette-red-900);
+  --ds-background-warning-material-bold: var(--palette-yellow-900);
+  --ds-background-success-material-bold: var(--palette-green-900);
+  --ds-background-discovery-material-bold: var(--palette-purple-900);
+  --ds-background-information-material-bold: var(--palette-blue-900);
 }
 }
 @media (prefers-color-scheme: light) and (prefers-contrast: more) {
@@ -3013,6 +3049,12 @@
   --chart-smart-relationship-hovered: var(--palette-magenta-1100);
   --chart-smart-technology-tools: var(--palette-brown-800);
   --chart-smart-technology-tools-hovered: var(--palette-brown-900);
+  --ds-background-brand-material-bold: var(--palette-lagoon-900);
+  --ds-background-danger-material-bold: var(--palette-red-900);
+  --ds-background-warning-material-bold: var(--palette-yellow-900);
+  --ds-background-success-material-bold: var(--palette-green-900);
+  --ds-background-discovery-material-bold: var(--palette-purple-900);
+  --ds-background-information-material-bold: var(--palette-blue-900);
 }
 }
 
@@ -3318,6 +3360,12 @@
   --chart-smart-relationship: var(--palette-magenta-100);
   --chart-smart-technology-tools: var(--palette-brown-300);
   --chart-smart-technology-tools-hovered: var(--palette-brown-200);
+  --ds-background-brand-material-bold: var(--palette-lagoon-200);
+  --ds-background-danger-material-bold: var(--palette-red-200);
+  --ds-background-warning-material-bold: var(--palette-yellow-200);
+  --ds-background-success-material-bold: var(--palette-green-200);
+  --ds-background-discovery-material-bold: var(--palette-purple-200);
+  --ds-background-information-material-bold: var(--palette-blue-200);
 }
 @media (prefers-contrast: more) {
   [data-color-mode="dark"][data-contrast-mode="auto"] {
@@ -3622,6 +3670,12 @@
   --chart-smart-relationship: var(--palette-magenta-100);
   --chart-smart-technology-tools: var(--palette-brown-300);
   --chart-smart-technology-tools-hovered: var(--palette-brown-200);
+  --ds-background-brand-material-bold: var(--palette-lagoon-200);
+  --ds-background-danger-material-bold: var(--palette-red-200);
+  --ds-background-warning-material-bold: var(--palette-yellow-200);
+  --ds-background-success-material-bold: var(--palette-green-200);
+  --ds-background-discovery-material-bold: var(--palette-purple-200);
+  --ds-background-information-material-bold: var(--palette-blue-200);
 }
 }
 @media (prefers-color-scheme: dark) {
@@ -3927,6 +3981,12 @@
   --chart-smart-relationship: var(--palette-magenta-100);
   --chart-smart-technology-tools: var(--palette-brown-300);
   --chart-smart-technology-tools-hovered: var(--palette-brown-200);
+  --ds-background-brand-material-bold: var(--palette-lagoon-200);
+  --ds-background-danger-material-bold: var(--palette-red-200);
+  --ds-background-warning-material-bold: var(--palette-yellow-200);
+  --ds-background-success-material-bold: var(--palette-green-200);
+  --ds-background-discovery-material-bold: var(--palette-purple-200);
+  --ds-background-information-material-bold: var(--palette-blue-200);
 }
 }
 @media (prefers-color-scheme: dark) and (prefers-contrast: more) {
@@ -4232,6 +4292,12 @@
   --chart-smart-relationship: var(--palette-magenta-100);
   --chart-smart-technology-tools: var(--palette-brown-300);
   --chart-smart-technology-tools-hovered: var(--palette-brown-200);
+  --ds-background-brand-material-bold: var(--palette-lagoon-200);
+  --ds-background-danger-material-bold: var(--palette-red-200);
+  --ds-background-warning-material-bold: var(--palette-yellow-200);
+  --ds-background-success-material-bold: var(--palette-green-200);
+  --ds-background-discovery-material-bold: var(--palette-purple-200);
+  --ds-background-information-material-bold: var(--palette-blue-200);
 }
 }
 
@@ -4241,6 +4307,12 @@
     --ds-surface-material-media: var(--ds-surface-overlay);
     --ds-surface-material-control: var(--ds-surface-overlay);
     --ds-surface-material-overlay: var(--ds-surface-overlay);
+    --ds-background-brand-material-bold: var(--ds-background-brand-bold);
+    --ds-background-danger-material-bold: var(--ds-background-danger-bold);
+    --ds-background-warning-material-bold: var(--ds-background-warning-bold);
+    --ds-background-success-material-bold: var(--ds-background-success-bold);
+    --ds-background-discovery-material-bold: var(--ds-background-discovery-bold);
+    --ds-background-information-material-bold: var(--ds-background-information-bold);
   }
 }
 @media (forced-colors: active) {

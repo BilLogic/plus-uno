@@ -170,6 +170,24 @@ export function colorChecks({ rows, palette }) {
     }
   }
 
+  // Colored material (small accents): the on-bold text holds 4.5:1 composited over pure white and pure black, in every mode;
+  // the subtle treatment's colored text holds on the 94% overlay material the same way.
+  const coloredMaterial = [];
+  for (const role of ['brand', 'success', 'warning', 'danger', 'information', 'discovery']) {
+    const fill = `color.background.${role}.material.bold`;
+    const text = role === 'warning' ? 'color.text.warning.inverse' : 'color.text.inverse';
+    for (const m of MODES) {
+      for (const behind of ['#ffffff', '#000000']) {
+        const ground = composite(S[fill][m], behind);
+        const v = contrast(composite(S[text][m], ground), ground);
+        if (v < 4.5) coloredMaterial.push(`${text} on ${role} material bold over ${behind}, ${m}: ${fmt(v)}:1 < 4.5:1`);
+        const sub = composite(S['elevation.surface.material.overlay'][m], behind);
+        const w = contrast(composite(S[`color.text.${role}`][m], sub), sub);
+        if (w < 4.5) coloredMaterial.push(`color.text.${role} on overlay material over ${behind}, ${m}: ${fmt(w)}:1 < 4.5:1`);
+      }
+    }
+  }
+
   const collapsedStates = [];
   for (const m of MODES) {
     const sel = S['color.background.selected'][m];
@@ -275,6 +293,7 @@ export function colorChecks({ rows, palette }) {
     'accent pairings': accentPairings,
     'row-state grounds': rowStateGrounds,
     'material grounds': materialGrounds,
+    'colored material': coloredMaterial,
     'collapsed states': collapsedStates,
     'tint vs frame': tintVsFrame,
     'chart color vision': chartCvd,

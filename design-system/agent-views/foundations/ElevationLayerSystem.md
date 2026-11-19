@@ -26,6 +26,8 @@ The page and everything in its flow. What sits on it is broken down below, in Wi
 #### Usage & styling
 
 - **Flat by default.** Set off from the Frame by tone alone.
+- **One surface, one pad.** The Page paints `--ds-surface` edge to edge with `--page-pad` on every side, and takes no radius, border or shadow. See Templates › Page.
+- **A standalone Panel** sits on Default: `--ds-surface` with an edge line, and no shadow. Only a floating Panel moves to Layer 3. See Templates › Panel.
 
 ### Layer 2 · Navigation
 
@@ -84,16 +86,17 @@ Most of the page: a Section and its side, tables, lists, forms; rows are hairlin
 #### Usage & styling
 
 - **A Section takes no surface:** no fill, no padding, no border.
-- **A Default card** takes `--ds-border`: on the Frame, on Sunken or colored areas, or when dense with its own rows.
+- **A Default card** (`surface="default"`) takes `--ds-border`: on the Frame, on Sunken or colored areas, or when dense with its own rows.
 
 ### Sunken
 
-A backdrop that groups static content: a Card (the default surface), the empty box, a clickable card at rest.
+A backdrop that groups static content: a Card (the default surface), the table’s empty box (`--ds-surface-sunken`, card radius), a clickable card at rest.
 
 #### Usage & styling
 
 - **Only on the Default surface;** one step only, never a Card inside a Card.
-- **Flat:** no shadow, no border.
+- **Flat:** no shadow, and a transparent 1px border that shows only in forced colors.
+- **The default card surface** (`surface="sunken"`). A clickable one lifts to Raised on hover, in place.
 
 ### Raised
 
@@ -101,10 +104,11 @@ The one card a view is about, a clickable card on hover, a grabbed control.
 
 #### Usage & styling
 
-- **One per view at rest.**
-- **Always the pair:** raised surface with raised shadow.
+- **One per view at rest,** placed first in reading order.
+- **Always the pair:** raised surface with raised shadow. In dark its fill is the page tone, so the shadow does the lifting.
+- **Hover lifts in place;** the card never moves.
 - **Dragged,** it takes the overlay pair.
 
 ### By template
 
-How a Section, its side and its detail sit on the page is in Templates › Section. Elevation sets only their surface: a Section takes none.
+How a Section, its side and its detail sit on the page is in Templates › Section; the table and its empty box are in Templates › Table; the Card and its three surfaces are in Templates › Card. Elevation sets only their surface: a Section takes none.

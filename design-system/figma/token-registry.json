@@ -1859,15 +1859,21 @@
       "color/chart/smart/relationship/default": "var(--chart-smart-relationship)",
       "color/chart/smart/relationship/hovered": "var(--chart-smart-relationship-hovered)",
       "color/chart/smart/technology-tools/default": "var(--chart-smart-technology-tools)",
-      "color/chart/smart/technology-tools/hovered": "var(--chart-smart-technology-tools-hovered)"
+      "color/chart/smart/technology-tools/hovered": "var(--chart-smart-technology-tools-hovered)",
+      "color/background/brand/material/bold": "var(--ds-background-brand-material-bold)",
+      "color/background/danger/material/bold": "var(--ds-background-danger-material-bold)",
+      "color/background/warning/material/bold": "var(--ds-background-warning-material-bold)",
+      "color/background/success/material/bold": "var(--ds-background-success-material-bold)",
+      "color/background/discovery/material/bold": "var(--ds-background-discovery-material-bold)",
+      "color/background/information/material/bold": "var(--ds-background-information-material-bold)"
     }
   },
   "validation": {
-    "scssTokenCount": 1225,
+    "scssTokenCount": 1243,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1763,
-      "resolved": 1726,
+      "total": 1769,
+      "resolved": 1732,
       "percent": 98,
       "skippedCollections": [
         {
