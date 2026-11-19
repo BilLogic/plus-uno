@@ -643,7 +643,7 @@ export const AccountHug = {
         const trigger = within(canvasElement).getByRole('button', { name: /Maria Lopez, Tutor: account menu/ });
         const role = trigger.querySelector('.plus-sidebar-account__role');
         const gap = trigger.getBoundingClientRect().right - role.getBoundingClientRect().right;
-        const eight = tokenLength(canvasElement, '--space-050');
+        const eight = tokenLength(canvasElement, '--stack-md');
         await expect(gap, 'the fill ends 8 after the role').toBeLessThanOrEqual(eight + 1);
         await expect(gap).toBeGreaterThanOrEqual(eight - 1);
         const avatar = trigger.querySelector('.plus-avatar');

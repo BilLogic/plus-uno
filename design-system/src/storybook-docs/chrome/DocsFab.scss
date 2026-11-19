@@ -2,8 +2,8 @@
 // dark and both contrast modes come from the tokens the buttons already use.
 .plus-docs-fab {
     position: fixed;
-    right: var(--space-150);
-    bottom: var(--space-150);
+    right: var(--inline-2xl);
+    bottom: var(--stack-2xl);
     z-index: var(--layer-navigation);
 }
 

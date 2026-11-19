@@ -664,7 +664,7 @@ export const MotionDemo = ({
       }}
     >
       {controls && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-100)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-xl)' }}>
           {title && (
             <span id={titleId} style={{ flex: 1, font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>
               {title}

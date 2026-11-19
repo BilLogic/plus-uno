@@ -29,6 +29,9 @@ export default {
     },
 };
 
+/* token gap: demo canvas size, no role token */
+const DEMO_SIZE = { top: '80px', side: '48px' };
+
 const onRetry = fn();
 
 const basicMenu = (
@@ -40,7 +43,7 @@ const basicMenu = (
 );
 
 export const Overview = () => (
-    <div style={{ padding: 'var(--space-500) var(--space-150) var(--size-1000)' }}>
+    <div style={{ padding: `${DEMO_SIZE.top} var(--inline-2xl) var(--size-1000)` }}>
         <DropdownMenu trigger={<Button text="Session actions" iconAfter={<Icon name="chevron-down" size={12} />} />}>
             {basicMenu}
         </DropdownMenu>
@@ -61,7 +64,7 @@ Overview.play = async ({ canvasElement }) => {
 };
 
 export const Placements = () => (
-    <div style={{ display: 'flex', gap: 'var(--space-300)', padding: 'var(--space-500) var(--space-150) var(--size-1500)' }}>
+    <div style={{ display: 'flex', gap: DEMO_SIZE.side, padding: `${DEMO_SIZE.top} var(--inline-2xl) var(--size-1500)` }}>
         <DropdownMenu trigger={<Button>Bottom start</Button>} placement="bottom-start">
             {basicMenu}
         </DropdownMenu>
@@ -75,7 +78,7 @@ export const Placements = () => (
 );
 
 export const Spacing = () => (
-    <div style={{ display: 'flex', gap: 'var(--space-300)', padding: 'var(--space-150) var(--space-150) var(--size-1500)' }}>
+    <div style={{ display: 'flex', gap: DEMO_SIZE.side, padding: 'var(--stack-2xl) var(--inline-2xl) var(--size-1500)' }}>
         <DropdownMenu trigger={<Button>Default</Button>} spacing="default">
             {basicMenu}
         </DropdownMenu>
@@ -100,7 +103,7 @@ Spacing.play = async ({ canvasElement }) => {
 };
 
 export const WithSections = () => (
-    <div style={{ padding: 'var(--space-150) var(--space-150) var(--size-1900)' }}>
+    <div style={{ padding: 'var(--stack-2xl) var(--inline-2xl) var(--size-1900)' }}>
         <DropdownMenu trigger={<Button>Views</Button>}>
             <Section title="Manage">
                 <ButtonItem onClick={() => {}}>Rename</ButtonItem>
@@ -114,7 +117,7 @@ export const WithSections = () => (
 );
 
 export const Loading = () => (
-    <div style={{ padding: 'var(--space-150) var(--space-150) var(--size-1400)' }}>
+    <div style={{ padding: 'var(--stack-2xl) var(--inline-2xl) var(--size-1400)' }}>
         <DropdownMenu trigger={<Button>Assignees</Button>} loading isOpen onOpenChange={() => {}} />
     </div>
 );
@@ -127,7 +130,7 @@ Loading.play = async ({ canvasElement }) => {
 
 /** After a failed load the menu says so and offers Retry, which leaves the menu open. */
 export const LoadFailed = () => (
-    <div style={{ padding: 'var(--space-150) var(--space-150) var(--size-1400)' }}>
+    <div style={{ padding: 'var(--stack-2xl) var(--inline-2xl) var(--size-1400)' }}>
         <DropdownMenu trigger={<Button>Assignees</Button>} hasError onRetry={onRetry} isOpen onOpenChange={() => {}} />
     </div>
 );
@@ -143,7 +146,7 @@ LoadFailed.play = async ({ canvasElement }) => {
 
 /** Open with the keyboard, move into the menu, then Escape: closed, focus on the trigger. */
 export const EscapeCloses = () => (
-    <div style={{ padding: 'var(--space-150) var(--space-150) var(--size-1000)' }}>
+    <div style={{ padding: 'var(--stack-2xl) var(--inline-2xl) var(--size-1000)' }}>
         <DropdownMenu trigger={<Button>Actions</Button>}>
             <ButtonItem onClick={() => {}}>Rename</ButtonItem>
             <ButtonItem onClick={() => {}}>Archive</ButtonItem>
@@ -173,7 +176,7 @@ EscapeCloses.play = async ({ canvasElement }) => {
 export const MenuKeyboardNavigation = () => {
     const [picked, setPicked] = React.useState('');
     return (
-        <div style={{ padding: 'var(--space-150) var(--space-150) var(--size-1400)' }}>
+        <div style={{ padding: 'var(--stack-2xl) var(--inline-2xl) var(--size-1400)' }}>
             <p data-testid="picked">{picked}</p>
             <DropdownMenu trigger={<Button>Actions</Button>}>
                 <ButtonItem onClick={() => setPicked('Rename')}>Rename</ButtonItem>
@@ -215,7 +218,7 @@ export const Interactive = {
         shouldFlip: true,
     },
     render: (args) => (
-        <div style={{ padding: 'var(--space-500) var(--space-300)' }}>
+        <div style={{ padding: `${DEMO_SIZE.top} ${DEMO_SIZE.side}` }}>
             <DropdownMenu trigger={<Button>Session actions</Button>} {...args}>
                 {basicMenu}
             </DropdownMenu>
@@ -229,7 +232,7 @@ const noop = () => {};
 
 export const Default = {
     render: () => (
-        <div style={{ padding: 'var(--space-150) var(--space-150) var(--space-150)' }}>
+        <div style={{ padding: 'var(--stack-2xl) var(--inline-2xl) var(--stack-2xl)' }}>
             <DropdownMenu trigger={<Button text="Actions" iconAfter={<Icon name="chevron-down" size={12} />} />}>
                 {basicMenu}
             </DropdownMenu>
@@ -244,7 +247,7 @@ export const Default = {
 
 export const Open = {
     render: () => (
-        <div style={{ padding: 'var(--space-150) var(--space-150) var(--size-1400)' }}>
+        <div style={{ padding: 'var(--stack-2xl) var(--inline-2xl) var(--size-1400)' }}>
             <DropdownMenu trigger={<Button text="Actions" />} isOpen onOpenChange={noop}>
                 {basicMenu}
             </DropdownMenu>
@@ -258,7 +261,7 @@ export const Open = {
 
 export const CompactRows = {
     render: () => (
-        <div style={{ padding: 'var(--space-150) var(--space-150) var(--size-1400)' }}>
+        <div style={{ padding: 'var(--stack-2xl) var(--inline-2xl) var(--size-1400)' }}>
             <DropdownMenu trigger={<Button text="Compact" />} spacing="compact" isOpen onOpenChange={noop}>
                 {basicMenu}
             </DropdownMenu>
@@ -272,7 +275,7 @@ export const CompactRows = {
 
 export const DisabledRow = {
     render: () => (
-        <div style={{ padding: 'var(--space-150) var(--space-150) var(--size-1400)' }}>
+        <div style={{ padding: 'var(--stack-2xl) var(--inline-2xl) var(--size-1400)' }}>
             <DropdownMenu trigger={<Button text="Manage" />} isOpen onOpenChange={noop}>
                 <ButtonItem onClick={noop}>Rename</ButtonItem>
                 <ButtonItem onClick={noop} isDisabled>Archive</ButtonItem>
@@ -289,7 +292,7 @@ export const DisabledRow = {
 /** A row disabled for a prerequisite the person can fix here; its description says what to do. */
 export const DisabledRowWithReason = {
     render: () => (
-        <div style={{ padding: 'var(--space-150) var(--space-150) var(--size-1400)' }}>
+        <div style={{ padding: 'var(--stack-2xl) var(--inline-2xl) var(--size-1400)' }}>
             <DropdownMenu trigger={<Button text="Manage" />} isOpen onOpenChange={noop}>
                 <ButtonItem onClick={noop}>Rename</ButtonItem>
                 <ButtonItem onClick={noop} isDisabled description="End the open session first">Archive</ButtonItem>
@@ -308,7 +311,7 @@ export const DisabledRowWithReason = {
 export const HoveredState = {
     parameters: { docs: { disable: true } },
     render: () => (
-        <div style={{ padding: 'var(--space-150) var(--space-150) var(--size-1400)' }}>
+        <div style={{ padding: 'var(--stack-2xl) var(--inline-2xl) var(--size-1400)' }}>
             <DropdownMenu trigger={<Button text="Actions" />} isOpen onOpenChange={noop}>
                 {basicMenu}
             </DropdownMenu>
@@ -326,7 +329,7 @@ export const HoveredState = {
 export const KeyboardFocus = {
     parameters: { docs: { disable: true } },
     render: () => (
-        <div style={{ padding: 'var(--space-150)' }}>
+        <div style={{ padding: 'var(--stack-2xl)' }}>
             <DropdownMenu trigger={<Button text="Actions" />}>{basicMenu}</DropdownMenu>
         </div>
     ),

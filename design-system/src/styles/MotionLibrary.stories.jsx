@@ -260,7 +260,7 @@ export const RealComponentCardReducedTwin = {
 
 export const ComponentSubjectCoverage = {
     render: () => (
-        <div style={{ display: 'grid', gap: 'var(--space-200)' }}>
+        <div style={{ display: 'grid', gap: 'var(--stack-3xl)' }}>
             <MotionLibraryCard row={MULTI_EVENT_ROW} reduced playOnInView={false} />
             {FALLBACK_ROW ? <MotionLibraryCard row={FALLBACK_ROW} reduced playOnInView={false} /> : null}
             <MotionLibraryCard row={PATTERN_ROW} reduced playOnInView={false} />

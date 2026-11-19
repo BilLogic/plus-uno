@@ -118,7 +118,7 @@ const matrixCell = {
     alignItems: 'center',
     justifyContent: 'center',
     minBlockSize: 'var(--height-500)',
-    paddingBlock: 'var(--space-050)',
+    paddingBlock: 'var(--stack-md)',
     borderBlockStart: 'var(--border-width-default) solid var(--ds-border)',
 };
 

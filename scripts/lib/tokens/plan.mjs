@@ -472,9 +472,10 @@ export const TOKEN_LADDER = [
  * Every replacement resolves to the same pixels the retired name did, so a
  * caller moving over changes a name, never a size.
  *  - `--size-element-*`: the old Figma element vocabulary, split by property
- *    onto the semantics Pad / Stack / Radius steps. Two of its values have no
- *    semantic step (a 4px vertical pad, a 10px gap) and read the primitive
- *    instead, and its 1.5px and 3px strokes take the 2px stroke.
+ *    onto the semantics Pad / Stack / Radius / Border steps. A 4px vertical
+ *    pad takes the nearest role with the same value, a 10px gap has none
+ *    (`RETIRED_NO_STEP`), and its 1.5px and 3px strokes take the 2px stroke.
+ *    No target is a primitive (`plan.test.mjs`).
  *  - `--element-{pad|gap|radius}-{default|compact}`: the role tokens this
  *    plan's first pass wrote; no "roles" concept survives (Bill, 2026-11-04).
  */
@@ -485,19 +486,19 @@ export const RETIRED_RENAMES = {
   '--size-element-pad-x-xs': '--pad-x-xs',
   '--size-element-pad-y-lg': '--pad-y-lg',
   '--size-element-pad-y-md': '--pad-y-md',
-  '--size-element-pad-y-sm': '--space-025',
+  // No 4px pad step exists; the nearest same-value role is used.
+  '--size-element-pad-y-sm': '--stack-sm',
   '--size-element-gap-xs': '--stack-sm',
   '--size-element-gap-sm': '--stack-md',
-  '--size-element-gap-md': '--space-0625',
   '--size-element-gap-lg': '--stack-lg',
   '--size-element-radius-sm': '--radius-md',
   '--size-element-radius-md': '--radius-md',
   '--size-element-radius-lg': '--radius-lg',
   '--size-element-radius-full': '--radius-full',
-  '--size-element-stroke-sm': '--stroke-1',
-  '--size-element-stroke-md': '--stroke-2',
-  '--size-element-stroke-lg': '--stroke-2',
-  '--size-element-stroke-xl': '--stroke-2',
+  '--size-element-stroke-sm': '--border-width-default',
+  '--size-element-stroke-md': '--border-width-selected',
+  '--size-element-stroke-lg': '--border-width-selected',
+  '--size-element-stroke-xl': '--border-width-selected',
   '--size-element-border': '--border-width-default',
   '--element-radius-full': '--radius-full',
   '--element-pad-default': '--pad-x-md',
@@ -515,7 +516,8 @@ export const RETIRED_RENAMES = {
   '--tooltip-radius': '--radius-control-sm',
   '--page-radius': '--radius-lg',
   '--page-radius-md': '--radius-xl',
-  '--tile-radius-sm': '--space-0375',
+  // No tile radius exists; the nearest same-value role is used.
+  '--tile-radius-sm': '--radius-control-sm',
   '--tile-radius-lg': '--radius-control-lg',
   '--card-pad-sm': '--card-pad',
   '--card-pad-md': '--card-pad',
@@ -528,6 +530,15 @@ export const RETIRED_RENAMES = {
   '--popup-width-lg': '--popup-width-4-col',
 };
 
+/**
+ * Retired names whose value no semantic step holds, so they map to nothing.
+ * `retiredRenames()` leaves them out; `RETIRED_TOKENS` still bans them.
+ */
+export const RETIRED_NO_STEP = new Set([
+  /* token gap: 10px column gap, no role token */
+  '--size-element-gap-md',
+]);
+
 /** Retired name -> its replacement: the explicit table above, then each ladder row's `old` (first row wins). */
 export function retiredRenames() {
   const map = new Map(Object.entries(RETIRED_RENAMES));
@@ -538,4 +549,4 @@ export function retiredRenames() {
 }
 
 /** Every retired name. The generators drop them and `check:old-system` bans their uses. */
-export const RETIRED_TOKENS = new Set(retiredRenames().keys());
+export const RETIRED_TOKENS = new Set([...retiredRenames().keys(), ...RETIRED_NO_STEP]);

@@ -12,7 +12,7 @@ The Foundations pages in `design-system/src/styles/*.mdx` are written for design
 ## Tokens and the plan
 
 - Spacing, size and radius tokens come from one plan, `scripts/lib/tokens/plan.mjs`. Add a row there, then `npm run generate:design-tokens`; the output in `design-system/src/tokens/ladder/` is generated. Old-to-new names are in `architecture/token-tiers-name-map.md`.
-- `npm run check:old-system` holds code outside `specs/` to the names on the ladder. `npm run check:no-primitive-reads` holds components and templates to semantic reads: the count of numbered-primitive reads may only fall.
+- `npm run check:old-system` holds code outside `specs/` to the names on the ladder. `npm run check:no-primitive-reads` holds components and templates to semantic reads: the count of numbered-primitive reads may only fall. Their stories and the docs figures and styles (`storybook-docs/`, `styles/`) read no `--space-<n>` or `--palette-*` at all.
 - A component that resolves a tier token into its own rules does it through a private custom property, `--_<component>-<role>`, set once on the component root:
 
 ```scss
