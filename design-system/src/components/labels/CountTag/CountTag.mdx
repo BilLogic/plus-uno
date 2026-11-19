@@ -8,6 +8,8 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureGround,
+    FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
@@ -195,9 +197,9 @@ and selectable `Tag` (`trailingMetric`).
 Subtle neutral is the default. Bold asks for action now, so use at most one bold count per area.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><CountTag value={12} /><CountTag value={4} /><CountTag value={3} isBold appearance="danger" label="3 errors" /></div>}
+    doExample={<FigureRow><CountTag value={12} /><CountTag value={4} /><CountTag value={3} isBold appearance="danger" label="3 errors" /></FigureRow>}
     doCaption="Subtle neutral by default, with bold only where something needs doing now."
-    dontExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><CountTag value={12} isBold appearance="danger" /><CountTag value={4} isBold appearance="info" /><CountTag value={3} isBold appearance="warning" /></div>}
+    dontExample={<FigureRow><CountTag value={12} isBold appearance="danger" /><CountTag value={4} isBold appearance="info" /><CountTag value={3} isBold appearance="warning" /></FigureRow>}
     dontCaption="Bold on every item in a list: when every count shouts, none of them does."
 />
 
@@ -206,9 +208,9 @@ Subtle neutral is the default. Bold asks for action now, so use at most one bold
 It renders nothing at `value={0}` and caps past `max` with a `+`, so pass the raw number.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-sm)' }}><span>Messages</span><CountTag value={0} /></div>}
+    doExample={<FigureRow gap="sm"><span>Messages</span><CountTag value={0} /></FigureRow>}
     doCaption="Pass the raw number: at zero the tag leaves the empty tab bare."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-sm)' }}><span>Messages</span><CountTag value={0} showZero /></div>}
+    dontExample={<FigureRow gap="sm"><span>Messages</span><CountTag value={0} showZero /></FigureRow>}
     dontCaption="Force a zero onto an empty tab, unless the zero is the news."
 />
 
@@ -221,7 +223,7 @@ The tag shows the number alone, never words alongside it; `label="4 unread messa
 Inverse is a solid light ground with dark text, so it passes contrast on any fill. On a light surface use subtle.
 
 <DoDontPair
-    doExample={<div style={{ display: 'inline-flex', padding: 'var(--pad-y-lg) var(--pad-x-md)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--ds-background-brand-bold)' }}><CountTag value={4} isInverse /></div>}
+    doExample={<FigureGround ground="brand"><CountTag value={4} isInverse /></FigureGround>}
     doCaption="Inverse on a filled, dark ground."
     dontExample={<CountTag value={4} isInverse />}
     dontCaption="Inverse on a light surface, where it barely separates from the page."

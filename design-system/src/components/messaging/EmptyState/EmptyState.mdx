@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureStack,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
@@ -243,7 +244,7 @@ Pass `EmptyState` to `DynamicTable`'s `emptyView` (or the Table template's `empt
 <DoDontPair
     doExample={<DynamicTable head={{ cells: [{ key: 'student', content: 'Student' }, { key: 'grade', content: 'Grade' }] }} rows={[]} label="Students" emptyView={<EmptyState spacing="compact" icon="user-group" header="No students yet" description="Add a student to see them here." />} />}
     doCaption="An EmptyState in DynamicTable's emptyView replaces the whole table."
-    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><StaticTable headers={['Student', 'Grade']} rows={[]} /><EmptyState spacing="compact" icon="user-group" header="No students yet" description="Add a student to see them here." /></div>}
+    dontExample={<FigureStack><StaticTable headers={['Student', 'Grade']} rows={[]} /><EmptyState spacing="compact" icon="user-group" header="No students yet" description="Add a student to see them here." /></FigureStack>}
     dontCaption="An EmptyState under a Static table with an empty body."
 />
 

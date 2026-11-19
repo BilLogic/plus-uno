@@ -1,7 +1,11 @@
 import { Meta } from '@storybook/addon-docs/blocks';
 import { Button } from '@/components';
 import * as ButtonStories from '../../components/forms-and-inputs/Button/Button.stories.jsx';
-import { ComponentExample, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    ComponentExample,
+    DoDontPair,
+    FigureRow,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 import { FoundationHero, DocsLink } from '@/storybook-docs/foundation-page.jsx';
 
 <Meta title="AI UI/Components/Button" />
@@ -29,9 +33,9 @@ import { FoundationHero, DocsLink } from '@/storybook-docs/foundation-page.jsx';
 Use one AI button per region, only for an action that calls the AI, such as "Generate summary" on session notes. Keep its built-in sparkle and required label. Use default or subtle buttons with an AI <DocsLink id="ai-ui-components-icon">Icon</DocsLink> for other AI actions.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><Button appearance="ai" text="Generate summary" /><Button appearance="subtle" text="Edit notes" /></div>}
+    doExample={<FigureRow><Button appearance="ai" text="Generate summary" /><Button appearance="subtle" text="Edit notes" /></FigureRow>}
     doCaption="One AI button for the region's main AI action, with the other actions subtle."
-    dontExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><Button appearance="ai" text="Generate summary" /><Button appearance="ai" text="Save notes" /></div>}
+    dontExample={<FigureRow><Button appearance="ai" text="Generate summary" /><Button appearance="ai" text="Save notes" /></FigureRow>}
     dontCaption="A second AI button competes with the first, and Save notes is not an AI action."
 />
 

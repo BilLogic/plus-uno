@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureStack,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -219,17 +220,17 @@ One line per step, a few words. A long label truncates with an ellipsis.
 Stack the steps in a narrow column such as a sidebar; keep the row when there is width for it.
 
 <DoDontPair
-    doExample={<div style={{ width: 'calc(var(--control-sm) * 7)' }}><ProgressTracker label="Do: vertical in a narrow column" orientation="vertical" items={[
+    doExample={<FigureStack size="sm"><ProgressTracker label="Do: vertical in a narrow column" orientation="vertical" items={[
         { id: 'a', label: 'Information', status: 'visited', onClick: () => {} },
         { id: 'b', label: 'Reflection', status: 'current' },
         { id: 'c', label: 'Feedback', status: 'unvisited' },
-    ]} /></div>}
+    ]} /></FigureStack>}
     doCaption="Vertical steps in a narrow column, each label readable."
-    dontExample={<div style={{ width: 'calc(var(--control-sm) * 7)' }}><ProgressTracker label="Don't: row in a narrow column" items={[
+    dontExample={<FigureStack size="sm"><ProgressTracker label="Don't: row in a narrow column" items={[
         { id: 'a', label: 'Information', status: 'visited', onClick: () => {} },
         { id: 'b', label: 'Reflection', status: 'current' },
         { id: 'c', label: 'Feedback', status: 'unvisited' },
-    ]} /></div>}
+    ]} /></FigureStack>}
     dontCaption="A row squeezed into a narrow column, so every label truncates."
 />
 

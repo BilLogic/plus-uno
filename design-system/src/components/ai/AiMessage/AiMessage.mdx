@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureStack,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -163,7 +164,7 @@ Keep progress visible rather than leaving a blank; follow the status sequence
 in Usage.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}><AiMessage status="thinking" /><AiMessage status="streaming" text="Maya has the steps for adding fractions, but in word" /></div>}
+    doExample={<FigureStack gap="lg"><AiMessage status="thinking" /><AiMessage status="streaming" text="Maya has the steps for adding fractions, but in word" /></FigureStack>}
     doCaption="The typing indicator, then the streaming state, shows the answer arriving."
     dontExample={<AiMessage text="Maya has the steps for adding fractions, but in word" />}
     dontCaption="Partial text shown as finished hides that it is still being written."

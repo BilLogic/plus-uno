@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureStack,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -217,7 +218,7 @@ Items share borders so the group reads as one control.
 <DoDontPair
     doExample={<Accordion items={sessionItems} />}
     doCaption="Items touch, borders shared."
-    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>{sessionItems.map((item) => <Accordion key={item.eventKey} items={[item]} />)}</div>}
+    dontExample={<FigureStack gap="lg">{sessionItems.map((item) => <Accordion key={item.eventKey} items={[item]} />)}</FigureStack>}
     dontCaption="Items spaced apart like separate cards."
 />
 

@@ -4,11 +4,12 @@ import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 import * as ButtonStories from './Button.stories.jsx';
 import { Button } from '@/components';
 import {
+    ComponentExample,
     DocsCanvasShell,
     DocsInteractivePlayground,
-    ComponentExample,
     DocsTable,
     DoDontPair,
+    FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
@@ -273,9 +274,9 @@ Most buttons need no icon. Add one only when the glyph has an established meanin
 ### Use one primary action per area.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><Button appearance="subtle" text="View schedule" /><Button appearance="primary" text="Book session" /></div>}
+    doExample={<FigureRow><Button appearance="subtle" text="View schedule" /><Button appearance="primary" text="Book session" /></FigureRow>}
     doCaption="One primary button, with the secondary action subtle beside it."
-    dontExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><Button appearance="primary" text="View schedule" /><Button appearance="primary" text="Book session" /></div>}
+    dontExample={<FigureRow><Button appearance="primary" text="View schedule" /><Button appearance="primary" text="Book session" /></FigureRow>}
     dontCaption="Two primary buttons in one area compete for attention."
 />
 
@@ -284,9 +285,9 @@ Most buttons need no icon. Add one only when the glyph has an established meanin
 The `ai` appearance marks the main AI action in a region, such as "Generate summary" on session notes. Use it only for actions that call AI, and leave its look as shipped (the sparkle is always drawn and a label is required). Every other AI action in the region is a `default` or `subtle` button with an AI icon.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><Button appearance="ai" text="Generate summary" /><Button appearance="subtle" text="Edit notes" /></div>}
+    doExample={<FigureRow><Button appearance="ai" text="Generate summary" /><Button appearance="subtle" text="Edit notes" /></FigureRow>}
     doCaption="One AI button for the region's main AI action, with the other actions subtle."
-    dontExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><Button appearance="ai" text="Generate summary" /><Button appearance="ai" text="Save notes" /></div>}
+    dontExample={<FigureRow><Button appearance="ai" text="Generate summary" /><Button appearance="ai" text="Save notes" /></FigureRow>}
     dontCaption="A second AI button competes with the first, and Save notes is not an AI action."
 />
 
@@ -299,7 +300,7 @@ Use `default` spacing in most places, `compact` for tables, headers and inline p
 An action that is not ready stays enabled. When pressed, move focus to the first field that needs attention and show the reason there, or in a warning `SectionMessage` above when it blocks the main action. Disable a button only while it is sending (`isLoading`), or when the reason is self-evident, such as Back on the first step. A button for something a role can never do is left out. See [Disabled](?path=/docs/patterns-states-disabled--docs).
 
 <DoDontPair
-    doExample={<div><Button appearance="primary" text="Save notes" /><p style={{ margin: 'var(--stack-md) 0 0' }}>Complete the session notes to continue.</p></div>}
+    doExample={<div><Button appearance="primary" text="Save notes" /><p>Complete the session notes to continue.</p></div>}
     doCaption="Enabled, with the reason shown as text when the button is pressed."
     dontExample={<Button appearance="primary" text="Save notes" isDisabled />}
     dontCaption="A disabled submit button gives no direction and leaves the tab order."

@@ -7,6 +7,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
@@ -160,9 +161,9 @@ prop to swap it for another kind.
 record rather than passing a custom glyph name.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><TaskIcon label="" /><span>Fix the broken sync</span></div>}
+    doExample={<FigureRow><TaskIcon label="" /><span>Fix the broken sync</span></FigureRow>}
     doCaption="The Task glyph beside the task name."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><BugIcon label="" /><span>Fix the broken sync</span></div>}
+    dontExample={<FigureRow><BugIcon label="" /><span>Fix the broken sync</span></FigureRow>}
     dontCaption="The Bug glyph on a task."
 />
 
@@ -173,9 +174,9 @@ Each kind defaults its accessible name to its kind ("Task", "Bug"). Set
 assistive technology does not hear it twice.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><TaskIcon label="" /><span>Task: fix the sync</span></div>}
+    doExample={<FigureRow><TaskIcon label="" /><span>Task: fix the sync</span></FigureRow>}
     doCaption="An empty label when the kind is written beside it."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><TaskIcon /><span>Task: fix the sync</span></div>}
+    dontExample={<FigureRow><TaskIcon /><span>Task: fix the sync</span></FigureRow>}
     dontCaption="Both the default name and the visible kind, so it reads twice."
 />
 
@@ -184,9 +185,9 @@ assistive technology does not hear it twice.
 Each kind has one glyph and color. Do not swap the glyph to indicate workflow state; pair it with `StatusTag`.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><TaskIcon /><span>Fix the sync</span><StatusTag appearance="success">Done</StatusTag></div>}
+    doExample={<FigureRow><TaskIcon /><span>Fix the sync</span><StatusTag appearance="success">Done</StatusTag></FigureRow>}
     doCaption="The kind stays a Task; the status goes in a Status tag."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><TaskIcon /><BugIcon /><span>Fix the sync</span></div>}
+    dontExample={<FigureRow><TaskIcon /><BugIcon /><span>Fix the sync</span></FigureRow>}
     dontCaption="A second glyph to hint at a status."
 />
 

@@ -3,6 +3,7 @@ import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/
 import { expect, userEvent, within } from 'storybook/test';
 import { Button, Dialog, DIALOG_WIDTHS, DIALOG_WIDTH_PX, FooterActions, IconButton } from '@/components';
 import { Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { FigureScreen } from '@/storybook-docs/ds-docs-layout.jsx';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
@@ -496,14 +497,12 @@ export const FooterLayouts = {
     },
 };
 
-const narrowPairScreen = { '--plus-overlay-screen': 'var(--width-3000)', width: '100%' };
-
 /** Size the Dialog to its content with a step of DIALOG_WIDTHS. */
 export const SizeToContent = {
     render: () => (
         <DoDont>
             <Do caption="The narrowest step for a short question.">
-                <div style={narrowPairScreen}>
+                <FigureScreen>
                     <Dialog
                         width="6-col"
                         title="Remove this session?"
@@ -512,10 +511,10 @@ export const SizeToContent = {
                         primaryButton={{ text: 'Remove', appearance: 'danger' }}
                         onClose={() => {}}
                     />
-                </div>
+                </FigureScreen>
             </Do>
             <Dont caption="The widest step around one sentence.">
-                <div style={narrowPairScreen}>
+                <FigureScreen>
                     <Dialog
                         width="10-col"
                         title="Remove this session?"
@@ -524,7 +523,7 @@ export const SizeToContent = {
                         primaryButton={{ text: 'Remove', appearance: 'danger' }}
                         onClose={() => {}}
                     />
-                </div>
+                </FigureScreen>
             </Dont>
         </DoDont>
     ),

@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
@@ -191,9 +192,9 @@ The label defaults to the subject name; a long rewrite breaks the one-line tag. 
 Repeating a subject adds nothing; a row lists the different subjects.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><CompetencyTag subject="social-emotional" /><CompetencyTag subject="mastering-content" /></div>}
+    doExample={<FigureRow><CompetencyTag subject="social-emotional" /><CompetencyTag subject="mastering-content" /></FigureRow>}
     doCaption="Distinct subjects."
-    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><CompetencyTag subject="social-emotional" /><CompetencyTag subject="social-emotional" /><CompetencyTag subject="social-emotional" /></div>}
+    dontExample={<FigureRow><CompetencyTag subject="social-emotional" /><CompetencyTag subject="social-emotional" /><CompetencyTag subject="social-emotional" /></FigureRow>}
     dontCaption="The same subject three times."
 />
 

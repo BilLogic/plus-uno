@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
@@ -177,9 +178,9 @@ it, never from the arrow alone.
 Pass the signed change as a number and set `goodDirection` once per metric. When less is better, up is bad: say so with `goodDirection="down"`.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>No-shows</span><ChangeTag value={2} goodDirection="down" comparison="vs last week" /></div>}
+    doExample={<FigureRow><span>No-shows</span><ChangeTag value={2} goodDirection="down" comparison="vs last week" /></FigureRow>}
     doCaption="More no-shows reads as danger."
-    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>No-shows</span><ChangeTag value={2} goodDirection="up" comparison="vs last week" /></div>}
+    dontExample={<FigureRow><span>No-shows</span><ChangeTag value={2} goodDirection="up" comparison="vs last week" /></FigureRow>}
     dontCaption="More no-shows reads as success."
 />
 
@@ -188,9 +189,9 @@ Pass the signed change as a number and set `goodDirection` once per metric. When
 Not every change is good or bad. Leave `goodDirection` at `none` for those.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Hours tutored</span><ChangeTag value={6} comparison="vs last week" /></div>}
+    doExample={<FigureRow><span>Hours tutored</span><ChangeTag value={6} comparison="vs last week" /></FigureRow>}
     doCaption="Neutral: more hours is neither good nor bad."
-    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Hours tutored</span><ChangeTag value={6} goodDirection="up" comparison="vs last week" /></div>}
+    dontExample={<FigureRow><span>Hours tutored</span><ChangeTag value={6} goodDirection="up" comparison="vs last week" /></FigureRow>}
     dontCaption="Success implies a judgment nobody made."
 />
 

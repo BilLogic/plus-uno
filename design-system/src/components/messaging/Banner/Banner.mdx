@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureStack,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -181,7 +182,7 @@ Stacked banners compete and push the page down.
 <DoDontPair
     doExample={<Banner appearance="announcement">New: the schedule view is here.</Banner>}
     doCaption="A single announcement."
-    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}><Banner appearance="warning">Finish setting up your account.</Banner><Banner appearance="danger">We could not save your changes. Try again.</Banner></div>}
+    dontExample={<FigureStack gap="sm"><Banner appearance="warning">Finish setting up your account.</Banner><Banner appearance="danger">We could not save your changes. Try again.</Banner></FigureStack>}
     dontCaption="A warning and a danger banner stacked."
 />
 

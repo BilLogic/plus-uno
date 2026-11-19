@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -230,7 +231,7 @@ a disabled field or `TagGroup` disables all through `TagContext`, shared with Ta
 <DoDontPair
     doExample={<Suggestion label="Shorten" isDisabled onAccept={() => {}} />}
     doCaption="Disabled when unavailable."
-    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><Suggestion label="Shorten" onAccept={() => {}} /><span>Nothing to shorten</span></div>}
+    dontExample={<FigureRow><Suggestion label="Shorten" onAccept={() => {}} /><span>Nothing to shorten</span></FigureRow>}
     dontCaption="Active with nothing to do."
 />
 

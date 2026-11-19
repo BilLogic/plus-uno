@@ -1,4 +1,5 @@
 import { withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
+import { FigureRow } from '@/storybook-docs/ds-docs-layout.jsx';
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
@@ -257,20 +258,20 @@ export const SayWhatControlDoes = {
         <DoDont>
             <Do caption="A few words on what the control does.">
                 <DocsOverlayBoundary fit={false} containHeight>
-                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <FigureRow>
                         <Tooltip text="Opens the session notes" placement="bottom" show>
                             <Button appearance="default" text="Notes" />
                         </Tooltip>
-                    </div>
+                    </FigureRow>
                 </DocsOverlayBoundary>
             </Do>
             <Dont caption="Repeats the label the control already shows.">
                 <DocsOverlayBoundary fit={false} containHeight>
-                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <FigureRow>
                         <Tooltip text="Notes" placement="bottom" show>
                             <Button appearance="default" text="Notes" />
                         </Tooltip>
-                    </div>
+                    </FigureRow>
                 </DocsOverlayBoundary>
             </Dont>
         </DoDont>
@@ -288,16 +289,16 @@ export const KeepToOneLine = {
         <DoDont>
             <Do caption="One line, sentence case, no closing period.">
                 <DocsOverlayBoundary fit={false} containHeight>
-                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <FigureRow>
                         <Tooltip text="Moves this session out of the active list" placement="bottom" show>
                             <Button appearance="default" text="Archive" />
                         </Tooltip>
-                    </div>
+                    </FigureRow>
                 </DocsOverlayBoundary>
             </Do>
             <Dont caption="Two sentences that wrap, with a closing period.">
                 <DocsOverlayBoundary fit={false} containHeight>
-                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <FigureRow>
                         <Tooltip
                             text="Moves this session out of the active list. You can bring it back later from the archive, and its notes stay with it."
                             placement="bottom"
@@ -305,7 +306,7 @@ export const KeepToOneLine = {
                         >
                             <Button appearance="default" text="Archive" />
                         </Tooltip>
-                    </div>
+                    </FigureRow>
                 </DocsOverlayBoundary>
             </Dont>
         </DoDont>
@@ -323,7 +324,7 @@ export const InteractiveContentInPopup = {
         <DoDont>
             <Do caption="A popup holds content the user can reach.">
                 <DocsOverlayBoundary fit={false} containHeight>
-                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <FigureRow>
                         <Popup
                             trigger={<Button appearance="default" text="Scheduling" />}
                             title="Scheduling"
@@ -333,16 +334,16 @@ export const InteractiveContentInPopup = {
                         >
                             <a href="#help">Read the guide</a>
                         </Popup>
-                    </div>
+                    </FigureRow>
                 </DocsOverlayBoundary>
             </Do>
             <Dont caption="A link in a tooltip: moving toward it leaves the trigger, and the tooltip hides.">
                 <DocsOverlayBoundary fit={false} containHeight>
-                    <div style={{ display: 'flex', justifyContent: 'center' }}>
-                        <Tooltip text={<a href="#help" style={{ color: 'inherit' }}>Read the guide</a>} placement="bottom" show>
+                    <FigureRow>
+                        <Tooltip text={<a href="#help">Read the guide</a>} placement="bottom" show>
                             <Button appearance="default" text="Scheduling" />
                         </Tooltip>
-                    </div>
+                    </FigureRow>
                 </DocsOverlayBoundary>
             </Dont>
         </DoDont>

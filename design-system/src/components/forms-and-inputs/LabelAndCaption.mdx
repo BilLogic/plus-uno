@@ -3,7 +3,14 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as LabelAndCaptionStories from './LabelAndCaption.stories.jsx';
 import { Button, TextField } from '@/components';
-import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    FigureStack,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -187,9 +194,9 @@ An instruction reads badly in a screen reader's list of form fields, where the l
 In a form where most fields are required, mark only the optional ones `"(optional)"`. In a form where most fields are optional, mark only the required ones `"(required)"`. Never mark both sides, and never use a separate color or symbol.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><TextField label="Student name" isRequired defaultValue="Maya Johnson" /><TextField label="Grade" isRequired defaultValue="Grade 8" /><TextField label="Notes" labelMarker="optional" placeholder="Anything we should know?" /></div>}
+    doExample={<FigureStack><TextField label="Student name" isRequired defaultValue="Maya Johnson" /><TextField label="Grade" isRequired defaultValue="Grade 8" /><TextField label="Notes" labelMarker="optional" placeholder="Anything we should know?" /></FigureStack>}
     doCaption="Only the minority field carries a marker."
-    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><TextField label="Student name" isRequired labelMarker="required" defaultValue="Maya Johnson" /><TextField label="Grade" isRequired labelMarker="required" defaultValue="Grade 8" /><TextField label="Notes" labelMarker="optional" placeholder="Anything we should know?" /></div>}
+    dontExample={<FigureStack><TextField label="Student name" isRequired labelMarker="required" defaultValue="Maya Johnson" /><TextField label="Grade" isRequired labelMarker="required" defaultValue="Grade 8" /><TextField label="Notes" labelMarker="optional" placeholder="Anything we should know?" /></FigureStack>}
     dontCaption="Every field carries a marker, so none stands out."
 />
 
@@ -209,9 +216,9 @@ A danger caption should say what to do. The state colors the line; the words do 
 The first line says what the form is for. A generic title makes people read the fields to find out.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><p style={{ margin: 0, font: 'var(--heading-sm)' }}>Book a session</p><TextField label="Student name" defaultValue="Maya Johnson" /></div>}
+    doExample={<FigureStack><Heading as="div" size="sm">Book a session</Heading><TextField label="Student name" defaultValue="Maya Johnson" /></FigureStack>}
     doCaption="The title names the task."
-    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><p style={{ margin: 0, font: 'var(--heading-sm)' }}>Form</p><TextField label="Student name" defaultValue="Maya Johnson" /></div>}
+    dontExample={<FigureStack><Heading as="div" size="sm">Form</Heading><TextField label="Student name" defaultValue="Maya Johnson" /></FigureStack>}
     dontCaption="A generic title."
 />
 
@@ -220,9 +227,9 @@ The first line says what the form is for. A generic title makes people read the 
 The button says what happens next. "Submit" leaves people unsure what they are sending.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--stack-md)' }}><TextField label="Student name" defaultValue="Maya Johnson" /><Button appearance="primary" text="Book session" /></div>}
+    doExample={<FigureStack align="start"><TextField label="Student name" defaultValue="Maya Johnson" /><Button appearance="primary" text="Book session" /></FigureStack>}
     doCaption="A verb and a noun."
-    dontExample={<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--stack-md)' }}><TextField label="Student name" defaultValue="Maya Johnson" /><Button appearance="primary" text="Submit" /></div>}
+    dontExample={<FigureStack align="start"><TextField label="Student name" defaultValue="Maya Johnson" /><Button appearance="primary" text="Submit" /></FigureStack>}
     dontCaption={'A bare "Submit".'}
 />
 

@@ -9,6 +9,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
@@ -208,9 +209,9 @@ Icons take `appearance` and `color`. Logos take a ground color only, since the
 logo keeps its own. Images cover the whole tile, so color does not apply.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile icon="book-open" appearance="bold" color="blue" /><Tile icon="book-open" /></div>}
+    doExample={<FigureRow><Tile icon="book-open" appearance="bold" color="blue" /><Tile icon="book-open" /></FigureRow>}
     doCaption="Icons take appearance and color; logos keep their own."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile content="logo" src={partnerMarkLight} label="Partner logo" appearance="bold" /></div>}
+    dontExample={<FigureRow><Tile content="logo" src={partnerMarkLight} label="Partner logo" appearance="bold" /></FigureRow>}
     dontCaption="A bold appearance on a logo, which does nothing."
 />
 
@@ -220,9 +221,9 @@ logo keeps its own. Images cover the whole tile, so color does not apply.
 item across the app, or leave tiles gray.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile icon="book-open" color="blue" /><Tile icon="book-open" color="blue" /></div>}
+    doExample={<FigureRow><Tile icon="book-open" color="blue" /><Tile icon="book-open" color="blue" /></FigureRow>}
     doCaption="One color for each kind of item, across the app."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile icon="book-open" color="blue" /><Tile icon="book-open" color="magenta" /></div>}
+    dontExample={<FigureRow><Tile icon="book-open" color="blue" /><Tile icon="book-open" color="magenta" /></FigureRow>}
     dontCaption="The same kind of item in two colors."
 />
 
@@ -231,9 +232,9 @@ item across the app, or leave tiles gray.
 Logos default to white. Set a ground color only to match a surface; never recolor the logo.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile content="logo" src={partnerMarkLight} label="Partner logo" /></div>}
+    doExample={<FigureRow><Tile content="logo" src={partnerMarkLight} label="Partner logo" /></FigureRow>}
     doCaption="A logo on the default white ground."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile content="logo" src={partnerMarkLight} label="Partner logo" color="blue" appearance="bold" /></div>}
+    dontExample={<FigureRow><Tile content="logo" src={partnerMarkLight} label="Partner logo" color="blue" appearance="bold" /></FigureRow>}
     dontCaption="A bold ground on the logo, which keeps its own."
 />
 
