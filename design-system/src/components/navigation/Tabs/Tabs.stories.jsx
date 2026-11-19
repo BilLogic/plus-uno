@@ -9,7 +9,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { CountTag } from '@/components';
 import Tabs from './Tabs';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
-import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
+import { DemoLabel } from '@/storybook-docs/lib/template-demo';
 
 export default {
     title: 'Components/Navigation/Tabs',

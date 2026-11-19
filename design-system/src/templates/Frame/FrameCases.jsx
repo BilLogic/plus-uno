@@ -4,7 +4,7 @@ import { Frame, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, Sectio
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { MultiStepTaskType, WINDOW_HEIGHT, stepItems } from '@/storybook-docs/lib/multi-step-task.jsx';
-import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { InAppFrame } from '@/storybook-docs/lib/template-demo.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 
 /**

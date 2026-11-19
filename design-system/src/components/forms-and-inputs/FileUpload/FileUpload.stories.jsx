@@ -4,7 +4,7 @@ import { expect, fireEvent, userEvent, within } from 'storybook/test';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { FileItem } from '@/components';
 import FileUpload from './FileUpload';
-import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
+import { DemoLabel } from '@/storybook-docs/lib/template-demo';
 
 const formats = ['.zip', '.mp4', '.m4a', '.txt'];
 

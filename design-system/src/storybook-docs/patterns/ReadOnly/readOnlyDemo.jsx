@@ -3,7 +3,7 @@ import React from 'react';
 import { Checkbox, DatePicker, RadioGroup, Select, TextArea, TextField, Toggle } from '@/components';
 import { Section } from '@/templates';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
-import { InAppFrame, RECORD_CRUMBS } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { InAppFrame, RECORD_CRUMBS } from '@/storybook-docs/lib/template-demo.jsx';
 
 /**
  * The Read-only pattern's examples, drawn with the real fields in their

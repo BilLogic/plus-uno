@@ -2,7 +2,7 @@
 
 # Flag
 
-The Popups pattern's Flag (Figma Pattern/Flag). One surface, 400 wide, padded 16: a 16 icon on the title's first line, the title and its optional description, actions, and the controls. `appearance` alone decides the kind: `normal` is the default flag (overlay surface, a status icon or an avatar, always the dismiss ×, actions as links); every other appearance is bold (its bold fill, no ×, collapsed to its title behind a chevron, actions as buttons).
+The Popup family's Flag (Figma Pattern/Flag). One surface, 400 wide, padded 16: a 16 icon on the title's first line, the title and its optional description, actions, and the controls. `appearance` alone decides the kind: `normal` is the default flag (overlay surface, a status icon or an avatar, always the dismiss ×, actions as links); every other appearance is bold (its bold fill, no ×, collapsed to its title behind a chevron, actions as buttons).
 
 Also asked as: notification, snackbar, success message, undo, temporary message, notify, save confirmation.
 

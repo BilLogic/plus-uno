@@ -4,13 +4,13 @@ import { expect, waitFor, within } from 'storybook/test';
 import { probe, px } from '@/storybook-docs/lib/style-probes.js';
 import { Flag, FlagGroup, Button, Popup, Tooltip } from '@/components';
 /**
- * The Popups pattern: Popup, Flag and Tooltip. Menu's own behavior and size
+ * The Popup family: Popup, Flag and Tooltip. Menu's own behavior and size
  * cover lives on `DropdownMenu`'s own stories
  * (`Components/Forms and inputs/Dropdown menu`), since it draws from the
  * Menu family's own tokens rather than this page's older Popup numbers.
  *
  * Floating layers behave the same everywhere, and these stories hold them to
- * the Popups pattern page: popups auto 160 to 320 or a column step, padded 16,
+ * the Popup template page: popups auto 160 to 320 or a column step, padded 16,
  * tooltips 4 · 8 up to 240, flags 400 wide stacking 16 apart top-right, and
  * every one of them at least 8 from the screen edge, 4 from its trigger.
  *
@@ -27,7 +27,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'Behavior cover for the Popups pattern: menu rows and scrolling, popup '
+                    'Behavior cover for the Popup family: menu rows and scrolling, popup '
                     + 'and tooltip sizes, flag stacking, and the 8 kept from the screen edge.',
             },
         },

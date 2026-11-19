@@ -25,7 +25,7 @@ import {
     PanelUpAction,
 } from '@/templates';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
-import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { InAppFrame } from '@/storybook-docs/lib/template-demo.jsx';
 import { WINDOW_HEIGHT } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { FullBleedFooter } from '../Form/formDemo.jsx';
 

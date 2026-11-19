@@ -39,7 +39,7 @@
     {
       "group": "Popups",
       "name": "Popup",
-      "use": "The Popups pattern is four floating layers that never block the page, each a component: `DropdownMenu` lists actions, `Popup` holds a small aside anchored to a control, `Flag` reports what just happened, `Tooltip` names a control."
+      "use": "The Popup template is four floating layers that never block the page, each a component: `DropdownMenu` lists actions, `Popup` holds a small aside anchored to a control, `Flag` reports what just happened, `Tooltip` names a control."
     },
     {
       "group": "AI",
