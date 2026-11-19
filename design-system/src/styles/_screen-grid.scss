@@ -6,7 +6,7 @@
  * capped at 1232 like content. A layer spans `--plus-overlay-span` of those
  * columns plus its own pad on each side, so it grows with the screen, never
  * shrinks below the 768 screen and ignores the sidebar. Figma's
- * Modal/width-modal-* per mode are this rule at 768 · 1024 · 1440, and
+ * Modal/width-4-col … 10-col per mode are this rule at 768 · 1024 · 1440, and
  * scripts/frame-layer-tokens.test.mjs holds it to those tokens.
  *
  * The screen is `--plus-overlay-screen` when an ancestor sets it (an inline

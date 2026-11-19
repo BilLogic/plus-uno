@@ -225,8 +225,30 @@
       }
     },
     {
+      "id": "VariableID:19378:46290",
+      "name": "Modal/width-4-col",
+      "variableCollectionId": "VariableCollectionId:19378:46207",
+      "resolvedType": "FLOAT",
+      "scopes": [
+        "WIDTH_HEIGHT"
+      ],
+      "codeSyntax": {
+        "WEB": "var(--modal-width-4-col)"
+      },
+      "valuesByMode": {
+        "19378:1": 269,
+        "19378:2": 355,
+        "19378:3": 440
+      },
+      "resolvedValuesByMode": {
+        "19378:1": 269,
+        "19378:2": 355,
+        "19378:3": 440
+      }
+    },
+    {
       "id": "VariableID:19378:46218",
-      "name": "Modal/width-modal-sm",
+      "name": "Modal/width-6-col",
       "variableCollectionId": "VariableCollectionId:19378:46207",
       "resolvedType": "FLOAT",
       "scopes": [
@@ -248,7 +270,7 @@
     },
     {
       "id": "VariableID:19378:46219",
-      "name": "Modal/width-modal-md",
+      "name": "Modal/width-8-col",
       "variableCollectionId": "VariableCollectionId:19378:46207",
       "resolvedType": "FLOAT",
       "scopes": [
@@ -270,7 +292,7 @@
     },
     {
       "id": "VariableID:19378:46220",
-      "name": "Modal/width-modal-lg",
+      "name": "Modal/width-10-col",
       "variableCollectionId": "VariableCollectionId:19378:46207",
       "resolvedType": "FLOAT",
       "scopes": [

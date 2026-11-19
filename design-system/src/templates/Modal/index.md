@@ -14,7 +14,7 @@ Also asked as: confirm, confirmation dialog, destructive confirm, popup window.
 
 **Source:** `design-system/src/templates/Modal/Modal.jsx`
 
-**Stories:** `design-system/src/templates/Modal/Modal.stories.jsx` — Overview, Widths, Heights, Tabs, BodyMinHeight, CustomHeader, Divider, Loading, Width4Col, Width6Col, Width8Col, Width10Col, HugLong, HeightFill, TabsStill, Interactive, LiveBehavior, StaticBlanketRefusesToClose, BlockingShadow, SelectKeepsOverlayShadow, TypePassive, TypeActive, TypeAcknowledge, TypeSteps, AnatomyActive, WidthStrip, ResponsiveWidth, TierActive, TierDanger, TierTypeName, FooterOne, FooterTwo, FooterThree, FooterTextLeft, FooterDestructive, FooterNarrow, KeyLongContent, KeyLoading, KeyConfirmInside, StackConfirmOverPanel, StackModalOnModalRefused, BlanketInline, BlanketPads, BlanketScreenGrid, BlanketInteractive, BlanketLayers, BlanketConfirmOverPanel, MotionOpenClose, MotionReduced, BlanketMotionOpenClose, BlanketMotionReduced
+**Stories:** `design-system/src/templates/Modal/Modal.stories.jsx` — Overview, Widths, Heights, Tabs, BodyMinHeight, CustomHeader, Divider, Loading, WidthsAtEveryScreen, Width4Col, Width6Col, Width8Col, Width10Col, HugLong, HeightFill, TabsStill, Interactive, LiveBehavior, StaticBlanketRefusesToClose, BlockingShadow, SelectKeepsOverlayShadow, TypePassive, TypeActive, TypeAcknowledge, TypeSteps, AnatomyActive, WidthStrip, ResponsiveWidth, TierActive, TierDanger, TierTypeName, FooterOne, FooterTwo, FooterThree, FooterTextLeft, FooterDestructive, FooterNarrow, KeyLongContent, KeyLoading, KeyConfirmInside, StackConfirmOverPanel, StackModalOnModalRefused, BlanketInline, BlanketPads, BlanketScreenGrid, BlanketInteractive, BlanketLayers, BlanketConfirmOverPanel, MotionOpenClose, MotionReduced, BlanketMotionOpenClose, BlanketMotionReduced
 
 **Storybook page:** `design-system/src/templates/Modal/Modal.mdx`
 
@@ -153,7 +153,7 @@ import { Button } from '@/components';
 | `body` | Text, a list, fields or a table. It scrolls past the cap. |
 | `footer` or `primaryButton` · `secondaryButton` | The footer's buttons. Leave them out for Passive. |
 | `blanket` · `keyboard` | Whether a Blanket press or Escape closes the Modal (`true` by default; `blanket="static"` keeps it open). |
-| Full-bleed footer | Planned. Cells that fill the footer edge to edge, 52 high (a 32 button plus 20 pad, so full bleed never changes the Modal's height), with the inner corners squared. Today the page composes it from Button. |
+| Full-bleed footer | Planned. Cells that fill the footer edge to edge and never change the Modal's height, with the inner corners squared. Today the page composes it from Button. |
 | `tabs` | Two to five views of one thing under the title. |
 | `confirmView` | Planned. The swapped title, body and footer for a confirm about the Modal itself. Today the caller swaps them in place. |
 | Blocked-submit shake | Planned. The Modal's single shake when a submit is blocked. |

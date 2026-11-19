@@ -149,16 +149,24 @@ test('every Layout token resolves to its value at Medium, Large and X-Large', ()
   }
 });
 
-// Figma names the modal widths sm · md · lg; the code names them for the grid columns they span.
-const MODAL_COLS = { sm: '6-col', md: '8-col', lg: '10-col' };
+// The modal widths are named for the grid columns they span, in code and in Figma.
+const MODAL_COLS = { xs: '4-col', sm: '6-col', md: '8-col', lg: '10-col' };
 
 test('the derived Layout rows are the frame rules worked at each mode width', () => {
   for (const [mode, width] of Object.entries(LAYOUT_MODES)) {
     for (const [leaf, value] of Object.entries(deriveLayout(width))) {
-      // The modal widths live with the Modal template tokens; 4-col was born there, with no Layout name to retire.
-      const name = leaf.startsWith('width-modal-') ? `--modal-width-${{ xs: '4-col', ...MODAL_COLS }[leaf.slice('width-modal-'.length)]}` : renamed(`--layout-${leaf}`);
-      assert.equal(atMode(name, mode), px(value), `${leaf} at ${mode}`);
+      assert.equal(atMode(renamed(`--layout-${leaf}`), mode), px(value), `${leaf} at ${mode}`);
     }
+  }
+});
+
+test('the Figma export holds Modal/width-4-col … 10-col at the token values', () => {
+  const layout = JSON.parse(fs.readFileSync(path.join(SOURCE_DIR, 'spacing _ layout.json'), 'utf8'));
+  for (const size of Object.values(MODAL_COLS)) {
+    const variable = layout.variables.find((v) => v.name === `Modal/width-${size}`);
+    assert.ok(variable, `Layout has no Modal/width-${size}`);
+    assert.equal(variable.codeSyntax.WEB, `var(--modal-width-${size})`);
+    assert.deepEqual(Object.values(variable.valuesByMode), Object.keys(LAYOUT_MODES).map((mode) => parseInt(atMode(`--modal-width-${size}`, mode), 10)), size);
   }
 });
 
@@ -318,7 +326,7 @@ const MODAL_PAD_PX = 20;
 /*
  * The screen grid (`styles/_screen-grid.scss`) is the one rule every
  * floating layer takes its column steps from: Modal, the Blanket templates and
- * Popup. At the three mode widths it has to land on Figma's Modal/width-modal-*.
+ * Popup. At the three mode widths it has to land on Figma's Modal/width-4-col … 10-col.
  */
 const SCREEN_GRID_SCSS = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/styles/_screen-grid.scss'), 'utf8');
 
@@ -344,8 +352,8 @@ function screenGridWidth(span, width, mode, padPx = MODAL_PAD_PX) {
   return new Function('clamp', 'calc', `return ${resolve(formula)};`)(clamp, calc);
 }
 
-test('the Overlay screen grid lands on Modal/width-modal-* at 768, 1024 and 1440', () => {
-  const spans = { '6-col': 6, '8-col': 8, '10-col': 10 };
+test('the Overlay screen grid lands on Modal/width-4-col … 10-col at 768, 1024 and 1440', () => {
+  const spans = { '4-col': 4, '6-col': 6, '8-col': 8, '10-col': 10 };
   for (const [mode, width] of Object.entries(LAYOUT_MODES)) {
     for (const [size, span] of Object.entries(spans)) {
       const expected = parseFloat(atMode(`--modal-width-${size}`, mode));

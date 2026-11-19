@@ -3,7 +3,7 @@
  * rather than typed in.
  *
  * Figma has no expressions, so `Layout/width-content`, `Layout/width-column`,
- * `Layout/width-column-screen` and `Layout/width-modal-*` are plain numbers
+ * and `Layout/width-column-screen` are plain numbers
  * per mode. They were filled by running this arithmetic at each mode's screen
  * width, and the token test checks the export against it, so a mode value that
  * drifts from the rules is caught instead of shipped.
@@ -41,35 +41,26 @@ const MAX_CONTENT = 1232;
 const MIN_CONTENT = 720;
 const COLUMNS = 12;
 const GUTTER = 16;
-const MODAL_PAD = 20;
-const MODAL_SPANS = { xs: 4, sm: 6, md: 8, lg: 10 };
 
 const clamp = (n) => Math.min(MAX_CONTENT, Math.max(MIN_CONTENT, n));
 const column = (content) => (content - (COLUMNS - 1) * GUTTER) / COLUMNS;
-const span = (n, col) => n * col + (n - 1) * GUTTER;
 
 /**
  * @param {number} width the screen width a mode stands for
  * @returns {{ 'width-screen': number, 'pad-x-screen': number,
  *   'width-content': number, 'width-column': number,
- *   'width-column-screen': number, 'width-modal-xs': number,
- *   'width-modal-sm': number, 'width-modal-md': number, 'width-modal-lg': number }}
+ *   'width-column-screen': number }}
  */
 export function deriveLayout(width) {
   const docked = width >= DOCK_FROM;
   const content = clamp(width - (docked ? SIDEBAR : 0) - 2 * PAGE_PAD);
   const padXScreen = width >= WIDE_SCREEN_PAD_FROM ? WIDE_SCREEN_PAD : SCREEN_PAD;
   const screenColumn = column(clamp(width - 2 * padXScreen));
-  const modal = (n) => Math.round(span(n, screenColumn) + 2 * MODAL_PAD);
   return {
     'width-screen': width,
     'pad-x-screen': padXScreen,
     'width-content': content,
     'width-column': column(content),
     'width-column-screen': screenColumn,
-    'width-modal-xs': modal(MODAL_SPANS.xs),
-    'width-modal-sm': modal(MODAL_SPANS.sm),
-    'width-modal-md': modal(MODAL_SPANS.md),
-    'width-modal-lg': modal(MODAL_SPANS.lg),
   };
 }

@@ -8804,6 +8804,7 @@
         "CustomHeader",
         "Divider",
         "Loading",
+        "WidthsAtEveryScreen",
         "Width4Col",
         "Width6Col",
         "Width8Col",

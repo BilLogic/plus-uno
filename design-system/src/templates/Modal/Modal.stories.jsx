@@ -111,10 +111,11 @@ export const Overview = {
         const [modal] = dialogs(canvas);
         const style = getComputedStyle(modal);
         await expect(style.paddingTop, 'Modal/pad').toBe(`${tokenLength(canvasElement, '--modal-pad')}px`);
-        await expect(style.paddingTop, 'pad 20 on the top').toBe('20px');
-        await expect(style.paddingRight, 'pad 20 on the right').toBe('20px');
-        await expect(style.paddingBottom, 'pad 20 on the bottom').toBe('20px');
-        await expect(style.paddingLeft, 'pad 20 on the left').toBe('20px');
+        const pad = tokenLength(canvasElement, '--modal-pad');
+        await expect(pad, '--modal-pad is 20').toBe(20);
+        for (const side of ['Top', 'Right', 'Bottom', 'Left']) {
+            await expect(style[`padding${side}`], `pad ${pad} on the ${side.toLowerCase()}`).toBe(`${pad}px`);
+        }
         await expect(style.rowGap, 'Modal/stack-md').toBe(`${tokenLength(canvasElement, '--modal-stack-md')}px`);
         const header = modal.querySelector('.plus-dialog-header');
         const footer = modal.querySelector('.plus-dialog-footer');
@@ -341,13 +342,48 @@ const widthStory = (width) => ({
         await settleAnimations(canvasElement);
         const [modal] = dialogs(canvas);
         await expect(modal.getBoundingClientRect().width, `${width} at 1024`).toBeCloseTo(WIDTHS_AT_1024[width], 0);
-        // The content box, inside the 20 pad, spans exactly N screen-grid columns: N * column + (N - 1) * gutter.
-        const columns = Number.parseInt(width, 10);
-        const column = (SCREEN.width - 2 * 24 - 11 * 16) / 12;
-        const content = modal.getBoundingClientRect().width - 2 * Number.parseFloat(getComputedStyle(modal).paddingLeft);
-        await expect(content, `${width} content box spans ${columns} columns at 1024`).toBeCloseTo(columns * column + (columns - 1) * 16, 0);
+        await expectContentBoxOnColumns(canvasElement, modal, width, SCREEN.width);
     },
 });
+
+/**
+ * Inside the Modal pad, the content box spans exactly N screen-grid columns:
+ * N * column + (N - 1) * gutter, where the screen grid is the screen less its
+ * pad on each side, held between the content min and max widths.
+ */
+async function expectContentBoxOnColumns(host, modal, width, screen) {
+    const columns = Number.parseInt(width, 10);
+    const gutter = tokenLength(host, '--grid-gutter');
+    const grid = Math.min(tokenLength(host, '--content-max-width'), Math.max(tokenLength(host, '--content-min-width'), screen - 2 * tokenLength(host, '--page-pad')));
+    const count = Number(getComputedStyle(host).getPropertyValue('--grid-columns'));
+    const column = (grid - (count - 1) * gutter) / count;
+    const content = modal.getBoundingClientRect().width - 2 * Number.parseFloat(getComputedStyle(modal).paddingLeft);
+    await expect(content, `${width} content box spans ${columns} columns at ${screen}`).toBeCloseTo(columns * column + (columns - 1) * gutter, 0);
+}
+
+/** Every width at the 768, 1024 and 1440 screens: the content box spans exactly 4 · 6 · 8 · 10 columns each time. */
+export const WidthsAtEveryScreen = {
+    render: () => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
+            {[768, 1024, 1440].flatMap((screenWidth) => MODAL_WIDTHS.map((width) => (
+                <Demo.ModalStage key={`${screenWidth}-${width}`} title={`${width} at ${screenWidth}`} width={width} screenWidth={screenWidth} screenHeight={320} footer={footerActions}>
+                    {bodyCopy}
+                </Demo.ModalStage>
+            )))}
+        </div>
+    ),
+    play: async ({ canvas, canvasElement }) => {
+        await settleAnimations(canvasElement);
+        const modals = dialogs(canvas);
+        let i = 0;
+        for (const screen of [768, 1024, 1440]) {
+            for (const width of MODAL_WIDTHS) {
+                await expectContentBoxOnColumns(canvasElement, modals[i], width, screen);
+                i += 1;
+            }
+        }
+    },
+};
 
 export const Width4Col = widthStory('4-col');
 export const Width6Col = widthStory('6-col');
@@ -698,7 +734,7 @@ export const AnatomyActive = {
         await expect(body.scrollHeight, 'the body shows every field whole: nothing clips').toBeLessThanOrEqual(body.clientHeight + 1);
         leadersCrossNoOtherPart(canvasElement, ANATOMY_PARTS);
         const modal = canvasElement.querySelector('.plus-dialog');
-        await expect(getComputedStyle(modal).paddingTop, 'pad 20 on every side').toBe('20px');
+        await expect(getComputedStyle(modal).paddingTop, 'pad on every side').toBe(`${tokenLength(canvasElement, '--modal-pad')}px`);
         await expect(getComputedStyle(modal).borderTopLeftRadius, 'radius 16').toBe(`${tokenLength(canvasElement, '--modal-radius')}px`);
         // Form in a Modal: fields 40px, footer buttons 32px.
         const student = canvas.getByLabelText(/Student/);
