@@ -16,7 +16,7 @@ const noop = () => {};
 export const LiveMenu = ({
     label = 'Session actions',
     defaultOpen = true,
-    minWidth = 'var(--width-1500)',
+    minWidth = 'var(--field-width-md)',
     trigger,
     children,
     ...menuProps

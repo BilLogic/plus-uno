@@ -520,12 +520,12 @@ Section.propTypes = {
     actions: PropTypes.node,
     /** @deprecated use `views` (and `format`) in the three-row header. Tabs row under the title row (header type `tabs`, or `tabs-only`).
      * @ds-context Used in: Section.tabs (ds guide section)
-     * @ds-context Governed by: Forms (ds guide forms)
+     * @ds-context Governed by: Filtering (ds guide filtering); Forms (ds guide forms); Search (ds guide search)
      */
     tabs: PropTypes.node,
     /** @deprecated use `search` and `filters` in the three-row header. Toolbar row under the title row (header type `toolbar`), usually a `Section.Toolbar`.
      * @ds-context Used in: Section.toolbar (ds guide section)
-     * @ds-context Governed by: Filtering (ds guide filtering); Search (ds guide search)
+     * @ds-context Governed by: Filtering (ds guide filtering); Forms (ds guide forms); Search (ds guide search)
      */
     toolbar: PropTypes.node,
     /** Free-form header in place of title and description (header type `custom`)

@@ -370,7 +370,7 @@ export function DoDontCard({ tone, children, caption, code }) {
                 className="sb-ds-dodont-card__well"
                 style={{
                     flex: 1,
-                    minHeight: 'calc(var(--height-500) * 2)',
+                    minHeight: 'calc(var(--field-min-height-sm) * 2)',
                     padding: 'var(--card-pad)',
                     boxSizing: 'border-box',
                     display: 'flex',
@@ -397,7 +397,7 @@ export function DoDontCard({ tone, children, caption, code }) {
 
 const FIGURE_GAPS = { none: 0, sm: 'var(--inline-sm)', md: 'var(--inline-md)', lg: 'var(--inline-lg)' };
 const FIGURE_STACK_GAPS = { none: 0, sm: 'var(--stack-sm)', md: 'var(--stack-md)', lg: 'var(--stack-lg)' };
-const FIGURE_WIDTHS = { narrow: 'var(--width-1500)', medium: 'var(--width-2000)' };
+const FIGURE_WIDTHS = { narrow: 'var(--field-width-md)', medium: 'var(--field-width-lg)' };
 
 /**
  * Several parts of one Do or Don't figure side by side, wrapping when the card
@@ -473,7 +473,7 @@ export function FigureBox({ tone = 'outline', arrange, inset = false, tall = fal
                 color: 'var(--ds-text)',
                 padding: tone === 'raised' ? 'var(--card-pad)' : padded ? 'var(--pad-y-md) var(--pad-x-md)' : undefined,
                 margin: inset ? 'var(--pad-y-lg) var(--pad-x-md)' : undefined,
-                height: tall ? 'calc(var(--height-750) * 2)' : clip ? 'var(--image-lg)' : undefined,
+                height: tall ? 'calc(var(--field-min-height-lg) * 2)' : clip ? 'var(--image-lg)' : undefined,
                 overflow: clip ? 'hidden' : undefined,
                 display: arrange ? 'flex' : undefined,
                 flexDirection: arrange === 'column' ? 'column' : undefined,
@@ -498,8 +498,8 @@ export function FigureScreen({ short = false, children }) {
         <div
             className="sb-ds-figure-screen"
             style={{
-                '--plus-overlay-screen': 'var(--width-3000)',
-                '--dialog-max-height': short ? 'var(--height-2000)' : undefined,
+                '--plus-overlay-screen': 'var(--field-width-xl)',
+                '--dialog-max-height': short ? '400px' /* docs-literal: a short Dialog's cap; no height role token holds 400 */ : undefined,
                 inlineSize: '100%',
             }}
         >
