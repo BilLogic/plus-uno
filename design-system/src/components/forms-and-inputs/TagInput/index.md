@@ -24,7 +24,7 @@ TagInput reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| change | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | A chip is added or removed. |
+| change | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | A tag is added or removed. |
 
 ## Alternatives
 

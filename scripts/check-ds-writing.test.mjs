@@ -241,8 +241,8 @@ test('gradeFindings: props-parity is an error on any page, so a new mismatch fai
   assert.deepEqual(gradeFindings(raw, { strict: false, enforce: false }).map((f) => f.severity), ['error']);
 });
 
-test('the strict list holds Modal and the Section template, enforced in the gate', () => {
-  assert.deepEqual(STRICT_PAGES, ['Modal', 'Section', 'Frame', 'Page']);
+test('the strict list holds the pages that pass both checks, enforced in the gate', () => {
+  assert.deepEqual(STRICT_PAGES, ['Modal', 'Section', 'Frame', 'Page', 'CountTag', 'TagInput']);
   assert.equal(ENFORCE_STRICT, true);
 });
 

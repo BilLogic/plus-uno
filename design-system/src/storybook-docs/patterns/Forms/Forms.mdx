@@ -55,7 +55,7 @@ Choose among four hosts. The <a target="_top" href="./?path=/docs/templates-form
 
 <ComponentExample of={FormsStories.HostModal} title="In a Modal" description="A rare, critical task with fewer than five fields. 8-col; a confirm is 4-col or 6-col." />
 
-<ComponentExample of={FormsStories.HostSteps} title="In steps" description="A stepped task on Frame: dots above one question under five steps, or the left step list at five or more." />
+<ComponentExample of={FormsStories.HostSteps} title="In steps" description="A stepped task on Frame: the Progress indicator above one question under five steps, or the left step list at five or more." />
 
 <ComponentExample of={FormsStories.SettingsInPage} title="Settings on a page" description="Settings that apply at once sit in grouped SettingRows under section headings on the page, dividing rows with `--border-width-default` and no card per row: Toggle (with no own label), compact Select, and connection rows with StatusTag beside the label and Button at the end. Flipping a Toggle saves immediately and confirms with a Flag." />
 
@@ -233,11 +233,11 @@ The form's title is the page, Panel or Modal heading. Groups take a `Fieldset` l
 
 `autoComplete` on name, email, phone and address fields. Prefill what is already known, such as the student picked from a row.
 
-### Center dots above a single-question step under five steps.
+### Center the Progress indicator above a single-question step under five steps.
 
 <RuleTag kind="automatic" />
 
-When the In steps host asks one focal question per step with two to four pictured `RadioGroup` or `CheckboxGroup` tiles, center `ProgressIndicator` dots above the heading while there are fewer than five steps, and center Back (Subtle) and Continue (Primary) under the tiles. At five steps or more, switch to the host's left step list. Continue stays enabled and validates on press.
+When the In steps host asks one focal question per step with two to four pictured `RadioGroup` or `CheckboxGroup` tiles, center the `ProgressIndicator` above the heading while there are fewer than five steps, and center Back (Subtle) and Continue (Primary) under the tiles. At five steps or more, switch to the host's left step list. Continue stays enabled and validates on press.
 
 </div>
 
@@ -286,7 +286,7 @@ When the In steps host asks one focal question per step with two to four picture
 <tr><td>Rejection at the top</td><td>`SectionMessage`</td><td>A danger message, scrolled into view.</td></tr>
 <tr><td>Choices</td><td>`RadioGroup`, `CheckboxGroup`, `Select`, `DatePicker`</td><td>A control that cannot be wrong; pictured tiles for one big question per step.</td></tr>
 <tr><td>Settings rows</td><td>`SettingRow`, `Toggle`, `Select`, `StatusTag`, `Flag`</td><td>Divided rows under section headings with no card per row; flipping a toggle confirms via Flag.</td></tr>
-<tr><td>Step progress</td><td>`ProgressIndicator`, `ProgressTracker`</td><td>Dots centered above a single-question step under five steps; the left step list at five or more.</td></tr>
+<tr><td>Step progress</td><td>`ProgressIndicator`, `ProgressTracker`</td><td>Progress indicator centered above a single-question step under five steps; the left step list at five or more.</td></tr>
 <tr><td>Hosts</td><td><a target="_top" href="./?path=/docs/templates-frame--docs">Frame</a>, <a target="_top" href="./?path=/docs/templates-panel--docs">Panel</a>, <a target="_top" href="./?path=/docs/templates-modal--docs">Modal</a></td><td>A page (on the Page itself, no Section around it), a Panel, a Modal, or steps on Frame · focused.</td></tr>
 <tr><td>Confirm view</td><td>Modal</td><td>Swapped in place today. <PlannedTag /> A confirm view prop is Planned.</td></tr>
 </tbody>

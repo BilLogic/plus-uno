@@ -35,7 +35,7 @@ export default defineConfig({
              * @tutors.plus/design-system — package-style import for the DS entry point.
              * Use: import { Button } from '@tutors.plus/design-system'
              */
-            '@tutors.plus/design-system': path.resolve(__dirname, '../../../../design-system/src/index.js'),
+            '@tutors.plus/design-system': path.resolve(__dirname, '../../../../design-system/src/components/index.js'),
 
             /**
              * @ — shorthand alias into design-system/src for component imports.

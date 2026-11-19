@@ -6,8 +6,8 @@
  *
  *   figma-variables-snapshot.json   → `generate:token-registry`, which validates
  *                                     the Figma-variable → CSS-token mapping
- *   figma-component-snapshot.json   → `poll-figma-library.js`, which reports
- *                                     what changed in the library since it ran
+ *   figma-component-snapshot.json   → `snapshot:figma-components`, which
+ *                                     re-records it, and the CI refresh that diffs it
  *
  * THE DEFECT (#339). "Nothing detects that they have gone stale." Measured
  * 2026-08-29: the variables snapshot was captured 2026-07-26 and the library had
@@ -30,13 +30,9 @@
  *
  * AND WHY THE REMEDY IS CHECKED TOO (#339, refresh pass, 2026-09-06). A ceiling
  * is only half a guard: the other half is that the run which goes red can be
- * made green. Until this pass the component finding said "run
- * `poll-figma-library.js`", and that instruction had quietly rotted — the
- * poller moved into the Worker on 2026-07-16 (`agents/uno-bot/src/
- * figma-poll.ts`, snapshot in KV), the repo file's writer left with it, and the
- * legacy script that remained opens a Notion PRD and posts to Slack before it
- * writes. So the one honest way to refresh the file was a command nobody would
- * reasonably run. `REFRESHERS` below names the npm script that rewrites each
+ * made green. Until this pass the component finding named a command
+ * that had quietly rotted, so the one honest way to refresh the file was a
+ * command nobody would reasonably run. `REFRESHERS` below names the npm script that rewrites each
  * snapshot, and the sweep asserts that script still EXISTS — a remedy naming a
  * task nobody has is the same defect as a ratchet entry asserting something
  * untrue, and it fails the same way rather than being discovered by the next
@@ -164,9 +160,9 @@ export function failures(files, opts) {
     );
   }
 
-  // Same rule as the variables half, and absent from the file the legacy poller
-  // wrote — so it is checked only when present rather than demanded, which is
-  // how a snapshot written by the older writer stays green.
+  // Same rule as the variables half, and absent from snapshots recorded before the
+  // key was kept — so it is checked only when present rather than demanded, which
+  // is how an older snapshot stays green.
   if (components?.figmaFileKey && components.figmaFileKey !== fileKey) {
     found.push(
       `figma-component-snapshot.json: figmaFileKey is ${components.figmaFileKey}, not this ` +

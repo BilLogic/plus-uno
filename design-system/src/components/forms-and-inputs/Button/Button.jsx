@@ -102,10 +102,9 @@ export const Button = ({
     /*
      * `Tag === 'button'` gets the real `disabled` attribute, which already
      * blocks clicks and keyboard activation on its own. An anchor has no such
-     * attribute, so the click and the Enter/Space key are handled by hand —
-     * the same behavior react-bootstrap's `useButtonProps` gave this
-     * component before the swap, including a trivial (`#` or empty) `href`
-     * still swallowing the click rather than letting it navigate nowhere.
+     * attribute, so the click and the Enter/Space key are handled by hand,
+     * including a trivial (`#` or empty) `href` swallowing the click rather
+     * than letting it navigate nowhere.
      */
     const handleAnchorClick = (event) => {
         if (disabled || (Tag === 'a' && isTrivialHref(href))) event.preventDefault();

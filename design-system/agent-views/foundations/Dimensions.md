@@ -108,7 +108,7 @@ Don't: A 36 avatar no component ships.
 
 ### One height per row
 
-Do: Search, dropdown and buttons at 32.
+Do: Search, Select and buttons at 32.
 Don't: 40, 32 and 24 in one toolbar.
 
 ## Accessibility

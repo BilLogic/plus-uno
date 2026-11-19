@@ -127,7 +127,7 @@ export const Flag = ({
     const showDetails = !bold || (hasDetails && expanded);
 
     // Only the latest onDismiss fires; changing it mid-countdown does not
-    // restart the timer, matching the previous react-bootstrap Toast timing.
+    // restart the timer.
     const onDismissRef = useRef(onDismiss);
     useEffect(() => {
         onDismissRef.current = onDismiss;

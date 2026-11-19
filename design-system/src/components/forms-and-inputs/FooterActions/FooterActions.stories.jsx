@@ -157,7 +157,7 @@ export const LinkLeft = {
     render: () => (
         <div style={stageStyle}>
             <FooterActions>
-                <LinkButton text="View guidelines" href="#guidelines" />
+                <LinkButton text="Save and exit" href="#save-and-exit" />
                 <Button text="Save draft" />
                 <Button text="Schedule" appearance="primary" />
             </FooterActions>
@@ -166,11 +166,11 @@ export const LinkLeft = {
     play: async ({ canvasElement }) => {
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const tracks = footerTracks(footer);
-        const guidelines = within(footer).getByRole('link', { name: 'View guidelines' });
+        const saveExit = within(footer).getByRole('link', { name: 'Save and exit' });
         const draft = within(footer).getByRole('button', { name: 'Save draft' });
         const schedule = within(footer).getByRole('button', { name: 'Schedule' });
-        await expect(rect(guidelines).left, 'hugs left content edge').toBeCloseTo(tracks.box.left, 0);
-        await expect(rect(guidelines).width, 'hugs label instead of filling tracks 1-2').toBeLessThan(tracks.span(1, 2).width);
+        await expect(rect(saveExit).left, 'hugs left content edge').toBeCloseTo(tracks.box.left, 0);
+        await expect(rect(saveExit).width, 'hugs label instead of filling tracks 1-2').toBeLessThan(tracks.span(1, 2).width);
         await expect(rect(draft).left, 'secondary in track 3').toBeCloseTo(tracks.track(3).left, 0);
         await expect(rect(draft).right, 'secondary in track 3').toBeCloseTo(tracks.track(3).right, 0);
         await expect(rect(schedule).left, 'primary in track 4').toBeCloseTo(tracks.track(4).left, 0);

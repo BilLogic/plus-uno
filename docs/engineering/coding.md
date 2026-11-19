@@ -64,9 +64,7 @@ import { Button, SectionMessage, Modal, TextField, Select, Checkbox } from '@/co
 import '@/styles/globals.scss';
 ```
 
-**Explicit entry points:**
-- `design-system/src/index.js`
-- `design-system/src/components/index.js`
+**Entry point:** `design-system/src/components/index.js`
 
 **Out of new files:** file-level and category-folder paths
 (`@/components/forms-and-inputs/Button/Button`), `_internal/` paths, and the `@plus-ds`
@@ -147,7 +145,7 @@ rename that reached `AGENTS.md` and stopped there.
 |--------|-------------|-----|
 | Prototype vite configs need own aliases | `@` doesn't resolve in prototypes without config | Add `@: path.resolve(...)` to each prototype's vite.config.js |
 | Token generation must follow sync | Generated files overwrite manual edits | Always run sync first, then generate |
-| `design-system/src/index.js` is the barrel | New components not exported = import fails | Add to barrel export when creating new components |
+| `design-system/src/components/index.js` is the barrel | New components not exported = import fails | Add to barrel export when creating new components |
 | Storybook uses autodocs | Missing JSDoc = empty docs page | Add JSDoc to component exports |
 | Raw HTML in marketplace pages | Breaks DS consistency | Use DS components: Button, TextField, StatusTag, Card, Select |
 | Nested Router providers | `MemoryRouter` inside `BrowserRouter` renders an empty root in React 19, with a silent console | One Router provider per tree — a shell mounted under another app takes its route from props |

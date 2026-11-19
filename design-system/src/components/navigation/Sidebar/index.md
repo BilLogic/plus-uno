@@ -94,7 +94,7 @@ Don't: Everything in the label, and the time is cut off.
 - Delete or Backspace closes the focused tab, and focus moves to the next tab, else the one before it, else the tab's row.
 - The toggle is named "Close sidebar", announces Ctrl+[ (Cmd+[ on a Mac) and reports that the Sidebar is expanded.
 - The account button is named by the person's name and role, then "account menu".
-- In the inner sidebar, focus lands on Back when it opens and returns to the open row when Back closes it. Back, then the context dropdown, then each row are reached with Tab; Enter picks a row.
+- In the inner sidebar, focus lands on Back when it opens and returns to the open row when Back closes it. Back, then the context Select, then each row are reached with Tab; Enter picks a row.
 - The swap slides 12 and fades. With reduced motion it only fades.
 
 ## Related

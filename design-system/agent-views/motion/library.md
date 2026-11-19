@@ -55,7 +55,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Filtering | pattern | count-change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | Filtering | pattern | reset | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Filtering | pattern | search | Update a value or state | `--ds-motion-spatial-fast` |  |
-| Filtering | pattern | chip | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
+| Filtering | pattern | tag | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Filtering | pattern | results | Swap content in place | `--ds-motion-appearance-fast` |  |
 | Filtering | pattern | results-load | Load content | `--ds-motion-appearance-fast` |  |
 | Forms | pattern | focus | Update a value or state | `--ds-motion-appearance-fast` |  |

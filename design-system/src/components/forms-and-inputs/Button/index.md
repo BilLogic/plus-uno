@@ -33,7 +33,7 @@ Use `Button` for an action on the current page: submit a form, mark attendance, 
 | Subtle | Secondary actions in headers, toolbars and button groups. Example: "Cancel" on a page form. Never "Not now": a declining action is a Default secondary in the left half of a footer. |
 | Warning | Confirms an action that may cause a significant change or a loss of data, often in a confirmation modal. Example: "Remove from this week". |
 | Danger | The final confirmation of a destructive, irreversible action. Example: "Delete session recording". It also fills a footer's leading slot as a side action. Example: "Delete". |
-| Link | A `LinkButton` that leaves the task. It fills a footer's leading slot. Example: "View guidelines". |
+| Link | A `LinkButton` that leaves the task. It fills a footer's leading slot. Example: "Save and exit". |
 | Discovery | The call to action for a new experience. Example: "Try the new schedule view". |
 | AI | The one primary AI action in a region. Draws the sparkle before its label. Example: "Generate summary". |
 

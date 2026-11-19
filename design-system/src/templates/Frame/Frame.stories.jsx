@@ -1569,7 +1569,7 @@ export const TypeDefault = {
 };
 
 
-/** Multi-step task: the steps in the inner sidebar, the page footer with Save and exit, Back and Next in tracks 2, 3 and 4. */
+/** Multi-step task: the steps in the inner sidebar, the page footer with Save and exit as a link, Back and Next in tracks 3 and 4. */
 export const LayoutMultiStepTask = {
     name: 'Layout: Multi-step task',
     parameters: { layout: 'padded' },
@@ -1584,7 +1584,7 @@ export const LayoutMultiStepTask = {
         const column = canvasElement.querySelector('[data-probe="bar-column"]');
         const back = canvas.getByRole('button', { name: 'Back' });
         const next = canvas.getByRole('button', { name: 'Next' });
-        const save = canvas.getByRole('button', { name: 'Save and exit' });
+        const save = canvas.getByRole('link', { name: 'Save and exit' });
 
         // The steps are the Sidebar's inner rows: five, the first current, the rest off.
         await expect(steps().querySelectorAll('li'), 'five steps are the rows').toHaveLength(5);
@@ -1593,7 +1593,7 @@ export const LayoutMultiStepTask = {
         await expect(row('Schedule'), 'a step past the answers is off').toHaveAttribute('aria-disabled', 'true');
         await expect(canvas.queryByRole('button', { name: 'Close' }), 'no Close: Save and exit leaves').toBeNull();
 
-        // The footer: Save and exit, Back and Next in tracks 2, 3 and 4, one 32 line in a 48 bar.
+        // The footer: Save and exit as a link at the left edge, Back and Next in tracks 3 and 4, one 32 line in a 48 bar.
         const tracks = footerTracks(column);
         await expect(rect(bar).height, 'the footer is 48 high').toBeCloseTo(tokenLength(canvasElement, BAR_TOKEN), 0);
         await expect(within(bar).queryByRole('button', { name: 'Cancel' }), 'no Cancel in footers').toBeNull();
@@ -1601,7 +1601,7 @@ export const LayoutMultiStepTask = {
             await expect(rect(button).height, 'each action is 32 high').toBeCloseTo(tokenLength(canvasElement, '--control-md'), 0);
             await expect(rect(button).top, 'on one line').toBeCloseTo(rect(save).top, 0);
         }
-        await expect(rect(save).left, 'Save and exit starts on track 2').toBeCloseTo(tracks.track(2).left, 0);
+        await expect(rect(save).left, 'Save and exit hugs the left edge').toBeCloseTo(tracks.box.left, 0);
         await expect(rect(back).left, 'Back starts on track 3').toBeCloseTo(tracks.track(3).left, 0);
         await expect(rect(next).right, 'Next ends on track 4').toBeCloseTo(tracks.track(4).right, 0);
         await expect(back, 'Back is disabled on the first step').toHaveAttribute('aria-disabled', 'true');
@@ -1646,7 +1646,7 @@ export const LayoutMultiStepTaskLeaves = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const probe = canvasElement.querySelector('[data-probe="left"]');
-        await userEvent.click(canvas.getByRole('button', { name: 'Save and exit' }));
+        await userEvent.click(canvas.getByRole('link', { name: 'Save and exit' }));
         await expect(probe, 'Save and exit leaves').toHaveTextContent('Saved and exited');
         await userEvent.click(canvas.getByRole('button', { name: 'Home' }));
         await expect(probe, 'Back in the inner sidebar leaves').toHaveTextContent('Left through Back');

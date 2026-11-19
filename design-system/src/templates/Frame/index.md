@@ -68,7 +68,7 @@ Don't: The steps drawn again inside the Page: two lists for one task.
 
 The footer is fixed along the bottom, one row high, with its buttons on one line. Save and exit leaves the task and keeps the answers, so the footer holds only it, Back and the primary Next. Back on the first step is disabled and needs no reason.
 
-Do: Save and exit, Back and the primary Next in the footer, on one line.
+Do: Save and exit as a link at the left edge; Back and the primary Next in the right half, on one line.
 Don't: Cancel repeated in the footer beside Save and exit: two ways out of one task.
 
 ### Keep the AI panel docked as its own region. {#keep-the-ai-panel-docked-as-its-own-region}
