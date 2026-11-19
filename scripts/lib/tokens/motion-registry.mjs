@@ -133,7 +133,7 @@ export const MOTION_REGISTRY = [
       'count-change': { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'The Filter count grows to the left; a changed number fades to its new value.' },
       reset: { transition: 'Update a value or state', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'The count fades out, then the icon narrows back.' },
       search: { transition: 'Update a value or state', spatial: 'spatial.fast', note: 'Search grows to the left, right edge fixed, so the pills and the primary never move. Escape, or an empty blur, shrinks it back the same way; fast stays fast on exit.' },
-      chip: { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'A chip being added or removed is Add or remove.' },
+      tag: { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'A tag being added or removed is Add or remove.' },
       results: { transition: 'Swap content in place', appearance: 'appearance.fast', note: 'The results swap in place, a clean fade, once per Apply. Typing in Search filters the list the same way.' },
       'results-load': { transition: 'Load content', appearance: 'appearance.fast', note: 'When the fetch is slow, the results are Load.' },
     },
@@ -633,7 +633,7 @@ export const MOTION_REGISTRY = [
     name: 'TagInput',
     tier: 'component',
     events: {
-      change: { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'A chip is added or removed.' },
+      change: { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'A tag is added or removed.' },
     },
   },
   {

@@ -18,7 +18,7 @@ Names agents reach for that this system does not have, or has retired. Write the
 |---|---|
 | `Alert` | `SectionMessage`, `Flag` (SectionMessage in the page; Flag for a passing notice) |
 | `Toast` | `Flag` (renamed) |
-| `ToastContainer` | `Flag` (renamed with Toast) |
+| `ToastContainer` | `Flag` (folded into Flag) |
 | `Switch` | `Toggle` (renamed) |
 | `NavTabs` | `Tabs` (one tab component) |
 | `NavPills` | `Tabs` |

@@ -89,7 +89,7 @@ each container.
 
 ## Related
 
-- `StaticTable`: use when wrapping a wide data table in a horizontal `ScrollBar` rather than shrinking its columns.
+- `StaticTable`: use when wrapping a wide table in a horizontal `ScrollBar` rather than shrinking its columns.
 - `Panel`: use when scrolling body content inside `PanelBody`.
 
 Same group: `Accordion` · `Carousel` · `PageHeader`

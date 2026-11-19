@@ -6,8 +6,8 @@ import { Modal, Card, Section, Page } from '@/templates';
 
 /**
  * Headings step down one size per nesting level, and their tags follow the
- * nesting: the page's one h1 is Heading/large 24, a section's h2 is
- * Heading/medium 20, a subsection's h3 is Heading/small 16.
+ * nesting: the page's one h1 is --heading-lg 24, a section's h2 is
+ * --heading-md 20, a subsection's h3 is --heading-sm 16.
  *
  * Container titles are fixed whatever level they sit at, and each is
  * documented on its own template: a modal's is 20 (the dialog's own h1, which
@@ -30,11 +30,11 @@ const expectStyle = async (element, name, [size, lineHeight, weight]) => {
     await expect(style.fontWeight, `${name} font weight`).toBe(String(weight));
 };
 
-const HEADING_LARGE = [24, 28, 600];
-const HEADING_MEDIUM = [20, 24, 600];
-const HEADING_SMALL = [16, 20, 600];
-const HEADING_XSMALL = [14, 20, 600];
-const HEADING_XXSMALL = [12, 16, 600];
+const HEADING_LG = [24, 28, 600];
+const HEADING_MD = [20, 24, 600];
+const HEADING_SM = [16, 20, 600];
+const HEADING_XS = [14, 20, 600];
+const HEADING_XXS = [12, 16, 600];
 const BODY_DEFAULT = [14, 20, 400];
 
 const headingNamed = (canvas, level, name) => canvas.getByRole('heading', { level, name });
@@ -53,9 +53,9 @@ export const PageSectionSubsection = () => (
 PageSectionSubsection.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-    await expectStyle(headingNamed(canvas, 1, 'Sessions'), 'page', HEADING_LARGE);
-    await expectStyle(headingNamed(canvas, 2, 'This week'), 'section', HEADING_MEDIUM);
-    await expectStyle(headingNamed(canvas, 3, 'Monday'), 'subsection', HEADING_SMALL);
+    await expectStyle(headingNamed(canvas, 1, 'Sessions'), 'page', HEADING_LG);
+    await expectStyle(headingNamed(canvas, 2, 'This week'), 'section', HEADING_MD);
+    await expectStyle(headingNamed(canvas, 3, 'Monday'), 'subsection', HEADING_SM);
     await expectStyle(canvas.getByText('Every session you tutor from Monday to Sunday.'), 'section description', BODY_DEFAULT);
 };
 
@@ -75,8 +75,8 @@ export const CardTitles = () => (
 
 CardTitles.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expectStyle(headingNamed(canvas, 3, 'Lincoln Middle'), 'card in a section', HEADING_XSMALL);
-    await expectStyle(headingNamed(canvas, 4, 'South High'), 'template card in a subsection', HEADING_XSMALL);
+    await expectStyle(headingNamed(canvas, 3, 'Lincoln Middle'), 'card in a section', HEADING_XS);
+    await expectStyle(headingNamed(canvas, 4, 'South High'), 'template card in a subsection', HEADING_XS);
     await expectStyle(canvas.getByText('Three students'), 'template card description', BODY_DEFAULT);
     await expectStyle(canvas.getByText('Two students'), 'card description', BODY_DEFAULT);
 };
@@ -103,9 +103,9 @@ ModalTitle.play = async ({ canvasElement }) => {
     const dialog = canvasElement.querySelector('.plus-modal');
     await expect(dialog, 'the modal renders inside the canvas').not.toBeNull();
     const inside = within(dialog);
-    await expectStyle(inside.getByRole('heading', { level: 1, name: 'Edit session' }), 'modal title', HEADING_MEDIUM);
+    await expectStyle(inside.getByRole('heading', { level: 1, name: 'Edit session' }), 'modal title', HEADING_MD);
     await expectStyle(inside.getByText('Changes apply to every session in the series.'), 'modal description', BODY_DEFAULT);
-    await expectStyle(inside.getByRole('heading', { level: 2, name: 'When' }), 'section in a modal', HEADING_SMALL);
+    await expectStyle(inside.getByRole('heading', { level: 2, name: 'When' }), 'section in a modal', HEADING_SM);
     await expectStyle(inside.getByText('Thursdays at 4:00 PM.'), 'section body in a modal', BODY_DEFAULT);
 };
 
@@ -124,7 +124,7 @@ export const PopupTitle = () => (
 
 PopupTitle.play = async ({ canvasElement }) => {
     const body = within(document.body);
-    await expectStyle(await body.findByText('Session notes'), 'popup title', HEADING_XSMALL);
+    await expectStyle(await body.findByText('Session notes'), 'popup title', HEADING_XS);
 };
 
 /** A flag's title is 14. */
@@ -133,7 +133,7 @@ export const FlagTitle = () => (
 );
 
 FlagTitle.play = async ({ canvasElement }) => {
-    await expectStyle(within(canvasElement).getByText('Session moved'), 'flag title', HEADING_XSMALL);
+    await expectStyle(within(canvasElement).getByText('Session moved'), 'flag title', HEADING_XS);
 };
 
 /** Group labels are 12 semibold: a menu group's label, and a table's column headers. */
@@ -154,9 +154,9 @@ GroupLabels.play = async ({ canvasElement }) => {
     const body = within(canvasElement.ownerDocument.body);
     await expect(canvas.queryAllByRole('heading')).toHaveLength(0);
     const group = await body.findByRole('group', { name: 'Order' });
-    await expectStyle(body.getByText('Order'), 'menu group label', HEADING_XXSMALL);
+    await expectStyle(body.getByText('Order'), 'menu group label', HEADING_XXS);
     await expect(within(group).getAllByRole('menuitem').map((b) => b.textContent)).toEqual(['Newest', 'Oldest']);
     for (const header of canvas.getAllByRole('columnheader')) {
-        await expectStyle(header, `column header ${header.textContent}`, HEADING_XXSMALL);
+        await expectStyle(header, `column header ${header.textContent}`, HEADING_XXS);
     }
 };

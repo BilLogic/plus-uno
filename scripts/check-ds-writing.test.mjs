@@ -166,8 +166,8 @@ test('gradeFindings: warnings everywhere, a stale marker always an error, a stri
   assert.deepEqual(gradeFindings(raw, { strict: true, enforce: true }).map((f) => f.severity), ['error', 'error']);
 });
 
-test('the strict list holds Modal and the Section template, enforced in the gate', () => {
-  assert.deepEqual(STRICT_PAGES, ['Modal', 'Section', 'Frame', 'Page']);
+test('the strict list holds the pages that pass both checks, enforced in the gate', () => {
+  assert.deepEqual(STRICT_PAGES, ['Modal', 'Section', 'Frame', 'Page', 'CountTag', 'TagInput']);
   assert.equal(ENFORCE_STRICT, true);
 });
 
