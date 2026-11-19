@@ -107,21 +107,16 @@
         transition-delay: var(--plus-rating-stagger);
     }
 
-    &:hover,
-    &:active {
-        transition-delay: 0ms;
-    }
-
     @include plus-state(
         $states: (
-            hovered: (background-color: var(--ds-background-selected-bold-hovered)),
+            hovered: (background-color: var(--ds-background-selected-bold-hovered), transition-delay: initial),
         ),
         $ring: false,
         $hovered-selector: '&:not(.plus-rating-item-disabled):hover'
     );
     @include plus-state(
         $states: (
-            pressed: (background-color: var(--ds-background-selected-bold-pressed)),
+            pressed: (background-color: var(--ds-background-selected-bold-pressed), transition-delay: initial),
         ),
         $ring: false,
         $pressed-selector: '&:not(.plus-rating-item-disabled):active'
