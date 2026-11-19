@@ -37,6 +37,9 @@ import { isUnreviewed } from './ratchet.mjs';
 
 export const EXCEPTIONS = 'scripts/exceptions.json';
 
+/** The shortest reason that says anything: a few characters is a label, not an argument. */
+export const MIN_REASON = 20;
+
 const plainObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 
 class UnreadableExceptions extends Error {
@@ -103,7 +106,9 @@ export function loadExceptions(check, list, { repoRoot = REPO_ROOT } = {}) {
     const where = `${check} ${list} entry ${index + 1}`;
     if (!plainObject(entry)) throw new UnreadableExceptions(`${where} is not an object`);
     if (typeof entry.at !== 'string' || !entry.at.trim()) throw new UnreadableExceptions(`${where} has no \`at\``);
-    if (isUnreviewed(entry.reason)) throw new UnreadableExceptions(`${where} ("${entry.at}") names no reason`);
+    if (isUnreviewed(entry.reason) || entry.reason.trim().length < MIN_REASON) {
+      throw new UnreadableExceptions(`${where} ("${entry.at}") names no reason of at least ${MIN_REASON} characters`);
+    }
     const key = identity(entry);
     if (seen.has(key)) throw new UnreadableExceptions(`${check} ${list} lists "${entry.at}" twice`);
     seen.add(key);

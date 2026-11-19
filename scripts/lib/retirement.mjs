@@ -39,6 +39,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { TOKEN_NAME } from '../../design-system/src/lib/tokens.mjs';
+import { REPO_ROOT } from './corpus.mjs';
 import { renderInventions, tokenMatchers } from './inventions.mjs';
 import { RETIRED_TOKENS, retiredRenames } from './tokens/plan.mjs';
 
@@ -154,6 +155,29 @@ function makeRetirement(rows, places, table) {
       return renderInventions(table);
     },
   };
+}
+
+/**
+ * The spelling rows a check owns, by their `kind:name` rule (`path:old`, `heading:retired`):
+ * a check that reads a family of rows asks for it here and holds no list of its own. A rule
+ * with no rows is an error, never an empty family: an empty family is a check that finds
+ * nothing and passes.
+ *
+ * @param {string} rule
+ * @param {string} [repoRoot]
+ */
+export function rowsOfRule(rule, repoRoot = REPO_ROOT) {
+  const rows = loadRetirement(repoRoot).ofKind('spelling').filter((row) => row.rule === rule);
+  if (!rows.length) throw new MissingRows(rule);
+  return rows;
+}
+
+/** What `rowsOfRule` throws, named so a caller and a test can tell it from a read error. */
+export class MissingRows extends Error {
+  constructor(rule) {
+    super(`the retirement list (${LIST}) holds no spelling rows with rule "${rule}", so the check that reads them has nothing to hold to.`);
+    this.name = 'MissingRows';
+  }
 }
 
 /**

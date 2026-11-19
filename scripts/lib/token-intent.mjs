@@ -17,20 +17,20 @@
  */
 
 import { buildPlan } from './color/build.mjs';
-import { REPO_ROOT } from './corpus.mjs';
 import { dsName } from './color/emit.mjs';
 import { ACTIVE_PLAN } from './color/plans.mjs';
-import { loadRetirement } from './retirement.mjs';
+import { rowsOfRule } from './retirement.mjs';
 import { MOTION_SEMANTICS, TOKEN_LADDER } from './tokens/plan.mjs';
 
 /**
  * Reference wording -> PLUS wording: the retirement list's `phrase:token-intent`
  * spelling rows, applied in order (the more specific phrase first).
  */
-const PHRASES = loadRetirement(REPO_ROOT)
-  .ofKind('spelling')
-  .filter((row) => row.rule === 'phrase:token-intent')
-  .map((row) => [new RegExp(row.pattern, 'g'), row.use[0]]);
+const phrases = () =>
+  rowsOfRule('phrase:token-intent').map((row) => {
+    if (row.use.length !== 1) throw new Error(`phrase row "${row.not}" names ${row.use.length} replacements; a phrase has one`);
+    return [new RegExp(row.pattern, 'g'), row.use[0]];
+  });
 
 /** What the rewrite does to a description whatever its words: a sentence starts capitalized, a dotted name becomes its CSS name. */
 const SHAPE_TERMS = [
@@ -41,7 +41,7 @@ const SHAPE_TERMS = [
 
 /** Rewrite one reference description into PLUS words. */
 export function toPlusTerms(text) {
-  const reworded = PHRASES.reduce((out, [from, to]) => out.replace(from, () => to), text);
+  const reworded = phrases().reduce((out, [from, to]) => out.replace(from, () => to), text);
   return SHAPE_TERMS.reduce((out, [from, to]) => out.replace(from, to), reworded);
 }
 

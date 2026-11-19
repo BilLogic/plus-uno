@@ -171,7 +171,7 @@ test('a hand-written copy of a vendored document is NOT exempt — the marker is
   }
 });
 
-test('a copy by construction is excluded, and a stale COPIES entry fails', () => {
+test('a copy by construction is excluded, and a stale copies entry fails', () => {
   const [copyPath] = [...exceptionLists().copies.keys()];
   const planted = passage('the triage roles');
   const both = estate({ [`plus-uno:${copyPath}`]: planted, [`sb:${copyPath}`]: planted });
@@ -316,14 +316,14 @@ test('an exemption whose OWN repos were both read is still asserted', () => {
   }
 });
 
-test('a COPIES entry stays suspended until every repo was read', () => {
-  // COPIES names a path rather than its repos, so "in fewer than two repos"
+test('a copies entry stays suspended until every repo was read', () => {
+  // A copies entry names a path rather than its repos, so "in fewer than two repos"
   // cannot be told apart from "in fewer than two repos I could look at". It
   // keeps the whole-run gate the recorded pairs no longer need.
   const e = estate({});
   try {
     const r = sweep({ ...e.roots, 'plus-uno': null });
-    for (const s of r.stale) assert.doesNotMatch(s, /^COPIES/);
+    for (const s of r.stale) assert.doesNotMatch(s, /^copies/);
   } finally {
     e.done();
   }

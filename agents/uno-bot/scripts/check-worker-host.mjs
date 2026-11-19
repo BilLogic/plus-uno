@@ -61,7 +61,7 @@ const SKIP_DIRS = new Set(["node_modules", ".git", "dist", "storybook-static", "
  *
  * This repo keeps agent worktrees under `.claude/worktrees/`, each a full copy.
  * Without this, running from the main checkout walked ten of them and reported
- * 112 strays — every allowed file, at a path prefix that is not in ALLOWED. A
+ * 112 strays — every allowed file, at a path prefix that is not in the allowed list. A
  * guard that is red for everyone is as useless as one that cannot fail, and it
  * gets switched off the same way. (`.git` is a file in a worktree, a directory
  * in a clone; existsSync covers both.)
@@ -128,8 +128,8 @@ export function findStrays(root = REPO_ROOT, host = HOST) {
     if (rel.split(path.sep).some((seg) => SKIP_DIRS.has(seg))) continue;
     const abs = path.join(root, rel);
     if (auditing) {
-      if (history.some((root) => rel.startsWith(root))) continue;
-    } else if (allowed.has(rel) || history.some((root) => rel.startsWith(root))) {
+      if (history.some((prefix) => rel.startsWith(prefix))) continue;
+    } else if (allowed.has(rel) || history.some((prefix) => rel.startsWith(prefix))) {
       continue;
     }
     let text;

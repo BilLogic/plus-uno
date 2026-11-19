@@ -1111,6 +1111,85 @@
       "caseSensitive": true,
       "rule": "read:old-token",
       "pattern": "var\\(\\s*(--(?:color|size|element|layout)-[a-z0-9-]+|--font-line-height-[a-z0-9-]+|--font-(?:size|family|weight)-(?:body\\d|h\\d|headline|header|code|title|normal|bold|medium|semibold-\\d))"
+    },
+    {
+      "not": "Correct and incorrect",
+      "use": [
+        "the rule it illustrates"
+      ],
+      "why": "dissolve it: move each pair under the rule it illustrates (#254)",
+      "caseSensitive": true,
+      "rule": "heading:retired",
+      "pattern": "^Correct and incorrect$"
+    },
+    {
+      "not": "When not to use",
+      "use": [
+        "a Related bullet"
+      ],
+      "why": "move each case to a `Related` bullet or a don't card (#254)",
+      "caseSensitive": true,
+      "rule": "heading:retired",
+      "pattern": "^When not to use$"
+    },
+    {
+      "not": "ADS parity",
+      "use": [
+        "the rule it carries"
+      ],
+      "why": "drop the citation and keep the rule it carries; benchmark atlassian.design silently, never cite it",
+      "caseSensitive": true,
+      "rule": "heading:retired",
+      "pattern": "^ADS parity$"
+    },
+    {
+      "not": "ADS documentation",
+      "use": [
+        "the rule it carries"
+      ],
+      "why": "drop the citation and keep the rule it carries; benchmark atlassian.design silently, never cite it",
+      "caseSensitive": true,
+      "rule": "heading:retired",
+      "pattern": "^ADS documentation$"
+    },
+    {
+      "not": "actions",
+      "use": [
+        "its current group folder"
+      ],
+      "why": "a folder that held components before the move; the components live in their group folders now",
+      "caseSensitive": true,
+      "rule": "path:components-folder",
+      "pattern": "(?:design-system/src/|@/)components/actions(?![\\w-])"
+    },
+    {
+      "not": "status-and-loading",
+      "use": [
+        "its current group folder"
+      ],
+      "why": "a folder that held components before the move; the components live in their group folders now",
+      "caseSensitive": true,
+      "rule": "path:components-folder",
+      "pattern": "(?:design-system/src/|@/)components/status-and-loading(?![\\w-])"
+    },
+    {
+      "not": "overlays",
+      "use": [
+        "its current group folder"
+      ],
+      "why": "a folder that held components before the move; the components live in their group folders now",
+      "caseSensitive": true,
+      "rule": "path:components-folder",
+      "pattern": "(?:design-system/src/|@/)components/overlays(?![\\w-])"
+    },
+    {
+      "not": "bot.md",
+      "use": [
+        "the uno-bot definition and skills"
+      ],
+      "why": "the retired faces' vocabulary; uno-bot.md and its kin are other files",
+      "rule": "face:retired",
+      "pattern": "(?<![\\w-])bot\\.md\\b|\\bWorker faces?\\b"
     }
   ],
   "outside": [
@@ -1186,7 +1265,12 @@
     "its current home",
     "skills/ and agents/",
     "agents/uno-bot/skills/",
-    "design-system/guidelines/"
+    "design-system/guidelines/",
+    "the rule it illustrates",
+    "a Related bullet",
+    "the rule it carries",
+    "its current group folder",
+    "the uno-bot definition and skills"
   ],
   "allowed": [
     {

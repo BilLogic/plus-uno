@@ -58,7 +58,7 @@ import { fileURLToPath } from 'node:url';
 import { documents, links, GENERATED_BUNDLE } from './lib/corpus.mjs';
 import { loadExceptions } from './lib/exceptions.mjs';
 import { byRoot, main } from './lib/findings.mjs';
-import { loadRetirement } from './lib/retirement.mjs';
+import { rowsOfRule } from './lib/retirement.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -138,11 +138,7 @@ const requiredIndexes = (repoRoot) => [
  * Retired path shapes: the retirement list's `path:old` spelling rows. `design-system/docs/`
  * went in #170, four homes into one.
  */
-const oldPaths = () =>
-  loadRetirement(REPO_ROOT)
-    .ofKind('spelling')
-    .filter((row) => row.rule === 'path:old')
-    .map((row) => ({ path: row.not, pattern: new RegExp(row.pattern) }));
+export const oldPaths = () => rowsOfRule('path:old').map((row) => ({ path: row.not, pattern: new RegExp(row.pattern) }));
 
 /**
  * Paths that are not active files: history keeps the words it was written in, and a

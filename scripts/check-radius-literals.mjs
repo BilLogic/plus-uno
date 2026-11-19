@@ -26,7 +26,8 @@
  * decided at runtime and is skipped rather than guessed.
  *
  * Component SCSS reads roles; existing raw semantic holds are counted in
- * the `exceptions` list in scripts/exceptions.json. Other source types retain the literal rule.
+ * the `exceptions` list in scripts/exceptions.json and
+ * the counts in scripts/baselines/radius-literals.json. Other source types retain the literal rule.
  *
  * NO BASELINE. The count that is correct is zero.
  *
@@ -40,6 +41,7 @@ import { fileURLToPath } from 'node:url';
 import { documents } from './lib/corpus.mjs';
 import { loadExceptions } from './lib/exceptions.mjs';
 import { byRoot, main } from './lib/findings.mjs';
+import { absentMessage, openRatchet } from './lib/ratchet.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ROOTS = ['design-system/src/components', 'design-system/src/templates'];
@@ -55,14 +57,17 @@ export const REMEDY =
   '     for a circle. No px, no %, no primitive step, no literal fallback.';
 
 /**
- * Exact, reviewed holds for existing pixels: the `exceptions` list of this check in
- * `scripts/exceptions.json`, one entry per file and token with the count held. A
- * visual migration belongs to the designer; new uses and stale entries fail this check.
+ * Reviewed holds for existing pixels: the `exceptions` list of this check in
+ * `scripts/exceptions.json` (a file, a token and why it is held), with the count held in
+ * `scripts/baselines/radius-literals.json`. The count may fall and never rise; a visual
+ * migration belongs to the designer, and a new raw read is a finding.
  */
-export const radiusExceptions = (repoRoot = REPO_ROOT) => loadExceptions('check:radius-literals', 'exceptions', { repoRoot });
+export const radiusExceptions = () => loadExceptions('check:radius-literals', 'exceptions');
+export const RADIUS_RECORD = 'scripts/baselines/radius-literals.json';
+const heldKey = (file, token) => `${file}|${token}`;
 
-/** Raw semantic scale reads in component SCSS, plus stale exception findings. */
-export function roleRadii(files, exceptions = radiusExceptions()) {
+/** Raw semantic scale reads in component SCSS, plus the findings of a held count that rose or went stale. */
+export function roleRadii(files, { exceptions = radiusExceptions(), ratchet = openRatchet({ file: RADIUS_RECORD }) } = {}) {
   const reads = files.filter((f) => f.path.endsWith('.scss') && f.path.startsWith('design-system/src/components/'))
     .flatMap(({ path: file, text }) => {
       const source = stripComments(text, false);
@@ -70,13 +75,22 @@ export function roleRadii(files, exceptions = radiusExceptions()) {
         file, token: m[0], line: source.slice(0, m.index).split('\n').length,
       }));
     });
-  const findings = [];
-  for (const exception of exceptions) {
-    const count = reads.filter((r) => r.file === exception.at && r.token === exception.token).length;
-    if (count !== exception.count) findings.push({ message: `stale radius exception: ${exception.at} ${exception.token}: expected ${exception.count}, found ${count}` });
-  }
+  if (ratchet.absent) return [{ message: absentMessage(RADIUS_RECORD) }];
+  const counts = {};
+  for (const r of reads) counts[heldKey(r.file, r.token)] = (counts[heldKey(r.file, r.token)] ?? 0) + 1;
+  const stale = (key, expected, found) => {
+    const [file, token] = key.split('|');
+    return { message: `stale radius exception: ${file} ${token}: expected ${expected}, found ${found}` };
+  };
+  const findings = [
+    ...ratchet.failures(counts).filter((f) => f.kind === 'rose').map((f) => stale(f.key, f.recorded, f.count)),
+    ...ratchet.stale(counts).map((s) => stale(s.key, s.recorded, 0)),
+  ];
+  const held = new Set(exceptions.map((e) => heldKey(e.at, e.token)));
   for (const read of reads) {
-    if (!exceptions.some((e) => e.at === read.file && e.token === read.token && e.count === reads.filter((r) => r.file === read.file && r.token === read.token).length)) {
+    const key = heldKey(read.file, read.token);
+    const recorded = ratchet.entries.get(key)?.count;
+    if (!held.has(key) || recorded === undefined || counts[key] > recorded) {
       findings.push({ ...read, message: `${read.file}:${read.line} reads raw radius scale ${read.token}; use a radius role or a reviewed central exception` });
     }
   }
@@ -135,12 +149,12 @@ const inputs = byRoot((repoRoot) =>
 );
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
-export function run({ repoRoot = REPO_ROOT, exceptions = radiusExceptions() } = {}) {
+export function run({ repoRoot = REPO_ROOT, exceptions = radiusExceptions(), ratchet = openRatchet({ file: RADIUS_RECORD }) } = {}) {
   const files = inputs(repoRoot);
   const found = literalRadii(files).map(({ file, line, value }) => ({
     message: `${file}:${line} sets a literal radius: ${value}`,
   }));
-  found.push(...roleRadii(files, exceptions));
+  found.push(...roleRadii(files, { exceptions, ratchet }));
   if (files.length < MIN_FILES) {
     found.unshift({ message: `${files.length} files searched, fewer than the ${MIN_FILES} this was measured over.` });
   }

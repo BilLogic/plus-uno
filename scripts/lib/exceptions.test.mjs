@@ -43,17 +43,16 @@ test('every live list is named for a registered check, and every entry says wher
       assert.ok(entries.length > 0, `${check} ${list} lists something`);
       for (const entry of entries) {
         assert.equal(typeof entry.at, 'string');
-        assert.ok(entry.reason.length > 10, `${check} ${list} ${entry.at} names its reason`);
       }
     }
   }
 });
 
 test('a list reads back as its entries, in file order', () => {
-  const entries = load(file({ allowed: [{ at: 'b', reason: 'because b stays' }, { at: 'a', reason: 'because a stays', token: 't' }] }));
+  const entries = load(file({ allowed: [{ at: 'b', reason: 'because b stays here' }, { at: 'a', reason: 'because a stays here', token: 't' }] }));
   assert.deepEqual(entries, [
-    { at: 'b', reason: 'because b stays' },
-    { at: 'a', reason: 'because a stays', token: 't' },
+    { at: 'b', reason: 'because b stays here' },
+    { at: 'a', reason: 'because a stays here', token: 't' },
   ]);
 });
 
@@ -68,15 +67,16 @@ test('a missing file, an unreadable one, and a list nobody wrote are each an err
 test('an entry without a reason, with a placeholder reason, or without a place is refused', () => {
   assert.throws(() => load(file({ allowed: [{ at: 'a' }] })), /entry 1 \("a"\) names no reason/);
   assert.throws(() => load(file({ allowed: [{ at: 'a', reason: 'TODO' }] })), /names no reason/);
+  assert.throws(() => load(file({ allowed: [{ at: 'a', reason: 'too short' }] })), /at least 20 characters/);
   assert.throws(() => load(file({ allowed: [{ at: 'a', reason: 'UNREVIEWED — later' }] })), /names no reason/);
   assert.throws(() => load(file({ allowed: [{ reason: 'a long enough reason' }] })), /entry 1 has no `at`/);
   assert.throws(() => load(file({ allowed: ['a'] })), /entry 1 is not an object/);
 });
 
 test('the same entry twice is refused, so a list cannot quietly hold a duplicate', () => {
-  const twice = { at: 'a', reason: 'because a stays' };
-  assert.throws(() => load(file({ allowed: [twice, { ...twice, reason: 'again, differently worded' }] })), /lists "a" twice/);
-  assert.equal(load(file({ allowed: [twice, { at: 'a', token: 't', reason: 'a different thing at a' }] })).length, 2);
+  const twice = { at: 'a', reason: 'because a stays in place' };
+  assert.throws(() => load(file({ allowed: [twice, { ...twice, reason: 'again, differently worded here' }] })), /lists "a" twice/);
+  assert.equal(load(file({ allowed: [twice, { at: 'a', token: 't', reason: 'a different thing at a, held' }] })).length, 2);
 });
 
 test('listsOf names every list a check keeps', () => {

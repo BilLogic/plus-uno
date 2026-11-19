@@ -29,6 +29,7 @@ export const RENAMED = { variant: 'appearance', tone: 'appearance or type' };
 export function allowedProps() {
   return loadExceptions('check:prop-names', 'allowed').map(({ at, reason }) => {
     const [component, prop] = at.split('.');
+    if (!component || !prop) throw new Error(`check:prop-names allowed entry "${at}" is not Component.prop`);
     return { component, prop, reason };
   });
 }

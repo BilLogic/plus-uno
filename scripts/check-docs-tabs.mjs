@@ -39,6 +39,7 @@ import { fileURLToPath } from 'node:url';
 import { documents } from './lib/corpus.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
+import { rowsOfRule } from './lib/retirement.mjs';
 
 import {
   TABBED_EXCEPTIONS,
@@ -115,12 +116,7 @@ const CODE_HEADINGS = new Set(['Slots']);
  * different component", it is a `Related` bullet; if the failure is visual, it
  * is a don't card under the rule it breaks.
  */
-const RETIRED_HEADINGS = new Map([
-  ['Correct and incorrect', 'dissolve it: move each pair under the rule it illustrates (#254)'],
-  ['When not to use', 'move each case to a `Related` bullet or a don\'t card (#254)'],
-  ['ADS parity', 'drop the citation and keep the rule it carries; benchmark atlassian.design silently, never cite it'],
-  ['ADS documentation', 'drop the citation and keep the rule it carries; benchmark atlassian.design silently, never cite it'],
-]);
+export const retiredHeadings = () => new Map(rowsOfRule('heading:retired').map((row) => [row.not, row.why]));
 
 const SECTION_OPEN = '<div className="sb-ds-doc-section">';
 const HEADING = /^##\s+(.*?)\s*$/;
@@ -180,7 +176,7 @@ export function readTabs(source) {
 }
 
 /** @returns {string[]} One line per problem; empty when the file is well-formed. */
-export function checkFile(file, source, tabbed = isTabbedDocsPage(file)) {
+export function checkFile(file, source, tabbed = isTabbedDocsPage(file), retired = retiredHeadings()) {
   const found = [];
   const read = readTabs(source);
 
@@ -218,7 +214,7 @@ export function checkFile(file, source, tabbed = isTabbedDocsPage(file)) {
     //    already says what to do with it. Without this, `Correct and incorrect`
     //    coming back would draw both "move it to the examples tab" and
     //    "dissolve it" — and following the first leaves the page still red.
-    if (RETIRED_HEADINGS.has(section.heading)) continue;
+    if (retired.has(section.heading)) continue;
     const belongs = USAGE_HEADINGS.has(section.heading) ? 'usage' : CODE_HEADINGS.has(section.heading) ? 'code' : 'examples';
     if (section.tab !== belongs) {
       found.push(
@@ -270,7 +266,7 @@ export function checkFile(file, source, tabbed = isTabbedDocsPage(file)) {
   //    two of them, and the reason each was wrong is recorded on the map above
   //    so this check tells the author what to do instead rather than only that
   //    they are wrong.
-  for (const [heading, remedy] of RETIRED_HEADINGS) {
+  for (const [heading, remedy] of retired) {
     const inSections = read.sections.some((sec) => sec.heading === heading);
     const inSubs = read.subHeadings.includes(heading);
     if (inSections || inSubs) {
@@ -308,10 +304,11 @@ export function checkFile(file, source, tabbed = isTabbedDocsPage(file)) {
 /** The two questions below read the same tree, so the walk happens once. */
 const inputs = byRoot((repoRoot) => {
   const files = allMdx(repoRoot);
+  const retired = retiredHeadings();
   return {
     files,
     tabbed: files.filter((f) => isTabbedDocsPage(f)),
-    found: files.flatMap((f) => checkFile(f, fs.readFileSync(path.join(repoRoot, f), 'utf8'))),
+    found: files.flatMap((f) => checkFile(f, fs.readFileSync(path.join(repoRoot, f), 'utf8'), undefined, retired)),
   };
 });
 

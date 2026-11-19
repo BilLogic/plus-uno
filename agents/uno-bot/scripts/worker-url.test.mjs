@@ -150,8 +150,8 @@ test("recorded runs are left alone — rewriting them would falsify the record",
 
 test("a nested checkout is not scanned — this repo keeps worktrees inside itself", () => {
   // Measured before the fix: from the main checkout, the ten copies under
-  // .claude/worktrees/ produced 112 strays — every ALLOWED file at a path
-  // prefix ALLOWED does not carry. Red for everyone is as bad as never red.
+  // .claude/worktrees/ produced 112 strays — every allowed file at a path
+  // prefix the allowed list does not carry. Red for everyone is as bad as never red.
   const root = mkdtempSync(path.join(tmpdir(), "worker-host-"));
   const nested = path.join(root, ".claude", "worktrees", "wt", "agents", "uno-bot", "scripts");
   mkdirSync(nested, { recursive: true });
@@ -182,7 +182,7 @@ test("binary and unknown extensions are skipped rather than read", () => {
 
 test("every exception carries a reason, so the list cannot grow silently", () => {
   // The failure mode this guards: someone hits the check, adds their path to
-  // ALLOWED to make it green, and the single-definition property quietly dies.
+  // the allowed list to make it green, and the single-definition property quietly dies.
   for (const [rel, why] of allowedPlaces()) {
     assert.ok(typeof why === "string" && why.length > 20, `${rel} needs a real reason`);
   }
@@ -207,8 +207,8 @@ test("a gitignored artifact is not a finding — it is not part of the repo", ()
   }
 });
 
-test("--host asks about a FOREIGN host, and ALLOWED does not apply there", () => {
-  // The cutover audit. ALLOWED exempts the files that may hold the CURRENT host;
+test("--host asks about a FOREIGN host, and the allowed list does not apply there", () => {
+  // The cutover audit. The allowed list exempts the files that may hold the CURRENT host;
   // those same files — wrangler.toml and both Slack manifests — are exactly
   // what a move has to rewrite. Exempting them here would report the move
   // complete with three files pointing at a dead account.
@@ -228,13 +228,13 @@ test("--host asks about a FOREIGN host, and ALLOWED does not apply there", () =>
 test("every exception is live — a dead one is a silent hole", () => {
   // The reason this matters: an entry whose stated reason no longer holds still
   // grants the exemption. The suite cannot catch that by writing the host into
-  // each ALLOWED path — that passes by construction — so check the real files.
+  // each allowed path — that passes by construction — so check the real files.
   for (const rel of allowedPlaces().keys()) {
     const abs = path.join(REPO_ROOT, rel);
-    assert.ok(existsSync(abs), `${rel} is in ALLOWED but does not exist`);
+    assert.ok(existsSync(abs), `${rel} is in the allowed list but does not exist`);
     assert.ok(
       readFileSync(abs, "utf8").includes(HOST),
-      `${rel} is in ALLOWED but no longer mentions the host — drop the exception`,
+      `${rel} is in the allowed list but no longer mentions the host — drop the exception`,
     );
   }
 });

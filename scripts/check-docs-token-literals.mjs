@@ -144,7 +144,7 @@ import {
 } from '../design-system/src/lib/tokens-node.mjs';
 import { documents } from './lib/corpus.mjs';
 import { byRoot, main } from './lib/findings.mjs';
-import { loadRetirement } from './lib/retirement.mjs';
+import { rowsOfRule } from './lib/retirement.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -411,15 +411,12 @@ export function findings(source, index) {
 // data, not styling. A hex that genuinely belongs in the chrome goes in a
 // comment-justified declaration of its own and is read in review.
 
-let oldTokenRead;
 /**
  * Retired names, as consumed through `var()`: the retirement list's `read:old-token`
  * spelling row, whose first group is the name. Definitions (Tailwind's `@theme`) are not uses.
+ * A list with no such row throws `MissingRows`.
  */
-export const oldTokenReads = () => {
-  oldTokenRead ??= loadRetirement(REPO_ROOT).ofKind('spelling').find((row) => row.rule === 'read:old-token').pattern;
-  return new RegExp(oldTokenRead, 'g');
-};
+export const oldTokenReads = (repoRoot = REPO_ROOT) => new RegExp(rowsOfRule('read:old-token', repoRoot)[0].pattern, 'g');
 const CHROME_HEX_CSS = /#[0-9a-f]{3,8}\b/gi;
 /** In a component a hex is a literal anywhere in a string or class (`bg-[#fff]`, `1px solid #ccc`); `href="#add"` has no digit-or-hex run of 3+ ending at a word edge after a quote or space only. */
 const CHROME_HEX_STRING = /(?:['"`\s\[(])#(?=[0-9a-f]*\d)[0-9a-f]{3,8}\b/gi;
@@ -462,7 +459,7 @@ function kitFindings(text, lineOf) {
   return found;
 }
 
-export function chromeFindings(source, { css, kit = false }) {
+export function chromeFindings(source, { css, kit = false, reads = oldTokenReads() }) {
   const text = blankProse(source);
   const found = [];
   const lineOf = (offset) => text.slice(0, offset).split('\n').length;
@@ -480,7 +477,7 @@ export function chromeFindings(source, { css, kit = false }) {
       found.push({ line, literal: m[0], kind: re === CHROME_DIMENSION ? 'dimension' : 'color-fn' });
     }
   }
-  for (const m of text.matchAll(oldTokenReads())) {
+  for (const m of text.matchAll(reads)) {
     found.push({ line: lineOf(m.index), literal: m[1], kind: 'old-token' });
   }
   if (kit) found.push(...kitFindings(text, lineOf));
@@ -572,6 +569,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
     }
   }
 
+  const reads = oldTokenReads();
   for (const file of chromeFiles(repoRoot)) {
     const isCss = file.endsWith('.css');
     // MDX prose says `#167`; its component styles are the .jsx beside it, where hex is scanned.
@@ -579,6 +577,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
     for (const f of chromeFindings(fs.readFileSync(file, 'utf8'), {
       css: isCss || file.endsWith('.html'),
       kit: file.includes('/storybook-docs/illustrations/'),
+      reads,
     })) {
       if (skipHex && f.kind === 'hex') continue;
       found.push({

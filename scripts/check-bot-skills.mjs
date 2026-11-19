@@ -38,6 +38,7 @@ import { fileURLToPath } from 'node:url';
 import { documents, frontmatter } from './lib/corpus.mjs';
 import { loadExceptions } from './lib/exceptions.mjs';
 import { main } from './lib/findings.mjs';
+import { rowsOfRule } from './lib/retirement.mjs';
 import { tryHarnessManifest } from './lib/bundled-set.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -51,8 +52,8 @@ const TOOL_TABLE = 'agents/uno-bot/tool-definitions.json';
 /** The three exits, each the opening word(s) of an Exit item. */
 export const EXITS = ['answer', 'file', 'hand off'];
 
-/** The vocabulary of the retired faces. `uno-bot.md` and its kin are other files. */
-const RETIRED_FACE = /(?<![\w-])bot\.md\b|\bWorker faces?\b/i;
+/** The vocabulary of the retired faces: the retirement list's `face:retired` row, read case-insensitively. `uno-bot.md` and its kin are other files. */
+export const retiredFace = () => new RegExp(rowsOfRule('face:retired')[0].pattern, 'i');
 
 /**
  * What the guard skips, from the `history` and `self` lists of this check in
@@ -150,13 +151,14 @@ export function compare({ repoRoot, manifest }) {
 export function retiredFaceHits({ repoRoot = REPO_ROOT } = {}) {
   const hits = [];
   const { roots, files } = skipped();
+  const face = retiredFace();
   for (const rel of documents('', { root: repoRoot, ext: ['.md', '.mjs', '.js', '.ts'] })) {
     if (roots.some((h) => rel.startsWith(h)) || files.includes(rel)) continue;
     fs.readFileSync(path.join(repoRoot, rel), 'utf8')
       .split('\n')
       .forEach((text, i) => {
         if (rel === GLOSSARY && AVOID_LINE.test(text)) return;
-        if (RETIRED_FACE.test(text)) hits.push({ file: rel, line: i + 1, text: text.trim().slice(0, 160) });
+        if (face.test(text)) hits.push({ file: rel, line: i + 1, text: text.trim().slice(0, 160) });
       });
   }
   return hits;

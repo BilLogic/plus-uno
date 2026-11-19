@@ -85,7 +85,7 @@
  * the line the rename maps crossed, and `check-cross-repo-duplication.test.mjs`
  * pins that with a fixture rather than with this sentence.
  *
- * EVERY EXEMPTION IS ASSERTED LIVE. A `COPIES` path that no longer exists in two
+ * EVERY EXEMPTION IS ASSERTED LIVE. A `copies` path that no longer exists in two
  * repos, and a recorded pair whose documents are gone or which no longer
  * shares anything, both FAIL: an allowlist nobody prunes is a backlog, and an
  * entry that outlives its reason is the thing it was written to prevent. The
@@ -512,7 +512,7 @@ export function sweep(overrides = {}) {
       );
     }
   }
-  // A COPIES entry names a path rather than its repos, so it is asserted only
+  // A `copies` entry names a path rather than its repos, so it is asserted only
   // when every repo was reached: "in fewer than two repos" cannot be told apart
   // from "in fewer than two repos I could look at".
   if (reached.length === REPOS.length) {
@@ -520,7 +520,7 @@ export function sweep(overrides = {}) {
       const holders = REPOS.filter((s) => existsSync(path.join(located[s.key].root, rel)));
       if (holders.length < 2) {
         stale.push(
-          `COPIES "${rel}" is now in ${holders.length} of ${REPOS.length} repos, so it is no longer a copy\n` +
+          `copies "${rel}" is now in ${holders.length} of ${REPOS.length} repos, so it is no longer a copy\n` +
             `  by construction. Delete the entry. It read: ${why}`,
         );
       }

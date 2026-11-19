@@ -457,6 +457,7 @@ export const CHECKS = [
     module: 'scripts/check-radius-literals.mjs',
     floors: { MIN_FILES: 150 },
     guards: 'no component or pattern rounding a corner with a px length, a %, a primitive radius step or a literal fallback; radius is a token.',
+    baseline: 'scripts/baselines/radius-literals.json',
   },
   {
     name: 'check:figma-scopes',

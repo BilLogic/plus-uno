@@ -195,10 +195,10 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   const { unused, stale, conflicts, unresolved } = inputs(repoRoot);
 
   const ratchet = openRatchet({ file: BASELINE, repoRoot });
-  if (ratchet.absent) return [{ message: absentMessage(BASELINE) }];
   const { newConflicts, staleBaseline } = splitVerdict(conflicts, unresolved, ratchet);
 
   const failures = [];
+  if (ratchet.absent) failures.push(absentMessage(BASELINE));
 
   if (unused.length) {
     failures.push(

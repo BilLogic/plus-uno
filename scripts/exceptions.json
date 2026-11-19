@@ -160,157 +160,131 @@
         {
           "at": "design-system/src/components/forms-and-inputs/Checkbox/Checkbox.scss",
           "token": "--radius-md",
-          "count": 1,
           "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
         },
         {
           "at": "design-system/src/components/forms-and-inputs/Select/Select.scss",
           "token": "--radius-md",
-          "count": 1,
           "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
         },
         {
           "at": "design-system/src/components/forms-and-inputs/_internal/Calendar.scss",
           "token": "--radius-md",
-          "count": 1,
           "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
         },
         {
           "at": "design-system/src/components/forms-and-inputs/_internal/FieldFrame.scss",
           "token": "--radius-md",
-          "count": 1,
           "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
         },
         {
           "at": "design-system/src/components/forms-and-inputs/_internal/OptionRow.scss",
           "token": "--radius-md",
-          "count": 1,
           "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
         },
         {
           "at": "design-system/src/components/images-and-icons/Avatar/Avatar.scss",
           "token": "--radius-xxl",
-          "count": 1,
           "reason": "Keep the size-derived Avatar corner capped at 16px; this is proportional image geometry, not a surface role."
         },
         {
           "at": "design-system/src/components/images-and-icons/Tile/Tile.scss",
           "token": "--radius-sm",
-          "count": 1,
           "reason": "Keep the existing 2px small mark; the control roles are 6/8/10px and would change its shape."
         },
         {
           "at": "design-system/src/components/ai/AiChat/AiChat.scss",
           "token": "--radius-md",
-          "count": 1,
           "reason": "Keep the existing 4px corner on the person's message; the control roles are 6/8/10px and require a visual decision."
         },
         {
           "at": "design-system/src/components/ai/AiMessage/AiMessage.scss",
           "token": "--radius-md",
-          "count": 1,
           "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
         },
         {
           "at": "design-system/src/components/ai/AiMessage/AiMessage.scss",
           "token": "--radius-sm",
-          "count": 1,
           "reason": "Keep the existing 2px small mark; the control roles are 6/8/10px and would change its shape."
         },
         {
           "at": "design-system/src/components/labels/ChangeTag/ChangeTag.scss",
           "token": "--radius-md",
-          "count": 1,
           "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
         },
         {
           "at": "design-system/src/components/labels/CountTag/CountTag.scss",
           "token": "--radius-md",
-          "count": 1,
           "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
         },
         {
           "at": "design-system/src/components/labels/DateTag/DateTag.scss",
           "token": "--radius-md",
-          "count": 1,
           "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
         },
         {
           "at": "design-system/src/components/labels/StatusTag/StatusTag.scss",
           "token": "--radius-md",
-          "count": 1,
           "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
         },
         {
           "at": "design-system/src/components/ai/Suggestion/Suggestion.scss",
           "token": "--radius-md",
-          "count": 1,
           "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
         },
         {
           "at": "design-system/src/components/labels/Tag/Tag.scss",
           "token": "--radius-md",
-          "count": 1,
           "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
         },
         {
           "at": "design-system/src/components/labels/Tag/Tag.scss",
           "token": "--radius-sm",
-          "count": 3,
           "reason": "Keep the existing 2px small mark; the control roles are 6/8/10px and would change its shape."
         },
         {
           "at": "design-system/src/components/layout-and-structure/ScrollBar/ScrollBar.scss",
           "token": "--radius-md",
-          "count": 1,
           "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
         },
         {
           "at": "design-system/src/components/loading/Skeleton/Skeleton.scss",
           "token": "--radius-md",
-          "count": 5,
           "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
         },
         {
           "at": "design-system/src/components/messaging/Flag/Flag.scss",
           "token": "--radius-md",
-          "count": 1,
           "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
         },
         {
           "at": "design-system/src/components/messaging/Spotlight/Spotlight.scss",
           "token": "--radius-lg",
-          "count": 1,
           "reason": "Keep the existing 8px media corner; a control role would assign interactive sizing to an image."
         },
         {
           "at": "design-system/src/components/navigation/Link/Link.scss",
           "token": "--radius-md",
-          "count": 1,
           "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
         },
         {
           "at": "design-system/src/components/navigation/Sidebar/Sidebar.scss",
           "token": "--radius-sm",
-          "count": 2,
           "reason": "Keep the existing 2px small mark on the lock focus ring and sidebar count; the control roles are 6/8/10px and would change its shape."
         },
         {
           "at": "design-system/src/components/text-and-data-display/Code/Code.scss",
           "token": "--radius-md",
-          "count": 1,
           "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
         },
         {
           "at": "design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.scss",
           "token": "--radius-md",
-          "count": 1,
           "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
         },
         {
           "at": "design-system/src/components/text-and-data-display/Table/Table.scss",
           "token": "--radius-md",
-          "count": 1,
           "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
         }
       ]
@@ -462,6 +436,10 @@
         {
           "at": "scripts/check-bot-skills.test.mjs",
           "reason": "This check names the vocabulary it guards, so its test skips itself."
+        },
+        {
+          "at": "scripts/retirement-parity.test.mjs",
+          "reason": "Its parity test holds the retired-face vocabulary as the check spelled it before, to prove the move changed nothing."
         }
       ]
     },
