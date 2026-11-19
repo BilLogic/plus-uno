@@ -4,6 +4,7 @@ import {
     Button,
     CheckboxGroup,
     Fieldset,
+    FooterActions,
     Flag,
     FlagGroup,
     Heading,
@@ -22,7 +23,9 @@ import { Frame, PatternSection } from '@/patterns';
 import { STEPS_ACROSS_MAX, STEPS_RAIL, stepItems } from '@/storybook-docs/lib/focused-task.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
+import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { FormFields, FILLED } from '../../../patterns/Form/formDemo.jsx';
+import { ModalStage, OneCell, SCREEN as MODAL_SCREEN } from '../../../patterns/Modal/modalDemo.jsx';
 
 /**
  * The Forms pattern's examples. The four hosts, the blocked submit, the server
@@ -568,3 +571,33 @@ export const SettingsPageInWindow = ({ address = 'app.plus.org/settings', height
     </BrowserWindow>
 );
 
+/** The stand-in screen's height for the two Modal examples, in px: docs geometry. */
+const MODAL_SCREEN_HEIGHT = 320; // docs-literal
+
+const ERROR_FOOTER = <FooterActions><Button text="Cancel" onClick={() => {}} /><Button text="Save session" appearance="primary" onClick={() => {}} /></FooterActions>;
+const sessionField = (error) => <TextField label="Student" isRequired defaultValue="" isInvalid errorMessage={error} />;
+
+/** Do: the message under the field, in the same Modal. */
+export const ErrorOnField = () => (
+    <FitStage width={MODAL_SCREEN.width} reflow={false}>
+        <ModalStage screenHeight={MODAL_SCREEN_HEIGHT} title="Log a session" footer={ERROR_FOOTER}>
+            {sessionField('Enter the student’s name')}
+        </ModalStage>
+    </FitStage>
+);
+
+/** Don't: a second dialog over the first, with the field left unexplained. */
+export const ErrorInSecondDialog = () => (
+    <FitStage width={MODAL_SCREEN.width} reflow={false}>
+        <div style={{ position: 'relative' }}>
+            <ModalStage screenHeight={MODAL_SCREEN_HEIGHT} title="Log a session" footer={ERROR_FOOTER}>
+                {sessionField(undefined)}
+            </ModalStage>
+            <div style={{ position: 'absolute', inset: 0 }}>
+                <ModalStage width="4-col" screenHeight={MODAL_SCREEN_HEIGHT} title="Something went wrong" footer={<OneCell action="OK" />}>
+                    <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>The session was not saved.</p>
+                </ModalStage>
+            </div>
+        </div>
+    </FitStage>
+);

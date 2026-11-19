@@ -3,7 +3,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { expectTypeCardAnchors } from '@/storybook-docs/lib/type-card-anchors.jsx';
-import { FIVE_QUESTION_STEPS, HelpInCaptionCase, HelpInTooltipCase, QuestionStep, SettingsPage } from './formsDemo.jsx';
+import { FIVE_QUESTION_STEPS, ErrorInSecondDialog, ErrorOnField, HelpInCaptionCase, HelpInTooltipCase, QuestionStep, SettingsPage } from './formsDemo.jsx';
 
 vi.mock('@storybook/addon-docs/blocks', () => import('@/storybook-docs/lib/addon-docs-blocks-mock.jsx'));
 
@@ -168,5 +168,17 @@ describe('Forms live cases and TypeCard links', () => {
 
     it('links every TypeCard anchor to a unique ComponentExample heading id in Forms.mdx', () => {
         expectTypeCardAnchors(join(__dirname, 'Forms.mdx'), 4);
+    });
+});
+
+describe('Forms error placement examples', () => {
+    it('ErrorOnField explains the field inside one dialog; ErrorInSecondDialog opens a second and leaves the field bare', () => {
+        const onField = render(<ErrorOnField />);
+        expect(screen.getAllByRole('dialog')).toHaveLength(1);
+        expect(screen.getByText('Enter the student’s name')).toBeInTheDocument();
+        onField.unmount();
+        render(<ErrorInSecondDialog />);
+        expect(screen.getAllByRole('dialog')).toHaveLength(2);
+        expect(screen.queryByText('Enter the student’s name')).toBeNull();
     });
 });
