@@ -68,7 +68,7 @@ test('real repo: a template answers with its kind and barrel', () => {
   assert.equal(card.status, 'exists');
   assert.equal(card.kind, 'template');
   assert.equal(card.import, "import { Card } from '@/templates';");
-  assert.equal(card.group, 'Card');
+  assert.equal(card.group, 'Blocks');
   const gap = card.props.find((p) => p.name === 'gap');
   assert.deepEqual(gap.values, ['sm', 'md', 'lg']);
   assert.equal(card.props.find((p) => p.name === 'padding'), undefined);

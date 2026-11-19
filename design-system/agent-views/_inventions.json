@@ -186,7 +186,7 @@
       "use": [
         "Panel"
       ],
-      "why": "a floating Panel",
+      "why": "a floating Panel, from `@/templates`",
       "retired": false
     },
     {
