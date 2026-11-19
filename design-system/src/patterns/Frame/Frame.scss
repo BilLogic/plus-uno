@@ -59,7 +59,7 @@
 }
 
 // Floating (a peek, or an overlay under 1024): over the Page, full height, on
-// the overlay fill with the overlay shadow and no Blanket, like the floating
+// the overlay material with the overlay shadow and no Blanket, like the floating
 // Panels. The shadow is what tells it from the docked, sunken Sidebar. It is on the navigation layer (200), under
 // popups (400) and a modal's Blanket (500); the hover edge sits one below it.
 .plus-frame__sidebar--raised {
@@ -68,7 +68,10 @@
     bottom: 0;
     left: 0;
     z-index: var(--layer-frame-sidebar);
-    background-color: var(--ds-surface-overlay);
+    background-color: var(--ds-surface-material-overlay);
+    // An inset outline, not a border: it adds no width and forced colors keep it.
+    outline: var(--border-width-default) solid var(--ds-border-material);
+    outline-offset: calc(-1 * var(--border-width-default));
     box-shadow: var(--ds-shadow-overlay);
 }
 
@@ -269,7 +272,7 @@
 }
 
 // Overlay and peek: over the Page, full height, with the overlay
-// role's fill and shadow. Neither has a Blanket.
+// material and shadow. Neither has a Blanket.
 .plus-frame__panel--overlay,
 .plus-frame__panel--peek {
     position: absolute;
@@ -277,7 +280,8 @@
     right: 0;
     bottom: 0;
     z-index: var(--layer-frame-panel-peek);
-    background-color: var(--ds-surface-overlay);
+    background-color: var(--ds-surface-material-overlay);
+    border-inline-start-color: var(--ds-border-material);
     box-shadow: var(--ds-shadow-overlay);
 
     // The ring reset on focus must not take the overlay's shadow with it.

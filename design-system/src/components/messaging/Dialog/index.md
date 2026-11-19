@@ -39,7 +39,7 @@ many columns of the screen grid plus the dialog pad.
 | 8-col | A short form. | 507 · 677 · 848 |
 | 10-col | A table or an editor. | 629 · 843 · 1056 |
 
-`Dialog` draws `--ds-surface-overlay` with `--dialog-shadow` (`--ds-shadow-blocking`) in every width. A `Select` list opened inside it keeps `--ds-shadow-overlay`.
+`Dialog` draws `--ds-surface-material-overlay` and a `--ds-border-material` edge with `--dialog-shadow` (`--ds-shadow-blocking`) in every width. A `Select` list opened inside it keeps `--ds-shadow-overlay`.
 
 The width grows with the screen, never shrinks, and ignores the Sidebar. The
 height hugs its content up to the cap (`--blanket-max-height-modal`);
@@ -190,7 +190,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--blanket-max-height-modal` · `--body-default` · `--border-width-default` · `--dialog-body-min-height` · `--dialog-inline-sm` · `--dialog-pad-x-default` · `--dialog-radius` · `--dialog-shadow` · `--dialog-stack-md` · `--dialog-stack-sm` · `--ds-border` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtle` · `--heading-md` · `--plus-overlay-max-height`
+`--blanket-max-height-modal` · `--body-default` · `--border-width-default` · `--dialog-body-min-height` · `--dialog-inline-sm` · `--dialog-pad-x-default` · `--dialog-radius` · `--dialog-shadow` · `--dialog-stack-md` · `--dialog-stack-sm` · `--ds-border` · `--ds-border-material` · `--ds-surface-material-overlay` · `--ds-text` · `--ds-text-subtle` · `--heading-md` · `--plus-overlay-max-height`
 
 From `design-system/src/components/messaging/Dialog/Dialog.scss`. Override these through the token layer, never with a literal.
 

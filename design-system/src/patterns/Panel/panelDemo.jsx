@@ -31,7 +31,7 @@ import { FullBleedFooter } from '../Form/formDemo.jsx';
  * The Panel template's examples: the real Frame with its Panel area, filled the
  * way each type fills it. A Frame under 1408 wide cannot dock a Sidebar and a
  * 400 Panel beside 720 of content, so at the docs stage the Panel floats on the
- * overlay fill and shadow with no Blanket, which is what Details and the
+ * overlay material and shadow with no Blanket, which is what Details and the
  * Inbox always do. The Frame is the only host a Panel has today, so the
  * Inbox's own placement (out of the Sidebar, on the left) is Planned and the
  * Inbox is drawn in the same right-hand slot.

@@ -40,7 +40,7 @@ The Bell in the Sidebar, with its unread count, opens the Inbox. It sits with th
 
 ## Width behavior
 
-Drag the Frame's width. From 1168 a 400 Panel docks beside the Page at an edge line with no shadow. Under it the Panel floats on the overlay fill and shadow, capped at 320 under 1024 and full width under 768. It never has a Blanket.
+Drag the Frame's width. From 1168 a 400 Panel docks beside the Page at an edge line with no shadow. Under it the Panel floats on the overlay material and shadow, capped at 320 under 1024 and full width under 768. It never has a Blanket.
 
 ## Key states
 
@@ -55,7 +55,7 @@ A floating Panel and the docked AI panel sit side by side, and the AI panel is n
 | `--panel-width-default` | 400 | The width a Panel opens at. |
 | `--panel-min-width` | 320 | The narrowest, and the cap under 1024. |
 | `--space-300` | 48 | The full-bleed footer's height, shown only while editing. |
-| `--ds-surface-overlay`, `--ds-shadow-overlay` | pair | The floating Panel's fill and elevation. A docked Panel uses `--ds-surface` and an edge line. |
+| `--ds-surface-material-overlay`, `--ds-border-material`, `--ds-shadow-overlay` | pair | The floating Panel's fill, edge and elevation. The fill is translucent with no blur, and turns solid under reduced transparency and increased contrast. A docked or standalone Panel uses `--ds-surface` and an edge line. |
 | `--ds-border` | 1 | The edge line where a docked Panel meets the Page. |
 
 The Panel resizes from 320 to 640 by drag or keys, never past what keeps 720 of content beside it.

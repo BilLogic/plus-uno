@@ -110,3 +110,14 @@ test('plans name every shadow layer edge, key, ambient', () => {
     for (const level of ['raised', 'overlay', 'blocking']) assert.deepEqual(Object.keys(sh[level]), ['edge', 'key', 'ambient'], `${key} ${level}`);
   }
 });
+
+test('the material falls back to the solid overlay under reduced transparency, and forced colors keep its border', () => {
+  const sem = files['_semantic.scss'];
+  const reduced = /@media \(prefers-reduced-transparency: reduce\) \{[^}]*\}/.exec(sem)?.[0] ?? '';
+  for (const t of ['media', 'control', 'overlay']) assert.match(reduced, new RegExp(`--ds-surface-material-${t}: var\\(--ds-surface-overlay\\);`));
+  const forced = /@media \(forced-colors: active\) \{[^}]*\}/.exec(sem)?.[0] ?? '';
+  assert.match(forced, /--ds-border-material: CanvasText;/);
+  // Increased contrast is a plain override to the solid ground in both schemes.
+  assert.match(sem, /--ds-surface-material-overlay: var\(--palette-neutral-0\);/);
+  assert.match(sem, /--ds-surface-material-overlay: var\(--palette-dark-neutral-250\);/);
+});

@@ -1,6 +1,7 @@
 import React from 'react';
 import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 import { expect, within } from 'storybook/test';
+import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { Button, Panel as PanelContainer, PanelActionGroup, PanelBackAction, PanelBody, PanelCloseAction, PanelDisclaimer, PanelFooter, PanelHeader, PanelMoreAction, PanelProvider, PanelSubheader } from '@/components';
 
 export default {
@@ -91,6 +92,7 @@ export const Rest = {
     render: () => <Subject />,
     play: async ({ canvasElement }) => {
         await expect(getComputedStyle(root(canvasElement)).width).toBe('360px');
+        await expect(getComputedStyle(root(canvasElement)).backgroundColor, 'a standalone Panel sits on the page ground').toBe(tokenColor(canvasElement, '--ds-surface'));
         await expect(within(canvasElement).getByText('Session details')).toBeVisible();
     },
 };

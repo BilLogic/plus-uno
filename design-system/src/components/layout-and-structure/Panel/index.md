@@ -123,7 +123,7 @@ Same group: `Accordion` · `Carousel` · `PageHeader` · `ScrollBar`
 
 | State | What changes |
 | --- | --- |
-| Rest | An overlay surface with a leading edge. |
+| Rest | The page ground with a leading edge. |
 | Hovered | Nothing changes on the panel. |
 | Pressed | Nothing changes on the panel. |
 | Focused | Not focusable. Focus goes to the fixed actions and the content. |
@@ -133,7 +133,7 @@ Same group: `Accordion` · `Carousel` · `PageHeader` · `ScrollBar`
 
 | Part | Token |
 | --- | --- |
-| Ground and edge | `--ds-surface-overlay`; `--ds-border` at `--border-width-default` on the leading edge. |
+| Ground and edge | `--ds-surface`; `--ds-border` at `--border-width-default` on the leading edge. |
 | Header | Padding `--panel-pad-y` and `--panel-pad`; `--panel-inline-md` between its parts; `--border-width-default` rule below. |
 | Action group | `--panel-inline-sm` between actions. |
 | Subheader | Padding `--panel-subheader-pad-y` and `--panel-pad`; `--border-width-default` rule below. |
@@ -158,7 +158,7 @@ Same group: `Accordion` · `Carousel` · `PageHeader` · `ScrollBar`
 
 ## Tokens touched
 
-`--body-sm` · `--border-width-default` · `--ds-border` · `--ds-surface-overlay` · `--ds-text-subtle` · `--panel-inline-lg` · `--panel-inline-md` · `--panel-inline-sm` · `--panel-pad` · `--panel-pad-y` · `--panel-subheader-pad-y`
+`--body-sm` · `--border-width-default` · `--ds-border` · `--ds-surface` · `--ds-text-subtle` · `--panel-inline-lg` · `--panel-inline-md` · `--panel-inline-sm` · `--panel-pad` · `--panel-pad-y` · `--panel-subheader-pad-y`
 
 From `design-system/src/components/layout-and-structure/Panel/Panel.scss`. Override these through the token layer, never with a literal.
 

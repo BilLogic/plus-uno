@@ -181,7 +181,7 @@ const expectFloating = async (frame, aside, surface, surfaceLeftBefore) => {
         .toBe(computedShadow(frame, 'var(--ds-shadow-overlay)'));
     await expect(rect(aside).width, 'sidebar width').toBeCloseTo(tokenLength(frame, '--frame-sidebar-width'), 0);
     await inEveryColorMode(async (mode) => {
-        await expect(getComputedStyle(aside).backgroundColor, `${mode}: on the overlay fill`).toBe(tokenColor(frame, '--ds-surface-overlay'));
+        await expect(getComputedStyle(aside).backgroundColor, `${mode}: on the overlay material`).toBe(tokenColor(frame, '--ds-surface-material-overlay'));
     });
     await expect(rect(aside).top, 'the raised sidebar runs from the top').toBeCloseTo(rect(frame).top, 0);
     await expect(rect(aside).bottom, 'the raised sidebar runs to the foot').toBeCloseTo(rect(frame).bottom, 0);

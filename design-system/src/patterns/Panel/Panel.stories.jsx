@@ -16,7 +16,7 @@ import { MotionPreferenceContext } from '@/lib/motionPreference';
 /**
  * Panel: the template page's examples, run in the Storybook tests. They compose
  * the real Frame, Panel parts, Table and EmptyState. Each type asserts the
- * ruling that defines it: a floating Panel sits on the overlay fill and shadow,
+ * ruling that defines it: a floating Panel sits on the overlay material and shadow,
  * draws no Blanket, and leaves the page reachable.
  *
  * Run: npx vitest run --project=storybook design-system/src/patterns/Panel/Panel.stories.jsx
@@ -47,7 +47,7 @@ const frameParts = (canvasElement) => {
     };
 };
 
-/** A floating Panel: the overlay fill and shadow over the page, full height at the right edge, and no Blanket layer anywhere. */
+/** A floating Panel: the overlay material and shadow over the page, full height at the right edge, and no Blanket layer anywhere. */
 const expectFloating = async (canvasElement) => {
     await expectNotInert(canvasElement);
     await expectFullScale(canvasElement);
@@ -55,7 +55,7 @@ const expectFloating = async (canvasElement) => {
     await waitFor(() => expect(panel(), 'the Panel is open').not.toBeNull());
     const el = panel();
     await expect(getComputedStyle(el).position, 'over the page').toBe('absolute');
-    await expect(getComputedStyle(el).backgroundColor, 'the overlay fill').toBe(tokenColor(frame, '--ds-surface-overlay'));
+    await expect(getComputedStyle(el).backgroundColor, 'the overlay material').toBe(tokenColor(frame, '--ds-surface-material-overlay'));
     await expect(getComputedStyle(el).boxShadow, 'the overlay shadow').toBe(computedShadow(frame, 'var(--ds-shadow-overlay)'));
     await expect(rect(el).top, 'full height, from the top').toBeCloseTo(rect(frame).top, 0);
     await expect(rect(el).right, 'at the right edge').toBeCloseTo(rect(frame).right, 0);
@@ -214,14 +214,14 @@ const expectDocked = async (canvasElement) => {
     await expectNoBlanket(canvasElement);
 };
 
-/** Floating: over the Page on the overlay fill and shadow. */
+/** Floating: over the Page on the overlay material and shadow. */
 const expectOverlay = async (canvasElement) => {
     await expectNotInert(canvasElement);
     await expectFullScale(canvasElement);
     const { frame, panel } = frameParts(canvasElement);
     await panelMode(canvasElement, 'overlay');
     await expect(getComputedStyle(panel()).boxShadow, 'floating: the overlay shadow').toBe(computedShadow(frame, 'var(--ds-shadow-overlay)'));
-    await expect(getComputedStyle(panel()).backgroundColor, 'floating: the overlay fill').toBe(tokenColor(frame, '--ds-surface-overlay'));
+    await expect(getComputedStyle(panel()).backgroundColor, 'floating: the overlay material').toBe(tokenColor(frame, '--ds-surface-material-overlay'));
     await expectNoBlanket(canvasElement);
 };
 
@@ -261,7 +261,7 @@ export const WidthDocked = {
     },
 };
 
-/** At 1000 the Panel floats on the overlay fill and shadow, with no Blanket. */
+/** At 1000 the Panel floats on the overlay material and shadow, with no Blanket. */
 export const WidthFloating = {
     name: 'Width: 1000',
     args: { width: 1000 },

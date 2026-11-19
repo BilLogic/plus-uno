@@ -903,6 +903,7 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-border-input  /* Borders of form UI elements, such as text fields, checkboxes, and radio buttons */
 --ds-border-input-search  /* The border of search inputs */
 --ds-border-inverse  /* Borders on bold backgrounds */
+--ds-border-material  /* The 1px edge of a floating surface that wears material. Forced colors keep it. */
 --ds-border-selected  /* Borders or visual indicators that communicate selection, such as the active tab or a selected menu item, or the opened state of a dropdown trigger. Do not use as a keyboard focus indicator; use --ds-border-focused for focus and preserve the selected treatment when both states apply */
 --ds-border-success  /* Borders communicating a favorable outcome, such as the borders on validated text fields */
 --ds-border-success-subtle  /* Decorative success borders that do not need to meet 3:1 contrast requirements */
@@ -969,6 +970,9 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-skeleton  /* Skeleton loading states */
 --ds-surface  /* The primary background for the UI */
 --ds-surface-hovered
+--ds-surface-material-control  /* A floating button, search or toolbar. Transparency only, no blur; solid under reduced transparency and increased contrast. */
+--ds-surface-material-media  /* A control or tag over an image or video. Transparency only, no blur; solid under reduced transparency and increased contrast. */
+--ds-surface-material-overlay  /* The ground of a floating Sidebar, a floating Panel and the Modal. Transparency only, no blur; solid under reduced transparency and increased contrast. */
 --ds-surface-overlay  /* The background of elements that sit on top of the UI, such as modals, dropdown menus, floating toolbars, and floating single-action buttons. Also use for the background of raised cards in a dragged state. Combine with --ds-shadow-overlay */
 --ds-surface-overlay-hovered
 --ds-surface-overlay-pressed
@@ -1204,6 +1208,9 @@ The ramps the `--ds-` tokens alias. Never name one in a component; a plan swap c
 --palette-orange-800
 --palette-orange-850
 --palette-orange-900
+--palette-overlay-alpha-50
+--palette-overlay-alpha-72
+--palette-overlay-alpha-94
 --palette-purple-100
 --palette-purple-1000
 --palette-purple-1100
@@ -1247,6 +1254,10 @@ The ramps the `--ds-` tokens alias. Never name one in a component; a plan swap c
 --palette-teal-800
 --palette-teal-850
 --palette-teal-900
+--palette-white-alpha-14
+--palette-white-alpha-50
+--palette-white-alpha-74
+--palette-white-alpha-94
 --palette-yellow-100
 --palette-yellow-1000
 --palette-yellow-1100

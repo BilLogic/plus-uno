@@ -726,7 +726,7 @@ export const SidebarFloating = {
             return el;
         });
         await expect(getComputedStyle(aside).position).toBe('absolute');
-        await expect(getComputedStyle(aside).backgroundColor, 'the overlay fill').toBe(tokenColor(canvasElement, '--ds-surface-overlay'));
+        await expect(getComputedStyle(aside).backgroundColor, 'the overlay material').toBe(tokenColor(canvasElement, '--ds-surface-material-overlay'));
         await expect(getComputedStyle(aside).boxShadow, 'the overlay shadow').not.toBe('none');
         await expect(canvas.getByRole('button', { name: 'Close sidebar' })).toHaveFocus();
         // The first Escape may close the focused toggle's tooltip; the next closes the Sidebar.

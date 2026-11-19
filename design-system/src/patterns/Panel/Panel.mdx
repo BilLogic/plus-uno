@@ -99,7 +99,7 @@ The Bell in the Sidebar, with its unread count, opens the Inbox. It sits with th
 
 ## Width behavior
 
-Drag the Frame's width. From 1168 a 400 Panel docks beside the Page at an edge line with no shadow. Under it the Panel floats on the overlay fill and shadow, capped at 320 under 1024 and full width under 768. It never has a Blanket.
+Drag the Frame's width. From 1168 a 400 Panel docks beside the Page at an edge line with no shadow. Under it the Panel floats on the overlay material and shadow, capped at 320 under 1024 and full width under 768. It never has a Blanket.
 
 <DocsInteractivePlayground of={PanelStories.ResponsiveWidth} description="The width control sets the Frame's own width." />
 
@@ -113,7 +113,7 @@ Drag the Frame's width. From 1168 a 400 Panel docks beside the Page at an edge l
 
 <ComponentExample of={PanelStories.KeyRecordGone} title="Record gone" description={<>When the row no longer exists the body shows its empty state with a way back: <DocsLink id="patterns-states-empty">Empty</DocsLink>.</>} />
 
-<ComponentExample of={PanelStories.KeyUnder1024} title="Under 1024" description="Too narrow to dock beside the table: the Panel floats on the overlay fill and shadow, capped as Width behavior says, still with no Blanket." />
+<ComponentExample of={PanelStories.KeyUnder1024} title="Under 1024" description="Too narrow to dock beside the table: the Panel floats on the overlay material and shadow, capped as Width behavior says, still with no Blanket." />
 
 ### Beside the AI panel <PlannedTag />
 
@@ -133,7 +133,7 @@ A floating Panel and the docked AI panel sit side by side, and the AI panel is n
 <tr><td><code>--panel-width-default</code></td><td>400</td><td>The width a Panel opens at.</td></tr>
 <tr><td><code>--panel-min-width</code></td><td>320</td><td>The narrowest, and the cap under 1024.</td></tr>
 <tr><td><code>--space-300</code></td><td>48</td><td>The full-bleed footer's height, shown only while editing.</td></tr>
-<tr><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code></td><td>pair</td><td>The floating Panel's fill and elevation. A docked Panel uses <code>--ds-surface</code> and an edge line.</td></tr>
+<tr><td><code>--ds-surface-material-overlay</code>, <code>--ds-border-material</code>, <code>--ds-shadow-overlay</code></td><td>pair</td><td>The floating Panel's fill, edge and elevation. The fill is translucent with no blur, and turns solid under reduced transparency and increased contrast. A docked or standalone Panel uses <code>--ds-surface</code> and an edge line.</td></tr>
 <tr><td><code>--ds-border</code></td><td>1</td><td>The edge line where a docked Panel meets the Page.</td></tr>
 </tbody>
 </DocsTable>

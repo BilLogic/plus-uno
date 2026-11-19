@@ -167,7 +167,7 @@ import { Button } from '@/components';
 | `--modal-stack-sm`, `-md`, `-lg` | 8, 16, 24 | Title to tabs; header, body and footer; groups of fields. |
 | `--modal-body-min-height` | 80 | The least the body draws. |
 | `--space-300` | 48 | The full-bleed footer's height: a 32 button plus 16 pad, so full bleed never changes the Modal's height. |
-| `--ds-surface-overlay`, `--ds-shadow-blocking` | pair | The Modal's fill and its elevation, the one surface that lifts above a Blanket. |
+| `--ds-surface-material-overlay`, `--ds-border-material`, `--ds-shadow-blocking` | pair | The Modal's fill, edge and elevation, the one surface that lifts above a Blanket. The fill is translucent with no blur, and turns solid under reduced transparency and increased contrast. |
 | `--ds-blanket` | color | The Blanket's fill. |
 
 The Modal's maximum height is the screen less `--blanket-pad-y` above and below.

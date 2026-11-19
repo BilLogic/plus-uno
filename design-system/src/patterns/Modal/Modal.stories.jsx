@@ -125,7 +125,8 @@ export const Overview = {
         await expect(overlayStyle.paddingTop, 'Overlay/pad-y').toBe(`${tokenLength(canvasElement, '--blanket-pad-y')}px`);
         await inEveryColorModeOf(canvasElement, async (mode, token) => {
             await expect(getComputedStyle(overlay).backgroundColor, `blanket fill (${mode})`).toBe(token('--ds-blanket'));
-            await expect(getComputedStyle(modal).backgroundColor, `surface overlay (${mode})`).toBe(token('--ds-surface-overlay'));
+            await expect(getComputedStyle(modal).backgroundColor, `overlay material (${mode})`).toBe(token('--ds-surface-material-overlay'));
+            await expect(getComputedStyle(modal).outlineColor, `material edge (${mode})`).toBe(token('--ds-border-material'));
             await expect(getComputedStyle(modal).boxShadow, `shadow blocking (${mode})`).toBe(probe(canvasElement, 'boxShadow', 'var(--ds-shadow-blocking)'));
         });
     },
@@ -517,7 +518,7 @@ BlockingShadow.play = async ({ canvasElement }) => {
     await settleAnimations(canvasElement.ownerDocument.body);
     await inEveryColorModeOf(canvasElement, async (mode) => {
         await expect(getComputedStyle(dialog).backgroundColor, `surface-overlay in ${mode}`)
-            .toBe(probe(canvasElement, 'backgroundColor', 'var(--ds-surface-overlay)'));
+            .toBe(probe(canvasElement, 'backgroundColor', 'var(--ds-surface-material-overlay)'));
         await expect(getComputedStyle(dialog).boxShadow, `shadow-blocking in ${mode}`)
             .toBe(probe(canvasElement, 'boxShadow', 'var(--ds-shadow-blocking)'));
     });

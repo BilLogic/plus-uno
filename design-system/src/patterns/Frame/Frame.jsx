@@ -66,7 +66,7 @@ const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
  *   it never docks.
  * - Docked, the Sidebar sits on the sunken fill with a 1px `--ds-border` on
  *   its Page-facing edge. Floating (a peek, or opened by hand under 1024) it
- *   lies over the Page on `--ds-surface-overlay` with `--ds-shadow-overlay`
+ *   lies over the Page on `--ds-surface-material-overlay` with `--ds-shadow-overlay`
  *   and no Blanket.
  * - Hovering the left edge peeks a closed Sidebar. An outside press, Escape,
  *   or the pointer leaving closes the peek.
@@ -81,7 +81,7 @@ const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
  * - The Panel area (`panel`) is the Frame's right-hand area. The resolver docks
  *   it beside the Page at a hairline when the content keeps 720, collapsing a
  *   default Sidebar first (and restoring it when the Panel closes); otherwise
- *   it floats over the Page on the overlay fill and shadow, with no Blanket,
+ *   it floats over the Page on the overlay material and shadow, with no Blanket,
  *   and a press outside or Escape closes it. Under 1024 it is an overlay
  *   capped at 320, and only one overlay is open at a time; under 768 it is
  *   full width. As an overlay the Panel is modal: focus moves into it and
