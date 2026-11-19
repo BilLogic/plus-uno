@@ -18175,7 +18175,7 @@
     ]
   },
   "inventions": {
-    "$about": "Hand-kept, reviewed in PRs. Names agents reach for that do not exist here, and retired names, each with what to use instead. The one source of retired component names: a row marked retired is banned by npm run check:ads-language, and inProse also bans it from component doc prose (a rename with no alias), so retiring a component is one row here. Retired token names are the token plan's (scripts/lib/tokens/plan.mjs, ADR-038); the DS facts module lists them beside these rows, and a token row here that covers a retired name may offer only what the plan maps it to (scripts/lib/retired-names.test.mjs). Rendered into the header of agent-views/components/index.md by npm run generate:agent; every target must exist in components.json or tokens.json (scripts/lib/inventions.test.mjs).",
+    "$about": "Hand-kept, reviewed in PRs. Names agents reach for that do not exist here, and retired names, each with what to use instead. The one retirement list (scripts/lib/retirement.mjs answers retired(name) and allowed(file) from it): components, props, tokens, words, spellings and outside names each with what to use instead, plus the shared places old names may stay. A component row marked retired is banned by npm run check:ads-language, and inProse also bans it from component doc prose (a rename with no alias), so retiring a component is one row here. Retired token names are the token plan's (scripts/lib/tokens/plan.mjs, ADR-038); the DS facts module lists them beside these rows, and a token row here that covers a retired name may offer only what the plan maps it to (scripts/lib/retired-names.test.mjs). Rendered into the header of agent-views/components/index.md by npm run generate:agent; every target must exist in components.json or tokens.json (scripts/lib/inventions.test.mjs).",
     "components": [
       {
         "not": "Alert",
@@ -18518,6 +18518,128 @@
           "--radius-md"
         ],
         "why": "retired; these are the commonest replacements, and check:ds-usage names the exact one for each old name"
+      }
+    ],
+    "words": [
+      {
+        "not": "surface container",
+        "use": [
+          "Frame",
+          "Page"
+        ],
+        "why": "the layout areas are Frame and Page"
+      },
+      {
+        "not": "scrim",
+        "use": [
+          "Blanket"
+        ],
+        "why": "renamed"
+      },
+      {
+        "not": "Rovo",
+        "use": [
+          "AI"
+        ],
+        "why": "the AI is unnamed"
+      },
+      {
+        "not": "PLUS AI",
+        "use": [
+          "AI"
+        ],
+        "why": "the AI is unnamed and shows as AI"
+      },
+      {
+        "not": "Atlassian",
+        "use": [
+          "the PLUS rule"
+        ],
+        "why": "shipped docs state the PLUS rule and do not cite the benchmark"
+      }
+    ],
+    "spellings": [
+      {
+        "not": "Tier 1 fix",
+        "use": [
+          "direct fix",
+          "gated change"
+        ],
+        "why": "Tier names the loading tiers and nothing else",
+        "pattern": "\\bTier[- ]?1/2\\b|\\bTier[- ]?[12] (?:fix|fixes|change|changes|digest|whitelist|pipeline|scope|apply)\\b|\\bTier[- ]?1 (?:only|auto-apply)\\b"
+      },
+      {
+        "not": "Gemini lane",
+        "use": [
+          "provider",
+          "adapter"
+        ],
+        "why": "lane keeps the blueprint's actor-row meaning only",
+        "pattern": "\\b(?:Gemini|Claude|Vertex-Claude|Anthropic|model|models|provider|providers|agent|agents|production|active|fallback|backup)[- ]lanes?\\b|\\b(?:both|two|either|each|per)[- ](?:provider |model |agent )?lanes?\\b"
+      },
+      {
+        "not": "Quiet by default",
+        "use": [
+          "Cut the noise"
+        ],
+        "why": "the motion principles are Always responsive, Build understanding, Lead with empathy, Cut the noise",
+        "pattern": "\\b(?:Show what changed|Move like real things|Quiet by default)\\b"
+      }
+    ],
+    "outside": [
+      {
+        "not": "lozenge",
+        "use": [
+          "StatusTag"
+        ],
+        "why": "another design system's word"
+      },
+      {
+        "not": "badge",
+        "use": [
+          "CountTag"
+        ],
+        "why": "another design system's word"
+      },
+      {
+        "not": "inline dialog",
+        "use": [
+          "Popover"
+        ],
+        "why": "another design system's word"
+      },
+      {
+        "not": "side navigation",
+        "use": [
+          "Sidebar"
+        ],
+        "why": "another design system's word"
+      }
+    ],
+    "allowed": [
+      {
+        "path": "docs/adr/",
+        "why": "a decision record keeps the words it decided in"
+      },
+      {
+        "path": "docs/knowledge/archive/",
+        "why": "the graveyard records old words as history"
+      },
+      {
+        "path": "docs/knowledge/changelog.md",
+        "why": "a changelog names what was renamed"
+      },
+      {
+        "path": "docs/plans/",
+        "why": "a plan keeps the words it was written in"
+      },
+      {
+        "path": "docs/evals/",
+        "why": "eval history and scenarios are written in the old names on purpose"
+      },
+      {
+        "path": "design-system/figma/",
+        "why": "Figma-side names stay until Figma is renamed"
       }
     ]
   },
