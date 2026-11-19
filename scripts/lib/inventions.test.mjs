@@ -54,7 +54,7 @@ test('the header renders a table per kind with the right-hand names, and the sel
     tokens: [{ not: '--space-050 (8px)', use: ['--stack-md'] }],
   });
   assert.match(md, /\| `Toast` \| `Flag` \(renamed\) \|/);
-  assert.match(md, /\| `Button variant` \| `Button appearance`, `Button appearance="default"` \|/);
+  assert.match(md, /\| `Button variant` \| `appearance`, `appearance="default"` \|/);
   assert.match(md, /\| `--space-050 \(8px\)` \| `--stack-md` \|/);
   assert.match(renderSelfCheck(), /npm run check:ds-usage/);
 });

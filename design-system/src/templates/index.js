@@ -30,7 +30,6 @@ export {
     usePanelManager,
 } from './Panel';
 export { Popup } from '@/components';
-export { default as AiChat, useAiChat, AI_CHAT_MODES, AI_CHAT_STORAGE_KEY, AI_CHAT_FULLSCREEN_BELOW, AI_CHAT_DISCLAIMER } from './AiChat';
 export { useSidebarControl } from '@/lib/sidebarControl';
 
 // Template motion helpers (Transitions & Choreography)

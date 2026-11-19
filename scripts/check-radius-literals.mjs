@@ -99,6 +99,12 @@ export const RADIUS_EXCEPTIONS = [
     "why": "Keep the existing 2px small mark; the control roles are 6/8/10px and would change its shape."
   },
   {
+    "file": "design-system/src/components/ai/AiChat/AiChat.scss",
+    "token": "--radius-md",
+    "count": 1,
+    "why": "Keep the existing 4px corner on the person's message; the control roles are 6/8/10px and require a visual decision."
+  },
+  {
     "file": "design-system/src/components/ai/AiMessage/AiMessage.scss",
     "token": "--radius-md",
     "count": 1,

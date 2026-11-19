@@ -113,6 +113,7 @@ const CARD_FILTER_CATEGORIES = [
  * and therefore fall back to their transition's kit drawing.
  */
 export const COMPONENT_SUBJECT_FALLBACKS = Object.freeze({
+    AiChat: 'Chat surface requires the Frame shell, its Panel area and the shared AiChat provider to open as a Popup.',
     Sidebar: 'Full-app navigation rail requires the Frame shell layout and shared open-tabs store.',
     Spotlight: 'Coachmark popover requires a page target and steals focus onto its dismiss control when opened.',
 });

@@ -87,7 +87,7 @@ Don't: A disabled idle field blocks the next question.
 - For the border treatment shown while loading, see `GenerativeBorder`.
 - For a short, tappable prompt suggestion, use `Suggestion` or `PromptStarters`.
 
-Same group: `AiIcon` · `AiMessage` · `GenerativeBorder` · `PromptStarters` · `Suggestion`
+Same group: `AiChat` · `AiIcon` · `AiMessage` · `GenerativeBorder` · `PromptStarters` · `Suggestion`
 
 ## Parts
 

@@ -72,7 +72,7 @@ no conditional wrapper is needed.
 - For a single follow-up prompt once a conversation is underway, use `Suggestion` directly.
 - For where a selected starter's text typically lands, see `PromptInput`.
 
-Same group: `AiIcon` · `AiMessage` · `GenerativeBorder` · `PromptInput` · `Suggestion`
+Same group: `AiChat` · `AiIcon` · `AiMessage` · `GenerativeBorder` · `PromptInput` · `Suggestion`
 
 ## Parts
 

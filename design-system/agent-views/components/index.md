@@ -43,20 +43,22 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `SectionToolbar` | `Section` |
 | `Section.Toolbar` | `Section` |
 
-**Props**
+**Props (same component)**
 
 | Not here | Use instead |
 |---|---|
-| `Button variant` | `Button appearance` |
-| `Button size` | `Button spacing` (spacing is default, compact or spacious) |
-| `Button disabled` | `Button isDisabled` |
-| `Button appearance="secondary"` | `Button appearance="default"` |
-| `Heading level` | `Heading as` (the level comes from the surrounding sections) |
-| `Heading size="small" / "large"` | `Heading size="sm"`, `Heading size="lg"` |
-| `Section tabs / type="tabs-only"` | `Section views` |
-| `Section toolbar / type="toolbar"` | `Section search`, `Section filters` |
-| `Frame width="content"` | `Frame width="default"` |
-| `Section onAddView / addViewLabel` | `Section views` |
+| `Button variant` | `appearance` |
+| `Button size` | `spacing` (spacing is default, compact or spacious) |
+| `Button disabled` | `isDisabled` |
+| `Button appearance="secondary"` | `appearance="default"` |
+| `Heading level` | `as` (the level comes from the surrounding sections) |
+| `Heading size="small" / "large"` | `size="sm"`, `size="lg"` |
+| `Section tabs / type="tabs-only"` | `views` |
+| `Section toolbar / type="toolbar"` | `search`, `filters` |
+| `Frame width="content"` | `width="default"` |
+| `Section onAddView / addViewLabel` | `views` |
+| `Rating variant` | `type` |
+| `CloseButton tone` | `appearance` |
 
 **Tokens**
 
@@ -86,11 +88,12 @@ A template is a shell that owns the frame (fill, pad, radius, elevation) and lea
 | Panel | [`Panel`](../../src/templates/Panel/Panel.mdx) | `import { Panel } from '@/templates';` | A full-height layer on the right with no Blanket, docked beside the Page when it fits and floating over it when it does not: `PanelContainer` and its parts (`PanelHeader`, `PanelSubheader`, `PanelBody`, `PanelFooter`), filled into the Frame's `panel`. Two types, Details and Notifications. For content that must be dealt with before anything else, use `Modal`. |
 | Overlays | [`Modal`](../../src/templates/Modal/Modal.mdx) | `import { Modal } from '@/templates';` | The template for content that takes over the screen until it is closed: a `Dialog` (@/components) on a Blanket with modal behavior on Base UI (portal, focus trap, Escape, scroll lock). For the dialog panel inline with no Blanket or modal behavior, use `Dialog`. |
 | Popups | [`Popup`](../../src/components/overlays-and-layering/Popup/Popup.mdx) | `import { Popup } from '@/components';` | The Popups pattern is four floating layers that never block the page, each a component: `DropdownMenu` lists actions, `Popup` holds a small aside anchored to a control, `Flag` reports what just happened, `Tooltip` names a control. |
-| AI | [`AiChat`](../../src/templates/AiChat/AiChat.mdx) | `import { AiChat } from '@/templates';` | AI chat as a popup, in the Frame's Panel or full screen, opened from one floating button. |
+| AI | [`AiChat`](../../src/components/ai/AiChat/AiChat.mdx) | `import { AiChat } from '@/components';` | AI chat as a popup, in the Frame's Panel or full screen, opened from one floating button. |
 
-## UI components (92)
+## UI components (93)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
+- [AiChat](../../src/components/ai/AiChat/index.md)
 - [AiIcon](../../src/components/ai/AiIcon/index.md)
 - [AiMessage](../../src/components/ai/AiMessage/index.md)
 - [Avatar](../../src/components/images-and-icons/Avatar/index.md)

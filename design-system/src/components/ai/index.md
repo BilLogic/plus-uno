@@ -2,11 +2,12 @@
 
 # AI
 
-6 components. Each row links to the generated facts; the three columns after it are the
+7 components. Each row links to the generated facts; the three columns after it are the
 authored half, counted rather than assumed.
 
 ## Which component to reach for
 
+- **[AiChat](AiChat/index.md)** — Use AI chat to ask about the current page. Choose a mode for the task.
 - **[AiIcon](AiIcon/index.md)** — Use `AiIcon` for AI actions. For other actions, use a plain Font Awesome Free glyph.
 - **[AiMessage](AiMessage/index.md)** — Use `AiMessage` for every AI reply, in chat, a panel or elsewhere. Choose its status from the table below.
 - **[GenerativeBorder](GenerativeBorder/index.md)** — Use `GenerativeBorder` only while the AI is generating into a piece of content, one ring per piece. It is never decoration, and two must not nest. For other waits, use `Spinner` or `Skeleton`.
@@ -16,6 +17,7 @@ authored half, counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
+| [AiChat](AiChat/index.md) | 15 | ✅ | ✅ | ✅ |
 | [AiIcon](AiIcon/index.md) | 5 | ✅ | ✅ | ✅ |
 | [AiMessage](AiMessage/index.md) | 11 | ✅ | ✅ | ✅ |
 | [GenerativeBorder](GenerativeBorder/index.md) | 5 | ✅ | ✅ | ✅ |
@@ -23,7 +25,7 @@ authored half, counted rather than assumed.
 | [PromptStarters](PromptStarters/index.md) | 4 | ✅ | ✅ | ✅ |
 | [Suggestion](Suggestion/index.md) | 9 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 6/6 (100%) · Correct/incorrect 6/6 (100%) · Accessibility 6/6 (100%)
+**Authored coverage:** When to use 7/7 (100%) · Correct/incorrect 7/7 (100%) · Accessibility 7/7 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says
