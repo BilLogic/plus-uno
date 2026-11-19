@@ -5,7 +5,7 @@
  * Combines the Blanket layer (`--layer-blanket`, `--ds-blanket`, `--blanket-pad-*`)
  * with `--modal-*` template tokens on the Dialog panel.
  */
-.plus-template-blanket {
+.plus-modal-blanket {
     position: fixed;
     inset: 0;
     z-index: var(--layer-blanket);
@@ -36,7 +36,7 @@
     }
 }
 
-.plus-template-blanket-inline {
+.plus-modal-blanket-inline {
     position: relative;
     inset: auto;
     z-index: auto;
@@ -58,9 +58,10 @@
     --dialog-inline-sm: var(--modal-inline-sm);
     --dialog-radius: var(--modal-radius);
     --dialog-body-min-height: var(--modal-body-min-height);
-    --dialog-shadow: var(--modal-shadow);
+    --dialog-max-height: var(--blanket-max-height-modal);
 
     box-shadow: var(--modal-shadow);
+
     --plus-overlay-origin: center;
     @include overlay-motion(plus-overlay-scale-in, plus-overlay-scale-out, default, default);
     transform-origin: var(--transform-origin, var(--plus-overlay-origin, center));

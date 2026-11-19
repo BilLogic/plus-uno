@@ -16,14 +16,19 @@ const KIND_COMPONENTS = {
 /**
  * Table template: how a table sits on a page. A Section holds it, and the
  * Section header carries the title and the toolbar. Under the header come the
- * table, then the footer (range, page size, Pagination), and the empty state
- * box in place of both when there are no rows.
+ * table, then the `footer` slot (range, page size, Pagination), and the empty
+ * state box in place of both when there are no rows. The template draws no
+ * default footer: the slot is the contract.
  *
  * Pass the table as `children` (a `StaticTable`, `DynamicTable` or
  * `TreeTable`), or name a `kind` and pass its props as `tableProps`. Choose
  * the kind by what people do with the rows: nesting is a Tree table; sort,
  * filter, select, page, expand or row actions is a Dynamic table; otherwise
  * it is a Static table.
+ *
+ * A Dynamic or Tree table already draws its own footer and empty state, so
+ * the template's `footer`, `emptyState` and `empty` serve a Static table and
+ * are not drawn around the other two.
  *
  * Every other prop goes to the Section (`title`, `description`, `actions`,
  * `views`, `search`, `filters`).
@@ -41,7 +46,8 @@ const Table = ({
 }) => {
     const Kind = KIND_COMPONENTS[kind];
     const element = children ?? (Kind ? <Kind {...tableProps} /> : null);
-    const showEmptyState = Boolean(empty && emptyState);
+    const ownsStates = element?.type === DynamicTable || element?.type === TreeTable;
+    const showEmptyState = !ownsStates && Boolean(empty && emptyState);
 
     return (
         <Section {...sectionProps}>
@@ -51,7 +57,7 @@ const Table = ({
                 ) : (
                     <>
                         {element}
-                        {footer && <TableFooterRow>{footer}</TableFooterRow>}
+                        {footer && !ownsStates && <TableFooterRow>{footer}</TableFooterRow>}
                     </>
                 )}
             </div>
@@ -70,12 +76,12 @@ Table.propTypes = {
      * @ds-context Used in: Table.children (ds guide table)
      */
     children: PropTypes.node,
-    /** Footer slot under the table (range, page-size Select, Pagination); hidden while the empty state shows
+    /** Footer slot under a Static table (range, page-size Select, Pagination); the template draws no default. Not drawn around a Dynamic or Tree table, which has its own; hidden while the empty state shows
      * @ds-context Used in: Table.footer (ds guide table)
      * @ds-context Governed by: Empty (ds guide empty)
      */
     footer: PropTypes.node,
-    /** Empty-state slot: replaces the table and footer when `empty` is true
+    /** Empty-state slot: replaces a Static table and its footer when `empty` is true; a Dynamic or Tree table draws its own
      * @ds-context Used in: Table.emptyState (ds guide table)
      * @ds-context Governed by: Empty (ds guide empty)
      */

@@ -190,7 +190,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--blanket-max-height-modal` · `--body-default` · `--border-width-default` · `--dialog-body-min-height` · `--dialog-inline-sm` · `--dialog-pad-x-default` · `--dialog-radius` · `--dialog-shadow` · `--dialog-stack-md` · `--dialog-stack-sm` · `--ds-border` · `--ds-border-material` · `--ds-surface-material-overlay` · `--ds-text` · `--ds-text-subtle` · `--heading-md` · `--plus-overlay-max-height`
+`--body-default` · `--border-width-default` · `--dialog-body-min-height` · `--dialog-inline-sm` · `--dialog-max-height` · `--dialog-pad-x-default` · `--dialog-radius` · `--dialog-shadow` · `--dialog-stack-md` · `--dialog-stack-sm` · `--ds-border` · `--ds-border-material` · `--ds-surface-material-overlay` · `--ds-text` · `--ds-text-subtle` · `--heading-md` · `--plus-overlay-max-height`
 
 From `design-system/src/components/messaging/Dialog/Dialog.scss`. Override these through the token layer, never with a literal.
 

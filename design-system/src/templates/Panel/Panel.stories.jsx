@@ -60,7 +60,7 @@ const expectFloating = async (canvasElement) => {
     await expect(getComputedStyle(el).boxShadow, 'the overlay shadow').toBe(computedShadow(frame, 'var(--ds-shadow-overlay)'));
     await expect(rect(el).top, 'full height, from the top').toBeCloseTo(rect(frame).top, 0);
     await expect(rect(el).right, 'at the right edge').toBeCloseTo(rect(frame).right, 0);
-    await expect(canvasElement.querySelector('.plus-frame__blanket, .plus-template-blanket'), 'a Panel never has a Blanket').toBeNull();
+    await expect(canvasElement.querySelector('.plus-frame__blanket, .plus-modal-blanket'), 'a Panel never has a Blanket').toBeNull();
     // The page under it is not covered by a layer of its own: only the Panel stands over it.
     const hit = document.elementFromPoint(rect(surface).left + 40, rect(surface).top + 40);
     await expect(frame.contains(hit) && !hit.closest('.plus-frame__panel'), 'a point on the page lands on the page').toBe(true);
@@ -198,7 +198,7 @@ const panelMode = (canvasElement, mode) => waitFor(() => expect(
 ).toContain(`plus-frame__panel--${mode}`));
 
 const expectNoBlanket = (canvasElement) => expect(
-    canvasElement.querySelector('.plus-frame__blanket, .plus-template-blanket'),
+    canvasElement.querySelector('.plus-frame__blanket, .plus-modal-blanket'),
     'no Blanket at any width',
 ).toBeNull();
 
@@ -321,7 +321,7 @@ export const KeyUnder1024 = {
         await waitFor(() => expect(panel()).not.toBeNull());
         const narrowest = tokenLength(frame, '--panel-min-width');
         await waitFor(() => expect(panel().offsetWidth, 'capped at its narrowest').toBeCloseTo(narrowest, 0));
-        await expect(canvasElement.querySelector('.plus-frame__blanket, .plus-template-blanket'), 'no Blanket').toBeNull();
+        await expect(canvasElement.querySelector('.plus-frame__blanket, .plus-modal-blanket'), 'no Blanket').toBeNull();
         await fitsCanvas(canvasElement);
     },
 };

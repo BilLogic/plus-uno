@@ -706,7 +706,7 @@ export const BlockingOnBlanket = {
         </DoDont>
     ),
     play: async ({ canvasElement }) => {
-        const blanket = canvasElement.querySelector('.plus-template-blanket');
+        const blanket = canvasElement.querySelector('.plus-modal-blanket');
         const modal = canvasElement.querySelector('.plus-modal');
         const panel = canvasElement.querySelector('.plus-panel');
         await expect(blanket).not.toBeNull();

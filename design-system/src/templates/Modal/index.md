@@ -225,7 +225,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--blanket-pad-x` · `--blanket-pad-y` · `--ds-blanket` · `--layer-blanket` · `--layer-modal` · `--modal-body-min-height` · `--modal-inline-sm` · `--modal-pad-x-default` · `--modal-radius` · `--modal-shadow` · `--modal-stack-md` · `--modal-stack-sm` · `--plus-overlay-origin` · `--plus-overlay-screen` · `--plus-overlay-screen-height` · `--transform-origin`
+`--blanket-max-height-modal` · `--blanket-pad-x` · `--blanket-pad-y` · `--ds-blanket` · `--layer-blanket` · `--layer-modal` · `--modal-body-min-height` · `--modal-inline-sm` · `--modal-pad-x-default` · `--modal-radius` · `--modal-shadow` · `--modal-stack-md` · `--modal-stack-sm` · `--plus-overlay-origin` · `--plus-overlay-screen` · `--plus-overlay-screen-height` · `--transform-origin`
 
 From `design-system/src/templates/Modal/Modal.scss`. Override these through the token layer, never with a literal.
 

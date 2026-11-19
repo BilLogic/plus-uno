@@ -1,13 +1,7 @@
 import { useMotionReduced } from '@/lib/motionPreference';
-import React, { createContext, useRef } from 'react';
+import React, { useRef } from 'react';
 import { useOverlayPresence } from '@/lib/overlayMotion';
 import PropTypes from 'prop-types';
-
-/**
- * Carries Blanket's `show` down to the Modal it holds so the Modal starts its
- * exit together with the Blanket instead of snapping away when `show` drops.
- */
-export const BlanketOpenContext = createContext(true);
 
 /**
  * Internal Blanket layer for the Modal template (`design-system/src/templates/Modal/`).
@@ -31,8 +25,8 @@ const Blanket = ({
     const present = useOverlayPresence(inline ? show : true, surface);
 
     const classes = [
-        'plus-template-blanket',
-        inline ? 'plus-template-blanket-inline' : '',
+        'plus-modal-blanket',
+        inline ? 'plus-modal-blanket-inline' : '',
         className,
     ].filter(Boolean).join(' ');
 
@@ -70,9 +64,7 @@ const Blanket = ({
             onClick={handleClick}
             {...props}
         >
-            <BlanketOpenContext.Provider value={show}>
-                {children}
-            </BlanketOpenContext.Provider>
+            {children}
         </div>
     );
 };

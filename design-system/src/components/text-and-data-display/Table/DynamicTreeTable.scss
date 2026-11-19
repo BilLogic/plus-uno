@@ -1,5 +1,5 @@
 /**
- * Dynamic table: the shared `_Table` parts on the table shell.
+ * The stylesheet the Dynamic and Tree tables share: the `_Table` parts on the table shell.
  *
  * The table shell owns the scroll region and draws row states as a layer over
  * each cell's fill (so a frozen, opaque cell keeps them); the `_Table` parts

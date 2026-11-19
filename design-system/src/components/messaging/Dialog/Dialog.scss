@@ -22,7 +22,7 @@
     gap: var(--dialog-stack-md);
     padding: var(--dialog-pad-x-default);
     overflow: hidden;
-    max-height: var(--plus-overlay-max-height, var(--blanket-max-height-modal));
+    max-height: var(--plus-overlay-max-height, var(--dialog-max-height, 100dvh));
     box-sizing: border-box;
 }
 
@@ -43,7 +43,7 @@
 }
 
 .plus-dialog-height-fill {
-    height: var(--plus-overlay-max-height, var(--blanket-max-height-modal));
+    height: var(--plus-overlay-max-height, var(--dialog-max-height, 100dvh));
 }
 
 .plus-dialog.plus-dialog-body-only {

@@ -4521,11 +4521,11 @@
         "Focused"
       ],
       "tokens": [
-        "--blanket-max-height-modal",
         "--body-default",
         "--border-width-default",
         "--dialog-body-min-height",
         "--dialog-inline-sm",
+        "--dialog-max-height",
         "--dialog-pad-x-default",
         "--dialog-radius",
         "--dialog-shadow",
@@ -8848,6 +8848,7 @@
         "BlanketMotionReduced"
       ],
       "tokens": [
+        "--blanket-max-height-modal",
         "--blanket-pad-x",
         "--blanket-pad-y",
         "--ds-blanket",
@@ -14818,7 +14819,7 @@
       "import": "import { Table } from '@/templates';",
       "group": "templates",
       "source": "design-system/src/templates/Table/Table.jsx",
-      "summary": "Section header carries the title and the toolbar. Under the header come the table, then the footer (range, page size, Pagination), and the empty state box in place of both when there are no rows. Pass the table as `children` (a `StaticTable`, `DynamicTable` or `TreeTable`), or name a `kind` and pass its props as `tableProps`. Choose the kind by what people do with the rows: nesting is a Tree table; sort, filter, select, page, expand or row actions is a Dynamic table; otherwise it is a Static table. Every other prop goes to the Section (`title`, `description`, `actions`, `views`, `search`, `filters`).",
+      "summary": "Section header carries the title and the toolbar. Under the header come the table, then the `footer` slot (range, page size, Pagination), and the empty state box in place of both when there are no rows. The template draws no default footer: the slot is the contract. Pass the table as `children` (a `StaticTable`, `DynamicTable` or `TreeTable`), or name a `kind` and pass its props as `tableProps`. Choose the kind by what people do with the rows: nesting is a Tree table; sort, filter, select, page, expand or row actions is a Dynamic table; otherwise it is a Static table. A Dynamic or Tree table already draws its own footer and empty state, so the template's `footer`, `emptyState` and `empty` serve a Static table and are not drawn around the other two. Every other prop goes to the Section (`title`, `description`, `actions`, `views`, `search`, `filters`).",
       "props": [
         {
           "name": "kind",
@@ -14857,7 +14858,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Footer slot under the table (range, page-size Select, Pagination); hidden while the empty state shows",
+          "description": "Footer slot under a Static table (range, page-size Select, Pagination); the template draws no default. Not drawn around a Dynamic or Tree table, which has its own; hidden while the empty state shows",
           "deprecated": null
         },
         {
@@ -14866,7 +14867,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Empty-state slot: replaces the table and footer when `empty` is true",
+          "description": "Empty-state slot: replaces a Static table and its footer when `empty` is true; a Dynamic or Tree table draws its own",
           "deprecated": null
         },
         {
