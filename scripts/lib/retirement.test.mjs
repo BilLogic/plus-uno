@@ -98,7 +98,7 @@ test('the blueprint actor-row sense of "lane" is not flagged', () => {
 
 test('over the tracked agent-read docs, the Gemini lane row has no false positive', () => {
   const row = 'Gemini lane';
-  const docs = trackedSources(REPO_ROOT, DOC_ROOTS, /\.md$/).filter(({ path: p }) => !retirement.allowed(p, 'spelling') && !/^agents\/uno-bot\/(?:harness-bundle|src\/)/.test(p));
+  const docs = trackedSources(REPO_ROOT, DOC_ROOTS, /\.md$/).filter(({ path: p }) => !retirement.allowed(p, 'spelling'));
   const hits = docs.flatMap(({ path: p, text }) => retirement.findIn(text).filter((f) => f.row.not === row).map((f) => `${p}: ${f.match}`));
   assert.deepEqual(hits, []);
 });
@@ -108,6 +108,8 @@ test('the shared allowed places cover history, and a place may keep only some ki
     assert.equal(retirement.allowed(file), true, file);
     assert.equal(retirement.allowed(file, 'word'), true, file);
   }
+  for (const file of ['docs/evals/scenarios/ds-usage/x/brief.md', 'docs/evals/fixtures/a.md']) assert.equal(retirement.allowed(file), true, file);
+  for (const file of ['docs/evals/README.md', 'docs/evals/rubrics/x.md', 'docs/evals/ds-usage.md']) assert.equal(retirement.allowed(file), false, `${file} stays policed`);
   const figma = 'design-system/figma/component-registry.json';
   assert.equal(retirement.allowed(figma, 'component'), true);
   assert.equal(retirement.allowed(figma, 'word'), false);
@@ -128,4 +130,36 @@ test('the committed list is well-formed, every replacement exists, and the Not-h
 test('listProblems names a row with no replacement, a spelling with no pattern, and a malformed place', () => {
   const bad = { words: [{ not: 'x', use: [] }], spellings: [{ not: 's', use: ['y'] }], allowed: [{ path: '', why: 'y' }, { path: 'docs/' }, { path: 'a/', why: 'b', kinds: ['nope'] }] };
   assert.deepEqual(listProblems(bad), ['word x: no replacement', 'spelling s: no pattern', 'allowed place "": no path', 'allowed place "docs/": no reason', 'allowed place "a/": unknown kind']);
+});
+
+test('ofKind lists the rows of one kind, and a copy cannot change the list', () => {
+  const words = retirement.ofKind('word');
+  assert.ok(words.some((r) => r.not === 'scrim'));
+  words[0].not = 'changed';
+  assert.notEqual(retirement.ofKind('word')[0].not, 'changed');
+  assert.ok(retirement.ofKind('outside').some((r) => r.not === 'lozenge'));
+});
+
+test('a tag is a retired name that is also a word: found by kind, never in prose', () => {
+  assert.ok(retirement.ofKind('tag').some((r) => r.not === 'Surface'));
+  assert.equal(retirement.retired('Surface').kind, 'tag');
+  assert.deepEqual(retirement.findIn('the Surface of the page, an Overlay').filter((f) => f.row.severity === 'error'), []);
+  assert.deepEqual(retirement.findIn('the Surface', { kinds: ['tag'] }).map((f) => f.match), ['Surface']);
+});
+
+test('a row may be case sensitive, bound to paths, or retired only through the plan', () => {
+  assert.deepEqual(retirement.findIn('rovo and Rovo', { kinds: ['word'] }).map((f) => f.match), ['Rovo']);
+  assert.equal(retirement.findIn('the PLUS AI', { kinds: ['word'], file: 'design-system/src/x.mdx' }).length, 1);
+  assert.equal(retirement.findIn('the PLUS AI', { kinds: ['word'], file: 'prototypes/x.jsx' }).length, 0);
+  // `--space-025` is a primitive agents misuse, not a retired name; a name the plan retired is.
+  assert.equal(retirement.findIn('--space-025', { kinds: ['token'], retiredOnly: true }).length, 0);
+  const [old] = [...retiredRenames()][0];
+  assert.equal(retirement.findIn(`use ${old}`, { kinds: ['token'], retiredOnly: true }).length, 1);
+});
+
+test('the retirement rule is written where engineering conventions live, and the list points at it', () => {
+  const coding = fs.readFileSync(path.join(REPO_ROOT, 'docs/engineering/coding.md'), 'utf8');
+  assert.match(coding, /### Retiring a name/);
+  assert.match(coding, /every use of a retired name is replaced in the same change/);
+  assert.match(list.$about, /docs\/engineering\/coding\.md § Retiring a name/);
 });

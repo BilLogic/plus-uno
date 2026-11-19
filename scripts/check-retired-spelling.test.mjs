@@ -5,7 +5,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { findingsIn, sweep, RETIRED, SKIP, REPO_ROOT } from './check-retired-spelling.mjs';
+import { findingsIn, sweep, REPO_ROOT } from './check-retired-spelling.mjs';
+import { loadRetirement } from './lib/retirement.mjs';
 
 test('the loading tiers pass untouched', () => {
   const text = [
@@ -86,6 +87,17 @@ test('every provider-sense phrase is caught, with its why', () => {
   for (const f of found) assert.match(f.why, /provider|adapter|ModelProvider/);
 });
 
+test('the list is the one reading of "lane": an actor row passes, a provider phrase fails', () => {
+  assert.deepEqual(findingsIn('an agent lane in the blueprint, and each lane is an actor row', 'docs/x.md'), []);
+  assert.equal(findingsIn('the Gemini lane stalled', 'docs/x.md').length, 1);
+});
+
+test('a retired spelling is matched in its own case: lowercase prose passes', () => {
+  assert.deepEqual(findingsIn('quiet by default is a fair thing to want, and a tier 1 fix is lowercase prose', 'docs/x.md'), []);
+  assert.equal(findingsIn('the principle "Quiet by default"', 'docs/x.md').length, 1);
+  assert.equal(findingsIn('a Tier 1 fix', 'docs/x.md').length, 1);
+});
+
 test('a reintroduced provider-sense "lane" fails the live sweep', () => {
   // The contract this check leaves behind: the phrase can fall out of the docs
   // but cannot come back. Proven against a real swept file's real text, so the
@@ -103,36 +115,29 @@ test('a reintroduced provider-sense "lane" fails the live sweep', () => {
   assert.equal(found[0].text, 'two lanes');
 });
 
-test('the ModelProvider entry in the Worker README may name the retired provider spellings', () => {
+test('an _Avoid_ line names the old spelling on purpose, so it is not swept', () => {
   const entry = '**ModelProvider**:\nuno-bot\'s seam …\n_Avoid_: "the provider loop", "provider lane", "Gemini lane", "both lanes" (there is one loop)';
   assert.deepEqual(findingsIn(entry, 'agents/uno-bot/README.md'), []);
-  assert.ok(findingsIn(entry, 'docs/other.md').length > 0, 'the exemption is the owning entry, not the words');
-  assert.ok(findingsIn(entry, 'GLOSSARY.md').length > 0, 'the entry left the glossary, and its exemption went with it');
+  const tiers = '**direct fix / gated change**:\nThe two maintenance severities.\n_Avoid_: "Tier 1 fix", "Tier 2 change"';
+  assert.deepEqual(findingsIn(tiers, 'GLOSSARY.md'), []);
 });
 
-test('the glossary entry that names the old spelling in its _Avoid_ line is exempt', () => {
-  const entry = '**direct fix / gated change**:\nThe two maintenance severities.\n_Avoid_: "Tier 1 fix", "Tier 2 change"';
-  assert.deepEqual(findingsIn(entry, 'GLOSSARY.md'), []);
-  assert.equal(findingsIn(entry, 'docs/other.md').length, 1, 'the exemption is the glossary entry, not the words');
-});
-
-test('only the owning entry\'s _Avoid_ line is exempt — a neighbor or its definition is swept', () => {
-  const neighbor = '**sweep**:\nThe end-of-day read.\n_Avoid_: "Tier 1 fix"';
-  assert.equal(findingsIn(neighbor, 'GLOSSARY.md').length, 1);
+test('the definition beside an _Avoid_ line is swept', () => {
   const definition = '**ModelProvider**:\nOne agent loop, no Gemini lane.\n_Avoid_: "the provider loop"';
   assert.equal(findingsIn(definition, 'agents/uno-bot/README.md').length, 1);
 });
 
-test('history and generated artifacts are skipped by prefix', () => {
-  for (const p of ['docs/plans/', 'docs/adr/', 'todos/', 'agents/uno-bot/harness-bundle.md']) {
-    assert.ok(SKIP.includes(p), `${p} must be skipped`);
+test('plans, decision records, the archive and the generated bundle are the list\'s allowed places', () => {
+  const retirement = loadRetirement(REPO_ROOT);
+  for (const p of ['docs/plans/x.md', 'docs/adr/001-x.md', 'docs/knowledge/archive/x.md', 'todos/x.md', 'agents/uno-bot/harness-bundle.md', 'agents/uno-bot/src/x.ts']) {
+    assert.equal(retirement.allowed(p, 'spelling'), true, `${p} must be allowed`);
+    assert.deepEqual(findingsIn('the Tier 1 fix', p), [], p);
   }
 });
 
 test('every shape is anchored on a maintenance noun, so a bare "Tier 1" passes', () => {
   assert.deepEqual(findingsIn('Tier 1 is one file. Tier 2 is on demand.', 'docs/x.md'), []);
   assert.deepEqual(findingsIn('A lane is the blueprint\'s actor row.', 'docs/x.md'), []);
-  assert.ok(RETIRED.length >= 9);
 });
 
 test('the live repo carries no retired spelling', () => {
