@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -217,9 +218,9 @@ A paragraph placeholder promises lines of text; a block promises an image.
 An avatar placeholder is round; a square one misleads about what will load.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Skeleton shape="circle" /><Skeleton shape="text" width={160} /></div>}
+    doExample={<FigureRow><Skeleton shape="circle" /><Skeleton shape="text" width={160} /></FigureRow>}
     doCaption="Circle beside a text line."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Skeleton width={32} height={32} /><Skeleton shape="text" width={160} /></div>}
+    dontExample={<FigureRow><Skeleton width={32} height={32} /><Skeleton shape="text" width={160} /></FigureRow>}
     dontCaption="Rectangle beside a text line."
 />
 
@@ -233,9 +234,9 @@ reads as a broken page. Leave `isShimmering` at its default.
 A preset has the label's height and corners, so nothing moves when the value arrives.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Unit 3 review</span><Skeleton preset="status" /></div>}
+    doExample={<FigureRow><span>Unit 3 review</span><Skeleton preset="status" /></FigureRow>}
     doCaption="The status preset, the size of the Status tag it stands in for."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Unit 3 review</span><Skeleton /></div>}
+    dontExample={<FigureRow><span>Unit 3 review</span><Skeleton /></FigureRow>}
     dontCaption="A free rectangle at its default size, so the row jumps when the status arrives."
 />
 
@@ -245,9 +246,9 @@ The container owns the skeleton. Labels become the same text bars as the rest,
 so a loading table does not fill with dozens of label shapes.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Skeleton shape="text" width={120} /><Skeleton shape="text" width={64} /><Skeleton shape="text" width={64} /></div>}
+    doExample={<FigureRow><Skeleton shape="text" width={120} /><Skeleton shape="text" width={64} /><Skeleton shape="text" width={64} /></FigureRow>}
     doCaption="Text bars throughout the row."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Skeleton shape="text" width={120} /><Skeleton preset="status" /><Skeleton preset="tag-group" /></div>}
+    dontExample={<FigureRow><Skeleton shape="text" width={120} /><Skeleton preset="status" /><Skeleton preset="tag-group" /></FigureRow>}
     dontCaption="Label shapes inside a loading container."
 />
 

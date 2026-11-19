@@ -72,16 +72,7 @@ export const LabelStyle = {
             <Do caption="Body/default/medium on a button or tab label.">
                 <span><Button text="Save changes" appearance="primary" /></span>
             </Do>
-            <Dont caption="Regular or bold weight, or a heading style, on a button or tab label.">
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-md)' }}>
-                    <Button appearance="primary">
-                        <span style={{ font: 'var(--body-default)', fontWeight: 'var(--type-weight-regular)' }}>Save changes</span>
-                    </Button>
-                    <Button appearance="primary">
-                        <span style={{ font: 'var(--heading-sm)' }}>Save changes</span>
-                    </Button>
-                </div>
-            </Dont>
+            <Dont caption="Regular or bold weight, or a heading style, on a button or tab label."><RegularOrBoldDontFigure /></Dont>
         </DoDont>
     ),
     play: async ({ canvas }) => {
@@ -93,22 +84,8 @@ export const LabelStyle = {
 export const TruncateName = {
     render: () => (
         <DoDont>
-            <Do caption="One line with an ellipsis. The StatusTag keeps its place.">
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', maxWidth: 'var(--card-min-width-md)' }}>
-                    <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>
-                        Alexandria Montgomery-Hernandez, Lincoln Middle
-                    </span>
-                    <StatusTag appearance="success">Active</StatusTag>
-                </div>
-            </Do>
-            <Dont caption="The name wraps onto extra lines and makes the row taller than its neighbors.">
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', maxWidth: 'var(--card-min-width-md)' }}>
-                    <span style={{ flex: 1, minWidth: 0, font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>
-                        Alexandria Montgomery-Hernandez, Lincoln Middle
-                    </span>
-                    <StatusTag appearance="success">Active</StatusTag>
-                </div>
-            </Dont>
+            <Do caption="One line with an ellipsis; the StatusTag keeps its place."><OneLineWithDoFigure /></Do>
+            <Dont caption="The name wraps onto extra lines and makes the row taller than its neighbors."><TheNameWrapsDontFigure /></Dont>
         </DoDont>
     ),
     play: async ({ canvas }) => {
@@ -123,9 +100,7 @@ export const HeadingStyleOverBold = {
             <Do caption="Heading/small, tagged as the section's heading.">
                 <Heading as="h3" size="sm">Next session</Heading>
             </Do>
-            <Dont caption="Bold body text looks like a heading but carries no structure.">
-                <span style={{ font: 'var(--body-default)', fontWeight: 'var(--type-weight-semibold)' }}>Next session</span>
-            </Dont>
+            <Dont caption="Bold body text looks like a heading but carries no structure."><BoldBodyTextDontFigure /></Dont>
         </DoDont>
     ),
     play: async ({ canvas }) => {
@@ -138,29 +113,8 @@ export const HeadingStyleOverBold = {
 export const StepHeadingLevels = {
     render: () => (
         <DoDont>
-            <Do caption="h1, then h2, then h3.">
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 'var(--inline-md)' }}>
-                        <C>h1</C> <Heading as="span" size="lg">Tutor dashboard</Heading>
-                    </span>
-                    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 'var(--inline-md)' }}>
-                        <C>h2</C> <Heading as="span" size="md">Upcoming sessions</Heading>
-                    </span>
-                    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 'var(--inline-md)' }}>
-                        <C>h3</C> <Heading as="span" size="sm">Grade 6 math</Heading>
-                    </span>
-                </div>
-            </Do>
-            <Dont caption="An h3 straight after the h1 skips the h2.">
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-                    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 'var(--inline-md)' }}>
-                        <C>h1</C> <Heading as="span" size="lg">Tutor dashboard</Heading>
-                    </span>
-                    <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 'var(--inline-md)' }}>
-                        <C>h3</C> <Heading as="span" size="sm">Grade 6 math</Heading>
-                    </span>
-                </div>
-            </Dont>
+            <Do caption="h1, then h2, then h3."><H1ThenH2DoFigure /></Do>
+            <Dont caption="An h3 straight after the h1 skips the h2."><AnH3StraightDontFigure /></Dont>
         </DoDont>
     ),
     play: async ({ canvas }) => {
@@ -172,21 +126,99 @@ export const StepHeadingLevels = {
 export const MetricNumbers = {
     render: () => (
         <DoDont>
-            <Do caption="Metric/large for the figure.">
-                <div>
-                    <span style={{ font: 'var(--metric-lg)', fontVariantNumeric: 'tabular-nums', color: 'var(--ds-text)' }}>1,284</span>
-                    <div style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
-                </div>
-            </Do>
-            <Dont caption="Heading/medium for a number.">
-                <div>
-                    <Heading as="span" size="md">1,284</Heading>
-                    <div style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
-                </div>
-            </Dont>
+            <Do caption="Metric/large for the figure."><MetricLargeForDoFigure /></Do>
+            <Dont caption="Heading/medium for a number."><HeadingMediumForDontFigure /></Dont>
         </DoDont>
     ),
     play: async ({ canvas }) => {
         await expect(canvas.getAllByText('1,284')).toHaveLength(2);
     },
 };
+
+const RegularOrBoldDontFigure = () => (
+    <>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-md)' }}>
+            <Button appearance="primary">
+                <span style={{ font: 'var(--body-default)', fontWeight: 'var(--type-weight-regular)' }}>Save changes</span>
+            </Button>
+            <Button appearance="primary">
+                <span style={{ font: 'var(--heading-sm)' }}>Save changes</span>
+            </Button>
+        </div>
+    </>
+);
+
+const OneLineWithDoFigure = () => (
+    <>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', maxWidth: 'var(--card-min-width-md)' }}>
+            <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>
+                Alexandria Montgomery-Hernandez, Lincoln Middle
+            </span>
+            <StatusTag appearance="success">Active</StatusTag>
+        </div>
+    </>
+);
+
+const TheNameWrapsDontFigure = () => (
+    <>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', maxWidth: 'var(--card-min-width-md)' }}>
+            <span style={{ flex: 1, minWidth: 0, font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>
+                Alexandria Montgomery-Hernandez, Lincoln Middle
+            </span>
+            <StatusTag appearance="success">Active</StatusTag>
+        </div>
+    </>
+);
+
+const BoldBodyTextDontFigure = () => (
+    <>
+        <span style={{ font: 'var(--body-default)', fontWeight: 'var(--type-weight-semibold)' }}>Next session</span>
+    </>
+);
+
+const H1ThenH2DoFigure = () => (
+    <>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 'var(--inline-md)' }}>
+                <C>h1</C> <Heading as="span" size="lg">Tutor dashboard</Heading>
+            </span>
+            <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 'var(--inline-md)' }}>
+                <C>h2</C> <Heading as="span" size="md">Upcoming sessions</Heading>
+            </span>
+            <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 'var(--inline-md)' }}>
+                <C>h3</C> <Heading as="span" size="sm">Grade 6 math</Heading>
+            </span>
+        </div>
+    </>
+);
+
+const AnH3StraightDontFigure = () => (
+    <>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
+            <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 'var(--inline-md)' }}>
+                <C>h1</C> <Heading as="span" size="lg">Tutor dashboard</Heading>
+            </span>
+            <span style={{ display: 'inline-flex', alignItems: 'baseline', gap: 'var(--inline-md)' }}>
+                <C>h3</C> <Heading as="span" size="sm">Grade 6 math</Heading>
+            </span>
+        </div>
+    </>
+);
+
+const MetricLargeForDoFigure = () => (
+    <>
+        <div>
+            <span style={{ font: 'var(--metric-lg)', fontVariantNumeric: 'tabular-nums', color: 'var(--ds-text)' }}>1,284</span>
+            <div style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
+        </div>
+    </>
+);
+
+const HeadingMediumForDontFigure = () => (
+    <>
+        <div>
+            <Heading as="span" size="md">1,284</Heading>
+            <div style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
+        </div>
+    </>
+);

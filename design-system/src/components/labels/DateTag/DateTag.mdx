@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
@@ -171,9 +172,9 @@ The app derives `appearance` from the date and a due-soon window it defines.
 The app picks the appearance from the date and its due-soon window, never from taste. Danger means the date has passed; a far-off date stays neutral.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Overdue</span><DateTag appearance="danger">2 days overdue</DateTag></div>}
+    doExample={<FigureRow><span>Overdue</span><DateTag appearance="danger">2 days overdue</DateTag></FigureRow>}
     doCaption="Danger when it is overdue."
-    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Due later</span><DateTag appearance="danger">Due next month</DateTag></div>}
+    dontExample={<FigureRow><span>Due later</span><DateTag appearance="danger">Due next month</DateTag></FigureRow>}
     dontCaption="Danger on a date far in the future."
 />
 
@@ -182,9 +183,9 @@ The app picks the appearance from the date and its due-soon window, never from t
 Warning tells people the date is near, before it turns overdue.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Due tomorrow</span><DateTag appearance="warning">Due tomorrow</DateTag></div>}
+    doExample={<FigureRow><span>Due tomorrow</span><DateTag appearance="warning">Due tomorrow</DateTag></FigureRow>}
     doCaption="Warning when it is due soon."
-    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Due tomorrow</span><DateTag>Due tomorrow</DateTag></div>}
+    dontExample={<FigureRow><span>Due tomorrow</span><DateTag>Due tomorrow</DateTag></FigureRow>}
     dontCaption="Neutral hides that it is due soon."
 />
 
@@ -193,9 +194,9 @@ Warning tells people the date is near, before it turns overdue.
 A row carries one date; extra tags compete for attention.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Session</span><DateTag>Due Nov 12</DateTag></div>}
+    doExample={<FigureRow><span>Session</span><DateTag>Due Nov 12</DateTag></FigureRow>}
     doCaption="One date per row."
-    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Session</span><DateTag>Due Nov 12</DateTag><DateTag appearance="warning">Due tomorrow</DateTag><DateTag appearance="danger">2 days overdue</DateTag></div>}
+    dontExample={<FigureRow><span>Session</span><DateTag>Due Nov 12</DateTag><DateTag appearance="warning">Due tomorrow</DateTag><DateTag appearance="danger">2 days overdue</DateTag></FigureRow>}
     dontCaption="Several dates in one row."
 />
 

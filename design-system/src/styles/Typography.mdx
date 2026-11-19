@@ -110,7 +110,7 @@ Markup without its own stylesheet can use the generated utility classes (`.headi
 
 Headings step down one size per nesting level; containers use a fixed title size. Reserve `Heading/xxlarge` (32) and `Heading/xlarge` (28) for heroes, empty states and metric-heavy dashboards, never a page title. Use a heading style rather than bold text or a size change, because heading styles carry the structure assistive technology reads.
 
-<Canvas of={TypographyStories.HeadingLevels} sourceState="none" />
+<Canvas of={TypographyStories.HeadingLevels} />
 
 <RefTable
     head={['Level', 'Style']}
@@ -144,7 +144,7 @@ Don't: Regular or bold weight, or a heading style, on a button or tab label.
 
 `Code/default` (12/16, Noto Sans Mono) sets code samples, token names and property values. In CSS, `var(--code-default)` sets `0.875em` of the parent size so inline code scales with surrounding text.
 
-<Canvas of={TypographyStories.CodeStyle} sourceState="none" />
+<Canvas of={TypographyStories.CodeStyle} />
 
 </FoundationSection>
 
@@ -225,12 +225,8 @@ Don't: Heading/medium for a number.
 Noto Sans Mono is for code, token names, property values and machine IDs such as a session ID or a URL. Never use it for metrics, times or counts: mono digits are wide and read as a data dump. `Code/default` is 0.875em of its parent, and in a table it pairs with `Body/small`.
 
 <DoDont>
-<Do caption="Metric/large for the count, mono for the session ID.">
-<Sample font="--metric-lg">1,284</Sample><div style={{ font: 'var(--code-default)', color: 'var(--ds-text-subtle)' }}>ses_8f2a91c4</div>
-</Do>
-<Dont caption="Mono for the count.">
-<span style={{ font: 'var(--metric-lg)', fontFamily: 'var(--type-family-code)', color: 'var(--ds-text)' }}>1,284</span><div style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
-</Dont>
+<Do caption="Metric/large for the count, mono for the session ID."><MetricLargeForDoFigure /></Do>
+<Dont caption="Mono for the count."><MonoForTheDontFigure /></Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -256,3 +252,15 @@ Noto Sans Mono is for code, token names, property values and machine IDs such as
 />
 
 </FoundationSection>
+
+export const MetricLargeForDoFigure = () => (
+    <>
+    <Sample font="--metric-lg">1,284</Sample><div style={{ font: 'var(--code-default)', color: 'var(--ds-text-subtle)' }}>ses_8f2a91c4</div>
+    </>
+);
+
+export const MonoForTheDontFigure = () => (
+    <>
+    <span style={{ font: 'var(--metric-lg)', fontFamily: 'var(--type-family-code)', color: 'var(--ds-text)' }}>1,284</span><div style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>Sessions this month</div>
+    </>
+);

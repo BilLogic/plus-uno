@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureStack,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
@@ -179,16 +180,16 @@ Full screen gives long answers room. A docked Panel squeezes them.
 <DoDontPair
     doExample={<AiMessage text="Ava attended 12 of 14 sessions this term." />}
     doCaption="Each reply is an AI message, led by the AI icon."
-    dontExample={<p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>Ava attended 12 of 14 sessions this term.</p>}
+    dontExample={<AReplyInDontFigure />}
     dontCaption="A reply in plain text reads as a person's."
 />
 
 ### Say fallibility once.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}><AiMessage text="Ava attended 12 of 14 sessions." /><AiMessage text="Her next session is Thursday at 4:00 PM." /><PromptInput label="Message to AI chat (do example)" placeholder="Ask anything" /><p style={{ margin: 0, font: 'var(--body-sm)', color: 'var(--ds-text-subtle)', textAlign: 'center' }}>AI can make mistakes. Check important info.</p></div>}
+    doExample={<OneLineUnderDoFigure />}
     doCaption="One line, under the prompt input."
-    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}><AiMessage text="Ava attended 12 of 14 sessions." /><p style={{ margin: 0, font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>AI can make mistakes. Check important info.</p><AiMessage text="Her next session is Thursday at 4:00 PM." /><p style={{ margin: 0, font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>AI can make mistakes. Check important info.</p><PromptInput label="Message to AI chat (don't example)" placeholder="Ask anything" /></div>}
+    dontExample={<TheLineRepeatedDontFigure />}
     dontCaption="The line repeated under every reply turns into noise."
 />
 
@@ -251,3 +252,26 @@ Full screen gives long answers room. A docked Panel squeezes them.
 </DocsTab>
 
 </DocsTabs>
+
+export const AReplyInDontFigure = () => (
+    <p className="sb-ds-plain-reply">Ava attended 12 of 14 sessions this term.</p>
+);
+
+export const OneLineUnderDoFigure = () => (
+    <FigureStack gap="sm">
+        <AiMessage text="Ava attended 12 of 14 sessions." />
+        <AiMessage text="Her next session is Thursday at 4:00 PM." />
+        <PromptInput label="Message to AI chat (do example)" placeholder="Ask anything" />
+        <p className="plus-ai-chat__disclaimer">AI can make mistakes. Check important info.</p>
+    </FigureStack>
+);
+
+export const TheLineRepeatedDontFigure = () => (
+    <FigureStack gap="sm">
+        <AiMessage text="Ava attended 12 of 14 sessions." />
+        <p className="plus-ai-chat__disclaimer">AI can make mistakes. Check important info.</p>
+        <AiMessage text="Her next session is Thursday at 4:00 PM." />
+        <p className="plus-ai-chat__disclaimer">AI can make mistakes. Check important info.</p>
+        <PromptInput label="Message to AI chat (don't example)" placeholder="Ask anything" />
+    </FigureStack>
+);

@@ -248,41 +248,16 @@ const sample = {
 /** Accent colors belong to components; the words around them stay neutral. */
 export const AccentOnComponents = () => (
     <DoDont>
-        <Do caption={<>Body text in <C>--ds-text</C> and <C>--ds-text-subtle</C>. The brand color marks the button and the link only.</>}>
-            <div style={sample}>
-                <span style={{ font: 'var(--body-default)', color: 'var(--ds-text)' }}>Your next session starts in 10 minutes.</span>
-                <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>Maya joined the waiting room.</span>
-                <span><Button text="Join session" appearance="primary" /></span>
-            </div>
-        </Do>
-        <Dont caption="Running text in the brand color. Nothing reads as the action any more, and links look like plain text.">
-            <div style={sample}>
-                <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-brand)' }}>Your next session starts in 10 minutes.</span>
-                <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-brand)' }}>Maya joined the waiting room.</span>
-                <span><Button text="Join session" appearance="primary" /></span>
-            </div>
-        </Dont>
+        <Do caption={<>Body text in <C>--ds-text</C> and <C>--ds-text-subtle</C>; the brand color marks the button and the link only.</>}><BodyTextInDoFigure /></Do>
+        <Dont caption="Running text in the brand color; nothing reads as the action any more, and links look like plain text."><RunningTextInDontFigure /></Dont>
     </DoDont>
 );
 
 /** Words take the role's text token, never its fill. */
 export const TextTokenForWords = () => (
     <DoDont>
-        <Do caption={<>A warning written in <C>--ds-text-warning</C> on <C>--ds-background-warning</C>.</>}>
-            <div style={{ ...sample, boxShadow: 'none', background: 'var(--ds-background-warning)' }}>
-                <span style={{ display: 'inline-flex', gap: 'var(--inline-md)', alignItems: 'center', font: 'var(--body-default)', color: 'var(--ds-text-warning)' }}>
-                    <i className={iconClass('triangle-exclamation')} aria-hidden="true" style={{ color: 'var(--ds-icon-warning)', fontSize: 'var(--icon-md)' }} />
-                    Two reflections are due today.
-                </span>
-            </div>
-        </Do>
-        <Dont caption={<>The same words in the bold warning fill, <C>--ds-background-warning-bold</C>. A fill is a ground, and as text it falls well under 4.5:1.</>}>
-            <div style={sample}>
-                <span aria-hidden="true" style={{ font: 'var(--body-default)', color: 'var(--ds-background-warning-bold)' }}>
-                    Two reflections are due today.
-                </span>
-            </div>
-        </Dont>
+        <Do caption={<>A warning written in <C>--ds-text-warning</C> on <C>--ds-background-warning</C>.</>}><AWarningWrittenDoFigure /></Do>
+        <Dont caption={<>The same words in the bold warning fill, <C>--ds-background-warning-bold</C>; a fill is a ground, and as text it falls well under 4.5:1.</>}><TheSameWordsDontFigure /></Dont>
     </DoDont>
 );
 
@@ -292,16 +267,8 @@ TextTokenForWords.parameters = { a11y: { config: { rules: [{ id: 'color-contrast
 /** Focus is a ring in `--ds-border-focused`, never a fill. */
 export const FocusIsARing = () => (
     <DoDont>
-        <Do caption={<>A 2px ring in <C>--ds-border-focused</C>, 2px outside the field. The fill stays as it was.</>}>
-            <div style={{ outline: 'var(--border-width-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--border-width-focused)', borderRadius: 'var(--radius-control-md)' }}>
-                <TextField id="color-focus-do" label="Student name" isLabelHidden placeholder="Search students" />
-            </div>
-        </Do>
-        <Dont caption="Focus shown by tinting the field. A fill reads as selected or hovered, and keyboard users lose their place.">
-            <div style={{ borderRadius: 'var(--radius-control-md)', background: 'var(--ds-background-selected)' }}>
-                <TextField id="color-focus-dont" label="Student name" isLabelHidden placeholder="Search students" />
-            </div>
-        </Dont>
+        <Do caption={<>A 2px ring in <C>--ds-border-focused</C>, 2px outside the field; the fill stays as it was.</>}><A2pxRingDoFigure /></Do>
+        <Dont caption="Focus shown by tinting the field; a fill reads as selected or hovered, and keyboard users lose their place."><FocusShownByDontFigure /></Dont>
     </DoDont>
 );
 
@@ -596,3 +563,60 @@ FromToolbar.play = async () => {
         });
     });
 };
+
+const BodyTextInDoFigure = () => (
+    <>
+        <div style={sample}>
+            <span style={{ font: 'var(--body-default)', color: 'var(--ds-text)' }}>Your next session starts in 10 minutes.</span>
+            <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>Maya joined the waiting room.</span>
+            <span><Button text="Join session" appearance="primary" /></span>
+        </div>
+    </>
+);
+
+const RunningTextInDontFigure = () => (
+    <>
+        <div style={sample}>
+            <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-brand)' }}>Your next session starts in 10 minutes.</span>
+            <span style={{ font: 'var(--body-sm)', color: 'var(--ds-text-brand)' }}>Maya joined the waiting room.</span>
+            <span><Button text="Join session" appearance="primary" /></span>
+        </div>
+    </>
+);
+
+const AWarningWrittenDoFigure = () => (
+    <>
+        <div style={{ ...sample, boxShadow: 'none', background: 'var(--ds-background-warning)' }}>
+            <span style={{ display: 'inline-flex', gap: 'var(--inline-md)', alignItems: 'center', font: 'var(--body-default)', color: 'var(--ds-text-warning)' }}>
+                <i className={iconClass('triangle-exclamation')} aria-hidden="true" style={{ color: 'var(--ds-icon-warning)', fontSize: 'var(--icon-md)' }} />
+                Two reflections are due today.
+            </span>
+        </div>
+    </>
+);
+
+const TheSameWordsDontFigure = () => (
+    <>
+        <div style={sample}>
+            <span aria-hidden="true" style={{ font: 'var(--body-default)', color: 'var(--ds-background-warning-bold)' }}>
+                Two reflections are due today.
+            </span>
+        </div>
+    </>
+);
+
+const A2pxRingDoFigure = () => (
+    <>
+        <div style={{ outline: 'var(--border-width-focused) solid var(--ds-border-focused)', outlineOffset: 'var(--border-width-focused)', borderRadius: 'var(--radius-control-md)' }}>
+            <TextField id="color-focus-do" label="Student name" isLabelHidden placeholder="Search students" />
+        </div>
+    </>
+);
+
+const FocusShownByDontFigure = () => (
+    <>
+        <div style={{ borderRadius: 'var(--radius-control-md)', background: 'var(--ds-background-selected)' }}>
+            <TextField id="color-focus-dont" label="Student name" isLabelHidden placeholder="Search students" />
+        </div>
+    </>
+);

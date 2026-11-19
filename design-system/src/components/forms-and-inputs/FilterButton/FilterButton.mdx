@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -159,9 +160,9 @@ Use `FilterButton` for a control in a view bar that opens a filter's options or 
 Leave a gap so neighboring filter buttons read as separate targets.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><FilterButton text="Subject" /><FilterButton text="Grade" /><FilterButton text="Status" /></div>}
+    doExample={<FigureRow><FilterButton text="Subject" /><FilterButton text="Grade" /><FilterButton text="Status" /></FigureRow>}
     doCaption="A clear gap between filter buttons."
-    dontExample={<div style={{ display: 'flex', gap: 0 }}><FilterButton text="Subject" /><FilterButton text="Grade" /><FilterButton text="Status" /></div>}
+    dontExample={<FigureRow gap="none"><FilterButton text="Subject" /><FilterButton text="Grade" /><FilterButton text="Status" /></FigureRow>}
     dontCaption="Filter buttons touching."
 />
 
@@ -173,9 +174,9 @@ it out when none is: `0` renders as a visible count of zero, not an empty
 state.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><FilterButton text="Subject" trailingMetric={3} /><FilterButton text="Grade" /></div>}
+    doExample={<FigureRow><FilterButton text="Subject" trailingMetric={3} /><FilterButton text="Grade" /></FigureRow>}
     doCaption="Subject shows its three applied values; Grade, with none, shows no count."
-    dontExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><FilterButton text="Subject" /><FilterButton text="Grade" /></div>}
+    dontExample={<FigureRow><FilterButton text="Subject" /><FilterButton text="Grade" /></FigureRow>}
     dontCaption="Subject has three values applied but shows no count."
 />
 

@@ -93,29 +93,8 @@ export const FocusRingShowcase = {
 export const FocusRingDoDont = {
     render: () => (
         <DoDont>
-            <Do caption="The field keeps its fill and gains the ring.">
-                <div style={fieldStackStyle}>
-                    <span aria-hidden="true" style={labelStyle}>Session</span>
-                    <RingDemo style={{ borderRadius: 'var(--radius-control-lg)', width: '100%' }}>
-                        <TextField id="border-ring-do" label="Session" isLabelHidden defaultValue="Lincoln Middle Thursday" />
-                    </RingDemo>
-                </div>
-            </Do>
-            <Dont caption="A filled field reads as selected and hides what is typed.">
-                <div style={fieldStackStyle}>
-                    <span aria-hidden="true" style={labelStyle}>Session</span>
-                    <div
-                        style={{
-                            width: '100%',
-                            '--ds-background-input': 'var(--ds-background-brand-bold)',
-                            '--ds-border-input': 'var(--ds-border-brand)',
-                            '--ds-text': 'var(--ds-text-inverse)',
-                        }}
-                    >
-                        <TextField id="border-ring-dont" label="Session" isLabelHidden defaultValue="Lincoln Middle Thursday" />
-                    </div>
-                </div>
-            </Dont>
+            <Do caption="The field keeps its fill and gains the ring."><TheFieldKeepsDoFigure /></Do>
+            <Dont caption="A filled field reads as selected and hides what is typed."><AFilledFieldDontFigure /></Dont>
         </DoDont>
     ),
     play: async ({ canvas }) => {
@@ -186,28 +165,7 @@ export const SidebarEdges = {
                     </Page>
                 </InAppFrame>
             </Do>
-            <Dont caption="A line under the page header adds a second edge the Frame does not use.">
-                <InAppFrame
-                    height="var(--height-2000)"
-                    panelStorageKey={null}
-                    contentAs="div"
-                    header={(
-                        <div
-                            style={{
-                                flex: 1,
-                                borderBlockEnd: 'var(--border-width-default) solid var(--ds-border)',
-                                paddingBlockEnd: 'var(--stack-sm)',
-                            }}
-                        >
-                            <Breadcrumb items={[{ text: 'Home', href: '#home' }, { text: 'Sessions' }]} label="Example breadcrumb" />
-                        </div>
-                    )}
-                >
-                    <Page>
-                        <Section title="Upcoming sessions" />
-                    </Page>
-                </InAppFrame>
-            </Dont>
+            <Dont caption="A line under the page header adds a second edge the Frame does not use."><ALineUnderDontFigure /></Dont>
         </DoDont>
     ),
     play: async ({ canvas }) => {
@@ -229,22 +187,7 @@ export const WholeSelectionOutline = {
                     defaultChecked
                 />
             </Do>
-            <Dont caption="A colored stripe on one edge marks nothing the system recognizes. Use the full outline, a fill or an icon.">
-                <Radio
-                    appearance="tile"
-                    name="border-whole-dont"
-                    value="lincoln"
-                    label="Lincoln Middle"
-                    description="Tuesdays, 4:30 PM"
-                    defaultChecked
-                    style={{
-                        borderWidth: 'var(--border-width-default)',
-                        borderColor: 'var(--ds-border)',
-                        borderInlineStartWidth: 'var(--border-width-selected)',
-                        borderInlineStartColor: 'var(--ds-border-selected)',
-                    }}
-                />
-            </Dont>
+            <Dont caption="A colored stripe on one edge marks nothing the system recognizes; use the full outline, a fill or an icon."><AColoredStripeDontFigure /></Dont>
         </DoDont>
     ),
     play: async ({ canvas }) => {
@@ -268,19 +211,7 @@ export const SelectedWidthOnlyForSelection = {
                     description="Tuesdays, 4:30 PM"
                 />
             </Do>
-            <Dont caption="The 2 px width on a resting row reads as selected, so users cannot tell what is chosen.">
-                <Radio
-                    appearance="tile"
-                    name="border-rest-dont"
-                    value="lincoln"
-                    label="Lincoln Middle"
-                    description="Tuesdays, 4:30 PM"
-                    style={{
-                        borderWidth: 'var(--border-width-selected)',
-                        borderColor: 'var(--ds-border-selected)',
-                    }}
-                />
-            </Dont>
+            <Dont caption="The 2 px width on a resting row reads as selected, so users cannot tell what is chosen."><The2PxDontFigure /></Dont>
         </DoDont>
     ),
     play: async ({ canvas }) => {
@@ -290,3 +221,92 @@ export const SelectedWidthOnlyForSelection = {
         await expect(radios[1]).not.toBeChecked();
     },
 };
+
+const TheFieldKeepsDoFigure = () => (
+    <>
+        <div style={fieldStackStyle}>
+            <span aria-hidden="true" style={labelStyle}>Session</span>
+            <RingDemo style={{ borderRadius: 'var(--radius-control-lg)', width: '100%' }}>
+                <TextField id="border-ring-do" label="Session" isLabelHidden defaultValue="Lincoln Middle Thursday" />
+            </RingDemo>
+        </div>
+    </>
+);
+
+const AFilledFieldDontFigure = () => (
+    <>
+        <div style={fieldStackStyle}>
+            <span aria-hidden="true" style={labelStyle}>Session</span>
+            <div
+                style={{
+                    width: '100%',
+                    '--ds-background-input': 'var(--ds-background-brand-bold)',
+                    '--ds-border-input': 'var(--ds-border-brand)',
+                    '--ds-text': 'var(--ds-text-inverse)',
+                }}
+            >
+                <TextField id="border-ring-dont" label="Session" isLabelHidden defaultValue="Lincoln Middle Thursday" />
+            </div>
+        </div>
+    </>
+);
+
+const ALineUnderDontFigure = () => (
+    <>
+        <InAppFrame
+            height="var(--height-2000)"
+            panelStorageKey={null}
+            contentAs="div"
+            header={(
+                <div
+                    style={{
+                        flex: 1,
+                        borderBlockEnd: 'var(--border-width-default) solid var(--ds-border)',
+                        paddingBlockEnd: 'var(--stack-sm)',
+                    }}
+                >
+                    <Breadcrumb items={[{ text: 'Home', href: '#home' }, { text: 'Sessions' }]} label="Example breadcrumb" />
+                </div>
+            )}
+        >
+            <Page>
+                <Section title="Upcoming sessions" />
+            </Page>
+        </InAppFrame>
+    </>
+);
+
+const AColoredStripeDontFigure = () => (
+    <>
+        <Radio
+            appearance="tile"
+            name="border-whole-dont"
+            value="lincoln"
+            label="Lincoln Middle"
+            description="Tuesdays, 4:30 PM"
+            defaultChecked
+            style={{
+                borderWidth: 'var(--border-width-default)',
+                borderColor: 'var(--ds-border)',
+                borderInlineStartWidth: 'var(--border-width-selected)',
+                borderInlineStartColor: 'var(--ds-border-selected)',
+            }}
+        />
+    </>
+);
+
+const The2PxDontFigure = () => (
+    <>
+        <Radio
+            appearance="tile"
+            name="border-rest-dont"
+            value="lincoln"
+            label="Lincoln Middle"
+            description="Tuesdays, 4:30 PM"
+            style={{
+                borderWidth: 'var(--border-width-selected)',
+                borderColor: 'var(--ds-border-selected)',
+            }}
+        />
+    </>
+);

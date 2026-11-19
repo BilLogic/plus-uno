@@ -115,22 +115,22 @@ The `Radius` group names a step by size; `Radius / Control` names it by control 
 ### Round an inner corner smaller than its parent
 
 Do: Rows inset 4 in a 12 Popup take 8, so the gap between the curves stays even.
-Don't: Rows at the Popup's own 12. Their corners bulge toward its edge, and the inset looks uneven.
+Don't: Rows at the Popup's own 12; their corners bulge toward its edge, and the inset looks uneven.
 
 ### Keep a component's own radius
 
 Do: Both buttons keep the button radius, 6.
-Don't: One button overridden to a pill. One component now has two shapes.
+Don't: One button overridden to a pill; one component now has two shapes.
 
 ### Stay on the scale
 
 Do: The Card at 16 and the tag at 4, both steps on the scale.
-Don't: A Card at 14 and a tag at 5. Off-scale values drift from every neighbor.
+Don't: A Card at 14 and a tag at 5; off-scale values drift from every neighbor.
 
 ### Round a tight group at 4
 
-Do: Tiles 2 apart at 4. The gaps stay straight.
-Don't: The same tiles at 12. Every gap pinches where the curves meet.
+Do: Tiles 2 apart at 4; the gaps stay straight.
+Don't: The same tiles at 12; every gap pinches where the curves meet.
 
 ### Close with an Icon button
 
@@ -143,6 +143,6 @@ Don't: A hand-built circle. Its corner, its states and its focus ring are all gu
 ### Read a token, never a px value
 
 Do: The token follows the rules when a value moves.
-Don't: A literal is right today and wrong after the next change. The radius lint fails it.
+Don't: A literal radius is right today and wrong after the next change, and the radius lint fails it.
 
 ## Related

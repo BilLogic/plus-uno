@@ -63,7 +63,7 @@ Don't: Warning typed into the text: the glyph is missing and it reads twice.
 A link is inline text. When the action stands alone, such as Save or Continue, it is a button, not a link.
 
 Do: The link sits on the words that name the destination.
-Don't: A standalone action dressed as a link. Use a button.
+Don't: A standalone action dressed as a link; use a button.
 
 ## Accessibility
 

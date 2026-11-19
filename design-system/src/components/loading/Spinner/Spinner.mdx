@@ -8,6 +8,8 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureGround,
+    FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -184,9 +186,9 @@ about 300 ms, show nothing so the indicator does not flicker.
 A small control takes the `size={16}` spinner; `size={48}` dwarfs the label it replaces.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Spinner size={16} /><span>Saving notes</span></div>}
+    doExample={<FigureRow><Spinner size={16} /><span>Saving notes</span></FigureRow>}
     doCaption="Small spinner in a compact row."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Spinner size={48} /><span>Saving notes</span></div>}
+    dontExample={<FigureRow><Spinner size={48} /><span>Saving notes</span></FigureRow>}
     dontCaption="Large spinner in a compact row."
 />
 
@@ -196,9 +198,9 @@ Inherit takes the text color around it; on a dark ground use invert so it
 stays visible. There is no color prop: a spinner is not a status color.
 
 <DoDontPair
-    doExample={<div style={{ display: 'inline-flex', padding: 'var(--pad-y-lg) var(--pad-x-md)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--ds-background-neutral-bold)' }}><Spinner appearance="invert" /></div>}
+    doExample={<FigureGround ground="neutral"><Spinner appearance="invert" /></FigureGround>}
     doCaption="Invert on a dark surface."
-    dontExample={<div style={{ display: 'inline-flex', padding: 'var(--pad-y-lg) var(--pad-x-md)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--ds-background-neutral-bold)' }}><Spinner /></div>}
+    dontExample={<FigureGround ground="neutral"><Spinner /></FigureGround>}
     dontCaption="Inherit on a dark surface."
 />
 
@@ -207,9 +209,9 @@ stays visible. There is no color prop: a spinner is not a status color.
 Several spinners on one view compete for attention; show one for the whole load.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Spinner /></div>}
+    doExample={<FigureRow><Spinner /></FigureRow>}
     doCaption="A single spinner."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Spinner /><Spinner /><Spinner /></div>}
+    dontExample={<FigureRow><Spinner /><Spinner /><Spinner /></FigureRow>}
     dontCaption="A spinner on every block."
 />
 
@@ -218,7 +220,7 @@ Several spinners on one view compete for attention; show one for the whole load.
 <DoDontPair
     doExample={<Button appearance="primary" text="Save notes" isLoading />}
     doCaption="isLoading puts the spinner inside the button and blocks it."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Button appearance="primary" text="Save notes" /><Spinner size={16} /></div>}
+    dontExample={<FigureRow><Button appearance="primary" text="Save notes" /><Spinner size={16} /></FigureRow>}
     dontCaption="A loose spinner beside a button that can still be pressed."
 />
 

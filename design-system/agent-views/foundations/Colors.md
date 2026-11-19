@@ -167,14 +167,14 @@ Sort categories from most to least (an ordinal set such as grades takes one hue 
 Students by grade in the tutoring cohort.
 
 Do: Biggest at the top, darkest tone on the biggest value.
-Don't: Grades in any order, one tone. The eye has to read every number to find the biggest.
+Don't: Grades in any order, one tone; the eye has to read every number to find the biggest.
 
 ### Mark the target with a tick and the range with an outline
 
 Attendance for one class against a 90% target.
 
 Do: A green tick at 90 and a green outline on the track.
-Don't: A shaded band and a value beside the bar. The band hides the bar's own end and the text repeats the tooltip.
+Don't: A shaded band and a value beside the bar; the band hides the bar's own end and the text repeats the tooltip.
 
 ## Disabled
 
@@ -185,7 +185,7 @@ Disabled is a dedicated color token (`color/text/disabled`, `color/background/di
 The Reschedule button after the session has ended.
 
 Do: Disabled takes color/text/disabled on color/background/disabled.
-Don't: Opacity on the primary button. It still looks clickable and the gray is not the system one.
+Don't: Opacity on the primary button; it still looks clickable and the gray is not the system one.
 
 ## Links
 
@@ -222,7 +222,7 @@ Don't: A purple accent where the color has semantic meaning.
 Take the text color from the same role as the ground. Gray text on a bold ground falls well below 4.5:1 in both modes.
 
 Do: Danger text on the subtle danger ground.
-Don't: Gray text on the bold danger ground. The role is right and the pair is wrong.
+Don't: Gray text on the bold danger ground; the role is right and the pair is wrong.
 
 ### Use inverse tokens on bold backgrounds
 
@@ -236,7 +236,7 @@ Don't: color/text/default on a bold fill loses contrast.
 A filled field looks selected or disabled. The focus ring is the one signal for keyboard focus.
 
 Do: The field keeps its fill and gains the focus ring, color/border/focused.
-Don't: A brand fill on the field to show focus. It reads as a selected value and hides what is typed.
+Don't: A brand fill on the field to show focus; it reads as a selected value and hides what is typed.
 
 ### Keep selected and focused distinct
 
@@ -250,7 +250,7 @@ Don't: The focus ring used to mean selected.
 A single series is drawn in the brand chart color. Reaching for the categorical set makes a legend that says nothing.
 
 Do: Five weeks of one measure, all in color/chart/brand.
-Don't: A rainbow on one measure suggests five series. The color does no job, and a reader looks for a legend that is not there.
+Don't: A rainbow on one measure suggests five series; the color does no job, and a reader looks for a legend that is not there.
 
 ## Accessibility
 

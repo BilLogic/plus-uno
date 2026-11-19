@@ -8,6 +8,8 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureGround,
+    FigureStack,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -208,9 +210,9 @@ no measurable end. `isIndeterminate` drops `value` and the value attributes.
 The default track disappears on a bold ground; inverse keeps the bar readable.
 
 <DoDontPair
-    doExample={<div style={{ padding: 'var(--pad-y-lg) var(--pad-x-md)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--ds-background-brand-bold)' }}><ProgressBar value={60} appearance="inverse" ariaLabel="Upload" /></div>}
+    doExample={<FigureGround ground="brand"><ProgressBar value={60} appearance="inverse" ariaLabel="Upload" /></FigureGround>}
     doCaption="Inverse appearance on a bold surface."
-    dontExample={<div style={{ padding: 'var(--pad-y-lg) var(--pad-x-md)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--ds-background-brand-bold)' }}><ProgressBar value={60} ariaLabel="Upload" /></div>}
+    dontExample={<FigureGround ground="brand"><ProgressBar value={60} ariaLabel="Upload" /></FigureGround>}
     dontCaption="Default appearance on a bold surface."
 />
 
@@ -219,9 +221,9 @@ The default track disappears on a bold ground; inverse keeps the bar readable.
 Stacked bars for one task read as separate jobs; show a single bar for the whole.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><ProgressBar value={30} ariaLabel="Upload" /></div>}
+    doExample={<FigureStack><ProgressBar value={30} ariaLabel="Upload" /></FigureStack>}
     doCaption="A single bar."
-    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><ProgressBar value={30} ariaLabel="Upload, part 1" /><ProgressBar value={30} ariaLabel="Upload, part 2" /><ProgressBar value={30} ariaLabel="Upload, part 3" /></div>}
+    dontExample={<FigureStack><ProgressBar value={30} ariaLabel="Upload, part 1" /><ProgressBar value={30} ariaLabel="Upload, part 2" /><ProgressBar value={30} ariaLabel="Upload, part 3" /></FigureStack>}
     dontCaption="Three bars for one task."
 />
 
@@ -230,9 +232,9 @@ Stacked bars for one task read as separate jobs; show a single bar for the whole
 The bar (`--progress-bar-height`) carries no visible text of its own.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}><ProgressBar value={68} ariaLabel="68% of goals met" /><span>68% of goals met</span></div>}
+    doExample={<FigureStack gap="sm"><ProgressBar value={68} ariaLabel="68% of goals met" /><span>68% of goals met</span></FigureStack>}
     doCaption="A caption beside the bar says what the fill means."
-    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}><ProgressBar value={68} ariaLabel="68% of goals met" /></div>}
+    dontExample={<FigureStack gap="sm"><ProgressBar value={68} ariaLabel="68% of goals met" /></FigureStack>}
     dontCaption="A bare bar leaves the reader to guess the number."
 />
 

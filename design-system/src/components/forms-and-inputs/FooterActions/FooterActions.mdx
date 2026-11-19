@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
@@ -201,7 +202,7 @@ Only the rightmost filled button carries the `primary` (or `danger`) appearance;
 
 <DoDontPair
     doExample={
-        <div style={{ inlineSize: '100%' }}>
+        <div>
             <FooterActions>
                 <Button text="Discard" />
                 <Button text="Save" appearance="primary" />
@@ -210,7 +211,7 @@ Only the rightmost filled button carries the `primary` (or `danger`) appearance;
     }
     doCaption="Secondary on the left, primary on the right."
     dontExample={
-        <div style={{ inlineSize: '100%' }}>
+        <div>
             <FooterActions>
                 <Button text="Save" appearance="primary" />
                 <Button text="Discard" appearance="primary" />
@@ -226,7 +227,7 @@ A `subtle`, `link` or `danger` button hugs the left edge only when it is the fir
 
 <DoDontPair
     doExample={
-        <div style={{ inlineSize: '100%' }}>
+        <div>
             <FooterActions>
                 <Button appearance="subtle" text="Not now" />
                 <Button text="Keep draft" />
@@ -236,7 +237,7 @@ A `subtle`, `link` or `danger` button hugs the left edge only when it is the fir
     }
     doCaption="A subtle first child hugs the left edge while the filled pair sits in the rightmost two tracks."
     dontExample={
-        <div style={{ inlineSize: '100%' }}>
+        <div>
             <FooterActions>
                 <Button text="Keep draft" />
                 <Button appearance="subtle" text="Not now" />
@@ -253,7 +254,7 @@ Put the safer alternative in the left half and the `danger` action rightmost; a 
 
 <DoDontPair
     doExample={
-        <div style={{ inlineSize: '100%' }}>
+        <div>
             <FooterActions>
                 <Button text="Archive instead" />
                 <Button appearance="danger" text="Delete session" />
@@ -262,7 +263,7 @@ Put the safer alternative in the left half and the `danger` action rightmost; a 
     }
     doCaption="Safer alternative on the left and danger rightmost, splitting equally across both halves."
     dontExample={
-        <div style={{ inlineSize: '100%' }}>
+        <div>
             <FooterActions>
                 <Button appearance="danger" text="Delete session" />
                 <Button text="Archive instead" />
@@ -278,7 +279,7 @@ Put the safer alternative in the left half and the `danger` action rightmost; a 
 
 <DoDontPair
     doExample={
-        <div style={{ inlineSize: '100%' }}>
+        <div>
             <FooterActions>
                 <Button text="Discard" />
                 <Button appearance="primary" text="Save changes" />
@@ -287,10 +288,10 @@ Put the safer alternative in the left half and the `danger` action rightmost; a 
     }
     doCaption="Real verbs split equally across both halves of the footer."
     dontExample={
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--inline-md)', inlineSize: '100%' }}>
+        <FigureRow justify="end">
             <Button text="Cancel" />
             <Button appearance="primary" text="Save changes" />
-        </div>
+        </FigureRow>
     }
     dontCaption="Default-height hugging buttons and a Cancel label that duplicates the corner close button."
 />
@@ -301,7 +302,7 @@ Keep `Back` in the `default` appearance so the step pair splits `50/50` across b
 
 <DoDontPair
     doExample={
-        <div style={{ inlineSize: '100%' }}>
+        <div>
             <FooterActions>
                 <Button text="Back" />
                 <Button text="Next" appearance="primary" />
@@ -310,7 +311,7 @@ Keep `Back` in the `default` appearance so the step pair splits `50/50` across b
     }
     doCaption="Back in the left half and Next in the right half, splitting the footer equally."
     dontExample={
-        <div style={{ inlineSize: '100%' }}>
+        <div>
             <FooterActions>
                 <Button appearance="subtle" text="Back" />
                 <Button text="Next" appearance="primary" />

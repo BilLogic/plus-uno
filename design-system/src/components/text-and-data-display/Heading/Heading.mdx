@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureGround,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
@@ -201,9 +202,9 @@ sits. Pass `size` for the look; reach for `as` only to break that link on purpos
 ### Let the ground set the ink.
 
 <DoDontPair
-    doExample={<div style={{ background: 'var(--ds-text)', padding: 'var(--pad-x-md)' }}><Heading as="div" size="xl" color="color.text.inverse">On a dark ground</Heading></div>}
+    doExample={<FigureGround ground="inverse"><Heading as="div" size="xl" color="color.text.inverse">On a dark ground</Heading></FigureGround>}
     doCaption="The inverse color on a dark ground."
-    dontExample={<div style={{ background: 'var(--ds-text)', padding: 'var(--pad-x-md)' }}><Heading as="div" size="xl">On a dark ground</Heading></div>}
+    dontExample={<FigureGround ground="inverse"><Heading as="div" size="xl">On a dark ground</Heading></FigureGround>}
     dontCaption="The default ink on a dark ground, which barely reads."
 />
 

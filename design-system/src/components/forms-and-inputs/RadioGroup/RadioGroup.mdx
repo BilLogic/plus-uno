@@ -3,7 +3,14 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import { CheckboxGroup, RadioGroup, Illustration } from '@/components';
 import * as RadioGroupStories from './RadioGroup.stories.jsx';
-import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    FigureStack,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const figmaMeta = {
@@ -219,7 +226,7 @@ In a flow of choice questions (onboarding, quizzes, check-ins, surveys), pick on
 
 <DoDontPair
     doExample={
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
+        <FigureStack gap="lg">
             <RadioGroup
                 name="do-rg-minority-1"
                 legend="Session format"
@@ -250,11 +257,11 @@ In a flow of choice questions (onboarding, quizzes, check-ins, surveys), pick on
                     { value: 'reading', label: 'Reading' },
                 ]}
             />
-        </div>
+        </FigureStack>
     }
     doCaption="Two single-select questions use soft rows without radio indicators; the one multi-select question keeps its visible checkboxes."
     dontExample={
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
+        <FigureStack gap="lg">
             <RadioGroup
                 name="dont-rg-minority-1"
                 legend="Session format"
@@ -285,7 +292,7 @@ In a flow of choice questions (onboarding, quizzes, check-ins, surveys), pick on
                     { value: 'reading', label: 'Reading' },
                 ]}
             />
-        </div>
+        </FigureStack>
     }
     dontCaption="The two majority single-select questions keep their radio indicators while the minority multi-select question goes soft without checkboxes."
 />

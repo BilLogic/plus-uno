@@ -58,7 +58,7 @@ Category charts sort items from most to least by default through <C>mostToLeast<
 
 Bars and columns round only the value end so the baseline stays flat and length comparisons stay accurate. Pies, donuts and areas take no radius. Point markers and bubbles size off the primitive `--size-*` scale rather than padding or control-height tokens.
 
-<Canvas of={FoundationsStories.BarRadius} sourceState="none" />
+<Canvas of={FoundationsStories.BarRadius} />
 
 <RefTable
     head={['Role', 'Token']}
@@ -110,7 +110,7 @@ Every text slot in a chart — title, subtitle, caption, axis labels and titles,
 
 Interactive states are declared once in the shared theme so every chart responds the same way ([Color](?path=/docs/foundations-visual-color--docs) and [Motion](#foundation-motion)). Hovering a mark shifts its fill to that mark's <C>-hovered</C> chart token while the other series fade to <C>--ds-opacity-disabled</C>. Selecting a mark paints <C>--ds-background-selected</C> with a 1px <C>--ds-border-selected</C> outline, never a brand fill.
 
-<Canvas of={FoundationsStories.States} sourceState="none" />
+<Canvas of={FoundationsStories.States} />
 
 <RefTable
     head={['State', 'Token / rule']}
@@ -127,7 +127,7 @@ Interactive states are declared once in the shared theme so every chart responds
 
 Charts grow to their value on the default spatial spring (<C>spatial.default</C>), and hover or inactive [state](#foundation-states) changes fade on <C>appearance.fast</C> ([Physics](?path=/docs/foundations-expression-motion-physics--docs) and [Choreography](?path=/docs/foundations-expression-motion-choreography--docs)). Under reduced motion, every entrance becomes the <C>appearance.fast</C> fade. Charts in one area arrive 20 ms apart within half a second, and nothing replays on redraw, resize or data update after the first render.
 
-<Canvas of={FoundationsStories.Motion} sourceState="none" />
+<Canvas of={FoundationsStories.Motion} />
 
 <RefTable
     head={['Role', 'Spring / rule']}

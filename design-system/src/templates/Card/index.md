@@ -70,20 +70,20 @@ Card reads these motion tokens and no literal duration or curve.
 
 Visible empty space inside the card means size down. A clipped or crowded body means size up.
 
-Do: One number fits sm. The card is only as wide as it needs, so a row of them stays tidy.
-Don't: The same number in lg leaves most of the card empty. Size down instead of filling the space.
+Do: One number fits sm; the card is only as wide as it needs, so a row of them stays tidy.
+Don't: The same number in lg leaves most of the card empty; size down instead of filling the space.
 
 ### Never put a card inside a card. {#never-put-a-card-inside-a-card}
 
 A card's fill and edge are its own object boundary. Group related cards in a Section instead.
 
 Do: One card; three metrics stacked in its body, split by dividers.
-Don't: Three mini cards inside the card. Borders and shadows pile up and the hierarchy flattens.
+Don't: Three mini cards inside the card; borders and shadows pile up and the hierarchy flattens.
 
 ### Keep the card in place while it loads. {#keep-the-card-in-place-while-it-loads}
 
 Do: Loading keeps the card in place: a skeleton fills the body, so the layout does not jump when data arrives.
-Don't: A bare loading line takes the card away. The row collapses and everything below it moves.
+Don't: A bare loading line takes the card away; the row collapses and everything below it moves.
 
 ### Put commit actions in the footer. {#put-commit-actions-in-the-footer}
 

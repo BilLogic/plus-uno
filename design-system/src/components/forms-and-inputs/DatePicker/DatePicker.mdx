@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureStack,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -27,7 +28,6 @@ export const figmaMeta = {
   ]
 };
 
-export const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' };
 
 <Meta of={DatePickerStories} />
 
@@ -214,9 +214,9 @@ The field says how to type the date before anyone types it. Without a hint peopl
 Use the same order and separators in the field, the calendar and any message. Mixed formats read as different dates.
 
 <DoDontPair
-    doExample={<div style={stack}><DatePicker aria-label="Session date" value="2026-10-21" /><span>Your session is on 10/21/2026.</span></div>}
+    doExample={<FigureStack gap="sm" align="start"><DatePicker aria-label="Session date" value="2026-10-21" /><span>Your session is on 10/21/2026.</span></FigureStack>}
     doCaption="One format throughout."
-    dontExample={<div style={stack}><DatePicker aria-label="Session date" value="2026-10-21" /><span>Your session is on 21 Oct 2026.</span></div>}
+    dontExample={<FigureStack gap="sm" align="start"><DatePicker aria-label="Session date" value="2026-10-21" /><span>Your session is on 21 Oct 2026.</span></FigureStack>}
     dontCaption="A second format appears in the message."
 />
 
@@ -225,9 +225,9 @@ Use the same order and separators in the field, the calendar and any message. Mi
 A range picks start and end in one field and one calendar. Two separate fields split one decision in two.
 
 <DoDontPair
-    doExample={<div style={stack}><DatePicker aria-label="Billing period" range value={['2026-10-05', '2026-10-23']} /></div>}
+    doExample={<FigureStack gap="sm" align="start"><DatePicker aria-label="Billing period" range value={['2026-10-05', '2026-10-23']} /></FigureStack>}
     doCaption="One range field."
-    dontExample={<div style={stack}><DatePicker aria-label="Billing period start" value="2026-10-05" /><DatePicker aria-label="Billing period end" value="2026-10-23" /></div>}
+    dontExample={<FigureStack gap="sm" align="start"><DatePicker aria-label="Billing period start" value="2026-10-05" /><DatePicker aria-label="Billing period end" value="2026-10-23" /></FigureStack>}
     dontCaption="Two separate fields."
 />
 

@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -200,9 +201,9 @@ Use `Checkbox` when a person needs to select one or more options from a list of 
 Use `appearance="tile"` when a step asks one focal question with two to four options and every option carries an `illustration`. Keep ordinary form lists and sets of five or more options in `plain` or `card`.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-lg)' }}><Checkbox label="Mastering content" description="Concept fluency." illustration={<Illustration character="mastering-content" size={48} />} appearance="tile" defaultChecked /><Checkbox label="Student advocacy" description="Self-advocacy skills." illustration={<Illustration character="advocacy" size={48} />} appearance="tile" /></div>}
+    doExample={<FigureRow gap="lg"><Checkbox label="Mastering content" description="Concept fluency." illustration={<Illustration character="mastering-content" size={48} />} appearance="tile" defaultChecked /><Checkbox label="Student advocacy" description="Self-advocacy skills." illustration={<Illustration character="advocacy" size={48} />} appearance="tile" /></FigureRow>}
     doCaption="Two pictured tiles with top-end checkboxes for one focal question."
-    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-lg)' }}><Checkbox label="Monday" appearance="tile" /><Checkbox label="Tuesday" appearance="tile" /><Checkbox label="Wednesday" appearance="tile" /></div>}
+    dontExample={<FigureRow gap="lg"><Checkbox label="Monday" appearance="tile" /><Checkbox label="Tuesday" appearance="tile" /><Checkbox label="Wednesday" appearance="tile" /></FigureRow>}
     dontCaption="Plain text options without illustrations drawn as tiles."
 />
 

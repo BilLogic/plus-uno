@@ -2,7 +2,14 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as TextFieldStories from './TextField.stories.jsx';
-import { DocsInteractivePlayground, ResourcesBlock, DocsTable, DoDontPair, ComponentExample } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    FigureStack,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 import { TextField } from '@/components';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
@@ -223,9 +230,9 @@ The label says what the field is, not what to do.
 A leading icon or a trailing action, not both crowding the text.
 
 <DoDontPair
-    doExample={<div style={{ maxWidth: 'var(--width-1500)' }}><TextField label="Search tutors" isLabelHidden placeholder="Search tutors" elemBeforeInput={<i className="fa-solid fa-magnifying-glass" aria-hidden="true" />} /></div>}
+    doExample={<FigureStack width="narrow"><TextField label="Search tutors" isLabelHidden placeholder="Search tutors" elemBeforeInput={<i className="fa-solid fa-magnifying-glass" aria-hidden="true" />} /></FigureStack>}
     doCaption="One element before the text."
-    dontExample={<div style={{ maxWidth: 'var(--width-1500)' }}><TextField label="Search tutors" isLabelHidden placeholder="Search tutors" elemBeforeInput={<i className="fa-solid fa-magnifying-glass" aria-hidden="true" />} elemAfterInput={<i className="fa-solid fa-circle-info" aria-hidden="true" />} /></div>}
+    dontExample={<FigureStack width="narrow"><TextField label="Search tutors" isLabelHidden placeholder="Search tutors" elemBeforeInput={<i className="fa-solid fa-magnifying-glass" aria-hidden="true" />} elemAfterInput={<i className="fa-solid fa-circle-info" aria-hidden="true" />} /></FigureStack>}
     dontCaption="Elements on both sides squeeze the value."
 />
 

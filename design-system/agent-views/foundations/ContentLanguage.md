@@ -24,7 +24,7 @@ Don't: Correct, but “availability” is an abstract noun to decode.
 New tutors don’t know our shorthand yet. Write the full name.
 
 Do: Clear on day one.
-Don't: Fine for a lead tutor. A new tutor has to ask.
+Don't: Fine for a lead tutor; a new tutor has to ask.
 
 | Say | Not |
 | --- | --- |
@@ -58,7 +58,7 @@ Don't: Close, but leaves out a grandparent or older sibling.
 On shared screens, first name and last initial. No names in research exports.
 
 Do: Enough to find her.
-Don't: Fine in a private record. Too much on a projected screen.
+Don't: Fine in a private record; too much on a projected screen.
 
 ## Sentences
 
@@ -67,7 +67,7 @@ Don't: Fine in a private record. Too much on a projected screen.
 Name the person behind a change. Passive voice hides them.
 
 Do: The tutor knows who to thank or ask.
-Don't: Fine in a tight flag. In a notice, it hides who decided.
+Don't: Fine in a tight flag; in a notice, it hides who decided.
 
 ### Write as “we” and “you”
 

@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureStack,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
@@ -243,9 +244,9 @@ card.
 ### Keep a cell to one line.
 
 <DoDontPair
-    doExample={<div style={{ width: 'var(--field-width-lg)' }}><StaticTable headers={[{ text: 'Student' }, { text: 'Note' }]} rows={[['Priya Nair', 'Needs a longer session on fractions and ratios this week']]} /></div>}
+    doExample={<FigureStack width="narrow"><StaticTable headers={[{ text: 'Student' }, { text: 'Note' }]} rows={[['Priya Nair', 'Needs a longer session on fractions and ratios this week']]} /></FigureStack>}
     doCaption="Long text truncates with an ellipsis and shows in full in a tooltip."
-    dontExample={<div style={{ width: 'var(--field-width-lg)' }}><StaticTable headers={[{ text: 'Student' }, { text: 'Note' }]} rows={[['Priya Nair', { content: 'Needs a longer session on fractions and ratios this week', overflow: 'wrap' }]]} /></div>}
+    dontExample={<FigureStack width="narrow"><StaticTable headers={[{ text: 'Student' }, { text: 'Note' }]} rows={[['Priya Nair', { content: 'Needs a longer session on fractions and ratios this week', overflow: 'wrap' }]]} /></FigureStack>}
     dontCaption="Every cell wrapped, so rows grow uneven."
 />
 

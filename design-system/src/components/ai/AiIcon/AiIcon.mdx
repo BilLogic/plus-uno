@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
@@ -142,9 +143,9 @@ Use `AiIcon` for AI actions. For other actions, use a plain Font Awesome Free gl
 Without `label` the icon is hidden from assistive technology.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><AiIcon name="summarize" label="Summarize" /><span>Summarize</span></div>}
+    doExample={<FigureRow><AiIcon name="summarize" label="Summarize" /><span>Summarize</span></FigureRow>}
     doCaption="The icon beside the verb it stands for."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><AiIcon name="summarize" /></div>}
+    dontExample={<FigureRow><AiIcon name="summarize" /></FigureRow>}
     dontCaption="A bare icon with no text and no label, so it has no name."
 />
 
@@ -153,9 +154,9 @@ Without `label` the icon is hidden from assistive technology.
 `generate`, `ask`, `rewrite`, `summarize`, `plan`, `suggest` and `stop-generating`.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><AiIcon name="ask" label="Ask" /><AiIcon name="rewrite" label="Rewrite" /><AiIcon name="plan" label="Plan" /></div>}
+    doExample={<FigureRow><AiIcon name="ask" label="Ask" /><AiIcon name="rewrite" label="Rewrite" /><AiIcon name="plan" label="Plan" /></FigureRow>}
     doCaption="One icon for each action it names."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><AiIcon name="ask" label="Rewrite" /><AiIcon name="ask" label="Plan" /></div>}
+    dontExample={<FigureRow><AiIcon name="ask" label="Rewrite" /><AiIcon name="ask" label="Plan" /></FigureRow>}
     dontCaption="One icon reused for different actions."
 />
 
@@ -164,9 +165,9 @@ Without `label` the icon is hidden from assistive technology.
 An AI icon marks something generative. Use a plain Font Awesome icon for an action that is not.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><AiIcon name="generate" label="Generate" /><span>Generate</span></div>}
+    doExample={<FigureRow><AiIcon name="generate" label="Generate" /><span>Generate</span></FigureRow>}
     doCaption="The sparkle marks something generative."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><AiIcon name="generate" label="Download" /><span>Download</span></div>}
+    dontExample={<FigureRow><AiIcon name="generate" label="Download" /><span>Download</span></FigureRow>}
     dontCaption="The sparkle on an action that is not AI."
 />
 

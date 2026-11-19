@@ -490,3 +490,10 @@
     align-self: stretch;
 }
 
+
+/* A reply drawn as bare text, for the AI chat Don't: no AI icon, no message frame. */
+.sb-ds-plain-reply {
+    margin: 0;
+    font: var(--body-default);
+    color: var(--ds-text);
+}

@@ -12,6 +12,7 @@ import {
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
+import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -268,9 +269,9 @@ must be read is content that has to stay put while it is read.
 ### Keep the body short, and keep forms out.
 
 <DoDontPair
-    doExample={<div className="plus-popup" style={{ position: 'static', width: '100%' }}><div className="plus-popup-title">Session 12</div><div className="plus-popup-body">Ran 45 minutes over.</div></div>}
+    doExample={<DocsOverlayBoundary fit={false} containHeight><Popup show title="Session 12" trigger="Session details" placement="bottom">Ran 45 minutes over.</Popup></DocsOverlayBoundary>}
     doCaption="A short noun phrase for the title and one sentence for the body."
-    dontExample={<div className="plus-popup" style={{ position: 'static', width: '100%' }}><div className="plus-popup-title">Do you want to change the session length?</div><div className="plus-popup-body">Pick a new length for this session and for every session after it, then add a note for the tutor explaining why the change was made.</div></div>}
+    dontExample={<DocsOverlayBoundary fit={false} containHeight><Popup show title="Do you want to change the session length?" trigger="Session details" placement="bottom">Pick a new length for this session and for every session after it, then add a note for the tutor explaining why the change was made.</Popup></DocsOverlayBoundary>}
     dontCaption="A question for a title and a paragraph for a body."
 />
 

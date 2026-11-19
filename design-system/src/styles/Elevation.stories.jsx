@@ -579,17 +579,69 @@ const menu = (style) => (
     </DocsOverlayBoundary>
 );
 
+/** The ground a figure sits on: the page color, a sunken page, or a column of cards; `tip` makes room for a tooltip. */
+const GroundFigure = ({ children, sunken = false, column = false, tip = false }) => (
+    <div
+        style={{
+            ...ground,
+            ...(sunken ? { background: 'var(--ds-surface-sunken)' } : null),
+            ...(tip ? { minHeight: 'calc(var(--image-xl) * 1.5)', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' } : null),
+            ...(column ? { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' } : null),
+        }}
+    >
+        {children}
+    </div>
+);
+
+/** A raised Card whose gray fill replaces its shadow lift: the fill is the subject. */
+const GrayFillDontFigure = () => (
+    <GroundFigure>
+        <Card surface="raised" title="Upcoming sessions" description="3 this week" style={{ background: 'var(--ds-surface-sunken)', boxShadow: 'none' }} />
+    </GroundFigure>
+);
+
+/** A Panel lifted with the blocking shadow and no Blanket. */
+const BlockingPanelDontFigure = () => (
+    <GroundFigure>
+        <div style={{ boxShadow: 'var(--ds-shadow-blocking)', borderRadius: 'var(--card-radius)' }}>
+            <HeadingContextProvider value={2}>
+                <PanelContainer width="100%">
+                    <PanelHeader title="Session notes" />
+                    <PanelBody>Factoring went well.</PanelBody>
+                </PanelContainer>
+            </HeadingContextProvider>
+        </div>
+    </GroundFigure>
+);
+
+/** A sunken fill with an overlay shadow on one Card. */
+const SunkenShadowDontFigure = () => (
+    <GroundFigure>
+        <Card surface="raised" title="Session 12" description="Ran 45 minutes over." style={{ background: 'var(--ds-surface-sunken)', boxShadow: 'var(--ds-shadow-overlay)' }} />
+    </GroundFigure>
+);
+
+/** A Tooltip drawn with the overlay pair instead of the flat dark fill. */
+const OverlayTooltipDontFigure = () => (
+    <DocsOverlayBoundary containHeight>
+        <GroundFigure tip>
+            <style>{'.plus-tooltip--dont-overlay { background: var(--ds-surface-overlay); color: var(--ds-text); box-shadow: var(--ds-shadow-overlay); }'}</style>
+            <Tooltip text="Reschedule this session" placement="top" trigger="manual" show className="plus-tooltip--dont-overlay">
+                <Button text="Reschedule" />
+            </Tooltip>
+        </GroundFigure>
+    </DocsOverlayBoundary>
+);
+
 /** Lift a surface with its shadow, never with a darker gray. */
 export const LiftWithShadow = {
     render: () => (
         <DoDont>
             <Do caption={<>The card keeps the page color and lifts on <C>--ds-shadow-raised</C>.</>}>
-                <div style={ground}><Card surface="raised" title="Upcoming sessions" description="3 this week" /></div>
+                <GroundFigure><Card surface="raised" title="Upcoming sessions" description="3 this week" /></GroundFigure>
             </Do>
             <Dont caption="A gray fill reads as a hole in the page, and dark loses the step.">
-                <div style={ground}>
-                    <Card surface="raised" title="Upcoming sessions" description="3 this week" style={{ background: 'var(--ds-surface-sunken)', boxShadow: 'none' }} />
-                </div>
+                <GrayFillDontFigure />
             </Dont>
         </DoDont>
     ),
@@ -606,10 +658,10 @@ export const NoBorder = {
     render: () => (
         <DoDont>
             <Do caption="The edge slot is the Popup's border.">
-                <div style={ground}>{menu()}</div>
+                <GroundFigure>{menu()}</GroundFigure>
             </Do>
             <Dont caption="A border on top doubles the edge and outlines the Popup.">
-                <div style={ground}>{menu({ border: 'var(--border-width-default) solid var(--ds-border-bold)' })}</div>
+                <GroundFigure>{menu({ border: 'var(--border-width-default) solid var(--ds-border-bold)' })}</GroundFigure>
             </Dont>
         </DoDont>
     ),
@@ -626,10 +678,10 @@ export const AlwaysPair = {
     render: () => (
         <DoDont>
             <Do caption={<>The overlay pair: <C>--ds-surface-overlay</C> with <C>--ds-shadow-overlay</C>.</>}>
-                <div style={{ ...ground, background: 'var(--ds-surface-sunken)' }}>{menu()}</div>
+                <GroundFigure sunken>{menu()}</GroundFigure>
             </Do>
             <Dont caption="The overlay surface with no shadow melts into the page.">
-                <div style={{ ...ground, background: 'var(--ds-surface-sunken)' }}>{menu({ boxShadow: 'none' })}</div>
+                <GroundFigure sunken>{menu({ boxShadow: 'none' })}</GroundFigure>
             </Dont>
         </DoDont>
     ),
@@ -648,17 +700,8 @@ export const BlockingOnBlanket = {
             <Do caption="The Modal on the Blanket takes the blocking shadow.">
                 <Modal inline show screenWidth={360} screenHeight={300} width={280} title="Move session" body="To 4:30 PM?" primaryButton={{ text: 'Move', onClick: () => {} }} onClose={() => {}} />
             </Do>
-            <Dont caption="A Panel with the blocking shadow and no Blanket. If it needs full attention, make it a Modal.">
-                <div style={ground}>
-                    <div style={{ boxShadow: 'var(--ds-shadow-blocking)', borderRadius: 'var(--card-radius)' }}>
-                        <HeadingContextProvider value={2}>
-                            <PanelContainer width="100%">
-                                <PanelHeader title="Session notes" />
-                                <PanelBody>Factoring went well.</PanelBody>
-                            </PanelContainer>
-                        </HeadingContextProvider>
-                    </div>
-                </div>
+            <Dont caption="A Panel with the blocking shadow and no Blanket: if it needs full attention, make it a Modal.">
+                <BlockingPanelDontFigure />
             </Dont>
         </DoDont>
     ),
@@ -678,14 +721,12 @@ export const SunkenNeverFloats = {
     render: () => (
         <DoDont>
             <Do caption="Sunken is the ground: the frame, or a sunken Card.">
-                <div style={ground}>
+                <GroundFigure>
                     <Card surface="sunken" title="This week" description="12 sessions" />
-                </div>
+                </GroundFigure>
             </Do>
             <Dont caption="A sunken fill with a shadow: the gray says recessed, the shadow says lifted.">
-                <div style={ground}>
-                    <Card surface="raised" title="Session 12" description="Ran 45 minutes over." style={{ background: 'var(--ds-surface-sunken)', boxShadow: 'var(--ds-shadow-overlay)' }} />
-                </div>
+                <SunkenShadowDontFigure />
             </Dont>
         </DoDont>
     ),
@@ -705,22 +746,15 @@ export const TooltipFlat = {
         <DoDont>
             <Do caption="Dark fill, inverse text, no shadow.">
                 <DocsOverlayBoundary containHeight>
-                    <div style={{ ...ground, minHeight: 'calc(var(--image-xl) * 1.5)', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
+                    <GroundFigure tip>
                         <Tooltip text="Reschedule this session" placement="top" trigger="manual" show>
                             <Button text="Reschedule" />
                         </Tooltip>
-                    </div>
+                    </GroundFigure>
                 </DocsOverlayBoundary>
             </Do>
             <Dont caption="The overlay pair makes it look like a menu, so people try to click it.">
-                <DocsOverlayBoundary containHeight>
-                    <div style={{ ...ground, minHeight: 'calc(var(--image-xl) * 1.5)', display: 'flex', justifyContent: 'center', alignItems: 'flex-end' }}>
-                        <style>{'.plus-tooltip--dont-overlay { background: var(--ds-surface-overlay); color: var(--ds-text); box-shadow: var(--ds-shadow-overlay); }'}</style>
-                        <Tooltip text="Reschedule this session" placement="top" trigger="manual" show className="plus-tooltip--dont-overlay">
-                            <Button text="Reschedule" />
-                        </Tooltip>
-                    </div>
-                </DocsOverlayBoundary>
+                <OverlayTooltipDontFigure />
             </Dont>
         </DoDont>
     ),
@@ -737,7 +771,7 @@ export const OneFocalPoint = {
     render: () => (
         <DoDont>
             <Do caption="One raised Card marks the next session.">
-                <div style={ground}>
+                <GroundFigure>
                     <Section title="Sessions">
                         <Card surface="raised" title="Next session" description="Today, 4:30 PM" />
                         <StaticTable
@@ -745,14 +779,14 @@ export const OneFocalPoint = {
                             rows={[['Past session', 'Monday'], ['Past session', 'Friday']]}
                         />
                     </Section>
-                </div>
+                </GroundFigure>
             </Do>
             <Dont caption="Every row raised: nothing stands out.">
-                <div style={{ ...ground, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
+                <GroundFigure column>
                     <Card surface="raised" title="Next session" description="Today, 4:30 PM" />
                     <Card surface="raised" title="Past session" description="Monday" />
                     <Card surface="raised" title="Past session" description="Friday" />
-                </div>
+                </GroundFigure>
             </Dont>
         </DoDont>
     ),

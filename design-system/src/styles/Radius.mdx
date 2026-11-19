@@ -194,7 +194,7 @@ The `Radius` group names a step by size; `Radius / Control` names it by control 
 
 <DoDont>
 <Do caption="Rows inset 4 in a 12 Popup take 8, so the gap between the curves stays even.">{<NestedDo />}</Do>
-<Dont caption="Rows at the Popup's own 12. Their corners bulge toward its edge, and the inset looks uneven.">{<NestedDont />}</Dont>
+<Dont caption="Rows at the Popup's own 12; their corners bulge toward its edge, and the inset looks uneven.">{<NestedDont />}</Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -203,7 +203,7 @@ The `Radius` group names a step by size; `Radius / Control` names it by control 
 
 <DoDont>
 <Do caption="Both buttons keep the button radius, 6.">{<OverrideDo />}</Do>
-<Dont caption="One button overridden to a pill. One component now has two shapes.">{<OverrideDont />}</Dont>
+<Dont caption="One button overridden to a pill; one component now has two shapes.">{<OverrideDont />}</Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -212,7 +212,7 @@ The `Radius` group names a step by size; `Radius / Control` names it by control 
 
 <DoDont>
 <Do caption="The Card at 16 and the tag at 4, both steps on the scale.">{<OffScaleDo />}</Do>
-<Dont caption="A Card at 14 and a tag at 5. Off-scale values drift from every neighbor.">{<OffScaleDont />}</Dont>
+<Dont caption="A Card at 14 and a tag at 5; off-scale values drift from every neighbor.">{<OffScaleDont />}</Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -220,8 +220,8 @@ The `Radius` group names a step by size; `Radius / Control` names it by control 
 <FoundationSubsection title="Round a tight group at 4">
 
 <DoDont>
-<Do caption="Tiles 2 apart at 4. The gaps stay straight.">{<TightDo />}</Do>
-<Dont caption="The same tiles at 12. Every gap pinches where the curves meet.">{<TightDont />}</Dont>
+<Do caption="Tiles 2 apart at 4; the gaps stay straight.">{<TightDo />}</Do>
+<Dont caption="The same tiles at 12; every gap pinches where the curves meet.">{<TightDont />}</Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -242,7 +242,7 @@ Don't: A hand-built circle. Its corner, its states and its focus ring are all gu
 
 <DoDont>
 <Do caption="The token follows the rules when a value moves.">{<C>border-radius: var(--radius-control-lg);</C>}</Do>
-<Dont caption="A literal is right today and wrong after the next change. The radius lint fails it.">{<C>border-radius: 10px;</C>}</Dont>
+<Dont caption="A literal radius is right today and wrong after the next change, and the radius lint fails it.">{<C>border-radius: 10px;</C>}</Dont>
 </DoDont>
 
 </FoundationSubsection>
