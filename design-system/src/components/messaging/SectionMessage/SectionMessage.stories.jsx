@@ -43,7 +43,7 @@ picks by default.
     },
     argTypes: {
         children: { table: { disable: true } },
-        onClick: { table: { disable: true } },
+        onClick: { storyOnly: true, table: { disable: true } },
         appearance: { table: { disable: true } },
         title: {
             control: 'text',

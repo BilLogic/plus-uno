@@ -17,8 +17,8 @@ export default {
     tags: ['!dev', '!autodocs'],
     argTypes: {
         children: { table: { disable: true } },
-        onClick: { table: { disable: true } },
-        style: { table: { disable: true } },
+        onClick: { storyOnly: true, table: { disable: true } },
+        style: { storyOnly: true, table: { disable: true } },
         text: { control: 'text', description: 'Tooltip text', table: { category: 'Content' } },
         placement: {
             control: 'select',

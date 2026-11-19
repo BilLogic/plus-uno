@@ -18,8 +18,8 @@ export default {
         }
     },
     argTypes: {
-        children: { table: { disable: true } },
-        onClick: { table: { disable: true } },
+        children: { storyOnly: true, table: { disable: true } },
+        onClick: { storyOnly: true, table: { disable: true } },
         style: { table: { disable: true } },
         value: {
             table: { disable: true, category: 'Development' }

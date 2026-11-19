@@ -24,7 +24,7 @@ export default {
     },
     argTypes: {
         children: { table: { disable: true } },
-        style: { table: { disable: true } },
+        style: { storyOnly: true, table: { disable: true } },
         appearance: {
             control: 'inline-radio',
             options: ['default', 'pill'],

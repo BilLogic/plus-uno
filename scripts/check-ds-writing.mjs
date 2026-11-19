@@ -35,10 +35,19 @@
  *                       `...NAME` spread read from the `const NAME = [...]` in
  *                       the stories or the component file. A list with anything
  *                       else in it (a call, say) is not compared.
+ *                       AN ARG THE STORY USES THAT IS NOT A PROP (`children`,
+ *                       `onClick`, `style`, a `*Preset` or `*Label` that
+ *                       drives the demo) is marked in its argType with
+ *                       `storyOnly: true`, e.g.
+ *                       `itemCount: { storyOnly: true, control: 'number' }`.
+ *                       Marking an arg that does name a prop is a finding, so
+ *                       a mark never outlives the reason for it.
  *
  * SEVERITY. Every rule warns on every page, so the check rolls out without
  * blocking a merge, except `stale-marker`, which fails anywhere: a defect stated
- * as fact is the one finding with no reading in which it is right.
+ * as fact is the one finding with no reading in which it is right. `props-parity`
+ * fails anywhere too: a Controls panel that disagrees with the props is wrong
+ * on every page, and every page now agrees, so a new mismatch fails the check.
  *
  * THE STRICT LIST, AND ITS SWITCH. `STRICT_PAGES` (`scripts/lib/ds-strict.mjs`,
  * shared with `check:ds-vocabulary`) names the pages held to every rule, and on
@@ -75,7 +84,7 @@ const NAME = 'check:ds-writing';
 export { ENFORCE_STRICT, STRICT_PAGES };
 
 export const RULES = ['usage-spine', 'alternatives-route', 'bare-number', 'stale-marker', 'props-parity'];
-const ALWAYS_ERROR = new Set(['stale-marker']);
+const ALWAYS_ERROR = new Set(['stale-marker', 'props-parity']);
 
 export const SPINE = ['Usage', 'Alternatives', 'Best practices', 'Accessibility', 'Related'];
 
@@ -250,9 +259,10 @@ function listValues(body, sources, seen = new Set()) {
 }
 
 /**
- * The meta's argTypes: `[{name, options}]`, from the first `argTypes:` object in a stories file outside a string.
+ * The meta's argTypes: `[{name, options, storyOnly}]`, from the first `argTypes:` object in a stories file outside a string.
  * `options` is null when the argType lists none or lists any the check cannot read; `extraSources` are the files
- * a `...NAME` spread may be declared in (the component's own source).
+ * a `...NAME` spread may be declared in (the component's own source). `storyOnly` is true for `storyOnly: true`,
+ * the mark for an arg the story uses that is not a prop.
  */
 export function argTypesOf(source, extraSources = []) {
   const src = String(source ?? '');
@@ -268,7 +278,7 @@ export function argTypesOf(source, extraSources = []) {
     const opts = m[3].match(/\boptions\s*:\s*\[/);
     const body = opts ? bracketBody(m[3], opts.index + opts[0].length - 1) : null;
     const options = body == null ? null : listValues(body, sources);
-    return [{ name: m[1] ?? m[2], options}];
+    return [{ name: m[1] ?? m[2], options, storyOnly: /\bstoryOnly\s*:\s*true\b/.test(m[3]) }];
   });
 }
 
@@ -277,15 +287,20 @@ function parityFindings(props, storiesSource, componentSource) {
   const argTypes = argTypesOf(storiesSource, componentSource ? [componentSource] : []);
   if (!argTypes.length) return [];
   const anchor = 'argTypes';
+  const real = argTypes.filter((a) => !a.storyOnly);
   if (!props.length) {
-    return [{ rule: 'props-parity', message: `argTypes name ${argTypes.length} prop(s), and the component declares no propTypes.`, anchor }];
+    return real.length ? [{ rule: 'props-parity', message: `argTypes name ${real.length} prop(s), and the component declares no propTypes.`, anchor }] : [];
   }
   const byName = new Map(props.map((p) => [p.name, p]));
   const out = [];
   for (const arg of argTypes) {
     const prop = byName.get(arg.name);
+    if (arg.storyOnly) {
+      if (prop) out.push({ rule: 'props-parity', message: `argType \`${arg.name}\` is marked storyOnly but names a prop in the component's propTypes; remove the mark.`, anchor });
+      continue;
+    }
     if (!prop) {
-      out.push({ rule: 'props-parity', message: `argType \`${arg.name}\` names no prop in the component's propTypes.`, anchor });
+      out.push({ rule: 'props-parity', message: `argType \`${arg.name}\` names no prop in the component's propTypes; mark a story-only arg with \`storyOnly: true\`.`, anchor });
       continue;
     }
     if (arg.options && prop.values?.length) {

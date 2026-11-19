@@ -21,9 +21,9 @@ export default {
     },
     argTypes: {
         children: { table: { disable: true } },
-        onClick: { table: { disable: true } },
-        style: { table: { disable: true } },
-        triggerLabel: {
+        onClick: { storyOnly: true, table: { disable: true } },
+        style: { storyOnly: true, table: { disable: true } },
+        triggerLabel: { storyOnly: true,
             control: 'text',
             description: 'Button label used as the popup trigger',
             table: { category: 'Content' }

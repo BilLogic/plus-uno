@@ -41,7 +41,7 @@ export default {
         },
     },
     argTypes: {
-        children: { table: { disable: true } },
+        children: { storyOnly: true, table: { disable: true } },
         onClick: { table: { disable: true } },
         style: { table: { disable: true } },
         label: {

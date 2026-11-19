@@ -147,12 +147,22 @@ test('props-parity: numeric options are read, a spread constant resolves from th
   assert.deepEqual(rulesOf(check(mdx(), { props, storiesSource: wrongTone, componentSource: component })), ['props-parity']);
 });
 
+test('props-parity: storyOnly marks an arg with no prop; marking a real prop story-only is named', () => {
+  const props = [{ name: 'title' }];
+  const marked = `export default { argTypes: { title: { control: 'text' }, itemCount: { storyOnly: true, control: 'number' } } };`;
+  assert.deepEqual(check(mdx(), { props, storiesSource: marked }), []);
+  const stale = `export default { argTypes: { title: { storyOnly: true } } };`;
+  const found = check(mdx(), { props, storiesSource: stale });
+  assert.deepEqual(rulesOf(found), ['props-parity']);
+  assert.match(found[0].message, /`title` is marked storyOnly but names a prop/);
+});
+
 test('argTypesOf reads the meta argTypes, skipping strings and nested objects', () => {
   const src = `const x = { argTypes: 'no' };\nexport default {\n  argTypes: {\n    a: { table: { category: 'C' } },\n    'b-c': { options: ["x", 'y'] },\n    d: { description: "{" },\n  },\n};`;
   assert.deepEqual(argTypesOf(src), [
-    { name: 'a', options: null },
-    { name: 'b-c', options: ['x', 'y'] },
-    { name: 'd', options: null },
+    { name: 'a', options: null, storyOnly: false },
+    { name: 'b-c', options: ['x', 'y'], storyOnly: false },
+    { name: 'd', options: null, storyOnly: false },
   ]);
   assert.deepEqual(argTypesOf('export default { title: "X" };'), []);
 });
@@ -175,6 +185,11 @@ test('gradeFindings: warnings everywhere, a stale marker always an error, a stri
   assert.deepEqual(gradeFindings(raw, { strict: false, enforce: true }).map((f) => f.severity), ['warning', 'error']);
   assert.deepEqual(gradeFindings(raw, { strict: true, enforce: false }).map((f) => f.severity), ['warning', 'error']);
   assert.deepEqual(gradeFindings(raw, { strict: true, enforce: true }).map((f) => f.severity), ['error', 'error']);
+});
+
+test('gradeFindings: props-parity is an error on any page, so a new mismatch fails the check', () => {
+  const raw = [{ rule: 'props-parity', message: 'p' }];
+  assert.deepEqual(gradeFindings(raw, { strict: false, enforce: false }).map((f) => f.severity), ['error']);
 });
 
 test('the strict list holds Modal and the Section template, enforced in the gate', () => {

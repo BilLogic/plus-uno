@@ -89,8 +89,8 @@ export default {
         tableProps: { table: { disable: true } },
         footer: { table: { disable: true } },
         emptyState: { table: { disable: true } },
-        actions: { table: { disable: true } },
-        style: { table: { disable: true } },
+        actions: { storyOnly: true, table: { disable: true } },
+        style: { storyOnly: true, table: { disable: true } },
         kind: {
             control: 'inline-radio',
             options: TABLE_KINDS,
@@ -100,7 +100,7 @@ export default {
             control: 'boolean',
             table: { category: 'State' },
         },
-        title: { control: 'text', table: { category: 'Design' } },
+        title: { storyOnly: true, control: 'text', table: { category: 'Design' } },
         className: { control: false, table: { disable: true, category: 'Development' } },
     },
 };

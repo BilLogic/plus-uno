@@ -20,7 +20,7 @@ export default {
         },
     },
     argTypes: {
-        children: { table: { disable: true } },
+        children: { storyOnly: true, table: { disable: true } },
         onChange: { table: { disable: true } },
         style: { table: { disable: true } },
         options: { table: { disable: true, category: 'Development' } },

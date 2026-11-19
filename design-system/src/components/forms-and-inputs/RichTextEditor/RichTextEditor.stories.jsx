@@ -17,14 +17,14 @@ export default {
         }
     },
     argTypes: {
-        children: { table: { disable: true } },
-        onClick: { table: { disable: true } },
+        children: { storyOnly: true, table: { disable: true } },
+        onClick: { storyOnly: true, table: { disable: true } },
         style: { table: { disable: true } },
         placeholder: {
             control: 'text',
             table: { category: 'Content' }
         },
-        initialContent: {
+        initialContent: { storyOnly: true,
             control: 'text',
             description: 'Starting editor content',
             table: { category: 'Content' }
