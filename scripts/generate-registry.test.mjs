@@ -116,7 +116,7 @@ test('check:registry fails on an injected unshippable import', () => {
 
 const withPatternsAndCharts = (extra = {}) => fixture({
   [`${L}/templates/index.js`]: "export { default as Frame } from './Frame';\nexport { default as Section } from './Section';\n",
-  'design-system/agent-views/_patterns.json': JSON.stringify({ patterns: [{ group: 'Templates', name: 'Frame', use: 'x' }, { group: 'Section', name: 'Section', use: 'x' }] }),
+  'design-system/agent-views/_templates.json': JSON.stringify({ templates: [{ group: 'Templates', name: 'Frame', use: 'x' }, { group: 'Section', name: 'Section', use: 'x' }] }),
   [`${L}/templates/Frame/index.js`]: "export { default } from './Frame';\n",
   [`${L}/templates/Frame/Frame.jsx`]: "import { Button } from '@/components';\nimport Section from '../Section';\nimport './Frame.scss';\nexport default () => [Button, Section];\n",
   [`${L}/templates/Frame/Frame.scss`]: '.f { color: red; }\n',

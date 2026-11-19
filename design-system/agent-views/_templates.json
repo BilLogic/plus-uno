@@ -1,6 +1,6 @@
 {
-  "_comment": "Hand-kept, reviewed in PRs. The patterns: the shells a page, a card, a section, a table or an overlay is built from. Each row keeps only what source cannot say, its group and when to reach for it; the import line and the Storybook page come from the barrels and source, through the DS facts (scripts/lib/ds-facts.mjs). Rendered into components/index.md by npm run generate:agent; scripts/lib/patterns-index.mjs holds every name to the facts and every pattern to a row.",
-  "patterns": [
+  "_comment": "Hand-kept, reviewed in PRs. The templates: the shells a page, a card, a section, a table or an overlay is built from. Each row keeps only what source cannot say, its group and when to reach for it; the import line and the Storybook page come from the barrels and source, through the DS facts (scripts/lib/ds-facts.mjs). Rendered into components/index.md by npm run generate:agent; scripts/lib/templates-index.mjs holds every name to the facts and every template to a row.",
+  "templates": [
     {
       "group": "Templates",
       "name": "Frame",

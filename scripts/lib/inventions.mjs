@@ -28,11 +28,11 @@ function parse(target) {
  * @param {{components: object[], props: object[], tokens: object[]}} inventions
  * @param {{components: {name: string, props: {name: string, values: string[]|null}[]|null}[]}} components
  * @param {{tokens: {name: string}[]}} tokens
- * @param {string[]} [patterns]  pattern names (`_patterns.json`), valid as a whole-name target
+ * @param {string[]} [templates]  template names (`_templates.json`), valid as a whole-name target
  */
-export function checkInventions(inventions, components, tokens, patterns = []) {
+export function checkInventions(inventions, components, tokens, templates = []) {
   const byName = new Map(components.components.map((c) => [c.name, c]));
-  const patternNames = new Set(patterns);
+  const templateNames = new Set(templates);
   const tokenNames = new Set(tokens.tokens.map((t) => t.name));
   const problems = [];
   for (const row of [...inventions.components, ...inventions.props, ...inventions.tokens]) {
@@ -42,7 +42,7 @@ export function checkInventions(inventions, components, tokens, patterns = []) {
         if (!tokenNames.has(t.name)) problems.push(`${row.not}: ${target} is not in tokens.json`);
         continue;
       }
-      if (!t.prop && patternNames.has(t.component)) continue;
+      if (!t.prop && templateNames.has(t.component)) continue;
       const record = byName.get(t.component);
       if (!record) {
         problems.push(`${row.not}: ${t.component} is not in components.json`);
