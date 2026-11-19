@@ -823,6 +823,7 @@ export function structuralFit({ folder, expected, repoRoot = REPO_ROOT }) {
   const findings = files.flatMap((file) => escapesIn({ ...file, page: pages.has(file.path) }, ctx));
   const elements = files.flatMap((file) => jsxElementsOf(blankComments(file.text)).map((el) => ({ ...el, file })));
   const names = new Set(elements.map((el) => el.name.split('.')[0]));
+  const hasFiltersViolation = findings.some((f) => f.rule === 'ds/placement' && /filters|view-bar filter/i.test(f.message));
   const hasBannerViolation = findings.some((f) => f.rule === 'ds/placement' && /page header|page message order/i.test(f.message));
   const hasShellViolation = findings.some((f) => f.rule === 'ds/page-starts-from-pattern');
 
@@ -860,6 +861,14 @@ export function structuralFit({ folder, expected, repoRoot = REPO_ROOT }) {
       } else {
         verdict = 'ignored';
         reason = `checker: no ${accepts.join(' or ')} found`;
+      }
+    } else if (check.kind === 'no-bare-select-in-filters') {
+      if (!hasFiltersViolation) {
+        verdict = 'followed';
+        reason = "checker: no bare Select or PopupSelect in Section's filters";
+      } else {
+        verdict = 'ignored';
+        reason = "checker: ds/placement flagged bare Select or PopupSelect in Section's filters";
       }
     } else if (check.kind === 'banner-placement') {
       const hasBanner = names.has('Banner');

@@ -117,8 +117,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Section | `--section-stack-lg` (declared elsewhere) |  |
 | Section | `--section-min-width-main` (declared elsewhere) |  |
 | Section | `--section-min-width-side` (declared elsewhere) |  |
-| Section | `--section-toolbar-min-width` |  |
-| Section | `--section-toolbar-count-min-width` |  |
 | Card | `--card-pad` |  |
 | Card | `--card-stack-sm` (declared elsewhere) |  |
 | Card | `--card-stack-md` (declared elsewhere) |  |

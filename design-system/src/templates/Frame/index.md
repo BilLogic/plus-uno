@@ -68,7 +68,7 @@ Don't: The steps drawn again inside the Page: two lists for one task.
 
 The footer is fixed along the bottom, one row high, with its buttons on one line. Save and exit leaves the task and keeps the answers, so the footer holds only it, Back and the primary Next. Back on the first step is disabled and needs no reason.
 
-Do: Save and exit at the start; Back and the primary Next at the end, on one line.
+Do: Save and exit as a link at the left edge; Back and the primary Next in the right half, on one line.
 Don't: Cancel repeated in the footer beside Save and exit: two ways out of one task.
 
 ### Keep the AI panel docked as its own region. {#keep-the-ai-panel-docked-as-its-own-region}
@@ -183,7 +183,7 @@ Lengths are in pixels. Where the layout mode changes a value, the columns read M
 | `panelDefaultWidth` | number | `FRAME_LAYOUT.panelDefault` | The width (px) the Panel opens at when the tab has nothing remembered: 320 to 640, default 400. |
 | `panelPeek` | bool | `false` | Hovering the Frame's right edge peeks a closed Panel over the Page, with no Blanket. Off by default. |
 | `panelStorageKey` | string | `PANEL_STORAGE_KEY` | The sessionStorage key the Panel's width and open state are kept under; null keeps nothing. |
-| `width` | enum | — | Content type: default caps the grid at 1232, full has no cap (chat, a board, a wide table), reading caps it at 864. `content` is the old name for `default`. |
+| `width` | enum | `'default'` | Content type: default caps the grid at 1232, full has no cap (chat, a board, a wide table), reading caps it at 864. |
 | `contentAs` | elementType | — | Element for the content box. `main` by default, the Page's landmark; pass `div` when the page supplies its own `main`. |
 | `contentClassName` | string | `''` | — |
 | `surfaceDirect` | bool | `false` | Render children straight into the page, with no content box or grid (full-bleed views). The Page itself is then the `main`. |

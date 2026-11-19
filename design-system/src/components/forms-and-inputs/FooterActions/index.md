@@ -2,13 +2,13 @@
 
 # FooterActions
 
-FooterActions — 4-track footer layout for Modal, Panel and a multi-step task's footer. Divides the footer into 4 equal tracks separated by `--inline-md`. Every filled action button is cloned at `spacing="spacious"` (48) with `shouldFitContainer`. A leading text or link action hugs the left edge without taking a filled track, and containers up to 400 wide split a single action across the full width via `@container (max-width: 400px)`.
+FooterActions — 4-track footer layout for Modal, Panel and a multi-step task's footer. Divides the footer into 4 equal tracks separated by `--inline-md`. Every filled action button is cloned at `spacing="spacious"` (48) with `shouldFitContainer`. A leading `danger` or link action hugs the left edge without taking a filled track, and containers up to 400 wide split a single action across the full width via `@container (max-width: 400px)`.
 
 **Import:** `import { FooterActions } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/FooterActions/FooterActions.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/FooterActions/FooterActions.stories.jsx` — OneButton, TwoButtons, ThreeButtons, TextButtonLeft, DangerTextButtonLeft, TextLeftWithThreeFilled, DestructiveSplit, Steps, NarrowPanel, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/FooterActions/FooterActions.stories.jsx` — OneButton, TwoButtons, ThreeButtons, DeclineInLeftHalf, SubtleFillsTrack, LinkLeft, DangerLeft, LeadingWithThreeFilled, DestructiveSplit, Steps, NarrowPanel, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/FooterActions/FooterActions.mdx`
 
@@ -20,7 +20,7 @@ Use `FooterActions` inside Modal, Panel (`PanelFooter`) and the multi-step task 
 2. **One action.** Sits in the right half (tracks `3` and `4`). A single action fills the full width (all four tracks) only when the footer itself is `400` px wide or less (`@container (max-width: 400px)`) and there is no leading action.
 3. **Two actions.** Split `50/50` across tracks `1`–`2` and `3`–`4`: secondary on the left in the `default` soft neutral fill (`--ds-background-neutral`), `primary` on the right.
 4. **Three actions.** Take one quarter each in tracks `2`, `3` and `4`; only the rightmost is `primary`.
-5. **Leading action.** A leading text, `link` or `subtle` action (or a link with `href`) hugs the left content edge only when it is the first child (of two or more) or is passed as `leadingAction`. A `danger` first child of two or more is also treated as leading, rendered in danger text ink on a subtle background. Filled actions then sit in tracks `3`–`4` (one filled), `3` and `4` (two filled), or `2`, `3` and `4` (three filled, clamping the leading action to track `1`).
+5. **Leading action.** The leading slot holds only a side action that is not one of the footer's two outcomes: a `danger` destructive action such as "Delete", or a `link` that leaves the task, such as "Save and exit". It hugs the left content edge when it is the first child (of two or more) or is passed as `leadingAction`. It is never "Not now", "Cancel" or "Back". An action that declines or postpones ("Not now", "Skip", "Keep editing", "Save for later") is a `default` secondary in the left half, beside the primary. Filled actions sit in tracks `3`–`4` (one filled), `3` and `4` (two filled), or `2`, `3` and `4` (three filled, clamping the leading action to track `1`).
 6. **Destructive confirmations.** Place the safer alternative (`default` secondary, such as "Archive instead") on the left and the `danger` action as the rightmost child, splitting `50/50` across tracks `1`–`2` and `3`–`4`.
 7. **No Cancel in footers.** `Modal` and `Panel` already carry a corner close button, so footers name real outcomes ("Discard", "Save", never Cancel). Cancel appears only on a page form, which has no close button: `subtle`, after the Primary.
 8. **Steps.** In a multi-step flow, "Back" (`default`) and "Next" (`primary`) split `50/50` across tracks `1`–`2` and `3`–`4`.
@@ -54,33 +54,33 @@ Only the rightmost filled button carries the `primary` (or `danger`) appearance;
 Do: Secondary on the left, primary on the right.
 Don't: Two primary buttons competing in the same footer.
 
-### Place a leading text or escape action first or in `leadingAction`. {#place-a-leading-text-or-escape-action-first-or-in-leadingaction}
+### Put a side action in the leading slot, and a declining action in the left half. {#put-a-side-action-in-the-leading-slot-and-a-declining-action-in-the-left-half}
 
-A `subtle`, `link` or `danger` button hugs the left edge only when it is the first child of two or more or passed via `leadingAction`.
+The leading slot holds a `danger` destructive action or a `link` that leaves the task. A declining action such as "Not now" is a `default` secondary, left of the primary.
 
-Do: A subtle first child hugs the left edge while the filled pair sits in the rightmost two tracks.
-Don't: A subtle child placed second takes a filled track instead of hugging the left edge.
+Do: A destructive side action hugs the left edge while the two outcomes sit in the rightmost tracks.
+Don't: "Not now" in the leading slot instead of the left half.
 
 ### Pair a destructive confirmation with a safer alternative. {#pair-a-destructive-confirmation-with-a-safer-alternative}
 
-Put the safer alternative in the left half and the `danger` action rightmost; a `danger` button placed first of two is treated as a leading text action instead.
+Put the safer alternative in the left half and the `danger` action rightmost; a `danger` button placed first of two moves to the leading slot instead.
 
 Do: Safer alternative on the left and danger rightmost, splitting equally across both halves.
-Don't: Danger placed first of two becomes a leading text action instead of the primary confirmation.
+Don't: Danger placed first of two moves to the leading slot instead of being the confirmation.
 
 ### Omit Cancel when the corner close button dismisses. {#omit-cancel-when-the-corner-close-button-dismisses}
 
-`Modal` and `Panel` already provide a corner close control, so the footer names the real secondary outcome (`Discard`, `Keep editing`, `Archive instead`) rather than a generic Cancel.
+`Modal` and `Panel` already provide a corner close control, so the footer names the real secondary outcome (`Discard`, `Keep editing`, `Archive instead`), as a `default` secondary in the left half, rather than a generic Cancel.
 
 Do: Real verbs split equally across both halves of the footer.
 Don't: Default-height hugging buttons and a Cancel label that duplicates the corner close button.
 
 ### Split Back and Next across the footer in multi-step flows. {#split-back-and-next-across-the-footer-in-multi-step-flows}
 
-Keep `Back` in the `default` appearance so the step pair splits `50/50` across both halves rather than collapsing `Back` into a leading text button.
+Keep `Back` in the `default` appearance so the step pair splits `50/50` across both halves rather than moving `Back` to the leading slot.
 
 Do: Back in the left half and Next in the right half, splitting the footer equally.
-Don't: Making Back subtle turns it into a leading text action instead of an equal step pair.
+Don't: Back in the leading slot, so Next stands alone instead of an equal step pair.
 
 ## Accessibility
 
@@ -98,7 +98,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 ## Parts
 
 1. **Grid container.** Four equal tracks separated by `--inline-md`, with `container-type: inline-size` so footers `400` px wide or narrower adapt automatically.
-2. **Leading action** (`leadingAction`, or the first child of two or more when `subtle`, `link`, a link with `href`, or `danger`). Hugs the left content edge and never stretches across a filled track.
+2. **Leading action** (`leadingAction`, or the first child of two or more when it is a `danger` action or a link). A side action, never one of the two outcomes. Hugs the left content edge and never stretches across a filled track.
 3. **Filled actions.** One to three `Button` children cloned at `spacing="spacious"` (`48`) with `shouldFitContainer`.
 
 ### States
@@ -128,7 +128,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `leadingAction` | node | — | Optional text or link action hugging the left content edge without taking a filled track. |
+| `leadingAction` | node | — | Optional `danger` or link action hugging the left content edge without taking a filled track. |
 | `children` | node | — | Filled action buttons placed across the 4 tracks. |
 | `className` | string | — | Extra class names added to the footer grid container. |
 | `style` | object | — | Inline style overrides on the footer grid container. |

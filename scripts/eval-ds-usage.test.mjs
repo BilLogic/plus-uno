@@ -555,7 +555,7 @@ test('expectedFor: loads answer keys for every active task, validates page + sec
   assert.ok(expected.screens.length >= 3, 'lists template per screen');
   assert.ok(expected.patterns.some((p) => p.id === 'filtering' && p.variant === '1 · Quick filters'), 'lists Filtering variant');
   assert.ok(expected.required_placements.length >= 3, 'lists required placements');
-  assert.ok(expected.against_placements.length >= 2, 'lists placements that count against');
+  assert.ok(expected.against_placements.length >= 3, 'lists placements that count against');
   assert.equal(expectedFor('no-such-task'), null, 'tasks without an answer key return null');
 
   const into = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-expected-'));
@@ -724,6 +724,26 @@ test('rejudge: writes reach, screenshot and per-item fit as new rows marked reju
   }
 });
 
+test('structuralFit: a bare Select in Section filters counts against, and the filters prop counts as quick filters', () => {
+  const expected = expectedFor('session-review-queue');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-bare-select-'));
+  try {
+    fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'src/App.jsx'), [
+      "import { Section } from '@/templates';",
+      "import { Select } from '@/components';",
+      'export default function App() {',
+      "  return <Section title=\"Sessions\" filters={[{ text: 'All', menu: () => <Select options={[]} /> }]} />;",
+      '}',
+    ].join('\n'));
+    const structural = structuralFit({ folder: dir, expected });
+    assert.equal(structural['bare-select-in-filters']?.verdict, 'ignored');
+    assert.equal(structural.filtering?.verdict, 'ignored');
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('structuralFit + fitJudge: structural items are scored by the checker while the AI judge scores semantic items from source only', () => {
   const expected = expectedFor('session-review-queue');
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-structural-fit-'));
@@ -754,6 +774,7 @@ test('structuralFit + fitJudge: structural items are scored by the checker while
     assert.equal(structural['banner-under-page-header']?.verdict, 'followed');
     assert.equal(structural['controls-in-section-header']?.verdict, 'followed');
     assert.equal(structural['detail-in-frame-panel']?.verdict, 'followed');
+    assert.equal(structural['bare-select-in-filters']?.verdict, 'followed');
     assert.equal(structural['banner-above-or-flush-page-header']?.verdict, 'followed');
 
     let promptSeen = '';

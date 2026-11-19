@@ -221,8 +221,6 @@ export const TOKEN_LADDER = [
   { tier: 'templates', group: 'Section', new: '--section-stack-lg', old: '--section-stack-lg', use: 'Vertical gap between groups of blocks inside a Section.' },
   { tier: 'templates', group: 'Section', new: '--section-min-width-main', old: '--section-min-width-main', use: 'Narrowest the main column of a two-column Section may shrink.' },
   { tier: 'templates', group: 'Section', new: '--section-min-width-side', old: '--section-min-width-side', use: 'Narrowest the side column of a two-column Section may shrink.' },
-  { tier: 'templates', group: 'Section', new: '--section-toolbar-min-width', old: null, ref: 'var(--width-3000)', use: 'Minimum width of the start group in a Section toolbar before its controls wrap.' },
-  { tier: 'templates', group: 'Section', new: '--section-toolbar-count-min-width', old: null, ref: 'var(--size-300)', use: 'Minimum width of the result count in a Section toolbar before it truncates.' },
 
   // ─── Templates / Card ──────────────────────────────────────────────────
   { tier: 'templates', group: 'Card', new: '--card-pad', old: null, value: '--space-100', use: 'Padding inside a Card at every size.' },
@@ -537,6 +535,9 @@ export const RETIRED_RENAMES = {
 export const RETIRED_NO_STEP = new Set([
   /* token gap: 10px column gap, no role token */
   '--size-element-gap-md',
+  /* the Section toolbar is gone */
+  '--section-toolbar-min-width',
+  '--section-toolbar-count-min-width',
 ]);
 
 /** Retired name -> its replacement: the explicit table above, then each ladder row's `old` (first row wins). */

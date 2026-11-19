@@ -227,6 +227,18 @@
       "section": "Placement",
       "scoring": "judge",
       "expectation": "Counts against: styling a table row action as Button appearance=\"subtle\" so it reads as plain text rather than a control."
+    },
+    {
+      "id": "bare-select-in-filters",
+      "placement": "Bare Select or PopupSelect in Section filters",
+      "page": "design-system/agent-views/patterns/Filtering.md",
+      "section": "Tiers",
+      "scoring": "checker",
+      "check": {
+        "kind": "no-bare-select-in-filters",
+        "rejects": ["Select", "PopupSelect"]
+      },
+      "expectation": "Counts against: placing bare Select or PopupSelect controls in Section's filters instead of FilterButton or FilterMenu."
     }
   ]
 }

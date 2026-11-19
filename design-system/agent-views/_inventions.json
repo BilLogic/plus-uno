@@ -186,7 +186,7 @@
       "use": [
         "Panel"
       ],
-      "why": "a floating Panel, imported from @/components"
+      "why": "a floating Panel"
     },
     {
       "not": "SectionToolbar",
@@ -234,15 +234,14 @@
       "use": [
         "Heading.as"
       ],
-      "why": "the level comes from the surrounding sections; set as only to override the element"
+      "why": "the level comes from the surrounding sections"
     },
     {
       "not": "Heading size=\"small\" / \"large\"",
       "use": [
         "Heading.size=sm",
         "Heading.size=lg"
-      ],
-      "why": "sizes match the tokens, xxl to xxs"
+      ]
     },
     {
       "not": "Section tabs / type=\"tabs-only\"",
@@ -255,6 +254,18 @@
       "use": [
         "Section.search",
         "Section.filters"
+      ]
+    },
+    {
+      "not": "Frame width=\"content\"",
+      "use": [
+        "Frame.width=default"
+      ]
+    },
+    {
+      "not": "Section onAddView / addViewLabel",
+      "use": [
+        "Section.views"
       ]
     }
   ],

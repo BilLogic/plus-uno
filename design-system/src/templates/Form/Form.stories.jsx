@@ -113,7 +113,7 @@ export const TypeSteps = {
         await expect(canvas.getByRole('button', { name: 'Back' }), 'Back on the first step is disabled').toHaveAttribute('aria-disabled', 'true');
         await expect(canvas.getByRole('button', { name: 'Next' }), 'Next in the footer').toBeInTheDocument();
         await expect(canvas.queryByRole('button', { name: 'Cancel' }), 'no Cancel in the steps footer').toBeNull();
-        await expect(canvas.getByRole('button', { name: 'Save and exit' }), 'Save and exit leads the footer').toBeInTheDocument();
+        await expect(canvas.getByRole('link', { name: 'Save and exit' }), 'Save and exit is in the footer').toBeInTheDocument();
         await userEvent.click(canvas.getByRole('button', { name: 'Next' }));
         await expect(canvas.getByLabelText(/Session date/)).toBeInTheDocument();
         await userEvent.click(canvas.getByRole('button', { name: 'Back' }));

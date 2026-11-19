@@ -339,9 +339,23 @@ test('ds/placement: a slot row rejects its components and takes the replacement 
   assert.deepEqual(warn('<><FilterBar filters={<FilterButton text="Status" />} /><Select label="Role" options={[]} /></>'), []);
 });
 
-test('ds/placement: the design system itself registers no slot-acceptance row for a Section', () => {
+test('ds/placement: a bare Select or PopupSelect in Section filters fails, a FilterButton trigger passes', () => {
   const facts = loadFacts(REPO_ROOT);
-  assert.deepEqual(facts.placements.filter((row) => (row.in ?? []).some((place) => /^Section/.test(place))), []);
+  const placementCtx = contextFrom({
+    components: facts.manifests.components,
+    tokens: facts.manifests.tokens,
+    exported: facts.importable,
+    barrels: facts.barrels,
+    placements: facts.placements,
+  });
+  const head = "import { Select, PopupSelect, FilterButton } from '@/components';\nimport { Section } from '@/templates';\n";
+  const found = (code) => escapesIn({ path: 'p/src/Queue.jsx', text: head + code, page: false }, placementCtx).filter((f) => f.rule === 'ds/placement');
+  const bare = found("<Section title=\"Q\" filters={[{ text: 'All', menu: () => <Select options={[]} /> }]} />");
+  assert.deepEqual(bare.map((f) => f.level), ['fail']);
+  assert.match(bare[0].fix, /FilterButton/);
+  assert.equal(found("<Section title=\"Q\" filters={[{ text: 'All', menu: (t) => <PopupSelect options={[]} trigger={t} /> }]} />").length, 0);
+  assert.equal(found("<Section title=\"Q\" filters={[{ text: 'All', menu: () => <FilterButton text=\"All\" /> }]} />").length, 0);
+  assert.equal(found('<Section title="Q"><Select options={[]} /></Section>').length, 0);
 });
 
 test('ds/placement: a Banner before a sibling PageHeader warns; the Page slots pass', () => {

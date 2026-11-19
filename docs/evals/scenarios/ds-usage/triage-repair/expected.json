@@ -143,6 +143,18 @@
         "kind": "no-banner-before-header"
       },
       "expectation": "Counts against: placing Banner before PageHeader or flush against PageHeader with no stack gap."
+    },
+    {
+      "id": "bare-select-in-filters",
+      "placement": "Bare Select or PopupSelect in Section filters",
+      "page": "design-system/agent-views/patterns/Filtering.md",
+      "section": "Tiers",
+      "scoring": "checker",
+      "check": {
+        "kind": "no-bare-select-in-filters",
+        "rejects": ["Select", "PopupSelect"]
+      },
+      "expectation": "Counts against: placing bare Select or PopupSelect controls in Section's filters instead of FilterButton or FilterMenu."
     }
   ]
 }

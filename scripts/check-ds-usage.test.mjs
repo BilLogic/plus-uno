@@ -32,8 +32,7 @@ test('reference stories, pattern code stories and MDX code blocks are held to ze
 test('a prototype with one escape per fail-level rule exits 1, naming file, line, column, rule and fix', () => {
   const out = cli(`${FIXTURES}/escaping`);
   assert.equal(out.status, 1);
-  // ds/placement fails only through a slot-acceptance row, and the design system registers none today; ds-usage.test.mjs runs that rule on a fixture row.
-  const failRules = Object.entries(RULES).filter(([id, r]) => r.level === 'fail' && id !== 'ds/no-raw-motion' && id !== 'ds/placement').map(([id]) => id);
+  const failRules = Object.entries(RULES).filter(([id, r]) => r.level === 'fail' && id !== 'ds/no-raw-motion').map(([id]) => id);
   for (const rule of failRules) {
     assert.match(out.stderr, new RegExp(`escaping/src/App\\.jsx:\\d+:\\d+  ${rule}  `), rule);
   }
@@ -181,7 +180,7 @@ export const Queue = { render: () => <Page><Banner>Heads up</Banner><PageHeader 
 
 test('promoted placements have repeated misses in the ledger and stay within five rows', () => {
   const rows = contextOf(ROOT).placements.filter((r) => r.level !== 'warn');
-  assert.ok(rows.length <= 5);
+  assert.ok(rows.length > 0 && rows.length <= 5);
   const ledger = fs.readFileSync(path.join(ROOT, 'docs/evals/ds-usage-ledger.jsonl'), 'utf8').trim().split('\n').map(JSON.parse);
   for (const row of rows) {
     const misses = ledger.filter((r) => r.task === row.evidence.task && r.fit?.[row.evidence.item]?.verdict === 'ignored');

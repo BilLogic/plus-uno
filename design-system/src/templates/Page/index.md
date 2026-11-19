@@ -146,7 +146,7 @@ A record page one level down shows every header slot, with markers in the gutter
 | `header` | One `PageHeader`: the h1 with `breadcrumbs` after a drill-in, `actions` and page tabs in `bottomBar`. Replaces `title`. |
 | `description` · `status` | Planned. `PageHeader` has neither slot yet, so the examples here compose both in its `title` block: the `Heading`, a StatusTag after it, then one description line. |
 | `banner` | One page `Banner`, below the header. Page separates the slots and content with `--page-stack-md`. |
-| Type | Set on the Frame's `width`: `default` (1232), `full` (no cap) or `reading` (864). `content` still works as `default` and warns. |
+| Type | Set on the Frame's `width`: `default` (1232), `full` (no cap) or `reading` (864). |
 | Scrolled header | Planned. The sticky one-row header. |
 | `as` | The container element. |
 

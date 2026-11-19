@@ -50,10 +50,10 @@ export const ThreeCells = ({ labels = ['Discard', 'Save draft', 'Schedule'] }) =
     </FooterActions>
 );
 
-/** Text (ghost) button hugging the left content edge; filled buttons in tracks 3 and 4. */
-export const TextLeftCells = ({ ghost = 'Skip', secondary = 'Save draft', action = 'Schedule' }) => (
+/** A danger side action hugging the left content edge; filled buttons in tracks 3 and 4. */
+export const LeadingCells = ({ elemBefore = 'Delete draft', secondary = 'Save draft', action = 'Schedule' }) => (
     <FooterActions>
-        <Button text={ghost} appearance="subtle" onClick={() => {}} />
+        <Button text={elemBefore} appearance="danger" onClick={() => {}} />
         <Button text={secondary} onClick={() => {}} />
         <Button text={action} appearance="primary" onClick={() => {}} />
     </FooterActions>

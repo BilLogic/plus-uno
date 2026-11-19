@@ -462,20 +462,6 @@
           }
         },
         {
-          "name": "Section/toolbar-min-width",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--section-toolbar-min-width)"
-          }
-        },
-        {
-          "name": "Section/toolbar-count-min-width",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--section-toolbar-count-min-width)"
-          }
-        },
-        {
           "name": "Card/pad",
           "resolvedType": "FLOAT",
           "codeSyntax": {

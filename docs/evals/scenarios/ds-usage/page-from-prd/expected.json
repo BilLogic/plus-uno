@@ -101,5 +101,18 @@
       "expectation": "SearchField sits in Section's search prop and the quick filters in its filters prop."
     }
   ],
-  "against_placements": []
+  "against_placements": [
+    {
+      "id": "bare-select-in-filters",
+      "placement": "Bare Select or PopupSelect in Section filters",
+      "page": "design-system/agent-views/patterns/Filtering.md",
+      "section": "Tiers",
+      "scoring": "checker",
+      "check": {
+        "kind": "no-bare-select-in-filters",
+        "rejects": ["Select", "PopupSelect"]
+      },
+      "expectation": "Counts against: placing bare Select or PopupSelect controls in Section's filters instead of FilterButton or FilterMenu."
+    }
+  ]
 }

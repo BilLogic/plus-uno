@@ -6436,7 +6436,7 @@
       "import": "import { FooterActions } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/FooterActions/FooterActions.jsx",
-      "summary": "FooterActions — 4-track footer layout for Modal, Panel and a multi-step task's footer. Divides the footer into 4 equal tracks separated by `--inline-md`. Every filled action button is cloned at `spacing=\"spacious\"` (48) with `shouldFitContainer`. A leading text or link action hugs the left edge without taking a filled track, and containers up to 400 wide split a single action across the full width via `@container (max-width: 400px)`.",
+      "summary": "FooterActions — 4-track footer layout for Modal, Panel and a multi-step task's footer. Divides the footer into 4 equal tracks separated by `--inline-md`. Every filled action button is cloned at `spacing=\"spacious\"` (48) with `shouldFitContainer`. A leading `danger` or link action hugs the left edge without taking a filled track, and containers up to 400 wide split a single action across the full width via `@container (max-width: 400px)`.",
       "props": [
         {
           "name": "leadingAction",
@@ -6444,7 +6444,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Optional text or link action hugging the left content edge without taking a filled track.",
+          "description": "Optional `danger` or link action hugging the left content edge without taking a filled track.",
           "deprecated": null
         },
         {
@@ -6479,9 +6479,11 @@
         "OneButton",
         "TwoButtons",
         "ThreeButtons",
-        "TextButtonLeft",
-        "DangerTextButtonLeft",
-        "TextLeftWithThreeFilled",
+        "DeclineInLeftHalf",
+        "SubtleFillsTrack",
+        "LinkLeft",
+        "DangerLeft",
+        "LeadingWithThreeFilled",
         "DestructiveSplit",
         "Steps",
         "NarrowPanel",
@@ -6626,13 +6628,13 @@
           "name": "width",
           "type": "enum",
           "required": false,
-          "default": null,
+          "default": "'default'",
           "values": [
             "default",
             "full",
             "reading"
           ],
-          "description": "Content type: default caps the grid at 1232, full has no cap (chat, a board, a wide table), reading caps it at 864. `content` is the old name for `default`.",
+          "description": "Content type: default caps the grid at 1232, full has no cap (chat, a board, a wide table), reading caps it at 864.",
           "deprecated": null
         },
         {
@@ -8849,7 +8851,7 @@
         "FooterOne",
         "FooterTwo",
         "FooterThree",
-        "FooterTextLeft",
+        "FooterLeadingAction",
         "FooterDestructive",
         "FooterNarrow",
         "KeyLongContent",

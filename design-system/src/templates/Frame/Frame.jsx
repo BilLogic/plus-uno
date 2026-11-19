@@ -20,18 +20,6 @@ const PEEK_LEAVE_MS = 200;
 /** The sessionStorage key the Panel's width and open state are kept under, for this tab. */
 export const PANEL_STORAGE_KEY = 'plus-frame-panel';
 
-/** Dev-only notice, once, that the old `width="content"` is now `default`. */
-let warnedContentWidth = false;
-const resolveWidth = (width) => {
-    if (width !== 'content') return width;
-    if (!warnedContentWidth && process.env.NODE_ENV !== 'production') {
-        warnedContentWidth = true;
-        // eslint-disable-next-line no-console
-        console.warn('Frame: width="content" is now width="default".');
-    }
-    return 'default';
-};
-
 const clampPanelWidth = (n) => clamp(n, FRAME_LAYOUT.panelMin, FRAME_LAYOUT.panelMax);
 
 /** The Panel's remembered `{ open, width }`, or null where there is none or no storage. */
@@ -129,7 +117,7 @@ const Frame = ({
     panelDefaultWidth = FRAME_LAYOUT.panelDefault,
     panelPeek = false,
     panelStorageKey = PANEL_STORAGE_KEY,
-    width: widthProp = 'default',
+    width = 'default',
     contentAs: Content = 'main',
     contentClassName = '',
     surfaceDirect = false,
@@ -138,7 +126,6 @@ const Frame = ({
     children,
     ...props
 }) => {
-    const width = resolveWidth(widthProp);
     const frameRef = useRef(null);
     const rowRef = useRef(null);
     const toggleRef = useRef(null);
@@ -713,7 +700,7 @@ Frame.propTypes = {
     panelPeek: PropTypes.bool,
     /** The sessionStorage key the Panel's width and open state are kept under; null keeps nothing. */
     panelStorageKey: PropTypes.string,
-    /** Content type: default caps the grid at 1232, full has no cap (chat, a board, a wide table), reading caps it at 864. `content` is the old name for `default`. */
+    /** Content type: default caps the grid at 1232, full has no cap (chat, a board, a wide table), reading caps it at 864. */
     width: PropTypes.oneOf(['default', 'full', 'reading']),
     /** Element for the content box. `main` by default, the Page's landmark; pass `div` when the page supplies its own `main`. */
     contentAs: PropTypes.elementType,

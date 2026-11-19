@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { render } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import Frame from './Frame.jsx';
@@ -19,14 +20,13 @@ describe('Frame width', () => {
         expect(contentOf(container)).toHaveClass('plus-frame__content--default');
     });
 
-    it('accepts the old width="content" as default and warns once', () => {
-        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-        const { container, rerender } = render(<Frame width="content"><p>Body</p></Frame>);
-        rerender(<Frame width="content"><p>Body</p></Frame>);
-        expect(contentOf(container)).toHaveClass('plus-frame__content--default');
-        expect(contentOf(container)).not.toHaveClass('plus-frame__content--content');
-        expect(warn).toHaveBeenCalledTimes(1);
-        expect(warn.mock.calls[0][0]).toMatch(/width="content".*default/);
+    it('takes only default, full and reading: the old `content` is retired', () => {
+        const check = (width) => PropTypes.checkPropTypes({ width: Frame.propTypes.width }, { width }, 'prop', 'Frame');
+        const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+        check('full');
+        expect(error).not.toHaveBeenCalled();
+        check('content');
+        expect(error).toHaveBeenCalledTimes(1);
     });
 
     it('lifts the content cap for full width in the stylesheet', async () => {
