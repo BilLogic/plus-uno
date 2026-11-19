@@ -354,6 +354,8 @@
         "DocsAgentFallback"
       ],
       "tokens": [
+        "--ai-chat-fab-size",
+        "--ai-chat-height",
         "--ai-chat-width",
         "--body-default",
         "--body-sm",
@@ -364,8 +366,6 @@
         "--ds-surface-sunken",
         "--ds-text",
         "--ds-text-subtle",
-        "--height-2000",
-        "--height-300",
         "--layer-dialog",
         "--layer-navigation",
         "--pad-x-md",
