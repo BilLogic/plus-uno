@@ -69,3 +69,20 @@ test('Section carries no glossary avoid-word of its own: its hand-kept aliases a
   assert.ok(!aliases.includes('toolbar'), 'toolbar is not a Section alias');
   assert.doesNotMatch(read('design-system/src/templates/Section/Section.jsx'), /with its header, toolbar and tabs/);
 });
+
+test('the Panel page places Details by width, credits Escape to the Frame and lists every part', () => {
+  const page = read('design-system/src/templates/Panel/Panel.mdx');
+  assert.doesNotMatch(page, /floating over the right of the Page/);
+  assert.doesNotMatch(page, /footer, and Escape to close/);
+  assert.match(page, /Docked from 1168; floating under it/);
+  assert.match(page, /The Frame closes the Panel on Escape/);
+  assert.match(page, /Inbox floating out of the Sidebar on the left is <PlannedTag \/> Planned/);
+  const slots = page.slice(page.indexOf('<tr><th>Slot</th>'), page.indexOf('</DocsTable>', page.indexOf('<tr><th>Slot</th>')));
+  for (const part of ['backAction', 'titleIcon', 'PanelSubheader', 'PanelDisclaimer']) assert.ok(slots.includes(part), `the Slots table lists ${part}`);
+});
+
+test('the Details demo puts Edit in the title row, where Common actions says, not in the body', () => {
+  const demo = read('design-system/src/templates/Panel/panelDemo.jsx');
+  assert.doesNotMatch(demo, /<div><Button text="Edit"/);
+  assert.match(demo, /actions=\{\(\s*<>\s*\{!editing && onEdit \? <Button text="Edit"/);
+});
