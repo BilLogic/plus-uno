@@ -190,8 +190,8 @@ const DEEP_CRUMBS = [{ text: 'Students', href: '#' }, { text: 'Maya Rodriguez', 
 const contentBox = (root) => root.querySelector('.plus-frame__content');
 
 /** A tutor's area page: the title alone over Sections. */
-const AreaPage = ({ full = false }) => (
-    <PageStage scrollable full={full} width={TYPE_STAGE} height={300}>
+const AreaPage = ({ type = 'default' }) => (
+    <PageStage scrollable type={type} width={TYPE_STAGE} height={300}>
         <DemoPageHeader title="Sessions" />
         <CardsSection title="Upcoming sessions" description="Next 7 days" actions={<Button text="View calendar" onClick={() => {}} />} />
     </PageStage>
@@ -216,13 +216,29 @@ export const TypeDefault = {
 /** Full width: the content runs to the pad, with no cap. */
 export const TypeFullWidth = {
     name: 'Type: Full width',
-    render: () => <AreaPage full />,
+    render: () => <AreaPage type="full" />,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(contentBox(canvasElement).getBoundingClientRect().width, 'the content runs past the cap').toBeGreaterThan(FRAME_LAYOUT.contentCap);
         await expect(canvasElement.querySelector('[data-page-stage]').offsetWidth, 'at the stage width').toBe(TYPE_STAGE);
+        const btn = canvas.getByRole('button', { name: 'View calendar' });
+        btn.focus();
+        await expect(btn).toHaveFocus();
+    },
+};
+
+/** Reading: the content grid capped at 864, the readable measure for a lesson, an article or a policy. */
+export const TypeReading = {
+    name: 'Type: Reading',
+    render: () => <AreaPage type="reading" />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        const cap = parseFloat(getComputedStyle(canvasElement).getPropertyValue('--content-max-width-reading')) || 864;
+        await expect(contentBox(canvasElement).getBoundingClientRect().width, 'the content box stops at the reading cap').toBe(cap);
         const btn = canvas.getByRole('button', { name: 'View calendar' });
         btn.focus();
         await expect(btn).toHaveFocus();

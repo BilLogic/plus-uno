@@ -2,7 +2,8 @@ import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ComponentExample } from '@/storybook-docs/ds-docs-layout.jsx';
 import { LiveAnatomy, TypeCard } from '@/storybook-docs/lib/template-page.jsx';
-import Section, { SectionToolbar } from './Section';
+import Section from './Section';
+import * as SectionModule from './Section';
 import * as Cases from './SectionCases.jsx';
 
 vi.mock('@storybook/addon-docs/blocks', () => ({
@@ -49,39 +50,24 @@ describe('Section', () => {
     });
 
     describe('header types', () => {
-        it('infers `tabs` from the tabs slot and puts the tabs row under the title row', () => {
+        it('draws the three-row header: views and format, then search, filters and count', () => {
             const { container } = render(
-                <Section title="Next session" tabs={<div data-testid="tabs" />}>Body</Section>,
-            );
-            const header = container.querySelector('.plus-template-section-header');
-            expect(header.className).toContain('plus-template-section-header--tabs');
-            expect(within(header).getByTestId('tabs').closest('.plus-template-section-tabs')).not.toBeNull();
-        });
-
-        it('puts "Add view" at the end of the tabs row when `onAddView` is set', () => {
-            const onAddView = vi.fn();
-            render(<Section title="Students" tabs={<div />} onAddView={onAddView}>Body</Section>);
-            screen.getByRole('button', { name: 'Add view' }).click();
-            expect(onAddView).toHaveBeenCalledOnce();
-        });
-
-        it('infers `toolbar` from the toolbar slot', () => {
-            const { container } = render(
-                <Section title="Students" toolbar={<SectionToolbar count="48 students" />}>Body</Section>,
-            );
-            expect(container.querySelector('.plus-template-section-header').className).toContain('plus-template-section-header--toolbar');
-            expect(screen.getByText('48 students')).toBeInTheDocument();
-        });
-
-        it('`tabs-only` keeps the title as a heading but hides it visually', () => {
-            render(
-                <Section type="tabs-only" title="Students" tabs={<div data-testid="tabs" />} actions={<button type="button">Add</button>}>
+                <Section
+                    title="Students"
+                    views={<div data-testid="views" />}
+                    format={<div data-testid="format" />}
+                    search={<div data-testid="search" />}
+                    filters={[{ key: 'status', label: 'Status', text: 'All' }]}
+                >
                     Body
                 </Section>,
             );
-            const heading = screen.getByRole('heading', { name: 'Students' });
-            expect(heading.closest('.visually-hidden')).not.toBeNull();
-            expect(screen.queryByRole('button', { name: 'Add' })).toBeNull();
+            const rows = container.querySelectorAll('.plus-section-row');
+            expect(rows).toHaveLength(2);
+            expect(within(rows[0]).getByTestId('views')).toBeInTheDocument();
+            expect(within(rows[0]).getByTestId('format')).toBeInTheDocument();
+            expect(within(rows[1]).getByTestId('search')).toBeInTheDocument();
+            expect(within(rows[1]).getByRole('button', { name: /Status/ })).toBeInTheDocument();
         });
 
         it('`custom` swaps title and description for the header slot and keeps the title as a hidden name', () => {
@@ -116,11 +102,11 @@ describe('Section', () => {
             expect(container.querySelectorAll('.plus-template-section-skeleton .plus-skeleton')).toHaveLength(2);
         });
 
-        it('adds a bar for the bottom row, and on tabs-only draws only that bar', () => {
-            const { container, rerender } = render(<Section title="S" tabs={<div />} loading>Body</Section>);
+        it('adds a bar for the rows under the title row', () => {
+            const { container, rerender } = render(<Section title="S" loading>Body</Section>);
+            expect(container.querySelectorAll('.plus-template-section-skeleton .plus-skeleton')).toHaveLength(2);
+            rerender(<Section title="S" views={<div />} loading>Body</Section>);
             expect(container.querySelectorAll('.plus-template-section-skeleton .plus-skeleton')).toHaveLength(3);
-            rerender(<Section type="tabs-only" title="S" tabs={<div />} loading>Body</Section>);
-            expect(container.querySelectorAll('.plus-template-section-skeleton .plus-skeleton')).toHaveLength(1);
         });
     });
 
@@ -160,34 +146,6 @@ describe('Section', () => {
             const parts = [...section(container).children].map((el) => el.className.split(' ')[0]);
             expect(parts).toEqual(['plus-template-section-header', 'plus-template-section-content', 'plus-template-section-footer']);
         });
-    });
-});
-
-describe('SectionToolbar', () => {
-    it('search, filters, count, then actions at the end', () => {
-        const { container } = render(
-            <SectionToolbar
-                search={<input aria-label="Search students" />}
-                filters={<button type="button">Status</button>}
-                count="48 students"
-                actions={<button type="button">Export</button>}
-            />,
-        );
-        const toolbar = container.firstChild;
-        const start = toolbar.querySelector('.plus-section-toolbar__start');
-        expect(within(start).getByRole('textbox', { name: 'Search students' })).toBeInTheDocument();
-        expect(within(start).getByRole('button', { name: 'Status' })).toBeInTheDocument();
-        expect(within(start).getByText('48 students')).toBeInTheDocument();
-        expect(within(toolbar.querySelector('.plus-section-toolbar__actions')).getByRole('button', { name: 'Export' })).toBeInTheDocument();
-    });
-
-    it('is reachable as Section.Toolbar', () => {
-        expect(Section.Toolbar).toBe(SectionToolbar);
-    });
-
-    it('announces the count politely', () => {
-        render(<SectionToolbar count="12 of 48 students" />);
-        expect(screen.getByRole('status')).toHaveTextContent('12 of 48 students');
     });
 });
 
@@ -420,18 +378,11 @@ describe('Section header rows', () => {
     });
 });
 
-describe('Section deprecated header props', () => {
-    it('warns once in development that `tabs` and `toolbar` give way to the rows', async () => {
-        vi.resetModules();
-        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-        const { default: Fresh } = await import('./Section');
-        const { rerender } = render(<Fresh title="S" tabs={<div />} toolbar={<div />}>Body</Fresh>);
-        rerender(<Fresh title="S" tabs={<div />} toolbar={<div />}>Body</Fresh>);
-        const messages = warn.mock.calls.map(([text]) => text);
-        expect(messages).toHaveLength(2);
-        expect(messages[0]).toMatch(/`tabs`.*deprecated.*`views` and `format`/);
-        expect(messages[1]).toMatch(/`toolbar`.*deprecated.*`search` and `filters`/);
-        warn.mockRestore();
+describe('Section retired header props', () => {
+    it('no longer exports the toolbar, the tabs or the Add view props', () => {
+        expect(SectionModule.SectionToolbar).toBeUndefined();
+        expect(Section.Toolbar).toBeUndefined();
+        ['tabs', 'toolbar', 'onAddView', 'addViewLabel'].forEach((name) => expect(Section.propTypes[name], name).toBeUndefined());
     });
 
     it('stays quiet for the three-row slots', async () => {

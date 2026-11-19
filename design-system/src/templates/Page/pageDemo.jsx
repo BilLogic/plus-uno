@@ -182,13 +182,12 @@ export const RecordTabSection = ({ tab = 'sessions', status = 'upcoming', onStat
 };
 
 /**
- * The Frame with no sidebar at the stage width, holding a page. `full` lifts the
- * 1232 cap (`width="full"` is planned on the Frame; the story sets the cap
- * token to none on the content box).
+ * The Frame with no sidebar at the stage width, holding a page. `type` is the Frame's `width`:
+ * default caps the grid at 1232, full lifts the cap, reading caps it at 864.
  */
-export const PageStage = ({ full = false, scrollable = false, width = SCENARIO_STAGE, height = STAGE_HEIGHT, children }) => {
+export const PageStage = ({ type = 'default', scrollable = false, width = SCENARIO_STAGE, height = STAGE_HEIGHT, children }) => {
     const frame = (
-        <Frame style={full ? { '--content-max-width': 'none' } : undefined}>
+        <Frame width={type}>
             {children}
         </Frame>
     );
@@ -205,7 +204,7 @@ export const PageStage = ({ full = false, scrollable = false, width = SCENARIO_S
     );
 };
 
-PageStage.propTypes = { full: PropTypes.bool, scrollable: PropTypes.bool, width: PropTypes.number, height: PropTypes.number, children: PropTypes.node };
+PageStage.propTypes = { type: PropTypes.oneOf(['default', 'full', 'reading']), scrollable: PropTypes.bool, width: PropTypes.number, height: PropTypes.number, children: PropTypes.node };
 
 /** The banner slot, under the header. */
 export const PageBanner = () => <Banner appearance="warning">Tutoring sessions move to the new calendar on Friday.</Banner>;

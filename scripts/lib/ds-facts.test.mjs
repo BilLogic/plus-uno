@@ -80,7 +80,7 @@ test('real repo: Frame and Sidebar answer with their props, from source', () => 
   const frame = facts.lookup('Frame');
   assert.equal(frame.kind, 'template');
   assert.equal(frame.import, "import { Frame } from '@/templates';");
-  assert.deepEqual(frame.props.find((p) => p.name === 'width').values, ['content', 'reading']);
+  assert.deepEqual(frame.props.find((p) => p.name === 'width').values, ['default', 'full', 'reading']);
   const sidebar = facts.lookup('Sidebar');
   assert.equal(sidebar.kind, 'component');
   assert.equal(sidebar.source, 'design-system/src/components/navigation/Sidebar/Sidebar.jsx');

@@ -23,9 +23,9 @@ test('reference stories, pattern code stories and MDX code blocks are held to ze
   const found = escapesIn({ path: 'design-system/src/Example.mdx', text }, contextOf(REPO_ROOT));
   assert.ok(found.some((f) => f.rule === 'ds/no-unknown-component' && f.line === 6));
   assert.equal(found.some((f) => f.rule === 'ds/no-raw-literal'), false);
-  const placement = `# Filtering\n\n\`\`\`jsx\nimport { Select } from '@/components';\nimport { Section } from '@/templates';\n<Section toolbar={<Select options={['All']} />} />;\n\`\`\``;
+  const placement = `# Filtering\n\n\`\`\`jsx\nimport { Banner, PageHeader } from '@/components';\nimport { Page } from '@/templates';\n<Page><Banner>Heads up</Banner><PageHeader title="Queue" /></Page>;\n\`\`\``;
   assert.ok(escapesIn({ path: 'design-system/src/Example.mdx', text: placement }, contextOf(REPO_ROOT)).some((f) => f.rule === 'ds/placement' && f.line === 6));
-  const outerImport = `import { Section } from '@/templates';\nimport { Select } from '@/components';\n\n\`\`\`jsx\n<Section toolbar={<Select options={['All']} />} />;\n\`\`\``;
+  const outerImport = `import { Page } from '@/templates';\nimport { Banner, PageHeader } from '@/components';\n\n\`\`\`jsx\n<Page><Banner>Heads up</Banner><PageHeader title="Queue" /></Page>;\n\`\`\``;
   assert.ok(escapesIn({ path: 'design-system/src/Example.mdx', text: outerImport }, contextOf(REPO_ROOT)).some((f) => f.rule === 'ds/placement' && f.line === 5));
 });
 
@@ -142,18 +142,19 @@ test('the real facts hold patterns: invented name, wrong prop and wrong value fa
   assert.deepEqual(rules(head + '<Frame width="wide" />'), ['ds/no-unknown-prop']);
 });
 
-test('repeated toolbar mistakes and hand-styled pages fail with actionable fixes', () => {
-  const code = `import { Select } from '@/components';
-import { Section } from '@/templates';
+test('a banner before the header and a hand-styled page are caught with actionable fixes', () => {
+  const code = `import { Banner, PageHeader } from '@/components';
+import { Page } from '@/templates';
 export default function App() {
-  return <div className="shell"><Section toolbar={<Select options={[]} />} /></div>;
+  return <div className="shell"><Page><Banner>Heads up</Banner><PageHeader title="Queue" /></Page></div>;
 }`;
   const found = escapesIn({ path: 'prototypes/x/src/App.jsx', text: code }, contextOf(REPO_ROOT));
-  for (const rule of ['ds/placement', 'ds/page-starts-from-pattern']) {
-    const finding = found.find((f) => f.rule === rule);
-    assert.equal(finding?.level, 'fail', rule);
-    assert.match(finding.fix, rule === 'ds/placement' ? /FilterButton/ : /Frame/);
-  }
+  const placement = found.find((f) => f.rule === 'ds/placement');
+  assert.equal(placement?.level, 'warn');
+  assert.match(placement.fix, /banner/);
+  const shell = found.find((f) => f.rule === 'ds/page-starts-from-pattern');
+  assert.equal(shell?.level, 'fail');
+  assert.match(shell.fix, /Frame/);
 });
 
 test('MDX examples and reference-screen stories use the same placement checker', () => {
@@ -162,16 +163,16 @@ test('MDX examples and reference-screen stories use the same placement checker',
   const story = 'design-system/src/storybook-docs/Reference.stories.jsx';
   try {
     fs.mkdirSync(path.dirname(path.join(root, mdx)), { recursive: true });
-    fs.writeFileSync(path.join(root, mdx), '# Example\n\n```jsx\n<Section.Toolbar filters={<Select options={[]} />} />\n```\n');
-    fs.writeFileSync(path.join(root, story), `import { Select } from '@/components';
-import { Section } from '@/templates';
+    fs.writeFileSync(path.join(root, mdx), '# Example\n\n```jsx\n<Page><Banner>Heads up</Banner><PageHeader title="Queue" /></Page>\n```\n');
+    fs.writeFileSync(path.join(root, story), `import { Banner, PageHeader } from '@/components';
+import { Page } from '@/templates';
 export default { tags: ['reference-screen'] };
-export const Queue = { render: () => <Section.Toolbar filters={<Select options={[]} />} /> };`);
+export const Queue = { render: () => <Page><Banner>Heads up</Banner><PageHeader title="Queue" /></Page> };`);
     const found = escapes(root, [mdx, story], ROOT).filter((f) => f.rule === 'ds/placement');
-    assert.deepEqual(found.map((f) => [f.file, f.line, f.level]), [[mdx, 4, 'fail'], [story, 4, 'fail']]);
+    assert.deepEqual(found.map((f) => [f.file, f.line, f.level]), [[mdx, 4, 'warn'], [story, 4, 'warn']]);
     assert.ok(inScope(mdx));
     assert.ok(inScope(story));
-    assert.ok(found.every((f) => /FilterButton/.test(f.fix)));
+    assert.ok(found.every((f) => /banner/.test(f.fix)));
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }

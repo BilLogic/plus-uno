@@ -13,7 +13,7 @@ Arrange components by filling a template's slots. Use patterns to guide the choi
 Templates run from broadest to smallest. Each page covers types, anatomy, key states and usage. See Templates and patterns below for how the layers fit together.
 
 - **Frame.** The app frame: the Sidebar beside the Page, with the AI panel as its own region. Two types: default and bare.
-- **Page.** The content inside a Frame: a page header, then Sections on the 12-column grid. Two types: default and full width.
+- **Page.** The content inside a Frame: a page header, then Sections on the 12-column grid. Three types: default, full width and reading.
 - **Section.** A span of the page grid under one heading: a header, a body, and an optional side, detail and footer.
 - **Card.** A raised container for one object on a page, such as a student, a session or a metric: an optional image, a header over a body, and an optional footer.
 - **Table.** How a table sits on a page: the Section header carries the title and toolbar, and the table spans the section under it.
