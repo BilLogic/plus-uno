@@ -29,7 +29,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Panel | template | narrow-enter | Open and close an overlay | `--ds-motion-spatial-slow` |  |
 | Panel | template | narrow-exit | Open and close an overlay | `--ds-motion-spatial-default` |  |
 | PatternCard | template | change | Update a value or state | `--ds-motion-appearance-fast` |  |
-| PatternCard | template | milestone | Load content | `--ds-motion-spatial-default` | `sound.done.milestone` on land: onboarding complete, first session, goal reached, term start or end, badge claimed; goal reached is shared, so the student hears it |
+| PatternCard | template | milestone | Load content | `--ds-motion-spatial-default` | `sound.done.milestone` on land: onboarding complete, first session, goal reached, term start or end, achievement claimed; goal reached is shared, so the student hears it |
 | PatternSection | template | view-bar | Swap content in place | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | PatternSection | template | side-open | Expand and collapse | `--ds-motion-spatial-default` |  |
 | PatternSection | template | side-close | Expand and collapse | `--ds-motion-spatial-default` |  |

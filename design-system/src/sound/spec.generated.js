@@ -491,7 +491,7 @@ export const SOUND_MOMENTS = [
     "transition": "Load content",
     "token": "done.milestone",
     "at": "land",
-    "when": "onboarding complete, first session, goal reached, term start or end, badge claimed; goal reached is shared, so the student hears it",
+    "when": "onboarding complete, first session, goal reached, term start or end, achievement claimed; goal reached is shared, so the student hears it",
     "spring": "spatial.default"
   },
   {
