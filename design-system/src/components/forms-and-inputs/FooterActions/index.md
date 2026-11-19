@@ -2,7 +2,7 @@
 
 # FooterActions
 
-FooterActions — 4-track footer layout for Modal, Panel and a multi-step task's footer. Divides the footer into 4 equal tracks separated by `--inline-md`. Every filled action button is cloned at `spacing="spacious"` (48) with `shouldFitContainer`. A leading `danger` or link action hugs the left edge without taking a filled track, and containers up to 400 wide split a single action across the full width via `@container (max-width: 400px)`.
+FooterActions — 4-track footer layout for Modal, Panel and a multi-step task's footer. Divides the footer into 4 equal tracks separated by `--inline-md`. Every filled action button is cloned at `spacing="spacious"` (48) with `shouldFitContainer`. A leading action hugs the left edge without taking a filled track and is always drawn as a link (`link`, or `danger-link` for a destructive one), and containers up to 400 wide split a single action across the full width via `@container (max-width: 400px)`.
 
 **Import:** `import { FooterActions } from '@/components';`
 
@@ -20,7 +20,7 @@ Use `FooterActions` inside Modal, Panel (`PanelFooter`) and the multi-step task 
 2. **One action.** Sits in the right half (tracks `3` and `4`). A single action fills the full width (all four tracks) only when the footer itself is `400` px wide or less (`@container (max-width: 400px)`) and there is no leading action.
 3. **Two actions.** Split `50/50` across tracks `1`–`2` and `3`–`4`: secondary on the left in the `default` soft neutral fill (`--ds-background-neutral`), `primary` on the right.
 4. **Three actions.** Take one quarter each in tracks `2`, `3` and `4`; only the rightmost is `primary`.
-5. **Leading action.** The leading slot holds only a side action that is not one of the footer's two outcomes: a `danger` destructive action such as "Delete", or a `link` that leaves the task, such as "Save and exit". It hugs the left content edge when it is the first child (of two or more) or is passed as `leadingAction`. It is never "Not now", "Cancel" or "Back". An action that declines or postpones ("Not now", "Skip", "Keep editing", "Save for later") is a `default` secondary in the left half, beside the primary. Filled actions sit in tracks `3`–`4` (one filled), `3` and `4` (two filled), or `2`, `3` and `4` (three filled, clamping the leading action to track `1`).
+5. **Leading action.** The leading slot holds only a side action that is not one of the footer's two outcomes: a destructive action such as "Delete", or a `link` that leaves the task, such as "Save and exit". It is always drawn as text with no fill: a `danger` action there becomes a `danger-link`, and any other leading action a `link`. It hugs the left content edge when it is the first child (of two or more) or is passed as `leadingAction`. It is never "Not now", "Cancel" or "Back". An action that declines or postpones ("Not now", "Skip", "Keep editing", "Save for later") is a `default` secondary in the left half, beside the primary. Filled actions sit in tracks `3`–`4` (one filled), `3` and `4` (two filled), or `2`, `3` and `4` (three filled, clamping the leading action to track `1`).
 6. **Destructive confirmations.** Place the safer alternative (`default` secondary, such as "Archive instead") on the left and the `danger` action as the rightmost child, splitting `50/50` across tracks `1`–`2` and `3`–`4`.
 7. **No Cancel in footers.** `Modal` and `Panel` already carry a corner close button, so footers name real outcomes ("Discard", "Save", never Cancel). Cancel appears only on a page form, which has no close button: `subtle`, after the Primary.
 8. **Steps.** In a multi-step flow, "Back" (`default`) and "Next" (`primary`) split `50/50` across tracks `1`–`2` and `3`–`4`.
@@ -63,7 +63,7 @@ Don't: "Not now" in the leading slot instead of the left half.
 
 ### Pair a destructive confirmation with a safer alternative. {#pair-a-destructive-confirmation-with-a-safer-alternative}
 
-Put the safer alternative in the left half and the `danger` action rightmost; a `danger` button placed first of two moves to the leading slot instead.
+Put the safer alternative in the left half and the `danger` action rightmost; a `danger` button placed first of two moves to the leading slot instead, drawn as a `danger-link`.
 
 Do: Safer alternative on the left and danger rightmost, splitting equally across both halves.
 Don't: Danger placed first of two moves to the leading slot instead of being the confirmation.
@@ -115,7 +115,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | --- | --- |
 | Height | 48: `--footer-height`. |
 | Track gap | `--inline-md` between the 4 equal tracks. |
-| Danger leading action | `--ds-text-danger` label and `--ds-icon-danger` icon on `--ds-background-neutral-subtle`, with `--ds-background-danger-subtler-hovered` and `--ds-background-danger-subtler-pressed` states. |
+| Link leading action | `--ds-link` label and `--ds-icon-brand` icon with no fill, underlined on hover and `--ds-link-pressed` when pressed. Its start padding is `0`, so the text sits on the content edge. |
+| Danger-link leading action | `--ds-text-danger` label and `--ds-icon-danger` icon with no fill, underlined on hover and `--ds-text-danger-bolder` when pressed. |
 
 ## Content guidelines
 
@@ -128,14 +129,14 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `leadingAction` | node | — | Optional `danger` or link action hugging the left content edge without taking a filled track. |
+| `leadingAction` | node | — | Optional leading action hugging the left content edge without taking a filled track. It is drawn as a `link`, or a `danger-link` when it is a `danger` action. |
 | `children` | node | — | Filled action buttons placed across the 4 tracks. |
 | `className` | string | — | Extra class names added to the footer grid container. |
 | `style` | object | — | Inline style overrides on the footer grid container. |
 
 ## Tokens touched
 
-`--ds-background-danger-subtler-hovered` · `--ds-background-danger-subtler-pressed` · `--ds-background-neutral-subtle` · `--ds-icon-danger` · `--ds-text-danger` · `--footer-height` · `--inline-md`
+`--footer-height` · `--inline-md`
 
 From `design-system/src/components/forms-and-inputs/FooterActions/FooterActions.scss`. Override these through the token layer, never with a literal.
 

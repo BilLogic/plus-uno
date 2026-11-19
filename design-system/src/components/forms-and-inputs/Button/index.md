@@ -14,7 +14,7 @@ Also asked as: cta, submit.
 
 **Source:** `design-system/src/components/forms-and-inputs/Button/Button.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Button/Button.stories.jsx` — Overview, Appearances, Spacing, Icons, WithCount, States, Default, Primary, Subtle, Warning, Danger, Discovery, Ai, Compact, Spacious, Selected, Disabled, Loading, ExplainsOnPress, FitContainer, Truncation, Interactive, StateSteps, KeyboardFocus, AnchorKeyboard, AnchorHref, Anatomy, FooterLayouts
+**Stories:** `design-system/src/components/forms-and-inputs/Button/Button.stories.jsx` — Overview, Appearances, Spacing, Icons, WithCount, States, Default, Primary, Subtle, Warning, Danger, Link, DangerLink, Discovery, Ai, Compact, Spacious, Selected, Disabled, Loading, ExplainsOnPress, FitContainer, Truncation, Interactive, StateSteps, LinkStates, KeyboardFocus, AnchorKeyboard, AnchorHref, Anatomy, FooterLayouts
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Button/Button.mdx`
 
@@ -32,8 +32,9 @@ Use `Button` for an action on the current page: submit a form, mark attendance, 
 | Primary | The main call to action or a form submission. One per page or area. Example: "Book session". |
 | Subtle | Secondary actions in headers, toolbars and button groups. Example: "Cancel" on a page form. Never "Not now": a declining action is a Default secondary in the left half of a footer. |
 | Warning | Confirms an action that may cause a significant change or a loss of data, often in a confirmation modal. Example: "Remove from this week". |
-| Danger | The final confirmation of a destructive, irreversible action. Example: "Delete session recording". It also fills a footer's leading slot as a side action. Example: "Delete". |
-| Link | A `LinkButton` that leaves the task. It fills a footer's leading slot. Example: "Save and exit". |
+| Danger | The final confirmation of a destructive, irreversible action. Example: "Delete session recording". |
+| Link | An action that leaves: text in the brand color with no fill, underlined on hover. It fills a footer's leading slot. Use it on a `LinkButton` to leave the page, or on a `Button` to leave the task. Examples: "Save and exit", "Open profile". |
+| Danger link | A footer's leading destructive action: danger-colored text with no fill, so every leading action lines up as text. Example: "Delete", "Discard". Use Danger for the final confirmation. |
 | Discovery | The call to action for a new experience. Example: "Try the new schedule view". |
 | AI | The one primary AI action in a region. Draws the sparkle before its label. Example: "Generate summary". |
 
@@ -174,7 +175,7 @@ Most buttons need no icon. Add one only when the glyph has an established meanin
 
 ## Variants
 
-**`appearance`** — `default` · `primary` · `subtle` · `warning` · `danger` · `discovery` · `ai`
+**`appearance`** — `default` · `primary` · `subtle` · `warning` · `danger` · `discovery` · `ai` · `link` · `danger-link`
 
 **`spacing`** — `default` · `compact` · `spacious`
 

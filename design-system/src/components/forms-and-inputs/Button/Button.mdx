@@ -103,6 +103,10 @@ A button triggers an action and lets people know what happens next.
 
 <ComponentExample of={ButtonStories.Danger} title="Danger" description="The final confirmation of a destructive, irreversible action." />
 
+<ComponentExample of={ButtonStories.Link} title="Link" description="Brand-colored text with no fill, for an action that leaves, such as Save and exit or Open profile. Hovering underlines it." />
+
+<ComponentExample of={ButtonStories.DangerLink} title="Danger link" description="Danger-colored text with no fill, for a footer's leading destructive action, such as Delete or Discard." />
+
 <ComponentExample of={ButtonStories.Discovery} title="Discovery" description="The call to action for a new experience." />
 
 <ComponentExample of={ButtonStories.Ai} title="AI" description="The one primary AI action in a region. The sparkle is always drawn." />
@@ -133,7 +137,7 @@ A button triggers an action and lets people know what happens next.
 
 ## Footer actions
 
-Inside <DocsLink id="components-forms-and-inputs-button-footer-actions">FooterActions</DocsLink>, filled buttons draw `48` high (`spacing="spacious"`) with `shouldFitContainer` across four equal tracks, while secondary actions use the `default` soft neutral fill (`--ds-background-neutral`) with no outline. An action that declines or postpones ("Not now", "Skip", "Keep editing") is a secondary in the left half. The leading slot holds only a `danger` action such as "Delete" or a link such as "Save and exit". Outside `FooterActions` (and a single action in a footer `400` px wide or less with no leading action), buttons hug their label. See <DocsLink id="components-forms-and-inputs-button-footer-actions">Footer actions</DocsLink> for the placement rules, do and don't pairs, and the hug-or-fill surface map.
+Inside <DocsLink id="components-forms-and-inputs-button-footer-actions">FooterActions</DocsLink>, filled buttons draw `48` high (`spacing="spacious"`) with `shouldFitContainer` across four equal tracks, while secondary actions use the `default` soft neutral fill (`--ds-background-neutral`) with no outline. An action that declines or postpones ("Not now", "Skip", "Keep editing") is a secondary in the left half. The leading slot holds only a side action, always drawn as text with no fill: a `danger-link` such as "Delete", or a `link` such as "Save and exit". `FooterActions` draws a `danger` action there as a `danger-link`. Outside `FooterActions` (and a single action in a footer `400` px wide or less with no leading action), buttons hug their label. See <DocsLink id="components-forms-and-inputs-button-footer-actions">Footer actions</DocsLink> for the placement rules, do and don't pairs, and the hug-or-fill surface map.
 
 <ComponentExample of={ButtonStories.FooterLayouts} title="Footer tracks" description="Inside FooterActions, spacious buttons draw 48 high and fill their assigned tracks across the four-track grid." />
 
@@ -197,8 +201,9 @@ Use `Button` for an action on the current page: submit a form, mark attendance, 
 <tr><td>Primary</td><td>The main call to action or a form submission. One per page or area. Example: "Book session".</td></tr>
 <tr><td>Subtle</td><td>Secondary actions in headers, toolbars and button groups. Example: "Cancel" on a page form. Never "Not now": a declining action is a Default secondary in the left half of a footer.</td></tr>
 <tr><td>Warning</td><td>Confirms an action that may cause a significant change or a loss of data, often in a confirmation modal. Example: "Remove from this week".</td></tr>
-<tr><td>Danger</td><td>The final confirmation of a destructive, irreversible action. Example: "Delete session recording". It also fills a footer's leading slot as a side action. Example: "Delete".</td></tr>
-<tr><td>Link</td><td>A <code>LinkButton</code> that leaves the task. It fills a footer's leading slot. Example: "Save and exit".</td></tr>
+<tr><td>Danger</td><td>The final confirmation of a destructive, irreversible action. Example: "Delete session recording".</td></tr>
+<tr><td>Link</td><td>An action that leaves: text in the brand color with no fill, underlined on hover. It fills a footer's leading slot. Use it on a <code>LinkButton</code> to leave the page, or on a <code>Button</code> to leave the task. Examples: "Save and exit", "Open profile".</td></tr>
+<tr><td>Danger link</td><td>A footer's leading destructive action: danger-colored text with no fill, so every leading action lines up as text. Example: "Delete", "Discard". Use Danger for the final confirmation.</td></tr>
 <tr><td>Discovery</td><td>The call to action for a new experience. Example: "Try the new schedule view".</td></tr>
 <tr><td>AI</td><td>The one primary AI action in a region. Draws the sparkle before its label. Example: "Generate summary".</td></tr>
 </tbody>

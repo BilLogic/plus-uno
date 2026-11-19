@@ -165,18 +165,22 @@ export function sweep(themes, values) {
 
 /**
  * Appearances that draw the same thing at rest: the same ground and the same
- * edge. The two rows with one ground, default and subtle, are told apart by
- * the edge only default draws.
+ * edge. The rows with one ground, default and subtle, are told apart by the
+ * edge only default draws. An appearance with no ground, such as subtle and the
+ * link appearances, is text on the page, so its label tells it apart.
  *
  * @returns {string[][]} groups of two or more appearance names
  */
 export function duplicateGrounds(themes, values) {
   const byLook = new Map();
+  const pageHex = toHex(parseColor(resolveToken(PAGE_TOKEN, values)));
   for (const theme of themes) {
     const built = combination(theme, 'rest', values);
     if (built.unresolved) continue;
     const edge = theme.edge === 'transparent' ? 'transparent' : resolveToken(theme.edge, values);
-    const key = `${toHex(built.ground)} ${edge}`;
+    const ground = toHex(built.ground);
+    // A ground-less appearance is text on the page, so its label is the look.
+    const key = ground === pageHex ? `${ground} ${edge} ${theme.label}` : `${ground} ${edge}`;
     if (!byLook.has(key)) byLook.set(key, []);
     byLook.get(key).push(theme.appearance);
   }

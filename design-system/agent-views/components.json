@@ -1107,7 +1107,9 @@
             "warning",
             "danger",
             "discovery",
-            "ai"
+            "ai",
+            "link",
+            "danger-link"
           ],
           "description": "The visual style.",
           "deprecated": null
@@ -1282,6 +1284,8 @@
         "Subtle",
         "Warning",
         "Danger",
+        "Link",
+        "DangerLink",
         "Discovery",
         "Ai",
         "Compact",
@@ -1294,6 +1298,7 @@
         "Truncation",
         "Interactive",
         "StateSteps",
+        "LinkStates",
         "KeyboardFocus",
         "AnchorKeyboard",
         "AnchorHref",
@@ -6446,7 +6451,7 @@
       "import": "import { FooterActions } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/FooterActions/FooterActions.jsx",
-      "summary": "FooterActions — 4-track footer layout for Modal, Panel and a multi-step task's footer. Divides the footer into 4 equal tracks separated by `--inline-md`. Every filled action button is cloned at `spacing=\"spacious\"` (48) with `shouldFitContainer`. A leading `danger` or link action hugs the left edge without taking a filled track, and containers up to 400 wide split a single action across the full width via `@container (max-width: 400px)`.",
+      "summary": "FooterActions — 4-track footer layout for Modal, Panel and a multi-step task's footer. Divides the footer into 4 equal tracks separated by `--inline-md`. Every filled action button is cloned at `spacing=\"spacious\"` (48) with `shouldFitContainer`. A leading action hugs the left edge without taking a filled track and is always drawn as a link (`link`, or `danger-link` for a destructive one), and containers up to 400 wide split a single action across the full width via `@container (max-width: 400px)`.",
       "props": [
         {
           "name": "leadingAction",
@@ -6454,7 +6459,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Optional `danger` or link action hugging the left content edge without taking a filled track.",
+          "description": "Optional leading action hugging the left content edge without taking a filled track. It is drawn as a `link`, or a `danger-link` when it is a `danger` action.",
           "deprecated": null
         },
         {
@@ -6500,11 +6505,6 @@
         "Interactive"
       ],
       "tokens": [
-        "--ds-background-danger-subtler-hovered",
-        "--ds-background-danger-subtler-pressed",
-        "--ds-background-neutral-subtle",
-        "--ds-icon-danger",
-        "--ds-text-danger",
         "--footer-height",
         "--inline-md"
       ]
@@ -8232,9 +8232,11 @@
             "warning",
             "danger",
             "discovery",
-            "ai"
+            "ai",
+            "link",
+            "danger-link"
           ],
-          "description": "The button's look, the same seven as Button. Use `primary` for the one main navigation on a view and `default` or `subtle` for the rest.",
+          "description": "The button's look, the same as Button. Use `primary` for the one main navigation on a view, `default` or `subtle` for the rest, and `link` for a text link that leaves.",
           "deprecated": null
         },
         {

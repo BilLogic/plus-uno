@@ -162,6 +162,16 @@ test('duplicateGrounds finds two appearances drawing one look, and an edge tells
   assert.deepEqual(findings(themes, values, {}), []);
 });
 
+test('a different label tells two ground-less appearances apart, and a shared label does not', () => {
+  const themes = [
+    { appearance: 'a', ground: '--none', label: '--x', hovered: '--none', pressed: '--none', edge: 'transparent' },
+    { appearance: 'b', ground: '--none', label: '--y', hovered: '--none', pressed: '--none', edge: 'transparent' },
+    { appearance: 'c', ground: '--none', label: '--y', hovered: '--none', pressed: '--none', edge: 'transparent' },
+  ];
+  const values = new Map([['--ds-surface', '#ffffff'], ['--none', 'transparent'], ['--x', '#222222'], ['--y', '#333333']]);
+  assert.deepEqual(duplicateGrounds(themes, values), [['b', 'c']]);
+});
+
 test('a duplicate baseline entry that no longer duplicates is a finding', () => {
   const themes = [{ appearance: 'solo', ground: '--t', label: '--x', hovered: '--t', pressed: '--t', edge: 'transparent' }];
   const values = new Map([['--ds-surface', '#ffffff'], ['--t', '#00404a'], ['--x', '#ffffff']]);
@@ -187,6 +197,6 @@ test('against the real repo, every label clears AA and every appearance draws it
   assert.deepEqual(duplicateGrounds(themes, values), []);
   assert.deepEqual(
     themes.map((theme) => theme.appearance),
-    ['default', 'primary', 'subtle', 'warning', 'danger', 'discovery', 'ai', 'selected'],
+    ['default', 'primary', 'subtle', 'warning', 'danger', 'discovery', 'ai', 'link', 'danger-link', 'selected'],
   );
 });

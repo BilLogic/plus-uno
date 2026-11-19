@@ -4,8 +4,8 @@
 @use "../../../styles/state" as *;
 
 /*
- * Button styles. Seven appearances (default, primary, subtle, warning, danger,
- * discovery, ai), three spacings (default 32, compact 24, spacious 48), and
+ * Button styles. Nine appearances (default, primary, subtle, warning, danger,
+ * discovery, ai, link, danger-link), three spacings (default 32, compact 24, spacious 48), and
  * the selected, disabled and loading states, all on named `--ds-*` tokens.
  * Each appearance takes its hovered and pressed fills from the named tokens,
  * laid straight on the container.
@@ -24,7 +24,16 @@ $btn-appearances: (
     'danger': ('--ds-background-danger-bold', '--ds-text-inverse', '--ds-icon-inverse', '--ds-background-danger-bold-hovered', '--ds-background-danger-bold-pressed', 'transparent'),
     'discovery': ('--ds-background-discovery-bold', '--ds-text-inverse', '--ds-icon-inverse', '--ds-background-discovery-bold-hovered', '--ds-background-discovery-bold-pressed', 'transparent'),
     'ai': ('--ds-ai-background-bold', '--ds-text-inverse', '--ds-icon-inverse', '--ds-ai-background-bold-hovered', '--ds-ai-background-bold-pressed', 'transparent'),
+    'link': ('--ds-background-neutral-subtle', '--ds-link', '--ds-icon-brand', '--ds-background-neutral-subtle', '--ds-background-neutral-subtle', 'transparent'),
+    'danger-link': ('--ds-background-neutral-subtle', '--ds-text-danger', '--ds-icon-danger', '--ds-background-neutral-subtle', '--ds-background-neutral-subtle', 'transparent'),
     'selected': ('--ds-background-selected', '--ds-text-selected', '--ds-icon-selected', '--ds-background-selected-hovered', '--ds-background-selected-pressed', '--ds-border-selected')
+);
+
+// The link appearances draw text with no fill in every state. Hovering
+// underlines the label and pressing darkens it, from these tokens.
+$btn-link-pressed: (
+    'link': '--ds-link-pressed',
+    'danger-link': '--ds-text-danger-bolder'
 );
 
 // Wraps a map slot as a `var()` read, or passes a keyword (`transparent`) through.
@@ -163,6 +172,22 @@ $btn-appearances: (
         }
     }
 
+    // --- LINK (link and danger-link) ---
+    // Text with no fill. The ground stays clear in every state, hover
+    // underlines the label and press darkens it, so the state reads without a
+    // fill. The 1px edge stays transparent, so the height matches the others.
+    @each $name, $pressed in $btn-link-pressed {
+        &.plus-btn--#{$name} {
+            @include plus-state(
+                $states: (
+                    hovered: (text-decoration: underline),
+                    pressed: (text-decoration: underline, --_button-fg: #{btn-read($pressed)}),
+                ),
+                $ring: false
+            );
+        }
+    }
+
     // --- SELECTED (default and subtle) ---
     &.plus-btn--selected.plus-btn--default,
     &.plus-btn--selected.plus-btn--subtle {
@@ -189,8 +214,15 @@ $btn-appearances: (
         pointer-events: none;
         cursor: not-allowed;
 
-        &.plus-btn--subtle {
+        &.plus-btn--subtle,
+        &.plus-btn--link,
+        &.plus-btn--danger-link {
             background-color: transparent;
+        }
+
+        &.plus-btn--link,
+        &.plus-btn--danger-link {
+            text-decoration: none;
         }
     }
 
