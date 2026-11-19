@@ -82,16 +82,17 @@ test("tokens by name and by role, and the not-here list, answer as the root modu
   assert.deepEqual(facts.notHere(), root.notHere());
 });
 
-test("'does PLUS have a card?' resolves to PatternCard and its import, from the bundled facts", () => {
-  const found = dsFacts().find("card");
-  assert.equal(found.answer.name, "Card");
-  assert.equal(found.answer.status, "not-here");
-  assert.deepEqual(found.answer.replacement, ["PatternCard"]);
-  const [use] = found.use;
-  assert.equal(use?.name, "PatternCard");
-  assert.equal(use?.status, "exists");
-  assert.equal(use?.kind, "pattern");
-  assert.equal(use?.import, "import { PatternCard } from '@/patterns';");
+test("'does PLUS have a card?' resolves to the Card template and its import, from the bundled facts", () => {
+  const facts = dsFacts();
+  const { answer } = facts.find("card");
+  assert.equal(answer.name, "Card");
+  assert.equal(answer.status, "exists");
+  assert.equal(answer.kind, "template");
+  assert.equal(answer.import, "import { Card } from '@/templates';");
+  // A name matched in another case reads the same record.
+  const old = facts.find("CARD").answer;
+  assert.equal(old.status, "exists");
+  assert.equal("import" in old ? old.import : null, "import { Card } from '@/templates';");
 });
 
 test("a name matched in another case is found, and a miss offers the names that contain it", () => {
@@ -109,8 +110,8 @@ test("the precedence index is the components with a generated doc, by name, with
   const button = index.find((e) => e.name === "Button");
   assert.ok(button, "Button is indexed");
   assert.match(button.docPath, /^design-system\/src\/components\/[^/]+\/Button\/index\.md$/);
-  // Patterns have no generated doc page, and Logo is implemented outside src/components.
-  assert.equal(index.some((e) => e.name === "PatternCard" || e.name === "Logo"), false);
+  // Templates are not in the index, and Logo is implemented outside src/components.
+  assert.equal(index.some((e) => e.name === "Card" || e.name === "Logo"), false);
   assert.ok(index.length > 50, `${index.length} entries`);
 });
 
@@ -136,9 +137,8 @@ test("github_read's lookup answers 'does PLUS have a card?' from the bundle, wit
   const out = JSON.parse(await readGithub({ lookup: "card" }, deps)) as { ok: boolean; lookup: string; answer: DsAnswer; use: DsAnswer[]; note: string };
   assert.equal(deps.calls, 0);
   assert.equal(out.ok, true);
-  assert.equal(out.answer.status, "not-here");
-  assert.equal(out.use[0]?.name, "PatternCard");
-  assert.equal(out.use[0]?.import, "import { PatternCard } from '@/patterns';");
+  assert.equal(out.answer.status, "exists");
+  assert.equal(out.answer.import, "import { Card } from '@/templates';");
 });
 
 test("github_read's lookup answers a prop and a token role from the bundle", async () => {

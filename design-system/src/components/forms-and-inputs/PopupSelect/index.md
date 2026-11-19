@@ -6,7 +6,7 @@ Popup select: one list in a Popup, applied the moment a row is picked. - **One l
 
 **Import:** `import { PopupSelect } from '@/components';`
 
-**Used in:** Page (`ds guide page`); Panel (`ds guide panel`); Section (`ds guide section`); Popup (`ds guide popup`)
+**Used in:** Page (`ds guide page`); Panel (`ds guide panel`); Popup (`ds guide popup`); Section (`ds guide section`)
 
 **Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.; Navigation (`ds guide navigation`)
 

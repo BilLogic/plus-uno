@@ -3,7 +3,7 @@
  * components manifest.
  *
  *   design-system/src/components/<group>/<Name>/index.md   ← per component (`<group>/<Name>.md` when filed flat)
- *   design-system/src/patterns/<Folder>/index.md           ← per pattern, and the Logo beside its source
+ *   design-system/src/templates/<Folder>/index.md           ← per pattern, and the Logo beside its source
  *   design-system/src/components/<group>/index.md          ← group index + coverage
  *   design-system/agent-views/components.json              ← the manifest
  *
@@ -47,7 +47,7 @@ const CHECK = process.argv.includes('--check');
 const UPDATE = process.argv.includes('--update');
 const BASELINE = 'scripts/baselines/component-docs.json';
 /** Every folder a generated doc is written under: the components, the pattern barrels' folders, the assets. */
-const DOC_ROOTS = ['components', 'patterns', 'specs/Universal/Pages', 'assets'].map((d) => path.join(REPO_ROOT, 'design-system/src', d));
+const DOC_ROOTS = ['components', 'templates', 'specs/Universal/Pages', 'assets'].map((d) => path.join(REPO_ROOT, 'design-system/src', d));
 /** The record's own explanation, written once when `--update` creates it; the file is its home after that. */
 const RECORD_WHY =
   'Prop rows and components the generated component docs leave undescribed, as `<Component> <prop>` or `<Component> (summary)`. ' +
@@ -443,37 +443,31 @@ function manifestEntryOf({ name, group, jsx, summary, props, defaults, descripti
 }
 
 /**
- * The barrels patterns come from. Each pattern gets a generated doc beside its
- * source, as a component does.
+ * The templates barrel's components, parsed from source the way a component
+ * is. A template's file is named for the folder its barrel line points at, not
+ * for its export: `Section` is `templates/Section/Section.jsx`. Each template
+ * gets a generated doc beside its source, as a component does.
  */
-const PATTERN_BARRELS = ['@/patterns'];
-
-/**
- * Each pattern barrel's components, parsed from source the way a component
- * is. A pattern's file is named for the folder its barrel line points at, not
- * for its export: `PatternSidebar` is `patterns/Sidebar/Sidebar.jsx`.
- */
-function patternEntries() {
-  const patterns = [];
+function templateEntries() {
+  const spec = '@/templates';
+  const dir = path.join(REPO_ROOT, 'design-system/src', spec.slice(2));
+  const { components, aliases } = readBarrel(REPO_ROOT, spec, {
+    onUnresolved: (star) => fail(`${spec} barrel: cannot resolve \`export * from '${star}'\``),
+  });
+  const templates = [];
   const parsed = [];
-  for (const spec of PATTERN_BARRELS) {
-    const dir = path.join(REPO_ROOT, 'design-system/src', spec.slice(2));
-    const { components, aliases } = readBarrel(REPO_ROOT, spec, {
-      onUnresolved: (star) => fail(`${spec} barrel: cannot resolve \`export * from '${star}'\``),
-    });
-    for (const name of components) {
-      patterns.push({ name, from: spec });
-      const folder = aliases[name] ?? name;
-      const jsx = path.join(dir, folder, `${folder}.jsx`);
-      if (!fs.existsSync(jsx)) {
-        fail(`${spec} exports ${name}, and ${rel(jsx)} is not a file: its props cannot be read`);
-        continue;
-      }
-      const built = parseEntry({ name, group: path.basename(dir).toLowerCase(), jsx });
-      if (built) parsed.push(built.entry);
+  for (const name of components) {
+    templates.push({ name, from: spec });
+    const folder = aliases[name] ?? name;
+    const jsx = path.join(dir, folder, `${folder}.jsx`);
+    if (!fs.existsSync(jsx)) {
+      fail(`${spec} exports ${name}, and ${rel(jsx)} is not a file: its props cannot be read`);
+      continue;
     }
+    const built = parseEntry({ name, group: path.basename(dir).toLowerCase(), jsx });
+    if (built) parsed.push(built.entry);
   }
-  return { patterns, parsed };
+  return { templates, parsed };
 }
 
 /**
@@ -561,16 +555,16 @@ for (const group of groups) {
  * The machine copy of the same facts, for checkers and the eval
  * (`scripts/lib/agent-manifests.mjs`). Keyed to the barrels, so it lists exactly
  * what `agent-views/components/index.md` lists: the components, then the
- * patterns from theirs.
+ * templates from theirs.
  */
 const { components: exports } = readBarrel(REPO_ROOT, '@/components', {
   onUnresolved: (spec) => fail(`components barrel: cannot resolve \`export * from '${spec}'\``),
 });
 // The design system ships from this repo's root package; its version is the one to stamp.
 const { version } = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8'));
-const { patterns, parsed: parsedPatterns } = patternEntries();
+const { templates, parsed: parsedTemplates } = templateEntries();
 manifestEntries.push(...assetEntries(exports, new Set(manifestEntries.map((e) => e.name))));
-const manifest = buildComponentsManifest({ exports, components: manifestEntries, patterns, parsedPatterns, version });
+const manifest = buildComponentsManifest({ exports, components: manifestEntries, templates, parsedTemplates, version });
 written.push([path.join(AGENT_ROOT, 'components.json'), serializeManifest(manifest, 'npm run generate:agent')]);
 const slots = documents('design-system/src', { root: REPO_ROOT, ext: ['.json'] })
   .filter((file) => file.endsWith('.slots.json'))
@@ -613,7 +607,9 @@ const renderOne = (facts) => {
   const alternatives = docs?.page?.alternatives?.map((a) => a.text.replace(/\s*\n\s*/g, ' ').trim()).filter(Boolean) ?? [];
   rendered.set(facts.name, { coverage: coverageOf(docs?.page), propCount: (facts.props ?? []).length, lead, alternatives });
 };
-for (const record of manifest.components) if (record.source) renderOne(componentFacts(manifest, record.name, aliasRows));
+for (const record of manifest.components) {
+  if (record.source) renderOne(componentFacts(manifest, record.name, aliasRows));
+}
 for (const [name, entry] of parsedByName) {
   if (rendered.has(name)) continue;
   const [record] = buildComponentsManifest({ exports: [name], components: [entry], version }).components;

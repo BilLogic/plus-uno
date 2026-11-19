@@ -6,7 +6,7 @@ A floating layer that hangs off its trigger and closes on an outside click. Six 
 
 **Kind:** Template
 
-**Storybook page:** `design-system/src/patterns/Popup/Popup.mdx`
+**Storybook page:** `design-system/src/templates/Popup/Popup.mdx`
 
 ## Types
 

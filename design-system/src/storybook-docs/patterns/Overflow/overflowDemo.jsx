@@ -4,7 +4,7 @@ import { ClippedTooltip } from '@/lib/ClippedTooltip';
 import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
 import { useLayerMount, STUDENTS, StudentsTable } from '@/storybook-docs/lib/view-bar.jsx';
 import { DynamicTable, Pagination, SectionMessage, StatusTag, Tag, TagGroup } from '@/components';
-import { PatternSection } from '@/patterns';
+import { Section } from '@/templates';
 
 /**
  * The Overflow pattern's examples: real parts holding text longer than their
@@ -45,9 +45,9 @@ const frame = { padding: 'var(--page-pad)' };
 /** A Section title and a SectionMessage: both take more lines, never an ellipsis. */
 export const Wrap = () => (
     <div style={{ ...frame, display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
-        <PatternSection title={LONG_TITLE}>
+        <Section title={LONG_TITLE}>
             <SectionMessage appearance="danger" dismissible={false}>{LONG_ERROR}</SectionMessage>
-        </PatternSection>
+        </Section>
     </div>
 );
 
@@ -134,12 +134,12 @@ export const PagedTable = ({ page: initialPage = 1 }) => {
     const slice = PAGED_STUDENTS.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
     return (
         <div style={frame}>
-            <PatternSection
+            <Section
                 title="Students"
                 footer={<Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />}
             >
                 <StudentsTable rows={slice} />
-            </PatternSection>
+            </Section>
         </div>
     );
 };

@@ -17,7 +17,7 @@ Sidebar order and grouping are generated from
 [`storybook.taxonomy.json`](../../../storybook.taxonomy.json):
 
 - **Components (`Components/<Group>/<Name>`):** the canonical component list per group is [`design-system/agent-views/components/index.md`](../../../design-system/agent-views/components/index.md). A component absent from that index has no page; a review that meets a retired name flags it and cites the replacement in the index's Not-here table.
-- **Templates (`Templates/<Name>`):** page, section, card, table, and overlay shells under `design-system/src/patterns/` and `design-system/src/storybook-docs/templates/` (agent views in `design-system/agent-views/templates/`).
+- **Templates (`Templates/<Name>`):** page, section, card, table, and overlay shells under `design-system/src/templates/` and `design-system/src/storybook-docs/templates/` (agent views in `design-system/agent-views/templates/`).
 - **Patterns (`Patterns/<Name>`):** cross-component interaction and layout rules under `design-system/src/storybook-docs/patterns/` (agent views in `design-system/agent-views/patterns/`).
 - **Foundations & Tech stack:** foundation pages under `design-system/src/styles/*.mdx` (agent views in `design-system/agent-views/foundations/`) and package pages under `design-system/src/storybook-docs/tech-stack/`.
 

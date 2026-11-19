@@ -52,12 +52,11 @@ test('a JSDoc that opens "<Name>: …" or "<Name> — …" keeps that line as it
   assert.match(summary('Checkbox'), /^Checkbox — single boolean control/);
 });
 
-test('find answers "card" with Card as not here and PatternCard with its import', () => {
+test('find answers "card" with Card as a template from @/templates', () => {
   const { results, next } = lookup.find('card');
-  assert.equal(results[0].kind, 'not-here');
-  assert.equal(results[0].name, 'Card');
-  assert.equal(results[0].use[0].import, "import { PatternCard } from '@/patterns';");
-  assert.ok(results.some((r) => r.kind === 'pattern' && r.name === 'PatternCard'));
+  const card = results.find((r) => r.name === 'Card');
+  assert.equal(card.kind, 'template');
+  assert.equal(card.import, "import { Card } from '@/templates';");
   assert.match(next, /ds_get/);
 });
 
@@ -157,10 +156,10 @@ test('get returns props, one section at a time, and the replacement for a retire
   assert.ok(button.props.find((p) => p.name === 'appearance').values.includes('primary'));
   assert.equal('usage' in button, false);
 
-  const [card] = lookup.get(['PatternCard']).records;
+  const [card] = lookup.get(['Card']).records;
   assert.match(card.a11y, /^## Accessibility/);
   assert.match(card.usage, /^## Usage/);
-  assert.equal(card.figma.sets[0].name, 'Pattern/Card');
+  assert.equal(card.figma.sets[0].name, 'Template/Card');
 
   const [alert] = lookup.get(['Alert']).records;
   assert.equal(alert.status, 'not-here');
@@ -216,9 +215,9 @@ test('guide answers pattern, template and foundation topics and situation aliase
 
   for (const alias of ['toolbar', 'view bar', 'view-bar', 'section']) {
     const g = lookup.guide(alias);
-    assert.equal(g.path, 'design-system/src/patterns/PatternSection/index.md', alias);
+    assert.equal(g.path, 'design-system/src/templates/Section/index.md', alias);
     assert.equal(g.brief, true, `${alias} is brief by default`);
-    assert.match(g.text, /^# PatternSection\n/, alias);
+    assert.match(g.text, /^# Section\n/, alias);
     assert.match(g.text, /^## Sections$/m, alias);
   }
 
@@ -260,10 +259,10 @@ test('guide answers pattern, template and foundation topics and situation aliase
     ['status', 'design-system/agent-views/patterns/Indicators.md'],
     ['patterns', 'design-system/agent-views/patterns/PatternsOverview.md'],
     ['pattern', 'design-system/agent-views/patterns/PatternsOverview.md'],
-    ['frame', 'design-system/src/patterns/Frame/index.md'],
-    ['card', 'design-system/src/patterns/PatternCard/index.md'],
-    ['table', 'design-system/src/patterns/Table/index.md'],
-    ['modal', 'design-system/src/patterns/Modal/index.md'],
+    ['frame', 'design-system/src/templates/Frame/index.md'],
+    ['card', 'design-system/src/templates/Card/index.md'],
+    ['table', 'design-system/src/templates/Table/index.md'],
+    ['modal', 'design-system/src/templates/Modal/index.md'],
     ['form', 'design-system/agent-views/templates/Form.md'],
     ['panel', 'design-system/agent-views/templates/Panel.md'],
     ['popup', 'design-system/agent-views/templates/Popup.md'],
@@ -278,8 +277,8 @@ test('guide answers pattern, template and foundation topics and situation aliase
   }
 });
 
-test('get includes Governed by: Filtering on SearchField, FilterButton, FilterMenu, PopupSelect, Select and PatternSection', () => {
-  const names = ['SearchField', 'FilterButton', 'FilterMenu', 'PopupSelect', 'Select', 'PatternSection'];
+test('get includes Governed by: Filtering on SearchField, FilterButton, FilterMenu, PopupSelect, Select and Section', () => {
+  const names = ['SearchField', 'FilterButton', 'FilterMenu', 'PopupSelect', 'Select', 'Section', 'Section'];
   const full = lookup.get(names);
   for (const r of full.records) {
     assert.match(r.text, /\*\*Governed by:\*\* Filtering \(`design-system\/agent-views\/patterns\/Filtering\.md`/, r.name);
@@ -346,7 +345,7 @@ test('get returns the generated doc byte for byte, for a component, a flat compo
   for (const [name, file] of [
     ['Dialog', 'design-system/src/components/messaging/Dialog/index.md'],
     ['Fieldset', 'design-system/src/components/forms-and-inputs/Fieldset.md'],
-    ['PatternCard', 'design-system/src/patterns/PatternCard/index.md'],
+    ['Card', 'design-system/src/templates/Card/index.md'],
   ]) {
     const result = lookup.get([name]);
     assert.equal(render('get', result), fs.readFileSync(path.join(REPO_ROOT, file), 'utf8'), name);
@@ -357,7 +356,7 @@ test('get returns the generated doc byte for byte, for a component, a flat compo
 test('a get section is that part of the same text', () => {
   const full = render('get', lookup.get(['Modal']));
   const a11y = render('get', lookup.get(['Modal'], 'a11y'));
-  assert.match(a11y, /^# Modal\n\nimport \{ Modal \} from '@\/patterns';\n\n## Accessibility\n/);
+  assert.match(a11y, /^# Modal\n\nimport \{ Modal \} from '@\/templates';\n\n## Accessibility\n/);
   assert.ok(full.includes(a11y.slice(a11y.indexOf('## Accessibility'))));
   assert.doesNotMatch(full, /figma\.com|Next:/);
 });
@@ -376,7 +375,7 @@ test('component lookups expose capped template and pattern back-edges in every a
 });
 
 test('a brief or three component names returns a screen kit in one answer', () => {
-  for (const query of ['Build a student list screen with search and filters', 'Frame Sidebar Page PageHeader PatternSection Table Panel']) {
+  for (const query of ['Build a student list screen with search and filters', 'Frame Sidebar Page PageHeader Section Table Panel']) {
     const result = lookup.find(query);
     assert.equal(result.kit.template.kind, 'template');
     assert.ok(result.kit.patterns.length);
@@ -422,7 +421,7 @@ test('a cold lookup reads only ds-index.json for find, get, tokens and guide, ev
     try {
       const cold = createLookup(tmp, { readPaths: false });
       assert.equal(cold.find('confirm before deleting').results[0].name, 'Common actions');
-      assert.equal(cold.get(['Button', 'PatternCard', 'Button.appearance', '--ds-text']).records[0].name, 'Button');
+      assert.equal(cold.get(['Button', 'Card', 'Button.appearance', '--ds-text']).records[0].name, 'Button');
       assert.ok(cold.tokens('stack').steps.length > 0);
       assert.match(cold.guide('filtering').text, /^# Filtering\n/);
       assert.match(cold.guide('ds/no-raw-literal').text, /^## ds\/no-raw-literal/);
@@ -466,4 +465,29 @@ test('editing a docs page, component, guideline or rule doc without regenerating
       fs.rmSync(tmp, { recursive: true, force: true });
     }
   }
+});
+
+test('a template answers under its new name from @/templates, as a template, and its old name still answers', () => {
+  const answer = (n) => lookup.get([n]).records[0];
+  for (const name of ['Frame', 'Page', 'Section', 'Card', 'Table', 'Modal', 'Panel']) {
+    const a = answer(name);
+    assert.equal(a.status, 'exists', name);
+    assert.equal(a.kind, 'template', name);
+    assert.equal(a.import, `import { ${name} } from '@/templates';`);
+  }
+  assert.equal(answer('Section').status, 'exists');
+  assert.equal(answer('Card').status, 'exists');
+  assert.equal(answer('Popup').status, 'exists');
+  assert.ok(lookup.find('Section').results.some((r) => r.name === 'Section' && r.kind === 'template'));
+});
+
+test('the check accepts the old and the new template imports', () => {
+  const rules = (code) => lookup.check({ code, path: 'prototypes/a.jsx' }).findings.map((f) => f.rule);
+  assert.ok(!rules("import { Section } from '@/templates';\nexport const X = () => <Section title=\"a\" />;").includes('ds/unknown-component'));
+  assert.ok(!rules("import { Section } from '@/templates';\nexport const X = () => <Section title=\"a\" />;").includes('ds/unknown-component'));
+});
+
+test('the orientation names template tokens, never pattern tokens', () => {
+  assert.match(ORIENTATION, /semantic, template or component tokens/);
+  assert.doesNotMatch(ORIENTATION, /pattern (or|and) component tokens|pattern tokens/);
 });

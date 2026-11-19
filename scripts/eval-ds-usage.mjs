@@ -518,8 +518,7 @@ export function readSet(stdout, root) {
 const normPage = (p = '') =>
   String(p)
     .replace(/^\/+/, '')
-    .replace(/^design-system\/agent-views\/pages\//, 'design-system/agent-views/')
-    .replace(/^design-system\/src\/templates\//, 'design-system/src/patterns/');
+    .replace(/^design-system\/agent-views\/pages\//, 'design-system/agent-views/');
 
 const pageMatchesFile = (expectedPage, file) => {
   const exp = normPage(expectedPage);
@@ -529,9 +528,9 @@ const pageMatchesFile = (expectedPage, file) => {
   const patMdx = /^design-system\/agent-views\/patterns\/([A-Za-z0-9]+)\.md$/.exec(exp);
   if (patMdx && got === `design-system/src/storybook-docs/patterns/${patMdx[1]}/${patMdx[1]}.mdx`) return true;
   const tplMdx = /^design-system\/agent-views\/templates\/([A-Za-z0-9]+)\.md$/.exec(exp);
-  if (tplMdx && (got === `design-system/src/storybook-docs/templates/${tplMdx[1]}.mdx` || got === `design-system/src/patterns/${tplMdx[1]}/${tplMdx[1]}.mdx`)) return true;
-  const compTpl = /^design-system\/src\/patterns\/([A-Za-z0-9]+)\/index\.md$/.exec(exp);
-  if (compTpl && got === `design-system/src/patterns/${compTpl[1]}/${compTpl[1]}.mdx`) return true;
+  if (tplMdx && (got === `design-system/src/storybook-docs/templates/${tplMdx[1]}.mdx` || got === `design-system/src/templates/${tplMdx[1]}/${tplMdx[1]}.mdx`)) return true;
+  const compTpl = /^design-system\/src\/templates\/([A-Za-z0-9]+)\/index\.md$/.exec(exp);
+  if (compTpl && got === `design-system/src/templates/${compTpl[1]}/${compTpl[1]}.mdx`) return true;
   return false;
 };
 
@@ -895,7 +894,7 @@ export function structuralFit({ folder, expected, repoRoot = REPO_ROOT }) {
       const owner = check.owner;
       const prop = check.prop;
       const hasSlot = elements.some((el) => el.name === owner && el.attributes.some((a) => a.name === prop))
-        || (owner === 'PatternSection' && prop === 'toolbar' && elements.some((el) => el.name === 'PatternSection.Toolbar' || el.name === 'SectionToolbar'))
+        || (owner === 'Section' && prop === 'toolbar' && elements.some((el) => el.name === 'Section.Toolbar' || el.name === 'SectionToolbar'))
         || (owner === 'Frame' && prop === 'panel' && files.some((f) => /\busePanelControl\b/.test(f.text)));
       const comps = check.components ?? [];
       const hasComp = !comps.length || comps.some((c) => names.has(c));

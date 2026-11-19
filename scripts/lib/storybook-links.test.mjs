@@ -37,7 +37,7 @@ test('records and fixtures are not linked to the live Storybook', () => {
   assert.equal(isLinkable('docs/adr/001-x.md'), false);
   assert.equal(isLinkable('agents/uno-bot/tests/figma-links.test.ts'), false);
   assert.equal(isLinkable('scripts/lib/storybook-links.test.mjs'), false);
-  assert.equal(isLinkable('design-system/src/patterns/Frame/Frame.mdx'), true);
+  assert.equal(isLinkable('design-system/src/templates/Frame/Frame.mdx'), true);
 });
 
 test('an id prefix named in prose is not a link', () => {

@@ -114,7 +114,7 @@ const FIXTURE_MANIFEST = {
       tokens: ['--ds-text', '--widget-pad'],
     },
     { name: 'Gadget', kind: 'component', import: "import { Gadget } from '@/components';", group: 'misc', source: 'x/Gadget/Gadget.jsx', summary: null, props: [] },
-    { name: 'PatternThing', kind: 'pattern', import: "import { PatternThing } from '@/patterns';", group: 'misc', source: 'p/PatternThing/PatternThing.jsx', summary: null, props: [] },
+    { name: 'PatternThing', kind: 'pattern', import: "import { PatternThing } from '@/templates';", group: 'misc', source: 'p/PatternThing/PatternThing.jsx', summary: null, props: [] },
   ],
 };
 
@@ -192,7 +192,7 @@ test('a component in its own folder is written as index.md, a flat one as <Name>
 
 test('generated template slot JSDoc carries the governing pattern where source readers look', async () => {
   const fs = await import('node:fs');
-  const source = fs.readFileSync('design-system/src/patterns/PatternSection/PatternSection.jsx', 'utf8');
+  const source = fs.readFileSync('design-system/src/templates/Section/Section.jsx', 'utf8');
   const toolbar = source.match(/\/\*\*([^*]|\*(?!\/))*\*\/\s*toolbar: PropTypes.node/)[0];
   assert.match(toolbar, /@ds-context Used in: Section\.toolbar/);
   assert.match(toolbar, /@ds-context Governed by:.*Filtering/);

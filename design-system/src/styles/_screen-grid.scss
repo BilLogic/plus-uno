@@ -1,6 +1,6 @@
 /**
  * The screen grid a floating layer takes its width from: the one place the
- * column steps are worked out, for Modal, the Blanket patterns and Popup.
+ * column steps are worked out, for Modal, the Blanket and Popup.
  *
  * Figma: 12 columns, gutter 16, inside the screen pad, never under 720 and
  * capped at 1232 like content. A layer spans `--plus-overlay-span` of those
@@ -16,7 +16,7 @@
  *
  * A layer includes this and sets `--plus-overlay-span` from its width step:
  * Modal's `6-col` · `8-col` · `10-col`, Popup's `3-col` · `4-col`, and the
- * Blanket patterns' sm · md · lg (6 · 8 · 10) through `screen-grid-width-steps`.
+ * Blanket templates' sm · md · lg (6 · 8 · 10) through `screen-grid-width-steps`.
  *
  * @param $pad the layer's own pad, added on each side of the columns
  */

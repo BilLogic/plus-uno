@@ -281,8 +281,8 @@ const Sidebar = ({
         // The old content unmounted with the focus inside it: put focus where the new content begins.
         if (!document.activeElement || document.activeElement === document.body) {
             const target = mode === 'inner'
-                ? el.querySelector('.plus-pattern-sidebar__back')
-                : (el.querySelector('[aria-current="page"]') ?? el.querySelector('.plus-pattern-sidebar__row'));
+                ? el.querySelector('.plus-template-sidebar__back')
+                : (el.querySelector('[aria-current="page"]') ?? el.querySelector('.plus-template-sidebar__row'));
             target?.focus({ preventScroll: true });
         }
         const fade = animate(0, 1, {
@@ -389,7 +389,7 @@ const Sidebar = ({
 
     const toggleButton = control ? (
         <IconButton
-            className="plus-pattern-sidebar__toggle"
+            className="plus-template-sidebar__toggle"
             appearance="subtle"
             icon="angles-left"
             label="Close sidebar"
@@ -399,7 +399,7 @@ const Sidebar = ({
         />
     ) : onToggle ? (
         <IconButton
-            className="plus-pattern-sidebar__toggle"
+            className="plus-template-sidebar__toggle"
             appearance="subtle"
             icon="angles-left"
             label="Close sidebar"
@@ -415,10 +415,10 @@ const Sidebar = ({
             lessonsLeft: effectiveLessonsLeft,
             modulesLeft: effectiveModulesLeft,
         });
-        if (extra) return <span className="plus-pattern-sidebar__end">{extra}</span>;
+        if (extra) return <span className="plus-template-sidebar__end">{extra}</span>;
         if (item.done) {
             return (
-                <span className="plus-pattern-sidebar__end plus-pattern-sidebar__end--icon">
+                <span className="plus-template-sidebar__end plus-template-sidebar__end--icon">
                     <Icon name="check" aria-hidden="true" />
                     <span className="visually-hidden">{item.doneLabel ?? 'Done'}</span>
                 </span>
@@ -426,28 +426,28 @@ const Sidebar = ({
         }
         if (training) {
             return (
-                <span className="plus-pattern-sidebar__end">
+                <span className="plus-template-sidebar__end">
                     <CountTag value={training.count} label={training.label} />
                 </span>
             );
         }
         if (item.count) {
             return (
-                <span className="plus-pattern-sidebar__end">
+                <span className="plus-template-sidebar__end">
                     <CountTag value={item.count} label={item.countLabel} />
                 </span>
             );
         }
         if (item.dot) {
             return (
-                <span className="plus-pattern-sidebar__end">
+                <span className="plus-template-sidebar__end">
                     <CountTag isDot appearance="info" label={item.dotLabel ?? 'New'} />
                 </span>
             );
         }
         if (item.external) {
             return (
-                <span className="plus-pattern-sidebar__end plus-pattern-sidebar__end--icon" aria-hidden="true">
+                <span className="plus-template-sidebar__end plus-template-sidebar__end--icon" aria-hidden="true">
                     <Icon name="arrow-up-right-from-square" />
                 </span>
             );
@@ -458,11 +458,11 @@ const Sidebar = ({
     const rowContent = (item, extra, labelRef) => (
         <>
             {item.textOnly ? null : (
-                <span className="plus-pattern-sidebar__slot" aria-hidden="true">
+                <span className="plus-template-sidebar__slot" aria-hidden="true">
                     {item.icon ? <Icon name={item.icon} /> : null}
                 </span>
             )}
-            <span ref={labelRef} className="plus-pattern-sidebar__label">{item.text}</span>
+            <span ref={labelRef} className="plus-template-sidebar__label">{item.text}</span>
             {item.external ? <span className="visually-hidden">(opens in a new tab)</span> : null}
             {trailing(item, extra)}
         </>
@@ -508,15 +508,15 @@ const Sidebar = ({
         // tab, else the one before it, else the tab's row.
         const onKeyDown = (event) => {
             if (event.key !== 'Delete' && event.key !== 'Backspace') return;
-            if (event.target.closest('.plus-pattern-sidebar__tab-close')) return;
+            if (event.target.closest('.plus-template-sidebar__tab-close')) return;
             event.preventDefault();
             const li = event.currentTarget;
-            const rowIn = (el) => (el?.matches('.plus-pattern-sidebar__tab') ? el.querySelector('.plus-pattern-sidebar__row') : null);
+            const rowIn = (el) => (el?.matches('.plus-template-sidebar__tab') ? el.querySelector('.plus-template-sidebar__row') : null);
             const sibling = rowIn(li.nextElementSibling) ?? rowIn(li.previousElementSibling);
-            const parent = li.closest('.plus-pattern-sidebar__item');
+            const parent = li.closest('.plus-template-sidebar__item');
             close();
             requestAnimationFrame(() => {
-                const target = sibling?.isConnected ? sibling : parent?.querySelector('.plus-pattern-sidebar__row');
+                const target = sibling?.isConnected ? sibling : parent?.querySelector('.plus-template-sidebar__row');
                 target?.focus();
             });
         };
@@ -534,11 +534,11 @@ const Sidebar = ({
                         id: tab.id,
                         // A task's progress rides on its label, so Close never hides it.
                         text: tab.progress
-                            ? <>{tab.label}<span className="plus-pattern-sidebar__progress">{tab.progress}</span></>
+                            ? <>{tab.label}<span className="plus-template-sidebar__progress">{tab.progress}</span></>
                             : tab.label,
                         href: tab.href,
                     },
-                    rowClass: ['plus-pattern-sidebar__row', selected && 'plus-pattern-sidebar__row--selected'].filter(Boolean).join(' '),
+                    rowClass: ['plus-template-sidebar__row', selected && 'plus-template-sidebar__row--selected'].filter(Boolean).join(' '),
                     current: selected,
                     onPress: () => handleSelectTab(tab, item),
                     extra: tab.live ? <CountTag isDot appearance="success" label="Live" /> : undefined,
@@ -549,12 +549,12 @@ const Sidebar = ({
         return (
             <li
                 key={tab.id}
-                className={['plus-pattern-sidebar__tab', last && 'plus-pattern-sidebar__tab--last', selected && 'plus-pattern-sidebar__tab--selected'].filter(Boolean).join(' ')}
+                className={['plus-template-sidebar__tab', last && 'plus-template-sidebar__tab--last', selected && 'plus-template-sidebar__tab--selected'].filter(Boolean).join(' ')}
                 onKeyDown={onKeyDown}
             >
                 {row}
                 <IconButton
-                    className="plus-pattern-sidebar__tab-close"
+                    className="plus-template-sidebar__tab-close"
                     appearance="subtle"
                     spacing="compact"
                     icon="xmark"
@@ -573,11 +573,11 @@ const Sidebar = ({
 
         if (locked) {
             return (
-                <li key={item.id} className="plus-pattern-sidebar__item">
+                <li key={item.id} className="plus-template-sidebar__item">
                     <Tooltip text={message} placement="right">
                         {renderRow({
                             item,
-                            rowClass: 'plus-pattern-sidebar__row plus-pattern-sidebar__row--locked',
+                            rowClass: 'plus-template-sidebar__row plus-template-sidebar__row--locked',
                             'aria-disabled': 'true',
                         })}
                     </Tooltip>
@@ -587,10 +587,10 @@ const Sidebar = ({
 
         if (!own.length) {
             return (
-                <li key={item.id} className="plus-pattern-sidebar__item">
+                <li key={item.id} className="plus-template-sidebar__item">
                     {renderRow({
                         item,
-                        rowClass: ['plus-pattern-sidebar__row', rowSelected && 'plus-pattern-sidebar__row--selected'].filter(Boolean).join(' '),
+                        rowClass: ['plus-template-sidebar__row', rowSelected && 'plus-template-sidebar__row--selected'].filter(Boolean).join(' '),
                         current: rowSelected,
                         onPress: select,
                     })}
@@ -610,14 +610,14 @@ const Sidebar = ({
         const selectedTab = own.find((tab) => tab.id === resolvedActiveId);
         const shown = selectedTab && !recent.includes(selectedTab) ? [...recent, selectedTab] : recent;
         const rowClass = [
-            'plus-pattern-sidebar__row',
-            (rowSelected || standsIn) && 'plus-pattern-sidebar__row--selected',
-            !shut && tabSelected && 'plus-pattern-sidebar__row--ancestor',
+            'plus-template-sidebar__row',
+            (rowSelected || standsIn) && 'plus-template-sidebar__row--selected',
+            !shut && tabSelected && 'plus-template-sidebar__row--ancestor',
         ].filter(Boolean).join(' ');
 
         return (
-            <li key={item.id} className="plus-pattern-sidebar__item plus-pattern-sidebar__item--parent">
-                <div className={['plus-pattern-sidebar__parent', shut && 'plus-pattern-sidebar__parent--shut'].filter(Boolean).join(' ')}>
+            <li key={item.id} className="plus-template-sidebar__item plus-template-sidebar__item--parent">
+                <div className={['plus-template-sidebar__parent', shut && 'plus-template-sidebar__parent--shut'].filter(Boolean).join(' ')}>
                     {renderRow({
                         item,
                         rowClass,
@@ -626,7 +626,7 @@ const Sidebar = ({
                         extra: shut ? <CountTag value={own.length} label={`${own.length} open tabs`} /> : undefined,
                     })}
                     <IconButton
-                        className="plus-pattern-sidebar__twist"
+                        className="plus-template-sidebar__twist"
                         appearance="subtle"
                         spacing="compact"
                         icon={<Icon name="angle-down" size={12} />}
@@ -637,7 +637,7 @@ const Sidebar = ({
                         onClick={() => flip(setShutRows, item.id)}
                     />
                     <IconButton
-                        className="plus-pattern-sidebar__close-all"
+                        className="plus-template-sidebar__close-all"
                         appearance="subtle"
                         spacing="compact"
                         icon="xmark"
@@ -647,22 +647,22 @@ const Sidebar = ({
                     />
                 </div>
                 {shut ? null : (
-                    <ul id={listId} className="plus-pattern-sidebar__tabs" aria-label={`Open ${item.text}`}>
+                    <ul id={listId} className="plus-template-sidebar__tabs" aria-label={`Open ${item.text}`}>
                         {shown.map((tab, index) => tabRow(item, tab, more <= 0 && index === shown.length - 1))}
                         {more > 0 ? (
                             <Collapsible.Root
                                 render={<li />}
-                                className="plus-pattern-sidebar__tab plus-pattern-sidebar__tab--last plus-pattern-sidebar__tab--more"
+                                className="plus-template-sidebar__tab plus-template-sidebar__tab--last plus-template-sidebar__tab--more"
                                 open={all}
                                 onOpenChange={() => flip(setShowingAll, item.id)}
                             >
                                 <Collapsible.Trigger
-                                    className="plus-pattern-sidebar__row"
+                                    className="plus-template-sidebar__row"
                                     // The extra tabs render in the sibling list, so this row owns no panel to point at.
                                     render={({ 'aria-controls': _owned, ...props }) => <button {...props} />}
                                 >
-                                    <span className="plus-pattern-sidebar__slot" aria-hidden="true" />
-                                    <span className="plus-pattern-sidebar__label">{all ? 'Show less' : `Show ${more} more`}</span>
+                                    <span className="plus-template-sidebar__slot" aria-hidden="true" />
+                                    <span className="plus-template-sidebar__label">{all ? 'Show less' : `Show ${more} more`}</span>
                                 </Collapsible.Trigger>
                             </Collapsible.Root>
                         ) : null}
@@ -682,12 +682,12 @@ const Sidebar = ({
         let title = null;
         if (group.title && locked) {
             title = (
-                <div className="plus-pattern-sidebar__title plus-pattern-sidebar__title--locked">
-                    <span id={titleId} className="plus-pattern-sidebar__title-text">{group.title}</span>
+                <div className="plus-template-sidebar__title plus-template-sidebar__title--locked">
+                    <span id={titleId} className="plus-template-sidebar__title-text">{group.title}</span>
                     <Tooltip text={message} placement="right">
                         {/* The lock is focusable so a keyboard reaches its message. */}
                         {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-                        <span className="plus-pattern-sidebar__caret plus-pattern-sidebar__caret--lock" tabIndex={0} role="img" aria-label={`Locked. ${message}`}>
+                        <span className="plus-template-sidebar__caret plus-template-sidebar__caret--lock" tabIndex={0} role="img" aria-label={`Locked. ${message}`}>
                             <Icon name="lock" />
                         </span>
                     </Tooltip>
@@ -696,10 +696,10 @@ const Sidebar = ({
         } else if (group.title) {
             title = (
                 <Collapsible.Trigger
-                    className={['plus-pattern-sidebar__title', shut && 'plus-pattern-sidebar__title--shut'].filter(Boolean).join(' ')}
+                    className={['plus-template-sidebar__title', shut && 'plus-template-sidebar__title--shut'].filter(Boolean).join(' ')}
                 >
-                    <span id={titleId} className="plus-pattern-sidebar__title-text">{group.title}</span>
-                    <span className="plus-pattern-sidebar__caret" aria-hidden="true">
+                    <span id={titleId} className="plus-template-sidebar__title-text">{group.title}</span>
+                    <span className="plus-template-sidebar__caret" aria-hidden="true">
                         <Icon name="angle-down" />
                     </span>
                 </Collapsible.Trigger>
@@ -712,14 +712,14 @@ const Sidebar = ({
             return (
                 <Collapsible.Root
                     key={group.id}
-                    className="plus-pattern-sidebar__group"
+                    className="plus-template-sidebar__group"
                     role="group"
                     aria-labelledby={titleId}
                     open={!shut}
                     onOpenChange={() => toggleGroup(group.id)}
                 >
                     {title}
-                    <Collapsible.Panel render={<ul />} className="plus-pattern-sidebar__list">
+                    <Collapsible.Panel render={<ul />} className="plus-template-sidebar__list">
                         {list}
                     </Collapsible.Panel>
                 </Collapsible.Root>
@@ -729,12 +729,12 @@ const Sidebar = ({
         return (
             <div
                 key={group.id}
-                className="plus-pattern-sidebar__group"
+                className="plus-template-sidebar__group"
                 role={group.title ? 'group' : undefined}
                 aria-labelledby={group.title ? titleId : undefined}
             >
                 {title}
-                <ul id={listId} className="plus-pattern-sidebar__list">{list}</ul>
+                <ul id={listId} className="plus-template-sidebar__list">{list}</ul>
             </div>
         );
     };
@@ -743,9 +743,9 @@ const Sidebar = ({
         const switcher = inner.switcher;
         const chosen = switcher?.options.find((option) => option.id === switcher.value);
         return (
-            <div className="plus-pattern-sidebar__inner">
+            <div className="plus-template-sidebar__inner">
                 <Button
-                    className="plus-pattern-sidebar__back"
+                    className="plus-template-sidebar__back"
                     appearance="default"
                     shouldFitContainer
                     iconBefore="arrow-left"
@@ -753,12 +753,12 @@ const Sidebar = ({
                     onClick={onBack}
                 />
                 {switcher ? (
-                    <div className="plus-pattern-sidebar__switcher">
+                    <div className="plus-template-sidebar__switcher">
                         <DropdownMenu
                             placement="bottom-start"
                             trigger={(
                                 <Button
-                                    className="plus-pattern-sidebar__switcher-trigger"
+                                    className="plus-template-sidebar__switcher-trigger"
                                     appearance="default"
                                     shouldFitContainer
                                     iconAfter="angle-down"
@@ -779,19 +779,19 @@ const Sidebar = ({
                         </DropdownMenu>
                     </div>
                 ) : null}
-                <ul className="plus-pattern-sidebar__list" aria-label={inner.label ?? `${inner.areaLabel} steps`}>
+                <ul className="plus-template-sidebar__list" aria-label={inner.label ?? `${inner.areaLabel} steps`}>
                     {inner.rows.map((row) => {
                         const selected = resolvedActiveId === row.id;
                         const off = Boolean(row.disabled);
                         const line = renderRow({
                             item: { ...row, textOnly: true },
-                            rowClass: ['plus-pattern-sidebar__row', 'plus-pattern-sidebar__row--text', selected && 'plus-pattern-sidebar__row--selected', off && 'plus-pattern-sidebar__row--locked'].filter(Boolean).join(' '),
+                            rowClass: ['plus-template-sidebar__row', 'plus-template-sidebar__row--text', selected && 'plus-template-sidebar__row--selected', off && 'plus-template-sidebar__row--locked'].filter(Boolean).join(' '),
                             current: selected,
                             onPress: () => onSelect?.(row.id, row),
                             ...(off ? { 'aria-disabled': 'true' } : {}),
                         });
                         return (
-                            <li key={row.id} className="plus-pattern-sidebar__item">
+                            <li key={row.id} className="plus-template-sidebar__item">
                                 {off && row.disabledText ? <Tooltip text={row.disabledText} placement="right">{line}</Tooltip> : line}
                             </li>
                         );
@@ -803,7 +803,7 @@ const Sidebar = ({
 
     const brand = handleHome ? (
         <a
-            className="plus-pattern-sidebar__brand"
+            className="plus-template-sidebar__brand"
             href={homeHref}
             aria-label="PLUS, go to Home"
             onClick={(event) => {
@@ -815,20 +815,20 @@ const Sidebar = ({
             <Logo appearance="colored" size={24} wordmark />
         </a>
     ) : (
-        <a className="plus-pattern-sidebar__brand" href={homeHref} aria-label="PLUS, go to Home">
+        <a className="plus-template-sidebar__brand" href={homeHref} aria-label="PLUS, go to Home">
             <Logo appearance="colored" size={24} wordmark />
         </a>
     );
 
     return (
-        <div id={id} className={['plus-pattern-sidebar', 'plus-sidebar', className].filter(Boolean).join(' ')} style={style}>
-            <div className="plus-pattern-sidebar__logo-row">
+        <div id={id} className={['plus-template-sidebar', 'plus-sidebar', className].filter(Boolean).join(' ')} style={style}>
+            <div className="plus-template-sidebar__logo-row">
                 {brand}
                 {toggleButton}
             </div>
-            <nav ref={navRef} aria-label={label} className="plus-pattern-sidebar__nav">
-                <span ref={glideRef} className="plus-pattern-sidebar__glide" aria-hidden="true" />
-                <div key={mode} ref={swapRef} className="plus-pattern-sidebar__swap" data-mode={mode}>
+            <nav ref={navRef} aria-label={label} className="plus-template-sidebar__nav">
+                <span ref={glideRef} className="plus-template-sidebar__glide" aria-hidden="true" />
+                <div key={mode} ref={swapRef} className="plus-template-sidebar__swap" data-mode={mode}>
                     {inner ? renderInner() : resolvedGroups.map(renderGroup)}
                 </div>
             </nav>

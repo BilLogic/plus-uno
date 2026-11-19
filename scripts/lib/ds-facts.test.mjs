@@ -63,23 +63,23 @@ test('real repo: Alert is not here; use SectionMessage', () => {
   assert.ok(alert.replacement.includes('SectionMessage'));
 });
 
-test('real repo: a pattern answers with its kind and barrel', () => {
-  const card = loadFacts(REPO_ROOT).lookup('PatternCard');
+test('real repo: a template answers with its kind and barrel', () => {
+  const card = loadFacts(REPO_ROOT).lookup('Card');
   assert.equal(card.status, 'exists');
-  assert.equal(card.kind, 'pattern');
-  assert.equal(card.import, "import { PatternCard } from '@/patterns';");
+  assert.equal(card.kind, 'template');
+  assert.equal(card.import, "import { Card } from '@/templates';");
   assert.equal(card.group, 'Card');
   const gap = card.props.find((p) => p.name === 'gap');
   assert.deepEqual(gap.values, ['sm', 'md', 'lg']);
   assert.equal(card.props.find((p) => p.name === 'padding'), undefined);
-  assert.equal(loadFacts(REPO_ROOT).lookup('PatternCard.gap=xl').status, 'unknown');
+  assert.equal(loadFacts(REPO_ROOT).lookup('Card.gap=xl').status, 'unknown');
 });
 
 test('real repo: Frame and Sidebar answer with their props, from source', () => {
   const facts = loadFacts(REPO_ROOT);
   const frame = facts.lookup('Frame');
-  assert.equal(frame.kind, 'pattern');
-  assert.equal(frame.import, "import { Frame } from '@/patterns';");
+  assert.equal(frame.kind, 'template');
+  assert.equal(frame.import, "import { Frame } from '@/templates';");
   assert.deepEqual(frame.props.find((p) => p.name === 'width').values, ['content', 'reading']);
   const sidebar = facts.lookup('Sidebar');
   assert.equal(sidebar.kind, 'component');
@@ -141,7 +141,7 @@ test('every check that scopes consumer code composes its roots from the facts mo
   assert.deepEqual(SOURCE_ROOTS, [LIBRARY_ROOT, ...consumer]);
   const roots = async (file, name) => (await import(`../${file}`))[name];
   assert.deepEqual(await roots('check-ds-usage.mjs', 'SCOPE'), [
-    ...consumer, 'design-system/src/components', 'design-system/src/patterns', 'design-system/src/templates',
+    ...consumer, 'design-system/src/components', 'design-system/src/templates',
     'design-system/src/storybook-docs', 'design-system/src/styles',
   ]);
   assert.equal(await roots('check-ads-language.mjs', 'SEARCH_ROOTS'), SOURCE_ROOTS);

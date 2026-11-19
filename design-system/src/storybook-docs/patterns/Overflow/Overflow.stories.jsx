@@ -181,7 +181,7 @@ export const PagedInFooter = {
     play: async ({ canvas, canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
-        const footer = canvasElement.querySelector('.plus-pattern-section-footer');
+        const footer = canvasElement.querySelector('.plus-template-section-footer');
         const pager = within(footer).getByRole('navigation', { name: 'Page navigation' });
         await expect(rect(pager).right, 'the pager sits at the end of the footer').toBeCloseTo(rect(footer).right, -1);
         await expect(canvas.getAllByRole('row').length, 'the rows stay at one page').toBe(5);

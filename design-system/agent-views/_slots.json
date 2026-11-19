@@ -5,8 +5,8 @@
       "owner": "SectionToolbar",
       "prop": "filters",
       "containers": [
-        "PatternSection.toolbar",
-        "PatternSection.Toolbar",
+        "Section.toolbar",
+        "Section.Toolbar",
         "SectionToolbar"
       ],
       "accepts": [

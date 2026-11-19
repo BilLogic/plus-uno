@@ -1,7 +1,7 @@
 /** The source shown behind Show code for each live example in ErrorsCases.jsx. */
 
 export const CODE = {
-    FailureInSlot: `<PatternSection
+    FailureInSlot: `<Section
     title="Sessions"
     description="This week"
     views={<ViewPills views={['This week', 'Next week']} activeView="This week" />}
@@ -14,7 +14,7 @@ export const CODE = {
         description="Check your connection and try again."
         primaryAction={<Button text="Try again" spacing="compact" />}
     />
-</PatternSection>`,
+</Section>`,
     FailureInModal: `<Dialog
     title="Couldn't load sessions"
     footer={(

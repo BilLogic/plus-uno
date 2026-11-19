@@ -70,9 +70,9 @@ const REGISTRY: DevLinkRegistry = {
       code: { source: "design-system/src/components/labels/Badge/Badge.jsx", storybookId: "components-labels-deprecated-badge--docs" },
       figma: { fileKey: LIB, sets: [{ componentSetNodeId: "25:568", status: "verified" }] },
     },
-    PatternCard: {
+    Card: {
       code: {
-        source: "design-system/src/patterns/PatternCard/PatternCard.jsx",
+        source: "design-system/src/templates/Card/Card.jsx",
         storybookId: "templates-card--docs",
       },
       figma: { fileKey: SPECS, sets: [{ componentSetNodeId: "10661:10292" }] },
@@ -265,16 +265,16 @@ describe("only registry components", () => {
     assert.deepEqual(
       chip.map((l) => [l.name, l.url]),
       [
-        ["Code (plus-uno): PatternCard", "https://github.com/BilLogic/plus-uno/blob/main/design-system/src/patterns/PatternCard/PatternCard.jsx"],
-        ["Storybook: PatternCard", "https://plus-uno.netlify.app/storybook/?path=/docs/templates-card--docs"],
+        ["Code (plus-uno): Card", "https://github.com/BilLogic/plus-uno/blob/main/design-system/src/templates/Card/Card.jsx"],
+        ["Storybook: Card", "https://plus-uno.netlify.app/storybook/?path=/docs/templates-card--docs"],
       ],
     );
     assert.equal(linksOf(card).length, 8);
     assert.deepEqual(
       (card.operations![0]!.input as { introduce: Array<{ component: string }> }).introduce.map((i) => i.component),
-      ["Button", "Badge", "PatternCard"],
+      ["Button", "Badge", "Card"],
     );
-    for (const name of ["Button", "Badge", "PatternCard"]) assert.ok(card.proposalText.includes(`*${name}*`), name);
+    for (const name of ["Button", "Badge", "Card"]) assert.ok(card.proposalText.includes(`*${name}*`), name);
     assert.ok(card.proposalText.includes(`<${BUTTON_CODE}|Code (plus-uno)>`), card.proposalText);
   });
 

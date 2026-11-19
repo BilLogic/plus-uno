@@ -36,21 +36,21 @@
       "name": "card",
       "token_scope": "--card-*",
       "typical_locations": [
-        "design-system/src/patterns/PatternCard/"
+        "design-system/src/templates/Card/"
       ]
     },
     {
       "name": "section",
       "token_scope": "--section-*",
       "typical_locations": [
-        "design-system/src/patterns/PatternSection/"
+        "design-system/src/templates/Section/"
       ]
     },
     {
       "name": "table",
       "token_scope": "--table-*",
       "typical_locations": [
-        "design-system/src/patterns/Table/"
+        "design-system/src/templates/Table/"
       ]
     },
     {
@@ -58,13 +58,13 @@
       "token_scope": "--modal-*",
       "typical_locations": [
         "design-system/src/components/messaging/Dialog/",
-        "design-system/src/patterns/Modal/"
+        "design-system/src/templates/Modal/"
       ]
     },
     {
       "name": "page",
       "typical_locations": [
-        "design-system/src/patterns/Page/"
+        "design-system/src/templates/Page/"
       ]
     }
   ],
@@ -74,7 +74,7 @@
     "section": "Major page region.",
     "table": "Structured tabular layout.",
     "modal": "Overlay dialog surface.",
-    "pattern": "Higher-level composition (Frame, Page, Section, Card, Table, overlays, templates) in design-system/src/patterns."
+    "template": "Higher-level composition (Frame, Page, Section, Card, Table, overlays) in design-system/src/templates."
   },
   "token_prefixes": [
     "--ds-*",

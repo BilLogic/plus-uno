@@ -68,7 +68,7 @@ export const TOOL_ORDER = ['ds_find', 'ds_get', 'ds_tokens', 'ds_guide', 'ds_che
 export const ORIENTATION = `PLUS design system: the React components, templates, patterns and tokens every PLUS prototype is built from. A name the lookup does not know does not exist here: propose it rather than write it.
 
 Barrels (import only from these):
-- ${BARRELS[1]}: the templates (Frame, which every full page starts from, Page, PatternSection, PatternCard, Table, overlays)
+- ${BARRELS[2]}: the templates (Frame, which every full page starts from, Page, Section, Card, Table, overlays)
 - ${BARRELS[0]}: the components (Button, TextField, SectionMessage...)
 
 Build in five stages:
@@ -81,7 +81,7 @@ Build in five stages:
 Hard rules:
 - Template, then blocks, then pieces; build new interactive behavior on @base-ui/react styled with tokens.
 - Props and values come from ds_get, never from memory.
-- Style with semantic, pattern or component tokens (ds_tokens); never a literal, never a primitive (--palette-*, --space-<n>).
+- Style with semantic, template or component tokens (ds_tokens); never a literal, never a primitive (--palette-*, --space-<n>).
 - Icons are Font Awesome Free: fa-solid, fa-regular, fa-brands.
 - A full page starts from a template: Frame with the PLUS Sidebar (ds_guide("templates")).
 - Run ds_check once at the end.`;
@@ -221,8 +221,19 @@ const headed = (page, title) => {
 const PRO_FAMILY = /\bfa-(?:sharp-duotone|sharp|duotone|light|thin)\b/;
 const GUIDELINES = 'design-system/guidelines';
 const AGENT_VIEWS = 'design-system/agent-views';
-const PATTERNS_SRC = 'design-system/src/patterns';
-const TEMPLATE_COMPONENTS = ['Frame', 'Page', 'PatternSection', 'PatternCard', 'Table', 'Modal'];
+const TEMPLATES_SRC = 'design-system/src/templates';
+/**
+ * Templates a plain word of a query names, which lead the results. Kept for `Card`: "a grid of cards" or "a kanban
+ * with draggable cards" names the template in one word, but BM25 over its name and summary ranks Table and Section above it
+ * (the ds-find bench falls from 41 to 40 hit@1 without it).
+ */
+const NAMED_BY_WORD = ['Card'];
+const TEMPLATE_COMPONENTS = ['Frame', 'Page', 'Section', 'Card', 'Table', 'Modal'];
+/** The name whose record owns a name's page and rendered text: a template its own, an alias what it aliases. */
+function homeNameOf(a) {
+  return a.kind === 'template' ? a.name : a.aliasOf ?? a.name;
+}
+
 const readIf = (file) => (fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null);
 const firstSentence = (text, max = 160) => {
   if (!text) return null;
@@ -310,7 +321,7 @@ const mdIn = (root, dir) =>
 /**
  * Topic → the file that answers it: generated template, pattern and
  * foundation agent views (`agent-views/<root>/<Name>.md` and component-backed
- * templates under `src/patterns/<Name>/index.md`), plus any surviving
+ * templates under `src/templates/<Name>/index.md`), plus any surviving
  * `guidelines/` pages.
  */
 function scanTopics(root) {
@@ -332,10 +343,10 @@ function scanTopics(root) {
     }
   }
   for (const sub of TEMPLATE_COMPONENTS) {
-    const rel = `${PATTERNS_SRC}/${sub}/index.md`;
+    const rel = `${TEMPLATES_SRC}/${sub}/index.md`;
     if (!fs.existsSync(path.join(root, rel))) continue;
     const kebab = sub.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
-    const short = sub.replace(/^Pattern/, '').replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+    const short = kebab;
     if (short === 'page') {
       map['page-template'] ??= rel;
     } else {
@@ -386,10 +397,12 @@ export function buildDsIndex(root) {
   }
   const patternFigma = new Map();
   for (const [key, entry] of Object.entries(registry.patterns ?? {})) {
-    const name = `Pattern${key.replace(/^Pattern\//, '').replace(/\s+(\w)/g, (_, c) => c.toUpperCase())}`;
-    if (facts.lookup(name).status !== 'exists') continue;
-    figmaAliases.push({ alias: key, name });
-    patternFigma.set(name, { key, ...entry });
+    const bare = key.replace(/^(?:Template|Pattern)\//, '').replace(/\s+(\w)/g, (_, c) => c.toUpperCase());
+    // A set is named for its template; the pattern name it shipped under still answers until the old name is retired.
+    for (const name of [bare, `Pattern${bare}`].filter((n) => facts.lookup(n).status === 'exists')) {
+      figmaAliases.push({ alias: key, name });
+      patternFigma.set(name, { key, ...entry });
+    }
   }
 
   function figmaFor(name) {
@@ -415,11 +428,11 @@ export function buildDsIndex(root) {
 
   const entries = records.map((r) => {
     const a = facts.lookup(r.name);
-    const home = a.aliasOf ? facts.lookup(a.aliasOf) : a;
-    const homeName = a.aliasOf ?? a.name;
+    const homeName = homeNameOf(a);
+    const home = homeName === a.name ? a : facts.lookup(homeName);
     const srcFile = home.source ?? a.source;
     const src = srcFile ? readIf(path.join(root, srcFile)) : null;
-    const liveSummary = src && a.kind !== 'pattern' ? (jsdocFor(src, implSymbol(src, homeName)) || null) : a.summary;
+    const liveSummary = src && a.kind !== 'template' ? (jsdocFor(src, implSymbol(src, homeName)) || null) : a.summary;
     const rankPage = pageOf(r.name, a.source)?.page;
     const docs = pageOf(homeName, srcFile);
     const edges = context.edges[homeName];
@@ -760,6 +773,8 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     const rows = [];
     for (const { row, bl } of notHere) if (row.kind === 'component' && words.includes(bl)) rows.push(notHereRow(row));
     if (singleWord && ql.length > 2) for (const { row, bl } of notHere) if (row.kind === 'component' && bl.includes(ql)) rows.push(notHereRow(row));
+    // A template a plain word names leads, as a not-here redirect would.
+    for (const name of NAMED_BY_WORD) if (words.includes(name.toLowerCase()) && entriesByName.has(name)) rows.push(item(name));
     return rows;
   }
 
@@ -772,7 +787,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
         const a = facts.lookup(r.id);
         const phrases = aliases ? a.aliases.filter((al) => al.length > 3 && hasPhrase(ql, al)) : [];
         const bonus = phrases.reduce((sum, al) => sum + aliasPhrase + al.split(' ').length, 0);
-        return { ...r, score: r.score + bonus + (a.kind === 'pattern' ? patternLift : 0) };
+        return { ...r, score: r.score + bonus + (a.kind === 'template' ? patternLift : 0) };
       })
       .sort((a, b) => b.score - a.score || (a.id < b.id ? -1 : 1));
     const top = ranked[0]?.score ?? 0;
@@ -932,7 +947,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     let kit;
     if (kitQuery) {
       const template = /\b(frame|screen|page|dashboard)\b/.test(c.ql) ? pages.find((p) => p.component === 'Frame') : pageRank('template')[0] ?? pages.find((p) => p.component === 'Frame');
-      const components = [...new Set([...named.map((r) => r.name), ...out.filter((r) => ['component', 'pattern', 'template'].includes(r.kind) && r.import).map((r) => r.name), ...(patternPages[0]?.components ?? [])])].slice(0, 16);
+      const components = [...new Set([...named.map((r) => r.name), ...out.filter((r) => ['component', 'template'].includes(r.kind) && r.import).map((r) => r.name), ...(patternPages[0]?.components ?? [])])].slice(0, 16);
       const governing = components.flatMap((name) => contexts().edges[name]?.governedBy ?? []);
       const frequency = (page) => governing.filter((p) => p.name === page.name).length;
       const patterns = [...new Map([...patternPages.slice(0, 3), ...governing.sort((a, b) => frequency(b) - frequency(a))].map((p) => [p.name, pageRow(p)])).values()].slice(0, 6);
@@ -967,7 +982,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
       return { name: a.name, status: a.status, why: a.why, use: a.replacement.map(brief), next: 'Use the replacement: ds_get it for its props.' };
     }
     if (a.kind === 'prop') return { ...a, next: null };
-    const homeName = a.aliasOf ?? a.name;
+    const homeName = homeNameOf(a);
     const homeEntry = entriesByName.get(homeName);
     const record = {
       name: a.name,
@@ -1036,7 +1051,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
   const isBriefGuide = (rel) =>
     rel.startsWith(`${AGENT_VIEWS}/patterns/`) ||
     rel.startsWith(`${AGENT_VIEWS}/templates/`) ||
-    rel.startsWith(`${PATTERNS_SRC}/`);
+    rel.startsWith(`${TEMPLATES_SRC}/`);
   const summarizeGuide = (rel, fullText) => {
     const parts = fullText.split(/\n(?=## )/);
     const header = parts[0].trim();

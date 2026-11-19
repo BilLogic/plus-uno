@@ -471,7 +471,7 @@ const preview = {
                 "AI feedback"
               ]
             ],
-            "Patterns",
+            "Templates",
             [
               "AI chat"
             ]

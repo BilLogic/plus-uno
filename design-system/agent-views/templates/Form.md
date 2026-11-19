@@ -6,7 +6,7 @@ A stack of fields with a footer, in one of four places: in a page, in a Panel, i
 
 **Kind:** Template
 
-**Storybook page:** `design-system/src/patterns/Form/Form.mdx`
+**Storybook page:** `design-system/src/templates/Form/Form.mdx`
 
 ## Types
 

@@ -106,7 +106,7 @@ function useDialogTabs(tabs, { activeTab, defaultActiveTab, onTabChange }) {
  * slots. Sizes from the screen grid (`4-col · 6-col · 8-col · 10-col`) and
  * renders inline with no Blanket and no modal behavior. For a blocking overlay
  * dialog with Blanket, portal, focus trap, Escape and scroll lock, use the
- * `Modal` template from `@/patterns`.
+ * `Modal` template from `@/templates`.
  */
 const Dialog = React.forwardRef(({
     id,

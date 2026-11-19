@@ -4,7 +4,7 @@ import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
 import { Button, DynamicTable, EmptyState, HeadCell, StaticTable } from '@/components';
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
-import PatternSection from '@/patterns/PatternSection';
+import { Section } from '@/templates';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 
 /**
@@ -237,7 +237,7 @@ export const EmptyNothingYet = {
     name: 'Empty box: Nothing yet',
     render: () => (
         <HeadingLevelContext.Provider value={3}>
-            <PatternSection
+            <Section
                 title="Students"
                 actions={<Button text="Add student" appearance="primary" spacing="compact" onClick={() => {}} />}
             >
@@ -255,7 +255,7 @@ export const EmptyNothingYet = {
                         />
                     )}
                 />
-            </PatternSection>
+            </Section>
         </HeadingLevelContext.Provider>
     ),
     play: async ({ canvasElement }) => {
@@ -281,7 +281,7 @@ const FilteredDynamicTable = () => {
     const visible = filtered ? [] : rows;
     return (
         <HeadingLevelContext.Provider value={3}>
-            <PatternSection
+            <Section
                 title="Students"
                 filters={[{
                     key: 'grade',
@@ -314,7 +314,7 @@ const FilteredDynamicTable = () => {
                         />
                     )}
                 />
-            </PatternSection>
+            </Section>
         </HeadingLevelContext.Provider>
     );
 };
@@ -340,7 +340,7 @@ export const EmptyNothingToCreate = {
     name: 'Empty box: Nothing to create',
     render: () => (
         <HeadingLevelContext.Provider value={3}>
-            <PatternSection title="Reflections">
+            <Section title="Reflections">
                 <DynamicTable
                     head={head}
                     rows={[]}
@@ -354,7 +354,7 @@ export const EmptyNothingToCreate = {
                         />
                     )}
                 />
-            </PatternSection>
+            </Section>
         </HeadingLevelContext.Provider>
     ),
     play: async ({ canvasElement }) => {
@@ -413,7 +413,7 @@ const RosterWithBulkBar = (args) => {
     const [selected, setSelected] = React.useState([]);
     return (
         <HeadingLevelContext.Provider value={3}>
-            <PatternSection title="Students" description={`${args.rows.length} students`}>
+            <Section title="Students" description={`${args.rows.length} students`}>
                 <DynamicTable
                     {...args}
                     isSelectable
@@ -421,7 +421,7 @@ const RosterWithBulkBar = (args) => {
                     onSelectionChange={setSelected}
                     bulkActions={BULK.map((label) => ({ label, onClick: () => {} }))}
                 />
-            </PatternSection>
+            </Section>
         </HeadingLevelContext.Provider>
     );
 };

@@ -3,13 +3,13 @@
 // from the root facts module (`scripts/lib/ds-facts.mjs`).
 //
 // WHY. The IDE answers "does PLUS have a card?" from the facts module:
-// `PatternCard`, with its import. The Worker answered it by reading the
+// `Card`, with its import. The Worker answered it by reading the
 // markdown index over GitHub and parsing it with a regex, so Slack and the IDE
 // could disagree, and every read cost a subrequest of the 50 a turn on Workers
 // Free has (`net.ts`). Baked, `github_read`'s `lookup` and the weekly
 // precedence check read the same facts the IDE does, with no fetch at all.
 //
-// WHAT IS KEPT. Only what the bot answers with: each component's and pattern's
+// WHAT IS KEPT. Only what the bot answers with: each component's and template's
 // kind, import, group, summary, source, generated doc and props (name, type,
 // values, default, whether required, a deprecation); each token's tier, group,
 // value and intent; the names each public barrel exports; and the names that

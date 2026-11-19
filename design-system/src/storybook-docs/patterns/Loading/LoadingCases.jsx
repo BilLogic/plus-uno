@@ -1,6 +1,6 @@
 import React from 'react';
 import { CustomItem, IconButton, Skeleton, Spinner } from '@/components';
-import { PatternSection } from '@/patterns';
+import { Section } from '@/templates';
 import { LoadingList } from './loadingDemo.jsx';
 import { LiveMenu } from '@/storybook-docs/lib/dropdown-menu-cases.jsx';
 
@@ -44,9 +44,9 @@ export const SkeletonInShape = () => <LoadingList band="shape" />;
 
 /** Don't: one spinner in a blank area, so the layout jumps when the rows arrive. */
 export const SpinnerInBlank = () => (
-    <PatternSection title="Students" description="Lincoln Middle">
+    <Section title="Students" description="Lincoln Middle">
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minBlockSize: 'calc(var(--control-lg) * 4)' }}>
             <Spinner size={24} label="Loading students" />
         </div>
-    </PatternSection>
+    </Section>
 );

@@ -4,7 +4,7 @@
 // The facts are the root facts module's (`scripts/lib/ds-facts.mjs`), baked
 // at deploy (`scripts/generate-ds-facts.mjs`), and this lookup answers as that
 // module does for the same name — `tests/ds-facts.test.ts` holds the two to
-// each other. So "does PLUS have a card?" is `PatternCard` with its import in
+// each other. So "does PLUS have a card?" is `Card` with its import in
 // Slack as it is in the IDE, and answering it fetches nothing.
 //
 // Every answer carries a `status` — `exists`, `not-here`, `retired` or

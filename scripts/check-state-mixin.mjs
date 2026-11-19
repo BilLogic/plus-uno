@@ -12,7 +12,7 @@
  * counts the three ways of hand-rolling it outside that file.
  *
  * WHAT IT READS. Every tracked `.scss` file under `design-system/src/components`
- * and `design-system/src/patterns`, by `git ls-files` (a filesystem walk finds
+ * and `design-system/src/templates`, by `git ls-files` (a filesystem walk finds
  * a second copy of the tree under `.claude/worktrees/`). The mixin's own file,
  * `design-system/src/styles/_state.scss`, is excluded: it is where the three
  * patterns are SUPPOSED to live, once.
@@ -54,7 +54,7 @@ export { REPO_ROOT };
 /** Repo-relative: what the registry row declares. */
 export const BASELINE = 'scripts/baselines/state-mixin.json';
 
-export const SEARCH_ROOTS = ['design-system/src/components', 'design-system/src/patterns'];
+export const SEARCH_ROOTS = ['design-system/src/components', 'design-system/src/templates'];
 export const SEARCHED = /\.scss$/;
 /** The mixin's own file: the one place these three patterns are meant to live. */
 const MIXIN_FILE = 'design-system/src/styles/_state.scss';
@@ -197,7 +197,7 @@ function record() {
         'Hand-rolled focus-ring, hover and press patterns the state mixin (design-system/src/styles/_state.scss) exists ' +
         'to replace: a raw `outline: none` reset, the legacy `--color-focus-ring` token, a hand-written forced-colors ' +
         '`Highlight` ring, and a `:hover` / `:active` selector written outside the mixin\'s `hovered:` / `pressed:` ' +
-        'state keys. Counted per rule and per file in design-system/src/components and design-system/src/patterns. ' +
+        'state keys. Counted per rule and per file in design-system/src/components and design-system/src/templates. ' +
         'A count may fall and never rise; a new file starts at zero. Regenerate with `npm run check:state-mixin -- --update`; ' +
         'never edit by hand.',
     },

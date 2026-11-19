@@ -2,8 +2,8 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { MotionPreferenceContext } from '@/lib/motionPreference';
-import { SECTION_DETAIL_FLOOR } from '@/patterns';
-import { FRAME_LAYOUT } from '@/patterns/Frame/frameLayout';
+import { SECTION_DETAIL_FLOOR } from '@/templates';
+import { FRAME_LAYOUT } from '@/templates/Frame/frameLayout';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
@@ -46,7 +46,7 @@ const parts = (canvasElement) => {
         filterIcon: () => canvas.queryByRole('button', { name: /^Filters/ }),
         rows: () => bar.querySelectorAll('.plus-section-row'),
         popup: () => canvasElement.querySelector('[data-filter-stage] [role="dialog"], [data-filter-stage] .plus-popup'),
-        status: () => canvasElement.querySelector('.plus-pattern-section-content span[role="status"]'),
+        status: () => canvasElement.querySelector('.plus-template-section-content span[role="status"]'),
     };
 };
 
@@ -235,7 +235,7 @@ export const FilterCount = {
         });
 
         await step('No row of tags repeats what is on', async () => {
-            await expect(canvasElement.querySelector('.plus-pattern-section-content .plus-tag, .plus-tag-group'), 'no tags under the header').toBeNull();
+            await expect(canvasElement.querySelector('.plus-template-section-content .plus-tag, .plus-tag-group'), 'no tags under the header').toBeNull();
         });
 
         await step('Reset clears the menu; Apply clears the count', async () => {

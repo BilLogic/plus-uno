@@ -4,11 +4,11 @@
 
 A full-height layer on the right with no Blanket: docked beside the Page when it fits, floating over it when it does not. Two types: Details and Notifications. The AI panel is a region of the Frame.
 
-Import the Panel and its parts from `@/patterns`. This template documents the parts and its layout within the Frame.
+Import the Panel and its parts from `@/templates`. This template documents the parts and its layout within the Frame.
 
 **Kind:** Template
 
-**Storybook page:** `design-system/src/patterns/Panel/Panel.mdx`
+**Storybook page:** `design-system/src/templates/Panel/Panel.mdx`
 
 ## Types
 
@@ -62,7 +62,7 @@ The Panel resizes from 320 to 640 by drag or keys, never past what keeps 720 of 
 ## Slots
 
 ```jsx
-import { Frame, PanelContainer, PanelHeader, PanelBody, PanelFooter } from '@/patterns';
+import { Frame, PanelContainer, PanelHeader, PanelBody, PanelFooter } from '@/templates';
 ```
 
 The Panel components are the parts: header with its fixed actions, body, footer, and Escape to close. The Frame hosts one and decides whether it docks or floats. The template is its filled layout, one per type. The AI panel is the Frame's `panel`.

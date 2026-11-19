@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { Banner, Flag, FlagGroup } from '@/components';
-import { Page, PatternSection } from '@/patterns';
+import { Page, Section } from '@/templates';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { STUDENTS, StudentsTable, ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
-import { DemoPageHeader } from '../../../patterns/Page/pageDemo.jsx';
+import { DemoPageHeader } from '../../../templates/Page/pageDemo.jsx';
 
 /**
  * Interactive key cases for the Notifications pattern page, kept beside the
@@ -130,9 +130,9 @@ export const TierFrameCase = () => (
     <BrowserWindow address="app.plus.org/students">
         <Banner appearance="announcement">Scheduled maintenance Saturday 2–4 AM ET.</Banner>
         <Page header={<DemoPageHeader title="Students" description="Lincoln Middle" />}>
-            <PatternSection title="Students">
+            <Section title="Students">
                 <StudentsTable sortable count={3} />
-            </PatternSection>
+            </Section>
         </Page>
     </BrowserWindow>
 );
@@ -144,9 +144,9 @@ export const TierPageCase = () => (
             header={<DemoPageHeader title="Students" description="Lincoln Middle" />}
             banner={<Banner appearance="warning">Tutoring sessions move to the new calendar on Friday.</Banner>}
         >
-            <PatternSection title="Students">
+            <Section title="Students">
                 <StudentsTable sortable count={3} />
-            </PatternSection>
+            </Section>
         </Page>
     </BrowserWindow>
 );
@@ -157,7 +157,7 @@ export const TierSectionCase = () => {
     return (
         <BrowserWindow address="app.plus.org/students">
             <Page header={<DemoPageHeader title="Students" description="Lincoln Middle" />}>
-                <PatternSection
+                <Section
                     title="All students"
                     views={<ViewPills views={['All students', 'Paused']} activeView={view} onViewChange={setView} />}
                 >
@@ -169,7 +169,7 @@ export const TierSectionCase = () => {
                             count={STUDENTS.length}
                         />
                     </div>
-                </PatternSection>
+                </Section>
             </Page>
         </BrowserWindow>
     );

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
 import { Banner, Button, ButtonItem, DropdownMenu, EmptyState, Flag, FlagGroup, IconButton, TextField } from '@/components';
-import { Page, PatternSection } from '@/patterns';
-import { DemoPageHeader, SessionsTable } from '../../../patterns/Page/pageDemo.jsx';
+import { Page, Section } from '@/templates';
+import { DemoPageHeader, SessionsTable } from '../../../templates/Page/pageDemo.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { HeaderSearch } from '@/storybook-docs/lib/section-header.jsx';
 import { ViewPills, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
@@ -63,7 +63,7 @@ export const LoadFailure = ({ onRetry, padded = true }) => {
     const showingTable = recovered || view !== 'This week';
 
     const section = (
-        <PatternSection
+        <Section
             title="Sessions"
             description={view}
             views={(
@@ -89,7 +89,7 @@ export const LoadFailure = ({ onRetry, padded = true }) => {
                     primaryAction={<Button text="Try again" appearance="default" spacing="compact" onClick={handleRetry} />}
                 />
             )}
-        </PatternSection>
+        </Section>
     );
     return padded ? <div style={pad}>{section}</div> : section;
 };
@@ -97,14 +97,14 @@ export const LoadFailure = ({ onRetry, padded = true }) => {
 /** No access: the same slot names who can help and offers no action the person cannot take. */
 export const NoAccess = () => (
     <div style={pad}>
-        <PatternSection title="Session notes" description="Lincoln Middle" views={<ViewPills views={['All notes']} />} search={<HeaderSearch label="Search notes" />}>
+        <Section title="Session notes" description="Lincoln Middle" views={<ViewPills views={['All notes']} />} search={<HeaderSearch label="Search notes" />}>
             <EmptyState
                 spacing="compact"
                 icon="lock"
                 header="Only Lincoln's supervisor can open these notes"
                 description="Ask the supervisor to add you."
             />
-        </PatternSection>
+        </Section>
     </div>
 );
 

@@ -1,68 +1,5 @@
 [
   {
-    "file": "design-system/src/patterns/Form/Form.mdx",
-    "title": "Templates/Form",
-    "categoryRoot": "Templates",
-    "componentSource": null,
-    "componentName": null
-  },
-  {
-    "file": "design-system/src/patterns/Frame/Frame.mdx",
-    "title": "Templates/Frame",
-    "categoryRoot": "Templates",
-    "componentSource": "design-system/src/patterns/Frame/Frame.jsx",
-    "componentName": null
-  },
-  {
-    "file": "design-system/src/patterns/Modal/Modal.mdx",
-    "title": "Templates/Modal",
-    "categoryRoot": "Templates",
-    "componentSource": "design-system/src/patterns/Modal/Modal.jsx",
-    "componentName": null
-  },
-  {
-    "file": "design-system/src/patterns/Page/Page.mdx",
-    "title": "Templates/Page",
-    "categoryRoot": "Templates",
-    "componentSource": "design-system/src/patterns/Page/Page.jsx",
-    "componentName": null
-  },
-  {
-    "file": "design-system/src/patterns/Panel/Panel.mdx",
-    "title": "Templates/Panel",
-    "categoryRoot": "Templates",
-    "componentSource": null,
-    "componentName": null
-  },
-  {
-    "file": "design-system/src/patterns/PatternCard/PatternCard.mdx",
-    "title": "Templates/Card",
-    "categoryRoot": "Templates",
-    "componentSource": "design-system/src/patterns/PatternCard/PatternCard.jsx",
-    "componentName": null
-  },
-  {
-    "file": "design-system/src/patterns/PatternSection/PatternSection.mdx",
-    "title": "Templates/Section",
-    "categoryRoot": "Templates",
-    "componentSource": "design-system/src/patterns/PatternSection/PatternSection.jsx",
-    "componentName": null
-  },
-  {
-    "file": "design-system/src/patterns/Popup/Popup.mdx",
-    "title": "Templates/Popup",
-    "categoryRoot": "Templates",
-    "componentSource": null,
-    "componentName": null
-  },
-  {
-    "file": "design-system/src/patterns/Table/Table.mdx",
-    "title": "Templates/Table",
-    "categoryRoot": "Templates",
-    "componentSource": "design-system/src/patterns/Table/Table.jsx",
-    "componentName": null
-  },
-  {
     "file": "design-system/src/storybook-docs/patterns/CommonActions/CommonActions.mdx",
     "title": "Patterns/Common actions",
     "categoryRoot": "Patterns",
@@ -165,6 +102,69 @@
     "title": "Templates/Overview",
     "categoryRoot": "Templates",
     "componentSource": null,
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/templates/Card/Card.mdx",
+    "title": "Templates/Card",
+    "categoryRoot": "Templates",
+    "componentSource": "design-system/src/templates/Card/Card.jsx",
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/templates/Form/Form.mdx",
+    "title": "Templates/Form",
+    "categoryRoot": "Templates",
+    "componentSource": null,
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/templates/Frame/Frame.mdx",
+    "title": "Templates/Frame",
+    "categoryRoot": "Templates",
+    "componentSource": "design-system/src/templates/Frame/Frame.jsx",
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/templates/Modal/Modal.mdx",
+    "title": "Templates/Modal",
+    "categoryRoot": "Templates",
+    "componentSource": "design-system/src/templates/Modal/Modal.jsx",
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/templates/Page/Page.mdx",
+    "title": "Templates/Page",
+    "categoryRoot": "Templates",
+    "componentSource": "design-system/src/templates/Page/Page.jsx",
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/templates/Panel/Panel.mdx",
+    "title": "Templates/Panel",
+    "categoryRoot": "Templates",
+    "componentSource": null,
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/templates/Popup/Popup.mdx",
+    "title": "Templates/Popup",
+    "categoryRoot": "Templates",
+    "componentSource": null,
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/templates/Section/Section.mdx",
+    "title": "Templates/Section",
+    "categoryRoot": "Templates",
+    "componentSource": "design-system/src/templates/Section/Section.jsx",
+    "componentName": null
+  },
+  {
+    "file": "design-system/src/templates/Table/Table.mdx",
+    "title": "Templates/Table",
+    "categoryRoot": "Templates",
+    "componentSource": "design-system/src/templates/Table/Table.jsx",
     "componentName": null
   }
 ]

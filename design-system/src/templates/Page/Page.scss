@@ -1,0 +1,45 @@
+/**
+ * Page template (Templates/Page)
+ * One Page surface: `--ds-surface` edge to edge, `--page-pad` on every side,
+ * no radius, border or shadow; stack stays `--page-stack-sm · md · lg`.
+ */
+
+@use '../../styles/navigation-motion';
+
+.plus-template-page {
+    display: block;
+    padding: var(--page-pad);
+    background-color: var(--ds-surface);
+    color: var(--ds-text);
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+}
+
+// Slots own the gap; legacy children keep their existing layout.
+.plus-template-page > .plus-template-page-header + .plus-template-page-banner,
+.plus-template-page > .plus-template-page-title + .plus-template-page-banner,
+.plus-template-page > .plus-template-page-header + .plus-template-page-content,
+.plus-template-page > .plus-template-page-title + .plus-template-page-content,
+.plus-template-page > .plus-template-page-banner + .plus-template-page-content {
+    margin-block-start: var(--page-stack-md);
+}
+
+.plus-template-page-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--page-stack-md);
+}
+
+// The title's optical negative margin must not reduce the new banner gap.
+.plus-template-page > .plus-template-page-title:has(+ .plus-template-page-banner) {
+    margin-block: 0;
+}
+
+/* The page's h1: Heading/large 24/28, the top of the page outline. */
+.plus-template-page-title {
+    margin: 0 0 var(--page-stack-md);
+    font: var(--heading-lg);
+    letter-spacing: var(--heading-lg-tracking);
+    color: var(--ds-text);
+}

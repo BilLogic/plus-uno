@@ -1,12 +1,12 @@
 import React from 'react';
 import { TextField } from '@/components';
-import { PatternSection } from '@/patterns';
+import { Section } from '@/templates';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { column, PlainText, ReadOnlyField } from './readOnlyDemo.jsx';
 
 /**
  * The live do and don't examples on the Read-only pattern page, composed from
- * `ReadOnlyField`, `PlainText`, `TextField`, `PatternSection` and `CaseSurface`.
+ * `ReadOnlyField`, `PlainText`, `TextField`, `Section` and `CaseSurface`.
  */
 
 const noop = () => {};
@@ -37,11 +37,11 @@ export const PlainValueCase = () => (
 /** Don't: putting a never-editable value in a read-only field promises an input. */
 export const FieldForFixedValueCase = () => (
     <CaseSurface>
-        <PatternSection title="Details" description="Lincoln Middle">
+        <Section title="Details" description="Lincoln Middle">
             <div style={column}>
                 <TextField label="School" value="Lincoln Middle School" onChange={noop} isReadOnly />
                 <TextField label="Created" value="Sep 3, 2026" onChange={noop} isReadOnly />
             </div>
-        </PatternSection>
+        </Section>
     </CaseSurface>
 );

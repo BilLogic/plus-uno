@@ -162,8 +162,8 @@ test('positive examples reject primitive reads and name semantic replacements', 
 });
 
 test('positive examples reject not-here tags with a fix', () => {
-  const output = findingsIn({ 'example.md': '```jsx\n<Card />\n<Button text="Open" />\n```\n' }).join('\n');
-  assert.match(output, /example.md:2.*Card.*(?:use|Use).*PatternCard/);
+  const output = findingsIn({ 'example.md': '```jsx\n<Alert />\n<Button text="Open" />\n```\n' }).join('\n');
+  assert.match(output, /example.md:2.*Alert.*(?:use|Use).*SectionMessage/);
 
 });
 

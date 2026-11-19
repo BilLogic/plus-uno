@@ -69,7 +69,7 @@ The template for a span of the page grid that groups content, including **Card**
 _Avoid_: "block" as a name, "region" as a name; "section" for a **Figma section** or a **Menu section**
 
 **Card**:
-The pattern for the container of one object, raised at rest with no border. Related cards group in a **Section**, one card level deep.
+The template for the container of one object, raised at rest with no border. Related cards group in a **Section**, one card level deep.
 _Avoid_: "tile" (Tile is its own component), "panel" (Panel is the Frame's right area)
 
 **Blanket**:
@@ -81,7 +81,7 @@ The component (`@/components`) for the dialog panel itself: header (title, close
 _Avoid_: "PatternModal"
 
 **Modal**:
-The template (`@/patterns`) for content that takes over the screen until it is closed: a **Dialog** on the **Blanket** with modal behavior on Base UI (portal, focus trap, Escape, scroll lock). A follow-up decision swaps the same Modal's content for its confirm view, and one Modal is open at a time.
+The template (`@/templates`) for content that takes over the screen until it is closed: a **Dialog** on the **Blanket** with modal behavior on Base UI (portal, focus trap, Escape, scroll lock). A follow-up decision swaps the same Modal's content for its confirm view, and one Modal is open at a time.
 _Avoid_: "Modal dialog" for the template, "ModalDialog", "PatternModal", "popup" for a blocking dialog
 
 **Part**:
@@ -89,7 +89,7 @@ A `_`-prefixed piece only its parent uses, such as `_Section header` or `_Modal 
 _Avoid_: "sub-component" for a part, "element"
 
 **Slot**:
-A named drop zone in a pattern or component where your own content goes: empty and tinted in the source component, filled with realistic placeholder content in examples and the **Playground**.
+A named drop zone in a template or component where your own content goes: empty and tinted in the source component, filled with realistic placeholder content in examples and the **Playground**.
 _Avoid_: "children area", "placeholder" for the slot itself
 
 ### Design system: components
@@ -99,11 +99,11 @@ A component group name, identical in Figma pages, Storybook and code folders, su
 _Avoid_: "Actions", "group" for a category
 
 **Table**:
-The template (`@/patterns`) for how a table sits on a page: a **Section** whose header carries the title and toolbar, then one of the three table kinds, the footer (range, page size, Pagination) and the empty state box when there are no rows. It takes a `kind` (`static`, `dynamic` or `tree`) or the table itself, and holds the type guidance as its chooser. There is one Table template and three table components; the base table and its parts (`TableRow`, `TableCell`, `HeadCell`, `TableFooter`, `TableMessageRow`, `TableSummaryRow`, `TableBulkActions`) are shared by all three.
+The template (`@/templates`) for how a table sits on a page: a **Section** whose header carries the title and toolbar, then one of the three table kinds, the footer (range, page size, Pagination) and the empty state box when there are no rows. It takes a `kind` (`static`, `dynamic` or `tree`) or the table itself, and holds the type guidance as its chooser. There is one Table template and three table components; the base table and its parts (`TableRow`, `TableCell`, `HeadCell`, `TableFooter`, `TableMessageRow`, `TableSummaryRow`, `TableBulkActions`) are shared by all three.
 _Avoid_: "Table component" for the template, "table pattern"
 
 **Static table**:
-A fixed grid people read, with nothing to act on: a link in a cell is fine, and rows rest or are highlighted. Which table type to use is `design-system/src/patterns/Table/index.md` § Type guidance.
+A fixed grid people read, with nothing to act on: a link in a cell is fine, and rows rest or are highlighted. Which table type to use is `design-system/src/templates/Table/index.md` § Type guidance.
 _Avoid_: "basic table", bare "table" for this type
 
 **Dynamic table**:
@@ -318,7 +318,7 @@ A kit `MotionDemo` with paths drawn before the motion, a dashed landing ghost, a
 _Avoid_: "demo" for a real-component story, "recording" for a kit figure
 
 **Motion registry**:
-The per-template, pattern and component event-to-token table for enter, exit and change, with semantic transitions and optional sound cells; `design-system/agent-views/motion/library.md` is its generated view. Motion tokens follow primitives, semantics, patterns and components (ADR-041).
+The per-template, pattern and component event-to-token table for enter, exit and change, with semantic transitions and optional sound cells; `design-system/agent-views/motion/library.md` is its generated view. Motion tokens follow primitives, semantics, templates and components (ADR-041).
 
 **Productive**:
 The default motion mode: springs at damping ratio 1 everywhere, so nothing overshoots. Controls, fields and anything done dozens of times a day stay Productive.

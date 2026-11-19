@@ -41,7 +41,7 @@ const MULTI_EVENT_ROW = ROWS.find((r) => r.tier === 'component' && r.name === 'P
 const CHECKBOX_ROW = ROWS.find((r) => r.tier === 'component' && r.name === 'Checkbox') ?? MULTI_EVENT_ROW;
 const FALLBACK_ROW = ROWS.find((r) => r.tier === 'component' && r.name === 'Sidebar');
 const PATTERN_ROW = ROWS.find((r) => r.tier === 'pattern') ?? ROWS[0];
-const MILESTONE_ROW = ROWS.find((r) => r.tier === 'template' && r.name === 'PatternCard') ?? ROWS[0];
+const MILESTONE_ROW = ROWS.find((r) => r.tier === 'template' && r.name === 'Card') ?? ROWS[0];
 
 const expectSceneAtLanding = async (demoEl) => {
     const expected = JSON.parse(demoEl.dataset.landing);
@@ -161,7 +161,7 @@ export const EveryRegistryRowRendersACard = {
         await expect(sampleCard).toHaveAccessibleName('Popup');
 
         // Milestone event uses Expressive mode
-        const milestoneCard = canvasElement.querySelector('[data-motion-card="template:PatternCard"]');
+        const milestoneCard = canvasElement.querySelector('[data-motion-card="template:Card"]');
         await expect(milestoneCard).toBeTruthy();
         const milestoneTab = [...milestoneCard.querySelectorAll('[role="tab"]')].find(
             (t) => t.textContent.trim() === 'milestone',

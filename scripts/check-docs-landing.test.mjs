@@ -109,11 +109,11 @@ test('coverage follows fixture titles and taxonomy sources, including attached p
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'landing-pages-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   const files = {
-    'storybook.taxonomy.json': JSON.stringify({ rootSources: { Templates: ['design-system/src/templates/'], Patterns: ['design-system/src/patterns/'] } }),
+    'storybook.taxonomy.json': JSON.stringify({ rootSources: { Templates: ['design-system/src/templates/'], Patterns: ['design-system/src/storybook-docs/patterns/'] } }),
     'design-system/src/templates/New.mdx': 'import * as S from "./New.stories.js";\n<Meta of={S} name="Usage guide" />',
     'design-system/src/templates/New.stories.js': 'export default { title: "Templates/New page" };',
     'design-system/src/styles/New.mdx': '<Meta title="Foundations/New foundation" />',
-    'design-system/src/patterns/New.mdx': '<Meta title="Patterns/New pattern" />',
+    'design-system/src/storybook-docs/patterns/New.mdx': '<Meta title="Patterns/New pattern" />',
     'design-system/src/Other.mdx': '<Meta title="Components/Other" />',
   };
   for (const [file, text] of Object.entries(files)) {
@@ -121,7 +121,7 @@ test('coverage follows fixture titles and taxonomy sources, including attached p
     fs.writeFileSync(path.join(root, file), text);
   }
   assert.deepEqual(coveredPages(root), [
-    { file: 'design-system/src/patterns/New.mdx', id: 'patterns-new-pattern' },
+    { file: 'design-system/src/storybook-docs/patterns/New.mdx', id: 'patterns-new-pattern' },
     { file: 'design-system/src/styles/New.mdx', id: 'foundations-new-foundation' },
     { file: 'design-system/src/templates/New.mdx', id: 'templates-new-page' },
   ]);

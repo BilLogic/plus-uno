@@ -50,7 +50,7 @@ export const MOTION_REGISTRY = [
     },
   },
   {
-    name: 'PatternSection',
+    name: 'Section',
     tier: 'template',
     events: {
       'view-bar': { transition: 'Swap content in place', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Title row: nothing moves. The selected pill\'s fill and the format switch\'s indicator glide while the content swaps in place. Search and the Filter count grow to the left.' },
@@ -62,7 +62,7 @@ export const MOTION_REGISTRY = [
     },
   },
   {
-    name: 'PatternCard',
+    name: 'Card',
     tier: 'template',
     events: {
       change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'It changes color on hover and press like a Button. Opening a clickable card is Drill.' },

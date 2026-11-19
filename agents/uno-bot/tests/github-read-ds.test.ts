@@ -66,8 +66,8 @@ test("a hosted miss on a name falls back to the built-in answer and says why", a
   assert.equal(out.source, "built-in");
   assert.equal(out.fallback, "timeout");
   assert.equal(out.answer.name, "Card");
-  assert.equal(out.answer.status, "not-here");
-  assert.equal(out.use[0].name, "PatternCard");
+  assert.equal(out.answer.status, "exists");
+  assert.equal(out.answer.import, "import { Card } from '@/templates';");
 });
 
 test("a hosted miss on a task in words falls back, and says the built-in facts match names only", async () => {
@@ -84,7 +84,7 @@ test("with no client the built-in facts answer, as before", async () => {
   const out = await parse(lookupDesignSystem("card"));
   assert.equal(out.source, "built-in");
   assert.equal(out.fallback, undefined);
-  assert.equal(out.answer.status, "not-here");
+  assert.equal(out.answer.status, "exists");
 });
 
 test("the query is classified from the built-in facts alone: a token role, a get or a find", () => {

@@ -2,7 +2,7 @@
 
 # Dialog
 
-The dialog panel itself: header (title, optional description, header actions, close button, or custom header / tabs), scrolling body, and optional footer slots. Sizes from the screen grid (`4-col · 6-col · 8-col · 10-col`) and renders inline with no Blanket and no modal behavior. For a blocking overlay dialog with Blanket, portal, focus trap, Escape and scroll lock, use the `Modal` template from `@/patterns`.
+The dialog panel itself: header (title, optional description, header actions, close button, or custom header / tabs), scrolling body, and optional footer slots. Sizes from the screen grid (`4-col · 6-col · 8-col · 10-col`) and renders inline with no Blanket and no modal behavior. For a blocking overlay dialog with Blanket, portal, focus trap, Escape and scroll lock, use the `Modal` template from `@/templates`.
 
 Also asked as: dialog panel, dialog layout.
 
@@ -20,7 +20,7 @@ Also asked as: dialog panel, dialog layout.
 
 ## Usage
 
-Use `Dialog` as the panel inside the Modal template, or when a docs illustration or mockup draws the dialog panel inline with no Blanket and no modal behavior. For a working overlay over the page (Blanket, portal, focus trap, Escape and scroll lock), use the `Modal` template from `@/patterns`.
+Use `Dialog` as the panel inside the Modal template, or when a docs illustration or mockup draws the dialog panel inline with no Blanket and no modal behavior. For a working overlay over the page (Blanket, portal, focus trap, Escape and scroll lock), use the `Modal` template from `@/templates`.
 
 The footer runs on `FooterActions`: pass `primaryButton` and `secondaryButton`
 as objects for a `50/50` pair (or `primaryButton` alone for the right half), or
@@ -47,7 +47,7 @@ height hugs its content up to the cap (`--blanket-max-height-modal`);
 
 ## Alternatives
 
-- For a blocking overlay over the page with Blanket, focus trap, Escape and scroll lock, use `Modal` (`@/patterns`).
+- For a blocking overlay over the page with Blanket, focus trap, Escape and scroll lock, use `Modal` (`@/templates`).
 - For a message the person only reads, use `SectionMessage` in the page or `Flag` at the screen corner.
 - For a task that keeps the page in view, use `Panel`, floating: a row's details, filters, a short edit.
 - For a small aside anchored to a control, use `Popup`.
@@ -91,7 +91,7 @@ Do: Pass `primaryButton` or `footer` when the dialog asks for a decision.
 
 Don't: Leave a confirm dialog with no footer action.
 
-### Use `Modal` from `@/patterns` when a task needs a Blanket and focus trap. {#use-modal-from-patterns-when-a-task-needs-a-blanket-and-focus-trap}
+### Use `Modal` from `@/templates` when a task needs a Blanket and focus trap. {#use-modal-from-templates-when-a-task-needs-a-blanket-and-focus-trap}
 
 `Dialog` draws the panel inline; `Modal` places it on a Blanket with Base UI
 focus management, Escape dismissal and scroll lock.

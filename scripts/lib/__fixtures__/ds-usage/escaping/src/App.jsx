@@ -2,7 +2,7 @@
 import { Buton } from '@/components';
 import StatusTag from '@/components/labels/StatusTag';
 import { Button, Select } from '@/components';
-import { PatternSection } from '@/patterns';
+import { Section } from '@/templates';
 
 export default function App() {
   return (
@@ -11,7 +11,7 @@ export default function App() {
       <i className="fa-light fa-house" />
       <span style={{ color: 'var(--palette-neutral-1000)' }} />
       <span style={{ color: 'var(--ds-txt)' }} />
-      <PatternSection title="Queue" toolbar={<PatternSection.Toolbar filters={<Select options={[]} />} />} />
+      <Section title="Queue" toolbar={<Section.Toolbar filters={<Select options={[]} />} />} />
       <button type="button">Raw</button>
     </div>
   );

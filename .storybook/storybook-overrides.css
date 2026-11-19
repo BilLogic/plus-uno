@@ -68,7 +68,7 @@ body,
  *   h5                --heading-sm     16 / 20 sans semibold
  *   h6                --heading-xs     14 / 20 sans semibold
  *
- * The space above a heading is the Page pattern's: `--page-stack-lg` before a
+ * The space above a heading is the Page template's: `--page-stack-lg` before a
  * section, `--page-stack-md` before a sub-heading, `--section-stack-sm` between
  * a heading and what it heads.
  *
@@ -1159,7 +1159,7 @@ html[data-color-mode="dark"] .docs-story {
   margin: 0;
 }
 
-/* A preview well's inner padding: one value at every width, from the Page pattern. */
+/* A preview well's inner padding: one value at every width, from the Page template. */
 .sbdocs .sb-ds-docs-preview-well__inner {
   min-height: calc(var(--control-lg) * 2.5);
   padding: var(--page-stack-lg);

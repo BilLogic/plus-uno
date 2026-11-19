@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { AiIcon, IconButton } from '@/components';
-import { AiChat, useAiChat } from '@/patterns';
+import { AiChat, useAiChat } from '@/templates';
 import DocsFab from './DocsFab';
 import { createAgentResponder } from './docsAgent';
 import { interceptDocsLinks, navigateInPlace } from './docsNavigate';

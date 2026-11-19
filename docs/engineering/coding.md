@@ -149,7 +149,7 @@ rename that reached `AGENTS.md` and stopped there.
 | Token generation must follow sync | Generated files overwrite manual edits | Always run sync first, then generate |
 | `design-system/src/index.js` is the barrel | New components not exported = import fails | Add to barrel export when creating new components |
 | Storybook uses autodocs | Missing JSDoc = empty docs page | Add JSDoc to component exports |
-| Raw HTML in marketplace pages | Breaks DS consistency | Use DS components: Button, TextField, StatusTag, PatternCard, Select |
+| Raw HTML in marketplace pages | Breaks DS consistency | Use DS components: Button, TextField, StatusTag, Card, Select |
 | Nested Router providers | `MemoryRouter` inside `BrowserRouter` renders an empty root in React 19, with a silent console | One Router provider per tree — a shell mounted under another app takes its route from props |
 | A shell mounted under `<Route path="/x/*">` | Descendant `<Routes>` sees only the remainder after the prefix, so every path collapses to `/` and the index route always wins | Declare the named shell paths (`/monthly-reports/*`, `/admin/*`) above `/:prototypeId/*` — v6 ranks static segments first — and pass the shell a `contentKey` prop so it knows what to render at `index` |
 | `Failed to import test file` naming a setup file, with a `SyntaxError` that is not a real syntax error | A dependency discovered mid-run forced a Vite re-optimize and the page reloaded through the setup import. Look for `Vite unexpectedly reloaded a test` in the same run | Add the dependency to `optimizeDeps.include` on the `storybook` test project in `vite.config.js` — that is the one field the browser server reads. `design-system/tests/storybook-vitest-project.test.js` holds the assertions |

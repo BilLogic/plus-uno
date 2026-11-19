@@ -26,7 +26,7 @@ beyond that.
 
 ## Tooltip
 
-The tooltip is a floating layer: the Popup pattern's surface
+The tooltip is a floating layer: the Popup template's surface
 (`--ds-surface-overlay`), overlay shadow (`--ds-shadow-overlay`), radius
 (`--popup-radius`) and padding (`--popup-pad`), plus the shared
 `--layer-popup` z-index. `useHTML` alone only moves the tooltip's TEXT into a

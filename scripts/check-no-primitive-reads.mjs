@@ -6,7 +6,7 @@
  * gap is named and a ladder row is added (`scripts/lib/tokens/plan.mjs`).
  *
  * WHAT IT READS. Every tracked `.scss .css .jsx .js` file under
- * `design-system/src/components` and `design-system/src/patterns`, by
+ * `design-system/src/components` and `design-system/src/templates`, by
  * `git ls-files`; tests and stories are skipped.
  *
  * WHAT IT COUNTS. `var(` uses of a primitive name, per file. A primitive is a
@@ -30,7 +30,7 @@ import { varReferencePattern } from '../design-system/src/lib/tokens.mjs';
 export { REPO_ROOT };
 
 export const BASELINE = 'scripts/baselines/no-primitive-reads.json';
-export const SEARCH_ROOTS = ['design-system/src/components', 'design-system/src/patterns'];
+export const SEARCH_ROOTS = ['design-system/src/components', 'design-system/src/templates'];
 export const SEARCHED = /\.(scss|css|jsx|js)$/;
 const SKIPPED = /\.(test|stories)\.[cm]?[jt]sx?$/;
 
@@ -125,7 +125,7 @@ function record() {
     seed: {
       why:
         'Reads of a numbered primitive (--space-<n>, --radius-<n>, --size-<n>, --stroke-<n>, --height-<n>, --width-<n>, --type-size-<n>) in design-system/src/components and ' +
-        'design-system/src/patterns, per file. The record only falls. Regenerate with `npm run check:no-primitive-reads -- --update`; never edit by hand.',
+        'design-system/src/templates, per file. The record only falls. Regenerate with `npm run check:no-primitive-reads -- --update`; never edit by hand.',
     },
   });
   console.log(`[check-no-primitive-reads] baseline recorded: ${Object.keys(found).length} file(s)`);

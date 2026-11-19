@@ -71,7 +71,7 @@ When several items arrive, they stagger 20 ms apart (or 500 ms ÷ items if short
 Stable parts arrive first, important last, top to bottom. Nothing arrives by rising; a settle of 4 px or less downward is fine, and so is a chart mark growing to its value.
 
 - **Routine** (dozens a day): the old page fades out, the new one fades in, in place, all at once.
-- **Hero** (a milestone): stable parts first, 20 ms apart, each settling 4 px or less downward. Expressive on the one PatternCard.
+- **Hero** (a milestone): stable parts first, 20 ms apart, each settling 4 px or less downward. Expressive on the one Card.
 
 ### Load order
 

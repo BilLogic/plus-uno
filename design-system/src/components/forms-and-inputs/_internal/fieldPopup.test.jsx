@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Cascader, DatePicker, Select, TreeSelect } from '@/components';
-import { Modal } from '@/patterns';
+import { Modal } from '@/templates';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { OverlayContainer } from '@/lib/overlay';
 
@@ -29,7 +29,7 @@ describe.each(fields)('%s field popup contract', (_name, field) => {
         const trigger = await screen.findByRole('combobox', { name: 'Field' });
         fireEvent.keyDown(trigger, { key: 'ArrowDown' });
         const surface = document.querySelector('.plus-listbox');
-        expect(surface.parentElement).toBe(trigger.closest('.plus-pattern-blanket'));
+        expect(surface.parentElement).toBe(trigger.closest('.plus-template-blanket'));
         expect(surface).toHaveAttribute('data-instant', 'keyboard');
         expect(surface).toHaveAttribute('data-side', 'bottom');
         fireEvent.pointerDown(surface);

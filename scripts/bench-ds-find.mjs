@@ -28,9 +28,11 @@ export const isName = (kind) => kind === 'name' || kind === 'real-name';
 
 // Rank of the first result that is a wanted component. A not-here row counts
 // when its redirect names a wanted component.
+
 export function rankOf(results, want) {
   const names = (r) => [r.name, ...(r.use ?? []).map((u) => u.name ?? u)];
-  return results.findIndex((r) => names(r).some((n) => want.includes(n))) + 1;
+  const wanted = new Set(want);
+  return results.findIndex((r) => names(r).some((n) => wanted.has(n))) + 1;
 }
 
 // Scores both sets. Returns { scores: {set: {kind: {n, hit1, hit3, mrr}}}, misses };

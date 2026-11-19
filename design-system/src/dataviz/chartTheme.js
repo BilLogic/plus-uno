@@ -15,7 +15,7 @@
  * The chart container is a Card, so `chart.spacing` reads `--card-pad`
  * (the density this component already rendered at: 16px, component tokens
  * defined in `chartTheme.css`). The tooltip is a floating layer, so it takes
- * the Popup pattern's surface, overlay shadow and radius — via `useHTML`,
+ * the Popup template's surface, overlay shadow and radius — via `useHTML`,
  * since Highcharts' native SVG tooltip can only draw its own filter-based
  * shadow, not a design-system shadow token; the CSS lives beside the other
  * chart-only tokens in `chartTheme.css`.
@@ -48,7 +48,7 @@ const tokenNumber = (varName, fallback) => {
     return Number.isNaN(parsed) ? fallback : parsed;
 };
 
-/** Chart container padding: the Card pattern's pad, the density this chart already rendered at. */
+/** Chart container padding: the Card template's pad, the density this chart already rendered at. */
 const CHART_SPACING = tokenNumber('--card-pad', 16);
 
 /** The tighter inset a chart opts into deliberately (e.g. a heatmap that wants more room for cells), still off the ladder rather than a literal. */
@@ -301,7 +301,7 @@ const chartTheme = {
         },
     },
     tooltip: {
-        // The Popup pattern's surface, styled in `chartTheme.css` via
+        // The Popup template's surface, styled in `chartTheme.css` via
         // `.highcharts-tooltip`. `useHTML` alone still draws the tooltip's
         // box as an SVG `<path>` (only the text runs through a foreignObject),
         // so a CSS `background`/`border-radius`/`box-shadow` on that class

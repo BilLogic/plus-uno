@@ -16,11 +16,12 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 
 import { REPO_ROOT } from './lib/corpus.mjs';
 
-test('the ds command answers find with PatternCard and its import', () => {
+test('the ds command answers find with Card and its import', () => {
   const out = execFileSync(process.execPath, [path.join(REPO_ROOT, 'scripts/ds.mjs'), 'find', 'card'], { encoding: 'utf8' });
-  assert.match(out, /import \{ PatternCard \} from '@\/patterns';/);
+  assert.match(out, /^template\s+Card\s+→ ds_guide\("card"\)/m);
   const json = JSON.parse(execFileSync(process.execPath, [path.join(REPO_ROOT, 'scripts/ds.mjs'), 'find', 'card', '--json'], { encoding: 'utf8' }));
   assert.equal(json.results[0].name, 'Card');
+  assert.equal(json.results[0].import, "import { Card } from '@/templates';");
 });
 
 test('the MCP server lists exactly the five tools, in order, and answers ds_find', async () => {
@@ -31,7 +32,7 @@ test('the MCP server lists exactly the five tools, in order, and answers ds_find
     assert.deepEqual(tools.map((t) => t.name), ['ds_find', 'ds_get', 'ds_tokens', 'ds_guide', 'ds_check']);
     assert.match(client.getInstructions(), /start.*ds_find.*ds_check/is);
     const result = await client.callTool({ name: 'ds_find', arguments: { query: 'card' } });
-    assert.match(result.content[0].text, /PatternCard/);
+    assert.match(result.content[0].text, /Card/);
   } finally {
     await client.close();
   }

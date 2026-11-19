@@ -50,7 +50,7 @@ The design system's documentation, published at [plus-uno.netlify.app/storybook]
 - **Get started**: design, develop, working with AI, content design.
 - **Foundations**: tokens, color, typography, spacing, layout and grid, elevation, motion, iconography, accessibility.
 - **Components**: grouped by job, from Forms and inputs to Overlays and layering.
-- **Patterns**: the page structure (Frame, Sidebar, Page, Panel, Section), overlays and templates.
+- **Templates**: the page structure (Frame, Sidebar, Page, Panel, Section) and overlays. **Patterns**: guidance for a situation, such as Filtering or Forms.
 - **AI**: the AI chat and the components it is built from.
 - **Data visualizations**: Highcharts-based charts by question type: comparison, distribution, part-to-whole, temporal and more.
 

@@ -13,7 +13,7 @@
  *   CONSUMER_ROOTS             the folders consumer code lives in; SOURCE_ROOTS
  *                              and the named roots beside them are the checks'
  *                              documented extensions of it
- *   BARRELS                    the public barrels: components and patterns
+ *   BARRELS                    the public barrels: components and templates
  *
  * Every reader of these facts is an adapter at this seam: `check:ds-usage`,
  * the component index generator and the manifest generator today. Each answer
@@ -63,7 +63,7 @@ export const STORYBOOK_ROOT = '.storybook';
 const COMPONENTS_BARREL = '@/components';
 
 /** The public barrels consumer code imports the design system from. */
-export const BARRELS = [COMPONENTS_BARREL, '@/patterns'];
+export const BARRELS = [COMPONENTS_BARREL, '@/templates'];
 
 /** The design-system folder under `root`: `design-system/` in a repo, `root` itself in a package. */
 function dsDir(root) {
@@ -239,7 +239,7 @@ export function loadFacts(root) {
       const kind = record.kind ?? 'component';
       const aliasOf = kind === 'component' ? barrel.aliases[name] ?? null : null;
       const props = record.props ?? (aliasOf ? records.get(aliasOf)?.props ?? null : null);
-      const row = kind === 'pattern' ? patternRows.get(name) : undefined;
+      const row = kind === 'template' ? patternRows.get(name) : undefined;
       return answer(name, 'exists', {
         kind,
         import: record.import,

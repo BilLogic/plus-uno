@@ -7,7 +7,7 @@ import {
     PanelContainer,
     PanelFooter,
     PanelHeader,
-} from '@/patterns';
+} from '@/templates';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 

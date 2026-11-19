@@ -8,7 +8,7 @@ Also asked as: hover hint, hover text.
 
 **Import:** `import { Tooltip } from '@/components';`
 
-**Used in:** Section (`ds guide section`); Popup (`ds guide popup`)
+**Used in:** Popup (`ds guide popup`); Section (`ds guide section`)
 
 **Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Errors (`ds guide errors`); Filtering (`ds guide filtering`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
 

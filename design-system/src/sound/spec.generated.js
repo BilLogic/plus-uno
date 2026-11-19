@@ -485,7 +485,7 @@ export const SOUND_SPEC = {
 // Sound moments from scripts/lib/tokens/motion-registry.mjs.
 export const SOUND_MOMENTS = [
   {
-    "row": "PatternCard",
+    "row": "Card",
     "tier": "template",
     "event": "milestone",
     "transition": "Load content",

@@ -68,7 +68,7 @@ test('an event naming a transition outside the 14 locked transitions fails with 
   const root = scratch(['Button']);
   const bad = [
     { name: 'Popup', tier: 'component', events: { enter: { transition: 'Open', spatial: 'spatial.fast' } } },
-    { name: 'PatternCard', tier: 'template', events: { milestone: { transition: 'Opening a page', spatial: 'spatial.default' } } },
+    { name: 'Card', tier: 'template', events: { milestone: { transition: 'Opening a page', spatial: 'spatial.default' } } },
     { name: 'Filtering', tier: 'pattern', events: { change: { appearance: 'appearance.fast' } } },
   ];
   const f = run({ repoRoot: root, index: INDEX, registry: bad, patterns: ['Filtering'] });
@@ -77,7 +77,7 @@ test('an event naming a transition outside the 14 locked transitions fails with 
   assert.match(f[0].message, /component/);
   assert.match(f[0].message, /enter/);
   assert.match(f[0].message, /Open/);
-  assert.match(f[1].message, /PatternCard/);
+  assert.match(f[1].message, /Card/);
   assert.match(f[1].message, /template/);
   assert.match(f[1].message, /milestone/);
   assert.match(f[1].message, /Opening a page/);

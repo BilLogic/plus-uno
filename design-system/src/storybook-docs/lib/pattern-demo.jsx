@@ -1,12 +1,12 @@
 import React from 'react';
 import { Breadcrumb, Sidebar } from '@/components';
-import { Frame } from '@/patterns';
+import { Frame } from '@/templates';
 
 /**
- * Story chrome shared by the pattern stories: a demo caption, a dashed
+ * Story chrome shared by the template stories: a demo caption, a dashed
  * content slot, and the app frame with the PLUS Sidebar and a breadcrumb in it.
  * Every color is a `--ds-*` token, so the chrome follows the color modes
- * with the patterns it frames.
+ * with the templates it frames.
  */
 
 /** A demo's caption: a group name above an example, in the subtle text color. */

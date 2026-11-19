@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button, DynamicTable, EmptyState, Pagination, StaticTable } from '@/components';
-import { PatternSection } from '@/patterns';
+import { Section } from '@/templates';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { ResetExampleButton } from '@/storybook-docs/lib/reset-example.jsx';
 import { HeaderSearch, SectionActions, categoryFilters } from '@/storybook-docs/lib/section-header.jsx';
@@ -9,7 +9,7 @@ import { CATEGORIES, narrow } from '../Filtering/filteringDemo.jsx';
 
 /**
  * The live do and don't examples on the Empty pattern page, composed from
- * `PatternSection`, `EmptyState`, `DynamicTable`, `StaticTable`, `Pagination`,
+ * `Section`, `EmptyState`, `DynamicTable`, `StaticTable`, `Pagination`,
  * `ViewPills`, the Section header props and `Button`.
  */
 
@@ -18,7 +18,7 @@ export const WhatBelongsHereCase = () => {
     const [added, setAdded] = useState(false);
     return (
         <CaseSurface>
-            <PatternSection
+            <Section
                 title="Students"
                 description="Lincoln Middle"
                 actions={added ? <ResetExampleButton onReset={() => setAdded(false)} /> : undefined}
@@ -34,7 +34,7 @@ export const WhatBelongsHereCase = () => {
                         primaryAction={<Button text="Add students" appearance="primary" spacing="compact" onClick={() => setAdded(true)} />}
                     />
                 )}
-            </PatternSection>
+            </Section>
         </CaseSurface>
     );
 };
@@ -42,11 +42,11 @@ export const WhatBelongsHereCase = () => {
 /** Don't: a bare string in an empty box reads as broken or still loading. */
 export const BareStringCase = () => (
     <CaseSurface>
-        <PatternSection title="Students" description="Lincoln Middle">
+        <Section title="Students" description="Lincoln Middle">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minBlockSize: 'calc(var(--control-xl) * 3)' }}>
                 <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>No results</p>
             </div>
-        </PatternSection>
+        </Section>
     </CaseSurface>
 );
 
@@ -71,7 +71,7 @@ export const ReplacedTableCase = () => {
 
     return (
         <CaseSurface>
-            <PatternSection
+            <Section
                 title="Students"
                 description="Lincoln Middle"
                 actions={<SectionActions />}
@@ -105,7 +105,7 @@ export const ReplacedTableCase = () => {
                     )}
                     isFixedSize
                 />
-            </PatternSection>
+            </Section>
         </CaseSurface>
     );
 };
@@ -113,7 +113,7 @@ export const ReplacedTableCase = () => {
 /** Don't: column headers and a footer left sitting over a short centered line. */
 export const HeaderOverNothingCase = () => (
     <CaseSurface>
-        <PatternSection
+        <Section
             title="Students"
             description="Lincoln Middle"
             views={<ViewPills views={['All students', 'Needs follow-up']} />}
@@ -124,6 +124,6 @@ export const HeaderOverNothingCase = () => (
                 emptyState="No results"
                 footer={<Pagination currentPage={1} totalPages={1} onPageChange={() => {}} />}
             />
-        </PatternSection>
+        </Section>
     </CaseSurface>
 );

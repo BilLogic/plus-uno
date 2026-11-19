@@ -9,7 +9,7 @@ import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-examp
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
-import { TierActive, TierDanger, TierTypeName } from '../../../patterns/Modal/modalDemo.jsx';
+import { TierActive, TierDanger, TierTypeName } from '../../../templates/Modal/modalDemo.jsx';
 import {
     APPEARANCES,
     Appearances,
@@ -162,7 +162,7 @@ export const PlacementCard = {
         await expectFullScale(canvasElement);
         const open = canvas.getByRole('button', { name: 'Open session' });
         await expect(open.className, 'the main action is Subtle').toContain('subtle');
-        await expect(open.closest('.plus-pattern-card-footer'), 'in the card\'s footer').not.toBeNull();
+        await expect(open.closest('.plus-template-card-footer'), 'in the card\'s footer').not.toBeNull();
         await expect(open).toBeEnabled();
         await userEvent.click(open);
         await fitsCanvas(canvasElement);

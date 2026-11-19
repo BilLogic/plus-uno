@@ -128,7 +128,7 @@ function usageTab(page, relatedFacts, motion) {
   return d;
 }
 
-const FILTERING_GOVERNED = new Set(['SearchField', 'FilterButton', 'FilterMenu', 'PopupSelect', 'Select', 'PatternSection']);
+const FILTERING_GOVERNED = new Set(['SearchField', 'FilterButton', 'FilterMenu', 'PopupSelect', 'Select', 'Section']);
 const FILTERING_LINE =
   'Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.';
 
@@ -158,7 +158,8 @@ export function renderComponent(facts, docs, edges) {
   d += `**Source:** ${code(facts.source)}\n\n`;
   if (facts.stories) d += `**Stories:** ${code(sibling(facts.source, '.stories.jsx'))} — ${facts.stories.join(', ') || 'none exported'}\n\n`;
   if (docs?.path) d += `**Storybook page:** ${code(docs.path)}\n\n`;
-  const motion = motionRowOf(facts.name);
+  const found = motionRowOf(facts.name);
+  const motion = found && { ...found, name: facts.name };
   if (motion) d += motionLineOf(motion);
 
   d += usageTab(page, facts.related, motion);

@@ -4,7 +4,7 @@
  *
  * Agents read the component index as the existence list, so a pattern missing
  * from it reads as missing from the system: the ds-usage eval's agents wrote
- * "no design-system Card exists" while `PatternCard` shipped, and hand-made
+ * "no design-system Card exists" while the `Card` template shipped, and hand-made
  * their page shells. The list keeps only what source cannot say: the group a
  * pattern is filed under and when to reach for it. Its import line and its
  * Storybook page come from the facts (`scripts/lib/ds-facts.mjs`), which read
@@ -41,15 +41,15 @@ export function checkPatterns(rows, { lookup, exists, required }) {
     const extra = Object.keys(r).filter((k) => !ROW_FIELDS.has(k));
     if (extra.length) problems.push(`${r.name}: ${extra.map((k) => `\`${k}\``).join(', ')} come from source; a row keeps only group, name and use`);
     const answer = lookup(r.name);
-    if (answer.status !== 'exists' || !['pattern', 'component'].includes(answer.kind)) {
-      problems.push(`${r.name} is not a pattern or component the design system exports`);
+    if (answer.status !== 'exists' || !['template', 'component'].includes(answer.kind)) {
+      problems.push(`${r.name} is not a template or component the design system exports`);
       continue;
     }
     const doc = docOf(answer, r.name);
     if (!doc || !exists(doc)) problems.push(`${r.name}: ${doc ?? 'its source'} is not a file`);
   }
   const listed = new Set(rows.map((r) => r.name));
-  for (const name of required) if (!listed.has(name)) problems.push(`${name} is a pattern and missing from the list`);
+  for (const name of required) if (!listed.has(name)) problems.push(`${name} is a template and missing from the list`);
   return problems;
 }
 
@@ -76,8 +76,8 @@ export function readPatterns(repoRoot) {
 /** The component index that renders the Templates table. */
 export const OVERVIEW_FILE = 'design-system/agent-views/components/index.md';
 
-/** Every pattern the facts hold: the `@/patterns` barrel's. */
-const patternNames = (facts) => facts.manifests.components.components.filter((c) => c.kind === 'pattern').map((c) => c.name);
+/** Every template the facts hold: the `@/templates` barrel's. */
+const patternNames = (facts) => facts.manifests.components.components.filter((c) => c.kind === 'template').map((c) => c.name);
 
 /** The committed list, read against the real facts and the rendered index. */
 export function checkCommitted(repoRoot) {

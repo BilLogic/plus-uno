@@ -3,7 +3,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { Button, DropdownMenu } from '@/components';
-import { Modal } from '@/patterns';
+import { Modal } from '@/templates';
 import { OverlayContainer } from '@/lib/overlay';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 
@@ -21,8 +21,8 @@ describe('DropdownMenu in a Modal', () => {
         const trigger = await screen.findByRole('button', { name: 'Actions' });
         await user.click(trigger);
         const menu = await screen.findByTestId('actions-menu');
-        expect(menu.closest('.plus-pattern-blanket')).toBe(trigger.closest('.plus-pattern-blanket'));
-        expect(menu.closest('.plus-pattern-blanket')).not.toBeNull();
+        expect(menu.closest('.plus-template-blanket')).toBe(trigger.closest('.plus-template-blanket'));
+        expect(menu.closest('.plus-template-blanket')).not.toBeNull();
     });
 });
 

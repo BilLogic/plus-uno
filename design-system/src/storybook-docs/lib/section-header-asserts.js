@@ -9,7 +9,7 @@ import { expect } from 'storybook/test';
  * @param {number} [rows]  rows 2 and 3 expected under the title row
  */
 export const expectSectionHeader = async (canvasElement, rows) => {
-    const header = canvasElement.querySelector('.plus-pattern-section-header');
+    const header = canvasElement.querySelector('.plus-template-section-header');
     await expect(header, 'the Section draws its header').not.toBeNull();
     if (rows !== undefined) {
         await expect(header.querySelectorAll('.plus-section-rows > .plus-section-row'), `${rows} header rows under the title`).toHaveLength(rows);

@@ -125,16 +125,16 @@
   "$rootSourcesComment": "Source folders (or file prefixes) of each shared root. A page titled under one of these roots sits in one of its sources, and a page in a source is titled under that root (check:storybook-categories).",
   "rootSources": {
     "Templates": [
-      "design-system/src/patterns/Form/",
-      "design-system/src/patterns/Frame/",
-      "design-system/src/patterns/Page/",
-      "design-system/src/patterns/PatternSection/",
-      "design-system/src/patterns/PatternCard/",
-      "design-system/src/patterns/Table/",
-      "design-system/src/patterns/Modal/",
-      "design-system/src/patterns/Panel/",
-      "design-system/src/patterns/Popup/",
-      "design-system/src/patterns/HeadingOutline",
+      "design-system/src/templates/Form/",
+      "design-system/src/templates/Frame/",
+      "design-system/src/templates/Page/",
+      "design-system/src/templates/Section/",
+      "design-system/src/templates/Card/",
+      "design-system/src/templates/Table/",
+      "design-system/src/templates/Modal/",
+      "design-system/src/templates/Panel/",
+      "design-system/src/templates/Popup/",
+      "design-system/src/templates/HeadingOutline",
       "design-system/src/storybook-docs/templates/"
     ],
     "Patterns": [

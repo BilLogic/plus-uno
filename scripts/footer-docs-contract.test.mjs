@@ -22,7 +22,7 @@ const PAGES = {
   FooterActions: 'design-system/src/components/forms-and-inputs/FooterActions/FooterActions.mdx',
   Button: 'design-system/src/components/forms-and-inputs/Button/Button.mdx',
   Dialog: 'design-system/src/components/messaging/Dialog/Dialog.mdx',
-  Modal: 'design-system/src/patterns/Modal/Modal.mdx',
+  Modal: 'design-system/src/templates/Modal/Modal.mdx',
 };
 
 const read = (rel) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');

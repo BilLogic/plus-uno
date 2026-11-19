@@ -1,0 +1,230 @@
+/* PLUS card: sunken, default, or raised surface, full-bleed image, padded content. */
+
+@use '../../styles/card-title' as *;
+@use '../../styles/state' as *;
+
+.plus-template-card {
+    // A surface tells what sits on it which surface it is: a sticky table
+    // cell inside the card paints this, so it matches the card, not the page.
+    --ds-utility-elevation-surface-current: var(--card-surface-sunken);
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    container: template-card / inline-size;
+    box-sizing: border-box;
+    min-width: 0;
+    background-color: var(--ds-utility-elevation-surface-current);
+    color: var(--card-text);
+    // Every card keeps a 1px border (transparent on sunken and raised) so
+    // forced colors draw its edge.
+    border: var(--card-border-width) solid transparent;
+    border-radius: var(--card-radius);
+    box-shadow: none;
+    overflow: hidden; // clip the image to the card radius
+    transition: box-shadow var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), border-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+}
+
+.plus-template-card--surface-sunken {
+    --ds-utility-elevation-surface-current: var(--card-surface-sunken);
+    border-color: transparent;
+    box-shadow: none;
+}
+
+.plus-template-card--surface-default {
+    --ds-utility-elevation-surface-current: var(--card-surface-default);
+    border-color: var(--card-border-default);
+    box-shadow: none;
+}
+
+.plus-template-card--surface-raised {
+    // The raised pair travels together: the surface and its shadow, never one
+    // without the other, or the card loses its edge in dark.
+    --ds-utility-elevation-surface-current: var(--card-surface-raised);
+    border-color: transparent;
+    box-shadow: var(--card-shadow-raised);
+}
+
+.plus-template-card--clickable {
+    cursor: pointer;
+}
+
+// A clickable sunken or default card lifts to Raised on hover in place;
+// pressed settles to the raised shadow.
+@include plus-state(
+    (
+        hovered: (
+            --ds-utility-elevation-surface-current: var(--card-surface-raised),
+            border-color: transparent,
+            box-shadow: var(--card-shadow-raised),
+        ),
+        pressed: (
+            --ds-utility-elevation-surface-current: var(--card-surface-raised-pressed),
+            border-color: transparent,
+            box-shadow: var(--card-shadow-raised),
+        ),
+    ),
+    $ring: false,
+    $hovered-selector: '.plus-template-card--clickable:not(.plus-template-card--dragging):hover, .plus-template-card--clickable:not(.plus-template-card--dragging)[data-hovered]',
+    $pressed-selector: '.plus-template-card--clickable:not(.plus-template-card--dragging):active, .plus-template-card--clickable:not(.plus-template-card--dragging)[data-pressed]'
+);
+
+// A clickable raised card lifts while hovered (raised hovered step under the
+// overlay shadow) and settles back onto the raised shadow while pressed.
+@include plus-state(
+    (
+        hovered: (
+            --ds-utility-elevation-surface-current: var(--card-surface-raised-hovered),
+            border-color: transparent,
+            box-shadow: var(--card-shadow-overlay),
+        ),
+        pressed: (
+            --ds-utility-elevation-surface-current: var(--card-surface-raised-pressed),
+            border-color: transparent,
+            box-shadow: var(--card-shadow-raised),
+        ),
+    ),
+    $ring: false,
+    $hovered-selector: '.plus-template-card--surface-raised.plus-template-card--clickable:not(.plus-template-card--dragging):hover, .plus-template-card--surface-raised.plus-template-card--clickable:not(.plus-template-card--dragging)[data-hovered]',
+    $pressed-selector: '.plus-template-card--surface-raised.plus-template-card--clickable:not(.plus-template-card--dragging):active, .plus-template-card--surface-raised.plus-template-card--clickable:not(.plus-template-card--dragging)[data-pressed]'
+);
+
+// A dragged card is over the UI: the overlay pair, held under hover and press.
+$-dragging: (
+    --ds-utility-elevation-surface-current: var(--card-surface-overlay),
+    border-color: transparent,
+    box-shadow: var(--card-shadow-overlay),
+);
+
+.plus-template-card--dragging {
+    --ds-utility-elevation-surface-current: var(--card-surface-overlay);
+    border-color: transparent;
+    box-shadow: var(--card-shadow-overlay);
+}
+
+@include plus-state(
+    (hovered: $-dragging, pressed: $-dragging),
+    $ring: false,
+    $hovered-selector: '.plus-template-card--dragging:hover, .plus-template-card--dragging[data-hovered]',
+    $pressed-selector: '.plus-template-card--dragging:active, .plus-template-card--dragging[data-pressed]'
+);
+
+@media (forced-colors: active) {
+    .plus-template-card {
+        border-color: CanvasText;
+    }
+}
+
+.plus-template-card-inner {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 100%;
+    gap: var(--card-stack-lg); /* body → footer */
+    min-width: 0;
+    padding: var(--card-pad);
+}
+
+.plus-template-card-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* Header → body stack */
+.plus-template-card-gap-sm .plus-template-card-content {
+    gap: var(--card-stack-sm);
+}
+
+.plus-template-card-gap-md .plus-template-card-content {
+    gap: var(--card-stack-md);
+}
+
+.plus-template-card-gap-lg .plus-template-card-content {
+    gap: var(--card-stack-lg);
+}
+
+.plus-template-card-image {
+    flex: 0 0 100%;
+    min-width: 0;
+}
+
+// Large card minimum width (480px --card-min-width-lg minus the 1px border on each side).
+// Container queries use the card's content width, independently of the page breakpoint.
+@container template-card (min-width: 478px) {
+    .plus-template-card--image-start,
+    .plus-template-card--image-end {
+        > .plus-template-card-image {
+            flex: 0 0 calc(100% / 3);
+            position: relative;
+            overflow: hidden;
+        }
+        > .plus-template-card-inner { flex: 1 1 0; }
+        > .plus-template-card-image > * {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            aspect-ratio: auto !important;
+        }
+        &.plus-template-card--image-half {
+            > .plus-template-card-image { flex-basis: 50%; }
+            .plus-template-card-title { font: var(--card-title-font-lg); }
+        }
+    }
+    .plus-template-card--image-end > .plus-template-card-image { order: 1; }
+}
+
+/* `_Card header`: the title block and the actions on one row */
+.plus-template-card-header {
+    min-width: 0;
+}
+
+.plus-template-card-header--default {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--card-inline-md);
+}
+
+.plus-template-card-heading {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    gap: var(--card-stack-sm);
+    min-width: 0;
+}
+
+// The card title type, shared with Card (`styles/_card-title.scss`).
+.plus-template-card-title {
+    @include card-title-type;
+    color: var(--card-text);
+}
+
+.plus-template-card-description {
+    margin: 0;
+    font: var(--card-description-font);
+    color: var(--card-text-subtle);
+}
+
+.plus-template-card-actions {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: var(--card-inline-md);
+}
+
+.plus-template-card-body {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* Footer: commit actions, left-aligned */
+.plus-template-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: var(--card-inline-md);
+}

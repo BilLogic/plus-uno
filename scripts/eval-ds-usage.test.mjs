@@ -404,7 +404,7 @@ test('score: the layout formula is the page rule, following the app entry to the
   try {
     fs.mkdirSync(path.join(dir, 'src'));
     fs.writeFileSync(path.join(dir, 'src', 'App.jsx'), "import History from './History';\nexport default function App() {\n  return <History />;\n}\n");
-    const page = (root) => `import { Frame } from '@/patterns';\nexport default function History() {\n  return (\n    ${root}\n  );\n}\n`;
+    const page = (root) => `import { Frame } from '@/templates';\nexport default function History() {\n  return (\n    ${root}\n  );\n}\n`;
     fs.writeFileSync(path.join(dir, 'src', 'History.jsx'), page('<div className="history-grid" />'));
     assert.equal(score({ folder: dir, label: 'eval-x' }).layoutFormula, false);
     fs.writeFileSync(path.join(dir, 'src', 'History.jsx'), page('<Frame />'));
@@ -466,8 +466,8 @@ test('lookup arm: the copy\'s plus-ds server through --mcp-config, all five tool
 
 test('readSet: a plus-ds tool call is a lookup, by tool name and input', () => {
   const call = (name, input) => JSON.stringify({ type: 'assistant', message: { content: [{ type: 'tool_use', name, input }] } });
-  const stdout = [call('mcp__plus-ds__ds_find', { query: 'card' }), call('mcp__plus-ds__ds_get', { names: ['PatternCard'] })].join('\n');
-  assert.deepEqual(readSet(stdout, '/c').lookups, ['ds_find {"query":"card"}', 'ds_get {"names":["PatternCard"]}']);
+  const stdout = [call('mcp__plus-ds__ds_find', { query: 'card' }), call('mcp__plus-ds__ds_get', { names: ['Card'] })].join('\n');
+  assert.deepEqual(readSet(stdout, '/c').lookups, ['ds_find {"query":"card"}', 'ds_get {"names":["Card"]}']);
 });
 
 test('compare: keep when escapes fall, or at zero escapes on a 20% input drop or 3 fewer turns, per model; delete otherwise', () => {
@@ -580,7 +580,7 @@ test('reach: deterministically scores opened and ds-guided template/pattern page
 
   const call = (name, input) => JSON.stringify({ type: 'assistant', message: { content: [{ type: 'tool_use', name, input }] } });
   const stdout = [
-    call('Read', { file_path: '/c/design-system/src/patterns/Frame/index.md' }),
+    call('Read', { file_path: '/c/design-system/src/templates/Frame/index.md' }),
     call('mcp__plus-ds__ds_guide', { topic: 'filtering' }),
     call('Write', { file_path: '/c/prototypes/eval-session-review-queue/src/App.jsx', content: 'export default () => null;' }),
     call('Read', { file_path: '/c/design-system/agent-views/patterns/CommonActions.md' }),
@@ -590,8 +590,8 @@ test('reach: deterministically scores opened and ds-guided template/pattern page
   const r = reach(rs, expected);
   assert.equal(r.hit, true);
   assert.equal(r.all_before_write, false, 'some pages were reached only after the first write');
-  assert.deepEqual(r.templates.reached, ['design-system/src/patterns/Frame/index.md']);
-  assert.deepEqual(r.templates.before_first_write, ['design-system/src/patterns/Frame/index.md']);
+  assert.deepEqual(r.templates.reached, ['design-system/src/templates/Frame/index.md']);
+  assert.deepEqual(r.templates.before_first_write, ['design-system/src/templates/Frame/index.md']);
   assert.deepEqual(r.patterns.reached, [
     'design-system/agent-views/patterns/Filtering.md',
     'design-system/agent-views/patterns/CommonActions.md',
@@ -652,7 +652,7 @@ test('rejudge: writes reach, screenshot and per-item fit as new rows marked reju
       fs.mkdirSync(path.join(d, 'src'), { recursive: true });
       fs.writeFileSync(
         path.join(d, 'src/App.jsx'),
-        "import { Frame } from '@/patterns';\nexport default function App() { return <Frame />; }\n",
+        "import { Frame } from '@/templates';\nexport default function App() { return <Frame />; }\n",
       );
     }
     const expected = expectedFor('session-review-queue');
@@ -732,16 +732,16 @@ test('structuralFit + fitJudge: structural items are scored by the checker while
     fs.writeFileSync(
       path.join(dir, 'src/App.jsx'),
       [
-        "import { Frame, Page, PageHeader, PatternSection, Table } from '@/patterns';",
+        "import { Frame, Page, PageHeader, Section, Table } from '@/templates';",
         "import { Banner, FilterButton, Panel, SearchField, usePanelControl } from '@/components';",
         'export default function App() {',
         '  const panel = usePanelControl();',
         '  return (',
         '    <Frame panel={<Panel>Details</Panel>}>',
         '      <Page header={<PageHeader title="Queue" />} banner={<Banner appearance="warning">Overdue</Banner>}>',
-        '        <PatternSection title="Sessions" toolbar={<PatternSection.Toolbar search={<SearchField label="Search" />} filters={<FilterButton label="Status" />} />}>',
+        '        <Section title="Sessions" toolbar={<Section.Toolbar search={<SearchField label="Search" />} filters={<FilterButton label="Status" />} />}>',
         '          <Table />',
-        '        </PatternSection>',
+        '        </Section>',
         '      </Page>',
         '    </Frame>',
         '  );',
@@ -790,7 +790,7 @@ test('structuralFit + fitJudge: structural items are scored by the checker while
 test('PRD-style briefs: active build briefs do not hand over template or component names', () => {
   const srqBrief = fs.readFileSync(path.join(REPO_ROOT, SCENARIOS, 'session-review-queue/BRIEF.md'), 'utf8');
   const trBrief = fs.readFileSync(path.join(REPO_ROOT, SCENARIOS, 'triage-repair/BRIEF.md'), 'utf8');
-  for (const name of ['PatternSection', 'Table', 'PageHeader', 'FilterButton', 'FilterMenu', 'SearchField', 'StatusTag', 'RadioGroup', 'FlagGroup', 'EmptyState']) {
+  for (const name of ['Section', 'Table', 'PageHeader', 'FilterButton', 'FilterMenu', 'SearchField', 'StatusTag', 'RadioGroup', 'FlagGroup', 'EmptyState']) {
     assert.doesNotMatch(srqBrief, new RegExp(`\\b${name}\\b`), `session-review-queue brief does not name ${name}`);
     assert.doesNotMatch(trBrief, new RegExp(`\\b${name}\\b`), `triage-repair brief does not name ${name}`);
   }

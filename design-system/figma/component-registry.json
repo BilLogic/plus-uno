@@ -2,7 +2,7 @@
   "version": "1.1.0",
   "generated": true,
   "generatedBy": "scripts/generate-component-registry-from-storybook.js",
-  "note": "DO NOT EDIT BY HAND. Components come from each component MDX `export const figmaMeta`; patterns come from design-system/figma/patterns.json. Run `npm run generate:component-registry` to regenerate.",
+  "note": "DO NOT EDIT BY HAND. Components come from each component MDX `export const figmaMeta`; templates come from design-system/figma/patterns.json. Run `npm run generate:component-registry` to regenerate.",
   "figmaFile": {
     "fileKey": "zAecJNRdvJzAUOcjV32tRX",
     "name": "Design System - BS4 Foundation Component Library",
@@ -2022,7 +2022,7 @@
     }
   },
   "patterns": {
-    "Pattern/Card": {
+    "Template/Card": {
       "componentSetNodeId": "17169:137",
       "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17169-137",
       "isComponentSet": true,
@@ -2038,7 +2038,7 @@
       "source": "designer-supplied",
       "status": "verified"
     },
-    "Pattern/Section": {
+    "Template/Section": {
       "componentSetNodeId": "17169:43292",
       "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17169-43292",
       "isComponentSet": true,
@@ -2054,7 +2054,7 @@
       "source": "designer-supplied",
       "status": "verified"
     },
-    "Pattern/Modal": {
+    "Template/Modal": {
       "componentSetNodeId": "17169:43279",
       "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17169-43279",
       "isComponentSet": true,
@@ -2071,7 +2071,7 @@
       "source": "designer-supplied",
       "status": "verified"
     },
-    "Pattern/Surface container": {
+    "Template/Surface container": {
       "componentSetNodeId": "17160:127",
       "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17160-127",
       "isComponentSet": false,
@@ -2084,7 +2084,7 @@
       "status": "verified",
       "notes": "Content is a real native SLOT (verified via the Plugin API: type === 'SLOT'). The '◇ Content — convert this frame to a slot' line still sitting inside it is stale instructional copy, not an unconverted frame — cosmetic cleanup only, it does not block write-back."
     },
-    "Pattern/Table": {
+    "Template/Table": {
       "componentSetNodeId": "17161:132",
       "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17161-132",
       "isComponentSet": false,

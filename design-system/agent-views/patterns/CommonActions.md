@@ -198,18 +198,18 @@ From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#CommonA
 
 ```jsx
 import { Button, TextField } from '@/components';
-import { PatternCard } from '@/patterns';
+import { Card } from '@/templates';
 
 function ActionsExample() {
     return (
-        <PatternCard title="Review notes" footer={
+        <Card title="Review notes" footer={
             <div style={{ display: 'flex', gap: 'var(--inline-sm)' }}>
                 <Button text="Cancel" />
                 <Button text="Save notes" appearance="primary" />
             </div>
         }>
             <TextField label="Notes" defaultValue="Start with unit rates." />
-        </PatternCard>
+        </Card>
     );
 }
 ```

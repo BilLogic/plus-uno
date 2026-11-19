@@ -16,11 +16,11 @@ import {
 vi.mock('@storybook/addon-docs/blocks', () => import('@/storybook-docs/lib/addon-docs-blocks-mock.jsx'));
 
 describe('Checklist (Patterns › Indicators)', () => {
-    it('renders card on Home from PatternSection and PatternCard with open steps above done steps and dismiss X', () => {
+    it('renders card on Home from Section and Card with open steps above done steps and dismiss X', () => {
         const { container } = render(<ChecklistOnHome />);
 
-        expect(container.querySelector('.plus-pattern-section')).not.toBeNull();
-        const card = container.querySelector('.plus-pattern-card');
+        expect(container.querySelector('.plus-template-section')).not.toBeNull();
+        const card = container.querySelector('.plus-template-card');
         expect(card).not.toBeNull();
 
         expect(within(card).getByRole('heading', { name: 'Get ready for your first session' })).toBeInTheDocument();
@@ -112,7 +112,7 @@ describe('Checklist (Patterns › Indicators)', () => {
                 now={completedTime + ONE_DAY_MS}
             />
         );
-        expect(container.querySelector('.plus-pattern-card')).toBeNull();
+        expect(container.querySelector('.plus-template-card')).toBeNull();
         expect(screen.queryByText(/All 5 steps completed/)).toBeNull();
     });
 
@@ -120,7 +120,7 @@ describe('Checklist (Patterns › Indicators)', () => {
         const user = userEvent.setup();
         const { container } = render(<ChecklistInPage />);
 
-        const card = container.querySelector('.plus-pattern-card');
+        const card = container.querySelector('.plus-template-card');
         expect(card).not.toBeNull();
         expect(within(card).getByText('2 of 5 done')).toBeInTheDocument();
         expect(within(card).queryByRole('button', { name: /dismiss/i })).toBeNull();
@@ -149,7 +149,7 @@ describe('Checklist (Patterns › Indicators)', () => {
         render(<ChecklistInSidebar />);
 
         const nav = screen.getByRole('navigation', { name: 'Main' });
-        const sidebar = nav.closest('.plus-pattern-frame__sidebar') ?? nav.parentElement.parentElement;
+        const sidebar = nav.closest('.plus-template-frame__sidebar') ?? nav.parentElement.parentElement;
 
         expect(within(sidebar).getByText('2 of 5 done')).toBeInTheDocument();
         expect(within(sidebar).getByRole('progressbar')).toHaveAttribute('aria-valuenow', '40');

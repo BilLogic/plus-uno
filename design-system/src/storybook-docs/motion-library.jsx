@@ -13,7 +13,7 @@ import {
 } from '@/components';
 import { HeadingContextProvider } from '@/lib/headingLevel';
 import { SwapInPlace } from '@/lib/swapMotion';
-import { PatternCard } from '@/patterns';
+import { Card } from '@/templates';
 import {
     MOTION_FAMILIES,
     MOTION_TIERS,
@@ -298,7 +298,7 @@ export const MotionLibraryCard = ({
             : subject;
 
     return (
-        <PatternCard
+        <Card
             role="group"
             aria-labelledby={titleId}
             minWidth="var(--card-min-width-md)"
@@ -308,13 +308,13 @@ export const MotionLibraryCard = ({
             data-active-mode={mode}
             data-active-transition={activeEvent.transition}
             header={
-                <div className="plus-pattern-card-header--default">
-                    <div className="plus-pattern-card-heading">
-                        <span id={titleId} className="plus-pattern-card-title">
+                <div className="plus-template-card-header--default">
+                    <div className="plus-template-card-heading">
+                        <span id={titleId} className="plus-template-card-title">
                             {row.name}
                         </span>
                     </div>
-                    <div className="plus-pattern-card-actions">
+                    <div className="plus-template-card-actions">
                         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-sm)' }}>
                             <Tag color="gray">{row.tier}</Tag>
                             <IconButton
@@ -419,7 +419,7 @@ export const MotionLibraryCard = ({
                     )}
                 </div>
             </div>
-        </PatternCard>
+        </Card>
     );
 };
 

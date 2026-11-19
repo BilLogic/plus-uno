@@ -203,7 +203,7 @@ A Status tag never opens a menu. Where a status can be changed, the field around
 
 <RuleTag kind="review" />
 
-Build the checklist from `PatternCard` and `PatternSection`:
+Build the checklist from `Card` and `Section`:
 
 1. Compose each row from an `Icon`, step text with one fact, and an action column. Use `--checklist-action-width` (128), with `--checklist-action-min-width` (120) as its floor. Buttons fill the column and align down the list.
 2. Put the title at the header's start and the count ("2 of 5 done") with a `ProgressBar` at the end. Align the bar's start edge with the action column: 128 wide on a persistent card, or 96 when a 32 dismiss `IconButton` occupies the end.

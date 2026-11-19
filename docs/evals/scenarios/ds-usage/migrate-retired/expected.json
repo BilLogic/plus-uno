@@ -8,21 +8,21 @@
     {
       "id": "calloff-page",
       "screen": "Call-off confirmation view",
-      "template": "Page + PatternCard",
-      "variant": "Page · Default / PatternCard · Default",
-      "page": "design-system/src/patterns/PatternCard/index.md",
+      "template": "Page + Card",
+      "variant": "Page · Default / Card · Default",
+      "page": "design-system/src/templates/Card/index.md",
       "section": "Anatomy",
       "pages": [
-        "design-system/src/patterns/Page/index.md",
-        "design-system/src/patterns/PatternCard/index.md"
+        "design-system/src/templates/Page/index.md",
+        "design-system/src/templates/Card/index.md"
       ],
       "guides": ["page", "card", "templates"],
       "scoring": "checker",
       "check": {
         "kind": "template",
-        "components": ["Page", "PatternCard"]
+        "components": ["Page", "Card"]
       },
-      "expectation": "Call-off confirmation migrated onto current Page / PatternCard templates and --ds-* tokens."
+      "expectation": "Call-off confirmation migrated onto current Page / Card templates and --ds-* tokens."
     }
   ],
   "patterns": [

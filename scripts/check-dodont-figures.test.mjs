@@ -81,9 +81,9 @@ test('Foundations exemption: a named helper may carry a style, a styled wrapper 
   const helper = helperPage('<div style={{ borderRadius: 3 }}><Button /></div>');
   assert.equal(isFoundationFile(file), true);
   assert.equal(isFoundationFile('design-system/src/storybook-docs/elevation-material-figures.jsx'), true);
-  assert.equal(isFoundationFile('design-system/src/patterns/AiChat/AiChat.mdx'), false);
+  assert.equal(isFoundationFile('design-system/src/templates/AiChat/AiChat.mdx'), false);
   assert.deepEqual(checkSource(helper, { file }), []);
-  assert.ok(checkSource(helper, { file: 'design-system/src/patterns/AiChat/AiChat.mdx' }).length > 0);
+  assert.ok(checkSource(helper, { file: 'design-system/src/templates/AiChat/AiChat.mdx' }).length > 0);
   assert.ok(checkSource('<Do caption="Keep it short."><div style={{ a: 1 }}><Button /></div></Do>', { file }).some((p) => /inline style/.test(p.message)));
   assert.ok(checkSource(helperPage('<svg viewBox="0 0 1 1" />'), { file }).some((p) => /<svg>/.test(p.message)));
 });

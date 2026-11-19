@@ -8,20 +8,20 @@
     {
       "id": "checklist-card",
       "screen": "Onboarding checklist card",
-      "template": "PatternCard",
-      "variant": "PatternCard · Default",
-      "page": "design-system/src/patterns/PatternCard/index.md",
+      "template": "Card",
+      "variant": "Card · Default",
+      "page": "design-system/src/templates/Card/index.md",
       "section": "Anatomy",
       "pages": [
-        "design-system/src/patterns/PatternCard/index.md"
+        "design-system/src/templates/Card/index.md"
       ],
       "guides": ["card", "templates"],
       "scoring": "checker",
       "check": {
         "kind": "template",
-        "components": ["PatternCard"]
+        "components": ["Card"]
       },
-      "expectation": "Onboarding checklist built on PatternCard with Font Awesome Free icons and semantic color tokens instead of the forbidden duotone family and raw hex."
+      "expectation": "Onboarding checklist built on Card with Font Awesome Free icons and semantic color tokens instead of the forbidden duotone family and raw hex."
     }
   ],
   "patterns": [

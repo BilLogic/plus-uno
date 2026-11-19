@@ -90,7 +90,7 @@
  {
   "q": "checklist card with progress bar",
   "want": [
-   "PatternCard",
+   "Card",
    "ProgressBar",
    "Checkbox"
   ],
@@ -100,7 +100,7 @@
  {
   "q": "checklist card with status",
   "want": [
-   "PatternCard",
+   "Card",
    "StatusTag",
    "Checkbox"
   ],
@@ -110,8 +110,8 @@
  {
   "q": "kanban board with draggable cards and columns",
   "want": [
-   "PatternCard",
-   "PatternSection"
+   "Card",
+   "Section"
   ],
   "kind": "real-intent",
   "source": "ledger"
@@ -119,8 +119,8 @@
  {
   "q": "kanban board draggable cards columns",
   "want": [
-   "PatternCard",
-   "PatternSection"
+   "Card",
+   "Section"
   ],
   "kind": "real-intent",
   "source": "ledger"
@@ -128,8 +128,8 @@
  {
   "q": "kanban board column drag and drop cards",
   "want": [
-   "PatternCard",
-   "PatternSection"
+   "Card",
+   "Section"
   ],
   "kind": "real-intent",
   "source": "ledger"
@@ -254,7 +254,7 @@
  {
   "q": "section toolbar search filters record count",
   "want": [
-   "PatternSection",
+   "Section",
    "Table"
   ],
   "kind": "real-intent",

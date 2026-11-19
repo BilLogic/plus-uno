@@ -117,7 +117,7 @@
 }
 
 /*
- * The tooltip is a floating layer, so it takes the Popup pattern's surface,
+ * The tooltip is a floating layer, so it takes the Popup template's surface,
  * overlay shadow, radius and padding (`design-system/src/components/
  * overlays-and-layering/Popup/Popup.scss`) and the shared popup z-index.
  *

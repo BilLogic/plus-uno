@@ -169,17 +169,17 @@ From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#Search`
 ```jsx
 import { useState } from 'react';
 import { SearchField } from '@/components';
-import { PatternSection } from '@/patterns';
+import { Section } from '@/templates';
 
 function SearchExample() {
     const [query, setQuery] = useState('');
     return (
-        <PatternSection
+        <Section
             title="Students"
             search={<SearchField placeholder="Search students" mode="active" spacing="compact" value={query} onValueChange={setQuery} />}
         >
             <p role="status">{['Ana Ruiz', 'Ben Okafor'].filter((name) => name.toLowerCase().includes(query.toLowerCase())).join(', ')}</p>
-        </PatternSection>
+        </Section>
     );
 }
 ```

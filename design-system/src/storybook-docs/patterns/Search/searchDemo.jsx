@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 import { Button, DynamicTable, EmptyState, PageHeader, SearchField, SearchFieldAction, Skeleton } from '@/components';
-import { PatternSection } from '@/patterns';
+import { Section } from '@/templates';
 import { SectionActions } from '@/storybook-docs/lib/section-header.jsx';
 import { STUDENTS, ViewPills, row, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
 
@@ -101,7 +101,7 @@ export const SearchStudents = ({ initialQuery = '', initialOpen = false, isLoadi
     const reset = () => { setQuery(''); setKey((n) => n + 1); };
     return (
         <div style={{ padding: 'var(--page-pad)' }}>
-            <PatternSection
+            <Section
                 title="Students"
                 description="Lincoln Middle"
                 actions={<SectionActions />}
@@ -120,7 +120,7 @@ export const SearchStudents = ({ initialQuery = '', initialOpen = false, isLoadi
                 )}
             >
                 <Results shown={shown} total={inView.length} query={query} loading={isLoading} onReset={reset} />
-            </PatternSection>
+            </Section>
         </div>
     );
 };
@@ -265,9 +265,9 @@ export const FocusedPage = ({ text = 'a' }) => {
                 </div>
             )}
         >
-            <PatternSection title="Roster" description="Lincoln Middle">
+            <Section title="Roster" description="Lincoln Middle">
                 <div aria-busy="true"><Skeleton shape="text" lines={6} /></div>
-            </PatternSection>
+            </Section>
         </PageFrame>
     );
 };
@@ -289,9 +289,9 @@ export const BasicPage = ({ text = 'Ava' }) => {
                 </div>
             )}
         >
-            <PatternSection title="Results" description={`For \u201C${submitted}\u201D`}>
+            <Section title="Results" description={`For \u201C${submitted}\u201D`}>
                 <div aria-busy="true"><Skeleton shape="text" lines={8} /></div>
-            </PatternSection>
+            </Section>
         </PageFrame>
     );
 };

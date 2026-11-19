@@ -43,7 +43,7 @@ import '@/styles/main.scss';
 
 ```
 design-system/
-  src/           # DS source (components, patterns, tokens, styles, MDX)
+  src/           # DS source (components, templates, tokens, styles, MDX)
   guidelines/    # Authored DS protocol (foundations, figma)
   agent-views/   # Generated facts — component index, pattern/template/foundation copies, token list
   figma/         # Registries + alignment runbooks

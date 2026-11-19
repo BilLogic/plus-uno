@@ -27,7 +27,7 @@
  * are not read: the ticket was font size, and `line-height: 1` on an icon
  * glyph is correct code.
  *
- * WHERE. `design-system/src/components` and `design-system/src/patterns`:
+ * WHERE. `design-system/src/components` and `design-system/src/templates`:
  * stylesheets and component source. Stories, tests and docs are excluded —
  * a story's demo frame is not a component.
  *
@@ -44,7 +44,7 @@ import { documents } from './lib/corpus.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const ROOTS = ['design-system/src/components', 'design-system/src/patterns', 'design-system/src/styles'];
+const ROOTS = ['design-system/src/components', 'design-system/src/templates', 'design-system/src/styles'];
 const EXT = ['.scss', '.css', '.jsx', '.js', '.tsx'];
 const EXCLUDED = /\.(stories|test)\.[jt]sx?$/;
 

@@ -10,11 +10,11 @@
       "screen": "Workflow editor page",
       "template": "Frame + Page + Panel",
       "variant": "Frame · Default / Page · Default / Panel · Details",
-      "page": "design-system/src/patterns/Frame/index.md",
+      "page": "design-system/src/templates/Frame/index.md",
       "section": "Anatomy",
       "pages": [
-        "design-system/src/patterns/Frame/index.md",
-        "design-system/src/patterns/Page/index.md",
+        "design-system/src/templates/Frame/index.md",
+        "design-system/src/templates/Page/index.md",
         "design-system/agent-views/templates/Panel.md"
       ],
       "guides": ["frame", "page", "panel", "templates"],
@@ -30,10 +30,10 @@
       "screen": "Delete node confirmation dialog",
       "template": "Modal",
       "variant": "Modal · Destructive",
-      "page": "design-system/src/patterns/Modal/index.md",
+      "page": "design-system/src/templates/Modal/index.md",
       "section": "Types",
       "pages": [
-        "design-system/src/patterns/Modal/index.md"
+        "design-system/src/templates/Modal/index.md"
       ],
       "guides": ["modal"],
       "scoring": "judge",

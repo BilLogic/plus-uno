@@ -31,7 +31,7 @@ import { TURN, turnTransform } from '../lib/iso-turn.js';
  * These stay kit illustrations, not live examples with Show code: each is an
  * abstract exploded figure with no readable text, which a live Section cannot draw.
  *
- * Alignment, from `src/patterns/PatternSection/PatternSection.mdx`: a view bar's controls
+ * Alignment, from `src/templates/Section/Section.mdx`: a view bar's controls
  * share the content's left and right edges, so a Section's heading starts at
  * the rows' left edge and its last control ends at the content's right edge. A
  * Popup opens bottom-end: its end edge meets its trigger's end edge and it sits

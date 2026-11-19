@@ -72,7 +72,7 @@ export const TABS = [
  */
 export const TABBED_EXCEPTIONS = [];
 
-const PATTERNS_ROOT = 'design-system/src/patterns';
+const PATTERNS_ROOT = 'design-system/src/templates';
 
 /**
  * Where docs-only template, pattern and foundation pages live and where
@@ -166,23 +166,23 @@ export function componentIdentity(entry) {
 
 /**
  * The barrel a docs page's component is imported from: `@/components` for a
- * component page, `@/patterns` for a pattern page. Public code never imports
+ * component page, `@/templates` for a template page. Public code never imports
  * from a deep path.
  *
- * A pattern page names its barrel only when the pattern is its own export,
+ * A docs page names its barrel only when its template is its own export,
  * which is exactly when the generator wrote an agent file beside it. A
- * docs-only pattern page (Templates, Popups) documents no export of its own,
+ * docs-only page (Templates, Popups) documents no export of its own,
  * so it shows no import line rather than an import that does not resolve.
  *
  * @param {{importPath?: string}} [entry] The page's meta entry.
  * @param {boolean} [hasGeneratedDoc] Whether the page has a Harness tab.
- * @returns {'@/patterns' | '@/components' | null}
+ * @returns {'@/templates' | '@/components' | null}
  */
 export function importSourceFor(entry, hasGeneratedDoc = true) {
   const file = entry && typeof entry.importPath === 'string' ? repoPath(entry.importPath) : '';
   if (!file.startsWith(`${PATTERNS_ROOT}/`)) return '@/components';
   if (inOwnFolder(file, PATTERNS_ROOT) && DOCS_ONLY_TEMPLATES.has(file.split('/').at(-2))) return null;
-  return hasGeneratedDoc ? '@/patterns' : null;
+  return hasGeneratedDoc ? '@/templates' : null;
 }
 
 /**

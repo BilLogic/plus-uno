@@ -1,6 +1,6 @@
 import React from 'react';
 import { Breadcrumb, Button, StaticTable } from '@/components';
-import { Frame, PatternSection } from '@/patterns';
+import { Frame, Section } from '@/templates';
 
 const ROWS = [
     { name: 'Jordan Blake', role: 'Tutor', status: 'Active' },
@@ -14,13 +14,13 @@ const ROWS = [
  */
 const ListPage = ({ title = 'Members', rows = ROWS, sidebar, onAdd }) => (
     <Frame sidebar={sidebar} header={<Breadcrumb items={[{ text: 'Home', href: '/' }, { text: title }]} />}>
-        <PatternSection level="page" title={title} actions={<Button text="Add member" appearance="primary" spacing="compact" onClick={onAdd} />}>
+        <Section level="page" title={title} actions={<Button text="Add member" appearance="primary" spacing="compact" onClick={onAdd} />}>
             <StaticTable
                 headers={['Name', 'Role', 'Status']}
                 rows={rows.map((row) => [row.name, row.role, row.status])}
                 titleColumn={0}
             />
-        </PatternSection>
+        </Section>
     </Frame>
 );
 

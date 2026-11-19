@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Page, PatternSection } from '@/patterns';
+import { Page, Section } from '@/templates';
 import {
     CardsSection,
     DemoPageHeader,
@@ -9,7 +9,7 @@ import {
     RecordTabSection,
     SessionsTable,
     STUDENT_SESSION_CARDS,
-} from '../../../patterns/Page/pageDemo.jsx';
+} from '../../../templates/Page/pageDemo.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { RECORD_CRUMBS } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { SectionActions } from '@/storybook-docs/lib/section-header.jsx';
@@ -70,12 +70,12 @@ export const ViewsPicture = () => {
     const [view, setView] = useState('Upcoming');
     return (
         <div style={pad}>
-            <PatternSection
+            <Section
                 title="Sessions"
                 views={<ViewPills views={['Upcoming', 'Past']} activeView={view} onViewChange={setView} />}
             >
                 <SessionsTable status={view === 'Past' ? 'past' : 'upcoming'} />
-            </PatternSection>
+            </Section>
         </div>
     );
 };
@@ -116,9 +116,9 @@ export const DrillPicture = () => (
 export const AreaPagePicture = () => (
     <BrowserWindow address="app.plus.org/students">
         <Page header={<DemoPageHeader title="Students" />}>
-            <PatternSection title="All students" actions={<SectionActions primary="Add student" more={false} />} views={<ViewPills views={['All students']} />}>
+            <Section title="All students" actions={<SectionActions primary="Add student" more={false} />} views={<ViewPills views={['All students']} />}>
                 <StudentsTable count={4} />
-            </PatternSection>
+            </Section>
         </Page>
     </BrowserWindow>
 );

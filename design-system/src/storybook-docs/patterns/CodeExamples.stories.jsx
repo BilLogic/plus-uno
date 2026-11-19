@@ -3,7 +3,7 @@ import {
     Banner, Breadcrumb, Button, EmptyState,
     SearchField, Skeleton, StaticTable, StatusTag, TextField,
 } from '@/components';
-import { PatternCard, PatternSection, Table } from '@/patterns';
+import { Card, Section, Table } from '@/templates';
 
 export default {
     title: 'Patterns/Overview/Code examples',
@@ -18,7 +18,7 @@ export const Filtering = {
     render: function QuickFilterExample() {
         const [status, setStatus] = useState('All');
         return (
-            <PatternSection
+            <Section
                 title="Sessions"
                 filters={[{
                     key: 'status',
@@ -29,7 +29,7 @@ export const Filtering = {
                 }]}
             >
                 <p role="status">Showing: {status}</p>
-            </PatternSection>
+            </Section>
         );
     },
 };
@@ -39,12 +39,12 @@ export const Search = {
     render: function SearchExample() {
         const [query, setQuery] = useState('');
         return (
-            <PatternSection
+            <Section
                 title="Students"
                 search={<SearchField placeholder="Search students" mode="active" spacing="compact" value={query} onValueChange={setQuery} />}
             >
                 <p role="status">{['Ana Ruiz', 'Ben Okafor'].filter((name) => name.toLowerCase().includes(query.toLowerCase())).join(', ')}</p>
-            </PatternSection>
+            </Section>
         );
     },
 };
@@ -53,14 +53,14 @@ export const CommonActions = {
     tags: ['pattern:CommonActions'],
     render: function ActionsExample() {
         return (
-            <PatternCard title="Review notes" footer={
+            <Card title="Review notes" footer={
                 <div style={{ display: 'flex', gap: 'var(--inline-sm)' }}>
                     <Button text="Cancel" />
                     <Button text="Save notes" appearance="primary" />
                 </div>
             }>
                 <TextField label="Notes" defaultValue="Start with unit rates." />
-            </PatternCard>
+            </Card>
         );
     },
 };
@@ -151,9 +151,9 @@ export const Overflow = {
     tags: ['pattern:Overflow'],
     render: function OverflowExample() {
         return (
-            <PatternSection title="Fractions, decimals and percentages: weekly review for the seventh grade group">
+            <Section title="Fractions, decimals and percentages: weekly review for the seventh grade group">
                 <p>The section title wraps so the full topic stays readable.</p>
-            </PatternSection>
+            </Section>
         );
     },
 };

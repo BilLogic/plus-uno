@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { Breadcrumb, Button } from '@/components';
-import { Frame } from '@/patterns';
+import { Frame } from '@/templates';
 import Sidebar, {
     createOpenTabsStore,
     OpenTabsProvider,
@@ -184,7 +184,7 @@ export default {
 /* ------------------------------------------------------------- helpers */
 
 const rect = (el) => el.getBoundingClientRect();
-const sidebarOf = (canvasElement) => canvasElement.querySelector('.plus-pattern-sidebar');
+const sidebarOf = (canvasElement) => canvasElement.querySelector('.plus-template-sidebar');
 /** x of an element's center, from the Sidebar's left edge. */
 const centerX = (canvasElement, el) => {
     const r = rect(el);
@@ -201,10 +201,10 @@ const visible = (el) => Boolean(el) && getComputedStyle(el).display !== 'none' &
 /** Every row's parts sit on the grid: icon center 32, label 48, trailing center 208. */
 const expectGrid = async (canvasElement) => {
     const out = {};
-    for (const row of nav(canvasElement).querySelectorAll('.plus-pattern-sidebar__row')) {
-        const slot = row.querySelector('.plus-pattern-sidebar__slot');
-        const label = row.querySelector('.plus-pattern-sidebar__label');
-        const end = row.querySelector('.plus-pattern-sidebar__end');
+    for (const row of nav(canvasElement).querySelectorAll('.plus-template-sidebar__row')) {
+        const slot = row.querySelector('.plus-template-sidebar__slot');
+        const label = row.querySelector('.plus-template-sidebar__label');
+        const end = row.querySelector('.plus-template-sidebar__end');
         await expect(px(getComputedStyle(row).height), 'rows are 32').toBeCloseTo(tokenLength(canvasElement, '--control-md'), 0);
         await expect(centerX(canvasElement, slot), `${label.textContent}: icon center`).toBeCloseTo(32, 0);
         await expect(leftX(canvasElement, label), `${label.textContent}: label`).toBeCloseTo(48, 0);
@@ -213,7 +213,7 @@ const expectGrid = async (canvasElement) => {
         out.label = leftX(canvasElement, label);
         if (end && visible(end)) out.trailing = centerX(canvasElement, end);
     }
-    for (const title of nav(canvasElement).querySelectorAll('.plus-pattern-sidebar__title-text')) {
+    for (const title of nav(canvasElement).querySelectorAll('.plus-template-sidebar__title-text')) {
         await expect(leftX(canvasElement, title), `${title.textContent}: title`).toBeCloseTo(20, 0);
         out.title = leftX(canvasElement, title);
     }
@@ -225,7 +225,7 @@ const expectGrid = async (canvasElement) => {
 /** Supervisor, onboarding done, two Sessions tabs and one Students tab, Sessions selected. */
 export const Overview = {
     play: async ({ canvasElement }) => {
-        const titles = [...nav(canvasElement).querySelectorAll('.plus-pattern-sidebar__title-text')].map((t) => t.textContent);
+        const titles = [...nav(canvasElement).querySelectorAll('.plus-template-sidebar__title-text')].map((t) => t.textContent);
         await expect(titles, 'Training, then the Toolkit, then Admin last').toEqual(['Training', 'Toolkit', 'Admin']);
         await expect(selectedRows(canvasElement), 'exactly one selected row').toHaveLength(1);
         await expect(rowNamed(canvasElement, 'Sessions')).toHaveAttribute('aria-current', 'page');
@@ -242,13 +242,13 @@ export const Geometry = {
     args: { tabSet: 'many' },
     play: async ({ canvasElement }) => {
         const grid = await expectGrid(canvasElement);
-        const thread = nav(canvasElement).querySelector('.plus-pattern-sidebar__tab .plus-pattern-sidebar__slot');
+        const thread = nav(canvasElement).querySelector('.plus-template-sidebar__tab .plus-template-sidebar__slot');
         const line = getComputedStyle(thread, '::before');
         const threadX = leftX(canvasElement, thread) + px(line.left) + px(line.width) / 2;
         await expect(threadX, 'thread on the icon column').toBeCloseTo(32, 0);
-        const turn = getComputedStyle(nav(canvasElement).querySelector('.plus-pattern-sidebar__tab--last .plus-pattern-sidebar__slot'), '::after');
+        const turn = getComputedStyle(nav(canvasElement).querySelector('.plus-template-sidebar__tab--last .plus-template-sidebar__slot'), '::after');
         await expect(px(turn.borderBottomLeftRadius), 'the last tab turns at radius 8').toBeCloseTo(tokenLength(canvasElement, '--frame-sidebar-row-radius'), 0);
-        const mark = canvasElement.querySelector('.plus-pattern-sidebar__brand .plus-logo');
+        const mark = canvasElement.querySelector('.plus-template-sidebar__brand .plus-logo');
         await expect(leftX(canvasElement, mark), 'mark on the slot edge').toBeCloseTo(20, 0);
         await expect(px(getComputedStyle(mark).height), 'lockup height 24').toBeCloseTo(24, 0);
         const toggle = within(canvasElement).getByRole('button', { name: 'Close sidebar' });
@@ -290,14 +290,14 @@ export const KeyboardDisclosure = {
     play: async ({ canvasElement }) => {
         const title = within(nav(canvasElement)).getAllByRole('button', { name: 'Toolkit' })[0];
         await expect(title).toHaveAttribute('aria-expanded', 'true');
-        const rowsBefore = nav(canvasElement).querySelectorAll('.plus-pattern-sidebar__row').length;
+        const rowsBefore = nav(canvasElement).querySelectorAll('.plus-template-sidebar__row').length;
         title.focus();
         await userEvent.keyboard('{Enter}');
         await expect(title).toHaveAttribute('aria-expanded', 'false');
-        await expect(nav(canvasElement).querySelectorAll('.plus-pattern-sidebar__row').length).toBeLessThan(rowsBefore);
+        await expect(nav(canvasElement).querySelectorAll('.plus-template-sidebar__row').length).toBeLessThan(rowsBefore);
         await userEvent.keyboard(' ');
         await expect(title).toHaveAttribute('aria-expanded', 'true');
-        await expect(nav(canvasElement).querySelectorAll('.plus-pattern-sidebar__row').length).toBe(rowsBefore);
+        await expect(nav(canvasElement).querySelectorAll('.plus-template-sidebar__row').length).toBe(rowsBefore);
 
         const more = within(nav(canvasElement)).getByRole('button', { name: /^Show \d+ more$/ });
         await expect(more).toHaveAttribute('aria-expanded', 'false');
@@ -321,7 +321,7 @@ export const KeyboardDisclosure = {
 export const Tutor = {
     args: { view: 'tutor' },
     play: async ({ canvasElement }) => {
-        const titles = [...nav(canvasElement).querySelectorAll('.plus-pattern-sidebar__title-text')].map((t) => t.textContent);
+        const titles = [...nav(canvasElement).querySelectorAll('.plus-template-sidebar__title-text')].map((t) => t.textContent);
         await expect(titles).toEqual(['Training', 'Toolkit']);
         await expect(within(canvasElement).getByText('· Tutor')).toBeVisible();
     },
@@ -335,7 +335,7 @@ export const DefaultRole = {
         </Box>
     ),
     play: async ({ canvasElement }) => {
-        const titles = [...nav(canvasElement).querySelectorAll('.plus-pattern-sidebar__title-text')].map((t) => t.textContent);
+        const titles = [...nav(canvasElement).querySelectorAll('.plus-template-sidebar__title-text')].map((t) => t.textContent);
         await expect(titles).toEqual(['Training', 'Toolkit']);
         await expect(rowNamed(canvasElement, 'Home')).toHaveAttribute('aria-current', 'page');
         await expect(rowNamed(canvasElement, 'Sessions')).toBeVisible();
@@ -412,7 +412,7 @@ export const OnboardingDone = {
 export const SectionsOpen = {
     play: async ({ canvasElement }) => {
         const title = within(canvasElement).getByRole('button', { name: 'Training' });
-        const caret = title.querySelector('.plus-pattern-sidebar__caret');
+        const caret = title.querySelector('.plus-template-sidebar__caret');
         await expect(px(getComputedStyle(title).height), 'title rows are 32').toBeCloseTo(tokenLength(canvasElement, '--control-md'), 0);
         await expect(getComputedStyle(caret).visibility, 'hidden at rest').toBe('hidden');
         const atHover = withForcedPseudo(title, ':hover', () => ({
@@ -423,7 +423,7 @@ export const SectionsOpen = {
         await expect(atHover.caret, 'the angle on hover').toBe('visible');
         await expect(atHover.fill, 'the hover fill').toBe(tokenColor(canvasElement, '--ds-background-neutral-subtle-hovered'));
         await expect(atHover.color, 'the title in ink').toBe(tokenColor(canvasElement, '--ds-text'));
-        const caretX = rect(caret).left - rect(title.querySelector('.plus-pattern-sidebar__title-text')).right;
+        const caretX = rect(caret).left - rect(title.querySelector('.plus-template-sidebar__title-text')).right;
         await expect(caretX, 'the angle 4 after the title').toBeCloseTo(tokenLength(canvasElement, '--inline-sm'), 0);
     },
 };
@@ -448,7 +448,7 @@ export const SectionsCollapsed = {
         await userEvent.click(training);
         await expect(training).toHaveAttribute('aria-expanded', 'false');
         await expect(canvas.queryByRole('button', { name: /^Lessons/ })).toBeNull();
-        await expect(getComputedStyle(training.querySelector('.plus-pattern-sidebar__caret i')).transform, 'turned right').not.toBe('none');
+        await expect(getComputedStyle(training.querySelector('.plus-template-sidebar__caret i')).transform, 'turned right').not.toBe('none');
         await expect(JSON.parse(window.localStorage.getItem(storage))).toEqual({ training: true });
         await userEvent.click(canvas.getByTestId('remount'));
         await waitFor(() => expect(canvas.getByRole('button', { name: 'Training' })).toHaveAttribute('aria-expanded', 'false'));
@@ -476,7 +476,7 @@ export const TabsFew = {
         const list = within(nav(canvasElement)).getByRole('list', { name: 'Open Sessions' });
         const items = list.querySelectorAll(':scope > li');
         await expect(items).toHaveLength(2);
-        await expect([...items].map((li) => li.classList.contains('plus-pattern-sidebar__tab--last'))).toEqual([false, true]);
+        await expect([...items].map((li) => li.classList.contains('plus-template-sidebar__tab--last'))).toEqual([false, true]);
         await expect(within(list).getByRole('button', { name: /4:00 PM · Ms. Ortiz/ }).querySelector('[aria-label="Live"]'), 'the live dot, named').not.toBeNull();
     },
 };
@@ -487,10 +487,10 @@ export const TabsMany = {
     play: async ({ canvasElement }) => {
         const list = within(nav(canvasElement)).getByRole('list', { name: 'Open Sessions' });
         const more = within(list).getByRole('button', { name: 'Show 4 more' });
-        await expect(list.querySelectorAll('.plus-pattern-sidebar__tab:not(.plus-pattern-sidebar__tab--more)')).toHaveLength(3);
-        await expect(more.closest('li')).toHaveClass('plus-pattern-sidebar__tab--last');
+        await expect(list.querySelectorAll('.plus-template-sidebar__tab:not(.plus-template-sidebar__tab--more)')).toHaveLength(3);
+        await expect(more.closest('li')).toHaveClass('plus-template-sidebar__tab--last');
         await userEvent.click(more);
-        await expect(list.querySelectorAll('.plus-pattern-sidebar__tab:not(.plus-pattern-sidebar__tab--more)')).toHaveLength(7);
+        await expect(list.querySelectorAll('.plus-template-sidebar__tab:not(.plus-template-sidebar__tab--more)')).toHaveLength(7);
         await expect(within(list).getByRole('button', { name: 'Show less' })).toHaveAttribute('aria-expanded', 'true');
         // Students holds exactly three: no "Show more".
         const students = within(nav(canvasElement)).getByRole('list', { name: 'Open Students' });
@@ -510,7 +510,7 @@ export const TabsClipped = {
         const fits = tabNamed(canvasElement, /4:00 PM · Ms. Ortiz/);
         const clipped = tabNamed(canvasElement, /Wed 4:30 PM/);
         const fullText = 'Wed 4:30 PM · Mr. Alexander-Montgomery';
-        const label = clipped.querySelector('.plus-pattern-sidebar__label');
+        const label = clipped.querySelector('.plus-template-sidebar__label');
 
         await waitFor(() => expect(label.scrollWidth, 'the label is clipped').toBeGreaterThan(label.clientWidth));
         await expect(clipped, 'no title attribute').not.toHaveAttribute('title');
@@ -547,7 +547,7 @@ export const TabRest = {
     args: { activeId: 'home' },
     play: async ({ canvasElement }) => {
         const tab = tabNamed(canvasElement, /4:00 PM · Ms. Ortiz/).closest('li');
-        await expect(visible(tab.querySelector('.plus-pattern-sidebar__tab-close')), 'no Close at rest').toBe(false);
+        await expect(visible(tab.querySelector('.plus-template-sidebar__tab-close')), 'no Close at rest').toBe(false);
         await expect(visible(tab.querySelector('.plus-count--dot')), 'the live dot').toBe(true);
     },
 };
@@ -557,8 +557,8 @@ export const TabHover = {
     args: { activeId: 'home' },
     play: async ({ canvasElement }) => {
         const tab = tabNamed(canvasElement, /4:00 PM · Ms. Ortiz/).closest('li');
-        const close = tab.querySelector('.plus-pattern-sidebar__tab-close');
-        const state = withForcedPseudo(tab, ':hover', () => ({ close: visible(close), dot: visible(tab.querySelector('.plus-pattern-sidebar__end')), x: centerX(canvasElement, close) }));
+        const close = tab.querySelector('.plus-template-sidebar__tab-close');
+        const state = withForcedPseudo(tab, ':hover', () => ({ close: visible(close), dot: visible(tab.querySelector('.plus-template-sidebar__end')), x: centerX(canvasElement, close) }));
         await expect(state.close, 'Close on hover').toBe(true);
         await expect(state.dot, 'the dot gives way').toBe(false);
         await expect(state.x, 'Close on the trailing column').toBeCloseTo(208, 0);
@@ -574,7 +574,7 @@ export const TabFocus = {
         const style = getComputedStyle(row);
         await expect(px(style.outlineWidth), 'a 2px ring').toBeCloseTo(tokenLength(canvasElement, '--focus-ring-width'), 0);
         await expect(style.outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
-        await expect(visible(row.closest('li').querySelector('.plus-pattern-sidebar__tab-close')), 'Close on focus').toBe(true);
+        await expect(visible(row.closest('li').querySelector('.plus-template-sidebar__tab-close')), 'Close on focus').toBe(true);
     },
 };
 
@@ -586,7 +586,7 @@ export const TabSelected = {
         await expect(tab).toHaveAttribute('aria-current', 'page');
         await expect(selectedRows(canvasElement), 'exactly one selected row').toHaveLength(1);
         await expect(getComputedStyle(tab).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected'));
-        await expect(visible(tab.closest('li').querySelector('.plus-pattern-sidebar__tab-close')), 'Close while selected').toBe(true);
+        await expect(visible(tab.closest('li').querySelector('.plus-template-sidebar__tab-close')), 'Close while selected').toBe(true);
         const sessions = rowNamed(canvasElement, 'Sessions');
         await expect(getComputedStyle(sessions).color, 'the row in ink').toBe(tokenColor(canvasElement, '--ds-text-selected'));
         await expect(getComputedStyle(sessions).backgroundColor, 'without fill').toBe('rgba(0, 0, 0, 0)');
@@ -854,10 +854,10 @@ const InnerTask = ({ startInner = true, ...args }) => {
 };
 
 const innerNav = (canvasElement) => within(canvasElement).getByRole('navigation', { name: 'Main' });
-const swapBlock = (canvasElement) => canvasElement.querySelector('.plus-pattern-sidebar__swap');
+const swapBlock = (canvasElement) => canvasElement.querySelector('.plus-template-sidebar__swap');
 const backButton = (canvasElement) => within(innerNav(canvasElement)).getByRole('button', { name: 'Sessions' });
-const stageRows = (canvasElement) => within(innerNav(canvasElement)).getByRole('list', { name: 'Sessions steps' }).querySelectorAll('.plus-pattern-sidebar__row');
-const settled = (canvasElement) => waitFor(() => expect(canvasElement.querySelector('.plus-pattern-sidebar__swap[data-swapping]')).toBeNull(), { timeout: 3000 });
+const stageRows = (canvasElement) => within(innerNav(canvasElement)).getByRole('list', { name: 'Sessions steps' }).querySelectorAll('.plus-template-sidebar__row');
+const settled = (canvasElement) => waitFor(() => expect(canvasElement.querySelector('.plus-template-sidebar__swap[data-swapping]')).toBeNull(), { timeout: 3000 });
 
 /** Presses something and samples the swapping block on every frame until the swap settles. */
 const sampleSwap = async (canvasElement, press, ready) => {
@@ -897,9 +897,9 @@ export const InnerSidebar = {
         const rows = [...stageRows(canvasElement)];
         await expect(rows.map((row) => row.textContent)).toEqual(['Prep', 'Session', 'Reflect', 'Feedback']);
         for (const row of rows) {
-            await expect(row.querySelector('.plus-pattern-sidebar__slot'), 'rows are text only').toBeNull();
+            await expect(row.querySelector('.plus-template-sidebar__slot'), 'rows are text only').toBeNull();
             await expect(px(getComputedStyle(row).height)).toBeCloseTo(tokenLength(canvasElement, '--control-md'), 0);
-            await expect(leftX(canvasElement, row.querySelector('.plus-pattern-sidebar__label')), 'the label starts on x 20').toBeCloseTo(20, 0);
+            await expect(leftX(canvasElement, row.querySelector('.plus-template-sidebar__label')), 'the label starts on x 20').toBeCloseTo(20, 0);
             await expect(px(getComputedStyle(row).borderTopLeftRadius), 'rows round 8').toBeCloseTo(8, 0);
         }
         await expect(rows[0], 'the current stage is selected').toHaveAttribute('aria-current', 'page');
@@ -943,7 +943,7 @@ export const InnerSwapInAndBack = {
         await settled(canvasElement);
         const open = within(canvasElement).getByRole('list', { name: 'Open Sessions' });
         const items = open.querySelectorAll(':scope > li');
-        await expect([...items].map((li) => li.classList.contains('plus-pattern-sidebar__tab--last')), 'the thread comes back, ending at the last open row').toEqual([false, true]);
+        await expect([...items].map((li) => li.classList.contains('plus-template-sidebar__tab--last')), 'the thread comes back, ending at the last open row').toEqual([false, true]);
         await expect(selectedRows(canvasElement), 'one selected row: the session left open').toHaveLength(1);
         await expect(selectedRows(canvasElement)[0].textContent).toMatch(/4:00 PM · Ms. Ortiz/);
         await expect(canvasElement.querySelector('[data-page="session"]'), 'the page stays put').not.toBeNull();
@@ -956,7 +956,7 @@ export const InnerTaskOpenRow = {
     render: (args) => <InnerTask {...args} />,
     play: async ({ canvasElement }) => {
         const list = within(innerNav(canvasElement)).getByRole('list', { name: 'Steps' });
-        await expect([...list.querySelectorAll('.plus-pattern-sidebar__row')].map((row) => row.textContent)).toEqual(['Your profile', 'Availability', 'Agreements']);
+        await expect([...list.querySelectorAll('.plus-template-sidebar__row')].map((row) => row.textContent)).toEqual(['Your profile', 'Availability', 'Agreements']);
         await userEvent.click(within(innerNav(canvasElement)).getByRole('button', { name: 'Home' }));
         await waitFor(() => expect(within(canvasElement).getByRole('list', { name: 'Open Home' })).toBeVisible());
         await settled(canvasElement);

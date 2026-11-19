@@ -32,7 +32,7 @@ Buttons fill in only two places: filled tracks inside `FooterActions`, and a sin
 | Surface | Buttons | Story |
 | --- | --- | --- |
 | Page header | `default` 32; at most one `primary`, rightmost | Layout/PageHeader |
-| Card or section header | `subtle` `compact` text button and/or `subtle` icon button | Patterns/PatternCard, Section |
+| Card or section header | `subtle` `compact` text button and/or `subtle` icon button | Card, Section |
 | Table toolbar | `compact`; `subtle` secondary, `primary` rightmost | Patterns/Table |
 | Table row | `subtle` icon buttons or one `subtle` `compact` text action; never filled | Table template, DynamicTable |
 | Popup inline confirm | `compact`; `subtle` Cancel plus the action | Patterns/Popup |

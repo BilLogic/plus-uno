@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **106,977 chars from 9 files**, against an assembled budget of 175,500 (68,523 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 86,593 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **106,972 chars from 9 files**, against an assembled budget of 175,500 (68,528 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 86,588 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,849 (−6,838 ide-only) | 9,849 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 18,194 | 28,072 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,442 | 49,555 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 51,201 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 52,449 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 58,143 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 69,929 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 21,123 (−8,489 ide-only) | 91,103 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 94,571 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,522 | 101,148 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 106,121 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 106,977 | — |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 18,196 | 28,074 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,435 | 49,550 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 51,196 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 52,444 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 58,138 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 69,924 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 21,123 (−8,489 ide-only) | 91,098 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 94,566 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,522 | 101,143 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 106,116 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 106,972 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -42,7 +42,7 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 164,509 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 164,515 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -53,7 +53,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `docs/connectors/notion/page-writing` | [`docs/connectors/notion/page-writing.md`](../../docs/connectors/notion/page-writing.md) | 6,695 |
 | `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 23,554 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,988 |
-| `docs/conventions/design-system-glossary` | [`docs/conventions/design-system-glossary.md`](../../docs/conventions/design-system-glossary.md) | 23,203 |
+| `docs/conventions/design-system-glossary` | [`docs/conventions/design-system-glossary.md`](../../docs/conventions/design-system-glossary.md) | 23,209 |
 | `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,535 |
 | `draft-a-prd` | [`agents/uno-bot/skills/draft-a-prd/SKILL.md`](../../agents/uno-bot/skills/draft-a-prd/SKILL.md) | 3,724 |
 | `ds-precedence` | [`agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) | 2,262 |
@@ -228,7 +228,7 @@ The Sidebar's content while a record with stages (a session) or a multi-step tas
 _Avoid_: "sub-sidebar", "second sidebar"
 
 **Commit action**:
-The footer button that commits the work (Submit, Save, Send, Approve); in multi-step forms, Back and Next may sit beside it, per the Form pattern.
+The footer button that commits the work (Submit, Save, Send, Approve); in multi-step forms, Back and Next may sit beside it, per the Form template.
 
 ### Organization
 
@@ -278,7 +278,7 @@ The engineered prompt handed to an external generative tool (Stitch, Figma Make,
 _Avoid_: bare "spec"
 
 **Component docs page**:
-The tabbed page a human reads for one component. Distinct from **Page** the pattern and from a **Flow spec**.
+The tabbed page a human reads for one component. Distinct from **Page** the template and from a **Flow spec**.
 _Avoid_: bare "docs page"
 
 **Docs parts**:
@@ -582,7 +582,7 @@ The one statement of it — replies, the copy code writes, and reactions; every 
 
 Audience: designers plus some technical teammates. Match the vocabulary the asker brings; default plain.
 
-- **Fine to say:** common AI/product terms — MCP, API, token, RAG, prompt, model — and the tools the team actually uses, by name: Notion, Supabase, Figma, Slack, GitHub, Storybook, Claude Code / Cursor / Codex / Antigravity (the product's own name, not "the IDE"). Design-system vocabulary (`var(--ds-background-brand-bold)`, `<PatternSection>`) is the team's language, not jargon.
+- **Fine to say:** common AI/product terms — MCP, API, token, RAG, prompt, model — and the tools the team actually uses, by name: Notion, Supabase, Figma, Slack, GitHub, Storybook, Claude Code / Cursor / Codex / Antigravity (the product's own name, not "the IDE"). Design-system vocabulary (`var(--ds-background-brand-bold)`, `<Section>`) is the team's language, not jargon.
 - **Translate to outcomes (internal plumbing):** "Worker," "KV," "harness," model/tier names, iteration/tool budgets, and every internal tool name — anything snake_case from the roster — reach the user as what they DO, unless the asker used the term first or is asking about the bot's internals. Not "notion_create is gated" but *"I can file the card — you approve it on the card before anything actually happens."* Skill names (`uno-prototype`, `uno-maintain`) live inside a ready-to-paste IDE prompt (that text is FOR the tool); the prose around it stays in the user's words.
 - **Cite by linking.** `[the Roadmap card](url)` inline, or a plain name when there's no URL. No `[1]` footnotes, no `[RM-2292]` brackets, no repo paths as citations (those only when the conversation is about the repo itself).
 - **A shortfall is named by what's missing, not by the mechanism.** "My tool budget is exhausted" reads as a malfunction — deliver what you have, say plainly what's missing, and offer to continue.
@@ -2078,7 +2078,7 @@ The template for a span of the page grid that groups content, including **Card**
 _Avoid_: "block" as a name, "region" as a name; "section" for a **Figma section** or a **Menu section**
 
 **Card**:
-The pattern for the container of one object, raised at rest with no border. Related cards group in a **Section**, one card level deep.
+The template for the container of one object, raised at rest with no border. Related cards group in a **Section**, one card level deep.
 _Avoid_: "tile" (Tile is its own component), "panel" (Panel is the Frame's right area)
 
 **Blanket**:
@@ -2090,7 +2090,7 @@ The component (`@/components`) for the dialog panel itself: header (title, close
 _Avoid_: "PatternModal"
 
 **Modal**:
-The template (`@/patterns`) for content that takes over the screen until it is closed: a **Dialog** on the **Blanket** with modal behavior on Base UI (portal, focus trap, Escape, scroll lock). A follow-up decision swaps the same Modal's content for its confirm view, and one Modal is open at a time.
+The template (`@/templates`) for content that takes over the screen until it is closed: a **Dialog** on the **Blanket** with modal behavior on Base UI (portal, focus trap, Escape, scroll lock). A follow-up decision swaps the same Modal's content for its confirm view, and one Modal is open at a time.
 _Avoid_: "Modal dialog" for the template, "ModalDialog", "PatternModal", "popup" for a blocking dialog
 
 **Part**:
@@ -2098,7 +2098,7 @@ A `_`-prefixed piece only its parent uses, such as `_Section header` or `_Modal 
 _Avoid_: "sub-component" for a part, "element"
 
 **Slot**:
-A named drop zone in a pattern or component where your own content goes: empty and tinted in the source component, filled with realistic placeholder content in examples and the **Playground**.
+A named drop zone in a template or component where your own content goes: empty and tinted in the source component, filled with realistic placeholder content in examples and the **Playground**.
 _Avoid_: "children area", "placeholder" for the slot itself
 
 ### Design system: components
@@ -2108,11 +2108,11 @@ A component group name, identical in Figma pages, Storybook and code folders, su
 _Avoid_: "Actions", "group" for a category
 
 **Table**:
-The template (`@/patterns`) for how a table sits on a page: a **Section** whose header carries the title and toolbar, then one of the three table kinds, the footer (range, page size, Pagination) and the empty state box when there are no rows. It takes a `kind` (`static`, `dynamic` or `tree`) or the table itself, and holds the type guidance as its chooser. There is one Table template and three table components; the base table and its parts (`TableRow`, `TableCell`, `HeadCell`, `TableFooter`, `TableMessageRow`, `TableSummaryRow`, `TableBulkActions`) are shared by all three.
+The template (`@/templates`) for how a table sits on a page: a **Section** whose header carries the title and toolbar, then one of the three table kinds, the footer (range, page size, Pagination) and the empty state box when there are no rows. It takes a `kind` (`static`, `dynamic` or `tree`) or the table itself, and holds the type guidance as its chooser. There is one Table template and three table components; the base table and its parts (`TableRow`, `TableCell`, `HeadCell`, `TableFooter`, `TableMessageRow`, `TableSummaryRow`, `TableBulkActions`) are shared by all three.
 _Avoid_: "Table component" for the template, "table pattern"
 
 **Static table**:
-A fixed grid people read, with nothing to act on: a link in a cell is fine, and rows rest or are highlighted. Which table type to use is `design-system/src/patterns/Table/index.md` § Type guidance.
+A fixed grid people read, with nothing to act on: a link in a cell is fine, and rows rest or are highlighted. Which table type to use is `design-system/src/templates/Table/index.md` § Type guidance.
 _Avoid_: "basic table", bare "table" for this type
 
 **Dynamic table**:
@@ -2327,7 +2327,7 @@ A kit `MotionDemo` with paths drawn before the motion, a dashed landing ghost, a
 _Avoid_: "demo" for a real-component story, "recording" for a kit figure
 
 **Motion registry**:
-The per-template, pattern and component event-to-token table for enter, exit and change, with semantic transitions and optional sound cells; `design-system/agent-views/motion/library.md` is its generated view. Motion tokens follow primitives, semantics, patterns and components (ADR-041).
+The per-template, pattern and component event-to-token table for enter, exit and change, with semantic transitions and optional sound cells; `design-system/agent-views/motion/library.md` is its generated view. Motion tokens follow primitives, semantics, templates and components (ADR-041).
 
 **Productive**:
 The default motion mode: springs at damping ratio 1 everywhere, so nothing overshoots. Controls, fields and anything done dozens of times a day stay Productive.

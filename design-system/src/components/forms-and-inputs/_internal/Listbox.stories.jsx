@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { TextField } from '@/components';
-import { Modal } from '@/patterns';
+import { Modal } from '@/templates';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import '../TagInput/TagInput.scss';
 import Listbox from './Listbox';
@@ -335,7 +335,7 @@ InsideAModal.play = async ({ canvasElement }) => {
     const listbox = await body.findByRole('listbox', { name: 'School options' });
     // Outside the dialog's panel, which clips, and inside its overlay.
     await expect(dialog.contains(listbox)).toBe(false);
-    await expect(listbox.closest('.plus-pattern-blanket')).toBe(dialog.closest('.plus-pattern-blanket'));
+    await expect(listbox.closest('.plus-template-blanket')).toBe(dialog.closest('.plus-template-blanket'));
 
     const field = input.getBoundingClientRect();
     const surface = listbox.closest('.plus-listbox').getBoundingClientRect();

@@ -115,7 +115,7 @@ EOF
 cat > "$dest/src/App.jsx" <<EOF
 import React from 'react';
 import { Breadcrumb, Sidebar } from '@/components';
-import { Frame, PatternSection } from '@/patterns';
+import { Frame, Section } from '@/templates';
 
 const GROUPS = [
     {
@@ -137,7 +137,7 @@ const App = () => (
             />
         )}
     >
-        <PatternSection level="page" title="$title" description="Start here." />
+        <Section level="page" title="$title" description="Start here." />
     </Frame>
 );
 

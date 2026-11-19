@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Button, DynamicTable, HeadingContextProvider, Popup, Select, StaticTable, Tooltip } from '@/components';
-import { Modal, PatternCard, PatternSection, PanelBody, PanelContainer, PanelHeader } from '@/patterns';
+import { Modal, Card, Section, PanelBody, PanelContainer, PanelHeader } from '@/templates';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
 import { Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
@@ -294,13 +294,13 @@ export const Layers = {
 export const CardLevels = {
     render: () => (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)', padding: 'var(--card-pad)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface)' }}>
-            <PatternCard surface="raised" title="Raised" description="The one focal card, first in reading order." />
-            <PatternCard surface="sunken" title="Sunken" description="The default. Clickable, it lifts in place on hover." onClick={() => {}} />
-            <PatternCard surface="default" title="Default" description="Bordered and flat." />
+            <Card surface="raised" title="Raised" description="The one focal card, first in reading order." />
+            <Card surface="sunken" title="Sunken" description="The default. Clickable, it lifts in place on hover." onClick={() => {}} />
+            <Card surface="default" title="Default" description="Bordered and flat." />
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const [raised, sunken, bordered] = canvasElement.querySelectorAll('.plus-pattern-card');
+        const [raised, sunken, bordered] = canvasElement.querySelectorAll('.plus-template-card');
         await expect(getComputedStyle(raised).boxShadow).not.toBe(getComputedStyle(sunken).boxShadow);
         await expect(getComputedStyle(bordered).boxShadow).toBe(getComputedStyle(sunken).boxShadow);
     },
@@ -348,10 +348,10 @@ const SessionsFrame = ({ edge, columns = 1, ...frameProps }) => {
                 {...frameProps}
             >
                 <div style={{ display: 'grid', gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gap: 'var(--grid-gutter)' }}>
-                    <PatternCard title="Session 12" description="Thursday, 4:30 PM · Lincoln Middle" />
-                    <PatternCard title="Session 13" description="Monday, 4:30 PM · Roosevelt K-8" />
-                    {columns > 1 && <PatternCard title="Session 14" description="Tuesday, 5:00 PM · Reading" />}
-                    {columns > 1 && <PatternCard title="Session 15" description="Friday, 3:30 PM · Writing" />}
+                    <Card title="Session 12" description="Thursday, 4:30 PM · Lincoln Middle" />
+                    <Card title="Session 13" description="Monday, 4:30 PM · Roosevelt K-8" />
+                    {columns > 1 && <Card title="Session 14" description="Tuesday, 5:00 PM · Reading" />}
+                    {columns > 1 && <Card title="Session 15" description="Friday, 3:30 PM · Writing" />}
                 </div>
             </InAppFrame>
         </div>
@@ -462,7 +462,7 @@ export const StickyHeaderScrolled = {
             }, []);
             return (
                 <div ref={ref}>
-                    <PatternSection title="Tutors">
+                    <Section title="Tutors">
                         <DynamicTable
                             label="Tutors"
                             stickyHeader
@@ -473,7 +473,7 @@ export const StickyHeaderScrolled = {
                                 cells: [{ key: 'tutor', content: n }, { key: 'sessions', content: String(12 - i) }],
                             }))}
                         />
-                    </PatternSection>
+                    </Section>
                 </div>
             );
         };
@@ -546,7 +546,7 @@ export const Contrast = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const ground = canvasElement.querySelector('[data-testid="contrast-demo"] [data-contrast-mode]');
-        const card = ground.querySelector('.plus-pattern-card, [class*="card"]');
+        const card = ground.querySelector('.plus-template-card, [class*="card"]');
         await waitFor(() => expect(ground.querySelector('.plus-popup')).not.toBeNull());
         const ringAlpha = () => parseShadow(getComputedStyle(card).boxShadow)[0]?.color.a ?? 0;
         await expect(ground).toHaveAttribute('data-contrast-mode', 'no-preference');
@@ -596,7 +596,7 @@ const GroundFigure = ({ children, sunken = false, column = false, tip = false })
 /** A raised Card whose gray fill replaces its shadow lift: the fill is the subject. */
 const GrayFillDontFigure = () => (
     <GroundFigure>
-        <PatternCard surface="raised" title="Upcoming sessions" description="3 this week" style={{ background: 'var(--ds-surface-sunken)', boxShadow: 'none' }} />
+        <Card surface="raised" title="Upcoming sessions" description="3 this week" style={{ background: 'var(--ds-surface-sunken)', boxShadow: 'none' }} />
     </GroundFigure>
 );
 
@@ -617,7 +617,7 @@ const BlockingPanelDontFigure = () => (
 /** A sunken fill with an overlay shadow on one Card. */
 const SunkenShadowDontFigure = () => (
     <GroundFigure>
-        <PatternCard surface="raised" title="Session 12" description="Ran 45 minutes over." style={{ background: 'var(--ds-surface-sunken)', boxShadow: 'var(--ds-shadow-overlay)' }} />
+        <Card surface="raised" title="Session 12" description="Ran 45 minutes over." style={{ background: 'var(--ds-surface-sunken)', boxShadow: 'var(--ds-shadow-overlay)' }} />
     </GroundFigure>
 );
 
@@ -638,7 +638,7 @@ export const LiftWithShadow = {
     render: () => (
         <DoDont>
             <Do caption={<>The card keeps the page color and lifts on <C>--ds-shadow-raised</C>.</>}>
-                <GroundFigure><PatternCard surface="raised" title="Upcoming sessions" description="3 this week" /></GroundFigure>
+                <GroundFigure><Card surface="raised" title="Upcoming sessions" description="3 this week" /></GroundFigure>
             </Do>
             <Dont caption="A gray fill reads as a hole in the page, and dark loses the step.">
                 <GrayFillDontFigure />
@@ -646,7 +646,7 @@ export const LiftWithShadow = {
         </DoDont>
     ),
     play: async ({ canvasElement }) => {
-        const cards = canvasElement.querySelectorAll('.plus-pattern-card');
+        const cards = canvasElement.querySelectorAll('.plus-template-card');
         await expect(cards).toHaveLength(2);
         await expect(getComputedStyle(cards[0]).boxShadow).not.toBe('none');
         await expect(getComputedStyle(cards[1]).boxShadow).toBe('none');
@@ -706,7 +706,7 @@ export const BlockingOnBlanket = {
         </DoDont>
     ),
     play: async ({ canvasElement }) => {
-        const blanket = canvasElement.querySelector('.plus-pattern-blanket');
+        const blanket = canvasElement.querySelector('.plus-template-blanket');
         const modal = canvasElement.querySelector('.plus-modal');
         const panel = canvasElement.querySelector('.plus-panel');
         await expect(blanket).not.toBeNull();
@@ -722,7 +722,7 @@ export const SunkenNeverFloats = {
         <DoDont>
             <Do caption="Sunken is the ground: the frame, or a sunken Card.">
                 <GroundFigure>
-                    <PatternCard surface="sunken" title="This week" description="12 sessions" />
+                    <Card surface="sunken" title="This week" description="12 sessions" />
                 </GroundFigure>
             </Do>
             <Dont caption="A sunken fill with a shadow: the gray says recessed, the shadow says lifted.">
@@ -731,8 +731,8 @@ export const SunkenNeverFloats = {
         </DoDont>
     ),
     play: async ({ canvasElement }) => {
-        const sunken = canvasElement.querySelector('.plus-pattern-card--surface-sunken');
-        const raised = canvasElement.querySelector('.plus-pattern-card--surface-raised');
+        const sunken = canvasElement.querySelector('.plus-template-card--surface-sunken');
+        const raised = canvasElement.querySelector('.plus-template-card--surface-raised');
         await expect(sunken).not.toBeNull();
         await expect(getComputedStyle(sunken).boxShadow).toBe('none');
         await expect(raised).not.toBeNull();
@@ -772,20 +772,20 @@ export const OneFocalPoint = {
         <DoDont>
             <Do caption="One raised Card marks the next session.">
                 <GroundFigure>
-                    <PatternSection title="Sessions">
-                        <PatternCard surface="raised" title="Next session" description="Today, 4:30 PM" />
+                    <Section title="Sessions">
+                        <Card surface="raised" title="Next session" description="Today, 4:30 PM" />
                         <StaticTable
                             headers={['Session', 'Day']}
                             rows={[['Past session', 'Monday'], ['Past session', 'Friday']]}
                         />
-                    </PatternSection>
+                    </Section>
                 </GroundFigure>
             </Do>
             <Dont caption="Every row raised: nothing stands out.">
                 <GroundFigure column>
-                    <PatternCard surface="raised" title="Next session" description="Today, 4:30 PM" />
-                    <PatternCard surface="raised" title="Past session" description="Monday" />
-                    <PatternCard surface="raised" title="Past session" description="Friday" />
+                    <Card surface="raised" title="Next session" description="Today, 4:30 PM" />
+                    <Card surface="raised" title="Past session" description="Monday" />
+                    <Card surface="raised" title="Past session" description="Friday" />
                 </GroundFigure>
             </Dont>
         </DoDont>
@@ -793,7 +793,7 @@ export const OneFocalPoint = {
     play: async ({ canvasElement }) => {
         const pair = canvasElement.querySelector('.sb-ds-dodont-pair');
         await expect(pair).not.toBeNull();
-        const cards = pair.querySelectorAll('.plus-pattern-card');
+        const cards = pair.querySelectorAll('.plus-template-card');
         await expect(cards).toHaveLength(4);
         await expect(pair.querySelectorAll('.plus-static-table')).toHaveLength(1);
     },

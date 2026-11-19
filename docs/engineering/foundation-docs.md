@@ -12,7 +12,7 @@ The Foundations pages in `design-system/src/styles/*.mdx` are written for design
 ## Tokens and the plan
 
 - Spacing, size and radius tokens come from one plan, `scripts/lib/tokens/plan.mjs`. Add a row there, then `npm run generate:design-tokens`; the output in `design-system/src/tokens/ladder/` is generated. Old-to-new names are in `architecture/token-tiers-name-map.md`.
-- `npm run check:old-system` holds code outside `specs/` to the names on the ladder. `npm run check:no-primitive-reads` holds components and patterns to semantic reads: the count of numbered-primitive reads may only fall.
+- `npm run check:old-system` holds code outside `specs/` to the names on the ladder. `npm run check:no-primitive-reads` holds components and templates to semantic reads: the count of numbered-primitive reads may only fall.
 - A component that resolves a tier token into its own rules does it through a private custom property, `--_<component>-<role>`, set once on the component root:
 
 ```scss
@@ -57,8 +57,8 @@ Collections prefixed `archived / ` and rows prefixed `Deprecated/` are legacy an
 
 ## Type
 
-- `npm run check:font-size-literals` holds components and patterns to text-style tokens.
-- `PatternSection` takes its heading level from `@/lib/headingLevel`; PatternCard's title type comes from the one mixin `card-title-type` in `design-system/src/styles/_card-title.scss`.
+- `npm run check:font-size-literals` holds components and templates to text-style tokens.
+- `Section` takes its heading level from `@/lib/headingLevel`; Card's title type comes from the one mixin `card-title-type` in `design-system/src/styles/_card-title.scss`.
 - A weighted label and a code sample bind their type variables directly in Figma: `design-system/guidelines/figma/token-mapping.md` § Text that carries no style.
 
 ## Accessibility checks

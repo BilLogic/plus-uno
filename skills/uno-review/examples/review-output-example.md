@@ -64,6 +64,6 @@ Results: 2 passed, 1 warnings, 2 failures
 STATUS: FAIL
 
 ❌ Must fix before shipping:
-1. Deep imports: import { StatusTag } from '@/components', PatternCard from '@/patterns', tokens as var(--ds-*)
+1. Deep imports: import { StatusTag } from '@/components', Card from '@/templates', tokens as var(--ds-*)
 2. FA Pro icons: Replace fa-light/fa-thin with fa-solid equivalents
 ```

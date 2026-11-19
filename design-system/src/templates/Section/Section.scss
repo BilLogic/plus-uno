@@ -1,0 +1,385 @@
+@use '../../styles/state' as *;
+
+/**
+ * Section template (Templates/Section)
+ * A span of the page grid: no fill, no pad, never elevated. Parts stack
+ * Section/stack-md; the header's rows stack Section/stack-sm.
+ */
+
+.plus-template-section {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    color: var(--ds-text);
+}
+
+/* Space between the header, the body and the footer: Section/stack-md is the Figma value. */
+.plus-template-section-spacing-compact {
+    gap: var(--section-stack-sm);
+}
+
+.plus-template-section-spacing-default {
+    gap: var(--section-stack-md);
+}
+
+.plus-template-section-spacing-spacious {
+    gap: var(--section-stack-lg);
+}
+
+/* `_Section header`: the title row, then the tabs or toolbar row when there is one */
+.plus-template-section-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-stack-sm);
+    min-width: 0;
+}
+
+/* Title row: heading block (or the custom header) + actions slot */
+.plus-template-section-title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--inline-md);
+}
+
+.plus-template-section-heading,
+.plus-template-section-custom {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: var(--stack-sm);
+    min-width: 0;
+}
+
+.plus-template-section-title {
+    margin: 0;
+    color: var(--ds-text);
+}
+
+/* The page header: Heading/large 24/28. */
+.plus-template-section-title--page {
+    font: var(--heading-lg);
+    letter-spacing: var(--heading-lg-tracking);
+}
+
+/* A section on a page: Heading/medium 20/24. */
+.plus-template-section-title--section {
+    font: var(--heading-md);
+}
+
+/* A section inside a section: Heading/small 16/20. */
+.plus-template-section-title--subsection {
+    font: var(--heading-sm);
+}
+
+/* Inside a Dialog or Modal (whose h1 is already Heading/medium 20), a section steps down to Heading/small 16 and its header-to-body gap to Section/stack-sm 8. */
+:is(.plus-dialog, .plus-modal) .plus-template-section-title--section {
+    font: var(--heading-sm);
+}
+
+:is(.plus-dialog, .plus-modal) .plus-template-section-title--subsection {
+    font: var(--heading-xs);
+}
+
+:is(.plus-dialog, .plus-modal) .plus-template-section-spacing-default {
+    gap: var(--section-stack-sm);
+}
+
+.plus-template-section-description {
+    margin: 0;
+    font: var(--body-default);
+    color: var(--ds-text-subtle);
+}
+
+.plus-template-section-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--inline-md);
+    flex-shrink: 0;
+}
+
+/*
+ * Rows 2 and 3 of the header: views and the format switch, then Search and the
+ * filter triggers. They stack Section/stack-sm under the title row, and every
+ * control in them sits on the one 32 line.
+ */
+.plus-section-rows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-stack-sm);
+    min-width: 0;
+}
+
+.plus-section-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: var(--inline-md);
+    row-gap: var(--section-stack-sm);
+    min-width: 0;
+    min-height: var(--control-md);
+}
+
+/* Row 2: the views scroll sideways; the format switch stays. */
+.plus-section-row--views {
+    flex-wrap: nowrap;
+}
+
+.plus-section-row__views {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+}
+
+.plus-section-row__end {
+    flex-shrink: 0;
+    margin-inline-start: auto;
+}
+
+/* Row 3: Search, then the triggers; the applied count and Clear all end the row. */
+.plus-section-row__search {
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+.plus-section-row__search--fill {
+    flex: 1 1 0;
+}
+
+.plus-section-row__filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--inline-md);
+    min-width: 0;
+}
+
+/* Triggers that no longer fit beside Search take their own row, at its end. */
+.plus-section-row__filters[data-wrapped] {
+    flex: 1 1 100%;
+    justify-content: flex-end;
+}
+
+.plus-section-row__applied {
+    display: flex;
+    align-items: center;
+    gap: var(--inline-md);
+    margin-inline-start: auto;
+}
+
+.plus-section-row__count {
+    font: var(--body-sm);
+    color: var(--ds-text-subtle);
+    white-space: nowrap;
+}
+
+/* Tabs row: the tabs, then "Add view" at its end. */
+.plus-template-section-tabs {
+    display: flex;
+    align-items: center;
+    gap: var(--inline-md);
+    min-width: 0;
+}
+
+.plus-template-section-toolbar {
+    min-width: 0;
+}
+
+/* Loading: skeleton bars in place of the header, Element/stack-sm apart. */
+.plus-template-section-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stack-sm);
+}
+
+/* Body */
+.plus-template-section-content {
+    min-width: 0;
+}
+
+/* Inside a Dialog or Modal, body text sets in Body/default and the last paragraph keeps no trailing margin. */
+:is(.plus-dialog, .plus-modal) .plus-template-section-content {
+    font: var(--body-default);
+
+    > p:last-child {
+        margin-bottom: 0;
+    }
+}
+
+/* Subsections: nested sections, Section/stack-lg apart. */
+.plus-template-section-content--subsections {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-stack-lg);
+}
+
+/*
+ * Detail: an inline expand inside the Section. The disclosure row opens the
+ * detail region in place and pushes the content below it down.
+ */
+.plus-template-section-with-detail {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-stack-md);
+    min-width: 0;
+}
+
+.plus-template-section-list {
+    min-width: 0;
+}
+
+/* The detail is a sunken Card: the Card supplies the surface, the pad and the radius. */
+.plus-template-section-detail {
+    min-width: 0;
+}
+
+.plus-template-section-detail-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--inline-md);
+    width: 100%;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    color: var(--ds-text);
+    font: var(--body-default);
+    text-align: left;
+    cursor: pointer;
+    transition: color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
+
+    @include plus-state((
+        hovered: (color: var(--ds-text-subtle)),
+        pressed: (color: var(--ds-text-subtle)),
+    ));
+}
+
+.plus-template-section-detail-heading {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stack-sm);
+    min-width: 0;
+}
+
+.plus-template-section-detail-title {
+    font: var(--heading-sm);
+    color: var(--ds-text);
+}
+
+.plus-template-section-detail-description {
+    font: var(--body-sm);
+    color: var(--ds-text-subtle);
+}
+
+.plus-template-section-detail-chevron {
+    display: inline-flex;
+    flex-shrink: 0;
+    color: var(--ds-icon-subtle);
+    transform: rotate(0deg);
+    transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
+}
+
+.plus-template-section-detail-trigger[data-panel-open] .plus-template-section-detail-chevron {
+    transform: rotate(-180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .plus-template-section-detail-trigger,
+    .plus-template-section-detail-chevron {
+        transition: none;
+    }
+}
+
+.plus-template-section-detail-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--card-stack-md);
+    padding-top: var(--card-stack-md);
+}
+
+.plus-template-section-detail-content {
+    min-width: 0;
+}
+
+.plus-template-section-detail-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--inline-md);
+}
+
+/*
+ * Split: a main column (span 8) beside a side column (span 4), a gutter
+ * apart. Growing 2:1 from these bases gives the 8/4 spans of the 12-column
+ * grid exactly; each column wraps under the other once it would drop below
+ * its minimum.
+ */
+.plus-template-section-content--split {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--grid-gutter);
+}
+
+.plus-template-section-main {
+    flex: 2 1 var(--grid-gutter);
+    min-width: min(100%, var(--section-min-width-main));
+}
+
+.plus-template-section-side {
+    flex: 1 1 0;
+    min-width: min(100%, var(--section-min-width-side));
+}
+
+/* Footer: "View all" or paging, at the end. */
+.plus-template-section-footer {
+    display: flex;
+    justify-content: flex-end;
+    min-width: 0;
+}
+
+/*
+ * `_Section toolbar`: search, filters and count at the start, actions at the
+ * end, wrapping Section/stack-sm under each other on a narrow section.
+ */
+.plus-section-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    column-gap: var(--inline-lg);
+    row-gap: var(--section-stack-sm);
+    min-height: var(--control-md);
+    min-width: 0;
+}
+
+.plus-section-toolbar__start {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    gap: var(--inline-md);
+    min-width: min(100%, var(--section-toolbar-min-width));
+}
+
+.plus-section-toolbar__search {
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+.plus-section-toolbar__slot {
+    display: flex;
+    align-items: center;
+    gap: var(--inline-sm);
+    flex-shrink: 0;
+}
+
+/* The count truncates first. */
+.plus-section-toolbar__count {
+    flex: 1 1 0;
+    min-width: var(--section-toolbar-count-min-width);
+    overflow: hidden;
+    font: var(--body-sm);
+    color: var(--ds-text-subtle);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

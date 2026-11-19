@@ -20,7 +20,7 @@ export const expectNotInert = async (canvasElement) => {
  */
 export const expectFullScale = async (
     canvasElement,
-    target = canvasElement.querySelector('.plus-frame, .plus-pattern-page') ?? canvasElement.firstElementChild,
+    target = canvasElement.querySelector('.plus-frame, .plus-template-page') ?? canvasElement.firstElementChild,
 ) => {
     await expect(target, 'live example renders a target element').not.toBeNull();
     for (let el = target; el && el !== canvasElement.parentElement; el = el.parentElement) {

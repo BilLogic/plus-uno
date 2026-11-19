@@ -175,10 +175,10 @@
     },
     {
       "name": "AiChat",
-      "kind": "pattern",
-      "import": "import { AiChat } from '@/patterns';",
-      "group": "patterns",
-      "source": "design-system/src/patterns/AiChat/AiChat.jsx",
+      "kind": "template",
+      "import": "import { AiChat } from '@/templates';",
+      "group": "templates",
+      "source": "design-system/src/templates/AiChat/AiChat.jsx",
       "summary": "AI chat on a Frame: a floating action button at the bottom right of the Page opens chat as a popup; from there it moves to the Frame's Panel or to full screen. It takes the Frame's props and adds the chat. - The button is the one way in. It hides while chat is open in the Panel or full screen. - The mode is remembered for the tab in sessionStorage (and an open Panel). - Under 768 the popup is shown full screen. - `variant=\"storybook\"` is the Storybook docs' chat: the same chat, with its mode remembered under its own key. - The conversation moves with the mode and is kept for the tab (the last 50 messages, under `${storageKey}-messages`), so a reload keeps it. There is no backend: `respond(text, history)` returns the reply, `history` being the turns before it as `{ role, text }`. A reply is text, or `{ text, sources }`: the pages or records it drew on list under it.",
       "props": [
         {
@@ -1512,6 +1512,259 @@
         "HoveredState",
         "KeyboardFocus",
         "Interactive"
+      ]
+    },
+    {
+      "name": "Card",
+      "kind": "template",
+      "import": "import { Card } from '@/templates';",
+      "group": "templates",
+      "source": "design-system/src/templates/Card/Card.jsx",
+      "summary": "PLUS card: an optional image, content and footer on a `sunken`, `default`, or `raised` surface. - **Surface**: `sunken` (default, flat), `default` (page surface with a 1px border, flat), or `raised` (raised surface and shadow). Every card carries a 1px border (transparent on sunken and raised) so forced colors draw its edge. - **Image placement**: `top` (default), `start` or `end`. Side images apply at the large card minimum width and fill the height. `imageSplit` chooses one third (default) or one half; half uses Heading md on a side card. Below the large minimum width, the image returns to the top with its own ratio. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: padding uses `--card-pad` and radius uses `--card-radius` at every size, the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: a clickable `sunken` or `default` card lifts to Raised on hover in place and settles to the raised shadow while pressed; a clickable `raised` card lifts to the raised hovered step under the overlay shadow and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.",
+      "props": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "title",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The card's title, in the card title type (`styles/_card-title.scss`), tagged one heading level below its section",
+          "deprecated": null
+        },
+        {
+          "name": "description",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Body/default 14 under the title",
+          "deprecated": null
+        },
+        {
+          "name": "actions",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Actions at the end of the header row: buttons, a pager or an overflow",
+          "deprecated": null
+        },
+        {
+          "name": "header",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Custom header that replaces title, description and actions (tabs, a toolbar)",
+          "deprecated": null
+        },
+        {
+          "name": "image",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Image slot, full bleed: above the content, or at the start or end edge per `imagePlacement`",
+          "deprecated": null
+        },
+        {
+          "name": "imagePlacement",
+          "type": "enum",
+          "required": false,
+          "default": "'top'",
+          "values": [
+            "top",
+            "start",
+            "end"
+          ],
+          "description": "Image position. Side placements apply from the large card minimum width; narrower cards put the image on top.",
+          "deprecated": null
+        },
+        {
+          "name": "imageSplit",
+          "type": "enum",
+          "required": false,
+          "default": "'1/3'",
+          "values": [
+            "1/3",
+            "1/2"
+          ],
+          "description": "Side image share. One half also steps the title up to Heading md. Ignored for top placement.",
+          "deprecated": null
+        },
+        {
+          "name": "footer",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Footer slot: commit actions, left-aligned, Card/stack-lg below the body",
+          "deprecated": null
+        },
+        {
+          "name": "surface",
+          "type": "enum",
+          "required": false,
+          "default": "'sunken'",
+          "values": [
+            "sunken",
+            "default",
+            "raised"
+          ],
+          "description": "Surface level: sunken (default, flat), default (page fill with a 1px border, flat), or raised (raised fill and shadow)",
+          "deprecated": null
+        },
+        {
+          "name": "gap",
+          "type": "enum",
+          "required": false,
+          "default": "'md'",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "description": "Header-to-body stack: Card/stack-sm · md · lg (4 · 8 · 12)",
+          "deprecated": null
+        },
+        {
+          "name": "minWidth",
+          "type": "number or string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Minimum width constraint (number of px or any CSS length)",
+          "deprecated": null
+        },
+        {
+          "name": "onClick",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Click handler, passed to the card's root element. Its presence adds the clickable class: a pointer cursor and the hover lift. It adds no role or tab stop; pass `role` and `tabIndex` for a card clickable as a whole.",
+          "deprecated": null
+        },
+        {
+          "name": "onKeyDown",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Key handler, passed to the card's root element. A card clickable as a whole takes Enter and Space here, beside its `role` and `tabIndex`.",
+          "deprecated": null
+        },
+        {
+          "name": "dragging",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "The card is being dragged: it lifts to the overlay pair",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "children",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Body content slot",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "Interactive",
+        "Elevation",
+        "Anatomy",
+        "Jobs",
+        "SizeSmall",
+        "SizeMedium",
+        "SizeLarge",
+        "ImageWide",
+        "ImageStandard",
+        "ImageSquare",
+        "ImageTop",
+        "ImageTopHovered",
+        "ImageTopPressed",
+        "ImageTopDragging",
+        "ImageStart",
+        "ImageStartHovered",
+        "ImageStartPressed",
+        "ImageStartDragging",
+        "ImageEnd",
+        "ImageEndHovered",
+        "ImageEndPressed",
+        "ImageEndDragging",
+        "ImageStartHalf",
+        "ImageEndHalf",
+        "ImageTopIgnoresSplit",
+        "BodyOnly",
+        "WithFooter",
+        "CustomHeader",
+        "SurfaceSunken",
+        "SurfaceDefault",
+        "SurfaceRaised",
+        "Static",
+        "Clickable",
+        "Dragging",
+        "ForcedColors",
+        "LoadingCard",
+        "Rows",
+        "PlacementBoundary"
+      ],
+      "tokens": [
+        "--card-border-default",
+        "--card-border-width",
+        "--card-description-font",
+        "--card-inline-md",
+        "--card-pad",
+        "--card-radius",
+        "--card-shadow-overlay",
+        "--card-shadow-raised",
+        "--card-stack-lg",
+        "--card-stack-md",
+        "--card-stack-sm",
+        "--card-surface-default",
+        "--card-surface-overlay",
+        "--card-surface-raised",
+        "--card-surface-raised-hovered",
+        "--card-surface-raised-pressed",
+        "--card-surface-sunken",
+        "--card-text",
+        "--card-text-subtle",
+        "--card-title-font-lg",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
+        "--ds-utility-elevation-surface-current"
       ]
     },
     {
@@ -4023,7 +4276,7 @@
       "import": "import { Dialog } from '@/components';",
       "group": "messaging",
       "source": "design-system/src/components/messaging/Dialog/Dialog.jsx",
-      "summary": "The dialog panel itself: header (title, optional description, header actions, close button, or custom header / tabs), scrolling body, and optional footer slots. Sizes from the screen grid (`4-col · 6-col · 8-col · 10-col`) and renders inline with no Blanket and no modal behavior. For a blocking overlay dialog with Blanket, portal, focus trap, Escape and scroll lock, use the `Modal` template from `@/patterns`.",
+      "summary": "The dialog panel itself: header (title, optional description, header actions, close button, or custom header / tabs), scrolling body, and optional footer slots. Sizes from the screen grid (`4-col · 6-col · 8-col · 10-col`) and renders inline with no Blanket and no modal behavior. For a blocking overlay dialog with Blanket, portal, focus trap, Escape and scroll lock, use the `Modal` template from `@/templates`.",
       "props": [
         {
           "name": "id",
@@ -6227,10 +6480,10 @@
     },
     {
       "name": "Frame",
-      "kind": "pattern",
-      "import": "import { Frame } from '@/patterns';",
-      "group": "patterns",
-      "source": "design-system/src/patterns/Frame/Frame.jsx",
+      "kind": "template",
+      "import": "import { Frame } from '@/templates';",
+      "group": "templates",
+      "source": "design-system/src/templates/Frame/Frame.jsx",
       "summary": "The Page runs the full height, and meets a docked Sidebar at its 1px edge. - The Frame owns the Sidebar state and hands it to the Sidebar through `SidebarControlContext`. Open, the toggle (`angles-left`) ends the Sidebar's logo row; closed, the Frame draws it (`bars`) at the Page's top left, centered on x 32, and the Page's header row (`header`, the breadcrumb) follows it on the same center line from x 56. - What docks is decided by the layout resolver (`./frameLayout`) from the Frame's own width: from 1024 the Sidebar docks (240, in flow); under 1024 it never docks. - Docked, the Sidebar sits on the sunken fill with a 1px `--ds-border` on its Page-facing edge. Floating (a peek, or opened by hand under 1024) it lies over the Page on `--ds-surface-material-overlay` with `--ds-shadow-overlay` and no Blanket. - Hovering the left edge peeks a closed Sidebar. An outside press, Escape, or the pointer leaving closes the peek. - Either toggle, or Ctrl+[ (Cmd+[ on a Mac), closes a showing Sidebar and opens a closed one; focus follows to the toggle that is left. - Opening a modal closes a floating Sidebar and leaves a docked one alone, and while one is open the Sidebar does not peek. The frame hears it from the shared overlay module (`@/lib/overlay`), so a page does not wire its modals to the frame. A modal opened from inside the floating Sidebar hands focus to the toggle when it closes, since its trigger left with the Sidebar. - The Panel area (`panel`) is the Frame's right-hand area. The resolver docks it beside the Page at a hairline when the content keeps 720, collapsing a default Sidebar first (and restoring it when the Panel closes); otherwise it floats over the Page on the overlay material and shadow, with no Blanket, and a press outside or Escape closes it. Under 1024 it is an overlay capped at 320, and only one overlay is open at a time; under 768 it is full width. As an overlay the Panel is modal: focus moves into it and stays there, the Page and the Sidebar under it are inert, and closing it hands focus back to what opened it. Docked or peeking it is not modal and leaves focus where it is. Its open state, dismissal and focus run on Base UI's `Dialog`, portaled into the Frame's row so a dock or overlay switch never remounts the Panel's content. Its splitter resizes it from 320 to 640 (never past what keeps 720 beside a docked Sidebar) by drag or keys. Width and open state are kept in sessionStorage. A modal leaves it open. Anything inside the Frame opens it through `usePanelControl`. - A multi-step task runs in the Sidebar's inner mode: its steps are the rows, and the Page's footer holds the task's actions. - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation; the Panel is a complementary landmark named by `panelLabel`. - The Page pads `--page-pad` (24 at every width) and caps its content at `--content-max-width` (1232), centered, on a 12-column grid with a 16 gutter. Children span all 12 columns unless they set `grid-column`.",
       "props": [
         {
@@ -8259,10 +8512,10 @@
     },
     {
       "name": "Modal",
-      "kind": "pattern",
-      "import": "import { Modal } from '@/patterns';",
-      "group": "patterns",
-      "source": "design-system/src/patterns/Modal/Modal.jsx",
+      "kind": "template",
+      "import": "import { Modal } from '@/templates';",
+      "group": "templates",
+      "source": "design-system/src/templates/Modal/Modal.jsx",
       "summary": "`@base-ui/react` Dialog (portal, focus trap, Escape, scroll lock, and the blanket-press rule). One Modal is open at a time (`useOverlaySlot`). `inline` renders the Blanket + Dialog in flow for docs previews and static stages without a portal, focus trap, Escape handling or scroll lock.",
       "props": [
         {
@@ -8837,10 +9090,10 @@
     },
     {
       "name": "Page",
-      "kind": "pattern",
-      "import": "import { Page } from '@/patterns';",
-      "group": "patterns",
-      "source": "design-system/src/patterns/Page/Page.jsx",
+      "kind": "template",
+      "import": "import { Page } from '@/templates';",
+      "group": "templates",
+      "source": "design-system/src/templates/Page/Page.jsx",
       "summary": "The Page surface: paints `--ds-surface` edge to edge with `--page-pad` (24) on every side and no radius, border, or shadow; children fill the content slot. A Page can carry its `title`: the page's one h1, at Heading/large 24, above the content. Sections inside it open at h2.",
       "props": [
         {
@@ -9293,10 +9546,10 @@
     },
     {
       "name": "Panel",
-      "kind": "pattern",
-      "import": "import { Panel } from '@/patterns';",
-      "group": "patterns",
-      "source": "design-system/src/patterns/Panel/Panel.jsx",
+      "kind": "template",
+      "import": "import { Panel } from '@/templates';",
+      "group": "templates",
+      "source": "design-system/src/templates/Panel/Panel.jsx",
       "summary": "PanelContainer: the panel's own surface, at a fixed or the provider's width.",
       "props": [
         {
@@ -9352,721 +9605,6 @@
         "--panel-pad",
         "--panel-pad-y",
         "--panel-subheader-pad-y"
-      ]
-    },
-    {
-      "name": "PatternCard",
-      "kind": "pattern",
-      "import": "import { PatternCard } from '@/patterns';",
-      "group": "patterns",
-      "source": "design-system/src/patterns/PatternCard/PatternCard.jsx",
-      "summary": "PLUS card: an optional image, content and footer on a `sunken`, `default`, or `raised` surface. - **Surface**: `sunken` (default, flat), `default` (page surface with a 1px border, flat), or `raised` (raised surface and shadow). Every card carries a 1px border (transparent on sunken and raised) so forced colors draw its edge. - **Image placement**: `top` (default), `start` or `end`. Side images apply at the large card minimum width and fill the height. `imageSplit` chooses one third (default) or one half; half uses Heading md on a side card. Below the large minimum width, the image returns to the top with its own ratio. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: padding uses `--card-pad` and radius uses `--card-radius` at every size, the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: a clickable `sunken` or `default` card lifts to Raised on hover in place and settles to the raised shadow while pressed; a clickable `raised` card lifts to the raised hovered step under the overlay shadow and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.",
-      "props": [
-        {
-          "name": "id",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "title",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "The card's title, in the card title type (`styles/_card-title.scss`), tagged one heading level below its section",
-          "deprecated": null
-        },
-        {
-          "name": "description",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Body/default 14 under the title",
-          "deprecated": null
-        },
-        {
-          "name": "actions",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Actions at the end of the header row: buttons, a pager or an overflow",
-          "deprecated": null
-        },
-        {
-          "name": "header",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Custom header that replaces title, description and actions (tabs, a toolbar)",
-          "deprecated": null
-        },
-        {
-          "name": "image",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Image slot, full bleed: above the content, or at the start or end edge per `imagePlacement`",
-          "deprecated": null
-        },
-        {
-          "name": "imagePlacement",
-          "type": "enum",
-          "required": false,
-          "default": "'top'",
-          "values": [
-            "top",
-            "start",
-            "end"
-          ],
-          "description": "Image position. Side placements apply from the large card minimum width; narrower cards put the image on top.",
-          "deprecated": null
-        },
-        {
-          "name": "imageSplit",
-          "type": "enum",
-          "required": false,
-          "default": "'1/3'",
-          "values": [
-            "1/3",
-            "1/2"
-          ],
-          "description": "Side image share. One half also steps the title up to Heading md. Ignored for top placement.",
-          "deprecated": null
-        },
-        {
-          "name": "footer",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Footer slot: commit actions, left-aligned, Card/stack-lg below the body",
-          "deprecated": null
-        },
-        {
-          "name": "surface",
-          "type": "enum",
-          "required": false,
-          "default": "'sunken'",
-          "values": [
-            "sunken",
-            "default",
-            "raised"
-          ],
-          "description": "Surface level: sunken (default, flat), default (page fill with a 1px border, flat), or raised (raised fill and shadow)",
-          "deprecated": null
-        },
-        {
-          "name": "gap",
-          "type": "enum",
-          "required": false,
-          "default": "'md'",
-          "values": [
-            "sm",
-            "md",
-            "lg"
-          ],
-          "description": "Header-to-body stack: Card/stack-sm · md · lg (4 · 8 · 12)",
-          "deprecated": null
-        },
-        {
-          "name": "minWidth",
-          "type": "number or string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Minimum width constraint (number of px or any CSS length)",
-          "deprecated": null
-        },
-        {
-          "name": "onClick",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Click handler, passed to the card's root element. Its presence adds the clickable class: a pointer cursor and the hover lift. It adds no role or tab stop; pass `role` and `tabIndex` for a card clickable as a whole.",
-          "deprecated": null
-        },
-        {
-          "name": "onKeyDown",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Key handler, passed to the card's root element. A card clickable as a whole takes Enter and Space here, beside its `role` and `tabIndex`.",
-          "deprecated": null
-        },
-        {
-          "name": "dragging",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "The card is being dragged: it lifts to the overlay pair",
-          "deprecated": null
-        },
-        {
-          "name": "className",
-          "type": "string",
-          "required": false,
-          "default": "''",
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "style",
-          "type": "object",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "children",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Body content slot",
-          "deprecated": null
-        }
-      ],
-      "stories": [
-        "Overview",
-        "Interactive",
-        "Elevation",
-        "Anatomy",
-        "Jobs",
-        "SizeSmall",
-        "SizeMedium",
-        "SizeLarge",
-        "ImageWide",
-        "ImageStandard",
-        "ImageSquare",
-        "ImageTop",
-        "ImageTopHovered",
-        "ImageTopPressed",
-        "ImageTopDragging",
-        "ImageStart",
-        "ImageStartHovered",
-        "ImageStartPressed",
-        "ImageStartDragging",
-        "ImageEnd",
-        "ImageEndHovered",
-        "ImageEndPressed",
-        "ImageEndDragging",
-        "ImageStartHalf",
-        "ImageEndHalf",
-        "ImageTopIgnoresSplit",
-        "BodyOnly",
-        "WithFooter",
-        "CustomHeader",
-        "SurfaceSunken",
-        "SurfaceDefault",
-        "SurfaceRaised",
-        "Static",
-        "Clickable",
-        "Dragging",
-        "ForcedColors",
-        "LoadingCard",
-        "Rows",
-        "PlacementBoundary"
-      ],
-      "tokens": [
-        "--card-border-default",
-        "--card-border-width",
-        "--card-description-font",
-        "--card-inline-md",
-        "--card-pad",
-        "--card-radius",
-        "--card-shadow-overlay",
-        "--card-shadow-raised",
-        "--card-stack-lg",
-        "--card-stack-md",
-        "--card-stack-sm",
-        "--card-surface-default",
-        "--card-surface-overlay",
-        "--card-surface-raised",
-        "--card-surface-raised-hovered",
-        "--card-surface-raised-pressed",
-        "--card-surface-sunken",
-        "--card-text",
-        "--card-text-subtle",
-        "--card-title-font-lg",
-        "--ds-motion-appearance-fast",
-        "--ds-motion-appearance-fast-duration",
-        "--ds-utility-elevation-surface-current"
-      ]
-    },
-    {
-      "name": "PatternSection",
-      "kind": "pattern",
-      "import": "import { PatternSection } from '@/patterns';",
-      "group": "patterns",
-      "source": "design-system/src/patterns/PatternSection/PatternSection.jsx",
-      "summary": "PatternSection: a span of the page grid under one heading, with its header, toolbar and tabs.",
-      "props": [
-        {
-          "name": "id",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "title",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Section title: an h2 at Heading/medium 20, or an h3 at Heading/small 16 inside another section",
-          "deprecated": null
-        },
-        {
-          "name": "description",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Optional description under the title, Body/default",
-          "deprecated": null
-        },
-        {
-          "name": "actions",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Actions slot, aligned to the end of the title row",
-          "deprecated": null
-        },
-        {
-          "name": "tabs",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "use `views` (and `format`) in the three-row header. Tabs row under the title row (header type `tabs`, or `tabs-only`).",
-          "deprecated": {
-            "replacement": "views"
-          }
-        },
-        {
-          "name": "toolbar",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "use `search` and `filters` in the three-row header. Toolbar row under the title row (header type `toolbar`), usually a `PatternSection.Toolbar`.",
-          "deprecated": {
-            "replacement": "search"
-          }
-        },
-        {
-          "name": "header",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Free-form header in place of title and description (header type `custom`)",
-          "deprecated": null
-        },
-        {
-          "name": "type",
-          "type": "enum",
-          "required": false,
-          "default": null,
-          "values": [
-            "default",
-            "custom"
-          ],
-          "description": "Header type: `default` (title and description) or `custom` (your own `header`). Read from the slots when left off.",
-          "deprecated": null
-        },
-        {
-          "name": "views",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Row 2, at the start: the views, usually Tabs in the pill appearance. It scrolls sideways when it does not fit.",
-          "deprecated": null
-        },
-        {
-          "name": "format",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Row 2, at the end: the format switch (Table / Cards). With no `views` it moves to the end of row 3.",
-          "deprecated": null
-        },
-        {
-          "name": "search",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Row 3, at the start: the Search field at compact spacing, which draws 32.",
-          "deprecated": null
-        },
-        {
-          "name": "filters",
-          "type": "arrayOf",
-          "required": true,
-          "default": null,
-          "values": null,
-          "description": "Row 3, after Search: one `{ key, label, text, isSelected, onClick, menu }` per trigger, drawn as a FilterButton that reads \"label: text\". `menu` is `(trigger) => node`: hand the trigger to a Popup select or a Filter menu, so the same button opens the list and keeps its selected state. Three show; the rest go in \"More filters\" with a count. Under 768 they fold into one Filter button. When they do not fit beside Search they wrap to their own row, end-aligned.",
-          "deprecated": null
-        },
-        {
-          "name": "count",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Row 3, at the end once a filter is applied: how many rows match, such as \"3 of 12\".",
-          "deprecated": null
-        },
-        {
-          "name": "onClearAll",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Runs when \"Clear all\" is pressed. The button shows once a filter is applied.",
-          "deprecated": null
-        },
-        {
-          "name": "onMoreFilters",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Runs when \"More filters\" is pressed.",
-          "deprecated": null
-        },
-        {
-          "name": "onOpenFilters",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Runs when the Filter button of a narrow Section is pressed.",
-          "deprecated": null
-        },
-        {
-          "name": "onAddView",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Puts \"Add view\" at the end of the tabs row, and runs when it is pressed",
-          "deprecated": null
-        },
-        {
-          "name": "addViewLabel",
-          "type": "string",
-          "required": false,
-          "default": "'Add view'",
-          "values": null,
-          "description": "The \"Add view\" button's label",
-          "deprecated": null
-        },
-        {
-          "name": "loading",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Swaps the header for skeleton bars and marks the section busy",
-          "deprecated": null
-        },
-        {
-          "name": "layout",
-          "type": "enum",
-          "required": false,
-          "default": "'single'",
-          "values": [
-            "single",
-            "split",
-            "subsections"
-          ],
-          "description": "Body layout: the content alone, content beside `side`, or stacked subsections",
-          "deprecated": null
-        },
-        {
-          "name": "side",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Side column of `layout=\"split\"`",
-          "deprecated": null
-        },
-        {
-          "name": "footer",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Footer, for \"View all\" or paging only; aligned to the end",
-          "deprecated": null
-        },
-        {
-          "name": "detail",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Inline expand content that opens in place inside the Section and pushes the content below it down",
-          "deprecated": null
-        },
-        {
-          "name": "detailTitle",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Title on the detail disclosure button; also names the detail region",
-          "deprecated": null
-        },
-        {
-          "name": "detailDescription",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Optional description on the detail disclosure button",
-          "deprecated": null
-        },
-        {
-          "name": "detailFooter",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Detail footer, such as \"Open full review\"",
-          "deprecated": null
-        },
-        {
-          "name": "detailOpen",
-          "type": "bool",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Controlled open state of the inline detail expand",
-          "deprecated": null
-        },
-        {
-          "name": "defaultDetailOpen",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Whether an uncontrolled inline detail expand starts open",
-          "deprecated": null
-        },
-        {
-          "name": "onDetailOpenChange",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Called with the next open boolean when the inline detail expand toggles",
-          "deprecated": null
-        },
-        {
-          "name": "level",
-          "type": "enum",
-          "required": false,
-          "default": null,
-          "values": [
-            "page"
-          ],
-          "description": "`page` makes the title the page's h1 at Heading/large 24; by default it nests one level down",
-          "deprecated": null
-        },
-        {
-          "name": "spacing",
-          "type": "enum",
-          "required": false,
-          "default": "'default'",
-          "values": [
-            "default",
-            "compact",
-            "spacious"
-          ],
-          "description": "Space between the header, the body and the footer (Section/stack tokens); `default` is the Figma value",
-          "deprecated": null
-        },
-        {
-          "name": "named",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Makes the section a region named by its title, for a section that stands apart as a landmark",
-          "deprecated": null
-        },
-        {
-          "name": "className",
-          "type": "string",
-          "required": false,
-          "default": "''",
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "style",
-          "type": "object",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "children",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Content slot; with `layout=\"split\"`, the main column",
-          "deprecated": null
-        }
-      ],
-      "stories": [
-        "Overview",
-        "HeaderDefault",
-        "HeaderCustom",
-        "LayoutSingle",
-        "LayoutSplit",
-        "LayoutSubsections",
-        "SunkenCard",
-        "DetailIsSunkenCard",
-        "CardNesting",
-        "NoSurfaceNoPad",
-        "Footer",
-        "Anatomy",
-        "Levels",
-        "ToolbarSearch",
-        "LoadingDefault",
-        "LoadingToolbar",
-        "LoadingTabsOnly",
-        "Interactive",
-        "ColorModes",
-        "SplitLayout",
-        "Spacing",
-        "Detail",
-        "TypeList",
-        "TypeQueue",
-        "TypeCards",
-        "TypeStats",
-        "TypeDetails",
-        "TypeMainAndSide",
-        "TypeForm",
-        "TypeSubsections",
-        "Full",
-        "FiltersApplied",
-        "NoViews",
-        "ViewsOnly",
-        "ManyFilters",
-        "WrappedFilters",
-        "RowsSelected",
-        "Narrow",
-        "Subsection",
-        "SideAtEnd",
-        "FilterSideAtStart",
-        "ResponsiveWidth",
-        "EmptyInTable",
-        "AnatomyQueue"
-      ],
-      "tokens": [
-        "--body-default",
-        "--body-sm",
-        "--card-stack-md",
-        "--control-md",
-        "--ds-icon-subtle",
-        "--ds-motion-appearance-fast",
-        "--ds-motion-appearance-fast-duration",
-        "--ds-motion-spatial-fast",
-        "--ds-motion-spatial-fast-duration",
-        "--ds-text",
-        "--ds-text-subtle",
-        "--grid-gutter",
-        "--heading-lg",
-        "--heading-lg-tracking",
-        "--heading-md",
-        "--heading-sm",
-        "--heading-xs",
-        "--inline-lg",
-        "--inline-md",
-        "--inline-sm",
-        "--section-min-width-main",
-        "--section-min-width-side",
-        "--section-stack-lg",
-        "--section-stack-md",
-        "--section-stack-sm",
-        "--section-toolbar-count-min-width",
-        "--section-toolbar-min-width",
-        "--stack-sm"
-      ],
-      "subComponents": [
-        {
-          "name": "Toolbar",
-          "impl": "SectionToolbar",
-          "deprecated": true,
-          "props": [
-            {
-              "name": "search",
-              "type": "node",
-              "required": false,
-              "default": null,
-              "description": "Search field slot, at the start"
-            },
-            {
-              "name": "filters",
-              "type": "node",
-              "required": false,
-              "default": null,
-              "description": "Filters slot: dropdown buttons"
-            },
-            {
-              "name": "count",
-              "type": "node",
-              "required": false,
-              "default": null,
-              "description": "Count in words, such as \"12 of 48 students\"; truncates first, and is announced politely when it changes"
-            },
-            {
-              "name": "actions",
-              "type": "node",
-              "required": false,
-              "default": null,
-              "description": "Actions slot, at the end"
-            },
-            {
-              "name": "className",
-              "type": "string",
-              "required": false,
-              "default": null,
-              "description": null
-            }
-          ]
-        }
       ]
     },
     {
@@ -12736,6 +12274,468 @@
       ]
     },
     {
+      "name": "Section",
+      "kind": "template",
+      "import": "import { Section } from '@/templates';",
+      "group": "templates",
+      "source": "design-system/src/templates/Section/Section.jsx",
+      "summary": "Section: a span of the page grid under one heading, with its header, toolbar and tabs.",
+      "props": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "title",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Section title: an h2 at Heading/medium 20, or an h3 at Heading/small 16 inside another section",
+          "deprecated": null
+        },
+        {
+          "name": "description",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Optional description under the title, Body/default",
+          "deprecated": null
+        },
+        {
+          "name": "actions",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Actions slot, aligned to the end of the title row",
+          "deprecated": null
+        },
+        {
+          "name": "tabs",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "use `views` (and `format`) in the three-row header. Tabs row under the title row (header type `tabs`, or `tabs-only`).",
+          "deprecated": {
+            "replacement": "views"
+          }
+        },
+        {
+          "name": "toolbar",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "use `search` and `filters` in the three-row header. Toolbar row under the title row (header type `toolbar`), usually a `Section.Toolbar`.",
+          "deprecated": {
+            "replacement": "search"
+          }
+        },
+        {
+          "name": "header",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Free-form header in place of title and description (header type `custom`)",
+          "deprecated": null
+        },
+        {
+          "name": "type",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "default",
+            "custom"
+          ],
+          "description": "Header type: `default` (title and description) or `custom` (your own `header`). Read from the slots when left off.",
+          "deprecated": null
+        },
+        {
+          "name": "views",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Row 2, at the start: the views, usually Tabs in the pill appearance. It scrolls sideways when it does not fit.",
+          "deprecated": null
+        },
+        {
+          "name": "format",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Row 2, at the end: the format switch (Table / Cards). With no `views` it moves to the end of row 3.",
+          "deprecated": null
+        },
+        {
+          "name": "search",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Row 3, at the start: the Search field at compact spacing, which draws 32.",
+          "deprecated": null
+        },
+        {
+          "name": "filters",
+          "type": "arrayOf",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "Row 3, after Search: one `{ key, label, text, isSelected, onClick, menu }` per trigger, drawn as a FilterButton that reads \"label: text\". `menu` is `(trigger) => node`: hand the trigger to a Popup select or a Filter menu, so the same button opens the list and keeps its selected state. Three show; the rest go in \"More filters\" with a count. Under 768 they fold into one Filter button. When they do not fit beside Search they wrap to their own row, end-aligned.",
+          "deprecated": null
+        },
+        {
+          "name": "count",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Row 3, at the end once a filter is applied: how many rows match, such as \"3 of 12\".",
+          "deprecated": null
+        },
+        {
+          "name": "onClearAll",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Runs when \"Clear all\" is pressed. The button shows once a filter is applied.",
+          "deprecated": null
+        },
+        {
+          "name": "onMoreFilters",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Runs when \"More filters\" is pressed.",
+          "deprecated": null
+        },
+        {
+          "name": "onOpenFilters",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Runs when the Filter button of a narrow Section is pressed.",
+          "deprecated": null
+        },
+        {
+          "name": "onAddView",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Puts \"Add view\" at the end of the tabs row, and runs when it is pressed",
+          "deprecated": null
+        },
+        {
+          "name": "addViewLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Add view'",
+          "values": null,
+          "description": "The \"Add view\" button's label",
+          "deprecated": null
+        },
+        {
+          "name": "loading",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Swaps the header for skeleton bars and marks the section busy",
+          "deprecated": null
+        },
+        {
+          "name": "layout",
+          "type": "enum",
+          "required": false,
+          "default": "'single'",
+          "values": [
+            "single",
+            "split",
+            "subsections"
+          ],
+          "description": "Body layout: the content alone, content beside `side`, or stacked subsections",
+          "deprecated": null
+        },
+        {
+          "name": "side",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Side column of `layout=\"split\"`",
+          "deprecated": null
+        },
+        {
+          "name": "footer",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Footer, for \"View all\" or paging only; aligned to the end",
+          "deprecated": null
+        },
+        {
+          "name": "detail",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline expand content that opens in place inside the Section and pushes the content below it down",
+          "deprecated": null
+        },
+        {
+          "name": "detailTitle",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Title on the detail disclosure button; also names the detail region",
+          "deprecated": null
+        },
+        {
+          "name": "detailDescription",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Optional description on the detail disclosure button",
+          "deprecated": null
+        },
+        {
+          "name": "detailFooter",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Detail footer, such as \"Open full review\"",
+          "deprecated": null
+        },
+        {
+          "name": "detailOpen",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Controlled open state of the inline detail expand",
+          "deprecated": null
+        },
+        {
+          "name": "defaultDetailOpen",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Whether an uncontrolled inline detail expand starts open",
+          "deprecated": null
+        },
+        {
+          "name": "onDetailOpenChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with the next open boolean when the inline detail expand toggles",
+          "deprecated": null
+        },
+        {
+          "name": "level",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "page"
+          ],
+          "description": "`page` makes the title the page's h1 at Heading/large 24; by default it nests one level down",
+          "deprecated": null
+        },
+        {
+          "name": "spacing",
+          "type": "enum",
+          "required": false,
+          "default": "'default'",
+          "values": [
+            "default",
+            "compact",
+            "spacious"
+          ],
+          "description": "Space between the header, the body and the footer (Section/stack tokens); `default` is the Figma value",
+          "deprecated": null
+        },
+        {
+          "name": "named",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Makes the section a region named by its title, for a section that stands apart as a landmark",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "children",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Content slot; with `layout=\"split\"`, the main column",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "HeaderDefault",
+        "HeaderCustom",
+        "LayoutSingle",
+        "LayoutSplit",
+        "LayoutSubsections",
+        "SunkenCard",
+        "DetailIsSunkenCard",
+        "CardNesting",
+        "NoSurfaceNoPad",
+        "Footer",
+        "Anatomy",
+        "Levels",
+        "ToolbarSearch",
+        "LoadingDefault",
+        "LoadingToolbar",
+        "LoadingTabsOnly",
+        "Interactive",
+        "ColorModes",
+        "SplitLayout",
+        "Spacing",
+        "Detail",
+        "TypeList",
+        "TypeQueue",
+        "TypeCards",
+        "TypeStats",
+        "TypeDetails",
+        "TypeMainAndSide",
+        "TypeForm",
+        "TypeSubsections",
+        "Full",
+        "FiltersApplied",
+        "NoViews",
+        "ViewsOnly",
+        "ManyFilters",
+        "WrappedFilters",
+        "RowsSelected",
+        "Narrow",
+        "Subsection",
+        "SideAtEnd",
+        "FilterSideAtStart",
+        "ResponsiveWidth",
+        "EmptyInTable",
+        "AnatomyQueue"
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-sm",
+        "--card-stack-md",
+        "--control-md",
+        "--ds-icon-subtle",
+        "--ds-motion-appearance-fast",
+        "--ds-motion-appearance-fast-duration",
+        "--ds-motion-spatial-fast",
+        "--ds-motion-spatial-fast-duration",
+        "--ds-text",
+        "--ds-text-subtle",
+        "--grid-gutter",
+        "--heading-lg",
+        "--heading-lg-tracking",
+        "--heading-md",
+        "--heading-sm",
+        "--heading-xs",
+        "--inline-lg",
+        "--inline-md",
+        "--inline-sm",
+        "--section-min-width-main",
+        "--section-min-width-side",
+        "--section-stack-lg",
+        "--section-stack-md",
+        "--section-stack-sm",
+        "--section-toolbar-count-min-width",
+        "--section-toolbar-min-width",
+        "--stack-sm"
+      ],
+      "subComponents": [
+        {
+          "name": "Toolbar",
+          "impl": "SectionToolbar",
+          "deprecated": true,
+          "props": [
+            {
+              "name": "search",
+              "type": "node",
+              "required": false,
+              "default": null,
+              "description": "Search field slot, at the start"
+            },
+            {
+              "name": "filters",
+              "type": "node",
+              "required": false,
+              "default": null,
+              "description": "Filters slot: dropdown buttons"
+            },
+            {
+              "name": "count",
+              "type": "node",
+              "required": false,
+              "default": null,
+              "description": "Count in words, such as \"12 of 48 students\"; truncates first, and is announced politely when it changes"
+            },
+            {
+              "name": "actions",
+              "type": "node",
+              "required": false,
+              "default": null,
+              "description": "Actions slot, at the end"
+            },
+            {
+              "name": "className",
+              "type": "string",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "SectionMessage",
       "kind": "component",
       "import": "import { SectionMessage } from '@/components';",
@@ -14814,10 +14814,10 @@
     },
     {
       "name": "Table",
-      "kind": "pattern",
-      "import": "import { Table } from '@/patterns';",
-      "group": "patterns",
-      "source": "design-system/src/patterns/Table/Table.jsx",
+      "kind": "template",
+      "import": "import { Table } from '@/templates';",
+      "group": "templates",
+      "source": "design-system/src/templates/Table/Table.jsx",
       "summary": "Section header carries the title and the toolbar. Under the header come the table, then the footer (range, page size, Pagination), and the empty state box in place of both when there are no rows. Pass the table as `children` (a `StaticTable`, `DynamicTable` or `TreeTable`), or name a `kind` and pass its props as `tableProps`. Choose the kind by what people do with the rows: nesting is a Tree table; sort, filter, select, page, expand or row actions is a Dynamic table; otherwise it is a Static table. Every other prop goes to the Section (`title`, `description`, `actions`, `views`, `search`, `filters`).",
       "props": [
         {

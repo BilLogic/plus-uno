@@ -8,22 +8,22 @@
     {
       "id": "roster-page",
       "screen": "Student roster table view",
-      "template": "Page + PatternSection + Table",
-      "variant": "Page · Default / PatternSection · Default / Table · Dynamic table",
-      "page": "design-system/src/patterns/Table/index.md",
+      "template": "Page + Section + Table",
+      "variant": "Page · Default / Section · Default / Table · Dynamic table",
+      "page": "design-system/src/templates/Table/index.md",
       "section": "Anatomy",
       "pages": [
-        "design-system/src/patterns/Page/index.md",
-        "design-system/src/patterns/PatternSection/index.md",
-        "design-system/src/patterns/Table/index.md"
+        "design-system/src/templates/Page/index.md",
+        "design-system/src/templates/Section/index.md",
+        "design-system/src/templates/Table/index.md"
       ],
       "guides": ["page", "section", "table", "templates"],
       "scoring": "checker",
       "check": {
         "kind": "template",
-        "components": ["Page", "PatternSection", "Table"]
+        "components": ["Page", "Section", "Table"]
       },
-      "expectation": "Student roster built on Page, PatternSection, and Table with sortable Name and Last session columns."
+      "expectation": "Student roster built on Page, Section, and Table with sortable Name and Last session columns."
     }
   ],
   "patterns": [
@@ -82,7 +82,7 @@
         "kind": "no-bare-select-in-toolbar",
         "rejects": ["Select", "PopupSelect"]
       },
-      "expectation": "Counts against: placing a bare Select or PopupSelect in PatternSection's toolbar."
+      "expectation": "Counts against: placing a bare Select or PopupSelect in Section's toolbar."
     }
   ]
 }
