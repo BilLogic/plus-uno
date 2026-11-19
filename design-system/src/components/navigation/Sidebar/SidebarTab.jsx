@@ -6,7 +6,7 @@ import Icon from '../../images-and-icons/Icon';
 /**
  * SidebarTab Component
  *
- * One row of a side navigation, matching the BS4 Foundation `Sidebar Tab`
+ * One row of the Sidebar, matching the BS4 Foundation `Sidebar Tab`
  * (node 17118:127). A 32 row (`--control-md`) padded 12 at the sides, with
  * a 16 icon box and a Body/default 14/20 label that truncates.
  *
