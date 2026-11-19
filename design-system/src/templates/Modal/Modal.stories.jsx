@@ -911,7 +911,7 @@ export const FooterLeadingAction = {
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const tracks = footerTracks(footer);
         const [leading, secondary, primary] = [...footer.querySelectorAll('button')];
-        await expect(leading, 'leading action is danger').toHaveClass('plus-btn--danger');
+        await expect(leading, 'leading action is a danger link').toHaveClass('plus-btn--danger-link');
         await expect(leading, 'leading action hugs its label and takes no track').not.toHaveClass('plus-btn--fit-container');
         await expect(rect(leading).left, 'leading action hugs the left content edge').toBeCloseTo(tracks.box.left, 0);
         await expect(rect(secondary).left, 'first filled button sits in track 3').toBeCloseTo(tracks.track(3).left, 0);

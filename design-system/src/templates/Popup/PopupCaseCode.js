@@ -28,7 +28,18 @@ export const CODE = {
     AsWideAsTrigger: content('auto', wide(360)),
     NarrowerThanTrigger: content('3-col', wide(360)),
     AtCap: content('4-col', '<Button text="Notes" spacing="compact" />'),
-    WiderThanCap: content('auto', wide(480)),
+    LongReadInPopup: `<Popup
+    show
+    triggerType="manual"
+    width="4-col"
+    placement="bottom-start"
+    title="Session notes"
+    trigger={<Button text="Notes" spacing="compact" />}
+>
+    <p>Notes stay with the session. The tutor sees them first, and parents never see them.</p>
+    <p>Each note keeps the date it was written and who wrote it, so a later session can see what changed and why.</p>
+    <p>A note can be edited for a day after it is saved. After that it is locked, and a correction is a new note.</p>
+</Popup>`,
     OneFlatMenu: menu('bottom-start'),
     PopupBesidePopup: `<DropdownMenu
     isOpen

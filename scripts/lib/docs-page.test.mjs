@@ -129,6 +129,33 @@ test('a docs table becomes one text line per row', () => {
   assert.match(usage, /^### Width guidance$/m);
 });
 
+test('a Key states section keeps each example as a line, and other sections drop theirs', () => {
+  const page = readDocsPage(`<DocsTab tab="examples">
+
+## Types
+
+<ComponentExample of={S.One} title="One" description="Dropped here." />
+
+## Key states
+
+<ComponentExample of={S.Flipped} title="Flipped" description="With no room below, the layer opens above." />
+
+<ComponentExample of={S.Loading} title="Loading" description={<>One row: <DocsLink id="templates-panel">Loading</DocsLink>.</>} />
+
+## Sizes
+
+<ComponentExample of={S.Two} title="Two" description="Dropped too." />
+
+</DocsTab>
+`);
+  assert.equal(
+    sectionText(page, 'Key states'),
+    '- **Flipped.** With no room below, the layer opens above.\n\n- **Loading.** One row: Loading.',
+  );
+  assert.equal(sectionText(page, 'Types'), '');
+  assert.equal(sectionText(page, 'Sizes'), '');
+});
+
 test('a do/don\'t pair keeps its captions and drops its examples', () => {
   const [size] = readDocsPage(COMPONENT_PAGE).rules;
   assert.match(size.text, /^Do: Six columns for a short question\.$/m);

@@ -12,7 +12,7 @@ import { BAR_TOKEN, WINDOW_HEIGHT } from '@/storybook-docs/lib/multi-step-task.j
 import { computedShadow, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { FRAME_LAYOUT } from '../Frame/frameLayout';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
-import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { InAppFrame } from '@/storybook-docs/lib/template-demo.jsx';
 import { FormInPanel } from '@/storybook-docs/patterns/Forms/formHosts.jsx';
 import { DetailsFrame, DetailsPanel, FLOAT_STAGE, GoneFrame, InboxFrame, PanelFrame, SessionsBehind } from './panelDemo.jsx';
 import { MotionPreferenceContext } from '@/lib/motionPreference';

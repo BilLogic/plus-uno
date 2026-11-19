@@ -4,7 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { Button } from '@/components';
 import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid, expectReadOnly } from '../_internal/fieldStatePlays';
-import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
+import { DemoLabel } from '@/storybook-docs/lib/template-demo';
 import TextField from './TextField';
 import { iconClass } from '../../../lib/icon';
 

@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Button, DynamicTable, HeadingContextProvider, Popup, Select, StaticTable, Tooltip } from '@/components';
 import { Modal, Card, Section, PanelBody, PanelContainer, PanelHeader } from '@/templates';
-import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { InAppFrame } from '@/storybook-docs/lib/template-demo.jsx';
 import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
 import { Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
 import { Illustration } from '@/storybook-docs/illustrations/Illustration.jsx';

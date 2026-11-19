@@ -55,9 +55,20 @@ const PAINT = {
         ground: '--ds-background-discovery-bold', label: '--ds-text-inverse', icon: '--ds-icon-inverse',
         hovered: '--ds-background-discovery-bold-hovered', pressed: '--ds-background-discovery-bold-pressed',
     },
+    link: {
+        ground: '--ds-background-neutral-subtle', label: '--ds-link', icon: '--ds-icon-brand',
+        hovered: '--ds-background-neutral-subtle', pressed: '--ds-background-neutral-subtle',
+    },
+    'danger-link': {
+        ground: '--ds-background-neutral-subtle', label: '--ds-text-danger', icon: '--ds-icon-danger',
+        hovered: '--ds-background-neutral-subtle', pressed: '--ds-background-neutral-subtle',
+    },
 };
 
-const label = (appearance) => appearance === 'ai' ? 'Generate summary' : appearance.charAt(0).toUpperCase() + appearance.slice(1);
+/** The link appearances draw no fill: hovering underlines the label and pressing darkens it. */
+const LINK_PRESSED = { link: '--ds-link-pressed', 'danger-link': '--ds-text-danger-bolder' };
+
+const label = (appearance) => appearance === 'ai' ? 'Generate summary' : appearance === 'danger-link' ? 'Danger link' : appearance.charAt(0).toUpperCase() + appearance.slice(1);
 const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-xl) var(--inline-xl)', alignItems: 'center' };
 /** A hover or pressed read with the transition out of the way. */
 const settled = (button) => { button.style.transition = 'none'; };
@@ -365,6 +376,12 @@ export const Warning = { render: () => <Button appearance="warning" text="Remove
 /** The final confirmation of a destructive action. */
 export const Danger = { render: () => <Button appearance="danger" text="Delete session recording" /> };
 
+/** An action that leaves, such as Save and exit or Open profile. Brand-colored text with no fill. */
+export const Link = { render: () => <Button appearance="link" text="Save and exit" /> };
+
+/** A footer's leading destructive action, such as Delete or Discard. Danger-colored text with no fill. */
+export const DangerLink = { render: () => <Button appearance="danger-link" text="Delete draft" /> };
+
 /** The call to action for a new experience. */
 export const Discovery = { render: () => <Button appearance="discovery" text="Try the new schedule view" /> };
 
@@ -522,6 +539,32 @@ export const StateSteps = {
             await expect(read(button, ':hover'), `${appearance} hovered`).toBe(tokenColor(canvasElement, paint.hovered));
             await expect(read(button, ':active'), `${appearance} pressed`).toBe(tokenColor(canvasElement, paint.pressed));
         }
+    },
+};
+
+/** A link appearance keeps a clear ground in every state, underlines on hover and darkens its label on press. */
+export const LinkStates = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={row}>
+            <Button appearance="link" text="Link" />
+            <Button appearance="danger-link" text="Danger link" />
+            <Button appearance="link" text="Link disabled" isDisabled />
+        </div>
+    ),
+    play: async ({ canvas, canvasElement }) => {
+        for (const appearance of ['link', 'danger-link']) {
+            const button = canvas.getByRole('button', { name: label(appearance) });
+            settled(button);
+            await expect(getComputedStyle(button).textDecorationLine, `${appearance} rest`).toBe('none');
+            // Read inside the callback: the computed style is live, and the forced state is gone once it returns.
+            const hoveredLine = withForcedPseudo(button, ':hover', () => getComputedStyle(button).textDecorationLine);
+            await expect(hoveredLine, `${appearance} hovered underline`).toBe('underline');
+            await expect(withForcedPseudo(button, ':active', () => getComputedStyle(button).color), `${appearance} pressed label`).toBe(tokenColor(canvasElement, LINK_PRESSED[appearance]));
+        }
+        const disabled = canvas.getByRole('button', { name: 'Link disabled' });
+        await expect(getComputedStyle(disabled).backgroundColor, 'disabled keeps no fill').toBe('rgba(0, 0, 0, 0)');
+        await expect(getComputedStyle(disabled).color, 'disabled label').toBe(tokenColor(canvasElement, '--ds-text-disabled'));
     },
 };
 

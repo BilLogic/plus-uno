@@ -8,7 +8,7 @@ import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { Tooltip, Button, Popup, Link } from '@/components';
 import { Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
-import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
+import { DemoLabel } from '@/storybook-docs/lib/template-demo';
 import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
 
 export default {

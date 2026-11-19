@@ -4,7 +4,7 @@ import { Frame, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, Sectio
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { MultiStepTaskType, WINDOW_HEIGHT, stepItems } from '@/storybook-docs/lib/multi-step-task.jsx';
-import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { InAppFrame } from '@/storybook-docs/lib/template-demo.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 
 /**
@@ -15,7 +15,7 @@ import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 /** Save and exit as a link at the left edge; Back and the primary Next in tracks 3 and 4, on one 32 line. */
 export const BarInOrder = () => (
     <CaseSurface border="top" padding="sm">
-        <FooterActions leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="subtle" spacing="default" onClick={(event) => { event.preventDefault(); }} />}>
+        <FooterActions leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="link" spacing="default" onClick={(event) => { event.preventDefault(); }} />}>
             <Button text="Back" spacing="default" onClick={() => {}} />
             <Button text="Next" appearance="primary" spacing="default" onClick={() => {}} />
         </FooterActions>
@@ -25,7 +25,7 @@ export const BarInOrder = () => (
 /** Cancel repeated in the footer beside Save and exit: two ways out of one task. */
 export const BarScrambled = () => (
     <CaseSurface border="top" padding="sm">
-        <FooterActions leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="subtle" spacing="default" onClick={(event) => { event.preventDefault(); }} />}>
+        <FooterActions leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="link" spacing="default" onClick={(event) => { event.preventDefault(); }} />}>
             <Button text="Cancel" spacing="default" onClick={() => {}} />
             <Button text="Next" appearance="primary" spacing="default" onClick={() => {}} />
         </FooterActions>

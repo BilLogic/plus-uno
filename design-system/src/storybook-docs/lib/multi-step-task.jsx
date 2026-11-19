@@ -121,7 +121,7 @@ export const MultiStepTask = ({
                         <FooterActions
                             data-probe="bar-column"
                             style={{ inlineSize: '100%', maxInlineSize: 'var(--content-max-width-reading)', marginInline: 'auto' }}
-                            leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="subtle" spacing="default" onClick={(event) => { event.preventDefault(); onSaveAndExit?.(); }} />}
+                            leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="link" spacing="default" onClick={(event) => { event.preventDefault(); onSaveAndExit?.(); }} />}
                         >
                             <Button text="Back" spacing="default" isDisabled={at === 0} onClick={() => go(at - 1)} />
                             <Button text={last ? 'Finish' : 'Next'} spacing="default" appearance="primary" onClick={() => go(Math.min(at + 1, labels.length - 1))} />

@@ -4,7 +4,7 @@ import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import { expectInk, expectInsetRing } from '@/storybook-docs/lib/navigation-states.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Pagination from './Pagination';
-import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
+import { DemoLabel } from '@/storybook-docs/lib/template-demo';
 
 export default {
     title: 'Components/Navigation/Pagination',
