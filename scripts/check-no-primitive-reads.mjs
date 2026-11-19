@@ -2,12 +2,17 @@
  * `npm run check:no-primitive-reads` — the ratchet on components and patterns
  * reading a primitive (ADR-038): a component or pattern reads a tier
  * token (components, templates, semantics), never `--space-*`, `--radius-<n>`,
- * `--size-<n>` or `--stroke-<n>` directly. When no tier holds the value, the
+ * `--size-<n>` or `--stroke-<n>` directly. Stories, the docs figures and the
+ * docs styles feed Show code and the pages readers copy from, so they read
+ * a role token too; there the check counts the spacing and color primitives
+ * (`--space-<n>`, `--palette-*`) and is held at zero. When no tier holds the value, the
  * gap is named and a ladder row is added (`scripts/lib/tokens/plan.mjs`).
  *
  * WHAT IT READS. Every tracked `.scss .css .jsx .js` file under
- * `design-system/src/components` and `design-system/src/templates`, by
- * `git ls-files`; tests and stories are skipped.
+ * `design-system/src/components`, `design-system/src/templates`,
+ * `design-system/src/storybook-docs` and `design-system/src/styles`, by
+ * `git ls-files`; tests are skipped. The token definitions live in
+ * `design-system/src/tokens`, outside every root.
  *
  * WHAT IT COUNTS. `var(` uses of a primitive name, per file. A primitive is a
  * numbered step of the four scales in `_scales.scss`: `--space-<n>`,
@@ -30,14 +35,27 @@ import { varReferencePattern } from '../design-system/src/lib/tokens.mjs';
 export { REPO_ROOT };
 
 export const BASELINE = 'scripts/baselines/no-primitive-reads.json';
-export const SEARCH_ROOTS = ['design-system/src/components', 'design-system/src/templates'];
+export const SEARCH_ROOTS = [
+  'design-system/src/components',
+  'design-system/src/templates',
+  'design-system/src/storybook-docs',
+  'design-system/src/styles',
+];
 export const SEARCHED = /\.(scss|css|jsx|js)$/;
-const SKIPPED = /\.(test|stories)\.[cm]?[jt]sx?$/;
+const SKIPPED = /\.test\.[cm]?[jt]sx?$/;
+/** A story, or anything outside components and templates: the docs figures and styles. */
+const DOCS_FILE = /\.stories\.[cm]?[jt]sx?$|^design-system\/src\/(storybook-docs|styles)\//;
 
 const PRIMITIVE = /^--(space|radius|size|stroke|height|width|type-size)-\d+$/;
 
+/** The primitives a story or a docs file must not read: a spacing step or a palette color. */
+const DOCS_PRIMITIVE = /^--(?:space-\d+|palette-.+)$/;
+
 /** Whether a custom property name is a numbered primitive step. */
 export const isPrimitive = (name) => PRIMITIVE.test(name);
+
+/** Whether `name` is a primitive for this file: the whole set in a component, the spacing and palette in a story or docs file. */
+const isPrimitiveIn = (file, name) => (DOCS_FILE.test(file) ? DOCS_PRIMITIVE.test(name) : PRIMITIVE.test(name));
 
 /** Every tracked, searched file under the roots, read. */
 export function sourcesOf(repoRoot) {
@@ -62,7 +80,7 @@ export function measure(sources) {
     let count = 0;
     let line;
     text.split('\n').forEach((l, i) => {
-      const hits = [...l.matchAll(pattern)].filter(([, name]) => isPrimitive(name)).length;
+      const hits = [...l.matchAll(pattern)].filter(([, name]) => isPrimitiveIn(file, name)).length;
       if (hits) line ??= i + 1;
       count += hits;
     });
@@ -110,7 +128,7 @@ export function run({ repoRoot = REPO_ROOT, sources } = {}) {
 export function summary({ repoRoot = REPO_ROOT, sources } = {}) {
   const found = measure(sources ?? sourcesOf(repoRoot));
   const now = [...found.values()].reduce((sum, { count }) => sum + count, 0);
-  return `${now} primitive read(s) in ${found.size} component/pattern file(s)`;
+  return `${now} primitive read(s) in ${found.size} file(s)`;
 }
 
 function record() {
@@ -125,7 +143,7 @@ function record() {
     seed: {
       why:
         'Reads of a numbered primitive (--space-<n>, --radius-<n>, --size-<n>, --stroke-<n>, --height-<n>, --width-<n>, --type-size-<n>) in design-system/src/components and ' +
-        'design-system/src/templates, per file. The record only falls. Regenerate with `npm run check:no-primitive-reads -- --update`; never edit by hand.',
+        'design-system/src/templates, and of --space-<n> and --palette-* in their stories and in design-system/src/storybook-docs and design-system/src/styles (held at zero), per file. The record only falls. Regenerate with `npm run check:no-primitive-reads -- --update`; never edit by hand.',
     },
   });
   console.log(`[check-no-primitive-reads] baseline recorded: ${Object.keys(found).length} file(s)`);
