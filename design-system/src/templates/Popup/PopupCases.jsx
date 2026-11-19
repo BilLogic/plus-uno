@@ -14,8 +14,8 @@ const MENU_STAGE = 230; // docs-literal
 /** A trigger wider than the 3-col step (328 at the widest screen), so the width rules show. Docs geometry, px. */
 const WIDE_TRIGGER = 360; // docs-literal
 
-/** A trigger wider than the 4-col cap (432 at the widest screen). Docs geometry, px. */
-const WIDER_THAN_CAP_TRIGGER = 480; // docs-literal
+/** The height of the stage a long read has room in. Docs geometry, px. */
+const LONG_READ_STAGE = 330; // docs-literal
 
 const wideTrigger = (size, text) => <Button text={text} spacing="compact" style={{ inlineSize: size }} />;
 
@@ -115,10 +115,16 @@ export const AtCap = () => (
     </PopupStage>
 );
 
-/** A trigger wider than the cap carries an auto-width Popup past it. */
-export const WiderThanCap = () => (
-    <PopupStage height={MENU_STAGE}>
-        {(mount) => <Content mount={mount} width="auto" trigger={wideTrigger(WIDER_THAN_CAP_TRIGGER, 'Session notes')} />}
+/** A long read in a Popup: three paragraphs at the cap. */
+export const LongReadInPopup = () => (
+    <PopupStage height={LONG_READ_STAGE}>
+        {(mount) => (
+            <Popup show triggerType="manual" container={mount} width="4-col" placement="bottom-start" title="Session notes" trigger={<Button text="Notes" spacing="compact" />}>
+                <p style={{ margin: 0 }}>Notes stay with the session. The tutor sees them first, and parents never see them.</p>
+                <p style={{ margin: 0 }}>Each note keeps the date it was written and who wrote it, so a later session can see what changed and why.</p>
+                <p style={{ margin: 0 }}>A note can be edited for a day after it is saved. After that it is locked, and a correction is a new note.</p>
+            </Popup>
+        )}
     </PopupStage>
 );
 

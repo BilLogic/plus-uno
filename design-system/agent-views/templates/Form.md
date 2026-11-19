@@ -56,6 +56,18 @@ A stepped form on its own page is a multi-step task on Frame, with the form in t
 
 These examples show form states within each host. See each field's component page for its states.
 
+- **Field error on blur.** The field takes its error look and the message says how to fix it. It clears once the rule is met.
+
+- **Disabled with its reason.** A field waits on another on the same screen; the caption says what to do first. Save stays enabled and says what is missing when pressed: Disabled.
+
+- **Blocked submit.** The Modal stays open and marks the field with what to fix. Focus moves to the first bad field and the footer never moves. The Modal's single shake is Planned.
+
+- **The server says no.** A danger SectionMessage at the top of the form, plus the field errors the server sent back. Nothing shakes: Errors.
+
+- **Sending.** The only time a button disables: it swaps its label for a spinner in place and keeps its width. Discard stays live.
+
+- **Leaving with edits.** Close or Discard with unsaved work asks first, in the same Modal's confirm view. Back returns without losing anything typed.
+
 ## Sizes
 
 | Token | Value | Purpose |

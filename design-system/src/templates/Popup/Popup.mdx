@@ -18,6 +18,7 @@ import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 import {
     AsWideAsTrigger,
     AtCap,
+    LongReadInPopup,
     EndAligned,
     FieldsInModalCase,
     FormInPopupCase,
@@ -25,7 +26,6 @@ import {
     OneFlatMenu,
     PopupBesidePopup,
     StartAlignedAtEnd,
-    WiderThanCap,
 } from './PopupCases.jsx';
 
 <Meta title="Templates/Popup" tags={['manifest']} />
@@ -64,7 +64,7 @@ Each type composes the Popup component, which handles placement, outside clicks 
 <TypeCard of={PopupStories.TypeSelectList} to="#select-list" title="Select list" stage={480}>One list that applies as you pick: radios for one choice, checkboxes for several.</TypeCard>
 <TypeCard of={PopupStories.TypeContent} to="#content" title="Content" stage={480}>A preview or a short explanation. Anything wider is a Panel or a Modal.</TypeCard>
 <TypeCard of={PopupStories.TypeFilterMenu} to="#filter-menu" title="Filter menu" stage={480}>Two or three categories, held until Apply. Reset and Apply sit full bleed, half each.</TypeCard>
-<TypeCard of={PopupStories.TypeFilterMenuStacked} to="#filter-menu-stacked" title="Filter menu, stacked" stage={480}>Four or more categories, or long lists, stacked at 3-col up to 4-col. The categories scroll between the pinned header and footer.</TypeCard>
+<TypeCard of={PopupStories.TypeFilterMenuStacked} to="#filter-menu-stacked" title="Filter menu, stacked" stage={480}>Four or more categories, or long lists, stacked at 3-col, or 4-col when the options need it. The categories scroll between the pinned header and footer.</TypeCard>
 </TypeGrid>
 
 <ComponentExample of={PopupStories.TypeMenu} title="Menu" description="Actions from a More button, at auto width. Applies on pick." />
@@ -77,7 +77,7 @@ Each type composes the Popup component, which handles placement, outside clicks 
 
 <ComponentExample of={PopupStories.TypeFilterMenu} title="Filter menu" description="Two or three categories, held until Apply. Reset and Apply sit full bleed, half each." />
 
-<ComponentExample of={PopupStories.TypeFilterMenuStacked} title="Filter menu, stacked" description="Four or more categories, or long lists, stacked at 3-col up to 4-col. The categories scroll between the pinned header and footer." />
+<ComponentExample of={PopupStories.TypeFilterMenuStacked} title="Filter menu, stacked" description="Four or more categories, or long lists, stacked at 3-col, or 4-col when the options need it. The categories scroll between the pinned header and footer." />
 
 </div>
 
@@ -147,8 +147,8 @@ Aligned to the edge of the trigger on the side where it sits. A trigger at the s
 <tbody>
 <tr><td><code>auto</code> (default)</td><td>160 to 320</td><td>160 to 320</td><td>160 to 320</td><td>Menus and select lists; at least the trigger</td></tr>
 <tr><td>2-col <PlannedTag /></td><td>200 (floor)</td><td>200 (floor)</td><td>about 224</td><td>A short choice list, a small date or time picker</td></tr>
-<tr><td>3-col</td><td>200</td><td>264</td><td>328</td><td>A filter menu, the profile menu</td></tr>
-<tr><td>4-col</td><td>261</td><td>347</td><td>432</td><td>Content; the cap</td></tr>
+<tr><td>3-col</td><td>200</td><td>264</td><td>328</td><td>A filter menu; the profile menu once DropdownMenu takes a width <PlannedTag /></td></tr>
+<tr><td>4-col</td><td>261</td><td>347</td><td>432</td><td>Content, and a stacked filter menu whose options need it; the cap</td></tr>
 </tbody>
 </DocsTable>
 
@@ -200,7 +200,7 @@ Popup is the component: placement, offset, outside click and Escape. Each type i
 </thead>
 <tbody>
 <tr><td><code>trigger</code></td><td>The control it hangs off: an IconButton, a FilterButton, the labeled view trigger, the account row.</td></tr>
-<tr><td><code>placement</code></td><td><code>bottom-start</code> for a trigger at the start of a bar, <code>bottom-end</code> for one at the end. It flips when there is no room.</td></tr>
+<tr><td><code>placement</code></td><td><code>Popup</code> itself opens <code>top</code>. Under a bar, set <code>bottom-start</code> for a trigger at the start and <code>bottom-end</code> for one at the end; DropdownMenu and PopupSelect default to <code>bottom-start</code> and FilterMenu to <code>bottom-end</code>. It flips when there is no room.</td></tr>
 <tr><td><code>width</code></td><td><code>auto</code> (default) · <code>3-col</code> · <code>4-col</code>.</td></tr>
 <tr><td><code>width="2-col"</code> <PlannedTag /></td><td>Planned. The short-list step with a 200 floor.</td></tr>
 <tr><td><code>children</code></td><td>Menu rows, a list, filter categories, or a short aside.</td></tr>
@@ -233,8 +233,8 @@ Use a Popup for content anchored to a trigger that leaves on an outside click or
 <tbody>
 <tr><td>Menu</td><td>Choosing one action from a short list</td><td>auto</td><td>On pick</td></tr>
 <tr><td>Select list</td><td>One category, picked as you go; the view picker under page tabs</td><td>auto</td><td>As you pick</td></tr>
-<tr><td>Filter menu</td><td>Two or more categories applied together</td><td>3-col, stacked up to 4-col</td><td>On Apply</td></tr>
-<tr><td>Profile menu</td><td>The account row</td><td>3-col</td><td>On pick</td></tr>
+<tr><td>Filter menu</td><td>Two or more categories applied together</td><td>3-col; stacked, 3-col or 4-col</td><td>On Apply</td></tr>
+<tr><td>Profile menu</td><td>The account row</td><td>auto today, 3-col once DropdownMenu takes a width <PlannedTag /></td><td>On pick</td></tr>
 <tr><td>Content</td><td>A preview, a definition, a short explanation</td><td>4-col at most</td><td>—</td></tr>
 </tbody>
 </DocsTable>
@@ -286,19 +286,19 @@ It hugs the longest item. The width is set once, on open, so it holds still whil
     dontCaption="A menu narrower than the trigger it hangs off: the edges no longer line up."
 />
 
-### Cap a Popup at 4-col.
+### Cap a Popup at 4-col, and keep it a short aside.
 
 <RuleTag kind="review" />
 
-Anything wider is a Panel or a Modal. Anything with inputs the person must finish, steps or a long scroll belongs in a Modal.
+Anything wider or longer is a Panel or a Modal. Anything with inputs the person must finish, steps or a long scroll belongs in a Modal. An auto-width Popup grows past 320 only to match a trigger wider than 320, never for its content.
 
 <DoDontPair
     doExample={<AtCap />}
     doCode={CODE.AtCap}
-    doCaption="A content Popup at 4-col, the cap."
-    dontExample={<WiderThanCap />}
-    dontCode={CODE.WiderThanCap}
-    dontCaption="A Popup wider than 4-col: anything this wide is a Panel or a Modal."
+    doCaption="A content Popup at 4-col, the cap, holding a short explanation."
+    dontExample={<LongReadInPopup />}
+    dontCode={CODE.LongReadInPopup}
+    dontCaption="A long read in a Popup: anything this long is a Panel or a Modal."
 />
 
 ### Put fields the person must finish in a Modal.
@@ -368,7 +368,7 @@ When a list applies, and the words Reset and Reset filters: <DocsLink id="patter
 ## Accessibility
 
 - The trigger carries `aria-haspopup` and an `aria-expanded` that tracks the open state. A Filter icon's name says what is on: "Filters, 2 applied".
-- A menu moves focus to its first row; Up and Down move, and Escape closes and returns focus to the trigger. A content Popup is a popup, so focus stays where it was and Tab reaches what is inside.
+- A menu moves focus to its first row; Up and Down move, and Escape closes and returns focus to the trigger. A content Popup opened by a click or a key takes focus too: its first focusable element, or the popup itself when there is none. Tab reaches what is inside, and Escape or a click away returns focus to the trigger.
 - A select list is a listbox or a group of checkboxes, and the chosen state is announced. The labeled view trigger reads "Status, Upcoming".
 - In a filter menu, Reset and Apply are reachable after the categories. Apply announces the new count in words.
 - A "Loading options" row is announced once, and "Couldn't load options" offers a Retry button.
