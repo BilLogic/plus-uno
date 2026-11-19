@@ -160,7 +160,7 @@ test('get returns props, one section at a time, and the replacement for a retire
   const [card] = lookup.get(['PatternCard']).records;
   assert.match(card.a11y, /^## Accessibility/);
   assert.match(card.usage, /^## Usage/);
-  assert.equal(card.figma.sets[0].name, 'Pattern/Card');
+  assert.equal(card.figma.sets[0].name, 'Template/Card');
 
   const [alert] = lookup.get(['Alert']).records;
   assert.equal(alert.status, 'not-here');
@@ -218,7 +218,7 @@ test('guide answers pattern, template and foundation topics and situation aliase
     const g = lookup.guide(alias);
     assert.equal(g.path, 'design-system/src/patterns/PatternSection/index.md', alias);
     assert.equal(g.brief, true, `${alias} is brief by default`);
-    assert.match(g.text, /^# PatternSection\n/, alias);
+    assert.match(g.text, /^# Section\n/, alias);
     assert.match(g.text, /^## Sections$/m, alias);
   }
 
@@ -278,8 +278,8 @@ test('guide answers pattern, template and foundation topics and situation aliase
   }
 });
 
-test('get includes Governed by: Filtering on SearchField, FilterButton, FilterMenu, PopupSelect, Select and PatternSection', () => {
-  const names = ['SearchField', 'FilterButton', 'FilterMenu', 'PopupSelect', 'Select', 'PatternSection'];
+test('get includes Governed by: Filtering on SearchField, FilterButton, FilterMenu, PopupSelect, Select and Section', () => {
+  const names = ['SearchField', 'FilterButton', 'FilterMenu', 'PopupSelect', 'Select', 'Section', 'PatternSection'];
   const full = lookup.get(names);
   for (const r of full.records) {
     assert.match(r.text, /\*\*Governed by:\*\* Filtering \(`design-system\/agent-views\/patterns\/Filtering\.md`/, r.name);
@@ -346,7 +346,7 @@ test('get returns the generated doc byte for byte, for a component, a flat compo
   for (const [name, file] of [
     ['Dialog', 'design-system/src/components/messaging/Dialog/index.md'],
     ['Fieldset', 'design-system/src/components/forms-and-inputs/Fieldset.md'],
-    ['PatternCard', 'design-system/src/patterns/PatternCard/index.md'],
+    ['Card', 'design-system/src/patterns/PatternCard/index.md'],
   ]) {
     const result = lookup.get([name]);
     assert.equal(render('get', result), fs.readFileSync(path.join(REPO_ROOT, file), 'utf8'), name);

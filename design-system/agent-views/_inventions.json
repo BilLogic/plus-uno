@@ -70,10 +70,10 @@
     {
       "not": "Jumbotron",
       "use": [
-        "PatternSection",
+        "Section",
         "SectionMessage"
       ],
-      "why": "PatternSection at page level",
+      "why": "Section at page level",
       "retired": true
     },
     {

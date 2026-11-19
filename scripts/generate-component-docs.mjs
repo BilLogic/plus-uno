@@ -464,7 +464,7 @@ function patternEntries() {
 
 /**
  * The templates barrel's components. Each re-exports a pattern's component, so
- * it is built from that pattern's parsed source: `Section` is `PatternSection`.
+ * it is built from that pattern's parsed source (`Section` from the `PatternSection` folder).
  */
 function templateEntries() {
   const spec = '@/templates';
@@ -612,10 +612,10 @@ const renderOne = (facts) => {
   const alternatives = docs?.page?.alternatives?.map((a) => a.text.replace(/\s*\n\s*/g, ' ').trim()).filter(Boolean) ?? [];
   rendered.set(facts.name, { coverage: coverageOf(docs?.page), propCount: (facts.props ?? []).length, lead, alternatives });
 };
-// A template renamed from a pattern shares that pattern's source, and so its doc: the old name writes it until the contract step.
-const patternSources = new Set(manifest.components.filter((r) => r.kind === 'pattern').map((r) => r.source));
+// A template renamed from a pattern shares that pattern's source, and so its doc: the template's name writes it.
+const templateSources = new Set(manifest.components.filter((r) => r.kind === 'template').map((r) => r.source));
 for (const record of manifest.components) {
-  if (record.source && !(record.kind === 'template' && patternSources.has(record.source))) renderOne(componentFacts(manifest, record.name, aliasRows));
+  if (record.source && !(record.kind === 'pattern' && templateSources.has(record.source))) renderOne(componentFacts(manifest, record.name, aliasRows));
 }
 for (const [name, entry] of parsedByName) {
   if (rendered.has(name)) continue;

@@ -4,7 +4,7 @@
 
 > **CRITICAL**: Only use components and patterns listed here. If it's not listed, it DOES NOT EXIST.
 
-Mirrors `design-system/src/components/`. Import from the barrel: `import { Button } from '@/components';`. Templates import from `@/patterns` (§ Templates).
+Mirrors `design-system/src/components/`. Import from the barrel: `import { Button } from '@/components';`. Templates import from `@/templates` (§ Templates).
 
 This index is the existence list. Each entry links to its generated doc — props, variants, tokens touched — derived from source.
 
@@ -24,7 +24,7 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `NavPills` | `Tabs` |
 | `Badge` | `StatusTag`, `CountTag` (StatusTag for a state, CountTag for a number) |
 | `BadgeVariants` | `StatusTag`, `CountTag` |
-| `Jumbotron` | `PatternSection`, `SectionMessage` (PatternSection at page level) |
+| `Jumbotron` | `Section`, `SectionMessage` (Section at page level) |
 | `ListGroup` | `DropdownMenu`, `Table` |
 | `MediaObject` | `Avatar`, `Tile` |
 | `Navbar` | `Sidebar` (a Navigation component, used in Frame) |

@@ -68,8 +68,7 @@ export const TOOL_ORDER = ['ds_find', 'ds_get', 'ds_tokens', 'ds_guide', 'ds_che
 export const ORIENTATION = `PLUS design system: the React components, templates, patterns and tokens every PLUS prototype is built from. A name the lookup does not know does not exist here: propose it rather than write it.
 
 Barrels (import only from these):
-- ${BARRELS[1]}: the templates (Frame, which every full page starts from, Page, PatternSection, PatternCard, Table, overlays)
-- ${BARRELS[2]}: the same templates under their new names (Section for PatternSection, Card for PatternCard); the ${BARRELS[1]} names keep working
+- ${BARRELS[2]}: the templates (Frame, which every full page starts from, Page, Section, Card, Table, overlays)
 - ${BARRELS[0]}: the components (Button, TextField, SectionMessage...)
 
 Build in five stages:
@@ -225,7 +224,20 @@ const AGENT_VIEWS = 'design-system/agent-views';
 const PATTERNS_SRC = 'design-system/src/patterns';
 /** Templates a plain word of a query names: `card` was a not-here redirect to the card pattern before the template took the name. */
 const NAMED_BY_WORD = ['Card'];
-const TEMPLATE_COMPONENTS = ['Frame', 'Page', 'PatternSection', 'PatternCard', 'Table', 'Modal'];
+const TEMPLATE_COMPONENTS = ['Frame', 'Page', 'Section', 'Card', 'Table', 'Modal'];
+/**
+ * The name whose record owns a name's page and rendered text. A template owns its own; a pattern a template
+ * was renamed from reads through to that template; any other alias reads through to what it aliases.
+ */
+function homeNameOf(a, records) {
+  if (a.kind === 'template') return a.name;
+  if (a.kind === 'pattern' && a.source) {
+    const renamed = records.find((r) => r.kind === 'template' && r.source === a.source);
+    if (renamed) return renamed.name;
+  }
+  return a.aliasOf ?? a.name;
+}
+
 const readIf = (file) => (fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null);
 const firstSentence = (text, max = 160) => {
   if (!text) return null;
@@ -335,10 +347,11 @@ function scanTopics(root) {
     }
   }
   for (const sub of TEMPLATE_COMPONENTS) {
-    const rel = `${PATTERNS_SRC}/${sub}/index.md`;
-    if (!fs.existsSync(path.join(root, rel))) continue;
+    // A template's folder keeps its pattern name (`PatternSection/`) until the folders are renamed.
+    const rel = [sub, `Pattern${sub}`].map((dir) => `${PATTERNS_SRC}/${dir}/index.md`).find((file) => fs.existsSync(path.join(root, file)));
+    if (!rel) continue;
     const kebab = sub.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
-    const short = sub.replace(/^Pattern/, '').replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+    const short = kebab;
     if (short === 'page') {
       map['page-template'] ??= rel;
     } else {
@@ -389,10 +402,12 @@ export function buildDsIndex(root) {
   }
   const patternFigma = new Map();
   for (const [key, entry] of Object.entries(registry.patterns ?? {})) {
-    const name = `Pattern${key.replace(/^Pattern\//, '').replace(/\s+(\w)/g, (_, c) => c.toUpperCase())}`;
-    if (facts.lookup(name).status !== 'exists') continue;
-    figmaAliases.push({ alias: key, name });
-    patternFigma.set(name, { key, ...entry });
+    const bare = key.replace(/^(?:Template|Pattern)\//, '').replace(/\s+(\w)/g, (_, c) => c.toUpperCase());
+    // A set is named for its template; the pattern name it shipped under still answers until the old name is retired.
+    for (const name of [bare, `Pattern${bare}`].filter((n) => facts.lookup(n).status === 'exists')) {
+      figmaAliases.push({ alias: key, name });
+      patternFigma.set(name, { key, ...entry });
+    }
   }
 
   function figmaFor(name) {
@@ -418,8 +433,8 @@ export function buildDsIndex(root) {
 
   const entries = records.map((r) => {
     const a = facts.lookup(r.name);
-    const home = a.aliasOf ? facts.lookup(a.aliasOf) : a;
-    const homeName = a.aliasOf ?? a.name;
+    const homeName = homeNameOf(a, facts.manifests.components.components);
+    const home = homeName === a.name ? a : facts.lookup(homeName);
     const srcFile = home.source ?? a.source;
     const src = srcFile ? readIf(path.join(root, srcFile)) : null;
     const liveSummary = src && !['pattern', 'template'].includes(a.kind) ? (jsdocFor(src, implSymbol(src, homeName)) || null) : a.summary;
@@ -975,7 +990,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
       return { name: a.name, status: a.status, why: a.why, use: a.replacement.map(brief), next: 'Use the replacement: ds_get it for its props.' };
     }
     if (a.kind === 'prop') return { ...a, next: null };
-    const homeName = a.aliasOf ?? a.name;
+    const homeName = homeNameOf(a, records);
     const homeEntry = entriesByName.get(homeName);
     const record = {
       name: a.name,

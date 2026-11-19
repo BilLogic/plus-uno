@@ -81,7 +81,7 @@ The component (`@/components`) for the dialog panel itself: header (title, close
 _Avoid_: "PatternModal"
 
 **Modal**:
-The template (`@/patterns`) for content that takes over the screen until it is closed: a **Dialog** on the **Blanket** with modal behavior on Base UI (portal, focus trap, Escape, scroll lock). A follow-up decision swaps the same Modal's content for its confirm view, and one Modal is open at a time.
+The template (`@/templates`) for content that takes over the screen until it is closed: a **Dialog** on the **Blanket** with modal behavior on Base UI (portal, focus trap, Escape, scroll lock). A follow-up decision swaps the same Modal's content for its confirm view, and one Modal is open at a time.
 _Avoid_: "Modal dialog" for the template, "ModalDialog", "PatternModal", "popup" for a blocking dialog
 
 **Part**:
@@ -99,7 +99,7 @@ A component group name, identical in Figma pages, Storybook and code folders, su
 _Avoid_: "Actions", "group" for a category
 
 **Table**:
-The template (`@/patterns`) for how a table sits on a page: a **Section** whose header carries the title and toolbar, then one of the three table kinds, the footer (range, page size, Pagination) and the empty state box when there are no rows. It takes a `kind` (`static`, `dynamic` or `tree`) or the table itself, and holds the type guidance as its chooser. There is one Table template and three table components; the base table and its parts (`TableRow`, `TableCell`, `HeadCell`, `TableFooter`, `TableMessageRow`, `TableSummaryRow`, `TableBulkActions`) are shared by all three.
+The template (`@/templates`) for how a table sits on a page: a **Section** whose header carries the title and toolbar, then one of the three table kinds, the footer (range, page size, Pagination) and the empty state box when there are no rows. It takes a `kind` (`static`, `dynamic` or `tree`) or the table itself, and holds the type guidance as its chooser. There is one Table template and three table components; the base table and its parts (`TableRow`, `TableCell`, `HeadCell`, `TableFooter`, `TableMessageRow`, `TableSummaryRow`, `TableBulkActions`) are shared by all three.
 _Avoid_: "Table component" for the template, "table pattern"
 
 **Static table**:

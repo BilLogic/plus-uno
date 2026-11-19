@@ -80,7 +80,7 @@ spoken out loud.
 **The component page template.** Every component page has the same four faces, in this order:
 
 - **Examples:** one story per appearance, state and size, each as a `ComponentExample` (an h3 and a one-line description over the live canvas), then the interactive playground.
-- **Code:** generated. The import line (from the `@/components` barrel, `@/patterns` on a pattern page) and the props table, derived from the story meta, so neither is authored.
+- **Code:** generated. The import line (from the `@/components` barrel, `@/templates` on a template page) and the props table, derived from the story meta, so neither is authored.
 - **Usage:** the Usage spine below, with parts (anatomy and tokens) and content guidelines after its Usage section.
 - **Harness:** generated. The component's generated file, byte for byte — what agents read, with a raw-text view, Copy, and a "Report a problem" link that opens a GitHub issue. Author nothing for it: the page and the source are its inputs.
 

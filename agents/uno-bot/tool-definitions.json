@@ -165,7 +165,7 @@
       "properties": {
         "lookup": {
           "type": "string",
-          "description": "A design-system question: a name returns its full record — a component or pattern ('Card', 'card', 'PatternCard'), a prop ('Button.appearance', 'Button.appearance=primary') or a token ('--stack-md'); a task in words ('choose many options from a list') returns ranked matches; a token role ('stack') returns its tokens. When set, 'path' and 'search' are ignored."
+          "description": "A design-system question: a name returns its full record — a component or pattern ('Card', 'card'), a prop ('Button.appearance', 'Button.appearance=primary') or a token ('--stack-md'); a task in words ('choose many options from a list') returns ranked matches; a token role ('stack') returns its tokens. When set, 'path' and 'search' are ignored."
         },
         "section": {
           "type": "string",
@@ -182,7 +182,7 @@
         },
         "search": {
           "type": "string",
-          "description": "Code-search mode: find WHERE something lives in the repo (e.g. 'focus-ring', 'PatternSection') — returns matching file paths + github.com links to read or cite. When set, 'path' is ignored."
+          "description": "Code-search mode: find WHERE something lives in the repo (e.g. 'focus-ring', 'Section') — returns matching file paths + github.com links to read or cite. When set, 'path' is ignored."
         },
         "repo": {
           "type": "string",

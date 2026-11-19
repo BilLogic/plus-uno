@@ -93,9 +93,9 @@ test('a recording for something no longer mapped is stale, and says so', () => {
 test('patterns are mapped too, not only components', () => {
   const found = mappings({
     figmaFile: { fileKey: 'FILE' },
-    patterns: { 'Pattern/Card': { componentSetNodeId: '3:3' } },
+    patterns: { 'Template/Card': { componentSetNodeId: '3:3' } },
   });
-  assert.deepEqual(found.map((m) => m.component), ['pattern:Pattern/Card']);
+  assert.deepEqual(found.map((m) => m.component), ['pattern:Template/Card']);
   assert.equal(found[0].fileKey, 'FILE');
 });
 

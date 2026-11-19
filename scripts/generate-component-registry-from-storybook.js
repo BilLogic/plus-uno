@@ -5,10 +5,10 @@
  * Source of truth (components): each component's MDX file declares
  *   export const figmaMeta = { fileKey, props?, sets: [...] };
  *
- * Source of truth (patterns): design-system/figma/patterns.json. Patterns are
+ * Source of truth (patterns): design-system/figma/patterns.json. Templates are
  * the layout/composition layer — Figma component sets bound to a `size /
- * semantics` token family. PatternCard, PatternSection, and Table are exported from `@/patterns` (`design-system/src/patterns/index.js`),
- * while `Pattern/Surface container` has no standalone export; they live in their
+ * semantics` token family. Card, Section, and Table are exported from `@/templates` (`design-system/src/templates/index.js`),
+ * while `Template/Surface container` has no standalone export; they live in their
  * own registry section because their MDX files do not carry `figmaMeta`.
  *
  * This script scans both and emits a single generated artifact:
@@ -173,10 +173,10 @@ function buildRegistry(entries, patterns) {
     version: '1.1.0',
     generated: true,
     generatedBy: 'scripts/generate-component-registry-from-storybook.js',
-    note: 'DO NOT EDIT BY HAND. Components come from each component MDX `export const figmaMeta`; patterns come from design-system/figma/patterns.json. Run `npm run generate:component-registry` to regenerate.',
+    note: 'DO NOT EDIT BY HAND. Components come from each component MDX `export const figmaMeta`; templates come from design-system/figma/patterns.json. Run `npm run generate:component-registry` to regenerate.',
     figmaFile: CANONICAL_FILE,
     components,
-    // Layout/composition layer. PatternCard, PatternSection, and Table are exported from `@/patterns`, while Pattern/Surface container
+    // Layout/composition layer. Card, Section, and Table are exported from `@/templates`, while Template/Surface container
     // has no standalone component; kept separate from `components` because their
     // MDX files do not carry `figmaMeta`.
     patterns,

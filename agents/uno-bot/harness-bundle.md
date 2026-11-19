@@ -42,7 +42,7 @@ artifact once a persona or bot-skill budget is blown.
 
 ## Disclosed references
 
-These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 164,483 chars.**
+These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/generated/references.ts` — the map the `read_reference` tool serves — instead of the prompt. They cost the prompt nothing and load only on the turns whose pointer fires. **19 reference(s), 164,485 chars.**
 
 | Name | Doc | Chars |
 |------|-----|------:|
@@ -53,7 +53,7 @@ These docs declare `disclosure: reference` and ship in `agents/uno-bot/src/gener
 | `docs/connectors/notion/page-writing` | [`docs/connectors/notion/page-writing.md`](../../docs/connectors/notion/page-writing.md) | 6,695 |
 | `docs/connectors/slack/shapes` | [`docs/connectors/slack/shapes.md`](../../docs/connectors/slack/shapes.md) | 23,554 |
 | `docs/connectors/supabase/blueprint-schema` | [`docs/connectors/supabase/blueprint-schema.md`](../../docs/connectors/supabase/blueprint-schema.md) | 25,988 |
-| `docs/conventions/design-system-glossary` | [`docs/conventions/design-system-glossary.md`](../../docs/conventions/design-system-glossary.md) | 23,177 |
+| `docs/conventions/design-system-glossary` | [`docs/conventions/design-system-glossary.md`](../../docs/conventions/design-system-glossary.md) | 23,179 |
 | `docs/engineering/operations` | [`docs/engineering/operations.md`](../../docs/engineering/operations.md) | 7,535 |
 | `draft-a-prd` | [`agents/uno-bot/skills/draft-a-prd/SKILL.md`](../../agents/uno-bot/skills/draft-a-prd/SKILL.md) | 3,724 |
 | `ds-precedence` | [`agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md`](../../agents/uno-bot/scheduled-actions/ds-precedence/ACTION.md) | 2,262 |
@@ -2090,7 +2090,7 @@ The component (`@/components`) for the dialog panel itself: header (title, close
 _Avoid_: "PatternModal"
 
 **Modal**:
-The template (`@/patterns`) for content that takes over the screen until it is closed: a **Dialog** on the **Blanket** with modal behavior on Base UI (portal, focus trap, Escape, scroll lock). A follow-up decision swaps the same Modal's content for its confirm view, and one Modal is open at a time.
+The template (`@/templates`) for content that takes over the screen until it is closed: a **Dialog** on the **Blanket** with modal behavior on Base UI (portal, focus trap, Escape, scroll lock). A follow-up decision swaps the same Modal's content for its confirm view, and one Modal is open at a time.
 _Avoid_: "Modal dialog" for the template, "ModalDialog", "PatternModal", "popup" for a blocking dialog
 
 **Part**:
@@ -2108,7 +2108,7 @@ A component group name, identical in Figma pages, Storybook and code folders, su
 _Avoid_: "Actions", "group" for a category
 
 **Table**:
-The template (`@/patterns`) for how a table sits on a page: a **Section** whose header carries the title and toolbar, then one of the three table kinds, the footer (range, page size, Pagination) and the empty state box when there are no rows. It takes a `kind` (`static`, `dynamic` or `tree`) or the table itself, and holds the type guidance as its chooser. There is one Table template and three table components; the base table and its parts (`TableRow`, `TableCell`, `HeadCell`, `TableFooter`, `TableMessageRow`, `TableSummaryRow`, `TableBulkActions`) are shared by all three.
+The template (`@/templates`) for how a table sits on a page: a **Section** whose header carries the title and toolbar, then one of the three table kinds, the footer (range, page size, Pagination) and the empty state box when there are no rows. It takes a `kind` (`static`, `dynamic` or `tree`) or the table itself, and holds the type guidance as its chooser. There is one Table template and three table components; the base table and its parts (`TableRow`, `TableCell`, `HeadCell`, `TableFooter`, `TableMessageRow`, `TableSummaryRow`, `TableBulkActions`) are shared by all three.
 _Avoid_: "Table component" for the template, "table pattern"
 
 **Static table**:

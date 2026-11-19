@@ -48,12 +48,12 @@ const MARKUP = /\.html$/;
  * Specifiers that are a public barrel: the components and the patterns. The
  * capture is the barrel's canonical `@/` name, whichever alias wrote it.
  */
-const BARREL = /^(?:@|@plus-ds)\/(components|patterns)\/?$/;
+const BARREL = /^(?:@|@plus-ds)\/(components|patterns|templates)\/?$/;
 const barrelOf = (source) => `@/${source.match(BARREL)[1]}`;
 /** The barrel a manifest record imports from: its import line's specifier, or `@/components`. */
 const homeOf = (record) => record.import?.match(/from '([^']+)'/)?.[1] ?? '@/components';
 /** Specifiers that reach past a barrel into design-system source. */
-const DEEP = /^(?:@|@plus-ds)\/(?:components|patterns|dataviz)\/.+|(?:^|\/)design-system\/(?:src\/)?components(?:\/|$)|(?:^|\/)design-system\/src\//;
+const DEEP = /^(?:@|@plus-ds)\/(?:components|patterns|templates|dataviz)\/.+|(?:^|\/)design-system\/(?:src\/)?components(?:\/|$)|(?:^|\/)design-system\/src\//;
 
 /**
  * Props every component takes without declaring them: React's own, and the
@@ -390,7 +390,7 @@ function rawControlEscapes(imports, elements, add) {
         'ds/no-raw-control',
         el.index + 1,
         'click handler on a raw `<div>` is not an accessible control',
-        'use `Button`, `IconButton`, `PatternCard` (with `onClick`), or a Base UI part (`@base-ui/react`)',
+        'use `Button`, `IconButton`, `Card` (with `onClick`), or a Base UI part (`@base-ui/react`)',
       );
     }
   }
@@ -763,7 +763,7 @@ function pageEscapes(text, add, story = false) {
       'ds/page-starts-from-pattern',
       root.index,
       `the page's outer element is a hand-styled \`<${root.name}>\`, not a template`,
-      "start the page from a template: `Frame` with the PLUS `Sidebar` (import { Frame } from '@/patterns'), or `Page` or `PatternCard` (@/patterns)",
+      "start the page from a template: `Frame` with the PLUS `Sidebar` (import { Frame } from '@/templates'), or `Page` or `Card` (@/templates)",
     );
   }
 }

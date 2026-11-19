@@ -1,6 +1,6 @@
 // A prototype that stays inside the design system.
 import { Button, SectionMessage } from '@/components';
-import { Frame } from '@/patterns';
+import { Frame } from '@/templates';
 import './App.scss';
 
 export default function App() {

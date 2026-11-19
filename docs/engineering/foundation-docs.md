@@ -58,7 +58,7 @@ Collections prefixed `archived / ` and rows prefixed `Deprecated/` are legacy an
 ## Type
 
 - `npm run check:font-size-literals` holds components and patterns to text-style tokens.
-- `PatternSection` takes its heading level from `@/lib/headingLevel`; PatternCard's title type comes from the one mixin `card-title-type` in `design-system/src/styles/_card-title.scss`.
+- `Section` takes its heading level from `@/lib/headingLevel`; Card's title type comes from the one mixin `card-title-type` in `design-system/src/styles/_card-title.scss`.
 - A weighted label and a code sample bind their type variables directly in Figma: `design-system/guidelines/figma/token-mapping.md` § Text that carries no style.
 
 ## Accessibility checks

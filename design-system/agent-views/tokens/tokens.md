@@ -68,22 +68,22 @@ Space owned by a template: page, section, card, table, modal, popup. Inside a te
 --blanket-max-height-modal  /* Tallest a Modal may grow inside its Blanket. */
 --blanket-pad-x  /* Horizontal space between the screen edge and a Modal on its Blanket. */
 --blanket-pad-y  /* Vertical space between the screen edge and a Modal on its Blanket; shrinks on short screens. */
---card-border-default  /* Border color of a default PatternCard. */
---card-border-width  /* Border width on every PatternCard (transparent on sunken and raised so forced colors draw an edge). */
---card-description-font  /* Description font of a PatternCard. */
---card-pad  /* Padding inside a PatternCard at every size. */
---card-radius  /* Corner rounding of a PatternCard. */
---card-shadow-overlay  /* Shadow of a dragged PatternCard, and of a clickable raised card on hover. */
---card-shadow-raised  /* Shadow of a raised PatternCard, of a clickable sunken or default card on hover, and when pressed. */
---card-surface-default  /* Surface fill of a default PatternCard. */
---card-surface-overlay  /* Surface fill of a PatternCard while dragged. */
---card-surface-raised  /* Surface fill of a raised PatternCard, and of a clickable card on hover. */
---card-surface-raised-hovered  /* Surface fill of a clickable raised PatternCard while hovered. */
---card-surface-raised-pressed  /* Surface fill of a clickable PatternCard while pressed. */
---card-surface-sunken  /* Surface fill of a sunken PatternCard (the default). */
---card-text  /* Primary text color inside a PatternCard. */
---card-text-subtle  /* Secondary description text color inside a PatternCard. */
---card-title-font-lg  /* Title font of a PatternCard with a half-width side image. */
+--card-border-default  /* Border color of a default Card. */
+--card-border-width  /* Border width on every Card (transparent on sunken and raised so forced colors draw an edge). */
+--card-description-font  /* Description font of a Card. */
+--card-pad  /* Padding inside a Card at every size. */
+--card-radius  /* Corner rounding of a Card. */
+--card-shadow-overlay  /* Shadow of a dragged Card, and of a clickable raised card on hover. */
+--card-shadow-raised  /* Shadow of a raised Card, of a clickable sunken or default card on hover, and when pressed. */
+--card-surface-default  /* Surface fill of a default Card. */
+--card-surface-overlay  /* Surface fill of a Card while dragged. */
+--card-surface-raised  /* Surface fill of a raised Card, and of a clickable card on hover. */
+--card-surface-raised-hovered  /* Surface fill of a clickable raised Card while hovered. */
+--card-surface-raised-pressed  /* Surface fill of a clickable Card while pressed. */
+--card-surface-sunken  /* Surface fill of a sunken Card (the default). */
+--card-text  /* Primary text color inside a Card. */
+--card-text-subtle  /* Secondary description text color inside a Card. */
+--card-title-font-lg  /* Title font of a Card with a half-width side image. */
 --frame-sidebar-group-gap  /* Vertical gap between two groups of rows in the Sidebar. */
 --frame-sidebar-pad  /* Padding on every side inside the Sidebar. */
 --frame-sidebar-row-gap  /* Vertical gap between two rows in the Sidebar. */
@@ -111,8 +111,8 @@ Space owned by a template: page, section, card, table, modal, popup. Inside a te
 --popup-radius  /* Corner rounding of a Popup. */
 --popup-width-3-col  /* Width of a 3-column Popup, such as a short picker. */
 --popup-width-4-col  /* Width of a 4-column Popup, such as a date picker or a menu with descriptions. */
---section-toolbar-count-min-width  /* Minimum width of the result count in a PatternSection toolbar before it truncates. */
---section-toolbar-min-width  /* Minimum width of the start group in a PatternSection toolbar before its controls wrap. */
+--section-toolbar-count-min-width  /* Minimum width of the result count in a Section toolbar before it truncates. */
+--section-toolbar-min-width  /* Minimum width of the start group in a Section toolbar before its controls wrap. */
 --table-empty-radius  /* Corner rounding of the empty state box that replaces an empty table. */
 --table-empty-surface  /* Surface of the empty state box that replaces an empty table. */
 --table-footer-height  /* Height of a table footer row: the range, the page-size Select and Pagination on one line. */
@@ -371,18 +371,18 @@ The Size and Border scales (spacing / foundations): heights, widths, and the Ico
 The templates on the page frame, per breakpoint: page, section, card, table, overlay, modal, popup.
 
 ```css
---card-inline-lg  /* Horizontal gap between columns inside a PatternCard. */
---card-inline-md  /* Horizontal gap between items in a PatternCard row, such as actions. */
---card-inline-sm  /* Horizontal gap between small items in a PatternCard row, such as tags. */
---card-max-height-lg  /* Tallest a tall scrolling PatternCard may grow. */
---card-max-height-md  /* Tallest a default scrolling PatternCard may grow. */
---card-max-height-sm  /* Tallest a short scrolling PatternCard may grow. */
---card-min-width-lg  /* Narrowest a large PatternCard may shrink in a grid. */
---card-min-width-md  /* Narrowest a default PatternCard may shrink in a grid. */
---card-min-width-sm  /* Narrowest a small PatternCard may shrink in a grid. */
---card-stack-lg  /* Vertical gap between a PatternCard's header, body and footer. */
---card-stack-md  /* Vertical gap between blocks in a PatternCard. */
---card-stack-sm  /* Vertical gap between tightly related lines in a PatternCard, such as a title and its meta. */
+--card-inline-lg  /* Horizontal gap between columns inside a Card. */
+--card-inline-md  /* Horizontal gap between items in a Card row, such as actions. */
+--card-inline-sm  /* Horizontal gap between small items in a Card row, such as tags. */
+--card-max-height-lg  /* Tallest a tall scrolling Card may grow. */
+--card-max-height-md  /* Tallest a default scrolling Card may grow. */
+--card-max-height-sm  /* Tallest a short scrolling Card may grow. */
+--card-min-width-lg  /* Narrowest a large Card may shrink in a grid. */
+--card-min-width-md  /* Narrowest a default Card may shrink in a grid. */
+--card-min-width-sm  /* Narrowest a small Card may shrink in a grid. */
+--card-stack-lg  /* Vertical gap between a Card's header, body and footer. */
+--card-stack-md  /* Vertical gap between blocks in a Card. */
+--card-stack-sm  /* Vertical gap between tightly related lines in a Card, such as a title and its meta. */
 --dropdown-menu-max-height  /* Tallest a DropdownMenu or listbox may grow before it scrolls. */
 --dropdown-menu-max-width  /* Widest a DropdownMenu or listbox may grow. */
 --dropdown-menu-min-width  /* Narrowest a DropdownMenu or listbox may shrink. */
@@ -411,10 +411,10 @@ The templates on the page frame, per breakpoint: page, section, card, table, ove
 --popup-width-lg  /* Width of a large Popup. */
 --popup-width-md  /* Width of a default Popup. */
 --popup-width-sm  /* Width of a small Popup. */
---section-min-width-main  /* Narrowest the main column of a two-column PatternSection may shrink. */
---section-min-width-side  /* Narrowest the side column of a two-column PatternSection may shrink. */
---section-stack-lg  /* Vertical gap between groups of blocks inside a PatternSection. */
---section-stack-md  /* Vertical gap between blocks inside a PatternSection. */
+--section-min-width-main  /* Narrowest the main column of a two-column Section may shrink. */
+--section-min-width-side  /* Narrowest the side column of a two-column Section may shrink. */
+--section-stack-lg  /* Vertical gap between groups of blocks inside a Section. */
+--section-stack-md  /* Vertical gap between blocks inside a Section. */
 --section-stack-sm  /* Vertical gap between a section header and its content. */
 --table-indent  /* Indent of each nested level in a tree table. */
 --table-min-width-title  /* Narrowest a table's title column may shrink. */

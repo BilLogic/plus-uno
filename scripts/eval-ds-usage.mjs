@@ -895,7 +895,7 @@ export function structuralFit({ folder, expected, repoRoot = REPO_ROOT }) {
       const owner = check.owner;
       const prop = check.prop;
       const hasSlot = elements.some((el) => el.name === owner && el.attributes.some((a) => a.name === prop))
-        || (owner === 'PatternSection' && prop === 'toolbar' && elements.some((el) => el.name === 'PatternSection.Toolbar' || el.name === 'SectionToolbar'))
+        || ((owner === 'Section' || owner === 'PatternSection') && prop === 'toolbar' && elements.some((el) => el.name === 'Section.Toolbar' || el.name === 'PatternSection.Toolbar' || el.name === 'SectionToolbar'))
         || (owner === 'Frame' && prop === 'panel' && files.some((f) => /\busePanelControl\b/.test(f.text)));
       const comps = check.components ?? [];
       const hasComp = !comps.length || comps.some((c) => names.has(c));

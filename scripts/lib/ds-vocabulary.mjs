@@ -17,8 +17,8 @@
  * heading are read for aliases.
  *
  * A TERM MAPS TO ITS COMPONENT BY NAME. "Section message" is `SectionMessage`;
- * a pattern term with no component of its own name maps to its `Pattern` name
- * ("Card" is `PatternCard`). A term with neither (a prop, a token tier, "Close /
+ * a template term maps to the template of that name
+ * ("Card" is the `Card` template). A term with neither (a prop, a token tier, "Close /
  * Dismiss") is reported as unmatched and feeds nothing.
  *
  * A WORD AVOIDED "AS A NAME" IS PLAIN. `"region" as a name` is ordinary

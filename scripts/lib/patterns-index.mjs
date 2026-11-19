@@ -4,7 +4,7 @@
  *
  * Agents read the component index as the existence list, so a pattern missing
  * from it reads as missing from the system: the ds-usage eval's agents wrote
- * "no design-system Card exists" while `PatternCard` shipped, and hand-made
+ * "no design-system Card exists" while the `Card` template shipped, and hand-made
  * their page shells. The list keeps only what source cannot say: the group a
  * pattern is filed under and when to reach for it. Its import line and its
  * Storybook page come from the facts (`scripts/lib/ds-facts.mjs`), which read
