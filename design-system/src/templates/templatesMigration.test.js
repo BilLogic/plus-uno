@@ -11,7 +11,7 @@ import { loadRetirement } from '../../../scripts/lib/retirement.mjs';
 const ROOT = execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim();
 const retirement = loadRetirement(ROOT);
 const OLD_NAMES = new RegExp(`(?<![/\\w])(?:${retirement.ofKind('tag').filter((r) => r.not.startsWith('Pattern')).map((r) => r.not).join('|')})(?![/\\w])`);
-const OLD_BARREL_ROW = retirement.ofKind('spelling').find((r) => r.use.includes('@/templates'));
+const OLD_BARREL_ROW = retirement.ofKind('spelling').find((r) => r.not === `@/${'patterns'}`);
 const saysOldBarrel = (text) => retirement.findIn(text, { kinds: ['spelling'] }).some((hit) => hit.row.not === OLD_BARREL_ROW.not);
 const ROOTS = ['design-system/src', 'design-system/tests', 'design-system/guidelines', '.storybook'];
 

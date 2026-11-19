@@ -27,7 +27,8 @@
  *                    (the list's word row of that rule).
  *   component:<Name> JSX tags `<Name` plus import statements binding `Name`,
  *                    for the retired names: the list's component rows marked `retired`.
- *   prop:style|fill|size   lines with the retired prop values: `style="primary"`
+ *   prop:style|fill|size   lines with the retired prop values (the list's spelling rows of
+ *                    those rules, not Not-here rows: a value is retired in one position): `style="primary"`
  *                    (a bare identifier, which no inline CSS is), `fill="filled"`,
  *                    `size="small|medium|large|sm|md|lg"`. A `<Heading>`'s size is the type
  *                    scale (`xxl|xl|lg|md|sm|xs|xxs`), so those token names are allowed on
@@ -95,21 +96,25 @@ const TAG_NAMES = RETIREMENT.ofKind('tag').map((r) => r.not);
 export const RENAMED_NO_ALIAS = Object.fromEntries(RETIREMENT.ofKind('component').filter((r) => r.inProse).map((r) => [r.not, r.use[0]]));
 /** Where doc prose is checked for a stale renamed-away name — component docs, not specs or prototypes. */
 const DOC_PATH = /^design-system\/src\/components\/.*\.mdx$/;
-const LINE_RULES = [
-  ['prop:style', /\bstyle="[a-z][a-z-]*"/],
-  ['prop:fill', /\bfill="(?:filled|tonal|outline|ghost|text)"/],
-  ['prop:size', /\bsize="(?:small|medium|large|sm|md|lg)"/],
-  ['proptype:size', /\bsize:\s*(?:PropTypes\.)?oneOf\(\s*\[\s*['"](?:small|medium|large|sm|md|lg)['"]/],
-  ['class:plus-btn', /plus-btn--(?:filled|tonal|outline|ghost|text|small|medium|large)/],
-];
+/**
+ * The retired prop values and class modifiers: the list's spelling rows whose
+ * rule is `prop:`, `proptype:` or `class:`. They are spellings, not Not-here
+ * table rows, because a value is only retired in one position (`style="primary"`
+ * is a prop, inline CSS is not). What stays below is structure: which tag owns
+ * an attribute, and that a type-scale tag takes `xxl` to `xxs`.
+ */
+const PROP_ROWS = RETIREMENT.ofKind('spelling').filter((r) => /^(?:prop|proptype|class):/.test(r.rule ?? ''));
+const LINE_RULES = PROP_ROWS.filter((r) => !r.typeScale).map((r) => [r.rule, new RegExp(r.pattern)]);
+const CONTROL_SIZE = new RegExp(PROP_ROWS.find((r) => r.rule === 'prop:size' && !r.typeScale).pattern, 'g');
+const CONTROL_SIZES = CONTROL_SIZE.source.match(/\(([^)]+)\)/)[1];
 
 /**
  * Components whose `size` is the type scale (`xxl|xl|lg|md|sm|xs|xxs`), not
- * the retired `small | medium | large | sm | md | lg` control sizes.
+ * the retired control sizes.
  */
 const TYPE_SCALE_TAGS = new Set(['Heading']);
 const TYPE_SCALE_TOKENS = new Set(['xxl', 'xl', 'lg', 'md', 'sm', 'xs', 'xxs']);
-const TYPE_SCALE_OLD_SIZE = /\bsize="(?:xxlarge|xlarge|large|medium|small|xsmall|xxsmall)"/g;
+const TYPE_SCALE_OLD_SIZE = new RegExp(PROP_ROWS.find((r) => r.typeScale).pattern, 'g');
 
 /** Find the nearest `<Tag` before `index` on line `i` that no `>` has closed yet. */
 function tagOwner(lines, i, index) {
@@ -131,7 +136,7 @@ function typeScaleSize(lines, i) {
     TYPE_SCALE_TAGS.has(tagOwner(lines, i, m.index)),
   );
   if (oldOnTypeScale) return false;
-  const bad = [...line.matchAll(/\bsize="(small|medium|large|sm|md|lg)"/g)];
+  const bad = [...line.matchAll(CONTROL_SIZE)];
   return (
     bad.length > 0 &&
     bad.every((m) => TYPE_SCALE_TAGS.has(tagOwner(lines, i, m.index)) && TYPE_SCALE_TOKENS.has(m[1]))
@@ -199,7 +204,7 @@ export function measure(sources) {
     }
     // `size: PropTypes.oneOf(SIZES)` with `const SIZES = ['sm', ...]` in the same file.
     const constSize = text.match(/\bsize:\s*(?:PropTypes\.)?oneOf\(\s*([A-Z_]+)\s*\)/);
-    if (constSize && new RegExp(`const\\s+${constSize[1]}\\s*=\\s*\\[\\s*['"](?:small|medium|large|sm|md|lg)['"]`).test(text)) {
+    if (constSize && new RegExp(`const\\s+${constSize[1]}\\s*=\\s*\\[\\s*['"](?:${CONTROL_SIZES})['"]`).test(text)) {
       const line = live.findIndex((l) => constSize[0] && l.includes(constSize[0])) + 1;
       add('proptype:size', file, 1, line || 1);
     }

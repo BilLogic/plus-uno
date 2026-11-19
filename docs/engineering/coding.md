@@ -143,19 +143,17 @@ rename that reached `AGENTS.md` and stopped there.
 
 ### Retiring a name
 
-When a name is retired, every use is replaced in the same change; there is no
-deprecation window and no alias left behind. The retirement list
-(`design-system/agent-views/_inventions.json`, read through
-`scripts/lib/retirement.mjs`) only stops the name from coming back: the row
-you add is what every check reads, and each one fails on a use outside the
-list's allowed places. It is the last step of the sweep, not a plan to
-sweep later.
+The target is that every use of a retired name is replaced in the same change.
+The retirement list (`design-system/agent-views/_inventions.json`, read through
+`scripts/lib/retirement.mjs`) then only stops the name from coming back: the
+row you add is what every check reads, and each one fails on a use outside the
+list's allowed places. Adding the row is the last step of the sweep.
 
 A rename too big for one PR is split by folder (stories, docs, components) and
 finished as one batch: every PR of the batch lands before the row does, and
-none leaves the old name half-replaced on `main`. The gap-token sweep went
-this way, one folder per PR, all merged together. A new check or a new row
-that fails on `main` means the sweep is not done.
+`main` holds each name fully replaced at every merge. The gap-token sweep went this
+way, one folder per PR, all merged together. A new row that fails on `main`
+shows a sweep still unfinished.
 
 ## Known gotchas
 

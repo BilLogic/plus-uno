@@ -68,9 +68,12 @@ test('every provider-sense phrase is caught, with its why', () => {
     'a surface rule that must hold on every model lane belongs in the renderer',
     'capabilities differ by provider lane (see the table above)',
     'both agent lanes log `mcp=off`',
+    'on the production lane the harness rides uncached',
+    'Judge on the active lane, defaulting to Gemini',
     'the gemini-2.5-pro fallback lane',
     'Both lanes run the same agent loop',
     'Two provider lanes run the SAME local tool roster',
+    'On either lane a turn runs at one of three tiers',
   ];
   // Every line must be caught; a line may match more than one shape (a "both
   // agent lanes" is two), so this asserts coverage per line rather than a count.
@@ -87,6 +90,12 @@ test('every provider-sense phrase is caught, with its why', () => {
 test('the list is the one reading of "lane": an actor row passes, a provider phrase fails', () => {
   assert.deepEqual(findingsIn('an agent lane in the blueprint, and each lane is an actor row', 'docs/x.md'), []);
   assert.equal(findingsIn('the Gemini lane stalled', 'docs/x.md').length, 1);
+});
+
+test('a retired spelling is matched in its own case: lowercase prose passes', () => {
+  assert.deepEqual(findingsIn('quiet by default is a fair thing to want, and a tier 1 fix is lowercase prose', 'docs/x.md'), []);
+  assert.equal(findingsIn('the principle "Quiet by default"', 'docs/x.md').length, 1);
+  assert.equal(findingsIn('a Tier 1 fix', 'docs/x.md').length, 1);
 });
 
 test('a reintroduced provider-sense "lane" fails the live sweep', () => {

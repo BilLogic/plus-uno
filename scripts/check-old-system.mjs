@@ -48,10 +48,12 @@ const RETIREMENT = loadRetirement(REPO_ROOT);
 /** The family a retired token belongs to when its row names none: the ladder retired size and spacing names. */
 const TOKEN_FAMILY = 'size';
 const familyOf = (row) => row.rule ?? TOKEN_FAMILY;
+/** A family row names a plain rule (`color`); a `kind:name` rule is the language check's. */
+const isFamily = (row) => row.rule && !row.rule.includes(':');
 
 /** One row per old family, from the list: its name and what to use instead. */
 export const FAMILIES = RETIREMENT.ofKind('spelling')
-  .filter((row) => row.rule && row.rule !== 'state-step')
+  .filter(isFamily)
   .map((row) => ({ name: row.rule, remedy: row.why }));
 
 /**
@@ -66,7 +68,7 @@ export function measure(sources) {
     if (RETIREMENT.allowed(file, 'token')) continue;
     const families = new Map();
     for (const { row, index } of RETIREMENT.findIn(text, { kinds: ['spelling', 'token'], retiredOnly: true, file })) {
-      if (row.kind === 'spelling' && !row.rule) continue; // another check's spelling
+      if (row.kind === 'spelling' && !isFamily(row)) continue; // another check's spelling
       const lines = families.get(familyOf(row)) ?? new Set();
       lines.add(text.slice(0, index).split('\n').length);
       families.set(familyOf(row), lines);

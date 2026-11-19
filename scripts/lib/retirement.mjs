@@ -19,7 +19,7 @@
  * The components index's Not-here table is rendered from the same rows
  * (`notHereTable`). `findIn(text)` scans prose with one rule for every kind;
  * `ofKind(kind)` lists the rows of one kind for a check that counts by shape
- * (a JSX tag, an import), and `renames()` is the token plan's old name to new.
+ * (a JSX tag, an import).
  *
  * A row may carry how its words are read: `pattern` (the shape that replaces
  * its text), `caseSensitive`, `in` (the path prefixes it binds; elsewhere it
@@ -92,9 +92,8 @@ function matcherOf(row) {
 /**
  * Build the lookup from a repo's list, token plan and glossaries.
  * @param {string} repoRoot
- * @param {{ avoid?: boolean }} [options]  `avoid: false` leaves the glossaries unread, for a caller (the hosted lookup) that bundles only the list
  */
-export function loadRetirement(repoRoot, { avoid: readAvoid = true } = {}) {
+export function loadRetirement(repoRoot) {
   const list = JSON.parse(fs.readFileSync(path.join(repoRoot, LIST), 'utf8'));
   // A component row is retired only when marked so; the rest are names agents invent.
   const rows = KIND_OF.flatMap(([key, kind]) => (list[key] ?? []).map((r) => ({ ...r, kind, severity: 'error' }))).filter((r) => !(r.kind === 'component' && !r.retired));
@@ -102,15 +101,15 @@ export function loadRetirement(repoRoot, { avoid: readAvoid = true } = {}) {
   // Every name the plan retired is a row, after the hand-kept ones: a table row that covers it answers `retired(name)`, and the plan's row is what makes it retired.
   const plan = [...RETIRED_TOKENS]
     .map((old) => ({ kind: 'token', not: old, use: renames.has(old) ? [renames.get(old)] : [], why: 'retired by the token plan', severity: 'error', fromPlan: true }));
-  const avoid = (readAvoid ? GLOSSARIES : []).flatMap((file) => {
+  const avoid = GLOSSARIES.flatMap((file) => {
     const full = path.join(repoRoot, file);
     return fs.existsSync(full) ? glossaryAvoid(fs.readFileSync(full, 'utf8')) : [];
   }).map((word) => ({ kind: 'avoid', not: word, use: [], why: 'the glossary says not to say it', severity: 'warn' }));
-  return makeRetirement([...rows, ...plan, ...avoid], list.allowed ?? [], { components: list.components, props: list.props, tokens: list.tokens }, renames);
+  return makeRetirement([...rows, ...plan, ...avoid], list.allowed ?? [], { components: list.components, props: list.props, tokens: list.tokens });
 }
 
 /** The lookup over built rows and places, and the table rows it renders; `loadRetirement` is its door. */
-function makeRetirement(rows, places, table, renamed) {
+function makeRetirement(rows, places, table) {
   const matchers = rows.map((row) => ({ row, ...matcherOf(row) }));
   const ranked = [...matchers].sort((a, b) => (a.row.severity === b.row.severity ? 0 : a.row.severity === 'error' ? -1 : 1));
   return {
@@ -148,10 +147,6 @@ function makeRetirement(rows, places, table, renamed) {
     /** The rows of one kind (`component`, `prop`, `token`, `word`, `spelling`, `outside`, `avoid`), as the list holds them. */
     ofKind(kind) {
       return rows.filter((row) => row.kind === kind).map((row) => ({ ...row }));
-    },
-    /** The token plan's retired name to its replacement. */
-    renames() {
-      return new Map(renamed);
     },
     /** The index header's Not-here table, rendered from the list's component, prop and token rows. */
     notHereTable() {

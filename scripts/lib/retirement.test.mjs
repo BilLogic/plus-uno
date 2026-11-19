@@ -108,6 +108,8 @@ test('the shared allowed places cover history, and a place may keep only some ki
     assert.equal(retirement.allowed(file), true, file);
     assert.equal(retirement.allowed(file, 'word'), true, file);
   }
+  for (const file of ['docs/evals/scenarios/ds-usage/x/brief.md', 'docs/evals/fixtures/a.md']) assert.equal(retirement.allowed(file), true, file);
+  for (const file of ['docs/evals/README.md', 'docs/evals/rubrics/x.md', 'docs/evals/ds-usage.md']) assert.equal(retirement.allowed(file), false, `${file} stays policed`);
   const figma = 'design-system/figma/component-registry.json';
   assert.equal(retirement.allowed(figma, 'component'), true);
   assert.equal(retirement.allowed(figma, 'word'), false);
@@ -155,15 +157,9 @@ test('a row may be case sensitive, bound to paths, or retired only through the p
   assert.equal(retirement.findIn(`use ${old}`, { kinds: ['token'], retiredOnly: true }).length, 1);
 });
 
-test('renames is the token plan\'s old name to new, a copy', () => {
-  const renames = retirement.renames();
-  assert.deepEqual([...renames], [...retiredRenames()]);
-  renames.clear();
-  assert.ok(retirement.renames().size > 0);
-});
 test('the retirement rule is written where engineering conventions live, and the list points at it', () => {
   const coding = fs.readFileSync(path.join(REPO_ROOT, 'docs/engineering/coding.md'), 'utf8');
   assert.match(coding, /### Retiring a name/);
-  assert.match(coding, /every use is replaced in the same change/);
+  assert.match(coding, /every use of a retired name is replaced in the same change/);
   assert.match(list.$about, /docs\/engineering\/coding\.md § Retiring a name/);
 });
