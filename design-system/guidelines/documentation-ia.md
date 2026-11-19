@@ -150,7 +150,7 @@ Every Do and Don't goes through `Do`, `Dont`, `DoDont` or `DoDontPair`, and the 
 
 - The figure is a live PLUS component, or an illustration-kit drawing when the lesson holds with every word removed. No `style`, `<svg>`, `<img>` or hex color on a figure. Several parts sit in `FigureRow` or `FigureStack`; a region, a bold ground or a narrow screen is `FigureBox`, `FigureGround` or `FigureScreen`. A figure whose subject is the styling itself (a Foundations page) is a named figure component.
 - The caption is one sentence under the figure, saying what to do or not do. Do and Don't show the same component, so only the point differs; where a swap is the lesson, the caption says so.
-- A pair sits side by side at docs width and stacks when narrow. `stacked="why"` is for a figure that needs the full width, and says why.
+- A pair sits side by side at docs width and stacks when narrow. `stacked` is for a figure that needs the full width, and its value says why.
 
 `npm run check:dodont-figures` fails on a figure with an inline style, an `<svg>`, an `<img>` or a hex color, on a missing or two-sentence caption, and on `stacked` with no reason.
 

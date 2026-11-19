@@ -80,7 +80,7 @@ Don't: Stretched to fill a banner.
 A single character carries the mood; a crowd competes with the message.
 
 Do: One character above the empty-state message.
-Don't: Four characters crowding one empty state. A collage like this belongs on a marketing page, not in the product.
+Don't: Four characters crowding one empty state; a collage like this belongs on a marketing page, not in the product.
 
 ## Accessibility
 
