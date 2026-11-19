@@ -6,6 +6,7 @@
  * box: the tags, the combobox, the clear × and the caret.
  */
 @use '../../../styles/state' as *;
+@use '../../labels/label-heights' as label;
 
 .plus-select-wrapper {
     width: 100%;
@@ -44,7 +45,8 @@
     }
 }
 
-// The typed text sits after the last tag, and takes the rest of the line.
+// The typed text sits after the last tag and takes the rest of that row. It
+// starts a new row only when the last one has under 4ch left.
 .plus-select-multi .plus-select-input {
     flex: 1 1 4ch;
     width: auto;
@@ -63,10 +65,41 @@
     }
 }
 
-// Tags take the whole line above the typed text; collapsed, one line.
-.plus-select-tags {
-    flex: 1 1 100%;
+// Wrapping tags are the content's own flex items, so they and the typed text
+// share the rows and the wrap gap.
+.plus-select-wrapper:not(.plus-select-nowrap) .plus-select-tags.plus-tag-group--wrap {
+    display: contents;
+}
+
+// Collapsed ("+n"): one row beside the typed text, which keeps only its 4ch.
+.plus-select-tags.plus-tag-group--collapse {
+    flex: 1 1 0;
     min-width: 0;
+}
+
+.plus-select-multi .plus-field__content:has(> .plus-tag-group--collapse) .plus-select-input {
+    flex: 0 0 4ch;
+}
+
+// No wrap: the tags stay on one row and the content scrolls.
+.plus-select-nowrap .plus-select-tags {
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+
+    > .plus-tag-group__item {
+        flex-shrink: 0;
+    }
+}
+
+// A field that grows keeps the clear × and the caret on its first row, as a
+// text field's trailing slot sits on its one line.
+.plus-select-multi .plus-field--grow {
+    align-items: flex-start;
+
+    .plus-field__leading,
+    .plus-field__trailing {
+        height: label.$tag-height;
+    }
 }
 
 // ── Trailing: the plain ✕ clear button and the caret ──

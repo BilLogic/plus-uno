@@ -352,7 +352,7 @@ PickLimitDisablesRows.play = async ({ canvasElement }) => {
     await expect(page().getByRole('option', { name: 'North High' })).not.toHaveAttribute('aria-disabled');
 };
 
-/** Without focus, the tags that do not fit collapse into "+n". */
+/** With `truncate`, and without focus, the tags that do not fit collapse into "+n". */
 export const CollapsedTagsShowPlusN = () => (
     <div style={{ ...stack, width: '220px' /* token gap: 220px */ }}>
         <Button>Before</Button>
@@ -360,6 +360,7 @@ export const CollapsedTagsShowPlusN = () => (
             id="scommit-collapse"
             label="Sites"
             isMulti
+            truncate
             options={[
                 { value: 'lincoln', label: 'Lincoln Middle' },
                 { value: 'north', label: 'North High' },
