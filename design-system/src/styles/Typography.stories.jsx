@@ -45,7 +45,7 @@ export const CodeStyle = () => (
 );
 
 const Outline = ({ sizes }) => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-sm)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
         <span style={{ font: `var(${sizes[0]})`, color: 'var(--ds-text)' }}>Sessions</span>
         <span style={{ font: `var(${sizes[1]})`, color: 'var(--ds-text)' }}>This week</span>
         <span style={{ font: `var(${sizes[2]})`, color: 'var(--ds-text)' }}>Upcoming</span>
