@@ -4,14 +4,11 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as LoadingStories from './Loading.stories.jsx';
 import { KIND_STAGE } from './loadingDemo.jsx';
-import { MenuOneRowCase, MenuSkeletonRowsCase } from './LoadingCases.jsx';
+import { MenuOneRowCase, MenuSkeletonRowsCase, SkeletonInShape, SpinnerInBlank } from './LoadingCases.jsx';
+import { CODE } from './LoadingCaseCode.js';
 import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
-import {
-    SkeletonInShape,
-    SpinnerInBlank,
-} from '@/storybook-docs/illustrations/loading.jsx';
 
 <Meta title="Patterns/States/Loading" tags={['manifest']} />
 
@@ -139,8 +136,10 @@ The same rows, columns and cards the content will have, as plain text bars, so n
 
 <DoDontPair
     doExample={<SkeletonInShape />}
+    doCode={CODE.SkeletonInShape}
     doCaption="A skeleton in the table's own shape, text bars throughout."
     dontExample={<SpinnerInBlank />}
+    dontCode={CODE.SpinnerInBlank}
     dontCaption="One spinner in a blank area: the layout jumps when the rows arrive."
 />
 

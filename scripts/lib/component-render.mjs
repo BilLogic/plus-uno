@@ -163,7 +163,8 @@ export function renderComponent(facts, docs, edges) {
 
   d += usageTab(page, facts.related, motion);
 
-  const props = facts.props ?? [];
+  // A deprecated prop or sub-component stays in the machine manifest (usage checks read it) and out of the agent view.
+  const props = (facts.props ?? []).filter((p) => !p.deprecated);
   if (props.length) d += `## Props\n\n${propsTable(props)}`;
   const enums = props.filter((p) => p.values?.length);
   if (enums.length) {
@@ -171,9 +172,10 @@ export function renderComponent(facts, docs, edges) {
     for (const e of enums) d += `**${code(e.name)}** — ${e.values.map(code).join(' · ')}\n\n`;
     d += `The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.\n\n`;
   }
-  if (facts.subComponents?.length) {
+  const subComponents = (facts.subComponents ?? []).filter((sub) => !sub.deprecated);
+  if (subComponents.length) {
     d += `## Sub-components\n\n`;
-    for (const sub of facts.subComponents) {
+    for (const sub of subComponents) {
       d += `### ${code(`${facts.name}.${sub.name}`)}\n\nImplemented as ${code(sub.impl)}.\n\n`;
       if (sub.props.length) d += propsTable(sub.props);
     }

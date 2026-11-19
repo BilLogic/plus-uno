@@ -132,7 +132,7 @@ The table's empty state replaces the whole table, by the Empty pattern; elevatio
 
 ## Accessibility
 
-- The title is a heading whose level follows nesting: h2 for a Section, h3 for a subsection. With the views alone (`type="tabs-only"`) the title stays in the page, hidden from sight.
+- The title is a heading whose level follows nesting: h2 for a Section, h3 for a subsection. With a custom header the title stays in the page, hidden from sight.
 - The pill views are a tablist; the selected tab says which rows the body shows. Views swap in place.
 - Search, the filter triggers and More carry their names: "Search students", "Status: Upcoming", "More section actions". A trigger's selected state is announced as pressed.
 - The table announces a selection politely, "2 selected", and the bulk bar's actions follow the select-all checkbox in the tab order.
@@ -178,8 +178,6 @@ A Section with its header rows, a detail and a footer. The title, the first pill
 | --- | --- |
 | `title` · `description` · `actions` | The title row. |
 | `views` · `format` · `search` · `filters` · `count` | Rows 2 and 3 of the header: pill Tabs and the format switch, then a compact Search and the "Field: value" triggers. A `filters` entry takes an optional `menu`, `(trigger) =&gt; node`, that wraps its trigger in a Popup select or a Filter menu. |
-| `toolbar` | A `SectionToolbar`, the row under the title row for the search, filters and actions of a table. Pass a `PatternSection.Toolbar` as the `toolbar` prop. It takes the place of `tabs` when both are passed. |
-| `tabs` · `type="tabs-only"` | The row under the title row; `tabs-only` hides the title row from sight when the page title names the collection. |
 | `spacing` | `compact`, `default` or `spacious`: the space between the header, the body and the footer. |
 | `children` | The body: a Table, a card grid, a list, a form or subsections. |
 | `layout="split"` · `side` | A second column at the end, for a summary. |
@@ -218,10 +216,8 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 | `title` | node | — | Section title: an h2 at Heading/medium 20, or an h3 at Heading/small 16 inside another section |
 | `description` | node | — | Optional description under the title, Body/default |
 | `actions` | node | — | Actions slot, aligned to the end of the title row |
-| `tabs` | node | — | Tabs row under the title row (header type `tabs`, or `tabs-only`) |
-| `toolbar` | node | — | Toolbar row under the title row (header type `toolbar`), usually a `PatternSection.Toolbar` |
 | `header` | node | — | Free-form header in place of title and description (header type `custom`) |
-| `type` | enum | — | Header type. Read from the slots when left off; pass `tabs-only` to show only the tabs row |
+| `type` | enum | — | Header type: `default` (title and description) or `custom` (your own `header`). Read from the slots when left off. |
 | `views` | node | — | Row 2, at the start: the views, usually Tabs in the pill appearance. It scrolls sideways when it does not fit. |
 | `format` | node | — | Row 2, at the end: the format switch (Table / Cards). With no `views` it moves to the end of row 3. |
 | `search` | node | — | Row 3, at the start: the Search field at compact spacing, which draws 32. |
@@ -252,7 +248,7 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 
 ## Variants
 
-**`type`** — `default` · `tabs` · `toolbar` · `custom` · `tabs-only`
+**`type`** — `default` · `custom`
 
 **`layout`** — `single` · `split` · `subsections`
 
@@ -261,20 +257,6 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 **`spacing`** — `default` · `compact` · `spacious`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
-
-## Sub-components
-
-### `PatternSection.Toolbar`
-
-Implemented as `SectionToolbar`.
-
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `search` | node | — | Search field slot, at the start |
-| `filters` | node | — | Filters slot: dropdown buttons |
-| `count` | node | — | Count in words, such as "12 of 48 students"; truncates first, and is announced politely when it changes |
-| `actions` | node | — | Actions slot, at the end |
-| `className` | string | — | — |
 
 ## Tokens touched
 

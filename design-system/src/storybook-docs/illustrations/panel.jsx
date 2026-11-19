@@ -1,7 +1,7 @@
 import React from 'react';
 import { PAINT } from './paint.js';
 import { Illustration } from './Illustration.jsx';
-import { Blanket, Panel, Rect, Row, Section } from './primitives.jsx';
+import { Panel, Rect, Row, Section } from './primitives.jsx';
 
 /**
  * The Panel template's do and don't drawings. Each lesson is about how a Panel
@@ -28,40 +28,6 @@ const PageBehind = ({ w = W - 2 * X }) => (
     <Row x={X} y={74} w={w} />
     <Row x={X} y={88} w={w} />
   </g>
-);
-
-/** Do: a Panel floats over the page on the overlay fill and shadow, and the page is still there. */
-export const FloatsNoBlanket = ({ title = 'A Panel floating over the right of the page on a shadow, the page beside it undimmed' }) => (
-  <Canvas title={title}>
-    <PageBehind />
-    <Panel x={96} y={0} w={72} h={H} accent floating />
-  </Canvas>
-);
-
-/** Don't: the same Panel with a Blanket dimming the page. */
-export const PanelOnBlanket = ({ title = 'The same Panel with a Blanket dimming the whole page behind it' }) => (
-  <Canvas title={title}>
-    <PageBehind />
-    <Blanket x={0} y={0} w={W} h={H} />
-    <Panel x={96} y={0} w={72} h={H} accent floating />
-  </Canvas>
-);
-
-/** Do: one floating Panel, another record swaps its content. */
-export const OneFloatingPanel = ({ title = 'One floating Panel over the page' }) => (
-  <Canvas title={title}>
-    <PageBehind />
-    <Panel x={96} y={0} w={72} h={H} accent floating />
-  </Canvas>
-);
-
-/** Don't: two floating Panels stacked, the second covering the first. */
-export const TwoFloatingPanels = ({ title = 'Two floating Panels open at once, the second covering part of the first' }) => (
-  <Canvas title={title}>
-    <PageBehind />
-    <Panel x={70} y={0} w={72} h={H} floating />
-    <Panel x={96} y={0} w={72} h={H} accent floating />
-  </Canvas>
 );
 
 /** Do: the floating Panel sits beside the docked AI panel, which stays uncovered. */

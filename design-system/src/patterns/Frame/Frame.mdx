@@ -4,7 +4,8 @@ import { Meta } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as FrameStories from './Frame.stories.jsx';
-import { BarInOrder, BarScrambled } from './FrameCases.jsx';
+import { AiPanelDocked, AiPanelFloating, BarInOrder, BarScrambled, BareColumn, BareWithSidebar, MultiStepInnerSidebar, MultiStepStepsInPage } from './FrameCases.jsx';
+import { CODE } from './FrameCaseCode.js';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 import {
     ComponentExample,
@@ -15,14 +16,6 @@ import {
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
-import {
-    AiPanelDocked,
-    AiPanelFloating,
-    BareColumn,
-    BareWithSidebar,
-    MultiStepInnerSidebar,
-    MultiStepStepsInPage,
-} from '@/storybook-docs/illustrations/frame.jsx';
 
 <Meta of={FrameStories} />
 
@@ -289,8 +282,10 @@ The steps are the Sidebar's rows, so the Page holds only the task. Done steps ti
 
 <DoDontPair
     doExample={<MultiStepInnerSidebar />}
+    doCode={CODE.MultiStepInnerSidebar}
     doCaption="The steps as rows in the inner sidebar; the Page holds only the task."
     dontExample={<MultiStepStepsInPage />}
+    dontCode={CODE.MultiStepStepsInPage}
     dontCaption="The steps drawn again inside the Page: two lists for one task."
 />
 
@@ -302,8 +297,10 @@ The footer is fixed along the bottom, one row high, with its buttons on one line
 
 <DoDontPair
     doExample={<BarInOrder />}
+    doCode={CODE.BarInOrder}
     doCaption="Save and exit at the start; Back and the primary Next at the end, on one line."
     dontExample={<BarScrambled />}
+    dontCode={CODE.BarScrambled}
     dontCaption="Cancel repeated in the footer beside Save and exit: two ways out of one task."
 />
 
@@ -315,8 +312,10 @@ The AI panel is a region of the Frame, not a floating Panel, so it stays put as 
 
 <DoDontPair
     doExample={<AiPanelDocked />}
+    doCode={CODE.AiPanelDocked}
     doCaption="The panel docked at the right edge, the Page narrowing beside it."
     dontExample={<AiPanelFloating />}
+    dontCode={CODE.AiPanelFloating}
     dontCaption="The panel floating over the Page, hiding the rows beneath it."
 />
 
@@ -328,8 +327,10 @@ Sign-in, errors and welcome have one job and no account yet, so the Frame carrie
 
 <DoDontPair
     doExample={<BareColumn />}
+    doCode={CODE.BareColumn}
     doCaption="One centered column: the form and its button."
     dontExample={<BareWithSidebar />}
+    dontCode={CODE.BareWithSidebar}
     dontCaption="The Sidebar beside a sign-in: navigation for a person who has not signed in."
 />
 

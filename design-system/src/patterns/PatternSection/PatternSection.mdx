@@ -217,8 +217,6 @@ Loading, errors and the search field follow their patterns and components: Loadi
 <tbody>
 <tr><td><code>title</code> · <code>description</code> · <code>actions</code></td><td>The title row.</td></tr>
 <tr><td><code>views</code> · <code>format</code> · <code>search</code> · <code>filters</code> · <code>count</code></td><td>Rows 2 and 3 of the header: pill Tabs and the format switch, then a compact Search and the "Field: value" triggers. A <code>filters</code> entry takes an optional <code>menu</code>, <code>(trigger) =&gt; node</code>, that wraps its trigger in a Popup select or a Filter menu.</td></tr>
-<tr><td><code>toolbar</code></td><td>A <code>SectionToolbar</code>, the row under the title row for the search, filters and actions of a table. Pass a <code>PatternSection.Toolbar</code> as the <code>toolbar</code> prop. It takes the place of <code>tabs</code> when both are passed.</td></tr>
-<tr><td><code>tabs</code> · <code>type="tabs-only"</code></td><td>The row under the title row; <code>tabs-only</code> hides the title row from sight when the page title names the collection.</td></tr>
 <tr><td><code>spacing</code></td><td><code>compact</code>, <code>default</code> or <code>spacious</code>: the space between the header, the body and the footer.</td></tr>
 <tr><td><code>children</code></td><td>The body: a Table, a card grid, a list, a form or subsections.</td></tr>
 <tr><td><code>layout="split"</code> · <code>side</code></td><td>A second column at the end, for a summary.</td></tr>
@@ -392,7 +390,7 @@ The table's empty state replaces the whole table, by the Empty pattern; elevatio
 
 ## Accessibility
 
-- The title is a heading whose level follows nesting: h2 for a Section, h3 for a subsection. With the views alone (`type="tabs-only"`) the title stays in the page, hidden from sight.
+- The title is a heading whose level follows nesting: h2 for a Section, h3 for a subsection. With a custom header the title stays in the page, hidden from sight.
 - The pill views are a tablist; the selected tab says which rows the body shows. Views swap in place.
 - Search, the filter triggers and More carry their names: "Search students", "Status: Upcoming", "More section actions". A trigger's selected state is announced as pressed.
 - The table announces a selection politely, "2 selected", and the bulk bar's actions follow the select-all checkbox in the tab order.
