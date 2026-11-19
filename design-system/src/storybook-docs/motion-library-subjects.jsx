@@ -67,7 +67,6 @@ import {
     TreeSelect,
     TreeTable,
 } from '@/components';
-import { Panel, PanelBody, PanelHeader } from '@/patterns';
 import { OverlayContainer } from '@/lib/overlay';
 import { BEAT, springFor } from '@/storybook-docs/illustrations/motion.jsx';
 
@@ -486,15 +485,6 @@ export const COMPONENT_SUBJECTS = Object.freeze({
             totalPages={4}
             onPageChange={NOOP}
         />
-    ),
-
-    Panel: () => (
-        <div style={{ width: '100%' }}>
-            <Panel width="100%">
-                <PanelHeader title="Student notes" />
-                <PanelBody>Focus on common denominators next week.</PanelBody>
-            </Panel>
-        </div>
     ),
 
     Popup: () => (
