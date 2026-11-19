@@ -104,8 +104,8 @@ describe('Page surface', () => {
             </Page>,
         );
         const root = container.firstElementChild;
-        expect(root).toHaveClass('plus-pattern-page');
-        expect(root.className).toBe('plus-pattern-page');
+        expect(root).toHaveClass('plus-template-page');
+        expect(root.className).toBe('plus-template-page');
         expect(screen.getByRole('heading', { level: 1, name: 'Sessions' })).toBeInTheDocument();
         expect(screen.getByText('Body')).toBeInTheDocument();
     });

@@ -107,7 +107,7 @@ export const Overview = {
     ),
     play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const overlay = canvasElement.querySelector('.plus-pattern-blanket');
+        const overlay = canvasElement.querySelector('.plus-template-blanket');
         const [modal] = dialogs(canvas);
         const style = getComputedStyle(modal);
         await expect(style.paddingTop, 'Modal/pad').toBe(`${tokenLength(canvasElement, '--modal-pad-x-default')}px`);
@@ -445,7 +445,7 @@ LiveBehavior.play = async ({ canvasElement }) => {
     await userEvent.click(trigger);
     const reopened = await doc.findByRole('dialog', { name: 'Confirm schedule' });
     await settleAnimations(ownerDoc.body);
-    const blanket = reopened.closest('.plus-pattern-blanket');
+    const blanket = reopened.closest('.plus-template-blanket');
     await expect(blanket).not.toBeNull();
     fireEvent.mouseDown(blanket);
     fireEvent.click(blanket);
@@ -456,7 +456,7 @@ LiveBehavior.play = async ({ canvasElement }) => {
     await userEvent.click(trigger);
     const staticDialog = await doc.findByRole('dialog', { name: 'Confirm schedule' });
     await settleAnimations(ownerDoc.body);
-    const staticBlanket = staticDialog.closest('.plus-pattern-blanket');
+    const staticBlanket = staticDialog.closest('.plus-template-blanket');
     fireEvent.mouseDown(staticBlanket);
     fireEvent.click(staticBlanket);
     await expect(doc.getByRole('dialog', { name: 'Confirm schedule' }), 'static blanket keeps Modal open').toBeInTheDocument();
@@ -498,7 +498,7 @@ StaticBlanketRefusesToClose.play = async ({ canvasElement }) => {
     await expect(closes).toHaveTextContent('0');
     await expect(doc.getByText('Uploading transcript')).toBeInTheDocument();
 
-    const blanket = canvasElement.ownerDocument.querySelector('.plus-pattern-blanket');
+    const blanket = canvasElement.ownerDocument.querySelector('.plus-template-blanket');
     await expect(blanket).not.toBeNull();
     blanket.click();
     await expect(closes).toHaveTextContent('0');
@@ -539,8 +539,8 @@ SelectKeepsOverlayShadow.play = async ({ canvasElement }) => {
     await userEvent.click(doc.getByRole('combobox', { name: 'Site' }));
     const listbox = await doc.findByRole('listbox');
     const option = within(listbox).getByRole('option', { name: 'South High' });
-    const overlay = doc.getByText('Assign site').closest('.plus-pattern-blanket');
-    await expect(listbox.closest('.plus-pattern-blanket')).toBe(overlay);
+    const overlay = doc.getByText('Assign site').closest('.plus-template-blanket');
+    await expect(listbox.closest('.plus-template-blanket')).toBe(overlay);
     await expect(getComputedStyle(listbox.closest('.plus-listbox')).zIndex).toBe('510');
     await settleAnimations(canvasElement.ownerDocument.body);
     const box = option.getBoundingClientRect();
@@ -666,7 +666,7 @@ export const TypeSteps = {
 };
 
 const ANATOMY_PARTS = [
-    { selector: '.plus-pattern-blanket', label: 'Blanket', side: 'end', at: 'start', holds: true },
+    { selector: '.plus-template-blanket', label: 'Blanket', side: 'end', at: 'start', holds: true },
     { selector: '.plus-dialog-header', label: 'Header', at: 'start' },
     { selector: '.plus-dialog-body', label: 'Body', at: 'middle' },
     { selector: '[data-probe="footer"]', label: 'Footer', at: 'end' },
@@ -749,7 +749,7 @@ export const ResponsiveWidth = {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         fitsCanvas(canvasElement);
-        const blanket = canvasElement.querySelector('.plus-pattern-blanket');
+        const blanket = canvasElement.querySelector('.plus-template-blanket');
         const modal = canvas.getByRole('dialog');
         const at = (screen) => {
             blanket.style.setProperty('--plus-overlay-screen', `${screen}px`);
@@ -950,7 +950,7 @@ export const StackConfirmOverPanel = {
         await settleAnimations(canvasElement);
         fitsCanvas(canvasElement);
         await waitFor(() => expect(canvas.queryByRole('dialog', { name: 'Delete student?' }), 'the confirm is open').not.toBeNull());
-        const blanket = canvasElement.querySelector('.plus-pattern-blanket');
+        const blanket = canvasElement.querySelector('.plus-template-blanket');
         const panel = rect(canvasElement.querySelector('.plus-panel'));
         const cover = rect(blanket);
         await expect(cover.left, 'the confirm’s Blanket covers the Panel').toBeLessThanOrEqual(panel.left + 0.5);
@@ -1011,7 +1011,7 @@ export const BlanketInline = {
     ),
     play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
-        const overlay = canvasElement.querySelector('.plus-pattern-blanket');
+        const overlay = canvasElement.querySelector('.plus-template-blanket');
         const modal = canvas.getByRole('dialog');
         await expect(modal.getBoundingClientRect().width, '6-col at 768').toBeCloseTo(384, 0);
         await inEveryColorModeOf(canvasElement, async (mode, token) => {
@@ -1034,7 +1034,7 @@ export const BlanketPads = {
     ),
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
-        const overlay = canvasElement.querySelector('.plus-pattern-blanket');
+        const overlay = canvasElement.querySelector('.plus-template-blanket');
         const style = getComputedStyle(overlay);
         await expect(style.paddingLeft, 'Overlay/pad-x').toBe(`${tokenLength(canvasElement, '--blanket-pad-x')}px`);
         await expect(style.paddingTop, 'Overlay/pad-y').toBe(`${tokenLength(canvasElement, '--blanket-pad-y')}px`);
@@ -1099,7 +1099,7 @@ export const BlanketLayers = {
     ),
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
-        const overlay = canvasElement.ownerDocument.querySelector('.plus-pattern-blanket');
+        const overlay = canvasElement.ownerDocument.querySelector('.plus-template-blanket');
         const modal = documentOf(canvasElement).getByRole('dialog');
         const z = (token) => probe(canvasElement, 'zIndex', `var(${token})`, { position: 'relative' });
         await expect(getComputedStyle(overlay).position).toBe('fixed');
@@ -1128,7 +1128,7 @@ export const BlanketConfirmOverPanel = {
         await settleAnimations(canvasElement);
         const confirm = canvas.getByRole('dialog', { name: 'Discard changes?' });
         await expect(confirm.getBoundingClientRect().width, '6-col at 1024').toBeCloseTo(512, 0);
-        await expect(canvasElement.querySelectorAll('.plus-pattern-blanket').length).toBe(1);
+        await expect(canvasElement.querySelectorAll('.plus-template-blanket').length).toBe(1);
     },
 };
 
@@ -1149,7 +1149,7 @@ const overlayMotionPlay = (reduced = false) => async ({ canvas, canvasElement })
     const surface = canvasElement.querySelector('.plus-modal');
     await expect(surface).not.toBeNull();
     await expectOverlayExit(surface, () => trigger.click(), reduced);
-    await expect(canvasElement.querySelector('.plus-pattern-blanket')).toBeNull();
+    await expect(canvasElement.querySelector('.plus-template-blanket')).toBeNull();
 };
 export const MotionOpenClose = { render: MotionOverlay, play: overlayMotionPlay() };
 export const MotionReduced = { ...MotionOpenClose, decorators: [withReducedMotion], play: overlayMotionPlay(true) };
@@ -1168,10 +1168,10 @@ const BlanketMotionOverlay = () => {
 const blanketMotionPlay = (reduced = false) => async ({ canvas, canvasElement }) => {
     const trigger = canvas.getByRole('button', { name: 'Session details' });
     await userEvent.click(trigger);
-    const surface = canvasElement.querySelector('.plus-pattern-blanket');
+    const surface = canvasElement.querySelector('.plus-template-blanket');
     await expect(surface).not.toBeNull();
     await expectOverlayExit(surface, () => trigger.click(), reduced);
-    await expect(canvasElement.querySelector('.plus-pattern-blanket')).toBeNull();
+    await expect(canvasElement.querySelector('.plus-template-blanket')).toBeNull();
 };
 export const BlanketMotionOpenClose = { render: BlanketMotionOverlay, play: blanketMotionPlay() };
 export const BlanketMotionReduced = { ...BlanketMotionOpenClose, decorators: [withReducedMotion], play: blanketMotionPlay(true) };

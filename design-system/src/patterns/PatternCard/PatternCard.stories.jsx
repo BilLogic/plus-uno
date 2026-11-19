@@ -228,7 +228,7 @@ export const Elevation = {
     ),
     play: async ({ canvas, canvasElement }) => {
         const card = (name) => {
-            const el = canvas.getByText(name).closest('.plus-pattern-card');
+            const el = canvas.getByText(name).closest('.plus-template-card');
             el.style.transition = 'none';
             return el;
         };
@@ -323,8 +323,8 @@ const sizedCard = (size) => (
 );
 
 const assertCardPadAndRadius = async ({ canvasElement }) => {
-    const card = canvasElement.querySelector('.plus-pattern-card');
-    const inner = canvasElement.querySelector('.plus-pattern-card-inner');
+    const card = canvasElement.querySelector('.plus-template-card');
+    const inner = canvasElement.querySelector('.plus-template-card-inner');
     const cardStyle = getComputedStyle(card);
     const innerStyle = getComputedStyle(inner);
     for (const corner of ['TopLeft', 'TopRight', 'BottomRight', 'BottomLeft']) {
@@ -455,7 +455,7 @@ export const SurfaceSunken = {
         </PatternCard>
     ),
     play: async ({ canvas, canvasElement }) => {
-        const card = canvas.getByText('Sunken').closest('.plus-pattern-card');
+        const card = canvas.getByText('Sunken').closest('.plus-template-card');
         card.style.transition = 'none';
         await expect(getComputedStyle(card).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
         await expect(getComputedStyle(card).boxShadow).toBe('none');
@@ -470,7 +470,7 @@ export const SurfaceDefault = {
         </PatternCard>
     ),
     play: async ({ canvas, canvasElement }) => {
-        const card = canvas.getByText('Default').closest('.plus-pattern-card');
+        const card = canvas.getByText('Default').closest('.plus-template-card');
         card.style.transition = 'none';
         await expect(getComputedStyle(card).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface'));
         await expect(getComputedStyle(card).borderTopWidth).toBe('1px');
@@ -487,7 +487,7 @@ export const SurfaceRaised = {
         </PatternCard>
     ),
     play: async ({ canvas, canvasElement }) => {
-        const card = canvas.getByText('Raised').closest('.plus-pattern-card');
+        const card = canvas.getByText('Raised').closest('.plus-template-card');
         card.style.transition = 'none';
         await expect(getComputedStyle(card).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-raised'));
         await expect(getComputedStyle(card).boxShadow).toBe(computedShadow(canvasElement, 'var(--ds-shadow-raised)'));
@@ -505,7 +505,7 @@ export const Clickable = {
         <PatternCard title="Clickable" minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }} role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</PatternCard>
     ),
     play: async ({ canvas, canvasElement }) => {
-        const card = canvas.getByText('Clickable').closest('.plus-pattern-card');
+        const card = canvas.getByText('Clickable').closest('.plus-template-card');
         card.style.transition = 'none';
         await expect(getComputedStyle(card).boxShadow).toBe('none');
         const hoveredShadow = withForcedPseudo(card, ':hover', () => getComputedStyle(card).boxShadow);
@@ -520,7 +520,7 @@ export const Dragging = {
         <PatternCard title="Dragging" minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }} dragging>{bodyCopy}</PatternCard>
     ),
     play: async ({ canvas, canvasElement }) => {
-        const card = canvas.getByText('Dragging').closest('.plus-pattern-card');
+        const card = canvas.getByText('Dragging').closest('.plus-template-card');
         card.style.transition = 'none';
         await expect(getComputedStyle(card).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-overlay'));
         await expect(getComputedStyle(card).boxShadow).toBe(computedShadow(canvasElement, 'var(--ds-shadow-overlay)'));
@@ -538,7 +538,7 @@ export const ForcedColors = {
     ),
     play: async ({ canvas }) => {
         for (const label of ['Sunken', 'Default', 'Raised']) {
-            const card = canvas.getByText(label).closest('.plus-pattern-card');
+            const card = canvas.getByText(label).closest('.plus-template-card');
             await expect(getComputedStyle(card).borderTopWidth, `${label} keeps a 1px border width`).toBe('1px');
             await expect(getComputedStyle(card).borderTopStyle, `${label} border is solid`).toBe('solid');
         }

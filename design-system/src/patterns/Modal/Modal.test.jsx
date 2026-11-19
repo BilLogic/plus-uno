@@ -42,7 +42,7 @@ describe('Modal template', () => {
     it('opens as a dialog on a Blanket, moves focus inside, and locks scroll', async () => {
         const { dialog } = await open();
         expect(dialog).toHaveAttribute('aria-modal', 'true');
-        expect(dialog.closest('.plus-pattern-blanket')).not.toBeNull();
+        expect(dialog.closest('.plus-template-blanket')).not.toBeNull();
         expect(dialog.contains(document.activeElement)).toBe(true);
     });
 
@@ -55,13 +55,13 @@ describe('Modal template', () => {
 
     it('closes on a Blanket press by default, and stays open when blanket="static" or false', async () => {
         const first = await open();
-        await first.user.click(first.dialog.closest('.plus-pattern-blanket'));
+        await first.user.click(first.dialog.closest('.plus-template-blanket'));
         await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
         first.unmount();
 
         for (const blanket of ['static', false]) {
             const { user, dialog, unmount } = await open({ blanket });
-            await user.click(dialog.closest('.plus-pattern-blanket'));
+            await user.click(dialog.closest('.plus-template-blanket'));
             expect(screen.getByRole('dialog', { name: 'Settings' })).toBeInTheDocument();
             await user.click(screen.getByRole('button', { name: 'Close' }));
             await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
@@ -127,7 +127,7 @@ describe('Modal template', () => {
                 <p>Body</p>
             </Modal>,
         );
-        const blanket = container.querySelector('.plus-pattern-blanket-inline');
+        const blanket = container.querySelector('.plus-template-blanket-inline');
         expect(blanket).not.toBeNull();
         expect(blanket.style.getPropertyValue('--plus-overlay-screen')).toBe('1024px');
         expect(container.querySelector('.plus-dialog-width-8-col')).toBeInTheDocument();
@@ -163,7 +163,7 @@ describe('Modal template', () => {
         );
         fireEvent.click(container.querySelector('.plus-dialog'));
         expect(onClose).not.toHaveBeenCalled();
-        fireEvent.click(container.querySelector('.plus-pattern-blanket'));
+        fireEvent.click(container.querySelector('.plus-template-blanket'));
         expect(onClose).toHaveBeenCalledTimes(1);
     });
 });

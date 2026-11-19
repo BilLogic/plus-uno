@@ -30,7 +30,7 @@ const Page = ({
     const hasSlots = Boolean(header || banner);
 
     const classes = [
-        'plus-pattern-page',
+        'plus-template-page',
         className,
     ].filter(Boolean).join(' ');
 
@@ -51,9 +51,9 @@ const Page = ({
 
     return (
         <Component ref={pageRef} id={id} className={classes} style={style} onClick={handleClick} {...props}>
-            {header ? <div className="plus-pattern-page-header">{header}</div> : title && <h1 className="plus-pattern-page-title">{title}</h1>}
-            {banner && <div className="plus-pattern-page-banner">{banner}</div>}
-            {hasSlots && children != null && children !== false ? <div className="plus-pattern-page-content">{children}</div> : children}
+            {header ? <div className="plus-template-page-header">{header}</div> : title && <h1 className="plus-template-page-title">{title}</h1>}
+            {banner && <div className="plus-template-page-banner">{banner}</div>}
+            {hasSlots && children != null && children !== false ? <div className="plus-template-page-content">{children}</div> : children}
         </Component>
     );
 };

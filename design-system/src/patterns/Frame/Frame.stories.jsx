@@ -866,7 +866,7 @@ export const PanelDockedAt1440 = {
 /** An overlay Panel floats: no Blanket is drawn, and a point on the Page lands on the Page, not on a layer over it. */
 const expectNoBlanket = async (p) => {
     await expect(p.blanket(), 'an overlay Panel has no Blanket').toBeNull();
-    await expect(p.frame.querySelector('.plus-pattern-blanket'), 'and no shared Blanket either').toBeNull();
+    await expect(p.frame.querySelector('.plus-template-blanket'), 'and no shared Blanket either').toBeNull();
     const s = rect(p.surface);
     const hit = document.elementFromPoint(s.left + 40, s.top + 40);
     await expect(p.frame.contains(hit), 'a point on the Page lands inside the Frame').toBe(true);

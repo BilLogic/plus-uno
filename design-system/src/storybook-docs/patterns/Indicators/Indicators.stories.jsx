@@ -210,8 +210,8 @@ export const ChecklistCardOnHome = {
     name: 'Checklist: card on Home',
     render: () => staged(<ChecklistOnHome />),
     play: async ({ canvas, canvasElement }) => {
-        const card = canvasElement.querySelector('.plus-pattern-card');
-        await expect(canvasElement.querySelector('.plus-pattern-section'), 'hosted in PatternSection').not.toBeNull();
+        const card = canvasElement.querySelector('.plus-template-card');
+        await expect(canvasElement.querySelector('.plus-template-section'), 'hosted in PatternSection').not.toBeNull();
 
         const title = within(card).getByRole('heading', { name: 'Get ready for your first session' });
         const count = within(card).getByText('2 of 5 done');
@@ -280,7 +280,7 @@ export const ChecklistCardInPage = {
     name: 'Checklist: card in a page',
     render: () => staged(<ChecklistInPage />),
     play: async ({ canvasElement }) => {
-        const card = canvasElement.querySelector('.plus-pattern-card');
+        const card = canvasElement.querySelector('.plus-template-card');
         const barWrap = card.querySelector('[data-checklist-bar]');
         const actionCols = [...card.querySelectorAll('[data-checklist-action]')];
 

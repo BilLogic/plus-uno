@@ -198,7 +198,7 @@ const TITLE_LINE = {
  * toolbar row when there is one. `tabs-only` draws only that last bar.
  */
 const HeaderSkeleton = ({ rank, hasBottomRow, tabsOnly }) => (
-    <div className="plus-pattern-section-skeleton">
+    <div className="plus-template-section-skeleton">
         {!tabsOnly && (
             <>
                 <Skeleton width="50%" height={TITLE_LINE[rank]} radius="element-radius-sm" />
@@ -206,7 +206,7 @@ const HeaderSkeleton = ({ rank, hasBottomRow, tabsOnly }) => (
             </>
         )}
         {(hasBottomRow || tabsOnly) && (
-            <Skeleton className="plus-pattern-section-skeleton__row" width="100%" height="var(--row-height-md)" radius="element-radius-sm" />
+            <Skeleton className="plus-template-section-skeleton__row" width="100%" height="var(--row-height-md)" radius="element-radius-sm" />
         )}
     </div>
 );
@@ -298,8 +298,8 @@ const PatternSection = ({
     ...props
 }) => {
     const classes = [
-        'plus-pattern-section',
-        `plus-pattern-section-spacing-${spacing}`,
+        'plus-template-section',
+        `plus-template-section-spacing-${spacing}`,
         className,
     ].filter(Boolean).join(' ');
 
@@ -325,32 +325,32 @@ const PatternSection = ({
     const titleId = useId();
     const labelled = named && Boolean(title);
     const titleNode = title && (
-        <Title id={labelled ? titleId : undefined} className={`plus-pattern-section-title plus-pattern-section-title--${rank}`}>{title}</Title>
+        <Title id={labelled ? titleId : undefined} className={`plus-template-section-title plus-template-section-title--${rank}`}>{title}</Title>
     );
 
     const renderHeader = () => {
         if (loading) {
             return (
-                <div className={`plus-pattern-section-header plus-pattern-section-header--${type}`}>
+                <div className={`plus-template-section-header plus-template-section-header--${type}`}>
                     {titleNode && <div className="visually-hidden">{titleNode}</div>}
                     <HeaderSkeleton rank={rank} hasBottomRow={Boolean(bottomRow)} tabsOnly={tabsOnly} />
                 </div>
             );
         }
         return (
-            <div className={`plus-pattern-section-header plus-pattern-section-header--${type}`}>
+            <div className={`plus-template-section-header plus-template-section-header--${type}`}>
                 {titleHidden && titleNode && <div className="visually-hidden">{titleNode}</div>}
                 {!tabsOnly && (
-                    <div className="plus-pattern-section-title-row">
+                    <div className="plus-template-section-title-row">
                         {custom ? (
-                            <div className="plus-pattern-section-custom">{header}</div>
+                            <div className="plus-template-section-custom">{header}</div>
                         ) : (
-                            <div className="plus-pattern-section-heading">
+                            <div className="plus-template-section-heading">
                                 {titleNode}
-                                {description && <p className="plus-pattern-section-description">{description}</p>}
+                                {description && <p className="plus-template-section-description">{description}</p>}
                             </div>
                         )}
-                        {actions && <div className="plus-pattern-section-actions">{actions}</div>}
+                        {actions && <div className="plus-template-section-actions">{actions}</div>}
                     </div>
                 )}
                 {hasRows && (
@@ -367,7 +367,7 @@ const PatternSection = ({
                     />
                 )}
                 {bottomRow && (
-                    <div className={type === 'toolbar' ? 'plus-pattern-section-toolbar' : 'plus-pattern-section-tabs'}>
+                    <div className={type === 'toolbar' ? 'plus-template-section-toolbar' : 'plus-template-section-tabs'}>
                         {bottomRow}
                         {type !== 'toolbar' && onAddView && (
                             <Button text={addViewLabel} appearance="subtle" iconBefore="plus" onClick={onAddView} />
@@ -380,8 +380,8 @@ const PatternSection = ({
 
     const body = layout === 'split' ? (
         <>
-            <div className="plus-pattern-section-main">{children}</div>
-            {side && <div className="plus-pattern-section-side">{side}</div>}
+            <div className="plus-template-section-main">{children}</div>
+            {side && <div className="plus-template-section-side">{side}</div>}
         </>
     ) : children;
 
@@ -412,29 +412,29 @@ const PatternSection = ({
     const detailTitleLabel = detailTitle ?? 'Details';
 
     const withDetail = hasDetailRegion ? (
-        <div className="plus-pattern-section-with-detail">
-            {hasBody && <div className="plus-pattern-section-list">{body}</div>}
+        <div className="plus-template-section-with-detail">
+            {hasBody && <div className="plus-template-section-list">{body}</div>}
             <Collapsible.Root
                 open={isDetailOpen}
                 onOpenChange={handleDetailOpenChange}
-                className="plus-pattern-section-detail"
+                className="plus-template-section-detail"
                 render={(rootProps) => <PatternCard surface="sunken" {...rootProps} />}
             >
                 <Collapsible.Trigger
                     ref={detailTriggerRef}
-                    className="plus-pattern-section-detail-trigger"
+                    className="plus-template-section-detail-trigger"
                 >
-                    <span className="plus-pattern-section-detail-heading">
-                        <span id={detailTitleId} className="plus-pattern-section-detail-title">
+                    <span className="plus-template-section-detail-heading">
+                        <span id={detailTitleId} className="plus-template-section-detail-title">
                             {detailTitleLabel}
                         </span>
                         {detailDescription && (
-                            <span className="plus-pattern-section-detail-description">
+                            <span className="plus-template-section-detail-description">
                                 {detailDescription}
                             </span>
                         )}
                     </span>
-                    <span className="plus-pattern-section-detail-chevron" aria-hidden="true">
+                    <span className="plus-template-section-detail-chevron" aria-hidden="true">
                         <Icon name="chevron-down" size={12} />
                     </span>
                 </Collapsible.Trigger>
@@ -449,16 +449,16 @@ const PatternSection = ({
                             aria-label={detailTitle ? undefined : 'Details'}
                             aria-hidden={!state.open ? true : undefined}
                             inert={!state.open ? true : undefined}
-                            className="plus-pattern-section-detail-region"
+                            className="plus-template-section-detail-region"
                             onKeyDown={handleDetailPanelKeyDown}
                         >
                             <AnimatePresence initial={false}>
                                 {state.open && (
-                                    <HeightSurface key="detail" className="plus-pattern-section-detail-panel">
-                                        <div className="plus-pattern-section-detail-body">
-                                            <div className="plus-pattern-section-detail-content">{detail}</div>
+                                    <HeightSurface key="detail" className="plus-template-section-detail-panel">
+                                        <div className="plus-template-section-detail-body">
+                                            <div className="plus-template-section-detail-content">{detail}</div>
                                             {detailFooter && (
-                                                <div className="plus-pattern-section-detail-footer">{detailFooter}</div>
+                                                <div className="plus-template-section-detail-footer">{detailFooter}</div>
                                             )}
                                         </div>
                                     </HeightSurface>
@@ -484,9 +484,9 @@ const PatternSection = ({
             {hasHeader && renderHeader()}
             {/* A section with no title is a wrapper: what it holds keeps the parent's level. */}
             <HeadingLevelContext.Provider value={title ? level : parentLevel}>
-                <div className={`plus-pattern-section-content plus-pattern-section-content--${layout}`}>{withDetail ?? body}</div>
+                <div className={`plus-template-section-content plus-template-section-content--${layout}`}>{withDetail ?? body}</div>
             </HeadingLevelContext.Provider>
-            {footer && <div className="plus-pattern-section-footer">{footer}</div>}
+            {footer && <div className="plus-template-section-footer">{footer}</div>}
         </section>
     );
 };

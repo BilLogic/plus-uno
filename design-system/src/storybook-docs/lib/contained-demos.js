@@ -22,7 +22,7 @@ const describe = (el) => {
 
 const TAKEOVER_SELECTOR = [
     '[aria-modal="true"]',
-    '.plus-pattern-blanket',
+    '.plus-template-blanket',
     '.plus-flag-container[data-container-position="fixed"]',
 ].join(', ');
 

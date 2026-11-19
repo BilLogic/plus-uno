@@ -218,5 +218,5 @@ export const ANATOMY_PARTS = [
     { selector: '.plus-page-header-actions', label: 'Page actions' },
     { selector: '.plus-page-header-bottom-bar', label: 'Page tabs' },
     { selector: '.plus-banner', label: 'Banner' },
-    { selector: '.plus-pattern-section', label: 'Content' },
+    { selector: '.plus-template-section', label: 'Content' },
 ];

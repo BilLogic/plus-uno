@@ -48,7 +48,7 @@ export const TypePage = {
         await expect(rect(footer).left, 'the footer starts at the fields’ edge').toBeCloseTo(rect(canvasElement.querySelector('.plus-fieldset')).left, 0);
         await expect(cancel.className, 'Cancel is Subtle').toContain('subtle');
         await expect(canvas.getByRole('heading', { level: 1, name: 'Log a session' }), 'the form’s title is the page’s h1').toBeInTheDocument();
-        await expect(canvasElement.querySelector('.plus-pattern-card--surface-sunken'), 'the form sits on the Page, not in a sunken Card').toBeNull();
+        await expect(canvasElement.querySelector('.plus-template-card--surface-sunken'), 'the form sits on the Page, not in a sunken Card').toBeNull();
         const student = canvas.getByLabelText(/Student/);
         await userEvent.type(student, 'Ana Ruiz');
         await expect(student).toHaveValue('Ana Ruiz');
@@ -200,7 +200,7 @@ export const AnatomyModal = {
 };
 
 const ANATOMY_STEPS_PARTS = [
-    { selector: '.plus-pattern-sidebar__list', label: 'Steps', at: 'start' },
+    { selector: '.plus-template-sidebar__list', label: 'Steps', at: 'start' },
     { selector: '[data-probe="task-body"]', label: 'Body', at: 'end' },
     { selector: '[data-probe="bar"]', label: 'Footer', at: 'middle' },
 ];

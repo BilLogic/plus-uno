@@ -6,7 +6,7 @@
  * Section/stack-md; the header's rows stack Section/stack-sm.
  */
 
-.plus-pattern-section {
+.plus-template-section {
     display: flex;
     flex-direction: column;
     min-width: 0;
@@ -14,20 +14,20 @@
 }
 
 /* Space between the header, the body and the footer: Section/stack-md is the Figma value. */
-.plus-pattern-section-spacing-compact {
+.plus-template-section-spacing-compact {
     gap: var(--section-stack-sm);
 }
 
-.plus-pattern-section-spacing-default {
+.plus-template-section-spacing-default {
     gap: var(--section-stack-md);
 }
 
-.plus-pattern-section-spacing-spacious {
+.plus-template-section-spacing-spacious {
     gap: var(--section-stack-lg);
 }
 
 /* `_Section header`: the title row, then the tabs or toolbar row when there is one */
-.plus-pattern-section-header {
+.plus-template-section-header {
     display: flex;
     flex-direction: column;
     gap: var(--section-stack-sm);
@@ -35,15 +35,15 @@
 }
 
 /* Title row: heading block (or the custom header) + actions slot */
-.plus-pattern-section-title-row {
+.plus-template-section-title-row {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: var(--inline-md);
 }
 
-.plus-pattern-section-heading,
-.plus-pattern-section-custom {
+.plus-template-section-heading,
+.plus-template-section-custom {
     display: flex;
     flex: 1 1 auto;
     flex-direction: column;
@@ -51,47 +51,47 @@
     min-width: 0;
 }
 
-.plus-pattern-section-title {
+.plus-template-section-title {
     margin: 0;
     color: var(--ds-text);
 }
 
 /* The page header: Heading/large 24/28. */
-.plus-pattern-section-title--page {
+.plus-template-section-title--page {
     font: var(--heading-lg);
     letter-spacing: var(--heading-lg-tracking);
 }
 
 /* A section on a page: Heading/medium 20/24. */
-.plus-pattern-section-title--section {
+.plus-template-section-title--section {
     font: var(--heading-md);
 }
 
 /* A section inside a section: Heading/small 16/20. */
-.plus-pattern-section-title--subsection {
+.plus-template-section-title--subsection {
     font: var(--heading-sm);
 }
 
 /* Inside a Dialog or Modal (whose h1 is already Heading/medium 20), a section steps down to Heading/small 16 and its header-to-body gap to Section/stack-sm 8. */
-:is(.plus-dialog, .plus-modal) .plus-pattern-section-title--section {
+:is(.plus-dialog, .plus-modal) .plus-template-section-title--section {
     font: var(--heading-sm);
 }
 
-:is(.plus-dialog, .plus-modal) .plus-pattern-section-title--subsection {
+:is(.plus-dialog, .plus-modal) .plus-template-section-title--subsection {
     font: var(--heading-xs);
 }
 
-:is(.plus-dialog, .plus-modal) .plus-pattern-section-spacing-default {
+:is(.plus-dialog, .plus-modal) .plus-template-section-spacing-default {
     gap: var(--section-stack-sm);
 }
 
-.plus-pattern-section-description {
+.plus-template-section-description {
     margin: 0;
     font: var(--body-default);
     color: var(--ds-text-subtle);
 }
 
-.plus-pattern-section-actions {
+.plus-template-section-actions {
     display: flex;
     align-items: center;
     gap: var(--inline-md);
@@ -174,31 +174,31 @@
 }
 
 /* Tabs row: the tabs, then "Add view" at its end. */
-.plus-pattern-section-tabs {
+.plus-template-section-tabs {
     display: flex;
     align-items: center;
     gap: var(--inline-md);
     min-width: 0;
 }
 
-.plus-pattern-section-toolbar {
+.plus-template-section-toolbar {
     min-width: 0;
 }
 
 /* Loading: skeleton bars in place of the header, Element/stack-sm apart. */
-.plus-pattern-section-skeleton {
+.plus-template-section-skeleton {
     display: flex;
     flex-direction: column;
     gap: var(--stack-sm);
 }
 
 /* Body */
-.plus-pattern-section-content {
+.plus-template-section-content {
     min-width: 0;
 }
 
 /* Inside a Dialog or Modal, body text sets in Body/default and the last paragraph keeps no trailing margin. */
-:is(.plus-dialog, .plus-modal) .plus-pattern-section-content {
+:is(.plus-dialog, .plus-modal) .plus-template-section-content {
     font: var(--body-default);
 
     > p:last-child {
@@ -207,7 +207,7 @@
 }
 
 /* Subsections: nested sections, Section/stack-lg apart. */
-.plus-pattern-section-content--subsections {
+.plus-template-section-content--subsections {
     display: flex;
     flex-direction: column;
     gap: var(--section-stack-lg);
@@ -217,23 +217,23 @@
  * Detail: an inline expand inside the Section. The disclosure row opens the
  * detail region in place and pushes the content below it down.
  */
-.plus-pattern-section-with-detail {
+.plus-template-section-with-detail {
     display: flex;
     flex-direction: column;
     gap: var(--section-stack-md);
     min-width: 0;
 }
 
-.plus-pattern-section-list {
+.plus-template-section-list {
     min-width: 0;
 }
 
 /* The detail is a sunken PatternCard: the Card supplies the surface, the pad and the radius. */
-.plus-pattern-section-detail {
+.plus-template-section-detail {
     min-width: 0;
 }
 
-.plus-pattern-section-detail-trigger {
+.plus-template-section-detail-trigger {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -254,24 +254,24 @@
     ));
 }
 
-.plus-pattern-section-detail-heading {
+.plus-template-section-detail-heading {
     display: flex;
     flex-direction: column;
     gap: var(--stack-sm);
     min-width: 0;
 }
 
-.plus-pattern-section-detail-title {
+.plus-template-section-detail-title {
     font: var(--heading-sm);
     color: var(--ds-text);
 }
 
-.plus-pattern-section-detail-description {
+.plus-template-section-detail-description {
     font: var(--body-sm);
     color: var(--ds-text-subtle);
 }
 
-.plus-pattern-section-detail-chevron {
+.plus-template-section-detail-chevron {
     display: inline-flex;
     flex-shrink: 0;
     color: var(--ds-icon-subtle);
@@ -279,29 +279,29 @@
     transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast);
 }
 
-.plus-pattern-section-detail-trigger[data-panel-open] .plus-pattern-section-detail-chevron {
+.plus-template-section-detail-trigger[data-panel-open] .plus-template-section-detail-chevron {
     transform: rotate(-180deg);
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .plus-pattern-section-detail-trigger,
-    .plus-pattern-section-detail-chevron {
+    .plus-template-section-detail-trigger,
+    .plus-template-section-detail-chevron {
         transition: none;
     }
 }
 
-.plus-pattern-section-detail-body {
+.plus-template-section-detail-body {
     display: flex;
     flex-direction: column;
     gap: var(--card-stack-md);
     padding-top: var(--card-stack-md);
 }
 
-.plus-pattern-section-detail-content {
+.plus-template-section-detail-content {
     min-width: 0;
 }
 
-.plus-pattern-section-detail-footer {
+.plus-template-section-detail-footer {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -315,24 +315,24 @@
  * grid exactly; each column wraps under the other once it would drop below
  * its minimum.
  */
-.plus-pattern-section-content--split {
+.plus-template-section-content--split {
     display: flex;
     flex-wrap: wrap;
     gap: var(--grid-gutter);
 }
 
-.plus-pattern-section-main {
+.plus-template-section-main {
     flex: 2 1 var(--grid-gutter);
     min-width: min(100%, var(--section-min-width-main));
 }
 
-.plus-pattern-section-side {
+.plus-template-section-side {
     flex: 1 1 0;
     min-width: min(100%, var(--section-min-width-side));
 }
 
 /* Footer: "View all" or paging, at the end. */
-.plus-pattern-section-footer {
+.plus-template-section-footer {
     display: flex;
     justify-content: flex-end;
     min-width: 0;

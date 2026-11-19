@@ -308,13 +308,13 @@ export const MotionLibraryCard = ({
             data-active-mode={mode}
             data-active-transition={activeEvent.transition}
             header={
-                <div className="plus-pattern-card-header--default">
-                    <div className="plus-pattern-card-heading">
-                        <span id={titleId} className="plus-pattern-card-title">
+                <div className="plus-template-card-header--default">
+                    <div className="plus-template-card-heading">
+                        <span id={titleId} className="plus-template-card-title">
                             {row.name}
                         </span>
                     </div>
-                    <div className="plus-pattern-card-actions">
+                    <div className="plus-template-card-actions">
                         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-sm)' }}>
                             <Tag color="gray">{row.tier}</Tag>
                             <IconButton

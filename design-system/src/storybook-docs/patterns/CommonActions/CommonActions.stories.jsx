@@ -162,7 +162,7 @@ export const PlacementCard = {
         await expectFullScale(canvasElement);
         const open = canvas.getByRole('button', { name: 'Open session' });
         await expect(open.className, 'the main action is Subtle').toContain('subtle');
-        await expect(open.closest('.plus-pattern-card-footer'), 'in the card\'s footer').not.toBeNull();
+        await expect(open.closest('.plus-template-card-footer'), 'in the card\'s footer').not.toBeNull();
         await expect(open).toBeEnabled();
         await userEvent.click(open);
         await fitsCanvas(canvasElement);

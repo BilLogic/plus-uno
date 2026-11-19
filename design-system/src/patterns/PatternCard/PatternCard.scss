@@ -3,7 +3,7 @@
 @use '../../styles/card-title' as *;
 @use '../../styles/state' as *;
 
-.plus-pattern-card {
+.plus-template-card {
     // A surface tells what sits on it which surface it is: a sticky table
     // cell inside the card paints this, so it matches the card, not the page.
     --ds-utility-elevation-surface-current: var(--card-surface-sunken);
@@ -25,19 +25,19 @@
     transition: box-shadow var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), border-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 }
 
-.plus-pattern-card--surface-sunken {
+.plus-template-card--surface-sunken {
     --ds-utility-elevation-surface-current: var(--card-surface-sunken);
     border-color: transparent;
     box-shadow: none;
 }
 
-.plus-pattern-card--surface-default {
+.plus-template-card--surface-default {
     --ds-utility-elevation-surface-current: var(--card-surface-default);
     border-color: var(--card-border-default);
     box-shadow: none;
 }
 
-.plus-pattern-card--surface-raised {
+.plus-template-card--surface-raised {
     // The raised pair travels together: the surface and its shadow, never one
     // without the other, or the card loses its edge in dark.
     --ds-utility-elevation-surface-current: var(--card-surface-raised);
@@ -45,7 +45,7 @@
     box-shadow: var(--card-shadow-raised);
 }
 
-.plus-pattern-card--clickable {
+.plus-template-card--clickable {
     cursor: pointer;
 }
 
@@ -65,8 +65,8 @@
         ),
     ),
     $ring: false,
-    $hovered-selector: '.plus-pattern-card--clickable:not(.plus-pattern-card--dragging):hover, .plus-pattern-card--clickable:not(.plus-pattern-card--dragging)[data-hovered]',
-    $pressed-selector: '.plus-pattern-card--clickable:not(.plus-pattern-card--dragging):active, .plus-pattern-card--clickable:not(.plus-pattern-card--dragging)[data-pressed]'
+    $hovered-selector: '.plus-template-card--clickable:not(.plus-template-card--dragging):hover, .plus-template-card--clickable:not(.plus-template-card--dragging)[data-hovered]',
+    $pressed-selector: '.plus-template-card--clickable:not(.plus-template-card--dragging):active, .plus-template-card--clickable:not(.plus-template-card--dragging)[data-pressed]'
 );
 
 // A clickable raised card lifts while hovered (raised hovered step under the
@@ -85,8 +85,8 @@
         ),
     ),
     $ring: false,
-    $hovered-selector: '.plus-pattern-card--surface-raised.plus-pattern-card--clickable:not(.plus-pattern-card--dragging):hover, .plus-pattern-card--surface-raised.plus-pattern-card--clickable:not(.plus-pattern-card--dragging)[data-hovered]',
-    $pressed-selector: '.plus-pattern-card--surface-raised.plus-pattern-card--clickable:not(.plus-pattern-card--dragging):active, .plus-pattern-card--surface-raised.plus-pattern-card--clickable:not(.plus-pattern-card--dragging)[data-pressed]'
+    $hovered-selector: '.plus-template-card--surface-raised.plus-template-card--clickable:not(.plus-template-card--dragging):hover, .plus-template-card--surface-raised.plus-template-card--clickable:not(.plus-template-card--dragging)[data-hovered]',
+    $pressed-selector: '.plus-template-card--surface-raised.plus-template-card--clickable:not(.plus-template-card--dragging):active, .plus-template-card--surface-raised.plus-template-card--clickable:not(.plus-template-card--dragging)[data-pressed]'
 );
 
 // A dragged card is over the UI: the overlay pair, held under hover and press.
@@ -96,7 +96,7 @@ $-dragging: (
     box-shadow: var(--card-shadow-overlay),
 );
 
-.plus-pattern-card--dragging {
+.plus-template-card--dragging {
     --ds-utility-elevation-surface-current: var(--card-surface-overlay);
     border-color: transparent;
     box-shadow: var(--card-shadow-overlay);
@@ -105,17 +105,17 @@ $-dragging: (
 @include plus-state(
     (hovered: $-dragging, pressed: $-dragging),
     $ring: false,
-    $hovered-selector: '.plus-pattern-card--dragging:hover, .plus-pattern-card--dragging[data-hovered]',
-    $pressed-selector: '.plus-pattern-card--dragging:active, .plus-pattern-card--dragging[data-pressed]'
+    $hovered-selector: '.plus-template-card--dragging:hover, .plus-template-card--dragging[data-hovered]',
+    $pressed-selector: '.plus-template-card--dragging:active, .plus-template-card--dragging[data-pressed]'
 );
 
 @media (forced-colors: active) {
-    .plus-pattern-card {
+    .plus-template-card {
         border-color: CanvasText;
     }
 }
 
-.plus-pattern-card-inner {
+.plus-template-card-inner {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -125,7 +125,7 @@ $-dragging: (
     padding: var(--card-pad);
 }
 
-.plus-pattern-card-content {
+.plus-template-card-content {
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
@@ -133,19 +133,19 @@ $-dragging: (
 }
 
 /* Header → body stack */
-.plus-pattern-card-gap-sm .plus-pattern-card-content {
+.plus-template-card-gap-sm .plus-template-card-content {
     gap: var(--card-stack-sm);
 }
 
-.plus-pattern-card-gap-md .plus-pattern-card-content {
+.plus-template-card-gap-md .plus-template-card-content {
     gap: var(--card-stack-md);
 }
 
-.plus-pattern-card-gap-lg .plus-pattern-card-content {
+.plus-template-card-gap-lg .plus-template-card-content {
     gap: var(--card-stack-lg);
 }
 
-.plus-pattern-card-image {
+.plus-template-card-image {
     flex: 0 0 100%;
     min-width: 0;
 }
@@ -153,15 +153,15 @@ $-dragging: (
 // Large card minimum width (480px --card-min-width-lg minus the 1px border on each side).
 // Container queries use the card's content width, independently of the page breakpoint.
 @container pattern-card (min-width: 478px) {
-    .plus-pattern-card--image-start,
-    .plus-pattern-card--image-end {
-        > .plus-pattern-card-image {
+    .plus-template-card--image-start,
+    .plus-template-card--image-end {
+        > .plus-template-card-image {
             flex: 0 0 calc(100% / 3);
             position: relative;
             overflow: hidden;
         }
-        > .plus-pattern-card-inner { flex: 1 1 0; }
-        > .plus-pattern-card-image > * {
+        > .plus-template-card-inner { flex: 1 1 0; }
+        > .plus-template-card-image > * {
             position: absolute;
             inset: 0;
             width: 100%;
@@ -169,26 +169,26 @@ $-dragging: (
             object-fit: cover;
             aspect-ratio: auto !important;
         }
-        &.plus-pattern-card--image-half {
-            > .plus-pattern-card-image { flex-basis: 50%; }
-            .plus-pattern-card-title { font: var(--card-title-font-lg); }
+        &.plus-template-card--image-half {
+            > .plus-template-card-image { flex-basis: 50%; }
+            .plus-template-card-title { font: var(--card-title-font-lg); }
         }
     }
-    .plus-pattern-card--image-end > .plus-pattern-card-image { order: 1; }
+    .plus-template-card--image-end > .plus-template-card-image { order: 1; }
 }
 
 /* `_Card header`: the title block and the actions on one row */
-.plus-pattern-card-header {
+.plus-template-card-header {
     min-width: 0;
 }
 
-.plus-pattern-card-header--default {
+.plus-template-card-header--default {
     display: flex;
     align-items: flex-start;
     gap: var(--card-inline-md);
 }
 
-.plus-pattern-card-heading {
+.plus-template-card-heading {
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
@@ -197,31 +197,31 @@ $-dragging: (
 }
 
 // The card title type, shared with Card (`styles/_card-title.scss`).
-.plus-pattern-card-title {
+.plus-template-card-title {
     @include card-title-type;
     color: var(--card-text);
 }
 
-.plus-pattern-card-description {
+.plus-template-card-description {
     margin: 0;
     font: var(--card-description-font);
     color: var(--card-text-subtle);
 }
 
-.plus-pattern-card-actions {
+.plus-template-card-actions {
     display: flex;
     align-items: center;
     flex-shrink: 0;
     gap: var(--card-inline-md);
 }
 
-.plus-pattern-card-body {
+.plus-template-card-body {
     flex: 1 1 auto;
     min-width: 0;
 }
 
 /* Footer: commit actions, left-aligned */
-.plus-pattern-card-footer {
+.plus-template-card-footer {
     display: flex;
     align-items: center;
     justify-content: flex-start;

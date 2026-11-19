@@ -87,7 +87,7 @@ export const HeaderAndBanner = {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         const header = canvas.getByRole('heading', { level: 1, name: 'Sessions' }).closest('header');
-        const content = canvas.getByRole('heading', { level: 2, name: 'Upcoming sessions' }).closest('.plus-pattern-section');
+        const content = canvas.getByRole('heading', { level: 2, name: 'Upcoming sessions' }).closest('.plus-template-section');
         const gap = px(probe(canvasElement, 'marginTop', 'var(--page-stack-md)'));
         const banner = canvas.getByRole('status');
         await expect(banner.getBoundingClientRect().top - header.getBoundingClientRect().bottom).toBeCloseTo(gap, 0);
@@ -120,7 +120,7 @@ export const OptionalSlots = {
         await expect(within(headerOnly).queryByText('Fallback title')).toBeNull();
         await expect(headerOnly.children).toHaveLength(1);
         const bannerOnly = canvas.getByTestId('banner-only');
-        await expect(bannerOnly.firstElementChild).toHaveClass('plus-pattern-page-banner');
+        await expect(bannerOnly.firstElementChild).toHaveClass('plus-template-page-banner');
         const titleBanner = canvas.getByTestId('title-banner');
         const gap = px(probe(canvasElement, 'marginTop', 'var(--page-stack-md)'));
         await expect(titleBanner.lastElementChild.getBoundingClientRect().top - titleBanner.firstElementChild.getBoundingClientRect().bottom).toBeCloseTo(gap, 0);
@@ -138,7 +138,7 @@ export const ColorModes = {
     parameters: { docs: { disable: true } },
     play: async ({ canvasElement }) => {
         await inEveryColorMode(async (mode) => {
-            const el = canvasElement.querySelector('.plus-pattern-page');
+            const el = canvasElement.querySelector('.plus-template-page');
             const style = getComputedStyle(el);
             await expect(style.backgroundColor, `${mode}: fill`).toBe(tokenColor(canvasElement, '--ds-surface'));
             await expect(style.boxShadow, `${mode}: no shadow`).toBe('none');
@@ -158,7 +158,7 @@ export const MediumPad = {
     ),
     parameters: { docs: { disable: true } },
     play: async ({ canvasElement }) => {
-        const style = getComputedStyle(canvasElement.querySelector('.plus-pattern-page'));
+        const style = getComputedStyle(canvasElement.querySelector('.plus-template-page'));
         const pad = px(probe(canvasElement, 'paddingTop', 'var(--page-pad)', { display: 'block' }));
         await expect(pad).toBe(24);
         for (const side of ['Top', 'Right', 'Bottom', 'Left']) {
@@ -300,7 +300,7 @@ export const ScenarioArea = {
         await expect(canvas.getAllByRole('heading', { level: 1 }), 'one h1').toHaveLength(1);
         await expect(canvasElement.querySelector('.plus-page-header-actions'), 'no page actions on an area page').toBeNull();
         const add = canvas.getByRole('button', { name: 'Add student' });
-        await expect(add.closest('.plus-pattern-section-actions'), '"Add student" sits in the Section title row, not the page header').not.toBeNull();
+        await expect(add.closest('.plus-template-section-actions'), '"Add student" sits in the Section title row, not the page header').not.toBeNull();
         await expect(Math.round(add.getBoundingClientRect().height), 'the action draws 32').toBe(32);
         await expect(canvasElement.querySelectorAll('.plus-section-rows > .plus-section-row'), 'views row only; no search or filter row').toHaveLength(1);
     },

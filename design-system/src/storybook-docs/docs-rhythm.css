@@ -476,8 +476,8 @@
     .plus-prompt-input,
     .plus-rich-text-editor,
     .plus-comment,
-    .plus-pattern-section,
-    .plus-pattern-card,
+    .plus-template-section,
+    .plus-template-card,
     .plus-table-shell,
     .plus-table-container,
     .plus-dynamic-table,
@@ -485,7 +485,7 @@
     .plus-tree-table,
     table,
     [style*="display: grid"],
-    :has(.plus-pattern-section, .plus-pattern-card, .plus-table-shell, .plus-banner, .plus-section-message, .plus-progress-bar, .plus-range, table)
+    :has(.plus-template-section, .plus-template-card, .plus-table-shell, .plus-banner, .plus-section-message, .plus-progress-bar, .plus-range, table)
 ) {
     align-self: stretch;
 }

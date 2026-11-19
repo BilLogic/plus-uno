@@ -88,7 +88,7 @@ export const ListWithFilters = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expect(canvas.getAllByRole('row')).toHaveLength(4);
-        const header = canvasElement.querySelector('.plus-pattern-section-header');
+        const header = canvasElement.querySelector('.plus-template-section-header');
         const heights = [...header.querySelectorAll('.plus-section-rows button, .plus-section-rows input')]
             .filter((el) => !el.closest('.plus-section-row__views'))
             .map((el) => Math.round((el.closest('.plus-search-field') ?? el).getBoundingClientRect().height));

@@ -73,7 +73,7 @@ describe('Sidebar disclosures', () => {
         const user = userEvent.setup();
         renderSidebar();
         const group = screen.getByRole('group', { name: 'Toolkit' });
-        expect(group.querySelector('ul.plus-pattern-sidebar__list')).not.toBeNull();
+        expect(group.querySelector('ul.plus-template-sidebar__list')).not.toBeNull();
         const trigger = screen.getByRole('button', { name: /account menu/ });
         expect(trigger).toHaveAttribute('aria-expanded', 'false');
         trigger.focus();

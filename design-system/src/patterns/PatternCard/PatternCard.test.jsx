@@ -34,18 +34,18 @@ describe('PatternCard surfaces', () => {
         const { container, rerender } = render(<PatternCard title="Sunken">Body</PatternCard>);
         const card = () => container.firstElementChild;
 
-        expect(card()).toHaveClass('plus-pattern-card', 'plus-pattern-card--surface-sunken');
-        expect(card()).not.toHaveClass('plus-pattern-card--surface-default', 'plus-pattern-card--surface-raised');
+        expect(card()).toHaveClass('plus-template-card', 'plus-template-card--surface-sunken');
+        expect(card()).not.toHaveClass('plus-template-card--surface-default', 'plus-template-card--surface-raised');
 
         rerender(<PatternCard surface="default" title="Default">Body</PatternCard>);
-        expect(card()).toHaveClass('plus-pattern-card--surface-default');
+        expect(card()).toHaveClass('plus-template-card--surface-default');
 
         rerender(<PatternCard surface="raised" onClick={() => {}} title="Raised">Body</PatternCard>);
-        expect(card()).toHaveClass('plus-pattern-card--surface-raised', 'plus-pattern-card--clickable');
+        expect(card()).toHaveClass('plus-template-card--surface-raised', 'plus-template-card--clickable');
 
         rerender(<PatternCard surface="sunken" dragging title="Dragging">Body</PatternCard>);
-        expect(card()).toHaveClass('plus-pattern-card--surface-sunken', 'plus-pattern-card--dragging');
-        expect(card().className).not.toMatch(/plus-pattern-card-pad-/);
-        expect(card().querySelector('.plus-pattern-card-inner')).toBeInTheDocument();
+        expect(card()).toHaveClass('plus-template-card--surface-sunken', 'plus-template-card--dragging');
+        expect(card().className).not.toMatch(/plus-template-card-pad-/);
+        expect(card().querySelector('.plus-template-card-inner')).toBeInTheDocument();
     });
 });

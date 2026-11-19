@@ -31,8 +31,8 @@ const Blanket = ({
     const present = useOverlayPresence(inline ? show : true, surface);
 
     const classes = [
-        'plus-pattern-blanket',
-        inline ? 'plus-pattern-blanket-inline' : '',
+        'plus-template-blanket',
+        inline ? 'plus-template-blanket-inline' : '',
         className,
     ].filter(Boolean).join(' ');
 

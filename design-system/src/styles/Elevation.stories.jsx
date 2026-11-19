@@ -276,7 +276,7 @@ export const CardLevels = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const [rest, , dragged] = canvasElement.querySelectorAll('.plus-pattern-card');
+        const [rest, , dragged] = canvasElement.querySelectorAll('.plus-template-card');
         await expect(getComputedStyle(dragged).boxShadow).not.toBe(getComputedStyle(rest).boxShadow);
     },
 };
@@ -521,7 +521,7 @@ export const Contrast = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const ground = canvasElement.querySelector('[data-testid="contrast-demo"] [data-contrast-mode]');
-        const card = ground.querySelector('.plus-pattern-card, [class*="card"]');
+        const card = ground.querySelector('.plus-template-card, [class*="card"]');
         await waitFor(() => expect(ground.querySelector('.plus-popup')).not.toBeNull());
         const ringAlpha = () => parseShadow(getComputedStyle(card).boxShadow)[0]?.color.a ?? 0;
         await expect(ground).toHaveAttribute('data-contrast-mode', 'no-preference');
@@ -569,7 +569,7 @@ export const LiftWithShadow = {
         </DoDont>
     ),
     play: async ({ canvasElement }) => {
-        const cards = canvasElement.querySelectorAll('.plus-pattern-card');
+        const cards = canvasElement.querySelectorAll('.plus-template-card');
         await expect(cards).toHaveLength(2);
         await expect(getComputedStyle(cards[0]).boxShadow).not.toBe('none');
         await expect(getComputedStyle(cards[1]).boxShadow).toBe('none');
@@ -638,7 +638,7 @@ export const BlockingOnBlanket = {
         </DoDont>
     ),
     play: async ({ canvasElement }) => {
-        const blanket = canvasElement.querySelector('.plus-pattern-blanket');
+        const blanket = canvasElement.querySelector('.plus-template-blanket');
         const modal = canvasElement.querySelector('.plus-modal');
         const panel = canvasElement.querySelector('.plus-panel');
         await expect(blanket).not.toBeNull();
@@ -665,8 +665,8 @@ export const SunkenNeverFloats = {
         </DoDont>
     ),
     play: async ({ canvasElement }) => {
-        const sunken = canvasElement.querySelector('.plus-pattern-card--surface-sunken');
-        const raised = canvasElement.querySelector('.plus-pattern-card--surface-raised');
+        const sunken = canvasElement.querySelector('.plus-template-card--surface-sunken');
+        const raised = canvasElement.querySelector('.plus-template-card--surface-raised');
         await expect(sunken).not.toBeNull();
         await expect(getComputedStyle(sunken).boxShadow).toBe('none');
         await expect(raised).not.toBeNull();
@@ -734,7 +734,7 @@ export const OneFocalPoint = {
     play: async ({ canvasElement }) => {
         const pair = canvasElement.querySelector('.sb-ds-dodont-pair');
         await expect(pair).not.toBeNull();
-        const cards = pair.querySelectorAll('.plus-pattern-card');
+        const cards = pair.querySelectorAll('.plus-template-card');
         await expect(cards).toHaveLength(4);
         await expect(pair.querySelectorAll('.plus-static-table')).toHaveLength(1);
     },

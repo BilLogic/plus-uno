@@ -150,7 +150,7 @@ test('Sidebar: rows, titles and the account row hover on the neutral subtle hove
   const decls = [];
   sheet('components/navigation/Sidebar/Sidebar.scss').walkRules((rule) => {
     if (/:hover/.test(rule.selector)) {
-      const selected = /--selected/.test(rule.selector) && !/:not\(\.plus-pattern-sidebar__row--selected\)/.test(rule.selector);
+      const selected = /--selected/.test(rule.selector) && !/:not\(\.plus-template-sidebar__row--selected\)/.test(rule.selector);
       for (const node of rule.nodes) if (node.prop === 'background-color') decls.push([selected, node.value]);
     }
   });

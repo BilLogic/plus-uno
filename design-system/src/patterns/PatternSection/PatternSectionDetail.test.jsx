@@ -32,9 +32,9 @@ describe('PatternSection detail (inline expand)', () => {
         expect(trigger).toHaveAttribute('aria-expanded', 'false');
         expect(screen.queryByRole('region', { name: 'Ava Thompson' })).toBeNull();
         expect(screen.getByText('Section rows')).toBeInTheDocument();
-        const detail = container.querySelector('.plus-pattern-section-detail');
-        expect(detail.className).toContain('plus-pattern-card--surface-sunken');
-        expect(detail.className).toContain('plus-pattern-card');
+        const detail = container.querySelector('.plus-template-section-detail');
+        expect(detail.className).toContain('plus-template-card--surface-sunken');
+        expect(detail.className).toContain('plus-template-card');
     });
 
     it('opens in place on click and names the detail region from detailTitle, then closes on click', async () => {
@@ -115,10 +115,10 @@ describe('PatternSection detail (inline expand)', () => {
 
     it('draws no detail wrapper on a plain Section or when detail is null', () => {
         const { container, rerender } = render(<PatternSection title="Sessions">Body</PatternSection>);
-        expect(container.querySelector('.plus-pattern-section-with-detail')).toBeNull();
-        expect(container.querySelector('.plus-pattern-section-detail')).toBeNull();
+        expect(container.querySelector('.plus-template-section-with-detail')).toBeNull();
+        expect(container.querySelector('.plus-template-section-detail')).toBeNull();
 
         rerender(<PatternSection title="Sessions" detail={null}>Body</PatternSection>);
-        expect(container.querySelector('.plus-pattern-section-detail')).toBeNull();
+        expect(container.querySelector('.plus-template-section-detail')).toBeNull();
     });
 });

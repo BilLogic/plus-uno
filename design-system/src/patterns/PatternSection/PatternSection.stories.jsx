@@ -220,7 +220,7 @@ export const SunkenCard = {
         const card = getComputedStyle(canvasElement.querySelector('[data-testid="sunken-card"]'));
         await expect(card.backgroundColor, 'the Card is on the sunken surface').toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
         await expect(card.borderTopLeftRadius, 'Card radius is 16').toBe('16px');
-        await expect(getComputedStyle(canvasElement.querySelector('.plus-pattern-card-inner')).paddingTop, 'Card pad is 16').toBe('16px');
+        await expect(getComputedStyle(canvasElement.querySelector('.plus-template-card-inner')).paddingTop, 'Card pad is 16').toBe('16px');
     },
 };
 
@@ -233,11 +233,11 @@ export const DetailIsSunkenCard = {
         </PatternSection>
     ),
     play: async ({ canvasElement }) => {
-        const detail = canvasElement.querySelector('.plus-pattern-section-detail');
+        const detail = canvasElement.querySelector('.plus-template-section-detail');
         const style = getComputedStyle(detail);
         await expect(style.backgroundColor, 'the detail is on the sunken surface').toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
         await expect(style.borderTopLeftRadius, 'detail radius is 16').toBe('16px');
-        await expect(getComputedStyle(detail.querySelector('.plus-pattern-card-inner')).paddingTop, 'detail pad is 16').toBe('16px');
+        await expect(getComputedStyle(detail.querySelector('.plus-template-card-inner')).paddingTop, 'detail pad is 16').toBe('16px');
     },
 };
 
@@ -250,7 +250,7 @@ export const CardNesting = {
         </PatternSection>
     ),
     play: async ({ canvasElement }) => {
-        const radius = (id) => getComputedStyle(canvasElement.querySelector(`[data-testid="${id}"] .plus-pattern-card`)).borderTopLeftRadius;
+        const radius = (id) => getComputedStyle(canvasElement.querySelector(`[data-testid="${id}"] .plus-template-card`)).borderTopLeftRadius;
         await expect(radius('plain'), 'Card in a Section: 16').toBe('16px');
     },
 };
@@ -265,7 +265,7 @@ export const NoSurfaceNoPad = {
         </PatternSection>
     ),
     play: async ({ canvasElement }) => {
-        const sections = [...canvasElement.querySelectorAll('.plus-pattern-section')];
+        const sections = [...canvasElement.querySelectorAll('.plus-template-section')];
         await expect(sections.length).toBe(3);
         sections.forEach((section) => {
             const style = getComputedStyle(section);
@@ -491,8 +491,8 @@ export const ColorModes = {
     parameters: { docs: { disable: true } },
     play: async ({ canvasElement }) => {
         const plain = canvasElement.querySelector('[data-probe="plain"]');
-        const title = plain.querySelector('.plus-pattern-section-title');
-        const desc = plain.querySelector('.plus-pattern-section-description');
+        const title = plain.querySelector('.plus-template-section-title');
+        const desc = plain.querySelector('.plus-template-section-description');
         await inEveryColorMode(async (mode) => {
             await expect(getComputedStyle(plain).backgroundColor, `${mode}: no fill`).toBe('rgba(0, 0, 0, 0)');
             await expect(getComputedStyle(plain).paddingTop, `${mode}: no pad`).toBe('0px');
@@ -520,7 +520,7 @@ export const SplitLayout = {
     parameters: { docs: { disable: true } },
     play: async ({ canvasElement }) => {
         const gutter = tokenLength(canvasElement, '--grid-gutter');
-        const box = (probe, part) => canvasElement.querySelector(`[data-probe="${probe}"] .plus-pattern-section-${part}`).getBoundingClientRect();
+        const box = (probe, part) => canvasElement.querySelector(`[data-probe="${probe}"] .plus-template-section-${part}`).getBoundingClientRect();
         const W = 960;
         const span = (n) => (n * (W - 11 * gutter)) / 12 + (n - 1) * gutter;
         await expect(box('wide', 'main').width, 'main is span 8').toBeCloseTo(span(8), 0);
@@ -541,11 +541,11 @@ export const Spacing = {
     parameters: { docs: { disable: true } },
     play: async ({ canvasElement }) => {
         const q = (s) => canvasElement.querySelector(s).getBoundingClientRect();
-        await expect(q('.plus-pattern-section-content').top - q('.plus-pattern-section-header').bottom, 'header to body')
+        await expect(q('.plus-template-section-content').top - q('.plus-template-section-header').bottom, 'header to body')
             .toBeCloseTo(tokenLength(canvasElement, '--section-stack-md'), 0);
-        await expect(q('.plus-section-rows').top - q('.plus-pattern-section-title-row').bottom, 'title row to header rows')
+        await expect(q('.plus-section-rows').top - q('.plus-template-section-title-row').bottom, 'title row to header rows')
             .toBeCloseTo(tokenLength(canvasElement, '--section-stack-sm'), 0);
-        await expect(q('.plus-pattern-section-description').top - q('.plus-pattern-section-title').bottom, 'title to description')
+        await expect(q('.plus-template-section-description').top - q('.plus-template-section-title').bottom, 'title to description')
             .toBeCloseTo(tokenLength(canvasElement, '--stack-sm'), 0);
     },
 };
@@ -591,7 +591,7 @@ export const Detail = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const trigger = canvas.getByRole('button', { name: /Ava Thompson/ });
-        const footer = canvasElement.querySelector('.plus-pattern-section-footer');
+        const footer = canvasElement.querySelector('.plus-template-section-footer');
 
         await expect(trigger).toHaveAttribute('aria-expanded', 'false');
         await expect(canvas.queryByRole('region', { name: 'Ava Thompson' })).toBeNull();
@@ -625,7 +625,7 @@ export const Detail = {
         await userEvent.keyboard('{Enter}');
         await expect(trigger).toHaveAttribute('aria-expanded', 'true');
         await waitFor(() => expect(
-            getComputedStyle(canvasElement.querySelector('.plus-pattern-section-detail-panel')).opacity,
+            getComputedStyle(canvasElement.querySelector('.plus-template-section-detail-panel')).opacity,
         ).toBe('1'));
     },
 };
@@ -948,7 +948,7 @@ const fullHeader = {
 
 /** Every control in a header row is 32 (Tag 20): measured, not assumed. */
 const expectOneHeight = async (canvasElement) => {
-    const header = canvasElement.querySelector('.plus-pattern-section-header');
+    const header = canvasElement.querySelector('.plus-template-section-header');
     const controls = [...header.querySelectorAll('button, input')].filter((el) => {
         const box = el.getBoundingClientRect();
         return box.height > 0 && !el.closest('.plus-section-row__views') && el.type !== 'hidden';
@@ -1393,11 +1393,11 @@ export const EmptyInTable = {
 /* ---- anatomy */
 
 const ANATOMY_PARTS = [
-    { selector: '[data-anatomy-root] > .plus-pattern-section-header .plus-pattern-section-title-row', label: 'Title row' },
-    { selector: '[data-anatomy-root] > .plus-pattern-section-header .plus-section-rows', label: 'Header rows' },
-    { selector: '[data-anatomy-root] .plus-pattern-section-list', label: 'Body' },
-    { selector: '[data-anatomy-root] .plus-pattern-section-detail', label: 'Detail', side: 'end' },
-    { selector: '[data-anatomy-root] > .plus-pattern-section-footer', label: 'Footer' },
+    { selector: '[data-anatomy-root] > .plus-template-section-header .plus-template-section-title-row', label: 'Title row' },
+    { selector: '[data-anatomy-root] > .plus-template-section-header .plus-section-rows', label: 'Header rows' },
+    { selector: '[data-anatomy-root] .plus-template-section-list', label: 'Body' },
+    { selector: '[data-anatomy-root] .plus-template-section-detail', label: 'Detail', side: 'end' },
+    { selector: '[data-anatomy-root] > .plus-template-section-footer', label: 'Footer' },
 ];
 
 /** Every part once: a Section with its header rows, an inline detail and a footer. */

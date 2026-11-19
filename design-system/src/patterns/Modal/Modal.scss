@@ -5,7 +5,7 @@
  * Combines the Blanket layer (`--layer-blanket`, `--ds-blanket`, `--blanket-pad-*`)
  * with `--modal-*` template tokens on the Dialog panel.
  */
-.plus-pattern-blanket {
+.plus-template-blanket {
     position: fixed;
     inset: 0;
     z-index: var(--layer-blanket);
@@ -36,7 +36,7 @@
     }
 }
 
-.plus-pattern-blanket-inline {
+.plus-template-blanket-inline {
     position: relative;
     inset: auto;
     z-index: auto;

@@ -46,7 +46,7 @@ const parts = (canvasElement) => {
         filterIcon: () => canvas.queryByRole('button', { name: /^Filters/ }),
         rows: () => bar.querySelectorAll('.plus-section-row'),
         popup: () => canvasElement.querySelector('[data-filter-stage] [role="dialog"], [data-filter-stage] .plus-popup'),
-        status: () => canvasElement.querySelector('.plus-pattern-section-content span[role="status"]'),
+        status: () => canvasElement.querySelector('.plus-template-section-content span[role="status"]'),
     };
 };
 
@@ -235,7 +235,7 @@ export const FilterCount = {
         });
 
         await step('No row of tags repeats what is on', async () => {
-            await expect(canvasElement.querySelector('.plus-pattern-section-content .plus-tag, .plus-tag-group'), 'no tags under the header').toBeNull();
+            await expect(canvasElement.querySelector('.plus-template-section-content .plus-tag, .plus-tag-group'), 'no tags under the header').toBeNull();
         });
 
         await step('Reset clears the menu; Apply clears the count', async () => {

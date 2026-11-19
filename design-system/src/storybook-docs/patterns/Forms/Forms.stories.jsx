@@ -63,7 +63,7 @@ export const SettingsInPage = {
         await expect(canvas.getByRole('heading', { level: 1, name: 'Settings' })).toBeInTheDocument();
         await expect(canvas.getByRole('heading', { level: 2, name: 'Notifications' })).toBeInTheDocument();
         await expect(canvas.getByRole('heading', { level: 2, name: 'Connected accounts' })).toBeInTheDocument();
-        await expect(canvasElement.querySelector('.plus-pattern-card'), 'no card per row').toBeNull();
+        await expect(canvasElement.querySelector('.plus-template-card'), 'no card per row').toBeNull();
         await expect(canvas.queryByRole('button', { name: /^Save/i }), 'instant settings need no Save button').toBeNull();
 
         const rows = canvasElement.querySelectorAll('.plus-setting-row');

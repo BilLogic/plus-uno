@@ -79,7 +79,7 @@ test('every floating layer takes the overlay pair, and only the Modal blocks', (
  * that names another level, or a literal shadow, fails.
  */
 const SURFACES = [
-  { file: 'design-system/src/patterns/PatternCard/PatternCard.scss', rule: '.plus-pattern-card--dragging {', shadow: '--ds-shadow-overlay' },
+  { file: 'design-system/src/patterns/PatternCard/PatternCard.scss', rule: '.plus-template-card--dragging {', shadow: '--ds-shadow-overlay' },
   { file: 'design-system/src/components/overlays-and-layering/Popup/Popup.scss', rule: '.plus-popup {', shadow: '--ds-shadow-overlay' },
   { file: 'design-system/src/components/messaging/Flag/Flag.scss', rule: '.plus-flag', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
   // The floating Sidebar floats, so it takes the overlay pair; the docked one stays on the sunken fill.
@@ -122,15 +122,15 @@ function resolveTemplateValue(value) {
 const PATTERN_CARD = {
   file: 'design-system/src/patterns/PatternCard/PatternCard.scss',
   states: [
-    ['.plus-pattern-card', '--ds-surface-sunken', null],
-    ['.plus-pattern-card--surface-sunken', '--ds-surface-sunken', null],
-    ['.plus-pattern-card--surface-default', '--ds-surface', null],
-    ['.plus-pattern-card--surface-raised', '--ds-surface-raised', '--ds-shadow-raised'],
-    ['.plus-pattern-card--clickable:not(.plus-pattern-card--dragging):hover', '--ds-surface-raised', '--ds-shadow-raised'],
-    ['.plus-pattern-card--clickable:not(.plus-pattern-card--dragging):active', '--ds-surface-raised-pressed', '--ds-shadow-raised'],
-    ['.plus-pattern-card--surface-raised.plus-pattern-card--clickable:not(.plus-pattern-card--dragging):hover', '--ds-surface-raised-hovered', '--ds-shadow-overlay'],
-    ['.plus-pattern-card--surface-raised.plus-pattern-card--clickable:not(.plus-pattern-card--dragging):active', '--ds-surface-raised-pressed', '--ds-shadow-raised'],
-    ['.plus-pattern-card--dragging', '--ds-surface-overlay', '--ds-shadow-overlay'],
+    ['.plus-template-card', '--ds-surface-sunken', null],
+    ['.plus-template-card--surface-sunken', '--ds-surface-sunken', null],
+    ['.plus-template-card--surface-default', '--ds-surface', null],
+    ['.plus-template-card--surface-raised', '--ds-surface-raised', '--ds-shadow-raised'],
+    ['.plus-template-card--clickable:not(.plus-template-card--dragging):hover', '--ds-surface-raised', '--ds-shadow-raised'],
+    ['.plus-template-card--clickable:not(.plus-template-card--dragging):active', '--ds-surface-raised-pressed', '--ds-shadow-raised'],
+    ['.plus-template-card--surface-raised.plus-template-card--clickable:not(.plus-template-card--dragging):hover', '--ds-surface-raised-hovered', '--ds-shadow-overlay'],
+    ['.plus-template-card--surface-raised.plus-template-card--clickable:not(.plus-template-card--dragging):active', '--ds-surface-raised-pressed', '--ds-shadow-raised'],
+    ['.plus-template-card--dragging', '--ds-surface-overlay', '--ds-shadow-overlay'],
   ],
 };
 
@@ -226,10 +226,10 @@ function compiledDecls(file, selector) {
 
 test('PatternCard pairs each surface with its shadow, at rest, lifted, pressed and dragged', () => {
   const { file, states } = PATTERN_CARD;
-  const rest = compiledDecls(file, '.plus-pattern-card');
+  const rest = compiledDecls(file, '.plus-template-card');
   assert.equal(rest['background-color'], 'var(--ds-utility-elevation-surface-current)', `${file}: the card paints the current surface`);
   assert.equal(rest.border, 'var(--card-border-width) solid transparent', `${file}: every card keeps a 1px transparent border for forced colors`);
-  const defaultCard = compiledDecls(file, '.plus-pattern-card--surface-default');
+  const defaultCard = compiledDecls(file, '.plus-template-card--surface-default');
   assert.equal(resolveTemplateValue(defaultCard['border-color']), 'var(--ds-border)', `${file}: default surface uses --ds-border`);
   for (const [selector, surface, shadow] of states) {
     const decls = compiledDecls(file, selector);
@@ -239,7 +239,7 @@ test('PatternCard pairs each surface with its shadow, at rest, lifted, pressed a
   compiledRules(file).walkRules((rule) => {
     for (const selector of rule.selectors) {
       assert.ok(
-        !(selector.trim() === '.plus-pattern-card:hover' && rule.nodes.some((n) => n.prop === 'box-shadow')),
+        !(selector.trim() === '.plus-template-card:hover' && rule.nodes.some((n) => n.prop === 'box-shadow')),
         `${file}: "${selector}" lifts every card on hover, not only a clickable one`,
       );
     }

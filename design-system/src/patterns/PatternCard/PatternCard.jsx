@@ -51,13 +51,13 @@ const PatternCard = ({
     ...props
 }) => {
     const classes = [
-        'plus-pattern-card',
-        `plus-pattern-card--surface-${surface}`,
-        image ? `plus-pattern-card--image-${imagePlacement}` : '',
-        image && imageSplit === '1/2' ? 'plus-pattern-card--image-half' : '',
-        `plus-pattern-card-gap-${gap}`,
-        props.onClick ? 'plus-pattern-card--clickable' : '',
-        dragging ? 'plus-pattern-card--dragging' : '',
+        'plus-template-card',
+        `plus-template-card--surface-${surface}`,
+        image ? `plus-template-card--image-${imagePlacement}` : '',
+        image && imageSplit === '1/2' ? 'plus-template-card--image-half' : '',
+        `plus-template-card-gap-${gap}`,
+        props.onClick ? 'plus-template-card--clickable' : '',
+        dragging ? 'plus-template-card--dragging' : '',
         className,
     ].filter(Boolean).join(' ');
 
@@ -71,22 +71,22 @@ const PatternCard = ({
 
     return (
         <div id={id} className={classes} style={cardStyle} {...props}>
-            {image && <div className="plus-pattern-card-image">{image}</div>}
-            <div className="plus-pattern-card-inner">
-                <div className="plus-pattern-card-content">
-                    {header && <div className="plus-pattern-card-header">{header}</div>}
+            {image && <div className="plus-template-card-image">{image}</div>}
+            <div className="plus-template-card-inner">
+                <div className="plus-template-card-content">
+                    {header && <div className="plus-template-card-header">{header}</div>}
                     {!header && hasHeading && (
-                        <div className="plus-pattern-card-header plus-pattern-card-header--default">
-                            <div className="plus-pattern-card-heading">
-                                {title && <Title className="plus-pattern-card-title">{title}</Title>}
-                                {description && <p className="plus-pattern-card-description">{description}</p>}
+                        <div className="plus-template-card-header plus-template-card-header--default">
+                            <div className="plus-template-card-heading">
+                                {title && <Title className="plus-template-card-title">{title}</Title>}
+                                {description && <p className="plus-template-card-description">{description}</p>}
                             </div>
-                            {actions && <div className="plus-pattern-card-actions">{actions}</div>}
+                            {actions && <div className="plus-template-card-actions">{actions}</div>}
                         </div>
                     )}
-                    {children != null && <div className="plus-pattern-card-body">{children}</div>}
+                    {children != null && <div className="plus-template-card-body">{children}</div>}
                 </div>
-                {footer && <div className="plus-pattern-card-footer">{footer}</div>}
+                {footer && <div className="plus-template-card-footer">{footer}</div>}
             </div>
         </div>
     );
