@@ -7797,12 +7797,12 @@
           "deprecated": null
         },
         {
-          "name": "required",
+          "name": "isRequired",
           "type": "bool",
           "required": false,
           "default": "false",
           "values": null,
-          "description": null,
+          "description": "Sets `aria-required` on the field.",
           "deprecated": null
         },
         {
@@ -11767,7 +11767,7 @@
           "deprecated": null
         },
         {
-          "name": "readOnly",
+          "name": "isReadOnly",
           "type": "bool",
           "required": false,
           "default": "false",
@@ -11776,7 +11776,7 @@
           "deprecated": null
         },
         {
-          "name": "disabled",
+          "name": "isDisabled",
           "type": "bool",
           "required": false,
           "default": "false",
@@ -15726,7 +15726,7 @@
           "deprecated": null
         },
         {
-          "name": "required",
+          "name": "isRequired",
           "type": "bool",
           "required": false,
           "default": "false",
@@ -15801,7 +15801,7 @@
           "deprecated": null
         },
         {
-          "name": "disabled",
+          "name": "isDisabled",
           "type": "bool",
           "required": false,
           "default": "false",
@@ -15810,7 +15810,7 @@
           "deprecated": null
         },
         {
-          "name": "readOnly",
+          "name": "isReadOnly",
           "type": "bool",
           "required": false,
           "default": "false",

@@ -59,6 +59,9 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `Section onAddView / addViewLabel` | `views` |
 | `Rating variant` | `type` |
 | `CloseButton tone` | `appearance` |
+| `InlineEditableTextfield required` | `isRequired` |
+| `TagInput required / disabled / readOnly` | `isRequired`, `isDisabled`, `isReadOnly` |
+| `RichTextEditor readOnly / disabled` | `isReadOnly`, `isDisabled` |
 
 **Tokens**
 

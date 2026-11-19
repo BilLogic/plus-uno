@@ -21,7 +21,7 @@ const InlineEditableTextfield = ({
     placeholder,
     maxLength,
     type = 'text',
-    required = false,
+    isRequired = false,
     onConfirm,
     spacing = 'default',
     ...inlineEditProps
@@ -55,7 +55,7 @@ const InlineEditableTextfield = ({
                     maxLength={maxLength}
                     type={type}
                     spacing={spacing}
-                    isRequired={required}
+                    isRequired={isRequired}
                     isInvalid={validation === 'invalid'}
                     errorMessage={validationMessage}
                 />
@@ -76,7 +76,8 @@ InlineEditableTextfield.propTypes = {
     placeholder: PropTypes.string,
     maxLength: PropTypes.number,
     type: PropTypes.string,
-    required: PropTypes.bool,
+    /** Sets `aria-required` on the field. */
+    isRequired: PropTypes.bool,
     /** Called with the new text. Throw or reject to keep the field open with the error. */
     onConfirm: PropTypes.func,
     /** Returns a message to refuse the text, or nothing to accept it. May be async. */

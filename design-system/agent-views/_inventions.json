@@ -280,6 +280,27 @@
       "use": [
         "CloseButton.appearance"
       ]
+    },
+    {
+      "not": "InlineEditableTextfield required",
+      "use": [
+        "InlineEditableTextfield.isRequired"
+      ]
+    },
+    {
+      "not": "TagInput required / disabled / readOnly",
+      "use": [
+        "TagInput.isRequired",
+        "TagInput.isDisabled",
+        "TagInput.isReadOnly"
+      ]
+    },
+    {
+      "not": "RichTextEditor readOnly / disabled",
+      "use": [
+        "RichTextEditor.isReadOnly",
+        "RichTextEditor.isDisabled"
+      ]
     }
   ],
   "tokens": [
