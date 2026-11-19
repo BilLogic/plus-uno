@@ -4,8 +4,7 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as LoadingStories from './Loading.stories.jsx';
 import { KIND_STAGE } from './loadingDemo.jsx';
-import { MenuOneRowCase, MenuSkeletonRowsCase, SkeletonInShape, SpinnerInBlank } from './LoadingCases.jsx';
-import { CODE } from './LoadingCaseCode.js';
+import { CODE, MenuOneRowCase, MenuSkeletonRowsCase, SkeletonInShape, SpinnerInBlank } from './LoadingCases.jsx';
 import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
@@ -169,8 +168,10 @@ They open in answer to a click and open complete. A menu whose items must load s
 
 <DoDontPair
     doExample={<MenuOneRowCase />}
+    doCode={CODE.MenuOneRow}
     doCaption="A menu shows one &quot;Loading options&quot; row."
     dontExample={<MenuSkeletonRowsCase />}
+    dontCode={CODE.MenuSkeletonRows}
     dontCaption="A menu full of skeleton rows, promising items it may not have."
 />
 

@@ -5,6 +5,9 @@ import { Banner, Flag, FlagGroup } from '@/components';
 import { Page, Section } from '@/templates';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { STUDENTS, StudentsTable, ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
+import { showCode } from '@/storybook-docs/lib/show-code.js';
+import * as Example from './NotificationsExamples.jsx';
+import examplesSource from './NotificationsExamples.jsx?raw';
 import { DemoPageHeader } from '../../../templates/Page/pageDemo.jsx';
 
 /**
@@ -174,3 +177,27 @@ export const TierSectionCase = () => {
         </BrowserWindow>
     );
 };
+
+/** The Show code for each do and don't example, read from `NotificationsExamples.jsx`. */
+export const CODE = showCode(examplesSource, ['FlagDo', 'FlagDont', 'BannerDo', 'BannerDont']);
+
+/** Holds a Flag group inside the picture instead of the screen: `.sb-ds-flag-stage` turns its fixed layer into one placed in the stage. */
+const FlagStage = ({ children }) => (
+    <div className="sb-ds-flag-stage" style={{ boxSizing: 'border-box', inlineSize: '100%', minBlockSize: 'calc(var(--control-lg) * 4)' }}>{children}</div>
+);
+
+/** Do: a passing notice, one line of next step, held at the top right of the picture. */
+export const FlagDo = () => (
+    <FlagStage><Example.FlagDo /></FlagStage>
+);
+
+/** Don't: a decision in a Flag, which is gone before it is answered. */
+export const FlagDont = () => (
+    <FlagStage><Example.FlagDont /></FlagStage>
+);
+
+/** Do: one Banner, one line, at the tier it concerns. */
+export const BannerDo = () => <div style={pad}><Example.BannerDo /></div>;
+
+/** Don't: two Banners stacked, pushing the page down. */
+export const BannerDont = () => <div style={pad}><Example.BannerDont /></div>;

@@ -1,52 +1,31 @@
 import React from 'react';
-import { CustomItem, IconButton, Skeleton, Spinner } from '@/components';
-import { Section } from '@/templates';
-import { LoadingList } from './loadingDemo.jsx';
-import { LiveMenu } from '@/storybook-docs/lib/dropdown-menu-cases.jsx';
+import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
+import { showCode } from '@/storybook-docs/lib/show-code.js';
+import * as Example from './LoadingExamples.jsx';
+import examplesSource from './LoadingExamples.jsx?raw';
 
 /**
- * The live do and don't examples on the Loading pattern page, composed from
- * `LiveMenu`, `CustomItem`, `IconButton` and `Skeleton`.
+ * The live do and don't examples on the Loading pattern page, built from
+ * `LoadingExamples.jsx`, which Show code prints, and staged here.
  */
 
-const noop = () => {};
-const menuTrigger = <IconButton icon="ellipsis" label="More" appearance="subtle" onClick={noop} />;
+export const CODE = showCode(examplesSource, ['SkeletonInShape', 'SpinnerInBlank', 'MenuOneRow', 'MenuSkeletonRows']);
+
+/** A held-open menu centered in a boundary that gives its layer room. */
+const MenuStage = ({ children }) => (
+    <DocsOverlayBoundary fit={false} containHeight>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>{children}</div>
+    </DocsOverlayBoundary>
+);
 
 /** Do: a menu that waits shows one "Loading options" row with a spinner. */
-export const MenuOneRowCase = () => (
-    <LiveMenu
-        isLoading
-        minWidth="var(--menu-group-min-width)"
-        trigger={menuTrigger}
-    />
-);
+export const MenuOneRowCase = () => <MenuStage><Example.MenuOneRow /></MenuStage>;
 
 /** Don't: a menu filled with skeleton rows promises items it may not have. */
-export const MenuSkeletonRowsCase = () => (
-    <LiveMenu
-        minWidth="var(--menu-group-min-width)"
-        trigger={menuTrigger}
-    >
-        <CustomItem aria-label="Loading option 1">
-            <Skeleton shape="text" width="85%" isShimmering={false} />
-        </CustomItem>
-        <CustomItem aria-label="Loading option 2">
-            <Skeleton shape="text" width="70%" isShimmering={false} />
-        </CustomItem>
-        <CustomItem aria-label="Loading option 3">
-            <Skeleton shape="text" width="55%" isShimmering={false} />
-        </CustomItem>
-    </LiveMenu>
-);
+export const MenuSkeletonRowsCase = () => <MenuStage><Example.MenuSkeletonRows /></MenuStage>;
 
 /** Do: a skeleton in the table's own shape, text bars throughout. */
-export const SkeletonInShape = () => <LoadingList band="shape" />;
+export const SkeletonInShape = () => <Example.SkeletonInShape />;
 
 /** Don't: one spinner in a blank area, so the layout jumps when the rows arrive. */
-export const SpinnerInBlank = () => (
-    <Section title="Students" description="Lincoln Middle">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minBlockSize: 'calc(var(--control-lg) * 4)' }}>
-            <Spinner size={24} label="Loading students" />
-        </div>
-    </Section>
-);
+export const SpinnerInBlank = () => <Example.SpinnerInBlank />;

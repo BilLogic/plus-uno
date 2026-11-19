@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import {
     Button,
     Fieldset,
-    FooterActions,
     Flag,
     FlagGroup,
     RadioGroup,
@@ -21,9 +20,7 @@ const STEPS_ACROSS_MAX = 4;
 const STEPS_RAIL = 256; // docs-literal
 import { InAppFrame } from '@/storybook-docs/lib/template-demo.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
-import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { FormFields, FILLED } from './formHosts.jsx';
-import { ModalStage, OneCell, SCREEN as MODAL_SCREEN } from '../../../templates/Modal/modalDemo.jsx';
 
 /**
  * The Forms pattern's examples. The four hosts, the blocked submit, the server
@@ -65,48 +62,6 @@ export const BoundInputs = () => {
         </div>
     );
 };
-
-const pairStack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', width: '100%' };
-
-/** Do: two required fields stay unmarked; the lone optional field carries `(optional)`. */
-export const MinorityMarked = () => (
-    <div style={pairStack}>
-        <TextField label="Student" isRequired defaultValue="Ana Ruiz" />
-        <TextField label="Site" isRequired defaultValue="Lincoln Middle" />
-        <TextField label="Notes" labelMarker="optional" placeholder="Anything we should know?" />
-    </div>
-);
-
-/** Don't: marking the majority case repeats `(required)` on nearly every label. */
-export const MajorityMarked = () => (
-    <div style={pairStack}>
-        <TextField label="Student" isRequired labelMarker="required" defaultValue="Ana Ruiz" />
-        <TextField label="Site" isRequired labelMarker="required" defaultValue="Lincoln Middle" />
-        <TextField label="Notes" labelMarker="optional" placeholder="Anything we should know?" />
-    </div>
-);
-
-/** Do: standing help stays in the caption under the field, still visible after typing. */
-export const HelpInCaptionCase = () => (
-    <div style={pairStack}>
-        <TextField
-            label="School email"
-            defaultValue="ana.ruiz@lincoln.edu"
-            caption="Shared with your site supervisor."
-        />
-    </div>
-);
-
-/** Don't: help placed only in an info tooltip beside the label disappears on touch and while typing. */
-export const HelpInTooltipCase = () => (
-    <div style={pairStack}>
-        <TextField
-            label="School email"
-            defaultValue="ana.ruiz@lincoln.edu"
-            info="Shared with your site supervisor."
-        />
-    </div>
-);
 
 /** Window height for the settings page example: docs geometry, in px. */
 export const SETTINGS_PAGE_HEIGHT = 560; // docs-literal
@@ -239,35 +194,4 @@ export const SettingsPageInWindow = ({ address = 'app.plus.org/settings', height
     <BrowserWindow address={address} height={height}>
         <SettingsPage />
     </BrowserWindow>
-);
-
-/** The stand-in screen's height for the two Modal examples, in px: docs geometry. */
-const MODAL_SCREEN_HEIGHT = 320; // docs-literal
-
-const ERROR_FOOTER = <FooterActions><Button text="Cancel" onClick={() => {}} /><Button text="Save session" appearance="primary" onClick={() => {}} /></FooterActions>;
-const sessionField = (error) => <TextField label="Student" isRequired defaultValue="" isInvalid errorMessage={error} />;
-
-/** Do: the message under the field, in the same Modal. */
-export const ErrorOnField = () => (
-    <FitStage width={MODAL_SCREEN.width} reflow={false}>
-        <ModalStage screenHeight={MODAL_SCREEN_HEIGHT} title="Log a session" footer={ERROR_FOOTER}>
-            {sessionField('Enter the student’s name')}
-        </ModalStage>
-    </FitStage>
-);
-
-/** Don't: a second dialog over the first, with the field left unexplained. */
-export const ErrorInSecondDialog = () => (
-    <FitStage width={MODAL_SCREEN.width} reflow={false}>
-        <div style={{ position: 'relative' }}>
-            <ModalStage screenHeight={MODAL_SCREEN_HEIGHT} title="Log a session" footer={ERROR_FOOTER}>
-                {sessionField(undefined)}
-            </ModalStage>
-            <div style={{ position: 'absolute', inset: 0 }}>
-                <ModalStage width="4-col" screenHeight={MODAL_SCREEN_HEIGHT} title="Something went wrong" footer={<OneCell action="OK" />}>
-                    <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>The session was not saved.</p>
-                </ModalStage>
-            </div>
-        </div>
-    </FitStage>
 );

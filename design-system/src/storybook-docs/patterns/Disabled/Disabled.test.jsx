@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { expectTypeCardAnchors } from '@/storybook-docs/lib/type-card-anchors.jsx';
 import {
+    CODE,
     DimmedInMenuCase,
     LeftOutOfMenuCase,
     ReasonInCaptionCase,
@@ -34,6 +35,14 @@ describe('Disabled live cases and TypeCard links', () => {
         render(<DimmedInMenuCase />);
         const deleteItem = await screen.findByRole('menuitem', { name: 'Delete school' });
         expect(deleteItem).toHaveAttribute('aria-disabled', 'true');
+    });
+
+    it('prints each example from its own source', () => {
+        expect(Object.keys(CODE)).toEqual(['ReasonInCaption', 'ReasonInTooltip', 'LeftOutOfMenu', 'DimmedInMenu']);
+        expect(CODE.ReasonInCaption).toContain('caption="Choose a school first."');
+        expect(CODE.DimmedInMenu).toContain('<ButtonItem isDisabled');
+        expect(CODE.DimmedInMenu).toContain('const MoreMenu');
+        for (const code of Object.values(CODE)) expect(code).not.toMatch(/Example\.|storybook-docs/);
     });
 
     it('links every TypeCard anchor to a ComponentExample heading id in Disabled.mdx', () => {

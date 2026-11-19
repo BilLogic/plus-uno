@@ -2,12 +2,17 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { Button, ChangeTag, CountTag, DynamicTable, Heading, StatusTag } from '@/components';
+import { showCode } from '@/storybook-docs/lib/show-code.js';
 import { ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
+import examplesSource from './IndicatorsExamples.jsx?raw';
 
 /**
  * Interactive key cases for the Indicators pattern page, kept beside the
  * stories so `indicatorsDemo.jsx` stays static for other callers.
  */
+
+/** The Show code for each do and don't example, read from `IndicatorsExamples.jsx`. */
+export const CODE = showCode(examplesSource, ['DangerOnMissed', 'SuccessOnMissed', 'RiseIsBad', 'RiseIsGood']);
 
 const frame = { padding: 'var(--page-pad)' };
 const line = { display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', flexWrap: 'wrap' };

@@ -4,10 +4,8 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as NavigationStories from './Navigation.stories.jsx';
-import { BreadcrumbCase } from './NavigationCases.jsx';
+import { BreadcrumbCase, CODE, OneTabSystemCase, OpenItemsDoCase, OpenItemsDontCase, TwoTabSystemsCase } from './NavigationCases.jsx';
 import {
-    OpenItemsDont,
-    OpenItemsPicture,
     SIDEBAR_STAGE,
     SMALL_STAGE,
     STAGE,
@@ -15,7 +13,6 @@ import {
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
-import { OneTabSystem, TwoTabSystems } from '@/templates/Page/PageCases.jsx';
 
 <Meta title="Patterns/Navigation" tags={['manifest']} />
 
@@ -155,8 +152,10 @@ Never on an area page or a multi-step task. It sits above the title in the page 
 
 <DoDontPair
     doExample={<BreadcrumbCase record />}
+    doCode={CODE.BreadcrumbOnRecordPage}
     doCaption="A breadcrumb on the record page, parents only."
     dontExample={<BreadcrumbCase record={false} />}
+    dontCode={CODE.BreadcrumbOnAreaPage}
     dontCaption="A breadcrumb on an area page: there is nothing to climb out of."
 />
 
@@ -167,9 +166,11 @@ Never on an area page or a multi-step task. It sits above the title in the page 
 Either page tabs under the title, or pill views in a Section's bar, never both. Under page tabs a Section's views become one labeled PopupSelect at the start of its bar. It picks a view, not a filter.
 
 <DoDontPair
-    doExample={<OneTabSystem />}
+    doExample={<OneTabSystemCase />}
+    doCode={CODE.OneTabSystem}
     doCaption="Under page tabs the Section's views are one labeled PopupSelect at the start of its bar."
-    dontExample={<TwoTabSystems />}
+    dontExample={<TwoTabSystemsCase />}
+    dontCode={CODE.TwoTabSystems}
     dontCaption="Page tabs and pill views on the same page: two tab systems."
 />
 
@@ -204,9 +205,11 @@ The steps replace the Sidebar's rows and Back returns to them; no breadcrumb. Ho
 "4:00 PM · Ms. Ortiz", with the school in the Tooltip. Three show, then "Show n more". Removing one is Add and remove; opening one is Go to.
 
 <DoDontPair
-    doExample={<OpenItemsPicture />}
+    doExample={<OpenItemsDoCase />}
+    doCode={CODE.OpenItemsByTimeAndWho}
     doCaption="Each item names the session by its time and the teacher."
-    dontExample={<OpenItemsDont />}
+    dontExample={<OpenItemsDontCase />}
+    dontCode={CODE.OpenItemsCarryEverything}
     dontCaption="Each item carries everything, and the time it is found by is cut off."
 />
 

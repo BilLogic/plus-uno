@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { expectTypeCardAnchors } from '@/storybook-docs/lib/type-card-anchors.jsx';
 import {
+    CODE,
     ClippedCellNoTextCase,
     ClippedCellOpensTextCase,
     ClippedSectionTitleCase,
@@ -69,6 +70,13 @@ describe('Overflow live cases and TypeCard links', () => {
 
         render(<FadedListCase />);
         expect(screen.queryByRole('button', { name: /Show/ })).toBeNull();
+    });
+
+    it('prints each example from its own source', () => {
+        expect(Object.keys(CODE)).toHaveLength(6);
+        expect(CODE.ClippedCellOpensText).not.toContain('@/lib');
+        expect(CODE.ShowMoreWithCount).toContain('const StudentsTable');
+        for (const code of Object.values(CODE)) expect(code).not.toMatch(/Example\.|storybook-docs/);
     });
 
     it('links every TypeCard anchor to a ComponentExample heading id in Overflow.mdx', () => {

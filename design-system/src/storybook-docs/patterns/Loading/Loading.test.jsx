@@ -2,7 +2,7 @@ import { join } from 'node:path';
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { expectTypeCardAnchors } from '@/storybook-docs/lib/type-card-anchors.jsx';
-import { MenuOneRowCase, MenuSkeletonRowsCase, SkeletonInShape, SpinnerInBlank } from './LoadingCases.jsx';
+import { CODE, MenuOneRowCase, MenuSkeletonRowsCase, SkeletonInShape, SpinnerInBlank } from './LoadingCases.jsx';
 
 vi.mock('@storybook/addon-docs/blocks', () => import('@/storybook-docs/lib/addon-docs-blocks-mock.jsx'));
 
@@ -26,6 +26,15 @@ describe('Loading live cases and TypeCard links', () => {
         const blank = render(<SpinnerInBlank />);
         expect(blank.container.querySelectorAll('.plus-skeleton')).toHaveLength(0);
         expect(screen.getByText('Loading students')).toBeInTheDocument();
+    });
+
+    it('prints every example from their own source', () => {
+        expect(Object.keys(CODE)).toEqual(['SkeletonInShape', 'SpinnerInBlank', 'MenuOneRow', 'MenuSkeletonRows']);
+        expect(CODE.SkeletonInShape).not.toContain('@/lib');
+        expect(CODE.SkeletonInShape).toContain('const SkeletonRows');
+        expect(CODE.SpinnerInBlank).toContain('<Spinner size={24} label="Loading students" />');
+        expect(CODE.MenuOneRow).toMatch(/<DropdownMenu[^>]*isOpen[^>]*isLoading/s);
+        for (const code of Object.values(CODE)) expect(code).not.toMatch(/Example\.|storybook-docs/);
     });
 
     it('links every TypeCard anchor to a ComponentExample heading id in Loading.mdx', () => {

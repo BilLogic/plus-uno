@@ -1,47 +1,25 @@
 import React from 'react';
-import { TextField } from '@/components';
-import { Section } from '@/templates';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
-import { column, PlainText, ReadOnlyField } from './readOnlyDemo.jsx';
+import { showCode } from '@/storybook-docs/lib/show-code.js';
+import * as Example from './ReadOnlyExamples.jsx';
+import examplesSource from './ReadOnlyExamples.jsx?raw';
 
 /**
- * The live do and don't examples on the Read-only pattern page, composed from
- * `ReadOnlyField`, `PlainText`, `TextField`, `Section` and `CaseSurface`.
+ * The live do and don't examples on the Read-only pattern page: each one is an
+ * example from `ReadOnlyExamples.jsx`, staged on a `CaseSurface`, and Show code
+ * prints the example's own source.
  */
 
-const noop = () => {};
+export const CODE = showCode(examplesSource, ['ReadableWithReason', 'FadedNoReason', 'PlainValue', 'FieldForFixedValue']);
 
 /** Do: read-only at full contrast with its reason in the caption. */
-export const ReadableWithReasonCase = () => (
-    <CaseSurface>
-        <ReadOnlyField padded={false} />
-    </CaseSurface>
-);
+export const ReadableWithReasonCase = () => <CaseSurface><Example.ReadableWithReason /></CaseSurface>;
 
 /** Don't: a faded disabled value with no reason, out of the tab order and hard to read. */
-export const FadedNoReasonCase = () => (
-    <CaseSurface>
-        <div style={column}>
-            <TextField label="Session time" value="Thursday at 4:00 PM" onChange={noop} isDisabled />
-        </div>
-    </CaseSurface>
-);
+export const FadedNoReasonCase = () => <CaseSurface><Example.FadedNoReason /></CaseSurface>;
 
 /** Do: a value nobody changes here is plain label and value text. */
-export const PlainValueCase = () => (
-    <CaseSurface>
-        <PlainText padded={false} />
-    </CaseSurface>
-);
+export const PlainValueCase = () => <CaseSurface><Example.PlainValue /></CaseSurface>;
 
 /** Don't: putting a never-editable value in a read-only field promises an input. */
-export const FieldForFixedValueCase = () => (
-    <CaseSurface>
-        <Section title="Details" description="Lincoln Middle">
-            <div style={column}>
-                <TextField label="School" value="Lincoln Middle School" onChange={noop} isReadOnly />
-                <TextField label="Created" value="Sep 3, 2026" onChange={noop} isReadOnly />
-            </div>
-        </Section>
-    </CaseSurface>
-);
+export const FieldForFixedValueCase = () => <CaseSurface><Example.FieldForFixedValue /></CaseSurface>;
