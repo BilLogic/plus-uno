@@ -182,13 +182,6 @@
       ]
     },
     {
-      "not": "Card",
-      "use": [
-        "PatternCard"
-      ],
-      "why": "a pattern, imported from @/patterns"
-    },
-    {
       "not": "Drawer",
       "use": [
         "Panel"

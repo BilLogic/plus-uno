@@ -25,8 +25,8 @@ const SCSS_USE = /(@(?:use|forward|import)\s+|meta\.load-css\(\s*)(['"])([^'"\n]
 const NOT_SOURCE = /(\.stories\.|-node\.mjs$|\.test\.|\.mdx$|\.md$|(^|\/)\.storybook\/|(^|\/)storybook-docs\/|(^|\/)prototypes\/|(^|\/)(retired|deprecated|_retired|_deprecated|specs)\/)/;
 const DEPRECATED_TAG = /^\s*\*?\s*@deprecated\b/m;
 
-const BARRELS = { '@/components': `${LIBRARY}/components/index.js`, '@/patterns': `${LIBRARY}/patterns/index.js` };
-const BARREL_IMPORT = /import\s*\{([^}]*)\}\s*from\s*(['"])(@\/components|@\/patterns)\2;?/g;
+const BARRELS = { '@/components': `${LIBRARY}/components/index.js`, '@/patterns': `${LIBRARY}/patterns/index.js`, '@/templates': `${LIBRARY}/templates/index.js` };
+const BARREL_IMPORT = /import\s*\{([^}]*)\}\s*from\s*(['"])(@\/components|@\/patterns|@\/templates)\2;?/g;
 
 /** name -> { spec, imported } for each named export a barrel re-exports from one part (`default as X` maps X to the default). */
 export function barrelMap(root, barrel) {
@@ -208,8 +208,15 @@ export function ownerOf(file, units, foundation) {
 export function patternList(root) {
   if (!isFile(root, PATTERN_INDEX) || !isFile(root, `${LIBRARY}/patterns/index.js`)) return [];
   const map = barrelMap(root, `${LIBRARY}/patterns/index.js`);
-  // A name the patterns barrel does not export is a component the index points at (Popup), already an item.
-  return JSON.parse(read(root, PATTERN_INDEX)).patterns.filter(({ name }) => map.has(name)).map(({ name }) => ({ name, dir: `${LIBRARY}/${map.get(name).spec.slice(2)}`, type: 'registry:component', title: name }));
+  // A row named for a template the templates barrel renamed (Section) is the item its pattern name still ships under (PatternSection).
+  const renamed = isFile(root, `${LIBRARY}/templates/index.js`) ? barrelMap(root, `${LIBRARY}/templates/index.js`) : new Map();
+  const items = new Map();
+  for (const { name } of JSON.parse(read(root, PATTERN_INDEX)).patterns) {
+    // A name the patterns barrel does not export is a component the index points at (Popup), already an item.
+    const home = map.get(name) ? { item: name, spec: map.get(name).spec } : renamed.has(name) && !map.has(name) && renamed.get(name).spec.startsWith('@/patterns/') ? { item: path.posix.basename(renamed.get(name).spec), spec: renamed.get(name).spec } : null;
+    if (home && !items.has(home.item)) items.set(home.item, { name: home.item, dir: `${LIBRARY}/${home.spec.slice(2)}`, type: 'registry:component', title: home.item });
+  }
+  return [...items.values()];
 }
 
 /** Page templates: one folder under `templates/` per item, named for its folder. */

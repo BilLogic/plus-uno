@@ -69,6 +69,7 @@ export const ORIENTATION = `PLUS design system: the React components, templates,
 
 Barrels (import only from these):
 - ${BARRELS[1]}: the templates (Frame, which every full page starts from, Page, PatternSection, PatternCard, Table, overlays)
+- ${BARRELS[2]}: the same templates under their new names (Section for PatternSection, Card for PatternCard); the ${BARRELS[1]} names keep working
 - ${BARRELS[0]}: the components (Button, TextField, SectionMessage...)
 
 Build in five stages:
@@ -222,6 +223,8 @@ const PRO_FAMILY = /\bfa-(?:sharp-duotone|sharp|duotone|light|thin)\b/;
 const GUIDELINES = 'design-system/guidelines';
 const AGENT_VIEWS = 'design-system/agent-views';
 const PATTERNS_SRC = 'design-system/src/patterns';
+/** Templates a plain word of a query names: `card` was a not-here redirect to the card pattern before the template took the name. */
+const NAMED_BY_WORD = ['Card'];
 const TEMPLATE_COMPONENTS = ['Frame', 'Page', 'PatternSection', 'PatternCard', 'Table', 'Modal'];
 const readIf = (file) => (fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null);
 const firstSentence = (text, max = 160) => {
@@ -419,7 +422,7 @@ export function buildDsIndex(root) {
     const homeName = a.aliasOf ?? a.name;
     const srcFile = home.source ?? a.source;
     const src = srcFile ? readIf(path.join(root, srcFile)) : null;
-    const liveSummary = src && a.kind !== 'pattern' ? (jsdocFor(src, implSymbol(src, homeName)) || null) : a.summary;
+    const liveSummary = src && !['pattern', 'template'].includes(a.kind) ? (jsdocFor(src, implSymbol(src, homeName)) || null) : a.summary;
     const rankPage = pageOf(r.name, a.source)?.page;
     const docs = pageOf(homeName, srcFile);
     const edges = context.edges[homeName];
@@ -529,6 +532,9 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
   const index = loadDsIndex(root, { buildIndex });
   const records = index.entries;
   const entriesByName = new Map(records.map((r) => [r.name, r]));
+  // A pattern name beside the template it was renamed to: find ranks the template alone, and the old name still answers by its exact name.
+  const templateSources = new Set(records.filter((r) => r.kind === 'template').map((r) => r.source));
+  const renamedPatterns = new Set(records.filter((r) => r.kind === 'pattern' && templateSources.has(r.source)).map((r) => r.name));
   const barrels = Object.fromEntries(BARRELS.map((spec) => [spec, new Set(index.barrels[spec] ?? [])]));
   const retired = retiredRenames();
   const inventions = index.inventions ?? { components: [], props: [], tokens: [] };
@@ -688,7 +694,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
   let ranker;
   const rank = () => {
     if (ranker) return ranker;
-    const docs = records.map((r) => ({
+    const docs = records.filter((r) => !renamedPatterns.has(r.name)).map((r) => ({
       id: r.name,
       fields: {
         name: r.name,
@@ -760,6 +766,8 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     const rows = [];
     for (const { row, bl } of notHere) if (row.kind === 'component' && words.includes(bl)) rows.push(notHereRow(row));
     if (singleWord && ql.length > 2) for (const { row, bl } of notHere) if (row.kind === 'component' && bl.includes(ql)) rows.push(notHereRow(row));
+    // A template a plain word names leads like its not-here redirect did before it shipped under that name.
+    for (const name of NAMED_BY_WORD) if (words.includes(name.toLowerCase()) && entriesByName.has(name)) rows.push(item(name));
     return rows;
   }
 
@@ -772,7 +780,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
         const a = facts.lookup(r.id);
         const phrases = aliases ? a.aliases.filter((al) => al.length > 3 && hasPhrase(ql, al)) : [];
         const bonus = phrases.reduce((sum, al) => sum + aliasPhrase + al.split(' ').length, 0);
-        return { ...r, score: r.score + bonus + (a.kind === 'pattern' ? patternLift : 0) };
+        return { ...r, score: r.score + bonus + (['pattern', 'template'].includes(a.kind) ? patternLift : 0) };
       })
       .sort((a, b) => b.score - a.score || (a.id < b.id ? -1 : 1));
     const top = ranked[0]?.score ?? 0;

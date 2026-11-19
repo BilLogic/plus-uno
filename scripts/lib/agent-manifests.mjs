@@ -34,7 +34,7 @@ export function deprecationOf(description) {
 
 /**
  * One record per barrel export, each with its `kind`: a `component` from
- * `@/components`, or a `pattern` from `@/patterns`. A component the barrel does not export is not part of the
+ * `@/components`, a `pattern` from `@/patterns`, or a `template` from `@/templates`. A component the barrel does not export is not part of the
  * public surface and is left out; an export with no parsed component (a hook,
  * a constant) is still listed, with `props: null`, so the manifest and the
  * existence index agree name for name.
@@ -43,6 +43,7 @@ export function deprecationOf(description) {
  *   exports: string[],
  *   components: ParsedComponent[],
  *   patterns?: {name: string, from: string}[],
+ *   templates?: {name: string, of?: string, from: string}[],
  *   parsedPatterns?: ParsedComponent[],
  *   version: string,
  * }} input
@@ -52,16 +53,23 @@ export function deprecationOf(description) {
  *   defaults?: Record<string,string>, descriptions?: Record<string,string>,
  *   doc?: {implementedAs?: string, stories?: string[], tokens?: string[], subComponents?: object[]}}} ParsedComponent
  */
-export function buildComponentsManifest({ exports, components, patterns = [], parsedPatterns = [], version }) {
+export function buildComponentsManifest({ exports, components, patterns = [], templates = [], parsedPatterns = [], version }) {
   const componentNames = new Set(exports);
   for (const { name, from } of patterns) {
     if (componentNames.has(name)) throw new Error(`${name} is exported from both @/components and ${from}: one name, one record`);
   }
   const parsedComponents = new Map(components.map((c) => [c.name, c]));
   const parsedPattern = new Map(parsedPatterns.map((c) => [c.name, c]));
+  const templateNames = new Set(templates.map((t) => t.name));
+  for (const { name, from } of templates) {
+    if (componentNames.has(name)) throw new Error(`${name} is exported from both @/components and ${from}: one name, one record`);
+  }
   const records = [
     ...[...componentNames].map((name) => recordOf(name, parsedComponents.get(name), 'component', '@/components')),
-    ...patterns.map(({ name, from }) => recordOf(name, parsedPattern.get(name), 'pattern', from)),
+    // A pattern the templates barrel exports under the same name is one record, the template's.
+    ...patterns.filter(({ name }) => !templateNames.has(name)).map(({ name, from }) => recordOf(name, parsedPattern.get(name), 'pattern', from)),
+    // A template is built from the source of the pattern it re-exports (`of`), under its own name.
+    ...templates.map(({ name, of = name, from }) => recordOf(name, parsedPattern.get(of), 'template', from)),
   ];
   return { version, components: records.sort(byName) };
 }

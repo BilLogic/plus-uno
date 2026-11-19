@@ -39,7 +39,6 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `Dropdown` | `Select`, `DropdownMenu` (Select picks a value; DropdownMenu runs an action) |
 | `Chip` | `Tag` |
 | `Loader` | `Spinner`, `Skeleton` |
-| `Card` | `PatternCard` (a pattern, imported from @/patterns) |
 | `Drawer` | `Panel` (a floating Panel, imported from @/components) |
 
 **Props**
@@ -73,13 +72,13 @@ A template is a shell that owns the frame (fill, pad, radius, elevation) and lea
 
 | Group | Name | Import | Reach for it when |
 |---|---|---|---|
-| Templates | [`Frame`](../../src/patterns/Frame/Frame.mdx) | `import { Frame } from '@/patterns';` | Every full page: the app frame (Sidebar, Page with its 12-column content grid, and Panel). Default type: the PLUS `Sidebar` (@/components) in `sidebar`, a `Breadcrumb` in `header`. Bare type: one centered column, no `sidebar`, for sign-in and errors. A multi-step task uses the Sidebar's inner mode, steps as rows, actions in the Page footer. |
-| Page | [`Page`](../../src/patterns/Page/Page.mdx) | `import { Page } from '@/patterns';` | A tokenized box with a level (fill and shadow together), a pad and a radius. The Frame draws the page's own; use it for any other block that needs a level. |
-| Section | [`PatternSection`](../../src/patterns/PatternSection/PatternSection.mdx) | `import { PatternSection } from '@/patterns';` | A span of the page grid under one heading, with its header, toolbar and tabs. No box of its own: the Page supplies the pad. `detail` for a list with a detail region. |
-| Card | [`PatternCard`](../../src/patterns/PatternCard/PatternCard.mdx) | `import { PatternCard } from '@/patterns';` | A raised container for one object: a student, a session, a metric. Optional image, a header over the body, optional footer. |
-| Table | [`Table`](../../src/patterns/Table/Table.mdx) | `import { Table } from '@/patterns';` | How a table sits on a page: a Section header over a Static, Dynamic or Tree table, with its footer and empty state. |
-| Panel | [`Panel`](../../src/patterns/Panel/Panel.mdx) | `import { Panel } from '@/patterns';` | A full-height layer on the right with no Blanket, docked beside the Page when it fits and floating over it when it does not: `PanelContainer` and its parts (`PanelHeader`, `PanelSubheader`, `PanelBody`, `PanelFooter`), filled into the Frame's `panel`. Two types, Details and Notifications. For content that must be dealt with before anything else, use `Modal`. |
-| Overlays | [`Modal`](../../src/patterns/Modal/Modal.mdx) | `import { Modal } from '@/patterns';` | The template for content that takes over the screen until it is closed: a `Dialog` (@/components) on a Blanket with modal behavior on Base UI (portal, focus trap, Escape, scroll lock). For the dialog panel inline with no Blanket or modal behavior, use `Dialog`. |
+| Templates | [`Frame`](../../src/patterns/Frame/Frame.mdx) | `import { Frame } from '@/templates';` | Every full page: the app frame (Sidebar, Page with its 12-column content grid, and Panel). Default type: the PLUS `Sidebar` (@/components) in `sidebar`, a `Breadcrumb` in `header`. Bare type: one centered column, no `sidebar`, for sign-in and errors. A multi-step task uses the Sidebar's inner mode, steps as rows, actions in the Page footer. |
+| Page | [`Page`](../../src/patterns/Page/Page.mdx) | `import { Page } from '@/templates';` | A tokenized box with a level (fill and shadow together), a pad and a radius. The Frame draws the page's own; use it for any other block that needs a level. |
+| Section | [`Section`](../../src/patterns/PatternSection/PatternSection.mdx) | `import { Section } from '@/templates';` | A span of the page grid under one heading, with its header, toolbar and tabs. No box of its own: the Page supplies the pad. `detail` for a list with a detail region. |
+| Card | [`Card`](../../src/patterns/PatternCard/PatternCard.mdx) | `import { Card } from '@/templates';` | A raised container for one object: a student, a session, a metric. Optional image, a header over the body, optional footer. |
+| Table | [`Table`](../../src/patterns/Table/Table.mdx) | `import { Table } from '@/templates';` | How a table sits on a page: a Section header over a Static, Dynamic or Tree table, with its footer and empty state. |
+| Panel | [`Panel`](../../src/patterns/Panel/Panel.mdx) | `import { Panel } from '@/templates';` | A full-height layer on the right with no Blanket, docked beside the Page when it fits and floating over it when it does not: `PanelContainer` and its parts (`PanelHeader`, `PanelSubheader`, `PanelBody`, `PanelFooter`), filled into the Frame's `panel`. Two types, Details and Notifications. For content that must be dealt with before anything else, use `Modal`. |
+| Overlays | [`Modal`](../../src/patterns/Modal/Modal.mdx) | `import { Modal } from '@/templates';` | The template for content that takes over the screen until it is closed: a `Dialog` (@/components) on a Blanket with modal behavior on Base UI (portal, focus trap, Escape, scroll lock). For the dialog panel inline with no Blanket or modal behavior, use `Dialog`. |
 | Popups | [`Popup`](../../src/components/overlays-and-layering/Popup/Popup.mdx) | `import { Popup } from '@/components';` | The Popups pattern is four floating layers that never block the page, each a component: `DropdownMenu` lists actions, `Popup` holds a small aside anchored to a control, `Flag` reports what just happened, `Tooltip` names a control. |
 | AI | [`AiChat`](../../src/patterns/AiChat/AiChat.mdx) | `import { AiChat } from '@/patterns';` | AI chat as a popup, in the Frame's Panel or full screen, opened from one floating button. |
 

@@ -52,11 +52,11 @@ test('a JSDoc that opens "<Name>: …" or "<Name> — …" keeps that line as it
   assert.match(summary('Checkbox'), /^Checkbox — single boolean control/);
 });
 
-test('find answers "card" with Card as not here and PatternCard with its import', () => {
+test('find answers "card" with Card as a template from @/templates and PatternCard still there', () => {
   const { results, next } = lookup.find('card');
-  assert.equal(results[0].kind, 'not-here');
-  assert.equal(results[0].name, 'Card');
-  assert.equal(results[0].use[0].import, "import { PatternCard } from '@/patterns';");
+  const card = results.find((r) => r.name === 'Card');
+  assert.equal(card.kind, 'template');
+  assert.equal(card.import, "import { Card } from '@/templates';");
   assert.ok(results.some((r) => r.kind === 'pattern' && r.name === 'PatternCard'));
   assert.match(next, /ds_get/);
 });
@@ -357,7 +357,7 @@ test('get returns the generated doc byte for byte, for a component, a flat compo
 test('a get section is that part of the same text', () => {
   const full = render('get', lookup.get(['Modal']));
   const a11y = render('get', lookup.get(['Modal'], 'a11y'));
-  assert.match(a11y, /^# Modal\n\nimport \{ Modal \} from '@\/patterns';\n\n## Accessibility\n/);
+  assert.match(a11y, /^# Modal\n\nimport \{ Modal \} from '@\/templates';\n\n## Accessibility\n/);
   assert.ok(full.includes(a11y.slice(a11y.indexOf('## Accessibility'))));
   assert.doesNotMatch(full, /figma\.com|Next:/);
 });
@@ -466,4 +466,24 @@ test('editing a docs page, component, guideline or rule doc without regenerating
       fs.rmSync(tmp, { recursive: true, force: true });
     }
   }
+});
+
+test('a template answers under its new name from @/templates, as a template, and its old name still answers', () => {
+  const answer = (n) => lookup.get([n]).records[0];
+  for (const name of ['Frame', 'Page', 'Section', 'Card', 'Table', 'Modal', 'Panel']) {
+    const a = answer(name);
+    assert.equal(a.status, 'exists', name);
+    assert.equal(a.kind, 'template', name);
+    assert.equal(a.import, `import { ${name} } from '@/templates';`);
+  }
+  assert.equal(answer('PatternSection').status, 'exists');
+  assert.equal(answer('PatternCard').status, 'exists');
+  assert.equal(answer('Popup').status, 'exists');
+  assert.ok(lookup.find('Section').results.some((r) => r.name === 'Section' && r.kind === 'template'));
+});
+
+test('the check accepts the old and the new template imports', () => {
+  const rules = (code) => lookup.check({ code, path: 'prototypes/a.jsx' }).findings.map((f) => f.rule);
+  assert.ok(!rules("import { Section } from '@/templates';\nexport const X = () => <Section title=\"a\" />;").includes('ds/unknown-component'));
+  assert.ok(!rules("import { PatternSection } from '@/patterns';\nexport const X = () => <PatternSection title=\"a\" />;").includes('ds/unknown-component'));
 });

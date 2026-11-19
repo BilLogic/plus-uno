@@ -463,6 +463,18 @@ function patternEntries() {
 }
 
 /**
+ * The templates barrel's components. Each re-exports a pattern's component, so
+ * it is built from that pattern's parsed source: `Section` is `PatternSection`.
+ */
+function templateEntries() {
+  const spec = '@/templates';
+  const { components, aliases } = readBarrel(REPO_ROOT, spec, {
+    onUnresolved: (star) => fail(`${spec} barrel: cannot resolve \`export * from '${star}'\``),
+  });
+  return components.map((name) => ({ name, of: aliases[name] ?? name, from: spec }));
+}
+
+/**
  * Barrel components implemented outside src/components/, in
  * src/assets/<Name>/<Name>.jsx (the Logo), parsed the way a component is.
  */
@@ -555,8 +567,9 @@ const { components: exports } = readBarrel(REPO_ROOT, '@/components', {
 // The design system ships from this repo's root package; its version is the one to stamp.
 const { version } = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8'));
 const { patterns, parsed: parsedPatterns } = patternEntries();
+const templates = templateEntries();
 manifestEntries.push(...assetEntries(exports, new Set(manifestEntries.map((e) => e.name))));
-const manifest = buildComponentsManifest({ exports, components: manifestEntries, patterns, parsedPatterns, version });
+const manifest = buildComponentsManifest({ exports, components: manifestEntries, patterns, templates, parsedPatterns, version });
 written.push([path.join(AGENT_ROOT, 'components.json'), serializeManifest(manifest, 'npm run generate:agent')]);
 const slots = documents('design-system/src', { root: REPO_ROOT, ext: ['.json'] })
   .filter((file) => file.endsWith('.slots.json'))
@@ -599,7 +612,11 @@ const renderOne = (facts) => {
   const alternatives = docs?.page?.alternatives?.map((a) => a.text.replace(/\s*\n\s*/g, ' ').trim()).filter(Boolean) ?? [];
   rendered.set(facts.name, { coverage: coverageOf(docs?.page), propCount: (facts.props ?? []).length, lead, alternatives });
 };
-for (const record of manifest.components) if (record.source) renderOne(componentFacts(manifest, record.name, aliasRows));
+// A template renamed from a pattern shares that pattern's source, and so its doc: the old name writes it until the contract step.
+const patternSources = new Set(manifest.components.filter((r) => r.kind === 'pattern').map((r) => r.source));
+for (const record of manifest.components) {
+  if (record.source && !(record.kind === 'template' && patternSources.has(record.source))) renderOne(componentFacts(manifest, record.name, aliasRows));
+}
 for (const [name, entry] of parsedByName) {
   if (rendered.has(name)) continue;
   const [record] = buildComponentsManifest({ exports: [name], components: [entry], version }).components;

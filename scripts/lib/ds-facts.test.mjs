@@ -78,8 +78,8 @@ test('real repo: a pattern answers with its kind and barrel', () => {
 test('real repo: Frame and Sidebar answer with their props, from source', () => {
   const facts = loadFacts(REPO_ROOT);
   const frame = facts.lookup('Frame');
-  assert.equal(frame.kind, 'pattern');
-  assert.equal(frame.import, "import { Frame } from '@/patterns';");
+  assert.equal(frame.kind, 'template');
+  assert.equal(frame.import, "import { Frame } from '@/templates';");
   assert.deepEqual(frame.props.find((p) => p.name === 'width').values, ['content', 'reading']);
   const sidebar = facts.lookup('Sidebar');
   assert.equal(sidebar.kind, 'component');

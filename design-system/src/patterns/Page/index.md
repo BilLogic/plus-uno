@@ -6,7 +6,7 @@ The Page surface: paints `--ds-surface` edge to edge with `--page-pad` (24) on e
 
 Also asked as: surface.
 
-**Import:** `import { Page } from '@/patterns';`
+**Import:** `import { Page } from '@/templates';`
 
 **Used in:** Form (`ds guide form`); Frame (`ds guide frame`); Modal (`ds guide modal`); Page (`ds guide page`); Panel (`ds guide panel`); Section (`ds guide section`); Popup (`ds guide popup`); Table (`ds guide table`)
 
@@ -116,7 +116,7 @@ Which tier a message belongs to: the Notifications pattern.
 - Elevation: use when picking which shadow goes with which level.
 - Patterns: use when deciding where a breadcrumb or a tab belongs (Navigation), or choosing the StatusTag beside the title (Indicators).
 
-Same group: `AiChat` · `Frame` · `Modal` · `Panel` · `PatternCard` · `PatternSection` · `Table`
+Same group: `Card` · `Frame` · `Modal` · `Panel` · `Section` · `Table`
 
 ## Types
 

@@ -6,7 +6,7 @@
 
 Also asked as: confirm, confirmation dialog, destructive confirm, popup window.
 
-**Import:** `import { Modal } from '@/patterns';`
+**Import:** `import { Modal } from '@/templates';`
 
 **Used in:** Form (`ds guide form`); Modal (`ds guide modal`); Panel (`ds guide panel`); Card (`ds guide card`); Popup (`ds guide popup`)
 
@@ -117,7 +117,7 @@ Footer buttons, real actions and Close, and which destructive tier, including ty
 - Popup: use when the content is a menu or a short list.
 - Patterns: use when you need the rules across Modals: Common actions, Forms, Errors, Loading.
 
-Same group: `AiChat` · `Frame` · `Page` · `Panel` · `PatternCard` · `PatternSection` · `Table`
+Same group: `Card` · `Frame` · `Page` · `Panel` · `Section` · `Table`
 
 ## Types
 

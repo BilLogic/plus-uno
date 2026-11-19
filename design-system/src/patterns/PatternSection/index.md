@@ -4,7 +4,7 @@
 
 PatternSection: a span of the page grid under one heading, with its header, toolbar and tabs.
 
-Also asked as: page section, toolbar, section header, block, region.
+Also asked as: page section, toolbar, section header.
 
 **Import:** `import { PatternSection } from '@/patterns';`
 
@@ -147,7 +147,7 @@ The table's empty state replaces the whole table, by the Empty pattern; elevatio
 - Filtering: use when picking a filter tier for the header.
 - Patterns: use when the question is the search field's behavior (Search) or an empty body (Empty).
 
-Same group: `AiChat` · `Frame` · `Modal` · `Page` · `Panel` · `PatternCard` · `Table`
+Same group: `AiChat` · `PatternCard`
 
 ## Types
 

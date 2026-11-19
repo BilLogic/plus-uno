@@ -6,7 +6,7 @@ The Page runs the full height, and meets a docked Sidebar at its 1px edge. - The
 
 Also asked as: page template, page shell, page layout, full page, new page, surface container.
 
-**Import:** `import { Frame } from '@/patterns';`
+**Import:** `import { Frame } from '@/templates';`
 
 **Used in:** Frame (`ds guide frame`); Page (`ds guide page`); Panel (`ds guide panel`); Card (`ds guide card`); Table (`ds guide table`)
 
@@ -115,7 +115,7 @@ Elevation and fills follow Elevation.
 - Panel: use when the work should float beside the page, not replace it.
 - Grid: use when you need the column math the Frame is sized by.
 
-Same group: `AiChat` · `Modal` · `Page` · `Panel` · `PatternCard` · `PatternSection` · `Table`
+Same group: `Card` · `Modal` · `Page` · `Panel` · `Section` · `Table`
 
 ## Types
 

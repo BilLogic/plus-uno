@@ -13,12 +13,12 @@
     },
     {
       "group": "Section",
-      "name": "PatternSection",
+      "name": "Section",
       "use": "A span of the page grid under one heading, with its header, toolbar and tabs. No box of its own: the Page supplies the pad. `detail` for a list with a detail region."
     },
     {
       "group": "Card",
-      "name": "PatternCard",
+      "name": "Card",
       "use": "A raised container for one object: a student, a session, a metric. Optional image, a header over the body, optional footer."
     },
     {

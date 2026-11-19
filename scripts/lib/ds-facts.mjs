@@ -63,7 +63,7 @@ export const STORYBOOK_ROOT = '.storybook';
 const COMPONENTS_BARREL = '@/components';
 
 /** The public barrels consumer code imports the design system from. */
-export const BARRELS = [COMPONENTS_BARREL, '@/patterns'];
+export const BARRELS = [COMPONENTS_BARREL, '@/patterns', '@/templates'];
 
 /** The design-system folder under `root`: `design-system/` in a repo, `root` itself in a package. */
 function dsDir(root) {
@@ -237,9 +237,13 @@ export function loadFacts(root) {
     const record = records.get(name);
     if (record) {
       const kind = record.kind ?? 'component';
-      const aliasOf = kind === 'component' ? barrel.aliases[name] ?? null : null;
+      // A template renamed from a pattern (same source, other name) is an alias of the pattern's name until the old name is retired.
+      const old = kind === 'template' ? componentManifest.components.find((r) => r.kind === 'pattern' && r.name !== name && r.source && r.source === record.source) : null;
+      const aliasOf = kind === 'component' ? barrel.aliases[name] ?? null : old?.name ?? null;
       const props = record.props ?? (aliasOf ? records.get(aliasOf)?.props ?? null : null);
-      const row = kind === 'pattern' ? patternRows.get(name) : undefined;
+      // A pattern renamed to a template takes the row its template carries.
+      const renamedTo = kind === 'pattern' ? componentManifest.components.find((r) => r.kind === 'template' && r.name !== name && r.source && r.source === record.source)?.name : null;
+      const row = kind === 'pattern' || kind === 'template' ? patternRows.get(name) ?? patternRows.get(renamedTo) : undefined;
       return answer(name, 'exists', {
         kind,
         import: record.import,

@@ -41,7 +41,7 @@ export function checkPatterns(rows, { lookup, exists, required }) {
     const extra = Object.keys(r).filter((k) => !ROW_FIELDS.has(k));
     if (extra.length) problems.push(`${r.name}: ${extra.map((k) => `\`${k}\``).join(', ')} come from source; a row keeps only group, name and use`);
     const answer = lookup(r.name);
-    if (answer.status !== 'exists' || !['pattern', 'component'].includes(answer.kind)) {
+    if (answer.status !== 'exists' || !['pattern', 'template', 'component'].includes(answer.kind)) {
       problems.push(`${r.name} is not a pattern or component the design system exports`);
       continue;
     }
@@ -77,7 +77,12 @@ export function readPatterns(repoRoot) {
 export const OVERVIEW_FILE = 'design-system/agent-views/components/index.md';
 
 /** Every pattern the facts hold: the `@/patterns` barrel's. */
-const patternNames = (facts) => facts.manifests.components.components.filter((c) => c.kind === 'pattern').map((c) => c.name);
+const patternNames = (facts) => {
+  const all = facts.manifests.components.components;
+  // An old pattern name beside the template it was renamed to (same source) is listed once, under the template's name.
+  const renamed = new Set(all.filter((c) => c.kind === 'template' && c.source).map((c) => c.source));
+  return all.filter((c) => (c.kind === 'template' || (c.kind === 'pattern' && !renamed.has(c.source)))).map((c) => c.name);
+};
 
 /** The committed list, read against the real facts and the rendered index. */
 export function checkCommitted(repoRoot) {

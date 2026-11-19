@@ -8,7 +8,7 @@ Also asked as: right panel, detail panel, side pane, slide-over, sheet, side she
 
 > Implemented as `PanelContainer` in the source and exported as `Panel`. Import the exported name; read the source under the implementation name.
 
-**Import:** `import { Panel } from '@/patterns';`
+**Import:** `import { Panel } from '@/templates';`
 
 **Used in:** Form (`ds guide form`); Frame (`ds guide frame`); Panel (`ds guide panel`); Section (`ds guide section`); Popup (`ds guide popup`)
 
@@ -35,7 +35,7 @@ Panel reads these motion tokens and no literal duration or curve.
 
 ## Related
 
-Same group: `AiChat` · `Frame` · `Modal` · `Page` · `PatternCard` · `PatternSection` · `Table`
+Same group: `Card` · `Frame` · `Modal` · `Page` · `Section` · `Table`
 
 ## Props
 

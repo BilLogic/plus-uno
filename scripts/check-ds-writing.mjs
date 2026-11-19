@@ -288,6 +288,11 @@ export function gradeFindings(raw, { strict, enforce }) {
 const inputs = byRoot((repoRoot) => {
   const manifest = readJson(repoRoot, MANIFEST) ?? { components: [] };
   const names = indexNames(readText(repoRoot, INDEX) ?? '');
+  // The old name of a listed template still resolves, so a route may keep naming it until the contract step.
+  for (const t of manifest.components ?? []) {
+    if (t.kind !== 'template' || !names.has(t.name)) continue;
+    for (const o of manifest.components) if (o.kind === 'pattern' && o.source && o.source === t.source) names.add(o.name);
+  }
   const findPage = createPageFinder(repoRoot, readJson(repoRoot, REGISTRY));
   const pages = [];
   let pageless = 0;

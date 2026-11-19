@@ -82,16 +82,17 @@ test("tokens by name and by role, and the not-here list, answer as the root modu
   assert.deepEqual(facts.notHere(), root.notHere());
 });
 
-test("'does PLUS have a card?' resolves to PatternCard and its import, from the bundled facts", () => {
-  const found = dsFacts().find("card");
-  assert.equal(found.answer.name, "Card");
-  assert.equal(found.answer.status, "not-here");
-  assert.deepEqual(found.answer.replacement, ["PatternCard"]);
-  const [use] = found.use;
-  assert.equal(use?.name, "PatternCard");
-  assert.equal(use?.status, "exists");
-  assert.equal(use?.kind, "pattern");
-  assert.equal(use?.import, "import { PatternCard } from '@/patterns';");
+test("'does PLUS have a card?' resolves to the Card template and its import, from the bundled facts", () => {
+  const facts = dsFacts();
+  const { answer } = facts.find("card");
+  assert.equal(answer.name, "Card");
+  assert.equal(answer.status, "exists");
+  assert.equal(answer.kind, "template");
+  assert.equal(answer.import, "import { Card } from '@/templates';");
+  // The old name keeps working beside it.
+  const old = facts.find("PatternCard").answer;
+  assert.equal(old.status, "exists");
+  assert.equal("import" in old ? old.import : null, "import { PatternCard } from '@/patterns';");
 });
 
 test("a name matched in another case is found, and a miss offers the names that contain it", () => {
@@ -136,9 +137,8 @@ test("github_read's lookup answers 'does PLUS have a card?' from the bundle, wit
   const out = JSON.parse(await readGithub({ lookup: "card" }, deps)) as { ok: boolean; lookup: string; answer: DsAnswer; use: DsAnswer[]; note: string };
   assert.equal(deps.calls, 0);
   assert.equal(out.ok, true);
-  assert.equal(out.answer.status, "not-here");
-  assert.equal(out.use[0]?.name, "PatternCard");
-  assert.equal(out.use[0]?.import, "import { PatternCard } from '@/patterns';");
+  assert.equal(out.answer.status, "exists");
+  assert.equal(out.answer.import, "import { Card } from '@/templates';");
 });
 
 test("github_read's lookup answers a prop and a token role from the bundle", async () => {

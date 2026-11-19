@@ -6,7 +6,7 @@ Section header carries the title and the toolbar. Under the header come the tabl
 
 Also asked as: list of records, data table on a page, sortable list, records with filters, rows and columns, grid, table pattern.
 
-**Import:** `import { Table } from '@/patterns';`
+**Import:** `import { Table } from '@/templates';`
 
 **Used in:** Modal (`ds guide modal`); Section (`ds guide section`); Table (`ds guide table`)
 
@@ -90,7 +90,7 @@ Don't: A hierarchy faked with expandable rows: the classes and students lose the
 - Pagination: the pager that fills the footer slot.
 - Card: a table never sits inside a card.
 
-Same group: `AiChat` · `Frame` · `Modal` · `Page` · `Panel` · `PatternCard` · `PatternSection`
+Same group: `Card` · `Frame` · `Modal` · `Page` · `Panel` · `Section`
 
 ## Parts
 

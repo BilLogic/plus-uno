@@ -28,9 +28,13 @@ export const isName = (kind) => kind === 'name' || kind === 'real-name';
 
 // Rank of the first result that is a wanted component. A not-here row counts
 // when its redirect names a wanted component.
+// A pattern renamed to a template is the same answer under either name while both ship.
+const RENAMED = { PatternSection: 'Section', PatternCard: 'Card' };
+
 export function rankOf(results, want) {
   const names = (r) => [r.name, ...(r.use ?? []).map((u) => u.name ?? u)];
-  return results.findIndex((r) => names(r).some((n) => want.includes(n))) + 1;
+  const wanted = new Set(want.flatMap((w) => [w, RENAMED[w]].filter(Boolean)));
+  return results.findIndex((r) => names(r).some((n) => wanted.has(n))) + 1;
 }
 
 // Scores both sets. Returns { scores: {set: {kind: {n, hit1, hit3, mrr}}}, misses };
