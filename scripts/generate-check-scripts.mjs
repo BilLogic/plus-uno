@@ -65,6 +65,7 @@ import {
   triggersOf,
   workflowRegions,
 } from './checks.registry.mjs';
+import { TOKEN_NAME } from '../design-system/src/lib/tokens.mjs';
 import { isEntry, report } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
 import { reachOf } from './lib/script-reach.mjs';
@@ -342,7 +343,7 @@ export function baselineFindings(
     });
   }
 
-  const flag = row.update ? /(--[a-z][\w-]*)\s*$/.exec(row.update)?.[1] : null;
+  const flag = row.update ? new RegExp(`(${TOKEN_NAME})\\s*$`).exec(row.update)?.[1] : null;
   if (row.update && !flag) {
     found.push({
       file: REGISTRY_FILE,
