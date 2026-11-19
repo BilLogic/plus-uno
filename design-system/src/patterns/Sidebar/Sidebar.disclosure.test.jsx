@@ -69,7 +69,7 @@ describe('Sidebar disclosures', () => {
         expect(screen.getByRole('button', { name: 'Show 2 more' })).toHaveAttribute('aria-expanded', 'false');
     });
 
-    it('opens the account menu from the keyboard and renders each group's items in a list', async () => {
+    it('opens the account menu from the keyboard and renders the items of each group in a list', async () => {
         const user = userEvent.setup();
         renderSidebar();
         const group = screen.getByRole('group', { name: 'Toolkit' });
