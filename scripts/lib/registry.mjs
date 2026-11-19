@@ -320,7 +320,7 @@ export function buildRegistry(root, release) {
 }
 
 /** A template's folder also holds docs examples and demos built on the docs chrome; they stay behind (`bare`). */
-const EXAMPLE = /\.examples\.|[dD]emo\.jsx$|Cases\.jsx$/;
+const EXAMPLE = /\.examples\.|[dD]emo\.jsx$|(?:Cases|Examples)\.jsx$/;
 
 function walkSource(root, dir, bare = false) {
   const out = [];
