@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { storybookId } from './storybook-id.mjs';
+import { trackedFiles } from './tracked-sources.mjs';
 
 const DS_SRC = 'design-system/src';
 const toPosix = (file) => file.split(path.sep).join('/');
@@ -91,16 +92,8 @@ export function readStorybookPage(repoRoot, file) {
 
 /** Every authored MDX and stories file under the design-system source, in path order. */
 export function scanStorybookPages(repoRoot) {
-  const files = [];
-  const walk = (dir) => {
-    if (!fs.existsSync(dir)) return;
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      if (entry.name.startsWith('.') || entry.name === 'node_modules') continue;
-      const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) walk(full);
-      else if (/(?:\.mdx|\.stories\.[jt]sx?)$/.test(entry.name) && !/ \d+\.mdx$/.test(entry.name)) files.push(toPosix(path.relative(repoRoot, full)));
-    }
-  };
-  walk(path.join(repoRoot, DS_SRC));
-  return files.sort().map((file) => readStorybookPage(repoRoot, file));
+  return trackedFiles(repoRoot, [DS_SRC], { untracked: true, skipHidden: true })
+    .filter((file) => /(?:\.mdx|\.stories\.[jt]sx?)$/.test(file) && !/ \d+\.mdx$/.test(file))
+    .sort()
+    .map((file) => readStorybookPage(repoRoot, file));
 }

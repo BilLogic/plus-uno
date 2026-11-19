@@ -1,10 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { spawnSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { REPO_ROOT, contextOf, escapes, filesUnder, inScope, judge, scopeFiles, tally } from './check-ds-usage.mjs';
+import { REPO_ROOT, contextOf, escapes, expandPaths, inScope, judge, scopeFiles, tally } from './check-ds-usage.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
 import { RULES, escapesIn } from './lib/ds-usage.mjs';
@@ -118,14 +118,20 @@ test('tally: fail-level findings per rule and file; warnings are not held', () =
   );
 });
 
-test('outside a git checkout, the files on disk stand in for the tracked list', () => {
+test('named paths expand to the searched files under them, outside a checkout and in one', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-usage-nogit-'));
   try {
-    for (const rel of ['prototypes/a/src/App.jsx', 'prototypes/a/node_modules/x.js', 'prototypes/.hidden/b.jsx', 'src/c.scss']) {
+    for (const rel of ['prototypes/a/src/App.jsx', 'prototypes/a/node_modules/x.js', 'prototypes/.hidden/b.jsx', 'src/c.scss', 'src/notes.md']) {
       fs.mkdirSync(path.join(root, path.dirname(rel)), { recursive: true });
       fs.writeFileSync(path.join(root, rel), '');
     }
-    assert.deepEqual(filesUnder(root, ['prototypes', 'src']), ['prototypes/a/src/App.jsx', 'src/c.scss']);
+    assert.deepEqual(expandPaths(root, ['prototypes', 'src']), ['prototypes/a/src/App.jsx', 'src/c.scss']);
+    assert.deepEqual(expandPaths(root, ['src/notes.md']), ['src/notes.md']);
+    assert.throws(() => expandPaths(root, ['missing']), /no such path/);
+    execFileSync('git', ['-C', root, 'init', '-q']);
+    execFileSync('git', ['-C', root, 'add', 'src/c.scss']);
+    assert.deepEqual(expandPaths(root, ['src']), ['src/c.scss'], 'a git checkout lists tracked and new files, never the ignored or dot ones');
+    assert.deepEqual(expandPaths(root, ['.']), ['prototypes/a/src/App.jsx', 'src/c.scss']);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }

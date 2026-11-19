@@ -63,6 +63,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { readStorybookPage, resolveStorybookSource as resolveSpec } from './storybook-pages.mjs';
+import { trackedFiles } from './tracked-sources.mjs';
 
 // ── scanning ────────────────────────────────────────────────────────────────
 
@@ -685,22 +686,12 @@ export function sectionText(page, title) {
 // ── finding a component's page ──────────────────────────────────────────────
 
 const DS_SRC = 'design-system/src';
-const toPosix = (p) => p.split(path.sep).join('/');
 
 /** Every authored `.mdx` under the design-system source (or the folder `dir` names), repo-relative. A ` 2.mdx` name is a Finder copy, not a page. */
 export function pagesUnder(root, dir = DS_SRC) {
-  const out = [];
-  const walk = (dir) => {
-    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-      if (e.name === 'node_modules' || e.name.startsWith('.')) continue;
-      const full = path.join(dir, e.name);
-      if (e.isDirectory()) walk(full);
-      else if (e.name.endsWith('.mdx') && !/ \d+\.mdx$/.test(e.name)) out.push(toPosix(path.relative(root, full)));
-    }
-  };
-  const base = path.join(root, dir);
-  if (fs.existsSync(base)) walk(base);
-  return out.sort();
+  return trackedFiles(root, [dir], { untracked: true, skipHidden: true })
+    .filter((file) => file.endsWith('.mdx') && !/ \d+\.mdx$/.test(file))
+    .sort();
 }
 
 /** The literal an `export const NAME =` in `text` binds, as text, or null. */

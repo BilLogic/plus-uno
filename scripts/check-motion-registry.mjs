@@ -34,12 +34,10 @@
  * `--update` refuses a component the record does not hold. Never edit by hand.
  */
 
-import fs from 'node:fs';
-import path from 'node:path';
-
-import { REPO_ROOT } from './lib/corpus.mjs';
+import { REPO_ROOT, text } from './lib/corpus.mjs';
 import { main } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
+import { trackedSources } from './lib/tracked-sources.mjs';
 import { MOTION_TRANSITIONS } from './lib/tokens/motion-docs.mjs';
 import { MOTION_REGISTRY } from './lib/tokens/motion-registry.mjs';
 import { MOTION_SEMANTICS } from './lib/tokens/plan.mjs';
@@ -75,22 +73,14 @@ const NOT_PAGES = new Set(['Overview']);
 /** Patterns pages by Storybook title (`Patterns/<Page>[/...]`, or `Patterns/States/<Page>[/...]` for the States group), the Overview excluded. */
 export function patternPages(repoRoot = REPO_ROOT) {
   const names = new Set();
-  const walk = (dir) => {
-    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-      const full = path.join(dir, e.name);
-      if (e.isDirectory()) walk(full);
-      else if (/\.(mdx|stories\.jsx?)$/.test(e.name)) {
-        for (const m of fs.readFileSync(full, 'utf8').matchAll(/title[:=]\s*['"]Patterns\/([^'"]+)['"]/g)) {
-          const parts = m[1].split('/');
-          const page = parts[0] === 'States' && parts.length > 1 ? parts[1] : parts[0];
-          // The Overview and its test harnesses (`Patterns/Overview/...`) are not a pattern page.
-          if (!NOT_PAGES.has(parts[0]) && !NOT_PAGES.has(page)) names.add(page);
-        }
-      }
+  for (const { text } of trackedSources(repoRoot, [PATTERNS_DIR], /\.(mdx|stories\.jsx?)$/)) {
+    for (const m of text.matchAll(/title[:=]\s*['"]Patterns\/([^'"]+)['"]/g)) {
+      const parts = m[1].split('/');
+      const page = parts[0] === 'States' && parts.length > 1 ? parts[1] : parts[0];
+      // The Overview and its test harnesses (`Patterns/Overview/...`) are not a pattern page.
+      if (!NOT_PAGES.has(parts[0]) && !NOT_PAGES.has(page)) names.add(page);
     }
-  };
-  const root = path.join(repoRoot, PATTERNS_DIR);
-  if (fs.existsSync(root)) walk(root);
+  }
   return [...names].sort();
 }
 
@@ -101,7 +91,7 @@ const unregistered = (components, registry) => {
   return components.filter((c) => !rows.has(c));
 };
 
-const readIndex = (repoRoot) => fs.readFileSync(path.join(repoRoot, INDEX), 'utf8');
+const readIndex = (repoRoot) => text(INDEX, { root: repoRoot });
 
 export const REMEDY =
   '  -> add the component\'s (or Patterns page\'s, tier: \'pattern\') row to scripts/lib/tokens/motion-registry.mjs, naming semantic tokens from plan.mjs.\n' +

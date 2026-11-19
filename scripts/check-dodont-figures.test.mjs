@@ -2,10 +2,14 @@
  * Every rule in `check:dodont-figures`, watched failing, each with a green twin.
  * The last case runs the real tree.
  */
+import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { captionText, checkSource, helperBody, isFoundationFile, isRunOn, run } from './check-dodont-figures.mjs';
+import { captionText, checkSource, helperBody, isFoundationFile, isRunOn, run, summary } from './check-dodont-figures.mjs';
 
 const pair = (extra = '', doEx = '<Button label="Save" />', dontEx = '<Button label="OK" />') =>
   `<DoDontPair\n  doExample={${doEx}}\n  doCaption="Name the action."\n  dontExample={${dontEx}}\n  dontCaption="Say nothing about it."\n  ${extra}\n/>`;
@@ -93,4 +97,25 @@ test('helperBody reads the whole definition and nothing after it', () => {
   assert.ok(helperBody(src, 'AFigure').includes('<div>'));
   assert.ok(!helperBody(src, 'AFigure').includes('style'));
   assert.equal(helperBody(src, 'MissingFigure'), '');
+});
+
+test('a fixture root: only tracked pages are read, never a second copy of the tree', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'dodont-'));
+  const put = (rel, text) => {
+    fs.mkdirSync(path.dirname(path.join(root, rel)), { recursive: true });
+    fs.writeFileSync(path.join(root, rel), text);
+  };
+  try {
+    const bad = '<Do caption="Keep it short."><svg viewBox="0 0 1 1" /></Do>';
+    put('design-system/src/components/Bad.mdx', bad);
+    put('design-system/src/components/Good.mdx', '<Do caption="Keep it short."><Button /></Do>');
+    put('design-system/src/components/Bad.test.jsx', bad);
+    put('.claude/worktrees/other/design-system/src/components/Copy.mdx', bad);
+    execFileSync('git', ['-C', root, 'init', '-q']);
+    execFileSync('git', ['-C', root, 'add', 'design-system']);
+    assert.deepEqual(run({ repoRoot: root }).map((f) => f.file), ['design-system/src/components/Bad.mdx']);
+    assert.match(summary({ repoRoot: root }), /^2 Do and Don't block/);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
 });
