@@ -232,9 +232,10 @@ describe('the Harness tab', () => {
 
   it('resolves every template, pattern and foundation page to an existing generated file', () => {
     const pages = [
-      ...['Frame', 'Page', 'PatternSection', 'PatternCard', 'Table', 'Modal', 'Form', 'Panel', 'Popup'].map(
-        (n) => `design-system/src/patterns/${n}/${n}.mdx`,
-      ),
+      ...fs
+        .readdirSync(path.join(REPO_ROOT, 'design-system/src/patterns'), { withFileTypes: true })
+        .filter((d) => d.isDirectory() && fs.existsSync(path.join(REPO_ROOT, `design-system/src/patterns/${d.name}/${d.name}.mdx`)))
+        .map((d) => `design-system/src/patterns/${d.name}/${d.name}.mdx`),
       'design-system/src/storybook-docs/templates/TemplatesOverview.mdx',
       'design-system/src/storybook-docs/patterns/PatternsOverview.mdx',
       ...fs

@@ -24,7 +24,7 @@ test('legacy components count as tags and imports, and a longer name is not its 
 });
 
 test('the retired Overlay pattern name is counted', () => {
-  const pattern = "import { Overlay } from '@/patterns';\n<Overlay />\n";
+  const pattern = "import { Overlay } from '@/templates';\n<Overlay />\n";
   assert.equal(countOf([src('design-system/src/P.jsx', pattern)], 'component:Overlay design-system/src/P.jsx'), 2);
 });
 

@@ -47,7 +47,7 @@ const baseFiles = () => ({
   ].join(NL),
   'design-system/guidelines/overview.md': [
     '# Building a PLUS screen',
-    'A screen starts from a template (`@/patterns`).',
+    'A screen starts from a template (`@/templates`).',
   ].join(NL),
   'skills/uno-prototype/references/deliverables/coded-build.md': [
     '# Deliverable — coded build',
