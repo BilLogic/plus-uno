@@ -272,6 +272,10 @@ _Avoid_: "the walker", "the parser" (there is one of each)
 `scripts/lib/ratchet.mjs`, a check's recorded baseline: a count may fall and a rise is a finding, an entry the run stops finding is a finding too, and a missing record fails loudly.
 _Avoid_: "the whitelist", "the exceptions file", "the allow-list"
 
+**exception list**:
+`scripts/exceptions.json`, read through `scripts/lib/exceptions.mjs`: where a check deliberately leaves something alone, one list per check, every entry a place (`at`) with the `reason` it is excepted. A ratchet records a count that may fall, and the retirement list's allowed places record where an old name may stay; an exception list is neither.
+_Avoid_: "the whitelist", "the allow-list"
+
 ## The ds-usage post-edit hook
 
 After an agent edits a file in `prototypes/`, `.cursor/hooks/ds-usage/post-edit.mjs` runs `check:ds-usage` on that file and hands any fail-level escape back to the agent, with its fix, so the agent corrects it before going on. The file is held to zero, as the checker holds any file a change touches, so escapes recorded in the baseline come back too. Edits anywhere else return at once.
@@ -341,8 +345,8 @@ Two kinds of failure, two mechanisms:
   highest-usage components whose behavior is the product. Everything else in
   the corpus is asserted to render, and to survive axe, and nothing more.)
 - **Accessibility is a ratchet**, not a threshold. `scripts/baselines/a11y-baseline.json`
-  records which axe rules each story already violates (54 stories, 8 rules at
-  2026-08-29). A story violating a rule it did not carry before fails the gate; a
+  records which axe rules each story already violates, and the size of the run
+  it was measured on, a floor that a shorter run falls under. A story violating a rule it did not carry before fails the gate; a
   count that falls does not. Re-record a genuine improvement with
   `npm run check:storybook -- --update` and commit the file in the same PR.
 - **What a ratchet IS, for every check that holds one**, is
@@ -381,10 +385,8 @@ Two kinds of failure, two mechanisms:
   `scripts/lib/fallback-check.mjs` where the record work actually is — and the
   `--update` its row's `update` names is a flag the check offers, in whichever
   of `main()`'s two slots the check chose (`check:glossary`'s writes and then
-  still gates). A row with no `update` must offer none. The a11y baseline is
-  the one record its check still parses itself, named as an exemption in
-  `scripts/generate-check-scripts.mjs` with the reason: the browser suite's
-  migration is its own piece of work.
+  still gates). A row with no `update` must offer none. Every record a
+  check holds is read through the module; no check parses one itself.
 
 **Which components carry `play` blocks, and why not all of them.** A `play`
 block costs runtime on every PR, so the set is chosen rather than grown: a

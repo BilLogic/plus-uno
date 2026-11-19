@@ -275,7 +275,7 @@ export function fallbackSides(audit) {
  * 191 disagreements across 30 tokens cannot be fixed in one commit and reviewed
  * honestly — several are load-bearing in prototypes no story renders. So the
  * recorded set may shrink and never grow, which is the shape of the a11y
- * baseline, `check:negation` and `CDN_BASELINE`.
+ * baseline, `check:negation` and `check:deps`'s CDN split record.
  *
  * KEYED ON `token + literal`, NOT ON FILE AND LINE. A line number changes when
  * someone adds an import above it, and a baseline that churns on every edit is

@@ -26,6 +26,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
+import { loadExceptions } from "../../../scripts/lib/exceptions.mjs";
 import { main } from "../../../scripts/lib/findings.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -34,24 +35,18 @@ const REPO_ROOT = path.resolve(here, "..", "..", "..");
 /** The one tree this guard reads, wherever the repo root happens to be. */
 const srcDirIn = (repoRoot) => path.join(repoRoot, "agents", "uno-bot", "src");
 
-// net.ts owns the one real fetch.
-const ALLOWED_BARE_FETCH = new Set(["net.ts"]);
+// The `bare-fetch` list of `check:fetch` in scripts/exceptions.json: net.ts owns the one real fetch.
+const bareFetchFiles = () => new Set(loadExceptions("check:fetch", "bare-fetch").map((e) => e.at));
 
 // The Figma client's REST adapter owns the one Figma door.
 const FIGMA_CLIENT = "figma/rest.ts";
 const FIGMA_API = /api\.figma\.com/i;
 
 // DO stub calls are real subrequests that never touch fetch(), so they must be
-// charge()d by hand. Allowlisted by file:line-content so a NEW stub call fails
-// the build instead of silently going uncounted — the one surface the meter
-// cannot instrument itself.
-const CHARGED_STUB_CALLS = new Set([
-  "slack/events.ts", // enqueueAgentJob charges 1 for the AgentRunner hop
-  "scheduled/jobs.ts", // enqueueScheduledRun charges 1 for the run's AgentRunner hop
-  "figma-notify/env.ts", // enqueueOnce charges 1 for the figma/events AgentRunner hop
-  "tools/figma-dev-links.ts", // handOff charges 1 for the Dev Mode links AgentRunner hop
-  "slack/interactive.ts", // stopCheck charges 1 for the blueprint check runner's /cancel hop (#1322)
-]);
+// charge()d by hand. The `stub-calls` list of `check:fetch` in scripts/exceptions.json
+// names the files that do, so a NEW stub call fails the build instead of silently
+// going uncounted — the one surface the meter cannot instrument itself.
+const chargedStubFiles = () => new Set(loadExceptions("check:fetch", "stub-calls").map((e) => e.at));
 
 // A Durable Object RPC hop — `stub.readHistory(ref, at)` (#493) — is the same
 // kind of uncounted internal subrequest, but it is INVISIBLE to the regex
@@ -97,6 +92,8 @@ export const REMEDY =
  */
 export function run({ repoRoot = REPO_ROOT } = {}) {
   const srcDir = srcDirIn(repoRoot);
+  const bareFetch = bareFetchFiles();
+  const chargedStubs = chargedStubFiles();
   const offenses = [];
   for (const rel of readdirSync(srcDir, { recursive: true })) {
     if (!rel.endsWith(".ts") || rel.startsWith("generated/")) continue;
@@ -116,16 +113,16 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
         offenses.push(`${at}\n    -> globalThis/self/window.fetch bypasses the meter; import countedFetch.`);
         return;
       }
-      if (BARE_FETCH.test(line) && !HANDLER_DEF.test(line) && !ALLOWED_BARE_FETCH.has(unix)) {
+      if (BARE_FETCH.test(line) && !HANDLER_DEF.test(line) && !bareFetch.has(unix)) {
         offenses.push(`${at}\n    -> bare fetch(); import countedFetch from net.ts.`);
         return;
       }
-      if (ALIAS_FETCH.test(line) && !ALLOWED_BARE_FETCH.has(unix)) {
+      if (ALIAS_FETCH.test(line) && !bareFetch.has(unix)) {
         offenses.push(`${at}\n    -> aliases the global fetch. A module-scope alias can be captured before\n       net.ts patches the global, escaping the meter; use countedFetch.`);
         return;
       }
-      if (STUB_FETCH.test(line) && !GLOBAL_FETCH.test(line) && !CHARGED_STUB_CALLS.has(unix)) {
-        offenses.push(`${at}\n    -> looks like a Durable Object / service-binding call. Those are INTERNAL\n       subrequests (separate 1,000 cap) the meter can't see: charge(1, "<label>")\n       next to it, then add this file to CHARGED_STUB_CALLS.`);
+      if (STUB_FETCH.test(line) && !GLOBAL_FETCH.test(line) && !chargedStubs.has(unix)) {
+        offenses.push(`${at}\n    -> looks like a Durable Object / service-binding call. Those are INTERNAL\n       subrequests (separate 1,000 cap) the meter can't see: charge(1, "<label>")\n       next to it, then add this file to the stub-calls list of check:fetch in scripts/exceptions.json.`);
       }
     });
   }

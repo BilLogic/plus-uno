@@ -122,6 +122,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-deps.mjs',
     guards: 'dependencies that are declared but imported nowhere, and ones used (a CDN <link> included) but never declared.',
+    baseline: 'scripts/baselines/cdn-splits.json',
   },
   {
     name: 'check:docs',
@@ -370,6 +371,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-cross-repo-duplication.mjs',
     guards: "one meaning stated in two repositories: a shingle sweep over the three repos' harness documents, held to the recorded pairs.",
+    baseline: 'scripts/baselines/cross-repo-duplication.json',
   },
   {
     name: 'check:button-contrast',
@@ -455,6 +457,7 @@ export const CHECKS = [
     module: 'scripts/check-radius-literals.mjs',
     floors: { MIN_FILES: 150 },
     guards: 'no component or pattern rounding a corner with a px length, a %, a primitive radius step or a literal fallback; radius is a token.',
+    baseline: 'scripts/baselines/radius-literals.json',
   },
   {
     name: 'check:figma-scopes',

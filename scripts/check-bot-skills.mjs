@@ -36,7 +36,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { documents, frontmatter } from './lib/corpus.mjs';
+import { loadExceptions } from './lib/exceptions.mjs';
 import { main } from './lib/findings.mjs';
+import { rowsOfRule } from './lib/retirement.mjs';
 import { tryHarnessManifest } from './lib/bundled-set.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -50,25 +52,22 @@ const TOOL_TABLE = 'agents/uno-bot/tool-definitions.json';
 /** The three exits, each the opening word(s) of an Exit item. */
 export const EXITS = ['answer', 'file', 'hand off'];
 
-/** The vocabulary of the retired faces. `uno-bot.md` and its kin are other files. */
-const RETIRED_FACE = /(?<![\w-])bot\.md\b|\bWorker faces?\b/i;
+/** The vocabulary of the retired faces: the retirement list's `face:retired` row, read case-insensitively. `uno-bot.md` and its kin are other files. */
+export const retiredFace = () => new RegExp(rowsOfRule('face:retired')[0].pattern, 'i');
 
-/** Roots the guard skips: history, kept as it was written, and generated copies. */
-const HISTORY = [
-  'docs/plans/',
-  'docs/knowledge/archive/',
-  'docs/adr/',
-  'todos/',
-  'agents/uno-bot/src/generated/',
-  'agents/uno-bot/harness-bundle.md',
-];
+/**
+ * What the guard skips, from the `history` and `self` lists of this check in
+ * `scripts/exceptions.json`: history kept as it was written and generated copies
+ * (roots), and this check itself, which names the vocabulary it guards (files).
+ */
+const skipped = () => ({
+  roots: loadExceptions('check:bot-skills', 'history').map((e) => e.at),
+  files: loadExceptions('check:bot-skills', 'self').map((e) => e.at),
+});
 
 /** The glossary's `_Avoid_:` line is where a retired word is meant to live. */
 const AVOID_LINE = /^_Avoid_:/;
 const GLOSSARY = 'GLOSSARY.md';
-
-/** This check names the vocabulary it guards, so it skips itself. */
-const SELF = ['scripts/check-bot-skills.mjs', 'scripts/check-bot-skills.test.mjs'];
 
 export const REMEDY =
   '  A bot skill names tools exactly as the tool table does, ends in one `## Exit` section\n' +
@@ -151,13 +150,15 @@ export function compare({ repoRoot, manifest }) {
  */
 export function retiredFaceHits({ repoRoot = REPO_ROOT } = {}) {
   const hits = [];
+  const { roots, files } = skipped();
+  const face = retiredFace();
   for (const rel of documents('', { root: repoRoot, ext: ['.md', '.mjs', '.js', '.ts'] })) {
-    if (HISTORY.some((h) => rel.startsWith(h)) || SELF.includes(rel)) continue;
+    if (roots.some((h) => rel.startsWith(h)) || files.includes(rel)) continue;
     fs.readFileSync(path.join(repoRoot, rel), 'utf8')
       .split('\n')
       .forEach((text, i) => {
         if (rel === GLOSSARY && AVOID_LINE.test(text)) return;
-        if (RETIRED_FACE.test(text)) hits.push({ file: rel, line: i + 1, text: text.trim().slice(0, 160) });
+        if (face.test(text)) hits.push({ file: rel, line: i + 1, text: text.trim().slice(0, 160) });
       });
   }
   return hits;

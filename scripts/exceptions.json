@@ -1,0 +1,529 @@
+{
+  "why": "Where a check deliberately leaves something alone: the files, lines, packages or names it skips, one list per check, every entry with the reason it is excepted. Read through scripts/lib/exceptions.mjs. These lists stay apart from the retirement list's allowed places (design-system/agent-views/_inventions.json), which record where an old name may stay, and from the baselines, which record a count that may only fall. An entry says WHY, so one that has outlived its reason is easy to see and delete.",
+  "checks": {
+    "check:deps": {
+      "allowed": [
+        {
+          "at": "typescript",
+          "reason": "the compiler. Invoked as `tsc` by typecheck and the test build; never imported."
+        },
+        {
+          "at": "@cloudflare/workers-types",
+          "reason": "the Worker runtime's ambient types. Loaded through tsconfig's `types`, which names it there rather than importing it."
+        },
+        {
+          "at": "@types/node",
+          "reason": "ambient Node types for the Worker's build scripts. Same shape: a tsconfig entry, never an import."
+        },
+        {
+          "at": "@vitest/coverage-v8",
+          "reason": "vitest loads it by convention when --coverage is passed; there is no import site."
+        },
+        {
+          "at": "uno-blueprint",
+          "reason": "the sb service-blueprint template kit (BilLogic/uno-blueprint, formerly agentic-service-blueprinting) — not the PLUS blueprint estate of the same name. Pinned as a development dependency the way plus-uno-blueprint pins it (#425). `check:cross-repo` reads its harness DOCUMENTS off disk in node_modules rather than importing a module, so there is no specifier to find — the package IS the corpus. Removing it does not break a build; it silently narrows a sweep to two repos, which is why it is declared here rather than left to a checkout somebody may or may not have."
+        }
+      ]
+    },
+    "check:cross-repo": {
+      "skip": [
+        {
+          "at": "docs/plans/",
+          "reason": "History keeps the words it was written in."
+        },
+        {
+          "at": "docs/adr/",
+          "reason": "History keeps the words it was written in."
+        },
+        {
+          "at": "docs/knowledge/archive/",
+          "reason": "History keeps the words it was written in."
+        },
+        {
+          "at": "docs/evals/",
+          "reason": "History keeps the words it was written in."
+        },
+        {
+          "at": "todos/",
+          "reason": "History keeps the words it was written in."
+        },
+        {
+          "at": "node_modules/",
+          "reason": "Installed packages are not authored in any of the repos."
+        }
+      ],
+      "copies": [
+        {
+          "at": "docs/agents/domain.md",
+          "reason": "installed by the mattpocock-skills setup skill in all three repos. Its home is the plugin; a divergent copy is the defect, and the plugin owns that. plus-uno appends one local section, its glossary-editing rule."
+        },
+        {
+          "at": "docs/agents/issue-tracker.md",
+          "reason": "same origin: it teaches the skills how this estate spells `gh`, and the spelling is deliberately the same everywhere."
+        },
+        {
+          "at": "docs/agents/triage-labels.md",
+          "reason": "same origin again. The label table differs per repo; the sentences defining the five canonical roles cannot, because the roles are the plugin's."
+        }
+      ]
+    },
+    "check:docs-dead-selectors": {
+      "vendor": [
+        {
+          "at": "sbdocs",
+          "reason": "Storybook or an addon puts this class in the DOM; the string occurs in storybook/dist/components/index.js."
+        },
+        {
+          "at": "sbdocs-wrapper",
+          "reason": "Storybook or an addon puts this class in the DOM; the string occurs in @storybook/addon-docs/dist/blocks.js."
+        },
+        {
+          "at": "sbdocs-content",
+          "reason": "Storybook or an addon puts this class in the DOM; the string occurs in @storybook/addon-docs/dist/blocks.js."
+        },
+        {
+          "at": "sbdocs-title",
+          "reason": "Storybook or an addon puts this class in the DOM; the string occurs in @storybook/addon-docs/dist/blocks.js."
+        },
+        {
+          "at": "sbdocs-preview",
+          "reason": "Storybook or an addon puts this class in the DOM; the string occurs in @storybook/addon-docs/dist/blocks.js."
+        },
+        {
+          "at": "sbdocs-preview-actions",
+          "reason": "Storybook or an addon puts this class in the DOM; the string occurs in @storybook/addon-docs/dist/blocks.js."
+        },
+        {
+          "at": "docblock-code-toggle--expanded",
+          "reason": "Storybook or an addon puts this class in the DOM; the string occurs in @storybook/addon-docs/dist/blocks.js."
+        },
+        {
+          "at": "sbdocs-toc",
+          "reason": "Storybook or an addon puts this class in the DOM; the string occurs in @storybook/addon-docs/dist/blocks.js."
+        },
+        {
+          "at": "sbdocs-a",
+          "reason": "Storybook or an addon puts this class in the DOM; the string occurs in storybook/dist/core-server/presets/common-manager.js."
+        },
+        {
+          "at": "toc-wrapper",
+          "reason": "Storybook or an addon puts this class in the DOM; the string occurs in @storybook/addon-docs/dist/blocks.js."
+        },
+        {
+          "at": "toc-list-item",
+          "reason": "Storybook or an addon puts this class in the DOM; the string occurs in @storybook/addon-docs/dist/blocks.js."
+        },
+        {
+          "at": "toc-list",
+          "reason": "Storybook or an addon puts this class in the DOM; the string occurs in @storybook/addon-docs/dist/blocks.js."
+        },
+        {
+          "at": "is-collapsible",
+          "reason": "Storybook or an addon puts this class in the DOM; the string occurs in @storybook/addon-docs/dist/blocks.js."
+        },
+        {
+          "at": "is-collapsed",
+          "reason": "Storybook or an addon puts this class in the DOM; the string occurs in @storybook/addon-docs/dist/blocks.js."
+        },
+        {
+          "at": "sb-main-padded",
+          "reason": "Storybook or an addon puts this class in the DOM; the string occurs in storybook/dist/_browser-chunks/ (preview runtime)."
+        },
+        {
+          "at": "docs-story",
+          "reason": "Storybook or an addon puts this class in the DOM; the string occurs in storybook/dist/csf/index.js."
+        },
+        {
+          "at": "docblock-colorpalette",
+          "reason": "Storybook or an addon puts this class in the DOM; the string occurs in @storybook/addon-docs/dist/blocks.js."
+        },
+        {
+          "at": "docblock-typeset",
+          "reason": "Storybook or an addon puts this class in the DOM; the string occurs in @storybook/addon-docs/dist/blocks.js."
+        },
+        {
+          "at": "docblock-argstable",
+          "reason": "Storybook or an addon puts this class in the DOM; the string occurs in storybook/dist/core-server/presets/common-manager.js."
+        },
+        {
+          "at": "docblock-argstable-head",
+          "reason": "Storybook or an addon puts this class in the DOM; the string occurs in storybook/dist/core-server/presets/common-manager.js."
+        },
+        {
+          "at": "innerZoomElementWrapper",
+          "reason": "Storybook or an addon puts this class in the DOM; the string occurs in storybook/dist/components/index.js."
+        }
+      ]
+    },
+    "check:radius-literals": {
+      "exceptions": [
+        {
+          "at": "design-system/src/components/forms-and-inputs/Checkbox/Checkbox.scss",
+          "token": "--radius-md",
+          "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
+        },
+        {
+          "at": "design-system/src/components/forms-and-inputs/Select/Select.scss",
+          "token": "--radius-md",
+          "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
+        },
+        {
+          "at": "design-system/src/components/forms-and-inputs/_internal/Calendar.scss",
+          "token": "--radius-md",
+          "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
+        },
+        {
+          "at": "design-system/src/components/forms-and-inputs/_internal/FieldFrame.scss",
+          "token": "--radius-md",
+          "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
+        },
+        {
+          "at": "design-system/src/components/forms-and-inputs/_internal/OptionRow.scss",
+          "token": "--radius-md",
+          "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
+        },
+        {
+          "at": "design-system/src/components/images-and-icons/Avatar/Avatar.scss",
+          "token": "--radius-xxl",
+          "reason": "Keep the size-derived Avatar corner capped at 16px; this is proportional image geometry, not a surface role."
+        },
+        {
+          "at": "design-system/src/components/images-and-icons/Tile/Tile.scss",
+          "token": "--radius-sm",
+          "reason": "Keep the existing 2px small mark; the control roles are 6/8/10px and would change its shape."
+        },
+        {
+          "at": "design-system/src/components/ai/AiChat/AiChat.scss",
+          "token": "--radius-md",
+          "reason": "Keep the existing 4px corner on the person's message; the control roles are 6/8/10px and require a visual decision."
+        },
+        {
+          "at": "design-system/src/components/ai/AiMessage/AiMessage.scss",
+          "token": "--radius-md",
+          "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
+        },
+        {
+          "at": "design-system/src/components/ai/AiMessage/AiMessage.scss",
+          "token": "--radius-sm",
+          "reason": "Keep the existing 2px small mark; the control roles are 6/8/10px and would change its shape."
+        },
+        {
+          "at": "design-system/src/components/labels/ChangeTag/ChangeTag.scss",
+          "token": "--radius-md",
+          "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
+        },
+        {
+          "at": "design-system/src/components/labels/CountTag/CountTag.scss",
+          "token": "--radius-md",
+          "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
+        },
+        {
+          "at": "design-system/src/components/labels/DateTag/DateTag.scss",
+          "token": "--radius-md",
+          "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
+        },
+        {
+          "at": "design-system/src/components/labels/StatusTag/StatusTag.scss",
+          "token": "--radius-md",
+          "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
+        },
+        {
+          "at": "design-system/src/components/ai/Suggestion/Suggestion.scss",
+          "token": "--radius-md",
+          "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
+        },
+        {
+          "at": "design-system/src/components/labels/Tag/Tag.scss",
+          "token": "--radius-md",
+          "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
+        },
+        {
+          "at": "design-system/src/components/labels/Tag/Tag.scss",
+          "token": "--radius-sm",
+          "reason": "Keep the existing 2px small mark; the control roles are 6/8/10px and would change its shape."
+        },
+        {
+          "at": "design-system/src/components/layout-and-structure/ScrollBar/ScrollBar.scss",
+          "token": "--radius-md",
+          "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
+        },
+        {
+          "at": "design-system/src/components/loading/Skeleton/Skeleton.scss",
+          "token": "--radius-md",
+          "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
+        },
+        {
+          "at": "design-system/src/components/messaging/Flag/Flag.scss",
+          "token": "--radius-md",
+          "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
+        },
+        {
+          "at": "design-system/src/components/messaging/Spotlight/Spotlight.scss",
+          "token": "--radius-lg",
+          "reason": "Keep the existing 8px media corner; a control role would assign interactive sizing to an image."
+        },
+        {
+          "at": "design-system/src/components/navigation/Link/Link.scss",
+          "token": "--radius-md",
+          "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
+        },
+        {
+          "at": "design-system/src/components/navigation/Sidebar/Sidebar.scss",
+          "token": "--radius-sm",
+          "reason": "Keep the existing 2px small mark on the lock focus ring and sidebar count; the control roles are 6/8/10px and would change its shape."
+        },
+        {
+          "at": "design-system/src/components/text-and-data-display/Code/Code.scss",
+          "token": "--radius-md",
+          "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
+        },
+        {
+          "at": "design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.scss",
+          "token": "--radius-md",
+          "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
+        },
+        {
+          "at": "design-system/src/components/text-and-data-display/Table/Table.scss",
+          "token": "--radius-md",
+          "reason": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
+        }
+      ]
+    },
+    "check:token-naming": {
+      "missing-syntax": [
+        {
+          "at": "color/ai/*",
+          "variable": "^color/ai/",
+          "reason": "AI UI color variables ship in Figma ahead of code by design."
+        },
+        {
+          "at": "Prompt input/*",
+          "variable": "^Prompt input/",
+          "reason": "AI Prompt input sizing variables ship in Figma ahead of code by design."
+        },
+        {
+          "at": "elevation/shadow/*/layer-*",
+          "collection": "color / semantics",
+          "variable": "^elevation/shadow/[^/]+/layer-\\d+(?:/(?:offsetX|offsetY|radius|spread))?$",
+          "reason": "Elevation shadow layer color and geometry parts compose `--ds-shadow-*` effect styles."
+        },
+        {
+          "at": "Frame/sidebar-docked",
+          "collection": "spacing / templates",
+          "variable": "^Frame/sidebar-docked$",
+          "reason": "Boolean breakpoint mode switch in Figma; code switches Sidebar docking via media query."
+        }
+      ]
+    },
+    "check:prop-names": {
+      "allowed": [
+        {
+          "at": "Dialog.loading",
+          "reason": "renamed after the modal-width work lands"
+        },
+        {
+          "at": "Modal.loading",
+          "reason": "renamed after the modal-width work lands"
+        }
+      ]
+    },
+    "check:docs": {
+      "vendored": [
+        {
+          "at": "docs/connectors/supabase/blueprint.md",
+          "reason": "Vendored from plus-uno-blueprint: the paths it names are that repo's, not this one's."
+        },
+        {
+          "at": "docs/connectors/supabase/blueprint-direct-access.md",
+          "reason": "Vendored from plus-uno-blueprint: the paths it names are that repo's, not this one's."
+        },
+        {
+          "at": "docs/connectors/supabase/blueprint-schema.md",
+          "reason": "Vendored from plus-uno-blueprint: the paths it names are that repo's, not this one's."
+        }
+      ],
+      "not-active": [
+        {
+          "at": "node_modules/",
+          "reason": "A build output is not authored."
+        },
+        {
+          "at": "docs/plans/",
+          "reason": "History keeps the words it was written in."
+        },
+        {
+          "at": "docs/knowledge/",
+          "reason": "History keeps the words it was written in."
+        },
+        {
+          "at": "docs/adr/",
+          "reason": "History keeps the words it was written in."
+        },
+        {
+          "at": "todos/",
+          "reason": "History keeps the words it was written in."
+        },
+        {
+          "at": "storybook-static/",
+          "reason": "A build output is not authored."
+        },
+        {
+          "at": "packages/cli/dist/",
+          "reason": "A build output is not authored."
+        },
+        {
+          "at": "design-system/figma/knowledge-audit.json",
+          "reason": "A generated record, not authored."
+        },
+        {
+          "at": "design-system/agent-views/_inventions.json",
+          "reason": "The retirement list itself, which names every retired path it keeps out."
+        },
+        {
+          "at": "design-system/agent-views/ds-index.json",
+          "reason": "Generated from the retirement list, so it quotes every retired path the list keeps out."
+        }
+      ]
+    },
+    "check:knowledge-disposition": {
+      "excluded": [
+        {
+          "at": "archive/",
+          "reason": "The archive is a destination: a note there has been disposed of and is kept as it was written."
+        },
+        {
+          "at": "INDEX.md",
+          "reason": "It governs the folder, so it is the contract and not a note staged in it."
+        },
+        {
+          "at": "changelog.md",
+          "reason": "It governs the folder, so it is a record and not a note staged in it."
+        }
+      ]
+    },
+    "check:bot-skills": {
+      "history": [
+        {
+          "at": "docs/plans/",
+          "reason": "History keeps the words it was written in."
+        },
+        {
+          "at": "docs/knowledge/archive/",
+          "reason": "History keeps the words it was written in."
+        },
+        {
+          "at": "docs/adr/",
+          "reason": "History keeps the words it was written in."
+        },
+        {
+          "at": "todos/",
+          "reason": "History keeps the words it was written in."
+        },
+        {
+          "at": "agents/uno-bot/src/generated/",
+          "reason": "A generated copy, regenerated from sources that are checked."
+        },
+        {
+          "at": "agents/uno-bot/harness-bundle.md",
+          "reason": "A generated copy, regenerated from sources that are checked."
+        }
+      ],
+      "self": [
+        {
+          "at": "scripts/check-bot-skills.mjs",
+          "reason": "This check names the vocabulary it guards, so it skips itself."
+        },
+        {
+          "at": "scripts/check-bot-skills.test.mjs",
+          "reason": "This check names the vocabulary it guards, so its test skips itself."
+        },
+        {
+          "at": "scripts/retirement-parity.test.mjs",
+          "reason": "Its parity test holds the retired-face vocabulary as the check spelled it before, to prove the move changed nothing."
+        }
+      ]
+    },
+    "check:storybook-categories": {
+      "history": [
+        {
+          "at": "docs/plans/",
+          "reason": "History keeps the folder names it was written with."
+        },
+        {
+          "at": "docs/adr/",
+          "reason": "History keeps the folder names it was written with."
+        }
+      ],
+      "self": [
+        {
+          "at": "scripts/check-storybook-categories.mjs",
+          "reason": "This check names the retired folders it guards, so it skips itself."
+        },
+        {
+          "at": "scripts/check-storybook-categories.test.mjs",
+          "reason": "This check names the retired folders it guards, so its test skips itself."
+        },
+        {
+          "at": "scripts/retirement-parity.test.mjs",
+          "reason": "Its parity test holds the retired folder list as the check spelled it before, to prove the move changed nothing."
+        }
+      ]
+    },
+    "check:worker-host": {
+      "allowed": [
+        {
+          "at": "agents/uno-bot/scripts/worker-url.mjs",
+          "reason": "The definition itself."
+        },
+        {
+          "at": "agents/uno-bot/wrangler.toml",
+          "reason": "SLACK_OAUTH_REDIRECT_URI, which Slack matches against the app's registered value and so cannot be derived — it changes in lockstep with Slack's config."
+        },
+        {
+          "at": "agents/uno-bot/slack-app-manifest.yaml",
+          "reason": "The Slack app's own declared config — 3 command URLs, the OAuth redirect, and the events and interactivity request URLs. NOT scripted: `pkce_enabled` permanently disables apps.manifest.update for this app, so every push path fails with cannot_disable_once_enabled (ADR-024). The file is the repo's record and the rollback point; applying it means pasting into the App Manifest web editor, then confirming with `npm run slack:diff`, which reads the live app. That makes it the slowest step of the #288 cutover, not the easiest."
+        }
+      ],
+      "history": [
+        {
+          "at": "docs/knowledge/archive/",
+          "reason": "Recorded history, which must NOT be rewritten when the host changes: a recorded run says which Worker it scored, and editing that to the new host would falsify the record."
+        },
+        {
+          "at": "docs/plans/",
+          "reason": "Recorded history, which must NOT be rewritten when the host changes: a plan says which Worker it meant, and editing that to the new host would falsify the record."
+        }
+      ]
+    },
+    "check:fetch": {
+      "bare-fetch": [
+        {
+          "at": "net.ts",
+          "reason": "It owns the one real fetch."
+        }
+      ],
+      "stub-calls": [
+        {
+          "at": "slack/events.ts",
+          "reason": "enqueueAgentJob charges 1 for the AgentRunner hop."
+        },
+        {
+          "at": "scheduled/jobs.ts",
+          "reason": "enqueueScheduledRun charges 1 for the run's AgentRunner hop."
+        },
+        {
+          "at": "figma-notify/env.ts",
+          "reason": "enqueueOnce charges 1 for the figma/events AgentRunner hop."
+        },
+        {
+          "at": "tools/figma-dev-links.ts",
+          "reason": "handOff charges 1 for the Dev Mode links AgentRunner hop."
+        },
+        {
+          "at": "slack/interactive.ts",
+          "reason": "stopCheck charges 1 for the blueprint check runner's /cancel hop."
+        }
+      ]
+    }
+  }
+}

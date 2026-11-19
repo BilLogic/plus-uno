@@ -8,6 +8,8 @@
  * rule has one home and a new bare name is a one-line change.
  */
 
+import { loadExceptions } from './exceptions.mjs';
+
 /** Bare boolean state names; each is `is` plus the name with a capital, `isDisabled`. */
 export const BARE_BOOLEANS = ['disabled', 'readOnly', 'required', 'loading', 'selected', 'open'];
 
@@ -18,13 +20,19 @@ export const isName = (bare) => `is${bare[0].toUpperCase()}${bare.slice(1)}`;
 export const RENAMED = { variant: 'appearance', tone: 'appearance or type' };
 
 /**
- * Bare names that stay, each for the reason it is still here. A name leaves
- * this list in the change that renames it, so the list only ever shrinks.
+ * Bare names that stay, each for the reason it is still here: the `allowed` list of
+ * `check:prop-names` in `scripts/exceptions.json`, an entry per `Component.prop`. A name
+ * leaves the list in the change that renames it, so the list only ever shrinks.
+ *
+ * @returns {{component: string, prop: string, reason: string}[]}
  */
-export const ALLOWED = [
-  { component: 'Dialog', prop: 'loading', why: 'renamed after the modal-width work lands' },
-  { component: 'Modal', prop: 'loading', why: 'renamed after the modal-width work lands' },
-];
+export function allowedProps() {
+  return loadExceptions('check:prop-names', 'allowed').map(({ at, reason }) => {
+    const [component, prop] = at.split('.');
+    if (!component || !prop) throw new Error(`check:prop-names allowed entry "${at}" is not Component.prop`);
+    return { component, prop, reason };
+  });
+}
 
 /**
  * What the rule says about one prop, or null when it is fine.

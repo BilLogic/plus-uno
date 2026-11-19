@@ -56,7 +56,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { loadExceptions } from './lib/exceptions.mjs';
 import { byRoot, main } from './lib/findings.mjs';
+import { rowsOfRule } from './lib/retirement.mjs';
 import { trackedFiles } from './lib/tracked-sources.mjs';
 
 import { readStorybookPage } from './lib/storybook-pages.mjs';
@@ -89,13 +91,12 @@ export const SITE_SECTIONS = ['Get started', 'Foundations', 'Components', 'Patte
 
 /**
  * Folders that held components before the move, as the repo path or the `@/`
- * alias, with or without a path after them. Assembled from parts so this file
- * does not name what it searches for.
+ * alias, with or without a path after them: the retirement list's
+ * `path:components-folder` rows, each pattern assembled so the list does not name
+ * what it searches for.
  */
-export const RETIRED_PATHS = ['actions', 'status-and-loading', 'overlays'].map((folder) => ({
-  folder,
-  re: new RegExp(`(?:design-system/src/|@/)components/${folder}(?![\\w-])`),
-}));
+export const retiredPaths = () =>
+  rowsOfRule('path:components-folder').map((row) => ({ folder: row.not, re: new RegExp(row.pattern) }));
 
 /** Where the component folders live, as a tracked path prefix. */
 const COMPONENTS_DIR = 'design-system/src/components/';
@@ -357,14 +358,18 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   }
 
   // (5) Retired paths.
-  const self = new Set(['scripts/check-storybook-categories.mjs', 'scripts/check-storybook-categories.test.mjs']);
+  const paths = retiredPaths();
+  // What the scan skips lives in scripts/exceptions.json: history kept as written,
+  // and the files that name the retired folders on purpose.
+  const history = loadExceptions('check:storybook-categories', 'history').map((e) => e.at);
+  const self = new Set(loadExceptions('check:storybook-categories', 'self').map((e) => e.at));
   for (const rel of tracked) {
-    if (self.has(rel) || rel.startsWith('docs/plans/') || rel.startsWith('docs/adr/')) continue;
+    if (self.has(rel) || history.some((root) => rel.startsWith(root))) continue;
     const abs = path.join(repoRoot, rel);
     if (!fs.existsSync(abs) || fs.statSync(abs).size > 2_000_000) continue;
     const src = fs.readFileSync(abs, 'utf8');
     if (src.includes('\u0000')) continue;
-    for (const { folder, re } of RETIRED_PATHS) {
+    for (const { folder, re } of paths) {
       if (re.test(src)) {
         found.push(`${rel}  names the retired folder components/${folder}/.`);
         break;

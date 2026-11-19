@@ -6,8 +6,8 @@
  * (excluding `archived / *` collections and `Deprecated/*` rows) against three rules:
  *   1. WEB code syntax names a token defined in SCSS (`collectScssTokens` +
  *      `parseWebCodeSyntax` from `scripts/generate-token-registry.mjs`).
- *   2. Every live variable carries a WEB code syntax unless listed on the explicit,
- *      commented `MISSING_SYNTAX_ALLOWLIST`.
+ *   2. Every live variable carries a WEB code syntax unless listed on the explicit
+ *      `missing-syntax` list in `scripts/exceptions.json`.
  *   3. Each WEB code syntax agrees with the naming rule and documented exceptions
  *      recorded in `docs/engineering/foundation-docs.md` § Token naming.
  *      Reported as warnings while `BLOCK_ON_NAMING_MISMATCH` is `false`; flip
@@ -19,6 +19,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
+import { loadExceptions } from './lib/exceptions.mjs';
 import { main } from './lib/findings.mjs';
 import {
   ARCHIVED_COLLECTION,
@@ -41,37 +42,24 @@ const MOTION_SPRING_ROW = /^(.+)\/(?:damping|mass|stiffness)$/;
 const CODE_DEFAULT_COLOR = /^color\/(?:background|text)\/code\/default$/;
 
 /**
- * Live Figma variables permitted to carry no WEB code syntax (#2641).
+ * Live Figma variables permitted to carry no WEB code syntax: the `missing-syntax` list of
+ * this check in `scripts/exceptions.json`. Each entry names the variable pattern it is
+ * (`at`), the collection it holds in where it says so, the `variable` expression that
+ * decides it, and why.
  * Do not add entries to silence unmapped variables; fix Figma or the SCSS instead.
+ *
+ * @returns {{at: string, reason: string, match: (collection: string, variable: string) => boolean}[]}
  */
-export const MISSING_SYNTAX_ALLOWLIST = [
-  // AI UI color variables in `color / semantics`: Figma ships AI surfaces ahead of code by design.
-  {
-    pattern: 'color/ai/*',
-    match: (_collection, variable) => variable.startsWith('color/ai/'),
-    reason: 'AI UI color variables ship in Figma ahead of code by design.',
-  },
-  // AI prompt input sizing variables: Figma ships Prompt input ahead of code by design.
-  {
-    pattern: 'Prompt input/*',
-    match: (_collection, variable) => variable.startsWith('Prompt input/'),
-    reason: 'AI Prompt input sizing variables ship in Figma ahead of code by design.',
-  },
-  // Elevation shadow per-layer color and geometry variables compose `--ds-shadow-*` effect styles.
-  {
-    pattern: 'elevation/shadow/*/layer-*',
-    match: (collection, variable) =>
-      collection === 'color / semantics' && ELEVATION_SHADOW_PART.test(variable),
-    reason: 'Elevation shadow layer color and geometry parts compose `--ds-shadow-*` effect styles.',
-  },
-  // Boolean mode variable switching Sidebar docked state per breakpoint; code uses a media query.
-  {
-    pattern: 'Frame/sidebar-docked',
-    match: (collection, variable) =>
-      collection === 'spacing / templates' && variable === 'Frame/sidebar-docked',
-    reason: 'Boolean breakpoint mode switch in Figma; code switches Sidebar docking via media query.',
-  },
-];
+export function missingSyntaxExceptions(repoRoot = REPO_ROOT) {
+  return loadExceptions('check:token-naming', 'missing-syntax', { repoRoot }).map((entry) => {
+    const variable = new RegExp(entry.variable);
+    return {
+      at: entry.at,
+      reason: entry.reason,
+      match: (collection, name) => (entry.collection === undefined || collection === entry.collection) && variable.test(name),
+    };
+  });
+}
 
 const kebabSegment = (segment) =>
   segment
@@ -164,21 +152,17 @@ function matchesNamingRule(collection, variable, actualToken, expected) {
   return actualToken === expected;
 }
 
-function isAllowlistedMissingSyntax(collection, variable) {
-  return MISSING_SYNTAX_ALLOWLIST.some((entry) => entry.match(collection, variable));
-}
-
 /**
  * Pure check over a parsed Figma variables snapshot and SCSS token set.
  *
  * @param {{collections?: Record<string, {variables?: string[], codeSyntax?: Record<string, string>}>}} snapshot
  * @param {Set<string>} scssTokens
- * @param {{blockOnNamingMismatch?: boolean, file?: string}} [options]
+ * @param {{blockOnNamingMismatch?: boolean, file?: string, exceptions?: ReturnType<typeof missingSyntaxExceptions>}} [options]
  */
 export function checkTokenNaming(
   snapshot,
   scssTokens,
-  { blockOnNamingMismatch = BLOCK_ON_NAMING_MISMATCH, file = SNAPSHOT_PATH } = {},
+  { blockOnNamingMismatch = BLOCK_ON_NAMING_MISMATCH, file = SNAPSHOT_PATH, exceptions = missingSyntaxExceptions() } = {},
 ) {
   const findings = [];
   const mismatchSeverity = blockOnNamingMismatch ? 'error' : 'warning';
@@ -194,7 +178,7 @@ export function checkTokenNaming(
       const rawSyntax = Object.hasOwn(codeSyntax, variable) ? codeSyntax[variable] : undefined;
 
       if (rawSyntax === undefined || rawSyntax === '') {
-        if (!isAllowlistedMissingSyntax(collection, variable)) {
+        if (!exceptions.some((entry) => entry.match(collection, variable))) {
           findings.push({
             kind: 'missing-syntax',
             severity: 'error',
@@ -274,7 +258,11 @@ export function run({ repoRoot = REPO_ROOT, blockOnNamingMismatch = BLOCK_ON_NAM
     return [{ file: SNAPSHOT_PATH, message: `${SNAPSHOT_PATH} is missing or unreadable` }];
   }
   const scssTokens = collectScssTokens({ root: repoRoot });
-  return checkTokenNaming(snapshot, scssTokens, { blockOnNamingMismatch, file: SNAPSHOT_PATH });
+  return checkTokenNaming(snapshot, scssTokens, {
+    blockOnNamingMismatch,
+    file: SNAPSHOT_PATH,
+    exceptions: missingSyntaxExceptions(),
+  });
 }
 
 function summary({ repoRoot = REPO_ROOT } = {}) {
@@ -291,7 +279,7 @@ function summary({ repoRoot = REPO_ROOT } = {}) {
 
 const REMEDY =
   '  -> unknown token: define it in SCSS or point the Figma WEB code syntax at a real token. ' +
-  'Missing syntax: set the WEB code syntax in Figma (or allowlist it here with a reason). ' +
+  'Missing syntax: set the WEB code syntax in Figma (or add it to the `missing-syntax` list in scripts/exceptions.json with a reason). ' +
   'Naming mismatch: align the Figma name or code syntax per `docs/engineering/foundation-docs.md` § Token naming. ' +
   'Then refresh `scripts/figma-variables-snapshot.json`.';
 

@@ -1,0 +1,26 @@
+{
+  "why": "Duplication between the estate's repositories that already existed when the cross-repo sweep was written. A pair's count is the number of shared words, a CEILING and not a permission: it may fall and never rise, so a recorded pair cannot absorb a new copy-paste. The reason says what closing the pair would take, so an entry cannot quietly become permanent. A side naming a repo's glossary matches it under either name.",
+  "sets": {
+    "main": {
+      "reasons": "required",
+      "entries": {
+        "blueprint:CONTEXT.md|sb:CONTEXT.md": {
+          "count": 98,
+          "reason": "The shared writing vocabulary: *ladder*, *sprawl*, *evidence*. A glossary is a LOCAL dictionary: a session in one repo never opens another's glossary, so one word must carry one definition in all three. Closing it takes a vendored glossary, which adds the vendoring edge the Worker's one-monorepo rule refuses, so this pair is expected to stay; the ceiling keeps it from growing back into a rename map."
+        },
+        "blueprint:docs/reference/interface-schema-map.md|sb:references/interface-schema-map.md": {
+          "count": 430,
+          "reason": "The rename map's sibling: each repo moved its interface-to-schema map out of the glossary rather than deduplicating it, so both stated the same alignment rule, the same \"not listed would mean both aligned and nobody looked\", and the same quoted complaint, already drifting. The blueprint's preamble is a pointer at the kit's now, so the method prose has one home. What remains shared is the GENERATED binding table: each repo's `npm run interface-map` writes rows from its own schema, and a deployment of the method binds most of the same words to the same columns, which is duplication by construction, not by hand. Closing it takes the two repos' schemas binding different words. Measured at 430, from 609; the ceiling keeps a hand-written paragraph from joining the rows again."
+        },
+        "blueprint:docs/agents/blueprint.md|sb:docs/agents/blueprint.md": {
+          "count": 577,
+          "reason": "The agent account's hand-written core, in the kit and in this deployment of it. Five sections are byte-identical (what a blueprint is, how to read a cell, what absence means, what a status licenses you to say, paths and the main route) plus the vocabulary preamble; the rest of each file is rendered by the same `generate-agent-account.mjs` from its own schema, and the deployment's Retrieval section is its own. A pointer cannot close it: this document is SERVED to an agent as `agent.references.blueprint`, and a reader handed a reference cannot follow a link into the kit's copy, so the meaning has to be present in both files. Closing it takes the deployment rendering the core from the kit it already installs, so one edit reaches both. Measured at 577 when the kit pin moved and the two texts met; the ceiling keeps a new hand-written paragraph from joining them."
+        },
+        "blueprint:docs/engineering/template-relationship.md|sb:docs/connectors/supabase/database.md": {
+          "count": 40,
+          "reason": "One runnable integrity query (cells whose step is missing from their path), which each doc needs verbatim so a reader can paste and run it. Prose around it differs and each repo owns its own copy of the schema it targets. Closing it takes the kit's database doc pointing at the blueprint's query instead, a kit release and a pin bump, out of proportion to 40 words; the ceiling stops the surrounding prose from joining it."
+        }
+      }
+    }
+  }
+}

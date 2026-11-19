@@ -7,8 +7,26 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 
-import { literalRadii, run } from './check-radius-literals.mjs';
+import { RADIUS_RECORD, literalRadii, radiusExceptions, run } from './check-radius-literals.mjs';
+import { openRatchet } from './lib/ratchet.mjs';
+
+/** The held counts, as the ratchet reads them from a scratch record: `held({ 'file|--radius-md': 1 })`. */
+function held(counts) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'radius-'));
+  try {
+    fs.mkdirSync(path.join(root, path.dirname(RADIUS_RECORD)), { recursive: true });
+    const entries = Object.fromEntries(Object.entries(counts).map(([key, count]) => [key, { count }]));
+    fs.writeFileSync(path.join(root, RADIUS_RECORD), JSON.stringify({ why: 'x', sets: { main: { entries } } }));
+    return openRatchet({ file: RADIUS_RECORD, repoRoot: root });
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+}
+const none = { exceptions: [], ratchet: held({}) };
 
 const at = (text, file = 'design-system/src/components/x/X.scss') => literalRadii([{ path: file, text }]);
 
@@ -72,25 +90,30 @@ test('component SCSS reads radius roles, with counted central exceptions', async
   const { roleRadii } = await import('./check-radius-literals.mjs');
   const file = 'design-system/src/components/x/X.scss';
   const files = [{ path: file, text: '.x { border-radius: var(--radius-md); --corner: var(--radius-sm); }' }];
-  assert.equal(roleRadii(files, []).length, 2);
-  assert.deepEqual(roleRadii([{ path: file, text: '.x { border-radius: var(--radius-control-md); --corner: var(--card-radius); }' }], []), []);
-  const exceptions = [{ file, token: '--radius-md', count: 1, why: 'Preserve the existing 4px mark pending design review.' }, { file, token: '--radius-sm', count: 1, why: 'Preserve the existing 2px mark pending design review.' }];
-  assert.deepEqual(roleRadii(files, exceptions), []);
-  assert.match(roleRadii([{ path: file, text: '' }], exceptions)[0].message, /stale radius exception/);
-  assert.match(roleRadii(files, [{ ...exceptions[0], why: '' }])[0].message, /reason/);
+  assert.equal(roleRadii(files, none).length, 2);
+  assert.deepEqual(roleRadii([{ path: file, text: '.x { border-radius: var(--radius-control-md); --corner: var(--card-radius); }' }], none), []);
+  const exceptions = [{ at: file, token: '--radius-md', reason: 'Preserve the existing 4px mark pending design review.' }, { at: file, token: '--radius-sm', reason: 'Preserve the existing 2px mark pending design review.' }];
+  const ratchet = held({ [`${file}|--radius-md`]: 1, [`${file}|--radius-sm`]: 1 });
+  assert.deepEqual(roleRadii(files, { exceptions, ratchet }), []);
+  assert.match(roleRadii([{ path: file, text: '' }], { exceptions, ratchet })[0].message, /stale radius exception: .* expected 1, found 0/);
+  const grown = [{ path: file, text: '.x { a: var(--radius-md); b: var(--radius-md); c: var(--radius-sm); }' }];
+  const rose = roleRadii(grown, { exceptions, ratchet }).map((f) => f.message);
+  assert.ok(rose.some((m) => /expected 1, found 2/.test(m)), 'a held count may not rise');
+  assert.equal(rose.filter((m) => /reads raw radius scale --radius-md/.test(m)).length, 2, 'and its reads are findings again');
+  assert.deepEqual(roleRadii(files, { exceptions, ratchet: held({ [`${file}|--radius-md`]: 2, [`${file}|--radius-sm`]: 1 }) }), [], 'a count that fell below the record passes');
 });
 
 test('role enforcement covers every raw scale read and ignores comments, docs and circles', async () => {
   const { roleRadii } = await import('./check-radius-literals.mjs');
   const file = 'design-system/src/components/x/X.scss';
-  assert.equal(roleRadii([{ path: file, text: '.x { --corner: var(--radius-xl); }' }], []).length, 1);
+  assert.equal(roleRadii([{ path: file, text: '.x { --corner: var(--radius-xl); }' }], none).length, 1);
   assert.deepEqual(roleRadii([{ path: file, text: '/* var(--radius-md) */ .x { border-radius: var(--radius-full); }' },
-    { path: file.replace('.scss', '.jsx'), text: 'var(--radius-md)' }], []), []);
+    { path: file.replace('.scss', '.jsx'), text: 'var(--radius-md)' }], none), []);
 });
 
 test('radius semantics in arbitrary component properties also require a component role', async () => {
   const { roleRadii } = await import('./check-radius-literals.mjs');
-  assert.equal(roleRadii([{ path: 'design-system/src/components/x/X.scss', text: '.x { --corner: var(--radius-md); }' }], []).length, 1);
+  assert.equal(roleRadii([{ path: 'design-system/src/components/x/X.scss', text: '.x { --corner: var(--radius-md); }' }], none).length, 1);
 });
 
 test('role substitutions resolve to the same primitive in the single-mode radius ladder', async () => {
@@ -119,8 +142,15 @@ test('run checks a fixture repo through its public interface and never writes', 
   const raw = path.join(dir, 'Raw.scss');
   const text = '.x { border-radius: var(--radius-md); }';
   fs.writeFileSync(raw, text);
-  const findings = run({ repoRoot: root, exceptions: [] });
+  const findings = run({ repoRoot: root, ...none });
   assert.equal(findings.length, 1);
   assert.match(findings[0].message, /raw radius scale --radius-md/);
   assert.equal(fs.readFileSync(raw, 'utf8'), text);
+});
+
+test('the live exceptions each name a held count, and every held count names an exception', () => {
+  const keys = new Set(radiusExceptions().map((e) => `${e.at}|${e.token}`));
+  const ratchet = openRatchet({ file: RADIUS_RECORD });
+  assert.deepEqual([...ratchet.entries.keys()].filter((k) => !keys.has(k)), []);
+  assert.deepEqual([...keys].filter((k) => !ratchet.entries.has(k)), []);
 });

@@ -64,12 +64,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { isEntry } from './lib/findings.mjs';
+import { openRatchet } from './lib/ratchet.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
-const BASELINE = path.join(REPO_ROOT, 'scripts/baselines/a11y-baseline.json');
-/** The same path as the reader sees it, so the verdict's messages need no root. */
-const BASELINE_REL = path.relative(REPO_ROOT, BASELINE);
+const BASELINE = 'scripts/baselines/a11y-baseline.json';
 
 const argv = process.argv.slice(2);
 const UPDATE = argv.includes('--update');
@@ -234,69 +233,79 @@ export function ruleCounts(a11y) {
   );
 }
 
-/**
- * The ratchet itself.
- *
- * A regression is a story violating a rule it did not violate at the baseline —
- * per story, not in total. A total-only comparison nets out: fix ten violations,
- * introduce ten elsewhere, and the gate reports green on a corpus that got no
- * more accessible. A story that disappears from the report, or stops violating,
- * is a `cleared` — never a failure, and the caller is told so the baseline can be
- * re-recorded and the gain locked in.
- *
- * @returns {{regressions: {story: string, added: string[], known: string[]}[], cleared: string[]}}
- */
-export function ratchet(a11y, baselineStories) {
-  const regressions = [];
-  for (const [story, current] of Object.entries(a11y)) {
-    const known = new Set(baselineStories[story] ?? []);
-    const added = current.filter((r) => !known.has(r));
-    if (added.length) regressions.push({ story, added, known: [...known] });
-  }
-  const cleared = Object.keys(baselineStories).filter((s) => !a11y[s]);
-  return { regressions, cleared };
-}
-
-/** What the record says it holds, kept across every re-record. */
-const A11Y_WHY =
-  'Accessibility rules each story violated when the record was measured. A story may stop violating a ' +
-  "rule and never start: a new violation is fixed, or argued in that story's own parameters.a11y.";
-
 /** A story's finding is a RULE it violates, so the `stories` set is keyed `story|rule`. */
 const JOIN = '|';
 
+/** What the record says it holds, kept across every re-record. */
+export const A11Y_WHY =
+  'Accessibility rules each story violated when the record was measured. A story may stop violating a ' +
+  "rule and never start: a new violation is fixed, or argued in that story's own parameters.a11y. The " +
+  '`suite` set is the size of the run the record was measured on, a floor: a shorter run has less to find.';
+
 /**
- * The committed baseline, in the envelope every ratchet record shares and in
- * one place so the writer and the reader agree.
+ * The record's two sets, opened over the shared ratchet: `stories` (one entry per
+ * story and rule it violates) and `suite` (the size of the run, which may only
+ * grow).
  */
-export function baselineRecord({ a11y, totals }) {
-  const stories = {};
-  for (const [story, rules] of Object.entries(a11y).sort(([a], [b]) => a.localeCompare(b))) {
-    for (const rule of rules) stories[`${story}${JOIN}${rule}`] = { count: 1 };
-  }
+export function openBaseline(repoRoot = REPO_ROOT) {
   return {
-    why: A11Y_WHY,
-    // What the numbers describe, so a reader does not have to re-derive them.
-    measured: new Date().toISOString().slice(0, 10),
-    suite: { storyFiles: totals.files, tests: totals.tests },
-    violatingStories: Object.keys(a11y).length,
-    sets: {
-      rules: { entries: Object.fromEntries(Object.entries(ruleCounts(a11y)).map(([rule, n]) => [rule, { count: n }])) },
-      stories: { entries: stories },
-    },
+    stories: openRatchet({ file: BASELINE, set: 'stories', repoRoot }),
+    suite: openRatchet({ file: BASELINE, set: 'suite', repoRoot }),
   };
 }
 
-/** The record's `stories` set read back as story → the rules it violated. */
-export function storiesOf(record) {
-  const out = {};
-  for (const key of Object.keys(record?.sets?.stories?.entries ?? {})) {
-    const at = key.lastIndexOf(JOIN);
-    (out[key.slice(0, at)] ??= []).push(key.slice(at + 1));
+/** What `--update` records from one run: a story's finding is one entry per rule it violates. */
+export function recordFrom({ a11y, totals }) {
+  const stories = {};
+  for (const [story, rules] of Object.entries(a11y).sort(([a], [b]) => a.localeCompare(b))) {
+    for (const rule of rules) stories[`${story}${JOIN}${rule}`] = 1;
   }
-  return out;
+  return { stories, suite: { storyFiles: totals.files, tests: totals.tests } };
 }
 
+/** Write the run into the record: the one place this check writes a baseline. */
+export function writeBaseline({ stories, suite }, { a11y, totals }) {
+  const found = recordFrom({ a11y, totals });
+  const seed = { why: A11Y_WHY };
+  stories.update(found.stories, { seed });
+  suite.update(found.suite, { seed: { ...seed, 'sets.suite.direction': 'grow-only' } });
+}
+
+const splitKey = (key) => {
+  const at = key.lastIndexOf(JOIN);
+  return [key.slice(0, at), key.slice(at + 1)];
+};
+
+/**
+ * The comparison, over the shared ratchet.
+ *
+ * A regression is a story violating a rule it did not violate at the baseline,
+ * per story, not in total. A total-only comparison nets out: fix ten violations,
+ * introduce ten elsewhere, and the gate reports green on a corpus that got no
+ * more accessible. A story that disappears from the report is a `cleared`, never
+ * a failure, and the caller is told so the baseline can be re-recorded and the
+ * gain locked in.
+ *
+ * @returns {{regressions: {story: string, added: string[], known: string[]}[], cleared: string[]}}
+ */
+export function compare(a11y, stories) {
+  const found = recordFrom({ a11y, totals: { files: 0, tests: 0 } }).stories;
+  const added = new Map();
+  for (const failure of stories.failures(found)) {
+    const [story, rule] = splitKey(failure.key);
+    if (!added.has(story)) added.set(story, []);
+    added.get(story).push(rule);
+  }
+  const known = new Map();
+  for (const key of stories.entries.keys()) {
+    const [story, rule] = splitKey(key);
+    if (!known.has(story)) known.set(story, []);
+    known.get(story).push(rule);
+  }
+  const regressions = [...added].map(([story, rules]) => ({ story, added: rules, known: known.get(story) ?? [] }));
+  const cleared = [...known.keys()].filter((story) => !a11y[story]);
+  return { regressions, cleared };
+}
 
 /**
  * The gate's verdict: everything it decides once a report exists.
@@ -316,9 +325,9 @@ export function storiesOf(record) {
  * stderr, exactly as before.
  *
  * @param {object} report a vitest `--reporter=json` report
- * @param {object|null} baseline the parsed committed baseline, or null if absent
+ * @param {{stories: object, suite: object}} baseline the committed record, opened over the shared ratchet (`openBaseline`)
  * @param {{root?: string, update?: boolean, seconds?: number|null}} options
- * @returns {{status: 0|1, lines: {stream: 'out'|'err', text: string}[], record?: object}}
+ * @returns {{status: 0|1, lines: {stream: 'out'|'err', text: string}[], recorded?: {a11y: object, totals: object}}}
  */
 export function verdict(report, baseline, { root = REPO_ROOT, update = false, seconds = null } = {}) {
   const lines = [];
@@ -353,10 +362,10 @@ export function verdict(report, baseline, { root = REPO_ROOT, update = false, se
   }
 
   if (update) {
-    const record = baselineRecord({ a11y, totals });
+    const recorded = { a11y, totals };
     out(
       `[storybook] a11y baseline recorded: ${violatingStories} stories, ` +
-        `${Object.keys(rules).length} rules -> ${BASELINE_REL}`,
+        `${Object.keys(rules).length} rules -> ${BASELINE}`,
     );
     if (blocking.length) {
       err(
@@ -365,9 +374,9 @@ export function verdict(report, baseline, { root = REPO_ROOT, update = false, se
           '     gate will still fail on them. Fix them. Listed below.',
       );
       for (const b of blocking) err(`\n  ✗ ${b.where}\n${b.message}`);
-      return { status: 1, lines, record };
+      return { status: 1, lines, recorded };
     }
-    return { status: 0, lines, record };
+    return { status: 0, lines, recorded };
   }
 
   let failed = false;
@@ -401,23 +410,28 @@ export function verdict(report, baseline, { root = REPO_ROOT, update = false, se
   }
 
   // 2. Accessibility. Ratchet against the committed baseline.
-  if (!baseline) {
+  if (baseline.stories.absent) {
     err(
-      `\n✗ no a11y baseline at ${BASELINE_REL}.\n` +
+      `\n✗ no a11y baseline at ${BASELINE}.\n` +
         '  -> Record it once: npm run check:storybook -- --update',
     );
     return { status: 1, lines };
   }
-
-  const base = baseline;
 
   // A run that collects fewer files than the baseline recorded is not a pass, it is
   // a run that did not happen. Every assertion below is over what the report
   // contains, so a report missing half the corpus reports half the violations and
   // still clears the ratchet. The baseline already carries the size it was
   // measured at, so the floor is free.
-  const expectedFiles = base.suite?.storyFiles;
-  if (expectedFiles && totals.files < expectedFiles) {
+  // The record's `suite` set is a floor, so the ratchet says FELL where the run is short.
+  const shorter = new Map(
+    baseline.suite
+      .failures({ storyFiles: totals.files, tests: totals.tests })
+      .filter((f) => f.kind === 'fell')
+      .map((f) => [f.key, f.recorded]),
+  );
+  const expectedFiles = shorter.get('storyFiles');
+  if (expectedFiles) {
     err(
       `\n[storybook] collected ${totals.files} story files, but the baseline was measured at ` +
         `${expectedFiles}. A short run cannot clear a ratchet — it just has less to find.\n` +
@@ -430,8 +444,8 @@ export function verdict(report, baseline, { root = REPO_ROOT, update = false, se
   // execute almost nothing in them — a project filter that matches the files but
   // no tests, a bail, a browser that died after the first file. The file count
   // then looks right while the ratchet is asked about a fraction of the corpus.
-  const expectedTests = base.suite?.tests;
-  if (expectedTests && totals.tests < expectedTests) {
+  const expectedTests = shorter.get('tests');
+  if (expectedTests) {
     err(
       `\n[storybook] ran ${totals.tests} tests, but the baseline was measured at ` +
         `${expectedTests}. A short run cannot clear a ratchet — it just has less to find.\n` +
@@ -439,7 +453,7 @@ export function verdict(report, baseline, { root = REPO_ROOT, update = false, se
     );
     return { status: 1, lines };
   }
-  const { regressions, cleared } = ratchet(a11y, storiesOf(base));
+  const { regressions, cleared } = compare(a11y, baseline.stories);
 
   if (regressions.length) {
     failed = true;
@@ -470,7 +484,7 @@ export function verdict(report, baseline, { root = REPO_ROOT, update = false, se
 
   out(
     '✓ check:storybook — no play failures; no new a11y violations ' +
-      `(baseline ${base.violatingStories} stories, measured ${base.measured})` +
+      `(baseline ${new Set([...baseline.stories.entries.keys()].map((k) => splitKey(k)[0])).size} stories)` +
       (cleared.length
         ? `\n  ${cleared.length} baselined stor${cleared.length === 1 ? 'y is' : 'ies are'} now clean` +
           ' — re-baseline with `npm run check:storybook -- --update` to lock the gain in.'
@@ -490,13 +504,13 @@ function main() {
     ? { report: JSON.parse(fs.readFileSync(path.resolve(JSON_ARG), 'utf8')), seconds: null }
     : runSuite();
 
-  const baseline = fs.existsSync(BASELINE) ? JSON.parse(fs.readFileSync(BASELINE, 'utf8')) : null;
-  const { status, lines, record } = verdict(report, baseline, { update: UPDATE, seconds });
+  const baseline = openBaseline();
+  const { status, lines, recorded } = verdict(report, baseline, { update: UPDATE, seconds });
 
   // The record is written before the lines are printed because one of those lines
   // announces the write; printing first would announce something that had not
   // happened yet if the write threw.
-  if (record) fs.writeFileSync(BASELINE, `${JSON.stringify(record, null, 2)}\n`);
+  if (recorded) writeBaseline(baseline, recorded);
   for (const line of lines) (line.stream === 'err' ? console.error : console.log)(line.text);
 
   return status;

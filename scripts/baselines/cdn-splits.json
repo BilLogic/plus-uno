@@ -1,0 +1,9 @@
+{
+  "why": "CDN version splits that already exist, one entry per library and version. A new split or a new version of a recorded library fails; a recorded version that is gone is reported, so the record stops asserting something untrue. A baseline, not an amnesty: the reason says what closing it would take.",
+  "sets": {
+    "main": {
+      "reasons": "required",
+      "entries": {}
+    }
+  }
+}

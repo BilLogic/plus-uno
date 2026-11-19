@@ -57,7 +57,7 @@
  * ({@link VENDORED}), rather than by path — so a new vendored document is exempt
  * the day it is vendored, and a hand-written one never is.
  *
- * A COPY BY CONSTRUCTION IS NOT A STATEMENT. {@link COPIES} names documents a
+ * A COPY BY CONSTRUCTION IS NOT A STATEMENT. {@link exceptionLists} (`copies`) names documents a
  * shared tool writes into each repo — today the three `docs/agents/` files the
  * `mattpocock-skills` setup skill installs. Their home is the plugin; editing
  * one of the three copies is the mistake, and this sweep has no opinion the
@@ -67,12 +67,12 @@
  * Measured: each overlaps its siblings 80–100%, against 3% for the glossary
  * pair below, so nothing here sits near a boundary.
  *
- * A RECORDED PAIR IS A BASELINE, NOT AN AMNESTY. {@link RECORDED} holds document
+ * A RECORDED PAIR IS A BASELINE, NOT AN AMNESTY. {@link recordedPairs} holds document
  * pairs already sharing passages when this check was written, each with a
  * CEILING on the words they share and a reason that says what closing it would
  * take. Shared words may fall and never rise, so a recorded pair cannot absorb a
  * new copy-paste — which is the property that makes it a baseline rather than a
- * hole. Same shape as `check:deps`'s CDN_BASELINE and the negation ratchet:
+ * hole. Same shape as `check:deps`'s CDN split record and the negation ratchet:
  * a corpus too large to fix in this repo still gets a binding direction.
  *
  * THE CEILING IS WHY THE GLOSSARY PAIR IS SAFE TO RECORD, and the number says
@@ -85,8 +85,8 @@
  * the line the rename maps crossed, and `check-cross-repo-duplication.test.mjs`
  * pins that with a fixture rather than with this sentence.
  *
- * EVERY EXEMPTION IS ASSERTED LIVE. A `COPIES` path that no longer exists in two
- * repos, and a `RECORDED` pair whose documents are gone or which no longer
+ * EVERY EXEMPTION IS ASSERTED LIVE. A `copies` path that no longer exists in two
+ * repos, and a recorded pair whose documents are gone or which no longer
  * shares anything, both FAIL: an allowlist nobody prunes is a backlog, and an
  * entry that outlives its reason is the thing it was written to prevent. The
  * assertion is suspended PER ENTRY, for any exemption whose OWN repos were not
@@ -133,7 +133,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { documents, frontmatter, stripLinks } from './lib/corpus.mjs';
+import { loadExceptions } from './lib/exceptions.mjs';
 import { isEntry, main } from './lib/findings.mjs';
+import { absentMessage, openRatchet } from './lib/ratchet.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(here, '..');
@@ -179,81 +181,46 @@ export const REPOS = [
 ];
 
 /**
- * Left as written in every repo, by the rules the other sweeps already use:
- * history keeps the words it was written in, and a generated artifact is
- * regenerated from sources that are swept anyway.
+ * What the sweep leaves alone, from `check:cross-repo` in `scripts/exceptions.json`:
+ *
+ *   skip    paths left as written in every repo, by the rules the other sweeps already use:
+ *           history keeps the words it was written in, and a generated artifact is
+ *           regenerated from sources that are swept anyway.
+ *   copies  documents a shared tool writes into every repo: the path, and why it is a copy.
+ *
+ * @returns {{skip: string[], copies: Map<string, string>}}
  */
-export const SKIP = [
-  'docs/plans/',
-  'docs/adr/',
-  'docs/knowledge/archive/',
-  'docs/evals/',
-  'todos/',
-  'node_modules/',
-];
+export function exceptionLists() {
+  return {
+    skip: loadExceptions('check:cross-repo', 'skip').map((e) => e.at),
+    copies: new Map(loadExceptions('check:cross-repo', 'copies').map((e) => [e.at, e.reason])),
+  };
+}
 
-/** Documents a shared tool writes into every repo: the path, and why it is a copy. */
-export const COPIES = new Map([
-  [
-    'docs/agents/domain.md',
-    'installed by the mattpocock-skills setup skill in all three repos. Its home is the plugin; a divergent copy is the defect, and the plugin owns that. plus-uno appends one local section, its glossary-editing rule.',
-  ],
-  [
-    'docs/agents/issue-tracker.md',
-    'same origin: it teaches the skills how this estate spells `gh`, and the spelling is deliberately the same everywhere.',
-  ],
-  [
-    'docs/agents/triage-labels.md',
-    'same origin again. The label table differs per repo; the sentences defining the five canonical roles cannot, because the roles are the plugin\'s.',
-  ],
-]);
+/** The record of duplication that already existed when this check was written. */
+export const BASELINE = 'scripts/baselines/cross-repo-duplication.json';
 
 /**
- * Duplication that already existed when this check was written.
+ * The recorded pairs, read through the ratchet: `a` and `b` are the two sides, `words` the shared
+ * words the pair may not exceed, `why` what closing it would take. A side naming a repo's glossary
+ * matches it under either name ({@link GLOSSARIES}), so a sibling's rename does not turn the
+ * glossary pair into a finding.
  *
- * `words` is a CEILING, not a permission: shared words may fall and never rise,
- * so a recorded pair cannot absorb a new copy-paste. `why` has to say what
- * closing it would take, so an entry cannot quietly become permanent. A side
- * naming a repo's glossary matches it under either name ({@link GLOSSARIES}),
- * so a sibling's rename does not turn the glossary pair into a finding.
+ * @param {ReturnType<typeof openRatchet>} [ratchet]
  */
-export const RECORDED = [
-  {
-    a: 'blueprint:CONTEXT.md',
-    b: 'sb:CONTEXT.md',
-    words: 98,
-    why:
-      "#417's shared writing vocabulary — *ladder*, *sprawl*, *evidence*. A glossary is a LOCAL dictionary: a session in one repo never opens another's glossary, so one word must carry one definition in all three. Closing it means a vendored glossary, i.e. the extra vendoring edge #417 § The Worker stays in the monorepo refuses — so this one is expected to stay, and the ceiling is what keeps it from growing back into a rename map.",
-  },
-  {
-    a: 'blueprint:docs/reference/interface-schema-map.md',
-    b: 'sb:references/interface-schema-map.md',
-    words: 430,
-    why:
-      'the rename map\'s sibling, and the finding this sweep opened with. #365 and #137 each MOVED their interface→schema map out of the glossary rather than deduplicating it, so the two stated the same alignment rule, the same "not listed would mean both aligned and nobody looked", and the same quoted complaint, in two repos, already drifting — one said five components, the other seven. On 2026-09-14 the blueprint\'s preamble became a pointer at sb\'s (plus-uno-blueprint#672): the method prose has one home now. What remains shared is the GENERATED binding table — each repo\'s `npm run interface-map` writes rows from its own schema, and a deployment of the method binds most of the same words to the same columns — which is duplication by construction, not by hand. Measured at 430 that day, from 609; the ceiling keeps a hand-written paragraph from joining the rows again.',
-  },
-  {
-    a: 'blueprint:docs/agents/blueprint.md',
-    b: 'sb:docs/agents/blueprint.md',
-    words: 577,
-    why:
-      "the agent account's hand-written core, in the kit and in this deployment of it. Five sections are byte-identical — what a blueprint is, how to read a cell, what absence means, what a status licenses you to say, paths and the main route — plus the vocabulary preamble; the rest of each file is rendered by the same `generate-agent-account.mjs` from its own schema, and the deployment's Retrieval section is its own. The pointer shape that closed the interface\u2192schema map (plus-uno-blueprint#672) is NOT available here: this document is SERVED to an agent as `agent.references.blueprint`, and a reader handed a reference cannot follow a link into the kit's copy, so the meaning has to be present in both files. Closing it means the deployment RENDERING the core from the kit it already installs, so one edit reaches both — plus-uno-blueprint#695. Measured at 577 on 2026-09-22, the day the pin moved v1.6.4 \u2192 v1.44.29 (#674) and the two texts met; the ceiling keeps a new hand-written paragraph from joining them.",
-  },
-  {
-    a: 'blueprint:docs/engineering/template-relationship.md',
-    b: 'sb:docs/connectors/supabase/database.md',
-    words: 40,
-    why:
-      'one runnable integrity query (cells whose step is missing from their path), which each doc needs verbatim so a reader can paste and run it. Prose around it differs and each repo owns its own copy of the schema it targets. Closing it means the kit\'s database doc points at the blueprint\'s query instead — a kit release and a pin bump, out of proportion to 40 words; the ceiling stops the surrounding prose from joining it.',
-  },
-];
+export function recordedPairs(ratchet = openRatchet({ file: BASELINE })) {
+  return [...ratchet.entries].map(([key, entry]) => {
+    const [a, b] = key.split('|');
+    return { a, b, words: entry.count, why: entry.reason };
+  });
+}
 
 /**
  * Frontmatter off, HTML comments out, then blank-line-separated blocks.
  *
  * Where the frontmatter ends is the corpus's answer, not a sixth fence search
  * of this file's own (#503): it is the same fact the bundler measures its char
- * budgets against, and the shingle counts recorded in RECORDED above were
+ * budgets against, and the shingle counts recorded in the baseline were
  * taken over the body it names.
  */
 export function blocksOf(text) {
@@ -289,15 +256,15 @@ export function wordsOf(block) {
 }
 
 /** Every harness document under a repo's roots, as `{rel, blocks}` of word arrays. */
-export function documentsIn(root, spec) {
+export function documentsIn(root, spec, { skip, copies } = exceptionLists()) {
   // The corpus walk skips dot-directories, which is also what keeps a CI
   // sibling checkout under `.sibling-repos/` from being read as part of the
   // repo above it.
   const files = spec.roots.flatMap((r) => documents(r, { root }));
   const docs = [];
   for (const rel of files) {
-    if (SKIP.some((p) => rel.startsWith(p))) continue;
-    if (COPIES.has(rel)) continue;
+    if (skip.some((p) => rel.startsWith(p))) continue;
+    if (copies.has(rel)) continue;
     const text = readFileSync(path.join(root, rel), 'utf8');
     if (VENDORED.test(text)) continue;
     docs.push({ rel, blocks: blocksOf(text).map(wordsOf).filter((w) => w.length >= SHINGLE) });
@@ -476,11 +443,12 @@ export function sweep(overrides = {}) {
   const reached = REPOS.filter((s) => located[s.key]).map((s) => s.key);
   const absent = REPOS.filter((s) => !located[s.key]);
 
+  const lists = exceptionLists();
   const corpus = {};
   const docs = {};
   for (const spec of REPOS) {
     if (!located[spec.key]) continue;
-    corpus[spec.key] = documentsIn(located[spec.key].root, spec);
+    corpus[spec.key] = documentsIn(located[spec.key].root, spec, lists);
     docs[spec.key] = corpus[spec.key].length;
   }
 
@@ -497,11 +465,14 @@ export function sweep(overrides = {}) {
   // A recorded pair absorbs its own passages and counts them; everything else
   // is a finding. Both directions of a pair match, since which repo is "a"
   // depends only on the order REPOS happens to list them in.
-  const shared = new Map(RECORDED.map((r) => [`${r.a}|${r.b}`, 0]));
+  const ratchet = openRatchet({ file: BASELINE });
+  if (ratchet.absent) throw new Error(absentMessage(BASELINE));
+  const recorded = recordedPairs(ratchet);
+  const shared = new Map(recorded.map((r) => [`${r.a}|${r.b}`, 0]));
   const findings = [];
   for (const p of passages) {
     const [pa, pb] = [documentKey(p.a), documentKey(p.b)];
-    const rec = RECORDED.find((r) => {
+    const rec = recorded.find((r) => {
       const [ra, rb] = [documentKey(r.a), documentKey(r.b)];
       return (ra === pa && rb === pb) || (ra === pb && rb === pa);
     });
@@ -513,12 +484,11 @@ export function sweep(overrides = {}) {
     findings.push(p);
   }
 
-  const rises = [];
+  const rises = ratchet
+    .failures(Object.fromEntries(shared))
+    .filter((f) => f.kind === 'rose')
+    .map((f) => ({ rec: recorded.find((r) => `${r.a}|${r.b}` === f.key), now: f.count }));
   const stale = [];
-  for (const rec of RECORDED) {
-    const now = shared.get(`${rec.a}|${rec.b}`);
-    if (now > rec.words) rises.push({ rec, now });
-  }
 
   // Each exemption is asserted when ITS OWN repos were reachable — not when all
   // three were.
@@ -533,7 +503,7 @@ export function sweep(overrides = {}) {
   const wasReached = (key) => reached.includes(key);
   const repoOf = (side) => String(side).split(':')[0];
 
-  for (const rec of RECORDED) {
+  for (const rec of recorded) {
     if (!wasReached(repoOf(rec.a)) || !wasReached(repoOf(rec.b))) continue;
     if (shared.get(`${rec.a}|${rec.b}`) === 0) {
       stale.push(
@@ -542,22 +512,22 @@ export function sweep(overrides = {}) {
       );
     }
   }
-  // A COPIES entry names a path rather than its repos, so it is asserted only
+  // A `copies` entry names a path rather than its repos, so it is asserted only
   // when every repo was reached: "in fewer than two repos" cannot be told apart
   // from "in fewer than two repos I could look at".
   if (reached.length === REPOS.length) {
-    for (const [rel, why] of COPIES) {
+    for (const [rel, why] of lists.copies) {
       const holders = REPOS.filter((s) => existsSync(path.join(located[s.key].root, rel)));
       if (holders.length < 2) {
         stale.push(
-          `COPIES "${rel}" is now in ${holders.length} of ${REPOS.length} repos, so it is no longer a copy\n` +
+          `copies "${rel}" is now in ${holders.length} of ${REPOS.length} repos, so it is no longer a copy\n` +
             `  by construction. Delete the entry. It read: ${why}`,
         );
       }
     }
   }
 
-  return { located, reached, absent, docs, comparisons, findings, rises, stale, shared };
+  return { located, reached, absent, docs, comparisons, findings, rises, stale, shared, copies: lists.copies, recorded, unreviewed: ratchet.unreviewed() };
 }
 
 /**
@@ -612,7 +582,7 @@ export function coverageReport({ located, absent, docs, comparisons }) {
 export const REMEDY =
   '  -> give the meaning ONE home. Either it belongs to one repo and the other points at it, or\n' +
   '     it is a shared standard and the tool that installs it owns it. If two repos genuinely\n' +
-  '     must both state it, record the pair in RECORDED with the reason and what would close it.';
+  '     must both state it, record the pair in scripts/baselines/cross-repo-duplication.json with the reason and what would close it.';
 
 /**
  * One sweep per process, shared by `run` and `summary`. The sweep reads three
@@ -634,6 +604,9 @@ const once = () => (swept ??= sweep());
 export function run() {
   const result = once();
   const found = [...result.stale];
+  for (const { key } of result.unreviewed) {
+    found.push(`${key} is recorded without a reason. Say what closing the pair would take, in ${BASELINE}.`);
+  }
   for (const { rec, now } of result.rises) {
     found.push(
       `${rec.a} ↔ ${rec.b} now share ${now} words, against the ${rec.words} recorded.\n` +
@@ -680,7 +653,7 @@ export function summary() {
   const result = once();
   // A recorded pair whose repos were not both reached reports `n/a`, never `0`.
   // "0/98" on a run that compared nothing reads like the duplication went away.
-  const recorded = RECORDED.map((r) => {
+  const recorded = result.recorded.map((r) => {
     const both = [r.a, r.b].every((side) => result.reached.includes(side.split(':')[0]));
     return both ? `${result.shared.get(`${r.a}|${r.b}`)}/${r.words}` : `n/a (not compared)/${r.words}`;
   }).join(' · ');
@@ -690,8 +663,8 @@ export function summary() {
       : `no unrecorded meaning stated twice across the ${result.reached.length} repos reached`;
   return (
     `${found} — passages of ` +
-    `${MIN_WORDS}+ words, ${SHINGLE}-word shingles. ${COPIES.size} copies by construction excluded; ` +
-    `${RECORDED.length} recorded pairs at ${recorded} shared words (may fall, never rise).\n${coverageReport(result)}` +
+    `${MIN_WORDS}+ words, ${SHINGLE}-word shingles. ${result.copies.size} copies by construction excluded; ` +
+    `${result.recorded.length} recorded pairs at ${recorded} shared words (may fall, never rise).\n${coverageReport(result)}` +
     (result.absent.length ? '\n  A pairing not compared is not a pairing that passed.' : '')
   );
 }

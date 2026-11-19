@@ -70,6 +70,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { IGNORED_DIRS, documents } from './lib/corpus.mjs';
+import { loadExceptions } from './lib/exceptions.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -97,37 +98,16 @@ const SKIP_DIRS = IGNORED_DIRS;
  * no amount of grepping the repo will find them, and every one is legitimately styled
  * here — dressing Storybook's own chrome is what a docs stylesheet is FOR.
  *
- * Each was verified present in the installed packages rather than assumed: the file
- * named is where the string occurs at the version in `package.json`. Two former
+ * They are the `vendor` list of this check in `scripts/exceptions.json`. Each was verified
+ * present in the installed packages rather than assumed: the file its reason
+ * names is where the string occurs at the version in `package.json`. Two former
  * members are NOT here on purpose — `toc-container` and `toc-title` occur nowhere in
  * `node_modules` at all, which is what makes them dead rather than vendor, and they
  * were written speculatively ("Storybook 8 TOC might lack .sbdocs-toc") against a
  * version this repo has never run.
  */
-const VENDOR = new Map([
-  ['sbdocs', 'storybook/dist/components/index.js'],
-  ['sbdocs-wrapper', '@storybook/addon-docs/dist/blocks.js'],
-  ['sbdocs-content', '@storybook/addon-docs/dist/blocks.js'],
-  ['sbdocs-title', '@storybook/addon-docs/dist/blocks.js'],
-  ['sbdocs-preview', '@storybook/addon-docs/dist/blocks.js'],
-  ['sbdocs-preview-actions', '@storybook/addon-docs/dist/blocks.js'],
-  ['docblock-code-toggle--expanded', '@storybook/addon-docs/dist/blocks.js'],
-  ['sbdocs-toc', '@storybook/addon-docs/dist/blocks.js'],
-  ['sbdocs-a', 'storybook/dist/core-server/presets/common-manager.js'],
-  ['toc-wrapper', '@storybook/addon-docs/dist/blocks.js'],
-  // Tocbot's own default class names, bundled into the same file (default-options.js).
-  ['toc-list-item', '@storybook/addon-docs/dist/blocks.js'],
-  ['toc-list', '@storybook/addon-docs/dist/blocks.js'],
-  ['is-collapsible', '@storybook/addon-docs/dist/blocks.js'],
-  ['is-collapsed', '@storybook/addon-docs/dist/blocks.js'],
-  ['sb-main-padded', 'storybook/dist/_browser-chunks/ (preview runtime)'],
-  ['docs-story', 'storybook/dist/csf/index.js'],
-  ['docblock-colorpalette', '@storybook/addon-docs/dist/blocks.js'],
-  ['docblock-typeset', '@storybook/addon-docs/dist/blocks.js'],
-  ['docblock-argstable', 'storybook/dist/core-server/presets/common-manager.js'],
-  ['docblock-argstable-head', 'storybook/dist/core-server/presets/common-manager.js'],
-  ['innerZoomElementWrapper', 'storybook/dist/components/index.js'],
-]);
+const vendorClasses = (repoRoot = REPO_ROOT) =>
+  new Map(loadExceptions('check:docs-dead-selectors', 'vendor', { repoRoot }).map((e) => [e.at, e.reason]));
 
 // ── reading the stylesheet ──────────────────────────────────────────────────────────
 
@@ -209,7 +189,7 @@ export function sourceFiles(root, { skip = SKIP_DIRS, exclude = new Set() } = {}
  * 400 is dead on line 415 for the same reason, and reporting both twice hides how
  * many DISTINCT selectors are dead.
  */
-export function deadSelectors(classes, isEmitted, vendor = VENDOR) {
+export function deadSelectors(classes, isEmitted, vendor = vendorClasses()) {
   const seen = new Set();
   const dead = [];
   for (const { name, line } of classes) {
@@ -254,7 +234,7 @@ const inputs = byRoot((repoRoot) => {
 export const REMEDY =
   '  -> Delete the rule: nothing in this repo puts that class in the DOM, so it has' +
   '\n     never once applied. If the class is one Storybook or an addon emits, add it' +
-  "\n     to VENDOR in scripts/check-docs-dead-selectors.mjs with the package file it" +
+  "\n     to the vendor list of check:docs-dead-selectors in scripts/exceptions.json with the package file it" +
   '\n     comes from — verified, not assumed. If it is assembled from fragments in a' +
   '\n     template literal, spell it out in the source instead; that is also what makes' +
   '\n     it findable by the next person.';
@@ -319,8 +299,8 @@ function list(repoRoot = REPO_ROOT) {
     const n = new Set(selectorClasses(fs.readFileSync(f, 'utf8')).map((c) => c.name)).size;
     console.log(`  ${path.relative(repoRoot, f).padEnd(46)} ${n} distinct classes in selector position`);
   }
-  console.log(`\nagainst ${sources.length} source files, and ${VENDOR.size} vendor classes:\n`);
-  for (const [name, where] of VENDOR) console.log(`  ${name.padEnd(26)} ${where}`);
+  console.log(`\nagainst ${sources.length} source files, and ${vendorClasses(repoRoot).size} vendor classes:\n`);
+  for (const [name, where] of vendorClasses(repoRoot)) console.log(`  ${name.padEnd(26)} ${where}`);
 }
 
 // `--list` prints the inventory and gates nothing, so it is a TERMINAL side

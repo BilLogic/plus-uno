@@ -19,7 +19,7 @@ import path from 'node:path';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { main } from './lib/findings.mjs';
-import { ALLOWED, ruleFor } from './lib/prop-names.mjs';
+import { allowedProps, ruleFor } from './lib/prop-names.mjs';
 
 export { REPO_ROOT };
 const FACTS = 'design-system/agent-views/components.json';
@@ -28,11 +28,11 @@ const FACTS = 'design-system/agent-views/components.json';
  * @param {{components: {name: string, source?: string, props?: {name: string, type?: string|null}[]}[]}} facts
  * @returns {import('./lib/findings.mjs').Finding[]}
  */
-export function findingsOf(facts) {
+export function findingsOf(facts, allowed = allowedProps()) {
   return facts.components.flatMap((component) =>
     (component.props ?? []).flatMap((prop) => {
       const rule = ruleFor(prop);
-      if (!rule || ALLOWED.some((a) => a.component === component.name && a.prop === prop.name)) return [];
+      if (!rule || allowed.some((a) => a.component === component.name && a.prop === prop.name)) return [];
       return [{ file: component.source, message: `${component.name} \`${prop.name}\`: name it \`${rule.use}\`` }];
     }),
   );
@@ -47,7 +47,7 @@ export const REMEDY = '  -> a boolean state prop is is…; a look is `appearance
 
 export function summary({ repoRoot = REPO_ROOT, facts } = {}) {
   const found = run({ repoRoot, facts }).length;
-  return `${found} bare boolean or variant/tone props (${ALLOWED.length} allowed)`;
+  return `${found} bare boolean or variant/tone props (${allowedProps().length} allowed)`;
 }
 
 main(import.meta.url, 'check:prop-names', { run, summary, remedy: REMEDY });

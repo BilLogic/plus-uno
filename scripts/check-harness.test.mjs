@@ -296,7 +296,7 @@ const BASELINE_ROWS = ALL.filter((row) => row.baseline);
 const rootScripts = () => JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8')).scripts;
 
 test('every baseline row reaches its record and offers exactly the flag its table names', () => {
-  assert.equal(BASELINE_ROWS.length, 20);
+  assert.equal(BASELINE_ROWS.length, 23);
   for (const row of BASELINE_ROWS) {
     assert.deepEqual(
       registryGenerator.baselineFindings(row, rootScripts()).map((f) => f.message),
@@ -380,23 +380,8 @@ test('a record that will not read is reported, never read as empty', () => {
   }
 });
 
-test('the one check that still parses its own record is named, and the exemption cannot outlive it', () => {
-  const row = byName('check:storybook');
-  // Unexempted, it is a finding — which is the assertion, not a quirk: #600
-  // listed the a11y baseline and migrated the other seven.
-  const unexempt = registryGenerator
-    .baselineFindings(row, rootScripts(), { exemptions: new Map() })
-    .map((f) => f.message);
-  assert.ok(unexempt.some((m) => /parses the record itself/.test(m)), unexempt.join('\n'));
-  // Exempted, it is still held to naming the record.
-  assert.deepEqual(registryGenerator.baselineFindings(row, rootScripts()), []);
-  // And an exemption for a check that HAS migrated is itself a finding.
-  const stale = registryGenerator
-    .baselineFindings(byName('check:glossary'), rootScripts(), {
-      exemptions: new Map([['check:glossary', 'a reason that has stopped being true']]),
-    })
-    .map((f) => f.message);
-  assert.ok(stale.some((m) => /Delete the exemption/.test(m)), stale.join('\n'));
+test('the a11y record is opened through the ratchet like every other, with no exemption', () => {
+  assert.deepEqual(registryGenerator.baselineFindings(byName('check:storybook'), rootScripts()), []);
 });
 
 // ---------------------------------------------------------------------------

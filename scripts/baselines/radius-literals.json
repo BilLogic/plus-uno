@@ -1,0 +1,87 @@
+{
+  "why": "Raw semantic radius reads that component SCSS holds on purpose, one entry per file and token, each with the count held. The count may fall and never rise: a visual migration belongs to the designer, and a new raw read is a finding. The reason each is held is in scripts/exceptions.json.",
+  "sets": {
+    "main": {
+      "entries": {
+        "design-system/src/components/forms-and-inputs/Checkbox/Checkbox.scss|--radius-md": {
+          "count": 1
+        },
+        "design-system/src/components/forms-and-inputs/Select/Select.scss|--radius-md": {
+          "count": 1
+        },
+        "design-system/src/components/forms-and-inputs/_internal/Calendar.scss|--radius-md": {
+          "count": 1
+        },
+        "design-system/src/components/forms-and-inputs/_internal/FieldFrame.scss|--radius-md": {
+          "count": 1
+        },
+        "design-system/src/components/forms-and-inputs/_internal/OptionRow.scss|--radius-md": {
+          "count": 1
+        },
+        "design-system/src/components/images-and-icons/Avatar/Avatar.scss|--radius-xxl": {
+          "count": 1
+        },
+        "design-system/src/components/images-and-icons/Tile/Tile.scss|--radius-sm": {
+          "count": 1
+        },
+        "design-system/src/components/ai/AiChat/AiChat.scss|--radius-md": {
+          "count": 1
+        },
+        "design-system/src/components/ai/AiMessage/AiMessage.scss|--radius-md": {
+          "count": 1
+        },
+        "design-system/src/components/ai/AiMessage/AiMessage.scss|--radius-sm": {
+          "count": 1
+        },
+        "design-system/src/components/labels/ChangeTag/ChangeTag.scss|--radius-md": {
+          "count": 1
+        },
+        "design-system/src/components/labels/CountTag/CountTag.scss|--radius-md": {
+          "count": 1
+        },
+        "design-system/src/components/labels/DateTag/DateTag.scss|--radius-md": {
+          "count": 1
+        },
+        "design-system/src/components/labels/StatusTag/StatusTag.scss|--radius-md": {
+          "count": 1
+        },
+        "design-system/src/components/ai/Suggestion/Suggestion.scss|--radius-md": {
+          "count": 1
+        },
+        "design-system/src/components/labels/Tag/Tag.scss|--radius-md": {
+          "count": 1
+        },
+        "design-system/src/components/labels/Tag/Tag.scss|--radius-sm": {
+          "count": 3
+        },
+        "design-system/src/components/layout-and-structure/ScrollBar/ScrollBar.scss|--radius-md": {
+          "count": 1
+        },
+        "design-system/src/components/loading/Skeleton/Skeleton.scss|--radius-md": {
+          "count": 5
+        },
+        "design-system/src/components/messaging/Flag/Flag.scss|--radius-md": {
+          "count": 1
+        },
+        "design-system/src/components/messaging/Spotlight/Spotlight.scss|--radius-lg": {
+          "count": 1
+        },
+        "design-system/src/components/navigation/Link/Link.scss|--radius-md": {
+          "count": 1
+        },
+        "design-system/src/components/navigation/Sidebar/Sidebar.scss|--radius-sm": {
+          "count": 2
+        },
+        "design-system/src/components/text-and-data-display/Code/Code.scss|--radius-md": {
+          "count": 1
+        },
+        "design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.scss|--radius-md": {
+          "count": 1
+        },
+        "design-system/src/components/text-and-data-display/Table/Table.scss|--radius-md": {
+          "count": 1
+        }
+      }
+    }
+  }
+}

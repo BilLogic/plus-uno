@@ -8,7 +8,8 @@
  *  - the ADR-035 color plan: each `--ds-*` semantic, shadow and opacity
  *    token's `use` from the semantic layer, which starts from the vendored
  *    reference descriptions. Those name another company's products, so
- *    `toPlusTerms` rewrites them into PLUS components before they ship.
+ *    `toPlusTerms` rewrites them into PLUS components before they ship, from the
+ *    phrases the retirement list holds.
  *
  * A token outside both plans (the legacy color, type and spacing groups) has
  * no source, so it has no intent: the views leave the field out, and the
@@ -18,36 +19,21 @@
 import { buildPlan } from './color/build.mjs';
 import { dsName } from './color/emit.mjs';
 import { ACTIVE_PLAN } from './color/plans.mjs';
+import { rowsOfRule } from './retirement.mjs';
 import { MOTION_SEMANTICS, TOKEN_LADDER } from './tokens/plan.mjs';
 
-/** Reference wording -> PLUS wording, applied in order (the more specific phrase first). */
-const PLUS_TERMS = [
-  [/\(e\.g\. semantic badges, status pills, callout chips\)/g, '(e.g. a StatusTag or CountTag)'],
-  [/\(e\.g\. status pills, callout chips\)/g, '(e.g. a StatusTag)'],
-  [/lozenges and badges/g, 'status tags and count tags'],
-  [/lozenges/g, 'status tags'],
-  [/such as Jira cards in columns/g, 'such as cards in board columns'],
-  [/such as Jira cards on a Kanban board/g, 'such as cards on a board'],
-  [/selected Editor blocks/g, 'selected blocks in a RichTextEditor'],
-  [/deletion of Editor block elements/g, 'deleting a block in a RichTextEditor'],
-  [/close buttons on toasts, chips on bold fills/g, 'close buttons on flags, tags on bold fills'],
-  [/Subject tag and chip fill/g, 'Subject tag fill'],
-  [/subject chip/g, 'subject tag'],
-  [/a filled badge/g, 'a filled tag'],
-  [/modals, dialogs, dropdown menus/g, 'modals, menus'],
-  [/the opened state of a dropdown trigger/g, 'the opened state of a Select trigger'],
-  [/side panel dividers/g, 'Panel dividers'],
-  [/modal dialogs/g, 'a Modal'],
-  [/menus, popovers, tooltips/g, 'menus, popups, tooltips'],
-  [/The Surface pattern's 1px edge/g, "A container's 1px edge"],
-  [/visualisation/g, 'visualization'],
-  [/'to-do' statues/g, "'to-do' statuses"],
-  [/sit on top of they UI/g, 'sit on top of the UI'],
-  [/used in error handing/g, 'used in error handling'],
-  [/success section messaged/g, 'success section messages'],
-  [/such in error/g, 'such as in error'],
-  [/^For backgrounds/, 'Backgrounds'],
-  [/^Vibrant for backgrounds/, 'Vibrant backgrounds'],
+/**
+ * Reference wording -> PLUS wording: the retirement list's `phrase:token-intent`
+ * spelling rows, applied in order (the more specific phrase first).
+ */
+const phrases = () =>
+  rowsOfRule('phrase:token-intent').map((row) => {
+    if (row.use.length !== 1) throw new Error(`phrase row "${row.not}" names ${row.use.length} replacements; a phrase has one`);
+    return [new RegExp(row.pattern, 'g'), row.use[0]];
+  });
+
+/** What the rewrite does to a description whatever its words: a sentence starts capitalized, a dotted name becomes its CSS name. */
+const SHAPE_TERMS = [
   [/^Use to (\w)/, (_, c) => c.toUpperCase()],
   // A dotted reference token name, written as the CSS name an agent types.
   [/\b(?:color|elevation)\.[a-z]+(?:\.[a-z0-9]+)*/g, (name) => dsName(name)],
@@ -55,7 +41,8 @@ const PLUS_TERMS = [
 
 /** Rewrite one reference description into PLUS words. */
 export function toPlusTerms(text) {
-  return PLUS_TERMS.reduce((out, [from, to]) => out.replace(from, to), text);
+  const reworded = phrases().reduce((out, [from, to]) => out.replace(from, () => to), text);
+  return SHAPE_TERMS.reduce((out, [from, to]) => out.replace(from, to), reworded);
 }
 
 /** `--ds-*` name -> intent, for the active color plan's semantic, shadow and opacity tokens. */

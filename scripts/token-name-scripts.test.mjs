@@ -7,7 +7,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { OLD_VOCABULARY } from './check-docs-token-literals.mjs';
+import { oldTokenReads } from './check-docs-token-literals.mjs';
 import { isLiteral } from './check-font-size-literals.mjs';
 import { resolveCssExpression } from './export-kit-art.mjs';
 import { contextOf } from './check-ds-usage.mjs';
@@ -19,7 +19,7 @@ const names = (re, text) => [...text.matchAll(new RegExp(re.source, re.flags))].
 
 test('the retired-vocabulary reader finds the old names through var() and no others', () => {
   const css = 'a { color: var(--color-text); gap: var( --size-100 ); font: var(--font-size-body1) var(--font-family-code); b: var(--ds-text) c: var(--font-size-custom); d: var(--layout-page-pad-x) }';
-  assert.deepEqual(names(OLD_VOCABULARY, css), ['--color-text', '--size-100', '--font-size-body1', '--font-family-code', '--layout-page-pad-x']);
+  assert.deepEqual(names(oldTokenReads(), css), ['--color-text', '--size-100', '--font-size-body1', '--font-family-code', '--layout-page-pad-x']);
 });
 
 test('a font-size value made only of tokens is not a literal, and a literal beside one is', () => {
