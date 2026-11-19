@@ -70,7 +70,6 @@ export default {
         header: { table: { disable: true } },
         side: { table: { disable: true } },
         footer: { table: { disable: true } },
-        onAddView: { table: { disable: true } },
         level: { control: false, table: { category: 'Design' } },
         title: { control: 'text', table: { category: 'Slots' } },
         description: { control: 'text', table: { category: 'Slots' } },
@@ -315,7 +314,7 @@ const SearchableStudents = () => {
     );
 };
 
-export const ToolbarSearch = {
+export const SearchInHeader = {
     name: 'Search',
     render: () => <SearchableStudents />,
     play: async ({ canvasElement, step }) => {
@@ -385,7 +384,7 @@ export const LoadingDefault = {
     ),
 };
 
-export const LoadingToolbar = {
+export const LoadingSearchAndFilters = {
     name: 'Loading, search and filters',
     render: () => (
         <Section
@@ -400,7 +399,7 @@ export const LoadingToolbar = {
     ),
 };
 
-export const LoadingTabsOnly = {
+export const LoadingViews = {
     name: 'Loading, views',
     render: () => (
         <Section title="Students" views={<ViewPills views={['All students', 'Active', 'Paused']} />} loading>

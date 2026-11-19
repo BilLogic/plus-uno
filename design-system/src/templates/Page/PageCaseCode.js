@@ -1,5 +1,16 @@
 /** The source shown behind Show code for each live example in PageCases.jsx. */
 
+/** The title block `PageHeader` takes today for a description line: the real `PageHeader`, with its own title styles off. */
+const titleWithDescription = (title, description) => `<PageHeader
+        disableTitleStyles
+        title={(
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
+                <Heading size="lg">${title}</Heading>
+                <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>${description}</p>
+            </div>
+        )}
+    />`;
+
 const SECTION = `<Section title="Students" views={<StudentViews />}>
     <SessionsTable />
 </Section>`;
@@ -34,14 +45,14 @@ const CASES = {
 >
     ${SECTION.replace(/\n/g, '\n    ')}
 </Page>`,
-    OneLineDescription: `<Page header={<DemoPageHeader title="Students" description="Every student you tutor, with their next session." />}>
+    OneLineDescription: `<Page header={${titleWithDescription('Students', 'Every student you tutor, with their next session.')}}>
     ${SECTION.replace(/\n/g, '\n    ')}
 </Page>`,
-    ParagraphUnderTitle: `<Page header={<DemoPageHeader title="Students" description="Every student you tutor is listed here with their grade, their site and their next session. Open a row to see the full record, ..." />}>
+    ParagraphUnderTitle: `<Page header={${titleWithDescription('Students', 'Every student you tutor is listed here with their grade, their site and their next session. Open a row to see the full record, ...')}}>
     ${SECTION.replace(/\n/g, '\n    ')}
 </Page>`,
 };
 
 export const CODE = Object.fromEntries(
-    Object.entries(CASES).map(([name, code]) => [name, code.includes('<PageHeader') || code.includes('<DemoPageHeader') ? NOTE + code : code]),
+    Object.entries(CASES).map(([name, code]) => [name, code.includes('<PageHeader') ? NOTE + code : code]),
 );

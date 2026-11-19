@@ -14,7 +14,7 @@ Also asked as: page section, section header, block, region.
 
 **Source:** `design-system/src/templates/Section/Section.jsx`
 
-**Stories:** `design-system/src/templates/Section/Section.stories.jsx` — Overview, HeaderDefault, HeaderCustom, LayoutSingle, LayoutSplit, LayoutSubsections, SunkenCard, DetailIsSunkenCard, CardNesting, NoSurfaceNoPad, Footer, Anatomy, Levels, ToolbarSearch, LoadingDefault, LoadingToolbar, LoadingTabsOnly, Interactive, ColorModes, SplitLayout, Spacing, Detail, TypeList, TypeQueue, TypeCards, TypeStats, TypeDetails, TypeMainAndSide, TypeForm, TypeSubsections, Full, FiltersApplied, NoViews, ViewsOnly, ManyFilters, WrappedFilters, RowsSelected, Narrow, Subsection, SideAtEnd, FilterSideAtStart, ResponsiveWidth, EmptyInTable, AnatomyQueue
+**Stories:** `design-system/src/templates/Section/Section.stories.jsx` — Overview, HeaderDefault, HeaderCustom, LayoutSingle, LayoutSplit, LayoutSubsections, SunkenCard, DetailIsSunkenCard, CardNesting, NoSurfaceNoPad, Footer, Anatomy, Levels, SearchInHeader, LoadingDefault, LoadingSearchAndFilters, LoadingViews, Interactive, ColorModes, SplitLayout, Spacing, Detail, TypeList, TypeQueue, TypeCards, TypeStats, TypeDetails, TypeMainAndSide, TypeForm, TypeSubsections, Full, FiltersApplied, NoViews, ViewsOnly, ManyFilters, WrappedFilters, RowsSelected, Narrow, Subsection, SideAtEnd, FilterSideAtStart, ResponsiveWidth, EmptyInTable, AnatomyQueue
 
 **Storybook page:** `design-system/src/templates/Section/Section.mdx`
 
@@ -183,8 +183,6 @@ A Section with its header rows, a detail and a footer. The title, the first pill
 | `level` | `page` makes the Section the page header: an h1, and the Sections it holds are h2s. Left off, the title is one level below what holds it. |
 | `named` | Makes the Section a region named by its title, for one that stands apart as a landmark. |
 | `onClearAll` · `onMoreFilters` · `onOpenFilters` | Clear all, More filters, and the Filter button of a narrow Section. |
-| `onAddView` · `addViewLabel` | The Add view button at the end of the views, and its label. |
-| `tabs` · `toolbar` | Deprecated. Use `views` and `format` for the tab row, and `search` and `filters` for the toolbar row. |
 | `id` · `className` · `style` | Passed to the Section's root. |
 | `spacing` | `compact`, `default` or `spacious`: the space between the header, the body and the footer. |
 | `children` | The body: a Table, a card grid, a list, a form or subsections. |
@@ -234,8 +232,6 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 | `onClearAll` | func | — | Runs when "Clear all" is pressed. The button shows once a filter is applied. |
 | `onMoreFilters` | func | — | Runs when "More filters" is pressed. |
 | `onOpenFilters` | func | — | Runs when the Filter button of a narrow Section is pressed. |
-| `onAddView` | func | — | Puts "Add view" at the end of the tabs row, and runs when it is pressed |
-| `addViewLabel` | string | `'Add view'` | The "Add view" button's label |
 | `loading` | bool | `false` | Swaps the header for skeleton bars and marks the section busy |
 | `layout` | enum | `'single'` | Body layout: the content alone, content beside `side`, or stacked subsections |
 | `side` | node | — | Side column of `layout="split"` |
@@ -268,7 +264,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-sm` · `--card-stack-md` · `--control-md` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-text` · `--ds-text-subtle` · `--grid-gutter` · `--heading-lg` · `--heading-lg-tracking` · `--heading-md` · `--heading-sm` · `--heading-xs` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--section-min-width-main` · `--section-min-width-side` · `--section-stack-lg` · `--section-stack-md` · `--section-stack-sm` · `--section-toolbar-count-min-width` · `--section-toolbar-min-width` · `--stack-sm`
+`--body-default` · `--body-sm` · `--card-stack-md` · `--control-md` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-text` · `--ds-text-subtle` · `--grid-gutter` · `--heading-lg` · `--heading-lg-tracking` · `--heading-md` · `--heading-sm` · `--heading-xs` · `--inline-md` · `--section-min-width-main` · `--section-min-width-side` · `--section-stack-lg` · `--section-stack-md` · `--section-stack-sm` · `--stack-sm`
 
 From `design-system/src/templates/Section/Section.scss`. Override these through the token layer, never with a literal.
 

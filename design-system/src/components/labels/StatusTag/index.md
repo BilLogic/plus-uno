@@ -8,7 +8,7 @@ Also asked as: lozenge, pill, state label.
 
 **Import:** `import { StatusTag } from '@/components';`
 
-**Used in:** Panel (`ds guide panel`)
+**Used in:** Page (`ds guide page`); Panel (`ds guide panel`)
 
 **Governed by:** Forms (`ds guide forms`); Indicators (`ds guide indicators`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
 

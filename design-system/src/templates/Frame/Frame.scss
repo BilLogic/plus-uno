@@ -187,6 +187,10 @@
     max-width: var(--content-max-width-reading);
 }
 
+.plus-frame__content--full {
+    max-width: none;
+}
+
 /* ------------------------------------------------------------- panel */
 
 // The Panel area: the Frame's right-hand area, full height.

@@ -11,7 +11,7 @@ export default function App() {
       <i className="fa-light fa-house" />
       <span style={{ color: 'var(--palette-neutral-1000)' }} />
       <span style={{ color: 'var(--ds-txt)' }} />
-      <Section title="Queue" toolbar={<Section.Toolbar filters={<Select options={[]} />} />} />
+      <Section title="Queue" filters={[{ text: 'All', menu: () => <Select options={[]} /> }]} />
       <button type="button">Raw</button>
     </div>
   );

@@ -93,7 +93,7 @@ Start the page from a template (`Frame` with the PLUS `Sidebar`; `import { Frame
 
 ## ds/placement
 
-**fail.** A component placed inside a slot or container where a template specifies a different control. Rows derive from slot acceptance metadata (`design-system/agent-views/_slots.json`): `<Select>` or `<PopupSelect>` (without a `FilterButton` `trigger`) inside a `Section`'s `toolbar` (`Section.Toolbar` / `SectionToolbar`), where the Filtering pattern uses `FilterButton` (for 1–3 quick filters) or `FilterMenu` (for staged multi-category filters).
+**fail.** A component placed inside a slot or container where a template specifies a different control. Rows derive from slot acceptance metadata (`design-system/agent-views/_slots.json`): a row names the components a slot rejects and the ones it takes instead. No template registers such a row today, so `_slots.json` is empty and the only rows are the hand-kept ones below.
 
 Hand-kept rows with `before` (`_placements.json`) check direct JSX siblings: a `Banner` before a `PageHeader` belongs in Page's `banner` slot, below its `header` (Notifications). This row remains **warn**.
 
