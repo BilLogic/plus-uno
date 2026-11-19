@@ -10,7 +10,6 @@
  */
 export const SOUND_SILENT = [
   { row: 'Banner', why: 'Banners persist on screen; a sound would repeat what is already visible.' },
-  { row: 'Form', event: 'error', why: 'Field errors are corrections, never an alert.' },
   { row: 'Forms', event: 'error', why: 'Field errors are corrections, never an alert.' },
   { row: 'Errors', event: 'field', why: 'Field errors are corrections, never an alert.' },
   { row: 'Forms', event: 'blocked', why: 'A blocked submit shakes and stays silent.' },

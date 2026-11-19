@@ -50,7 +50,6 @@ import {
   SectionHero,
   CardHero,
   TableHero,
-  FormHero,
   ModalHero,
   PanelHero,
   PopupHero,
@@ -355,11 +354,6 @@ export const HEROES = {
     Hero: TableHero,
     description:
       'A Section as a table: header, rows, one selected.',
-  },
-  'templates-form': {
-    Hero: FormHero,
-    description:
-      'Fields in a column, the commit at the end.',
   },
   'templates-modal': {
     Hero: ModalHero,

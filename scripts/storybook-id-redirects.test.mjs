@@ -38,7 +38,7 @@ const storyRules = [
 ].map((m) => ({ from: m[1], to: m[2] }));
 
 test('the renamed and folded docs ids each redirect to a live page', () => {
-  assert.equal(rules.length, 57);
+  assert.equal(rules.length, 58);
   for (const r of rules) {
     assert.ok(!ids.has(r.from), `${r.from} is a live page and should not redirect`);
     if (r.from in FAMILIES || r.from in FLATTENED || r.from in RENAMED_COMPONENTS) continue;
@@ -159,4 +159,12 @@ test('historical Modal Backdrop bookmarks land on the Blanket section', () => {
   assert.deepEqual(rules.find((r) => r.from === 'templates-modal-backdrop'), {
     from: 'templates-modal-backdrop', to: 'templates-modal', anchor: '#blanket',
   });
+});
+
+test('the retired Form template id lands on the Forms pattern', () => {
+  assert.deepEqual(rules.find((r) => r.from === 'templates-form'), {
+    from: 'templates-form', to: 'patterns-forms', anchor: undefined,
+  });
+  assert.ok(ids.has('patterns-forms'));
+  assert.ok(!ids.has('templates-form'));
 });

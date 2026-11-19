@@ -10,9 +10,10 @@ import { FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { MultiStepTaskType, WINDOW_HEIGHT } from '@/storybook-docs/lib/multi-step-task.jsx';
 
 /**
- * The Form template's examples. There is no Form component: a form is the
- * fields, grouped in a Fieldset, inside one of four hosts, and the host sets the
- * footer. Everything here composes real PLUS components; the full-bleed footer
+ * The Forms pattern's host examples. There is no Form component: a form is the
+ * fields, grouped in a Fieldset, inside a host (a page, a Panel, a Modal or a
+ * multi-step task), and the host owns the footer. The Modal and Panel pages
+ * reuse these demos. Everything here composes real PLUS components; the full-bleed footer
  * and the in-place sending button are composed from Button, because the Modal
  * and the Panel have no footer prop for either yet.
  */
@@ -94,7 +95,7 @@ export const FormMessage = ({ children }) => (
 
 /** Left-aligned under the fields, Primary first, Cancel Subtle: a form on its own page. */
 export const PageFooter = ({ sending, onSave }) => (
-    <div data-probe="footer" style={{ display: 'flex', gap: 'var(--stack-md)', marginBlockStart: '48px' /* token gap: 48px */ }}>
+    <div data-probe="footer" style={{ display: 'flex', gap: 'var(--stack-md)', marginBlockStart: 'var(--stack-3xl)' }}>
         <Button text="Save session" appearance="primary" isLoading={sending} onClick={onSave} />
         <Button text="Cancel" appearance="subtle" onClick={() => {}} />
     </div>

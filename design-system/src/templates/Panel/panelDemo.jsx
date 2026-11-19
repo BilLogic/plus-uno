@@ -27,7 +27,7 @@ import {
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { WINDOW_HEIGHT } from '@/storybook-docs/lib/multi-step-task.jsx';
-import { FullBleedFooter } from '../Form/formDemo.jsx';
+import { FullBleedFooter } from '@/storybook-docs/patterns/Forms/formHosts.jsx';
 
 /**
  * The Panel template's examples: the real Frame with its Panel area, filled the
