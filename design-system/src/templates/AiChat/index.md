@@ -21,7 +21,7 @@ Use AI chat to ask about the current page. Choose a mode for the task.
 | Mode | When to use |
 | --- | --- |
 | Popup | The default. A quick ask that keeps the page in view. |
-| Panel | Ongoing work beside the page. The Frame docks it, or opens it over the Page on a Blanket when there is no room. |
+| Panel | Ongoing work beside the page. The Frame docks it, or floats it over the Page when there is no room. |
 | Full screen | Long answers that need room. It covers the window. |
 
 Follow the six AI interaction guidelines for identity, answer marking, fallibility, sources, confirmation and feedback.
@@ -79,7 +79,7 @@ Don't: An answer from records with nothing to check it against.
 ## Related
 
 - Frame places the Panel the chat docks in.
-- Blanket sits under the Panel when it opens over the Page.
+- A Panel never draws a Blanket: it docks beside the Page or floats over it, and the Page stays in view.
 - For one reply on its own, use `AiMessage`.
 - For the field alone, use `PromptInput`; for suggested prompts, `PromptStarters`.
 
@@ -102,7 +102,7 @@ The same surface fills every mode; the mode only changes which header controls s
 | --- | --- |
 | Closed | Only the button shows. |
 | Popup | The popup opens anchored to the button, over the Page. The button stays. |
-| Panel | Chat docks in the Frame's Panel, or opens over the Page on a Blanket. The button hides. |
+| Panel | Chat docks in the Frame's Panel, or floats over the Page. The button hides. |
 | Full screen | Chat covers the window, in a column capped at the reading width. The button hides. |
 | Replying | A typing indicator stands in for the reply, and the prompt input's send button becomes Stop. |
 

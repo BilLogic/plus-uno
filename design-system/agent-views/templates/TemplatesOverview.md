@@ -58,7 +58,7 @@ A suggested starting point for each scenario, with the patterns to consult and t
 | Working through a queue | Panel · Details, docked beside the list | Navigation · Common actions | `Table`, `Panel`, `Button` |
 | A quick look at one row | Panel · Details | Navigation | `Panel`, `Button` |
 | A short decision before going on | Modal · Active, confirm width | Common actions · Errors | `Dialog`, `Button` |
-| A long task with steps | Frame multi-step task, with a Form in steps | Forms · Navigation | `ProgressTracker`, `Fieldset`, `Button` |
+| A long task with steps | Frame multi-step task, with a Form in steps | Forms · Navigation | `Sidebar` (inner mode), `Fieldset`, `FooterActions`, `Button` |
 | Settings saved as a group | Form in a page, on the Page under its page-level header; subsections for several groups | Forms · Read-only · Disabled | `Fieldset`, `TextField`, `PopupSelect`, `Toggle`, `Button` |
 | Narrowing a long catalog | Section with a filter side | Filtering | `Checkbox`, `PopupSelect`, `Button` |
 | Signing in | Frame · bare | Forms · Errors | `Logo`, `TextField`, `Button` |

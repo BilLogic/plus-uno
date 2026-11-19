@@ -72,7 +72,7 @@ const Block = ({ title, children }) => (
 
 const bodyStack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' };
 
-/** Details: the title names the record, its status sits under it, then Up, Down, More and Close. */
+/** Details: the title names the record, its status sits under it, then Edit and the fixed actions Up, Down, More and Close. */
 export const DetailsPanel = ({ editing = false, onEdit, onClose = () => {}, onSave, onCancel, picked = 'Ben Okafor' }) => (
     <PanelContainer>
         <div data-probe="head" style={{ flex: 'none' }}>
@@ -80,6 +80,7 @@ export const DetailsPanel = ({ editing = false, onEdit, onClose = () => {}, onSa
             title={`${picked} · Thu 5:00 PM`}
             actions={(
                 <>
+                    {!editing && onEdit ? <Button text="Edit" spacing="compact" onClick={onEdit} /> : null}
                     <PanelUpAction />
                     <PanelDownAction />
                     <PanelMoreAction />
@@ -103,7 +104,6 @@ export const DetailsPanel = ({ editing = false, onEdit, onClose = () => {}, onSa
                     </Block>
                     <Block title="Tutor">
                         {text('Not assigned yet. Three tutors are free at this time.')}
-                        {!editing && onEdit ? <div><Button text="Edit" onClick={onEdit} /></div> : null}
                     </Block>
                 </div>
             )}

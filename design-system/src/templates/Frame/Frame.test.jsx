@@ -6,6 +6,8 @@ import { ComponentExample, exampleSlug } from '@/storybook-docs/ds-docs-layout.j
 import { TypeCard } from '@/storybook-docs/lib/template-page.jsx';
 import { AiPanelDocked, AiPanelFloating, BarInOrder, BarScrambled, BareColumn, BareWithSidebar, MultiStepInnerSidebar, MultiStepStepsInPage } from './FrameCases.jsx';
 import { CODE } from './FrameCaseCode.js';
+import { FRAME_LAYOUT } from './frameLayout.js';
+import { readFileSync as readSource } from 'node:fs';
 
 vi.mock('@storybook/addon-docs/blocks', async () => {
     const React = await import('react');
@@ -22,6 +24,38 @@ vi.mock('@storybook/addon-docs/blocks', async () => {
 });
 
 const frameMdx = readFileSync(join(__dirname, 'Frame.mdx'), 'utf8');
+
+/** Each `<Button text=... appearance=...>` of a Show code string, in source order. */
+const snippetButtons = (code) => [...code.matchAll(/<Button text="([^"]+)"(?: appearance="([^"]+)")?/g)]
+    .map(([, text, appearance]) => `${text}:${appearance ?? 'default'}`);
+
+/** The buttons a live case renders, in DOM order, as the same `text:appearance` strings. */
+const renderedButtons = (container) => [...container.querySelectorAll('.plus-btn')].map((button) => {
+    const appearance = ['primary', 'subtle', 'default'].find((a) => button.classList.contains(`plus-btn--${a}`));
+    return `${button.textContent.trim()}:${appearance}`;
+});
+
+describe('Frame Show code', () => {
+    it.each([['BarInOrder', BarInOrder], ['BarScrambled', BarScrambled]])('%s prints the buttons the live bar renders', (key, Example) => {
+        const { container } = render(<Example />);
+        expect(snippetButtons(CODE[key])).toEqual(renderedButtons(container));
+    });
+
+    it('states the dock breakpoints the layout constants give', () => {
+        const panelAlone = 2 * FRAME_LAYOUT.pagePad + FRAME_LAYOUT.contentFloor + FRAME_LAYOUT.panelDefault;
+        const both = panelAlone + FRAME_LAYOUT.sidebarWidth;
+        expect([panelAlone, both, FRAME_LAYOUT.dockMin]).toEqual([1168, 1408, 1024]);
+        const here = (file) => readSource(join(__dirname, file), 'utf8');
+        for (const file of ['Frame.mdx', 'FrameCaseCode.js', 'FrameCases.jsx']) {
+            expect(here(file), `${file} names the old 1200 dock`).not.toMatch(/(under|or more|from|at) 1200\b(?! with)/);
+        }
+        expect(CODE.AiPanelDocked).toContain(String(panelAlone));
+        expect(CODE.AiPanelFloating).toContain(String(panelAlone));
+        expect(frameMdx).toContain(String(both));
+        expect(frameMdx).toContain(String(panelAlone));
+        expect(frameMdx).not.toMatch(/docked wherever it shows/);
+    });
+});
 
 describe('Frame live cases', () => {
     it('BarInOrder renders Save and exit, Back and Next in FooterActions without Cancel', () => {
