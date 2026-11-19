@@ -83,7 +83,8 @@ export function DocsAllProps({ of: ofStory }) {
 export function DocsSource({ of: ofStory, code, language = 'jsx' }) {
     return (
         <div className="sb-ds-docs-source not-prose">
-            <Source of={ofStory} code={code} language={language} dark={false} />
+            {/* Source throws when `of` is present but undefined, so pass only the one given. */}
+            <Source {...(ofStory === undefined ? {} : { of: ofStory })} {...(code === undefined ? {} : { code })} language={language} dark={false} />
         </div>
     );
 }
