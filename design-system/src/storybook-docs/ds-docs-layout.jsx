@@ -6,19 +6,6 @@ import { ArgTypes, Canvas, Controls, Source, Stories, useOf } from '@storybook/a
  * Use with Component.mdx + `.sb-ds-component-docs` / `.sb-ds-doc-section` wrappers.
  */
 
-/** Overview / hero canvases: inline story + source panel visible. */
-export function DsCanvasHero({ of: ofStory, layout, ...rest }) {
-    return (
-        <Canvas
-            of={ofStory}
-            story={{ inline: true }}
-            layout={layout}
-            sourceState="hidden"
-            {...rest}
-        />
-    );
-}
-
 /** Secondary sections: preview only (no source). */
 export function DsCanvasQuiet({ of: ofStory, layout, ...rest }) {
     return (

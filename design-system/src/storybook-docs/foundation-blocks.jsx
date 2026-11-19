@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, StatusTag, Icon } from '@/components';
+import { Button, Icon } from '@/components';
 import { DocsTable, DoDontCard } from '@/storybook-docs/ds-docs-layout.jsx';
 import { usePageContrast } from '@/storybook-docs/lib/use-page-contrast.js';
 
@@ -114,16 +114,6 @@ export const RefTable = ({ head, rows }) => (
         </tbody>
     </DocsTable>
 );
-
-/** The Do or Don’t tag a verdict carries; kept for callers that render the countTag inline. */
-export const VerdictTag = ({ tone }) => {
-    const isDo = tone === 'do';
-    return (
-        <StatusTag type="state" appearance={isDo ? 'success' : 'danger'} iconBefore={isDo ? 'circle-check' : 'circle-xmark'}>
-            {isDo ? 'Do' : 'Don’t'}
-        </StatusTag>
-    );
-};
 
 /**
  * The Do half of a pair: a live example over its caption.

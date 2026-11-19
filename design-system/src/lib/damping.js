@@ -21,11 +21,6 @@ export function dampedStretch(position, { limit, stiffness = DAMPING_DEFAULTS.st
     return maxStretch * (1 - Math.exp((-stiffness * overshoot) / maxStretch));
 }
 
-/** The position to draw: 1:1 up to the limit, damped beyond it. */
-export function dampedPosition(position, settings) {
-    return position <= settings.limit ? position : settings.limit + dampedStretch(position, settings);
-}
-
 const DEFAULT_SETTLE_MS = 300;
 
 /** Stretch left `elapsedMs` after release: a critically damped spring, exactly 0 once settled. */
