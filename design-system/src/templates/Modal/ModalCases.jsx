@@ -3,7 +3,10 @@ import { Button, Dialog, FooterActions, ProgressTracker, TextField } from '@/com
 import { CaseBlanket } from '@/storybook-docs/lib/case-surface.jsx';
 import { stepItems } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
-import { ConfirmInside, ModalStage, SCREEN, TwoCells } from './modalDemo.jsx';
+import { SCREEN } from './modalDemo.jsx';
+import { showCode } from '@/storybook-docs/lib/show-code.js';
+import * as Example from './ModalExamples.jsx';
+import examplesSource from './ModalExamples.jsx?raw';
 
 /**
  * The live do and don't examples on the Modal template page, composed from
@@ -145,36 +148,26 @@ export const TabsForStepsModal = () => {
     );
 };
 
-const confirmBody = <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>This removes Thursday's session for Ana and her tutor.</p>;
+/** The Show code for each example, read from `ModalExamples.jsx`. */
+export const CODE = showCode(examplesSource, ['ConfirmNarrow', 'ConfirmWide', 'ConfirmsInside', 'ModalOnModal']);
 
-/** The stand-in screen, scaled to the example's card so the Modal's width step reads against it. */
-const OnScreen = ({ children }) => <FitStage width={SCREEN.width} reflow={false}>{children}</FitStage>;
-
-const ConfirmAt = ({ width }) => (
-    <OnScreen><ModalStage width={width} screenHeight={300} title="Delete session?" footer={<TwoCells secondary="Keep session" action="Delete session" appearance="danger" />}>
-        {confirmBody}
-    </ModalStage></OnScreen>
+/** The stand-in screen the Blanket is drawn on, scaled to the example's card so the Modal's width step reads against it. */
+const OnScreen = ({ children }) => (
+    <FitStage width={SCREEN.width} reflow={false}>
+        <div className="sb-ds-modal-stack" style={{ '--plus-overlay-screen': `${SCREEN.width}px`, '--plus-overlay-screen-height': '300px' }}>
+            {children}
+        </div>
+    </FitStage>
 );
 
 /** A confirm at the narrow step: the title, one line and two buttons. */
-export const ConfirmNarrow = () => <ConfirmAt width="4-col" />;
+export const ConfirmNarrow = () => <OnScreen><Example.ConfirmNarrow /></OnScreen>;
 
 /** The same confirm at a wide step: empty width around one line. */
-export const ConfirmWide = () => <ConfirmAt width="10-col" />;
+export const ConfirmWide = () => <OnScreen><Example.ConfirmWide /></OnScreen>;
 
 /** One Modal that confirms inside itself, with a message and its own buttons. */
-export const ConfirmsInside = () => <OnScreen><ConfirmInside start="confirm" /></OnScreen>;
+export const ConfirmsInside = () => <OnScreen><Example.ConfirmsInside /></OnScreen>;
 
 /** A Modal opened on another Modal, a second Blanket dimming the first. */
-export const ModalOnModal = () => (
-    <OnScreen><div style={{ position: 'relative' }}>
-        <ModalStage screenHeight={300} title="Session details" footer={<TwoCells secondary="Keep session" action="Delete session" appearance="danger" />}>
-            {confirmBody}
-        </ModalStage>
-        <div style={{ position: 'absolute', inset: 0 }}>
-            <ModalStage width="4-col" screenHeight={300} title="Delete session?" footer={<TwoCells secondary="Back" action="Delete" appearance="danger" />}>
-                {confirmBody}
-            </ModalStage>
-        </div>
-    </div></OnScreen>
-);
+export const ModalOnModal = () => <OnScreen><Example.ModalOnModal /></OnScreen>;
