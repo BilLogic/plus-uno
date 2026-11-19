@@ -7,7 +7,7 @@ const isLeadingNode = (node, totalCount) => {
     if (!React.isValidElement(node)) return false;
     const { appearance, role, href } = node.props ?? {};
     if (node.props?.['data-footer-leading']) return true;
-    if (appearance === 'subtle' || appearance === 'link') return true;
+    if (appearance === 'link') return true;
     if (role === 'link' || href != null) return true;
     if (appearance === 'danger' && totalCount >= 2) return true;
     return false;
@@ -98,7 +98,7 @@ export const FooterActions = ({
 };
 
 FooterActions.propTypes = {
-    /** Optional text or link action hugging the left content edge without taking a filled track. */
+    /** Optional `danger` or link action hugging the left content edge without taking a filled track. */
     leadingAction: PropTypes.node,
     /** Filled action buttons placed across the 4 tracks. */
     children: PropTypes.node,

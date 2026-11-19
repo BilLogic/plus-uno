@@ -34,7 +34,7 @@ describe('FooterActions non-layout behavior', () => {
         expect(onSave).toHaveBeenCalledTimes(1);
     });
 
-    it('detects leading actions by role (subtle, link, danger leading, or leadingAction slot) and keeps them hugging content', () => {
+    it('detects leading actions by role (link, danger first of two or more, or leadingAction slot) and keeps them hugging content', () => {
         const { rerender } = render(
             <FooterActions leadingAction={<Button text="Delete session" appearance="danger" />}>
                 <Button text="Discard" />
@@ -47,7 +47,7 @@ describe('FooterActions non-layout behavior', () => {
 
         rerender(
             <FooterActions>
-                <LinkButton text="Learn more" href="https://plus.org" appearance="subtle" />
+                <LinkButton text="Learn more" href="https://plus.org" />
                 <Button text="Got it" appearance="primary" />
             </FooterActions>
         );
@@ -64,6 +64,17 @@ describe('FooterActions non-layout behavior', () => {
         expect(screen.getByRole('button', { name: 'Delete session' })).not.toHaveClass('plus-btn--fit-container');
         expect(screen.getByRole('button', { name: 'Discard' })).toHaveClass('plus-btn--fit-container');
         expect(screen.getByRole('button', { name: 'Save' })).toHaveClass('plus-btn--fit-container');
+    });
+
+    it('lays a subtle first child out as an ordinary filled track', () => {
+        render(
+            <FooterActions>
+                <Button text="Not now" appearance="subtle" />
+                <Button text="Save" appearance="primary" />
+            </FooterActions>
+        );
+        expect(screen.getByRole('button', { name: 'Not now' })).toHaveClass('plus-btn--fit-container');
+        expect(screen.getByRole('button', { name: 'Not now' })).not.toHaveClass('plus-footer-actions__leading');
     });
 
     it('renders all 4 buttons when a leading action pairs with 3 filled buttons', () => {

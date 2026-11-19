@@ -132,6 +132,26 @@ export const DeclineInLeftHalf = {
     },
 };
 
+/** A subtle first child is not leading: it fills a track like any other action. */
+export const SubtleFillsTrack = {
+    render: () => (
+        <div style={stageStyle}>
+            <FooterActions>
+                <Button text="Not now" appearance="subtle" />
+                <Button text="Save" appearance="primary" />
+            </FooterActions>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const tracks = footerTracks(footer);
+        const notNow = within(footer).getByRole('button', { name: 'Not now' });
+        await expect(notNow, 'subtle fills its track').toHaveClass('plus-btn--fit-container');
+        await expect(rect(notNow).left, 'starts at track 1').toBeCloseTo(tracks.track(1).left, 0);
+        await expect(rect(notNow).right, 'ends at track 2').toBeCloseTo(tracks.track(2).right, 0);
+    },
+};
+
 /** A link that leaves the task hugs the left content edge while filled actions take tracks 3 and 4. */
 export const LinkLeft = {
     render: () => (

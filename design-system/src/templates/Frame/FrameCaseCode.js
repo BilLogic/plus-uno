@@ -34,7 +34,8 @@ export const CODE = {
     >
         <h1>Plan a tutoring term</h1>
         {stepBody}
-        <FooterActions leadingAction={<Button text="Save and exit" appearance="subtle" />}>
+        <FooterActions>
+            <Button text="Save and exit" />
             <Button text="Back" />
             <Button text="Next" appearance="primary" />
         </FooterActions>

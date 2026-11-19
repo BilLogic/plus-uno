@@ -129,7 +129,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `leadingAction` | node | — | Optional text or link action hugging the left content edge without taking a filled track. |
+| `leadingAction` | node | — | Optional `danger` or link action hugging the left content edge without taking a filled track. |
 | `children` | node | — | Filled action buttons placed across the 4 tracks. |
 | `className` | string | — | Extra class names added to the footer grid container. |
 | `style` | object | — | Inline style overrides on the footer grid container. |

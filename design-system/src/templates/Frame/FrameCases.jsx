@@ -12,10 +12,11 @@ import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
  * `FooterActions` and `Button`.
  */
 
-/** Save and exit at the start; Back and the primary Next at the end, on one 32 line. */
+/** Save and exit, Back and the primary Next in tracks 2, 3 and 4, on one 32 line. */
 export const BarInOrder = () => (
     <CaseSurface border="top" padding="sm">
-        <FooterActions leadingAction={<Button text="Save and exit" appearance="subtle" spacing="default" onClick={() => {}} />}>
+        <FooterActions>
+            <Button text="Save and exit" spacing="default" onClick={() => {}} />
             <Button text="Back" spacing="default" onClick={() => {}} />
             <Button text="Next" appearance="primary" spacing="default" onClick={() => {}} />
         </FooterActions>
@@ -25,7 +26,8 @@ export const BarInOrder = () => (
 /** Cancel repeated in the footer beside Save and exit: two ways out of one task. */
 export const BarScrambled = () => (
     <CaseSurface border="top" padding="sm">
-        <FooterActions leadingAction={<Button text="Save and exit" appearance="subtle" spacing="default" onClick={() => {}} />}>
+        <FooterActions>
+            <Button text="Save and exit" spacing="default" onClick={() => {}} />
             <Button text="Cancel" spacing="default" onClick={() => {}} />
             <Button text="Next" appearance="primary" spacing="default" onClick={() => {}} />
         </FooterActions>

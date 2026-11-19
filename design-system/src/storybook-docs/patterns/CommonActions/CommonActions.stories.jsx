@@ -122,7 +122,7 @@ export const PlacementModal = {
     },
 };
 
-/** A multi-step task: Save and exit at the start, Back and Next at the end, on one 32 line in a 48 footer. */
+/** A multi-step task: Save and exit, Back and Next in tracks 2, 3 and 4, on one 32 line in a 48 footer. */
 export const PlacementMultiStep = {
     name: 'Placement: In a multi-step task',
     render: () => staged(<MultiStepBar />, TASK_STAGE),
@@ -137,7 +137,7 @@ export const PlacementMultiStep = {
         const next = canvas.getByRole('button', { name: 'Next' });
         await expect(within(bar).queryByRole('button', { name: 'Cancel' }), 'no Cancel in footers').toBeNull();
         const save = canvas.getByRole('button', { name: 'Save and exit' });
-        await expect(rect(save).left, 'Save and exit starts the line').toBeLessThan(rect(back).left);
+        await expect(rect(save).left, 'Save and exit starts on track 2').toBeCloseTo(tracks.track(2).left, 0);
         await expect(rect(back).left, 'Back starts on track 3').toBeCloseTo(tracks.track(3).left, 0);
         await expect(rect(next).right, 'Next ends on track 4').toBeCloseTo(tracks.track(4).right, 0);
         await expect(rect(back).height, 'Back is 32 high').toBeCloseTo(tokenLength(canvasElement, '--control-md'), 0);

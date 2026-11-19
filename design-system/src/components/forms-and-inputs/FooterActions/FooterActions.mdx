@@ -60,6 +60,12 @@ single action spans the full width.
 />
 
 <ComponentExample
+    of={FooterActionsStories.SubtleFillsTrack}
+    title="Subtle is an ordinary action"
+    description="A subtle first child is not a leading action. It fills a track like any other action."
+/>
+
+<ComponentExample
     of={FooterActionsStories.LinkLeft}
     title="Link in the leading slot"
     description="A link that leaves the task hugs the left content edge without taking a filled track, while filled actions sit in tracks 3 and 4."
@@ -245,8 +251,7 @@ The leading slot holds a `danger` destructive action or a `link` that leaves the
     doCaption="A destructive side action hugs the left edge while the two outcomes sit in the rightmost tracks."
     dontExample={
         <div>
-            <FooterActions>
-                <Button appearance="subtle" text="Not now" />
+            <FooterActions leadingAction={<Button text="Not now" />}>
                 <Button text="Save draft" />
                 <Button appearance="primary" text="Publish" />
             </FooterActions>
@@ -319,13 +324,12 @@ Keep `Back` in the `default` appearance so the step pair splits `50/50` across b
     doCaption="Back in the left half and Next in the right half, splitting the footer equally."
     dontExample={
         <div>
-            <FooterActions>
-                <Button appearance="subtle" text="Back" />
+            <FooterActions leadingAction={<Button text="Back" />}>
                 <Button text="Next" appearance="primary" />
             </FooterActions>
         </div>
     }
-    dontCaption="Making Back subtle moves it to the leading slot instead of an equal step pair."
+    dontCaption="Back in the leading slot, so Next stands alone instead of an equal step pair."
 />
 
 </div>
