@@ -4,7 +4,8 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as NotificationsStories from './Notifications.stories.jsx';
-import { INBOX_STAGE, PLACE_STAGE, STAGE, BannerDo, BannerDont, FlagDo, FlagDont } from './notificationsDemo.jsx';
+import { INBOX_STAGE, PLACE_STAGE, STAGE } from './notificationsDemo.jsx';
+import { BannerDo, BannerDont, CODE, FlagDo, FlagDont } from './NotificationsCases.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
@@ -176,8 +177,10 @@ A Flag can be dismissed before it is read. A failure that needs a decision stays
 
 <DoDontPair
     doExample={<FlagDo />}
+    doCode={CODE.FlagDo}
     doCaption="A finished action on the default Flag: the event in the title, the next step below."
     dontExample={<FlagDont />}
+    dontCode={CODE.FlagDont}
     dontCaption="A decision in a Flag, which is gone before it is answered."
 />
 
@@ -195,8 +198,10 @@ Frame for system news, pinned only during an active outage <PlannedTag />; Page 
 
 <DoDontPair
     doExample={<BannerDo />}
+    doCode={CODE.BannerDo}
     doCaption="One Banner, one line, at the tier it concerns."
     dontExample={<BannerDont />}
+    dontCode={CODE.BannerDont}
     dontCaption="Two Banners stacked, pushing the page down."
 />
 

@@ -5,14 +5,7 @@ import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as OverflowStories from './Overflow.stories.jsx';
 import { FOLD_STAGE, NARROW, TABLE_STAGE } from './overflowDemo.jsx';
-import {
-    ClippedCellNoTextCase,
-    ClippedCellOpensTextCase,
-    ClippedSectionTitleCase,
-    FadedListCase,
-    ShowMoreWithCountCase,
-    WrappedSectionTitleCase,
-} from './OverflowCases.jsx';
+import { CODE, ClippedCellNoTextCase, ClippedCellOpensTextCase, ClippedSectionTitleCase, FadedListCase, ShowMoreWithCountCase, WrappedSectionTitleCase } from './OverflowCases.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
@@ -149,8 +142,10 @@ They must be read whole, so they take more lines. Nothing that tells a person wh
 
 <DoDontPair
     doExample={<WrappedSectionTitleCase />}
+    doCode={CODE.WrappedSectionTitle}
     doCaption="A long Section title takes a second line."
     dontExample={<ClippedSectionTitleCase />}
+    dontCode={CODE.ClippedSectionTitle}
     dontCaption="A clipped Section title: the one thing that names the content is the one thing cut."
 />
 
@@ -168,8 +163,10 @@ The Tooltip opens on hover and on focus, and the clipped element becomes a tab s
 
 <DoDontPair
     doExample={<ClippedCellOpensTextCase />}
+    doCode={CODE.ClippedCellOpensText}
     doCaption="A clipped cell opens its full text in a Tooltip."
     dontExample={<ClippedCellNoTextCase />}
+    dontCode={CODE.ClippedCellNoText}
     dontCaption="A clipped cell with nothing to open: the rest of the text cannot be read."
 />
 
@@ -187,8 +184,10 @@ A "…" that stands for hidden items, such as the breadcrumb middle, is a button
 
 <DoDontPair
     doExample={<ShowMoreWithCountCase />}
+    doCode={CODE.ShowMoreWithCount}
     doCaption="A button under the list that names how many more it holds, and the list grows in place."
     dontExample={<FadedListCase />}
+    dontCode={CODE.FadedList}
     dontCaption="A fade over the list, hiding how much is there."
 />
 

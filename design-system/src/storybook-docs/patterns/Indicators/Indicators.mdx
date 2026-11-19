@@ -5,7 +5,8 @@ import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as IndicatorsStories from './Indicators.stories.jsx';
 import { NARROW, ROLL_UP_STAGE, STAGE } from './indicatorsDemo.jsx';
-import { ChangeTag, StatusTag } from '@/components';
+import { CODE } from './IndicatorsCases.jsx';
+import { DangerOnMissed, RiseIsBad, RiseIsGood, SuccessOnMissed } from './IndicatorsExamples.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
@@ -150,9 +151,11 @@ The words say the state; the fill repeats it. A state that must be told apart at
 Neutral is not started, info is in progress, success is done, warning needs attention, danger failed or missed, discovery is new. Success never labels a problem. There is no color prop; a category with a color is a Tag.
 
 <DoDontPair
-    doExample={<StatusTag appearance="danger">Missed</StatusTag>}
+    doExample={<DangerOnMissed />}
+    doCode={CODE.DangerOnMissed}
     doCaption="Danger on a missed session: the word and the fill agree."
-    dontExample={<StatusTag appearance="success">Missed</StatusTag>}
+    dontExample={<SuccessOnMissed />}
+    dontCode={CODE.SuccessOnMissed}
     dontCaption="Success on a missed session: the fill says good about bad news."
 />
 
@@ -181,9 +184,11 @@ Subtle neutral is the default. Bold asks for action now, so at most one bold cou
 The sign gives the direction; the good direction gives the tone: up, down or none. Absences rising is danger; sessions held rising is success; a change with no judgment stays neutral. The value is always signed.
 
 <DoDontPair
-    doExample={<ChangeTag value={3} goodDirection="down" comparison="vs last week" />}
+    doExample={<RiseIsBad />}
+    doCode={CODE.RiseIsBad}
     doCaption="A rise in absences in danger: the good direction is down."
-    dontExample={<ChangeTag value={3} goodDirection="up" comparison="vs last week" />}
+    dontExample={<RiseIsGood />}
+    dontCode={CODE.RiseIsGood}
     dontCaption="A rise in absences in success: the color says good about bad news."
 />
 

@@ -44,7 +44,6 @@ import { StudentsTable, ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
  *   InboxInSidebar    the 360px (--inbox-width) Inbox Panel beside the Sidebar
  *   TierPicture       one Banner at the Frame, Page or Section tier
  *   SeverityRow       the four statuses on SectionMessage
- *   FlagDo / FlagDont, BannerDo / BannerDont  the do and don't pairs
  */
 
 /** The width a picture lays out at, in px: docs geometry. */
@@ -485,35 +484,6 @@ export const TierSection = () => (
             </Section>
         </Page>
     </BrowserWindow>
-);
-
-/** Do: a finished action on the default Flag, the event in the title and the next step below. */
-export const FlagDo = () => (
-    <TopRight>
-        <Flag icon="circle-check" title="Session logged" autohide={false} show>Maya's supervisor will see it Friday.</Flag>
-    </TopRight>
-);
-
-/** Don't: a decision in a Flag, which is gone before it is answered. */
-export const FlagDont = () => (
-    <TopRight>
-        <Flag title="Move this session to 4:30 PM?" autohide={false} show actions={[{ text: 'Move', onClick: noop }, { text: 'Keep', onClick: noop }]} />
-    </TopRight>
-);
-
-/** Do: one Banner, one line, at the tier it concerns. */
-export const BannerDo = () => (
-    <div style={pad}>
-        <Banner appearance="danger">We lost the connection. Your work is kept on this device.</Banner>
-    </div>
-);
-
-/** Don't: two Banners stacked, pushing the page down. */
-export const BannerDont = () => (
-    <div style={pad}>
-        <Banner appearance="warning">Tutoring sessions move to the new calendar on Friday.</Banner>
-        <Banner appearance="danger">We lost the connection. Your work is kept on this device.</Banner>
-    </div>
 );
 
 /** A page whose Flag has found the person at the top right: the page behind them. */

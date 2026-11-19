@@ -5,6 +5,9 @@ import { Banner, Flag, FlagGroup } from '@/components';
 import { Page, Section } from '@/templates';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { STUDENTS, StudentsTable, ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
+import { showCode } from '@/storybook-docs/lib/show-code.js';
+import * as Example from './NotificationsExamples.jsx';
+import examplesSource from './NotificationsExamples.jsx?raw';
 import { DemoPageHeader } from '../../../templates/Page/pageDemo.jsx';
 
 /**
@@ -174,3 +177,22 @@ export const TierSectionCase = () => {
         </BrowserWindow>
     );
 };
+
+/** The Show code for each do and don't example, read from `NotificationsExamples.jsx`. */
+export const CODE = showCode(examplesSource, ['FlagDo', 'FlagDont', 'BannerDo', 'BannerDont']);
+
+/** Do: a passing notice, one line of next step, held at the top right of the picture. */
+export const FlagDo = () => (
+    <div style={{ ...pad, display: 'flex', justifyContent: 'flex-end' }}><Example.FlagDo /></div>
+);
+
+/** Don't: a decision in a Flag, which is gone before it is answered. */
+export const FlagDont = () => (
+    <div style={{ ...pad, display: 'flex', justifyContent: 'flex-end' }}><Example.FlagDont /></div>
+);
+
+/** Do: one Banner, one line, at the tier it concerns. */
+export const BannerDo = () => <div style={pad}><Example.BannerDo /></div>;
+
+/** Don't: two Banners stacked, pushing the page down. */
+export const BannerDont = () => <div style={pad}><Example.BannerDont /></div>;
