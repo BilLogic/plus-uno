@@ -2,7 +2,8 @@
  * Which Foundations ▸ Tokens page each token is shown on, and in which section.
  *
  * ONE LIST, ONE MAPPING. Every docs token block reads the generated token table
- * (`agent-views/tokens.json`: name, value, tier, intent) through `tokenCollections`, which returns
+ * (`agent-views/tokens.json`: name, value, tier, intent, and the dark value
+ * where the dark mode changes it) through `tokenCollections`, which returns
  * ordered collections. A token's collection (Color, Typography, Spacing and
  * size, Elevation and layers, Motion), tier (primitive or semantic) and scope
  * (global, components or templates) are derived here from its name and its
@@ -87,10 +88,11 @@ export function placeToken(name, record = {}) {
  * no section are left out.
  *
  * A token's value is its alias followed to a literal, as the page resolves it;
- * `raw` is what the stylesheet says.
+ * `raw` is what the stylesheet says; `dark` is its dark-mode value, or null when
+ * the dark mode leaves it alone.
  *
- * @param {{name: string, value: string, tier?: string, group?: string, intent?: string}[]} records the rows of `agent-views/tokens.json`
- * @returns {{collection: string, title: string, sections: {id: string, tier: string, scope: string|null, title: string, tokens: {name: string, raw: string, value: string, intent: string}[]}[]}[]}
+ * @param {{name: string, value: string, tier?: string, group?: string, intent?: string, dark?: string}[]} records the rows of `agent-views/tokens.json`
+ * @returns {{collection: string, title: string, sections: {id: string, tier: string, scope: string|null, title: string, tokens: {name: string, raw: string, value: string, dark: string|null, intent: string}[]}[]}[]}
  */
 export function tokenCollections(records) {
   const raw = new Map(records.map((r) => [r.name, r.value]));
@@ -103,6 +105,7 @@ export function tokenCollections(records) {
       name: record.name,
       raw: record.value,
       value: resolveToken(record.name, raw) ?? record.value,
+      dark: record.dark ?? null,
       intent: record.intent ?? '',
     });
   }

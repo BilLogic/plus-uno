@@ -96,9 +96,12 @@ test('ladders render in their meaning: layers by z-index, sizes small to large, 
   before(motion, '--ds-motion-spatial-fast', '--ds-motion-spatial-default', '--ds-motion-spatial-slow');
 });
 
-test('a token carries its resolved value and its intent', () => {
+test('a token carries its resolved value, its dark value where the dark mode changes it, and its intent', () => {
   const found = new Map(allTokens(tokenCollections(records)).map((t) => [t.name, t]));
-  assert.notEqual(found.get('--ds-text').value, found.get('--ds-text').raw);
+  const text = found.get('--ds-text');
+  assert.notEqual(text.dark, null);
+  assert.notEqual(text.value, text.dark);
+  assert.equal(found.get('--space-100').dark, null);
   assert.equal(found.get('--ds-text-subtle').intent, at.get('--ds-text-subtle').intent ?? '');
 });
 
