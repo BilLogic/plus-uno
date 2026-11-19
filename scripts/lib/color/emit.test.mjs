@@ -36,7 +36,7 @@ const MODE_SELECTORS = [
     '@media (prefers-color-scheme: dark)', '[data-color-mode="auto"][data-contrast-mode="more"]',
     '@media (prefers-color-scheme: dark) and (prefers-contrast: more)', '[data-color-mode="auto"][data-contrast-mode="auto"]',
 ];
-const MATERIAL_SELECTORS = ['@media (prefers-reduced-transparency: reduce)', '[data-color-mode]', '@media (forced-colors: active)', '[data-color-mode]'];
+const MATERIAL_SELECTORS = ['@media (prefers-reduced-transparency: reduce)', '[data-color-mode][data-color-mode][data-color-mode]', '@media (forced-colors: active)', '[data-color-mode][data-color-mode][data-color-mode]'];
 
 test('_semantic.scss selector structure: light, dark, auto dark, and all 8 increased-contrast combinations', () => {
   const sem = files['_semantic.scss'];
@@ -120,4 +120,12 @@ test('the material falls back to the solid overlay under reduced transparency, a
   // Increased contrast is a plain override to the solid ground in both schemes.
   assert.match(sem, /--ds-surface-material-overlay: var\(--palette-neutral-0\);/);
   assert.match(sem, /--ds-surface-material-overlay: var\(--palette-dark-neutral-250\);/);
+});
+
+test('the material fallbacks come after every mode block and outrank the increased-contrast selectors', () => {
+  const sem = files['_semantic.scss'];
+  const lastMode = sem.lastIndexOf('data-contrast-mode="auto"]');
+  assert.ok(sem.indexOf('@media (prefers-reduced-transparency: reduce)') > lastMode);
+  assert.ok(sem.indexOf('@media (forced-colors: active)') > lastMode);
+  assert.match(sem, /@media \(forced-colors: active\) \{\n {2}:root:root:root,\n {2}\[data-color-mode\]\[data-color-mode\]\[data-color-mode\] \{/);
 });

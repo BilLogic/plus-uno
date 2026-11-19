@@ -4236,16 +4236,16 @@
 }
 
 @media (prefers-reduced-transparency: reduce) {
-  :root,
-  [data-color-mode] {
+  :root:root:root,
+  [data-color-mode][data-color-mode][data-color-mode] {
     --ds-surface-material-media: var(--ds-surface-overlay);
     --ds-surface-material-control: var(--ds-surface-overlay);
     --ds-surface-material-overlay: var(--ds-surface-overlay);
   }
 }
 @media (forced-colors: active) {
-  :root,
-  [data-color-mode] {
+  :root:root:root,
+  [data-color-mode][data-color-mode][data-color-mode] {
     --ds-surface-material-media: Canvas;
     --ds-surface-material-control: Canvas;
     --ds-surface-material-overlay: Canvas;

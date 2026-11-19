@@ -72,6 +72,10 @@ function contrastBlocks(lines, scheme) {
   );
 }
 
+// Three attribute-or-pseudo steps, so these outrank every increased-contrast block (two): a forced-colors
+// person with increased contrast on still gets the system colors.
+const RAISED = ':root:root:root,\n[data-color-mode][data-color-mode][data-color-mode]';
+
 /**
  * The floating material's solid fallbacks. Reduced transparency swaps each translucent surface
  * for the solid overlay surface; forced colors swap them for the system canvas and keep the
@@ -83,7 +87,7 @@ function materialFallbacks(rows) {
   if (!surfaces.length) return '';
   const solid = surfaces.map((n) => `${n}: var(--ds-surface-overlay);`);
   const forced = [...surfaces.map((n) => `${n}: Canvas;`), ...border.map((n) => `${n}: CanvasText;`)];
-  const inMedia = (query, lines) => `@media ${query} {\n${block(':root,\n[data-color-mode]', lines).replace(/^/gm, '  ').replace(/^ {2}$/gm, '')}}\n`;
+  const inMedia = (query, lines) => `@media ${query} {\n${block(`${RAISED}`, lines).replace(/^/gm, '  ').replace(/^ {2}$/gm, '')}}\n`;
   return `\n${inMedia('(prefers-reduced-transparency: reduce)', solid)}${inMedia('(forced-colors: active)', forced)}`;
 }
 

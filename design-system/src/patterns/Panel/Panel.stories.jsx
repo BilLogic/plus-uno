@@ -56,6 +56,7 @@ const expectFloating = async (canvasElement) => {
     const el = panel();
     await expect(getComputedStyle(el).position, 'over the page').toBe('absolute');
     await expect(getComputedStyle(el).backgroundColor, 'the overlay material').toBe(tokenColor(frame, '--ds-surface-material-overlay'));
+    await expect(getComputedStyle(el).borderInlineStartColor, 'the material edge').toBe(tokenColor(frame, '--ds-border-material'));
     await expect(getComputedStyle(el).boxShadow, 'the overlay shadow').toBe(computedShadow(frame, 'var(--ds-shadow-overlay)'));
     await expect(rect(el).top, 'full height, from the top').toBeCloseTo(rect(frame).top, 0);
     await expect(rect(el).right, 'at the right edge').toBeCloseTo(rect(frame).right, 0);
