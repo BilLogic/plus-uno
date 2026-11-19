@@ -25,7 +25,8 @@ function parse(target) {
 
 /**
  * Every target that names nothing real, as messages.
- * @param {{components: object[], props: object[], tokens: object[]}} inventions
+ * @param {{components: object[], props: object[], tokens: object[], words?: object[], spellings?: object[], outside?: object[], concepts?: string[]}} inventions
+ *   a words, spellings or outside row may also point at a named concept (`concepts`, e.g. Blanket) that is no component
  * @param {{components: {name: string, props: {name: string, values: string[]|null}[]|null}[]}} components
  * @param {{tokens: {name: string}[]}} tokens
  * @param {string[]} [templates]  template names (`_templates.json`), valid as a whole-name target
@@ -35,8 +36,11 @@ export function checkInventions(inventions, components, tokens, templates = []) 
   const templateNames = new Set(templates);
   const tokenNames = new Set(tokens.tokens.map((t) => t.name));
   const problems = [];
-  for (const row of [...inventions.components, ...inventions.props, ...inventions.tokens]) {
+  const concepts = new Set(inventions.concepts ?? []);
+  const rows = [...inventions.components, ...inventions.props, ...inventions.tokens, ...(inventions.words ?? []), ...(inventions.spellings ?? []), ...(inventions.outside ?? [])];
+  for (const row of rows) {
     for (const target of row.use) {
+      if (concepts.has(target)) continue;
       const t = parse(target);
       if (t.kind === 'token') {
         if (!tokenNames.has(t.name)) problems.push(`${row.not}: ${target} is not in tokens.json`);

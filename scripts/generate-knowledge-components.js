@@ -21,7 +21,7 @@ import { loadFacts, readBarrel } from './lib/ds-facts.mjs';
 import { isEntry } from './lib/findings.mjs';
 import { checkArtifacts, writeArtifacts } from './lib/generated-artifact.js';
 import { renderSelfCheck } from './lib/inventions.mjs';
-import { loadRetirement, notHereTable } from './lib/retirement.mjs';
+import { loadRetirement } from './lib/retirement.mjs';
 import { readTemplates, renderTemplates } from './lib/templates-index.mjs';
 
 /** Repo-relative path of a component's generated doc, or null if it has none. */
@@ -57,7 +57,7 @@ function renderComponentIndex(components, aliases) {
   doc += `Templates import from \`@/templates\` (§ Templates).\n\n`;
   doc += `This index is the existence list. Each entry links to its generated doc — `;
   doc += `props, variants, tokens touched — derived from source.\n\n`;
-  doc += notHereTable(loadRetirement(REPO_ROOT));
+  doc += loadRetirement(REPO_ROOT).notHereTable();
   const facts = loadFacts(REPO_ROOT);
   doc += renderTemplates(readTemplates(REPO_ROOT), { from: 'design-system/agent-views/components', lookup: (name) => facts.lookup(name) });
   doc += `## UI components (${components.length})\n\n`;

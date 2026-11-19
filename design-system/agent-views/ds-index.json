@@ -18139,7 +18139,7 @@
     ]
   },
   "inventions": {
-    "$about": "Hand-kept, reviewed in PRs. Names agents reach for that do not exist here, and retired names, each with what to use instead. The one retirement list (scripts/lib/retirement.mjs answers retired(name) and allowed(file) from it): components, props, tokens, words, spellings and outside names each with what to use instead, plus the shared places old names may stay. A component row marked retired is banned by npm run check:ads-language, and inProse also bans it from component doc prose (a rename with no alias), so retiring a component is one row here. Retired token names are the token plan's (scripts/lib/tokens/plan.mjs, ADR-038); the DS facts module lists them beside these rows, and a token row here that covers a retired name may offer only what the plan maps it to (scripts/lib/retired-names.test.mjs). Rendered into the header of agent-views/components/index.md by npm run generate:agent; every target must exist in components.json or tokens.json (scripts/lib/inventions.test.mjs).",
+    "$about": "Hand-kept, reviewed in PRs. Names agents reach for that do not exist here, and retired names, each with what to use instead. The one retirement list (scripts/lib/retirement.mjs answers retired(name) and allowed(file) from it): components, props, tokens, words, spellings and outside names each with what to use instead, plus the shared places old names may stay (a place may name the kinds it keeps) and the concepts a words, spellings or outside row may point at that are not components, such as Blanket. A component row marked retired is banned by npm run check:ads-language, and inProse also bans it from component doc prose (a rename with no alias), so retiring a component is one row here. Retired token names are the token plan's (scripts/lib/tokens/plan.mjs, ADR-038); the DS facts module lists them beside these rows, and a token row here that covers a retired name may offer only what the plan maps it to (scripts/lib/retired-names.test.mjs). Rendered into the header of agent-views/components/index.md by npm run generate:agent; every target must exist in components.json or tokens.json (scripts/lib/inventions.test.mjs).",
     "components": [
       {
         "not": "Alert",
@@ -18326,7 +18326,8 @@
         "use": [
           "Panel"
         ],
-        "why": "a floating Panel"
+        "why": "a floating Panel",
+        "retired": false
       },
       {
         "not": "SectionToolbar",
@@ -18538,8 +18539,8 @@
           "provider",
           "adapter"
         ],
-        "why": "lane keeps the blueprint's actor-row meaning only",
-        "pattern": "\\b(?:Gemini|Claude|Vertex-Claude|Anthropic|model|models|provider|providers|agent|agents|production|active|fallback|backup)[- ]lanes?\\b|\\b(?:both|two|either|each|per)[- ](?:provider |model |agent )?lanes?\\b"
+        "why": "the model-provider sense of lane is retired; lane keeps the blueprint's actor-row meaning, so only a provider word beside it is flagged",
+        "pattern": "\\b(?:Gemini|Claude|Vertex-Claude|Anthropic|model|models|provider|providers|fallback|backup)[- ]lanes?\\b|\\b(?:both|two|either|each|per)[- ](?:provider|model|agent) lanes?\\b"
       },
       {
         "not": "Quiet by default",
@@ -18566,19 +18567,22 @@
         "why": "another design system's word"
       },
       {
-        "not": "inline dialog",
-        "use": [
-          "Popover"
-        ],
-        "why": "another design system's word"
-      },
-      {
         "not": "side navigation",
         "use": [
           "Sidebar"
         ],
         "why": "another design system's word"
       }
+    ],
+    "concepts": [
+      "Blanket",
+      "AI",
+      "the PLUS rule",
+      "direct fix",
+      "gated change",
+      "provider",
+      "adapter",
+      "Cut the noise"
     ],
     "allowed": [
       {
@@ -18603,7 +18607,12 @@
       },
       {
         "path": "design-system/figma/",
-        "why": "Figma-side names stay until Figma is renamed"
+        "why": "Figma-side names stay until Figma is renamed",
+        "kinds": [
+          "component",
+          "prop",
+          "token"
+        ]
       }
     ]
   },
