@@ -5,6 +5,7 @@ import { CODE } from './PageCaseCode.js';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PageStories from './Page.stories.jsx';
+import * as ReferenceScreenStories from './ReferenceScreens.stories.jsx';
 import {
     AddInTitleRow,
     AddTwice,
@@ -122,6 +123,18 @@ Drag the width control. Above the content cap, content centers at the cap; below
 <ComponentExample of={PageStories.KeyBanner} title="Page banner" description="A message about this page sits under the page header and scrolls with the content. Which tier a message belongs to is the Notifications pattern, listed in the Patterns overview." />
 
 <ComponentExample of={PageStories.HeaderAndBanner} title="Header and banner slots" description="Page owns the spacing from its header to the banner and content, including when the banner is removed." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Reference screens
+
+Two whole screens built from the templates: a list that keeps search and quick filters in the Section header, and a detail page with its editing Panel docked beside it.
+
+<ComponentExample of={ReferenceScreenStories.ListWithFilters} title="List with filters" description="Search and quick filters sit in the Section header rows, and the empty result keeps them in place." />
+
+<ComponentExample of={ReferenceScreenStories.DetailWithPanel} title="Detail with panel" description="The record stays visible beside a docked Panel for editing." />
 
 </div>
 

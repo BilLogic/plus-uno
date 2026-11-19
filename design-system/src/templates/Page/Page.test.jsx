@@ -169,3 +169,18 @@ describe('Page surface', () => {
         expect(screen.getByText('Body')).toBeInTheDocument();
     });
 });
+
+describe('Page reference screens', () => {
+    const referenceSource = readFileSync(join(__dirname, 'ReferenceScreens.stories.jsx'), 'utf8');
+
+    it('keeps the reference screens out of the sidebar, so Templates/Page is one entry', () => {
+        const meta = referenceSource.slice(referenceSource.indexOf('export default'), referenceSource.indexOf('};', referenceSource.indexOf('export default')));
+        expect(meta).toContain("'!dev'");
+    });
+
+    it('shows both reference screens on the Page docs', () => {
+        expect(pageMdx).toContain("import * as ReferenceScreenStories from './ReferenceScreens.stories.jsx'");
+        expect(pageMdx).toContain('of={ReferenceScreenStories.ListWithFilters}');
+        expect(pageMdx).toContain('of={ReferenceScreenStories.DetailWithPanel}');
+    });
+});
