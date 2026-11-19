@@ -32,8 +32,8 @@ A control rounds at a quarter of its height, so the corner reads the same at eve
 
 | Control height (px) | Radius (px) | Token | Examples |
 | --- | --- | --- | --- |
-| 24 | 6 | `--radius-control-sm` | Tooltip, Sidebar row, compact tab |
-| 32 | 8 | `--radius-control-md` | Compact field, tab, option row |
+| 24 | 6 | `--radius-control-sm` | Tooltip, compact tab |
+| 32 | 8 | `--radius-control-md` | Compact field, tab, option row, Sidebar row |
 | 40 | 10 | `--radius-control-lg` | Default field |
 
 A Tile follows the same quarter: 20 rounds at 5 and 40 at 10. A square Avatar rounds at a quarter of its size, up to 16.

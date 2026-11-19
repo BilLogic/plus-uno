@@ -42,8 +42,8 @@ Start here for space, size and radius (ADR-038). A component reads its component
 --pad-y-md  /* Vertical padding inside a default control: a Button, a field, a menu item. */
 --pad-y-sm  /* Vertical padding inside a compact control, such as a compact Button or a Sidebar tab. */
 --radius-control-lg  /* Corner rounding for a control 40px high: a default field. */
---radius-control-md  /* Corner rounding for a control 32px high: a compact field, a tab, a menu row. */
---radius-control-sm  /* Corner rounding for a control 24px high: a compact field, a Tooltip, a Sidebar row. */
+--radius-control-md  /* Corner rounding for a control 32px high: a compact field, a tab, a menu row, a Sidebar row. */
+--radius-control-sm  /* Corner rounding for a control 24px high: a compact field, a Tooltip. */
 --radius-lg  /* Corner rounding for larger containers that are not a template, such as a tile or image. */
 --radius-md  /* Corner rounding for controls and small containers. */
 --radius-sm  /* Corner rounding for small marks: a checkbox, a small tag. */
