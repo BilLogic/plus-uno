@@ -142,11 +142,15 @@ $inset-24: calc((var(--control-md) - var(--icon-lg)) / 2);
     flex: 0 0 auto;
     gap: var(--frame-sidebar-group-gap);
     min-width: 0;
+    // At rest: no slide, fully shown. The swap's springs write these three.
+    --swap-dir: 0;
+    --swap-p: 1;
+    --swap-a: 1;
 }
 
 .plus-pattern-sidebar__swap[data-swapping='true'] {
-    opacity: var(--swap-a, 1);
-    transform: translateX(calc(var(--inline-lg) * var(--swap-dir, 0) * (1 - var(--swap-p, 1))));
+    opacity: var(--swap-a);
+    transform: translateX(calc(var(--inline-lg) * var(--swap-dir) * (1 - var(--swap-p))));
     will-change: transform, opacity;
 }
 

@@ -469,6 +469,7 @@ export const MOTION_REGISTRY = [
     events: {
       enter: { transition: 'Dock and undock a panel', spatial: 'spatial.default', note: 'Slides in from its edge while the Page narrows on the same clock; the Page toggle fades out.' },
       exit: { transition: 'Dock and undock a panel', spatial: 'spatial.fast', note: 'Slides out to its edge and leaves nothing behind; the Page widens and its toggle fades in.' },
+      swap: { transition: 'Swap content in place', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'The Sidebar container stays still and only its content swaps between the main and the inner sidebar. The old content leaves at once; the new enters as one block, no stagger, sliding 12 from the end going in and from the start going back, fading in, with no overshoot. The page does not animate. Reduced motion keeps only the fade.' },
     },
   },
   {

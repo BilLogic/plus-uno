@@ -178,6 +178,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | SettingRow | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | Sidebar | component | enter | Dock and undock a panel | `--ds-motion-spatial-default` |  |
 | Sidebar | component | exit | Dock and undock a panel | `--ds-motion-spatial-fast` |  |
+| Sidebar | component | swap | Swap content in place | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Skeleton | component | change | Load content | `--ds-motion-linear` |  |
 | Spinner | component | change | Load content | `--ds-motion-loop` |  |
 | SplitButton | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |

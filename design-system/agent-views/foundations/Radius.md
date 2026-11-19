@@ -98,7 +98,7 @@ The focus ring sits 2 px outside the element (`--focus-ring-width`), so its radi
 
 ## Tokens
 
-The `Radius` group names a step by size; `Radius / Control` names it by control height. `--frame-sidebar-row-radius` (6) rounds a Sidebar row. Template and component radius tokens sit in the tables above, and [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists the full ladder.
+The `Radius` group names a step by size; `Radius / Control` names it by control height. `--frame-sidebar-row-radius` (8) rounds a Sidebar row. Template and component radius tokens sit in the tables above, and [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists the full ladder.
 
 - `--radius-sm` (Radius/sm): Small details.
 - `--radius-md` (Radius/md): Tight grids and small tags.
