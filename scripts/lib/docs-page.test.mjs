@@ -417,6 +417,7 @@ test('literalValue reads literals and refuses anything computed', () => {
   assert.deepEqual(literalValue(`{ '6-col': [384, 512], b: "x", c: true }`), { '6-col': [384, 512], b: 'x', c: true });
   assert.equal(literalValue('2'), 2);
   assert.equal(literalValue('[...A, 1]'), undefined);
+  assert.equal(literalValue('{ ...printed, A: 1 }'), undefined);
   assert.equal(literalValue('makeWidths()'), undefined);
   assert.equal(literalValue('`a${b}`'), undefined);
 });
