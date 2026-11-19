@@ -50,7 +50,7 @@ export const stepItems = (labels, at, go) => labels.map((label, i) => ({
  * more go down a left side 256 wide; four or fewer run across the top. The bar
  * along the bottom is Back and Next: the × in the title row dismisses.
  */
-export const FocusedTask = ({ count = 5, start = 1, labels: given, title = 'Plan a tutoring term', children }) => {
+export const FocusedTask = ({ count = 5, start = 1, labels: given, title = 'Plan a tutoring term', sidebar, children }) => {
     const labels = given ?? TASK_STEPS.slice(0, count);
     const [at, setAt] = useState(start);
     const [placement] = useState(() => resolveStepAxis({ maxSteps: labels.length, labels }));
@@ -73,6 +73,7 @@ export const FocusedTask = ({ count = 5, start = 1, labels: given, title = 'Plan
                     </div>
                 )}
                 width="reading"
+                sidebar={sidebar}
                 style={{ flex: '1 1 auto', minBlockSize: 0 }}
             >
                 <div data-probe="steps-layout" data-steps={down ? 'down' : 'across'} style={{ display: 'flex', flexDirection: down ? 'row' : 'column', gap: 'var(--page-pad)' }}>

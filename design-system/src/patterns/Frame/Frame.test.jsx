@@ -4,7 +4,8 @@ import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ComponentExample, exampleSlug } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard } from '@/storybook-docs/lib/template-page.jsx';
-import { BarInOrder, BarScrambled } from './FrameCases.jsx';
+import { AiPanelDocked, AiPanelFloating, BarInOrder, BarScrambled, BareColumn, BareWithSidebar, FocusedNoSidebar, FocusedWithSidebar } from './FrameCases.jsx';
+import { CODE } from './FrameCaseCode.js';
 
 vi.mock('@storybook/addon-docs/blocks', async () => {
     const React = await import('react');
@@ -35,6 +36,28 @@ describe('Frame live cases', () => {
         expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Next' })).toBeInTheDocument();
+    });
+
+    it.each([
+        ['FocusedNoSidebar', FocusedNoSidebar, false],
+        ['FocusedWithSidebar', FocusedWithSidebar, true],
+        ['BareColumn', BareColumn, false],
+        ['BareWithSidebar', BareWithSidebar, true],
+    ])('%s renders a live Frame, with a Sidebar only when it is the don\'t', (_name, Example, withSidebar) => {
+        const { container } = render(<Example />);
+        expect(container.querySelector('.plus-frame')).not.toBeNull();
+        expect(Boolean(container.querySelector('.plus-frame__sidebar'))).toBe(withSidebar);
+    });
+
+    it.each([['AiPanelDocked', AiPanelDocked], ['AiPanelFloating', AiPanelFloating]])('%s renders a live Frame with the AI chat panel open', (_name, Example) => {
+        const { container } = render(<Example />);
+        expect(container.querySelector('.plus-frame')).not.toBeNull();
+        expect(screen.getAllByText('AI chat').length).toBeGreaterThan(0);
+    });
+
+    it('has Show code source for every live pair in Frame.mdx', () => {
+        ['BarInOrder', 'BarScrambled', 'FocusedNoSidebar', 'FocusedWithSidebar', 'AiPanelDocked', 'AiPanelFloating', 'BareColumn', 'BareWithSidebar']
+            .forEach((key) => expect(CODE[key].length).toBeGreaterThan(20));
     });
 
     it('links TypeCard anchors to unique ComponentExample and heading ids in Frame.mdx', () => {

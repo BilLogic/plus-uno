@@ -4,7 +4,8 @@ import { Meta } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as FrameStories from './Frame.stories.jsx';
-import { BarInOrder, BarScrambled } from './FrameCases.jsx';
+import { AiPanelDocked, AiPanelFloating, BarInOrder, BarScrambled, BareColumn, BareWithSidebar, FocusedNoSidebar, FocusedWithSidebar } from './FrameCases.jsx';
+import { CODE } from './FrameCaseCode.js';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 import {
     ComponentExample,
@@ -15,14 +16,6 @@ import {
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
-import {
-    AiPanelDocked,
-    AiPanelFloating,
-    BareColumn,
-    BareWithSidebar,
-    FocusedNoSidebar,
-    FocusedWithSidebar,
-} from '@/storybook-docs/illustrations/frame.jsx';
 
 <Meta of={FrameStories} />
 
@@ -296,8 +289,10 @@ A focused Frame has no Sidebar and no breadcrumb. Close leads the title row, so 
 
 <DoDontPair
     doExample={<FocusedNoSidebar />}
+    doCode={CODE.FocusedNoSidebar}
     doCaption="The task fills the window: no Sidebar, nothing to invite the person away."
     dontExample={<FocusedWithSidebar />}
+    dontCode={CODE.FocusedWithSidebar}
     dontCaption="The Sidebar left docked beside a focused task, one click from leaving it."
 />
 
@@ -309,8 +304,10 @@ The bottom bar is fixed along the bottom, one row high, sized by its Buttons and
 
 <DoDontPair
     doExample={<BarInOrder />}
+    doCode={CODE.BarInOrder}
     doCaption="Back and the primary Next split the bar; Close in the title row leaves the task."
     dontExample={<BarScrambled />}
+    dontCode={CODE.BarScrambled}
     dontCaption="Cancel repeated in the bar beside Back and Next: two ways out of one task."
 />
 
@@ -322,8 +319,10 @@ The AI panel is a region of the Frame, not a floating Panel, so it stays put as 
 
 <DoDontPair
     doExample={<AiPanelDocked />}
+    doCode={CODE.AiPanelDocked}
     doCaption="The panel docked at the right edge, the Page narrowing beside it."
     dontExample={<AiPanelFloating />}
+    dontCode={CODE.AiPanelFloating}
     dontCaption="The panel floating over the Page, hiding the rows beneath it."
 />
 
@@ -335,8 +334,10 @@ Sign-in, errors and welcome have one job and no account yet, so the Frame carrie
 
 <DoDontPair
     doExample={<BareColumn />}
+    doCode={CODE.BareColumn}
     doCaption="One centered column: the form and its button."
     dontExample={<BareWithSidebar />}
+    dontCode={CODE.BareWithSidebar}
     dontCaption="The Sidebar beside a sign-in: navigation for a person who has not signed in."
 />
 
