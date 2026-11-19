@@ -117,7 +117,7 @@ Overview.parameters = {
 };
 
 export const Spacing = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', maxWidth: 'var(--size-5400)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--size-5400)' }}>
         <div>
             <DemoLabel>DEFAULT (40)</DemoLabel>
             <DateTimePicker id="dt-default" label="Session start" isRequired spacing="default" showSectionLabels={false} />
@@ -130,7 +130,7 @@ export const Spacing = () => (
 );
 
 export const Validation = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', maxWidth: 'var(--size-5400)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--size-5400)' }}>
         <div>
             <DemoLabel>INVALID</DemoLabel>
             <DateTimePicker
@@ -157,7 +157,7 @@ export const Validation = () => (
 );
 
 export const InteractionStates = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', maxWidth: 'var(--size-5400)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--size-5400)' }}>
         <div>
             <DemoLabel>DEFAULT</DemoLabel>
             <DateTimePicker id="datetime-default" label="Session start" isRequired showSectionLabels={false} />
@@ -174,7 +174,7 @@ export const InteractionStates = () => (
 );
 
 export const TimeZones = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', maxWidth: 'var(--size-4000)', paddingBottom: 'var(--size-1900)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--size-4000)', paddingBottom: 'var(--size-1900)' }}>
         <DateTimePicker
             id="datetime-tz-same"
             label="Session start"
