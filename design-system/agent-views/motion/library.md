@@ -106,6 +106,8 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Calendar | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Calendar | component | change | Step to the next or previous | `--ds-motion-spatial-default` |  |
 | Carousel | component | change | Step to the next or previous | `--ds-motion-spatial-default` |  |
+| Carousel | component | enter | Update a value or state | `--ds-motion-appearance-default` |  |
+| Carousel | component | exit | Update a value or state | `--ds-motion-appearance-fast` |  |
 | Cascader | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Cascader | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Cascader | component | change | Expand and collapse | `--ds-motion-spatial-fast` |  |

@@ -176,6 +176,8 @@
 
     /* AI chat */
     --ai-chat-width: var(--width-2500);
+    --ai-chat-height: calc(var(--height-2000) * 2); /* 640px */
+    --ai-chat-fab-size: var(--height-300);
 
     /* Prompt input */
     --prompt-input-min-height: var(--height-250);

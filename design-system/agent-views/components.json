@@ -354,6 +354,8 @@
         "DocsAgentFallback"
       ],
       "tokens": [
+        "--ai-chat-fab-size",
+        "--ai-chat-height",
         "--ai-chat-width",
         "--body-default",
         "--body-sm",
@@ -364,8 +366,6 @@
         "--ds-surface-sunken",
         "--ds-text",
         "--ds-text-subtle",
-        "--height-2000",
-        "--height-300",
         "--layer-dialog",
         "--layer-navigation",
         "--pad-x-md",
@@ -1616,6 +1616,7 @@
         "Overview",
         "Static",
         "NoLoop",
+        "CaptionFadesInPlace",
         "FewSlides",
         "ReducedMotion",
         "Interactive",
@@ -1673,7 +1674,6 @@
         "--page-stack-md",
         "--section-stack-lg",
         "--section-stack-md",
-        "--stack-md",
         "--stack-sm"
       ]
     },
@@ -10312,6 +10312,7 @@
       "stories": [
         "Overview",
         "Geometry",
+        "KeyboardDisclosure",
         "Tutor",
         "PrototypeAreas",
         "OnboardingInProgress",
@@ -10372,7 +10373,6 @@
         "--pad-x-sm",
         "--pad-x-xs",
         "--radius-sm",
-        "--stack-lg",
         "--stack-md",
         "--type-weight-medium"
       ]

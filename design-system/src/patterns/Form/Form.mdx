@@ -75,7 +75,7 @@ Settings saved as a group, drawn in the Frame with the Sidebar docked. The form 
 1. **Message slot.** At the top, for a server failure.
 2. **Group.** One Fieldset per group of fields that describe one thing, with its legend.
 3. **Field.** Label, control, help text, and the error under it when there is one. Only the minority case carries "(optional)" or "(required)" in the label.
-4. **Footer.** Left-aligned, `--space-300` below the last field, Primary first. Cancel is Subtle.
+4. **Footer.** Left-aligned, 48 below the last field, Primary first. Cancel is Subtle.
 
 ### In a Panel
 
@@ -84,7 +84,7 @@ The Details Panel with the form open. The footer shows only while editing.
 <ComponentExample of={FormStories.AnatomyPanel} />
 
 1. **Header.** The record's name and its fixed actions.
-2. **Body.** The fields, with `--space-200` of pad from every edge.
+2. **Body.** The fields, with `--panel-pad` (24) from every edge.
 3. **Footer.** Discard (Default) and Save (Primary), full bleed, half each; Close in the header dismisses, so no Cancel.
 
 ### In a Modal
@@ -138,9 +138,8 @@ These examples show form states within each host. See each field's component pag
 <tr><th>Token</th><th>Value</th><th>Purpose</th></tr>
 </thead>
 <tbody>
-<tr><td><code>--space-300</code></td><td>48</td><td>The height of a full-bleed footer, and of the focused bar: the 32 button plus 16 of pad. It is also the gap from the last field to a page form's footer.</td></tr>
 <tr><td><code>--panel-width-default</code></td><td>400</td><td>The Panel a form opens in.</td></tr>
-<tr><td><code>--space-200</code></td><td>24</td><td>The Panel body's pad from every edge, and the stack between groups.</td></tr>
+<tr><td><code>--panel-pad</code></td><td>24</td><td>The Panel body's pad from every edge.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -180,7 +179,7 @@ A Form is a composition: the fields in a Fieldset, inside a Page, a Panel, a Mod
 <tr><td><code>message</code></td><td>A <code>SectionMessage</code> at the top for a server failure, scrolled into view and announced; a warning one when a disabled prerequisite blocks the main action.</td></tr>
 <tr><td><code>groups</code></td><td>One <code>Fieldset</code> per group of fields that describe one thing.</td></tr>
 <tr><td><code>footer</code></td><td>The container's: left-aligned on a page; full bleed in a Modal, a Panel or a card; Back and Next in a step flow.</td></tr>
-<tr><td>Modal and Panel <code>footer</code>, full bleed <PlannedTag /></td><td>Planned. A footer that fills its cells edge to edge at <code>--space-300</code>, with the inner corners squared. Today the page composes it from two Buttons.</td></tr>
+<tr><td>Modal and Panel <code>footer</code>, full bleed <PlannedTag /></td><td>Planned. A footer that fills its cells edge to edge 48 high, with the inner corners squared. Today the page composes it from two Buttons.</td></tr>
 <tr><td>Blocked-submit shake <PlannedTag /></td><td>Planned. The Modal's single shake when a submit is blocked. Today the Modal stays open and marks the field.</td></tr>
 </tbody>
 </DocsTable>

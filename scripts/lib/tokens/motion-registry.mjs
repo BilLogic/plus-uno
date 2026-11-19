@@ -673,6 +673,8 @@ export const MOTION_REGISTRY = [
     tier: 'component',
     events: {
       change: { transition: 'Step to the next or previous', spatial: 'spatial.default', note: 'No autoplay by default; if it plays, it has a visible pause.' },
+      enter: { transition: 'Update a value or state', appearance: 'appearance.default', note: 'The caption fades in place with no vertical travel.' },
+      exit: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'The caption fades out in place before the next words swap in.' },
     },
   },
   {

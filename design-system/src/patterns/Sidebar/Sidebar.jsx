@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { animate } from 'motion/react';
+import { Collapsible } from '@base-ui/react/collapsible';
 import { CountTag, Icon, IconButton, Logo, Tooltip } from '@/components';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { ClippedTooltip } from '@/lib/ClippedTooltip';
@@ -452,17 +453,21 @@ const PatternSidebar = ({
                     <ul id={listId} className="plus-pattern-sidebar__tabs" aria-label={`Open ${item.text}`}>
                         {shown.map((tab, index) => tabRow(item, tab, more <= 0 && index === shown.length - 1))}
                         {more > 0 ? (
-                            <li className="plus-pattern-sidebar__tab plus-pattern-sidebar__tab--last plus-pattern-sidebar__tab--more">
-                                <button
-                                    type="button"
+                            <Collapsible.Root
+                                render={<li />}
+                                className="plus-pattern-sidebar__tab plus-pattern-sidebar__tab--last plus-pattern-sidebar__tab--more"
+                                open={all}
+                                onOpenChange={() => flip(setShowingAll, item.id)}
+                            >
+                                <Collapsible.Trigger
                                     className="plus-pattern-sidebar__row"
-                                    aria-expanded={all}
-                                    onClick={() => flip(setShowingAll, item.id)}
+                                    // The extra tabs render in the sibling list, so this row owns no panel to point at.
+                                    render={({ 'aria-controls': _owned, ...props }) => <button {...props} />}
                                 >
                                     <span className="plus-pattern-sidebar__slot" aria-hidden="true" />
                                     <span className="plus-pattern-sidebar__label">{all ? 'Show less' : `Show ${more} more`}</span>
-                                </button>
-                            </li>
+                                </Collapsible.Trigger>
+                            </Collapsible.Root>
                         ) : null}
                     </ul>
                 )}
@@ -493,18 +498,34 @@ const PatternSidebar = ({
             );
         } else if (group.title) {
             title = (
-                <button
-                    type="button"
+                <Collapsible.Trigger
                     className={['plus-pattern-sidebar__title', shut && 'plus-pattern-sidebar__title--shut'].filter(Boolean).join(' ')}
-                    aria-expanded={!shut}
-                    aria-controls={shut ? undefined : listId}
-                    onClick={() => toggleGroup(group.id)}
                 >
                     <span id={titleId} className="plus-pattern-sidebar__title-text">{group.title}</span>
                     <span className="plus-pattern-sidebar__caret" aria-hidden="true">
                         <Icon name="angle-down" />
                     </span>
-                </button>
+                </Collapsible.Trigger>
+            );
+        }
+
+        const list = group.items.map((item) => renderItem(item, locked, message));
+
+        if (group.title && !locked) {
+            return (
+                <Collapsible.Root
+                    key={group.id}
+                    className="plus-pattern-sidebar__group"
+                    role="group"
+                    aria-labelledby={titleId}
+                    open={!shut}
+                    onOpenChange={() => toggleGroup(group.id)}
+                >
+                    {title}
+                    <Collapsible.Panel render={<ul />} className="plus-pattern-sidebar__list">
+                        {list}
+                    </Collapsible.Panel>
+                </Collapsible.Root>
             );
         }
 
@@ -516,11 +537,7 @@ const PatternSidebar = ({
                 aria-labelledby={group.title ? titleId : undefined}
             >
                 {title}
-                {shut ? null : (
-                    <ul id={listId} className="plus-pattern-sidebar__list">
-                        {group.items.map((item) => renderItem(item, locked, message))}
-                    </ul>
-                )}
+                <ul id={listId} className="plus-pattern-sidebar__list">{list}</ul>
             </div>
         );
     };

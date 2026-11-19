@@ -153,7 +153,7 @@ import { Button } from '@/components';
 | `body` | Text, a list, fields or a table. It scrolls past the cap. |
 | `footer` or `primaryButton` · `secondaryButton` | The footer's buttons. Leave them out for Passive. |
 | `blanket` · `keyboard` | Whether a Blanket press or Escape closes the Modal (`true` by default; `blanket="static"` keeps it open). |
-| Full-bleed footer | Planned. Cells that fill the footer edge to edge at `--space-300` with the inner corners squared. Today the page composes it from Button. |
+| Full-bleed footer | Planned. Cells that fill the footer edge to edge, 48 high (a 32 button plus 16 pad, so full bleed never changes the Modal's height), with the inner corners squared. Today the page composes it from Button. |
 | `tabs` | Two to five views of one thing under the title. |
 | `confirmView` | Planned. The swapped title, body and footer for a confirm about the Modal itself. Today the caller swaps them in place. |
 | Blocked-submit shake | Planned. The Modal's single shake when a submit is blocked. |
@@ -166,7 +166,6 @@ import { Button } from '@/components';
 | `--modal-radius` | 16 | Corner radius at every width. |
 | `--modal-stack-sm`, `-md`, `-lg` | 8, 16, 24 | Title to tabs; header, body and footer; groups of fields. |
 | `--modal-body-min-height` | 80 | The least the body draws. |
-| `--space-300` | 48 | The full-bleed footer's height: a 32 button plus 16 pad, so full bleed never changes the Modal's height. |
 | `--ds-surface-overlay`, `--ds-shadow-blocking` | pair | The Modal's fill and its elevation, the one surface that lifts above a Blanket. |
 | `--ds-blanket` | color | The Blanket's fill. |
 

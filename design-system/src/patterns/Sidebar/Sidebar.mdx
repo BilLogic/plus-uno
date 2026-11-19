@@ -261,7 +261,7 @@ Past three open tabs the rest go behind Show n more. The Sidebar does this for y
 
 - The Sidebar is a `nav` named by `label`, Main by default. A titled group is a `group` named by its title.
 - The selected row or tab carries `aria-current="page"`, so selection never rests on the fill alone.
-- A section title is a button that reports whether its rows are expanded and points at them.
+- A section title is a button that reports whether its rows are expanded and points at them. It opens and closes with Enter and Space, as does "Show n more"; both are built on Base UI Collapsible, and the account button opens its menu on Base UI Menu.
 - A locked group's lock is focusable and named "Locked. Complete your assigned training to unlock the Toolkit".
 - Delete or Backspace closes the focused tab, and focus moves to the next tab, else the one before it, else the tab's row.
 - The toggle is named "Close sidebar", announces Ctrl+[ (Cmd+[ on a Mac) and reports that the Sidebar is expanded.

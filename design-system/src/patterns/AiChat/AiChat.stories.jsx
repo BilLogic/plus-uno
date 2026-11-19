@@ -19,8 +19,8 @@ import { MotionPreferenceContext } from '@/lib/motionPreference';
  */
 
 const HEIGHT = 900;
-// Tall enough for the open popup (twice --height-2000) over the button and its pads, so it stays inside its canvas.
-const DOCS_HEIGHT = 'calc(var(--height-2000) * 2 + var(--height-300) + var(--page-pad) * 3)';
+// Tall enough for the open popup (--ai-chat-height) over the button and its pads, so it stays inside its canvas.
+const DOCS_HEIGHT = 'calc(var(--ai-chat-height) + var(--ai-chat-fab-size) + var(--page-pad) * 3)';
 
 const STARTERS = [
     { id: 'summarize', label: 'Summarize today’s sessions', text: 'Summarize my upcoming sessions at Lincoln Middle.' },
