@@ -20,11 +20,24 @@
  *      stacks on its own when narrow, so `stacked="why"` says why a figure
  *      needs the full width.
  *
+ * HELPER FIGURES. A figure that is a `<XFigure />` child (a helper component
+ * named `*Figure`, defined in the same file) is followed to its definition and
+ * scanned with the same rules, so a figure cannot hide its inline style, svg,
+ * img or hex color inside a helper. Layout helpers (`FigureRow`, `FigureStack`,
+ * ...) do not end in `Figure` and are not followed.
+ *
+ * FOUNDATIONS EXEMPTION. On a Foundations page the styling is the subject: a
+ * Dont that shows a literal radius or a gray fill has to carry that style. Files
+ * under `design-system/src/styles/` and the foundation figure helpers
+ * (`storybook-docs/elevation-*.jsx`, `storybook-docs/foundation-*.jsx`) may put
+ * an inline `style` inside a named `*Figure` helper. Only that: the Do and Don't
+ * itself still takes the helper, never a styled wrapper, and svg, img, hex and
+ * captions are checked everywhere. Pattern and component pages have no exemption.
+ *
  * WHAT IT CANNOT SEE. Whether the two halves of a pair show the same
  * component, and whether a live figure is the right one: those are a reader's
- * judgment, so they live in the docs review, not in an exit code. A figure
- * built inside a separate helper component is read where it is written, not
- * where it is used.
+ * judgment, so they live in the docs review, not in an exit code. A helper
+ * defined in another file is not followed.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -60,10 +73,70 @@ export function captionText(raw) {
 /** True when the text holds more than one sentence. */
 export const isRunOn = (text) => /[.!?][”’")]?\s+[A-Z“‘"(]/.test(text.replace(/\b(e\.g|i\.e|vs)\./g, '$1'));
 
+/** Foundations files, where a named `*Figure` helper may carry an inline style. */
+export const isFoundationFile = (file) =>
+  /^design-system\/src\/styles\//.test(file) || /^design-system\/src\/storybook-docs\/(elevation|foundation)-[^/]*\.jsx$/.test(file);
+
+const HELPER = /<([A-Z]\w*Figure)(?=[\s>/])/g;
+
+/** The source of `function Name` or `const Name =` in this file, or '' when it is not defined here. */
+export function helperBody(source, name) {
+  const m = new RegExp(`(?:function\\s+${name}\\b|(?:const|let)\\s+${name}\\s*=)`).exec(source);
+  if (!m) return '';
+  let i = m.index + m[0].length;
+  const open = { '(': ')', '{': '}', '[': ']' };
+  let depth = 0;
+  let quote = null;
+  let started = false;
+  let braces = 0;
+  for (; i < source.length; i++) {
+    const ch = source[i];
+    if (quote) {
+      if (ch === '\\') i++;
+      else if (ch === quote) quote = null;
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === '`') { quote = ch; continue; }
+    if (open[ch]) { depth++; if (ch === '{') braces++; started = true; continue; }
+    if (ch === ')' || ch === '}' || ch === ']') {
+      depth--;
+      if (depth < 0) break;
+      continue;
+    }
+    // A body ends at the `;` or blank-line break after its outermost group closes.
+    if (started && depth === 0 && (ch === ';' || (ch === '\n' && /\n\s*\n/.test(source.slice(i, i + 3)) && braces > 0))) break;
+  }
+  return source.slice(m.index, i);
+}
+
+/** The helper figures a figure uses, followed through nested helpers, as { name, body }. */
+function followHelpers(source, figure, seen = new Set()) {
+  const out = [];
+  HELPER.lastIndex = 0;
+  for (const m of figure.matchAll(HELPER)) {
+    const name = m[1];
+    if (seen.has(name)) continue;
+    seen.add(name);
+    const body = helperBody(source, name);
+    if (!body) continue;
+    out.push({ name, body });
+    out.push(...followHelpers(source, body, seen));
+  }
+  return out;
+}
+
 /** The problems with one figure's source. */
-function figureProblems(figure) {
+function figureProblems(figure, { source = '', foundation = false } = {}) {
+  const found = figureOwnProblems(figure, false);
+  for (const { name, body } of followHelpers(source, figure)) {
+    figureOwnProblems(body, foundation).forEach((p) => found.push(`helper ${name} ${p}`));
+  }
+  return found;
+}
+
+function figureOwnProblems(figure, allowStyle) {
   const found = [];
-  if (/\bstyle\s*=/.test(figure)) found.push('has an inline style; arrange parts with FigureRow or FigureStack, and let the card own the frame');
+  if (!allowStyle && /\bstyle\s*=/.test(figure)) found.push('has an inline style; arrange parts with FigureRow or FigureStack, and let the card own the frame');
   if (/<svg[\s>]/.test(figure)) found.push('draws an <svg>; use a PLUS component or an illustration-kit drawing');
   if (/<img[\s/>]/.test(figure)) found.push('uses an <img>; use a PLUS component or an illustration-kit drawing');
   if (/#[0-9a-fA-F]{3,8}\b/.test(figure.replace(/&#\d+;/g, ''))) found.push('carries a hex color; use a PLUS component, which brings its own tokens');
@@ -82,7 +155,8 @@ function captionProblems(label, raw) {
  *
  * @returns {{ line: number, message: string }[]}
  */
-export function checkSource(source) {
+export function checkSource(source, { file = '' } = {}) {
+  const foundation = isFoundationFile(file);
   const problems = [];
   BLOCKS.lastIndex = 0;
   let m;
@@ -93,7 +167,7 @@ export function checkSource(source) {
     const add = (message) => problems.push({ line, message: `<${el.name}> ${message}` });
     if (el.name === 'DoDontPair') {
       for (const [label, figure, caption] of [['Do', attrs.doExample, attrs.doCaption], ['Don’t', attrs.dontExample, attrs.dontCaption]]) {
-        if (typeof figure === 'string') figureProblems(figure).forEach((p) => add(`${label} figure ${p}`));
+        if (typeof figure === 'string') figureProblems(figure, { source, foundation }).forEach((p) => add(`${label} figure ${p}`));
         else add(`${label} figure is missing`);
         captionProblems(`${label}`, caption).forEach(add);
       }
@@ -101,7 +175,7 @@ export function checkSource(source) {
         add('uses stacked with no reason; write stacked="why the figure needs the full width"');
       }
     } else {
-      figureProblems(el.children).forEach((p) => add(`figure ${p}`));
+      figureProblems(el.children, { source, foundation }).forEach((p) => add(`figure ${p}`));
       captionProblems(el.name, attrs.caption).forEach(add);
     }
     BLOCKS.lastIndex = m.index + 1;
@@ -127,7 +201,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
     if (DEFINITIONS.has(file)) continue;
     const source = fs.readFileSync(abs, 'utf8');
     if (!/\bDo(Dont)?\b|DoDontPair|DoDontCard|<Dont\b/.test(source)) continue;
-    for (const { line, message } of checkSource(source)) findings.push({ file, line, message });
+    for (const { line, message } of checkSource(source, { file })) findings.push({ file, line, message });
   }
   return findings;
 }

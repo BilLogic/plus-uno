@@ -6,7 +6,7 @@ import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
-import { Tooltip, Button, Popup } from '@/components';
+import { Tooltip, Button, Popup, Link } from '@/components';
 import { Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
 import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 import { DocsOverlayBoundary } from '@/storybook-docs/lib/docs-overlay-boundary.jsx';
@@ -332,7 +332,7 @@ export const InteractiveContentInPopup = {
                             defaultShow
                             rootClose={false}
                         >
-                            <a href="#help">Read the guide</a>
+                            <Link href="#help">Read the guide</Link>
                         </Popup>
                     </FigureRow>
                 </DocsOverlayBoundary>
@@ -356,5 +356,5 @@ export const InteractiveContentInPopup = {
     },
 };
 
-/** The link a tooltip must not hold, in the tooltip's own text color. */
-const TooltipLinkFigure = () => <a href="#help" style={{ color: 'inherit' }}>Read the guide</a>;
+/** The link a tooltip must not hold, on the tooltip's dark ground. */
+const TooltipLinkFigure = () => <Link href="#help" appearance="inverse">Read the guide</Link>;
