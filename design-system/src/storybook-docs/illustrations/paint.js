@@ -62,6 +62,12 @@ const ROLES = {
   modalShadow: ['--ds-shadow-blocking', 'tokens/ladder/_templates.scss'],
   modalDivider: ['--ds-border', 'components/messaging/Dialog/Dialog.scss'],
   blanket: ['--ds-blanket', 'patterns/Modal/Modal.scss'],
+  // Material: the overlay fill is `modalSurface`/`sidebarOverlaySurface`; media and control have no
+  // component yet, so they are drawn from the token alone.
+  materialMedia: ['--ds-surface-material-media', null],
+  materialControl: ['--ds-surface-material-control', null],
+  materialOverlay: ['--ds-surface-material-overlay', 'components/messaging/Dialog/Dialog.scss'],
+  materialEdge: ['--ds-border-material', 'components/messaging/Dialog/Dialog.scss'],
   // Placeholder text: the Skeleton component's own bar
   placeholderText: ['--ds-skeleton', 'components/loading/Skeleton/Skeleton.scss'],
   placeholderHeading: ['--ds-skeleton', 'components/loading/Skeleton/Skeleton.scss'],

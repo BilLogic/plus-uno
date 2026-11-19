@@ -31,6 +31,20 @@ import {
     UsageRaiseOneThing,
 } from '@/storybook-docs/elevation-usage-figures.jsx';
 import {
+    MaterialAnatomyFigure,
+    MaterialAsIs,
+    MaterialChooseTable,
+    MaterialEdge,
+    MaterialMatchSurface,
+    MaterialNeutralOnly,
+    MaterialNoBlur,
+    MaterialOnBlanket,
+    MaterialOnlyFloating,
+    MaterialOnMedia,
+    MaterialRampFigure,
+    MaterialValuesTable,
+} from '@/storybook-docs/elevation-material-figures.jsx';
+import {
     BehaviorGuide,
     ByTemplateGrid,
     ClipDemo,
@@ -1035,3 +1049,45 @@ export const ControlBoundary = { render: () => <ControlBoundaryDoDont everyMode 
 export const CardEdgeContrast = { render: () => <AccessibilityCardEdges />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
 export const CardsInForcedColors = { render: () => <AccessibilityForcedColors />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
 
+
+/* ----------------------------------------------------- EL-D6 Material page */
+
+export const MaterialRamp = {
+    render: () => <MaterialRampFigure />,
+    play: async ({ canvasElement }) => {
+        const panel = canvasElement.querySelector('[data-testid="material-ramp"]');
+        await assertPanelContainer(panel);
+        await expect(panel.querySelectorAll('figure').length).toBe(2);
+        await expect(panel.querySelector('svg text'), 'the ramp draws no words').toBeNull();
+    },
+};
+export const MaterialAnatomy = {
+    render: () => <MaterialAnatomyFigure />,
+    play: async ({ canvasElement }) => {
+        const panel = canvasElement.querySelector('[data-testid="material-anatomy"]');
+        await assertPanelContainer(panel);
+        await expect(panel.querySelectorAll('figure').length).toBe(4);
+    },
+};
+export const MaterialChoose = {
+    render: () => <MaterialChooseTable />,
+    play: async ({ canvasElement }) => {
+        const table = canvasElement.querySelector('[data-testid="material-choose-table"]');
+        await expect(table.querySelectorAll('tbody tr').length).toBe(5);
+    },
+};
+export const MaterialValues = {
+    render: () => <MaterialValuesTable />,
+    play: async ({ canvasElement }) => {
+        const table = canvasElement.querySelector('[data-testid="material-values-table"]');
+        await expect(table.querySelectorAll('tbody tr').length).toBe(4);
+    },
+};
+export const MaterialOnMediaPair = { render: () => <MaterialOnMedia />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
+export const MaterialMatchSurfacePair = { render: () => <MaterialMatchSurface />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
+export const MaterialEdgePair = { render: () => <MaterialEdge />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
+export const MaterialOnlyFloatingPair = { render: () => <MaterialOnlyFloating />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
+export const MaterialNoBlurPair = { render: () => <MaterialNoBlur />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
+export const MaterialAsIsPair = { render: () => <MaterialAsIs />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
+export const MaterialNeutralOnlyPair = { render: () => <MaterialNeutralOnly />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };
+export const MaterialOnBlanketPair = { render: () => <MaterialOnBlanket />, play: async ({ canvasElement }) => expectPairIllustrations(canvasElement) };

@@ -1,0 +1,103 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { C, Callout } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import {
+    FoundationSection,
+    FoundationSubsection,
+} from '@/storybook-docs/foundation-page.jsx';
+import * as ElevationStories from './Elevation.stories.jsx';
+
+<Meta title="Foundations/Visual/Elevation/Material" />
+
+<DocsLanding
+    page="foundations-visual-elevation-material"
+    eyebrow="Foundation · Elevation"
+    title="Material"
+    purpose="Translucent surfaces for things that float above other UI and stay connected to what is behind them: a Tag on an illustration, a floating button, a floating Panel, a Modal on the Blanket. Material varies the surface a layer uses, never the layer."
+/>
+
+<Callout title="Tokens on this page">
+
+<C>--ds-surface-material-media</C> · <C>--ds-surface-material-control</C> · <C>--ds-surface-material-overlay</C> · <C>--ds-border-material</C>
+
+</Callout>
+
+<FoundationSection title="Material ramp">
+
+Three materials, from most to least see-through. The bigger the surface and the longer its text, the less it lets through.
+
+<Canvas of={ElevationStories.MaterialRamp} />
+
+</FoundationSection>
+
+<FoundationSection title="Material tokens">
+
+A material surface is three tokens together. The fill alone dissolves on busy content.
+
+<Canvas of={ElevationStories.MaterialAnatomy} />
+
+</FoundationSection>
+
+<FoundationSection title="Choose a material">
+
+<Canvas of={ElevationStories.MaterialChoose} />
+
+<Canvas of={ElevationStories.MaterialValues} />
+
+</FoundationSection>
+
+{/* Colored material (bold and subtle accents for a Tag, Lozenge or Badge on media) is added here once its tokens ship. */}
+
+<FoundationSection title="Do and don’t">
+
+Each rule as a Do and a Don’t.
+
+<FoundationSubsection title="Over media, use media material">
+
+<Canvas of={ElevationStories.MaterialOnMediaPair} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Match the material to the surface">
+
+<Canvas of={ElevationStories.MaterialMatchSurfacePair} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Give every material its edge">
+
+<Canvas of={ElevationStories.MaterialEdgePair} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Use material only on what floats">
+
+<Canvas of={ElevationStories.MaterialOnlyFloatingPair} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Transparency only, no blur">
+
+<Canvas of={ElevationStories.MaterialNoBlurPair} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Apply the token as it is">
+
+<Canvas of={ElevationStories.MaterialAsIsPair} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Neutral material only">
+
+<Canvas of={ElevationStories.MaterialNeutralOnlyPair} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="A blocking material sits on the Blanket">
+
+<Canvas of={ElevationStories.MaterialOnBlanketPair} />
+
+</FoundationSubsection>
+
+</FoundationSection>
