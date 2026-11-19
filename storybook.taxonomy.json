@@ -147,7 +147,8 @@
     "AI message",
     "Prompt input",
     "Prompt starters",
-    "Suggestion"
+    "Suggestion",
+    "AI chat"
   ],
   "specTypeOrder": [
     "Overview",
@@ -460,10 +461,7 @@
           "AI message",
           "AI sources",
           "AI feedback"
-        ]
-      ],
-      "Patterns",
-      [
+        ],
         "AI chat"
       ]
     ],

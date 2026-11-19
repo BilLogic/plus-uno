@@ -24,7 +24,7 @@ function px(name, seen = new Set()) {
     return Function(`return (${expr});`)();
 }
 
-const scss = read('design-system/src/templates/AiChat/AiChat.scss');
+const scss = read('design-system/src/components/ai/AiChat/AiChat.scss');
 
 describe('AiChat size tokens', () => {
     it('keeps the launcher at 48px and the popup at 2 x the old height', () => {

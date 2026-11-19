@@ -546,6 +546,14 @@
   status = 301
   force = true
 
+# The AI chat template became an AI UI component.
+[[redirects]]
+  from = "/storybook/"
+  query = { path = "/docs/ai-ai-chat--docs" }
+  to = "/storybook/?path=/docs/ai-ui-components-ai-chat--docs"
+  status = 301
+  force = true
+
 # Retired Modal component docs and story ids redirect to Modal template or Dialog component.
 [[redirects]]
   from = "/storybook/"

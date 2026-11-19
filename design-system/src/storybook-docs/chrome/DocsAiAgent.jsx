@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { AiIcon, IconButton } from '@/components';
-import { AiChat, useAiChat } from '@/templates';
+import { AI_CHAT_STORAGE_KEY, AiChat, AiIcon, IconButton, useAiChat } from '@/components';
 import DocsFab from './DocsFab';
 import { createAgentResponder } from './docsAgent';
 import { interceptDocsLinks, navigateInPlace } from './docsNavigate';
@@ -42,7 +41,7 @@ const AgentAction = () => {
 
 /**
  * The Storybook docs' floating button and the AI agent it opens: `AiChat`
- * in its `storybook` variant, answered by the docs-agent Netlify function
+ * on its own storage key, answered by the docs-agent Netlify function
  * (Gemini on Vertex, credentials server-side) and, when that errors or is
  * rate limited, by a search of the docs themselves. The chat's own button is left out; the AI chat
  * action in the floating button is the way in.
@@ -74,7 +73,7 @@ const DocsAiAgent = ({ loadEntries = loadDocsEntries, hrefFor = docsHref, fetchF
         // The click is the links' own (Enter on a link fires it too); the container only reroutes it.
         <div className="plus-docs-ai" onClickCapture={onClickCapture}>
             <AiChat
-                variant="storybook"
+                storageKey={`${AI_CHAT_STORAGE_KEY}-storybook`}
                 launcher={false}
                 linkTarget="_top"
                 title="AI chat"

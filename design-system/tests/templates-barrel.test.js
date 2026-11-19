@@ -6,7 +6,7 @@ import * as templates from '@/templates';
 
 describe('@/templates', () => {
     it('exports every template under its name', () => {
-        for (const name of ['Frame', 'Page', 'Section', 'Card', 'Table', 'Modal', 'Panel', 'Popup', 'AiChat']) {
+        for (const name of ['Frame', 'Page', 'Section', 'Card', 'Table', 'Modal', 'Panel', 'Popup']) {
             expect(templates[name], name).toBeDefined();
         }
     });
@@ -14,6 +14,12 @@ describe('@/templates', () => {
     it('carries the parts a template is filled with', () => {
         for (const name of ['PanelContainer', 'PanelBody', 'SECTION_DETAIL_FLOOR', 'MODAL_WIDTHS', 'TABLE_KINDS']) {
             expect(templates[name], name).toBeDefined();
+        }
+    });
+
+    it('does not export AiChat: it is a component, imported from @/components', () => {
+        for (const name of ['AiChat', 'useAiChat', 'AI_CHAT_MODES', 'AI_CHAT_STORAGE_KEY']) {
+            expect(templates[name], name).toBeUndefined();
         }
     });
 

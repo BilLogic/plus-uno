@@ -115,7 +115,7 @@ Elevation and fills follow Elevation.
 - Panel: use when the work should float beside the page, not replace it.
 - Grid: use when you need the column math the Frame is sized by.
 
-Same group: `AiChat` · `Card` · `Modal` · `Page` · `Panel` · `Section` · `Table`
+Same group: `Card` · `Modal` · `Page` · `Panel` · `Section` · `Table`
 
 ## Types
 

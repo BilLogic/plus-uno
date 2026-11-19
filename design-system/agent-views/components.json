@@ -175,24 +175,12 @@
     },
     {
       "name": "AiChat",
-      "kind": "template",
-      "import": "import { AiChat } from '@/templates';",
-      "group": "templates",
-      "source": "design-system/src/templates/AiChat/AiChat.jsx",
-      "summary": "AI chat on a Frame: a floating action button at the bottom right of the Page opens chat as a popup; from there it moves to the Frame's Panel or to full screen. It takes the Frame's props and adds the chat. - The button is the one way in. It hides while chat is open in the Panel or full screen. - The mode is remembered for the tab in sessionStorage (and an open Panel). - Under 768 the popup is shown full screen. - `variant=\"storybook\"` is the Storybook docs' chat: the same chat, with its mode remembered under its own key. - The conversation moves with the mode and is kept for the tab (the last 50 messages, under `${storageKey}-messages`), so a reload keeps it. There is no backend: `respond(text, history)` returns the reply, `history` being the turns before it as `{ role, text }`. A reply is text, or `{ text, sources }`: the pages or records it drew on list under it.",
+      "kind": "component",
+      "import": "import { AiChat } from '@/components';",
+      "group": "ai",
+      "source": "design-system/src/components/ai/AiChat/AiChat.jsx",
+      "summary": "AI chat on a Frame: a floating action button at the bottom right of the Page opens chat as a popup; from there it moves to the Frame's Panel or to full screen. It takes the Frame's props and adds the chat. - The button is the one way in. It hides while chat is open in the Panel or full screen. - The mode is remembered for the tab in sessionStorage (and an open Panel). - Under 768 the popup is shown full screen. - The conversation moves with the mode and is kept for the tab (the last 50 messages, under `${storageKey}-messages`), so a reload keeps it. There is no backend: `respond(text, history)` returns the reply, `history` being the turns before it as `{ role, text }`. A reply is text, or `{ text, sources }`: the pages or records it drew on list under it.",
       "props": [
-        {
-          "name": "variant",
-          "type": "enum",
-          "required": false,
-          "default": "'app'",
-          "values": [
-            "app",
-            "storybook"
-          ],
-          "description": "`storybook` is the docs' chat, which remembers its mode under its own key; the controls are the same.",
-          "deprecated": null
-        },
         {
           "name": "defaultMode",
           "type": "oneOf",
@@ -219,9 +207,9 @@
           "name": "storageKey",
           "type": "string",
           "required": false,
-          "default": "variant === 'storybook' ? `${AI_CHAT_STORAGE_KEY}-storybook` : AI_CHAT_STORAGE_KEY",
+          "default": "AI_CHAT_STORAGE_KEY",
           "values": null,
-          "description": "The sessionStorage key the mode and the conversation are kept under (the Storybook variant has its own); null keeps nothing.",
+          "description": "The sessionStorage key the mode and the conversation are kept under (the Storybook docs' chat passes its own); null keeps nothing.",
           "deprecated": null
         },
         {
@@ -338,7 +326,6 @@
         "Popup",
         "PanelMode",
         "Fullscreen",
-        "StorybookVariant",
         "Interactive",
         "SwitchingModes",
         "ConversationFollowsTheMode",
@@ -346,8 +333,7 @@
         "RemembersFullscreenClosed",
         "PopupIsFullScreenUnder768",
         "PopupStaysAPopupAt768",
-        "StorybookVariantControls",
-        "AppVariantControls",
+        "HeaderControls",
         "ModalLeavesThePopupOpen",
         "TrustMarks",
         "RepliesWithSources",

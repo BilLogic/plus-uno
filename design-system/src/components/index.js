@@ -3,6 +3,7 @@
 
 import '../styles/main.scss';
 
+export { default as AiChat, AI_CHAT_DISCLAIMER, AI_CHAT_FULLSCREEN_BELOW, AI_CHAT_MODES, AI_CHAT_STORAGE_KEY, useAiChat } from '@/components/ai/AiChat';
 export { default as AiIcon, AI_ICON_ALL_SIZES, AI_ICON_NAMES, AI_ICON_SIZES } from '@/components/ai/AiIcon';
 export { default as AiMessage, AI_MESSAGE_STATUSES, AiFeedback, AiSources, TypingText } from '@/components/ai/AiMessage';
 export { default as GenerativeBorder, GENERATIVE_BORDER_RADII } from '@/components/ai/GenerativeBorder';

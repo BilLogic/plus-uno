@@ -35,7 +35,7 @@ Panel reads these motion tokens and no literal duration or curve.
 
 ## Related
 
-Same group: `AiChat` · `Card` · `Frame` · `Modal` · `Page` · `Section` · `Table`
+Same group: `Card` · `Frame` · `Modal` · `Page` · `Section` · `Table`
 
 ## Props
 

@@ -13,7 +13,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const read = (file) => fs.readFileSync(path.join(ROOT, file), 'utf8');
 
 test('AI chat docks or floats its Panel and never sits on a Blanket', () => {
-  const page = read('design-system/src/templates/AiChat/AiChat.mdx');
+  const page = read('design-system/src/components/ai/AiChat/AiChat.mdx');
   assert.doesNotMatch(page, /on a Blanket|#blanket/);
   assert.match(page, /docks it, or floats it over the Page/);
 });

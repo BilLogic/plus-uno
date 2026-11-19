@@ -538,6 +538,14 @@ export const MOTION_REGISTRY = [
     },
   },
   {
+    name: 'AiChat',
+    tier: 'component',
+    events: {
+      enter: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Opens as a Popup.' },
+      exit: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Fades.' },
+    },
+  },
+  {
     name: 'Calendar',
     tier: 'component',
     events: {
