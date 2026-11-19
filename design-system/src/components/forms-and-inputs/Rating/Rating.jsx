@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { RadioGroup as BaseRadioGroup } from '@base-ui/react/radio-group';
 import { Radio as BaseRadio } from '@base-ui/react/radio';
@@ -11,6 +11,13 @@ import './Rating.scss';
 
 /** The scale, in order. Five is the whole of it — there is no other length. */
 const RATING_VALUES = [1, 2, 3, 4, 5];
+
+/**
+ * How long the select stagger stays on the items after a pick: the last step's
+ * delay plus the appearance transition. Past it the delay is gone, so a hover
+ * or press that leaves an item returns without waiting.
+ */
+const STAGGER_WINDOW_MS = RATING_VALUES.length * STAGGER.gap + 400;
 
 /**
  * Rating Component
@@ -55,10 +62,17 @@ const Rating = ({
 
     const prevValueRef = useRef(numericValue);
     const [staggerFrom, setStaggerFrom] = useState(numericValue);
+    const [staggering, setStaggering] = useState(false);
     if (prevValueRef.current !== numericValue) {
         setStaggerFrom(prevValueRef.current);
+        setStaggering(true);
         prevValueRef.current = numericValue;
     }
+    useEffect(() => {
+        if (!staggering) return undefined;
+        const timer = setTimeout(() => setStaggering(false), STAGGER_WINDOW_MS);
+        return () => clearTimeout(timer);
+    }, [staggering, numericValue]);
 
     const handleValueChange = (next) => {
         if (next === numericValue) return;
@@ -92,7 +106,7 @@ const Rating = ({
                 {RATING_VALUES.map((starValue) => {
                     const selected = numericValue >= starValue;
                     const staggerStep = Math.max(0, starValue - staggerFrom - 1);
-                    const itemStyle = selected && !reduced
+                    const itemStyle = selected && staggering && !reduced
                         ? { '--plus-rating-stagger': `${staggerStep * STAGGER.gap}ms` }
                         : undefined;
                     return (
@@ -163,17 +177,12 @@ const RatingItem = ({
     style,
     ...props
 }) => {
-    const reduced = useMotionReduced();
     const itemClasses = [
         'plus-rating-item',
         selected ? 'plus-rating-item-selected' : 'plus-rating-item-unselected',
         disabled ? 'plus-rating-item-disabled' : '',
         className
     ].filter(Boolean).join(' ');
-
-    const itemStyle = selected && !reduced
-        ? { '--plus-rating-stagger': `${(value - 1) * STAGGER.gap}ms`, ...style }
-        : style;
 
     return (
         <div className="plus-rating-item-wrapper">
@@ -193,7 +202,7 @@ const RatingItem = ({
                 value={value}
                 disabled={disabled}
                 className={itemClasses}
-                style={itemStyle}
+                style={style}
                 aria-label={`Rate ${value}`}
                 {...props}
             >

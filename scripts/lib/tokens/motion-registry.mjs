@@ -388,7 +388,7 @@ export const MOTION_REGISTRY = [
     name: 'Rating',
     tier: 'component',
     events: {
-      change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'Stars fill as a color change, staggered 20 ms.' },
+      change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'Stars fill with the brand selected color, staggered 20 ms.' },
     },
   },
   {

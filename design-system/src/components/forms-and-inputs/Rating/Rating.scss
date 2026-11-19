@@ -78,6 +78,13 @@
         ),
         $hovered-selector: '&:not(.plus-rating-item-disabled):hover'
     );
+    @include plus-state(
+        $states: (
+            pressed: (background-color: var(--ds-background-neutral-pressed)),
+        ),
+        $ring: false,
+        $pressed-selector: '&:not(.plus-rating-item-disabled):active'
+    );
 }
 
 // Unselected state (outlined star)
@@ -87,12 +94,33 @@
     }
 }
 
-// Selected state (filled star)
+// Selected state (filled star on the brand selected fill). Every item up to the
+// score carries it, so the chosen rating reads as brand against the neutral
+// circles that follow. The stagger delays the fill and the ink together; a
+// pointer on the item skips the delay so hover and press answer at once.
 .plus-rating-item-selected {
+    background-color: var(--ds-background-selected-bold);
+    transition-delay: var(--plus-rating-stagger);
+
     i {
-        color: var(--ds-icon-selected);
+        color: var(--ds-icon-inverse);
         transition-delay: var(--plus-rating-stagger);
     }
+
+    @include plus-state(
+        $states: (
+            hovered: (background-color: var(--ds-background-selected-bold-hovered), transition-delay: initial),
+        ),
+        $ring: false,
+        $hovered-selector: '&:not(.plus-rating-item-disabled):hover'
+    );
+    @include plus-state(
+        $states: (
+            pressed: (background-color: var(--ds-background-selected-bold-pressed), transition-delay: initial),
+        ),
+        $ring: false,
+        $pressed-selector: '&:not(.plus-rating-item-disabled):active'
+    );
 }
 
 // Disabled state

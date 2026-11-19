@@ -175,7 +175,7 @@ Interactive.play = async ({ canvasElement }) => {
     await userEvent.click(star4);
     await settleAnimations(canvasElement);
     await expect(star4).toHaveAttribute('aria-checked', 'true');
-    await expect(getComputedStyle(star4.querySelector('i')).color).toBe(tokenColor(canvasElement, '--ds-icon-selected'));
+    await expect(getComputedStyle(star4.querySelector('i')).color).toBe(tokenColor(canvasElement, '--ds-icon-inverse'));
 
     const star5 = canvas.getByRole('radio', { name: 'Rate 5' });
     await userEvent.click(star5);
@@ -222,56 +222,56 @@ PropsRender.play = async ({ canvasElement }) => {
 /** One story per state, for the Examples tab. */
 const frame = { maxWidth: 'var(--width-3000)' };
 
-export const Unrated = {
-    render: () => (
-        <div style={frame}>
-            <Rating id="rating-ex-off" label="How was the session?" value={0} onChange={() => {}} />
-        </div>
-    ),
-    play: async ({ canvasElement }) => {
-        const radios = within(canvasElement).getAllByRole('radio');
-        await expect(radios.every((r) => r.getAttribute('aria-checked') === 'false')).toBe(true);
-        await expect(getComputedStyle(radios[0]).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
-    },
-};
+const stateRender = (id, type, props) => () => (
+    <div style={frame}>
+        <Rating id={id} label="How was the session?" type={type} onChange={() => {}} {...props} />
+    </div>
+);
 
-export const Rated = {
-    render: () => (
-        <div style={frame}>
-            <Rating id="rating-ex-on" label="How was the session?" value={3} onChange={() => {}} />
-        </div>
-    ),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        await expect(canvas.getByRole('radio', { name: 'Rate 3' })).toHaveAttribute('aria-checked', 'true');
-        await expect(getComputedStyle(canvas.getByRole('radio', { name: 'Rate 2' }).querySelector('i')).color).toBe(tokenColor(canvasElement, '--ds-icon-selected'));
-        await expect(getComputedStyle(canvas.getByRole('radio', { name: 'Rate 4' }).querySelector('i')).color).toBe(tokenColor(canvasElement, '--ds-icon-subtle'));
-    },
+const itemOf = (canvasElement, n) => {
+    const item = within(canvasElement).getByRole('radio', { name: `Rate ${n}` });
+    item.style.transition = 'none';
+    return item;
 };
+const fillOf = (item) => getComputedStyle(item).backgroundColor;
+const inkOf = (item) => getComputedStyle(item.querySelector('i')).color;
 
-export const Hovered = {
-    render: () => (
-        <div style={frame}>
-            <Rating id="rating-ex-hover" label="How was the session?" value={2} onChange={() => {}} />
-        </div>
-    ),
-    play: async ({ canvasElement }) => {
-        const item = within(canvasElement).getByRole('radio', { name: 'Rate 4' });
-        item.style.transition = 'none';
-        const fill = withForcedPseudo(item, ':hover', () => getComputedStyle(item).backgroundColor);
-        await expect(fill).toBe(tokenColor(canvasElement, '--ds-background-neutral-hovered'));
+/** The seven states of the item, one play each, shared by every type. */
+const statePlays = {
+    rest: async ({ canvasElement }) => {
+        const items = within(canvasElement).getAllByRole('radio');
+        await expect(items.every((r) => r.getAttribute('aria-checked') === 'false')).toBe(true);
+        const first = itemOf(canvasElement, 1);
+        await expect(fillOf(first)).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+        await expect(inkOf(first)).toBe(tokenColor(canvasElement, '--ds-icon-subtle'));
     },
-};
-
-export const Focused = {
-    render: () => (
-        <div style={frame}>
-            <Rating id="rating-ex-focus" label="How was the session?" value={3} onChange={() => {}} />
-        </div>
-    ),
-    play: async ({ canvasElement }) => {
-        const item = within(canvasElement).getByRole('radio', { name: 'Rate 3' });
-        item.style.transition = 'none';
+    selected: async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByRole('radio', { name: 'Rate 3' })).toHaveAttribute('aria-checked', 'true');
+        const picked = itemOf(canvasElement, 2);
+        await expect(fillOf(picked)).toBe(tokenColor(canvasElement, '--ds-background-selected-bold'));
+        await expect(inkOf(picked)).toBe(tokenColor(canvasElement, '--ds-icon-inverse'));
+        const rest = itemOf(canvasElement, 4);
+        await expect(fillOf(rest)).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+        await expect(inkOf(rest)).toBe(tokenColor(canvasElement, '--ds-icon-subtle'));
+    },
+    hovered: async ({ canvasElement }) => {
+        const item = itemOf(canvasElement, 4);
+        await expect(withForcedPseudo(item, ':hover', () => fillOf(item))).toBe(tokenColor(canvasElement, '--ds-background-neutral-hovered'));
+    },
+    pressed: async ({ canvasElement }) => {
+        const item = itemOf(canvasElement, 4);
+        await expect(withForcedPseudo(item, ':active', () => fillOf(item))).toBe(tokenColor(canvasElement, '--ds-background-neutral-pressed'));
+    },
+    selectedHovered: async ({ canvasElement }) => {
+        const item = itemOf(canvasElement, 2);
+        await expect(withForcedPseudo(item, ':hover', () => fillOf(item))).toBe(tokenColor(canvasElement, '--ds-background-selected-bold-hovered'));
+    },
+    selectedPressed: async ({ canvasElement }) => {
+        const item = itemOf(canvasElement, 2);
+        await expect(withForcedPseudo(item, ':active', () => fillOf(item))).toBe(tokenColor(canvasElement, '--ds-background-selected-bold-pressed'));
+    },
+    focused: async ({ canvasElement }) => {
+        const item = itemOf(canvasElement, 3);
         await userEvent.tab();
         await expect(document.activeElement).toBe(item);
         const style = getComputedStyle(item);
@@ -280,7 +280,44 @@ export const Focused = {
         await expect(style.outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
         item.blur();
     },
+    disabled: async ({ canvasElement }) => {
+        const item = itemOf(canvasElement, 2);
+        await expect(item).toHaveAttribute('data-disabled');
+        await expect(fillOf(item)).toBe(tokenColor(canvasElement, '--ds-background-disabled'));
+        await expect(inkOf(item)).toBe(tokenColor(canvasElement, '--ds-icon-disabled'));
+    },
 };
+
+const state = (id, type, props, play) => ({ render: stateRender(id, type, props), play });
+
+export const Unrated = state('rating-ex-off', 'comments', { value: 0 }, statePlays.rest);
+export const Rated = state('rating-ex-on', 'comments', { value: 3 }, statePlays.selected);
+export const Hovered = state('rating-ex-hover', 'comments', { value: 2 }, statePlays.hovered);
+export const Pressed = state('rating-ex-press', 'comments', { value: 2 }, statePlays.pressed);
+export const SelectedHovered = state('rating-ex-selected-hover', 'comments', { value: 3 }, statePlays.selectedHovered);
+export const SelectedPressed = state('rating-ex-selected-press', 'comments', { value: 3 }, statePlays.selectedPressed);
+export const Focused = state('rating-ex-focus', 'comments', { value: 3 }, statePlays.focused);
+export const Disabled = state('rating-ex-disabled', 'comments', { value: 3, isDisabled: true }, statePlays.disabled);
+
+export const UnratedNumeric = state('rating-num-off', 'numeric', { value: 0 }, statePlays.rest);
+export const RatedNumeric = state('rating-num-on', 'numeric', { value: 3 }, statePlays.selected);
+export const HoveredNumeric = state('rating-num-hover', 'numeric', { value: 2 }, statePlays.hovered);
+export const PressedNumeric = state('rating-num-press', 'numeric', { value: 2 }, statePlays.pressed);
+export const SelectedHoveredNumeric = state('rating-num-selected-hover', 'numeric', { value: 3 }, statePlays.selectedHovered);
+export const SelectedPressedNumeric = state('rating-num-selected-press', 'numeric', { value: 3 }, statePlays.selectedPressed);
+export const FocusedNumeric = state('rating-num-focus', 'numeric', { value: 3 }, statePlays.focused);
+export const DisabledNumeric = state('rating-num-disabled', 'numeric', { value: 3, isDisabled: true }, statePlays.disabled);
+
+/** The thumbs-up glyph wears the same brand selected fill as the star. */
+export const RatedThumbsUp = state('rating-ex-thumbs', 'comments', { value: 3, icon: 'thumbs-up' }, async ({ canvasElement }) => {
+    const picked = itemOf(canvasElement, 2);
+    await expect(picked.querySelector('i').className).toContain('fa-thumbs-up');
+    await expect(fillOf(picked)).toBe(tokenColor(canvasElement, '--ds-background-selected-bold'));
+    await expect(inkOf(picked)).toBe(tokenColor(canvasElement, '--ds-icon-inverse'));
+    const rest = itemOf(canvasElement, 4);
+    await expect(rest.querySelector('i').className).toContain('fa-regular');
+    await expect(fillOf(rest)).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+});
 
 export const Required = {
     render: () => (
@@ -295,18 +332,5 @@ export const Required = {
         await expect(getComputedStyle(marker).color).toBe(tokenColor(canvasElement, '--ds-text-subtle'));
         const label = canvasElement.querySelector('.plus-rating-label');
         await expect(getComputedStyle(label).color).toBe(tokenColor(canvasElement, '--ds-text'));
-    },
-};
-
-export const Disabled = {
-    render: () => (
-        <div style={frame}>
-            <Rating id="rating-ex-disabled" label="How was the session?" value={3} isDisabled />
-        </div>
-    ),
-    play: async ({ canvasElement }) => {
-        const item = within(canvasElement).getByRole('radio', { name: 'Rate 3' });
-        await expect(item).toHaveAttribute('data-disabled');
-        await expect(getComputedStyle(item).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-disabled'));
     },
 };
