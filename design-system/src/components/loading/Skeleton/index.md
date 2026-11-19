@@ -8,7 +8,7 @@ Also asked as: loading placeholder, shimmer, ghost.
 
 **Import:** `import { Skeleton } from '@/components';`
 
-**Used in:** Card (`ds guide card`)
+**Used in:** Card (`ds guide card`); Section (`ds guide section`)
 
 **Governed by:** Empty (`ds guide empty`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Search (`ds guide search`)
 

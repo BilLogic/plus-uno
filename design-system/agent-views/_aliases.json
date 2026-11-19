@@ -46,7 +46,7 @@
     "Table": ["list of records", "data table on a page", "sortable list", "records with filters", "rows and columns", "grid"],
     "FilterButton": ["filter chip", "filter control"],
     "Card": ["summary card", "object card"],
-    "Section": ["page section", "toolbar", "section header"],
+    "Section": ["page section", "section header"],
     "Button": ["cta", "submit"],
     "IconButton": ["icon only button", "icon action"],
     "Heading": ["title", "headline"],

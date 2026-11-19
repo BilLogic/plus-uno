@@ -102,8 +102,8 @@ test('the component snapshot is held to the same file key — when it carries on
   withKey.components.figmaFileKey = 'W0qzhXWxFsMwSJzkdV2yal';
   assert.match(failures(withKey, OPTS)[0], /figma-component-snapshot\.json: figmaFileKey/);
 
-  // The legacy poller writes no key at all, and that must stay green rather
-  // than demand a field the writer on disk has never produced.
+  // An older snapshot carries no key, and that must stay green rather than
+  // demand a field it has never held.
   assert.deepEqual(failures(sound(), OPTS), []);
 });
 

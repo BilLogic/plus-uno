@@ -15,9 +15,77 @@ import { fileURLToPath } from 'node:url';
 
 import { TOKEN_DIR, tokenCorpus } from '../design-system/src/lib/tokens-node.mjs';
 import { tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
-import { LAYOUT_MODES, deriveLayout } from './layout-derived.mjs';
 import { retiredRenames } from './lib/tokens/plan.mjs';
 import { exportedValue } from './lib/docs-page.mjs';
+
+/**
+ * The derived rows of the Layout collection, computed from the Frame rules
+ * rather than typed in.
+ *
+ * Figma has no expressions, so `Layout/width-content`, `Layout/width-column`,
+ * and `Layout/width-column-screen` are plain numbers
+ * per mode. They were filled by running this arithmetic at each mode's screen
+ * width, and the token test checks the export against it, so a mode value that
+ * drifts from the rules is caught instead of shipped.
+ *
+ * The rules, at a screen `width`:
+ * - The Frame has no seams: the Page runs to the window edges. The Sidebar
+ *   docks from 1024 and is 240 from the screen edge; below 1024 it is an
+ *   overlay and takes no room.
+ * - The Page pads 24 at every width.
+ * - Content is the Page's inner width, capped at 1232 and never under 720:
+ *   the width, less the docked Sidebar, less two Page pads.
+ * - The grid is 12 columns with gutter 16.
+ * - The screen grid (Modals and the Panel, the Page grid with the Sidebar
+ *   closed) has its own pad, 24 · 24 · 32, so it does not move when the Page
+ *   pad does. It is 12 columns with gutter 16, centered, and capped at 1232
+ *   like content.
+ * - A modal spans 6 · 8 · 10 columns of the screen grid plus its own 16 pad
+ *   on each side, rounded to a whole pixel.
+ *
+ * The constants restate rules rather than read tokens on purpose: this is the
+ * oracle the exported values are checked against, so it cannot take its
+ * inputs from the export.
+ */
+const { LAYOUT_MODES, deriveLayout } = (() => {
+  /** The spacing / layout modes, by their Figma names, and the screen width each is worked at. */
+  const LAYOUT_MODES = { 'Medium (768px)': 768, 'Large (1024px)': 1024, 'X-Large (1440px)': 1440 };
+
+  const SIDEBAR = 240;
+  const DOCK_FROM = 1024;
+  const PAGE_PAD = 24;
+  const SCREEN_PAD = 24;
+  const WIDE_SCREEN_PAD = 32;
+  const WIDE_SCREEN_PAD_FROM = 1440;
+  const MAX_CONTENT = 1232;
+  const MIN_CONTENT = 720;
+  const COLUMNS = 12;
+  const GUTTER = 16;
+
+  const clamp = (n) => Math.min(MAX_CONTENT, Math.max(MIN_CONTENT, n));
+  const column = (content) => (content - (COLUMNS - 1) * GUTTER) / COLUMNS;
+
+  /**
+   * @param {number} width the screen width a mode stands for
+   * @returns {{ 'width-screen': number, 'pad-x-screen': number,
+   *   'width-content': number, 'width-column': number,
+   *   'width-column-screen': number }}
+   */
+  function deriveLayout(width) {
+    const docked = width >= DOCK_FROM;
+    const content = clamp(width - (docked ? SIDEBAR : 0) - 2 * PAGE_PAD);
+    const padXScreen = width >= WIDE_SCREEN_PAD_FROM ? WIDE_SCREEN_PAD : SCREEN_PAD;
+    const screenColumn = column(clamp(width - 2 * padXScreen));
+    return {
+      'width-screen': width,
+      'pad-x-screen': padXScreen,
+      'width-content': content,
+      'width-column': column(content),
+      'width-column-screen': screenColumn,
+    };
+  }
+  return { LAYOUT_MODES, deriveLayout };
+})();
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SOURCE_DIR = path.join(REPO_ROOT, TOKEN_DIR, 'source');
@@ -127,9 +195,6 @@ const FIXED = {
   '--modal-inline-lg': '24px',
   '--modal-radius': '16px',
   '--popup-pad': '16px',
-  '--popup-width-sm': '320px',
-  '--popup-width-md': '400px',
-  '--popup-width-lg': '480px',
   '--flag-width': '400px',
   '--flag-stack': '16px',
   '--dropdown-menu-pad': '4px',
@@ -410,8 +475,8 @@ test('the Frame stacks its layers by name: no arithmetic on --layer-navigation a
   assert.doesNotMatch(scss, /z-index:\s*-?\d/);
 });
 
-test('the Frame layer steps are named and ordered edge < Sidebar < Blanket < Panel peek', () => {
-  const order = ['edge', 'sidebar', 'blanket', 'panel-peek'].map((n) => `--layer-frame-${n}`);
+test('the Frame layer steps are named and ordered edge < Sidebar < Panel peek', () => {
+  const order = ['edge', 'sidebar', 'panel-peek'].map((n) => `--layer-frame-${n}`);
   const values = order.map((n) => {
     const token = corpus.get(n);
     assert.ok(token, `${n} is not declared`);
@@ -439,4 +504,17 @@ test('a Section draws no surface of its own: no radius token, no fill, no pad', 
 
 test('the Frame names its server-render width instead of writing 1440 bare', () => {
   assert.doesNotMatch(read('design-system/src/templates/Frame/useOwnWidth.js'), /fallback = 1440/);
+});
+
+test('Popup widths are the column steps, and the old size words read as retired', async () => {
+  const { TOKEN_LADDER } = await import('./lib/tokens/plan.mjs');
+  const popupWidths = TOKEN_LADDER.filter((r) => /^--popup-width-/.test(r.new)).map((r) => r.new).sort();
+  assert.deepEqual(popupWidths, ['--popup-width-3-col', '--popup-width-4-col', '--popup-width-range']);
+  const retired = retiredRenames();
+  for (const size of ['sm', 'md', 'lg']) assert.ok(retired.has(`--popup-width-${size}`), `--popup-width-${size} is retired`);
+  const use = (name) => TOKEN_LADDER.find((r) => r.new === name).use;
+  assert.match(use('--popup-width-3-col'), /filter menu/);
+  assert.match(use('--popup-width-3-col'), /profile menu/);
+  assert.match(use('--popup-width-4-col'), /content/);
+  assert.doesNotMatch(use('--popup-width-4-col'), /date picker/);
 });

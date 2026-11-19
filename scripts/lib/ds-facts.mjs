@@ -23,7 +23,7 @@
  * WHERE THE FACTS COME FROM. The generated manifests
  * (`agent-views/components.json`, `tokens.json`: components and patterns,
  * each with its kind, import, props and values), the hand-kept
- * lists (`_inventions.json`; `_patterns.json`, which adds only a pattern's group
+ * lists (`_inventions.json`; `_templates.json`, which adds only a template's group
  * and when to reach for it; `_aliases.json`, the other words a component is
  * asked by, as `lookup(name).aliases`), the glossary's design-system avoid-words
  * (`docs/conventions/design-system-glossary.md`, read through `ds-vocabulary.mjs` and appended to those aliases;
@@ -188,7 +188,7 @@ export function loadFacts(root) {
   const componentManifest = readJson(manifestFile);
   const tokenManifest = optional('tokens.json', { tokens: [] });
   const inventions = optional('_inventions.json', { components: [], props: [], tokens: [] });
-  const patterns = optional('_patterns.json', { patterns: [] }).patterns;
+  const templates = optional('_templates.json', { templates: [] }).templates;
   const placements = [
     ...placementsFromSlots(optional('_slots.json', { slots: [] })),
     ...optional('_placements.json', { placements: [] }).placements,
@@ -204,7 +204,7 @@ export function loadFacts(root) {
   const retired = retiredRenames();
 
   const records = new Map(componentManifest.components.map((c) => [c.name, c]));
-  const patternRows = new Map(patterns.map((r) => [r.name, r]));
+  const templateRows = new Map(templates.map((r) => [r.name, r]));
   const tokenRecords = new Map(tokenManifest.tokens.map((t) => [t.name, t]));
   const inventedComponents = new Map(inventions.components.map((r) => [r.not, r]));
   const inventedProps = inventions.props.map((r) => ({ row: r, ...parsePropRow(r.not) })).filter((r) => r.component);
@@ -239,7 +239,7 @@ export function loadFacts(root) {
       const kind = record.kind ?? 'component';
       const aliasOf = kind === 'component' ? barrel.aliases[name] ?? null : null;
       const props = record.props ?? (aliasOf ? records.get(aliasOf)?.props ?? null : null);
-      const row = kind === 'template' ? patternRows.get(name) : undefined;
+      const row = kind === 'template' ? templateRows.get(name) : undefined;
       return answer(name, 'exists', {
         kind,
         import: record.import,

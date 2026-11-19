@@ -1,11 +1,10 @@
 /**
  * Tests for `npm run snapshot:figma-components`.
  *
- * This script writes the file `poll-figma-library.js` diffs, so the thing worth
- * testing is that it writes the SAME population the poller does. A snapshot
- * built from a slightly different set of rows is not a stale snapshot — it is a
- * snapshot that reports every difference as a change, once, loudly, into Notion
- * and Slack.
+ * The thing worth testing is that it writes a stable population: a snapshot
+ * built from a slightly different set of rows is not a stale snapshot, it is a
+ * snapshot that reports every difference as a change, once, loudly, in the
+ * refresh PR.
  *
  * The network is never touched here; the REST shapes are fixtures.
  *
@@ -53,7 +52,7 @@ const componentsResponse = {
         containing_frame: { name: 'Tooltip' },
       },
       { key: 'k2', name: 'size=lg', description: '', node_id: '1:2', containing_frame: { name: 'StatusTag' } },
-      // Dropped by the shared ignore list, exactly as the poller drops them.
+      // Dropped by the shared ignore list, exactly as the ignore list drops them.
       { key: 'k3', name: '_Tooltip Arrow', description: '', node_id: '1:3', containing_frame: { name: 'Tooltip' } },
       { key: 'k4', name: 'grid', description: '', node_id: '1:4', containing_frame: { name: 'layout-blocks/x' } },
       { key: 'k5', name: 'Spacing Token Guidelines', description: '', node_id: '1:5', containing_frame: { name: 'Docs' } },
@@ -72,7 +71,7 @@ test('rows carry the five fields the snapshot has always held', () => {
   });
 });
 
-test('the ignore list is the poller’s, so the two writers agree on the population', () => {
+test('the ignore list drops internals and docs, so the population is only the library’s components', () => {
   const rows = rowsFrom(componentsResponse);
   assert.deepEqual(rows.map((r) => r.key), ['k1', 'k2']);
   assert.equal(isIgnored({ name: '_Tooltip Arrow', containingFrame: 'Tooltip' }), true);
@@ -240,7 +239,7 @@ test('the verdict command prints GITHUB_OUTPUT lines, and fails on a file that i
   assert.throws(() => execFileSync('node', [cli, live, bad], { stdio: 'pipe' }), (e) => e.status !== 0);
 });
 
-test('the written document keeps the shape the poller reads, plus the file key', () => {
+test('the written document keeps the shape the refresh diffs, plus the file key', () => {
   const now = new Date('2026-09-06T00:00:00.000Z');
   const doc = snapshotFrom({
     rows: rowsFrom(componentsResponse),

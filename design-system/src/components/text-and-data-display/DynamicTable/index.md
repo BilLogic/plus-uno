@@ -110,7 +110,8 @@ Same group: `Code` · `CodeBlock` · `Heading` · `InlineEdit` · `StaticTable` 
 | Disabled row | `--ds-text-disabled` |
 | Row height | `--row-height-sm`, `--row-height-md`, `--row-height-lg` |
 | Cell padding | `--table-pad-x-cell`, `--table-pad-y-cell` |
-| Footer | `--table-inline`, `--table-footer-height` |
+| Footer slot (Table template) | `--table-inline`, `--table-footer-height` |
+| Footer the shell draws (Dynamic/Tree) | `--stack-md` |
 | Empty state box | `--table-empty-surface`, `--table-empty-radius` |
 | Ring | `--ds-border-focused`, `--focus-ring-width` |
 

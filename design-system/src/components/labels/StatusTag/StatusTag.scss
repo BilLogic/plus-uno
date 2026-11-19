@@ -1,9 +1,9 @@
 /*
  * Status tag — the condition something is in.
  *
- * THE BOX. Default is 20 tall (B3 12, icon 12, radius 4); spacious is 32 (B2 14, icon 16, radius 8). The two heights have no semantic token yet
- * (label heights 20/22/32 are a token follow-up), so they are local custom
- * properties set from `_label-heights.scss`, which Skeleton reads too.
+ * THE BOX. Default is 20 tall (B3 12, icon 12, radius 4, `--label-height-md`);
+ * spacious is 32 (B2 14, icon 16, radius 8, `--control-md`). Both are local
+ * custom properties set from `_label-heights.scss`, which Skeleton reads too.
  *
  * THE PADDING, AS FIGMA BUILDS IT. The label and icon sit in an inner wrapper
  * (`__content`) whose right padding, added to the outer right padding, makes

@@ -1,9 +1,9 @@
 /*
  * Count tag — a number on its own, as a near-square countTag.
  *
- * EVERY NUMBER IS A BADGE: 16 high everywhere, a 4 corner and a minimum width
- * of 24, so one digit is a small rectangle and two or three digits grow it
- * from the trailing edge. Only the dot is round.
+ * EVERY NUMBER IS THE SAME COUNT TAG: 16 high everywhere, a 4 corner and a
+ * minimum width of 24, so one digit is a small rectangle and two or three
+ * digits grow it from the trailing edge. Only the dot is round.
  *
  * The height is a local custom property set from `_label-heights.scss`, which
  * Skeleton reads too. The minimum width and the dot take the spacing

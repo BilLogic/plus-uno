@@ -62,4 +62,4 @@ The six states told apart by what the view is doing. A filled dot means the patt
 | shows a value this person cannot change right now | No | No | No | No | No | Yes |
 | hides what this role can never use | No | No | No | No | Yes | No |
 
-A load failure fills two dots: Errors owns its words, and Empty owns the slot they show in. To choose a layer for a task, use the chooser on the Templates overview.
+A load failure fills two markers: Errors owns its words, and Empty owns the slot they show in. To choose a layer for a task, use the chooser on the Templates overview.

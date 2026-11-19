@@ -109,8 +109,8 @@ Space owned by a template: page, section, card, table, modal, popup. Inside a te
 --panel-subheader-pad-y  /* Vertical padding of a Panel subheader. */
 --panel-width-default  /* Width the Panel opens at. */
 --popup-radius  /* Corner rounding of a Popup. */
---popup-width-3-col  /* Width of a 3-column Popup, such as a short picker. */
---popup-width-4-col  /* Width of a 4-column Popup, such as a date picker or a menu with descriptions. */
+--popup-width-3-col  /* Width of a 3-column Popup: a filter menu or the profile menu. */
+--popup-width-4-col  /* Width of a 4-column Popup: content, or a stacked filter menu. The widest a Popup goes. */
 --section-toolbar-count-min-width  /* Minimum width of the result count in a Section toolbar before it truncates. */
 --section-toolbar-min-width  /* Minimum width of the start group in a Section toolbar before its controls wrap. */
 --table-empty-radius  /* Corner rounding of the empty state box that replaces an empty table. */
@@ -195,6 +195,7 @@ Tokens one component owns, named for it.
 --popup-clip-reach  /* How far past its edges a Popup's opening clip stays, so the overlay shadow is never cut. */
 --popup-max-width  /* Widest an auto-width Popup grows to fit its content, unless its trigger is wider. */
 --popup-min-width  /* Narrowest an auto-width Popup gets, unless its trigger is wider. */
+--popup-width-range  /* Width of the range picker's Popup: the presets beside the calendar. */
 --progress-bar-height  /* Height of a ProgressBar track. */
 --progress-indicator-dot-size-12  /* Dot size of a ProgressIndicator with size 12. */
 --progress-indicator-dot-size-8  /* Dot size of a ProgressIndicator with size 8. */
@@ -388,7 +389,6 @@ The templates on the page frame, per breakpoint: page, section, card, table, ove
 --dropdown-menu-pad  /* Padding inside a DropdownMenu or listbox. */
 --flag-stack  /* Vertical gap between stacked Flags. */
 --flag-width  /* Width of a Flag. */
---layer-frame-blanket
 --layer-frame-docked-edge
 --layer-frame-edge
 --layer-frame-panel-peek
@@ -407,9 +407,6 @@ The templates on the page frame, per breakpoint: page, section, card, table, ove
 --popup-gap-screen  /* Space a floating layer keeps from the screen edge, such as a Flag or a listbox. */
 --popup-offset  /* Gap between a Popup, menu or Tooltip and the element that opened it. */
 --popup-pad  /* Padding inside a Popup. */
---popup-width-lg  /* Width of a large Popup. */
---popup-width-md  /* Width of a default Popup. */
---popup-width-sm  /* Width of a small Popup. */
 --section-min-width-main  /* Narrowest the main column of a two-column Section may shrink. */
 --section-min-width-side  /* Narrowest the side column of a two-column Section may shrink. */
 --section-stack-lg  /* Vertical gap between groups of blocks inside a Section. */
@@ -827,7 +824,7 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-background-neutral-subtle  /* The background of elements that appear to have no background in a resting state, such as subtle buttons and menu items */
 --ds-background-neutral-subtle-hovered
 --ds-background-neutral-subtle-pressed
---ds-background-selected  /* The background of an element that communicates selection, such as a selected navigation item, or the opened state of a dropdown trigger. Use --ds-background-selected-hovered or --ds-background-selected-pressed when interacting with a selected element. Selection is distinct from keyboard focus and hover alone */
+--ds-background-selected  /* The background of an element that communicates selection, such as a selected navigation item, or the opened state of a Select trigger. Use --ds-background-selected-hovered or --ds-background-selected-pressed when interacting with a selected element. Selection is distinct from keyboard focus and hover alone */
 --ds-background-selected-bold  /* The bold background of selected controls, such as checked checkboxes and selected radio buttons. Pair with --ds-text-inverse or --ds-icon-inverse for foreground content. Do not use for primary actions or keyboard focus alone */
 --ds-background-selected-bold-hovered  /* The background of a selected control that uses --ds-background-selected-bold while it is hovered, such as a checked checkbox. Pair with --ds-text-inverse or --ds-icon-inverse for foreground content. Do not use for an unselected control or keyboard focus alone */
 --ds-background-selected-bold-pressed  /* The background of a selected control that uses --ds-background-selected-bold while it is being pressed, such as a checked checkbox. Pair with --ds-text-inverse or --ds-icon-inverse for foreground content. Do not use for an unselected control or keyboard focus alone */
@@ -858,7 +855,7 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-blanket  /* The screen overlay that appears with a Modal */
 --ds-blanket-danger  /* An overlay to communicate danger states when a simple background color change isn't possible, such as deleting a block in a RichTextEditor */
 --ds-blanket-selected  /* A translucent blanket to communicate selection when changing the background of the selected content is not possible, such as selected blocks in a RichTextEditor. The content beneath remains visible. Do not use to indicate keyboard focus or hover alone */
---ds-border  /* Visually group or separate UI elements, such as flat cards or side panel dividers */
+--ds-border  /* Visually group or separate UI elements, such as flat cards or Panel dividers */
 --ds-border-accent-blue  /* Blue borders on non-bold backgrounds when there is no meaning tied to the color */
 --ds-border-accent-blue-subtle  /* Decorative blue borders that do not need to meet 3:1 contrast requirements */
 --ds-border-accent-brown  /* Brown borders on non-bold backgrounds when there is no meaning tied to the color */
@@ -902,7 +899,7 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-border-input-search  /* The border of search inputs */
 --ds-border-inverse  /* Borders on bold backgrounds */
 --ds-border-material  /* The 1px edge of a floating surface that wears material. Forced colors keep it. */
---ds-border-selected  /* Borders or visual indicators that communicate selection, such as the active tab or a selected menu item, or the opened state of a dropdown trigger. Do not use as a keyboard focus indicator; use --ds-border-focused for focus and preserve the selected treatment when both states apply */
+--ds-border-selected  /* Borders or visual indicators that communicate selection, such as the active tab or a selected menu item, or the opened state of a Select trigger. Do not use as a keyboard focus indicator; use --ds-border-focused for focus and preserve the selected treatment when both states apply */
 --ds-border-success  /* Borders communicating a favorable outcome, such as the borders on validated text fields */
 --ds-border-success-subtle  /* Decorative success borders that do not need to meet 3:1 contrast requirements */
 --ds-border-surface  /* A container's 1px edge. Invisible except in light increased contrast, where the sunken frame turns white. */
@@ -931,7 +928,7 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-icon-discovery  /* Icons communicating change or something new, such as discovery section messages */
 --ds-icon-information  /* Icons communicating information or something in-progress, such as information section messages */
 --ds-icon-inverse  /* Icons on bold backgrounds */
---ds-icon-selected  /* Icons that communicate selection, such as icons in selected navigation items, or the opened state of a dropdown trigger. On bold selected backgrounds, use --ds-icon-inverse instead. Do not use for brand emphasis or hover alone. Keep the selected icon treatment when the element also has focus */
+--ds-icon-selected  /* Icons that communicate selection, such as icons in selected navigation items, or the opened state of a Select trigger. On bold selected backgrounds, use --ds-icon-inverse instead. Do not use for brand emphasis or hover alone. Keep the selected icon treatment when the element also has focus */
 --ds-icon-subtle  /* Icons paired with --ds-text-subtle */
 --ds-icon-subtlest  /* Icons paired with --ds-text-subtlest */
 --ds-icon-success  /* Icons communicating a favorable outcome, such as those used in success section messages */
@@ -971,7 +968,7 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-surface-material-control  /* A floating button, search or toolbar. Transparency only, no blur; solid under reduced transparency and increased contrast. */
 --ds-surface-material-media  /* A control or tag over an image or video. Transparency only, no blur; solid under reduced transparency and increased contrast. */
 --ds-surface-material-overlay  /* The ground of a floating Sidebar, a floating Panel and the Modal. Transparency only, no blur; solid under reduced transparency and increased contrast. */
---ds-surface-overlay  /* The background of elements that sit on top of the UI, such as modals, dropdown menus, floating toolbars, and floating single-action buttons. Also use for the background of raised cards in a dragged state. Combine with --ds-shadow-overlay */
+--ds-surface-overlay  /* The background of elements that sit on top of the UI, such as modals, menus, floating toolbars, and floating single-action buttons. Also use for the background of raised cards in a dragged state. Combine with --ds-shadow-overlay */
 --ds-surface-overlay-hovered
 --ds-surface-overlay-pressed
 --ds-surface-pressed
@@ -1027,7 +1024,7 @@ The color set, generated from a plan into `design-system/src/tokens/color/` with
 --ds-text-information  /* Informative text or to communicate something is in progress, such as in-progress status tags */
 --ds-text-information-bolder  /* Text on top of information semantic labels to ensure accessibility and desired visual appearance */
 --ds-text-inverse  /* Text on bold backgrounds */
---ds-text-selected  /* Text that communicates selection, such as the active tab or a selected navigation item, or the opened state of a dropdown trigger. On bold selected backgrounds, use --ds-text-inverse instead. Do not use for unselected links, brand emphasis, or hover alone. Keep the selected text treatment when the element also has focus */
+--ds-text-selected  /* Text that communicates selection, such as the active tab or a selected navigation item, or the opened state of a Select trigger. On bold selected backgrounds, use --ds-text-inverse instead. Do not use for unselected links, brand emphasis, or hover alone. Keep the selected text treatment when the element also has focus */
 --ds-text-subtle  /* Secondary text, such as navigation, subtle button links, input field labels, and all caps subheadings */
 --ds-text-subtlest  /* Tertiary text, such as meta-data, breadcrumbs, input field placeholder and helper text */
 --ds-text-success  /* Text to communicate a favorable outcome, such as input field success messaging */

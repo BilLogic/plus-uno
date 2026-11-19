@@ -2,23 +2,13 @@
 /**
  * `npm run snapshot:figma-components` — refresh
  * `scripts/figma-component-snapshot.json` from the live Figma library, and do
- * nothing else.
- *
- * WHY THIS EXISTS WHEN `figma:poll` ALREADY FETCHES THE SAME LIST.
- * `poll-figma-library.js` is a NOTIFIER that happens to leave a snapshot
- * behind: a real run opens a Notion PRD and posts a Slack card before it
- * writes, and `--dry-run` (made honestly dry in #340) writes nothing at all. So
- * there was no way to say "just re-record what the library contains" — the two
- * available answers were "publish to two other systems" and "publish nothing,
- * including the file". That is why the snapshot sat at 2026-07-09 while the
- * poller itself moved into the Worker on 2026-07-16 (agents/uno-bot/src/
- * figma-poll.ts, snapshot in KV): the file's writer left, and the only
- * remaining way to rewrite it had side effects nobody wanted to trigger by
- * hand. This script is the missing half — same read, no publishing.
+ * nothing else: it reads Figma REST and publishes nowhere. The CI refresh
+ * (`.github/workflows/figma-snapshot-refresh.yml`) runs it and opens a draft PR
+ * with the result.
  *
  * WHAT IT CAPTURES, AND WHY IT MUST BE THIS ROUTE. `GET /v1/files/:key/
  * components` returns the components PUBLISHED to the file's library, which is
- * exactly what the snapshot holds and what the poller diffs. The Plugin API
+ * exactly what the snapshot holds. The Plugin API
  * (`use_figma`) can enumerate the file but not that set: it sees the canvas,
  * which on 2026-09-06 held 1,977 COMPONENT nodes and 171 COMPONENT_SETs against
  * the snapshot's 1,311 published variants, because the canvas includes
@@ -28,9 +18,9 @@
  * published thing. And the one MCP tool that does list the published library,
  * `list_file_components_for_code_connect`, answers "You need a Dev or Full seat
  * on an Organization or Enterprise plan to use Code Connect." So a canvas dump
- * written into this file would not be a refresh; it would replace the poller's
- * baseline with a different population and make the next poll report several
- * hundred phantom additions, each one a Notion PRD and a Slack card.
+ * written into this file would not be a refresh; it would replace the baseline
+ * with a different population and make the next refresh report several hundred
+ * phantom additions.
  *
  * WHICH IS WHY IT REFUSES RATHER THAN IMPROVISES. With no `FIGMA_ACCESS_TOKEN`
  * it names what is missing and exits 1. A refresher that quietly wrote
@@ -79,9 +69,9 @@ const SNAPSHOT = 'scripts/figma-component-snapshot.json';
 export const DEFAULT_FILE_KEY = 'zAecJNRdvJzAUOcjV32tRX';
 
 /**
- * Non-DS component patterns to ignore — the same list `poll-figma-library.js`
- * filters by, because the two write the same file and a snapshot that includes
- * rows the poller drops reads to the poller as a mass deletion.
+ * Non-DS component patterns to ignore: a snapshot that includes rows the
+ * library's own components list leaves out reads as a mass deletion on the next
+ * refresh.
  */
 export const IGNORED = [
   /^layout-blocks\//i,
@@ -557,7 +547,7 @@ export function refreshVerdict(before, after, { now } = {}) {
 /**
  * The snapshot document.
  *
- * `nodeHashes` is carried in the shape the poller wrote it — one md5 per node
+ * `nodeHashes` is carried in the shape the earlier snapshots carry — one md5 per node
  * document — so a visual change with no metadata change is still visible. It is
  * optional: with no hashes fetched, the previous ones are dropped rather than
  * left to describe nodes that have moved on.

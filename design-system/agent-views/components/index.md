@@ -18,7 +18,7 @@ Names agents reach for that this system does not have, or has retired. Write the
 |---|---|
 | `Alert` | `SectionMessage`, `Flag` (SectionMessage in the page; Flag for a passing notice) |
 | `Toast` | `Flag` (renamed) |
-| `ToastContainer` | `Flag` (renamed with Toast) |
+| `ToastContainer` | `Flag` (folded into Flag) |
 | `Switch` | `Toggle` (renamed) |
 | `NavTabs` | `Tabs` (one tab component) |
 | `NavPills` | `Tabs` |
@@ -74,7 +74,7 @@ A template is a shell that owns the frame (fill, pad, radius, elevation) and lea
 |---|---|---|---|
 | Templates | [`Frame`](../../src/templates/Frame/Frame.mdx) | `import { Frame } from '@/templates';` | Every full page: the app frame (Sidebar, Page with its 12-column content grid, and Panel). Default type: the PLUS `Sidebar` (@/components) in `sidebar`, a `Breadcrumb` in `header`. Bare type: one centered column, no `sidebar`, for sign-in and errors. A multi-step task uses the Sidebar's inner mode, steps as rows, actions in the Page footer. |
 | Page | [`Page`](../../src/templates/Page/Page.mdx) | `import { Page } from '@/templates';` | A tokenized box with a level (fill and shadow together), a pad and a radius. The Frame draws the page's own; use it for any other block that needs a level. |
-| Section | [`Section`](../../src/templates/Section/Section.mdx) | `import { Section } from '@/templates';` | A span of the page grid under one heading, with its header, toolbar and tabs. No box of its own: the Page supplies the pad. `detail` for a list with a detail region. |
+| Section | [`Section`](../../src/templates/Section/Section.mdx) | `import { Section } from '@/templates';` | A span of the page grid under one heading, with its title row, views, search and filters. No box of its own: the Page supplies the pad. `detail` for a list with a detail region. |
 | Card | [`Card`](../../src/templates/Card/Card.mdx) | `import { Card } from '@/templates';` | A raised container for one object: a student, a session, a metric. Optional image, a header over the body, optional footer. |
 | Table | [`Table`](../../src/templates/Table/Table.mdx) | `import { Table } from '@/templates';` | How a table sits on a page: a Section header over a Static, Dynamic or Tree table, with its footer and empty state. |
 | Panel | [`Panel`](../../src/templates/Panel/Panel.mdx) | `import { Panel } from '@/templates';` | A full-height layer on the right with no Blanket, docked beside the Page when it fits and floating over it when it does not: `PanelContainer` and its parts (`PanelHeader`, `PanelSubheader`, `PanelBody`, `PanelFooter`), filled into the Frame's `panel`. Two types, Details and Notifications. For content that must be dealt with before anything else, use `Modal`. |

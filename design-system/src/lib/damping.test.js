@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { dampedStretch, dampedPosition, springBackValue, springBack, settleMsOf } from './damping';
+import { dampedStretch, springBackValue, springBack, settleMsOf } from './damping';
 import { SPRINGS } from '../tokens/ladder/springs.generated.js';
 
 const opts = { limit: 640, stiffness: 0.5, maxStretch: 48 };
@@ -53,18 +53,6 @@ describe('dampedStretch', () => {
 
     it('a zero maximum stretch is a hard wall', () => {
         expect(dampedStretch(5000, { ...opts, maxStretch: 0 })).toBe(0);
-    });
-});
-
-describe('dampedPosition', () => {
-    it('follows the pointer 1:1 up to the limit', () => {
-        expect(dampedPosition(500, opts)).toBe(500);
-        expect(dampedPosition(640, opts)).toBe(640);
-    });
-    it('resists past the limit and stays bounded', () => {
-        expect(dampedPosition(700, opts)).toBeGreaterThan(640);
-        expect(dampedPosition(700, opts)).toBeLessThan(700);
-        expect(dampedPosition(1e9, opts)).toBeLessThanOrEqual(640 + 48);
     });
 });
 

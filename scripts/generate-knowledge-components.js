@@ -21,7 +21,7 @@ import { loadFacts, readBarrel } from './lib/ds-facts.mjs';
 import { isEntry } from './lib/findings.mjs';
 import { checkArtifacts, writeArtifacts } from './lib/generated-artifact.js';
 import { renderInventions, renderSelfCheck } from './lib/inventions.mjs';
-import { readPatterns, renderPatterns } from './lib/patterns-index.mjs';
+import { readTemplates, renderTemplates } from './lib/templates-index.mjs';
 
 /** Repo-relative path of a component's generated doc, or null if it has none. */
 function generatedDocFor(name) {
@@ -63,7 +63,7 @@ function renderComponentIndex(components, aliases) {
   doc += `props, variants, tokens touched — derived from source.\n\n`;
   doc += renderInventions(readInventions());
   const facts = loadFacts(REPO_ROOT);
-  doc += renderPatterns(readPatterns(REPO_ROOT), { from: 'design-system/agent-views/components', lookup: (name) => facts.lookup(name) });
+  doc += renderTemplates(readTemplates(REPO_ROOT), { from: 'design-system/agent-views/components', lookup: (name) => facts.lookup(name) });
   doc += `## UI components (${components.length})\n\n`;
   doc += components
     .map((name) => {
@@ -95,7 +95,7 @@ Nothing here is authored, and nothing here explains a component.
 | \`components.json\` | the barrels (\`@/components\`, \`@/templates\`), each component's and template's propTypes, defaults and JSDoc | For a program: which components and templates exist (each record's \`kind\`), which props each takes, which values an enum prop accepts |
 | \`tokens.json\` | the same token files as \`tokens.md\` | For a program: each token's tier, group and first declared value |
 | \`_inventions.json\` | hand-kept, reviewed in PRs | The names agents reach for that do not exist here; rendered into the header of \`components/index.md\` |
-| \`_patterns.json\` | hand-kept, reviewed in PRs | The templates a page, section, card, table or overlay starts from: each one's group and when to reach for it; rendered into \`components/index.md\` with its import and page from source |
+| \`_templates.json\` | hand-kept, reviewed in PRs | The templates a page, section, card, table or overlay starts from: each one's group and when to reach for it; rendered into \`components/index.md\` with its import and page from source |
 | \`_aliases.json\` | hand-kept, reviewed in PRs | The other words a component is asked by, which its name and docs do not say; \`ds_find\` ranks on them and \`ds_get\` prints them. Not rendered into \`components/index.md\`, which is the existence list, not a thesaurus |
 | \`_placements.json\` | hand-kept, reviewed in PRs | Component placements that \`ds/placement\` warns on: which components inside which slot or container belong to a different pattern, what to use instead, and the \`ds guide\` topic to read |
 
