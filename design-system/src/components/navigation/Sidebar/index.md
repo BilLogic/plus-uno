@@ -14,7 +14,7 @@ Also asked as: left nav, side nav, side navigation.
 
 **Source:** `design-system/src/components/navigation/Sidebar/Sidebar.jsx`
 
-**Stories:** `design-system/src/components/navigation/Sidebar/Sidebar.stories.jsx` — Overview, Geometry, KeyboardDisclosure, Tutor, DefaultRole, PrototypeAreas, OnboardingInProgress, OnboardingDone, SectionsOpen, SectionsCollapsed, TabsNone, TabsFew, TabsMany, TabsClipped, TabRest, TabHover, TabFocus, TabSelected, TabsCollapsedWithSelection, ClosingTabs, AccountHug, AccountRow, SidebarOpen, SidebarClosed, SidebarFloating, InnerSidebar, RowsRoundEight, InnerSwapInAndBack, InnerTaskOpenRow, InnerStepsDoneAndOff, InnerKeyboard, InnerSwapMotion, InnerSwapReducedMotion, Interactive, Light, Dark
+**Stories:** `design-system/src/components/navigation/Sidebar/Sidebar.stories.jsx` — Overview, Geometry, KeyboardDisclosure, Tutor, DefaultRole, PrototypeAreas, OnboardingInProgress, OnboardingDone, SectionsOpen, SectionsCollapsed, TabsNone, TabsFew, TabsMany, TabsClipped, TabRest, TabHover, TabFocus, TabSelected, TabsCollapsedWithSelection, ClosingTabs, AccountHug, AccountRow, SidebarOpen, SidebarClosed, SidebarFloating, InnerSidebar, RowsRoundEight, InnerSwapInAndBack, InnerTaskOpenRow, StudentBreadcrumb, InnerStepsDoneAndOff, InnerKeyboard, InnerSwapMotion, InnerSwapReducedMotion, Interactive, Light, Dark
 
 **Storybook page:** `design-system/src/components/navigation/Sidebar/Sidebar.mdx`
 
@@ -143,6 +143,7 @@ The Sidebar's width, 240, belongs to the Frame: see Frame.
 | Selected | `--ds-background-selected` with hovered and pressed steps; `--ds-text-selected`, `--ds-icon-selected`. |
 | Section title and locked rows | `--ds-text-subtlest`, `--ds-icon-subtlest`; titles at `--body-sm`. |
 | Focus ring | `--ds-border-focused`, `--focus-ring-width`, inside the row. |
+| Account row | 8 above: `--stack-md`; 12 below and at the start: `--frame-sidebar-pad`; 16 at the end: `--pad-x-lg`. |
 | Account row divider | `--ds-border`. |
 
 Docked, collapsed, peeking and overlay are the Frame's states, on the Frame page.

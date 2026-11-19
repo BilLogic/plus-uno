@@ -114,6 +114,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Part | Token |
 | --- | --- |
+| Height | 48: `--footer-height`. |
 | Track gap | `--inline-md` between the 4 equal tracks. |
 | Danger leading action | `--ds-text-danger` label and `--ds-icon-danger` icon on `--ds-background-neutral-subtle`, with `--ds-background-danger-subtler-hovered` and `--ds-background-danger-subtler-pressed` states. |
 
@@ -135,7 +136,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Tokens touched
 
-`--ds-background-danger-subtler-hovered` · `--ds-background-danger-subtler-pressed` · `--ds-background-neutral-subtle` · `--ds-icon-danger` · `--ds-text-danger` · `--inline-md`
+`--ds-background-danger-subtler-hovered` · `--ds-background-danger-subtler-pressed` · `--ds-background-neutral-subtle` · `--ds-icon-danger` · `--ds-text-danger` · `--footer-height` · `--inline-md`
 
 From `design-system/src/components/forms-and-inputs/FooterActions/FooterActions.scss`. Override these through the token layer, never with a literal.
 

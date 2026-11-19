@@ -62,6 +62,8 @@ These examples show form states within each host. See each field's component pag
 | --- | --- | --- |
 | `--panel-width-default` | 400 | The Panel a form opens in. |
 | `--panel-pad` | 24 | The Panel body's pad from every edge. |
+| `--stack-xl` | 16 | The stack between groups: one Fieldset to the next. |
+| `--stack-md` | 8 | The stack between fields inside a group, set by the Fieldset. |
 
 ## Slots
 

@@ -6475,6 +6475,7 @@
         "--ds-background-neutral-subtle",
         "--ds-icon-danger",
         "--ds-text-danger",
+        "--footer-height",
         "--inline-md"
       ]
     },
@@ -9592,7 +9593,15 @@
         "WidthFloating",
         "KeyEditing",
         "KeyRecordGone",
-        "KeyUnder1024"
+        "KeyUnder1024",
+        "FullComposition",
+        "MinimalHeaderAndBody",
+        "WidthFromProvider",
+        "Playground",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused"
       ],
       "tokens": [
         "--body-sm",
@@ -13833,6 +13842,7 @@
         "RowsRoundEight",
         "InnerSwapInAndBack",
         "InnerTaskOpenRow",
+        "StudentBreadcrumb",
         "InnerStepsDoneAndOff",
         "InnerKeyboard",
         "InnerSwapMotion",
@@ -14628,6 +14638,7 @@
         }
       ],
       "stories": [
+        "ColoredMaterial",
         "Styles",
         "WithCount",
         "TrailingMetricAppearance",
@@ -15403,6 +15414,7 @@
         "Saving",
         "Truncation",
         "OnImages",
+        "ColoredMaterial",
         "ElevatedAvatarTypes",
         "ElevatedDisabled",
         "ElevatedRemoveFocus",

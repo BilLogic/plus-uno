@@ -71,6 +71,8 @@ The Sidebar, the app's navigation: the logo row, the groups with their section t
 
 <ComponentExample of={SidebarStories.InnerTaskOpenRow} title="Open row" description="Back shows the main Sidebar. What you left sits as one open row under its area, a task under Home with its progress. The page stays put." />
 
+<ComponentExample of={SidebarStories.StudentBreadcrumb} title="Student breadcrumb" description="A record without stages keeps the main Sidebar. The student sits as an open row under Students, and the page's Breadcrumb says where they are." />
+
 <ComponentExample of={SidebarStories.InnerStepsDoneAndOff} title="Steps of a task" description="A done step ticks and stays pressable; a step past your answers is dimmed, does nothing, and says why in a tooltip. The layout around it is on Frame." />
 
 <ComponentExample of={SidebarStories.AccountRow} title="Account row" description="The initials avatar, the first name and the role open the account menu, beside Help Center." />
@@ -192,6 +194,7 @@ The Sidebar's width, 240, belongs to the Frame: see <a href="?path=/docs/templat
 <tr><td>Selected</td><td><code>--ds-background-selected</code> with hovered and pressed steps; <code>--ds-text-selected</code>, <code>--ds-icon-selected</code>.</td></tr>
 <tr><td>Section title and locked rows</td><td><code>--ds-text-subtlest</code>, <code>--ds-icon-subtlest</code>; titles at <code>--body-sm</code>.</td></tr>
 <tr><td>Focus ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code>, inside the row.</td></tr>
+<tr><td>Account row</td><td>8 above: <code>--stack-md</code>; 12 below and at the start: <code>--frame-sidebar-pad</code>; 16 at the end: <code>--pad-x-lg</code>.</td></tr>
 <tr><td>Account row divider</td><td><code>--ds-border</code>.</td></tr>
 </tbody>
 </DocsTable>

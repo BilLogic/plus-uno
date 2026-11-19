@@ -19,8 +19,8 @@ import { ScreenStage } from './fit-stage.jsx';
 export const WINDOW_HEIGHT = 440; // docs-literal
 /** The width the window lays out at on a docs page, wide enough that the Sidebar docks. */
 export const TASK_STAGE = 1100; // docs-literal: keeps the Frame at or above 1024 inside the window's border
-/** The page footer's height in the ledger: 48px (--height-300, the 32 button plus 8 above and below). */
-export const BAR_TOKEN = '--height-300';
+/** The page footer's height: 48px (--footer-height, one spacious button). */
+export const BAR_TOKEN = '--footer-height';
 
 export const TASK_STEPS = ['Student', 'Schedule', 'Goals', 'Materials', 'Review'];
 

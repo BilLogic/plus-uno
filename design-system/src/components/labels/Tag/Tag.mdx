@@ -3,6 +3,7 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as TagStories from './Tag.stories.jsx';
 import { Tag } from '@/components';
+import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -76,6 +77,8 @@ category.
 <ComponentExample of={TagStories.OnImages} title="Elevated" description={<><code>isElevated</code> lifts a read-only or link tag onto a photo, a thumbnail or a video, on the overlay surface with its shadow and no border.</>} />
 
 <ComponentExample of={TagStories.ElevatedAvatarTypes} title="Elevated avatar types" description="A person, agent or team tag takes the same ground, and its avatar keeps its own fill." />
+
+<ComponentExample of={TagStories.ColoredMaterial} title="Colored material" description={<><code>material</code> (<code>bold</code> or <code>subtle</code>) with <code>materialColor</code> (brand, success, warning, danger, information or discovery) gives a read-only tag a colored fill and the material edge over a picture. A removable or selectable tag ignores it. See <DocsLink id="foundations-visual-elevation-material">Material</DocsLink>.</>} />
 
 </div>
 

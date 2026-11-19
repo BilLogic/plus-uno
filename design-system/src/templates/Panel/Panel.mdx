@@ -109,6 +109,22 @@ Drag the Frame's width. From 1168 a 400 Panel docks beside the Page at an edge l
 
 <div className="sb-ds-doc-section">
 
+## Composition
+
+The parts on their own, outside a Frame, at the width they are given.
+
+<ComponentExample of={PanelStories.FullComposition} title="Full composition" description="Back, title and actions in the header, a subheader, the body, and a footer with its disclaimer beside the action." />
+
+<ComponentExample of={PanelStories.MinimalHeaderAndBody} title="Header and body" description="The smallest Panel: a header and a body, with no footer." />
+
+<ComponentExample of={PanelStories.WidthFromProvider} title="Width from the provider" description={<>A Panel with no width of its own takes the width of the nearest <code>PanelProvider</code>, shared by every Panel under it.</>} />
+
+<DocsInteractivePlayground of={PanelStories.Playground} description="The width control sets the Panel's width: the narrowest, the default or the widest its splitter allows." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Key states
 
 <ComponentExample of={PanelStories.KeyEditing} title="Editing" description="The same Panel with the form open and its full-bleed footer: Discard (Default) left and Save (Primary) right; Close in the header dismisses, so no Cancel. Save returns to reading, which has no footer." />

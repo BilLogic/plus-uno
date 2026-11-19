@@ -14,7 +14,7 @@ Also asked as: lozenge, pill, state label.
 
 **Source:** `design-system/src/components/labels/StatusTag/StatusTag.jsx`
 
-**Stories:** `design-system/src/components/labels/StatusTag/StatusTag.stories.jsx` — Styles, WithCount, TrailingMetricAppearance, IconBefore, Truncation, NarrowContainer, NeverAButton, PinnedWeight, UnknownValuesFallBack, Interactive, Rest, Hovered, Pressed, Focused, Disabled
+**Stories:** `design-system/src/components/labels/StatusTag/StatusTag.stories.jsx` — ColoredMaterial, Styles, WithCount, TrailingMetricAppearance, IconBefore, Truncation, NarrowContainer, NeverAButton, PinnedWeight, UnknownValuesFallBack, Interactive, Rest, Hovered, Pressed, Focused, Disabled
 
 **Storybook page:** `design-system/src/components/labels/StatusTag/StatusTag.mdx`
 

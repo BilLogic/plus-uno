@@ -57,7 +57,7 @@ export function placeToken(name, file = '') {
     return place('spacing', 'primitive');
   }
   if (TEMPLATE_PREFIXES.some((p) => name.startsWith(`--${p}-`))) return place('spacing', 'semantic', 'templates');
-  if (/^--(pad|stack|inline|radius|control|focus-ring|grid|screen|content|border|breakpoint|col)-/.test(name)) {
+  if (/^--(pad|stack|inline|radius|control|footer|focus-ring|grid|screen|content|border|breakpoint|col)-/.test(name)) {
     return place('spacing', 'semantic', 'global');
   }
   // Card, modal, popup, table, blanket, panel and every per-component size

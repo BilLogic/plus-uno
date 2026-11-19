@@ -42,6 +42,10 @@ The Bell in the Sidebar, with its unread count, opens the Inbox. It sits with th
 
 Drag the Frame's width. From 1168 a 400 Panel docks beside the Page at an edge line with no shadow. Under it the Panel floats on the overlay material and shadow, capped at 320 under 1024 and full width under 768. It never has a Blanket.
 
+## Composition
+
+The parts on their own, outside a Frame, at the width they are given.
+
 ## Key states
 
 ### Beside the AI panel

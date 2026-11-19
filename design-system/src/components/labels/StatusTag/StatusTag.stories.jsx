@@ -89,6 +89,28 @@ const tokenWeight = (host, token) => {
 
 /* ----------------------------------------------------------------- stories */
 
+/** Colored material: `material` (bold or subtle) fills a colored status over a picture, with the material edge. Neutral has none. */
+export const ColoredMaterial = () => (
+    <div style={{ ...row, padding: 'var(--pad-x-lg)', backgroundImage: 'linear-gradient(135deg, var(--ds-background-accent-orange-subtler), var(--ds-background-accent-teal-bolder) 45%, var(--ds-background-neutral-bold))' }}>
+        <StatusTag appearance="success" material="bold" data-testid="bold">Approved</StatusTag>
+        <StatusTag appearance="danger" material="subtle" data-testid="subtle">Overdue</StatusTag>
+        <StatusTag appearance="neutral" material="bold" data-testid="neutral">Draft</StatusTag>
+    </div>
+);
+
+ColoredMaterial.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const t = (token) => tokenColor(canvasElement, token);
+    const bold = getComputedStyle(canvas.getByTestId('bold'));
+    await expect(bold.backgroundColor, 'bold fills in the appearance color').toBe(t('--ds-background-success-material-bold'));
+    await expect(bold.boxShadow, 'the material edge').toContain(t('--ds-border-material'));
+    const subtle = getComputedStyle(canvas.getByTestId('subtle'));
+    await expect(subtle.backgroundColor, 'subtle sits on the overlay material').toBe(t('--ds-surface-material-overlay'));
+    await expect(subtle.color, 'subtle text takes the color').toBe(t('--ds-text-danger'));
+    await expect(getComputedStyle(canvas.getByTestId('neutral')).backgroundColor, 'neutral has no colored material')
+        .not.toBe(t('--ds-surface-material-overlay'));
+};
+
 /** Every appearance at every spacing. Fill is the appearance's tinted background, text its (Text), border its pressed step. */
 export const Styles = () => (
     <div style={grid}>
