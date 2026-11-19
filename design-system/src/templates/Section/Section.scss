@@ -26,7 +26,7 @@
     gap: var(--section-stack-lg);
 }
 
-/* `_Section header`: the title row, then the tabs or toolbar row when there is one */
+/* `_Section header`: the title row, then the views and the search and filters rows when there are any */
 .plus-template-section-header {
     display: flex;
     flex-direction: column;
@@ -171,18 +171,6 @@
     font: var(--body-sm);
     color: var(--ds-text-subtle);
     white-space: nowrap;
-}
-
-/* Tabs row: the tabs, then "Add view" at its end. */
-.plus-template-section-tabs {
-    display: flex;
-    align-items: center;
-    gap: var(--inline-md);
-    min-width: 0;
-}
-
-.plus-template-section-toolbar {
-    min-width: 0;
 }
 
 /* Loading: skeleton bars in place of the header, Element/stack-sm apart. */
@@ -336,50 +324,4 @@
     display: flex;
     justify-content: flex-end;
     min-width: 0;
-}
-
-/*
- * `_Section toolbar`: search, filters and count at the start, actions at the
- * end, wrapping Section/stack-sm under each other on a narrow section.
- */
-.plus-section-toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    column-gap: var(--inline-lg);
-    row-gap: var(--section-stack-sm);
-    min-height: var(--control-md);
-    min-width: 0;
-}
-
-.plus-section-toolbar__start {
-    display: flex;
-    flex: 1 1 auto;
-    align-items: center;
-    gap: var(--inline-md);
-    min-width: min(100%, var(--section-toolbar-min-width));
-}
-
-.plus-section-toolbar__search {
-    flex: 0 1 auto;
-    min-width: 0;
-}
-
-.plus-section-toolbar__slot {
-    display: flex;
-    align-items: center;
-    gap: var(--inline-sm);
-    flex-shrink: 0;
-}
-
-/* The count truncates first. */
-.plus-section-toolbar__count {
-    flex: 1 1 0;
-    min-width: var(--section-toolbar-count-min-width);
-    overflow: hidden;
-    font: var(--body-sm);
-    color: var(--ds-text-subtle);
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }

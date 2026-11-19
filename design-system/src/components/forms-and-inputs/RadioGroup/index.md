@@ -12,7 +12,7 @@ Also asked as: single choice, radio buttons, single select, multiple choice, rad
 
 **Source:** `design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.stories.jsx` — Overview, Keyboard, Orientation, Size, LinearScale, Descriptions, Reveal, States, Validation, TwoGroupsWithoutIds, Interactive, Soft, Tiles, TileRest, TileHovered, TileSelected, TileFocused, TileInvalid, TileReadOnly, TileDisabled, Unanswered, Selected, Hovered, Focused, Required, Invalid, ReadOnly, Disabled
+**Stories:** `design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.stories.jsx` — Overview, Keyboard, Orientation, Size, LinearScale, Descriptions, Reveal, States, Validation, TwoGroupsWithoutIds, Interactive, Soft, Tiles, TileRest, TileHovered, TileSelected, TileFocused, TileInvalid, TileReadOnly, TileDisabled, SoftRest, SoftHovered, SoftPressed, SoftSelected, SoftSelectedHovered, SoftFocused, SoftInvalid, SoftInvalidSelected, SoftReadOnly, SoftDisabled, SoftMixedFlow, Unanswered, Selected, Hovered, Focused, Required, Invalid, ReadOnly, Disabled
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.mdx`
 
@@ -126,13 +126,14 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | State | What changes |
 | --- | --- |
+| Rest | As Radio; in `soft`, `--ds-background-neutral` fill with no edge and no radio dot. |
 | Hovered | As Radio. Unselected: `--ds-background-input-hovered` with a `--ds-border-brand` edge (or `--ds-background-neutral-hovered` in `soft`). Selected: the hovered step of the selected bold fill (or `--ds-background-selected-hovered` in `soft`). |
 | Selected | As Radio: `--ds-background-selected-bold` fill and `--ds-border-selected` edge; in `soft`, `--ds-background-selected` fill, 1px `--ds-border-selected` edge, and a trailing `fa-solid fa-check` icon in `--ds-icon-selected`. |
 | Pressed | No step of its own in plain/card; in `soft`, an unselected option steps to `--ds-background-neutral-pressed` and a selected option steps to `--ds-background-selected-pressed`. |
 | Focused | A 2px ring in `--ds-border-focused` on the one tab stop (around the row in `soft` and `tile`). |
 | Invalid | Unselected options take `--ds-border-danger` (and in `soft`, selected options do too), with one message for the group. |
-| Read-only | Full contrast, focusable, no hover, `aria-readonly` on the group; unchecked radios take the `--ds-background-neutral` fill and the answer does not change. |
-| Disabled | Every option takes the disabled fill and edge and leaves the tab order. |
+| Read-only | Full contrast, focusable, no hover, `aria-readonly` on the group; unchecked radios take the `--ds-background-neutral` fill and the answer does not change. In `soft`, the selected row keeps `--ds-background-selected`, its `--ds-border-selected` edge and the trailing check in `--ds-icon-selected`; unselected rows stay `--ds-background-neutral`, with no hover or pressed step and a default cursor. |
+| Disabled | Every option takes the disabled fill and edge and leaves the tab order. In `soft`, every row takes `--ds-background-disabled` and a `--ds-border-disabled` edge; a selected row keeps its trailing check, in `--ds-icon-disabled`. |
 
 ### Tokens
 

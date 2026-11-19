@@ -724,6 +724,26 @@ test('rejudge: writes reach, screenshot and per-item fit as new rows marked reju
   }
 });
 
+test('structuralFit: a bare Select in Section filters counts against, and the filters prop counts as quick filters', () => {
+  const expected = expectedFor('session-review-queue');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-bare-select-'));
+  try {
+    fs.mkdirSync(path.join(dir, 'src'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'src/App.jsx'), [
+      "import { Section } from '@/templates';",
+      "import { Select } from '@/components';",
+      'export default function App() {',
+      "  return <Section title=\"Sessions\" filters={[{ text: 'All', menu: () => <Select options={[]} /> }]} />;",
+      '}',
+    ].join('\n'));
+    const structural = structuralFit({ folder: dir, expected });
+    assert.equal(structural['bare-select-in-filters']?.verdict, 'ignored');
+    assert.equal(structural.filtering?.verdict, 'ignored');
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('structuralFit + fitJudge: structural items are scored by the checker while the AI judge scores semantic items from source only', () => {
   const expected = expectedFor('session-review-queue');
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-structural-fit-'));
@@ -733,13 +753,13 @@ test('structuralFit + fitJudge: structural items are scored by the checker while
       path.join(dir, 'src/App.jsx'),
       [
         "import { Frame, Page, PageHeader, Section, Table } from '@/templates';",
-        "import { Banner, FilterButton, Panel, SearchField, usePanelControl } from '@/components';",
+        "import { Banner, Panel, SearchField, usePanelControl } from '@/components';",
         'export default function App() {',
         '  const panel = usePanelControl();',
         '  return (',
         '    <Frame panel={<Panel>Details</Panel>}>',
         '      <Page header={<PageHeader title="Queue" />} banner={<Banner appearance="warning">Overdue</Banner>}>',
-        '        <Section title="Sessions" toolbar={<Section.Toolbar search={<SearchField label="Search" />} filters={<FilterButton label="Status" />} />}>',
+        '        <Section title="Sessions" search={<SearchField label="Search" />} filters={[{ key: "status", label: "Status", text: "All" }]}>',
         '          <Table />',
         '        </Section>',
         '      </Page>',
@@ -752,9 +772,9 @@ test('structuralFit + fitJudge: structural items are scored by the checker while
     assert.equal(structural['queue-page']?.verdict, 'followed');
     assert.equal(structural.filtering?.verdict, 'followed');
     assert.equal(structural['banner-under-page-header']?.verdict, 'followed');
-    assert.equal(structural['controls-in-section-toolbar']?.verdict, 'followed');
+    assert.equal(structural['controls-in-section-header']?.verdict, 'followed');
     assert.equal(structural['detail-in-frame-panel']?.verdict, 'followed');
-    assert.equal(structural['bare-select-in-toolbar']?.verdict, 'followed');
+    assert.equal(structural['bare-select-in-filters']?.verdict, 'followed');
     assert.equal(structural['banner-above-or-flush-page-header']?.verdict, 'followed');
 
     let promptSeen = '';

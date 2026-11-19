@@ -4,6 +4,7 @@ import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { Illustration } from '@/components';
+import CheckboxGroup from '../CheckboxGroup';
 import RadioGroup from './RadioGroup';
 
 export default {
@@ -598,6 +599,199 @@ export const TileDisabled = {
         const tile = canvasElement.querySelector('.plus-choice-tile');
         await expect(getComputedStyle(tile).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-disabled'));
         await expect(getComputedStyle(tile).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-disabled'));
+    },
+};
+
+/** Soft state matrix: rest, hovered, pressed, selected, selected-hovered, focused, invalid, read-only, disabled. */
+const softOptions = tileChoices.slice(0, 2).map(({ value, label }) => ({ value, label }));
+const softRows = (canvasElement) => [...canvasElement.querySelectorAll('.plus-choice-soft')].map((row) => {
+    row.style.transition = 'none';
+    return row;
+});
+const softCheck = (row) => row.querySelector('.plus-choice-soft-check');
+
+export const SoftRest = {
+    render: () => <RadioGroup name="rg-soft-rest" legend="Tutoring format" appearance="soft" options={softOptions} />,
+    play: async ({ canvasElement }) => {
+        const [row] = softRows(canvasElement);
+        await expect(getComputedStyle(row).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+        await expect(getComputedStyle(row).borderTopColor).toBe('rgba(0, 0, 0, 0)');
+        await expect(getComputedStyle(softCheck(row)).opacity).toBe('0');
+    },
+};
+
+export const SoftHovered = {
+    render: () => <RadioGroup name="rg-soft-hover" legend="Tutoring format" appearance="soft" options={softOptions} />,
+    play: async ({ canvasElement }) => {
+        const [row] = softRows(canvasElement);
+        const hovered = withForcedPseudo(row, ':hover', () => getComputedStyle(row).backgroundColor);
+        await expect(hovered).toBe(tokenColor(canvasElement, '--ds-background-neutral-hovered'));
+    },
+};
+
+export const SoftPressed = {
+    render: () => <RadioGroup name="rg-soft-pressed" legend="Tutoring format" appearance="soft" options={softOptions} />,
+    play: async ({ canvasElement }) => {
+        const [row] = softRows(canvasElement);
+        const pressed = withForcedPseudo(row, ':active', () => getComputedStyle(row).backgroundColor);
+        await expect(pressed).toBe(tokenColor(canvasElement, '--ds-background-neutral-pressed'));
+    },
+};
+
+export const SoftSelected = {
+    render: () => <RadioGroup name="rg-soft-selected" legend="Tutoring format" appearance="soft" options={softOptions} defaultValue="one-on-one" />,
+    play: async ({ canvasElement }) => {
+        const [row] = softRows(canvasElement);
+        await expect(getComputedStyle(row).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected'));
+        await expect(px(getComputedStyle(row).borderTopWidth)).toBe(1);
+        await expect(getComputedStyle(row).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-selected'));
+        await expect(getComputedStyle(softCheck(row)).opacity).toBe('1');
+        await expect(getComputedStyle(softCheck(row)).color).toBe(tokenColor(canvasElement, '--ds-icon-selected'));
+    },
+};
+
+export const SoftSelectedHovered = {
+    render: () => <RadioGroup name="rg-soft-selected-hover" legend="Tutoring format" appearance="soft" options={softOptions} defaultValue="one-on-one" />,
+    play: async ({ canvasElement }) => {
+        const [row] = softRows(canvasElement);
+        const hovered = withForcedPseudo(row, ':hover', () => ({
+            backgroundColor: getComputedStyle(row).backgroundColor,
+            borderTopColor: getComputedStyle(row).borderTopColor,
+        }));
+        await expect(hovered.backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected-hovered'));
+        await expect(hovered.borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-selected'));
+        await expect(getComputedStyle(softCheck(row)).opacity).toBe('1');
+    },
+};
+
+export const SoftFocused = {
+    render: () => <RadioGroup name="rg-soft-focus" legend="Tutoring format" appearance="soft" options={softOptions} defaultValue="one-on-one" />,
+    play: async ({ canvasElement }) => {
+        const radio = within(canvasElement).getByRole('radio', { name: 'One-on-one' });
+        const [row] = softRows(canvasElement);
+        radio.focus({ focusVisible: true });
+        await waitFor(() => expect(getComputedStyle(row).outlineStyle).toBe('solid'));
+        await expect(px(getComputedStyle(row).outlineWidth)).toBe(2);
+        await expect(px(getComputedStyle(row).outlineOffset)).toBe(2);
+        await expect(getComputedStyle(row).outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        radio.blur();
+    },
+};
+
+export const SoftInvalid = {
+    render: () => (
+        <RadioGroup
+            name="rg-soft-invalid"
+            legend="Tutoring format"
+            appearance="soft"
+            options={softOptions}
+            isRequired
+            error="Choose a tutoring format."
+        />
+    ),
+    play: async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByRole('alert').textContent).toBe('Choose a tutoring format.');
+        const [row] = softRows(canvasElement);
+        await expect(getComputedStyle(row).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-danger'));
+        await expect(getComputedStyle(row).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+    },
+};
+
+export const SoftInvalidSelected = {
+    render: () => (
+        <RadioGroup
+            name="rg-soft-invalid-selected"
+            legend="Tutoring format"
+            appearance="soft"
+            options={softOptions}
+            defaultValue="one-on-one"
+            error="Choose a tutoring format."
+        />
+    ),
+    play: async ({ canvasElement }) => {
+        const [row] = softRows(canvasElement);
+        await expect(getComputedStyle(row).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected'));
+        await expect(getComputedStyle(row).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-danger'));
+        await expect(getComputedStyle(softCheck(row)).opacity).toBe('1');
+    },
+};
+
+export const SoftReadOnly = {
+    render: () => <RadioGroup name="rg-soft-readonly" legend="Tutoring format" appearance="soft" options={softOptions} defaultValue="one-on-one" isReadOnly />,
+    play: async ({ canvasElement }) => {
+        const [selected, other] = softRows(canvasElement);
+        const radio = within(selected).getByRole('radio', { name: 'One-on-one' });
+        await expect(getComputedStyle(selected).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected'));
+        await expect(getComputedStyle(softCheck(selected)).opacity).toBe('1');
+        await expect(getComputedStyle(other).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+        // No hover or pressed step on either row, and the answer stays put.
+        await expect(withForcedPseudo(other, ':hover', () => getComputedStyle(other).backgroundColor)).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+        await expect(withForcedPseudo(selected, ':hover', () => getComputedStyle(selected).backgroundColor)).toBe(tokenColor(canvasElement, '--ds-background-selected'));
+        await expect(getComputedStyle(other).cursor).toBe('default');
+        await userEvent.click(other);
+        await expect(radio).toHaveAttribute('aria-checked', 'true');
+        // Still focusable, with the ring around the row.
+        radio.focus({ focusVisible: true });
+        await expect(document.activeElement).toBe(radio);
+        await waitFor(() => expect(getComputedStyle(selected).outlineStyle).toBe('solid'));
+        radio.blur();
+    },
+};
+
+export const SoftDisabled = {
+    render: () => <RadioGroup name="rg-soft-disabled" legend="Tutoring format" appearance="soft" options={softOptions} defaultValue="one-on-one" isDisabled />,
+    play: async ({ canvasElement }) => {
+        const [selected, other] = softRows(canvasElement);
+        for (const row of [selected, other]) {
+            await expect(getComputedStyle(row).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-disabled'));
+            await expect(getComputedStyle(row).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-disabled'));
+        }
+        await expect(getComputedStyle(softCheck(selected)).opacity).toBe('1');
+        await expect(getComputedStyle(softCheck(selected)).color).toBe(tokenColor(canvasElement, '--ds-icon-disabled'));
+        await expect(getComputedStyle(softCheck(other)).opacity).toBe('0');
+        await expect(withForcedPseudo(other, ':hover', () => getComputedStyle(other).backgroundColor)).toBe(tokenColor(canvasElement, '--ds-background-disabled'));
+        const radio = within(selected).getByRole('radio', { name: 'One-on-one' });
+        await expect(radio).toHaveAttribute('data-disabled');
+        await userEvent.tab();
+        await expect(canvasElement.contains(document.activeElement) && canvasElement.querySelector('.plus-radio-group').contains(document.activeElement)).toBe(false);
+    },
+};
+
+/** A choice flow: soft single-select questions in the majority, one multi-select question that keeps its visible checkboxes. */
+export const SoftMixedFlow = {
+    render: () => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--content-max-width-reading)' }}>
+            <RadioGroup name="rg-flow-1" legend="Session format" appearance="soft" defaultValue="one-on-one" options={softOptions} />
+            <RadioGroup
+                name="rg-flow-2"
+                legend="First goal for this session"
+                appearance="soft"
+                options={[{ value: 'fluency', label: 'Concept fluency' }, { value: 'homework', label: 'Homework completion' }]}
+            />
+            {/* The minority type keeps a visible control, so people notice the question takes several answers. */}
+            <CheckboxGroup
+                name="cbg-flow-3"
+                legend="Subjects you can tutor"
+                appearance="card"
+                defaultValue={['math']}
+                options={[{ value: 'math', label: 'Math' }, { value: 'reading', label: 'Reading' }]}
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const radioRows = canvasElement.querySelectorAll('.plus-radio-group-soft .plus-choice-soft');
+        await expect(radioRows).toHaveLength(4);
+        for (const radio of canvasElement.querySelectorAll('.plus-radio-group-soft [role="radio"]')) {
+            await expect(getComputedStyle(radio).opacity).toBe('0');
+        }
+        await expect(canvasElement.querySelectorAll('.plus-choice-soft-check')).toHaveLength(4);
+        const boxes = within(canvasElement).getAllByRole('checkbox');
+        await expect(boxes).toHaveLength(2);
+        for (const box of boxes) {
+            await expect(box.closest('.plus-choice-soft')).toBeNull();
+            await expect(getComputedStyle(box).opacity).toBe('1');
+            await expect(px(getComputedStyle(box).width)).toBeGreaterThan(1);
+        }
     },
 };
 

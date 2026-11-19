@@ -134,7 +134,7 @@ Every control in a header row is 32: Buttons, Icon buttons and Filter buttons at
 
 <ComponentExample of={SectionStories.Subsection} title="Subsection" description="Any header nests once. The title drops to the subsection size and its primary acts on it alone." />
 
-<ComponentExample of={SectionStories.ToolbarSearch} title="Search" description={<>The Search field, a collapsible compact <code>SearchField</code>, grows left into a field. Esc clears it, a second Esc closes it, and it stays open while it holds text.</>} />
+<ComponentExample of={SectionStories.SearchInHeader} title="Search" description={<>The Search field, a collapsible compact <code>SearchField</code>, grows left into a field. Esc clears it, a second Esc closes it, and it stays open while it holds text.</>} />
 
 </div>
 
@@ -222,8 +222,6 @@ Loading, errors and the search field follow their patterns and components: Loadi
 <tr><td><code>level</code></td><td><code>page</code> makes the Section the page header: an h1, and the Sections it holds are h2s. Left off, the title is one level below what holds it.</td></tr>
 <tr><td><code>named</code></td><td>Makes the Section a region named by its title, for one that stands apart as a landmark.</td></tr>
 <tr><td><code>onClearAll</code> · <code>onMoreFilters</code> · <code>onOpenFilters</code></td><td>Clear all, More filters, and the Filter button of a narrow Section.</td></tr>
-<tr><td><code>onAddView</code> · <code>addViewLabel</code></td><td>The Add view button at the end of the views, and its label.</td></tr>
-<tr><td><code>tabs</code> · <code>toolbar</code></td><td>Deprecated. Use <code>views</code> and <code>format</code> for the tab row, and <code>search</code> and <code>filters</code> for the toolbar row.</td></tr>
 <tr><td><code>id</code> · <code>className</code> · <code>style</code></td><td>Passed to the Section's root.</td></tr>
 <tr><td><code>spacing</code></td><td><code>compact</code>, <code>default</code> or <code>spacious</code>: the space between the header, the body and the footer.</td></tr>
 <tr><td><code>children</code></td><td>The body: a Table, a card grid, a list, a form or subsections.</td></tr>

@@ -22,8 +22,7 @@ import './Section.scss';
  * `custom` swaps title and description for a free-form `header` slot, and the
  * title stays in the markup as its heading, visually hidden, so assistive tech
  * still has it. `loading` swaps the header for skeleton bars while the section
- * loads. The older `tabs` and `toolbar` props (and the `tabs-only` and
- * `toolbar` types) are deprecated: use the rows below.
+ * loads.
  *
  * ROWS. Under the title row a header can carry two more, all on one 32 line.
  * Row 2 holds the `views` at the start and the `format` switch at the end.
@@ -67,12 +66,7 @@ export const SECTION_SPACINGS = ['default', 'compact', 'spacious'];
 /** Section width from which the filter side sits beside the body. */
 export const SECTION_DETAIL_FLOOR = FRAME_LAYOUT.splitFloor;
 
-const inferType = ({ header, toolbar, tabs }) => {
-    if (header) return 'custom';
-    if (toolbar) return 'toolbar';
-    if (tabs) return 'tabs';
-    return 'default';
-};
+const inferType = ({ header }) => (header ? 'custom' : 'default');
 
 /** How many filter triggers show before the rest go in "More filters". */
 export const SECTION_VISIBLE_FILTERS = 3;
@@ -192,17 +186,13 @@ const TITLE_LINE = {
 /**
  * The header while the section loads: a bar for the title row (half width,
  * the title's height), one for the description, and one for the views or
- * filters row when there is one. `tabs-only` draws only that last bar.
+ * filters row when there is one.
  */
-const HeaderSkeleton = ({ rank, hasBottomRow, tabsOnly }) => (
+const HeaderSkeleton = ({ rank, hasRows }) => (
     <div className="plus-template-section-skeleton">
-        {!tabsOnly && (
-            <>
-                <Skeleton width="50%" height={TITLE_LINE[rank]} radius="element-radius-sm" />
-                <Skeleton width="100%" height="var(--type-line-height-125)" radius="element-radius-sm" />
-            </>
-        )}
-        {(hasBottomRow || tabsOnly) && (
+        <Skeleton width="50%" height={TITLE_LINE[rank]} radius="element-radius-sm" />
+        <Skeleton width="100%" height="var(--type-line-height-125)" radius="element-radius-sm" />
+        {hasRows && (
             <Skeleton className="plus-template-section-skeleton__row" width="100%" height="var(--row-height-md)" radius="element-radius-sm" />
         )}
     </div>
@@ -210,62 +200,7 @@ const HeaderSkeleton = ({ rank, hasBottomRow, tabsOnly }) => (
 
 HeaderSkeleton.propTypes = {
     rank: PropTypes.oneOf(['page', 'section', 'subsection']).isRequired,
-    hasBottomRow: PropTypes.bool,
-    tabsOnly: PropTypes.bool,
-};
-
-/** @deprecated use the `search`, `filters` and `count` props of the three-row header.
- * `_Section toolbar`: the row a section header carries above a table or a
- * list. Search, filters and a count at the start, actions at the end; the
- * count truncates first. Selected rows never change it: a Dynamic table's
- * bulk bar is its own head row.
- */
-export const SectionToolbar = ({
-    search,
-    filters,
-    count,
-    actions,
-    className = '',
-    ...props
-}) => {
-    const classes = ['plus-section-toolbar', className].filter(Boolean).join(' ');
-
-    return (
-        <div className={classes} {...props}>
-            <div className="plus-section-toolbar__start">
-                {search && <div className="plus-section-toolbar__search">{search}</div>}
-                {filters && <div className="plus-section-toolbar__slot">{filters}</div>}
-                {/* A polite live region: the count changes as search and filters narrow the rows. */}
-                {count && <span className="plus-section-toolbar__count" role="status">{count}</span>}
-            </div>
-            {actions && <div className="plus-section-toolbar__slot plus-section-toolbar__actions">{actions}</div>}
-        </div>
-    );
-};
-
-SectionToolbar.propTypes = {
-    /** Search field slot, at the start */
-    search: PropTypes.node,
-    /** Filters slot: dropdown buttons */
-    filters: PropTypes.node,
-    /** Count in words, such as "12 of 48 students"; truncates first, and is announced politely when it changes */
-    count: PropTypes.node,
-    /** Actions slot, at the end */
-    actions: PropTypes.node,
-    className: PropTypes.string,
-};
-
-/** Dev-only notice, once per prop, that the old header props are on their way out. */
-const warned = new Set();
-const warnDeprecatedHeaderProps = ({ tabs, toolbar }) => {
-    if (process.env.NODE_ENV === 'production') return;
-    const notes = [[tabs, 'tabs', '`views` and `format`'], [toolbar, 'toolbar', '`search` and `filters`']];
-    notes.forEach(([value, name, instead]) => {
-        if (!value || warned.has(name)) return;
-        warned.add(name);
-        // eslint-disable-next-line no-console
-        console.warn(`Section: the \`${name}\` prop is deprecated. Use ${instead} in the three-row header.`);
-    });
+    hasRows: PropTypes.bool,
 };
 
 /** Section: a span of the page grid under one heading, with its title row, views, search and filters. */
@@ -274,8 +209,6 @@ const Section = ({
     title,
     description,
     actions,
-    tabs,
-    toolbar,
     header,
     type: typeProp,
     views,
@@ -286,8 +219,6 @@ const Section = ({
     onClearAll,
     onMoreFilters,
     onOpenFilters,
-    onAddView,
-    addViewLabel = 'Add view',
     loading = false,
     layout = 'single',
     side,
@@ -313,26 +244,22 @@ const Section = ({
         className,
     ].filter(Boolean).join(' ');
 
-    warnDeprecatedHeaderProps({ tabs, toolbar });
-
     const rootRef = useRef(null);
     const ownWidth = useOwnWidth(rootRef);
     const narrow = ownWidth < FRAME_LAYOUT.fullWidthBelow;
     const hasRows = Boolean(views || format || search || (filters && filters.length));
 
-    const type = typeProp ?? inferType({ header, toolbar, tabs });
-    const tabsOnly = type === 'tabs-only';
+    const type = typeProp ?? inferType({ header });
     const custom = type === 'custom';
-    const bottomRow = type === 'toolbar' ? toolbar : (type === 'tabs' || tabsOnly) ? tabs : null;
-    const hasHeader = loading || title || description || actions || bottomRow || hasRows || (custom && header);
+    const hasHeader = loading || title || description || actions || hasRows || (custom && header);
 
     const parentLevel = useHeadingLevel();
     const isPage = rankProp === 'page';
     const level = isPage ? 1 : parentLevel + 1;
     const Title = headingTag(level);
     const rank = isPage ? 'page' : level > 2 ? 'subsection' : 'section';
-    // In `custom` and `tabs-only` the title names the section without showing.
-    const titleHidden = custom || tabsOnly;
+    // In `custom` the title names the section without showing.
+    const titleHidden = custom;
 
     const titleId = useId();
     const labelled = named && Boolean(title);
@@ -345,26 +272,24 @@ const Section = ({
             return (
                 <div className={`plus-template-section-header plus-template-section-header--${type}`}>
                     {titleNode && <div className="visually-hidden">{titleNode}</div>}
-                    <HeaderSkeleton rank={rank} hasBottomRow={Boolean(bottomRow) || hasRows} tabsOnly={tabsOnly} />
+                    <HeaderSkeleton rank={rank} hasRows={hasRows} />
                 </div>
             );
         }
         return (
             <div className={`plus-template-section-header plus-template-section-header--${type}`}>
                 {titleHidden && titleNode && <div className="visually-hidden">{titleNode}</div>}
-                {!tabsOnly && (
-                    <div className="plus-template-section-title-row">
-                        {custom ? (
-                            <div className="plus-template-section-custom">{header}</div>
-                        ) : (
-                            <div className="plus-template-section-heading">
-                                {titleNode}
-                                {description && <p className="plus-template-section-description">{description}</p>}
-                            </div>
-                        )}
-                        {actions && <div className="plus-template-section-actions">{actions}</div>}
-                    </div>
-                )}
+                <div className="plus-template-section-title-row">
+                    {custom ? (
+                        <div className="plus-template-section-custom">{header}</div>
+                    ) : (
+                        <div className="plus-template-section-heading">
+                            {titleNode}
+                            {description && <p className="plus-template-section-description">{description}</p>}
+                        </div>
+                    )}
+                    {actions && <div className="plus-template-section-actions">{actions}</div>}
+                </div>
                 {hasRows && (
                     <SectionHeaderRows
                         views={views}
@@ -377,14 +302,6 @@ const Section = ({
                         onOpenFilters={onOpenFilters}
                         narrow={narrow}
                     />
-                )}
-                {bottomRow && (
-                    <div className={type === 'toolbar' ? 'plus-template-section-toolbar' : 'plus-template-section-tabs'}>
-                        {bottomRow}
-                        {type !== 'toolbar' && onAddView && (
-                            <Button text={addViewLabel} appearance="subtle" iconBefore="plus" onClick={onAddView} />
-                        )}
-                    </div>
                 )}
             </div>
         );
@@ -518,16 +435,6 @@ Section.propTypes = {
      * @ds-context Governed by: Common actions (ds guide common-actions)
      */
     actions: PropTypes.node,
-    /** @deprecated use `views` (and `format`) in the three-row header. Tabs row under the title row (header type `tabs`, or `tabs-only`).
-     * @ds-context Used in: Section.tabs (ds guide section)
-     * @ds-context Governed by: Filtering (ds guide filtering); Forms (ds guide forms); Search (ds guide search)
-     */
-    tabs: PropTypes.node,
-    /** @deprecated use `search` and `filters` in the three-row header. Toolbar row under the title row (header type `toolbar`), usually a `Section.Toolbar`.
-     * @ds-context Used in: Section.toolbar (ds guide section)
-     * @ds-context Governed by: Filtering (ds guide filtering); Forms (ds guide forms); Search (ds guide search)
-     */
-    toolbar: PropTypes.node,
     /** Free-form header in place of title and description (header type `custom`)
      * @ds-context Used in: Section.header (ds guide section)
      */
@@ -569,10 +476,6 @@ Section.propTypes = {
     onMoreFilters: PropTypes.func,
     /** Runs when the Filter button of a narrow Section is pressed. */
     onOpenFilters: PropTypes.func,
-    /** Puts "Add view" at the end of the tabs row, and runs when it is pressed */
-    onAddView: PropTypes.func,
-    /** The "Add view" button's label */
-    addViewLabel: PropTypes.string,
     /** Swaps the header for skeleton bars and marks the section busy */
     loading: PropTypes.bool,
     /** Body layout: the content alone, content beside `side`, or stacked subsections */
@@ -621,7 +524,5 @@ Section.propTypes = {
      */
     children: PropTypes.node,
 };
-
-Section.Toolbar = SectionToolbar;
 
 export default Section;

@@ -108,7 +108,7 @@ export default {
         contentClassName: { control: false, table: { disable: true } },
         width: {
             control: 'select',
-            options: ['content', 'reading'],
+            options: ['default', 'full', 'reading'],
             table: { category: 'Design' },
         },
         id: { control: false, table: { disable: true, category: 'Development' } },
@@ -309,7 +309,7 @@ export const PairTitleInHeader = {
 /** The playground: the frame at the docs height, with its layout props live. */
 export const Interactive = {
     render: DocsFrame,
-    args: { width: 'content', surfaceDirect: false },
+    args: { width: 'default', surfaceDirect: false },
     parameters: { layout: 'padded' },
 };
 
