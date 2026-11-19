@@ -7,7 +7,7 @@ import { TextField } from '@/components';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
-import { BAR_TOKEN } from '@/storybook-docs/lib/multi-step-task.jsx';
+import { BAR_TOKEN, TASK_STAGE } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { FILLED, FormInModal, FormInPage, FormInPanel, FormInSteps, PAGE_WIDTH } from './formDemo.jsx';
@@ -104,7 +104,7 @@ export const TypeModal = {
 
 export const TypeSteps = {
     name: 'Type: In steps',
-    render: () => <ScreenStage width={STAGE} scrollable><FormInSteps /></ScreenStage>,
+    render: () => <ScreenStage width={TASK_STAGE} scrollable><FormInSteps /></ScreenStage>,
     play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement.ownerDocument.body);
         await expectNotInert(canvasElement);
@@ -200,15 +200,15 @@ export const AnatomyModal = {
 };
 
 const ANATOMY_STEPS_PARTS = [
-    { selector: '[data-probe="steps"]', label: 'Steps', at: 'start' },
-    { selector: '.plus-frame__content', label: 'Body', at: 'end' },
-    { selector: '[data-probe="bar"]', label: 'Bar', at: 'middle' },
+    { selector: '.plus-pattern-sidebar__list', label: 'Steps', at: 'start' },
+    { selector: '[data-probe="task-body"]', label: 'Body', at: 'end' },
+    { selector: '[data-probe="bar"]', label: 'Footer', at: 'middle' },
 ];
 
 export const AnatomySteps = {
     name: 'Anatomy: In steps',
     render: () => (
-        <LiveAnatomy live scrollable width={STAGE} title="A stepped form with its parts numbered" parts={ANATOMY_STEPS_PARTS}>
+        <LiveAnatomy live scrollable width={TASK_STAGE} title="A stepped form with its parts numbered" parts={ANATOMY_STEPS_PARTS}>
             <FormInSteps />
         </LiveAnatomy>
     ),

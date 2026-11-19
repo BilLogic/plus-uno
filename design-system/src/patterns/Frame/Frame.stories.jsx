@@ -1602,10 +1602,10 @@ export const LayoutMultiStepTask = {
 
         // The footer: Save and exit at the start, Back and Next at the end, one 32 line in a 48 bar.
         const tracks = footerTracks(column);
-        await expect(rect(bar).height, 'the footer is 48 high').toBeCloseTo(tokenLength(bar, BAR_TOKEN), 0);
+        await expect(rect(bar).height, 'the footer is 48 high').toBeCloseTo(tokenLength(canvasElement, BAR_TOKEN), 0);
         await expect(within(bar).queryByRole('button', { name: 'Cancel' }), 'no Cancel in footers').toBeNull();
         for (const button of [save, back, next]) {
-            await expect(rect(button).height, 'each action is 32 high').toBeCloseTo(tokenLength(bar, '--control-md'), 0);
+            await expect(rect(button).height, 'each action is 32 high').toBeCloseTo(tokenLength(canvasElement, '--control-md'), 0);
             await expect(rect(button).top, 'on one line').toBeCloseTo(rect(save).top, 0);
         }
         await expect(rect(save).left, 'Save and exit starts the line').toBeLessThan(rect(back).left);

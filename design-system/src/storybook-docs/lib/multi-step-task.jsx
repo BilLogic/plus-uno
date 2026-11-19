@@ -17,8 +17,8 @@ import { ScreenStage } from './fit-stage.jsx';
 
 /** The browser body's height on the docs page: docs geometry, in px. */
 export const WINDOW_HEIGHT = 440; // docs-literal
-/** The widest the window lays out at on a docs page: the docs' stand-in screen. */
-const TASK_SCREEN = 1024; // docs-literal
+/** The width the window lays out at on a docs page, wide enough that the Sidebar docks. */
+export const TASK_STAGE = 1100; // docs-literal: keeps the Frame at or above 1024 inside the window's border
 /** The page footer's height in the ledger: 48px (--height-300, the 32 button plus 8 above and below). */
 export const BAR_TOKEN = '--height-300';
 
@@ -135,7 +135,7 @@ export const MultiStepTask = ({
 
 /** The task in its window: on a docs page it reflows with the canvas and scales below the Page's floor (or scrolls horizontally when `scrollable`). */
 export const MultiStepTaskType = ({ address = 'app.plus.org/terms/new', scrollable = false, ...props }) => (
-    <ScreenStage width={TASK_SCREEN} fluid scrollable={scrollable}>
+    <ScreenStage width={TASK_STAGE} fluid scrollable={scrollable}>
         <BrowserWindow address={address} height={WINDOW_HEIGHT}>
             <MultiStepTask {...props} />
         </BrowserWindow>

@@ -48,9 +48,9 @@ A short form at 8-col: the Modal's header, the fields in its body, its full-blee
 
 A stepped form on its own page is a multi-step task on Frame, with the form in the body. Back keeps what was typed.
 
-1. **Steps.** The rail at the start, with done, current and later steps; four or fewer run across the top.
+1. **Steps.** The Sidebar's inner rows, with done, current and later steps.
 2. **Body.** One group per step, at reading width.
-3. **Bar.** Back and Next, full bleed; Close in the title row leaves the task. On the last step Next takes the outcome's name.
+3. **Footer.** Save and exit at the start; Back and Next at the end. On the last step Next takes the outcome's name.
 
 ## Key states
 

@@ -3,7 +3,7 @@ import { expect, userEvent, within } from 'storybook/test';
 
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
-import { MultiStepTaskType } from '@/storybook-docs/lib/multi-step-task.jsx';
+import { MultiStepTaskType, TASK_STAGE } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { PatternSection } from '@/patterns';
 import { ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
@@ -201,7 +201,7 @@ export const KeyOneTabSystem = {
 /** A multi-step task: the steps replace the Sidebar's rows, Back leaves; no breadcrumb. */
 export const KeyMultiStepTask = {
     name: 'Key case: A multi-step task',
-    render: () => staged(<MultiStepTaskType />),
+    render: () => staged(<MultiStepTaskType />, TASK_STAGE),
     play: async ({ canvasElement }) => {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
