@@ -40,13 +40,13 @@ The <DocsLink id="components-images-and-icons-icon">Icon</DocsLink> component re
 <FoundationSubsection title="Use one recognized symbol per meaning">
 Pick the plainest glyph most people read the same way (calendar for dates, bell for notifications, gear for settings) and keep one glyph per meaning across the product.
 
-<Canvas of={IconsStories.OneGlyphOneMeaning} sourceState="none" />
+<Canvas of={IconsStories.OneGlyphOneMeaning} />
 </FoundationSubsection>
 
 <FoundationSubsection title="Pair icons with text labels">
 A label states what the icon does and names it for screen readers. Leave an icon unlabeled only for a familiar action in a tight space, and give the control an accessible `label` in code.
 
-<Canvas of={IconsStories.PairWithLabels} sourceState="none" />
+<Canvas of={IconsStories.PairWithLabels} />
 </FoundationSubsection>
 
 </FoundationSection>
@@ -55,7 +55,7 @@ A label states what the icon does and names it for screen readers. Leave an icon
 
 Icons ship at three sizes bound to `Size/Icon` tokens. `--fa-width: 1em` is set globally so every glyph fills its square box without adding line height. Chevrons are always 12. Add breathing room with spacing tokens, never a larger icon size.
 
-<Canvas of={IconsStories.Sizes} sourceState="none" />
+<Canvas of={IconsStories.Sizes} />
 
 <RefTable
     head={['Size (px)', 'Figma token', 'Code', 'Use']}
@@ -72,7 +72,7 @@ Icons ship at three sizes bound to `Size/Icon` tokens. `--fa-width: 1em` is set 
 
 24 is the top of the icon scale. A larger mark, tool logo or empty-state symbol belongs in a <DocsLink id="components-images-and-icons-tile">Tile</DocsLink>, which sets its size, radius and fill together.
 
-<Canvas of={IconsStories.LargerMeansTile} sourceState="none" />
+<Canvas of={IconsStories.LargerMeansTile} />
 
 </FoundationSection>
 
@@ -80,11 +80,11 @@ Icons ship at three sizes bound to `Size/Icon` tokens. `--fa-width: 1em` is set 
 
 Use Font Awesome Free 7.2 only: `fa-solid`, `fa-regular` and `fa-brands` (such as `fa-brands fa-figma` and `fa-brands fa-github`). Pro families (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`) and Pro-only names are unlicensed and render blank, so check a glyph name against the Free set first. Regular is the default weight; solid is used where Free has no regular glyph. Where one set of icons needs a glyph Free draws only in solid, that one glyph is solid and the rest stay regular. Always use current glyph names rather than legacy aliases (`calendar-days`, not `calendar-alt`).
 
-<Canvas of={IconsStories.Families} sourceState="none" />
+<Canvas of={IconsStories.Families} />
 
 Color icons with `--ds-icon-*` tokens (`--ds-icon-success`, `--ds-icon-danger`, or the text color beside the icon), never a raw hex value.
 
-<Canvas of={IconsStories.Colors} sourceState="none" />
+<Canvas of={IconsStories.Colors} />
 
 </FoundationSection>
 

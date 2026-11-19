@@ -264,26 +264,8 @@ Sort categories from most to least (an ordinal set such as grades takes one hue 
 Students by grade in the tutoring cohort.
 
 <DoDont>
-<Do caption="Biggest at the top, darkest tone on the biggest value.">
-<ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-    {[['Grade 9', 48, '--chart-blue-boldest'], ['Grade 10', 36, '--chart-blue-bolder'], ['Grade 11', 27, '--chart-blue-bold'], ['Grade 12', 15, '--ds-background-accent-blue-subtler']].map(([label, n, tone]) => (
-        <li key={label} style={{ display: 'grid', gridTemplateColumns: 'var(--card-min-width-sm) 1fr', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-sm)' }}>
-            <span>{label}</span>
-            <span style={{ display: 'block', height: 'var(--icon-md)', width: `${n * 2}%`, borderRadius: 'var(--radius-sm)', background: `var(${tone})` }} />
-        </li>
-    ))}
-</ul>
-</Do>
-<Dont caption="Grades in any order, one tone. The eye has to read every number to find the biggest.">
-<ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
-    {[['Grade 11', 27], ['Grade 9', 48], ['Grade 12', 15], ['Grade 10', 36]].map(([label, n]) => (
-        <li key={label} style={{ display: 'grid', gridTemplateColumns: 'var(--card-min-width-sm) 1fr', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-sm)' }}>
-            <span>{label}</span>
-            <span style={{ display: 'block', height: 'var(--icon-md)', width: `${n * 2}%`, borderRadius: 'var(--radius-sm)', background: 'var(--chart-neutral)' }} />
-        </li>
-    ))}
-</ul>
-</Dont>
+<Do caption="Biggest at the top, darkest tone on the biggest value."><BiggestAtTheDoFigure /></Do>
+<Dont caption="Grades in any order, one tone; the eye has to read every number to find the biggest."><GradesInAnyDontFigure /></Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -293,19 +275,8 @@ Students by grade in the tutoring cohort.
 Attendance for one class against a 90% target.
 
 <DoDont>
-<Do caption="A green tick at 90 and a green outline on the track.">
-<div style={{ font: 'var(--body-sm)', marginBlockEnd: 'var(--stack-sm)' }}>Lincoln Middle · 86% attended</div>
-<div style={{ position: 'relative', height: 'var(--icon-md)', borderRadius: 'var(--radius-sm)', boxShadow: 'inset 0 0 0 var(--border-width-default) var(--chart-success)' }}>
-    <span style={{ position: 'absolute', insetBlock: 0, insetInlineStart: 0, width: '86%', borderRadius: 'var(--radius-sm)', background: 'var(--chart-brand)' }} />
-    <span style={{ position: 'absolute', insetBlock: '-25%', insetInlineStart: '90%', width: 'var(--stroke-2)', background: 'var(--chart-success-bold)' }} />
-</div>
-</Do>
-<Dont caption="A shaded band and a value beside the bar. The band hides the bar's own end and the text repeats the tooltip.">
-<div style={{ font: 'var(--body-sm)', marginBlockEnd: 'var(--stack-sm)' }}>Lincoln Middle · 86% attended · Target 90%</div>
-<div style={{ position: 'relative', height: 'var(--icon-md)', background: 'var(--chart-success)' }}>
-    <span style={{ position: 'absolute', insetBlock: 0, insetInlineStart: 0, width: '86%', background: 'var(--chart-brand)' }} />
-</div>
-</Dont>
+<Do caption="A green tick at 90 and a green outline on the track."><AGreenTickDoFigure /></Do>
+<Dont caption="A shaded band and a value beside the bar; the band hides the bar's own end and the text repeats the tooltip."><AShadedBandDontFigure /></Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -321,12 +292,8 @@ Disabled is a dedicated color token (`color/text/disabled`, `color/background/di
 The Reschedule button after the session has ended.
 
 <DoDont>
-<Do caption="Disabled takes color/text/disabled on color/background/disabled.">
-<span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--control-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-disabled)', color: 'var(--ds-text-disabled)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Reschedule</span>
-</Do>
-<Dont caption="Opacity on the primary button. It still looks clickable and the gray is not the system one.">
-<span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--control-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)', opacity: 0.4 }}>Reschedule</span>
-</Dont>
+<Do caption="Disabled takes color/text/disabled on color/background/disabled."><DisabledTakesColorDoFigure /></Do>
+<Dont caption="Opacity on the primary button; it still looks clickable and the gray is not the system one."><OpacityOnTheDontFigure /></Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -340,12 +307,8 @@ Links take `color/link/default` (`--ds-link`, with `--ds-link-pressed` on press 
 <FoundationSubsection title="Underline links in running text">
 
 <DoDont>
-<Do caption="Link color and underline together.">
-The session notes are ready. <a href="#foundation-links" style={{ color: 'var(--ds-link)', textDecoration: 'underline' }}>Send them to the family</a> from the link below.
-</Do>
-<Dont caption="The color alone is too close to the body text, so the link is easy to miss.">
-The session notes are ready. <a href="#foundation-links" style={{ color: 'var(--ds-link)', textDecoration: 'none' }}>Send them to the family</a> from the link below.
-</Dont>
+<Do caption="Link color and underline together."><LinkColorAndDoFigure /></Do>
+<Dont caption="The color alone is too close to the body text, so the link is easy to miss."><TheColorAloneDontFigure /></Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -376,12 +339,8 @@ The session notes are ready. <a href="#foundation-links" style={{ color: 'var(--
 Pick the role for the job. A failed payment is danger; an accent has no meaning, so it should not carry one.
 
 <DoDont>
-<Do caption="Danger for a failed payment.">
-<span style={{ color: 'var(--ds-text-danger)' }}>Payment failed</span>
-</Do>
-<Dont caption="A purple accent where the color has semantic meaning.">
-<span style={{ color: 'var(--ds-text-accent-purple)' }}>Payment failed</span>
-</Dont>
+<Do caption="Danger for a failed payment."><DangerForADoFigure /></Do>
+<Dont caption="A purple accent where the color has semantic meaning."><APurpleAccentDontFigure /></Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -391,18 +350,8 @@ Pick the role for the job. A failed payment is danger; an accent has no meaning,
 Take the text color from the same role as the ground. Gray text on a bold ground falls well below 4.5:1 in both modes.
 
 <DoDont>
-<Do caption="Danger text on the subtle danger ground.">
-<div style={{ padding: 'var(--card-pad)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-danger-subtler)' }}>
-    <strong style={{ font: 'var(--heading-xs)', color: 'var(--ds-text-danger)' }}>Payment failed</strong>
-    <div style={{ font: 'var(--body-sm)', color: 'var(--ds-text)' }}>Update your card to keep sessions booked.</div>
-</div>
-</Do>
-<Dont caption="Gray text on the bold danger ground. The role is right and the pair is wrong.">
-<div style={{ padding: 'var(--card-pad)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-danger-bold)' }}>
-    <strong style={{ font: 'var(--heading-xs)', color: 'var(--ds-text-subtle)' }}>Payment failed</strong>
-    <div style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>Update your card to keep sessions booked.</div>
-</div>
-</Dont>
+<Do caption="Danger text on the subtle danger ground."><DangerTextOnDoFigure /></Do>
+<Dont caption="Gray text on the bold danger ground; the role is right and the pair is wrong."><GrayTextOnDontFigure /></Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -412,12 +361,8 @@ Take the text color from the same role as the ground. Gray text on a bold ground
 On a bold fill, text and icons take `color/text/inverse` and `color/icon/inverse` (`color/text/warning/inverse` on bold warning).
 
 <DoDont>
-<Do caption="color/text/inverse on a bold danger fill.">
-<span style={{ display: 'inline-block', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-danger-bold)', color: 'var(--ds-text-inverse)' }}>Delete session</span>
-</Do>
-<Dont caption="color/text/default on a bold fill loses contrast.">
-<span style={{ display: 'inline-block', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-danger-bold)', color: 'var(--ds-text)' }}>Delete session</span>
-</Dont>
+<Do caption="color/text/inverse on a bold danger fill."><ColorTextInverseDoFigure /></Do>
+<Dont caption="color/text/default on a bold fill loses contrast."><ColorTextDefaultDontFigure /></Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -427,12 +372,8 @@ On a bold fill, text and icons take `color/text/inverse` and `color/icon/inverse
 A filled field looks selected or disabled. The focus ring is the one signal for keyboard focus.
 
 <DoDont>
-<Do caption="The field keeps its fill and gains the focus ring, color/border/focused.">
-<RingDemo style={{ borderRadius: 'var(--radius-lg)' }}><div style={{ padding: 'var(--pad-x-md)', height: 'var(--height-250)', display: 'flex', alignItems: 'center', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', color: 'var(--ds-text-subtlest)' }}>Placeholder</div></RingDemo>
-</Do>
-<Dont caption="A brand fill on the field to show focus. It reads as a selected value and hides what is typed.">
-<div style={{ padding: 'var(--pad-x-md)', height: 'var(--height-250)', display: 'flex', alignItems: 'center', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)' }}>Lincoln Middle Thursday</div>
-</Dont>
+<Do caption="The field keeps its fill and gains the focus ring, color/border/focused."><TheFieldKeepsDoFigure /></Do>
+<Dont caption="A brand fill on the field to show focus; it reads as a selected value and hides what is typed."><ABrandFillDontFigure /></Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -442,14 +383,8 @@ A filled field looks selected or disabled. The focus ring is the one signal for 
 Selection uses the selected tokens and another cue such as a check mark. The focus ring is only for keyboard focus.
 
 <DoDont>
-<Do caption="Selected tokens plus a check mark.">
-<span style={{ display: 'inline-flex', gap: 'var(--inline-sm)', alignItems: 'center', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-selected)', color: 'var(--ds-text-selected)' }}>
-    <i className="fa-solid fa-check" aria-hidden="true" /> Tuesday 4:00 PM
-</span>
-</Do>
-<Dont caption="The focus ring used to mean selected.">
-<RingDemo style={{ borderRadius: 'var(--radius-md)' }}><span style={{ display: 'inline-flex', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-md)' }}>Tuesday 4:00 PM</span></RingDemo>
-</Dont>
+<Do caption="Selected tokens plus a check mark."><SelectedTokensPlusDoFigure /></Do>
+<Dont caption="The focus ring used to mean selected."><TheFocusRingDontFigure /></Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -459,16 +394,8 @@ Selection uses the selected tokens and another cue such as a check mark. The foc
 A single series is drawn in the brand chart color. Reaching for the categorical set makes a legend that says nothing.
 
 <DoDont>
-<Do caption="Five weeks of one measure, all in color/chart/brand.">
-<div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--inline-md)', height: 'var(--card-min-width-sm)' }}>
-    {[40, 55, 48, 70, 62].map((h, i) => <span key={i} style={{ flex: 1, height: `${h}%`, borderRadius: 'var(--radius-sm)', background: 'var(--chart-brand)' }} />)}
-</div>
-</Do>
-<Dont caption="A rainbow on one measure suggests five series. The color does no job, and a reader looks for a legend that is not there.">
-<div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--inline-md)', height: 'var(--card-min-width-sm)' }}>
-    {[40, 55, 48, 70, 62].map((h, i) => <span key={i} style={{ flex: 1, height: `${h}%`, borderRadius: 'var(--radius-sm)', background: `var(--chart-categorical-${i + 1})` }} />)}
-</div>
-</Dont>
+<Do caption="Five weeks of one measure, all in color/chart/brand."><FiveWeeksOfDoFigure /></Do>
+<Dont caption="A rainbow on one measure suggests five series; the color does no job, and a reader looks for a legend that is not there."><ARainbowOnDontFigure /></Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -496,3 +423,156 @@ A single series is drawn in the brand chart color. Reaching for the categorical 
 />
 
 </FoundationSection>
+
+export const BiggestAtTheDoFigure = () => (
+    <>
+    <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
+        {[['Grade 9', 48, '--chart-blue-boldest'], ['Grade 10', 36, '--chart-blue-bolder'], ['Grade 11', 27, '--chart-blue-bold'], ['Grade 12', 15, '--ds-background-accent-blue-subtler']].map(([label, n, tone]) => (
+            <li key={label} style={{ display: 'grid', gridTemplateColumns: 'var(--card-min-width-sm) 1fr', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-sm)' }}>
+                <span>{label}</span>
+                <span style={{ display: 'block', height: 'var(--icon-md)', width: `${n * 2}%`, borderRadius: 'var(--radius-sm)', background: `var(${tone})` }} />
+            </li>
+        ))}
+    </ul>
+    </>
+);
+
+export const GradesInAnyDontFigure = () => (
+    <>
+    <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
+        {[['Grade 11', 27], ['Grade 9', 48], ['Grade 12', 15], ['Grade 10', 36]].map(([label, n]) => (
+            <li key={label} style={{ display: 'grid', gridTemplateColumns: 'var(--card-min-width-sm) 1fr', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-sm)' }}>
+                <span>{label}</span>
+                <span style={{ display: 'block', height: 'var(--icon-md)', width: `${n * 2}%`, borderRadius: 'var(--radius-sm)', background: 'var(--chart-neutral)' }} />
+            </li>
+        ))}
+    </ul>
+    </>
+);
+
+export const AGreenTickDoFigure = () => (
+    <>
+    <div style={{ font: 'var(--body-sm)', marginBlockEnd: 'var(--stack-sm)' }}>Lincoln Middle · 86% attended</div>
+    <div style={{ position: 'relative', height: 'var(--icon-md)', borderRadius: 'var(--radius-sm)', boxShadow: 'inset 0 0 0 var(--border-width-default) var(--chart-success)' }}>
+        <span style={{ position: 'absolute', insetBlock: 0, insetInlineStart: 0, width: '86%', borderRadius: 'var(--radius-sm)', background: 'var(--chart-brand)' }} />
+        <span style={{ position: 'absolute', insetBlock: '-25%', insetInlineStart: '90%', width: 'var(--stroke-2)', background: 'var(--chart-success-bold)' }} />
+    </div>
+    </>
+);
+
+export const AShadedBandDontFigure = () => (
+    <>
+    <div style={{ font: 'var(--body-sm)', marginBlockEnd: 'var(--stack-sm)' }}>Lincoln Middle · 86% attended · Target 90%</div>
+    <div style={{ position: 'relative', height: 'var(--icon-md)', background: 'var(--chart-success)' }}>
+        <span style={{ position: 'absolute', insetBlock: 0, insetInlineStart: 0, width: '86%', background: 'var(--chart-brand)' }} />
+    </div>
+    </>
+);
+
+export const DisabledTakesColorDoFigure = () => (
+    <>
+    <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--control-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-disabled)', color: 'var(--ds-text-disabled)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)' }}>Reschedule</span>
+    </>
+);
+
+export const OpacityOnTheDontFigure = () => (
+    <>
+    <span style={{ display: 'inline-flex', alignItems: 'center', height: 'var(--control-md)', padding: '0 var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--body-default)', fontWeight: 'var(--type-weight-medium)', opacity: 0.4 }}>Reschedule</span>
+    </>
+);
+
+export const LinkColorAndDoFigure = () => (
+    <>
+    The session notes are ready. <a href="#foundation-links" style={{ color: 'var(--ds-link)', textDecoration: 'underline' }}>Send them to the family</a> from the link below.
+    </>
+);
+
+export const TheColorAloneDontFigure = () => (
+    <>
+    The session notes are ready. <a href="#foundation-links" style={{ color: 'var(--ds-link)', textDecoration: 'none' }}>Send them to the family</a> from the link below.
+    </>
+);
+
+export const DangerForADoFigure = () => (
+    <>
+    <span style={{ color: 'var(--ds-text-danger)' }}>Payment failed</span>
+    </>
+);
+
+export const APurpleAccentDontFigure = () => (
+    <>
+    <span style={{ color: 'var(--ds-text-accent-purple)' }}>Payment failed</span>
+    </>
+);
+
+export const DangerTextOnDoFigure = () => (
+    <>
+    <div style={{ padding: 'var(--card-pad)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-danger-subtler)' }}>
+        <strong style={{ font: 'var(--heading-xs)', color: 'var(--ds-text-danger)' }}>Payment failed</strong>
+        <div style={{ font: 'var(--body-sm)', color: 'var(--ds-text)' }}>Update your card to keep sessions booked.</div>
+    </div>
+    </>
+);
+
+export const GrayTextOnDontFigure = () => (
+    <>
+    <div style={{ padding: 'var(--card-pad)', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-danger-bold)' }}>
+        <strong style={{ font: 'var(--heading-xs)', color: 'var(--ds-text-subtle)' }}>Payment failed</strong>
+        <div style={{ font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>Update your card to keep sessions booked.</div>
+    </div>
+    </>
+);
+
+export const ColorTextInverseDoFigure = () => (
+    <>
+    <span style={{ display: 'inline-block', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-danger-bold)', color: 'var(--ds-text-inverse)' }}>Delete session</span>
+    </>
+);
+
+export const ColorTextDefaultDontFigure = () => (
+    <>
+    <span style={{ display: 'inline-block', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-control-sm)', background: 'var(--ds-background-danger-bold)', color: 'var(--ds-text)' }}>Delete session</span>
+    </>
+);
+
+export const TheFieldKeepsDoFigure = () => (
+    <>
+    <RingDemo style={{ borderRadius: 'var(--radius-lg)' }}><div style={{ padding: 'var(--pad-x-md)', height: 'var(--height-250)', display: 'flex', alignItems: 'center', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-input)', color: 'var(--ds-text-subtlest)' }}>Placeholder</div></RingDemo>
+    </>
+);
+
+export const ABrandFillDontFigure = () => (
+    <>
+    <div style={{ padding: 'var(--pad-x-md)', height: 'var(--height-250)', display: 'flex', alignItems: 'center', borderRadius: 'var(--radius-lg)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)' }}>Lincoln Middle Thursday</div>
+    </>
+);
+
+export const SelectedTokensPlusDoFigure = () => (
+    <>
+    <span style={{ display: 'inline-flex', gap: 'var(--inline-sm)', alignItems: 'center', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-md)', background: 'var(--ds-background-selected)', color: 'var(--ds-text-selected)' }}>
+        <i className="fa-solid fa-check" aria-hidden="true" /> Tuesday 4:00 PM
+    </span>
+    </>
+);
+
+export const TheFocusRingDontFigure = () => (
+    <>
+    <RingDemo style={{ borderRadius: 'var(--radius-md)' }}><span style={{ display: 'inline-flex', padding: 'var(--pad-x-md)', borderRadius: 'var(--radius-md)' }}>Tuesday 4:00 PM</span></RingDemo>
+    </>
+);
+
+export const FiveWeeksOfDoFigure = () => (
+    <>
+    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--inline-md)', height: 'var(--card-min-width-sm)' }}>
+        {[40, 55, 48, 70, 62].map((h, i) => <span key={i} style={{ flex: 1, height: `${h}%`, borderRadius: 'var(--radius-sm)', background: 'var(--chart-brand)' }} />)}
+    </div>
+    </>
+);
+
+export const ARainbowOnDontFigure = () => (
+    <>
+    <div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--inline-md)', height: 'var(--card-min-width-sm)' }}>
+        {[40, 55, 48, 70, 62].map((h, i) => <span key={i} style={{ flex: 1, height: `${h}%`, borderRadius: 'var(--radius-sm)', background: `var(--chart-categorical-${i + 1})` }} />)}
+    </div>
+    </>
+);

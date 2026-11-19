@@ -125,11 +125,14 @@ export const VerdictTag = ({ tone }) => {
     );
 };
 
-/** The Do half of a pair: a live example over its caption. */
-export const Do = ({ caption, children }) => <DoDontCard tone="do" caption={caption}>{children}</DoDontCard>;
+/**
+ * The Do half of a pair: a live example over its caption.
+ * `code` is the example's source, folded behind Show code; leave it out only for a pair that is prose about a value, not a use of one.
+ */
+export const Do = ({ caption, code, children }) => <DoDontCard tone="do" caption={caption} code={code}>{children}</DoDontCard>;
 
-/** The Don't half of a pair. */
-export const Dont = ({ caption, children }) => <DoDontCard tone="dont" caption={caption}>{children}</DoDontCard>;
+/** The Don't half of a pair; `code` works as on `Do`. */
+export const Dont = ({ caption, code, children }) => <DoDontCard tone="dont" caption={caption} code={code}>{children}</DoDontCard>;
 
 /** A Do and its Don't side by side, on the same topic. */
 export const DoDont = ({ children }) => (

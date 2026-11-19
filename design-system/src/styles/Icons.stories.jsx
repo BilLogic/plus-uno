@@ -92,42 +92,16 @@ export const Colors = () => (
 /** A label says what the icon means. */
 export const PairWithLabels = () => (
     <DoDont>
-        <Do caption="An icon beside its label. The label says what it does, and a screen reader reads the label.">
-            <span style={{ display: 'flex', gap: 'var(--inline-md)' }}>
-                <Button text="Reschedule" iconBefore="calendar-days" />
-                <Button text="Message" iconBefore="comment" />
-            </span>
-        </Do>
-        <Dont caption="Icons alone for actions people use rarely. Each one costs the reader a guess.">
-            <span style={{ display: 'flex', gap: 'var(--inline-md)' }}>
-                <IconButton icon="calendar-days" label="Reschedule" />
-                <IconButton icon="comment" label="Message" />
-            </span>
-        </Dont>
+        <Do caption="An icon beside its label; the label says what it does, and a screen reader reads the label."><AnIconBesideDoFigure /></Do>
+        <Dont caption="Icons alone for actions people use rarely; each one costs the reader a guess."><IconsAloneForDontFigure /></Dont>
     </DoDont>
 );
 
 /** One glyph for one meaning, across the product. */
 export const OneGlyphOneMeaning = () => (
     <DoDont>
-        <Do caption="Every date in the product takes the same calendar glyph.">
-            <span style={col('var(--stack-md)')}>
-                {['Tuesday, June 3', 'Due Friday', 'Started May 12'].map((t) => (
-                    <span key={t} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
-                        <Glyph name="calendar-days" />{t}
-                    </span>
-                ))}
-            </span>
-        </Do>
-        <Dont caption="Three different glyphs for a date. People read them as three different things.">
-            <span style={col('var(--stack-md)')}>
-                {[['Tuesday, June 3', 'calendar-days'], ['Due Friday', 'clock'], ['Started May 12', 'flag']].map(([t, g]) => (
-                    <span key={t} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
-                        <Glyph name={g} />{t}
-                    </span>
-                ))}
-            </span>
-        </Dont>
+        <Do caption="Every date in the product takes the same calendar glyph."><EveryDateInDoFigure /></Do>
+        <Dont caption="Three different glyphs for a date; people read them as three different things."><ThreeDifferentGlyphsDontFigure /></Dont>
     </DoDont>
 );
 
@@ -149,13 +123,7 @@ export const LargerMeansTile = () => (
 export const FreeFamiliesOnly = {
     render: () => (
         <DoDont>
-            <Do caption="Free families (fa-regular, fa-solid, fa-brands) render everywhere.">
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
-                    <Icon name="fa-brands fa-figma" size={16} />
-                    <Icon name="fa-regular fa-calendar-days" size={16} />
-                    <C>fa-brands fa-figma · fa-regular fa-calendar-days</C>
-                </span>
-            </Do>
+            <Do caption="Free families (fa-regular, fa-solid, fa-brands) render everywhere."><FreeFamiliesFaDoFigure /></Do>
             <Dont caption="Pro families (fa-light, fa-thin, fa-sharp, fa-duotone) render blank.">
                 <C>fa-light fa-calendar-days</C>
             </Dont>
@@ -208,3 +176,55 @@ export const RecognizableSymbols = {
         await expect(canvas.getAllByRole('button', { name: 'Notifications' })).toHaveLength(2);
     },
 };
+
+const AnIconBesideDoFigure = () => (
+    <>
+        <span style={{ display: 'flex', gap: 'var(--inline-md)' }}>
+            <Button text="Reschedule" iconBefore="calendar-days" />
+            <Button text="Message" iconBefore="comment" />
+        </span>
+    </>
+);
+
+const IconsAloneForDontFigure = () => (
+    <>
+        <span style={{ display: 'flex', gap: 'var(--inline-md)' }}>
+            <IconButton icon="calendar-days" label="Reschedule" />
+            <IconButton icon="comment" label="Message" />
+        </span>
+    </>
+);
+
+const EveryDateInDoFigure = () => (
+    <>
+        <span style={col('var(--stack-md)')}>
+            {['Tuesday, June 3', 'Due Friday', 'Started May 12'].map((t) => (
+                <span key={t} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+                    <Glyph name="calendar-days" />{t}
+                </span>
+            ))}
+        </span>
+    </>
+);
+
+const ThreeDifferentGlyphsDontFigure = () => (
+    <>
+        <span style={col('var(--stack-md)')}>
+            {[['Tuesday, June 3', 'calendar-days'], ['Due Friday', 'clock'], ['Started May 12', 'flag']].map(([t, g]) => (
+                <span key={t} style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
+                    <Glyph name={g} />{t}
+                </span>
+            ))}
+        </span>
+    </>
+);
+
+const FreeFamiliesFaDoFigure = () => (
+    <>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
+            <Icon name="fa-brands fa-figma" size={16} />
+            <Icon name="fa-regular fa-calendar-days" size={16} />
+            <C>fa-brands fa-figma · fa-regular fa-calendar-days</C>
+        </span>
+    </>
+);

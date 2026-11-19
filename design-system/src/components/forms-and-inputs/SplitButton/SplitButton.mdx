@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -144,7 +145,7 @@ The primary action and the menu trigger share one outline and one height.
 <DoDontPair
     doExample={<SplitButton><Button appearance="primary" text="Save" /><IconButton appearance="primary" icon={<Icon name="chevron-down" size={12} />} label="More save options" /></SplitButton>}
     doCaption="One outline around both halves."
-    dontExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><Button appearance="primary" text="Save" /><IconButton appearance="primary" icon={<Icon name="chevron-down" size={12} />} label="More save options" /></div>}
+    dontExample={<FigureRow><Button appearance="primary" text="Save" /><IconButton appearance="primary" icon={<Icon name="chevron-down" size={12} />} label="More save options" /></FigureRow>}
     dontCaption="Two separate buttons with a gap."
 />
 

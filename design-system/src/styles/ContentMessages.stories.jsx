@@ -63,30 +63,8 @@ export const Errors = {
 export const Warnings = {
     render: () => (
         <DoDont>
-            <Do caption="The tutor sees the ripple before deciding.">
-                <div style={narrowOverlay}>
-                    <Dialog
-                        width="6-col"
-                        title="Call off Thursday’s session?"
-                        body="Jordan’s teacher gets a note, and we look for a fill-in."
-                        secondaryButton={{ text: 'Keep session' }}
-                        primaryButton={{ text: 'Call off', appearance: 'warning' }}
-                        onClose={() => {}}
-                    />
-                </div>
-            </Do>
-            <Dont caption="Clear action, but it hides the people it touches.">
-                <div style={narrowOverlay}>
-                    <Dialog
-                        width="6-col"
-                        title="Call off this session?"
-                        body="You can’t undo this."
-                        secondaryButton={{ text: 'Cancel' }}
-                        primaryButton={{ text: 'Call off', appearance: 'warning' }}
-                        onClose={() => {}}
-                    />
-                </div>
-            </Dont>
+            <Do caption="The tutor sees the ripple before deciding."><TheTutorSeesDoFigure /></Do>
+            <Dont caption="Clear action, but it hides the people it touches."><ClearActionButDontFigure /></Dont>
         </DoDont>
     ),
     play: async ({ canvas }) => {
@@ -171,3 +149,33 @@ export const FieldErrors = {
         await expect(canvas.getByText('Must be between 30 and 90.')).toBeInTheDocument();
     },
 };
+
+const TheTutorSeesDoFigure = () => (
+    <>
+        <div style={narrowOverlay}>
+            <Dialog
+                width="6-col"
+                title="Call off Thursday’s session?"
+                body="Jordan’s teacher gets a note, and we look for a fill-in."
+                secondaryButton={{ text: 'Keep session' }}
+                primaryButton={{ text: 'Call off', appearance: 'warning' }}
+                onClose={() => {}}
+            />
+        </div>
+    </>
+);
+
+const ClearActionButDontFigure = () => (
+    <>
+        <div style={narrowOverlay}>
+            <Dialog
+                width="6-col"
+                title="Call off this session?"
+                body="You can’t undo this."
+                secondaryButton={{ text: 'Cancel' }}
+                primaryButton={{ text: 'Call off', appearance: 'warning' }}
+                onClose={() => {}}
+            />
+        </div>
+    </>
+);

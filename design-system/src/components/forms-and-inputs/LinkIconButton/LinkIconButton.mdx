@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -212,9 +213,9 @@ Hover, pressed and focus are the browser's own. A link icon button has no disabl
 Leave a gap so neighboring link icon buttons read as separate targets.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><LinkIconButton href="#help" icon="circle-question" label="Open Help Center" /><LinkIconButton href="#settings" icon="gear" label="Open settings" /><LinkIconButton href="#notifications" icon="bell" label="Open notifications" /></div>}
+    doExample={<FigureRow><LinkIconButton href="#help" icon="circle-question" label="Open Help Center" /><LinkIconButton href="#settings" icon="gear" label="Open settings" /><LinkIconButton href="#notifications" icon="bell" label="Open notifications" /></FigureRow>}
     doCaption="A clear gap between link icon buttons."
-    dontExample={<div style={{ display: 'flex', gap: 0 }}><LinkIconButton href="#help" icon="circle-question" label="Open Help Center" /><LinkIconButton href="#settings" icon="gear" label="Open settings" /><LinkIconButton href="#notifications" icon="bell" label="Open notifications" /></div>}
+    dontExample={<FigureRow gap="none"><LinkIconButton href="#help" icon="circle-question" label="Open Help Center" /><LinkIconButton href="#settings" icon="gear" label="Open settings" /><LinkIconButton href="#notifications" icon="bell" label="Open notifications" /></FigureRow>}
     dontCaption="Link icon buttons touching."
 />
 
@@ -252,9 +253,9 @@ If the icon acts on the current page, use `IconButton`. Navigation uses `LinkIco
 Do not reuse one glyph for several links in the same area.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><LinkIconButton href="#help" icon="circle-question" label="Open Help Center" /><LinkIconButton href="#settings" icon="gear" label="Open settings" /></div>}
+    doExample={<FigureRow><LinkIconButton href="#help" icon="circle-question" label="Open Help Center" /><LinkIconButton href="#settings" icon="gear" label="Open settings" /></FigureRow>}
     doCaption="Help Center and settings each have their own glyph."
-    dontExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><LinkIconButton href="#help" icon="link" label="Open Help Center" /><LinkIconButton href="#settings" icon="link" label="Open settings" /></div>}
+    dontExample={<FigureRow><LinkIconButton href="#help" icon="link" label="Open Help Center" /><LinkIconButton href="#settings" icon="link" label="Open settings" /></FigureRow>}
     dontCaption="One link glyph for two destinations."
 />
 

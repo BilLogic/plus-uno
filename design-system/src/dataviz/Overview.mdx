@@ -79,19 +79,49 @@ Single-series charts take <C>--chart-brand</C>; de-emphasized comparison or refe
 <FoundationSection title="Color do and don't">
 
 <DoDont>
-    <Do caption="Stay within five or six series so each keeps its categorical slot and legend label.">
+    <Do caption="Stay within five or six series so each keeps its categorical slot and legend label." code={`<BarChart
+    height={200}
+    categories={['Math', 'Science', 'History']}
+    series={[
+        { name: 'Fall', data: [40, 55, 30] },
+        { name: 'Winter', data: [52, 48, 41] },
+        { name: 'Spring', data: [61, 66, 45] },
+    ]}
+/>`}>
         <Story of={OverviewStories.WithinTheLimit} />
     </Do>
-    <Dont caption="Past six series, slots 7 and 8 are overflow and neighbors blur. Group the smallest categories into Other.">
+    <Dont caption="Past six series, slots 7 and 8 are overflow and neighbors blur; group the smallest categories into Other." code={`const schools = ['Lincoln Middle', 'Roosevelt K-8', 'North High', 'South High', 'Hillside', 'Westview', 'Oak Grove', 'Central'];
+
+<BarChart
+    height={200}
+    categories={['Math', 'Science', 'History']}
+    series={schools.map((name, i) => ({ name, data: [20 + i * 3, 30 + i * 2, 25 + i] }))}
+/>`}>
         <Story of={OverviewStories.PastTheLimit} />
     </Dont>
 </DoDont>
 
 <DoDont>
-    <Do caption="Use categorical colors to separate categories, and reserve state colors for state values.">
+    <Do caption="Use categorical colors to separate categories, and reserve state colors for state values." code={`<BarChart
+    height={200}
+    categories={['Math', 'Science', 'History']}
+    series={[
+        { name: 'Online', data: [40, 55, 30] },
+        { name: 'In person', data: [52, 48, 41] },
+    ]}
+/>`}>
         <Story of={OverviewStories.CategoriesOnly} />
     </Do>
-    <Dont caption="Do not mix categorical and state colors: one series reads as success and the other as nothing.">
+    <Dont caption="Do not mix categorical and state colors: one series reads as success and the other as nothing." code={`const { STATUS } = chartPalette;
+
+<BarChart
+    height={200}
+    categories={['Math', 'Science', 'History']}
+    series={[
+        { name: 'Online', data: [40, 55, 30], color: 'var(--chart-categorical-2)' },
+        { name: 'In person', data: [52, 48, 41], color: STATUS.success },
+    ]}
+/>`}>
         <Story of={OverviewStories.CategoryAndStateMixed} />
     </Dont>
 </DoDont>

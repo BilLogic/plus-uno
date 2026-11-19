@@ -147,7 +147,7 @@ function skipCodeSpan(s, i) {
  * fragment): `{name, attrs, children, end}`. An element that never closes runs
  * to the end of the text.
  */
-function readElement(s, i) {
+export function readElement(s, i) {
   const name = s[i + 1] === '>' ? '' : s.slice(i + 1).match(/^[A-Za-z][\w.:-]*/)[0];
   let j = i + 1 + name.length;
   const attrsStart = j;
@@ -233,7 +233,7 @@ export function topLevelEntries(text, open) {
 }
 
 /** An element's attributes: name → raw value (`"…"`, `'…'`, `{…}`, or true). */
-function attrsOf(raw) {
+export function attrsOf(raw) {
   const out = {};
   let j = 0;
   while (j < raw.length) {

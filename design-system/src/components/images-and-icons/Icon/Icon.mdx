@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
@@ -169,9 +170,9 @@ Navigation icons are always outlined: a selected row shows a fill, not a filled 
 Without `label` the icon is hidden from assistive technology, so the words beside it carry the meaning.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}><Icon name="calendar-days" size={16} color="subtle" />Tuesday, 4 pm</div>}
+    doExample={<FigureRow gap="sm"><Icon name="calendar-days" size={16} color="subtle" />Tuesday, 4 pm</FigureRow>}
     doCaption="The icon beside the words it backs up."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-sm)' }}><Icon name="calendar-days" size={16} color="subtle" /></div>}
+    dontExample={<FigureRow gap="sm"><Icon name="calendar-days" size={16} color="subtle" /></FigureRow>}
     dontCaption="An icon alone with no label, so it has no name."
 />
 

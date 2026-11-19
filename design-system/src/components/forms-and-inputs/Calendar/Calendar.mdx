@@ -205,7 +205,7 @@ In single mode one day carries the selected fill. A second fill reads as a range
 Put the limit in text near the calendar, so people do not find it by trying disabled days.
 
 <DoDontPair
-    doExample={<div><p style={{ margin: '0 0 var(--stack-sm)' }}>Pick a day between October 12 and 25.</p><Calendar viewDate={new Date(2026, 9, 1)} onViewDateChange={() => {}} minDate="2026-10-12" maxDate="2026-10-25" onPick={() => {}} /></div>}
+    doExample={<div><p>Pick a day between October 12 and 25.</p><Calendar viewDate={new Date(2026, 9, 1)} onViewDateChange={() => {}} minDate="2026-10-12" maxDate="2026-10-25" onPick={() => {}} /></div>}
     doCaption="A line above the grid states the span."
     dontExample={<div><Calendar viewDate={new Date(2026, 9, 1)} onViewDateChange={() => {}} minDate="2026-10-12" maxDate="2026-10-25" onPick={() => {}} /></div>}
     dontCaption="No text: the limit shows only as dimmed days."

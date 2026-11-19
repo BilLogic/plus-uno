@@ -641,6 +641,14 @@ export const CHECKS = [
     guards: 'no rule in the docs stylesheet aiming at a class nothing puts in the DOM.',
   },
   {
+    name: 'check:dodont-figures',
+    script: 'node scripts/check-dodont-figures.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-dodont-figures.mjs',
+    guards: 'every Do and Don\'t figure being a live PLUS component or kit drawing with no inline style, one sentence under it, and stacked only with a reason.',
+  },
+  {
     name: 'check:docs-landing',
     script: 'node scripts/check-docs-landing.mjs',
     pkg: 'root',

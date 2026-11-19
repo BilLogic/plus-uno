@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureScreen,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
@@ -27,8 +28,6 @@ export const figmaMeta = {
   ]
 };
 
-export const narrowScreen = { '--plus-overlay-screen': 'var(--width-3000)', width: '100%' };
-export const shortCap = { ...narrowScreen, '--blanket-max-height-modal': 'var(--height-2000)' };
 export const longBody =
     'Review the session summary before publishing it to the student profile. Note which two-step equation problems Maya K. solved independently, which steps still needed a prompt, and which practice set is assigned for Thursday at 4:00 PM ET at Lincoln Middle. Families and lead tutors read this note together before the next check-in. ' +
     'Make sure the attendance record, warm-up check, and exit ticket results match what you covered during the call before confirming. ' +
@@ -231,9 +230,9 @@ An informational `Dialog` keeps its close button; `showCloseButton={false}` is
 for a decision that has to be answered from the footer.
 
 <DoDontPair
-    doExample={<div style={narrowScreen}><Dialog title="Session details" description="Monday, 4:00 PM" body="Lincoln Middle with Jordan, 45 minutes." primaryButton={{ text: 'Done' }} onClose={() => {}} /></div>}
+    doExample={<FigureScreen><Dialog title="Session details" description="Monday, 4:00 PM" body="Lincoln Middle with Jordan, 45 minutes." primaryButton={{ text: 'Done' }} onClose={() => {}} /></FigureScreen>}
     doCaption="Close stays on an informational dialog."
-    dontExample={<div style={narrowScreen}><Dialog showCloseButton={false} title="Session details" description="Monday, 4:00 PM" body="Lincoln Middle with Jordan, 45 minutes." primaryButton={{ text: 'Done' }} onClose={() => {}} /></div>}
+    dontExample={<FigureScreen><Dialog showCloseButton={false} title="Session details" description="Monday, 4:00 PM" body="Lincoln Middle with Jordan, 45 minutes." primaryButton={{ text: 'Done' }} onClose={() => {}} /></FigureScreen>}
     dontCaption="No way out of an informational dialog."
 />
 
@@ -243,9 +242,9 @@ The rules mark where the header and footer stay put while the body scrolls; a
 short body reads cleaner without them.
 
 <DoDontPair
-    doExample={<div style={shortCap}><Dialog dividers title="Session notes" body={longBody} primaryButton={{ text: 'Done' }} onClose={() => {}} /></div>}
+    doExample={<FigureScreen short><Dialog dividers title="Session notes" body={longBody} primaryButton={{ text: 'Done' }} onClose={() => {}} /></FigureScreen>}
     doCaption="Dividers around a scrolling body."
-    dontExample={<div style={shortCap}><Dialog dividers title="Session notes" body="One short note." primaryButton={{ text: 'Done' }} onClose={() => {}} /></div>}
+    dontExample={<FigureScreen short><Dialog dividers title="Session notes" body="One short note." primaryButton={{ text: 'Done' }} onClose={() => {}} /></FigureScreen>}
     dontCaption="Dividers around a short body."
 />
 

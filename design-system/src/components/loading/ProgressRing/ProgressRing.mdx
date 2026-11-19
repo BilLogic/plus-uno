@@ -8,6 +8,8 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureGround,
+    FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -203,9 +205,9 @@ half-filled ring when there is no total misleads the tutor about how long is
 left.
 
 <DoDontPair
-    doExample={<div style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Spinner size={16} /><span>Connecting to session</span></div>}
+    doExample={<FigureRow><Spinner size={16} /><span>Connecting to session</span></FigureRow>}
     doCaption="Spinner when the wait has no measurable percent."
-    dontExample={<div style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}><ProgressRing value={50} size={16} label="Connecting to session" /><span>Connecting to session</span></div>}
+    dontExample={<FigureRow><ProgressRing value={50} size={16} label="Connecting to session" /><span>Connecting to session</span></FigureRow>}
     dontCaption="A fixed ProgressRing faking an unknown wait."
 />
 
@@ -215,9 +217,9 @@ At `PROGRESS_RING_SIZES` diameters (`16`, `20`, `24`), the center of the ring
 cannot hold text; put the percent beside it on the row's meta line.
 
 <DoDontPair
-    doExample={<div style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}><ProgressRing value={64} label="Uploading recording, 64%" /><span>Uploading · 64%</span></div>}
+    doExample={<FigureRow><ProgressRing value={64} label="Uploading recording, 64%" /><span>Uploading · 64%</span></FigureRow>}
     doCaption="The percent sits beside the ring."
-    dontExample={<div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}><ProgressRing value={64} size={24} label="Uploading recording, 64%" /></div>}
+    dontExample={<ProgressRing value={64} size={24} label="Uploading recording, 64%" />}
     dontCaption="A bare ring with no surrounding context."
 />
 
@@ -227,9 +229,9 @@ Use `size={20}` in a row's leading slot so swapping between a status icon and
 an active upload never shifts the row, and `size={16}` beside compact text.
 
 <DoDontPair
-    doExample={<div style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}><ProgressRing value={40} size={20} label="Uploading recording, 40%" /><span>session-recording.mp4</span></div>}
+    doExample={<FigureRow><ProgressRing value={40} size={20} label="Uploading recording, 40%" /><span>session-recording.mp4</span></FigureRow>}
     doCaption="A ring sized to match the row's leading icon slot."
-    dontExample={<div style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}><ProgressRing value={40} size={16} label="Uploading recording, 40%" /><span>session-recording.mp4</span></div>}
+    dontExample={<FigureRow><ProgressRing value={40} size={16} label="Uploading recording, 40%" /><span>session-recording.mp4</span></FigureRow>}
     dontCaption="An undersized ring that shifts when replaced by the row's icon."
 />
 
@@ -239,9 +241,9 @@ The neutral track disappears against a bold ground; `inverse` switches the track
 and fill to inverse roles that stay legible.
 
 <DoDontPair
-    doExample={<div style={{ display: 'inline-flex', padding: 'var(--pad-y-lg) var(--pad-x-md)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--ds-background-brand-bold)' }}><ProgressRing value={64} appearance="inverse" label="Uploading recording" /></div>}
+    doExample={<FigureGround ground="brand"><ProgressRing value={64} appearance="inverse" label="Uploading recording" /></FigureGround>}
     doCaption="Inverse appearance on a bold surface."
-    dontExample={<div style={{ display: 'inline-flex', padding: 'var(--pad-y-lg) var(--pad-x-md)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--ds-background-brand-bold)' }}><ProgressRing value={64} label="Uploading recording" /></div>}
+    dontExample={<FigureGround ground="brand"><ProgressRing value={64} label="Uploading recording" /></FigureGround>}
     dontCaption="Default appearance lost against a brand-bold fill."
 />
 

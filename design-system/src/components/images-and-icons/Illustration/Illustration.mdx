@@ -8,6 +8,8 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureBox,
+    FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
@@ -176,18 +178,18 @@ The body token for each character is on
 ### Keep characters decorative unless they carry meaning.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Illustration character="advocacy" size={96} /><strong>Advocacy</strong></div>}
+    doExample={<FigureRow><Illustration character="advocacy" size={96} /><strong>Advocacy</strong></FigureRow>}
     doCaption="Decorative beside a heading that already says it."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Illustration character="advocacy" title="Advocacy" size={96} /><strong>Advocacy</strong></div>}
+    dontExample={<FigureRow><Illustration character="advocacy" title="Advocacy" size={96} /><strong>Advocacy</strong></FigureRow>}
     dontCaption="A title that repeats the heading, so it is read twice."
 />
 
 ### Give a character room for its limbs.
 
 <DoDontPair
-    doExample={<div style={{ padding: 'var(--pad-x-md)' }}><Illustration character="dot" size={96} /></div>}
+    doExample={<FigureBox tone="surface"><Illustration character="dot" size={96} /></FigureBox>}
     doCaption="Room on every side the limbs reach."
-    dontExample={<div style={{ overflow: 'hidden', height: 'var(--image-lg)' }}><Illustration character="dot" size={96} /></div>}
+    dontExample={<FigureBox tone="surface" clip><Illustration character="dot" size={96} /></FigureBox>}
     dontCaption="Clipping the box cuts off the limbs."
 />
 

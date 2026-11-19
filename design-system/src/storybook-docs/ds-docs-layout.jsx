@@ -83,7 +83,8 @@ export function DocsAllProps({ of: ofStory }) {
 export function DocsSource({ of: ofStory, code, language = 'jsx' }) {
     return (
         <div className="sb-ds-docs-source not-prose">
-            <Source of={ofStory} code={code} language={language} dark={false} />
+            {/* Source throws when `of` is present but undefined, so pass only the one given. */}
+            <Source {...(ofStory === undefined ? {} : { of: ofStory })} {...(code === undefined ? {} : { code })} language={language} dark={false} />
         </div>
     );
 }
@@ -394,8 +395,155 @@ export function DoDontCard({ tone, children, caption, code }) {
     );
 }
 
-/** A matched do and don't, side by side (or `stacked` one above the other when an example is too wide to halve). */
-export function DoDontPair({ doExample, doCaption, doCode, dontExample, dontCaption, dontCode, stacked = false }) {
+const FIGURE_GAPS = { none: 0, sm: 'var(--inline-sm)', md: 'var(--inline-md)', lg: 'var(--inline-lg)' };
+const FIGURE_STACK_GAPS = { none: 0, sm: 'var(--stack-sm)', md: 'var(--stack-md)', lg: 'var(--stack-lg)' };
+const FIGURE_WIDTHS = { narrow: 'var(--width-1500)', medium: 'var(--width-2000)' };
+
+/**
+ * Several parts of one Do or Don't figure side by side, wrapping when the card
+ * is narrow. The card owns the frame; a page arranges its parts with this, never with `style`.
+ *
+ * @param {'none' | 'sm' | 'md' | 'lg'} [gap] - `none` draws parts touching, for a figure about spacing
+ * @param {'center' | 'start' | 'end' | 'stretch'} [align]
+ * @param {'between' | 'end'} [justify]
+ */
+export function FigureRow({ gap = 'md', align = 'center', justify, children }) {
+    return (
+        <div
+            className="sb-ds-figure-row"
+            style={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                alignItems: align === 'start' || align === 'end' ? `flex-${align}` : align,
+                justifyContent: justify === 'between' ? 'space-between' : justify === 'end' ? 'flex-end' : undefined,
+                gap: FIGURE_GAPS[gap],
+            }}
+        >
+            {children}
+        </div>
+    );
+}
+
+/**
+ * Several parts of one Do or Don't figure one above the other, full width of the card.
+ *
+ * @param {'none' | 'sm' | 'md' | 'lg'} [gap]
+ * @param {'narrow' | 'medium'} [width] - cap the figure's width, for a field or a card that should not span the well
+ * @param {'start' | 'center' | 'stretch'} [align]
+ */
+export function FigureStack({ gap = 'md', width, align = 'stretch', children }) {
+    return (
+        <div
+            className="sb-ds-figure-stack"
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: align === 'start' ? 'flex-start' : align,
+                gap: FIGURE_STACK_GAPS[gap],
+                inlineSize: '100%',
+                maxInlineSize: width ? FIGURE_WIDTHS[width] : undefined,
+                marginInline: width ? 'auto' : undefined,
+            }}
+        >
+            {children}
+        </div>
+    );
+}
+
+/**
+ * A plain region inside a figure: a bordered box (or a raised card) that holds
+ * the part under test, for a figure about what sits in a region.
+ *
+ * @param {'outline' | 'raised' | 'surface'} [tone] - `outline` is a bare edge, `raised` a card, `surface` a message-like row
+ * @param {'row' | 'between' | 'column'} [arrange] - how the parts inside sit
+ * @param {boolean} [inset] - sit in from the edge of the parent region
+ * @param {boolean} [tall] - a taller box, for a region that fills its container
+ * @param {boolean} [clip] - a short box that clips its contents, for a figure about clipping
+ */
+export function FigureBox({ tone = 'outline', arrange, inset = false, tall = false, clip = false, children }) {
+    const padded = tone !== 'outline';
+    return (
+        <div
+            className="sb-ds-figure-box"
+            style={{
+                boxSizing: 'border-box',
+                border: 'var(--border-width-default) solid var(--ds-border)',
+                borderRadius: tone === 'raised' ? 'var(--radius-xxl)' : 'var(--radius-md)',
+                background: tone === 'raised' ? 'var(--ds-surface-raised)' : tone === 'surface' ? 'var(--ds-surface)' : undefined,
+                color: 'var(--ds-text)',
+                padding: tone === 'raised' ? 'var(--card-pad)' : padded ? 'var(--pad-y-md) var(--pad-x-md)' : undefined,
+                margin: inset ? 'var(--pad-y-lg) var(--pad-x-md)' : undefined,
+                height: tall ? 'calc(var(--height-750) * 2)' : clip ? 'var(--image-lg)' : undefined,
+                overflow: clip ? 'hidden' : undefined,
+                display: arrange ? 'flex' : undefined,
+                flexDirection: arrange === 'column' ? 'column' : undefined,
+                justifyContent: arrange === 'between' ? 'space-between' : undefined,
+                alignItems: arrange === 'between' ? 'flex-start' : undefined,
+                gap: arrange ? 'var(--inline-md)' : undefined,
+            }}
+        >
+            {children}
+        </div>
+    );
+}
+
+/**
+ * A narrow screen for an overlay in a figure, so a Dialog sized for a phone
+ * reads at figure width.
+ *
+ * @param {boolean} [short] - also cap the overlay's height
+ */
+export function FigureScreen({ short = false, children }) {
+    return (
+        <div
+            className="sb-ds-figure-screen"
+            style={{
+                '--plus-overlay-screen': 'var(--width-3000)',
+                '--blanket-max-height-modal': short ? 'var(--height-2000)' : undefined,
+                inlineSize: '100%',
+            }}
+        >
+            {children}
+        </div>
+    );
+}
+
+const FIGURE_GROUNDS = {
+    brand: 'var(--ds-background-brand-bold)',
+    neutral: 'var(--ds-background-neutral-bold)',
+    inverse: 'var(--ds-background-inverse-subtle)',
+};
+
+/**
+ * A bold ground behind a part drawn for one, such as a spinner or a count on a brand fill.
+ * The ground belongs to the figure, so the page never paints it.
+ *
+ * @param {'brand' | 'neutral' | 'inverse'} ground
+ */
+export function FigureGround({ ground, children }) {
+    return (
+        <div
+            className="sb-ds-figure-ground"
+            style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: 'var(--pad-y-lg) var(--pad-x-md)',
+                borderRadius: 'var(--radius-md)',
+                backgroundColor: FIGURE_GROUNDS[ground],
+            }}
+        >
+            {children}
+        </div>
+    );
+}
+
+/**
+ * A matched do and don't, side by side at docs width and one above the other when narrow.
+ * `stacked` is the reason a figure needs the full width (a string); it puts the pair one above the other at every width.
+ *
+ * @param {string} [stacked] - why the figure cannot be halved
+ */
+export function DoDontPair({ doExample, doCaption, doCode, dontExample, dontCaption, dontCode, stacked = '' }) {
     return (
         <div
             className="sb-ds-dodont-pair"

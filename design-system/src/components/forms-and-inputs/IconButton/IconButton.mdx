@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -238,9 +239,9 @@ Use `IconButton` when space is limited and the glyph clearly matches the action:
 Leave a gap so neighboring icon buttons read as separate targets.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><IconButton icon="pen" label="Edit page" /><IconButton icon="link" label="Copy link" /><IconButton icon="trash" label="Delete page" /></div>}
+    doExample={<FigureRow><IconButton icon="pen" label="Edit page" /><IconButton icon="link" label="Copy link" /><IconButton icon="trash" label="Delete page" /></FigureRow>}
     doCaption="A clear gap between icon buttons."
-    dontExample={<div style={{ display: 'flex', gap: 0 }}><IconButton icon="pen" label="Edit page" /><IconButton icon="link" label="Copy link" /><IconButton icon="trash" label="Delete page" /></div>}
+    dontExample={<FigureRow gap="none"><IconButton icon="pen" label="Edit page" /><IconButton icon="link" label="Copy link" /><IconButton icon="trash" label="Delete page" /></FigureRow>}
     dontCaption="Icon buttons touching."
 />
 
@@ -273,9 +274,9 @@ When filters are on, pass their number as `trailingMetric`. A positive count dra
 Primary marks the main action of a small area. The other icon buttons beside it stay default or subtle.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><IconButton icon="pen" label="Edit comment" appearance="subtle" /><IconButton icon="link" label="Copy link" appearance="subtle" /><IconButton icon="paper-plane" label="Send comment" appearance="primary" /></div>}
+    doExample={<FigureRow><IconButton icon="pen" label="Edit comment" appearance="subtle" /><IconButton icon="link" label="Copy link" appearance="subtle" /><IconButton icon="paper-plane" label="Send comment" appearance="primary" /></FigureRow>}
     doCaption="One primary icon button, with the other actions subtle."
-    dontExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><IconButton icon="pen" label="Edit comment" appearance="primary" /><IconButton icon="link" label="Copy link" appearance="primary" /><IconButton icon="paper-plane" label="Send comment" appearance="primary" /></div>}
+    dontExample={<FigureRow><IconButton icon="pen" label="Edit comment" appearance="primary" /><IconButton icon="link" label="Copy link" appearance="primary" /><IconButton icon="paper-plane" label="Send comment" appearance="primary" /></FigureRow>}
     dontCaption="Three primary icon buttons compete for attention."
 />
 
@@ -290,7 +291,7 @@ Put related icon buttons in a `ButtonGroup`, and use `isSelected` for a choice b
 <DoDontPair
     doExample={<ButtonGroup label="View"><IconButton icon="grip" label="Grid view" isSelected /><IconButton icon="list" label="List view" /></ButtonGroup>}
     doCaption="Grid and list views joined in one group, with the current view selected."
-    dontExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><IconButton icon="grip" label="Grid view" isSelected /><IconButton icon="list" label="List view" /></div>}
+    dontExample={<FigureRow><IconButton icon="grip" label="Grid view" isSelected /><IconButton icon="list" label="List view" /></FigureRow>}
     dontCaption="The same two views as loose buttons read as unrelated actions."
 />
 

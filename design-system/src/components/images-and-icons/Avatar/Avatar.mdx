@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
@@ -198,9 +199,9 @@ Keep one shape per kind within a list, so the shape tells a person from an
 agent at a glance.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Avatar name="Jane Park" /><Avatar shape="square" icon="robot" label="Study bot" /></div>}
+    doExample={<FigureRow><Avatar name="Jane Park" /><Avatar shape="square" icon="robot" label="Study bot" /></FigureRow>}
     doCaption="A circle for a person, a square for an agent."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Avatar shape="square" name="Jane Park" /><Avatar icon="robot" label="Study bot" /></div>}
+    dontExample={<FigureRow><Avatar shape="square" name="Jane Park" /><Avatar icon="robot" label="Study bot" /></FigureRow>}
     dontCaption="A person in a square and an agent in a circle."
 />
 
@@ -225,9 +226,9 @@ stays even.
 Keep one color per kind of person, or leave avatars blue. Green, yellow and red belong to the presence dot, so a green avatar reads as "online".
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Avatar name="Jane Park" /><Avatar name="Sam Lee" /></div>}
+    doExample={<FigureRow><Avatar name="Jane Park" /><Avatar name="Sam Lee" /></FigureRow>}
     doCaption="One color for all people, or one per kind."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Avatar name="Jane Park" color="green" /><Avatar name="Sam Lee" color="yellow" /></div>}
+    dontExample={<FigureRow><Avatar name="Jane Park" color="green" /><Avatar name="Sam Lee" color="yellow" /></FigureRow>}
     dontCaption="Green and yellow read as online and away."
 />
 
@@ -236,9 +237,9 @@ Keep one color per kind of person, or leave avatars blue. Green, yellow and red 
 Use the dot in a list a person scans for who is around. Leave it off a byline or a comment, where presence is not the question.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Avatar name="Jane Park" status="online" /><span>Jane Park</span></div>}
+    doExample={<FigureRow><Avatar name="Jane Park" status="online" /><span>Jane Park</span></FigureRow>}
     doCaption="The dot in a list that is scanned for who is around."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Avatar name="Jane Park" status="online" size={16} /></div>}
+    dontExample={<FigureRow><Avatar name="Jane Park" status="online" size={16} /></FigureRow>}
     dontCaption="A dot on a tiny byline, where presence is not the question."
 />
 

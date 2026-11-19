@@ -3,7 +3,15 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as InlineEditStories from './InlineEdit.stories.jsx';
 import { Button, InlineEdit, InlineEditableTextfield } from '@/components';
-import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    FigureRow,
+    FigureStack,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const figmaMeta = {
@@ -197,7 +205,7 @@ Both save; Escape cancels. The inline edit saves itself, so it needs no Save but
 <DoDontPair
     doExample={<InlineEditableTextfield label="Session title" defaultValue="Fractions" />}
     doCaption="Enter or leaving the field saves the title."
-    dontExample={<div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--inline-md)' }}><InlineEditableTextfield label="Session title" defaultValue="Fractions" /><Button text="Save" /></div>}
+    dontExample={<FigureRow align="end"><InlineEditableTextfield label="Session title" defaultValue="Fractions" /><Button text="Save" /></FigureRow>}
     dontCaption="A separate Save step beside an inline edit."
 />
 
@@ -206,9 +214,9 @@ Both save; Escape cancels. The inline edit saves itself, so it needs no Save but
 `spacing="compact"` draws both views at `--control-md`, to sit in a table cell or a dense row.
 
 <DoDontPair
-    doExample={<div><div style={{ borderBottom: 'var(--border-width-default) solid var(--ds-border)' }}><InlineEditableTextfield defaultValue="Ada Lovelace" spacing="compact" /></div><div style={{ borderBottom: 'var(--border-width-default) solid var(--ds-border)' }}><InlineEditableTextfield defaultValue="Grace Hopper" spacing="compact" /></div><div style={{ borderBottom: 'var(--border-width-default) solid var(--ds-border)' }}><InlineEditableTextfield defaultValue="Katherine Johnson" spacing="compact" /></div></div>}
+    doExample={<FigureStack gap="sm"><InlineEditableTextfield defaultValue="Ada Lovelace" spacing="compact" /><InlineEditableTextfield defaultValue="Grace Hopper" spacing="compact" /><InlineEditableTextfield defaultValue="Katherine Johnson" spacing="compact" /></FigureStack>}
     doCaption="Compact rows in a dense list."
-    dontExample={<div><div style={{ borderBottom: 'var(--border-width-default) solid var(--ds-border)' }}><InlineEditableTextfield defaultValue="Ada Lovelace" /></div><div style={{ borderBottom: 'var(--border-width-default) solid var(--ds-border)' }}><InlineEditableTextfield defaultValue="Grace Hopper" /></div><div style={{ borderBottom: 'var(--border-width-default) solid var(--ds-border)' }}><InlineEditableTextfield defaultValue="Katherine Johnson" /></div></div>}
+    dontExample={<FigureStack gap="sm"><InlineEditableTextfield defaultValue="Ada Lovelace" /><InlineEditableTextfield defaultValue="Grace Hopper" /><InlineEditableTextfield defaultValue="Katherine Johnson" /></FigureStack>}
     dontCaption="The default height spreads a dense list out."
 />
 

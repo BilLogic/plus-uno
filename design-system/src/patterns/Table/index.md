@@ -49,28 +49,28 @@ Table reads these motion tokens and no literal duration or curve.
 ### Put a plain table in a Section. {#put-a-plain-table-in-a-section}
 
 Do: The table spans the Section under its header: no frame, no card, no padding of its own.
-Don't: The table sits inside its own frame with padding. It stops lining up with the Section and the Section header.
+Don't: The table sits inside its own frame with padding; it stops lining up with the Section and the Section header.
 
 ### Put nothing between the header and the head row. {#put-nothing-between-the-header-and-the-head-row}
 
-Do: Search, filters and the record count live in the Section header rows. The head row follows directly.
-Don't: A second toolbar sits between the Section header and the head row. The table has no toolbar of its own.
+Do: Search, filters and the record count live in the Section header rows; the head row follows directly.
+Don't: A second toolbar sits between the Section header and the head row; the table has no toolbar of its own.
 
 ### One table per block. {#one-table-per-block}
 
 Never mix a Static, Dynamic or Tree table in one Section either.
 
 Do: One table per Section, with its own header, so people always know which rows its Search and filters act on.
-Don't: Two tables share one Section and one header. Search and filters no longer say which table they act on.
+Don't: Two tables share one Section and one header; search and filters no longer say which table they act on.
 
 ### Use a Dynamic table for rows people act on. {#use-a-dynamic-table-for-rows-people-act-on}
 
 Do: A roster people act on as a Dynamic table: sortable heads, checkboxes, a pager, and bulk actions in the head row while rows are selected.
-Don't: A roster people act on as a Static table. With no sort, selection or paging, 340 students become one long scroll.
+Don't: A roster people act on as a Static table; with no sort, selection or paging, 340 students become one long scroll.
 
 ### Use a Tree table for a hierarchy. {#use-a-tree-table-for-a-hierarchy}
 
-Do: Classes nest under their school and students under their class. Each level indents and keeps the columns.
+Do: Classes nest under their school and students under their class; each level indents and keeps the columns.
 Don't: A hierarchy faked with expandable rows: the classes and students lose their columns and can't be sorted or selected.
 
 ## Accessibility

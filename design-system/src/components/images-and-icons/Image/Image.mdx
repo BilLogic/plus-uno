@@ -9,6 +9,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureStack,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
@@ -174,9 +175,9 @@ already states.
 Use `fluid` and let the container set the width, so one image works from phone to desktop. Reach for `fixed` only for a picture that must stay at its natural size.
 
 <DoDontPair
-    doExample={<div style={{ width: '50%' }}><Image src={sessionSummaryLight} alt="" /></div>}
+    doExample={<FigureStack width="narrow"><Image src={sessionSummaryLight} alt="" /></FigureStack>}
     doCaption="Fluid, so the container sets the width."
-    dontExample={<div style={{ width: '50%' }}><Image src={sessionSummaryLight} alt="" size="fixed" /></div>}
+    dontExample={<FigureStack width="narrow"><Image src={sessionSummaryLight} alt="" size="fixed" /></FigureStack>}
     dontCaption="Fixed in a narrow container: the picture overflows it."
 />
 

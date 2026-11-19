@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureGround,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -210,7 +211,7 @@ A short row reads at a glance. With many steps, position stops being readable.
 `inverted` is for a dark surface; on a light one use `default`, `primary` or `help`.
 
 <DoDontPair
-    doExample={<div style={{ display: 'inline-flex', padding: 'var(--pad-y-lg) var(--pad-x-md)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--ds-background-inverse-subtle)' }}><ProgressIndicator values={['Session setup', 'Warm-up', 'Practice', 'Reflection']} selectedIndex={1} appearance="inverted" /></div>}
+    doExample={<FigureGround ground="inverse"><ProgressIndicator values={['Session setup', 'Warm-up', 'Practice', 'Reflection']} selectedIndex={1} appearance="inverted" /></FigureGround>}
     doCaption="Inverted indicator on a dark ground."
     dontExample={<ProgressIndicator values={['Session setup', 'Warm-up', 'Practice', 'Reflection']} selectedIndex={1} appearance="inverted" />}
     dontCaption="Inverted indicator on a light surface, where it vanishes."

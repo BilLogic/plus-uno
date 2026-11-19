@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
@@ -209,9 +210,9 @@ A status is read at a glance; a sentence belongs in the row text.
 Two statuses on one object force people to decide which is true.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Session 12</span><StatusTag appearance="success">Complete</StatusTag></div>}
+    doExample={<FigureRow><span>Session 12</span><StatusTag appearance="success">Complete</StatusTag></FigureRow>}
     doCaption="One status per row."
-    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Session 12</span><StatusTag appearance="success">Complete</StatusTag><StatusTag appearance="warning">Needs review</StatusTag></div>}
+    dontExample={<FigureRow><span>Session 12</span><StatusTag appearance="success">Complete</StatusTag><StatusTag appearance="warning">Needs review</StatusTag></FigureRow>}
     dontCaption="Two competing statuses."
 />
 
@@ -220,7 +221,7 @@ Two statuses on one object force people to decide which is true.
 <DoDontPair
     doExample={<StatusTag appearance="success" trailingMetric={38}>Completed</StatusTag>}
     doCaption="One label; the number reads as part of it."
-    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><StatusTag appearance="success">Completed</StatusTag><CountTag value={38} /></div>}
+    dontExample={<FigureRow><StatusTag appearance="success">Completed</StatusTag><CountTag value={38} /></FigureRow>}
     dontCaption="Two labels that read as unrelated."
 />
 

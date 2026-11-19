@@ -182,32 +182,36 @@ export const CloseControl = {
                     />
                 </PanelContainer>
             </Do>
-            <Dont caption="A hand-built circle. Its corner, its states and its focus ring are all guesses.">
-                <PanelContainer width="100%">
-                    <PanelHeader
-                        title="Session details"
-                        actions={(
-                            <span
-                                aria-hidden="true"
-                                style={{
-                                    display: 'grid',
-                                    placeItems: 'center',
-                                    width: 'var(--control-md)',
-                                    height: 'var(--control-md)',
-                                    borderRadius: 'var(--radius-full)',
-                                    background: 'var(--ds-background-neutral)',
-                                    color: 'var(--ds-icon-subtle)',
-                                }}
-                            >
-                                <Icon name="xmark" size={16} />
-                            </span>
-                        )}
-                    />
-                </PanelContainer>
-            </Dont>
+            <Dont caption="A hand-built circle; its corner, its states and its focus ring are all guesses."><AHandBuiltDontFigure /></Dont>
         </DoDont>
     ),
     play: async ({ canvas }) => {
         await expect(canvas.getAllByRole('button', { name: 'Close session details' })).toHaveLength(1);
     },
 };
+
+const AHandBuiltDontFigure = () => (
+    <>
+        <PanelContainer width="100%">
+            <PanelHeader
+                title="Session details"
+                actions={(
+                    <span
+                        aria-hidden="true"
+                        style={{
+                            display: 'grid',
+                            placeItems: 'center',
+                            width: 'var(--control-md)',
+                            height: 'var(--control-md)',
+                            borderRadius: 'var(--radius-full)',
+                            background: 'var(--ds-background-neutral)',
+                            color: 'var(--ds-icon-subtle)',
+                        }}
+                    >
+                        <Icon name="xmark" size={16} />
+                    </span>
+                )}
+            />
+        </PanelContainer>
+    </>
+);

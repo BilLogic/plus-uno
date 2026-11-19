@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
@@ -196,10 +197,10 @@ Pass `StatusTag` through `status` so every row's end slot holds only its action 
             label="Google Calendar"
             description="Sync upcoming tutoring sessions to your calendar."
             control={(
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-sm)' }}>
+                <FigureRow gap="sm">
                     <StatusTag appearance="success">Connected</StatusTag>
                     <Button spacing="compact">Disconnect</Button>
-                </span>
+                </FigureRow>
             )}
         />
     )}

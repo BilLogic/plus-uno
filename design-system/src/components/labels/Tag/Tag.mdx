@@ -8,6 +8,7 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureRow,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
@@ -239,9 +240,9 @@ category from a workflow state without reading the words.
 A color names a category; changing it inside one category reads as a different one.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><Tag color="blue">Lincoln Middle</Tag><Tag color="blue">Roosevelt K-8</Tag><Tag color="blue">North High</Tag></div>}
+    doExample={<FigureRow><Tag color="blue">Lincoln Middle</Tag><Tag color="blue">Roosevelt K-8</Tag><Tag color="blue">North High</Tag></FigureRow>}
     doCaption="One color for one category."
-    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><Tag color="blue">Lincoln Middle</Tag><Tag color="green">Roosevelt K-8</Tag><Tag color="orange">Fractions</Tag></div>}
+    dontExample={<FigureRow><Tag color="blue">Lincoln Middle</Tag><Tag color="green">Roosevelt K-8</Tag><Tag color="orange">Fractions</Tag></FigureRow>}
     dontCaption="Rainbow inside one category."
 />
 
@@ -250,7 +251,7 @@ A color names a category; changing it inside one category reads as a different o
 Pick a color per category and keep it stable, or leave every tag gray. A condition that can change is a `StatusTag`.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><Tag color="blue">North High</Tag><Tag color="blue">South High</Tag></div>}
+    doExample={<FigureRow><Tag color="blue">North High</Tag><Tag color="blue">South High</Tag></FigureRow>}
     doCaption="A stable color for a category."
     dontExample={<Tag color="green">Passed</Tag>}
     dontCaption={'Green reads as "went well" beside anything red.'}
@@ -304,9 +305,9 @@ selectable tags only; anywhere else it is ignored with a warning.
 Person, agent and team tell people who something belongs to; topics stay plain.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><Tag type="person">Ava Reyes</Tag><Tag type="agent" color="purple">Coach</Tag><Tag type="team">Math team</Tag></div>}
+    doExample={<FigureRow><Tag type="person">Ava Reyes</Tag><Tag type="agent" color="purple">Coach</Tag><Tag type="team">Math team</Tag></FigureRow>}
     doCaption="Types name the owner."
-    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><Tag>Ava Reyes</Tag><Tag>Coach</Tag><Tag>Math team</Tag></div>}
+    dontExample={<FigureRow><Tag>Ava Reyes</Tag><Tag>Coach</Tag><Tag>Math team</Tag></FigureRow>}
     dontCaption="Plain tags hide the owner."
 />
 

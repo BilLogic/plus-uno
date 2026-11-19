@@ -8,14 +8,13 @@ import {
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
+    FigureBox,
+    FigureRow,
+    FigureStack,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
-export const surface = { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--inline-md)', padding: 'var(--pad-y-md) var(--pad-x-md)', border: 'var(--border-width-default) solid var(--ds-border)', borderRadius: 'var(--radius-md)', background: 'var(--ds-surface)' };
-export const surfaceStacked = { ...surface, flexDirection: 'column', justifyContent: 'flex-start' };
-export const surfaceList = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', flex: 1 };
-export const itemRow = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--inline-md)' };
 
 <Meta of={CloseButtonStories} />
 
@@ -141,9 +140,9 @@ Use `CloseButton` wherever a surface closes as a whole, such as the corner of a 
 The close button anchors the top-right corner of the modal, panel or message it closes.
 
 <DoDontPair
-    doExample={<div style={surface}><span>Your session moved to 4 pm.</span><CloseButton label="Dismiss update" /></div>}
+    doExample={<FigureBox tone="surface" arrange="between"><span>Your session moved to 4 pm.</span><CloseButton label="Dismiss update" /></FigureBox>}
     doCaption="Top-right of the message."
-    dontExample={<div style={surfaceStacked}><span>Your session moved to 4 pm.</span><CloseButton label="Dismiss update" /></div>}
+    dontExample={<FigureBox tone="surface" arrange="column"><span>Your session moved to 4 pm.</span><CloseButton label="Dismiss update" /></FigureBox>}
     dontCaption="Bottom-left, under the content."
 />
 
@@ -160,9 +159,9 @@ Use "Close" for a surface that blocks, like a Modal, and "Dismiss" plus what goe
 Inverse tone is for the declared colored and dark grounds. Neutral surfaces use default.
 
 <DoDontPair
-    doExample={<div style={surface}><span>Your session moved to 4 pm.</span><CloseButton label="Dismiss update" /></div>}
+    doExample={<FigureBox tone="surface" arrange="between"><span>Your session moved to 4 pm.</span><CloseButton label="Dismiss update" /></FigureBox>}
     doCaption="Default tone on a neutral surface."
-    dontExample={<div style={surface}><span>Your session moved to 4 pm.</span><CloseButton tone="inverse" label="Dismiss update" /></div>}
+    dontExample={<FigureBox tone="surface" arrange="between"><span>Your session moved to 4 pm.</span><CloseButton tone="inverse" label="Dismiss update" /></FigureBox>}
     dontCaption="Inverse tone on a neutral surface: the glyph disappears."
 />
 
@@ -171,9 +170,9 @@ Inverse tone is for the declared colored and dark grounds. Neutral surfaces use 
 A close button dismisses the surface it sits on. To remove one item from a set, use an `IconButton` with its own icon and label.
 
 <DoDontPair
-    doExample={<div style={surface}><div style={surfaceList}><span>Maya Chen joined your group.</span><span>Sam Lee joined your group.</span></div><CloseButton label="Dismiss update" /></div>}
+    doExample={<FigureBox tone="surface" arrange="between"><FigureStack gap="sm"><span>Maya Chen joined your group.</span><span>Sam Lee joined your group.</span></FigureStack><CloseButton label="Dismiss update" /></FigureBox>}
     doCaption="One close button for the whole message."
-    dontExample={<div style={surface}><div style={surfaceList}><span style={itemRow}>Maya Chen joined your group.<CloseButton label="Dismiss Maya Chen" /></span><span style={itemRow}>Sam Lee joined your group.<CloseButton label="Dismiss Sam Lee" /></span></div></div>}
+    dontExample={<FigureBox tone="surface" arrange="between"><FigureStack gap="sm"><FigureRow gap="md" justify="between">Maya Chen joined your group.<CloseButton label="Dismiss Maya Chen" /></FigureRow><FigureRow gap="md" justify="between">Sam Lee joined your group.<CloseButton label="Dismiss Sam Lee" /></FigureRow></FigureStack></FigureBox>}
     dontCaption="A close button on each item inside the message."
 />
 
