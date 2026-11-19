@@ -99,22 +99,24 @@ export function tokenRowConflicts(inventions, retired) {
   return problems;
 }
 
-const show = (target) => {
+/** A target as shown; `own` is the component a props row is about, whose name a same-component target leaves off. */
+const show = (target, own = null) => {
   const t = parse(target);
   if (t.kind === 'token') return `\`${t.name}\``;
-  if (t.value) return `\`${t.component} ${t.prop}="${t.value}"\``;
-  return t.prop ? `\`${t.component} ${t.prop}\`` : `\`${t.component}\``;
+  const name = t.prop && t.component === own ? '' : `${t.component} `;
+  if (t.value) return `\`${name}${t.prop}="${t.value}"\``;
+  return t.prop ? `\`${name}${t.prop}\`` : `\`${t.component}\``;
 };
 
 /** The header table: what agents reach for, and what to write instead. */
 export function renderInventions(inventions) {
-  const row = (r) => `| ${r.not.startsWith('--') || /^[A-Z]/.test(r.not) ? `\`${r.not}\`` : r.not} | ${r.use.map(show).join(', ')}${r.why ? ` (${r.why})` : ''} |`;
-  const table = (title, rows) => (rows.length ? `**${title}**\n\n| Not here | Use instead |\n|---|---|\n${rows.map(row).join('\n')}\n\n` : '');
+  const row = (r, own) => `| ${r.not.startsWith('--') || /^[A-Z]/.test(r.not) ? `\`${r.not}\`` : r.not} | ${r.use.map((u) => show(u, own ? r.not.split(' ')[0] : null)).join(', ')}${r.why ? ` (${r.why})` : ''} |`;
+  const table = (title, rows, own = false) => (rows.length ? `**${title}**\n\n| Not here | Use instead |\n|---|---|\n${rows.map((r) => row(r, own)).join('\n')}\n\n` : '');
   return (
     `## Not here → use instead\n\n` +
     `Names agents reach for that this system does not have, or has retired. Write the right-hand name.\n\n` +
     table('Components', inventions.components) +
-    table('Props', inventions.props) +
+    table('Props (same component)', inventions.props, true) +
     table('Tokens', inventions.tokens)
   );
 }

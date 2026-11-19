@@ -43,22 +43,22 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `SectionToolbar` | `Section` |
 | `Section.Toolbar` | `Section` |
 
-**Props**
+**Props (same component)**
 
 | Not here | Use instead |
 |---|---|
-| `Button variant` | `Button appearance` |
-| `Button size` | `Button spacing` (spacing is default, compact or spacious) |
-| `Button disabled` | `Button isDisabled` |
-| `Button appearance="secondary"` | `Button appearance="default"` |
-| `Heading level` | `Heading as` (the level comes from the surrounding sections) |
-| `Heading size="small" / "large"` | `Heading size="sm"`, `Heading size="lg"` |
-| `Section tabs / type="tabs-only"` | `Section views` |
-| `Section toolbar / type="toolbar"` | `Section search`, `Section filters` |
-| `Frame width="content"` | `Frame width="default"` |
-| `Section onAddView / addViewLabel` | `Section views` |
-| `Rating variant` | `Rating type` |
-| `CloseButton tone` | `CloseButton appearance` |
+| `Button variant` | `appearance` |
+| `Button size` | `spacing` (spacing is default, compact or spacious) |
+| `Button disabled` | `isDisabled` |
+| `Button appearance="secondary"` | `appearance="default"` |
+| `Heading level` | `as` (the level comes from the surrounding sections) |
+| `Heading size="small" / "large"` | `size="sm"`, `size="lg"` |
+| `Section tabs / type="tabs-only"` | `views` |
+| `Section toolbar / type="toolbar"` | `search`, `filters` |
+| `Frame width="content"` | `width="default"` |
+| `Section onAddView / addViewLabel` | `views` |
+| `Rating variant` | `type` |
+| `CloseButton tone` | `appearance` |
 
 **Tokens**
 
