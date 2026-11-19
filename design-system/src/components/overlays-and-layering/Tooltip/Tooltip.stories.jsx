@@ -340,7 +340,7 @@ export const InteractiveContentInPopup = {
             <Dont caption="A link in a tooltip: moving toward it leaves the trigger, and the tooltip hides.">
                 <DocsOverlayBoundary fit={false} containHeight>
                     <FigureRow>
-                        <Tooltip text={<a href="#help">Read the guide</a>} placement="bottom" show>
+                        <Tooltip text={<TooltipLinkFigure />} placement="bottom" show>
                             <Button appearance="default" text="Scheduling" />
                         </Tooltip>
                     </FigureRow>
@@ -355,3 +355,6 @@ export const InteractiveContentInPopup = {
         await expect(canvas.getAllByRole('button', { name: 'Scheduling' })).toHaveLength(2);
     },
 };
+
+/** The link a tooltip must not hold, in the tooltip's own text color. */
+const TooltipLinkFigure = () => <a href="#help" style={{ color: 'inherit' }}>Read the guide</a>;
