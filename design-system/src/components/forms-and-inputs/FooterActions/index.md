@@ -22,7 +22,7 @@ Use `FooterActions` inside Modal, Panel (`PanelFooter`) and the multi-step task 
 4. **Three actions.** Take one quarter each in tracks `2`, `3` and `4`; only the rightmost is `primary`.
 5. **Leading action.** The leading slot holds only a side action that is not one of the footer's two outcomes: a destructive action such as "Delete", or a `link` that leaves the task, such as "Save and exit". It is always drawn as text with no fill: a `danger` action there becomes a `danger-link`, and any other leading action a `link`. It hugs the left content edge when it is the first child (of two or more) or is passed as `leadingAction`. It is never "Not now", "Cancel" or "Back". An action that declines or postpones ("Not now", "Skip", "Keep editing", "Save for later") is a `default` secondary in the left half, beside the primary. Filled actions sit in tracks `3`–`4` (one filled), `3` and `4` (two filled), or `2`, `3` and `4` (three filled, clamping the leading action to track `1`).
 6. **Destructive confirmations.** Place the safer alternative (`default` secondary, such as "Archive instead") on the left and the `danger` action as the rightmost child, splitting `50/50` across tracks `1`–`2` and `3`–`4`.
-7. **No Cancel in footers.** `Modal` and `Panel` already carry a corner close button, so footers name real outcomes ("Discard", "Save", never Cancel). Cancel appears only in a Popup, which has no close button: `subtle`, after the Primary.
+7. **No Cancel in footers.** `Modal` and `Panel` already carry a corner close button, so footers name real outcomes ("Discard", "Save", never Cancel).
 8. **Steps.** In a multi-step flow, "Back" (`default`) and "Next" (`primary`) split `50/50` across tracks `1`–`2` and `3`–`4`.
 
 ### Hug or fill
