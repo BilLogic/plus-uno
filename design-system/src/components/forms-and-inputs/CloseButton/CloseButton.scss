@@ -1,8 +1,8 @@
 @use '../../../styles/state' as *;
 
 /**
- * CloseButton — an Icon button, subtle, fixed to the × glyph. Its own tone
- * repaints what Icon button doesn't reach: `inverse`, for a colored or dark
+ * CloseButton — an Icon button, subtle, fixed to the × glyph. Its own
+ * appearance repaints what Icon button doesn't reach: `inverse`, for a colored or dark
  * ground, where the subtle appearance's own hover and pressed read as nearly
  * invisible.
  */

@@ -25,7 +25,7 @@ Use the toolbar's **Color mode** switch for these examples.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=21740-1284"
-    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/templates/AiChat"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/ai/AiChat"
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
@@ -35,8 +35,6 @@ Use the toolbar's **Color mode** switch for these examples.
 ## Appearance
 
 <ComponentExample of={AiChatStories.Overview} title="App" description="Chat closed: the floating action button at the bottom right of the Page." />
-
-<ComponentExample of={AiChatStories.StorybookVariant} title="Storybook" description={<><code>variant="storybook"</code> is the chat in these docs: the same controls, its mode remembered under its own key.</>} />
 
 </div>
 
@@ -98,9 +96,9 @@ Call the chat "AI chat". Return `{ text, sources }` from `respond` for answers
 based on records; `linkTarget` controls where source links open. `onFeedback`
 receives the reply and its rating, which persists across modes.
 
-### Storybook variant
+### In the Storybook docs
 
-`variant="storybook"` uses the docs' floating button's AI chat action to open chat.
+The docs' floating button has an AI chat action that opens chat; the docs' chat keeps its mode under its own `storageKey`.
 Set `launcher={false}` to omit chat's own button; the popup floats above the bottom right corner.
 
 The docs answerer uses a server-side function grounded in the design-system index.
@@ -114,7 +112,7 @@ and the component index and names that fallback.
 ## Parts
 
 1. **Button.** A primary circle Icon button with the AI icon, at the bottom right of the Page. It is the one way in, and it hides while chat is open in the Panel or full screen.
-2. **Header.** The AI icon, the title and the controls: clear chat, switch mode (popup and Panel trade places), full screen, more and close. The Storybook variant carries clear chat, move to Panel and close.
+2. **Header.** The AI icon, the title and the controls: clear chat, switch mode (popup and Panel trade places), full screen, more and close.
 3. **Conversation.** The person's messages on the sunken fill, and each reply as an AI message with its sources and thumbs.
 4. **Prompt starters** (optional). Offered while the conversation is empty, from `starters`.
 5. **Prompt input.** Where the person writes. While a reply is coming, its send button becomes Stop.

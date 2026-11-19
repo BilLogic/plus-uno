@@ -90,7 +90,7 @@ Don't: A hierarchy faked with expandable rows: the classes and students lose the
 - Pagination: the pager that fills the footer slot.
 - Card: a table never sits inside a card.
 
-Same group: `AiChat` · `Card` · `Frame` · `Modal` · `Page` · `Panel` · `Section`
+Same group: `Card` · `Frame` · `Modal` · `Page` · `Panel` · `Section`
 
 ## Parts
 

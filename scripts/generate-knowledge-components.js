@@ -20,7 +20,8 @@ import { AGENT_ROOT, REPO_ROOT } from './agent-views-paths.js';
 import { loadFacts, readBarrel } from './lib/ds-facts.mjs';
 import { isEntry } from './lib/findings.mjs';
 import { checkArtifacts, writeArtifacts } from './lib/generated-artifact.js';
-import { renderInventions, renderSelfCheck } from './lib/inventions.mjs';
+import { renderSelfCheck } from './lib/inventions.mjs';
+import { loadRetirement } from './lib/retirement.mjs';
 import { readTemplates, renderTemplates } from './lib/templates-index.mjs';
 
 /** Repo-relative path of a component's generated doc, or null if it has none. */
@@ -40,11 +41,6 @@ function generatedDocFor(name) {
   return null;
 }
 
-/** The hand-kept list of names agents reach for that do not exist here. */
-function readInventions() {
-  return JSON.parse(fs.readFileSync(path.join(AGENT_ROOT, '_inventions.json'), 'utf8'));
-}
-
 /**
  * `aliases` maps a barrel export onto the component it re-exports
  * (`export { default as Scale } from './RadioGroup'`). An agent that treats an
@@ -61,7 +57,7 @@ function renderComponentIndex(components, aliases) {
   doc += `Templates import from \`@/templates\` (§ Templates).\n\n`;
   doc += `This index is the existence list. Each entry links to its generated doc — `;
   doc += `props, variants, tokens touched — derived from source.\n\n`;
-  doc += renderInventions(readInventions());
+  doc += loadRetirement(REPO_ROOT).notHereTable();
   const facts = loadFacts(REPO_ROOT);
   doc += renderTemplates(readTemplates(REPO_ROOT), { from: 'design-system/agent-views/components', lookup: (name) => facts.lookup(name) });
   doc += `## UI components (${components.length})\n\n`;

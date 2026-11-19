@@ -8,14 +8,14 @@ import './CloseButton.scss';
  * The one dismiss control for a surface that closes as a whole — Modal,
  * Section message, Flag. An Icon button, subtle, fixed to the ×
  * glyph. `label` is required: "Close" for a surface that blocks (Modal),
- * "Dismiss {what}" for a message. `tone="inverse"` is for colored or
+ * "Dismiss {what}" for a message. `appearance="inverse"` is for colored or
  * dark grounds, where the subtle appearance's own hover and pressed read as
  * nearly invisible. There is no disabled state: a close control is always
  * available.
  */
 const CloseButton = ({
     label = 'Close',
-    tone = 'default',
+    appearance = 'default',
     spacing = 'default',
     className,
     onClick,
@@ -29,7 +29,7 @@ const CloseButton = ({
         spacing={spacing}
         onClick={onClick}
         type="button"
-        className={clsx('plus-close-btn', { 'plus-close-btn--inverse': tone === 'inverse' }, className)}
+        className={clsx('plus-close-btn', { 'plus-close-btn--inverse': appearance === 'inverse' }, className)}
     />
 );
 
@@ -37,7 +37,7 @@ CloseButton.propTypes = {
     /** The accessible name and hover title. "Close" for a surface that blocks; "Dismiss {what}" for a message. */
     label: PropTypes.string,
     /** `default` for neutral surfaces; `inverse` for colored or dark grounds */
-    tone: PropTypes.oneOf(['default', 'inverse']),
+    appearance: PropTypes.oneOf(['default', 'inverse']),
     /** `default` draws 32. `compact` draws 24. */
     spacing: PropTypes.oneOf(['default', 'compact']),
     /** Called with the click event. The surface that owns the close button closes itself here. */

@@ -13,7 +13,7 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: 'Rating component for form inputs. Supports two variants: with "Comments" label below or with numeric labels (1-5) above each star. Provides interactive star selection from 0 to 5 stars.'
+                component: 'Rating component for form inputs. Supports two types: with "Comments" label below or with numeric labels (1-5) above each star. Provides interactive star selection from 0 to 5 stars.'
             }
         }
     },
@@ -34,7 +34,7 @@ export default {
             control: 'text',
             table: { category: 'Content' }
         },
-        variant: {
+        type: {
             control: 'select',
             options: ['comments', 'numeric'],
             table: { category: 'Design' }
@@ -69,7 +69,7 @@ export const Overview = () => {
                 label="How was the session?"
                 isRequired
                 value={value}
-                variant="comments"
+                type="comments"
                 onChange={setValue}
             />
         </div>
@@ -96,7 +96,7 @@ export const Content = () => {
                     label="How was the session?"
                     isRequired
                     value={value}
-                    variant="comments"
+                    type="comments"
                     onChange={setValue}
                 />
             </section>
@@ -115,14 +115,14 @@ export const Variants = () => {
                 <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Label appears below the stars for open-ended feedback flows.
                 </p>
-                <Rating id="rating-comments-variant" value={commentsValue} variant="comments" onChange={setCommentsValue} />
+                <Rating id="rating-comments-type" value={commentsValue} type="comments" onChange={setCommentsValue} />
             </section>
             <section>
                 <span style={{ display: 'block', marginBottom: 'var(--stack-md)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>NUMERIC</span>
                 <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Numeric labels above each star for more explicit scales.
                 </p>
-                <Rating id="rating-numeric-variant" value={numericValue} variant="numeric" onChange={setNumericValue} />
+                <Rating id="rating-numeric-type" value={numericValue} type="numeric" onChange={setNumericValue} />
             </section>
         </div>
     );
@@ -136,8 +136,8 @@ export const InteractionStates = () => (
                 Disabled ratings remain visible but cannot be changed.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)' }}>
-                <Rating id="rating-disabled-comments" value={3} variant="comments" isDisabled />
-                <Rating id="rating-disabled-numeric" value={3} variant="numeric" isDisabled />
+                <Rating id="rating-disabled-comments" value={3} type="comments" isDisabled />
+                <Rating id="rating-disabled-numeric" value={3} type="numeric" isDisabled />
             </div>
         </section>
     </div>
@@ -148,14 +148,14 @@ export const Interactive = (args) => {
 
     useEffect(() => {
         setValue(3);
-    }, [args.variant]);
+    }, [args.type]);
 
     return (
         <div style={{ maxWidth: 'var(--width-2500)' }}>
             <Rating
                 label={args.label}
                 isRequired={args.isRequired}
-                variant={args.variant}
+                type={args.type}
                 isDisabled={args.isDisabled}
                 value={value}
                 onChange={setValue}
@@ -166,7 +166,7 @@ export const Interactive = (args) => {
 Interactive.args = {
     label: 'How was the session?',
     isRequired: false,
-    variant: 'comments',
+    type: 'comments',
     isDisabled: false,
 };
 Interactive.play = async ({ canvasElement }) => {
@@ -187,8 +187,8 @@ Interactive.play = async ({ canvasElement }) => {
 /** Each prop shows up in the DOM: numeric labels, comments label, icon family, minority marker. */
 export const PropsRender = () => (
     <div style={ratingCol}>
-        <Rating id="rating-props-numeric" label="Session pacing" variant="numeric" icon="thumbs-up" isRequired labelMarker="required" value={2} />
-        <Rating id="rating-props-comments" label="Tutor feedback" variant="comments" commentsLabel="Tell us more" value={2} />
+        <Rating id="rating-props-numeric" label="Session pacing" type="numeric" icon="thumbs-up" isRequired labelMarker="required" value={2} />
+        <Rating id="rating-props-comments" label="Tutor feedback" type="comments" commentsLabel="Tell us more" value={2} />
     </div>
 );
 PropsRender.parameters = { docs: { disable: true } };
@@ -197,13 +197,13 @@ PropsRender.play = async ({ canvasElement }) => {
     const numeric = canvas.getByRole('radiogroup', { name: 'Session pacing' });
     const comments = canvas.getByRole('radiogroup', { name: 'Tutor feedback' });
 
-    // variant=numeric: a label 1-5 above each item, no comments label.
+    // type=numeric: a label 1-5 above each item, no comments label.
     for (const n of [1, 2, 3, 4, 5]) {
         await expect(within(numeric.parentElement).getByText(String(n))).toBeTruthy();
     }
     await expect(within(numeric.parentElement).queryByText('Comments')).toBeNull();
 
-    // variant=comments: the comments label sits below, no numbers.
+    // type=comments: the comments label sits below, no numbers.
     await expect(canvas.getByText('Tell us more')).toBeTruthy();
     await expect(within(comments.parentElement).queryByText('1')).toBeNull();
 

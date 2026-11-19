@@ -746,7 +746,7 @@ const Sidebar = ({
             <div className="plus-template-sidebar__inner">
                 <Button
                     className="plus-template-sidebar__back"
-                    appearance="default"
+                    appearance="subtle"
                     shouldFitContainer
                     iconBefore="arrow-left"
                     text={inner.areaLabel}

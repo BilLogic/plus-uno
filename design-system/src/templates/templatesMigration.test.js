@@ -43,10 +43,9 @@ describe('templates migration', () => {
         expect(hits).toEqual([]);
     });
 
-    // The AI chat template stays under the AI UI root, which has its own Patterns group.
     it('every coded template story sits under the Templates root', () => {
         const stories = files.filter(
-            (f) => /\.stories\.jsx?$/.test(f) && /\/design-system\/src\/templates\//.test(f) && !f.endsWith('/AiChat/AiChat.stories.jsx'),
+            (f) => /\.stories\.jsx?$/.test(f) && /\/design-system\/src\/templates\//.test(f),
         );
         expect(stories.length).toBeGreaterThan(5);
         const misplaced = stories.filter((f) => !/title:\s*['"`]Templates\//.test(readFileSync(f, 'utf8')));

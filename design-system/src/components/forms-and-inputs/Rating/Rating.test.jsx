@@ -80,4 +80,19 @@ describe('Rating', () => {
         await user.click(screen.getByRole('radio', { name: 'Rate 5' }));
         expect(screen.getByRole('radio', { name: 'Rate 5' }).style.getPropertyValue('--plus-rating-stagger')).toBe('0ms');
     });
+
+    it('`type` picks the content: numbers above each item for numeric, a caption below for comments', () => {
+        const { container, rerender } = render(<Rating label="Confidence" type="numeric" value={2} onChange={() => {}} />);
+        expect(container.querySelectorAll('.plus-rating-item-label')).toHaveLength(5);
+        expect(screen.queryByText('Comments')).toBeNull();
+        rerender(<Rating label="Confidence" type="comments" value={2} onChange={() => {}} />);
+        expect(container.querySelectorAll('.plus-rating-item-label')).toHaveLength(0);
+        expect(screen.getByText('Comments')).toBeInTheDocument();
+    });
+
+    it('has no `variant` prop: the old name no longer picks the content', () => {
+        const { container } = render(<Rating label="Confidence" variant="numeric" value={2} onChange={() => {}} />);
+        expect(container.querySelectorAll('.plus-rating-item-label')).toHaveLength(0);
+        expect(screen.getByText('Comments')).toBeInTheDocument();
+    });
 });
