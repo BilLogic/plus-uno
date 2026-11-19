@@ -17,14 +17,12 @@ import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 import {
     AsWideAsTrigger,
     AtCap,
-    EndAligned,
     NarrowerThanTrigger,
     OneFlatMenu,
     PopupBesidePopup,
-    StartAlignedAtEnd,
     WiderThanCap,
 } from '@/storybook-docs/illustrations/popup.jsx';
-import { FieldsInModalCase, FormInPopupCase } from './PopupCases.jsx';
+import { EndAligned, FieldsInModalCase, FormInPopupCase, StartAlignedAtEnd } from './PopupCases.jsx';
 
 <Meta title="Templates/Popup" tags={['manifest']} />
 
@@ -273,6 +271,8 @@ A trigger at the start of a bar, such as the view picker under page tabs, gets a
 
 It hugs the longest item. The width is set once, on open, so it holds still while someone types. A long or loading list opens at 320. A long row: <DocsLink id="patterns-states-overflow">Overflow</DocsLink>.
 
+Drawn, not live: the Popup never renders narrower than its trigger, so the figure is the only way to show the don't.
+
 <DoDontPair
     doExample={<AsWideAsTrigger />}
     doCaption="The menu is at least as wide as its trigger, so their edges line up."
@@ -285,6 +285,8 @@ It hugs the longest item. The width is set once, on open, so it holds still whil
 <RuleTag kind="review" />
 
 Anything wider is a Panel or a Modal. Anything with inputs the person must finish, steps or a long scroll belongs in a Modal.
+
+Drawn, not live: the Popup never renders wider than 4-col, so the figure is the only way to show the don't.
 
 <DoDontPair
     doExample={<AtCap />}
@@ -311,6 +313,8 @@ An outside click closes a Popup and loses what was typed.
 <RuleTag kind="automatic" />
 
 A confirm Modal may open over a Popup and brings its own Blanket. A Popup opened from a Modal sits above it; a Tooltip sits above everything.
+
+Drawn, not live: the overlay module keeps a second Popup closed, so the figure is the only way to show the don't.
 
 <DoDontPair
     doExample={<OneFlatMenu />}

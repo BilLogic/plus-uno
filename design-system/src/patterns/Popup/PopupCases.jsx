@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { Button, Dialog, FooterActions, Popup, TextField } from '@/components';
 import { CaseBlanket, CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
+import { Menu, PopupStage } from './popupDemo.jsx';
 
 /**
  * The live do and don't examples on the Popup template page, composed from
- * `CaseBlanket`, `Dialog`, `Popup`, `FooterActions`, `TextField` and `Button`.
+ * `CaseBlanket`, `Dialog`, `Popup`, `DropdownMenu`, `FooterActions`, `TextField` and `Button`.
  */
+
+/** The height of the stage a held-open menu has room in. Docs geometry, px. */
+const MENU_STAGE = 230; // docs-literal
 
 /** Fields the person must finish sit in a Modal over a Blanket. */
 export const FieldsInModalCase = () => {
@@ -67,3 +71,17 @@ export const FormInPopupCase = () => {
         </CaseSurface>
     );
 };
+
+/** More sits at the end of the bar, so its menu aligns to its end edge and grows into the page. */
+export const EndAligned = () => (
+    <PopupStage height={MENU_STAGE} side="end">
+        {(mount) => <Menu mount={mount} placement="bottom-end" />}
+    </PopupStage>
+);
+
+/** An end trigger with a start-aligned menu: it runs off the edge of the page. */
+export const StartAlignedAtEnd = () => (
+    <PopupStage height={MENU_STAGE} side="end">
+        {(mount) => <Menu mount={mount} placement="bottom-start" />}
+    </PopupStage>
+);

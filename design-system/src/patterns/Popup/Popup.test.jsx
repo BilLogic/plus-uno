@@ -4,7 +4,7 @@ import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ComponentExample, exampleSlug } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard } from '@/storybook-docs/lib/template-page.jsx';
-import { FieldsInModalCase, FormInPopupCase } from './PopupCases.jsx';
+import { EndAligned, FieldsInModalCase, FormInPopupCase, StartAlignedAtEnd } from './PopupCases.jsx';
 
 vi.mock('@storybook/addon-docs/blocks', async () => {
     const React = await import('react');
@@ -36,6 +36,15 @@ describe('Popup live cases and docs links', () => {
         expect(screen.getByRole('textbox', { name: 'Student' })).toHaveValue('Ana Ruiz');
         expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
+    });
+
+    it('renders EndAligned and StartAlignedAtEnd as an open menu off the More trigger', async () => {
+        for (const Case of [EndAligned, StartAlignedAtEnd]) {
+            const { unmount } = render(<Case />);
+            expect(screen.getByRole('button', { name: 'More' })).toBeInTheDocument();
+            expect(await screen.findByRole('menuitem', { name: 'Reschedule' })).toBeInTheDocument();
+            unmount();
+        }
     });
 
     it('links TypeCard anchors to unique ComponentExample and heading ids in Popup.mdx', () => {
