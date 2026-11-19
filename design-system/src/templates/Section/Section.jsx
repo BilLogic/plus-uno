@@ -268,7 +268,7 @@ const warnDeprecatedHeaderProps = ({ tabs, toolbar }) => {
     });
 };
 
-/** Section: a span of the page grid under one heading, with its header, toolbar and tabs. */
+/** Section: a span of the page grid under one heading, with its title row, views, search and filters. */
 const Section = ({
     id,
     title,
@@ -530,7 +530,6 @@ Section.propTypes = {
     toolbar: PropTypes.node,
     /** Free-form header in place of title and description (header type `custom`)
      * @ds-context Used in: Section.header (ds guide section)
-     * @ds-context Governed by: Forms (ds guide forms)
      */
     header: PropTypes.node,
     /** Header type: `default` (title and description) or `custom` (your own `header`). Read from the slots when left off. */

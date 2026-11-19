@@ -41,3 +41,31 @@ test('no page keeps a form or a Cancel in a Popup', () => {
     assert.doesNotMatch(text, /Popup inline confirm/, `${file} keeps a Popup confirm row`);
   }
 });
+
+/** The keys of `<Name>.propTypes = { ... }`, each a public prop. */
+const propTypeKeys = (source, name) => {
+  const start = source.indexOf(`${name}.propTypes = {`);
+  assert.ok(start >= 0, `${name}.propTypes is in the source`);
+  const body = source.slice(start).split('\n};')[0];
+  return [...body.matchAll(/^ {4}(\w+):/gm)].map((m) => m[1]);
+};
+
+test('the Section Slots table lists every public prop', () => {
+  const page = read('design-system/src/templates/Section/Section.mdx');
+  const slots = page.slice(page.indexOf('## Slots'), page.indexOf('The bulk bar lives'));
+  for (const prop of propTypeKeys(read('design-system/src/templates/Section/Section.jsx'), 'Section')) {
+    assert.ok(new RegExp(`<code>${prop}[<="]`).test(slots), `the Slots table lists ${prop}`);
+  }
+});
+
+test('the Section page states the narrow behavior the code has', () => {
+  const page = read('design-system/src/templates/Section/Section.mdx');
+  assert.match(page, /filters fold into one Filter button and the views scroll sideways/);
+  assert.doesNotMatch(page, /Primary keeps only its icon|Search collapses|extra pills fold/);
+});
+
+test('Section carries no glossary avoid-word of its own: its hand-kept aliases and its summary', () => {
+  const aliases = JSON.parse(read('design-system/agent-views/_aliases.json')).components.Section;
+  assert.ok(!aliases.includes('toolbar'), 'toolbar is not a Section alias');
+  assert.doesNotMatch(read('design-system/src/templates/Section/Section.jsx'), /with its header, toolbar and tabs/);
+});

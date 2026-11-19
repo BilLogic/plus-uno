@@ -14,7 +14,7 @@
     {
       "group": "Section",
       "name": "Section",
-      "use": "A span of the page grid under one heading, with its header, toolbar and tabs. No box of its own: the Page supplies the pad. `detail` for a list with a detail region."
+      "use": "A span of the page grid under one heading, with its title row, views, search and filters. No box of its own: the Page supplies the pad. `detail` for a list with a detail region."
     },
     {
       "group": "Card",
