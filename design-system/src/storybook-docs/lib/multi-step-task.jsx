@@ -12,7 +12,7 @@ import { ScreenStage } from './fit-stage.jsx';
  * stay pressable; steps past the answers are off), the Page holds the task's
  * name and the step's body, and the footer along the bottom holds Save and exit
  * as a link at the left edge, with Back and Next (Finish on the last step) in
- * tracks 3 and 4, on one 32 line.
+ * tracks 3 and 4: FooterActions' filled buttons, 48 high.
  */
 
 /** The browser body's height on the docs page: docs geometry, in px. */
@@ -92,6 +92,8 @@ export const MultiStepTask = ({
                             minBlockSize: 0,
                             overflowY: 'auto',
                             padding: 'var(--page-pad)',
+                            // The footer is exactly 48 so its filled buttons fit; the hairline sits on the body's edge.
+                            borderBlockEnd: 'var(--border-width-default) solid var(--ds-border)',
                             boxSizing: 'border-box',
                         }}
                     >
@@ -115,16 +117,15 @@ export const MultiStepTask = ({
                             overflow: 'hidden',
                             paddingInline: 'var(--page-pad)',
                             background: 'var(--ds-surface)',
-                            borderBlockStart: 'var(--border-width-default) solid var(--ds-border)',
                         }}
                     >
                         <FooterActions
                             data-probe="bar-column"
                             style={{ inlineSize: '100%', maxInlineSize: 'var(--content-max-width-reading)', marginInline: 'auto' }}
-                            leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="link" spacing="default" onClick={(event) => { event.preventDefault(); onSaveAndExit?.(); }} />}
+                            leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="link" onClick={(event) => { event.preventDefault(); onSaveAndExit?.(); }} />}
                         >
-                            <Button text="Back" spacing="default" isDisabled={at === 0} onClick={() => go(at - 1)} />
-                            <Button text={last ? 'Finish' : 'Next'} spacing="default" appearance="primary" onClick={() => go(Math.min(at + 1, labels.length - 1))} />
+                            <Button text="Back" isDisabled={at === 0} onClick={() => go(at - 1)} />
+                            <Button text={last ? 'Finish' : 'Next'} appearance="primary" onClick={() => go(Math.min(at + 1, labels.length - 1))} />
                         </FooterActions>
                     </div>
                 </div>

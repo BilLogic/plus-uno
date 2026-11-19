@@ -12,9 +12,9 @@ import './Card.scss';
  *   a 1px border (transparent on sunken and raised) so forced colors draw its
  *   edge.
  * - **Image placement**: `top` (default), `start` or `end`. Side images apply
- *   at the large card minimum width and fill the height. `imageSplit` chooses
+ *   at the 480 minimum width and fill the height. `imageSplit` chooses
  *   one third (default) or one half; half uses Heading md on a side card.
- *   Below the large minimum width, the image returns to the top with its own ratio.
+ *   Below the 480 minimum width, the image returns to the top with its own ratio.
  * - **Image ratio**: `imageRatio` is `16:9` (default), `4:3` or `1:1`. A top
  *   image's height is the card width times the ratio, rounded to a multiple of
  *   4 so the card stays on the 4 px grid; the picture crops to cover and the
@@ -124,7 +124,7 @@ Card.propTypes = {
      * @ds-context Used in: Card.image (ds guide card)
      */
     image: PropTypes.node,
-    /** Image position. Side placements apply from the large card minimum width; narrower cards put the image on top. */
+    /** Image position. Side placements apply from the 480 minimum width; narrower cards put the image on top. */
     imagePlacement: PropTypes.oneOf(['top', 'start', 'end']),
     /** Image shape on a top image: its height follows the card width at 16:9, 4:3 or 1:1, rounded to a multiple of 4, and the picture crops to cover. A side image fills the card height instead. */
     imageRatio: PropTypes.oneOf(['16:9', '4:3', '1:1']),

@@ -2,7 +2,7 @@
 
 # Common actions
 
-Which button, in which look, in which place, with which word. Cancel, Close, Reset, copy, edit, remove, the destructive tiers, and acting on many rows at once.
+Which button, in which look, in which place, with which word. Cancel, Close, Clear, Reset, copy, edit, remove, the destructive tiers, and acting on many rows at once.
 
 **Kind:** Pattern
 
@@ -86,7 +86,7 @@ Choose a button's appearance by importance, placement by what it acts on, and la
 | --- | --- |
 | Verb and object: "Log session", "Add students", "Remove from group". | "Submit", "OK", "Yes", "Continue" with nothing after it. |
 | "Cancel" on a page form; "Close" to dismiss a layer; real actions like "Discard" in Modal or Panel footers. | "Dismiss" on a form; "Cancel" on a Close icon or inside a Modal or Panel footer. |
-| "Reset" in a menu; "Reset filters" everywhere else. | "Clear all", "Clear filters", "Reset all". |
+| "Clear" in a menu; "Reset filters" everywhere else. | "Reset" in a menu; "Clear all", "Clear filters", "Reset all". |
 | "Delete" for something destroyed; "Remove" for something taken out of a group. | "Delete" for leaving a group; "Remove" for erasing a record. |
 | Sentence case: "Mark attendance". | Title Case: "Mark Attendance". |
 
@@ -110,7 +110,7 @@ Choose a button's appearance by importance, placement by what it acts on, and la
 ## Related
 
 - Forms: use when the buttons submit fields.
-- Filtering: use for Reset and Apply inside a filter menu.
+- Filtering: use for Clear and Apply inside a filter menu.
 - Modal: use for the confirm a destructive action raises.
 - Disabled: use when an action cannot run yet.
 
@@ -172,11 +172,11 @@ Close ends a layer and lives in its header, or by Save and exit in a multi-step 
 
 Beside a Primary it is already clear the row is interactive, so Cancel steps back as Subtle. Cancel may be a link where a button would compete. In a Modal or Panel footer every filled track is a button, so the secondary action takes the Default fill to read as one. "Not now", "Skip" and "Keep editing" are that secondary action, never Subtle and never in the leading slot.
 
-### Say Reset in a menu and Reset filters everywhere else. {#say-reset-in-a-menu-and-reset-filters-everywhere-else}
+### Say Clear in a menu and Reset filters everywhere else. {#say-clear-in-a-menu-and-reset-filters-everywhere-else}
 
 **Checked:** Automatic
 
-The words and where they sit: Filtering › Say Reset in a menu and Reset filters everywhere else.
+The words and where they sit: Filtering › Say Clear in a menu and Reset filters everywhere else.
 
 ### Confirm a copy with a Copied tooltip, not a Flag. {#confirm-a-copy-with-a-copied-tooltip-not-a-flag}
 

@@ -354,10 +354,11 @@ export const ImageWide = { name: 'Image 16:9', render: () => imageCard('16:9') }
 export const ImageStandard = { name: 'Image 4:3', render: () => imageCard('4:3') };
 export const ImageSquare = { name: 'Image 1:1', render: () => imageCard('1:1') };
 
-/** The image height follows the card width for each ratio, rounded to a multiple of 4. */
+/** The image height follows the card width for each ratio, rounded to a multiple of 4. The three widths are test geometry, not recommended sizes. */
 export const ImageRatioGrid = {
     render: () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
+            {/* test geometry: three arbitrary widths, none on the grid */}
             {['16:9', '4:3', '1:1'].flatMap((ratio) => [240, 333, 477].map((width) => (
                 <Card key={`${ratio}-${width}`} role="article" aria-label={`${ratio} at ${width}`}
                     image={imagePlaceholder(ratio)} imageRatio={ratio} title="Ana Ruiz"
@@ -627,7 +628,7 @@ export const Rows = {
     },
 };
 
-/** Cards reflow at the large minimum width independently of the page width. */
+/** Cards reflow at the 480 minimum width independently of the page width. */
 export const PlacementBoundary = {
     render: () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>

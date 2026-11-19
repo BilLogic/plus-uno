@@ -117,12 +117,12 @@ The default type at 1440 with the AI panel docked.
 
 A task with several steps runs in the Sidebar's inner mode on a default Frame. A one-screen task stays a <DocsLink id="templates-modal">Modal</DocsLink>. When a long task takes over the Sidebar is the <DocsLink id="patterns-navigation">Navigation</DocsLink> pattern.
 
-<ComponentExample of={FrameStories.LayoutMultiStepTask} title="Five steps, in the inner sidebar" description="The steps are the rows. Done steps tick and stay pressable; steps past your answers are off. Save and exit is a link at the left edge; Back and Next sit in the right half of the footer, on one 32 line." />
+<ComponentExample of={FrameStories.LayoutMultiStepTask} title="Five steps, in the inner sidebar" description="The steps are the rows. Done steps tick and stay pressable; steps past your answers are off. Save and exit is a link at the left edge; Back and Next sit in the right half of the footer, as FooterActions' filled buttons." />
 
 1. **Back.** The inner sidebar's first row names the area the task came from and returns to the main Sidebar.
 2. **Steps.** Text-only rows, one noun each. The current step is marked, answered steps carry a tick, and steps past your answers are disabled with the reason in a tooltip.
 3. **Page.** The task's name as the page's one h1, then the step's body at reading width, 864, centered.
-4. **Footer**, fixed along the bottom and 48 high. Save and exit is a link at the left edge. Back (Default), then Next (Primary; Finish on the last step) take the right half. Each is 32 high on one line. Back on the first step is disabled and needs no reason.
+4. **Footer**, fixed along the bottom and 48 high. Save and exit is a link at the left edge. Back (Default), then Next (Primary; Finish on the last step) take the right half. Both are FooterActions' filled buttons, 48 high, on the footer rule from <DocsLink id="patterns-common-actions">Common actions</DocsLink>. Back on the first step is disabled and needs no reason.
 
 <ComponentExample of={FrameStories.LayoutMultiStepTaskLeaves} title="Leaving" description="Save and exit keeps the answers and leaves. Back in the inner sidebar returns to the main Sidebar." />
 

@@ -16,7 +16,7 @@ import { FilteredStudents, STAGE, ViewPicker } from './filteringDemo.jsx';
  * composes the real Section, its view bar and the real menus (FilterButton,
  * Popup select, FilterMenu), and each asserts the ruling it shows: one tier
  * per bar at the bar's end, what is on shown on the control that holds it,
- * Reset in a menu and "Reset filters" everywhere else.
+ * Clear in a menu and "Reset filters" everywhere else.
  *
  * Run: npx vitest run --project=storybook design-system/src/storybook-docs/patterns/Filtering/Filtering.stories.jsx
  */
@@ -96,7 +96,7 @@ export const TierQuickFilters = {
         await expect(buttons[0], 'what is on takes the selected state').toHaveAttribute('aria-pressed', 'true');
         await expect(buttons[1], 'what is off does not').not.toHaveAttribute('aria-pressed', 'true');
         await expectHungFrom(canvasElement, buttons[0], 'end');
-        await expect(within(p.popup()).queryByRole('button', { name: /Apply|Reset/ }), 'one list applies as you pick: no footer').toBeNull();
+        await expect(within(p.popup()).queryByRole('button', { name: /Apply|Clear/ }), 'one list applies as you pick: no footer').toBeNull();
         await userEvent.click(within(p.popup()).getByRole('option', { name: 'Grade 8' }));
         await expect(p.status()).toHaveTextContent('3 of 8 students');
         await waitFor(() => expect(p.canvas.getByRole('button', { name: 'Grade: Grade 8' })).toBeInTheDocument());
@@ -119,14 +119,14 @@ export const TierOneList = {
         await expectInRow3(canvasElement, [p.filterIcon()]);
         await expectHungFrom(canvasElement, p.filterIcon(), 'start');
         await expect(within(p.popup()).getByRole('listbox'), 'one list').toBeInTheDocument();
-        await expect(within(p.popup()).queryByRole('button', { name: /Apply|Reset/ }), 'no footer').toBeNull();
+        await expect(within(p.popup()).queryByRole('button', { name: /Apply|Clear/ }), 'no footer').toBeNull();
         await userEvent.click(within(p.popup()).getByRole('option', { name: 'Grade 6' }));
         await expect(p.status()).toHaveTextContent('2 of 8 students');
         await fitsCanvas(canvasElement);
     },
 };
 
-/** Tier 2b: two or three short categories side by side, Reset and Apply full bleed. */
+/** Tier 2b: two or three short categories side by side, Clear and Apply at the end. */
 export const TierSideBySide = {
     name: 'Tier 2b: Menu, side by side',
     render: () => staged(<FilteredStudents tier="2b" categories={['grade', 'school']} initial={{ grade: ['Grade 7'], school: ['Lincoln Middle'] }} openMenu="filters" />),
@@ -139,7 +139,7 @@ export const TierSideBySide = {
         await expectHungFrom(canvasElement, p.filterIcon(), 'start');
         const menu = within(p.popup());
         await expect(p.popup().closest('.plus-filter-menu') ?? p.popup().querySelector('.plus-filter-menu') ?? p.popup(), 'side by side').toHaveClass('plus-filter-menu--side-by-side');
-        await expect(menu.getByRole('button', { name: 'Reset' }), 'a menu says Reset').toBeInTheDocument();
+        await expect(menu.getByRole('button', { name: 'Clear' }), 'a menu says Clear').toBeInTheDocument();
         await expect(menu.getByRole('button', { name: 'Apply' })).toBeInTheDocument();
         await expect(menu.queryByRole('button', { name: 'Reset filters' }), 'never "Reset filters" in a menu').toBeNull();
         await userEvent.click(menu.getByRole('checkbox', { name: 'Grade 8' }));
@@ -238,10 +238,10 @@ export const FilterCount = {
             await expect(canvasElement.querySelector('.plus-template-section-content .plus-tag, .plus-tag-group'), 'no tags under the header').toBeNull();
         });
 
-        await step('Reset clears the menu; Apply clears the count', async () => {
+        await step('Clear clears the menu; Apply clears the count', async () => {
             await userEvent.click(p.filterIcon());
             await waitFor(() => expect(p.popup()).not.toBeNull());
-            await userEvent.click(menu().getByRole('button', { name: 'Reset' }));
+            await userEvent.click(menu().getByRole('button', { name: 'Clear' }));
             await expectFilterCount(p.filterIcon(), 2);
             await userEvent.click(menu().getByRole('button', { name: 'Apply' }));
             await waitFor(() => expectFilterCount(p.filterIcon(), 0));

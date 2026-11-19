@@ -16,7 +16,7 @@ Each type composes the Popup component, which handles placement, outside clicks 
 - **Profile menu.** From the account row: who is signed in, then links and Sign out. The 3-col width is Planned: today the menu hugs its rows.
 - **Select list.** One list that applies as you pick: radios for one choice, checkboxes for several.
 - **Content.** A preview or a short explanation. Anything wider is a Panel or a Modal.
-- **Filter menu.** Two or three categories, held until Apply. Reset and Apply sit full bleed, half each.
+- **Filter menu.** Two or three categories, held until Apply. Clear and Apply sit compact at the end.
 - **Filter menu, stacked.** Four or more categories, or long lists, stacked at 3-col, or 4-col when the options need it. The categories scroll between the pinned header and footer.
 
 ## Anatomy
@@ -26,7 +26,7 @@ A filter menu off the Filter icon. Every part once; the layer is padded 16 and r
 1. **Trigger.** The control it hangs off. It shows the open state and, for the Filter icon, the count.
 2. **Layer.** Hangs 4 below the trigger, aligned to the trigger's end edge because the trigger sits at the end of the bar. A titled layer's title is 14, whatever level the page around it is at.
 3. **Rows or categories.** Menu rows; a list of checkboxes or radios; columns or stacked categories.
-4. **Footer** (filter menu only). Reset (Default) and Apply (Primary), full bleed, half each.
+4. **Footer** (filter menu only). Clear (Subtle) and Apply (Default), compact, at the end. No Primary.
 
 ## Widths
 
@@ -81,7 +81,7 @@ Popup is the component: placement, offset, outside click and Escape. Each type i
 | `width` | `auto` (default) · `3-col` · `4-col`. |
 | `width="2-col"` | Planned. The short-list step with a 200 floor. |
 | `children` | Menu rows, a list, filter categories, or a short aside. |
-| Filter footer | Reset and Apply, full bleed. It belongs to FilterMenu. |
+| Filter footer | Clear and Apply, compact, at the end. It belongs to FilterMenu. |
 | Profile menu width | Planned. DropdownMenu hugs its rows today; it takes the 3-col step once it takes a width. |
 | Tooltip on a clipped row | Planned. The full text of a row that ends in an ellipsis. |
 
@@ -111,14 +111,14 @@ Use a Popup for content anchored to a trigger that leaves on an outside click or
 | A menu label that starts with the verb: "Reschedule". | A sentence as the label. |
 | A category title in a filter menu: "Grade", "Tutor". | "Filter by grade". |
 | A Filter Tooltip that names the control: "Filters". | "Click to filter the table". |
-| Say Reset in a menu: Reset, Apply. | "Reset filters" inside the menu. |
+| Say Clear in a menu: Clear, Apply. | "Reset" or "Reset filters" inside the menu. |
 
 ## Accessibility
 
 - The trigger carries `aria-haspopup` and an `aria-expanded` that tracks the open state. A Filter icon's name says what is on: "Filters, 2 applied".
 - A menu moves focus to its first row; Up and Down move, and Escape closes and returns focus to the trigger. A content Popup opened by a click or a key takes focus too: its first focusable element, or the popup itself when there is none. Tab reaches what is inside, and Escape or a click away returns focus to the trigger.
 - A select list is a listbox or a group of checkboxes, and the chosen state is announced. The labeled view trigger reads "Status, Upcoming".
-- In a filter menu, Reset and Apply are reachable after the categories. Apply announces the new count in words.
+- In a filter menu, Clear and Apply are reachable after the categories. Apply announces the new count in words.
 - A "Loading options" row is announced once, and "Couldn't load options" offers a Retry button.
 
 ## Related
@@ -197,4 +197,4 @@ A Popup floats on the overlay pair, `--ds-surface-overlay` with `--ds-shadow-ove
 
 Start with the verb: "Reschedule", "Export notes". An option that waits on something says why in its description line, as visible text.
 
-When a list applies, and the words Reset and Reset filters: Filtering.
+When a list applies, and the words Clear and Reset filters: Filtering.

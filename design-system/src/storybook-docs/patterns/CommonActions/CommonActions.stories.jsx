@@ -146,7 +146,7 @@ export const PlacementModalLeading = {
     },
 };
 
-/** A multi-step task: Save and exit as a link, Back and Next in tracks 3 and 4, on one 32 line in a 48 footer. */
+/** A multi-step task: Save and exit as a link, Back and Next in tracks 3 and 4, filled 48 buttons in a 48 footer. */
 export const PlacementMultiStep = {
     name: 'Placement: In a multi-step task',
     render: () => staged(<MultiStepBar />, TASK_STAGE),
@@ -164,8 +164,8 @@ export const PlacementMultiStep = {
         await expect(rect(save).left, 'Save and exit hugs the left edge').toBeCloseTo(tracks.box.left, 0);
         await expect(rect(back).left, 'Back starts on track 3').toBeCloseTo(tracks.track(3).left, 0);
         await expect(rect(next).right, 'Next ends on track 4').toBeCloseTo(tracks.track(4).right, 0);
-        await expect(rect(back).height, 'Back is 32 high').toBeCloseTo(tokenLength(canvasElement, '--control-md'), 0);
-        await expect(rect(save).height, 'Save and exit is on the same 32 line').toBeCloseTo(tokenLength(canvasElement, '--control-md'), 0);
+        await expect(rect(back).height, 'Back is 48 high').toBeCloseTo(tokenLength(canvasElement, BAR_TOKEN), 0);
+        await expect(rect(save).height, 'Save and exit is 48 high too').toBeCloseTo(tokenLength(canvasElement, BAR_TOKEN), 0);
         await expect(rect(save).top, 'one line: Save and exit and Back share a top').toBeCloseTo(rect(back).top, 0);
         await expect(rect(bar).height, 'the bar is 48 high').toBeCloseTo(tokenLength(canvasElement, BAR_TOKEN), 0);
         await userEvent.click(back);
@@ -207,7 +207,7 @@ export const PlacementPopup = {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         const layer = await waitFor(() => {
-            const found = canvasElement.querySelector('[role="dialog"]');
+            const found = canvasElement.querySelector('.plus-filter-menu');
             expect(found).not.toBeNull();
             return found;
         });

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { Button, ButtonItem, Checkbox, Dialog, DropdownMenu, Fieldset, FooterActions, IconButton, InlineEdit, LinkButton, Popup, TextField, Tooltip } from '@/components';
+import { Button, ButtonItem, Dialog, DropdownMenu, Fieldset, FooterActions, IconButton, InlineEdit, LinkButton, TextField, Tooltip } from '@/components';
 import { Card, Section } from '@/templates';
 import { HeaderSearch, SectionActions } from '@/storybook-docs/lib/section-header.jsx';
 import { FilterSide, StudentsTable, ViewPills, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
@@ -9,7 +9,10 @@ import { FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { MultiStepTaskType } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { FILLED, FormInPage, PAGE_WIDTH as FORM_PAGE_WIDTH } from '../Forms/formHosts.jsx';
 import { ModalStage, LeadingCells, TwoCells } from '../../../templates/Modal/modalDemo.jsx';
-import { PopupStage } from '../../../templates/Popup/popupDemo.jsx';
+import { FilterMenuLayer, PopupStage } from '../../../templates/Popup/popupDemo.jsx';
+
+/** Room for the open filter menu in its stage: docs geometry, in px. */
+const POPUP_FOOTER_HEIGHT = 290; // docs-literal
 
 /**
  * The Common actions pattern's examples: real Buttons, placed where each
@@ -97,26 +100,10 @@ export const CardAction = () => (
     </div>
 );
 
-/** A Popup that holds choices: compact Clear (Subtle) and Apply (Default) at the end, no Primary. */
+/** A Popup that holds choices, the real filter menu: compact Clear (Subtle) and Apply (Default) at the end, no Primary. */
 export const PopupFooter = () => (
-    <PopupStage height={320}>
-        {(mount) => (
-            <Popup
-                show
-                triggerType="manual"
-                container={mount}
-                placement="bottom-start"
-                title="Grades"
-                trigger={<Button text="Grades" spacing="compact" />}
-            >
-                <Checkbox label="Grade 7" defaultChecked />
-                <Checkbox label="Grade 8" />
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--inline-md)', marginBlockStart: 'var(--stack-lg)' }}>
-                    <Button text="Clear" appearance="subtle" spacing="compact" onClick={() => {}} />
-                    <Button text="Apply" spacing="compact" onClick={() => {}} />
-                </div>
-            </Popup>
-        )}
+    <PopupStage height={POPUP_FOOTER_HEIGHT} side="end">
+        {(mount) => <FilterMenuLayer mount={mount} />}
     </PopupStage>
 );
 

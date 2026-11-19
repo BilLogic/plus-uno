@@ -14,8 +14,8 @@ Choose a tier by the number of categories and the length of their lists. See Bes
 
 - **1 · Quick filters.** One to three categories, each a short list: a "Field: value" trigger per category opening its own list, applied as you pick.
 - **2a · Menu, one category.** The Filter button opens one list, applied as you pick. No footer.
-- **2b · Menu, side by side.** Two or three categories with short lists in columns, with Reset and Apply full bleed.
-- **2c · Menu, stacked.** Four or more categories, or long lists, stacked, with Reset and Apply full bleed.
+- **2b · Menu, side by side.** Two or three categories with short lists in columns, with Clear and Apply at the end.
+- **2c · Menu, stacked.** Four or more categories, or long lists, stacked, with Clear and Apply at the end.
 - **3 · Filter side.** Filtering is the main job: a side at the Section's start, "Reset filters" at its top and a count beside each category.
 
 ## What is on
@@ -40,8 +40,8 @@ Use Filtering when a person narrows a collection by its attributes. Filters live
 | --- | --- | --- | --- | --- |
 | 1 · Quick filters | One to three categories, each a short list | A FilterButton per category | As you pick | The button's selected fill and count |
 | 2a · Menu, one category | One category, and the bar has no room for a button | The Filter button, one list | As you pick | The Filter button's count |
-| 2b · Menu, side by side | Two or three categories with short lists, applied together | The Filter button, columns, Reset and Apply | On Apply | The Filter button's count |
-| 2c · Menu, stacked | Four or more categories, or long lists | The Filter button, stacked categories, Reset and Apply | On Apply | The Filter button's count |
+| 2b · Menu, side by side | Two or three categories with short lists, applied together | The Filter button, columns, Clear and Apply | On Apply | The Filter button's count |
+| 2c · Menu, stacked | Four or more categories, or long lists | The Filter button, stacked categories, Clear and Apply | On Apply | The Filter button's count |
 | 3 · Filter side | Filtering is the main job, such as browsing a long catalog | A side at the Section's start | As you pick, or on "Apply filters" for a batch | A count beside each category |
 
 ## Alternatives
@@ -55,7 +55,7 @@ Use Filtering when a person narrows a collection by its attributes. Filters live
 | Do | Don't |
 | --- | --- |
 | Name categories as nouns: "Grade", "School", "Subject". | "Filter by grade", "Choose a school". |
-| Label the menu footer "Reset" and "Apply". | "Clear", "OK", "Done". |
+| Label the menu footer "Clear" and "Apply". | "Reset", "OK", "Done". |
 | Put "Reset filters" at the top of a side; "Apply filters" only for a batch. | "Clear all", "Submit". |
 | Name the Filter button with filters on: "Filters 2". | "Filters (2)". |
 | Count the results in words: "1 of 8 students". | "1 result". |
@@ -66,7 +66,7 @@ Use Filtering when a person narrows a collection by its attributes. Filters live
 - The Filter button's name is "Filters"; with a count it reads "Filters 2". Apply returns focus to it, so its new name is read.
 - A FilterButton's name is its text plus its count. Its list is a listbox the arrow keys move through; Escape closes it and returns focus to the button.
 - The result count is a polite live region: it is read as the rows narrow.
-- Reset and Apply are the last tab stops in a menu.
+- Clear and Apply are the last tab stops in a menu.
 - A filter side is a region named "Filters", and each category is a group named by its legend.
 
 ## Parts
@@ -76,7 +76,7 @@ Use Filtering when a person narrows a collection by its attributes. Filters live
 | Quick filter | Filter button | A count only when a value is on; it hugs its label and opens its list at bottom-end. |
 | Filter button | Filter button | Text "Filters" with the `filter` icon; its `trailingMetric` draws the count on the selected fill. The Section's `filters` entry hands it to the menu. |
 | One list (tier 1 lists, 2a) | Popup select | Applies as you pick, radios for one. Checkboxes for several are Planned. |
-| Filter menu (2b, 2c) | Filter menu | Holds values until Apply; columns side by side or stacked; Reset and Apply full bleed. |
+| Filter menu (2b, 2c) | Filter menu | Holds values until Apply; columns side by side or stacked; Clear and Apply at the end. |
 | Placement and width | Popup | bottom-end at the end of a bar, bottom-start at its start; 4 from the trigger. |
 | Filter side | Section side | Composed at the start today. A start placement prop is Planned. |
 | No matches | Empty state | Replaces the table and offers "Reset filters". |
@@ -139,13 +139,13 @@ Don't: A row of tags under the bar, repeating what is on.
 
 **Checked:** Automatic
 
-A one-list menu is a Popup select: radios for one choice, not searchable for a short list. Checkboxes for several choices in one list are Planned on it . A multi-category menu is a Filter menu that holds values until Apply; Apply closes it and updates the content once, and Reset clears the choices without applying. Where a menu opens and how wide it is: Popup.
+A one-list menu is a Popup select: radios for one choice, not searchable for a short list. Checkboxes for several choices in one list are Planned on it . A multi-category menu is a Filter menu that holds values until Apply; Apply closes it and updates the content once, and Clear clears the choices without applying. Where a menu opens and how wide it is: Popup.
 
-### Say Reset in a menu and Reset filters everywhere else. {#say-reset-in-a-menu-and-reset-filters-everywhere-else}
+### Say Clear in a menu and Reset filters everywhere else. {#say-clear-in-a-menu-and-reset-filters-everywhere-else}
 
 **Checked:** Automatic
 
-"Reset filters" at the top of a side clears them all, and the "No matches" state offers it too; both clear the search. "Apply filters" appears only for batch filtering in a side.
+A menu's footer says "Clear" and "Apply", compact at the end. "Reset filters" at the top of a side clears them all, and the "No matches" state offers it too; both clear the search. "Apply filters" appears only for batch filtering in a side.
 
 ### Hide the filter side below 960 and fold quick filters below 768. {#hide-the-filter-side-below-960-and-fold-quick-filters-below-768}
 

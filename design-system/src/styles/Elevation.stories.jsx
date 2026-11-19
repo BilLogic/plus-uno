@@ -466,7 +466,7 @@ export const StickyHeaderScrolled = {
                         <DynamicTable
                             label="Tutors"
                             stickyHeader
-                            maxHeight={304 /* token gap: 304px */}
+                            maxHeight="var(--card-min-width-md)" /* a 304 stand-in: no height token fits a scroll demo */
                             head={{ cells: [{ key: 'tutor', content: 'Tutor' }, { key: 'sessions', content: 'Sessions', align: 'number' }] }}
                             rows={['Ana Ruiz', 'Ben Cho', 'Cara Diaz', 'Dev Shah', 'Eli Park', 'Fay Wu', 'Gus Lee', 'Hana Ito', 'Ivy Moss', 'Jon Bell'].map((n, i) => ({
                                 key: n,

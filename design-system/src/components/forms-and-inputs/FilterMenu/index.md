@@ -2,7 +2,7 @@
 
 # FilterMenu
 
-Filter menu: several filter categories in a Popup, held until Apply. - **Held until Apply.** Ticking a box changes the menu, not the content. Apply hands the values to `onApply`, closes the menu with a fade, and the content behind swaps in place once. Escape or a click away drops what was ticked; the next open starts from what is applied. - **Reset** clears every box in the menu without applying. Apply then applies the empty set. - **Layout follows the count.** Two or three categories sit side by side at `3-col`; four or more stack, at `3-col` or `4-col`. - **The trigger** is the Filter icon button, its count the number of values applied, on the selected fill once any is. It opens `bottom-end`, the end of the bar where filters sit.
+Filter menu: several filter categories in a Popup, held until Apply. - **Held until Apply.** Ticking a box changes the menu, not the content. Apply hands the values to `onApply`, closes the menu with a fade, and the content behind swaps in place once. Escape or a click away drops what was ticked; the next open starts from what is applied. - **Clear** clears every box in the menu without applying. Apply then applies the empty set. Both are compact (24) at the end of the menu: Clear is Subtle, Apply is Default, with no Primary. - **Layout follows the count.** Two or three categories sit side by side at `3-col`; four or more stack, at `3-col` or `4-col`. - **The trigger** is the Filter icon button, its count the number of values applied, on the selected fill once any is. It opens `bottom-end`, the end of the bar where filters sit.
 
 Also asked as: filter dropdown.
 
@@ -76,7 +76,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 1. **Trigger.** The Filter `IconButton`. Once any value is applied it shows the count on the selected fill and reads "Filters, 2 applied".
 2. **Popup.** A `Popup` at a column step: `3-col` side by side; `3-col` or `4-col` stacked.
 3. **Categories.** A `Fieldset` per category, its label the legend, its options `Checkbox`es. Pick as many as apply.
-4. **Footer.** Reset (default) and Apply (primary), half each, full bleed across the bottom.
+4. **Footer.** Clear (subtle) and Apply (default), compact, at the end. No Primary.
 
 ### Placement
 
@@ -91,7 +91,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | --- | --- |
 | Open | The menu clips open from the trigger's corner, on the values applied. A keyboard open is instant. |
 | Ticked | The box changes color. The content behind does not change. |
-| Reset | Every box clears with the same color change. Nothing is applied yet. |
+| Clear | Every box clears with the same color change. Nothing is applied yet. |
 | Applied | The menu fades, the content behind swaps in place once, and the trigger's count changes. Nothing slides. |
 | Dismissed | Escape or a click away closes it and drops the ticks; the next open starts from what is applied. |
 
@@ -109,7 +109,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Do | Don't |
 | --- | --- |
-| "Reset" in the menu. | "Reset filters" or "Clear all" in the menu. "Reset filters" is for everywhere else, such as a No matches state. |
+| "Clear" in the menu. | "Reset", "Reset filters" or "Clear all" in the menu. "Reset filters" is for everywhere else, such as a No matches state. |
 | Name a category by what it holds: "Status", "Subject". | A verb phrase such as "Filter by status". |
 
 ## Props
@@ -147,7 +147,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-width-default` · `--dropdown-menu-max-height` · `--heading-xs` · `--inline-lg` · `--plus-filter-menu-bleed` · `--plus-filter-menu-columns` · `--popup-pad` · `--stack-lg`
+`--dropdown-menu-max-height` · `--heading-xs` · `--inline-lg` · `--inline-md` · `--plus-filter-menu-columns` · `--popup-pad` · `--stack-lg`
 
 From `design-system/src/components/forms-and-inputs/FilterMenu/FilterMenu.scss`. Override these through the token layer, never with a literal.
 

@@ -78,7 +78,7 @@ The examples on this page follow the toolbar's Color mode switch.
 
 ## Image placement
 
-`imagePlacement` is `top` (default), `start` or `end`. Side placement applies when the card itself is at least the large minimum width (480), independently of the viewport. Below that width the image returns to the top and takes its `imageRatio` height. Use one placement per row of cards.
+`imagePlacement` is `top` (default), `start` or `end`. Side placement applies when the card itself is at least the 480 minimum width, independently of the viewport. Below that width the image returns to the top and takes its `imageRatio` height. Use one placement per row of cards.
 
 `imageSplit` is `1/3` (default) or `1/2`, for side placement only. A side image fills the card height, crops to cover, has no padding and takes the card's corners on its side only. The half split steps the title up to Heading md; top placement and narrow cards keep the regular card title.
 
@@ -92,7 +92,7 @@ The examples on this page follow the toolbar's Color mode switch.
 
 <ComponentExample of={CardStories.ImageEndHalf} title="Half at the end" description="The text leads a finished moment with an equal image split." />
 
-<ComponentExample of={CardStories.PlacementBoundary} title="Below large" description="Narrow cards return to an image on top, including on wide pages." />
+<ComponentExample of={CardStories.PlacementBoundary} title="Below 480" description="Narrow cards return to an image on top, including on wide pages." />
 
 </div>
 
