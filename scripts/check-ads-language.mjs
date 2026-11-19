@@ -7,21 +7,26 @@
  * Badge, `style` x `fill`, small / medium / large, the 08 / 12 / 16 state
  * steps, surface container, scrim, Rovo) are gone from the tree, and the ban is
  * hard: any hit is a finding, with no baseline and no exemption beyond the
- * allowlist below.
+ * shared allowed places.
+ *
+ * THE NAMES ARE THE RETIREMENT LIST'S. This check holds no list of retired
+ * names and no list of places that may keep them: both come from
+ * `design-system/agent-views/_inventions.json` through `scripts/lib/retirement.mjs`.
+ * What stays here is how a use is counted (a JSX tag, an import, a prose line)
+ * and the retired prop shapes, which are code structure rather than names.
  *
  * WHAT IT READS. Every tracked `.scss .css .jsx .js .html .mdx` file under
  * `design-system/src`, `prototypes` and `src` (`.mjs` counts as js), by `git ls-files` (a filesystem
  * walk finds a second copy of the tree under `.claude/worktrees/`), the token
- * files included. `docs/knowledge/archive/`, `docs/adr/` and
- * `_Avoid_:` glossary lines are allowlisted: they record the old words on
- * purpose, as history or as what not to say.
+ * files included. The list's allowed places (decision records, the knowledge
+ * archive, changelogs, plans, eval history) and `_Avoid_:` glossary lines record
+ * the old words on purpose, as history or as what not to say.
  *
  * WHAT IT COUNTS, per rule and per file, keyed `<rule> <path>`:
- *   state-step       lines naming a `--*-state-NN` custom property, NN being 08, 12 or 16.
+ *   state-step       lines naming a `--*-state-NN` custom property, NN being 08, 12 or 16
+ *                    (the list's word row of that rule).
  *   component:<Name> JSX tags `<Name` plus import statements binding `Name`,
- *                    for the retired names: the Not-here rows marked `retired`
- *                    (`design-system/agent-views/_inventions.json`), plus the retired
- *                    `Overlay` and `Surface` pattern names.
+ *                    for the retired names: the list's component rows marked `retired`.
  *   prop:style|fill|size   lines with the retired prop values: `style="primary"`
  *                    (a bare identifier, which no inline CSS is), `fill="filled"`,
  *                    `size="small|medium|large|sm|md|lg"`. A `<Heading>`'s size is the type
@@ -32,17 +37,17 @@
  *                    side of `prop:size`: a component that declares the old vocabulary
  *                    never writes it as JSX, so only the declaration shows it.
  *   class:plus-btn   lines naming `plus-btn--(filled|tonal|...|large)`.
- *   word:<word>      lines naming `surface container`, `scrim` or `Rovo`.
- *   word:Atlassian   zero allowed: MDX prose, story doc strings and `atlassian.design` links.
- *   word:PLUS-AI  lines under `design-system/src` naming the AI "PLUS AI": the product's
- *                    AI is unnamed and shows as AI (decision 1 of #1591). Prototypes keep
- *                    their own recorded copy.
+ *   word:<word>      lines naming a retired word of the list (`surface container`, `scrim`,
+ *                    `Rovo`, ...). A row bound to paths (`in`) counts only there: the AI's old
+ *                    product name only under `design-system/src`, prototypes keep their own
+ *                    recorded copy. A `shipped` row (the benchmark's name) counts in MDX prose,
+ *                    story doc strings and links, and a code comment may cite it.
  *
  * AGENT-READ MARKDOWN. The `.md` docs agents learn from (`DOC_ROOTS`: the
  * constitution, glossary and README, skills, agents, docs, the design-system
  * guidelines) are held to one rule:
- *   retired-name:<Name> lines naming a retired component (the `NOT_HERE.components`
- *                    rows marked retired) as a word; the finding names the replacement.
+ *   retired-name:<Name> lines naming a retired component (the list's rows marked retired)
+ *                    as a word; the finding names the replacement.
  * A table or paragraph that maps old names to new on purpose carries
  * `<!-- retired-names-ok: why -->`, which covers the contiguous non-blank block
  * it sits in. A generated file (a `GENERATED` banner in its first lines) is
@@ -52,41 +57,22 @@
  *
  * EVERY RULE ALLOWS ZERO. A hit is a finding; there is no baseline to hold it
  * and no `--update` to record it. A word that is legitimately cited (a Figma
- * layer name, a decision record) goes into the allowlist below, named.
+ * layer name, a decision record) is an allowed place in the list, named.
  */
-
-import fs from 'node:fs';
-import path from 'node:path';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { SOURCE_ROOTS } from './lib/ds-facts.mjs';
 import { main } from './lib/findings.mjs';
-import { renamedInProse, retiredComponents } from './lib/inventions.mjs';
+import { loadRetirement } from './lib/retirement.mjs';
 import { trackedSources } from './lib/tracked-sources.mjs';
 
 export { REPO_ROOT };
 /** The library's own source and consumer code: the language binds both. */
 export const SEARCH_ROOTS = SOURCE_ROOTS;
 export const SEARCHED = /\.(scss|css|jsx|js|mjs|html|mdx)$/;
-/** Files that record the old words on purpose: history and decisions. */
-const ALLOWED_PATHS = [
-  /^docs\/knowledge\/archive\//,
-  /^docs\/adr\//,
-];
-/**
- * Decision records that cite the benchmark on purpose, so the citation is the
- * content. Named, not globbed; a new record earns its own line here. None today.
- */
-const ATLASSIAN_RECORDS = [];
 /** The agent-read markdown: what uno, uno-bot and the review skills learn from. */
 export const DOC_ROOTS = ['AGENTS.md', 'GLOSSARY.md', 'README.md', 'skills', 'agents', 'docs', 'design-system/guidelines'];
 const DOC_FILE = /\.md$/;
-/**
- * Plans are working notes, deleted once landed; eval scenarios are fixtures an
- * eval hands to the agent under test, written in the old names on purpose. The
- * archive and ADRs are history (ALLOWED_PATHS).
- */
-const DOC_SKIPPED = /^docs\/(?:plans|evals\/scenarios)\//;
 /** A block that maps retired names to their replacements on purpose. */
 const RETIRED_OK = /<!--\s*retired-names-ok:\s*.+?-->/i;
 /** A generated file's banner, within its first lines: `GENERATED by …` or `DO NOT EDIT BY HAND`. */
@@ -97,32 +83,24 @@ const COMMENT_LINE = /^\s*(?:\/\/|\/\*|\*)/;
 /** A glossary line saying what not to say. */
 const ALLOWED_LINE = /^\s*_Avoid_:/;
 
-/** The Not-here table: the one list of retired names, each with its replacement. */
-const NOT_HERE = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'design-system/agent-views/_inventions.json'), 'utf8'));
+/** The one retirement list: names, replacements and the places that may keep them. */
+const RETIREMENT = loadRetirement(REPO_ROOT);
 
-/** The retired component names: the Not-here rows marked `retired`. Retire one there, not here. */
-export const LEGACY_COMPONENTS = retiredComponents(NOT_HERE);
-/** Retired pattern names, counted the same way as the retired components. */
-const PATTERN_COMPONENTS = ['Overlay', 'Surface'];
+/** The retired component names: the list's component rows. Retire one there, not here. */
+export const LEGACY_COMPONENTS = RETIREMENT.ofKind('component').map((r) => r.not);
+/** Retired names that are also English words (the list's `tags`): counted as JSX tags and imports, not in prose. */
+const TAG_NAMES = RETIREMENT.ofKind('tag').map((r) => r.not);
 
-/** A component renamed with no alias (ADR-037 "clean replace"), the Not-here rows marked `inProse`: the old name may not survive in doc prose either. */
-export const RENAMED_NO_ALIAS = renamedInProse(NOT_HERE);
+/** A component renamed with no alias (ADR-037 "clean replace"), the rows marked `inProse`: the old name may not survive in doc prose either. */
+export const RENAMED_NO_ALIAS = Object.fromEntries(RETIREMENT.ofKind('component').filter((r) => r.inProse).map((r) => [r.not, r.use[0]]));
 /** Where doc prose is checked for a stale renamed-away name — component docs, not specs or prototypes. */
 const DOC_PATH = /^design-system\/src\/components\/.*\.mdx$/;
-/** The AI's old product name; the AI is unnamed (decision 1 of #1591), held to zero in the design system. */
-const AI_NAME = /\bPLUS AI\b/;
-const DESIGN_SYSTEM_PATH = /^design-system\/src\//;
-
 const LINE_RULES = [
-  ['state-step', /--[a-z0-9-]*-state-(?:08|12|16)(?![0-9])/],
   ['prop:style', /\bstyle="[a-z][a-z-]*"/],
   ['prop:fill', /\bfill="(?:filled|tonal|outline|ghost|text)"/],
   ['prop:size', /\bsize="(?:small|medium|large|sm|md|lg)"/],
   ['proptype:size', /\bsize:\s*(?:PropTypes\.)?oneOf\(\s*\[\s*['"](?:small|medium|large|sm|md|lg)['"]/],
   ['class:plus-btn', /plus-btn--(?:filled|tonal|outline|ghost|text|small|medium|large)/],
-  ['word:surface-container', /surface container/i],
-  ['word:scrim', /\bscrim/i],
-  ['word:Rovo', /\bRovo\b/],
 ];
 
 /**
@@ -176,17 +154,19 @@ function componentCount(text, name) {
 }
 
 /**
- * Is this line shipped doc that names Atlassian? Every MDX line is; in code
- * only a non-comment line of a story is (its `docs` strings);
- * and an `atlassian.design` link is anywhere, because JSDoc flows into the
+ * Is this line shipped doc that says a `shipped` word? Every MDX line is; in
+ * code only a non-comment line of a story is (its `docs` strings); and the
+ * word as a link host (`word.design`) is anywhere, because JSDoc flows into the
  * generated agent views.
  */
-function atlassianShipped(file, line) {
-  if (/atlassian\.design/i.test(line)) return true;
-  if (!/atlassian/i.test(line)) return false;
+function shippedUse(file, line, word) {
+  if (new RegExp(`${word}\\.[a-z]{2,}`, 'i').test(line)) return true;
   if (/\.mdx$/.test(file)) return true;
   return /\.stories\.jsx$/.test(file) && !COMMENT_LINE.test(line);
 }
+
+/** The rule a retired word or spelling is counted under: the row's own, else `word:<name>`. */
+const ruleOf = (row) => row.rule ?? `word:${row.not.replace(/\s+/g, '-')}`;
 
 /**
  * Measure sources: `{ path, text }[]` in, `Map<key, {count, line}>` out, where
@@ -201,7 +181,7 @@ export function measure(sources) {
     if (count > 0) found.set(`${rule} ${file}`, { count, line });
   };
   for (const { path: file, text } of sources) {
-    if (ALLOWED_PATHS.some((re) => re.test(file))) continue;
+    if (RETIREMENT.allowed(file)) continue;
     if (DOC_FILE.test(file)) {
       measureDoc(file, text, add);
       continue;
@@ -230,17 +210,20 @@ export function measure(sources) {
         add(`stale-name:${oldName}`, file, hits.length, hits[0]);
       }
     }
-    if (DESIGN_SYSTEM_PATH.test(file)) {
-      const hits = live.flatMap((l, i) => (AI_NAME.test(l) ? [i + 1] : []));
-      add('word:PLUS-AI', file, hits.length, hits[0]);
+    const lineAt = (index) => live.join('\n').slice(0, index).split('\n').length;
+    const named = new Map();
+    for (const { row, match, index } of RETIREMENT.findIn(live.join('\n'), { kinds: ['word'], file })) {
+      const line = lineAt(index);
+      if (row.shipped && !shippedUse(file, live[line - 1], match)) continue;
+      const rule = ruleOf(row);
+      const lines = named.get(rule) ?? new Set();
+      lines.add(line);
+      named.set(rule, lines);
     }
-    if (!ATLASSIAN_RECORDS.some((re) => re.test(file))) {
-      const hits = live.flatMap((l, i) => (atlassianShipped(file, l) ? [i + 1] : []));
-      add('word:Atlassian', file, hits.length, hits[0]);
-    }
+    for (const [rule, lines] of named) add(rule, file, lines.size, Math.min(...lines));
     const body = live.join('\n');
     const where = (name) => Math.max(1, live.findIndex((l) => l.includes(name)) + 1);
-    for (const name of [...LEGACY_COMPONENTS, ...PATTERN_COMPONENTS]) {
+    for (const name of [...LEGACY_COMPONENTS, ...TAG_NAMES]) {
       add(`component:${name}`, file, componentCount(body, name), where(name));
     }
   }
@@ -271,34 +254,24 @@ function measureDoc(file, text, add) {
 
 /** Every tracked, searched file under the roots, read: the code and MDX, then the agent-read markdown. */
 export function sourcesOf(repoRoot) {
-  const docs = trackedSources(repoRoot, DOC_ROOTS, DOC_FILE).filter(({ path: p }) => !DOC_SKIPPED.test(p));
+  const docs = trackedSources(repoRoot, DOC_ROOTS, DOC_FILE).filter(({ path: p }) => !RETIREMENT.allowed(p));
   return [...trackedSources(repoRoot, SEARCH_ROOTS, SEARCHED), ...docs];
 }
 
-/** Per-rule reason, keyed by rule name; a rule without one gets the generic line. */
+/** What to write instead, as a row's replacements and reason. */
+const writeInstead = (row) => `write ${row.use.map((u) => `\`${u}\``).join(' or ')}${row.why ? ` (${row.why})` : ''}`;
+
+/** Per-rule reason, keyed by rule name, from the list's rows; a rule without one gets the generic line. */
 const RULE_MESSAGE = new Map([
-  ...NOT_HERE.components
-    .filter((r) => r.retired)
-    .map((r) => [
-      `retired-name:${r.not}`,
-      `\`${r.not}\` is retired; write ${r.use.map((u) => `\`${u}\``).join(' or ')}${r.why ? ` (${r.why})` : ''}, or mark a table that maps old names to new with <!-- retired-names-ok: why -->`,
-    ]),
+  ...RETIREMENT.ofKind('component').map((r) => [
+    `retired-name:${r.not}`,
+    `\`${r.not}\` is retired; ${writeInstead(r)}, or mark a table that maps old names to new with <!-- retired-names-ok: why -->`,
+  ]),
   ...Object.entries(RENAMED_NO_ALIAS).map(([oldName, newName]) => [
     `stale-name:${oldName}`,
     `${newName} was renamed with no alias; \`${oldName}\` may not survive in doc prose either`,
   ]),
-  [
-    'word:Atlassian',
-    'shipped docs state the PLUS rule and do not cite the benchmark (no name, no atlassian.design link); a decision record that must is named in ATLASSIAN_RECORDS',
-  ],
-  [
-    'word:PLUS-AI',
-    'the AI is unnamed and shows as AI: say "AI" or "the AI", never a product name for it',
-  ],
-  [
-    'state-step',
-    'the 08 / 12 / 16 state steps are gone (use the named hovered, pressed and selected tokens)',
-  ],
+  ...RETIREMENT.ofKind('word').map((r) => [ruleOf(r), `\`${r.not}\` is retired; ${writeInstead(r)}`]),
 ]);
 
 export const REMEDY = '  -> use the ADS names (spec #1604 section 2); the old language may not come back.';

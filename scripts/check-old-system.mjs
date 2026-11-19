@@ -15,13 +15,17 @@
  * Comments count: a comment that cites an old name teaches it.
  *
  * WHAT IT COUNTS, per family and per file, keyed `<family> <path>`: lines
- * matching one of `FAMILIES`, a family named by its wildcard (`--x-*`) included.
+ * naming a retired token or an old family. Both are the retirement list's
+ * (`design-system/agent-views/_inventions.json`): a spelling row with a `rule`
+ * is a family (`color`, `elevation`, `size`, `type`), and a retired token row,
+ * or a name the token plan retired (ADR-038), counts under `size`. A file the
+ * list allows to keep retired tokens (decision records, the archive) is not read.
  */
 
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { SOURCE_ROOTS } from './lib/ds-facts.mjs';
 import { main } from './lib/findings.mjs';
-import { RETIRED_TOKENS } from './lib/tokens/plan.mjs';
+import { loadRetirement } from './lib/retirement.mjs';
 import { trackedSources } from './lib/tracked-sources.mjs';
 
 export { REPO_ROOT };
@@ -38,47 +42,17 @@ export const SEARCH_ROOTS = [...SOURCE_ROOTS, ...DOC_ROOTS];
 export const SEARCHED = /\.(scss|css|jsx|js|mjs|ts|tsx|html|mdx|md)$/;
 
 
-/** A name from the archived size collections, or one the token ladder retired (ADR-038). */
-const OLD_SIZE = new RegExp(
-  '(?<![\\w-])(?:--size-(?:spacing|border|column|card|section|modal|surface|table|media|row|icon|indicator)-[a-z0-9*]' +
-    `|(?:${[...RETIRED_TOKENS].join('|')})(?![\\w-]))`,
-);
+/** The retirement list: the old families are its spelling rows (by `rule`), the retired tokens its token rows. */
+const RETIREMENT = loadRetirement(REPO_ROOT);
 
-/** An old type token, or an old type class: the `*-txt` utilities and the `h1` … `h6` title classes. */
-const OLD_TYPE = new RegExp(
-  '(?<![\\w-])--(?:font-size-(?:(?:h[1-6]|body[1-3]|lead|blockquote|code|display[1-4])(?![\\w])|fa-[a-z0-9*])|font-(?:family|weight|line-height|letter-spacing)-[a-z0-9*])' +
-    '|(?<![\\w-])(?:body[1-3]|display[1-4]|body-lead|body-blockquote)-txt(?![\\w-])' +
-    '|class(?:Name)?=["\'{`][^"\'}`>]*(?<![\\w-])h[1-6](?![\\w-])' +
-    '|(?<!-)\\.h[1-6](?![\\w-])',
-);
+/** The family a retired token belongs to when its row names none: the ladder retired size and spacing names. */
+const TOKEN_FAMILY = 'size';
+const familyOf = (row) => row.rule ?? TOKEN_FAMILY;
 
-/**
- * One row per old family: its name, the line pattern, and what to use instead.
- * The pattern refuses a match inside a longer name (`--bs-link-color-rgb`,
- * `--x--color-y`).
- */
-export const FAMILIES = [
-  {
-    name: 'color',
-    pattern: /(?<![\w-])--color-[a-z0-9*]/,
-    remedy: 'the Material `--color-*` roles are old; use the `--ds-*` color token for the role (fill, edge, text, icon)',
-  },
-  {
-    name: 'elevation',
-    pattern: /(?<![\w-])--(?:elevation-light|surface)-[a-z0-9*]/,
-    remedy: 'the `--elevation-light-*` shadows and `--surface-*` roles are old; use `--ds-shadow-raised` / `--ds-shadow-overlay` and the `--ds-surface-*` fill they pair with',
-  },
-  {
-    name: 'size',
-    pattern: OLD_SIZE,
-    remedy: 'the old size names are gone; use the current token for the role: `--space-*` / `--size-*` / `--radius-*` / `--stroke-*` primitives, the `--pad-*` / `--stack-*` / `--inline-*` semantics, or the template tokens (`--card-*`, `--section-*`, `--modal-*`, `--page-*`, `--table-*`, `--icon-*`, `--image-*`, `--row-height-*`)',
-  },
-  {
-    name: 'type',
-    pattern: OLD_TYPE,
-    remedy: 'the old type tokens and classes are gone; use a text style (`font: var(--heading-*)`, `var(--body-*)`, `var(--metric-*)`, `var(--code-default)`), the `--type-size-NNNN` / `--type-line-height-NNNN` steps, `--type-family-*` and `--type-weight-*`, or `--icon-*` for a glyph',
-  },
-];
+/** One row per old family, from the list: its name and what to use instead. */
+export const FAMILIES = RETIREMENT.ofKind('spelling')
+  .filter((row) => row.rule && row.rule !== 'state-step')
+  .map((row) => ({ name: row.rule, remedy: row.why }));
 
 /**
  * Measure sources: `{ path, text }[]` in, `Map<key, {count, line}>` out.
@@ -89,11 +63,15 @@ export const FAMILIES = [
 export function measure(sources) {
   const found = new Map();
   for (const { path: file, text } of sources) {
-    const lines = text.split('\n');
-    for (const { name, pattern } of FAMILIES) {
-      const hits = lines.flatMap((l, i) => (pattern.test(l) ? [i + 1] : []));
-      if (hits.length) found.set(`${name} ${file}`, { count: hits.length, line: hits[0] });
+    if (RETIREMENT.allowed(file, 'token')) continue;
+    const families = new Map();
+    for (const { row, index } of RETIREMENT.findIn(text, { kinds: ['spelling', 'token'], retiredOnly: true, file })) {
+      if (row.kind === 'spelling' && !row.rule) continue; // another check's spelling
+      const lines = families.get(familyOf(row)) ?? new Set();
+      lines.add(text.slice(0, index).split('\n').length);
+      families.set(familyOf(row), lines);
     }
+    for (const [name, lines] of families) found.set(`${name} ${file}`, { count: lines.size, line: Math.min(...lines) });
   }
   return found;
 }

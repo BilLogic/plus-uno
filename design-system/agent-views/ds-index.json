@@ -18344,6 +18344,44 @@
         "retired": true
       }
     ],
+    "tags": [
+      {
+        "not": "Overlay",
+        "use": [
+          "Blanket"
+        ],
+        "why": "the layer behind a modal is Blanket"
+      },
+      {
+        "not": "Surface",
+        "use": [
+          "Frame",
+          "Page"
+        ],
+        "why": "the layout areas are Frame and Page"
+      },
+      {
+        "not": "PatternSection",
+        "use": [
+          "Section"
+        ],
+        "why": "a template name since the Templates move"
+      },
+      {
+        "not": "PatternCard",
+        "use": [
+          "Card"
+        ],
+        "why": "a template name since the Templates move"
+      },
+      {
+        "not": "PatternTable",
+        "use": [
+          "Table"
+        ],
+        "why": "a template name since the Templates move"
+      }
+    ],
     "props": [
       {
         "not": "Button variant",
@@ -18487,40 +18525,61 @@
     ],
     "words": [
       {
+        "not": "08 / 12 / 16 state steps",
+        "use": [
+          "the named state tokens"
+        ],
+        "why": "the 08 / 12 / 16 state steps are gone; use the named hovered, pressed and selected tokens",
+        "rule": "state-step",
+        "caseSensitive": true,
+        "pattern": "--[a-z0-9-]*-state-(?:08|12|16)(?![0-9])"
+      },
+      {
         "not": "surface container",
         "use": [
           "Frame",
           "Page"
         ],
-        "why": "the layout areas are Frame and Page"
+        "why": "the layout areas are Frame and Page",
+        "pattern": "surface container"
       },
       {
         "not": "scrim",
         "use": [
           "Blanket"
         ],
-        "why": "renamed"
+        "why": "renamed",
+        "pattern": "\\bscrim"
       },
       {
         "not": "Rovo",
         "use": [
           "AI"
         ],
-        "why": "the AI is unnamed"
+        "why": "the AI is unnamed",
+        "pattern": "\\bRovo\\b",
+        "caseSensitive": true
       },
       {
         "not": "PLUS AI",
         "use": [
           "AI"
         ],
-        "why": "the AI is unnamed and shows as AI"
+        "why": "the AI is unnamed and shows as AI",
+        "pattern": "\\bPLUS AI\\b",
+        "caseSensitive": true,
+        "in": [
+          "design-system/src/"
+        ]
       },
       {
         "not": "Atlassian",
         "use": [
           "the PLUS rule"
         ],
-        "why": "shipped docs state the PLUS rule and do not cite the benchmark"
+        "why": "shipped docs state the PLUS rule and do not cite the benchmark",
+        "pattern": "atlassian",
+        "shipped": true
       }
     ],
     "spellings": [
@@ -18549,6 +18608,144 @@
         ],
         "why": "the motion principles are Always responsive, Build understanding, Lead with empathy, Cut the noise",
         "pattern": "\\b(?:Show what changed|Move like real things|Quiet by default)\\b"
+      },
+      {
+        "not": "suggested tier",
+        "use": [
+          "suggested severity"
+        ],
+        "why": "the intake field is \"suggested severity\"",
+        "pattern": "\\bsuggested tier\\b"
+      },
+      {
+        "not": "tier it",
+        "use": [
+          "classify its severity"
+        ],
+        "why": "\"classify its severity\"",
+        "caseSensitive": true,
+        "pattern": "\\btier it\\b"
+      },
+      {
+        "not": "uno-tier1-digest",
+        "use": [
+          "a direct fix leaves its commit"
+        ],
+        "why": "the direct-fix digest is retired; a direct fix leaves its commit",
+        "caseSensitive": true,
+        "pattern": "\\buno-tier1-digest\\b"
+      },
+      {
+        "not": "weekly-tier1-digest",
+        "use": [
+          "a direct fix leaves its commit"
+        ],
+        "why": "the direct-fix digest is retired; a direct fix leaves its commit",
+        "caseSensitive": true,
+        "pattern": "\\bweekly-tier1-digest\\b"
+      },
+      {
+        "not": "NO_TIER1_THIS_WEEK",
+        "use": [
+          "a direct fix leaves its commit"
+        ],
+        "why": "the direct-fix digest is retired; a direct fix leaves its commit",
+        "caseSensitive": true,
+        "pattern": "\\bNO_TIER1_THIS_WEEK\\b"
+      },
+      {
+        "not": "lane honors",
+        "use": [
+          "provider",
+          "adapter"
+        ],
+        "why": "an adapter honors, reports or runs; \"lane\" in the provider sense is retired",
+        "pattern": "\\blanes?[- ](?:honors?|report|reports|run|runs|log|logs)\\b"
+      },
+      {
+        "not": "foundations-basics-*",
+        "use": [
+          "the Foundations groups"
+        ],
+        "why": "a retired Storybook id: Foundations is Brand, Visual, Layout, Expression, Accessibility and Tokens (motion and sound ids start foundations-expression-)",
+        "caseSensitive": true,
+        "pattern": "\\bfoundations-(?:basics|motion|sound)-[a-z-]+"
+      },
+      {
+        "not": "Foundations › Basics",
+        "use": [
+          "the Foundations groups"
+        ],
+        "why": "Motion and Sound sit under Foundations › Expression; Basics is gone",
+        "caseSensitive": true,
+        "pattern": "\\bFoundations(?: · |\\/)(?:Basics|Motion|Sound)\\b"
+      },
+      {
+        "not": "Get started › Content design",
+        "use": [
+          "Foundations › Brand › Content"
+        ],
+        "why": "Content design became Foundations › Brand › Content (Voice and tone, Language, Messages)",
+        "caseSensitive": true,
+        "pattern": "\\bGet started(?: › |\\/)Content design\\b"
+      },
+      {
+        "not": "@/patterns",
+        "use": [
+          "@/templates"
+        ],
+        "why": "the patterns barrel is gone; templates import from the templates barrel",
+        "caseSensitive": true,
+        "pattern": "['\"`]@/patterns(?:/[^'\"`]*)?['\"`]"
+      },
+      {
+        "not": "--color-*",
+        "use": [
+          "a --ds-* color token"
+        ],
+        "why": "the Material --color-* roles are old; use the --ds-* color token for the role (fill, edge, text, icon)",
+        "rule": "color",
+        "caseSensitive": true,
+        "pattern": "(?<![\\w-])--color-[a-z0-9*]"
+      },
+      {
+        "not": "--elevation-light-*",
+        "use": [
+          "a --ds-* shadow or surface token"
+        ],
+        "why": "the --elevation-light-* shadows and --surface-* roles are old; use --ds-shadow-raised / --ds-shadow-overlay and the --ds-surface-* fill they pair with",
+        "rule": "elevation",
+        "caseSensitive": true,
+        "pattern": "(?<![\\w-])--(?:elevation-light|surface)-[a-z0-9*]"
+      },
+      {
+        "not": "--size-spacing-*",
+        "use": [
+          "a space, size, radius or template token"
+        ],
+        "why": "the old size names are gone; use the current token for the role: --space-* / --size-* / --radius-* / --stroke-* primitives, the --pad-* / --stack-* / --inline-* semantics, or the template tokens (--card-*, --section-*, --modal-*, --page-*, --table-*, --icon-*, --image-*, --row-height-*)",
+        "rule": "size",
+        "caseSensitive": true,
+        "pattern": "(?<![\\w-])--size-(?:spacing|border|column|card|section|modal|surface|table|media|row|icon|indicator)-[a-z0-9*]"
+      },
+      {
+        "not": "--font-size-h1",
+        "use": [
+          "a text style"
+        ],
+        "why": "the old type tokens and classes are gone; use a text style (font: var(--heading-*), var(--body-*), var(--metric-*), var(--code-default)), the --type-size-NNNN / --type-line-height-NNNN steps, --type-family-* and --type-weight-*, or --icon-* for a glyph",
+        "rule": "type",
+        "caseSensitive": true,
+        "pattern": "(?<![\\w-])--(?:font-size-(?:(?:h[1-6]|body[1-3]|lead|blockquote|code|display[1-4])(?![\\w])|fa-[a-z0-9*])|font-(?:family|weight|line-height|letter-spacing)-[a-z0-9*])|(?<![\\w-])(?:body[1-3]|display[1-4]|body-lead|body-blockquote)-txt(?![\\w-])|class(?:Name)?=[\"'{`][^\"'}`>]*(?<![\\w-])h[1-6](?![\\w-])|(?<!-)\\.h[1-6](?![\\w-])"
+      },
+      {
+        "not": "both lanes",
+        "use": [
+          "provider",
+          "adapter"
+        ],
+        "why": "there is one agent loop and two adapters behind the ModelProvider seam; count adapters or providers, not lanes",
+        "pattern": "\\b(?:both|two)[- ]lanes\\b"
       }
     ],
     "outside": [
@@ -18582,7 +18779,18 @@
       "gated change",
       "provider",
       "adapter",
-      "Cut the noise"
+      "Cut the noise",
+      "the named state tokens",
+      "suggested severity",
+      "classify its severity",
+      "a direct fix leaves its commit",
+      "the Foundations groups",
+      "Foundations › Brand › Content",
+      "@/templates",
+      "a --ds-* color token",
+      "a --ds-* shadow or surface token",
+      "a space, size, radius or template token",
+      "a text style"
     ],
     "allowed": [
       {
@@ -18612,6 +18820,27 @@
           "component",
           "prop",
           "token"
+        ]
+      },
+      {
+        "path": "todos/",
+        "why": "working notes keep the words they were written in",
+        "kinds": [
+          "spelling"
+        ]
+      },
+      {
+        "path": "agents/uno-bot/harness-bundle.md",
+        "why": "generated from the swept sources",
+        "kinds": [
+          "spelling"
+        ]
+      },
+      {
+        "path": "agents/uno-bot/src/",
+        "why": "the Worker's source quotes the retired spellings it routes away from",
+        "kinds": [
+          "spelling"
         ]
       }
     ]

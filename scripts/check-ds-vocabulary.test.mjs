@@ -102,6 +102,9 @@ function fixtureRepo({ glossary = GLOSSARY, pages }) {
     if (name !== 'Flag') records.push({ name, kind: 'component', source: `${dir}/${name}.jsx` });
   }
   write('design-system/agent-views/components.json', JSON.stringify({ components: records }));
+  // The retirement list's outside rows: another design system's words, an error wherever read.
+  const outside = ['lozenge', 'badge', 'side navigation'].map((not) => ({ not, use: ['StatusTag'], why: 'another design system\'s word' }));
+  write('design-system/agent-views/_inventions.json', JSON.stringify({ components: [], props: [], tokens: [], outside }));
   return root;
 }
 

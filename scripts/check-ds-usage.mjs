@@ -49,6 +49,7 @@ import { contextFrom, docLink, escapesIn, isDsStyle, pagesOf } from './lib/ds-us
 import { readIconLists } from './lib/icon-lists.mjs';
 import { byRoot, isEntry } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
+import { loadRetirement } from './lib/retirement.mjs';
 import { TOKEN_LADDER } from './lib/tokens/plan.mjs';
 import { definitions } from './undefined-tokens.mjs';
 import { exampleFences, isTokenTierPage } from './doc-identifiers.mjs';
@@ -127,7 +128,7 @@ export const contextOf = byRoot((repoRoot) => {
     tokens: facts.manifests.tokens,
     defined: definitions(declaring),
     ...freeIconLists(repoRoot),
-    retired: facts.retired,
+    retired: loadRetirement(repoRoot, { avoid: false }).renames(),
     promoted: new Set(TOKEN_LADDER.filter((row) => row.primitive).map((row) => row.new)),
     exported: facts.importable,
     barrels: facts.barrels,
