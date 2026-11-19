@@ -1,13 +1,17 @@
 import React from 'react';
-import { CustomItem, IconButton, Skeleton, Spinner } from '@/components';
-import { Section } from '@/templates';
-import { LoadingList } from './loadingDemo.jsx';
+import { CustomItem, IconButton, Skeleton } from '@/components';
 import { LiveMenu } from '@/storybook-docs/lib/dropdown-menu-cases.jsx';
+import { showCode } from '@/storybook-docs/lib/show-code.js';
+import * as Example from './LoadingExamples.jsx';
+import examplesSource from './LoadingExamples.jsx?raw';
 
 /**
  * The live do and don't examples on the Loading pattern page, composed from
- * `LiveMenu`, `CustomItem`, `IconButton` and `Skeleton`.
+ * `LiveMenu`, `CustomItem`, `IconButton` and `Skeleton`; the two table
+ * examples are `LoadingExamples.jsx`, which Show code prints.
  */
+
+export const CODE = showCode(examplesSource, ['SkeletonInShape', 'SpinnerInBlank']);
 
 const noop = () => {};
 const menuTrigger = <IconButton icon="ellipsis" label="More" appearance="subtle" onClick={noop} />;
@@ -40,13 +44,7 @@ export const MenuSkeletonRowsCase = () => (
 );
 
 /** Do: a skeleton in the table's own shape, text bars throughout. */
-export const SkeletonInShape = () => <LoadingList band="shape" />;
+export const SkeletonInShape = () => <Example.SkeletonInShape />;
 
 /** Don't: one spinner in a blank area, so the layout jumps when the rows arrive. */
-export const SpinnerInBlank = () => (
-    <Section title="Students" description="Lincoln Middle">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minBlockSize: 'calc(var(--control-lg) * 4)' }}>
-            <Spinner size={24} label="Loading students" />
-        </div>
-    </Section>
-);
+export const SpinnerInBlank = () => <Example.SpinnerInBlank />;

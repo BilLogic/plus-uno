@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { expectTypeCardAnchors } from '@/storybook-docs/lib/type-card-anchors.jsx';
-import { BorderAndTooltipCase, FailureInModal, FailureInSlot, MessageOnFieldCase } from './ErrorsCases.jsx';
+import { BorderAndTooltipCase, CODE, FailureInModal, FailureInSlot, MessageOnFieldCase } from './ErrorsCases.jsx';
 
 vi.mock('@storybook/addon-docs/blocks', () => import('@/storybook-docs/lib/addon-docs-blocks-mock.jsx'));
 
@@ -36,6 +36,15 @@ describe('Errors live cases and TypeCard links', () => {
         slot.unmount();
         render(<FailureInModal />);
         expect(screen.getByText("Couldn't load sessions")).toBeInTheDocument();
+    });
+
+    it('prints each example from its own source, with the PLUS imports it needs', () => {
+        expect(Object.keys(CODE)).toEqual(['MessageOnField', 'BorderAndTooltip', 'FailureInSlot', 'FailureInModal']);
+        expect(CODE.FailureInSlot).toMatch(/^import \{ .*EmptyState.* \} from '@\/components';/);
+        expect(CODE.FailureInSlot).toContain("header=\"Couldn't load this week's sessions\"");
+        expect(CODE.FailureInModal).toContain('<Dialog');
+        expect(CODE.MessageOnField).toContain('isValidEmail');
+        for (const code of Object.values(CODE)) expect(code).not.toMatch(/Example\.|storybook-docs/);
     });
 
     it('links every TypeCard anchor to a ComponentExample heading id in Errors.mdx', () => {

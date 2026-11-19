@@ -5,13 +5,12 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as FormsStories from './Forms.stories.jsx';
-import { ErrorInSecondDialog, ErrorOnField, HelpInCaptionCase, HelpInTooltipCase, MajorityMarked, MinorityMarked, STAGE } from './formsDemo.jsx';
+import { HelpInCaptionCase, HelpInTooltipCase, MajorityMarked, MinorityMarked, STAGE } from './formsDemo.jsx';
 import { PAGE_WIDTH } from './formHosts.jsx';
-import { EditInModal, EditInPanel, OneColumnFields, TwoColumnFields } from './formLayoutCases.jsx';
+import { CODE, EditInModal, EditInPanel, ErrorInSecondDialog, ErrorOnField, OneColumnFields, TwoColumnFields } from './FormsCases.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
-import { CODE } from './FormsCaseCode.js';
 
 <Meta title="Patterns/Forms" tags={['manifest']} />
 
@@ -235,8 +234,10 @@ Pair two fields side by side only when they belong together, such as first and l
 
 <DoDontPair
     doExample={<OneColumnFields />}
+    doCode={CODE.OneColumnFields}
     doCaption="One column, so the eye moves straight down."
     dontExample={<TwoColumnFields />}
+    dontCode={CODE.TwoColumnFields}
     dontCaption="Unrelated fields scattered across two columns."
 />
 

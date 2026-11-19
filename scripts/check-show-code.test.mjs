@@ -39,7 +39,15 @@ test('an examples module that reaches outside its folder fails; a barrel import 
   assert.deepEqual(messages('design-system/src/templates/X/XExamples.jsx', "import { useMotionReduced } from '@/lib/motionPreference';"), []);
 });
 
+test('a pattern page is held to the same rules as a template page', () => {
+  const page = 'design-system/src/storybook-docs/patterns/X/X.mdx';
+  assert.deepEqual(messages(page, '<DoDontPair doCode={CODE.A} dontCode={CODE.B} />'), []);
+  assert.ok(messages(page, '<DoDontPair doCode={`<Button />`} />').some((m) => /typed here/.test(m)));
+  assert.ok(messages('design-system/src/storybook-docs/patterns/X/XExamples.jsx', "import { Demo } from '@/storybook-docs/x';").some((m) => /staging/.test(m)));
+});
+
 test('the real tree has no hand-typed Show code', () => {
   assert.deepEqual(run(), []);
+  assert.ok(summary().includes('page(s)'));
   assert.match(summary(), /print Show code from source/);
 });

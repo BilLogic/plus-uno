@@ -12,14 +12,15 @@
  * `showCode` (`storybook-docs/lib/show-code.js`), and the staging the docs add
  * (stage, window, Blanket) stays in `*Cases.jsx`, which Show code never reads.
  *
- * WHAT IT FAILS ON, under `design-system/src/templates`:
+ * WHAT IT FAILS ON, under `design-system/src/templates` and
+ * `design-system/src/storybook-docs/patterns` (a pattern page prints its examples the same way):
  *   1. a module named `*CaseCode*`: a place to type snippets;
  *   2. a `doCode` or `dontCode` prop in an `.mdx` page that is anything
  *      but `{CODE.Name}`: a string or template literal is a typed snippet;
  *   3. a `CODE` export that is not built with `showCode(`, or that holds a
  *      template-literal entry;
  *   4. an `*Examples.jsx` module that imports a docs-only wrapper (anything
- *      from `@/storybook-docs`) or reaches outside its own template folder
+ *      from `@/storybook-docs`) or reaches outside its own folder
  *      with a relative path: it imports only the public barrels.
  *
  * WHAT IT CANNOT SEE. Whether an example reads well or is the right one; that
@@ -29,7 +30,7 @@ import { REPO_ROOT } from './lib/corpus.mjs';
 import { main } from './lib/findings.mjs';
 import { trackedFiles, trackedSources } from './lib/tracked-sources.mjs';
 
-const ROOT = 'design-system/src/templates';
+const ROOTS = ['design-system/src/templates', 'design-system/src/storybook-docs/patterns'];
 
 const CODE_PROP = /\b(doCode|dontCode)=(\{[^}]*\}|"[^"]*"|'[^']*')/g;
 const CODE_REFERENCE = /^\{CODE\.[A-Za-z_$][\w$]*\}$/;
@@ -72,10 +73,10 @@ export function checkFile(file, text) {
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
   const findings = [];
-  for (const file of trackedFiles(repoRoot, [ROOT])) {
+  for (const file of trackedFiles(repoRoot, ROOTS)) {
     if (/CaseCode/.test(file)) findings.push({ file, message: 'a hand-typed code module; print Show code from the example with showCode instead' });
   }
-  for (const { path: file, text } of trackedSources(repoRoot, [ROOT], /\.(mdx|jsx)$/)) {
+  for (const { path: file, text } of trackedSources(repoRoot, ROOTS, /\.(mdx|jsx)$/)) {
     if (/\.(test|stories)\.jsx$/.test(file)) continue;
     for (const { line, message } of checkFile(file, text)) findings.push({ file, line, message });
   }
@@ -83,8 +84,8 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
 }
 
 export function summary({ repoRoot = REPO_ROOT } = {}) {
-  const pages = trackedSources(repoRoot, [ROOT], /\.mdx$/).filter(({ text }) => /\bdontCode=/.test(text)).length;
-  return `${pages} template page(s) print Show code from source.`;
+  const pages = trackedSources(repoRoot, ROOTS, /\.mdx$/).filter(({ text }) => /\bdontCode=/.test(text)).length;
+  return `${pages} page(s) print Show code from source.`;
 }
 
 export const REMEDY =
