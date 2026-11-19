@@ -5,7 +5,7 @@ import { Button, Dialog, DIALOG_WIDTHS, DIALOG_WIDTH_PX, FooterActions, IconButt
 import { Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
 import { FigureScreen } from '@/storybook-docs/ds-docs-layout.jsx';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
-import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
+import { DemoLabel } from '@/storybook-docs/lib/template-demo';
 
 export default {
     title: 'Components/Messaging/Dialog',

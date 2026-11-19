@@ -15,6 +15,9 @@ import examplesSource from './PopupExamples.jsx?raw';
 /** The height of the stage a held-open menu has room in. Docs geometry, px. */
 const MENU_STAGE = 230; // docs-literal
 
+/** The height of the stage a long read has room in. Docs geometry, px. */
+const LONG_READ_STAGE = 330; // docs-literal
+
 /** Fields the person must finish sit in a Modal over a Blanket. */
 export const FieldsInModalCase = () => {
     const [student, setStudent] = useState('Ana Ruiz');
@@ -83,14 +86,14 @@ export const CODE = showCode(examplesSource, [
     'AsWideAsTrigger',
     'NarrowerThanTrigger',
     'AtCap',
-    'WiderThanCap',
+    'LongReadInPopup',
     'OneFlatMenu',
     'PopupBesidePopup',
 ]);
 
 /** A stage that holds the example's layer open inside its own box, with room under the trigger. */
-const Held = ({ side, children }) => (
-    <PopupStage height={MENU_STAGE} side={side}>
+const Held = ({ side, height = MENU_STAGE, children }) => (
+    <PopupStage height={height} side={side}>
         {(mount) => <OverlayContainer container={mount} boundary={null}>{children}</OverlayContainer>}
     </PopupStage>
 );
@@ -110,8 +113,8 @@ export const NarrowerThanTrigger = () => <Held><Example.NarrowerThanTrigger /></
 /** A content Popup at 4-col, the cap. */
 export const AtCap = () => <Held><Example.AtCap /></Held>;
 
-/** A trigger wider than the cap carries an auto-width Popup past it. */
-export const WiderThanCap = () => <Held><Example.WiderThanCap /></Held>;
+/** A long read in a Popup: three paragraphs at the cap. */
+export const LongReadInPopup = () => <Held height={LONG_READ_STAGE}><Example.LongReadInPopup /></Held>;
 
 /** One flat menu: a choice with two forms is two rows. */
 export const OneFlatMenu = () => <Held><Example.OneFlatMenu /></Held>;

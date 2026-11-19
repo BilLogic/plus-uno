@@ -9,7 +9,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { Button } from '@/components';
 import SectionMessage, { SECTION_MESSAGE_ICONS, SECTION_MESSAGE_APPEARANCES } from './SectionMessage';
 import { iconClass } from '../../../lib/icon';
-import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
+import { DemoLabel } from '@/storybook-docs/lib/template-demo';
 
 const ICON_TOKEN = {
     primary: '--ds-icon-brand',

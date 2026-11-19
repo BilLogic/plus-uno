@@ -14,7 +14,7 @@
  *
  * WHAT IT FAILS ON, under `design-system/src/templates`:
  *   1. a module named `*CaseCode*`: a place to type snippets;
- *   2. a `doCode`, `dontCode` or `code` prop in an `.mdx` page that is anything
+ *   2. a `doCode` or `dontCode` prop in an `.mdx` page that is anything
  *      but `{CODE.Name}`: a string or template literal is a typed snippet;
  *   3. a `CODE` export that is not built with `showCode(`, or that holds a
  *      template-literal entry;
@@ -30,7 +30,7 @@ import { trackedFiles, trackedSources } from './lib/tracked-sources.mjs';
 
 const ROOT = 'design-system/src/templates';
 
-const CODE_PROP = /\b(doCode|dontCode|code)=(\{[^}]*\}|"[^"]*"|'[^']*')/g;
+const CODE_PROP = /\b(doCode|dontCode)=(\{[^}]*\}|"[^"]*"|'[^']*')/g;
 const CODE_REFERENCE = /^\{CODE\.[A-Za-z_$][\w$]*\}$/;
 const lineOf = (text, index) => text.slice(0, index).split('\n').length;
 

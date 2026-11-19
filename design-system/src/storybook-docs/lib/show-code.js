@@ -35,9 +35,37 @@ function declarations(raw) {
     });
 }
 
+/** The module's imports as { from, default, named[] }, so a snippet can carry the ones it uses. */
+function imports(raw) {
+    const found = [];
+    for (const match of raw.matchAll(/^import\s+([\s\S]*?)\s+from\s+'([^']+)';?$/gm)) {
+        const clause = match[1];
+        if (clause.startsWith('*')) continue;
+        const braces = /\{([^}]*)\}/.exec(clause);
+        const lead = clause.replace(/\{[^}]*\}/, '').replace(/,/g, '').trim();
+        const named = braces ? braces[1].split(',').map((n) => n.trim()).filter(Boolean) : [];
+        found.push({ from: match[2], lead, named });
+    }
+    return found;
+}
+
+/** The import lines the printed code needs, keeping only the names it uses. */
+function importLines(raw, code) {
+    const uses = (name) => new RegExp(`(?<![\\w$.])${name.split(/\s+as\s+/).pop()}(?![\\w$])`).test(code);
+    const lines = [];
+    for (const { from, lead, named } of imports(raw)) {
+        const parts = [];
+        if (lead && uses(lead)) parts.push(lead);
+        const used = named.filter(uses);
+        if (used.length) parts.push(`{ ${used.join(', ')} }`);
+        if (parts.length) lines.push(`import ${parts.join(', ')} from '${from}';`);
+    }
+    return lines;
+}
+
 /**
- * The source of one example: its declaration, preceded by every declaration in
- * the same module that it reads, in file order.
+ * The source of one example: the imports it needs, then every declaration in
+ * the same module that it reads, then its own declaration, in file order.
  *
  * @param {string} raw - the examples module as text
  * @param {string} name - the example's export name
@@ -55,7 +83,9 @@ export function sourceOf(raw, name) {
         }
     };
     visit(byName.get(name));
-    return all.filter((d) => needed.has(d.name)).map((d) => d.text).join('\n\n');
+    const body = all.filter((d) => needed.has(d.name)).map((d) => d.text).join('\n\n');
+    const lines = importLines(raw, body);
+    return lines.length ? `${lines.join('\n')}\n\n${body}` : body;
 }
 
 /**

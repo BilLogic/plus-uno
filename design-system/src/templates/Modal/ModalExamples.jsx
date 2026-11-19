@@ -36,20 +36,20 @@ export const ConfirmNarrow = () => <DeleteSession width="4-col" />;
 export const ConfirmWide = () => <DeleteSession width="10-col" />;
 
 export const ConfirmsInside = () => {
-    const [confirming, setConfirming] = useState(true);
+    const [isConfirming, setIsConfirming] = useState(true);
     return (
         <Modal
             inline
             show
-            title={confirming ? 'Delete session?' : 'Session details'}
+            title={isConfirming ? 'Delete session?' : 'Session details'}
             footer={(
                 <FooterActions>
-                    <Button text={confirming ? 'Back' : 'Keep session'} onClick={() => setConfirming(false)} />
-                    <Button text="Delete session" appearance="danger" onClick={() => setConfirming(true)} />
+                    <Button text={isConfirming ? 'Back' : 'Keep session'} onClick={isConfirming ? () => setIsConfirming(false) : undefined} />
+                    <Button text="Delete session" appearance="danger" onClick={isConfirming ? undefined : () => setIsConfirming(true)} />
                 </FooterActions>
             )}
         >
-            {confirming ? (
+            {isConfirming ? (
                 <SectionMessage appearance="warning" dismissible={false}>
                     This removes Thursday’s session for Ana and her tutor. This cannot be undone.
                 </SectionMessage>

@@ -495,6 +495,25 @@ function elementText(el) {
   }
 }
 
+/** Is the position `j` inside a `## Key states` section: the last `##` heading before it names one. */
+function inKeyStates(s, j) {
+  const heads = s.slice(0, j).match(/^## .*$/gm);
+  return heads ? /^##\s+Key states\s*$/.test(heads[heads.length - 1]) : false;
+}
+
+/**
+ * A Key states example as one line, `- **Title.** what it shows`. A Key states
+ * section is a run of live examples with nothing else to read, so without this
+ * the heading comes out empty and every state is lost.
+ */
+function keyStateText(el) {
+  const attrs = attrsOf(el.attrs);
+  const title = valueText(attrs.title);
+  const line = inline(valueText(attrs.description));
+  if (!title) return '';
+  return `\n- **${title}.** ${line}\n`;
+}
+
 /** MDX body text to markdown: elements by `elementText`, expressions by `expressionText`, ESM dropped, code kept. */
 function convert(s) {
   let out = '';
@@ -524,7 +543,7 @@ function convert(s) {
     } else if (isTagStart(s, j)) {
       flush(j);
       const el = readElement(s, j);
-      out += elementText(el);
+      out += el.name === 'ComponentExample' && inKeyStates(s, j) ? keyStateText(el) : elementText(el);
       j = text = el.end;
     } else j++;
   }

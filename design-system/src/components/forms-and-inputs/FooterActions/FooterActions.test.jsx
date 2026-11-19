@@ -112,4 +112,43 @@ describe('FooterActions non-layout behavior', () => {
             warn.mockRestore();
         }
     });
+
+    it('draws a leading danger action as a danger-link, whether it is the first child or the leadingAction', () => {
+        const { rerender } = render(
+            <FooterActions leadingAction={<Button text="Delete session" appearance="danger" />}>
+                <Button text="Discard" />
+                <Button text="Save" appearance="primary" />
+            </FooterActions>
+        );
+        expect(screen.getByRole('button', { name: 'Delete session' })).toHaveClass('plus-btn--danger-link');
+        expect(screen.getByRole('button', { name: 'Delete session' })).not.toHaveClass('plus-btn--danger');
+
+        rerender(
+            <FooterActions>
+                <Button text="Delete draft" appearance="danger" />
+                <Button text="Save" appearance="primary" />
+            </FooterActions>
+        );
+        expect(screen.getByRole('button', { name: 'Delete draft' })).toHaveClass('plus-btn--danger-link');
+        expect(screen.getByRole('button', { name: 'Save' })).toHaveClass('plus-btn--primary');
+    });
+
+    it('draws any other leading action as a link, and treats a link appearance as leading', () => {
+        const { rerender } = render(
+            <FooterActions leadingAction={<LinkButton text="Save and exit" href="#exit" appearance="subtle" />}>
+                <Button text="Next" appearance="primary" />
+            </FooterActions>
+        );
+        expect(screen.getByRole('link', { name: 'Save and exit' })).toHaveClass('plus-btn--link');
+        expect(screen.getByRole('link', { name: 'Save and exit' })).not.toHaveClass('plus-btn--subtle');
+
+        rerender(
+            <FooterActions>
+                <Button text="Open profile" appearance="link" />
+                <Button text="Close" appearance="primary" />
+            </FooterActions>
+        );
+        expect(screen.getByRole('button', { name: 'Open profile' })).toHaveClass('plus-btn--link', 'plus-footer-actions__leading');
+        expect(screen.getByRole('button', { name: 'Close' })).toHaveClass('plus-btn--primary', 'plus-btn--fit-container');
+    });
 });

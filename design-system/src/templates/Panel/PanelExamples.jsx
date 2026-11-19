@@ -38,16 +38,16 @@ const AssistantPanel = () => (
     </PanelContainer>
 );
 
-const AT_THE_END = { position: 'absolute', insetBlock: 0, insetInlineEnd: 0, display: 'flex', maxInlineSize: '100%' };
+const DEMO_STAGE_END = { position: 'absolute', insetBlock: 0, insetInlineEnd: 0, display: 'flex', maxInlineSize: '100%' };
 
-const FLOATING = { ...AT_THE_END, boxShadow: 'var(--ds-shadow-overlay)' };
+const DEMO_STAGE_FLOATING = { ...DEMO_STAGE_END, boxShadow: 'var(--ds-shadow-overlay)' };
 
-const SECOND_PANEL = { ...FLOATING, insetInlineEnd: 'var(--inline-3xl)' };
+const DEMO_STAGE_SECOND = { ...DEMO_STAGE_FLOATING, insetInlineEnd: 'var(--inline-3xl)' };
 
 export const FloatsNoBlanket = () => (
     <>
         <SessionsBehind />
-        <div style={FLOATING}><DetailsPanel /></div>
+        <div style={DEMO_STAGE_FLOATING}><DetailsPanel /></div>
     </>
 );
 
@@ -55,30 +55,30 @@ export const PanelOnBlanket = () => (
     <>
         <SessionsBehind />
         <Blanket inline show style={{ position: 'absolute', inset: 0 }} />
-        <div style={FLOATING}><DetailsPanel /></div>
+        <div style={DEMO_STAGE_FLOATING}><DetailsPanel /></div>
     </>
 );
 
 export const TwoFloatingPanels = () => (
     <>
         <SessionsBehind />
-        <div style={SECOND_PANEL}><DetailsPanel /></div>
-        <div style={FLOATING}><DetailsPanel /></div>
+        <div style={DEMO_STAGE_SECOND}><DetailsPanel /></div>
+        <div style={DEMO_STAGE_FLOATING}><DetailsPanel /></div>
     </>
 );
 
 export const BesideAiPanel = () => (
     <>
         <SessionsBehind />
-        <div style={AT_THE_END}><AssistantPanel /></div>
-        <div style={{ ...FLOATING, insetInlineEnd: 'var(--panel-width-default)' }}><DetailsPanel /></div>
+        <div style={DEMO_STAGE_END}><AssistantPanel /></div>
+        <div style={{ ...DEMO_STAGE_FLOATING, insetInlineEnd: 'var(--panel-width-default)' }}><DetailsPanel /></div>
     </>
 );
 
 export const CoversAiPanel = () => (
     <>
         <SessionsBehind />
-        <div style={AT_THE_END}><AssistantPanel /></div>
-        <div style={SECOND_PANEL}><DetailsPanel /></div>
+        <div style={DEMO_STAGE_END}><AssistantPanel /></div>
+        <div style={DEMO_STAGE_SECOND}><DetailsPanel /></div>
     </>
 );

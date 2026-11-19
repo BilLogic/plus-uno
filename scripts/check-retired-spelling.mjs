@@ -13,13 +13,16 @@
  *
  * What it sweeps: hand-authored docs an agent reads — the constitution, the
  * glossary, agents/, skills/, docs/ (minus history), the design-system
- * guidelines, the headless prompts and the workflows. What it leaves alone, by
- * rule: docs/plans/ and todos/ (a plan keeps the words it was written in),
- * docs/adr/ (a decision record keeps the spelling it decided in),
- * docs/knowledge/archive/ (the graveyard), generated artifacts (the bundle is
- * regenerated from the swept sources), and the `_Avoid_:` lines of the
- * entries that own a retirement (`OWNERS`), which name the old spelling
+ * guidelines, the headless prompts and the workflows. What it leaves alone is the
+ * retirement list's allowed places for a spelling (`design-system/agent-views/_inventions.json`):
+ * plans and `todos/` (a plan keeps the words it was written in), decision
+ * records, the knowledge archive (the graveyard), the generated bundle and the
+ * Worker's source, and every `_Avoid_:` line, which names the old spelling
  * precisely so this sweep has something to point at.
+ *
+ * THE SPELLINGS ARE THE LIST'S. This check holds no list of retired shapes and
+ * no list of places that may keep them; it reads the spelling rows and the
+ * allowed places through `scripts/lib/retirement.mjs`, and sweeps the files.
  *
  * Each pattern is a MAINTENANCE-only shape: the word beside "Tier" is one only
  * the severity meaning ever took (fix, digest, whitelist, pipeline, apply,
@@ -45,7 +48,7 @@ import { fileURLToPath } from 'node:url';
 
 import { documents } from './lib/corpus.mjs';
 import { byRoot, main } from './lib/findings.mjs';
-import { TERM } from './check-glossary.mjs';
+import { loadRetirement } from './lib/retirement.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(here, '..');
@@ -69,68 +72,15 @@ export const ROOTS = [
   '.github/workflows',
 ];
 
-/** Path prefixes left as written, relative to the repo. */
-export const SKIP = [
-  'docs/plans/',
-  'docs/adr/',
-  'docs/knowledge/archive/',
-  'todos/',
-  'agents/uno-bot/harness-bundle.md',
-  'agents/uno-bot/src/',
-  'agents/uno-bot/node_modules/',
-];
-
-/** Every spelling of the retired direct-fix digest gets the same answer. */
-const DIGEST_RETIRED = 'the direct-fix digest is retired; a direct fix leaves its commit';
-
-/** The retired shapes. Every one names the maintenance meaning and no loading use. */
-export const RETIRED = [
-  { re: /\bTier[- ]?1\/2\b/g, why: 'the 1/2 slash form named the two severities together' },
-  { re: /\bTier[- ]?[12] (?:fix|fixes|change|changes|digest|whitelist|pipeline|scope|apply)\b/g, why: 'a severity noun beside "Tier"' },
-  { re: /\bTier[- ]?1 (?:only|auto-apply)\b/g, why: 'the direct-fix whitelist' },
-  { re: /\bsuggested tier\b/gi, why: 'the intake field is "suggested severity"' },
-  { re: /\btier it\b/g, why: '"classify its severity"' },
-  { re: /\buno-tier1-digest\b/g, why: DIGEST_RETIRED },
-  { re: /\bweekly-tier1-digest\b/g, why: DIGEST_RETIRED },
-  { re: /\bNO_TIER1_THIS_WEEK\b/g, why: DIGEST_RETIRED },
-  // "lane" in the model-provider sense. Anchored on the provider word beside it,
-  // so the blueprint's actor row — the only surviving meaning — always passes.
-  {
-    re: /\b(?:Gemini|Claude|Vertex-Claude|Anthropic|model|models|provider|providers|agent|agents|production|active|fallback|backup)[- ]lanes?\b/gi,
-    why: 'the model-provider sense of "lane" is retired — say provider, ModelProvider or adapter ("lane" is the blueprint\'s actor row)',
-  },
-  {
-    re: /\b(?:both|two|either|each|per)[- ](?:provider |model |agent )?lanes?\b/gi,
-    why: 'there is one agent loop and two adapters behind the ModelProvider seam — count adapters or providers, not lanes',
-  },
-  {
-    re: /\blanes?[- ](?:honors?|honors?|report|reports|run|runs|log|logs)\b/gi,
-    why: 'an adapter honors/reports/runs — "lane" in the provider sense is retired',
-  },
-  // THE THIRD RETIREMENT: the pre-regroup Foundations IA (#2429). Foundations became
-  // Brand, Visual, Layout, Expression, Accessibility and Tokens (#2433); Basics, the
-  // top-level Motion and Sound groups, Get started › Content design and the first
-  // motion principles are gone. Old ids resolve through netlify redirects for readers;
-  // an agent that cites one sends a human to a page that no longer exists.
-  { re: /\bfoundations-(?:basics|motion|sound)-[a-z-]+/g, why: 'a retired Storybook id: Foundations is Brand, Visual, Layout, Expression, Accessibility and Tokens (motion and sound ids start foundations-expression-)' },
-  { re: /\bFoundations(?: · |\/)(?:Basics|Motion|Sound)\b/g, why: 'Motion and Sound sit under Foundations › Expression; Basics is gone' },
-  { re: /\bGet started(?: › |\/)Content design\b/g, why: 'Content design became Foundations › Brand › Content (Voice and tone, Language, Messages)' },
-  { re: /\b(?:Show what changed|Move like real things|Quiet by default)\b/g, why: 'the motion principles are Always responsive, Build understanding, Lead with empathy, Cut the noise' },
-];
-
-/**
- * The entries that OWN a retired spelling: their `_Avoid_:` line names it
- * precisely so this sweep has something to point at, and so cannot be swept.
- * One entry per retirement, keyed by the file that holds it — the maintenance
- * severities in the glossary, and the ModelProvider seam that retired the
- * provider sense of "lane" in the Worker README's § Worker seams. Matched on
- * the entry's `**Term**:` line; the exemption is that entry's `_Avoid_:` line
- * and no other.
- */
-export const OWNERS = {
-  'GLOSSARY.md': [/^\*\*direct fix \/ gated change\*\*:$/],
-  'agents/uno-bot/README.md': [/^\*\*ModelProvider\*\*:$/],
-};
+/** The retirement list of a root; a fixture root that carries none is swept against this repo's. */
+const retirementOf = byRoot((repoRoot) => {
+  try {
+    return loadRetirement(repoRoot);
+  } catch (err) {
+    if (err.code === 'ENOENT') return loadRetirement(REPO_ROOT);
+    throw err;
+  }
+});
 
 /** The file types an agent reads. Tested against the name, as the walk hands it. */
 const SWEPT = ['.md', '.mdx', '.yml', '.yaml', '.json'];
@@ -151,25 +101,21 @@ const SWEPT = ['.md', '.mdx', '.yml', '.yaml', '.json'];
  */
 const skipEntry = (name) => name === 'node_modules' || name.startsWith('.') || name.startsWith('__');
 
-/** Sweep one file's text. Returns findings: { line, text, why }. */
-export function findingsIn(text, rel = '') {
-  const out = [];
-  const lines = text.split('\n');
-  const owners = OWNERS[rel];
-  let owner = false; // inside an entry that owns a retired spelling
-  lines.forEach((line, i) => {
-    if (owners) {
-      if (TERM.test(line)) owner = owners.some((re) => re.test(line));
-      else if (line.trim() === '') owner = false;
-      else if (owner && line.startsWith('_Avoid_:')) return;
-    }
-    for (const { re, why } of RETIRED) {
-      re.lastIndex = 0;
-      const m = re.exec(line);
-      if (m) out.push({ line: i + 1, text: m[0], why });
-    }
-  });
-  return out;
+/**
+ * Sweep one file's text. Returns findings: { line, text, why }, one per spelling
+ * per line. A file the list lets keep a retired spelling has none.
+ */
+export function findingsIn(text, rel = '', repoRoot = REPO_ROOT) {
+  const retirement = retirementOf(repoRoot);
+  if (retirement.allowed(rel, 'spelling')) return [];
+  const out = new Map();
+  for (const { row, match, index } of retirement.findIn(text, { kinds: ['spelling'], file: rel })) {
+    if (row.rule) continue; // another check's family, not a maintenance spelling
+    const line = text.slice(0, index).split('\n').length;
+    const key = `${line}:${row.not}`;
+    if (!out.has(key)) out.set(key, { line, text: match, why: row.why });
+  }
+  return [...out.values()].sort((a, b) => a.line - b.line);
 }
 
 export function sweep(root = REPO_ROOT) {
@@ -188,13 +134,12 @@ export function sweep(root = REPO_ROOT) {
   const findings = [];
   for (const abs of files) {
     const rel = path.relative(root, abs).split(path.sep).join('/');
-    if (SKIP.some((p) => rel.startsWith(p))) continue;
     // A file can vanish between the walk and the read — the belt to the braces
     // above, because the next fixture somebody plants may not be `__`-prefixed.
     // A file that is gone carries no retired spelling.
     let text;
     try { text = readFileSync(abs, 'utf8'); } catch (err) { if (err.code === 'ENOENT') continue; throw err; }
-    for (const f of findingsIn(text, rel)) findings.push({ file: rel, ...f });
+    for (const f of findingsIn(text, rel, root)) findings.push({ file: rel, ...f });
   }
   return { files: files.length, findings };
 }

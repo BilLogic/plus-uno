@@ -34,7 +34,13 @@ export const NarrowerThanTrigger = () => <SessionNotes width="3-col" trigger={wi
 
 export const AtCap = () => <SessionNotes width="4-col" trigger={<Button text="Notes" spacing="compact" />} />;
 
-export const WiderThanCap = () => <SessionNotes width="auto" trigger={wideTrigger('var(--field-width-xl)')} />;
+export const LongReadInPopup = () => (
+    <Popup show triggerType="manual" width="4-col" placement="bottom-start" title="Session notes" trigger={<Button text="Notes" spacing="compact" />}>
+        <p style={{ margin: 0 }}>Notes stay with the session. The tutor sees them first, and parents never see them.</p>
+        <p style={{ margin: 0 }}>Each note keeps the date it was written and who wrote it, so a later session can see what changed and why.</p>
+        <p style={{ margin: 0 }}>A note can be edited for a day after it is saved. After that it is locked, and a correction is a new note.</p>
+    </Popup>
+);
 
 export const OneFlatMenu = () => <SessionMenu placement="bottom-start" />;
 

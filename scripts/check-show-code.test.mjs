@@ -14,9 +14,13 @@ test('a page that passes CODE references is clean: the green twin', () => {
 });
 
 test('a hand-typed string, template literal or inline expression in a code prop fails', () => {
-  for (const prop of ['doCode="<Button />"', 'dontCode={`<Button />`}', 'code={\'<a />\'}', 'doCode={SNIPPETS.A}']) {
+  for (const prop of ['doCode="<Button />"', 'dontCode={`<Button />`}', 'doCode={SNIPPETS.A}']) {
     assert.ok(messages('design-system/src/templates/X/X.mdx', `<DoDontPair ${prop} />`).some((m) => /typed here/.test(m)), prop);
   }
+});
+
+test('only the doc-figure props are read: a code prop on another element is not a snippet', () => {
+  assert.deepEqual(messages('design-system/src/templates/X/X.mdx', '<Other code="x" />'), []);
 });
 
 test('a CODE built with showCode is clean; one that is typed fails', () => {

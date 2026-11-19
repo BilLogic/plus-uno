@@ -16,7 +16,7 @@ import { BAR_TOKEN, MultiStepTask, MultiStepTaskType, TASK_STEPS, WINDOW_HEIGHT 
 import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
-import { InAppFrame, RECORD_CRUMBS } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { InAppFrame, RECORD_CRUMBS } from '@/storybook-docs/lib/template-demo.jsx';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 
 /**

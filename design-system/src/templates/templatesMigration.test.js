@@ -2,12 +2,17 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 
+import { loadRetirement } from '../../../scripts/lib/retirement.mjs';
+
 // Source under design-system/src speaks the template names and imports from
-// the templates barrel. The old names and the old barrel are gone.
-const OLD_NAMES = new RegExp(`(?<![/\\w])Pattern(?:${['Section', 'Card', 'Table'].join('|')})(?![/\\w])`);
-const OLD_BARREL = new RegExp(`['"\`]@/${'patterns'}(?:/[^'"\`]*)?['"\`]`);
-// This guard spells the old names to look for them.
-const ALLOWED = new Set(['design-system/src/templates/templatesMigration.test.js']);
+// the templates barrel. The old names and the old barrel are gone. Which names
+// and which barrel is the retirement list's (`_inventions.json`): the retired
+// `Pattern*` names, and the retired barrel spelling. This guard spells none.
+const ROOT = execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim();
+const retirement = loadRetirement(ROOT);
+const OLD_NAMES = new RegExp(`(?<![/\\w])(?:${retirement.ofKind('tag').filter((r) => r.not.startsWith('Pattern')).map((r) => r.not).join('|')})(?![/\\w])`);
+const OLD_BARREL_ROW = retirement.ofKind('spelling').find((r) => r.not === `@/${'patterns'}`);
+const saysOldBarrel = (text) => retirement.findIn(text, { kinds: ['spelling'] }).some((hit) => hit.row.not === OLD_BARREL_ROW.not);
 const ROOTS = ['design-system/src', 'design-system/tests', 'design-system/guidelines', '.storybook'];
 
 function sourceFiles() {
@@ -16,13 +21,18 @@ function sourceFiles() {
     return out
         .split('\n')
         .filter((f) => /\.(jsx?|mjs|tsx?|mdx?|scss)$/.test(f))
-        .filter((f) => !/generated/.test(f) && !ALLOWED.has(f))
+        .filter((f) => !/generated/.test(f))
         .map((f) => `${root}/${f}`);
 }
 
 
 describe('templates migration', () => {
     const files = sourceFiles();
+
+    it('the retirement list names the old template names and the old barrel', () => {
+        expect(OLD_NAMES.source).toMatch(/PatternSection/);
+        expect(OLD_BARREL_ROW).toBeTruthy();
+    });
 
     it('scans the source tree', () => {
         expect(files.length).toBeGreaterThan(100);
@@ -39,7 +49,7 @@ describe('templates migration', () => {
     });
 
     it('no source file imports the patterns barrel', () => {
-        const hits = files.filter((f) => OLD_BARREL.test(readFileSync(f, 'utf8')));
+        const hits = files.filter((f) => saysOldBarrel(readFileSync(f, 'utf8')));
         expect(hits).toEqual([]);
     });
 

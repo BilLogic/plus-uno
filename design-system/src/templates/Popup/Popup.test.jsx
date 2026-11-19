@@ -14,7 +14,7 @@ import {
     OneFlatMenu,
     PopupBesidePopup,
     StartAlignedAtEnd,
-    WiderThanCap,
+    LongReadInPopup,
 } from './PopupCases.jsx';
 
 vi.mock('@storybook/addon-docs/blocks', async () => {
@@ -59,11 +59,16 @@ describe('Popup live cases and docs links', () => {
     });
 
     it('renders the width cases as an open Popup off a trigger', async () => {
-        for (const Case of [AsWideAsTrigger, NarrowerThanTrigger, AtCap, WiderThanCap]) {
+        for (const Case of [AsWideAsTrigger, NarrowerThanTrigger, AtCap]) {
             const { unmount } = render(<Case />);
             expect(await screen.findByText(/Notes stay with the session/)).toBeInTheDocument();
             unmount();
         }
+    });
+
+    it('renders LongReadInPopup as an open Popup with three paragraphs', async () => {
+        render(<LongReadInPopup />);
+        expect(await screen.findByText(/A note can be edited for a day/)).toBeInTheDocument();
     });
 
     it('renders OneFlatMenu as one open menu', async () => {
@@ -110,5 +115,18 @@ describe('Popup live cases and docs links', () => {
         for (const title of exampleTitles) {
             expect(within(document.body).getByRole('heading', { level: 3, name: title })).toHaveAttribute('id', exampleSlug(title));
         }
+    });
+
+    it('lists every Key state on the page in the generated agent view', () => {
+        const section = popupMdx.split(/^## Key states$/m)[1].split(/^## /m)[0];
+        const titles = [...section.matchAll(/<ComponentExample[^\n]*? title="([^"]+)"/g)].map((match) => match[1]);
+        expect(titles.length).toBeGreaterThanOrEqual(5);
+        const view = readFileSync(join(__dirname, '../../../agent-views/templates/Popup.md'), 'utf8');
+        for (const title of titles) expect(view, title).toContain(`**${title}.**`);
+    });
+
+    it('teaches the focus the Popup component gives, not focus that stays put', () => {
+        expect(popupMdx).not.toMatch(/focus stays where it was/);
+        expect(popupMdx).toMatch(/takes focus too/);
     });
 });

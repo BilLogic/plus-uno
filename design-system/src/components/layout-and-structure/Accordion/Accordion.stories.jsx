@@ -6,7 +6,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import Accordion from './Accordion';
 import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { probe, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
-import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
+import { DemoLabel } from '@/storybook-docs/lib/template-demo';
 
 export default {
     title: 'Components/Layout and structure/Accordion',

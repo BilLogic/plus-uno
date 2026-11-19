@@ -13,8 +13,13 @@ import {
     TextField,
     Toggle,
 } from '@/components';
-import { Section } from '@/templates';
-import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { Frame, Section } from '@/templates';
+import { stepItems } from '@/storybook-docs/lib/multi-step-task.jsx';
+
+/** A form in steps: four or fewer run across the top; five or more go down a rail 256 wide. */
+const STEPS_ACROSS_MAX = 4;
+const STEPS_RAIL = 256; // docs-literal
+import { InAppFrame } from '@/storybook-docs/lib/template-demo.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { FormFields, FILLED } from './formHosts.jsx';

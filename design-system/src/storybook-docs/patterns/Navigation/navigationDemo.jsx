@@ -11,7 +11,7 @@ import {
     STUDENT_SESSION_CARDS,
 } from '../../../templates/Page/pageDemo.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
-import { RECORD_CRUMBS } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { RECORD_CRUMBS } from '@/storybook-docs/lib/template-demo.jsx';
 import { SectionActions } from '@/storybook-docs/lib/section-header.jsx';
 import { StudentsTable, ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
 import { NamesDo, TabLabelDo, TabLabelDont } from '../../../components/navigation/Sidebar/Sidebar.examples.jsx';

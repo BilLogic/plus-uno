@@ -30,7 +30,7 @@ LinkButton.propTypes = {
     text: PropTypes.string,
     /** The label, used when `text` is not given. */
     children: PropTypes.node,
-    /** The button's look, the same seven as Button. Use `primary` for the one main navigation on a view and `default` or `subtle` for the rest. */
+    /** The button's look, the same as Button. Use `primary` for the one main navigation on a view, `default` or `subtle` for the rest, and `link` for a text link that leaves. */
     appearance: PropTypes.oneOf(BUTTON_APPEARANCES),
     /** `default` draws 32. `compact` draws 24. */
     spacing: PropTypes.oneOf(['default', 'compact']),

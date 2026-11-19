@@ -88,7 +88,7 @@ Choose a button's appearance by importance, placement by what it acts on, and la
 
 | Part | Component | Notes |
 | --- | --- | --- |
-| Action | Button | The seven appearances; `isLoading` swaps the label for a spinner and keeps the width. |
+| Action | Button | The nine appearances; `isLoading` swaps the label for a spinner and keeps the width. |
 | Icon action | Icon button | Close, Copy, Edit and More; its `label` names it. |
 | Full-bleed footer | Modal footer | Composed from Button in fixed cells today. Planned as a footer prop on the Modal and the Panel. |
 | Bulk bar | Section table head | The Dynamic table's head row, through `TableBulkActions`. |

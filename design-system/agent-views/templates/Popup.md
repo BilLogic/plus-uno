@@ -17,7 +17,7 @@ Each type composes the Popup component, which handles placement, outside clicks 
 - **Select list.** One list that applies as you pick: radios for one choice, checkboxes for several.
 - **Content.** A preview or a short explanation. Anything wider is a Panel or a Modal.
 - **Filter menu.** Two or three categories, held until Apply. Reset and Apply sit full bleed, half each.
-- **Filter menu, stacked.** Four or more categories, or long lists, stacked at 3-col up to 4-col. The categories scroll between the pinned header and footer.
+- **Filter menu, stacked.** Four or more categories, or long lists, stacked at 3-col, or 4-col when the options need it. The categories scroll between the pinned header and footer.
 
 ## Anatomy
 
@@ -38,14 +38,24 @@ Aligned to the edge of the trigger on the side where it sits. A trigger at the s
 
 ## Key states
 
+- **Long label.** A menu stops at 320. Past that a row ends in an ellipsis, and the full text opens in a Tooltip when clipped: Overflow. The Tooltip on a clipped row is Planned.
+
+- **Loading a list.** One “Loading options” row, with no skeleton: Loading.
+
+- **Load failed.** “Couldn't load options” with Retry; the menu stays open.
+
+- **Flipped.** With no room below, the layer opens above the trigger and stays 8 from the screen edge.
+
+- **Filter applied.** After Apply the menu closes and the count sits on the Filter icon's selected fill, read “Filters, 2 applied”. No tag row: Filtering.
+
 ## Sizes
 
 | Width | 768 | 1024 | 1280 | Used for |
 | --- | --- | --- | --- | --- |
 | `auto` (default) | 160 to 320 | 160 to 320 | 160 to 320 | Menus and select lists; at least the trigger |
 | 2-col | 200 (floor) | 200 (floor) | about 224 | A short choice list, a small date or time picker |
-| 3-col | 200 | 264 | 328 | A filter menu, the profile menu |
-| 4-col | 261 | 347 | 432 | Content; the cap |
+| 3-col | 200 | 264 | 328 | A filter menu; the profile menu once DropdownMenu takes a width |
+| 4-col | 261 | 347 | 432 | Content, and a stacked filter menu whose options need it; the cap |
 
 | Token | Value | Used for |
 | --- | --- | --- |
@@ -67,7 +77,7 @@ Popup is the component: placement, offset, outside click and Escape. Each type i
 | Slot or prop | Holds |
 | --- | --- |
 | `trigger` | The control it hangs off: an IconButton, a FilterButton, the labeled view trigger, the account row. |
-| `placement` | `bottom-start` for a trigger at the start of a bar, `bottom-end` for one at the end. It flips when there is no room. |
+| `placement` | `Popup` itself opens `top`. Under a bar, set `bottom-start` for a trigger at the start and `bottom-end` for one at the end; DropdownMenu and PopupSelect default to `bottom-start` and FilterMenu to `bottom-end`. It flips when there is no room. |
 | `width` | `auto` (default) · `3-col` · `4-col`. |
 | `width="2-col"` | Planned. The short-list step with a 200 floor. |
 | `children` | Menu rows, a list, filter categories, or a short aside. |
@@ -83,8 +93,8 @@ Use a Popup for content anchored to a trigger that leaves on an outside click or
 | --- | --- | --- | --- |
 | Menu | Choosing one action from a short list | auto | On pick |
 | Select list | One category, picked as you go; the view picker under page tabs | auto | As you pick |
-| Filter menu | Two or more categories applied together | 3-col, stacked up to 4-col | On Apply |
-| Profile menu | The account row | 3-col | On pick |
+| Filter menu | Two or more categories applied together | 3-col; stacked, 3-col or 4-col | On Apply |
+| Profile menu | The account row | auto today, 3-col once DropdownMenu takes a width | On pick |
 | Content | A preview, a definition, a short explanation | 4-col at most | — |
 
 ## Alternatives
@@ -106,7 +116,7 @@ Use a Popup for content anchored to a trigger that leaves on an outside click or
 ## Accessibility
 
 - The trigger carries `aria-haspopup` and an `aria-expanded` that tracks the open state. A Filter icon's name says what is on: "Filters, 2 applied".
-- A menu moves focus to its first row; Up and Down move, and Escape closes and returns focus to the trigger. A content Popup is a popup, so focus stays where it was and Tab reaches what is inside.
+- A menu moves focus to its first row; Up and Down move, and Escape closes and returns focus to the trigger. A content Popup opened by a click or a key takes focus too: its first focusable element, or the popup itself when there is none. Tab reaches what is inside, and Escape or a click away returns focus to the trigger.
 - A select list is a listbox or a group of checkboxes, and the chosen state is announced. The labeled view trigger reads "Status, Upcoming".
 - In a filter menu, Reset and Apply are reachable after the categories. Apply announces the new count in words.
 - A "Loading options" row is announced once, and "Couldn't load options" offers a Retry button.
@@ -148,14 +158,14 @@ It hugs the longest item. The width is set once, on open, so it holds still whil
 Do: The menu is at least as wide as its trigger, so their edges line up.
 Don't: A menu narrower than the trigger it hangs off: the edges no longer line up.
 
-### Cap a Popup at 4-col. {#cap-a-popup-at-4-col}
+### Cap a Popup at 4-col, and keep it a short aside. {#cap-a-popup-at-4-col-and-keep-it-a-short-aside}
 
 **Checked:** Review
 
-Anything wider is a Panel or a Modal. Anything with inputs the person must finish, steps or a long scroll belongs in a Modal.
+Anything wider or longer is a Panel or a Modal. Anything with inputs the person must finish, steps or a long scroll belongs in a Modal. An auto-width Popup grows past 320 only to match a trigger wider than 320, never for its content.
 
-Do: A content Popup at 4-col, the cap.
-Don't: A Popup wider than 4-col: anything this wide is a Panel or a Modal.
+Do: A content Popup at 4-col, the cap, holding a short explanation.
+Don't: A long read in a Popup: anything this long is a Panel or a Modal.
 
 ### Put fields the person must finish in a Modal. {#put-fields-the-person-must-finish-in-a-modal}
 
