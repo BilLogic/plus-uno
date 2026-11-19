@@ -129,6 +129,52 @@ test('run: an avoid-word equal to another component\'s name fails, on any page s
   assert.match(errors[0].message, /\[collision\] "flag".*Section message.*Flag/);
 });
 
+const OUTSIDE = `${GLOSSARY}
+**Status tag**:
+A label that shows the state of one thing.
+_Avoid_: "pill" as a name, "lozenge"
+`;
+
+test('run: a planted Lozenge in an MDX page is an error even on a non-strict page', () => {
+  const root = fixtureRepo({ glossary: OUTSIDE, pages: { StatusTag: '## Usage\n\nLike a Lozenge.\n' } });
+  const errors = run({ repoRoot: root, enforceStrict: false }).filter((f) => f.severity === 'error');
+  assert.equal(errors.length, 1, JSON.stringify(errors));
+  assert.match(errors[0].message, /"Lozenge".*Status tag/);
+  assert.ok(errors[0].file.endsWith('StatusTag.mdx'));
+});
+
+test('run: a planted Lozenge in a token intent (plan.mjs use or note) is an error; a comment is not', () => {
+  const root = fixtureRepo({ glossary: OUTSIDE, pages: { StatusTag: '## Usage\n\nIn the flow.\n' } });
+  fs.mkdirSync(path.join(root, 'scripts/lib/tokens'), { recursive: true });
+  fs.writeFileSync(
+    path.join(root, 'scripts/lib/tokens/plan.mjs'),
+    "// A lozenge in a comment is not an intent.\nexport const TOKEN_LADDER = [\n  { new: '--x', use: 'Fill of a lozenge on a row.' },\n  { new: '--y', note: 'Clean line.' },\n];\n",
+  );
+  const errors = run({ repoRoot: root, enforceStrict: false }).filter((f) => f.severity === 'error');
+  assert.equal(errors.length, 1, JSON.stringify(errors));
+  assert.equal(errors[0].file, 'scripts/lib/tokens/plan.mjs');
+  assert.equal(errors[0].line, 3);
+});
+
+test('run: generated token docs and agent views are read; routing data and code spans are not', () => {
+  const root = fixtureRepo({ glossary: OUTSIDE, pages: { StatusTag: '## Usage\n\nIn the flow.\n' } });
+  const write = (rel, text) => {
+    fs.mkdirSync(path.dirname(path.join(root, rel)), { recursive: true });
+    fs.writeFileSync(path.join(root, rel), text);
+  };
+  write('design-system/src/styles/TokensColor.mdx', '# Color tokens\n\nThe lozenge fill.\n');
+  write('design-system/agent-views/tokens/tokens.md', '| `--x` | The lozenge fill |\n');
+  write('design-system/agent-views/foundations/Radius.md', 'A Lozenge keeps its shape.\n');
+  write('design-system/agent-views/components/index.md', '| `Lozenge` | `StatusTag` |\n');
+  write('design-system/agent-views/_aliases.json', '{"StatusTag": ["lozenge"]}');
+  const files = run({ repoRoot: root, enforceStrict: false }).filter((f) => f.severity === 'error').map((f) => f.file).sort();
+  assert.deepEqual(files, [
+    'design-system/agent-views/foundations/Radius.md',
+    'design-system/agent-views/tokens/tokens.md',
+    'design-system/src/styles/TokensColor.mdx',
+  ]);
+});
+
 test('run: the real tree has no collision and the strict page is clean', () => {
   assert.equal(ENFORCE_STRICT, true);
   const found = run();
