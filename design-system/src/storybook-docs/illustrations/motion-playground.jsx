@@ -179,7 +179,7 @@ export const SpringPlayground = ({ reduced: forcedReduced }) => {
           value={String(speed)}
           onChange={(v) => setSpeed(Number(v))}
         />
-        <div style={{ display: 'flex', gap: 'var(--space-100)', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 'var(--inline-xl)', alignItems: 'center' }}>
           <Button appearance="primary" onClick={play}>
             Play
           </Button>

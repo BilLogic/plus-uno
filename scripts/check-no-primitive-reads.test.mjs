@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { isPrimitive, measure } from './check-no-primitive-reads.mjs';
+import { isPrimitive, measure, SEARCH_ROOTS, run } from './check-no-primitive-reads.mjs';
 
 test('numbered space, radius, size and stroke steps are primitives', () => {
   for (const name of ['--space-050', '--space-025', '--size-200', '--stroke-2']) assert.ok(isPrimitive(name), name);
@@ -24,11 +24,43 @@ test('a fallback after the primitive still counts as a read', () => {
   assert.equal(measure([{ path: 'a.scss', text: 'gap: var(--space-050, 8px);' }]).get('a.scss').count, 1);
 });
 
-test('a clean file, a story and a test are absent', () => {
+test('a clean file and a test are absent', () => {
   const found = measure([
     { path: 'clean.scss', text: '.x { gap: var(--stack-md); }' },
-    { path: 'A.stories.jsx', text: 'var(--space-050)' },
     { path: 'A.test.jsx', text: 'var(--space-050)' },
   ]);
   assert.equal(found.size, 0);
+});
+
+test('the roots cover components, templates, storybook-docs and styles', () => {
+  for (const root of ['design-system/src/components', 'design-system/src/templates', 'design-system/src/storybook-docs', 'design-system/src/styles']) {
+    assert.ok(SEARCH_ROOTS.includes(root), root);
+  }
+});
+
+test('a story counts a space or palette read', () => {
+  const found = measure([
+    { path: 'design-system/src/components/x/A.stories.jsx', text: "const s = { gap: 'var(--space-150)', color: 'var(--palette-blue-500)' };" },
+  ]);
+  assert.equal(found.get('design-system/src/components/x/A.stories.jsx').count, 2);
+});
+
+test('a docs file counts a space read', () => {
+  const found = measure([
+    { path: 'design-system/src/storybook-docs/fig.jsx', text: "gap: 'var(--space-100)'" },
+    { path: 'design-system/src/styles/_grid.scss', text: '.a { pad: var(--space-150); }' },
+  ]);
+  assert.equal(found.size, 2);
+});
+
+test('a story keeps its sized demo scaffolding: only space and palette reads count there', () => {
+  const found = measure([{ path: 'a/A.stories.jsx', text: "maxWidth: 'var(--size-5400)', border: 'var(--stroke-1) solid red'" }]);
+  assert.equal(found.size, 0);
+});
+
+test('a read in a story or docs file the baseline does not hold fails the check', () => {
+  const findings = run({
+    sources: [{ path: 'design-system/src/storybook-docs/fig.jsx', text: "gap: 'var(--space-100)'" }],
+  });
+  assert.ok(findings.some((f) => f.file === 'design-system/src/storybook-docs/fig.jsx'));
 });

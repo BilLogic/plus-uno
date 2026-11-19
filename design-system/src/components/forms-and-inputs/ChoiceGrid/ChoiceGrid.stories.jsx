@@ -110,7 +110,7 @@ export const Variants = () => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--size-5400)' }}>
             <div>
-                <span style={{ display: 'block', marginBottom: 'var(--space-050)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Radio (one per row)</span>
+                <span style={{ display: 'block', marginBottom: 'var(--stack-md)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Radio (one per row)</span>
                 <ChoiceGrid
                     id="choice-grid-radio"
                     name="choice-grid-radio"
@@ -124,7 +124,7 @@ export const Variants = () => {
                 />
             </div>
             <div>
-                <span style={{ display: 'block', marginBottom: 'var(--space-050)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Checkbox (multiple per row)</span>
+                <span style={{ display: 'block', marginBottom: 'var(--stack-md)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Checkbox (multiple per row)</span>
                 <ChoiceGrid
                     id="choice-grid-checkbox"
                     name="choice-grid-checkbox"
@@ -171,7 +171,7 @@ export const Size = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--size-5400)' }}>
         {[12, 14, 16].map((size) => (
             <div key={size}>
-                <span style={{ display: 'block', marginBottom: 'var(--space-050)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{size}</span>
+                <span style={{ display: 'block', marginBottom: 'var(--stack-md)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{size}</span>
                 <ChoiceGrid
                     id={`choice-grid-size-${size}`}
                     name={`choice-grid-size-${size}`}

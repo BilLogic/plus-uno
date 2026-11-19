@@ -239,7 +239,7 @@ export const Steps = {
 /** Narrow Panel (400): measured by `@container (max-width: 400px)` with no prop, so a single action fills tracks 1–4 and two actions split 50/50. */
 export const NarrowPanel = {
     render: () => (
-        <div style={{ display: 'flex', gap: 'var(--space-200)', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', gap: 'var(--inline-3xl)', flexWrap: 'wrap', alignItems: 'flex-start' }}>
             <PanelContainer width="var(--panel-width-default)">
                 <PanelHeader title="Session moved" actions={<PanelCloseAction />} />
                 <PanelBody>Thursday’s session with Ana is now at 4:30 PM.</PanelBody>
