@@ -71,25 +71,25 @@ Interactive.play = async ({ canvasElement }) => {
 };
 
 export const Appearances = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-100)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
         <ProgressIndicator values={VALUES} selectedIndex={1} appearance="default" />
         <ProgressIndicator values={VALUES} selectedIndex={1} appearance="primary" />
         <ProgressIndicator values={VALUES} selectedIndex={1} appearance="help" />
-        <div style={{ background: 'var(--ds-background-inverse-subtle)', padding: 'var(--space-100)', borderRadius: 'var(--radius-lg)' }}>
+        <div style={{ background: 'var(--ds-background-inverse-subtle)', padding: 'var(--stack-xl)', borderRadius: 'var(--radius-lg)' }}>
             <ProgressIndicator values={VALUES} selectedIndex={1} appearance="inverted" />
         </div>
     </div>
 );
 
 export const Sizes = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-100)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
         <ProgressIndicator values={VALUES} selectedIndex={1} size={8} />
         <ProgressIndicator values={VALUES} selectedIndex={1} size={12} />
     </div>
 );
 
 export const Spacing = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-100)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
         <ProgressIndicator values={VALUES} selectedIndex={1} spacing="spacious" />
         <ProgressIndicator values={VALUES} selectedIndex={1} spacing="default" />
         <ProgressIndicator values={VALUES} selectedIndex={1} spacing="compact" />
@@ -163,7 +163,7 @@ const fillScale = (dot) => {
 
 /** With `progress`, the current dot stretches into a bar filled to that fraction; the other dots stay dots. */
 export const Timed = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-100)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
         <ProgressIndicator values={VALUES} selectedIndex={1} progress={0} label="Start" />
         <ProgressIndicator values={VALUES} selectedIndex={1} progress={0.5} label="Half" />
         <ProgressIndicator values={VALUES} selectedIndex={1} progress={1} label="Full" />

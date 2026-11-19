@@ -23,7 +23,7 @@ const SESSIONS = [
     { name: 'North High with Sam', status: 'Canceled', site: 'North High', format: 'In person' },
 ];
 
-const pad = { padding: 'var(--space-300)', minHeight: 'calc(var(--space-400) * 10)' };
+const pad = { padding: 'calc(var(--stack-2xl) * 2)', minHeight: 'calc(var(--stack-3xl) * 20)' };
 const bar = { display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 'var(--inline-md)' };
 
 /** The sessions the applied filters keep: within a category any pick matches, across categories all must. */
@@ -154,7 +154,7 @@ export const Staging = {
 /** Four or more categories stack, at 3-col or up to 4-col. */
 export const Stacked = {
     render: () => (
-        <div style={{ ...pad, minHeight: 'calc(var(--space-400) * 14)' }}>
+        <div style={{ ...pad, minHeight: 'calc(var(--stack-3xl) * 28)' }}>
             <div style={bar}>
                 <FilterMenu categories={STACKED} label="Filters" defaultOpen id="filter-menu-stacked" width="4-col" />
             </div>
