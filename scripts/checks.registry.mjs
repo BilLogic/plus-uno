@@ -122,6 +122,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-deps.mjs',
     guards: 'dependencies that are declared but imported nowhere, and ones used (a CDN <link> included) but never declared.',
+    baseline: 'scripts/baselines/cdn-splits.json',
   },
   {
     name: 'check:docs',
@@ -370,6 +371,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-cross-repo-duplication.mjs',
     guards: "one meaning stated in two repositories: a shingle sweep over the three repos' harness documents, held to the recorded pairs.",
+    baseline: 'scripts/baselines/cross-repo-duplication.json',
   },
   {
     name: 'check:button-contrast',

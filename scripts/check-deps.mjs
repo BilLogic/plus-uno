@@ -23,6 +23,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { cdnPins, pinConflicts, unusedDeclared } from "./deps.mjs";
 import { byRoot, main } from "./lib/findings.mjs";
+import { absentMessage, openRatchet } from "./lib/ratchet.mjs";
 import { trackedFiles } from "./lib/tracked-sources.mjs";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -45,12 +46,62 @@ const ALLOWED = new Map([
 ]);
 
 /**
- * CDN version splits that already exist. New ones fail; these are recorded.
- *
- * A baseline, not an amnesty: the reason has to say what it would take to
- * close it, so it does not quietly become permanent.
+ * CDN version splits that already exist. New ones fail; these are recorded in
+ * `scripts/baselines/cdn-splits.json`, one entry per `lib@version`, each with the
+ * reason it stands. A baseline, not an amnesty: the reason has to say what it would
+ * take to close it, so it does not quietly become permanent.
  */
-const CDN_BASELINE = new Map([]);
+export const BASELINE = "scripts/baselines/cdn-splits.json";
+
+/** The ratchet's key for one version of one library. */
+const splitKey = (lib, version) => `${lib}@${version}`;
+
+/**
+ * Judge the CDN conflicts against the recorded splits.
+ *
+ * A recorded split is not a blank check for that library: the record names the exact
+ * versions, and a THIRD version appearing is new and has to fail. A recorded version
+ * that is gone is reported, so the record stops asserting something untrue.
+ *
+ * @param {{lib: string, versions: string[]}[]} conflicts
+ * @param {string[]} unresolved libraries whose installed version could not be read
+ * @param {ReturnType<typeof openRatchet>} ratchet
+ * @returns {{newConflicts: object[], staleBaseline: string[], baselined: number}}
+ */
+export function splitVerdict(conflicts, unresolved, ratchet) {
+  const found = conflicts.flatMap((c) => c.versions.map((v) => splitKey(c.lib, v)));
+  const recordedOf = (lib) => [...ratchet.entries.keys()].filter((k) => k.startsWith(`${lib}@`)).map((k) => k.slice(lib.length + 1));
+  const isNew = new Set(ratchet.failures(found).filter((f) => f.kind === "new").map((f) => f.key));
+
+  const newConflicts = [];
+  for (const c of conflicts) {
+    if (!recordedOf(c.lib).length) {
+      newConflicts.push(c);
+      continue;
+    }
+    const extra = c.versions.filter((v) => isNew.has(splitKey(c.lib, v)));
+    if (extra.length) newConflicts.push({ ...c, extra });
+  }
+
+  // A recorded split nobody prunes is a backlog wearing a ratchet's clothes — the
+  // same thing the ALLOWED list has a staleness check for.
+  const staleBaseline = [];
+  const staleLibs = new Set();
+  for (const { key } of ratchet.stale(found)) {
+    const lib = key.slice(0, key.lastIndexOf("@"));
+    // Not "no conflict found" — "no conflict found, and we were able to look".
+    // A CDN-pin-versus-shipped split needs node_modules to compare, so without
+    // it the comparison never runs, and calling that closed would delete a live entry.
+    if (unresolved.includes(lib) || staleLibs.has(lib)) continue;
+    staleLibs.add(lib);
+    const live = conflicts.find((c) => c.lib === lib);
+    const recorded = recordedOf(lib);
+    const stillSplit = live ? recorded.filter((v) => live.versions.includes(v)) : [];
+    staleBaseline.push(`${lib} (recorded ${recorded.join(", ")}; still present: ${stillSplit.join(", ") || "none"})`);
+  }
+
+  return { newConflicts, staleBaseline, baselined: conflicts.filter((c) => recordedOf(c.lib).length).length };
+}
 
 // `mts`/`cts` are here because a TypeScript ESM module was invisible to this
 // sweep: agents/uno-bot/vitest.workerd.config.mts imports
@@ -149,34 +200,9 @@ const inputs = byRoot((repoRoot) => {
 export function run({ repoRoot = REPO_ROOT } = {}) {
   const { unused, stale, conflicts, unresolved } = inputs(repoRoot);
 
-  // A recorded split is not a blank check for that library. The baseline names
-  // the exact versions; a THIRD FontAwesome appearing is new, and has to fail.
-  // This is the a11y ratchet's rule: the recorded set may only shrink.
-  const newConflicts = [];
-  for (const c of conflicts) {
-    const recorded = CDN_BASELINE.get(c.lib);
-    if (!recorded) {
-      newConflicts.push(c);
-      continue;
-    }
-    const extra = c.versions.filter((v) => !recorded.versions.includes(v));
-    if (extra.length) newConflicts.push({ ...c, extra });
-  }
-
-  // A baseline that never shrinks is a backlog wearing a ratchet's clothes — the
-  // same thing the ALLOWED list has a staleness check for.
-  const staleBaseline = [];
-  for (const [lib, recorded] of CDN_BASELINE) {
-    // Not "no conflict found" — "no conflict found, and we were able to look".
-    // A CDN-pin-versus-shipped split needs node_modules to compare, so without
-    // it the comparison never runs, and calling that closed would delete a live entry.
-    if (unresolved.includes(lib)) continue;
-    const live = conflicts.find((c) => c.lib === lib);
-    const stillSplit = live ? recorded.versions.filter((v) => live.versions.includes(v)) : [];
-    if (stillSplit.length < recorded.versions.length) {
-      staleBaseline.push(`${lib} (recorded ${recorded.versions.join(", ")}; still present: ${stillSplit.join(", ") || "none"})`);
-    }
-  }
+  const ratchet = openRatchet({ file: BASELINE, repoRoot });
+  if (ratchet.absent) return [{ message: absentMessage(BASELINE) }];
+  const { newConflicts, staleBaseline } = splitVerdict(conflicts, unresolved, ratchet);
 
   const failures = [];
 
@@ -202,7 +228,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
 
   if (staleBaseline.length) {
     failures.push(
-      `${staleBaseline.length} CDN_BASELINE entr(ies) describing a split that no longer exists:\n` +
+      `${staleBaseline.length} recorded CDN split(s) describing a split that no longer exists:\n` +
         staleBaseline.map((l) => `       ${l}`).join("\n") +
         "\n     Someone closed it. Delete the entry so the file stops asserting something untrue.",
     );
@@ -217,7 +243,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
         `${c.lib} is pinned at ${c.extra ? `a version not in the baseline (${c.extra.join(", ")})` : "more than one version on a CDN, or disagrees with the installed one"}` +
           `${c.declared ? ` (package.json installs ${c.declared})` : ""}:\n${lines}\n` +
           "     A CDN <link> is invisible to Dependabot, so nothing else will ever notice.\n" +
-          "     Unify the version, or record it in CDN_BASELINE with what closing it needs.",
+          "     Unify the version, or record it in scripts/baselines/cdn-splits.json with what closing it needs.",
       );
     }
   }
@@ -234,7 +260,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
  */
 export function summary({ repoRoot = REPO_ROOT } = {}) {
   const { pins, conflicts, unresolved, declaredCount } = inputs(repoRoot);
-  const baselined = conflicts.filter((c) => CDN_BASELINE.has(c.lib)).length;
+  const { baselined } = splitVerdict(conflicts, unresolved, openRatchet({ file: BASELINE, repoRoot }));
   const line =
     `${declaredCount} declared, all referenced (${ALLOWED.size} documented exception(s)); ` +
     `${pins.length} CDN pin(s) across ${new Set(pins.map((p) => p.path)).size} file(s), ` +

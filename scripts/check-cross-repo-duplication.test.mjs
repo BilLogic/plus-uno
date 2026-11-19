@@ -15,10 +15,10 @@ import path from 'node:path';
 import {
   COPIES,
   MIN_WORDS,
-  RECORDED,
   SHINGLE,
   blocksOf,
   coverageReport,
+  recordedPairs,
   runsIn,
   sweep,
   wordsOf,
@@ -195,7 +195,7 @@ test('a copy by construction is excluded, and a stale COPIES entry fails', () =>
 });
 
 test('a recorded pair absorbs what it recorded, refuses a rise, and fails when it goes empty', () => {
-  const rec = RECORDED.find((r) => r.a === 'blueprint:CONTEXT.md' && r.b === 'sb:CONTEXT.md');
+  const rec = recordedPairs().find((r) => r.a === 'blueprint:CONTEXT.md' && r.b === 'sb:CONTEXT.md');
   assert.ok(rec, 'the glossary pair is the recorded entry these assertions are about');
   const under = passage('the writing vocabulary');
   assert.ok(wordsOf(under).length <= rec.words, 'the fixture has to sit under the ceiling');
@@ -205,6 +205,7 @@ test('a recorded pair absorbs what it recorded, refuses a rise, and fails when i
     const r = sweep(held.roots);
     assert.deepEqual(r.findings, [], 'a recorded pair is not a finding');
     assert.deepEqual(r.rises, [], 'and it is under its ceiling');
+    assert.deepEqual(r.unreviewed, [], 'and every recorded pair says what closing it would take');
   } finally {
     held.done();
   }
@@ -229,7 +230,7 @@ test('a recorded pair absorbs what it recorded, refuses a rise, and fails when i
 });
 
 test('the recorded glossary pair holds under either name, so a sibling\'s rename is not a finding', () => {
-  const rec = RECORDED.find((r) => r.a === 'blueprint:CONTEXT.md' && r.b === 'sb:CONTEXT.md');
+  const rec = recordedPairs().find((r) => r.a === 'blueprint:CONTEXT.md' && r.b === 'sb:CONTEXT.md');
   const under = passage('the writing vocabulary');
   assert.ok(wordsOf(under).length <= rec.words);
   const renamed = estate({ 'blueprint:GLOSSARY.md': under, 'sb:CONTEXT.md': under });
@@ -248,7 +249,7 @@ test('THE TWO RENAME MAPS WOULD HAVE FAILED IT: the ceiling sits where they cros
   // agentic-service-blueprinting#137 shared 771 words. Rebuilt here at scale
   // rather than vendored, because a fixture that quotes another repo's deleted
   // prose is one more copy of it.
-  const rec = RECORDED.find((r) => r.a === 'blueprint:CONTEXT.md' && r.b === 'sb:CONTEXT.md');
+  const rec = recordedPairs().find((r) => r.a === 'blueprint:CONTEXT.md' && r.b === 'sb:CONTEXT.md');
   const map = Array.from({ length: 20 }, (_, i) => passage(`row ${i}`)).join('\n\n');
   const e = estate({
     'blueprint:CONTEXT.md': `# Glossary\n\n## The rename map\n\n${map}\n`,
@@ -297,7 +298,7 @@ test('an exemption whose OWN repos were both read is still asserted', () => {
   // computed. A single absent repo is a normal state rather than an
   // exceptional one, so a deduplicated pair could survive as a stale entry indefinitely.
   //
-  // Every RECORDED entry is blueprint↔sb, so dropping plus-uno leaves them all
+  // Every recorded pair is blueprint↔sb, so dropping plus-uno leaves them all
   // fully reachable while the run as a whole is not. Counted from the list
   // rather than written out, so recording a pair does not fail this.
   const e = estate({});
@@ -306,7 +307,7 @@ test('an exemption whose OWN repos were both read is still asserted', () => {
     assert.deepEqual(r.reached, ['blueprint', 'sb']);
     assert.equal(
       r.stale.length,
-      RECORDED.length,
+      recordedPairs().length,
       `every entry is asserted:\n${r.stale.join('\n')}`,
     );
     for (const s of r.stale) assert.match(s, /shares nothing any more/);
@@ -318,7 +319,7 @@ test('an exemption whose OWN repos were both read is still asserted', () => {
 test('a COPIES entry stays suspended until every repo was read', () => {
   // COPIES names a path rather than its repos, so "in fewer than two repos"
   // cannot be told apart from "in fewer than two repos I could look at". It
-  // keeps the whole-run gate the RECORDED entries no longer need.
+  // keeps the whole-run gate the recorded pairs no longer need.
   const e = estate({});
   try {
     const r = sweep({ ...e.roots, 'plus-uno': null });

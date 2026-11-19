@@ -210,31 +210,7 @@ const manifestScripts = (pkg) =>
 // the `baseline` column
 // ---------------------------------------------------------------------------
 
-/**
- * The check that still parses its own record, and the argument for naming it
- * here rather than letting a weaker assertion pass all twelve quietly.
- *
- * #600 listed "the a11y baseline" among the records that would read the module
- * and migrated the other seven; #601's message says "not one check parses a
- * record any more", and this one does — `check-storybook.mjs` reads
- * `scripts/baselines/a11y-baseline.json` with `JSON.parse` and rebuilds the whole
- * record on `--update`, which is the rewrite `update()` exists not to be. It is
- * the one check whose measurement needs a browser and a built Storybook, so its
- * migration is a piece of work with its own verification and not a line of this
- * one. What this map buys is that the gap is WRITTEN DOWN and cannot grow: a
- * row named here is held to the weak assertion — its reach must still name the
- * record — and a row named here that has since migrated is itself a finding, so
- * the exemption cannot outlive the defect.
- */
 const REGISTRY_FILE = 'scripts/checks.registry.mjs';
-
-const PARSES_ITS_OWN_RECORD = new Map([
-  [
-    'check:storybook',
-    'its verdict takes the parsed record as an argument and returns a rebuilt one, and its ' +
-      'measurement needs a browser — the migration #600 left behind, not a line of #602.',
-  ],
-]);
 
 /**
  * What a `baseline:` row claims, asserted through the ratchet module rather
@@ -277,15 +253,15 @@ const PARSES_ITS_OWN_RECORD = new Map([
  *
  * @param {object} row  a registry row with a `baseline`.
  * @param {Record<string, string>} manifest  its package's `scripts`.
- * @param {{repoRoot?: string, exemptions?: Map<string, string>}} [opts]  both
- *        injected for the tests, which drive a doctored row over a scratch tree
- *        rather than planting a malformed record in the live one.
+ * @param {{repoRoot?: string}} [opts]  injected for the tests, which drive a
+ *        doctored row over a scratch tree rather than planting a malformed
+ *        record in the live one.
  * @returns {import('./lib/findings.mjs').Finding[]}
  */
 export function baselineFindings(
   row,
   manifest,
-  { repoRoot = REPO_ROOT, exemptions = PARSES_ITS_OWN_RECORD } = {},
+  { repoRoot = REPO_ROOT } = {},
 ) {
   const found = [];
   if (!fs.existsSync(path.join(repoRoot, row.baseline))) {
@@ -313,32 +289,15 @@ export function baselineFindings(
   if (!entry || !fs.existsSync(path.join(repoRoot, entry))) return found;
   const reach = reachOf(entry, { repoRoot });
   const hops = `${entry} and the ${reach.files.length - 1} file(s) it imports`;
-  const exempt = exemptions.get(row.name);
 
   if (!reach.opens(row.baseline)) {
-    if (!exempt) {
-      found.push({
-        file: entry,
-        message:
-          `${row.name} declares baseline ${row.baseline}, which nothing in ${hops} opens ` +
-          'through scripts/lib/ratchet.mjs. The registry is describing a ratchet the check ' +
-          'does not read — or the check parses the record itself, which the module exists ' +
-          'to end.',
-      });
-    } else if (!reach.names(row.baseline)) {
-      found.push({
-        file: entry,
-        message:
-          `${row.name} declares baseline ${row.baseline}, which ${hops} never names. ` +
-          'The registry is describing a ratchet the check does not read.',
-      });
-    }
-  } else if (exempt) {
     found.push({
+      file: entry,
       message:
-        `${row.name} is exempted in generate-check-scripts.mjs as a check that parses its own ` +
-        `record (${exempt}) — and it now opens ${row.baseline} through the module. Delete the ` +
-        'exemption: a stated gap that has been closed is a gap the next reader believes.',
+        `${row.name} declares baseline ${row.baseline}, which nothing in ${hops} opens ` +
+        'through scripts/lib/ratchet.mjs. The registry is describing a ratchet the check ' +
+        'does not read — or the check parses the record itself, which the module exists ' +
+        'to end.',
     });
   }
 

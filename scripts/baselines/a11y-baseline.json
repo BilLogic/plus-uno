@@ -1,17 +1,19 @@
 {
-  "why": "Accessibility rules each story violated when the record was measured. A story may stop violating a rule and never start: a new violation is fixed, or argued in that story's own parameters.a11y.",
-  "measured": "2026-11-19",
-  "suite": {
-    "storyFiles": 216,
-    "tests": 2443
-  },
-  "violatingStories": 0,
+  "why": "Accessibility rules each story violated when the record was measured. A story may stop violating a rule and never start: a new violation is fixed, or argued in that story's own parameters.a11y. The `suite` set is the size of the run the record was measured on, a floor: a shorter run has less to find.",
   "sets": {
-    "rules": {
-      "entries": {}
-    },
     "stories": {
       "entries": {}
+    },
+    "suite": {
+      "direction": "grow-only",
+      "entries": {
+        "storyFiles": {
+          "count": 216
+        },
+        "tests": {
+          "count": 2443
+        }
+      }
     }
   }
 }

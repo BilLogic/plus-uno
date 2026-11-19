@@ -17,16 +17,20 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 
 import {
   UNIDENTIFIED_RULE,
-  baselineRecord,
   classify,
-  ratchet,
+  compare,
+  openBaseline,
+  recordFrom,
   reoptimizationFailures,
   ruleCounts,
-  storiesOf,
   verdict,
+  writeBaseline,
 } from './check-storybook.mjs';
 
 const ROOT = '/repo';
@@ -148,6 +152,31 @@ test('a violation with no helpUrl is still counted, under a named placeholder', 
   assert.deepEqual(a11y['a.stories.jsx::Default'], [UNIDENTIFIED_RULE]);
 });
 
+const RECORD = 'scripts/baselines/a11y-baseline.json';
+
+/** A scratch tree holding a record whose `stories` set lists `stories` (story → rules) and whose `suite` set holds `suite`. */
+function tree(stories, suite = {}) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'a11y-'));
+  if (stories !== null) {
+    const entries = {};
+    for (const [story, rules] of Object.entries(stories)) for (const rule of rules) entries[`${story}|${rule}`] = { count: 1 };
+    const sized = Object.fromEntries(Object.entries(suite).map(([k, n]) => [k, { count: n }]));
+    fs.mkdirSync(path.join(root, 'scripts/baselines'), { recursive: true });
+    fs.writeFileSync(
+      path.join(root, RECORD),
+      `${JSON.stringify({ why: 'x', sets: { stories: { entries }, suite: { direction: 'grow-only', entries: sized } } }, null, 2)}\n`,
+    );
+  }
+  return root;
+}
+const opened = (stories, suite) => {
+  const root = tree(stories, suite);
+  const baseline = openBaseline(root);
+  fs.rmSync(root, { recursive: true, force: true });
+  return baseline;
+};
+const ratchet = (a11y, stories) => compare(a11y, opened(stories).stories);
+
 test('the ratchet passes when the report matches the baseline exactly', () => {
   const base = { 'a.stories.jsx::Default': ['color-contrast'] };
   const { regressions, cleared } = ratchet({ 'a.stories.jsx::Default': ['color-contrast'] }, base);
@@ -190,6 +219,7 @@ test('dropping a rule from a story is a pass, not a regression', () => {
 });
 
 test('the recorded baseline round-trips through the ratchet it feeds', () => {
+  const root = tree(null);
   const parsed = classify(
     report([
       file('a.stories.jsx', [story('Default', 'failed', [a11yMessage('label')])]),
@@ -197,11 +227,17 @@ test('the recorded baseline round-trips through the ratchet it feeds', () => {
     ]),
     ROOT,
   );
-  const record = JSON.parse(JSON.stringify(baselineRecord(parsed)));
-
-  assert.equal(record.violatingStories, 2);
-  assert.deepEqual(record.sets.rules.entries, { 'color-contrast': { count: 1 }, label: { count: 1 } });
-  assert.deepEqual(ratchet(parsed.a11y, storiesOf(record)), { regressions: [], cleared: [] });
+  try {
+    const baseline = openBaseline(root);
+    writeBaseline(baseline, parsed);
+    const written = JSON.parse(fs.readFileSync(path.join(root, RECORD), 'utf8'));
+    assert.deepEqual(Object.keys(written.sets.stories.entries), ['a.stories.jsx::Default|label', 'b.stories.jsx::Default|color-contrast']);
+    assert.equal(written.sets.suite.direction, 'grow-only', 'a record written from nothing still holds the suite as a floor');
+    assert.deepEqual(written.sets.suite.entries, { storyFiles: { count: 2 }, tests: { count: 2 } });
+    assert.deepEqual(compare(parsed.a11y, openBaseline(root).stories), { regressions: [], cleared: [] });
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
 });
 
 test('rule counts are ordered heaviest first', () => {
@@ -253,12 +289,9 @@ test('the flake is reported alongside the real failures, never instead of them',
  * makes is over what the report contains.
  */
 
-/** A committed baseline, in the shape `baselineRecord` writes. */
-const baseline = (stories, suite = {}) => {
-  const totals = { files: Object.keys(stories).length, tests: 0 };
-  const record = baselineRecord({ a11y: stories, totals });
-  return { ...record, measured: '2026-08-26', suite: { storyFiles: totals.files, ...suite } };
-};
+/** A committed baseline, opened over the shared ratchet; `null` is no record on disk. */
+const baseline = (stories, suite = {}) =>
+  stories === null ? opened(null) : opened(stories, { storyFiles: Object.keys(stories).length, tests: 0, ...suite });
 
 /** Everything the verdict would print, joined, for matching against. */
 const printed = (lines, stream) =>
@@ -280,14 +313,14 @@ test('a run that collected no tests fails, and blames the suite rather than the 
 test('zero tests fails even with no baseline to measure against', () => {
   // The hole seen during #507: the baseline itself had been measured at a moment
   // the suite was empty, so no floor derived from it could catch the next one.
-  assert.equal(decide(report([]), null).status, 1);
+  assert.equal(decide(report([]), baseline(null)).status, 1);
   assert.equal(decide(report([]), baseline({})).status, 1);
 });
 
 test('zero tests is not recorded as a baseline, even under --update', () => {
-  const { status, record } = decide(report([]), null, { update: true });
+  const { status, recorded } = decide(report([]), baseline(null), { update: true });
   assert.equal(status, 1);
-  assert.equal(record, undefined, 'a run that did not happen must not set the floors to zero');
+  assert.equal(recorded, undefined, 'a run that did not happen must not set the floors to zero');
 });
 
 test('a run with fewer tests than the baseline recorded fails, as a short file count does', () => {
@@ -303,9 +336,7 @@ test('a baseline with no recorded test count leaves only the zero floor', () => 
   // Baselines written before this floor existed carry `suite.storyFiles` alone;
   // an absent count must not be read as "expected zero tests", nor block.
   const rep = report([file('a.stories.jsx', [story('Default', 'passed')])]);
-  const base = baseline({});
-  delete base.suite.tests;
-  assert.equal(decide(rep, base).status, 0);
+  assert.equal(decide(rep, opened({}, { storyFiles: 1 })).status, 0);
 });
 
 test('a green run passes and says what it compared against', () => {
@@ -350,16 +381,18 @@ test('--update hands the record back to the caller, and still reports blocking f
     file('a.stories.jsx', [story('Default', 'failed', [a11yMessage('label')])]),
     file('b.stories.jsx', [story('Default', 'failed', [playMessage])]),
   ]);
-  const { status, lines, record } = decide(rep, null, { update: true });
+  const { status, lines, recorded } = decide(rep, baseline(null), { update: true });
   assert.equal(status, 1, 'the baseline covers accessibility only');
-  assert.deepEqual(storiesOf(record), { 'a.stories.jsx::Default': ['label'] });
-  assert.equal(record.suite.tests, 2);
+  assert.deepEqual(recordFrom(recorded), {
+    stories: { 'a.stories.jsx::Default|label': 1 },
+    suite: { storyFiles: 2, tests: 2 },
+  });
   assert.match(printed(lines, 'err'), /NON-a11y failure\(s\) were present during --update/);
 });
 
 test('a missing baseline is a failure with the one-off remedy, not a silent pass', () => {
   const rep = report([file('a.stories.jsx', [story('Default', 'passed')])]);
-  const { status, lines } = decide(rep, null);
+  const { status, lines } = decide(rep, baseline(null));
   assert.equal(status, 1);
   assert.match(printed(lines, 'err'), /no a11y baseline at scripts\/baselines\/a11y-baseline\.json/);
 });
