@@ -53,6 +53,7 @@ ScrollBar.propTypes = {
     /** Scrolls sideways instead of up and down. `maxHeight` is ignored. */
     horizontal: PropTypes.bool,
     id: PropTypes.string,
+    /** Names the scrollable region for assistive technology. Defaults to `Scrollable content`. */
     'aria-label': PropTypes.string,
     className: PropTypes.string,
     style: PropTypes.object

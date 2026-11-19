@@ -91,6 +91,17 @@ Table.propTypes = {
     /** The table's accessible name, kept on the empty state box when the table is replaced */
     label: PropTypes.string,
     className: PropTypes.string,
+    /** The Section title above the table; passed to the Section
+     * @ds-context Used in: Table.title (ds guide table)
+     */
+    title: PropTypes.node,
+    /** Actions slot in the Section's title row; passed to the Section
+     * @ds-context Used in: Table.actions (ds guide table)
+     * @ds-context Governed by: Common actions (ds guide common-actions)
+     */
+    actions: PropTypes.node,
+    /** Inline styles on the Section; passed to the Section */
+    style: PropTypes.object,
 };
 
 export default Table;

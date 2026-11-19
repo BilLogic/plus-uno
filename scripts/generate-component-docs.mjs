@@ -214,15 +214,16 @@ function parsePropTypes(source, name) {
       : '';
     const cleaned = raw.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '').trim();
     if (!cleaned) continue;
-    const m = cleaned.match(/^([A-Za-z_$][\w$]*)\s*:\s*([\s\S]+)$/);
+    // A key is an identifier or a quoted name such as `'aria-label'`.
+    const m = cleaned.match(/^(?:([A-Za-z_$][\w$]*)|'([^']+)'|"([^"]+)")\s*:\s*([\s\S]+)$/);
     if (!m) continue;
     // `PropTypes.oneOf(STYLES)` names an array; when this file declares it and
     // every element is a literal, it is documented as if written inline. An
     // array that cannot be read (a spread, an import) stays `oneOf(NAME)`.
-    const type = resolveNamedOneOf(m[2].replace(/\s+/g, ' ').trim(), source);
+    const type = resolveNamedOneOf(m[4].replace(/\s+/g, ' ').trim(), source);
     const oneOf = type.match(/^PropTypes\.oneOf\(\[([\s\S]*?)\]\)/);
     props.push({
-      name: m[1],
+      name: m[1] ?? m[2] ?? m[3],
       raw: type,
       type: prettyType(type),
       description,

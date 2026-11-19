@@ -1864,6 +1864,24 @@
           "values": null,
           "description": "Inline styles on the root.",
           "deprecated": null
+        },
+        {
+          "name": "aria-label",
+          "type": "requireName",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Names the carousel region. This or `aria-labelledby` is required.",
+          "deprecated": null
+        },
+        {
+          "name": "aria-labelledby",
+          "type": "requireName",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Names the carousel region by another element's id. This or `aria-label` is required.",
+          "deprecated": null
         }
       ],
       "stories": [
@@ -11920,6 +11938,15 @@
           "deprecated": null
         },
         {
+          "name": "aria-label",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Names the scrollable region for assistive technology. Defaults to `Scrollable content`.",
+          "deprecated": null
+        },
+        {
           "name": "className",
           "type": "string",
           "required": false,
@@ -14928,6 +14955,33 @@
           "default": "''",
           "values": null,
           "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "title",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The Section title above the table; passed to the Section",
+          "deprecated": null
+        },
+        {
+          "name": "actions",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Actions slot in the Section's title row; passed to the Section",
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline styles on the Section; passed to the Section",
           "deprecated": null
         }
       ],
