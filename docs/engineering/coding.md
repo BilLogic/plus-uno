@@ -145,6 +145,20 @@ start: the 2026-07 sweep found one renamed tool still named in the live system
 prompt, a constant whose old value survived in three doc surfaces, and a path
 rename that reached `AGENTS.md` and stopped there.
 
+### Retiring a name
+
+The target is that every use of a retired name is replaced in the same change.
+The retirement list (`design-system/agent-views/_inventions.json`, read through
+`scripts/lib/retirement.mjs`) then only stops the name from coming back: the
+row you add is what every check reads, and each one fails on a use outside the
+list's allowed places. Adding the row is the last step of the sweep.
+
+A rename too big for one PR is split by folder (stories, docs, components) and
+finished as one batch: every PR of the batch lands before the row does, and
+`main` holds each name fully replaced at every merge. The gap-token sweep went this
+way, one folder per PR, all merged together. A new row that fails on `main`
+shows a sweep still unfinished.
+
 ## Known gotchas
 
 | Gotcha | What Happens | Fix |

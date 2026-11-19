@@ -16,7 +16,7 @@ const ANSWERS = {
 const lookup = (name) => ANSWERS[name] ?? { status: 'unknown', kind: null, import: null, source: null };
 const exists = (doc) => doc !== 'p/Missing.mdx';
 const row = (name, group = 'Card') => ({ group, name, use: 'x' });
-const env = (required = ['Frame', 'Card']) => ({ lookup, exists, required });
+const env = (required = ['Frame', 'Card']) => ({ lookup, exists, required, pageOf: () => null });
 
 test('a list that names only real templates and components passes', () => {
   assert.deepEqual(checkTemplates([row('Frame'), row('Card'), row('Popup')], env()), []);
@@ -42,10 +42,35 @@ test('a template the facts hold and the list leaves out fails', () => {
 });
 
 test('rendering takes the import line and the doc from the facts', () => {
-  const out = renderTemplates([row('Frame', 'Templates'), row('Card')], { from: 'design-system/agent-views/components', lookup });
+  const out = renderTemplates([row('Frame', 'Templates'), row('Card')], { from: 'design-system/agent-views/components', lookup, pageOf: () => null });
   assert.match(out, /^## Templates: start a page, section, card, table or overlay here/m);
   assert.match(out, /\| Templates \| \[`Frame`\]\(\.\.\/\.\.\/\.\.\/p\/Frame\.mdx\) \| `import \{ Frame \} from '@\/templates';` \| x \|/);
   assert.match(out, /\| Card \| \[`Card`\]/);
+});
+
+test('rows of one group print the group once, and a template whose facts say component links its template page', () => {
+  const answers = { ...ANSWERS, Popup: { ...ANSWERS.Popup, source: 'c/Popup.jsx' } };
+  const out = renderTemplates([row('Frame', 'Shell'), row('Card', 'Blocks'), row('Popup', 'Blocks')], {
+    from: 'design-system/agent-views/components',
+    lookup: (n) => answers[n],
+    pageOf: (name) => (name === 'Popup' ? 'design-system/src/templates/Popup/Popup.mdx' : null),
+  });
+  assert.match(out, /\| Shell \| \[`Frame`\]/);
+  assert.match(out, /\| Blocks \| \[`Card`\]/);
+  assert.match(out, /\|\s+\| \[`Popup`\]\(\.\.\/\.\.\/src\/templates\/Popup\/Popup\.mdx\)/);
+});
+
+test('each committed row reads as its template page first line, and the groups are the three layers', async () => {
+  const { readTemplates } = await import('./templates-index.mjs');
+  const fs = await import('node:fs');
+  const rows = readTemplates(REPO_ROOT);
+  assert.deepEqual(rows.map((r) => r.name), ['Frame', 'Page', 'Section', 'Card', 'Table', 'Modal', 'Panel', 'Popup']);
+  assert.deepEqual([...new Set(rows.map((r) => r.group))], ['Shell', 'Blocks', 'Overlays']);
+  for (const r of rows) {
+    const mdx = fs.readFileSync(path.join(REPO_ROOT, `design-system/src/templates/${r.name}/${r.name}.mdx`), 'utf8');
+    const purpose = mdx.match(/purpose="([^"]+)"/)?.[1];
+    assert.equal(r.use, purpose, `${r.name} row is its page's purpose`);
+  }
 });
 
 test('THE COMMITTED LIST passes against the real facts', async () => {

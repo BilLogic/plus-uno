@@ -17,7 +17,7 @@ Code-free guidance for a situation, shown on annotated **Template**s used as the
 _Avoid_: "layout component", "practice"
 
 **Template**:
-An arrangement of components with named **Slot**s, holding its key scenarios and key states and linking to each component for the rest: **Frame**, **Page**, **Section**, **Card**, Table, Modal, Panel and Popup. There is no Form template: a form is a `Fieldset` of fields in one of these hosts, and the host owns the title and the footer. The tie-break: behavior splits out into a component, and a template that only redraws one component stays a component. How pieces sit in one template goes on that template's page; a rule that holds across two or more templates is a **Pattern**.
+An arrangement of components with named **Slot**s, holding its key scenarios and key states and linking to each component for the rest: **Frame**, **Page**, **Section**, **Card**, **Table**, **Modal**, **Panel** and **Popup**. There is no Form template: a form is a `Fieldset` of fields in one of these hosts, and the host owns the title and the footer. The tie-break: behavior splits out into a component, and a template that only redraws one component stays a component. How pieces sit in one template goes on that template's page; a rule that holds across two or more templates is a **Pattern**.
 _Avoid_: "container", "starter", "page template" for the **Frame** alone
 
 **Frame**:

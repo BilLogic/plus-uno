@@ -1,6 +1,7 @@
 // Templates: the coded shells a page, a section, a card, a table or an overlay
 // is built from. Shells own the frame (tokens for bg/radius/elevation/border/
-// spacing); consumers fill the slots.
+// spacing); consumers fill the slots. ListPage is a CLI registry starter, not a
+// template, so it has no export here.
 
 export { default as Frame, PANEL_STORAGE_KEY } from './Frame';
 export { usePanelControl } from './Frame/PanelControl';

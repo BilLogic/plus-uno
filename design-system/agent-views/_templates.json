@@ -1,50 +1,45 @@
 {
-  "_comment": "Hand-kept, reviewed in PRs. The templates: the shells a page, a card, a section, a table or an overlay is built from. Each row keeps only what source cannot say, its group and when to reach for it; the import line and the Storybook page come from the barrels and source, through the DS facts (scripts/lib/ds-facts.mjs). Rendered into components/index.md by npm run generate:agent; scripts/lib/templates-index.mjs holds every name to the facts and every template to a row.",
+  "_comment": "Hand-kept, reviewed in PRs. The eight templates, in three groups (shell, blocks, overlays): the shells a page, a block or an overlay is built from. Each row keeps only its group and its page's first line (the `purpose` of its DocsLanding); the import line and the Storybook page come from the barrels and source, through the DS facts (scripts/lib/ds-facts.mjs). Rendered into components/index.md by npm run generate:agent; scripts/lib/templates-index.mjs holds every name to the facts and every template to a row, and npm run check:template-roster holds every layer to the same eight.",
   "templates": [
     {
-      "group": "Templates",
+      "group": "Shell",
       "name": "Frame",
-      "use": "Every full page: the app frame (Sidebar, Page with its 12-column content grid, and Panel). Default type: the PLUS `Sidebar` (@/components) in `sidebar`, a `Breadcrumb` in `header`. Bare type: one centered column, no `sidebar`, for sign-in and errors. A multi-step task uses the Sidebar's inner mode, steps as rows, actions in the Page footer."
+      "use": "Every full page starts in the app frame: the Sidebar beside the Page, with the AI panel as its own region. Two types: default and bare. A multi-step task runs in the Sidebar's inner mode."
     },
     {
-      "group": "Page",
+      "group": "Shell",
       "name": "Page",
-      "use": "A tokenized box with a level (fill and shadow together), a pad and a radius. The Frame draws the page's own; use it for any other block that needs a level."
+      "use": "The content inside a Frame: a page header, then Sections on the 12-column grid. Three types: default, full width and reading."
     },
     {
-      "group": "Section",
+      "group": "Blocks",
       "name": "Section",
-      "use": "A span of the page grid under one heading, with its title row, views, search and filters. No box of its own: the Page supplies the pad. `detail` for a list with a detail region."
+      "use": "A span of the page grid under one heading: a header, a body, and an optional side, detail and footer. The header owns the title row, the views and the filters."
     },
     {
-      "group": "Card",
+      "group": "Blocks",
       "name": "Card",
-      "use": "A raised container for one object: a student, a session, a metric. Optional image, a header over the body, optional footer."
+      "use": "A container for one student, session, metric or other object, with slots for an image, header, body and footer."
     },
     {
-      "group": "Table",
+      "group": "Blocks",
       "name": "Table",
       "use": "How a table sits on a page: a Section header over a Static, Dynamic or Tree table, with its footer and empty state."
     },
     {
-      "group": "Panel",
-      "name": "Panel",
-      "use": "A full-height layer on the right with no Blanket, docked beside the Page when it fits and floating over it when it does not: `PanelContainer` and its parts (`PanelHeader`, `PanelSubheader`, `PanelBody`, `PanelFooter`), filled into the Frame's `panel`. Two types, Details and Notifications. For content that must be dealt with before anything else, use `Modal`."
+      "group": "Overlays",
+      "name": "Modal",
+      "use": "A dialog for one task before anything else can happen, centered over a Blanket. Four types: Passive, Active, Acknowledge and Steps."
     },
     {
       "group": "Overlays",
-      "name": "Modal",
-      "use": "The template for content that takes over the screen until it is closed: a `Dialog` (@/components) on a Blanket with modal behavior on Base UI (portal, focus trap, Escape, scroll lock). For the dialog panel inline with no Blanket or modal behavior, use `Dialog`."
+      "name": "Panel",
+      "use": "A full-height layer on the right with no Blanket: docked beside the Page when it fits, floating over it when it does not. Two types: Details and Notifications. The AI panel is a region of the Frame."
     },
     {
-      "group": "Popups",
+      "group": "Overlays",
       "name": "Popup",
-      "use": "The Popups pattern is four floating layers that never block the page, each a component: `DropdownMenu` lists actions, `Popup` holds a small aside anchored to a control, `Flag` reports what just happened, `Tooltip` names a control."
-    },
-    {
-      "group": "AI",
-      "name": "AiChat",
-      "use": "AI chat as a popup, in the Frame's Panel or full screen, opened from one floating button."
+      "use": "A floating layer that hangs off its trigger and closes on an outside click. Six types: menu, profile menu, select list, content, filter menu and stacked filter menu."
     }
   ]
 }

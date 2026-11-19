@@ -31,8 +31,8 @@
  * (`_aliases.json`, `_inventions.json`) records the old words on purpose and
  * is skipped, as are `_Avoid_` glossary lines, ADRs and the archive.
  *
- * SEVERITY. An outside name (`OUTSIDE_NAMES`: another design system's word
- * for a PLUS term, such as Lozenge) is an error wherever it is read. Any other
+ * SEVERITY. An outside name (the retirement list's `outside` rows: another
+ * design system's word for a PLUS term, such as Lozenge) is an error wherever it is read. Any other
  * `avoid-word` warns on every page while the rollout runs, except on
  * `STRICT_PAGES`, held to it while `ENFORCE_STRICT` is on: the list and switch
  * `check:ds-writing` reads, from `scripts/lib/ds-strict.mjs`. `collision` always fails.
@@ -51,6 +51,7 @@ import { createPageFinder, pagesUnder, readDocsPage } from './lib/docs-page.mjs'
 import { lineOf, readJson, readText, withoutCode } from './lib/ds-check-helpers.mjs';
 import { DS_GLOSSARY, DS_SECTION, aliasInputs, componentOf, parseGlossary, vocabularyAliases } from './lib/ds-vocabulary.mjs';
 import { ENFORCE_STRICT, STRICT_PAGES } from './lib/ds-strict.mjs';
+import { loadRetirement } from './lib/retirement.mjs';
 import { trackedFiles } from './lib/tracked-sources.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -63,8 +64,19 @@ const NAME = 'check:ds-vocabulary';
 
 export { ENFORCE_STRICT, STRICT_PAGES };
 
-/** Another design system's names for PLUS terms; a hit in any source read is an error, strict page or not. */
-export const OUTSIDE_NAMES = ['lozenge', 'badge', 'inline dialog', 'side navigation'];
+/**
+ * Another design system's names for PLUS terms, from the retirement list's
+ * `outside` rows (a root without a list has none); a hit in any source read is
+ * an error, strict page or not.
+ */
+function outsideNames(repoRoot) {
+  try {
+    return loadRetirement(repoRoot).ofKind('outside').map((row) => row.not.toLowerCase());
+  } catch (err) {
+    if (err.code === 'ENOENT') return [];
+    throw err;
+  }
+}
 
 /** Agent views read: the generated markdown and the token table; the `_`-prefixed JSON files are routing data. */
 const VIEW_FILE = /\.md$|\/tokens\.json$/;
@@ -181,7 +193,7 @@ const inputs = byRoot((repoRoot) => {
     severity: 'error',
     message: `[collision] "${c.word}", an avoid-word of ${c.term}, is ${c.with}'s name or alias; qualify it ("${c.word}" (${c.with} is its own component)) or drop it.`,
   }));
-  return { pages, collisionFindings };
+  return { pages, collisionFindings, outside: new Set(outsideNames(repoRoot)) };
 });
 
 /**
@@ -190,13 +202,13 @@ const inputs = byRoot((repoRoot) => {
  * @returns {import('./lib/findings.mjs').Finding[]}
  */
 export function run({ repoRoot = REPO_ROOT, enforceStrict = ENFORCE_STRICT, all = false } = {}) {
-  const { pages, collisionFindings } = inputs(repoRoot);
+  const { pages, collisionFindings, outside: outsideSet } = inputs(repoRoot);
   const listed = [...collisionFindings];
   let rolled = 0;
   const rolledPages = new Set();
   for (const { file, strict, raw } of pages) {
     for (const f of raw) {
-      const outside = OUTSIDE_NAMES.includes(f.word.toLowerCase());
+      const outside = outsideSet.has(f.word.toLowerCase());
       const severity = outside || (strict && enforceStrict) ? 'error' : 'warning';
       if (!all && !strict && !outside) {
         rolled++;

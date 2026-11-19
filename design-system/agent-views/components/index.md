@@ -2,7 +2,7 @@
 <!-- Load when: building UI | Route: design-system/guidelines/overview.md -->
 # PLUS DS — Components
 
-> **CRITICAL**: Only use components and patterns listed here. If it's not listed, it DOES NOT EXIST.
+> **CRITICAL**: Only use components and templates listed here. If it's not listed, it DOES NOT EXIST.
 
 Mirrors `design-system/src/components/`. Import from the barrel: `import { Button } from '@/components';`. Templates import from `@/templates` (§ Templates).
 
@@ -39,7 +39,7 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `Dropdown` | `Select`, `DropdownMenu` (Select picks a value; DropdownMenu runs an action) |
 | `Chip` | `Tag` |
 | `Loader` | `Spinner`, `Skeleton` |
-| `Drawer` | `Panel` (a floating Panel) |
+| `Drawer` | `Panel` (a floating Panel, from `@/templates`) |
 | `SectionToolbar` | `Section` |
 | `Section.Toolbar` | `Section` |
 
@@ -59,24 +59,29 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `Section onAddView / addViewLabel` | `views` |
 | `Rating variant` | `type` |
 | `CloseButton tone` | `appearance` |
-| `TagInput / RichTextEditor / InlineEditableTextfield required, disabled, readOnly` | `isRequired`, `isDisabled`, `isReadOnly` |
-| `Select / PopupSelect / FilterMenu open` | `isOpen` |
-| `Section / DropdownMenu loading` | `isLoading` |
-| `Select option disabled` | `isDisabled` |
+| `TagInput required / disabled / readOnly` | `isRequired`, `isDisabled`, `isReadOnly` |
+| `RichTextEditor readOnly / disabled` | `isReadOnly`, `isDisabled` |
+| `InlineEditableTextfield required` | `isRequired` |
+| `Select open` | `isOpen` |
+| `PopupSelect open` | `isOpen` |
+| `FilterMenu open` | `isOpen` |
+| `DropdownMenu loading` | `isLoading` |
+| `Section loading` | `isLoading` |
+| `Option disabled` | `option isDisabled` |
 
 **Tokens**
 
 | Not here | Use instead |
 |---|---|
-| `--space-025 (4px)` | `--stack-sm`, `--inline-sm`, `--pad-x-xs` (a primitive) |
+| `--space-025 (4px)` | `--stack-sm`, `--inline-sm`, `--pad-x-xs` (a primitive; read the step for the role) |
 | `--space-050 (8px)` | `--stack-md`, `--inline-md`, `--pad-x-sm` |
 | `--space-075 (12px)` | `--stack-lg`, `--inline-lg`, `--pad-x-md` |
 | `--space-100 (16px)` | `--stack-xl`, `--inline-xl`, `--pad-x-lg` |
 | `--space-150 (24px)` | `--stack-2xl`, `--inline-2xl`, `--page-pad` |
 | `--space-200 (32px) and up` | `--stack-3xl`, `--inline-3xl` (general gaps; --page-stack-lg is only for Page) |
-| `--radius-<n>` | `--radius-md`, `--radius-xl` (the role's step, --radius-sm to --radius-xxl, or --radius-control-sm, -md, -lg) |
+| `--radius-<n>` | `--radius-md`, `--radius-xl` (read the semantic step for the role: --radius-sm to --radius-xxl, or --radius-control-sm, -md, -lg for a control by height) |
 | `--ds-on-surface` | `--ds-text`, `--ds-text-subtle` |
-| `--size-element-*, --element-*` | `--pad-x-md`, `--stack-md`, `--radius-md` |
+| `--size-element-*, --element-*` | `--pad-x-md`, `--stack-md`, `--radius-md` (retired; these are the commonest replacements, and check:ds-usage names the exact one for each old name) |
 
 ## Templates: start a page, section, card, table or overlay here
 
@@ -84,15 +89,14 @@ A template is a shell that owns the frame (fill, pad, radius, elevation) and lea
 
 | Group | Name | Import | Reach for it when |
 |---|---|---|---|
-| Templates | [`Frame`](../../src/templates/Frame/Frame.mdx) | `import { Frame } from '@/templates';` | Every full page: the app frame (Sidebar, Page with its 12-column content grid, and Panel). Default type: the PLUS `Sidebar` (@/components) in `sidebar`, a `Breadcrumb` in `header`. Bare type: one centered column, no `sidebar`, for sign-in and errors. A multi-step task uses the Sidebar's inner mode, steps as rows, actions in the Page footer. |
-| Page | [`Page`](../../src/templates/Page/Page.mdx) | `import { Page } from '@/templates';` | A tokenized box with a level (fill and shadow together), a pad and a radius. The Frame draws the page's own; use it for any other block that needs a level. |
-| Section | [`Section`](../../src/templates/Section/Section.mdx) | `import { Section } from '@/templates';` | A span of the page grid under one heading, with its title row, views, search and filters. No box of its own: the Page supplies the pad. `detail` for a list with a detail region. |
-| Card | [`Card`](../../src/templates/Card/Card.mdx) | `import { Card } from '@/templates';` | A raised container for one object: a student, a session, a metric. Optional image, a header over the body, optional footer. |
-| Table | [`Table`](../../src/templates/Table/Table.mdx) | `import { Table } from '@/templates';` | How a table sits on a page: a Section header over a Static, Dynamic or Tree table, with its footer and empty state. |
-| Panel | [`Panel`](../../src/templates/Panel/Panel.mdx) | `import { Panel } from '@/templates';` | A full-height layer on the right with no Blanket, docked beside the Page when it fits and floating over it when it does not: `PanelContainer` and its parts (`PanelHeader`, `PanelSubheader`, `PanelBody`, `PanelFooter`), filled into the Frame's `panel`. Two types, Details and Notifications. For content that must be dealt with before anything else, use `Modal`. |
-| Overlays | [`Modal`](../../src/templates/Modal/Modal.mdx) | `import { Modal } from '@/templates';` | The template for content that takes over the screen until it is closed: a `Dialog` (@/components) on a Blanket with modal behavior on Base UI (portal, focus trap, Escape, scroll lock). For the dialog panel inline with no Blanket or modal behavior, use `Dialog`. |
-| Popups | [`Popup`](../../src/components/overlays-and-layering/Popup/Popup.mdx) | `import { Popup } from '@/components';` | The Popups pattern is four floating layers that never block the page, each a component: `DropdownMenu` lists actions, `Popup` holds a small aside anchored to a control, `Flag` reports what just happened, `Tooltip` names a control. |
-| AI | [`AiChat`](../../src/components/ai/AiChat/AiChat.mdx) | `import { AiChat } from '@/components';` | AI chat as a popup, in the Frame's Panel or full screen, opened from one floating button. |
+| Shell | [`Frame`](../../src/templates/Frame/Frame.mdx) | `import { Frame } from '@/templates';` | Every full page starts in the app frame: the Sidebar beside the Page, with the AI panel as its own region. Two types: default and bare. A multi-step task runs in the Sidebar's inner mode. |
+|   | [`Page`](../../src/templates/Page/Page.mdx) | `import { Page } from '@/templates';` | The content inside a Frame: a page header, then Sections on the 12-column grid. Three types: default, full width and reading. |
+| Blocks | [`Section`](../../src/templates/Section/Section.mdx) | `import { Section } from '@/templates';` | A span of the page grid under one heading: a header, a body, and an optional side, detail and footer. The header owns the title row, the views and the filters. |
+|   | [`Card`](../../src/templates/Card/Card.mdx) | `import { Card } from '@/templates';` | A container for one student, session, metric or other object, with slots for an image, header, body and footer. |
+|   | [`Table`](../../src/templates/Table/Table.mdx) | `import { Table } from '@/templates';` | How a table sits on a page: a Section header over a Static, Dynamic or Tree table, with its footer and empty state. |
+| Overlays | [`Modal`](../../src/templates/Modal/Modal.mdx) | `import { Modal } from '@/templates';` | A dialog for one task before anything else can happen, centered over a Blanket. Four types: Passive, Active, Acknowledge and Steps. |
+|   | [`Panel`](../../src/templates/Panel/Panel.mdx) | `import { Panel } from '@/templates';` | A full-height layer on the right with no Blanket: docked beside the Page when it fits, floating over it when it does not. Two types: Details and Notifications. The AI panel is a region of the Frame. |
+|   | [`Popup`](../../src/templates/Popup/Popup.mdx) | `import { Popup } from '@/components';` | A floating layer that hangs off its trigger and closes on an outside click. Six types: menu, profile menu, select list, content, filter menu and stacked filter menu. |
 
 ## UI components (93)
 

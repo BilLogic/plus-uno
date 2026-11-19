@@ -103,16 +103,3 @@ test('the Table and Dynamic table pages label the two footer gaps apart', () => 
     assert.match(page, /Footer the shell draws \(Dynamic\/Tree\)/, file);
   }
 });
-
-test('the glossary names the eight templates the overview lists, and no Form template', () => {
-  const entry = read('docs/conventions/design-system-glossary.md')
-    .split('\n').find((line) => line.startsWith('An arrangement of components with named'));
-  assert.ok(entry, 'the glossary has the Template entry');
-  const named = ['Frame', 'Page', 'Section', 'Card', 'Table', 'Modal', 'Panel', 'Popup'];
-  const listed = entry.match(/: (\*\*Frame\*\*.*?)\. There is no Form template/)?.[1] ?? '';
-  assert.deepEqual(listed.replace(/\*\*/g, '').split(/, | and /), named);
-  const overview = read('design-system/src/storybook-docs/templates/TemplatesOverview.mdx');
-  assert.match(overview, /The eight templates/);
-  for (const name of named) assert.ok(overview.includes(`title="${name}"`), `${name} has a tile on the overview`);
-  assert.doesNotMatch(overview, /title="Form"/);
-});

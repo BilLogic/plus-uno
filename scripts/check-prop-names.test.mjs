@@ -36,6 +36,11 @@ test('an allowed bare name passes for its component only', () => {
   assert.equal(findingsOf(facts(comp('Elsewhere', [prop, 'bool']))).length, 1);
 });
 
+test('a bare name of unknown or missing type is judged as a boolean', () => {
+  for (const type of [null, undefined, 'unknown']) assert.equal(ruleFor({ name: 'disabled', type })?.use, 'isDisabled', String(type));
+  assert.equal(findingsOf(facts(comp('Widget', ['open', null]))).length, 1);
+});
+
 test('ruleFor reads one rule for every caller', () => {
   assert.equal(ruleFor({ name: 'disabled', type: 'bool' }).use, 'isDisabled');
   assert.equal(ruleFor({ name: 'disabled', type: 'string' }), null);

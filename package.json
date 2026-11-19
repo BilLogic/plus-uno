@@ -72,6 +72,7 @@
     "check:knowledge-disposition": "node scripts/check-knowledge-disposition.mjs",
     "check:negation": "node scripts/check-negation-ratchet.mjs",
     "check:pointers": "node scripts/check-pointers.mjs",
+    "check:template-roster": "node scripts/check-template-roster.mjs",
     "check:glossary": "node scripts/check-glossary.mjs",
     "check:ads-language": "node scripts/check-ads-language.mjs",
     "check:slot-names": "node scripts/check-slot-names.mjs",

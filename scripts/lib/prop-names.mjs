@@ -33,6 +33,7 @@ export const ALLOWED = [
  */
 export function ruleFor(prop) {
   if (prop.name in RENAMED) return { use: RENAMED[prop.name] };
-  if (BARE_BOOLEANS.includes(prop.name) && /^bool/.test(prop.type ?? '')) return { use: isName(prop.name) };
+  // A type the facts could not read is no excuse: it is judged as a boolean until it says otherwise.
+  if (BARE_BOOLEANS.includes(prop.name) && (!prop.type || /^bool/.test(prop.type) || prop.type === 'unknown')) return { use: isName(prop.name) };
   return null;
 }

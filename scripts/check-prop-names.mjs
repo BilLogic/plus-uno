@@ -10,8 +10,7 @@
  *
  * WHAT IT READS. `design-system/agent-views/components.json`, the generated
  * component facts: every component's and template's props with their types. A
- * prop that is not a boolean (a `selected` date, say) is not a state flag and is
- * not counted. Nothing in this file is hand-kept.
+ * prop typed as something else (a `selected` date, say) is not a state flag; one with no type is judged as a boolean.
  *
  * Run: `npm run check:prop-names`.
  */
