@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **106,649 chars from 9 files**, against an assembled budget of 175,500 (68,851 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 86,265 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **106,977 chars from 9 files**, against an assembled budget of 175,500 (68,523 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 86,593 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 9,849 (−6,838 ide-only) | 9,849 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 17,866 | 27,744 | 20,000 (constitution) |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,442 | 49,227 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 50,873 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 52,121 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 57,815 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 69,601 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 21,123 (−8,489 ide-only) | 90,775 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 94,243 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,522 | 100,820 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 105,793 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 106,649 | — |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 18,194 | 28,072 | 20,000 (constitution) |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,442 | 49,555 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 51,201 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 52,449 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 58,143 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 69,929 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 21,123 (−8,489 ide-only) | 91,103 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 94,571 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,522 | 101,148 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 106,121 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 106,977 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -222,6 +222,10 @@ A page worked item by item (Flags, Highlights, Feedback, Approvals, Escalations)
 
 **Section detail**:
 An inline expand inside a Section.
+
+**Inner sidebar**:
+The Sidebar's content while a record with stages (a session) or a multi-step task is open: a Back button with the area name, an optional context dropdown, then text-only rows. Back returns to the main Sidebar, where what you left sits as one open row under its area.
+_Avoid_: "sub-sidebar", "second sidebar"
 
 **Commit action**:
 The footer button that commits the work (Submit, Save, Send, Approve); in multi-step forms, Back and Next may sit beside it, per the Form pattern.
