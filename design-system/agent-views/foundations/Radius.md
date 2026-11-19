@@ -143,6 +143,6 @@ Don't: A hand-built circle. Its corner, its states and its focus ring are all gu
 ### Read a token, never a px value
 
 Do: The token follows the rules when a value moves.
-Don't: A literal is right today and wrong after the next change; the radius lint fails it.
+Don't: A literal radius is right today and wrong after the next change, and the radius lint fails it.
 
 ## Related

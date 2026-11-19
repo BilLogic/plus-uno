@@ -90,12 +90,13 @@ Single-series charts take <C>--chart-brand</C>; de-emphasized comparison or refe
 />`}>
         <Story of={OverviewStories.WithinTheLimit} />
     </Do>
-    <Dont caption="Past six series, slots 7 and 8 are overflow and neighbors blur; group the smallest categories into Other." code={`<BarChart
+    <Dont caption="Past six series, slots 7 and 8 are overflow and neighbors blur; group the smallest categories into Other." code={`const schools = ['Lincoln Middle', 'Roosevelt K-8', 'North High', 'South High', 'Hillside', 'Westview', 'Oak Grove', 'Central'];
+
+<BarChart
     height={200}
     categories={['Math', 'Science', 'History']}
     series={schools.map((name, i) => ({ name, data: [20 + i * 3, 30 + i * 2, 25 + i] }))}
-/>
-// schools: eight names, Lincoln Middle through Central`}>
+/>`}>
         <Story of={OverviewStories.PastTheLimit} />
     </Dont>
 </DoDont>
@@ -111,12 +112,14 @@ Single-series charts take <C>--chart-brand</C>; de-emphasized comparison or refe
 />`}>
         <Story of={OverviewStories.CategoriesOnly} />
     </Do>
-    <Dont caption="Do not mix categorical and state colors: one series reads as success and the other as nothing." code={`<BarChart
+    <Dont caption="Do not mix categorical and state colors: one series reads as success and the other as nothing." code={`const { STATUS } = chartPalette;
+
+<BarChart
     height={200}
     categories={['Math', 'Science', 'History']}
     series={[
         { name: 'Online', data: [40, 55, 30], color: 'var(--chart-categorical-2)' },
-        { name: 'In person', data: [52, 48, 41], color: chartPalette.STATUS.success },
+        { name: 'In person', data: [52, 48, 41], color: STATUS.success },
     ]}
 />`}>
         <Story of={OverviewStories.CategoryAndStateMixed} />
