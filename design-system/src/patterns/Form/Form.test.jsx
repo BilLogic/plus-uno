@@ -4,7 +4,7 @@ import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ComponentExample, exampleSlug } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard } from '@/storybook-docs/lib/template-page.jsx';
-import { OneColumnFields, TwoColumnFields } from './FormCases.jsx';
+import { EditInModal, EditInPanel, OneColumnFields, TwoColumnFields } from './FormCases.jsx';
 
 vi.mock('@storybook/addon-docs/blocks', async () => {
     const React = await import('react');
@@ -23,6 +23,21 @@ vi.mock('@storybook/addon-docs/blocks', async () => {
 const formMdx = readFileSync(join(__dirname, 'Form.mdx'), 'utf8');
 
 describe('Form live cases', () => {
+    it('EditInPanel keeps the rows beside the edit, while EditInModal covers them with a Blanket', () => {
+        const r1 = render(<EditInPanel />);
+        expect(screen.getByRole('heading', { name: 'Ana Ruiz' })).toBeInTheDocument();
+        expect(screen.getByRole('textbox', { name: /Student/ })).toHaveValue('Ana Ruiz');
+        expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
+        expect(screen.getByText('Sessions')).toBeInTheDocument();
+        expect(document.querySelector('.plus-pattern-blanket')).toBeNull();
+        r1.unmount();
+
+        render(<EditInModal />);
+        expect(screen.getByRole('textbox', { name: /Student/ })).toHaveValue('Ana Ruiz');
+        expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
+        expect(document.querySelector('.plus-pattern-blanket')).not.toBeNull();
+    });
+
     it('OneColumnFields renders Session fields in one column with date and time paired', () => {
         render(<OneColumnFields />);
         expect(screen.getByRole('textbox', { name: /Student/ })).toHaveValue('Ana Ruiz');

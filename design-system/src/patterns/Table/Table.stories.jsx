@@ -3,7 +3,6 @@ import { expect, userEvent, within } from 'storybook/test';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
 import Table, { TABLE_KINDS } from './Table';
-import { SectionToolbar } from '@/patterns/PatternSection';
 import { Button, EmptyState as PlusEmptyState, StaticTable } from '@/components';
 
 const MEMBERS = [
@@ -91,7 +90,6 @@ export default {
         footer: { table: { disable: true } },
         emptyState: { table: { disable: true } },
         actions: { table: { disable: true } },
-        toolbar: { table: { disable: true } },
         style: { table: { disable: true } },
         kind: {
             control: 'inline-radio',
@@ -138,7 +136,8 @@ export const DynamicKind = {
     render: () => (
         <Table
             title="Team members"
-            toolbar={<SectionToolbar count="340 members" actions={addMember} />}
+            description="340 members"
+            actions={addMember}
             kind="dynamic"
             tableProps={dynamicProps}
         />
@@ -147,7 +146,7 @@ export const DynamicKind = {
         const canvas = within(canvasElement);
         const template = canvasElement.querySelector('.plus-table-template');
         await expect(template).toHaveAttribute('data-kind', 'dynamic');
-        await expect(canvas.getByText('340 members'), 'the toolbar sits in the Section header').toBeVisible();
+        await expect(canvas.getByText('340 members'), 'the count sits in the Section header').toBeVisible();
         await expect(canvas.getByRole('table', { name: 'Team members' })).toBeVisible();
         await expect(canvas.getByText(/of 340 members/), 'the table draws its range footer').toBeVisible();
         await expect(template.querySelector('.plus-dynamic-table')).not.toBeNull();
@@ -237,19 +236,14 @@ const FilteredMembers = () => {
     return (
         <Table
             title="Team members"
-            toolbar={(
-                <SectionToolbar
-                    count={`${visible.length} members`}
-                    filters={(
-                        <Button
-                            text={filtered ? 'Role: Admin' : 'All roles'}
-                            appearance="subtle"
-                            spacing="compact"
-                            onClick={() => setFiltered((prev) => !prev)}
-                        />
-                    )}
-                />
-            )}
+            filters={[{
+                key: 'role',
+                label: 'Role',
+                text: filtered ? 'Admin' : 'All',
+                isSelected: filtered,
+                onClick: () => setFiltered((prev) => !prev),
+            }]}
+            count={`${visible.length} members`}
             empty={visible.length === 0}
             emptyState={(
                 <PlusEmptyState

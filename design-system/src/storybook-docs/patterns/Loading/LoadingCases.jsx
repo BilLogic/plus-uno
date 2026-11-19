@@ -1,5 +1,7 @@
 import React from 'react';
-import { CustomItem, IconButton, Skeleton } from '@/components';
+import { CustomItem, IconButton, Skeleton, Spinner } from '@/components';
+import { PatternSection } from '@/patterns';
+import { LoadingList } from './loadingDemo.jsx';
 import { LiveMenu } from '@/storybook-docs/lib/dropdown-menu-cases.jsx';
 
 /**
@@ -35,4 +37,16 @@ export const MenuSkeletonRowsCase = () => (
             <Skeleton shape="text" width="55%" isShimmering={false} />
         </CustomItem>
     </LiveMenu>
+);
+
+/** Do: a skeleton in the table's own shape, text bars throughout. */
+export const SkeletonInShape = () => <LoadingList band="shape" />;
+
+/** Don't: one spinner in a blank area, so the layout jumps when the rows arrive. */
+export const SpinnerInBlank = () => (
+    <PatternSection title="Students" description="Lincoln Middle">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minBlockSize: 'calc(var(--control-lg) * 4)' }}>
+            <Spinner size={24} label="Loading students" />
+        </div>
+    </PatternSection>
 );

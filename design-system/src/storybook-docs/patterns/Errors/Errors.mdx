@@ -4,14 +4,11 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as ErrorsStories from './Errors.stories.jsx';
 import { PLACE_STAGE } from './errorsDemo.jsx';
-import { BorderAndTooltipCase, MessageOnFieldCase } from './ErrorsCases.jsx';
+import { BorderAndTooltipCase, FailureInModal, FailureInSlot, MessageOnFieldCase } from './ErrorsCases.jsx';
+import { CODE } from './ErrorsCaseCode.js';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
-import {
-    FailureInModal,
-    FailureInSlot,
-} from '@/storybook-docs/illustrations/errors.jsx';
 
 <Meta title="Patterns/States/Errors" tags={['manifest']} />
 
@@ -159,8 +156,10 @@ Content that fails to load takes the place an empty view would, in the Section's
 
 <DoDontPair
     doExample={<FailureInSlot />}
+    doCode={CODE.FailureInSlot}
     doCaption="The failure in the Section's slot; the rest of the page works."
     dontExample={<FailureInModal />}
+    dontCode={CODE.FailureInModal}
     dontCaption="A Modal over the whole page to report one Section's failure."
 />
 

@@ -4,15 +4,12 @@ import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as FormsStories from './Forms.stories.jsx';
-import { HelpInCaptionCase, HelpInTooltipCase, MajorityMarked, MinorityMarked, STAGE } from './formsDemo.jsx';
+import { ErrorInSecondDialog, ErrorOnField, HelpInCaptionCase, HelpInTooltipCase, MajorityMarked, MinorityMarked, STAGE } from './formsDemo.jsx';
 import { PAGE_WIDTH } from '../../../patterns/Form/formDemo.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
-import {
-    ErrorInSecondDialog,
-    ErrorOnField,
-} from '@/storybook-docs/illustrations/forms.jsx';
+import { CODE } from './FormsCaseCode.js';
 
 <Meta title="Patterns/Forms" tags={['manifest']} />
 
@@ -179,8 +176,10 @@ Mark the field, say what to fix inline, scroll the body to it, and shake once <P
 
 <DoDontPair
     doExample={<ErrorOnField />}
+    doCode={CODE.ErrorOnField}
     doCaption="The message under the field, in the same Modal."
     dontExample={<ErrorInSecondDialog />}
+    dontCode={CODE.ErrorInSecondDialog}
     dontCaption="A second dialog over the first, with the field left unexplained."
 />
 
