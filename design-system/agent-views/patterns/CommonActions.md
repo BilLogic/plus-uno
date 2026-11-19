@@ -43,7 +43,7 @@ Choose a button's appearance by importance, placement by what it acts on, and la
 | --- | --- | --- | --- |
 | The main action of an area | Primary, one per area | Last in its group (on a page form: first, before Cancel) | Verb and object: "Add students" |
 | Another action in the area | Default | Before the Primary | Verb and object: "Reschedule session" |
-| Leave a page form or popup without saving | Subtle | After Primary on a page form; left of Primary in a popup | "Cancel"; a link is allowed |
+| Leave a page form without saving | Subtle | After Primary on a page form | "Cancel"; a link is allowed |
 | Dismiss a Modal, Panel or Flag | Icon button | End of the header | Named "Close" |
 | Empty a menu's choices | Default, full bleed with Apply | The menu's footer, or the top of a filter side | "Reset" in a menu; "Reset filters" everywhere else |
 | Empty one field | Icon button inside the field | End of the field | Named "Clear", "Clear search" |
@@ -69,7 +69,7 @@ Choose a button's appearance by importance, placement by what it acts on, and la
 | Do | Don't |
 | --- | --- |
 | Verb and object: "Log session", "Add students", "Remove from group". | "Submit", "OK", "Yes", "Continue" with nothing after it. |
-| "Cancel" on a page form or popup; "Close" to dismiss a layer; real actions like "Discard" in Modal or Panel footers. | "Dismiss" on a form; "Cancel" on a Close icon or inside a Modal or Panel footer. |
+| "Cancel" on a page form; "Close" to dismiss a layer; real actions like "Discard" in Modal or Panel footers. | "Dismiss" on a form; "Cancel" on a Close icon or inside a Modal or Panel footer. |
 | "Reset" in a menu; "Reset filters" everywhere else. | "Clear all", "Clear filters", "Reset all". |
 | "Delete" for something destroyed; "Remove" for something taken out of a group. | "Delete" for leaving a group; "Remove" for erasing a record. |
 | Sentence case: "Mark attendance". | Title Case: "Mark Attendance". |
@@ -148,9 +148,9 @@ Header and footer stay pinned while the body scrolls. A blocked submit, a server
 
 **Checked:** Automatic
 
-Close ends a layer and lives in its header, or by Save and exit in a multi-step task. In a Modal and Panel the corner Close dismisses, so their footers carry real actions (such as Discard or Keep) and no Cancel. Page forms and popups have no Close, so they keep a subtle Cancel.
+Close ends a layer and lives in its header, or by Save and exit in a multi-step task. In a Modal and Panel the corner Close dismisses, so their footers carry real actions (such as Discard or Keep) and no Cancel. A page form has no Close, so it keeps a subtle Cancel. A Popup holds no form, so it has no Cancel.
 
-### Make Cancel Subtle on page forms and popups. {#make-cancel-subtle-on-page-forms-and-popups}
+### Make Cancel Subtle on page forms. {#make-cancel-subtle-on-page-forms}
 
 **Checked:** Automatic
 
