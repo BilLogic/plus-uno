@@ -69,7 +69,7 @@ The template for a span of the page grid that groups content, including **Card**
 _Avoid_: "block" as a name, "region" as a name; "section" for a **Figma section** or a **Menu section**
 
 **Card**:
-The pattern for the container of one object, raised at rest with no border. Related cards group in a **Section**, one card level deep.
+The template for the container of one object, raised at rest with no border. Related cards group in a **Section**, one card level deep.
 _Avoid_: "tile" (Tile is its own component), "panel" (Panel is the Frame's right area)
 
 **Blanket**:
@@ -89,7 +89,7 @@ A `_`-prefixed piece only its parent uses, such as `_Section header` or `_Modal 
 _Avoid_: "sub-component" for a part, "element"
 
 **Slot**:
-A named drop zone in a pattern or component where your own content goes: empty and tinted in the source component, filled with realistic placeholder content in examples and the **Playground**.
+A named drop zone in a template or component where your own content goes: empty and tinted in the source component, filled with realistic placeholder content in examples and the **Playground**.
 _Avoid_: "children area", "placeholder" for the slot itself
 
 ### Design system: components
@@ -318,7 +318,7 @@ A kit `MotionDemo` with paths drawn before the motion, a dashed landing ghost, a
 _Avoid_: "demo" for a real-component story, "recording" for a kit figure
 
 **Motion registry**:
-The per-template, pattern and component event-to-token table for enter, exit and change, with semantic transitions and optional sound cells; `design-system/agent-views/motion/library.md` is its generated view. Motion tokens follow primitives, semantics, patterns and components (ADR-041).
+The per-template, pattern and component event-to-token table for enter, exit and change, with semantic transitions and optional sound cells; `design-system/agent-views/motion/library.md` is its generated view. Motion tokens follow primitives, semantics, templates and components (ADR-041).
 
 **Productive**:
 The default motion mode: springs at damping ratio 1 everywhere, so nothing overshoots. Controls, fields and anything done dozens of times a day stay Productive.

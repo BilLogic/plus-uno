@@ -72,7 +72,7 @@ The Sidebar's content while a record with stages (a session) or a multi-step tas
 _Avoid_: "sub-sidebar", "second sidebar"
 
 **Commit action**:
-The footer button that commits the work (Submit, Save, Send, Approve); in multi-step forms, Back and Next may sit beside it, per the Form pattern.
+The footer button that commits the work (Submit, Save, Send, Approve); in multi-step forms, Back and Next may sit beside it, per the Form template.
 
 ### Organization
 
@@ -122,7 +122,7 @@ The engineered prompt handed to an external generative tool (Stitch, Figma Make,
 _Avoid_: bare "spec"
 
 **Component docs page**:
-The tabbed page a human reads for one component. Distinct from **Page** the pattern and from a **Flow spec**.
+The tabbed page a human reads for one component. Distinct from **Page** the template and from a **Flow spec**.
 _Avoid_: bare "docs page"
 
 **Docs parts**:

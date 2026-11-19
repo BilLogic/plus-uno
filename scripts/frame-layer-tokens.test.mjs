@@ -317,7 +317,7 @@ const MODAL_PAD_PX = 16;
 
 /*
  * The screen grid (`styles/_screen-grid.scss`) is the one rule every
- * floating layer takes its column steps from: Modal, the Blanket patterns and
+ * floating layer takes its column steps from: Modal, the Blanket templates and
  * Popup. At the three mode widths it has to land on Figma's Modal/width-modal-*.
  */
 const SCREEN_GRID_SCSS = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/styles/_screen-grid.scss'), 'utf8');

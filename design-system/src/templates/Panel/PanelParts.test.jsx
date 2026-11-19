@@ -66,11 +66,11 @@ describe('Panel', () => {
 });
 
 describe('Panel barrel', () => {
-    it('is exported once, from the patterns barrel, and not from the components barrel', async () => {
-        const patterns = await import('@/templates');
+    it('is exported once, from the templates barrel, and not from the components barrel', async () => {
+        const templates = await import('@/templates');
         const components = await import('@/components');
-        expect(patterns.PanelContainer).toBe(patterns.Panel);
-        expect(patterns.PanelHeader).toBeTypeOf('function');
+        expect(templates.PanelContainer).toBe(templates.Panel);
+        expect(templates.PanelHeader).toBeTypeOf('function');
         expect(components.Panel).toBeUndefined();
         expect(components.PanelContainer).toBeUndefined();
     });

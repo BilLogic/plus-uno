@@ -16,7 +16,7 @@ vi.mock('@storybook/addon-docs/blocks', () => ({
 }));
 
 /**
- * The Section pattern follows the Figma Section: no fill and no pad of its
+ * The Section template follows the Figma Section: no fill and no pad of its
  * own, a `_Section header` of five types, a body laid out single, split or
  * as subsections, an optional footer, a toolbar, and a loading header. Sizes and colors are asserted in the browser,
  * in the `Templates/Section` stories; this file holds structure.

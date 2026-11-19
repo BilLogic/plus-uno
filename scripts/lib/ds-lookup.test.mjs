@@ -486,3 +486,8 @@ test('the check accepts the old and the new template imports', () => {
   assert.ok(!rules("import { Section } from '@/templates';\nexport const X = () => <Section title=\"a\" />;").includes('ds/unknown-component'));
   assert.ok(!rules("import { Section } from '@/templates';\nexport const X = () => <Section title=\"a\" />;").includes('ds/unknown-component'));
 });
+
+test('the orientation names template tokens, never pattern tokens', () => {
+  assert.match(ORIENTATION, /semantic, template or component tokens/);
+  assert.doesNotMatch(ORIENTATION, /pattern (or|and) component tokens|pattern tokens/);
+});

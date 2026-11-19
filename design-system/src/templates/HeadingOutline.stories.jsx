@@ -76,8 +76,8 @@ export const CardTitles = () => (
 CardTitles.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expectStyle(headingNamed(canvas, 3, 'Lincoln Middle'), 'card in a section', HEADING_XSMALL);
-    await expectStyle(headingNamed(canvas, 4, 'South High'), 'pattern card in a subsection', HEADING_XSMALL);
-    await expectStyle(canvas.getByText('Three students'), 'pattern card description', BODY_DEFAULT);
+    await expectStyle(headingNamed(canvas, 4, 'South High'), 'template card in a subsection', HEADING_XSMALL);
+    await expectStyle(canvas.getByText('Three students'), 'template card description', BODY_DEFAULT);
     await expectStyle(canvas.getByText('Two students'), 'card description', BODY_DEFAULT);
 };
 

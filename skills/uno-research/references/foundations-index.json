@@ -74,7 +74,7 @@
     "section": "Major page region.",
     "table": "Structured tabular layout.",
     "modal": "Overlay dialog surface.",
-    "pattern": "Higher-level composition (Frame, Page, Section, Card, Table, overlays, templates) in design-system/src/templates."
+    "template": "Higher-level composition (Frame, Page, Section, Card, Table, overlays) in design-system/src/templates."
   },
   "token_prefixes": [
     "--ds-*",

@@ -166,12 +166,12 @@ export function componentIdentity(entry) {
 
 /**
  * The barrel a docs page's component is imported from: `@/components` for a
- * component page, `@/templates` for a pattern page. Public code never imports
+ * component page, `@/templates` for a template page. Public code never imports
  * from a deep path.
  *
- * A pattern page names its barrel only when the pattern is its own export,
+ * A docs page names its barrel only when its template is its own export,
  * which is exactly when the generator wrote an agent file beside it. A
- * docs-only pattern page (Templates, Popups) documents no export of its own,
+ * docs-only page (Templates, Popups) documents no export of its own,
  * so it shows no import line rather than an import that does not resolve.
  *
  * @param {{importPath?: string}} [entry] The page's meta entry.

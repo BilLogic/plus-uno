@@ -9,7 +9,7 @@ summary: The escape rules `check:ds-usage` holds consumer code to — one sectio
 
 An **escape** is one place where code in `prototypes/` or `src/` leaves the design system. `npm run check:ds-usage` finds them from the generated manifests (`design-system/agent-views/components.json`, `tokens.json`), so a rule here is only as current as `npm run generate:agent` left those files.
 
-The motion rule also checks component, pattern and template styles under `design-system/src/`. Positive MDX code blocks and stories tagged `reference-screen` use the same checker.
+The motion rule also checks component and template styles under `design-system/src/`. Positive MDX code blocks and stories tagged `reference-screen` use the same checker.
 
 Each finding reads `file:line:col  rule-id  message`, then `->` with what to write instead, then a link to its section below. Fix the escape the line names; the suggestion is the nearest real name in the manifest, and where it lists several tokens that hold the same value, pick the one named for the role.
 
@@ -24,9 +24,9 @@ Rules at level **fail** block; rules at level **warn** print and let the run pas
 
 ## ds/no-unknown-component
 
-**fail.** A name imported from a public barrel (`@/components` or `@/templates`) that the barrel does not export, or `<DS.Name>` through a namespace import of one. A real component or pattern imported from the wrong barrel fails too, and its fix is the import line it belongs on.
+**fail.** A name imported from a public barrel (`@/components` or `@/templates`) that the barrel does not export, or `<DS.Name>` through a namespace import of one. A real component or template imported from the wrong barrel fails too, and its fix is the import line it belongs on.
 
-Write a component or pattern listed in `design-system/agent-views/components/index.md`. When none fits, propose a new component instead of naming one.
+Write a component listed in `design-system/agent-views/components/index.md`. When none fits, propose a new component instead of naming one.
 
 ## ds/no-deep-import
 
@@ -36,9 +36,9 @@ Import from the barrel: `import { Button } from '@/components';`. Stylesheets (`
 
 ## ds/no-unknown-prop
 
-**fail.** On a design-system component or pattern (`Card`, `Frame` and the rest), a prop its manifest record does not list, or a literal value for an enum prop outside its list.
+**fail.** On a design-system component or template (`Card`, `Frame` and the rest), a prop its manifest record does not list, or a literal value for an enum prop outside its list.
 
-Use a prop from the record in `components.json` (or the component's generated doc, or the pattern's Storybook page). Every component also takes `key`, `ref`, `children`, `className`, `style`, `id`, `role`, `title`, `tabIndex`, `aria-*` and `data-*`. A value written as an expression (`appearance={tone}`) is not judged, and neither is a component whose record has `props: null`.
+Use a prop from the record in `components.json` (or the component's generated doc, or the template's Storybook page). Every component also takes `key`, `ref`, `children`, `className`, `style`, `id`, `role`, `title`, `tabIndex`, `aria-*` and `data-*`. A value written as an expression (`appearance={tone}`) is not judged, and neither is a component whose record has `props: null`.
 
 ## ds/no-raw-literal
 
@@ -48,7 +48,7 @@ Read a token: `var(--ds-text)`, `var(--stack-md)`, a typography token. `0`, unit
 
 ## ds/no-raw-motion
 
-**fail.** In component, pattern and template CSS/SCSS under `design-system/src/`, a `transition` or `animation` shorthand, duration or timing function with literal times, `ease*` or `cubic-bezier()` fails. Separate stagger delays retain their documented cadence. This rule checks DS implementation styles; the other usage rules check consumer code.
+**fail.** In component and template CSS/SCSS under `design-system/src/`, a `transition` or `animation` shorthand, duration or timing function with literal times, `ease*` or `cubic-bezier()` fails. Separate stagger delays retain their documented cadence. This rule checks DS implementation styles; the other usage rules check consumer code.
 
 Read the matching `--ds-motion-*` semantic and its `-duration`. Loops use `--ds-motion-loop`; time-following progress uses `--ds-motion-linear`. The shared reduced-motion rule in `styles/main.scss` makes CSS state changes instant and stops loops. For React transitions and choreography, import the motion helpers and spring table from `@/templates` (`AreaStage`, `DrillStack`, `useDrillStack`, `SlideViews`, `StepStage`, `scrollToSpot`, `callAttention`, `SwapInPlace`, `LoadThenReveal`, `LoadRevealSlot`, `PresenceSlot`, `useMotionReduced`, `SPRINGS`).
 
@@ -62,7 +62,7 @@ Use the suggested token. A prototype may declare its own custom property (`--my-
 
 **fail.** Consumer code reading a primitive-tier token (`--palette-*`, `--space-<n>`, `--radius-<n>`, `--size-<n>`, `--stroke-<n>` and the other primitives in `tokens.json`).
 
-Read the semantic, pattern or component token that holds the value; the fix lists the ones that resolve to that primitive. `--radius-full` is a semantic step that keeps the primitive's name, so it reads as semantic.
+Read the semantic, template or component token that holds the value; the fix lists the ones that resolve to that primitive. `--radius-full` is a semantic step that keeps the primitive's name, so it reads as semantic.
 
 ## ds/fa-free-only
 
@@ -93,11 +93,11 @@ Start the page from a template (`Frame` with the PLUS `Sidebar`; `import { Frame
 
 ## ds/placement
 
-**fail.** A component placed inside a slot or container where a pattern specifies a different control. Rows derive from slot acceptance metadata (`design-system/agent-views/_slots.json`): `<Select>` or `<PopupSelect>` (without a `FilterButton` `trigger`) inside a `Section`'s `toolbar` (`Section.Toolbar` / `SectionToolbar`), where the Filtering pattern uses `FilterButton` (for 1–3 quick filters) or `FilterMenu` (for staged multi-category filters).
+**fail.** A component placed inside a slot or container where a template specifies a different control. Rows derive from slot acceptance metadata (`design-system/agent-views/_slots.json`): `<Select>` or `<PopupSelect>` (without a `FilterButton` `trigger`) inside a `Section`'s `toolbar` (`Section.Toolbar` / `SectionToolbar`), where the Filtering pattern uses `FilterButton` (for 1–3 quick filters) or `FilterMenu` (for staged multi-category filters).
 
 Hand-kept rows with `before` (`_placements.json`) check direct JSX siblings: a `Banner` before a `PageHeader` belongs in Page's `banner` slot, below its `header` (Notifications). This row remains **warn**.
 
-Use the component the pattern names and read the pattern guide the fix points to.
+Use the component the template names and read the guide the fix points to.
 
 ## ds/no-raw-control
 

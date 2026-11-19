@@ -3,7 +3,7 @@ import React from 'react';
 import { Button, IconButton, SearchField } from '@/components';
 
 /**
- * The parts a pattern example hands to Section's header slots: the
+ * The parts a template example hands to Section's header slots: the
  * title row's actions, the compact Search of row 3, and the "Field: value"
  * trigger props for a category. Each part is the real PLUS component; the
  * Section draws the rows, so no example builds header markup of its own.

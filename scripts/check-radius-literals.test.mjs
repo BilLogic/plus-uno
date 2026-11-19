@@ -12,7 +12,7 @@ import { literalRadii, run } from './check-radius-literals.mjs';
 
 const at = (text, file = 'design-system/src/components/x/X.scss') => literalRadii([{ path: file, text }]);
 
-test('semantic, Control, pattern and component tokens are allowed', () => {
+test('semantic, Control, template and component tokens are allowed', () => {
   assert.deepEqual(at('.a { border-radius: var(--radius-md); }'), []);
   assert.deepEqual(at('.a { border-radius: var(--radius-control-lg); }'), []);
   assert.deepEqual(at('.a { border-radius: var(--card-radius); }'), []);

@@ -65,7 +65,7 @@ const settledLayout = (Story) => <MotionPreferenceContext.Provider value><Story 
 
 export default {
     decorators: [settledLayout],
-    title: 'AI UI/Patterns/AI chat',
+    title: 'AI UI/Templates/AI chat',
     id: 'ai-ai-chat',
     component: AiChat,
     tags: ['!dev', '!autodocs'],

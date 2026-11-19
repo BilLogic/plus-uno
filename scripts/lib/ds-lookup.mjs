@@ -81,7 +81,7 @@ Build in five stages:
 Hard rules:
 - Template, then blocks, then pieces; build new interactive behavior on @base-ui/react styled with tokens.
 - Props and values come from ds_get, never from memory.
-- Style with semantic, pattern or component tokens (ds_tokens); never a literal, never a primitive (--palette-*, --space-<n>).
+- Style with semantic, template or component tokens (ds_tokens); never a literal, never a primitive (--palette-*, --space-<n>).
 - Icons are Font Awesome Free: fa-solid, fa-regular, fa-brands.
 - A full page starts from a template: Frame with the PLUS Sidebar (ds_guide("templates")).
 - Run ds_check once at the end.`;

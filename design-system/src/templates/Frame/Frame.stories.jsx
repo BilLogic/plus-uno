@@ -759,7 +759,7 @@ const ChatSidebar = () => {
     const control = useSidebarControl();
     return (
         <nav aria-label="Main">
-            {/* A sidebar of its own still draws the Frame's toggle, as the Sidebar pattern does. */}
+            {/* A sidebar of its own still draws the Frame's toggle, as the Sidebar does. */}
             <IconButton appearance="subtle" icon="angles-left" label="Close sidebar" {...control?.closeProps} />
             <Button text="Ask AI" onClick={() => panel?.setOpen(true)} />
         </nav>

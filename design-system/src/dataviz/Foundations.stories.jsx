@@ -43,7 +43,7 @@ export const BarRadius = () => (
     </div>
 );
 
-/** The tooltip's surface, shadow, radius and padding — the Popup pattern's tokens on a live chart tooltip. */
+/** The tooltip's surface, shadow, radius and padding — the Popup template's tokens on a live chart tooltip. */
 function TooltipSurfaceSpecimen() {
     const slotRef = useRef(null);
     useEffect(() => {

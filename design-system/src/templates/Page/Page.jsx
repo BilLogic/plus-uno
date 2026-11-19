@@ -5,7 +5,7 @@ import { findScrollContainer, scrollToSpot } from '@/lib/navigationMotion';
 import './Page.scss';
 
 /**
- * Page pattern for PLUS design system.
+ * Page template for PLUS design system.
  * The Page surface: paints `--ds-surface` edge to edge with `--page-pad` (24)
  * on every side and no radius, border, or shadow; children fill the content
  * slot.

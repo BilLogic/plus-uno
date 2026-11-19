@@ -10,7 +10,7 @@ import Card from '../Card/Card';
 import './Section.scss';
 
 /**
- * Section pattern for PLUS design system: a span of the page grid that
+ * Section template for PLUS design system: a span of the page grid that
  * groups content under one heading. It has no fill and no pad: a padded box
  * with a fill is a Card, and the Page around the Section supplies the pad. It mirrors
  * `Pattern/Section` in the Figma design system file.

@@ -53,7 +53,7 @@ const canFocus = (el) => Boolean(el?.isConnected && !el.closest('[inert]'));
 const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
 
 /**
- * Frame pattern: the app frame, the Sidebar beside the Page (and the Panel).
+ * Frame template: the app frame, the Sidebar beside the Page (and the Panel).
  * The Page runs the full height, and meets a docked Sidebar at its 1px edge.
  *
  * - The Frame owns the Sidebar state and hands it to the Sidebar through
