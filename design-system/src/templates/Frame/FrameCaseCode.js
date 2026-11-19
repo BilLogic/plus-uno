@@ -7,7 +7,7 @@ ${body}
 const SIDEBAR = `<Sidebar user="tutor" activeTabId="home" account={account} />`;
 
 const BAR = (second) => `<CaseSurface border="top" padding="sm">
-    <FooterActions leadingAction={<Button text="Save and exit" appearance="subtle" spacing="default" />}>
+    <FooterActions leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="subtle" spacing="default" />}>
         <Button text="${second}" spacing="default" />
         <Button text="Next" appearance="primary" spacing="default" />
     </FooterActions>
@@ -34,7 +34,7 @@ export const CODE = {
     >
         <h1>Plan a tutoring term</h1>
         {stepBody}
-        <FooterActions leadingAction={<Button text="Save and exit" appearance="subtle" />}>
+        <FooterActions leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="subtle" />}>
             <Button text="Back" />
             <Button text="Next" appearance="primary" />
         </FooterActions>

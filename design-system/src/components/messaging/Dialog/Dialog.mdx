@@ -77,9 +77,9 @@ The width examples are drawn at the 1024 screen.
 
 ## Footer actions
 
-`Dialog` renders its bottom bar with <DocsLink id="components-forms-and-inputs-button-footer-actions">FooterActions</DocsLink>: pass `primaryButton` and `secondaryButton` for a `50/50` pair (`secondaryButton` draws in the left half when `primaryButton` is also given, defaulting to "Discard" in the soft neutral fill), `primaryButton` alone for the right half, or `footer` with `<FooterActions>` for three actions or a leading action. Because the header close button dismisses the dialog, Dialog footers name real outcomes rather than Cancel. See <DocsLink id="components-forms-and-inputs-button-footer-actions">Footer actions</DocsLink> for the full placement rules, do and don't pairs, and the hug-or-fill surface map.
+`Dialog` renders its bottom bar with <DocsLink id="components-forms-and-inputs-button-footer-actions">FooterActions</DocsLink>: pass `primaryButton` and `secondaryButton` for a `50/50` pair (`secondaryButton` draws in the left half when `primaryButton` is also given, defaulting to "Discard" in the soft neutral fill), `primaryButton` alone for the right half, or `footer` with `<FooterActions>` for three actions or a leading action (a `danger` side action or a link, never "Not now"). Because the header close button dismisses the dialog, Dialog footers name real outcomes rather than Cancel. See <DocsLink id="components-forms-and-inputs-button-footer-actions">Footer actions</DocsLink> for the full placement rules, do and don't pairs, and the hug-or-fill surface map.
 
-<ComponentExample of={DialogStories.FooterLayouts} title="Footer tracks" description="One action in the right half, two split 50/50, a leading subtle action beside tracks 3–4, and a 50/50 destructive pair." />
+<ComponentExample of={DialogStories.FooterLayouts} title="Footer tracks" description="One action in the right half, two split 50/50, a leading danger action beside tracks 3–4, and a 50/50 destructive pair." />
 
 </div>
 
@@ -138,8 +138,8 @@ Use `Dialog` as the panel inside the <DocsLink id="templates-modal">Modal</DocsL
 
 The footer runs on `FooterActions`: pass `primaryButton` and `secondaryButton`
 as objects for a `50/50` pair (or `primaryButton` alone for the right half), or
-pass `footer` with `<FooterActions>` for three actions or a leading text
-button.
+pass `footer` with `<FooterActions>` for three actions or a leading action
+(a `danger` side action or a link).
 
 ### Width guidance
 
@@ -311,7 +311,7 @@ Don't: Render a bare `Dialog` over page content on your own.
 ## Related
 
 - `Modal` template: places `Dialog` on a Blanket with portal, focus trap, Escape and scroll lock.
-- `FooterActions`: use when placing three actions or a leading text button across the Dialog's four-track footer slot.
+- `FooterActions`: use when placing three actions or a leading action across the Dialog's four-track footer slot.
 - Templates: use when choosing between a Modal and a full page; its Usage section weighs the two.
 
 </div>

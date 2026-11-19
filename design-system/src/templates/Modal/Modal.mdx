@@ -89,7 +89,7 @@ An Active Modal at 8-col with a short form. Every part once; the pad is 20 on ev
 1. **Blanket.** Dims the page and holds the Modal centered.
 2. **Header.** The title at 20/24, whatever the level around it, and the Close icon button. With tabs, the tab group sits 8 under the title.
 3. **Body.** Text, a list, fields or a table. It scrolls past the cap and never draws under 96 tall.
-4. **Footer** (optional). Full-bleed buttons; secondary (Default) left, Primary right; Close in the header dismisses, so no Cancel.
+4. **Footer** (optional). Full-bleed buttons; secondary (Default) left, Primary right. A declining action such as "Not now" is the secondary. Close in the header dismisses, so no Cancel.
 
 <DocsCanvasShell description="A modal with its title, description and a section.">
     <DsCanvasQuiet of={HeadingOutlineStories.ModalTitle} />
@@ -155,7 +155,7 @@ The rule for 4-track placement, real actions and Close: <DocsLink id="patterns-c
 
 <ComponentExample of={ModalStories.FooterThree} title="Three buttons" description="A quarter each in tracks 2, 3 and 4; only the rightmost is Primary." />
 
-<ComponentExample of={ModalStories.FooterTextLeft} title="Text button left" description="A text button hugs the left content edge and takes no track; the filled buttons take tracks 3 and 4." />
+<ComponentExample of={ModalStories.FooterLeadingAction} title="Leading action" description="A danger side action hugs the left content edge and takes no track; the two outcomes take tracks 3 and 4. A declining action such as Not now is a Default secondary in the left half." />
 
 <ComponentExample of={ModalStories.FooterDestructive} title="Destructive split" description="The safer alternative is secondary and the danger action is primary, split 50/50." />
 
