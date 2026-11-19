@@ -66,7 +66,7 @@ export const MOTION_REGISTRY = [
     tier: 'template',
     events: {
       change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'It changes color on hover and press like a Button. Opening a clickable card is Drill.' },
-      milestone: { transition: 'Load content', spatial: 'spatial.default', note: 'The one card in a milestone page entrance is Expressive and leaves by the exit rules.', sound: { token: 'done.milestone', when: 'onboarding complete, first session, goal reached, term start or end, badge claimed; goal reached is shared, so the student hears it' } },
+      milestone: { transition: 'Load content', spatial: 'spatial.default', note: 'The one card in a milestone page entrance is Expressive and leaves by the exit rules.', sound: { token: 'done.milestone', when: 'onboarding complete, first session, goal reached, term start or end, achievement claimed; goal reached is shared, so the student hears it' } },
     },
   },
   {

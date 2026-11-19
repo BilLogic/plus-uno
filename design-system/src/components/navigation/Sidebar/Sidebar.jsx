@@ -56,7 +56,7 @@ const writeCollapsed = (key, value) => {
 };
 
 /**
- * The PLUS sidebar: the app's side navigation, 240 wide, padded 12, on the
+ * The PLUS sidebar: the app's navigation, 240 wide, padded 12, on the
  * sunken fill. Every row sits on one grid: rows 32 high from x 12 to 228 with
  * radius 8, a 24 icon slot centered on x 32, the label on x 48, and a trailing
  * slot centered on x 208.

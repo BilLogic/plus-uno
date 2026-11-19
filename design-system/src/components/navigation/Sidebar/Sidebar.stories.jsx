@@ -13,7 +13,7 @@ import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 
 /**
- * `Sidebar` — the app's side navigation.
+ * `Sidebar` — the app's navigation.
  *
  * THE TEST SEAM IS THIS FILE. Each story is one state of the signed-off
  * prototype's dial (view, onboarding, sections, tabs, tab state, sidebar

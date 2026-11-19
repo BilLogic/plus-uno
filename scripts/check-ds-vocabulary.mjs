@@ -23,7 +23,17 @@
  *                hand-kept alias. Fed to `ds_find`, it would route that
  *                component's word to this term (`scripts/lib/ds-vocabulary.mjs`).
  *
- * SEVERITY. `avoid-word` warns on every page while the rollout runs, except on
+ * WHERE IT READS. Component, pattern and foundation pages (`design-system/src/{components,patterns,styles}`,
+ * the generated token docs among them), and the sources an agent reads
+ * instead: token intents (the `use` and `note` strings of
+ * `scripts/lib/tokens/plan.mjs`) and the generated agent views
+ * (`design-system/agent-views/**` `.md` and `tokens.json`). Routing data
+ * (`_aliases.json`, `_inventions.json`) records the old words on purpose and
+ * is skipped, as are `_Avoid_` glossary lines, ADRs and the archive.
+ *
+ * SEVERITY. An outside name (`OUTSIDE_NAMES`: another design system's word
+ * for a PLUS term, such as Lozenge) is an error wherever it is read. Any other
+ * `avoid-word` warns on every page while the rollout runs, except on
  * `STRICT_PAGES`, held to it while `ENFORCE_STRICT` is on: the list and switch
  * `check:ds-writing` reads, from `scripts/lib/ds-strict.mjs`. `collision` always fails.
  *
@@ -33,6 +43,7 @@
  *   npm run check:ds-vocabulary -- --strict   the strict list enforced; exit 1 on its findings
  */
 
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -51,6 +62,35 @@ const PAGE_ROOTS = ['design-system/src/components', 'design-system/src/templates
 const NAME = 'check:ds-vocabulary';
 
 export { ENFORCE_STRICT, STRICT_PAGES };
+
+/** Another design system's names for PLUS terms; a hit in any source read is an error, strict page or not. */
+export const OUTSIDE_NAMES = ['lozenge', 'badge', 'inline dialog', 'side navigation'];
+
+/** Agent views read: the generated markdown and the token table; the `_`-prefixed JSON files are routing data. */
+const VIEW_FILE = /\.md$|\/tokens\.json$/;
+const PLAN = 'scripts/lib/tokens/plan.mjs';
+/** A token row's intent strings: `use: '…'` and `note: '…'`. */
+const INTENT = /\b(?:use|note):\s*(['"`])((?:\\.|(?!\1).)*)\1/g;
+
+function filesUnder(dir) {
+  if (!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? filesUnder(path.join(dir, e.name)) : [path.join(dir, e.name)]));
+}
+
+/** The prose sources beyond docs pages: `[{file, text}]`, the plan reduced to its intent strings, one per source line. */
+function proseSources(repoRoot) {
+  const sources = filesUnder(path.join(repoRoot, VIEWS))
+    .map((f) => path.relative(repoRoot, f).split(path.sep).join('/'))
+    .filter((f) => VIEW_FILE.test(f))
+    .sort()
+    .map((file) => ({ file, text: readText(repoRoot, file) ?? '' }));
+  const plan = readText(repoRoot, PLAN);
+  if (plan != null) {
+    const lines = plan.split('\n').map((l) => [...l.matchAll(INTENT)].map((m) => m[2]).join(' '));
+    sources.push({ file: PLAN, text: lines.join('\n') });
+  }
+  return sources;
+}
 
 export const RULES = ['avoid-word', 'collision'];
 
@@ -110,7 +150,7 @@ export function vocabularyFindings(text, words, { names = [] } = {}) {
       for (const { 0: hit, index: at } of line.matchAll(re)) {
         if (spans.some(([a, b]) => a <= at && at + hit.length <= b && b - a > hit.length)) continue;
         if (named && !namesAThing(line, hit, at)) continue;
-        out.push({ rule: 'avoid-word', message: `"${hit}" is a glossary avoid-word; say ${term}: "${line.trim()}"`, anchor: line.trim() });
+        out.push({ rule: 'avoid-word', word: hit, message: `"${hit}" is a glossary avoid-word; say ${term}: "${line.trim()}"`, anchor: line.trim() });
       }
     }
   }
@@ -135,6 +175,12 @@ const inputs = byRoot((repoRoot) => {
     const text = [page.intro, ...page.sections.map((s) => `## ${s.title}\n${s.text}`)].join('\n');
     return { file, strict: strictFiles.has(file), raw: vocabularyFindings(text, words, { names }).map((f) => ({ ...f, line: lineOf(source, f.anchor) })) };
   });
+  const prose = proseSources(repoRoot).map(({ file, text }) => ({
+    file,
+    strict: false,
+    raw: vocabularyFindings(text, words, { names }).map((f) => ({ ...f, line: lineOf(text, f.anchor) })),
+  }));
+  pages.push(...prose);
   const collisionFindings = collisions.map((c) => ({
     file: GLOSSARY,
     line: lineOf(glossary, `**${c.term}**`),
@@ -156,8 +202,9 @@ export function run({ repoRoot = REPO_ROOT, enforceStrict = ENFORCE_STRICT, all 
   const rolledPages = new Set();
   for (const { file, strict, raw } of pages) {
     for (const f of raw) {
-      const severity = strict && enforceStrict ? 'error' : 'warning';
-      if (!all && !strict) {
+      const outside = OUTSIDE_NAMES.includes(f.word.toLowerCase());
+      const severity = outside || (strict && enforceStrict) ? 'error' : 'warning';
+      if (!all && !strict && !outside) {
         rolled++;
         rolledPages.add(file);
         continue;
