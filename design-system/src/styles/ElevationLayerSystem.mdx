@@ -44,6 +44,8 @@ The page and everything in its flow. What sits on it is broken down below, in Wi
 #### Usage & styling
 
 - **Flat by default.** Set off from the Frame by tone alone.
+- **One surface, one pad.** The Page paints <C>--ds-surface</C> edge to edge with <C>--page-pad</C> on every side, and takes no radius, border or shadow. See <DocsLink id="templates-page">Templates › Page</DocsLink>.
+- **A standalone Panel** sits on Default: <C>--ds-surface</C> with an edge line, and no shadow. Only a floating Panel moves to Layer 3. See <DocsLink id="templates-panel">Templates › Panel</DocsLink>.
 
 </LayerDetailRow>
 
@@ -132,7 +134,7 @@ Most of the page: a Section and its side, tables, lists, forms; rows are hairlin
 #### Usage & styling
 
 - **A Section takes no surface:** no fill, no padding, no border.
-- **A Default card** takes <C>--ds-border</C>: on the Frame, on Sunken or colored areas, or when dense with its own rows.
+- **A Default card** (`surface="default"`) takes <C>--ds-border</C>: on the Frame, on Sunken or colored areas, or when dense with its own rows.
 
 </LayerDetailRow>
 
@@ -142,12 +144,13 @@ Most of the page: a Section and its side, tables, lists, forms; rows are hairlin
 
 <LayerDetailRow variant="surface-sunken">
 
-A backdrop that groups static content: a Card (the default surface), the empty box, a clickable card at rest.
+A backdrop that groups static content: a Card (the default surface), the table’s empty box (<C>--ds-surface-sunken</C>, card radius), a clickable card at rest.
 
 #### Usage & styling
 
 - **Only on the Default surface;** one step only, never a Card inside a Card.
-- **Flat:** no shadow, no border.
+- **Flat:** no shadow, and a transparent 1px border that shows only in forced colors.
+- **The default card surface** (`surface="sunken"`). A clickable one lifts to Raised on hover, in place.
 
 </LayerDetailRow>
 
@@ -161,8 +164,9 @@ The one card a view is about, a clickable card on hover, a grabbed control.
 
 #### Usage & styling
 
-- **One per view at rest.**
-- **Always the pair:** raised surface with raised shadow.
+- **One per view at rest,** placed first in reading order.
+- **Always the pair:** raised surface with raised shadow. In dark its fill is the page tone, so the shadow does the lifting.
+- **Hover lifts in place;** the card never moves.
 - **Dragged,** it takes the overlay pair.
 
 </LayerDetailRow>
@@ -173,7 +177,7 @@ The one card a view is about, a clickable card on hover, a grabbed control.
 
 <Canvas of={ElevationStories.ByTemplate} />
 
-How a Section, its side and its detail sit on the page is in <DocsLink id="templates-section">Templates › Section</DocsLink>. Elevation sets only their surface: a Section takes none.
+How a Section, its side and its detail sit on the page is in <DocsLink id="templates-section">Templates › Section</DocsLink>; the table and its empty box are in <DocsLink id="templates-table">Templates › Table</DocsLink>; the Card and its three surfaces are in <DocsLink id="templates-card">Templates › Card</DocsLink>. Elevation sets only their surface: a Section takes none.
 
 </FoundationSubsection>
 

@@ -538,8 +538,8 @@ export const UsageInMotion = () => {
 const COLOR_TOKENS = [
     { token: '--ds-surface-sunken', usedBy: 'Frame; Sunken cards, empty box' },
     { token: '--ds-surface', usedBy: 'Page · Default' },
-    { token: '--ds-surface-raised', usedBy: 'Page · Raised' },
-    { token: '--ds-surface-overlay', usedBy: 'Layer 3 and Layer 4' },
+    { token: '--ds-surface-raised', usedBy: 'Page · Raised; in dark it takes the page tone' },
+    { token: '--ds-surface-overlay', usedBy: 'Layer 3; the solid fallback for overlay material' },
 ];
 
 const toHex = (value) => {

@@ -1,5 +1,6 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import { C, RefTable } from '@/storybook-docs/foundation-blocks.jsx';
 import { FoundationSection } from '@/storybook-docs/foundation-page.jsx';
 import * as ElevationStories from './Elevation.stories.jsx';
 
@@ -21,5 +22,19 @@ import * as ElevationStories from './Elevation.stories.jsx';
 Forced colors drop background fills and shadows but keep borders. Every card carries a 1px transparent border, so its edge still shows there.
 
 <Canvas of={ElevationStories.CardsInForcedColors} />
+
+</FoundationSection>
+
+<FoundationSection title="Material">
+
+<RefTable
+    head={['Case', 'What happens']}
+    rows={[
+        ['Text contrast', 'Text on material meets 4.5:1 against the busiest content it can float over, and icons 3:1. Check against the darkest and the lightest picture, not the average.'],
+        ['Reduced transparency', <>Under <C>prefers-reduced-transparency</C>, every material falls back to solid <C>--ds-surface-overlay</C>. Shape, edge and shadow stay.</>],
+        ['Increased contrast', <>Under <C>prefers-contrast: more</C>, solid as above, and the edge becomes the 3:1 border.</>],
+        ['Forced colors', 'The fill is replaced by the system color; the 1px border stays and draws the edge.'],
+    ]}
+/>
 
 </FoundationSection>

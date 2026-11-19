@@ -31,4 +31,6 @@ A surface token may be swapped for a solid background token when the color means
 
 Shadows read weakly on dark surfaces, so floating and blocking surfaces step lighter. Which ones step lighter is rule 9 under Usage; here is how.
 
+Raised is the exception: in dark it keeps the page tone (`--ds-surface-raised` equals `--ds-surface`), so a Raised card separates by its shadow alone and never steps lighter.
+
 ### Pair a lighter surface with its shadow
