@@ -111,8 +111,8 @@
       "tokens": [
         "--body-lg",
         "--border-width-default",
-        "--card-pad-default",
-        "--card-radius-compact",
+        "--card-pad",
+        "--card-radius",
         "--ds-background-neutral-subtle-hovered",
         "--ds-background-neutral-subtle-pressed",
         "--ds-background-selected",
@@ -382,8 +382,8 @@
       "name": "AiIcon",
       "kind": "component",
       "import": "import { AiIcon } from '@/components';",
-      "group": "images-and-icons",
-      "source": "design-system/src/components/images-and-icons/AiIcon/AiIcon.jsx",
+      "group": "ai",
+      "source": "design-system/src/components/ai/AiIcon/AiIcon.jsx",
       "summary": "An icon for an AI action: generate, ask, rewrite, summarize, plan, suggest or stop generating. Each icon with a sparkle mark is a Font Awesome Free glyph with one four-point sparkle in its top-right corner and a clean gap cut around it. Generate is the sparkle alone, and stop generating has none because stopping is not generative. - **name** picks the icon. - **size** is 16 (the default) or 24. Generate and stop generating also have 12. Asking another icon for 12 draws it at 16 and warns. - **label** names the icon for assistive technology. Without it the icon is hidden, so pair it with visible text. The shapes fill with `currentColor`, which starts at the icon color; set `color` to change it. Pair every icon with a label unless its meaning is obvious.",
       "props": [
         {
@@ -463,8 +463,8 @@
       "name": "AiMessage",
       "kind": "component",
       "import": "import { AiMessage } from '@/components';",
-      "group": "labels",
-      "source": "design-system/src/components/labels/AiMessage/AiMessage.jsx",
+      "group": "ai",
+      "source": "design-system/src/components/ai/AiMessage/AiMessage.jsx",
       "summary": "An assistant reply, marked as AI by the small AI icon at its start (named \"AI\" for assistive technology), so no answer reads as a person's. Text is Markdown: paragraphs, lists, headings, code, bold, italic and links. The content is `text`, or `parts` when a reply mixes text with other content: a part is `{ type: 'text', text }` or any other `{ type, ... }`, which `renderPart` draws. - `status=\"complete\"` is a finished message. - `status=\"streaming\"` is text still arriving: a caret follows the last character and the message is marked busy for assistive technology. - `status=\"thinking\"` is the typing indicator, before any text exists. `sources` lists what a finished answer read, folded under the message behind one toggle: the answer links what it names in its own text, so the list is there to check, not to read. `onFeedback` puts thumbs up and down under a finished answer; `feedback` holds the rating when the page owns it.",
       "props": [
         {
@@ -586,6 +586,8 @@
         "WithFeedback"
       ],
       "tokens": [
+        "--ai-message-caret-width",
+        "--ai-message-dot-size",
         "--body-default",
         "--body-sm",
         "--code-default",
@@ -973,109 +975,6 @@
         "--pad-x-md",
         "--pad-y-md",
         "--type-weight-medium"
-      ]
-    },
-    {
-      "name": "Blanket",
-      "kind": "pattern",
-      "import": "import { Blanket } from '@/patterns';",
-      "group": "patterns",
-      "source": "design-system/src/patterns/Blanket/Blanket.jsx",
-      "summary": null,
-      "props": [
-        {
-          "name": "show",
-          "type": "bool",
-          "required": false,
-          "default": "true",
-          "values": null,
-          "description": "Keep mounted and set false to finish the exit before removal.",
-          "deprecated": null
-        },
-        {
-          "name": "inline",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Draw in the page flow at a stand-in screen, for docs and previews, instead of fixed over the page.",
-          "deprecated": null
-        },
-        {
-          "name": "screenWidth",
-          "type": "number",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Inline only: the screen width (px) the layers inside take their width from, such as 768, 1024 or 1440.",
-          "deprecated": null
-        },
-        {
-          "name": "screenHeight",
-          "type": "number",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Inline only: the screen height (px); a layer inside caps at it less Blanket/pad-y above and below. The pad follows the real viewport (24 under 640 tall), not this height, as Figma's frames do.",
-          "deprecated": null
-        },
-        {
-          "name": "onBlanketClick",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Called for a click on the blanket, not on the layer it holds.",
-          "deprecated": null
-        },
-        {
-          "name": "className",
-          "type": "string",
-          "required": false,
-          "default": "''",
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "style",
-          "type": "object",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "children",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "The layer it holds: a PatternModal, or a confirm over one.",
-          "deprecated": null
-        }
-      ],
-      "stories": [
-        "Inline",
-        "ConfirmOverPanel",
-        "Layers",
-        "Pads",
-        "ScreenGrid",
-        "Interactive",
-        "MotionOpenClose",
-        "MotionReduced"
-      ],
-      "tokens": [
-        "--blanket-pad-x",
-        "--blanket-pad-y",
-        "--ds-blanket",
-        "--layer-blanket",
-        "--layer-modal",
-        "--plus-overlay-origin",
-        "--plus-overlay-screen",
-        "--plus-overlay-screen-height",
-        "--transform-origin"
       ]
     },
     {
@@ -1501,7 +1400,7 @@
       "import": "import { Calendar } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Calendar/Calendar.jsx",
-      "summary": "Calendar — the month grid DatePicker and DateTimePicker open (Figma `_Calendar`), public for a caller who wants the grid on its own rather than behind a field's popup. It is the same component the pickers use. - **Grid:** always six weeks, 42 cells, so the panel never changes height. Days of the months either side are drawn and can't be picked. - **Days:** each is a button named with its full date. `aria-pressed` marks the picked day, or both ends of a range; `data-in-range` marks the days between; `aria-current=\"date\"` marks today. - **Bounds:** days before `minDate` or after `maxDate` are disabled. - **Size:** a pixel width, 28, 36 or 44, drawn from the `--calendar-day-*` tokens.",
+      "summary": "Calendar — the month grid DatePicker and DateTimePicker open (Figma `_Calendar`), public for a caller who wants the grid on its own rather than behind a field's popup. It is the same component the pickers use. - **Grid:** always six weeks, 42 cells, so the panel never changes height. Days of the months either side are drawn and can't be picked. - **Days:** each is a button named with its full date. `aria-pressed` marks the picked day, or both ends of a range; `data-in-range` marks the days between; `aria-current=\"date\"` marks today. - **Bounds:** days before `minDate` or after `maxDate` are disabled. - **Size:** a pixel width, 24, 32 or 40, drawn from the `--calendar-day-*` tokens.",
       "props": [
         {
           "name": "viewDate",
@@ -1572,11 +1471,11 @@
           "required": false,
           "default": null,
           "values": [
-            "28",
-            "36",
-            "44"
+            "24",
+            "32",
+            "40"
           ],
-          "description": "Day width in pixels: 28, 36 or 44.",
+          "description": "Day width in pixels: 24, 32 or 40.",
           "deprecated": null
         },
         {
@@ -1599,9 +1498,9 @@
         }
       ],
       "stories": [
-        "Size28",
-        "Size36",
-        "Size44",
+        "Size24",
+        "Size32",
+        "Size40",
         "PickADay",
         "TurnMonths",
         "TurnMonthsReduced",
@@ -1746,6 +1645,7 @@
         "--carousel-ring-size",
         "--carousel-ring-stroke",
         "--carousel-slide-max",
+        "--carousel-slide-max-width",
         "--carousel-slide-share",
         "--carousel-slide-share-md",
         "--carousel-slide-share-sm",
@@ -2331,7 +2231,7 @@
         "--body-default",
         "--border-width-default",
         "--border-width-selected",
-        "--card-pad-default",
+        "--card-pad",
         "--checkbox-control-size",
         "--choice-tile-width",
         "--control-sm",
@@ -2358,18 +2258,15 @@
         "--ds-surface",
         "--ds-surface-hovered",
         "--ds-text",
+        "--inline-md",
         "--pad-x-lg",
         "--pad-x-md",
+        "--pad-y-md",
         "--plus-choice-indent",
         "--radius-control-md",
         "--radius-md",
-        "--space-025",
-        "--space-0375",
-        "--space-050",
         "--stack-lg",
         "--stack-sm",
-        "--stroke-1",
-        "--stroke-2",
         "--type-weight-medium"
       ]
     },
@@ -2721,7 +2618,7 @@
         "--checkbox-control-size",
         "--choice-grid-control-size-10",
         "--choice-grid-control-size-12",
-        "--ds-surface-container",
+        "--ds-surface-sunken",
         "--ds-text",
         "--ds-text-subtle",
         "--pad-x-md",
@@ -2939,7 +2836,7 @@
       ],
       "tokens": [
         "--border-width-default",
-        "--card-radius-compact",
+        "--card-radius",
         "--code-default",
         "--ds-background-code-default",
         "--ds-background-code-gutter",
@@ -3113,15 +3010,17 @@
         "--body-default",
         "--body-sm",
         "--border-width-default",
-        "--card-radius-compact",
+        "--card-radius",
+        "--comment-gap",
+        "--comment-pad",
+        "--comment-replies-indent",
+        "--comment-replies-stack",
         "--ds-background-selected",
         "--ds-border",
         "--ds-text-subtle",
-        "--space-025",
-        "--space-050",
-        "--space-075",
-        "--space-100",
-        "--space-150",
+        "--inline-lg",
+        "--stack-md",
+        "--stack-sm",
         "--type-weight-semibold"
       ]
     },
@@ -3347,6 +3246,7 @@
         "--body-sm",
         "--control-sm",
         "--count-tag-dot-size",
+        "--count-tag-ring-width",
         "--ds-background-competency-mastering-content",
         "--ds-background-competency-mastering-content-bold",
         "--ds-background-danger",
@@ -3379,8 +3279,7 @@
         "--plus-count-min",
         "--plus-count-size",
         "--radius-full",
-        "--radius-md",
-        "--stroke-2"
+        "--radius-md"
       ]
     },
     {
@@ -3428,12 +3327,78 @@
           "deprecated": null
         },
         {
+          "name": "defaultValue",
+          "type": "string or arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Initial value when uncontrolled.",
+          "deprecated": null
+        },
+        {
           "name": "range",
           "type": "bool",
           "required": false,
           "default": "false",
           "values": null,
           "description": "Pick a first and a last day",
+          "deprecated": null
+        },
+        {
+          "name": "presets",
+          "type": "bool or arrayOf or shape or string or func",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Show preset ranges beside the calendar with Clear and Apply actions",
+          "deprecated": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Filter trigger label for the preset range popup",
+          "deprecated": null
+        },
+        {
+          "name": "trigger",
+          "type": "node or func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Custom trigger element or `({ isOpen, value, summary }) => node` for the filter popup.",
+          "deprecated": null
+        },
+        {
+          "name": "placement",
+          "type": "enum",
+          "required": false,
+          "default": "'bottom-start'",
+          "values": [
+            "bottom-start",
+            "bottom-end"
+          ],
+          "description": "Popup placement relative to a filter trigger.",
+          "deprecated": null
+        },
+        {
+          "name": "today",
+          "type": "string or instanceOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Reference date used for relative presets and `lookBack`; defaults to today.",
+          "deprecated": null
+        },
+        {
+          "name": "lookBack",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Disable days after `today`. Defaults to true when `presets` or a filter `label` is set.",
           "deprecated": null
         },
         {
@@ -3516,6 +3481,15 @@
           "deprecated": null
         },
         {
+          "name": "container",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Where a filter popup portals to; defaults to the page overlay layer.",
+          "deprecated": null
+        },
+        {
           "name": "onChange",
           "type": "func",
           "required": false,
@@ -3585,10 +3559,22 @@
         "TypedEntry",
         "DaysAnnounceTheirDate",
         "ClearControl",
-        "MonthTurnKeepsPopupHeight"
+        "MonthTurnKeepsPopupHeight",
+        "RangePopup",
+        "RangePopupPresetKeyboard",
+        "RangePopupClearCommits",
+        "RangePopupPresetBounds",
+        "RangePopupReadOnly"
       ],
       "tokens": [
-        "--ds-icon-subtle"
+        "--border-width-default",
+        "--calendar-day-sm",
+        "--ds-icon-subtle",
+        "--inline-md",
+        "--pad-x-md",
+        "--popup-pad",
+        "--popup-width-md",
+        "--width-1000"
       ]
     },
     {
@@ -4022,12 +4008,281 @@
       "tokens": [
         "--body-default",
         "--body-sm",
+        "--date-time-picker-section-gap",
         "--ds-text",
         "--ds-text-subtle",
-        "--space-0625",
         "--stack-md",
         "--stack-sm",
         "--type-weight-medium"
+      ]
+    },
+    {
+      "name": "Dialog",
+      "kind": "component",
+      "import": "import { Dialog } from '@/components';",
+      "group": "messaging",
+      "source": "design-system/src/components/messaging/Dialog/Dialog.jsx",
+      "summary": "The dialog panel itself: header (title, optional description, header actions, close button, or custom header / tabs), scrolling body, and optional footer slots. Sizes from the screen grid (`4-col · 6-col · 8-col · 10-col`) and renders inline with no Blanket and no modal behavior. For a blocking overlay dialog with Blanket, portal, focus trap, Escape and scroll lock, use the `Modal` template from `@/patterns`.",
+      "props": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The `id` attribute of the dialog panel.",
+          "deprecated": null
+        },
+        {
+          "name": "title",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The dialog's h1, and its accessible name.",
+          "deprecated": null
+        },
+        {
+          "name": "description",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "A line under the title, read as the dialog's description.",
+          "deprecated": null
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The dialog's accessible name when it has no visible `title` or uses a custom `header`.",
+          "deprecated": null
+        },
+        {
+          "name": "header",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Custom header slot replacing the title row (title and close button), so the caller owns both and names the dialog with `ariaLabel`.",
+          "deprecated": null
+        },
+        {
+          "name": "headerActions",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Icon buttons in the header, before the close button.",
+          "deprecated": null
+        },
+        {
+          "name": "showCloseButton",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The header's close button. Off for a dialog that has to be answered.",
+          "deprecated": null
+        },
+        {
+          "name": "tabs",
+          "type": "arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Tab group under the title (`{ key, label, content, disabled? }`). The body becomes the tab panel and shows the selected tab's `content`.",
+          "deprecated": null
+        },
+        {
+          "name": "activeTab",
+          "type": "string or number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Selected tab's key when controlled; update from `onTabChange`.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultActiveTab",
+          "type": "string or number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Initial tab key when uncontrolled; defaults to the first enabled tab.",
+          "deprecated": null
+        },
+        {
+          "name": "onTabChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with the key of the selected tab.",
+          "deprecated": null
+        },
+        {
+          "name": "body",
+          "type": "string or node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The main content of the dialog. A string is drawn as body text; a node is drawn as given. `children` is rendered after it.",
+          "deprecated": null
+        },
+        {
+          "name": "height",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "hug",
+            "fill"
+          ],
+          "description": "`hug` grows with the content to the cap and then scrolls its body; `fill` sits at that cap.",
+          "deprecated": null
+        },
+        {
+          "name": "showBottomButtons",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Show the footer: `footer`, or the secondary and primary buttons.",
+          "deprecated": null
+        },
+        {
+          "name": "footer",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Custom footer content in place of the built-in pair, such as a three-button or leading-text FooterActions layout.",
+          "deprecated": null
+        },
+        {
+          "name": "primaryButton",
+          "type": "buttonShape",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The confirming footer button, drawn on the right. Takes `text` (default \"Confirm\"), `onClick`, `appearance` (default `primary`), `spacing` and `icon`.",
+          "deprecated": null
+        },
+        {
+          "name": "secondaryButton",
+          "type": "buttonShape",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The secondary footer button, drawn in the left half when a primary button is also given. Takes `text` (default \"Discard\"), `onClick`, `appearance` (default `default`), `spacing` and `icon`.",
+          "deprecated": null
+        },
+        {
+          "name": "dividers",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "A rule under the header and over the footer.",
+          "deprecated": null
+        },
+        {
+          "name": "loading",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Skeleton bars in place of the body while its content loads.",
+          "deprecated": null
+        },
+        {
+          "name": "onClose",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called when the close button is clicked.",
+          "deprecated": null
+        },
+        {
+          "name": "width",
+          "type": "enum or number or string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`4-col` · `6-col` · `8-col` · `10-col`: 4 · 6 · 8 · 10 columns of the screen grid plus the dialog pad. Grows with the screen, never shrinks, ignores the sidebar. A number or a length sets a fixed width.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Extra class names added to the dialog panel beside the component's own.",
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline styles for the dialog panel. A fixed `width` is applied after them.",
+          "deprecated": null
+        },
+        {
+          "name": "children",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "More content rendered in the body after `body`, for composing the dialog contents directly.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Width4Col",
+        "Width6Col",
+        "Width8Col",
+        "Width10Col",
+        "HeightHug",
+        "HeightFill",
+        "HeaderOptions",
+        "WithoutCloseButton",
+        "Tabs",
+        "Loading",
+        "Content",
+        "Layout",
+        "Interactive",
+        "Overview",
+        "FooterLayouts",
+        "SizeToContent",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused"
+      ],
+      "tokens": [
+        "--blanket-max-height-modal",
+        "--body-default",
+        "--border-width-default",
+        "--dialog-body-min-height",
+        "--dialog-inline-sm",
+        "--dialog-pad-x-default",
+        "--dialog-radius",
+        "--dialog-shadow",
+        "--dialog-stack-md",
+        "--dialog-stack-sm",
+        "--ds-border",
+        "--ds-surface-overlay",
+        "--ds-text",
+        "--ds-text-subtle",
+        "--heading-md",
+        "--plus-overlay-max-height"
       ]
     },
     {
@@ -4241,6 +4496,387 @@
         "--pad-y-md",
         "--popup-radius",
         "--stack-md"
+      ]
+    },
+    {
+      "name": "DynamicTable",
+      "kind": "component",
+      "import": "import { DynamicTable } from '@/components';",
+      "group": "text-and-data-display",
+      "source": "design-system/src/components/text-and-data-display/DynamicTable/DynamicTable.jsx",
+      "summary": "Dynamic table. A table people sort, page or act on, built on the table shell: its `footer` and `emptyState` slots, sortable `HeadCell`s in the head row and the shared `TableRow` and `TableCell` parts in the body. - **Data.** `head.cells` is one `{ key, content, isSortable, width, align }` per column; `rows` is `{ key, cells, onClick }` with one `{ key, content }` per column. A column sorts by its cells' `key`. - **Stateful or stateless.** Left alone it holds its own sort and page, seeded by `defaultSortKey`, `defaultSortOrder` and `defaultPage`. Pass `sortKey` and `sortOrder`, or `page`, and the page owns that state: the table reports a press through `onSort` or `onSetPage` and draws only what it is given. With `totalRows`, `rows` is already the current page (paged on a server) and the footer counts against `totalRows`. - **States.** `default`, `empty`, `no results`, `loading`, `refreshing` and `error`. `empty` and `no results` replace the whole table (no head row, footer or pagination) with `EmptyState`; `loading` and `error` keep the head row and swap the body for one message row; `refreshing` keeps the rows at the loading opacity under a spinner. `isLoading` and an empty `rows` choose the state on their own; `state` names one outright (`no results` and `error` are only ever named). - **Selection.** `isSelectable` adds a checkbox column as wide as the row is tall: \"Select row N\" on each row, \"Select all rows\" in the head, which is checked when every row on the page is selected and mixed when only some are. A selected row carries `aria-selected` and the selected fill. The keys come back through `onSelectionChange`; pass `selectedRowKeys` to own them. - **Bulk bar.** While rows are selected, the head row becomes the bulk bar: select-all stays in its cell, and one cell across the columns says \"N selected\" and holds `bulkActions` at the start. The labels cross-fade in place and the row keeps its height. There is no Clear: the checkboxes clear the selection, and the head row comes back when none are left. - **Sticky header and frozen column.** `stickyHeader` pins the head row inside the table's own scroll region, bounded by `maxHeight`. `isFrozen` pins the first column (with the checkboxes, the title column beside them) on an opaque surface, with a stronger divider and the overflow shadow only while the table is scrolled sideways. - **Width.** Under the content minimum the table scrolls sideways instead of squeezing. The first column fills the room and the rest size to their content, unless a head cell sets `width`; `isFixedSize` holds every column to its set width.",
+      "props": [
+        {
+          "name": "head",
+          "type": "shape",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "One `{ key, content, isSortable, width, align }` per column",
+          "deprecated": null
+        },
+        {
+          "name": "rows",
+          "type": "arrayOf",
+          "required": true,
+          "default": "[]",
+          "values": null,
+          "description": "One `{ key, cells, onClick }` per row; each cell `{ key, content }`",
+          "deprecated": null
+        },
+        {
+          "name": "caption",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "A visible caption that names the table.",
+          "deprecated": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The table's accessible name when there is no caption.",
+          "deprecated": null
+        },
+        {
+          "name": "rowsPerPage",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Rows per page; leave it out and the table does not page.",
+          "deprecated": null
+        },
+        {
+          "name": "rowsPerPageOptions",
+          "type": "arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Page sizes offered in the footer's \"25 / page\" Select; with `onRowsPerPageChange`.",
+          "deprecated": null
+        },
+        {
+          "name": "onRowsPerPageChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with the chosen page size.",
+          "deprecated": null
+        },
+        {
+          "name": "noun",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The table's noun in the footer range, \"1–25 of 140 sessions\".",
+          "deprecated": null
+        },
+        {
+          "name": "page",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The current page, owned by the page (stateless).",
+          "deprecated": null
+        },
+        {
+          "name": "defaultPage",
+          "type": "number",
+          "required": false,
+          "default": "1",
+          "values": null,
+          "description": "The first page when the table holds its own page.",
+          "deprecated": null
+        },
+        {
+          "name": "onSetPage",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with the page the pager asks for.",
+          "deprecated": null
+        },
+        {
+          "name": "totalRows",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The full count when `rows` is already one page, paged on a server.",
+          "deprecated": null
+        },
+        {
+          "name": "sortKey",
+          "type": "string or number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The sorted column's key, owned by the page (stateless).",
+          "deprecated": null
+        },
+        {
+          "name": "sortOrder",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "ascending",
+            "descending",
+            "none"
+          ],
+          "description": "The sort direction, owned by the page.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultSortKey",
+          "type": "string or number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The column the table starts sorted by when it holds its own sort.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultSortOrder",
+          "type": "enum",
+          "required": false,
+          "default": "'ascending'",
+          "values": [
+            "ascending",
+            "descending"
+          ],
+          "description": "The direction the table starts sorted in when it holds its own sort.",
+          "deprecated": null
+        },
+        {
+          "name": "onSort",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with `{ key, sortOrder }` when a head cell asks for a sort.",
+          "deprecated": null
+        },
+        {
+          "name": "isLoading",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Rows are on their way: `loading` with no rows, `refreshing` over them.",
+          "deprecated": null
+        },
+        {
+          "name": "state",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "default",
+            "empty",
+            "no results",
+            "loading",
+            "refreshing",
+            "error"
+          ],
+          "description": "Names the body's state outright.",
+          "deprecated": null
+        },
+        {
+          "name": "emptyView",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The `EmptyState` (or heading text) rendered in place of the table for the `empty` state.",
+          "deprecated": null
+        },
+        {
+          "name": "noResultsView",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The `EmptyState` (or heading text) rendered in place of the table for the `no results` state.",
+          "deprecated": null
+        },
+        {
+          "name": "errorView",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The message for the `error` state.",
+          "deprecated": null
+        },
+        {
+          "name": "highlightedRowIndex",
+          "type": "number or arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The index (across every page) of the row to highlight, or a list of them.",
+          "deprecated": null
+        },
+        {
+          "name": "isFixedSize",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Hold every column to its head cell's `width`.",
+          "deprecated": null
+        },
+        {
+          "name": "verticalLines",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Rules between the columns.",
+          "deprecated": null
+        },
+        {
+          "name": "wrap",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Every cell wraps instead of truncating.",
+          "deprecated": null
+        },
+        {
+          "name": "size",
+          "type": "enum",
+          "required": false,
+          "default": "40",
+          "values": [
+            "32",
+            "40",
+            "48"
+          ],
+          "description": "Row height: 32, 40 or 48.",
+          "deprecated": null
+        },
+        {
+          "name": "isSelectable",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "A checkbox column with select-all in the head.",
+          "deprecated": null
+        },
+        {
+          "name": "selectedRowKeys",
+          "type": "arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The selected rows' keys, owned by the page.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultSelectedRowKeys",
+          "type": "arrayOf",
+          "required": false,
+          "default": "[]",
+          "values": null,
+          "description": "The rows selected at first when the table holds its own selection.",
+          "deprecated": null
+        },
+        {
+          "name": "onSelectionChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with every selected key when the selection changes.",
+          "deprecated": null
+        },
+        {
+          "name": "bulkActions",
+          "type": "arrayOf",
+          "required": true,
+          "default": "[]",
+          "values": null,
+          "description": "The bulk bar's actions, one `{ label, onClick }` each: the first three show as buttons, the rest in an overflow menu.",
+          "deprecated": null
+        },
+        {
+          "name": "stickyHeader",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Pin the head row inside the table's own scroll region; needs `maxHeight`.",
+          "deprecated": null
+        },
+        {
+          "name": "maxHeight",
+          "type": "number or string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Bound the scroll region's height (px or any CSS length).",
+          "deprecated": null
+        },
+        {
+          "name": "isFrozen",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Pin the first column (the title column too, beside the checkboxes).",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra class names added to the table's wrapper beside the component's own.",
+          "deprecated": null
+        },
+        {
+          "name": "testId",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Maps to `data-testid`, for test queries.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Default",
+        "Stateless",
+        "States",
+        "Empty",
+        "NoResults",
+        "EmptyNothingYet",
+        "EmptyHiddenByFilter",
+        "EmptyNothingToCreate",
+        "Widths",
+        "Selection",
+        "StickyHeaderAndFrozenColumn",
+        "SortableHeadCells",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "DisabledRow",
+        "Interactive"
       ]
     },
     {
@@ -4886,7 +5522,8 @@
         "--body-default",
         "--body-sm",
         "--border-width-default",
-        "--card-radius-compact",
+        "--card-pad",
+        "--card-radius",
         "--ds-background-brand-subtlest",
         "--ds-background-danger-subtler",
         "--ds-background-disabled",
@@ -4911,8 +5548,6 @@
         "--focus-ring-width",
         "--icon-sm",
         "--inline-md",
-        "--pad-x-md",
-        "--pad-y-md",
         "--stack-md",
         "--stack-sm"
       ]
@@ -4926,12 +5561,21 @@
       "summary": "Filter button: opens or toggles a filter. It shows the filter's name, an optional count of what is applied, and a chevron when it opens a menu.",
       "props": [
         {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The field the filter narrows, such as \"Status\". With it the button reads \"Status: Upcoming\": the label quiet, `text` the value in ink.",
+          "deprecated": null
+        },
+        {
           "name": "text",
           "type": "string",
           "required": true,
           "default": null,
           "values": null,
-          "description": "The filter's name.",
+          "description": "The filter's name, or its value when `label` is set.",
           "deprecated": null
         },
         {
@@ -5024,6 +5668,7 @@
       ],
       "stories": [
         "Overview",
+        "Label",
         "Metric",
         "Appearances",
         "Spacing",
@@ -5037,6 +5682,8 @@
         "Interactive"
       ],
       "tokens": [
+        "--ds-text",
+        "--ds-text-subtle",
         "--ds-text-subtlest",
         "--inline-md",
         "--inline-sm"
@@ -5959,8 +6606,8 @@
       "name": "GenerativeBorder",
       "kind": "component",
       "import": "import { GenerativeBorder } from '@/components';",
-      "group": "loading",
-      "source": "design-system/src/components/loading/GenerativeBorder/GenerativeBorder.jsx",
+      "group": "ai",
+      "source": "design-system/src/components/ai/GenerativeBorder/GenerativeBorder.jsx",
       "summary": "The border that shows the AI is generating content: a 2px rounded stroke in two flat colors, in hard-edged segments that run clockwise around the edge. - **isActive** shows the ring and sets `aria-busy` on the wrapper. Off, the children render inside the wrapper with no ring at all. - **radius** names the radius token the ring follows; match the content it wraps. Defaults to `radius-xxl`. The segments turn slowly while active. The ring is decorative and hidden from assistive technology; `aria-busy` is what says content is changing. Under reduced motion the same segments hold still. Use it only while generating, one ring per piece of content. Do not nest two.",
       "props": [
         {
@@ -6764,12 +7411,15 @@
           "deprecated": null
         },
         {
-          "name": "compact",
-          "type": "bool",
+          "name": "spacing",
+          "type": "enum",
           "required": false,
-          "default": "false",
-          "values": null,
-          "description": "The 24 height, with the compact buttons.",
+          "default": "'default'",
+          "values": [
+            "default",
+            "compact"
+          ],
+          "description": "Field and button height: `default` (40) or `compact` (32).",
           "deprecated": null
         },
         {
@@ -6996,12 +7646,15 @@
           "deprecated": null
         },
         {
-          "name": "compact",
-          "type": "bool",
+          "name": "spacing",
+          "type": "oneOf",
           "required": false,
-          "default": "false",
-          "values": null,
-          "description": null,
+          "default": "'default'",
+          "values": [
+            "default",
+            "compact"
+          ],
+          "description": "Field and button height: `default` (40) or `compact` (32).",
           "deprecated": null
         },
         {
@@ -7630,31 +8283,35 @@
         "ClearSpace"
       ],
       "tokens": [
-        "--ds-text",
-        "--palette-dark-neutral-0",
-        "--palette-dark-neutral-1000",
-        "--palette-lagoon-400",
-        "--palette-lagoon-500",
-        "--palette-lagoon-700",
-        "--palette-lagoon-900",
-        "--palette-neutral-0",
-        "--palette-neutral-1000",
-        "--palette-red-200",
-        "--palette-red-300",
-        "--palette-teal-200",
-        "--palette-teal-300",
-        "--palette-yellow-250",
-        "--palette-yellow-300",
-        "--palette-yellow-400"
+        "--ds-logo-glow-dark-0",
+        "--ds-logo-glow-dark-1",
+        "--ds-logo-glow-dark-2",
+        "--ds-logo-glow-dark-3",
+        "--ds-logo-glow-dark-4",
+        "--ds-logo-glow-light-0",
+        "--ds-logo-glow-light-1",
+        "--ds-logo-glow-light-2",
+        "--ds-logo-glow-light-3",
+        "--ds-logo-glow-light-4",
+        "--ds-logo-ground",
+        "--ds-logo-mark",
+        "--ds-logo-mark-reversed",
+        "--ds-logo-plus",
+        "--ds-logo-tile",
+        "--ds-logo-tile-dark",
+        "--ds-logo-wordmark",
+        "--ds-logo-wordmark-reversed",
+        "--ds-logo-wordmark-stroke",
+        "--ds-text"
       ]
     },
     {
       "name": "Modal",
-      "kind": "component",
-      "import": "import { Modal } from '@/components';",
-      "group": "messaging",
-      "source": "design-system/src/components/messaging/Modal/Modal.jsx",
-      "summary": "Universal modal component for creating dialog windows that overlay the main content. It is a real dialog on Base UI's `Dialog`, placed in `Blanket`: opening it moves focus inside and keeps it there, the page behind is hidden from assistive tech and stops scrolling, Escape and a press on the blanket close it, and closing returns focus to what had it. It takes a stack slot from the shared overlay module (`@/lib/overlay`): a second Modal stays closed and calls `onClose`. A follow-up about the dialog itself — \"discard these edits?\" — is best shown in place: the caller swaps `title`, `body` and the footer buttons, driven by its own state. A Modal never opens on another Modal.",
+      "kind": "pattern",
+      "import": "import { Modal } from '@/patterns';",
+      "group": "patterns",
+      "source": "design-system/src/patterns/Modal/Modal.jsx",
+      "summary": "`@base-ui/react` Dialog (portal, focus trap, Escape, scroll lock, and the blanket-press rule). One Modal is open at a time (`useOverlaySlot`). `inline` renders the Blanket + Dialog in flow for docs previews and static stages without a portal, focus trap, Escape handling or scroll lock.",
       "props": [
         {
           "name": "id",
@@ -7667,7 +8324,7 @@
         },
         {
           "name": "title",
-          "type": "string",
+          "type": "node",
           "required": false,
           "default": null,
           "values": null,
@@ -7689,7 +8346,70 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "The dialog's accessible name when it has no visible `title`.",
+          "description": "The dialog's accessible name when it has no visible `title` or uses a custom `header`.",
+          "deprecated": null
+        },
+        {
+          "name": "header",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Custom header slot replacing the title row (title and close button), so the caller owns both and names the dialog with `ariaLabel`.",
+          "deprecated": null
+        },
+        {
+          "name": "headerActions",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Icon buttons in the header, before the close button.",
+          "deprecated": null
+        },
+        {
+          "name": "showCloseButton",
+          "type": "bool",
+          "required": false,
+          "default": "true",
+          "values": null,
+          "description": "The header's close button. Off for a dialog that has to be answered.",
+          "deprecated": null
+        },
+        {
+          "name": "tabs",
+          "type": "arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Tab group under the title (`{ key, label, content, disabled? }`). The body becomes the tab panel and shows the selected tab's `content`.",
+          "deprecated": null
+        },
+        {
+          "name": "activeTab",
+          "type": "string or number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Selected tab's key when controlled; update from `onTabChange`.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultActiveTab",
+          "type": "string or number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Initial tab key when uncontrolled; defaults to the first enabled tab.",
+          "deprecated": null
+        },
+        {
+          "name": "onTabChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with the key of the selected tab.",
           "deprecated": null
         },
         {
@@ -7710,7 +8430,7 @@
             "hug",
             "fill"
           ],
-          "description": "`hug` grows with the content to the screen less 128 and then scrolls its body; `fill` sits at that cap.",
+          "description": "`hug` grows with the content to the cap and then scrolls its body; `fill` sits at that cap.",
           "deprecated": null
         },
         {
@@ -7723,30 +8443,30 @@
           "deprecated": null
         },
         {
-          "name": "showCloseButton",
-          "type": "bool",
-          "required": false,
-          "default": "true",
-          "values": null,
-          "description": "The header's close button. Off for a dialog that has to be answered.",
-          "deprecated": null
-        },
-        {
-          "name": "headerActions",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Icon buttons in the header, before the close button.",
-          "deprecated": null
-        },
-        {
           "name": "footer",
           "type": "node",
           "required": false,
           "default": null,
           "values": null,
           "description": "Custom footer content in place of the built-in pair, such as a three-button or leading-text FooterActions layout.",
+          "deprecated": null
+        },
+        {
+          "name": "primaryButton",
+          "type": "buttonShape",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The confirming footer button, drawn on the right. Takes `text` (default \"Confirm\"), `onClick`, `appearance` (default `primary`), `spacing` and `icon`.",
+          "deprecated": null
+        },
+        {
+          "name": "secondaryButton",
+          "type": "buttonShape",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The secondary footer button, drawn in the left half when a primary button is also given. Takes `text` (default \"Discard\"), `onClick`, `appearance` (default `default`), `spacing` and `icon`.",
           "deprecated": null
         },
         {
@@ -7773,7 +8493,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Whether the dialog is open. Controlled by the parent: set it to false in `onClose` to close.",
+          "description": "Whether the modal is open. Controlled by the parent: set it to false in `onClose` to close.",
           "deprecated": null
         },
         {
@@ -7784,7 +8504,7 @@
           "values": [
             "static"
           ],
-          "description": "`true` (default): a click on the blanket closes. `static`: the blanket shows but refuses to close on a click. `false`: no close on a click.",
+          "description": "`true` (default): a press on the Blanket closes. `static` or `false`: the Blanket shows but refuses to close on a press.",
           "deprecated": null
         },
         {
@@ -7793,37 +8513,34 @@
           "required": false,
           "default": "true",
           "values": null,
-          "description": "Escape closes, by default. `false` for a dialog that has to be answered.",
+          "description": "Escape closes by default. `false` for a dialog that has to be answered.",
           "deprecated": null
         },
         {
-          "name": "renderAs",
-          "type": "enum",
+          "name": "inline",
+          "type": "bool",
           "required": false,
-          "default": "'modal'",
-          "values": [
-            "modal",
-            "inline"
-          ],
-          "description": "`modal` (default) opens as a real dialog over the page; `inline` draws the same panel in place as a plain block, for docs previews.",
+          "default": "false",
+          "values": null,
+          "description": "Renders Blanket and Dialog inline in flow for docs previews and mockups, without portal, focus trap, Escape or scroll lock.",
           "deprecated": null
         },
         {
-          "name": "primaryButton",
-          "type": "buttonShape",
+          "name": "screenWidth",
+          "type": "number or string",
           "required": false,
           "default": null,
           "values": null,
-          "description": "The confirming footer button, drawn on the right. Takes `text` (default \"Confirm\"), `onClick`, `appearance` (default `primary`), `spacing` and `icon`.",
+          "description": "Stand-in screen width when `inline` is true.",
           "deprecated": null
         },
         {
-          "name": "secondaryButton",
-          "type": "buttonShape",
+          "name": "screenHeight",
+          "type": "number or string",
           "required": false,
           "default": null,
           "values": null,
-          "description": "The secondary footer button, drawn in the left half when a primary button is also given. Takes `text` (default \"Discard\"), `onClick`, `appearance` (default `default`), `spacing` and `icon`.",
+          "description": "Stand-in screen height when `inline` is true.",
           "deprecated": null
         },
         {
@@ -7832,7 +8549,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Called when the dialog asks to close: the close button, Escape (unless `keyboard` is false) or a press on the blanket (unless `blanket` blocks it). The parent sets `show` to false.",
+          "description": "Called when the modal asks to close: Close button, Escape (unless `keyboard` is false) or a press on the Blanket (unless `blanket` blocks it).",
           "deprecated": null
         },
         {
@@ -7841,7 +8558,7 @@
           "required": false,
           "default": "'6-col'",
           "values": null,
-          "description": "`4-col` · `6-col` · `8-col` · `10-col`: 4 · 6 · 8 · 10 columns of the screen grid plus the modal pad. Grows with the screen, never shrinks, ignores the sidebar. A number or a length is a fixed width, kept for the callers that still pass one.",
+          "description": "`4-col` · `6-col` · `8-col` · `10-col`: 4 · 6 · 8 · 10 columns of the screen grid plus the modal pad.",
           "deprecated": null
         },
         {
@@ -7850,7 +8567,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": "Extra class names added to the dialog panel beside the component's own.",
+          "description": "Extra class names added to the dialog panel.",
           "deprecated": null
         },
         {
@@ -7859,7 +8576,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Inline styles for the dialog panel. A fixed `width` is applied after them.",
+          "description": "Inline styles for the dialog panel.",
           "deprecated": null
         },
         {
@@ -7868,56 +8585,79 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "More content rendered in the body after `body`, for composing the dialog contents directly.",
+          "description": "More content rendered in the body after `body`.",
           "deprecated": null
         }
       ],
       "stories": [
+        "Overview",
+        "Widths",
+        "Heights",
+        "Tabs",
+        "BodyMinHeight",
+        "CustomHeader",
+        "Divider",
+        "Loading",
         "Width4Col",
         "Width6Col",
         "Width8Col",
         "Width10Col",
-        "HeightHug",
+        "HugLong",
         "HeightFill",
-        "HeaderOptions",
-        "WithoutCloseButton",
-        "Loading",
-        "Content",
-        "Layout",
+        "TabsStill",
         "Interactive",
-        "Overview",
-        "ConfirmView",
-        "ConfirmViewEscape",
-        "ModalOverModalRefused",
+        "LiveBehavior",
+        "StaticBlanketRefusesToClose",
         "BlockingShadow",
         "SelectKeepsOverlayShadow",
-        "Rest",
-        "Hovered",
-        "Pressed",
-        "Focused",
-        "FooterLayouts",
-        "SizeToContent",
-        "MotionOpenAndClose",
-        "MotionReduced"
+        "TypePassive",
+        "TypeActive",
+        "TypeAcknowledge",
+        "TypeSteps",
+        "AnatomyActive",
+        "WidthStrip",
+        "ResponsiveWidth",
+        "TierActive",
+        "TierDanger",
+        "TierTypeName",
+        "FooterOne",
+        "FooterTwo",
+        "FooterThree",
+        "FooterTextLeft",
+        "FooterDestructive",
+        "FooterNarrow",
+        "KeyLongContent",
+        "KeyLoading",
+        "KeyConfirmInside",
+        "StackConfirmOverPanel",
+        "StackModalOnModalRefused",
+        "BlanketInline",
+        "BlanketPads",
+        "BlanketScreenGrid",
+        "BlanketInteractive",
+        "BlanketLayers",
+        "BlanketConfirmOverPanel",
+        "MotionOpenClose",
+        "MotionReduced",
+        "BlanketMotionOpenClose",
+        "BlanketMotionReduced"
       ],
       "tokens": [
-        "--blanket-max-height-modal",
-        "--body-default",
-        "--ds-border",
-        "--ds-shadow-blocking",
-        "--ds-surface-overlay",
-        "--ds-text",
-        "--ds-text-subtle",
-        "--heading-md",
-        "--inline-sm",
+        "--blanket-pad-x",
+        "--blanket-pad-y",
+        "--ds-blanket",
+        "--layer-blanket",
+        "--layer-modal",
+        "--modal-body-min-height",
         "--modal-inline-sm",
         "--modal-pad-x-default",
         "--modal-radius",
+        "--modal-shadow",
         "--modal-stack-md",
+        "--modal-stack-sm",
         "--plus-overlay-origin",
-        "--stack-md",
-        "--stack-sm",
-        "--stroke-1",
+        "--plus-overlay-screen",
+        "--plus-overlay-screen-height",
         "--transform-origin"
       ]
     },
@@ -8149,7 +8889,7 @@
       "import": "import { Page } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/Page/Page.jsx",
-      "summary": "Bare tokenized content box: pick an elevation level, padding scale, radius scale and border — children fill the content slot. The level sets the fill and its shadow together: sunken (the frame's blanket), default (the page, edged by the surface border), raised (a card) and overlay (anything over the UI). A Page can carry its `title`: the page's one h1, at Heading/large 24, above the content. Sections inside it open at h2.",
+      "summary": "The Page surface: paints `--ds-surface` edge to edge with `--page-pad` (24) on every side and no radius, border, or shadow; children fill the content slot. A Page can carry its `title`: the page's one h1, at Heading/large 24, above the content. Sections inside it open at h2.",
       "props": [
         {
           "name": "id",
@@ -8158,57 +8898,6 @@
           "default": null,
           "values": null,
           "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "level",
-          "type": "enum",
-          "required": false,
-          "default": "'default'",
-          "values": [
-            "sunken",
-            "default",
-            "raised",
-            "overlay"
-          ],
-          "description": "Elevation level: its fill and its shadow, as a pair",
-          "deprecated": null
-        },
-        {
-          "name": "padding",
-          "type": "enum",
-          "required": false,
-          "default": "'md'",
-          "values": [
-            "none",
-            "sm",
-            "md",
-            "lg"
-          ],
-          "description": "Padding scale (md is the frame's own pad)",
-          "deprecated": null
-        },
-        {
-          "name": "radius",
-          "type": "enum",
-          "required": false,
-          "default": "'none'",
-          "values": [
-            "none",
-            "sm",
-            "md",
-            "lg"
-          ],
-          "description": "Radius scale",
-          "deprecated": null
-        },
-        {
-          "name": "border",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "A bold border on/off",
           "deprecated": null
         },
         {
@@ -8277,15 +8966,6 @@
       ],
       "stories": [
         "Overview",
-        "Sunken",
-        "DefaultLevel",
-        "Raised",
-        "Overlay",
-        "StepNone",
-        "StepSmall",
-        "StepMedium",
-        "StepLarge",
-        "Bordered",
         "WithTitle",
         "HeaderAndBanner",
         "OptionalSlots",
@@ -8307,26 +8987,12 @@
         "MotionScrollToSpotReduced"
       ],
       "tokens": [
-        "--ds-border-bold",
-        "--ds-shadow-overlay",
-        "--ds-shadow-raised",
         "--ds-surface",
-        "--ds-surface-overlay",
-        "--ds-surface-raised",
-        "--ds-surface-sunken",
         "--ds-text",
         "--heading-lg",
         "--heading-lg-tracking",
-        "--page-border-width",
         "--page-pad",
-        "--page-pad-x-compact",
-        "--page-pad-x-spacious",
-        "--page-pad-y-compact",
-        "--page-pad-y-spacious",
-        "--page-stack-md",
-        "--radius-lg",
-        "--radius-xl",
-        "--radius-xxl"
+        "--page-stack-md"
       ]
     },
     {
@@ -8432,9 +9098,9 @@
       ],
       "tokens": [
         "--body-sm",
-        "--space-075",
-        "--space-100",
-        "--space-150"
+        "--inline-lg",
+        "--page-header-gap",
+        "--page-header-stack"
       ]
     },
     {
@@ -8724,10 +9390,12 @@
         "--ds-border",
         "--ds-surface-overlay",
         "--ds-text-subtle",
-        "--space-025",
-        "--space-075",
-        "--space-100",
-        "--space-150"
+        "--panel-inline-lg",
+        "--panel-inline-md",
+        "--panel-inline-sm",
+        "--panel-pad",
+        "--panel-pad-y",
+        "--panel-subheader-pad-y"
       ]
     },
     {
@@ -8736,7 +9404,7 @@
       "import": "import { PatternCard } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/PatternCard/PatternCard.jsx",
-      "summary": "PLUS card: an optional image, content and footer on the raised surface and shadow. - **Image placement**: `top` (default), `start` or `end`. Side images apply at the large card minimum width and fill the height. `imageSplit` chooses one third (default) or one half; half uses Heading md on a side card. Below the large minimum width, the image returns to the top with its own ratio. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: `padding` sets Card/pad-compact · default · spacious (via prop values `'sm'`, `'md'`, `'lg'`), the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: the raised pair at rest. A card with an `onClick` lifts on hover to the raised surface's hovered step under the overlay shadow, and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.",
+      "summary": "PLUS card: an optional image, content and footer on a `sunken`, `default`, or `raised` surface. - **Surface**: `sunken` (default, flat), `default` (page surface with a 1px border, flat), or `raised` (raised surface and shadow). Every card carries a 1px border (transparent on sunken and raised) so forced colors draw its edge. - **Image placement**: `top` (default), `start` or `end`. Side images apply at the large card minimum width and fill the height. `imageSplit` chooses one third (default) or one half; half uses Heading md on a side card. Below the large minimum width, the image returns to the top with its own ratio. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: padding uses `--card-pad` and radius uses `--card-radius` at every size, the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: a clickable `sunken` or `default` card lifts to Raised on hover in place and settles to the raised shadow while pressed; a clickable `raised` card lifts to the raised hovered step under the overlay shadow and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.",
       "props": [
         {
           "name": "id",
@@ -8827,16 +9495,16 @@
           "deprecated": null
         },
         {
-          "name": "padding",
+          "name": "surface",
           "type": "enum",
           "required": false,
-          "default": "'md'",
+          "default": "'sunken'",
           "values": [
-            "sm",
-            "md",
-            "lg"
+            "sunken",
+            "default",
+            "raised"
           ],
-          "description": "Padding scale: Card/pad-compact · default · spacious (16 · 20 · 24)",
+          "description": "Surface level: sunken (default, flat), default (page fill with a 1px border, flat), or raised (raised fill and shadow)",
           "deprecated": null
         },
         {
@@ -8946,265 +9614,41 @@
         "BodyOnly",
         "WithFooter",
         "CustomHeader",
+        "SurfaceSunken",
+        "SurfaceDefault",
+        "SurfaceRaised",
         "Static",
         "Clickable",
         "Dragging",
+        "ForcedColors",
         "LoadingCard",
         "Rows",
         "PlacementBoundary"
       ],
       "tokens": [
-        "--body-default",
+        "--card-border-default",
+        "--card-border-width",
+        "--card-description-font",
         "--card-inline-md",
-        "--card-pad-compact",
-        "--card-pad-default",
-        "--card-pad-spacious",
+        "--card-pad",
         "--card-radius",
-        "--card-radius-compact",
+        "--card-shadow-overlay",
+        "--card-shadow-raised",
         "--card-stack-lg",
         "--card-stack-md",
         "--card-stack-sm",
+        "--card-surface-default",
+        "--card-surface-overlay",
+        "--card-surface-raised",
+        "--card-surface-raised-hovered",
+        "--card-surface-raised-pressed",
+        "--card-surface-sunken",
+        "--card-text",
+        "--card-text-subtle",
+        "--card-title-font-lg",
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
-        "--ds-shadow-overlay",
-        "--ds-shadow-raised",
-        "--ds-surface-overlay",
-        "--ds-surface-raised",
-        "--ds-surface-raised-hovered",
-        "--ds-surface-raised-pressed",
-        "--ds-text",
-        "--ds-text-subtle",
-        "--ds-utility-elevation-surface-current",
-        "--heading-md"
-      ]
-    },
-    {
-      "name": "PatternModal",
-      "kind": "pattern",
-      "import": "import { PatternModal } from '@/patterns';",
-      "group": "patterns",
-      "source": "design-system/src/patterns/PatternModal/PatternModal.jsx",
-      "summary": "Modal pattern for PLUS design system. Modal shell rendered inline (no portal, focus trap or Escape): header with title and close button, body slot, footer slot. Width is a step of the screen grid (xs · sm · md · lg: 4 · 6 · 8 · 10 columns plus the modal pad), and height hugs the content up to the screen less 128 or fills to it, the body scrolling past it. Place it in `Blanket`. Baked-in tokens: the overlay pair (`--ds-surface-overlay` with `--ds-shadow-overlay`), as the Modal component draws it, and Modal/pad, Modal/stack-md and Modal/radius. Mirrors \"Pattern/Modal\" in the Figma design system file. For a real overlay dialog (blanket, focus trap), use the core Modal component. A dialog is its own page: the title is its h1, at Heading/medium 20, and a section inside it opens at h2. `tabs` puts a tab group under the title, as Figma's `_Modal header` type=tabs: `Tabs` in the header, so it stays put while only the body scrolls. The body becomes the tab panel, named by the selected tab, and shows that tab's content in place of `children`. `header` is Figma's `_Modal header` type=custom: a slot that takes the place of the title row (the title and the close button), so the caller owns both and names the dialog with `aria-label` or `aria-labelledby`. `divider` draws a rule under the header and above the footer, as Figma's `divider?`. `loading` swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. The body never draws shorter than Modal/body-min-height 96.",
-      "props": [
-        {
-          "name": "show",
-          "type": "bool",
-          "required": false,
-          "default": "true",
-          "values": null,
-          "description": "Keep mounted and set false to finish the exit before removal; also follows its Blanket.",
-          "deprecated": null
-        },
-        {
-          "name": "id",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "title",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Modal title in the header row: the dialog's h1, at Heading/medium 20, and its name",
-          "deprecated": null
-        },
-        {
-          "name": "header",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Custom header slot, Figma's `_Modal header` type=custom. It replaces the title row (the title and the close button), so name the dialog with `aria-label`.",
-          "deprecated": null
-        },
-        {
-          "name": "divider",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "A rule under the header and above the footer, as Figma's `divider?`. Off by default.",
-          "deprecated": null
-        },
-        {
-          "name": "loading",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. Off by default.",
-          "deprecated": null
-        },
-        {
-          "name": "onClose",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Close handler — renders the close button when provided",
-          "deprecated": null
-        },
-        {
-          "name": "footer",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Footer slot (typically action buttons)",
-          "deprecated": null
-        },
-        {
-          "name": "width",
-          "type": "oneOf",
-          "required": false,
-          "default": "'sm'",
-          "values": [
-            "xs",
-            "sm",
-            "md",
-            "lg"
-          ],
-          "description": "`xs` · `sm` · `md` · `lg`: 4 · 6 · 8 · 10 columns of the screen grid plus the modal pad (261 · 384 · 507 · 629 at 768, 347 · 512 · 677 · 843 at 1024, 432 · 640 · 848 · 1056 at 1440). Grows with the screen, never shrinks, ignores the sidebar.",
-          "deprecated": null
-        },
-        {
-          "name": "height",
-          "type": "oneOf",
-          "required": false,
-          "default": "'hug'",
-          "values": [
-            "hug",
-            "fill"
-          ],
-          "description": "`hug` grows with the content to the screen less 128 and then scrolls its body; `fill` sits at that cap.",
-          "deprecated": null
-        },
-        {
-          "name": "tabs",
-          "type": "arrayOf",
-          "required": true,
-          "default": null,
-          "values": null,
-          "description": "A tab group under the title: `{ key, label, content, disabled? }` per tab. The tabs stay put in the header and the body, now the tab panel, shows the selected tab's content in place of `children`. Arrow keys move between tabs, Home and End jump to the ends.",
-          "deprecated": null
-        },
-        {
-          "name": "activeTab",
-          "type": "string or number",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "The selected tab's key, when the caller holds it; move it from `onTabChange`.",
-          "deprecated": null
-        },
-        {
-          "name": "defaultActiveTab",
-          "type": "string or number",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "The tab to start on when the modal holds the selection; the first enabled tab by default.",
-          "deprecated": null
-        },
-        {
-          "name": "onTabChange",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Called with the key of the tab a person selects.",
-          "deprecated": null
-        },
-        {
-          "name": "className",
-          "type": "string",
-          "required": false,
-          "default": "''",
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "style",
-          "type": "object",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "children",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Body content slot; with `tabs`, the selected tab's `content` takes its place",
-          "deprecated": null
-        }
-      ],
-      "stories": [
-        "Overview",
-        "Widths",
-        "Heights",
-        "Tabs",
-        "BodyMinHeight",
-        "CustomHeader",
-        "Divider",
-        "Loading",
-        "WidthXSmall",
-        "WidthSmall",
-        "WidthMedium",
-        "WidthLarge",
-        "HugLong",
-        "HeightFill",
-        "TabsStill",
-        "Interactive",
-        "TypePassive",
-        "TypeActive",
-        "TypeAcknowledge",
-        "TypeSteps",
-        "AnatomyActive",
-        "WidthStrip",
-        "ResponsiveWidth",
-        "TierActive",
-        "TierDanger",
-        "TierTypeName",
-        "FooterOne",
-        "FooterTwo",
-        "FooterThree",
-        "FooterTextLeft",
-        "FooterDestructive",
-        "FooterNarrow",
-        "KeyLongContent",
-        "KeyLoading",
-        "KeyConfirmInside",
-        "StackConfirmOverPanel",
-        "StackModalOnModalRefused",
-        "MotionOpenClose",
-        "MotionReduced"
-      ],
-      "tokens": [
-        "--border-width-default",
-        "--ds-border",
-        "--ds-shadow-overlay",
-        "--ds-surface-overlay",
-        "--ds-text",
-        "--heading-md",
-        "--modal-body-min-height",
-        "--modal-pad-x-default",
-        "--modal-radius",
-        "--modal-stack-md",
-        "--modal-stack-sm",
-        "--plus-overlay-origin",
-        "--stack-lg",
-        "--stack-md",
-        "--transform-origin"
+        "--ds-utility-elevation-surface-current"
       ]
     },
     {
@@ -9291,6 +9735,78 @@
             "tabs-only"
           ],
           "description": "Header type. Read from the slots when left off; pass `tabs-only` to show only the tabs row",
+          "deprecated": null
+        },
+        {
+          "name": "views",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Row 2, at the start: the views, usually Tabs in the pill appearance. It scrolls sideways when it does not fit.",
+          "deprecated": null
+        },
+        {
+          "name": "format",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Row 2, at the end: the format switch (Table / Cards). With no `views` it moves to the end of row 3.",
+          "deprecated": null
+        },
+        {
+          "name": "search",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Row 3, at the start: the Search field at compact spacing, which draws 32.",
+          "deprecated": null
+        },
+        {
+          "name": "filters",
+          "type": "arrayOf",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "Row 3, after Search: one `{ key, label, text, isSelected, onClick, menu }` per trigger, drawn as a FilterButton that reads \"label: text\". `menu` is `(trigger) => node`: hand the trigger to a Popup select or a Filter menu, so the same button opens the list and keeps its selected state. Three show; the rest go in \"More filters\" with a count. Under 768 they fold into one Filter button. When they do not fit beside Search they wrap to their own row, end-aligned.",
+          "deprecated": null
+        },
+        {
+          "name": "count",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Row 3, at the end once a filter is applied: how many rows match, such as \"3 of 12\".",
+          "deprecated": null
+        },
+        {
+          "name": "onClearAll",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Runs when \"Clear all\" is pressed. The button shows once a filter is applied.",
+          "deprecated": null
+        },
+        {
+          "name": "onMoreFilters",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Runs when \"More filters\" is pressed.",
+          "deprecated": null
+        },
+        {
+          "name": "onOpenFilters",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Runs when the Filter button of a narrow Section is pressed.",
           "deprecated": null
         },
         {
@@ -9426,28 +9942,16 @@
           "deprecated": null
         },
         {
-          "name": "gap",
+          "name": "spacing",
           "type": "enum",
           "required": false,
-          "default": "'md'",
+          "default": "'default'",
           "values": [
-            "sm",
-            "md",
-            "lg"
+            "default",
+            "compact",
+            "spacious"
           ],
-          "description": "Gap between the header, the body and the footer (Section/stack tokens); `md` is the Figma value",
-          "deprecated": null
-        },
-        {
-          "name": "fill",
-          "type": "enum",
-          "required": false,
-          "default": "'none'",
-          "values": [
-            "none",
-            "subtle"
-          ],
-          "description": "`subtle` sets the section on the sunken surface with a pad and a radius; `none` (default) draws nothing",
+          "description": "Space between the header, the body and the footer (Section/stack tokens); `default` is the Figma value",
           "deprecated": null
         },
         {
@@ -9490,15 +9994,14 @@
       "stories": [
         "Overview",
         "HeaderDefault",
-        "HeaderTabs",
-        "HeaderToolbar",
         "HeaderCustom",
-        "HeaderTabsOnly",
         "LayoutSingle",
         "LayoutSplit",
         "LayoutSubsections",
-        "FillSubtle",
+        "SunkenCard",
+        "DetailIsSunkenCard",
         "CardNesting",
+        "NoSurfaceNoPad",
         "Footer",
         "Anatomy",
         "Levels",
@@ -9519,33 +10022,31 @@
         "TypeMainAndSide",
         "TypeForm",
         "TypeSubsections",
-        "HeaderTypeTitle",
-        "HeaderTypeTitleAndActions",
-        "HeaderTypeViewBarOneView",
-        "HeaderTypeViewBarSeveralViews",
-        "HeaderTypeFormatSwitch",
-        "HeaderTypeViewBarAlone",
-        "HeaderTypeUnderPageTabs",
-        "HeaderTypeSubsection",
+        "Full",
+        "FiltersApplied",
+        "NoViews",
+        "ViewsOnly",
+        "ManyFilters",
+        "WrappedFilters",
+        "RowsSelected",
+        "Narrow",
+        "Subsection",
         "SideAtEnd",
         "FilterSideAtStart",
         "ResponsiveWidth",
-        "RowsSelected",
         "EmptyInTable",
         "AnatomyQueue"
       ],
       "tokens": [
         "--body-default",
         "--body-sm",
+        "--card-stack-md",
         "--control-md",
-        "--ds-background-neutral-subtle-hovered",
-        "--ds-background-neutral-subtle-pressed",
         "--ds-icon-subtle",
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
         "--ds-motion-spatial-fast",
         "--ds-motion-spatial-fast-duration",
-        "--ds-surface-sunken",
         "--ds-text",
         "--ds-text-subtle",
         "--grid-gutter",
@@ -9559,15 +10060,12 @@
         "--inline-sm",
         "--section-min-width-main",
         "--section-min-width-side",
-        "--section-pad-x-default",
-        "--section-pad-y-default",
-        "--section-radius",
         "--section-stack-lg",
         "--section-stack-md",
         "--section-stack-sm",
-        "--size-300",
-        "--stack-sm",
-        "--width-3000"
+        "--section-toolbar-count-min-width",
+        "--section-toolbar-min-width",
+        "--stack-sm"
       ],
       "subComponents": [
         {
@@ -9611,164 +10109,6 @@
             }
           ]
         }
-      ]
-    },
-    {
-      "name": "PatternTable",
-      "kind": "pattern",
-      "import": "import { PatternTable } from '@/patterns';",
-      "group": "patterns",
-      "source": "design-system/src/patterns/PatternTable/PatternTable.jsx",
-      "summary": "Table pattern for PLUS design system. Table shell: table children (consumers pass their own thead/tbody), a footer slot under the rows, and an empty-state slot. The table has no toolbar of its own: the Section header above it carries the title, search, filters and actions. With `empty`, the empty state replaces the whole table (no column headers, no caption, no footer). The table itself is no-fill (transparent): the surrounding card or surface provides the background, and row states are layered over each cell's fill rather than replacing it. - **Row states**: hovered and pressed rows take the neutral subtle steps; a row with `aria-selected=\"true\"` (in a `role=\"grid\"` table) takes the selected ladder across the whole row, with no stripe on its leading edge; the row's checkbox is the cue that does not rest on color. - **Sticky cells**: `stickyHeader` pins the head row and `stickyColumn` the first column. They paint the current surface, so they match the page or the card they sit in, and take the overflow shadow only while content is scrolled under them. `stickyHeader` pairs with `maxHeight`: only a bounded region scrolls vertically, so without `maxHeight` the header is not pinned. A bounded region, or one with a sticky column, takes keyboard focus so it can be scrolled without a pointer. Mirrors the \"Table\" slot component in the Figma design system file.",
-      "props": [
-        {
-          "name": "id",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "footer",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Footer slot under the rows (range, page-size Select, Pagination); hidden while the empty state shows",
-          "deprecated": null
-        },
-        {
-          "name": "emptyState",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Empty-state slot: replaces the entire table (no head row, caption, or footer) when `empty` is true",
-          "deprecated": null
-        },
-        {
-          "name": "empty",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Replace the table with the `emptyState` slot; with `empty` and no `emptyState`, the table renders normally",
-          "deprecated": null
-        },
-        {
-          "name": "stickyHeader",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Pin the head row while the rows scroll under it; needs `maxHeight`, since only a bounded region scrolls vertically",
-          "deprecated": null
-        },
-        {
-          "name": "stickyColumn",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Pin the first column while the other columns scroll under it",
-          "deprecated": null
-        },
-        {
-          "name": "maxHeight",
-          "type": "number or string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Bound the scroll region's height (number of px or any CSS length); a sticky header pins only within it",
-          "deprecated": null
-        },
-        {
-          "name": "tableProps",
-          "type": "object",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Props for the `table` element itself: an accessible name, a class a wrapper styles it by",
-          "deprecated": null
-        },
-        {
-          "name": "className",
-          "type": "string",
-          "required": false,
-          "default": "''",
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "style",
-          "type": "object",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "children",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Table content slot — pass thead/tbody elements",
-          "deprecated": null
-        }
-      ],
-      "stories": [
-        "Overview",
-        "EmptyState",
-        "EmptyWithStickyColumn",
-        "Interactive",
-        "RowStates",
-        "Sticky",
-        "StickyHeaderNeedsMaxHeight",
-        "StickyHeader",
-        "StickyColumn",
-        "MotionAddRow",
-        "MotionAddRowReduced",
-        "MotionRemoveRow",
-        "MotionRemoveRowReduced",
-        "MotionReorderRows",
-        "MotionReorderRowsReduced"
-      ],
-      "tokens": [
-        "--body-default",
-        "--border-width-default",
-        "--ds-background-neutral-subtle-hovered",
-        "--ds-background-neutral-subtle-pressed",
-        "--ds-background-selected",
-        "--ds-background-selected-hovered",
-        "--ds-background-selected-pressed",
-        "--ds-border",
-        "--ds-border-bold",
-        "--ds-border-focused",
-        "--ds-shadow-overflow",
-        "--ds-text",
-        "--ds-text-subtle",
-        "--ds-utility-elevation-surface-current",
-        "--focus-ring-width",
-        "--heading-xxs",
-        "--layer-card",
-        "--pattern-table-overflow-reach",
-        "--pattern-table-z-corner",
-        "--pattern-table-z-sticky",
-        "--plus-pattern-table-row-state",
-        "--row-height-md",
-        "--section-stack-md",
-        "--space-0625",
-        "--stack-md",
-        "--stack-sm",
-        "--table-footer-height",
-        "--table-overflow-reach",
-        "--table-pad-x-cell",
-        "--table-pad-y-cell"
       ]
     },
     {
@@ -10333,11 +10673,11 @@
           "name": "spacing",
           "type": "enum",
           "required": false,
-          "default": "'comfortable'",
+          "default": "'spacious'",
           "values": [
-            "comfortable",
-            "cozy",
-            "compact"
+            "default",
+            "compact",
+            "spacious"
           ],
           "description": null,
           "deprecated": null
@@ -10551,11 +10891,11 @@
           "name": "spacing",
           "type": "enum",
           "required": false,
-          "default": "'cozy'",
+          "default": "'default'",
           "values": [
-            "comfortable",
-            "cozy",
-            "compact"
+            "default",
+            "compact",
+            "spacious"
           ],
           "description": null,
           "deprecated": null
@@ -10618,14 +10958,13 @@
         "--icon-sm",
         "--inline-sm",
         "--pad-x-md",
+        "--progress-tracker-connector-width",
+        "--progress-tracker-dot-size",
         "--radius-control-md",
         "--radius-full",
-        "--space-050",
-        "--space-150",
         "--stack-lg",
         "--stack-md",
         "--stack-sm",
-        "--stroke-1",
         "--type-weight-medium"
       ]
     },
@@ -10633,8 +10972,8 @@
       "name": "PromptInput",
       "kind": "component",
       "import": "import { PromptInput } from '@/components';",
-      "group": "forms-and-inputs",
-      "source": "design-system/src/components/forms-and-inputs/PromptInput/PromptInput.jsx",
+      "group": "ai",
+      "source": "design-system/src/components/ai/PromptInput/PromptInput.jsx",
       "summary": "Where a person writes to the AI: a text area that grows from one line up to five, then scrolls, with an optional control before the text and one send action after it. - **value / defaultValue / onChange** control or seed the text. Uncontrolled, the field clears itself after a send; controlled, the owner clears it in `onSubmit`. - **onSubmit(value)** runs on Enter or the send button, with the text as typed. Shift+Enter starts a new line. Nothing sends while the field is empty, disabled, loading, or an input method is mid-composition. - **isLoading** turns the send button into Stop (`onStop`) and rings the field in a `GenerativeBorder`. - **startSlot** is one quiet control before the text, such as an attach button. **attachments** renders a row of staged files above the text. **actions** is a slot for extra controls beside the send button. A PLUS composition of `FieldBox`, `IconButton` and `GenerativeBorder`.",
       "props": [
         {
@@ -10803,11 +11142,11 @@
       "tokens": [
         "--border-width-default",
         "--control-md",
-        "--height-250",
         "--pad-x-md",
         "--pad-x-xs",
         "--pad-y-md",
         "--plus-prompt-input-max-height",
+        "--prompt-input-min-height",
         "--stack-md",
         "--stack-sm",
         "--type-line-height-125"
@@ -10817,8 +11156,8 @@
       "name": "PromptStarters",
       "kind": "component",
       "import": "import { PromptStarters } from '@/components';",
-      "group": "labels",
-      "source": "design-system/src/components/labels/PromptStarters/PromptStarters.jsx",
+      "group": "ai",
+      "source": "design-system/src/components/ai/PromptStarters/PromptStarters.jsx",
       "summary": "A few things a person could ask the AI, as a wrapping row of prompt `Suggestion` tags. - **starters** are `{ id, label, text }`: the short `label` on the tag and the longer `text` it stands for. - **onSelect(starter)** runs when a tag is pressed, with the whole starter and nothing else. A starter suggests; it never sends on its own, so the caller decides what happens — usually putting `text` in a `PromptInput` for a person to read and send. - **label** names the group for assistive technology.",
       "props": [
         {
@@ -11109,7 +11448,7 @@
         "--body-default",
         "--border-width-default",
         "--border-width-selected",
-        "--card-pad-default",
+        "--card-pad",
         "--choice-tile-width",
         "--control-sm",
         "--ds-background-disabled",
@@ -11135,18 +11474,15 @@
         "--ds-surface",
         "--ds-surface-hovered",
         "--ds-text",
+        "--inline-md",
         "--pad-x-lg",
         "--pad-x-md",
+        "--pad-y-md",
         "--plus-choice-indent",
         "--radio-control-size",
         "--radius-control-md",
         "--radius-full",
-        "--space-025",
-        "--space-0375",
-        "--space-050",
         "--stack-sm",
-        "--stroke-1",
-        "--stroke-2",
         "--type-weight-medium"
       ]
     },
@@ -11391,7 +11727,7 @@
         "--radio-control-size",
         "--radio-control-size-10",
         "--radio-control-size-14",
-        "--space-0625",
+        "--radio-group-inline-gap",
         "--stack-md"
       ]
     },
@@ -11568,7 +11904,7 @@
         "--range-track-height-4",
         "--range-track-height-6",
         "--range-track-height-8",
-        "--space-025"
+        "--stack-sm"
       ]
     },
     {
@@ -11745,7 +12081,7 @@
         "--icon-md",
         "--plus-rating-stagger",
         "--radius-full",
-        "--space-0625",
+        "--rating-gap",
         "--stack-md",
         "--stack-sm",
         "--type-weight-regular"
@@ -12002,6 +12338,7 @@
         "--pad-y-lg",
         "--pad-y-md",
         "--radius-control-lg",
+        "--rich-text-editor-max-width",
         "--rte-content-pad-x",
         "--rte-content-pad-y",
         "--stack-md",
@@ -12577,8 +12914,8 @@
         "--body-default",
         "--border-width-default",
         "--card-inline-sm",
-        "--card-pad-compact",
-        "--card-radius-compact",
+        "--card-pad",
+        "--card-radius",
         "--control-md",
         "--ds-border",
         "--ds-text",
@@ -13065,9 +13402,9 @@
         "--focus-ring-width",
         "--icon-sm",
         "--pad-x-md",
+        "--pad-x-xs",
         "--pad-y-md",
         "--radius-md",
-        "--space-025",
         "--stack-md",
         "--stack-sm",
         "--type-size-0875"
@@ -13628,10 +13965,7 @@
             "element-radius-lg",
             "element-radius-full",
             "card-radius-sm",
-            "card-radius-md",
-            "section-radius-sm",
-            "section-radius-md",
-            "section-radius-lg"
+            "card-radius-md"
           ],
           "description": "A radius token name, such as `element-radius-md` or `card-radius-sm`. Ignored, with a warning, by presets, by `circle` (always round) and by several text `lines`, which keep the text bar's radius.",
           "deprecated": null
@@ -14003,15 +14337,188 @@
         "--ds-text",
         "--ds-text-inverse",
         "--heading-sm",
+        "--inline-lg",
         "--plus-overlay-origin",
         "--popup-radius",
         "--radius-lg",
-        "--space-075",
-        "--space-100",
-        "--space-150",
+        "--spotlight-footer-stack",
+        "--spotlight-gap",
         "--spotlight-media-height",
+        "--spotlight-pad",
+        "--spotlight-screen-pad",
         "--spotlight-width",
         "--transform-origin"
+      ]
+    },
+    {
+      "name": "StaticTable",
+      "kind": "component",
+      "import": "import { StaticTable } from '@/components';",
+      "group": "text-and-data-display",
+      "source": "design-system/src/components/text-and-data-display/StaticTable/StaticTable.jsx",
+      "summary": "The Static table: a fixed grid people read. Rows rest or are highlighted (`rowStates`); there is nothing to sort, select, page or expand, so it takes no hover and no row click. Reach for the Dynamic table when rows act or people work the data. Takes `headers` and `rows`, plus `size`, `frame`, `titleColumn`, `summary`, `verticalLines` and `striped`.",
+      "props": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The `id` of the `table` element. The wrapper takes `{id}-wrapper`.",
+          "deprecated": null
+        },
+        {
+          "name": "headers",
+          "type": "arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Column headers — a string, or { text, width, align } for control over layout; align is text, number or icon",
+          "deprecated": null
+        },
+        {
+          "name": "rows",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Row data — each row is an array of cells; a cell is a node or { content, align, emphasis, overflow, secondary, elemBefore, state, loading, colSpan, className }",
+          "deprecated": null
+        },
+        {
+          "name": "striped",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Alternate row background",
+          "deprecated": null
+        },
+        {
+          "name": "bordered",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Frame the table and draw vertical lines",
+          "deprecated": null
+        },
+        {
+          "name": "verticalLines",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Vertical hairlines between columns",
+          "deprecated": null
+        },
+        {
+          "name": "frame",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "plain",
+            "framed"
+          ],
+          "description": "Plain spans its section with no outer frame; framed draws its own edge",
+          "deprecated": null
+        },
+        {
+          "name": "size",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "32",
+            "40",
+            "48"
+          ],
+          "description": "Row height in pixels, from the Row size tokens",
+          "deprecated": null
+        },
+        {
+          "name": "titleColumn",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Index of the one column that names the record, set in semibold",
+          "deprecated": null
+        },
+        {
+          "name": "rowStates",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "One state per row: rest, highlighted, selected or disabled",
+          "deprecated": null
+        },
+        {
+          "name": "summary",
+          "type": "arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "One calculation per column, in a muted row that closes the table",
+          "deprecated": null
+        },
+        {
+          "name": "emptyState",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Shown as a message row spanning every column when there are no rows",
+          "deprecated": null
+        },
+        {
+          "name": "footer",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "A TableFooter under the rows",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra class names added to the `table` element beside the component's own.",
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline styles for the table's wrapper element.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "Striped",
+        "Bordered",
+        "Sizes",
+        "FramedAndLines",
+        "Cells",
+        "RowStates",
+        "Summary",
+        "Static",
+        "HeadCells",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "Disabled",
+        "Invalid",
+        "Interactive"
       ]
     },
     {
@@ -14182,8 +14689,8 @@
       "name": "Suggestion",
       "kind": "component",
       "import": "import { Suggestion } from '@/components';",
-      "group": "labels",
-      "source": "design-system/src/components/labels/Suggestion/Suggestion.jsx",
+      "group": "ai",
+      "source": "design-system/src/components/ai/Suggestion/Suggestion.jsx",
       "summary": "Suggestion: a tag for a value or question the system proposes, which a person accepts or leaves.",
       "props": [
         {
@@ -14309,134 +14816,41 @@
     },
     {
       "name": "Table",
-      "kind": "component",
-      "import": "import { Table } from '@/components';",
-      "group": "text-and-data-display",
-      "source": "design-system/src/components/text-and-data-display/Table/Table.jsx",
-      "summary": "Standard table component for displaying tabular data, built from the shared `_Table` parts (`TableRow`, `TableCell`, `TableMessageRow`, `TableSummaryRow`, `TableFooter`). The feel: hairline horizontal dividers, no outer frame, a quiet header over a stronger rule, single-line cells that end in an ellipsis with a tooltip, no zebra. Rows are 32, 40 or 48 tall (`size`). `StaticTable` is this table for a fixed grid people read.",
+      "kind": "pattern",
+      "import": "import { Table } from '@/patterns';",
+      "group": "patterns",
+      "source": "design-system/src/patterns/Table/Table.jsx",
+      "summary": "Section header carries the title and the toolbar. Under the header come the table, then the footer (range, page size, Pagination), and the empty state box in place of both when there are no rows. Pass the table as `children` (a `StaticTable`, `DynamicTable` or `TreeTable`), or name a `kind` and pass its props as `tableProps`. Choose the kind by what people do with the rows: nesting is a Tree table; sort, filter, select, page, expand or row actions is a Dynamic table; otherwise it is a Static table. Every other prop goes to the Section (`title`, `description`, `actions`, `toolbar`, `tabs`).",
       "props": [
         {
-          "name": "id",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "The `id` of the `table` element. The wrapper takes `{id}-wrapper`.",
-          "deprecated": null
-        },
-        {
-          "name": "headers",
-          "type": "arrayOf",
-          "required": false,
-          "default": "[]",
-          "values": null,
-          "description": "The column headers. A string is the header text; an object adds `width`, `align`, `className` and `style` to `text`.",
-          "deprecated": null
-        },
-        {
-          "name": "rows",
-          "type": "enum",
-          "required": false,
-          "default": "[]",
-          "values": null,
-          "description": "The body rows, each an array of cells. A cell is a node, or an object with `content` plus `align`, `emphasis`, `overflow`, `secondary`, `elemBefore`, `state`, `loading`, `className`, `colSpan` or `style`.",
-          "deprecated": null
-        },
-        {
-          "name": "striped",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Shades alternate rows.",
-          "deprecated": null
-        },
-        {
-          "name": "hover",
-          "type": "bool",
-          "required": false,
-          "default": "true",
-          "values": null,
-          "description": "Highlights a row on hover. On by default.",
-          "deprecated": null
-        },
-        {
-          "name": "bordered",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Draws a frame around the table and lines between columns. Shorthand for `frame=\"framed\"` plus `verticalLines`.",
-          "deprecated": null
-        },
-        {
-          "name": "verticalLines",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Draws lines between columns.",
-          "deprecated": null
-        },
-        {
-          "name": "frame",
-          "type": "enum",
-          "required": false,
-          "default": "'plain'",
-          "values": [
-            "plain",
-            "framed"
-          ],
-          "description": "`plain` (default) draws no outer frame; `framed` draws a border around the table.",
-          "deprecated": null
-        },
-        {
-          "name": "size",
+          "name": "kind",
           "type": "enum",
           "required": false,
           "default": null,
           "values": [
-            "32",
-            "40",
-            "48"
+            "static",
+            "dynamic",
+            "tree"
           ],
-          "description": "Row height in px: 32 for dense tables, 40 (default) or 48 for roomy ones.",
+          "description": "The kind of table to draw when no table is passed as `children`",
           "deprecated": null
         },
         {
-          "name": "titleColumn",
-          "type": "number",
+          "name": "tableProps",
+          "type": "object",
           "required": false,
           "default": null,
           "values": null,
-          "description": "The index of the column drawn in the title emphasis, for the row's main label.",
+          "description": "Props for the table a `kind` draws: its head, rows, label and state",
           "deprecated": null
         },
         {
-          "name": "rowStates",
-          "type": "enum",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "A state per row, by index: `rest`, `highlighted`, `selected` or `disabled`.",
-          "deprecated": null
-        },
-        {
-          "name": "summary",
-          "type": "arrayOf",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Cells for a summary row at the bottom of the table, one per column, such as totals.",
-          "deprecated": null
-        },
-        {
-          "name": "emptyState",
+          "name": "children",
           "type": "node",
           "required": false,
           "default": null,
           "values": null,
-          "description": "Content shown in a single row spanning all columns when `rows` is empty.",
+          "description": "The table itself, a `StaticTable`, `DynamicTable` or `TreeTable`; wins over `kind`",
           "deprecated": null
         },
         {
@@ -14445,16 +14859,34 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Content drawn under the table inside its wrapper, such as pagination.",
+          "description": "Footer slot under the table (range, page-size Select, Pagination); hidden while the empty state shows",
           "deprecated": null
         },
         {
-          "name": "onRowClick",
-          "type": "func",
+          "name": "emptyState",
+          "type": "node",
           "required": false,
           "default": null,
           "values": null,
-          "description": "Called with the row index when a row is clicked. The row gets no button role or key handling, so put any keyboard action in a control inside a cell.",
+          "description": "Empty-state slot: replaces the table and footer when `empty` is true",
+          "deprecated": null
+        },
+        {
+          "name": "empty",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Replace the table with the `emptyState` slot; with `empty` and no `emptyState`, the table renders normally",
+          "deprecated": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The table's accessible name, kept on the empty state box when the table is replaced",
           "deprecated": null
         },
         {
@@ -14463,54 +14895,22 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": "Extra class names added to the `table` element beside the component's own.",
-          "deprecated": null
-        },
-        {
-          "name": "style",
-          "type": "object",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Inline styles for the table's wrapper element.",
+          "description": null,
           "deprecated": null
         }
       ],
+      "stories": [
+        "StaticKind",
+        "DynamicKind",
+        "TreeKind",
+        "TableAsChild",
+        "EmptyState",
+        "EmptyHiddenByFilter",
+        "EmptyNothingToCreate",
+        "Interactive"
+      ],
       "tokens": [
-        "--body-default",
-        "--body-sm",
-        "--border-width-default",
-        "--ds-background-neutral-subtle-hovered",
-        "--ds-background-neutral-subtle-pressed",
-        "--ds-background-selected",
-        "--ds-background-selected-hovered",
-        "--ds-background-selected-pressed",
-        "--ds-background-warning-bold",
-        "--ds-border",
-        "--ds-border-bold",
-        "--ds-border-focused",
-        "--ds-text",
-        "--ds-text-danger",
-        "--ds-text-disabled",
-        "--ds-text-subtle",
-        "--focus-ring-width",
-        "--heading-xxs",
-        "--icon-md",
-        "--icon-sm",
-        "--inline-md",
-        "--plus-table-cell-max-width",
-        "--plus-table-row-height",
-        "--radius-md",
-        "--row-height-lg",
-        "--row-height-md",
-        "--row-height-sm",
-        "--space-0625",
-        "--table-cell-max-width",
-        "--table-footer-height",
-        "--table-pad-x-cell",
-        "--table-pad-y-cell",
-        "--table-radius",
-        "--type-weight-semibold"
+        "--table-inline"
       ]
     },
     {
@@ -15096,7 +15496,6 @@
         "--radius-md",
         "--radius-sm",
         "--stack-sm",
-        "--stroke-2",
         "--tag-dot-size",
         "--type-family-heading",
         "--type-weight-semibold"
@@ -15549,8 +15948,8 @@
         "--option-menu-width",
         "--pad-x-md",
         "--pad-x-sm",
+        "--pad-x-xs",
         "--plus-tag-input-max-height",
-        "--space-025",
         "--stack-md"
       ]
     },
@@ -16900,6 +17299,7 @@
       ],
       "tokens": [
         "--body-sm",
+        "--border-width-default",
         "--ds-background-neutral-bold",
         "--ds-text-inverse",
         "--layer-tooltip",
@@ -17108,6 +17508,150 @@
         "--ds-motion-spatial-fast",
         "--ds-motion-spatial-fast-duration",
         "--plus-popup-reach"
+      ]
+    },
+    {
+      "name": "TreeTable",
+      "kind": "component",
+      "import": "import { TreeTable } from '@/components';",
+      "group": "text-and-data-display",
+      "source": "design-system/src/components/text-and-data-display/TreeTable/TreeTable.jsx",
+      "summary": "Tree table. Records that nest: a school, its classes, their students. Each level indents one step and keeps every column, so the nested rows can still be read across. Built on the table shell with `HeadCell`s and the shared `TableRow` and `TableCell` parts. - **Data.** `items` is one `{ id, cells, children, hasChildren, count }` per row; `cells` is one `{ content }` per column, and `children` nests the same shape. A row with `hasChildren` and no `children` gets them from `loadChildren(item)`, which returns them or a promise of them; until they arrive a loading message row sits under it, and an empty answer leaves an empty message row. - **Expand and collapse.** The chevron toggles a parent (12 tall in a 24 hit area). `shouldExpandOnClick` lets a press anywhere on the row toggle it too, but never a press on a control inside the row, so use it only on rows without controls. `defaultExpandedIds` seeds the open rows; `expandedIds` with `onExpandedChange` hands them to the page. - **Keyboard.** The WAI-ARIA treegrid pattern in row-focus mode, written here because Base UI has no treegrid part (an ADR-037 exception, like the Select keyboard):  the table is one tab stop; Down and Up move between rows, Home and End to the ends; Right opens a closed parent, then moves to its first child; Left closes an open parent, then moves to the parent row; Enter toggles. Every row carries `aria-level`, `aria-posinset` and `aria-setsize`, and a parent `aria-expanded`.",
+      "props": [
+        {
+          "name": "head",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "One `{ key, content, width, align }` per column",
+          "deprecated": null
+        },
+        {
+          "name": "items",
+          "type": "arrayOf",
+          "required": false,
+          "default": "[]",
+          "values": null,
+          "description": "One `{ id, cells, children, hasChildren, count }` per row",
+          "deprecated": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The treegrid's accessible name.",
+          "deprecated": null
+        },
+        {
+          "name": "loadChildren",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Returns a row's children, or a promise of them, the first time it opens.",
+          "deprecated": null
+        },
+        {
+          "name": "shouldExpandOnClick",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "A press anywhere on a parent row toggles it; never a press on a control in the row.",
+          "deprecated": null
+        },
+        {
+          "name": "expandedIds",
+          "type": "arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The open rows' ids, owned by the page.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultExpandedIds",
+          "type": "arrayOf",
+          "required": false,
+          "default": "[]",
+          "values": null,
+          "description": "The rows open at first when the table holds its own expansion.",
+          "deprecated": null
+        },
+        {
+          "name": "onExpandedChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with every open row's id when a row opens or closes.",
+          "deprecated": null
+        },
+        {
+          "name": "emptyMessage",
+          "type": "node",
+          "required": false,
+          "default": "'Nothing in here yet'",
+          "values": null,
+          "description": "The message under an open parent with nothing in it.",
+          "deprecated": null
+        },
+        {
+          "name": "size",
+          "type": "enum",
+          "required": false,
+          "default": "40",
+          "values": [
+            "32",
+            "40",
+            "48"
+          ],
+          "description": "Row height: 32, 40 or 48.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra class names added to the table's wrapper beside the component's own.",
+          "deprecated": null
+        },
+        {
+          "name": "testId",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Maps to `data-testid`, for test queries.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "LoadingChildren",
+        "Keyboard",
+        "ExpandOnRowPress",
+        "Rest",
+        "Focused",
+        "Interactive",
+        "MotionOpenClose",
+        "MotionReduced"
+      ],
+      "tokens": [
+        "--control-sm",
+        "--ds-text-subtle",
+        "--focus-ring-width",
+        "--icon-sm",
+        "--inline-md",
+        "--plus-table-row-height",
+        "--plus-tree-table-level",
+        "--table-indent",
+        "--type-weight-regular"
       ]
     },
     {

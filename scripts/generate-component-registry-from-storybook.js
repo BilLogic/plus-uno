@@ -7,8 +7,7 @@
  *
  * Source of truth (patterns): design-system/figma/patterns.json. Patterns are
  * the layout/composition layer — Figma component sets bound to a `size /
- * semantics` token family. PatternCard, PatternSection, PatternModal, and
- * PatternTable are exported from `@/patterns` (`design-system/src/patterns/index.js`),
+ * semantics` token family. PatternCard, PatternSection, and Table are exported from `@/patterns` (`design-system/src/patterns/index.js`),
  * while `Pattern/Surface container` has no standalone export; they live in their
  * own registry section because their MDX files do not carry `figmaMeta`.
  *
@@ -177,8 +176,7 @@ function buildRegistry(entries, patterns) {
     note: 'DO NOT EDIT BY HAND. Components come from each component MDX `export const figmaMeta`; patterns come from design-system/figma/patterns.json. Run `npm run generate:component-registry` to regenerate.',
     figmaFile: CANONICAL_FILE,
     components,
-    // Layout/composition layer. PatternCard, PatternSection, PatternModal, and
-    // PatternTable are exported from `@/patterns`, while Pattern/Surface container
+    // Layout/composition layer. PatternCard, PatternSection, and Table are exported from `@/patterns`, while Pattern/Surface container
     // has no standalone component; kept separate from `components` because their
     // MDX files do not carry `figmaMeta`.
     patterns,

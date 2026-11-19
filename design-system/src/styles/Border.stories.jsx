@@ -31,7 +31,7 @@ export const PairWidthWithColor = {
             style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))',
-                gap: 'var(--grid-gutter)',
+                gap: 'var(--stack-xl)',
             }}
         >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
@@ -71,7 +71,7 @@ export const PairWidthWithColor = {
 /** Focus ring outside a button and a field, leaving the control fill unchanged. */
 export const FocusRingShowcase = {
     render: () => (
-        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--section-stack-md)', padding: 'var(--pad-x-md)' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--stack-xl) var(--inline-xl)', padding: 'var(--pad-x-md)' }}>
             <RingDemo style={{ borderRadius: 'var(--radius-control-md)' }}>
                 <Button text="Button" appearance="primary" />
             </RingDemo>
@@ -127,9 +127,9 @@ export const FocusRingDoDont = {
 /** Space separates items inside a group; a 1 px divider separates two groups or two controls. */
 export const Dividers = {
     render: () => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
-            <PatternCard padding="md">
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
+            <PatternCard>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                         <span style={{ font: 'var(--heading-xs)', color: 'var(--ds-text)' }}>Upcoming sessions</span>
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-md)' }}>
@@ -181,7 +181,7 @@ export const SidebarEdges = {
                     panelStorageKey={null}
                     breadcrumbs={[{ text: 'Home', href: '#home' }, { text: 'Sessions' }]}
                 >
-                    <Page level="surface" padding="sm">
+                    <Page>
                         <PatternSection title="Upcoming sessions" />
                     </Page>
                 </InAppFrame>
@@ -203,7 +203,7 @@ export const SidebarEdges = {
                         </div>
                     )}
                 >
-                    <Page level="surface" padding="sm">
+                    <Page>
                         <PatternSection title="Upcoming sessions" />
                     </Page>
                 </InAppFrame>

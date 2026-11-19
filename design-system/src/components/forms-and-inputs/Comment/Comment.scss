@@ -1,6 +1,6 @@
 .plus-comment {
-    padding: var(--space-100);
-    border-radius: var(--card-radius-compact);
+    padding: var(--comment-pad);
+    border-radius: var(--card-radius);
 
     &--highlighted {
         background: var(--ds-background-selected);
@@ -9,7 +9,7 @@
 
 .plus-comment-row {
     display: flex;
-    gap: var(--space-100);
+    gap: var(--comment-gap);
 }
 
 .plus-comment-avatar {
@@ -24,7 +24,7 @@
 .plus-comment-header {
     display: flex;
     align-items: baseline;
-    gap: var(--space-075);
+    gap: var(--inline-lg);
     flex-wrap: wrap;
 }
 
@@ -42,24 +42,24 @@
 
 .plus-comment-content {
     font: var(--body-default);
-    margin-top: var(--space-025);
+    margin-top: var(--stack-sm);
 }
 
 .plus-comment-actions {
     display: flex;
-    gap: var(--space-100);
-    margin-top: var(--space-050);
+    gap: var(--comment-gap);
+    margin-top: var(--stack-md);
 }
 
 .plus-comment-saving {
     font: var(--body-sm);
     color: var(--ds-text-subtle);
-    margin-top: var(--space-050);
+    margin-top: var(--stack-md);
 }
 
 .plus-comment-replies {
-    margin-top: var(--space-100);
-    margin-inline-start: var(--space-150);
-    padding-inline-start: var(--space-150);
+    margin-top: var(--comment-replies-stack);
+    margin-inline-start: var(--comment-replies-indent);
+    padding-inline-start: var(--comment-replies-indent);
     border-inline-start: var(--border-width-default) solid var(--ds-border);
 }

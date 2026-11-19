@@ -86,7 +86,7 @@ export const Overview = () => (
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 'var(--card-stack-md)',
-                padding: 'var(--card-pad-default)',
+                padding: 'var(--card-pad)',
                 borderRadius: 'var(--card-radius)',
                 background: 'var(--ds-surface-raised)',
                 boxShadow: 'var(--ds-shadow-raised)',
@@ -127,7 +127,7 @@ export const BackgroundRoles = () => (
 );
 
 export const SurfaceRoles = () => (
-    <Swatches kind="surface" tokens={['--ds-surface-sunken', '--ds-surface', '--ds-surface-raised', '--ds-surface-overlay', '--ds-surface-container']} />
+    <Swatches kind="surface" tokens={['--ds-surface-sunken', '--ds-surface', '--ds-surface-raised', '--ds-surface-overlay']} />
 );
 
 const STATUSES = ['danger', 'warning', 'success', 'information', 'discovery'];
@@ -239,8 +239,8 @@ const sample = {
     display: 'flex',
     flexDirection: 'column',
     gap: 'var(--card-stack-md)',
-    padding: 'var(--card-pad-compact)',
-    borderRadius: 'var(--card-radius-compact)',
+    padding: 'var(--card-pad)',
+    borderRadius: 'var(--card-radius)',
     background: 'var(--ds-surface-raised)',
     boxShadow: 'var(--ds-shadow-raised)',
 };

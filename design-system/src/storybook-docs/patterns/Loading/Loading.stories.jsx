@@ -4,6 +4,7 @@ import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { expectSectionHeader } from '@/storybook-docs/lib/section-header-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { settleAnimations, withReducedMotion } from '@/storybook-docs/lib/overlay-motion-plays';
 import {
@@ -98,7 +99,6 @@ export const KindAction = {
         await fitsCanvas(canvasElement);
         await userEvent.click(cancel);
         await expect(canvas.getByRole('button', { name: 'Save session' })).not.toHaveAttribute('aria-busy');
-        await settleAnimations(canvasElement);
     },
 };
 
@@ -143,6 +143,7 @@ export const KeyUnderOneSecond = {
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
         await expect(canvas.getByRole('table'), 'the old rows stay').toBeInTheDocument();
+        await expectSectionHeader(canvasElement, 2);
         await expect(busy(canvasElement), 'nothing is marked busy yet').toBeNull();
         await expect(bars(canvasElement), 'no skeleton flashes').toHaveLength(0);
         await fitsCanvas(canvasElement);
@@ -161,7 +162,6 @@ export const KeyOverTenSeconds = {
         await waitFor(() => expect(canvas.getByText('Still loading students')).toBeInTheDocument());
         await expect(canvas.getByText(/you can keep working/), 'it says the person can keep working').toBeInTheDocument();
         await fitsCanvas(canvasElement);
-        await settleAnimations(canvasElement);
     },
 };
 

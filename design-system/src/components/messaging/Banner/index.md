@@ -90,7 +90,7 @@ Don't: A paragraph in the banner.
 - `Link`: use when embedding an inline action or destination inside the banner message.
 - Frame: use when placing a site-wide banner above the application layout.
 
-Same group: `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `NotificationItem` · `SectionMessage` · `Spotlight`
+Same group: `Dialog` · `EmptyState` · `Flag` · `InlineMessage` · `NotificationItem` · `SectionMessage` · `Spotlight`
 
 ## Parts
 

@@ -8,7 +8,7 @@ Also asked as: cta, submit.
 
 **Import:** `import { Button } from '@/components';`
 
-**Used in:** Form (`ds guide form`); Frame (`ds guide frame`); Panel (`ds guide panel`); Modal (`ds guide modal`); Section (`ds guide section`)
+**Used in:** Form (`ds guide form`); Frame (`ds guide frame`); Modal (`ds guide modal`); Panel (`ds guide panel`); Section (`ds guide section`)
 
 **Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Empty (`ds guide empty`); Filtering (`ds guide filtering`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); Read-only (`ds guide read-only`); +1 more
 
@@ -97,7 +97,7 @@ In Modal, Panel and focused-view footers, `FooterActions` places the primary act
 - `DropdownMenu`: use when a trigger opens a list of actions.
 - `ProgressBar`: use when showing progress on the page rather than inside the button.
 
-Same group: `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
+Same group: `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
 
 ## Parts
 

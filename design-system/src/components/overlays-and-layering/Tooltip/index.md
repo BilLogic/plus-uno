@@ -8,7 +8,7 @@ Also asked as: hover hint, hover text.
 
 **Import:** `import { Tooltip } from '@/components';`
 
-**Used in:** Popup (`ds guide popup`)
+**Used in:** Section (`ds guide section`); Popup (`ds guide popup`)
 
 **Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Errors (`ds guide errors`); Filtering (`ds guide filtering`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`)
 
@@ -199,7 +199,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-sm` · `--ds-background-neutral-bold` · `--ds-text-inverse` · `--layer-tooltip` · `--pad-x-sm` · `--plus-overlay-origin` · `--radius-control-sm` · `--tooltip-max-width` · `--tooltip-pad-y` · `--transform-origin`
+`--body-sm` · `--border-width-default` · `--ds-background-neutral-bold` · `--ds-text-inverse` · `--layer-tooltip` · `--pad-x-sm` · `--plus-overlay-origin` · `--radius-control-sm` · `--tooltip-max-width` · `--tooltip-pad-y` · `--transform-origin`
 
 From `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.scss`. Override these through the token layer, never with a literal.
 

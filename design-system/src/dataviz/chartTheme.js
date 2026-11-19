@@ -12,7 +12,7 @@
  *
  * Every other foundation (spacing, radius, elevation, stroke, type, states,
  * motion) takes the same component tokens as the rest of the design system.
- * The chart container is a Card, so `chart.spacing` reads `--card-pad-compact`
+ * The chart container is a Card, so `chart.spacing` reads `--card-pad`
  * (the density this component already rendered at: 16px, component tokens
  * defined in `chartTheme.css`). The tooltip is a floating layer, so it takes
  * the Popup pattern's surface, overlay shadow and radius — via `useHTML`,
@@ -48,8 +48,8 @@ const tokenNumber = (varName, fallback) => {
     return Number.isNaN(parsed) ? fallback : parsed;
 };
 
-/** Chart container padding: the Card pattern's compact density, the one this chart already rendered at. */
-const CHART_SPACING = tokenNumber('--card-pad-compact', 16);
+/** Chart container padding: the Card pattern's pad, the density this chart already rendered at. */
+const CHART_SPACING = tokenNumber('--card-pad', 16);
 
 /** The tighter inset a chart opts into deliberately (e.g. a heatmap that wants more room for cells), still off the ladder rather than a literal. */
 export const CHART_SPACING_COMPACT = tokenNumber('--pad-y-md', 6);

@@ -64,9 +64,9 @@ describe('Templates Overview: the flat exploded view', () => {
         expect(new Set(steps).size).toBe(1);
     });
 
-    it('outlines only the Frame plate', () => {
+    it('outlines the Frame plate and the sunken Card, the two fills that are the ground itself', () => {
         const edged = [...draw().querySelectorAll('[data-plate]')].filter((p) => p.querySelector(`[stroke="${PAINT.illustrationEdge}"]`));
-        expect(edged.map((p) => p.dataset.plate)).toEqual(['frame']);
+        expect(edged.map((p) => p.dataset.plate)).toEqual(['frame', 'section']);
     });
 
     it('selects one table row and rings it', () => {

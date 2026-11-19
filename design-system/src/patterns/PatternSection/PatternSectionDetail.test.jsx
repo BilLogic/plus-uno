@@ -26,14 +26,15 @@ const renderDetail = (props = {}) => render(
 );
 
 describe('PatternSection detail (inline expand)', () => {
-    it('starts closed by default with a disclosure button and subtle fill', () => {
+    it('starts closed by default with a disclosure button, drawn as a sunken Card', () => {
         const { container } = renderDetail();
         const trigger = screen.getByRole('button', { name: /Ava Thompson/ });
         expect(trigger).toHaveAttribute('aria-expanded', 'false');
         expect(screen.queryByRole('region', { name: 'Ava Thompson' })).toBeNull();
         expect(screen.getByText('Section rows')).toBeInTheDocument();
-        expect(container.querySelector('.plus-pattern-section-detail').className)
-            .toContain('plus-pattern-section-fill-subtle');
+        const detail = container.querySelector('.plus-pattern-section-detail');
+        expect(detail.className).toContain('plus-pattern-card--surface-sunken');
+        expect(detail.className).toContain('plus-pattern-card');
     });
 
     it('opens in place on click and names the detail region from detailTitle, then closes on click', async () => {

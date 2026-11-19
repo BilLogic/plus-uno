@@ -31,7 +31,7 @@ const TOPICS = [
     { value: 'dev-coordination', label: 'Dev coordination', color: 'teal' },
 ];
 
-const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: 'var(--width-2500)' };
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)', maxWidth: 'var(--width-2500)' };
 
 const bodyOf = (canvasElement) => within(canvasElement.ownerDocument.body);
 const tagsIn = (canvas, label) => within(canvas.getByRole('list', { name: `Selected: ${label}` }));

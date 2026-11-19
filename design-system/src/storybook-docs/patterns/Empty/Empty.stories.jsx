@@ -3,9 +3,10 @@ import { expect, userEvent, within } from 'storybook/test';
 
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { expectSectionHeader } from '@/storybook-docs/lib/section-header-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
-import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
-import { EmptyType, FullPage, InCard, InPanel, InTable, SMALL_STAGE, STAGE, TYPE_STAGE } from './emptyDemo.jsx';
+import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { EmptyTableBoxCase, EmptyType, FullPage, InCard, InPanel, InTable, SMALL_STAGE, STAGE, TYPE_STAGE } from './emptyDemo.jsx';
 
 /**
  * Empty: the pattern page's examples, run in the Storybook tests. Each composes
@@ -110,7 +111,7 @@ export const PlaceFullPage = {
     },
 };
 
-/** A table: the empty state replaces the whole table (no head row, no footer); the view bar stays. */
+/** A table: the empty state replaces the whole table (no head row, no footer); the header rows stay. */
 export const PlaceTable = {
     name: 'Place: In a table',
     render: () => staged(<InTable />),
@@ -121,7 +122,8 @@ export const PlaceTable = {
         await expect(canvas.queryByRole('table'), 'no table, so no column headers and no footer').toBeNull();
         await expect(canvas.queryAllByRole('columnheader'), 'no column headers').toHaveLength(0);
         await expect(canvas.queryByRole('navigation'), 'no pagination').toBeNull();
-        await expect(canvasElement.querySelector('.plus-section-view-bar'), 'the view bar stays').not.toBeNull();
+        await expect(canvasElement.querySelector('.plus-section-rows'), 'the header rows stay').not.toBeNull();
+        await expectSectionHeader(canvasElement, 1);
         await expect(canvas.getByRole('heading', { name: 'No students in this group yet' })).toBeVisible();
         await fitsCanvas(canvasElement);
     },
@@ -179,7 +181,6 @@ export const KeyNoMatchesInTable = {
         await expect(canvas.getByRole('tab', { name: 'Needs follow-up' })).toHaveAttribute('aria-selected', 'true');
         await userEvent.click(canvas.getByRole('tab', { name: 'All students' }));
         await expect(canvas.getByRole('heading', { name: 'No students match these filters' })).toBeVisible();
-        await settleAnimations(canvasElement);
     },
 };
 
@@ -197,5 +198,67 @@ export const KeyLoadFailure = {
         await fitsCanvas(canvasElement);
         await userEvent.click(retry);
         await expect(canvas.getByRole('table')).toBeVisible();
+    },
+};
+
+/** Empty state box, nothing yet: sunken, card-rounded box with a default button matching the title row's primary action. */
+export const KeyEmptyBoxNothingYet = {
+    name: 'Key: Empty box — nothing yet',
+    render: () => staged(<EmptyTableBoxCase variant="nothingYet" />),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        await expect(canvas.queryByRole('table')).toBeNull();
+        const box = canvasElement.querySelector('.plus-table-shell-empty');
+        await expect(box, 'empty box rendered').not.toBeNull();
+        await expect(getComputedStyle(box).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+        await expect(px(getComputedStyle(box).borderTopLeftRadius)).toBe(tokenLength(canvasElement, '--table-empty-radius'));
+        const action = within(box).getByRole('button', { name: 'Add students' });
+        await expect(action.className, 'empty box action is default').not.toContain('primary');
+        await expect(canvas.getAllByRole('button', { name: 'Add students' })[0], 'title row primary action stays above').toBeEnabled();
+        await fitsCanvas(canvasElement);
+        await userEvent.click(action);
+        await expect(canvas.getByRole('table')).toBeVisible();
+    },
+};
+
+/** Empty state box, hidden by a default filter: filter row stays above, button clears the filter to reveal rows. */
+export const KeyEmptyBoxHiddenByFilter = {
+    name: 'Key: Empty box — hidden by a default filter',
+    render: () => staged(<EmptyTableBoxCase variant="hiddenByFilter" />),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        await expect(canvas.queryByRole('table')).toBeNull();
+        const box = canvasElement.querySelector('.plus-table-shell-empty');
+        await expect(box, 'empty box rendered').not.toBeNull();
+        await expect(getComputedStyle(box).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+        await expect(px(getComputedStyle(box).borderTopLeftRadius)).toBe(tokenLength(canvasElement, '--table-empty-radius'));
+        const reset = within(box).getByRole('button', { name: 'Reset filters' });
+        await expect(reset.className).not.toContain('primary');
+        await fitsCanvas(canvasElement);
+        await userEvent.click(reset);
+        await expect(canvas.getByRole('table')).toBeVisible();
+    },
+};
+
+/** Empty state box, nothing to create: title and one line only, with no action button. */
+export const KeyEmptyBoxNothingToCreate = {
+    name: 'Key: Empty box — nothing to create',
+    render: () => staged(<EmptyTableBoxCase variant="nothingToCreate" />),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        await expect(canvas.queryByRole('table')).toBeNull();
+        const box = canvasElement.querySelector('.plus-table-shell-empty');
+        await expect(box, 'empty box rendered').not.toBeNull();
+        await expect(getComputedStyle(box).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+        await expect(px(getComputedStyle(box).borderTopLeftRadius)).toBe(tokenLength(canvasElement, '--table-empty-radius'));
+        await expect(within(box).getByRole('heading', { name: 'Every reflection is reviewed' })).toBeVisible();
+        await expect(canvas.queryAllByRole('button')).toHaveLength(0);
+        await fitsCanvas(canvasElement);
     },
 };

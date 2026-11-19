@@ -2,7 +2,7 @@
 
 # Calendar
 
-Calendar — the month grid DatePicker and DateTimePicker open (Figma `_Calendar`), public for a caller who wants the grid on its own rather than behind a field's popup. It is the same component the pickers use. - **Grid:** always six weeks, 42 cells, so the panel never changes height. Days of the months either side are drawn and can't be picked. - **Days:** each is a button named with its full date. `aria-pressed` marks the picked day, or both ends of a range; `data-in-range` marks the days between; `aria-current="date"` marks today. - **Bounds:** days before `minDate` or after `maxDate` are disabled. - **Size:** a pixel width, 28, 36 or 44, drawn from the `--calendar-day-*` tokens.
+Calendar — the month grid DatePicker and DateTimePicker open (Figma `_Calendar`), public for a caller who wants the grid on its own rather than behind a field's popup. It is the same component the pickers use. - **Grid:** always six weeks, 42 cells, so the panel never changes height. Days of the months either side are drawn and can't be picked. - **Days:** each is a button named with its full date. `aria-pressed` marks the picked day, or both ends of a range; `data-in-range` marks the days between; `aria-current="date"` marks today. - **Bounds:** days before `minDate` or after `maxDate` are disabled. - **Size:** a pixel width, 24, 32 or 40, drawn from the `--calendar-day-*` tokens.
 
 **Import:** `import { Calendar } from '@/components';`
 
@@ -10,7 +10,7 @@ Calendar — the month grid DatePicker and DateTimePicker open (Figma `_Calendar
 
 **Source:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.stories.jsx` — Size28, Size36, Size44, PickADay, TurnMonths, TurnMonthsReduced, Default, Selected, Range, Disabled, HoveredState, KeyboardFocus, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.stories.jsx` — Size24, Size32, Size40, PickADay, TurnMonths, TurnMonthsReduced, Default, Selected, Range, Disabled, HoveredState, KeyboardFocus, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.mdx`
 
@@ -93,7 +93,7 @@ Six weeks render every month, including the days of neighboring months that fill
 - `DatePicker`: use when a single date or date range field opens the calendar in a popup.
 - `DateTimePicker`: use when a date and a time are answered together.
 
-Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
 
 ## Parts
 
@@ -119,14 +119,14 @@ Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `CheckboxGr
 
 | Part | Token |
 | --- | --- |
-| Month | `--heading-sm` in `--ds-text`. |
-| Month buttons | `--calendar-nav-size` square, `--ds-icon-subtle`, hovered `--ds-background-neutral-subtle-hovered`. |
+| Month | `--heading-xs` in `--ds-text`. |
+| Month buttons | Compact `IconButton` (`--control-sm` square), `--ds-icon-subtle`, hovered `--ds-background-neutral-subtle-hovered`. |
 | Weekday names | `--body-sm` in `--ds-text-subtle`. |
 | Day text | `--body-default` in `--ds-text`. |
-| Day size | `--calendar-day-sm` (28), `--calendar-day-md` (36), `--calendar-day-lg` (44). |
+| Day size | `--calendar-day-sm` (24), `--calendar-day-md` (32), `--calendar-day-lg` (40). |
 | Day radius | `--radius-md`. |
-| Gaps | `--stack-md` between header, weekdays and days; `--stack-sm` between cells. |
-| Padding | `--space-025` top and bottom, `--pad-x-sm` either side. |
+| Gaps | `--stack-md` between header, weekdays and days; `--stack-sm` between rows. |
+| Padding | `--space-025` top and bottom, `--pad-x-md` either side. |
 
 ## Content guidelines
 
@@ -147,13 +147,13 @@ Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `CheckboxGr
 | `rangeEnd` | string or instanceOf | — | — |
 | `minDate` | string or instanceOf | — | The earliest day that can be picked, as ISO `YYYY-MM-DD` or a Date. Earlier days are disabled. |
 | `maxDate` | string or instanceOf | — | The latest day that can be picked, as ISO `YYYY-MM-DD` or a Date. Later days are disabled. |
-| `size` | enum | — | Day width in pixels: 28, 36 or 44. |
+| `size` | enum | — | Day width in pixels: 24, 32 or 40. |
 | `onPick` | func (required) | — | `(date)` when an enabled day is pressed. |
 | `className` | string | — | — |
 
 ## Variants
 
-**`size`** — `28` · `36` · `44`
+**`size`** — `24` · `32` · `40`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 

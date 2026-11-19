@@ -69,7 +69,7 @@ Use Empty when a list, table, card, Panel or page has no records to show, a sear
 | --- | --- | --- |
 | The block | Empty state | Picture or icon, header, one line and the action; `spacing` is `default` for a view and `compact` for a table body or card. |
 | The action | Button | `primaryAction` takes one Button; a No matches action is Default. |
-| Table slot | Table | `emptyState` (`PatternTable`) and `emptyView` / `noResultsView` (`DynamicTable`) take the block and replace the whole table, header and footer included. |
+| Table slot | Table | `emptyState` (the Table template) and `emptyView` / `noResultsView` (`DynamicTable`) take the block and replace the whole table, header and footer included. |
 | In a Panel | Panel | The record-gone state at the top of the body. |
 
 ## Related
@@ -78,7 +78,7 @@ Use Empty when a list, table, card, Panel or page has no records to show, a sear
 - Errors: use for the words in a Can't show state.
 - Filtering: use for where No matches comes from, and the "Reset filters" wording.
 - Search: use for a search that matches nothing.
-- Section: use for the view bar that stays above a replaced table.
+- Section: use for the header rows that stay above a replaced table.
 
 ## Best practices
 
@@ -101,9 +101,9 @@ The picture above, then the heading, one line and the action, all on one left ed
 
 **Checked:** Review
 
-No column headers and no footer while the table is empty; the view bar above stays, so the person can change the view, search or reset. A "No matches" state offers "Reset filters".
+No column headers and no footer while the table is empty; the Section's header rows above stay, so the person can change the view, search or reset. A "No matches" state offers "Reset filters".
 
-Do: The whole table replaced; the view bar stays.
+Do: The whole table replaced; the header rows stay.
 Don't: Column headers and a footer over nothing, with a centered paragraph.
 
 ### Give at most one Primary action. {#give-at-most-one-primary-action}
@@ -147,18 +147,17 @@ An illustration for a full view a person meets once, such as a new tutor's first
 From `design-system/src/storybook-docs/patterns/CodeExamples.stories.jsx#Empty`.
 
 ```jsx
-import { Button, EmptyState } from '@/components';
-import { PatternTable } from '@/patterns';
+import { Button, EmptyState, StaticTable } from '@/components';
+import { Table } from '@/patterns';
 
 function EmptyExample() {
     return (
-        <PatternTable empty emptyState={
+        <Table title="Sessions" empty emptyState={
             <EmptyState spacing="compact" header="No matching sessions" description="Try another search or reset the filters."
                 secondaryAction={<Button text="Reset filters" spacing="compact" />} />
         }>
-            <thead><tr><th>Student</th><th>Status</th></tr></thead>
-            <tbody />
-        </PatternTable>
+            <StaticTable headers={['Student', 'Status']} rows={[]} />
+        </Table>
     );
 }
 ```

@@ -1,6 +1,5 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
@@ -59,7 +58,7 @@ const PAINT = {
 };
 
 const label = (appearance) => appearance === 'ai' ? 'Generate summary' : appearance.charAt(0).toUpperCase() + appearance.slice(1);
-const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--grid-gutter)', alignItems: 'center' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-xl) var(--inline-xl)', alignItems: 'center' };
 /** A hover or pressed read with the transition out of the way. */
 const settled = (button) => { button.style.transition = 'none'; };
 
@@ -433,7 +432,6 @@ export const ExplainsOnPress = {
         await expect(canvas.queryByText('Add the session notes before saving.')).toBeNull();
         await userEvent.click(save);
         await waitFor(() => expect(canvas.getByText('Add the session notes before saving.')).toBeVisible());
-        await settleAnimations(canvasElement);
         await expect(save).toBeEnabled();
     },
 };

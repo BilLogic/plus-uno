@@ -1,0 +1,250 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as PromptInputStories from './PromptInput.stories.jsx';
+import { PromptInput } from '@/components';
+import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
+
+<Meta of={PromptInputStories} />
+
+<Title />
+A growing text area for AI prompts, with an optional leading control and a send action.
+
+<DocsTabs of={PromptInputStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=21740-1280"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/ai/PromptInput"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Size and layout
+
+<ComponentExample of={PromptInputStories.WithSlots} title="Slots" description="startSlot holds a quiet control before the text, attachments a row of staged files above it, and actions extra controls beside send." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Behavior
+
+<ComponentExample of={PromptInputStories.EnterSends} title="Enter sends" description="Enter sends, and an uncontrolled field clears itself." />
+
+<ComponentExample of={PromptInputStories.ShiftEnterStartsALine} title="Shift and Enter" description="Shift and Enter start a new line instead of sending." />
+
+<ComponentExample of={PromptInputStories.CannotSendWhenEmpty} title="Empty" description="Nothing sends while the field is empty." />
+
+<ComponentExample of={PromptInputStories.ComposingDoesNotSend} title="Composing" description="Enter is ignored while an input method is mid-composition." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## State
+
+<ComponentExample of={PromptInputStories.Default} title="Rest" description="A growing text area with a send button, held back until there is text." />
+
+<ComponentExample of={PromptInputStories.Focused} title="Focused" description='The focus ring, drawn here with state="focus".' />
+
+<ComponentExample of={PromptInputStories.Loading} title="Loading" description="isLoading turns the send button into Stop and rings the field in a GenerativeBorder." />
+
+<ComponentExample of={PromptInputStories.Disabled} title="Disabled" description="The field and the send button fade and take no input." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="PromptInput" />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={PromptInputStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong>inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use `PromptInput` for AI chat or a feature that drafts from a free-text request.
+For a plain multiline field without send-on-Enter or loading behavior, use `TextArea`.
+
+`PromptInput` does not include the <a href="?path=/docs/ai-ui-ai-interaction-guidelines--docs#foundation-identity-and-trust">fallibility line</a>.
+`AiChat` supplies it; other consumers must place it under the field.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Attachments** (optional). A row of staged files above the text.
+2. **Start slot** (optional). One quiet control before the text, such as an attach button.
+3. **Text area.** Grows from one line to five, then scrolls. Named by `label`.
+4. **Actions** (optional). Extra controls beside the send button.
+5. **Send.** A default (32) primary icon button, 4 from the edge on every side and on the last line as the text grows; while loading it becomes Stop.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>The input fill and <code>--border-width-default</code> input edge. Send is held back until there is text.</td></tr>
+<tr><td>Hovered</td><td>The edge turns <code>--ds-border-focused</code>.</td></tr>
+<tr><td>Pressed</td><td>No step of its own on the field; the send button takes its own pressed fill.</td></tr>
+<tr><td>Focused</td><td>A <code>--focus-ring-width</code> ring in <code>--ds-border-focused</code>, <code>--focus-ring-width</code> off the box.</td></tr>
+<tr><td>Disabled</td><td>The field fades to <code>--ds-opacity-disabled</code>, and nothing sends.</td></tr>
+<tr><td>Loading</td><td>Send becomes Stop, and a GenerativeBorder rings the field and sets <code>aria-busy</code>. Stop is never held back by <code>isDisabled</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Box</td><td><code>--ds-background-input</code> fill, <code>--border-width-default</code> edge in <code>--ds-border-input</code>, <code>--radius-control-lg</code>.</td></tr>
+<tr><td>Height</td><td>Starts at one line, <code>--height-250</code> (40, a single-line field), and grows to five lines: <code>--type-line-height-125</code> × 5 plus <code>--space-0375</code> top and bottom, then scrolls.</td></tr>
+<tr><td>Padding</td><td><code>--pad-y-md</code> top and bottom, <code>--pad-x-md</code> either side.</td></tr>
+<tr><td>Text</td><td><code>--body-default</code> in <code>--ds-text</code>; placeholder <code>--ds-text-subtlest</code>.</td></tr>
+<tr><td>Attachments</td><td><code>--stack-md</code> between files and under the row.</td></tr>
+<tr><td>Actions and send</td><td><code>--stack-sm</code> between them.</td></tr>
+<tr><td>Loading ring</td><td>GenerativeBorder at <code>radius-control-lg</code>, the field's own radius.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Keep the field visible while generating.
+
+Pair `isLoading` with `onStop` to show progress while keeping the question visible and Stop reachable. Keep the field enabled.
+
+<DoDontPair
+    doExample={<PromptInput label="Message to AI chat" defaultValue="Summarize Maya's last two sessions" isLoading onStop={() => {}} />}
+    doCaption="The loading state shows progress inside the field."
+    dontExample={<PromptInput label="Message to AI chat" placeholder="Ask about a student, a session or a lesson" isLoading onStop={() => {}} />}
+    dontCaption="A field emptied while generating loses the question."
+/>
+
+### Show focus while typing.
+
+Focus tells the user the field accepts input. The field draws its own focus ring; never remove it with custom styles.
+
+### Hint at what can be asked.
+
+<DoDontPair
+    doExample={<PromptInput label="Message to AI chat" placeholder="Ask about a student, a session or a lesson" />}
+    doCaption="The placeholder hints at what can be asked."
+    dontExample={<PromptInput label="Message to AI chat" placeholder="Type here" />}
+    dontCaption="The placeholder describes the control."
+/>
+
+### Leave the field enabled when idle.
+
+A disabled field blocks follow-up questions.
+
+<DoDontPair
+    doExample={<PromptInput label="Message to AI chat" placeholder="Ask about a student, a session or a lesson" />}
+    doCaption="An idle field takes the next question."
+    dontExample={<PromptInput label="Message to AI chat" placeholder="Ask about a student, a session or a lesson" isDisabled />}
+    dontCaption="A disabled idle field blocks the next question."
+/>
+
+### Send only real text.
+
+`onSubmit` never fires for an empty, disabled or loading field, or on Enter during IME composition.
+
+```jsx
+<PromptInput
+    label="Message to AI chat"
+    placeholder="Ask anything about this session…"
+    isLoading={isGenerating}
+    onSubmit={sendMessage}
+    onStop={cancelGeneration}
+/>
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name the field for what it sends: "Message to AI chat".</td><td>A generic name such as "Text" or "Input".</td></tr>
+<tr><td>Hint at what can be asked: "Ask about a student, a session or a lesson".</td><td>Describe the control: "Type here".</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **`label` is required** and is the field's only accessible name — there is
+  no visible label by default.
+- **Send and Stop are both labeled buttons**, each with its own
+  `aria-label`, not just an icon.
+- **Enter-to-send follows the platform convention for composed text**:
+  Shift+Enter inserts a line break, and an in-progress IME composition never
+  triggers a send.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a plain multi-line field with no AI behavior, use `TextArea`.
+- For the border treatment shown while loading, see `GenerativeBorder`.
+- For a short, tappable prompt suggestion, use `Suggestion` or
+  `PromptStarters`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

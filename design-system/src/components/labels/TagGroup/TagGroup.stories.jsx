@@ -478,7 +478,7 @@ OneMoreTag.play = async ({ canvasElement }) => {
  * squeezes nothing, and a cap of 1 with room to spare shows its tag whole.
  */
 export const CapNeverSqueezes = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', width: '600px' /* token gap: 600px */ }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)', width: '600px' /* token gap: 600px */ }}>
         <TagGroup label="None shown" overflow="collapse" maxVisible={0}>
             {SUBJECTS.map((s) => <Tag key={s} color="green">{s}</Tag>)}
         </TagGroup>
@@ -665,7 +665,7 @@ export const StableOnParentRender = () => {
     const [extra, setExtra] = useState(false);
     const tags = extra ? [...SUBJECTS, 'Latin'] : SUBJECTS;
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', width: '300px' /* token gap: 300px */ }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)', width: '300px' /* token gap: 300px */ }}>
             <TagGroup label="Subjects" overflow="collapse">
                 {tags.map((s) => <Tag key={s} color="green">{s}</Tag>)}
             </TagGroup>
@@ -716,7 +716,7 @@ const readCollapseList = (list) => Array.from(list.querySelectorAll('[role="list
 export const SqueezedFirstReplaced = () => {
     const [first, setFirst] = useState('Science');
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
             <div style={{ width: '90px' /* token gap: 90px */ }}>
                 <TagGroup label="Squeezed" overflow="collapse">
                     {[first, ...SUBJECTS.slice(1)].map((s) => <Tag key={s} color="green">{s}</Tag>)}
@@ -756,7 +756,7 @@ SqueezedFirstReplaced.play = async ({ canvasElement }) => {
  * table column: every wrapped row, and the `+n` of a collapsed one.
  */
 export const AlignmentRight = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', width: 'var(--width-2000)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', width: 'var(--width-2000)' }}>
         <TagGroup label="Wrapped subjects" alignment="end">
             {SUBJECTS.map((s) => <Tag key={s} color="purple" data-testid={`wrap-${s}`}>{s}</Tag>)}
         </TagGroup>
@@ -792,7 +792,7 @@ AlignmentRight.play = async ({ canvasElement }) => {
 export const Disabled = {
     args: { onAccept: fn(), onSelect: fn() },
     render: ({ onAccept, onSelect }) => (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', width: '360px' /* token gap: 360px */ }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)', width: '360px' /* token gap: 360px */ }}>
             <Button>Before</Button>
             <TagGroup label="Focus areas" isDisabled>
                 <Tag color="blue" data-testid="read-only">Read only</Tag>

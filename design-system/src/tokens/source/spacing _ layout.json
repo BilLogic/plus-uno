@@ -264,7 +264,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--modal-width-sm)"
+        "WEB": "var(--modal-width-6-col)"
       },
       "valuesByMode": {
         "19378:1": 384,
@@ -286,7 +286,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--modal-width-md)"
+        "WEB": "var(--modal-width-8-col)"
       },
       "valuesByMode": {
         "19378:1": 507,
@@ -308,7 +308,7 @@
         "WIDTH_HEIGHT"
       ],
       "codeSyntax": {
-        "WEB": "var(--modal-width-lg)"
+        "WEB": "var(--modal-width-10-col)"
       },
       "valuesByMode": {
         "19378:1": 629,

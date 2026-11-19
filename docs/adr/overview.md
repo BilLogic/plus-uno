@@ -45,8 +45,9 @@ Worker source, the guard script, the OAuth handler — and carry the same
 - [ADR-047](047-the-design-system-ships-outside-the-repo.md): the design system ships through the `@plus-uno/cli` package; supersedes ADR-006.
 - [ADR-048](048-agents-build-in-stages-and-a-ds-fact-has-one-home.md): agents build in five stages (`templates-first`), and each DS fact has one authored home; `guidelines/composition/` retires.
 - [ADR-049](049-motion-docs-teach-with-kit-demos.md): motion docs teach with kit demos; real components are tests and examples.
-- [ADR-050](050-an-empty-table-is-replaced-by-its-empty-state.md): empty and no-results tables in `PatternTable` and `DynamicTable` replace the whole table with `EmptyState`.
+- [ADR-050](050-an-empty-table-is-replaced-by-its-empty-state.md): empty and no-results tables in the Table template and `DynamicTable` replace the whole table with `EmptyState`.
 - [ADR-051](051-a-page-header-title-is-the-page-h1.md): `PageHeader` renders its title as the page's `h1` at `Heading` `large` (`24/28`) by default, with `titleAs="h2"` for subordinate headers.
+- [ADR-052](052-dimensions-is-the-one-ladder-and-layout-owns-it.md): Dimensions is the one rem ladder every gap, size, radius and stroke reads from; the Layout foundation (Dimensions, Spacing, Grid) owns it.
 
 ## Writing a new one
 

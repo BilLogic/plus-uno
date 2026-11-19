@@ -1,0 +1,13 @@
+/**
+ * Table template (Templates/Table)
+ * The arrangement under a Section header: the table, then its footer, with the
+ * empty state box in their place when there are no rows. The table kinds own
+ * their cells, rows and sticky edges; the template reads only its own tokens.
+ */
+
+.plus-table-template {
+    display: flex;
+    flex-direction: column;
+    gap: var(--table-inline);
+    min-width: 0;
+}

@@ -74,7 +74,7 @@
  *     instructing the author to write code that does not work.
  *  4. WHICH token is the right one. It reports every token that carries the
  *     value and leaves the role to the author: `24px` is `--space-150` and
- *     `--card-pad-spacious` and `--section-pad-x-default`, and only a human
+ *     `--modal-pad-x-spacious`, and only a human
  *     knows whether this is a card or a section. It filters by property family
  *     (a `font-size` is never offered a spacing token) and it prefers semantic
  *     names over the primitives — but it does not choose.

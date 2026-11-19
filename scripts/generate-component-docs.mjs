@@ -66,6 +66,7 @@ const GROUP_TITLES = {
       JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'storybook.taxonomy.json'), 'utf8')).componentGroups,
     ).map((category) => [category.toLowerCase().replace(/ /g, '-'), category]),
   ),
+  ai: 'AI',
   _internal: 'Internal',
 };
 

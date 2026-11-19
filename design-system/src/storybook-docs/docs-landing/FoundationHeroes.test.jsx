@@ -8,8 +8,14 @@ const FOUNDATION_IDS = [
     'foundations-overview',
     'foundations-accessibility',
     'foundations-visual-border',
-    'foundations-visual-elevation',
+    'foundations-visual-elevation-overview',
+    'foundations-visual-elevation-layer-system',
+    'foundations-visual-elevation-shadow-ramp',
+    'foundations-visual-elevation-usage',
+    'foundations-visual-elevation-color',
+    'foundations-visual-elevation-accessibility',
     'foundations-layout-grid',
+    'foundations-layout-dimensions',
     'foundations-visual-iconography',
     'foundations-brand-illustrations',
     'foundations-brand-logos',
@@ -62,7 +68,7 @@ describe('Foundations heroes', () => {
     });
 
     it('Elevation is a light | dark split, the same drawing in two panes', () => {
-        const { container } = render(React.createElement(HEROES['foundations-visual-elevation'].Hero));
+        const { container } = render(React.createElement(HEROES['foundations-visual-elevation-overview'].Hero));
         expect([...container.querySelectorAll('[data-color-mode]')].map((n) => n.dataset.colorMode)).toEqual(['light', 'dark']);
     });
 

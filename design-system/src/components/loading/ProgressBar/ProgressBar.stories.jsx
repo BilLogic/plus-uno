@@ -22,7 +22,7 @@ export default {
     },
 };
 
-const col = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' };
+const col = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' };
 
 export const Overview = () => (
     <div style={{ width: '100%', minWidth: '200px' /* token gap: 200px */, maxWidth: '100%' }}>
@@ -37,7 +37,7 @@ export const Appearances = () => (
     <div style={col}>
         <ProgressBar value={60} appearance="default" />
         <ProgressBar value={100} appearance="success" />
-        <div style={{ padding: 'var(--section-pad-y-compact) var(--section-pad-x-compact)', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--radius-md)' }}>
+        <div style={{ padding: 'var(--pad-x-lg)', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--radius-md)' }}>
             <ProgressBar value={60} appearance="inverse" />
         </div>
     </div>
@@ -49,7 +49,7 @@ export const Default = () => <ProgressBar value={60} appearance="default" />;
 export const Success = () => <ProgressBar value={100} appearance="success" />;
 
 export const Inverse = () => (
-    <div style={{ padding: 'var(--section-pad-y-compact) var(--section-pad-x-compact)', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--radius-md)' }}>
+    <div style={{ padding: 'var(--pad-x-lg)', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--radius-md)' }}>
         <ProgressBar value={60} appearance="inverse" />
     </div>
 );

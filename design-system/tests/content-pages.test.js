@@ -49,8 +49,9 @@ describe('Content pages', () => {
 
     it('Messages links each type’s component docs page', () => {
         const text = readFileSync(join(STYLES, 'ContentMessages.mdx'), 'utf8');
-        for (const id of ['flag', 'section-message', 'inline-message', 'banner', 'modal', 'empty-state', 'spotlight']) {
+        for (const id of ['flag', 'section-message', 'inline-message', 'banner', 'empty-state', 'spotlight']) {
             expect(text).toContain(`components-messaging-${id}`);
         }
+        expect(text).toContain('templates-modal');
     });
 });

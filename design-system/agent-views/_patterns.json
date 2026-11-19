@@ -23,18 +23,13 @@
     },
     {
       "group": "Table",
-      "name": "PatternTable",
-      "use": "How a table sits on a page: inside a Section whose header carries the title and toolbar, with slots for pagination and the empty state."
+      "name": "Table",
+      "use": "How a table sits on a page: a Section header over a Static, Dynamic or Tree table, with its footer and empty state."
     },
     {
       "group": "Overlays",
-      "name": "PatternModal",
-      "use": "The modal's layout, drawn inline: title, body and footer, width a step of the screen grid. For a working dialog (Blanket, focus trap, Escape) use the `Modal` component, which draws the same layers."
-    },
-    {
-      "group": "Overlays",
-      "name": "Blanket",
-      "use": "The full-screen layer under a modal. PatternModal brings its own; use it alone only for a new blocking layer. A Panel floats with no Blanket."
+      "name": "Modal",
+      "use": "The template for content that takes over the screen until it is closed: a `Dialog` (@/components) on a Blanket with modal behavior on Base UI (portal, focus trap, Escape, scroll lock). For the dialog panel inline with no Blanket or modal behavior, use `Dialog`."
     },
     {
       "group": "Popups",

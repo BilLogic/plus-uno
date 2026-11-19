@@ -63,7 +63,8 @@
   @include meta.load-css("../components/forms-and-inputs/ButtonGroup/ButtonGroup");
   // @import "../components/Checkbox/Checkbox"; // no Checkbox component in components/
 
-@include meta.load-css("../components/messaging/Modal/Modal");
+@include meta.load-css("../components/messaging/Dialog/Dialog");
+@include meta.load-css("../patterns/Modal/Modal");
 @include meta.load-css("../components/forms-and-inputs/FooterActions/FooterActions");
 // @import "../components/Navigation/Navigation"; // no Navigation component in components/
 // @import "../components/Form/Form"; // forms live under src/components/forms-and-inputs/
@@ -195,11 +196,11 @@ time {
 }
 
 .border-outline {
-    border: 1px solid var(--ds-border-bold);
+    border: var(--border-width-default) solid var(--ds-border-bold);
 }
 
 .border-outline-variant {
-    border: 1px solid var(--ds-border);
+    border: var(--border-width-default) solid var(--ds-border);
 }
 
 // Visually hidden: read by assistive technology, never seen. A one-pixel,
@@ -220,8 +221,8 @@ time {
 
 // Image Placeholder Utility
 .image-placeholder {
-    background-color: var(--ds-surface-container);
-    border: 1px dashed var(--ds-border);
+    background-color: var(--ds-background-neutral);
+    border: var(--border-width-default) dashed var(--ds-border);
     display: flex;
     align-items: center;
     justify-content: center;

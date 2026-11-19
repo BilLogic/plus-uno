@@ -43,7 +43,7 @@ export default {
     },
 };
 
-const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--grid-gutter)', alignItems: 'center' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--stack-xl) var(--inline-xl)', alignItems: 'center' };
 const pair = { display: 'inline-flex', gap: 'var(--inline-md)', alignItems: 'center' };
 
 /* ------------------------------------------------------------------ helpers */
@@ -153,7 +153,7 @@ PresetWinsOverShape.play = async ({ canvasElement }) => {
 
 /** A loading TagGroup: three tag shapes at the group's gap. */
 export const TagGroupPreset = () => (
-    <div style={{ display: 'grid', gap: 'var(--section-stack-md)' }}>
+    <div style={{ display: 'grid', gap: 'var(--stack-xl) var(--inline-xl)' }}>
         <Skeleton preset="tag-group" data-testid="group" />
         <TagGroup>
             <Tag text="Lincoln Middle" />
@@ -214,7 +214,7 @@ Shapes.play = async ({ canvasElement }) => {
     await expectInert(canvas.getByTestId('stripped'), 'a skeleton given role and tabIndex');
 
     const thumb = canvas.getByTestId('thumb');
-    await expect(radius(thumb), 'radius takes a token name').toBe(12);
+    await expect(radius(thumb), 'radius takes a token name').toBe(16);
 
     // The look: color.skeleton, with the shimmer toward color.skeleton.subtle.
     for (const el of [rect, circle, text, thumb]) {
@@ -243,7 +243,7 @@ export const Text = () => <Skeleton shape="text" width={160} />;
  * `"text"` draw exactly what `shape` does, and resize the same way.
  */
 export const PresetNamesAShape = () => (
-    <div style={{ display: 'grid', gap: 'var(--section-stack-md)' }}>
+    <div style={{ display: 'grid', gap: 'var(--stack-xl) var(--inline-xl)' }}>
         <div style={row}>
             <Skeleton preset="rect" width={160} height={64} data-testid="preset-rect" />
             <Skeleton preset="circle" data-testid="preset-circle" />
@@ -279,7 +279,7 @@ PresetNamesAShape.play = async ({ canvasElement }) => {
 
 /** `lines` repeats the text bar; the last line is shorter so it reads as text. */
 export const Paragraph = () => (
-    <div style={{ display: 'grid', gap: 'var(--section-stack-lg)', width: 'var(--width-1500)' }}>
+    <div style={{ display: 'grid', gap: 'var(--stack-2xl) var(--inline-2xl)', width: 'var(--width-1500)' }}>
         <Skeleton shape="text" lines={3} data-testid="lines" />
         <Skeleton preset="paragraph" data-testid="paragraph" />
     </div>
@@ -475,9 +475,9 @@ export const LoadingCard = () => {
                     display: 'grid',
                     gap: '10px' /* token gap: 10px */,
                     width: '294px' /* token gap: 294px */,
-                    padding: 'var(--card-pad-compact)',
+                    padding: 'var(--card-pad)',
                     border: 'var(--border-width-default) solid var(--ds-border)',
-                    borderRadius: 'var(--card-radius-compact)',
+                    borderRadius: 'var(--card-radius)',
                 }}
             >
                 {loaded ? (

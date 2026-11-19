@@ -53,9 +53,9 @@ Both save; Escape cancels. The inline edit saves itself, so it needs no Save but
 Do: Enter or leaving the field saves the title.
 Don't: A separate Save step beside an inline edit.
 
-### Use compact in dense lists. {#use-compact-in-dense-lists}
+### Use compact spacing in dense lists. {#use-compact-spacing-in-dense-lists}
 
-`compact` draws both views at `--control-md`, to sit in a table cell or a dense row.
+`spacing="compact"` draws both views at `--control-md`, to sit in a table cell or a dense row.
 
 Do: Compact rows in a dense list.
 Don't: The default height spreads a dense list out.
@@ -94,7 +94,7 @@ thought, and keep the buttons so there is a clear way out.
 - `TextField`: use when configuring the text input inside `InlineEditableTextfield` or editing in place with `appearance="subtle"`.
 - `TextArea`: use when passing a multi-line edit view to `InlineEdit`.
 
-Same group: `Code` · `CodeBlock` · `Heading` · `Table` · `VisuallyHidden`
+Same group: `Code` · `CodeBlock` · `DynamicTable` · `Heading` · `StaticTable` · `TreeTable` · `VisuallyHidden`
 
 ## Parts
 
@@ -153,12 +153,18 @@ The edit view takes the field's own tokens: see Text field.
 | `keepEditViewOpenOnBlur` | bool | `false` | Leaving the editor no longer confirms; only Enter and the confirm button do. |
 | `startWithEditViewOpen` | bool | `false` | Opens in the edit view and puts the caret in it. |
 | `hideActionButtons` | bool | `false` | Leaves off the confirm and cancel buttons. Enter, Escape and leaving the editor still work. |
-| `compact` | bool | `false` | The 24 height, with the compact buttons. |
+| `spacing` | enum | `'default'` | Field and button height: `default` (40) or `compact` (32). |
 | `readViewFitContainerWidth` | bool | `false` | The read view fills its container, so the whole row is one press target. |
 | `editLabel` | string | `'Edit'` | What a screen reader hears after the read view, naming what pressing does. |
 | `confirmLabel` | string | `'Confirm'` | — |
 | `cancelLabel` | string | `'Cancel'` | — |
 | `className` | string | `''` | — |
+
+## Variants
+
+**`spacing`** — `default` · `compact`
+
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 

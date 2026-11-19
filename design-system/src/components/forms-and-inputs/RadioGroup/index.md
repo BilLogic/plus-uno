@@ -112,7 +112,7 @@ When choosing one option should show an extra field, such as "Other, please spec
 - `Select`: use when choosing from six or more options.
 - `Fieldset`: use when grouping mixed controls under a legend.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
 
 ## Parts
 
@@ -138,11 +138,11 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Part | Token |
 | --- | --- |
-| Options gap | Stacked `--stack-md`; inline column gap `--space-0625`; tile gap `--inline-lg`. |
+| Options gap | Stacked `--stack-md`; inline column gap `--radio-group-inline-gap`; tile gap `--inline-lg`. |
 | Soft row | `--ds-background-neutral` fill at rest; selected `--ds-background-selected` fill, `--border-width-default` `--ds-border-selected` edge, and `--icon-sm` trailing check in `--ds-icon-selected`. |
 | Choice tile width | `--choice-tile-width` (224px), inline and wrapping. |
 | Radio size | `--radio-control-size`, or `--radio-control-size-10` and `-14` through `size`. |
-| Scale ends | `--ds-text`, body default; gap `--space-0625`. |
+| Scale ends | `--ds-text`, body default; gap `--radio-group-inline-gap`. |
 | Reveal indent | The radio width plus `--stack-md`. |
 
 ## Content guidelines
@@ -194,7 +194,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--ds-text` · `--inline-lg` · `--radio-control-size` · `--radio-control-size-10` · `--radio-control-size-14` · `--space-0625` · `--stack-md`
+`--body-default` · `--ds-text` · `--inline-lg` · `--radio-control-size` · `--radio-control-size-10` · `--radio-control-size-14` · `--radio-group-inline-gap` · `--stack-md`
 
 From `design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.scss`. Override these through the token layer, never with a literal.
 

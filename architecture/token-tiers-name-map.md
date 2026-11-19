@@ -25,9 +25,15 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Stack | `--stack-sm` |  |
 | Stack | `--stack-md` |  |
 | Stack | `--stack-lg` |  |
+| Stack | `--stack-xl` |  |
+| Stack | `--stack-2xl` |  |
+| Stack | `--stack-3xl` |  |
 | Inline | `--inline-sm` |  |
 | Inline | `--inline-md` |  |
 | Inline | `--inline-lg` |  |
+| Inline | `--inline-xl` |  |
+| Inline | `--inline-2xl` |  |
+| Inline | `--inline-3xl` |  |
 | Radius | `--radius-sm` |  |
 | Radius | `--radius-md` |  |
 | Radius | `--radius-lg` |  |
@@ -54,6 +60,8 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Content | `--content-max-width-reading` |  |
 | Content | `--content-min-width` |  |
 | Content | `--content-width` |  |
+| Content | `--content-prose-stack` |  |
+| Content | `--content-list-indent` |  |
 | Size | `--icon-sm` (declared elsewhere) |  |
 | Size | `--icon-md` (declared elsewhere) |  |
 | Size | `--icon-lg` (declared elsewhere) |  |
@@ -92,33 +100,26 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Frame | `--frame-sidebar-group-gap` | two Sidebar groups sit 16 apart |
 | Frame | `--frame-sidebar-row-radius` | the rounding of a Sidebar row (6) |
 | Page | `--page-pad` (declared elsewhere) |  |
-| Page | `--page-pad-x-compact` |  |
-| Page | `--page-pad-x-default` |  |
-| Page | `--page-pad-x-spacious` |  |
-| Page | `--page-pad-y-compact` |  |
-| Page | `--page-pad-y-default` |  |
-| Page | `--page-pad-y-spacious` |  |
 | Page | `--page-stack-sm` (declared elsewhere) |  |
 | Page | `--page-stack-md` (declared elsewhere) |  |
 | Page | `--page-stack-lg` (declared elsewhere) |  |
 | Panel | `--panel-min-width` | the narrowest the splitter allows (320) |
 | Panel | `--panel-width-default` | the width a Panel opens at (400) |
 | Panel | `--panel-max-width` | the widest the splitter allows (640) |
-| Section | `--section-pad-x-compact` |  |
-| Section | `--section-pad-x-default` |  |
-| Section | `--section-pad-x-spacious` |  |
-| Section | `--section-pad-y-compact` |  |
-| Section | `--section-pad-y-default` |  |
-| Section | `--section-pad-y-spacious` |  |
-| Section | `--section-radius` | the rounding of a Section with a fill |
+| Panel | `--panel-pad` |  |
+| Panel | `--panel-pad-y` |  |
+| Panel | `--panel-subheader-pad-y` |  |
+| Panel | `--panel-inline-sm` |  |
+| Panel | `--panel-inline-md` |  |
+| Panel | `--panel-inline-lg` |  |
 | Section | `--section-stack-sm` (declared elsewhere) |  |
 | Section | `--section-stack-md` (declared elsewhere) |  |
 | Section | `--section-stack-lg` (declared elsewhere) |  |
 | Section | `--section-min-width-main` (declared elsewhere) |  |
 | Section | `--section-min-width-side` (declared elsewhere) |  |
-| Card | `--card-pad-compact` |  |
-| Card | `--card-pad-default` |  |
-| Card | `--card-pad-spacious` |  |
+| Section | `--section-toolbar-min-width` |  |
+| Section | `--section-toolbar-count-min-width` |  |
+| Card | `--card-pad` |  |
 | Card | `--card-stack-sm` (declared elsewhere) |  |
 | Card | `--card-stack-md` (declared elsewhere) |  |
 | Card | `--card-stack-lg` (declared elsewhere) |  |
@@ -129,20 +130,35 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Card | `--card-min-width-md` (declared elsewhere) |  |
 | Card | `--card-min-width-lg` (declared elsewhere) |  |
 | Card | `--card-radius` |  |
-| Card | `--card-radius-compact` |  |
 | Card | `--card-max-height-sm` (declared elsewhere) |  |
 | Card | `--card-max-height-md` (declared elsewhere) |  |
 | Card | `--card-max-height-lg` (declared elsewhere) |  |
+| Card | `--card-surface-sunken` |  |
+| Card | `--card-surface-default` |  |
+| Card | `--card-surface-raised` |  |
+| Card | `--card-surface-raised-hovered` |  |
+| Card | `--card-surface-raised-pressed` |  |
+| Card | `--card-surface-overlay` |  |
+| Card | `--card-border-default` |  |
+| Card | `--card-border-width` |  |
+| Card | `--card-shadow-raised` |  |
+| Card | `--card-shadow-overlay` |  |
+| Card | `--card-text` |  |
+| Card | `--card-text-subtle` |  |
+| Card | `--card-title-font-lg` |  |
+| Card | `--card-description-font` |  |
 | Table | `--table-pad-x-cell` (declared elsewhere) |  |
 | Table | `--table-pad-y-cell` (declared elsewhere) |  |
 | Table | `--table-indent` (declared elsewhere) |  |
 | Table | `--table-radius` |  |
 | Table | `--table-pad-x-footer` (declared elsewhere) |  |
+| Table | `--table-inline` |  |
 | Table | `--table-footer-height` |  |
 | Table | `--table-min-width-title` (declared elsewhere) |  |
+| Table | `--table-empty-surface` |  |
+| Table | `--table-empty-radius` |  |
 | Blanket | `--blanket-pad-x` |  |
 | Blanket | `--blanket-pad-y` |  |
-| Blanket | `--blanket-fill` | the Blanket's own fill color; the old declaration's value, written directly so this file carries no old-language word |
 | Blanket | `--blanket-max-height-modal` | a calc() of the pad above: code only, no Figma variable |
 | Modal | `--modal-pad-x-default` |  |
 | Modal | `--modal-pad-x-spacious` |  |
@@ -153,13 +169,14 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Modal | `--modal-inline-md` (declared elsewhere) |  |
 | Modal | `--modal-inline-lg` (declared elsewhere) |  |
 | Modal | `--modal-radius` |  |
-| Modal | `--modal-width-xs` | 4 screen-grid columns plus 2 × 16 modal pad at 768 · 1024 · 1440 |
-| Modal | `--modal-width-sm` | lifted out of spacing / layout, beside the template’s pad/stack tokens |
-| Modal | `--modal-width-md` |  |
-| Modal | `--modal-width-lg` |  |
+| Modal | `--modal-width-4-col` | 4 screen-grid columns plus 2 × 16 modal pad at 768 · 1024 · 1440 |
+| Modal | `--modal-width-6-col` | lifted out of spacing / layout, beside the template’s pad/stack tokens |
+| Modal | `--modal-width-8-col` |  |
+| Modal | `--modal-width-10-col` |  |
 | Page | `--page-border-width` |  |
 | Table | `--table-overflow-reach` |  |
 | Modal | `--modal-body-min-height` |  |
+| Modal | `--modal-shadow` |  |
 | Popup | `--popup-pad` (declared elsewhere) |  |
 | Popup | `--popup-width-sm` (declared elsewhere) |  |
 | Popup | `--popup-width-md` (declared elsewhere) |  |
@@ -192,10 +209,20 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Button | `--button-radius-default` | nests in a 40-high field: its radius 10 minus the 4 slot inset = 6 |
 | Button | `--button-radius-compact` | nests in a 32-high field: its radius 8 minus the 4 slot inset = 4 |
 | Button | `--button-radius-spacious` | 48-high footer button; pairs with --control-xl |
+| Dialog | `--dialog-pad-x-default` |  |
+| Dialog | `--dialog-pad-x-spacious` |  |
+| Dialog | `--dialog-stack-sm` |  |
+| Dialog | `--dialog-stack-md` |  |
+| Dialog | `--dialog-stack-lg` |  |
+| Dialog | `--dialog-inline-sm` |  |
+| Dialog | `--dialog-inline-md` |  |
+| Dialog | `--dialog-inline-lg` |  |
+| Dialog | `--dialog-radius` |  |
+| Dialog | `--dialog-body-min-height` |  |
+| Dialog | `--dialog-shadow` |  |
 | Calendar | `--calendar-day-sm` |  |
 | Calendar | `--calendar-day-md` |  |
 | Calendar | `--calendar-day-lg` |  |
-| Calendar | `--calendar-nav-size` |  |
 | Progress indicator | `--progress-indicator-dot-size-8` | ProgressIndicator size 8 |
 | Progress indicator | `--progress-indicator-dot-size-12` | ProgressIndicator size 12 |
 | Checkbox | `--checkbox-control-size` |  |
@@ -232,6 +259,14 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Option row | `--option-row-control-gap` |  |
 | Option row | `--option-row-dot-size` |  |
 | Count tag | `--count-tag-dot-size` |  |
+| Count tag | `--count-tag-ring-width` |  |
+| Date time picker | `--date-time-picker-section-gap` |  |
+| Field | `--field-gap` |  |
+| Radio group | `--radio-group-inline-gap` |  |
+| Rating | `--rating-gap` |  |
+| Rich text editor | `--rich-text-editor-max-width` |  |
+| AI message | `--ai-message-caret-width` |  |
+| AI message | `--ai-message-dot-size` |  |
 | Tag | `--tag-dot-size` |  |
 | Tag | `--tag-pad-x-end-compact` |  |
 | Tag | `--tag-gap-compact` |  |
@@ -248,6 +283,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Carousel | `--carousel-indicator-height-compact` |  |
 | Carousel | `--carousel-indicator-height` |  |
 | Carousel | `--carousel-indicator-height-spacious` |  |
+| Carousel | `--carousel-slide-max-width` |  |
 | Scroll bar | `--scroll-bar-size` |  |
 | Scroll bar | `--scroll-bar-max-height` |  |
 | Skeleton | `--skeleton-height` |  |
@@ -266,15 +302,27 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Flag | `--flag-timer-height` |  |
 | Spotlight | `--spotlight-width` |  |
 | Spotlight | `--spotlight-media-height` |  |
+| Spotlight | `--spotlight-screen-pad` |  |
+| Spotlight | `--spotlight-pad` |  |
+| Spotlight | `--spotlight-gap` |  |
+| Spotlight | `--spotlight-footer-stack` |  |
 | Menu group | `--menu-group-min-width` |  |
-| Menu group | `--menu-group-pad-x` |  |
-| Menu group | `--menu-group-gap` |  |
 | Popup | `--popup-min-width` |  |
 | Popup | `--popup-max-width` |  |
 | Popup | `--popup-clip-reach` |  |
 | AI chat | `--ai-chat-width` |  |
+| Prompt input | `--prompt-input-min-height` |  |
 | Inbox | `--inbox-width` | 360px |
 | Table | `--table-cell-max-width` |  |
+| Table | `--table-message-gap` |  |
+| Page header | `--page-header-stack` |  |
+| Page header | `--page-header-gap` |  |
+| Comment | `--comment-pad` |  |
+| Comment | `--comment-gap` |  |
+| Comment | `--comment-replies-stack` |  |
+| Comment | `--comment-replies-indent` |  |
+| Progress tracker | `--progress-tracker-connector-width` |  |
+| Progress tracker | `--progress-tracker-dot-size` |  |
 | Avatar | `--avatar-size-96` |  |
 | Avatar | `--avatar-size-128` |  |
 | Spinner | `--spinner-size-sm` |  |

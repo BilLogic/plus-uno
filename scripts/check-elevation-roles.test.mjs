@@ -60,8 +60,9 @@ test('every floating layer takes the overlay pair, and only the Modal blocks', (
   assert.ok(blocking, 'token-mapping.md has no Blocking shadow row');
   assert.match(blocking, /Modal/);
   assert.ok(blocking.includes('var(--ds-shadow-blocking)'), 'the Blocking shadow row does not name var(--ds-shadow-blocking)');
-  const file = 'design-system/src/patterns/PatternModal/PatternModal.scss';
-  assert.match(fs.readFileSync(path.join(REPO_ROOT, file), 'utf8'), /--ds-shadow-overlay/, `${file} does not take the overlay shadow`);
+  const file = 'design-system/src/patterns/Modal/Modal.scss';
+  assert.match(fs.readFileSync(path.join(REPO_ROOT, file), 'utf8'), /--modal-shadow/, `${file} does not take --modal-shadow`);
+  assert.equal(resolveTemplateValue('var(--modal-shadow)'), 'var(--ds-shadow-blocking)', '--modal-shadow does not resolve to --ds-shadow-blocking');
 });
 
 /**
@@ -69,12 +70,13 @@ test('every floating layer takes the overlay pair, and only the Modal blocks', (
  *
  * The Elevation page assigns the levels by pattern. The floating
  * layers on the new color tokens (menus and dropdowns, Listbox, Popover,
- * Toast) and modals take the overlay pair, `--ds-surface-overlay`
+ * Toast) take the overlay pair, `--ds-surface-overlay`
  * with `--ds-shadow-overlay`; the Frame's floating sidebar floats too, so it
- * takes the overlay pair. A card is on the
- * raised pair or lifts while a clickable card is hovered or dragged. Each row
- * is one surface and the shadow its rule must name; a rule that names another
- * level, or a literal shadow, fails.
+ * takes the overlay pair. The Dialog and Modal sit on a Blanket, so
+ * they take `--ds-surface-overlay` with `--ds-shadow-blocking` (`--dialog-shadow` / `--modal-shadow`).
+ * A card is on the raised pair or lifts while a clickable card is hovered or
+ * dragged. Each row is one surface and the shadow its rule must name; a rule
+ * that names another level, or a literal shadow, fails.
  */
 const SURFACES = [
   { file: 'design-system/src/patterns/PatternCard/PatternCard.scss', rule: '.plus-pattern-card--dragging {', shadow: '--ds-shadow-overlay' },
@@ -82,11 +84,30 @@ const SURFACES = [
   { file: 'design-system/src/components/messaging/Flag/Flag.scss', rule: '.plus-flag', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
   // The floating Sidebar floats, so it takes the overlay pair; the docked one stays on the sunken fill.
   { file: 'design-system/src/patterns/Frame/Frame.scss', rule: '.plus-frame__sidebar--raised {', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
-  { file: 'design-system/src/components/messaging/Modal/Modal.scss', rule: '.plus-modal', shadow: '--ds-shadow-blocking', fill: '--ds-surface-overlay' },
-  { file: 'design-system/src/patterns/PatternModal/PatternModal.scss', rule: '.plus-pattern-modal {', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
+  { file: 'design-system/src/components/messaging/Dialog/Dialog.scss', rule: '.plus-dialog {', shadow: '--ds-shadow-blocking', fill: '--ds-surface-overlay' },
+  { file: 'design-system/src/patterns/Modal/Modal.scss', rule: '.plus-modal {', shadow: '--ds-shadow-blocking' },
   { file: 'design-system/src/components/forms-and-inputs/_internal/Listbox.scss', rule: '', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
   { file: 'design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.scss', rule: '.plus-dropdown-menu {', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
 ];
+
+const TEMPLATES_FILE = 'design-system/src/tokens/ladder/_templates.scss';
+const COMPONENTS_FILE = 'design-system/src/tokens/ladder/_components.scss';
+
+function tokenMap(relFile) {
+  const src = fs.readFileSync(path.join(REPO_ROOT, relFile), 'utf8');
+  const map = new Map();
+  for (const m of src.matchAll(/^\s*(--[a-z0-9-]+):\s*([^;]+);/gm)) {
+    map.set(m[1], m[2].trim());
+  }
+  return map;
+}
+
+const TOKEN_DEFINITIONS = new Map([...tokenMap(TEMPLATES_FILE), ...tokenMap(COMPONENTS_FILE)]);
+function resolveTemplateValue(value) {
+  if (!value) return value;
+  const m = /^var\((--(?:modal|dialog|card)-[a-z0-9-]+)\)$/.exec(value.trim());
+  return m && TOKEN_DEFINITIONS.has(m[1]) ? TOKEN_DEFINITIONS.get(m[1]) : value.trim();
+}
 
 /**
  * THE CARD PATTERN IS ON ATLASSIAN'S RAISED PAIR (color proposal, decision
@@ -96,12 +117,18 @@ const SURFACES = [
  * on the overlay pair. The card paints the current surface and sets it, so a
  * sticky table cell inside matches the card.
  */
+
 const PATTERN_CARD = {
   file: 'design-system/src/patterns/PatternCard/PatternCard.scss',
   states: [
-    ['.plus-pattern-card', '--ds-surface-raised', '--ds-shadow-raised'],
-    ['.plus-pattern-card--clickable:hover', '--ds-surface-raised-hovered', '--ds-shadow-overlay'],
-    ['.plus-pattern-card--clickable:active', '--ds-surface-raised-pressed', '--ds-shadow-raised'],
+    ['.plus-pattern-card', '--ds-surface-sunken', null],
+    ['.plus-pattern-card--surface-sunken', '--ds-surface-sunken', null],
+    ['.plus-pattern-card--surface-default', '--ds-surface', null],
+    ['.plus-pattern-card--surface-raised', '--ds-surface-raised', '--ds-shadow-raised'],
+    ['.plus-pattern-card--clickable:not(.plus-pattern-card--dragging):hover', '--ds-surface-raised', '--ds-shadow-raised'],
+    ['.plus-pattern-card--clickable:not(.plus-pattern-card--dragging):active', '--ds-surface-raised-pressed', '--ds-shadow-raised'],
+    ['.plus-pattern-card--surface-raised.plus-pattern-card--clickable:not(.plus-pattern-card--dragging):hover', '--ds-surface-raised-hovered', '--ds-shadow-overlay'],
+    ['.plus-pattern-card--surface-raised.plus-pattern-card--clickable:not(.plus-pattern-card--dragging):active', '--ds-surface-raised-pressed', '--ds-shadow-raised'],
     ['.plus-pattern-card--dragging', '--ds-surface-overlay', '--ds-shadow-overlay'],
   ],
 };
@@ -117,7 +144,7 @@ function firstAfter(source, rule, property) {
 for (const surface of SURFACES) {
   test(`${path.basename(surface.file)} lifts its surface with ${surface.shadow}`, () => {
     const source = fs.readFileSync(path.join(REPO_ROOT, surface.file), 'utf8');
-    const shadow = firstAfter(source, surface.rule, 'box-shadow');
+    const shadow = resolveTemplateValue(firstAfter(source, surface.rule, 'box-shadow'));
     assert.ok(shadow, `no box-shadow after "${surface.rule}" in ${surface.file}`);
     assert.match(
       shadow,
@@ -125,7 +152,7 @@ for (const surface of SURFACES) {
       `${surface.file} lifts its surface with "${shadow}"; the Elevation page and the role layer say var(${surface.shadow}).`,
     );
     if (surface.fill) {
-      assert.equal(firstAfter(source, surface.rule, 'background-color'), `var(${surface.fill})`);
+      assert.equal(resolveTemplateValue(firstAfter(source, surface.rule, 'background-color')), `var(${surface.fill})`);
     }
   });
 }
@@ -185,10 +212,11 @@ function compiledRules(file) {
   return compiled.get(file);
 }
 
-/** The declarations every compiled rule listing exactly `selector` sets, in source order. */
+/** The declarations every top-level compiled rule listing exactly `selector` sets, in source order. */
 function compiledDecls(file, selector) {
   const merged = {};
   compiledRules(file).walkRules((rule) => {
+    if (rule.parent?.type === 'atrule') return;
     if (!rule.selectors.map((s) => s.trim()).includes(selector)) return;
     for (const node of rule.nodes) if (node.type === 'decl') merged[node.prop] = node.value;
   });
@@ -199,11 +227,13 @@ test('PatternCard pairs each surface with its shadow, at rest, lifted, pressed a
   const { file, states } = PATTERN_CARD;
   const rest = compiledDecls(file, '.plus-pattern-card');
   assert.equal(rest['background-color'], 'var(--ds-utility-elevation-surface-current)', `${file}: the card paints the current surface`);
-  assert.equal(rest.border ?? rest['border-width'], undefined, `${file}: the shadow's ring is the edge, not a border`);
+  assert.equal(rest.border, 'var(--card-border-width) solid transparent', `${file}: every card keeps a 1px transparent border for forced colors`);
+  const defaultCard = compiledDecls(file, '.plus-pattern-card--surface-default');
+  assert.equal(resolveTemplateValue(defaultCard['border-color']), 'var(--ds-border)', `${file}: default surface uses --ds-border`);
   for (const [selector, surface, shadow] of states) {
     const decls = compiledDecls(file, selector);
-    assert.equal(decls['--ds-utility-elevation-surface-current'], `var(${surface})`, `${file}: "${selector}" surface`);
-    assert.equal(decls['box-shadow'], `var(${shadow})`, `${file}: "${selector}" shadow`);
+    assert.equal(resolveTemplateValue(decls['--ds-utility-elevation-surface-current']), `var(${surface})`, `${file}: "${selector}" surface`);
+    assert.equal(resolveTemplateValue(decls['box-shadow']), shadow ? `var(${shadow})` : 'none', `${file}: "${selector}" shadow`);
   }
   compiledRules(file).walkRules((rule) => {
     for (const selector of rule.selectors) {

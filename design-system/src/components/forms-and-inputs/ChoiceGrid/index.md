@@ -101,7 +101,7 @@ Don't: A `size={12}` grid under a `size={14}` grid.
 - `CheckboxGroup`: use when asking a single multi-select question.
 - `Table`: use when displaying data rather than collecting answers.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
 
 ## Parts
 
@@ -127,7 +127,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Part | Token |
 | --- | --- |
-| Surface | `--ds-surface-container` on the table, headers, labels and cells. |
+| Surface | `--ds-surface-sunken` on the table, headers, labels and cells. |
 | Padding | `--pad-y-md` and `--pad-x-md` on headers, labels and cells. |
 | Corner | `--radius-md`. |
 | Text | `--ds-text`, body default, or the label font `size` picks. |
@@ -169,7 +169,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-lg` · `--body-sm` · `--checkbox-control-size` · `--choice-grid-control-size-10` · `--choice-grid-control-size-12` · `--ds-surface-container` · `--ds-text` · `--ds-text-subtle` · `--pad-x-md` · `--pad-y-md` · `--table-radius`
+`--body-default` · `--body-lg` · `--body-sm` · `--checkbox-control-size` · `--choice-grid-control-size-10` · `--choice-grid-control-size-12` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--pad-x-md` · `--pad-y-md` · `--table-radius`
 
 From `design-system/src/components/forms-and-inputs/ChoiceGrid/ChoiceGrid.scss`. Override these through the token layer, never with a literal.
 

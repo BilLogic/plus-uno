@@ -1,0 +1,105 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { RefTable } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import {
+    FoundationSection,
+    FoundationSubsection,
+} from '@/storybook-docs/foundation-page.jsx';
+import * as ElevationStories from './Elevation.stories.jsx';
+
+<Meta title="Foundations/Visual/Elevation/Usage" />
+
+<DocsLanding
+    page="foundations-visual-elevation-usage"
+    eyebrow="Foundation · Elevation"
+    title="Usage"
+    purpose="Choose elevation by what a surface does, never by how strong a shadow looks."
+/>
+
+<RefTable
+    head={['What it does', 'Where it sits', 'Templates and components']}
+    rows={[
+        ['Blocks the page', <strong>Layer 4 · Blocking</strong>, 'Modal on the Blanket'],
+        ['Floats, page stays usable', <strong>Layer 3 · Non-blocking</strong>, 'Floating Sidebar and Panel, Popup types, Inline edit, Flag, Spotlight, a dragged Card'],
+        ['Stays put while content scrolls', <strong>Layer 2 · Navigation</strong>, 'Sticky table header and column'],
+        ['The one object the view is about', <strong>Page · Raised</strong>, 'Primary card, a clickable card on hover, Range thumb, current Carousel slide'],
+        ['Groups static content', <strong>Page · Sunken</strong>, 'Card (default), empty box, a clickable card at rest'],
+        ['Everything else in the flow', <strong>Page · Default</strong>, 'Section and its side, table, list, form; a Default card, bordered'],
+        ['Holds the app', <strong>Layer 0 · Frame</strong>, 'The Frame and the docked Sidebar'],
+        ['Labels a control', <strong>Not a layer</strong>, 'Tooltip, no shadow'],
+    ]}
+/>
+
+<FoundationSection title="Golden rules">
+
+Ten rules, each as a Do and a Don’t.
+
+<FoundationSubsection title="1. Flat by default">
+
+<Canvas of={ElevationStories.UsageRule1} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="2. Lift means you can act on it">
+
+<Canvas of={ElevationStories.UsageRule2} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="3. Raise one thing per view">
+
+<Canvas of={ElevationStories.UsageRule3} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="4. Group with a surface color or a border, never a shadow">
+
+<Canvas of={ElevationStories.UsageRule4} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="5. A blocking overlay sits on the Blanket">
+
+<Canvas of={ElevationStories.UsageRule5} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="6. One blocking overlay at a time">
+
+<Canvas of={ElevationStories.UsageRule6} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="7. No stroke on an elevated surface">
+
+<Canvas of={ElevationStories.UsageRule7} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="8. Pair the surface with its shadow">
+
+<Canvas of={ElevationStories.UsageRule8} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="9. Dark mode lightens only what floats">
+
+<Canvas of={ElevationStories.UsageRule9} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="10. A control’s boundary meets 3:1">
+
+<Canvas of={ElevationStories.UsageRule10} />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="In motion">
+
+Elevation changes on a spring and never jumps. A clip never cuts a shadow: a scrolling area leaves room for the shadow of what floats inside it.
+
+<Canvas of={ElevationStories.InMotion} />
+
+</FoundationSubsection>
+
+</FoundationSection>

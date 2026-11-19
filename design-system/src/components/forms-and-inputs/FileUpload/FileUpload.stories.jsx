@@ -103,7 +103,7 @@ Overview.parameters = {
 
 export const Content = () => (
     <div style={{ maxWidth: 'var(--size-5400)' }}>
-        <p className="body-default" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--section-stack-md)' }}>
+        <p className="body-default" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--stack-xl)' }}>
             Label, minority marker, accepted formats, and button copy.
         </p>
         <FileUpload
@@ -614,5 +614,5 @@ Interactive.args = {
 
 const radiusOf = (root, selector) => getComputedStyle(root.querySelector(selector)).borderTopLeftRadius;
 Overview.play = async ({ canvasElement }) => {
-    await expect(radiusOf(canvasElement, '.plus-file-upload-container'), 'Drop zone radius is 12').toBe('12px');
+    await expect(radiusOf(canvasElement, '.plus-file-upload-container'), 'Drop zone radius is 16').toBe('16px');
 };

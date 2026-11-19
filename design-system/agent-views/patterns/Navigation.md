@@ -14,7 +14,7 @@ Four tiers, from the whole app down to one record. A quick look is a layer, not 
 
 - **1 · Areas.** Go to: the Sidebar's fixed items. The selected row takes the selected fill.
 - **1b · Open items.** Records the person opened, a session or a student, as temporary items in the Sidebar: add and remove, then go to.
-- **2 · Views.** Pill views in a Section's view bar, or page tabs under the page title. Content swaps in place.
+- **2 · Views.** Pill views in a Section's header, or page tabs under the page title. Content swaps in place.
 - **3 · Drill in and climb out.** A record page with a breadcrumb: the record's place, parents only. Climb out through the breadcrumb.
 
 ## Key cases
@@ -27,7 +27,7 @@ Choose the navigation tier first; it sets the control, placement and motion. Nav
 | --- | --- | --- | --- |
 | 1 · Areas | To another part of the app | A Sidebar item | Go to |
 | 1b · Open items | To a session or student opened earlier | A temporary item in the Sidebar, named by when and who | Add and remove, then Go to |
-| 2 · Views | Between views of one collection or record | Pill views in the view bar; page tabs under the title | Switch views: content in place, the indicator glides |
+| 2 · Views | Between views of one collection or record | Pill views in the Section header; page tabs under the title | Switch views: content in place, the indicator glides |
 | 3 · Drill in and climb out | Into one record and back | A row, then the breadcrumb | Drill in, Climb out |
 | Within a level | Through a task's steps | Back and Next in the bottom bar; the step rail | Step |
 | A layer | A quick look without leaving | A Details Panel or a Modal | Open and Close |
@@ -142,11 +142,11 @@ Close at the start of the title row, no Sidebar, no breadcrumb. How the steps, t
 Do: Each item names the session by its time and the teacher.
 Don't: Each item carries everything, and the time it is found by is cut off.
 
-### Put the collection's add action in its view bar, not the page header. {#put-the-collection-s-add-action-in-its-view-bar-not-the-page-header}
+### Put the collection's add action in its Section's title row, not the page header. {#put-the-collection-s-add-action-in-its-section-s-title-row-not-the-page-header}
 
 **Checked:** Automatic
 
-"Add student" is the Primary at the end of the Students view bar. Page actions sit at the end of the title row and are only about the page.
+"Add student" is the Primary at the end of the Students Section's title row. Page actions sit at the end of the page header and are only about the page.
 
 ## In code
 

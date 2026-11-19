@@ -59,7 +59,7 @@ test('frame tokens sit on Spacing and size and layer tokens on Elevation and lay
   assert.equal(placeToken('--layer-modal', 'ladder/_layers.scss').collection, 'elevation');
   assert.equal(placeToken('--layer-frame-sidebar', '_frame_layers.scss').collection, 'elevation');
   assert.equal(placeToken('--layer-frame-sidebar', '_frame_layers.scss').scope, 'templates');
-  assert.equal(placeToken('--card-pad-default', 'ladder/_templates.scss').scope, 'components');
+  assert.equal(placeToken('--card-pad', 'ladder/_templates.scss').scope, 'components');
 });
 
 test('scope follows the family: page-level tokens are Templates, card, modal, popup and table are Components', () => {

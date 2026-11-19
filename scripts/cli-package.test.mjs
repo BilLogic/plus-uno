@@ -104,7 +104,7 @@ test('npm pack, install in a scratch project, `npx ds find Button` answers from 
 
     // A page template and a chart: patterns and the chart theme come along, and the project builds.
     const more = JSON.parse(sh('npx', ['--no-install', 'ds', 'add', 'ListPage', 'BarChart', '--json'], project));
-    for (const name of ['ListPage', 'Frame', 'PatternSection', 'PatternTable', 'BarChart', 'chart-theme']) assert.ok(more.items.includes(name), `${name} comes along`);
+    for (const name of ['ListPage', 'Frame', 'PatternSection', 'StaticTable', 'BarChart', 'chart-theme']) assert.ok(more.items.includes(name), `${name} comes along`);
     assert.ok(more.added.includes('highcharts'), 'the chart brings highcharts');
     fs.writeFileSync(path.join(project, 'src/main.jsx'), [
       "import { createRoot } from 'react-dom/client';",

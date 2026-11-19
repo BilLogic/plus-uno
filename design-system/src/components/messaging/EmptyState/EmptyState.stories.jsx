@@ -5,7 +5,7 @@ import { expect, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { px } from '@/storybook-docs/lib/style-probes.js';
-import { Button, DynamicTable, Illustration, Table } from '@/components';
+import { Button, DynamicTable, Illustration, StaticTable } from '@/components';
 import EmptyState from './EmptyState';
 
 /**
@@ -205,7 +205,7 @@ NoAccess.play = async ({ canvasElement }) => {
 
 /** A table body that fails to load keeps its header row. */
 export const LoadFailureInATable = () => (
-    <Table
+    <StaticTable
         headers={['Student', 'Grade', 'Sessions']}
         rows={[]}
         emptyState={(

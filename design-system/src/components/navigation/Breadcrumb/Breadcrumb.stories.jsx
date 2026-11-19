@@ -53,7 +53,7 @@ export default {
     },
 };
 
-const breadcrumbCol = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' };
+const breadcrumbCol = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)' };
 const breadcrumbBlock = { display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-md)' };
 
 function BreadcrumbStandardDemo() {

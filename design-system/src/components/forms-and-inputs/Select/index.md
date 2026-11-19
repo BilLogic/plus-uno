@@ -8,7 +8,7 @@ Also asked as: combobox, picklist, option list, async select.
 
 **Import:** `import { Select } from '@/components';`
 
-**Used in:** Form (`ds guide form`); Section (`ds guide section`)
+**Used in:** Form (`ds guide form`); Section (`ds guide section`); Table (`ds guide table`)
 
 **Governed by:** Filtering (`design-system/agent-views/patterns/Filtering.md`, `ds guide filtering`) — Quick filters (1–3 categories, short lists) use `FilterButton`, not `Select`.; Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Read-only (`ds guide read-only`); +1 more
 
@@ -165,7 +165,7 @@ Don't: Disabled fades a value people need to read.
 - `Cascader`: use when choosing a hierarchical path column by column.
 - `TagInput`: use when picking and creating color-coded tags in place.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
 
 ## Parts
 
@@ -200,7 +200,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | List | `--ds-surface-overlay` with a `--ds-border` edge, `--popup-radius` and `--ds-shadow-overlay`. |
 | Option | `--pad-y-md` `--pad-x-md`, `--body-default`; hovered `--ds-background-neutral-subtle-hovered`, picked `--ds-background-selected`. |
 | Select all mark | `--ds-background-input` with a `--ds-border-input` edge and `--radius-md`; checked `--ds-background-selected-bold`, `--ds-border-selected`, `--ds-icon-inverse`. |
-| Search hint | "Type to search" above a long list: `--body-sm` in `--ds-text-subtle`, `--space-025` `--pad-x-md`. |
+| Search hint | "Type to search" above a long list: `--body-sm` in `--ds-text-subtle`, `--pad-x-xs` `--pad-x-md`. |
 
 ## Content guidelines
 
@@ -275,7 +275,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-sm` · `--border-width-default` · `--ds-background-input` · `--ds-background-neutral-subtle-hovered` · `--ds-background-selected-bold` · `--ds-border-focused` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-subtle` · `--ds-text-subtlest` · `--focus-ring-width` · `--icon-sm` · `--pad-x-md` · `--pad-y-md` · `--radius-md` · `--space-025` · `--stack-md` · `--stack-sm` · `--type-size-0875`
+`--body-default` · `--body-sm` · `--border-width-default` · `--ds-background-input` · `--ds-background-neutral-subtle-hovered` · `--ds-background-selected-bold` · `--ds-border-focused` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-subtle` · `--ds-text-subtlest` · `--focus-ring-width` · `--icon-sm` · `--pad-x-md` · `--pad-x-xs` · `--pad-y-md` · `--radius-md` · `--stack-md` · `--stack-sm` · `--type-size-0875`
 
 From `design-system/src/components/forms-and-inputs/Select/Select.scss`. Override these through the token layer, never with a literal.
 

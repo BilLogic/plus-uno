@@ -21,7 +21,7 @@ InlineEditableTextfield reads these motion tokens and no literal duration or cur
 
 ## Related
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `IconButton` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `IconButton` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
 
 ## Props
 
@@ -42,12 +42,18 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `keepEditViewOpenOnBlur` | bool | — | — |
 | `startWithEditViewOpen` | bool | — | — |
 | `hideActionButtons` | bool | — | — |
-| `compact` | bool | `false` | — |
+| `spacing` | oneOf | `'default'` | Field and button height: `default` (40) or `compact` (32). |
 | `readViewFitContainerWidth` | bool | — | — |
 | `editLabel` | string | — | — |
 | `confirmLabel` | string | — | — |
 | `cancelLabel` | string | — | — |
 | `className` | string | — | — |
+
+## Variants
+
+**`spacing`** — `default` · `compact`
+
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

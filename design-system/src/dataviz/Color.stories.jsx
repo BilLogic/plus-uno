@@ -109,7 +109,7 @@ const bar = (segments, { separator = true } = {}) => (
 
 /** A stacked bar with and without the separator line between two close tones. */
 export const SeparatorCompare = () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(304px, 1fr))', gap: 'var(--grid-gutter)' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(304px, 1fr))', gap: 'var(--stack-xl) var(--inline-xl)' }}>
         <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
             {bar([['--chart-categorical-3', 1], ['--chart-categorical-3-hovered', 1]])}
             <figcaption style={label}>With the separator line, the seam between two close tones still reads.</figcaption>

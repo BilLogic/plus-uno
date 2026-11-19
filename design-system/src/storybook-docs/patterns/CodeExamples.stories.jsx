@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import {
-    Banner, Breadcrumb, Button, EmptyState, FilterButton,
-    PopupSelect, SearchField, Skeleton, StatusTag, TextField,
+    Banner, Breadcrumb, Button, EmptyState,
+    SearchField, Skeleton, StaticTable, StatusTag, TextField,
 } from '@/components';
-import { PatternCard, PatternSection, PatternTable } from '@/patterns';
+import { PatternCard, PatternSection, Table } from '@/patterns';
 
 export default {
     title: 'Patterns/Overview/Code examples',
@@ -11,17 +11,23 @@ export default {
     parameters: { layout: 'padded' },
 };
 
+const STATUSES = ['All', 'Needs review', 'Reviewed'];
+
 export const Filtering = {
     tags: ['pattern:Filtering'],
     render: function QuickFilterExample() {
         const [status, setStatus] = useState('All');
         return (
-            <PatternSection title="Sessions" toolbar={
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}><PopupSelect label="Status" options={['All', 'Needs review', 'Reviewed']}
-                    value={status} onChange={setStatus}
-                    trigger={<FilterButton text="Status" trailingMetric={status === 'All' ? undefined : 1} />}
-                /></div>
-            }>
+            <PatternSection
+                title="Sessions"
+                filters={[{
+                    key: 'status',
+                    label: 'Status',
+                    text: status,
+                    isSelected: status !== 'All',
+                    onClick: () => setStatus(STATUSES[(STATUSES.indexOf(status) + 1) % STATUSES.length]),
+                }]}
+            >
                 <p role="status">Showing: {status}</p>
             </PatternSection>
         );
@@ -33,11 +39,10 @@ export const Search = {
     render: function SearchExample() {
         const [query, setQuery] = useState('');
         return (
-            <PatternSection title="Students" toolbar={
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    <SearchField placeholder="Search students" mode="active" value={query} onValueChange={setQuery} />
-                </div>
-            }>
+            <PatternSection
+                title="Students"
+                search={<SearchField placeholder="Search students" mode="active" spacing="compact" value={query} onValueChange={setQuery} />}
+            >
                 <p role="status">{['Ana Ruiz', 'Ben Okafor'].filter((name) => name.toLowerCase().includes(query.toLowerCase())).join(', ')}</p>
             </PatternSection>
         );
@@ -99,13 +104,12 @@ export const Empty = {
     tags: ['pattern:Empty'],
     render: function EmptyExample() {
         return (
-            <PatternTable empty emptyState={
+            <Table title="Sessions" empty emptyState={
                 <EmptyState spacing="compact" header="No matching sessions" description="Try another search or reset the filters."
                     secondaryAction={<Button text="Reset filters" spacing="compact" />} />
             }>
-                <thead><tr><th>Student</th><th>Status</th></tr></thead>
-                <tbody />
-            </PatternTable>
+                <StaticTable headers={['Student', 'Status']} rows={[]} />
+            </Table>
         );
     },
 };

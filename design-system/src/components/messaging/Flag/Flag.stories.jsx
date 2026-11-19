@@ -72,7 +72,7 @@ export default {
 };
 
 export const Overview = () => (
-    <FlagGroup style={{ padding: 'var(--card-pad-compact)' }} containerPosition="static">
+    <FlagGroup style={{ padding: 'var(--card-pad)' }} containerPosition="static">
         <Flag title="Notes copied" timestamp="Just now" autohide={false}>
             The session notes are on your clipboard.
         </Flag>
@@ -170,7 +170,7 @@ const FlagInteractiveWrapper = ({ appearance, position, title, children, show, a
 
     return (
         <div className="plus-flag-interactive-demo">
-            <FlagGroup position={position} style={{ padding: 'var(--card-pad-compact)' }}>
+            <FlagGroup position={position} style={{ padding: 'var(--card-pad)' }}>
                 <Flag
                     show={isOpen}
                     onDismiss={() => setIsOpen(false)}
@@ -555,7 +555,7 @@ const STACK_SLOT = { position: 'relative', width: 420 /* token gap: 420px */, he
 const ClosingStack = ({ reducedMotion }) => {
     const [middleOpen, setMiddleOpen] = useState(true);
     return (
-        <div style={{ position: 'relative', display: 'flex', gap: 'var(--section-stack-lg)', height: 360 /* token gap: 360px */ }}>
+        <div style={{ position: 'relative', display: 'flex', gap: 'var(--inline-2xl)', height: 360 /* token gap: 360px */ }}>
             <div style={STACK_SLOT}>
                 <FlagGroup position="top-start" containerPosition="absolute" reducedMotion={reducedMotion} data-testid="stack-three">
                     <Flag title="First" autohide={false} data-testid="three-first" />

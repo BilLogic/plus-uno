@@ -51,7 +51,7 @@ Frame reads these motion tokens and no literal duration or curve.
 
 - For a bare fill and elevation, use `Page`.
 - For a region inside the content, use `PatternSection`.
-- For a short task that keeps the page in view behind it, use `PatternModal`. A focused Frame is for a task that blocks the page until it is done, or a long one.
+- For a short task that keeps the page in view behind it, use `Modal`. A focused Frame is for a task that blocks the page until it is done, or a long one.
 
 ## Best practices
 
@@ -123,7 +123,7 @@ Elevation and fills follow Elevation.
 - Panel: use when the work should float beside the page, not replace it.
 - Grid: use when you need the column math the Frame is sized by.
 
-Same group: `AiChat` · `Blanket` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternTable`
+Same group: `AiChat` · `Modal` · `Page` · `PatternCard` · `PatternSection` · `Table`
 
 ## Types
 

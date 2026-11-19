@@ -2,9 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 const METRIC_CLASSES = {
-    lg: 'metric-lg',
-    md: 'metric-md',
-    sm: 'metric-sm',
+    'metric-lg': 'metric-lg',
+    'metric-md': 'metric-md',
+    'metric-sm': 'metric-sm',
 };
 
 /**
@@ -17,7 +17,7 @@ const DonutChartSVG = ({
     percentage: percentageProp,
     value,
     label = '',
-    centerTextSize = 'sm',
+    centerTextSize = 'metric-sm',
 }) => {
     let percentage = percentageProp;
     if (percentage === undefined) {
@@ -40,7 +40,7 @@ const DonutChartSVG = ({
         completedPath = path30Percent;
     }
 
-    const metricClass = METRIC_CLASSES[centerTextSize] || METRIC_CLASSES.sm;
+    const metricClass = METRIC_CLASSES[centerTextSize] || METRIC_CLASSES['metric-sm'];
 
     let displayValue = value;
     if (!displayValue) {
@@ -129,8 +129,8 @@ DonutChartSVG.propTypes = {
     value: PropTypes.string,
     /** Label text below the value */
     label: PropTypes.string,
-    /** Metric scale step for the center figure */
-    centerTextSize: PropTypes.oneOf(['lg', 'md', 'sm']),
+    /** Metric scale type token for the center figure */
+    centerTextSize: PropTypes.oneOf(['metric-lg', 'metric-md', 'metric-sm']),
     /** Size of the chart (currently fixed at 48x40px for table cells) */
     size: PropTypes.number,
 };

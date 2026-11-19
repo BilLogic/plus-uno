@@ -86,6 +86,27 @@
           }
         },
         {
+          "name": "Stack/xl",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--stack-xl)"
+          }
+        },
+        {
+          "name": "Stack/2xl",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--stack-2xl)"
+          }
+        },
+        {
+          "name": "Stack/3xl",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--stack-3xl)"
+          }
+        },
+        {
           "name": "Inline/sm",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -104,6 +125,27 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--inline-lg)"
+          }
+        },
+        {
+          "name": "Inline/xl",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--inline-xl)"
+          }
+        },
+        {
+          "name": "Inline/2xl",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--inline-2xl)"
+          }
+        },
+        {
+          "name": "Inline/3xl",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--inline-3xl)"
           }
         },
         {
@@ -268,6 +310,20 @@
           }
         },
         {
+          "name": "Content/prose-stack",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--content-prose-stack)"
+          }
+        },
+        {
+          "name": "Content/list-indent",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--content-list-indent)"
+          }
+        },
+        {
           "name": "Control/sm",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -343,48 +399,6 @@
           }
         },
         {
-          "name": "Page/pad-x-compact",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--page-pad-x-compact)"
-          }
-        },
-        {
-          "name": "Page/pad-x-default",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--page-pad-x-default)"
-          }
-        },
-        {
-          "name": "Page/pad-x-spacious",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--page-pad-x-spacious)"
-          }
-        },
-        {
-          "name": "Page/pad-y-compact",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--page-pad-y-compact)"
-          }
-        },
-        {
-          "name": "Page/pad-y-default",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--page-pad-y-default)"
-          }
-        },
-        {
-          "name": "Page/pad-y-spacious",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--page-pad-y-spacious)"
-          }
-        },
-        {
           "name": "Panel/min-width",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -406,73 +420,66 @@
           }
         },
         {
-          "name": "Section/pad-x-compact",
+          "name": "Panel/pad",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--section-pad-x-compact)"
+            "WEB": "var(--panel-pad)"
           }
         },
         {
-          "name": "Section/pad-x-default",
+          "name": "Panel/pad-y",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--section-pad-x-default)"
+            "WEB": "var(--panel-pad-y)"
           }
         },
         {
-          "name": "Section/pad-x-spacious",
+          "name": "Panel/subheader-pad-y",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--section-pad-x-spacious)"
+            "WEB": "var(--panel-subheader-pad-y)"
           }
         },
         {
-          "name": "Section/pad-y-compact",
+          "name": "Panel/inline-sm",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--section-pad-y-compact)"
+            "WEB": "var(--panel-inline-sm)"
           }
         },
         {
-          "name": "Section/pad-y-default",
+          "name": "Panel/inline-md",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--section-pad-y-default)"
+            "WEB": "var(--panel-inline-md)"
           }
         },
         {
-          "name": "Section/pad-y-spacious",
+          "name": "Panel/inline-lg",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--section-pad-y-spacious)"
+            "WEB": "var(--panel-inline-lg)"
           }
         },
         {
-          "name": "Section/radius",
+          "name": "Section/toolbar-min-width",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--section-radius)"
+            "WEB": "var(--section-toolbar-min-width)"
           }
         },
         {
-          "name": "Card/pad-compact",
+          "name": "Section/toolbar-count-min-width",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--card-pad-compact)"
+            "WEB": "var(--section-toolbar-count-min-width)"
           }
         },
         {
-          "name": "Card/pad-default",
+          "name": "Card/pad",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--card-pad-default)"
-          }
-        },
-        {
-          "name": "Card/pad-spacious",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--card-pad-spacious)"
+            "WEB": "var(--card-pad)"
           }
         },
         {
@@ -483,13 +490,6 @@
           }
         },
         {
-          "name": "Card/radius-compact",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--card-radius-compact)"
-          }
-        },
-        {
           "name": "Table/radius",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -497,10 +497,31 @@
           }
         },
         {
+          "name": "Table/inline",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--table-inline)"
+          }
+        },
+        {
           "name": "Table/footer-height",
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--table-footer-height)"
+          }
+        },
+        {
+          "name": "Table/empty-surface",
+          "resolvedType": "COLOR",
+          "codeSyntax": {
+            "WEB": "var(--table-empty-surface)"
+          }
+        },
+        {
+          "name": "Table/empty-radius",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--table-empty-radius)"
           }
         },
         {
@@ -515,13 +536,6 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--blanket-pad-y)"
-          }
-        },
-        {
-          "name": "Blanket/fill",
-          "resolvedType": "COLOR",
-          "codeSyntax": {
-            "WEB": "var(--blanket-fill)"
           }
         },
         {
@@ -546,24 +560,24 @@
           }
         },
         {
-          "name": "Modal/width-sm",
+          "name": "Modal/width-6-col",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--modal-width-sm)"
+            "WEB": "var(--modal-width-6-col)"
           }
         },
         {
-          "name": "Modal/width-md",
+          "name": "Modal/width-8-col",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--modal-width-md)"
+            "WEB": "var(--modal-width-8-col)"
           }
         },
         {
-          "name": "Modal/width-lg",
+          "name": "Modal/width-10-col",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--modal-width-lg)"
+            "WEB": "var(--modal-width-10-col)"
           }
         },
         {
@@ -635,6 +649,83 @@
           }
         },
         {
+          "name": "Dialog/pad-x-default",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--dialog-pad-x-default)"
+          }
+        },
+        {
+          "name": "Dialog/pad-x-spacious",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--dialog-pad-x-spacious)"
+          }
+        },
+        {
+          "name": "Dialog/stack-sm",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--dialog-stack-sm)"
+          }
+        },
+        {
+          "name": "Dialog/stack-md",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--dialog-stack-md)"
+          }
+        },
+        {
+          "name": "Dialog/stack-lg",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--dialog-stack-lg)"
+          }
+        },
+        {
+          "name": "Dialog/inline-sm",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--dialog-inline-sm)"
+          }
+        },
+        {
+          "name": "Dialog/inline-md",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--dialog-inline-md)"
+          }
+        },
+        {
+          "name": "Dialog/inline-lg",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--dialog-inline-lg)"
+          }
+        },
+        {
+          "name": "Dialog/radius",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--dialog-radius)"
+          }
+        },
+        {
+          "name": "Dialog/body-min-height",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--dialog-body-min-height)"
+          }
+        },
+        {
+          "name": "Dialog/shadow",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--dialog-shadow)"
+          }
+        },
+        {
           "name": "Calendar/day-sm",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -653,13 +744,6 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--calendar-day-lg)"
-          }
-        },
-        {
-          "name": "Calendar/nav-size",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--calendar-nav-size)"
           }
         },
         {
@@ -915,6 +999,62 @@
           }
         },
         {
+          "name": "Count/tag-ring-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--count-tag-ring-width)"
+          }
+        },
+        {
+          "name": "Date/time-picker-section-gap",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--date-time-picker-section-gap)"
+          }
+        },
+        {
+          "name": "Field/gap",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--field-gap)"
+          }
+        },
+        {
+          "name": "Radio/group-inline-gap",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--radio-group-inline-gap)"
+          }
+        },
+        {
+          "name": "Rating/gap",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--rating-gap)"
+          }
+        },
+        {
+          "name": "Rich/text-editor-max-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--rich-text-editor-max-width)"
+          }
+        },
+        {
+          "name": "Ai/message-caret-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--ai-message-caret-width)"
+          }
+        },
+        {
+          "name": "Ai/message-dot-size",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--ai-message-dot-size)"
+          }
+        },
+        {
           "name": "Tag/dot-size",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -1024,6 +1164,13 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--carousel-indicator-height-spacious)"
+          }
+        },
+        {
+          "name": "Carousel/slide-max-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--carousel-slide-max-width)"
           }
         },
         {
@@ -1153,24 +1300,38 @@
           }
         },
         {
+          "name": "Spotlight/screen-pad",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--spotlight-screen-pad)"
+          }
+        },
+        {
+          "name": "Spotlight/pad",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--spotlight-pad)"
+          }
+        },
+        {
+          "name": "Spotlight/gap",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--spotlight-gap)"
+          }
+        },
+        {
+          "name": "Spotlight/footer-stack",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--spotlight-footer-stack)"
+          }
+        },
+        {
           "name": "Menu/group-min-width",
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--menu-group-min-width)"
-          }
-        },
-        {
-          "name": "Menu/group-pad-x",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--menu-group-pad-x)"
-          }
-        },
-        {
-          "name": "Menu/group-gap",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--menu-group-gap)"
           }
         },
         {
@@ -1202,6 +1363,13 @@
           }
         },
         {
+          "name": "Prompt/input-min-height",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--prompt-input-min-height)"
+          }
+        },
+        {
           "name": "Inbox/width",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -1213,6 +1381,69 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--table-cell-max-width)"
+          }
+        },
+        {
+          "name": "Table/message-gap",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--table-message-gap)"
+          }
+        },
+        {
+          "name": "Page/header-stack",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--page-header-stack)"
+          }
+        },
+        {
+          "name": "Page/header-gap",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--page-header-gap)"
+          }
+        },
+        {
+          "name": "Comment/pad",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--comment-pad)"
+          }
+        },
+        {
+          "name": "Comment/gap",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--comment-gap)"
+          }
+        },
+        {
+          "name": "Comment/replies-stack",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--comment-replies-stack)"
+          }
+        },
+        {
+          "name": "Comment/replies-indent",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--comment-replies-indent)"
+          }
+        },
+        {
+          "name": "Progress/tracker-connector-width",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--progress-tracker-connector-width)"
+          }
+        },
+        {
+          "name": "Progress/tracker-dot-size",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--progress-tracker-dot-size)"
           }
         },
         {

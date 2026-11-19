@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import {
-    Banner, Button, EmptyState, FilterButton, FooterActions, PageHeader,
-    PanelBody, PanelContainer, PanelFooter, PanelHeader, PopupSelect, SearchField, StatusTag, Tabs, TextField,
+    Banner, Button, EmptyState, FooterActions, PageHeader,
+    PanelBody, PanelContainer, PanelFooter, PanelHeader, SearchField, StaticTable, StatusTag, TextField,
 } from '@/components';
-import { Frame, Page, PatternSection, PatternTable, usePanelControl } from '@/patterns';
+import { Frame, Page, PatternSection, Table, usePanelControl } from '@/patterns';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
 
 export default {
     title: 'Templates/Page/Reference screens',
@@ -13,7 +14,9 @@ export default {
     parameters: { layout: 'fullscreen' },
 };
 
-/** A list keeps search and quick filters in the Section view bar, including when no rows match. */
+const STATUS_CYCLE = ['All', 'Needs review', 'Reviewed'];
+
+/** A list keeps search and quick filters in the Section header rows, including when no rows match. */
 export const ListWithFilters = {
     name: 'List with filters',
     tags: ['reference:list'],
@@ -33,26 +36,34 @@ export const ListWithFilters = {
                     header={<PageHeader title="Session review queue" />}
                     banner={<Banner appearance="announcement">Review notes are visible to the session tutor.</Banner>}
                 >
-                    <PatternSection title="Sessions" toolbar={
-                        <div className="plus-section-view-bar" style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
-                            <Tabs appearance="pill" defaultActiveKey="all" aria-label="Session views"><Tabs.Tab eventKey="all">All sessions</Tabs.Tab></Tabs>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', marginInlineStart: 'auto' }}>
-                            <SearchField placeholder="Search students" mode="active" value={query} onValueChange={setQuery} />
-                            <PopupSelect label="Status" options={['All', 'Needs review', 'Reviewed']} value={status} onChange={setStatus}
-                                trigger={<FilterButton text="Status" trailingMetric={status === 'All' ? undefined : 1} />} />
-                            </div>
-                        </div>
-                    }>
-                        <PatternTable empty={!rows.length} emptyState={
+                    <Table
+                        title="Sessions"
+                        views={<ViewPills views={['All sessions']} />}
+                        search={<SearchField mode="active" spacing="compact" placeholder="Search students" value={query} onValueChange={setQuery} />}
+                        filters={[{
+                            key: 'status',
+                            label: 'Status',
+                            text: status,
+                            isSelected: status !== 'All',
+                            onClick: () => setStatus(STATUS_CYCLE[(STATUS_CYCLE.indexOf(status) + 1) % STATUS_CYCLE.length]),
+                        }]}
+                        count={`${rows.length} of ${sessions.length}`}
+                        onClearAll={reset}
+                        empty={!rows.length}
+                        label="Sessions"
+                        emptyState={
                             <EmptyState spacing="compact" header="No matching sessions" description="Try another search or reset the filters."
                                 secondaryAction={<Button text="Reset filters" onClick={reset} />} />
-                        }>
-                            <thead><tr><th>Student</th><th>Status</th></tr></thead>
-                            <tbody>{rows.map((row) => <tr key={row.student}>
-                                <td>{row.student}</td><td><StatusTag appearance={row.status === 'Reviewed' ? 'success' : 'warning'}>{row.status}</StatusTag></td>
-                            </tr>)}</tbody>
-                        </PatternTable>
-                    </PatternSection>
+                        }
+                    >
+                        <StaticTable
+                            headers={['Student', 'Status']}
+                            rows={rows.map((row) => [
+                                row.student,
+                                <StatusTag appearance={row.status === 'Reviewed' ? 'success' : 'warning'}>{row.status}</StatusTag>,
+                            ])}
+                        />
+                    </Table>
                 </Page>
             </Frame>
         );
@@ -60,11 +71,17 @@ export const ListWithFilters = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expect(canvas.getAllByRole('row')).toHaveLength(4);
-        await userEvent.click(canvas.getByRole('button', { name: 'Status' }));
-        await userEvent.click(await within(document.body).findByRole('option', { name: 'Reviewed', exact: true }));
+        const header = canvasElement.querySelector('.plus-pattern-section-header');
+        const heights = [...header.querySelectorAll('.plus-section-rows button, .plus-section-rows input')]
+            .filter((el) => !el.closest('.plus-section-row__views'))
+            .map((el) => Math.round((el.closest('.plus-search-field') ?? el).getBoundingClientRect().height));
+        await expect(heights.length, 'search and filter controls in row 3').toBeGreaterThan(1);
+        heights.forEach((h) => expect(h, 'header controls draw 32').toBe(32));
+        await userEvent.click(canvas.getByRole('button', { name: 'Status: All' }));
+        await userEvent.click(canvas.getByRole('button', { name: 'Status: Needs review' }));
         await waitFor(() => expect(canvas.getAllByRole('row')).toHaveLength(2));
-        await expect(canvas.getByText('Ben Okafor')).toBeVisible();
-        await expect(canvas.getByRole('button', { name: /Status/ })).toHaveTextContent('1');
+        await waitFor(() => expect(canvas.getByText('Ben Okafor')).toBeVisible());
+        await expect(canvas.getByRole('button', { name: 'Status: Reviewed' })).toHaveAttribute('aria-pressed', 'true');
         const search = canvas.getByRole('searchbox', { name: 'Search students' });
         await userEvent.type(search, 'Ana');
         await expect(canvas.getByText('No matching sessions')).toBeVisible();

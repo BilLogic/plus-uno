@@ -2,7 +2,7 @@
 
 # Forms and inputs
 
-39 components. Each row links to the generated facts; the three columns after it are the
+38 components. Each row links to the generated facts; the three columns after it are the
 authored half, counted rather than assumed.
 
 ## Which component to reach for
@@ -94,7 +94,6 @@ authored half, counted rather than assumed.
   - For a value that belongs to a form field, use `Select`.
   - For several filter categories staged and applied together, use `FilterMenu`.
   - For a menu of actions rather than values, use `DropdownMenu`.
-- **[PromptInput](PromptInput/index.md)** — Use `PromptInput` for AI chat or a feature that drafts from a free-text request. For a plain multiline field without send-on-Enter or loading behavior, use `TextArea`.
 - **[Radio](Radio/index.md)** — Use `Radio` directly only when options need custom layout, such as radio cells inside a table.
   - For a standard radio question with a shared legend and error, use `RadioGroup`.
   - For a question where several options may be chosen, use `CheckboxGroup` or `Checkbox`.
@@ -170,13 +169,13 @@ authored half, counted rather than assumed.
 | [ChoiceGrid](ChoiceGrid/index.md) | 12 | ✅ | ✅ | ✅ |
 | [CloseButton](CloseButton/index.md) | 5 | ✅ | ✅ | ✅ |
 | [Comment](Comment/index.md) | 14 | ✅ | ✅ | ✅ |
-| [DatePicker](DatePicker/index.md) | 18 | ✅ | ✅ | ✅ |
+| [DatePicker](DatePicker/index.md) | 26 | ✅ | ✅ | ✅ |
 | [DateTimePicker](DateTimePicker/index.md) | 31 | ✅ | ✅ | ✅ |
 | [DropdownMenu](DropdownMenu/index.md) | 17 | ✅ | ✅ | ✅ |
 | [Fieldset](Fieldset.md) | 9 | ✅ | ✅ | ✅ |
 | [FileItem](FileItem/index.md) | 15 | ✅ | ✅ | ✅ |
 | [FileUpload](FileUpload/index.md) | 20 | ✅ | ✅ | ✅ |
-| [FilterButton](FilterButton/index.md) | 10 | ✅ | ✅ | ✅ |
+| [FilterButton](FilterButton/index.md) | 11 | ✅ | ✅ | ✅ |
 | [FilterMenu](FilterMenu/index.md) | 16 | ✅ | ✕ | ✅ |
 | [FooterActions](FooterActions/index.md) | 4 | ✅ | ✅ | ✅ |
 | [IconButton](IconButton/index.md) | 14 | ✅ | ✅ | ✅ |
@@ -184,7 +183,6 @@ authored half, counted rather than assumed.
 | [LinkButton](LinkButton/index.md) | 13 | ✅ | ✅ | ✅ |
 | [LinkIconButton](LinkIconButton/index.md) | 11 | ✅ | ✅ | ✅ |
 | [PopupSelect](PopupSelect/index.md) | 18 | ✅ | ✕ | ✅ |
-| [PromptInput](PromptInput/index.md) | 16 | ✅ | ✅ | ✅ |
 | [Radio](Radio/index.md) | 22 | ✅ | ✅ | ✅ |
 | [RadioGroup](RadioGroup/index.md) | 20 | ✅ | ✅ | ✅ |
 | [Range](Range/index.md) | 14 | ✅ | ✅ | ✅ |
@@ -201,7 +199,7 @@ authored half, counted rather than assumed.
 | [Toggle](Toggle/index.md) | 17 | ✅ | ✅ | ✅ |
 | [TreeSelect](TreeSelect/index.md) | 18 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 38/39 (97%) · Correct/incorrect 36/39 (92%) · Accessibility 38/39 (97%)
+**Authored coverage:** When to use 37/38 (97%) · Correct/incorrect 35/38 (92%) · Accessibility 37/38 (97%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

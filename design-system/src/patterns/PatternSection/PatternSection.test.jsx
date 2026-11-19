@@ -31,11 +31,19 @@ describe('PatternSection', () => {
         expect(cls).not.toMatch(/plus-pattern-section-bg-/);
     });
 
-    describe('fill', () => {
-        it('takes a subtle fill on request, and none otherwise', () => {
-            const { container, rerender } = render(<PatternSection title="Flag" fill="subtle">Body</PatternSection>);
-            expect(section(container).className).toContain('plus-pattern-section-fill-subtle');
-            rerender(<PatternSection title="Flag">Body</PatternSection>);
+    describe('spacing', () => {
+        it('puts the default step on the Section, and each other step on request', () => {
+            const { container, rerender } = render(<PatternSection title="Flag">Body</PatternSection>);
+            expect(section(container).className).toContain('plus-pattern-section-spacing-default');
+            rerender(<PatternSection title="Flag" spacing="compact">Body</PatternSection>);
+            expect(section(container).className).toContain('plus-pattern-section-spacing-compact');
+            rerender(<PatternSection title="Flag" spacing="spacious">Body</PatternSection>);
+            expect(section(container).className).toContain('plus-pattern-section-spacing-spacious');
+        });
+
+        it('takes no fill prop: a padded box with a fill is a Card', () => {
+            const removed = { fill: 'subtle' };
+            const { container } = render(<PatternSection title="Flag" {...removed}>Body</PatternSection>);
             expect(section(container).className).not.toMatch(/plus-pattern-section-fill-/);
         });
     });
@@ -270,6 +278,16 @@ describe('Template docs live examples', () => {
         expect(screen.getByRole('button', { name: 'Add students' })).toBeInTheDocument();
         r3.unmount();
 
+        const r3b = render(<Cases.TitleRowAboveHeaderRows />);
+        expect(screen.getByRole('heading', { name: 'Students' })).toBeInTheDocument();
+        expect(screen.getByRole('tab', { name: 'All students' })).toBeInTheDocument();
+        r3b.unmount();
+
+        const r3c = render(<Cases.TitleInViewsRow />);
+        expect(screen.queryByRole('heading', { name: 'Students' }), 'the title sits in the views row, not in a heading').toBeNull();
+        expect(screen.getByRole('tab', { name: 'All students' })).toBeInTheDocument();
+        r3c.unmount();
+
         const r4 = render(<Cases.ActionsInTwoHomes />);
         expect(screen.getByRole('heading', { name: 'Students' })).toBeInTheDocument();
         expect(screen.getAllByRole('button', { name: 'Add students' })).toHaveLength(2);
@@ -277,7 +295,7 @@ describe('Template docs live examples', () => {
 
         const r5 = render(<Cases.RightSideInOrder />);
         expect(screen.getByRole('heading', { name: 'Sessions' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'Filters' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'Status: All' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'New session' })).toBeInTheDocument();
         r5.unmount();
 
@@ -300,5 +318,104 @@ describe('Template docs live examples', () => {
         expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
         expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
         r8.unmount();
+    });
+});
+
+describe('PatternSection header rows', () => {
+    const filters = [
+        { key: 'status', label: 'Status', text: 'Upcoming' },
+        { key: 'group', label: 'Group', text: 'All' },
+        { key: 'date', label: 'Date', text: 'All time' },
+    ];
+    const rows = (container) => [...container.querySelectorAll('.plus-section-rows > .plus-section-row')];
+
+    it('draws views and the format switch in row 2, Search and filters in row 3', () => {
+        const { container } = render(
+            <PatternSection
+                title="Sessions"
+                views={<div data-testid="views" />}
+                format={<div data-testid="format" />}
+                search={<div data-testid="search" />}
+                filters={filters}
+            >
+                Body
+            </PatternSection>,
+        );
+        const [row2, row3] = rows(container);
+        expect(within(row2).getByTestId('views')).toBeInTheDocument();
+        expect(within(row2).getByTestId('format')).toBeInTheDocument();
+        expect(within(row3).getByTestId('search')).toBeInTheDocument();
+        expect(within(row3).getByRole('button', { name: 'Status: Upcoming' })).toBeInTheDocument();
+    });
+
+    it('drops row 2 without views and moves the format switch to the end of row 3', () => {
+        const { container } = render(
+            <PatternSection title="Students" format={<div data-testid="format" />} search={<div />} filters={filters}>Body</PatternSection>,
+        );
+        const found = rows(container);
+        expect(found).toHaveLength(1);
+        expect(within(found[0]).getByTestId('format')).toBeInTheDocument();
+    });
+
+    it('drops row 3 when there is nothing to search or filter', () => {
+        const { container } = render(<PatternSection title="Reflections" views={<div />}>Body</PatternSection>);
+        expect(rows(container)).toHaveLength(1);
+    });
+
+    it('ends row 3 with the count and Clear all once a filter is applied', () => {
+        const onClearAll = vi.fn();
+        const applied = filters.map((f, i) => ({ ...f, isSelected: i < 2 }));
+        render(<PatternSection title="Sessions" search={<div />} filters={applied} count="3 of 12" onClearAll={onClearAll}>Body</PatternSection>);
+        expect(screen.getByText('3 of 12')).toBeInTheDocument();
+        screen.getByRole('button', { name: 'Clear all' }).click();
+        expect(onClearAll).toHaveBeenCalled();
+    });
+
+    it('shows no count or Clear all while nothing is applied', () => {
+        render(<PatternSection title="Sessions" search={<div />} filters={filters} count="12 of 12" onClearAll={() => {}}>Body</PatternSection>);
+        expect(screen.queryByRole('button', { name: 'Clear all' })).toBeNull();
+    });
+
+    it('shows three filters and folds the rest into More filters with a count', () => {
+        const many = [...filters, { key: 'grade', label: 'Grade', text: 'All' }, { key: 'tutor', label: 'Tutor', text: 'Any' }];
+        render(<PatternSection title="Sessions" search={<div />} filters={many}>Body</PatternSection>);
+        expect(screen.getByRole('button', { name: 'Date: All time' })).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'Grade: All' })).toBeNull();
+        expect(screen.getByRole('button', { name: /More filters/ })).toHaveTextContent('2');
+    });
+
+    it('hands a filter entry\'s trigger to its menu, so the same button opens it', () => {
+        const menu = vi.fn((trigger) => <div data-testid="menu-wrap">{trigger}</div>);
+        render(<PatternSection title="Sessions" search={<div />} filters={[{ key: 'status', label: 'Status', text: 'Upcoming', isSelected: true, menu }]}>Body</PatternSection>);
+        const trigger = screen.getByRole('button', { name: 'Status: Upcoming' });
+        expect(menu).toHaveBeenCalled();
+        expect(screen.getByTestId('menu-wrap')).toContainElement(trigger);
+        expect(trigger).toHaveAttribute('aria-pressed', 'true');
+    });
+
+    it('keeps the count and Clear all under 768', () => {
+        const before = window.innerWidth;
+        window.innerWidth = 600;
+        try {
+            const applied = filters.map((f, i) => ({ ...f, isSelected: i === 0 }));
+            render(<PatternSection title="Sessions" search={<div />} filters={applied} count="3 of 12" onClearAll={() => {}}>Body</PatternSection>);
+            expect(screen.getByText('3 of 12')).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'Clear all' })).toBeInTheDocument();
+        } finally {
+            window.innerWidth = before;
+        }
+    });
+
+    it('folds the triggers into one Filter button with the applied count under 768', () => {
+        const before = window.innerWidth;
+        window.innerWidth = 600;
+        try {
+            const applied = filters.map((f, i) => ({ ...f, isSelected: i === 0 }));
+            render(<PatternSection title="Sessions" search={<div data-testid="search" />} filters={applied}>Body</PatternSection>);
+            expect(screen.queryByRole('button', { name: 'Status: Upcoming' })).toBeNull();
+            expect(screen.getByRole('button', { name: /^Filter/ })).toHaveTextContent('1');
+        } finally {
+            window.innerWidth = before;
+        }
     });
 });

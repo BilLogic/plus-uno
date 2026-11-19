@@ -12,7 +12,8 @@ import {
 } from '../../../patterns/Page/pageDemo.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { RECORD_CRUMBS } from '@/storybook-docs/lib/pattern-demo.jsx';
-import { StudentsTable, ViewBar } from '@/storybook-docs/lib/view-bar.jsx';
+import { SectionActions } from '@/storybook-docs/lib/section-header.jsx';
+import { StudentsTable, ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
 import { NamesDo, TabLabelDo, TabLabelDont } from '../../../components/navigation/Sidebar/Sidebar.examples.jsx';
 
 /**
@@ -25,7 +26,7 @@ import { NamesDo, TabLabelDo, TabLabelDont } from '../../../components/navigatio
  *   AreaPicture              the Sidebar with an area selected
  *   OpenItemsPicture         open items under Sessions, named by time and who
  *   OpenItemsDont            the same item carrying everything, cut off
- *   ViewsPicture             pill views in a Section's view bar
+ *   ViewsPicture             pill views in a Section's header
  *   PageTabsPicture          page tabs under a record's title
  *   DrillPicture             the record page after a drill-in, breadcrumb above the title
  *   AreaPagePicture          an area page: no breadcrumb
@@ -64,14 +65,14 @@ export const OpenItemsDont = ({ label = "Open items — don't" } = {}) => (
     </div>
 );
 
-/** Tier 2: pill views in a Section's view bar. */
+/** Tier 2: pill views in a Section's header. */
 export const ViewsPicture = () => {
     const [view, setView] = useState('Upcoming');
     return (
         <div style={pad}>
             <PatternSection
                 title="Sessions"
-                tabs={<ViewBar views={['Upcoming', 'Past']} activeView={view} onViewChange={setView} filters={null} primary={null} more={false} search={false} />}
+                views={<ViewPills views={['Upcoming', 'Past']} activeView={view} onViewChange={setView} />}
             >
                 <SessionsTable status={view === 'Past' ? 'past' : 'upcoming'} />
             </PatternSection>
@@ -111,11 +112,11 @@ export const DrillPicture = () => (
     </BrowserWindow>
 );
 
-/** An area page: the title alone, no breadcrumb, the collection's Primary at the end of its view bar. */
+/** An area page: the title alone, no breadcrumb, the collection's Primary in its Section's title row. */
 export const AreaPagePicture = () => (
     <BrowserWindow address="app.plus.org/students">
         <Page header={<DemoPageHeader title="Students" />}>
-            <PatternSection title="Students" type="tabs-only" tabs={<ViewBar views={['All students']} filters={null} primary="Add student" more={false} />}>
+            <PatternSection title="All students" actions={<SectionActions primary="Add student" more={false} />} views={<ViewPills views={['All students']} />}>
                 <StudentsTable count={4} />
             </PatternSection>
         </Page>

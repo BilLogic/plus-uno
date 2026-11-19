@@ -2,7 +2,7 @@
 
 # Spacing
 
-The kind of box sets its pad; the template it sits in sets its stack and inline.
+Four words space everything: pad, stack, inline and gutter. The template you are in picks the size.
 
 **Kind:** Foundation
 
@@ -10,260 +10,211 @@ The kind of box sets its pad; the template it sits in sets its stack and inline.
 
 ## Overview
 
-Spacing tokens name a job, not a size. Pick the template you are in (Page, Section, Card, Modal, Popup, Table or a control), then the relationship (pad inside a box, stack between rows, inline between things side by side), then the size. Bind the semantic token, never a primitive or a typed number.
+Spacing is the empty space inside a component or template and between the things it holds. Its tokens name a job, not a size. Pick the template you are in (Page, Section, Card, Modal, Popup, Table or a control), then the job (pad around the content, stack between rows, inline between things side by side, gutter between cards on the grid), then the size. Every value is a dimension primitive; bind the token, never a primitive or a typed number.
 
 ```css
-padding: var(--card-pad-default);
-gap: var(--card-stack-md);
+padding: var(--card-pad);           /* space-100 */
+gap: var(--card-stack-md);          /* space-050 */
 ```
 
-Figma holds them in `spacing / semantics` (Pad, Stack, Inline, Grid, Screen, Content), `spacing / templates` (Frame, Page, Section, Card, Table, Blanket, Modal, Popup), `spacing / components` and the hidden `spacing / primitives`. [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs) lists every token.
+In Figma the same tokens live in `spacing / semantics` (Pad, Stack, Inline, Grid, Screen, Content) and `spacing / templates`; primitives are hidden from the picker.
 
 ## Principles
 
+Space tells people what belongs together. Five ideas decide every gap on a page.
+
 ### Similarity
 
-Items of equal weight, such as the fields of one form group, sit close together with one stack.
+Things of equal weight sit close, one stack apart.
 
 ### Differentiation
 
-When the content changes kind, from a suggestion to the form controls, step up a tier so the change reads at a glance.
+When content changes kind, step up a tier so the change reads.
 
 ### Rhythm
 
-Gaps grow with the box: 4 · 8 · 12 px inside a control or Card, 8 · 16 · 24 px inside a Section or Modal, and 16 · 24 · 40 px between Page sections.
+Gaps grow from the inside out: smallest between a label and its field, larger inside a card, largest inside a section.
 
 ### Hierarchy
 
-Give headings and primary actions the larger stack of their tier, and never add space by hand.
+A heading takes the larger stack of its tier; never add space by hand.
 
 ### White space
 
-Pad the modal on every side, and leave the largest gap of its tier between the content and the footer buttons.
+Pad a modal on every side, so nothing touches its edge.
 
 ## Tokens
 
-Primitives are the raw scale, named rem × 100 (`--space-100` is 16 px), and are hidden in Figma, so nothing binds them. Every other tier points at a primitive and names a job as `Collection/property-variant` in Figma, and the same words joined by dashes in code: `Section/pad-x-default` is `--section-pad-x-default`. A collection with a single property skips the variant (`--table-indent`).
-
-Name the relationship first, then pick the token from the four-tier ladder on [Tokens: Spacing and size](?path=/docs/foundations-tokens-spacing-and-size--docs). If you cannot name the context a value belongs to, step back to the box that holds it.
+A token reads as template, then job, then size: Section/stack-md in Figma is --section-stack-md in code. A template with one job skips the size (--page-pad).
 
 | Word | Means | Example |
 | --- | --- | --- |
-| `pad` | The space between a box’s edge and its content, the same on all four sides | `--card-pad-default` 20 |
-| `pad-x` · `pad-y` | Used only when the two axes differ, as on an Item | `--pad-x-md` 12 · `--pad-y-md` 6 |
-| `stack` | The vertical gap between rows, chosen by use, never by the size of the box | `--section-stack-md` 16 |
-| `inline` | The horizontal gap between things side by side | `--modal-inline-sm` 8 |
-| `gutter` | The gap between grid columns, and between cards side by side on the grid | `--grid-gutter` 16 |
-| `radius` | Corner radius, set per component (Radius) | `--card-radius` 16 |
-| `height` · `width` · `min` · `max` | Size roles (Grid) | `--control-md` 32 |
+| pad | Space between an edge and the content inside it, the same on all four sides | --card-pad · space-100 |
+| pad-x · pad-y | Only when the axes differ, as on a control | --pad-x-md · space-075, --pad-y-md · space-0375 |
+| stack | Vertical gap between rows, chosen by use, never by the size of what holds them | --section-stack-md · space-100 |
+| inline | Horizontal gap between things side by side | --modal-inline-sm · space-050 |
+| gutter | Gap between grid columns, and between cards side by side on the grid | --grid-gutter · space-100 |
 
-Margin, slot and viewport are never token words. What other systems call a page margin is the Page pad, `--page-pad`.
+Margin, slot and viewport are never token words: a page margin is the Page pad. Corners live on Radius; heights and widths live on Dimensions.
 
-## Three kinds of box
+## Pad
 
-Every box on a page is one of three kinds, and the kind decides its padding.
+Pad is the space between an edge and the content inside it. A template pads the same on every side. A control pads wider than tall, because its height comes first: the label is a 20 line and the pad fills what is left.
 
-- An **Item** has a minimum height, and its pad-x is larger than its pad-y.
-- A **Container** has a background and one pad on every side, and its height hugs its content.
-- A **Wrapper** has no fill and no pad. It only arranges its children with a gap or a grid.
+### A control
 
-## Padding
+pad-y = (height − 20) ÷ 2, so space-0125 at a 24 control and space-0375 at 32. A 40 field centers its content. Pad-x is always the larger.
 
-### Items: height first
+| Token | Figma | Value | Use |
+| --- | --- | --- | --- |
+| `--pad-x-xs` | `Pad/pad-x-xs` | `space-025` | Tag, Status, Count |
+| `--pad-x-sm` | `Pad/pad-x-sm` | `space-050` | Compact 24 controls |
+| `--pad-x-md` | `Pad/pad-x-md` | `space-075` | Default 32 controls, fields |
+| `--pad-x-lg` | `Pad/pad-x-lg` | `space-100` | Spacious 48 controls |
+| `--pad-y-sm` | `Pad/pad-y-sm` | `space-0125` | Compact 24 controls |
+| `--pad-y-md` | `Pad/pad-y-md` | `space-0375` | Default 32 controls |
+| `--pad-y-lg` | `Pad/pad-y-lg` | `space-050` | Spacious controls |
 
-The label stays 14/20 at every size, so pad-y is (height − 20) ÷ 2: 2 at 24 and 6 at 32. Pad-x is always the larger: 8 at 24 and 12 at 32. Buttons, tabs and menu rows come in 32, or 24 compact inside table rows and inline toolbars. Fields come in 40, or 32 compact, with pad-y 10 at 40. Labels (Tag, Status, Count) pad 4 across. Corner rounding is in [Radius](?path=/docs/foundations-visual-radius--docs).
+### A template
 
-- `--pad-x-xs` (Pad/pad-x-xs): Labels: Tag, Status, Count
-- `--pad-x-sm` (Pad/pad-x-sm): Compact 24 Items
-- `--pad-x-md` (Pad/pad-x-md): Default 32 Items
-- `--pad-y-sm` (Pad/pad-y-sm): Compact 24 Items
-- `--pad-y-md` (Pad/pad-y-md): Default 32 Items
+A Card, Modal or Popup carries its own pad on every side. Every Card pads space-100 at every size, so cards differ by width, not by pad. A component that pads like a card but is not a template, such as a Section message or a File upload, takes the compact Card pad, space-100. A Section has no pad.
 
-### Containers: one pad on every side
+| Token | Figma | Value | Use |
+| --- | --- | --- | --- |
+| `--card-pad` | `Card/pad` | `space-100` | Every side of every Card, at every size |
+| `--modal-pad-x-default` | `Modal/pad-x-default` | `space-100` | Every side of a Modal |
+| `--popup-pad` | `Popup/pad` | `space-100` | Popup, Flag |
+| `--frame-sidebar-pad` | — | `space-075` | The Sidebar, every side |
+| `--page-pad` | `Page/pad` | `space-150` | Every side of the Page |
 
-A template carries its own pad ([Template tokens](#foundation-template-tokens)). A container that is not a template takes the Card pad of its size: a Section message and File upload take 16.
+### A table cell
 
-### Table cells
+Cells pad space-025 top and bottom and space-050 across. In a plain table the first cell sits flush with the table edge, so its text lines up with the heading above.
 
-Cells pad 4 top and bottom and 8 across (`--table-pad-y-cell`, `--table-pad-x-cell`). The row height is a minimum, and the row grows with its content. On a plain table, the first and last cells sit flush with the table's edge.
+## Stack
 
-## Stack and inline
+Stack is the vertical gap between rows. It comes in tiers that grow from a control out to the page, and each tier has sm, md and lg. Pick the tier from the template the rows sit in, then the step from how closely they relate.
 
-Gaps come in tiers that grow with the box. The space between sections is two to three times the space inside them. Stack follows use, not the size of the box: a Card stacks its parts 8 apart at every size.
-
-| Group | sm (px) | md (px) | lg (px) | Used between |
+| Tier | sm | md | lg | Used between |
 | --- | --- | --- | --- | --- |
-| Control | 4 | 8 | 12 | Parts inside a component: icon and label, label and field, field and help text |
-| Card | 4 | 8 | 12 | The parts of a card: title, body, footer |
-| Modal | 8 | 16 | 24 | Header, body and footer content |
-| Section | 8 | 16 | 24 | A section’s heading, its body and its footer |
-| Page | 16 | 24 | 40 | Sections on a page; 40 before a new topic |
-| Grid | — | 16 | — | Anything side by side on the grid: the gutter |
+| Control | `space-025` | `space-050` | `space-075` | Label and field, field and help text |
+| Card | `space-025` | `space-050` | `space-075` | Title, body and footer inside a card |
+| Modal | `space-050` | `space-100` | `space-150` | Header, body and footer; fields and groups |
+| Section | `space-050` | `space-100` | `space-150` | Heading, body and footer of a section |
+| Page | `space-100` | `space-150` | `space-250` | Sections; space-250 before a new topic |
 
-- `--stack-sm` (Stack/stack-sm)
-- `--stack-md` (Stack/stack-md)
-- `--stack-lg` (Stack/stack-lg)
-- `--inline-sm` (Inline/inline-sm)
-- `--inline-md` (Inline/inline-md)
-- `--inline-lg` (Inline/inline-lg)
+| Token | Figma | Value | Use |
+| --- | --- | --- | --- |
+| `--stack-sm · md · lg · xl · 2xl · 3xl` | `Stack/stack-sm · md · lg · xl · 2xl · 3xl` | `space-025 · space-050 · space-075 · space-100 · space-150 · space-200` | Inside a control; xl, 2xl and 3xl for the larger general gaps |
+| `--card-stack-sm · md · lg` | `Card/stack-…` | `space-025 · space-050 · space-075` | Inside a card |
+| `--modal-stack-sm · md · lg` | `Modal/stack-…` | `space-050 · space-100 · space-150` | Inside a modal |
+| `--section-stack-sm · md · lg` | `Section/stack-…` | `space-050 · space-100 · space-150` | Inside a section |
+| `--page-stack-sm · md · lg` | `Page/stack-…` | `space-100 · space-150 · space-250` | Between sections |
+
+## Inline
+
+Inline is the horizontal gap between things side by side: an icon and its label, two buttons, a tag and the text after it. It follows the same tiers as stack: inside one card, an icon sits space-025 from a Button’s label, space-025 from the card title, and the actions sit space-050 apart.
+
+| Token | Figma | Value | Use |
+| --- | --- | --- | --- |
+| `--inline-sm · md · lg · xl · 2xl · 3xl` | `Inline/inline-sm · md · lg · xl · 2xl · 3xl` | `space-025 · space-050 · space-075 · space-100 · space-150 · space-200` | Inside a control: icon and label; xl, 2xl and 3xl for the larger general gaps |
+| `--card-inline-sm · md · lg` | `Card/inline-…` | `space-025 · space-050 · space-075` | Side by side inside a card |
+| `--modal-inline-sm · md · lg` | `Modal/inline-…` | `space-050 · space-100 · space-150` | Footer actions, side by side |
+
+## Gutter
+
+Gutter is the gap between grid columns, and so between cards side by side on the grid. It is one value at every width, space-100, so cards stay on the columns when the screen changes. Inside a card the grid stops and stack and inline take over.
+
+| Token | Figma | Value | Use |
+| --- | --- | --- | --- |
+| `--grid-gutter` | `Grid/gutter` | `space-100` | Between columns, and between cards on the grid |
 
 ## Template tokens
 
 Every template has its own tokens, so a value is read from where it sits.
 
-### Frame and Page
+| Template | Token | Value | What it spaces |
+| --- | --- | --- | --- |
+| Frame | `--frame-sidebar-pad` | `space-075` | The Sidebar, every side |
+|  | `--frame-sidebar-row-gap` | `space-0125` | Between Sidebar rows (32 tall), so hover fills never touch |
+|  | `--frame-sidebar-group-gap` | `space-100` | Between Sidebar groups |
+| Page | `--page-pad` | `space-150` | The Page, every side; the content grid’s margin |
+|  | `--page-stack-sm · md · lg` | `space-100 · space-150 · space-250` | Between sections |
+| Section | `--section-stack-sm · md · lg` | `space-050 · space-100 · space-150` | Heading, body, footer. A Section has no fill and no pad. |
+|  | `--section-min-width-main · side` | 480 · 224 | The narrowest a split’s columns get before they stack |
+| Card | `--card-pad` | `space-100` | Every side, every card size |
+|  | `--card-stack · --card-inline (sm · md · lg)` | `space-025 · space-050 · space-075` | Inside the card |
+|  | `--card-min-width-sm · md · lg` | 224 · 304 · 480 | Decides cards per row |
+| Table | `--table-pad-x-cell · pad-y-cell` | `space-050 · space-025` | Every cell |
+|  | `--table-indent` | `space-150` | A nested row’s first cell |
+|  | `--table-pad-x-footer` | `space-100` | The table footer |
+| Blanket | `--blanket-pad-x · pad-y` | `space-100 · space-400` | Around a modal; pad-y drops to 24 on screens under 640 tall |
+| Modal | `--modal-pad-x-default · spacious` | `space-100 · space-125` | Every side |
+|  | `--modal-stack · --modal-inline (sm · md · lg)` | `space-050 · space-100 · space-150` | Inside the modal |
+| Popup | `--popup-pad` | `space-100` | Popup, Flag |
+|  | `--popup-gap-screen` | `space-050` | The nearest a popup comes to the screen edge |
+|  | `--dropdown-menu-pad` | `space-025` | Around the rows of a menu |
+|  | `--tooltip-pad-y` | `space-025` | Above and below a tooltip’s text |
 
-The Frame is the whole screen: the topbar above a row holding the sidebar and the Page. The Page holds the content, and its pad is the content grid's margin.
-
-- `--page-pad` (Page/pad): Every width
-- `--page-stack-sm` (Page/stack-sm)
-- `--page-stack-md` (Page/stack-md): Between sections
-- `--page-stack-lg` (Page/stack-lg): Before a new topic
-
-### Section
-
-A span of the page grid under one heading. A plain section has no fill, no pad and no size options.
-
-- `--section-stack-sm` (Section/stack-sm)
-- `--section-stack-md` (Section/stack-md): Heading to body
-- `--section-stack-lg` (Section/stack-lg): Body to the primary action
-- `--section-min-width-main` (Section/min-width-main): The main column of a split section
-- `--section-min-width-side` (Section/min-width-side): The side column of a split section
-
-### Card
-
-Pad and radius follow the card's size; stack and inline follow use.
-
-- `--card-pad-compact` (Card/pad-sm)
-- `--card-pad-default` (Card/pad-md)
-- `--card-pad-spacious` (Card/pad-lg)
-- `--card-stack-sm` (Card/stack-sm): Title to description
-- `--card-stack-md` (Card/stack-md): Header to body
-- `--card-stack-lg` (Card/stack-lg): Body to footer
-- `--card-inline-sm` (Card/inline-sm)
-- `--card-inline-md` (Card/inline-md)
-- `--card-inline-lg` (Card/inline-lg)
-- `--card-min-width-sm` (Card/min-width-sm)
-- `--card-min-width-md` (Card/min-width-md)
-- `--card-min-width-lg` (Card/min-width-lg)
-- `--card-max-height-sm` (Card/max-height-sm)
-- `--card-max-height-md` (Card/max-height-md)
-- `--card-max-height-lg` (Card/max-height-lg)
-
-### Table
-
-Plain and full-span by default.
-
-- `--table-pad-x-cell` (Table/pad-x-cell)
-- `--table-pad-y-cell` (Table/pad-y-cell)
-- `--table-indent` (Table/indent)
-- `--table-pad-x-footer` (Table/pad-x-footer)
-- `--table-min-width-title` (Table/min-width-title)
-
-### Blanket and Modal
-
-The Blanket pads the screen. A modal pads 16 on every side at every width.
-
-- `--blanket-pad-x` (Blanket/pad-x)
-- `--blanket-pad-y` (Blanket/pad-y)
-- `--modal-pad-x-default` (Modal/pad-x-default)
-- `--modal-stack-sm` (Modal/stack-sm)
-- `--modal-stack-md` (Modal/stack-md): Between related fields
-- `--modal-stack-lg` (Modal/stack-lg): Between groups, and before the footer
-- `--modal-inline-sm` (Modal/inline-sm): Between footer actions
-- `--modal-inline-md` (Modal/inline-md)
-- `--modal-inline-lg` (Modal/inline-lg)
-
-### Popup, menu and tooltip
-
-Menu, popup, flag and tooltip float without a Blanket. The outer box of a menu pads 4, and a popup or flag pads 16.
-
-- `--popup-pad` (Popup and flag/pad)
-- `--popup-width-sm` (Popup and flag/width-sm)
-- `--popup-width-md` (Popup and flag/width-md)
-- `--popup-width-lg` (Popup and flag/width-lg)
-- `--flag-width` (Popup and flag/width-flag)
-- `--flag-stack` (Popup and flag/stack-flag)
-- `--dropdown-menu-pad` (Menu/pad-menu)
-- `--dropdown-menu-min-width` (Menu/min-width-menu)
-- `--dropdown-menu-max-width` (Menu/max-width-menu)
-- `--dropdown-menu-max-height` (Menu/max-height-menu)
-- `--tooltip-pad-y` (Tooltip/pad-y-tooltip)
-- `--tooltip-max-width` (Tooltip/max-width-tooltip)
-- `--popup-gap-screen` (Placement/gap-screen): The closest a floating layer comes to the screen edge
+Template pads and gaps step by 4. A value finer than 4 stays inside a component; the one template exception is the Sidebar row gap of 2.
 
 ## Usage
 
 ### Group first, then assign tokens
 
-Before picking a token, group the content from the inside out; each step out is one tier up. In a modal form:
+Group from the inside out; each step out is one tier up. In a modal form: a label and its field space-050 (--stack-md); related fields space-100 (--modal-stack-md); a new group space-150 (--modal-stack-lg); header, body and footer space-100 (--modal-stack-md); actions side by side space-050 (--modal-inline-sm).
 
-1. Pair a control with what it changes, such as a field and its "Repeats weekly" toggle: `--stack-md` (8).
-2. Gather related fields: `--modal-stack-md` (16) between them.
-3. Separate unrelated groups: `--modal-stack-lg` (24).
-4. Separate the header from the body, and the body from the footer: `--modal-stack-lg` (24).
-5. Set the actions side by side: `--modal-inline-sm` (8).
+### Be consistent first
+
+Use the same token for the same relationship everywhere. A slightly-off value used consistently reads better than a perfect value used once.
+
+### Start generous, then tighten
+
+When a gap is unclear, start a step larger and step down until related things read together. A little too much space reads better than a little too little.
+
+### Space between groups is never smaller than space inside them
+
+The gap between two groups is at least the gap within each, or the groups blur together.
+
+### The gap inside never exceeds the pad
+
+Things inside a card, a modal or a control sit no further apart than that card, modal or control pads, or the content looks loose inside a tight edge.
 
 ### Pick by context, not by number
 
-Use a Card token inside a card, a Section token inside a section, and Stack or Inline tokens inside a component. Never borrow a token because its number happens to match.
+A Card token inside a card, a Section token inside a section, a Stack or Inline token inside a control. Two gaps with the same value can still be different tokens. Never type a number.
 
-### Never hand-space
+## Do and don’t
 
-If a gap looks wrong with the right tokens, step to the next tier of the same group, such as `--section-stack-md` to `--section-stack-lg`. If no tier fits, raise it as a token or template question rather than adding space by hand. A one-off value takes the nearest semantic token of its context, or becomes a proposed token.
+Do: Group by proximity: related rows close, a tier between groups.
+Don't: One gap everywhere: nothing groups.
 
-### Build from templates and slots
+Do: Inside a Card, read a Card token.
+Don't: A Page token inside a Card: a gap from the wrong tier.
 
-Start from the template (Section, Card, Modal, Popup) and keep it attached. The template owns the pad, the stacks and the size; add content only inside its slots. Never detach it; if you copy a layout to get a variation, it needs a slot, not a new variant.
+Do: Bind a token.
+Don't: Type a number: off the ladder, and it drifts.
 
-### No card inside a card
+Do: Keep the gap inside a card no larger than its pad, so the content holds together.
+Don't: A gap bigger than the pad: the content drifts apart and the edge feels tight.
 
-A card groups one thing. Tiers inside it are stacks and dividers in the card body, not more cards.
-
-### Let the content pick the size
-
-Visible empty space means a smaller size; overflow or clipping means a larger one. Cards hug their content, with an optional maximum height that scrolls the body. Modals hug or fill. Tables, sections and tab groups grow to fit.
-
-## Space never speaks alone
-
-A gap tells the eye there is a boundary, but it cannot say what the boundary is. Pair a group gap with a heading, label, fieldset legend or divider.
-
-- Group first, then space: related fields sit close and each group takes a bigger gap than the one inside it.
-- Pick one stack tier for the context and keep it across the container. All three metric cards on Home take the same stack.
-- An optical nudge is allowed where the eye needs it, such as an icon beside an all-caps label. Note it on the layer, keep it on a scale unit, and never leave a silent hard-code.
-
-**Name the groups the space separates.** The create-session form has student fields, then schedule fields.
-
-Do: A 24 gap and a subsection heading say the same thing twice.
-Don't: Four fields and one unexplained gap. People who cannot see the spacing, or whose screen reader skips it, miss the break.
-
-## Do and don't
-
-### Group by proximity
-
-Keep a label near its own field and put the larger gap between groups.
-
-Do: Label to field 8 (Stack/stack-md), group to group 24 (Modal/stack-lg), so each label attaches to its field.
-Don't: Label to field 24 and group to group 8: each label sits nearer the previous field than its own.
-
-### Match the token to the context
-
-Pad tokens for controls, card tokens for cards.
-
-Do: A card pads with a card token, so the content breathes at the card scale.
-Don't: A control pad on a card squeezes the content to a button-sized pad.
-
-### Never hardcode spacing
-
-Always use the variable; the code token is the same name with `var()`.
-
-Do: Bound to the variable, so the pad follows the system.
-Don't: A literal 13 matches no step on the scale and will not follow a token change.
+Do: Pad a control wider than tall, about two to one, so it reads as one line.
+Don't: Equal pad on every side: the control turns into a block.
 
 ## Accessibility
 
-- Keep one stack tier per context across a container so readers can see what belongs together without reading every label.
-- Spacing never carries meaning alone. Pair a group break with a heading, label or fieldset legend.
-- Leave room for the focus ring: the ring sits outside a control, so a control never sits flush against a clipping edge ([Border](?path=/docs/foundations-visual-border--docs)).
+- Spacing never carries meaning alone: name every group with a heading, label or legend.
+- Keep one stack tier per context across a template, so the structure reads the same everywhere.
+- Leave room for the focus ring: a control never sits flush against an edge that clips it.
+- Sizes are rem, so every gap grows with the reader’s font setting.
 
 ## Related
+
+| Page | Why |
+| --- | --- |
+| Dimensions | The ladder every gap reads from; heights and widths |
+| Grid | Columns, gutters, content caps, modal widths |
+| Radius | Corners, and how a menu’s rows round inside it |
+| Border | Stroke widths |
+| Typography | The 20 line that sets every control’s pad |
+| Elevation | Which surface each layer sits on |

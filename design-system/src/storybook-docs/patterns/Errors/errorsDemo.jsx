@@ -4,7 +4,8 @@ import { Banner, Button, ButtonItem, DropdownMenu, EmptyState, Flag, FlagGroup, 
 import { Page, PatternSection } from '@/patterns';
 import { DemoPageHeader, SessionsTable } from '../../../patterns/Page/pageDemo.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
-import { ViewBar, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
+import { HeaderSearch } from '@/storybook-docs/lib/section-header.jsx';
+import { ViewPills, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
 
 /**
  * The Errors pattern's examples: where a failure shows, drawn with the real
@@ -54,7 +55,7 @@ export const FieldError = ({ padded = true }) => {
     return padded ? <div style={{ ...pad, maxInlineSize: 'var(--card-min-width-lg)' }}>{field}</div> : field;
 };
 
-/** A Section whose content could not load: the view bar stays, the body holds the error with Try again. */
+/** A Section whose content could not load: the header rows stay, the body holds the error with Try again. */
 export const LoadFailure = ({ onRetry, padded = true }) => {
     const [recovered, setRecovered] = useState(false);
     const [view, setView] = useState('This week');
@@ -65,19 +66,17 @@ export const LoadFailure = ({ onRetry, padded = true }) => {
         <PatternSection
             title="Sessions"
             description={view}
-            tabs={(
-                <ViewBar
+            views={(
+                <ViewPills
                     views={['This week', 'Next week']}
                     activeView={view}
                     onViewChange={(next) => {
                         setView(next);
                         if (next === 'This week') setRecovered(false);
                     }}
-                    searchLabel="Search sessions"
-                    filters={null}
-                    primary={null}
                 />
             )}
+            search={<HeaderSearch label="Search sessions" />}
         >
             {showingTable ? (
                 <SessionsTable status={view === 'Next week' ? 'past' : 'upcoming'} />
@@ -98,7 +97,7 @@ export const LoadFailure = ({ onRetry, padded = true }) => {
 /** No access: the same slot names who can help and offers no action the person cannot take. */
 export const NoAccess = () => (
     <div style={pad}>
-        <PatternSection title="Session notes" description="Lincoln Middle" tabs={<ViewBar views={['All notes']} filters={null} primary={null} />}>
+        <PatternSection title="Session notes" description="Lincoln Middle" views={<ViewPills views={['All notes']} />} search={<HeaderSearch label="Search notes" />}>
             <EmptyState
                 spacing="compact"
                 icon="lock"

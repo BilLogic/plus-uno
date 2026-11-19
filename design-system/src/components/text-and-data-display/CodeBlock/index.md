@@ -62,7 +62,7 @@ Don't: A line number beside a single command.
 
 - `Code`: use when formatting a short identifier or command inline within prose.
 
-Same group: `Code` · `Heading` · `InlineEdit` · `Table` · `VisuallyHidden`
+Same group: `Code` · `DynamicTable` · `Heading` · `InlineEdit` · `StaticTable` · `TreeTable` · `VisuallyHidden`
 
 ## Parts
 
@@ -114,7 +114,7 @@ Same group: `Code` · `Heading` · `InlineEdit` · `Table` · `VisuallyHidden`
 
 ## Tokens touched
 
-`--border-width-default` · `--card-radius-compact` · `--code-default` · `--ds-background-code-default` · `--ds-background-code-gutter` · `--ds-background-code-highlight` · `--ds-border` · `--ds-border-focused` · `--ds-text-code-default` · `--ds-text-code-gutter` · `--focus-ring-width` · `--pad-x-lg` · `--pad-x-md` · `--pad-y-lg` · `--plus-code-block-digits` · `--plus-code-block-gutter` · `--type-line-height-125` · `--type-size-0875`
+`--border-width-default` · `--card-radius` · `--code-default` · `--ds-background-code-default` · `--ds-background-code-gutter` · `--ds-background-code-highlight` · `--ds-border` · `--ds-border-focused` · `--ds-text-code-default` · `--ds-text-code-gutter` · `--focus-ring-width` · `--pad-x-lg` · `--pad-x-md` · `--pad-y-lg` · `--plus-code-block-digits` · `--plus-code-block-gutter` · `--type-line-height-125` · `--type-size-0875`
 
 From `design-system/src/components/text-and-data-display/CodeBlock/CodeBlock.scss`. Override these through the token layer, never with a literal.
 

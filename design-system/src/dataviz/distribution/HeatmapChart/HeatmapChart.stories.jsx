@@ -2,7 +2,7 @@ import React from 'react';
 import { expect, waitFor } from 'storybook/test';
 import { Heading } from '@/components';
 import { HUES } from '@/dataviz/palette';
-import HeatmapChart from './HeatmapChart';
+import HeatmapChart, { HEATMAP_CHART_SPACINGS } from './HeatmapChart';
 
 export default {
     title: 'Data visualizations/Distribution/Heatmap chart',
@@ -19,7 +19,7 @@ export default {
         max: { control: 'number' },
         showLegend: { control: 'boolean' },
         showDataLabels: { control: 'boolean' },
-        compactSpacing: { control: 'boolean' },
+        spacing: { control: 'select', options: HEATMAP_CHART_SPACINGS },
         hideLegendNavigation: { control: 'boolean' },
         pointPadding: { control: 'number' },
     },
@@ -28,7 +28,7 @@ export default {
 const stackStyle = {
     display: 'flex',
     flexDirection: 'column',
-    gap: 'var(--section-stack-lg)',
+    gap: 'var(--stack-2xl)',
 };
 
 const sectionStyle = {

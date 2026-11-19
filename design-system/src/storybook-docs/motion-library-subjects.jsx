@@ -18,6 +18,7 @@ import {
     DatePicker,
     DateTimePicker,
     DropdownMenu,
+    DynamicTable,
     FileItem,
     FileUpload,
     FilterButton,
@@ -33,7 +34,6 @@ import {
     Link,
     LinkButton,
     LinkIconButton,
-    Modal,
     NotificationItem,
     PageHeader,
     Pagination,
@@ -60,7 +60,6 @@ import {
     Spinner,
     SplitButton,
     Suggestion,
-    Table,
     Tabs,
     TagInput,
     TextArea,
@@ -69,6 +68,7 @@ import {
     Toggle,
     Tooltip,
     TreeSelect,
+    TreeTable,
 } from '@/components';
 import { OverlayContainer } from '@/lib/overlay';
 import { BEAT, springFor } from '@/storybook-docs/illustrations/motion.jsx';
@@ -195,7 +195,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
         <Calendar
             viewDate={step === 'landing' ? CALENDAR_NEXT_DATE : CALENDAR_BASE_DATE}
             selected="2026-11-16"
-            size={28}
+            size={24}
             onViewDateChange={NOOP}
             onPick={NOOP}
         />
@@ -377,7 +377,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
         <GenerativeBorder isActive={step === 'landing'} radius="radius-lg">
             <div
                 style={{
-                    padding: 'var(--space-100) var(--space-150)',
+                    padding: 'var(--card-pad)',
                     background: 'var(--ds-surface)',
                     borderRadius: 'var(--radius-lg)',
                     font: 'var(--body-sm)',
@@ -403,7 +403,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
         <div style={{ width: '100%' }}>
             <InlineEdit
                 label="Session goal"
-                compact
+                spacing="compact"
                 defaultValue={step === 'landing' ? 'Equivalent fractions' : 'Number lines'}
                 readView={() => (
                     <span>{step === 'landing' ? 'Equivalent fractions' : 'Number lines'}</span>
@@ -420,7 +420,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
         <div style={{ width: '100%' }}>
             <InlineEditableTextfield
                 label="Student nickname"
-                compact
+                spacing="compact"
                 value={step === 'landing' ? 'Maya L.' : 'Maya'}
                 placeholder="Enter nickname"
                 onConfirm={NOOP}
@@ -458,21 +458,6 @@ export const COMPONENT_SUBJECTS = Object.freeze({
             label="Open in new tab"
             onClick={(e) => e.preventDefault()}
         />
-    ),
-
-    Modal: () => (
-        <div style={{ width: '100%' }}>
-            <Modal
-                renderAs="inline"
-                show
-                title="End session early?"
-                body="Progress so far will be saved to the session log."
-                width="100%"
-                primaryButton={{ text: 'Save & end', appearance: 'primary', spacing: 'compact', onClick: NOOP }}
-                secondaryButton={{ text: 'Keep going', appearance: 'default', spacing: 'compact', onClick: NOOP }}
-                onClose={NOOP}
-            />
-        </div>
     ),
 
     NotificationItem: ({ step }) => (
@@ -520,7 +505,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 'var(--space-075)',
+                gap: 'var(--stack-lg)',
             }}
         >
             <Popup
@@ -533,7 +518,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
             <div
                 className="plus-popup"
                 style={{
-                    padding: 'var(--space-100) var(--space-150)',
+                    padding: 'var(--card-pad)',
                     borderRadius: 'var(--radius-lg)',
                     background: 'var(--ds-surface-overlay)',
                     boxShadow: 'var(--ds-shadow-overlay)',
@@ -727,7 +712,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
     Skeleton: ({ step }) => (
         <div style={{ width: '100%' }}>
             {step === 'landing' ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-075)' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
                     <Skeleton preset="paragraph" lines={2} />
                 </div>
             ) : (
@@ -762,19 +747,37 @@ export const COMPONENT_SUBJECTS = Object.freeze({
         />
     ),
 
-    Table: ({ step }) => (
+    DynamicTable: ({ step }) => (
         <div style={{ width: '100%' }}>
-            <Table
-                size={32}
-                headers={['Student', 'Status']}
-                rows={
-                    step === 'landing'
-                        ? [
-                            ['Maya Lin', 'Present'],
-                            ['Leo Park', 'Joined'],
-                        ]
-                        : [['Maya Lin', 'Present']]
-                }
+            <DynamicTable
+                label="Session roster"
+                head={{ cells: [{ key: 'student', content: 'Student' }, { key: 'status', content: 'Status' }] }}
+                rows={(step === 'landing'
+                    ? [['Maya Lin', 'Present'], ['Leo Park', 'Joined']]
+                    : [['Maya Lin', 'Present']]
+                ).map(([student, status]) => ({
+                    key: student,
+                    cells: [{ key: 'student', content: student }, { key: 'status', content: status }],
+                }))}
+            />
+        </div>
+    ),
+
+    TreeTable: ({ step }) => (
+        <div style={{ width: '100%' }}>
+            <TreeTable
+                label="School roster"
+                head={{ cells: [{ key: 'name', content: 'Name' }, { key: 'type', content: 'Type' }] }}
+                items={[{
+                    id: 'lincoln',
+                    cells: [{ content: 'Lincoln Middle' }, { content: 'School' }],
+                    children: [
+                        { id: 'g7', cells: [{ content: 'Grade 7 · Math' }, { content: 'Class' }] },
+                        { id: 'g6', cells: [{ content: 'Grade 6 · Reading' }, { content: 'Class' }] },
+                    ],
+                }]}
+                expandedIds={step === 'landing' ? ['lincoln'] : []}
+                onExpandedChange={NOOP}
             />
         </div>
     ),
@@ -849,7 +852,7 @@ export const COMPONENT_SUBJECTS = Object.freeze({
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 'var(--space-075)',
+                gap: 'var(--stack-lg)',
             }}
         >
             <div className="plus-tooltip">
@@ -1204,7 +1207,7 @@ export const MotionComponentStage = ({
             style={{
                 position: 'relative',
                 minHeight: 168,
-                padding: 'var(--space-200)',
+                padding: 'calc(var(--card-pad) * 2)',
                 borderRadius: 'var(--card-radius)',
                 background: 'var(--ds-surface-sunken)',
                 display: 'flex',

@@ -31,13 +31,14 @@ import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { InAppFrame, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
-import { FilterSide, STUDENTS, StudentsTable, ViewBar, filterStudentList, row } from '@/storybook-docs/lib/view-bar.jsx';
+import { FilterSide, FormatSwitch, STUDENTS, StudentsTable, ViewPills, filterStudentList } from '@/storybook-docs/lib/view-bar.jsx';
+import { HeaderSearch, SectionActions } from '@/storybook-docs/lib/section-header.jsx';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
 import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { iconClass } from '../../lib/icon';
 import { ScreenStage } from '@/storybook-docs/lib/fit-stage.jsx';
 
-const col = { display: 'flex', flexDirection: 'column', gap: 'var(--page-pad-x-default)' };
+const col = { display: 'flex', flexDirection: 'column', gap: 'var(--page-pad)' };
 
 const Actions = () => (
     <>
@@ -69,8 +70,8 @@ const DefaultToolbar = () => (
         count="48 students"
         actions={(
             <>
-                <Button text="Export" spacing="compact" iconBefore="download" onClick={() => {}} />
-                <Button text="Add student" appearance="primary" spacing="compact" iconBefore="user-plus" onClick={() => {}} />
+                <Button text="Export" iconBefore="download" onClick={() => {}} />
+                <Button text="Add student" appearance="primary" iconBefore="user-plus" onClick={() => {}} />
             </>
         )}
     />
@@ -117,7 +118,11 @@ export default {
             table: { category: 'Design' },
         },
         loading: { control: 'boolean', table: { category: 'State' } },
-        gap: { control: false, table: { category: 'Design' } },
+        spacing: {
+            control: 'select',
+            options: ['default', 'compact', 'spacious'],
+            table: { category: 'Design' },
+        },
         id: { control: false, table: { disable: true, category: 'Development' } },
         className: { control: false, table: { disable: true, category: 'Development' } },
     },
@@ -140,24 +145,6 @@ export const HeaderDefault = {
     ),
 };
 
-export const HeaderTabs = {
-    name: 'Tabs header',
-    render: () => (
-        <PatternSection title="Students" description={description} actions={<Actions />} tabs={<ViewTabs />} onAddView={() => {}}>
-            {slotContent('Content slot')}
-        </PatternSection>
-    ),
-};
-
-export const HeaderToolbar = {
-    name: 'Toolbar header',
-    render: () => (
-        <PatternSection title="Students" description={description} toolbar={<DefaultToolbar />}>
-            {slotContent('Table')}
-        </PatternSection>
-    ),
-};
-
 export const HeaderCustom = {
     name: 'Custom header',
     render: () => (
@@ -170,15 +157,6 @@ export const HeaderCustom = {
                 </>
             )}
         >
-            {slotContent('Content slot')}
-        </PatternSection>
-    ),
-};
-
-export const HeaderTabsOnly = {
-    name: 'Tabs only header',
-    render: () => (
-        <PatternSection type="tabs-only" title="Students" tabs={<ViewTabs label="Students" />}>
             {slotContent('Content slot')}
         </PatternSection>
     ),
@@ -225,36 +203,70 @@ export const LayoutSubsections = {
     ),
 };
 
-/** `fill="subtle"`: the sunken surface with a pad and a radius, for a section that stands apart. */
-export const FillSubtle = {
-    name: 'Subtle fill',
+/** A box with a fill is a Card: a sunken Card sits in a Section, and the Section draws nothing of its own. */
+export const SunkenCard = {
+    name: 'Sunken Card in a Section',
     render: () => (
-        <PatternSection title="Flag 3 of 12" description={description} fill="subtle">
-            {slotContent('Record')}
+        <PatternSection title="Flag 3 of 12" description={description} data-testid="host">
+            <PatternCard surface="sunken" title="Record" description="Needs a follow-up call this week." data-testid="sunken-card" />
         </PatternSection>
     ),
     play: async ({ canvasElement }) => {
-        await expect(getComputedStyle(canvasElement.querySelector('.plus-pattern-section-fill-subtle')).borderTopLeftRadius, 'Section radius is 16').toBe('16px');
+        const card = getComputedStyle(canvasElement.querySelector('[data-testid="sunken-card"]'));
+        await expect(card.backgroundColor, 'the Card is on the sunken surface').toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+        await expect(card.borderTopLeftRadius, 'Card radius is 16').toBe('16px');
+        await expect(getComputedStyle(canvasElement.querySelector('.plus-pattern-card-inner')).paddingTop, 'Card pad is 16').toBe('16px');
     },
 };
 
-/** A Card in a Section with a fill is nested and takes the compact radius; in an unfilled Section it keeps the Card radius. */
+/** The inline detail is a sunken Card, so it takes the Card's surface, pad and radius. */
+export const DetailIsSunkenCard = {
+    name: 'Detail is a sunken Card',
+    render: () => (
+        <PatternSection title="Session reflections" detail={<p style={{ margin: 0 }}>Two goals for next week.</p>} detailTitle="Ava Thompson">
+            {slotContent('Rows')}
+        </PatternSection>
+    ),
+    play: async ({ canvasElement }) => {
+        const detail = canvasElement.querySelector('.plus-pattern-section-detail');
+        const style = getComputedStyle(detail);
+        await expect(style.backgroundColor, 'the detail is on the sunken surface').toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
+        await expect(style.borderTopLeftRadius, 'detail radius is 16').toBe('16px');
+        await expect(getComputedStyle(detail.querySelector('.plus-pattern-card-inner')).paddingTop, 'detail pad is 16').toBe('16px');
+    },
+};
+
+/** A Card in a Section keeps the Card radius. */
 export const CardNesting = {
     name: 'Card in a Section',
     render: () => (
-        <div style={col}>
-            <PatternSection title="With a fill" fill="subtle" data-testid="filled">
-                <StatCard title="Sessions this week" body="12 scheduled · 2 need a tutor" />
-            </PatternSection>
-            <PatternSection title="Without a fill" data-testid="plain">
-                <StatCard title="Sessions this week" body="12 scheduled · 2 need a tutor" />
-            </PatternSection>
-        </div>
+        <PatternSection title="Sessions" data-testid="plain">
+            <StatCard title="Sessions this week" body="12 scheduled · 2 need a tutor" />
+        </PatternSection>
     ),
     play: async ({ canvasElement }) => {
         const radius = (id) => getComputedStyle(canvasElement.querySelector(`[data-testid="${id}"] .plus-pattern-card`)).borderTopLeftRadius;
-        await expect(radius('filled'), 'Card in a filled Section: 12').toBe('12px');
-        await expect(radius('plain'), 'Card in an unfilled Section: 16').toBe('16px');
+        await expect(radius('plain'), 'Card in a Section: 16').toBe('16px');
+    },
+};
+
+/** No Section draws a surface or a pad of its own, however it is composed. */
+export const NoSurfaceNoPad = {
+    name: 'No fill, no pad',
+    render: () => (
+        <PatternSection title="Sessions" layout="subsections" detail={<p style={{ margin: 0 }}>Notes</p>} detailTitle="Ava Thompson">
+            <PatternSection title="This week" spacing="compact">{slotContent('Rows')}</PatternSection>
+            <PatternSection title="Next week" spacing="spacious">{slotContent('Rows')}</PatternSection>
+        </PatternSection>
+    ),
+    play: async ({ canvasElement }) => {
+        const sections = [...canvasElement.querySelectorAll('.plus-pattern-section')];
+        await expect(sections.length).toBe(3);
+        sections.forEach((section) => {
+            const style = getComputedStyle(section);
+            expect(style.backgroundColor, 'no fill').toBe('rgba(0, 0, 0, 0)');
+            ['Top', 'Right', 'Bottom', 'Left'].forEach((side) => expect(style[`padding${side}`], `no ${side} pad`).toBe('0px'));
+        });
     },
 };
 
@@ -268,13 +280,13 @@ export const Footer = () => (
     </PatternSection>
 );
 
-/** Every part of a section: header with actions and a tabs row, content, side and footer. */
+/** Every part of a section: header with actions and views, content, side and footer. */
 export const Anatomy = () => (
     <PatternSection
         title="Upcoming sessions"
         description={description}
         actions={<Actions />}
-        tabs={<ViewTabs />}
+        views={<ViewPills views={['All students', 'Active', 'Paused']} />}
         layout="split"
         side={slotContent('Side · span 4')}
         footer={<Button text="View all" appearance="subtle" onClick={() => {}} />}
@@ -304,9 +316,9 @@ const SEARCH_STUDENTS = [
 ];
 
 /**
- * The view bar's Search: the icon grows left into the field. Esc clears, a
+ * The header's Search: the icon grows left into the field. Esc clears, a
  * second Esc closes; it stays open while it holds text. The count is a polite
- * live region, and Reset filters clears the search with the filters.
+ * live region, and Clear all clears the search with the filters.
  */
 const SearchableStudents = () => {
     const [query, setQuery] = useState('');
@@ -321,21 +333,15 @@ const SearchableStudents = () => {
     return (
         <PatternSection
             title="Students"
-            toolbar={(
-                <PatternSection.Toolbar
-                    count={narrowed ? `${rows.length} of ${SEARCH_STUDENTS.length} students` : `${SEARCH_STUDENTS.length} students`}
-                    filters={narrowed ? <Button text="Reset filters" appearance="subtle" spacing="compact" onClick={reset} /> : null}
-                    actions={(
-                        <>
-                            <SearchField mode="active" isCollapsible spacing="compact" placeholder="Search students" value={query} onValueChange={setQuery} />
-                            <IconButton icon="filter" label="Filters" appearance="subtle" trailingMetric={activeOnly ? 1 : undefined} isSelected={activeOnly} onClick={() => setActiveOnly((on) => !on)} />
-                            <Button text="Add student" appearance="primary" spacing="compact" iconBefore="user-plus" onClick={() => {}} />
-                        </>
-                    )}
-                />
-            )}
+            actions={<SectionActions primary="Add student" more={false} />}
+            search={<SearchField mode="active" isCollapsible spacing="compact" placeholder="Search students" value={query} onValueChange={setQuery} />}
+            filters={[{ key: 'status', label: 'Status', text: activeOnly ? 'Active' : 'All', isSelected: activeOnly, onClick: () => setActiveOnly((on) => !on) }]}
+            onClearAll={reset}
         >
-            <ul style={{ margin: 0, paddingInlineStart: 'var(--page-pad-x-spacious)', font: 'var(--body-default)' }}>
+            <p role="status" style={{ margin: 0, font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
+                {narrowed ? `${rows.length} of ${SEARCH_STUDENTS.length} students` : `${SEARCH_STUDENTS.length} students`}
+            </p>
+            <ul style={{ margin: 0, paddingInlineStart: 'var(--page-pad)', font: 'var(--body-default)' }}>
                 {rows.map((student) => <li key={student.name}>{student.name}</li>)}
             </ul>
         </PatternSection>
@@ -390,12 +396,12 @@ export const ToolbarSearch = {
             await waitFor(() => expect(canvas.queryByRole('searchbox')).toBeNull());
         });
 
-        await step('Reset filters clears the search too', async () => {
+        await step('Clear all clears the search too', async () => {
             await userEvent.click(icon());
             await userEvent.type(field(), 'sam');
-            await userEvent.click(canvas.getByRole('button', { name: /^Filters/ }));
+            await userEvent.click(canvas.getByRole('button', { name: 'Status: All' }));
             expect(canvas.getByRole('status')).toHaveTextContent('1 of 6 students');
-            await userEvent.click(canvas.getByRole('button', { name: 'Reset filters' }));
+            await userEvent.click(canvas.getByRole('button', { name: 'Clear all' }));
             await waitFor(() => expect(canvas.queryByRole('searchbox')).toBeNull());
             expect(canvas.getByRole('status')).toHaveTextContent('6 students');
         });
@@ -520,10 +526,10 @@ export const SplitLayout = {
     },
 };
 
-/** Header to body is Section/stack-md; the tabs row sits Section/stack-sm under the title row. */
+/** Header to body is Section/stack-md; the header rows sit Section/stack-sm under the title row. */
 export const Spacing = {
     render: () => (
-        <PatternSection title="Students" description={description} tabs={<ViewTabs />}>
+        <PatternSection title="Students" description={description} views={<ViewPills views={['All students', 'Active', 'Paused']} />}>
             {slotContent('Content slot')}
         </PatternSection>
     ),
@@ -532,7 +538,7 @@ export const Spacing = {
         const q = (s) => canvasElement.querySelector(s).getBoundingClientRect();
         await expect(q('.plus-pattern-section-content').top - q('.plus-pattern-section-header').bottom, 'header to body')
             .toBeCloseTo(tokenLength(canvasElement, '--section-stack-md'), 0);
-        await expect(q('.plus-pattern-section-tabs').top - q('.plus-pattern-section-title-row').bottom, 'title row to tabs')
+        await expect(q('.plus-section-rows').top - q('.plus-pattern-section-title-row').bottom, 'title row to header rows')
             .toBeCloseTo(tokenLength(canvasElement, '--section-stack-sm'), 0);
         await expect(q('.plus-pattern-section-description').top - q('.plus-pattern-section-title').bottom, 'title to description')
             .toBeCloseTo(tokenLength(canvasElement, '--stack-sm'), 0);
@@ -558,7 +564,7 @@ export const Detail = {
             <PatternSection
                 title="Reflections"
                 description="Week of Oct 20"
-                tabs={<ViewBar views={['All reflections', 'Needs follow-up']} primary={null} />}
+                views={<ViewPills views={['All reflections', 'Needs follow-up']} />}
                 detailTitle="Ava Thompson"
                 detailDescription="Grade 7"
                 detail={(
@@ -623,30 +629,13 @@ export const Detail = {
 /*
  * The Section template page's examples: its types, its header types, the
  * side and the detail, its key states and its width behavior. Each is a
- * live Section of real PLUS components holding tutoring content. The view bar
- * slot is planned, so these stories compose it in the `tabs` row: pill views
- * at the start, then format switch, Search, filters, More and the labeled
- * Primary at the end.
+ * live Section of real PLUS components holding tutoring content. Each header
+ * is the three rows: the title row with its actions, the views, then Search
+ * and the filters.
  */
 
 /** The width the queue and filter-side stories lay out at: past the 960 floor, so the detail and the side sit beside the list. */
 const STAGE = SECTION_DETAIL_FLOOR + 64;
-
-/** The Filter icon with its count, on the shipped FilterButton: named "Filters", read "Filters, 2 applied". */
-const FiltersButton = ({ applied, onClick }) => (
-    <FilterButton
-        text="Filters"
-        iconBefore="filter"
-        hasChevronDown={false}
-        appearance="subtle"
-        trailingMetric={applied || undefined}
-        isSelected={applied > 0}
-        aria-label={applied ? `Filters, ${applied} applied` : 'Filters'}
-        onClick={onClick}
-    />
-);
-
-
 
 const SESSIONS = [
     ['Lincoln Middle', 'Tue 4:30 PM · 6 students'],
@@ -675,11 +664,15 @@ const STUDENT_FACTS = [['School', 'Lincoln Middle School'], ['Grade', 'Grade 7']
 
 /* ---- types */
 
-/** List: the view bar alone, one table, paging. */
+/** List: the views alone, one table, paging. */
 const TypeListDemo = () => {
     const [view, setView] = useState('All students');
     return (
-        <PatternSection title="Students" type="tabs-only" tabs={<ViewBar views={['All students', 'Needs follow-up']} activeView={view} onViewChange={setView} />}>
+        <PatternSection
+            title="Students"
+            actions={<SectionActions />}
+            views={<ViewPills views={['All students', 'Needs follow-up']} activeView={view} onViewChange={setView} />}
+        >
             <StudentsTable count={6} rowsPerPage={4} sortable view={view} />
         </PatternSection>
     );
@@ -767,7 +760,7 @@ export const TypeQueue = {
             >
                 <PatternSection
                     title="Reflections to review"
-                    tabs={<ViewBar views={['To review']} primary={null} />}
+                    views={<ViewPills views={['To review']} />}
                 >
                     <DynamicTable
                         label="Reflections to review"
@@ -911,242 +904,307 @@ export const TypeSubsections = {
     ),
 };
 
-/* ---- header types */
+/* ---- header rows */
 
-/** Title: a title and a description, nothing to act on. */
-export const HeaderTypeTitle = {
-    name: 'Header: Title',
-    render: () => (
-        <PatternSection title="Upcoming sessions" description="Next 7 days">
-            <SessionCards />
-        </PatternSection>
-    ),
+const HEADER_SESSIONS = [
+    ['Tue Nov 18', '3:30 PM', 'Whitaker · period 6', '4'],
+    ['Thu Nov 20', '3:30 PM', 'Whitaker · period 6', '4'],
+    ['Tue Nov 25', '3:30 PM', 'Whitaker · period 6', '4'],
+    ['Tue Dec 2', '3:30 PM', 'Whitaker · period 6', '4'],
+];
+const HEADER_STUDENTS = [
+    ['Maya R.', 'Grade 7', 'Whitaker', '12'],
+    ['Jonah T.', 'Grade 8', 'Lincoln', '9'],
+];
+const rowsOf = (list) => list.map((cells) => ({ key: cells.join(), cells: cells.map((content, i) => ({ key: `${i}`, content })) }));
+const headOf = (names) => ({ cells: names.map((content) => ({ key: content, content })) });
+const HeaderTable = ({ list = HEADER_SESSIONS.slice(0, 3), names = ['Date', 'Time', 'Group', 'Students'], ...props }) => (
+    <DynamicTable head={headOf(names)} rows={rowsOf(list)} label="Sessions" isFixedSize {...props} />
+);
+
+const signUp = <SectionActions primary="Sign up" icon="plus" />;
+
+const headerSearch = <HeaderSearch label="Search" />;
+
+const STATUS_FILTERS = [
+    { key: 'status', label: 'Status', text: 'Upcoming', onClick: () => {} },
+    { key: 'group', label: 'Group', text: 'All', onClick: () => {} },
+    { key: 'date', label: 'Date', text: 'All time', onClick: () => {} },
+];
+
+const fullHeader = {
+    title: 'Sessions',
+    actions: signUp,
+    views: <ViewPills views={['Upcoming', 'Past', 'All']} />,
+    format: <FormatSwitch />,
+    search: headerSearch,
+    filters: STATUS_FILTERS,
 };
 
-/** Title and actions: actions in the title row, only when there is no view bar. */
-export const HeaderTypeTitleAndActions = {
-    name: 'Header: Title and actions',
+/** Every control in a header row is 32 (Tag 20): measured, not assumed. */
+const expectOneHeight = async (canvasElement) => {
+    const header = canvasElement.querySelector('.plus-pattern-section-header');
+    const controls = [...header.querySelectorAll('button, input')].filter((el) => {
+        const box = el.getBoundingClientRect();
+        return box.height > 0 && !el.closest('.plus-section-row__views') && el.type !== 'hidden';
+    });
+    controls.forEach((el) => {
+        const box = (el.closest('.plus-search-field') ?? el).getBoundingClientRect();
+        expect(Math.round(box.height), `${el.getAttribute('aria-label') ?? el.textContent} draws 32`).toBe(32);
+    });
+    header.querySelectorAll('.plus-tag').forEach((tag) => {
+        expect(Math.round(tag.getBoundingClientRect().height), 'a Tag draws 20').toBe(20);
+    });
+    header.querySelectorAll('.plus-section-row__views [role="tab"]').forEach((tab) => {
+        expect(Math.round(tab.getBoundingClientRect().height), `${tab.textContent} draws 32`).toBe(32);
+    });
+};
+
+/** Row 1: the default More button and the labeled primary with its plus icon. */
+const expectRowOne = async (canvasElement, primary = 'Sign up') => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('button', { name: 'More section actions' }), 'the default More button').toBeInTheDocument();
+    const button = canvas.getByRole('button', { name: primary });
+    await expect(button.querySelector('.fa-plus'), 'the primary leads with a plus icon').not.toBeNull();
+    await expect(button, 'the primary is the primary appearance').toHaveClass('plus-btn--primary');
+};
+
+const rowsIn = (canvasElement) => [...canvasElement.querySelectorAll('.plus-section-rows > .plus-section-row')];
+
+/** Full: a title with its actions, views and the format switch, then Search and three triggers. */
+export const Full = {
+    render: () => (
+        <PatternSection {...fullHeader}>
+            <HeaderTable />
+        </PatternSection>
+    ),
+    play: async ({ canvasElement }) => {
+        await expectOneHeight(canvasElement);
+        await expectRowOne(canvasElement);
+        await expect(rowsIn(canvasElement), 'rows 2 and 3').toHaveLength(2);
+        const canvas = within(canvasElement);
+        await expect(canvas.getByRole('button', { name: 'Status: Upcoming' })).toBeInTheDocument();
+        await expect(canvas.getByRole('button', { name: 'Date: All time' })).toBeInTheDocument();
+        const field = canvasElement.querySelector('.plus-section-row__search .plus-search-field');
+        await expect(Math.round(field.getBoundingClientRect().width), 'Search keeps its field width beside the triggers')
+            .toBe(Math.round(tokenLength(canvasElement, '--field-width-md')));
+    },
+};
+
+/** Filters applied: the applied triggers take the selected state; the row ends with the count and Clear all. */
+const FiltersAppliedDemo = () => {
+    const [applied, setApplied] = useState(true);
+    const filters = STATUS_FILTERS.map((filter, i) => (
+        applied && i < 2 ? { ...filter, text: i === 0 ? 'Upcoming' : 'Whitaker', label: i === 0 ? 'Status' : 'Group', isSelected: true } : filter
+    ));
+    return (
+        <PatternSection {...fullHeader} filters={filters} count="3 of 12" onClearAll={() => setApplied(false)}>
+            <HeaderTable />
+        </PatternSection>
+    );
+};
+
+export const FiltersApplied = {
+    name: 'Filters applied',
+    render: () => <FiltersAppliedDemo />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expectOneHeight(canvasElement);
+        await expect(canvas.getByText('3 of 12')).toBeInTheDocument();
+        await expect(canvas.getByRole('button', { name: 'Status: Upcoming' })).toHaveAttribute('aria-pressed', 'true');
+        await expect(canvas.getByRole('button', { name: 'Group: Whitaker' })).toHaveAttribute('aria-pressed', 'true');
+        await userEvent.click(canvas.getByRole('button', { name: 'Clear all' }));
+        await waitFor(() => expect(canvas.queryByRole('button', { name: 'Clear all' })).toBeNull());
+    },
+};
+
+/** No views: row 2 goes and the format switch joins the end of row 3. */
+export const NoViews = {
+    name: 'No views',
     render: () => (
         <PatternSection
             title="Students"
-            description="Lincoln Middle · 24 students"
-            actions={(
-                <>
-                    <Button text="Export" iconBefore="download" onClick={() => {}} />
-                    <Button text="Add students" iconBefore="user-plus" appearance="primary" onClick={() => {}} />
-                </>
-            )}
+            actions={<SectionActions primary="Add student" />}
+            format={<FormatSwitch />}
+            search={headerSearch}
+            filters={[
+                { key: 'group', label: 'Group', text: 'All', onClick: () => {} },
+                { key: 'grade', label: 'Grade', text: 'All', onClick: () => {} },
+                { key: 'status', label: 'Status', text: 'Active', onClick: () => {} },
+            ]}
         >
-            <StudentsTable count={3} />
+            <HeaderTable list={HEADER_STUDENTS} names={['Name', 'Grade', 'Group', 'Sessions']} />
         </PatternSection>
     ),
+    play: async ({ canvasElement }) => {
+        await expectOneHeight(canvasElement);
+        const found = rowsIn(canvasElement);
+        await expect(found, 'row 2 is gone').toHaveLength(1);
+        await expect(found[0].querySelector('.plus-section-row__end'), 'the format switch ends row 3').not.toBeNull();
+    },
 };
 
-/** View bar, one view: one pill names the rows and stays. */
-export const HeaderTypeViewBarOneView = {
-    name: 'Header: View bar, one view',
+/** Views only: nothing to search or filter, so row 3 goes. */
+export const ViewsOnly = {
+    name: 'Views only',
     render: () => (
-        <PatternSection title="Students" description="Lincoln Middle · 24 students" tabs={<ViewBar views={['All students']} />}>
-            <StudentsTable count={3} />
+        <PatternSection title="Reflections" views={<ViewPills views={['Owed', 'Submitted']} />}>
+            <HeaderTable list={HEADER_STUDENTS} names={['Name', 'Grade', 'Group', 'Sessions']} />
         </PatternSection>
     ),
+    play: async ({ canvasElement }) => {
+        await expectOneHeight(canvasElement);
+        await expect(rowsIn(canvasElement), 'row 3 is gone').toHaveLength(1);
+        within(canvasElement).getAllByRole('tab').forEach((tab) => expect(Math.round(tab.getBoundingClientRect().height), 'a view draws 32').toBe(32));
+        await expect(within(canvasElement).queryByRole('button', { name: /^(Table|Cards)$/ }), 'no format switch').toBeNull();
+    },
 };
 
-/** View bar, several views of the same rows. */
-const HeaderTypeViewBarSeveralViewsDemo = () => {
-    const [view, setView] = useState('All students');
-    return (
+/** Many filters: three triggers show, the rest sit in More filters with a count. */
+export const ManyFilters = {
+    name: 'Many filters',
+    render: () => (
         <PatternSection
-            title="Students"
-            description="Lincoln Middle · 6 students"
-            tabs={<ViewBar views={['All students', 'Needs follow-up', 'Paused']} activeView={view} onViewChange={setView} />}
+            {...fullHeader}
+            filters={[
+                ...STATUS_FILTERS,
+                { key: 'grade', label: 'Grade', text: 'All', onClick: () => {} },
+                { key: 'tutor', label: 'Tutor', text: 'Any', onClick: () => {} },
+            ]}
+            onMoreFilters={() => {}}
         >
-            <StudentsTable count={6} view={view} />
+            <HeaderTable />
         </PatternSection>
-    );
-};
-
-export const HeaderTypeViewBarSeveralViews = {
-    name: 'Header: View bar, several views',
-    render: () => <HeaderTypeViewBarSeveralViewsDemo />,
+    ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(canvas.getByRole('cell', { name: 'Sofia Ramirez' })).toBeInTheDocument();
-
-        await userEvent.click(canvas.getByRole('tab', { name: 'Needs follow-up' }));
-        await expect(canvas.queryByRole('cell', { name: 'Sofia Ramirez' })).toBeNull();
-        await expect(canvas.getByRole('cell', { name: 'Marcus Lee' })).toBeInTheDocument();
-
-        await userEvent.click(canvas.getByRole('tab', { name: 'Paused' }));
-        await expect(canvas.queryByRole('cell', { name: 'Marcus Lee' })).toBeNull();
-        await expect(canvas.getByRole('cell', { name: 'Noah Williams' })).toBeInTheDocument();
-
-        await userEvent.click(canvas.getByRole('tab', { name: 'All students' }));
-        await expect(canvas.getByRole('cell', { name: 'Sofia Ramirez' })).toBeInTheDocument();
+        await expectOneHeight(canvasElement);
+        await expect(canvas.queryByRole('button', { name: 'Grade: All' }), 'the fourth trigger is folded').toBeNull();
+        await expect(canvas.getByRole('button', { name: /More filters/ })).toHaveTextContent('2');
     },
 };
 
-/** Format switch: equal-width segments, first on the right. */
-const HeaderTypeFormatSwitchDemo = () => {
-    const [view, setView] = useState('Upcoming');
-    const [format, setFormat] = useState('table');
-    const status = view === 'Past' ? 'past' : 'upcoming';
-    const cards = (status === 'past' ? PAST_SESSIONS : UPCOMING_SESSIONS).slice(0, 3);
-    return (
-        <PatternSection
-            title="Sessions"
-            description="This term"
-            tabs={<ViewBar views={['Upcoming', 'Past']} activeView={view} onViewChange={setView} format={format} onFormatChange={setFormat} primary="New session" primaryIcon="plus" searchLabel="Search sessions" />}
-        >
-            {format === 'cards' ? (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 'var(--grid-gutter)' }}>
-                    {cards.map(([time, tutor, subject]) => (
-                        <PatternCard key={`${time}-${subject}`} title={`${time} · ${subject}`} description={tutor} />
-                    ))}
-                </div>
-            ) : (
-                <SessionsTable status={status} />
-            )}
-        </PatternSection>
-    );
-};
-
-export const HeaderTypeFormatSwitch = {
-    name: 'Header: Format switch',
-    render: () => <HeaderTypeFormatSwitchDemo />,
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        await expect(canvas.getByRole('table', { name: 'Sessions' })).toBeInTheDocument();
-        await expect(canvas.getByRole('cell', { name: 'Algebra' })).toBeInTheDocument();
-
-        await userEvent.click(canvas.getByRole('button', { name: 'Cards' }));
-        await expect(canvas.queryByRole('table', { name: 'Sessions' })).toBeNull();
-        await expect(canvas.getByText('Thu 4:00 PM · Algebra')).toBeInTheDocument();
-
-        await userEvent.click(canvas.getByRole('tab', { name: 'Past' }));
-        await expect(canvas.getByText('Tue 4:00 PM · Two-step equations')).toBeInTheDocument();
-
-        await userEvent.click(canvas.getByRole('button', { name: 'Table' }));
-        await expect(canvas.getByRole('table', { name: 'Sessions' })).toBeInTheDocument();
-        await expect(canvas.getByRole('cell', { name: 'Two-step equations' })).toBeInTheDocument();
-
-        await userEvent.click(canvas.getByRole('tab', { name: 'Upcoming' }));
-        await expect(canvas.getByRole('cell', { name: 'Algebra' })).toBeInTheDocument();
-    },
-};
-
-/** View bar alone: the page title names the collection, so the title row is hidden from sight. */
-const HeaderTypeViewBarAloneDemo = () => {
-    const [view, setView] = useState('All students');
-    return (
-        <PatternSection title="Students" type="tabs-only" tabs={<ViewBar views={['All students', 'Needs follow-up']} activeView={view} onViewChange={setView} />}>
-            <StudentsTable count={6} view={view} />
-        </PatternSection>
-    );
-};
-
-export const HeaderTypeViewBarAlone = {
-    name: 'Header: View bar alone',
-    render: () => <HeaderTypeViewBarAloneDemo />,
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        await expect(canvas.getByRole('cell', { name: 'Sofia Ramirez' })).toBeInTheDocument();
-
-        await userEvent.click(canvas.getByRole('tab', { name: 'Needs follow-up' }));
-        await expect(canvas.queryByRole('cell', { name: 'Sofia Ramirez' })).toBeNull();
-        await expect(canvas.getByRole('cell', { name: 'Marcus Lee' })).toBeInTheDocument();
-
-        await userEvent.click(canvas.getByRole('tab', { name: 'All students' }));
-        await expect(canvas.getByRole('cell', { name: 'Sofia Ramirez' })).toBeInTheDocument();
-    },
-};
-
-/** Under page tabs: the views become one labeled PopupSelect at the start of the bar. */
-const HeaderTypeUnderPageTabsDemo = () => {
-    const [tab, setTab] = useState('sessions');
-    const [status, setStatus] = useState('upcoming');
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--page-stack-md)' }}>
-            <TabsComponent activeKey={tab} onSelect={setTab} aria-label="Student pages">
-                <TabsComponent.Tab eventKey="overview">Overview</TabsComponent.Tab>
-                <TabsComponent.Tab eventKey="sessions">Sessions</TabsComponent.Tab>
-                <TabsComponent.Tab eventKey="notes">Notes</TabsComponent.Tab>
-            </TabsComponent>
-            {tab === 'overview' && (
-                <PatternSection title="Upcoming sessions">
-                    <SessionCards items={STUDENT_SESSION_CARDS} />
-                </PatternSection>
-            )}
-            {tab === 'sessions' && (
-                <PatternSection
-                    title="Sessions"
-                    type="tabs-only"
-                    tabs={(
-                        <ViewBar
-                            start={(
-                                <PopupSelect
-                                    label="Status"
-                                    options={[{ value: 'upcoming', label: 'Upcoming' }, { value: 'past', label: 'Past' }]}
-                                    value={status}
-                                    onChange={setStatus}
-                                    isSearchable={false}
-                                />
-                            )}
-                            primary="New session"
-                            primaryIcon="plus"
-                            searchLabel="Search sessions"
-                        />
-                    )}
-                >
-                    <SessionsTable status={status} />
-                </PatternSection>
-            )}
-            {tab === 'notes' && (
-                <PatternSection title="Tutor notes">
-                    <PatternCard title="Oct 14 reflection" description="Worked through distributive property and two-step equations together." />
-                </PatternSection>
-            )}
+/** Wrapped filters: when the triggers no longer fit beside Search they take their own row, end-aligned. */
+export const WrappedFilters = {
+    name: 'Wrapped filters',
+    render: () => (
+        <div data-probe="stage" style={{ inlineSize: 800 }}>
+            <PatternSection
+                {...fullHeader}
+                filters={[
+                    ...STATUS_FILTERS,
+                    { key: 'grade', label: 'Grade', text: 'All', onClick: () => {} },
+                    { key: 'tutor', label: 'Tutor', text: 'Any', onClick: () => {} },
+                ]}
+                onMoreFilters={() => {}}
+            >
+                <HeaderTable />
+            </PatternSection>
         </div>
-    );
-};
-
-export const HeaderTypeUnderPageTabs = {
-    name: 'Header: Under page tabs',
-    render: () => <HeaderTypeUnderPageTabsDemo />,
+    ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        const body = within(canvasElement.ownerDocument.body);
-        await expect(canvas.getByRole('cell', { name: 'Algebra' })).toBeInTheDocument();
+        const stage = canvasElement.querySelector('[data-probe="stage"]');
+        const triggers = () => canvasElement.querySelector('.plus-section-row__filters');
+        const search = canvasElement.querySelector('.plus-section-row__search');
+        const rowEnd = () => search.parentElement.getBoundingClientRect().right;
 
-        await userEvent.click(canvas.getByRole('button', { name: 'Status: Upcoming' }));
-        await userEvent.click(await body.findByRole('option', { name: 'Past' }));
-        await expect(canvas.getByRole('cell', { name: 'Two-step equations' })).toBeInTheDocument();
+        await waitFor(() => expect(triggers(), 'too wide for one line: the triggers are marked wrapped').toHaveAttribute('data-wrapped'));
+        await expect(triggers().getBoundingClientRect().top, 'on their own row, under Search').toBeGreaterThanOrEqual(search.getBoundingClientRect().bottom);
+        await expect(canvas.getByRole('button', { name: /More filters/ }).getBoundingClientRect().right, 'the last trigger meets the end of the row').toBeCloseTo(rowEnd(), 0);
+        await expectOneHeight(canvasElement);
 
-        await userEvent.click(canvas.getByRole('button', { name: 'Status: Past' }));
-        await userEvent.click(await body.findByRole('option', { name: 'Upcoming' }));
-        await expect(canvas.getByRole('cell', { name: 'Algebra' })).toBeInTheDocument();
-
-        await userEvent.click(canvas.getByRole('tab', { name: 'Overview' }));
-        await expect(canvas.getByRole('heading', { name: 'Upcoming sessions' })).toBeInTheDocument();
-
-        await userEvent.click(canvas.getByRole('tab', { name: 'Notes' }));
-        await expect(canvas.getByRole('heading', { name: 'Tutor notes' })).toBeInTheDocument();
-
-        await userEvent.click(canvas.getByRole('tab', { name: 'Sessions' }));
-        await expect(canvas.getByRole('table', { name: 'Sessions' })).toBeInTheDocument();
+        stage.style.inlineSize = '1100px';
+        await waitFor(() => expect(triggers(), 'room again: back beside Search').not.toHaveAttribute('data-wrapped'));
+        await expect(triggers().getBoundingClientRect().top, 'on the Search line').toBeLessThan(search.getBoundingClientRect().bottom);
     },
 };
 
-/** Subsection: any type nests once; the title drops to an h3 and the view bar keeps its size. */
-export const HeaderTypeSubsection = {
-    name: 'Header: Subsection',
+/** Rows selected: the header stays and the table's head row becomes the bulk bar. */
+export const RowsSelected = {
+    name: 'Rows selected',
+    render: () => (
+        <PatternSection {...fullHeader}>
+            <HeaderTable
+                list={HEADER_SESSIONS}
+                isSelectable
+                defaultSelectedRowKeys={HEADER_SESSIONS.slice(0, 3).map((cells) => cells.join())}
+                bulkActions={[{ label: 'Call off' }, { label: 'Export' }, { label: 'Move to group' }, { label: 'Remove from group' }]}
+            />
+        </PatternSection>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const head = within(canvasElement.querySelector('thead'));
+        await expectOneHeight(canvasElement);
+        await expect(rowsIn(canvasElement), 'the header keeps its rows').toHaveLength(2);
+        await expect(head.getByText('3 selected')).toBeInTheDocument();
+        await expect(head.getByRole('checkbox', { name: 'Select all rows' })).toBePartiallyChecked();
+        await expect(head.getByRole('button', { name: 'Call off' })).toBeInTheDocument();
+        await expect(head.getByRole('button', { name: 'Export' })).toBeInTheDocument();
+        await expect(head.getByRole('button', { name: 'More actions' }), 'the rest sit behind the ellipsis').toBeInTheDocument();
+        await expect(canvas.queryByRole('button', { name: /Cancel|Clear/ }), 'no Clear: the checkboxes clear it').toBeNull();
+        await expect(Math.round(canvasElement.querySelector('thead tr').getBoundingClientRect().height), 'the head row keeps its 40').toBe(40);
+        await expect(canvasElement.querySelectorAll('tbody tr[aria-selected="true"]')).toHaveLength(3);
+    },
+};
+
+/** Narrow, at 600 wide: Search fills row 3 and the triggers fold into one Filter button with a count. */
+export const Narrow = {
+    name: 'Narrow',
+    render: () => (
+        <div data-probe="stage" style={{ inlineSize: 600 }}>
+            <PatternSection
+                {...fullHeader}
+                filters={STATUS_FILTERS.map((filter, i) => (i === 0 ? { ...filter, isSelected: true } : filter))}
+                count="3 of 12"
+                onClearAll={() => {}}
+                onOpenFilters={() => {}}
+            >
+                <HeaderTable list={HEADER_SESSIONS.slice(0, 3).map((cells) => cells.slice(0, 3))} names={['Date', 'Time', 'Group']} maxHeight={320} />
+            </PatternSection>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expectOneHeight(canvasElement);
+        await expectRowOne(canvasElement);
+        const filter = await canvas.findByRole('button', { name: /^Filter/ });
+        await expect(filter).toHaveTextContent('1');
+        await expect(canvas.getAllByRole('button', { name: /^Filter/ }), 'one Filter button').toHaveLength(1);
+        const clear = canvas.getByRole('button', { name: 'Clear all' });
+        await expect(canvas.getByText('3 of 12'), 'the count stays under 768').toBeInTheDocument();
+        await expect(clear.getBoundingClientRect().right, 'Clear all ends the Search row').toBeCloseTo(canvasElement.querySelector('.plus-section-row--filters').getBoundingClientRect().right, 0);
+        await expect(clear.getBoundingClientRect().top, 'on the Search line').toBeLessThan(canvasElement.querySelector('.plus-section-row__search').getBoundingClientRect().bottom);
+        await expect(canvas.queryByRole('button', { name: 'Status: Upcoming' }), 'the triggers are folded').toBeNull();
+        const search = canvasElement.querySelector('.plus-section-row__search');
+        const row = search.parentElement;
+        await expect(search.getBoundingClientRect().width, 'Search takes the row').toBeGreaterThan(row.getBoundingClientRect().width / 2);
+        const views = canvasElement.querySelector('.plus-section-row__views');
+        await expect(getComputedStyle(views).overflowX, 'the views scroll sideways').toBe('auto');
+    },
+};
+
+/** Subsection: the title drops to the subsection size; its primary acts on it alone. */
+export const Subsection = {
     render: () => (
         <PatternSection title="Lincoln Middle">
-            <PatternSection title="Students" tabs={<ViewBar views={['All students']} />}>
-                <StudentsTable count={3} />
+            <PatternSection
+                {...fullHeader}
+                title="This week"
+            >
+                <HeaderTable />
             </PatternSection>
         </PatternSection>
     ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const title = canvas.getByRole('heading', { name: 'This week' });
+        await expect(title.tagName).toBe('H3');
+        await expect(parseFloat(getComputedStyle(title).fontSize)).toBeLessThan(parseFloat(getComputedStyle(canvas.getByRole('heading', { name: 'Lincoln Middle' })).fontSize));
+        await expectOneHeight(canvasElement.querySelector('section section'));
+        await expectRowOne(canvasElement);
+    },
 };
 
 /* ---- side and detail */
@@ -1157,7 +1215,8 @@ export const SideAtEnd = {
     render: () => (
         <PatternSection
             title="Lincoln Middle"
-            tabs={<ViewBar views={['All students']} />}
+            actions={<SectionActions />}
+            views={<ViewPills views={['All students']} />}
             layout="split"
             side={<Facts pairs={GROUP_FACTS} columns={1} />}
         >
@@ -1215,13 +1274,17 @@ const FilterSideSection = () => {
             <PatternSection
                 title="Students"
                 description={`Lincoln Middle · ${matching.length} ${matching.length === 1 ? 'student' : 'students'}`}
-                tabs={(
-                    <ViewBar
-                        views={['All students']}
-                        narrow={narrow}
-                        filters={sideFits ? null : <FiltersButton applied={checked.length} onClick={() => setShowFilters(true)} />}
-                    />
-                )}
+                actions={<SectionActions narrow={narrow} />}
+                views={<ViewPills views={['All students']} />}
+                filters={sideFits ? undefined : [{
+                    key: 'filters',
+                    text: 'Filters',
+                    iconBefore: 'filter',
+                    hasChevronDown: false,
+                    trailingMetric: checked.length || undefined,
+                    isSelected: checked.length > 0,
+                    onClick: () => setShowFilters(true),
+                }]}
             >
                 {body}
             </PatternSection>
@@ -1280,8 +1343,7 @@ export const ResponsiveWidth = {
 
         setWidth(SECTION_DETAIL_FLOOR - 64);
         await waitFor(() => expect(side(), 'below 960 the side hides').toBeNull());
-        await expect(filters(), 'the Filter icon returns, named with its count').toHaveAccessibleName('Filters, 2 applied');
-        await expect(filters()).toHaveTextContent('2');
+        await expect(filters(), 'the Filter button returns, with its count').toHaveTextContent('2');
         await expect(canvas.getByRole('button', { name: 'Add students' }), 'the Primary keeps its label').toHaveTextContent('Add students');
 
         await userEvent.click(filters());
@@ -1292,7 +1354,7 @@ export const ResponsiveWidth = {
 
         setWidth(FRAME_LAYOUT.fullWidthBelow - 64);
         await waitFor(() => expect(canvas.getByRole('button', { name: 'Add students' }), 'below 768 the Primary keeps only its icon').not.toHaveTextContent('Add students'));
-        await expect(filters()).toHaveAccessibleName('Filters, 2 applied');
+        await expect(filters()).toHaveTextContent('2');
 
         setWidth(SECTION_DETAIL_FLOOR + 64);
         await waitFor(() => expect(side(), 'back to the side').not.toBeNull());
@@ -1302,39 +1364,11 @@ export const ResponsiveWidth = {
 
 /* ---- key states */
 
-/** Rows selected: the Dynamic table's head row becomes the bulk bar; no Cancel. */
-export const RowsSelected = {
-    name: 'Rows selected',
-    render: () => (
-        <PatternSection title="Students" description="Lincoln Middle · 24 students" tabs={<ViewBar views={['All students', 'Needs follow-up']} />}>
-            <StudentsTable
-                count={4}
-                isSelectable
-                defaultSelectedRowKeys={[STUDENTS[0][0], STUDENTS[2][0]]}
-                bulkActions={[{ label: 'Move to group' }, { label: 'Remove from group' }]}
-            />
-        </PatternSection>
-    ),
-    play: async ({ canvasElement }) => {
-        const canvas = within(canvasElement);
-        const head = within(canvasElement.querySelector('thead'));
-        await expect(head.getByText('2 selected'), 'the head row says how many').toBeInTheDocument();
-        await expect(head.getByRole('button', { name: 'Move to group' })).toBeInTheDocument();
-        await expect(head.getByRole('checkbox', { name: 'Select all rows' })).toBePartiallyChecked();
-        await expect(canvas.queryByRole('button', { name: /Cancel|Clear/ }), 'no Cancel: the checkboxes clear it').toBeNull();
-        await expect(canvas.getByRole('tab', { name: 'All students' }), 'the view bar stays put').toBeInTheDocument();
-        await userEvent.click(canvas.getByRole('checkbox', { name: 'Select all rows' }));
-        await userEvent.click(canvas.getByRole('checkbox', { name: 'Select all rows' }));
-        await waitFor(() => expect(head.queryByText(/selected/), 'clearing brings the column heads back').toBeNull());
-        await expect(head.getByRole('columnheader', { name: 'Name' })).toBeInTheDocument();
-    },
-};
-
 /** Empty, in a table: the empty state replaces the whole table, headers and footer too. */
 export const EmptyInTable = {
     name: 'Empty, in a table',
     render: () => (
-        <PatternSection title="Students" description="Lincoln Middle · 24 students" tabs={<ViewBar views={['All students', 'Needs follow-up']} />}>
+        <PatternSection title="Students" description="Lincoln Middle · 24 students" views={<ViewPills views={['All students', 'Needs follow-up']} />}>
             <EmptyState
                 spacing="compact"
                 icon="user-group"
@@ -1355,13 +1389,13 @@ export const EmptyInTable = {
 
 const ANATOMY_PARTS = [
     { selector: '[data-anatomy-root] > .plus-pattern-section-header .plus-pattern-section-title-row', label: 'Title row' },
-    { selector: '[data-anatomy-root] > .plus-pattern-section-header .plus-pattern-section-tabs', label: 'View bar' },
+    { selector: '[data-anatomy-root] > .plus-pattern-section-header .plus-section-rows', label: 'Header rows' },
     { selector: '[data-anatomy-root] .plus-pattern-section-list', label: 'Body' },
     { selector: '[data-anatomy-root] .plus-pattern-section-detail', label: 'Detail', side: 'end' },
     { selector: '[data-anatomy-root] > .plus-pattern-section-footer', label: 'Footer' },
 ];
 
-/** Every part once: a Section with a view bar, an inline detail and a footer. */
+/** Every part once: a Section with its header rows, an inline detail and a footer. */
 export const AnatomyQueue = {
     name: 'Anatomy',
     render: () => (
@@ -1370,7 +1404,7 @@ export const AnatomyQueue = {
                 data-anatomy-root
                 title="Reflections"
                 description="Week of Oct 20"
-                tabs={<ViewBar views={['All reflections', 'Needs follow-up']} primary={null} />}
+                views={<ViewPills views={['All reflections', 'Needs follow-up']} />}
                 detailTitle="Ava Thompson"
                 detailDescription="Grade 7"
                 detail={<p style={{ margin: 0, font: 'var(--body-default)' }}>The reflection names two goals for next week.</p>}

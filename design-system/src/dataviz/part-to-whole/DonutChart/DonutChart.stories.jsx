@@ -2,7 +2,7 @@ import React from 'react';
 import { expect, waitFor } from 'storybook/test';
 import { Heading } from '@/components';
 import { BRAND, CATEGORICAL, CHROME } from '@/dataviz/palette';
-import DonutChart from './DonutChart';
+import DonutChart, { DONUT_CENTER_TEXT_SIZES } from './DonutChart';
 
 export default {
     title: 'Data visualizations/Part-to-whole/Donut chart',
@@ -12,7 +12,7 @@ export default {
         size: { control: { type: 'number', min: 100, max: 500, step: 10 }, description: 'Diameter in pixels' },
         value: { control: 'text', description: 'Center value text' },
         label: { control: 'text', description: 'Center label below value' },
-        centerTextSize: { control: { type: 'select', options: ['lg', 'md', 'sm'] }, description: 'Metric scale step for the center figure' },
+        centerTextSize: { control: { type: 'select', options: DONUT_CENTER_TEXT_SIZES }, description: 'Metric scale type token for the center figure' },
         sort: { control: 'boolean', description: 'Sort categorical segments from most to least by default' },
         segments: { control: 'object', description: 'Array of { value, color, label }' },
     },
@@ -21,13 +21,13 @@ export default {
 const stackStyle = {
     display: 'flex',
     flexDirection: 'column',
-    gap: 'var(--section-stack-lg)',
+    gap: 'var(--stack-2xl)',
 };
 
 const sectionStyle = {
     display: 'flex',
     flexDirection: 'column',
-    gap: 'var(--section-stack-md)',
+    gap: 'var(--stack-xl)',
 };
 
 const captionStyle = {
@@ -47,7 +47,7 @@ const completionData = {
 const distributionData = {
     value: '100',
     label: 'Sessions by subject',
-    centerTextSize: 'md',
+    centerTextSize: 'metric-md',
     segments: [
         { value: 30, label: 'Reading' },
         { value: 20, label: 'Science' },
@@ -60,7 +60,7 @@ const smallData = {
     size: 150,
     value: '1/4',
     label: 'Step',
-    centerTextSize: 'sm',
+    centerTextSize: 'metric-sm',
     segments: [
         { value: 25, color: BRAND, label: 'Current' },
         { value: 75, color: CHROME.track, label: 'Remaining' },
@@ -114,7 +114,7 @@ export const Interactive = {
         size: 250,
         value: '100',
         label: 'Sessions',
-        centerTextSize: 'lg',
+        centerTextSize: 'metric-lg',
         sort: true,
         segments: [
             { value: 50, color: CATEGORICAL[0], label: 'Math' },

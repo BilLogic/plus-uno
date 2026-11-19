@@ -11,20 +11,9 @@
     --plus-option-row-indent-step: var(--option-row-indent-step);
     --plus-option-row-toggle-size: var(--icon-md);
 
-    display: flex;
-    align-items: center;
-    gap: var(--inline-md);
-    box-sizing: border-box;
-    width: 100%;
-    min-width: 0;
+    @include row-spacing.row;
     @include row-spacing.size('default');
-    padding-inline: var(--pad-x-md);
-    margin: 0;
-    border: none;
-    border-radius: var(--radius-control-md);
     background-color: transparent;
-    color: var(--ds-text);
-    font: var(--body-default);
     text-align: left;
     cursor: pointer;
     user-select: none;

@@ -3,7 +3,8 @@ import { expectOverlayExit, withReducedMotion, settleAnimations } from '@/storyb
 import React, { useRef, useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import { Modal, TextField } from '@/components';
+import { TextField } from '@/components';
+import { Modal } from '@/patterns';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import '../TagInput/TagInput.scss';
 import Listbox from './Listbox';
@@ -34,7 +35,7 @@ export default {
 };
 
 const SITES = ['Lincoln Middle', 'North High', 'Riverside Academy', 'Roosevelt K-8', 'South High', 'Jefferson Elementary', 'Washington Middle'];
-const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: '360px' };
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)', maxWidth: '360px' };
 
 /**
  * A field with its list: focus stays in the input, which points at the

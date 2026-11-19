@@ -78,21 +78,19 @@ export const Scale = {
 
 /* ----------------------------------------------------------- templates */
 
-/** Frame, Page, Section and Card, each rounded by its own token. */
+/** Frame, Page and Card, each rounded by its own token. */
 export const Templates = {
     render: () => <TemplateMap />,
     play: async ({ canvasElement }) => {
         const root = canvasElement.querySelector('[data-testid="radius-templates"]');
         await expectNoWords(root);
         await expect(root.querySelector('[data-legend="page"] [data-value]')).toHaveTextContent('0');
-        await expectLegendValue(root, 'section', '--section-radius', canvasElement);
         await expectLegendValue(root, 'card', '--card-radius', canvasElement);
-        await expectLegendValue(root, 'card-compact', '--card-radius-compact', canvasElement);
         // The drawing is at half scale: one unit is 2px.
         const section = root.querySelector('[data-part="section-box"]');
-        await expect(cornerOf(section)).toBeCloseTo(radiusOf(canvasElement, '--section-radius') / 2, 1);
-        const compact = root.querySelector('[data-part="card-compact"]');
-        await expect(cornerOf(compact)).toBeCloseTo(radiusOf(canvasElement, '--card-radius-compact'), 1);
+        await expect(cornerOf(section)).toBeCloseTo(radiusOf(canvasElement, '--card-radius') / 2, 1);
+        const nested = root.querySelector('[data-part="card-nested"]');
+        await expect(cornerOf(nested)).toBeCloseTo(radiusOf(canvasElement, '--card-radius'), 1);
     },
 };
 

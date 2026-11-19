@@ -1,0 +1,299 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as SuggestionStories from './Suggestion.stories.jsx';
+import { Suggestion, Tag } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
+
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "props": {
+    "type": {
+      "type": "enum",
+      "values": ["insert", "prompt"]
+    }
+  },
+  "sets": [
+    {
+      "id": "suggestion",
+      "name": "Suggestion",
+      "componentSetNodeId": "20094:1242",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20094-1242",
+      "source": "manual",
+      "status": "verified",
+      "isComponentSet": true,
+      "notes": "On the AI Label page (docs page: node 17885:57). Figma marks defaults in the value name (\"insert (default)\", \"rest (default)\"); code takes the bare value. The state axis (rest, hover, pressed, focus) is the browser's own :hover, :active and :focus-visible, never a prop; state=disabled is the native disabled button, from isDisabled or from a disabled field's or TagGroup's TagContext."
+    }
+  ]
+};
+
+<Meta of={SuggestionStories} />
+
+<Title />
+A button for accepting a proposed value or prompt, such as an AI-suggested focus area.
+
+<DocsTabs of={SuggestionStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=21749-1113"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/ai/Suggestion"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Appearance
+
+<ComponentExample of={SuggestionStories.Types} title="Insert and prompt" description={<><code>insert</code> adds a value to the field and leads with a plus; <code>prompt</code> sends or fills text and leads with a sparkle wand.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Layout
+
+<ComponentExample of={SuggestionStories.InATagRow} title="In a tag row" description="The same 20-tall box as Tag, with its words on the same baseline, after the tags already in the field." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Behavior
+
+<ComponentExample of={SuggestionStories.AcceptIntoTags} title="Accept into tags" description="Accepted, an insert suggestion becomes a Tag: the field adds the value and drops the suggestion." />
+
+<ComponentExample of={SuggestionStories.DisabledBesideTags} title="Disabled beside tags" description={<>It follows the field or <code>isDisabled</code>: the disabled ground, a dashed neutral edge and disabled words, and it cannot be focused or accepted.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## State
+
+<ComponentExample of={SuggestionStories.StateLayers} title="State layers" description="Rest is a dashed edge on a clear ground, hovered the discovery ground and pressed its hovered step." />
+
+<ComponentExample of={SuggestionStories.FocusRing} title="Focus ring" description="Keyboard focus is a 2px focus ring 2px outside the dashed edge." />
+
+<ComponentExample of={SuggestionStories.Rest} title="Rest" description="A dashed discovery edge on a clear ground." />
+
+<ComponentExample of={SuggestionStories.Hovered} title="Hovered" description="The discovery ground." />
+
+<ComponentExample of={SuggestionStories.Pressed} title="Pressed" description="The next discovery step." />
+
+<ComponentExample of={SuggestionStories.Focused} title="Focused" description="The 2px focus ring, 2px off the dashed edge." />
+
+<ComponentExample of={SuggestionStories.Disabled} title="Disabled" description="A native disabled button, never accepted." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Suggestion" />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={SuggestionStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong>inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use `Suggestion` when the system proposes a value and a person decides whether
+to take it: an AI-suggested focus area beside the ones already chosen, or a
+suggested question beside a chat box. Put it in the row where the accepted
+value will land, after the tags already there.
+
+### Type guidance
+
+<DocsTable>
+<thead>
+<tr><th>Type</th><th>When to use</th></tr>
+</thead>
+<tbody>
+<tr><td>Insert</td><td>The default. Adds a value to the field, in place; <code>onAccept</code> hands back the <code>value</code>. Leads with a plus. Example: "Fractions".</td></tr>
+<tr><td>Prompt</td><td>Sends or fills text, starting a conversation; <code>onAccept</code> hands back the <code>text</code>. Leads with a sparkle wand. Example: "Summarize".</td></tr>
+</tbody>
+</DocsTable>
+
+Use `Tag` for a value that is already in the field. Use `Button` for an action
+that is not a proposed value.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Glyph.** A plus for an <code>insert</code> suggestion, a sparkles wand for a <code>prompt</code>. It says which kind of proposal this is.
+2. **Label.** The proposed value or prompt, short.
+3. **Edge.** Dashed, in the discovery border: the system proposed it, the person has not accepted it.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>A dashed edge on a clear ground. The accessible name is "Add Fractions, suggested" or "Summarize, suggested".</td></tr>
+<tr><td>Hovered</td><td><code>--ds-background-discovery</code>.</td></tr>
+<tr><td>Pressed</td><td><code>--ds-background-discovery-hovered</code>.</td></tr>
+<tr><td>Focused</td><td>A 2px ring 2px off the dashed edge. The ground stays clear, so focus never reads as pressed.</td></tr>
+<tr><td>Disabled</td><td>Disabled ground and words, no focus, and <code>onAccept</code> never fires. A disabled field or tag group disables every suggestion in it.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Edge</td><td><code>--ds-border-discovery</code>, dashed, <code>--border-width-default</code> wide.</td></tr>
+<tr><td>Words and glyph</td><td><code>--ds-text-discovery</code> and <code>--ds-icon-discovery</code>.</td></tr>
+<tr><td>Hovered, pressed</td><td><code>--ds-background-discovery</code> and <code>--ds-background-discovery-hovered</code>.</td></tr>
+<tr><td>Focus ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code> wide and offset.</td></tr>
+<tr><td>Disabled</td><td><code>--ds-background-disabled</code>, <code>--ds-text-disabled</code>, <code>--ds-icon-disabled</code>.</td></tr>
+<tr><td>Box</td><td>The same height (<code>--label-height-md</code>, 20), padding (<code>--pad-x-xs</code>) and radius (<code>--radius-md</code>) as Tag, so it fits the row where the value will land.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Name the action.
+
+Name an insert suggestion for its value. Start a prompt label with a short verb
+and pass the full request as `text`.
+
+<DoDontPair
+    doExample={<Suggestion label="Shorten" onAccept={() => {}} />}
+    doCaption="A short verb."
+    dontExample={<Suggestion label="Please rewrite this paragraph to be shorter" onAccept={() => {}} />}
+    dontCaption="A sentence in the tag."
+/>
+
+### Pick insert or prompt by outcome.
+
+Insert changes the content in place; prompt starts a conversation.
+
+<DoDontPair
+    doExample={<Suggestion label="Summary" onAccept={() => {}} />}
+    doCaption="Insert for an in-place edit."
+    dontExample={<Suggestion type="prompt" label="Summary" onAccept={() => {}} />}
+    dontCaption="Prompt for an in-place edit."
+/>
+
+### Show an unavailable action as disabled.
+
+Keep unavailable suggestions visible and disabled. `isDisabled` disables one;
+a disabled field or `TagGroup` disables all through `TagContext`, shared with Tag.
+
+<DoDontPair
+    doExample={<Suggestion label="Shorten" isDisabled onAccept={() => {}} />}
+    doCaption="Disabled when unavailable."
+    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><Suggestion label="Shorten" onAccept={() => {}} /><span>Nothing to shorten</span></div>}
+    dontCaption="Active with nothing to do."
+/>
+
+### Let the field decide what happens next.
+
+`onAccept` returns the value (insert) or text (prompt). The field adds a Tag,
+sends a message or fills the text box, then removes the suggestion; the suggestion
+does not change itself.
+
+<DoDontPair
+    doExample={<Suggestion label="Relationships" value="focus-relationships" onAccept={() => {}} />}
+    doCaption="Insert hands back the value; the field turns it into a Tag."
+    dontExample={<Tag color="purple">Relationships</Tag>}
+    dontCaption="A Tag styled as a suggestion is not a button, so nobody can accept it with a keyboard."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Use the value itself: "Fractions".</td><td>Write an instruction: "Click to add Fractions".</td></tr>
+<tr><td>Keep a prompt to a few words that read as a request: "Summarize".</td><td>Send a whole paragraph as the label.</td></tr>
+<tr><td>Offer a few. Three to five fit a row.</td><td>Fill a row with suggestions until the real tags are lost.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **A real button.** It takes focus, and Enter or Space accepts it.
+- **Disabled is a disabled button.** It keeps its name, is announced as
+  disabled, is skipped by Tab, and never calls `onAccept`.
+- **Named for what pressing it does.** An insert suggestion is announced as
+  `Add {label}, suggested`, so a screen-reader user knows pressing it adds a
+  value. A prompt is not added to anything, so it is announced as
+  `{label}, suggested`.
+- **The glyph is decorative.** The plus and the sparkle wand are hidden from
+  assistive technology; the name already says what the suggestion does.
+- **Focus is a ring, not a fill**: a 2px Focus Ring 2px outside the edge, so
+  focus never reads as pressed.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a value already in the field, use `Tag`, inside a `TagGroup`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

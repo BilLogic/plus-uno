@@ -127,8 +127,8 @@ Same group: `Accordion` · `Carousel` · `Panel` · `ScrollBar`
 | Part | Token |
 | --- | --- |
 | Title | `Heading` at `lg` (24/28); see Best practices for heading level. |
-| Rows | `--space-100` between breadcrumbs, title row and bottom bar. |
-| Title row | `--space-150` between the title and its actions; `--space-075` between actions. |
+| Rows | `--page-header-stack` between breadcrumbs, title row and bottom bar. |
+| Title row | `--page-header-gap` between the title and its actions; `--inline-lg` between actions. |
 | Breadcrumbs | `--body-sm`. |
 
 ## Content guidelines
@@ -160,7 +160,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-sm` · `--space-075` · `--space-100` · `--space-150`
+`--body-sm` · `--inline-lg` · `--page-header-gap` · `--page-header-stack`
 
 From `design-system/src/components/layout-and-structure/PageHeader/PageHeader.scss`. Override these through the token layer, never with a literal.
 

@@ -81,8 +81,8 @@ const GROUND_TOKEN = {
     info: '--ds-background-information',
 };
 
-const sectionMessageCol = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' };
-const contentVariantCol = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' };
+const sectionMessageCol = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)' };
+const contentVariantCol = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)' };
 
 function SectionMessageContentDemos() {
     return (
@@ -203,7 +203,7 @@ Interactive.args = {
  * 16px icon whatever the text size beside it.
  */
 export const DismissPlacement = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--width-2500)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--width-2500)' }}>
         <SectionMessage appearance="primary" title="With a title" data-testid="placement-title">
             The × centers on the title line, not on the message.
         </SectionMessage>
@@ -251,7 +251,6 @@ DismissPlacement.play = async ({ canvasElement }) => {
     const body = canvas.getByTestId('placement-body');
     await userEvent.click(within(body).getByRole('button', { name: 'Dismiss message' }));
     await waitFor(() => expect(canvas.queryByTestId('placement-body')).toBeNull());
-    await settleAnimations(canvasElement);
 };
 
 
@@ -263,7 +262,7 @@ DismissPlacement.play = async ({ canvasElement }) => {
  * decorative: the message's role and its text already say what it is.
  */
 export const LeadingIcon = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--width-2500)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--width-2500)' }}>
         {SECTION_MESSAGE_APPEARANCES.map((appearance) => (
             <SectionMessage key={appearance} appearance={appearance} title="Session update" data-testid={`icon-${appearance}`}>
                 Thursday&apos;s math session starts at 4:00 PM ET.
@@ -362,7 +361,6 @@ LeadingIcon.play = async ({ canvasElement }) => {
     // The × is unchanged beside the icon: it still dismisses its message.
     await userEvent.click(within(none).getByRole('button', { name: 'Dismiss message' }));
     await waitFor(() => expect(canvas.queryByTestId('icon-none')).toBeNull());
-    await settleAnimations(canvasElement);
 };
 
 /**
@@ -377,8 +375,8 @@ export const GroundAndText = () => (
         style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 'var(--section-stack-lg)',
-            padding: 'var(--section-pad-y-default) var(--section-pad-x-default)',
+            gap: 'var(--stack-2xl)',
+            padding: 'var(--pad-x-lg)',
             background: 'var(--ds-surface-sunken)',
         }}
     >
@@ -405,9 +403,9 @@ GroundAndText.play = async ({ canvasElement }) => {
             await expect(px(s[`border${side}Width`]), `${id}: no ${side.toLowerCase()} border`).toBe(0);
         }
 
-        // --radius-md corners and the role's named background ground.
-        const radius = tokenLength(canvasElement, '--radius-xl');
-        await expect(radius, 'the radius token is 12px').toBe(12);
+        // --card-radius corners and the role's named background ground.
+        const radius = tokenLength(canvasElement, '--card-radius');
+        await expect(radius, 'the radius token is 16px').toBe(16);
         for (const corner of ['TopLeft', 'TopRight', 'BottomRight', 'BottomLeft']) {
             await expect(px(s[`border${corner}Radius`]), `${id}: ${corner} radius is the section message radius token`).toBe(radius);
         }
@@ -446,7 +444,6 @@ Actions.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const message = canvas.getByTestId('actions');
     await waitFor(() => expect(within(message).getByRole('button', { name: 'Reschedule' })).toBeVisible());
-    await settleAnimations(canvasElement);
     await expect(within(message).getByRole('link', { name: 'Learn more' })).toHaveAttribute('href', '#');
 };
 
@@ -502,7 +499,7 @@ export const Focused = {
 
 const radiusOf = (root, selector) => getComputedStyle(root.querySelector(selector)).borderTopLeftRadius;
 Overview.play = async ({ canvasElement }) => {
-    await expect(radiusOf(canvasElement, '.plus-section-message'), 'Section message radius is 12').toBe('12px');
+    await expect(radiusOf(canvasElement, '.plus-section-message'), 'Section message radius is 16').toBe('16px');
 };
 
 function SectionMessageMotionDemo() {
@@ -546,7 +543,6 @@ export const MotionEnterAndExit = {
         await expect(alert.isConnected, 'SectionMessage stays connected while exiting').toBe(true);
         await expect(slot).toHaveAttribute('data-presence-phase', 'exit-fade');
         await waitFor(() => expect(alert.isConnected).toBe(false));
-        await settleAnimations(canvasElement);
     },
 };
 
@@ -564,6 +560,5 @@ export const MotionReduced = {
 
         fireEvent.click(canvas.getByRole('button', { name: 'Dismiss message' }));
         await waitFor(() => expect(alert.isConnected).toBe(false));
-        await settleAnimations(canvasElement);
     },
 };

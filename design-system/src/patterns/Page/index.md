@@ -2,19 +2,19 @@
 
 # Page
 
-Bare tokenized content box: pick an elevation level, padding scale, radius scale and border — children fill the content slot. The level sets the fill and its shadow together: sunken (the frame's blanket), default (the page, edged by the surface border), raised (a card) and overlay (anything over the UI). A Page can carry its `title`: the page's one h1, at Heading/large 24, above the content. Sections inside it open at h2.
+The Page surface: paints `--ds-surface` edge to edge with `--page-pad` (24) on every side and no radius, border, or shadow; children fill the content slot. A Page can carry its `title`: the page's one h1, at Heading/large 24, above the content. Sections inside it open at h2.
 
 Also asked as: surface.
 
 **Import:** `import { Page } from '@/patterns';`
 
-**Used in:** Form (`ds guide form`); Frame (`ds guide frame`); Page (`ds guide page`); Panel (`ds guide panel`); Modal (`ds guide modal`); Section (`ds guide section`); Popup (`ds guide popup`)
+**Used in:** Form (`ds guide form`); Frame (`ds guide frame`); Modal (`ds guide modal`); Page (`ds guide page`); Panel (`ds guide panel`); Section (`ds guide section`); Popup (`ds guide popup`); Table (`ds guide table`)
 
 **Governed by:** Common actions (`ds guide common-actions`); Disabled (`ds guide disabled`); Empty (`ds guide empty`); Errors (`ds guide errors`); Forms (`ds guide forms`); Indicators (`ds guide indicators`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Overflow (`ds guide overflow`); +1 more
 
 **Source:** `design-system/src/patterns/Page/Page.jsx`
 
-**Stories:** `design-system/src/patterns/Page/Page.stories.jsx` — Overview, Sunken, DefaultLevel, Raised, Overlay, StepNone, StepSmall, StepMedium, StepLarge, Bordered, WithTitle, HeaderAndBanner, OptionalSlots, ColorModes, MediumPad, Interactive, TypeDefault, TypeFullWidth, AnatomyRecord, ScenarioArea, ScenarioSeveralSections, ScenarioRecordTabs, ScenarioTwoLevels, KeyBanner, ResponsiveWidth, MotionSwitchViews, MotionSwitchViewsReduced, MotionScrollToSpot, MotionScrollToSpotReduced
+**Stories:** `design-system/src/patterns/Page/Page.stories.jsx` — Overview, WithTitle, HeaderAndBanner, OptionalSlots, ColorModes, MediumPad, Interactive, TypeDefault, TypeFullWidth, AnatomyRecord, ScenarioArea, ScenarioSeveralSections, ScenarioRecordTabs, ScenarioTwoLevels, KeyBanner, ResponsiveWidth, MotionSwitchViews, MotionSwitchViewsReduced, MotionScrollToSpot, MotionScrollToSpotReduced
 
 **Storybook page:** `design-system/src/patterns/Page/Page.mdx`
 
@@ -66,8 +66,8 @@ Don't: A breadcrumb on a top-level area page, repeating the Sidebar's place.
 
 Page actions sit at the end of the title row and are about the page only. Where an add action goes: the Navigation pattern.
 
-Do: "Add" ends the collection's view bar; the header carries only page actions.
-Don't: The same Primary twice: in the page header and in the Section's view bar.
+Do: "Add" is the Section's one action, in its title row; the page header carries only page actions.
+Don't: The same Primary twice: in the page header and in the Section's title row.
 
 ### Keep the description to one line. {#keep-the-description-to-one-line}
 
@@ -84,14 +84,14 @@ Don't: A paragraph under the title pushes the first Section down.
 
 The rule and its reasons: the Navigation pattern. Page tabs name views of one subject; the Section's views become one labeled PopupSelect.
 
-Do: Under page tabs the Section's views are one labeled PopupSelect at the start of its bar.
+Do: Under page tabs the Section's views are one labeled PopupSelect in its views row.
 Don't: Pill views under page tabs: two tab systems on one page.
 
 ### Shrink the scrolled header to one sticky row. {#shrink-the-scrolled-header-to-one-sticky-row}
 
 **Checked:** Review
 
-The breadcrumb with the title at its end, then the page actions; page tabs stick under it. The Section view bar scrolls away. This state is planned.
+The breadcrumb with the title at its end, then the page actions; page tabs stick under it. The Section header rows scroll away. This state is planned.
 
 ### Show one banner at a time, scrolling with the content. {#show-one-banner-at-a-time-scrolling-with-the-content}
 
@@ -111,12 +111,12 @@ Which tier a message belongs to: the Notifications pattern.
 ## Related
 
 - Frame: use when deciding which type the page sits in.
-- Section: use when a region needs its own heading, view bar or detail.
+- Section: use when a region needs its own heading, views or detail.
 - Card: use when one object has a shape already agreed.
 - Elevation: use when picking which shadow goes with which level.
 - Patterns: use when deciding where a breadcrumb or a tab belongs (Navigation), or choosing the StatusTag beside the title (Indicators).
 
-Same group: `AiChat` · `Blanket` · `Frame` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternTable`
+Same group: `AiChat` · `Frame` · `Modal` · `PatternCard` · `PatternSection` · `Table`
 
 ## Types
 
@@ -146,7 +146,7 @@ A record page one level down shows every header slot, with markers in the gutter
 | `banner` | One page `Banner`, below the header. Page separates the slots and content with `--page-stack-md`. |
 | `width` | Planned. `default` or `full`; today the Frame's `width` sets `content` or `reading`. |
 | Scrolled header | Planned. The sticky one-row header. |
-| `level` · `padding` · `radius` · `border` · `as` | The container: its fill and shadow as a pair, its pad and corner, and its element. |
+| `as` | The container element. |
 
 ## Sizes
 
@@ -175,10 +175,6 @@ A record page one level down shows every header slot, with markers in the gutter
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `id` | string | — | — |
-| `level` | enum | `'default'` | Elevation level: its fill and its shadow, as a pair |
-| `padding` | enum | `'md'` | Padding scale (md is the frame's own pad) |
-| `radius` | enum | `'none'` | Radius scale |
-| `border` | bool | `false` | A bold border on/off |
 | `as` | elementType | — | Render element / component |
 | `title` | node | — | The page's title: its one h1, at Heading/large 24. Leave it unset on a Page that is not a whole page. |
 | `header` | node | — | One PageHeader with the page's h1, actions and tabs. Replaces title. |
@@ -187,19 +183,9 @@ A record page one level down shows every header slot, with markers in the gutter
 | `style` | object | — | — |
 | `children` | node | — | Content slot |
 
-## Variants
-
-**`level`** — `sunken` · `default` · `raised` · `overlay`
-
-**`padding`** — `none` · `sm` · `md` · `lg`
-
-**`radius`** — `none` · `sm` · `md` · `lg`
-
-The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
-
 ## Tokens touched
 
-`--ds-border-bold` · `--ds-shadow-overlay` · `--ds-shadow-raised` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-raised` · `--ds-surface-sunken` · `--ds-text` · `--heading-lg` · `--heading-lg-tracking` · `--page-border-width` · `--page-pad` · `--page-pad-x-compact` · `--page-pad-x-spacious` · `--page-pad-y-compact` · `--page-pad-y-spacious` · `--page-stack-md` · `--radius-lg` · `--radius-xl` · `--radius-xxl`
+`--ds-surface` · `--ds-text` · `--heading-lg` · `--heading-lg-tracking` · `--page-pad` · `--page-stack-md`
 
 From `design-system/src/patterns/Page/Page.scss`. Override these through the token layer, never with a literal.
 

@@ -69,9 +69,10 @@ test('real repo: a pattern answers with its kind and barrel', () => {
   assert.equal(card.kind, 'pattern');
   assert.equal(card.import, "import { PatternCard } from '@/patterns';");
   assert.equal(card.group, 'Card');
-  const padding = card.props.find((p) => p.name === 'padding');
-  assert.deepEqual(padding.values, ['sm', 'md', 'lg']);
-  assert.equal(loadFacts(REPO_ROOT).lookup('PatternCard.padding=xl').status, 'unknown');
+  const gap = card.props.find((p) => p.name === 'gap');
+  assert.deepEqual(gap.values, ['sm', 'md', 'lg']);
+  assert.equal(card.props.find((p) => p.name === 'padding'), undefined);
+  assert.equal(loadFacts(REPO_ROOT).lookup('PatternCard.gap=xl').status, 'unknown');
 });
 
 test('real repo: Frame and Sidebar answer with their props, from source', () => {
@@ -107,19 +108,20 @@ test('real repo: tokens by name, by role, and retired', () => {
   assert.equal(stack.tier, 'semantic');
   assert.match(stack.intent, /gap/);
   const role = facts.tokens('stack').map((t) => t.name);
-  assert.ok(role.includes('--stack-sm') && role.includes('--stack-lg'));
+  assert.ok(role.includes('--stack-sm') && role.includes('--stack-lg') && role.includes('--stack-xl'));
   assert.ok(role.every((name) => name.startsWith('--stack-')));
-  assert.deepEqual(facts.tokens('--card-pad-sm'), [
-    { name: '--card-pad-sm', status: 'retired', tier: null, group: null, value: null, intent: null, replacement: ['--card-pad-compact'], why: null },
+  assert.deepEqual(facts.tokens('--element-pad-default'), [
+    { name: '--element-pad-default', status: 'retired', tier: null, group: null, value: null, intent: null, replacement: ['--pad-x-md'], why: null },
   ]);
-  assert.equal(facts.tokens('--stack-xl')[0].status, 'not-here');
+  assert.equal(facts.tokens('--stack-xl')[0].status, 'exists');
+  assert.equal(facts.tokens('--ds-on-surface')[0].status, 'not-here');
   assert.deepEqual(facts.tokens('--nothing-like-this'), []);
 });
 
 test('real repo: not-here lists inventions and retired tokens, each with a replacement', () => {
   const rows = loadFacts(REPO_ROOT).notHere();
   assert.ok(rows.some((r) => r.not === 'Toast' && r.kind === 'component' && r.use.includes('Flag')));
-  assert.ok(rows.some((r) => r.not === '--card-pad-sm' && r.kind === 'token' && r.use[0] === '--card-pad-compact'));
+  assert.ok(rows.some((r) => r.not === '--element-pad-default' && r.kind === 'token' && r.use[0] === '--pad-x-md'));
   assert.ok(rows.every((r) => r.use.length > 0));
 });
 

@@ -88,7 +88,7 @@ Don't: No label, only a placeholder, which disappears as soon as someone types.
 - To display formatted content the user cannot edit, render the HTML yourself after sanitizing it.
 - `Comment`: use when displaying a formatted note in a discussion thread.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CheckboxGroup` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileItem` · `FileUpload` · `FilterButton` · `FilterMenu` · `FooterActions` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `Radio` · `RadioGroup` · `Range` · `Rating` · `SearchField` · `Select` · `SettingRow` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
 
 ## Parts
 
@@ -118,6 +118,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Toolbar | Subtle icon buttons; gap `--stack-md` between clusters, `--stack-sm` inside one; padding `--pad-x-xs`; keyline `--ds-border`. |
 | Writing area | Body default in `--ds-text`; padding `--pad-y-lg` and `--pad-x-md`; minimum height `--field-min-height-lg` (120). |
 | Placeholder | `--ds-text-subtlest`. |
+| Maximum width | `--rich-text-editor-max-width` unless `fullWidth` is set. |
 | Focus ring | `--ds-border-focused`, 2px. |
 
 ## Content guidelines
@@ -161,7 +162,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--border-width-default` · `--ds-background-input` · `--ds-background-neutral` · `--ds-border` · `--ds-border-input` · `--ds-opacity-disabled` · `--ds-text` · `--ds-text-subtle` · `--ds-text-subtlest` · `--field-min-height-lg` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-lg` · `--pad-y-md` · `--radius-control-lg` · `--rte-content-pad-x` · `--rte-content-pad-y` · `--stack-md` · `--stack-sm` · `--type-weight-regular`
+`--body-default` · `--border-width-default` · `--ds-background-input` · `--ds-background-neutral` · `--ds-border` · `--ds-border-input` · `--ds-opacity-disabled` · `--ds-text` · `--ds-text-subtle` · `--ds-text-subtlest` · `--field-min-height-lg` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-lg` · `--pad-y-md` · `--radius-control-lg` · `--rich-text-editor-max-width` · `--rte-content-pad-x` · `--rte-content-pad-y` · `--stack-md` · `--stack-sm` · `--type-weight-regular`
 
 From `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.scss`. Override these through the token layer, never with a literal.
 

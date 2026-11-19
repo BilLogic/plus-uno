@@ -24,7 +24,7 @@
     --carousel-slide-share: 0.74;
     --carousel-slide-share-md: 0.8;
     --carousel-slide-share-sm: 0.86;
-    --carousel-slide-max: 1000px;
+    --carousel-slide-max: var(--carousel-slide-max-width);
     --carousel-neighbor-scale: 0.65;
     --carousel-neighbor-dim: 0.45;
     --carousel-neighbor-gap: var(--section-stack-lg);

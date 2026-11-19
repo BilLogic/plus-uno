@@ -3,6 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { expectSectionHeader } from '@/storybook-docs/lib/section-header-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import { EMPTY, FILLED, FormInModal, FormInPage, PAGE_WIDTH } from '../../../patterns/Form/formDemo.jsx';
@@ -50,11 +51,10 @@ export const PlaceField = {
         await userEvent.type(field, 'ana@school.org');
         await expect(field).not.toHaveAttribute('aria-invalid', 'true');
         await waitFor(() => expect(canvas.queryByText('Enter a full email, like name@school.org')).toBeNull());
-        await settleAnimations(canvasElement);
     },
 };
 
-/** A view that could not load: the error in the empty-state slot, with Try again; the view bar stays. */
+/** A view that could not load: the error in the empty-state slot, with Try again; the header rows stay. */
 export const PlaceLoadFailure = {
     name: 'Place: A view that could not load',
     render: () => staged(<LoadFailure />, PLACE_STAGE),
@@ -65,7 +65,8 @@ export const PlaceLoadFailure = {
         await expect(canvas.getByRole('heading', { name: "Couldn't load this week's sessions" }), 'the heading says what failed').toBeInTheDocument();
         await expect(canvas.getByRole('button', { name: 'Try again' }), 'the way forward').toBeInTheDocument();
         await expect(canvas.queryByRole('table'), 'the table is replaced whole').toBeNull();
-        await expect(canvas.getByRole('tab', { name: 'This week' }), 'the view bar stays').toBeInTheDocument();
+        await expect(canvas.getByRole('tab', { name: 'This week' }), 'the header rows stay').toBeInTheDocument();
+        await expectSectionHeader(canvasElement, 2);
         await fitsCanvas(canvasElement);
     },
 };
@@ -96,7 +97,6 @@ export const PlaceBackgroundJob = {
         await expect(canvas.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
         await expect(canvas.getByRole('alert'), 'a danger Flag is an alert').toBeInTheDocument();
         await fitsCanvas(canvasElement);
-        await settleAnimations(canvasElement);
     },
 };
 
@@ -127,7 +127,6 @@ export const PlaceMenu = {
         await fitsCanvas(canvasElement);
         await userEvent.click(retry);
         await expect(await canvas.findByRole('menuitem', { name: 'Edit' })).toBeInTheDocument();
-        await settleAnimations(canvasElement);
     },
 };
 
@@ -148,7 +147,6 @@ export const KeyBlockedSubmit = {
         await userEvent.type(student, 'Ana Ruiz');
         await expect(student).not.toHaveAttribute('aria-invalid', 'true');
         await waitFor(() => expect(canvas.queryByText('Enter the student’s name.')).toBeNull());
-        await settleAnimations(canvasElement);
     },
 };
 
@@ -165,7 +163,6 @@ export const KeyRejectedSubmit = {
         await expect(within(message).getByRole('alert'), 'announced when it appears').toBeInTheDocument();
         await expect(message.getBoundingClientRect().top, 'at the top of the form').toBeLessThanOrEqual(canvas.getByLabelText(/Student/).getBoundingClientRect().top);
         await fitsCanvas(canvasElement);
-        await settleAnimations(canvasElement);
     },
 };
 
@@ -184,7 +181,6 @@ export const KeySectionFailed = {
         await expect(canvas.getByRole('table')).toBeVisible();
         await userEvent.click(canvas.getByRole('tab', { name: 'Next week' }));
         await expect(canvas.getByRole('tab', { name: 'Next week' })).toHaveAttribute('aria-selected', 'true');
-        await settleAnimations(canvasElement);
     },
 };
 
@@ -199,7 +195,6 @@ export const KeyFlagOnPage = {
         await fitsCanvas(canvasElement);
         await userEvent.click(canvas.getByRole('button', { name: 'Try again' }));
         await expect(canvas.getByText('Session note saved')).toBeInTheDocument();
-        await settleAnimations(canvasElement);
     },
 };
 

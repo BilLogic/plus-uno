@@ -65,15 +65,15 @@ Two kinds of text node carry no text style, and each binds its type variables di
 
 | Figma Spacing Context | PLUS CSS Token Pattern |
 |----------------------|----------------------|
-| Card padding | `var(--card-pad-{compact\|default\|spacious})` |
+| Card padding | `var(--card-pad)` |
 | Card gap | `var(--card-stack-{sm\|md\|lg})`, `var(--card-inline-{sm\|md\|lg})` |
-| Card radius | `var(--card-radius)`, `var(--card-radius-compact)` |
+| Card radius | `var(--card-radius)` |
 | Element padding | `var(--pad-x-{xs\|sm\|md\|lg})`, `var(--pad-y-{sm\|md\|lg})` (ADR-038) |
-| Element gap | `var(--stack-{sm\|md\|lg})`, `var(--inline-{sm\|md\|lg})`; the 10px step reads `var(--space-0625)` |
+| Element gap | `var(--stack-{sm\|md\|lg\|xl\|2xl\|3xl})`, `var(--inline-{sm\|md\|lg\|xl\|2xl\|3xl})`; the 10px step reads `var(--space-0625)` |
 | Element radius | `var(--radius-{sm\|md\|lg\|full})` |
 | Modal padding | `var(--modal-pad-x-{default\|spacious})` |
-| Section padding | `var(--section-pad-{x\|y}-{compact\|default\|spacious})` |
-| Page padding | `var(--page-pad-{x\|y}-{compact\|default\|spacious})` |
+| Section gap | `var(--section-stack-{sm\|md\|lg})` |
+| Page padding | `var(--page-pad)` |
 | Table cell | `var(--table-pad-x-cell)` 8 · `var(--table-pad-y-cell)` 4 |
 | Size roles | `var(--icon-md)`, `var(--control-md)`, `var(--row-height-md)`, `var(--image-sm)`: Icon sm · md · lg 12 · 16 · 24, Control sm · md · lg 24 · 32 · 40, Row sm · md · lg 32 · 40 · 48, Image xxs … xl 16 · 20 · 24 · 32 · 40 · 48 |
 
@@ -85,7 +85,7 @@ The spacing / primitives and spacing / foundations collections (Foundations hold
 |----------------|----------------|-------|
 | spacing / primitives `Space/space-*`, `Radius/radius-*`, `Stroke/stroke-*`, `Size/size-*` | `var(--space-025)`, `var(--space-050)`, `var(--stroke-1)`, `var(--size-200)` | Named by rem × 100 (`space-025` is 4). Hidden in Figma; semantic tokens point at them |
 | Foundations `Element/pad-x-{xs\|sm\|md}`, `pad-y-{sm\|md}` | `var(--pad-x-sm)` | 4 · 8 · 12 · 16 and 2 · 6 · 8 |
-| Foundations `Element/stack-*`, `inline-*` | `var(--stack-md)`, `var(--inline-sm)` | 4 · 8 · 12 |
+| Foundations `Element/stack-*`, `inline-*` | `var(--stack-md)`, `var(--inline-sm)` | 4 · 8 · 12 · 16 · 24 · 32 |
 | Semantics `Radius/{sm\|md\|lg\|xl\|xxl\|full}`, `Radius/Control/{sm\|md\|lg}` | `var(--radius-control-md)` | 2 · 4 · 8 · 12 · 16, controls 6 · 8 · 10 |
 | Foundations `Size/Height/*`, `Width/*` | `var(--height-200)`, `var(--width-1400)` | Common scales, named by rem × 100 |
 | Foundations `Size/Item/height-{sm\|md}` | `var(--control-md)` | 24 · 32; there is no 40 Item |
@@ -113,7 +113,7 @@ The spacing / primitives and spacing / foundations collections (Foundations hold
 | — (code only) | `var(--layer-card)` … `var(--layer-tooltip)` | PLUS layers: card 100, navigation 200, dialog 300, popup 400, scrim 500, modal 510, flag 600, spotlight 700, tooltip 800. A popup opened from a field inside a modal mounts in the modal's overlay and takes its layer. Figma has no z-index |
 | — (code only) | `var(--listbox-max-width)` | 320, the widest a popup from a field or button grows. A popup with columns (Cascader, the calendar) is exempt |
 | — (code only) | `var(--checkbox-control-size)` · `var(--radio-control-size)` | 18 and 12, the checkbox box and radio dot; a description or reveal under the label indents by one plus the label gap |
-| — (code only) | `var(--calendar-day-sm)` · `var(--calendar-day-md)` · `var(--calendar-day-lg)` · `var(--calendar-nav-size)` | 28 / 36 / 44 calendar days by picker size, and the 32 month buttons |
+| — (code only) | `var(--calendar-day-sm)` · `var(--calendar-day-md)` · `var(--calendar-day-lg)` | 24 / 32 / 40 calendar days by size |
 | — (code only) | `var(--join-row-width)` | 520, the Home Join button with the session Select beside it |
 
 ## Rules for create_design_system_rules

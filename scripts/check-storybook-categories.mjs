@@ -44,8 +44,8 @@
  *      Foundations › Expression › Sound follows the same rule, with no required Library page.
  *
  * An AI component (Icon, Prompt input) is listed in the taxonomy's
- * `aiComponents` and titled `AI UI/Components/<name>`, while its folder stays
- * under its category.
+ * `aiComponents`, titled `AI UI/Components/<name>`, and lives under
+ * `design-system/src/components/ai/`.
  *
  * The categories are Atlassian's, read live from atlassian.design/components on
  * 2026-10-24. Only the ones with members are used; adding a member to another
@@ -200,7 +200,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   // (2) Folders.
   const byFolder = new Map(groups.map((g) => [folderOf(g), g]));
   for (const folder of folders) {
-    if (folder !== '_internal' && !byFolder.has(folder)) {
+    if (folder !== '_internal' && folder !== 'ai' && !byFolder.has(folder)) {
       found.push(
         `design-system/src/components/${folder}/  is not a category folder.\n` +
           `      -> Folders are the taxonomy's component groups in kebab case: ${[...byFolder.keys()].join(', ')}.`,
@@ -217,7 +217,12 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
     const [root, category, ...rest] = title.split('/');
     const parts = rel.split('/');
     const folder = parts.length > 4 ? parts[3] : '_internal';
-    if (root === AI_ROOT && category === AI_COMPONENTS && (taxonomy.aiComponents ?? []).includes(rest[0])) continue;
+    if (root === AI_ROOT && category === AI_COMPONENTS && (taxonomy.aiComponents ?? []).includes(rest[0])) {
+      if (folder !== 'ai' && folder !== '_internal') {
+        found.push(`${rel}  is titled "${title}", so its folder belongs under components/ai/.`);
+      }
+      continue;
+    }
     if (root !== 'Components' || !groups.includes(category)) {
       found.push(
         `${rel}  is titled "${title}", outside every component category.\n` +

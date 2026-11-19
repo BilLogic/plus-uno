@@ -186,13 +186,15 @@ test('a component story under Patterns goes red: components are titled under the
   assert.ok(messages(root).some((m) => m.includes('Panel.stories.jsx')));
 });
 
-test('an AI component may sit under AI UI, and only one the taxonomy names', () => {
+test('an AI component sits in components/ai/ under AI UI, and only one the taxonomy names', () => {
   const root = fixture({
-    'design-system/src/components/labels/AiMessage.stories.jsx': story('AI UI/Components/AI message'),
-    'design-system/src/components/labels/Tag.stories.jsx': story('AI UI/Components/Tag'),
+    'design-system/src/components/ai/AiMessage.stories.jsx': story('AI UI/Components/AI message'),
+    'design-system/src/components/labels/AiMessageCopy.stories.jsx': story('AI UI/Components/AI message'),
+    'design-system/src/components/ai/Tag.stories.jsx': story('AI UI/Components/Tag'),
   });
   const found = messages(root);
   assert.ok(!found.some((m) => m.includes('AiMessage.stories.jsx')));
+  assert.ok(found.some((m) => m.includes('AiMessageCopy.stories.jsx') && m.includes('components/ai/')));
   assert.ok(found.some((m) => m.includes('Tag.stories.jsx')));
 });
 

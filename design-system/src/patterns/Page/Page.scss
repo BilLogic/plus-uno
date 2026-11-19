@@ -1,15 +1,19 @@
 /**
  * Page pattern (Patterns/Page)
- * Bare tokenized content box — elevation level, padding, radius, border.
- * Each level is a fill and its shadow, as a pair; every value is a token.
+ * One Page surface: `--ds-surface` edge to edge, `--page-pad` on every side,
+ * no radius, border or shadow; stack stays `--page-stack-sm · md · lg`.
  */
 
-@use '../../styles/surface-edge' as *;
 @use '../../styles/navigation-motion';
 
 .plus-pattern-page {
     display: block;
+    padding: var(--page-pad);
+    background-color: var(--ds-surface);
     color: var(--ds-text);
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
 }
 
 // Slots own the gap; legacy children keep their existing layout.
@@ -30,73 +34,6 @@
 // The title's optical negative margin must not reduce the new banner gap.
 .plus-pattern-page > .plus-pattern-page-title:has(+ .plus-pattern-page-banner) {
     margin-block: 0;
-}
-
-/* Levels: a fill and its shadow, always together */
-.plus-pattern-page-level-sunken {
-    background-color: var(--ds-surface-sunken);
-}
-
-// The page: no shadow, only the surface edge.
-.plus-pattern-page-level-default {
-    background-color: var(--ds-surface);
-    @include surface-edge;
-}
-
-.plus-pattern-page-level-raised {
-    background-color: var(--ds-surface-raised);
-    box-shadow: var(--ds-shadow-raised);
-}
-
-.plus-pattern-page-level-overlay {
-    background-color: var(--ds-surface-overlay);
-    box-shadow: var(--ds-shadow-overlay);
-}
-
-/* Padding scale — md is the frame's own pad, so a Page used alone pads
-   as the one inside the frame does; sm and lg are the Page pattern's
-   compact and spacious pads. */
-.plus-pattern-page-pad-none {
-    padding: 0;
-}
-
-.plus-pattern-page-pad-sm {
-    padding: var(--page-pad-y-compact) var(--page-pad-x-compact);
-}
-
-.plus-pattern-page-pad-md {
-    padding: var(--page-pad);
-}
-
-.plus-pattern-page-pad-lg {
-    padding: var(--page-pad-y-spacious) var(--page-pad-x-spacious);
-}
-
-/* Radius scale: 8, 12 and 16. */
-.plus-pattern-page-radius-none {
-    border-radius: 0;
-}
-
-.plus-pattern-page-radius-sm {
-    border-radius: var(--radius-lg);
-}
-
-.plus-pattern-page-radius-md {
-    border-radius: var(--radius-xl);
-}
-
-.plus-pattern-page-radius-lg {
-    border-radius: var(--radius-xxl);
-}
-
-/* Border */
-.plus-pattern-page-bordered {
-    border: var(--page-border-width) solid var(--ds-border-bold);
-}
-
-// A bordered default page draws its border instead of the edge ring, never both.
-.plus-pattern-page-level-default.plus-pattern-page-bordered {
-    box-shadow: none;
 }
 
 /* The page's h1: Heading/large 24/28, the top of the page outline. */

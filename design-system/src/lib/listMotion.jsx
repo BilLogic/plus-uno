@@ -356,14 +356,14 @@ const wrapRowCellsForSeam = (rowElement, extraProps) => {
         return cloneElement(
             cell,
             {},
-            <div className="plus-pattern-table-seam" data-table-seam="">{cell.props.children}</div>,
+            <div className="plus-table-shell-seam" data-table-seam="">{cell.props.children}</div>,
         );
     });
     return cloneElement(rowElement, extraProps, cells);
 };
 
 /**
- * TableBodyMotion: coordinates keyed `<tbody>` rows for `PatternTable`:
+ * TableBodyMotion: coordinates keyed `<tbody>` rows for the table shell:
  * - Add a row: opens cell seams on `spatial.fast` while content fades in on `appearance.fast` once room exists.
  * - Remove a row (exit before reflow): holds the leaving row at its index while fading out on `appearance.fast`,
  *   then collapses its seam height, padding and rule to 0 on `spatial.fast` so rows below close up cleanly.

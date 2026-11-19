@@ -4,7 +4,7 @@ import './ProgressIndicator.scss';
 
 export const PROGRESS_INDICATOR_APPEARANCES = ['default', 'primary', 'help', 'inverted'];
 export const PROGRESS_INDICATOR_SIZES = [8, 12];
-export const PROGRESS_INDICATOR_SPACINGS = ['comfortable', 'cozy', 'compact'];
+export const PROGRESS_INDICATOR_SPACINGS = ['default', 'compact', 'spacious'];
 
 /**
  * A row of dots showing where you are along the steps of a journey. Unlike
@@ -25,7 +25,7 @@ export const PROGRESS_INDICATOR_SPACINGS = ['comfortable', 'cozy', 'compact'];
  * @param {number} props.selectedIndex - The current step, zero-based.
  * @param {'default'|'primary'|'help'|'inverted'} [props.appearance='default']
  * @param {8|12} [props.size=8] - The dot diameter, in pixels.
- * @param {'comfortable'|'cozy'|'compact'} [props.spacing='comfortable']
+ * @param {'default'|'compact'|'spacious'} [props.spacing='spacious']
  * @param {(selection: { index: number }) => void} [props.onSelect] - Present → dots become buttons.
  * @param {string} [props.ariaControls] - Id of the panel the dots control.
  * @param {string} [props.label='Progress'] - Accessible name for the dot group.
@@ -36,7 +36,7 @@ const ProgressIndicator = ({
     selectedIndex,
     appearance = 'default',
     size = 8,
-    spacing = 'comfortable',
+    spacing = 'spacious',
     onSelect,
     ariaControls,
     label = 'Progress',

@@ -57,7 +57,7 @@ Below `LOCKUP_MIN_SIZE` (`24`), `Logo` renders the mark alone even when `wordmar
 
 ### Tokens
 
-The logomark's glows and fills use fixed brand palette colors (`Logo.scss`); in the colored appearance the wordmark follows `--ds-text`, so it tracks the color mode.
+The logomark's glows and fills use fixed `--ds-logo-*` brand tokens (`Logo.scss`); in the colored appearance the wordmark follows `--ds-text`, so it tracks the color mode.
 
 ## Props
 
@@ -78,7 +78,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-text` · `--palette-dark-neutral-0` · `--palette-dark-neutral-1000` · `--palette-lagoon-400` · `--palette-lagoon-500` · `--palette-lagoon-700` · `--palette-lagoon-900` · `--palette-neutral-0` · `--palette-neutral-1000` · `--palette-red-200` · `--palette-red-300` · `--palette-teal-200` · `--palette-teal-300` · `--palette-yellow-250` · `--palette-yellow-300` · `--palette-yellow-400`
+`--ds-logo-glow-dark-0` · `--ds-logo-glow-dark-1` · `--ds-logo-glow-dark-2` · `--ds-logo-glow-dark-3` · `--ds-logo-glow-dark-4` · `--ds-logo-glow-light-0` · `--ds-logo-glow-light-1` · `--ds-logo-glow-light-2` · `--ds-logo-glow-light-3` · `--ds-logo-glow-light-4` · `--ds-logo-ground` · `--ds-logo-mark` · `--ds-logo-mark-reversed` · `--ds-logo-plus` · `--ds-logo-tile` · `--ds-logo-tile-dark` · `--ds-logo-wordmark` · `--ds-logo-wordmark-reversed` · `--ds-logo-wordmark-stroke` · `--ds-text`
 
 From `design-system/src/assets/Logo/Logo.scss`. Override these through the token layer, never with a literal.
 

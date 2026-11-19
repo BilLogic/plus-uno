@@ -10,17 +10,17 @@
 @use '../_internal/choice-tile';
 
 .plus-form-checkbox-wrapper {
-    --plus-choice-indent: calc(var(--checkbox-control-size) + var(--space-050));
+    --plus-choice-indent: calc(var(--checkbox-control-size) + var(--inline-md));
     display: flex;
     flex-direction: column;
-    gap: var(--space-025);
+    gap: var(--stack-sm);
     width: 100%;
 }
 
 .plus-form-checkbox-row {
     display: flex;
     align-items: center;
-    gap: var(--space-050);
+    gap: var(--inline-md);
     // A choice row is 24 at every size (`--control-sm`), its label 14/20.
     min-height: var(--control-sm);
 }
@@ -36,7 +36,7 @@
     min-height: var(--checkbox-control-size);
     padding: 0;
     margin: 0;
-    border: var(--stroke-2) solid var(--ds-border-input);
+    border: var(--border-width-selected) solid var(--ds-border-input);
     border-radius: var(--radius-md);
     background-color: var(--ds-background-input);
     cursor: pointer;
@@ -106,7 +106,7 @@
     }
 
     .plus-form-checkbox[data-indeterminate] & {
-        clip-path: inset(calc(50% - 1px) 20% calc(50% - 1px) 20%);
+        clip-path: inset(calc(50% - var(--border-width-default)) 20% calc(50% - var(--border-width-default)) 20%);
         transform: scale(1);
     }
 }
@@ -154,8 +154,8 @@
 }
 
 .plus-choice-card {
-    padding: var(--space-0375) var(--pad-x-md);
-    border: var(--stroke-1) solid var(--ds-border);
+    padding: var(--pad-y-md) var(--pad-x-md);
+    border: var(--border-width-default) solid var(--ds-border);
     border-radius: var(--radius-control-md);
     background-color: var(--ds-surface);
 
@@ -187,7 +187,7 @@
 .plus-form-checkbox-wrapper.plus-choice-tile {
     width: var(--choice-tile-width);
     max-width: 100%;
-    padding: var(--card-pad-default) var(--pad-x-lg);
+    padding: var(--card-pad) var(--pad-x-lg);
     border: var(--border-width-default) solid var(--ds-border);
     border-radius: var(--radius-control-md);
     background-color: var(--ds-surface);
@@ -246,7 +246,7 @@
         background-color: var(--ds-background-selected);
         border-width: var(--border-width-selected);
         border-color: var(--ds-border-selected);
-        padding: calc(var(--card-pad-default) - var(--border-width-selected) + var(--border-width-default)) calc(var(--pad-x-lg) - var(--border-width-selected) + var(--border-width-default));
+        padding: calc(var(--card-pad) - var(--border-width-selected) + var(--border-width-default)) calc(var(--pad-x-lg) - var(--border-width-selected) + var(--border-width-default));
 
         .plus-form-checkbox {
             inset-block-start: calc(var(--stack-lg) - var(--border-width-selected) + var(--border-width-default));

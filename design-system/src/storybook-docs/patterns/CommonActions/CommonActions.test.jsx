@@ -68,10 +68,10 @@ describe('CommonActions live cases and links', () => {
         expect(saveRight).toHaveFocus();
     });
 
-    it('ModalFooterFullBleedCase and ModalFooterInsetCase render live interactive PatternModal footers', async () => {
+    it('ModalFooterFullBleedCase and ModalFooterInsetCase render live interactive Dialog footers', async () => {
         const user = userEvent.setup();
         const { unmount } = render(<ModalFooterFullBleedCase />);
-        expect(screen.getByRole('dialog')).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Log a session' })).toBeInTheDocument();
         const fullBleedStudent = screen.getByRole('textbox', { name: 'Student' });
         await user.clear(fullBleedStudent);
         await user.type(fullBleedStudent, 'Ava Thompson');
@@ -82,7 +82,7 @@ describe('CommonActions live cases and links', () => {
         unmount();
 
         render(<ModalFooterInsetCase />);
-        expect(screen.getByRole('dialog')).toBeInTheDocument();
+        expect(screen.getByRole('heading', { name: 'Log a session' })).toBeInTheDocument();
         const insetStudent = screen.getByRole('textbox', { name: 'Student' });
         await user.clear(insetStudent);
         await user.type(insetStudent, 'Noah Patel');

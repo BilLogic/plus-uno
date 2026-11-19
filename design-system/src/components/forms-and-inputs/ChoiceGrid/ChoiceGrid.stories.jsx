@@ -108,7 +108,7 @@ export const Variants = () => {
     });
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--size-5400)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--size-5400)' }}>
             <div>
                 <span style={{ display: 'block', marginBottom: 'var(--space-050)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Radio (one per row)</span>
                 <ChoiceGrid
@@ -143,7 +143,7 @@ export const Variants = () => {
 
 export const Layout = () => (
     <div style={{ maxWidth: 'var(--size-5400)' }}>
-        <p className="body-default" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--section-stack-md)' }}>
+        <p className="body-default" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--stack-xl)' }}>
             Multiple rows share the same columns; each row tracks its own selection.
         </p>
         <ChoiceGrid
@@ -168,7 +168,7 @@ export const Layout = () => (
 
 /** `size` sets the option-label font and the control width that goes with it. */
 export const Size = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--size-5400)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--size-5400)' }}>
         {[12, 14, 16].map((size) => (
             <div key={size}>
                 <span style={{ display: 'block', marginBottom: 'var(--space-050)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{size}</span>
@@ -215,7 +215,7 @@ export const TwoGridsWithoutIds = () => {
     const [first, setFirst] = useState({});
     const [second, setSecond] = useState({});
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)', maxWidth: 'var(--size-5400)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)', maxWidth: 'var(--size-5400)' }}>
             <ChoiceGrid
                 type="radio"
                 rows={singleRow}
@@ -427,10 +427,17 @@ export const Disabled = {
 const radiusOf = (root, selector) => getComputedStyle(root.querySelector(selector)).borderTopLeftRadius;
 Overview.play = async ({ canvasElement }) => {
     await expect(radiusOf(canvasElement, '.plus-choice-grid-table'), 'Choice grid radius is 12').toBe('12px');
+    const table = canvasElement.querySelector('.plus-choice-grid-table');
     const corner = canvasElement.querySelector('.plus-choice-grid-row-header');
     const column = canvasElement.querySelector('.plus-choice-grid-column-header');
+    const rowLabel = canvasElement.querySelector('.plus-choice-grid-row-label');
+    const bodyCell = canvasElement.querySelector('.plus-choice-grid-cell');
     await inEveryColorModeOf(canvasElement, async (mode, token) => {
+        const sunken = token('--ds-surface-sunken');
+        await expect(getComputedStyle(column).backgroundColor, `${mode}: column header takes the sunken fill`).toBe(sunken);
         await expect(getComputedStyle(corner).backgroundColor, `${mode}: corner cell matches a column header`).toBe(getComputedStyle(column).backgroundColor);
-        await expect(getComputedStyle(corner).backgroundColor, `${mode}: corner cell takes the container fill`).toBe(token('--ds-surface-container'));
+        await expect(getComputedStyle(table).backgroundColor, `${mode}: table takes the sunken fill`).toBe(sunken);
+        await expect(getComputedStyle(rowLabel).backgroundColor, `${mode}: row label takes the sunken fill`).toBe(sunken);
+        await expect(getComputedStyle(bodyCell).backgroundColor, `${mode}: body cell takes the sunken fill`).toBe(sunken);
     });
 };

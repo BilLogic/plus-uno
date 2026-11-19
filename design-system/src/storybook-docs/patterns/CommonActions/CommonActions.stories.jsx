@@ -4,11 +4,12 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
 import { BAR_TOKEN } from '@/storybook-docs/lib/focused-task.jsx';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
+import { expectSectionHeader } from '@/storybook-docs/lib/section-header-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
-import { TierActive, TierDanger, TierTypeName } from '../../../patterns/PatternModal/modalDemo.jsx';
+import { TierActive, TierDanger, TierTypeName } from '../../../patterns/Modal/modalDemo.jsx';
 import {
     APPEARANCES,
     Appearances,
@@ -297,6 +298,7 @@ export const BulkBar = {
         await expectFullScale(canvasElement);
         const head = within(canvasElement.querySelector('thead'));
         await expect(head.getByText('2 selected')).toBeInTheDocument();
+        await expectSectionHeader(canvasElement, 2);
         await expect(head.getByRole('checkbox', { name: 'Select all rows' }), 'the select-all reports its mixed state').toBePartiallyChecked();
         await expect(head.getByRole('button', { name: 'Remove from group' })).toBeInTheDocument();
         await expect(canvas.queryByRole('button', { name: /Cancel|Clear/ }), 'no Cancel: the checkboxes clear it').toBeNull();

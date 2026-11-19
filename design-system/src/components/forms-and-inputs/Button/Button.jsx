@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
-import AiIcon from '../../images-and-icons/AiIcon';
+import AiIcon from '../../ai/AiIcon';
 import Icon from '../../images-and-icons/Icon';
 import Spinner from '../../loading/Spinner/Spinner';
 import './Button.scss';

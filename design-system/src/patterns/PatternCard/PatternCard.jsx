@@ -4,8 +4,13 @@ import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
 import './PatternCard.scss';
 
 /**
- * PLUS card: an optional image, content and footer on the raised surface and shadow.
+ * PLUS card: an optional image, content and footer on a `sunken`, `default`, or
+ * `raised` surface.
  *
+ * - **Surface**: `sunken` (default, flat), `default` (page surface with a 1px
+ *   border, flat), or `raised` (raised surface and shadow). Every card carries
+ *   a 1px border (transparent on sunken and raised) so forced colors draw its
+ *   edge.
  * - **Image placement**: `top` (default), `start` or `end`. Side images apply
  *   at the large card minimum width and fill the height. `imageSplit` chooses
  *   one third (default) or one half; half uses Heading md on a side card.
@@ -15,12 +20,13 @@ import './PatternCard.scss';
  *   optional `description` (Body/default 14), with
  *   `actions` at the end of the row. `header` replaces that block with custom
  *   content, like the header's `custom` type, for tabs or a toolbar.
- * - **Spacing** comes from the Card tokens: `padding` sets Card/pad-compact · default · spacious
- *   (via prop values `'sm'`, `'md'`, `'lg'`), the header sits Card/stack-md above the body (`gap` picks the stack step),
+ * - **Spacing** comes from the Card tokens: padding uses `--card-pad` and radius
+ *   uses `--card-radius` at every size, the header sits Card/stack-md above the body (`gap` picks the stack step),
  *   and the footer sits Card/stack-lg below. The footer is left-aligned.
  * - The card hugs its content; in a row it stretches to the tallest card.
- * - **Elevation**: the raised pair at rest. A card with an `onClick` lifts on
- *   hover to the raised surface's hovered step under the overlay shadow, and
+ * - **Elevation**: a clickable `sunken` or `default` card lifts to Raised on
+ *   hover in place and settles to the raised shadow while pressed; a clickable
+ *   `raised` card lifts to the raised hovered step under the overlay shadow and
  *   settles back onto the raised shadow while pressed; `dragging` puts any card
  *   on the overlay pair while it moves. The card also sets the current surface,
  *   so a sticky table cell inside it matches the card.
@@ -33,9 +39,9 @@ const PatternCard = ({
     header,
     image,
     footer,
+    surface = 'sunken',
     imagePlacement = 'top',
     imageSplit = '1/3',
-    padding = 'md',
     gap = 'md',
     minWidth,
     dragging = false,
@@ -46,9 +52,9 @@ const PatternCard = ({
 }) => {
     const classes = [
         'plus-pattern-card',
+        `plus-pattern-card--surface-${surface}`,
         image ? `plus-pattern-card--image-${imagePlacement}` : '',
         image && imageSplit === '1/2' ? 'plus-pattern-card--image-half' : '',
-        `plus-pattern-card-pad-${padding}`,
         `plus-pattern-card-gap-${gap}`,
         props.onClick ? 'plus-pattern-card--clickable' : '',
         dragging ? 'plus-pattern-card--dragging' : '',
@@ -119,8 +125,8 @@ PatternCard.propTypes = {
      * @ds-context Governed by: Common actions (ds guide common-actions)
      */
     footer: PropTypes.node,
-    /** Padding scale: Card/pad-compact · default · spacious (16 · 20 · 24) */
-    padding: PropTypes.oneOf(['sm', 'md', 'lg']),
+    /** Surface level: sunken (default, flat), default (page fill with a 1px border, flat), or raised (raised fill and shadow) */
+    surface: PropTypes.oneOf(['sunken', 'default', 'raised']),
     /** Header-to-body stack: Card/stack-sm · md · lg (4 · 8 · 12) */
     gap: PropTypes.oneOf(['sm', 'md', 'lg']),
     /** Minimum width constraint (number of px or any CSS length) */

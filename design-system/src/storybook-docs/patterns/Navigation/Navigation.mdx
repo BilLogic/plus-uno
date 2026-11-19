@@ -50,7 +50,7 @@ Four tiers, from the whole app down to one record. A quick look is a layer, not 
 <TypeGrid>
 <TypeCard of={NavigationStories.TierAreas} to="#1-areas" title="1 · Areas" stage={SIDEBAR_STAGE}>Go to: the Sidebar's fixed items. The selected row takes the selected fill.</TypeCard>
 <TypeCard of={NavigationStories.TierOpenItems} to="#1b-open-items" title="1b · Open items" stage={SIDEBAR_STAGE}>Records the person opened, a session or a student, as temporary items in the Sidebar: add and remove, then go to.</TypeCard>
-<TypeCard of={NavigationStories.TierViews} to="#2-views" title="2 · Views" stage={SMALL_STAGE}>Pill views in a Section's view bar, or page tabs under the page title. Content swaps in place.</TypeCard>
+<TypeCard of={NavigationStories.TierViews} to="#2-views" title="2 · Views" stage={SMALL_STAGE}>Pill views in a Section's header, or page tabs under the page title. Content swaps in place.</TypeCard>
 <TypeCard of={NavigationStories.TierDrill} to="#3-drill-in-and-climb-out" title="3 · Drill in and climb out" stage={STAGE}>A record page with a breadcrumb: the record's place, parents only. Climb out through the breadcrumb.</TypeCard>
 </TypeGrid>
 
@@ -58,7 +58,7 @@ Four tiers, from the whole app down to one record. A quick look is a layer, not 
 
 <ComponentExample of={NavigationStories.TierOpenItems} title="1b · Open items" description="Temporary session items under Sessions, named by time and teacher; click to open or dismiss with the close button." />
 
-<ComponentExample of={NavigationStories.TierViews} title="2 · Views" description="Pill views in a Section's view bar swap content in place as you switch tabs." />
+<ComponentExample of={NavigationStories.TierViews} title="2 · Views" description="Pill views in a Section's header swap content in place as you switch tabs." />
 
 <ComponentExample of={NavigationStories.TierDrill} title="3 · Drill in and climb out" description="Maya Rodriguez's record page with a Students link in the breadcrumb above the title." />
 
@@ -72,7 +72,7 @@ Four tiers, from the whole app down to one record. A quick look is a layer, not 
 
 <ComponentExample of={NavigationStories.KeyOneTabSystem} title="One tab system per page" description={'Under page tabs a Section has no pill views: its views become one labeled PopupSelect at the start of the bar ("Status: Upcoming"), picking a view and not a filter.'} />
 
-<ComponentExample of={NavigationStories.KeyAreaPage} title="An area page" description="Nothing to climb out of, so no breadcrumb. The collection's add action is the Primary at the end of its view bar." />
+<ComponentExample of={NavigationStories.KeyAreaPage} title="An area page" description="Nothing to climb out of, so no breadcrumb. The collection's add action is the Primary in its Section's title row." />
 
 <ComponentExample of={NavigationStories.KeyFocusedTask} title="A focused task" description={<>A long task leaves the Sidebar: Close at the start of the title row, no breadcrumb, the steps down the left from five. Its layout is on <a target="_top" href="./?path=/docs/templates-frame--docs">Frame</a>.</>} />
 
@@ -107,7 +107,7 @@ Choose the navigation tier first; it sets the control, placement and motion. Nav
 <tbody>
 <tr><td>1 · Areas</td><td>To another part of the app</td><td>A Sidebar item</td><td>Go to</td></tr>
 <tr><td>1b · Open items</td><td>To a session or student opened earlier</td><td>A temporary item in the Sidebar, named by when and who</td><td>Add and remove, then Go to</td></tr>
-<tr><td>2 · Views</td><td>Between views of one collection or record</td><td>Pill views in the view bar; page tabs under the title</td><td>Switch views: content in place, the indicator glides</td></tr>
+<tr><td>2 · Views</td><td>Between views of one collection or record</td><td>Pill views in the Section header; page tabs under the title</td><td>Switch views: content in place, the indicator glides</td></tr>
 <tr><td>3 · Drill in and climb out</td><td>Into one record and back</td><td>A row, then the breadcrumb</td><td>Drill in, Climb out</td></tr>
 <tr><td>Within a level</td><td>Through a task's steps</td><td>Back and Next in the bottom bar; the step rail</td><td>Step</td></tr>
 <tr><td>A layer</td><td>A quick look without leaving</td><td>A Details Panel or a Modal</td><td>Open and Close</td></tr>
@@ -210,11 +210,11 @@ Close at the start of the title row, no Sidebar, no breadcrumb. How the steps, t
     dontCaption="Each item carries everything, and the time it is found by is cut off."
 />
 
-### Put the collection's add action in its view bar, not the page header.
+### Put the collection's add action in its Section's title row, not the page header.
 
 <RuleTag kind="automatic" />
 
-"Add student" is the Primary at the end of the Students view bar. Page actions sit at the end of the title row and are only about the page.
+"Add student" is the Primary at the end of the Students Section's title row. Page actions sit at the end of the page header and are only about the page.
 
 </div>
 

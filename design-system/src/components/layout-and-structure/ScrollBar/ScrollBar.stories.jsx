@@ -46,7 +46,7 @@ export default {
 const demoBox = {
     border: 'var(--border-width-default) solid var(--ds-border)',
     borderRadius: 'var(--radius-lg)',
-    padding: 'var(--section-pad-y-compact) var(--section-pad-x-compact)'
+    padding: 'var(--pad-x-lg)'
 };
 
 const sessionRows = [
@@ -108,7 +108,7 @@ function WideContent({ count = 12 }) {
                     style={{
                         ...demoBox,
                         minWidth: 'var(--width-1000)',
-                        backgroundColor: 'var(--ds-surface-container)'
+                        backgroundColor: 'var(--ds-surface-sunken)'
                     }}
                 >
                     <p className="body-sm" style={{ margin: 0, color: 'var(--ds-text)' }}>{title}</p>
@@ -132,7 +132,7 @@ export const Layout = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' /* token gap: 48px */, width: '100%', maxWidth: '600px' /* token gap: 600px */ }}>
         <section>
             <DemoLabel>VERTICAL (DEFAULT)</DemoLabel>
-            <p className="body-sm" style={{ marginBottom: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
+            <p className="body-sm" style={{ marginBottom: 'var(--stack-xl)', color: 'var(--ds-text)' }}>
                 Content scrolls vertically once it exceeds maxHeight.
             </p>
             <div style={demoBox}>
@@ -143,7 +143,7 @@ export const Layout = () => (
         </section>
         <section>
             <DemoLabel>HORIZONTAL</DemoLabel>
-            <p className="body-sm" style={{ marginBottom: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
+            <p className="body-sm" style={{ marginBottom: 'var(--stack-xl)', color: 'var(--ds-text)' }}>
                 Wide content scrolls sideways with the same thin, tokenized scrollbar.
             </p>
             <div style={demoBox}>
@@ -158,12 +158,12 @@ export const Layout = () => (
 export const Content = () => (
     <div style={{ width: '100%', maxWidth: '600px' /* token gap: 600px */ }}>
         <DemoLabel>USE CASE EXAMPLE</DemoLabel>
-        <p className="body-sm" style={{ marginBottom: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
+        <p className="body-sm" style={{ marginBottom: 'var(--stack-xl)', color: 'var(--ds-text)' }}>
             A list panel with the Design System scrollbar instead of the browser default.
         </p>
         <div style={{ ...demoBox, padding: 0 }}>
             <ScrollBar maxHeight={'220px' /* token gap: 220px */}>
-                <div style={{ padding: 'var(--section-pad-y-compact) var(--section-pad-x-compact)' }}>
+                <div style={{ padding: 'var(--pad-x-lg)' }}>
                     <TallContent count={16} />
                 </div>
             </ScrollBar>

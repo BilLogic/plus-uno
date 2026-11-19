@@ -8,23 +8,23 @@
     {
       "id": "queue-page",
       "screen": "Supervisor triage queue page",
-      "template": "Frame + Page + PatternSection + PatternTable",
-      "variant": "Frame · Default / Page · Default / PatternSection · Toolbar / PatternTable · Dynamic table",
+      "template": "Frame + Page + PatternSection + Table",
+      "variant": "Frame · Default / Page · Default / PatternSection · Toolbar / Table · Dynamic table",
       "page": "design-system/src/patterns/Frame/index.md",
       "section": "Anatomy",
       "pages": [
         "design-system/src/patterns/Frame/index.md",
         "design-system/src/patterns/Page/index.md",
         "design-system/src/patterns/PatternSection/index.md",
-        "design-system/src/patterns/PatternTable/index.md"
+        "design-system/src/patterns/Table/index.md"
       ],
       "guides": ["frame", "page", "section", "table", "templates"],
       "scoring": "checker",
       "check": {
         "kind": "template",
-        "components": ["Frame", "Page", "PatternSection", "PatternTable"]
+        "components": ["Frame", "Page", "PatternSection", "Table"]
       },
-      "expectation": "Full-page shell on Frame and Page with a PatternSection and PatternTable replacing the hand-styled main wrapper."
+      "expectation": "Full-page shell on Frame and Page with a PatternSection and Table replacing the hand-styled main wrapper."
     },
     {
       "id": "record-panel",
@@ -44,12 +44,12 @@
     {
       "id": "resolve-modal",
       "screen": "Resolve confirmation dialog",
-      "template": "PatternModal",
+      "template": "Modal",
       "variant": "Modal · Active",
-      "page": "design-system/src/patterns/PatternModal/index.md",
+      "page": "design-system/src/patterns/Modal/index.md",
       "section": "Types",
       "pages": [
-        "design-system/src/patterns/PatternModal/index.md"
+        "design-system/src/patterns/Modal/index.md"
       ],
       "guides": ["modal"],
       "scoring": "judge",

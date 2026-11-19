@@ -27,6 +27,7 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | CountTag | `20454:869` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20454-869) |
 | Components | DatePicker | `9279:4480` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9279-4480) |
 | Components | DateTimePicker | `13549:6703` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13549-6703) |
+| Components | Dialog | `3497:19502` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19502) |
 | Components | DynamicTable | `19685:27042` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27042) |
 | Components | FileUpload | `13337:2288` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13337-2288) |
 | Components | Flag | `3548:245993` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3548-245993) |
@@ -39,7 +40,6 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | Link | `20455:4587` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-4587) |
 | Components | LinkButton | `20303:76277` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20303-76277) |
 | Components | LinkIconButton | `20304:2513` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20304-2513) |
-| Components | Modal | `3497:19502` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19502) |
 | Components | Object | `20630:28` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-28) |
 | Components | PageHeader | `20455:2827` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-2827) |
 | Components | Pagination | `3497:19505` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19505) |
@@ -92,6 +92,7 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | CountTag | Count tag | `20095:199` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-199) | verified |
 | Components | DatePicker | Date picker | `20074:16843` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20074-16843) | verified |
 | Components | DateTimePicker | Date time picker | `20067:8922` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20067-8922) | verified |
+| Components | Dialog | Dialog | `20701:48348` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20701-48348) | verified |
 | Components | DynamicTable | Dynamic table | `20095:14282` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-14282) | verified |
 | Components | FileItem | FileItem | `22249:594` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/?node-id=22249-594) | verified |
 | Components | FileUpload | File upload | `20007:4455` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20007-4455) | verified |
@@ -106,7 +107,6 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Link | Link | `20624:87` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20624-87) | verified |
 | Components | LinkButton | Link button | `20303:77826` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20303-77826) | verified |
 | Components | LinkIconButton | Link icon button | `20304:2570` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20304-2570) | verified |
-| Components | Modal | Modal | `20701:48348` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20701-48348) | verified |
 | Components | NotificationItem | NotificationItem | `22315:138` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/?node-id=22315-138) | verified |
 | Components | Object | Object | `20630:40` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-40) | verified |
 | Components | PageHeader | Page header | `20622:81` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20622-81) | verified |

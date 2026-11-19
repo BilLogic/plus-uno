@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Breadcrumb, Button, FooterActions, IconButton, Logo, Modal, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, ProgressTracker, Sidebar, Skeleton, StatusTag, TextField } from '@/components';
-import { Blanket, Frame, PANEL_STORAGE_KEY, PatternCard, PatternModal, PatternSection, usePanelControl, useSidebarControl } from '@/patterns';
+import { Breadcrumb, Button, FooterActions, IconButton, Logo, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, ProgressTracker, Sidebar, Skeleton, StatusTag, TextField } from '@/components';
+import { Frame, Modal, PANEL_STORAGE_KEY, PatternCard, PatternSection, usePanelControl, useSidebarControl } from '@/patterns';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { FRAME_LAYOUT } from './frameLayout';
 import { BrowserWindow, LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
@@ -17,7 +17,6 @@ import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/li
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 import { InAppFrame, RECORD_CRUMBS } from '@/storybook-docs/lib/pattern-demo.jsx';
-import { PAGE_EDGE } from '@/patterns/Page';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 
 /**
@@ -257,8 +256,9 @@ export const ColorModes = {
         await waitFor(() => expect(getComputedStyle(sidebar()).position, 'docked at 1024, in flow').not.toBe('absolute'));
         const aside = sidebar();
         await expect(rect(aside).right, 'the sidebar sits flush against the surface').toBeCloseTo(rect(surface).left, 0);
+        const surfaceEdge = '0 0 0 var(--stroke-2) var(--ds-border-surface)';
         const edgeLine = 'var(--border-width-default) 0 0 0 var(--ds-border)';
-        await expect(tokenLength(frame, '--page-border-width'), 'the surface edge covers the divider')
+        await expect(tokenLength(frame, '--stroke-2'), 'the surface edge covers the divider')
             .toBeGreaterThanOrEqual(tokenLength(frame, '--border-width-default'));
         await inEveryColorMode(async (mode) => {
             const frameStyle = getComputedStyle(frame);
@@ -268,7 +268,7 @@ export const ColorModes = {
             await expect(frameStyle.color, `${mode}: frame text`).toBe(tokenColor(canvasElement, '--ds-text'));
             await expect(surfaceStyle.backgroundColor, `${mode}: the surface`).toBe(tokenColor(canvasElement, '--ds-surface'));
             await expect(surfaceStyle.boxShadow, `${mode}: the surface edge`)
-                .toBe(computedShadow(canvasElement, PAGE_EDGE));
+                .toBe(computedShadow(canvasElement, surfaceEdge));
             await expect(asideStyle.backgroundColor, `${mode}: the docked sidebar stays sunken`).toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
             await expect(asideStyle.boxShadow, `${mode}: the docked sidebar's 1px edge in the border color`)
                 .toBe(computedShadow(canvasElement, edgeLine));
@@ -373,7 +373,7 @@ export const Medium768 = {
 
         await expect(offset(frame, surface).x, 'surface starts at the window edge').toBeCloseTo(0, 0);
         await expect(surfacePad(surface), 'surface pad').toBeCloseTo(tokenLength(frame, '--page-pad'), 0);
-        await expect(surfacePad(surface), 'surface pad is 24 at every width').toBeCloseTo(tokenLength(frame, '--page-pad-y-default'), 0);
+        await expect(surfacePad(surface), 'surface pad is 24 at every width').toBeCloseTo(24, 0);
         await expect(rect(content).width, 'content width').toBeCloseTo(tokenLength(frame, '--content-width'), 0);
         await expectNoSeam(frame, surface);
 
@@ -433,7 +433,7 @@ export const Large1024 = {
         await expect(getComputedStyle(sidebar()).position).not.toBe('absolute');
         await expect(offset(frame, surface).x).toBeCloseTo(tokenLength(frame, '--frame-sidebar-width'), 0);
         await expect(surfacePad(surface)).toBeCloseTo(tokenLength(frame, '--page-pad'), 0);
-        await expect(surfacePad(surface), 'surface pad is 24 at every width').toBeCloseTo(tokenLength(frame, '--page-pad-y-default'), 0);
+        await expect(surfacePad(surface), 'surface pad is 24 at every width').toBeCloseTo(24, 0);
         await expect(rect(content).width).toBeCloseTo(tokenLength(frame, '--content-width'), 0);
         await expectNoSeam(frame, surface);
         await expectCorner(frame, surface);
@@ -521,7 +521,7 @@ export const XLarge1440 = {
         await waitFor(() => expect(sidebar()).not.toBeNull());
         await expectToggleHome(frame, p.toggle);
         await expect(surfacePad(surface), 'surface pad from 1440').toBeCloseTo(tokenLength(frame, '--page-pad'), 0);
-        await expect(surfacePad(surface)).toBeCloseTo(tokenLength(frame, '--page-pad-y-default'), 0);
+        await expect(surfacePad(surface), 'surface pad is 24 at every width').toBeCloseTo(24, 0);
         await expect(rect(content).width).toBeCloseTo(tokenLength(frame, '--content-width'), 0);
     }),
 };
@@ -982,7 +982,7 @@ export const ModalLeavesPanelOpen = {
         await waitFor(() => expect(dialog(canvasElement)).not.toBeNull());
         await expect(p.frame.querySelector('.plus-frame__panel'), 'the Panel stays open under the Modal').not.toBeNull();
         await userEvent.click(within(dialog(canvasElement)).getByRole('button', { name: 'Done' }));
-        await waitFor(() => expect(dialog(canvasElement)).toBeNull());
+        await waitFor(() => expect(dialog(canvasElement)).toBeNull(), { timeout: 3000 });
         await expect(p.panel(), 'still open after the Modal').not.toBeNull();
     }),
 };
@@ -1003,7 +1003,7 @@ export const ModalOverOverlayPanelAt1100 = {
         await userEvent.click(within(dialog(canvasElement)).getByText('The Panel stays open under this Modal.'));
         await expect(p.panel(), 'a press inside the Modal is not outside the Panel').not.toBeNull();
         await userEvent.keyboard('{Escape}');
-        await waitFor(() => expect(dialog(canvasElement)).toBeNull());
+        await waitFor(() => expect(dialog(canvasElement)).toBeNull(), { timeout: 3000 });
         await expect(p.panel(), 'Escape closed the Modal only').not.toBeNull();
         await waitFor(() => expect(canvasElement.ownerDocument.activeElement, 'focus is back on what raised the Modal').toBe(settings));
     }),
@@ -2351,7 +2351,6 @@ const DrillDemo = ({ initialDepth = 0 }) => {
                                                 {DRILL_STUDENTS.map((student) => (
                                                     <PatternCard
                                                         key={student.id}
-                                                        padding="sm"
                                                         data-drill-row={student.id}
                                                         title={student.name}
                                                         description={student.detail}
@@ -2388,7 +2387,6 @@ const DrillDemo = ({ initialDepth = 0 }) => {
                                                     return (
                                                         <PatternCard
                                                             key={session[0]}
-                                                            padding="sm"
                                                             data-drill-row={rowId}
                                                             title={session[0]}
                                                             actions={(
@@ -2644,7 +2642,6 @@ const RecordOverlayDemo = () => {
                                                 {DRILL_STUDENTS.map((student) => (
                                                     <PatternCard
                                                         key={student.id}
-                                                        padding="sm"
                                                         data-drill-row={student.id}
                                                         title={student.name}
                                                         description={student.detail}
@@ -2678,15 +2675,15 @@ const RecordOverlayDemo = () => {
                             }}
                         />
                     </Frame>
-                    <Blanket inline show={Boolean(modalStudent)}>
-                        <PatternModal
-                            title={modalStudent ? `Edit ${modalStudent.name}` : 'Edit student'}
-                            onClose={closeModal}
-                            footer={<Button text="Done" appearance="primary" onClick={closeModal} />}
-                        >
-                            <TextField label="Notes" value={modalStudent?.detail ?? ''} onChange={() => {}} />
-                        </PatternModal>
-                    </Blanket>
+                    <Modal
+                        inline
+                        show={Boolean(modalStudent)}
+                        title={modalStudent ? `Edit ${modalStudent.name}` : 'Edit student'}
+                        onClose={closeModal}
+                        footer={<Button text="Done" appearance="primary" onClick={closeModal} />}
+                    >
+                        <TextField label="Notes" value={modalStudent?.detail ?? ''} onChange={() => {}} />
+                    </Modal>
                 </div>
             </BrowserWindow>
         </FitStage>
@@ -2701,8 +2698,8 @@ const recordOverlayPlay = (reduced) => async ({ canvasElement }) => {
 
     const editBtn = canvas.getByRole('button', { name: 'Edit Maya Rodriguez' });
     await userEvent.click(editBtn);
-    const modal = canvasElement.querySelector('.plus-pattern-modal');
-    await expect(modal, 'record opens as PatternModal via shared overlay helper').not.toBeNull();
+    const modal = canvasElement.querySelector('.plus-modal');
+    await expect(modal, 'record opens as Modal via shared overlay helper').not.toBeNull();
     await expectOverlayExit(modal, () => within(modal).getByRole('button', { name: 'Done' }).click(), reduced);
     await expect(surface.scrollTop, 'closing Modal preserves scroll').toBeCloseTo(savedScroll, 0);
     await expect(canvasElement.ownerDocument.activeElement, 'closing Modal returns focus to row button').toBe(editBtn);
@@ -2821,20 +2818,20 @@ const FocusedTaskTransitionDemo = () => {
                             </div>
                         )}
                     />
-                    <Blanket inline show={confirmDiscard}>
-                        <PatternModal
-                            title="Discard unsaved session?"
-                            onClose={() => setConfirmDiscard(false)}
-                            footer={(
-                                <FooterActions>
-                                    <Button text="Keep editing" onClick={() => setConfirmDiscard(false)} />
-                                    <Button text="Discard" appearance="danger" onClick={discardAndLeave} />
-                                </FooterActions>
-                            )}
-                        >
-                            Your notes have not been saved yet.
-                        </PatternModal>
-                    </Blanket>
+                    <Modal
+                        inline
+                        show={confirmDiscard}
+                        title="Discard unsaved session?"
+                        onClose={() => setConfirmDiscard(false)}
+                        footer={(
+                            <FooterActions>
+                                <Button text="Keep editing" onClick={() => setConfirmDiscard(false)} />
+                                <Button text="Discard" appearance="danger" onClick={discardAndLeave} />
+                            </FooterActions>
+                        )}
+                    >
+                        Your notes have not been saved yet.
+                    </Modal>
                 </div>
             </BrowserWindow>
         </FitStage>
@@ -2860,7 +2857,7 @@ const focusedTaskPlay = (reduced) => async ({ canvasElement }) => {
     await userEvent.type(field, 'Linear equations');
     await userEvent.click(canvas.getByRole('button', { name: 'Close' }));
 
-    const modal = canvasElement.querySelector('.plus-pattern-modal');
+    const modal = canvasElement.querySelector('.plus-modal');
     await expect(modal, 'unsaved work asks first in a Modal').not.toBeNull();
     await expectOverlayExit(modal, () => within(modal).getByRole('button', { name: 'Discard' }).click(), reduced);
 
@@ -2925,7 +2922,7 @@ const FocusedStepMotionDemo = ({ count = 4, allowExtraBranch = false }) => {
                         width="reading"
                         style={{ flex: '1 1 auto', minBlockSize: 0 }}
                     >
-                        <div data-probe="steps-layout" data-steps={placement} style={{ display: 'flex', flexDirection: down ? 'row' : 'column', gap: 'var(--page-pad-x-default)' }}>
+                        <div data-probe="steps-layout" data-steps={placement} style={{ display: 'flex', flexDirection: down ? 'row' : 'column', gap: 'var(--page-pad)' }}>
                             <div data-probe="steps" style={down ? { flex: `0 0 ${STEPS_RAIL}px`, inlineSize: STEPS_RAIL } : undefined}>
                                 <ProgressTracker
                                     label="Steps"

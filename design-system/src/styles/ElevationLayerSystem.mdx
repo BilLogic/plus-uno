@@ -1,0 +1,179 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { C } from '@/storybook-docs/foundation-blocks.jsx';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
+import {
+    DocsLink,
+    FoundationSection,
+    FoundationSubsection,
+} from '@/storybook-docs/foundation-page.jsx';
+import { LayerDetailRow } from '@/storybook-docs/elevation-folder-figures.jsx';
+import * as ElevationStories from './Elevation.stories.jsx';
+
+<Meta title="Foundations/Visual/Elevation/Layer system" />
+
+<DocsLanding
+    page="foundations-visual-elevation-layer-system"
+    eyebrow="Foundation · Elevation"
+    title="Layer system"
+    purpose="Every surface sits in one of five layers. Layers 0 and 1 are flat; 2 to 4 are elevated. Then, within the page, three surfaces set what groups and what stands out."
+/>
+
+<FoundationSection title="The five layers">
+
+<FoundationSubsection title="Layer 0 · Frame">
+
+<LayerDetailRow variant="frame">
+
+The ground the app sits on, and the docked Sidebar on it.
+
+#### Usage & styling
+
+- **Flat.** Never a shadow, never floats.
+- **Docked Sidebar** shares the Frame; floating, it moves to Layer 3.
+
+</LayerDetailRow>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Layer 1 · Page">
+
+<LayerDetailRow variant="page">
+
+The page and everything in its flow. What sits on it is broken down below, in Within the page.
+
+#### Usage & styling
+
+- **Flat by default.** Set off from the Frame by tone alone.
+
+</LayerDetailRow>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Layer 2 · Navigation">
+
+<LayerDetailRow variant="navigation">
+
+Edges that stay put while content scrolls under them: a sticky table header and column.
+
+#### Usage & styling
+
+- **Border first;** the overflow shadow appears only once content scrolls beneath.
+
+#### Stacking
+
+<C>--layer-card</C>
+
+</LayerDetailRow>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Layer 3 · Non-blocking overlay">
+
+<LayerDetailRow variant="non-blocking-overlay">
+
+Floats while the page stays usable: the floating Sidebar and Panel, Popup types, Inline edit, Flag, Spotlight, a dragged Card.
+
+#### Usage & styling
+
+- **Overlay pair,** no border.
+- **Dark mode:** steps lighter.
+
+#### Stacking
+
+<C>--layer-navigation</C> · <C>--layer-popup</C> · <C>--layer-flag</C> · <C>--layer-spotlight</C>
+
+</LayerDetailRow>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Layer 4 · Blocking overlay">
+
+<LayerDetailRow variant="blocking-overlay">
+
+The Modal, and nothing else.
+
+#### Usage & styling
+
+- **Always on the Blanket;** nothing else dims the page.
+- **One at a time;** a Flag may sit above it.
+- **A confirm Modal may open over a Panel or a Popup,** with its own Blanket.
+- **Popups and Tooltips open over a Modal.**
+- **`--layer-*` tokens are set in code only.** Components name the token, never a number.
+
+#### Stacking
+
+<C>--layer-blanket</C> · <C>--layer-modal</C>
+
+</LayerDetailRow>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Not a layer">
+
+A **Tooltip** labels a control: no shadow, <C>--layer-tooltip</C>.
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Within the page">
+
+Layer 1 has three surfaces: Default, Sunken and Raised.
+
+<Canvas of={ElevationStories.WithinThePage} />
+
+<FoundationSubsection title="Default">
+
+<LayerDetailRow variant="surface-default">
+
+Most of the page: a Section and its side, tables, lists, forms; rows are hairlines. A Default card is this surface with a border.
+
+#### Usage & styling
+
+- **A Section takes no surface:** no fill, no padding, no border.
+- **A Default card** takes <C>--ds-border</C>: on the Frame, on Sunken or colored areas, or when dense with its own rows.
+
+</LayerDetailRow>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Sunken">
+
+<LayerDetailRow variant="surface-sunken">
+
+A backdrop that groups static content: a Card (the default surface), the empty box, a clickable card at rest.
+
+#### Usage & styling
+
+- **Only on the Default surface;** one step only, never a Card inside a Card.
+- **Flat:** no shadow, no border.
+
+</LayerDetailRow>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Raised">
+
+<LayerDetailRow variant="surface-raised">
+
+The one card a view is about, a clickable card on hover, a grabbed control.
+
+#### Usage & styling
+
+- **One per view at rest.**
+- **Always the pair:** raised surface with raised shadow.
+- **Dragged,** it takes the overlay pair.
+
+</LayerDetailRow>
+
+</FoundationSubsection>
+
+<FoundationSubsection title="By template">
+
+<Canvas of={ElevationStories.ByTemplate} />
+
+How a Section, its side and its detail sit on the page is in <DocsLink id="templates-section">Templates › Section</DocsLink>. Elevation sets only their surface: a Section takes none.
+
+</FoundationSubsection>
+
+</FoundationSection>

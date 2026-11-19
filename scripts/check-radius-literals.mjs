@@ -99,13 +99,13 @@ export const RADIUS_EXCEPTIONS = [
     "why": "Keep the existing 2px small mark; the control roles are 6/8/10px and would change its shape."
   },
   {
-    "file": "design-system/src/components/labels/AiMessage/AiMessage.scss",
+    "file": "design-system/src/components/ai/AiMessage/AiMessage.scss",
     "token": "--radius-md",
     "count": 1,
     "why": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
   },
   {
-    "file": "design-system/src/components/labels/AiMessage/AiMessage.scss",
+    "file": "design-system/src/components/ai/AiMessage/AiMessage.scss",
     "token": "--radius-sm",
     "count": 1,
     "why": "Keep the existing 2px small mark; the control roles are 6/8/10px and would change its shape."
@@ -135,7 +135,7 @@ export const RADIUS_EXCEPTIONS = [
     "why": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
   },
   {
-    "file": "design-system/src/components/labels/Suggestion/Suggestion.scss",
+    "file": "design-system/src/components/ai/Suggestion/Suggestion.scss",
     "token": "--radius-md",
     "count": 1,
     "why": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."

@@ -76,7 +76,7 @@ Don't: A read-only group that looks editable.
 - `CompetencyTag`: use when tagging competency areas inside the group.
 - `Suggestion`: use when offering proposed tags at the end of the group.
 
-Same group: `AiMessage` · `ChangeTag` · `CompetencyTag` · `CountTag` · `DateTag` · `PromptStarters` · `StatusTag` · `Suggestion` · `Tag`
+Same group: `ChangeTag` · `CompetencyTag` · `CountTag` · `DateTag` · `StatusTag` · `Tag`
 
 ## Parts
 

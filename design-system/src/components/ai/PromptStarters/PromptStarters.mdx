@@ -1,0 +1,216 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as PromptStartersStories from './PromptStarters.stories.jsx';
+import { PromptStarters } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
+
+<Meta of={PromptStartersStories} />
+
+<Title />
+A wrapping row of `Suggestion` tags offering first prompts. Selecting a starter never sends it automatically.
+
+<DocsTabs of={PromptStartersStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=21788-11927"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/ai/PromptStarters"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Appearance
+
+<ComponentExample of={PromptStartersStories.Default} title="Starters" description="A wrapping row of prompt tags, each a short label standing for a longer prompt." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Behavior
+
+<ComponentExample of={PromptStartersStories.SelectHandsBackTheStarter} title="Select" description={<>Pressing a tag calls <code>onSelect</code> with the whole starter (<code>id</code>, <code>label</code> and <code>text</code>) and nothing else.</>} />
+
+<ComponentExample of={PromptStartersStories.FillsThePromptInput} title="Fills the prompt input" description={<>The common pattern: <code>onSelect</code> puts the starter's <code>text</code> into a <code>PromptInput</code> for a person to read and send.</>} />
+
+<ComponentExample of={PromptStartersStories.EmptyRendersNothing} title="Empty" description={<>An empty <code>starters</code> array renders nothing: no empty group, no placeholder.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="PromptStarters" />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={PromptStartersStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong>inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use `PromptStarters` before a person types into an empty chat, new reflection or
+blank prompt field. For a single follow-up during a conversation, use `Suggestion`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Group.** A wrapping row with <code>role="group"</code>, named by the required <code>label</code>.
+2. **Starter.** A prompt <code>Suggestion</code> per entry in <code>starters</code>: the sparkle wand, the short <code>label</code> on the tag, and the longer <code>text</code> it stands for.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>A row of prompt tags. The group itself has no ground and no state.</td></tr>
+<tr><td>Hovered, pressed, focused</td><td>Each tag reacts as a <code>Suggestion</code> does.</td></tr>
+<tr><td>Empty</td><td>An empty <code>starters</code> array renders nothing.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Gap</td><td><code>--stack-md</code> between tags and between rows, the same gap as a tag row.</td></tr>
+<tr><td>Starter</td><td>A <code>Suggestion</code>, so its edge, words, grounds and focus ring are Suggestion's tokens.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Keep the label short, and put the prompt in `text`.
+
+Use a few words for `label` and put the full request in `text`.
+
+<DoDontPair
+    doExample={<PromptStarters label="Suggested prompts" starters={[{ id: 'summarize', label: 'Summarize this session', text: 'Summarize Maya\'s last two sessions and suggest what to practice next.' }]} onSelect={() => {}} />}
+    doCaption="A short label for a longer prompt."
+    dontExample={<PromptStarters label="Suggested prompts" starters={[{ id: 'summarize', label: 'Summarize Maya\'s last two sessions and suggest what to practice next', text: 'Summarize Maya\'s last two sessions and suggest what to practice next.' }]} onSelect={() => {}} />}
+    dontCaption="The whole prompt as the label."
+/>
+
+### Offer a few.
+
+Three to five starters fit a row and can be read at a glance.
+
+<DoDontPair
+    doExample={<PromptStarters label="Suggested prompts" starters={[{ id: 'summarize', label: 'Summarize this session', text: 'Summarize this session for the family.' }, { id: 'plan', label: 'Plan next steps', text: 'What should we cover next session?' }, { id: 'explain', label: 'Explain this concept', text: 'Explain this in simpler terms.' }]} onSelect={() => {}} />}
+    doCaption="A few starters to choose from."
+    dontExample={<PromptStarters label="Suggested prompts" starters={[{ id: 'summarize', label: 'Summarize this session', text: 'Summarize this session for the family.' }, { id: 'plan', label: 'Plan next steps', text: 'What should we cover next session?' }, { id: 'explain', label: 'Explain this concept', text: 'Explain this in simpler terms.' }, { id: 'practice', label: 'Suggest practice', text: 'Suggest what to practice next.' }, { id: 'family', label: 'Draft a family note', text: 'Draft a note to the family.' }, { id: 'compare', label: 'Compare sessions', text: 'Compare the last two sessions.' }, { id: 'goals', label: 'Review goals', text: 'Review the student goals.' }, { id: 'quiz', label: 'Make a quiz', text: 'Make a short quiz on this topic.' }]} onSelect={() => {}} />}
+    dontCaption="So many starters the row becomes a wall."
+/>
+
+### Write each label as a request.
+
+The label says what the person is asking for, starting with a verb.
+
+<DoDontPair
+    doExample={<PromptStarters label="Suggested prompts" starters={[{ id: 'plan', label: 'Plan next steps', text: 'What should we cover next session?' }, { id: 'explain', label: 'Explain this concept', text: 'Explain this in simpler terms.' }]} onSelect={() => {}} />}
+    doCaption="Labels that read as requests."
+    dontExample={<PromptStarters label="Suggested prompts" starters={[{ id: 'plan', label: 'Next steps', text: 'What should we cover next session?' }, { id: 'explain', label: 'Concepts', text: 'Explain this in simpler terms.' }]} onSelect={() => {}} />}
+    dontCaption="Topic names that don't say what will be asked."
+/>
+
+### Let `onSelect` decide what happens.
+
+Use `onSelect` to fill a `PromptInput` with the starter's `text` so the person
+can read, edit and send it. Never send it on their behalf.
+
+### Pass an empty list rather than a guard.
+
+Pass an empty `starters` array to render nothing, including no empty group;
+no conditional wrapper is needed.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Write a label of a few words that reads as a request: "Summarize this session".</td><td>Put a whole paragraph on the tag.</td></tr>
+<tr><td>Name the group for what it offers: "Suggested prompts".</td><td>Leave the group unnamed.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **A named group.** The row is `role="group"` with `label` as its accessible
+  name, required so assistive technology announces the set together.
+- **Each tag is `Suggestion`'s own control.** Keyboard reach, focus and the
+  accept action all follow `Suggestion`'s accessibility contract.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For a single follow-up prompt once a conversation is underway, use
+  `Suggestion` directly.
+- For where a selected starter's text typically lands, see `PromptInput`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

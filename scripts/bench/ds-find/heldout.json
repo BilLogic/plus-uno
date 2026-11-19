@@ -10,8 +10,7 @@
  {
   "q": "table",
   "want": [
-   "Table",
-   "PatternTable"
+   "Table"
   ],
   "kind": "real-name",
   "source": "ledger"
@@ -163,7 +162,6 @@
  {
   "q": "table of sessions with status, filter, search, pagination",
   "want": [
-   "PatternTable",
    "Table"
   ],
   "kind": "real-intent",
@@ -172,7 +170,6 @@
  {
   "q": "table of sessions with filter, search, pagination, status badge",
   "want": [
-   "PatternTable",
    "Table"
   ],
   "kind": "real-intent",
@@ -258,7 +255,7 @@
   "q": "section toolbar search filters record count",
   "want": [
    "PatternSection",
-   "PatternTable"
+   "Table"
   ],
   "kind": "real-intent",
   "source": "ledger"
@@ -307,7 +304,7 @@
   "q": "page layout with title, primary action, table of sessions, filter, search, pagination",
   "want": [
    "Frame",
-   "PatternTable",
+   "Table",
    "PageHeader"
   ],
   "kind": "real-intent",
@@ -317,7 +314,7 @@
   "q": "page layout with title, actions, and a table list with filter, search, pagination",
   "want": [
    "Frame",
-   "PatternTable",
+   "Table",
    "PageHeader"
   ],
   "kind": "real-intent",

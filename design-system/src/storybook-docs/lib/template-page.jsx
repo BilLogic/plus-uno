@@ -95,7 +95,7 @@ export const TypeCard = ({ of, thumb, hero, title, stage = TYPE_STAGE, to, thumb
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 'var(--card-stack-lg)',
-                padding: 'var(--card-pad-default)',
+                padding: 'var(--card-pad)',
                 borderRadius: 'var(--card-radius)',
                 background: 'var(--ds-surface-raised)',
                 boxShadow: 'var(--ds-shadow-raised)',
@@ -421,13 +421,13 @@ export const BrowserWindow = ({ address = 'app.plus.org', height, fill = false, 
             background: 'var(--ds-surface)',
         }}
     >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-100)', background: 'var(--ds-surface-sunken)', padding: 'var(--space-050) var(--space-100)', borderBottom: 'var(--border-width-default) solid var(--ds-border)' }}>
-            <span aria-hidden="true" style={{ display: 'flex', gap: 'var(--space-050)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--grid-gutter)', background: 'var(--ds-surface-sunken)', padding: 'var(--pad-y-lg) var(--pad-x-lg)', borderBottom: 'var(--border-width-default) solid var(--ds-border)' }}>
+            <span aria-hidden="true" style={{ display: 'flex', gap: 'var(--inline-md)' }}>
                 {[0, 1, 2].map((i) => (
-                    <span key={i} style={{ inlineSize: 'var(--space-075)', blockSize: 'var(--space-075)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-neutral)' }} />
+                    <span key={i} style={{ inlineSize: 'var(--icon-sm)', blockSize: 'var(--icon-sm)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-neutral)' }} />
                 ))}
             </span>
-            <span style={{ flex: '1 1 auto', padding: 'var(--space-025) var(--space-100)', borderRadius: 'var(--radius-full)', background: 'var(--ds-surface)', font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
+            <span style={{ flex: '1 1 auto', padding: 'var(--pad-x-xs) var(--pad-x-lg)', borderRadius: 'var(--radius-full)', background: 'var(--ds-surface)', font: 'var(--body-sm)', color: 'var(--ds-text-subtle)' }}>
                 {address}
             </span>
         </div>

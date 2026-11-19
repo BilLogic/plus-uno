@@ -167,7 +167,7 @@ export function ResourcesBlock({ figmaLink, githubLink }) {
     );
 }
 
-/** Filled + bordered padded inner well (`--ds-surface-container`) —
+/** Filled + bordered padded inner well (`--ds-surface-sunken`) —
  *  shared by DocsDemoBlock and DocsCanvasShell so every display block is distinguishable. */
 export function DocsPreviewCard({ children, innerClassName = '' }) {
     return (
@@ -175,8 +175,8 @@ export function DocsPreviewCard({ children, innerClassName = '' }) {
             className="sb-ds-docs-preview-well"
             style={{
                 overflow: 'visible',
-                borderRadius: 'var(--card-radius-compact)',
-                backgroundColor: 'var(--ds-surface-container)',
+                borderRadius: 'var(--card-radius)',
+                backgroundColor: 'var(--ds-surface-sunken)',
                 border: 'var(--border-width-default) solid var(--ds-border)',
             }}
         >
@@ -287,7 +287,7 @@ export function DoDontCaption({ tone, children, style }) {
                 display: 'flex',
                 alignItems: 'flex-start',
                 gap: 'var(--inline-lg)',
-                padding: 'var(--card-pad-compact) var(--card-pad-default)',
+                padding: 'var(--card-pad)',
                 borderRadius: 'var(--radius-lg)',
                 backgroundColor: isDo
                     ? 'var(--ds-background-success-subtler)'
@@ -357,7 +357,7 @@ export function DoDontCard({ tone, children, caption }) {
                 rowGap: 'var(--section-stack-md)',
                 minInlineSize: 0,
                 boxSizing: 'border-box',
-                padding: 'var(--card-pad-default)',
+                padding: 'var(--card-pad)',
                 borderRadius: 'var(--card-radius)',
                 border: 'var(--border-width-default) solid var(--ds-border)',
                 backgroundColor: 'var(--ds-surface-raised)',
@@ -369,7 +369,7 @@ export function DoDontCard({ tone, children, caption }) {
                 style={{
                     flex: 1,
                     minHeight: 'calc(var(--height-500) * 2)',
-                    padding: 'var(--card-pad-default)',
+                    padding: 'var(--card-pad)',
                     boxSizing: 'border-box',
                     display: 'flex',
                     alignItems: 'center',
@@ -499,8 +499,8 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
                 className="sb-ds-docs-preview-well sb-ds-docs-interactive-panel"
                 style={{
                     overflow: 'visible',
-                    borderRadius: 'var(--card-radius-compact)',
-                    backgroundColor: 'var(--ds-surface-container)',
+                    borderRadius: 'var(--card-radius)',
+                    backgroundColor: 'var(--ds-surface-sunken)',
                     border: 'var(--border-width-default) solid var(--ds-border)',
                 }}
             >
@@ -526,12 +526,12 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
                         padding: 'var(--page-stack-md) var(--page-stack-lg)',
                         // Canvas and controls are two groups in one well; the line separates them.
                         borderTop: 'var(--border-width-default) solid var(--ds-border)',
-                        backgroundColor: 'var(--ds-surface-container)',
+                        backgroundColor: 'var(--ds-surface-sunken)',
                         // The panel is overflow-visible (Controls popups), so this
                         // last child's own background must follow the panel's curve
                         // or it squares off the bottom corners.
-                        borderBottomLeftRadius: 'calc(var(--card-radius-compact) - var(--border-width-default))',
-                        borderBottomRightRadius: 'calc(var(--card-radius-compact) - var(--border-width-default))',
+                        borderBottomLeftRadius: 'calc(var(--card-radius) - var(--border-width-default))',
+                        borderBottomRightRadius: 'calc(var(--card-radius) - var(--border-width-default))',
                     }}
                 >
                     <Controls of={ofStory} />

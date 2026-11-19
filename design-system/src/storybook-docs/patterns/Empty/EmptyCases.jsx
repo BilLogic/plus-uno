@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
-import { Button, DynamicTable, EmptyState, Pagination, Table } from '@/components';
+import { Button, DynamicTable, EmptyState, Pagination, StaticTable } from '@/components';
 import { PatternSection } from '@/patterns';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { ResetExampleButton } from '@/storybook-docs/lib/reset-example.jsx';
-import { StudentsTable, ViewBar } from '@/storybook-docs/lib/view-bar.jsx';
-import { CATEGORIES, QuickFilter, narrow } from '../Filtering/filteringDemo.jsx';
+import { HeaderSearch, SectionActions, categoryFilters } from '@/storybook-docs/lib/section-header.jsx';
+import { StudentsTable, ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
+import { CATEGORIES, narrow } from '../Filtering/filteringDemo.jsx';
 
 /**
  * The live do and don't examples on the Empty pattern page, composed from
- * `PatternSection`, `EmptyState`, `DynamicTable`, `Table`, `Pagination`,
- * `ViewBar`, `QuickFilter` and `Button`.
+ * `PatternSection`, `EmptyState`, `DynamicTable`, `StaticTable`, `Pagination`,
+ * `ViewPills`, the Section header props and `Button`.
  */
 
 /** Do: say what belongs here, why it is empty, and give the one action that fills it. */
@@ -56,7 +57,7 @@ const FILTERED_HEAD = {
 const NO_MATCHES_FILTERS = { grade: ['Grade 6'], subject: ['Math'] };
 const CLEARED_FILTERS = { grade: [], subject: [] };
 
-/** Do: replace the whole table with the empty state while the view bar stays above. */
+/** Do: replace the whole table with the empty state while the header rows stay above. */
 export const ReplacedTableCase = () => {
     const [view, setView] = useState('All students');
     const [filters, setFilters] = useState(NO_MATCHES_FILTERS);
@@ -73,25 +74,20 @@ export const ReplacedTableCase = () => {
             <PatternSection
                 title="Students"
                 description="Lincoln Middle"
-                tabs={(
-                    <ViewBar
+                actions={<SectionActions />}
+                views={(
+                    <ViewPills
                         views={['All students', 'Needs follow-up']}
                         activeView={view}
                         onViewChange={(next) => {
                             setView(next);
                             setFilters(next === 'All students' ? NO_MATCHES_FILTERS : CLEARED_FILTERS);
                         }}
-                        filters={(
-                            <>
-                                <QuickFilter category={CATEGORIES.grade} value={filters} onPick={pickFilter} />
-                                <QuickFilter category={CATEGORIES.subject} value={filters} onPick={pickFilter} />
-                            </>
-                        )}
-                        search={false}
-                        more={false}
-                        primary={null}
                     />
                 )}
+                search={<HeaderSearch />}
+                filters={categoryFilters([CATEGORIES.grade, CATEGORIES.subject], filters, pickFilter)}
+                onClearAll={() => setFilters(CLEARED_FILTERS)}
             >
                 <DynamicTable
                     head={FILTERED_HEAD}
@@ -120,9 +116,9 @@ export const HeaderOverNothingCase = () => (
         <PatternSection
             title="Students"
             description="Lincoln Middle"
-            tabs={<ViewBar views={['All students', 'Needs follow-up']} filters={null} search={false} more={false} primary={null} />}
+            views={<ViewPills views={['All students', 'Needs follow-up']} />}
         >
-            <Table
+            <StaticTable
                 headers={['Name', 'Grade', 'Last session']}
                 rows={[]}
                 emptyState="No results"

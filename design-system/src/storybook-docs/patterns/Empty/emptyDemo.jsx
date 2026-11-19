@@ -6,8 +6,9 @@ import { DemoPageHeader, SessionsTable } from '../../../patterns/Page/pageDemo.j
 import { GonePanel } from '../../../patterns/Panel/panelDemo.jsx';
 import { ResetExampleButton } from '@/storybook-docs/lib/reset-example.jsx';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
-import { StudentsTable, ViewBar } from '@/storybook-docs/lib/view-bar.jsx';
-import { CATEGORIES, QuickFilter } from '../Filtering/filteringDemo.jsx';
+import { HeaderSearch, SectionActions, categoryFilters } from '@/storybook-docs/lib/section-header.jsx';
+import { StudentsTable, ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
+import { CATEGORIES } from '../Filtering/filteringDemo.jsx';
 
 /**
  * The Empty pattern's examples: the real EmptyState in the four types and the
@@ -123,7 +124,7 @@ export const FullPage = () => (
 const NO_MATCHES_FILTERS = { grade: ['Grade 6'], subject: ['Math'] };
 const CLEARED_FILTERS = { grade: [], subject: [] };
 
-/** A Section whose table is empty: the empty state replaces the whole table; the view bar above stays. */
+/** A Section whose table is empty: the empty state replaces the whole table inside the empty state box; the header rows above stay. */
 export const InTable = ({ kind = 'first' }) => {
     const [view, setView] = useState('All students');
     const [resolved, setResolved] = useState(false);
@@ -134,42 +135,154 @@ export const InTable = ({ kind = 'first' }) => {
         setFilters(updated);
         if (updated.grade.length === 0 || updated.subject.length === 0) setResolved(true);
     };
+    const emptyNode = (
+        <EmptyType
+            kind={kind}
+            spacing="compact"
+            onAction={() => {
+                setResolved(true);
+                if (kind === 'matches') setFilters(CLEARED_FILTERS);
+            }}
+        />
+    );
+
+    const changeView = (next) => {
+        setView(next);
+        setResolved(false);
+        if (kind === 'matches' && next === 'All students') setFilters(NO_MATCHES_FILTERS);
+    };
 
     return (
         <div style={{ padding: 'var(--page-pad)', boxSizing: 'border-box' }}>
             <PatternSection
                 title="Students"
                 description="Lincoln Middle"
-                tabs={(
-                    <ViewBar
-                        views={['All students', 'Needs follow-up']}
-                        activeView={view}
-                        onViewChange={(next) => {
-                            setView(next);
-                            setResolved(false);
-                            if (kind === 'matches' && next === 'All students') setFilters(NO_MATCHES_FILTERS);
-                        }}
-                        filters={kind === 'matches' ? (
-                            <>
-                                <QuickFilter category={CATEGORIES.grade} value={resolved ? CLEARED_FILTERS : filters} onPick={pickFilter} />
-                                <QuickFilter category={CATEGORIES.subject} value={resolved ? CLEARED_FILTERS : filters} onPick={pickFilter} />
-                            </>
-                        ) : null}
-                    />
-                )}
+                actions={<SectionActions />}
+                views={<ViewPills views={['All students', 'Needs follow-up']} activeView={view} onViewChange={changeView} />}
+                search={kind === 'matches' ? <HeaderSearch /> : undefined}
+                filters={kind === 'matches' ? categoryFilters([CATEGORIES.grade, CATEGORIES.subject], resolved ? CLEARED_FILTERS : filters, pickFilter) : undefined}
+                onClearAll={() => { setResolved(true); setFilters(CLEARED_FILTERS); }}
             >
-                {showingRows ? (
-                    <StudentsTable count={4} view={view} sortable />
-                ) : (
-                    <EmptyType
-                        kind={kind}
-                        spacing="compact"
-                        onAction={() => {
-                            setResolved(true);
-                            if (kind === 'matches') setFilters(CLEARED_FILTERS);
-                        }}
+                <StudentsTable
+                    count={showingRows ? 4 : 0}
+                    rows={showingRows ? undefined : []}
+                    view={view}
+                    sortable
+                    state={showingRows ? undefined : (kind === 'matches' ? 'no results' : 'empty')}
+                    emptyView={emptyNode}
+                    noResultsView={emptyNode}
+                />
+            </PatternSection>
+        </div>
+    );
+};
+
+/**
+ * The three empty state box cases inside a PatternSection + DynamicTable:
+ * - `nothingYet`: title, one line, default Button repeating the title row's primary action
+ * - `hiddenByFilter`: title, one line, Button clearing the default filter
+ * - `nothingToCreate`: title and line only
+ */
+export const EmptyTableBoxCase = ({ variant }) => {
+    const [resolved, setResolved] = useState(false);
+    const [filters, setFilters] = useState(NO_MATCHES_FILTERS);
+
+    if (variant === 'nothingToCreate') {
+        return (
+            <div style={{ padding: 'var(--page-pad)', boxSizing: 'border-box' }}>
+                <PatternSection title="Reflections" description="Lincoln Middle">
+                    <StudentsTable
+                        count={0}
+                        rows={[]}
+                        label="Reflections"
+                        emptyView={(
+                            <EmptyState
+                                spacing="compact"
+                                icon="circle-check"
+                                header="Every reflection is reviewed"
+                                description="New ones arrive after Friday's sessions."
+                            />
+                        )}
                     />
-                )}
+                </PatternSection>
+            </div>
+        );
+    }
+
+    if (variant === 'hiddenByFilter') {
+        const pickFilter = (id, next) => {
+            const updated = { ...filters, [id]: next };
+            setFilters(updated);
+            if (updated.grade.length === 0 || updated.subject.length === 0) setResolved(true);
+        };
+        return (
+            <div style={{ padding: 'var(--page-pad)', boxSizing: 'border-box' }}>
+                <PatternSection
+                    title="Students"
+                    description="Lincoln Middle"
+                    views={<ViewPills views={['All students']} />}
+                    filters={categoryFilters([CATEGORIES.grade, CATEGORIES.subject], resolved ? CLEARED_FILTERS : filters, pickFilter)}
+                    onClearAll={() => { setResolved(true); setFilters(CLEARED_FILTERS); }}
+                >
+                    <StudentsTable
+                        count={resolved ? 4 : 0}
+                        rows={resolved ? undefined : []}
+                        sortable
+                        state={resolved ? undefined : 'no results'}
+                        noResultsView={(
+                            <EmptyState
+                                spacing="compact"
+                                icon="magnifying-glass"
+                                header="No students match these filters"
+                                description="Nothing matches Grade 6 and Math. Reset filters to see every student."
+                                primaryAction={(
+                                    <Button
+                                        text="Reset filters"
+                                        appearance="default"
+                                        spacing="compact"
+                                        onClick={() => {
+                                            setResolved(true);
+                                            setFilters(CLEARED_FILTERS);
+                                        }}
+                                    />
+                                )}
+                            />
+                        )}
+                    />
+                </PatternSection>
+            </div>
+        );
+    }
+
+    return (
+        <div style={{ padding: 'var(--page-pad)', boxSizing: 'border-box' }}>
+            <PatternSection
+                title="Students"
+                description="Lincoln Middle"
+                actions={<Button text="Add students" appearance="primary" spacing="compact" onClick={() => setResolved(true)} />}
+                views={<ViewPills views={['All students']} />}
+            >
+                <StudentsTable
+                    count={resolved ? 4 : 0}
+                    rows={resolved ? undefined : []}
+                    sortable
+                    emptyView={(
+                        <EmptyState
+                            spacing="compact"
+                            icon="user-group"
+                            header="No students in this group yet"
+                            description="Add students to schedule sessions and track their progress."
+                            primaryAction={(
+                                <Button
+                                    text="Add students"
+                                    appearance="default"
+                                    spacing="compact"
+                                    onClick={() => setResolved(true)}
+                                />
+                            )}
+                        />
+                    )}
+                />
             </PatternSection>
         </div>
     );

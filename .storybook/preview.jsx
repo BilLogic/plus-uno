@@ -19,6 +19,7 @@ import { addons } from 'storybook/preview-api';
 import { GLOBALS_UPDATED, SET_GLOBALS, STORY_CHANGED } from 'storybook/internal/core-events';
 import { BACKGROUND_OPTIONS, DEFAULT_BACKGROUND } from './backgrounds.js';
 import { assertContained } from '../design-system/src/storybook-docs/lib/contained-demos';
+import { settleAnimations } from '../design-system/src/storybook-docs/lib/overlay-motion-plays';
 
 // ---- Docs floating button (AI agent, Marketplace, Uno Blueprint) -----------------------
 mountDocsFab();
@@ -199,11 +200,20 @@ const preview = {
               "Typography",
               "Iconography",
               "Elevation",
+              [
+                "Overview",
+                "Layer system",
+                "Shadow ramp",
+                "Usage",
+                "Color",
+                "Accessibility"
+              ],
               "Radius",
               "Border"
             ],
             "Layout",
             [
+              "Dimensions",
               "Spacing",
               "Grid"
             ],
@@ -342,10 +352,10 @@ const preview = {
             "Messaging",
             [
               "Banner",
+              "Dialog",
               "Empty state",
               "Flag",
               "Inline message",
-              "Modal dialog",
               "Notification item",
               "Section message",
               "Spotlight"
@@ -645,7 +655,20 @@ const preview = {
 
   // A demo shown in the docs stays inside its canvas: no modal, Blanket or
   // fixed Flag stack over the docs page (test-only `!dev` stories are exempt).
-  afterEach: assertContained,
+  // Story animations settle before the a11y scan (afterEach runs in reverse order).
+  afterEach: [
+    assertContained,
+    async ({ canvasElement, viewMode, globals, parameters }) => {
+      if (viewMode !== 'story' || !canvasElement) return;
+      if (
+        globals?.ghostStories ||
+        parameters?.a11y?.disable === true ||
+        parameters?.a11y?.test === 'off' ||
+        globals?.a11y?.manual === true
+      ) return;
+      await settleAnimations(canvasElement.ownerDocument?.body ?? canvasElement);
+    },
+  ],
 };
 
 export default preview;

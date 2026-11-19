@@ -15,3 +15,17 @@
 .plus-filter-btn.plus-btn--selected .plus-filter-btn__metric {
     color: inherit;
 }
+
+// "Field: value": the field reads one step quieter, the value in ink. The
+// selected state keeps both on the selected color.
+.plus-filter-btn .plus-filter-btn__label {
+    color: var(--ds-text-subtle);
+}
+
+.plus-filter-btn .plus-filter-btn__value {
+    color: var(--ds-text);
+}
+
+.plus-filter-btn.plus-btn--selected :is(.plus-filter-btn__label, .plus-filter-btn__value) {
+    color: inherit;
+}

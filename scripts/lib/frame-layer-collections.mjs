@@ -16,7 +16,7 @@
  * as ` _ `, as the older `size / *` exports are.
  *
  * A variable's code name is its folder plus its last name segment, with no
- * family prefix: Patterns > `Card/pad-sm` is `--card-pad-sm`, Patterns >
+ * family prefix: Patterns > `Card/pad` is `--card-pad`, Patterns >
  * `Popover/Menu/pad-menu` is `--dropdown-menu-pad`, Color > `Overlay/scrim` is
  * `--overlay-scrim`. In `spacing / layout` every folder is `--layout-*`
  * (`Topbar/height-topbar` is `--layout-height-topbar`) except Page, which

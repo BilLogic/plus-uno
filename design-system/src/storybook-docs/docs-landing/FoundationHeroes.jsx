@@ -200,6 +200,32 @@ export const ElevationHero = () => {
   );
 };
 
+export const ElevationLayersHero = () => (
+  <HeroDrawing>
+    <Rect x={24} y={118} w={252} h={26} fill={PAINT.frameSunken} stroke={PAINT.illustrationEdge} corner="card" />
+    <Rect x={40} y={92} w={220} h={26} fill={PAINT.pageSurface} stroke={PAINT.illustrationEdge} corner="card" />
+    <Layer x={58} y={66} w={184} h={26} fill={PAINT.pageSurface} shadow={PAINT.overflowShadow} corner="card" />
+    <Layer x={78} y={40} w={144} h={26} fill={PAINT.popupSurface} shadow={PAINT.popupShadow} corner="popup" />
+    <Modal x={98} y={10} w={104} h={34} accent divider={false} closeButton />
+  </HeroDrawing>
+);
+
+export const ElevationRampHero = () => (
+  <HeroDrawing>
+    {[
+      { cx: 74, fill: PAINT.cardSurface, shadow: PAINT.cardShadow, stroke: PAINT.illustrationEdge },
+      { cx: 122, fill: PAINT.pageSurface, shadow: PAINT.overflowShadow, stroke: PAINT.illustrationEdge },
+      { cx: 170, fill: PAINT.popupSurface, shadow: PAINT.popupShadow, stroke: PAINT.illustrationEdge },
+      { cx: 218, fill: PAINT.modalSurface, shadow: PAINT.modalShadow, stroke: PAINT.accent },
+    ].map((disc) => (
+      <g key={disc.cx}>
+        <Layer x={disc.cx - 34} y={46} w={68} h={68} fill={disc.fill} shadow={disc.shadow} corner="full" />
+        <circle cx={disc.cx} cy={80} r={34} fill="none" stroke={disc.stroke} style={HAIRLINE} />
+      </g>
+    ))}
+  </HeroDrawing>
+);
+
 /** Twelve columns, a gutter of 8 units, a 440-unit run: the frame's own grid. */
 const GRID = { x: -70, w: 440, cols: 12, gutter: 8 };
 const colW = (GRID.w - GRID.gutter * (GRID.cols - 1)) / GRID.cols;
@@ -337,6 +363,37 @@ export const RadiusHero = () => (
     <circle cx={130} cy={105} r={2.5} fill={PAINT.annotation} />
   </HeroDrawing>
 );
+
+/** The dimension ladder: each step a bar as wide as its value, the five core sizes outlined, the default 32 in the brand color. */
+const LADDER = [4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80];
+const CORE = new Set([16, 24, 32, 40, 48]);
+
+export const DimensionsHero = () => {
+  let x = -30;
+  return (
+    <HeroDrawing>
+      {LADDER.map((step) => {
+        const width = step * 0.8;
+        const at = x;
+        x += width + 4;
+        return (
+          <React.Fragment key={step}>
+            <Rect x={at} y={20} w={width} h={110} fill={PAINT.zone} />
+            {CORE.has(step) && (
+              <Rect
+                x={at}
+                y={20}
+                w={width}
+                h={110}
+                stroke={step === 32 ? PAINT.accent : PAINT.measureLine}
+              />
+            )}
+          </React.Fragment>
+        );
+      })}
+    </HeroDrawing>
+  );
+};
 
 /** The spacing scale, in kit units: each step a square its own size. */
 const STEPS = [4, 8, 12, 16, 24, 32, 48, 64, 96, 128];

@@ -12,11 +12,22 @@
     --button-radius-compact: calc(var(--radius-control-md) - var(--pad-x-xs)); /* nests in a 32-high field: its radius 8 minus the 4 slot inset = 4 */
     --button-radius-spacious: var(--radius-control-lg); /* 48-high footer button; pairs with --control-xl */
 
+    /* Dialog */
+    --dialog-pad-x-default: var(--space-100);
+    --dialog-pad-x-spacious: var(--space-150);
+    --dialog-stack-sm: var(--space-050);
+    --dialog-stack-md: var(--space-100);
+    --dialog-stack-lg: var(--space-150);
+    --dialog-inline-sm: var(--space-050);
+    --dialog-inline-md: var(--space-100);
+    --dialog-inline-lg: var(--space-150);
+    --dialog-radius: var(--radius-xxl);
+    --dialog-body-min-height: var(--height-500);
+
     /* Calendar */
-    --calendar-day-sm: 28px;
-    --calendar-day-md: 36px;
-    --calendar-day-lg: 44px;
-    --calendar-nav-size: 32px;
+    --calendar-day-sm: var(--control-sm);
+    --calendar-day-md: var(--control-md);
+    --calendar-day-lg: var(--control-lg);
 
     /* Progress indicator */
     --progress-indicator-dot-size-8: var(--space-050); /* ProgressIndicator size 8 */
@@ -83,6 +94,26 @@
 
     /* Count tag */
     --count-tag-dot-size: var(--space-050);
+    --count-tag-ring-width: var(--stroke-2);
+
+    /* Date time picker */
+    --date-time-picker-section-gap: var(--space-0625);
+
+    /* Field */
+    --field-gap: var(--space-0625);
+
+    /* Radio group */
+    --radio-group-inline-gap: var(--space-0625);
+
+    /* Rating */
+    --rating-gap: var(--space-0625);
+
+    /* Rich text editor */
+    --rich-text-editor-max-width: 56rem;
+
+    /* AI message */
+    --ai-message-caret-width: var(--space-0125);
+    --ai-message-dot-size: var(--space-0375);
 
     /* Tag */
     --tag-dot-size: var(--space-0625);
@@ -103,6 +134,7 @@
     --carousel-indicator-height-compact: var(--space-025);
     --carousel-indicator-height: var(--space-0375);
     --carousel-indicator-height-spacious: var(--space-050);
+    --carousel-slide-max-width: 1000px;
 
     /* Scroll bar */
     --scroll-bar-size: var(--space-0375);
@@ -129,11 +161,13 @@
     /* Spotlight */
     --spotlight-width: var(--width-2500);
     --spotlight-media-height: calc(var(--size-750) + var(--space-150));
+    --spotlight-screen-pad: var(--space-100);
+    --spotlight-pad: var(--space-150);
+    --spotlight-gap: var(--space-100);
+    --spotlight-footer-stack: var(--space-150);
 
     /* Menu group */
     --menu-group-min-width: var(--size-1400);
-    --menu-group-pad-x: var(--space-150);
-    --menu-group-gap: var(--space-100);
 
     /* Popup */
     --popup-min-width: var(--width-1000);
@@ -143,11 +177,29 @@
     /* AI chat */
     --ai-chat-width: var(--width-2500);
 
+    /* Prompt input */
+    --prompt-input-min-height: var(--height-250);
+
     /* Inbox */
     --inbox-width: calc(var(--width-2000) + var(--space-250)); /* 360px */
 
     /* Table */
     --table-cell-max-width: var(--size-300);
+    --table-message-gap: var(--space-0625);
+
+    /* Page header */
+    --page-header-stack: var(--space-100);
+    --page-header-gap: var(--space-150);
+
+    /* Comment */
+    --comment-pad: var(--space-100);
+    --comment-gap: var(--space-100);
+    --comment-replies-stack: var(--space-100);
+    --comment-replies-indent: var(--space-150);
+
+    /* Progress tracker */
+    --progress-tracker-connector-width: var(--space-150);
+    --progress-tracker-dot-size: var(--space-050);
 
     /* Avatar */
     --avatar-size-96: calc(var(--space-300) * 2);
@@ -163,4 +215,13 @@
 
     /* Progress ring */
     --progress-ring-stroke: var(--stroke-2);
+}
+
+/* Mode-sensitive aliases re-evaluate at subtree mode or contrast boundaries. */
+:root,
+[data-color-mode],
+[data-contrast-mode] {
+
+    /* Dialog */
+    --dialog-shadow: var(--ds-shadow-blocking);
 }
