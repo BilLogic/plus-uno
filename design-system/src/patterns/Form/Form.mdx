@@ -49,7 +49,7 @@ The place sets the footer. The fields are the same everywhere.
 <TypeCard of={FormStories.TypePage} to="#form-in-a-page" title="In a page" stage={PAGE_WIDTH}>Settings and anything saved as a group. Buttons left-aligned under the fields, Primary first.</TypeCard>
 <TypeCard of={FormStories.TypePanel} to="#form-in-a-panel" title="In a Panel">Editing a record beside the page. A full-bleed footer, only while editing.</TypeCard>
 <TypeCard of={FormStories.TypeModal} to="#form-in-a-modal" title="In a Modal">Fewer than five fields. A full-bleed footer, Primary furthest right.</TypeCard>
-<TypeCard of={FormStories.TypeSteps} to="#form-in-steps" title="In steps">Frame · focused with the form in the body. The bar carries Back and Next.</TypeCard>
+<TypeCard of={FormStories.TypeSteps} to="#form-in-steps" title="In steps">A multi-step task with the form in the body. The footer carries Save and exit, Back and Next.</TypeCard>
 </TypeGrid>
 
 <ComponentExample of={FormStories.TypePage} title="Form in a page" description="Settings and anything saved as a group. Buttons left-aligned under the fields, Primary first." />
@@ -58,7 +58,7 @@ The place sets the footer. The fields are the same everywhere.
 
 <ComponentExample of={FormStories.TypeModal} title="Form in a Modal" description="Fewer than five fields. A full-bleed footer, Primary furthest right." />
 
-<ComponentExample of={FormStories.TypeSteps} title="Form in steps" description="Frame · focused with the form in the body. The bar carries Back and Next." />
+<ComponentExample of={FormStories.TypeSteps} title="Form in steps" description="A multi-step task with the form in the body. The footer carries Save and exit, Back and Next." />
 
 </div>
 
@@ -99,13 +99,13 @@ A short form at 8-col: the Modal's header, the fields in its body, its full-blee
 
 ### In steps
 
-A stepped form on its own page is Frame · focused with the form in the body. Back keeps what was typed.
+A stepped form on its own page is a multi-step task on Frame, with the form in the body. Back keeps what was typed.
 
 <ComponentExample of={FormStories.AnatomySteps} />
 
-1. **Steps.** The rail at the start, with done, current and later steps; four or fewer run across the top.
+1. **Steps.** The Sidebar's inner rows, with done, current and later steps.
 2. **Body.** One group per step, at reading width.
-3. **Bar.** Back and Next, full bleed; Close in the title row leaves the task. On the last step Next takes the outcome's name.
+3. **Footer.** Save and exit at the start; Back and Next at the end. On the last step Next takes the outcome's name.
 
 </div>
 
@@ -169,7 +169,7 @@ These examples show form states within each host. See each field's component pag
 import { Fieldset, TextField, Select, DatePicker, Button, SectionMessage } from '@/components';
 ```
 
-A Form is a composition: the fields in a Fieldset, inside a Page, a Panel, a Modal or a focused Frame. Its footer is the container's.
+A Form is a composition: the fields in a Fieldset, inside a Page, a Panel, a Modal or a multi-step task. Its footer is the container's.
 
 <DocsTable>
 <thead>
@@ -198,7 +198,7 @@ A Form is a composition: the fields in a Fieldset, inside a Page, a Panel, a Mod
 
 ## Usage
 
-Use a Form wherever a person enters or changes values that are saved together. The place sets the footer: in a Modal, a Panel and the focused view the corner × dismisses, so their footers carry real actions and no Cancel; the steps footer is Back and Next; page forms and popups have no ×, so they keep a subtle Cancel. A stepped form on its own page is Frame · focused with the form in the body.
+Use a Form wherever a person enters or changes values that are saved together. The place sets the footer: in a Modal and a Panel the corner × dismisses, so their footers carry real actions and no Cancel; the steps footer is Save and exit, Back and Next; page forms and popups have no ×, so they keep a subtle Cancel. A stepped form on its own page is a multi-step task on Frame, with the form in the body.
 
 Pick the host from the task:
 
@@ -210,7 +210,7 @@ Pick the host from the task:
 <tr><td>is saved as a group on its own page: settings, a profile</td><td>In a page</td><td>Left-aligned under the fields, Primary first, Cancel Subtle</td></tr>
 <tr><td>is a short edit of a row, with the page still in view</td><td>In a Panel · Details</td><td>Discard (Default) and Save (Primary) full bleed at the bottom, no Cancel</td></tr>
 <tr><td>is rare and critical, with fewer than five fields</td><td>In a Modal, 8-col</td><td>Discard (Default) and the action (Primary), full bleed, no Cancel</td></tr>
-<tr><td>is long, or has sections someone works through</td><td>In steps on Frame · focused</td><td>Back and Next in the bar, no Cancel</td></tr>
+<tr><td>is long, or has sections someone works through</td><td>In steps, a multi-step task on Frame</td><td>Save and exit, Back and Next in the footer, no Cancel</td></tr>
 </tbody>
 </DocsTable>
 
@@ -300,7 +300,7 @@ Pair two fields side by side only when they belong together, such as first and l
 
 ## Related
 
-- <DocsLink id="templates-frame">Frame</DocsLink>: use for a stepped form on its own page, in the focused type.
+- <DocsLink id="templates-frame">Frame</DocsLink>: use for a stepped form on its own page, as a multi-step task.
 - <DocsLink id="templates-section">Section</DocsLink>: use for the page header a page form sits under, and for subsections when settings have several groups.
 - <DocsLink id="templates-modal">Modal</DocsLink>: use for a rare, critical task with few fields.
 - <DocsLink id="templates-panel">Panel</DocsLink>: use for a short edit with the page still in view.

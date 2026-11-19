@@ -2,7 +2,8 @@ import { expectOverlayExit, withReducedMotion, settleAnimations } from '@/storyb
 import React, { useState } from 'react';
 import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 import Modal, { MODAL_HEIGHTS, MODAL_WIDTHS, MODAL_WIDTH_PX } from './Modal';
-import { Button, FooterActions, IconButton, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, Select } from '@/components';
+import { Button, FooterActions, IconButton, Select } from '@/components';
+import { PanelBody, PanelCloseAction, PanelContainer, PanelHeader } from '@/patterns';
 import { footerTracks } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { probe, tokenLength } from '@/storybook-docs/lib/style-probes.js';
@@ -11,7 +12,7 @@ import { fitsCanvas, leadersCrossNoOtherPart, markersLevelWithParts } from '@/st
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { ScrollStage } from '@/storybook-docs/lib/fit-stage.jsx';
 import { openOverlay } from '@/lib/overlay.js';
-import { BAR_TOKEN } from '@/storybook-docs/lib/focused-task.jsx';
+import { BAR_TOKEN } from '@/storybook-docs/lib/multi-step-task.jsx';
 import * as Demo from './modalDemo.jsx';
 
 /** The stand-in screen the docs draw the overlay at: the Large mode, and a short template. */
@@ -125,7 +126,8 @@ export const Overview = {
         await expect(overlayStyle.paddingTop, 'Overlay/pad-y').toBe(`${tokenLength(canvasElement, '--blanket-pad-y')}px`);
         await inEveryColorModeOf(canvasElement, async (mode, token) => {
             await expect(getComputedStyle(overlay).backgroundColor, `blanket fill (${mode})`).toBe(token('--ds-blanket'));
-            await expect(getComputedStyle(modal).backgroundColor, `surface overlay (${mode})`).toBe(token('--ds-surface-overlay'));
+            await expect(getComputedStyle(modal).backgroundColor, `overlay material (${mode})`).toBe(token('--ds-surface-material-overlay'));
+            await expect(getComputedStyle(modal).outlineColor, `material edge (${mode})`).toBe(token('--ds-border-material'));
             await expect(getComputedStyle(modal).boxShadow, `shadow blocking (${mode})`).toBe(probe(canvasElement, 'boxShadow', 'var(--ds-shadow-blocking)'));
         });
     },
@@ -517,7 +519,7 @@ BlockingShadow.play = async ({ canvasElement }) => {
     await settleAnimations(canvasElement.ownerDocument.body);
     await inEveryColorModeOf(canvasElement, async (mode) => {
         await expect(getComputedStyle(dialog).backgroundColor, `surface-overlay in ${mode}`)
-            .toBe(probe(canvasElement, 'backgroundColor', 'var(--ds-surface-overlay)'));
+            .toBe(probe(canvasElement, 'backgroundColor', 'var(--ds-surface-material-overlay)'));
         await expect(getComputedStyle(dialog).boxShadow, `shadow-blocking in ${mode}`)
             .toBe(probe(canvasElement, 'boxShadow', 'var(--ds-shadow-blocking)'));
     });

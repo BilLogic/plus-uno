@@ -34,7 +34,7 @@
    size: Body/default's 14. */
 body {
     font-size: var(--type-size-0875);
-    /* next rule prevents "rubberband" nudging of topbar in OSX/Chrome browser */
+    /* next rule prevents "rubberband" nudging of the page in OSX/Chrome browser */
     overscroll-behavior: none;
 }
 

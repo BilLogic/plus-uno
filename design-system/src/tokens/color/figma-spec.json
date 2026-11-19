@@ -2230,6 +2230,83 @@
      },
      "scopes": [],
      "hiddenFromPublishing": true
+    },
+    {
+     "name": "whiteAlpha/14",
+     "value": {
+      "r": 1,
+      "g": 1,
+      "b": 1,
+      "a": 0.1412
+     },
+     "scopes": [],
+     "hiddenFromPublishing": true
+    },
+    {
+     "name": "whiteAlpha/50",
+     "value": {
+      "r": 1,
+      "g": 1,
+      "b": 1,
+      "a": 0.502
+     },
+     "scopes": [],
+     "hiddenFromPublishing": true
+    },
+    {
+     "name": "whiteAlpha/74",
+     "value": {
+      "r": 1,
+      "g": 1,
+      "b": 1,
+      "a": 0.7412
+     },
+     "scopes": [],
+     "hiddenFromPublishing": true
+    },
+    {
+     "name": "whiteAlpha/94",
+     "value": {
+      "r": 1,
+      "g": 1,
+      "b": 1,
+      "a": 0.9412
+     },
+     "scopes": [],
+     "hiddenFromPublishing": true
+    },
+    {
+     "name": "overlayAlpha/50",
+     "value": {
+      "r": 0.149,
+      "g": 0.149,
+      "b": 0.149,
+      "a": 0.502
+     },
+     "scopes": [],
+     "hiddenFromPublishing": true
+    },
+    {
+     "name": "overlayAlpha/72",
+     "value": {
+      "r": 0.149,
+      "g": 0.149,
+      "b": 0.149,
+      "a": 0.7216
+     },
+     "scopes": [],
+     "hiddenFromPublishing": true
+    },
+    {
+     "name": "overlayAlpha/94",
+     "value": {
+      "r": 0.149,
+      "g": 0.149,
+      "b": 0.149,
+      "a": 0.9412
+     },
+     "scopes": [],
+     "hiddenFromPublishing": true
     }
    ]
   },
@@ -16238,6 +16315,125 @@
       "Dark IC": {
        "alias": "color / primitives",
        "name": "brown/200"
+      }
+     }
+    },
+    {
+     "name": "elevation/surface/material/media",
+     "codeSyntax": {
+      "WEB": "var(--ds-surface-material-media)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "A control or tag over an image or video. Transparency only, no blur; solid under reduced transparency and increased contrast. PLUS: PLUS addition: floating material. Increased contrast and reduced transparency fall back to the solid surface.overlay.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "whiteAlpha/50"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "overlayAlpha/50"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "neutral/0"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/250"
+      }
+     }
+    },
+    {
+     "name": "elevation/surface/material/control",
+     "codeSyntax": {
+      "WEB": "var(--ds-surface-material-control)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "A floating button, search or toolbar. Transparency only, no blur; solid under reduced transparency and increased contrast. PLUS: PLUS addition: floating material. Increased contrast and reduced transparency fall back to the solid surface.overlay.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "whiteAlpha/74"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "overlayAlpha/72"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "neutral/0"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/250"
+      }
+     }
+    },
+    {
+     "name": "elevation/surface/material/overlay",
+     "codeSyntax": {
+      "WEB": "var(--ds-surface-material-overlay)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "The ground of a floating Sidebar, a floating Panel and the Modal. Transparency only, no blur; solid under reduced transparency and increased contrast. PLUS: PLUS addition: floating material, named for the layer it paints (Panel is a template). Increased contrast and reduced transparency fall back to the solid surface.overlay.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "whiteAlpha/94"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "overlayAlpha/94"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "neutral/0"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/250"
+      }
+     }
+    },
+    {
+     "name": "color/border/material",
+     "codeSyntax": {
+      "WEB": "var(--ds-border-material)"
+     },
+     "scopes": [
+      "STROKE_COLOR"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "The 1px edge of a floating surface that wears material. Forced colors keep it. PLUS: PLUS addition: paired with elevation.surface.material.*.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "neutral/0"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "whiteAlpha/14"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "neutralAlpha/900"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "darkNeutralAlpha/900"
       }
      }
     },

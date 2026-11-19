@@ -6,37 +6,6 @@
   },
   "variables": [
     {
-      "id": "VariableID:19378:46208",
-      "name": "Topbar/height-topbar",
-      "variableCollectionId": "VariableCollectionId:19378:46207",
-      "resolvedType": "FLOAT",
-      "scopes": [
-        "WIDTH_HEIGHT"
-      ],
-      "codeSyntax": {
-        "WEB": "var(--frame-topbar-height)"
-      },
-      "valuesByMode": {
-        "19378:1": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19378:102"
-        },
-        "19378:2": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19378:102"
-        },
-        "19378:3": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19378:102"
-        }
-      },
-      "resolvedValuesByMode": {
-        "19378:1": 32,
-        "19378:2": 32,
-        "19378:3": 32
-      }
-    },
-    {
       "id": "VariableID:19378:46209",
       "name": "Sidebar/width-sidebar",
       "variableCollectionId": "VariableCollectionId:19378:46207",

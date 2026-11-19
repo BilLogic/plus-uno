@@ -1,13 +1,13 @@
 import React, { useRef, useState } from 'react';
 
-import { Button, Fieldset, PanelBody, PanelCloseAction, PanelContainer, PanelFooter, PanelHeader, SectionMessage, Select, Skeleton, TextField } from '@/components';
+import { Button, Fieldset, SectionMessage, Select, Skeleton, TextField } from '@/components';
 import { PresenceSlot } from '@/lib/listMotion';
 import { SwapInPlace } from '@/lib/swapMotion';
-import { Modal, PatternSection } from '@/patterns';
+import { Modal, PatternSection, PanelBody, PanelCloseAction, PanelContainer, PanelFooter, PanelHeader } from '@/patterns';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
-import { FocusedType, WINDOW_HEIGHT } from '@/storybook-docs/lib/focused-task.jsx';
+import { MultiStepTaskType, WINDOW_HEIGHT } from '@/storybook-docs/lib/multi-step-task.jsx';
 
 /**
  * The Form template's examples. There is no Form component: a form is the
@@ -252,12 +252,12 @@ export const FormInModal = ({ initial, server, sendingForever, marked, sending, 
     );
 };
 
-/** A form in steps: Frame · focused, the form's groups one per step in the body. */
+/** A form in steps: the multi-step task, the form's groups one per step in the body. */
 export const FormInSteps = ({ start = 0 }) => {
     const f = useFormState();
     const [schedule, setSchedule] = useState({ date: 'Thu, Oct 24', time: '4:00 PM' });
     return (
-        <FocusedType address="app.plus.org/sessions/new" labels={['Student', 'Schedule', 'Notes', 'Review']} start={start} title="Log a session">
+        <MultiStepTaskType address="app.plus.org/sessions/new" labels={['Student', 'Schedule', 'Notes', 'Review']} start={start} title="Log a session">
             {(stepIndex) => {
                 if (stepIndex === 0) {
                     return <FormFields values={f.values} onChange={f.setValues} errors={f.errors} onBlurField={f.onBlurField} setRef={f.setRef} />;
@@ -302,6 +302,6 @@ export const FormInSteps = ({ start = 0 }) => {
                     </Fieldset>
                 );
             }}
-        </FocusedType>
+        </MultiStepTaskType>
     );
 };

@@ -47,7 +47,7 @@ Modal reads these motion tokens and no literal duration or curve.
 - For the dialog panel itself with no Blanket or modal behavior, use `Dialog` (`@/components`).
 - For content read beside the page, use `Panel`.
 - For a short aside off a control, use `Popup`.
-- For a long or stepped task, use `Frame` · focused.
+- For a long or stepped task, use `Frame`.
 - For a passing notice, use `Flag`.
 
 ## Best practices
@@ -117,7 +117,7 @@ Footer buttons, real actions and Close, and which destructive tier, including ty
 - Popup: use when the content is a menu or a short list.
 - Patterns: use when you need the rules across Modals: Common actions, Forms, Errors, Loading.
 
-Same group: `AiChat` · `Frame` · `Page` · `PatternCard` · `PatternSection` · `PatternSidebar` · `Table`
+Same group: `AiChat` · `Frame` · `Page` · `Panel` · `PatternCard` · `PatternSection` · `Table`
 
 ## Types
 
@@ -166,7 +166,7 @@ import { Button } from '@/components';
 | `--modal-radius` | 16 | Corner radius at every width. |
 | `--modal-stack-sm`, `-md`, `-lg` | 8, 16, 24 | Title to tabs; header, body and footer; groups of fields. |
 | `--modal-body-min-height` | 80 | The least the body draws. |
-| `--ds-surface-overlay`, `--ds-shadow-blocking` | pair | The Modal's fill and its elevation, the one surface that lifts above a Blanket. |
+| `--ds-surface-material-overlay`, `--ds-border-material`, `--ds-shadow-blocking` | pair | The Modal's fill, edge and elevation, the one surface that lifts above a Blanket. The fill is translucent with no blur, and turns solid under reduced transparency and increased contrast. |
 | `--ds-blanket` | color | The Blanket's fill. |
 
 The Modal's maximum height is the screen less `--blanket-pad-y` above and below.

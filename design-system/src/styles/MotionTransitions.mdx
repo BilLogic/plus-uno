@@ -76,9 +76,9 @@ Never a slide (which suggests the areas sit side by side) and never a cut. The S
     rows={[
         [
             'You went one level deeper, and the way back is the way you came.',
-            'Opening one record or item from a list, card or overview, or opening a focused task.',
+            'Opening one record or item from a list, card or overview, or opening a task from its row.',
             'A quick look that leaves the page in place is Open an overlay.',
-            'Gains a level going in, loses one coming back. A focused task has no Breadcrumb; it still counts as a Drill.',
+            'Gains a level going in, loses one coming back. A task opened from a row has no Breadcrumb; it still counts as a Drill.',
             'Session row in a tutor’s record; Log a session. Triggered by a row or button, the Breadcrumb, browser back.',
         ],
     ]}
@@ -106,11 +106,7 @@ Climbing back one level shrinks the page into the row it came from. Jumping back
 
 <Canvas of={TransitionStories.ClimbOut} sourceState="none" />
 
-**Focused task.** Opening a focused task (Log a session) replaces the frame itself: the page and Sidebar fade out together on `appearance.fast`, then Frame · focused fades in on `appearance.default`. A button, a row's menu item or a link all open the task the same way, because the frame changes, not the thing pressed. Moving between steps is Step; leaving with unsaved work confirms in a Modal, then reverses one speed faster. Finishing carries on forward to the new record and a Flag confirms.
-
-<Canvas of={TransitionStories.FocusedTask} sourceState="none" />
-
-**Used in:** Record page, Table rows, PatternCard, Breadcrumb, focused tasks.
+**Used in:** Record page, Table rows, PatternCard, Breadcrumb.
 
 </FoundationSubsection>
 
@@ -177,7 +173,7 @@ The body moves on the same axis as the step list. Step states change in place on
 
 <Canvas of={TransitionStories.StepDown} sourceState="none" />
 
-**Used in:** Form steps, Table paging, Schedule weeks, Carousel, focused tasks.
+**Used in:** Form steps, Table paging, Schedule weeks, Carousel, multi-step tasks.
 
 </FoundationSubsection>
 

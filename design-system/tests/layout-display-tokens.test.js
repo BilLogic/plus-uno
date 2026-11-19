@@ -20,7 +20,7 @@ function stripCommentsAndSafeLines(source, { allowVisuallyHidden = false, allowC
 }
 
 const TARGETS = [
-    { file: 'design-system/src/components/layout-and-structure/Panel/Panel.scss' },
+    { file: 'design-system/src/patterns/Panel/Panel.scss' },
     { file: 'design-system/src/components/layout-and-structure/PageHeader/PageHeader.scss' },
     { file: 'design-system/src/patterns/PatternSection/PatternSection.scss' },
     { file: 'design-system/src/patterns/PatternSection/PatternSection.jsx' },

@@ -1121,7 +1121,7 @@
             "compact",
             "spacious"
           ],
-          "description": "Height and padding: `default` draws 32, `compact` draws 24, `spacious` draws 48. Compact is for tables and tight toolbars; spacious is for modal, panel and focused-view footers.",
+          "description": "Height and padding: `default` draws 32, `compact` draws 24, `spacious` draws 48. Compact is for tables and tight toolbars; spacious is for modal and panel footers.",
           "deprecated": null
         },
         {
@@ -4278,7 +4278,8 @@
         "--dialog-stack-md",
         "--dialog-stack-sm",
         "--ds-border",
-        "--ds-surface-overlay",
+        "--ds-border-material",
+        "--ds-surface-material-overlay",
         "--ds-text",
         "--ds-text-subtle",
         "--heading-md",
@@ -6163,7 +6164,7 @@
       "import": "import { FooterActions } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/FooterActions/FooterActions.jsx",
-      "summary": "FooterActions — 4-track footer layout for Modal, Panel and Focused view. Divides the footer into 4 equal tracks separated by `--inline-md`. Every filled action button is cloned at `spacing=\"spacious\"` (48) with `shouldFitContainer`. A leading text or link action hugs the left edge without taking a filled track, and containers up to 400 wide split a single action across the full width via `@container (max-width: 400px)`.",
+      "summary": "FooterActions — 4-track footer layout for Modal, Panel and a multi-step task's footer. Divides the footer into 4 equal tracks separated by `--inline-md`. Every filled action button is cloned at `spacing=\"spacious\"` (48) with `shouldFitContainer`. A leading text or link action hugs the left edge without taking a filled track, and containers up to 400 wide split a single action across the full width via `@container (max-width: 400px)`.",
       "props": [
         {
           "name": "leadingAction",
@@ -6229,7 +6230,7 @@
       "import": "import { Frame } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/Frame/Frame.jsx",
-      "summary": "There is no top bar: the Page runs the full height, and meets a docked Sidebar at its 1px edge. - The Frame owns the Sidebar state and hands it to the Sidebar through `SidebarControlContext`. Open, the toggle (`angles-left`) ends the Sidebar's logo row; closed, the Frame draws it (`bars`) at the Page's top left, centered on x 32, and the Page's header row (`header`, the breadcrumb) follows it on the same center line from x 56. - What docks is decided by the layout resolver (`./frameLayout`) from the Frame's own width: from 1024 the Sidebar docks (240, in flow); under 1024 it never docks. - Docked, the Sidebar sits on the sunken fill with a 1px `--ds-border` on its Page-facing edge. Floating (a peek, or opened by hand under 1024) it lies over the Page on `--ds-surface-overlay` with `--ds-shadow-overlay` and no Blanket. - Hovering the left edge peeks a closed Sidebar. An outside press, Escape, or the pointer leaving closes the peek. - Either toggle, or Ctrl+[ (Cmd+[ on a Mac), closes a showing Sidebar and opens a closed one; focus follows to the toggle that is left. - Opening a modal closes a floating Sidebar and leaves a docked one alone, and while one is open the Sidebar does not peek. The frame hears it from the shared overlay module (`@/lib/overlay`), so a page does not wire its modals to the frame. A modal opened from inside the floating Sidebar hands focus to the toggle when it closes, since its trigger left with the Sidebar. - The Panel area (`panel`) is the Frame's right-hand area. The resolver docks it beside the Page at a hairline when the content keeps 720, collapsing a default Sidebar first (and restoring it when the Panel closes); otherwise it floats over the Page on the overlay fill and shadow, with no Blanket, and a press outside or Escape closes it. Under 1024 it is an overlay capped at 320, and only one overlay is open at a time; under 768 it is full width. As an overlay the Panel is modal: focus moves into it and stays there, the Page and the Sidebar under it are inert, and closing it hands focus back to what opened it. Docked or peeking it is not modal and leaves focus where it is. Its open state, dismissal and focus run on Base UI's `Dialog`, portaled into the Frame's row so a dock or overlay switch never remounts the Panel's content. Its splitter resizes it from 320 to 640 (never past what keeps 720 beside a docked Sidebar) by drag or keys. Width and open state are kept in sessionStorage. A modal leaves it open. Anything inside the Frame opens it through `usePanelControl`. - There is no top bar on any Frame. A focused page (no Sidebar) puts Back (`onBack`, leading) and Close (`onClose`, trailing) in the Page's header row, around the `header` content. - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation; the Panel is a complementary landmark named by `panelLabel`. - The Page pads `--page-pad` (24 at every width) and caps its content at `--content-max-width` (1232), centered, on a 12-column grid with a 16 gutter. Children span all 12 columns unless they set `grid-column`.",
+      "summary": "The Page runs the full height, and meets a docked Sidebar at its 1px edge. - The Frame owns the Sidebar state and hands it to the Sidebar through `SidebarControlContext`. Open, the toggle (`angles-left`) ends the Sidebar's logo row; closed, the Frame draws it (`bars`) at the Page's top left, centered on x 32, and the Page's header row (`header`, the breadcrumb) follows it on the same center line from x 56. - What docks is decided by the layout resolver (`./frameLayout`) from the Frame's own width: from 1024 the Sidebar docks (240, in flow); under 1024 it never docks. - Docked, the Sidebar sits on the sunken fill with a 1px `--ds-border` on its Page-facing edge. Floating (a peek, or opened by hand under 1024) it lies over the Page on `--ds-surface-material-overlay` with `--ds-shadow-overlay` and no Blanket. - Hovering the left edge peeks a closed Sidebar. An outside press, Escape, or the pointer leaving closes the peek. - Either toggle, or Ctrl+[ (Cmd+[ on a Mac), closes a showing Sidebar and opens a closed one; focus follows to the toggle that is left. - Opening a modal closes a floating Sidebar and leaves a docked one alone, and while one is open the Sidebar does not peek. The frame hears it from the shared overlay module (`@/lib/overlay`), so a page does not wire its modals to the frame. A modal opened from inside the floating Sidebar hands focus to the toggle when it closes, since its trigger left with the Sidebar. - The Panel area (`panel`) is the Frame's right-hand area. The resolver docks it beside the Page at a hairline when the content keeps 720, collapsing a default Sidebar first (and restoring it when the Panel closes); otherwise it floats over the Page on the overlay material and shadow, with no Blanket, and a press outside or Escape closes it. Under 1024 it is an overlay capped at 320, and only one overlay is open at a time; under 768 it is full width. As an overlay the Panel is modal: focus moves into it and stays there, the Page and the Sidebar under it are inert, and closing it hands focus back to what opened it. Docked or peeking it is not modal and leaves focus where it is. Its open state, dismissal and focus run on Base UI's `Dialog`, portaled into the Frame's row so a dock or overlay switch never remounts the Panel's content. Its splitter resizes it from 320 to 640 (never past what keeps 720 beside a docked Sidebar) by drag or keys. Width and open state are kept in sessionStorage. A modal leaves it open. Anything inside the Frame opens it through `usePanelControl`. - A multi-step task runs in the Sidebar's inner mode: its steps are the rows, and the Page's footer holds the task's actions. - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation; the Panel is a complementary landmark named by `panelLabel`. - The Page pads `--page-pad` (24 at every width) and caps its content at `--content-max-width` (1232), centered, on a 12-column grid with a 16 gutter. Children span all 12 columns unless they set `grid-column`.",
       "props": [
         {
           "name": "id",
@@ -6256,51 +6257,6 @@
           "default": null,
           "values": null,
           "description": "The Page's header row, 32 high on the logo row's center line: the breadcrumb. While the Sidebar is closed it follows the toggle.",
-          "deprecated": null
-        },
-        {
-          "name": "onBack",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "A focused page: called when Back is pressed. With it the header row leads with a Back icon button.",
-          "deprecated": null
-        },
-        {
-          "name": "backHref",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "A focused page: where Back goes, as a link.",
-          "deprecated": null
-        },
-        {
-          "name": "backLabel",
-          "type": "string",
-          "required": false,
-          "default": "'Back'",
-          "values": null,
-          "description": "The accessible name of Back.",
-          "deprecated": null
-        },
-        {
-          "name": "onClose",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "A focused page: called when Close is pressed. With it the header row ends with a Close icon button.",
-          "deprecated": null
-        },
-        {
-          "name": "closeLabel",
-          "type": "string",
-          "required": false,
-          "default": "'Close'",
-          "values": null,
-          "description": "The accessible name of Close.",
           "deprecated": null
         },
         {
@@ -6525,12 +6481,10 @@
         "StateAt1024",
         "StateAt1440",
         "TypeDefault",
-        "TypeFocused",
+        "LayoutMultiStepTask",
+        "LayoutMultiStepTaskLeaves",
         "TypeBare",
         "AnatomyDefault",
-        "AnatomyFocused",
-        "FocusedStepsDown",
-        "FocusedStepsAcross",
         "ResponsiveWidth",
         "KeyPanelCollapsesSidebar",
         "KeyUnder1024",
@@ -6556,10 +6510,6 @@
         "MotionClimbTwoLevelsReduced",
         "MotionRecordOverlay",
         "MotionRecordOverlayReduced",
-        "MotionFocusedTask",
-        "MotionFocusedTaskReduced",
-        "MotionStepAcross",
-        "MotionStepAcrossReduced",
         "MotionStepDown",
         "MotionStepDownReduced"
       ],
@@ -6570,6 +6520,7 @@
         "--content-min-width",
         "--control-md",
         "--ds-border",
+        "--ds-border-material",
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
         "--ds-motion-spatial-default",
@@ -6580,7 +6531,7 @@
         "--ds-motion-spatial-slow-duration",
         "--ds-shadow-overlay",
         "--ds-surface",
-        "--ds-surface-overlay",
+        "--ds-surface-material-overlay",
         "--ds-surface-sunken",
         "--ds-text",
         "--frame-panel-width",
@@ -9339,10 +9290,10 @@
     },
     {
       "name": "Panel",
-      "kind": "component",
-      "import": "import { Panel } from '@/components';",
-      "group": "layout-and-structure",
-      "source": "design-system/src/components/layout-and-structure/Panel/Panel.jsx",
+      "kind": "pattern",
+      "import": "import { Panel } from '@/patterns';",
+      "group": "patterns",
+      "source": "design-system/src/patterns/Panel/Panel.jsx",
       "summary": "PanelContainer: the panel's own surface, at a fixed or the provider's width.",
       "props": [
         {
@@ -9351,7 +9302,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Falls back to the nearest PanelProvider's width, then `--panel-width-default` (400). Inside the Frame's Panel area it fills the area instead.",
+          "description": "The Frame\\'s own width, in px.",
           "deprecated": null
         },
         {
@@ -9375,20 +9326,22 @@
       ],
       "implementedAs": "PanelContainer",
       "stories": [
-        "FullComposition",
-        "MinimalHeaderAndBody",
-        "WidthFromProvider",
-        "Interactive",
-        "Rest",
-        "Hovered",
-        "Pressed",
-        "Focused"
+        "TypeDetails",
+        "TypeNotifications",
+        "AnatomyDetails",
+        "AnatomyNotifications",
+        "ResponsiveWidth",
+        "WidthDocked",
+        "WidthFloating",
+        "KeyEditing",
+        "KeyRecordGone",
+        "KeyUnder1024"
       ],
       "tokens": [
         "--body-sm",
         "--border-width-default",
         "--ds-border",
-        "--ds-surface-overlay",
+        "--ds-surface",
         "--ds-text-subtle",
         "--panel-inline-lg",
         "--panel-inline-md",
@@ -10109,272 +10062,6 @@
             }
           ]
         }
-      ]
-    },
-    {
-      "name": "PatternSidebar",
-      "kind": "pattern",
-      "import": "import { PatternSidebar } from '@/patterns';",
-      "group": "patterns",
-      "source": "design-system/src/patterns/Sidebar/Sidebar.jsx",
-      "summary": "Sidebar pattern: the app's side navigation, 240 wide, padded 12, on the sunken fill. Every row sits on one grid: rows 32 high from x 12 to 228 with radius 6, a 24 icon slot centered on x 32, the label on x 48, and a trailing slot centered on x 208. - **Logo row**: the PLUS Logo lockup at height 24, a link to Home, and the sidebar toggle (`angles-left`) on the trailing column. Inside a Frame the toggle comes from the Frame; standalone, pass `onToggle`. - **Groups**: the first has no title (Home, Slack). Every other group has a title row, a full 32 row that collapses its group; an `angle-down` shows after the title on hover and focus and turns right while collapsed. Each person's collapsed sections are remembered in localStorage. - **Locked group**: while `modulesLeft` is above 0, a group marked `lockedDuringOnboarding` shows a lock in the title's caret slot, its rows in the subtlest text with no hover, and the tooltip \"Complete your assigned training to unlock the Toolkit\" (no number). It neither collapses nor opens. - **Training counts**: a row with `training: 'lessons'` shows the Count tag of `lessonsLeft` (\"2 assigned lessons left\"); `training: 'modules'` shows `modulesLeft` (\"3 onboarding modules left\"), only while onboarding is in progress. Zero shows nothing. - **Trailing slot**: a count, a dot, the external icon for a link that leaves the app, or a close button. - **Open tabs** (`tabs[item.id]`): records a person opened (a session, a student) list under their row on a thread, one line on the icon column whose last row turns into the label column. Each tab shows a live dot at rest and Close on hover, focus and while selected; Delete or Backspace closes the focused tab. Three show, then \"Show n more\". On hover the row's icon slot turns into a collapse angle and its trailing slot into Close all. Exactly one row is selected: a selected tab takes the fill and its row goes to ink; collapsed, the row takes the fill and shows the tab count. - **Icons**: every row icon is outlined (Font Awesome Free regular) in the one subtle icon color. A selected row shows the fill and the selected icon color, never a solid icon; a brand mark (`fa-brands fa-slack`) is the only exception. - **Account row**: `SidebarAccount`, under a divider. Content is data. The pattern draws what it is given and never changes the URL; which groups a role sees is the caller's config.",
-      "props": [
-        {
-          "name": "groups",
-          "type": "arrayOf",
-          "required": true,
-          "default": "[]",
-          "values": null,
-          "description": "The groups, in order. The first usually has no title (Home, Slack).",
-          "deprecated": null
-        },
-        {
-          "name": "activeId",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Id of the selected row or tab; it carries `aria-current=\"page\"`",
-          "deprecated": null
-        },
-        {
-          "name": "onSelect",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Called with `(id, item)` when a row other than an external link is pressed",
-          "deprecated": null
-        },
-        {
-          "name": "tabs",
-          "type": "objectOf",
-          "required": false,
-          "default": "{}",
-          "values": null,
-          "description": "Open tabs by row id, in the order they show",
-          "deprecated": null
-        },
-        {
-          "name": "onSelectTab",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Called with `(tab, item)` on a plain click of a tab",
-          "deprecated": null
-        },
-        {
-          "name": "onCloseTab",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Called with `(tab, item)` by a tab's Close and by Delete or Backspace",
-          "deprecated": null
-        },
-        {
-          "name": "onCloseAllTabs",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Called with `(item)` by a row's Close all",
-          "deprecated": null
-        },
-        {
-          "name": "modulesLeft",
-          "type": "number",
-          "required": false,
-          "default": "0",
-          "values": null,
-          "description": "Onboarding modules a tutor has left. Above 0, groups marked `lockedDuringOnboarding` lock, and the `modules` row counts it.",
-          "deprecated": null
-        },
-        {
-          "name": "lessonsLeft",
-          "type": "number",
-          "required": false,
-          "default": "0",
-          "values": null,
-          "description": "Assigned lessons a tutor has left; the `lessons` row counts it",
-          "deprecated": null
-        },
-        {
-          "name": "account",
-          "type": "shape",
-          "required": true,
-          "default": null,
-          "values": null,
-          "description": "The signed-in person, for the account row. Their `id` keys the remembered sections.",
-          "deprecated": null
-        },
-        {
-          "name": "onProfile",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "The account menu's Profile",
-          "deprecated": null
-        },
-        {
-          "name": "onSignOut",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "The account menu's Sign out",
-          "deprecated": null
-        },
-        {
-          "name": "helpHref",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Help Center, opened in a new tab",
-          "deprecated": null
-        },
-        {
-          "name": "homeHref",
-          "type": "string",
-          "required": false,
-          "default": "'/'",
-          "values": null,
-          "description": "Where the logo goes",
-          "deprecated": null
-        },
-        {
-          "name": "onHome",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Called on a plain click of the logo; the caller goes Home",
-          "deprecated": null
-        },
-        {
-          "name": "onToggle",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Standalone: the toggle's press. Inside a Frame the Frame draws the toggle's state.",
-          "deprecated": null
-        },
-        {
-          "name": "storageKey",
-          "type": "string",
-          "required": false,
-          "default": "SIDEBAR_SECTIONS_STORAGE_KEY",
-          "values": null,
-          "description": "The localStorage key collapsed sections are kept under, per account id; null keeps nothing",
-          "deprecated": null
-        },
-        {
-          "name": "label",
-          "type": "string",
-          "required": false,
-          "default": "'Main'",
-          "values": null,
-          "description": "Accessible name of the `nav` landmark",
-          "deprecated": null
-        },
-        {
-          "name": "id",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "className",
-          "type": "string",
-          "required": false,
-          "default": "''",
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "style",
-          "type": "object",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        }
-      ],
-      "stories": [
-        "Overview",
-        "Geometry",
-        "KeyboardDisclosure",
-        "Tutor",
-        "PrototypeAreas",
-        "OnboardingInProgress",
-        "OnboardingDone",
-        "SectionsOpen",
-        "SectionsCollapsed",
-        "TabsNone",
-        "TabsFew",
-        "TabsMany",
-        "TabsClipped",
-        "TabRest",
-        "TabHover",
-        "TabFocus",
-        "TabSelected",
-        "TabsCollapsedWithSelection",
-        "ClosingTabs",
-        "AccountHug",
-        "AccountRow",
-        "SidebarOpen",
-        "SidebarClosed",
-        "SidebarFloating",
-        "Interactive",
-        "Light",
-        "Dark"
-      ],
-      "tokens": [
-        "--body-default",
-        "--body-sm",
-        "--border-width-default",
-        "--control-md",
-        "--ds-background-neutral-subtle-hovered",
-        "--ds-background-neutral-subtle-pressed",
-        "--ds-background-selected",
-        "--ds-background-selected-hovered",
-        "--ds-background-selected-pressed",
-        "--ds-border",
-        "--ds-icon",
-        "--ds-icon-selected",
-        "--ds-icon-subtle",
-        "--ds-icon-subtlest",
-        "--ds-motion-spatial-fast",
-        "--ds-motion-spatial-fast-duration",
-        "--ds-text",
-        "--ds-text-selected",
-        "--ds-text-subtle",
-        "--ds-text-subtlest",
-        "--focus-ring-width",
-        "--frame-sidebar-group-gap",
-        "--frame-sidebar-pad",
-        "--frame-sidebar-row-gap",
-        "--frame-sidebar-row-radius",
-        "--icon-lg",
-        "--icon-md",
-        "--icon-sm",
-        "--inline-sm",
-        "--pad-x-lg",
-        "--pad-x-md",
-        "--pad-x-sm",
-        "--pad-x-xs",
-        "--radius-sm",
-        "--stack-md",
-        "--type-weight-medium"
       ]
     },
     {
@@ -13824,18 +13511,18 @@
       "import": "import { Sidebar } from '@/components';",
       "group": "navigation",
       "source": "design-system/src/components/navigation/Sidebar/Sidebar.jsx",
-      "summary": "The PLUS sidebar: the Sidebar pattern (`@/patterns`) filled with the groups for the role (`sidebarConfig.js`), the signed-in person's account row, and the open tabs. Home is selected when nothing else is. Pass `groups` to add or override a prototype's own area(s) by `id` while keeping the role's navigation. Open tabs come from `useOpenTabs()`: a page that opens a record (a session, a student) calls `open(parentId, record)`, and the record shows here as a tab under its row. A tab is selected while its row is the current page (`activeTabId`); elsewhere the page's own row is. Pressing a tab selects it and calls `onOpenTabSelect(tab)`, which is where an app goes to the record's route if it is not already there. Signing out clears the tabs. Nothing here changes the URL.",
+      "summary": "The PLUS sidebar: the app's side navigation, 240 wide, padded 12, on the sunken fill. Every row sits on one grid: rows 32 high from x 12 to 228 with radius 8, a 24 icon slot centered on x 32, the label on x 48, and a trailing slot centered on x 208. By default it fills with the groups for `user` (`sidebarConfig.js`, defaulting to `'tutor'`), the signed-in person's account row, and open tabs from `useOpenTabs()`. Pass `user` and `groups` together to add or override a prototype's own area(s) by `id` while keeping the role's navigation; pass `groups` without `user` (and/or `tabs`) to render custom groups directly. - **Logo row**: the PLUS Logo lockup at height 24, a link to Home, and the sidebar toggle (`angles-left`) on the trailing column. Inside a Frame the toggle comes from the Frame; standalone, pass `onToggle`. - **Groups**: the first has no title (Home, Slack). Every other group has a title row, a full 32 row that collapses its group; an `angle-down` shows after the title on hover and focus and turns right while collapsed. Each person's collapsed sections are remembered in localStorage. - **Locked group**: while `modulesLeft` is above 0, a group marked `lockedDuringOnboarding` shows a lock in the title's caret slot, its rows in the subtlest text with no hover, and the tooltip \"Complete your assigned training to unlock the Toolkit\" (no number). It neither collapses nor opens. - **Training counts**: a row with `training: 'lessons'` shows the Count tag of `lessonsLeft` (\"2 assigned lessons left\"); `training: 'modules'` shows `modulesLeft` (\"3 onboarding modules left\"), only while onboarding is in progress. Zero shows nothing. - **Trailing slot**: a count, a dot, the external icon for a link that leaves the app, or a close button. - **Open tabs** (`useOpenTabs()` or `tabs[item.id]`): records a person opened (a session, a student) list under their row on a thread, one line on the icon column whose last row turns into the label column. Each tab shows a live dot at rest and Close on hover, focus and while selected; Delete or Backspace closes the focused tab. Three show, then \"Show n more\". On hover the row's icon slot turns into a collapse angle and its trailing slot into Close all. Exactly one row is selected: a selected tab takes the fill and its row goes to ink; collapsed, the row takes the fill and shows the tab count. - **Icons**: every row icon is outlined (Font Awesome Free regular) in the one subtle icon color. A selected row shows the fill and the selected icon color, never a solid icon; a brand mark (`fa-brands fa-slack`) is the only exception. - **Inner mode**: pass `inner` and the Sidebar's content swaps for an inner sidebar: one full-width Back button (`onBack`) with the area name centered, an optional full-width context dropdown (`inner.switcher`), then text-only rows (`inner.rows`: a record's stages, or a task's steps). The container, logo row and account row stay still; only the content swaps. The old content leaves at once and the new enters as one block, sliding 12 on `spatial.fast` from the end going in and from the start going back, and fading on `appearance.fast`, with no overshoot. Reduced motion keeps only the fade. Back shows the main Sidebar, where what was left sits as one open row (`tabs`) under its area. - **Account row**: `SidebarAccount`, under a divider. Content is data. Nothing here changes the URL.",
       "props": [
         {
           "name": "user",
           "type": "enum",
           "required": false,
-          "default": "'tutor'",
+          "default": null,
           "values": [
             "tutor",
             "supervisor"
           ],
-          "description": null,
+          "description": "Role whose navigation fills the Sidebar when `groups` is omitted (defaults to `'tutor'`), or merged into `groups` when both are passed",
           "deprecated": null
         },
         {
@@ -13844,43 +13531,34 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Extra or overridden groups merged by `id` into the role's config (`sidebarConfig.js`): e.g. `[{ id: 'toolkit', items: [{ id: 'reviews', text: 'Reviews', icon: 'clipboard-check' }] }]`",
+          "description": "Groups to render directly, or merged by `id` into the role's config (`sidebarConfig.js`) when `user` is also passed",
           "deprecated": null
         },
         {
-          "name": "account",
-          "type": "shape",
-          "required": true,
-          "default": null,
-          "values": null,
-          "description": "The signed-in person: name, preferred name, one-word role, and an id that keys their remembered sections",
-          "deprecated": null
-        },
-        {
-          "name": "modulesLeft",
-          "type": "number",
-          "required": false,
-          "default": "0",
-          "values": null,
-          "description": "A tutor's onboarding modules left. Above 0 the Toolkit is locked; supervisors are never locked.",
-          "deprecated": null
-        },
-        {
-          "name": "lessonsLeft",
-          "type": "number",
-          "required": false,
-          "default": "0",
-          "values": null,
-          "description": "A tutor's assigned lessons left; counted on the Lessons row",
-          "deprecated": null
-        },
-        {
-          "name": "countTags",
-          "type": "objectOf",
+          "name": "activeId",
+          "type": "string",
           "required": false,
           "default": null,
           "values": null,
-          "description": "The trailing slot by row id: `{ compliance-monitor: { count: 3, countLabel: '3 open flags' }, lessons: { dot: true } }`",
+          "description": "Id of the selected row or tab; it carries `aria-current=\"page\"`",
+          "deprecated": null
+        },
+        {
+          "name": "activeTabId",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Id of the row to show as selected when `activeId` is not set (e.g. `'sessions'`, `'home'`)",
+          "deprecated": null
+        },
+        {
+          "name": "onSelect",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with `(id, item)` when a row other than an external link is pressed",
           "deprecated": null
         },
         {
@@ -13911,6 +13589,78 @@
           "deprecated": null
         },
         {
+          "name": "tabs",
+          "type": "objectOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Open tabs by row id, in the order they show; defaults to `useOpenTabs()`",
+          "deprecated": null
+        },
+        {
+          "name": "onSelectTab",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with `(tab, item)` on a plain click of a tab",
+          "deprecated": null
+        },
+        {
+          "name": "onCloseTab",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with `(tab, item)` by a tab's Close and by Delete or Backspace",
+          "deprecated": null
+        },
+        {
+          "name": "onCloseAllTabs",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with `(item)` by a row's Close all",
+          "deprecated": null
+        },
+        {
+          "name": "modulesLeft",
+          "type": "number",
+          "required": false,
+          "default": "0",
+          "values": null,
+          "description": "Onboarding modules a tutor has left. Above 0, groups marked `lockedDuringOnboarding` lock, and the `modules` row counts it. Supervisors are never locked.",
+          "deprecated": null
+        },
+        {
+          "name": "lessonsLeft",
+          "type": "number",
+          "required": false,
+          "default": "0",
+          "values": null,
+          "description": "Assigned lessons a tutor has left; the `lessons` row counts it",
+          "deprecated": null
+        },
+        {
+          "name": "countTags",
+          "type": "objectOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The trailing slot by row id when using the role config: `{ compliance-monitor: { count: 3, countLabel: '3 open flags' }, lessons: { dot: true } }`",
+          "deprecated": null
+        },
+        {
+          "name": "account",
+          "type": "shape",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "The signed-in person, for the account row. Their `id` keys the remembered sections.",
+          "deprecated": null
+        },
+        {
           "name": "onProfile",
           "type": "func",
           "required": false,
@@ -13925,7 +13675,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "The account menu's Sign out, after the open tabs are cleared",
+          "description": "The account menu's Sign out, after open tabs are cleared when using `useOpenTabs()`",
           "deprecated": null
         },
         {
@@ -13938,12 +13688,12 @@
           "deprecated": null
         },
         {
-          "name": "activeTabId",
+          "name": "homeHref",
           "type": "string",
           "required": false,
-          "default": null,
+          "default": "'/'",
           "values": null,
-          "description": "Id of the row to show as selected (e.g. 'sessions', 'home')",
+          "description": "Where the logo goes",
           "deprecated": null
         },
         {
@@ -13952,7 +13702,52 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Where Slack links; defaults to `SLACK_URL`",
+          "description": "Where Slack links in the role config; defaults to `SLACK_URL`",
+          "deprecated": null
+        },
+        {
+          "name": "onHome",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called on a plain click of the logo; the caller goes Home",
+          "deprecated": null
+        },
+        {
+          "name": "onToggle",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Standalone: the toggle's press. Inside a Frame the Frame draws the toggle's state.",
+          "deprecated": null
+        },
+        {
+          "name": "inner",
+          "type": "shape",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "Swaps the content for an inner sidebar: the area's Back button, an optional context dropdown, then text-only rows. Omit it for the main Sidebar.",
+          "deprecated": null
+        },
+        {
+          "name": "onBack",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called by the inner sidebar's Back; the caller shows the main Sidebar and leaves the page where it is",
+          "deprecated": null
+        },
+        {
+          "name": "storageKey",
+          "type": "string",
+          "required": false,
+          "default": "SIDEBAR_SECTIONS_STORAGE_KEY",
+          "values": null,
+          "description": "The localStorage key collapsed sections are kept under, per account id; null keeps nothing",
           "deprecated": null
         },
         {
@@ -13961,7 +13756,7 @@
           "required": false,
           "default": "'Main'",
           "values": null,
-          "description": "Accessible name of the navigation landmark",
+          "description": "Accessible name of the `nav` landmark",
           "deprecated": null
         },
         {
@@ -13970,7 +13765,16 @@
           "required": false,
           "default": "true",
           "values": null,
-          "description": null,
+          "description": "Whether the Sidebar renders",
+          "deprecated": null
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "HTML id attribute on the Sidebar root element",
           "deprecated": null
         },
         {
@@ -13979,7 +13783,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Additional CSS class names applied to the Sidebar root",
           "deprecated": null
         },
         {
@@ -13988,9 +13792,86 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Inline styles applied to the Sidebar root",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Geometry",
+        "KeyboardDisclosure",
+        "Tutor",
+        "DefaultRole",
+        "PrototypeAreas",
+        "OnboardingInProgress",
+        "OnboardingDone",
+        "SectionsOpen",
+        "SectionsCollapsed",
+        "TabsNone",
+        "TabsFew",
+        "TabsMany",
+        "TabsClipped",
+        "TabRest",
+        "TabHover",
+        "TabFocus",
+        "TabSelected",
+        "TabsCollapsedWithSelection",
+        "ClosingTabs",
+        "AccountHug",
+        "AccountRow",
+        "SidebarOpen",
+        "SidebarClosed",
+        "SidebarFloating",
+        "InnerSidebar",
+        "RowsRoundEight",
+        "InnerSwapInAndBack",
+        "InnerTaskOpenRow",
+        "InnerStepsDoneAndOff",
+        "InnerKeyboard",
+        "InnerSwapMotion",
+        "InnerSwapReducedMotion",
+        "Interactive",
+        "Light",
+        "Dark"
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-sm",
+        "--border-width-default",
+        "--control-md",
+        "--ds-background-neutral-subtle-hovered",
+        "--ds-background-neutral-subtle-pressed",
+        "--ds-background-selected",
+        "--ds-background-selected-hovered",
+        "--ds-background-selected-pressed",
+        "--ds-border",
+        "--ds-icon",
+        "--ds-icon-selected",
+        "--ds-icon-subtle",
+        "--ds-icon-subtlest",
+        "--ds-motion-spatial-fast",
+        "--ds-motion-spatial-fast-duration",
+        "--ds-text",
+        "--ds-text-selected",
+        "--ds-text-subtle",
+        "--ds-text-subtlest",
+        "--focus-ring-width",
+        "--frame-sidebar-group-gap",
+        "--frame-sidebar-pad",
+        "--frame-sidebar-row-gap",
+        "--frame-sidebar-row-radius",
+        "--icon-lg",
+        "--icon-md",
+        "--icon-sm",
+        "--inline-lg",
+        "--inline-sm",
+        "--pad-x-lg",
+        "--pad-x-md",
+        "--pad-x-sm",
+        "--pad-x-xs",
+        "--radius-sm",
+        "--stack-md",
+        "--type-weight-medium"
       ]
     },
     {

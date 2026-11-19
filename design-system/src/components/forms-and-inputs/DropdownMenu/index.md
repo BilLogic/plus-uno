@@ -4,7 +4,7 @@
 
 DropdownMenu: a trigger that opens a list of menu items in a floating popup. Positioning and dismissal (outside click, Escape) are Base UI Menu's; the rows are `ButtonItem`, `LinkItem`, `CustomItem` and `Section`, which this folder's `index.js` re-exports.
 
-Also asked as: actions menu, overflow menu, kebab, more actions, context menu, menu button, dropdown button.
+Also asked as: actions menu, menu of actions, overflow menu, kebab, more actions, context menu, menu button, dropdown button.
 
 **Import:** `import { DropdownMenu } from '@/components';`
 

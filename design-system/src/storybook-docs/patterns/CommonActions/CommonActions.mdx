@@ -61,7 +61,7 @@ The place sets the alignment. A page form's buttons start under the fields; a la
 <TypeGrid>
 <TypeCard of={CommonActionsStories.PlacementPage} to="#in-a-page-form" title="In a page form" stage={PAGE_WIDTH}>Left-aligned under the fields, Primary first.</TypeCard>
 <TypeCard of={CommonActionsStories.PlacementModal} to="#in-a-modal" title="In a Modal" stage={STAGE}>Full bleed across the footer: Discard left, Primary right, no Cancel.</TypeCard>
-<TypeCard of={CommonActionsStories.PlacementFocused} to="#in-a-focused-task" title="In a focused task" stage={STAGE}>Back and Next split 50/50 across the bar; Close in the title row.</TypeCard>
+<TypeCard of={CommonActionsStories.PlacementMultiStep} to="#in-a-multi-step-task" title="In a multi-step task" stage={STAGE}>Save and exit at the start; Back and Next at the end, on one 32 line.</TypeCard>
 <TypeCard of={CommonActionsStories.PlacementCard} to="#in-a-card" title="In a card" stage={STAGE}>Subtle in the footer; clickable cards keep no inner buttons.</TypeCard>
 </TypeGrid>
 
@@ -69,7 +69,7 @@ The place sets the alignment. A page form's buttons start under the fields; a la
 
 <ComponentExample of={CommonActionsStories.PlacementModal} title="In a Modal" description="Full bleed across the footer: Discard (Default) left, Primary right, Close in the header, no Cancel. The footer is 48 high and never moves." />
 
-<ComponentExample of={CommonActionsStories.PlacementFocused} title="In a focused task" description="The bottom bar: Back and Next split 50/50, Close in the title row, no Cancel. Back is disabled on the first step." />
+<ComponentExample of={CommonActionsStories.PlacementMultiStep} title="In a multi-step task" description="The page footer: Save and exit at the start, Back and Next at the end, no Cancel. Back is disabled on the first step." />
 
 <ComponentExample of={CommonActionsStories.PlacementCard} title="In a card" description="The main action is Subtle in the footer. A clickable card has no inner buttons; when in doubt, full-span inside tiles." />
 
@@ -155,7 +155,7 @@ Choose a button's appearance by importance, placement by what it acts on, and la
 <tr><td>The main action of an area</td><td>Primary, one per area</td><td>Last in its group (on a page form: first, before Cancel)</td><td>Verb and object: "Add students"</td></tr>
 <tr><td>Another action in the area</td><td>Default</td><td>Before the Primary</td><td>Verb and object: "Reschedule session"</td></tr>
 <tr><td>Leave a page form or popup without saving</td><td>Subtle</td><td>After Primary on a page form; left of Primary in a popup</td><td>"Cancel"; a link is allowed</td></tr>
-<tr><td>Dismiss a Modal, Panel or focused task</td><td>Icon button</td><td>Start of a focused title row; end of a Modal, Panel or Flag header</td><td>Named "Close"</td></tr>
+<tr><td>Dismiss a Modal, Panel or Flag</td><td>Icon button</td><td>End of the header</td><td>Named "Close"</td></tr>
 <tr><td>Empty a menu's choices</td><td>Default, full bleed with Apply</td><td>The menu's footer, or the top of a filter side</td><td>"Reset" in a menu; "Reset filters" everywhere else</td></tr>
 <tr><td>Empty one field</td><td>Icon button inside the field</td><td>End of the field</td><td>Named "Clear", "Clear search"</td></tr>
 <tr><td>Copy a value</td><td>Icon button</td><td>Beside the value</td><td>Named "Copy"; "Copied" in a tooltip after</td></tr>
@@ -200,7 +200,7 @@ The Primary is the main call to action or a form's submit. A second main action 
     dontCaption="Two Primary buttons in one row: neither reads as the next step."
 />
 
-### Left-align buttons under a page form and right-align them in a Modal, a focused task or steps.
+### Left-align buttons under a page form and right-align them in a Modal or a multi-step task.
 
 <RuleTag kind="automatic" />
 
@@ -236,7 +236,7 @@ Header and footer stay pinned while the body scrolls. A blocked submit, a server
 
 <RuleTag kind="automatic" />
 
-Close ends a layer and lives in its header, or at the start of a focused title row. In a Modal, Panel and focused task the corner Close dismisses, so their footers carry real actions (such as Discard or Keep) and no Cancel. Page forms and popups have no Close, so they keep a subtle Cancel.
+Close ends a layer and lives in its header, or by Save and exit in a multi-step task. In a Modal and Panel the corner Close dismisses, so their footers carry real actions (such as Discard or Keep) and no Cancel. Page forms and popups have no Close, so they keep a subtle Cancel.
 
 ### Make Cancel Subtle on page forms and popups.
 

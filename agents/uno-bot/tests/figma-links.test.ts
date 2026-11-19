@@ -351,8 +351,8 @@ describe("only registry components", () => {
     // went with them (-9 net). 67: SidebarTab folded into patterns/Sidebar
     // as a pattern-internal part, and its registry row went with it (-1 net).
     // 66: Dropdown was retired for DropdownMenu, which has no figmaMeta of
-    // its own yet (-1 net); Phase D backfills Figma for it. 65: the Specs
-    // TopBar left when the Sidebar refresh removed the top bar (-1 net).
+    // its own yet (-1 net); Phase D backfills Figma for it. 65: a Specs
+    // frame part left when the Sidebar refresh retired it (-1 net).
     // 63: Footer was deleted from code and AiLabel was deleted when the AI UI
     // section replaced it, and their registry rows went with them (-2 net).
     // 57: the Specs code left main for the archive/legacy-ds branch, and six
@@ -365,7 +365,10 @@ describe("only registry components", () => {
     // figmaMeta (+2).
     // 61: SettingRow gained its Core component set and figmaMeta (+1).
     // 62: NotificationItem gained its Core component set and figmaMeta (+1).
-    assert.equal(names.length, 62);
+    // 61: Panel became part of the Frame template, no longer a public
+    // component, and its registry row went with it (-1 net); Sidebar's row
+    // now points at components/navigation.
+    assert.equal(names.length, 61);
     for (const name of names) {
       const code = registry.components[name]!.code!;
       assert.ok(code.source && existsSync(join(root, code.source)), `${name}: ${code.source}`);

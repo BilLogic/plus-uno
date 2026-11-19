@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
-import { PatternSidebar } from '@/patterns';
+import { Sidebar } from '@/components';
 
 const groups = [
     { id: 'home', items: [{ id: 'home', text: 'Home', icon: 'house' }] },
@@ -18,7 +18,7 @@ const groups = [
 const sessions = ['One', 'Two', 'Three', 'Four', 'Five'].map((label) => ({ id: `t-${label}`, label }));
 
 const renderSidebar = () => render(
-    <PatternSidebar
+    <Sidebar
         storageKey={null}
         groups={groups}
         activeId="home"

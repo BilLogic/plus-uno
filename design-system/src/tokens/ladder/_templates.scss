@@ -8,13 +8,11 @@
 :root {
 
     /* Frame */
-    --frame-topbar-height: var(--height-200);
     --frame-sidebar-width: var(--width-1500);
-    --frame-sidebar-width-nav: 164px; /* fixed SideNav width (164), distinct from the responsive sidebar above */
     --frame-sidebar-pad: var(--space-075); /* the Sidebar pads 12 on every side */
     --frame-sidebar-row-gap: var(--space-0125); /* two Sidebar rows sit 2 apart */
     --frame-sidebar-group-gap: var(--space-100); /* two Sidebar groups sit 16 apart */
-    --frame-sidebar-row-radius: var(--radius-control-sm); /* the rounding of a Sidebar row (6) */
+    --frame-sidebar-row-radius: var(--radius-control-md); /* the rounding of a Sidebar row (8) */
 
     /* Panel */
     --panel-min-width: var(--width-2000); /* the narrowest the splitter allows (320) */

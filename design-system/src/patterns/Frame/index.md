@@ -2,23 +2,23 @@
 
 # Frame
 
-There is no top bar: the Page runs the full height, and meets a docked Sidebar at its 1px edge. - The Frame owns the Sidebar state and hands it to the Sidebar through `SidebarControlContext`. Open, the toggle (`angles-left`) ends the Sidebar's logo row; closed, the Frame draws it (`bars`) at the Page's top left, centered on x 32, and the Page's header row (`header`, the breadcrumb) follows it on the same center line from x 56. - What docks is decided by the layout resolver (`./frameLayout`) from the Frame's own width: from 1024 the Sidebar docks (240, in flow); under 1024 it never docks. - Docked, the Sidebar sits on the sunken fill with a 1px `--ds-border` on its Page-facing edge. Floating (a peek, or opened by hand under 1024) it lies over the Page on `--ds-surface-overlay` with `--ds-shadow-overlay` and no Blanket. - Hovering the left edge peeks a closed Sidebar. An outside press, Escape, or the pointer leaving closes the peek. - Either toggle, or Ctrl+[ (Cmd+[ on a Mac), closes a showing Sidebar and opens a closed one; focus follows to the toggle that is left. - Opening a modal closes a floating Sidebar and leaves a docked one alone, and while one is open the Sidebar does not peek. The frame hears it from the shared overlay module (`@/lib/overlay`), so a page does not wire its modals to the frame. A modal opened from inside the floating Sidebar hands focus to the toggle when it closes, since its trigger left with the Sidebar. - The Panel area (`panel`) is the Frame's right-hand area. The resolver docks it beside the Page at a hairline when the content keeps 720, collapsing a default Sidebar first (and restoring it when the Panel closes); otherwise it floats over the Page on the overlay fill and shadow, with no Blanket, and a press outside or Escape closes it. Under 1024 it is an overlay capped at 320, and only one overlay is open at a time; under 768 it is full width. As an overlay the Panel is modal: focus moves into it and stays there, the Page and the Sidebar under it are inert, and closing it hands focus back to what opened it. Docked or peeking it is not modal and leaves focus where it is. Its open state, dismissal and focus run on Base UI's `Dialog`, portaled into the Frame's row so a dock or overlay switch never remounts the Panel's content. Its splitter resizes it from 320 to 640 (never past what keeps 720 beside a docked Sidebar) by drag or keys. Width and open state are kept in sessionStorage. A modal leaves it open. Anything inside the Frame opens it through `usePanelControl`. - There is no top bar on any Frame. A focused page (no Sidebar) puts Back (`onBack`, leading) and Close (`onClose`, trailing) in the Page's header row, around the `header` content. - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation; the Panel is a complementary landmark named by `panelLabel`. - The Page pads `--page-pad` (24 at every width) and caps its content at `--content-max-width` (1232), centered, on a 12-column grid with a 16 gutter. Children span all 12 columns unless they set `grid-column`.
+The Page runs the full height, and meets a docked Sidebar at its 1px edge. - The Frame owns the Sidebar state and hands it to the Sidebar through `SidebarControlContext`. Open, the toggle (`angles-left`) ends the Sidebar's logo row; closed, the Frame draws it (`bars`) at the Page's top left, centered on x 32, and the Page's header row (`header`, the breadcrumb) follows it on the same center line from x 56. - What docks is decided by the layout resolver (`./frameLayout`) from the Frame's own width: from 1024 the Sidebar docks (240, in flow); under 1024 it never docks. - Docked, the Sidebar sits on the sunken fill with a 1px `--ds-border` on its Page-facing edge. Floating (a peek, or opened by hand under 1024) it lies over the Page on `--ds-surface-material-overlay` with `--ds-shadow-overlay` and no Blanket. - Hovering the left edge peeks a closed Sidebar. An outside press, Escape, or the pointer leaving closes the peek. - Either toggle, or Ctrl+[ (Cmd+[ on a Mac), closes a showing Sidebar and opens a closed one; focus follows to the toggle that is left. - Opening a modal closes a floating Sidebar and leaves a docked one alone, and while one is open the Sidebar does not peek. The frame hears it from the shared overlay module (`@/lib/overlay`), so a page does not wire its modals to the frame. A modal opened from inside the floating Sidebar hands focus to the toggle when it closes, since its trigger left with the Sidebar. - The Panel area (`panel`) is the Frame's right-hand area. The resolver docks it beside the Page at a hairline when the content keeps 720, collapsing a default Sidebar first (and restoring it when the Panel closes); otherwise it floats over the Page on the overlay material and shadow, with no Blanket, and a press outside or Escape closes it. Under 1024 it is an overlay capped at 320, and only one overlay is open at a time; under 768 it is full width. As an overlay the Panel is modal: focus moves into it and stays there, the Page and the Sidebar under it are inert, and closing it hands focus back to what opened it. Docked or peeking it is not modal and leaves focus where it is. Its open state, dismissal and focus run on Base UI's `Dialog`, portaled into the Frame's row so a dock or overlay switch never remounts the Panel's content. Its splitter resizes it from 320 to 640 (never past what keeps 720 beside a docked Sidebar) by drag or keys. Width and open state are kept in sessionStorage. A modal leaves it open. Anything inside the Frame opens it through `usePanelControl`. - A multi-step task runs in the Sidebar's inner mode: its steps are the rows, and the Page's footer holds the task's actions. - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation; the Panel is a complementary landmark named by `panelLabel`. - The Page pads `--page-pad` (24 at every width) and caps its content at `--content-max-width` (1232), centered, on a 12-column grid with a 16 gutter. Children span all 12 columns unless they set `grid-column`.
 
 Also asked as: page template, page shell, page layout, full page, new page, surface container.
 
 **Import:** `import { Frame } from '@/patterns';`
 
-**Used in:** Form (`ds guide form`); Frame (`ds guide frame`); Page (`ds guide page`); Panel (`ds guide panel`); Card (`ds guide card`); Table (`ds guide table`)
+**Used in:** Frame (`ds guide frame`); Page (`ds guide page`); Panel (`ds guide panel`); Card (`ds guide card`); Table (`ds guide table`)
 
 **Governed by:** Forms (`ds guide forms`); Loading (`ds guide loading`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`)
 
 **Source:** `design-system/src/patterns/Frame/Frame.jsx`
 
-**Stories:** `design-system/src/patterns/Frame/Frame.stories.jsx` — Overview, WithoutBrowserFrame, ColorModes, Reading, DocsOverview, DocsReading, DocsContentGrid, PairWithSidebar, PairWithoutSidebar, PairTitleInHeader, Interactive, Floating, Medium768, Large1024, CtrlBracketToggle, CtrlBracketAt768, SidebarMeetsPage, XLarge1440, Wide1600, ReadingAt1440, ContentGrid, ModalClosesFloatingSidebar, ModalFromFloatingSidebar, ModalLeavesDockedSidebar, ModalClosesOverlaySidebarAt768, PanelDockedAt1440, PanelAutoCollapsesSidebarAt1200, PanelOverlayAt1100, SidebarByHandWinsAt1300, ModalLeavesPanelOpen, ModalOverOverlayPanelAt1100, OverlayPanelIsModalAt1100, DockedPanelIsNotModalAt1440, PanelFieldKeepsEscapeAt1100, DockedPanelLeavesEscapeAt1200, DockedPanelTakesLostFocusAt1200, HeaderTriggerTogglesOverlayAt1100, OverlaySplitterKeepsSidebarAt1100, OneOverlayAt768, FullWidthUnder768, SplitterKeyboardAt1440, SplitterDragAt1440, PanelRememberedForTheTab, PanelPeek, NoPanelPeekByDefault, StateSidebarDocked, StateSidebarClosed, StateSidebarPeek, StateSidebarFloating, StatePanelDocked, StatePanelPeek, StatePanelOverlay, StatePanelFullWidth, StatePanelNarrowest, StatePanelWidest, StateSidebarAndPanel, StatePanelCollapsesSidebar, StatePanelOnBlanket, StateWithModal, StateModalClosesFloating, StateAt768, StateAt1024, StateAt1440, TypeDefault, TypeFocused, TypeBare, AnatomyDefault, AnatomyFocused, FocusedStepsDown, FocusedStepsAcross, ResponsiveWidth, KeyPanelCollapsesSidebar, KeyUnder1024, SidebarCollapseMotion, SidebarCollapseMotionReduced, SidebarPeekMotion, SidebarPeekMotionReduced, PanelDockMotion, PanelDockMotionReduced, PanelOverlayMotion, PanelOverlayMotionReduced, PanelPeekMotion, PanelPeekMotionReduced, BreakpointReflowMotion, BreakpointReflowMotionReduced, MotionGoToArea, MotionGoToAreaReduced, MotionDrillAndClimb, MotionDrillAndClimbReduced, MotionDrillDeeper, MotionDrillDeeperReduced, MotionClimbTwoLevels, MotionClimbTwoLevelsReduced, MotionRecordOverlay, MotionRecordOverlayReduced, MotionFocusedTask, MotionFocusedTaskReduced, MotionStepAcross, MotionStepAcrossReduced, MotionStepDown, MotionStepDownReduced
+**Stories:** `design-system/src/patterns/Frame/Frame.stories.jsx` — Overview, WithoutBrowserFrame, ColorModes, Reading, DocsOverview, DocsReading, DocsContentGrid, PairWithSidebar, PairWithoutSidebar, PairTitleInHeader, Interactive, Floating, Medium768, Large1024, CtrlBracketToggle, CtrlBracketAt768, SidebarMeetsPage, XLarge1440, Wide1600, ReadingAt1440, ContentGrid, ModalClosesFloatingSidebar, ModalFromFloatingSidebar, ModalLeavesDockedSidebar, ModalClosesOverlaySidebarAt768, PanelDockedAt1440, PanelAutoCollapsesSidebarAt1200, PanelOverlayAt1100, SidebarByHandWinsAt1300, ModalLeavesPanelOpen, ModalOverOverlayPanelAt1100, OverlayPanelIsModalAt1100, DockedPanelIsNotModalAt1440, PanelFieldKeepsEscapeAt1100, DockedPanelLeavesEscapeAt1200, DockedPanelTakesLostFocusAt1200, HeaderTriggerTogglesOverlayAt1100, OverlaySplitterKeepsSidebarAt1100, OneOverlayAt768, FullWidthUnder768, SplitterKeyboardAt1440, SplitterDragAt1440, PanelRememberedForTheTab, PanelPeek, NoPanelPeekByDefault, StateSidebarDocked, StateSidebarClosed, StateSidebarPeek, StateSidebarFloating, StatePanelDocked, StatePanelPeek, StatePanelOverlay, StatePanelFullWidth, StatePanelNarrowest, StatePanelWidest, StateSidebarAndPanel, StatePanelCollapsesSidebar, StatePanelOnBlanket, StateWithModal, StateModalClosesFloating, StateAt768, StateAt1024, StateAt1440, TypeDefault, LayoutMultiStepTask, LayoutMultiStepTaskLeaves, TypeBare, AnatomyDefault, ResponsiveWidth, KeyPanelCollapsesSidebar, KeyUnder1024, SidebarCollapseMotion, SidebarCollapseMotionReduced, SidebarPeekMotion, SidebarPeekMotionReduced, PanelDockMotion, PanelDockMotionReduced, PanelOverlayMotion, PanelOverlayMotionReduced, PanelPeekMotion, PanelPeekMotionReduced, BreakpointReflowMotion, BreakpointReflowMotionReduced, MotionGoToArea, MotionGoToAreaReduced, MotionDrillAndClimb, MotionDrillAndClimbReduced, MotionDrillDeeper, MotionDrillDeeperReduced, MotionClimbTwoLevels, MotionClimbTwoLevelsReduced, MotionRecordOverlay, MotionRecordOverlayReduced, MotionStepDown, MotionStepDownReduced
 
 **Storybook page:** `design-system/src/patterns/Frame/Frame.mdx`
 
-**Motion:** sidebar-open `spatial.default` · sidebar-close `spatial.fast` · panel-dock `spatial.slow` + `appearance.fast` · panel-undock `spatial.default` · focused-open `appearance.default` · focused-close `appearance.fast` · step `spatial.default` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
+**Motion:** sidebar-open `spatial.default` · sidebar-close `spatial.fast` · panel-dock `spatial.slow` + `appearance.fast` · panel-undock `spatial.default` · step `spatial.default` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations › Expression › Motion.
 
 ## Usage
 
@@ -43,35 +43,33 @@ Frame reads these motion tokens and no literal duration or curve.
 | sidebar-close | Dock and undock a panel | `--ds-motion-spatial-fast` | It closes on spatial.fast to its edge and leaves nothing behind: no rail. |
 | panel-dock | Dock and undock a panel | `--ds-motion-spatial-slow` · `--ds-motion-appearance-fast` | The AI Panel docks on the right and the Page makes room; its content fades in once the page is about 90% done. |
 | panel-undock | Dock and undock a panel | `--ds-motion-spatial-default` | It reverses and stays at the edge. |
-| focused-open | Drill into and climb back out | `--ds-motion-appearance-default` | Focused opens as a change of frame: the page and the Sidebar fade out together on appearance.fast, then the task fades in, in place. A focused task fades; it does not grow or slide. Bare frames, such as sign-in, do not move. |
-| focused-close | Drill into and climb back out | `--ds-motion-appearance-fast` | Close reverses the entrance one speed faster: the task fades out, then the page and Sidebar fade back in, asking first in a Modal if anything is unsaved. |
 | step | Step to the next or previous | `--ds-motion-spatial-default` · `--ds-motion-appearance-fast` | The body slides on the same axis as the step list: up with the steps down the left, across with four or fewer across the top. Step states change in place. Placement is set once, when the task opens, by the longest path the flow can take. |
 
 ## Alternatives
 
 - For a bare fill and elevation, use `Page`.
 - For a region inside the content, use `PatternSection`.
-- For a short task that keeps the page in view behind it, use `Modal`. A focused Frame is for a task that blocks the page until it is done, or a long one.
+- For a short task that keeps the page in view behind it, use `Modal`. A multi-step task runs in the Sidebar's inner mode.
 
 ## Best practices
 
-### Give a focused task the whole window. {#give-a-focused-task-the-whole-window}
+### Give a multi-step task its steps in the inner sidebar. {#give-a-multi-step-task-its-steps-in-the-inner-sidebar}
 
 **Checked:** Review
 
-A focused Frame has no Sidebar and no breadcrumb. Close leads the title row, so the way out is one control, not a menu of other places.
+The steps are the Sidebar's rows, so the Page holds only the task. Done steps tick and stay pressable; steps past your answers are off.
 
-Do: The task fills the window: no Sidebar, nothing to invite the person away.
-Don't: The Sidebar left docked beside a focused task, one click from leaving it.
+Do: The steps as rows in the inner sidebar; the Page holds only the task.
+Don't: The steps drawn again inside the Page: two lists for one task.
 
-### Put Back and Next in the bar, with no Cancel. {#put-back-and-next-in-the-bar-with-no-cancel}
+### Put Save and exit, Back and Next in the footer, with no Cancel. {#put-save-and-exit-back-and-next-in-the-footer-with-no-cancel}
 
 **Checked:** Review
 
-The bottom bar is fixed along the bottom, one row high, sized by its Buttons and their pad. Close in the title row leaves the task, so the bar holds only Back and the primary Next, full bleed. Back on the first step is disabled and needs no reason.
+The footer is fixed along the bottom, one row high, with its buttons on one line. Save and exit leaves the task and keeps the answers, so the footer holds only it, Back and the primary Next. Back on the first step is disabled and needs no reason.
 
-Do: Back and the primary Next split the bar; Close in the title row leaves the task.
-Don't: Cancel repeated in the bar beside Back and Next: two ways out of one task.
+Do: Save and exit at the start; Back and the primary Next at the end, on one line.
+Don't: Cancel repeated in the footer beside Save and exit: two ways out of one task.
 
 ### Keep the AI panel docked as its own region. {#keep-the-ai-panel-docked-as-its-own-region}
 
@@ -91,17 +89,11 @@ Sign-in, errors and welcome have one job and no account yet, so the Frame carrie
 Do: One centered column: the form and its button.
 Don't: The Sidebar beside a sign-in: navigation for a person who has not signed in.
 
-### Show steps by how many there are. {#show-steps-by-how-many-there-are}
-
-**Checked:** Review
-
-The count sets the side or the top once, when the task opens. The thresholds are under Focused steps.
-
 ### Put the place in the header as a breadcrumb. {#put-the-place-in-the-header-as-a-breadcrumb}
 
 **Checked:** Review
 
-The header row is the breadcrumb, shown only after drilling into a record; area pages and focused tasks have none. A page's title belongs to its content, in a Section with `level="page"`.
+The header row is the breadcrumb, shown only after drilling into a record; area pages and multi-step tasks have none. A page's title belongs to its content, in a Section with `level="page"`.
 
 Elevation and fills follow Elevation.
 
@@ -112,7 +104,7 @@ Elevation and fills follow Elevation.
 - A peeking or floating Sidebar closes on Escape, and focus returns to the toggle.
 - Docked, the AI panel is a complementary landmark named by `panelLabel`, after the Page in reading order. Below `FRAME_LAYOUT.dockMin` it is a Modal-style layer: focus moves to its first control, Tab stays inside it, the Page and the Sidebar under it are inert, and closing returns focus to what opened it.
 - The splitter is a vertical separator named "Resize panel" that reports its width. The left arrow widens the panel by 16 and the right arrow narrows it, 64 with Shift; Home and End go to the narrowest and the widest.
-- A focused task's steps are a navigation named "Steps"; the current step is marked, and the bar's buttons follow the body in the tab order.
+- A multi-step task's steps are a list named "Steps" in the Sidebar's navigation; the current step is marked, a done step is named "Done", and an off step is not pressable. The footer's buttons follow the body in the tab order.
 
 ## Related
 
@@ -123,14 +115,13 @@ Elevation and fills follow Elevation.
 - Panel: use when the work should float beside the page, not replace it.
 - Grid: use when you need the column math the Frame is sized by.
 
-Same group: `AiChat` · `Modal` · `Page` · `PatternCard` · `PatternSection` · `PatternSidebar` · `Table`
+Same group: `AiChat` · `Modal` · `Page` · `Panel` · `PatternCard` · `PatternSection` · `Table`
 
 ## Types
 
-Choose one of three Frame types for every app page, shown here in browser windows. See Templates and patterns for how filled Frames become Screens and Flows, documented with the flows.
+Choose one of two Frame types for every app page, shown here in browser windows. See Templates and patterns for how filled Frames become Screens and Flows, documented with the flows.
 
 - **Default.** Pages people move among: the Sidebar, the Page, and the AI panel as its own region on the right.
-- **Focused.** One task a person finishes or leaves: the whole window, Close beside the title, no Sidebar.
 - **Bare.** Sign-in, errors and welcome: one centered column, with no Sidebar and no header row.
 
 ## Anatomy
@@ -144,26 +135,16 @@ The default type at 1440 with the AI panel docked.
 3. **Content.** The Page's content box: no corner radius, a 24 pad, and a 12-column grid capped at 1232 (864 at reading width).
 4. **AI panel.** A Frame region on the right, 320 to 640 and opening at 400, with its splitter on the left hairline. It is docked wherever it shows.
 
-### Focused
-
-A task with five steps. No Sidebar and no breadcrumb: nothing invites the person away.
-
-1. **Title row.** Close at the start, then the task's name as the page's one h1.
-2. **Steps.** A Section side at the start, 256 wide (320 for long labels), or a bar across the top; Focused steps says which.
-3. **Body.** The task's Sections at reading width, 864, centered.
-4. **Bar**, fixed along the bottom and 48 high. Back and Next split the bar, full bleed; Close in the title row leaves the task. Back on the first step is disabled and needs no reason.
-
 ## Slots
 
 | Slot or prop | Holds |
 | --- | --- |
 | `sidebar` | The Sidebar. Without it there is no Sidebar and no toggle. |
-| `header` | The Page's header row: the breadcrumb, or a focused task's Close and title. |
+| `header` | The Page's header row: the breadcrumb. |
 | `children` | The content: Sections in a 12-column grid. `width="reading"` caps it at 864. |
 | `panel` · `panelLabel` · `panelOpen` | The AI panel region at the right, named for its content, filled with the Panel parts. |
-| `onBack` · `onClose` | A Back and a Close icon button in the header row. A focused page leads its title row with its own Close instead. |
 | `surfaceDirect` | Children go straight into the Page with no content box, for a bare column or a full-bleed view. |
-| `bar` | Planned. The focused bottom bar, 48 high, with Back and Next, full bleed. Today the page places the bar, so the Anatomy bar is the target shape. |
+| `bar` | Planned. The multi-step footer, 48 high, with Save and exit, Back and Next. Today the page places the footer. |
 | `banner` | Planned. System news across the whole width above the Sidebar and the Page. |
 
 ## Sizes
@@ -180,7 +161,7 @@ Lengths are in pixels. Where the layout mode changes a value, the columns read M
 
 | Do | Don't |
 | --- | --- |
-| Name the focused task for what it does: "Plan a tutoring term". | A generic title such as "Wizard". |
+| Name the multi-step task for what it does: "Plan a tutoring term". | A generic title such as "Wizard". |
 | Name the panel for its content with `panelLabel`: "AI chat". | A generic name such as "Panel". |
 | Name steps with one noun each: "Student", "Schedule", "Review". | A sentence for a step. |
 | Keep Back and Next named for what they do. | Icon buttons with no name. |
@@ -192,11 +173,6 @@ Lengths are in pixels. Where the layout mode changes a value, the columns read M
 | `id` | string | — | — |
 | `areaKey` | string or number | — | Current Sidebar area key: changing it fades the old page out on `appearance.fast`, then fades the new page in on `appearance.default`. |
 | `header` | node | — | The Page's header row, 32 high on the logo row's center line: the breadcrumb. While the Sidebar is closed it follows the toggle. |
-| `onBack` | func | — | A focused page: called when Back is pressed. With it the header row leads with a Back icon button. |
-| `backHref` | string | — | A focused page: where Back goes, as a link. |
-| `backLabel` | string | `'Back'` | The accessible name of Back. |
-| `onClose` | func | — | A focused page: called when Close is pressed. With it the header row ends with a Close icon button. |
-| `closeLabel` | string | `'Close'` | The accessible name of Close. |
 | `sidebar` | node | — | Sidebar content. Without it there is no Sidebar and no toggle. |
 | `sidebarDocked` | bool | — | Sets the Sidebar's default request: true opens it, false closes it. Under 1024 it never docks. Unset opens it where it fits. |
 | `panel` | node | — | Panel area content, usually a `PanelContainer` and its parts. Without it there is no Panel. |
@@ -223,7 +199,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-width-default` · `--content-max-width` · `--content-max-width-reading` · `--content-min-width` · `--control-md` · `--ds-border` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-default` · `--ds-motion-spatial-default-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-motion-spatial-slow` · `--ds-motion-spatial-slow-duration` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-sunken` · `--ds-text` · `--frame-panel-width` · `--frame-sidebar-pad` · `--frame-sidebar-width` · `--grid-columns` · `--grid-gutter` · `--inline-md` · `--layer-frame-docked-edge` · `--layer-frame-edge` · `--layer-frame-panel-peek` · `--layer-frame-sidebar` · `--layer-frame-splitter` · `--pad-x-sm` · `--pad-x-xs` · `--page-pad` · `--page-stack-md` · `--page-stack-sm` · `--panel-width-default`
+`--border-width-default` · `--content-max-width` · `--content-max-width-reading` · `--content-min-width` · `--control-md` · `--ds-border` · `--ds-border-material` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-default` · `--ds-motion-spatial-default-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-motion-spatial-slow` · `--ds-motion-spatial-slow-duration` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-material-overlay` · `--ds-surface-sunken` · `--ds-text` · `--frame-panel-width` · `--frame-sidebar-pad` · `--frame-sidebar-width` · `--grid-columns` · `--grid-gutter` · `--inline-md` · `--layer-frame-docked-edge` · `--layer-frame-edge` · `--layer-frame-panel-peek` · `--layer-frame-sidebar` · `--layer-frame-splitter` · `--pad-x-sm` · `--pad-x-xs` · `--page-pad` · `--page-stack-md` · `--page-stack-sm` · `--panel-width-default`
 
 From `design-system/src/patterns/Frame/Frame.scss`. Override these through the token layer, never with a literal.
 

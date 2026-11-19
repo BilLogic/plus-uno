@@ -7,6 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
+import { withCliDistLock } from './lib/cli-dist-lock.mjs';
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { PACKAGE_NAME } from '../packages/cli/src/constants.mjs';
 
@@ -43,7 +44,7 @@ test('the README install lines read the constant', () => {
 test('npm pack, install in a scratch project, `npx ds find Button` answers from the snapshot', { timeout: 300_000 }, () => {
   const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'plus-uno-cli-'));
   try {
-    const out = sh('npm', ['pack', '--json', '--pack-destination', scratch], PKG);
+    const out = withCliDistLock(() => sh('npm', ['pack', '--json', '--pack-destination', scratch], PKG));
     const [{ filename, size, unpackedSize }] = JSON.parse(out.slice(out.indexOf('[\n')));
     const budget = JSON.parse(fs.readFileSync(path.join(PKG, 'snapshot-budget.json'), 'utf8'));
     assert.ok(size <= budget.packedBytes, `tarball ${size} B is over the ${budget.packedBytes} B budget`);

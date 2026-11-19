@@ -9,6 +9,7 @@
  *   contrast pairs      text, icons and edges on the grounds they are drawn on
  *   accent pairings     every accent family's tag text, bold fill and icon
  *   row-state grounds   meta text, links, focus and field edges on hovered, selected and overlay grounds
+ *   material grounds    body text on the translucent overlay and control materials over pure white and pure black, the worst page behind them
  *   collapsed states    base, hovered and pressed never share a value; the selection ladder stays ordered
  *   tint vs frame       status tints read as tints against the page and the sunken frame
  *   chart color vision  neighbors in categorical series 1-6 and the SMART series stay apart, under

@@ -108,7 +108,7 @@ export default {
         spacing: {
             control: 'inline-radio',
             options: BUTTON_SPACINGS,
-            description: 'Height and padding: `default` draws 32, `compact` draws 24, `spacious` draws 48. Compact is for tables and tight toolbars; spacious is for modal, panel and focused-view footers.',
+            description: 'Height and padding: `default` draws 32, `compact` draws 24, `spacious` draws 48. Compact is for tables and tight toolbars; spacious is for modal and panel footers.',
             table: { category: 'Design' }
         },
         shouldFitContainer: {
@@ -376,7 +376,7 @@ export const Compact = {
     },
 };
 
-/** Spacious spacing, 48 high, for modal, panel and focused-view footers. */
+/** Spacious spacing, 48 high, for modal and panel footers. */
 export const Spacious = {
     render: () => <Button appearance="primary" spacing="spacious" text="Spacious" />,
     play: async ({ canvas }) => {

@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import { Breadcrumb, Sidebar as RoleSidebar, Button } from '@/components';
+import { Breadcrumb, Button } from '@/components';
 import { Frame } from '@/patterns';
-import PatternSidebar, {
+import Sidebar, {
     createOpenTabsStore,
     OpenTabsProvider,
     SIDEBAR_SECTIONS_STORAGE_KEY,
-} from '@/patterns/Sidebar';
+} from './index';
 import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { MotionPreferenceContext } from '@/lib/motionPreference';
 
 /**
- * `PatternSidebar` — the app's side navigation.
+ * `Sidebar` — the app's side navigation.
  *
  * THE TEST SEAM IS THIS FILE. Each story is one state of the signed-off
  * prototype's dial (view, onboarding, sections, tabs, tab state, sidebar
@@ -110,7 +110,7 @@ const Live = ({ view = 'supervisor', tabSet = 'few', boxHeight, account, ...args
     const [tabs, setTabs] = useState(TAB_SETS[tabSet]);
     return (
         <Box height={boxHeight}>
-            <PatternSidebar
+            <Sidebar
                 groups={groups(view)}
                 account={account ?? (view === 'tutor' ? TUTOR : ACCOUNT)}
                 helpHref="https://www.notion.so/"
@@ -141,24 +141,32 @@ const settledLayout = (Story) => <MotionPreferenceContext.Provider value><Story 
 export default {
     decorators: [settledLayout],
     title: 'Components/Navigation/Navigation system/Navigation system',
-    component: PatternSidebar,
+    component: Sidebar,
     tags: ['!dev', '!autodocs'],
     render: (args) => <Live {...args} />,
     args: { view: 'supervisor', tabSet: 'few', activeId: 'sessions', modulesLeft: 0, lessonsLeft: 0, label: 'Main', storageKey: SIDEBAR_SECTIONS_STORAGE_KEY },
     argTypes: {
         view: { control: 'inline-radio', options: ['tutor', 'supervisor'], table: { category: 'Story' } },
         tabSet: { control: 'inline-radio', options: ['none', 'few', 'many'], table: { category: 'Story' } },
+        user: { control: 'inline-radio', options: ['tutor', 'supervisor'], table: { category: 'Content' } },
         groups: { control: false, table: { category: 'Content' } },
         tabs: { control: false, table: { category: 'Content' } },
+        countTags: { control: false, table: { category: 'Content' } },
         account: { control: 'object', table: { category: 'Content' } },
         modulesLeft: { control: { type: 'number', min: 0 }, table: { category: 'Content' } },
         lessonsLeft: { control: { type: 'number', min: 0 }, table: { category: 'Content' } },
         activeId: { control: 'text', table: { category: 'Behavior' } },
+        activeTabId: { control: 'text', table: { category: 'Behavior' } },
         helpHref: { control: 'text', table: { category: 'Content' } },
         homeHref: { control: 'text', table: { category: 'Content' } },
+        slackUrl: { control: 'text', table: { category: 'Content' } },
         storageKey: { control: 'text', table: { category: 'Behavior' } },
         label: { control: 'text', table: { category: 'Accessibility' } },
+        visible: { control: 'boolean', table: { category: 'Behavior' } },
         onSelect: { table: { disable: true } },
+        onHomeClick: { table: { disable: true } },
+        onTabClick: { table: { disable: true } },
+        onOpenTabSelect: { table: { disable: true } },
         onSelectTab: { table: { disable: true } },
         onCloseTab: { table: { disable: true } },
         onCloseAllTabs: { table: { disable: true } },
@@ -239,7 +247,7 @@ export const Geometry = {
         const threadX = leftX(canvasElement, thread) + px(line.left) + px(line.width) / 2;
         await expect(threadX, 'thread on the icon column').toBeCloseTo(32, 0);
         const turn = getComputedStyle(nav(canvasElement).querySelector('.plus-pattern-sidebar__tab--last .plus-pattern-sidebar__slot'), '::after');
-        await expect(px(turn.borderBottomLeftRadius), 'the last tab turns at radius 6').toBeCloseTo(tokenLength(canvasElement, '--frame-sidebar-row-radius'), 0);
+        await expect(px(turn.borderBottomLeftRadius), 'the last tab turns at radius 8').toBeCloseTo(tokenLength(canvasElement, '--frame-sidebar-row-radius'), 0);
         const mark = canvasElement.querySelector('.plus-pattern-sidebar__brand .plus-logo');
         await expect(leftX(canvasElement, mark), 'mark on the slot edge').toBeCloseTo(20, 0);
         await expect(px(getComputedStyle(mark).height), 'lockup height 24').toBeCloseTo(24, 0);
@@ -319,11 +327,26 @@ export const Tutor = {
     },
 };
 
+/** Default content: with no `groups` or `user` prop, Sidebar renders the tutor role's groups with Home selected. */
+export const DefaultRole = {
+    render: () => (
+        <Box>
+            <Sidebar account={TUTOR} storageKey={null} onToggle={() => {}} />
+        </Box>
+    ),
+    play: async ({ canvasElement }) => {
+        const titles = [...nav(canvasElement).querySelectorAll('.plus-pattern-sidebar__title-text')].map((t) => t.textContent);
+        await expect(titles).toEqual(['Training', 'Toolkit']);
+        await expect(rowNamed(canvasElement, 'Home')).toHaveAttribute('aria-current', 'page');
+        await expect(rowNamed(canvasElement, 'Sessions')).toBeVisible();
+    },
+};
+
 /** A prototype: keeps the role's navigation with its own area added to the Toolkit and selected. */
 export const PrototypeAreas = {
     render: () => (
         <Box>
-            <RoleSidebar
+            <Sidebar
                 user="tutor"
                 groups={[
                     {
@@ -685,7 +708,7 @@ const InFrame = ({ width, sidebarDocked }) => {
                 <Frame
                     sidebarDocked={sidebarDocked}
                     header={<Breadcrumb items={[{ text: 'Toolkit' }, { text: 'Sessions' }]} />}
-                    sidebar={<RoleSidebar user="supervisor" activeTabId="sessions" account={ACCOUNT} countTags={{ 'compliance-monitor': { count: 3, countLabel: '3 open flags' } }} lessonsLeft={2} />}
+                    sidebar={<Sidebar user="supervisor" activeTabId="sessions" account={ACCOUNT} countTags={{ 'compliance-monitor': { count: 3, countLabel: '3 open flags' } }} lessonsLeft={2} />}
                     panelStorageKey={null}
                 >
                     <p style={{ margin: 0 }}>Upcoming and past sessions.</p>
@@ -708,7 +731,6 @@ export const SidebarOpen = {
         await expect(getComputedStyle(aside).backgroundColor, 'the sunken fill').toBe(tokenColor(canvasElement, '--ds-surface-sunken'));
         await expect(getComputedStyle(aside).boxShadow, 'docked: the 1px line, no shadow')
             .toBe(computedShadow(canvasElement, 'var(--border-width-default) 0 0 0 var(--ds-border)'));
-        await expect(canvasElement.querySelector('.plus-frame__topbar'), 'no top bar').toBeNull();
         await userEvent.keyboard('{Control>}[[{/Control}');
         await waitFor(() => expect(canvas.getByRole('button', { name: 'Open sidebar' })).toHaveFocus());
         await userEvent.click(canvas.getByRole('button', { name: 'Open sidebar' }));
@@ -746,7 +768,7 @@ export const SidebarFloating = {
             return el;
         });
         await expect(getComputedStyle(aside).position).toBe('absolute');
-        await expect(getComputedStyle(aside).backgroundColor, 'the overlay fill').toBe(tokenColor(canvasElement, '--ds-surface-overlay'));
+        await expect(getComputedStyle(aside).backgroundColor, 'the overlay material').toBe(tokenColor(canvasElement, '--ds-surface-material-overlay'));
         await expect(getComputedStyle(aside).boxShadow, 'the overlay shadow').not.toBe('none');
         await expect(canvas.getByRole('button', { name: 'Close sidebar' })).toHaveFocus();
         // The first Escape may close the focused toggle's tooltip; the next closes the Sidebar.
@@ -755,6 +777,315 @@ export const SidebarFloating = {
             expect(canvasElement.querySelector('.plus-frame__sidebar--raised')).toBeNull();
         });
         await waitFor(() => expect(canvas.getByRole('button', { name: 'Open sidebar' })).toHaveFocus());
+    },
+};
+
+/* ------------------------------------------------------------- inner sidebar */
+
+const SESSION_OPTIONS = [
+    { id: 't-s1', text: '4:00 PM · Ms. Ortiz' },
+    { id: 't-s2', text: '5:30 PM · Mr. Patel' },
+];
+const STAGES = [
+    { id: 'stage-prep', text: 'Prep' },
+    { id: 'stage-session', text: 'Session' },
+    { id: 'stage-reflect', text: 'Reflect' },
+    { id: 'stage-feedback', text: 'Feedback', dot: true },
+];
+const TASK_STEPS = [
+    { id: 'step-profile', text: 'Your profile' },
+    { id: 'step-availability', text: 'Availability' },
+    { id: 'step-agreements', text: 'Agreements' },
+];
+
+/**
+ * A session opens its stages in an inner sidebar; Back returns to the main
+ * Sidebar with the session as one open row under Sessions. The page stays put,
+ * so the story keeps its own `data-page` element that nothing here changes.
+ */
+const InnerSession = ({ startInner = true, ...args }) => {
+    const [inner, setInner] = useState(startInner);
+    const [sessionId, setSessionId] = useState('t-s1');
+    const [stage, setStage] = useState('stage-prep');
+    const tabs = { sessions: SESSION_TABS.slice(0, 2) };
+    return (
+        <Box height={520}>
+            <div data-page="session" style={{ position: 'absolute', insetBlockStart: 0, insetInlineEnd: 0 }}>Session page</div>
+            <Sidebar
+                groups={groups('tutor')}
+                account={TUTOR}
+                storageKey={null}
+                onToggle={() => {}}
+                tabs={tabs}
+                activeId={inner ? stage : sessionId}
+                onSelect={(id) => { if (inner) setStage(id); args.onSelect?.(id); }}
+                onSelectTab={(tab) => { setSessionId(tab.id); setInner(true); }}
+                inner={inner ? {
+                    areaLabel: 'Sessions',
+                    rows: STAGES,
+                    switcher: { label: 'Session', value: sessionId, options: SESSION_OPTIONS, onChange: (id) => { setSessionId(id); setStage('stage-prep'); } },
+                } : undefined}
+                onBack={() => { setInner(false); args.onBack?.(); }}
+            />
+        </Box>
+    );
+};
+
+/** A multi-step task swaps in its steps; Back leaves it as one open row under Home, with its progress. */
+const InnerTask = ({ startInner = true, ...args }) => {
+    const [inner, setInner] = useState(startInner);
+    const [step, setStep] = useState('step-availability');
+    return (
+        <Box height={520}>
+            <Sidebar
+                groups={groups('tutor')}
+                account={TUTOR}
+                storageKey={null}
+                onToggle={() => {}}
+                tabs={{ home: [{ id: 'task-onboarding', label: 'Finish your profile', progress: '2 of 3' }] }}
+                activeId={inner ? step : 'task-onboarding'}
+                onSelect={(id) => { if (inner) setStep(id); }}
+                onSelectTab={() => setInner(true)}
+                inner={inner ? { areaLabel: 'Home', rows: TASK_STEPS, label: 'Steps' } : undefined}
+                onBack={() => { setInner(false); args.onBack?.(); }}
+            />
+        </Box>
+    );
+};
+
+const innerNav = (canvasElement) => within(canvasElement).getByRole('navigation', { name: 'Main' });
+const swapBlock = (canvasElement) => canvasElement.querySelector('.plus-pattern-sidebar__swap');
+const backButton = (canvasElement) => within(innerNav(canvasElement)).getByRole('button', { name: 'Sessions' });
+const stageRows = (canvasElement) => within(innerNav(canvasElement)).getByRole('list', { name: 'Sessions steps' }).querySelectorAll('.plus-pattern-sidebar__row');
+const settled = (canvasElement) => waitFor(() => expect(canvasElement.querySelector('.plus-pattern-sidebar__swap[data-swapping]')).toBeNull(), { timeout: 3000 });
+
+/** Presses something and samples the swapping block on every frame until the swap settles. */
+const sampleSwap = async (canvasElement, press, ready) => {
+    const samples = [];
+    let running = true;
+    const read = () => {
+        const el = swapBlock(canvasElement);
+        if (el) {
+            const style = getComputedStyle(el);
+            const matrix = style.transform === 'none' ? null : new DOMMatrix(style.transform);
+            samples.push({ x: matrix ? matrix.m41 : 0, opacity: Number(style.opacity), motion: el.dataset.swapMotion, from: el.dataset.swapFrom });
+        }
+        if (running) requestAnimationFrame(read);
+    };
+    requestAnimationFrame(read);
+    await press();
+    await waitFor(ready);
+    await settled(canvasElement);
+    running = false;
+    return samples.filter((sample) => sample.motion);
+};
+
+/** The inner sidebar: Back with the area name centered, the context dropdown, then text-only rows on the grid. */
+export const InnerSidebar = {
+    render: (args) => <InnerSession {...args} />,
+    play: async ({ canvasElement }) => {
+        const back = backButton(canvasElement);
+        await expect(px(getComputedStyle(back).height), 'Back is 32 high').toBeCloseTo(tokenLength(canvasElement, '--control-md'), 0);
+        await expect(px(getComputedStyle(back).width), 'Back is full width, x 12 to 228').toBeCloseTo(216, 0);
+        await expect(getComputedStyle(back).backgroundColor, 'Back is the soft neutral fill').toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+        const label = back.querySelector('.plus-btn-text');
+        await expect(centerX(canvasElement, label), 'the area name is centered').toBeCloseTo(120, 0);
+        await expect(back.querySelector('.plus-btn-visual--before'), 'the back arrow sits at the start').not.toBeNull();
+        await expect(centerX(canvasElement, back.querySelector('.plus-btn-visual--before')), 'the arrow on the icon column').toBeCloseTo(32, 0);
+        const switcher = within(innerNav(canvasElement)).getByRole('button', { name: /Session: 4:00 PM/ });
+        await expect(px(getComputedStyle(switcher).width), 'the dropdown is full width').toBeCloseTo(216, 0);
+        const rows = [...stageRows(canvasElement)];
+        await expect(rows.map((row) => row.textContent)).toEqual(['Prep', 'Session', 'Reflect', 'Feedback']);
+        for (const row of rows) {
+            await expect(row.querySelector('.plus-pattern-sidebar__slot'), 'rows are text only').toBeNull();
+            await expect(px(getComputedStyle(row).height)).toBeCloseTo(tokenLength(canvasElement, '--control-md'), 0);
+            await expect(leftX(canvasElement, row.querySelector('.plus-pattern-sidebar__label')), 'the label starts on x 20').toBeCloseTo(20, 0);
+            await expect(px(getComputedStyle(row).borderTopLeftRadius), 'rows round 8').toBeCloseTo(8, 0);
+        }
+        await expect(rows[0], 'the current stage is selected').toHaveAttribute('aria-current', 'page');
+        await expect(selectedRows(canvasElement)).toHaveLength(1);
+    },
+};
+
+/** Rows round 8: a 32 row, height over 4, `--frame-sidebar-row-radius` on `--radius-control-md`. */
+export const RowsRoundEight = {
+    play: async ({ canvasElement }) => {
+        await expect(tokenLength(canvasElement, '--frame-sidebar-row-radius')).toBeCloseTo(8, 0);
+        await expect(tokenLength(canvasElement, '--frame-sidebar-row-radius')).toBeCloseTo(tokenLength(canvasElement, '--radius-control-md'), 0);
+        await expect(px(getComputedStyle(rowNamed(canvasElement, 'Sessions')).borderTopLeftRadius)).toBeCloseTo(8, 0);
+    },
+};
+
+/** Swap in and back: Back shows the main Sidebar and the page stays put; the session sits as one open row, selected. */
+export const InnerSwapInAndBack = {
+    render: (args) => <InnerSession startInner={false} {...args} />,
+    args: { onBack: fn() },
+    play: async ({ canvasElement, args }) => {
+        await expect(within(innerNav(canvasElement)).queryByRole('button', { name: 'Sessions' }), 'the main Sidebar shows first').toBeInTheDocument();
+        const page = canvasElement.querySelector('[data-page="session"]');
+        const stillPage = () => {
+            const look = getComputedStyle(page);
+            return { transform: look.transform, transition: look.transitionDuration, opacity: look.opacity };
+        };
+        const before = stillPage();
+        await expect(page, 'the page is on screen').toBeVisible();
+        await expect(before.transform, 'the page has no transform at rest').toBe('none');
+        await userEvent.click(tabNamed(canvasElement, /4:00 PM · Ms. Ortiz/));
+        await expect(stillPage(), 'the page does not animate as the swap starts').toEqual(before);
+        await waitFor(() => expect(backButton(canvasElement)).toBeVisible());
+        await expect(stillPage().transform, 'the page does not move during the swap').toBe('none');
+        await settled(canvasElement);
+        await expect(within(canvasElement).queryByRole('list', { name: 'Open Sessions' }), 'the main content has left').toBeNull();
+        await expect(backButton(canvasElement), 'focus lands on Back').toHaveFocus();
+        await userEvent.click(backButton(canvasElement));
+        await expect(args.onBack).toHaveBeenCalledTimes(1);
+        await waitFor(() => expect(within(canvasElement).getByRole('list', { name: 'Open Sessions' })).toBeVisible());
+        await settled(canvasElement);
+        const open = within(canvasElement).getByRole('list', { name: 'Open Sessions' });
+        const items = open.querySelectorAll(':scope > li');
+        await expect([...items].map((li) => li.classList.contains('plus-pattern-sidebar__tab--last')), 'the thread comes back, ending at the last open row').toEqual([false, true]);
+        await expect(selectedRows(canvasElement), 'one selected row: the session left open').toHaveLength(1);
+        await expect(selectedRows(canvasElement)[0].textContent).toMatch(/4:00 PM · Ms. Ortiz/);
+        await expect(canvasElement.querySelector('[data-page="session"]'), 'the page stays put').not.toBeNull();
+        await expect(selectedRows(canvasElement)[0], 'focus returns to the open row').toHaveFocus();
+    },
+};
+
+/** A task keeps its progress on its open row under Home. */
+export const InnerTaskOpenRow = {
+    render: (args) => <InnerTask {...args} />,
+    play: async ({ canvasElement }) => {
+        const list = within(innerNav(canvasElement)).getByRole('list', { name: 'Steps' });
+        await expect([...list.querySelectorAll('.plus-pattern-sidebar__row')].map((row) => row.textContent)).toEqual(['Your profile', 'Availability', 'Agreements']);
+        await userEvent.click(within(innerNav(canvasElement)).getByRole('button', { name: 'Home' }));
+        await waitFor(() => expect(within(canvasElement).getByRole('list', { name: 'Open Home' })).toBeVisible());
+        await settled(canvasElement);
+        const row = within(within(canvasElement).getByRole('list', { name: 'Open Home' })).getByRole('button', { name: /^Finish your profile/ });
+        await expect(row).toHaveAttribute('aria-current', 'page');
+        await expect(within(row).getByText('2 of 3')).toBeVisible();
+    },
+};
+
+/** A task's steps: done ones tick and stay pressable; steps past the answers are dimmed, explain why, and do nothing. */
+export const InnerStepsDoneAndOff = {
+    render: () => {
+        const [step, setStep] = useState('step-availability');
+        const order = TASK_STEPS.map((row) => row.id);
+        const at = order.indexOf(step);
+        const rows = TASK_STEPS.map((row, i) => ({
+            ...row,
+            done: i < at,
+            disabled: i > at,
+            disabledText: 'Answer the steps before it first.',
+        }));
+        return (
+            <Box height={520}>
+                <Sidebar
+                    groups={groups('tutor')}
+                    account={TUTOR}
+                    storageKey={null}
+                    onToggle={() => {}}
+                    activeId={step}
+                    onSelect={setStep}
+                    inner={{ areaLabel: 'Home', rows, label: 'Steps' }}
+                    onBack={() => {}}
+                />
+            </Box>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const list = within(innerNav(canvasElement)).getByRole('list', { name: 'Steps' });
+        const rowOf = (name) => within(list).getByRole('button', { name: new RegExp(`^${name}`) });
+        await expect(within(rowOf('Your profile')).getByText('Done'), 'a done step ticks').toBeInTheDocument();
+        await expect(rowOf('Your profile'), 'and stays pressable').not.toHaveAttribute('aria-disabled');
+        await expect(rowOf('Availability'), 'the current step is marked').toHaveAttribute('aria-current', 'page');
+        await expect(rowOf('Agreements'), 'a step past the answers is off').toHaveAttribute('aria-disabled', 'true');
+        await userEvent.click(rowOf('Agreements'));
+        await expect(rowOf('Availability'), 'pressing an off step does nothing').toHaveAttribute('aria-current', 'page');
+        await userEvent.click(rowOf('Your profile'));
+        await expect(rowOf('Your profile'), 'a done step goes back').toHaveAttribute('aria-current', 'page');
+        await expect(rowOf('Availability'), 'and the later one is off again').toHaveAttribute('aria-disabled', 'true');
+        await expect(within(rowOf('Your profile')).queryByText('Done'), 'the current step is not ticked').toBeNull();
+    },
+};
+
+/** Keyboard: Back first, then the context dropdown, then each row in order; Enter picks a row; the dropdown opens by key and picks by key. */
+export const InnerKeyboard = {
+    render: (args) => <InnerSession {...args} />,
+    play: async ({ canvasElement }) => {
+        await settled(canvasElement);
+        const back = backButton(canvasElement);
+        back.focus();
+        await userEvent.tab();
+        const trigger = within(innerNav(canvasElement)).getByRole('button', { name: /Session: / });
+        await expect(trigger, 'the dropdown follows Back').toHaveFocus();
+        await userEvent.tab();
+        const rows = [...stageRows(canvasElement)];
+        await expect(rows[0], 'then the first row').toHaveFocus();
+        await userEvent.tab();
+        await expect(rows[1]).toHaveFocus();
+        await userEvent.keyboard('{Enter}');
+        await expect(rows[1], 'Enter picks the row').toHaveAttribute('aria-current', 'page');
+        await expect(selectedRows(canvasElement)).toHaveLength(1);
+        trigger.focus();
+        await userEvent.keyboard('{Enter}');
+        await userEvent.click(await within(document.body).findByRole('menuitem', { name: /5:30 PM · Mr. Patel/ }));
+        await waitFor(() => expect(within(innerNav(canvasElement)).getByRole('button', { name: /Session: 5:30 PM/ })).toBeVisible());
+        await expect(stageRows(canvasElement)[0], 'a new session starts at its first stage').toHaveAttribute('aria-current', 'page');
+        back.focus();
+        await userEvent.keyboard('{Enter}');
+        await waitFor(() => expect(within(canvasElement).getByRole('list', { name: 'Open Sessions' })).toBeVisible());
+    },
+};
+
+/**
+ * Swap motion: the new content enters as one block, sliding 12 from the end
+ * going in and from the start going back on spatial.fast, fading on
+ * appearance.fast, and never overshoots.
+ */
+export const InnerSwapMotion = {
+    decorators: [(Story) => <MotionPreferenceContext.Provider value={false}><Story /></MotionPreferenceContext.Provider>],
+    render: (args) => <InnerSession startInner={false} {...args} />,
+    play: async ({ canvasElement }) => {
+        const into = await sampleSwap(
+            canvasElement,
+            () => userEvent.click(tabNamed(canvasElement, /4:00 PM · Ms. Ortiz/)),
+            () => expect(backButton(canvasElement)).toBeVisible(),
+        );
+        await expect(into.length, 'the swap was sampled').toBeGreaterThan(0);
+        await expect(new Set(into.map((s) => s.motion)), 'slide and fade').toEqual(new Set(['slide-fade']));
+        await expect(new Set(into.map((s) => s.from))).toEqual(new Set(['end']));
+        const travelIn = into.map((s) => s.x);
+        await expect(Math.max(...travelIn), 'it slides').toBeGreaterThan(0);
+        await expect(Math.max(...travelIn), 'by 12 at most, from the end').toBeLessThanOrEqual(tokenLength(canvasElement, '--inline-lg') + 0.01);
+        await expect(Math.min(...travelIn), 'with no overshoot past rest').toBeGreaterThanOrEqual(-0.01);
+        await expect(Math.min(...into.map((s) => s.opacity)), 'it fades in').toBeLessThan(1);
+        await expect(Math.max(...into.map((s) => s.opacity)), 'with no overshoot').toBeLessThanOrEqual(1);
+        const back = await sampleSwap(
+            canvasElement,
+            () => userEvent.click(backButton(canvasElement)),
+            () => expect(within(canvasElement).getByRole('list', { name: 'Open Sessions' })).toBeVisible(),
+        );
+        await expect(new Set(back.map((s) => s.from)), 'going back it comes from the start').toEqual(new Set(['start']));
+        await expect(Math.min(...back.map((s) => s.x))).toBeLessThan(0);
+        await expect(Math.max(...back.map((s) => s.x)), 'with no overshoot past rest').toBeLessThanOrEqual(0.01);
+        await expect(getComputedStyle(swapBlock(canvasElement)).transform, 'at rest nothing is transformed').toBe('none');
+    },
+};
+
+/** Reduced motion keeps the fade only: nothing slides. */
+export const InnerSwapReducedMotion = {
+    render: (args) => <InnerSession startInner={false} {...args} />,
+    play: async ({ canvasElement }) => {
+        const into = await sampleSwap(
+            canvasElement,
+            () => userEvent.click(tabNamed(canvasElement, /4:00 PM · Ms. Ortiz/)),
+            () => expect(backButton(canvasElement)).toBeVisible(),
+        );
+        await expect(into.length).toBeGreaterThan(0);
+        await expect(new Set(into.map((s) => s.motion))).toEqual(new Set(['fade']));
+        await expect(into.every((s) => s.x === 0), 'no frame is translated').toBe(true);
+        await expect(Math.min(...into.map((s) => s.opacity)), 'it still fades').toBeLessThan(1);
     },
 };
 

@@ -197,7 +197,6 @@ const CODE_ONLY_FRAME_LAYERS = {
     // Frame.scss does arithmetic on none of them.
     'layer-frame-edge': { value: 'calc(var(--layer-navigation) - 1)', note: 'the hover strips that peek a closed Sidebar or Panel', figmaName: 'Layer/frame-edge' },
     'layer-frame-sidebar': { value: 'var(--layer-navigation)', note: 'the raised Sidebar', figmaName: 'Layer/frame-sidebar' },
-    'layer-frame-topbar-start': { value: 'calc(var(--layer-navigation) + 1)', note: 'the Topbar start, above a raised Sidebar', figmaName: 'Layer/frame-topbar-start' },
     'layer-frame-blanket': { value: 'calc(var(--layer-navigation) + 2)', note: "the overlay Panel's Blanket", figmaName: 'Layer/frame-blanket' },
     'layer-frame-panel-peek': { value: 'calc(var(--layer-navigation) + 3)', note: 'a peeking or overlay Panel, above its Blanket', figmaName: 'Layer/frame-panel-peek' },
     'layer-frame-splitter': { value: '1', note: "local to the Panel's own stacking context, not a step on the navigation scale: the splitter's hit strip", figmaName: 'Layer/frame-splitter' },

@@ -83,8 +83,9 @@ const SURFACES = [
   { file: 'design-system/src/components/overlays-and-layering/Popup/Popup.scss', rule: '.plus-popup {', shadow: '--ds-shadow-overlay' },
   { file: 'design-system/src/components/messaging/Flag/Flag.scss', rule: '.plus-flag', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
   // The floating Sidebar floats, so it takes the overlay pair; the docked one stays on the sunken fill.
-  { file: 'design-system/src/patterns/Frame/Frame.scss', rule: '.plus-frame__sidebar--raised {', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
-  { file: 'design-system/src/components/messaging/Dialog/Dialog.scss', rule: '.plus-dialog {', shadow: '--ds-shadow-blocking', fill: '--ds-surface-overlay' },
+  { file: 'design-system/src/patterns/Frame/Frame.scss', rule: '.plus-frame__sidebar--raised {', shadow: '--ds-shadow-overlay', fill: '--ds-surface-material-overlay' },
+  { file: 'design-system/src/patterns/Frame/Frame.scss', rule: '.plus-frame__panel--overlay,\n.plus-frame__panel--peek {\n    position', shadow: '--ds-shadow-overlay', fill: '--ds-surface-material-overlay' },
+  { file: 'design-system/src/components/messaging/Dialog/Dialog.scss', rule: '.plus-dialog {', shadow: '--ds-shadow-blocking', fill: '--ds-surface-material-overlay' },
   { file: 'design-system/src/patterns/Modal/Modal.scss', rule: '.plus-modal {', shadow: '--ds-shadow-blocking' },
   { file: 'design-system/src/components/forms-and-inputs/_internal/Listbox.scss', rule: '', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
   { file: 'design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.scss', rule: '.plus-dropdown-menu {', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
@@ -253,4 +254,15 @@ test('no pattern or Popover-family stylesheet writes a literal shadow', () => {
       assert.doesNotMatch(match[1], /rgba?\(|#[0-9a-f]{3,8}\b/i, `${file}: literal shadow "${match[1]}"`);
     }
   }
+});
+
+test('the overlay material is the ground of every floating shell, and a standalone Panel is on the page ground', () => {
+  const read = (file) => fs.readFileSync(path.join(REPO_ROOT, file), 'utf8');
+  // A standalone Panel sits in Layer 1 like a docked one; only a floating Panel is on the overlay material.
+  assert.match(read('design-system/src/patterns/Panel/Panel.scss'), /^\.plus-panel \{[^}]*background: var\(--ds-surface\);/m);
+  // Each floating shell keeps a visible edge in the material's border color, which forced colors preserve.
+  const frame = read('design-system/src/patterns/Frame/Frame.scss');
+  assert.match(frame, /\.plus-frame__sidebar--raised \{[^}]*outline: var\(--border-width-default\) solid var\(--ds-border-material\)/);
+  assert.match(frame, /\.plus-frame__panel--peek \{[^}]*border-inline-start-color: var\(--ds-border-material\)/);
+  assert.match(read('design-system/src/components/messaging/Dialog/Dialog.scss'), /\.plus-dialog \{[^}]*outline: var\(--border-width-default\) solid var\(--ds-border-material\)/);
 });

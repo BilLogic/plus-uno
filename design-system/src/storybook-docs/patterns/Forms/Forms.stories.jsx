@@ -2,7 +2,7 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { settleAnimations } from '@/storybook-docs/lib/overlay-motion-plays';
-import { BAR_TOKEN } from '@/storybook-docs/lib/focused-task.jsx';
+import { BAR_TOKEN, TASK_STAGE } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { expectFullScale, expectNotInert } from '@/storybook-docs/lib/live-example-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
@@ -126,7 +126,7 @@ export const HostModal = {
 
 export const HostSteps = {
     name: 'Host: In steps',
-    render: () => staged(<FormInSteps />),
+    render: () => staged(<FormInSteps />, TASK_STAGE),
     play: async ({ canvas, canvasElement }) => {
         await settleAnimations(canvasElement);
         await expectNotInert(canvasElement);
@@ -154,7 +154,7 @@ export const OneQuestionPerStep = {
             return (box.left + box.right) / 2;
         };
 
-        await expect(canvas.queryByRole('navigation', { name: 'Main' }), 'Frame is focused without a Sidebar').toBeNull();
+        await expect(canvas.queryByRole('navigation', { name: 'Main' }), 'the form sits in the Page, with no Sidebar').toBeNull();
         await expect(canvas.queryByRole('navigation', { name: 'Steps' }), 'under five steps omits the left step list').toBeNull();
 
         const progress = canvas.getByRole('group', { name: 'Setup progress' });

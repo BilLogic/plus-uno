@@ -171,7 +171,7 @@ export const Dividers = {
     },
 };
 
-/** Docked sidebar carries one 1 px border on its page edge; the topbar carries none. */
+/** Docked sidebar carries one 1 px border on its page edge; the page header carries none. */
 export const SidebarEdges = {
     render: () => (
         <DoDont>
@@ -186,7 +186,7 @@ export const SidebarEdges = {
                     </Page>
                 </InAppFrame>
             </Do>
-            <Dont caption="A line under the topbar adds a second edge the Frame does not use.">
+            <Dont caption="A line under the page header adds a second edge the Frame does not use.">
                 <InAppFrame
                     height="var(--height-2000)"
                     panelStorageKey={null}

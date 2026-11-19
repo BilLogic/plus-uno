@@ -19,7 +19,9 @@ authored half, counted rather than assumed.
   - For a step-by-step workflow rather than pages of results, use `ProgressTracker`.
   - For a bounded list that scrolls inside a fixed region, use `ScrollBar`.
   - For a continuously loading feed, use infinite scroll rather than pages.
-- **[Sidebar](Sidebar/index.md)** — The PLUS sidebar: the Sidebar pattern (`@/patterns`) filled with the groups for the role (`sidebarConfig.js`), the signed-in person's account row, and the open tabs. Home is selected when nothing else is. Pass `groups` to add or override a prototype's own area(s) by `id` while keeping the role's navigation. Open tabs come from `useOpenTabs()`: a page that opens a record (a session, a student) calls `open(parentId, record)`, and the record shows here as a tab under its row. A tab is selected while its row is the current page (`activeTabId`); elsewhere the page's own row is. Pressing a tab selects it and calls `onOpenTabSelect(tab)`, which is where an app goes to the record's route if it is not already there. Signing out clears the tabs. Nothing here changes the URL.
+- **[Sidebar](Sidebar/index.md)** — Use `Sidebar` for the app's main areas. `Sidebar` (`@/components`) fills the rail from the role's config (`user`), and a prototype passes `groups` to add or override its own areas by `id` while keeping the role's navigation. The Frame decides whether it docks, collapses or floats; this page covers what is inside it.
+  - For switching between views of a single subject inside a page, use `Tabs`.
+  - For showing position inside a deep hierarchy above the page title, use `Breadcrumb`.
 - **[Tabs](Tabs/index.md)** — Use `Tabs` for the tab bar that switches between sibling views on the same page — a student's Overview / Sessions / Progress, or the sections of an admin page. Compose it from `Tabs.Tab` children, and declare a `Tabs.Panel` alongside each one when the tab's content should be owned by the component rather than rendered separately.
   - For navigating to a different page in a hierarchy, use `Breadcrumb` or `Sidebar`.
   - For more options than fit on one strip without wrapping, use `Select`.
@@ -31,10 +33,10 @@ authored half, counted rather than assumed.
 | [Breadcrumb](Breadcrumb/index.md) | 6 | ✅ | ✅ | ✅ |
 | [Link](Link/index.md) | 7 | ✅ | ✅ | ✅ |
 | [Pagination](Pagination/index.md) | 11 | ✅ | ✅ | ✅ |
-| [Sidebar](Sidebar/index.md) | 18 | ✕ | ✕ | ✕ |
+| [Sidebar](Sidebar/index.md) | 31 | ✅ | ✅ | ✅ |
 | [Tabs](Tabs/index.md) | 9 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 4/5 (80%) · Correct/incorrect 4/5 (80%) · Accessibility 4/5 (80%)
+**Authored coverage:** When to use 5/5 (100%) · Correct/incorrect 5/5 (100%) · Accessibility 5/5 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

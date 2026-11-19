@@ -37,8 +37,6 @@ export const MOTION_REGISTRY = [
       'sidebar-close': { transition: 'Dock and undock a panel', spatial: 'spatial.fast', note: 'It closes on spatial.fast to its edge and leaves nothing behind: no rail.' },
       'panel-dock': { transition: 'Dock and undock a panel', spatial: 'spatial.slow', appearance: 'appearance.fast', note: 'The AI Panel docks on the right and the Page makes room; its content fades in once the page is about 90% done.' },
       'panel-undock': { transition: 'Dock and undock a panel', spatial: 'spatial.default', note: 'It reverses and stays at the edge.' },
-      'focused-open': { transition: 'Drill into and climb back out', appearance: 'appearance.default', note: 'Focused opens as a change of frame: the page and the Sidebar fade out together on appearance.fast, then the task fades in, in place. A focused task fades; it does not grow or slide. Bare frames, such as sign-in, do not move.' },
-      'focused-close': { transition: 'Drill into and climb back out', appearance: 'appearance.fast', note: 'Close reverses the entrance one speed faster: the task fades out, then the page and Sidebar fade back in, asking first in a Modal if anything is unsaved.' },
       step: { transition: 'Step to the next or previous', spatial: 'spatial.default', appearance: 'appearance.fast', note: 'The body slides on the same axis as the step list: up with the steps down the left, across with four or fewer across the top. Step states change in place. Placement is set once, when the task opens, by the longest path the flow can take.' },
     },
   },
@@ -47,7 +45,7 @@ export const MOTION_REGISTRY = [
     tier: 'template',
     events: {
       title: { transition: 'Scroll to a spot on the page', appearance: 'linear', note: 'The header is scroll-linked: the small title fades in at the end of the Breadcrumb row, its opacity mapped to the next 24 px of scroll. No spring, no timer, no snap when scrolling stops.' },
-      anchor: { transition: 'Scroll to a spot on the page', appearance: 'linear', note: 'The actions and the tabs ride up with the page and anchor: the actions at the end of the Breadcrumb row, the tabs under it. One copy of every control. A focused task header just sticks.' },
+      anchor: { transition: 'Scroll to a spot on the page', appearance: 'linear', note: 'The actions and the tabs ride up with the page and anchor: the actions at the end of the Breadcrumb row, the tabs under it. One copy of every control.' },
       'tabs-shadow': { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'The tabs\' shadow appears when they stick, a single moment. In Reduced mode nothing changes: every movement is the person\'s own scroll.' },
     },
   },
@@ -120,7 +118,7 @@ export const MOTION_REGISTRY = [
     name: 'Form',
     tier: 'template',
     events: {
-      focus: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'A form in a page, a Panel or a Modal moves by its container; a form in steps is Frame, focused. A field\'s border changes color on focus; the focus ring never animates. Field motion is in Patterns, Forms.' },
+      focus: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'A form in a page, a Panel or a Modal moves by its container; a form in steps is a multi-step task on Frame. A field\'s border changes color on focus; the focus ring never animates. Field motion is in Patterns, Forms.' },
       error: { transition: 'Call attention', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'An error on leaving a field makes room, then fades in; it fades and the room closes once the field is fixed.' },
     },
   },
@@ -464,19 +462,12 @@ export const MOTION_REGISTRY = [
     },
   },
   {
-    name: 'Panel',
-    tier: 'component',
-    events: {
-      enter: { transition: 'Dock and undock a panel', spatial: 'spatial.slow', note: 'Docked: slides in while the page resizes. Floating: spatial.default over the page. Narrow: slides over with a Blanket.' },
-      exit: { transition: 'Dock and undock a panel', spatial: 'spatial.default', note: 'Floating panels leave on spatial.fast.' },
-    },
-  },
-  {
     name: 'Sidebar',
     tier: 'component',
     events: {
       enter: { transition: 'Dock and undock a panel', spatial: 'spatial.default', note: 'Slides in from its edge while the Page narrows on the same clock; the Page toggle fades out.' },
       exit: { transition: 'Dock and undock a panel', spatial: 'spatial.fast', note: 'Slides out to its edge and leaves nothing behind; the Page widens and its toggle fades in.' },
+      swap: { transition: 'Swap content in place', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'The Sidebar container stays still and only its content swaps between the main and the inner sidebar. The old content leaves at once; the new enters as one block, no stagger, sliding 12 from the end going in and from the start going back, fading in, with no overshoot. The page does not animate. Reduced motion keeps only the fade.' },
     },
   },
   {

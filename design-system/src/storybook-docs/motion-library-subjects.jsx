@@ -37,9 +37,6 @@ import {
     NotificationItem,
     PageHeader,
     Pagination,
-    Panel,
-    PanelBody,
-    PanelHeader,
     Popup,
     PopupSelect,
     ProgressBar,
@@ -488,15 +485,6 @@ export const COMPONENT_SUBJECTS = Object.freeze({
             totalPages={4}
             onPageChange={NOOP}
         />
-    ),
-
-    Panel: () => (
-        <div style={{ width: '100%' }}>
-            <Panel width="100%">
-                <PanelHeader title="Student notes" />
-                <PanelBody>Focus on common denominators next week.</PanelBody>
-            </Panel>
-        </div>
     ),
 
     Popup: () => (

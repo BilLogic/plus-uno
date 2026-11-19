@@ -65,7 +65,7 @@ Collections prefixed `archived / ` and rows prefixed `Deprecated/` are legacy an
 
 - A heading's look comes from its text style, not its tag: `<h2 className="heading-lg">` draws the same at any level. Select a heading by its class, not its tag.
 - In the docs, the `.sbdocs hN` rules apply to MDX prose only: each is fenced with `:not(:where(.docs-story *))`, so a story's own headings draw at their real size. A new rule of that kind needs the same fence.
-- axe's `heading-order` misses a missing top, and its `page-has-heading-one` rule does not run when scoped to a story. In the default template the page-level Section header's title is the `h1`; in the focused template it is the task's name in the Frame's header row.
+- axe's `heading-order` misses a missing top, and its `page-has-heading-one` rule does not run when scoped to a story. In the default template the page-level Section header's title is the `h1`; in a multi-step task it is the task's name at the top of the Page.
 - Charts share `chartTheme`, which turns on the Highcharts accessibility module and sets `landmarkVerbosity: 'disabled'`. A chart that builds its own options carries `accessibility: chartTheme.accessibility`. Leave a chart outside `aria-hidden`: that wrapper hides the keyboard proxies the module creates.
 - Run the checks for a set of stories with `npx vitest --project=storybook --run <path>`.
 

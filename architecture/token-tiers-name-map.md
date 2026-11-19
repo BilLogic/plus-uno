@@ -93,13 +93,11 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 
 | Group | Token | Note |
 |---|---|---|
-| Frame | `--frame-topbar-height` |  |
 | Frame | `--frame-sidebar-width` |  |
-| Frame | `--frame-sidebar-width-nav` | fixed SideNav width (164), distinct from the responsive sidebar above |
 | Frame | `--frame-sidebar-pad` | the Sidebar pads 12 on every side |
 | Frame | `--frame-sidebar-row-gap` | two Sidebar rows sit 2 apart |
 | Frame | `--frame-sidebar-group-gap` | two Sidebar groups sit 16 apart |
-| Frame | `--frame-sidebar-row-radius` | the rounding of a Sidebar row (6) |
+| Frame | `--frame-sidebar-row-radius` | the rounding of a Sidebar row (8) |
 | Page | `--page-pad` (declared elsewhere) |  |
 | Page | `--page-stack-sm` (declared elsewhere) |  |
 | Page | `--page-stack-md` (declared elsewhere) |  |
@@ -195,13 +193,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Popup | `--tooltip-max-width` (declared elsewhere) |  |
 | Popup | `--popup-gap-screen` (declared elsewhere) |  |
 | Popup | `--popup-offset` (declared elsewhere) |  |
-| Focused page | `--focused-page-pad-x` (declared elsewhere) |  |
-| Focused page | `--focused-page-pad-y` (declared elsewhere) |  |
-| Focused page | `--focused-page-stack-sm` (declared elsewhere) |  |
-| Focused page | `--focused-page-stack-md` (declared elsewhere) |  |
-| Focused page | `--focused-page-stack-lg` (declared elsewhere) |  |
-| Focused page | `--focused-page-inline-sm` (declared elsewhere) |  |
-| Focused page | `--focused-page-inline-md` (declared elsewhere) |  |
 
 ## Components
 

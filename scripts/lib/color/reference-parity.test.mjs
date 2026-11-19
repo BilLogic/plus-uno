@@ -54,8 +54,10 @@ const values = (rows) => rows.map((r) => Object.fromEntries(VALUE_KEYS.map((k) =
 const withoutProse = (value) =>
   JSON.parse(currentNames(JSON.stringify(value, (k, v) => (k === 'description' || k === 'use' || k === 'deviation' ? undefined : v))));
 /** Tokens PLUS added after the reference was cut. */
-const PLUS_ONLY_TOKEN = /^color[./]background[./]competency[./][a-z-]+[./]subtle$|^color[./]ai[./]background[./]bold|^color[./]logo[./]|^opacity[./]chart[./]/;
-const PLUS_ONLY_SCSS_DECL = /^ +--ds-(?:background-competency-[a-z-]+-subtle|ai-background-bold[a-z-]*|logo-[a-z0-9-]+|opacity-chart-[a-z]+): [^\n]*\n/gm;
+const PLUS_ONLY_TOKEN = /^color[./]background[./]competency[./][a-z-]+[./]subtle$|^color[./]ai[./]background[./]bold|^color[./]logo[./]|^opacity[./]chart[./]|^color[./]border[./]material$|^elevation[./]surface[./]material[./]|^(?:white|overlay)Alpha[./]\d+$/;
+const PLUS_ONLY_SCSS_DECL = /^ +--(?:palette-(?:white|overlay)-alpha-\d+|ds-(?:background-competency-[a-z-]+-subtle|ai-background-bold[a-z-]*|logo-[a-z0-9-]+|opacity-chart-[a-z]+|surface-material-[a-z]+|border-material)): [^\n]*\n/gm;
+/** The material's reduced-transparency and forced-colors blocks, which the reference has no counterpart for. */
+const MATERIAL_FALLBACKS = /\n?@media \((?:prefers-reduced-transparency: reduce|forced-colors: active)\) \{[\s\S]*?\n\}\n/g;
 const withoutPlusOnly = (spec) => ({
   ...spec,
   collections: spec.collections.map((c) => ({ ...c, variables: c.variables.filter((v) => !PLUS_ONLY_TOKEN.test(v.name)) })),
@@ -77,7 +79,7 @@ const keptSpec = (spec) => ({
 const ELEVATION_2 = /shadow[./-](raised|blocking)\b/;
 const slotsToArray = (spec) => (Array.isArray(spec) ? spec : [spec.edge, spec.key, spec.ambient]);
 /** Our palette with the plan's named shadow slots in the reference's array form, and the departed shadows dropped. */
-const refShape = (palette) => ({
+const refShape = ({ whiteAlpha, overlayAlpha, ...palette }) => ({
   ...palette,
   shadow: { overlay: slotsToArray(palette.shadow.overlay) },
 });
@@ -149,7 +151,7 @@ for (const key of ['A', 'B']) {
   test(`Plan ${key}: palette and semantic SCSS match byte for byte below the header`, { skip }, () => {
     const files = renderPlan(key, 'scripts/generate-color-tokens.mjs');
     for (const file of ['_palette.scss', '_semantic.scss']) {
-      assert.equal(keptCss(body(files[file]).replace(PLUS_ONLY_SCSS_DECL, '')), keptCss(body(lagoonSwap(key)(readFileSync(join(REF, `out/${key}/${file}`), 'utf8')))), file);
+      assert.equal(keptCss(body(files[file]).replace(MATERIAL_FALLBACKS, '').replace(PLUS_ONLY_SCSS_DECL, '')), keptCss(body(lagoonSwap(key)(readFileSync(join(REF, `out/${key}/${file}`), 'utf8')))), file);
     }
   });
 

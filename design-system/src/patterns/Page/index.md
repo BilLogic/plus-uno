@@ -31,12 +31,12 @@ Page reads these motion tokens and no literal duration or curve.
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
 | title | Scroll to a spot on the page | `--ds-motion-linear` | The header is scroll-linked: the small title fades in at the end of the Breadcrumb row, its opacity mapped to the next 24 px of scroll. No spring, no timer, no snap when scrolling stops. |
-| anchor | Scroll to a spot on the page | `--ds-motion-linear` | The actions and the tabs ride up with the page and anchor: the actions at the end of the Breadcrumb row, the tabs under it. One copy of every control. A focused task header just sticks. |
+| anchor | Scroll to a spot on the page | `--ds-motion-linear` | The actions and the tabs ride up with the page and anchor: the actions at the end of the Breadcrumb row, the tabs under it. One copy of every control. |
 | tabs-shadow | Update a value or state | `--ds-motion-appearance-fast` | The tabs' shadow appears when they stick, a single moment. In Reduced mode nothing changes: every movement is the person's own scroll. |
 
 ## Alternatives
 
-- For one task that takes the whole window, use `Frame` in its focused type.
+- For one task that takes the whole window, use `Frame`.
 - For a region of the page with its own heading, use `PatternSection`.
 - For one object with an agreed shape, use `PatternCard` inside a Section.
 
@@ -116,7 +116,7 @@ Which tier a message belongs to: the Notifications pattern.
 - Elevation: use when picking which shadow goes with which level.
 - Patterns: use when deciding where a breadcrumb or a tab belongs (Navigation), or choosing the StatusTag beside the title (Indicators).
 
-Same group: `AiChat` · `Frame` · `Modal` · `PatternCard` · `PatternSection` · `PatternSidebar` · `Table`
+Same group: `AiChat` · `Frame` · `Modal` · `Panel` · `PatternCard` · `PatternSection` · `Table`
 
 ## Types
 

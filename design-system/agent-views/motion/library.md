@@ -14,8 +14,6 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Frame | template | sidebar-close | Dock and undock a panel | `--ds-motion-spatial-fast` |  |
 | Frame | template | panel-dock | Dock and undock a panel | `--ds-motion-spatial-slow` · `--ds-motion-appearance-fast` |  |
 | Frame | template | panel-undock | Dock and undock a panel | `--ds-motion-spatial-default` |  |
-| Frame | template | focused-open | Drill into and climb back out | `--ds-motion-appearance-default` |  |
-| Frame | template | focused-close | Drill into and climb back out | `--ds-motion-appearance-fast` |  |
 | Frame | template | step | Step to the next or previous | `--ds-motion-spatial-default` · `--ds-motion-appearance-fast` |  |
 | Modal | template | enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` |  |
 | Modal | template | exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` |  |
@@ -155,8 +153,6 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | NotificationItem | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | PageHeader | component | change | Scroll to a spot on the page | `--ds-motion-linear` |  |
 | Pagination | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
-| Panel | component | enter | Dock and undock a panel | `--ds-motion-spatial-slow` |  |
-| Panel | component | exit | Dock and undock a panel | `--ds-motion-spatial-default` |  |
 | Popup | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Popup | component | exit | Open and close an overlay | `--ds-motion-spatial-exit` · `--ds-motion-appearance-fast` |  |
 | PopupSelect | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
@@ -182,6 +178,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | SettingRow | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | Sidebar | component | enter | Dock and undock a panel | `--ds-motion-spatial-default` |  |
 | Sidebar | component | exit | Dock and undock a panel | `--ds-motion-spatial-fast` |  |
+| Sidebar | component | swap | Swap content in place | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Skeleton | component | change | Load content | `--ds-motion-linear` |  |
 | Spinner | component | change | Load content | `--ds-motion-loop` |  |
 | SplitButton | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |

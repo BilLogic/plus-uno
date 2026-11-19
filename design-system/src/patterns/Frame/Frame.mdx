@@ -20,8 +20,8 @@ import {
     AiPanelFloating,
     BareColumn,
     BareWithSidebar,
-    FocusedNoSidebar,
-    FocusedWithSidebar,
+    MultiStepInnerSidebar,
+    MultiStepStepsInPage,
 } from '@/storybook-docs/illustrations/frame.jsx';
 
 <Meta of={FrameStories} />
@@ -50,7 +50,8 @@ export const colorTokens = [
     ['--ds-surface', 'The page\'s fill.'],
     ['--ds-border-surface', 'The page\'s edge ring. Transparent, except in light increased contrast, where the frame turns white and the page needs a line to stand on.'],
     ['--ds-border', 'The 1px line on the Page-facing edge of a docked Sidebar, the same as the divider above its account row. Where the Page\'s edge is drawn, it lies on the same pixel, so one line shows.'],
-    ['--ds-surface-overlay', 'The fill of an overlay or peeking Panel, and of a floating Sidebar (a peek, or opened under 1024). A docked Sidebar stays on the sunken fill.'],
+    ['--ds-surface-material-overlay', 'The fill of an overlay or peeking Panel, and of a floating Sidebar (a peek, or opened under 1024): translucent, no blur, solid under reduced transparency and increased contrast. A docked Sidebar stays on the sunken fill.'],
+    ['--ds-border-material', 'The 1px edge of a floating Sidebar or Panel. Forced colors keep it.'],
     ['--ds-shadow-overlay', 'The shadow of a peeking or overlay Sidebar, and of an overlay or peeking Panel.'],
     ['--ds-border-focused', 'The splitter\'s line while it has keyboard focus or is dragged.'],
 ];
@@ -59,7 +60,7 @@ export const colorTokens = [
     page="templates-frame"
     eyebrow="Template"
     title="Frame"
-    purpose="The app frame: the Sidebar beside the Page, with the AI panel as its own region. Three types: default, focused and bare."
+    purpose="The app frame: the Sidebar beside the Page, with the AI panel as its own region. Two types: default and bare. A multi-step task runs in the Sidebar's inner mode."
     links={{
         label: 'Uses',
         items: [
@@ -87,11 +88,10 @@ export const colorTokens = [
 
 ## Types
 
-Choose one of three Frame types for every app page, shown here in browser windows. See <DocsLink id="templates-overview">Templates and patterns</DocsLink> for how filled Frames become Screens and Flows, documented with the flows.
+Choose one of two Frame types for every app page, shown here in browser windows. See <DocsLink id="templates-overview">Templates and patterns</DocsLink> for how filled Frames become Screens and Flows, documented with the flows.
 
 <TypeGrid wide>
 <TypeCard of={FrameStories.TypeDefault} to="#default-frame" title="Default" stage={1440}>Pages people move among: the Sidebar, the Page, and the AI panel as its own region on the right.</TypeCard>
-<TypeCard of={FrameStories.TypeFocused} to="#five-steps-down-the-left" title="Focused" stage={1440}>One task a person finishes or leaves: the whole window, Close beside the title, no Sidebar.</TypeCard>
 <TypeCard of={FrameStories.TypeBare} to="#bare" title="Bare" stage={1440}>Sign-in, errors and welcome: one centered column, with no Sidebar and no header row.</TypeCard>
 </TypeGrid>
 
@@ -116,28 +116,22 @@ The default type at 1440 with the AI panel docked.
 3. **Content.** The Page's content box: no corner radius, a 24 pad, and a 12-column grid capped at 1232 (864 at reading width).
 4. **AI panel.** A Frame region on the right, 320 to 640 and opening at 400, with its splitter on the left hairline. It is docked wherever it shows.
 
-### Focused
-
-A task with five steps. No Sidebar and no breadcrumb: nothing invites the person away.
-
-<ComponentExample of={FrameStories.AnatomyFocused} />
-
-1. **Title row.** Close at the start, then the task's name as the page's one h1.
-2. **Steps.** A Section side at the start, 256 wide (320 for long labels), or a bar across the top; <i>Focused steps</i> says which.
-3. **Body.** The task's Sections at reading width, 864, centered.
-4. **Bar**, fixed along the bottom and 48 high. Back and Next split the bar, full bleed; Close in the title row leaves the task. Back on the first step is disabled and needs no reason.
-
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Focused steps
+## Multi-step task
 
-Five or more steps go down the left. Four or fewer run across the top. Placement is chosen when the task opens and does not change mid-task, however the count moves. The bar is the same in both, and the focused Frame moves like a Drill: it slides in over the dimmed opener, and Close plays it backwards. When a long task gets its own Frame is the <DocsLink id="patterns-navigation">Navigation</DocsLink> pattern.
+A task with several steps runs in the Sidebar's inner mode on a default Frame. A one-screen task stays a <DocsLink id="templates-modal">Modal</DocsLink>. When a long task takes over the Sidebar is the <DocsLink id="patterns-navigation">Navigation</DocsLink> pattern.
 
-<ComponentExample of={FrameStories.FocusedStepsDown} title="Five steps, down the left" description="The rail is 256 wide; use 320 when a label is long. The current step is marked, and visited steps go back." />
+<ComponentExample of={FrameStories.LayoutMultiStepTask} title="Five steps, in the inner sidebar" description="The steps are the rows. Done steps tick and stay pressable; steps past your answers are off. Save and exit sits at the start of the footer, Back and Next at the end, on one 32 line." />
 
-<ComponentExample of={FrameStories.FocusedStepsAcross} title="Four steps, across the top" description="A horizontal tracker above the body. Back on the first step is disabled, with no reason given." />
+1. **Back.** The inner sidebar's first row names the area the task came from and returns to the main Sidebar.
+2. **Steps.** Text-only rows, one noun each. The current step is marked, answered steps carry a tick, and steps past your answers are disabled with the reason in a tooltip.
+3. **Page.** The task's name as the page's one h1, then the step's body at reading width, 864, centered.
+4. **Footer**, fixed along the bottom and 48 high. Save and exit at the start; Back, then Next (Finish on the last step) at the end, each 32 high on one line. Back on the first step is disabled and needs no reason.
+
+<ComponentExample of={FrameStories.LayoutMultiStepTaskLeaves} title="Leaving" description="Save and exit keeps the answers and leaves. Back in the inner sidebar returns to the main Sidebar." />
 
 </div>
 
@@ -237,12 +231,11 @@ Lengths are in pixels. Where the layout mode changes a value, the columns read M
 </thead>
 <tbody>
 <tr><td><code>sidebar</code></td><td>The Sidebar. Without it there is no Sidebar and no toggle.</td></tr>
-<tr><td><code>header</code></td><td>The Page's header row: the breadcrumb, or a focused task's Close and title.</td></tr>
+<tr><td><code>header</code></td><td>The Page's header row: the breadcrumb.</td></tr>
 <tr><td><code>children</code></td><td>The content: Sections in a 12-column grid. <code>width="reading"</code> caps it at 864.</td></tr>
 <tr><td><code>panel</code> · <code>panelLabel</code> · <code>panelOpen</code></td><td>The AI panel region at the right, named for its content, filled with the Panel parts.</td></tr>
-<tr><td><code>onBack</code> · <code>onClose</code></td><td>A Back and a Close icon button in the header row. A focused page leads its title row with its own Close instead.</td></tr>
 <tr><td><code>surfaceDirect</code></td><td>Children go straight into the Page with no content box, for a bare column or a full-bleed view.</td></tr>
-<tr><td><code>bar</code> <PlannedTag /></td><td>Planned. The focused bottom bar, 48 high, with Back and Next, full bleed. Today the page places the bar, so the Anatomy bar is the target shape.</td></tr>
+<tr><td><code>bar</code> <PlannedTag /></td><td>Planned. The multi-step footer, 48 high, with Save and exit, Back and Next. Today the page places the footer.</td></tr>
 <tr><td><code>banner</code> <PlannedTag /></td><td>Planned. System news across the whole width above the Sidebar and the Page.</td></tr>
 </tbody>
 </DocsTable>
@@ -280,7 +273,7 @@ Docked, the panel meets the Page at a hairline. Its splitter resizes it from 320
 
 - For a bare fill and elevation, use `Page`.
 - For a region inside the content, use `PatternSection`.
-- For a short task that keeps the page in view behind it, use `Modal`. A focused Frame is for a task that blocks the page until it is done, or a long one.
+- For a short task that keeps the page in view behind it, use `Modal`. A multi-step task runs in the Sidebar's inner mode.
 
 </div>
 
@@ -288,30 +281,30 @@ Docked, the panel meets the Page at a hairline. Its splitter resizes it from 320
 
 ## Best practices
 
-### Give a focused task the whole window.
+### Give a multi-step task its steps in the inner sidebar.
 
 <RuleTag kind="review" />
 
-A focused Frame has no Sidebar and no breadcrumb. Close leads the title row, so the way out is one control, not a menu of other places.
+The steps are the Sidebar's rows, so the Page holds only the task. Done steps tick and stay pressable; steps past your answers are off.
 
 <DoDontPair
-    doExample={<FocusedNoSidebar />}
-    doCaption="The task fills the window: no Sidebar, nothing to invite the person away."
-    dontExample={<FocusedWithSidebar />}
-    dontCaption="The Sidebar left docked beside a focused task, one click from leaving it."
+    doExample={<MultiStepInnerSidebar />}
+    doCaption="The steps as rows in the inner sidebar; the Page holds only the task."
+    dontExample={<MultiStepStepsInPage />}
+    dontCaption="The steps drawn again inside the Page: two lists for one task."
 />
 
-### Put Back and Next in the bar, with no Cancel.
+### Put Save and exit, Back and Next in the footer, with no Cancel.
 
 <RuleTag kind="review" />
 
-The bottom bar is fixed along the bottom, one row high, sized by its Buttons and their pad. Close in the title row leaves the task, so the bar holds only Back and the primary Next, full bleed. Back on the first step is disabled and needs no reason.
+The footer is fixed along the bottom, one row high, with its buttons on one line. Save and exit leaves the task and keeps the answers, so the footer holds only it, Back and the primary Next. Back on the first step is disabled and needs no reason.
 
 <DoDontPair
     doExample={<BarInOrder />}
-    doCaption="Back and the primary Next split the bar; Close in the title row leaves the task."
+    doCaption="Save and exit at the start; Back and the primary Next at the end, on one line."
     dontExample={<BarScrambled />}
-    dontCaption="Cancel repeated in the bar beside Back and Next: two ways out of one task."
+    dontCaption="Cancel repeated in the footer beside Save and exit: two ways out of one task."
 />
 
 ### Keep the AI panel docked as its own region.
@@ -340,17 +333,11 @@ Sign-in, errors and welcome have one job and no account yet, so the Frame carrie
     dontCaption="The Sidebar beside a sign-in: navigation for a person who has not signed in."
 />
 
-### Show steps by how many there are.
-
-<RuleTag kind="review" />
-
-The count sets the side or the top once, when the task opens. The thresholds are under Focused steps.
-
 ### Put the place in the header as a breadcrumb.
 
 <RuleTag kind="review" />
 
-The header row is the breadcrumb, shown only after drilling into a record; area pages and focused tasks have none. A page's title belongs to its content, in a Section with `level="page"`.
+The header row is the breadcrumb, shown only after drilling into a record; area pages and multi-step tasks have none. A page's title belongs to its content, in a Section with `level="page"`.
 
 Elevation and fills follow <DocsLink id="foundations-visual-elevation-overview">Elevation</DocsLink>.
 
@@ -365,7 +352,7 @@ Elevation and fills follow <DocsLink id="foundations-visual-elevation-overview">
 <tr><th>Do</th><th>Don't</th></tr>
 </thead>
 <tbody>
-<tr><td>Name the focused task for what it does: "Plan a tutoring term".</td><td>A generic title such as "Wizard".</td></tr>
+<tr><td>Name the multi-step task for what it does: "Plan a tutoring term".</td><td>A generic title such as "Wizard".</td></tr>
 <tr><td>Name the panel for its content with <code>panelLabel</code>: "AI chat".</td><td>A generic name such as "Panel".</td></tr>
 <tr><td>Name steps with one noun each: "Student", "Schedule", "Review".</td><td>A sentence for a step.</td></tr>
 <tr><td>Keep Back and Next named for what they do.</td><td>Icon buttons with no name.</td></tr>
@@ -383,7 +370,7 @@ Elevation and fills follow <DocsLink id="foundations-visual-elevation-overview">
 - A peeking or floating Sidebar closes on Escape, and focus returns to the toggle.
 - Docked, the AI panel is a complementary landmark named by `panelLabel`, after the Page in reading order. Below `FRAME_LAYOUT.dockMin` it is a Modal-style layer: focus moves to its first control, Tab stays inside it, the Page and the Sidebar under it are inert, and closing returns focus to what opened it.
 - The splitter is a vertical separator named "Resize panel" that reports its width. The left arrow widens the panel by 16 and the right arrow narrows it, 64 with Shift; Home and End go to the narrowest and the widest.
-- A focused task's steps are a navigation named "Steps"; the current step is marked, and the bar's buttons follow the body in the tab order.
+- A multi-step task's steps are a list named "Steps" in the Sidebar's navigation; the current step is marked, a done step is named "Done", and an off step is not pressable. The footer's buttons follow the body in the tab order.
 
 </div>
 

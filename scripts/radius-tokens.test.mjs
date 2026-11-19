@@ -30,7 +30,7 @@ const RADIUS = {
   '--card-radius': [16, 'var(--radius-xxl)'],
   '--popup-radius': [12, 'var(--radius-xl)'],
   '--table-radius': [12, 'var(--radius-xl)'],
-  '--frame-sidebar-row-radius': [6, 'var(--radius-control-sm)'],
+  '--frame-sidebar-row-radius': [8, 'var(--radius-control-md)'],
 };
 
 test('--radius-full and the 17 semantic and component tokens exist', () => {

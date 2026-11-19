@@ -1,5 +1,5 @@
 /**
- * Sidebar pattern (Patterns/Sidebar). One grid holds every part: the Sidebar
+ * Sidebar (Components/Navigation/Navigation system). One grid holds every part: the Sidebar
  * pads 12, so rows run from x 12 to 228; a row pads 4, its 24 icon slot sits
  * 4 in (x 20 to 44, center 32), the label follows 4 later (x 48), and the
  * trailing slot ends 4 before the row's end (center 208). Section titles start
@@ -7,7 +7,7 @@
  * a Frame, semantic or size token; every color is a `--ds-*` role.
  */
 
-@use '../../styles/state' as *;
+@use '../../../styles/state' as *;
 
 // The ring sits inside the row's edge, so the scrolling nav never clips it.
 @mixin sidebar-ring-inside {
@@ -127,6 +127,96 @@ $inset-24: calc((var(--control-md) - var(--icon-lg)) / 2);
 .plus-pattern-sidebar__tab {
     position: relative;
     min-width: 0;
+}
+
+/* ------------------------------------------------------------- swap and inner mode */
+
+// The block the main and the inner sidebar swap in. At rest it is a plain
+// column (no transform, no stacking context). While swapping, two springs set
+// `--_swap-p` (the slide, 0 to 1) and `--_swap-a` (the fade, 0 to 1); `--_swap-dir`
+// is +1 from the end going in and -1 from the start going back. The slide is
+// 12, `--inline-lg`. With reduced motion `--_swap-p` stays 1, so only the fade runs.
+.plus-pattern-sidebar__swap {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
+    gap: var(--frame-sidebar-group-gap);
+    min-width: 0;
+    // At rest: no slide, fully shown. The swap's springs write these three.
+    --_swap-dir: 0;
+    --_swap-p: 1;
+    --_swap-a: 1;
+}
+
+.plus-pattern-sidebar__swap[data-swapping='true'] {
+    opacity: var(--_swap-a);
+    transform: translateX(calc(var(--inline-lg) * var(--_swap-dir) * (1 - var(--_swap-p))));
+    will-change: transform, opacity;
+}
+
+// Back, the context dropdown and the rows sit 2 apart like every other row.
+.plus-pattern-sidebar__inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--frame-sidebar-row-gap);
+    min-width: 0;
+}
+
+// Full width, 32 high, the soft neutral fill. The arrow stays at the start on
+// the icon column and the area name is centered on the whole row.
+.plus-pattern-sidebar__back {
+    position: relative;
+    width: 100%;
+    border-radius: var(--frame-sidebar-row-radius);
+
+    // The arrow's 24 slot starts on x 20, inside the Button's 1 edge.
+    .plus-btn-visual--before {
+        position: absolute;
+        inset-inline-start: calc(2 * var(--pad-x-xs) - var(--border-width-default));
+        top: 50%;
+        display: grid;
+        place-items: center;
+        width: var(--icon-lg);
+        height: var(--icon-lg);
+        transform: translateY(-50%);
+    }
+
+    .plus-btn-text {
+        flex: 0 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+.plus-pattern-sidebar__switcher {
+    display: flex;
+    min-width: 0;
+
+    > * {
+        width: 100%;
+    }
+}
+
+.plus-pattern-sidebar__switcher-trigger {
+    width: 100%;
+    justify-content: space-between;
+    border-radius: var(--frame-sidebar-row-radius);
+}
+
+// Text-only rows: no icon slot, so the label starts on x 20 like a section title.
+.plus-pattern-sidebar__row.plus-pattern-sidebar__row--text {
+    padding-inline-start: calc(2 * var(--pad-x-xs));
+}
+
+// A task's progress on its open row, after the label.
+.plus-pattern-sidebar__progress {
+    margin-inline-start: var(--inline-sm);
+    font: var(--body-sm);
+    color: inherit;
 }
 
 /* ------------------------------------------------------------- section titles */
@@ -389,7 +479,7 @@ button.plus-pattern-sidebar__title {
 
 // The thread, as in the Claude desktop app: one line on the icon column
 // (x 32) through each tab's empty slot and on through the gaps, so it hangs
-// from the row above. Only the last tab turns, radius 6, into the label
+// from the row above. Only the last tab turns, radius 8, into the label
 // column (ending on x 44, 4 before the label), so the thread visibly ends.
 .plus-pattern-sidebar__tab .plus-pattern-sidebar__slot {
     position: relative;

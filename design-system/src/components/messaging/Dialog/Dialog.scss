@@ -10,7 +10,10 @@
     @include screen-grid-width(var(--dialog-pad-x-default));
     --plus-overlay-span: 6;
 
-    background-color: var(--ds-surface-overlay);
+    background-color: var(--ds-surface-material-overlay);
+    // An inset outline, not a border: it adds no size and forced colors keep it.
+    outline: var(--border-width-default) solid var(--ds-border-material);
+    outline-offset: calc(-1 * var(--border-width-default));
     color: var(--ds-text);
     border-radius: var(--dialog-radius);
     box-shadow: var(--dialog-shadow);

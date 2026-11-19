@@ -150,6 +150,26 @@ export function colorChecks({ rows, palette }) {
     }
   }
 
+  // Body text holds on every material over the worst page behind it: pure white and pure black bound any busy table
+  // under a translucent surface. Increased contrast is solid, so its bar is the stricter 7:1.
+  const materialGrounds = [];
+  // The overlay carries running text, so all three text roles hold; the control is a button or toolbar label, so body text holds.
+  for (const [g, texts] of [
+    ['elevation.surface.material.overlay', ['color.text', 'color.text.subtle', 'color.text.subtlest']],
+    ['elevation.surface.material.control', ['color.text']],
+  ]) {
+    for (const fg of texts) {
+      for (const m of MODES) {
+        for (const behind of ['#ffffff', '#000000']) {
+          const ground = composite(S[g][m], behind);
+          const v = contrast(composite(S[fg][m], ground), ground);
+          const b = m.endsWith('_ic') ? 7 : 4.5;
+          if (v < b) materialGrounds.push(`${fg} on ${g.split('.').at(-1)} over ${behind}, ${m}: ${fmt(v)}:1 < ${b}:1`);
+        }
+      }
+    }
+  }
+
   const collapsedStates = [];
   for (const m of MODES) {
     const sel = S['color.background.selected'][m];
@@ -254,6 +274,7 @@ export function colorChecks({ rows, palette }) {
     'contrast pairs': contrastPairs,
     'accent pairings': accentPairings,
     'row-state grounds': rowStateGrounds,
+    'material grounds': materialGrounds,
     'collapsed states': collapsedStates,
     'tint vs frame': tintVsFrame,
     'chart color vision': chartCvd,

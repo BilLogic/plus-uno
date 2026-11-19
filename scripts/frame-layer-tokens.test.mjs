@@ -66,7 +66,6 @@ const px = (n) => `${+n.toFixed(2)}px`;
 
 /* Layout: one value per mode, Medium · Large · X-Large. */
 const LAYOUT = {
-  '--frame-topbar-height': ['32px', '32px', '32px'],
   '--frame-sidebar-width': ['240px', '240px', '240px'],
   '--grid-gutter': ['16px', '16px', '16px'],
   '--grid-width-column': ['45.33px', '46.67px', '81.33px'],
@@ -127,13 +126,6 @@ const FIXED = {
   '--modal-inline-md': '16px',
   '--modal-inline-lg': '24px',
   '--modal-radius': '16px',
-  '--focused-page-pad-x': '8px',
-  '--focused-page-pad-y': '8px',
-  '--focused-page-stack-sm': '8px',
-  '--focused-page-stack-md': '16px',
-  '--focused-page-stack-lg': '24px',
-  '--focused-page-inline-sm': '8px',
-  '--focused-page-inline-md': '12px',
   '--popup-pad': '16px',
   '--popup-width-sm': '320px',
   '--popup-width-md': '400px',
@@ -246,7 +238,7 @@ test('a modal is never taller than the screen less the overlay pad above and bel
 test('no new token name uses a banned word', () => {
   const names = [...Object.keys(LAYOUT), ...Object.keys(FIXED), '--page-pad'];
   for (const name of names) {
-    assert.doesNotMatch(name, /margin|shell|slot|viewport|top-bar/, name);
+    assert.doesNotMatch(name, /margin|shell|slot|viewport/, name);
   }
 });
 
@@ -290,7 +282,6 @@ test('the new names take no family prefix, and never land on an old --size-* nam
 
 test('every alias lands on the scales, never on an old --size-* primitive', () => {
   const ALIASES = {
-    '--frame-topbar-height': 'var(--height-200)',
     '--frame-sidebar-width': 'var(--width-1500)',
     '--grid-gutter': 'var(--space-100)',
     '--content-max-width': 'var(--size-7700)',
@@ -313,7 +304,6 @@ test('every alias lands on the scales, never on an old --size-* primitive', () =
 
 test('the code-only frame tokens resolve, unchanged', () => {
   const OLD = {
-    '--frame-sidebar-width-nav': '164px',
     '--listbox-max-width': '320px',
   };
   for (const [name, value] of Object.entries(OLD)) {
@@ -412,8 +402,8 @@ test('the Frame stacks its layers by name: no arithmetic on --layer-navigation a
   assert.doesNotMatch(scss, /z-index:\s*-?\d/);
 });
 
-test('the Frame layer steps are named and ordered edge < Sidebar < Topbar start < Blanket < Panel peek', () => {
-  const order = ['edge', 'sidebar', 'topbar-start', 'blanket', 'panel-peek'].map((n) => `--layer-frame-${n}`);
+test('the Frame layer steps are named and ordered edge < Sidebar < Blanket < Panel peek', () => {
+  const order = ['edge', 'sidebar', 'blanket', 'panel-peek'].map((n) => `--layer-frame-${n}`);
   const values = order.map((n) => {
     const token = corpus.get(n);
     assert.ok(token, `${n} is not declared`);

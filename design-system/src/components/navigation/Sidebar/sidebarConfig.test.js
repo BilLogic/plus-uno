@@ -93,4 +93,47 @@ describe('sidebarGroups config override', () => {
         const reviews = within(nav).getByRole('button', { name: 'Reviews' });
         expect(reviews).toHaveAttribute('aria-current', 'page');
     });
+
+    it('defaults to tutor role groups with Home selected when both groups and user are omitted', () => {
+        render(React.createElement(Sidebar, { account: { id: 'ana', name: 'Ana Ruiz', role: 'Tutor' } }));
+
+        const nav = screen.getByRole('navigation', { name: 'Main' });
+        expect(within(nav).getByRole('button', { name: 'Home' })).toHaveAttribute('aria-current', 'page');
+        expect(within(nav).getByRole('button', { name: 'Sessions' })).toBeInTheDocument();
+        expect(within(nav).queryByRole('button', { name: 'Compliance Monitor' })).not.toBeInTheDocument();
+    });
+
+    it('renders explicit groups directly without merging when user is omitted', () => {
+        render(
+            React.createElement(Sidebar, {
+                groups: [{ id: 'custom', title: 'Custom', items: [{ id: 'only', text: 'Only item' }] }],
+                activeId: 'only',
+            })
+        );
+
+        const nav = screen.getByRole('navigation', { name: 'Main' });
+        expect(within(nav).getByRole('button', { name: 'Only item' })).toHaveAttribute('aria-current', 'page');
+        expect(within(nav).queryByRole('button', { name: 'Home' })).not.toBeInTheDocument();
+    });
+
+    it('never locks or shows training counts for supervisor, and respects visible=false', () => {
+        const { rerender } = render(
+            React.createElement(Sidebar, {
+                user: 'supervisor',
+                modulesLeft: 3,
+                lessonsLeft: 2,
+                account: { id: 'sam', name: 'Sam Lee', role: 'Admin' },
+            })
+        );
+
+        const nav = screen.getByRole('navigation', { name: 'Main' });
+        for (const button of within(nav).getAllByRole('button', { name: 'Sessions' })) {
+            expect(button).not.toHaveAttribute('aria-disabled');
+        }
+        expect(within(nav).queryByText('3')).not.toBeInTheDocument();
+        expect(within(nav).queryByText('2')).not.toBeInTheDocument();
+
+        rerender(React.createElement(Sidebar, { visible: false }));
+        expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    });
 });

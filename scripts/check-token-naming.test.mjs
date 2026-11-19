@@ -46,7 +46,7 @@ test('archived collections and Deprecated/* rows are excluded from all three che
         codeSyntax: { 'Advocacy/Advocacy': 'var(--does-not-exist)' },
       },
       'archived / spacing / layout': {
-        variables: ['Topbar/height-topbar'],
+        variables: ['Sidebar/width-sidebar'],
         codeSyntax: {},
       },
       'color / semantics': {
@@ -169,7 +169,6 @@ test('naming rule: collection prefixes, no doubled prefixes, camelCase kebab-cas
   assert.equal(expectedToken('typography', 'Family/brand-heading'), '--type-family-brand-heading');
   assert.equal(expectedToken('typography', 'Tracking/tight'), '--type-tracking-tight');
   assert.equal(expectedToken('spacing / semantics', 'Pad/x-md'), '--pad-x-md');
-  assert.equal(expectedToken('spacing / templates', 'Focused page/pad-x'), '--focused-page-pad-x');
   assert.equal(expectedToken('spacing / components', 'Dropdown menu/max-width'), '--dropdown-menu-max-width');
   assert.equal(expectedToken('layers', 'Layer/modal'), '--layer-modal');
 

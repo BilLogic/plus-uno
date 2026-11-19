@@ -96,7 +96,7 @@ above.
   component set named `Alert`. Whether it is the alert the code implements is a
   judgment no id check makes.
 - **Whether the variant props still line up.** `figmaMeta.variantProps` records
-  name divergences (TopBar's Figma `expand?` vs code's `mode`). Nothing
+  name divergences (a Figma prop name vs the code's). Nothing
   re-reads them.
 - **Whether anything is missing** — this was the third blind spot, and it is
   now closed once, by hand, in the section below. The npm script still only

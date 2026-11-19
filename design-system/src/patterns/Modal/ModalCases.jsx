@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Dialog, FooterActions, ProgressTracker, TextField } from '@/components';
 import { CaseBlanket } from '@/storybook-docs/lib/case-surface.jsx';
-import { stepItems } from '@/storybook-docs/lib/focused-task.jsx';
+import { stepItems } from '@/storybook-docs/lib/multi-step-task.jsx';
 
 /**
  * The live do and don't examples on the Modal template page, composed from

@@ -126,19 +126,19 @@ Take pattern borders from this table rather than adding one of your own.
     head={['Pattern', 'Line', 'Token', 'Note']}
     rows={[
         ['Table', 'Grid lines and the head rule', <><C>color/border/default</C> · <C>color/border/bold</C></>, 'The selected row fills the whole row with color/background/selected. The checkbox is the second cue.'],
-        ['Docked sidebar', 'One 1 px divider on the edge that faces the Page', <C>color/border/default</C>, 'The topbar and the Page carry no border of their own.'],
+        ['Docked sidebar', 'One 1 px divider on the edge that faces the Page', <C>color/border/default</C>, 'The Page carries no border of its own.'],
         ['Banner', 'None', '—', 'Meaning comes from the fill and the icon.'],
         ['Card', 'None', '—', 'The edge comes from elevation, not a border.'],
     ]}
 />
 
-<FoundationSubsection title="Give the sidebar one edge and the topbar none">
+<FoundationSubsection title="Give the sidebar one edge and the page header none">
 
-The sidebar ends in a 1 px divider in `color/border/default`. The topbar has no border.
+The sidebar ends in a 1 px divider in `color/border/default`. The page header has no border.
 
 Do: One hairline on the sidebar edge.
 
-Don't: A line under the topbar adds a second edge the Frame does not use.
+Don't: A line under the page header adds a second edge the Frame does not use.
 
 <Canvas of={BorderStories.SidebarEdges} />
 

@@ -198,11 +198,6 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-layout-and-structure-page-header--docs"
   ],
   [
-    "design-system/src/components/layout-and-structure/Panel/",
-    "Panel",
-    "components-layout-and-structure-panel--docs"
-  ],
-  [
     "design-system/src/components/layout-and-structure/ScrollBar/",
     "ScrollBar",
     "components-layout-and-structure-scrollbar--docs"
@@ -268,6 +263,11 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-navigation-pagination--docs"
   ],
   [
+    "design-system/src/components/navigation/Sidebar/",
+    "Sidebar",
+    "components-navigation-navigation-system-navigation-system--docs"
+  ],
+  [
     "design-system/src/components/navigation/Tabs/",
     "Tabs",
     "components-navigation-tabs--docs"
@@ -306,10 +306,5 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "design-system/src/components/text-and-data-display/TreeTable/",
     "TreeTable",
     "components-text-and-data-display-tree-table--docs"
-  ],
-  [
-    "design-system/src/patterns/Sidebar/",
-    "Sidebar",
-    "components-navigation-navigation-system-navigation-system--docs"
   ]
 ];

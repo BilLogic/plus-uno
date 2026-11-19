@@ -129,8 +129,8 @@ export const TOKEN_LADDER = [
   { tier: 'semantics', group: 'Radius', new: '--radius-full', old: '--element-radius-full', ref: 'var(--radius-full)', primitive: true, note: 'Figma Radius/full; the code name is the --radius-full primitive, so no second declaration', use: 'Fully rounded ends: an avatar, a pill-shaped tag, a toggle track.' },
 
   // ─── Semantics / Radius / Control (radius = control height ÷ 4) ──────
-  { tier: 'semantics', group: 'Radius / Control', new: '--radius-control-sm', old: '--element-radius-item-sm', figma: 'Radius/Control/sm', ref: 'var(--space-0375)', note: 'pairs with --control-sm; height 24, 24÷4 = 6', use: 'Corner rounding for a control 24px high: a compact field, a Tooltip, a Sidebar row.' },
-  { tier: 'semantics', group: 'Radius / Control', new: '--radius-control-md', old: '--element-radius-item-md', figma: 'Radius/Control/md', ref: 'var(--space-050)', note: 'pairs with --control-md; height 32, 32÷4 = 8', use: 'Corner rounding for a control 32px high: a compact field, a tab, a menu row.' },
+  { tier: 'semantics', group: 'Radius / Control', new: '--radius-control-sm', old: '--element-radius-item-sm', figma: 'Radius/Control/sm', ref: 'var(--space-0375)', note: 'pairs with --control-sm; height 24, 24÷4 = 6', use: 'Corner rounding for a control 24px high: a compact field, a Tooltip.' },
+  { tier: 'semantics', group: 'Radius / Control', new: '--radius-control-md', old: '--element-radius-item-md', figma: 'Radius/Control/md', ref: 'var(--space-050)', note: 'pairs with --control-md; height 32, 32÷4 = 8', use: 'Corner rounding for a control 32px high: a compact field, a tab, a menu row, a Sidebar row.' },
   { tier: 'semantics', group: 'Radius / Control', new: '--radius-control-lg', old: null, figma: 'Radius/Control/lg', ref: 'var(--space-0625)', note: 'pairs with --control-lg; height 40, 40÷4 = 10', use: 'Corner rounding for a control 40px high: a default field.' },
 
   // ─── Semantics / Border (reclassified, unchanged names) ──────────────
@@ -190,14 +190,12 @@ export const TOKEN_LADDER = [
   { tier: 'semantics', group: 'Size', new: '--control-lg', old: '--size-control-lg', ref: 'var(--size-250)', use: 'Height of a large control: 40px high.' },
   { tier: 'semantics', group: 'Size', new: '--control-xl', old: null, ref: 'var(--size-300)', use: 'Height of an extra-large control: 48px high.' },
 
-  // ─── Templates / Frame (with Topbar and Sidebar) ──────────────────────
-  { tier: 'templates', group: 'Frame', new: '--frame-topbar-height', old: '--layout-height-topbar', ref: 'var(--height-200)', use: 'Height of the Frame\'s top bar.' },
+  // ─── Templates / Frame (with the Sidebar) ──────────────────────
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-width', old: '--layout-width-sidebar', ref: 'var(--width-1500)', use: 'Width of the Frame\'s Sidebar at the current breakpoint.' },
-  { tier: 'templates', group: 'Frame', new: '--frame-sidebar-width-nav', old: '--layout-sidebar-width', ref: '164px', note: 'fixed SideNav width (164), distinct from the responsive sidebar above', use: 'Fixed width of the side navigation inside the Frame.' },
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-pad', old: null, value: '--space-075', note: 'the Sidebar pads 12 on every side', use: 'Padding on every side inside the Sidebar.' },
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-row-gap', old: null, value: '--space-0125', note: 'two Sidebar rows sit 2 apart', use: 'Vertical gap between two rows in the Sidebar.' },
   { tier: 'templates', group: 'Frame', new: '--frame-sidebar-group-gap', old: null, value: '--space-100', note: 'two Sidebar groups sit 16 apart', use: 'Vertical gap between two groups of rows in the Sidebar.' },
-  { tier: 'templates', group: 'Frame', new: '--frame-sidebar-row-radius', old: null, ref: 'var(--radius-control-sm)', note: 'the rounding of a Sidebar row (6)', use: 'Corner rounding of a Sidebar row.' },
+  { tier: 'templates', group: 'Frame', new: '--frame-sidebar-row-radius', old: null, ref: 'var(--radius-control-md)', note: 'the rounding of a Sidebar row (8)', use: 'Corner rounding of a Sidebar row.' },
 
   // ─── Templates / Page ──────────────────────────────────────────────────
   { tier: 'templates', group: 'Page', new: '--page-pad', old: '--page-pad', use: 'Padding around a Page\'s content at the current breakpoint.' },
@@ -309,15 +307,6 @@ export const TOKEN_LADDER = [
   { tier: 'templates', group: 'Popup', new: '--tooltip-max-width', old: '--tooltip-max-width', use: 'Widest a Tooltip may grow before its text wraps.' },
   { tier: 'templates', group: 'Popup', new: '--popup-gap-screen', old: '--popup-gap-screen', use: 'Space a floating layer keeps from the screen edge, such as a Flag or a listbox.' },
   { tier: 'templates', group: 'Popup', new: '--popup-offset', old: '--popup-offset', use: 'Gap between a Popup, menu or Tooltip and the element that opened it.' },
-
-  // ─── Templates / Focused page ──────────────────────────────────────────
-  { tier: 'templates', group: 'Focused page', new: '--focused-page-pad-x', old: '--focused-page-pad-x', use: 'Horizontal padding of a focused page: a single task with no Sidebar, such as a wizard step.' },
-  { tier: 'templates', group: 'Focused page', new: '--focused-page-pad-y', old: '--focused-page-pad-y', use: 'Vertical padding of a focused page.' },
-  { tier: 'templates', group: 'Focused page', new: '--focused-page-stack-sm', old: '--focused-page-stack-sm', use: 'Vertical gap between a focused page\'s title and its description.' },
-  { tier: 'templates', group: 'Focused page', new: '--focused-page-stack-md', old: '--focused-page-stack-md', use: 'Vertical gap between blocks on a focused page.' },
-  { tier: 'templates', group: 'Focused page', new: '--focused-page-stack-lg', old: '--focused-page-stack-lg', use: 'Vertical gap between a focused page\'s header, body and actions.' },
-  { tier: 'templates', group: 'Focused page', new: '--focused-page-inline-sm', old: '--focused-page-inline-sm', use: 'Horizontal gap between small items in a focused page row.' },
-  { tier: 'templates', group: 'Focused page', new: '--focused-page-inline-md', old: '--focused-page-inline-md', use: 'Horizontal gap between the actions on a focused page.' },
 
   // ─── Components / Button ──────────────────────────────────────────────
   { tier: 'components', group: 'Button', new: '--button-radius-default', old: '--element-radius-item-sm', ref: 'calc(var(--radius-control-lg) - var(--pad-x-xs))', note: 'nests in a 40-high field: its radius 10 minus the 4 slot inset = 6', use: 'Corner rounding of a Button with default spacing.' },
@@ -471,7 +460,7 @@ export const TOKEN_LADDER = [
 
   // ─── Layers (own non-spacing family, code only) ───────────────────────
   { tier: 'layers', group: 'Layer', new: '--layer-card', old: '--layout-z-index-card', ref: '100', use: 'Stacking order of a card raised above page content, such as a sticky table part.' },
-  { tier: 'layers', group: 'Layer', new: '--layer-navigation', old: '--layout-z-index-navigation', ref: '200', use: 'Stacking order of the Frame\'s top bar and Sidebar.' },
+  { tier: 'layers', group: 'Layer', new: '--layer-navigation', old: '--layout-z-index-navigation', ref: '200', use: 'Stacking order of the Frame\'s Sidebar and Panel.' },
   { tier: 'layers', group: 'Layer', new: '--layer-dialog', old: '--layout-z-index-dialog', ref: '300', use: 'Stacking order of a non-modal dialog over the page, below popups.' },
   { tier: 'layers', group: 'Layer', new: '--layer-popup', old: '--layout-z-index-popup', ref: '400', use: 'Stacking order of a Popup, DropdownMenu or listbox.' },
   { tier: 'layers', group: 'Layer', new: '--layer-blanket', old: '--layout-z-index-scrim', ref: '500', note: "the Blanket's z-index; the old declaration's value, written directly so this file carries no old-language word", use: 'Stacking order of the Blanket behind a Modal.' },
@@ -531,6 +520,10 @@ export const RETIRED_RENAMES = {
   '--page-radius-md': '--radius-xl',
   '--tile-radius-sm': '--space-0375',
   '--tile-radius-lg': '--radius-control-lg',
+  '--card-pad-sm': '--card-pad',
+  '--card-pad-md': '--card-pad',
+  '--card-pad-lg': '--card-pad',
+  '--layout-sidebar-width': '--frame-sidebar-width',
   '--card-radius-sm': '--card-radius',
   '--layout-calendar-nav': '--control-sm',
 };
