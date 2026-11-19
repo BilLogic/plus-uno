@@ -903,17 +903,17 @@ export const FooterThree = {
     },
 };
 
-export const FooterTextLeft = {
-    name: 'Footer: Text button left',
-    render: () => sized(<Demo.ModalStage title="Schedule session" footer={<Demo.TextLeftCells />}><p style={{ margin: 0, font: 'var(--body-default)' }}>Skip for now, save a draft, or schedule it.</p></Demo.ModalStage>),
+export const FooterLeadingAction = {
+    name: 'Footer: Leading action',
+    render: () => sized(<Demo.ModalStage title="Schedule session" footer={<Demo.LeadingCells />}><p style={{ margin: 0, font: 'var(--body-default)' }}>Delete the draft, save it, or schedule it.</p></Demo.ModalStage>),
     play: async ({ canvasElement }) => {
         await settleAnimations(canvasElement);
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const tracks = footerTracks(footer);
         const [leading, secondary, primary] = [...footer.querySelectorAll('button')];
-        await expect(leading, 'text button is subtle').toHaveClass('plus-btn--subtle');
-        await expect(leading, 'text button hugs its label and takes no track').not.toHaveClass('plus-btn--fit-container');
-        await expect(rect(leading).left, 'text button hugs the left content edge').toBeCloseTo(tracks.box.left, 0);
+        await expect(leading, 'leading action is danger').toHaveClass('plus-btn--danger');
+        await expect(leading, 'leading action hugs its label and takes no track').not.toHaveClass('plus-btn--fit-container');
+        await expect(rect(leading).left, 'leading action hugs the left content edge').toBeCloseTo(tracks.box.left, 0);
         await expect(rect(secondary).left, 'first filled button sits in track 3').toBeCloseTo(tracks.track(3).left, 0);
         await expect(rect(primary).left, 'second filled button sits in track 4').toBeCloseTo(tracks.track(4).left, 0);
         await buttonsInside(canvasElement);

@@ -14,7 +14,7 @@ Also asked as: confirm, confirmation dialog, destructive confirm, popup window.
 
 **Source:** `design-system/src/templates/Modal/Modal.jsx`
 
-**Stories:** `design-system/src/templates/Modal/Modal.stories.jsx` — Overview, Widths, Heights, Tabs, BodyMinHeight, CustomHeader, Divider, Loading, WidthsAtEveryScreen, Width4Col, Width6Col, Width8Col, Width10Col, HugLong, HeightFill, TabsStill, Interactive, LiveBehavior, StaticBlanketRefusesToClose, BlockingShadow, SelectKeepsOverlayShadow, TypePassive, TypeActive, TypeAcknowledge, TypeSteps, AnatomyActive, WidthStrip, ResponsiveWidth, TierActive, TierDanger, TierTypeName, FooterOne, FooterTwo, FooterThree, FooterTextLeft, FooterDestructive, FooterNarrow, KeyLongContent, KeyLoading, KeyWithForm, KeyConfirmInside, StackConfirmOverPanel, StackModalOnModalRefused, BlanketInline, BlanketPads, BlanketScreenGrid, BlanketInteractive, BlanketLayers, BlanketConfirmOverPanel, MotionOpenClose, MotionReduced, BlanketMotionOpenClose, BlanketMotionReduced
+**Stories:** `design-system/src/templates/Modal/Modal.stories.jsx` — Overview, Widths, Heights, Tabs, BodyMinHeight, CustomHeader, Divider, Loading, WidthsAtEveryScreen, Width4Col, Width6Col, Width8Col, Width10Col, HugLong, HeightFill, TabsStill, Interactive, LiveBehavior, StaticBlanketRefusesToClose, BlockingShadow, SelectKeepsOverlayShadow, TypePassive, TypeActive, TypeAcknowledge, TypeSteps, AnatomyActive, WidthStrip, ResponsiveWidth, TierActive, TierDanger, TierTypeName, FooterOne, FooterTwo, FooterThree, FooterLeadingAction, FooterDestructive, FooterNarrow, KeyLongContent, KeyLoading, KeyWithForm, KeyConfirmInside, StackConfirmOverPanel, StackModalOnModalRefused, BlanketInline, BlanketPads, BlanketScreenGrid, BlanketInteractive, BlanketLayers, BlanketConfirmOverPanel, MotionOpenClose, MotionReduced, BlanketMotionOpenClose, BlanketMotionReduced
 
 **Storybook page:** `design-system/src/templates/Modal/Modal.mdx`
 
@@ -135,7 +135,7 @@ An Active Modal at 8-col with a short form. Every part once; the pad is 20 on ev
 1. **Blanket.** Dims the page and holds the Modal centered.
 2. **Header.** The title at 20/24, whatever the level around it, and the Close icon button. With tabs, the tab group sits 8 under the title.
 3. **Body.** Text, a list, fields or a table. It scrolls past the cap and never draws under 96 tall.
-4. **Footer** (optional). Full-bleed buttons; secondary (Default) left, Primary right; Close in the header dismisses, so no Cancel.
+4. **Footer** (optional). Full-bleed buttons; secondary (Default) left, Primary right. A declining action such as "Not now" is the secondary. Close in the header dismisses, so no Cancel.
 
 ## Slots
 

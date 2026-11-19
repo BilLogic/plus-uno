@@ -244,6 +244,7 @@ test('guide answers pattern, template and foundation topics and situation aliase
     ['navigation', 'design-system/agent-views/patterns/Navigation.md'],
     ['validation', 'design-system/agent-views/patterns/Forms.md'],
     ['forms', 'design-system/agent-views/patterns/Forms.md'],
+    ['form', 'design-system/agent-views/patterns/Forms.md'],
     ['form-behavior', 'design-system/agent-views/patterns/Forms.md'],
     ['disabled', 'design-system/agent-views/patterns/Disabled.md'],
     ['unavailable', 'design-system/agent-views/patterns/Disabled.md'],
@@ -489,4 +490,10 @@ test('the check accepts the old and the new template imports', () => {
 test('the orientation names template tokens, never pattern tokens', () => {
   assert.match(ORIENTATION, /semantic, template or component tokens/);
   assert.doesNotMatch(ORIENTATION, /pattern (or|and) component tokens|pattern tokens/);
+});
+
+test('"form" is a weak guide word: a bare "form" guide resolves to Forms, but "fill out a form" gets no guide row until a cue joins it', () => {
+  assert.equal(lookup.guide('form').path, 'design-system/agent-views/patterns/Forms.md');
+  assert.equal(lookup.find('fill out a form').results.some((r) => r.kind === 'guide'), false);
+  assert.equal(lookup.find('form guidelines').results.some((r) => r.kind === 'guide' && /forms/.test(r.name)), true);
 });

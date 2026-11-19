@@ -24,8 +24,8 @@ Use `Dialog` as the panel inside the Modal template, or when a docs illustration
 
 The footer runs on `FooterActions`: pass `primaryButton` and `secondaryButton`
 as objects for a `50/50` pair (or `primaryButton` alone for the right half), or
-pass `footer` with `<FooterActions>` for three actions or a leading text
-button.
+pass `footer` with `<FooterActions>` for three actions or a leading action
+(a `danger` side action or a link).
 
 ### Width guidance
 
@@ -119,7 +119,7 @@ Don't: Render a bare `Dialog` over page content on your own.
 ## Related
 
 - `Modal` template: places `Dialog` on a Blanket with portal, focus trap, Escape and scroll lock.
-- `FooterActions`: use when placing three actions or a leading text button across the Dialog's four-track footer slot.
+- `FooterActions`: use when placing three actions or a leading action across the Dialog's four-track footer slot.
 - Templates: use when choosing between a Modal and a full page; its Usage section weighs the two.
 
 Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `NotificationItem` · `SectionMessage` · `Spotlight`
