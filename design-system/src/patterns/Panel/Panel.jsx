@@ -1,15 +1,12 @@
 import React, { createContext, useContext, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
-import IconButton from '@/components/forms-and-inputs/IconButton';
-import Icon from '@/components/images-and-icons/Icon';
-import Heading from '@/components/text-and-data-display/Heading';
+import { Heading, Icon, IconButton } from '@/components';
 import './Panel.scss';
 
 /**
  * PanelProvider / usePanelManager: the width a Panel opens at and the setter
- * that changes it, shared with whatever opens the panel. Composition follows
- * Atlassian's internal `@atlassian/panel-system`.
+ * that changes it, shared with whatever opens the panel.
  */
 const PanelContext = createContext(null);
 

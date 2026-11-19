@@ -213,6 +213,33 @@ If the person must not look at anything outside it, it is a Modal.
 
 Its left edge sits against the Sidebar, over the left of the Page. Picking an item opens its page behind the Inbox, which stays open. Flags still show at the top right. This placement is Planned.
 
+### Keep the header to one cue. {#keep-the-header-to-one-cue}
+
+**Checked:** Review
+
+An icon, a back action and a subheader together bury the title; pick the one the task needs.
+
+### Share one width across a page's Panels with `PanelProvider`. {#share-one-width-across-a-page-s-panels-with-panelprovider}
+
+**Checked:** Review
+
+Wrap the region that can open Panels in a `PanelProvider`, and read or change the shared width with `usePanelManager`, so Panels opened over time stay the same size instead of each picking its own.
+
+```jsx
+<PanelProvider>
+    <PanelContainer>
+        <PanelHeader title="Student detail" actions={<PanelCloseAction onClick={close} />} />
+        <PanelBody>...</PanelBody>
+    </PanelContainer>
+</PanelProvider>
+```
+
+### Reach for the fixed action components before building your own. {#reach-for-the-fixed-action-components-before-building-your-own}
+
+**Checked:** Review
+
+`PanelBackAction`, `PanelCloseAction` and the rest already carry the right icon, label and compact spacing; a custom `IconButton` for the same job risks a different icon or label than the rest of the system uses.
+
 ### Title the Panel with the object. {#title-the-panel-with-the-object}
 
 **Checked:** Review
