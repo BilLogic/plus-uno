@@ -125,6 +125,8 @@ Space owned by a template: page, section, card, table, modal, popup. Inside a te
 Tokens one component owns, named for it.
 
 ```css
+--ai-chat-fab-size  /* Width and height of the floating button that opens the AI chat. */
+--ai-chat-height  /* Height of the AI chat popup, before the window caps it. */
 --ai-chat-width  /* Width of the AI chat when it opens as a popup or floats beside the page. */
 --ai-message-caret-width  /* Width and leading gap of the streaming caret in an AiMessage. */
 --ai-message-dot-size  /* Diameter of each typing-indicator dot in an AiMessage. */

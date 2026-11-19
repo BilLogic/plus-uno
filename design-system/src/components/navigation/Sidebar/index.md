@@ -14,7 +14,7 @@ Also asked as: left nav, side nav.
 
 **Source:** `design-system/src/components/navigation/Sidebar/Sidebar.jsx`
 
-**Stories:** `design-system/src/components/navigation/Sidebar/Sidebar.stories.jsx` — Overview, Geometry, Tutor, DefaultRole, PrototypeAreas, OnboardingInProgress, OnboardingDone, SectionsOpen, SectionsCollapsed, TabsNone, TabsFew, TabsMany, TabsClipped, TabRest, TabHover, TabFocus, TabSelected, TabsCollapsedWithSelection, ClosingTabs, AccountHug, AccountRow, SidebarOpen, SidebarClosed, SidebarFloating, InnerSidebar, RowsRoundEight, InnerSwapInAndBack, InnerTaskOpenRow, InnerStepsDoneAndOff, InnerKeyboard, InnerSwapMotion, InnerSwapReducedMotion, Interactive, Light, Dark
+**Stories:** `design-system/src/components/navigation/Sidebar/Sidebar.stories.jsx` — Overview, Geometry, KeyboardDisclosure, Tutor, DefaultRole, PrototypeAreas, OnboardingInProgress, OnboardingDone, SectionsOpen, SectionsCollapsed, TabsNone, TabsFew, TabsMany, TabsClipped, TabRest, TabHover, TabFocus, TabSelected, TabsCollapsedWithSelection, ClosingTabs, AccountHug, AccountRow, SidebarOpen, SidebarClosed, SidebarFloating, InnerSidebar, RowsRoundEight, InnerSwapInAndBack, InnerTaskOpenRow, InnerStepsDoneAndOff, InnerKeyboard, InnerSwapMotion, InnerSwapReducedMotion, Interactive, Light, Dark
 
 **Storybook page:** `design-system/src/components/navigation/Sidebar/Sidebar.mdx`
 
@@ -89,7 +89,7 @@ Don't: Everything in the label, and the time is cut off.
 
 - The Sidebar is a `nav` named by `label`, Main by default. A titled group is a `group` named by its title.
 - The selected row or tab carries `aria-current="page"`, so selection never rests on the fill alone.
-- A section title is a button that reports whether its rows are expanded and points at them.
+- A section title is a button that reports whether its rows are expanded and points at them. It opens and closes with Enter and Space, as does "Show n more"; both are built on Base UI Collapsible, and the account button opens its menu on Base UI Menu.
 - A locked group's lock is focusable and named "Locked. Complete your assigned training to unlock the Toolkit".
 - Delete or Backspace closes the focused tab, and focus moves to the next tab, else the one before it, else the tab's row.
 - The toggle is named "Close sidebar", announces Ctrl+[ (Cmd+[ on a Mac) and reports that the Sidebar is expanded.
@@ -200,7 +200,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-sm` · `--border-width-default` · `--control-md` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-border` · `--ds-icon` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-icon-subtlest` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-text` · `--ds-text-selected` · `--ds-text-subtle` · `--ds-text-subtlest` · `--focus-ring-width` · `--frame-sidebar-group-gap` · `--frame-sidebar-pad` · `--frame-sidebar-row-gap` · `--frame-sidebar-row-radius` · `--icon-lg` · `--icon-md` · `--icon-sm` · `--inline-lg` · `--inline-sm` · `--pad-x-lg` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--radius-sm` · `--stack-lg` · `--stack-md` · `--type-weight-medium`
+`--body-default` · `--body-sm` · `--border-width-default` · `--control-md` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-border` · `--ds-icon` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-icon-subtlest` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-text` · `--ds-text-selected` · `--ds-text-subtle` · `--ds-text-subtlest` · `--focus-ring-width` · `--frame-sidebar-group-gap` · `--frame-sidebar-pad` · `--frame-sidebar-row-gap` · `--frame-sidebar-row-radius` · `--icon-lg` · `--icon-md` · `--icon-sm` · `--inline-lg` · `--inline-sm` · `--pad-x-lg` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--radius-sm` · `--stack-md` · `--type-weight-medium`
 
 From `design-system/src/components/navigation/Sidebar/Sidebar.scss`. Override these through the token layer, never with a literal.
 

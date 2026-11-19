@@ -1356,6 +1356,20 @@
           }
         },
         {
+          "name": "Ai/chat-height",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--ai-chat-height)"
+          }
+        },
+        {
+          "name": "Ai/chat-fab-size",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--ai-chat-fab-size)"
+          }
+        },
+        {
           "name": "Prompt/input-min-height",
           "resolvedType": "FLOAT",
           "codeSyntax": {

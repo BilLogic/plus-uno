@@ -66,7 +66,7 @@ Don't: The steps drawn again inside the Page: two lists for one task.
 
 **Checked:** Review
 
-The footer is fixed along the bottom, one row high (`--space-300`), with its buttons on one line. Save and exit leaves the task and keeps the answers, so the footer holds only it, Back and the primary Next. Back on the first step is disabled and needs no reason.
+The footer is fixed along the bottom, one row high, with its buttons on one line. Save and exit leaves the task and keeps the answers, so the footer holds only it, Back and the primary Next. Back on the first step is disabled and needs no reason.
 
 Do: Save and exit at the start; Back and the primary Next at the end, on one line.
 Don't: Cancel repeated in the footer beside Save and exit: two ways out of one task.

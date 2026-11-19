@@ -60,7 +60,7 @@ const offsetOf = (k, active, count, wraps) => {
     return ((d + half + count) % count) - half;
 };
 
-// How long the caption takes to lift out: the appearance.fast duration, which
+// How long the caption takes to fade out: the appearance.fast duration, which
 // is a fade in every mode.
 const captionOutMs = (element) => {
     const value = element ? getComputedStyle(element).getPropertyValue('--ds-motion-appearance-fast-duration') : '';
@@ -68,7 +68,7 @@ const captionOutMs = (element) => {
     return Number.isFinite(ms) ? ms : 0;
 };
 
-// The caption lifts out, swaps its text, then rises back in.
+// The caption fades out, swaps its text, then fades back in, in place.
 const useCaptionSwap = (index, animate, rootRef) => {
     const [shown, setShown] = useState(index);
     const [phase, setPhase] = useState('in');

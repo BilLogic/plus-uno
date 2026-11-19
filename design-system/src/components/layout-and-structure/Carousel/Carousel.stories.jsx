@@ -120,6 +120,27 @@ export const NoLoop = {
     },
 };
 
+/** The caption fades to the next slide's words in place: it has no vertical travel at any point of the change. */
+export const CaptionFadesInPlace = {
+    render: (args) => <CarouselFrame {...args} />,
+    args: { autoplay: false },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const inner = canvasElement.querySelector('.plus-carousel-caption-inner');
+        const transforms = new Set();
+        let sampling = true;
+        const sample = () => {
+            transforms.add(getComputedStyle(inner).transform);
+            if (sampling) requestAnimationFrame(sample);
+        };
+        sample();
+        await userEvent.click(canvas.getByRole('button', { name: 'Next slide' }));
+        await new Promise((resolve) => setTimeout(resolve, 900));
+        sampling = false;
+        await expect([...transforms].every((value) => value === 'none')).toBe(true);
+    },
+};
+
 /** Two slides: no neighbor wraps round, so one side of the stage stays open. */
 export const FewSlides = {
     render: (args) => <CarouselFrame {...args} slides={featureSlides.slice(0, 2)} />,

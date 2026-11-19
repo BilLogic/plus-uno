@@ -26,14 +26,14 @@ Settings saved as a group, drawn in the Frame with the Sidebar docked. The form 
 1. **Message slot.** At the top, for a server failure.
 2. **Group.** One Fieldset per group of fields that describe one thing, with its legend.
 3. **Field.** Label, control, help text, and the error under it when there is one. Only the minority case carries "(optional)" or "(required)" in the label.
-4. **Footer.** Left-aligned, `--space-300` below the last field, Primary first. Cancel is Subtle.
+4. **Footer.** Left-aligned, 48 below the last field, Primary first. Cancel is Subtle.
 
 ### In a Panel
 
 The Details Panel with the form open. The footer shows only while editing.
 
 1. **Header.** The record's name and its fixed actions.
-2. **Body.** The fields, with `--space-200` of pad from every edge.
+2. **Body.** The fields, with `--panel-pad` (24) from every edge.
 3. **Footer.** Discard (Default) and Save (Primary), full bleed, half each; Close in the header dismisses, so no Cancel.
 
 ### In a Modal
@@ -60,9 +60,8 @@ These examples show form states within each host. See each field's component pag
 
 | Token | Value | Purpose |
 | --- | --- | --- |
-| `--space-300` | 48 | The height of a full-bleed footer, and of the multi-step footer: the 32 button plus 16 of pad. It is also the gap from the last field to a page form's footer. |
 | `--panel-width-default` | 400 | The Panel a form opens in. |
-| `--space-200` | 24 | The Panel body's pad from every edge, and the stack between groups. |
+| `--panel-pad` | 24 | The Panel body's pad from every edge. |
 
 ## Slots
 
@@ -77,7 +76,7 @@ A Form is a composition: the fields in a Fieldset, inside a Page, a Panel, a Mod
 | `message` | A `SectionMessage` at the top for a server failure, scrolled into view and announced; a warning one when a disabled prerequisite blocks the main action. |
 | `groups` | One `Fieldset` per group of fields that describe one thing. |
 | `footer` | The container's: left-aligned on a page; full bleed in a Modal, a Panel or a card; Back and Next in a step flow. |
-| Modal and Panel `footer`, full bleed | Planned. A footer that fills its cells edge to edge at `--space-300`, with the inner corners squared. Today the page composes it from two Buttons. |
+| Modal and Panel `footer`, full bleed | Planned. A footer that fills its cells edge to edge 48 high, with the inner corners squared. Today the page composes it from two Buttons. |
 | Blocked-submit shake | Planned. The Modal's single shake when a submit is blocked. Today the Modal stays open and marks the field. |
 
 ## Usage

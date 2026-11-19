@@ -54,7 +54,6 @@ A floating Panel and the docked AI panel sit side by side, and the AI panel is n
 | --- | --- | --- |
 | `--panel-width-default` | 400 | The width a Panel opens at. |
 | `--panel-min-width` | 320 | The narrowest, and the cap under 1024. |
-| `--space-300` | 48 | The full-bleed footer's height, shown only while editing. |
 | `--ds-surface-material-overlay`, `--ds-border-material`, `--ds-shadow-overlay` | pair | The floating Panel's fill, edge and elevation. The fill is translucent with no blur, and turns solid under reduced transparency and increased contrast. A docked or standalone Panel uses `--ds-surface` and an edge line. |
 | `--ds-border` | 1 | The edge line where a docked Panel meets the Page. |
 

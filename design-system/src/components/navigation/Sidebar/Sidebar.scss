@@ -71,7 +71,7 @@ $inset-24: calc((var(--control-md) - var(--icon-lg)) / 2);
     flex: 1 1 auto;
     gap: var(--frame-sidebar-group-gap);
     min-height: 0;
-    margin-top: var(--stack-lg);
+    margin-top: var(--frame-sidebar-pad);
     overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
