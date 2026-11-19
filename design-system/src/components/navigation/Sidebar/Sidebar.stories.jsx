@@ -896,7 +896,7 @@ export const InnerSidebar = {
         const back = backButton(canvasElement);
         await expect(px(getComputedStyle(back).height), 'Back is 32 high').toBeCloseTo(tokenLength(canvasElement, '--control-md'), 0);
         await expect(px(getComputedStyle(back).width), 'Back is full width, x 12 to 228').toBeCloseTo(216, 0);
-        await expect(getComputedStyle(back).backgroundColor, 'Back is the soft neutral fill').toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+        await expect(getComputedStyle(back).backgroundColor, 'Back has no fill at rest').toBe('rgba(0, 0, 0, 0)');
         const label = back.querySelector('.plus-btn-text');
         await expect(centerX(canvasElement, label), 'the area name is centered').toBeCloseTo(120, 0);
         await expect(back.querySelector('.plus-btn-visual--before'), 'the back arrow sits at the start').not.toBeNull();
