@@ -9,11 +9,7 @@ import MotionSection from '@/storybook-docs/motion-section.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
-import {
-    EditInModal,
-    EditInPanel,
-} from '@/storybook-docs/illustrations/form.jsx';
-import { OneColumnFields, TwoColumnFields } from './FormCases.jsx';
+import { EditInModal, EditInPanel, OneColumnFields, TwoColumnFields } from './FormCases.jsx';
 
 <Meta title="Templates/Form" tags={['manifest']} />
 
@@ -246,6 +242,7 @@ For form behavior, follow the pattern pages:
 Editing a row opens a Panel so the person keeps the page in view. A Modal is for a rare, critical task with fewer than five fields.
 
 <DoDontPair
+    stacked
     doExample={<EditInPanel />}
     doCaption="A short edit in a Panel, the rows still in view."
     dontExample={<EditInModal />}

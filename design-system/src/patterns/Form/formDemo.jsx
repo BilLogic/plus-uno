@@ -114,7 +114,7 @@ export const FullBleedFooter = ({ sending, onSave, onCancel, primary = 'Save ses
 );
 
 /** A page body made of placeholder bars, so the form is what reads. */
-const Behind = () => (
+export const Behind = () => (
     <PatternSection title="Sessions">
         <Skeleton preset="text" lines={3} />
     </PatternSection>
