@@ -95,7 +95,7 @@ export const FormMessage = ({ children }) => (
 
 /** Left-aligned under the fields, Primary first, Cancel Subtle: a form on its own page. */
 export const PageFooter = ({ sending, onSave }) => (
-    <div data-probe="footer" style={{ display: 'flex', gap: 'var(--stack-md)', marginBlockStart: '48px' /* token gap: 48px */ }}>
+    <div data-probe="footer" style={{ display: 'flex', gap: 'var(--stack-md)', marginBlockStart: 'var(--stack-3xl)' }}>
         <Button text="Save session" appearance="primary" isLoading={sending} onClick={onSave} />
         <Button text="Cancel" appearance="subtle" onClick={() => {}} />
     </div>
