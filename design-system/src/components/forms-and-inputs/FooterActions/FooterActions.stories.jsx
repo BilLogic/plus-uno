@@ -132,7 +132,7 @@ export const DeclineInLeftHalf = {
     },
 };
 
-/** A subtle first child is not leading: it fills a track like any other action. */
+/** A subtle first child takes a track like any other action; it does not hug the left edge. */
 export const SubtleFillsTrack = {
     render: () => (
         <div style={stageStyle}>
@@ -220,12 +220,12 @@ export const LeadingWithThreeFilled = {
     play: async ({ canvasElement }) => {
         const footer = canvasElement.querySelector('[data-probe="footer"]');
         const tracks = footerTracks(footer);
-        const leading = within(footer).getByRole('button', { name: 'Delete draft' });
+        const deleteDraft = within(footer).getByRole('button', { name: 'Delete draft' });
         const discard = within(footer).getByRole('button', { name: 'Discard' });
         const draft = within(footer).getByRole('button', { name: 'Save draft' });
         const schedule = within(footer).getByRole('button', { name: 'Schedule' });
-        await expect(rect(leading).left, 'leading action starts at track 1 left').toBeCloseTo(tracks.track(1).left, 0);
-        await expect(rect(leading).right, 'leading action stays within track 1').toBeLessThanOrEqual(tracks.track(1).right);
+        await expect(rect(deleteDraft).left, 'leading action starts at track 1 left').toBeCloseTo(tracks.track(1).left, 0);
+        await expect(rect(deleteDraft).right, 'leading action stays within track 1').toBeLessThanOrEqual(tracks.track(1).right);
         await expect(rect(discard).left, 'first filled button in track 2').toBeCloseTo(tracks.track(2).left, 0);
         await expect(rect(discard).right, 'first filled button in track 2').toBeCloseTo(tracks.track(2).right, 0);
         await expect(rect(draft).left, 'second filled button in track 3').toBeCloseTo(tracks.track(3).left, 0);
