@@ -9,7 +9,7 @@
       "id": "reviews-page",
       "screen": "Monthly reviews list page",
       "template": "Page + Section + Table",
-      "variant": "Page · Default / Section · Toolbar / Table",
+      "variant": "Page · Default / Section · Search and filters / Table",
       "page": "design-system/src/templates/Section/index.md",
       "section": "Anatomy",
       "pages": [
@@ -77,18 +77,5 @@
       "expectation": "Pagination sits in the footer alongside the filtered 'Showing X to Y of Z results' count."
     }
   ],
-  "against_placements": [
-    {
-      "id": "bare-select-in-toolbar",
-      "placement": "Bare Select or PopupSelect in Section toolbar",
-      "page": "design-system/agent-views/patterns/Filtering.md",
-      "section": "Tiers",
-      "scoring": "checker",
-      "check": {
-        "kind": "no-bare-select-in-toolbar",
-        "rejects": ["Select", "PopupSelect"]
-      },
-      "expectation": "Counts against: placing a bare Select or PopupSelect inside Section's toolbar instead of FilterButton or Tabs."
-    }
-  ]
+  "against_placements": []
 }

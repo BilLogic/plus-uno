@@ -714,7 +714,7 @@ Frame.propTypes = {
     /** The sessionStorage key the Panel's width and open state are kept under; null keeps nothing. */
     panelStorageKey: PropTypes.string,
     /** Content type: default caps the grid at 1232, full has no cap (chat, a board, a wide table), reading caps it at 864. `content` is the old name for `default`. */
-    width: PropTypes.oneOf(['default', 'full', 'reading', 'content']),
+    width: PropTypes.oneOf(['default', 'full', 'reading']),
     /** Element for the content box. `main` by default, the Page's landmark; pass `div` when the page supplies its own `main`. */
     contentAs: PropTypes.elementType,
     contentClassName: PropTypes.string,

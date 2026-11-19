@@ -193,7 +193,7 @@ Lengths are in pixels. Where the layout mode changes a value, the columns read M
 
 ## Variants
 
-**`width`** — `default` · `full` · `reading` · `content`
+**`width`** — `default` · `full` · `reading`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 

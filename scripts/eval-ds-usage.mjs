@@ -823,7 +823,6 @@ export function structuralFit({ folder, expected, repoRoot = REPO_ROOT }) {
   const findings = files.flatMap((file) => escapesIn({ ...file, page: pages.has(file.path) }, ctx));
   const elements = files.flatMap((file) => jsxElementsOf(blankComments(file.text)).map((el) => ({ ...el, file })));
   const names = new Set(elements.map((el) => el.name.split('.')[0]));
-  const hasToolbarViolation = findings.some((f) => f.rule === 'ds/placement' && /toolbar|view-bar filter/i.test(f.message));
   const hasBannerViolation = findings.some((f) => f.rule === 'ds/placement' && /page header|page message order/i.test(f.message));
   const hasShellViolation = findings.some((f) => f.rule === 'ds/page-starts-from-pattern');
 
@@ -846,28 +845,21 @@ export function structuralFit({ folder, expected, repoRoot = REPO_ROOT }) {
         verdict = 'ignored';
         reason = `checker: missing expected template components (${comps.join(', ')})`;
       }
-    } else if (check.kind === 'toolbar-filters') {
+    } else if (check.kind === 'header-filters') {
       const accepts = check.accepts ?? ['FilterButton', 'FilterMenu'];
       const rejects = check.rejects ?? ['Select', 'PopupSelect'];
       const usedAccepted = accepts.filter((c) => names.has(c));
       const usedRejected = rejects.filter((c) => names.has(c));
-      if (!hasToolbarViolation && usedAccepted.length > 0) {
+      const filtersSlot = elements.some((el) => el.name === 'Section' && el.attributes.some((a) => a.name === 'filters'));
+      if ((filtersSlot || usedAccepted.length > 0) && usedRejected.length === 0) {
         verdict = 'followed';
-        reason = `checker: uses ${usedAccepted.join(', ')} with no toolbar placement violation`;
-      } else if (hasToolbarViolation || usedRejected.length > 0) {
+        reason = `checker: quick filters through ${filtersSlot ? "Section's filters prop" : usedAccepted.join(', ')}`;
+      } else if (usedRejected.length > 0) {
         verdict = 'ignored';
-        reason = `checker: uses ${usedRejected.join(', ') || 'non-filter control'} in toolbar instead of ${accepts.join(' or ')}`;
+        reason = `checker: uses ${usedRejected.join(', ')} instead of ${accepts.join(' or ')}`;
       } else {
         verdict = 'ignored';
         reason = `checker: no ${accepts.join(' or ')} found`;
-      }
-    } else if (check.kind === 'no-bare-select-in-toolbar') {
-      if (!hasToolbarViolation) {
-        verdict = 'followed';
-        reason = 'checker: no bare Select or PopupSelect in Section toolbar';
-      } else {
-        verdict = 'ignored';
-        reason = 'checker: ds/placement flagged bare Select or PopupSelect in Section toolbar';
       }
     } else if (check.kind === 'banner-placement') {
       const hasBanner = names.has('Banner');
@@ -894,7 +886,6 @@ export function structuralFit({ folder, expected, repoRoot = REPO_ROOT }) {
       const owner = check.owner;
       const prop = check.prop;
       const hasSlot = elements.some((el) => el.name === owner && el.attributes.some((a) => a.name === prop))
-        || (owner === 'Section' && prop === 'toolbar' && elements.some((el) => el.name === 'Section.Toolbar' || el.name === 'SectionToolbar'))
         || (owner === 'Frame' && prop === 'panel' && files.some((f) => /\busePanelControl\b/.test(f.text)));
       const comps = check.components ?? [];
       const hasComp = !comps.length || comps.some((c) => names.has(c));

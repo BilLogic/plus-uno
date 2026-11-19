@@ -555,7 +555,7 @@ test('expectedFor: loads answer keys for every active task, validates page + sec
   assert.ok(expected.screens.length >= 3, 'lists template per screen');
   assert.ok(expected.patterns.some((p) => p.id === 'filtering' && p.variant === '1 · Quick filters'), 'lists Filtering variant');
   assert.ok(expected.required_placements.length >= 3, 'lists required placements');
-  assert.ok(expected.against_placements.length >= 3, 'lists placements that count against');
+  assert.ok(expected.against_placements.length >= 2, 'lists placements that count against');
   assert.equal(expectedFor('no-such-task'), null, 'tasks without an answer key return null');
 
   const into = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-expected-'));
@@ -733,13 +733,13 @@ test('structuralFit + fitJudge: structural items are scored by the checker while
       path.join(dir, 'src/App.jsx'),
       [
         "import { Frame, Page, PageHeader, Section, Table } from '@/templates';",
-        "import { Banner, FilterButton, Panel, SearchField, usePanelControl } from '@/components';",
+        "import { Banner, Panel, SearchField, usePanelControl } from '@/components';",
         'export default function App() {',
         '  const panel = usePanelControl();',
         '  return (',
         '    <Frame panel={<Panel>Details</Panel>}>',
         '      <Page header={<PageHeader title="Queue" />} banner={<Banner appearance="warning">Overdue</Banner>}>',
-        '        <Section title="Sessions" toolbar={<Section.Toolbar search={<SearchField label="Search" />} filters={<FilterButton label="Status" />} />}>',
+        '        <Section title="Sessions" search={<SearchField label="Search" />} filters={[{ key: "status", label: "Status", text: "All" }]}>',
         '          <Table />',
         '        </Section>',
         '      </Page>',
@@ -752,9 +752,8 @@ test('structuralFit + fitJudge: structural items are scored by the checker while
     assert.equal(structural['queue-page']?.verdict, 'followed');
     assert.equal(structural.filtering?.verdict, 'followed');
     assert.equal(structural['banner-under-page-header']?.verdict, 'followed');
-    assert.equal(structural['controls-in-section-toolbar']?.verdict, 'followed');
+    assert.equal(structural['controls-in-section-header']?.verdict, 'followed');
     assert.equal(structural['detail-in-frame-panel']?.verdict, 'followed');
-    assert.equal(structural['bare-select-in-toolbar']?.verdict, 'followed');
     assert.equal(structural['banner-above-or-flush-page-header']?.verdict, 'followed');
 
     let promptSeen = '';

@@ -6630,8 +6630,7 @@
           "values": [
             "default",
             "full",
-            "reading",
-            "content"
+            "reading"
           ],
           "description": "Content type: default caps the grid at 1232, full has no cap (chat, a board, a wide table), reading caps it at 864. `content` is the old name for `default`.",
           "deprecated": null
@@ -12359,28 +12358,6 @@
           "deprecated": null
         },
         {
-          "name": "tabs",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "use `views` (and `format`) in the three-row header. Tabs row under the title row (header type `tabs`, or `tabs-only`).",
-          "deprecated": {
-            "replacement": "views"
-          }
-        },
-        {
-          "name": "toolbar",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "use `search` and `filters` in the three-row header. Toolbar row under the title row (header type `toolbar`), usually a `Section.Toolbar`.",
-          "deprecated": {
-            "replacement": "search"
-          }
-        },
-        {
           "name": "header",
           "type": "node",
           "required": false,
@@ -12471,24 +12448,6 @@
           "default": null,
           "values": null,
           "description": "Runs when the Filter button of a narrow Section is pressed.",
-          "deprecated": null
-        },
-        {
-          "name": "onAddView",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Puts \"Add view\" at the end of the tabs row, and runs when it is pressed",
-          "deprecated": null
-        },
-        {
-          "name": "addViewLabel",
-          "type": "string",
-          "required": false,
-          "default": "'Add view'",
-          "values": null,
-          "description": "The \"Add view\" button's label",
           "deprecated": null
         },
         {
@@ -12669,10 +12628,10 @@
         "Footer",
         "Anatomy",
         "Levels",
-        "ToolbarSearch",
+        "SearchInHeader",
         "LoadingDefault",
-        "LoadingToolbar",
-        "LoadingTabsOnly",
+        "LoadingSearchAndFilters",
+        "LoadingViews",
         "Interactive",
         "ColorModes",
         "SplitLayout",
@@ -12719,61 +12678,13 @@
         "--heading-md",
         "--heading-sm",
         "--heading-xs",
-        "--inline-lg",
         "--inline-md",
-        "--inline-sm",
         "--section-min-width-main",
         "--section-min-width-side",
         "--section-stack-lg",
         "--section-stack-md",
         "--section-stack-sm",
-        "--section-toolbar-count-min-width",
-        "--section-toolbar-min-width",
         "--stack-sm"
-      ],
-      "subComponents": [
-        {
-          "name": "Toolbar",
-          "impl": "SectionToolbar",
-          "deprecated": true,
-          "props": [
-            {
-              "name": "search",
-              "type": "node",
-              "required": false,
-              "default": null,
-              "description": "Search field slot, at the start"
-            },
-            {
-              "name": "filters",
-              "type": "node",
-              "required": false,
-              "default": null,
-              "description": "Filters slot: dropdown buttons"
-            },
-            {
-              "name": "count",
-              "type": "node",
-              "required": false,
-              "default": null,
-              "description": "Count in words, such as \"12 of 48 students\"; truncates first, and is announced politely when it changes"
-            },
-            {
-              "name": "actions",
-              "type": "node",
-              "required": false,
-              "default": null,
-              "description": "Actions slot, at the end"
-            },
-            {
-              "name": "className",
-              "type": "string",
-              "required": false,
-              "default": null,
-              "description": null
-            }
-          ]
-        }
       ]
     },
     {

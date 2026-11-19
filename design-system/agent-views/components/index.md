@@ -40,6 +40,8 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `Chip` | `Tag` |
 | `Loader` | `Spinner`, `Skeleton` |
 | `Drawer` | `Panel` (a floating Panel, imported from @/components) |
+| `SectionToolbar` | `Section` |
+| `Section.Toolbar` | `Section` |
 
 **Props**
 
@@ -51,6 +53,8 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `Button appearance="secondary"` | `Button appearance="default"` |
 | `Heading level` | `Heading as` (the level comes from the surrounding sections; set as only to override the element) |
 | `Heading size="small" / "large"` | `Heading size="sm"`, `Heading size="lg"` (sizes match the tokens, xxl to xxs) |
+| `Section tabs / type="tabs-only"` | `Section views` |
+| `Section toolbar / type="toolbar"` | `Section search`, `Section filters` |
 
 **Tokens**
 

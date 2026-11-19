@@ -9,7 +9,7 @@
       "id": "queue-page",
       "screen": "Supervisor triage queue page",
       "template": "Frame + Page + Section + Table",
-      "variant": "Frame · Default / Page · Default / Section · Toolbar / Table · Dynamic table",
+      "variant": "Frame · Default / Page · Default / Section · Search and filters / Table · Dynamic table",
       "page": "design-system/src/templates/Frame/index.md",
       "section": "Anatomy",
       "pages": [
@@ -67,7 +67,7 @@
       "aliases": ["filter", "filters"],
       "scoring": "checker",
       "check": {
-        "kind": "toolbar-filters",
+        "kind": "header-filters",
         "accepts": ["FilterButton", "FilterMenu"],
         "rejects": ["Select", "PopupSelect"]
       },
@@ -118,33 +118,21 @@
   ],
   "required_placements": [
     {
-      "id": "controls-in-section-toolbar",
-      "placement": "Search and status filter in Section.Toolbar",
+      "id": "controls-in-section-header",
+      "placement": "Search and status filter in the Section header rows",
       "page": "design-system/src/templates/Section/index.md",
       "section": "Slots",
       "scoring": "checker",
       "check": {
         "kind": "slot-use",
         "owner": "Section",
-        "prop": "toolbar",
+        "prop": "search",
         "components": ["SearchField"]
       },
-      "expectation": "SearchField and filter controls sit in Section's toolbar prop via Section.Toolbar."
+      "expectation": "SearchField sits in Section's search prop and the quick filters in its filters prop."
     }
   ],
   "against_placements": [
-    {
-      "id": "bare-select-in-toolbar",
-      "placement": "Bare Select or PopupSelect in Section toolbar",
-      "page": "design-system/agent-views/patterns/Filtering.md",
-      "section": "Tiers",
-      "scoring": "checker",
-      "check": {
-        "kind": "no-bare-select-in-toolbar",
-        "rejects": ["Select", "PopupSelect"]
-      },
-      "expectation": "Counts against: placing bare Select or PopupSelect controls in Section's toolbar instead of FilterButton or FilterMenu."
-    },
     {
       "id": "banner-above-or-flush-page-header",
       "placement": "Banner above or flush against PageHeader",

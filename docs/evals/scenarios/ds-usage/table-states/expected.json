@@ -71,18 +71,5 @@
     }
   ],
   "required_placements": [],
-  "against_placements": [
-    {
-      "id": "bare-select-in-toolbar",
-      "placement": "Bare Select or PopupSelect in Section toolbar",
-      "page": "design-system/agent-views/patterns/Filtering.md",
-      "section": "Tiers",
-      "scoring": "checker",
-      "check": {
-        "kind": "no-bare-select-in-toolbar",
-        "rejects": ["Select", "PopupSelect"]
-      },
-      "expectation": "Counts against: placing a bare Select or PopupSelect in Section's toolbar."
-    }
-  ]
+  "against_placements": []
 }

@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import { REPO_ROOT } from './corpus.mjs';
 import { loadFacts } from './ds-facts.mjs';
+import { placementsFromSlots } from './ds-placements.mjs';
 import { RULES, closest, contextFrom, escapesIn, isPageModule, pagesOf } from './ds-usage.mjs';
 
 const ctx = contextFrom({
@@ -287,7 +288,23 @@ test('pagesOf: the module an app entry renders as its root is a page too', () =>
   assert.ok(pagesOf(provided).has('p/src/shell/index.jsx'));
 });
 
-test('ds/placement: Select or PopupSelect without trigger in a Section toolbar fails', () => {
+test('ds/placement: a slot row rejects its components and takes the replacement named in its fix', () => {
+  // The design system has no slot-acceptance row today, so the mechanics run on a fixture row in the registry's shape.
+  const fixtureSlots = {
+    slots: [{
+      owner: 'FilterBar',
+      prop: 'filters',
+      containers: ['FilterBar'],
+      accepts: ['FilterButton', 'FilterMenu'],
+      rejects: ['Select', 'PopupSelect'],
+      unlessProp: { PopupSelect: 'trigger' },
+      id: 'filter-bar',
+      pattern: 'Filtering',
+      guide: 'filtering',
+      message: "in a filter bar is a form or view-switch control, not a view-bar filter",
+      fix: 'use FilterButton (1–3 quick filters; pass trigger={<FilterButton … />} to PopupSelect) or FilterMenu (staged multi-category menu); run `ds guide filtering`',
+    }],
+  };
   const placementCtx = contextFrom({
     components: {
       components: [
@@ -295,30 +312,36 @@ test('ds/placement: Select or PopupSelect without trigger in a Section toolbar f
         { name: 'PopupSelect', kind: 'component', import: "import { PopupSelect } from '@/components';", props: [{ name: 'options', values: null }, { name: 'label', values: null }, { name: 'trigger', values: null }] },
         { name: 'FilterButton', kind: 'component', import: "import { FilterButton } from '@/components';", props: [{ name: 'text', values: null }] },
         { name: 'FilterMenu', kind: 'component', import: "import { FilterMenu } from '@/components';", props: [{ name: 'categories', values: null }] },
-        { name: 'Section', kind: 'pattern', import: "import { Section } from '@/templates';", props: [{ name: 'title', values: null }, { name: 'toolbar', values: null }] },
+        { name: 'FilterBar', kind: 'pattern', import: "import { FilterBar } from '@/templates';", props: [{ name: 'filters', values: null }] },
       ],
     },
     tokens: { tokens: [] },
     exported: new Set(['Select', 'PopupSelect', 'FilterButton', 'FilterMenu']),
-    barrels: { '@/templates': new Set(['Section', 'SectionToolbar']) },
+    barrels: { '@/templates': new Set(['FilterBar']) },
+    placements: placementsFromSlots(fixtureSlots),
   });
-  const head = "import { Select, PopupSelect, FilterButton, FilterMenu } from '@/components';\nimport { Section, SectionToolbar } from '@/templates';\n";
+  const head = "import { Select, PopupSelect, FilterButton, FilterMenu } from '@/components';\nimport { FilterBar } from '@/templates';\n";
   const warn = (code) => escapesIn({ path: 'p/src/Queue.jsx', text: head + code, page: false }, placementCtx);
 
-  const f1 = warn('<Section title="Queue" toolbar={<Section.Toolbar filters={<Select options={[]} />} />} />');
+  const f1 = warn('<FilterBar filters={<Select options={[]} />} />');
   assert.deepEqual(f1.map((f) => [f.rule, f.level]), [['ds/placement', 'fail']]);
   assert.match(f1[0].message, /Select/);
   assert.match(f1[0].fix, /FilterButton/);
   assert.match(f1[0].fix, /ds guide filtering/);
 
-  const f2 = warn('<SectionToolbar filters={<PopupSelect label="Status" options={[]} />} />');
+  const f2 = warn('<FilterBar filters={<PopupSelect label="Status" options={[]} />} />');
   assert.deepEqual(f2.map((f) => [f.rule, f.level]), [['ds/placement', 'fail']]);
   assert.match(f2[0].message, /PopupSelect/);
 
   // Passing a FilterButton trigger to PopupSelect, or using FilterButton / FilterMenu directly, or Select in the body passes.
-  assert.deepEqual(warn('<Section.Toolbar filters={<PopupSelect label="Status" options={[]} trigger={<FilterButton text="Status" />} />} />'), []);
-  assert.deepEqual(warn('<Section.Toolbar filters={<FilterMenu categories={[]} />} />'), []);
-  assert.deepEqual(warn('<Section title="Form" toolbar={<Section.Toolbar filters={<FilterButton text="Status" />} />}><Select label="Role" options={[]} /></Section>'), []);
+  assert.deepEqual(warn('<FilterBar filters={<PopupSelect label="Status" options={[]} trigger={<FilterButton text="Status" />} />} />'), []);
+  assert.deepEqual(warn('<FilterBar filters={<FilterMenu categories={[]} />} />'), []);
+  assert.deepEqual(warn('<><FilterBar filters={<FilterButton text="Status" />} /><Select label="Role" options={[]} /></>'), []);
+});
+
+test('ds/placement: the design system itself registers no slot-acceptance row for a Section', () => {
+  const facts = loadFacts(REPO_ROOT);
+  assert.deepEqual(facts.placements.filter((row) => (row.in ?? []).some((place) => /^Section/.test(place))), []);
 });
 
 test('ds/placement: a Banner before a sibling PageHeader warns; the Page slots pass', () => {
