@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { findingsOf, run } from './check-prop-names.mjs';
-import { BARE_BOOLEANS, ALLOWED, isName, ruleFor } from './lib/prop-names.mjs';
+import { BARE_BOOLEANS, allowedProps, isName, ruleFor } from './lib/prop-names.mjs';
 
 const facts = (...components) => ({ components });
 const comp = (name, ...props) => ({ name, source: `design-system/src/${name}.jsx`, props: props.map(([n, type]) => ({ name: n, type })) });
@@ -31,7 +31,7 @@ test('is… props, handlers and a non-boolean selected are not findings', () => 
 });
 
 test('an allowed bare name passes for its component only', () => {
-  const { component, prop } = ALLOWED[0];
+  const { component, prop } = allowedProps()[0];
   assert.deepEqual(findingsOf(facts(comp(component, [prop, 'bool']))), []);
   assert.equal(findingsOf(facts(comp('Elsewhere', [prop, 'bool']))).length, 1);
 });

@@ -15,7 +15,7 @@
 //
 //   node scripts/check-worker-host.mjs --host=uno-bot.old-account.workers.dev
 //
-// ALLOWED does not apply to that scan. Those entries are exceptions for the host
+// The allowed list does not apply to that scan. Those entries are exceptions for the host
 // this repo currently deploys to — wrangler.toml and the two Slack manifests —
 // and they are exactly the files a cutover has to rewrite, so exempting them
 // there would report the move complete while three files still point at a dead
@@ -25,6 +25,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { DEFAULT_WORKER_ORIGIN } from "./worker-url.mjs";
+import { loadExceptions } from "../../../scripts/lib/exceptions.mjs";
 import { isEntry, main } from "../../../scripts/lib/findings.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -34,40 +35,24 @@ const REPO_ROOT = path.resolve(here, "../../..");
 export const HOST = new URL(DEFAULT_WORKER_ORIGIN).host;
 
 /**
- * Where the host may still appear, and why. Repo-relative.
+ * Where the host may still appear, and why: the `allowed` list of `check:worker-host`
+ * in `scripts/exceptions.json`, repo-relative path to reason.
  *
- * Each entry is a deliberate exception, not a backlog. A new one needs a reason
- * written next to it.
+ * Each entry is a deliberate exception, not a backlog. A new one needs a reason.
+ *
+ * @returns {Map<string, string>}
  */
-export const ALLOWED = new Map([
-  [
-    "agents/uno-bot/scripts/worker-url.mjs",
-    "the definition itself",
-  ],
-  [
-    "agents/uno-bot/wrangler.toml",
-    "SLACK_OAUTH_REDIRECT_URI, which Slack matches against the app's registered " +
-      "value and so cannot be derived — it changes in lockstep with Slack's config",
-  ],
-  [
-    "agents/uno-bot/slack-app-manifest.yaml",
-    "the Slack app's own declared config — 3 command URLs, the OAuth redirect, and " +
-      "the events and interactivity request URLs. NOT scripted: `pkce_enabled` " +
-      "permanently disables apps.manifest.update for this app, so every push path " +
-      "fails with cannot_disable_once_enabled (ADR-024). The file is the repo's record " +
-      "and the rollback point; applying it means pasting into the App Manifest web " +
-      "editor, then confirming with `npm run slack:diff`, which reads the live app. " +
-      "That makes it the slowest step of the #288 cutover, not the easiest",
-  ],
-]);
+export const allowedPlaces = () =>
+  new Map(loadExceptions("check:worker-host", "allowed").map((e) => [e.at, e.reason]));
 
 /**
- * Recorded history, which must NOT be rewritten when the host changes.
+ * Recorded history, which must NOT be rewritten when the host changes: the `history` list
+ * of `check:worker-host` in `scripts/exceptions.json`, as path prefixes.
  *
  * A recorded run says which Worker it scored. Editing that to the new
  * host would be falsifying the record — the run really did hit the old one.
  */
-const HISTORY = [/^docs\/knowledge\/archive\//, /^docs\/plans\//];
+const historyRoots = () => loadExceptions("check:worker-host", "history").map((e) => e.at);
 
 const SKIP_DIRS = new Set(["node_modules", ".git", "dist", "storybook-static", ".test-build"]);
 
@@ -135,14 +120,16 @@ export function findStrays(root = REPO_ROOT, host = HOST) {
   const rels = gitFiles(root) ?? [...files(root)].map((abs) => path.relative(root, abs));
   // Asking about a foreign host is a cutover audit, not the invariant check.
   const auditing = host !== HOST;
+  const allowed = allowedPlaces();
+  const history = historyRoots();
   const strays = [];
   for (const rel of rels) {
     if (!TEXT.test(rel)) continue;
     if (rel.split(path.sep).some((seg) => SKIP_DIRS.has(seg))) continue;
     const abs = path.join(root, rel);
     if (auditing) {
-      if (HISTORY.some((re) => re.test(rel))) continue;
-    } else if (ALLOWED.has(rel) || HISTORY.some((re) => re.test(rel))) {
+      if (history.some((root) => rel.startsWith(root))) continue;
+    } else if (allowed.has(rel) || history.some((root) => rel.startsWith(root))) {
       continue;
     }
     let text;
@@ -172,8 +159,8 @@ function hostArgument() {
 
 export const REMEDY =
   "  -> Import workerOrigin()/workerUrl() from scripts/worker-url.mjs, or read\n" +
-  "     UNO_BOT_WORKER_URL. If the mention is deliberate, add it to ALLOWED in\n" +
-  "     scripts/check-worker-host.mjs with the reason (#288).";
+  "     UNO_BOT_WORKER_URL. If the mention is deliberate, add it to the allowed list of\n" +
+  "     check:worker-host in scripts/exceptions.json with the reason (#288).";
 
 /**
  * The cutover audit has its own remedy, because a foreign host is not a stray
@@ -208,7 +195,7 @@ export function run({ repoRoot = REPO_ROOT, host = hostArgument() } = {}) {
  */
 export function summary({ host = hostArgument() } = {}) {
   return host === HOST
-    ? `${HOST} is defined once; ${ALLOWED.size} documented exception(s).`
+    ? `${HOST} is defined once; ${allowedPlaces().size} documented exception(s).`
     : `no file mentions ${host}.`;
 }
 

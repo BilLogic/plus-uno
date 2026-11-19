@@ -32,14 +32,22 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import { documents, frontmatter } from './lib/corpus.mjs';
+import { loadExceptions } from './lib/exceptions.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 const RELATIVE_ROOT = 'docs/knowledge';
 
-const EXCLUDED_DIRS = ['archive'];
-const GOVERNING_FILES = ['INDEX.md', 'changelog.md'];
+/**
+ * What the check leaves out of the folder, from the `excluded` list of this check in
+ * `scripts/exceptions.json`: a name ending in `/` is a directory directly below the
+ * folder, any other is a file directly in it.
+ */
+const excluded = () => {
+  const entries = loadExceptions('check:knowledge-disposition', 'excluded').map((e) => e.at);
+  return { dirs: entries.filter((at) => at.endsWith('/')), files: entries.filter((at) => !at.endsWith('/')) };
+};
 const DISPOSITIONS = ['rule', 'adr', 'archive'];
 /** `archive` names a destination inside the folder, so it needs no separate target. */
 const TARGET_REQUIRED = ['rule', 'adr'];
@@ -50,12 +58,13 @@ export const REMEDY =
 
 /** Files in scope: everything below docs/knowledge/ that is not excluded. */
 function inScope(root = REPO_ROOT) {
+  const { dirs, files } = excluded();
   return documents(RELATIVE_ROOT, { root, ext: null })
     .filter((rel) => {
       const within = rel.slice(RELATIVE_ROOT.length + 1);
       return within.includes('/')
-        ? !EXCLUDED_DIRS.includes(within.slice(0, within.indexOf('/')))
-        : !GOVERNING_FILES.includes(within);
+        ? !dirs.includes(within.slice(0, within.indexOf('/') + 1))
+        : !files.includes(within);
     })
     .map((rel) => path.join(root, rel));
 }
@@ -146,7 +155,7 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
   if (!exists) return 'docs/knowledge/ does not exist — nothing to check';
   return (
     `${files.length} in-scope file(s) under docs/knowledge/, all dispositioned` +
-    ` (archive/ excluded; ${GOVERNING_FILES.join(' + ')} govern the folder)`
+    ` (${excluded().dirs.join(' + ')} excluded; ${excluded().files.join(' + ')} govern the folder)`
   );
 }
 

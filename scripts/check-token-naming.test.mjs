@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { exitCodeFor } from './lib/findings.mjs';
 import {
   BLOCK_ON_NAMING_MISMATCH,
-  MISSING_SYNTAX_ALLOWLIST,
+  missingSyntaxExceptions,
   SNAPSHOT_PATH,
   checkTokenNaming,
   expectedToken,
@@ -131,8 +131,8 @@ test('kind 2: fails when a live variable has no WEB code syntax and is not on th
 });
 
 test('kind 2 allowlist: permits color/ai/*, Prompt input/*, elevation shadow parts, and Frame/sidebar-docked without WEB code syntax', () => {
-  assert.ok(MISSING_SYNTAX_ALLOWLIST.length >= 4);
-  for (const entry of MISSING_SYNTAX_ALLOWLIST) {
+  assert.ok(missingSyntaxExceptions().length >= 4);
+  for (const entry of missingSyntaxExceptions()) {
     assert.ok(entry.reason && entry.reason.length > 10, `allowlist entry missing reason: ${JSON.stringify(entry)}`);
   }
   const findings = checkTokenNaming(

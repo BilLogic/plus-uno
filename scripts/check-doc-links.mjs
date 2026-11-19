@@ -56,6 +56,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 import { documents, links, GENERATED_BUNDLE } from './lib/corpus.mjs';
+import { loadExceptions } from './lib/exceptions.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -111,11 +112,13 @@ const ROOTED = /^(AGENTS\.md|docs\/|skills\/|agents\/|scripts\/|design-system\/|
  */
 const CODE_SPAN = /`([^`\n]+)`/g;
 
-const VENDORED_POINTERS = [
-  /^docs\/connectors\/supabase\/blueprint\.md$/,
-  /^docs\/connectors\/supabase\/blueprint-direct-access\.md$/,
-  /^docs\/connectors\/supabase\/blueprint-schema\.md$/,
-];
+/**
+ * Documents vendored from another repo, whose backticked paths are that repo's: the
+ * `vendored` list of `check:docs` in `scripts/exceptions.json`, as anchored patterns.
+ */
+const vendoredPointers = () =>
+  loadExceptions('check:docs', 'vendored').map((e) => new RegExp(`^${e.at.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`));
+
 
 /** A bare filename: no slash, no space, and a `.md` tail. */
 const BARE_MD = /^[^`/ ]+\.md$/;
@@ -144,17 +147,13 @@ const OLD_PATTERNS = [
   'design-system/agent-views/pages/',
 ];
 
-/** History keeps the words it was written in; a build output is not authored. */
-const NOT_ACTIVE = [
-  'node_modules/',
-  'docs/plans/',
-  'docs/knowledge/',
-  'docs/adr/',
-  'todos/',
-  'storybook-static/',
-  'packages/cli/dist/',
-  'design-system/figma/knowledge-audit.json',
-];
+/**
+ * Paths that are not active files: history keeps the words it was written in, and a
+ * build output is not authored. The `not-active` list of `check:docs` in
+ * `scripts/exceptions.json`.
+ */
+const notActive = () => loadExceptions('check:docs', 'not-active').map((e) => e.at);
+
 
 /**
  * All seven passes, run once per repo root.
@@ -211,7 +210,7 @@ const inputs = byRoot((repoRoot) => {
   ].map((m) => m[1]);
 
   for (const file of md(POINTER_DIRS, {
-    exclude: [GENERATED_BUNDLE, ...VENDORED_POINTERS],
+    exclude: [GENERATED_BUNDLE, ...vendoredPointers()],
     plus: ['AGENTS.md', 'GLOSSARY.md', 'SETUP.md'],
   })) {
     for (const raw of codeSpans(file)) {
@@ -317,13 +316,14 @@ const inputs = byRoot((repoRoot) => {
   // ── 7. retired path shapes ────────────────────────────────────────────────
 
   notes.push('[check] validating no old path remnants in active files');
+  const skips = notActive();
 
   const activeFiles = documents('.', {
     root: repoRoot,
     ext: ['.md', '.jsx', '.json', '.mdc'],
     ignore: new Set(['node_modules', '.git', 'storybook-static', 'dist']),
     skipDotDirs: false,
-  }).filter((rel) => !NOT_ACTIVE.some((skip) => rel.includes(skip)));
+  }).filter((rel) => !skips.some((skip) => rel.includes(skip)));
 
   const activeLines = activeFiles.flatMap((rel) =>
     readFileSync(path.join(repoRoot, rel), 'utf8')
@@ -333,7 +333,7 @@ const inputs = byRoot((repoRoot) => {
 
   for (const pattern of OLD_PATTERNS) {
     const hits = activeLines.filter(
-      (line) => line.includes(pattern) && !NOT_ACTIVE.some((skip) => line.includes(skip)),
+      (line) => line.includes(pattern) && !skips.some((skip) => line.includes(skip)),
     );
     if (hits.length) fail(`[stale] ${hits.length} references to old path pattern: ${pattern}`);
   }

@@ -13,7 +13,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import {
-  COPIES,
+  exceptionLists,
   MIN_WORDS,
   SHINGLE,
   blocksOf,
@@ -172,7 +172,7 @@ test('a hand-written copy of a vendored document is NOT exempt — the marker is
 });
 
 test('a copy by construction is excluded, and a stale COPIES entry fails', () => {
-  const [copyPath] = [...COPIES.keys()];
+  const [copyPath] = [...exceptionLists().copies.keys()];
   const planted = passage('the triage roles');
   const both = estate({ [`plus-uno:${copyPath}`]: planted, [`sb:${copyPath}`]: planted });
   try {

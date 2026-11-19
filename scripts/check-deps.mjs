@@ -23,27 +23,20 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { cdnPins, pinConflicts, unusedDeclared } from "./deps.mjs";
 import { byRoot, main } from "./lib/findings.mjs";
+import { loadExceptions } from "./lib/exceptions.mjs";
 import { absentMessage, openRatchet } from "./lib/ratchet.mjs";
 import { trackedFiles } from "./lib/tracked-sources.mjs";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 /**
- * Declared, never referenced, and kept on purpose. Each needs a reason.
+ * Declared, never referenced, and kept on purpose: the `allowed` list of
+ * `check:deps` in `scripts/exceptions.json`, each with its reason.
  *
  * The bar: something the repo genuinely needs at build or test time but never
  * names in source. Anything else belongs out of package.json.
  */
-const ALLOWED = new Map([
-  ["typescript", "the compiler. Invoked as `tsc` by typecheck and the test build; never imported."],
-  ["@cloudflare/workers-types", "the Worker runtime's ambient types. Loaded through tsconfig's `types`, which names it there rather than importing it."],
-  ["@types/node", "ambient Node types for the Worker's build scripts. Same shape: a tsconfig entry, never an import."],
-  ["@vitest/coverage-v8", "vitest loads it by convention when --coverage is passed; there is no import site."],
-  [
-    "uno-blueprint",
-    "the sb service-blueprint template kit (BilLogic/uno-blueprint, formerly agentic-service-blueprinting) — not the PLUS blueprint estate of the same name. Pinned as a development dependency the way plus-uno-blueprint pins it (#425). `check:cross-repo` reads its harness DOCUMENTS off disk in node_modules rather than importing a module, so there is no specifier to find — the package IS the corpus. Removing it does not break a build; it silently narrows a sweep to two repos, which is why it is declared here rather than left to a checkout somebody may or may not have.",
-  ],
-]);
+const allowedPackages = () => new Map(loadExceptions("check:deps", "allowed").map((e) => [e.at, e.reason]));
 
 /**
  * CDN version splits that already exist. New ones fail; these are recorded in
@@ -84,7 +77,7 @@ export function splitVerdict(conflicts, unresolved, ratchet) {
   }
 
   // A recorded split nobody prunes is a backlog wearing a ratchet's clothes — the
-  // same thing the ALLOWED list has a staleness check for.
+  // same thing the allowed list has a staleness check for.
   const staleBaseline = [];
   const staleLibs = new Set();
   for (const { key } of ratchet.stale(found)) {
@@ -145,6 +138,7 @@ const inputs = byRoot((repoRoot) => {
     .filter((f) => SOURCE.test(f) && path.basename(f) !== "package.json" && path.basename(f) !== "package-lock.json")
     .map((rel) => ({ path: rel, text: read(rel) }));
 
+  const allowed = allowedPackages();
   const unused = [];
   const stale = [];
   let declaredCount = 0;
@@ -155,7 +149,7 @@ const inputs = byRoot((repoRoot) => {
       declared,
       sources,
       scripts: json.scripts ?? {},
-      allowed: ALLOWED,
+      allowed,
       detailed: true,
     });
     // Named by manifest: "typescript is unused" means different things in the
@@ -193,7 +187,7 @@ const inputs = byRoot((repoRoot) => {
   }
   const conflicts = pinConflicts(pins, { declaredVersions });
 
-  return { unused, stale, pins, conflicts, unresolved, declaredCount };
+  return { unused, stale, pins, conflicts, unresolved, declaredCount, allowedCount: allowed.size };
 });
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
@@ -210,7 +204,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
     failures.push(
       `${unused.length} declared dependenc(ies) nothing in the repo refers to:\n` +
         unused.map((n) => `       ${n}`).join("\n") +
-        "\n     Remove them, or add them to ALLOWED in scripts/check-deps.mjs with the reason\n" +
+        "\n     Remove them, or add them to `allowed` in scripts/exceptions.json with the reason\n" +
         "     they are needed without being named.",
     );
   }
@@ -220,7 +214,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   const trulyStale = [...new Set(stale)].filter((n) => !unused.some((u) => u.startsWith(`${n}  (`)));
   if (trulyStale.length) {
     failures.push(
-      `${trulyStale.length} ALLOWED entr(ies) for dependencies that ARE used now: ${trulyStale.join(", ")}.\n` +
+      `${trulyStale.length} allowed entr(ies) for dependencies that ARE used now: ${trulyStale.join(", ")}.\n` +
         "     The exemption outlived its reason — delete it, so the list stays a set of\n" +
         "     decisions rather than a backlog.",
     );
@@ -259,10 +253,10 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
  * failed on a runner.
  */
 export function summary({ repoRoot = REPO_ROOT } = {}) {
-  const { pins, conflicts, unresolved, declaredCount } = inputs(repoRoot);
+  const { pins, conflicts, unresolved, declaredCount, allowedCount } = inputs(repoRoot);
   const { baselined } = splitVerdict(conflicts, unresolved, openRatchet({ file: BASELINE, repoRoot }));
   const line =
-    `${declaredCount} declared, all referenced (${ALLOWED.size} documented exception(s)); ` +
+    `${declaredCount} declared, all referenced (${allowedCount} documented exception(s)); ` +
     `${pins.length} CDN pin(s) across ${new Set(pins.map((p) => p.path)).size} file(s), ` +
     `${baselined} recorded split(s), 0 new.`;
   if (!unresolved.length) return line;

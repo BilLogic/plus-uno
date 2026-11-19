@@ -57,7 +57,7 @@
  * ({@link VENDORED}), rather than by path — so a new vendored document is exempt
  * the day it is vendored, and a hand-written one never is.
  *
- * A COPY BY CONSTRUCTION IS NOT A STATEMENT. {@link COPIES} names documents a
+ * A COPY BY CONSTRUCTION IS NOT A STATEMENT. {@link exceptionLists} (`copies`) names documents a
  * shared tool writes into each repo — today the three `docs/agents/` files the
  * `mattpocock-skills` setup skill installs. Their home is the plugin; editing
  * one of the three copies is the mistake, and this sweep has no opinion the
@@ -133,6 +133,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { documents, frontmatter, stripLinks } from './lib/corpus.mjs';
+import { loadExceptions } from './lib/exceptions.mjs';
 import { isEntry, main } from './lib/findings.mjs';
 import { absentMessage, openRatchet } from './lib/ratchet.mjs';
 
@@ -180,34 +181,21 @@ export const REPOS = [
 ];
 
 /**
- * Left as written in every repo, by the rules the other sweeps already use:
- * history keeps the words it was written in, and a generated artifact is
- * regenerated from sources that are swept anyway.
+ * What the sweep leaves alone, from `check:cross-repo` in `scripts/exceptions.json`:
+ *
+ *   skip    paths left as written in every repo, by the rules the other sweeps already use:
+ *           history keeps the words it was written in, and a generated artifact is
+ *           regenerated from sources that are swept anyway.
+ *   copies  documents a shared tool writes into every repo: the path, and why it is a copy.
+ *
+ * @returns {{skip: string[], copies: Map<string, string>}}
  */
-export const SKIP = [
-  'docs/plans/',
-  'docs/adr/',
-  'docs/knowledge/archive/',
-  'docs/evals/',
-  'todos/',
-  'node_modules/',
-];
-
-/** Documents a shared tool writes into every repo: the path, and why it is a copy. */
-export const COPIES = new Map([
-  [
-    'docs/agents/domain.md',
-    'installed by the mattpocock-skills setup skill in all three repos. Its home is the plugin; a divergent copy is the defect, and the plugin owns that. plus-uno appends one local section, its glossary-editing rule.',
-  ],
-  [
-    'docs/agents/issue-tracker.md',
-    'same origin: it teaches the skills how this estate spells `gh`, and the spelling is deliberately the same everywhere.',
-  ],
-  [
-    'docs/agents/triage-labels.md',
-    'same origin again. The label table differs per repo; the sentences defining the five canonical roles cannot, because the roles are the plugin\'s.',
-  ],
-]);
+export function exceptionLists() {
+  return {
+    skip: loadExceptions('check:cross-repo', 'skip').map((e) => e.at),
+    copies: new Map(loadExceptions('check:cross-repo', 'copies').map((e) => [e.at, e.reason])),
+  };
+}
 
 /** The record of duplication that already existed when this check was written. */
 export const BASELINE = 'scripts/baselines/cross-repo-duplication.json';
@@ -268,15 +256,15 @@ export function wordsOf(block) {
 }
 
 /** Every harness document under a repo's roots, as `{rel, blocks}` of word arrays. */
-export function documentsIn(root, spec) {
+export function documentsIn(root, spec, { skip, copies } = exceptionLists()) {
   // The corpus walk skips dot-directories, which is also what keeps a CI
   // sibling checkout under `.sibling-repos/` from being read as part of the
   // repo above it.
   const files = spec.roots.flatMap((r) => documents(r, { root }));
   const docs = [];
   for (const rel of files) {
-    if (SKIP.some((p) => rel.startsWith(p))) continue;
-    if (COPIES.has(rel)) continue;
+    if (skip.some((p) => rel.startsWith(p))) continue;
+    if (copies.has(rel)) continue;
     const text = readFileSync(path.join(root, rel), 'utf8');
     if (VENDORED.test(text)) continue;
     docs.push({ rel, blocks: blocksOf(text).map(wordsOf).filter((w) => w.length >= SHINGLE) });
@@ -455,11 +443,12 @@ export function sweep(overrides = {}) {
   const reached = REPOS.filter((s) => located[s.key]).map((s) => s.key);
   const absent = REPOS.filter((s) => !located[s.key]);
 
+  const lists = exceptionLists();
   const corpus = {};
   const docs = {};
   for (const spec of REPOS) {
     if (!located[spec.key]) continue;
-    corpus[spec.key] = documentsIn(located[spec.key].root, spec);
+    corpus[spec.key] = documentsIn(located[spec.key].root, spec, lists);
     docs[spec.key] = corpus[spec.key].length;
   }
 
@@ -527,7 +516,7 @@ export function sweep(overrides = {}) {
   // when every repo was reached: "in fewer than two repos" cannot be told apart
   // from "in fewer than two repos I could look at".
   if (reached.length === REPOS.length) {
-    for (const [rel, why] of COPIES) {
+    for (const [rel, why] of lists.copies) {
       const holders = REPOS.filter((s) => existsSync(path.join(located[s.key].root, rel)));
       if (holders.length < 2) {
         stale.push(
@@ -538,7 +527,7 @@ export function sweep(overrides = {}) {
     }
   }
 
-  return { located, reached, absent, docs, comparisons, findings, rises, stale, shared, recorded, unreviewed: ratchet.unreviewed() };
+  return { located, reached, absent, docs, comparisons, findings, rises, stale, shared, copies: lists.copies, recorded, unreviewed: ratchet.unreviewed() };
 }
 
 /**
@@ -674,7 +663,7 @@ export function summary() {
       : `no unrecorded meaning stated twice across the ${result.reached.length} repos reached`;
   return (
     `${found} — passages of ` +
-    `${MIN_WORDS}+ words, ${SHINGLE}-word shingles. ${COPIES.size} copies by construction excluded; ` +
+    `${MIN_WORDS}+ words, ${SHINGLE}-word shingles. ${result.copies.size} copies by construction excluded; ` +
     `${result.recorded.length} recorded pairs at ${recorded} shared words (may fall, never rise).\n${coverageReport(result)}` +
     (result.absent.length ? '\n  A pairing not compared is not a pairing that passed.' : '')
   );

@@ -23,7 +23,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { DEFAULT_WORKER_ORIGIN, workerOrigin, workerUrl } from "./worker-url.mjs";
-import { ALLOWED, HOST, findStrays } from "./check-worker-host.mjs";
+import { allowedPlaces, HOST, findStrays } from "./check-worker-host.mjs";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 
@@ -112,7 +112,7 @@ test("a file with no mention is silent — this is not just always red", () => {
 });
 
 test("the documented exceptions are exempt, and only they are", () => {
-  for (const rel of ALLOWED.keys()) {
+  for (const rel of allowedPlaces().keys()) {
     withRepo(rel, `https://${HOST}/x\n`, (root) => {
       assert.deepEqual(findStrays(root), [], `${rel} should be allowed`);
     });
@@ -183,7 +183,7 @@ test("binary and unknown extensions are skipped rather than read", () => {
 test("every exception carries a reason, so the list cannot grow silently", () => {
   // The failure mode this guards: someone hits the check, adds their path to
   // ALLOWED to make it green, and the single-definition property quietly dies.
-  for (const [rel, why] of ALLOWED) {
+  for (const [rel, why] of allowedPlaces()) {
     assert.ok(typeof why === "string" && why.length > 20, `${rel} needs a real reason`);
   }
 });
@@ -229,7 +229,7 @@ test("every exception is live — a dead one is a silent hole", () => {
   // The reason this matters: an entry whose stated reason no longer holds still
   // grants the exemption. The suite cannot catch that by writing the host into
   // each ALLOWED path — that passes by construction — so check the real files.
-  for (const rel of ALLOWED.keys()) {
+  for (const rel of allowedPlaces().keys()) {
     const abs = path.join(REPO_ROOT, rel);
     assert.ok(existsSync(abs), `${rel} is in ALLOWED but does not exist`);
     assert.ok(

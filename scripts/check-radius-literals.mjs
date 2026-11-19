@@ -26,7 +26,7 @@
  * decided at runtime and is skipped rather than guessed.
  *
  * Component SCSS reads roles; existing raw semantic holds are counted in
- * RADIUS_EXCEPTIONS below. Other source types retain the literal rule.
+ * the `exceptions` list in scripts/exceptions.json. Other source types retain the literal rule.
  *
  * NO BASELINE. The count that is correct is zero.
  *
@@ -38,6 +38,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { documents } from './lib/corpus.mjs';
+import { loadExceptions } from './lib/exceptions.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -53,169 +54,15 @@ export const REMEDY =
   '     (`var(--radius-control-lg)`), a template or component token, or `var(--radius-full)`\n' +
   '     for a circle. No px, no %, no primitive step, no literal fallback.';
 
-// Exact, reviewed holds for existing pixels. A visual migration belongs to
-// the designer; new uses and stale entries fail this check.
-export const RADIUS_EXCEPTIONS = [
-  {
-    "file": "design-system/src/components/forms-and-inputs/Checkbox/Checkbox.scss",
-    "token": "--radius-md",
-    "count": 1,
-    "why": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
-  },
-  {
-    "file": "design-system/src/components/forms-and-inputs/Select/Select.scss",
-    "token": "--radius-md",
-    "count": 1,
-    "why": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
-  },
-  {
-    "file": "design-system/src/components/forms-and-inputs/_internal/Calendar.scss",
-    "token": "--radius-md",
-    "count": 1,
-    "why": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
-  },
-  {
-    "file": "design-system/src/components/forms-and-inputs/_internal/FieldFrame.scss",
-    "token": "--radius-md",
-    "count": 1,
-    "why": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
-  },
-  {
-    "file": "design-system/src/components/forms-and-inputs/_internal/OptionRow.scss",
-    "token": "--radius-md",
-    "count": 1,
-    "why": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
-  },
-  {
-    "file": "design-system/src/components/images-and-icons/Avatar/Avatar.scss",
-    "token": "--radius-xxl",
-    "count": 1,
-    "why": "Keep the size-derived Avatar corner capped at 16px; this is proportional image geometry, not a surface role."
-  },
-  {
-    "file": "design-system/src/components/images-and-icons/Tile/Tile.scss",
-    "token": "--radius-sm",
-    "count": 1,
-    "why": "Keep the existing 2px small mark; the control roles are 6/8/10px and would change its shape."
-  },
-  {
-    "file": "design-system/src/components/ai/AiChat/AiChat.scss",
-    "token": "--radius-md",
-    "count": 1,
-    "why": "Keep the existing 4px corner on the person's message; the control roles are 6/8/10px and require a visual decision."
-  },
-  {
-    "file": "design-system/src/components/ai/AiMessage/AiMessage.scss",
-    "token": "--radius-md",
-    "count": 1,
-    "why": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
-  },
-  {
-    "file": "design-system/src/components/ai/AiMessage/AiMessage.scss",
-    "token": "--radius-sm",
-    "count": 1,
-    "why": "Keep the existing 2px small mark; the control roles are 6/8/10px and would change its shape."
-  },
-  {
-    "file": "design-system/src/components/labels/ChangeTag/ChangeTag.scss",
-    "token": "--radius-md",
-    "count": 1,
-    "why": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
-  },
-  {
-    "file": "design-system/src/components/labels/CountTag/CountTag.scss",
-    "token": "--radius-md",
-    "count": 1,
-    "why": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
-  },
-  {
-    "file": "design-system/src/components/labels/DateTag/DateTag.scss",
-    "token": "--radius-md",
-    "count": 1,
-    "why": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
-  },
-  {
-    "file": "design-system/src/components/labels/StatusTag/StatusTag.scss",
-    "token": "--radius-md",
-    "count": 1,
-    "why": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
-  },
-  {
-    "file": "design-system/src/components/ai/Suggestion/Suggestion.scss",
-    "token": "--radius-md",
-    "count": 1,
-    "why": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
-  },
-  {
-    "file": "design-system/src/components/labels/Tag/Tag.scss",
-    "token": "--radius-md",
-    "count": 1,
-    "why": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
-  },
-  {
-    "file": "design-system/src/components/labels/Tag/Tag.scss",
-    "token": "--radius-sm",
-    "count": 3,
-    "why": "Keep the existing 2px small mark; the control roles are 6/8/10px and would change its shape."
-  },
-  {
-    "file": "design-system/src/components/layout-and-structure/ScrollBar/ScrollBar.scss",
-    "token": "--radius-md",
-    "count": 1,
-    "why": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
-  },
-  {
-    "file": "design-system/src/components/loading/Skeleton/Skeleton.scss",
-    "token": "--radius-md",
-    "count": 5,
-    "why": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
-  },
-  {
-    "file": "design-system/src/components/messaging/Flag/Flag.scss",
-    "token": "--radius-md",
-    "count": 1,
-    "why": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
-  },
-  {
-    "file": "design-system/src/components/messaging/Spotlight/Spotlight.scss",
-    "token": "--radius-lg",
-    "count": 1,
-    "why": "Keep the existing 8px media corner; a control role would assign interactive sizing to an image."
-  },
-  {
-    "file": "design-system/src/components/navigation/Link/Link.scss",
-    "token": "--radius-md",
-    "count": 1,
-    "why": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
-  },
-  {
-    "file": "design-system/src/components/navigation/Sidebar/Sidebar.scss",
-    "token": "--radius-sm",
-    "count": 2,
-    "why": "Keep the existing 2px small mark on the lock focus ring and sidebar count; the control roles are 6/8/10px and would change its shape."
-  },
-  {
-    "file": "design-system/src/components/text-and-data-display/Code/Code.scss",
-    "token": "--radius-md",
-    "count": 1,
-    "why": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
-  },
-  {
-    "file": "design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.scss",
-    "token": "--radius-md",
-    "count": 1,
-    "why": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
-  },
-  {
-    "file": "design-system/src/components/text-and-data-display/Table/Table.scss",
-    "token": "--radius-md",
-    "count": 1,
-    "why": "Keep the existing 4px corner; the control roles are 6/8/10px and require a visual decision."
-  }
-];
+/**
+ * Exact, reviewed holds for existing pixels: the `exceptions` list of this check in
+ * `scripts/exceptions.json`, one entry per file and token with the count held. A
+ * visual migration belongs to the designer; new uses and stale entries fail this check.
+ */
+export const radiusExceptions = (repoRoot = REPO_ROOT) => loadExceptions('check:radius-literals', 'exceptions', { repoRoot });
 
 /** Raw semantic scale reads in component SCSS, plus stale exception findings. */
-export function roleRadii(files, exceptions = RADIUS_EXCEPTIONS) {
+export function roleRadii(files, exceptions = radiusExceptions()) {
   const reads = files.filter((f) => f.path.endsWith('.scss') && f.path.startsWith('design-system/src/components/'))
     .flatMap(({ path: file, text }) => {
       const source = stripComments(text, false);
@@ -225,15 +72,11 @@ export function roleRadii(files, exceptions = RADIUS_EXCEPTIONS) {
     });
   const findings = [];
   for (const exception of exceptions) {
-    if (!exception.why) {
-      findings.push({ message: `radius exception needs a reason: ${exception.file} ${exception.token}` });
-      continue;
-    }
-    const count = reads.filter((r) => r.file === exception.file && r.token === exception.token).length;
-    if (count !== exception.count) findings.push({ message: `stale radius exception: ${exception.file} ${exception.token}: expected ${exception.count}, found ${count}` });
+    const count = reads.filter((r) => r.file === exception.at && r.token === exception.token).length;
+    if (count !== exception.count) findings.push({ message: `stale radius exception: ${exception.at} ${exception.token}: expected ${exception.count}, found ${count}` });
   }
   for (const read of reads) {
-    if (!exceptions.some((e) => e.file === read.file && e.token === read.token && e.why && e.count === reads.filter((r) => r.file === read.file && r.token === read.token).length)) {
+    if (!exceptions.some((e) => e.at === read.file && e.token === read.token && e.count === reads.filter((r) => r.file === read.file && r.token === read.token).length)) {
       findings.push({ ...read, message: `${read.file}:${read.line} reads raw radius scale ${read.token}; use a radius role or a reviewed central exception` });
     }
   }
@@ -292,7 +135,7 @@ const inputs = byRoot((repoRoot) =>
 );
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
-export function run({ repoRoot = REPO_ROOT, exceptions = RADIUS_EXCEPTIONS } = {}) {
+export function run({ repoRoot = REPO_ROOT, exceptions = radiusExceptions() } = {}) {
   const files = inputs(repoRoot);
   const found = literalRadii(files).map(({ file, line, value }) => ({
     message: `${file}:${line} sets a literal radius: ${value}`,

@@ -74,10 +74,9 @@ test('component SCSS reads radius roles, with counted central exceptions', async
   const files = [{ path: file, text: '.x { border-radius: var(--radius-md); --corner: var(--radius-sm); }' }];
   assert.equal(roleRadii(files, []).length, 2);
   assert.deepEqual(roleRadii([{ path: file, text: '.x { border-radius: var(--radius-control-md); --corner: var(--card-radius); }' }], []), []);
-  const exceptions = [{ file, token: '--radius-md', count: 1, why: 'Preserve the existing 4px mark pending design review.' }, { file, token: '--radius-sm', count: 1, why: 'Preserve the existing 2px mark pending design review.' }];
+  const exceptions = [{ at: file, token: '--radius-md', count: 1, reason: 'Preserve the existing 4px mark pending design review.' }, { at: file, token: '--radius-sm', count: 1, reason: 'Preserve the existing 2px mark pending design review.' }];
   assert.deepEqual(roleRadii(files, exceptions), []);
   assert.match(roleRadii([{ path: file, text: '' }], exceptions)[0].message, /stale radius exception/);
-  assert.match(roleRadii(files, [{ ...exceptions[0], why: '' }])[0].message, /reason/);
 });
 
 test('role enforcement covers every raw scale read and ignores comments, docs and circles', async () => {
