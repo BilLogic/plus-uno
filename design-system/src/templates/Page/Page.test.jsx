@@ -7,7 +7,7 @@ import { TypeCard } from '@/storybook-docs/lib/template-page.jsx';
 import { DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { CODE as POPUP_CODE } from '../Popup/PopupCaseCode.js';
 import { CODE as FORMS_CODE } from '@/storybook-docs/patterns/Forms/FormsCaseCode.js';
-import { CODE as PANEL_CODE } from '../Panel/PanelCaseCode.js';
+import { CODE as PANEL_CODE } from '../Panel/PanelCases.jsx';
 import * as PageModule from './Page.jsx';
 import Page from './Page.jsx';
 import {

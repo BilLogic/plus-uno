@@ -9,9 +9,10 @@ import {
     PanelSubheader,
 } from '@/templates';
 import { HeadingLevelContext } from '@/lib/headingLevel';
-import Blanket from '../Modal/Blanket';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
-import { DetailsPanel, SessionsBehind } from './panelDemo.jsx';
+import { showCode } from '@/storybook-docs/lib/show-code.js';
+import * as Example from './PanelExamples.jsx';
+import examplesSource from './PanelExamples.jsx?raw';
 
 /**
  * The live do and don't examples of the Panel template page, built from
@@ -20,9 +21,6 @@ import { DetailsPanel, SessionsBehind } from './panelDemo.jsx';
 
 /** The height of the stage a floating Panel sits in. Docs geometry, px. */
 const FLOAT_STAGE = 440; // docs-literal
-
-/** How far a second Panel sits in from the first. Docs geometry, px. */
-const SECOND_OFFSET = 48; // docs-literal
 
 const ReadingPanel = ({ footer, inlineSize }) => (
     <CaseSurface
@@ -65,85 +63,41 @@ export const ReadingWithFooter = () => (
     />
 );
 
-/** A floating Panel's place: the end of the stage, on the overlay fill with the overlay shadow. */
-const FloatingPanel = ({ inset = 0, onTop = true }) => (
-    <div
-        style={{
-            position: 'absolute',
-            insetBlock: 0,
-            insetInlineEnd: inset,
-            zIndex: onTop ? 2 : 1,
-            boxShadow: 'var(--ds-shadow-overlay)',
-            display: 'flex',
-            maxInlineSize: '100%',
-        }}
-    >
-        <HeadingLevelContext.Provider value={4}>
-            <DetailsPanel />
-        </HeadingLevelContext.Provider>
-    </div>
-);
+/** The Show code for each floating-Panel example, read from `PanelExamples.jsx`. */
+const printed = showCode(examplesSource, [
+    'FloatsNoBlanket',
+    'PanelOnBlanket',
+    'TwoFloatingPanels',
+    'BesideAiPanel',
+    'CoversAiPanel',
+]);
 
-/** The page under floating Panels, in a box that clips them to the stage. */
+/** One Panel is the same example as the one that floats with no Blanket. */
+export const CODE = { ...printed, OneFloatingPanel: printed.FloatsNoBlanket };
+
+/** The stage under floating Panels: a box that clips them, at the docs heading level, with room around the page behind. */
 const FloatStage = ({ children }) => (
-    <CaseSurface padding="none" style={{ position: 'relative', blockSize: FLOAT_STAGE, overflow: 'hidden' }}>
-        <div style={{ padding: 'var(--page-pad)' }}><SessionsBehind /></div>
-        {children}
+    <CaseSurface padding="none" style={{ position: 'relative', blockSize: FLOAT_STAGE, overflow: 'hidden', padding: 'var(--page-pad)', boxSizing: 'border-box' }}>
+        <HeadingLevelContext.Provider value={4}>
+            {children}
+        </HeadingLevelContext.Provider>
     </CaseSurface>
 );
 
 /** The Panel floats on its shadow and the page beside it stays undimmed. */
-export const FloatsNoBlanket = () => (
-    <FloatStage><FloatingPanel /></FloatStage>
-);
+export const FloatsNoBlanket = () => <FloatStage><Example.FloatsNoBlanket /></FloatStage>;
 
 /** The same Panel with a Blanket dimming the whole page. */
-export const PanelOnBlanket = () => (
-    <FloatStage>
-        <Blanket inline show style={{ position: 'absolute', inset: 0, zIndex: 1 }} />
-        <FloatingPanel />
-    </FloatStage>
-);
+export const PanelOnBlanket = () => <FloatStage><Example.PanelOnBlanket /></FloatStage>;
 
 /** One Panel; another row swaps what it shows. */
 export const OneFloatingPanel = FloatsNoBlanket;
 
 /** Two Panels open at once, the second covering the first. */
-export const TwoFloatingPanels = () => (
-    <FloatStage>
-        <FloatingPanel inset={SECOND_OFFSET} onTop={false} />
-        <FloatingPanel />
-    </FloatStage>
-);
-
-/** The docked AI panel: a Panel at the end of the stage, on the page and not floating. */
-const DockedAiPanel = () => (
-    <div style={{ position: 'absolute', insetBlock: 0, insetInlineEnd: 0, zIndex: 1, display: 'flex', maxInlineSize: '100%' }}>
-        <HeadingLevelContext.Provider value={4}>
-            <PanelContainer width="var(--panel-width-default)">
-                <PanelHeader title="Assistant" actions={<PanelCloseAction onClick={() => {}} />} />
-                <PanelBody>
-                    <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>
-                        Ben has missed two Thursday sessions. Want a note for his tutor?
-                    </p>
-                </PanelBody>
-            </PanelContainer>
-        </HeadingLevelContext.Provider>
-    </div>
-);
+export const TwoFloatingPanels = () => <FloatStage><Example.TwoFloatingPanels /></FloatStage>;
 
 /** The floating Panel sits beside the docked AI panel, both fully visible. */
-export const BesideAiPanel = () => (
-    <FloatStage>
-        <DockedAiPanel />
-        <FloatingPanel inset="var(--panel-width-default)" />
-    </FloatStage>
-);
+export const BesideAiPanel = () => <FloatStage><Example.BesideAiPanel /></FloatStage>;
 
 /** The floating Panel drawn over the docked AI panel, hiding part of it. */
-export const CoversAiPanel = () => (
-    <FloatStage>
-        <DockedAiPanel />
-        <FloatingPanel inset={SECOND_OFFSET} />
-    </FloatStage>
-);
+export const CoversAiPanel = () => <FloatStage><Example.CoversAiPanel /></FloatStage>;
