@@ -20,6 +20,7 @@
  * shadow, not a design-system shadow token; the CSS lives beside the other
  * chart-only tokens in `chartTheme.css`.
  */
+import Highcharts from 'highcharts/esm/highcharts';
 import { tooltipHeaderFormat, tooltipPointFormat } from '@/dataviz/chartFormat';
 import { chartEntrance, chartStateTransition } from '@/dataviz/chartMotion';
 import { CATEGORICAL, CHROME } from '@/dataviz/palette';
@@ -316,6 +317,10 @@ const chartTheme = {
         backgroundColor: 'transparent',
         borderWidth: 0,
         shadow: false,
+        // The Popup padding plus Highcharts' own inset, inside the box, so the
+        // container div is exactly as wide as the tooltip Highcharts positions and
+        // the text sits where it did with the padding on the div.
+        padding: tokenNumber('--popup-pad', 0) + (Highcharts.defaultOptions.tooltip?.padding ?? 0),
         headerFormat: tooltipHeaderFormat(),
         pointFormat: tooltipPointFormat(),
         style: {

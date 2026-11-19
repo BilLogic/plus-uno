@@ -82,6 +82,8 @@ export const TooltipSurface = {
         const tooltip = doc.querySelector('.highcharts-tooltip-container');
         expect(tooltip).toHaveTextContent('24');
         expect(getComputedStyle(tooltip).backgroundColor).toBe(resolveColor('--ds-surface-overlay', canvasElement));
+        // An open tooltip stays inside the window, so it never widens a narrow page.
+        expect(tooltip.getBoundingClientRect().right, 'the tooltip ends inside the window').toBeLessThanOrEqual(window.innerWidth);
     },
 };
 

@@ -2,5 +2,10 @@
 .plus-prompt-starters {
     display: flex;
     flex-wrap: wrap;
+    // In a flex or grid parent that centers its children, a wrapping row is sized
+    // by its longest label and can outgrow the parent. Capping it at the parent's
+    // width lets a long label truncate instead of setting the row's width.
+    max-inline-size: 100%;
+    min-inline-size: 0;
     gap: var(--stack-md);
 }

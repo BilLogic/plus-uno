@@ -60,7 +60,7 @@ Don't: A Section whose heading repeats its only card's title: two headings for o
 
 **Checked:** Automatic
 
-The title row sits `--section-stack-sm` above the header rows, and the header sits `--section-stack-md` above the body. The title, the first pill's label and the first column's text share one left edge. At every width the two stay separate rows. In a narrow Section the filters fold into one Filter button and the views scroll sideways.
+The title row sits `--section-stack-sm` above the header rows, and the header sits `--section-stack-md` above the body. The title, the first pill's label and the first column's text share one left edge. Actions that do not fit beside the heading drop under it, still at the end of the row. At every width the two stay separate rows. In a narrow Section the filters fold into one Filter button and the views scroll sideways.
 
 Do: The title row first, the header rows under it, sharing one left edge.
 Don't: The title pushed into the views row: the heading and the pills fight for the start, and the description has nowhere to go.
