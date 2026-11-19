@@ -47,7 +47,7 @@ const InWindow = ({ address, stage = DOCKED_STAGE, children }) => (
     </FitStage>
 );
 
-/** Save and exit as a link at the left edge; Back and the primary Next in tracks 3 and 4, on one 32 line. */
+/** Save and exit as a link at the left edge; Back and the primary Next in tracks 3 and 4, FooterActions' filled buttons 48 high. */
 export const BarInOrder = () => <OnBar><Example.BarInOrder /></OnBar>;
 
 /** Cancel repeated in the footer beside Save and exit: two ways out of one task. */

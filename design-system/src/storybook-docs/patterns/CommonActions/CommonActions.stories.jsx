@@ -20,6 +20,8 @@ import {
     MultiStepBar,
     ManyRows,
     ModalFooter,
+    ModalLeading,
+    PopupFooter,
     Page,
     Reset,
     STAGE,
@@ -31,7 +33,7 @@ import {
  * Common actions: the pattern page's examples, run in the Storybook tests. Each
  * composes the real Button, IconButton and the hosts the buttons sit in, and
  * each asserts the ruling it shows: one Primary per area, left-aligned under a
- * page form and full bleed in a Modal, Close apart from Cancel, a sending
+ * page form and four tracks in a Modal, Close apart from Cancel, a sending
  * button that keeps its width, the destructive tiers, and the bulk bar.
  *
  * Run: npx vitest run --project=storybook design-system/src/storybook-docs/patterns/CommonActions/CommonActions.stories.jsx
@@ -122,7 +124,29 @@ export const PlacementModal = {
     },
 };
 
-/** A multi-step task: Save and exit as a link, Back and Next in tracks 3 and 4, on one 32 line in a 48 footer. */
+/** A Modal with a side action: the danger link leads, a secondary and the Primary fill tracks 3 and 4... in the filled tracks. */
+export const PlacementModalLeading = {
+    name: 'Placement: In a Modal, with a side action',
+    render: () => staged(<ModalLeading />),
+    play: async ({ canvas, canvasElement }) => {
+        await settleAnimations(canvasElement.ownerDocument.body);
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        const footer = canvasElement.querySelector('[data-probe="footer"]');
+        const tracks = footerTracks(footer);
+        const remove = within(footer).getByRole('button', { name: 'Delete draft' });
+        const draft = within(footer).getByRole('button', { name: 'Save draft' });
+        const schedule = within(footer).getByRole('button', { name: 'Schedule' });
+        await expect(remove.className, 'a destructive side action is a danger link').toContain('danger-link');
+        await expect(rect(remove).left, 'it hugs the start edge').toBeCloseTo(tracks.box.left, 0);
+        await expect(rect(draft).left, 'the secondary fills track 3').toBeCloseTo(tracks.track(3).left, 0);
+        await expect(rect(schedule).right, 'the Primary ends the footer').toBeCloseTo(tracks.track(4).right, 0);
+        await expect(within(footer).queryByRole('button', { name: 'Cancel' }), 'no Cancel in footers').toBeNull();
+        await fitsCanvas(canvasElement);
+    },
+};
+
+/** A multi-step task: Save and exit as a link, Back and Next in tracks 3 and 4, filled 48 buttons in a 48 footer. */
 export const PlacementMultiStep = {
     name: 'Placement: In a multi-step task',
     render: () => staged(<MultiStepBar />, TASK_STAGE),
@@ -140,8 +164,8 @@ export const PlacementMultiStep = {
         await expect(rect(save).left, 'Save and exit hugs the left edge').toBeCloseTo(tracks.box.left, 0);
         await expect(rect(back).left, 'Back starts on track 3').toBeCloseTo(tracks.track(3).left, 0);
         await expect(rect(next).right, 'Next ends on track 4').toBeCloseTo(tracks.track(4).right, 0);
-        await expect(rect(back).height, 'Back is 32 high').toBeCloseTo(tokenLength(canvasElement, '--control-md'), 0);
-        await expect(rect(save).height, 'Save and exit is on the same 32 line').toBeCloseTo(tokenLength(canvasElement, '--control-md'), 0);
+        await expect(rect(back).height, 'Back is 48 high').toBeCloseTo(tokenLength(canvasElement, BAR_TOKEN), 0);
+        await expect(rect(save).height, 'Save and exit is 48 high too').toBeCloseTo(tokenLength(canvasElement, BAR_TOKEN), 0);
         await expect(rect(save).top, 'one line: Save and exit and Back share a top').toBeCloseTo(rect(back).top, 0);
         await expect(rect(bar).height, 'the bar is 48 high').toBeCloseTo(tokenLength(canvasElement, BAR_TOKEN), 0);
         await userEvent.click(back);
@@ -152,7 +176,7 @@ export const PlacementMultiStep = {
     },
 };
 
-/** A card: its main action is Subtle in the footer. */
+/** A card: one action that goes somewhere is a link; two actions are a compact pair with no Primary. */
 export const PlacementCard = {
     name: 'Placement: In a card',
     render: () => staged(<CardAction />, STAGE, { fluid: true }),
@@ -160,12 +184,42 @@ export const PlacementCard = {
         await settleAnimations(canvasElement.ownerDocument.body);
         await expectNotInert(canvasElement);
         await expectFullScale(canvasElement);
-        const open = canvas.getByRole('button', { name: 'Open session' });
-        await expect(open.className, 'the main action is Subtle').toContain('subtle');
-        await expect(open.closest('.plus-template-card-footer'), 'in the card\'s footer').not.toBeNull();
-        await expect(open).toBeEnabled();
-        await userEvent.click(open);
+        const open = canvas.getByRole('link', { name: 'Open session' });
+        await expect(open.className, 'an action that leaves is a link').toContain('link');
+        const [alone, pair] = Array.from(canvasElement.querySelectorAll('.plus-template-card-footer'));
+        await expect(alone.contains(open), 'in the card\'s footer').toBe(true);
+        const reschedule = within(pair).getByRole('button', { name: 'Reschedule' });
+        const note = within(pair).getByRole('button', { name: 'Add note' });
+        await expect(pair.querySelector('[class*="primary"]'), 'a pair has no Primary').toBeNull();
+        await expect(reschedule.className, 'compact').toContain('compact');
+        await expect(rect(reschedule).left, 'the pair hugs the start').toBeCloseTo(rect(pair).left, 0);
+        await expect(rect(reschedule).left, 'in order').toBeLessThan(rect(note).left);
+        await userEvent.click(reschedule);
         await fitsCanvas(canvasElement);
+    },
+};
+
+/** A Popup that holds choices: compact Clear (Subtle) and Apply (Default) at the end, no Primary. */
+export const PlacementPopup = {
+    name: 'Placement: In a Popup',
+    render: () => staged(<PopupFooter />, 480),
+    play: async ({ canvasElement }) => {
+        await expectNotInert(canvasElement);
+        await expectFullScale(canvasElement);
+        const layer = await waitFor(() => {
+            const found = canvasElement.querySelector('.plus-filter-menu');
+            expect(found).not.toBeNull();
+            return found;
+        });
+        const clear = within(layer).getByRole('button', { name: 'Clear' });
+        const apply = within(layer).getByRole('button', { name: 'Apply' });
+        await expect(clear.className, 'Clear is Subtle').toContain('subtle');
+        await expect(apply.className, 'Apply is Default').toContain('default');
+        await expect(layer.querySelector('[class*="primary"]'), 'no Primary in a Popup').toBeNull();
+        await expect(rect(clear).left, 'Clear then Apply').toBeLessThan(rect(apply).left);
+        await expect(rect(apply).right, 'at the end of the Popup').toBeGreaterThan(rect(layer).right - rect(layer).width / 3);
+        await expect(rect(clear).height, 'compact is 24').toBeCloseTo(tokenLength(canvasElement, '--control-sm'), 0);
+        await expect(within(layer).queryByRole('button', { name: 'Cancel' }), 'no Cancel').toBeNull();
     },
 };
 

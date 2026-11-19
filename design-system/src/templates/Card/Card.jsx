@@ -12,9 +12,13 @@ import './Card.scss';
  *   a 1px border (transparent on sunken and raised) so forced colors draw its
  *   edge.
  * - **Image placement**: `top` (default), `start` or `end`. Side images apply
- *   at the large card minimum width and fill the height. `imageSplit` chooses
+ *   at the 480 minimum width and fill the height. `imageSplit` chooses
  *   one third (default) or one half; half uses Heading md on a side card.
- *   Below the large minimum width, the image returns to the top with its own ratio.
+ *   Below the 480 minimum width, the image returns to the top with its own ratio.
+ * - **Image ratio**: `imageRatio` is `16:9` (default), `4:3` or `1:1`. A top
+ *   image's height is the card width times the ratio, rounded to a multiple of
+ *   4 so the card stays on the 4 px grid; the picture crops to cover and the
+ *   text sets the rest of the height.
  * - **Header** (`_Card header`): `title` (the card title type, shared with Card
  *   in `styles/_card-title.scss`, one heading level below its section) over an
  *   optional `description` (Body/default 14), with
@@ -22,7 +26,9 @@ import './Card.scss';
  *   content, like the header's `custom` type, for tabs or a toolbar.
  * - **Spacing** comes from the Card tokens: padding uses `--card-pad` and radius
  *   uses `--card-radius` at every size, the header sits Card/stack-md above the body (`gap` picks the stack step),
- *   and the footer sits Card/stack-lg below. The footer is left-aligned.
+ *   and the footer sits Card/stack-lg below. The footer hugs the start: one action that
+ *   goes somewhere is a link (`appearance="link"`), two are a compact pair with no
+ *   Primary, and a card that is all one action is clickable with no buttons.
  * - The card hugs its content; in a row it stretches to the tallest card.
  * - **Elevation**: a clickable `sunken` or `default` card lifts to Raised on
  *   hover in place and settles to the raised shadow while pressed; a clickable
@@ -41,6 +47,7 @@ const Card = ({
     footer,
     surface = 'sunken',
     imagePlacement = 'top',
+    imageRatio = '16:9',
     imageSplit = '1/3',
     gap = 'md',
     minWidth,
@@ -54,6 +61,7 @@ const Card = ({
         'plus-template-card',
         `plus-template-card--surface-${surface}`,
         image ? `plus-template-card--image-${imagePlacement}` : '',
+        image ? `plus-template-card--ratio-${imageRatio.replace(':', '-')}` : '',
         image && imageSplit === '1/2' ? 'plus-template-card--image-half' : '',
         `plus-template-card-gap-${gap}`,
         props.onClick ? 'plus-template-card--clickable' : '',
@@ -116,11 +124,13 @@ Card.propTypes = {
      * @ds-context Used in: Card.image (ds guide card)
      */
     image: PropTypes.node,
-    /** Image position. Side placements apply from the large card minimum width; narrower cards put the image on top. */
+    /** Image position. Side placements apply from the 480 minimum width; narrower cards put the image on top. */
     imagePlacement: PropTypes.oneOf(['top', 'start', 'end']),
+    /** Image shape on a top image: its height follows the card width at 16:9, 4:3 or 1:1, rounded to a multiple of 4, and the picture crops to cover. A side image fills the card height instead. */
+    imageRatio: PropTypes.oneOf(['16:9', '4:3', '1:1']),
     /** Side image share. One half also steps the title up to Heading md. Ignored for top placement. */
     imageSplit: PropTypes.oneOf(['1/3', '1/2']),
-    /** Footer slot: commit actions, left-aligned, Card/stack-lg below the body
+    /** Footer slot: a link for one action that leaves, or a compact pair with no Primary, start-aligned, Card/stack-lg below the body
      * @ds-context Used in: Card.footer (ds guide card)
      * @ds-context Governed by: Common actions (ds guide common-actions)
      */

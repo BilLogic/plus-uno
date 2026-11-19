@@ -234,9 +234,6 @@ export const TOKEN_LADDER = [
   { tier: 'templates', group: 'Card', new: '--card-min-width-md', old: '--card-min-width-md', use: 'Narrowest a default Card may shrink in a grid.' },
   { tier: 'templates', group: 'Card', new: '--card-min-width-lg', old: '--card-min-width-lg', use: 'Narrowest a large Card may shrink in a grid.' },
   { tier: 'templates', group: 'Card', new: '--card-radius', old: null, ref: 'var(--radius-xxl)', use: 'Corner rounding of a Card.' },
-  { tier: 'templates', group: 'Card', new: '--card-max-height-sm', old: '--card-max-height-sm', use: 'Tallest a short scrolling Card may grow.' },
-  { tier: 'templates', group: 'Card', new: '--card-max-height-md', old: '--card-max-height-md', use: 'Tallest a default scrolling Card may grow.' },
-  { tier: 'templates', group: 'Card', new: '--card-max-height-lg', old: '--card-max-height-lg', use: 'Tallest a tall scrolling Card may grow.' },
   { tier: 'templates', group: 'Card', new: '--card-surface-sunken', old: null, ref: 'var(--ds-surface-sunken)', codeOnly: true, use: 'Surface fill of a sunken Card (the default).' },
   { tier: 'templates', group: 'Card', new: '--card-surface-default', old: null, ref: 'var(--ds-surface)', codeOnly: true, use: 'Surface fill of a default Card.' },
   { tier: 'templates', group: 'Card', new: '--card-surface-raised', old: null, ref: 'var(--ds-surface-raised)', codeOnly: true, use: 'Surface fill of a raised Card, and of a clickable card on hover.' },
@@ -538,6 +535,10 @@ export const RETIRED_NO_STEP = new Set([
   /* the Section toolbar is gone */
   '--section-toolbar-min-width',
   '--section-toolbar-count-min-width',
+  /* Card height follows its content; a top image follows its ratio */
+  '--card-max-height-sm',
+  '--card-max-height-md',
+  '--card-max-height-lg',
 ]);
 
 /** Retired name -> its replacement: the explicit table above, then each ladder row's `old` (first row wins). */

@@ -119,7 +119,7 @@ export const Overview = {
     },
 };
 
-/** Escape drops what was ticked; Reset clears the boxes without applying. */
+/** Escape drops what was ticked; Clear clears the boxes without applying. */
 export const Staging = {
     render: () => <SessionsBar />,
     play: async ({ canvasElement }) => {
@@ -143,9 +143,9 @@ export const Staging = {
         await userEvent.click(canvas.getByRole('button', { name: 'Filters, 1 applied' }));
         menu = await openMenu(canvasElement);
         await expect(within(menu).getByRole('checkbox', { name: 'Lincoln Middle' })).toBeChecked();
-        await userEvent.click(within(menu).getByRole('button', { name: 'Reset' }));
+        await userEvent.click(within(menu).getByRole('button', { name: 'Clear' }));
         await expect(within(menu).getByRole('checkbox', { name: 'Lincoln Middle' })).not.toBeChecked();
-        await expect(canvas.getAllByRole('listitem'), 'Reset does not apply').toHaveLength(2);
+        await expect(canvas.getAllByRole('listitem'), 'Clear does not apply').toHaveLength(2);
         await userEvent.click(within(menu).getByRole('button', { name: 'Apply' }));
         await menuClosed(canvasElement);
         await expect(canvas.getAllByRole('listitem')).toHaveLength(4);
@@ -173,7 +173,7 @@ export const Stacked = {
     },
 };
 
-/** The menu opens 4 under the Filter icon, its end edge on the trigger's; Reset and Apply span the bottom half each. */
+/** The menu opens 4 under the Filter icon, its end edge on the trigger's; compact Clear and Apply sit at the end of the bottom row. */
 export const Placement = {
     render: () => (
         <div style={pad}>
@@ -191,12 +191,13 @@ export const Placement = {
         await expect(menuBox.right, 'end edge meets the trigger').toBeCloseTo(triggerBox.right, 0);
         await expect(menuBox.top - triggerBox.bottom, 'offset 4').toBeCloseTo(tokenLength(canvasElement, '--popup-offset'), 0);
 
-        const reset = within(menu).getByRole('button', { name: 'Reset' }).getBoundingClientRect();
-        const apply = within(menu).getByRole('button', { name: 'Apply' }).getBoundingClientRect();
-        await expect(reset.left, 'full bleed').toBeCloseTo(menuBox.left, 0);
-        await expect(apply.right, 'full bleed').toBeCloseTo(menuBox.right, 0);
-        await expect(apply.bottom, 'full bleed').toBeCloseTo(menuBox.bottom, 0);
-        await expect(reset.width).toBeCloseTo(apply.width, 0);
+        const clear = within(menu).getByRole('button', { name: 'Clear' });
+        const apply = within(menu).getByRole('button', { name: 'Apply' });
+        await expect(clear.className, 'Clear is Subtle').toContain('subtle');
+        await expect(apply.className, 'Apply is Default, no Primary').toContain('default');
+        await expect(clear.getBoundingClientRect().height, 'compact is 24').toBeCloseTo(tokenLength(canvasElement, '--control-sm'), 0);
+        await expect(apply.getBoundingClientRect().right, 'at the end').toBeLessThan(menuBox.right);
+        await expect(clear.getBoundingClientRect().left, 'Clear then Apply').toBeLessThan(apply.getBoundingClientRect().left);
         await userEvent.keyboard('{Escape}');
         await menuClosed(canvasElement);
     },

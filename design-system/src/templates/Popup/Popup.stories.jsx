@@ -90,11 +90,11 @@ export const TypeFilterMenu = {
         const layer = await holdsInStage(canvasElement, '.plus-filter-menu');
         await expect(layer, 'two or three categories sit side by side').toHaveClass('plus-filter-menu--side-by-side');
         const footer = layer.querySelector('.plus-filter-menu__footer');
-        const reset = within(footer).getByRole('button', { name: 'Reset' });
-        await expect(reset, 'Reset (Default) then Apply').toBeInTheDocument();
-        await expect(within(footer).getByRole('button', { name: 'Apply' }), 'Apply (Primary)').toBeInTheDocument();
-        reset.focus();
-        await expect(reset).toHaveFocus();
+        const clear = within(footer).getByRole('button', { name: 'Clear' });
+        await expect(clear.className, 'Clear is Subtle').toContain('subtle');
+        await expect(within(footer).getByRole('button', { name: 'Apply' }).className, 'Apply is Default, no Primary').toContain('default');
+        clear.focus();
+        await expect(clear).toHaveFocus();
     },
 };
 

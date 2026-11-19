@@ -148,17 +148,42 @@ $-dragging: (
 .plus-template-card-image {
     flex: 0 0 100%;
     min-width: 0;
+    overflow: hidden;
+    // The ratio's sides, set by the `imageRatio` class below. The aspect ratio
+    // sizes the slot wherever `round()` is unsupported, so the image never collapses.
+    --_image-w: 16;
+    --_image-h: 9;
+    aspect-ratio: var(--_image-w) / var(--_image-h);
+
+    // Card width times the ratio, snapped to the 4px grid; the picture crops to cover.
+    @supports (height: round(nearest, 10px, 4px)) {
+        aspect-ratio: auto;
+        height: round(nearest, calc(100cqw * var(--_image-h) / var(--_image-w)), 4px);
+    }
+
+    > * {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        aspect-ratio: auto;
+    }
 }
 
-// Large card minimum width (480px --card-min-width-lg minus the 1px border on each side).
+.plus-template-card--ratio-16-9 > .plus-template-card-image { --_image-w: 16; --_image-h: 9; }
+.plus-template-card--ratio-4-3 > .plus-template-card-image { --_image-w: 4; --_image-h: 3; }
+.plus-template-card--ratio-1-1 > .plus-template-card-image { --_image-w: 1; --_image-h: 1; }
+
+// The 480 minimum width (--card-min-width-lg) minus the 1px border on each side.
 // Container queries use the card's content width, independently of the page breakpoint.
 @container template-card (min-width: 478px) {
     .plus-template-card--image-start,
     .plus-template-card--image-end {
         > .plus-template-card-image {
             flex: 0 0 calc(100% / 3);
+            height: auto;
+            aspect-ratio: auto;
             position: relative;
-            overflow: hidden;
         }
         > .plus-template-card-inner { flex: 1 1 0; }
         > .plus-template-card-image > * {
@@ -167,7 +192,6 @@ $-dragging: (
             width: 100%;
             height: 100%;
             object-fit: cover;
-            aspect-ratio: auto !important;
         }
         &.plus-template-card--image-half {
             > .plus-template-card-image { flex-basis: 50%; }
@@ -220,7 +244,7 @@ $-dragging: (
     min-width: 0;
 }
 
-/* Footer: commit actions, left-aligned */
+/* Footer: the card's actions, start-aligned */
 .plus-template-card-footer {
     display: flex;
     align-items: center;

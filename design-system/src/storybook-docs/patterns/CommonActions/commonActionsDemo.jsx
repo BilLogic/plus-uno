@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { Button, ButtonItem, Dialog, DropdownMenu, Fieldset, FooterActions, IconButton, InlineEdit, TextField, Tooltip } from '@/components';
+import { Button, ButtonItem, Dialog, DropdownMenu, Fieldset, FooterActions, IconButton, InlineEdit, LinkButton, TextField, Tooltip } from '@/components';
 import { Card, Section } from '@/templates';
 import { HeaderSearch, SectionActions } from '@/storybook-docs/lib/section-header.jsx';
 import { FilterSide, StudentsTable, ViewPills, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
@@ -8,7 +8,11 @@ import { CaseBlanket, CaseSurface } from '@/storybook-docs/lib/case-surface.jsx'
 import { FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { MultiStepTaskType } from '@/storybook-docs/lib/multi-step-task.jsx';
 import { FILLED, FormInPage, PAGE_WIDTH as FORM_PAGE_WIDTH } from '../Forms/formHosts.jsx';
-import { ModalStage, TwoCells } from '../../../templates/Modal/modalDemo.jsx';
+import { ModalStage, LeadingCells, TwoCells } from '../../../templates/Modal/modalDemo.jsx';
+import { FilterMenuLayer, PopupStage } from '../../../templates/Popup/popupDemo.jsx';
+
+/** Room for the open filter menu in its stage: docs geometry, in px. */
+const POPUP_FOOTER_HEIGHT = 290; // docs-literal
 
 /**
  * The Common actions pattern's examples: real Buttons, placed where each
@@ -17,12 +21,15 @@ import { ModalStage, TwoCells } from '../../../templates/Modal/modalDemo.jsx';
  *
  *   Appearances   every appearance, with the word it takes
  *   Page          buttons under a page form
- *   ModalFooter   full bleed, Close in the header, Discard left and the action right (no Cancel)
+ *   ModalFooter   four tracks, Close in the header, Discard left and the action right (no Cancel)
+ *   ModalLeading  a leading danger link, a secondary and a primary in tracks 2 to 4
+ *   CardAction    one link, and a compact pair with no primary
+ *   PopupFooter   compact Clear (Subtle) and Apply (Default) at the end
  *   Reset         a filter side, "Reset filters" at its top
  *   Copy          an icon button and its "Copied" tooltip
  *   EditOne       one value, edited in place
  *   EditRecord    the whole record, from the More menu
- *   Sending       a full-bleed button that keeps its width
+ *   Sending       a filled button that keeps its width
  */
 
 /** The width a picture lays out at, in px: docs geometry. */
@@ -53,7 +60,7 @@ export const Appearances = () => (
 /** Buttons under a page form: left-aligned, Primary first, Cancel Subtle. The form sits on the Page, in the Frame. */
 export const Page = () => <FormInPage initial={FILLED} />;
 
-/** A Modal's footer: full bleed, Discard (Default) left and the action right; Close sits in the header, no Cancel. */
+/** A Modal's footer: four equal tracks, Discard (Default) left and the action right; Close sits in the header, no Cancel. */
 export const ModalFooter = () => (
     <ModalStage title="Log a session" footer={<TwoCells action="Save session" />}>
         {text('Ana Ruiz, Thursday at 4:00 PM, Lincoln Middle.')}
@@ -63,15 +70,41 @@ export const ModalFooter = () => (
 /** A multi-step task's bottom bar: Back and Next split 50/50, Close in the title row, no Cancel. */
 export const MultiStepBar = () => <MultiStepTaskType start={1} />;
 
-/** A card's main action: Subtle in the footer. */
+/** A Modal footer with a side action: the leading danger link, then a secondary and the Primary in the filled tracks. */
+export const ModalLeading = () => (
+    <ModalStage title="Schedule this draft?" footer={<LeadingCells />}>
+        {text('The draft goes to Ana Ruiz and her parents on Thursday at 4:00 PM.')}
+    </ModalStage>
+);
+
+/** A card's footer: one action that goes somewhere is a link; two actions are a compact pair with no Primary. Both hug the start. */
 export const CardAction = () => (
-    <div style={{ display: 'flex', padding: 'var(--page-pad)' }}>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--inline-lg)', padding: 'var(--page-pad)', alignItems: 'flex-start' }}>
         <Card
             title="Next session"
             description="Thursday, 4:00 PM with Ana Ruiz"
-            footer={<Button text="Open session" appearance="subtle" spacing="compact" onClick={() => {}} />}
+            minWidth="var(--card-min-width-md)"
+            footer={<LinkButton text="Open session" href="#open-session" appearance="link" spacing="compact" onClick={(event) => event.preventDefault()} />}
+        />
+        <Card
+            title="Open slot"
+            description="Friday, 3:30 PM at Lincoln Middle"
+            minWidth="var(--card-min-width-md)"
+            footer={(
+                <>
+                    <Button text="Reschedule" spacing="compact" onClick={() => {}} />
+                    <Button text="Add note" spacing="compact" onClick={() => {}} />
+                </>
+            )}
         />
     </div>
+);
+
+/** A Popup that holds choices, the real filter menu: compact Clear (Subtle) and Apply (Default) at the end, no Primary. */
+export const PopupFooter = () => (
+    <PopupStage height={POPUP_FOOTER_HEIGHT} side="end">
+        {(mount) => <FilterMenuLayer mount={mount} />}
+    </PopupStage>
 );
 
 /** Reset clears the choices; the rows come back when it is pressed. */
@@ -247,8 +280,8 @@ export const PageButtonsFarRightCase = () => (
     </CaseSurface>
 );
 
-/** Do: two buttons filling the Modal footer edge to edge. */
-export const ModalFooterFullBleedCase = () => (
+/** Do: two buttons filling the Modal footer's four equal tracks. */
+export const ModalFooterTracksCase = () => (
     <CaseBlanket height={280}>
         <Dialog
             width="4-col"
@@ -267,7 +300,7 @@ export const ModalFooterFullBleedCase = () => (
 );
 
 /** Don't: small buttons inset at the end, with spare footer around them. */
-// Deliberately mirrors the inset footer (non-full-bleed) as the Don't example.
+// Deliberately draws a hand-built inset footer as the Don't example.
 export const ModalFooterInsetCase = () => (
     <CaseBlanket height={280}>
         <Dialog

@@ -1593,12 +1593,12 @@ export const LayoutMultiStepTask = {
         await expect(row('Schedule'), 'a step past the answers is off').toHaveAttribute('aria-disabled', 'true');
         await expect(canvas.queryByRole('button', { name: 'Close' }), 'no Close: Save and exit leaves').toBeNull();
 
-        // The footer: Save and exit as a link at the left edge, Back and Next in tracks 3 and 4, one 32 line in a 48 bar.
+        // The footer: Save and exit as a link at the left edge, Back and Next in tracks 3 and 4, filled 48 buttons in a 48 bar.
         const tracks = footerTracks(column);
         await expect(rect(bar).height, 'the footer is 48 high').toBeCloseTo(tokenLength(canvasElement, BAR_TOKEN), 0);
         await expect(within(bar).queryByRole('button', { name: 'Cancel' }), 'no Cancel in footers').toBeNull();
         for (const button of [save, back, next]) {
-            await expect(rect(button).height, 'each action is 32 high').toBeCloseTo(tokenLength(canvasElement, '--control-md'), 0);
+            await expect(rect(button).height, 'each action is 48 high').toBeCloseTo(tokenLength(canvasElement, BAR_TOKEN), 0);
             await expect(rect(button).top, 'on one line').toBeCloseTo(rect(save).top, 0);
         }
         await expect(rect(save).left, 'Save and exit hugs the left edge').toBeCloseTo(tracks.box.left, 0);

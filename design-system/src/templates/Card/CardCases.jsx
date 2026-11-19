@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, ProgressBar, Skeleton } from '@/components';
+import { LinkButton, ProgressBar, Skeleton } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { Card } from '@/templates';
 
@@ -19,8 +19,8 @@ const metric = (
 /** `sb-unstyled` keeps Storybook's docs styles off the examples, as it does inside a canvas. */
 const InDocs = ({ children }) => <div className="sb-unstyled">{children}</div>;
 
-/** One number fits a small card, which is only as wide as it needs. */
-export const MetricInSmall = () => (
+/** One number fits the 224 minimum, which is only as wide as it needs. */
+export const MetricAtMin224 = () => (
     <InDocs>
         <Card minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-sm)' }}>
             {metric}
@@ -28,8 +28,8 @@ export const MetricInSmall = () => (
     </InDocs>
 );
 
-/** The same number in a large card leaves most of it empty. */
-export const MetricInLarge = () => (
+/** The same number at the 480 minimum leaves most of the card empty. */
+export const MetricAtMin480 = () => (
     <InDocs>
         <Card minWidth="var(--card-min-width-lg)">
             {metric}
@@ -53,7 +53,7 @@ export const CardJobs = () => (
             title="Lincoln Middle · Thursday"
             description="4:30 to 5:15 PM"
             minWidth="var(--card-min-width-md)"
-            footer={<Button text="View session" appearance="subtle" spacing="compact" onClick={() => {}} />}
+            footer={<LinkButton text="View session" href="#view-session" appearance="link" spacing="compact" onClick={(event) => event.preventDefault()} />}
         >
             <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>
                 Tutor · Ana Ruiz

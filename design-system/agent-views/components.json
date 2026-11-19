@@ -1511,7 +1511,7 @@
       "import": "import { Card } from '@/templates';",
       "group": "templates",
       "source": "design-system/src/templates/Card/Card.jsx",
-      "summary": "PLUS card: an optional image, content and footer on a `sunken`, `default`, or `raised` surface. - **Surface**: `sunken` (default, flat), `default` (page surface with a 1px border, flat), or `raised` (raised surface and shadow). Every card carries a 1px border (transparent on sunken and raised) so forced colors draw its edge. - **Image placement**: `top` (default), `start` or `end`. Side images apply at the large card minimum width and fill the height. `imageSplit` chooses one third (default) or one half; half uses Heading md on a side card. Below the large minimum width, the image returns to the top with its own ratio. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: padding uses `--card-pad` and radius uses `--card-radius` at every size, the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: a clickable `sunken` or `default` card lifts to Raised on hover in place and settles to the raised shadow while pressed; a clickable `raised` card lifts to the raised hovered step under the overlay shadow and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.",
+      "summary": "PLUS card: an optional image, content and footer on a `sunken`, `default`, or `raised` surface. - **Surface**: `sunken` (default, flat), `default` (page surface with a 1px border, flat), or `raised` (raised surface and shadow). Every card carries a 1px border (transparent on sunken and raised) so forced colors draw its edge. - **Image placement**: `top` (default), `start` or `end`. Side images apply at the 480 minimum width and fill the height. `imageSplit` chooses one third (default) or one half; half uses Heading md on a side card. Below the 480 minimum width, the image returns to the top with its own ratio. - **Image ratio**: `imageRatio` is `16:9` (default), `4:3` or `1:1`. A top image's height is the card width times the ratio, rounded to a multiple of 4 so the card stays on the 4 px grid; the picture crops to cover and the text sets the rest of the height. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: padding uses `--card-pad` and radius uses `--card-radius` at every size, the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer hugs the start: one action that goes somewhere is a link (`appearance=\"link\"`), two are a compact pair with no Primary, and a card that is all one action is clickable with no buttons. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: a clickable `sunken` or `default` card lifts to Raised on hover in place and settles to the raised shadow while pressed; a clickable `raised` card lifts to the raised hovered step under the overlay shadow and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.",
       "props": [
         {
           "name": "id",
@@ -1577,7 +1577,20 @@
             "start",
             "end"
           ],
-          "description": "Image position. Side placements apply from the large card minimum width; narrower cards put the image on top.",
+          "description": "Image position. Side placements apply from the 480 minimum width; narrower cards put the image on top.",
+          "deprecated": null
+        },
+        {
+          "name": "imageRatio",
+          "type": "enum",
+          "required": false,
+          "default": "'16:9'",
+          "values": [
+            "16:9",
+            "4:3",
+            "1:1"
+          ],
+          "description": "Image shape on a top image: its height follows the card width at 16:9, 4:3 or 1:1, rounded to a multiple of 4, and the picture crops to cover. A side image fills the card height instead.",
           "deprecated": null
         },
         {
@@ -1598,7 +1611,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Footer slot: commit actions, left-aligned, Card/stack-lg below the body",
+          "description": "Footer slot: a link for one action that leaves, or a compact pair with no Primary, start-aligned, Card/stack-lg below the body",
           "deprecated": null
         },
         {
@@ -1697,12 +1710,14 @@
         "Elevation",
         "Anatomy",
         "Jobs",
-        "SizeSmall",
-        "SizeMedium",
-        "SizeLarge",
+        "MinWidth224",
+        "MinWidth304",
+        "MinWidth480",
         "ImageWide",
         "ImageStandard",
         "ImageSquare",
+        "ImageRatioGrid",
+        "ImageRatioDefault",
         "ImageTop",
         "ImageTopHovered",
         "ImageTopPressed",
@@ -5969,7 +5984,7 @@
       "import": "import { FilterMenu } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/FilterMenu/FilterMenu.jsx",
-      "summary": "Filter menu: several filter categories in a Popup, held until Apply. - **Held until Apply.** Ticking a box changes the menu, not the content. Apply hands the values to `onApply`, closes the menu with a fade, and the content behind swaps in place once. Escape or a click away drops what was ticked; the next open starts from what is applied. - **Reset** clears every box in the menu without applying. Apply then applies the empty set. - **Layout follows the count.** Two or three categories sit side by side at `3-col`; four or more stack, at `3-col` or `4-col`. - **The trigger** is the Filter icon button, its count the number of values applied, on the selected fill once any is. It opens `bottom-end`, the end of the bar where filters sit.",
+      "summary": "Filter menu: several filter categories in a Popup, held until Apply. - **Held until Apply.** Ticking a box changes the menu, not the content. Apply hands the values to `onApply`, closes the menu with a fade, and the content behind swaps in place once. Escape or a click away drops what was ticked; the next open starts from what is applied. - **Clear** clears every box in the menu without applying. Apply then applies the empty set. Both are compact (24) at the end of the menu: Clear is Subtle, Apply is Default, with no Primary. - **Layout follows the count.** Two or three categories sit side by side at `3-col`; four or more stack, at `3-col` or `4-col`. - **The trigger** is the Filter icon button, its count the number of values applied, on the selected fill once any is. It opens `bottom-end`, the end of the bar where filters sit.",
       "props": [
         {
           "name": "container",
@@ -6136,11 +6151,10 @@
         "Interactive"
       ],
       "tokens": [
-        "--border-width-default",
         "--dropdown-menu-max-height",
         "--heading-xs",
         "--inline-lg",
-        "--plus-filter-menu-bleed",
+        "--inline-md",
         "--plus-filter-menu-columns",
         "--popup-pad",
         "--stack-lg"

@@ -41,7 +41,7 @@ Two or three categories sit side by side; four or more stack.
 
 ## Layout
 
-<ComponentExample of={FilterMenuStories.Placement} title="Placement" description="The menu opens 4 under the Filter icon at the end of the bar, its end edge on the trigger's. Reset and Apply span the bottom, half each." />
+<ComponentExample of={FilterMenuStories.Placement} title="Placement" description="The menu opens 4 under the Filter icon at the end of the bar, its end edge on the trigger's. Clear and Apply sit compact at the end of the bottom row." />
 
 </div>
 
@@ -49,7 +49,7 @@ Two or three categories sit side by side; four or more stack.
 
 ## Behavior
 
-<ComponentExample of={FilterMenuStories.Staging} title="Reset and Apply" description="Escape or a click away drops what was ticked. Reset clears the boxes without applying; Apply applies what the menu shows, even nothing." />
+<ComponentExample of={FilterMenuStories.Staging} title="Clear and Apply" description="Escape or a click away drops what was ticked. Clear clears the boxes without applying; Apply applies what the menu shows, even nothing." />
 
 </div>
 
@@ -107,7 +107,7 @@ Use `FilterMenu` when a section's content takes two or more filter categories st
 1. **Trigger.** The Filter `IconButton`. Once any value is applied it shows the count on the selected fill and reads "Filters, 2 applied".
 2. **Popup.** A `Popup` at a column step: `3-col` side by side; `3-col` or `4-col` stacked.
 3. **Categories.** A `Fieldset` per category, its label the legend, its options `Checkbox`es. Pick as many as apply.
-4. **Footer.** Reset (default) and Apply (primary), half each, full bleed across the bottom.
+4. **Footer.** Clear (subtle) and Apply (default), compact, at the end. No Primary.
 
 ### Placement
 
@@ -130,7 +130,7 @@ Use `FilterMenu` when a section's content takes two or more filter categories st
 <tbody>
 <tr><td>Open</td><td>The menu clips open from the trigger's corner, on the values applied. A keyboard open is instant.</td></tr>
 <tr><td>Ticked</td><td>The box changes color. The content behind does not change.</td></tr>
-<tr><td>Reset</td><td>Every box clears with the same color change. Nothing is applied yet.</td></tr>
+<tr><td>Clear</td><td>Every box clears with the same color change. Nothing is applied yet.</td></tr>
 <tr><td>Applied</td><td>The menu fades, the content behind swaps in place once, and the trigger's count changes. Nothing slides.</td></tr>
 <tr><td>Dismissed</td><td>Escape or a click away closes it and drops the ticks; the next open starts from what is applied.</td></tr>
 </tbody>
@@ -180,7 +180,7 @@ Pass `layout="stacked"` when a few categories have long option lists so each cat
 <tr><th>Do</th><th>Don't</th></tr>
 </thead>
 <tbody>
-<tr><td>"Reset" in the menu.</td><td>"Reset filters" or "Clear all" in the menu. "Reset filters" is for everywhere else, such as a No matches state.</td></tr>
+<tr><td>"Clear" in the menu.</td><td>"Reset", "Reset filters" or "Clear all" in the menu. "Reset filters" is for everywhere else, such as a No matches state.</td></tr>
 <tr><td>Name a category by what it holds: "Status", "Subject".</td><td>A verb phrase such as "Filter by status".</td></tr>
 </tbody>
 </DocsTable>

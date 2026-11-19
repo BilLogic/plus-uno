@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { expectTypeCardAnchors } from '@/storybook-docs/lib/type-card-anchors.jsx';
 import {
-    ModalFooterFullBleedCase,
+    ModalFooterTracksCase,
     ModalFooterInsetCase,
     OnePrimaryCase,
     PageButtonsFarRightCase,
@@ -68,9 +68,9 @@ describe('CommonActions live cases and links', () => {
         expect(saveRight).toHaveFocus();
     });
 
-    it('ModalFooterFullBleedCase and ModalFooterInsetCase render live interactive Dialog footers', async () => {
+    it('ModalFooterTracksCase and ModalFooterInsetCase render live interactive Dialog footers', async () => {
         const user = userEvent.setup();
-        const { unmount } = render(<ModalFooterFullBleedCase />);
+        const { unmount } = render(<ModalFooterTracksCase />);
         expect(screen.getByRole('heading', { name: 'Log a session' })).toBeInTheDocument();
         const fullBleedStudent = screen.getByRole('textbox', { name: 'Student' });
         await user.clear(fullBleedStudent);
@@ -93,6 +93,6 @@ describe('CommonActions live cases and links', () => {
     });
 
     it('links every TypeCard anchor to a unique ComponentExample heading id in CommonActions.mdx', () => {
-        expectTypeCardAnchors(join(__dirname, 'CommonActions.mdx'), 7);
+        expectTypeCardAnchors(join(__dirname, 'CommonActions.mdx'), 9);
     });
 });

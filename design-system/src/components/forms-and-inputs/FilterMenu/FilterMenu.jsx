@@ -37,8 +37,9 @@ const countApplied = (value) => Object.values(value ?? {})
  *   Apply hands the values to `onApply`, closes the menu with a fade, and the
  *   content behind swaps in place once. Escape or a click away drops what was
  *   ticked; the next open starts from what is applied.
- * - **Reset** clears every box in the menu without applying. Apply then
- *   applies the empty set.
+ * - **Clear** clears every box in the menu without applying. Apply then
+ *   applies the empty set. Both are compact (24) at the end of the menu:
+ *   Clear is Subtle, Apply is Default, with no Primary.
  * - **Layout follows the count.** Two or three categories sit side by side
  *   at `3-col`; four or more stack, at `3-col` or `4-col`.
  * - **The trigger** is the Filter icon button, its count the number of values
@@ -107,7 +108,7 @@ const FilterMenu = ({
         });
     };
 
-    const reset = () => setDraft(normalize(categories, {}));
+    const clear = () => setDraft(normalize(categories, {}));
 
     const apply = () => {
         const next = normalize(categories, draft);
@@ -152,8 +153,8 @@ const FilterMenu = ({
                 ))}
             </div>
             <div className="plus-filter-menu__footer">
-                <Button text="Reset" appearance="default" shouldFitContainer onClick={reset} />
-                <Button text="Apply" appearance="primary" shouldFitContainer onClick={apply} />
+                <Button text="Clear" appearance="subtle" spacing="compact" onClick={clear} />
+                <Button text="Apply" appearance="default" spacing="compact" onClick={apply} />
             </div>
         </Popup>
     );

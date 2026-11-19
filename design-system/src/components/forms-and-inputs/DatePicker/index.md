@@ -8,7 +8,7 @@ Also asked as: calendar input, date field, date input, date selector.
 
 **Import:** `import { DatePicker } from '@/components';`
 
-**Governed by:** Forms (`ds guide forms`); Read-only (`ds guide read-only`)
+**Governed by:** Common actions (`ds guide common-actions`); Forms (`ds guide forms`); Read-only (`ds guide read-only`)
 
 **Source:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.jsx`
 

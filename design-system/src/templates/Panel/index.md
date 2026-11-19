@@ -10,7 +10,7 @@ Also asked as: right panel, detail panel, side pane, slide-over, sheet, side she
 
 **Import:** `import { Panel } from '@/templates';`
 
-**Used in:** Frame (`ds guide frame`); Panel (`ds guide panel`); Popup (`ds guide popup`); Section (`ds guide section`)
+**Used in:** Card (`ds guide card`); Frame (`ds guide frame`); Panel (`ds guide panel`); Popup (`ds guide popup`); Section (`ds guide section`)
 
 **Governed by:** Common actions (`ds guide common-actions`); Empty (`ds guide empty`); Forms (`ds guide forms`); Navigation (`ds guide navigation`); Notifications (`ds guide notifications`); Search (`ds guide search`)
 

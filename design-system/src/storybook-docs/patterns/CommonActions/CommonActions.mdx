@@ -5,7 +5,7 @@ import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as CommonActionsStories from './CommonActions.stories.jsx';
 import {
-    ModalFooterFullBleedCase,
+    ModalFooterTracksCase,
     ModalFooterInsetCase,
     OnePrimaryCase,
     PAGE_WIDTH,
@@ -15,6 +15,7 @@ import {
     TwoPrimariesCase,
 } from './commonActionsDemo.jsx';
 import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsLink } from '@/storybook-docs/foundation-page.jsx';
 import { TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 
@@ -24,7 +25,7 @@ import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
     page="patterns-common-actions"
     eyebrow="Pattern"
     title="Common actions"
-    purpose="Which button, in which look, in which place, with which word. Cancel, Close, Reset, copy, edit, remove, the destructive tiers, and acting on many rows at once."
+    purpose="Which button, in which look, in which place, with which word. Cancel, Close, Clear, Reset, copy, edit, remove, the destructive tiers, and acting on many rows at once."
     links={{
         label: 'Uses',
         items: [
@@ -54,24 +55,45 @@ Primary, Default, Subtle, Warning, Danger, Discovery and AI. One Primary per are
 
 <div className="sb-ds-doc-section">
 
-## Placement
+## Footers
 
-The place sets the alignment. A page form's buttons start under the fields; a layer's end where the eye does.
+One question picks the footer: what does it finish? An action that leaves is a link; an action that does something is a button.
+
+<DocsTable>
+<thead>
+<tr><th>Where</th><th>Footer</th></tr>
+</thead>
+<tbody>
+<tr><td>Modal, Panel</td><td><DocsLink id="components-forms-and-inputs-button-footer-actions">FooterActions</DocsLink>: four equal tracks, filled buttons 48 high, Primary last, no Cancel (the corner Close dismisses). A side action leads as a link, or as a danger link when it destroys. "Not now", "Skip" and "Keep editing" are Default buttons in the left half, never the leading slot.</td></tr>
+<tr><td>Multi-step task (Frame)</td><td>The same FooterActions pinned under every step, one-question steps too: Save and exit as a link at the start, Back, then Next or Finish. No centered Back and Continue, no progress dots.</td></tr>
+<tr><td>A form on a page</td><td>Buttons hug their labels at 32, at the start under the last field, Primary first: Save, then Cancel or Reset. Never pinned or full bleed.</td></tr>
+<tr><td>Card</td><td>Buttons hug at the start. One action that goes somewhere is a link; two are a compact pair with no Primary; a card that is all one action is clickable and has no buttons.</td></tr>
+<tr><td>Popup (filter menu, date picker)</td><td>Compact 24 at the end: Clear (Subtle), Apply (Default). No Primary.</td></tr>
+</tbody>
+</DocsTable>
+
+The place sets the alignment: a page form's buttons start under the fields; a layer's end where the eye does.
 
 <TypeGrid>
+<TypeCard of={CommonActionsStories.PlacementModal} to="#in-a-modal" title="In a Modal" stage={STAGE}>Four tracks: Discard left, Primary right, no Cancel.</TypeCard>
+<TypeCard of={CommonActionsStories.PlacementModalLeading} to="#in-a-modal-with-a-side-action" title="In a Modal, with a side action" stage={STAGE}>A danger link leads; a secondary and the Primary fill tracks 3 and 4.</TypeCard>
+<TypeCard of={CommonActionsStories.PlacementMultiStep} to="#in-a-multi-step-task" title="In a multi-step task" stage={STAGE}>Save and exit as a link at the left edge; Back and Next in the right half.</TypeCard>
 <TypeCard of={CommonActionsStories.PlacementPage} to="#in-a-page-form" title="In a page form" stage={PAGE_WIDTH}>Left-aligned under the fields, Primary first.</TypeCard>
-<TypeCard of={CommonActionsStories.PlacementModal} to="#in-a-modal" title="In a Modal" stage={STAGE}>Full bleed across the footer: Discard left, Primary right, no Cancel.</TypeCard>
-<TypeCard of={CommonActionsStories.PlacementMultiStep} to="#in-a-multi-step-task" title="In a multi-step task" stage={STAGE}>Save and exit as a link at the left edge; Back and Next in the right half, on one 32 line.</TypeCard>
-<TypeCard of={CommonActionsStories.PlacementCard} to="#in-a-card" title="In a card" stage={STAGE}>Subtle in the footer; clickable cards keep no inner buttons.</TypeCard>
+<TypeCard of={CommonActionsStories.PlacementCard} to="#in-a-card" title="In a card" stage={STAGE}>A link for one action that leaves; a compact pair otherwise.</TypeCard>
+<TypeCard of={CommonActionsStories.PlacementPopup} to="#in-a-popup" title="In a Popup" stage={480}>Clear (Subtle) and Apply (Default), compact, at the end.</TypeCard>
 </TypeGrid>
+
+<ComponentExample of={CommonActionsStories.PlacementModal} title="In a Modal" description="Four equal tracks: Discard (Default) in the left half, Primary in the right half, Close in the header, no Cancel. The footer is 48 high and never moves." />
+
+<ComponentExample of={CommonActionsStories.PlacementModalLeading} title="In a Modal, with a side action" description="A side action hugs the start as a danger link when it destroys, or a link when it leaves. The secondary and the Primary fill tracks 3 and 4." />
+
+<ComponentExample of={CommonActionsStories.PlacementMultiStep} title="In a multi-step task" description="The same footer pinned under every step: Save and exit as a link at the left edge, Back (Default) and Next (Primary), no Cancel. Back is disabled on the first step." />
 
 <ComponentExample of={CommonActionsStories.PlacementPage} title="In a page form" description="Left-aligned under the fields, Primary first, Cancel Subtle beside it." />
 
-<ComponentExample of={CommonActionsStories.PlacementModal} title="In a Modal" description="Full bleed across the footer: Discard (Default) left, Primary right, Close in the header, no Cancel. The footer is 48 high and never moves." />
+<ComponentExample of={CommonActionsStories.PlacementCard} title="In a card" description="One action that goes somewhere is a link; two actions are a compact pair with no Primary. A card that is all one action is clickable and has no inner buttons." />
 
-<ComponentExample of={CommonActionsStories.PlacementMultiStep} title="In a multi-step task" description="The page footer: Save and exit as a link at the left edge, Back (Default) and Next (Primary), no Cancel. Back is disabled on the first step." />
-
-<ComponentExample of={CommonActionsStories.PlacementCard} title="In a card" description="The main action is Subtle in the footer. A clickable card has no inner buttons; when in doubt, full-span inside tiles." />
+<ComponentExample of={CommonActionsStories.PlacementPopup} title="In a Popup" description="A Popup that holds choices ends with compact Clear (Subtle) and Apply (Default). It holds no form, so it has no Cancel; Escape or a click outside dismisses it." />
 
 </div>
 
@@ -155,10 +177,12 @@ Choose a button's appearance by importance, placement by what it acts on, and la
 <tr><td>The main action of an area</td><td>Primary, one per area</td><td>Last in its group (on a page form: first, before Cancel)</td><td>Verb and object: "Add students"</td></tr>
 <tr><td>Another action in the area</td><td>Default</td><td>Before the Primary</td><td>Verb and object: "Reschedule session"</td></tr>
 <tr><td>Decline or postpone: "Not now", "Skip", "Keep editing", "Save for later"</td><td>Default</td><td>Left half of a two-action footer, beside the Primary</td><td>"Not now"</td></tr>
-<tr><td>A side action that is not one of the footer's two outcomes</td><td>Danger, or a link</td><td>The leading slot, at the left edge</td><td>"Delete"; "Save and exit"</td></tr>
+<tr><td>A side action that is not one of the footer's two outcomes</td><td>Link when it leaves, danger link when it destroys</td><td>The leading slot, at the left edge</td><td>"Save and exit"; "Delete draft"</td></tr>
 <tr><td>Leave a page form without saving</td><td>Subtle</td><td>After Primary on a page form</td><td>"Cancel"; a link is allowed</td></tr>
+<tr><td>Go somewhere from a card</td><td>Link, compact</td><td>The card's footer, at the start</td><td>"Open session"</td></tr>
+<tr><td>Two actions on a card</td><td>Default pair, compact, no Primary</td><td>The card's footer, at the start</td><td>"Reschedule", "Add note"</td></tr>
 <tr><td>Dismiss a Modal, Panel or Flag</td><td>Icon button</td><td>End of the header</td><td>Named "Close"</td></tr>
-<tr><td>Empty a menu's choices</td><td>Default, full bleed with Apply</td><td>The menu's footer, or the top of a filter side</td><td>"Reset" in a menu; "Reset filters" everywhere else</td></tr>
+<tr><td>Empty a Popup's choices</td><td>Subtle, compact, before Apply (Default)</td><td>The end of the Popup's footer, or the top of a filter side</td><td>"Clear" in a Popup; "Reset filters" everywhere else</td></tr>
 <tr><td>Empty one field</td><td>Icon button inside the field</td><td>End of the field</td><td>Named "Clear", "Clear search"</td></tr>
 <tr><td>Copy a value</td><td>Icon button</td><td>Beside the value</td><td>Named "Copy"; "Copied" in a tooltip after</td></tr>
 <tr><td>Change one value on a record</td><td>Inline edit on hover</td><td>On the value</td><td>Pencil named "Edit"</td></tr>
@@ -215,17 +239,17 @@ On a page the Primary comes first, read in the same direction as the fields. In 
     dontCaption="The buttons at the far end of the page, away from the fields, with the Primary last."
 />
 
-### Go full bleed in a Modal footer and keep it 48 high.
+### Fill the four tracks in a Modal footer and keep it 48 high.
 
 <RuleTag kind="automatic" />
 
-Buttons fill the footer, each a fraction of its width with a hairline between, losing their inner corners. One button takes the whole footer. The footer is the same 32 button plus 16 bottom pad a regular footer takes, so nothing inside changes its size. A Panel's editing footer and a card form's footer go full bleed the same way.
+FooterActions divides the footer into four equal tracks: filled buttons 48 high, Primary in the last track. One button takes the right half. A side action leads as a link and takes no track. A Panel's editing footer and a multi-step task's footer use the same component.
 
 <DoDontPair
-    doExample={<ModalFooterFullBleedCase />}
-    doCaption="Two buttons filling the footer edge to edge."
+    doExample={<ModalFooterTracksCase />}
+    doCaption="Two buttons filling the footer's four tracks."
     dontExample={<ModalFooterInsetCase />}
-    dontCaption="Small buttons inset at the end, with spare footer around them."
+    dontCaption="Small buttons inset at the end, hand-built, with spare footer around them."
 />
 
 ### Keep the footer where it is.
@@ -238,19 +262,19 @@ Header and footer stay pinned while the body scrolls. A blocked submit, a server
 
 <RuleTag kind="automatic" />
 
-Close ends a layer and lives in its header, or by Save and exit in a multi-step task. In a Modal and Panel the corner Close dismisses, so their footers carry real actions (such as Discard or Keep) and no Cancel. A page form has no Close, so it keeps a subtle Cancel. A Popup holds no form, so it has no Cancel.
+Close ends a layer and lives in its header, or by Save and exit in a multi-step task. In a Modal and Panel the corner Close dismisses, so their footers carry real actions (such as Discard or Keep) and no Cancel. A page form has no Close, so it keeps a subtle Cancel. A Popup holds no form, so it has no Cancel; Escape or a click outside dismisses it.
 
 ### Make Cancel Subtle on page forms.
 
 <RuleTag kind="automatic" />
 
-Beside a Primary it is already clear the row is interactive, so Cancel steps back as Subtle. Cancel may be a link where a button would compete. In a full-bleed Modal or Panel footer every cell is a button, so the secondary action takes the Default fill to read as one. "Not now" is that secondary action, never Subtle and never in the leading slot.
+Beside a Primary it is already clear the row is interactive, so Cancel steps back as Subtle. Cancel may be a link where a button would compete. In a Modal or Panel footer every filled track is a button, so the secondary action takes the Default fill to read as one. "Not now", "Skip" and "Keep editing" are that secondary action, never Subtle and never in the leading slot.
 
-### Say Reset in a menu and Reset filters everywhere else.
+### Say Clear in a menu and Reset filters everywhere else.
 
 <RuleTag kind="automatic" />
 
-The words and where they sit: <a target="_top" href="./?path=/docs/patterns-filtering--docs#say-reset-in-a-menu-and-reset-filters-everywhere-else">Filtering › Say Reset in a menu and Reset filters everywhere else</a>.
+The words and where they sit: <a target="_top" href="./?path=/docs/patterns-filtering--docs#say-clear-in-a-menu-and-reset-filters-everywhere-else">Filtering › Say Clear in a menu and Reset filters everywhere else</a>.
 
 ### Confirm a copy with a Copied tooltip, not a Flag.
 
@@ -276,11 +300,11 @@ Active: it can be undone, Discard (or a real alternative) and a Primary. Active 
 
 The bar and its words: <a target="_top" href="./?path=/docs/templates-section--docs#turn-the-head-row-into-the-bulk-bar-when-rows-are-selected">Section › Turn the head row into the bulk bar when rows are selected</a>.
 
-### Keep a card's main action Subtle in its footer.
+### Link one action in a card, and pair two.
 
 <RuleTag kind="review" />
 
-A clickable card has no inner buttons; the whole card is the action. When a card does carry a button, it is Subtle in the footer, and inside tiles it spans the full width when in doubt.
+A card's buttons hug the start of its footer. One action that goes somewhere is a link; two actions are a compact Default pair with no Primary. A card that is all one action is clickable instead and has no inner buttons.
 
 </div>
 
@@ -295,7 +319,7 @@ A clickable card has no inner buttons; the whole card is the action. When a card
 <tbody>
 <tr><td>Verb and object: "Log session", "Add students", "Remove from group".</td><td>"Submit", "OK", "Yes", "Continue" with nothing after it.</td></tr>
 <tr><td>"Cancel" on a page form; "Close" to dismiss a layer; real actions like "Discard" in Modal or Panel footers.</td><td>"Dismiss" on a form; "Cancel" on a Close icon or inside a Modal or Panel footer.</td></tr>
-<tr><td>"Reset" in a menu; "Reset filters" everywhere else.</td><td>"Clear all", "Clear filters", "Reset all".</td></tr>
+<tr><td>"Clear" in a menu; "Reset filters" everywhere else.</td><td>"Reset" in a menu; "Clear all", "Clear filters", "Reset all".</td></tr>
 <tr><td>"Delete" for something destroyed; "Remove" for something taken out of a group.</td><td>"Delete" for leaving a group; "Remove" for erasing a record.</td></tr>
 <tr><td>Sentence case: "Mark attendance".</td><td>Title Case: "Mark Attendance".</td></tr>
 </tbody>
@@ -324,9 +348,9 @@ A clickable card has no inner buttons; the whole card is the action. When a card
 <tr><th>Part</th><th>Component</th><th>Notes</th></tr>
 </thead>
 <tbody>
-<tr><td>Action</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-button-button--docs">Button</a></td><td>The nine appearances; `isLoading` swaps the label for a spinner and keeps the width.</td></tr>
+<tr><td>Action</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-button-button--docs">Button</a></td><td>The nine appearances, `link` and `danger-link` among them; `isLoading` swaps the label for a spinner and keeps the width.</td></tr>
 <tr><td>Icon action</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-button-icon-button--docs">Icon button</a></td><td>Close, Copy, Edit and More; its `label` names it.</td></tr>
-<tr><td>Full-bleed footer</td><td><a target="_top" href="./?path=/docs/templates-modal--docs">Modal</a> footer</td><td>Composed from Button in fixed cells today. Planned as a footer prop on the Modal and the Panel.</td></tr>
+<tr><td>Modal, Panel and task footer</td><td><DocsLink id="components-forms-and-inputs-button-footer-actions">FooterActions</DocsLink></td><td>Four equal tracks; a leading action is a link or a danger link.</td></tr>
 <tr><td>Bulk bar</td><td><a target="_top" href="./?path=/docs/templates-section--docs">Section</a> table head</td><td>The Dynamic table's head row, through `TableBulkActions`.</td></tr>
 </tbody>
 </DocsTable>
@@ -338,7 +362,7 @@ A clickable card has no inner buttons; the whole card is the action. When a card
 ## Related
 
 - <a target="_top" href="./?path=/docs/patterns-forms--docs">Forms</a>: use when the buttons submit fields.
-- <a target="_top" href="./?path=/docs/patterns-filtering--docs">Filtering</a>: use for Reset and Apply inside a filter menu.
+- <a target="_top" href="./?path=/docs/patterns-filtering--docs">Filtering</a>: use for Clear and Apply inside a filter menu.
 - <a target="_top" href="./?path=/docs/templates-modal--docs">Modal</a>: use for the confirm a destructive action raises.
 - <a target="_top" href="./?path=/docs/patterns-states-disabled--docs">Disabled</a>: use when an action cannot run yet.
 

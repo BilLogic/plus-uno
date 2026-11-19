@@ -11,16 +11,16 @@ import { Frame, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, Sectio
 const ACCOUNT = { id: 'john-doe', name: 'John Doe', role: 'Lead' };
 
 export const BarInOrder = () => (
-    <FooterActions leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="link" spacing="default" />}>
-        <Button text="Back" spacing="default" />
-        <Button text="Next" appearance="primary" spacing="default" />
+    <FooterActions leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="link" />}>
+        <Button text="Back" />
+        <Button text="Next" appearance="primary" />
     </FooterActions>
 );
 
 export const BarScrambled = () => (
-    <FooterActions leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="link" spacing="default" />}>
-        <Button text="Cancel" spacing="default" />
-        <Button text="Next" appearance="primary" spacing="default" />
+    <FooterActions leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="link" />}>
+        <Button text="Cancel" />
+        <Button text="Next" appearance="primary" />
     </FooterActions>
 );
 
@@ -62,9 +62,9 @@ export const MultiStepInnerSidebar = () => (
                     borderBlockStart: 'var(--border-width-default) solid var(--ds-border)',
                 }}
             >
-                <FooterActions leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="link" spacing="default" />}>
-                    <Button text="Back" spacing="default" />
-                    <Button text="Next" appearance="primary" spacing="default" />
+                <FooterActions leadingAction={<LinkButton text="Save and exit" href="#save-and-exit" appearance="link" />}>
+                    <Button text="Back" />
+                    <Button text="Next" appearance="primary" />
                 </FooterActions>
             </div>
         </div>
