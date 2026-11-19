@@ -4,7 +4,14 @@ import { Meta } from '@storybook/addon-docs/blocks';
 import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 
 import * as PanelStories from './Panel.stories.jsx';
-import { ReadingNoFooter, ReadingWithFooter } from './PanelCases.jsx';
+import {
+    FloatsNoBlanket,
+    OneFloatingPanel,
+    PanelOnBlanket,
+    ReadingNoFooter,
+    ReadingWithFooter,
+    TwoFloatingPanels,
+} from './PanelCases.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 import {
     ComponentExample,
@@ -14,14 +21,7 @@ import {
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
-import {
-    BesideAiPanel,
-    CoversAiPanel,
-    FloatsNoBlanket,
-    OneFloatingPanel,
-    PanelOnBlanket,
-    TwoFloatingPanels,
-} from '@/storybook-docs/illustrations/panel.jsx';
+import { BesideAiPanel, CoversAiPanel } from '@/storybook-docs/illustrations/panel.jsx';
 
 <Meta title="Templates/Panel" tags={['manifest']} />
 
@@ -224,6 +224,7 @@ The AI panel is not a floating Panel. It is a region of the Frame, docked where 
 The page keeps scrolling and stays clickable. A press on the page outside the Panel, or Escape, closes it. Narrow, it is capped and then full width, still with no Blanket. A confirm Modal over a Panel brings its own Blanket.
 
 <DoDontPair
+    stacked
     doExample={<FloatsNoBlanket />}
     doCaption="The Panel floats on its shadow and the page beside it stays undimmed."
     dontExample={<PanelOnBlanket />}
@@ -237,6 +238,7 @@ The page keeps scrolling and stays clickable. A press on the page outside the Pa
 Another row swaps the content; the Inbox replaces Details. The overlay module keeps a second overlay closed.
 
 <DoDontPair
+    stacked
     doExample={<OneFloatingPanel />}
     doCaption="One Panel; another row swaps what it shows."
     dontExample={<TwoFloatingPanels />}
@@ -267,6 +269,8 @@ Discard (Default) and Save (Primary), full bleed; Close in the header dismisses,
 <RuleTag kind="review" />
 
 A floating Panel and the docked AI panel sit side by side. The AI panel is never covered. This pair is Planned.
+
+Drawn, not live: the docked AI panel's placement beside a floating Panel is not built yet, so there is nothing to render.
 
 <DoDontPair
     doExample={<BesideAiPanel />}

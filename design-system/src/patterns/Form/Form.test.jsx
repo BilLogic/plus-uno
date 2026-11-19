@@ -29,13 +29,13 @@ describe('Form live cases', () => {
         expect(screen.getByRole('textbox', { name: /Student/ })).toHaveValue('Ana Ruiz');
         expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
         expect(screen.getByText('Sessions')).toBeInTheDocument();
-        expect(document.querySelector('.plus-blanket')).toBeNull();
+        expect(document.querySelector('.plus-pattern-blanket')).toBeNull();
         r1.unmount();
 
         render(<EditInModal />);
         expect(screen.getByRole('textbox', { name: /Student/ })).toHaveValue('Ana Ruiz');
         expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
-        expect(document.querySelector('.plus-blanket')).not.toBeNull();
+        expect(document.querySelector('.plus-pattern-blanket')).not.toBeNull();
     });
 
     it('OneColumnFields renders Session fields in one column with date and time paired', () => {

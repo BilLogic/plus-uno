@@ -34,24 +34,6 @@ const Behind = () => (
   </g>
 );
 
-/** Do: a trigger at the end of the bar gets a layer aligned to its end edge, growing into the page. */
-export const EndAligned = ({ title = 'A trigger at the end of the bar with its Popup aligned to the trigger’s end edge, inside the page' }) => (
-  <Canvas title={title}>
-    <ButtonShape x={W - X - 24} y={BAR_Y} w={24} />
-    <Popup x={W - X - 64} y={POPUP_Y} w={64} h={44} accent />
-    <Behind />
-  </Canvas>
-);
-
-/** Don't: the same trigger with a start-aligned layer, which runs off the edge of the page. */
-export const StartAlignedAtEnd = ({ title = 'A trigger at the end of the bar with its Popup aligned to the start edge, running past the page’s edge' }) => (
-  <Canvas title={title}>
-    <ButtonShape x={W - X - 24} y={BAR_Y} w={24} />
-    <Popup x={W - X - 24} y={POPUP_Y} w={64} h={44} accent />
-    <Behind />
-  </Canvas>
-);
-
 /** Do: content at the 4-col cap. */
 export const AtCap = ({ title = 'A content Popup at the 4-column cap under its trigger' }) => (
   <Canvas title={title}>
