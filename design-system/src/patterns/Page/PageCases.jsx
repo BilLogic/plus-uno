@@ -4,7 +4,7 @@ import { HeadingLevelContext } from '@/lib/headingLevel';
 import { Page, PatternCard, PatternSection } from '@/patterns';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
 import { ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
-import { AddStudentAction, PageTabs, SessionsTable, StudentViews, ViewSelect } from './pageDemo.jsx';
+import { AddStudentAction, DemoPageHeader, PageTabs, SessionsTable, StudentViews, ViewSelect } from './pageDemo.jsx';
 
 /**
  * The live do and don't examples of the Page template page, built from
@@ -98,3 +98,79 @@ export const TwoTabSystems = () => {
         </InDocs>
     );
 };
+
+/** The page header is the page's one h1; the Section under it opens at h2. */
+export const HeaderIsTheH1 = () => (
+    <InDocs>
+        <Page header={<PageHeader title="Students" titleAs="h4" />}>
+            <PatternSection title="Sessions" views={<StudentViews />}>
+                <SessionsTable />
+            </PatternSection>
+        </Page>
+    </InDocs>
+);
+
+/** Sections standing in for the title: two page-level headings and no page header. */
+export const SectionsAsTitles = () => (
+    <InDocs>
+        <Page>
+            <PatternSection level="page" title="Students" views={<StudentViews />}>
+                <SessionsTable />
+            </PatternSection>
+            <PatternSection level="page" title="Sessions" views={<StudentViews />}>
+                <SessionsTable status="past" />
+            </PatternSection>
+        </Page>
+    </InDocs>
+);
+
+/** An area page: the title alone, with nothing above it. */
+export const AreaPageTitleAlone = () => (
+    <InDocs>
+        <Page header={<PageHeader title="Students" titleAs="h4" />}>
+            <PatternSection title="Students" views={<StudentViews />}>
+                <SessionsTable />
+            </PatternSection>
+        </Page>
+    </InDocs>
+);
+
+/** A breadcrumb on an area page, repeating the Sidebar's place. */
+export const BreadcrumbOnAreaPage = () => (
+    <InDocs>
+        <Page header={<DemoPageHeader breadcrumb={[{ text: 'Students', href: '#students' }, { text: 'Students' }]} title="Students" />}>
+            <PatternSection title="Students" views={<StudentViews />}>
+                <SessionsTable />
+            </PatternSection>
+        </Page>
+    </InDocs>
+);
+
+/** One detail line under the title. */
+export const OneLineDescription = () => (
+    <InDocs>
+        <Page header={<DemoPageHeader title="Students" description="Every student you tutor, with their next session." />}>
+            <PatternSection title="Students" views={<StudentViews />}>
+                <SessionsTable />
+            </PatternSection>
+        </Page>
+    </InDocs>
+);
+
+/** A paragraph under the title pushes the first Section down. */
+export const ParagraphUnderTitle = () => (
+    <InDocs>
+        <Page
+            header={(
+                <DemoPageHeader
+                    title="Students"
+                    description="Every student you tutor is listed here with their grade, their site and their next session. Open a row to see the full record, and use the views to switch between your students and the ones waiting for a tutor. Anything you change is saved as you go."
+                />
+            )}
+        >
+            <PatternSection title="Students" views={<StudentViews />}>
+                <SessionsTable />
+            </PatternSection>
+        </Page>
+    </InDocs>
+);

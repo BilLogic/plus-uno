@@ -6,7 +6,18 @@ import { ComponentExample, exampleSlug } from '@/storybook-docs/ds-docs-layout.j
 import { TypeCard } from '@/storybook-docs/lib/template-page.jsx';
 import * as PageModule from './Page.jsx';
 import Page from './Page.jsx';
-import { AddInTitleRow, AddTwice, OneTabSystem, TwoTabSystems } from './PageCases.jsx';
+import {
+    AddInTitleRow,
+    AddTwice,
+    AreaPageTitleAlone,
+    BreadcrumbOnAreaPage,
+    HeaderIsTheH1,
+    OneLineDescription,
+    OneTabSystem,
+    ParagraphUnderTitle,
+    SectionsAsTitles,
+    TwoTabSystems,
+} from './PageCases.jsx';
 
 vi.mock('@storybook/addon-docs/blocks', async () => {
     const React = await import('react');
@@ -47,6 +58,38 @@ describe('Page live cases', () => {
 
         fireEvent.click(screen.getByRole('tab', { name: 'Overview' }));
         expect(screen.getByText('Lincoln Middle · Grade 8')).toBeInTheDocument();
+    });
+
+    it('HeaderIsTheH1 renders a page header and one Section, while SectionsAsTitles has two Sections and no header', () => {
+        const r1 = render(<HeaderIsTheH1 />);
+        expect(document.querySelectorAll('.plus-page-header')).toHaveLength(1);
+        expect(screen.getByRole('heading', { name: 'Students' })).toBeInTheDocument();
+        r1.unmount();
+
+        const r2 = render(<SectionsAsTitles />);
+        expect(document.querySelectorAll('.plus-page-header')).toHaveLength(0);
+        expect(screen.getAllByRole('heading', { name: /^(Students|Sessions)$/ })).toHaveLength(2);
+        r2.unmount();
+    });
+
+    it('AreaPageTitleAlone has no breadcrumb, while BreadcrumbOnAreaPage adds one', () => {
+        const r1 = render(<AreaPageTitleAlone />);
+        expect(screen.queryByRole('navigation', { name: 'Breadcrumb' })).toBeNull();
+        r1.unmount();
+
+        render(<BreadcrumbOnAreaPage />);
+        expect(screen.getByRole('navigation', { name: 'Breadcrumb' })).toBeInTheDocument();
+    });
+
+    it('OneLineDescription keeps one short line under the title, while ParagraphUnderTitle runs long', () => {
+        const r1 = render(<OneLineDescription />);
+        const short = document.querySelector('[data-part="description"]').textContent;
+        r1.unmount();
+
+        render(<ParagraphUnderTitle />);
+        const long = document.querySelector('[data-part="description"]').textContent;
+        expect(short.length).toBeLessThan(80);
+        expect(long.length).toBeGreaterThan(160);
     });
 
     it('TwoTabSystems shows the anti-pattern of two tablists on one page', () => {
