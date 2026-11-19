@@ -56,6 +56,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { loadExceptions } from './lib/exceptions.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 import { rowsOfRule } from './lib/retirement.mjs';
 import { trackedFiles } from './lib/tracked-sources.mjs';
@@ -358,9 +359,12 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
 
   // (5) Retired paths.
   const paths = retiredPaths();
-  const self = new Set(['scripts/check-storybook-categories.mjs', 'scripts/check-storybook-categories.test.mjs']);
+  // What the scan skips lives in scripts/exceptions.json: history kept as written,
+  // and the files that name the retired folders on purpose.
+  const history = loadExceptions('check:storybook-categories', 'history').map((e) => e.at);
+  const self = new Set(loadExceptions('check:storybook-categories', 'self').map((e) => e.at));
   for (const rel of tracked) {
-    if (self.has(rel) || rel.startsWith('docs/plans/') || rel.startsWith('docs/adr/')) continue;
+    if (self.has(rel) || history.some((root) => rel.startsWith(root))) continue;
     const abs = path.join(repoRoot, rel);
     if (!fs.existsSync(abs) || fs.statSync(abs).size > 2_000_000) continue;
     const src = fs.readFileSync(abs, 'utf8');

@@ -443,6 +443,32 @@
         }
       ]
     },
+    "check:storybook-categories": {
+      "history": [
+        {
+          "at": "docs/plans/",
+          "reason": "History keeps the folder names it was written with."
+        },
+        {
+          "at": "docs/adr/",
+          "reason": "History keeps the folder names it was written with."
+        }
+      ],
+      "self": [
+        {
+          "at": "scripts/check-storybook-categories.mjs",
+          "reason": "This check names the retired folders it guards, so it skips itself."
+        },
+        {
+          "at": "scripts/check-storybook-categories.test.mjs",
+          "reason": "This check names the retired folders it guards, so its test skips itself."
+        },
+        {
+          "at": "scripts/retirement-parity.test.mjs",
+          "reason": "Its parity test holds the retired folder list as the check spelled it before, to prove the move changed nothing."
+        }
+      ]
+    },
     "check:worker-host": {
       "allowed": [
         {
