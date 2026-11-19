@@ -658,8 +658,8 @@ const Sidebar = ({
                             >
                                 <Collapsible.Trigger
                                     className="plus-template-sidebar__row"
-                                    // The extra tabs render in the sibling list, so this row owns no panel to point at.
-                                    render={({ 'aria-controls': _owned, ...props }) => <button {...props} />}
+                                    // The extra tabs are rows of the list this row sits in, so it points at that list, not at a panel of its own.
+                                    render={(props) => <button {...props} aria-controls={listId} />}
                                 >
                                     <span className="plus-template-sidebar__slot" aria-hidden="true" />
                                     <span className="plus-template-sidebar__label">{all ? 'Show less' : `Show ${more} more`}</span>

@@ -48,18 +48,19 @@ describe('Sidebar disclosures', () => {
         expect(screen.getByRole('button', { name: 'Students' })).toBeInTheDocument();
     });
 
-    it('shows the rest of the open tabs from the keyboard and reports it in aria-expanded', async () => {
+    it('shows the rest of the open tabs from the keyboard, reports it in aria-expanded and points aria-controls at the tab list', async () => {
         const user = userEvent.setup();
         renderSidebar();
         const more = screen.getByRole('button', { name: 'Show 2 more' });
         expect(more).toHaveAttribute('aria-expanded', 'false');
+        expect(more.getAttribute('aria-controls')).toBe(screen.getByRole('list', { name: 'Open Sessions' }).id);
         expect(screen.queryByRole('button', { name: 'Five' })).toBeNull();
 
         more.focus();
         await user.keyboard('{Enter}');
         const less = screen.getByRole('button', { name: 'Show less' });
         expect(less).toHaveAttribute('aria-expanded', 'true');
-        // The extra tabs live in the sibling list, so the row must not point at a panel that is not there.
+        // Every aria-controls on the page names an element that exists.
         document.querySelectorAll('[aria-controls]').forEach((el) => {
             expect(document.getElementById(el.getAttribute('aria-controls'))).not.toBeNull();
         });
