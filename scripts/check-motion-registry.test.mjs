@@ -1,6 +1,7 @@
 // check:motion-registry, mutation-tested.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -159,4 +160,24 @@ test('patternPages reads titles under Patterns/ and skips the Overview', () => {
 
 test('the live tree holds its own record', () => {
   assert.deepEqual(run(), []);
+});
+
+/** Findings are the same on a plain tree, a tracked one, and a tracked one beside a second copy of itself under `.claude/worktrees`. */
+function sameAcrossCopies(root, read) {
+  const key = (found) => JSON.stringify(found, null, 1).split('\n').sort().join('\n');
+  const plain = key(read());
+  execFileSync('git', ['-C', root, 'init', '-q']);
+  execFileSync('git', ['-C', root, 'add', '-A']);
+  assert.equal(key(read()), plain, 'tracked');
+  fs.cpSync(path.join(root, 'design-system'), path.join(root, '.claude/worktrees/other/design-system'), { recursive: true });
+  assert.equal(key(read()), plain, 'beside a worktree copy');
+  return plain;
+}
+
+test('patternPages reads the same tracked, untracked-copy and plain', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'pattern-pages-copy-'));
+  const dir = path.join(root, 'design-system/src/storybook-docs/patterns/Filtering');
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'Filtering.mdx'), '<Meta title="Patterns/Filtering" />');
+  assert.match(sameAcrossCopies(root, () => patternPages(root)), /Filtering/);
 });

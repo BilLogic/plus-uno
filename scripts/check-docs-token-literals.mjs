@@ -134,7 +134,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { resolveToken } from '../design-system/src/lib/tokens.mjs';
+import { TOKEN_NAME, TOKEN_NAME_TAIL, resolveToken } from '../design-system/src/lib/tokens.mjs';
 import {
   TOKEN_DIR,
   colorKey,
@@ -411,8 +411,10 @@ export function findings(source, index) {
 // comment-justified declaration of its own and is read in review.
 
 /** Retired names, as consumed through `var()`. Definitions (Tailwind's `@theme`) are not uses. */
-export const OLD_VOCABULARY =
-  /var\(\s*(--(?:color|size|element|layout)-[a-z0-9-]+|--font-line-height-[a-z0-9-]+|--font-(?:size|family|weight)-(?:body\d|h\d|headline|header|code|title|normal|bold|medium|semibold-\d))/g;
+export const OLD_VOCABULARY = new RegExp(
+  `var\\(\\s*(--(?:color|size|element|layout)-${TOKEN_NAME_TAIL}|--font-line-height-${TOKEN_NAME_TAIL}|--font-(?:size|family|weight)-(?:body\\d|h\\d|headline|header|code|title|normal|bold|medium|semibold-\\d))`,
+  'g',
+);
 const CHROME_HEX_CSS = /#[0-9a-f]{3,8}\b/gi;
 /** In a component a hex is a literal anywhere in a string or class (`bg-[#fff]`, `1px solid #ccc`); `href="#add"` has no digit-or-hex run of 3+ ending at a word edge after a quote or space only. */
 const CHROME_HEX_STRING = /(?:['"`\s\[(])#(?=[0-9a-f]*\d)[0-9a-f]{3,8}\b/gi;
@@ -439,8 +441,8 @@ const DOCS_LITERAL = /docs-literal:/;
 // currentColor), and a stroke width or corner radius is a token too.
 const KIT_PAINT = /\b(fill|stroke|stopColor|floodColor)\s*[=:]\s*\{?\s*(["'])([^"']*)\2/g;
 const KIT_GEOMETRY = /\b(strokeWidth|rx|ry)\s*[=:]\s*\{?\s*(?:(["'])([^"']*)\2|(-?\d*\.?\d+)\s*\})/g;
-const KIT_PAINT_OK = /^(?:var\(--ds-[\w-]+\)|none|transparent|currentColor|inherit)$/;
-const KIT_GEOMETRY_OK = /^var\(--[\w-]+\)$/;
+const KIT_PAINT_OK = new RegExp(`^(?:var\\(--ds-${TOKEN_NAME_TAIL}\\)|none|transparent|currentColor|inherit)$`);
+const KIT_GEOMETRY_OK = new RegExp(`^var\\(${TOKEN_NAME}\\)$`);
 
 function kitFindings(text, lineOf) {
   const found = [];

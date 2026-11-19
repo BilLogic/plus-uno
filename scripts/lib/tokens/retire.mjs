@@ -9,9 +9,10 @@
  * and so does a `@media` block or `:root` block left empty.
  */
 
+import { TOKEN_NAME } from '../../../design-system/src/lib/tokens.mjs';
 import { RETIRED_TOKENS, TOKEN_LADDER } from './plan.mjs';
 
-const DECLARATION = /^\s*(--[\w-]+)\s*:[^;]*;.*$/;
+const DECLARATION = new RegExp(`^\\s*(${TOKEN_NAME})\\s*:[^;]*;.*$`);
 const COMMENT_ONLY = /^\s*\/\*.*\*\/\s*$/;
 
 /** Is this line the end of the thing it sits in (a closing brace) or nothing after it? */

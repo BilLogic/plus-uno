@@ -23,6 +23,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { TOKEN_NAME } from '../../design-system/src/lib/tokens.mjs';
 import { renderInventions, tokenMatchers } from './inventions.mjs';
 import { RETIRED_TOKENS, retiredRenames } from './tokens/plan.mjs';
 
@@ -58,7 +59,7 @@ const escape = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 function matcherOf(row) {
   if (row.kind === 'token') {
     const names = tokenMatchers(row.not);
-    return { name: (n) => names.some((re) => re.test(n)), scan: (text) => [...text.matchAll(/--[\w-]+/g)].filter((m) => names.some((re) => re.test(m[0]))) };
+    return { name: (n) => names.some((re) => re.test(n)), scan: (text) => [...text.matchAll(new RegExp(TOKEN_NAME, 'g'))].filter((m) => names.some((re) => re.test(m[0]))) };
   }
   const source = row.pattern ?? `(?<![\\w-])${escape(row.not)}(?![\\w-])`;
   const flags = row.kind === 'component' ? 'g' : 'gi';

@@ -365,3 +365,24 @@ test('a same-name single-child wrapper folder goes red even when !dev sub-storie
   });
   assert.ok(!messages(flat).some((m) => m.includes('wrapper')));
 });
+
+/** Findings are the same on a plain tree, a tracked one, and a tracked one beside a second copy of itself under `.claude/worktrees`. */
+function sameAcrossCopies(root, read) {
+  const key = (found) => JSON.stringify(found, null, 1).split('\n').sort().join('\n');
+  const plain = key(read());
+  execFileSync('git', ['-C', root, 'init', '-q']);
+  execFileSync('git', ['-C', root, 'add', '-A']);
+  assert.equal(key(read()), plain, 'tracked');
+  fs.cpSync(path.join(root, 'design-system'), path.join(root, '.claude/worktrees/other/design-system'), { recursive: true });
+  assert.equal(key(read()), plain, 'beside a worktree copy');
+  return plain;
+}
+
+test('a fixture root reads the same beside a second copy of the tree', () => {
+  const root = fixture({ 'design-system/src/components/labels/Tag.stories.jsx': story('Components/Status and loading/Tag') });
+  const key = (found) => JSON.stringify(found.map((f) => f.message));
+  const tracked = key(run({ repoRoot: root }));
+  assert.match(tracked, /outside every component category/);
+  fs.cpSync(path.join(root, 'design-system'), path.join(root, '.claude/worktrees/other/design-system'), { recursive: true });
+  assert.equal(key(run({ repoRoot: root })), tracked);
+});

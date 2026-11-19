@@ -14,11 +14,14 @@
 
 import slotMetadata from '../../design-system/agent-views/_slots.json' with { type: 'json' };
 import { placementsFromSlots } from './ds-placements.mjs';
-import { varReferencePattern } from '../../design-system/src/lib/tokens.mjs';
+import { TOKEN_NAME, varReferencePattern } from '../../design-system/src/lib/tokens.mjs';
 import { EXTERNAL, isInterpolated } from '../undefined-tokens.mjs';
 import { blankComments, closeOf, importsOf, jsxElementsOf, literalOf, positionAt, styleObjectsOf } from './jsx-scan.mjs';
 
 export const RULES_DOC = 'docs/engineering/ds-usage-rules.md';
+
+/** A value that is nothing but one `var()` of a token: the next hop of an alias chain. */
+const ALIAS_OF_TOKEN = new RegExp(`^var\\((${TOKEN_NAME})\\)$`);
 
 /** id -> level. `fail` blocks; `warn` is printed and never blocks. */
 export const RULES = {
@@ -115,7 +118,7 @@ export function contextFrom({
   for (const t of usable) {
     let value = t.value;
     for (let hops = 1; hops <= 8; hops += 1) {
-      const ref = String(value).trim().match(/^var\((--[\w-]+)\)$/);
+      const ref = String(value).trim().match(ALIAS_OF_TOKEN);
       if (!ref) {
         push(byValue, normalizeValue(value), t.name, hops);
         break;
@@ -545,7 +548,7 @@ function rawFix(reason, property, literal, ctx) {
 /** At-rule preludes (`@media (...)`, `@include x(...)`) blanked: their values are not declarations. */
 const blankAtRules = (text) => text.replace(/@[a-z-]+[^{;]*/g, (m) => m.replace(/[^\n]/g, ' '));
 
-const DECLARATION = /(^|[;{\s])(\$[\w-]+|--[\w-]+|[a-z][a-z-]*)\s*:\s*([^;{}]+?)\s*(?=;|}|$)/gm;
+const DECLARATION = new RegExp(`(^|[;{\\s])(\\$[\\w-]+|${TOKEN_NAME}|[a-z][a-z-]*)\\s*:\\s*([^;{}]+?)\\s*(?=;|}|$)`, 'gm');
 
 function styleEscapes(text, ctx, add) {
   const body = blankAtRules(text);

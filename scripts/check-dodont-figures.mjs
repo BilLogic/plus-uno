@@ -39,15 +39,10 @@
  * judgment, so they live in the docs review, not in an exit code. A helper
  * defined in another file is not followed.
  */
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
+import { REPO_ROOT } from './lib/corpus.mjs';
 import { attrsOf, readElement } from './lib/docs-page.mjs';
 import { main } from './lib/findings.mjs';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = path.resolve(__dirname, '..');
+import { trackedSources } from './lib/tracked-sources.mjs';
 const SRC = 'design-system/src';
 
 /** The files that define the Do and Don't blocks, not pages that use them. */
@@ -183,23 +178,14 @@ export function checkSource(source, { file = '' } = {}) {
   return problems;
 }
 
-function files(dir, out = []) {
-  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (e.name === 'node_modules' || e.name.startsWith('.')) continue;
-    const full = path.join(dir, e.name);
-    if (e.isDirectory()) files(full, out);
-    else if (/\.(mdx|jsx)$/.test(e.name) && !/\.test\.jsx$/.test(e.name)) out.push(full);
-  }
-  return out;
-}
+/** Every docs page and story source under the design-system source, tracked and still on disk. */
+const sources = (repoRoot) => trackedSources(repoRoot, [SRC], /\.(mdx|jsx)$/).filter(({ path: file }) => !/\.test\.jsx$/.test(file));
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
   const findings = [];
-  for (const abs of files(path.join(repoRoot, SRC))) {
-    const file = path.relative(repoRoot, abs).split(path.sep).join('/');
+  for (const { path: file, text: source } of sources(repoRoot)) {
     if (DEFINITIONS.has(file)) continue;
-    const source = fs.readFileSync(abs, 'utf8');
     if (!/\bDo(Dont)?\b|DoDontPair|DoDontCard|<Dont\b/.test(source)) continue;
     for (const { line, message } of checkSource(source, { file })) findings.push({ file, line, message });
   }
@@ -213,8 +199,7 @@ export const REMEDY =
 
 export function summary({ repoRoot = REPO_ROOT } = {}) {
   let blocks = 0;
-  for (const abs of files(path.join(repoRoot, SRC))) {
-    const source = fs.readFileSync(abs, 'utf8');
+  for (const { text: source } of sources(repoRoot)) {
     blocks += (source.match(BLOCKS) ?? []).length;
   }
   return `${blocks} Do and Don't block(s) hold one figure rule.`;

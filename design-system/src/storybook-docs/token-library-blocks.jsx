@@ -5,20 +5,16 @@ import { DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
 import { FoundationSection, FoundationSubsection } from '@/storybook-docs/foundation-page.jsx';
 import { COLLECTION_TITLES, COLLECTIONS, SCOPES, SCOPE_TITLES, TIERS } from '@/storybook-docs/lib/token-collections.mjs';
 import { buildLibrary, filterLibrary, groupLibrary } from '@/storybook-docs/lib/token-library.mjs';
-import { SOURCES, corpus } from '@/storybook-docs/token-collection-blocks.jsx';
-import registry from '../../agent-views/tokens.json';
+import { TOKEN_COLLECTIONS } from '@/storybook-docs/docs-tokens.js';
 
 /**
  * Foundations ▸ Tokens ▸ Library: one searchable list of every token. Rows come
- * from the same corpus and the same placement as the collection pages
- * (`lib/token-collections.mjs`), so a token added to the source shows here with
- * no edit. A color role reads its light and dark value from the token
- * stylesheets; every other row has one value.
+ * from the same collections as the collection pages (`docs-tokens.js`), so a
+ * token added to the source shows here with no edit. A color role carries its
+ * light and dark value in the token table; every other row has one value.
  */
 
-const intents = new Map(registry.tokens.map((t) => [t.name, t.intent ?? '']));
-const darkSources = SOURCES.filter((s) => /^color\/_(semantic|elevation)\.scss$/.test(s.file));
-const LIBRARY = buildLibrary(corpus, { darkSources, intents });
+const LIBRARY = buildLibrary(TOKEN_COLLECTIONS);
 
 const ALL = 'all';
 const options = (all, items) => [{ value: ALL, label: all }, ...items.map(([value, label]) => ({ value, label }))];

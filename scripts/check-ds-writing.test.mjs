@@ -7,6 +7,7 @@
  */
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -316,4 +317,22 @@ test('run: a stale marker in a guideline markdown file fails', () => {
   fs.writeFileSync(path.join(root, 'design-system/guidelines/components/overview.md'), '# Components\n\n## Known stale below this line\n\nNo `TODO` in code is a finding.\n');
   const found = run({ repoRoot: root, enforceStrict: false });
   assert.deepEqual(found.map((f) => [f.file, f.line, f.severity, /stale-marker/.test(f.message)]), [['design-system/guidelines/components/overview.md', 3, 'error', true]]);
+});
+
+/** Findings are the same on a plain tree, a tracked one, and a tracked one beside a second copy of itself under `.claude/worktrees`. */
+function sameAcrossCopies(root, read) {
+  const key = (found) => JSON.stringify(found, null, 1).split('\n').sort().join('\n');
+  const plain = key(read());
+  execFileSync('git', ['-C', root, 'init', '-q']);
+  execFileSync('git', ['-C', root, 'add', '-A']);
+  assert.equal(key(read()), plain, 'tracked');
+  fs.cpSync(path.join(root, 'design-system'), path.join(root, '.claude/worktrees/other/design-system'), { recursive: true });
+  assert.equal(key(read()), plain, 'beside a worktree copy');
+  return plain;
+}
+
+test('run: a fixture root reads the same tracked, untracked-copy and plain', () => {
+  const root = fixtureRepo({ Modal: mdx({ alternatives: null }), Popup: mdx({ alternatives: null, extra: '## Notes\n\nTODO: rewrite.\n' }) });
+  const plain = sameAcrossCopies(root, () => run({ repoRoot: root, enforceStrict: false, all: true }));
+  assert.match(plain, /usage-spine/);
 });
