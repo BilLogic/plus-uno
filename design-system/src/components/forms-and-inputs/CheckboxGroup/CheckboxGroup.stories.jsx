@@ -606,6 +606,10 @@ export const SoftDisabled = {
         await expect(getComputedStyle(softCheck(selected)).color).toBe(tokenColor(canvasElement, '--ds-icon-disabled'));
         await expect(getComputedStyle(softCheck(other)).opacity).toBe('0');
         await expect(withForcedPseudo(other, ':hover', () => getComputedStyle(other).backgroundColor)).toBe(tokenColor(canvasElement, '--ds-background-disabled'));
+        const box = within(selected).getByRole('checkbox', { name: 'Email summary' });
+        await expect(box).toHaveAttribute('data-disabled');
+        await userEvent.tab();
+        await expect(canvasElement.querySelector('fieldset').contains(document.activeElement)).toBe(false);
         await expect(within(selected).getByRole('checkbox', { name: 'Email summary' })).toHaveAttribute('tabindex', '-1');
     },
 };

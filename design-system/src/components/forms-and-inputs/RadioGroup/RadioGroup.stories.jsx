@@ -750,7 +750,7 @@ export const SoftDisabled = {
         const radio = within(selected).getByRole('radio', { name: 'One-on-one' });
         await expect(radio).toHaveAttribute('data-disabled');
         await userEvent.tab();
-        await expect(document.activeElement).not.toBe(radio);
+        await expect(canvasElement.contains(document.activeElement) && canvasElement.querySelector('.plus-radio-group').contains(document.activeElement)).toBe(false);
     },
 };
 
@@ -765,6 +765,7 @@ export const SoftMixedFlow = {
                 appearance="soft"
                 options={[{ value: 'fluency', label: 'Concept fluency' }, { value: 'homework', label: 'Homework completion' }]}
             />
+            {/* The minority type keeps a visible control, so people notice the question takes several answers. */}
             <CheckboxGroup
                 name="cbg-flow-3"
                 legend="Subjects you can tutor"
