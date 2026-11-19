@@ -96,7 +96,7 @@
 }
 
 .plus-browser-frame__toolbar--safari {
-    gap: var(--grid-gutter);
+    gap: var(--inline-xl);
     height: var(--row-height-lg);
     padding-inline: var(--pad-x-lg);
     background: var(--ds-surface-sunken);
@@ -134,7 +134,7 @@
 
 .plus-browser-frame__tools {
     display: flex;
-    gap: var(--grid-gutter);
+    gap: var(--inline-xl);
 }
 
 // Edge: Chrome's layout with rounder tabs and a pill address bar.

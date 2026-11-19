@@ -49,7 +49,7 @@ const Pillar = ({ name, axis, promise }) => (
 );
 
 export const FrameworkPillars = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-2xl)' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
             <p style={lede}>{PROBLEM}</p>
             <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)', maxWidth: '64ch' }}>{VILLAGE}</p>
@@ -58,7 +58,7 @@ export const FrameworkPillars = () => (
         <p style={{ margin: 0, font: 'var(--body-lg)', color: 'var(--ds-text)' }}>
             Our design strategy prompts productivity, learning, uplift and simplicity.
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--section-stack-lg) var(--section-stack-md)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--stack-2xl) var(--inline-xl)' }}>
             {PILLARS.map((p) => (
                 <Pillar key={p.name} {...p} />
             ))}

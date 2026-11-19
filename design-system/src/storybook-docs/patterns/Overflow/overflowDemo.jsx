@@ -44,7 +44,7 @@ const frame = { padding: 'var(--page-pad)' };
 
 /** A Section title and a SectionMessage: both take more lines, never an ellipsis. */
 export const Wrap = () => (
-    <div style={{ ...frame, display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+    <div style={{ ...frame, display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
         <Section title={LONG_TITLE}>
             <SectionMessage appearance="danger" dismissible={false}>{LONG_ERROR}</SectionMessage>
         </Section>

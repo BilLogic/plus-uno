@@ -784,7 +784,7 @@ const TEMPLATE_GRID_STYLE = {
 /** Within-the-page surface summary grouped by Section, Table, and Card (shipped code truth). */
 export const ByTemplateGrid = () => (
     <ElevationPanel data-testid="by-template-grid">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-xl)' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
                 <h4 style={{ margin: 0, font: 'var(--heading-sm)', color: 'var(--ds-text)' }}>Section</h4>
                 <div style={TEMPLATE_GRID_STYLE}>

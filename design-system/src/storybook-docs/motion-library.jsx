@@ -604,7 +604,7 @@ export const MotionLibrary = ({
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 'var(--section-stack-lg)',
+                    gap: 'var(--stack-2xl)',
                 }}
             >
                 {groups.map((group) => (
@@ -614,7 +614,7 @@ export const MotionLibrary = ({
                         style={{
                             display: 'flex',
                             flexDirection: 'column',
-                            gap: 'var(--section-stack-md)',
+                            gap: 'var(--stack-xl)',
                         }}
                     >
                         <h3 style={{ margin: 0, font: 'var(--heading-md)', color: 'var(--ds-text)' }}>
@@ -634,7 +634,7 @@ export const MotionLibrary = ({
             style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 'var(--section-stack-md)',
+                gap: 'var(--stack-xl)',
             }}
         >
             <div
