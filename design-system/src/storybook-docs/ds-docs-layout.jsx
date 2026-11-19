@@ -499,7 +499,7 @@ export function FigureScreen({ short = false, children }) {
             className="sb-ds-figure-screen"
             style={{
                 '--plus-overlay-screen': 'var(--field-width-xl)',
-                '--dialog-max-height': short ? '400px' /* docs-literal: a short Dialog's cap; no height role token holds 400 */ : undefined,
+                '--dialog-max-height': short ? '320px' /* token gap: 320px; docs-literal: a short Dialog's cap, no height role token holds it */ : undefined,
                 inlineSize: '100%',
             }}
         >

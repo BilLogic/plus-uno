@@ -5,8 +5,9 @@ import { Button, IconButton, PopupSelect, SearchField } from '@/components';
 /**
  * The parts a template example hands to Section's header slots: the
  * title row's actions, the compact Search of row 3, and the "Field: value"
- * triggers for a category, each opening its list. Each part is the real PLUS component; the
- * Section draws the rows, so no example builds header markup of its own.
+ * triggers for a category, each opening its list. Each part is the real PLUS
+ * component; the Section draws the rows, so no example builds header markup
+ * of its own.
  *
  *   SectionActions     More and the labeled Primary, for the title row
  *   HeaderSearch       the compact SearchField that starts row 3

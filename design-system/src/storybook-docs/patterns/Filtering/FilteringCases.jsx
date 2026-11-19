@@ -4,13 +4,13 @@ import { FilterButton, FilterMenu, Tag, TagGroup } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { Section } from '@/templates';
 import { CaseSurface } from '@/storybook-docs/lib/case-surface.jsx';
-import { HeaderSearch } from '@/storybook-docs/lib/section-header.jsx';
+import { HeaderSearch, categoryFilters } from '@/storybook-docs/lib/section-header.jsx';
 import { StudentsTable, ViewPills } from '@/storybook-docs/lib/view-bar.jsx';
-import { CATEGORIES, appliedCount, filterTrigger, narrow, quickFilters } from './filteringDemo.jsx';
+import { CATEGORIES, appliedCount, filterTrigger, narrow } from './filteringDemo.jsx';
 
 /**
  * Live Do / Don't cases on the Filtering pattern page, composed from
- * `Section` and its header props, `ViewPills`, `quickFilters`, `FilterMenu`,
+ * `Section` and its header props, `ViewPills`, `categoryFilters`, `FilterMenu`,
  * `TagGroup`, and `StudentsTable`.
  */
 
@@ -72,7 +72,7 @@ export const OneTierCase = () => {
     const [value, pick] = useQuickFilters();
     return (
         <FilteringCaseSection
-            filters={quickFilters(QUICK(['grade', 'school', 'subject']), value, pick)}
+            filters={categoryFilters(QUICK(['grade', 'school', 'subject']), value, pick)}
             rows={narrow(value)}
             limit={3}
         />
@@ -86,7 +86,7 @@ export const TwoTiersCase = () => {
     return (
         <FilteringCaseSection
             filters={[
-                ...quickFilters(QUICK(['grade', 'school']), value, pick),
+                ...categoryFilters(QUICK(['grade', 'school']), value, pick),
                 ...filterTrigger(appliedCount(menuValue), (trigger) => (
                     <FilterMenu
                         categories={[CATEGORIES.subject, CATEGORIES.tutor]}
@@ -113,7 +113,7 @@ export const FiltersAtEndCase = () => {
             activeView={view}
             onViewChange={setView}
             search
-            filters={quickFilters(QUICK(['grade', 'school']), value, pick)}
+            filters={categoryFilters(QUICK(['grade', 'school']), value, pick)}
             rows={narrow(value)}
             limit={3}
         />
@@ -130,7 +130,7 @@ export const FiltersAmongViewsCase = () => {
             viewsNode={(
                 <>
                     <ViewPills views={['All students', 'Needs follow-up']} activeView={view} onViewChange={setView} />
-                    {quickFilters(QUICK(['grade', 'school']), value, pick, { placement: 'bottom-start' }).map(({ key, menu, ...trigger }) => (
+                    {categoryFilters(QUICK(['grade', 'school']), value, pick, { placement: 'bottom-start' }).map(({ key, menu, ...trigger }) => (
                         <React.Fragment key={key}>{menu(<FilterButton {...trigger} />)}</React.Fragment>
                     ))}
                 </>
