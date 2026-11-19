@@ -418,6 +418,14 @@ const Sidebar = ({
             modulesLeft: effectiveModulesLeft,
         });
         if (extra) return <span className="plus-pattern-sidebar__end">{extra}</span>;
+        if (item.done) {
+            return (
+                <span className="plus-pattern-sidebar__end plus-pattern-sidebar__end--icon">
+                    <Icon name="check" aria-hidden="true" />
+                    <span className="visually-hidden">{item.doneLabel ?? 'Done'}</span>
+                </span>
+            );
+        }
         if (training) {
             return (
                 <span className="plus-pattern-sidebar__end">
@@ -760,14 +768,17 @@ const Sidebar = ({
                 <ul className="plus-pattern-sidebar__list" aria-label={inner.label ?? `${inner.areaLabel} steps`}>
                     {inner.rows.map((row) => {
                         const selected = resolvedActiveId === row.id;
+                        const off = Boolean(row.disabled);
+                        const line = renderRow({
+                            item: { ...row, textOnly: true },
+                            rowClass: ['plus-pattern-sidebar__row', 'plus-pattern-sidebar__row--text', selected && 'plus-pattern-sidebar__row--selected', off && 'plus-pattern-sidebar__row--locked'].filter(Boolean).join(' '),
+                            current: selected,
+                            onPress: () => onSelect?.(row.id, row),
+                            ...(off ? { 'aria-disabled': 'true' } : {}),
+                        });
                         return (
                             <li key={row.id} className="plus-pattern-sidebar__item">
-                                {renderRow({
-                                    item: { ...row, textOnly: true },
-                                    rowClass: ['plus-pattern-sidebar__row', 'plus-pattern-sidebar__row--text', selected && 'plus-pattern-sidebar__row--selected'].filter(Boolean).join(' '),
-                                    current: selected,
-                                    onPress: () => onSelect?.(row.id, row),
-                                })}
+                                {off && row.disabledText ? <Tooltip text={row.disabledText} placement="right">{line}</Tooltip> : line}
                             </li>
                         );
                     })}
@@ -940,6 +951,14 @@ Sidebar.propTypes = {
             countLabel: PropTypes.string,
             dot: PropTypes.bool,
             dotLabel: PropTypes.string,
+            /** A finished step: a tick after the label; the row stays pressable */
+            done: PropTypes.bool,
+            /** The tick's accessible name; defaults to "Done" */
+            doneLabel: PropTypes.string,
+            /** A step the person has not reached: dimmed and not pressable */
+            disabled: PropTypes.bool,
+            /** Why a disabled step waits, shown in a tooltip */
+            disabledText: PropTypes.string,
         })).isRequired,
         /** Accessible name of the rows' list; defaults to "<area> steps" */
         label: PropTypes.string,

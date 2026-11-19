@@ -914,6 +914,49 @@ export const InnerTaskOpenRow = {
     },
 };
 
+/** A task's steps: done ones tick and stay pressable; steps past the answers are dimmed, explain why, and do nothing. */
+export const InnerStepsDoneAndOff = {
+    render: () => {
+        const [step, setStep] = useState('step-availability');
+        const order = TASK_STEPS.map((row) => row.id);
+        const at = order.indexOf(step);
+        const rows = TASK_STEPS.map((row, i) => ({
+            ...row,
+            done: i < at,
+            disabled: i > at,
+            disabledText: 'Answer the steps before it first.',
+        }));
+        return (
+            <Box height={520}>
+                <Sidebar
+                    groups={groups('tutor')}
+                    account={TUTOR}
+                    storageKey={null}
+                    onToggle={() => {}}
+                    activeId={step}
+                    onSelect={setStep}
+                    inner={{ areaLabel: 'Home', rows, label: 'Steps' }}
+                    onBack={() => {}}
+                />
+            </Box>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const list = within(innerNav(canvasElement)).getByRole('list', { name: 'Steps' });
+        const rowOf = (name) => within(list).getByRole('button', { name: new RegExp(`^${name}`) });
+        await expect(within(rowOf('Your profile')).getByText('Done'), 'a done step ticks').toBeInTheDocument();
+        await expect(rowOf('Your profile'), 'and stays pressable').not.toHaveAttribute('aria-disabled');
+        await expect(rowOf('Availability'), 'the current step is marked').toHaveAttribute('aria-current', 'page');
+        await expect(rowOf('Agreements'), 'a step past the answers is off').toHaveAttribute('aria-disabled', 'true');
+        await userEvent.click(rowOf('Agreements'));
+        await expect(rowOf('Availability'), 'pressing an off step does nothing').toHaveAttribute('aria-current', 'page');
+        await userEvent.click(rowOf('Your profile'));
+        await expect(rowOf('Your profile'), 'a done step goes back').toHaveAttribute('aria-current', 'page');
+        await expect(rowOf('Availability'), 'and the later one is off again').toHaveAttribute('aria-disabled', 'true');
+        await expect(within(rowOf('Your profile')).queryByText('Done'), 'the current step is not ticked').toBeNull();
+    },
+};
+
 /** Keyboard: Back first, then the context dropdown, then each row in order; Enter picks a row; the dropdown opens by key and picks by key. */
 export const InnerKeyboard = {
     render: (args) => <InnerSession {...args} />,
