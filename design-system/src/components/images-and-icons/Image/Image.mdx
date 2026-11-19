@@ -175,9 +175,9 @@ already states.
 Use `fluid` and let the container set the width, so one image works from phone to desktop. Reach for `fixed` only for a picture that must stay at its natural size.
 
 <DoDontPair
-    doExample={<FigureStack size="sm"><Image src={sessionSummaryLight} alt="" /></FigureStack>}
+    doExample={<FigureStack width="narrow"><Image src={sessionSummaryLight} alt="" /></FigureStack>}
     doCaption="Fluid, so the container sets the width."
-    dontExample={<FigureStack size="sm"><Image src={sessionSummaryLight} alt="" size="fixed" /></FigureStack>}
+    dontExample={<FigureStack width="narrow"><Image src={sessionSummaryLight} alt="" size="fixed" /></FigureStack>}
     dontCaption="Fixed in a narrow container: the picture overflows it."
 />
 

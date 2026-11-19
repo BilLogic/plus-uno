@@ -234,9 +234,9 @@ Use `Select` for a form field with six or more options, where typing to filter h
 Short, parallel labels scan as a list; a sentence in the field gets cut off.
 
 <DoDontPair
-    doExample={<FigureStack size="md"><Select label="Session length" options={lengths} defaultValue="45" /></FigureStack>}
+    doExample={<FigureStack width="medium"><Select label="Session length" options={lengths} defaultValue="45" /></FigureStack>}
     doCaption="A short label names the value."
-    dontExample={<FigureStack size="md"><Select label="Session length" options={sentenceLengths} defaultValue="45" /></FigureStack>}
+    dontExample={<FigureStack width="medium"><Select label="Session length" options={sentenceLengths} defaultValue="45" /></FigureStack>}
     dontCaption="A sentence in the field does not fit."
 />
 
@@ -318,9 +318,9 @@ Typing is on because most lists are long enough to need it. A menu that holds a 
 `isReadOnly` keeps the value focusable, selectable and at full contrast (`aria-readonly`); `isDisabled` removes the field from the tab order when it does not apply yet. Say why in the caption. Never swap one for the other, and never clip a read-only value; content nobody can edit is plain text, not a field. See [Read-only](?path=/docs/patterns-states-read-only--docs) and [Disabled](?path=/docs/patterns-states-disabled--docs).
 
 <DoDontPair
-    doExample={<FigureStack size="md"><Select label="Session length" options={lengths} defaultValue="45" isReadOnly caption="Set by your supervisor." /></FigureStack>}
+    doExample={<FigureStack width="medium"><Select label="Session length" options={lengths} defaultValue="45" isReadOnly caption="Set by your supervisor." /></FigureStack>}
     doCaption="Read-only keeps the value readable, and the caption says why."
-    dontExample={<FigureStack size="md"><Select label="Session length" options={lengths} defaultValue="45" isDisabled caption="Set by your supervisor." /></FigureStack>}
+    dontExample={<FigureStack width="medium"><Select label="Session length" options={lengths} defaultValue="45" isDisabled caption="Set by your supervisor." /></FigureStack>}
     dontCaption="Disabled fades a value people need to read."
 />
 

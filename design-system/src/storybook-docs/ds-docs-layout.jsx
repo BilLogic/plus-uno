@@ -396,7 +396,7 @@ export function DoDontCard({ tone, children, caption, code }) {
 
 const FIGURE_GAPS = { none: 0, sm: 'var(--inline-sm)', md: 'var(--inline-md)', lg: 'var(--inline-lg)' };
 const FIGURE_STACK_GAPS = { none: 0, sm: 'var(--stack-sm)', md: 'var(--stack-md)', lg: 'var(--stack-lg)' };
-const FIGURE_SIZES = { sm: 'var(--width-1500)', md: 'var(--width-2000)' };
+const FIGURE_WIDTHS = { narrow: 'var(--width-1500)', medium: 'var(--width-2000)' };
 
 /**
  * Several parts of one Do or Don't figure side by side, wrapping when the card
@@ -427,10 +427,10 @@ export function FigureRow({ gap = 'md', align = 'center', justify, children }) {
  * Several parts of one Do or Don't figure one above the other, full width of the card.
  *
  * @param {'none' | 'sm' | 'md' | 'lg'} [gap]
- * @param {'sm' | 'md'} [size] - cap the figure's width, for a field or a card that should not span the well
+ * @param {'narrow' | 'medium'} [width] - cap the figure's width, for a field or a card that should not span the well
  * @param {'start' | 'center' | 'stretch'} [align]
  */
-export function FigureStack({ gap = 'md', size, align = 'stretch', children }) {
+export function FigureStack({ gap = 'md', width, align = 'stretch', children }) {
     return (
         <div
             className="sb-ds-figure-stack"
@@ -440,8 +440,8 @@ export function FigureStack({ gap = 'md', size, align = 'stretch', children }) {
                 alignItems: align === 'start' ? 'flex-start' : align,
                 gap: FIGURE_STACK_GAPS[gap],
                 inlineSize: '100%',
-                maxInlineSize: size ? FIGURE_SIZES[size] : undefined,
-                marginInline: size ? 'auto' : undefined,
+                maxInlineSize: width ? FIGURE_WIDTHS[width] : undefined,
+                marginInline: width ? 'auto' : undefined,
             }}
         >
             {children}

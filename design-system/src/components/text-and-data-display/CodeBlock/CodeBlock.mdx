@@ -175,36 +175,36 @@ a command sequence, a config file.
 Scroll keeps line structure, which matters for shell commands and config, where a fold could read as a new line. Wrap suits prose-like output in a narrow column.
 
 <DoDontPair
-    doExample={<FigureStack size="sm"><CodeBlock text="npm run build -- --mode production --verbose" label="Build command" /></FigureStack>}
+    doExample={<FigureStack width="narrow"><CodeBlock text="npm run build -- --mode production --verbose" label="Build command" /></FigureStack>}
     doCaption="A command scrolls, so one line stays one line."
-    dontExample={<FigureStack size="sm"><CodeBlock text="npm run build -- --mode production --verbose" wrap /></FigureStack>}
+    dontExample={<FigureStack width="narrow"><CodeBlock text="npm run build -- --mode production --verbose" wrap /></FigureStack>}
     dontCaption="A command folded onto a second line reads like two commands."
 />
 
 ### Name each block when there are several on a page.
 
 <DoDontPair
-    doExample={<FigureStack size="md"><CodeBlock text="npm install" label="Install command" /></FigureStack>}
+    doExample={<FigureStack width="medium"><CodeBlock text="npm install" label="Install command" /></FigureStack>}
     doCaption="Each region says what it holds: Install command."
-    dontExample={<FigureStack size="md"><CodeBlock text="npm install" /></FigureStack>}
+    dontExample={<FigureStack width="medium"><CodeBlock text="npm install" /></FigureStack>}
     dontCaption="Every block named Code snippet."
 />
 
 ### State what a highlight points at in prose.
 
 <DoDontPair
-    doExample={<FigureStack size="md"><p className="body-default">The second line sets the retries.</p><CodeBlock text={'const timeout = 30;\nconst retries = 3;'} highlight="2" /></FigureStack>}
+    doExample={<FigureStack width="medium"><p className="body-default">The second line sets the retries.</p><CodeBlock text={'const timeout = 30;\nconst retries = 3;'} highlight="2" /></FigureStack>}
     doCaption="The sentence says which line to read, and the highlight supports it."
-    dontExample={<FigureStack size="md"><CodeBlock text={'const timeout = 30;\nconst retries = 3;'} highlight="2" /></FigureStack>}
+    dontExample={<FigureStack width="medium"><CodeBlock text={'const timeout = 30;\nconst retries = 3;'} highlight="2" /></FigureStack>}
     dontCaption="The fill is the only cue."
 />
 
 ### Keep line numbers for code you discuss.
 
 <DoDontPair
-    doExample={<FigureStack size="md"><CodeBlock text="npm run dev" showLineNumbers={false} /></FigureStack>}
+    doExample={<FigureStack width="medium"><CodeBlock text="npm run dev" showLineNumbers={false} /></FigureStack>}
     doCaption="A one-line command with no gutter."
-    dontExample={<FigureStack size="md"><CodeBlock text="npm run dev" /></FigureStack>}
+    dontExample={<FigureStack width="medium"><CodeBlock text="npm run dev" /></FigureStack>}
     dontCaption="A line number beside a single command."
 />
 
