@@ -35,7 +35,7 @@ export default {
         },
         placement: {
             control: 'select',
-            options: ['top', 'bottom', 'left', 'right'],
+            options: ['auto', 'top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left', 'left-start', 'left-end', 'right', 'right-start', 'right-end'],
             description: 'Popup placement',
             table: { category: 'Layout' }
         },

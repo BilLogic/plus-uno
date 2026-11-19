@@ -136,6 +136,17 @@ test('props-parity: an argType that names no prop, and options that disagree wit
   assert.deepEqual(check(mdx(), { props, storiesSource: green }), []);
 });
 
+test('props-parity: numeric options are read, a spread constant resolves from the component, an unresolvable one is skipped', () => {
+  const props = [{ name: 'size', values: [24, 32, 40] }, { name: 'tone', values: ['a', 'b'] }, { name: 'preset', values: ['x', 'y'] }];
+  const component = "export const TONES = ['a', 'b'];";
+  const stories = `export default { argTypes: { size: { options: [24, 32] }, tone: { options: [undefined, ...TONES] }, preset: { options: [...Object.keys(P)] } } };`;
+  const found = check(mdx(), { props, storiesSource: stories, componentSource: component });
+  assert.deepEqual(rulesOf(found), ['props-parity']);
+  assert.match(found[0].message, /`size` options \[24, 32\] differ from the prop's values \[24, 32, 40\]/);
+  const wrongTone = `export default { argTypes: { tone: { options: [...TONES, 'c'] } } };`;
+  assert.deepEqual(rulesOf(check(mdx(), { props, storiesSource: wrongTone, componentSource: component })), ['props-parity']);
+});
+
 test('argTypesOf reads the meta argTypes, skipping strings and nested objects', () => {
   const src = `const x = { argTypes: 'no' };\nexport default {\n  argTypes: {\n    a: { table: { category: 'C' } },\n    'b-c': { options: ["x", 'y'] },\n    d: { description: "{" },\n  },\n};`;
   assert.deepEqual(argTypesOf(src), [

@@ -30,6 +30,11 @@
  *                       `options` disagreeing with the prop's `oneOf`. A prop
  *                       with no argType is no finding: Storybook infers its row
  *                       from the component, so the Code tab already shows it.
+ *                       Options are compared as written: strings and numbers,
+ *                       `undefined` (the unset choice) left out, and a
+ *                       `...NAME` spread read from the `const NAME = [...]` in
+ *                       the stories or the component file. A list with anything
+ *                       else in it (a call, say) is not compared.
  *
  * SEVERITY. Every rule warns on every page, so the check rolls out without
  * blocking a merge, except `stale-marker`, which fails anywhere: a defect stated
@@ -205,9 +210,53 @@ function guidelineFiles(root) {
   return out.sort();
 }
 
-/** The meta's argTypes: `[{name, options}]`, from the first `argTypes:` object in a stories file outside a string. */
-export function argTypesOf(source) {
+/** The text between the bracket at `open` and its match, strings skipped; null when unbalanced. */
+function bracketBody(src, open) {
+  let depth = 0;
+  for (let i = open; i < src.length; i++) {
+    const c = src[i];
+    if (c === '"' || c === "'" || c === '`') {
+      for (i++; i < src.length && src[i] !== c; i++) if (src[i] === '\\') i++;
+    } else if (c === '[') depth++;
+    else if (c === ']' && --depth === 0) return src.slice(open + 1, i);
+  }
+  return null;
+}
+
+/**
+ * The values an array literal lists, as strings: strings and numbers as written,
+ * `undefined` and `null` (the unset choice) left out, and `...NAME` read from
+ * `const NAME = [...]` in the given sources. Null when any element is anything
+ * else, such as a call, since a list the check cannot read is not compared.
+ */
+function listValues(body, sources, seen = new Set()) {
+  const out = [];
+  for (const raw of topLevelEntries(`{${body}}`, 0)) {
+    const el = raw.trim();
+    let m;
+    if ((m = el.match(/^["']([^"']*)["']$/))) out.push(m[1]);
+    else if (/^-?\d+(?:\.\d+)?$/.test(el)) out.push(el);
+    else if (el === 'undefined' || el === 'null' || el === '') continue;
+    else if ((m = el.match(/^\.\.\.([A-Za-z_$][\w$]*)$/)) && !seen.has(m[1])) {
+      const found = sources.map((src) => src.match(new RegExp(`\\bconst\\s+${m[1].replace(/\$/g, '\\$')}\\s*=\\s*\\[`))).find(Boolean);
+      const src = found && sources.find((x) => x.includes(found[0]));
+      const inner = found && bracketBody(src, src.indexOf(found[0]) + found[0].length - 1);
+      const values = inner == null ? null : listValues(inner, sources, new Set([...seen, m[1]]));
+      if (!values) return null;
+      out.push(...values);
+    } else return null;
+  }
+  return out;
+}
+
+/**
+ * The meta's argTypes: `[{name, options}]`, from the first `argTypes:` object in a stories file outside a string.
+ * `options` is null when the argType lists none or lists any the check cannot read; `extraSources` are the files
+ * a `...NAME` spread may be declared in (the component's own source).
+ */
+export function argTypesOf(source, extraSources = []) {
   const src = String(source ?? '');
+  const sources = [src, ...extraSources.map(String)];
   const meta = src.search(/export\s+default\b|\bconst\s+meta\b/);
   const at = src.indexOf('argTypes:', meta === -1 ? 0 : meta);
   if (at === -1) return [];
@@ -216,15 +265,16 @@ export function argTypesOf(source) {
   return topLevelEntries(src, open).flatMap((raw) => {
     const m = raw.match(/^(?:["']([^"']+)["']|([A-Za-z_$][\w$]*))\s*:\s*([\s\S]*)$/);
     if (!m) return [];
-    const opts = m[3].match(/\boptions\s*:\s*\[([^\]]*)\]/);
-    const options = opts ? [...opts[1].matchAll(/["']([^"']*)["']/g)].map((o) => o[1]) : null;
-    return [{ name: m[1] ?? m[2], options }];
+    const opts = m[3].match(/\boptions\s*:\s*\[/);
+    const body = opts ? bracketBody(m[3], opts.index + opts[0].length - 1) : null;
+    const options = body == null ? null : listValues(body, sources);
+    return [{ name: m[1] ?? m[2], options}];
   });
 }
 
-function parityFindings(props, storiesSource) {
+function parityFindings(props, storiesSource, componentSource) {
   if (!storiesSource || !props) return [];
-  const argTypes = argTypesOf(storiesSource);
+  const argTypes = argTypesOf(storiesSource, componentSource ? [componentSource] : []);
   if (!argTypes.length) return [];
   const anchor = 'argTypes';
   if (!props.length) {
@@ -240,7 +290,7 @@ function parityFindings(props, storiesSource) {
     }
     if (arg.options && prop.values?.length) {
       const a = [...arg.options].sort().join(', ');
-      const p = [...prop.values].sort().join(', ');
+      const p = prop.values.map(String).sort().join(', ');
       if (a !== p) out.push({ rule: 'props-parity', message: `argType \`${arg.name}\` options [${a}] differ from the prop's values [${p}].`, anchor });
     }
   }
@@ -252,13 +302,13 @@ function parityFindings(props, storiesSource) {
  * `names` is the components index's names; `props` and `storiesSource` feed
  * props-parity, which is skipped without them.
  */
-export function writingFindings({ page, names, props = null, storiesSource = null, strict = false }) {
+export function writingFindings({ page, names, props = null, storiesSource = null, componentSource = null, strict = false }) {
   return [
     ...spineFindings(page),
     ...routeFindings(page, names),
     ...bareNumberFindings(page, { strict }),
     ...staleFindings(page),
-    ...parityFindings(props, storiesSource),
+    ...parityFindings(props, storiesSource, componentSource),
   ];
 }
 
@@ -311,6 +361,7 @@ const inputs = byRoot((repoRoot) => {
       names,
       props: record.props ?? [],
       storiesSource: readText(repoRoot, stories),
+      componentSource: readText(repoRoot, record.source),
       strict,
     });
     pages.push({
