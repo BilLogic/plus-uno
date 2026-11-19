@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import Rating from './Rating';
@@ -79,6 +79,14 @@ describe('Rating', () => {
 
         await user.click(screen.getByRole('radio', { name: 'Rate 5' }));
         expect(screen.getByRole('radio', { name: 'Rate 5' }).style.getPropertyValue('--plus-rating-stagger')).toBe('0ms');
+    });
+
+    it('drops the stagger once the select has settled, so hover-out returns at once', async () => {
+        const user = userEvent.setup();
+        render(<Controlled value={0} />);
+        await user.click(screen.getByRole('radio', { name: 'Rate 3' }));
+        expect(screen.getByRole('radio', { name: 'Rate 3' }).style.getPropertyValue('--plus-rating-stagger')).toBe('40ms');
+        await waitFor(() => expect(screen.getByRole('radio', { name: 'Rate 3' }).style.getPropertyValue('--plus-rating-stagger')).toBe(''), { timeout: 2000 });
     });
 
     it('`type` picks the content: numbers above each item for numeric, a caption below for comments', () => {

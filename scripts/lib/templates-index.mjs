@@ -14,6 +14,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { loadFacts } from './ds-facts.mjs';
 
@@ -25,8 +26,16 @@ const ROW_FIELDS = new Set(['group', 'name', 'use']);
 /** A template with no page of its own: the section of its parent's page that documents it. */
 const FOLDED_INTO = {};
 
-/** A template's Storybook page: the MDX beside its source, or the page it is folded into. */
-const docOf = (answer, name) => FOLDED_INTO[name] ?? answer.source?.replace(/\.jsx$/, '.mdx') ?? null;
+const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+
+/** A template's own page in the templates folder, where there is one (Popup's source is a component, its page is not). */
+const templatePage = (name) => {
+  const doc = `design-system/src/templates/${name}/${name}.mdx`;
+  return fs.existsSync(path.join(REPO, doc)) ? doc : null;
+};
+
+/** A template's Storybook page: its own page, the MDX beside its source, or the page it is folded into. */
+const docOf = (answer, name, pageOf = templatePage) => FOLDED_INTO[name] ?? pageOf(name) ?? answer.source?.replace(/\.jsx$/, '.mdx') ?? null;
 
 /**
  * Every row that names nothing real, keeps a field source owns, or points at a
@@ -35,7 +44,7 @@ const docOf = (answer, name) => FOLDED_INTO[name] ?? answer.source?.replace(/\.j
  * @param {{lookup: (name: string) => {status: string, kind: string|null, source: string|null},
  *   exists: (doc: string) => boolean, required: string[]}} env
  */
-export function checkTemplates(rows, { lookup, exists, required }) {
+export function checkTemplates(rows, { lookup, exists, required, pageOf }) {
   const problems = [];
   for (const r of rows) {
     const extra = Object.keys(r).filter((k) => !ROW_FIELDS.has(k));
@@ -45,7 +54,7 @@ export function checkTemplates(rows, { lookup, exists, required }) {
       problems.push(`${r.name} is not a template or component the design system exports`);
       continue;
     }
-    const doc = docOf(answer, r.name);
+    const doc = docOf(answer, r.name, pageOf);
     if (!doc || !exists(doc)) problems.push(`${r.name}: ${doc ?? 'its source'} is not a file`);
   }
   const listed = new Set(rows.map((r) => r.name));
@@ -54,16 +63,18 @@ export function checkTemplates(rows, { lookup, exists, required }) {
 }
 
 /** The section, with doc links relative to the folder the index is written in. */
-export function renderTemplates(rows, { from, lookup }) {
+export function renderTemplates(rows, { from, lookup, pageOf }) {
   const link = (doc) => path.relative(from, doc).split(path.sep).join('/');
   let out = `## Templates: start a page, section, card, table or overlay here\n\n`;
   out += `A template is a shell that owns the frame (fill, pad, radius, elevation) and leaves you slots to fill. `;
   out += `Build a page or a container from these before writing a \`div\` with its own flex or grid. `;
   out += `Each one's props are on its page (linked) and in its source.\n\n`;
   out += `| Group | Name | Import | Reach for it when |\n|---|---|---|---|\n`;
+  let group = null;
   for (const r of rows) {
     const answer = lookup(r.name);
-    out += `| ${r.group} | [\`${r.name}\`](${link(docOf(answer, r.name))}) | \`${answer.import}\` | ${r.use} |\n`;
+    out += `| ${r.group === group ? ' ' : r.group} | [\`${r.name}\`](${link(docOf(answer, r.name, pageOf))}) | \`${answer.import}\` | ${r.use} |\n`;
+    group = r.group;
   }
   return `${out}\n`;
 }
