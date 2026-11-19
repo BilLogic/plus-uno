@@ -59,6 +59,7 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `Section onAddView / addViewLabel` | `views` |
 | `Rating variant` | `type` |
 | `CloseButton tone` | `appearance` |
+| `Card size` | `minWidth` (a Card has no size; name the minimum width (224, 304 or 480) and let the text set the height. A top image takes imageRatio.) |
 
 **Tokens**
 

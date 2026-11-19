@@ -39,10 +39,6 @@ const imagePlaceholder = (ratio) => (
     <Image
         src={sessionSummaryLight}
         alt={`Weekly tutoring session summary (${ratio})`}
-        style={{
-            aspectRatio: ratio.replace(':', ' / '),
-            objectFit: 'cover',
-        }}
     />
 );
 
@@ -131,6 +127,11 @@ export default {
             options: ['top', 'start', 'end'],
             table: { category: 'Design' },
         },
+        imageRatio: {
+            control: 'select',
+            options: ['16:9', '4:3', '1:1'],
+            table: { category: 'Design' },
+        },
         imageSplit: {
             control: 'select',
             options: ['1/3', '1/2'],
@@ -170,6 +171,7 @@ export const Interactive = {
         gap: 'md',
         minWidth: '',
         imagePlacement: 'top',
+        imageRatio: '16:9',
         imageSplit: '1/3',
     },
     render: (args) => (
@@ -182,6 +184,7 @@ export const Interactive = {
             surface={args.surface}
             image={imagePlaceholder('16:9')}
             imagePlacement={args.imagePlacement}
+            imageRatio={args.imageRatio}
             imageSplit={args.imageSplit}
             gap={args.gap}
             minWidth={args.minWidth || undefined}
@@ -308,11 +311,11 @@ export const Anatomy = () => (
 
 export const Jobs = () => <CardJobs />;
 
-/** One size per story: every size uses the same pad (16) and radius (16), differing by minimum width. */
-const sizedCard = (size) => (
+/** One minimum width per story; every width uses the same pad (16) and radius (16). */
+const sizedCard = (width) => (
     <div style={{ display: 'flex', alignItems: 'flex-start' }}>
     <Card
-        minWidth={`var(--card-min-width-${size})`}
+        minWidth={`var(--card-min-width-${width})`}
         title="Ana Ruiz"
         description="Lincoln Middle · Thu 4:00 PM"
         footer={viewSession}
@@ -335,13 +338,13 @@ const assertCardPadAndRadius = async ({ canvasElement }) => {
     }
 };
 
-export const SizeSmall = { name: 'Small', render: () => sizedCard('sm'), play: assertCardPadAndRadius };
-export const SizeMedium = { name: 'Medium', render: () => sizedCard('md'), play: assertCardPadAndRadius };
-export const SizeLarge = { name: 'Large', render: () => sizedCard('lg'), play: assertCardPadAndRadius };
+export const MinWidth224 = { name: 'Minimum width 224', render: () => sizedCard('sm'), play: assertCardPadAndRadius };
+export const MinWidth304 = { name: 'Minimum width 304', render: () => sizedCard('md'), play: assertCardPadAndRadius };
+export const MinWidth480 = { name: 'Minimum width 480', render: () => sizedCard('lg'), play: assertCardPadAndRadius };
 
 /** One image ratio per story, edge to edge above the padded content. */
 const imageCard = (ratio) => (
-    <Card image={imagePlaceholder(ratio)} title="Ana Ruiz" description="Lincoln Middle · Thu 4:00 PM" style={{ width: 'var(--card-min-width-md)' }}>
+    <Card image={imagePlaceholder(ratio)} imageRatio={ratio} title="Ana Ruiz" description="Lincoln Middle · Thu 4:00 PM" style={{ width: 'var(--card-min-width-md)' }}>
         {sessionBody}
     </Card>
 );
@@ -350,12 +353,54 @@ export const ImageWide = { name: 'Image 16:9', render: () => imageCard('16:9') }
 export const ImageStandard = { name: 'Image 4:3', render: () => imageCard('4:3') };
 export const ImageSquare = { name: 'Image 1:1', render: () => imageCard('1:1') };
 
+/** The image height follows the card width for each ratio, rounded to a multiple of 4. */
+export const ImageRatioGrid = {
+    render: () => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
+            {['16:9', '4:3', '1:1'].flatMap((ratio) => [240, 333, 477].map((width) => (
+                <Card key={`${ratio}-${width}`} role="article" aria-label={`${ratio} at ${width}`}
+                    image={imagePlaceholder(ratio)} imageRatio={ratio} title="Ana Ruiz"
+                    style={{ width }}>
+                    {sessionBody}
+                </Card>
+            )))}
+        </div>
+    ),
+    play: async ({ canvas }) => {
+        for (const ratio of ['16:9', '4:3', '1:1']) {
+            const [w, h] = ratio.split(':').map(Number);
+            for (const width of [240, 333, 477]) {
+                const card = canvas.getByRole('article', { name: `${ratio} at ${width}` });
+                const media = card.firstElementChild.getBoundingClientRect();
+                await expect(media.height % 4, `${ratio} at ${width} is a multiple of 4`).toBe(0);
+                await expect(Math.abs(media.height - (card.clientWidth * h) / w), `${ratio} at ${width} follows the width`).toBeLessThanOrEqual(2);
+                await expect(getComputedStyle(card.firstElementChild.firstElementChild).objectFit).toBe('cover');
+            }
+        }
+    },
+};
+
+/** Without `imageRatio` the image is 16:9. */
+export const ImageRatioDefault = {
+    render: () => (
+        <Card role="article" aria-label="Default ratio" image={imagePlaceholder('16:9')} title="Ana Ruiz" style={{ width: 320 }}>
+            {sessionBody}
+        </Card>
+    ),
+    play: async ({ canvas }) => {
+        const card = canvas.getByRole('article', { name: 'Default ratio' });
+        const media = card.firstElementChild.getBoundingClientRect();
+        await expect(media.height % 4).toBe(0);
+        await expect(Math.abs(media.height - (card.clientWidth * 9) / 16)).toBeLessThanOrEqual(2);
+    },
+};
+
 /** Each image placement retains the card's elevation states. */
 const placementStory = (imagePlacement, state = 'rest', imageSplit = '1/3') => ({
     render: () => (
         <Card surface="raised" imagePlacement={imagePlacement} imageSplit={imageSplit}
             image={<Image alt="Session illustration" src={sessionSummaryLight}
-                style={{ aspectRatio: '16 / 9', objectFit: 'cover' }} />}
+                />}
             title="Ana Ruiz" description="Lincoln Middle · Thu 4:00 PM" footer={viewSession}
             role="article" aria-label="Session summary" dragging={state === 'dragging'}
             onClick={state === 'hovered' || state === 'pressed' ? () => {} : undefined}
@@ -377,7 +422,8 @@ const placementStory = (imagePlacement, state = 'rest', imageSplit = '1/3') => (
         if (imagePlacement === 'top') {
             await expect(media.width).toBeCloseTo(inner.width, 0);
             await expect(title.top).toBeGreaterThanOrEqual(media.bottom);
-            await expect(media.width / media.height).toBeCloseTo(16 / 9, 2);
+            await expect(media.height % 4).toBe(0);
+            await expect(Math.abs(media.height - (media.width * 9) / 16)).toBeLessThanOrEqual(2);
         } else {
             await expect(media.width).toBeCloseTo(inner.width / (imageSplit === '1/2' ? 2 : 3), 0);
             await expect(media.height).toBeCloseTo(inner.height, 0);
@@ -586,7 +632,7 @@ export const PlacementBoundary = {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
             {['start', 'end'].flatMap((placement) => ['1/3', '1/2'].map((split) => (
                 <Card key={`${placement}-${split}`} imagePlacement={placement} imageSplit={split}
-                    image={imagePlaceholder('1:1')} title="Ana Ruiz" role="article"
+                    image={imagePlaceholder('1:1')} imageRatio="1:1" title="Ana Ruiz" role="article"
                     aria-label={`${placement} ${split}`} style={{ width: 479 /* token gap: 479px */ }}>
                     {sessionBody}
                 </Card>
@@ -607,7 +653,7 @@ export const PlacementBoundary = {
                         expect(media.width).toBeCloseTo(width < 480 ? innerWidth : innerWidth / (split === '1/2' ? 2 : 3), 0);
                         if (width < 480) {
                             expect(heading.getBoundingClientRect().top).toBeGreaterThanOrEqual(media.bottom);
-                            expect(media.height).toBeCloseTo(innerWidth, 0);
+                            expect(Math.abs(media.height - innerWidth)).toBeLessThanOrEqual(2);
                         }
                     });
                 }

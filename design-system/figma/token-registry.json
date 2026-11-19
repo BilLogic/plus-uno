@@ -273,9 +273,6 @@
       "Card/inline-lg": "var(--card-inline-lg)",
       "Card/inline-md": "var(--card-inline-md)",
       "Card/inline-sm": "var(--card-inline-sm)",
-      "Card/max-height-lg": "var(--card-max-height-lg)",
-      "Card/max-height-md": "var(--card-max-height-md)",
-      "Card/max-height-sm": "var(--card-max-height-sm)",
       "Card/min-width-lg": "var(--card-min-width-lg)",
       "Card/min-width-md": "var(--card-min-width-md)",
       "Card/min-width-sm": "var(--card-min-width-sm)",
@@ -1866,11 +1863,11 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1237,
+    "scssTokenCount": 1234,
     "unknownTokens": [],
     "figmaVariableCoverage": {
-      "total": 1769,
-      "resolved": 1729,
+      "total": 1766,
+      "resolved": 1726,
       "percent": 98,
       "skippedCollections": [
         {

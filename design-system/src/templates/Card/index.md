@@ -2,7 +2,7 @@
 
 # Card
 
-PLUS card: an optional image, content and footer on a `sunken`, `default`, or `raised` surface. - **Surface**: `sunken` (default, flat), `default` (page surface with a 1px border, flat), or `raised` (raised surface and shadow). Every card carries a 1px border (transparent on sunken and raised) so forced colors draw its edge. - **Image placement**: `top` (default), `start` or `end`. Side images apply at the large card minimum width and fill the height. `imageSplit` chooses one third (default) or one half; half uses Heading md on a side card. Below the large minimum width, the image returns to the top with its own ratio. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: padding uses `--card-pad` and radius uses `--card-radius` at every size, the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: a clickable `sunken` or `default` card lifts to Raised on hover in place and settles to the raised shadow while pressed; a clickable `raised` card lifts to the raised hovered step under the overlay shadow and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.
+PLUS card: an optional image, content and footer on a `sunken`, `default`, or `raised` surface. - **Surface**: `sunken` (default, flat), `default` (page surface with a 1px border, flat), or `raised` (raised surface and shadow). Every card carries a 1px border (transparent on sunken and raised) so forced colors draw its edge. - **Image placement**: `top` (default), `start` or `end`. Side images apply at the large card minimum width and fill the height. `imageSplit` chooses one third (default) or one half; half uses Heading md on a side card. Below the large minimum width, the image returns to the top with its own ratio. - **Image ratio**: `imageRatio` is `16:9` (default), `4:3` or `1:1`. A top image's height is the card width times the ratio, rounded to a multiple of 4 so the card stays on the 4 px grid; the picture crops to cover and the text sets the rest of the height. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: padding uses `--card-pad` and radius uses `--card-radius` at every size, the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: a clickable `sunken` or `default` card lifts to Raised on hover in place and settles to the raised shadow while pressed; a clickable `raised` card lifts to the raised hovered step under the overlay shadow and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.
 
 Also asked as: summary card, object card.
 
@@ -14,7 +14,7 @@ Also asked as: summary card, object card.
 
 **Source:** `design-system/src/templates/Card/Card.jsx`
 
-**Stories:** `design-system/src/templates/Card/Card.stories.jsx` — Overview, Interactive, Elevation, Anatomy, Jobs, SizeSmall, SizeMedium, SizeLarge, ImageWide, ImageStandard, ImageSquare, ImageTop, ImageTopHovered, ImageTopPressed, ImageTopDragging, ImageStart, ImageStartHovered, ImageStartPressed, ImageStartDragging, ImageEnd, ImageEndHovered, ImageEndPressed, ImageEndDragging, ImageStartHalf, ImageEndHalf, ImageTopIgnoresSplit, BodyOnly, WithFooter, CustomHeader, SurfaceSunken, SurfaceDefault, SurfaceRaised, Static, Clickable, Dragging, ForcedColors, LoadingCard, Rows, PlacementBoundary
+**Stories:** `design-system/src/templates/Card/Card.stories.jsx` — Overview, Interactive, Elevation, Anatomy, Jobs, MinWidth224, MinWidth304, MinWidth480, ImageWide, ImageStandard, ImageSquare, ImageRatioGrid, ImageRatioDefault, ImageTop, ImageTopHovered, ImageTopPressed, ImageTopDragging, ImageStart, ImageStartHovered, ImageStartPressed, ImageStartDragging, ImageEnd, ImageEndHovered, ImageEndPressed, ImageEndDragging, ImageStartHalf, ImageEndHalf, ImageTopIgnoresSplit, BodyOnly, WithFooter, CustomHeader, SurfaceSunken, SurfaceDefault, SurfaceRaised, Static, Clickable, Dragging, ForcedColors, LoadingCard, Rows, PlacementBoundary
 
 **Storybook page:** `design-system/src/templates/Card/Card.mdx`
 
@@ -33,23 +33,23 @@ Use a card when one object needs its own container on the page. Pick `surface` b
 
 To give a card a semantic or accent fill, swap its surface token for a solid brand (`--ds-background-brand-subtlest`, or `--ds-background-brand-bold` with `--ds-text-inverse`), status (`--ds-background-information`, `--ds-background-success`), accent-subtlest (`--ds-background-accent-teal-subtlest`), or selected (`--ds-background-selected`) background token. `surface="raised"` keeps `--ds-shadow-raised`. On a clickable colored card, hovered and pressed states use that same token's `-hovered` and `-pressed` steps.
 
-### Size guidance
+### Width guidance
 
-Content picks the size. Choose the smallest card that holds the content without clipping, then let the row decide how many fit. Height always hugs the content, and a card in a row stretches to the tallest card.
+Content picks the minimum width. Choose the narrowest card that holds the content without clipping, then let the row decide how many fit. Height always hugs the content, and a card in a row stretches to the tallest card.
 
-| Size | When to use | Pad | Radius | Minimum width | Height cap |
-| --- | --- | --- | --- | --- | --- |
-| `sm` | One number or one line. | 16 | 16 | 224 | 304 |
-| `md` | A short list or a few lines. | 16 | 16 | 304 | 400 |
-| `lg` | A summary with several parts. | 16 | 16 | 480 | 640 |
+| Minimum width | When to use | Pad | Radius | Token |
+| --- | --- | --- | --- | --- |
+| 224 | One number or one line. | 16 | 16 | `--card-min-width-sm` |
+| 304 | A short list or a few lines. | 16 | 16 | `--card-min-width-md` |
+| 480 | A summary with several parts. | 16 | 16 | `--card-min-width-lg` |
 
-In Figma, `size` picks the minimum width. In code, `minWidth` sets the minimum width; every size uses `--card-pad` (16) and `--card-radius` (16). A height cap is set with `style`'s `maxHeight`, and the card clips what passes it.
+`minWidth` sets the minimum width; every width uses `--card-pad` (16) and `--card-radius` (16). The text sets the height, and a top image takes its `imageRatio` height from the card width, rounded to a multiple of 4. Set a height cap with `style`'s `maxHeight`; the card clips what passes it.
 
 ### Cards in a row
 
 In a row, place the most cards that keep each card at its minimum width. Each row is the content width of its mode, with a 16 gutter. The count switches between viewport widths of 1224 and 1256 with the sidebar docked.
 
-| Mode | Content width | Small, 224 | Medium, 304 | Large, 480 |
+| Mode | Content width | Min 224 | Min 304 | Min 480 |
 | --- | --- | --- | --- | --- |
 | Medium, 768 | 720 | 3 | 2 | 1 |
 | Large, 1024 | 736 | 3 | 2 | 1 |
@@ -66,12 +66,12 @@ Card reads these motion tokens and no literal duration or curve.
 
 ## Best practices
 
-### Size the card to what it holds. {#size-the-card-to-what-it-holds}
+### Fit the width to what the card holds. {#fit-the-width-to-what-the-card-holds}
 
-Visible empty space inside the card means size down. A clipped or crowded body means size up.
+Visible empty space inside the card means a narrower minimum width. A clipped or crowded body means a wider one.
 
-Do: One number fits sm; the card is only as wide as it needs, so a row of them stays tidy.
-Don't: The same number in lg leaves most of the card empty; size down instead of filling the space.
+Do: One number fits the 224 minimum; the card is only as wide as it needs, so a row of them stays tidy.
+Don't: The same number at 480 leaves most of the card empty; narrow it instead of filling the space.
 
 ### Never put a card inside a card. {#never-put-a-card-inside-a-card}
 
@@ -110,7 +110,7 @@ Same group: `Frame` · `Modal` · `Page` · `Panel` · `Section` · `Table`
 
 ## Parts
 
-1. **Image** (optional). A slot above everything else, or beside the content in a side layout. It runs edge to edge, outside the pad, and the card radius clips its corners. On top, give the image you pass an aspect ratio of 16:9, 4:3 or 1:1; beside the content it fills the full height at one third or one half of the width and crops to cover.
+1. **Image** (optional). A slot above everything else, or beside the content in a side layout. It runs edge to edge, outside the pad, and the card radius clips its corners. On top, `imageRatio` (16:9 default, 4:3 or 1:1) sets its height from the card width, rounded to a multiple of 4, and the picture crops to cover; beside the content it fills the full height at one third or one half of the width and crops to cover.
 2. **Header.** The title, an optional description and an optional actions slot. A custom `header` replaces all three. The title uses Heading xs at every heading level, stepping up to Heading md for a half side image. The description uses Body default. In Figma the title truncates to one line and the description's `text` variant truncates at three lines or wraps; code leaves wrapping to CSS.
 3. **Body.** A slot for text, a list or media.
 4. **Footer** (optional). A left-aligned slot for actions that commit a change.
@@ -133,12 +133,11 @@ The image sits above (or, in a side layout, beside) a padded frame, and the head
 
 | Token | Value | Used for |
 | --- | --- | --- |
-| `--card-pad` | 16 | Padding inside a card at every size. |
-| `--card-radius` | 16 | Corner rounding of a card at every size. |
+| `--card-pad` | 16 | Padding inside a card at every width. |
+| `--card-radius` | 16 | Corner rounding of a card at every width. |
 | `--card-stack-sm`, `-md`, `-lg` | 4 · 8 · 12 | Title to description; header to body, set by `gap`; body to footer. |
 | `--card-inline-md` | 8 | Items on a row, such as actions in the header. |
-| `--card-min-width-sm`, `-md`, `-lg` | 224 · 304 · 480 | The minimum width of each size. |
-| `--card-max-height-sm`, `-md`, `-lg` | 304 · 400 · 640 | The height cap of each size. |
+| `--card-min-width-sm`, `-md`, `-lg` | 224 · 304 · 480 | The minimum width of each card width. |
 | `--card-surface-sunken`, `-default`, `-raised` | color | The card fill at rest (`--ds-surface-sunken`, `--ds-surface`, `--ds-surface-raised`). |
 | `--card-border-default`, `--card-border-width` | border | The 1px `--ds-border` on `default` cards, and the 1px width kept on every card for forced colors. |
 | `--card-shadow-raised`, `-overlay` | shadow | `--ds-shadow-raised` on raised and hovered clickable cards; `--ds-shadow-overlay` while dragged or hovering a raised card. |
@@ -166,6 +165,7 @@ The image sits above (or, in a side layout, beside) a padded frame, and the head
 | `header` | node | — | Custom header that replaces title, description and actions (tabs, a toolbar) |
 | `image` | node | — | Image slot, full bleed: above the content, or at the start or end edge per `imagePlacement` |
 | `imagePlacement` | enum | `'top'` | Image position. Side placements apply from the large card minimum width; narrower cards put the image on top. |
+| `imageRatio` | enum | `'16:9'` | Image shape on a top image: its height follows the card width at 16:9, 4:3 or 1:1, rounded to a multiple of 4, and the picture crops to cover. A side image fills the card height instead. |
 | `imageSplit` | enum | `'1/3'` | Side image share. One half also steps the title up to Heading md. Ignored for top placement. |
 | `footer` | node | — | Footer slot: commit actions, left-aligned, Card/stack-lg below the body |
 | `surface` | enum | `'sunken'` | Surface level: sunken (default, flat), default (page fill with a 1px border, flat), or raised (raised fill and shadow) |
@@ -181,6 +181,8 @@ The image sits above (or, in a side layout, beside) a padded frame, and the head
 ## Variants
 
 **`imagePlacement`** — `top` · `start` · `end`
+
+**`imageRatio`** — `16:9` · `4:3` · `1:1`
 
 **`imageSplit`** — `1/3` · `1/2`
 

@@ -15,6 +15,10 @@ import './Card.scss';
  *   at the large card minimum width and fill the height. `imageSplit` chooses
  *   one third (default) or one half; half uses Heading md on a side card.
  *   Below the large minimum width, the image returns to the top with its own ratio.
+ * - **Image ratio**: `imageRatio` is `16:9` (default), `4:3` or `1:1`. A top
+ *   image's height is the card width times the ratio, rounded to a multiple of
+ *   4 so the card stays on the 4 px grid; the picture crops to cover and the
+ *   text sets the rest of the height.
  * - **Header** (`_Card header`): `title` (the card title type, shared with Card
  *   in `styles/_card-title.scss`, one heading level below its section) over an
  *   optional `description` (Body/default 14), with
@@ -41,6 +45,7 @@ const Card = ({
     footer,
     surface = 'sunken',
     imagePlacement = 'top',
+    imageRatio = '16:9',
     imageSplit = '1/3',
     gap = 'md',
     minWidth,
@@ -54,6 +59,7 @@ const Card = ({
         'plus-template-card',
         `plus-template-card--surface-${surface}`,
         image ? `plus-template-card--image-${imagePlacement}` : '',
+        image ? `plus-template-card--ratio-${imageRatio.replace(':', '-')}` : '',
         image && imageSplit === '1/2' ? 'plus-template-card--image-half' : '',
         `plus-template-card-gap-${gap}`,
         props.onClick ? 'plus-template-card--clickable' : '',
@@ -118,6 +124,8 @@ Card.propTypes = {
     image: PropTypes.node,
     /** Image position. Side placements apply from the large card minimum width; narrower cards put the image on top. */
     imagePlacement: PropTypes.oneOf(['top', 'start', 'end']),
+    /** Image shape on a top image: its height follows the card width at 16:9, 4:3 or 1:1, rounded to a multiple of 4, and the picture crops to cover. A side image fills the card height instead. */
+    imageRatio: PropTypes.oneOf(['16:9', '4:3', '1:1']),
     /** Side image share. One half also steps the title up to Heading md. Ignored for top placement. */
     imageSplit: PropTypes.oneOf(['1/3', '1/2']),
     /** Footer slot: commit actions, left-aligned, Card/stack-lg below the body

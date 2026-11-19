@@ -148,7 +148,24 @@ $-dragging: (
 .plus-template-card-image {
     flex: 0 0 100%;
     min-width: 0;
+    overflow: hidden;
+    // The ratio's height over its width, set by the `imageRatio` class below.
+    --_image-ratio: calc(9 / 16);
+    // Card width times the ratio, snapped to the 4px grid; the picture crops to cover.
+    height: round(nearest, calc(100cqw * var(--_image-ratio)), 4px);
+
+    > * {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        aspect-ratio: auto !important;
+    }
 }
+
+.plus-template-card--ratio-16-9 > .plus-template-card-image { --_image-ratio: calc(9 / 16); }
+.plus-template-card--ratio-4-3 > .plus-template-card-image { --_image-ratio: calc(3 / 4); }
+.plus-template-card--ratio-1-1 > .plus-template-card-image { --_image-ratio: 1; }
 
 // Large card minimum width (480px --card-min-width-lg minus the 1px border on each side).
 // Container queries use the card's content width, independently of the page breakpoint.
@@ -157,8 +174,8 @@ $-dragging: (
     .plus-template-card--image-end {
         > .plus-template-card-image {
             flex: 0 0 calc(100% / 3);
+            height: auto;
             position: relative;
-            overflow: hidden;
         }
         > .plus-template-card-inner { flex: 1 1 0; }
         > .plus-template-card-image > * {

@@ -454,7 +454,7 @@ export const StickyHeader = {
     name: 'Sticky header',
     render: () => (
         <Section title="Tutors">
-            <TableShell stickyHeader maxHeight="var(--card-max-height-sm)">
+            <TableShell stickyHeader maxHeight={304 /* token gap: 304px */}>
                 {wideTable}
             </TableShell>
         </Section>

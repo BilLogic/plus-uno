@@ -907,69 +907,6 @@
       }
     },
     {
-      "id": "VariableID:19413:34",
-      "name": "Card/max-height-sm",
-      "variableCollectionId": "VariableCollectionId:19378:46226",
-      "resolvedType": "FLOAT",
-      "scopes": [
-        "WIDTH_HEIGHT"
-      ],
-      "codeSyntax": {
-        "WEB": "var(--card-max-height-sm)"
-      },
-      "valuesByMode": {
-        "19378:4": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:238"
-        }
-      },
-      "resolvedValuesByMode": {
-        "19378:4": 304
-      }
-    },
-    {
-      "id": "VariableID:19413:35",
-      "name": "Card/max-height-md",
-      "variableCollectionId": "VariableCollectionId:19378:46226",
-      "resolvedType": "FLOAT",
-      "scopes": [
-        "WIDTH_HEIGHT"
-      ],
-      "codeSyntax": {
-        "WEB": "var(--card-max-height-md)"
-      },
-      "valuesByMode": {
-        "19378:4": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19364:240"
-        }
-      },
-      "resolvedValuesByMode": {
-        "19378:4": 400
-      }
-    },
-    {
-      "id": "VariableID:19413:36",
-      "name": "Card/max-height-lg",
-      "variableCollectionId": "VariableCollectionId:19378:46226",
-      "resolvedType": "FLOAT",
-      "scopes": [
-        "WIDTH_HEIGHT"
-      ],
-      "codeSyntax": {
-        "WEB": "var(--card-max-height-lg)"
-      },
-      "valuesByMode": {
-        "19378:4": {
-          "type": "VARIABLE_ALIAS",
-          "id": "VariableID:19413:28"
-        }
-      },
-      "resolvedValuesByMode": {
-        "19378:4": 640
-      }
-    },
-    {
       "id": "VariableID:19627:112779",
       "name": "Table/pad-x-footer",
       "variableCollectionId": "VariableCollectionId:19378:46226",

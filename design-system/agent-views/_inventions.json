@@ -318,6 +318,13 @@
       "use": [
         "CloseButton.appearance"
       ]
+    },
+    {
+      "not": "Card size",
+      "use": [
+        "Card.minWidth"
+      ],
+      "why": "a Card has no size; name the minimum width (224, 304 or 480) and let the text set the height. A top image takes imageRatio."
     }
   ],
   "tokens": [

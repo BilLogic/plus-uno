@@ -128,9 +128,6 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Card | `--card-min-width-md` (declared elsewhere) |  |
 | Card | `--card-min-width-lg` (declared elsewhere) |  |
 | Card | `--card-radius` |  |
-| Card | `--card-max-height-sm` (declared elsewhere) |  |
-| Card | `--card-max-height-md` (declared elsewhere) |  |
-| Card | `--card-max-height-lg` (declared elsewhere) |  |
 | Card | `--card-surface-sunken` |  |
 | Card | `--card-surface-default` |  |
 | Card | `--card-surface-raised` |  |

@@ -19,8 +19,8 @@ const metric = (
 /** `sb-unstyled` keeps Storybook's docs styles off the examples, as it does inside a canvas. */
 const InDocs = ({ children }) => <div className="sb-unstyled">{children}</div>;
 
-/** One number fits a small card, which is only as wide as it needs. */
-export const MetricInSmall = () => (
+/** One number fits the 224 minimum, which is only as wide as it needs. */
+export const MetricAtMin224 = () => (
     <InDocs>
         <Card minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-sm)' }}>
             {metric}
@@ -28,8 +28,8 @@ export const MetricInSmall = () => (
     </InDocs>
 );
 
-/** The same number in a large card leaves most of it empty. */
-export const MetricInLarge = () => (
+/** The same number at the 480 minimum leaves most of the card empty. */
+export const MetricAtMin480 = () => (
     <InDocs>
         <Card minWidth="var(--card-min-width-lg)">
             {metric}

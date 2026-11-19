@@ -372,9 +372,6 @@ The templates on the page frame, per breakpoint: page, section, card, table, ove
 --card-inline-lg  /* Horizontal gap between columns inside a Card. */
 --card-inline-md  /* Horizontal gap between items in a Card row, such as actions. */
 --card-inline-sm  /* Horizontal gap between small items in a Card row, such as tags. */
---card-max-height-lg  /* Tallest a tall scrolling Card may grow. */
---card-max-height-md  /* Tallest a default scrolling Card may grow. */
---card-max-height-sm  /* Tallest a short scrolling Card may grow. */
 --card-min-width-lg  /* Narrowest a large Card may shrink in a grid. */
 --card-min-width-md  /* Narrowest a default Card may shrink in a grid. */
 --card-min-width-sm  /* Narrowest a small Card may shrink in a grid. */
