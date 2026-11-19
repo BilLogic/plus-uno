@@ -13,6 +13,17 @@ const BAR = (cancel) => `<CaseSurface border="top" padding="sm">
     </FooterActions>
 </CaseSurface>`;
 
+const PANEL = (stage, note) => `{/* ${note} */}
+<div style={{ inlineSize: ${stage} }}>
+    <BrowserWindow address="app.plus.org/dashboard" height={440}>
+        <InAppFrame panelLabel="AI chat" panelStorageKey={null} panel={<AskPanel />} panelOpen>
+            <PatternSection title="Upcoming sessions">
+                <Skeleton preset="text" lines={6} />
+            </PatternSection>
+        </InAppFrame>
+    </BrowserWindow>
+</div>`;
+
 export const CODE = {
     BarInOrder: BAR(false),
     BarScrambled: BAR(true),
@@ -32,16 +43,8 @@ export const CODE = {
         <ProgressTracker label="Steps" orientation="vertical" items={steps} />
         <Skeleton preset="text" lines={4} />
     </Frame>`),
-    AiPanelDocked: WINDOW('app.plus.org/dashboard', `    <Frame sidebar={${SIDEBAR}} panel={<AskPanel />} panelOpen panelLabel="AI chat">
-        <PatternSection title="Upcoming sessions">
-            <Skeleton preset="text" lines={6} />
-        </PatternSection>
-    </Frame>`),
-    AiPanelFloating: WINDOW('app.plus.org/dashboard', `    <Frame sidebar={${SIDEBAR}} panel={<AskPanel />} panelOpen panelLabel="AI chat">
-        <PatternSection title="Upcoming sessions">
-            <Skeleton preset="text" lines={6} />
-        </PatternSection>
-    </Frame>`),
+    AiPanelDocked: PANEL('1440', 'The stage is 1440 wide: at 1200 or more the Frame docks the panel and the Page narrows beside it.'),
+    AiPanelFloating: PANEL('1100', 'The stage is 1100 wide: under 1200 the Frame cannot dock both, so the panel floats over the Page.'),
     BareColumn: WINDOW('app.plus.org/sign-in', `    <Frame surfaceDirect>
         <Logo />
         <TextField label="Email" type="email" />

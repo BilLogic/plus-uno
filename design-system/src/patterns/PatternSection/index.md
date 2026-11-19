@@ -216,10 +216,8 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 | `title` | node | — | Section title: an h2 at Heading/medium 20, or an h3 at Heading/small 16 inside another section |
 | `description` | node | — | Optional description under the title, Body/default |
 | `actions` | node | — | Actions slot, aligned to the end of the title row |
-| `tabs` | node | — | use `views` (and `format`) in the three-row header. Tabs row under the title row (header type `tabs`, or `tabs-only`). |
-| `toolbar` | node | — | use `search` and `filters` in the three-row header. Toolbar row under the title row (header type `toolbar`), usually a `PatternSection.Toolbar`. |
 | `header` | node | — | Free-form header in place of title and description (header type `custom`) |
-| `type` | enum | — | Header type. Read from the slots when left off; pass `tabs-only` to show only the tabs row |
+| `type` | enum | — | Header type: `default` (title and description) or `custom` (your own `header`). Read from the slots when left off. |
 | `views` | node | — | Row 2, at the start: the views, usually Tabs in the pill appearance. It scrolls sideways when it does not fit. |
 | `format` | node | — | Row 2, at the end: the format switch (Table / Cards). With no `views` it moves to the end of row 3. |
 | `search` | node | — | Row 3, at the start: the Search field at compact spacing, which draws 32. |
@@ -250,7 +248,7 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 
 ## Variants
 
-**`type`** — `default` · `tabs` · `toolbar` · `custom` · `tabs-only`
+**`type`** — `default` · `custom`
 
 **`layout`** — `single` · `split` · `subsections`
 
@@ -259,20 +257,6 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 **`spacing`** — `default` · `compact` · `spacious`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
-
-## Sub-components
-
-### `PatternSection.Toolbar`
-
-Implemented as `SectionToolbar`.
-
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `search` | node | — | Search field slot, at the start |
-| `filters` | node | — | Filters slot: dropdown buttons |
-| `count` | node | — | Count in words, such as "12 of 48 students"; truncates first, and is announced politely when it changes |
-| `actions` | node | — | Actions slot, at the end |
-| `className` | string | — | — |
 
 ## Tokens touched
 

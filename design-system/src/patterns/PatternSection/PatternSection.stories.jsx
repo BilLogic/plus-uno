@@ -76,7 +76,7 @@ export default {
         description: { control: 'text', table: { category: 'Slots' } },
         type: {
             control: 'select',
-            options: ['default', 'custom', 'tabs', 'tabs-only', 'toolbar'],
+            options: ['default', 'custom'],
             table: { category: 'Design' },
         },
         layout: {

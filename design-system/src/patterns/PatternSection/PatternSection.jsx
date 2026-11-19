@@ -60,7 +60,7 @@ import './PatternSection.scss';
  * commit changes belong in a card footer, not on the section.
  */
 
-export const SECTION_HEADER_TYPES = ['default', 'tabs', 'toolbar', 'custom', 'tabs-only'];
+export const SECTION_HEADER_TYPES = ['default', 'custom'];
 export const SECTION_LAYOUTS = ['single', 'split', 'subsections'];
 export const SECTION_SPACINGS = ['default', 'compact', 'spacious'];
 
@@ -214,7 +214,7 @@ HeaderSkeleton.propTypes = {
     tabsOnly: PropTypes.bool,
 };
 
-/**
+/** @deprecated use the `search`, `filters` and `count` props of the three-row header.
  * `_Section toolbar`: the row a section header carries above a table or a
  * list. Search, filters and a count at the start, actions at the end; the
  * count truncates first. Selected rows never change it: a Dynamic table's
@@ -533,7 +533,7 @@ PatternSection.propTypes = {
      * @ds-context Governed by: Forms (ds guide forms)
      */
     header: PropTypes.node,
-    /** Header type. Read from the slots when left off; pass `tabs-only` to show only the tabs row */
+    /** Header type: `default` (title and description) or `custom` (your own `header`). Read from the slots when left off. */
     type: PropTypes.oneOf(SECTION_HEADER_TYPES),
     /** Row 2, at the start: the views, usually Tabs in the pill appearance. It scrolls sideways when it does not fit.
      * @ds-context Used in: Section.views (ds guide section)

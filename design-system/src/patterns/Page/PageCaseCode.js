@@ -4,7 +4,10 @@ const SECTION = `<PatternSection title="Students" views={<StudentViews />}>
     <SessionsTable />
 </PatternSection>`;
 
-export const CODE = {
+/** These cases sit on a docs page that already has an h1, so they pass `titleAs="h4"`; the snippets leave it off, as a real page does. */
+const NOTE = '{/* The docs page already has an h1, so these cases render the title as an h4 (titleAs="h4"). On a real page, leave it off. */}\n';
+
+const CASES = {
     HeaderIsTheH1: `<Page header={<PageHeader title="Students" />}>
     <PatternSection title="Sessions" views={<StudentViews />}>
         <SessionsTable />
@@ -38,3 +41,7 @@ export const CODE = {
     ${SECTION.replace(/\n/g, '\n    ')}
 </Page>`,
 };
+
+export const CODE = Object.fromEntries(
+    Object.entries(CASES).map(([name, code]) => [name, code.includes('<PageHeader') || code.includes('<DemoPageHeader') ? NOTE + code : code]),
+);

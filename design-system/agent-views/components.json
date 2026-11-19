@@ -132,6 +132,7 @@
         {
           "name": "Item",
           "impl": "AccordionItem",
+          "deprecated": false,
           "props": [
             {
               "name": "eventKey",
@@ -9214,6 +9215,7 @@
         {
           "name": "Page",
           "impl": "PaginationPage",
+          "deprecated": false,
           "props": [
             {
               "name": "page",
@@ -9248,6 +9250,7 @@
         {
           "name": "Navigator",
           "impl": "PaginationNavigator",
+          "deprecated": false,
           "props": [
             {
               "name": "direction",
@@ -9686,12 +9689,9 @@
           "default": null,
           "values": [
             "default",
-            "tabs",
-            "toolbar",
-            "custom",
-            "tabs-only"
+            "custom"
           ],
-          "description": "Header type. Read from the slots when left off; pass `tabs-only` to show only the tabs row",
+          "description": "Header type: `default` (title and description) or `custom` (your own `header`). Read from the slots when left off.",
           "deprecated": null
         },
         {
@@ -10028,6 +10028,7 @@
         {
           "name": "Toolbar",
           "impl": "SectionToolbar",
+          "deprecated": true,
           "props": [
             {
               "name": "search",
@@ -12047,6 +12048,7 @@
         {
           "name": "Item",
           "impl": "RatingItem",
+          "deprecated": false,
           "props": [
             {
               "name": "value",
@@ -15051,6 +15053,7 @@
         {
           "name": "Tab",
           "impl": "Tab",
+          "deprecated": false,
           "props": [
             {
               "name": "eventKey",
@@ -15085,6 +15088,7 @@
         {
           "name": "Panel",
           "impl": "Panel",
+          "deprecated": false,
           "props": [
             {
               "name": "eventKey",

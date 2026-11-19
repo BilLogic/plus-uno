@@ -4,7 +4,18 @@ import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ComponentExample, exampleSlug } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TypeCard } from '@/storybook-docs/lib/template-page.jsx';
-import { EndAligned, FieldsInModalCase, FormInPopupCase, StartAlignedAtEnd } from './PopupCases.jsx';
+import {
+    AsWideAsTrigger,
+    AtCap,
+    EndAligned,
+    FieldsInModalCase,
+    FormInPopupCase,
+    NarrowerThanTrigger,
+    OneFlatMenu,
+    PopupBesidePopup,
+    StartAlignedAtEnd,
+    WiderThanCap,
+} from './PopupCases.jsx';
 
 vi.mock('@storybook/addon-docs/blocks', async () => {
     const React = await import('react');
@@ -45,6 +56,25 @@ describe('Popup live cases and docs links', () => {
             expect(await screen.findByRole('menuitem', { name: 'Reschedule' })).toBeInTheDocument();
             unmount();
         }
+    });
+
+    it('renders the width cases as an open Popup off a trigger', async () => {
+        for (const Case of [AsWideAsTrigger, NarrowerThanTrigger, AtCap, WiderThanCap]) {
+            const { unmount } = render(<Case />);
+            expect(await screen.findByText(/Notes stay with the session/)).toBeInTheDocument();
+            unmount();
+        }
+    });
+
+    it('renders OneFlatMenu as one open menu', async () => {
+        render(<OneFlatMenu />);
+        expect(await screen.findByRole('menuitem', { name: 'Export notes' })).toBeInTheDocument();
+    });
+
+    it('renders PopupBesidePopup as an open menu with a second Popup open beside it', async () => {
+        render(<PopupBesidePopup />);
+        expect(await screen.findByRole('menuitem', { name: 'Reschedule' })).toBeInTheDocument();
+        expect(await screen.findByText('Choose a format.')).toBeInTheDocument();
     });
 
     it('links TypeCard anchors to unique ComponentExample and heading ids in Popup.mdx', () => {
